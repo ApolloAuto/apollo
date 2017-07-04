@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package apollo.canbus;
+
+import "modules/canbus/proto/chassis.proto";
+
+message VehicleParameter {
+  enum VehicleBrand {
+    LINCOLN_MKZ = 0;
+  }
+
+  optional VehicleBrand brand = 1;
+  optional double max_steer_angle = 2;
+  optional double max_steer_angle_spd = 3;
+  optional double min_steer_angle_spd = 4;
+  optional double max_acc = 5;
+  optional double min_acc = 6;
+  optional double max_brake_pressure = 7;
+  optional double max_engine_pedal = 8;
+  optional int32 max_enable_fail_attempt = 9;
+  optional Chassis.DrivingMode driving_mode = 10;
+}

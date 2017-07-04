@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+import "modules/common/proto/header.proto";
+
+message TrafficLight {
+    enum Color {
+        UNKNOWN = 0;
+        RED = 1;
+        YELLOW = 2;
+        GREEN = 3;
+    };
+    optional Color color = 1;
+
+    // Traffic light string-ID in the map data.
+    optional string id = 2;
+
+    // How confidence about the detected results, between 0 and 1.
+    optional double confidence = 3 [default = 1.0];
+
+    // Duration of the traffic light since detected.
+    optional double tracking_time = 4;
+}
+
+message TrafficLightDetection {
+    optional apollo.common.Header header = 2;
+
+    repeated TrafficLight traffic_light = 1;
+}

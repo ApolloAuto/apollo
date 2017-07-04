@@ -1,0 +1,106 @@
+syntax = "proto2";
+
+package apollo.canbus;
+
+import "modules/common/proto/header.proto";
+
+message Signal {
+  enum TurnSignal {
+    TURN_NONE = 0;
+    TURN_LEFT = 1;
+    TURN_RIGHT = 2;
+  };
+  optional TurnSignal turn_signal = 1;
+  // lights enable command
+  optional bool high_beam = 2;
+  optional bool low_beam = 3;
+  optional bool horn = 4;
+  optional bool emergency_light = 5;
+}
+
+// next id :28
+message Chassis {
+  enum DrivingMode {
+    COMPLETE_MANUAL = 0;  // human drive
+    COMPLETE_AUTO_DRIVE = 1;
+    AUTO_STEER_ONLY = 2;  // only steer
+    AUTO_SPEED_ONLY = 3;  // include throttle and brake
+
+    // security mode when manual intervention happens, only response status
+    EMERGENCY_MODE = 4;
+  }
+
+  // FIXME: To be merged with common::ErrorCode
+  enum ErrorCode {
+    NO_ERROR = 0;
+
+    CMD_NOT_IN_PERIOD = 1;  // control cmd not in period
+
+    // car chassis report error, like steer, brake, throttle, gear fault
+    CHASSIS_ERROR = 2;
+
+    MANUAL_INTERVENTION = 3;  // human manual intervention
+
+    // receive car chassis can frame not in period
+    CHASSIS_CAN_NOT_IN_PERIOD = 4;
+
+    UNKNOWN_ERROR = 5;
+  }
+
+  enum GearPosition {
+    GEAR_NEUTRAL = 0;
+    GEAR_DRIVE = 1;
+    GEAR_REVERSE = 2;
+    GEAR_PARKING = 3;
+    GEAR_LOW = 4;
+    GEAR_INVALID = 5;
+    GEAR_NONE = 6;
+  }
+
+  optional bool engine_started = 3;
+  // Engine speed in RPM.
+  optional float engine_rpm = 4 [default = nan];
+  // Vehicle Speed in meters per second.
+  optional float speed_mps = 5 [default = nan];
+  // Vehicle odometer in meters.
+  optional float odometer_m = 6 [default = nan];
+  // Fuel range in meters.
+  optional int32 fuel_range_m = 7;
+  // Real throttle location in [%], ranging from 0 to 100.
+  optional float throttle_percentage = 8 [default = nan];
+  // Real brake location in [%], ranging from 0 to 100.
+  optional float brake_percentage = 9 [default = nan];
+  // Real gear location.
+  // optional int32 gear_location = 10; deprecated use enum replace this [id 23]
+  // Real steering location in [%], ranging from 0 to 100.
+  optional float steering_percentage = 11 [default = nan];
+  // Applied steering torque in [Nm].
+  optional float steering_torque_nm = 12 [default = nan];
+
+  // Parking brake status.
+  optional bool parking_brake = 13;
+
+
+  optional bool wiper = 19;
+  optional bool disengage_status = 20 [deprecated = true];
+  optional DrivingMode driving_mode = 21 [default = COMPLETE_MANUAL];
+  optional ErrorCode error_code = 22 [default = NO_ERROR];
+  optional GearPosition gear_location = 23;
+
+  // timestamp for steering module
+  optional double steering_timestamp = 24;  // In seconds, with 1e-6 accuracy
+
+  // chassis also needs it own sending timestamp
+  optional apollo.common.Header header = 25;
+
+  optional int32 chassis_error_mask = 26 [default = 0];
+
+  optional Signal signal = 27;
+
+  // Light signals.
+  optional bool high_beam_signal = 14 [deprecated = true];
+  optional bool low_beam_signal = 15 [deprecated = true];
+  optional bool left_turn_signal = 16 [deprecated = true];
+  optional bool right_turn_signal = 17 [deprecated = true];
+  optional bool horn = 18 [deprecated = true];
+}

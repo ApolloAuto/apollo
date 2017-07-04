@@ -1,0 +1,28 @@
+camera:
+  defaults:
+    fov: 60
+    near: 1
+    far: 300
+    viewAngle: 0.5
+  laneWidth: 4.5 # original 3.32
+  laneWidthToViewDistanceRatio: 5
+ground:
+  mpp: 200
+  xres: 8192
+  yres: 8192
+  xorigin: 4096
+  yorigin: 4096
+  mapname: SUNNYVALELOOP
+  xyoffset: 0
+planning:
+  # The minimum interval between two consecutive
+  minInterval: 0.1
+  defaults:
+    width: 1.4
+options:
+  defaults:
+    showConsole: false
+    showPlanning: true
+debug:
+  # Turn this on for monitor related debugging
+  autoMonitorMessage: false

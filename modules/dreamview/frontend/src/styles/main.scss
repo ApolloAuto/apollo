@@ -1,0 +1,487 @@
+@import "media-queries";
+
+@mixin monitor-item-common-properties() {
+    display: flex;
+    list-style-type: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    border-top: 1px solid #333333;
+    padding: 10px;
+    
+    .icon {
+        height: 20px;
+        width: 20px;
+    }
+
+    .text {
+        margin-left: 10px;
+        line-height: 150%;
+        max-width: 200px;
+        font-size: 12px;
+        character: 0px;
+        line: 20px;
+    }
+
+    .alert {
+        color: #D7466F;
+    }
+
+    .warn {
+        color: #A3842D;
+    }
+}
+
+body {
+    margin: 0px;
+    background-color: #031C31 !important;
+    overflow: hidden;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+/* This is the styles for the main canvas of the dreamview container.
+   It is applied to the major <div> of <Dreamview>. */
+.dreamview-canvas {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: -1;
+}
+
+.sidebar {
+    position: absolute;
+    z-index: 100;
+
+    top: 150px;
+    left: 40px;
+
+    @include small-screen {
+        top: 120px;
+        left: 40px;
+    }
+
+    .button {
+        height: 50px;
+        width: 130px;
+        border: none;
+        padding: 0px;
+        font-size: 15px;
+        color: #ffffff;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .button:focus {
+        outline: 0;
+    }
+
+    .button:active {
+        color: #30A5FF;
+    }
+
+    .active {
+        color: #30A5FF;
+    }
+
+    .button-corner {
+        clip-path: polygon(0% 0%, 80% 0%, 100% 50%, 100% 100%, 0% 100%);
+    }
+
+    .separator {
+        display: inline-block;
+        vertical-align: middle;
+        border-left:1px solid #38546d; 
+        height: 30px;
+    }
+
+    .console {
+        background-color: rgba(74, 5, 24, 0.3);
+        border: none;
+        margin: 0px;
+        padding: 0px;
+        width: 260px;
+        height: 300px;
+        overflow: scroll;
+        overflow-x: hidden;
+
+        // Adjust the scrollbar style.
+        
+        &::-webkit-scrollbar-track {
+	    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	    background-color: #555555;
+        }
+
+        &::-webkit-scrollbar {
+	    width: 5px;
+	    background-color: #F5F5F5;
+        }
+
+        &::-webkit-scrollbar-thumb {
+	    background-color: #30A5FF;
+        }
+        
+        .monitor-item {
+            @include monitor-item-common-properties();
+        }
+    }
+}
+
+.notification-warn {
+    @include monitor-item-common-properties();
+
+    margin-top: 20px;
+    border: 1px solid #A3842D;
+    background-color: rgba(52, 39, 5, 0.3);
+}
+
+.notification-alert {
+    @include monitor-item-common-properties();
+
+    margin-top: 20px;
+    border: 1px solid #D7466F;
+    background-color: rgba(74, 5, 24, 0.3);
+}
+
+.status-bar {
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+    background: linear-gradient(to bottom,
+                                rgba(3, 38, 68, 1) 0%,
+                                rgba(3, 38, 68, 1) 65%,
+                                rgba(4, 36, 65, 1) 70%,
+                                rgba(4, 36, 65, 0));
+
+    min-height: 650px;
+    
+    @include small-screen {
+        min-height: 450px;
+    }
+    
+    .label-text {
+        font-size: 15px;
+        color: #778899;
+
+        @include small-screen {
+            font-size: 14px;
+        }
+    }
+
+    .status-background {
+        width: 100%;
+        height: 300px;
+
+        @include small-screen {
+            height: 200px;
+        }
+    }
+
+    /* The Apollo logo on the status bar. */
+    .apollo-logo {
+        position: absolute;
+
+        top: 40px;
+        left: 40px;
+        height: 46px;
+        width: 141px;
+
+        @include small-screen {
+            top: 28px;
+            left: 40px;
+            height: 27.6px;
+            width: 84.6px;
+        }
+    }
+
+    .throttle-panel {
+        position: absolute;
+
+        top: 30px;
+        right: 172px;
+        width: 100px;
+        height: 200px;
+
+        @include small-screen {
+            top: 20px;
+            right: 112px;
+            width: 75px;
+            height: 150px;
+        }
+    }
+
+    .brake-panel {
+        position: absolute;
+        
+        top: 30px;
+        right: 72px;
+        width: 100px;
+        height: 200px;
+
+        @include small-screen {
+            top: 20px;
+            right: 37px;
+            width: 75px;
+            height: 150px;
+        }
+    }
+
+    .speed-unit {
+        position: absolute;
+        color: #fff;
+
+        font-size: 10px;
+        top: 122px;
+        right: 118px;
+
+        @include small-screen {
+            font-size: 8px;
+            top: 98px;
+            right: 102px;
+        }
+    }
+
+    .speed-panel {
+        position: absolute;
+        text-align: center;
+        color: #fff;
+        width: 100px;
+        height: 100px;
+
+        top: 85px;
+        right: 122px;
+        
+        @include small-screen {
+            top: 56px;
+            right: 62px;
+        }
+
+        .speed-read {
+            font-family: Arial;
+            font-weight: lighter;
+
+            font-size: 50px;
+
+            @include small-screen {
+                font-size: 36px;
+            }
+        }
+
+        .driving-mode {
+            font-family: Arial;
+            font-weight: 300;
+            color: #30A5FF;
+
+            margin-top: 5px;
+            font-size: 18px;
+            
+            @include small-screen {
+                margin-top: 15px;
+                font-size: 13px;
+            }
+        }
+    }
+
+    .meter-text-accelerator {
+        position: absolute;
+        color: #ffffff;
+
+        top: 240px;
+        right: 190px;
+
+        @include small-screen {
+            top: 175px;
+            right: 135px;
+        }
+    }
+
+    .meter-text-brake {
+        position: absolute;
+        color: #ffffff;
+
+        top: 240px;
+        right: 80px;
+
+        @include small-screen {
+            top: 175px;
+            right: 35px;
+        }
+    }
+
+    .wheel {
+        position: absolute;
+
+        top: 30px;
+        right: 420px;
+
+        @include small-screen {
+            top: 20px;
+            right: 300px;
+        }
+
+        .wheel-background {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            z-index: 5;
+
+            width: 200px;
+            height: 130px;
+            
+            @include small-screen {
+                width: 140px;
+                height: 91px;
+            }
+        }
+
+        .wheel-image {
+            position: absolute;
+            z-index: 10;
+
+            top: 28px;
+            right: 62px;
+            width: 76px;
+            height: 76px;
+
+            @include small-screen {
+                top: 19.6px;
+                right: 43.4px;
+                width: 53.2px;
+                height: 53.2px;
+            }
+        }
+
+        .left-arrow {
+            position: absolute;
+            z-index: 10;
+
+            top: 55px;
+            right: 170px;
+            width: 19px;
+            height: 22px;
+
+            @include small-screen {
+                top: 38.5px;
+                right: 119px;
+                width: 13.3px;
+                height: 15.4px;
+            }
+        }
+
+        .right-arrow {
+            position: absolute;
+            z-index: 10;
+
+            top: 55px;
+            right: 10px;
+            width: 19px;
+            height: 22px;
+
+            @include small-screen {
+                top: 38.5px;
+                right: 7px;
+                width: 13.3px;
+                height: 15.4px;
+            }
+        }
+
+        .left-label-text {
+            position: absolute;
+            color: #ffffff;
+
+            top: 58px;
+            right: 210px;
+
+            @include small-screen {
+                top: 40.6px;
+                right: 147px;
+            }
+        }
+
+        .right-label-text {
+            position: absolute;
+            color: #ffffff;
+
+            top: 58px;
+            right: -50px;
+
+            @include small-screen {
+                top: 40.6px;
+                right: -35px;
+            }
+        }
+    }
+
+    .traffic-light-indicator {
+        position: absolute;
+
+        top: 180px;
+        right: 590px;
+
+        @include small-screen {
+            top: 126px;
+            right: 420px;
+        }
+        
+        .green {
+            position: absolute;
+
+            top: 0px;
+            left: 0px;
+            width: 40px;
+            height: 40px;
+
+            @include small-screen {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        .yellow {
+            position: absolute;
+
+            top: 0px;
+            left: 50px;
+            width: 40px;
+            height: 40px;
+
+            @include small-screen {
+                left: 35px;
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        .red {
+            position: absolute;
+
+            top: 0px;
+            left: 100px;
+            width: 40px;
+            height: 40px;
+
+            @include small-screen {
+                left: 70px;
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        .traffic-light-label-text {
+            position: absolute;
+            color: #ffffff;
+
+            top: 60px;
+            left: 25px;
+            width: 200px;
+
+            @include small-screen {
+                top: 48px;
+                left: 4px;
+                width: 140px;
+            }
+        }
+    }
+}

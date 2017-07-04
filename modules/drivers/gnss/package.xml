@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package>
+  <name>gnss_driver</name>
+  <version>1.0.0</version>
+  <description>The GNSS driver package</description>
+
+  <maintainer email="info@apollo.auto">Apollo Authors</maintainer>
+
+  <license>Licensed under the Apache License, Version 2.0 </license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <run_depend>nodelet</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <nodelet plugin="${prefix}/nodelets.xml"/>
+  </export>
+</package>

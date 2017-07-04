@@ -1,0 +1,79 @@
+* Redistributions of source code must retain all third party copyright notice.
+* Redistributions in binary form must reproduce all third party copyright notice
+  in the documentation and/or other materials provided with the distribution.
+
+* bazel:
+    Apache 2.0
+    https://github.com/bazelbuild/bazel/blob/master/LICENSE
+* Boost:
+    Boost Software License 1.0
+    http://www.boost.org/users/license.html
+    http://www.boost.org/LICENSE_1_0.txt
+* Bootstrap
+    MIT License
+    https://github.com/twbs/bootstrap/blob/master/LICENSE
+* Buildify
+    Apache 2.0
+    https://github.com/bazelbuild/bazel/blob/master/LICENSE
+* civetweb
+    MIT
+    https://github.com/civetweb/civetweb/blob/master/LICENSE.md
+* cpplint
+    BSD 3-clause "New" or "Revised" License
+    https://github.com/cpplint/cpplint/blob/master/LICENSE
+* curlpp
+    https://github.com/jpbarrette/curlpp/blob/master/doc/LICENSE
+* Docker
+    Apache License 2.0
+    https://www.docker.com/components-licenses
+* Eigen
+    Mozilla Public License version 2.0
+    http://eigen.tuxfamily.org/index.php?title=Licensing_FAQ
+* FastCDR
+    Apache License 2.0
+    https://github.com/eProsima/Fast-CDR/blob/master/LICENSE
+* Fast RTPS
+    Apache License 2.0
+    https://github.com/eProsima/Fast-RTPS/blob/release/1.4.0/LICENSE
+* gflags
+    BSD 3-clause "New" or "Revised" License
+    https://github.com/gflags/gflags/blob/master/COPYING.txt
+* glog
+    BSD 3-Clause License
+    https://github.com/google/glog/blob/master/COPYING
+* grpc
+    Apache License 2.0
+    https://github.com/grpc/grpc/blob/master/LICENSE
+* gtest
+    https://github.com/google/googletest/blob/master/googletest/LICENSE
+* libcurl4-openssl-dev
+    MIT/X derivate license
+    https://curl.haxx.se/docs/copyright.html
+* jQuery
+    MIT License
+    https://jquery.org/license/
+* JSON
+    MIT License
+    https://github.com/nlohmann/json/blob/develop/LICENSE.MIT
+* PaddlePaddle
+    Apache License 2.0
+    https://github.com/PaddlePaddle/Paddle/blob/develop/LICENSE
+* Protocol Buffer
+    https://github.com/google/protobuf/blob/master/LICENSE
+* Protobuf Rules
+    Apache License 2.0
+    https://github.com/pubref/rules_protobuf/blob/master/LICENSE
+* python-eventlet
+    MIT
+    http://eventlet.net/
+* python-requests
+    Apache2 License
+    http://docs.python-requests.org/en/master/user/intro/#apache2-license
+* ROS
+    Apache License 2.0
+    http://docs.ros.org/diamondback/api/licenses.html
+* socketio
+    MIT License
+    https://github.com/socketio/socket.io-client/blob/master/LICENSE
+* websocketpp
+    https://github.com/zaphoyd/websocketpp/blob/master/COPYING

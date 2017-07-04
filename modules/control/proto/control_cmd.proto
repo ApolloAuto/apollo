@@ -1,0 +1,115 @@
+syntax = "proto2";
+package apollo.control;
+
+import "modules/canbus/proto/chassis.proto";
+import "modules/common/proto/header.proto";
+import "modules/control/proto/pad_msg.proto";
+
+enum TurnSignal {
+  TURN_NONE = 0;
+  TURN_LEFT = 1;
+  TURN_RIGHT = 2;
+}
+
+message LatencyStats {
+  optional double total_time_ms = 1;
+  repeated double controller_time_ms = 2;
+}
+
+message ControlCommand {
+  optional apollo.common.Header header = 1;
+  // target throttle in percentage [0, 100]
+  optional double throttle = 3;
+
+  // target brake in percentage [0, 100]
+  optional double brake = 4;
+
+  // target steering rate, in percentage of full scale per second [-100, 100]
+  optional double steering_rate = 6;
+
+  // target steerig angle, in percentage of full scalce [-100, 100]
+  optional double steering_target = 7;
+
+  // parking brake engage. true: engaged
+  optional bool parking_brake = 8;
+
+  // target speed, in km/h
+  optional double speed = 9;
+
+  // target acceleration in m`s^-2
+  optional double acceleration = 10;
+
+  // model reset
+  optional bool reset_model = 16 [deprecated = true];
+  // engine on/off, true: engine on
+  optional bool engine_on_off = 17;
+  // completion percentage of trajectory planned in last cycle
+  optional double trajectory_fraction = 18;
+  optional apollo.canbus.Chassis.DrivingMode driving_mode = 19 [deprecated = true];
+  optional apollo.canbus.Chassis.GearPosition gear_location = 20;
+
+  optional Debug debug = 22;
+  optional apollo.canbus.Signal signal = 23;
+  optional LatencyStats latency_stats = 24;
+  optional PadMessage pad_msg = 25;
+
+  // deprecated fields
+  optional bool left_turn = 13 [deprecated = true];
+  optional bool right_turn = 14 [deprecated = true];
+  optional bool high_beam = 11 [deprecated = true];
+  optional bool low_beam = 12 [deprecated = true];
+  optional bool horn = 15 [deprecated = true];
+  optional TurnSignal turnsignal = 21 [deprecated = true];
+}
+
+message SimpleLongitudinalDebug {
+  optional double station_reference = 1;
+  optional double station_error = 2;
+  optional double station_error_limited = 3;
+  optional double preview_station_error = 4;
+  optional double speed_reference = 5;
+  optional double speed_error = 6;
+  optional double speed_controller_input_limited = 7;
+  optional double preview_speed_reference = 8;
+  optional double preview_speed_error = 9;
+  optional double preview_acceleration_reference = 10;
+  optional double acceleration_cmd_closeloop = 11;
+  optional double acceleration_cmd = 12;
+  optional double acceleration_lookup = 13;
+  optional double speed_lookup = 14;
+  optional double calibration_value = 15;
+  optional double throttle_cmd = 16;
+  optional double brake_cmd = 17;
+  optional bool is_full_stop = 18;
+}
+
+message SimpleLateralDebug {
+  optional double lateral_error = 1;
+  optional double ref_heading = 2;
+  optional double heading = 3;
+  optional double heading_error = 4;
+  optional double heading_error_rate = 5;
+  optional double lateral_error_rate = 6;
+  optional double curvature = 7;
+  optional double steer_angle = 8;
+  optional double steer_angle_feedforward = 9;
+  optional double steer_angle_lateral_contribution = 10;
+  optional double steer_angle_lateral_rate_contribution = 11;
+  optional double steer_angle_heading_contribution = 12;
+  optional double steer_angle_heading_rate_contribution = 13;
+  optional double steer_angle_feedback = 14;
+  optional double steering_position = 15;
+  optional double ref_speed = 16;
+}
+
+message InputDebug {
+  optional apollo.common.Header localization_header = 1;
+  optional apollo.common.Header canbus_header = 2;
+  optional apollo.common.Header trajectory_header = 3;
+  }
+
+message Debug {
+  optional SimpleLongitudinalDebug simple_lon_debug = 1;
+  optional SimpleLateralDebug simple_lat_debug = 2;
+  optional InputDebug input_debug = 3;
+}
