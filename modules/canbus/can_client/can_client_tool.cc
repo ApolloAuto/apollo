@@ -185,7 +185,6 @@ class CanAgent {
     AINFO << "Receive thread starting...";
     TestCanParam* param = param_ptr();
     CanClient* client = param->can_client;
-    std::stringstream ss("");
     int64_t start = 0;
     std::vector<CanFrame> buf;
 
