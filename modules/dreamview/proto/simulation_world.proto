@@ -1,0 +1,197 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+import "modules/common/monitor/proto/monitor.proto";
+import "modules/decision/proto/decision.proto";
+import "modules/planning/proto/planning.proto";
+
+// Next-id: 4
+message PolygonPoint {
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3 [default = 0.0];
+}
+
+// Next-id: 3
+message Prediction {
+  optional double probability = 1;
+  repeated PolygonPoint predicted_trajectory = 2;
+}
+
+// Next-id: 12
+message Decision {
+  enum Type {
+    IGNORE = 0; // Ignore the object
+    STOP = 1; // Stop at a distance from the object
+    NUDGE = 2; // Go around the object
+    YIELD = 3; // Go after the object
+    OVERTAKE = 4; // Go before the object
+    FOLLOW = 5; // Follow the object in the same lane
+    SIDEPASS = 6; // Pass the object in neighbouring lane
+  }
+  required Type type = 1 [default = IGNORE];
+
+  // Shape Info
+  // Can be used for corners of nudge region
+  repeated PolygonPoint polygon_point = 2;
+
+  // Position Info
+  // Can be used for stop fence
+  optional double heading = 3;
+  optional double latitude = 4;
+  optional double longitude = 5;
+  optional double position_x = 6;
+  optional double position_y = 7;
+  optional double length = 8 [default = 2.8];
+  optional double width = 9 [default = 1.4];
+  optional double height = 10 [default = 1.8];
+
+  enum StopReasonCode {
+    STOP_REASON_HEAD_VEHICLE = 1;
+    STOP_REASON_DESTINATION = 2;
+    STOP_REASON_PEDESTRIAN = 3;
+    STOP_REASON_OBSTACLE = 4;
+    STOP_REASON_SIGNAL = 100;
+    STOP_REASON_STOP_SIGN = 101;
+    STOP_REASON_YIELD_SIGN = 102;
+    STOP_REASON_CLEAR_ZONE = 103;
+    STOP_REASON_CROSSWALK = 104;
+    STOP_REASON_EMERGENCY = 105;
+    STOP_REASON_NOT_READY = 106;
+  }
+  optional StopReasonCode stopReason = 11;
+}
+
+// Next-id: 32
+message Object {
+  // ID
+  optional string id = 1;  // primary identifier for each object
+
+  // Shape Info
+  repeated PolygonPoint polygon_point = 2;  // corners of an object
+
+  // Position Info
+  optional double heading = 3;
+  optional double latitude = 4;
+  optional double longitude = 5;
+  optional double position_x = 6;
+  optional double position_y = 7;
+  optional double length = 8 [default = 2.8];
+  optional double width = 9 [default = 1.4];
+  optional double height = 10 [default = 1.8];
+
+  // Motion Info
+  // For objects with motion info such as ADC.
+  optional double speed = 11; // in m/s
+  optional double speed_acceleration = 12; // in m/s^2
+  optional double speed_jerk = 13;
+  optional double spin = 14;
+  optional double spin_acceleration = 15;
+  optional double spin_jerk = 16;
+  optional double speed_heading = 30;
+
+  // Signal Info
+  // For objects with signals set and current signal such as Traffic Light and Stop Sign.
+  repeated string signal_set = 17;
+  optional string current_signal = 18;
+
+  // Time Info
+  optional double timestamp_sec = 19;
+
+  // Decision Info
+  repeated Decision decision = 20;
+  // ADC decision results
+  optional .apollo.decision.DecisionResult adc_decision_result = 29;
+  // ADC planning trajectory
+  optional .apollo.planning.ADCTrajectory adc_trajectory = 31;
+
+  // Chassis Info
+  // For ADC
+  optional double throttle_percentage = 21;
+  optional double brake_percentage = 22;
+  optional double steering_angle = 23;
+  enum DisengageType {
+    DISENGAGE_NONE = 0;
+    DISENGAGE_UNKNOWN = 1;
+    DISENGAGE_MANUAL = 2;
+  };
+
+  optional DisengageType disengage_type = 24;
+
+  enum Type {
+    UNKNOWN = 0;
+    UNKNOWN_MOVABLE = 1;
+    UNKNOWN_UNMOVABLE = 2;
+    PEDESTRIAN = 3;  // pedestrian, usually determined by moving behaviour.
+    BICYCLE = 4;  // bike, motor bike.
+    VEHICLE = 5;  // passenger car or truck.
+    VIRTUAL = 6; // virtual object created by decision module.
+  };
+
+  optional Type type = 25;  // obstacle type
+  repeated Prediction prediction = 26;
+}
+
+message DelayItem {
+    optional uint32 delay = 1;
+    optional uint32 last_delay = 2;
+}
+
+message Delay {
+    optional DelayItem adc_status = 1;
+    optional DelayItem decision = 2;
+    optional DelayItem localization = 3;
+    optional DelayItem localization_pcl = 4;
+    optional DelayItem perception_obstacle = 5;
+    optional DelayItem perception_radar = 6;
+    optional DelayItem planning_trajectory = 7;
+    optional DelayItem prediction= 8;
+    optional DelayItem traffic_light = 10;
+}
+
+// Next-id: 2
+message Debug {
+    optional string novatel_position_type = 1;
+}
+
+// Next-id: 30
+message SimulationWorld {
+  // Time
+  optional double timestamp_sec = 1;
+
+  // Objects in the world and the associated predictions/decisions
+  repeated Object object = 3;
+
+  // Autonomous driving cars
+  optional Object auto_driving_car = 4;
+
+  // Traffic light status
+  optional Object traffic_signal = 6;
+
+  // Routing path
+  repeated PolygonPoint route = 7;
+
+  // Planned trajectory
+  repeated Object planning_trajectory = 8;
+
+  // Main stop
+  optional Object main_stop = 9;
+
+  // Speed limit
+  optional double speed_limit = 10;
+
+  // Map Hashcode
+  optional string map_md5 = 11;
+
+  optional Delay delay = 17;
+
+  // Relative time w.r.t. the begin time of rosbag
+  optional double relative_time_sec = 18;
+
+  optional string decision_task_name = 19;
+
+  optional Debug debug_log = 26;
+
+  optional .apollo.common.monitor.MonitorMessage monitor = 29;
+}

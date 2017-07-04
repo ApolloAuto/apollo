@@ -1,0 +1,12 @@
+a: gear_location = chassis_pb2.Chassis.GEAR_DRIVE
+a: brake = 40.0
+a: steering_target = 0.0
+a: throttle = 0.0
+c: vehicle_speed == 0.0
+t: 2.0 
+a: brake = 0.0
+a: throttle = 60.0
+c: vehicle_speed >= 11.0
+a: throttle = 15.0
+a: brake = 0.0
+c: vehicle_speed == 0.0

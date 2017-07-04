@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.hmi;
+
+
+service HMIRosNode {
+  rpc ChangeDrivingMode(ChangeDrivingModeRequest) returns (ChangeDrivingModeResponse) {}
+}
+
+
+message ChangeDrivingModeRequest {
+  enum Action {
+    RESET_TO_MANUAL = 1;
+    START_TO_AUTO = 2;
+  }
+
+  optional Action action = 1;
+}
+
+message ChangeDrivingModeResponse {
+  enum Result {
+    UNKNOWN = 1;
+    SUCCESS = 2;
+    FAIL = 3;
+  }
+
+  optional Result result = 1;
+}

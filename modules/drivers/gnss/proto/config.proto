@@ -1,0 +1,92 @@
+syntax = "proto2";
+
+package apollo.drivers.gnss.config;
+
+message Stream {
+    enum Format {
+        UNKNOWN = 0;
+        NMEA = 1;
+        RTCM_V2 = 2;
+        RTCM_V3 = 3;
+
+        NOVATEL_TEXT = 10;
+        NOVATEL_BINARY = 11;
+
+        UBLOX_TEXT = 20;
+        UBLOX_BINARY = 21;
+    }
+    optional Format format = 1;
+
+    message Serial {
+        optional bytes device = 1;  // Something like "/dev/ttyXXX".
+        optional int32 baud_rate = 2 [default = 9600];
+        // In general, we assumes no parity, 8 data bits, 1 stop bit, no handshaking, break
+        // detection enabled. If not, add more fields here.
+    }
+
+    message Tcp {
+        optional bytes address = 1;  // Something like "192.168.10.6".
+        optional int32 port = 2 [default = 3001];
+    }
+
+    message Udp {
+        optional bytes address = 1;  // Something like "192.168.10.6".
+        optional int32 port = 2 [default = 3001];
+    }
+
+    message Ntrip {
+        optional bytes address = 1;  // Something like "1.1.1.1".
+        optional int32 port = 2 [default = 2101];
+        optional bytes mount_point = 3;  // Something like "demo".
+        optional bytes user = 4;
+        optional bytes password = 5;
+        optional uint32 timeout_s = 6 [default = 30];
+    }
+
+    oneof type {
+        Serial serial = 2;
+        Tcp tcp = 3;
+        Udp udp = 4;
+        Ntrip ntrip = 5;
+    }
+}
+
+// Device-specific configuration.
+message NovatelConfig {
+    // See Page 75 of SPAN on OEM6 Firmware Reference Manual for details.
+    optional int32 imu_orientation = 1 [default = 5];
+}
+
+message UbloxConfig {
+}
+
+message Config {
+    // The driver reads data from this port. This port should always be provided.
+    optional Stream data = 1;
+
+    // If given, the driver sends commands to this port. If not given, the driver sends commands to
+    // the data port.
+    optional Stream command = 2;
+
+    // The driver gets RTK correction data from this remote port. Usually this is an NTRIP port.
+    optional Stream rtk_from = 3;
+
+    // If given, the driver sends RTK correction data to this port. If not given, the driver sends
+    // RTK correction data to the data port.
+    optional Stream rtk_to = 4;
+
+    repeated bytes login_commands = 5;
+
+    repeated bytes logout_commands = 6;
+
+    oneof device_config {
+        NovatelConfig novatel_config = 7;
+        UbloxConfig ublox_config = 8;
+    }
+
+    enum RtkSolutionType {
+        RTK_RECEIVER_SOLUTION = 1;
+        RTK_SOFTWARE_SOLUTION = 2;
+    }
+    optional RtkSolutionType rtk_solution_type = 9;
+}

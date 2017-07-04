@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.localization;
+
+message LocalizationConfig {
+  enum LocalizationType {
+    RTK = 0;
+    CAMERA = 1;
+  };
+  optional LocalizationType localization_type = 1 [default = RTK];
+}

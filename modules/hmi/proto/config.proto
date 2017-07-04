@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+package apollo.hmi;
+
+
+message Command {
+  optional string name = 1;
+
+  // Command components, in [cmd, arg1, arg2, ...] format.
+  // Binary path starting with '/' indicates an absolute path, otherwise it will
+  // be taken as a relative path of the Apollo root.
+  repeated string command = 2;
+
+  // Log file paths.
+  // Note that only files under /apollo/data can be viewed from HMI.
+  optional string stdout_file = 3 [default = '/dev/null'];
+  optional string stderr_file = 4 [default = '/dev/null'];
+  repeated string log_files = 5;
+}
+
+message Component {
+  optional string name = 1;
+  optional string display_name = 2;
+  repeated Command supported_commands = 3;
+}
+
+message Config {
+  repeated Component modules = 1;
+  repeated Component hardware = 2;
+  repeated Command tools = 3;
+}

@@ -1,0 +1,55 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+import "modules/common/proto/header.proto";
+
+// FIXME: To be merged with common::ErrorCode
+enum PerceptionErrorCode {
+    ERROR_NONE = 0;
+    ERROR_TF = 1;
+    ERROR_PROCESS = 2;
+    ERROR_UNKNOWN = 3;
+}
+
+message Point {
+    optional double x = 1;  // in meters.
+    optional double y = 2;  // in meters.
+    optional double z = 3;  // height in meters.
+}
+
+message PerceptionObstacle {
+    optional int32 id = 1;  // obstacle ID.
+    optional Point position = 2;  // obstacle position in the world coordinate system.
+    optional double theta = 3;  // heading in the world coordinate system.
+    optional Point velocity = 4;  // obstacle velocity.
+
+    // Size of obstacle bounding box.
+    optional double length = 5;  // obstacle length.
+    optional double width = 6;  // obstacle width.
+    optional double height = 7;  // obstacle height.
+
+    repeated Point polygon_point = 8;  // obstacle corner points.
+    optional double tracking_time = 9;  // duration of an obstacle since detection in s.
+
+    enum Type {
+        UNKNOWN = 0;
+        UNKNOWN_MOVABLE = 1;
+        UNKNOWN_UNMOVABLE = 2;
+        PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behaviour.
+        BICYCLE = 4;  // bike, motor bike
+        VEHICLE = 5;  // Passenger car or truck.
+    };
+    optional Type type = 10;  // obstacle type
+    optional double timestamp = 11;  // GPS time in seconds.
+
+    // Just for offline debuging, onboard will not fill this field.
+    // Format like : [x0, y0, z0, x1, y1, z1...]
+    repeated double point_cloud = 12 [packed = true];
+}
+
+message PerceptionObstacles {
+    repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
+    optional apollo.common.Header header = 2;  // Header
+    optional PerceptionErrorCode error_code = 3 [default = ERROR_NONE];
+}
