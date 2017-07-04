@@ -158,7 +158,7 @@ For more information about the CAN-PCIe/402, see:
 There are **two** GPS-IMU **options** available,and the choice depends upon the one that most fits your needs:
 
 - **Option 1: NovAtel SPAN-IGM-A1**
-- **Option 2: NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1 **
+- **Option 2: NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1**
 
 ### Option 1: The NovAtel SPAN-IGM-A1
 
@@ -503,7 +503,7 @@ The following two diagrams indicate the locations of where the three major compo
 
 This section provides general information about installing **one** of two choices:
 
-- **Option 1: **GPS-IMU: **NovAtel SPAN-IGM-A1**
+- **Option 1:** GPS-IMU: **NovAtel SPAN-IGM-A1**
 - **Option 2:** GPS-IMU: **NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1**
 
 #### Option 1: Installing the NovAtel SPAN-IGM-A1
