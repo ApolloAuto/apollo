@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.drivers.gnss.gpgga;
+
+message GPGGA {
+    required string gpgga = 1;
+}

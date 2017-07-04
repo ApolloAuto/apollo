@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.localization;
+
+import "modules/common/proto/header.proto";
+import "modules/localization/proto/pose.proto";
+
+message Imu {
+  optional apollo.common.Header header = 1;
+
+  // Inertial Measurement Unit(IMU)
+  optional apollo.localization.Pose imu = 3;
+}

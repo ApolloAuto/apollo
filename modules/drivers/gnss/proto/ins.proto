@@ -1,0 +1,60 @@
+syntax = "proto2";
+
+package apollo.drivers.gnss;
+
+import "modules/common/proto/header.proto";
+import "modules/common/proto/geometry.proto";
+
+// Solution from a inertial navigation system (INS), which usually fuses GNSS and IMU measurements.
+message Ins {
+    optional apollo.common.Header header = 1;
+
+    // The time of position measurement, seconds since the GPS epoch (Jan 6, 1980).
+    optional double measurement_time = 2;  // In seconds.
+
+    // INS solution type.
+    enum Type {
+        // Do NOT use.
+        INVALID = 0;  // Invalid solution due to insufficient observations, no initial GNSS, ...
+
+        // Use with caution. The covariance matrix may be unavailable or incorrect.
+        CONVERGING = 1;  // High-variance result due to aligning, insufficient vehicle dynamics, ...
+
+        // Safe to use. The INS has fully converged.
+        GOOD = 2;
+    }
+    optional Type type = 3;
+
+    // Position of the IMU.
+    optional apollo.common.PointLLH position = 4;
+
+    // Roll/pitch/yaw that represents a rotation of the intrinsic sequence z-y-x.
+    // Note: our definition differs from what NovAtel and aviation use.
+    optional apollo.common.Point3D euler_angles = 5;  // Roll/pitch/yaw in radians.
+
+    optional apollo.common.Point3D linear_velocity = 6;  // East/north/up in meters per second.
+
+    optional apollo.common.Point3D angular_velocity = 7;  // Around forward/left/up axes in radians per second.
+
+    optional apollo.common.Point3D linear_acceleration = 8;  // Forward/left/up in meters per square second.
+
+    // The size of a covariance matrix field may be
+    //  3: then the elements are xx, yy, zz.
+    //  9: then the elements are xx, xy, xz, yx, yy, yz, zx, zy, zz.
+    // If the field size is not 3 or 9, treat the field invalid.
+
+    // 3-by-3 covariance matrix, in m^2.
+    repeated float position_covariance = 9 [packed = true];
+
+    // 3-by-3 covariance matrix, in rad^2.
+    repeated float euler_angles_covariance = 10 [packed = true];
+
+    // 3-by-3 covariance matrix, in m^2/s^2.
+    repeated float linear_velocity_covariance = 11 [packed = true];
+
+    // 3-by-3 covariance matrix, in rad^2/s^2.
+    repeated float angular_velocity_covariance = 12 [packed = true];
+
+    // 3-by-3 covariance matrix, in m^2/s^4.
+    repeated float linear_acceleration_covariance = 13 [packed = true];
+}

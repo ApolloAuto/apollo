@@ -1,0 +1,7 @@
+header {
+  timestamp_sec: 1494373003.683531
+  module_name: "control"
+  sequence_num: 1
+}
+driving_mode: COMPLETE_MANUAL
+action: START

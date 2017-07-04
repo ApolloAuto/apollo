@@ -1,0 +1,41 @@
+syntax = "proto2";
+
+package apollo.common.adapter;
+
+// Property of a certain Input/Output that will be used by a module.
+message AdapterConfig {
+  enum MessageType {
+    POINT_CLOUD = 1;
+    GPS = 2;
+    IMU = 3;
+    CHASSIS = 4;
+    LOCALIZATION = 5;
+    PLANNING_TRAJECTORY = 6;
+    MONITOR = 7;
+    PAD = 8;
+    CONTROL_COMMAND = 9;
+    PREDICTION = 10;
+    PERCEPTION_OBSTACLES = 11;
+    TRAFFIC_LIGHT_DETECTION = 12;
+    CHASSIS_DETAIL = 13;
+    DECISION = 14;
+    CANBUS = 15;
+  }
+  enum Mode {
+    RECEIVE_ONLY = 0;
+    PUBLISH_ONLY = 1;
+    DUPLEX = 2;
+  }
+  required MessageType type = 1;
+  required Mode mode = 2;
+  // The max number of received messages to keep in the adapter, this field
+  // is not useful for PUBLISH_ONLY mode messages.
+  optional int32 message_history_limit = 3 [default = 10];
+}
+
+// A config to specify which messages a certain module would consume and
+// produce.
+message AdapterManagerConfig {
+  repeated AdapterConfig config = 1;
+  required bool is_ros = 2;  // Whether the message comes from ROS
+}

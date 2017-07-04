@@ -1,0 +1,53 @@
+header {
+  module_name: "control"
+  sequence_num: 1
+}
+throttle: 0
+brake: 28.483080798929389
+steering_rate: 100
+steering_target: 0.38721622899752267
+driving_mode: COMPLETE_MANUAL
+gear_location: GEAR_DRIVE
+debug {
+  simple_lon_debug {
+    station_reference: 0
+    station_error: -24.80340189188103
+    station_error_limited: -3
+    preview_station_error: -24.80340189188103
+    speed_reference: 0
+    speed_error: -2.672269178903619
+    speed_controller_input_limited: -2.9722691789036189
+    preview_speed_reference: 0
+    preview_speed_error: -2.672269178903619
+    preview_acceleration_reference: -5.4248076728e-06
+    acceleration_cmd: -3
+    acceleration_lookup: -3
+    speed_lookup: 2.6861112117767334
+    calibration_value: -28.483080798929389
+    throttle_cmd: 0
+    brake_cmd: 28.483080798929389
+    is_full_stop: true
+  }
+  simple_lat_debug {
+    lateral_error: 1.4650921125973442
+    ref_heading: 1.30368721847
+    heading: 1.24020744288
+    heading_error: -0.063479775589999843
+    heading_error_rate: -0.63479775589999843
+    lateral_error_rate: 14.650921125973442
+    curvature: -0.00202858508204
+    steer_angle: 0.38721622899752267
+    steer_angle_feedforward: -0.57166132202304087
+    steer_angle_lateral_contribution: -11.383587723701474
+    steer_angle_lateral_rate_contribution: -2.0358749627117025
+    steer_angle_heading_contribution: 12.420159664453241
+    steer_angle_heading_rate_contribution: 2.1717223240517005
+    steer_angle_feedback: 1.172419302091763
+    steering_position: 0.29787233471870422
+    ref_speed: 2.6861112117767334
+  }
+}
+latency_stats {
+  controller_time_ms: 1.4789104461669922
+  controller_time_ms: 0.12564659118652344
+}

@@ -1,0 +1,158 @@
+modules {
+  name: "GPS"
+  display_name: "GPS Driver"
+  supported_commands {
+    name: "start"
+    command: "scripts/gps.sh"
+    command: "start"
+    stdout_file: "data/log/gnss_driver.stdout"
+    stderr_file: "data/log/gnss_driver.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/gps.sh"
+    command: "stop"
+    stdout_file: "data/log/gnss_driver.stdout"
+    stderr_file: "data/log/gnss_driver.stderr"
+  }
+}
+modules {
+  name: "control"
+  display_name: "Control"
+  supported_commands {
+    name: "start"
+    command: "scripts/control.sh"
+    command: "start"
+    stdout_file: "data/log/control.stdout"
+    stderr_file: "data/log/control.stderr"
+    log_files: "data/log/control.INFO"
+    log_files: "data/log/control.ERROR"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/control.sh"
+    command: "stop"
+    stdout_file: "data/log/control.stdout"
+    stderr_file: "data/log/control.stderr"
+  }
+}
+modules {
+  name: "canbus"
+  display_name: "CAN Bus"
+  supported_commands {
+    name: "start"
+    command: "scripts/canbus.sh"
+    command: "start"
+    stdout_file: "data/log/canbus.stdout"
+    stderr_file: "data/log/canbus.stderr"
+    log_files: "data/log/canbus.INFO"
+    log_files: "data/log/canbus.ERROR"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/canbus.sh"
+    command: "stop"
+    stdout_file: "data/log/canbus.stdout"
+    stderr_file: "data/log/canbus.stderr"
+  }
+}
+modules {
+  name: "localization"
+  display_name: "Localization"
+  supported_commands {
+    name: "start"
+    command: "scripts/localization.sh"
+    command: "start"
+    stdout_file: "data/log/localization.stdout"
+    stderr_file: "data/log/localization.stderr"
+    log_files: "data/log/localization.INFO"
+    log_files: "data/log/localization.ERROR"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/localization.sh"
+    command: "stop"
+    stdout_file: "data/log/localization.stdout"
+    stderr_file: "data/log/localization.stderr"
+  }
+}
+modules {
+  name: "dreamview"
+  display_name: "Dreamview"
+  supported_commands {
+    name: "start"
+    command: "scripts/dreamview.sh"
+    command: "start"
+    stdout_file: "data/log/dreamview.stdout"
+    stderr_file: "data/log/dreamview.stderr"
+    log_files: "data/log/dreamview.INFO"
+    log_files: "data/log/dreamview.ERROR"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/dreamview.sh"
+    command: "stop"
+    stdout_file: "data/log/dreamview.stdout"
+    stderr_file: "data/log/dreamview.stderr"
+  }
+}
+modules {
+  name: "apollo_record"
+  display_name: "Apollo Data Record"
+  supported_commands {
+    name: "start"
+    command: "scripts/apollo_record.sh"
+    command: "start"
+    stdout_file: "data/log/apollo_record.stdout"
+    stderr_file: "data/log/apollo_record.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/apollo_record.sh"
+    command: "stop"
+    stdout_file: "data/log/apollo_record.stdout"
+    stderr_file: "data/log/apollo_record.stderr"
+  }
+}
+tools {
+  name: "start_recording"
+  command: "scripts/run_rtk_recorder.sh"
+  stdout_file: "data/log/rtk_recorder.stdout"
+  stderr_file: "data/log/rtk_recorder.stderr"
+}
+tools {
+  name: "stop_recording"
+  command: "scripts/stop_rtk_recorder.sh"
+  stdout_file: "data/log/stop_rtk_recorder.stdout"
+  stderr_file: "data/log/stop_rtk_recorder.stderr"
+}
+tools {
+  name: "start_player"
+  command: "scripts/run_rtk_player.sh"
+  stdout_file: "data/log/rtk_player.stdout"
+  stderr_file: "data/log/rtk_player.stderr"
+}
+tools {
+  name: "stop_player"
+  command: "scripts/stop_rtk_player.sh"
+  stdout_file: "data/log/stop_rtk_player.stdout"
+  stderr_file: "data/log/stop_rtk_player.stderr"
+}
+hardware {
+  name: "GPS"
+  display_name: "GPS"
+  supported_commands {
+    name: "health_check"
+    command: "scripts/hw_check.sh"
+    command: "gps"
+  }
+}
+hardware {
+  name: "ESD_CAN-0"
+  display_name: "CAN"
+  supported_commands {
+    name: "health_check"
+    command: "scripts/hw_check.sh"
+    command: "can"
+  }
+}

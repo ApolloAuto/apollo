@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package apollo.common;
+
+// Error codes enum for API's categorized by modules.
+enum ErrorCode {
+  // No error, reutrns on success.
+  OK = 0;
+
+  // Control module error codes start from here.
+  CONTROL_ERROR = 1000;
+  CONTROL_INIT_ERROR = 1001;
+  CONTROL_COMPUTE_ERROR = 1002;
+
+  // Canbus module error codes start from here.
+  CANBUS_ERROR = 2000;
+  CAN_CLIENT_ERROR_BASE = 2100;
+  CAN_CLIENT_ERROR_OPEN_DEVICE_FAILED = 2101;
+  CAN_CLIENT_ERROR_FRAME_NUM = 2102;
+  CAN_CLIENT_ERROR_SEND_FAILED = 2103;
+  CAN_CLIENT_ERROR_RECV_FAILED = 2104;
+
+  // Localization module error codes start from here.
+  LOCALIZATION_ERROR = 3000;
+}
+
+message StatusPb {
+	optional ErrorCode error_code = 1 [default = OK];
+	optional string msg = 2;
+}

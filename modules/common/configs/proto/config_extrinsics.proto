@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.common.config;
+
+import "modules/common/proto/geometry.proto";
+
+message Transform {
+  optional bytes source_frame = 1;  // Also known as "frame_id."
+
+  optional bytes target_frame = 2;  // Also known as "child_frame_id."
+
+  // Position of target in the source frame.
+  optional Point3D translation = 3;
+
+  // Activate rotation from the source frame to the target frame.
+  optional Quaternion rotation = 4;
+}
+
+message Extrinsics {
+  repeated Transform tansforms = 1;
+}
