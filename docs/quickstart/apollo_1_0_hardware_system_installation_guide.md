@@ -426,7 +426,7 @@ After having the release package downloaded:
 ```
 tar zxvf linux-4.4.32-apollo-1.0.0.tar.gz
 cd install
-sudo ./install_kernel.sh
+sudo bash install_kernel.sh
 ```
 3. Build the ESD CAN driver source code
 
