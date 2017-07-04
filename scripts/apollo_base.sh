@@ -102,7 +102,9 @@ if [ "$RELEASE_DOCKER" == 1 ];then
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib
     export PYTHONPATH=/apollo/lib:${PYTHONPATH}
 else
-    source "${APOLLO_ROOT_DIR}/third_party/ros/setup.bash"
+    if [ -e "${APOLLO_ROOT_DIR}/third_party/ros/setup.bash" ]; then
+       source "${APOLLO_ROOT_DIR}/third_party/ros/setup.bash"
+    fi
     export PYTHONPATH=${APOLLO_ROOT_DIR}/bazel-genfiles:${PYTHONPATH}
 fi
 
