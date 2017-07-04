@@ -180,6 +180,7 @@ function release() {
   LIB_DIR=$ROOT_DIR/lib
   mkdir $LIB_DIR
   if $USE_ESD_CAN; then
+    warn_proprietary_sw
     for m in esd_can
     do
         cp third_party/can_card_library/$m/lib/* $LIB_DIR
@@ -200,9 +201,6 @@ function release() {
   META=${ROOT_DIR}/meta.txt
   echo "Git commit: $(git show --oneline  -s | awk '{print $1}')" > $META
   echo "Build time: $TIME" >>  $META
-  if $USE_ESD_CAN; then
-    warn_proprietary_sw
-  fi
 }
 
 function gen_coverage() {
