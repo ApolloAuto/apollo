@@ -378,19 +378,6 @@ bool RawStream::logout() {
   return true;
 }
 
-std::string RawStream::status_string(Stream::Status status) {
-  switch (status) {
-    case Stream::Status::DISCONNECTED:
-      return std::string("disconnected");
-
-    case Stream::Status::ERROR:
-      return std::string("error");
-
-    default:
-      return std::string("ok.");
-  }
-}
-
 void RawStream::stream_status_check() {
   bool status_report = false;
   apollo::common::gnss_status::StreamStatus_Type report_stream_status;
@@ -449,7 +436,6 @@ void RawStream::ntrip_spin() {
     return;
   }
   while (ros::ok()) {
-    size_t ret = 0;
     size_t length = _in_rtk_stream->read(_buffer_ntrip, BUFFER_SIZE);
     if (length > 0) {
       if (_rtk_software_solution) {
@@ -465,7 +451,7 @@ void RawStream::ntrip_spin() {
         if (_out_rtk_stream == nullptr) {
           continue;
         }
-        ret = _out_rtk_stream->write(_buffer_ntrip, length);
+        size_t ret = _out_rtk_stream->write(_buffer_ntrip, length);
         if (ret != length) {
           ROS_ERROR_STREAM("Expect write out rtk stream bytes "
                            << length << " but got " << ret);
@@ -474,6 +460,7 @@ void RawStream::ntrip_spin() {
     }
   }
 }
+
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo

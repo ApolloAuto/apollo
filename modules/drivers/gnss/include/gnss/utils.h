@@ -14,13 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef DRIVERS_GNSS_UTILS_H
-#define DRIVERS_GNSS_UTILS_H
+#ifndef MODULES_DRIVERS_GNSS_UTILS_H_
+#define MODULES_DRIVERS_GNSS_UTILS_H_
 
 #include <string>
 
 #include "proto/config.pb.h"
-//#include "modules/drivers/gnss/proto/config.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -34,4 +33,4 @@ std::string encode_base64(const std::string& in);
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // DRIVERS_GNSS_UTILS_H
+#endif  // MODULES_DRIVERS_GNSS_UTILS_H_
