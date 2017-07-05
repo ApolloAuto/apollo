@@ -282,7 +282,6 @@ size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
 }
 
 size_t TcpStream::write(const uint8_t* buffer, size_t length) {
-  ssize_t nsent = 0;
   size_t total_nsent = 0;
 
   if (_status != Stream::Status::CONNECTED) {
@@ -294,7 +293,7 @@ size_t TcpStream::write(const uint8_t* buffer, size_t length) {
   }
 
   while (length > 0) {
-    nsent = ::send(_sockfd, buffer, length, 0);
+    ssize_t nsent = ::send(_sockfd, buffer, length, 0);
     if (nsent < 0) {
       if (errno == EINTR) {
         continue;
