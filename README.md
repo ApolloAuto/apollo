@@ -39,7 +39,7 @@ Follow the steps below to launch Apollo:
 bash scripts/hmi.sh
 ```
 ### Access HMI
-Access HMI by openning your favorite browser, e.g. Chrome, go to http://localhost:8887, click Dreamview to start.
+Access HMI by opening your favorite browser, e.g. Chrome, go to http://localhost:8887, click Dreamview to start.
 ![HMI Enable Dreamview](docs/demo_guide/images/dreamview_enable.png)
 
 
