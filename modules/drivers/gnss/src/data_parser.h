@@ -19,9 +19,9 @@
 
 #include <memory>
 
+#include <proj_api.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <proj_api.h>
 
 #include "gnss/parser.h"
 #include "proto/config.pb.h"
@@ -33,44 +33,46 @@
 #include "proto/gnss_status.pb.h"
 
 namespace apollo {
-namespace drivers{
+namespace drivers {
 namespace gnss {
 
 class DataParser {
-public:
-    DataParser(ros::NodeHandle& nh, const std::string &raw_data_topic,
-               const std::string &gpgga_topic,
-               const std::string &corr_imu_topic, const std::string &odometry_topic,
-               const std::string &gnss_status_topic, const std::string &ins_status_topic);
-    ~DataParser() {}
-    bool init(const std::string &cfg_file);
-private:
-    void raw_data_callback(const std_msgs::String::ConstPtr& msg);
-    void dispatch_message(Parser::MessageType type, MessagePtr message);
-    void publish_odometry_pb_message(const MessagePtr message);
-    void publish_corrimu_pb_message(const MessagePtr message);
-    void check_ins_status(::apollo::drivers::gnss::Ins *ins);
-    void check_gnss_status(::apollo::drivers::gnss::Gnss *gnss);
+ public:
+  DataParser(ros::NodeHandle &nh, const std::string &raw_data_topic,
+             const std::string &gpgga_topic, const std::string &corr_imu_topic,
+             const std::string &odometry_topic,
+             const std::string &gnss_status_topic,
+             const std::string &ins_status_topic);
+  ~DataParser() {}
+  bool init(const std::string &cfg_file);
 
-    bool _inited_flag = false;
-    std::unique_ptr<Parser> _data_parser;
+ private:
+  void raw_data_callback(const std_msgs::String::ConstPtr &msg);
+  void dispatch_message(Parser::MessageType type, MessagePtr message);
+  void publish_odometry_pb_message(const MessagePtr message);
+  void publish_corrimu_pb_message(const MessagePtr message);
+  void check_ins_status(::apollo::drivers::gnss::Ins *ins);
+  void check_gnss_status(::apollo::drivers::gnss::Gnss *gnss);
 
-    const ros::Subscriber _raw_data_sub;
-    const ros::Publisher _gpgga_publisher;
-    const ros::Publisher _imu_publisher;
-    const ros::Publisher _nav_odometry_publisher;
-    const ros::Publisher _gnss_status_publisher;
-    const ros::Publisher _ins_status_publisher;
+  bool _inited_flag = false;
+  std::unique_ptr<Parser> _data_parser;
 
-    boost::shared_ptr<apollo::common::gnss_status::GnssStatus> _gnss_status;
-    boost::shared_ptr<apollo::common::gnss_status::InsStatus> _ins_status;
-    uint32_t _ins_status_record = static_cast<uint32_t>(0);
-    projPJ _wgs84pj_source;
-    projPJ _utm_target;
+  const ros::Subscriber _raw_data_sub;
+  const ros::Publisher _gpgga_publisher;
+  const ros::Publisher _imu_publisher;
+  const ros::Publisher _nav_odometry_publisher;
+  const ros::Publisher _gnss_status_publisher;
+  const ros::Publisher _ins_status_publisher;
+
+  boost::shared_ptr<apollo::common::gnss_status::GnssStatus> _gnss_status;
+  boost::shared_ptr<apollo::common::gnss_status::InsStatus> _ins_status;
+  uint32_t _ins_status_record = static_cast<uint32_t>(0);
+  projPJ _wgs84pj_source;
+  projPJ _utm_target;
 };
 
-} // namespace gnss
-} // namespace drivers
-} // namespace apollo
+}  // namespace gnss
+}  // namespace drivers
+}  // namespace apollo
 
 #endif

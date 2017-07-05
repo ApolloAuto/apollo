@@ -18,36 +18,37 @@
 #define DRIVERS_GNSS_TCP_STREAM_H
 
 namespace apollo {
-namespace drivers{
+namespace drivers {
 namespace gnss {
 
 class TcpStream : public Stream {
-typedef uint16_t  be16_t;
-typedef uint32_t  be32_t;
-public:
-    TcpStream(const char* address, uint16_t port, uint32_t timeout_usec);
-    ~TcpStream();
+  typedef uint16_t be16_t;
+  typedef uint32_t be32_t;
 
-    virtual bool connect();
-    virtual bool disconnect();
-    virtual size_t read(uint8_t* buffer, size_t max_length);
-    virtual size_t write(const uint8_t* data, size_t length);
+ public:
+  TcpStream(const char* address, uint16_t port, uint32_t timeout_usec);
+  ~TcpStream();
 
-private:
-    bool readable(uint32_t timeout_us);
-    TcpStream() {}
-    void open();
-    void close();
-    bool init_socket();
-    be16_t _peer_port = 0;
-    be32_t _peer_addr = 0;
-    uint32_t _timeout_usec = 0;
-    int _sockfd = -1;
-    int _errno = 0;
+  virtual bool connect();
+  virtual bool disconnect();
+  virtual size_t read(uint8_t* buffer, size_t max_length);
+  virtual size_t write(const uint8_t* data, size_t length);
+
+ private:
+  bool readable(uint32_t timeout_us);
+  TcpStream() {}
+  void open();
+  void close();
+  bool init_socket();
+  be16_t _peer_port = 0;
+  be32_t _peer_addr = 0;
+  uint32_t _timeout_usec = 0;
+  int _sockfd = -1;
+  int _errno = 0;
 };
 
-} // namespace gnss
-} // namespace drivers
-} // namespace apollo
+}  // namespace gnss
+}  // namespace drivers
+}  // namespace apollo
 
 #endif
