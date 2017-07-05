@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 """HMI ros node service restful Api."""
 
 import httplib
@@ -72,5 +71,6 @@ class RosServiceApi(flask_restful.Resource):
             return error_msg, httplib.BAD_REQUEST
 
         status.broadcast_status_if_changed()
-        glog.info('Processed command "{}", and get response:{}'.format(cmd_name, response))
+        glog.info('Processed command "{}", and get response:{}'.format(
+            cmd_name, response))
         return 'OK', httplib.OK

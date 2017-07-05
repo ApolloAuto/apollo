@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 """
 Control Planning Analyzer
 """
@@ -164,10 +163,8 @@ class ControlInfo(object):
             entity.debug.simple_lon_debug.preview_acceleration_reference)
         self.acc_close.append(
             entity.debug.simple_lon_debug.acceleration_cmd_closeloop)
-        self.station_error.append(
-            entity.debug.simple_lon_debug.station_error)
-        self.speed_error.append(
-            entity.debug.simple_lon_debug.speed_error)
+        self.station_error.append(entity.debug.simple_lon_debug.station_error)
+        self.speed_error.append(entity.debug.simple_lon_debug.speed_error)
 
         self.curvature.append(entity.debug.simple_lat_debug.curvature)
         self.heading_error.append(entity.debug.simple_lat_debug.heading_error)
@@ -240,13 +237,9 @@ class ControlInfo(object):
         self.ax[1, 1].plot(self.controltime, self.acc_open, label='Acc Open')
         self.ax[1, 1].plot(self.controltime, self.acc_close, label='Acc Close')
         self.ax[1, 1].plot(
-            self.controltime,
-            self.station_error,
-            label='station_error')
+            self.controltime, self.station_error, label='station_error')
         self.ax[1, 1].plot(
-            self.controltime,
-            self.speed_error,
-            label='speed_error')
+            self.controltime, self.speed_error, label='speed_error')
         self.ax[1, 1].legend(fontsize='medium')
         self.ax[1, 1].grid(True)
         self.ax[1, 1].set_title('IMU Info')
