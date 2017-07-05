@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef DRIVERS_GNSS_RAW_STREAM_H
-#define DRIVERS_GNSS_RAW_STREAM_H
+#ifndef MODULES_DRIVERS_GNSS_RAW_STREAM_H_
+#define MODULES_DRIVERS_GNSS_RAW_STREAM_H_
 
 #include <memory>
 #include <thread>
@@ -52,7 +52,6 @@ class RawStream {
   bool login();
   bool logout();
   void stream_status_check();
-  std::string status_string(Stream::Status status);
 
   static constexpr size_t BUFFER_SIZE = 2048;
   uint8_t _buffer[BUFFER_SIZE];
@@ -82,7 +81,9 @@ class RawStream {
   std::unique_ptr<std::thread> _data_thread_ptr;
   std::unique_ptr<std::thread> _ntrip_thread_ptr;
 };
-}
-}
-}
-#endif
+
+}  // namespace apollo
+}  // namespace drivers
+}  // namespace gnss
+
+#endif  // MODULES_DRIVERS_GNSS_RAW_STREAM_H_

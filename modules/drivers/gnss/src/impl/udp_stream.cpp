@@ -198,7 +198,6 @@ size_t UdpStream::read(uint8_t* buffer, size_t max_length) {
 }
 
 size_t UdpStream::write(const uint8_t* data, size_t length) {
-  ssize_t nsent = 0;
   size_t total_nsent = 0;
   struct sockaddr_in peer_sockaddr;
   bzero(&peer_sockaddr, sizeof(peer_sockaddr));
@@ -207,8 +206,9 @@ size_t UdpStream::write(const uint8_t* data, size_t length) {
   peer_sockaddr.sin_addr.s_addr = _peer_addr;
 
   while (length > 0) {
-    nsent = ::sendto(_sockfd, data, length, 0, (struct sockaddr*)&peer_sockaddr,
-                     (socklen_t)sizeof(peer_sockaddr));
+    ssize_t nsent =
+        ::sendto(_sockfd, data, length, 0, (struct sockaddr*)&peer_sockaddr,
+                 (socklen_t)sizeof(peer_sockaddr));
     if (nsent < 0) {  // error
       if (errno == EINTR) {
         continue;

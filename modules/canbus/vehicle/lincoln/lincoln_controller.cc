@@ -665,14 +665,13 @@ bool LincolnController::CheckResponse(const int32_t flags, bool need_wait) {
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;
-  bool check_ok = false;
 
   do {
     if (message_manager_->GetChassisDetail(&chassis_detail) != ErrorCode::OK) {
       AERROR << "get chassis detail failed.";
       return false;
     }
-    check_ok = true;
+    bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
       is_eps_online = chassis_detail.has_check_response() &&
                       chassis_detail.check_response().has_is_eps_online() &&

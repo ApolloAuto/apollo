@@ -306,6 +306,7 @@ void DataParser::publish_corrimu_pb_message(const MessagePtr message) {
       << " s.");
   _imu_publisher.publish(imu);
 }
-}
-}
-}
+
+}  // namespace gnss
+}  // namespace drivers
+}  // namespace apollo

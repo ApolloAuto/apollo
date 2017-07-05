@@ -16,8 +16,8 @@
 
 // This defines an stream interface for communication via USB, Ethernet, etc.
 
-#ifndef DRIVERS_GNSS_STREAM_H
-#define DRIVERS_GNSS_STREAM_H
+#ifndef MODULES_DRIVERS_GNSS_STREAM_H_
+#define MODULES_DRIVERS_GNSS_STREAM_H_
 
 #include <ros/ros.h>
 #include <stdint.h>
@@ -107,4 +107,4 @@ class Stream {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // DRIVERS_GNSS_STREAM_H
+#endif  // MODULES_DRIVERS_GNSS_STREAM_H_

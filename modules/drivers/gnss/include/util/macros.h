@@ -17,8 +17,8 @@
 // Commonly-used macro definitions. Some of them are copied from
 // https://chromium.googlesource.com/chromium/src/base/+/master/macros.h
 
-#ifndef APOLLO_DRIVERS_GNSS_INCLUDE_UTIL_MACROS_H
-#define APOLLO_DRIVERS_GNSS_INCLUDE_UTIL_MACROS_H
+#ifndef MODULES_DRIVERS_GNSS_INCLUDE_UTIL_MACROS_H_
+#define MODULES_DRIVERS_GNSS_INCLUDE_UTIL_MACROS_H_
 
 #include <cstddef>
 
@@ -65,4 +65,4 @@ constexpr size_t array_size(T (&)[N]) {
 
 }  // namespace apollo
 
-#endif  // APOLLO_DRIVERS_GNSS_INCLUDE_UTIL_MACROS_H
+#endif  // MODULES_DRIVERS_GNSS_INCLUDE_UTIL_MACROS_H_
