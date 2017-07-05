@@ -26,6 +26,7 @@ import mkz_polygon
 import gflags
 from gflags import FLAGS
 
+
 def find_closest_t(points_t, current_t):
     if len(points_t) == 0:
         return -1

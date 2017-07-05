@@ -50,7 +50,6 @@ class RtkPlayer(object):
     rtk player class
     """
 
-
     def __init__(self, record_file, speedmultiplier, completepath, replan):
         """Init player."""
         self.firstvalid = False
@@ -81,7 +80,7 @@ class RtkPlayer(object):
 
         b, a = signal.butter(6, 0.05, 'low')
         self.data['acceleration'] = signal.filtfilt(b, a,
-            self.data['acceleration'])
+                                                    self.data['acceleration'])
 
         self.start = 0
         self.end = 0
