@@ -16,7 +16,12 @@ RUN apt-get update && apt-get install -y \
     realpath \
     tmux \
     unzip \
-    wget
+    wget  \
+    libtinyxml-dev \
+    libpoco-dev \
+    libproj-dev \
+    liblz4-dev \
+    libconsole-bridge-dev
 
 RUN apt-get clean autoclean && apt-get autoremove -y
 RUN rm -fr /var/lib/apt/lists/*
