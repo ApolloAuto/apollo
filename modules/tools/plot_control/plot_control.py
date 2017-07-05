@@ -16,14 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
+import sys
 import rospy
+import gflags
+from gflags import FLAGS
 from std_msgs.msg import String
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import gflags
-from gflags import FLAGS
 
-import sys
 from modules.control.proto import control_cmd_pb2
 
 BRAKE_LINE_DATA = []
