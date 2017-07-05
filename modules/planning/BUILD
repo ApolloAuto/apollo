@@ -21,7 +21,7 @@ cc_library(
         "//modules/planning/planner:lib_planner",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 

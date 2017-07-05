@@ -24,7 +24,7 @@
 #include "modules/monitor/hwmonitor/hw_check/hw_chk_utils.h"
 
 #include "modules/common/proto/gnss_status.pb.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 using apollo::platform::HwCheckResult;
 using apollo::platform::hw::Status;

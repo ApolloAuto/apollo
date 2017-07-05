@@ -14,7 +14,7 @@ cc_library(
         "//modules/common/time",
         "//modules/decision/common:decision_common",
         "//modules/decision/proto:decision_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
         "@glog//:glog",
     ],
 )
@@ -28,7 +28,7 @@ cc_binary(
         "//modules/decision:lib_decision",
         "//modules/decision/common:decision_common",
         "//modules/decision/proto:decision_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 

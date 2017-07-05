@@ -23,7 +23,7 @@
 #include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "third_party/ros/include/std_msgs/String.h"
+#include "ros/include/std_msgs/String.h"
 
 namespace apollo {
 namespace control {

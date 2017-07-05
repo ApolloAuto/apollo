@@ -25,7 +25,7 @@
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::perception
