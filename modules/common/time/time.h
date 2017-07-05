@@ -153,8 +153,8 @@ class Clock {
    * @return a Timestamp object representing the current time.
    */
   static Timestamp Now() {
-    return Clock::instance()->is_system_clock_ ? SystemNow()
-                                               : Clock::instance()->mock_now_;
+    return instance()->is_system_clock_ ? SystemNow()
+                                               : instance()->mock_now_;
   }
 
   /**
@@ -164,21 +164,21 @@ class Clock {
    * provided with FALSE, it will use the mock clock instead.
    */
   static void UseSystemClock(bool is_system_clock) {
-    Clock::instance()->is_system_clock_ = is_system_clock;
+    instance()->is_system_clock_ = is_system_clock;
   }
 
   /**
    * @brief Check whether the \class Clock instance is using system clock.
    * @return TRUE if it is using system clock, and FALSE otherwise.
    */
-  static bool IsSystemClock() { return Clock::instance()->is_system_clock_; }
+  static bool IsSystemClock() { return instance()->is_system_clock_; }
 
   /**
    * @brief This is for mock clock mode only. It will set the timestamp
    * for the mock clock.
    */
   static void SetNow(const Duration &duration) {
-    Clock *clock = Clock::instance();
+    Clock *clock = instance();
     if (clock->is_system_clock_) {
       throw std::runtime_error("Cannot set now when using system clock!");
     }
