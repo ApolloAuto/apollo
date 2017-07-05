@@ -14,14 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <glog/logging.h>
 #include <chrono>
 #include <mutex>
 #include <thread>
+
+#include <glog/logging.h>
+
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/proto/pad_msg.pb.h"
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;

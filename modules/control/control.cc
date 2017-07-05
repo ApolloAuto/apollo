@@ -17,13 +17,15 @@
 
 #include <string>
 
+#include "ros/include/std_msgs/String.h"
+
+#include "modules/localization/proto/localization.pb.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "ros/include/std_msgs/String.h"
 
 namespace apollo {
 namespace control {

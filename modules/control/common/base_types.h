@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_CONTROL_COMMON_BASE_TYPES_H_
 #define MODULES_CONTROL_COMMON_BASE_TYPES_H_
 
@@ -58,4 +59,4 @@ struct TrajectoryPoint : public PathPoint {
 }  // namespace control
 }  // namespace apollo
 
-#endif /* MODULES_CONTROL_COMMON_BASE_TYPES_H_ */
+#endif  // MODULES_CONTROL_COMMON_BASE_TYPES_H_

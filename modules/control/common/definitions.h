@@ -18,6 +18,7 @@
 #define MODULES_CONTROL_COMMON_DEFINITIONS_H_
 
 #include "modules/common/proto/error_code.pb.h"
+
 #include "modules/common/status/status.h"
 
 /**
