@@ -25,7 +25,7 @@ cc_binary(
         "//modules/common:log",
         "//modules/perception/common:perception_common",
         "//modules/perception/proto:perception_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 

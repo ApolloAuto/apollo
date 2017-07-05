@@ -25,7 +25,7 @@
 #include "modules/common/macro.h"
 #include "modules/common/time/time.h"
 #include "modules/control/proto/control_cmd.pb.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 // gflags
 DEFINE_double(throttle_inc_delta, 2.0,

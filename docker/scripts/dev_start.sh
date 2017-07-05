@@ -103,9 +103,6 @@ function main(){
         --shm-size 512M \
         $IMG
     docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
-    docker exec apollo_dev bash -c 'rm -rf /apollo/third_party/ros_*'
-    docker exec apollo_dev bash -c 'cp -Lr /root/ros_* /apollo/third_party/'
-    docker exec apollo_dev bash -c "chown -R ${USER}:${USER} /apollo"
 }
 
 main

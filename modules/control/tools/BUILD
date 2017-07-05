@@ -12,7 +12,7 @@ cc_binary(
         "//modules/common/adapters:adapter_manager",
         "//modules/control/common",
         "//modules/control/proto:control_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 
@@ -24,7 +24,7 @@ cc_binary(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_manager",
         "//modules/control/common",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 
@@ -38,7 +38,7 @@ cc_binary(
         "//modules/control/common:control_gflags",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 
