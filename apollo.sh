@@ -46,6 +46,7 @@ IS_AARCH64=false
 
 BUILD_TARGETS=""
 TEST_TARGETS=""
+CAN_CARD="fake_can"
 
 rm -rf ./third_party/ros
 if [ "$MACHINE_ARCH" == 'x86_64' ]; then
@@ -67,6 +68,7 @@ function check_esd_files() {
       -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4 \
       -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4.0.1 ]; then
       USE_ESD_CAN=true
+      CAN_CARD="esd_can"
   else
       warning "${YELLOW}ESD CAN library supplied by ESD Electronics does not exit.${NO_COLOR}"
       warning "${YELLOW}If you need ESD CAN, please refer to third_party/can_card_library/esd_can/README.md${NO_COLOR}"
