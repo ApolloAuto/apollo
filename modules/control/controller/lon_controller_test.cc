@@ -23,15 +23,15 @@
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
-#include "modules/common/log.h"
 
+#include "modules/control/proto/control_conf.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+
+#include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/proto/control_conf.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -56,7 +56,7 @@ class LonControllerTest : public ::testing::Test, LonController {
         "modules/control/testdata/conf/lincoln.pb.txt";
 
     CHECK(apollo::common::util::GetProtoFromFile(control_conf_file,
-                                                       &control_conf));
+                                                 &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
     timestamp_ = apollo::common::time::ToSecond(Clock::Now());
@@ -77,7 +77,7 @@ class LonControllerTest : public ::testing::Test, LonController {
   }
 
  protected:
-  LocalizationPb LoadLocalizationPb(const std::string& filename) {
+  LocalizationPb LoadLocalizationPb(const std::string &filename) {
     LocalizationPb localization;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &localization))
         << "Failed to open file " << filename;
@@ -85,7 +85,7 @@ class LonControllerTest : public ::testing::Test, LonController {
     return std::move(localization);
   }
 
-  ChassisPb LoadChassisPb(const std::string& filename) {
+  ChassisPb LoadChassisPb(const std::string &filename) {
     ChassisPb chassis_pb;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
@@ -93,10 +93,9 @@ class LonControllerTest : public ::testing::Test, LonController {
     return std::move(chassis_pb);
   }
 
-  TrajectoryPb LoadPlanningTrajectoryPb(const std::string& filename) {
+  TrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
     TrajectoryPb trajectory_pb;
-    CHECK(
-        apollo::common::util::GetProtoFromFile(filename, &trajectory_pb))
+    CHECK(apollo::common::util::GetProtoFromFile(filename, &trajectory_pb))
         << "Failed to open file " << filename;
 
     trajectory_pb.mutable_header()->set_timestamp_sec(timestamp_);
@@ -127,8 +126,8 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   double preview_time = longitudinal_conf_.preview_window() * ts;
 
   SimpleLongitudinalDebug debug;
-  ComputeLongitudinalErrors(vehicle_state, &trajectory_analyzer,
-                                         preview_time, &debug);
+  ComputeLongitudinalErrors(vehicle_state, &trajectory_analyzer, preview_time,
+                            &debug);
 
   double station_reference_expected = 0.16716666937000002;
   double speed_reference_expected = 1.70833337307;
