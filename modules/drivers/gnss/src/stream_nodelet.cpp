@@ -16,9 +16,9 @@
 
 #include <signal.h>
 
-#include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+#include <ros/ros.h>
 
 #include "gnss/stream.h"
 #include "raw_stream.h"
@@ -26,60 +26,60 @@
 namespace {
 
 void init_signal(void) {
-    signal(SIGPIPE, SIG_IGN); //ignore SIGPIPE
-    signal(SIGSYS, SIG_IGN); //ignore SIGSYS
+  signal(SIGPIPE, SIG_IGN);  // ignore SIGPIPE
+  signal(SIGSYS, SIG_IGN);   // ignore SIGSYS
 }
-
 }
 
 namespace apollo {
-namespace drivers{
+namespace drivers {
 namespace gnss {
 
 class StreamNodelet : public nodelet::Nodelet {
-public:
-    StreamNodelet() {}
-    ~StreamNodelet() {}
+ public:
+  StreamNodelet() {}
+  ~StreamNodelet() {}
 
-private:
-    virtual void onInit();
-    std::unique_ptr<RawStream> _raw_stream;
-
+ private:
+  virtual void onInit();
+  std::unique_ptr<RawStream> _raw_stream;
 };
 
 void StreamNodelet::onInit() {
-    ros::NodeHandle& nh = getPrivateNodeHandle();
-    std::string gnss_conf;
-    std::string raw_data_topic;
-    std::string rtcm_data_topic;
-    std::string stream_status_topic;
+  ros::NodeHandle& nh = getPrivateNodeHandle();
+  std::string gnss_conf;
+  std::string raw_data_topic;
+  std::string rtcm_data_topic;
+  std::string stream_status_topic;
 
+  nh.param("gnss_conf", gnss_conf, std::string("./conf/gnss_conf.txt"));
+  nh.param("raw_data_topic", raw_data_topic,
+           std::string("/apollo/sensor/gnss/raw_data"));
+  nh.param("rtcm_data_topic", rtcm_data_topic,
+           std::string("/apollo/sensor/gnss/rtcm_data"));
+  nh.param("stream_status_topic", stream_status_topic,
+           std::string("/apollo/sensor/gnss/stream_status"));
 
-    nh.param("gnss_conf", gnss_conf, std::string("./conf/gnss_conf.txt"));
-    nh.param("raw_data_topic", raw_data_topic, std::string("/apollo/sensor/gnss/raw_data"));
-    nh.param("rtcm_data_topic", rtcm_data_topic, std::string("/apollo/sensor/gnss/rtcm_data"));
-    nh.param("stream_status_topic", stream_status_topic, std::string("/apollo/sensor/gnss/stream_status"));
+  ROS_INFO_STREAM("gnss conf: " << gnss_conf);
+  ROS_INFO_STREAM("raw data topic: " << raw_data_topic);
 
-    ROS_INFO_STREAM("gnss conf: " << gnss_conf);
-    ROS_INFO_STREAM("raw data topic: " << raw_data_topic);
-
-    init_signal();
-    _raw_stream.reset(new RawStream(nh, getName(), raw_data_topic, rtcm_data_topic, stream_status_topic));
-    if (!_raw_stream->init(gnss_conf)) {
-        ROS_ERROR("Init stream nodelet failed.");
-        ROS_ERROR_STREAM("Init stream nodelet failed.");
-        return;
-    }
-    ROS_INFO("Init stream nodelet success.");
+  init_signal();
+  _raw_stream.reset(new RawStream(nh, getName(), raw_data_topic,
+                                  rtcm_data_topic, stream_status_topic));
+  if (!_raw_stream->init(gnss_conf)) {
+    ROS_ERROR("Init stream nodelet failed.");
+    ROS_ERROR_STREAM("Init stream nodelet failed.");
+    return;
+  }
+  ROS_INFO("Init stream nodelet success.");
 }
 
-} // namespace gnss
-} // namespace drivers
-} // namespace apollo
+}  // namespace gnss
+}  // namespace drivers
+}  // namespace apollo
 
 // Register this plugin with pluginlib.  Names must match nodelet_gnss.xml.
 //
 // parameters: package, class name, class type, base class type
 PLUGINLIB_DECLARE_CLASS(gnss_driver, StreamNodelet,
-        apollo::drivers::gnss::StreamNodelet, nodelet::Nodelet);
-
+                        apollo::drivers::gnss::StreamNodelet, nodelet::Nodelet);
