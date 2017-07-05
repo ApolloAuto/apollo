@@ -18,11 +18,12 @@
 
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
+#include "ros/include/ros/ros.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "third_party/ros/include/ros/ros.h"
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;

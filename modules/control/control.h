@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CONTROL_CONTROL_H_
-#define CONTROL_CONTROL_H_
+#ifndef MODULES_CONTROL_CONTROL_H_
+#define MODULES_CONTROL_CONTROL_H_
 
 #include <cstdio>
 #include <memory>
@@ -23,16 +23,16 @@
 #include <string>
 
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/apollo_app.h"
-#include "modules/common/monitor/monitor.h"
 #include "modules/common/monitor/proto/monitor.pb.h"
-#include "modules/common/util/util.h"
-#include "modules/control/controller/controller_agent.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "std_msgs/String.h"
+
+#include "modules/common/apollo_app.h"
+#include "modules/common/monitor/monitor.h"
+#include "modules/common/util/util.h"
+#include "modules/control/controller/controller_agent.h"
 
 /**
  * @namespace apollo::control
@@ -126,4 +126,4 @@ class Control : public apollo::common::ApolloApp {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // CONTROL_CONTROL_H_
+#endif  // MODULES_CONTROL_CONTROL_H_
