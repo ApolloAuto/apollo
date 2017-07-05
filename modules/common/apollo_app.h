@@ -29,7 +29,7 @@
 #include "modules/common/status/status.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
 
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::common

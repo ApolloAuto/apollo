@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 #include "modules/canbus/can_client/can_client.h"
 #include "modules/canbus/can_comm/can_receiver.h"

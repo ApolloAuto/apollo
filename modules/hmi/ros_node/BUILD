@@ -13,7 +13,7 @@ cc_binary(
         "//modules/control/common",
         "//modules/control/proto:control_proto",
         "//modules/hmi/proto:ros_node_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
         "@com_github_google_protobuf//:protobuf",
     ],
 )

@@ -27,7 +27,7 @@
 #include "modules/common/util/file.h"
 #include "modules/control/integration_tests/control_test_base.h"
 #include "modules/control/proto/control_cmd.pb.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 DEFINE_string(test_chassis_file, "", "chassis input file");
 DEFINE_string(test_data_dir, "", "the test data folder");

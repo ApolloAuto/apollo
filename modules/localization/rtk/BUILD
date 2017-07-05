@@ -21,7 +21,7 @@ cc_library(
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 

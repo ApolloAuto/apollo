@@ -5,7 +5,7 @@ cc_library(
     deps = [
         ":log",
         ":macro",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
         "@glog//:glog",
     ],
 )
@@ -38,7 +38,7 @@ cc_library(
     deps = [
         "//modules/common/status",
         "//modules/hmi/utils:hmi_status_helper",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
         "@glog//:glog",
     ],
 )
