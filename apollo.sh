@@ -50,15 +50,15 @@ TEST_TARGETS=""
 rm -rf ./third_party/ros
 if [ "$MACHINE_ARCH" == 'x86_64' ]; then
    IS_X86_64=true
+   sed "s/MACHINE_ARCH/x86_64/g" WORKSPACE.in > WORKSPACE
 elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
    IS_AARCH64=true
+   sed "s/MACHINE_ARCH/aarch64/g" WORKSPACE.in > WORKSPACE
 fi
 
 if ! $IS_X86_64 && ! $IS_AARCH64 ; then
    fail "Unknown machine architecture $MACHINE_ARCH"
    exit 1
-else
-  ln -rs "$(pwd)/third_party/ros_$MACHINE_ARCH" "$(pwd)/third_party/ros"
 fi
 
 function check_esd_files() {
@@ -170,7 +170,7 @@ function release() {
   find modules/ -name "*.pyc" | xargs -I {} rm {}
   cp -r modules/tools $MODULES_DIR
   #ros
-  cp -Lr third_party/ros $ROOT_DIR/
+  cp -Lr bazel-apollo/external/ros $ROOT_DIR/
   #scripts
   cp -r scripts $ROOT_DIR
   #dreamview

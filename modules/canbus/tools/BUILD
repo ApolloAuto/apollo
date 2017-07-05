@@ -6,7 +6,7 @@ cc_binary(
     deps = [
         "//modules/canbus:canbus_lib",
         "//modules/common",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 
@@ -19,6 +19,6 @@ cc_binary(
         "//modules/common",
         "//modules/common/adapters:adapter_manager",
         "//modules/control/proto:control_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )

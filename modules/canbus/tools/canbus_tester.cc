@@ -18,7 +18,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
 #include "std_msgs/String.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/util/file.h"

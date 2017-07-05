@@ -18,7 +18,7 @@
 #define MODULES_DECISION_DECISION_H_
 
 #include <string>
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
