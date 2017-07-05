@@ -17,10 +17,11 @@
 // Converts GPS timestamp from/to UNIX system timestamp.
 // This helper is considering leap second.
 
-#ifndef APOLLO_DRIVERS_GNSS_TIME_CONVERSION_H
-#define APOLLO_DRIVERS_GNSS_TIME_CONVERSION_H
+#ifndef MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_
+#define MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_
 
 #include <stdint.h>
+
 #include "macros.h"
 
 namespace apollo {
@@ -139,4 +140,4 @@ T gps2unix(T gps_seconds) {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // APOLLO_DRIVERS_GNSS_TIME_CONVERSION_H
+#endif  // MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_
