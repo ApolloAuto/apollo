@@ -75,4 +75,4 @@ You are welcome to submit questions and bug reports as [Github Issues](https://g
 Apollo is provided under the [Apache-2.0 license](LICENSE).
 
 ## Disclaimer
-Please refer the Disclaimer of Apollo in [Apollo official website](http://apollo.auto).
+Please refer the Disclaimer of Apollo in [Apollo official website](http://apollo.auto/docs/disclaimer.html).
