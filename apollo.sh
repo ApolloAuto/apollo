@@ -78,10 +78,6 @@ function generate_test_targets() {
   fi
 }
 
-
-
-source third_party/ros/setup.bash
-
 #=================================================
 #              Build functions
 #=================================================
