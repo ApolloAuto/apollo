@@ -20,6 +20,8 @@ See the following instructions on how to set up the docker environment and build
 
 ```
 bash docker/scripts/install_docker.sh
+# logout and login to make sure to run docker command without sudo
+docker ps  # to verify docker works without sudo
 bash docker/scripts/dev_start.sh
 bash docker/scripts/dev_into.sh
 ```
