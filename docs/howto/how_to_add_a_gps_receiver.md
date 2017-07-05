@@ -6,14 +6,14 @@ GPS receiver is a device that receives information from GPS satellites and then 
 ## Steps to add a new GPS Receiver
 Please follow the steps below to add a new GPS Receiver.
 
-  * implement the new data parser for new GPS receiver, by inheritating class `Parser`
+  * implement the new data parser for new GPS receiver, by inheriting class `Parser`
   * add new interfaces in `Parser` class for the new GPS receiver
   * in config.proto, add the new data format for the new GPS receiver
   * in function `create_parser` from file data_parser.cpp, add new parser instance for new GPS receiver
 
 Assuming that we would like to add a new GPS Receiver: `u-blox`.
 
-### Step 1: implement the new data parser for new GPS receiver, by inheritating class `Parser`
+### Step 1: implement the new data parser for new GPS receiver, by inheriting class `Parser`
 
 ```cpp
 class UbloxParser : public Parser {
