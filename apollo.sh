@@ -103,6 +103,7 @@ function apollo_build() {
   if [ -d release ];then
     rm -rf release
   fi
+  echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
   echo "$BUILD_TARGETS"
