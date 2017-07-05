@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 """Global runtime status."""
 
 import os
@@ -187,9 +186,8 @@ class RuntimeStatus(object):
                     glog.info(
                         'RuntimeStatus::_calculate_playing_status: No file to play'
                     )
-        elif (playing_status == ToolStatus.PLAYING_CHECKING
-              and modules_and_hardware_ready
-              and tool_status.planning_ready):
+        elif (playing_status == ToolStatus.PLAYING_CHECKING and
+              modules_and_hardware_ready and tool_status.planning_ready):
             tool_status.playing_status = ToolStatus.PLAYING_READY_TO_START
             glog.info(
                 'RuntimeStatus::_calculate_playing_status: All modules/hardware are ready'
