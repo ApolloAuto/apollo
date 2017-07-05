@@ -15,14 +15,17 @@
  *****************************************************************************/
 
 #include <iostream>
+
+#include "ros/include/ros/ros.h"
+#include "std_msgs/String.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/proto/pad_msg.pb.h"
-#include "std_msgs/String.h"
-#include "ros/include/ros/ros.h"
 
 namespace {
 

@@ -24,9 +24,10 @@
 
 #include <vector>
 
+#include "modules/planning/proto/planning.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/control/common/base_types.h"
-#include "modules/planning/proto/planning.pb.h"
 
 /**
  * @namespace apollo::control
@@ -138,4 +139,4 @@ class TrajectoryAnalyzer {
 }  // namespace control
 }  // namespace apollo
 
-#endif /* MODULES_CONTROL_COMMON_TRAJECTORY_ANALYZER_H_ */
+#endif  // MODULES_CONTROL_COMMON_TRAJECTORY_ANALYZER_H_
