@@ -25,6 +25,19 @@ cd "${DIR}"
 
 source "${DIR}/scripts/apollo_base.sh"
 
+# check operating system
+K_VERSION=$(uname -a)
+case $K_VERSION in
+  *"Ubuntu"*)
+     echo "System version Ubuntu 14.04 check passed. Build continue ..."
+     ;;
+  *)
+     error "Unsupported system: ${K_VERSION}."
+     error "Please use Ubuntu, we recommend use Ubuntu 14.04."
+     exit 1
+     ;;
+esac
+
 # the machine type, currently support x86_64, aarch64
 MACHINE_ARCH=$(uname -m)
 
