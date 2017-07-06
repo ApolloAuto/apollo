@@ -18,7 +18,7 @@
 #include <mutex>
 #include <thread>
 
-#include <glog/logging.h>
+#include "glog/logging.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
