@@ -1,12 +1,56 @@
-### CMake
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-### bazel
-/bazel-*
+bazel-apollo
+bazel-bin
+bazel-genfiles
+bazel-out
+bazel-testlogs
+/Debug/
+*.pyc
+
+# javascript
+*bundle.js
+*.worker.js
+node_modules
+# generated files
+generatedViews
+generatedScripts
+# database/log files
+*.sqlite
+dreamview.log
+npm-debug.log
+
+# Eclipse IDE files
+.project
+.cproject
+.settings
+.classpath
+
+# atom.io files
+*.gch
+
+# Logs.
+*.stdout
+*.stderr
+nohup.out
+*.bak
+*.csv.result
+
+# Editor configs
+.ycm_extra_conf.py
+
+# ROS
+ros_param_server.pid
+.master_snapshot
+
+# third_party
+third_party/ros
+third_party/ros_aarch64/
+third_party/ros_x86_64/
+modules/ros/third_party/fast-rtps
+
+data/log
+data/core
+data/bag
+data/cov
+
+# Doxygen
+docs/doxygen
