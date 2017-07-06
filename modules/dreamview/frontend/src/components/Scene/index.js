@@ -6,12 +6,6 @@ import RENDERER from "renderer";
 export default class Scene extends React.Component {
     componentDidMount() {
         RENDERER.initialize("canvas", this.props.width, this.props.height);
-        window.addEventListener("blur", () => {
-            RENDERER.stopAnimate();
-        });
-        window.addEventListener("focus", () => {
-            RENDERER.startAnimate();
-        });
     }
 
     componentWillUpdate() {
