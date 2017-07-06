@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/websocket.h"
 
 #include <functional>
+
 #include "modules/common/log.h"
 
 using std::placeholders::_1;
@@ -62,7 +63,7 @@ WebsocketServer::WebsocketServer(int port, websocketpp::log::level log_level)
 
 void WebsocketServer::Stop() {
   if (!server_thread_) {
-    // Nothing to stop is the server thread is not active.
+    // Nothing to stop because the server thread is not active.
     return;
   }
 
@@ -95,9 +96,7 @@ void WebsocketServer::Stop() {
   server_thread_.reset(nullptr);
 }
 
-WebsocketServer::~WebsocketServer() {
-  Stop();
-}
+WebsocketServer::~WebsocketServer() { Stop(); }
 
 void WebsocketServer::Run() {
   server_thread_.reset(new std::thread([this]() {
