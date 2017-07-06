@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install -y bazel oracle-java8-installer
 RUN apt-get clean autoclean && apt-get autoremove -y
 RUN rm -fr /var/lib/apt/lists/*
 
-#install protobuf 3.1.0
+# install protobuf 3.1.0
 WORKDIR /root
 RUN wget https://github.com/google/protobuf/releases/download/v3.1.0/protobuf-cpp-3.1.0.tar.gz
 RUN tar xzf protobuf-cpp-3.1.0.tar.gz
@@ -49,7 +49,7 @@ RUN wget https://github.com/google/protobuf/releases/download/v3.1.0/protoc-3.1.
 RUN unzip protoc-3.1.0-linux-x86_64.zip -d protoc3
 RUN mv protoc3/bin/protoc /usr/bin/
 
-#set up node v8.0.0
+# set up node v8.0.0
 RUN wget https://github.com/tj/n/archive/v2.1.0.tar.gz
 RUN tar xzf v2.1.0.tar.gz
 WORKDIR /root/n-2.1.0
@@ -88,3 +88,6 @@ RUN apt-get update && apt-get install -y \
 
 RUN add-apt-repository "deb http://archive.ubuntu.com/ubuntu trusty-backports universe"
 RUN apt-get update && apt-get install shellcheck
+
+# https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
+RUN ln -s -f /bin/true /usr/bin/chfn
