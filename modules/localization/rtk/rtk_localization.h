@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file localization_rtk.h
+ * @file rtk_localization.h
  * @brief The class of RTKLocalization
  */
 
@@ -27,15 +27,17 @@
 #include <utility>
 #include <vector>
 
+#include "ros/include/ros/ros.h"
+
+#include "modules/localization/proto/gps.pb.h"
+#include "modules/localization/proto/imu.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+
 #include "glog/logging.h"
 #include "gtest/gtest_prod.h"
 #include "modules/common/monitor/monitor.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/localization_base.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/imu.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::localization
