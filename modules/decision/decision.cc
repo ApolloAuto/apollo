@@ -16,8 +16,9 @@
 
 #include "modules/decision/decision.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/decision/common/decision_gflags.h"
 
@@ -27,30 +28,23 @@ namespace decision {
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Decision::Name() const {
-  return FLAGS_decision_module_name;
-}
+std::string Decision::Name() const { return FLAGS_decision_module_name; }
 
-apollo::common::Status Decision::Init() {
-  return apollo::common::Status::OK();
-}
+common::Status Decision::Init() { return common::Status::OK(); }
 
-apollo::common::Status Decision::Start() {
+common::Status Decision::Start() {
   AdapterManager::Init();
 
   // start ROS timer, one-shot = false, auto-start = true
   const double duration = 1.0 / FLAGS_decision_publish_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &Decision::OnTimer, this);
-  return apollo::common::Status::OK();
+  return common::Status::OK();
 }
 
-void Decision::Stop() {  // spinner_.stop();
-}
+void Decision::Stop() {}
 
-void Decision::OnTimer(const ros::TimerEvent&) {
-  PublishDecision();
-}
+void Decision::OnTimer(const ros::TimerEvent&) { PublishDecision(); }
 
 void Decision::PublishDecision() {
   DecisionResult decision_result;
