@@ -23,10 +23,13 @@
 
 #include <functional>
 #include <string>
+
+#include "third_party/json/json.hpp"
+
+#include "modules/dreamview/proto/simulation_world.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/dreamview/proto/simulation_world.pb.h"
-#include "third_party/json/json.hpp"
 
 /**
  * @namespace apollo::dreamview::internal
@@ -86,9 +89,7 @@ class SimulationWorldService {
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const {
-    return world_;
-  }
+  inline const SimulationWorld &world() const { return world_; }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
@@ -109,9 +110,7 @@ class SimulationWorldService {
    * The backend won't push the SimulationWorld to frontend if it is not ready.
    * @return True if the object is ready to push.
    */
-  bool ReadyToPush() const {
-    return world_.has_auto_driving_car();
-  }
+  bool ReadyToPush() const { return world_.has_auto_driving_car(); }
 
  private:
   /**
@@ -140,4 +139,4 @@ class SimulationWorldService {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif /* MODULES_DREAMVIEW_BACKEND_SIM_WORLD_H_ */
+#endif  // MODULES_DREAMVIEW_BACKEND_SIM_WORLD_H_

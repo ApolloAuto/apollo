@@ -18,6 +18,7 @@
 #define MODULES_DECISION_DECISION_H_
 
 #include <string>
+
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/apollo_app.h"
