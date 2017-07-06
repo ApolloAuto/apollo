@@ -22,14 +22,18 @@ else
     APOLLO_IN_DOCKER=false
 fi
 
+hostname
 if $APOLLO_IN_DOCKER; then
   set -x
+  echo "Inside docker"
   uname -a
   pip list
-  env
 else
+  echo "Outside docker"
   set -x
   uname -a
   docker --version
   docker images | grep apollo
 fi
+echo "-----------env---------------"
+env
