@@ -1,3 +1,4 @@
+# Bazel
 bazel-apollo
 bazel-bin
 bazel-genfiles
@@ -5,6 +6,7 @@ bazel-out
 bazel-testlogs
 /Debug/
 *.pyc
+WORKSPACE
 
 # javascript
 *bundle.js
@@ -47,6 +49,7 @@ third_party/ros_aarch64/
 third_party/ros_x86_64/
 modules/ros/third_party/fast-rtps
 
+# Data
 data/log
 data/core
 data/bag
