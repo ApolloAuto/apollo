@@ -16,21 +16,18 @@
 
 #include "modules/prediction/prediction.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/time/time.h"
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
 using ::apollo::perception::PerceptionObstacles;
 using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::time::Clock;
 
-std::string Prediction::Name() const {
-  return FLAGS_prediction_module_name;
-}
+std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 apollo::common::Status Prediction::Init() {
   AdapterManager::instance()->Init();
