@@ -61,4 +61,3 @@ The following is a commit message example:
 >
 > Fixes #1234
 
-
