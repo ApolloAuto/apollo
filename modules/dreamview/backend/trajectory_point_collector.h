@@ -16,14 +16,16 @@
 
 /**
  * @file
+ * @brief the class of TrajectoryPointCollector
  */
 
 #ifndef MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_
 #define MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
 
 /**
  * @namespace apollo::dreamview::util
@@ -79,4 +81,4 @@ class TrajectoryPointCollector {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif /* MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_ */
+#endif  // MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_DECISION_COMMON_DECISION_GFLAGS_H_
-#define MODEULES_DECISION_COMMON_DECISION_GFLAGS_H_
+#ifndef MODULES_DECISION_COMMON_DECISION_GFLAGS_H_
+#define MODULES_DECISION_COMMON_DECISION_GFLAGS_H_
 
 #include "gflags/gflags.h"
 
@@ -23,4 +23,4 @@ DECLARE_string(decision_module_name);
 
 DECLARE_double(decision_publish_freq);
 
-#endif  // MODEULES_DECISION_COMMON_DECISION_GFLAGS_H_
+#endif  // MODULES_DECISION_COMMON_DECISION_GFLAGS_H_

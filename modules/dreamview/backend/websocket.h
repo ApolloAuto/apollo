@@ -21,12 +21,12 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_WEBSOCKET_H_
 #define MODULES_DREAMVIEW_BACKEND_WEBSOCKET_H_
 
-#include <unordered_map>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <string>
 #include <thread>
+#include <unordered_map>
 
 #include "third_party/json/json.hpp"
 #include "websocketpp/client.hpp"
@@ -120,23 +120,6 @@ class WebsocketServer {
   }
 
  private:
-  // The server endpoint.
-  ServerEndpoint server_;
-
-  // The thread for the server (listeners and handlers).
-  std::unique_ptr<std::thread> server_thread_;
-
-  // The pool of all maintained connections.
-  ConnectionSet connections_;
-
-  // Message handlers keyed by message type.
-  std::unordered_map<std::string, MessageHandler> message_handlers_;
-
-  // The mutex guarding the connection set. We are not using read
-  // write lock, as the server is not expected to get many clients
-  // (connections).
-  mutable std::mutex mutex_;
-
   // OnAcceptConnection() will be called upon connection request
   // (handshake) from a new client. It returns true if the connection
   // is accepted, or false if it is rejected.
@@ -154,9 +137,26 @@ class WebsocketServer {
   // client, it will dispatch the message to the corresponding handler
   // based on the message type.
   void OnMessage(ConnectionHandle handle, MessagePtr message);
+
+  // The server endpoint.
+  ServerEndpoint server_;
+
+  // The thread for the server (listeners and handlers).
+  std::unique_ptr<std::thread> server_thread_;
+
+  // The pool of all maintained connections.
+  ConnectionSet connections_;
+
+  // Message handlers keyed by message type.
+  std::unordered_map<std::string, MessageHandler> message_handlers_;
+
+  // The mutex guarding the connection set. We are not using read
+  // write lock, as the server is not expected to get many clients
+  // (connections).
+  mutable std::mutex mutex_;
 };
 
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif /* MODULES_DREAMVIEW_BACKEND_WEBSOCKET_H_ */
+#endif  // MODULES_DREAMVIEW_BACKEND_WEBSOCKET_H_
