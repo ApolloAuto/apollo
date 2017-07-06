@@ -37,7 +37,6 @@ void Localization::RegisterLocalizationMethods() {
       LocalizationConfig::RTK,
       []() -> LocalizationBase* { return new RTKLocalization(); });
 
-  // TODO(Dong): Implement camera based localization method.
   localization_factory_.Register(
       LocalizationConfig::CAMERA,
       []() -> LocalizationBase* { return new CameraLocalization(); });

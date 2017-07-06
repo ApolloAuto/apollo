@@ -25,9 +25,7 @@
 namespace apollo {
 namespace localization {
 
-using ::Eigen::Vector3d;
 using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::adapter::ImuAdapter;
 using ::apollo::common::monitor::MonitorMessageItem;
 using ::apollo::common::monitor::MonitorBuffer;
 using ::apollo::common::Status;
@@ -38,12 +36,12 @@ CameraLocalization::CameraLocalization()
 
 Status CameraLocalization::Start() {
   MonitorBuffer buffer(&monitor_);
-  if (!apollo::common::util::GetProtoFromFile(
-          FLAGS_camera_parameter_config_file, &camera_parameter_)) {
+  if (!common::util::GetProtoFromFile(FLAGS_camera_parameter_config_file,
+                                      &camera_parameter_)) {
     buffer.ERROR() << "Camera parameter is not initialized. Check "
                    << FLAGS_camera_parameter_config_file;
     buffer.PrintLog();
-    return Status(apollo::common::LOCALIZATION_ERROR,
+    return Status(common::LOCALIZATION_ERROR,
                   "failed to load camera parameter");
   }
 
@@ -56,13 +54,13 @@ Status CameraLocalization::Start() {
     buffer.ERROR() << "GPS input not initialized. Check "
                    << FLAGS_camera_adapter_config_file;
     buffer.PrintLog();
-    return Status(apollo::common::LOCALIZATION_ERROR, "no GPS adapter");
+    return Status(common::LOCALIZATION_ERROR, "no GPS adapter");
   }
   if (!AdapterManager::GetCamera()) {
     buffer.ERROR() << "Camera input not initialized. Check "
                    << FLAGS_camera_adapter_config_file;
     buffer.PrintLog();
-    return Status(apollo::common::LOCALIZATION_ERROR, "no Camera adapter");
+    return Status(common::LOCALIZATION_ERROR, "no Camera adapter");
   }
   // IMU is optional
   if (!AdapterManager::GetImu()) {
@@ -81,8 +79,8 @@ Status CameraLocalization::Stop() {
 }
 
 void CameraLocalization::OnTimer(const ros::TimerEvent &event) {
-  double time_delay = apollo::common::time::ToSecond(Clock::Now()) -
-                      last_received_timestamp_sec_;
+  double time_delay =
+      common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
   MonitorBuffer buffer(&monitor_);
   if (FLAGS_enable_gps_timestamp &&
       time_delay > FLAGS_gps_time_delay_tolerance) {
@@ -132,14 +130,13 @@ void CameraLocalization::OnTimer(const ros::TimerEvent &event) {
   // watch dog
   RunWatchDog();
 
-  last_received_timestamp_sec_ = apollo::common::time::ToSecond(Clock::Now());
+  last_received_timestamp_sec_ = common::time::ToSecond(Clock::Now());
 }
 
 // TODO(Dong): Implement this function for camera based high accuracy
 // localization.
 bool CameraLocalization::CreateLocalizationMsg(
-    const ::apollo::localization::Gps &gps_msg,
-    const ::apollo::localization::Camera &camera_msg,
+    const Gps &gps_msg, const Camera &camera_msg,
     LocalizationEstimate *localization) {
   localization->Clear();
 
@@ -198,16 +195,16 @@ void CameraLocalization::RunWatchDog() {
     return;
   }
 
-  bool msg_lost = false;
-
   MonitorBuffer buffer(&monitor_);
 
   // check GPS time stamp against ROS timer
   double gps_delay_sec =
-      apollo::common::time::ToSecond(Clock::Now()) -
+      common::time::ToSecond(Clock::Now()) -
       AdapterManager::GetGps()->GetLatestObserved().header().timestamp_sec();
   int64_t gps_delay_cycle_cnt =
       static_cast<int64_t>(gps_delay_sec * FLAGS_localization_publish_freq);
+
+  bool msg_lost = false;
   if (FLAGS_enable_gps_timestamp &&
       (gps_delay_cycle_cnt > FLAGS_report_threshold_err_num)) {
     msg_lost = true;
@@ -220,7 +217,7 @@ void CameraLocalization::RunWatchDog() {
 
   // check Camera time stamp against ROS timer
   double camera_delay_sec =
-      apollo::common::time::ToSecond(Clock::Now()) -
+      common::time::ToSecond(Clock::Now()) -
       AdapterManager::GetCamera()->GetLatestObserved().header().timestamp_sec();
   int64_t camera_delay_cycle_cnt =
       static_cast<int64_t>(camera_delay_sec * FLAGS_localization_publish_freq);
@@ -236,10 +233,10 @@ void CameraLocalization::RunWatchDog() {
 
   // to prevent it from beeping continuously
   if (msg_lost && (last_reported_timestamp_sec_ < 1. ||
-                   apollo::common::time::ToSecond(Clock::Now()) >
+                   common::time::ToSecond(Clock::Now()) >
                        last_reported_timestamp_sec_ + 1.)) {
     AERROR << "gps/camera frame lost!";
-    last_reported_timestamp_sec_ = apollo::common::time::ToSecond(Clock::Now());
+    last_reported_timestamp_sec_ = common::time::ToSecond(Clock::Now());
   }
 }
 
