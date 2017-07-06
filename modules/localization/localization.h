@@ -25,11 +25,12 @@
 #include <memory>
 #include <string>
 
+#include "modules/localization/proto/localization_config.pb.h"
+
 #include "modules/common/apollo_app.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/localization/localization_base.h"
-#include "modules/localization/proto/localization_config.pb.h"
 
 /**
  * @namespace apollo::localization
