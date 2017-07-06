@@ -2,15 +2,8 @@ syntax = "proto2";
 
 package apollo.perception;
 
+import "modules/common/proto/error_code.proto";
 import "modules/common/proto/header.proto";
-
-// FIXME: To be merged with common::ErrorCode
-enum PerceptionErrorCode {
-    ERROR_NONE = 0;
-    ERROR_TF = 1;
-    ERROR_PROCESS = 2;
-    ERROR_UNKNOWN = 3;
-}
 
 message Point {
     optional double x = 1;  // in meters.
@@ -51,5 +44,5 @@ message PerceptionObstacle {
 message PerceptionObstacles {
     repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
     optional apollo.common.Header header = 2;  // Header
-    optional PerceptionErrorCode error_code = 3 [default = ERROR_NONE];
+    optional apollo.common.ErrorCode error_code = 3 [default = OK];
 }
