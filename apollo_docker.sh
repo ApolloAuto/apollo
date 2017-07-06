@@ -41,7 +41,6 @@ function start_build_docker() {
 function gen_docker() {
   IMG="apolloauto/apollo:run-env-latest"
   RELEASE_DIR=${HOME}/.cache/release
-  SETUP=/root/mnt/scripts/docker_setup.sh
   RELEASE_NAME="${DOCKER_REPO}:release-${TIME}"
   DEFAULT_NAME="${DOCKER_REPO}:release-latest"
   docker pull $IMG
@@ -55,7 +54,7 @@ function gen_docker() {
       -w /apollo \
       "$IMG"
 
-  docker exec apollo_release "${SETUP}"
+  docker exec apollo_release bash -c "cp -Lr /root/mnt/* ."
   CONTAINER_ID=$(docker ps | grep apollo_release | awk '{print $1}')
   docker commit "$CONTAINER_ID" "$RELEASE_NAME"
   docker commit "$CONTAINER_ID" "$DEFAULT_NAME"
