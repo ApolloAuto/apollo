@@ -21,7 +21,9 @@ RUN apt-get update && apt-get install -y \
    unzip \
    wget \
    zip \
-   cppcheck
+   cppcheck \
+   git \
+   bc
 
 RUN add-apt-repository ppa:webupd8team/java
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
