@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_GFLAGS_H_
-#define MODULES_PREDICTION_COMMON_GFLAGS_H_
+#ifndef MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+#define MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
 
 #include "gflags/gflags.h"
 
 // System gflags
 DECLARE_string(prediction_module_name);
 
-#endif
+#endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

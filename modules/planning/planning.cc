@@ -131,7 +131,8 @@ TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
   point.v = vehicle_state.linear_velocity();
   point.a = vehicle_state.linear_acceleration();
   point.kappa = 0.0;
-  if (point.v > 0.1) {
+  const double speed_threshold = 0.1;
+  if (point.v > speed_threshold) {
     point.kappa =
         vehicle_state.angular_velocity() / vehicle_state.linear_velocity();
   }
