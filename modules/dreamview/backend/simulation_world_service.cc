@@ -219,7 +219,8 @@ void UpdateSimulationWorld<PlanningTrajectoryAdapter>(
       } else if (i < trajectory_length - 2) {
         // When collecting the trajectory points, downsample with a
         // ratio of 10.
-        i += 10;
+        constexpr double downsample_ratio = 10;
+        i += downsample_ratio;
         if (i > trajectory_length - 2) {
           i = trajectory_length - 2;
         }
