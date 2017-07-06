@@ -23,9 +23,9 @@
 
 #include "ros/include/ros/ros.h"
 
-#include "modules/common/apollo_app.h"
-#include "modules/common/macro.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/common/apollo_app.h"
 
 /**
  * @namespace apollo::prediction
@@ -36,15 +36,16 @@ namespace prediction {
 
 class Prediction : public apollo::common::ApolloApp {
  public:
+  virtual ~Prediction() = default;
+
   virtual std::string Name() const override;
-  virtual apollo::common::Status Init() override;
-  virtual apollo::common::Status Start() override;
+  virtual common::Status Init() override;
+  virtual common::Status Start() override;
   virtual void Stop() override;
-  ~Prediction(){};
 
  private:
   void OnPerception(
-      const ::apollo::perception::PerceptionObstacles &perception_obstacles);
+      const perception::PerceptionObstacles &perception_obstacles);
 };
 
 }  // namespace prediction
