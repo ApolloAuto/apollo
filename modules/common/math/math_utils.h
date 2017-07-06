@@ -23,6 +23,7 @@
 #define MODULES_COMMON_MATH_MATH_UTILS_H_
 
 #include <limits>
+#include <utility>
 
 #include "modules/common/math/vec2d.h"
 
