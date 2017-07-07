@@ -10,6 +10,16 @@ If you are a user and would like to install and build Apollo, please refer apoll
 If you are a developer and would like to build the Apollo Kernel, the Robot Operating System (ROS), and Apollo, please refer apollo/docs/quickstart/apollo_1_0_quick_start_developer.md.
 
 ## How to debug build problems?
+1. Please make sure you followed the guidance in the correct help document as listed in the first question.
+
+2. Please make sure you followed exactly the same steps in the document.
+
+3. Currently, build can only be done on Linux, we recommend Ubuntu 14.04. 
+
+4. Please double check the internet setting on your computer is correct.
+
+5. Please allocate sufficient memory for your computer. It is recommended to have > 1GB memory.
+
 ## I cannot solve my build problems, what is the most effective way to ask for help?
 So far, many build problems are related to environment setting. You can run the script to get your environment: bash scripts/env.sh >& env.txt and provide the content of env.txt in your post.
 
