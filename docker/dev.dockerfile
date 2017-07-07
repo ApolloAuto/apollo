@@ -23,7 +23,8 @@ RUN apt-get update && apt-get install -y \
    zip \
    cppcheck \
    git \
-   bc
+   bc \
+   apt-transport-https
 
 RUN add-apt-repository ppa:webupd8team/java
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
@@ -34,39 +35,43 @@ RUN apt-get update && apt-get install -y bazel oracle-java8-installer
 
 RUN apt-get clean autoclean && apt-get autoremove -y
 RUN rm -fr /var/lib/apt/lists/*
+COPY ./modules/tools/py27_requirements.txt /tmp/
 
+WORKDIR /tmp
 # install protobuf 3.1.0
-WORKDIR /root
 RUN wget https://github.com/google/protobuf/releases/download/v3.1.0/protobuf-cpp-3.1.0.tar.gz
 RUN tar xzf protobuf-cpp-3.1.0.tar.gz
-WORKDIR /root/protobuf-3.1.0
+WORKDIR /tmp/protobuf-3.1.0
 RUN ./configure --prefix=/usr
 RUN make
 RUN make install
 
-WORKDIR /root
+WORKDIR /tmp
 RUN wget https://github.com/google/protobuf/releases/download/v3.1.0/protoc-3.1.0-linux-x86_64.zip
 RUN unzip protoc-3.1.0-linux-x86_64.zip -d protoc3
 RUN mv protoc3/bin/protoc /usr/bin/
+RUN chmod 755 /usr/bin/protoc
 
 # set up node v8.0.0
 RUN wget https://github.com/tj/n/archive/v2.1.0.tar.gz
 RUN tar xzf v2.1.0.tar.gz
-WORKDIR /root/n-2.1.0
+WORKDIR /tmp/n-2.1.0
 RUN make install
 RUN n 8.0.0
 
-WORKDIR /root
+WORKDIR /tmp
 # Install required python packages.
-# Please make sure you are building the image from Apollo root, or else the file cannot be located.
-COPY ./modules/tools/py27_requirements.txt /tmp/
-RUN pip install -r /tmp/py27_requirements.txt
+RUN pip install -r py27_requirements.txt
+
+# Install yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update && apt-get install -y yarn
 
 # Remove all temporary files.
 RUN rm -fr /tmp/*
 
 ENV ROSCONSOLE_FORMAT '${file}:${line} ${function}() [${severity}] [${time}]: ${message}'
-ENV PYTHONPATH /apollo/bazel-genfiles:/apollo/third_party/ros/lib/python2.7/dist-packages
 
 # install dependency for ros build
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'

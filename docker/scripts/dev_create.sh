@@ -25,8 +25,11 @@ fi
 
 
 APOLLO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+TAG="dev-${TIME}"
 
 # Build image from APOLLO_ROOT, while use the specified Dockerfile.
-docker build -t "${DOCKER_REPO}:dev-${TIME}" \
+docker build -t "${DOCKER_REPO}:${TAG}" \
     -f "${APOLLO_ROOT}/docker/dev.dockerfile" \
     "${APOLLO_ROOT}"
+
+sed -i "s/dev-.*\"/${TAG}\"/g" ${APOLLO_ROOT}/docker/scripts/dev_start.sh
