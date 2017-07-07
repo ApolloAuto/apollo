@@ -29,10 +29,10 @@ class Brakeinfo74Test : public ::testing::Test {
 
 TEST_F(Brakeinfo74Test, simple) {
   Brakeinfo74 brakeinfo;
-  uint8_t data = 0x64U;
+  uint8_t data[8] = {0x64U};
   int32_t length = 8;
   ChassisDetail cd;
-  brakeinfo.Parse(&data, length, &cd);
+  brakeinfo.Parse(data, length, &cd);
 
   EXPECT_FALSE(cd.esp().is_abs_active());
   EXPECT_FALSE(cd.esp().is_abs_enabled());
@@ -42,11 +42,11 @@ TEST_F(Brakeinfo74Test, simple) {
   EXPECT_FALSE(cd.esp().is_trac_enabled());
 
   EXPECT_EQ(cd.epb().parking_brake_status(), Epb::PBRAKE_OFF);
-  EXPECT_DOUBLE_EQ(cd.brake().brake_torque_req(), 8592.0);
+  EXPECT_DOUBLE_EQ(cd.brake().brake_torque_req(), 400.0);
   EXPECT_EQ(cd.brake().hsa_status(), Brake::HSA_INACTIVE);
   EXPECT_DOUBLE_EQ(cd.brake().brake_torque_act(), 0.0);
   EXPECT_EQ(cd.brake().hsa_status(), Brake::HSA_OFF);
-  EXPECT_DOUBLE_EQ(cd.brake().wheel_torque_act(), 8192.0);
+  EXPECT_DOUBLE_EQ(cd.brake().wheel_torque_act(), 0.0);
   EXPECT_FALSE(cd.vehicle_spd().is_vehicle_standstill());
   EXPECT_DOUBLE_EQ(cd.vehicle_spd().acc_est(), 0.0);
 }
