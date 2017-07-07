@@ -70,7 +70,7 @@ function check_esd_files() {
       USE_ESD_CAN=true
       CAN_CARD="esd_can"
   else
-      warning "${YELLOW}ESD CAN library supplied by ESD Electronics does not exit.${NO_COLOR}"
+      warning "${YELLOW}ESD CAN library supplied by ESD Electronics does not exist.${NO_COLOR}"
       warning "${YELLOW}If you need ESD CAN, please refer to third_party/can_card_library/esd_can/README.md${NO_COLOR}"
       USE_ESD_CAN=false
   fi
