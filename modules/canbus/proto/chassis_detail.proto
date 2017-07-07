@@ -272,11 +272,11 @@ message Brake {
   optional bool connector_fault = 22;
 
   // lincoln brakeinfo 74
-  optional int32 brake_torque_req = 23;
+  optional double brake_torque_req = 23;
   optional HSAStatusType hsa_status = 24;
-  optional int32 brake_torque_act = 25;
+  optional double brake_torque_act = 25;
   optional HSAModeType hsa_mode = 26;
-  optional int32 wheel_torque_act = 27;
+  optional double wheel_torque_act = 27;
 
   // lincoln version 7f
   optional int32 major_version = 28;
