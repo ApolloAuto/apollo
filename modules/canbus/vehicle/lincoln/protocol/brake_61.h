@@ -88,6 +88,9 @@ class Brake61 : public ProtocolData {
    */
   double pedal_output(const std::uint8_t* bytes, int32_t length) const;
 
+  double parse_two_frames(const std::uint8_t low_byte,
+                          const std::uint8_t high_byte) const;
+
   /**
    * @brief check if boo bit from input byte array is 1 or 0 (at position 0)
    * config detail: {'name': 'bi', 'offset': 0.0, 'precision': 1.0, 'len': 1,
