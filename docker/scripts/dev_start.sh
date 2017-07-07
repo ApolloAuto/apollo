@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-VERSION=dev-latest
+VERSION="dev-20170707_1129"
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
