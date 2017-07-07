@@ -109,7 +109,7 @@ function apollo_build() {
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
   echo "$BUILD_TARGETS"
-  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg
+  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
