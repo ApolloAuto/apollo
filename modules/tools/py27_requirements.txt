@@ -8,6 +8,7 @@ google-apputils
 grpc >= 0.3
 protobuf == 3.1.0.post1
 python-gflags
+grpcio
 
 # Web utils.
 eventlet
