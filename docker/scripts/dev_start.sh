@@ -92,7 +92,7 @@ function main(){
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $LOCAL_DIR:/apollo \
         -v /media:/media \
-        -v $HOME:/home/$USER \
+        -v $HOME:$HOME \
         -v /etc/localtime:/etc/localtime:ro \
         --net host \
         -w /apollo \

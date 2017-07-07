@@ -99,7 +99,7 @@ function main() {
         --net host \
         -v /media:/media \
         -v ${APOLLO_ROOT_DIR}/data:/apollo/data \
-        -v $HOME:/home/$USER \
+        -v $HOME:$HOME \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /etc/localtime:/etc/localtime:ro \
         -w /apollo \
