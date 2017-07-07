@@ -16,7 +16,10 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/accel_6b.h"
 
+#include "glog/logging.h"
+
 #include "modules/canbus/common/byte.h"
+#include "modules/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -35,36 +38,28 @@ void Accel6b::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 double Accel6b::lateral_acceleration(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte high_frame(bytes + 1);
-  int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 0);
-  int32_t low = low_frame.get_byte(0, 8);
-  int32_t value = (high << 8) | low;
-  if (value > 0x7FFF) {
-    value -= 0x10000;
-  }
-  return value * 0.010000;
+                                     const int32_t length) const {
+  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  return parse_two_frames(bytes[0], bytes[1]);
 }
 
 double Accel6b::longitudinal_acceleration(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte high_frame(bytes + 3);
-  int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 2);
-  int32_t low = low_frame.get_byte(0, 8);
-  int32_t value = (high << 8) | low;
-  if (value > 0x7FFF) {
-    value -= 0x10000;
-  }
-  return value * 0.010000;
+                                          const int32_t length) const {
+  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  return parse_two_frames(bytes[2], bytes[3]);
 }
 
 double Accel6b::vertical_acceleration(const std::uint8_t* bytes,
-                                      int32_t length) const {
-  Byte high_frame(bytes + 5);
+                                      const int32_t length) const {
+  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  return parse_two_frames(bytes[4], bytes[5]);
+}
+
+double Accel6b::parse_two_frames(const std::uint8_t low_byte,
+                                 const std::uint8_t high_byte) const {
+  Byte high_frame(&high_byte);
   int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 4);
+  Byte low_frame(&low_byte);
   int32_t low = low_frame.get_byte(0, 8);
   int32_t value = (high << 8) | low;
   if (value > 0x7FFF) {
