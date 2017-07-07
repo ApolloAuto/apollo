@@ -35,16 +35,6 @@ TEST_F(Brake60Test, simple) {
   EXPECT_EQ(brake.GetPeriod(), 20 * 1000);
   uint8_t data[8] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68};
   brake.UpdateData(data);
-  /* output should be:
-          00000000
-          00000000
-          01100010
-          01100100
-          01100101
-          01100110
-          01100111
-          00000000
-  */
   EXPECT_EQ(data[0], 0b00000000);
   EXPECT_EQ(data[1], 0b00000000);
   EXPECT_EQ(data[2], 0b01100010);
