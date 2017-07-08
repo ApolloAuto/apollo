@@ -25,18 +25,30 @@ cd "${DIR}"
 
 source "${DIR}/scripts/apollo_base.sh"
 
-# check operating system
-OP_SYSTEM=$(uname -o)
-case $OP_SYSTEM in
-  *"Linux")
-     echo "System check passed. Build continue ..."
-     ;;
-  *)
-     error "Unsupported system: ${OP_SYSTEM}."
-     error "Please use Linux, we recommend Ubuntu 14.04."
-     exit 1
-     ;;
-esac
+
+function apollo_check_system_config() {
+  # check operating system
+  OP_SYSTEM=$(uname -o)
+  case $OP_SYSTEM in
+    *"Linux")
+       echo "System check passed. Build continue ..."
+       ;;
+    *)
+       error "Unsupported system: ${OP_SYSTEM}."
+       error "Please use Linux, we recommend Ubuntu 14.04."
+       exit 1
+       ;;
+  esac
+
+  # check system configuration
+  DEFAULT_MEM_SIZE="2.0"
+  MEM_SIZE=$(free | grep Mem | awk '{printf("%0.2f", $2 / 1024.0 / 1024.0)}')
+  if (( $(echo "$MEM_SIZE < $DEFAULT_MEM_SIZE" | bc -l) )); then
+     warning "System memory [${MEM_SIZE}G] is lower than minimum required memory size [2.0G]. Apollo build could fail."
+  fi
+}
+
+apollo_check_system_config
 
 # the machine type, currently support x86_64, aarch64
 MACHINE_ARCH=$(uname -m)
@@ -70,8 +82,7 @@ function check_esd_files() {
       USE_ESD_CAN=true
       CAN_CARD="esd_can"
   else
-      warning "${YELLOW}ESD CAN library supplied by ESD Electronics does not exist.${NO_COLOR}"
-      warning "${YELLOW}If you need ESD CAN, please refer to third_party/can_card_library/esd_can/README.md${NO_COLOR}"
+      warning "ESD CAN library supplied by ESD Electronics does not exist. If you need ESD CAN, please refer to third_party/can_card_library/esd_can/README.md."
       USE_ESD_CAN=false
   fi
 }
@@ -96,7 +107,6 @@ function generate_test_targets() {
 #=================================================
 #              Build functions
 #=================================================
-
 
 function apollo_build() {
   START_TIME=$(($(date +%s%N)/1000000))

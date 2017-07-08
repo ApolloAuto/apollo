@@ -35,7 +35,7 @@ function error() {
 }
 
 function warning() {
-  (>&2 echo -e "[${YELLOW}WARNING${NO_COLOR}] $*")
+  (>&2 echo -e "${YELLOW}[WARNING] $*${NO_COLOR}")
 }
 
 function ok() {
