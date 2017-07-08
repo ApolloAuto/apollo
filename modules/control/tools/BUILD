@@ -17,18 +17,6 @@ cc_binary(
 )
 
 cc_binary(
-    name = "enter_auto_mode",
-    srcs = ["enter_auto_mode.cc"],
-    deps = [
-        "//external:gflags",
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/control/common",
-        "@ros//:ros_common",
-    ],
-)
-
-cc_binary(
     name = "control_tester",
     srcs = ["control_tester.cc"],
     deps = [
