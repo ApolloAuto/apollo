@@ -16,10 +16,21 @@
 # limitations under the License.
 ###############################################################################
 
-VERSION="dev-20170707_1129"
+VERSION=""
+ARCH=$(uname -m)
+VERSION_X86_64="dev-20170707_1129"
+VERSION_AARCH64="dev-aarch64-20170708_1737"
 if [[ $# == 1 ]];then
     VERSION=$1
+elif [ ${ARCH} == "x86_64" ]; then
+    VERSION=${VERSION_X86_64}
+elif [ ${ARCH} == "aarch64" ]; then
+    VERSION=${VERSION_AARCH64}
+else
+    echo "Unknown architecture: ${ARCH}"
+    exit 0
 fi
+
 if [ -z "${DOCKER_REPO}" ]; then
     DOCKER_REPO=apolloauto/apollo
 fi
