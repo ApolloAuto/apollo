@@ -27,7 +27,7 @@ namespace vehicle_state {
 VehicleState::VehicleState(
     const localization::LocalizationEstimate &localization) {
   ConstructExceptLinearVelocity(&localization);
-  if (localization.has_pose() && localization.pose().has_linear_velocity()) {
+  if (localization != nullptr && localization.has_pose() && localization.pose().has_linear_velocity()) {
     linear_v_ = localization.pose().linear_velocity().y();
   }
 }
