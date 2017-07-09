@@ -32,5 +32,5 @@ sudo add-apt-repository \
        main"
 
 sudo apt-get update
-sudo apt-get -y install docker-engine
+sudo apt-get -y --force-yes install docker-engine
 sudo usermod -aG docker "$USER"
