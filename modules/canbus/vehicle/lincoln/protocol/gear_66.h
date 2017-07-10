@@ -109,11 +109,10 @@ class Gear66 : public ProtocolData {
    * 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
    * 'bit': 7, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
    */
-  void set_clear_driver_override_flag_p(uint8_t* bytes, bool clear);
+  void set_clear_driver_override_flag_p(uint8_t* bytes);
 
  private:
   int32_t gear_ = 0;
-  bool clear_driver_override_flag_ = false;
   bool update_ = false;
 };
 

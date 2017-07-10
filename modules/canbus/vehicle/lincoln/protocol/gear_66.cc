@@ -33,13 +33,10 @@ uint32_t Gear66::GetPeriod() const {
 
 void Gear66::UpdateData(uint8_t* data) {
   set_gear_p(data, gear_);
-  set_clear_driver_override_flag_p(data, clear_driver_override_flag_);
+  set_clear_driver_override_flag_p(data);
 }
 
-void Gear66::Reset() {
-  gear_ = 0;
-  clear_driver_override_flag_ = false;
-}
+void Gear66::Reset() { gear_ = 0; }
 
 Gear66* Gear66::set_gear_none() {
   gear_ = 0x00;
@@ -78,13 +75,9 @@ void Gear66::set_gear_p(uint8_t* data, int32_t gear) {
   frame.set_value(gear, 0, 3);
 }
 
-void Gear66::set_clear_driver_override_flag_p(uint8_t* bytes, bool clear) {
-  Byte frame(bytes + 0);
-  if (clear) {
-    frame.set_bit_1(7);
-  } else {
-    frame.set_bit_0(7);
-  }
+void Gear66::set_clear_driver_override_flag_p(uint8_t* bytes) {
+  Byte frame(bytes);
+  frame.set_bit_0(7);
 }
 
 }  // namespace lincoln
