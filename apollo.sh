@@ -16,15 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-
 #=================================================
 #                   Utils
 #=================================================
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "${DIR}"
 
-source "${DIR}/scripts/apollo_base.sh"
+function source_apollo_base() {
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  cd "${DIR}"
 
+  source "${DIR}/scripts/apollo_base.sh"
+}
 
 function apollo_check_system_config() {
   # check operating system
@@ -48,33 +49,24 @@ function apollo_check_system_config() {
   fi
 }
 
-apollo_check_system_config
+function check_machine_arch() {
+  # the machine type, currently support x86_64, aarch64
+  MACHINE_ARCH=$(uname -m)
 
-# the machine type, currently support x86_64, aarch64
-MACHINE_ARCH=$(uname -m)
-
-IS_X86_64=false
-IS_AARCH64=false
-
-BUILD_TARGETS=""
-TEST_TARGETS=""
-CAN_CARD="fake_can"
-
-rm -rf ./third_party/ros
-if [ "$MACHINE_ARCH" == 'x86_64' ]; then
-   IS_X86_64=true
-   sed "s/MACHINE_ARCH/x86_64/g" WORKSPACE.in > WORKSPACE
-elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
-   IS_AARCH64=true
-   sed "s/MACHINE_ARCH/aarch64/g" WORKSPACE.in > WORKSPACE
-fi
-
-if ! $IS_X86_64 && ! $IS_AARCH64 ; then
-   fail "Unknown machine architecture $MACHINE_ARCH"
-   exit 1
-fi
+  # Generate WORKSPACE file based on marchine architecture
+  if [ "$MACHINE_ARCH" == 'x86_64' ]; then
+    sed "s/MACHINE_ARCH/x86_64/g" WORKSPACE.in > WORKSPACE
+  elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
+    sed "s/MACHINE_ARCH/aarch64/g" WORKSPACE.in > WORKSPACE
+  else
+    fail "Unknown machine architecture $MACHINE_ARCH"
+    exit 1
+  fi
+}
 
 function check_esd_files() {
+  CAN_CARD="fake_can"
+
   if [ -f ./third_party/can_card_library/esd_can/include/ntcan.h \
       -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so \
       -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4 \
@@ -86,8 +78,6 @@ function check_esd_files() {
       USE_ESD_CAN=false
   fi
 }
-
-check_esd_files
 
 function generate_build_targets() {
   BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
@@ -129,7 +119,7 @@ function apollo_build() {
 }
 
 function check() {
-  local check_start_time=$START_TIME
+  local check_start_time=$(get_now)
   apollo_build && run_test && run_lint
 
   START_TIME=$check_start_time
@@ -160,7 +150,7 @@ function release() {
   ROOT_DIR=$HOME/.cache/release
   rm -rf $ROOT_DIR
 
-  #modules
+  # modules
   MODULES_DIR=$ROOT_DIR/modules
   mkdir -p $MODULES_DIR
   for m in control canbus localization decision perception prediction planning
@@ -175,28 +165,36 @@ function release() {
         cp -r modules/$m/conf $TARGET_DIR
     fi
   done
-  #control tools
+
+  # control tools
   mkdir $MODULES_DIR/control/tools
   cp bazel-bin/modules/control/tools/pad_terminal $MODULES_DIR/control/tools
+
   #remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
   cp -r modules/tools $MODULES_DIR
-  #ros
+
+  # ros
   cp -Lr bazel-apollo/external/ros $ROOT_DIR/
-  #scripts
+
+  # scripts
   cp -r scripts $ROOT_DIR
+
   #dreamview
   cp -Lr bazel-bin/modules/dreamview/dreamview.runfiles/apollo/modules/dreamview $MODULES_DIR
   cp -r modules/dreamview/conf $MODULES_DIR/dreamview
-  #common data
+
+  # common data
   mkdir $MODULES_DIR/common
   cp -r modules/common/data $MODULES_DIR/common
-  #hmi
+
+  # hmi
   mkdir -p $MODULES_DIR/hmi/ros_node $MODULES_DIR/hmi/utils
   cp bazel-bin/modules/hmi/ros_node/ros_node_service $MODULES_DIR/hmi/ros_node/
   cp -r modules/hmi/conf $MODULES_DIR/hmi
   cp -r modules/hmi/web $MODULES_DIR/hmi
   cp -r modules/hmi/utils/*.py $MODULES_DIR/hmi/utils
+
   # lib
   LIB_DIR=$ROOT_DIR/lib
   mkdir $LIB_DIR
@@ -206,7 +204,7 @@ function release() {
     do
         cp third_party/can_card_library/$m/lib/* $LIB_DIR
     done
-    #hw check
+    # hw check
     mkdir -p $MODULES_DIR/monitor/hwmonitor/hw_check/
     cp bazel-bin/modules/monitor/hwmonitor/hw_check/can_check $MODULES_DIR/monitor/hwmonitor/hw_check/
     cp bazel-bin/modules/monitor/hwmonitor/hw_check/gps_check $MODULES_DIR/monitor/hwmonitor/hw_check/
@@ -214,11 +212,13 @@ function release() {
     cp bazel-bin/modules/monitor/hwmonitor/hw/tools/esdcan_test_app $MODULES_DIR/monitor/hwmonitor/hw/tools/
   fi
   cp -r bazel-genfiles/* $LIB_DIR
+  
   # doc
   cp -r docs $ROOT_DIR
   cp LICENSE $ROOT_DIR
   cp third_party/ACKNOWLEDGEMENT.txt $ROOT_DIR
-  #release info
+
+  # release info
   META=${ROOT_DIR}/meta.txt
   echo "Git commit: $(git show --oneline  -s | awk '{print $1}')" > $META
   echo "Build time: $TIME" >>  $META
@@ -346,7 +346,7 @@ function version() {
   echo "Date: ${date}"
 }
 
-function buildgnss() {
+function build_gnss() {
     CURRENT_PATH=$(pwd)
     MACHINE_ARCH="$(uname -m)"
     INSTALL_PATH="${CURRENT_PATH}/third_party/ros_${MACHINE_ARCH}"
@@ -387,44 +387,53 @@ function buildgnss() {
     rm -rf modules/devel_isolated/
 }
 
-case $1 in
-  check)
-    check
-    ;;
-  build)
-    apollo_build
-    ;;
-  buildify)
-    buildify
-    ;;
-  buildgnss)
-    buildgnss
-    ;;
-  doc)
-    gen_doc
-    ;;
-  lint)
-    run_lint
-    ;;
-  test)
-    run_test
-    ;;
-  release)
-    release 1
-    ;;
-  release_noproprietary)
-    release 0
-    ;;
-  coverage)
-    gen_coverage
-    ;;
-  clean)
-    clean
-    ;;
-  version)
-    version
-    ;;
-  *)
-    print_usage
-    ;;
-esac
+function main() {
+  source_apollo_base
+  apollo_check_system_config
+  check_machine_arch
+  check_esd_files
+
+  case $1 in
+    check)
+      check
+      ;;
+    build)
+      apollo_build
+      ;;
+    buildify)
+      buildify
+      ;;
+    buildgnss)
+      build_gnss
+      ;;
+    doc)
+      gen_doc
+      ;;
+    lint)
+      run_lint
+      ;;
+    test)
+      run_test
+      ;;
+    release)
+      release 1
+      ;;
+    release_noproprietary)
+      release 0
+      ;;
+    coverage)
+      gen_coverage
+      ;;
+    clean)
+      clean
+      ;;
+    version)
+      version
+      ;;
+    *)
+      print_usage
+      ;;
+  esac
+}
+
+main $@
