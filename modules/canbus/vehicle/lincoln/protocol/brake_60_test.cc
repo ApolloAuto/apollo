@@ -18,9 +18,6 @@
 
 #include "gtest/gtest.h"
 
-#include <bitset>
-#include <iostream>
-
 namespace apollo {
 namespace canbus {
 namespace lincoln {

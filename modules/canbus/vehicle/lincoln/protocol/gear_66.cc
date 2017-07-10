@@ -74,7 +74,7 @@ Gear66* Gear66::set_gear_low() {
 // private
 void Gear66::set_gear_p(uint8_t* data, int32_t gear) {
   gear = ProtocolData::BoundedValue(0, 5, gear);
-  Byte frame(data + 0);
+  Byte frame(data);
   frame.set_value(gear, 0, 3);
 }
 
