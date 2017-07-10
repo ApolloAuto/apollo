@@ -29,16 +29,19 @@ function source_apollo_base() {
 
 function apollo_check_system_config() {
   # check operating system
-  OP_SYSTEM=$(uname -o)
+  OP_SYSTEM=$(uname -s)
   case $OP_SYSTEM in
-    *"Linux")
-       echo "System check passed. Build continue ..."
-       ;;
+    "Linux")
+      echo "System check passed. Build continue ..."
+      ;;
+    "Darwin")
+      warning "Mac OS is not officially supported in the current version. Build could fail. We recommend using Ubuntu 14.04."
+      ;;
     *)
-       error "Unsupported system: ${OP_SYSTEM}."
-       error "Please use Linux, we recommend Ubuntu 14.04."
-       exit 1
-       ;;
+      error "Unsupported system: ${OP_SYSTEM}."
+      error "Please use Linux, we recommend Ubuntu 14.04."
+      exit 1
+      ;;
   esac
 
   # check system configuration
