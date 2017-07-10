@@ -81,6 +81,8 @@ function main(){
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
     USER_ID=$(id -u)
+    GRP=$(id -g -n)
+    GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
     docker run -it \
         -d \
@@ -89,6 +91,8 @@ function main(){
         -e DOCKER_USER=$USER \
         -e USER=$USER \
         -e DOCKER_USER_ID=$USER_ID \
+        -e DOCKER_GRP=$GRP \
+        -e DOCKER_GRP_ID=$GRP_ID \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $LOCAL_DIR:/apollo \
         -v /media:/media \
