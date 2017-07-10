@@ -32,6 +32,7 @@ TEST_F(Accel6bTest, Parse) {
   uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   EXPECT_EQ(gear.GetPeriod(), 20 * 1000);
   gear.UpdateData(data);
+
   EXPECT_EQ(data[0], 0b01100000);
   EXPECT_EQ(data[1], 0b01100010);
   EXPECT_EQ(data[2], 0b01100011);
