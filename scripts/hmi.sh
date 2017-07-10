@@ -37,10 +37,18 @@ function start() {
         --log_dir=${APOLLO_ROOT_DIR}/data/log \
         >${LOG} 2>&1 &
 
-    echo "HMI running at http://localhost:8887"
     LOG="${APOLLO_ROOT_DIR}/data/log/hmi.out"
     nohup python modules/hmi/web/hmi_main.py \
         --conf=modules/hmi/conf/config.pb.txt >"${LOG}" 2>&1 &
+
+    sleep 1
+    HMI_PROCESS="$(pgrep -c -f modules/hmi/web/hmi_main.py)"
+    if [ "${HMI_PROCESS}" -eq 1 ]; then
+        echo "HMI is running at http://localhost:8887"
+    else
+        echo "Failed to start HMI."
+        cat "${LOG}"
+    fi
 }
 
 function stop() {
