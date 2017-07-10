@@ -18,8 +18,6 @@
 
 #include "gtest/gtest.h"
 
-#include <iostream>
-
 namespace apollo {
 namespace canbus {
 namespace lincoln {
