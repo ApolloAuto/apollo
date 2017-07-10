@@ -92,6 +92,8 @@ function main() {
         display="${DISPLAY}"
     fi
     USER_ID=$(id -u)
+    GRP=$(id -g -n)
+    GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
     docker run -it \
         -d --privileged \
@@ -108,6 +110,8 @@ function main() {
         -e DOCKER_USER=$USER \
         -e USER=$USER \
         -e DOCKER_USER_ID=$USER_ID \
+        -e DOCKER_GRP=$GRP \
+        -e DOCKER_GRP_ID=$GRP_ID \
         -e PYTHONPATH=/apollo/lib:/apollo/ros/lib/python2.7/dist-packages \
         ${devices} \
         --add-host in_release_docker:127.0.0.1 \
@@ -116,7 +120,7 @@ function main() {
         --shm-size 512M \
         $IMG
     docker exec apollo_release /apollo/scripts/docker_adduser.sh
-    docker exec apollo_release bash -c "chown -R ${USER}:${USER} /apollo"
+    docker exec apollo_release bash -c "chown -R ${DOCKER_USER}:${DOCKER_GRP} /apollo"
     docker exec -u ${USER} apollo_release "/apollo/scripts/hmi.sh"
 }
 
