@@ -109,7 +109,7 @@ function generate_test_targets() {
 #=================================================
 
 function apollo_build() {
-  START_TIME=$(($(date +%s%N)/1000000))
+  START_TIME=$(get_now)
 
   # Avoid query release directory.
   if [ -d release ];then
@@ -260,7 +260,7 @@ function gen_coverage() {
 }
 
 function run_test() {
-  START_TIME=$(($(date +%s%N)/1000000))
+  START_TIME=$(get_now)
 
   # Avoid query release directory.
   if [ -d release ];then
@@ -289,7 +289,7 @@ function run_bash_lint() {
 }
 
 function run_lint() {
-  START_TIME=$(($(date +%s%N)/1000000))
+  START_TIME=$(get_now)
   run_cpp_lint
 
   if [ $? -eq 0 ]; then

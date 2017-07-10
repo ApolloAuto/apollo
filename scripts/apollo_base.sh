@@ -16,11 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-
-START_TIME=$(($(date +%s%N)/1000000))
-TIME=$(date  +%Y%m%d_%H%M)
 
 RED='\033[0;31m'
 YELLOW='\e[33m'
@@ -46,9 +42,13 @@ function print_delim() {
   echo '============================'
 }
 
-print_time() {
-  END_TIME=$(($(date +%s%N)/1000000))
-  ELAPSED_TIME=$(echo "scale=3; ($END_TIME - $START_TIME) / 1000" | bc -l)
+function get_now() {
+  echo $(date +%s)
+}
+
+function print_time() {
+  END_TIME=$(get_now)
+  ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc -l)
   MESSAGE="Took ${ELAPSED_TIME} seconds"
   info "${MESSAGE}"
 }
