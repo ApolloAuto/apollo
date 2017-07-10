@@ -33,6 +33,13 @@ function apollo_check_system_config() {
   case $OP_SYSTEM in
     "Linux")
       echo "System check passed. Build continue ..."
+
+      # check system configuration
+      DEFAULT_MEM_SIZE="2.0"
+      MEM_SIZE=$(free | grep Mem | awk '{printf("%0.2f", $2 / 1024.0 / 1024.0)}')
+      if (( $(echo "$MEM_SIZE < $DEFAULT_MEM_SIZE" | bc -l) )); then
+         warning "System memory [${MEM_SIZE}G] is lower than minimum required memory size [2.0G]. Apollo build could fail."
+      fi
       ;;
     "Darwin")
       warning "Mac OS is not officially supported in the current version. Build could fail. We recommend using Ubuntu 14.04."
@@ -43,13 +50,6 @@ function apollo_check_system_config() {
       exit 1
       ;;
   esac
-
-  # check system configuration
-  DEFAULT_MEM_SIZE="2.0"
-  MEM_SIZE=$(free | grep Mem | awk '{printf("%0.2f", $2 / 1024.0 / 1024.0)}')
-  if (( $(echo "$MEM_SIZE < $DEFAULT_MEM_SIZE" | bc -l) )); then
-     warning "System memory [${MEM_SIZE}G] is lower than minimum required memory size [2.0G]. Apollo build could fail."
-  fi
 }
 
 function check_machine_arch() {
