@@ -19,7 +19,7 @@
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
-START_TIME=$(($(date +%s%N)/1000000))
+START_TIME=$(date +%s)
 TIME=$(date  +%Y%m%d_%H%M)
 
 RED='\033[0;31m'
@@ -47,8 +47,8 @@ function print_delim() {
 }
 
 print_time() {
-  END_TIME=$(($(date +%s%N)/1000000))
-  ELAPSED_TIME=$(echo "scale=3; ($END_TIME - $START_TIME) / 1000" | bc -l)
+  END_TIME=$(date +%s)
+  ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc -l)
   MESSAGE="Took ${ELAPSED_TIME} seconds"
   info "${MESSAGE}"
 }
