@@ -177,7 +177,6 @@ function release() {
   done
   #control tools
   mkdir $MODULES_DIR/control/tools
-  cp bazel-bin/modules/control/tools/enter_auto_mode $MODULES_DIR/control/tools
   cp bazel-bin/modules/control/tools/pad_terminal $MODULES_DIR/control/tools
   #remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
