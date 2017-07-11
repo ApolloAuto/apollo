@@ -22,3 +22,7 @@ If you are a developer and would like to build the Apollo Kernel, the Robot Oper
 
 ## I cannot solve my build problems, what is the most effective way to ask for help?
 So far, many build problems are related to environment setting. You can run the script to get your environment: `bash scripts/env.sh >& env.txt` and provide the content of env.txt in your post.
+
+## Which ports need be white list to run Apollo in public cloud instance?
+8887: HMI
+8888, 8889: Dreamview
