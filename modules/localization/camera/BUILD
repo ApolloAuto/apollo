@@ -23,6 +23,7 @@ cc_library(
         "//modules/localization/proto:camera_proto",
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",
+        "@gtest//:gtest",
         "@ros//:ros_common",
     ],
 )
