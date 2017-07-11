@@ -25,11 +25,11 @@ namespace lincoln {
 const int32_t Throttleinfo75::ID = 0x75;
 
 void Throttleinfo75::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* car_status) const {
-  car_status->mutable_ems()->set_engine_rpm(engine_rpm(bytes, length));
-  car_status->mutable_gas()->set_accelerator_pedal(
+                           ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_ems()->set_engine_rpm(engine_rpm(bytes, length));
+  chassis_detail->mutable_gas()->set_accelerator_pedal(
       acc_pedal_percent(bytes, length));
-  car_status->mutable_gas()->set_accelerator_pedal_rate(
+  chassis_detail->mutable_gas()->set_accelerator_pedal_rate(
       acc_pedal_rate(bytes, length));
 }
 
