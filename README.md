@@ -52,7 +52,8 @@ to load Dreamview UI.
 
 ### Replay demo rosbag
 ```
-# in a different terminal inside docker
+# in a different terminal, in the apollo directory
+bash docker/scripts/dev_into.sh # jump into the docker container
 rosbag play -l ./docs/demo_guide/demo.bag
 ```
 Dreamview should show a running vehicle with trajectory now.
