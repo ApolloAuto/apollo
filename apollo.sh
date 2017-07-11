@@ -104,10 +104,6 @@ function generate_test_targets() {
 function apollo_build() {
   START_TIME=$(get_now)
 
-  # Avoid query release directory.
-  if [ -d release ];then
-    rm -rf release
-  fi
   echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
@@ -151,7 +147,10 @@ function warn_proprietary_sw() {
 
 function release() {
   ROOT_DIR=$HOME/.cache/release
-  rm -rf $ROOT_DIR
+  if [ -d $ROOT_DIR ];then
+    rm -rf $ROOT_DIR
+  fi
+  mkdir -p $ROOT_DIR
 
   # modules
   MODULES_DIR=$ROOT_DIR/modules
