@@ -23,11 +23,23 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Turnsignal68Test, General) {
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Turnsignal68 turn_signal;
-  uint8_t data = 0x00;
-  turn_signal.UpdateData(&data);
+  EXPECT_EQ(turn_signal.GetPeriod(), 50 * 1000);
   EXPECT_EQ(turn_signal.turn_cmd(), 0);
-  EXPECT_EQ(turn_signal.GetPeriod(), 50000);
+
+  turn_signal.UpdateData(data);
+
+  EXPECT_EQ(data[0], 0b01100100);
+  EXPECT_EQ(data[1], 0b01100010);
+  EXPECT_EQ(data[2], 0b01100011);
+  EXPECT_EQ(data[3], 0b01100100);
+  EXPECT_EQ(data[4], 0b01010001);
+  EXPECT_EQ(data[5], 0b01010010);
+  EXPECT_EQ(data[6], 0b01010011);
+  EXPECT_EQ(data[7], 0b01010100);
+
+  EXPECT_EQ(turn_signal.turn_cmd(), 0);
   turn_signal.set_turn_none();
   EXPECT_EQ(turn_signal.turn_cmd(), 0x00);
   turn_signal.set_turn_left();
