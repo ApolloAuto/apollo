@@ -43,7 +43,7 @@ fi
 
 echo "APOLLO_ROOT_DIR=$APOLLO_ROOT_DIR"
 
-VERSION=release-latest
+VERSION=release-20170711_1546
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
