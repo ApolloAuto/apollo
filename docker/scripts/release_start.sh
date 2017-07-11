@@ -95,13 +95,17 @@ function main() {
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
+    DOCKER_HOME="/home/$USER"
+    if [ "$USER" == "root" ];then
+        DOCKER_HOME="/root"
+    fi
     docker run -it \
         -d --privileged \
         --name apollo_release \
         --net host \
         -v /media:/media \
         -v ${APOLLO_ROOT_DIR}/data:/apollo/data \
-        -v $HOME:$HOME \
+        -v $HOME:${DOCKER_HOME} \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /etc/localtime:/etc/localtime:ro \
         -w /apollo \
@@ -120,7 +124,7 @@ function main() {
         --shm-size 512M \
         $IMG
     docker exec apollo_release /apollo/scripts/docker_adduser.sh
-    docker exec apollo_release bash -c "chown -R ${DOCKER_USER}:${DOCKER_GRP} /apollo"
+    docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo"
     docker exec -u ${USER} apollo_release "/apollo/scripts/hmi.sh"
 }
 
