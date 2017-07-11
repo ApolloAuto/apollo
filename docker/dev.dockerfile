@@ -3,10 +3,15 @@ FROM ubuntu:14.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
+   apt-transport-https \
+   bc \
    build-essential \
+   cppcheck \
    curl \
    debconf-utils \
    doxygen \
+   gdb \
+   git \
    lcov \
    libboost-all-dev \
    libcurl4-openssl-dev \
@@ -20,11 +25,7 @@ RUN apt-get update && apt-get install -y \
    software-properties-common \
    unzip \
    wget \
-   zip \
-   cppcheck \
-   git \
-   bc \
-   apt-transport-https
+   zip
 
 RUN add-apt-repository ppa:webupd8team/java
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
