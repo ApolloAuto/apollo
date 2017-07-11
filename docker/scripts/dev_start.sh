@@ -84,6 +84,10 @@ function main(){
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
+    DOCKER_HOME="/home/$USER"
+    if [ "$USER" == "root" ];then
+        DOCKER_HOME="/root"
+    fi
     docker run -it \
         -d \
         --name apollo_dev \
@@ -96,7 +100,7 @@ function main(){
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $LOCAL_DIR:/apollo \
         -v /media:/media \
-        -v $HOME:$HOME \
+        -v $HOME:${DOCKER_HOME} \
         -v /etc/localtime:/etc/localtime:ro \
         --net host \
         -w /apollo \
