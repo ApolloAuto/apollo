@@ -50,6 +50,7 @@ class Tirepressure71 : public ProtocolData {
   virtual void Parse(const std::uint8_t* bytes, int32_t length,
                      ChassisDetail* car_status) const;
 
+ private:
   /**
    * @brief calculate front left tire based on byte array.
    * config detail: {'name': 'fl', 'offset': 0.0, 'precision': 1.0, 'len': 16,
