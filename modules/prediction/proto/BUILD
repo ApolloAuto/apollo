@@ -14,6 +14,15 @@ cc_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "lane_graph_proto",
+    protos = [
+        "lane_graph.proto",
+    ],
+    deps = [
+    ],
+)
+
 py_proto_compile(
     name = "prediction_proto_pylib",
     protos = [
