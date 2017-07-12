@@ -71,11 +71,16 @@ function find_device() {
 function main() {
     docker pull "$IMG"
 
-    docker stop apollo_release
-    docker rm -f apollo_release
+    docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
+    if [ $? == 0 ]; then
+        docker stop apollo_release 1>/dev/null
+        docker rm -f apollo_release 1>/dev/null
+    fi
 
     # setup CAN device
-    sudo mknod --mode=a+rw /dev/can0 c 52 0
+    if [ ! -e /dev/can0 ]; then
+        sudo mknod --mode=a+rw /dev/can0 c 52 0
+    fi
 
     # enable coredump
     echo "${APOLLO_ROOT_DIR}/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
