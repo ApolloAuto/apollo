@@ -21,6 +21,9 @@
 #ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
 #define MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
 
+#include <unordered_map>
+
+#include "modules/prediction/container/container.h"
 #include "modules/common/macro.h"
 
 /**
@@ -31,8 +34,26 @@ namespace apollo {
 namespace prediction {
 
 class ContainerManager {
-public:
-  virtual ~ContainerManager() {}
+ public:
+  /**
+   * @brief Destructor
+   */ 
+  virtual ~ContainerManager();
+
+  /**
+   * @brief Register all containers
+   */
+  void RegisterContainer();
+
+  /**
+   * @brief Get mutable container
+   * @param Name of the container
+   * @return Pointer of the container given the name
+   */
+  Container* mutable_container(const std::string& name);
+
+ private:
+  std::unordered_map<std::string, std::unique_ptr<Container>> containers_;
 
   DECLARE_SINGLETON(ContainerManager)
 };
