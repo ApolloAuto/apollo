@@ -25,14 +25,14 @@ namespace lincoln {
 const int32_t Tirepressure71::ID = 0x71;
 
 void Tirepressure71::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* car_status) const {
-  car_status->mutable_safety()->set_front_left_tire_press(
+                           ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_safety()->set_front_left_tire_press(
       front_left_tire(bytes, length));
-  car_status->mutable_safety()->set_front_right_tire_press(
+  chassis_detail->mutable_safety()->set_front_right_tire_press(
       front_right_tire(bytes, length));
-  car_status->mutable_safety()->set_rear_left_tire_press(
+  chassis_detail->mutable_safety()->set_rear_left_tire_press(
       rear_left_tire(bytes, length));
-  car_status->mutable_safety()->set_rear_right_tire_press(
+  chassis_detail->mutable_safety()->set_rear_right_tire_press(
       rear_right_tire(bytes, length));
 }
 

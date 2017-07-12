@@ -25,68 +25,68 @@ namespace lincoln {
 const int32_t Gear67::ID = 0x67;
 
 void Gear67::Parse(const std::uint8_t* bytes, int32_t length,
-                   ChassisDetail* car_status) const {
+                   ChassisDetail* chassis_detail) const {
   int32_t gear = gear_state(bytes, length);
   switch (gear) {
     case 0x01:
-      car_status->mutable_gear()->set_gear_state(Chassis::GEAR_PARKING);
+      chassis_detail->mutable_gear()->set_gear_state(Chassis::GEAR_PARKING);
       break;
     case 0x02:
-      car_status->mutable_gear()->set_gear_state(Chassis::GEAR_REVERSE);
+      chassis_detail->mutable_gear()->set_gear_state(Chassis::GEAR_REVERSE);
       break;
     case 0x03:
-      car_status->mutable_gear()->set_gear_state(Chassis::GEAR_NEUTRAL);
+      chassis_detail->mutable_gear()->set_gear_state(Chassis::GEAR_NEUTRAL);
       break;
     case 0x04:
-      car_status->mutable_gear()->set_gear_state(Chassis::GEAR_DRIVE);
+      chassis_detail->mutable_gear()->set_gear_state(Chassis::GEAR_DRIVE);
       break;
     case 0x05:
-      car_status->mutable_gear()->set_gear_state(Chassis::GEAR_LOW);
+      chassis_detail->mutable_gear()->set_gear_state(Chassis::GEAR_LOW);
       break;
     case 0x00:
-      car_status->mutable_gear()->set_gear_state(Chassis::GEAR_NONE);
+      chassis_detail->mutable_gear()->set_gear_state(Chassis::GEAR_NONE);
       break;
     default:
-      car_status->mutable_gear()->set_gear_state(Chassis::GEAR_INVALID);
+      chassis_detail->mutable_gear()->set_gear_state(Chassis::GEAR_INVALID);
       break;
   }
 
   if (is_driver_override(bytes, length)) {
     // last shift requested by driver
-    car_status->mutable_gear()->set_is_shift_position_valid(false);
+    chassis_detail->mutable_gear()->set_is_shift_position_valid(false);
   } else {
     // last shift requested by-wire
-    car_status->mutable_gear()->set_is_shift_position_valid(true);
+    chassis_detail->mutable_gear()->set_is_shift_position_valid(true);
   }
-  car_status->mutable_gear()->set_driver_override(
+  chassis_detail->mutable_gear()->set_driver_override(
       is_driver_override(bytes, length));
 
   int32_t gear_cmd = reported_gear_cmd(bytes, length);
   switch (gear_cmd) {
     case 0x01:
-      car_status->mutable_gear()->set_gear_cmd(Chassis::GEAR_PARKING);
+      chassis_detail->mutable_gear()->set_gear_cmd(Chassis::GEAR_PARKING);
       break;
     case 0x02:
-      car_status->mutable_gear()->set_gear_cmd(Chassis::GEAR_REVERSE);
+      chassis_detail->mutable_gear()->set_gear_cmd(Chassis::GEAR_REVERSE);
       break;
     case 0x03:
-      car_status->mutable_gear()->set_gear_cmd(Chassis::GEAR_NEUTRAL);
+      chassis_detail->mutable_gear()->set_gear_cmd(Chassis::GEAR_NEUTRAL);
       break;
     case 0x04:
-      car_status->mutable_gear()->set_gear_cmd(Chassis::GEAR_DRIVE);
+      chassis_detail->mutable_gear()->set_gear_cmd(Chassis::GEAR_DRIVE);
       break;
     case 0x05:
-      car_status->mutable_gear()->set_gear_cmd(Chassis::GEAR_LOW);
+      chassis_detail->mutable_gear()->set_gear_cmd(Chassis::GEAR_LOW);
       break;
     case 0x00:
-      car_status->mutable_gear()->set_gear_cmd(Chassis::GEAR_NONE);
+      chassis_detail->mutable_gear()->set_gear_cmd(Chassis::GEAR_NONE);
       break;
     default:
-      car_status->mutable_gear()->set_gear_cmd(Chassis::GEAR_INVALID);
+      chassis_detail->mutable_gear()->set_gear_cmd(Chassis::GEAR_INVALID);
       break;
   }
 
-  car_status->mutable_gear()->set_canbus_fault(is_canbus_fault(bytes, length));
+  chassis_detail->mutable_gear()->set_canbus_fault(is_canbus_fault(bytes, length));
 }
 
 int32_t Gear67::gear_state(const std::uint8_t* bytes, int32_t length) const {
