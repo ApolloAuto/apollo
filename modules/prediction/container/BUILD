@@ -5,6 +5,7 @@ cc_library(
     srcs = ["container_manager.cc"],
     hdrs = ["container_manager.h"],
     deps = [
+        "//modules/prediction/container:container",
         "//modules/common:macro",
         "@glog//:glog"
     ]
