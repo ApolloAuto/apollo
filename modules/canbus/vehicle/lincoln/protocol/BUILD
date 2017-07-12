@@ -200,10 +200,34 @@ cc_test(
 )
 
 cc_test(
+    name = "steering_64_test",
+    size = "small",
+    srcs = [
+        "steering_64_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "steering_65_test",
     size = "small",
     srcs = [
         "steering_65_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "throttle_62_test",
+    size = "small",
+    srcs = [
+        "throttle_62_test.cc",
     ],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",

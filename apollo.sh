@@ -104,10 +104,6 @@ function generate_test_targets() {
 function apollo_build() {
   START_TIME=$(get_now)
 
-  # Avoid query release directory.
-  if [ -d release ];then
-    rm -rf release
-  fi
   echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
@@ -135,23 +131,21 @@ function check() {
   fi
 }
 
-# print the given message in red txt with white background.
-function echo_red_white() {
-  echo -e "$(tput setaf 1)$(tput setab 7)"$1 "\e[0m"
-}
-
 function warn_proprietary_sw() {
-  echo_red_white "The release built contains proprietary software provided by other parties. "
-  echo_red_white "Make sure you have obtained proper licensing agreement for redistribution "
-  echo_red_white "if you intend to publish the release package built. "
-  echo_red_white "Such licensing agreement is solely between you and the other parties, "
-  echo_red_white "and is NOT covered by the license terms of the Apollo project "
-  echo_red_white "(see file LICENSE)."
+  echo -e "${RED}The release built contains proprietary software provided by other parties.${NO_COLOR}"
+  echo -e "${RED}Make sure you have obtained proper licensing agreement for redistribution${NO_COLOR}"
+  echo -e "${RED}if you intend to publish the release package built.${NO_COLOR}"
+  echo -e "${RED}Such licensing agreement is solely between you and the other parties,${NO_COLOR}"
+  echo -e "${RED}and is not covered by the license terms of the apollo project${NO_COLOR}"
+  echo -e "${RED}(see file license).${NO_COLOR}"
 }
 
 function release() {
   ROOT_DIR=$HOME/.cache/release
-  rm -rf $ROOT_DIR
+  if [ -d $ROOT_DIR ];then
+    rm -rf $ROOT_DIR
+  fi
+  mkdir -p $ROOT_DIR
 
   # modules
   MODULES_DIR=$ROOT_DIR/modules

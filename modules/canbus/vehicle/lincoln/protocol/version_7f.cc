@@ -25,29 +25,31 @@ namespace lincoln {
 const int32_t Version7f::ID = 0x7f;
 
 void Version7f::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* car_status) const {
+                      ChassisDetail* chassis_detail) const {
   switch (module_name(bytes, length)) {
     case 0x01:
-      car_status->mutable_brake()->set_major_version(
+      chassis_detail->mutable_brake()->set_major_version(
           major_version(bytes, length));
-      car_status->mutable_brake()->set_minor_version(
+      chassis_detail->mutable_brake()->set_minor_version(
           minor_version(bytes, length));
-      car_status->mutable_brake()->set_build_number(
+      chassis_detail->mutable_brake()->set_build_number(
           build_number(bytes, length));
       break;
     case 0x02:
-      car_status->mutable_gas()->set_major_version(
+      chassis_detail->mutable_gas()->set_major_version(
           major_version(bytes, length));
-      car_status->mutable_gas()->set_minor_version(
+      chassis_detail->mutable_gas()->set_minor_version(
           minor_version(bytes, length));
-      car_status->mutable_gas()->set_build_number(build_number(bytes, length));
+      chassis_detail->mutable_gas()->set_build_number(
+          build_number(bytes, length));
       break;
     case 0x03:
-      car_status->mutable_eps()->set_major_version(
+      chassis_detail->mutable_eps()->set_major_version(
           major_version(bytes, length));
-      car_status->mutable_eps()->set_minor_version(
+      chassis_detail->mutable_eps()->set_minor_version(
           minor_version(bytes, length));
-      car_status->mutable_eps()->set_build_number(build_number(bytes, length));
+      chassis_detail->mutable_eps()->set_build_number(
+          build_number(bytes, length));
       break;
     default:
       break;

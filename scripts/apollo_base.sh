@@ -70,7 +70,7 @@ function fail() {
 
 # Check whether user has agreed license agreement
 function check_agreement() {
-  agreement_record="$HOME/.apollo_agreement.txt"
+  agreement_record="$HOME/.cache/.apollo_agreement.txt"
   if [ ! -e "$agreement_record" ]; then
      AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
      if [ ! -e "$AGREEMENT_FILE" ]; then
@@ -79,7 +79,7 @@ function check_agreement() {
      fi
      cat $AGREEMENT_FILE
      tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-     echo $tip 
+     echo $tip
      read -n 1 user_agreed
      if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
          rm -rf $agreement_record

@@ -32,6 +32,7 @@ cc_library(
         "//modules/canbus/vehicle:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:gtest",
     ],
 )
 

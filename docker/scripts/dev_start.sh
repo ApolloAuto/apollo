@@ -84,6 +84,13 @@ function main(){
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
+    DOCKER_HOME="/home/$USER"
+    if [ "$USER" == "root" ];then
+        DOCKER_HOME="/root"
+    fi
+    if [ ! -d "$HOME/.cache" ];then
+        mkdir "$HOME/.cache"
+    fi
     docker run -it \
         -d \
         --name apollo_dev \
@@ -96,7 +103,7 @@ function main(){
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $LOCAL_DIR:/apollo \
         -v /media:/media \
-        -v $HOME:$HOME \
+        -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
         --net host \
         -w /apollo \
@@ -106,7 +113,9 @@ function main(){
         --hostname in_dev_docker \
         --shm-size 512M \
         $IMG
-    docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
+    if [ "${USER}" != "root" ]; then
+        docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
+    fi
 }
 
 main

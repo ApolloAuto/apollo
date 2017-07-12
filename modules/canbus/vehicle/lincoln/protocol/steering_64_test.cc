@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/throttleinfo_75.h"
+#include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
 
 #include "gtest/gtest.h"
 
@@ -22,22 +22,19 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-TEST(Throttleinfo75Test, General) {
+TEST(Steering64Test, General) {
   uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
-  int32_t length = 8;
-  ChassisDetail cd;
-  Throttleinfo75 throttle_info;
-  throttle_info.Parse(data, length, &cd);
-
-  EXPECT_TRUE(cd.has_ems());
-  EXPECT_TRUE(cd.ems().has_engine_rpm());
-  EXPECT_TRUE(cd.has_gas());
-  EXPECT_TRUE(cd.gas().has_accelerator_pedal());
-  EXPECT_TRUE(cd.gas().has_accelerator_pedal_rate());
-
-  EXPECT_DOUBLE_EQ(cd.ems().engine_rpm(), 6297.75);
-  EXPECT_DOUBLE_EQ(cd.gas().accelerator_pedal(), 9.9);
-  EXPECT_DOUBLE_EQ(cd.gas().accelerator_pedal_rate(), -7);
+  Steering64 steering;
+  EXPECT_EQ(steering.GetPeriod(), 20 * 1000);
+  steering.UpdateData(data);
+  EXPECT_EQ(data[0], 0b00000000);
+  EXPECT_EQ(data[1], 0b00000000);
+  EXPECT_EQ(data[2], 0b01100000);
+  EXPECT_EQ(data[3], 0b00000000);
+  EXPECT_EQ(data[4], 0b01010001);
+  EXPECT_EQ(data[5], 0b01010010);
+  EXPECT_EQ(data[6], 0b01010011);
+  EXPECT_EQ(data[7], 0b00000000);
 }
 
 }  // namespace lincoln

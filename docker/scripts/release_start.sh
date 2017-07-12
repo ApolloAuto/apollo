@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [ -e "$DIR/../../scripts/apollo_base.sh" ]; then
@@ -42,7 +43,7 @@ fi
 
 echo "APOLLO_ROOT_DIR=$APOLLO_ROOT_DIR"
 
-VERSION=release-latest
+VERSION=release-20170711_1546
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
@@ -95,15 +96,22 @@ function main() {
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
+    DOCKER_HOME="/home/$USER"
+    if [ "$USER" == "root" ];then
+        DOCKER_HOME="/root"
+    fi
+    if [ ! -d "$HOME/.cache" ];then
+        mkdir "$HOME/.cache"
+    fi
     docker run -it \
         -d --privileged \
         --name apollo_release \
         --net host \
         -v /media:/media \
         -v ${APOLLO_ROOT_DIR}/data:/apollo/data \
-        -v $HOME:$HOME \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /etc/localtime:/etc/localtime:ro \
+        -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -w /apollo \
         -e DISPLAY=${display} \
         -e RELEASE_DOCKER=1 \
@@ -119,9 +127,11 @@ function main() {
         --hostname in_release_docker \
         --shm-size 512M \
         $IMG
-    docker exec apollo_release /apollo/scripts/docker_adduser.sh
-    docker exec apollo_release bash -c "chown -R ${DOCKER_USER}:${DOCKER_GRP} /apollo"
-    docker exec -u ${USER} apollo_release "/apollo/scripts/hmi.sh"
+    if [ "${USER}" != "root" ]; then
+        docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
+        docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo"
+    fi
+    docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
 }
 
 main
