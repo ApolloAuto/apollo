@@ -25,27 +25,27 @@ namespace lincoln {
 const int32_t Wheelspeed6a::ID = 0x6A;
 
 void Wheelspeed6a::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* car_status) const {
+                         ChassisDetail* chassis_detail) const {
   // TODO
 
   // how to set direction
   // what is "valid"
   // front left
-  car_status->mutable_vehicle_spd()->set_wheel_spd_fl(
+  chassis_detail->mutable_vehicle_spd()->set_wheel_spd_fl(
       front_left_wheel_speed(bytes, length));
-  car_status->mutable_vehicle_spd()->set_is_wheel_spd_fl_valid(true);
+  chassis_detail->mutable_vehicle_spd()->set_is_wheel_spd_fl_valid(true);
   // front right
-  car_status->mutable_vehicle_spd()->set_wheel_spd_fr(
+  chassis_detail->mutable_vehicle_spd()->set_wheel_spd_fr(
       front_right_wheel_speed(bytes, length));
-  car_status->mutable_vehicle_spd()->set_is_wheel_spd_fr_valid(true);
+  chassis_detail->mutable_vehicle_spd()->set_is_wheel_spd_fr_valid(true);
   // rear left
-  car_status->mutable_vehicle_spd()->set_wheel_spd_rl(
+  chassis_detail->mutable_vehicle_spd()->set_wheel_spd_rl(
       rear_left_wheel_speed(bytes, length));
-  car_status->mutable_vehicle_spd()->set_is_wheel_spd_rl_valid(true);
+  chassis_detail->mutable_vehicle_spd()->set_is_wheel_spd_rl_valid(true);
   // rear right
-  car_status->mutable_vehicle_spd()->set_wheel_spd_rr(
+  chassis_detail->mutable_vehicle_spd()->set_wheel_spd_rr(
       rear_right_wheel_speed(bytes, length));
-  car_status->mutable_vehicle_spd()->set_is_wheel_spd_rr_valid(true);
+  chassis_detail->mutable_vehicle_spd()->set_is_wheel_spd_rr_valid(true);
   /*
   -?(rr(bytes, length));
   -?(rl(bytes, length));
@@ -55,10 +55,10 @@ void Wheelspeed6a::Parse(const std::uint8_t* bytes, int32_t length,
 
 void Wheelspeed6a::Parse(const std::uint8_t* bytes, int32_t length,
                          const struct timeval& timestamp,
-                         ChassisDetail* car_status) const {
-  car_status->mutable_vehicle_spd()->set_timestamp_sec(
+                         ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_vehicle_spd()->set_timestamp_sec(
       timestamp.tv_sec + timestamp.tv_usec / 1000000.0);
-  Parse(bytes, length, car_status);
+  Parse(bytes, length, chassis_detail);
 }
 
 double Wheelspeed6a::front_left_wheel_speed(const std::uint8_t* bytes,

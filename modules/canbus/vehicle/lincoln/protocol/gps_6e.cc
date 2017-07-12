@@ -25,18 +25,18 @@ namespace lincoln {
 const int32_t Gps6e::ID = 0x6E;
 
 void Gps6e::Parse(const std::uint8_t* bytes, int32_t length,
-                  ChassisDetail* car_status) const {
-  car_status->mutable_basic()->set_year(year(bytes, length));
-  car_status->mutable_basic()->set_month(month(bytes, length));
-  car_status->mutable_basic()->set_day(day(bytes, length));
-  car_status->mutable_basic()->set_hours(hours(bytes, length));
-  car_status->mutable_basic()->set_minutes(minutes(bytes, length));
-  car_status->mutable_basic()->set_seconds(seconds(bytes, length));
-  car_status->mutable_basic()->set_compass_direction(
+                  ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_basic()->set_year(year(bytes, length));
+  chassis_detail->mutable_basic()->set_month(month(bytes, length));
+  chassis_detail->mutable_basic()->set_day(day(bytes, length));
+  chassis_detail->mutable_basic()->set_hours(hours(bytes, length));
+  chassis_detail->mutable_basic()->set_minutes(minutes(bytes, length));
+  chassis_detail->mutable_basic()->set_seconds(seconds(bytes, length));
+  chassis_detail->mutable_basic()->set_compass_direction(
       compass_direction(bytes, length));
-  car_status->mutable_basic()->set_pdop(pdop(bytes, length));
-  car_status->mutable_basic()->set_is_gps_fault(is_gps_fault(bytes, length));
-  car_status->mutable_basic()->set_is_inferred(
+  chassis_detail->mutable_basic()->set_pdop(pdop(bytes, length));
+  chassis_detail->mutable_basic()->set_is_gps_fault(is_gps_fault(bytes, length));
+  chassis_detail->mutable_basic()->set_is_inferred(
       is_inferred_position(bytes, length));
 }
 

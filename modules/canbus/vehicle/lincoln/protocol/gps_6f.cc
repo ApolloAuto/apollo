@@ -25,28 +25,28 @@ namespace lincoln {
 const int32_t Gps6f::ID = 0x6F;
 
 void Gps6f::Parse(const std::uint8_t* bytes, int32_t length,
-                  ChassisDetail* car_status) const {
-  car_status->mutable_basic()->set_altitude(altitude(bytes, length));
-  car_status->mutable_basic()->set_heading(heading(bytes, length));
+                  ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_basic()->set_altitude(altitude(bytes, length));
+  chassis_detail->mutable_basic()->set_heading(heading(bytes, length));
   // speed mph -> mps
-  car_status->mutable_basic()->set_gps_speed(speed(bytes, length) * 0.44704);
-  car_status->mutable_basic()->set_hdop(hdop(bytes, length));
-  car_status->mutable_basic()->set_vdop(vdop(bytes, length));
+  chassis_detail->mutable_basic()->set_gps_speed(speed(bytes, length) * 0.44704);
+  chassis_detail->mutable_basic()->set_hdop(hdop(bytes, length));
+  chassis_detail->mutable_basic()->set_vdop(vdop(bytes, length));
   switch (fix_quality(bytes, length)) {
     case 0:
-      car_status->mutable_basic()->set_quality(BasicInfo::FIX_NO);
+      chassis_detail->mutable_basic()->set_quality(BasicInfo::FIX_NO);
       break;
     case 1:
-      car_status->mutable_basic()->set_quality(BasicInfo::FIX_2D);
+      chassis_detail->mutable_basic()->set_quality(BasicInfo::FIX_2D);
       break;
     case 2:
-      car_status->mutable_basic()->set_quality(BasicInfo::FIX_3D);
+      chassis_detail->mutable_basic()->set_quality(BasicInfo::FIX_3D);
       break;
     default:
-      car_status->mutable_basic()->set_quality(BasicInfo::FIX_INVALID);
+      chassis_detail->mutable_basic()->set_quality(BasicInfo::FIX_INVALID);
       break;
   }
-  car_status->mutable_basic()->set_num_satellites(
+  chassis_detail->mutable_basic()->set_num_satellites(
       num_satellites(bytes, length));
 }
 

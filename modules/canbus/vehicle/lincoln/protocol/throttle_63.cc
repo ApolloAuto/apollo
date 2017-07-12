@@ -25,26 +25,26 @@ namespace lincoln {
 const int32_t Throttle63::ID = 0x63;
 
 void Throttle63::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* car_status) const {
-  car_status->mutable_gas()->set_throttle_input(pedal_input(bytes, length));
-  car_status->mutable_gas()->set_throttle_cmd(pedal_cmd(bytes, length));
-  car_status->mutable_gas()->set_throttle_output(pedal_output(bytes, length));
-  car_status->mutable_gas()->set_watchdog_source(
+                       ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_gas()->set_throttle_input(pedal_input(bytes, length));
+  chassis_detail->mutable_gas()->set_throttle_cmd(pedal_cmd(bytes, length));
+  chassis_detail->mutable_gas()->set_throttle_output(pedal_output(bytes, length));
+  chassis_detail->mutable_gas()->set_watchdog_source(
       watchdog_counter_source(bytes, length));
-  car_status->mutable_gas()->set_throttle_enabled(is_enabled(bytes, length));
-  car_status->mutable_gas()->set_driver_override(
+  chassis_detail->mutable_gas()->set_throttle_enabled(is_enabled(bytes, length));
+  chassis_detail->mutable_gas()->set_driver_override(
       is_driver_override(bytes, length));
-  car_status->mutable_gas()->set_driver_activity(
+  chassis_detail->mutable_gas()->set_driver_activity(
       is_driver_activity(bytes, length));
-  car_status->mutable_gas()->set_watchdog_fault(
+  chassis_detail->mutable_gas()->set_watchdog_fault(
       is_watchdog_counter_fault(bytes, length));
-  car_status->mutable_gas()->set_channel_1_fault(
+  chassis_detail->mutable_gas()->set_channel_1_fault(
       is_channel_1_fault(bytes, length));
-  car_status->mutable_gas()->set_channel_2_fault(
+  chassis_detail->mutable_gas()->set_channel_2_fault(
       is_channel_2_fault(bytes, length));
-  car_status->mutable_gas()->set_connector_fault(
+  chassis_detail->mutable_gas()->set_connector_fault(
       is_connector_fault(bytes, length));
-  car_status->mutable_check_response()->set_is_vcu_online(
+  chassis_detail->mutable_check_response()->set_is_vcu_online(
       !is_driver_override(bytes, length));
 }
 

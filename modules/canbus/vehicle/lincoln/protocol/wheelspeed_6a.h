@@ -45,21 +45,21 @@ class Wheelspeed6a : public ProtocolData {
    * @brief parse received data
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
   virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+                     ChassisDetail* chassis_detail) const;
 
   /*
    * @brief parse received data
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
    * @param timestamp the timestamp of input bytes
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
   virtual void Parse(const std::uint8_t* bytes, int32_t length,
                      const struct timeval& timestamp,
-                     ChassisDetail* car_status) const;
+                     ChassisDetail* chassis_detail) const;
 
   /**
    * @brief calculate front left wheel speed based on byte array.

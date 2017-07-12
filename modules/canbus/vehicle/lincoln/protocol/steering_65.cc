@@ -25,50 +25,50 @@ namespace lincoln {
 const int32_t Steering65::ID = 0x65;
 
 void Steering65::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* car_status) const {
-  car_status->mutable_eps()->set_steering_angle(steering_angle(bytes, length));
+                       ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_eps()->set_steering_angle(steering_angle(bytes, length));
   // no steering angle speed
 
-  car_status->mutable_eps()->set_steering_angle_cmd(
+  chassis_detail->mutable_eps()->set_steering_angle_cmd(
       reported_steering_angle_cmd(bytes, length));
   // ?
-  car_status->mutable_eps()->set_is_steering_angle_valid(true);
+  chassis_detail->mutable_eps()->set_is_steering_angle_valid(true);
   // vehicle speed from steering, kph -> mps
-  car_status->mutable_eps()->set_vehicle_speed(vehicle_speed(bytes, length) /
+  chassis_detail->mutable_eps()->set_vehicle_speed(vehicle_speed(bytes, length) /
                                                3.6);
 
   // speed, as it has a higher accuracy
   // kph -> mps
-  car_status->mutable_vehicle_spd()->set_vehicle_spd(
+  chassis_detail->mutable_vehicle_spd()->set_vehicle_spd(
       vehicle_speed(bytes, length) / 3.6);
-  car_status->mutable_vehicle_spd()->set_is_vehicle_spd_valid(true);
+  chassis_detail->mutable_vehicle_spd()->set_is_vehicle_spd_valid(true);
 
-  car_status->mutable_eps()->set_epas_torque(epas_torque(bytes, length));
-  car_status->mutable_eps()->set_steering_enabled(is_enabled(bytes, length));
-  car_status->mutable_eps()->set_driver_override(
+  chassis_detail->mutable_eps()->set_epas_torque(epas_torque(bytes, length));
+  chassis_detail->mutable_eps()->set_steering_enabled(is_enabled(bytes, length));
+  chassis_detail->mutable_eps()->set_driver_override(
       is_driver_override(bytes, length));
-  car_status->mutable_eps()->set_driver_activity(
+  chassis_detail->mutable_eps()->set_driver_activity(
       is_driver_activity(bytes, length));
-  car_status->mutable_eps()->set_watchdog_fault(
+  chassis_detail->mutable_eps()->set_watchdog_fault(
       is_watchdog_counter_fault(bytes, length));
-  car_status->mutable_eps()->set_channel_1_fault(
+  chassis_detail->mutable_eps()->set_channel_1_fault(
       is_channel_1_fault(bytes, length));
-  car_status->mutable_eps()->set_channel_2_fault(
+  chassis_detail->mutable_eps()->set_channel_2_fault(
       is_channel_2_fault(bytes, length));
-  car_status->mutable_eps()->set_calibration_fault(
+  chassis_detail->mutable_eps()->set_calibration_fault(
       is_calibration_fault(bytes, length));
-  car_status->mutable_eps()->set_connector_fault(
+  chassis_detail->mutable_eps()->set_connector_fault(
       is_connector_fault(bytes, length));
-  car_status->mutable_check_response()->set_is_eps_online(
+  chassis_detail->mutable_check_response()->set_is_eps_online(
       !is_driver_override(bytes, length));
 }
 
 void Steering65::Parse(const std::uint8_t* bytes, int32_t length,
                        const struct timeval& timestamp,
-                       ChassisDetail* car_status) const {
-  car_status->mutable_eps()->set_timestamp_65(timestamp.tv_sec +
+                       ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_eps()->set_timestamp_65(timestamp.tv_sec +
                                               timestamp.tv_usec / 1000000.0);
-  Parse(bytes, length, car_status);
+  Parse(bytes, length, chassis_detail);
 }
 
 double Steering65::steering_angle(const std::uint8_t* bytes,
