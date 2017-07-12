@@ -23,6 +23,16 @@ cc_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "feature_proto",
+    protos = [
+        "feature.proto",
+    ],
+    deps = [
+        "//modules/prediction/proto:lane_graph_proto",
+    ],
+)
+
 py_proto_compile(
     name = "prediction_proto_pylib",
     protos = [
