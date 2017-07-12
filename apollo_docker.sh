@@ -45,7 +45,11 @@ function gen_docker() {
   DEFAULT_NAME="${DOCKER_REPO}:release-latest"
   docker pull $IMG
 
-  docker rm -f apollo_release
+  docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
+  if [ $? == 0 ];then
+    docker stop apollo_release 1>/dev/null
+    docker rm -f apollo_release 1>/dev/null
+  fi
   docker run -it \
       -d \
       --name apollo_release \
