@@ -38,7 +38,8 @@ RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true
 RUN apt-get install -y oracle-java8-installer
 RUN apt-get clean autoclean && apt-get autoremove -y
 RUN rm -fr /var/lib/apt/lists/*
-COPY bazel /usr/local/bin/bazel
+
+## copy bazel to /usr/local/bin
 RUN mkdir -p /usr/local/bin
 WORKDIR /usr/local/bin/
 RUN wget https://github.com/startcode/bazel-arm64/releases/download/0.4.4/bazel-aarch64 && ln -rs bazel-aarch64 bazel
