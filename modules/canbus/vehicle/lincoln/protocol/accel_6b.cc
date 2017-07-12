@@ -39,19 +39,19 @@ void Accel6b::Parse(const std::uint8_t* bytes, int32_t length,
 
 double Accel6b::lateral_acceleration(const std::uint8_t* bytes,
                                      const int32_t length) const {
-  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  DCHECK_GE(length, 2);
   return parse_two_frames(bytes[0], bytes[1]);
 }
 
 double Accel6b::longitudinal_acceleration(const std::uint8_t* bytes,
                                           const int32_t length) const {
-  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  DCHECK_GE(length, 4);
   return parse_two_frames(bytes[2], bytes[3]);
 }
 
 double Accel6b::vertical_acceleration(const std::uint8_t* bytes,
                                       const int32_t length) const {
-  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  DCHECK_GE(length, 6);
   return parse_two_frames(bytes[4], bytes[5]);
 }
 
