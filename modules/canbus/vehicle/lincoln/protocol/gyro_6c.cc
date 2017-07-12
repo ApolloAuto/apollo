@@ -25,12 +25,12 @@ namespace lincoln {
 const int32_t Gyro6c::ID = 0x6C;
 
 void Gyro6c::Parse(const std::uint8_t* bytes, int32_t length,
-                   ChassisDetail* car_status) const {
+                   ChassisDetail* chassis_detail) const {
   // TODO
-  car_status->mutable_vehicle_spd()->set_roll_rate(roll_rate(bytes, length));
-  car_status->mutable_vehicle_spd()->set_yaw_rate(yaw_rate(bytes, length));
+  chassis_detail->mutable_vehicle_spd()->set_roll_rate(roll_rate(bytes, length));
+  chassis_detail->mutable_vehicle_spd()->set_yaw_rate(yaw_rate(bytes, length));
   // why
-  car_status->mutable_vehicle_spd()->set_is_yaw_rate_valid(true);
+  chassis_detail->mutable_vehicle_spd()->set_is_yaw_rate_valid(true);
 }
 
 double Gyro6c::roll_rate(const std::uint8_t* bytes, int32_t length) const {
