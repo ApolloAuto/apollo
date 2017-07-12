@@ -60,19 +60,19 @@ void Brake61::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 double Brake61::pedal_input(const std::uint8_t* bytes, int32_t length) const {
-  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  DCHECK_GE(length, 2);
   // Pedal Input from the physical pedal
   return parse_two_frames(bytes[0], bytes[1]);
 }
 
 double Brake61::pedal_cmd(const std::uint8_t* bytes, int32_t length) const {
-  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  DCHECK_GE(length, 4);
   // Pedal Command from the command message
   return parse_two_frames(bytes[2], bytes[3]);
 }
 
 double Brake61::pedal_output(const std::uint8_t* bytes, int32_t length) const {
-  DCHECK_EQ(length, CANBUS_MESSAGE_LENGTH);
+  DCHECK_GE(length, 6);
   // Pedal Output is the maximum of PI and PC
   return parse_two_frames(bytes[4], bytes[5]);
 }
