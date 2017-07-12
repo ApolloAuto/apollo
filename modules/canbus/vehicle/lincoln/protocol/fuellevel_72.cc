@@ -25,8 +25,8 @@ namespace lincoln {
 const int32_t Fuellevel72::ID = 0x72;
 
 void Fuellevel72::Parse(const std::uint8_t* bytes, int32_t length,
-                        ChassisDetail* car_status) const {
-  car_status->mutable_battery()->set_fuel_level(fuel_level(bytes, length));
+                        ChassisDetail* chassis_detail) const {
+  chassis_detail->mutable_battery()->set_fuel_level(fuel_level(bytes, length));
 }
 
 double Fuellevel72::fuel_level(const std::uint8_t* bytes,

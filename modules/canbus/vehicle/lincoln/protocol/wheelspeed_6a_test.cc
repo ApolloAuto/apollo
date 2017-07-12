@@ -38,7 +38,6 @@ TEST(Wheelspeed6aTest, General) {
   EXPECT_DOUBLE_EQ(cd.vehicle_spd().wheel_spd_fr(), 256.99);
   EXPECT_TRUE(cd.vehicle_spd().is_wheel_spd_rr_valid());
   EXPECT_DOUBLE_EQ(cd.vehicle_spd().wheel_spd_fl(), 251.85);
-  EXPECT_DOUBLE_EQ(cd.vehicle_spd().timestamp_sec(), 206158.430216);
 }
 
 }  // namespace lincoln
