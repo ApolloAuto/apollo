@@ -36,21 +36,23 @@ bash apollo.sh build
 ```
 
 ## 运行Apollo
-请按照如下步骤启动Apollo。
+请按照如下步骤启动Apollo:
+
 ### 启动Apollo
 ```
 # 启动人际交互界面(HMI)
 bash scripts/hmi.sh
 ```
 ### 访问 HMI
-可使用您常用的浏览器，比如Chrome, 打开人机交互界面(HMI), 地址是：http://localhost:8887。
-然后点击Dreamview启动HMI。
+可使用您常用的浏览器，比如Chrome, 打开人机交互界面(HMI), 地址是：http://localhost:8887,
+
+然后点击Dreamview启动HMI：
 ![HMI Enable Dreamview](docs/demo_guide/images/dreamview_enable.png)
 
-继续点击右上角的Dreamview按钮。
+继续点击右上角的Dreamview按钮：
 ![HMI Launch Dreamview](docs/demo_guide/images/dreamview_launch.png)
 
-Dreamview 页面载入。
+Dreamview 页面载入：
 ![Open Dreamview](docs/quickstart/images/hmi_open_dreamview.png)
 
 ### 播放演示rosbag
@@ -68,18 +70,18 @@ rosbag play -l ./docs/demo_guide/demo.bag
 ## 文档
 Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/docs/)目录下找到。
    * [quickstart](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/): 快速入门手册
-   * [demo_guide](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/): 演示指南
+   * [demo_guide](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/): 演示指南。
    * [![Apollo Offline Demo](https://img.youtube.com/vi/Q4BawiLWl8c/0.jpg)](https://www.youtube.com/watch?v=Q4BawiLWl8c)
-   * [how to contribute code](https://github.com/ApolloAuto/apollo/blob/master/CONTRIBUTING.md): 贡献代码必读
-   * [howto](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/): 编译、运行、修改代码教程
-   * [specs](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/): Apollo 1.0 技术文档
+   * [how to contribute code](https://github.com/ApolloAuto/apollo/blob/master/CONTRIBUTING.md): 贡献代码必读。
+   * [howto](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/): 编译、运行、修改代码教程。
+   * [specs](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/): Apollo 1.0 技术文档。
 
 ## 咨询
 
-非常欢迎您随时提出疑问或提交bug报告: [Github Issues](https://github.com/ApolloAuto/apollo/issues)。
+非常欢迎您随时提出疑问或提交bug报告[Github Issues](https://github.com/ApolloAuto/apollo/issues)。
 
 ## 版权
-Apollo遵守[Apache-2.0 licenses](License)。
+Apollo遵守[Apache-2.0 license](授权)。
 
 ## 免责声明
 请参考Apollo的免责声明[Apollo official website](http://apollo.auto/docs/disclaimer.html)。
