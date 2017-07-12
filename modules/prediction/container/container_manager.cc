@@ -21,5 +21,18 @@ namespace prediction {
 
 ContainerManager::ContainerManager() {}
 
+ContainerManager::~ContainerManager() {
+  containers_.clear();
+}
+
+void ContainerManager::RegisterContainer() {}
+
+Container* ContainerManager::mutable_container(const std::string& name) {
+  if (containers_.find(name) != containers_.end()) {
+    return containers_[name].get();
+  } else {
+    return nullptr;
+  }
+}
 } 
 }
