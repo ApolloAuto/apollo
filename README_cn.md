@@ -37,13 +37,15 @@ bash apollo.sh build
 
 ## 运行Apollo
 请按照如下步骤启动Apollo:
+
 ### 启动Apollo
 ```
 # 启动人际交互界面(HMI)
 bash scripts/hmi.sh
 ```
 ### 访问 HMI
-可使用您常用的浏览器，比如Chrome, 打开人机交互界面(HMI), 地址是：http://localhost:8887。
+可使用您常用的浏览器，比如Chrome, 打开人机交互界面(HMI), 地址是：http://localhost:8887,
+
 然后点击Dreamview启动HMI：
 ![HMI Enable Dreamview](docs/demo_guide/images/dreamview_enable.png)
 

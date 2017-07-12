@@ -28,7 +28,9 @@ VehicleState::VehicleState(
     const localization::LocalizationEstimate &localization) {
   ConstructExceptLinearVelocity(&localization);
   if (localization.has_pose() && localization.pose().has_linear_velocity()) {
-    linear_v_ = localization.pose().linear_velocity().y();
+    double linear_v_x = localization.pose().linear_velocity().x();
+    double linear_v_y = localization.pose().linear_velocity().y();
+    linear_v_ = std::hypot(linear_v_x, linear_v_y);
   }
 }
 
