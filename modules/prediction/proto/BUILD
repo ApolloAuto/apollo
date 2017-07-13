@@ -20,6 +20,7 @@ cc_proto_library(
         "lane_graph.proto",
     ],
     deps = [
+        "//modules/common/proto:common_proto",
     ],
 )
 
@@ -29,6 +30,7 @@ cc_proto_library(
         "feature.proto",
     ],
     deps = [
+        "//modules/common/proto:common_proto",
         "//modules/prediction/proto:lane_graph_proto",
     ],
 )
