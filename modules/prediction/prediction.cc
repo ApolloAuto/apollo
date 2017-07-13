@@ -19,6 +19,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -31,6 +32,13 @@ std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 apollo::common::Status Prediction::Init() {
   AdapterManager::instance()->Init();
+
+  CHECK(AdapterManager::GetLocalization())
+      << "Localization is not ready.";
+
+  CHECK(AdapterManager::GetPerceptionObstacles())
+      << "Perception is not ready.";
+
   AdapterManager::SetPerceptionObstaclesCallback(&Prediction::OnPerception,
                                                  this);
   return apollo::common::Status::OK();
@@ -43,12 +51,18 @@ apollo::common::Status Prediction::Start() {
 void Prediction::Stop() {}
 
 void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
-  PredictionObstacles prediction_obstacles;
-  AdapterManager::FillPredictionHeader(Name(),
-                                       prediction_obstacles.mutable_header());
-  AdapterManager::PublishPrediction(prediction_obstacles);
-
-  ADEBUG << prediction_obstacles.ShortDebugString();
+  auto localization_adapter = AdapterManager::GetLocalization();
+  if (localization_adapter->Empty()) {
+    AINFO << "No localization message.";
+  } else {
+    const ::apollo::localization::LocalizationEstimate& localization =
+        localization_adapter->GetLatestObserved();
+    ADEBUG << "Received localization message ["
+           << localization.ShortDebugString()
+           << "].";
+    ContainerManager::instance()->mutable_container("Pose")->Insert(localization);
+  }
+  ContainerManager::instance()->mutable_container("Obstacles")->Insert(perception_obstacles);
 }
 
 }  // namespace prediction
