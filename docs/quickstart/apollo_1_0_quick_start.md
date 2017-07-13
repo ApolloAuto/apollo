@@ -1,7 +1,7 @@
-# Apollo 快速入门指南  1.0
+# Apollo 1.0 快速入门指南
 ## 目录
 * [关于这个文档](#关于这个文档)
-    * [文档规约](#文档规约)
+    * [文档规约](#document-conventions)
 * [Apollo概览](#overview-of-apollo)
 * [车辆环境描述](#description-of-the-vehicle-environment)
 * [硬件安装](#hardware-installation)
@@ -19,21 +19,21 @@
 
 # 关于这个文档
 
-_Apollo 快速入门指南 1.0_ 提供了所有关于了解、安装以及构建Apollo的基本说明
+The _Apollo 1.0 Quick Start Guide_ provides all of the basic instructions to understand, install, and build Apollo.
 
-## 文档规约
+## Document Conventions
 
-下表列出了本文档中使用的归约：
+The following table lists the conventions that are used in this document:
 
-| **Icon**                            | **描述**                          |
+| **Icon**                            | **Description**                          |
 | ----------------------------------- | ---------------------------------------- |
-| **粗体**                            | 重要                                 |
-| `等宽字体`                   | 代码，类型数据                        |
-| _斜体_                            | 文件标题，章节和标题使用的术语 |
-| ![info](images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果 |
-| ![tip](images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于您完成任务的捷径。 |
-| ![online](images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息 |
-| ![warning](images/warning_icon.png) | **Warning**. 包含**不**能忽略的信息，或者执行某个任务或步骤时，您将面临风险失误 |
+| **Bold**                            | Emphasis                                 |
+| `Mono-space font`                   | Code, typed data                         |
+| _Italic_                            | Titles of documents, sections, and headings Terms used |
+| ![info](images/info_icon.png)       | **Info**  Contains information that might be useful.  Ignoring the Info icon has no negative consequences. |
+| ![tip](images/tip_icon.png)         | **Tip**. Includes helpful hints or a shortcut that might assist you in completing a task. |
+| ![online](images/online_icon.png)   | **Online**. Provides a link to a particular web site where you can get more information. |
+| ![warning](images/warning_icon.png) | **Warning**. Contains information that must **not** be ignored or you risk failure when you perform a certain task or step. |
 
 # Overview of Apollo
 
