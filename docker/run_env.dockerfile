@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     libyaml-cpp-dev \
     libyaml-dev \
     python-pip \
+    python-matplotlib \
+    python-scipy \
+    python-software-properties \
     realpath \
     tmux \
     unzip \
