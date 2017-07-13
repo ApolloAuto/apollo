@@ -31,8 +31,6 @@ namespace apollo {
 namespace control {
 
 using ::apollo::canbus::Chassis;
-using ::apollo::common::ErrorCode;
-using ::apollo::common::Status;
 using ::apollo::common::adapter::AdapterManager;
 using ::apollo::common::monitor::MonitorMessageItem;
 using ::apollo::common::time::Clock;

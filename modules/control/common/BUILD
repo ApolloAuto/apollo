@@ -21,21 +21,8 @@ cc_library(
         "base_types.h",
     ],
     deps = [
-        ":definitions",
         "//modules/common:log",
         "@eigen//:eigen",
-    ],
-)
-
-cc_library(
-    name = "definitions",
-    srcs = [],
-    hdrs = [
-        "definitions.h",
-    ],
-    deps = [
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/status",
     ],
 )
 
@@ -100,7 +87,6 @@ cc_library(
     deps = [
         ":base_types",
         ":control_gflags",
-        ":definitions",
         ":hysteresis_filter",
         ":interpolation_2d",
         ":pid_controller",
