@@ -22,7 +22,16 @@
 #ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
 #define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
 
+#include <deque>
+#include <unordered_map>
+#include <vector>
+#include <string>
+#include <mutex>
+
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/feature.pb.h"
+
+#include "modules/common/math/kalman_filter.h"
 
 namespace apollo {
 namespace prediction {
@@ -36,6 +45,16 @@ class Obstacle {
   void Insert(
     const apollo::perception::PerceptionObstacle& perception_obstacle,
     const double timestamp);
+
+ private:
+  int id_;
+  apollo::perception::PerceptionObstacle::Type type_;
+  std::deque<Feature> feature_history_;
+  apollo::common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
+  bool is_motion_tracker_enabled;
+  std::unordered_map<std::string,
+      apollo::common::math::KalmanFilter<double, 4, 2, 0>> kf_lane_tracker_;
+  static std::mutex _mutex;
 };
 
 }  // namespace prediction
