@@ -65,14 +65,14 @@ cpp_proto_repositories(
         # newest-ish commit-id off that branch.
         "boringssl": {
             "rule": "http_archive",
-            "url": "https://github.com/google/boringssl/archive/master-with-bazel.zip"
+            "url": "https://github.com/google/boringssl/archive/e3860009a091cd1bd2bc189cdbc3c6d095abde84.zip"
         },
 
         # libssl is required for c++ grpc where it is expected in
         # //external:libssl.  This can be either boringssl or openssl.
         "libssl": {
             "rule": "bind",
-            "actual": "@boringssl//boringssl-master-with-bazel:ssl",
+            "actual": "@boringssl//boringssl-e3860009a091cd1bd2bc189cdbc3c6d095abde84:ssl",
         },
 
         # C-library for zlib
