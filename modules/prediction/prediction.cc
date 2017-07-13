@@ -44,6 +44,7 @@ void Prediction::Stop() {}
 
 void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   PredictionObstacles prediction_obstacles;
+  // TODO fulfill prediction_obstacles
   AdapterManager::FillPredictionHeader(Name(),
                                        prediction_obstacles.mutable_header());
   AdapterManager::PublishPrediction(prediction_obstacles);
