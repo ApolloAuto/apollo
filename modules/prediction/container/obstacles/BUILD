@@ -9,3 +9,12 @@ cc_library(
         "//modules/perception/proto:perception_proto"
     ]
 )
+
+cc_library(
+    name = "obstacle",
+    srcs = ["obstacle.cc"],
+    hdrs = ["obstacle.h"],
+    deps = [
+        "//modules/perception/proto:perception_proto",
+    ]
+)
