@@ -4,8 +4,8 @@
     * [文档规约](#文档规约)
 * [Apollo概览](#Apollo概览)
 * [车辆环境描述](#车辆环境描述)
-* [硬件安装](#hardware-installation)
-* [Apollo 软件安装](#apollo-software-installation)
+* [硬件安装](#硬件安装)
+* [Apollo软件安装](#Apollo软件安装)
     * [下载Apollo源代码](#download-apollo-source)
     * [设置Docker支持](#set-up-docker-support)
     * [设置Apollo发布的Docker映像（image）](#set-up-apollo-release-docker)
@@ -47,21 +47,21 @@ Apollo 1.0, 也被称为 _Automatic GPS Waypoint Following(自动GPS跟随)_, �
 
 The Lincoln MKZ, enhanced by Autonomous Stuff, 为用户提供了一个无障碍的自动车辆平台。该平台为用户提供了一整套硬件和软件解决方案。
 
-Users gain direct access to vehicle controls such as gear selection, speed, and indicator lights. Software interfaces have been created for steering, braking, acceleration, and gear selection to provide Developers with a workable user interface.
+用户可以直接获得车辆某些模块控制权限，如档位，速度和指示灯。平台已经为转向，刹车，加速和档位创建了接口，为开发人员提供了可使用的用户界面。
 
-Additional features include:
+包含的其他功能:
 
-- Power distributor terminals
-- Integrated PC with ROS pre-installed and configured
-- Emergency Stop using a drive-by-wire system
-- Ethernet network and USB connections (to PC)
+- 电源分配器终端
+- 集成PC与ROS预安装和配置
+- 线控驱动的紧急停止系统
+- 以太网和USB连接 (to PC)
 
-# Hardware Installation
+# 硬件安装
 
-Please refer to [Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
-for the steps to install the hardware components and the system software.
+请参考 [Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
+中的步骤来安装硬件组件以及系统软件
 
-# Apollo Software Installation
+# Apollo软件安装
 
 This section includes:
 
