@@ -19,12 +19,27 @@
 namespace apollo {
 namespace prediction {
 
-Obstacle::Obstacle() {
+using apollo::perception::PerceptionObstacle;
+
+std::mutex Obstacle::_mutex;
+
+Obstacle::Obstacle() : 
+    id_(-1),
+    type_(PerceptionObstacle::UNKNOWN_MOVABLE),
+    feature_history_(0),
+    kf_motion_tracker_(),
+    is_motion_tracker_enabled_(false),
+    kf_lane_tracker_map_(0) {
 
 }
 
 Obstacle::~Obstacle() {
-
+  id_ = -1;
+  type_ = PerceptionObstacle::UNKNOWN_UNMOVABLE;
+  feature_history_.clear();
+  is_motion_tracker_enabled_ = false;
+  kf_lane_tracker_map_.clear();
+  // TODO(author) current_lanes_.clear();
 }
 
 void Obstacle::Insert(
