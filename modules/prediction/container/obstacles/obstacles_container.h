@@ -16,50 +16,40 @@
 
 /**
  * @file
- * @brief Use container manager to manage all containers
+ * @brief Obstacles container
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
-#define MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
-
-#include <unordered_map>
+#ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
+#define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
 
 #include "modules/prediction/container/container.h"
-#include "modules/common/macro.h"
 
-/**
- * @namespace apollo::prediction
- * @brief apollo::prediction
- */
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 namespace apollo {
 namespace prediction {
 
-class ContainerManager {
+class ObstaclesContainer : public Container {
  public:
   /**
+   * @brief Constructor
+   */
+  explicit ObstaclesContainer() = default;
+
+  /**
    * @brief Destructor
-   */ 
-  virtual ~ContainerManager();
+   */
+  virtual ~ObstaclesContainer() = default;
 
   /**
-   * @brief Register all containers
+   * @brief Insert a data message into the container
+   * @param Data message to be inserted in protobuf
    */
-  void RegisterContainer();
-
-  /**
-   * @brief Get mutable container
-   * @param Name of the container
-   * @return Pointer of the container given the name
-   */
-  Container* mutable_container(const std::string& name);
-
- private:
-  std::unordered_map<std::string, std::unique_ptr<Container>> containers_;
-
-  DECLARE_SINGLETON(ContainerManager)
+  virtual void Insert(
+    const ::apollo::perception::PerceptionObstacles& obstacles);
 };
 
 } // namespace prediction
 } // namespace apollo
 
-#endif // MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
+#endif // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
