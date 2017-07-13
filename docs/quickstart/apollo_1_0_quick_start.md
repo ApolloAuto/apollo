@@ -1,23 +1,23 @@
-# Apollo 1.0 Quick Start Guide
-## Contents
-* [About This Guide](#about-this-guide)
-    * [Document Conventions](#document-conventions)
-* [Overview of Apollo](#overview-of-apollo)
-* [Description of the Vehicle Environment](#description-of-the-vehicle-environment)
-* [Hardware Installation](#hardware-installation)
-* [Apollo Software Installation](#apollo-software-installation)
-    * [Download Apollo Source](#download-apollo-source)
-    * [Set up Docker Support](#set-up-docker-support)
-    * [Set up Apollo Release Docker Image](#set-up-apollo-release-docker)
-    * [Customize Your Release Container](#customize-your-release-container)
-* [Run the Demo on Vehicle](#run-the-demo-on-vehicle)
-    * [Launch the Local Release Docker Image](#launch-the-local-release-env-docker-image)
-    * [Record the Driving Trajectory](#record-driving-trajectory)
-    * [Perform Autonomous Driving](#perform-autonomous-driving)
-    * [Shut Down](#shut-down)
-* [Run Offline Demo](#run-offline-demo)
+# Apollo 1.0 快速入门指南
+## 目录
+* [关于这个文档](#关于这个文档)
+    * [文档规约](#document-conventions)
+* [Apollo概览](#overview-of-apollo)
+* [车辆环境描述](#description-of-the-vehicle-environment)
+* [硬件安装](#hardware-installation)
+* [Apollo 软件安装](#apollo-software-installation)
+    * [下载Apollo源代码](#download-apollo-source)
+    * [设置Docker支持](#set-up-docker-support)
+    * [设置阿波罗发布的Docker映像（image）](#set-up-apollo-release-docker)
+    * [自定义你的发布容器](#customize-your-release-container)
+* [在车辆上运行示例](#run-the-demo-on-vehicle)
+    * [启动本地版本Docker映像](#launch-the-local-release-env-docker-image)
+    * [记录驾驶轨迹](#record-driving-trajectory)
+    * [执行自动驾驶](#perform-autonomous-driving)
+    * [关闭](#shut-down)
+* [运行离线演示](#run-offline-demo)
 
-# About This Guide
+# 关于这个文档
 
 The _Apollo 1.0 Quick Start Guide_ provides all of the basic instructions to understand, install, and build Apollo.
 
