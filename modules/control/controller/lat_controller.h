@@ -42,7 +42,9 @@ namespace control {
 /**
  * @class LatController
  *
- * @brief Lateral controller, to compute steering target.
+ * @brief LQR-Based lateral controller, to compute steering target.
+ * For more details, please refer to "Vehicle dynamics and control."
+ * Rajamani, Rajesh. Springer Science & Business Media, 2011.
  */
 class LatController : public Controller {
  public:
