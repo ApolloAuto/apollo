@@ -174,7 +174,6 @@ void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
                            Feature* feature) {
   double x = 0.0;
   double y = 0.0;
-  double z = 0.0;
 
   if (perception_obstacle.has_position()) {
     if (perception_obstacle.position().has_x()) {
@@ -183,26 +182,20 @@ void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
     if (perception_obstacle.position().has_y()) {
       y = perception_obstacle.position().y();
     }
-    if (perception_obstacle.position().has_z()) {
-      z = perception_obstacle.position().z();
-    }
   }
 
   feature->mutable_position()->set_x(x);
   feature->mutable_position()->set_y(y);
-  feature->mutable_position()->set_z(z);
 
   AINFO << "Obstacle [" << id_ << "] set position [" << std::fixed
         << std::setprecision(6) << x << ", " << std::fixed
-        << std::setprecision(6) << y << ", " << std::fixed
-        << std::setprecision(6) << z << "].";
+        << std::setprecision(6) << y << "].";
 }
 
 void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
                            Feature* feature) {
   double x = 0.0;
   double y = 0.0;
-  double z = 0.0;
 
   if (perception_obstacle.has_velocity()) {
     if (perception_obstacle.velocity().has_x()) {
@@ -211,24 +204,19 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
     if (perception_obstacle.velocity().has_y()) {
       y = perception_obstacle.velocity().y();
     }
-    if (perception_obstacle.velocity().has_z()) {
-      z = perception_obstacle.velocity().z();
-    }
   }
 
   feature->mutable_velocity()->set_x(x);
   feature->mutable_velocity()->set_y(y);
-  feature->mutable_velocity()->set_z(z);
 
-  double speed = std::hypot(std::hypot(x, y), z);
+  double speed = std::hypot(x, y);
   double velocity_heading = std::atan2(y, x);
   feature->set_velocity_heading(velocity_heading);
   feature->set_speed(speed);
 
   AINFO << "Obstacle [" << id_ << "] set velocity [" << std::fixed
         << std::setprecision(6) << x << ", " << std::fixed
-        << std::setprecision(6) << y << ", " << std::fixed
-        << std::setprecision(6) << z << "], "
+        << std::setprecision(6) << y << "], "
         << "velocity heading [" << velocity_heading << "] and speed [" << speed
         << "].";
 }
