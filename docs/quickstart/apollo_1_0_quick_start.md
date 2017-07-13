@@ -2,11 +2,11 @@
 ## 目录
 * [关于这个文档](#关于这个文档)
     * [文档规约](#文档规约)
-* [概览](#概览)
+* [Apollo概览](#Apollo概览)
 * [车辆环境描述](#车辆环境描述)
 * [硬件安装](#硬件安装)
-* [软件安装](#软件安装)
-    * [下载Apollo源代码](#下载Apollo源代码)
+* [Apollo软件安装](#Apollo软件安装)
+    * [下载Apollo源代码](#download-apollo-source)
     * [设置Docker支持](#set-up-docker-support)
     * [设置Apollo发布的Docker映像（image）](#set-up-apollo-release-docker)
     * [自定义你的发布容器](#customize-your-release-container)
@@ -35,7 +35,7 @@ _Apollo 快速入门指南 1.0_ 提供了所有关于了解、安装以及构建
 | ![online](images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息 |
 | ![warning](images/warning_icon.png) | **Warning**. 包含**不**能忽略的信息，或者执行某个任务或步骤时，您将面临失败风险 |
 
-# 概览
+# Apollo概览
 
 Apollo已经开始为汽车和自主驾驶行业的合作伙伴提供开放，全面，可靠的软件平台。合作伙伴可以使用Apollo软件平台和通过Apollo认证的参考硬件模板来定制自己的自主车辆研发。
 
@@ -61,20 +61,20 @@ The Lincoln MKZ, enhanced by Autonomous Stuff, 为用户提供了一个无障碍
 请参考 [Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
 中的步骤来安装硬件组件以及系统软件
 
-# 软件安装
+# Apollo软件安装
 
-本节包括：
+This section includes:
 
-- 下载Apollo发行包
-- 设置Docker支持
-- 自定义你的发布容器
+- Download the Apollo Release Package
+- Set up Docker Support
+- Customize Your Release Container
 
-在开始之前，请确保您已经按照
-[Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)中的步骤
-安装了Ubuntu Linux 14.04.3和Apollo Kernel。
-## 下载Apollo源代码
+Before getting started, please make sure you have installed the Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the
+[Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md).
 
-1. 从[github source](https://github.com/ApolloAuto/apollo/)下载Apollo的源代码：
+## Download Apollo Source
+
+1. Download Apollo source code from the [github source](https://github.com/ApolloAuto/apollo/):
 
 ```
 git clone git@github.com:ApolloAuto/apollo.git
@@ -82,24 +82,24 @@ cd apollo
 
 ```
 
-2. 参考以下命令设置环境变量 `APOLLO_HOME`:
+2. Set up environment variable `APOLLO_HOME` by the following command:
 
 ```
 echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc
 ```
 
-3. 在一个新的终端或者已有的终端中输入`source ~/.bashrc`
+3. Open a new terminal or run `source ~/.bashrc` in an existing terminal.
 
 
-![tip](images/tip_icon.png) 在以下部分中，假设Apollo目录位于 `$APOLLO_HOME`.
+![tip](images/tip_icon.png) In the following sections, it is assumed that the Apollo directory is located in  `$APOLLO_HOME`.
 
-## 设置Docker支持
+## Set up Docker Support
 
-Docker容器是设置Apollo构建环境的最简单方法。
+The Docker container is the simplest way to set up the build environment for Apollo.
 
-有关更多信息，请参阅Docker详细教程 [here](https://docs.docker.com/).
+For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
 
-1. 运行以下命令来安装Docker：
+1. Run the following command to install Docker:
 
 
 ```
@@ -107,42 +107,43 @@ cd $APOLLO_HOME
 bash docker/scripts/install_docker.sh
 ```
 
-2. 脚本完成后，注销并重新登录系统以启用Docker。
+2. After the script completes, log out and then log back into the system to enable Docker.
 
 
-3. （可选）如果您已经安装了Docker（在安装Apollo内核之前），请在其中添加以下行 `/etc/default/docker`:
+3. (Optional) If you already have Docker installed (before you installed the Apollo Kernel), add the following line in `/etc/default/docker`:
 
 ```
 DOCKER_OPTS = "-s overlay"
 ```
 
-## 自定义你的发布容器
+## Customize Your Release Container
 
-1. 通过运行以下命令下载并启动Apollo 发布的 Docker映像：
+1. Download and start the Apollo Release docker image by running the following commands:
 
 ```
 cd $APOLLO_HOME
 bash docker/scripts/release_start.sh
 ```
 
-2. 通过运行以下命令登录Apollo 发布的 Docker映像：
+2. Login into the Apollo Release docker image by running the following commands:
 
 ```
 bash docker/scripts/release_into.sh
 ```
 
-3. 通过修改文件中的以下行来设置全球导航卫星系统（GNSS）驱动程序的区域编号 `./ros/share/gnss_driver/launch/gnss_driver.launch`.
+3. Set up the zone number for the Global Navigation Satellite System (GNSS) Driver by modifying the following line in file `./ros/share/gnss_driver/launch/gnss_driver.launch`.
 
 ```
 <arg name="proj4_text" default="+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs " />
 ```
-你只需修改上面一行的`+zone=10`的值即可。请参考
-[Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) 找到您当地的区号。例如，如果你在北京，中国，你必须设置`+zone=50`。
+You only have to modify the value `+zone=10` in the above line.
+Please refer to the
+[Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) to find your local zone number.
+For example, if you are in Beijing, China, you have to set `+zone=50`.
 
-5. 通过修改文件，为GNSS驱动程序设置实时运动（RTK）基站：
- `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
+5. Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
 
-   有关典型的RTK设置，请参阅以下示例：
+   Refer to the following example for a typical RTK setup:
 
 ```
 rtk_from {
