@@ -6,7 +6,6 @@ not because they are easy, but because they are hard.
 我们决定在这十年间登上月球并实现更多梦想，
 并非它们轻而易举，而是因为它们困难重重。
 -- John F. Kennedy (约翰 F. 肯尼迪), 1962
-
 ```
 
 欢迎来到Apollo GitHub。
@@ -63,7 +62,7 @@ rosbag play -l ./docs/demo_guide/demo.bag
 这时，Dreamview会播放一辆带着预测轨迹的行驶中的汽车。
 ![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory.png)
 
-想在Docker环境外搭建Apollo的高级用户，可以参考相应的Docker文档(`./docker/dev.dockerfile`).
+想在Docker环境外搭建Apollo的高级用户，可以参考相应的Docker文档(./docker/dev.dockerfile)。
 
 ## 文档
 Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/docs/)目录下找到。
@@ -82,4 +81,4 @@ Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/doc
 Apollo遵守[Apache-2.0 licenses](License)。
 
 ## 免责声明
-请参考Apollo的免责声明[Apollo official website](http://apollo.auto/docs/disclaimer.html)。
+请参考Apollo的免责声明[Apollo official website](http://apollo.auto/docs/disclaimer_cn.html)。
