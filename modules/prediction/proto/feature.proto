@@ -37,11 +37,11 @@ message Feature {
     optional uint32 id = 1;
 
     // Obstacle features
-    optional apollo.common.Point3D position = 2;
-    optional apollo.common.Point3D velocity = 3;
-    optional double velocity_heading = 4;
-    optional double speed = 5;
-    optional apollo.common.Point3D vec_acc = 6;
+    optional apollo.common.Point2D position = 2;
+    optional apollo.common.Point2D velocity = 3;
+    optional apollo.common.Point2D acceleration = 4;
+    optional double velocity_heading = 5;
+    optional double speed = 6;
     optional double acc = 7;
     optional double theta = 8;
     optional double length = 9;
@@ -54,11 +54,11 @@ message Feature {
     optional Lane lane = 14;
 
     // Obstacle tracked features
-    optional apollo.common.Point3D t_position = 16;
-    optional apollo.common.Point3D t_velocity = 17;
+    optional apollo.common.Point2D t_position = 16;
+    optional apollo.common.Point2D t_velocity = 17;
     optional double t_velocity_heading = 18;
     optional double t_speed = 19;
-    optional apollo.common.Point3D t_vec_acc = 20;
+    optional apollo.common.Point2D t_acceleration = 20;
     optional double t_acc = 21;
 
     optional bool is_still = 22 [default = true];
