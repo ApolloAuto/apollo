@@ -46,6 +46,25 @@ class Obstacle {
     const apollo::perception::PerceptionObstacle& perception_obstacle,
     const double timestamp);
 
+  int id() const;
+
+  double timestamp() const;
+
+  const Feature& feature(size_t i);
+
+  Feature* mutable_feature(size_t i);
+
+  const Feature& latest_feature();
+
+  Feature* mutable_latest_feature();
+
+  size_t history_size() const;
+
+  const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf_lane_tracker(
+      const std::string& lane_id);
+
+  // TODO(author) void SetLaneGraphFeature(ObstacleClusters* p_cluster);
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;
