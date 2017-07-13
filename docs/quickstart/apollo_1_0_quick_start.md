@@ -2,13 +2,13 @@
 ## 目录
 * [关于这个文档](#关于这个文档)
     * [文档规约](#文档规约)
-* [Apollo概览](#overview-of-apollo)
-* [车辆环境描述](#description-of-the-vehicle-environment)
+* [Apollo概览](#Apollo概览)
+* [车辆环境描述](#车辆环境描述)
 * [硬件安装](#hardware-installation)
 * [Apollo 软件安装](#apollo-software-installation)
     * [下载Apollo源代码](#download-apollo-source)
     * [设置Docker支持](#set-up-docker-support)
-    * [设置阿波罗发布的Docker映像（image）](#set-up-apollo-release-docker)
+    * [设置Apollo发布的Docker映像（image）](#set-up-apollo-release-docker)
     * [自定义你的发布容器](#customize-your-release-container)
 * [在车辆上运行示例](#run-the-demo-on-vehicle)
     * [启动本地版本Docker映像](#launch-the-local-release-env-docker-image)
@@ -33,19 +33,19 @@ _Apollo 快速入门指南 1.0_ 提供了所有关于了解、安装以及构建
 | ![info](images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果 |
 | ![tip](images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于您完成任务的捷径。 |
 | ![online](images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息 |
-| ![warning](images/warning_icon.png) | **Warning**. 包含**不**能忽略的信息，或者执行某个任务或步骤时，您将面临风险失误 |
+| ![warning](images/warning_icon.png) | **Warning**. 包含**不**能忽略的信息，或者执行某个任务或步骤时，您将面临失败风险 |
 
-# Overview of Apollo
+# Apollo概览
 
-Apollo has been initiated to provide an open, comprehensive, and reliable software platform for its partners in the automotive and autonomous-driving industries. Partners can use the Apollo software platform and the reference hardware that Apollo has certified as a template to customize in the development of their own autonomous vehicles.
+Apollo已经开始为汽车和自主驾驶行业的合作伙伴提供开放，全面，可靠的软件平台。合作伙伴可以使用Apollo软件平台和通过Apollo认证的参考硬件模板来定制自己的自主车辆研发。
 
-Apollo 1.0, also referred to as the _Automatic GPS Waypoint Following_, works in an enclosed venue such as a test track or parking lot. It accurately replays a trajectory and the speed of that trajectory that a human driver has traveled in an enclosed, flat area on solid ground.
+Apollo 1.0, 也被称为 _Automatic GPS Waypoint Following(自动GPS跟随)_, 使用在封闭的区域内，如测试轨道或停车场。它可以准确地以人类驾驶员在封闭的平坦区域的速度复现一个驾驶轨迹。
 
-At this stage of development, Apollo 1.0 **cannot** perceive obstacles in close proximity, drive on public roads, or drive in areas without GPS signals.
+在这个开发阶段, Apollo 1.0 **无法** 察觉到邻近的障碍物, **不要**在公共道路或没有GPS信号的区域行驶。
 
-# Description of the Vehicle Environment
+# 车辆环境描述
 
-The Lincoln MKZ, enhanced by Autonomous Stuff, provides users with an accessible autonomous vehicle platform. The platform supplies users with a comprehensive stack of hardware and software solutions.
+The Lincoln MKZ, enhanced by Autonomous Stuff, 为用户提供了一个无障碍的自动车辆平台。该平台为用户提供了一整套硬件和软件解决方案。
 
 Users gain direct access to vehicle controls such as gear selection, speed, and indicator lights. Software interfaces have been created for steering, braking, acceleration, and gear selection to provide Developers with a workable user interface.
 
