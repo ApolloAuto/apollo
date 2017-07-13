@@ -1,80 +1,80 @@
-# Apollo 快速入门指南  1.0
-## 目录
-* [关于这个文档](#关于这个文档)
-    * [文档规约](#文档规约)
-* [概览](#概览)
-* [车辆环境描述](#车辆环境描述)
-* [硬件安装](#硬件安装)
-* [软件安装](#软件安装)
-    * [下载Apollo源代码](#下载Apollo源代码)
-    * [设置Docker支持](#设置Docker支持)
-    * [设置Apollo发布的Docker映像（image）](#设置Apollo发布的Docker映像（image）)
-    * [自定义你的发布容器](#自定义你的发布容器)
-* [在车辆上运行示例](#在车辆上运行示例)
-    * [启动本地版本Docker映像](#启动本地版本Docker映像)
-    * [记录驾驶轨迹](#记录驾驶轨迹)
-    * [执行自动驾驶](#执行自动驾驶)
-    * [关闭](#关闭)
-* [运行离线演示](#运行离线演示)
+# Apollo 1.0 Quick Start Guide
+## Contents
+* [About This Guide](#about-this-guide)
+    * [Document Conventions](#document-conventions)
+* [Overview of Apollo](#overview-of-apollo)
+* [Description of the Vehicle Environment](#description-of-the-vehicle-environment)
+* [Hardware Installation](#hardware-installation)
+* [Apollo Software Installation](#apollo-software-installation)
+    * [Download Apollo Source](#download-apollo-source)
+    * [Set up Docker Support](#set-up-docker-support)
+    * [Set up Apollo Release Docker Image](#set-up-apollo-release-docker)
+    * [Customize Your Release Container](#customize-your-release-container)
+* [Run the Demo on Vehicle](#run-the-demo-on-vehicle)
+    * [Launch the Local Release Docker Image](#launch-the-local-release-env-docker-image)
+    * [Record the Driving Trajectory](#record-driving-trajectory)
+    * [Perform Autonomous Driving](#perform-autonomous-driving)
+    * [Shut Down](#shut-down)
+* [Run Offline Demo](#run-offline-demo)
 
-# 关于这个文档
+# About This Guide
 
-_Apollo 快速入门指南 1.0_ 提供了所有关于了解、安装以及构建Apollo的基本说明
+The _Apollo 1.0 Quick Start Guide_ provides all of the basic instructions to understand, install, and build Apollo.
 
-## 文档规约
+## Document Conventions
 
-下表列出了本文档中使用的归约：
+The following table lists the conventions that are used in this document:
 
-| **Icon**                            | **描述**                          |
+| **Icon**                            | **Description**                          |
 | ----------------------------------- | ---------------------------------------- |
-| **粗体**                            | 重要                                 |
-| `等宽字体`                   | 代码，类型数据                        |
-| _斜体_                            | 文件标题，章节和标题使用的术语 |
-| ![info](images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果 |
-| ![tip](images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于您完成任务的捷径。 |
-| ![online](images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息 |
-| ![warning](images/warning_icon.png) | **Warning**. 包含**不**能忽略的信息，或者执行某个任务或步骤时，您将面临失败风险 |
+| **Bold**                            | Emphasis                                 |
+| `Mono-space font`                   | Code, typed data                         |
+| _Italic_                            | Titles of documents, sections, and headings Terms used |
+| ![info](images/info_icon.png)       | **Info**  Contains information that might be useful.  Ignoring the Info icon has no negative consequences. |
+| ![tip](images/tip_icon.png)         | **Tip**. Includes helpful hints or a shortcut that might assist you in completing a task. |
+| ![online](images/online_icon.png)   | **Online**. Provides a link to a particular web site where you can get more information. |
+| ![warning](images/warning_icon.png) | **Warning**. Contains information that must **not** be ignored or you risk failure when you perform a certain task or step. |
 
-# 概览
+# Overview of Apollo
 
-Apollo已经开始为汽车和自主驾驶行业的合作伙伴提供开放，全面，可靠的软件平台。合作伙伴可以使用Apollo软件平台和通过Apollo认证的参考硬件模板来定制自己的自主车辆研发。
+Apollo has been initiated to provide an open, comprehensive, and reliable software platform for its partners in the automotive and autonomous-driving industries. Partners can use the Apollo software platform and the reference hardware that Apollo has certified as a template to customize in the development of their own autonomous vehicles.
 
-Apollo 1.0, 也被称为 _Automatic GPS Waypoint Following(自动GPS跟随)_, 使用在封闭的区域内，如测试轨道或停车场。它可以准确地以人类驾驶员在封闭的平坦区域的速度复现一个驾驶轨迹。
+Apollo 1.0, also referred to as the _Automatic GPS Waypoint Following_, works in an enclosed venue such as a test track or parking lot. It accurately replays a trajectory and the speed of that trajectory that a human driver has traveled in an enclosed, flat area on solid ground.
 
-在这个开发阶段, Apollo 1.0 **无法** 察觉到邻近的障碍物, **不要**在公共道路或没有GPS信号的区域行驶。
+At this stage of development, Apollo 1.0 **cannot** perceive obstacles in close proximity, drive on public roads, or drive in areas without GPS signals.
 
-# 车辆环境描述
+# Description of the Vehicle Environment
 
-The Lincoln MKZ, enhanced by Autonomous Stuff, 为用户提供了一个无障碍的自动车辆平台。该平台为用户提供了一整套硬件和软件解决方案。
+The Lincoln MKZ, enhanced by Autonomous Stuff, provides users with an accessible autonomous vehicle platform. The platform supplies users with a comprehensive stack of hardware and software solutions.
 
-用户可以直接获得车辆某些模块控制权限，如档位，速度和指示灯。平台已经为转向，刹车，加速和档位创建了接口，为开发人员提供了可使用的用户界面。
+Users gain direct access to vehicle controls such as gear selection, speed, and indicator lights. Software interfaces have been created for steering, braking, acceleration, and gear selection to provide Developers with a workable user interface.
 
-包含的其他功能:
+Additional features include:
 
-- 电源分配器终端
-- 集成PC与ROS预安装和配置
-- 线控驱动的紧急停止系统
-- 以太网和USB连接 (to PC)
+- Power distributor terminals
+- Integrated PC with ROS pre-installed and configured
+- Emergency Stop using a drive-by-wire system
+- Ethernet network and USB connections (to PC)
 
-# 硬件安装
+# Hardware Installation
 
-请参考 [Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
-中的步骤来安装硬件组件以及系统软件
+Please refer to [Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
+for the steps to install the hardware components and the system software.
 
-# 软件安装
+# Apollo Software Installation
 
-本节包括：
+This section includes:
 
-- 下载Apollo发行包
-- 设置Docker支持
-- 自定义你的发布容器
+- Download the Apollo Release Package
+- Set up Docker Support
+- Customize Your Release Container
 
-在开始之前，请确保您已经按照
-[Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)中的步骤
-安装了Ubuntu Linux 14.04.3和Apollo Kernel。
-## 下载Apollo源代码
+Before getting started, please make sure you have installed the Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the
+[Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md).
 
-1. 从[github source](https://github.com/ApolloAuto/apollo/)下载Apollo的源代码：
+## Download Apollo Source
+
+1. Download Apollo source code from the [github source](https://github.com/ApolloAuto/apollo/):
 
 ```
 git clone git@github.com:ApolloAuto/apollo.git
@@ -82,24 +82,24 @@ cd apollo
 
 ```
 
-2. 参考以下命令设置环境变量 `APOLLO_HOME`:
+2. Set up environment variable `APOLLO_HOME` by the following command:
 
 ```
 echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc
 ```
 
-3. 在一个新的终端或者已有的终端中输入`source ~/.bashrc`
+3. Open a new terminal or run `source ~/.bashrc` in an existing terminal.
 
 
-![tip](images/tip_icon.png) 在以下部分中，假设Apollo目录位于 `$APOLLO_HOME`.
+![tip](images/tip_icon.png) In the following sections, it is assumed that the Apollo directory is located in  `$APOLLO_HOME`.
 
-## 设置Docker支持
+## Set up Docker Support
 
-Docker容器是设置Apollo构建环境的最简单方法。
+The Docker container is the simplest way to set up the build environment for Apollo.
 
-有关更多信息，请参阅Docker详细教程 [here](https://docs.docker.com/).
+For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
 
-1. 运行以下命令来安装Docker：
+1. Run the following command to install Docker:
 
 
 ```
@@ -107,42 +107,43 @@ cd $APOLLO_HOME
 bash docker/scripts/install_docker.sh
 ```
 
-2. 脚本完成后，注销并重新登录系统以启用Docker。
+2. After the script completes, log out and then log back into the system to enable Docker.
 
 
-3. （可选）如果您已经安装了Docker（在安装Apollo内核之前），请在其中添加以下行 `/etc/default/docker`:
+3. (Optional) If you already have Docker installed (before you installed the Apollo Kernel), add the following line in `/etc/default/docker`:
 
 ```
 DOCKER_OPTS = "-s overlay"
 ```
 
-## 自定义你的发布容器
+## Customize Your Release Container
 
-1. 通过运行以下命令下载并启动Apollo 发布的 Docker映像：
+1. Download and start the Apollo Release docker image by running the following commands:
 
 ```
 cd $APOLLO_HOME
 bash docker/scripts/release_start.sh
 ```
 
-2. 通过运行以下命令登录Apollo 发布的 Docker映像：
+2. Login into the Apollo Release docker image by running the following commands:
 
 ```
 bash docker/scripts/release_into.sh
 ```
 
-3. 通过修改文件中的以下行来设置全球导航卫星系统（GNSS）驱动程序的区域编号 `./ros/share/gnss_driver/launch/gnss_driver.launch`.
+3. Set up the zone number for the Global Navigation Satellite System (GNSS) Driver by modifying the following line in file `./ros/share/gnss_driver/launch/gnss_driver.launch`.
 
 ```
 <arg name="proj4_text" default="+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs " />
 ```
-你只需修改上面一行的`+zone=10`的值即可。请参考
-[Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) 找到您当地的区号。例如，如果你在北京，中国，你必须设置`+zone=50`。
+You only have to modify the value `+zone=10` in the above line.
+Please refer to the
+[Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) to find your local zone number.
+For example, if you are in Beijing, China, you have to set `+zone=50`.
 
-5. 通过修改以下文件，为GNSS驱动程序设置实时运动（RTK）基站：
- `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
+5. Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
 
-   有关典型的RTK设置，请参阅以下示例：
+   Refer to the following example for a typical RTK setup:
 
 ```
 rtk_from {
@@ -165,16 +166,16 @@ rtk_to {
 }
 ```
 
- `rtk_from` 用于RTK基站信息。
+The `rtk_from` is  used for RTK base station information.
 
- `rtk_to` 用于将RTK差分数据发送到接收器。
+The `rtk_to` is used to send the RTK differential data to the receiver.
 
-6. 添加ESD CAN支持
+6. Add ESD CAN Support
 
-   请参考 [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md)
-   来设置ESD CAN库。
+   Please refer to [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md)
+   to setup the ESD CAN library.
 
-7. 按照以下步骤继续更改你的本地环境：
+7. Follow these steps to persist your local changes:
 
 ```
 # RUN OUT OF DOCKER ENV
@@ -184,74 +185,74 @@ cd $APOLLO_HOME
 bash docker/scripts/release_commit.sh
 ```
 
-# 在车辆上运行示例
+# Run Demo on Vehicle
 
-本节提供运行Apollo 1.0 Demo on Vehicle的说明。
-1. 设置硬件：
+This section provides the instructions to run the Apollo 1.0 Demo on Vehicle.
+1. Set up the hardware:
 
-- 打开平台车辆
-- 打开工业PC机（IPC）.
+- Power-on the platform vehicle.
+- Power-on the Industrial PC (IPC).
     ![](images/ipc_power_on.png)
-- 通过按住电源按钮打开调制解调器电源，直到指示灯亮起
-- 设置IPC的网络配置：静态IP（例如192.168.10.6），子网掩码（例如255.255.255.0）和网关（例如192.168.10.1）
-   - 配置您的DNS服务器IP（例如，8.8.8.8）。
-   - 使用平板电脑访问**设置**并连接到MKZ wifi 热点：
+- Power-on the modem by pressing and holding the power button until the lights turn on.
+- Set up the network configuration for the IPC: static IP (for example, 192.168.10.6), subnet mask (for example, 255.255.255.0), and gateway (for example, 192.168.10.1)
+   - Configurate your DNS server IP (for example, 8.8.8.8).
+   - Use a tablet to access **Settings** and connect to MKZ wifi:
 
    ![](images/ipad_config_wifi.png)
 
-2. 在Docker中使用**Chrome（只能使用Chrome）** 启动HMI：
+2. Start the HMI in Docker **using Chrome only**:
 
-   ![warning](images/warning_icon.png)**Warning:** 确保您不是同时从两个Docker容器启动HMI。
+   ![warning](images/warning_icon.png)**Warning:** Make sure that you are not starting HMI from two Docker containers concurrently.
 
-## 启动本地版本Docker映像
+## Launch the Local release env Docker Image
 
-运行以下命令：
+Run the following commands:
 ```
 cd $APOLLO_HOME
 bash docker/scripts/release_start.sh local
 ```
-当Docker启动时，它创建一个端口映射，将Docker内部端口8887映射到主机端口8887.然后，您可以在主机浏览器中访问HMI Web服务：
+When Docker starts, it creates a port mapping, which maps the Docker internal port 8887 to the host port 8887. You can then visit the HMI web service in your host machine browser:
 
-打开Chrome浏览器并启动阿波罗人机界面，转到 **192.168.10.6:8887**.
+Open the Chrome browser and start the Apollo HMI by going to **192.168.10.6:8887**.
  ![](images/start_hmi.png)
 
-## 记录驾驶轨迹
+## Record the Driving Trajectory
 
-按照以下步骤记录驾驶轨迹：
+Follow these steps to record the driving trajectory:
 
-1. 在Apollo HMI中，在**Quick Record**下，单击**Setup**以启动所有模块并执行硬件运行状况检查。
+1. In the Apollo HMI, under Quick Record, click **Setup** to start all modules and perform the hardware health check.
    ![](images/hmi_record_setup.png)
-2. 如果硬件健康检查通过，单击 **Start** 按钮开始记录驱动程序轨迹。
+2. If the hardware health check passes, click the **Start** button to start to record the driver trajectory.
    ![](images/hmi_record_start.png)
-3. 到达目的地后，点击**Stop** 按钮停止录制。
+3. After arriving at a destination, click the **Stop** button to stop recording.
    ![](images/hmi_record_stop.png)
-4. 如果要记录不同的轨迹，请单击**New** 按钮再次开始录制。
+4. If you want to record a *different* trajectory, click the **New** button to initiate recording again.
    ![](images/hmi_record_reset.png)
 
-## 执行自动驾驶
+## Perform Autonomous Driving
 
-按照以下步骤执行自主驾驶：
+Follow these steps to perform autonomous driving:
 
-1. 在Apollo HMI中，在Quick Play下，单击 **Setup** 启动所有模块并执行硬件运行状况检查。
+1. In the Apollo HMI, under Quick Play, click **Setup** to start all modules and perform a hardware health check.
    ![](images/hmi_play_setup.png)
 
-2. 如果车辆顺利通过Setup这一步, 它已经准备好进入自动模式了。 **确保驾驶员准备好了！**  点击 **Start**按钮开始自动驾驶。
+2. If the vehicle successfully passes the Setup step, it is ready to enter the Autonomous mode. **MAKE SURE DRIVER IS READY!**  Click the **Start** button to start the autonomous driving.
 
    ![](images/hmi_play_start.png)
 
-3. 到达目的地后，点击 **Stop** 按钮停止重放录制的轨迹。
+3. After arriving at your destination,  click the **Stop** button to stop replaying the recorded trajectory.
    ![](images/hmi_play_stop.png)
 
-## 关闭
+## Shut Down
 
-1. 从终端关闭系统：
+1. Shut down the system from a terminal:
     ```sudo shutdown now```
 
-2. 关闭IPC（找到桌面右上角的图标点击 **Shut Down**).
+2. Power-off the IPC (locate the icon on the top right of the desktop to click **Shut Down**).
 
-3. 按住电源按钮关闭调制解调器，直到指示灯熄灭。
+3. Turn off the modem by pressing and holding the power button until the lights turn off.
 
-4. 关掉车子
+4. Turn off the car.
 
-# 运行离线演示
-参考 [Offline Demo Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/README.md)
+# Run Offline Demo
+Refer to [Offline Demo Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/README.md)
