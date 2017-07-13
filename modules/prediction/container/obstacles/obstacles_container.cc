@@ -14,26 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
 
-ContainerManager::ContainerManager() {}
+void ObstaclesContainer::Insert(
+    const ::apollo::perception::PerceptionObstacles& obstacles) {}
 
-ContainerManager::~ContainerManager() {
-  containers_.clear();
 }
-
-void ContainerManager::RegisterContainer() {}
-
-Container* ContainerManager::mutable_container(const std::string& name) {
-  if (containers_.find(name) != containers_.end()) {
-    return containers_[name].get();
-  } else {
-    return nullptr;
-  }
-}
-
-} 
 }
