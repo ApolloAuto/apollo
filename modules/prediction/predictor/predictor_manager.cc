@@ -14,43 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- * @brief Define the data container base class
- */
+#include "modules/prediction/predictor/predictor_manager.h"
 
-#ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_H_
-#define MODULES_PREDICTION_CONTAINER_CONTAINER_H_
-
-#include <google/protobuf/message.h>
-
-/**
- * @namespace apollo::prediction
- * @brief apollo::prediction
- */
 namespace apollo {
 namespace prediction {
 
-class Container {
- public:
-  /**
-   * @brief Constructor
-   */
-  Container() = default;
+PredictorManager::PredictorManager() {}
 
-  /**
-   * @brief Destructor
-   */
-  virtual ~Container() = default;
+const Predictor* PredictorManager::GetPredictor() {
+  return nullptr;
+}
 
-  /**
-   * @brief Insert data into the container
-   * @param Message data in protobuf format
-   */
-  virtual void Insert(const ::google::protobuf::Message& message) = 0;
-};
+void PredictorManager::Run(
+    const ::apollo::perception::PerceptionObstacles& perception_obstacles) {}
 
-} // namespace prediction
-} // namespace apollo
-
-#endif // MODULES_PREDICTION_CONTAINER_CONTAINER_H_
+} 
+}

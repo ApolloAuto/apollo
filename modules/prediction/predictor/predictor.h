@@ -19,8 +19,8 @@
  * @brief Define the data container base class
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_H_
-#define MODULES_PREDICTION_CONTAINER_CONTAINER_H_
+#ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
+#define MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
 
 #include <google/protobuf/message.h>
 
@@ -31,26 +31,20 @@
 namespace apollo {
 namespace prediction {
 
-class Container {
+class Predictor {
  public:
   /**
    * @brief Constructor
    */
-  Container() = default;
+  Predictor() = default;
 
   /**
    * @brief Destructor
    */
-  virtual ~Container() = default;
-
-  /**
-   * @brief Insert data into the container
-   * @param Message data in protobuf format
-   */
-  virtual void Insert(const ::google::protobuf::Message& message) = 0;
+  virtual ~Predictor() = default;
 };
 
 } // namespace prediction
 } // namespace apollo
 
-#endif // MODULES_PREDICTION_CONTAINER_CONTAINER_H_
+#endif // MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_

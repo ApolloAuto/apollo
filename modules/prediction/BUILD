@@ -10,6 +10,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/prediction/container:container_manager",
+        "//modules/prediction/predictor:predictor_manager",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_common",
         "//modules/prediction/proto:prediction_proto",
