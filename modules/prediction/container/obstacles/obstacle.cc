@@ -16,13 +16,18 @@
 
 #include "modules/prediction/container/obstacles/obstacle.h"
 
+#include <iomanip>
+
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
 using apollo::common::math::KalmanFilter;
+using apollo::common::ErrorCode;
 
-std::mutex Obstacle::_mutex;
+std::mutex Obstacle::mutex_;
 
 Obstacle::Obstacle() : 
     id_(-1),
@@ -44,12 +49,12 @@ Obstacle::~Obstacle() {
 }
 
 int Obstacle::id() const {
-  std::lock_guard<std::mutex> lock(_mutex);
+  std::lock_guard<std::mutex> lock(mutex_);
   return id_;
 }
 
 double Obstacle::timestamp() const {
-  std::lock_guard<std::mutex> lock(_mutex);
+  std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0) {
     return feature_history_.front().timestamp();
   } else {
@@ -58,32 +63,32 @@ double Obstacle::timestamp() const {
 }
 
 const Feature& Obstacle::feature(size_t i) {
-  std::lock_guard<std::mutex> lock(_mutex);
+  std::lock_guard<std::mutex> lock(mutex_);
   CHECK(i < feature_history_.size());
   return feature_history_[i];
 }
 
 Feature* Obstacle::mutable_feature(size_t i) {
-  std::lock_guard<std::mutex> lock(_mutex);
+  std::lock_guard<std::mutex> lock(mutex_);
   CHECK(i < feature_history_.size());
   return &feature_history_[i];
 }
 
 const Feature& Obstacle::latest_feature() {
-  std::lock_guard<std::mutex> lock(_mutex);
+  std::lock_guard<std::mutex> lock(mutex_);
   CHECK(feature_history_.size() > 0);
   return feature_history_.front();
 }
 
 Feature* Obstacle::mutable_latest_feature() {
-  std::lock_guard<std::mutex> lock(_mutex);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   CHECK(feature_history_.size() > 0);
   return &(feature_history_.front());
 }
 
 size_t Obstacle::history_size() const {
-  std::lock_guard<std::mutex> lock(_mutex);
+  std::lock_guard<std::mutex> lock(mutex_);
   return feature_history_.size();
 }
 
@@ -93,11 +98,104 @@ const KalmanFilter<double, 4, 2, 0>& Obstacle::kf_lane_tracker(
     return kf_lane_tracker_map_[lane_id];
 }
 
-void Obstacle::Insert(
-    const apollo::perception::PerceptionObstacle& perception_obstacle,
-    const double timestamp) {
+void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
+                      const double timestamp) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (feature_history_.size() > 0 &&
+      timestamp <= feature_history_.front().timestamp()) {
+    AINFO << "Obstacle [" << id_ << "] received an older frame [" << timestamp
+          << "] than the most recent timestamp [ "
+          << feature_history_.front().timestamp() << "].";
+    return;
+  }
 
+  Feature feature;
+  if (SetId(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
+    return;
+  }
+  if (SetType(perception_obstacle) == ErrorCode::PREDICTION_ERROR) {
+    return;
+  }
+  SetTimestamp(perception_obstacle, timestamp, &feature);
+  SetPosition(perception_obstacle, &feature);
 }
+
+ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
+                          Feature* feature) {
+  if (!perception_obstacle.has_id()) {
+    AERROR << "Obstacle has no ID.";
+    return ErrorCode::PREDICTION_ERROR;
+  }
+
+  int id = perception_obstacle.id();
+  if (id_ < 0) {
+    id_ = id;
+    AINFO << "Obstacle set id [" << id_ << "].";
+  } else {
+    if (id_ != id) {
+      AERROR << "Obstacle [" << id_ << "] has a mismatched ID [" << id
+             << "] from perception obstacle.";
+      return ErrorCode::PREDICTION_ERROR;
+    } else {
+      feature->set_id(id);
+    }
+  }
+  return ErrorCode::OK;
+}
+
+ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle) {
+  if (perception_obstacle.has_type()) {
+    type_ = perception_obstacle.type();
+    AINFO << "Obstacle [" << id_ << "] set type [" << type_ << "].";
+  } else {
+    AERROR << "Obstacle [" << id_ << "] has no type.";
+    return ErrorCode::PREDICTION_ERROR;
+  }
+  return ErrorCode::OK;
+}
+
+void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
+                            const double timestamp, Feature* feature) {
+  double ts = timestamp;
+  if (perception_obstacle.has_timestamp() &&
+      perception_obstacle.timestamp() > 0.0) {
+    ts = perception_obstacle.timestamp();
+  }
+  feature->set_timestamp(ts);
+
+  AINFO << "Obstacle [" << id_ << "] set timestamp [" << std::fixed
+        << std::setprecision(6) << ts << "].";
+}
+
+
+void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
+                           Feature* feature) {
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
+
+  if (perception_obstacle.has_position()) {
+    if (perception_obstacle.position().has_x()) {
+      x = perception_obstacle.position().x();
+    }
+    if (perception_obstacle.position().has_y()) {
+      y = perception_obstacle.position().y();
+    }
+    if (perception_obstacle.position().has_z()) {
+      z = perception_obstacle.position().z();
+    }
+  }
+
+  feature->mutable_position()->set_x(x);
+  feature->mutable_position()->set_y(y);
+  feature->mutable_position()->set_z(z);
+
+  AINFO << "Obstacle [" << id_ << "] set position [" << std::fixed
+        << std::setprecision(6) << x << ", " << std::fixed
+        << std::setprecision(6) << y << ", " << std::fixed
+        << std::setprecision(6) << z << "].";
+}
+
 
 }  // namespace prediction
 }  // namespace apollo
