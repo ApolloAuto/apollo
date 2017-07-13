@@ -32,4 +32,4 @@ docker build -t "${DOCKER_REPO}:${TAG}" \
     -f "${APOLLO_ROOT}/docker/dev.${ARCH}.dockerfile" \
     "${APOLLO_ROOT}"
 
-#sed -i "s/dev-.*\"/${TAG}\"/g" ${APOLLO_ROOT}/docker/scripts/dev_start.sh
+sed -i "s/dev-${ARCH}-.*\"/${TAG}\"/g" ${APOLLO_ROOT}/docker/scripts/dev_start.sh
