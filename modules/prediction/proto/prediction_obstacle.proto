@@ -15,6 +15,7 @@ message TrajectoryPoint {
     optional double heading = 6; // heading in angle
 }
 
+// haha
 message Trajectory {
     optional double probability = 1; //probability of this trajectory
     repeated TrajectoryPoint trajectory_point = 2;
