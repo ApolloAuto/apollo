@@ -83,6 +83,10 @@ class Obstacle {
       const apollo::perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
+  void SetVelocity(
+      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      Feature* feature);
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;
