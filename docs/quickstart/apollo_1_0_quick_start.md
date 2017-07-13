@@ -139,7 +139,7 @@ bash docker/scripts/release_into.sh
 你只需修改上面一行的`+zone=10`的值即可。请参考
 [Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) 找到您当地的区号。例如，如果你在北京，中国，你必须设置`+zone=50`。
 
-5. 通过修改以下文件，为GNSS驱动程序设置实时运动（RTK）基站：
+5. 通过修改文件，为GNSS驱动程序设置实时运动（RTK）基站：
  `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
 
    有关典型的RTK设置，请参阅以下示例：
@@ -165,16 +165,16 @@ rtk_to {
 }
 ```
 
- `rtk_from` 用于RTK基站信息。
+The `rtk_from` is  used for RTK base station information.
 
- `rtk_to` 用于将RTK差分数据发送到接收器。
+The `rtk_to` is used to send the RTK differential data to the receiver.
 
-6. 添加ESD CAN支持
+6. Add ESD CAN Support
 
-   请参考 [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md)
-   来设置ESD CAN库。
+   Please refer to [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md)
+   to setup the ESD CAN library.
 
-7. 按照以下步骤继续更改你的本地环境：
+7. Follow these steps to persist your local changes:
 
 ```
 # RUN OUT OF DOCKER ENV
@@ -184,74 +184,74 @@ cd $APOLLO_HOME
 bash docker/scripts/release_commit.sh
 ```
 
-# 在车辆上运行示例
+# Run Demo on Vehicle
 
-本节提供运行Apollo 1.0 Demo on Vehicle的说明。
-1. 设置硬件：
+This section provides the instructions to run the Apollo 1.0 Demo on Vehicle.
+1. Set up the hardware:
 
-- 打开平台车辆
-- 打开工业PC机（IPC）.
+- Power-on the platform vehicle.
+- Power-on the Industrial PC (IPC).
     ![](images/ipc_power_on.png)
-- 通过按住电源按钮打开调制解调器电源，直到指示灯亮起
-- 设置IPC的网络配置：静态IP（例如192.168.10.6），子网掩码（例如255.255.255.0）和网关（例如192.168.10.1）
-   - 配置您的DNS服务器IP（例如，8.8.8.8）。
-   - 使用平板电脑访问**设置**并连接到MKZ wifi 热点：
+- Power-on the modem by pressing and holding the power button until the lights turn on.
+- Set up the network configuration for the IPC: static IP (for example, 192.168.10.6), subnet mask (for example, 255.255.255.0), and gateway (for example, 192.168.10.1)
+   - Configurate your DNS server IP (for example, 8.8.8.8).
+   - Use a tablet to access **Settings** and connect to MKZ wifi:
 
    ![](images/ipad_config_wifi.png)
 
-2. 在Docker中使用**Chrome（只能使用Chrome）** 启动HMI：
+2. Start the HMI in Docker **using Chrome only**:
 
-   ![warning](images/warning_icon.png)**Warning:** 确保您不是同时从两个Docker容器启动HMI。
+   ![warning](images/warning_icon.png)**Warning:** Make sure that you are not starting HMI from two Docker containers concurrently.
 
-## 启动本地版本Docker映像
+## Launch the Local release env Docker Image
 
-运行以下命令：
+Run the following commands:
 ```
 cd $APOLLO_HOME
 bash docker/scripts/release_start.sh local
 ```
-当Docker启动时，它创建一个端口映射，将Docker内部端口8887映射到主机端口8887.然后，您可以在主机浏览器中访问HMI Web服务：
+When Docker starts, it creates a port mapping, which maps the Docker internal port 8887 to the host port 8887. You can then visit the HMI web service in your host machine browser:
 
-打开Chrome浏览器并启动阿波罗人机界面，转到 **192.168.10.6:8887**.
+Open the Chrome browser and start the Apollo HMI by going to **192.168.10.6:8887**.
  ![](images/start_hmi.png)
 
-## 记录驾驶轨迹
+## Record the Driving Trajectory
 
-按照以下步骤记录驾驶轨迹：
+Follow these steps to record the driving trajectory:
 
-1. 在Apollo HMI中，在**Quick Record**下，单击**Setup**以启动所有模块并执行硬件运行状况检查。
+1. In the Apollo HMI, under Quick Record, click **Setup** to start all modules and perform the hardware health check.
    ![](images/hmi_record_setup.png)
-2. 如果硬件健康检查通过，单击 **Start** 按钮开始记录驱动程序轨迹。
+2. If the hardware health check passes, click the **Start** button to start to record the driver trajectory.
    ![](images/hmi_record_start.png)
-3. 到达目的地后，点击**Stop** 按钮停止录制。
+3. After arriving at a destination, click the **Stop** button to stop recording.
    ![](images/hmi_record_stop.png)
-4. 如果要记录不同的轨迹，请单击**New** 按钮再次开始录制。
+4. If you want to record a *different* trajectory, click the **New** button to initiate recording again.
    ![](images/hmi_record_reset.png)
 
-## 执行自动驾驶
+## Perform Autonomous Driving
 
-按照以下步骤执行自主驾驶：
+Follow these steps to perform autonomous driving:
 
-1. 在Apollo HMI中，在Quick Play下，单击 **Setup** 启动所有模块并执行硬件运行状况检查。
+1. In the Apollo HMI, under Quick Play, click **Setup** to start all modules and perform a hardware health check.
    ![](images/hmi_play_setup.png)
 
-2. 如果车辆顺利通过Setup这一步, 它已经准备好进入自动模式了。 **确保驾驶员准备好了！**  点击 **Start**按钮开始自动驾驶。
+2. If the vehicle successfully passes the Setup step, it is ready to enter the Autonomous mode. **MAKE SURE DRIVER IS READY!**  Click the **Start** button to start the autonomous driving.
 
    ![](images/hmi_play_start.png)
 
-3. 到达目的地后，点击 **Stop** 按钮停止重放录制的轨迹。
+3. After arriving at your destination,  click the **Stop** button to stop replaying the recorded trajectory.
    ![](images/hmi_play_stop.png)
 
-## 关闭
+## Shut Down
 
-1. 从终端关闭系统：
+1. Shut down the system from a terminal:
     ```sudo shutdown now```
 
-2. 关闭IPC（找到桌面右上角的图标点击 **Shut Down**).
+2. Power-off the IPC (locate the icon on the top right of the desktop to click **Shut Down**).
 
-3. 按住电源按钮关闭调制解调器，直到指示灯熄灭。
+3. Turn off the modem by pressing and holding the power button until the lights turn off.
 
-4. 关掉车子
+4. Turn off the car.
 
-# 运行离线演示
-参考 [Offline Demo Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/README.md)
+# Run Offline Demo
+Refer to [Offline Demo Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/README.md)
