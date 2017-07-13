@@ -30,6 +30,7 @@
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
+#include "modules/common/proto/error_code.pb.h"
 
 #include "modules/common/math/kalman_filter.h"
 
@@ -66,6 +67,23 @@ class Obstacle {
   // TODO(author) void SetLaneGraphFeature(ObstacleClusters* p_cluster);
 
  private:
+  apollo::common::ErrorCode SetId(
+      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      Feature* feature);
+
+  apollo::common::ErrorCode SetType(
+      const apollo::perception::PerceptionObstacle& perception_obstacle);
+
+  void SetTimestamp(
+      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      const double timestamp,
+      Feature* feature);
+
+  void SetPosition(
+      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      Feature* feature);
+
+ private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;
   std::deque<Feature> feature_history_;
@@ -74,7 +92,7 @@ class Obstacle {
   std::unordered_map<std::string,
       apollo::common::math::KalmanFilter<double, 4, 2, 0>> kf_lane_tracker_map_;
   // TODO(author) std::vector<const adu::hdmap::LaneInfo*> _current_lanes;
-  static std::mutex _mutex;
+  static std::mutex mutex_;
 };
 
 }  // namespace prediction
