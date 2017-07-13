@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <iostream>
+#include <thread>
 
 #include "ros/include/ros/ros.h"
 #include "std_msgs/String.h"
@@ -100,7 +101,7 @@ void on_chassis(const apollo::canbus::Chassis& chassis) {
   }
 }
 
-void* terminal_thread(void* arg) {
+void terminal_thread_func() {
   int mode = 0;
   bool should_exit = false;
   while (std::cin >> mode) {
@@ -122,7 +123,6 @@ void* terminal_thread(void* arg) {
       break;
     }
   }
-  return NULL;
 }
 
 }  // end of namespace
@@ -160,11 +160,8 @@ int main(int argc, char** argv) {
   AdapterManager::SetChassisCallback(on_chassis);
 
   help();
-  pthread_t pid;
-  if (pthread_create(&pid, NULL, terminal_thread, NULL) != 0) {
-    AINFO << "create terminal thread failed.";
-    exit(0);
-  }
+  std::thread terminal_thread(terminal_thread_func);
   ros::spin();
+  terminal_thread.join();
   return 0;
 }
