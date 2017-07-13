@@ -49,7 +49,7 @@ class ContainerManager {
   /**
    * @brief Get mutable container
    * @param Name of the container
-   * @return Pointer of the container given the name
+   * @return Pointer to the container given the name
    */
   Container* mutable_container(const std::string& name);
 
