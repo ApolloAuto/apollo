@@ -17,6 +17,7 @@
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 #include <iomanip>
+#include <cmath>
 
 #include "modules/common/log.h"
 
@@ -103,8 +104,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0 &&
       timestamp <= feature_history_.front().timestamp()) {
-    AINFO << "Obstacle [" << id_ << "] received an older frame [" << timestamp
-          << "] than the most recent timestamp [ "
+    AINFO << "Obstacle [" << id_ << "] received an older frame ["
+          << timestamp << "] than the most recent timestamp [ "
           << feature_history_.front().timestamp() << "].";
     return;
   }
@@ -118,6 +119,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   }
   SetTimestamp(perception_obstacle, timestamp, &feature);
   SetPosition(perception_obstacle, &feature);
+  SetVelocity(perception_obstacle, &feature);
 }
 
 ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
@@ -196,6 +198,40 @@ void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
         << std::setprecision(6) << z << "].";
 }
 
+void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
+                           Feature* feature) {
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
+
+  if (perception_obstacle.has_velocity()) {
+    if (perception_obstacle.velocity().has_x()) {
+      x = perception_obstacle.velocity().x();
+    }
+    if (perception_obstacle.velocity().has_y()) {
+      y = perception_obstacle.velocity().y();
+    }
+    if (perception_obstacle.velocity().has_z()) {
+      z = perception_obstacle.velocity().z();
+    }
+  }
+
+  feature->mutable_velocity()->set_x(x);
+  feature->mutable_velocity()->set_y(y);
+  feature->mutable_velocity()->set_z(z);
+
+  double speed = std::hypot(std::hypot(x, y), z);
+  double velocity_heading = std::atan2(y, x);
+  feature->set_velocity_heading(velocity_heading);
+  feature->set_speed(speed);
+
+  AINFO << "Obstacle [" << id_ << "] set velocity [" << std::fixed
+        << std::setprecision(6) << x << ", " << std::fixed
+        << std::setprecision(6) << y << ", " << std::fixed
+        << std::setprecision(6) << z << "], "
+        << "velocity heading [" << velocity_heading << "] and speed [" << speed
+        << "].";
+}
 
 }  // namespace prediction
 }  // namespace apollo
