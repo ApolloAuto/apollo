@@ -25,7 +25,6 @@
 #include <fstream>
 #include <string>
 
-#include "modules/control/common/definitions.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/filters/digital_filter.h"
