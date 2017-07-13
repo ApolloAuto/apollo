@@ -61,6 +61,7 @@ class Wheelspeed6a : public ProtocolData {
                      const struct timeval& timestamp,
                      ChassisDetail* chassis_detail) const;
 
+ private:
   /**
    * @brief calculate front left wheel speed based on byte array.
    * config detail: {'name': 'fl', 'offset': 0.0, 'precision': 0.01, 'len': 16,
@@ -107,6 +108,9 @@ class Wheelspeed6a : public ProtocolData {
    */
   double rear_right_wheel_speed(const std::uint8_t* bytes,
                                 int32_t length) const;
+
+  double parse_two_frames(const std::uint8_t low_byte,
+                          const std::uint8_t high_byte) const;
 };
 
 }  // namespace lincoln
