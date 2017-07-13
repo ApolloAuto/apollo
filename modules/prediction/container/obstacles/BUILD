@@ -15,7 +15,9 @@ cc_library(
     srcs = ["obstacle.cc"],
     hdrs = ["obstacle.h"],
     deps = [
-        "//modules/perception/proto:perception_proto"
-    ]
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/common/math:kalman_filter",
+    ],
 )
 
