@@ -16,13 +16,17 @@
 
 /**
  * @file
- * @brief Define the data container base class
+ * @brief Use predictor manager to manage all predictors
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_H_
-#define MODULES_PREDICTION_CONTAINER_CONTAINER_H_
+#ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
+#define MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
 
-#include <google/protobuf/message.h>
+#include <unordered_map>
+
+#include "modules/prediction/predictor/predictor.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common/macro.h"
 
 /**
  * @namespace apollo::prediction
@@ -31,26 +35,25 @@
 namespace apollo {
 namespace prediction {
 
-class Container {
+class PredictorManager {
  public:
   /**
-   * @brief Constructor
-   */
-  Container() = default;
-
-  /**
    * @brief Destructor
-   */
-  virtual ~Container() = default;
+   */ 
+  virtual ~PredictorManager() = default;
 
   /**
-   * @brief Insert data into the container
-   * @param Message data in protobuf format
+   * @brief Get predictor
+   * @return Pointer to the predictor
    */
-  virtual void Insert(const ::google::protobuf::Message& message) = 0;
+  const Predictor* GetPredictor();
+
+  void Run(const ::apollo::perception::PerceptionObstacles& perception_obstacles);
+
+  DECLARE_SINGLETON(PredictorManager)
 };
 
 } // namespace prediction
 } // namespace apollo
 
-#endif // MODULES_PREDICTION_CONTAINER_CONTAINER_H_
+#endif // MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
