@@ -22,6 +22,7 @@
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace prediction {
@@ -29,10 +30,19 @@ namespace prediction {
 using ::apollo::perception::PerceptionObstacles;
 using ::apollo::localization::LocalizationEstimate;
 using ::apollo::common::adapter::AdapterManager;
+using ::apollo::common::Status;
+using ::apollo::common::ErrorCode;
 
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
-apollo::common::Status Prediction::Init() {
+Status Prediction::Init() {
+  // Load prediction conf
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
+                                                &conf_)) {
+    return OnError("Unable to load prediction conf file" +
+                   FLAGS_prediction_conf_file);
+  }
+
   AdapterManager::instance()->Init();
 
   CHECK(AdapterManager::GetLocalization())
@@ -43,11 +53,11 @@ apollo::common::Status Prediction::Init() {
 
   AdapterManager::SetPerceptionObstaclesCallback(&Prediction::OnPerception,
                                                  this);
-  return apollo::common::Status::OK();
+  return Status::OK();
 }
 
-apollo::common::Status Prediction::Start() {
-  return apollo::common::Status::OK();
+Status Prediction::Start() {
+  return Status::OK();
 }
 
 void Prediction::Stop() {}
@@ -71,6 +81,10 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   PredictorManager::instance()->Run(perception_obstacles);
   // GeneratorManager::instance()->Run(perception_obstacles);
   // AdapterManager::PublishPrediction(GeneratorManager::instance()->GetPredictions());
+}
+
+Status Prediction::OnError(const std::string& error_msg) {
+  return Status(ErrorCode::PREDICTION_ERROR, error_msg);
 }
 
 }  // namespace prediction
