@@ -121,6 +121,13 @@ class KalmanFilter {
   void SetObservationNoise(const Eigen::Matrix<T, ZN, ZN>& R) { R_ = R; }
 
   /**
+   * @brief Changes the covariance matrix of current state belief distribution.
+   *
+   * @param P New state covariance matrix
+   */
+  void SetStateCovariance(const Eigen::Matrix<T, XN, XN>& P) { P_ = P; }
+
+  /**
    * @brief Changes the control matrix in the state transition rule.
    *
    * @param B New control matrix
