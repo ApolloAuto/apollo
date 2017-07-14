@@ -20,6 +20,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/common/util/file.h"
@@ -78,8 +79,8 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   ContainerManager::instance()
       ->mutable_container("Obstacles")->Insert(perception_obstacles);
   ContainerManager::instance()->mutable_container("Obstacles")->Insert(perception_obstacles);
+  EvaluatorManager::instance()->Run(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
-  // GeneratorManager::instance()->Run(perception_obstacles);
   // AdapterManager::PublishPrediction(GeneratorManager::instance()->GetPredictions());
 }
 
