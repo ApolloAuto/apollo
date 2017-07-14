@@ -73,16 +73,16 @@ TEST(MathUtilsTest, Square) {
 }
 
 TEST(MathUtilsTest, Double) {
-  EXPECT_EQ(double_compare(234.32, 93.9), 1);
-  EXPECT_EQ(double_compare({234.32}, {93.9}), 1);
-  EXPECT_EQ(double_compare(234.32, 93.9, 1e-5), 1);
-  EXPECT_EQ(double_compare({234.32}, {93.9}, 1e-5), 1);
+  EXPECT_EQ(DoubleCompare(234.32, 93.9), 1);
+  EXPECT_EQ(DoubleCompare({234.32}, {93.9}), 1);
+  EXPECT_EQ(DoubleCompare(234.32, 93.9, 1e-5), 1);
+  EXPECT_EQ(DoubleCompare({234.32}, {93.9}, 1e-5), 1);
 
-  EXPECT_EQ(double_compare(23.32, 93.9), -1);
-  EXPECT_EQ(double_compare(4.32, 4.32), 0);
-  EXPECT_EQ(double_compare(2.1, 2.0009, 1e-5), 1);
-  EXPECT_EQ(double_compare(1.1, 2.0009, 1e-5), -1);
-  EXPECT_EQ(double_compare(2.1, 2.0009, 1), 0);
+  EXPECT_EQ(DoubleCompare(23.32, 93.9), -1);
+  EXPECT_EQ(DoubleCompare(4.32, 4.32), 0);
+  EXPECT_EQ(DoubleCompare(2.1, 2.0009, 1e-5), 1);
+  EXPECT_EQ(DoubleCompare(1.1, 2.0009, 1e-5), -1);
+  EXPECT_EQ(DoubleCompare(2.1, 2.0009, 1), 0);
 }
 
 }  // namespace math

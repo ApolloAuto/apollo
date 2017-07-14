@@ -23,4 +23,8 @@
 DECLARE_string(prediction_module_name);
 DECLARE_string(prediction_conf_file);
 
+DECLARE_double(double_precision);
+DECLARE_double(max_acc);
+DECLARE_double(min_acc);
+
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
