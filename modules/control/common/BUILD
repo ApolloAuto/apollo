@@ -16,17 +16,6 @@ cc_library(
 )
 
 cc_library(
-    name = "base_types",
-    hdrs = [
-        "base_types.h",
-    ],
-    deps = [
-        "//modules/common:log",
-        "@eigen//:eigen",
-    ],
-)
-
-cc_library(
     name = "hysteresis_filter",
     srcs = [
         "hysteresis_filter.cc",
@@ -73,10 +62,10 @@ cc_library(
         "trajectory_analyzer.h",
     ],
     deps = [
-        ":base_types",
         "//modules/common:log",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:search",
+        "//modules/common/proto:path_point_proto",
         "//modules/common/vehicle_state",
         "//modules/planning/proto:planning_proto",
     ],
@@ -85,7 +74,6 @@ cc_library(
 cc_library(
     name = "common",
     deps = [
-        ":base_types",
         ":control_gflags",
         ":hysteresis_filter",
         ":interpolation_2d",
