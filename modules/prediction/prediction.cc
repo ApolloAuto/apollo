@@ -67,6 +67,7 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   }
   ContainerManager::instance()
       ->mutable_container("Obstacles")->Insert(perception_obstacles);
+  ContainerManager::instance()->mutable_container("Obstacles")->Insert(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
   // GeneratorManager::instance()->Run(perception_obstacles);
   // AdapterManager::PublishPrediction(GeneratorManager::instance()->GetPredictions());

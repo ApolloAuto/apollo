@@ -87,6 +87,12 @@ class Obstacle {
       const apollo::perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
+  void SetAcceleration(Feature* feature);
+
+  void SetTheta(
+      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      Feature* feature);
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;

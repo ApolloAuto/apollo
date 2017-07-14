@@ -27,8 +27,17 @@ namespace prediction {
 using apollo::perception::PerceptionObstacle;
 using apollo::common::math::KalmanFilter;
 using apollo::common::ErrorCode;
+using apollo::common::Point3D;
 
 std::mutex Obstacle::mutex_;
+
+namespace {
+
+double Damp(const double x, const double sigma) {
+    return 1 / (1 + exp(1 / (std::fabs(x) + sigma)));
+}
+
+}  // namespace
 
 Obstacle::Obstacle() : 
     id_(-1),
@@ -120,6 +129,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetTimestamp(perception_obstacle, timestamp, &feature);
   SetPosition(perception_obstacle, &feature);
   SetVelocity(perception_obstacle, &feature);
+  SetAcceleration(&feature);
+  SetTheta(perception_obstacle, &feature);
 }
 
 ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
@@ -174,6 +185,7 @@ void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
                            Feature* feature) {
   double x = 0.0;
   double y = 0.0;
+  double z = 0.0;
 
   if (perception_obstacle.has_position()) {
     if (perception_obstacle.position().has_x()) {
@@ -182,43 +194,108 @@ void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
     if (perception_obstacle.position().has_y()) {
       y = perception_obstacle.position().y();
     }
+    if (perception_obstacle.position().has_z()) {
+      z = perception_obstacle.position().z();
+    }
   }
 
   feature->mutable_position()->set_x(x);
   feature->mutable_position()->set_y(y);
+  feature->mutable_position()->set_z(z);
 
   AINFO << "Obstacle [" << id_ << "] set position [" << std::fixed
         << std::setprecision(6) << x << ", " << std::fixed
-        << std::setprecision(6) << y << "].";
+        << std::setprecision(6) << y << ", " << std::fixed
+        << std::setprecision(6) << z << "].";
 }
 
 void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
                            Feature* feature) {
-  double x = 0.0;
-  double y = 0.0;
+  double velocity_x = 0.0;
+  double velocity_y = 0.0;
+  double velocity_z = 0.0;
 
   if (perception_obstacle.has_velocity()) {
     if (perception_obstacle.velocity().has_x()) {
-      x = perception_obstacle.velocity().x();
+      velocity_x = perception_obstacle.velocity().x();
     }
     if (perception_obstacle.velocity().has_y()) {
-      y = perception_obstacle.velocity().y();
+      velocity_y = perception_obstacle.velocity().y();
+    }
+    if (perception_obstacle.velocity().has_z()) {
+      velocity_z = perception_obstacle.velocity().z();
     }
   }
 
-  feature->mutable_velocity()->set_x(x);
-  feature->mutable_velocity()->set_y(y);
+  feature->mutable_velocity()->set_x(velocity_x);
+  feature->mutable_velocity()->set_y(velocity_y);
+  feature->mutable_velocity()->set_z(velocity_z);
 
-  double speed = std::hypot(x, y);
-  double velocity_heading = std::atan2(y, x);
+  double speed = std::hypot(std::hypot(velocity_x, velocity_y), velocity_z);
+  double velocity_heading = std::atan2(velocity_y, velocity_x);
   feature->set_velocity_heading(velocity_heading);
   feature->set_speed(speed);
 
   AINFO << "Obstacle [" << id_ << "] set velocity [" << std::fixed
-        << std::setprecision(6) << x << ", " << std::fixed
-        << std::setprecision(6) << y << "], "
+        << std::setprecision(6) << velocity_x << ", " << std::fixed
+        << std::setprecision(6) << velocity_y << ", " << std::fixed
+        << std::setprecision(6) << velocity_z << "], "
         << "velocity heading [" << velocity_heading << "] and speed [" << speed
         << "].";
+}
+
+void Obstacle::SetAcceleration(Feature* feature) {
+  double acc_x = 0.0;
+  double acc_y = 0.0;
+  double acc_z = 0.0;
+
+  if (feature_history_.size() > 0) {
+    double curr_ts = feature->timestamp();
+    double prev_ts = feature_history_.front().timestamp();
+
+    const Point3D& curr_velocity = feature->velocity();
+    const Point3D& prev_velocity = feature_history_.front().velocity();
+
+    // TODO(kechxu) add a gflag of double precision
+    if (curr_ts > prev_ts) {
+      double damping_x = Damp(curr_velocity.x(), 0.001);
+      double damping_y = Damp(curr_velocity.y(), 0.001);
+      double damping_z = Damp(curr_velocity.z(), 0.001);
+
+      acc_x = (curr_velocity.x() - prev_velocity.x()) / (curr_ts - prev_ts);
+      acc_y = (curr_velocity.y() - prev_velocity.y()) / (curr_ts - prev_ts);
+      acc_z = (curr_velocity.z() - prev_velocity.z()) / (curr_ts - prev_ts);
+      // TODO(kechxu) clamp the acc
+      acc_x *= damping_x;
+      acc_y *= damping_y;
+      acc_z *= damping_z;
+    }
+  }
+
+  feature->mutable_acceleration()->set_x(acc_x);
+  feature->mutable_acceleration()->set_y(acc_y);
+  feature->mutable_acceleration()->set_z(acc_z);
+  double acc = std::hypot(std::hypot(acc_x, acc_y), acc_z);
+  feature->set_acc(acc);
+
+  LOG(INFO) << "Obstacle [" << id_ << "] set acc [" << std::fixed
+            << std::setprecision(6) << acc_x << ", " << std::fixed
+            << std::setprecision(6) << acc_y << ", " << std::fixed
+            << std::setprecision(6) << acc_z << "], "
+            << "and acc [" << acc << "].";
+}
+
+
+void Obstacle::SetTheta(const PerceptionObstacle& perception_obstacle,
+                        Feature* feature) {
+  double theta = 0.0;
+  if (perception_obstacle.has_theta()) {
+    theta = perception_obstacle.theta();
+  }
+  feature->set_theta(theta);
+
+  AINFO << "Obstacle [" << id_ << "] set theta [" << std::fixed
+        << std::setprecision(6) << theta << "].";
 }
 
 }  // namespace prediction
