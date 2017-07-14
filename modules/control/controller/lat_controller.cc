@@ -97,6 +97,8 @@ bool LatController::LoadControlConf(const ControlConf* control_conf) {
       control_conf->lat_controller_conf().steer_transmission_ratio();
   steer_single_direction_max_degree_ =
       control_conf->lat_controller_conf().steer_single_direction_max_degree();
+  max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
+
   double mass_fl = control_conf->lat_controller_conf().mass_fl();
   double mass_fr = control_conf->lat_controller_conf().mass_fr();
   double mass_rl = control_conf->lat_controller_conf().mass_rl();
@@ -264,11 +266,21 @@ Status LatController::ComputeControlCommand(
 
   double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
   double steer_angle = steer_angle_feedback + steer_angle_feedforward;
+
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = apollo::common::math::Clamp(steer_angle, -100.0, 100.0);
 
-  steer_angle = digital_filter_.Filter(steer_angle);
-  cmd->set_steering_target(steer_angle);
+  double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
+       (vehicle_state_.linear_velocity() * vehicle_state_.linear_velocity())) *
+       steer_transmission_ratio_ * 180 / M_PI /
+       steer_single_direction_max_degree_;
+
+  // Clamp the steer angle
+  double steer_angle_limited = apollo::common::math::Clamp(steer_angle,
+                               -steer_limit, steer_limit);
+
+  steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
+  cmd->set_steering_target(steer_angle_limited);
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
 
   // compute extra information for logging and debugging
@@ -302,6 +314,7 @@ Status LatController::ComputeControlCommand(
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
   debug->set_ref_speed(vehicle_state_.linear_velocity());
+  debug->set_steer_angle_limited(steer_angle_limited);
   ProcessLogs(debug, chassis);
   return Status::OK();
 }
