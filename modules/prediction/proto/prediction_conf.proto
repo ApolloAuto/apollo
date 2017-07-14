@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+message PredictionConf {
+  enum Eval {
+    DEF_EVAL = 0;
+  }
+
+  enum VehicleModel {
+    DEF_VEHICLE_MODEL = 0;
+  }
+
+  optional Eval eval = 1;
+  optional VehicleModel vehicle_model = 2; 
+}

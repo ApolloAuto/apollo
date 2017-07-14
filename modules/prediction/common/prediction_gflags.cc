@@ -18,4 +18,6 @@
 
 // System gflags
 DEFINE_string(prediction_module_name, "prediction",
-              "Default prediciton module name");
+    "Default prediciton module name");
+DEFINE_string(prediction_conf_file, "modules/prediction/conf/prediction_conf.pb.txt",
+    "Default conf file for prediction");

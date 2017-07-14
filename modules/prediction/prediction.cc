@@ -27,6 +27,7 @@ namespace apollo {
 namespace prediction {
 
 using ::apollo::perception::PerceptionObstacles;
+using ::apollo::localization::LocalizationEstimate;
 using ::apollo::common::adapter::AdapterManager;
 
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
@@ -56,14 +57,16 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   if (localization_adapter->Empty()) {
     AINFO << "No localization message.";
   } else {
-    const ::apollo::localization::LocalizationEstimate& localization =
+    const LocalizationEstimate& localization =
         localization_adapter->GetLatestObserved();
     ADEBUG << "Received localization message ["
            << localization.ShortDebugString()
            << "].";
-    ContainerManager::instance()->mutable_container("Pose")->Insert(localization);
+    ContainerManager::instance()
+        ->mutable_container("Pose")->Insert(localization);
   }
-  ContainerManager::instance()->mutable_container("Obstacles")->Insert(perception_obstacles);
+  ContainerManager::instance()
+      ->mutable_container("Obstacles")->Insert(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
   // GeneratorManager::instance()->Run(perception_obstacles);
   // AdapterManager::PublishPrediction(GeneratorManager::instance()->GetPredictions());
