@@ -152,7 +152,7 @@ T Clamp(const T value, T bound1, T bound2) {
   return value;
 }
 
-int double_compare(
+int DoubleCompare(
     const double d1, const double d2,
     const double epsilon = std::numeric_limits<double>::epsilon());
 
