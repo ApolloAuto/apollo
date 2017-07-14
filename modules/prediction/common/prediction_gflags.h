@@ -26,5 +26,8 @@ DECLARE_string(prediction_conf_file);
 DECLARE_double(double_precision);
 DECLARE_double(max_acc);
 DECLARE_double(min_acc);
+DECLARE_double(q_var);
+DECLARE_double(r_var);
+DECLARE_double(p_var);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

@@ -161,7 +161,7 @@ ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
 ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle) {
   if (perception_obstacle.has_type()) {
     type_ = perception_obstacle.type();
-    AINFO << "Obstacle [" << id_ << "] set type [" << type_ << "].";
+    ADEBUG << "Obstacle [" << id_ << "] set type [" << type_ << "].";
   } else {
     AERROR << "Obstacle [" << id_ << "] has no type.";
     return ErrorCode::PREDICTION_ERROR;
@@ -178,8 +178,8 @@ void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
   }
   feature->set_timestamp(ts);
 
-  AINFO << "Obstacle [" << id_ << "] set timestamp [" << std::fixed
-        << std::setprecision(6) << ts << "].";
+  ADEBUG << "Obstacle [" << id_ << "] set timestamp [" << std::fixed
+         << std::setprecision(6) << ts << "].";
 }
 
 
@@ -205,10 +205,10 @@ void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
   feature->mutable_position()->set_y(y);
   feature->mutable_position()->set_z(z);
 
-  AINFO << "Obstacle [" << id_ << "] set position [" << std::fixed
-        << std::setprecision(6) << x << ", " << std::fixed
-        << std::setprecision(6) << y << ", " << std::fixed
-        << std::setprecision(6) << z << "].";
+  ADEBUG << "Obstacle [" << id_ << "] set position [" << std::fixed
+         << std::setprecision(6) << x << ", " << std::fixed
+         << std::setprecision(6) << y << ", " << std::fixed
+         << std::setprecision(6) << z << "].";
 }
 
 void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
@@ -238,12 +238,12 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   feature->set_velocity_heading(velocity_heading);
   feature->set_speed(speed);
 
-  AINFO << "Obstacle [" << id_ << "] set velocity [" << std::fixed
-        << std::setprecision(6) << velocity_x << ", " << std::fixed
-        << std::setprecision(6) << velocity_y << ", " << std::fixed
-        << std::setprecision(6) << velocity_z << "], "
-        << "velocity heading [" << velocity_heading << "] and speed [" << speed
-        << "].";
+  ADEBUG << "Obstacle [" << id_ << "] set velocity [" << std::fixed
+         << std::setprecision(6) << velocity_x << ", " << std::fixed
+         << std::setprecision(6) << velocity_y << ", " << std::fixed
+         << std::setprecision(6) << velocity_z << "], "
+         << "velocity heading [" << velocity_heading << "] and speed [" << speed
+         << "].";
 }
 
 void Obstacle::SetAcceleration(Feature* feature) {
@@ -282,11 +282,11 @@ void Obstacle::SetAcceleration(Feature* feature) {
   double acc = std::hypot(std::hypot(acc_x, acc_y), acc_z);
   feature->set_acc(acc);
 
-  LOG(INFO) << "Obstacle [" << id_ << "] set acc [" << std::fixed
-            << std::setprecision(6) << acc_x << ", " << std::fixed
-            << std::setprecision(6) << acc_y << ", " << std::fixed
-            << std::setprecision(6) << acc_z << "], "
-            << "and acc [" << acc << "].";
+  ADEBUG << "Obstacle [" << id_ << "] set acc [" << std::fixed
+         << std::setprecision(6) << acc_x << ", " << std::fixed
+         << std::setprecision(6) << acc_y << ", " << std::fixed
+         << std::setprecision(6) << acc_z << "], "
+         << "and acc [" << acc << "].";
 }
 
 
@@ -298,8 +298,68 @@ void Obstacle::SetTheta(const PerceptionObstacle& perception_obstacle,
   }
   feature->set_theta(theta);
 
-  AINFO << "Obstacle [" << id_ << "] set theta [" << std::fixed
-        << std::setprecision(6) << theta << "].";
+  ADEBUG << "Obstacle [" << id_ << "] set theta [" << std::fixed
+         << std::setprecision(6) << theta << "].";
+}
+
+void Obstacle::SetLengthWidthHeight(
+    const PerceptionObstacle& perception_obstacle, Feature* feature) {
+  double length = 0.0;
+  double width = 0.0;
+  double height = 0.0;
+
+  if (perception_obstacle.has_length()) {
+    length = perception_obstacle.length();
+  }
+  if (perception_obstacle.has_width()) {
+    width = perception_obstacle.width();
+  }
+  if (perception_obstacle.has_height()) {
+    height = perception_obstacle.height();
+  }
+
+  feature->set_length(length);
+  feature->set_width(width);
+  feature->set_height(height);
+
+  ADEBUG << "Obstacle [" << id_ << "] set dimension [" << std::fixed
+         << std::setprecision(6) << length << ", " << std::fixed
+         << std::setprecision(6) << width << ", " << std::fixed
+         << std::setprecision(6) << height << "].";
+}
+
+void Obstacle::InitKFMotionTracker() {
+  // Set transition matrix F
+  Eigen::Matrix<double, 6, 6> F;
+  F.setIdentity();
+  kf_motion_tracker_.SetTransitionMatrix(F);
+
+  // Set observation matrix H
+  Eigen::Matrix<double, 2, 6> H;
+  H.setZero();
+  H(0, 0) = 1.0;
+  H(1, 1) = 1.0;
+  kf_motion_tracker_.SetObservationMatrix(H);
+
+  // Set covariance of transition noise matrix Q
+  Eigen::Matrix<double, 6, 6> Q;
+  Q.setIdentity();
+  Q *= FLAGS_q_var;
+  kf_motion_tracker_.SetTransitionNoise(Q);
+
+  // Set observation noise matrix R
+  Eigen::Matrix<double, 2, 2> R;
+  R.setIdentity();
+  R *= FLAGS_r_var;
+  kf_motion_tracker_.SetObservationNoise(R);
+
+  // Set current state covariance matrix P
+  Eigen::Matrix<double, 6, 6> P;
+  P.setIdentity();
+  P *= FLAGS_p_var;
+  // TODO(author) kf_motion_tracker_.SetStateCovariance(P);
+
+  is_motion_tracker_enabled_ = true;
 }
 
 }  // namespace prediction
