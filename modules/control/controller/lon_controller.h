@@ -28,7 +28,6 @@
 #include <vector>
 
 #include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/control/common/definitions.h"
 #include "modules/control/common/interpolation_2d.h"
 #include "modules/control/common/pid_controller.h"
 #include "modules/control/common/trajectory_analyzer.h"

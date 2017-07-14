@@ -23,7 +23,6 @@
 #include "gtest/gtest.h"
 #include "modules/common/macro.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/common/definitions.h"
 #include "modules/control/control.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
@@ -33,12 +32,6 @@
     google::InitGoogleLogging(argv[0]);                  \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
     return RUN_ALL_TESTS();                              \
-  }
-
-#define RUN_HAND_TEST                              \
-  {                                                \
-    ErrorCode error_code = test_control();         \
-    EXPECT_EQ(ErrorCode::CTRL_ERR_OK, error_code); \
   }
 
 #define RUN_GOLDEN_TEST                                            \
