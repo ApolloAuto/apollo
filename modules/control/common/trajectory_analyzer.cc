@@ -81,8 +81,8 @@ PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
       index_min + 1 == trajectory_points_.size() ? index_min : index_min + 1;
 
   if (index_start == index_end ||
-      common::math::double_compare(trajectory_points_[index_start].s,
-                                   trajectory_points_[index_end].s) == 0) {
+      common::math::DoubleCompare(trajectory_points_[index_start].s,
+                                  trajectory_points_[index_end].s) == 0) {
     return trajectory_points_[index_start];
   }
 
