@@ -1,0 +1,3 @@
+MODULE proto name conf_file
+CANBUS modules.canbus.proto.canbus_conf_pb2 CanbusConf() /apollo/modules/canbus/conf/canbus_conf.pb.txt
+CONTROL modules.control.proto.control_conf_pb2 ControlConf() /apollo/modules/control/conf/lincoln.pb.txt
