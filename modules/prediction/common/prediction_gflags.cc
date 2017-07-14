@@ -19,3 +19,7 @@
 // System gflags
 DEFINE_string(prediction_module_name, "prediction",
               "Default prediciton module name");
+
+DEFINE_double(double_precision, 1e-6, "precision of double");
+DEFINE_double(max_acc, 4.0, "Upper bound of acceleration");
+DEFINE_double(min_acc, -4.0, "Lower bound of deceleration");
