@@ -21,5 +21,6 @@
 
 // System gflags
 DECLARE_string(prediction_module_name);
+DECLARE_string(prediction_conf_file);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
