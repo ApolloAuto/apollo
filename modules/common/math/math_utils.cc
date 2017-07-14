@@ -65,7 +65,7 @@ double RandomDouble(const double s, const double t, unsigned int rand_seed) {
   return s + (t - s) / 16383.0 * (rand_r(&rand_seed) & 16383);
 }
 
-int double_compare(const double d1, const double d2, const double epsilon) {
+int DoubleCompare(const double d1, const double d2, const double epsilon) {
   DCHECK(!std::isnan(d1));
   DCHECK(!std::isnan(d2));
 
