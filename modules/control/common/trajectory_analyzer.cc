@@ -25,9 +25,39 @@
 #include "modules/common/math/search.h"
 
 namespace math = ::apollo::common::math;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 
 namespace apollo {
 namespace control {
+namespace {
+
+// Squared distance from the point to (x, y).
+double PointDistanceSquare(const TrajectoryPoint& point,
+                           const double x, const double y) {
+  const double dx = point.x() - x;
+  const double dy = point.y() - y;
+  return dx * dx + dy * dy;
+}
+
+PathPoint TrajectoryPointToPathPoint(const TrajectoryPoint& point) {
+  PathPoint result;
+  if (point.has_x())
+    result.set_x(point.x());
+  if (point.has_y())
+    result.set_y(point.y());
+  if (point.has_z())
+    result.set_z(point.z());
+  if (point.has_theta())
+    result.set_theta(point.theta());
+  if (point.has_kappa())
+    result.set_kappa(point.kappa());
+  if (point.has_s())
+    result.set_s(point.s());
+  return result;
+}
+
+}  // namespace
 
 TrajectoryAnalyzer::TrajectoryAnalyzer(
     const planning::ADCTrajectory* planning_published_trajectory) {
@@ -43,14 +73,14 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
         planning_published_trajectory->adc_trajectory_point(i);
 
     TrajectoryPoint point;
-    point.s = published_trajectory_point.accumulated_s();
-    point.x = published_trajectory_point.x();
-    point.y = published_trajectory_point.y();
-    point.theta = published_trajectory_point.theta();
-    point.kappa = published_trajectory_point.curvature();
-    point.v = published_trajectory_point.speed();
-    point.a = published_trajectory_point.acceleration_s();
-    point.relative_time = published_trajectory_point.relative_time();
+    point.set_s(published_trajectory_point.accumulated_s());
+    point.set_x(published_trajectory_point.x());
+    point.set_y(published_trajectory_point.y());
+    point.set_theta(published_trajectory_point.theta());
+    point.set_kappa(published_trajectory_point.curvature());
+    point.set_v(published_trajectory_point.speed());
+    point.set_a(published_trajectory_point.acceleration_s());
+    point.set_relative_time(published_trajectory_point.relative_time());
 
     trajectory_points_.push_back(std::move(point));
   }
@@ -58,18 +88,11 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
 
 PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
                                                     const double y) const {
-  auto func_distance_square = [](const PathPoint& point, const double x,
-                                 const double y) {
-    double dx = point.x - x;
-    double dy = point.y - y;
-    return dx * dx + dy * dy;
-  };
-
-  double d_min = func_distance_square(trajectory_points_.front(), x, y);
+  double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
   size_t index_min = 0;
 
   for (size_t i = 1; i < trajectory_points_.size(); ++i) {
-    double d_temp = func_distance_square(trajectory_points_[i], x, y);
+    double d_temp = PointDistanceSquare(trajectory_points_[i], x, y);
     if (d_temp < d_min) {
       d_min = d_temp;
       index_min = i;
@@ -81,9 +104,9 @@ PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
       index_min + 1 == trajectory_points_.size() ? index_min : index_min + 1;
 
   if (index_start == index_end ||
-      common::math::double_compare(trajectory_points_[index_start].s,
-                                   trajectory_points_[index_end].s) == 0) {
-    return trajectory_points_[index_start];
+      math::double_compare(trajectory_points_[index_start].s(),
+                           trajectory_points_[index_end].s()) == 0) {
+    return TrajectoryPointToPathPoint(trajectory_points_[index_start]);
   }
 
   return FindMinDistancePoint(trajectory_points_[index_start],
@@ -103,11 +126,11 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
                                            double* ptr_s, double* ptr_s_dot,
                                            double* ptr_d,
                                            double* ptr_d_dot) const {
-  double dx = x - ref_point.x;
-  double dy = y - ref_point.y;
+  double dx = x - ref_point.x();
+  double dy = y - ref_point.y();
 
-  double cos_ref_theta = std::cos(ref_point.theta);
-  double sin_ref_theta = std::sin(ref_point.theta);
+  double cos_ref_theta = std::cos(ref_point.theta());
+  double sin_ref_theta = std::sin(ref_point.theta());
 
   // the sin of diff angle between vector (cos_ref_theta, sin_ref_theta) and
   // (dx, dy)
@@ -117,21 +140,22 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
   // the cos of diff angle between vector (cos_ref_theta, sin_ref_theta) and
   // (dx, dy)
   double dot_rd_nd = dx * cos_ref_theta + dy * sin_ref_theta;
-  *ptr_s = ref_point.s + dot_rd_nd;
+  *ptr_s = ref_point.s() + dot_rd_nd;
 
-  double delta_theta = theta - ref_point.theta;
+  double delta_theta = theta - ref_point.theta();
   double cos_delta_theta = std::cos(delta_theta);
   double sin_delta_theta = std::sin(delta_theta);
 
   *ptr_d_dot = v * sin_delta_theta;
 
-  double one_minus_kappa_r_d = 1 - ref_point.kappa * (*ptr_d);
+  double one_minus_kappa_r_d = 1 - ref_point.kappa() * (*ptr_d);
   if (one_minus_kappa_r_d <= 0.0) {
     AERROR << "TrajectoryAnalyzer::ToTrajectoryFrame "
               "found fatal reference and actual difference. "
               "Control output might be unstable:"
-           << " ref_point.kappa:" << ref_point.kappa
-           << " ref_point.x:" << ref_point.x << " ref_point.y:" << ref_point.y
+           << " ref_point.kappa:" << ref_point.kappa()
+           << " ref_point.x:" << ref_point.x()
+           << " ref_point.y:" << ref_point.y()
            << " car x:" << x << " car y:" << y << " *ptr_d:" << *ptr_d
            << " one_minus_kappa_r_d:" << one_minus_kappa_r_d;
     // currently set to a small value to avoid control crash.
@@ -150,7 +174,7 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
     const double t) const {
   auto func_comp = [](const TrajectoryPoint& point,
                       const double relative_time) {
-    return point.relative_time < relative_time;
+    return point.relative_time() < relative_time;
   };
 
   auto it_low = std::lower_bound(trajectory_points_.begin(),
@@ -165,7 +189,7 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
   }
 
   auto it_lower = it_low - 1;
-  if (it_low->relative_time - t < t - it_lower->relative_time) {
+  if (it_low->relative_time() - t < t - it_lower->relative_time()) {
     return *it_low;
   } else {
     return *it_lower;
@@ -174,18 +198,11 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
 
 TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByPosition(
     const double x, const double y) const {
-  auto func_distance_square = [](const PathPoint& point, const double x,
-                                 const double y) {
-    double dx = point.x - x;
-    double dy = point.y - y;
-    return dx * dx + dy * dy;
-  };
-
-  double d_min = func_distance_square(trajectory_points_.front(), x, y);
+  double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
   size_t index_min = 0;
 
   for (size_t i = 1; i < trajectory_points_.size(); ++i) {
-    double d_temp = func_distance_square(trajectory_points_[i], x, y);
+    double d_temp = PointDistanceSquare(trajectory_points_[i], x, y);
     if (d_temp < d_min) {
       d_min = d_temp;
       index_min = i;
@@ -199,28 +216,28 @@ const std::vector<TrajectoryPoint>& TrajectoryAnalyzer::trajectory_points()
   return trajectory_points_;
 }
 
-PathPoint TrajectoryAnalyzer::FindMinDistancePoint(const PathPoint& p0,
-                                                   const PathPoint& p1,
+PathPoint TrajectoryAnalyzer::FindMinDistancePoint(const TrajectoryPoint& p0,
+                                                   const TrajectoryPoint& p1,
                                                    const double x,
                                                    const double y) const {
   // given the fact that the discretized trajectory is dense enough,
   // we assume linear trajectory between consecutive trajectory points.
   auto dist_square = [&p0, &p1, &x, &y](const double s) {
-    double px = math::lerp(p0.x, p0.s, p1.x, p1.s, s);
-    double py = math::lerp(p0.y, p0.s, p1.y, p1.s, s);
+    double px = math::lerp(p0.x(), p0.s(), p1.x(), p1.s(), s);
+    double py = math::lerp(p0.y(), p0.s(), p1.y(), p1.s(), s);
     double dx = px - x;
     double dy = py - y;
     return dx * dx + dy * dy;
   };
 
-  PathPoint p = p0;
-  double s = math::GoldenSectionSearch(dist_square, p0.s, p1.s);
-  p.s = s;
-  p.x = math::lerp(p0.x, p0.s, p1.x, p1.s, s);
-  p.y = math::lerp(p0.y, p0.s, p1.y, p1.s, s);
-  p.theta = math::slerp(p0.theta, p0.s, p1.theta, p1.s, s);
+  PathPoint p = TrajectoryPointToPathPoint(p0);
+  double s = math::GoldenSectionSearch(dist_square, p0.s(), p1.s());
+  p.set_s(s);
+  p.set_x(math::lerp(p0.x(), p0.s(), p1.x(), p1.s(), s));
+  p.set_y(math::lerp(p0.y(), p0.s(), p1.y(), p1.s(), s));
+  p.set_theta(math::slerp(p0.theta(), p0.s(), p1.theta(), p1.s(), s));
   // approximate the curvature at the intermediate point
-  p.kappa = math::lerp(p0.kappa, p0.s, p1.kappa, p1.s, s);
+  p.set_kappa(math::lerp(p0.kappa(), p0.s(), p1.kappa(), p1.s(), s));
   return p;
 }
 
