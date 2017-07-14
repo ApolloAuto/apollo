@@ -20,6 +20,8 @@
 #include <cmath>
 
 #include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -256,8 +258,7 @@ void Obstacle::SetAcceleration(Feature* feature) {
     const Point3D& curr_velocity = feature->velocity();
     const Point3D& prev_velocity = feature_history_.front().velocity();
 
-    // TODO(kechxu) add a gflag of double precision
-    if (curr_ts > prev_ts) {
+    if (apollo::common::math::DoubleCompare(curr_ts, prev_ts) == 1) {
       double damping_x = Damp(curr_velocity.x(), 0.001);
       double damping_y = Damp(curr_velocity.y(), 0.001);
       double damping_z = Damp(curr_velocity.z(), 0.001);
@@ -265,10 +266,13 @@ void Obstacle::SetAcceleration(Feature* feature) {
       acc_x = (curr_velocity.x() - prev_velocity.x()) / (curr_ts - prev_ts);
       acc_y = (curr_velocity.y() - prev_velocity.y()) / (curr_ts - prev_ts);
       acc_z = (curr_velocity.z() - prev_velocity.z()) / (curr_ts - prev_ts);
-      // TODO(kechxu) clamp the acc
-      acc_x *= damping_x;
-      acc_y *= damping_y;
-      acc_z *= damping_z;
+
+      acc_x = apollo::common::math::Clamp(
+          acc_x * damping_x, FLAGS_min_acc, FLAGS_max_acc);
+      acc_y = apollo::common::math::Clamp(
+          acc_y * damping_y, FLAGS_min_acc, FLAGS_max_acc);
+      acc_z = apollo::common::math::Clamp(
+          acc_z * damping_z, FLAGS_min_acc, FLAGS_max_acc);
     }
   }
 
