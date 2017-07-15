@@ -99,6 +99,10 @@ class Obstacle {
 
   void InitKFMotionTracker();
 
+  void UpdateKFMotionTracker(Feature* feature);
+
+  void UpdateMotionBelief(Feature* feature);
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;
