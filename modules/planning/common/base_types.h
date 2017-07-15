@@ -24,6 +24,8 @@
 namespace apollo {
 namespace planning {
 
+// TODO(aaron): Migrate to apollo::common::PathPoint and TrajectoryPoint.
+
 /**
  * @class PathPoint
  * @brief PathPoint is a data structure class

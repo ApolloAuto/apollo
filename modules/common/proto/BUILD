@@ -42,6 +42,13 @@ cc_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "path_point_proto",
+    protos = [
+        "path_point.proto",
+    ],
+)
+
 py_proto_compile(
     name = "common_proto_pylib",
     protos = [
