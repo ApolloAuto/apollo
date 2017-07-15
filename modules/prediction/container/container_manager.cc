@@ -16,6 +16,8 @@
 
 #include "modules/prediction/container/container_manager.h"
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -25,7 +27,9 @@ ContainerManager::~ContainerManager() {
   containers_.clear();
 }
 
-void ContainerManager::RegisterContainer() {}
+void ContainerManager::RegisterContainers() {
+  RegisterContainer("PerceptionObstacles");
+}
 
 Container* ContainerManager::mutable_container(const std::string& name) {
   if (containers_.find(name) != containers_.end()) {
@@ -33,6 +37,19 @@ Container* ContainerManager::mutable_container(const std::string& name) {
   } else {
     return nullptr;
   }
+}
+
+std::unique_ptr<Container> ContainerManager::CreateContainer(
+    const std::string& name) {
+  std::unique_ptr<Container> container_ptr(nullptr);
+  if (name == "PerceptionObstacles") {
+    container_ptr.reset(new ObstaclesContainer());
+  }
+  return container_ptr;
+}
+
+void ContainerManager::RegisterContainer(const std::string& name) {
+  containers_[name] = CreateContainer(name);
 }
 
 } 

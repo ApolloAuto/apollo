@@ -24,8 +24,6 @@
 
 #include "modules/prediction/container/container.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 namespace apollo {
 namespace prediction {
 
@@ -45,8 +43,7 @@ class ObstaclesContainer : public Container {
    * @brief Insert a data message into the container
    * @param Data message to be inserted in protobuf
    */
-  virtual void Insert(
-    const ::apollo::perception::PerceptionObstacles& obstacles);
+  virtual void Insert(const ::google::protobuf::Message& message) override;
 };
 
 } // namespace prediction
