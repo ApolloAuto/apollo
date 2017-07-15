@@ -38,12 +38,14 @@ std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 Status Prediction::Init() {
   // Load prediction conf
+  conf_.Clear();
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
                                                 &conf_)) {
     return OnError("Unable to load prediction conf file" +
                    FLAGS_prediction_conf_file);
   }
 
+  // Initialize the adapters
   AdapterManager::instance()->Init();
 
   CHECK(AdapterManager::GetLocalization())
@@ -52,6 +54,7 @@ Status Prediction::Init() {
   CHECK(AdapterManager::GetPerceptionObstacles())
       << "Perception is not ready.";
 
+  // Set perception obstacle callback function
   AdapterManager::SetPerceptionObstaclesCallback(&Prediction::OnPerception,
                                                  this);
   return Status::OK();
@@ -81,7 +84,7 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   ContainerManager::instance()->mutable_container("Obstacles")->Insert(perception_obstacles);
   EvaluatorManager::instance()->Run(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
-  // AdapterManager::PublishPrediction(GeneratorManager::instance()->GetPredictions());
+  // AdapterManager::PublishPrediction(PredictorManager::instance()->GetPredictions());
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
