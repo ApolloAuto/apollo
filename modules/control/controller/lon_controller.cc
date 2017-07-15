@@ -27,6 +27,7 @@
 namespace apollo {
 namespace control {
 
+using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::time::Clock;
 using ::apollo::common::vehicle_state::VehicleState;
 
@@ -329,15 +330,15 @@ void LonController::ComputeLongitudinalErrors(
   ADEBUG << "matched point:" << matched_point.DebugString();
   ADEBUG << "reference point:" << reference_point.DebugString();
   ADEBUG << "preview point:" << preview_point.DebugString();
-  debug->set_station_error(reference_point.s - s_matched);
-  debug->set_speed_error(reference_point.v - s_dot_matched);
+  debug->set_station_error(reference_point.s() - s_matched);
+  debug->set_speed_error(reference_point.v() - s_dot_matched);
 
-  debug->set_station_reference(reference_point.s);
-  debug->set_speed_reference(reference_point.v);
-  debug->set_preview_station_error(preview_point.s - s_matched);
-  debug->set_preview_speed_error(preview_point.v - s_dot_matched);
-  debug->set_preview_speed_reference(preview_point.v);
-  debug->set_preview_acceleration_reference(preview_point.a);
+  debug->set_station_reference(reference_point.s());
+  debug->set_speed_reference(reference_point.v());
+  debug->set_preview_station_error(preview_point.s() - s_matched);
+  debug->set_preview_speed_error(preview_point.v() - s_dot_matched);
+  debug->set_preview_speed_reference(preview_point.v());
+  debug->set_preview_acceleration_reference(preview_point.a());
 }
 
 void LonController::SetDigitalFilter(double ts, double cutoff_freq,
