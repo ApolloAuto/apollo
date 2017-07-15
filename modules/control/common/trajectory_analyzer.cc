@@ -67,11 +67,8 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
   int num_points = planning_published_trajectory->adc_trajectory_point_size();
   trajectory_points_.reserve(num_points);
 
-  for (int i = 0;
-       i < planning_published_trajectory->adc_trajectory_point_size(); ++i) {
-    const auto& published_trajectory_point =
-        planning_published_trajectory->adc_trajectory_point(i);
-
+  for (const auto& published_trajectory_point:
+       planning_published_trajectory->adc_trajectory_point()) {
     TrajectoryPoint point;
     point.set_s(published_trajectory_point.accumulated_s());
     point.set_x(published_trajectory_point.x());
