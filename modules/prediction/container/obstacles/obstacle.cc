@@ -357,9 +357,76 @@ void Obstacle::InitKFMotionTracker() {
   Eigen::Matrix<double, 6, 6> P;
   P.setIdentity();
   P *= FLAGS_p_var;
-  // TODO(author) kf_motion_tracker_.SetStateCovariance(P);
+  kf_motion_tracker_.SetStateCovariance(P);
 
   is_motion_tracker_enabled_ = true;
+}
+
+void Obstacle::UpdateKFMotionTracker(Feature* feature) {
+  if (is_motion_tracker_enabled_) {
+    double delta_ts = 0.0;  
+    if (feature_history_.size() > 0) {
+      delta_ts = feature->timestamp() - feature_history_.front().timestamp();
+    }
+    // TODO(author) if not lost track do the following
+    if (delta_ts > FLAGS_double_precision) {
+      // Set tansition matrix and predict
+      Eigen::Matrix<double, 6, 6> F;
+      F.setIdentity();
+      F(0, 2) = delta_ts;
+      F(0, 4) = delta_ts;
+      F(1, 3) = 0.5 * delta_ts * delta_ts;
+      F(1, 5) = 0.5 * delta_ts * delta_ts;
+      F(2, 4) = delta_ts;
+      F(3, 5) = delta_ts;
+      kf_motion_tracker_.SetTransitionMatrix(F);
+      kf_motion_tracker_.Predict();
+
+      // Set observation and correct
+      Eigen::Matrix<double, 2, 1> Z;
+      Z(0, 0) = feature->position().x();
+      Z(1, 0) = feature->position().y();
+      kf_motion_tracker_.Correct(Z);
+    }
+  } else {
+    InitKFMotionTracker();
+    // TODO(kechxu) implement following
+    // Eigen::Matrix<double, 6, 1> state;
+    // state(0, 0) = feature->position().x();
+    // state(1, 0) = feature->position().y();
+    // state(2, 0) = feature->velocity().x();
+    // state(3, 0) = feature->velocity().y();
+    // state(4, 0) = feature->acceleration().x();
+    // state(5, 0) = feature->acceleration().y();
+    // kf_motion_tracker.SetState(x);
+    is_motion_tracker_enabled_ = true;
+  }
+
+  UpdateMotionBelief(feature);
+}
+
+void Obstacle::UpdateMotionBelief(Feature* feature) {
+  auto state = kf_motion_tracker_.GetStateEstimate();
+  feature->mutable_t_position()->set_x(state(0, 0));
+  feature->mutable_t_position()->set_y(state(1, 0));
+  feature->mutable_t_velocity()->set_x(state(2, 0));
+  feature->mutable_t_velocity()->set_y(state(3, 0));
+  feature->set_t_velocity_heading(std::atan2(state(3, 0), state(2, 0)));
+  double acc_x =
+      apollo::common::math::Clamp(state(4, 0), FLAGS_min_acc, FLAGS_max_acc);
+  double acc_y =
+      apollo::common::math::Clamp(state(5, 0), FLAGS_min_acc, FLAGS_max_acc);
+  feature->mutable_t_acceleration()->set_x(acc_x);
+  feature->mutable_t_acceleration()->set_y(acc_y);
+  ADEBUG << "Obstacle [" << id_ << "] "
+         << "set tracked position [" << feature->t_position().x() << ", "
+         << feature->t_position().y() << "] "
+         << "and tracked velocity [" << feature->t_velocity().x() << ", "
+         << feature->t_velocity().y() << "] "
+         << "and tracked acc [" << feature->t_acceleration().x() << ", "
+         << feature->t_acceleration().y() << "] "
+         << "and tracked velocity heading [" << feature->t_velocity_heading()
+         << "].";
 }
 
 }  // namespace prediction
