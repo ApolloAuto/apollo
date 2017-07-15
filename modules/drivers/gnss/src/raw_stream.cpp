@@ -359,10 +359,10 @@ bool RawStream::disconnect() {
 
 bool RawStream::login() {
   std::vector<std::string> login_data;
-  for (int i = 0; i < _config.login_commands_size(); ++i) {
-    _command_stream->write(_config.login_commands(i));
-    login_data.emplace_back(_config.login_commands(i));
-    ROS_INFO_STREAM("Login command: " << _config.login_commands(i));
+  for (const auto& login_command : _config.login_commands()) {
+    _command_stream->write(login_command);
+    login_data.emplace_back(login_command);
+    ROS_INFO_STREAM("Login command: " << login_command);
     // sleep a little to avoid overun of the slow serial interface.
     ros::Duration(0.2).sleep();
   }
@@ -371,9 +371,9 @@ bool RawStream::login() {
 }
 
 bool RawStream::logout() {
-  for (int i = 0; i < _config.logout_commands_size(); ++i) {
-    _command_stream->write(_config.logout_commands(i));
-    ROS_INFO_STREAM("Logout command: " << _config.logout_commands(i));
+  for (const auto& logout_command : _config.logout_commands()) {
+    _command_stream->write(logout_command);
+    ROS_INFO_STREAM("Logout command: " << logout_command);
   }
   return true;
 }
