@@ -93,6 +93,12 @@ class Obstacle {
       const apollo::perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
+  void SetLengthWidthHeight(
+      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      Feature* feature);
+
+  void InitKFMotionTracker();
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;
