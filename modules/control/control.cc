@@ -219,10 +219,9 @@ void Control::OnTimer(const ros::TimerEvent&) {
     pad_received_ = false;
   }
 
-  control_command.mutable_latency_stats()->set_total_time_ms(
-      (end_timestamp - start_timestamp) * 1000);
-  AINFO << "control cycle time is: " << (end_timestamp - start_timestamp) * 1000
-        << " ms.";
+  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  AINFO << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 
   SendCmd(&control_command);

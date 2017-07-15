@@ -100,9 +100,8 @@ TEST(AdapterTest, History) {
 
   adapter.Observe();
   {
-    // After calling Observe(), the history starts from 5. Since we
-    // only maintain 3 elements in this adapter, 1 and 2 will be
-    // throwed out.
+    // After calling Observe(), the history starts from 5. Since we only
+    // maintain 3 elements in this adapter, 1 and 2 will be thrown out.
     //
     // History should be 5, 4, 3.
     std::vector<std::shared_ptr<int>> history(adapter.begin(), adapter.end());
