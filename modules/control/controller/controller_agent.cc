@@ -87,10 +87,11 @@ Status ControllerAgent::ComputeControlCommand(
     double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
     controller->ComputeControlCommand(localization, chassis, trajectory, cmd);
     double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
-    AINFO << "controller: " << controller->Name() << " calculation time is: "
-          << (end_timestamp - start_timestamp) * 1000 << " ms.";
-    cmd->mutable_latency_stats()->add_controller_time_ms(
-        (end_timestamp - start_timestamp) * 1000);
+    const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+
+    AINFO << "controller: " << controller->Name()
+          << " calculation time is: " << time_diff_ms << " ms.";
+    cmd->mutable_latency_stats()->add_controller_time_ms(time_diff_ms);
   }
   return Status::OK();
 }

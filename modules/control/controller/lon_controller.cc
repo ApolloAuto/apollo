@@ -133,11 +133,10 @@ void LonController::LoadControlCalibrationTable(
     const LonControllerConf &lon_controller_conf) {
   const auto &control_table = lon_controller_conf.calibration_table();
   AINFO << "Control calibration table loaded";
-  int control_table_size = control_table.calibration_size();
-  AINFO << "Control calibration table size is " << control_table_size;
+  AINFO << "Control calibration table size is "
+        << control_table.calibration_size();
   Interpolation2D::DataType xyz;
-  for (int i = 0; i < control_table_size; ++i) {
-    const auto &calibration = control_table.calibration(i);
+  for (const auto& calibration : control_table.calibration()) {
     xyz.push_back(std::make_tuple(calibration.speed(),
                                   calibration.acceleration(),
                                   calibration.command()));
