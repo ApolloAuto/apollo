@@ -185,7 +185,7 @@ function stop() {
     fi
 }
 
-function print_usage() {
+function help() {
   echo "Usage:
   ./$0 [COMMAND]"
   echo "COMMAND:
@@ -209,7 +209,7 @@ function run() {
             stop "$2"
             ;;
         help)
-            print_usage
+            help
             ;;
         *)
             start "$2"
