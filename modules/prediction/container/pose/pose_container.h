@@ -16,56 +16,37 @@
 
 /**
  * @file
- * @brief Use container manager to manage all containers
+ * @brief Obstacles container
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
-#define MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
-
-#include <unordered_map>
-#include <string>
+#ifndef MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
+#define MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
 
 #include "modules/prediction/container/container.h"
-#include "modules/common/macro.h"
 
-/**
- * @namespace apollo::prediction
- * @brief apollo::prediction
- */
 namespace apollo {
 namespace prediction {
 
-class ContainerManager {
+class PoseContainer : public Container {
  public:
   /**
+   * @brief Constructor
+   */
+  explicit PoseContainer() = default;
+
+  /**
    * @brief Destructor
-   */ 
-  virtual ~ContainerManager();
+   */
+  virtual ~PoseContainer() = default;
 
   /**
-   * @brief Register all containers
+   * @brief Insert a data message into the container
+   * @param Data message to be inserted in protobuf
    */
-  void RegisterContainers();
-
-  /**
-   * @brief Get mutable container
-   * @param Name of the container
-   * @return Pointer to the container given the name
-   */
-  Container* mutable_container(const std::string& name);
-
- private:
-  std::unique_ptr<Container> CreateContainer(const std::string& name);
-
-  void RegisterContainer(const std::string& name);
-
- private:
-  std::unordered_map<std::string, std::unique_ptr<Container>> containers_;
-
-  DECLARE_SINGLETON(ContainerManager)
+  virtual void Insert(const ::google::protobuf::Message& message) override;
 };
 
 } // namespace prediction
 } // namespace apollo
 
-#endif // MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
+#endif // MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_

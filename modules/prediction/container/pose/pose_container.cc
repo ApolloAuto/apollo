@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
 
-void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {}
+void PoseContainer::Insert(const ::google::protobuf::Message& message) {}
 
 }
 }
