@@ -11,6 +11,7 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/common:log",
+        "//modules/common/proto:path_point_proto",
         "//modules/common/util",
         "//modules/common/vehicle_state",
         "//modules/planning/common:lib_planning_common",
