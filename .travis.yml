@@ -1,7 +1,4 @@
 language: cpp
-cache:
-    directories:
-        - ${HOME}/.cache
 sudo: required
 services:
     - docker
