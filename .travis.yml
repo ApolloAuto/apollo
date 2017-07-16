@@ -7,6 +7,7 @@ os: linux
 env:
     - JOB=build
     - JOB=lint
+    - JOB=test
 install: skip
 before_script:
     - if [ ! -d "${HOME}/.cache" ]; then mkdir ${HOME}/.cache; fi
