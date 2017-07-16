@@ -222,10 +222,6 @@ function release() {
 }
 
 function gen_coverage() {
-  # Avoid query release directory.
-  if [ -d release ];then
-    rm -rf release
-  fi
   bazel clean
   generate_test_targets
   echo "$TEST_TARGETS" | xargs bazel test --define ARCH="$(uname -m)" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --config=coverage
@@ -258,10 +254,6 @@ function gen_coverage() {
 function run_test() {
   START_TIME=$(get_now)
 
-  # Avoid query release directory.
-  if [ -d release ];then
-    rm -rf release
-  fi
   # FIXME(all): when all unit test passed, switch back.
   # bazel test --config=unit_test -c dbg //...
   generate_test_targets
