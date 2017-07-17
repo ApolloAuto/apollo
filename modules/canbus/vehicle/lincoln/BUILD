@@ -1,6 +1,21 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "lincoln_vehicle_factory",
+    srcs = [
+        "lincoln_vehicle_factory.cc",
+    ],
+    hdrs = [
+        "lincoln_vehicle_factory.h",
+    ],
+    deps = [
+        ":lincoln_controller",
+        ":lincoln_message_manager",
+        "//modules/canbus/vehicle:abstract_vehicle_factory",
+    ],
+)
+
+cc_library(
     name = "lincoln_message_manager",
     srcs = [
         "lincoln_message_manager.cc",
@@ -57,6 +72,16 @@ cc_test(
     ],
     deps = [
         "//modules/canbus/vehicle/lincoln:lincoln_message_manager",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "lincoln_vehicle_factory_test",
+    size = "small",
+    srcs = ["lincoln_vehicle_factory_test.cc"],
+    deps = [
+        ":lincoln_vehicle_factory",
         "@gtest//:main",
     ],
 )
