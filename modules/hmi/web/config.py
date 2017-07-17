@@ -75,8 +75,8 @@ class Config(object):
         """
         Get realpath from a path string in config.
 
-        Starting with '/' indicates an absolute path, otherwise it will be taken as a relative path
-        of the Apollo root.
+        Starting with '/' indicates an absolute path, otherwise it will be taken
+        as a relative path of the Apollo root.
         """
         if path_str.startswith('/'):
             return path_str

@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <stdio.h>
-#include <termios.h>
 #include <iostream>
 #include <memory>
+#include <stdio.h>
+#include <termios.h>
 #include <thread>
 
 #include "ros/include/ros/ros.h"
@@ -381,7 +381,7 @@ void signal_handler(int32_t signal_num) {
   ros::shutdown();
 }
 
-}  // end of namespace;
+}  // namespace
 
 int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);

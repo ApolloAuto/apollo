@@ -14,7 +14,8 @@ package apollo.common;
 message PointENU {
   optional double x = 1 [default = nan];  // East from the origin, in meters.
   optional double y = 2 [default = nan];  // North from the origin, in meters.
-  optional double z = 3 [default = 0.0];  // Up from the WGS-84 ellipsoid, in meters.
+  optional double z = 3 [default = 0.0];  // Up from the WGS-84 ellipsoid, in
+                                          // meters.
 }
 
 // A point in the global reference frame. Similar to PointENU, PointLLH allows

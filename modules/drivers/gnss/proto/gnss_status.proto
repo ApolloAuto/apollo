@@ -11,9 +11,9 @@ message StreamStatus {
     CONNECTED = 1;
   }
 
-  optional Type ins_stream_type = 2 [default=DISCONNECTED];
-  optional Type rtk_stream_in_type = 3 [default=DISCONNECTED];
-  optional Type rtk_stream_out_type = 4 [default=DISCONNECTED];
+  optional Type ins_stream_type = 2 [default = DISCONNECTED];
+  optional Type rtk_stream_in_type = 3 [default = DISCONNECTED];
+  optional Type rtk_stream_out_type = 4 [default = DISCONNECTED];
 }
 
 message InsStatus {
@@ -30,14 +30,14 @@ message InsStatus {
     // Safe to use. The INS has fully converged.
     GOOD = 2;
   }
-  optional Type type = 2 [default=INVALID];
+  optional Type type = 2 [default = INVALID];
 }
 
 message GnssStatus {
   optional apollo.common.Header header = 1;
-  optional bool solution_completed = 2 [default=false];
-  optional uint32 solution_status = 3 [default=0];
-  optional uint32 position_type = 4 [default=0];
+  optional bool solution_completed = 2 [default = false];
+  optional uint32 solution_status = 3 [default = 0];
+  optional uint32 position_type = 4 [default = 0];
   // Number of satellites in position solution.
-  optional int32 num_sats = 5 [default=0];
+  optional int32 num_sats = 5 [default = 0];
 }
