@@ -29,3 +29,7 @@ DEFINE_double(min_acc, -4.0, "Lower bound of deceleration");
 DEFINE_double(q_var, 0.01, "Processing noise covariance");
 DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
+DEFINE_double(go_approach_rate, 0.995,
+    "The rate to approach to the reference line of going straight");
+DEFINE_double(cutin_approach_rate, 0.9,
+    "The rate to approach to the reference line of lane change");

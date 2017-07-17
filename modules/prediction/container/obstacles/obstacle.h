@@ -105,6 +105,16 @@ class Obstacle {
 
   void InitKFLaneTracker(const std::string& lane_id, const double beta);
 
+  void UpdateKFLaneTrackers(Feature* feature);
+
+  void UpdateKFLaneTracker(
+      const std::string& lane_id,
+      const double lane_s, const double lane_l,
+      const double lane_speed, const double lane_acc,
+      const double timestamp, const double beta);
+
+  void UpdateLaneBelief(Feature* feature);
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;

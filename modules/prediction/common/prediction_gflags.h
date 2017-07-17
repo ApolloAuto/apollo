@@ -29,5 +29,7 @@ DECLARE_double(min_acc);
 DECLARE_double(q_var);
 DECLARE_double(r_var);
 DECLARE_double(p_var);
+DECLARE_double(go_approach_rate);
+DECLARE_double(cutin_approach_rate);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
