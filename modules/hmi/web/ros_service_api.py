@@ -42,6 +42,7 @@ class RosServiceApi(flask_restful.Resource):
     @staticmethod
     def execute_cmd(cmd_name):
         """Run ros command by sending GRPC requests and return HTTP response."""
+        ToolStatus = runtime_status_pb2.ToolStatus
         channel = grpc.insecure_channel(gflags.FLAGS.hmi_ros_node_service)
         stub = ros_node_pb2.HMIRosNodeStub(channel)
 
@@ -54,8 +55,8 @@ class RosServiceApi(flask_restful.Resource):
 
             # Update runtime status.
             tool_status = status.get_tools()
-            if tool_status.playing_status != runtime_status_pb2.ToolStatus.PLAYING_NOT_READY:
-                tool_status.playing_status = runtime_status_pb2.ToolStatus.PLAYING_READY_TO_CHECK
+            if tool_status.playing_status != ToolStatus.PLAYING_NOT_READY:
+                tool_status.playing_status = ToolStatus.PLAYING_READY_TO_CHECK
 
         elif cmd_name == 'start_auto_driving':
             request = ros_node_pb2.ChangeDrivingModeRequest(
@@ -63,8 +64,7 @@ class RosServiceApi(flask_restful.Resource):
             response = stub.ChangeDrivingMode(request)
 
             # Update runtime status.
-            status.get_tools(
-            ).playing_status = runtime_status_pb2.ToolStatus.PLAYING
+            status.get_tools().playing_status = ToolStatus.PLAYING
         else:
             error_msg = 'RosServiceApi: Unknown command "{}"'.format(cmd_name)
             glog.error(error_msg)
