@@ -54,8 +54,9 @@ class RTKReplayPlanner : public Planner {
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  bool Plan(const TrajectoryPoint& start_point,
-            std::vector<TrajectoryPoint>* ptr_trajectory) override;
+  bool Plan(
+      const apollo::common::TrajectoryPoint& start_point,
+      std::vector<apollo::common::TrajectoryPoint>* ptr_trajectory) override;
 
   /**
    * @brief Read the recorded trajectory file.
@@ -65,10 +66,10 @@ class RTKReplayPlanner : public Planner {
 
  private:
   std::size_t QueryPositionMatchedPoint(
-      const TrajectoryPoint& start_point,
-      const std::vector<TrajectoryPoint>& trajectory) const;
+      const apollo::common::TrajectoryPoint& start_point,
+      const std::vector<apollo::common::TrajectoryPoint>& trajectory) const;
 
-  std::vector<TrajectoryPoint> complete_rtk_trajectory_;
+  std::vector<apollo::common::TrajectoryPoint> complete_rtk_trajectory_;
 };
 
 }  // namespace planning
