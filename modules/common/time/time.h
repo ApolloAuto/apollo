@@ -41,8 +41,7 @@ namespace time {
 
 /**
  * @class Duration
- * @brief the default Duration is of precision nanoseconds (1e-9
- * seconds).
+ * @brief the default Duration is of precision nanoseconds (1e-9 seconds).
  */
 using Duration = std::chrono::nanoseconds;
 
@@ -66,8 +65,7 @@ using hours = std::chrono::hours;
 /**
  * @brief converts the input duration (nanos) to a 64 bit integer, with
  * the unit specified by PrecisionDuration.
- * @param duration the input duration that needs to be converted to
- * integer.
+ * @param duration the input duration that needs to be converted to integer.
  * @return an integer representing the duration in the specified unit.
  */
 template <typename PrecisionDuration>
@@ -78,8 +76,7 @@ int64_t AsInt64(const Duration &duration) {
 /**
  * @brief converts the input timestamp (nanos) to a 64 bit integer, with
  * the unit specified by PrecisionDuration.
- * @param timestamp the input timestamp that needs to be converted to
- * integer.
+ * @param timestamp the input timestamp that needs to be converted to integer.
  * @return an integer representing the timestamp in the specified unit.
  */
 template <typename PrecisionDuration>
@@ -109,8 +106,7 @@ inline double ToSecond(const Timestamp &timestamp) {
 }
 
 /**
- * @brief converts the integer-represented timestamp to \class
- * Timestamp.
+ * @brief converts the integer-represented timestamp to \class Timestamp.
  * @return a Timestamp object.
  */
 template <typename PrecisionDuration>

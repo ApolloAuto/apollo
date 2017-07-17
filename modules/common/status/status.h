@@ -88,8 +88,7 @@ class Status {
   bool operator!=(const Status& rh) const { return !(*this == rh); }
 
   /**
-   * @brief returns the error message of the status, empty if the status is
-   * OK.
+   * @brief returns the error message of the status, empty if the status is OK.
    * @returns the error message
    */
   const std::string& error_message() const { return msg_; }
