@@ -24,6 +24,8 @@
 
 #include <memory>
 
+#include "modules/prediction/evaluator/evaluator.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/macro.h"
 
@@ -31,6 +33,9 @@
  * @namespace apollo::prediction
  * @brief apollo::prediction
  */
+
+namespace apollo {
+namespace prediction {
 
 class EvaluatorFactory
     : public apollo::common::util::Factory<PredictionConf::Eval,
@@ -50,6 +55,9 @@ class EvaluatorFactory
 
  private:
   DECLARE_SINGLETON(EvaluatorFactory);
-}
+};
+
+} // namespace prediction
+} // namespace apollo
 
 #endif // MODULES_PREDICTION_EVALUATOR_EVALUATOR_FACTORY_H_
