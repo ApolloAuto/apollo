@@ -46,6 +46,7 @@ Obstacle::Obstacle() :
     type_(PerceptionObstacle::UNKNOWN_MOVABLE),
     feature_history_(0),
     kf_motion_tracker_(),
+    kf_motion_tracker_enabled_(false),
     kf_lane_trackers_(0) {
 
 }
@@ -55,6 +56,7 @@ Obstacle::~Obstacle() {
   type_ = PerceptionObstacle::UNKNOWN_UNMOVABLE;
   feature_history_.clear();
   kf_lane_trackers_.clear();
+  kf_motion_tracker_enabled_ = false;
   // TODO(author) current_lanes_.clear();
 }
 
@@ -131,7 +133,9 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetVelocity(perception_obstacle, &feature);
   SetAcceleration(&feature);
   SetTheta(perception_obstacle, &feature);
-  InitKFMotionTracker(&feature);
+  if (!kf_motion_tracker_enabled_) {
+    InitKFMotionTracker(&feature);
+  }
   UpdateKFMotionTracker(&feature);
 }
 
@@ -368,6 +372,8 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
   x(5, 0) = feature->acceleration().y();
 
   kf_motion_tracker_.SetStateEstimate(x, P);
+
+  kf_motion_tracker_enabled_ = true;
 }
 
 void Obstacle::UpdateKFMotionTracker(Feature* feature) {  
@@ -420,6 +426,43 @@ void Obstacle::UpdateMotionBelief(Feature* feature) {
          << feature->t_acceleration().y() << "] "
          << "and tracked velocity heading [" << feature->t_velocity_heading()
          << "].";
+}
+
+void Obstacle::InitKFLaneTracker(const std::string& lane_id,
+                                 const double beta) {
+  KalmanFilter<double, 4, 2, 0> kf;
+
+  // transition matrix: update delta_t at each processing step
+  Eigen::Matrix<double, 4, 4> F;
+  F.setIdentity();
+  F(1, 1) = beta;
+  kf.SetTransitionMatrix(F);
+
+  // observation matrix
+  Eigen::Matrix<double, 2, 4> H;
+  H(0, 0) = 1.0;
+  H(1, 1) = 1.0;
+  kf.SetObservationMatrix(H);
+
+  // Set covariance of transition noise matrix Q
+  Eigen::Matrix<double, 4, 4> Q;
+  Q.setIdentity();
+  Q *= FLAGS_q_var;
+  kf.SetTransitionNoise(Q);
+
+  // Set observation noise matrix R
+  Eigen::Matrix<double, 2, 2> R;
+  R.setIdentity();
+  R *= FLAGS_r_var;
+  kf.SetObservationNoise(R);
+
+  // Set current state covariance matrix P
+  Eigen::Matrix<double, 4, 4> P;
+  P.setIdentity();
+  P *= FLAGS_p_var;
+  kf.SetStateCovariance(P);
+
+  kf_lane_trackers_.emplace(lane_id, std::move(kf));
 }
 
 }  // namespace prediction
