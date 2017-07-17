@@ -18,6 +18,7 @@
 
 #include <iomanip>
 #include <cmath>
+#include <unordered_set>
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -48,7 +49,6 @@ Obstacle::Obstacle() :
     kf_motion_tracker_(),
     kf_motion_tracker_enabled_(false),
     kf_lane_trackers_(0) {
-
 }
 
 Obstacle::~Obstacle() {
@@ -429,7 +429,7 @@ void Obstacle::UpdateMotionBelief(Feature* feature) {
 }
 
 void Obstacle::InitKFLaneTracker(const std::string& lane_id,
-                                 const double beta) {
+                                const double beta) {
   KalmanFilter<double, 4, 2, 0> kf;
 
   // transition matrix: update delta_t at each processing step
@@ -463,6 +463,135 @@ void Obstacle::InitKFLaneTracker(const std::string& lane_id,
   kf.SetStateCovariance(P);
 
   kf_lane_trackers_.emplace(lane_id, std::move(kf));
+}
+
+void Obstacle::UpdateKFLaneTrackers(Feature* feature) {
+  if (!feature->has_lane()) {
+    return;
+  }
+  std::unordered_set<std::string> lane_ids;
+  for (auto& lane_feature : feature->lane().current_lane_feature()) {
+    if (!lane_feature.lane_id().empty()) {
+      lane_ids.insert(lane_feature.lane_id());
+    }
+  }
+  for (auto& lane_feature : feature->lane().nearby_lane_feature()) {
+    if (!lane_feature.lane_id().empty()) {
+      lane_ids.insert(lane_feature.lane_id());
+    }
+  }
+  if (lane_ids.empty()) {
+    return;
+  }
+
+  auto iter = kf_lane_trackers_.begin();
+  while (iter != kf_lane_trackers_.end()) {
+    if (lane_ids.find(iter->first) == lane_ids.end()) {
+      iter = kf_lane_trackers_.erase(iter);
+    } else {
+      ++iter;
+    }
+  }
+
+  double ts = feature->timestamp();
+  double speed = feature->timestamp();
+  double acc = feature->acc();
+  for (auto& lane_feature : feature->lane().current_lane_feature()) {
+    std::string lane_id = lane_feature.lane_id();
+    if (lane_id.empty()) {
+      continue;
+    }
+    double s = lane_feature.lane_s();
+    double l = lane_feature.lane_l();
+    UpdateKFLaneTracker(lane_id, s, l, speed, acc, ts,
+        FLAGS_go_approach_rate);
+  }
+  for (auto& nearby_lane_feature : feature->lane().nearby_lane_feature()) {
+    std::string lane_id = nearby_lane_feature.lane_id();
+    if (lane_id.empty()) {
+      continue;
+    }
+    double s = nearby_lane_feature.lane_s();
+    double l = nearby_lane_feature.lane_l();
+    UpdateKFLaneTracker(lane_id, s, l, speed, acc, ts,
+        FLAGS_cutin_approach_rate);
+  }
+
+  UpdateLaneBelief(feature);
+}
+
+void Obstacle::UpdateKFLaneTracker(const std::string& lane_id,
+                                   const double lane_s, const double lane_l,
+                                   const double lane_speed,
+                                   const double lane_acc,
+                                   const double timestamp, const double beta) {
+  KalmanFilter<double, 4, 2, 0>* kf_ptr = nullptr;
+  if (kf_lane_trackers_.find(lane_id) != kf_lane_trackers_.end()) {
+    kf_ptr = &kf_lane_trackers_[lane_id];
+    if (kf_ptr != nullptr) {
+      double delta_ts = 0.0;
+      if (feature_history_.size() > 0) {
+        delta_ts = timestamp - feature_history_.front().timestamp();
+      }
+      if (delta_ts > FLAGS_double_precision) {
+        auto F = kf_ptr->GetTransitionMatrix();
+        F(0, 2) = delta_ts;
+        F(0, 3) = 0.5 * delta_ts * delta_ts;
+        F(2, 3) = delta_ts;
+        kf_ptr->SetTransitionMatrix(F);
+        kf_ptr->Predict();
+
+        Eigen::Matrix<double, 2, 1> z;
+        z(0, 0) = lane_s;
+        z(1, 0) = lane_l;
+        kf_ptr->Correct(z);
+      }
+    } else {
+      kf_lane_trackers_.erase(lane_id);
+    }
+  }
+
+  if (kf_lane_trackers_.find(lane_id) == kf_lane_trackers_.end()) {
+    InitKFLaneTracker(lane_id, beta);
+    kf_ptr = &kf_lane_trackers_[lane_id];
+    if (kf_ptr != nullptr) {
+      Eigen::Matrix<double, 4, 1> state;
+      state(0, 0) = lane_s;
+      state(1, 0) = lane_l;
+      state(2, 0) = lane_speed;
+      state(3, 0) = lane_acc;
+
+      auto P = kf_ptr->GetStateCovariance();
+      kf_ptr->SetStateEstimate(state, P);
+    }
+  }
+}
+
+void Obstacle::UpdateLaneBelief(Feature* feature) {
+  if ((!feature->has_lane()) || (!feature->lane().has_lane_feature())) {
+    return;
+  }
+  const std::string& lane_id = feature->lane().lane_feature().lane_id();
+  if (lane_id.empty()) {
+    return;
+  }
+
+  KalmanFilter<double, 4, 2, 0>* kf_ptr = nullptr;
+  if (kf_lane_trackers_.find(lane_id) != kf_lane_trackers_.end()) {
+    kf_ptr = &kf_lane_trackers_[lane_id];
+  }
+  if (kf_ptr == nullptr) {
+    return;
+  }
+
+  double lane_speed = kf_ptr->GetStateEstimate()(2, 0);
+  double lane_acc = apollo::common::math::Clamp(
+      kf_ptr->GetStateEstimate()(2, 0), FLAGS_min_acc, FLAGS_max_acc);
+  feature->set_t_speed(lane_speed);
+  feature->set_t_acc(lane_acc);
+
+  ADEBUG << "Obstacle [" << id_ << "] set tracked speed [" << lane_speed
+         << " and tracked acc [" << lane_acc << "]";
 }
 
 }  // namespace prediction
