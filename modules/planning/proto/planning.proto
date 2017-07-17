@@ -6,6 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/planning/proto/planning_internal.proto";
 
+// TODO(aaron): Migrate to apollo::common::TrajectoryPoint.
 message ADCTrajectoryPoint {
   optional double x = 1;  // in meters.
   optional double y = 2;  // in meters.
@@ -45,6 +46,7 @@ message EStop {
   optional bool is_estop = 1;
 }
 
+// TODO(aaron): Migrate to apollo::common::PathPoint.
 message ADCPathPoint {
   optional double x = 1;  // in meters
   optional double y = 2;  // in meters

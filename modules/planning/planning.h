@@ -47,7 +47,7 @@ class Planning {
    */
   bool Plan(const common::vehicle_state::VehicleState& vehicle_state,
             const bool is_on_auto_mode, const double publish_time,
-            std::vector<TrajectoryPoint>* discretized_trajectory);
+            std::vector<common::TrajectoryPoint>* discretized_trajectory);
 
   /**
    * @brief Reset the planner to initial state.
@@ -55,19 +55,19 @@ class Planning {
   void Reset();
 
  private:
-  std::pair<TrajectoryPoint, std::size_t>
+  std::pair<common::TrajectoryPoint, std::size_t>
   ComputeStartingPointFromLastTrajectory(const double curr_time) const;
 
-  TrajectoryPoint ComputeStartingPointFromVehicleState(
+  common::TrajectoryPoint ComputeStartingPointFromVehicleState(
       const common::vehicle_state::VehicleState& vehicle_state,
       const double forward_time) const;
 
-  std::vector<TrajectoryPoint> GetOverheadTrajectory(
+  std::vector<common::TrajectoryPoint> GetOverheadTrajectory(
       const std::size_t matched_index, const std::size_t buffer_size);
 
   std::unique_ptr<Planner> ptr_planner_;
 
-  std::vector<TrajectoryPoint> last_trajectory_;
+  std::vector<common::TrajectoryPoint> last_trajectory_;
 
   double last_header_time_ = 0.0;
 };

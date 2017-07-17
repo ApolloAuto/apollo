@@ -35,9 +35,10 @@
 namespace apollo {
 namespace control {
 
-using common::Point3D;
-using Matrix = Eigen::MatrixXd;
+using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::Point3D;
 using ::apollo::common::vehicle_state::VehicleState;
+using Matrix = Eigen::MatrixXd;
 
 namespace {
 
@@ -97,6 +98,8 @@ bool LatController::LoadControlConf(const ControlConf* control_conf) {
       control_conf->lat_controller_conf().steer_transmission_ratio();
   steer_single_direction_max_degree_ =
       control_conf->lat_controller_conf().steer_single_direction_max_degree();
+  max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
+
   double mass_fl = control_conf->lat_controller_conf().mass_fl();
   double mass_fr = control_conf->lat_controller_conf().mass_fr();
   double mass_rl = control_conf->lat_controller_conf().mass_rl();
@@ -264,11 +267,21 @@ Status LatController::ComputeControlCommand(
 
   double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
   double steer_angle = steer_angle_feedback + steer_angle_feedforward;
+
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = apollo::common::math::Clamp(steer_angle, -100.0, 100.0);
 
-  steer_angle = digital_filter_.Filter(steer_angle);
-  cmd->set_steering_target(steer_angle);
+  double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
+       (vehicle_state_.linear_velocity() * vehicle_state_.linear_velocity())) *
+       steer_transmission_ratio_ * 180 / M_PI /
+       steer_single_direction_max_degree_;
+
+  // Clamp the steer angle
+  double steer_angle_limited = apollo::common::math::Clamp(steer_angle,
+                               -steer_limit, steer_limit);
+
+  steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
+  cmd->set_steering_target(steer_angle_limited);
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
 
   // compute extra information for logging and debugging
@@ -302,6 +315,7 @@ Status LatController::ComputeControlCommand(
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
   debug->set_ref_speed(vehicle_state_.linear_velocity());
+  debug->set_steer_angle_limited(steer_angle_limited);
   ProcessLogs(debug, chassis);
   return Status::OK();
 }
@@ -322,16 +336,16 @@ void LatController::UpdateState(SimpleLateralDebug* debug) {
   // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
   debug->set_lateral_error(lateral_error_filter_.Update(raw_lateral_error));
 
-  // ref_curvature_ = traj_point.kappa;
-  debug->set_curvature(traj_point.kappa);
+  // ref_curvature_ = traj_point.kappa();
+  debug->set_curvature(traj_point.kappa());
 
   // ref_heading_ = traj_point.theta;
-  debug->set_ref_heading(traj_point.theta);
+  debug->set_ref_heading(traj_point.theta());
 
   // heading_error_ =
   //    common::math::NormalizeAngle(vehicle_state_.heading() - ref_heading_);
   debug->set_heading_error(common::math::NormalizeAngle(
-      vehicle_state_.heading() - traj_point.theta));
+      vehicle_state_.heading() - traj_point.theta()));
 
   // heading_error_rate_ = (heading_error_ - previous_heading_error_) / ts_;
   debug->set_heading_error_rate(
@@ -383,13 +397,13 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug* debug) {
         trajectory_analyzer_.QueryNearestPointByRelativeTime(preview_time);
 
     auto matched_point = trajectory_analyzer_.QueryNearestPointByPosition(
-        preview_point.x, preview_point.y);
+        preview_point.x(), preview_point.y());
 
-    double dx = preview_point.x - matched_point.x;
-    double dy = preview_point.y - matched_point.y;
+    double dx = preview_point.x() - matched_point.x();
+    double dy = preview_point.y() - matched_point.y();
 
-    double cos_matched_theta = std::cos(matched_point.theta);
-    double sin_matched_theta = std::sin(matched_point.theta);
+    double cos_matched_theta = std::cos(matched_point.theta());
+    double sin_matched_theta = std::sin(matched_point.theta());
     double preview_d_error = cos_matched_theta * dy - sin_matched_theta * dx;
 
     matrix_state_(basic_state_size_ + i, 0) = preview_d_error;
@@ -446,14 +460,15 @@ double LatController::GetLateralError(const Eigen::Vector2d& point,
   auto closest =
       trajectory_analyzer_.QueryNearestPointByPosition(point.x(), point.y());
 
-  double point_angle = std::atan2(point.y() - closest.y, point.x() - closest.x);
-  double point2path_angle = point_angle - closest.theta;
+  double point_angle = std::atan2(point.y() - closest.y(),
+                                  point.x() - closest.x());
+  double point2path_angle = point_angle - closest.theta();
   if (traj_point != nullptr) {
     *traj_point = closest;
   }
 
-  double dx = closest.x - point.x();
-  double dy = closest.y - point.y();
+  double dx = closest.x() - point.x();
+  double dy = closest.y() - point.y();
   return std::sin(point2path_angle) * std::sqrt(dx * dx + dy * dy);
 }
 
@@ -463,30 +478,30 @@ void LatController::ComputeLateralErrors(
     SimpleLateralDebug* debug) const {
   auto matched_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
 
-  double dx = x - matched_point.x;
-  double dy = y - matched_point.y;
+  double dx = x - matched_point.x();
+  double dy = y - matched_point.y();
 
-  double cos_matched_theta = std::cos(matched_point.theta);
-  double sin_matched_theta = std::sin(matched_point.theta);
+  double cos_matched_theta = std::cos(matched_point.theta());
+  double sin_matched_theta = std::sin(matched_point.theta());
   // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
   debug->set_lateral_error(cos_matched_theta * dy - sin_matched_theta * dx);
 
   double delta_theta =
-      common::math::NormalizeAngle(theta - matched_point.theta);
+      common::math::NormalizeAngle(theta - matched_point.theta());
   double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = linear_v * sin_delta_theta;
   debug->set_lateral_error_rate(linear_v * sin_delta_theta);
 
   // theta_error = delta_theta;
   debug->set_heading_error(delta_theta);
-  // theta_error_dot = angular_v - matched_point.kappa * matched_point.v;
+  // theta_error_dot = angular_v - matched_point.kappa() * matched_point.v();
   debug->set_heading_error_rate(angular_v -
-                                matched_point.kappa * matched_point.v);
+                                matched_point.kappa() * matched_point.v());
 
-  // matched_theta = matched_point.theta;
-  debug->set_ref_heading(matched_point.theta);
-  // matched_kappa = matched_point.kappa;
-  debug->set_curvature(matched_point.kappa);
+  // matched_theta = matched_point.theta();
+  debug->set_ref_heading(matched_point.theta());
+  // matched_kappa = matched_point.kappa();
+  debug->set_curvature(matched_point.kappa());
 }
 
 }  // namespace control

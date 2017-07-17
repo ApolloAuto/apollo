@@ -15,6 +15,7 @@ cc_library(
         "lib/libroscpp_serialization.so",
         "lib/librostime.so",
         "lib/libxmlrpcpp.so",
+        "lib/librosconsole_log4cxx.so",
     ],
     hdrs = glob([
         "include/*/*.h",

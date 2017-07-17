@@ -22,4 +22,5 @@ message LatControllerConf {
   optional int32 steer_transmission_ratio = 14;
   optional int32 steer_single_direction_max_degree = 15;  // in degree
   optional int32 max_iteration = 16;  // maximum iteration for lqr solve
+  optional double max_lateral_acceleration = 17;  // limit aggressive steering
 }
