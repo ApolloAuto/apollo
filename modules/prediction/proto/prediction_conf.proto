@@ -2,15 +2,31 @@ syntax = "proto2";
 
 package apollo.prediction;
 
-message PredictionConf {
+message ObstacleConf {
+  enum Type {
+    VEHICLE = 0;
+    PERDESTRIAN = 1;
+  }
+
   enum Eval {
     DEF_EVAL = 0;
   }
 
-  enum VehicleModel {
+  enum Model {
     DEF_VEHICLE_MODEL = 0;
   }
 
-  optional Eval eval = 1;
-  optional VehicleModel vehicle_model = 2; 
+  enum Pred {
+    DEF_VEHICLE_PRED = 0;
+    DEF_PEDESTRIAN_PRED = 1;
+  }
+
+  optional Type type = 1;
+  optional Eval eval = 2;
+  optional Model model = 3;
+  optional Pred pred = 4;
+}
+
+message PredictionConf {
+  optional ObstacleConf obstacle_conf = 1; 
 }
