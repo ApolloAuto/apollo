@@ -17,6 +17,7 @@
 #include "modules/prediction/container/container_manager.h"
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -29,6 +30,7 @@ ContainerManager::~ContainerManager() {
 
 void ContainerManager::RegisterContainers() {
   RegisterContainer("PerceptionObstacles");
+  RegisterContainer("Pose");
 }
 
 Container* ContainerManager::mutable_container(const std::string& name) {
@@ -44,6 +46,8 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
   std::unique_ptr<Container> container_ptr(nullptr);
   if (name == "PerceptionObstacles") {
     container_ptr.reset(new ObstaclesContainer());
+  } else if (name == "Pose") {
+    container_ptr.reset(new PoseContainer());
   }
   return container_ptr;
 }
