@@ -46,7 +46,6 @@ Obstacle::Obstacle() :
     type_(PerceptionObstacle::UNKNOWN_MOVABLE),
     feature_history_(0),
     kf_motion_tracker_(),
-    is_motion_tracker_enabled_(false),
     kf_lane_tracker_map_(0) {
 
 }
@@ -55,7 +54,6 @@ Obstacle::~Obstacle() {
   id_ = -1;
   type_ = PerceptionObstacle::UNKNOWN_UNMOVABLE;
   feature_history_.clear();
-  is_motion_tracker_enabled_ = false;
   kf_lane_tracker_map_.clear();
   // TODO(author) current_lanes_.clear();
 }
@@ -133,6 +131,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetVelocity(perception_obstacle, &feature);
   SetAcceleration(&feature);
   SetTheta(perception_obstacle, &feature);
+  InitKFMotionTracker(&feature);
+  UpdateKFMotionTracker(&feature);
 }
 
 ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
@@ -328,7 +328,7 @@ void Obstacle::SetLengthWidthHeight(
          << std::setprecision(6) << height << "].";
 }
 
-void Obstacle::InitKFMotionTracker() {
+void Obstacle::InitKFMotionTracker(Feature* feature) {
   // Set transition matrix F
   Eigen::Matrix<double, 6, 6> F;
   F.setIdentity();
@@ -357,53 +357,43 @@ void Obstacle::InitKFMotionTracker() {
   Eigen::Matrix<double, 6, 6> P;
   P.setIdentity();
   P *= FLAGS_p_var;
-  kf_motion_tracker_.SetStateCovariance(P);
 
-  is_motion_tracker_enabled_ = true;
+  // Set initial state
+  Eigen::Matrix<double, 6, 1> x;
+  x(0, 0) = feature->position().x();
+  x(1, 0) = feature->position().y();
+  x(2, 0) = feature->velocity().x();
+  x(3, 0) = feature->velocity().y();
+  x(4, 0) = feature->acceleration().x();
+  x(5, 0) = feature->acceleration().y();
+
+  kf_motion_tracker_.SetStateEstimate(x, P);
 }
 
-void Obstacle::UpdateKFMotionTracker(Feature* feature) {
-  if (is_motion_tracker_enabled_) {
-    double delta_ts = 0.0;  
-    if (feature_history_.size() > 0) {
-      delta_ts = feature->timestamp() - feature_history_.front().timestamp();
-    }
-    if (delta_ts > FLAGS_double_precision) {
-      // Set tansition matrix and predict
-      auto F = kf_motion_tracker_.GetTransitionMatrix();
-      F(0, 2) = delta_ts;
-      F(0, 4) = delta_ts;
-      F(1, 3) = 0.5 * delta_ts * delta_ts;
-      F(1, 5) = 0.5 * delta_ts * delta_ts;
-      F(2, 4) = delta_ts;
-      F(3, 5) = delta_ts;
-      kf_motion_tracker_.SetTransitionMatrix(F);
-      kf_motion_tracker_.Predict();
-
-      // Set observation and correct
-      Eigen::Matrix<double, 2, 1> z;
-      z(0, 0) = feature->position().x();
-      z(1, 0) = feature->position().y();
-      kf_motion_tracker_.Correct(z);
-    }
-  } else {
-    InitKFMotionTracker();
-    // TODO(kechxu) consider to implement a setter with only
-    // one input of state in KalmanFilter.h
-    Eigen::Matrix<double, 6, 1> state;
-    state(0, 0) = feature->position().x();
-    state(1, 0) = feature->position().y();
-    state(2, 0) = feature->velocity().x();
-    state(3, 0) = feature->velocity().y();
-    state(4, 0) = feature->acceleration().x();
-    state(5, 0) = feature->acceleration().y();
-
-    auto P = kf_motion_tracker_.GetStateCovariance();
-
-    kf_motion_tracker_.SetStateEstimate(state, P);
-
-    is_motion_tracker_enabled_ = true;
+void Obstacle::UpdateKFMotionTracker(Feature* feature) {  
+  double delta_ts = 0.0;  
+  if (feature_history_.size() > 0) {
+    delta_ts = feature->timestamp() - feature_history_.front().timestamp();
   }
+  if (delta_ts <= FLAGS_double_precision) {
+    return;
+  }
+  // Set tansition matrix and predict
+  auto F = kf_motion_tracker_.GetTransitionMatrix();
+  F(0, 2) = delta_ts;
+  F(0, 4) = delta_ts;
+  F(1, 3) = 0.5 * delta_ts * delta_ts;
+  F(1, 5) = 0.5 * delta_ts * delta_ts;
+  F(2, 4) = delta_ts;
+  F(3, 5) = delta_ts;
+  kf_motion_tracker_.SetTransitionMatrix(F);
+  kf_motion_tracker_.Predict();
+
+  // Set observation and correct
+  Eigen::Matrix<double, 2, 1> z;
+  z(0, 0) = feature->position().x();
+  z(1, 0) = feature->position().y();
+  kf_motion_tracker_.Correct(z);
 
   UpdateMotionBelief(feature);
 }
