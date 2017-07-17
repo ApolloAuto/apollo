@@ -209,7 +209,7 @@ function release() {
     cp bazel-bin/modules/monitor/hwmonitor/hw/tools/esdcan_test_app $MODULES_DIR/monitor/hwmonitor/hw/tools/
   fi
   cp -r bazel-genfiles/* $LIB_DIR
-  
+
   # doc
   cp -r docs $ROOT_DIR
   cp LICENSE $ROOT_DIR
@@ -272,7 +272,7 @@ function run_cpp_lint() {
 }
 
 function run_bash_lint() {
-  FILES=$(find "${DIR}" -type f -name "*.sh" | grep -v ros | grep -v kernel)
+  FILES=$(find "${APOLLO_ROOT_DIR}" -type f -name "*.sh" | grep -v ros | grep -v kernel)
   echo "${FILES}" | xargs shellcheck
 }
 
@@ -313,6 +313,7 @@ function print_usage() {
   buildify: fix style of BUILD files
   check: run build/lint/test, please make sure it passes before checking in new code
   clean: runs Bazel clean
+  config: run configurator tool
   coverage: generate test coverage report
   doc: generate doxygen document
   lint: run code style check
@@ -376,6 +377,10 @@ function build_gnss() {
     rm -rf modules/devel_isolated/
 }
 
+function config() {
+    ${APOLLO_ROOT_DIR}/scripts/configurator.sh
+}
+
 function main() {
   source_apollo_base
   apollo_check_system_config
@@ -394,6 +399,9 @@ function main() {
       ;;
     buildgnss)
       build_gnss
+      ;;
+    config)
+      config
       ;;
     doc)
       gen_doc
