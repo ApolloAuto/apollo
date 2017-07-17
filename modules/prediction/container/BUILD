@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["container_manager.h"],
     deps = [
         "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/container/pose:pose_container",
         "//modules/common:macro",
         "@glog//:glog"
     ]
