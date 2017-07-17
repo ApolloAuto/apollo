@@ -53,22 +53,6 @@ cc_library(
 )
 
 cc_library(
-    name = "lincoln_vehicle_factory",
-    srcs = [
-        "lincoln_vehicle_factory.cc",
-    ],
-    hdrs = [
-        "lincoln_vehicle_factory.h",
-        "vehicle_factory.h",
-    ],
-    deps = [
-        ":abstract_vehicle_factory",
-        "//modules/canbus/vehicle/lincoln:lincoln_controller",
-        "//modules/canbus/vehicle/lincoln:lincoln_message_manager",
-    ],
-)
-
-cc_library(
     name = "vehicle_factory",
     srcs = [
         "vehicle_factory.cc",
@@ -77,7 +61,7 @@ cc_library(
         "vehicle_factory.h",
     ],
     deps = [
-        ":lincoln_vehicle_factory",
+        "//modules/canbus/vehicle/lincoln:lincoln_vehicle_factory",
         "//modules/common/util:factory",
     ],
 )
@@ -90,16 +74,6 @@ cc_test(
     ],
     deps = [
         "//modules/canbus/vehicle:message_manager_base",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "lincoln_vehicle_factory_test",
-    size = "small",
-    srcs = ["lincoln_vehicle_factory_test.cc"],
-    deps = [
-        "//modules/canbus/vehicle:lincoln_vehicle_factory",
         "@gtest//:main",
     ],
 )
