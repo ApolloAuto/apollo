@@ -103,11 +103,14 @@ class Obstacle {
 
   void UpdateMotionBelief(Feature* feature);
 
+  void InitKFLaneTracker(const std::string& lane_id, const double beta);
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;
   std::deque<Feature> feature_history_;
   apollo::common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
+  bool kf_motion_tracker_enabled_;
   std::unordered_map<std::string,
       apollo::common::math::KalmanFilter<double, 4, 2, 0>> kf_lane_trackers_;
   // TODO(author) std::vector<const adu::hdmap::LaneInfo*> _current_lanes;
