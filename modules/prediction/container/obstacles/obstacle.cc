@@ -368,11 +368,9 @@ void Obstacle::UpdateKFMotionTracker(Feature* feature) {
     if (feature_history_.size() > 0) {
       delta_ts = feature->timestamp() - feature_history_.front().timestamp();
     }
-    // TODO(author) if not lost track do the following
     if (delta_ts > FLAGS_double_precision) {
       // Set tansition matrix and predict
-      Eigen::Matrix<double, 6, 6> F;
-      F.setIdentity();
+      auto F = kf_motion_tracker_.GetTransitionMatrix();
       F(0, 2) = delta_ts;
       F(0, 4) = delta_ts;
       F(1, 3) = 0.5 * delta_ts * delta_ts;
@@ -383,22 +381,27 @@ void Obstacle::UpdateKFMotionTracker(Feature* feature) {
       kf_motion_tracker_.Predict();
 
       // Set observation and correct
-      Eigen::Matrix<double, 2, 1> Z;
-      Z(0, 0) = feature->position().x();
-      Z(1, 0) = feature->position().y();
-      kf_motion_tracker_.Correct(Z);
+      Eigen::Matrix<double, 2, 1> z;
+      z(0, 0) = feature->position().x();
+      z(1, 0) = feature->position().y();
+      kf_motion_tracker_.Correct(z);
     }
   } else {
     InitKFMotionTracker();
-    // TODO(kechxu) implement following
-    // Eigen::Matrix<double, 6, 1> state;
-    // state(0, 0) = feature->position().x();
-    // state(1, 0) = feature->position().y();
-    // state(2, 0) = feature->velocity().x();
-    // state(3, 0) = feature->velocity().y();
-    // state(4, 0) = feature->acceleration().x();
-    // state(5, 0) = feature->acceleration().y();
-    // kf_motion_tracker.SetState(x);
+    // TODO(kechxu) consider to implement a setter with only
+    // one input of state in KalmanFilter.h
+    Eigen::Matrix<double, 6, 1> state;
+    state(0, 0) = feature->position().x();
+    state(1, 0) = feature->position().y();
+    state(2, 0) = feature->velocity().x();
+    state(3, 0) = feature->velocity().y();
+    state(4, 0) = feature->acceleration().x();
+    state(5, 0) = feature->acceleration().y();
+
+    auto P = kf_motion_tracker_.GetStateCovariance();
+
+    kf_motion_tracker_.SetStateEstimate(state, P);
+
     is_motion_tracker_enabled_ = true;
   }
 
