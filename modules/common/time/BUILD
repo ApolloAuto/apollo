@@ -14,7 +14,7 @@ cc_test(
     name = "time_test",
     size = "small",
     srcs = [
-        "time_test.cpp",
+        "time_test.cc",
     ],
     deps = [
         ":time",
