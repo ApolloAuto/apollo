@@ -109,7 +109,7 @@ class Obstacle {
   std::deque<Feature> feature_history_;
   apollo::common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
   std::unordered_map<std::string,
-      apollo::common::math::KalmanFilter<double, 4, 2, 0>> kf_lane_tracker_map_;
+      apollo::common::math::KalmanFilter<double, 4, 2, 0>> kf_lane_trackers_;
   // TODO(author) std::vector<const adu::hdmap::LaneInfo*> _current_lanes;
   static std::mutex mutex_;
 };

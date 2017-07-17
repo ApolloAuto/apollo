@@ -36,7 +36,7 @@ std::mutex Obstacle::mutex_;
 namespace {
 
 double Damp(const double x, const double sigma) {
-    return 1 / (1 + exp(1 / (std::fabs(x) + sigma)));
+  return 1 / (1 + exp(1 / (std::fabs(x) + sigma)));
 }
 
 }  // namespace
@@ -46,7 +46,7 @@ Obstacle::Obstacle() :
     type_(PerceptionObstacle::UNKNOWN_MOVABLE),
     feature_history_(0),
     kf_motion_tracker_(),
-    kf_lane_tracker_map_(0) {
+    kf_lane_trackers_(0) {
 
 }
 
@@ -54,7 +54,7 @@ Obstacle::~Obstacle() {
   id_ = -1;
   type_ = PerceptionObstacle::UNKNOWN_UNMOVABLE;
   feature_history_.clear();
-  kf_lane_tracker_map_.clear();
+  kf_lane_trackers_.clear();
   // TODO(author) current_lanes_.clear();
 }
 
@@ -103,9 +103,9 @@ size_t Obstacle::history_size() const {
 }
 
 const KalmanFilter<double, 4, 2, 0>& Obstacle::kf_lane_tracker(
-      const std::string& lane_id) {
-    CHECK(kf_lane_tracker_map_.find(lane_id) != kf_lane_tracker_map_.end());
-    return kf_lane_tracker_map_[lane_id];
+    const std::string& lane_id) {
+  CHECK(kf_lane_trackers_.find(lane_id) != kf_lane_trackers_.end());
+  return kf_lane_trackers_[lane_id];
 }
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
