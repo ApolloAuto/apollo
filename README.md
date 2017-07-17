@@ -1,6 +1,6 @@
 # Apollo
 
-![Build status](https://api.travis-ci.org/ApolloAuto/apollo.svg?branch=master)
+[![Build Status](https://travis-ci.org/ApolloAuto/apollo.svg?branch=master)](https://travis-ci.org/ApolloAuto/apollo)
 
 ```
 We choose to go to the moon in this decade and do the other things,
