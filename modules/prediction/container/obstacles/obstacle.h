@@ -97,7 +97,7 @@ class Obstacle {
       const apollo::perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
-  void InitKFMotionTracker();
+  void InitKFMotionTracker(Feature* feature);
 
   void UpdateKFMotionTracker(Feature* feature);
 
@@ -108,7 +108,6 @@ class Obstacle {
   apollo::perception::PerceptionObstacle::Type type_;
   std::deque<Feature> feature_history_;
   apollo::common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
-  bool is_motion_tracker_enabled_;
   std::unordered_map<std::string,
       apollo::common::math::KalmanFilter<double, 4, 2, 0>> kf_lane_tracker_map_;
   // TODO(author) std::vector<const adu::hdmap::LaneInfo*> _current_lanes;
