@@ -14,29 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/evaluator/evaluator_factory.h"
+#include "modules/prediction/predictor/predictor_factory.h"
 
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
 
-EvaluatorFactory::EvaluatorFactory() {}
+PredictorFactory::PredictorFactory() {}
 
-void EvaluatorFactory::RegisterEvaluator() {
-    Register(ObstacleConf::DEF_EVAL,
-        []() -> Evaluator* { return nullptr; });
+void PredictorFactory::RegisterPredictor() {
+    Register(ObstacleConf::DEF_VEHICLE_PRED,
+        []() -> Predictor* { return nullptr; });
 }
 
-std::unique_ptr<Evaluator> EvaluatorFactory::CreateEvaluator(
-    const ObstacleConf::Eval& eval) {
-  auto evaluator = CreateObject(eval);
-  if (!evaluator) {
-    AERROR << "Failed to create an evaluator with " << eval;
+std::unique_ptr<Predictor> PredictorFactory::CreatePredictor(
+    const ObstacleConf::Pred& pred) {
+  auto predictor = CreateObject(pred);
+  if (!predictor) {
+    AERROR << "Failed to create a predictor with " << pred;
   } else {
-    ADEBUG << "Succeeded in creating an evaluator with " << eval;
+    ADEBUG << "Succeeded in creating a predictor with " << pred;
   }
-  return evaluator;
+  return predictor;
 }
 
 }

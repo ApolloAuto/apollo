@@ -16,15 +16,15 @@
 
 /**
  * @file
- * @brief Defines the evaluator factory
+ * @brief Defines the predictor factory
  */
 
-#ifndef MODULES_PREDICTION_EVALUATOR_EVALUATOR_FACTORY_H_
-#define MODULES_PREDICTION_EVALUATOR_EVALUATOR_FACTORY_H_
+#ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_FACTORY_H_
+#define MODULES_PREDICTION_PREDICTOR_PREDICTOR_FACTORY_H_
 
 #include <memory>
 
-#include "modules/prediction/evaluator/evaluator.h"
+#include "modules/prediction/predictor/predictor.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/macro.h"
@@ -37,27 +37,27 @@
 namespace apollo {
 namespace prediction {
 
-class EvaluatorFactory
-    : public apollo::common::util::Factory<ObstacleConf::Eval,
-                                           Evaluator> {
+class PredictorFactory
+    : public apollo::common::util::Factory<ObstacleConf::Pred,
+                                           Predictor> {
  public:
   /**
-   * @brief Register evaluators
+   * @brief Register predictor
    */
-  void RegisterEvaluator();
+  void RegisterPredictor();
 
   /**
-   * @brief Create a pointer to an evaluator
-   * @param Evaluator name
-   * @return A pointer to the given evaluator
+   * @brief Create a pointer to a predictor
+   * @param Predictor name
+   * @return A pointer to the given predictor
    */
-  std::unique_ptr<Evaluator> CreateEvaluator(const ObstacleConf::Eval& eval);
+  std::unique_ptr<Predictor> CreatePredictor(const ObstacleConf::Pred& pred);
 
  private:
-  DECLARE_SINGLETON(EvaluatorFactory);
+  DECLARE_SINGLETON(PredictorFactory);
 };
 
 } // namespace prediction
 } // namespace apollo
 
-#endif // MODULES_PREDICTION_EVALUATOR_EVALUATOR_FACTORY_H_
+#endif // MODULES_PREDICTION_PREDICTOR_PREDICTOR_FACTORY_H_
