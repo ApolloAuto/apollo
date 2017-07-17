@@ -100,6 +100,7 @@ message SimpleLateralDebug {
   optional double steer_angle_feedback = 14;
   optional double steering_position = 15;
   optional double ref_speed = 16;
+  optional double steer_angle_limited = 17;
 }
 
 message InputDebug {

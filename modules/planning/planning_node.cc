@@ -24,6 +24,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
@@ -111,14 +112,15 @@ TrajectoryPb PlanningNode::ToTrajectoryPb(
 
   for (const auto& trajectory_point : discretized_trajectory) {
     auto ptr_trajectory_point_pb = trajectory_pb.add_adc_trajectory_point();
-    ptr_trajectory_point_pb->set_x(trajectory_point.x);
-    ptr_trajectory_point_pb->set_y(trajectory_point.y);
-    ptr_trajectory_point_pb->set_theta(trajectory_point.theta);
-    ptr_trajectory_point_pb->set_curvature(trajectory_point.kappa);
-    ptr_trajectory_point_pb->set_relative_time(trajectory_point.relative_time);
-    ptr_trajectory_point_pb->set_speed(trajectory_point.v);
-    ptr_trajectory_point_pb->set_acceleration_s(trajectory_point.a);
-    ptr_trajectory_point_pb->set_accumulated_s(trajectory_point.s);
+    ptr_trajectory_point_pb->set_x(trajectory_point.x());
+    ptr_trajectory_point_pb->set_y(trajectory_point.y());
+    ptr_trajectory_point_pb->set_theta(trajectory_point.theta());
+    ptr_trajectory_point_pb->set_curvature(trajectory_point.kappa());
+    ptr_trajectory_point_pb->set_relative_time(
+        trajectory_point.relative_time());
+    ptr_trajectory_point_pb->set_speed(trajectory_point.v());
+    ptr_trajectory_point_pb->set_acceleration_s(trajectory_point.a());
+    ptr_trajectory_point_pb->set_accumulated_s(trajectory_point.s());
   }
   return std::move(trajectory_pb);
 }

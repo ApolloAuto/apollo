@@ -19,8 +19,8 @@
 
 #include <vector>
 
+#include "modules/common/proto/path_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/common/base_types.h"
 
 /**
  * @namespace apollo::planning
@@ -53,8 +53,9 @@ class Planner {
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  virtual bool Plan(const TrajectoryPoint& start_point,
-                    std::vector<TrajectoryPoint>* discretized_trajectory) = 0;
+  virtual bool Plan(
+      const apollo::common::TrajectoryPoint& start_point,
+      std::vector<apollo::common::TrajectoryPoint>* discretized_trajectory) = 0;
 };
 
 }  // namespace planning

@@ -106,8 +106,9 @@ class LatController : public Controller {
 
   double ComputeFeedForward(double ref_curvature) const;
 
-  double GetLateralError(const Eigen::Vector2d& point,
-                         TrajectoryPoint* trajectory_point) const;
+  double GetLateralError(
+      const Eigen::Vector2d& point,
+      apollo::common::TrajectoryPoint* trajectory_point) const;
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
@@ -148,6 +149,9 @@ class LatController : public Controller {
   double steer_transmission_ratio_ = 0.0;
   // the maximum turn of steer
   double steer_single_direction_max_degree_ = 0.0;
+
+  // limit steering to maximum theoretical lateral acceleration
+  double max_lat_acc_ = 0.0;
 
   // number of control cycles look ahead (preview controller)
   int preview_window_ = 0;
