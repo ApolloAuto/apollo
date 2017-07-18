@@ -41,8 +41,8 @@ cc_library(
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
-        "//modules/planning/proto:planning_proto",
         "//modules/dreamview/proto:simulation_world_proto",
+        "//modules/planning/proto:planning_proto",
     ],
 )
 
@@ -73,9 +73,9 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/math:quaternion",
         "//modules/common/proto:common_proto",
+        "//modules/dreamview/proto:simulation_world_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/dreamview/proto:simulation_world_proto",
         "//third_party/json",
         "@com_github_google_protobuf//:protobuf",
     ],
