@@ -23,7 +23,9 @@
 #ifndef BAIDU_ADU_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_KERNEL_H_
 #define BAIDU_ADU_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_KERNEL_H_
 
+#include <vector>
 #include "Eigen/Core"
+
 #include "modules/planning/math/smoothing_spline/spline_1d.h"
 
 namespace apollo {
@@ -31,9 +33,9 @@ namespace planning {
 
 class Spline1dKernel {
  public:
-  Spline1dKernel(const Spline1d& spline1d);
-  Spline1dKernel(const std::vector<double>& x_knots,
-                 const std::size_t spline_order);
+  explicit Spline1dKernel(const Spline1d& spline1d);
+  explicit Spline1dKernel(const std::vector<double>& x_knots,
+                          const std::size_t spline_order);
 
   // customized input / output method
   void add_regularization(const double regularized_param);
