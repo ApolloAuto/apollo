@@ -51,17 +51,14 @@ class PoseContainer : public Container {
   void Insert(const ::google::protobuf::Message& message) override;
 
   /**
-   * @brief Update the content in pose container by localization.
-   * @param localization The information to update the content in
-   *        the pose container.
-   */
-  void Update(const localization::LocalizationEstimate &localization);
-
-  /**
    * @brief Transform pose to a perception obstacle.
    * @return A pointer to a perception obstacle.
    */
   apollo::perception::PerceptionObstacle* ToPerceptionObstacle();
+
+ private:
+
+  void Update(const localization::LocalizationEstimate &localization);
 
  private:
   std::unique_ptr<apollo::perception::PerceptionObstacle> obstacle_ptr_;

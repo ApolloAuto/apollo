@@ -21,12 +21,15 @@ namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::Point;
+using apollo::localization::LocalizationEstimate;
 
 std::mutex PoseContainer::g_mutex_;
 int PoseContainer::id_ = -1;
 PerceptionObstacle::Type PoseContainer::type_ = PerceptionObstacle::VEHICLE;
 
-void PoseContainer::Insert(const ::google::protobuf::Message& message) {}
+void PoseContainer::Insert(const ::google::protobuf::Message& message) {
+  Update(dynamic_cast<const LocalizationEstimate&>(message));
+}
 
 void PoseContainer::Update(
     const localization::LocalizationEstimate &localization) {
