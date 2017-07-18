@@ -138,6 +138,11 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
     InitKFMotionTracker(&feature);
   }
   UpdateKFMotionTracker(&feature);
+  SetCurrentLanes(&feature);
+  SetNearbyLanes(&feature);
+  UpdateKFLaneTrackers(&feature);
+  InsertFeatureToHistory(&feature);
+  SetMotionStatus();
 }
 
 ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
@@ -593,6 +598,22 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
 
   ADEBUG << "Obstacle [" << id_ << "] set tracked speed [" << lane_speed
          << " and tracked acc [" << lane_acc << "]";
+}
+
+void Obstacle::SetCurrentLanes(Feature* feature) {
+  // TODO(kechxu) implement
+}
+
+void Obstacle::SetNearbyLanes(Feature* feature) {
+  // TODO(kechxu) implement
+}
+
+void Obstacle::SetMotionStatus() {
+  // TODO(kechxu) implement
+}
+
+void Obstacle::InsertFeatureToHistory(Feature* feature) {
+  // TODO(kechxu) implement
 }
 
 }  // namespace prediction
