@@ -15,34 +15,24 @@
  *****************************************************************************/
 
 /**
- * @file st_point.cpp
+ * @file sl_point_util.h
  **/
 
-#include "modules/planning/common/speed/st_point.h"
+#ifndef MODULES_PLANNING_COMMON_PATH_SL_POINT_H_
+#define MODULES_PLANNING_COMMON_PATH_SL_POINT_H_
 
-#include <iomanip>
-#include <sstream>
+#include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
 namespace planning {
+namespace util {
 
-STPoint::STPoint(const double s, const double t) : Vec2d(t, s){};
-
-double STPoint::s() const { return y_; }
-
-double STPoint::t() const { return x_; }
-
-void STPoint::set_s(const double s) { return set_y(s); }
-
-void STPoint::set_t(const double t) { return set_x(t); }
-
-std::string STPoint::DebugString() const {
-  std::ostringstream sout;
-  sout << "{ \"s\" : " << std::setprecision(6) << s()
-       << ", \"t\" : " << std::setprecision(6) << t() << " }";
-  sout.flush();
-  return sout.str();
-}
+static common::SLPoint interpolate(const common::SLPoint& start,
+                                   const common::SLPoint& end,
+                                   const double weight);
+};
 
 }  // namespace planning
 }  // namespace apollo
+
+#endif  // MODULES_PLANNING_COMMON_PATH_SL_POINT_H_

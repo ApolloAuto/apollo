@@ -15,43 +15,44 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file frenet_frame_path.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H
-#define MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H
+#ifndef BAIDU_ADU_HOUSTON_COMMON_PATH_FRENET_FRAME_PATH_H_
+#define BAIDU_ADU_HOUSTON_COMMON_PATH_FRENET_FRAME_PATH_H_
 
-#include "modules/planning/common/speed/st_point.h"
+#include <vector>
+
+#include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
 namespace planning {
 
-class SpeedPoint : public STPoint {
+class FrenetFramePath {
  public:
-  SpeedPoint() = default;
-  SpeedPoint(const double s, const double t, const double v, const double a,
-             const double j);
-  SpeedPoint(const STPoint& st_point, const double v, const double a,
-             const double j);
-  void set_v(const double v);
-  void set_a(const double a);
-  void set_j(const double j);
+  FrenetFramePath() = default;
 
-  double v() const;
-  double a() const;
-  double j() const;
+  explicit FrenetFramePath(std::vector<common::FrenetFramePoint> sl_points);
 
-  std::string DebugString() const;
-  static SpeedPoint interpolate(const SpeedPoint& left, const SpeedPoint& right,
-                                const double weight);
+  virtual ~FrenetFramePath() = default;
+
+  void set_frenet_points(const std::vector<common::FrenetFramePoint>& points);
+
+  std::vector<common::FrenetFramePoint>* mutable_points();
+
+  const std::vector<common::FrenetFramePoint>& points() const;
+
+  std::size_t num_points() const;
+
+  const common::FrenetFramePoint& point_at(const std::size_t index) const;
+
+  common::FrenetFramePoint& point_at(const std::size_t index);
 
  private:
-  double v_ = 0.0;
-  double a_ = 0.0;
-  double j_ = 0.0;
+  std::vector<common::FrenetFramePoint> points_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H
+#endif /* BAIDU_ADU_HOUSTON_COMMON_PATH_FRENET_FRAME_PATH_H_ */

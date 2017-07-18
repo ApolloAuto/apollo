@@ -33,11 +33,8 @@ namespace planning {
 
 class LogicPoint : public ::apollo::common::math::Vec2d {
  public:
-  explicit LogicPoint(const double x,
-                      const double y,
-                      const double s,
-                      const double heading,
-                      const double kappa,
+  explicit LogicPoint(const double x, const double y, const double s,
+                      const double heading, const double kappa,
                       const double dkappa);
   double s() const;
   double heading() const;
@@ -45,6 +42,7 @@ class LogicPoint : public ::apollo::common::math::Vec2d {
   double dkappa() const;
   const std::string &lane_id() const;
   void set_lane_id(const std::string &lane_id);
+
  private:
   double _s;
   double _heading;
@@ -53,7 +51,7 @@ class LogicPoint : public ::apollo::common::math::Vec2d {
   std::string _lane_id;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif // MODULES_PLANNING_COMMON_LOGIC_POINT_H
+#endif  // MODULES_PLANNING_COMMON_LOGIC_POINT_H

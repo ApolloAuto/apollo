@@ -15,34 +15,30 @@
  *****************************************************************************/
 
 /**
- * @file st_point.cpp
+ * @file path_point_util.h
  **/
 
-#include "modules/planning/common/speed/st_point.h"
+#ifndef MODULES_PLANNING_COMMON_PATH_PATH_POINT_H_
+#define MODULES_PLANNING_COMMON_PATH_PATH_POINT_H_
 
-#include <iomanip>
-#include <sstream>
+#include "Eigen/Dense"
+
+#include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
 namespace planning {
+namespace util {
 
-STPoint::STPoint(const double s, const double t) : Vec2d(t, s){};
+common::PathPoint interpolate(const common::PathPoint& p0,
+                              const common::PathPoint& p1, const double s);
 
-double STPoint::s() const { return y_; }
+// @ weight shall between 1 and 0
+common::PathPoint interpolate_linear_approximation(
+    const common::PathPoint& left, const common::PathPoint& right,
+    const double s);
 
-double STPoint::t() const { return x_; }
-
-void STPoint::set_s(const double s) { return set_y(s); }
-
-void STPoint::set_t(const double t) { return set_x(t); }
-
-std::string STPoint::DebugString() const {
-  std::ostringstream sout;
-  sout << "{ \"s\" : " << std::setprecision(6) << s()
-       << ", \"t\" : " << std::setprecision(6) << t() << " }";
-  sout.flush();
-  return sout.str();
-}
-
+}  // namespace util
 }  // namespace planning
 }  // namespace apollo
+
+#endif  // MODULES_PLANNING_COMMON_PATH_PATH_POINT_H_

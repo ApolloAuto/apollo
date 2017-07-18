@@ -28,31 +28,31 @@ namespace apollo {
 namespace planning {
 
 class SpeedData {
-public:
-    SpeedData() = default;
+ public:
+  SpeedData() = default;
 
-    SpeedData(std::vector<SpeedPoint> speed_points);
+  SpeedData(std::vector<SpeedPoint> speed_points);
 
-    std::vector<SpeedPoint>* mutable_speed_vector();
+  std::vector<SpeedPoint>* mutable_speed_vector();
 
-    const std::vector<SpeedPoint>& speed_vector() const;
+  const std::vector<SpeedPoint>& speed_vector() const;
 
-    void set_speed_vector(const std::vector<SpeedPoint>& speed_points);
+  void set_speed_vector(const std::vector<SpeedPoint>& speed_points);
 
-    virtual std::string DebugString() const;
+  virtual std::string DebugString() const;
 
-    bool get_speed_point_with_time(const double time, SpeedPoint* const speed_point) const;
+  bool get_speed_point_with_time(const double time,
+                                 SpeedPoint* const speed_point) const;
 
-    double total_time() const;
-private:
-    std::size_t find_index(const double s) const;
+  double total_time() const;
 
-    std::vector<SpeedPoint> speed_vector_;
+ private:
+  std::size_t find_index(const double s) const;
+
+  std::vector<SpeedPoint> speed_vector_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif // MODULES_PLANNING_COMMON_SPEED_SPEED_DATA_H
-
-
+#endif  // MODULES_PLANNING_COMMON_SPEED_SPEED_DATA_H
