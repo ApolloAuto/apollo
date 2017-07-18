@@ -50,7 +50,7 @@ class Container {
   virtual void Insert(const ::google::protobuf::Message& message) = 0;
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_CONTAINER_CONTAINER_H_
+#endif  // MODULES_PREDICTION_CONTAINER_CONTAINER_H_

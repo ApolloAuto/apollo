@@ -39,7 +39,7 @@ namespace prediction {
 
 class Obstacle {
  public:
-  explicit Obstacle();
+  Obstacle();
 
   virtual ~Obstacle();
 
@@ -130,4 +130,4 @@ class Obstacle {
 }  // namespace prediction
 }  // namespace apollo
 
- #endif  // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
+#endif  // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
