@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/planning/planning.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"

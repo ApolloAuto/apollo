@@ -52,9 +52,8 @@ class EMPlanner : public Planner {
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  bool Plan(
-      const apollo::common::TrajectoryPoint& start_point,
-      std::vector<apollo::common::TrajectoryPoint>* trajectory) override;
+  bool Plan(const apollo::common::TrajectoryPoint& start_point,
+            std::vector<apollo::common::TrajectoryPoint>* trajectory) override;
 
  private:
 };

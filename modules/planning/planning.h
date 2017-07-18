@@ -102,9 +102,7 @@ class Planning : public apollo::common::ApolloApp {
       const double header_time,
       const std::vector<common::TrajectoryPoint>& discretized_trajectory);
 
-
-  apollo::common::util::Factory<PlanningConfig::PlannerType,
-                                Planner>
+  apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
   PlanningConfig config_;
 

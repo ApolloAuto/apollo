@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/planning.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planning.h"
 #include "modules/planning/proto/planning.pb.h"
 
 #include "gmock/gmock.h"

@@ -33,7 +33,8 @@ namespace planning {
 using ::apollo::common::ErrorCode;
 using ::apollo::common::PathPoint;
 
-QuinticSpiralCurve::QuinticSpiralCurve(const PathPoint& s, const PathPoint& e)
+QuinticSpiralCurve::QuinticSpiralCurve(const common::PathPoint& s,
+                                       const common::PathPoint& e)
     : SpiralCurve(s, e, 5) {
   // generate an order 5 spiral path with four parameters
 }
@@ -191,7 +192,7 @@ bool QuinticSpiralCurve::calculate_path() {
 }
 
 ErrorCode QuinticSpiralCurve::get_path_vec(
-    const std::size_t n, std::vector<PathPoint>* path_points) const {
+    const std::size_t n, std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   if (n <= 1 || error() > spiral_config().newton_raphson_tol()) {
@@ -199,7 +200,7 @@ ErrorCode QuinticSpiralCurve::get_path_vec(
   }
 
   path_points->resize(n);
-  std::vector<PathPoint>& result = *path_points;
+  std::vector<common::PathPoint>& result = *path_points;
 
   result[0].set_x(start_point().x());
   result[0].set_y(start_point().y());
@@ -247,7 +248,7 @@ ErrorCode QuinticSpiralCurve::get_path_vec(
 
 ErrorCode QuinticSpiralCurve::get_path_vec_with_s(
     const std::vector<double>& vec_s,
-    std::vector<PathPoint>* path_points) const {
+    std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   if (error() > spiral_config().newton_raphson_tol()) {
@@ -260,10 +261,10 @@ ErrorCode QuinticSpiralCurve::get_path_vec_with_s(
 
   const std::size_t n = vec_s.size();
 
-  PathPoint ref_point = start_point();
+  common::PathPoint ref_point = start_point();
 
   path_points->resize(n);
-  std::vector<PathPoint>& result = *path_points;
+  std::vector<common::PathPoint>& result = *path_points;
   std::array<double, 6> p_value;
   std::copy(p_params().begin(), p_params().end(), p_value.begin());
   std::array<double, 6> a_params = SpiralFormula::p_to_a_k5(sg(), p_value);
