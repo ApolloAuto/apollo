@@ -29,6 +29,7 @@
 #ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_H_
 #define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_H_
 
+#include <vector>
 #include "Eigen/Core"
 
 #include "modules/planning/math/polynomial_xd.h"

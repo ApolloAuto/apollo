@@ -18,11 +18,12 @@
  * @file cartesian_frenet_conversion.cc
  **/
 
-#include "modules/common/math/math_utils.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 #include <cmath>
 #include "glog/logging.h"
+
+#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace planning {

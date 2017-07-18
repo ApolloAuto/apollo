@@ -80,5 +80,5 @@ bool Spline1dGenerator::solve() {
 
 const Spline1d& Spline1dGenerator::spline() const { return spline_; }
 
-}  // planning
-}  // adu
+}  // namespace planning
+}  // namespace apollo

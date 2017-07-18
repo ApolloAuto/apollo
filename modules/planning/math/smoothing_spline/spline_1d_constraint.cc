@@ -22,6 +22,8 @@
 
 #include "modules/planning/math/smoothing_spline/spline_1d_constraint.h"
 
+#include <limits>
+
 namespace apollo {
 namespace planning {
 
@@ -68,7 +70,7 @@ bool Spline1dConstraint::add_fx_boundary(
                           &filtered_lower_bound_x, &filtered_lower_bound,
                           &filtered_upper_bound_x, &filtered_upper_bound)) {
     return false;
-  };
+  }
   // emplace affine constraints
   Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(
       filtered_upper_bound.size() + filtered_lower_bound.size(),
@@ -121,7 +123,7 @@ bool Spline1dConstraint::add_derivative_boundary(
                           &filtered_lower_bound_x, &filtered_lower_bound,
                           &filtered_upper_bound_x, &filtered_upper_bound)) {
     return false;
-  };
+  }
 
   // emplace affine constraints
   Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(
@@ -173,7 +175,7 @@ bool Spline1dConstraint::add_second_derivative_boundary(
                           &filtered_lower_bound_x, &filtered_lower_bound,
                           &filtered_upper_bound_x, &filtered_upper_bound)) {
     return false;
-  };
+  }
 
   // emplace affine constraints
   Eigen::MatrixXd inequality_constraint = Eigen::MatrixXd::Zero(
@@ -221,7 +223,7 @@ bool Spline1dConstraint::add_third_derivative_boundary(
                           &filtered_lower_bound_x, &filtered_lower_bound,
                           &filtered_upper_bound_x, &filtered_upper_bound)) {
     return false;
-  };
+  }
 
   if (x_knots_.size() < 2) {
     return false;

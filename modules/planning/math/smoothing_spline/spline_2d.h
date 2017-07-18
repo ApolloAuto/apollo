@@ -22,6 +22,9 @@
 #ifndef MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_H_
 #define MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_H_
 
+#include <utility>
+#include <vector>
+
 #include "Eigen/Core"
 #include "glog/logging.h"
 

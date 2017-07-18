@@ -19,7 +19,11 @@
  * @brief: wrapp up solver constraint interface with direct methods and preset
  *methods
  **/
+
 #include "modules/planning/math/smoothing_spline/spline_1d_kernel.h"
+
+#include <algorithm>
+
 #include "modules/planning/math/smoothing_spline/spline_seg_kernel.h"
 
 namespace apollo {

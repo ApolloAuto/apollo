@@ -72,7 +72,7 @@ double SLAnalyticTransformation::calculate_second_order_lateral_derivative(
       calculate_lateral_derivative(theta_ref, theta, l, kappa_ref);
   const double theta_diff = theta - theta_ref;
   const double cos_theta_diff = std::cos(theta_diff);
-  // TODO: add sanity check for invalid input
+  // TODO(fanhaoyang): add sanity check for invalid input
   return -(dkappa_ref * l + kappa_ref * dl) * std::tan(theta - theta_ref) +
          (1 - kappa_ref * l) / (cos_theta_diff * cos_theta_diff) *
              (kappa * (1 - kappa_ref * l) / cos_theta_diff - kappa_ref);

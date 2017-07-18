@@ -70,5 +70,4 @@ class CartesianFrenetConverter {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_MATH_FRAME_CONVERSION_CARTESIAN_FRENET_CONVERSION_H_ \
-          */
+#endif  // MODULES_PLANNING_MATH_FRAME_CONVERSION_CARTESIAN_FRENET_CONVERSION_H_

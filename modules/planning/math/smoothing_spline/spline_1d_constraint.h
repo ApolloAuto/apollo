@@ -23,6 +23,8 @@
 #ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_1D_CONSTRAINT_H_
 #define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_1D_CONSTRAINT_H_
 
+#include <algorithm>
+#include <vector>
 #include "Eigen/Core"
 
 #include "modules/planning/math/smoothing_spline/affine_constraint.h"

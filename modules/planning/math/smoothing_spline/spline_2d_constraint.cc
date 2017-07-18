@@ -18,8 +18,10 @@
  * @file : spline_smoother_constraint.cc
  **/
 
-#include <cmath>
 #include "modules/planning/math/smoothing_spline/spline_2d_constraint.h"
+
+#include <algorithm>
+#include <cmath>
 
 namespace apollo {
 namespace planning {
@@ -281,7 +283,7 @@ bool Spline2dConstraint::add_point_angle_constraint(const double t,
   }
   if (!add_equality_constraint(affine_equality, affine_boundary)) {
     return false;
-  };
+  }
   return add_inequality_constraint(affine_inequality,
                                    affine_inequality_boundary);
 }
