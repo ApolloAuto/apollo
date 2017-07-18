@@ -36,3 +36,13 @@ DEFINE_double(replanning_threshold, 2.0,
 DEFINE_double(trajectory_resolution, 0.01,
               "The time resolution of "
               "output trajectory.");
+
+// math : active set solver
+DEFINE_double(default_active_set_eps_num, 1e-7,
+              "qpOases wrapper error control numerator");
+DEFINE_double(default_active_set_eps_den, 1e-7,
+              "qpOases wrapper error control numerator");
+DEFINE_double(default_active_set_eps_iter_ref, 1e-7,
+              "qpOases wrapper error control numerator");
+DEFINE_bool(default_enable_active_set_debug_info, false,
+            "Enable print information");

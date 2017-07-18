@@ -102,6 +102,14 @@ double WrapAngle(const double angle);
 double NormalizeAngle(const double angle);
 
 /**
+ * @brief Calculate the difference between angle from and to
+ * @param from the start angle
+ * @param from the end angle
+ * @return The difference between from and to. The range is between [0, PI).
+ */
+double AngleDiff(const double from, const double to);
+
+/**
  * @brief Get a random integer between two integer values by a random seed.
  * @param s The lower bound of the random integer.
  * @param t The upper bound of the random integer.

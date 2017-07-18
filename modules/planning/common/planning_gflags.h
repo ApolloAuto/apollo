@@ -26,4 +26,10 @@ DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(replanning_threshold);
 DECLARE_double(trajectory_resolution);
 
+// math : active set solver
+DECLARE_double(default_active_set_eps_num);
+DECLARE_double(default_active_set_eps_den);
+DECLARE_double(default_active_set_eps_iter_ref);
+DECLARE_bool(default_enable_active_set_debug_info);
+
 #endif /* MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_ */
