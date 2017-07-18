@@ -26,8 +26,7 @@ namespace math {
 TEST(MPCSolverTest, MPC) {
     const int STATES = 4;
     const int CONTROLS = 1;
-    const int PREVIEW_HORIZON = 30;
-    const int CONTROL_HORIZON = 30;
+    const int HORIZON = 10;
     const double EPS = 0.01;
     const int MAX_ITER = 100;
 
@@ -61,7 +60,6 @@ TEST(MPCSolverTest, MPC) {
     Eigen::MatrixXd lower_bound(CONTROLS, 1);
     lower_bound << -0.2;
 
-    std::cout << "lower_bound size: " << lower_bound.size() << std::endl;
     Eigen::MatrixXd upper_bound(CONTROLS, 1);
     upper_bound << 0.6;
 
@@ -77,18 +75,75 @@ TEST(MPCSolverTest, MPC) {
                        0,
                        0;
 
-    std::vector<Eigen::MatrixXd> reference(PREVIEW_HORIZON, reference_state);
+    std::vector<Eigen::MatrixXd> reference(HORIZON, reference_state);
 
     Eigen::MatrixXd control_matrix(CONTROLS, 1);
     control_matrix << 0;
 
-    std::vector<Eigen::MatrixXd> control(CONTROL_HORIZON, control_matrix);
-    solve_linear_mpc(A, B, C, Q, R, lower_bound, upper_bound, initial_state, reference, EPS, MAX_ITER, &control);
-    for (int i = 0; i < control.size(); ++i) {
-        EXPECT_FLOAT_EQ(0.6, control[0](0));
-    }
-}
+    std::vector<Eigen::MatrixXd> control(HORIZON, control_matrix);
 
+    for (unsigned int i = 0; i < control.size(); ++i) {
+        for (unsigned int i = 1; i < control.size(); ++i) {
+            control[i-1] = control[i];
+        }
+        SolveLinearMPC(A, B, C, Q, R, lower_bound, upper_bound, initial_state, reference, EPS, MAX_ITER, &control);
+        EXPECT_FLOAT_EQ(upper_bound(0), control[0](0));
+        initial_state = A * initial_state + B * control[0](0) + C;
+    }
+
+    Eigen::MatrixXd initial_state1(STATES, 1);
+    initial_state1 << 300,
+                      300,
+                      0,
+                      0;
+
+    Eigen::MatrixXd reference_state1(STATES, 1);
+    reference_state1 << 200,
+                        200,
+                        0,
+                        0;
+
+    std::vector<Eigen::MatrixXd> reference1(HORIZON, reference_state1);
+
+    control_matrix << 0;
+    std::vector<Eigen::MatrixXd> control1(HORIZON, control_matrix);
+
+    for (unsigned int i = 0; i < control1.size(); ++i) {
+        for (unsigned int i = 1; i < control.size(); ++i) {
+            control1[i-1] = control1[i];
+        }
+        SolveLinearMPC(A, B, C, Q, R, lower_bound, upper_bound, initial_state1, reference1, EPS, MAX_ITER, &control1);
+        EXPECT_FLOAT_EQ(lower_bound(0), control1[0](0));
+        initial_state1 = A * initial_state1 + B * control1[0](0) + C;
+    }
+
+    Eigen::MatrixXd initial_state2(STATES, 1);
+    initial_state2 << 300,
+                      300,
+                      0,
+                      0;
+
+    Eigen::MatrixXd reference_state2(STATES, 1);
+    reference_state2 << 300,
+                        300,
+                        0,
+                        0;
+
+    std::vector<Eigen::MatrixXd> reference2(HORIZON, reference_state2);
+
+    control_matrix << 0;
+    std::vector<Eigen::MatrixXd> control2(HORIZON, control_matrix);
+
+    for (unsigned int i = 0; i < control2.size(); ++i) {
+        for (unsigned int i = 1; i < control.size(); ++i) {
+            control2[i-1] = control2[i];
+        }
+        SolveLinearMPC(A, B, C, Q, R, lower_bound, upper_bound, initial_state2, reference2, EPS, MAX_ITER, &control2);
+        EXPECT_FLOAT_EQ(0.0, control2[0](0));
+        initial_state2 = A * initial_state2 + B * control2[0](0) + C;
+    }
+
+}
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
