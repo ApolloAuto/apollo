@@ -34,3 +34,17 @@ py_proto_compile(
         "//modules/prediction/proto:prediction_proto_pylib",
     ],
 )
+
+cc_proto_library(
+    name = "spiral_curve_config_proto",
+    protos = [
+        "spiral_curve_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "sprial_curve_config_proto_pylib",
+    protos = [
+        "spiral_curve_config.proto",
+    ],
+)
