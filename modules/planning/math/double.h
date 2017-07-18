@@ -29,8 +29,7 @@ namespace planning {
 
 class Double {
  public:
-  Double(const double value);
-  Double(const Double& other);
+  explicit Double(const double value);
   ~Double() = default;
 
   double value() const;
