@@ -680,9 +680,9 @@ void Obstacle::SetMotionStatus() {
   }
 }
 
-
 void Obstacle::InsertFeatureToHistory(Feature* feature) {
-  // TODO(kechxu) implement
+  feature_history_.push_front(std::move(*feature));
+  ADEBUG << "Obstacle [" << id_ << "] inserted a frame into the history.";
 }
 
 }  // namespace prediction
