@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <unordered_set>
 #include <utility>
+#include <algorithm>
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
