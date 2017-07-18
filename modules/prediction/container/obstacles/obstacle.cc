@@ -609,8 +609,77 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 }
 
 void Obstacle::SetMotionStatus() {
-  // TODO(kechxu) implement
+  bool is_still = true;
+  int history_size = static_cast<int>(feature_history_.size());
+  if (history_size < 2) {
+    ADEBUG << "Obstacle [" << id_ << "] has no history and "
+           << "is considered still [default = true].";
+    if (history_size > 0) {
+      feature_history_.front().set_is_still(is_still);
+      ADEBUG << "Obstacle [" << id_ << "] has stillness status [" << is_still
+             << "].";
+    }
+    return;
+  }
+
+  double start_x = 0.0;
+  double start_y = 0.0;
+  double avg_drift_x = 0.0;
+  double avg_drift_y = 0.0;
+  int len = std::min(history_size, FLAGS_still_obstacle_history_length);
+  CHECK(len > 1);
+
+  auto feature_riter = feature_history_.rbegin();
+  if (FLAGS_enable_kf_tracking) {
+    start_x = feature_riter->t_position().x();
+    start_y = feature_riter->t_position().y();
+  } else {
+    start_x = feature_riter->position().x();
+    start_y = feature_riter->position().y();
+  }
+  ++feature_riter;
+  while (feature_riter != feature_history_.rend()) {
+    if (FLAGS_enable_kf_tracking) {
+      avg_drift_x += (feature_riter->t_position().x() - start_x) / (len - 1);
+      avg_drift_y += (feature_riter->t_position().y() - start_y) / (len - 1);
+    } else {
+      avg_drift_x += (feature_riter->position().x() - start_x) / (len - 1);
+      avg_drift_y += (feature_riter->position().y() - start_y) / (len - 1);
+    }
+    ++feature_riter;
+  }
+
+  double delta_ts = feature_history_.front().timestamp() -
+                    feature_history_.back().timestamp();
+  double std = FLAGS_still_obstacle_position_std;
+  double speed_sensibility =
+      std::sqrt(2 * history_size) * 4 * std / ((history_size + 1) * delta_ts);
+  double speed = (FLAGS_enable_kf_tracking ? feature_history_.front().t_speed()
+                                           : feature_history_.front().speed());
+  double speed_threshold = FLAGS_still_obstacle_speed_threshold;
+  if (apollo::common::math::DoubleCompare(speed, speed_threshold) < 0) {
+    is_still = true;
+    ADEBUG << "Obstacle [" << id_
+           << "] has a small speed and is considered still.";
+  } else if (apollo::common::math::DoubleCompare(speed_sensibility,
+                                                 speed_threshold) < 0) {
+    is_still = false;
+    ADEBUG << "Obstacle [" << id_ << "] has a too short history ["
+           << history_size << "] and is considered moving [sensibility = "
+           << speed_sensibility << "]";
+  } else {
+    double distance = std::hypot(avg_drift_x, avg_drift_y);
+    double distance_std = std::sqrt(2.0 / len) * std;
+    if (apollo::common::math::DoubleCompare(distance, 2.0 * distance_std) > 0) {
+      is_still = false;
+      ADEBUG << "Obstacle [" << id_ << "] is moving.";
+    } else {
+      is_still = true;
+      ADEBUG << "Obstacle [" << id_ << "] is still.";
+    }
+  }
 }
+
 
 void Obstacle::InsertFeatureToHistory(Feature* feature) {
   // TODO(kechxu) implement
