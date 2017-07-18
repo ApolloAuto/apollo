@@ -44,7 +44,8 @@ class Evaluator {
   virtual ~Evaluator() = default;
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
+#endif  // MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
+

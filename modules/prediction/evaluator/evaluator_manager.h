@@ -48,12 +48,13 @@ class EvaluatorManager {
    */
   const Evaluator* GetEvaluator();
 
-  void Run(const ::apollo::perception::PerceptionObstacles& perception_obstacles);
+  void Run(
+      const ::apollo::perception::PerceptionObstacles& perception_obstacles);
 
   DECLARE_SINGLETON(EvaluatorManager)
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_EVALUATOR_EVALUATOR_MANAGER_H_
+#endif  // MODULES_PREDICTION_EVALUATOR_EVALUATOR_MANAGER_H_

@@ -32,7 +32,7 @@ class ObstaclesContainer : public Container {
   /**
    * @brief Constructor
    */
-  explicit ObstaclesContainer() = default;
+  ObstaclesContainer() = default;
 
   /**
    * @brief Destructor
@@ -43,10 +43,10 @@ class ObstaclesContainer : public Container {
    * @brief Insert a data message into the container
    * @param Data message to be inserted in protobuf
    */
-  virtual void Insert(const ::google::protobuf::Message& message) override;
+  void Insert(const ::google::protobuf::Message& message) override;
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
+#endif  // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_

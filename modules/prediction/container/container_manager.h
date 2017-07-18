@@ -24,6 +24,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <memory>
 
 #include "modules/prediction/container/container.h"
 #include "modules/common/macro.h"
@@ -65,7 +66,7 @@ class ContainerManager {
   DECLARE_SINGLETON(ContainerManager)
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
+#endif  // MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
