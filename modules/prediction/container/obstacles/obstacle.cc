@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <cmath>
 #include <unordered_set>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -42,7 +43,7 @@ double Damp(const double x, const double sigma) {
 
 }  // namespace
 
-Obstacle::Obstacle() : 
+Obstacle::Obstacle() :
     id_(-1),
     type_(PerceptionObstacle::UNKNOWN_MOVABLE),
     feature_history_(0),
@@ -88,14 +89,14 @@ Feature* Obstacle::mutable_feature(size_t i) {
 
 const Feature& Obstacle::latest_feature() {
   std::lock_guard<std::mutex> lock(mutex_);
-  CHECK(feature_history_.size() > 0);
+  CHECK_GT(feature_history_.size(), 0);
   return feature_history_.front();
 }
 
 Feature* Obstacle::mutable_latest_feature() {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  CHECK(feature_history_.size() > 0);
+  CHECK_GT(feature_history_.size(), 0);
   return &(feature_history_.front());
 }
 
@@ -381,8 +382,8 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
   kf_motion_tracker_enabled_ = true;
 }
 
-void Obstacle::UpdateKFMotionTracker(Feature* feature) {  
-  double delta_ts = 0.0;  
+void Obstacle::UpdateKFMotionTracker(Feature* feature) {
+  double delta_ts = 0.0;
   if (feature_history_.size() > 0) {
     delta_ts = feature->timestamp() - feature_history_.front().timestamp();
   }
