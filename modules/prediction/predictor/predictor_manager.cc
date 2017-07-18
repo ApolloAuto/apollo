@@ -28,5 +28,6 @@ const Predictor* PredictorManager::GetPredictor() {
 void PredictorManager::Run(
     const ::apollo::perception::PerceptionObstacles& perception_obstacles) {}
 
-} 
-}
+}  // namespace prediction
+}  // namespace apollo
+

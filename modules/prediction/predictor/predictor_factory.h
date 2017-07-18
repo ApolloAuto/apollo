@@ -57,7 +57,7 @@ class PredictorFactory
   DECLARE_SINGLETON(PredictorFactory);
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_PREDICTOR_PREDICTOR_FACTORY_H_
+#endif  // MODULES_PREDICTION_PREDICTOR_PREDICTOR_FACTORY_H_

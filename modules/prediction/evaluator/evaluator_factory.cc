@@ -39,5 +39,5 @@ std::unique_ptr<Evaluator> EvaluatorFactory::CreateEvaluator(
   return evaluator;
 }
 
-}
-}
+}  // namespace prediction
+}  // namespace apollo
