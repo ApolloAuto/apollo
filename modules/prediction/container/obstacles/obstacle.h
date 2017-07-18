@@ -115,6 +115,14 @@ class Obstacle {
 
   void UpdateLaneBelief(Feature* feature);
 
+  void SetCurrentLanes(Feature* feature);
+
+  void SetNearbyLanes(Feature* feature);
+
+  void SetMotionStatus();
+
+  void InsertFeatureToHistory(Feature* feature);
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;
