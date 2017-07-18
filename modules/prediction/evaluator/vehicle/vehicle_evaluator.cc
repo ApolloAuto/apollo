@@ -14,40 +14,35 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- * @brief Define the data container base class
- */
+#include <utility>
 
-#ifndef MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
-#define MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
+#include "modules/prediction/evaluator/vehicle/vehicle_evaluator.h"
 
-#include "google/protobuf/message.h"
-#include "modules/prediction/container/obstacles/obstacle.h"
-/**
- * @namespace apollo::prediction
- * @brief apollo::prediction
- */
 namespace apollo {
 namespace prediction {
 
-class Evaluator {
- public:
-  /**
-   * @brief Constructor
-   */
-  Evaluator() = default;
+VehicleEvaluator::VehicleEvaluator() : evaluator_(nullptr) {
+  Init();
+}
 
-  /**
-   * @brief Destructor
-   */
-  virtual ~Evaluator() = default;
+void VehicleEvaluator::Init() {
+  CHECK(map_evaluators_.find("DefaultVehicleEvaluator") !=
+        map_evaluators_.end());
+  evaluator_ = map_evaluators_["DefaultVehicleEvaluator"].get();
 
-  virtual void Evaluate(Obstacle* obstacle) = 0;
-};
+  // TODO(kechxu) load user defined model taking over the default one
+
+  CHECK(evaluator_ != nullptr);
+}
+
+void VehicleEvaluator::Evaluate(Obstacle* obstacle) {
+  evaluator_->Evaluate(obstacle);
+}
+
+void VehicleEvaluator::RegisterClass(const std::string& name,
+                                     std::unique_ptr<Evaluator> ptr) {
+  map_evaluators_[name] = std::move(ptr);
+}
 
 }  // namespace prediction
 }  // namespace apollo
-
-#endif  // MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
-
