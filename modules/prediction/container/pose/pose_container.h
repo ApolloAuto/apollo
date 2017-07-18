@@ -22,7 +22,12 @@
 #ifndef MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
 #define MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
 
+#include <memory>
+#include <mutex>
+
 #include "modules/prediction/container/container.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -44,6 +49,26 @@ class PoseContainer : public Container {
    * @param Data message to be inserted in protobuf
    */
   void Insert(const ::google::protobuf::Message& message) override;
+
+  /**
+   * @brief Update the content in pose container by localization.
+   * @param localization The information to update the content in
+   *        the pose container.
+   */
+  void Update(const localization::LocalizationEstimate &localization);
+
+  /**
+   * @brief Transform pose to a perception obstacle.
+   * @return A pointer to a perception obstacle.
+   */
+  apollo::perception::PerceptionObstacle* ToPerceptionObstacle();
+
+ private:
+  std::unique_ptr<apollo::perception::PerceptionObstacle> obstacle_ptr_;
+
+  static std::mutex g_mutex_;
+  static int id_;
+  static apollo::perception::PerceptionObstacle::Type type_;
 };
 
 }  // namespace prediction
