@@ -20,6 +20,8 @@
 
 #include "modules/planning/math/smoothing_spline/spline_2d_kernel.h"
 
+#include <algorithm>
+
 #include "modules/planning/math/smoothing_spline/spline_seg_kernel.h"
 
 namespace apollo {

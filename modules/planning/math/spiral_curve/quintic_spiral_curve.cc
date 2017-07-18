@@ -127,7 +127,7 @@ bool QuinticSpiralCurve::calculate_path() {
       cos_ptp_p4[i] = cos_theta[i] * ptp_p4[i];
       cos_ptp_sg[i] = cos_theta[i] * ptp_sg[i];
       s += ds;
-    };
+    }
 
     // update Jacobian and delta q
     jacobi(0, 0) =
@@ -240,7 +240,7 @@ ErrorCode QuinticSpiralCurve::get_path_vec(
              (2 * k);
     result[k].set_x(result[k].s() * dx + result[0].x());
     result[k].set_y(result[k].s() * dy + result[0].y());
-  };
+  }
 
   return ErrorCode::OK;
 }

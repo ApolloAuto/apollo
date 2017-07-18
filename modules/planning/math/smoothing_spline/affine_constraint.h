@@ -30,10 +30,10 @@ namespace planning {
 class AffineConstraint {
  public:
   AffineConstraint() = default;
-  AffineConstraint(const bool is_equality);
-  AffineConstraint(const Eigen::MatrixXd& constraint_matrix,
-                   const Eigen::MatrixXd& constraint_boundary,
-                   const bool is_equality);
+  explicit AffineConstraint(const bool is_equality);
+  explicit AffineConstraint(const Eigen::MatrixXd& constraint_matrix,
+                            const Eigen::MatrixXd& constraint_boundary,
+                            const bool is_equality);
 
   void set_is_equality(const double is_equality);
 

@@ -19,7 +19,9 @@
  **/
 #include "modules/planning/math/qp_solver/active_set_qp_solver.h"
 
+#include <algorithm>
 #include <climits>
+#include <vector>
 #include "include/qpOASES.hpp"
 
 #include "modules/planning/common/planning_gflags.h"
@@ -59,8 +61,8 @@ bool ActiveSetQPSolver::solve() {
 
   // qp_problem.setOptions(my_options);
   // definition of qpOASESproblem
-  double h_matrix[kernel_matrix_.rows() * kernel_matrix_.cols()];
-  double g_matrix[offset_.rows() * 1];
+  double h_matrix[kernel_matrix_.rows() * kernel_matrix_.cols()];  // NOLINT
+  double g_matrix[offset_.rows()];                                 // NOLINT
   int index = 0;
 
   for (int r = 0; r < kernel_matrix_.rows(); ++r) {
@@ -72,23 +74,23 @@ bool ActiveSetQPSolver::solve() {
   }
 
   // search space lower bound and uppper bound
-  double lower_bound[num_param_];
-  double upper_bound[num_param_];
+  double lower_bound[num_param_];  // NOLINT
+  double upper_bound[num_param_];  // NOLINT
 
-  // TODO: Haoyang Fan change this to a configurable version
+  // TODO(fanhaoyang): Haoyang Fan change this to a configurable version
   for (int i = 0; i < num_param_; ++i) {
     lower_bound[i] = l_lower_bound_;
     upper_bound[i] = l_upper_bound_;
   }
 
   // constraint matrix construction
-  double affine_constraint_matrix[num_param_ * num_constraint_];
-  double constraint_lower_bound[num_constraint_];
-  double constraint_upper_bound[num_constraint_];
+  double affine_constraint_matrix[num_param_ * num_constraint_];  // NOLINT
+  double constraint_lower_bound[num_constraint_];                 // NOLINT
+  double constraint_upper_bound[num_constraint_];                 // NOLINT
   index = 0;
 
   for (int r = 0; r < affine_equality_matrix_.rows(); ++r) {
-    // TODO: change to a configurable version
+    // TODO(fanhaoyang): change to a configurable version
     constraint_lower_bound[r] = affine_equality_boundary_(r, 0);
     constraint_upper_bound[r] = affine_equality_boundary_(r, 0);
 
@@ -103,7 +105,7 @@ bool ActiveSetQPSolver::solve() {
     constraint_upper_bound[r + affine_equality_boundary_.rows()] =
         constraint_upper_bound_;
 
-    // TODO: change to a configurable version
+    // TODO(fanhaoyang): change to a configurable version
     for (int c = 0; c < num_param_; ++c) {
       affine_constraint_matrix[index++] = affine_inequality_matrix_(r, c);
     }
@@ -117,9 +119,9 @@ bool ActiveSetQPSolver::solve() {
                       constraint_upper_bound,
                       max_iter) != qpOASES::SUCCESSFUL_RETURN) {
     return false;
-  };
+  }
 
-  double result[num_param_];
+  double result[num_param_];  // NOLINT
 
   qp_problem.getPrimalSolution(result);
 
@@ -136,50 +138,50 @@ bool ActiveSetQPSolver::solve() {
   return false;
 }
 
-void ActiveSetQPSolver::set_qp_eps_num(const double eps) { qp_eps_num_ = eps; };
+void ActiveSetQPSolver::set_qp_eps_num(const double eps) { qp_eps_num_ = eps; }
 
-void ActiveSetQPSolver::set_qp_eps_den(const double eps) { qp_eps_den_ = eps; };
+void ActiveSetQPSolver::set_qp_eps_den(const double eps) { qp_eps_den_ = eps; }
 
 void ActiveSetQPSolver::set_qp_eps_iter_ref(const double eps) {
   qp_eps_iter_ref_ = eps;
-};
+}
 
 void ActiveSetQPSolver::set_debug_info(const bool enable) {
   debug_info_ = enable;
-};
+}
 
 void ActiveSetQPSolver::set_l_lower_bound(const double l_lower_bound) {
   l_lower_bound_ = l_lower_bound;
-};
+}
 
 void ActiveSetQPSolver::set_l_upper_bound(const double l_upper_bound) {
   l_upper_bound_ = l_upper_bound;
-};
+}
 
 void ActiveSetQPSolver::set_constraint_upper_bound(
     const double la_upper_bound) {
   constraint_upper_bound_ = la_upper_bound;
-};
+}
 
 void ActiveSetQPSolver::set_max_iteration(const int max_iter) {
   max_iteration_ = max_iter;
 }
 
-double ActiveSetQPSolver::qp_eps_num() const { return qp_eps_num_; };
+double ActiveSetQPSolver::qp_eps_num() const { return qp_eps_num_; }
 
-double ActiveSetQPSolver::qp_eps_den() const { return qp_eps_den_; };
+double ActiveSetQPSolver::qp_eps_den() const { return qp_eps_den_; }
 
-double ActiveSetQPSolver::qp_eps_iter_ref() const { return qp_eps_iter_ref_; };
+double ActiveSetQPSolver::qp_eps_iter_ref() const { return qp_eps_iter_ref_; }
 
-bool ActiveSetQPSolver::debug_info() const { return debug_info_; };
+bool ActiveSetQPSolver::debug_info() const { return debug_info_; }
 
-double ActiveSetQPSolver::l_lower_bound() const { return l_lower_bound_; };
+double ActiveSetQPSolver::l_lower_bound() const { return l_lower_bound_; }
 
-double ActiveSetQPSolver::l_upper_bound() const { return l_upper_bound_; };
+double ActiveSetQPSolver::l_upper_bound() const { return l_upper_bound_; }
 
 double ActiveSetQPSolver::constraint_upper_bound() const {
   return constraint_upper_bound_;
-};
+}
 
 int ActiveSetQPSolver::max_iteration() const { return max_iteration_; }
 // pure virtual

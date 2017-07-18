@@ -49,6 +49,7 @@
 #define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_GENERATOR_H_
 
 #include <memory>
+#include <vector>
 
 #include "Eigen/Core"
 #include "glog/logging.h"
@@ -94,6 +95,7 @@ class Spline1dGenerator {
   Eigen::MatrixXd init_z_;
   Eigen::MatrixXd init_s_;
 };
+
 }  // namespace planning
 }  // namespace apollo
 
