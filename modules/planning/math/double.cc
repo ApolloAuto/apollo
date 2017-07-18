@@ -27,10 +27,6 @@ Double::Double(const double value) : value_(value) {
   CHECK(!std::isnan(value));
 }
 
-Double::Double(const Double& other) : value_(other.value()) {
-  CHECK(!std::isnan(other.value()));
-}
-
 double Double::value() const { return value_; }
 
 int Double::compare(const double d1, const double d2, const double epsilon) {
