@@ -28,13 +28,10 @@ namespace planning {
 using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 
-EMPlanner::EMPlanner() {
-}
+EMPlanner::EMPlanner() {}
 
-bool EMPlanner::Plan(
-    const TrajectoryPoint& start_point,
-    std::vector<TrajectoryPoint>* discretized_trajectory) {
-
+bool EMPlanner::Plan(const TrajectoryPoint& start_point,
+                     std::vector<TrajectoryPoint>* discretized_trajectory) {
   return true;
 }
 

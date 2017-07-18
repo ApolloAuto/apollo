@@ -28,43 +28,27 @@
 namespace apollo {
 namespace planning {
 
-LogicPoint::LogicPoint(const double x,
-                       const double y,
-                       const double s,
-                       const double heading,
-                       const double kappa,
+LogicPoint::LogicPoint(const double x, const double y, const double s,
+                       const double heading, const double kappa,
                        const double dkappa)
     : ::apollo::common::math::Vec2d(x, y),
       _s(s),
       _heading(heading),
       _kappa(kappa),
       _dkappa(dkappa),
-      _lane_id("") {
-}
+      _lane_id("") {}
 
-double LogicPoint::s() const {
-  return _s;
-}
+double LogicPoint::s() const { return _s; }
 
-double LogicPoint::heading() const {
-  return _heading;
-}
+double LogicPoint::heading() const { return _heading; }
 
-double LogicPoint::kappa() const {
-  return _kappa;
-}
+double LogicPoint::kappa() const { return _kappa; }
 
-double LogicPoint::dkappa() const {
-  return _dkappa;
-}
+double LogicPoint::dkappa() const { return _dkappa; }
 
-void LogicPoint::set_lane_id(const std::string &lane_id) {
-  _lane_id = lane_id;
-}
+void LogicPoint::set_lane_id(const std::string &lane_id) { _lane_id = lane_id; }
 
-const std::string &LogicPoint::lane_id() const {
-  return _lane_id;
-}
+const std::string &LogicPoint::lane_id() const { return _lane_id; }
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
