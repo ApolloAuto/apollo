@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//third_party/json",
-        "@websocketpp//:websocketpp",
+        "@civetweb//:civetweb++",
     ],
 )
 
@@ -27,7 +27,6 @@ cc_test(
         ":websocket",
         "//modules/common:log",
         "@gtest//:main",
-        "@websocketpp//:websocketpp",
     ],
 )
 

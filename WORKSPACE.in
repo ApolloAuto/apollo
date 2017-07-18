@@ -147,15 +147,6 @@ new_http_archive(
     strip_prefix = "eigen-eigen-b9cd8366d4e8",
 )
 
-# websocket++/websocketpp
-new_http_archive(
-    name = "websocketpp",
-    url = "https://github.com/zaphoyd/websocketpp/archive/0.7.0.tar.gz",
-    sha256 = "07b3364ad30cda022d91759d4b83ff902e1ebadb796969e58b59caa535a03923",
-    build_file = "third_party/websocketpp.BUILD",
-    strip_prefix = "websocketpp-0.7.0",
-)
-
 # CivetWeb (web server)
 new_http_archive(
     name = "civetweb",
