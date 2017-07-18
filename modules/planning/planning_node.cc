@@ -86,10 +86,12 @@ void PlanningNode::RunOnce() {
       planning_cycle_time;
 
   std::vector<TrajectoryPoint> planning_trajectory;
-  bool res_planning = planning_.Plan(vehicle_state, is_on_auto_mode,
-      execution_start_time, &planning_trajectory);
+  bool res_planning =
+      planning_.Plan(vehicle_state, is_on_auto_mode, execution_start_time,
+                     &planning_trajectory);
   if (res_planning) {
-    TrajectoryPb trajectory_pb = ToTrajectoryPb(execution_start_time, planning_trajectory);
+    TrajectoryPb trajectory_pb =
+        ToTrajectoryPb(execution_start_time, planning_trajectory);
     AdapterManager::PublishPlanningTrajectory(trajectory_pb);
     AINFO << "Planning succeeded";
   } else {
@@ -97,9 +99,7 @@ void PlanningNode::RunOnce() {
   }
 }
 
-void PlanningNode::Reset() {
-  planning_.Reset();
-}
+void PlanningNode::Reset() { planning_.Reset(); }
 
 TrajectoryPb PlanningNode::ToTrajectoryPb(
     const double header_time,

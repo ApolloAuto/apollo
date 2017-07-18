@@ -35,7 +35,6 @@ RTKReplayPlanner::RTKReplayPlanner() {
 bool RTKReplayPlanner::Plan(
     const TrajectoryPoint& start_point,
     std::vector<TrajectoryPoint>* ptr_discretized_trajectory) {
-
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     AERROR << "RTKReplayPlanner doesn't have a recorded trajectory or "
               "the recorded trajectory doesn't have enough valid trajectory "
@@ -68,8 +67,8 @@ bool RTKReplayPlanner::Plan(
   while (ptr_discretized_trajectory->size() < FLAGS_rtk_trajectory_forward) {
     ptr_discretized_trajectory->push_back(ptr_discretized_trajectory->back());
     auto& last_point = ptr_discretized_trajectory->back();
-    last_point.set_relative_time(
-        last_point.relative_time() + FLAGS_trajectory_resolution);
+    last_point.set_relative_time(last_point.relative_time() +
+                                 FLAGS_trajectory_resolution);
   }
   return true;
 }
@@ -97,7 +96,8 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
 
     auto tokens = apollo::common::util::StringTokenizer::Split(line, "\t ");
     if (tokens.size() < 11) {
-      AERROR << "RTKReplayPlanner parse line failed; the data dimension does not match.";
+      AERROR << "RTKReplayPlanner parse line failed; the data dimension does "
+                "not match.";
       AERROR << line;
       continue;
     }
@@ -137,8 +137,8 @@ std::size_t RTKReplayPlanner::QueryPositionMatchedPoint(
                                       start_point.y());
   std::size_t index_min = 0;
   for (std::size_t i = 1; i < trajectory.size(); ++i) {
-    double d_temp = func_distance_square(trajectory[i], start_point.x(),
-                                         start_point.y());
+    double d_temp =
+        func_distance_square(trajectory[i], start_point.x(), start_point.y());
     if (d_temp < d_min) {
       d_min = d_temp;
       index_min = i;
