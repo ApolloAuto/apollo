@@ -44,7 +44,7 @@ class Predictor {
   virtual ~Predictor() = default;
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
+#endif  // MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_

@@ -28,5 +28,5 @@ const Evaluator* EvaluatorManager::GetEvaluator() {
 void EvaluatorManager::Run(
     const ::apollo::perception::PerceptionObstacles& perception_obstacles) {}
 
-} 
-}
+}  // namespace prediction
+}  // namespace apollo

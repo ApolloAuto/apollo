@@ -57,7 +57,7 @@ class EvaluatorFactory
   DECLARE_SINGLETON(EvaluatorFactory);
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_EVALUATOR_EVALUATOR_FACTORY_H_
+#endif  // MODULES_PREDICTION_EVALUATOR_EVALUATOR_FACTORY_H_

@@ -48,12 +48,14 @@ class PredictorManager {
    */
   const Predictor* GetPredictor();
 
-  void Run(const ::apollo::perception::PerceptionObstacles& perception_obstacles);
+  void Run(
+      const ::apollo::perception::PerceptionObstacles& perception_obstacles);
 
   DECLARE_SINGLETON(PredictorManager)
 };
 
-} // namespace prediction
-} // namespace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
+#endif  // MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
+
