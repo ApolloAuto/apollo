@@ -56,5 +56,5 @@ void ContainerManager::RegisterContainer(const std::string& name) {
   containers_[name] = CreateContainer(name);
 }
 
-} 
-}
+}  // namespace prediction
+}  // namespace apollo

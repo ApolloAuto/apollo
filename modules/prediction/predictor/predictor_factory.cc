@@ -39,5 +39,5 @@ std::unique_ptr<Predictor> PredictorFactory::CreatePredictor(
   return predictor;
 }
 
-}
-}
+}  // namespace prediction
+}  // namespace apollo
