@@ -39,7 +39,7 @@ double PIDController::Control(const double error, const double dt) {
   // integral handling
   if (!integrator_enabled_) {
     integral_ = 0;
-  } else if (integrator_enabled_ && !integrator_hold_) {
+  } else if (!integrator_hold_) {
     integral_ += error * dt * ki_;
     // apply Ki before integrating to avoid steps when change Ki at steady state
     if (integral_ > saturation_high_) {
