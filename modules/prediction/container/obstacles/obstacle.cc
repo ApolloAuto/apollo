@@ -16,7 +16,6 @@
 
 #include "modules/prediction/container/obstacles/obstacle.h"
 
-#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <unordered_set>
