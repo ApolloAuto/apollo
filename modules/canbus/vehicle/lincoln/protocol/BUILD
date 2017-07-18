@@ -23,7 +23,7 @@ cc_library(
         "tirepressure_71.cc",
         "turnsignal_68.cc",
         "version_7f.cc",
-        "wheelspeed_6a.cc"
+        "wheelspeed_6a.cc",
     ],
     hdrs = [
         "accel_6b.h",
@@ -46,7 +46,7 @@ cc_library(
         "tirepressure_71.h",
         "turnsignal_68.h",
         "version_7f.h",
-        "wheelspeed_6a.h"
+        "wheelspeed_6a.h",
     ],
     deps = [
         "//modules/canbus/common:canbus_common",

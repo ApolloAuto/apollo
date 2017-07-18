@@ -288,21 +288,22 @@ function run_lint() {
 }
 
 function clean() {
-   bazel clean --async
+  bazel clean --async
 }
 
 function buildify() {
-   wget \
-   https://github.com/bazelbuild/buildtools/releases/download/0.4.5/buildifier \
-   -O ~/.buildifier
-   chmod +x ~/.buildifier
-   find . -name BUILD -type f -exec ~/.buildifier -showlog -mode=fix {} +
-   if [ $? -eq 0 ]; then
-     success 'Buildify worked!'
-   else
-     fail 'Buildify failed!'
-   fi
-   rm ~/.buildifier
+  START_TIME=$(get_now)
+
+  local buildifier_url=https://github.com/bazelbuild/buildtools/releases/download/0.4.5/buildifier
+  wget $buildifier_url -O ~/.buildifier
+  chmod +x ~/.buildifier
+  find . -name BUILD -type f -exec ~/.buildifier -showlog -mode=fix {} +
+  if [ $? -eq 0 ]; then
+    success 'Buildify worked!'
+  else
+    fail 'Buildify failed!'
+  fi
+  rm ~/.buildifier
 }
 
 function print_usage() {
@@ -337,48 +338,48 @@ function version() {
 }
 
 function build_gnss() {
-    CURRENT_PATH=$(pwd)
-    MACHINE_ARCH="$(uname -m)"
-    INSTALL_PATH="${CURRENT_PATH}/third_party/ros_${MACHINE_ARCH}"
+  CURRENT_PATH=$(pwd)
+  MACHINE_ARCH="$(uname -m)"
+  INSTALL_PATH="${CURRENT_PATH}/third_party/ros_${MACHINE_ARCH}"
 
-    source "${INSTALL_PATH}/setup.bash"
+  source "${INSTALL_PATH}/setup.bash"
 
-    protoc modules/common/proto/error_code.proto --cpp_out=./
-    protoc modules/common/proto/header.proto --cpp_out=./
-    protoc modules/common/proto/geometry.proto --cpp_out=./
+  protoc modules/common/proto/error_code.proto --cpp_out=./
+  protoc modules/common/proto/header.proto --cpp_out=./
+  protoc modules/common/proto/geometry.proto --cpp_out=./
 
-    protoc modules/localization/proto/imu.proto --cpp_out=./
-    protoc modules/localization/proto/gps.proto --cpp_out=./
-    protoc modules/localization/proto/pose.proto --cpp_out=./
+  protoc modules/localization/proto/imu.proto --cpp_out=./
+  protoc modules/localization/proto/gps.proto --cpp_out=./
+  protoc modules/localization/proto/pose.proto --cpp_out=./
 
-    protoc modules/drivers/gnss/proto/gnss.proto --cpp_out=./
-    protoc modules/drivers/gnss/proto/imu.proto --cpp_out=./
-    protoc modules/drivers/gnss/proto/ins.proto --cpp_out=./
-    protoc modules/drivers/gnss/proto/config.proto --cpp_out=./
-    protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./
-    protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gnss.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/imu.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/ins.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/config.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
 
-    cd modules
-    catkin_make_isolated --install --source drivers \
-        --install-space "${INSTALL_PATH}" -DCMAKE_BUILD_TYPE=Release \
-        --cmake-args --no-warn-unused-cli
-    find "${INSTALL_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-    cd -
+  cd modules
+  catkin_make_isolated --install --source drivers \
+    --install-space "${INSTALL_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${INSTALL_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
 
-    rm -rf modules/common/proto/*.pb.cc
-    rm -rf modules/common/proto/*.pb.h
-    rm -rf modules/drivers/gnss/proto/*.pb.cc
-    rm -rf modules/drivers/gnss/proto/*.pb.h
-    rm -rf modules/localization/proto/*.pb.cc
-    rm -rf modules/localization/proto/*.pb.h
+  rm -rf modules/common/proto/*.pb.cc
+  rm -rf modules/common/proto/*.pb.h
+  rm -rf modules/drivers/gnss/proto/*.pb.cc
+  rm -rf modules/drivers/gnss/proto/*.pb.h
+  rm -rf modules/localization/proto/*.pb.cc
+  rm -rf modules/localization/proto/*.pb.h
 
-    rm -rf modules/.catkin_workspace
-    rm -rf modules/build_isolated/
-    rm -rf modules/devel_isolated/
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
 }
 
 function config() {
-    ${APOLLO_ROOT_DIR}/scripts/configurator.sh
+  ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
 
 function main() {
