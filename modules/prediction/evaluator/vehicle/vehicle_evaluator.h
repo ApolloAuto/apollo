@@ -16,38 +16,43 @@
 
 /**
  * @file
- * @brief Define the data container base class
+ * @brief Define the vehicle evaluator.
  */
 
-#ifndef MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
-#define MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
+#ifndef MODULES_PREDICTION_EVALUATOR_VEHICLE_VEHICLE_EVALUATOR_H_
+#define MODULES_PREDICTION_EVALUATOR_VEHICLE_VEHICLE_EVALUATOR_H_
 
-#include "google/protobuf/message.h"
+#include <string>
+#include <memory>
+#include <unordered_map>
+
+#include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
-/**
- * @namespace apollo::prediction
- * @brief apollo::prediction
- */
+
 namespace apollo {
 namespace prediction {
 
-class Evaluator {
+class VehicleEvaluator : public Evaluator {
  public:
-  /**
-   * @brief Constructor
-   */
-  Evaluator() = default;
+  VehicleEvaluator();
 
-  /**
-   * @brief Destructor
-   */
-  virtual ~Evaluator() = default;
+  virtual ~VehicleEvaluator();
 
-  virtual void Evaluate(Obstacle* obstacle) = 0;
+  void Evaluate(Obstacle* obstacle);
+
+  void Clear();
+
+ private:
+  void RegisterClass(const std::string& name, std::unique_ptr<Evaluator> ptr);
+
+  void Init();
+
+ private:
+  Evaluator* evaluator_;
+  std::unordered_map<std::string, std::unique_ptr<Evaluator>> map_evaluators_;
 };
 
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
-
+#endif  // MODULES_PREDICTION_EVALUATOR_VEHICLE_VEHICLE_EVALUATOR_H_
