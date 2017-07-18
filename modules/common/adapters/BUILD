@@ -28,8 +28,8 @@ cc_library(
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/monitor/proto:monitor_proto",
         "//modules/common/util",
-        "@ros//:ros_common",
         "@glog//:glog",
+        "@ros//:ros_common",
     ],
 )
 
