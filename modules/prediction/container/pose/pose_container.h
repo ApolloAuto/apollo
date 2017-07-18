@@ -14,22 +14,39 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
-#define MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+/**
+ * @file
+ * @brief Obstacles container
+ */
 
-#include "gflags/gflags.h"
+#ifndef MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
+#define MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
 
-// System gflags
-DECLARE_string(prediction_module_name);
-DECLARE_string(prediction_conf_file);
+#include "modules/prediction/container/container.h"
 
-DECLARE_double(double_precision);
-DECLARE_double(max_acc);
-DECLARE_double(min_acc);
-DECLARE_double(q_var);
-DECLARE_double(r_var);
-DECLARE_double(p_var);
-DECLARE_double(go_approach_rate);
-DECLARE_double(cutin_approach_rate);
+namespace apollo {
+namespace prediction {
 
-#endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+class PoseContainer : public Container {
+ public:
+  /**
+   * @brief Constructor
+   */
+  explicit PoseContainer() = default;
+
+  /**
+   * @brief Destructor
+   */
+  virtual ~PoseContainer() = default;
+
+  /**
+   * @brief Insert a data message into the container
+   * @param Data message to be inserted in protobuf
+   */
+  virtual void Insert(const ::google::protobuf::Message& message) override;
+};
+
+} // namespace prediction
+} // namespace apollo
+
+#endif // MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_

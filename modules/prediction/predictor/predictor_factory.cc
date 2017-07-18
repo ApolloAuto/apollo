@@ -14,22 +14,30 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
-#define MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+#include "modules/prediction/predictor/predictor_factory.h"
 
-#include "gflags/gflags.h"
+#include "modules/common/log.h"
 
-// System gflags
-DECLARE_string(prediction_module_name);
-DECLARE_string(prediction_conf_file);
+namespace apollo {
+namespace prediction {
 
-DECLARE_double(double_precision);
-DECLARE_double(max_acc);
-DECLARE_double(min_acc);
-DECLARE_double(q_var);
-DECLARE_double(r_var);
-DECLARE_double(p_var);
-DECLARE_double(go_approach_rate);
-DECLARE_double(cutin_approach_rate);
+PredictorFactory::PredictorFactory() {}
 
-#endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+void PredictorFactory::RegisterPredictor() {
+    Register(ObstacleConf::DEF_VEHICLE_PRED,
+        []() -> Predictor* { return nullptr; });
+}
+
+std::unique_ptr<Predictor> PredictorFactory::CreatePredictor(
+    const ObstacleConf::Pred& pred) {
+  auto predictor = CreateObject(pred);
+  if (!predictor) {
+    AERROR << "Failed to create a predictor with " << pred;
+  } else {
+    ADEBUG << "Succeeded in creating a predictor with " << pred;
+  }
+  return predictor;
+}
+
+}
+}

@@ -14,22 +14,43 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
-#define MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+/**
+ * @file
+ * @brief Define the data container base class
+ */
 
-#include "gflags/gflags.h"
+#ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_H_
+#define MODULES_PREDICTION_CONTAINER_CONTAINER_H_
 
-// System gflags
-DECLARE_string(prediction_module_name);
-DECLARE_string(prediction_conf_file);
+#include <google/protobuf/message.h>
 
-DECLARE_double(double_precision);
-DECLARE_double(max_acc);
-DECLARE_double(min_acc);
-DECLARE_double(q_var);
-DECLARE_double(r_var);
-DECLARE_double(p_var);
-DECLARE_double(go_approach_rate);
-DECLARE_double(cutin_approach_rate);
+/**
+ * @namespace apollo::prediction
+ * @brief apollo::prediction
+ */
+namespace apollo {
+namespace prediction {
 
-#endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+class Container {
+ public:
+  /**
+   * @brief Constructor
+   */
+  Container() = default;
+
+  /**
+   * @brief Destructor
+   */
+  virtual ~Container() = default;
+
+  /**
+   * @brief Insert data into the container
+   * @param Message data in protobuf format
+   */
+  virtual void Insert(const ::google::protobuf::Message& message) = 0;
+};
+
+} // namespace prediction
+} // namespace apollo
+
+#endif // MODULES_PREDICTION_CONTAINER_CONTAINER_H_

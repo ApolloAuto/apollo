@@ -14,22 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
-#define MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+#include "modules/prediction/predictor/predictor_manager.h"
 
-#include "gflags/gflags.h"
+namespace apollo {
+namespace prediction {
 
-// System gflags
-DECLARE_string(prediction_module_name);
-DECLARE_string(prediction_conf_file);
+PredictorManager::PredictorManager() {}
 
-DECLARE_double(double_precision);
-DECLARE_double(max_acc);
-DECLARE_double(min_acc);
-DECLARE_double(q_var);
-DECLARE_double(r_var);
-DECLARE_double(p_var);
-DECLARE_double(go_approach_rate);
-DECLARE_double(cutin_approach_rate);
+const Predictor* PredictorManager::GetPredictor() {
+  return nullptr;
+}
 
-#endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+void PredictorManager::Run(
+    const ::apollo::perception::PerceptionObstacles& perception_obstacles) {}
+
+} 
+}

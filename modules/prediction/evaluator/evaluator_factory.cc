@@ -14,22 +14,30 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
-#define MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+#include "modules/prediction/evaluator/evaluator_factory.h"
 
-#include "gflags/gflags.h"
+#include "modules/common/log.h"
 
-// System gflags
-DECLARE_string(prediction_module_name);
-DECLARE_string(prediction_conf_file);
+namespace apollo {
+namespace prediction {
 
-DECLARE_double(double_precision);
-DECLARE_double(max_acc);
-DECLARE_double(min_acc);
-DECLARE_double(q_var);
-DECLARE_double(r_var);
-DECLARE_double(p_var);
-DECLARE_double(go_approach_rate);
-DECLARE_double(cutin_approach_rate);
+EvaluatorFactory::EvaluatorFactory() {}
 
-#endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+void EvaluatorFactory::RegisterEvaluator() {
+    Register(ObstacleConf::DEF_EVAL,
+        []() -> Evaluator* { return nullptr; });
+}
+
+std::unique_ptr<Evaluator> EvaluatorFactory::CreateEvaluator(
+    const ObstacleConf::Eval& eval) {
+  auto evaluator = CreateObject(eval);
+  if (!evaluator) {
+    AERROR << "Failed to create an evaluator with " << eval;
+  } else {
+    ADEBUG << "Succeeded in creating an evaluator with " << eval;
+  }
+  return evaluator;
+}
+
+}
+}
