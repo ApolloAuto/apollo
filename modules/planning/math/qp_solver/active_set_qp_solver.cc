@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <climits>
 #include <vector>
-#include "include/qpOASES.hpp"
 
 #include "modules/planning/common/planning_gflags.h"
 
