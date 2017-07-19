@@ -77,6 +77,6 @@ TEST_F(FileTest, RemoveAllFiles) {
   EXPECT_FALSE(GetProtoFromASCIIFile(path2, &message));
 }
 
-}  // namespace file
+}  // namespace util
 }  // namespace common
 }  // namespace apollo
