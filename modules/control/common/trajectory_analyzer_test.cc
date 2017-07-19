@@ -91,8 +91,8 @@ TEST_F(TrajectoryAnalyzerTest, Constructor) {
   EXPECT_EQ(trajectory_analyzer.trajectory_points().size(), 5);
   int i = 0;
   for (auto& point : trajectory_analyzer.trajectory_points()) {
-    EXPECT_EQ(xs[i], point.x());
-    EXPECT_EQ(ys[i], point.y());
+    EXPECT_EQ(xs[i], point.path_point().x());
+    EXPECT_EQ(ys[i], point.path_point().y());
     ++i;
   }
   EXPECT_EQ(trajectory_analyzer.seq_num(), 123);
@@ -159,17 +159,17 @@ TEST_F(TrajectoryAnalyzerTest, QueryNearestPointByAbsoluteTimeInterpolation) {
   current_time = apollo::common::time::ToSecond(Clock::Now()) - 20.0;
   TrajectoryPoint point_2 =
       trajectory_analyzer.QueryNearestPointByAbsoluteTime(current_time);
-  EXPECT_NEAR(point_2.x(), 1.0, 1e-6);
+  EXPECT_NEAR(point_2.path_point().x(), 1.0, 1e-6);
 
   current_time = timestamp_ + 50.0;
   TrajectoryPoint point_4 =
       trajectory_analyzer.QueryNearestPointByAbsoluteTime(current_time);
-  EXPECT_NEAR(point_4.x(), 1.4, 1e-6);
+  EXPECT_NEAR(point_4.path_point().x(), 1.4, 1e-6);
 
   current_time = timestamp_ + 0.03;
   TrajectoryPoint point_6 =
       trajectory_analyzer.QueryNearestPointByAbsoluteTime(current_time);
-  EXPECT_NEAR(point_6.x(), 1.0, 1e-6);
+  EXPECT_NEAR(point_6.path_point().x(), 1.0, 1e-6);
 }
 
 }  // namespace control

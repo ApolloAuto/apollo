@@ -16,8 +16,8 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planning.h"
 #include "modules/planning/planner/rtk_replay_planner.h"
+#include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {
@@ -30,14 +30,11 @@ using TrajectoryPb = ADCTrajectory;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 
-std::string Planning::Name() const {
-  return "planning";
-}
+std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
-      PlanningConfig::RTK,
-      []() -> Planner* { return new RTKReplayPlanner(); });
+      PlanningConfig::RTK, []() -> Planner* { return new RTKReplayPlanner(); });
 }
 
 Status Planning::Init() {
@@ -45,20 +42,19 @@ Status Planning::Init() {
                                               &config_)) {
     AERROR << "failed to load planning config file "
            << FLAGS_planning_config_file;
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "failed to load planning config file: " +
-                      FLAGS_planning_config_file);
+    return Status(
+        ErrorCode::PLANNING_ERROR,
+        "failed to load planning config file: " + FLAGS_planning_config_file);
   }
 
   AdapterManager::Init(FLAGS_adapter_config_path);
 
   RegisterPlanners();
-  planner_ =
-      planner_factory_.CreateObject(config_.planner_type());
+  planner_ = planner_factory_.CreateObject(config_.planner_type());
   if (!planner_) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "planning is not initialized with config : " +
-                      config_.DebugString());
+    return Status(
+        ErrorCode::PLANNING_ERROR,
+        "planning is not initialized with config : " + config_.DebugString());
   }
 
   return Status::OK();
@@ -116,9 +112,8 @@ void Planning::RunOnce() {
       planning_cycle_time;
 
   std::vector<TrajectoryPoint> planning_trajectory;
-  bool res_planning =
-      Plan(vehicle_state, is_on_auto_mode, execution_start_time,
-           &planning_trajectory);
+  bool res_planning = Plan(vehicle_state, is_on_auto_mode, execution_start_time,
+                           &planning_trajectory);
   if (res_planning) {
     TrajectoryPb trajectory_pb =
         ToTrajectoryPb(execution_start_time, planning_trajectory);
@@ -131,11 +126,9 @@ void Planning::RunOnce() {
 
 void Planning::Stop() {}
 
-
-
 bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
-                        const bool is_on_auto_mode, const double publish_time,
-                        std::vector<TrajectoryPoint>* planning_trajectory) {
+                    const bool is_on_auto_mode, const double publish_time,
+                    std::vector<TrajectoryPoint>* planning_trajectory) {
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   double execution_start_time = publish_time;
 
@@ -155,8 +148,8 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
     // position and target vehicle position.
     // If the deviation exceeds a specific threshold,
     // it will be unsafe to planning from the matched point.
-    double dx = matched_point.x() - vehicle_state.x();
-    double dy = matched_point.y() - vehicle_state.y();
+    double dx = matched_point.path_point().x() - vehicle_state.x();
+    double dy = matched_point.path_point().y() - vehicle_state.y();
     double position_deviation = std::sqrt(dx * dx + dy * dy);
 
     if (position_deviation < FLAGS_replanning_threshold) {
@@ -229,19 +222,19 @@ TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
   TrajectoryPoint point;
   // point.set_x(estimated_position.x());
   // point.set_y(estimated_position.y());
-  point.set_x(vehicle_state.x());
-  point.set_y(vehicle_state.y());
-  point.set_z(vehicle_state.z());
+  point.mutable_path_point()->set_x(vehicle_state.x());
+  point.mutable_path_point()->set_y(vehicle_state.y());
+  point.mutable_path_point()->set_z(vehicle_state.z());
   point.set_v(vehicle_state.linear_velocity());
   point.set_a(vehicle_state.linear_acceleration());
-  point.set_kappa(0.0);
+  point.mutable_path_point()->set_kappa(0.0);
   const double speed_threshold = 0.1;
   if (point.v() > speed_threshold) {
-    point.set_kappa(vehicle_state.angular_velocity() /
-                    vehicle_state.linear_velocity());
+    point.mutable_path_point()->set_kappa(vehicle_state.angular_velocity() /
+                                          vehicle_state.linear_velocity());
   }
-  point.set_dkappa(0.0);
-  point.set_s(0.0);
+  point.mutable_path_point()->set_dkappa(0.0);
+  point.mutable_path_point()->set_s(0.0);
   point.set_relative_time(0.0);
   return point;
 }
@@ -279,15 +272,17 @@ TrajectoryPb Planning::ToTrajectoryPb(
 
   for (const auto& trajectory_point : discretized_trajectory) {
     auto ptr_trajectory_point_pb = trajectory_pb.add_adc_trajectory_point();
-    ptr_trajectory_point_pb->set_x(trajectory_point.x());
-    ptr_trajectory_point_pb->set_y(trajectory_point.y());
-    ptr_trajectory_point_pb->set_theta(trajectory_point.theta());
-    ptr_trajectory_point_pb->set_curvature(trajectory_point.kappa());
+    ptr_trajectory_point_pb->set_x(trajectory_point.path_point().x());
+    ptr_trajectory_point_pb->set_y(trajectory_point.path_point().y());
+    ptr_trajectory_point_pb->set_theta(trajectory_point.path_point().theta());
+    ptr_trajectory_point_pb->set_curvature(
+        trajectory_point.path_point().kappa());
     ptr_trajectory_point_pb->set_relative_time(
         trajectory_point.relative_time());
     ptr_trajectory_point_pb->set_speed(trajectory_point.v());
     ptr_trajectory_point_pb->set_acceleration_s(trajectory_point.a());
-    ptr_trajectory_point_pb->set_accumulated_s(trajectory_point.s());
+    ptr_trajectory_point_pb->set_accumulated_s(
+        trajectory_point.path_point().s());
   }
   return std::move(trajectory_pb);
 }
