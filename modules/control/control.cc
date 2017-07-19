@@ -192,6 +192,7 @@ Status Control::ProduceControlCommand(ControlCommand* control_command) {
     control_command->set_speed(0);
     control_command->set_throttle(0);
     control_command->set_brake(control_conf_.soft_estop_brake());
+    control_command->set_gear_location(::apollo::canbus::Chassis::GEAR_DRIVE);
   }
   // check signal
   if (trajectory_.has_signal()) {
@@ -204,8 +205,6 @@ void Control::OnTimer(const ros::TimerEvent&) {
   double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
 
   ControlCommand control_command;
-
-  control_command.set_gear_location(::apollo::canbus::Chassis::GEAR_DRIVE);
 
   Status status = ProduceControlCommand(&control_command);
   if (!status.ok()) {

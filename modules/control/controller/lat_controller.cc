@@ -347,6 +347,11 @@ void LatController::UpdateState(SimpleLateralDebug* debug) {
   debug->set_heading_error(common::math::NormalizeAngle(
       vehicle_state_.heading() - traj_point.theta()));
 
+  // Reverse heading error if vehicle is going in reverse
+  if (vehicle_state_.gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+    debug->set_heading_error(-debug->heading_error());
+  }
+
   // heading_error_rate_ = (heading_error_ - previous_heading_error_) / ts_;
   debug->set_heading_error_rate(
       (debug->heading_error() - previous_heading_error_) / ts_);
