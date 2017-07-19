@@ -22,7 +22,7 @@ namespace apollo {
 namespace planning {
 
 std::unique_ptr<Planner> PlannerFactory::CreateInstance(
-    const PlannerType& planner_type) {
+    const PlannerType &planner_type) {
   switch (planner_type) {
     case PlannerType::RTK_PLANNER:
       return std::unique_ptr<Planner>(new RTKReplayPlanner());

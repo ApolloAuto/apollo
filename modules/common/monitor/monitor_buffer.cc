@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/monitor/monitor_buffer.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/monitor/monitor.h"
-#include "modules/common/monitor/monitor_buffer.h"
 #include "modules/common/time/time.h"
 
 namespace apollo {
@@ -27,14 +27,14 @@ namespace monitor {
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-MonitorBuffer::MonitorBuffer(Monitor* monitor) : monitor_(monitor) {}
+MonitorBuffer::MonitorBuffer(Monitor *monitor) : monitor_(monitor) {}
 
 void MonitorBuffer::PrintLog() {
   if (monitor_msg_items_.empty()) {
     return;
   }
   const auto level = monitor_msg_items_.back().first;
-  const auto& msg = monitor_msg_items_.back().second;
+  const auto &msg = monitor_msg_items_.back().second;
   switch (level) {
     case MonitorMessageItem::INFO:
       AINFO << msg;
@@ -61,7 +61,7 @@ void MonitorBuffer::Publish() {
   }
 }
 
-MonitorBuffer& MonitorBuffer::operator<<(const std::string& msg) {
+MonitorBuffer &MonitorBuffer::operator<<(const std::string &msg) {
   if (monitor_msg_items_.empty() || monitor_msg_items_.back().first != level_) {
     AddMonitorMsgItem(level_, msg);
   } else {
@@ -70,7 +70,7 @@ MonitorBuffer& MonitorBuffer::operator<<(const std::string& msg) {
   return *this;
 }
 
-MonitorBuffer& MonitorBuffer::operator<<(const char* msg) {
+MonitorBuffer &MonitorBuffer::operator<<(const char *msg) {
   if (msg) {
     std::string msg_str(msg);
     return operator<<(msg_str);
@@ -82,7 +82,7 @@ MonitorBuffer& MonitorBuffer::operator<<(const char* msg) {
 MonitorBuffer::~MonitorBuffer() { Publish(); }
 
 void MonitorBuffer::AddMonitorMsgItem(
-    const MonitorMessageItem::LogLevel log_level, const std::string& msg) {
+    const MonitorMessageItem::LogLevel log_level, const std::string &msg) {
   level_ = log_level;
   monitor_msg_items_.push_back(std::make_pair(log_level, msg));
 }

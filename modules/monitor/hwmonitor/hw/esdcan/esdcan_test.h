@@ -54,9 +54,7 @@ struct EsdCanDetails {
   }
 
   /// Marks a specific field of the given mask as valid.
-  inline void add_valid_field(ValidMasks mask) {
-    valid_flag |= mask;
-  }
+  inline void add_valid_field(ValidMasks mask) { valid_flag |= mask; }
 };
 
 /// Test (check) esdcan of the given id.

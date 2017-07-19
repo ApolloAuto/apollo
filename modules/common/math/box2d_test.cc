@@ -28,8 +28,8 @@ namespace math {
 
 namespace {
 
-bool CheckBoxOverlapSlow(const Box2d& box1, const Box2d& box2,
-                         bool* const ambiguous) {
+bool CheckBoxOverlapSlow(const Box2d &box1, const Box2d &box2,
+                         bool *const ambiguous) {
   double headings[4] = {box1.heading(), box1.heading() + M_PI_2, box2.heading(),
                         box2.heading() + M_PI_2};
   *ambiguous = false;
@@ -44,12 +44,12 @@ bool CheckBoxOverlapSlow(const Box2d& box1, const Box2d& box2,
     double t1 = -std::numeric_limits<double>::infinity();
     double s2 = std::numeric_limits<double>::infinity();
     double t2 = -std::numeric_limits<double>::infinity();
-    for (const auto& p : c1) {
+    for (const auto &p : c1) {
       const double proj = p.x() * cos_heading + p.y() * sin_heading;
       if (proj < s1) s1 = proj;
       if (proj > t1) t1 = proj;
     }
-    for (const auto& p : c2) {
+    for (const auto &p : c2) {
       const double proj = p.x() * cos_heading + p.y() * sin_heading;
       if (proj < s2) s2 = proj;
       if (proj > t2) t2 = proj;

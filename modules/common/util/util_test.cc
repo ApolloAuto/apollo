@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
 #include "modules/common/util/util.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {

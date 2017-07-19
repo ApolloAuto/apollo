@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/configs/config_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/file.h"
 
 namespace apollo {
@@ -28,18 +28,18 @@ VehicleConfigHelper::VehicleConfigHelper() {}
 
 void VehicleConfigHelper::Init() { Init(FLAGS_vehicle_config_path); }
 
-void VehicleConfigHelper::Init(const std::string& config_file) {
+void VehicleConfigHelper::Init(const std::string &config_file) {
   VehicleConfig params;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &params))
       << "Unable to parse adapter config file " << config_file;
   Init(params);
 }
 
-void VehicleConfigHelper::Init(const VehicleConfig& vehicle_params) {
+void VehicleConfigHelper::Init(const VehicleConfig &vehicle_params) {
   vehicle_config_ = vehicle_params;
 }
 
-const VehicleConfig& VehicleConfigHelper::GetConfig() {
+const VehicleConfig &VehicleConfigHelper::GetConfig() {
   return vehicle_config_;
 }
 

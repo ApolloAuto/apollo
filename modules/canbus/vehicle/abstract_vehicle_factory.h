@@ -64,7 +64,7 @@ class AbstractVehicleFactory {
   /**
    * @brief set VehicleParameter.
    */
-  void SetVehicleParameter(const VehicleParameter& vehicle_paramter);
+  void SetVehicleParameter(const VehicleParameter &vehicle_paramter);
 
  private:
   VehicleParameter vehicle_parameter_;
