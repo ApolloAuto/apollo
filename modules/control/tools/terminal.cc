@@ -63,7 +63,7 @@ void send(int cmd_type) {
   AINFO << "send pad_message OK";
 }
 
-void on_chassis(const apollo::canbus::Chassis& chassis) {
+void on_chassis(const apollo::canbus::Chassis &chassis) {
   static bool is_first_emergency_mode = true;
   static int64_t count_start = 0;
   static bool waiting_reset = false;
@@ -127,7 +127,7 @@ void terminal_thread_func() {
 
 }  // end of namespace
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
@@ -139,19 +139,19 @@ int main(int argc, char** argv) {
   apollo::common::adapter::AdapterManagerConfig config;
   config.set_is_ros(true);
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
     sub_config->set_type(apollo::common::adapter::AdapterConfig::PAD);
   }
 
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(apollo::common::adapter::AdapterConfig::CHASSIS);
   }
 
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(apollo::common::adapter::AdapterConfig::LOCALIZATION);
   }

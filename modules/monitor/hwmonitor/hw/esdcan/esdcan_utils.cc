@@ -60,8 +60,7 @@ void esdcan_print_summary(std::ostream &os, const EsdCanDetails &details) {
   }
 }
 
-void esdcan_print_test_result(
-    std::ostream &os, const EsdCanDetails &details) {
+void esdcan_print_test_result(std::ostream &os, const EsdCanDetails &details) {
   if (details.result == NTCAN_SUCCESS) {
     os << "ESD-CAN test PASSED\n" << std::endl;
   } else {
@@ -88,7 +87,6 @@ void esdcan_print_if_status(int id, const CAN_IF_STATUS &if_status) {
       (if_status.hardware >> 8) & 0xf, if_status.hardware & 0xff,
       (unsigned int)if_status.boardstatus);
 }
-
 
 void esdcan_print_stats(const NTCAN_BUS_STATISTIC &stats) {
   printf("CAN bus statistics:\n");

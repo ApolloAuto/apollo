@@ -14,15 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <cmath>
 #include "modules/canbus/vehicle/protocol_data.h"
+#include <cmath>
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace canbus {
 
 // (SUM(input))^0xFF
-uint8_t ProtocolData::CalculateCheckSum(const uint8_t* input,
+uint8_t ProtocolData::CalculateCheckSum(const uint8_t *input,
                                         const uint32_t length) {
   uint8_t sum = 0;
   for (size_t i = 0; i < length; ++i) {
@@ -38,16 +38,16 @@ uint32_t ProtocolData::GetPeriod() const {
 
 int32_t ProtocolData::GetLength() const { return data_length_; }
 
-void ProtocolData::Parse(const uint8_t* /*bytes*/, int32_t /*length*/,
-                         ChassisDetail* /*car_status*/) const {}
+void ProtocolData::Parse(const uint8_t * /*bytes*/, int32_t /*length*/,
+                         ChassisDetail * /*car_status*/) const {}
 
-void ProtocolData::Parse(const uint8_t* bytes, int32_t length,
-                         const struct timeval& timestamp,
-                         ChassisDetail* car_status) const {
+void ProtocolData::Parse(const uint8_t *bytes, int32_t length,
+                         const struct timeval &timestamp,
+                         ChassisDetail *car_status) const {
   Parse(bytes, length, car_status);
 }
 
-void ProtocolData::UpdateData(uint8_t* /*data*/) {}
+void ProtocolData::UpdateData(uint8_t * /*data*/) {}
 
 void ProtocolData::Reset() {}
 

@@ -112,9 +112,7 @@ class Adapter {
   /**
    * @brief returns the topic name that this adapter listens to.
    */
-  const std::string &topic_name() const {
-    return topic_name_;
-  }
+  const std::string &topic_name() const { return topic_name_; }
 
   /**
    * @brief reads the proto message from the file, and push it into
@@ -204,18 +202,14 @@ class Adapter {
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator begin() const {
-    return observed_queue_.begin();
-  }
+  Iterator begin() const { return observed_queue_.begin(); }
 
   /**
    * @brief returns an iterator representing the tail of the observing
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator end() const {
-    return observed_queue_.end();
-  }
+  Iterator end() const { return observed_queue_.end(); }
 
   /**
    * @brief registers the provided callback function to the adapter,
@@ -223,9 +217,7 @@ class Adapter {
    * message hits the adapter.
    * @param callback the callback with signature void(const D &).
    */
-  void SetCallback(Callback callback) {
-    receive_callback_ = callback;
-  }
+  void SetCallback(Callback callback) { receive_callback_ = callback; }
 
   /**
    * @brief fills the fields module_name, timestamp_sec and

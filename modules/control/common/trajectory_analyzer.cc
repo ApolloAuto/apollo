@@ -33,41 +33,35 @@ namespace control {
 namespace {
 
 // Squared distance from the point to (x, y).
-double PointDistanceSquare(const TrajectoryPoint& point,
-                           const double x, const double y) {
+double PointDistanceSquare(const TrajectoryPoint &point, const double x,
+                           const double y) {
   const double dx = point.x() - x;
   const double dy = point.y() - y;
   return dx * dx + dy * dy;
 }
 
-PathPoint TrajectoryPointToPathPoint(const TrajectoryPoint& point) {
+PathPoint TrajectoryPointToPathPoint(const TrajectoryPoint &point) {
   PathPoint result;
-  if (point.has_x())
-    result.set_x(point.x());
-  if (point.has_y())
-    result.set_y(point.y());
-  if (point.has_z())
-    result.set_z(point.z());
-  if (point.has_theta())
-    result.set_theta(point.theta());
-  if (point.has_kappa())
-    result.set_kappa(point.kappa());
-  if (point.has_s())
-    result.set_s(point.s());
+  if (point.has_x()) result.set_x(point.x());
+  if (point.has_y()) result.set_y(point.y());
+  if (point.has_z()) result.set_z(point.z());
+  if (point.has_theta()) result.set_theta(point.theta());
+  if (point.has_kappa()) result.set_kappa(point.kappa());
+  if (point.has_s()) result.set_s(point.s());
   return result;
 }
 
 }  // namespace
 
 TrajectoryAnalyzer::TrajectoryAnalyzer(
-    const planning::ADCTrajectory* planning_published_trajectory) {
+    const planning::ADCTrajectory *planning_published_trajectory) {
   header_time_ = planning_published_trajectory->header().timestamp_sec();
   seq_num_ = planning_published_trajectory->header().sequence_num();
 
   int num_points = planning_published_trajectory->adc_trajectory_point_size();
   trajectory_points_.reserve(num_points);
 
-  for (const auto& published_trajectory_point:
+  for (const auto &published_trajectory_point :
        planning_published_trajectory->adc_trajectory_point()) {
     TrajectoryPoint point;
     point.set_s(published_trajectory_point.accumulated_s());
@@ -119,10 +113,10 @@ PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
 // perpendicular.
 void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
                                            const double theta, const double v,
-                                           const PathPoint& ref_point,
-                                           double* ptr_s, double* ptr_s_dot,
-                                           double* ptr_d,
-                                           double* ptr_d_dot) const {
+                                           const PathPoint &ref_point,
+                                           double *ptr_s, double *ptr_s_dot,
+                                           double *ptr_d,
+                                           double *ptr_d_dot) const {
   double dx = x - ref_point.x();
   double dy = y - ref_point.y();
 
@@ -152,8 +146,8 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
               "Control output might be unstable:"
            << " ref_point.kappa:" << ref_point.kappa()
            << " ref_point.x:" << ref_point.x()
-           << " ref_point.y:" << ref_point.y()
-           << " car x:" << x << " car y:" << y << " *ptr_d:" << *ptr_d
+           << " ref_point.y:" << ref_point.y() << " car x:" << x
+           << " car y:" << y << " *ptr_d:" << *ptr_d
            << " one_minus_kappa_r_d:" << one_minus_kappa_r_d;
     // currently set to a small value to avoid control crash.
     one_minus_kappa_r_d = 0.01;
@@ -169,7 +163,7 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByAbsoluteTime(
 
 TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
     const double t) const {
-  auto func_comp = [](const TrajectoryPoint& point,
+  auto func_comp = [](const TrajectoryPoint &point,
                       const double relative_time) {
     return point.relative_time() < relative_time;
   };
@@ -208,13 +202,13 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByPosition(
   return trajectory_points_[index_min];
 }
 
-const std::vector<TrajectoryPoint>& TrajectoryAnalyzer::trajectory_points()
+const std::vector<TrajectoryPoint> &TrajectoryAnalyzer::trajectory_points()
     const {
   return trajectory_points_;
 }
 
-PathPoint TrajectoryAnalyzer::FindMinDistancePoint(const TrajectoryPoint& p0,
-                                                   const TrajectoryPoint& p1,
+PathPoint TrajectoryAnalyzer::FindMinDistancePoint(const TrajectoryPoint &p0,
+                                                   const TrajectoryPoint &p1,
                                                    const double x,
                                                    const double y) const {
   // given the fact that the discretized trajectory is dense enough,

@@ -17,40 +17,49 @@
 #ifndef MODULES_PLATFORM_ANNOTATIONS_H_
 #define MODULES_PLATFORM_ANNOTATIONS_H_
 
-#define DISALLOW_COPY_AND_ASSIGN(TypeName)                                                         \
-    TypeName(const TypeName&);                                                                     \
-    TypeName& operator=(const TypeName&)
+#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
+  TypeName(const TypeName &);              \
+  TypeName &operator=(const TypeName &)
 
-/// Indicating a pointer class member is not owned by an object of the class; it is the
-/// responsibility of the programmer to make sure the given pointer is valid during the life time
+/// Indicating a pointer class member is not owned by an object of the class; it
+/// is the
+/// responsibility of the programmer to make sure the given pointer is valid
+/// during the life time
 /// of the object.
 #define PTR_NOT_OWNED
 
-/// Indicating a pointer function argument is used by the object of the function for the lifetime
-/// of the object; it is the responsibility of the programmer to make sure the given pointer
+/// Indicating a pointer function argument is used by the object of the function
+/// for the lifetime
+/// of the object; it is the responsibility of the programmer to make sure the
+/// given pointer
 /// is valid during the life time of the object.
 #define PTR_LIFETIME
 
 /// Indicating ownership of a pointer argument is transferred to the callee.
 #define PTR_OWNER_XFR
 
-/// Indicating a pointer function argument is used only in the scope of this function,
-/// will not be used after this function is done (e.g., not saved for future use).
+/// Indicating a pointer function argument is used only in the scope of this
+/// function,
+/// will not be used after this function is done (e.g., not saved for future
+/// use).
 /// This is the default behavior of any pointer argument of a function.
 #define PTR_USE_ONCE
 
-/// Indicating access to the given (data) member is lock-protected by the given lock.
+/// Indicating access to the given (data) member is lock-protected by the given
+/// lock.
 #define XLOCK_BY(lock)
 
 /// Indicating this function will acquire the given exclusive lock(s).
 #define ACQ_LOCK(locks...)
 
-/// Indicating this function should only be called when the given exclusive lock(s) is/are locked.
+/// Indicating this function should only be called when the given exclusive
+/// lock(s) is/are locked.
 #define WITH_LOCK(locks...)
 
 #define THREAD_SAFE
 
-/// Indicating private global variable that is implementation specific and should not be used
+/// Indicating private global variable that is implementation specific and
+/// should not be used
 /// directly.
 #define PRIVATE
 

@@ -109,7 +109,7 @@ class EulerAnglesZXY {
    * @brief Constructs a rotation from quaternion.
    * @param q Quaternion
    */
-  explicit EulerAnglesZXY(const Eigen::Quaternion<T>& q)
+  explicit EulerAnglesZXY(const Eigen::Quaternion<T> &q)
       : EulerAnglesZXY(q.w(), q.x(), q.y(), q.z()) {}
 
   /**

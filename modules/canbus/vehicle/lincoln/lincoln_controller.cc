@@ -42,9 +42,9 @@ const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }
 
-ErrorCode LincolnController::Init(const VehicleParameter& params,
-                                  CanSender* const can_sender,
-                                  MessageManager* const message_manager) {
+ErrorCode LincolnController::Init(const VehicleParameter &params,
+                                  CanSender *const can_sender,
+                                  MessageManager *const message_manager) {
   if (is_initialized_) {
     AINFO << "LincolnController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -68,34 +68,34 @@ ErrorCode LincolnController::Init(const VehicleParameter& params,
   message_manager_ = message_manager;
 
   // sender part
-  brake_60_ = dynamic_cast<Brake60*>(
+  brake_60_ = dynamic_cast<Brake60 *>(
       message_manager_->GetMutableProtocolDataById(Brake60::ID));
   if (brake_60_ == nullptr) {
     AERROR << "Brake60 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  throttle_62_ = dynamic_cast<Throttle62*>(
+  throttle_62_ = dynamic_cast<Throttle62 *>(
       message_manager_->GetMutableProtocolDataById(Throttle62::ID));
   if (throttle_62_ == nullptr) {
     AERROR << "Throttle62 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  steering_64_ = dynamic_cast<Steering64*>(
+  steering_64_ = dynamic_cast<Steering64 *>(
       message_manager_->GetMutableProtocolDataById(Steering64::ID));
   if (steering_64_ == nullptr) {
     AERROR << "Steering64 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  gear_66_ = dynamic_cast<Gear66*>(
+  gear_66_ = dynamic_cast<Gear66 *>(
       message_manager_->GetMutableProtocolDataById(Gear66::ID));
   if (gear_66_ == nullptr) {
     AERROR << "Gear66 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
-  turnsignal_68_ = dynamic_cast<Turnsignal68*>(
+  turnsignal_68_ = dynamic_cast<Turnsignal68 *>(
       message_manager_->GetMutableProtocolDataById(Turnsignal68::ID));
   if (turnsignal_68_ == nullptr) {
     AERROR << "Turnsignal68 does not exist in the LincolnMessageManager!";
@@ -120,7 +120,7 @@ bool LincolnController::Start() {
     AERROR << "LincolnController has NOT been initiated.";
     return false;
   }
-  const auto& update_func = [this] { SecurityDogThreadFunc(); };
+  const auto &update_func = [this] { SecurityDogThreadFunc(); };
   thread_.reset(new std::thread(update_func));
 
   return true;
@@ -443,7 +443,7 @@ void LincolnController::Steer(double angle, double angle_spd) {
       ->set_steering_angle_speed(real_angle_spd);
 }
 
-void LincolnController::SetEpbBreak(const ControlCommand& command) {
+void LincolnController::SetEpbBreak(const ControlCommand &command) {
   if (command.parking_brake()) {
     // None
   } else {
@@ -451,7 +451,7 @@ void LincolnController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void LincolnController::SetBeam(const ControlCommand& command) {
+void LincolnController::SetBeam(const ControlCommand &command) {
   if (command.signal().high_beam()) {
     // None
   } else if (command.signal().low_beam()) {
@@ -461,7 +461,7 @@ void LincolnController::SetBeam(const ControlCommand& command) {
   }
 }
 
-void LincolnController::SetHorn(const ControlCommand& command) {
+void LincolnController::SetHorn(const ControlCommand &command) {
   if (command.signal().horn()) {
     // None
   } else {
@@ -469,7 +469,7 @@ void LincolnController::SetHorn(const ControlCommand& command) {
   }
 }
 
-void LincolnController::SetTurningSignal(const ControlCommand& command) {
+void LincolnController::SetTurningSignal(const ControlCommand &command) {
   // Set Turn Signal
   auto signal = command.signal().turn_signal();
   if (signal == Signal::TURN_LEFT) {
@@ -722,7 +722,7 @@ Chassis::ErrorCode LincolnController::chassis_error_code() {
 }
 
 void LincolnController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+    const Chassis::ErrorCode &error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

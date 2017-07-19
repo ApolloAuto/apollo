@@ -28,7 +28,7 @@ namespace canbus {
 
 using ::apollo::common::ErrorCode;
 
-ErrorCode CanReceiver::Init(CanClient* can_client, MessageManager* pt_manager,
+ErrorCode CanReceiver::Init(CanClient *can_client, MessageManager *pt_manager,
                             bool enable_log) {
   can_client_ = can_client;
   pt_manager_ = pt_manager;
@@ -82,10 +82,10 @@ void CanReceiver::RecvThreadFunc() {
     }
     receive_none_count = 0;
 
-    for (const auto& frame : buf) {
+    for (const auto &frame : buf) {
       uint8_t len = frame.len;
       uint32_t uid = frame.id;
-      const uint8_t* data = frame.data;
+      const uint8_t *data = frame.data;
       struct timeval timestamp;
       timestamp.tv_sec = frame.timestamp.tv_sec;
       timestamp.tv_usec = frame.timestamp.tv_usec;

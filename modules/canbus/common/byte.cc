@@ -37,9 +37,9 @@ const uint8_t RANG_MASK_0_L[] = {0xFE, 0XFC, 0xF8, 0xF0,
 
 }  // namespace
 
-Byte::Byte(const uint8_t* value) : value_(const_cast<uint8_t*>(value)) {}
+Byte::Byte(const uint8_t *value) : value_(const_cast<uint8_t *>(value)) {}
 
-Byte::Byte(const Byte& value) : value_(value.value_) {}
+Byte::Byte(const Byte &value) : value_(value.value_) {}
 
 std::string Byte::byte_to_hex(const uint8_t value) {
   uint8_t high = value >> 4;

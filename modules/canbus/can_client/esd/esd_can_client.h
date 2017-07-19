@@ -50,7 +50,7 @@ class EsdCanClient : public CanClient {
    * @param parameter CAN card parameters to initialize the CAN client.
    * @return If the initialization is successful.
    */
-  bool Init(const CANCardParameter& parameter) override;
+  bool Init(const CANCardParameter &parameter) override;
 
   /**
    * @brief Destructor
@@ -76,8 +76,8 @@ class EsdCanClient : public CanClient {
    * @return The status of the sending action which is defined by
    *         apollo::common::ErrorCode.
    */
-  apollo::common::ErrorCode Send(const std::vector<CanFrame>& frames,
-                                 int32_t* const frame_num) override;
+  apollo::common::ErrorCode Send(const std::vector<CanFrame> &frames,
+                                 int32_t *const frame_num) override;
 
   /**
    * @brief Receive messages
@@ -86,8 +86,8 @@ class EsdCanClient : public CanClient {
    * @return The status of the receiving action which is defined by
    *         apollo::common::ErrorCode.
    */
-  apollo::common::ErrorCode Receive(std::vector<CanFrame>* const frames,
-                                    int32_t* const frame_num) override;
+  apollo::common::ErrorCode Receive(std::vector<CanFrame> *const frames,
+                                    int32_t *const frame_num) override;
 
   /**
    * @brief Get the error string.

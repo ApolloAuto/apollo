@@ -26,13 +26,13 @@ class TcpStream : public Stream {
   typedef uint32_t be32_t;
 
  public:
-  TcpStream(const char* address, uint16_t port, uint32_t timeout_usec);
+  TcpStream(const char *address, uint16_t port, uint32_t timeout_usec);
   ~TcpStream();
 
   virtual bool connect();
   virtual bool disconnect();
-  virtual size_t read(uint8_t* buffer, size_t max_length);
-  virtual size_t write(const uint8_t* data, size_t length);
+  virtual size_t read(uint8_t *buffer, size_t max_length);
+  virtual size_t write(const uint8_t *data, size_t length);
 
  private:
   bool readable(uint32_t timeout_us);
