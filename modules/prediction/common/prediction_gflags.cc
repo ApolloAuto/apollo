@@ -41,3 +41,5 @@ DEFINE_double(still_obstacle_speed_threshold, 1.0,
     "Speed threshold for still obstacles");
 DEFINE_double(still_obstacle_position_std, 1.0,
     "Position standard deviation for still obstacles");
+// TODO(kechxu) specify the map file here
+DEFINE_string(map_file, "/path/to/map_file", "Path to map file");
