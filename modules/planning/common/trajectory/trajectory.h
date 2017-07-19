@@ -21,8 +21,6 @@
 #ifndef MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_H_
 #define MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_H_
 
-#include <cstdlib>
-
 #include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
@@ -36,11 +34,12 @@ class Trajectory {
 
   virtual double time_length() const = 0;
 
-  virtual TrajectoryPoint evaluate(const double relative_time) const = 0;
+  virtual apollo::common::TrajectoryPoint evaluate(
+      const double relative_time) const = 0;
 
-  virtual TrajectoryPoint start_point() const = 0;
+  virtual apollo::common::TrajectoryPoint start_point() const = 0;
 
-  virtual TrajectoryPoint end_point() const = 0;
+  virtual apollo::common::TrajectoryPoint end_point() const = 0;
 };
 
 }  // namespace planning
