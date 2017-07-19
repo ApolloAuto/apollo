@@ -25,7 +25,7 @@
 #include <cmath>
 
 #include "glog/logging.h"
-#include "modules/common/math/math_util.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/planning/math/hermite_spline.h"
 
 namespace apollo {
