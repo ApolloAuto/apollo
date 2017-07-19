@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H
-#define MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H
+#ifndef MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H_
+#define MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H_
 
 #include "modules/planning/common/speed/st_point.h"
 
@@ -54,4 +54,4 @@ class SpeedPoint : public STPoint {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H
+#endif  // MODULES_PLANNING_COMMON_SPEED_SPEED_POINT_H_

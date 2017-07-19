@@ -18,8 +18,8 @@
  * @file logic_point.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_LOGIC_POINT_H
-#define MODULES_PLANNING_COMMON_LOGIC_POINT_H
+#ifndef MODULES_PLANNING_COMMON_LOGIC_POINT_H_
+#define MODULES_PLANNING_COMMON_LOGIC_POINT_H_
 
 #include <string>
 #include "modules/common/math/vec2d.h"
@@ -54,4 +54,4 @@ class LogicPoint : public ::apollo::common::math::Vec2d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_LOGIC_POINT_H
+#endif  // MODULES_PLANNING_COMMON_LOGIC_POINT_H_

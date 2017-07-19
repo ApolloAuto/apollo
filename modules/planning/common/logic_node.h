@@ -18,15 +18,15 @@
  * @file logic_node.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_LOGIC_NODE_H
-#define MODULES_PLANNING_COMMON_LOGIC_NODE_H
+#ifndef MODULES_PLANNING_COMMON_LOGIC_NODE_H_
+#define MODULES_PLANNING_COMMON_LOGIC_NODE_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <memory>
 
-#include "modules/planning/common/planning_error.h"
+#include "modules/common/proto/error_code.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -39,8 +39,10 @@ class LogicNode {
   const std::unordered_set<std::string> &lane_name() const;
   void connect(const LogicNode &node);
   void add_lane_name(const std::string &lane_name);
-  ErrorCode get_next_node(const std::string &lane_id,
-                          std::size_t *const node_id);
+  common::ErrorCode get_next_node(const std::string &lane_id,
+                                  std::size_t *const node_id);
+  void f() {}
+
  private:
   std::size_t _node_id;
   std::string _lane_id;
@@ -51,4 +53,4 @@ class LogicNode {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_LOGIC_NODE_H
+#endif  // MODULES_PLANNING_COMMON_LOGIC_NODE_H_
