@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/map/proto/map_geometry.proto";
+import "modules/map/proto/map_id.proto";
+
+// A stop sign is a traffic sign to notify drivers that they must stop before proceeding.
+message StopSign {
+  enum StopType {
+    UNKNOWN = 0;
+    ONE_WAY = 1;
+    TWO_WAY = 2;
+    THREE_WAY = 3;
+    FOUR_WAY = 4;
+    ALL_WAY = 5;
+  };
+
+  optional Id id = 1;
+
+  // now no data support
+  optional Curve stop_line = 2;
+
+  // Location of the stand point.
+  optional Point location = 3;
+
+  repeated Id overlap_id = 4;
+
+  // if stop sign is not the stop sign of signal, signal_id is null.
+  optional Id signal_id = 5;
+
+  optional StopType type = 6;
+}
