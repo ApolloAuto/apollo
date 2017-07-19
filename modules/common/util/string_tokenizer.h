@@ -44,7 +44,8 @@ class StringTokenizer {
    * @param s String to be split
    * @param delims Delimiters where the string should be split
    */
-  StringTokenizer(const std::string& s, const std::string& delims = " ");
+  explicit StringTokenizer(const std::string& s,
+                           const std::string& delims = " ");
 
   /**
    * Destructor
