@@ -27,3 +27,17 @@ cc_library(
         "@eigen//:eigen",
     ],
 )
+
+cc_library(
+    name = "publishable_trajectory",
+    srcs = [
+        "publishable_trajectory.cc",
+    ],
+    hdrs = [
+        "publishable_trajectory.h",
+    ],
+    deps = [
+        ":discretized_trajectory",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
