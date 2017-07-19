@@ -34,6 +34,42 @@ cc_library(
 )
 
 cc_library(
+    name = "planning_data",
+    srcs = [
+        "planning_data.cc",
+    ],
+    hdrs = [
+        "planning_data.h",
+    ],
+)
+
+cc_library(
+    name = "environment",
+    srcs = [
+        "environment.cc",
+    ],
+    hdrs = [
+        "environment.h",
+    ],
+)
+
+cc_library(
+    name = "frame",
+    srcs = [
+        "frame.cc",
+    ],
+    hdrs = [
+        "frame.h",
+    ],
+    deps = [
+        "//modules/planning/common:planning_data",
+        "//modules/planning/common:environment",
+        "//modules/common:log",
+    ],
+)
+
+
+cc_library(
     name = "speed_limit",
     srcs = [
         "speed_limit.cc",
@@ -52,6 +88,8 @@ cc_library(
     deps = [
         "@eigen//:eigen",
         ":planning_gflags",
+        ":frame",
+        ":speed_limit",
         "//modules/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
