@@ -8,13 +8,17 @@ env:
     - JOB=build
     - JOB=lint
     - JOB=test
+cache:
+  directories:
+  - $HOME/.cache/bazel
 install: skip
 before_script:
     - if [ ! -d "${HOME}/.cache" ]; then mkdir ${HOME}/.cache; fi
     - cp scripts/AGREEMENT.txt ${HOME}/.cache/.apollo_agreement.txt
-    - ./apollo_docker.sh clean
 script:
     - ./apollo_docker.sh ${JOB}
+    - ./apollo_docker.sh clean
+    - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
 notifications:
     email:
         on_success: change
