@@ -27,7 +27,7 @@ cc_library(
         ":qp_solver",
         "//modules/planning/common:planning_gflags",
         "@eigen//:eigen",
-        "@qp_oases//:qp_oases",
+        "//third_party/qp_oases",
     ],
 )
 
