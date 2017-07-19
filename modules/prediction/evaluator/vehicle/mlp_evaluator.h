@@ -14,35 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <utility>
+#ifndef MODULES_PREDICTION_EVALUATOR_VEHICLE_MLP_EVALUATOR_H_
+#define MODULES_PREDICTION_EVALUATOR_VEHICLE_MLP_EVALUATOR_H_
 
-#include "modules/prediction/evaluator/vehicle/vehicle_evaluator.h"
+#include <vector>
+
+#include "modules/prediction/evaluator/evaluator.h"
+#include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
 
-VehicleEvaluator::VehicleEvaluator() : evaluator_(nullptr) {
-  Init();
-}
+class MLPEvaluator : public Evaluator {
+ public:
+  MLPEvaluator();
 
-void VehicleEvaluator::Init() {
-  CHECK(map_evaluators_.find("DefaultVehicleEvaluator") !=
-        map_evaluators_.end());
-  evaluator_ = map_evaluators_["DefaultVehicleEvaluator"].get();
+  virtual ~MLPEvaluator();
 
-  // TODO(kechxu) load user defined model taking over the default one
+  void Evaluate(Obstacle* obstacle_ptr);
 
-  CHECK(evaluator_ != nullptr);
-}
+  void ExtractFeatureValues(Obstacle* obstacle_ptr,
+                            LaneSequence* lane_sequence_ptr);
 
-void VehicleEvaluator::Evaluate(Obstacle* obstacle) {
-  evaluator_->Evaluate(obstacle);
-}
-
-void VehicleEvaluator::RegisterClass(const std::string& name,
-                                     std::unique_ptr<Evaluator> ptr) {
-  map_evaluators_[name] = std::move(ptr);
-}
+  void Clear();
+};
 
 }  // namespace prediction
 }  // namespace apollo
+
+#endif  // MODULES_PREDICTION_EVALUATOR_VEHICLE_MLP_EVALUATOR_H_
