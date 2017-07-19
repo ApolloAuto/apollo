@@ -30,7 +30,6 @@
 namespace apollo {
 namespace planning {
 
-using ::apollo::common::ErrorCode;
 using ::apollo::common::PathPoint;
 
 QuinticSpiralCurve::QuinticSpiralCurve(const common::PathPoint& s,
@@ -191,12 +190,12 @@ bool QuinticSpiralCurve::calculate_path() {
   return diff < spiral_config().newton_raphson_tol() && result_sanity_check();
 }
 
-ErrorCode QuinticSpiralCurve::get_path_vec(
+common::ErrorCode QuinticSpiralCurve::get_path_vec(
     const std::size_t n, std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   if (n <= 1 || error() > spiral_config().newton_raphson_tol()) {
-    return ErrorCode::PLANNING_ERROR;
+    return common::ErrorCode::PLANNING_ERROR;
   }
 
   path_points->resize(n);
@@ -243,20 +242,20 @@ ErrorCode QuinticSpiralCurve::get_path_vec(
     result[k].set_y(result[k].s() * dy + result[0].y());
   }
 
-  return ErrorCode::OK;
+  return common::ErrorCode::OK;
 }
 
-ErrorCode QuinticSpiralCurve::get_path_vec_with_s(
+common::ErrorCode QuinticSpiralCurve::get_path_vec_with_s(
     const std::vector<double>& vec_s,
     std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   if (error() > spiral_config().newton_raphson_tol()) {
-    return ErrorCode::PLANNING_ERROR;
+    return common::ErrorCode::PLANNING_ERROR;
   }
 
   if (vec_s.size() == 0) {
-    return ErrorCode::OK;
+    return common::ErrorCode::OK;
   }
 
   const std::size_t n = vec_s.size();
@@ -304,7 +303,7 @@ ErrorCode QuinticSpiralCurve::get_path_vec_with_s(
     result[k].set_y(dy + ref_point.y());
   }
 
-  return ErrorCode::OK;
+  return common::ErrorCode::OK;
 }
 
 }  // namespace planning

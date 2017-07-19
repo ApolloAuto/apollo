@@ -25,7 +25,7 @@
 
 #include "modules/common/proto/path_point.pb.h"
 
-namespace adu {
+namespace apollo {
 namespace planning {
 
 class Trajectory {
@@ -44,6 +44,6 @@ class Trajectory {
 };
 
 }  // namespace planning
-}  // namespace adu
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_H_
