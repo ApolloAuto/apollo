@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planner_factory.h"
 #include "modules/planning/planning.h"
 #include "modules/planning/proto/planning.pb.h"
 
@@ -28,7 +28,12 @@ namespace planning {
 using TrajectoryPb = ADCTrajectory;
 using apollo::common::TrajectoryPoint;
 
-class PlanningTest : public ::testing::Test {};
+class PlanningTest : public ::testing::Test {
+  virtual void SetUp() {
+    FLAGS_planning_config_file = "modules/planning/testdata/conf/planning_config.pb.txt";
+    FLAGS_adapter_config_path = "modules/planning/testdata/conf/adapter.conf";
+  }
+};
 
 TEST_F(PlanningTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
@@ -43,6 +48,7 @@ TEST_F(PlanningTest, ComputeTrajectory) {
 
   std::vector<TrajectoryPoint> trajectory1;
   double time1 = 0.1;
+  planning.Init();
   planning.Plan(vehicle_state, false, time1, &trajectory1);
 
   EXPECT_EQ(trajectory1.size(), (std::size_t)FLAGS_rtk_trajectory_forward);
@@ -77,6 +83,8 @@ TEST_F(PlanningTest, ComputeTrajectory) {
 TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
   FLAGS_rtk_trajectory_filename = "";
   Planning planning;
+  planning.Init();
+
   common::vehicle_state::VehicleState vehicle_state;
   vehicle_state.set_x(586385.782841);
   vehicle_state.set_y(4140674.76065);
@@ -92,11 +100,6 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
 
   // check Reset runs gracefully.
   planning.Reset();
-}
-
-TEST_F(PlanningTest, PlannerFactory) {
-  auto ptr_planner = PlannerFactory::CreateInstance(PlannerType::OTHER);
-  EXPECT_TRUE(ptr_planner == nullptr);
 }
 
 }  // namespace control
