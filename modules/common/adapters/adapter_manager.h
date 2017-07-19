@@ -23,7 +23,9 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 #include "modules/common/adapters/adapter.h"
 #include "modules/common/adapters/message_adapters.h"

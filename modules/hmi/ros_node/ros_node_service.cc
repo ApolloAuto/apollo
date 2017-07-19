@@ -17,6 +17,7 @@
 #include "modules/hmi/ros_node/ros_node_service.h"
 
 #include <chrono>
+#include <memory>
 #include <thread>
 
 #include "gflags/gflags.h"

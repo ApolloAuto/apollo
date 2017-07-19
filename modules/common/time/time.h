@@ -186,7 +186,7 @@ class Clock {
    * @brief constructs the \class Clock instance
    * @param is_system_clock See UseSystemClock.
    */
-  Clock(bool is_system_clock)
+  explicit Clock(bool is_system_clock)
       : is_system_clock_(is_system_clock), mock_now_(Timestamp()) {}
 
   /**

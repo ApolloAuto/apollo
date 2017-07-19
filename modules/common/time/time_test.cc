@@ -53,7 +53,6 @@ TEST(TimeTest, TimestampFromAndToDouble) {
   EXPECT_FLOAT_EQ(1234567.889923456, ToSecond(timestamp));
 }
 
-
 TEST(TimeTest, MockTime) {
   EXPECT_TRUE(Clock::IsSystemClock());
   Clock::UseSystemClock(false);
@@ -65,6 +64,6 @@ TEST(TimeTest, MockTime) {
   EXPECT_EQ(123, AsInt64<micros>(Clock::Now()));
 }
 
-} // namespace time
-} // namespace common
-} // namespace apollo
+}  // namespace time
+}  // namespace common
+}  // namespace apollo

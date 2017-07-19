@@ -39,5 +39,4 @@
   }                                         \
   DISALLOW_IMPLICIT_CONSTRUCTORS(classname) \
  private:
-
 #endif  // MODULES_COMMON_MACRO_H_
