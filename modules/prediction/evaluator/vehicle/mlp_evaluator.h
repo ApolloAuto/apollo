@@ -18,6 +18,7 @@
 #define MODULES_PREDICTION_EVALUATOR_VEHICLE_MLP_EVALUATOR_H_
 
 #include <vector>
+#include <unordered_map>
 
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
@@ -38,6 +39,19 @@ class MLPEvaluator : public Evaluator {
                             LaneSequence* lane_sequence_ptr);
 
   void Clear();
+
+ private:
+  void SetObstacleFeatureValues(Obstacle* obstacle,
+                                std::vector<double>* feature_values);
+
+  void SetLaneFeatureValues(Obstacle* obstacle,
+                            LaneSequence* lane_sequence,
+                            std::vector<double>* features);
+
+ private:
+  std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
+  static const size_t OBSTACLE_FEATURE_SIZE = 18;
+  static const size_t LANE_FEATURE_SIZE = 20;
 };
 
 }  // namespace prediction
