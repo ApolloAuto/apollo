@@ -19,6 +19,8 @@
 
 #include <memory>
 
+#include "Eigen/Dense"
+
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 
@@ -28,6 +30,13 @@ namespace prediction {
 class PredictionMap {
  public:
   ~PredictionMap();
+
+  void LoadMap();
+
+  void Clear();
+
+  Eigen::Vector2d PositionOnLane(const apollo::hdmap::LaneInfo& lane_info,
+                                 const double s);
 
  private:
   std::unique_ptr<apollo::hdmap::HDMapImpl> hdmap_;

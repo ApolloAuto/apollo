@@ -15,9 +15,32 @@
  *****************************************************************************/
 
 #include "modules/prediction/map/prediction_map.h"
+#include "modules/prediction/common/prediction_gflags.h"
+#include "modules/map/hdmap/hdmap.h"
 
 namespace apollo {
 namespace prediction {
+
+using apollo::hdmap::LaneInfo;
+
+PredictionMap::PredictionMap() : hdmap_(nullptr) {
+  LoadMap();
+}
+
+PredictionMap::~PredictionMap() {
+  Clear();
+}
+
+void PredictionMap::LoadMap() {
+  hdmap_.reset(new apollo::hdmap::HDMapImpl());
+  CHECK(hdmap_ != nullptr);
+  hdmap_->load_map_from_file(FLAGS_map_file);
+  ADEBUG << "Load map file: " << FLAGS_map_file;
+}
+
+void PredictionMap::Clear() {
+  hdmap_.reset();
+}
 
 }  // namespace prediction
 }  // namespace apollo
