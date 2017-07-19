@@ -48,7 +48,7 @@ class Evaluator {
   virtual void Evaluate(Obstacle* obstacle) = 0;
 
  protected:
-  std::vector<double> feature_values;
+  std::vector<double> feature_values_;
 };
 
 }  // namespace prediction
