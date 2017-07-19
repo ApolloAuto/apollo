@@ -67,7 +67,45 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
                                         LaneSequence* lane_sequence_ptr) {
   feature_values_.clear();
-  // TODO(kechxu) implement insert feture values into feature_values_
+  int id = obstacle_ptr->id();
+  std::vector<double> obstacle_feature_values;
+  if (obstacle_feature_values_map_.find(id) ==
+      obstacle_feature_values_map_.end()) {
+    SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
+  } else {
+    obstacle_feature_values = obstacle_feature_values_map_[id];
+  }
+
+  if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
+           << "expected obstacle features "
+           << obstacle_feature_values.size() << ".";
+    return;
+  }
+
+  std::vector<double> lane_feature_values;
+  SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
+  if (lane_feature_values.size() != LANE_FEATURE_SIZE) {
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
+           << "expected lane features"
+           << lane_feature_values.size() << ".";
+    return;
+  }
+
+  feature_values_.insert(feature_values_.end(),
+      lane_feature_values.begin(), lane_feature_values.end());
+  feature_values_.insert(feature_values_.end(),
+      lane_feature_values.begin(), lane_feature_values.end());
+}
+
+void MLPEvaluator::SetObstacleFeatureValues(Obstacle* obstacle,
+    std::vector<double>* feature_values) {
+  // TODO(kechxu) implement
+}
+
+void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle,
+    LaneSequence* lane_sequence, std::vector<double>* features) {
+  // TODO(kechxu) implement
 }
 
 }  // namespace prediction
