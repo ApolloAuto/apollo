@@ -3,9 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "lib_planning",
     srcs = [
-        "planner_factory.cc",
         "planning.cc",
-        "planning_node.cc",
     ],
     hdrs = glob([
         "*.h",
@@ -14,6 +12,7 @@ cc_library(
         "//modules/common",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common:apollo_app",
         "//modules/common/proto:path_point_proto",
         "//modules/common/vehicle_state",
         "//modules/decision/proto:decision_proto",

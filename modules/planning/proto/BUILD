@@ -7,6 +7,7 @@ cc_proto_library(
     name = "planning_proto",
     protos = [
         "planning.proto",
+        "planning_config.proto",
         "planning_internal.proto",
     ],
     deps = [
@@ -23,6 +24,7 @@ py_proto_compile(
     name = "planning_proto_pylib",
     protos = [
         "planning.proto",
+        "planning_config.proto",
         "planning_internal.proto",
     ],
     deps = [
