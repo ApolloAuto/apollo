@@ -18,13 +18,23 @@ cc_library(
 cc_library(
     name = "logic_map",
     srcs = [
+        "logic_node.cc",
         "logic_point.cc",
     ],
     hdrs = [
+        "logic_node.h",
         "logic_point.h",
     ],
     deps = [
         "//modules/common/math",
+        "//modules/planning/common:planning_error_code",
+    ],
+)
+
+cc_library(
+    name = "planning_error_code",
+    hdrs = [
+        "planning_error.h",
     ],
 )
 
