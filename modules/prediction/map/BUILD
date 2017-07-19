@@ -11,9 +11,11 @@ cc_library(
         "prediction_map.cc",
     ],
     deps = [
+        "@eigen//:eigen",
         "//modules/map/hdmap:hdmap",
         "//modules/common:macro",
-    ]
+        "//modules/prediction/common:prediction_common",
+    ],
 )
 
 cpplint()
