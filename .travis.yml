@@ -17,7 +17,6 @@ before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.cache/.apollo_agreement.txt
 script:
     - ./apollo_docker.sh ${JOB}
-    - ./apollo_docker.sh clean
     - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
 notifications:
     email:
