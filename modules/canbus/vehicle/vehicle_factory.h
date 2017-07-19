@@ -51,7 +51,7 @@ class VehicleFactory
    * @param vehicle_parameter is defined in vehicle_parameter.proto
    */
   std::unique_ptr<AbstractVehicleFactory> CreateVehicle(
-      const VehicleParameter& vehicle_parameter);
+      const VehicleParameter &vehicle_parameter);
 };
 
 }  // namespace canbus

@@ -63,7 +63,7 @@ class PlanningNode {
 
   ADCTrajectory ToTrajectoryPb(
       const double header_time,
-      const std::vector<common::TrajectoryPoint>& discretized_trajectory);
+      const std::vector<common::TrajectoryPoint> &discretized_trajectory);
 
   Planning planning_;
 };

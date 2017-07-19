@@ -49,7 +49,7 @@ class PlannerFactory {
    * @return A unique pointer pointing to the planner instance.
    */
   static std::unique_ptr<Planner> CreateInstance(
-      const PlannerType& planner_type);
+      const PlannerType &planner_type);
 };
 
 }  // namespace planning

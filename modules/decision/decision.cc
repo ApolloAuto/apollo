@@ -44,7 +44,7 @@ common::Status Decision::Start() {
 
 void Decision::Stop() {}
 
-void Decision::OnTimer(const ros::TimerEvent&) { PublishDecision(); }
+void Decision::OnTimer(const ros::TimerEvent &) { PublishDecision(); }
 
 void Decision::PublishDecision() {
   DecisionResult decision_result;

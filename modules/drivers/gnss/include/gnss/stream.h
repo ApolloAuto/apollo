@@ -33,21 +33,21 @@ namespace gnss {
 class Stream {
  public:
   // Return a pointer to a Stream object. The caller should take ownership.
-  static Stream* create_tcp(const char* address, uint16_t port,
+  static Stream *create_tcp(const char *address, uint16_t port,
                             uint32_t timeout_usec = 1000000);
 
-  static Stream* create_udp(const char* address, uint16_t port,
+  static Stream *create_udp(const char *address, uint16_t port,
                             uint32_t timeout_usec = 1000000);
 
   // Currently the following baud rates are supported:
   //  9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600.
-  static Stream* create_serial(const char* device_name, uint32_t baud_rate,
+  static Stream *create_serial(const char *device_name, uint32_t baud_rate,
                                uint32_t timeout_usec = 0);
 
-  static Stream* create_ntrip(const std::string& address, uint16_t port,
-                              const std::string& mountpoint,
-                              const std::string& user,
-                              const std::string& passwd,
+  static Stream *create_ntrip(const std::string &address, uint16_t port,
+                              const std::string &mountpoint,
+                              const std::string &user,
+                              const std::string &passwd,
                               uint32_t timeout_s = 30);
 
   virtual ~Stream() {}
@@ -83,13 +83,13 @@ class Stream {
   }
 
   // Reads up to max_length bytes. Returns actually number of bytes read.
-  virtual size_t read(uint8_t* buffer, size_t max_length) = 0;
+  virtual size_t read(uint8_t *buffer, size_t max_length) = 0;
 
   // Returns how many bytes it was successful to write.
-  virtual size_t write(const uint8_t* buffer, size_t length) = 0;
+  virtual size_t write(const uint8_t *buffer, size_t length) = 0;
 
-  size_t write(const std::string& buffer) {
-    return write(reinterpret_cast<const uint8_t*>(buffer.data()),
+  size_t write(const std::string &buffer) {
+    return write(reinterpret_cast<const uint8_t *>(buffer.data()),
                  buffer.size());
   }
 

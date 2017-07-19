@@ -27,8 +27,8 @@ namespace lincoln {
 
 const int32_t Accel6b::ID = 0x6B;
 
-void Accel6b::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis_detail) const {
+void Accel6b::Parse(const std::uint8_t *bytes, int32_t length,
+                    ChassisDetail *chassis_detail) const {
   chassis_detail->mutable_vehicle_spd()->set_lat_acc(
       lateral_acceleration(bytes, length));
   chassis_detail->mutable_vehicle_spd()->set_long_acc(
@@ -37,19 +37,19 @@ void Accel6b::Parse(const std::uint8_t* bytes, int32_t length,
       vertical_acceleration(bytes, length));
 }
 
-double Accel6b::lateral_acceleration(const std::uint8_t* bytes,
+double Accel6b::lateral_acceleration(const std::uint8_t *bytes,
                                      const int32_t length) const {
   DCHECK_GE(length, 2);
   return parse_two_frames(bytes[0], bytes[1]);
 }
 
-double Accel6b::longitudinal_acceleration(const std::uint8_t* bytes,
+double Accel6b::longitudinal_acceleration(const std::uint8_t *bytes,
                                           const int32_t length) const {
   DCHECK_GE(length, 4);
   return parse_two_frames(bytes[2], bytes[3]);
 }
 
-double Accel6b::vertical_acceleration(const std::uint8_t* bytes,
+double Accel6b::vertical_acceleration(const std::uint8_t *bytes,
                                       const int32_t length) const {
   DCHECK_GE(length, 6);
   return parse_two_frames(bytes[4], bytes[5]);

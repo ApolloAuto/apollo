@@ -57,7 +57,7 @@ class CanClientFactory
    * @param parameter The parameter to create the CAN client.
    * @return A pointer to the created CAN client.
    */
-  std::unique_ptr<CanClient> CreateCANClient(const CANCardParameter& parameter);
+  std::unique_ptr<CanClient> CreateCANClient(const CANCardParameter &parameter);
 
  private:
   DECLARE_SINGLETON(CanClientFactory);

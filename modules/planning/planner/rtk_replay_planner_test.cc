@@ -26,8 +26,7 @@ using apollo::common::TrajectoryPoint;
 namespace apollo {
 namespace planning {
 
-class RTKReplayPlannerTest : public ::testing::Test {
-};
+class RTKReplayPlannerTest : public ::testing::Test {};
 
 TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
@@ -54,7 +53,8 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
 }
 
 TEST_F(RTKReplayPlannerTest, ErrorTest) {
-  FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage_no_file.csv";
+  FLAGS_rtk_trajectory_filename =
+      "modules/planning/testdata/garage_no_file.csv";
   RTKReplayPlanner planner;
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage_error.csv";
   RTKReplayPlanner planner_with_error_csv;

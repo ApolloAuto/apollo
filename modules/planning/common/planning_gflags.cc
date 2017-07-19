@@ -33,5 +33,6 @@ DEFINE_double(replanning_threshold, 2.0,
               "The threshold of position deviation "
               "that triggers the planner replanning");
 
-DEFINE_double(trajectory_resolution, 0.01, "The time resolution of "
+DEFINE_double(trajectory_resolution, 0.01,
+              "The time resolution of "
               "output trajectory.");

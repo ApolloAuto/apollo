@@ -54,7 +54,7 @@ class SimulationWorldUpdater {
    * @param websocket Pointer of the websocket handler that has been attached to
    * the server.
    */
-  explicit SimulationWorldUpdater(WebSocketHandler* websocket)
+  explicit SimulationWorldUpdater(WebSocketHandler *websocket)
       : sim_world_service_(), websocket_(websocket) {}
 
   /**
@@ -63,7 +63,7 @@ class SimulationWorldUpdater {
    * is triggered.
    * @param event Timer event
    */
-  void OnPushTimer(const ros::TimerEvent& event) {
+  void OnPushTimer(const ros::TimerEvent &event) {
     if (!sim_world_service_.ReadyToPush()) {
       AWARN << "Not sending simulation world as the data is not ready!";
       return;
@@ -74,7 +74,7 @@ class SimulationWorldUpdater {
 
  private:
   SimulationWorldService sim_world_service_;
-  WebSocketHandler* websocket_;
+  WebSocketHandler *websocket_;
 };
 
 }  // namespace dreamview
@@ -83,7 +83,7 @@ class SimulationWorldUpdater {
 /// Time interval, in seconds, between pushing SimulationWorld to frontend.
 static constexpr double kTimeInterval = 0.1;
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   using apollo::common::adapter::AdapterManager;
   using apollo::dreamview::SimulationWorldUpdater;
   using apollo::dreamview::WebSocketHandler;

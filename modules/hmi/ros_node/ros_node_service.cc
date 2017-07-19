@@ -79,13 +79,13 @@ void HMIRosNodeImpl::Init() {
   AdapterManagerConfig config;
   config.set_is_ros(true);
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
     sub_config->set_type(AdapterConfig::PAD);
   }
 
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(AdapterConfig::CHASSIS);
   }
@@ -94,8 +94,8 @@ void HMIRosNodeImpl::Init() {
 }
 
 grpc::Status HMIRosNodeImpl::ChangeDrivingMode(
-    grpc::ServerContext* context, const ChangeDrivingModeRequest* request,
-    ChangeDrivingModeResponse* response) {
+    grpc::ServerContext *context, const ChangeDrivingModeRequest *request,
+    ChangeDrivingModeResponse *response) {
   AINFO << "received ChangeDrivingModeRequest: " << request->DebugString();
   auto driving_action_to_send = DrivingAction::RESET;
   auto driving_mode_to_wait = Chassis::COMPLETE_MANUAL;
@@ -135,7 +135,7 @@ grpc::Status HMIRosNodeImpl::ChangeDrivingMode(
   return grpc::Status::OK;
 }
 
-void HMIRosNodeImpl::MonitorDrivingMode(const canbus::Chassis& status) {
+void HMIRosNodeImpl::MonitorDrivingMode(const canbus::Chassis &status) {
   auto driving_mode = status.driving_mode();
   std::lock_guard<std::mutex> guard(current_driving_mode_mutex_);
   // Update current_driving_mode_ when it is changed.
@@ -150,7 +150,7 @@ void HMIRosNodeImpl::MonitorDrivingMode(const canbus::Chassis& status) {
 }  // namespace hmi
 }  // namespace apollo
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
