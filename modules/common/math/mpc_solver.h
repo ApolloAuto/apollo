@@ -21,8 +21,9 @@
 #ifndef MODULES_CONTROL_COMMON_MPC_SOLVER_H_
 #define MODULES_CONTROL_COMMON_MPC_SOLVER_H_
 
-#include "Eigen/Core"
+#include <vector>
 
+#include "Eigen/Core"
 #include "Eigen/LU"
 
 /**
@@ -44,31 +45,29 @@ namespace math {
  * @param max_num_iteration The maximum iterations for solving ARE
  * @param ptr_K The feedback control matrix (pointer)
  */
+void SolveLinearMPC(const Eigen::MatrixXd &matrix_a,
+                    const Eigen::MatrixXd &matrix_b,
+                    const Eigen::MatrixXd &matrix_c,
+                    const Eigen::MatrixXd &matrix_q,
+                    const Eigen::MatrixXd &matrix_r,
+                    const Eigen::MatrixXd &matrix_lower,
+                    const Eigen::MatrixXd &matrix_upper,
+                    const Eigen::MatrixXd &_matrix_initial_state,
+                    const std::vector<Eigen::MatrixXd> &reference,
+                    const double eps,
+                    const int max_iter,
+                    std::vector<Eigen::MatrixXd> *control);
 
-    void SolveLinearMPC(const Eigen::MatrixXd &matrix_a,
-            const Eigen::MatrixXd &matrix_b,
-            const Eigen::MatrixXd &matrix_c,
-            const Eigen::MatrixXd &matrix_q,
-            const Eigen::MatrixXd &matrix_r,
-            const Eigen::MatrixXd &matrix_lower,
-            const Eigen::MatrixXd &matrix_upper,
-            const Eigen::MatrixXd &_matrix_initial_state,
-            const std::vector<Eigen::MatrixXd> &reference,
-            const double eps,
-            const int max_iter,
-            std::vector<Eigen::MatrixXd> *control);
-
-    void SolveQPSMO (
-            const Eigen::MatrixXd& matrix_q,
-            const Eigen::MatrixXd& matrix_b,
-            const Eigen::MatrixXd& matrix_lower,
-            const Eigen::MatrixXd& matrix_upper,
-            const double& eps,
-            const int& max_iter,
-            Eigen::MatrixXd* matrix_alpha);
+void SolveQPSMO(const Eigen::MatrixXd& matrix_q,
+                const Eigen::MatrixXd& matrix_b,
+                const Eigen::MatrixXd& matrix_lower,
+                const Eigen::MatrixXd& matrix_upper,
+                const double& eps,
+                const int& max_iter,
+                Eigen::MatrixXd* matrix_alpha);
 
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
 
-#endif // MODULES_CONTROL_COMMON_MPC_SOLVER_H_
+#endif  // MODULES_CONTROL_COMMON_MPC_SOLVER_H_
