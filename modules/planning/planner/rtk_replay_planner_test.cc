@@ -33,8 +33,8 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   RTKReplayPlanner planner;
 
   TrajectoryPoint start_point;
-  start_point.set_x(586385.782842);
-  start_point.set_y(4140674.76063);
+  start_point.mutable_path_point()->set_x(586385.782842);
+  start_point.mutable_path_point()->set_y(4140674.76063);
 
   std::vector<TrajectoryPoint> trajectory;
   bool planning_succeeded = planner.Plan(start_point, &trajectory);
@@ -44,12 +44,12 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   EXPECT_EQ(trajectory.size(), (std::size_t)FLAGS_rtk_trajectory_forward);
 
   auto first_point = trajectory.front();
-  EXPECT_DOUBLE_EQ(first_point.x(), 586385.782841);
-  EXPECT_DOUBLE_EQ(first_point.y(), 4140674.76065);
+  EXPECT_DOUBLE_EQ(first_point.path_point().x(), 586385.782841);
+  EXPECT_DOUBLE_EQ(first_point.path_point().y(), 4140674.76065);
 
   auto last_point = trajectory.back();
-  EXPECT_DOUBLE_EQ(last_point.x(), 586355.063786);
-  EXPECT_DOUBLE_EQ(last_point.y(), 4140681.98605);
+  EXPECT_DOUBLE_EQ(last_point.path_point().x(), 586355.063786);
+  EXPECT_DOUBLE_EQ(last_point.path_point().y(), 4140681.98605);
 }
 
 TEST_F(RTKReplayPlannerTest, ErrorTest) {
@@ -59,8 +59,8 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage_error.csv";
   RTKReplayPlanner planner_with_error_csv;
   TrajectoryPoint start_point;
-  start_point.set_x(586385.782842);
-  start_point.set_y(4140674.76063);
+  start_point.mutable_path_point()->set_x(586385.782842);
+  start_point.mutable_path_point()->set_y(4140674.76063);
   std::vector<TrajectoryPoint> trajectory;
   EXPECT_TRUE(!planner_with_error_csv.Plan(start_point, &trajectory));
 }

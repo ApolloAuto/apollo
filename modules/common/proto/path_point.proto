@@ -22,24 +22,15 @@ message PathPoint {
 }
 
 message TrajectoryPoint {
-  // coordinates
-  optional double x = 1;
-  optional double y = 2;
-  optional double z = 3;
-
-  // derivative direction on the x-y plane
-  optional double theta = 4;
-  // curvature on the x-y planning
-  optional double kappa = 5;
-  // accumulated distance from beginning of the path
-  optional double s = 6;
+  // path point
+  optional PathPoint path_point = 1;
 
   // linear velocity
-  optional double v = 7;  // in [m/s]
+  optional double v = 2;  // in [m/s]
   // linear acceleration
-  optional double a = 8;
+  optional double a = 3;
   // relative time from beginning of the trajectory
-  optional double relative_time = 9;
+  optional double relative_time = 4;
   // curvature change rate w.r.t. time
-  optional double dkappa = 10;
+  optional double dkappa = 5;
 }

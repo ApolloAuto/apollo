@@ -30,7 +30,8 @@ using apollo::common::TrajectoryPoint;
 
 class PlanningTest : public ::testing::Test {
   virtual void SetUp() {
-    FLAGS_planning_config_file = "modules/planning/testdata/conf/planning_config.pb.txt";
+    FLAGS_planning_config_file =
+        "modules/planning/testdata/conf/planning_config.pb.txt";
     FLAGS_adapter_config_path = "modules/planning/testdata/conf/adapter.conf";
   }
 };
@@ -55,8 +56,8 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   const auto& p1_start = trajectory1.front();
   const auto& p1_end = trajectory1.back();
 
-  EXPECT_DOUBLE_EQ(p1_start.x(), 586385.782841);
-  EXPECT_DOUBLE_EQ(p1_end.x(), 586355.063786);
+  EXPECT_DOUBLE_EQ(p1_start.path_point().x(), 586385.782841);
+  EXPECT_DOUBLE_EQ(p1_end.path_point().x(), 586355.063786);
 
   std::vector<TrajectoryPoint> trajectory2;
   double time2 = 0.5;
@@ -69,9 +70,9 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   const auto& p2_start = trajectory2[FLAGS_rtk_trajectory_backward];
   const auto& p2_end = trajectory2.back();
 
-  EXPECT_DOUBLE_EQ(p2_backward.x(), 586385.577255);
-  EXPECT_DOUBLE_EQ(p2_start.x(), 586385.486723);
-  EXPECT_DOUBLE_EQ(p2_end.x(), 586353.262913);
+  EXPECT_DOUBLE_EQ(p2_backward.path_point().x(), 586385.577255);
+  EXPECT_DOUBLE_EQ(p2_start.path_point().x(), 586385.486723);
+  EXPECT_DOUBLE_EQ(p2_end.path_point().x(), 586353.262913);
 
   double absolute_time1 = trajectory1[100].relative_time() + time1;
   double absolute_time2 =
