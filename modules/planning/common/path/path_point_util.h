@@ -29,13 +29,25 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-common::PathPoint interpolate(const common::PathPoint& p0,
-                              const common::PathPoint& p1, const double s);
+apollo::common::PathPoint interpolate(
+    const apollo::common::PathPoint& p0,
+    const apollo::common::PathPoint& p1, const double s);
 
 // @ weight shall between 1 and 0
-common::PathPoint interpolate_linear_approximation(
-    const common::PathPoint& left, const common::PathPoint& right,
+apollo::common::PathPoint interpolate_linear_approximation(
+    const apollo::common::PathPoint& p0,
+    const apollo::common::PathPoint& p1,
     const double s);
+
+apollo::common::TrajectoryPoint interpolate(
+    const apollo::common::TrajectoryPoint& tp0,
+    const apollo::common::TrajectoryPoint& tp1,
+    const double t);
+
+apollo::common::TrajectoryPoint interpolate_linear_approximation(
+    const apollo::common::TrajectoryPoint& tp0,
+    const apollo::common::TrajectoryPoint& tp1,
+    const double t);
 
 }  // namespace util
 }  // namespace planning

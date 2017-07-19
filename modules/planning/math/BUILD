@@ -73,6 +73,8 @@ cc_library(
         "interpolation.h",
     ]),
     deps = [
+        ":hermite_spline",
+        "//modules/common/math:math_utils",
         "@glog//:glog",
     ],
 )

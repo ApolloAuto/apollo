@@ -24,13 +24,17 @@
 
 #include "modules/planning/math/hermite_spline.h"
 #include "modules/planning/math/integration.h"
+#include "modules/planning/math/interpolation.h"
 
 namespace apollo {
 namespace planning {
 namespace util {
 
-common::PathPoint interpolate(const common::PathPoint& p0,
-                              const common::PathPoint& p1, const double s) {
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
+
+PathPoint interpolate(const PathPoint& p0, const PathPoint& p1,
+                      const double s) {
   double s0 = p0.s();
   double s1 = p1.s();
   CHECK(s0 <= s && s <= s1);
@@ -54,7 +58,7 @@ common::PathPoint interpolate(const common::PathPoint& p0,
   double dkappa = geometry_spline.evaluate(2, s);
   double d2kappa = geometry_spline.evaluate(3, s);
 
-  common::PathPoint p;
+  PathPoint p;
   p.set_x(x);
   p.set_y(y);
   p.set_theta(theta);
@@ -65,25 +69,25 @@ common::PathPoint interpolate(const common::PathPoint& p0,
   return std::move(p);
 }
 
-common::PathPoint interpolate_linear_approximation(
-    const common::PathPoint& left, const common::PathPoint& right,
-    const double s) {
-  double s0 = left.s();
-  double s1 = right.s();
+PathPoint interpolate_linear_approximation(const PathPoint& p0,
+                                           const PathPoint& p1,
+                                           const double s) {
+  double s0 = p0.s();
+  double s1 = p1.s();
   CHECK(s0 < s1);
 
-  common::PathPoint path_point;
+  PathPoint path_point;
   double weight = (s - s0) / (s1 - s0);
-  double x = (1 - weight) * left.x() + weight * right.x();
-  double y = (1 - weight) * left.y() + weight * right.y();
+  double x = (1 - weight) * p0.x() + weight * p1.x();
+  double y = (1 - weight) * p0.y() + weight * p1.y();
   double cos_heading =
-      (1 - weight) * std::cos(left.theta()) + weight * std::cos(right.theta());
+      (1 - weight) * std::cos(p0.theta()) + weight * std::cos(p1.theta());
   double sin_heading =
-      (1 - weight) * std::sin(left.theta()) + weight * std::sin(right.theta());
+      (1 - weight) * std::sin(p0.theta()) + weight * std::sin(p1.theta());
   double theta = std::atan2(sin_heading, cos_heading);
-  double kappa = (1 - weight) * left.kappa() + weight * right.kappa();
-  double dkappa = (1 - weight) * left.dkappa() + weight * right.dkappa();
-  double ddkappa = (1 - weight) * left.ddkappa() + weight * right.ddkappa();
+  double kappa = (1 - weight) * p0.kappa() + weight * p1.kappa();
+  double dkappa = (1 - weight) * p0.dkappa() + weight * p1.dkappa();
+  double ddkappa = (1 - weight) * p0.ddkappa() + weight * p1.ddkappa();
   path_point.set_x(x);
   path_point.set_y(y);
   path_point.set_theta(theta);
@@ -91,6 +95,94 @@ common::PathPoint interpolate_linear_approximation(
   path_point.set_dkappa(dkappa);
   path_point.set_ddkappa(ddkappa);
   return path_point;
+}
+
+TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
+                            const TrajectoryPoint& tp1,
+                            const double t) {
+  const PathPoint& pp0 = tp0.path_point();
+  const PathPoint& pp1 = tp1.path_point();
+  double t0 = tp0.relative_time();
+  double t1 = tp1.relative_time();
+
+  std::array<double, 2> dx0 { { tp0.v(), tp0.a() } };
+  std::array<double, 2> dx1 { { tp1.v(), tp1.a() } };
+  HermiteSpline<double, 3> dynamic_spline(dx0, dx1, t0, t1);
+
+  double s0 = 0.0;
+  auto func_v = [&dynamic_spline](const double t) {
+    return dynamic_spline.evaluate(0, t);
+  };
+  double s1 = Integration::gauss_legendre(func_v, t0, t1);
+  double s = Integration::gauss_legendre(func_v, t0, t);
+
+  double v = dynamic_spline.evaluate(0, t);
+  double a = dynamic_spline.evaluate(1, t);
+
+  std::array<double, 2> gx0 { { pp0.theta(), pp0.kappa() } };
+  std::array<double, 2> gx1 { { pp1.theta(), pp1.kappa() } };
+  HermiteSpline<double, 3> geometry_spline(gx0, gx1, s0, s1);
+  auto func_cos_theta = [&geometry_spline](const double s) {
+    auto theta = geometry_spline.evaluate(0, s);
+    return std::cos(theta);
+  };
+  auto func_sin_theta = [&geometry_spline](const double s) {
+    auto theta = geometry_spline.evaluate(0, s);
+    return std::sin(theta);
+  };
+
+  double x = pp0.x() + Integration::gauss_legendre(func_cos_theta, s0, s);
+  double y = pp0.y() + Integration::gauss_legendre(func_sin_theta, s0, s);
+  double theta = geometry_spline.evaluate(0, s);
+  double kappa = geometry_spline.evaluate(1, s);
+  double dkappa = geometry_spline.evaluate(2, s);
+  double d2kappa = geometry_spline.evaluate(3, s);
+
+  TrajectoryPoint tp;
+  tp.set_v(v);
+  tp.set_a(a);
+
+  PathPoint* path_point = tp.mutable_path_point();
+  path_point->set_x(x);
+  path_point->set_y(y);
+  path_point->set_theta(theta);
+  path_point->set_kappa(kappa);
+  path_point->set_dkappa(dkappa);
+  path_point->set_ddkappa(d2kappa);
+  path_point->set_s(s);
+
+  // check the diff of computed s1 and p1.s()?
+  return tp;
+}
+
+TrajectoryPoint interpolate_linear_approximation(const TrajectoryPoint& tp0,
+                                                 const TrajectoryPoint& tp1,
+                                                 const double t) {
+  const PathPoint& pp0 = tp0.path_point();
+  const PathPoint& pp1 = tp1.path_point();
+  double t0 = tp0.relative_time();
+  double t1 = tp1.relative_time();
+
+  TrajectoryPoint tp;
+  tp.set_v(Interpolation::lerp(tp0.v(), t0, tp1.v(), t1, t));
+  tp.set_a(Interpolation::lerp(tp0.a(), t0, tp1.a(), t1, t));
+  tp.set_relative_time(t);
+  tp.set_dkappa(Interpolation::lerp(tp0.dkappa(), t0, tp1.dkappa(), t1, t));
+
+  PathPoint* path_point = tp.mutable_path_point();
+  path_point->set_x(Interpolation::lerp(pp0.x(), t0, pp1.x(), t1, t));
+  path_point->set_y(Interpolation::lerp(pp0.y(), t0, pp1.y(), t1, t));
+  path_point->set_theta(
+      Interpolation::lerp(pp0.theta(), t0, pp1.theta(), t1, t));
+  path_point->set_kappa(
+      Interpolation::lerp(pp0.kappa(), t0, pp1.kappa(), t1, t));
+  path_point->set_dkappa(
+      Interpolation::lerp(pp0.dkappa(), t0, pp1.dkappa(), t1, t));
+  path_point->set_ddkappa(
+      Interpolation::lerp(pp0.ddkappa(), t0, pp1.ddkappa(), t1, t));
+  path_point->set_s(Interpolation::lerp(pp0.s(), t0, pp1.s(), t1, t));
+
+  return tp;
 }
 
 }  // namespace util
