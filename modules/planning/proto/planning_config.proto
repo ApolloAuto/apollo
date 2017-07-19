@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message PlanningConfig {
+  enum PlannerType {
+    RTK = 0;
+    EM = 1;  // expecting maximal
+  };
+  optional PlannerType planner_type = 1 [default = EM];
+}

@@ -16,6 +16,10 @@
 
 #include "modules/planning/common/planning_gflags.h"
 
+DEFINE_string(planning_config_file,
+              "modules/planning/conf/planning_config.pb.txt",
+              "planning config file");
+
 DEFINE_int32(planning_loop_rate, 5, "Loop rate for planning node");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
