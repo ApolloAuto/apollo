@@ -39,6 +39,20 @@ cc_library(
 )
 
 cc_library(
+    name = "speed_limit",
+    srcs = [
+        "speed_limit.cc",
+    ],
+    hdrs = [
+        "speed_limit.h",
+    ],
+    deps = [
+        "//modules/common/math",
+        "//modules/planning/common/speed:speed",
+    ],
+)
+
+cc_library(
     name = "lib_planning_common",
     deps = [
         "@eigen//:eigen",
