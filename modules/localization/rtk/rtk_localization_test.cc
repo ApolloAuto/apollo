@@ -42,7 +42,7 @@ class RTKLocalizationTest : public ::testing::Test {
     AdapterManagerConfig config;
     config.set_is_ros(false);
     {
-      auto* sub_config = config.add_config();
+      auto *sub_config = config.add_config();
       sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
       sub_config->set_type(AdapterConfig::LOCALIZATION);
     }
@@ -51,7 +51,7 @@ class RTKLocalizationTest : public ::testing::Test {
 
  protected:
   template <class T>
-  void load_data(const std::string& filename, T* data) {
+  void load_data(const std::string &filename, T *data) {
     CHECK(::apollo::common::util::GetProtoFromFile(filename, data))
         << "Failed to open file " << filename;
   }

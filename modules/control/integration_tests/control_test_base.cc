@@ -100,11 +100,11 @@ bool ControlTestBase::test_control() {
   return true;
 }
 
-void ControlTestBase::trim_control_command(ControlCommand* origin) {
+void ControlTestBase::trim_control_command(ControlCommand *origin) {
   origin->mutable_header()->clear_timestamp_sec();
 }
 
-bool ControlTestBase::test_control(const std::string& test_case_name,
+bool ControlTestBase::test_control(const std::string &test_case_name,
                                    int case_num) {
   std::string golden_result_file("result_" + test_case_name + "_" +
                                  std::to_string(case_num) + ".pb.txt");

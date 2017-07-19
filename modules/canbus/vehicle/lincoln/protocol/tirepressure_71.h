@@ -47,8 +47,8 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the input bytes
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis_detail) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
  private:
   /**
@@ -60,7 +60,7 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of front left tire
    */
-  int32_t front_left_tire(const std::uint8_t* bytes, int32_t length) const;
+  int32_t front_left_tire(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief calculate front right tire based on byte array.
@@ -71,7 +71,7 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of front right tire
    */
-  int32_t front_right_tire(const std::uint8_t* bytes, int32_t length) const;
+  int32_t front_right_tire(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief calculate rear left tire based on byte array.
@@ -82,7 +82,7 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of rear left tire
    */
-  int32_t rear_left_tire(const std::uint8_t* bytes, int32_t length) const;
+  int32_t rear_left_tire(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief calculate rear right tire based on byte array.
@@ -93,7 +93,7 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of rear right tire
    */
-  int32_t rear_right_tire(const std::uint8_t* bytes, int32_t length) const;
+  int32_t rear_right_tire(const std::uint8_t *bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

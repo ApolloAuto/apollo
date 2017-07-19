@@ -16,8 +16,8 @@
 
 #include "esdcan_test.h"
 
-#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 #include "esdcan_err_str.h"
+#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
 namespace platform {

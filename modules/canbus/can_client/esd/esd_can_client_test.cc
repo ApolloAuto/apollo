@@ -39,13 +39,13 @@ TEST(EsdCanClientTest, simple_test) {
   std::vector<CanFrame> frames;
   int32_t num = 0;
   EXPECT_EQ(esd_can_client.Send(frames, &num),
-      ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
+            ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
   EXPECT_EQ(esd_can_client.Receive(&frames, &num),
-      ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED);
+            ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED);
   CanFrame can_frame;
   frames.push_back(can_frame);
   EXPECT_EQ(esd_can_client.SendSingleFrame(frames),
-      ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
+            ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
   esd_can_client.Stop();
 }
 

@@ -27,11 +27,13 @@ namespace hw {
 
 /// Status of HW component (CAN, Camera, ...).
 enum Status {
-  /// This code may only be used for initialization, may never be returned by a function.
+  /// This code may only be used for initialization, may never be returned by a
+  /// function.
   UNDEF = -1,
   /// HW is OK.
   OK = 0,
-  /// HW device is present and in working order, but not ready for service (e.g., no GPS lock).
+  /// HW device is present and in working order, but not ready for service
+  /// (e.g., no GPS lock).
   NOT_READY = 1,
   /// HW is not preent.
   NOT_PRESENT = 2,

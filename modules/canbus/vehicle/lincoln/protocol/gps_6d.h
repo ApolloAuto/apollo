@@ -48,8 +48,8 @@ class Gps6d : public ProtocolData {
    * @param timestamp the timestamp of input data
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis_detail) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
   /**
    * @brief get latitude from byte array
@@ -61,7 +61,7 @@ class Gps6d : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of latitude
    */
-  double latitude(const std::uint8_t* bytes, int32_t length) const;
+  double latitude(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get longitude from byte array
@@ -73,7 +73,7 @@ class Gps6d : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of longitude
    */
-  double longitude(const std::uint8_t* bytes, int32_t length) const;
+  double longitude(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief check is_valid from byte array
@@ -84,7 +84,7 @@ class Gps6d : public ProtocolData {
    * @param length the length of the byte array
    * @return the boolean value of is_valid bit
    */
-  bool is_valid(const std::uint8_t* bytes, int32_t length) const;
+  bool is_valid(const std::uint8_t *bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

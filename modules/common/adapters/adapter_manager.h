@@ -95,9 +95,9 @@ namespace adapter {
     name##_.reset(                                                             \
         new name##Adapter(#name, topic_name, message_history_limit));          \
     if (mode != AdapterConfig::PUBLISH_ONLY && node_handle_) {                 \
-      name##subscriber_ = node_handle_->subscribe(                             \
-          topic_name, message_history_limit,                                   \
-          &name##Adapter::OnReceive, name##_.get());                           \
+      name##subscriber_ =                                                      \
+          node_handle_->subscribe(topic_name, message_history_limit,           \
+                                  &name##Adapter::OnReceive, name##_.get());   \
     }                                                                          \
     if (mode != AdapterConfig::RECEIVE_ONLY && node_handle_) {                 \
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \

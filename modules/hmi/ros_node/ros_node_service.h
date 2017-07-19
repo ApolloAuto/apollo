@@ -53,13 +53,13 @@ class HMIRosNodeImpl final : public HMIRosNode::Service {
    * @param feature a pointer to an instance of ChangeDrivingModeResponse
    * @return the grpc status
    */
-  grpc::Status ChangeDrivingMode(grpc::ServerContext* context,
-                                 const ChangeDrivingModeRequest* point,
-                                 ChangeDrivingModeResponse* feature) override;
+  grpc::Status ChangeDrivingMode(grpc::ServerContext *context,
+                                 const ChangeDrivingModeRequest *point,
+                                 ChangeDrivingModeResponse *feature) override;
 
  private:
   // Monitor the driving mode by listening to Chassis message.
-  static void MonitorDrivingMode(const apollo::canbus::Chassis& status);
+  static void MonitorDrivingMode(const apollo::canbus::Chassis &status);
 
   static std::mutex current_driving_mode_mutex_;
   static apollo::canbus::Chassis::DrivingMode current_driving_mode_;

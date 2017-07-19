@@ -52,7 +52,7 @@ namespace math {
  * @param upper_bound The upper bound of the integral
  * @return The integral result
  */
-double GaussLegendre(const std::function<double(double)>& func,
+double GaussLegendre(const std::function<double(double)> &func,
                      const double lower_bound, const double upper_bound);
 
 }  // namespace math

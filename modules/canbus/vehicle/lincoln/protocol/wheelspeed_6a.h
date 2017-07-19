@@ -47,8 +47,8 @@ class Wheelspeed6a : public ProtocolData {
    * @param length the length of the input bytes
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis_detail) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
   /*
    * @brief parse received data
@@ -57,9 +57,9 @@ class Wheelspeed6a : public ProtocolData {
    * @param timestamp the timestamp of input bytes
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     const struct timeval& timestamp,
-                     ChassisDetail* chassis_detail) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     const struct timeval &timestamp,
+                     ChassisDetail *chassis_detail) const;
 
  private:
   /**
@@ -71,7 +71,7 @@ class Wheelspeed6a : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of byte input
    */
-  double front_left_wheel_speed(const std::uint8_t* bytes,
+  double front_left_wheel_speed(const std::uint8_t *bytes,
                                 int32_t length) const;
 
   /**
@@ -83,7 +83,7 @@ class Wheelspeed6a : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of front right wheel speed
    */
-  double front_right_wheel_speed(const std::uint8_t* bytes,
+  double front_right_wheel_speed(const std::uint8_t *bytes,
                                  int32_t length) const;
 
   /**
@@ -95,7 +95,7 @@ class Wheelspeed6a : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of rear left wheel speed
    */
-  double rear_left_wheel_speed(const std::uint8_t* bytes, int32_t length) const;
+  double rear_left_wheel_speed(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief calculate rear right wheel speed based on byte array.
@@ -106,7 +106,7 @@ class Wheelspeed6a : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of rear right wheel speed
    */
-  double rear_right_wheel_speed(const std::uint8_t* bytes,
+  double rear_right_wheel_speed(const std::uint8_t *bytes,
                                 int32_t length) const;
 
   double parse_two_frames(const std::uint8_t low_byte,

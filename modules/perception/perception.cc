@@ -26,9 +26,7 @@ namespace perception {
 using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
 
-std::string Perception::Name() const {
-  return "perception";
-}
+std::string Perception::Name() const { return "perception"; }
 
 Status Perception::Init() {
   AdapterManager::Init();
