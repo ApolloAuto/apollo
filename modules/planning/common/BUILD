@@ -29,14 +29,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
-        "//modules/planning/common:planning_error_code",
-    ],
-)
-
-cc_library(
-    name = "planning_error_code",
-    hdrs = [
-        "planning_error.h",
+        "//modules/common/proto:error_code_proto",
     ],
 )
 
