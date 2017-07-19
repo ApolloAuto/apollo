@@ -3,16 +3,17 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "vehicle_evaluator",
+    name = "mlp_evaluator",
     hdrs = [
-        "vehicle_evaluator.h",
+        "mlp_evaluator.h",
     ],
     srcs = [
-        "vehicle_evaluator.cc",
+        "mlp_evaluator.cc",
     ],
     deps = [
         "//modules/prediction/evaluator:evaluator",
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/proto:lane_graph_proto",
     ],
 )
 
