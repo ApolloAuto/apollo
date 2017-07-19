@@ -21,7 +21,7 @@
 #ifndef MODULES_PLANNING_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
 #define MODULES_PLANNING_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
 
-#include "include/qpOASES.hpp"
+#include "qpOASES/include/qpOASES.hpp"
 
 #include "modules/planning/math/qp_solver/qp_solver.h"
 
