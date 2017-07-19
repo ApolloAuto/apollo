@@ -4,6 +4,7 @@ cc_library(
     name = "lib_planner",
     srcs = [
         "rtk_replay_planner.cc",
+        "em_planner.cc",
     ],
     hdrs = glob([
         "*.h",

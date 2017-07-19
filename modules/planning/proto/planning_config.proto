@@ -5,7 +5,7 @@ package apollo.planning;
 message PlanningConfig {
   enum PlannerType {
     RTK = 0;
-    EM = 1;  // expecting maximal
+    EM = 1;  // expectation maximization
   };
   optional PlannerType planner_type = 1 [default = EM];
 }
