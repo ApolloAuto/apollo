@@ -32,9 +32,9 @@ namespace prediction {
 
 class MLPEvaluator : public Evaluator {
  public:
-  MLPEvaluator();
+  MLPEvaluator() = default;
 
-  virtual ~MLPEvaluator();
+  virtual ~MLPEvaluator() = default;
 
   void Evaluate(Obstacle* obstacle_ptr);
 
