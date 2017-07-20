@@ -84,3 +84,4 @@ class Obstacle : public PlanningObject {
 }  // namespace apollo
 
 #endif  // MODULES_PLANNING_COMMON_OBSTACLE_H_
+
