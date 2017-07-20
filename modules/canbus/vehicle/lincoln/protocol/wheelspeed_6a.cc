@@ -28,8 +28,6 @@ const int32_t Wheelspeed6a::ID = 0x6A;
 
 void Wheelspeed6a::Parse(const std::uint8_t *bytes, int32_t length,
                          ChassisDetail *chassis_detail) const {
-  // TODO
-
   // how to set direction
   // what is "valid"
   // front left

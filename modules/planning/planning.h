@@ -17,10 +17,12 @@
 #ifndef MODULES_PLANNING_PLANNING_H_
 #define MODULES_PLANNING_PLANNING_H_
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/planner/planner.h"
-
-#include <memory>
 
 namespace apollo {
 namespace planning {

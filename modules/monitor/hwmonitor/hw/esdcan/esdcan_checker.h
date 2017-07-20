@@ -32,7 +32,7 @@ namespace apollo {
 namespace platform {
 namespace hw {
 
-class EsdCanChecker : public HwCheckerIntf {
+class EsdCanChecker : public HwCheckerInterface {
  public:
   static const std::string ESD_CAN_NAME;
 

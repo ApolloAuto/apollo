@@ -21,6 +21,8 @@
 #ifndef MODULES_CONFIGS_VEHICLE_CONFIG_H_
 #define MODULES_CONFIGS_VEHICLE_CONFIG_H_
 
+#include <string>
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/macro.h"
 

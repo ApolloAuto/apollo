@@ -16,6 +16,8 @@
 
 #include "modules/canbus/can_comm/can_sender.h"
 
+#include <algorithm>
+
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 

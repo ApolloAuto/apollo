@@ -21,6 +21,8 @@
 #ifndef MODULES_CANBUS_VEHICLE_VEHICLE_FACTORY_H_
 #define MODULES_CANBUS_VEHICLE_VEHICLE_FACTORY_H_
 
+#include <memory>
+
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/common/util/factory.h"
 

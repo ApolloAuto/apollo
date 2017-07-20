@@ -44,5 +44,5 @@ TEST(Gps6fTest, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

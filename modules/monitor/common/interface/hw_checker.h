@@ -70,7 +70,7 @@ struct HwCheckResult {
         }) {}
 };
 
-class HwCheckerIntf {
+class HwCheckerInterface {
  public:
   /// Returns HW class (one of pre-defined: CAN, Camera, ...).
   virtual const int get_class() const { return HW_CLASS_UNDEF; };

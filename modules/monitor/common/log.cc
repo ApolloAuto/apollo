@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "log.h"
+#include "modules/monitor/common/log.h"
 
 #include <stdio.h>
 

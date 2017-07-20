@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "rtk_replay_planner.h"
+#include "modules/planning/planner/rtk_replay_planner.h"
 
 #include <fstream>
 
@@ -148,4 +148,4 @@ std::size_t RTKReplayPlanner::QueryPositionMatchedPoint(
 }
 
 }  // namespace planning
-}  // nameapace apollo
+}  // namespace apollo
