@@ -24,7 +24,7 @@ namespace apollo {
 namespace planning {
 
 std::string MapObject::Id() const {
-    return id_;
+  return id_;
 }
 
 } // namespace planning
