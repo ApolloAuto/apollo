@@ -24,6 +24,7 @@
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/em_planning_data.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 namespace apollo {
@@ -39,11 +40,11 @@ bool EMPlanner::MakePlan(const TrajectoryPoint& start_point,
   DataCenter* data_center = DataCenter::instance();
   // Frame* frame = data_center->current_frame();
 
-  //  frame->set_planning_data(task->create_planning_data_instance());
-  //  frame->mutable_planning_data()->set_reference_line(reference_line);
-  //  frame->mutable_planning_data()->set_decision_data(decision_data);
-  //  frame->mutable_planning_data()->set_init_planning_point(
-  //      frame->environment().vehicle_state_proxy().init_point(data_center->last_frame()));
+  frame->set_planning_data(new EMPlanningData());
+//  frame->mutable_planning_data()->set_reference_line(reference_line);
+//  frame->mutable_planning_data()->set_decision_data(decision_data);
+//  frame->mutable_planning_data()->set_init_planning_point(
+//      frame->environment().vehicle_state_proxy().init_point(data_center->last_frame()));
 
   return true;
 }
