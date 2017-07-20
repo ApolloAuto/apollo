@@ -22,9 +22,9 @@
 
 #include <utility>
 
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/math/hermite_spline.h"
 #include "modules/planning/math/integration.h"
-#include "modules/planning/math/interpolation.h"
 
 namespace apollo {
 namespace planning {
@@ -163,22 +163,22 @@ TrajectoryPoint interpolate_linear_approximation(const TrajectoryPoint& tp0,
   double t1 = tp1.relative_time();
 
   TrajectoryPoint tp;
-  tp.set_v(Interpolation::lerp(tp0.v(), t0, tp1.v(), t1, t));
-  tp.set_a(Interpolation::lerp(tp0.a(), t0, tp1.a(), t1, t));
+  tp.set_v(apollo::common::math::lerp(tp0.v(), t0, tp1.v(), t1, t));
+  tp.set_a(apollo::common::math::lerp(tp0.a(), t0, tp1.a(), t1, t));
   tp.set_relative_time(t);
 
   PathPoint* path_point = tp.mutable_path_point();
-  path_point->set_x(Interpolation::lerp(pp0.x(), t0, pp1.x(), t1, t));
-  path_point->set_y(Interpolation::lerp(pp0.y(), t0, pp1.y(), t1, t));
+  path_point->set_x(apollo::common::math::lerp(pp0.x(), t0, pp1.x(), t1, t));
+  path_point->set_y(apollo::common::math::lerp(pp0.y(), t0, pp1.y(), t1, t));
   path_point->set_theta(
-      Interpolation::lerp(pp0.theta(), t0, pp1.theta(), t1, t));
+      apollo::common::math::lerp(pp0.theta(), t0, pp1.theta(), t1, t));
   path_point->set_kappa(
-      Interpolation::lerp(pp0.kappa(), t0, pp1.kappa(), t1, t));
+      apollo::common::math::lerp(pp0.kappa(), t0, pp1.kappa(), t1, t));
   path_point->set_dkappa(
-      Interpolation::lerp(pp0.dkappa(), t0, pp1.dkappa(), t1, t));
+      apollo::common::math::lerp(pp0.dkappa(), t0, pp1.dkappa(), t1, t));
   path_point->set_ddkappa(
-      Interpolation::lerp(pp0.ddkappa(), t0, pp1.ddkappa(), t1, t));
-  path_point->set_s(Interpolation::lerp(pp0.s(), t0, pp1.s(), t1, t));
+      apollo::common::math::lerp(pp0.ddkappa(), t0, pp1.ddkappa(), t1, t));
+  path_point->set_s(apollo::common::math::lerp(pp0.s(), t0, pp1.s(), t1, t));
 
   return tp;
 }
