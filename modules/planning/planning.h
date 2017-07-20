@@ -98,7 +98,7 @@ class Planning : public apollo::common::ApolloApp {
   std::vector<common::TrajectoryPoint> GetOverheadTrajectory(
       const std::size_t matched_index, const std::size_t buffer_size);
 
-  ADCTrajectory ToTrajectoryPb(
+  ADCTrajectory ToADCTrajectory(
       const double header_time,
       const std::vector<common::TrajectoryPoint>& discretized_trajectory);
 

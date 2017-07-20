@@ -13,6 +13,7 @@ cc_proto_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/proto:common_proto",
+        "//modules/common/proto:path_point_proto",
         "//modules/decision/proto:decision_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",

@@ -41,9 +41,7 @@ std::size_t PublishableTrajectory::query_nearest_point_absolute_time(
   return query_nearest_point(abs_time - _header_time);
 }
 
-double PublishableTrajectory::header_time() const {
-  return _header_time;
-}
+double PublishableTrajectory::header_time() const { return _header_time; }
 
 void PublishableTrajectory::set_header_time(const double header_time) {
   _header_time = header_time;
@@ -53,21 +51,11 @@ ADCTrajectory PublishableTrajectory::to_trajectory_protobuf() const {
   ADCTrajectory trajectory_pb;
   trajectory_pb.mutable_header()->set_timestamp_sec(_header_time);
   for (const auto& tp : _trajectory_points) {
-    const auto& path_point = tp.path_point();
-    auto* trajectory_point = trajectory_pb.add_adc_trajectory_point();
-    trajectory_point->set_relative_time(tp.relative_time());
-    trajectory_point->set_accumulated_s(path_point.s());
-    trajectory_point->set_speed(tp.v());
-    trajectory_point->set_acceleration_s(tp.a());
-    trajectory_point->set_theta(path_point.theta());
-    trajectory_point->set_curvature(path_point.kappa());
-    trajectory_point->set_curvature_change_rate(path_point.dkappa());
-    trajectory_point->set_x(path_point.x());
-    trajectory_point->set_y(path_point.y());
-    trajectory_point->set_z(0.0);
+    auto* trajectory_point = trajectory_pb.add_trajectory_point();
+    trajectory_point->CopyFrom(tp);
   }
   return trajectory_pb;
 }
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo

@@ -30,7 +30,7 @@ using apollo::common::monitor::MonitorMessage;
 using apollo::canbus::Chassis;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::planning::ADCTrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 namespace apollo {
 namespace dreamview {
@@ -39,9 +39,7 @@ namespace internal {
 
 class InternalTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    apollo::common::config::VehicleConfigHelper::Init();
-  }
+  virtual void SetUp() { apollo::common::config::VehicleConfigHelper::Init(); }
 };
 
 TEST_F(InternalTest, UpdateMonitorSuccessTest) {
@@ -167,9 +165,9 @@ TEST_F(InternalTest, UpdatePlanningTrajectoryTest) {
   // SimulationWorld object.
   ADCTrajectory planning_trajectory;
   for (int i = 0; i < 30; ++i) {
-    ADCTrajectoryPoint *point = planning_trajectory.add_adc_trajectory_point();
-    point->set_x(i * 10);
-    point->set_y(i * 10 + 10);
+    TrajectoryPoint *point = planning_trajectory.add_trajectory_point();
+    point->mutable_path_point()->set_x(i * 10);
+    point->mutable_path_point()->set_y(i * 10 + 10);
   }
 
   // Commit the update.

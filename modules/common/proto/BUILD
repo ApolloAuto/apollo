@@ -55,5 +55,6 @@ py_proto_compile(
         "error_code.proto",
         "geometry.proto",
         "header.proto",
+        "path_point.proto",
     ],
 )
