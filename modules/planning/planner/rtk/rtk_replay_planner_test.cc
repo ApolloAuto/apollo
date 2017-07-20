@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planner/rtk_replay_planner.h"
+#include "modules/planning/planner/rtk/rtk_replay_planner.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -37,7 +37,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_y(4140674.76063);
 
   std::vector<TrajectoryPoint> trajectory;
-  bool planning_succeeded = planner.Plan(start_point, &trajectory);
+  bool planning_succeeded = planner.MakePlan(start_point, &trajectory);
 
   EXPECT_TRUE(planning_succeeded);
   EXPECT_TRUE(!trajectory.empty());
@@ -62,7 +62,7 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
   std::vector<TrajectoryPoint> trajectory;
-  EXPECT_TRUE(!planner_with_error_csv.Plan(start_point, &trajectory));
+  EXPECT_TRUE(!planner_with_error_csv.MakePlan(start_point, &trajectory));
 }
 
 }  // namespace control
