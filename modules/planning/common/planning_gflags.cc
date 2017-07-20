@@ -40,3 +40,74 @@ DEFINE_double(replanning_threshold, 2.0,
 DEFINE_double(trajectory_resolution, 0.01,
               "The time resolution of "
               "output trajectory.");
+
+DEFINE_double(cycle_duration_in_sec, 0.002, "# of seconds per planning cycle.");
+DEFINE_double(maximal_delay_sec, 0.005, "# of seconds for delay.");
+
+DEFINE_int32(max_history_result, 10, "The maximal number of result in history.");
+
+DEFINE_int32(max_frame_size, 30, "max size for prediction window");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Finite State Machine
+DEFINE_int32(state_fail_threshold, 5, "This is continuous fail threshold for FSM change to fail state.");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Object Table
+DEFINE_int32(object_table_obstacle_capacity, 200, "The number of obstacles we hold in the object table.");
+DEFINE_int32(object_table_map_object_capacity, 200, "The number of map objects we hold in the object table.");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// parameters for trajectory stitching and reinit planning starting point.
+DEFINE_bool(use_stitch, true, "Use trajectory stitch if possible.");
+DEFINE_double(forward_predict_time, 0.2, "The forward predict time in each planning cycle.");
+DEFINE_double(replan_distance_threshold, 5.0, "The distance threshold of replan");
+DEFINE_double(replan_s_threshold, 5.0, "The s difference to real position threshold of replan");
+DEFINE_double(replan_l_threshold, 2.5, "The l difference to real position threshold of replan");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// parameters for path planning
+DEFINE_double(planning_distance, 100, "Planning distance");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// parameters for trajectory planning
+DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
+DEFINE_double(trajectory_time_resolution, 0.1, "Trajectory time resolution in planning");
+DEFINE_double(output_trajectory_time_resolution, 0.05, "Trajectory time resolution when publish");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// parameters for trajectory sanity check
+DEFINE_double(speed_lower_bound, 0.0, "The lowest speed allowed." );
+DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
+
+DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
+        "The lowest longitudinal acceleration allowed.");
+DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
+        "The highest longitudinal acceleration allowed.");
+
+DEFINE_double(lateral_acceleration_bound, 4.5, "The bound of lateral acceleration; symmetric for left and right");
+DEFINE_double(lateral_jerk_bound, 4.0, "The bound of lateral jerk; symmetric for left and right");
+
+DEFINE_double(longitudinal_jerk_lower_bound, -4.0, "The lower bound of longitudinal jerk.");
+DEFINE_double(longitudinal_jerk_upper_bound, 4.0, "The upper bound of longitudinal jerk.");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Math : active set solver
+DEFINE_double(default_active_set_eps_num, 1e-7,
+        "qpOases wrapper error control numerator");
+DEFINE_double(default_active_set_eps_den, 1e-7,
+        "qpOases wrapper error control numerator");
+DEFINE_double(default_active_set_eps_iter_ref, 1e-7,
+        "qpOases wrapper error control numerator");
+DEFINE_bool(default_enable_active_set_debug_info, false,
+        "Enable print information");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// parameters for velocity planning, ST Graph
+DEFINE_double(stgraph_default_point_cost, 1e10, "The default stgraph point cost.");
+DEFINE_double(stgraph_max_acceleration_divide_factor_level_1, 2.0,
+        "The divide factor for max acceleration at level 1.");
+DEFINE_double(stgraph_max_deceleration_divide_factor_level_1, 3.0,
+        "The divide factor for max deceleration at level 1.");
+DEFINE_double(stgraph_max_deceleration_divide_factor_level_2, 2.0,
+        "The divide factor for max deceleration at level 2.");
