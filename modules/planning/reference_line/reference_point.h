@@ -21,25 +21,25 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_POINT_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_POINT_H_
 
-#include "map/trajectory.h"
+#include "modules/common/path/path.h"
 
 namespace apollo {
 namespace planning {
 
-class ReferencePoint : public ::adu::hdmap::TrajectoryPoint {
+class ReferencePoint : public ::apollo::common::PathPoint {
  public:
   ReferencePoint() = default;
 
-  ReferencePoint(const ::adu::common::math::Vec2d& point, const double heading,
-                 const double kappa, const double dkappa,
+  ReferencePoint(const ::apollo::common::math::Vec2d& point,
+                 const double heading, const double kappa, const double dkappa,
                  const double lower_bound, const double upper_bound);
 
-  ReferencePoint(const adu::common::math::Vec2d& point, const double heading,
-                 const ::adu::hdmap::LaneWaypoint lane_waypoint);
+  ReferencePoint(const apollo::common::math::Vec2d& point, const double heading,
+                 const ::apollo::common::LaneWaypoint lane_waypoint);
 
-  ReferencePoint(const adu::common::math::Vec2d& point, const double heading,
+  ReferencePoint(const apollo::common::math::Vec2d& point, const double heading,
                  const double kappa, const double dkappa,
-                 const ::adu::hdmap::LaneWaypoint lane_waypoint);
+                 const ::apollo::common::LaneWaypoint lane_waypoint);
 
   void set_kappa(const double kappa);
   void set_dkappa(const double dkappa);
@@ -51,8 +51,6 @@ class ReferencePoint : public ::adu::hdmap::TrajectoryPoint {
 
   double lower_bound() const;
   double upper_bound() const;
-
-  std::string to_json() const override;
 
  private:
   double _kappa = 0.0;
