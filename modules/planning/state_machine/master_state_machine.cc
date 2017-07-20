@@ -31,5 +31,6 @@ MasterStateMachine::MasterState MasterStateMachine::state() const {
     return state_;
 }
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
+

@@ -103,5 +103,5 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
   planning.Reset();
 }
 
-}  // namespace control
+}  // namespace planning
 }  // namespace apollo

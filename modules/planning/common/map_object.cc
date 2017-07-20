@@ -27,5 +27,5 @@ std::string MapObject::Id() const {
   return id_;
 }
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo

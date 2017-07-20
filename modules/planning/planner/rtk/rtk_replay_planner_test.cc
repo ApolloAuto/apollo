@@ -65,5 +65,6 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   EXPECT_TRUE(!planner_with_error_csv.MakePlan(start_point, &trajectory));
 }
 
-}  // namespace control
+}  // namespace planning
 }  // namespace apollo
+

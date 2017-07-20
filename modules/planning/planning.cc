@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/planning/planning.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/planning.h"
-#include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {

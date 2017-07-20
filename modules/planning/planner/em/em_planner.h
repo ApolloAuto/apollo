@@ -64,6 +64,6 @@ class EMPlanner : public Planner {
 };
 
 }  // namespace planning
-}  // nameapace apollo
+}  // namespace apollo
 
-#endif /* MODULES_PLANNING_PLANNER_EM_PLANNER_H_ */
+#endif  //* MODULES_PLANNING_PLANNER_EM_PLANNER_H_

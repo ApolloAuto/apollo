@@ -25,28 +25,29 @@ namespace apollo {
 namespace planning {
 
 PlanningObject::PlanningObjectType PlanningObject::ObjectType() const {
-    return object_type_;
+  return object_type_;
 }
 
 PlanningObject::PlanningObjectType* PlanningObject::MutableObjectType() {
-    return &object_type_;
+  return &object_type_;
 }
 
 const std::vector<Decision>& PlanningObject::Decisions() const {
-    return decisions_;
+  return decisions_;
 }
 
 std::vector<Decision>* PlanningObject::MutableDecisions() {
-    return &decisions_;
+  return &decisions_;
 }
 
 const ::apollo::common::math::Polygon2d& PlanningObject::Polygon() const {
-    return polygon_;
+  return polygon_;
 }
 
 ::apollo::common::math::Polygon2d* PlanningObject::MutablePolygon() {
-    return &polygon_;
+  return &polygon_;
 }
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo
+

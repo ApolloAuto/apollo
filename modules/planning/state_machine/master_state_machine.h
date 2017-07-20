@@ -20,31 +20,33 @@
  *    header file of master state machine.
  **/
 
-#ifndef MODULES_PLANNING_STATE_MACHINE_MASTER_STATE_MACHINE_H
-#define MODULES_PLANNING_STATE_MACHINE_MASTER_STATE_MACHINE_H
+#ifndef MODULES_PLANNING_STATE_MACHINE_MASTER_STATE_MACHINE_H_
+#define MODULES_PLANNING_STATE_MACHINE_MASTER_STATE_MACHINE_H_
 
 namespace apollo {
 namespace planning {
 
 class MasterStateMachine {
-public:
-    enum MasterState {
-        INIT = 0,
-        CRUISE = 1,
-        CHANGING_LANE = 2,
-        ESTOP = 3,
-        WAIT = 4,
-        FINISH = 5,
-        OVERTAKE = 6,
+ public:
+  enum MasterState {
+      INIT = 0,
+      CRUISE = 1,
+      CHANGING_LANE = 2,
+      ESTOP = 3,
+      WAIT = 4,
+      FINISH = 5,
+      OVERTAKE = 6,
     };
-    MasterStateMachine() = default;
-    void set_state(MasterState state);
-    MasterState state() const;
-private:
-    MasterState state_ = MasterState::INIT;
+
+  MasterStateMachine() = default;
+  void set_state(MasterState state);
+  MasterState state() const;
+
+ private:
+  MasterState state_ = MasterState::INIT;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif // MODULES_PLANNING_STATE_MACHINE_MASTER_STATE_MACHINE_H
+#endif  // MODULES_PLANNING_STATE_MACHINE_MASTER_STATE_MACHINE_H_

@@ -19,8 +19,8 @@
  *
  **/
 
-#ifndef MODULES_PLANNING_COMMON_PLANNING_OBJECT_H
-#define MODULES_PLANNING_COMMON_PLANNING_OBJECT_H
+#ifndef MODULES_PLANNING_COMMON_PLANNING_OBJECT_H_
+#define MODULES_PLANNING_COMMON_PLANNING_OBJECT_H_
 
 #include <vector>
 
@@ -31,26 +31,28 @@ namespace apollo {
 namespace planning {
 
 class PlanningObject {
-public:
-    enum class PlanningObjectType {
-        OBSTACLE = 0,
-        MAP_OBJECT = 1,
-    };
-public:
-    PlanningObject() = default;
-    virtual PlanningObjectType ObjectType() const;
-    virtual PlanningObjectType* MutableObjectType();
-    virtual const ::apollo::common::math::Polygon2d& Polygon() const;
-    virtual ::apollo::common::math::Polygon2d* MutablePolygon();
-    virtual const std::vector<Decision>& Decisions() const;
-    virtual std::vector<Decision>* MutableDecisions();
-private:
-    PlanningObjectType object_type_;
-    ::apollo::common::math::Polygon2d polygon_;
-    std::vector<Decision> decisions_;
+ public:
+  enum class PlanningObjectType {
+      OBSTACLE = 0,
+      MAP_OBJECT = 1,
+  };
+
+ public:
+  PlanningObject() = default;
+  virtual PlanningObjectType ObjectType() const;
+  virtual PlanningObjectType* MutableObjectType();
+  virtual const ::apollo::common::math::Polygon2d& Polygon() const;
+  virtual ::apollo::common::math::Polygon2d* MutablePolygon();
+  virtual const std::vector<Decision>& Decisions() const;
+  virtual std::vector<Decision>* MutableDecisions();
+
+ private:
+  PlanningObjectType object_type_;
+  ::apollo::common::math::Polygon2d polygon_;
+  std::vector<Decision> decisions_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_OBJECT_H
+#endif  // MODULES_PLANNING_COMMON_PLANNING_OBJECT_H_
