@@ -27,12 +27,12 @@ namespace apollo {
 namespace planning {
 
 class MapObject : public PlanningObject {
-public:
-    MapObject() = default;
-    std::string Id() const;
+ public:
+  MapObject() = default;
+  std::string Id() const;
 
-private:
-    std::string id_;
+ private:
+  std::string id_;
 };
 
 } // namespace planning

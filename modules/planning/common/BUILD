@@ -50,6 +50,7 @@ cc_library(
     deps = [
         "//modules/common/math:box2d",
         "//modules/planning/common:planning_object",
+        "//modules/planning/common/trajectory:prediction_trajectory",
     ],
 )
 
@@ -127,12 +128,11 @@ cc_library(
         "frame.h",
     ],
     deps = [
-        "//modules/planning/common:planning_data",
-        "//modules/planning/common:environment",
         "//modules/common:log",
+        "//modules/planning/common:environment",
+        "//modules/planning/common:planning_data",
     ],
 )
-
 
 cc_library(
     name = "speed_limit",
@@ -161,8 +161,8 @@ cc_library(
         ":frame",
         ":planning_data",
         ":planning_gflags",
-        "//modules/common/status",
         "//modules/common",
+        "//modules/common/status",
         "//modules/planning/state_machine:master_state_machine",
     ],
 )
@@ -171,8 +171,8 @@ cc_library(
     name = "planning_common",
     deps = [
         "@eigen//:eigen",
-        ":frame",
         ":data_center",
+        ":frame",
         ":planning_gflags",
         ":speed_limit",
         "//modules/common:log",
