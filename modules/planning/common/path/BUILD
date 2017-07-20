@@ -15,7 +15,6 @@ cc_library(
     deps = [
         "//modules/common/proto:path_point_proto",
         "//modules/planning/math:hermite_spline",
-        "//modules/planning/math:integration",
         "//modules/common/math:math",
         "@eigen//:eigen",
     ],

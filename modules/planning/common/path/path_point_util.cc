@@ -22,9 +22,9 @@
 
 #include <utility>
 
+#include "modules/common/math/integral.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/math/hermite_spline.h"
-#include "modules/planning/math/integration.h"
 
 namespace apollo {
 namespace planning {
@@ -51,8 +51,10 @@ PathPoint interpolate(const PathPoint& p0, const PathPoint& p1,
     return std::sin(theta);
   };
 
-  double x = p0.x() + Integration::gauss_legendre(func_cos_theta, s0, s);
-  double y = p0.y() + Integration::gauss_legendre(func_sin_theta, s0, s);
+  double x = p0.x() + apollo::common::math::IntegrateByGaussLegendre(
+                          func_cos_theta, s0, s);
+  double y = p0.y() + apollo::common::math::IntegrateByGaussLegendre(
+                          func_sin_theta, s0, s);
   double theta = geometry_spline.evaluate(0, s);
   double kappa = geometry_spline.evaluate(1, s);
   double dkappa = geometry_spline.evaluate(2, s);
@@ -112,8 +114,8 @@ TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
   auto func_v = [&dynamic_spline](const double t) {
     return dynamic_spline.evaluate(0, t);
   };
-  double s1 = Integration::gauss_legendre(func_v, t0, t1);
-  double s = Integration::gauss_legendre(func_v, t0, t);
+  double s1 = apollo::common::math::IntegrateByGaussLegendre(func_v, t0, t1);
+  double s = apollo::common::math::IntegrateByGaussLegendre(func_v, t0, t);
 
   double v = dynamic_spline.evaluate(0, t);
   double a = dynamic_spline.evaluate(1, t);
@@ -130,8 +132,10 @@ TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
     return std::sin(theta);
   };
 
-  double x = pp0.x() + Integration::gauss_legendre(func_cos_theta, s0, s);
-  double y = pp0.y() + Integration::gauss_legendre(func_sin_theta, s0, s);
+  double x = pp0.x() + apollo::common::math::IntegrateByGaussLegendre(
+                           func_cos_theta, s0, s);
+  double y = pp0.y() + apollo::common::math::IntegrateByGaussLegendre(
+                           func_sin_theta, s0, s);
   double theta = geometry_spline.evaluate(0, s);
   double kappa = geometry_spline.evaluate(1, s);
   double dkappa = geometry_spline.evaluate(2, s);

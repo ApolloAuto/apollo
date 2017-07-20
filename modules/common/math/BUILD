@@ -248,6 +248,9 @@ cc_library(
     hdrs = [
         "integral.h",
     ],
+    deps = [
+        "//modules/common:log",
+    ],
 )
 
 cc_library(

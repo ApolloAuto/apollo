@@ -26,19 +26,6 @@ cc_library(
 )
 
 cc_library(
-    name = "integration",
-    srcs = [
-        "integration.cc",
-    ],
-    hdrs = [
-        "integration.h",
-    ],
-    deps = [
-        "//modules/common:log",
-    ],
-)
-
-cc_library(
     name = "polynomial_xd",
     srcs = [
         "polynomial_xd.cc",

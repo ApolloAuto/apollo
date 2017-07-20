@@ -43,7 +43,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:path_point_proto",
-        "//modules/planning/math:integration",
+        "//modules/common/math:math",
         "@eigen//:eigen",
     ],
 )
@@ -61,7 +61,7 @@ cc_library(
         ":spiral_formula",
         "//modules/common:log",
         "//modules/common/proto:path_point_proto",
-        "//modules/planning/math:integration",
+        "//modules/common/math:math",
         "@eigen//:eigen",
     ],
 )
