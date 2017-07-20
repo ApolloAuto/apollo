@@ -18,11 +18,12 @@
 #define MODULES_PLATFORM_HW_ESDCAN_CHECKER_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/monitor/common/annotations.h"
 #include "modules/monitor/common/interface/hw_checker.h"
 
-#include "esdcan_test.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
 /**
  * @namespace apollo::platform::hw
