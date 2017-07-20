@@ -17,7 +17,7 @@
 #ifndef MODULES_PLATFORM_HW_ESDCAN_UTILS_H_
 #define MODULES_PLATFORM_HW_ESDCAN_UTILS_H_
 
-#include "esdcan_test.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
 #include <ostream>
 

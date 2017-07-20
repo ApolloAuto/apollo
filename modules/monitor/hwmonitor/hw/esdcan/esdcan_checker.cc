@@ -14,18 +14,20 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "esdcan_checker.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_checker.h"
 
 #include <sstream>
+#include <utility>
+#include <vector>
 
-#include "esdcan_err_str.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
 #include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
 namespace platform {
 namespace hw {
 
-const std::string EsdCanChecker::ESD_CAN_NAME = "ESD_CAN";
+const char EsdCanChecker::ESD_CAN_NAME[] = "ESD_CAN";
 
 EsdCanChecker::EsdCanChecker(int id) : can_id_(id) {
   std::ostringstream os;
@@ -43,7 +45,7 @@ std::string EsdCanChecker::esdcan_result_to_message(NTCAN_RESULT ntstatus) {
                                    : std::string(esdcan_err_to_str(ntstatus));
 }
 
-void EsdCanChecker::run_check(std::vector<HwCheckResult> &results) {
+void EsdCanChecker::run_check(std::vector<HwCheckResult> *results) {
   PLATFORM_DBG(get_log_module(), log::LVL_INFO, "To check ESD-CAN-%d", can_id_);
 
   EsdCanDetails *details = new EsdCanDetails();
@@ -52,7 +54,7 @@ void EsdCanChecker::run_check(std::vector<HwCheckResult> &results) {
   HwCheckResult rslt(name_, esdcan_result_to_hw_status(result), details,
                      std::move(esdcan_result_to_message(result)));
 
-  results.emplace_back(std::move(rslt));
+  results->emplace_back(std::move(rslt));
 }
 
 }  // namespace hw
