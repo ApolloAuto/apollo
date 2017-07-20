@@ -16,6 +16,7 @@
 
 #include "modules/prediction/evaluator/evaluator_factory.h"
 
+#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -24,8 +25,8 @@ namespace prediction {
 EvaluatorFactory::EvaluatorFactory() {}
 
 void EvaluatorFactory::RegisterEvaluator() {
-    Register(ObstacleConf::DEF_EVAL,
-        []() -> Evaluator* { return nullptr; });
+  Register(ObstacleConf::MLP_EVAL,
+        []() -> Evaluator* { return new MLPEvaluator(); });
 }
 
 std::unique_ptr<Evaluator> EvaluatorFactory::CreateEvaluator(

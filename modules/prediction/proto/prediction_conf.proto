@@ -9,7 +9,7 @@ message ObstacleConf {
   }
 
   enum Eval {
-    DEF_EVAL = 0;
+    MLP_EVAL = 0;
   }
 
   enum Model {
