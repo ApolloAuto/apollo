@@ -25,6 +25,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/proto/geometry.pb.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/dreamview/backend/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
@@ -165,10 +166,11 @@ void UpdateSimulationWorld<ChassisAdapter>(const Chassis &chassis,
   }
   auto_driving_car->set_steering_angle(angle_percentage);
 
-  if (chassis.signal().turn_signal() == ::apollo::canbus::Signal::TURN_LEFT) {
+  if (chassis.signal().turn_signal() ==
+      ::apollo::common::VehicleSignal::TURN_LEFT) {
     auto_driving_car->set_current_signal("LEFT");
   } else if (chassis.signal().turn_signal() ==
-             ::apollo::canbus::Signal::TURN_RIGHT) {
+             ::apollo::common::VehicleSignal::TURN_RIGHT) {
     auto_driving_car->set_current_signal("RIGHT");
   } else {
     auto_driving_car->set_current_signal("");

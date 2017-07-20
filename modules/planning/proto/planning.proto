@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/common/proto/header.proto";
+import "modules/common/proto/vehicle_signal.proto";
 import "modules/common/proto/path_point.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/planning/proto/planning_internal.proto";
@@ -31,12 +32,10 @@ message ADCTrajectory {
   repeated apollo.common.TrajectoryPoint trajectory_point = 4;
   optional EStop estop = 6;
   repeated apollo.common.PathPoint path_point = 7;
+  optional apollo.planning_internal.Debug debug = 8;
   // is_replan == true mean replan triggered
   optional bool is_replan = 9 [default = false];
   // Specify trajectory gear
   optional apollo.canbus.Chassis.GearPosition gear = 10;
-  optional apollo.planning_internal.Debug debug = 8;
-  optional apollo.canbus.Signal signal = 11;
-
-  optional ADCSignals signals = 5 [deprecated = true];
+  optional apollo.common.VehicleSignal signal = 11;
 }
