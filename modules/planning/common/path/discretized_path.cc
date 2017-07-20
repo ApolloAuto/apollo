@@ -74,11 +74,11 @@ int DiscretizedPath::query_closest_point(const double param) const {
   }
 }
 
-std::vector<common::PathPoint>* DiscretizedPath::mutable_path_points() {
+std::vector<common::PathPoint> *DiscretizedPath::mutable_path_points() {
   return &path_points_;
 }
 
-const std::vector<common::PathPoint>& DiscretizedPath::path_points() const {
+const std::vector<common::PathPoint> &DiscretizedPath::path_points() const {
   return path_points_;
 }
 
@@ -86,7 +86,7 @@ std::size_t DiscretizedPath::num_of_points() const {
   return path_points_.size();
 }
 
-const common::PathPoint& DiscretizedPath::path_point_at(
+const common::PathPoint &DiscretizedPath::path_point_at(
     const std::size_t index) const {
   CHECK_LT(index, path_points_.size());
   return path_points_[index];
@@ -102,14 +102,14 @@ common::PathPoint DiscretizedPath::end_point() const {
   return path_points_.back();
 }
 
-common::PathPoint& DiscretizedPath::path_point_at(const std::size_t index) {
+common::PathPoint &DiscretizedPath::path_point_at(const std::size_t index) {
   CHECK_LT(index, path_points_.size());
   return path_points_[index];
 }
 
 std::vector<common::PathPoint>::const_iterator
 DiscretizedPath::query_lower_bound(const double param) const {
-  auto func = [](const common::PathPoint& tp, const double param) {
+  auto func = [](const common::PathPoint &tp, const double param) {
     return tp.s() < param;
   };
   return std::lower_bound(path_points_.begin(), path_points_.end(), param,
