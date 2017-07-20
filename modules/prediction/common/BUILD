@@ -12,4 +12,11 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "prediction_util",
+    srcs = ["prediction_util.cc"],
+    hdrs = ["prediction_util.h"],
+    deps = [],
+)
+
 cpplint()
