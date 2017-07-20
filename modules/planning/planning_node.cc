@@ -16,6 +16,8 @@
 
 #include "modules/planning/planning_node.h"
 
+#include <utility>
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"

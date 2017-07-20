@@ -35,5 +35,5 @@ TEST(Gyro6cTest, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

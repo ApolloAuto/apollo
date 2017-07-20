@@ -43,7 +43,7 @@ namespace canbus {
 namespace lincoln {
 
 LincolnMessageManager::LincolnMessageManager() {
-  // TODO: verify which one is recv/sent
+  // TODO(Authors): verify which one is recv/sent
   AddSendProtocolData<Brake60, true>();
   AddSendProtocolData<Throttle62, true>();
   AddSendProtocolData<Steering64, true>();

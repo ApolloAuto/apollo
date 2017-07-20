@@ -234,7 +234,7 @@ class Teleop {
             exit(-1);
           }
           level = c - KEYCODE_ZERO;
-          GetPadMessage(pad_msg, level);
+          GetPadMessage(&pad_msg, level);
           control_command_.mutable_pad_msg()->CopyFrom(pad_msg);
           sleep(1);
           control_command_.mutable_pad_msg()->Clear();
@@ -276,7 +276,7 @@ class Teleop {
     }
   }
 
-  void GetPadMessage(PadMessage &pad_msg, int32_t int_action) {
+  void GetPadMessage(PadMessage *pad_msg, int32_t int_action) {
     apollo::control::DrivingAction action =
         apollo::control::DrivingAction::RESET;
     switch (int_action) {
@@ -292,7 +292,7 @@ class Teleop {
         printf("unknown action:%d, use default RESET\n", int_action);
         break;
     }
-    pad_msg.set_action(action);
+    pad_msg->set_action(action);
     return;
   }
 

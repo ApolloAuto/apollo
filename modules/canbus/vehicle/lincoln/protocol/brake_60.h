@@ -44,18 +44,18 @@ class Brake60 : public ProtocolData {
    * @brief get the data period
    * @return the value of data period
    */
-  virtual uint32_t GetPeriod() const override;
+  uint32_t GetPeriod() const override;
 
   /**
    * @brief update the data
    * @param data a pointer to the data to be updated
    */
-  virtual void UpdateData(uint8_t *data) override;
+  void UpdateData(uint8_t *data) override;
 
   /**
    * @brief reset the private variables
    */
-  virtual void Reset() override;
+  void Reset() override;
 
   /**
    * @brief set pedal based on pedal command

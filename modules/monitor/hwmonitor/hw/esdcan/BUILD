@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -33,3 +35,5 @@ cc_library(
         "//third_party/can_card_library/esd_can",
     ],
 )
+
+# cpplint()

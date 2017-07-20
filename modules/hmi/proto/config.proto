@@ -2,7 +2,6 @@ syntax = "proto2";
 
 package apollo.hmi;
 
-
 message Command {
   optional string name = 1;
 
