@@ -36,5 +36,6 @@ const Decision::DecisionType& Decision::Type() const {
     return type_;
 }
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
+

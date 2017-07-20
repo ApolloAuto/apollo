@@ -23,39 +23,37 @@
 namespace apollo {
 namespace planning {
 
-// TODO: complete data extracting functions here
 const std::vector<Obstacle>& DecisionData::Obstacles() const {
-    return obstacles_;
+  return obstacles_;
 }
 
 std::vector<Obstacle>* DecisionData::MutableObstacles() {
-    return &obstacles_;
+  return &obstacles_;
 }
 
 std::vector<const Obstacle*> DecisionData::StaticObstacles() const {
-    return std::vector<const Obstacle*>();
+  return std::vector<const Obstacle*>();
 }
 
 std::vector<Obstacle*> DecisionData::MutableStaticObstacles() const {
-    return std::vector<Obstacle*>();
+  return std::vector<Obstacle*>();
 }
 
 std::vector<const Obstacle*> DecisionData::DynamicObstacles() const {
-    return std::vector<const Obstacle*>();
+  return std::vector<const Obstacle*>();
 }
 
 std::vector<Obstacle*> DecisionData::MutableDynamicObstacles() const {
-    return std::vector<Obstacle*>();
+  return std::vector<Obstacle*>();
 }
 
 std::vector<const MapObject*> DecisionData::MapObjects() const {
-    return std::vector<const MapObject*>();
+  return std::vector<const MapObject*>();
 }
 
 std::vector<MapObject*> DecisionData::MutableMapObjects() const {
-    return std::vector<MapObject*>();
+  return std::vector<MapObject*>();
 }
 
-} // namespace planning
-} // namespace apollo
-
+}  // namespace planning
+}  // namespace apollo
