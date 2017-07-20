@@ -25,9 +25,9 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-bool parse_config_text(const std::string& filename, config::Config* config);
+bool parse_config_text(const std::string &filename, config::Config *config);
 
-std::string encode_base64(const std::string& in);
+std::string encode_base64(const std::string &in);
 
 }  // namespace gnss
 }  // namespace drivers

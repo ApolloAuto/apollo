@@ -38,7 +38,7 @@ TEST(Brake61Test, General) {
   EXPECT_EQ(data[6], 0b00010011);
   EXPECT_EQ(data[7], 0b00010100);
 
-  auto& brakeinfo = cd.brake();
+  auto &brakeinfo = cd.brake();
   EXPECT_DOUBLE_EQ(brakeinfo.brake_input(), 0.78278782330052543);
   EXPECT_DOUBLE_EQ(brakeinfo.brake_cmd(), 1.5671015487907205);
   EXPECT_DOUBLE_EQ(brakeinfo.brake_output(), 7.057297627222086);
@@ -60,5 +60,5 @@ TEST(Brake61Test, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

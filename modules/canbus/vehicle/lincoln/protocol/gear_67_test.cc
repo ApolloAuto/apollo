@@ -40,5 +40,5 @@ TEST(Gear67Test, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

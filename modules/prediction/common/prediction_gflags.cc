@@ -34,3 +34,13 @@ DEFINE_double(go_approach_rate, 0.995,
     "The rate to approach to the reference line of going straight");
 DEFINE_double(cutin_approach_rate, 0.9,
     "The rate to approach to the reference line of lane change");
+DEFINE_int32(still_obstacle_history_length, 10,
+    "Min # historical frames for still obstacles");
+DEFINE_bool(enable_kf_tracking, true, "Use measurements with KF tracking");
+DEFINE_double(still_obstacle_speed_threshold, 1.0,
+    "Speed threshold for still obstacles");
+DEFINE_double(still_obstacle_position_std, 1.0,
+    "Position standard deviation for still obstacles");
+// TODO(kechxu) specify the map file here
+DEFINE_string(map_file, "/path/to/map_file", "Path to map file");
+DEFINE_double(prediction_duration, 1.0, "Prediction duration (in seconds)");

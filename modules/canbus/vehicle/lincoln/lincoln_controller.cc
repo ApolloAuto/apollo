@@ -16,8 +16,6 @@
 
 #include "modules/canbus/vehicle/lincoln/lincoln_controller.h"
 
-#include "modules/common/log.h"
-
 #include "modules/canbus/can_comm/can_sender.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
@@ -26,6 +24,8 @@
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/common/log.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 
 namespace apollo {
@@ -42,9 +42,9 @@ const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }
 
-ErrorCode LincolnController::Init(const VehicleParameter& params,
-                                  CanSender* const can_sender,
-                                  MessageManager* const message_manager) {
+ErrorCode LincolnController::Init(const VehicleParameter &params,
+                                  CanSender *const can_sender,
+                                  MessageManager *const message_manager) {
   if (is_initialized_) {
     AINFO << "LincolnController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -68,34 +68,34 @@ ErrorCode LincolnController::Init(const VehicleParameter& params,
   message_manager_ = message_manager;
 
   // sender part
-  brake_60_ = dynamic_cast<Brake60*>(
+  brake_60_ = dynamic_cast<Brake60 *>(
       message_manager_->GetMutableProtocolDataById(Brake60::ID));
   if (brake_60_ == nullptr) {
     AERROR << "Brake60 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  throttle_62_ = dynamic_cast<Throttle62*>(
+  throttle_62_ = dynamic_cast<Throttle62 *>(
       message_manager_->GetMutableProtocolDataById(Throttle62::ID));
   if (throttle_62_ == nullptr) {
     AERROR << "Throttle62 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  steering_64_ = dynamic_cast<Steering64*>(
+  steering_64_ = dynamic_cast<Steering64 *>(
       message_manager_->GetMutableProtocolDataById(Steering64::ID));
   if (steering_64_ == nullptr) {
     AERROR << "Steering64 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  gear_66_ = dynamic_cast<Gear66*>(
+  gear_66_ = dynamic_cast<Gear66 *>(
       message_manager_->GetMutableProtocolDataById(Gear66::ID));
   if (gear_66_ == nullptr) {
     AERROR << "Gear66 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
-  turnsignal_68_ = dynamic_cast<Turnsignal68*>(
+  turnsignal_68_ = dynamic_cast<Turnsignal68 *>(
       message_manager_->GetMutableProtocolDataById(Turnsignal68::ID));
   if (turnsignal_68_ == nullptr) {
     AERROR << "Turnsignal68 does not exist in the LincolnMessageManager!";
@@ -120,7 +120,7 @@ bool LincolnController::Start() {
     AERROR << "LincolnController has NOT been initiated.";
     return false;
   }
-  const auto& update_func = [this] { SecurityDogThreadFunc(); };
+  const auto &update_func = [this] { SecurityDogThreadFunc(); };
   thread_.reset(new std::thread(update_func));
 
   return true;
@@ -211,22 +211,26 @@ Chassis LincolnController::chassis() {
   } else {
     chassis_.set_parking_brake(false);
   }
-  // TODO: lincoln beam
+  // TODO(Authors): lincoln beam
   // 14, 15
 
   // 16, 17
   if (chassis_detail.light().has_turn_light_type() &&
       chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
     if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
-      chassis_.mutable_signal()->set_turn_signal(Signal::TURN_LEFT);
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_LEFT);
     } else if (chassis_detail.light().turn_light_type() ==
                Light::TURN_RIGHT_ON) {
-      chassis_.mutable_signal()->set_turn_signal(Signal::TURN_RIGHT);
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_RIGHT);
     } else {
-      chassis_.mutable_signal()->set_turn_signal(Signal::TURN_NONE);
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_NONE);
     }
   } else {
-    chassis_.mutable_signal()->set_turn_signal(Signal::TURN_NONE);
+    chassis_.mutable_signal()->set_turn_signal(
+        common::VehicleSignal::TURN_NONE);
   }
   // 18
   if (chassis_detail.light().has_is_horn_on() &&
@@ -346,7 +350,6 @@ void LincolnController::Gear(Chassis::GearPosition gear_position) {
   // we need to apply a brake
   // which needs to be done by human or
   // some canbus cmd
-  // TODO
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
       gear_66_->set_gear_neutral();
@@ -390,8 +393,6 @@ void LincolnController::Gear(Chassis::GearPosition gear_position) {
 // acceleration_spd:60 ~ 100, suggest: 90
 // -> pedal
 void LincolnController::Brake(double pedal) {
-  // double real_value = params_.max_acc() * acceleration / 100;
-  // TODO
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";
@@ -443,7 +444,7 @@ void LincolnController::Steer(double angle, double angle_spd) {
       ->set_steering_angle_speed(real_angle_spd);
 }
 
-void LincolnController::SetEpbBreak(const ControlCommand& command) {
+void LincolnController::SetEpbBreak(const ControlCommand &command) {
   if (command.parking_brake()) {
     // None
   } else {
@@ -451,7 +452,7 @@ void LincolnController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void LincolnController::SetBeam(const ControlCommand& command) {
+void LincolnController::SetBeam(const ControlCommand &command) {
   if (command.signal().high_beam()) {
     // None
   } else if (command.signal().low_beam()) {
@@ -461,7 +462,7 @@ void LincolnController::SetBeam(const ControlCommand& command) {
   }
 }
 
-void LincolnController::SetHorn(const ControlCommand& command) {
+void LincolnController::SetHorn(const ControlCommand &command) {
   if (command.signal().horn()) {
     // None
   } else {
@@ -469,12 +470,12 @@ void LincolnController::SetHorn(const ControlCommand& command) {
   }
 }
 
-void LincolnController::SetTurningSignal(const ControlCommand& command) {
+void LincolnController::SetTurningSignal(const ControlCommand &command) {
   // Set Turn Signal
   auto signal = command.signal().turn_signal();
-  if (signal == Signal::TURN_LEFT) {
+  if (signal == common::VehicleSignal::TURN_LEFT) {
     turnsignal_68_->set_turn_left();
-  } else if (signal == Signal::TURN_RIGHT) {
+  } else if (signal == common::VehicleSignal::TURN_RIGHT) {
     turnsignal_68_->set_turn_right();
   } else {
     turnsignal_68_->set_turn_none();
@@ -722,7 +723,7 @@ Chassis::ErrorCode LincolnController::chassis_error_code() {
 }
 
 void LincolnController::set_chassis_error_code(
-    const Chassis::ErrorCode& error_code) {
+    const Chassis::ErrorCode &error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
 }

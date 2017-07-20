@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
@@ -22,3 +24,5 @@ cc_binary(
         "@ros//:ros_common",
     ],
 )
+
+cpplint()

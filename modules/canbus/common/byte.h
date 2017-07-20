@@ -42,13 +42,13 @@ class Byte {
    * @brief Constructor which takes a pointer to a one-byte unsigned integer.
    * @param value The pointer to a one-byte unsigned integer for construction.
    */
-  explicit Byte(const uint8_t* value);
+  explicit Byte(const uint8_t *value);
 
   /**
    * @brief Constructor which takes a reference to a one-byte unsigned integer.
    * @param value The reference to a one-byte unsigned integer for construction.
    */
-  Byte(const Byte& value);
+  Byte(const Byte &value);
 
   /**
    * @brief Desctructor.
@@ -171,7 +171,7 @@ class Byte {
   std::string to_binary_string() const;
 
  private:
-  uint8_t* value_;
+  uint8_t *value_;
 };
 
 }  // namespace canbus

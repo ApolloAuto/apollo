@@ -24,6 +24,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
 namespace apollo {
@@ -32,7 +33,7 @@ namespace lincoln {
 
 using apollo::common::ErrorCode;
 using apollo::control::ControlCommand;
-using apollo::canbus::Signal;
+using apollo::common::VehicleSignal;
 
 class LincolnControllerTest : public ::testing::Test {
  public:
@@ -50,7 +51,7 @@ class LincolnControllerTest : public ::testing::Test {
  protected:
   LincolnController controller_;
   ControlCommand control_cmd_;
-  Signal signal_;
+  VehicleSignal vehicle_signal_;
   CanSender sender_;
   LincolnMessageManager msg_manager_;
   CanbusConf canbus_conf_;
@@ -62,15 +63,14 @@ TEST_F(LincolnControllerTest, Init) {
   EXPECT_EQ(ret, ErrorCode::OK);
 }
 
-TEST_F(LincolnControllerTest, SetDrivingMode) {  
+TEST_F(LincolnControllerTest, SetDrivingMode) {
   Chassis chassis;
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
 
   controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(chassis.driving_mode());
   EXPECT_EQ(controller_.driving_mode(), chassis.driving_mode());
-  EXPECT_EQ(controller_.SetDrivingMode(chassis.driving_mode()),
-      ErrorCode::OK);
+  EXPECT_EQ(controller_.SetDrivingMode(chassis.driving_mode()), ErrorCode::OK);
 }
 
 TEST_F(LincolnControllerTest, Status) {
@@ -83,19 +83,19 @@ TEST_F(LincolnControllerTest, Status) {
   EXPECT_FALSE(controller_.CheckChassisError());
 }
 
-TEST_F (LincolnControllerTest, UpdateDrivingMode) {
+TEST_F(LincolnControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
-      ErrorCode::OK);
+            ErrorCode::OK);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::AUTO_STEER_ONLY),
-      ErrorCode::OK);
+            ErrorCode::OK);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::AUTO_SPEED_ONLY),
-      ErrorCode::OK);
+            ErrorCode::OK);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_AUTO_DRIVE),
-      ErrorCode::CANBUS_ERROR);
+            ErrorCode::CANBUS_ERROR);
 }
 
 }  // namespace lincoln

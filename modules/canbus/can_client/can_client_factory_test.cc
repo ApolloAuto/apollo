@@ -24,7 +24,7 @@ namespace apollo {
 namespace canbus {
 
 TEST(CanClientFactoryTest, CreateCanClient) {
-  auto* can_factory = CanClientFactory::instance();
+  auto *can_factory = CanClientFactory::instance();
   EXPECT_TRUE(can_factory != nullptr);
 
   can_factory->RegisterCanClients();

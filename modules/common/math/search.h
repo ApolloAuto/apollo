@@ -42,7 +42,7 @@ namespace math {
  * @param tol The tolerance of error.
  * @return The value that minimize the function fun.
  */
-double GoldenSectionSearch(const std::function<double(double)>& func,
+double GoldenSectionSearch(const std::function<double(double)> &func,
                            const double lower_bound, const double upper_bound,
                            const double tol = 1e-6);
 

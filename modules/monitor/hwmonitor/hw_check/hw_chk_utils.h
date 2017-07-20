@@ -27,9 +27,8 @@ namespace apollo {
 namespace platform {
 namespace hw {
 
-void set_hmi_status(apollo::hmi::HardwareStatus *hs,
-                    const std::string &name, int status,
-                    const std::string &mssg) {
+void set_hmi_status(apollo::hmi::HardwareStatus *hs, const std::string &name,
+                    int status, const std::string &mssg) {
   hs->set_name(name);
   hs->set_status(status);
   hs->set_message(mssg);

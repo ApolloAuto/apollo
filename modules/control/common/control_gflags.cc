@@ -28,7 +28,7 @@ DEFINE_bool(enable_control_watchdog, true, "True to enable control watchdog");
 DEFINE_string(node_name, "control", "The control node name in proto");
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
 DEFINE_bool(use_preview_speed_for_table, false,
-        "True to use preview speed for table lookup");
+            "True to use preview speed for table lookup");
 
 DEFINE_bool(enable_input_timestamp_check, true,
             "True to enable input timestamp delay check");

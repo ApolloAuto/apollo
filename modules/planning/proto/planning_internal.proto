@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.planning_internal;
 
 import "modules/common/proto/header.proto";
+import "modules/common/proto/error_code.proto";
 import "modules/decision/proto/decision.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/localization/proto/pose.proto";
@@ -48,19 +49,12 @@ message PlanningObstacle {
 }
 
 message Debug {
-  enum ErrorCode {
-    OK = 0; ERR_NOT_READY = 1; ERR_ESTOP = 2; ERR_PATH_OPTIMIZER = 3;
-    ERR_SPEED_OPTIMIZER = 4;
-    ERR_ST_GRAPH = 5;
-    ERR_SANITY_CHECK = 6;
-  }
-
   /*
       PLEASE add id here
       id = 1: st_graph_info
   */
   message DebugMessage {
-    optional ErrorCode error_code = 1 [default = OK];
+    optional apollo.common.ErrorCode error_code = 1;
     optional int32 id = 2;
     oneof debug_string {
       string trace = 3;
@@ -71,7 +65,7 @@ message Debug {
     }
   }
 
-  optional ErrorCode error_code = 1 [default = OK];
+  optional apollo.common.ErrorCode error_code = 1;
   optional PlanningData planning_data = 2;
   repeated DebugMessage debug_message = 3;
 }

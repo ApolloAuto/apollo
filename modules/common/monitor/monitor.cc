@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/monitor/monitor.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 
 namespace apollo {

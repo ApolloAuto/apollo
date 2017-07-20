@@ -29,11 +29,12 @@ cc_test(
     name = "restful_client_test",
     size = "small",
     srcs = ["restful_client_test.cc"],
-    deps = ["//modules/hmi/utils:restful_client",
-            "//modules/hmi/proto:runtime_status_proto",
-            "@gtest//:main",
-            "//external:gflags",
-    ]
+    deps = [
+        "//external:gflags",
+        "//modules/hmi/proto:runtime_status_proto",
+        "//modules/hmi/utils:restful_client",
+        "@gtest//:main",
+    ],
 )
 
 cpplint()

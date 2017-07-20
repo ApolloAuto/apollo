@@ -31,7 +31,7 @@ cc_library(
     name = "evaluator",
     hdrs = ["evaluator.h"],
     deps = [
-    
+        "//modules/prediction/container/obstacles:obstacle"
     ]
 )
 

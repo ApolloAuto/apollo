@@ -40,7 +40,7 @@ class Decision : public apollo::common::ApolloApp {
   virtual ~Decision() = default;
 
  private:
-  void OnTimer(const ros::TimerEvent& event);
+  void OnTimer(const ros::TimerEvent &event);
   void PublishDecision();
 
  private:

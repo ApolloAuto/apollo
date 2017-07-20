@@ -30,6 +30,9 @@ enum ErrorCode {
 
   // Prediction module error codes start from here.
   PREDICTION_ERROR = 5000;
+
+  // Planning module error codes start from here
+  PLANNING_ERROR = 6000;
 }
 
 message StatusPb {
