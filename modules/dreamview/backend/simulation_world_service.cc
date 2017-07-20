@@ -246,9 +246,17 @@ SimulationWorldService::SimulationWorldService() {
   AdapterManager::Init();
   VehicleConfigHelper::Init();
   RegisterDataCallback("Monitor", AdapterManager::GetMonitor());
-  RegisterDataCallback("Chassis", AdapterManager::GetChassis());
-  RegisterDataCallback("Localization", AdapterManager::GetLocalization());
-  RegisterDataCallback("Planning", AdapterManager::GetPlanningTrajectory());
+}
+
+const SimulationWorld &SimulationWorldService::Update() {
+  AdapterManager::Observe();
+  UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis(), &world_);
+  UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization(),
+                           &world_);
+  UpdateWithLatestObserved("Planning", AdapterManager::GetPlanningTrajectory(),
+                           &world_);
+
+  return world_;
 }
 
 Json SimulationWorldService::GetUpdateAsJson() const {

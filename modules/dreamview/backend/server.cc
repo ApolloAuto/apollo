@@ -64,6 +64,7 @@ class SimulationWorldUpdater {
    * @param event Timer event
    */
   void OnPushTimer(const ros::TimerEvent &event) {
+    sim_world_service_.Update();
     if (!sim_world_service_.ReadyToPush()) {
       AWARN << "Not sending simulation world as the data is not ready!";
       return;
