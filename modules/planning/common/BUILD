@@ -149,11 +149,31 @@ cc_library(
 )
 
 cc_library(
+    name = "data_center",
+    srcs = [
+        "data_center.cc",
+    ],
+    hdrs = [
+        "data_center.h",
+    ],
+    deps = [
+        ":environment",
+        ":frame",
+        ":planning_data",
+        ":planning_gflags",
+        "//modules/common/status",
+        "//modules/common",
+        "//modules/planning/state_machine:master_state_machine",
+    ],
+)
+
+cc_library(
     name = "lib_planning_common",
     deps = [
         "@eigen//:eigen",
-        ":planning_gflags",
         ":frame",
+        ":data_center",
+        ":planning_gflags",
         ":speed_limit",
         "//modules/common:log",
         "//modules/localization/common:localization_common",
