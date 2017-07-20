@@ -23,14 +23,15 @@
  *                          C * x >= d (equality constraint)
  **/
 
-#ifndef MODULES_PLANNING_MATH_QP_SOLVER_QP_SOLVER_H_
-#define MODULES_PLANNING_MATH_QP_SOLVER_QP_SOLVER_H_
+#ifndef MODULES_COMMON_MATH_QP_SOLVER_QP_SOLVER_H_
+#define MODULES_COMMON_MATH_QP_SOLVER_QP_SOLVER_H_
 
 #include "Eigen/Core"
 #include "Eigen/LU"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
 class QPSolver {
  public:
@@ -60,7 +61,8 @@ class QPSolver {
   Eigen::MatrixXd affine_equality_boundary_;
 };
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_QP_SOLVER_QP_SOLVER_H_
+#endif  // MODULES_COMMON_MATH_QP_SOLVER_QP_SOLVER_H_

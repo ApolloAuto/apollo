@@ -14,17 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
-#define MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
+#ifndef MODULES_PLANNING_MATH_QP_SOLVER_QP_SOLVER_GFLAGS_H_
+#define MODULES_PLANNING_MATH_QP_SOLVER_QP_SOLVER_GFLAGS_H_
 
 #include "gflags/gflags.h"
 
-DECLARE_string(planning_config_file);
-DECLARE_int32(planning_loop_rate);
-DECLARE_string(rtk_trajectory_filename);
-DECLARE_uint64(rtk_trajectory_backward);
-DECLARE_uint64(rtk_trajectory_forward);
-DECLARE_double(replanning_threshold);
-DECLARE_double(trajectory_resolution);
+// math : active set solver
+DECLARE_double(default_active_set_eps_num);
+DECLARE_double(default_active_set_eps_den);
+DECLARE_double(default_active_set_eps_iter_ref);
+DECLARE_bool(default_enable_active_set_debug_info);
 
-#endif /* MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_ */
+#endif /* MODULES_PLANNING_MATH_QP_SOLVER_QP_SOLVER_GFLAGS_H_ */

@@ -23,7 +23,7 @@
 
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 
-#include "modules/planning/math/qp_solver/active_set_qp_solver.h"
+#include "modules/common/math/qp_solver/active_set_qp_solver.h"
 
 namespace apollo {
 namespace planning {
@@ -64,7 +64,7 @@ bool Spline1dGenerator::solve() {
   const Eigen::MatrixXd& equality_constraint_boundary =
       spline_constraint_.equality_constraint().constraint_boundary();
 
-  qp_solver_.reset(new ActiveSetQPSolver(
+  qp_solver_.reset(new apollo::common::math::ActiveSetQPSolver(
       kernel_matrix, offset, inequality_constraint_matrix,
       inequality_constraint_boundary, equality_constraint_matrix,
       equality_constraint_boundary));
