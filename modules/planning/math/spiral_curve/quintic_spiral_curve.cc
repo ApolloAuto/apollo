@@ -24,7 +24,7 @@
 #include "Eigen/LU"
 
 #include "modules/common/log.h"
-#include "modules/planning/math/integration.h"
+#include "modules/common/math/integral.h"
 #include "modules/planning/math/spiral_curve/spiral_formula.h"
 
 namespace apollo {
@@ -130,25 +130,25 @@ bool QuinticSpiralCurve::calculate_path() {
     }
 
     // update Jacobian and delta q
-    jacobi(0, 0) =
-        -Integration::simpson(sin_ptp_p3, ds, spiral_config().simpson_size());
+    jacobi(0, 0) = -apollo::common::math::IntegrateBySimpson(
+        sin_ptp_p3, ds, spiral_config().simpson_size());
 
-    jacobi(0, 1) =
-        -Integration::simpson(sin_ptp_p4, ds, spiral_config().simpson_size());
+    jacobi(0, 1) = -apollo::common::math::IntegrateBySimpson(
+        sin_ptp_p4, ds, spiral_config().simpson_size());
 
-    jacobi(0, 2) =
-        cos_theta[spiral_config().simpson_size() - 1] -
-        Integration::simpson(sin_ptp_sg, ds, spiral_config().simpson_size());
+    jacobi(0, 2) = cos_theta[spiral_config().simpson_size() - 1] -
+                   apollo::common::math::IntegrateBySimpson(
+                       sin_ptp_sg, ds, spiral_config().simpson_size());
 
-    jacobi(1, 0) =
-        Integration::simpson(cos_ptp_p3, ds, spiral_config().simpson_size());
+    jacobi(1, 0) = apollo::common::math::IntegrateBySimpson(
+        cos_ptp_p3, ds, spiral_config().simpson_size());
 
-    jacobi(1, 1) =
-        Integration::simpson(cos_ptp_p4, ds, spiral_config().simpson_size());
+    jacobi(1, 1) = apollo::common::math::IntegrateBySimpson(
+        cos_ptp_p4, ds, spiral_config().simpson_size());
 
-    jacobi(1, 2) =
-        sin_theta[spiral_config().simpson_size() - 1] +
-        Integration::simpson(cos_ptp_sg, ds, spiral_config().simpson_size());
+    jacobi(1, 2) = sin_theta[spiral_config().simpson_size() - 1] +
+                   apollo::common::math::IntegrateBySimpson(
+                       cos_ptp_sg, ds, spiral_config().simpson_size());
 
     jacobi(2, 0) = ptp_p3[spiral_config().simpson_size() - 1];
 
@@ -156,11 +156,11 @@ bool QuinticSpiralCurve::calculate_path() {
 
     jacobi(2, 2) = ptp_sg[spiral_config().simpson_size() - 1];
 
-    q_guess(0) =
-        Integration::simpson(cos_theta, ds, spiral_config().simpson_size());
+    q_guess(0) = apollo::common::math::IntegrateBySimpson(
+        cos_theta, ds, spiral_config().simpson_size());
 
-    q_guess(1) =
-        Integration::simpson(sin_theta, ds, spiral_config().simpson_size());
+    q_guess(1) = apollo::common::math::IntegrateBySimpson(
+        sin_theta, ds, spiral_config().simpson_size());
 
     q_guess(2) = theta[spiral_config().simpson_size() - 1];
 
