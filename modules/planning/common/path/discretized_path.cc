@@ -21,8 +21,8 @@
 #include "modules/planning/common/path/discretized_path.h"
 
 #include <utility>
-#include "glog/logging.h"
 
+#include "modules/common/log.h"
 #include "modules/planning/common/path/path_point_util.h"
 
 namespace apollo {
@@ -88,7 +88,7 @@ std::size_t DiscretizedPath::num_of_points() const {
 
 const common::PathPoint& DiscretizedPath::path_point_at(
     const std::size_t index) const {
-  CHECK(index < path_points_.size());
+  CHECK_LT(index, path_points_.size());
   return path_points_[index];
 }
 
@@ -103,7 +103,7 @@ common::PathPoint DiscretizedPath::end_point() const {
 }
 
 common::PathPoint& DiscretizedPath::path_point_at(const std::size_t index) {
-  CHECK(index < path_points_.size());
+  CHECK_LT(index, path_points_.size());
   return path_points_[index];
 }
 

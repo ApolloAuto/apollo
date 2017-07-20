@@ -20,7 +20,7 @@
 
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -88,7 +88,7 @@ double QuinticPolynomialCurve1d::evaluate(const size_t order,
 void QuinticPolynomialCurve1d::compute_coefficients(
     const double x0, const double dx0, const double ddx0, const double x1,
     const double dx1, const double ddx1, const double p) {
-  CHECK(p > 0.0);
+  CHECK_GT(p, 0.0);
 
   coef_[5] = x0;
   coef_[4] = dx0;
