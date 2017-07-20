@@ -33,8 +33,8 @@ RTKReplayPlanner::RTKReplayPlanner() {
 }
 
 bool RTKReplayPlanner::Plan(
-    const TrajectoryPoint &start_point,
-    std::vector<TrajectoryPoint> *ptr_discretized_trajectory) {
+    const TrajectoryPoint& start_point,
+    std::vector<TrajectoryPoint>* ptr_discretized_trajectory) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     AERROR << "RTKReplayPlanner doesn't have a recorded trajectory or "
               "the recorded trajectory doesn't have enough valid trajectory "
@@ -66,7 +66,7 @@ bool RTKReplayPlanner::Plan(
   // adjust their corresponding time stamps.
   while (ptr_discretized_trajectory->size() < FLAGS_rtk_trajectory_forward) {
     ptr_discretized_trajectory->push_back(ptr_discretized_trajectory->back());
-    auto &last_point = ptr_discretized_trajectory->back();
+    auto& last_point = ptr_discretized_trajectory->back();
     last_point.set_relative_time(last_point.relative_time() +
                                  FLAGS_trajectory_resolution);
   }
@@ -103,21 +103,21 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string &filename) {
     }
 
     TrajectoryPoint point;
-    point.set_x(std::stod(tokens[0]));
-    point.set_y(std::stod(tokens[1]));
-    point.set_z(std::stod(tokens[2]));
+    point.mutable_path_point()->set_x(std::stod(tokens[0]));
+    point.mutable_path_point()->set_y(std::stod(tokens[1]));
+    point.mutable_path_point()->set_z(std::stod(tokens[2]));
 
     point.set_v(std::stod(tokens[3]));
     point.set_a(std::stod(tokens[4]));
 
-    point.set_kappa(std::stod(tokens[5]));
-    point.set_dkappa(std::stod(tokens[6]));
+    point.mutable_path_point()->set_kappa(std::stod(tokens[5]));
+    point.mutable_path_point()->set_dkappa(std::stod(tokens[6]));
 
     point.set_relative_time(std::stod(tokens[7]));
 
-    point.set_theta(std::stod(tokens[8]));
+    point.mutable_path_point()->set_theta(std::stod(tokens[8]));
 
-    point.set_s(std::stod(tokens[10]));
+    point.mutable_path_point()->set_s(std::stod(tokens[10]));
     complete_rtk_trajectory_.push_back(point);
   }
 
@@ -129,16 +129,18 @@ std::size_t RTKReplayPlanner::QueryPositionMatchedPoint(
     const std::vector<TrajectoryPoint> &trajectory) const {
   auto func_distance_square = [](const TrajectoryPoint &point, const double x,
                                  const double y) {
-    double dx = point.x() - x;
-    double dy = point.y() - y;
+    double dx = point.path_point().x() - x;
+    double dy = point.path_point().y() - y;
     return dx * dx + dy * dy;
   };
-  double d_min = func_distance_square(trajectory.front(), start_point.x(),
-                                      start_point.y());
+  double d_min =
+      func_distance_square(trajectory.front(), start_point.path_point().x(),
+                           start_point.path_point().y());
   std::size_t index_min = 0;
   for (std::size_t i = 1; i < trajectory.size(); ++i) {
     double d_temp =
-        func_distance_square(trajectory[i], start_point.x(), start_point.y());
+        func_distance_square(trajectory[i], start_point.path_point().x(),
+                             start_point.path_point().y());
     if (d_temp < d_min) {
       d_min = d_temp;
       index_min = i;

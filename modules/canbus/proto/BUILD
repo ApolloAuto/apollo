@@ -11,6 +11,7 @@ cc_proto_library(
     deps = [
         "//modules/common",
         "//modules/common/proto:common_proto",
+        "//modules/common/proto:vehicle_signal_proto",
     ],
 )
 

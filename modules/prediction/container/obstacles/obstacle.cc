@@ -16,10 +16,11 @@
 
 #include "modules/prediction/container/obstacles/obstacle.h"
 
-#include <iomanip>
 #include <cmath>
+#include <iomanip>
 #include <unordered_set>
 #include <utility>
+#include <algorithm>
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -43,14 +44,13 @@ double Damp(const double x, const double sigma) {
 
 }  // namespace
 
-Obstacle::Obstacle() :
-    id_(-1),
-    type_(PerceptionObstacle::UNKNOWN_MOVABLE),
-    feature_history_(0),
-    kf_motion_tracker_(),
-    kf_motion_tracker_enabled_(false),
-    kf_lane_trackers_(0) {
-}
+Obstacle::Obstacle()
+    : id_(-1),
+      type_(PerceptionObstacle::UNKNOWN_MOVABLE),
+      feature_history_(0),
+      kf_motion_tracker_(),
+      kf_motion_tracker_enabled_(false),
+      kf_lane_trackers_(0) {}
 
 Obstacle::~Obstacle() {
   id_ = -1;
@@ -116,8 +116,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0 &&
       timestamp <= feature_history_.front().timestamp()) {
-    AINFO << "Obstacle [" << id_ << "] received an older frame ["
-          << timestamp << "] than the most recent timestamp [ "
+    AINFO << "Obstacle [" << id_ << "] received an older frame [" << timestamp
+          << "] than the most recent timestamp [ "
           << feature_history_.front().timestamp() << "].";
     return;
   }
@@ -191,7 +191,6 @@ void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
   ADEBUG << "Obstacle [" << id_ << "] set timestamp [" << std::fixed
          << std::setprecision(6) << ts << "].";
 }
-
 
 void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
                            Feature* feature) {
@@ -277,12 +276,12 @@ void Obstacle::SetAcceleration(Feature* feature) {
       acc_y = (curr_velocity.y() - prev_velocity.y()) / (curr_ts - prev_ts);
       acc_z = (curr_velocity.z() - prev_velocity.z()) / (curr_ts - prev_ts);
 
-      acc_x = apollo::common::math::Clamp(
-          acc_x * damping_x, FLAGS_min_acc, FLAGS_max_acc);
-      acc_y = apollo::common::math::Clamp(
-          acc_y * damping_y, FLAGS_min_acc, FLAGS_max_acc);
-      acc_z = apollo::common::math::Clamp(
-          acc_z * damping_z, FLAGS_min_acc, FLAGS_max_acc);
+      acc_x = apollo::common::math::Clamp(acc_x * damping_x, FLAGS_min_acc,
+                                          FLAGS_max_acc);
+      acc_y = apollo::common::math::Clamp(acc_y * damping_y, FLAGS_min_acc,
+                                          FLAGS_max_acc);
+      acc_z = apollo::common::math::Clamp(acc_z * damping_z, FLAGS_min_acc,
+                                          FLAGS_max_acc);
     }
   }
 
@@ -298,7 +297,6 @@ void Obstacle::SetAcceleration(Feature* feature) {
          << std::setprecision(6) << acc_z << "], "
          << "and acc [" << acc << "].";
 }
-
 
 void Obstacle::SetTheta(const PerceptionObstacle& perception_obstacle,
                         Feature* feature) {
@@ -435,7 +433,7 @@ void Obstacle::UpdateMotionBelief(Feature* feature) {
 }
 
 void Obstacle::InitKFLaneTracker(const std::string& lane_id,
-                                const double beta) {
+                                 const double beta) {
   KalmanFilter<double, 4, 2, 0> kf;
 
   // transition matrix: update delta_t at each processing step
@@ -509,8 +507,7 @@ void Obstacle::UpdateKFLaneTrackers(Feature* feature) {
     }
     double s = lane_feature.lane_s();
     double l = lane_feature.lane_l();
-    UpdateKFLaneTracker(lane_id, s, l, speed, acc, ts,
-        FLAGS_go_approach_rate);
+    UpdateKFLaneTracker(lane_id, s, l, speed, acc, ts, FLAGS_go_approach_rate);
   }
   for (auto& nearby_lane_feature : feature->lane().nearby_lane_feature()) {
     std::string lane_id = nearby_lane_feature.lane_id();
@@ -520,7 +517,7 @@ void Obstacle::UpdateKFLaneTrackers(Feature* feature) {
     double s = nearby_lane_feature.lane_s();
     double l = nearby_lane_feature.lane_l();
     UpdateKFLaneTracker(lane_id, s, l, speed, acc, ts,
-        FLAGS_cutin_approach_rate);
+                        FLAGS_cutin_approach_rate);
   }
 
   UpdateLaneBelief(feature);
@@ -609,11 +606,81 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 }
 
 void Obstacle::SetMotionStatus() {
-  // TODO(kechxu) implement
+  bool is_still = true;
+  int history_size = static_cast<int>(feature_history_.size());
+  if (history_size < 2) {
+    ADEBUG << "Obstacle [" << id_ << "] has no history and "
+           << "is considered still [default = true].";
+    if (history_size > 0) {
+      feature_history_.front().set_is_still(is_still);
+      ADEBUG << "Obstacle [" << id_ << "] has stillness status [" << is_still
+             << "].";
+    }
+    return;
+  }
+
+  double start_x = 0.0;
+  double start_y = 0.0;
+  double avg_drift_x = 0.0;
+  double avg_drift_y = 0.0;
+  int len = std::min(history_size, FLAGS_still_obstacle_history_length);
+  CHECK_GT(len, 1);
+
+  auto feature_riter = feature_history_.rbegin();
+  if (FLAGS_enable_kf_tracking) {
+    start_x = feature_riter->t_position().x();
+    start_y = feature_riter->t_position().y();
+  } else {
+    start_x = feature_riter->position().x();
+    start_y = feature_riter->position().y();
+  }
+  ++feature_riter;
+  while (feature_riter != feature_history_.rend()) {
+    if (FLAGS_enable_kf_tracking) {
+      avg_drift_x += (feature_riter->t_position().x() - start_x) / (len - 1);
+      avg_drift_y += (feature_riter->t_position().y() - start_y) / (len - 1);
+    } else {
+      avg_drift_x += (feature_riter->position().x() - start_x) / (len - 1);
+      avg_drift_y += (feature_riter->position().y() - start_y) / (len - 1);
+    }
+    ++feature_riter;
+  }
+
+  double delta_ts = feature_history_.front().timestamp() -
+                    feature_history_.back().timestamp();
+  double std = FLAGS_still_obstacle_position_std;
+  double speed_sensibility =
+      std::sqrt(2 * history_size) * 4 * std / ((history_size + 1) * delta_ts);
+  double speed = (FLAGS_enable_kf_tracking ? feature_history_.front().t_speed()
+                                           : feature_history_.front().speed());
+  double speed_threshold = FLAGS_still_obstacle_speed_threshold;
+  if (apollo::common::math::DoubleCompare(speed, speed_threshold) < 0) {
+    is_still = true;
+    ADEBUG << "Obstacle [" << id_
+           << "] has a small speed and is considered still.";
+  } else if (apollo::common::math::DoubleCompare(speed_sensibility,
+                                                 speed_threshold) < 0) {
+    is_still = false;
+    ADEBUG << "Obstacle [" << id_ << "] has a too short history ["
+           << history_size
+           << "] and is considered moving [sensibility = " << speed_sensibility
+           << "]";
+  } else {
+    double distance = std::hypot(avg_drift_x, avg_drift_y);
+    double distance_std = std::sqrt(2.0 / len) * std;
+    if (apollo::common::math::DoubleCompare(distance, 2.0 * distance_std) > 0) {
+      is_still = false;
+      ADEBUG << "Obstacle [" << id_ << "] is moving.";
+    } else {
+      is_still = true;
+      ADEBUG << "Obstacle [" << id_ << "] is still.";
+    }
+  }
 }
 
 void Obstacle::InsertFeatureToHistory(Feature* feature) {
-  // TODO(kechxu) implement
+  feature_history_.push_front(std::move(*feature));
+  ADEBUG << "Obstacle [" << id_ << "] inserted a frame into the history.";
 }
 
 }  // namespace prediction

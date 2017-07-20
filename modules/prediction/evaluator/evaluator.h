@@ -22,8 +22,11 @@
 #ifndef MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
 #define MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
 
-#include <google/protobuf/message.h>
+#include <vector>
+#include <string>
 
+#include "google/protobuf/message.h"
+#include "modules/prediction/container/obstacles/obstacle.h"
 /**
  * @namespace apollo::prediction
  * @brief apollo::prediction
@@ -42,6 +45,11 @@ class Evaluator {
    * @brief Destructor
    */
   virtual ~Evaluator() = default;
+
+  virtual void Evaluate(Obstacle* obstacle) = 0;
+
+ protected:
+  std::vector<double> feature_values_;
 };
 
 }  // namespace prediction

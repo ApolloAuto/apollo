@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/map/proto/map_geometry.proto";
+import "modules/map/proto/map_id.proto";
+
+// An junction is the junction at-grade of two or more roads crossing.
+message Junction {
+  optional Id id = 1;
+
+  optional Polygon polygon = 2;
+
+  // TODO: add roundabout information if need.
+
+  // crosswalk in junction
+  repeated Id crosswalk_id = 3;
+  repeated Id overlap_id = 4;
+
+  // The number of road segments (arms) that are involved.
+  // e.g 3-way junction indicates a T junction (two arms form one road) or a Y junction.
+  optional int32 num_road_segments = 5 [default = 4];
+  // lanes in the junction
+  repeated Id lane_id = 6;
+
+  enum Type {
+    UNKNOWN = 0;
+    IN_ROAD = 1;
+    CROSS_ROAD = 2;
+  };
+  optional Type type = 7;
+}

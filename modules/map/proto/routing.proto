@@ -1,0 +1,70 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/common/proto/header.proto";
+
+message RoutingRequest {
+  message Lane {
+    optional string id = 1;
+    optional double start_s = 2;
+    optional double end_s = 3;
+    optional double expired_timestamp = 4;
+  }
+  message Pose {
+    optional double x = 1;
+    optional double y = 2;
+  }
+  message LaneWaypoint {
+    optional string id = 1;
+    optional double s = 2;
+    optional Pose pose = 3;
+  }
+  optional apollo.common.Header header = 1;
+  optional LaneWaypoint start = 2;
+  optional LaneWaypoint end = 3;
+
+  // Route must go through each waypoint in the order from start to end.
+  // Ignored if empty.
+  repeated LaneWaypoint waypoint = 6;
+
+  repeated Lane blacklisted_lane = 4;
+  optional bool broadcast = 5 [default = true];
+
+  optional double car_speed = 7; // meter/second
+  // Next tag: 8
+}
+
+message RoutingResult {
+    message LaneSegment {
+        optional string id = 1;
+        optional double start_s = 2;
+        optional double end_s = 3;
+    }
+    message Measurement {
+        optional double distance = 1;
+    }
+    message LaneChangeInfo {
+        enum Type {
+            UNKNOWN = 0;
+            LEFT_FORWARD = 1;
+            LEFT_REVERSE = 2;
+            RIGHT_FORWARD = 3;
+            RIGHT_REVERSE = 4;
+            FORWARD = 5;
+            REVERSE = 6;
+        }
+        optional Type type = 1 [default = UNKNOWN];
+        optional int32 start_route_index = 2;
+        optional int32 end_route_index = 3;
+        repeated LaneSegment segment = 4;
+    }
+    optional apollo.common.Header header = 1;
+    repeated LaneSegment route = 2;
+    optional Measurement measurement = 3;
+    optional RoutingRequest routing_request = 4;
+    repeated LaneChangeInfo lane_change_info = 5;
+
+    // the map version which is used to build road graph
+    optional bytes map_version = 6;
+}
