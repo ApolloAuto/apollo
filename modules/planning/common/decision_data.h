@@ -18,8 +18,10 @@
  * @file decision_data.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_DECISION_DATA_H
-#define MODULES_PLANNING_COMMON_DECISION_DATA_H
+#ifndef MODULES_PLANNING_COMMON_DECISION_DATA_H_
+#define MODULES_PLANNING_COMMON_DECISION_DATA_H_
+
+#include <vector>
 
 #include "modules/planning/common/map_object.h"
 #include "modules/planning/common/obstacle.h"
@@ -28,30 +30,25 @@ namespace apollo {
 namespace planning {
 
 class DecisionData {
-public:
-    DecisionData() = default;
-    // init decision data methods
+ public:
+  DecisionData() = default;
 
-    // extract and editing
-    std::vector<const Obstacle*> StaticObstacles() const;
-    std::vector<Obstacle*> MutableStaticObstacles() const;
+  std::vector<const Obstacle*> StaticObstacles() const;
+  std::vector<Obstacle*> MutableStaticObstacles() const;
 
-    std::vector<const Obstacle*> DynamicObstacles() const;
-    std::vector<Obstacle*> MutableDynamicObstacles() const;
+  std::vector<const Obstacle*> DynamicObstacles() const;
+  std::vector<Obstacle*> MutableDynamicObstacles() const;
+  std::vector<const MapObject*> MapObjects() const;
+  std::vector<MapObject*> MutableMapObjects() const;
+  const std::vector<Obstacle>& Obstacles() const;
+  std::vector<Obstacle>* MutableObstacles();
 
-    std::vector<const MapObject*> MapObjects() const;
-    std::vector<MapObject*> MutableMapObjects() const;
-
-    const std::vector<Obstacle>& Obstacles() const;
-    std::vector<Obstacle>* MutableObstacles();
-
-    //TODO: main decision interface
-private:
-    std::vector<Obstacle> obstacles_;
-    std::vector<MapObject> map_objects_;
+ private:
+  std::vector<Obstacle> obstacles_;
+  std::vector<MapObject> map_objects_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_DECISION_DATA_H
+#endif  // MODULES_PLANNING_COMMON_DECISION_DATA_H_

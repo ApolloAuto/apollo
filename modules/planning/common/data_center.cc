@@ -21,6 +21,8 @@
 #include "modules/planning/common/data_center.h"
 
 #include <fstream>
+#include <utility>
+
 #include "google/protobuf/text_format.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -62,7 +64,8 @@ Frame* DataCenter::current_frame() const {
 void DataCenter::save_frame() {
     _sequence_queue.push_back(_frame->sequence_num());
     _frames[_frame->sequence_num()] = std::move(_frame);
-    if (_sequence_queue.size() > static_cast<size_t>(FLAGS_max_history_result)) {
+    if (_sequence_queue.size() >
+            static_cast<size_t>(FLAGS_max_history_result)) {
         _frames.erase(_sequence_queue.front());
         _sequence_queue.pop_front();
     }
@@ -80,5 +83,6 @@ MasterStateMachine* DataCenter::mutable_master() const {
     return _master.get();
 }
 
-} //namespace planning
-} //namespace apollo
+}  // namespace planning
+}  // namespace apollo
+
