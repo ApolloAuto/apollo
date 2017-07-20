@@ -20,7 +20,7 @@ namespace apollo {
 namespace common {
 namespace util {
 
-bool EndWith(const std::string& original, const std::string& pattern) {
+bool EndWith(const std::string &original, const std::string &pattern) {
   return original.length() >= pattern.length() &&
          original.substr(original.length() - pattern.length()) == pattern;
 }

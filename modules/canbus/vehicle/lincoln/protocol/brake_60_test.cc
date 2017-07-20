@@ -43,5 +43,5 @@ TEST_F(Brake60Test, simple) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

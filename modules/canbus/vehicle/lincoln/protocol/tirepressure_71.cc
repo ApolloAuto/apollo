@@ -24,8 +24,8 @@ namespace lincoln {
 
 const int32_t Tirepressure71::ID = 0x71;
 
-void Tirepressure71::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis_detail) const {
+void Tirepressure71::Parse(const std::uint8_t *bytes, int32_t length,
+                           ChassisDetail *chassis_detail) const {
   chassis_detail->mutable_safety()->set_front_left_tire_press(
       front_left_tire(bytes, length));
   chassis_detail->mutable_safety()->set_front_right_tire_press(
@@ -36,7 +36,7 @@ void Tirepressure71::Parse(const std::uint8_t* bytes, int32_t length,
       rear_right_tire(bytes, length));
 }
 
-int32_t Tirepressure71::front_left_tire(const std::uint8_t* bytes,
+int32_t Tirepressure71::front_left_tire(const std::uint8_t *bytes,
                                         int32_t length) const {
   Byte high_frame(bytes + 1);
   int32_t high = high_frame.get_byte(0, 8);
@@ -45,7 +45,7 @@ int32_t Tirepressure71::front_left_tire(const std::uint8_t* bytes,
   return (high << 8) | low;
 }
 
-int32_t Tirepressure71::front_right_tire(const std::uint8_t* bytes,
+int32_t Tirepressure71::front_right_tire(const std::uint8_t *bytes,
                                          int32_t length) const {
   Byte high_frame(bytes + 3);
   int32_t high = high_frame.get_byte(0, 8);
@@ -54,7 +54,7 @@ int32_t Tirepressure71::front_right_tire(const std::uint8_t* bytes,
   return (high << 8) | low;
 }
 
-int32_t Tirepressure71::rear_left_tire(const std::uint8_t* bytes,
+int32_t Tirepressure71::rear_left_tire(const std::uint8_t *bytes,
                                        int32_t length) const {
   Byte high_frame(bytes + 5);
   int32_t high = high_frame.get_byte(0, 8);
@@ -63,7 +63,7 @@ int32_t Tirepressure71::rear_left_tire(const std::uint8_t* bytes,
   return (high << 8) | low;
 }
 
-int32_t Tirepressure71::rear_right_tire(const std::uint8_t* bytes,
+int32_t Tirepressure71::rear_right_tire(const std::uint8_t *bytes,
                                         int32_t length) const {
   Byte high_frame(bytes + 7);
   int32_t high = high_frame.get_byte(0, 8);

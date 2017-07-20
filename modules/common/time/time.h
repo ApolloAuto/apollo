@@ -149,8 +149,7 @@ class Clock {
    * @return a Timestamp object representing the current time.
    */
   static Timestamp Now() {
-    return instance()->is_system_clock_ ? SystemNow()
-                                               : instance()->mock_now_;
+    return instance()->is_system_clock_ ? SystemNow() : instance()->mock_now_;
   }
 
   /**
@@ -186,7 +185,7 @@ class Clock {
    * @brief constructs the \class Clock instance
    * @param is_system_clock See UseSystemClock.
    */
-  Clock(bool is_system_clock)
+  explicit Clock(bool is_system_clock)
       : is_system_clock_(is_system_clock), mock_now_(Timestamp()) {}
 
   /**

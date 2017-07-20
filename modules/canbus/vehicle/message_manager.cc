@@ -29,7 +29,7 @@ using Clock = ::apollo::common::time::Clock;
 using micros = std::chrono::microseconds;
 using ::apollo::common::ErrorCode;
 
-ProtocolData* MessageManager::GetMutableProtocolDataById(
+ProtocolData *MessageManager::GetMutableProtocolDataById(
     const uint32_t message_id) {
   if (protocol_data_map_.find(message_id) == protocol_data_map_.end()) {
     ADEBUG << "Unable to get protocol data because of invalid message_id:"
@@ -39,9 +39,9 @@ ProtocolData* MessageManager::GetMutableProtocolDataById(
   return protocol_data_map_[message_id];
 }
 
-void MessageManager::Parse(const uint32_t message_id, const uint8_t* data,
+void MessageManager::Parse(const uint32_t message_id, const uint8_t *data,
                            int32_t length, struct timeval timestamp) {
-  ProtocolData* protocol_data = GetMutableProtocolDataById(message_id);
+  ProtocolData *protocol_data = GetMutableProtocolDataById(message_id);
   if (protocol_data == nullptr) {
     return;
   }
@@ -49,7 +49,7 @@ void MessageManager::Parse(const uint32_t message_id, const uint8_t* data,
     std::lock_guard<std::mutex> lock(chassis_detail_mutex_);
     protocol_data->Parse(data, length, &chassis_detail_);
   } else {
-    // TODO: only lincoln implemented this virtual function
+    // TODO(Authors): only lincoln implemented this virtual function
     std::lock_guard<std::mutex> lock(chassis_detail_mutex_);
     protocol_data->Parse(data, length, timestamp, &chassis_detail_);
   }
@@ -71,7 +71,7 @@ void MessageManager::Parse(const uint32_t message_id, const uint8_t* data,
 }
 
 ErrorCode MessageManager::GetChassisDetail(
-    ChassisDetail* const chassis_detail) {
+    ChassisDetail *const chassis_detail) {
   if (chassis_detail == nullptr) {
     AERROR << "Failed to get chassis_detail due to nullptr.";
     return ErrorCode::CANBUS_ERROR;
@@ -82,7 +82,7 @@ ErrorCode MessageManager::GetChassisDetail(
 }
 
 void MessageManager::ResetSendMessages() {
-  for (auto& protocol_data : send_protocol_data_) {
+  for (auto &protocol_data : send_protocol_data_) {
     if (protocol_data == nullptr) {
       AERROR << "Invalid protocol data.";
     } else {

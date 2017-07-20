@@ -37,19 +37,18 @@ volatile bool g_gnss_detected = false;
 apollo::common::gnss_status::InsStatus g_ins_status;
 apollo::common::gnss_status::GnssStatus g_gnss_status;
 
-void ins_status_callback(const apollo::common::gnss_status::InsStatus
-                         &ins_status) {
-    g_ins_status.CopyFrom(ins_status);
-    g_ins_detected = true;
-    std::cout << "INS status: " << ins_status.DebugString() << std::endl;
+void ins_status_callback(
+    const apollo::common::gnss_status::InsStatus &ins_status) {
+  g_ins_status.CopyFrom(ins_status);
+  g_ins_detected = true;
+  std::cout << "INS status: " << ins_status.DebugString() << std::endl;
 }
 
-void gnss_status_callback(const apollo::common::gnss_status::GnssStatus
-                          &gnss_status) {
-    g_gnss_status.CopyFrom(gnss_status);
-    g_gnss_detected = true;
-    std::cout << "GNSS status: "
-              << gnss_status.DebugString() << std::endl;
+void gnss_status_callback(
+    const apollo::common::gnss_status::GnssStatus &gnss_status) {
+  g_gnss_status.CopyFrom(gnss_status);
+  g_gnss_detected = true;
+  std::cout << "GNSS status: " << gnss_status.DebugString() << std::endl;
 }
 }  // namespace
 
@@ -65,22 +64,22 @@ int main(int argc, char *argv[]) {
   struct timeval now;
   uint64_t timeout_sec = 5;
 
-  ins_status_sub = nh.subscribe("/apollo/sensor/gnss/ins_status",
-                                      16, ins_status_callback);
-  gnss_status_sub = nh.subscribe("/apollo/sensor/gnss/gnss_status",
-                                       16, gnss_status_callback);
+  ins_status_sub =
+      nh.subscribe("/apollo/sensor/gnss/ins_status", 16, ins_status_callback);
+  gnss_status_sub =
+      nh.subscribe("/apollo/sensor/gnss/gnss_status", 16, gnss_status_callback);
 
   gettimeofday(&start_time, NULL);
   while (!(timeout) && ((!g_ins_detected) || (!g_gnss_detected))) {
     ros::spinOnce();
 
     gettimeofday(&now, NULL);
-    if (static_cast<uint64_t>(now.tv_sec * 1000000 + now.tv_usec
-                              - start_time.tv_sec * 1000000
-                              - start_time.tv_usec)
-           > static_cast<uint64_t>(timeout_sec * 1000000)) {
-        std::cout << "Detect timeout." << std::endl;
-        timeout = true;
+    if (static_cast<uint64_t>(now.tv_sec * 1000000 + now.tv_usec -
+                              start_time.tv_sec * 1000000 -
+                              start_time.tv_usec) >
+        static_cast<uint64_t>(timeout_sec * 1000000)) {
+      std::cout << "Detect timeout." << std::endl;
+      timeout = true;
     }
   }
 
@@ -88,27 +87,26 @@ int main(int argc, char *argv[]) {
   if (timeout) {
     set_hmi_status(&gps_st, "GPS", Status::ERR, "GPS CHECK TIMEOUT");
     std::cout << "gps check timeout." << std::endl;
-  } else if (g_gnss_status.solution_completed()
-             != true) {
+  } else if (g_gnss_status.solution_completed() != true) {
     set_hmi_status(&gps_st, "GPS", Status::ERR, "GPS SOLUTION UNCOMPUTED");
     std::cout << "gps solution not computed." << std::endl;
   } else {
     switch (g_ins_status.type()) {
-    case apollo::common::gnss_status::InsStatus::CONVERGING:
-      set_hmi_status(&gps_st, "GPS", Status::NOT_READY, "INS ALIGNING");
-      std::cout << "ins is aligning." << std::endl;
-      break;
+      case apollo::common::gnss_status::InsStatus::CONVERGING:
+        set_hmi_status(&gps_st, "GPS", Status::NOT_READY, "INS ALIGNING");
+        std::cout << "ins is aligning." << std::endl;
+        break;
 
-    case apollo::common::gnss_status::InsStatus::GOOD:
-      set_hmi_status(&gps_st, "GPS", Status::OK, "OK");
-      std::cout << "ins is good." << std::endl;
-      break;
+      case apollo::common::gnss_status::InsStatus::GOOD:
+        set_hmi_status(&gps_st, "GPS", Status::OK, "OK");
+        std::cout << "ins is good." << std::endl;
+        break;
 
-    case apollo::common::gnss_status::InsStatus::INVALID:
-    default:
-      set_hmi_status(&gps_st, "GPS", Status::ERR, "INS INACTIVE");
-      std::cout << "ins is inactive." << std::endl;
-      break;
+      case apollo::common::gnss_status::InsStatus::INVALID:
+      default:
+        set_hmi_status(&gps_st, "GPS", Status::ERR, "INS INACTIVE");
+        std::cout << "ins is inactive." << std::endl;
+        break;
     }
   }
 

@@ -28,9 +28,10 @@
 #include <string>
 #include <type_traits>
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
 #include "glog/logging.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/message.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/proto/header.pb.h"
 #include "modules/common/time/time.h"

@@ -28,16 +28,15 @@ namespace hmi {
 namespace {
 
 template <class T>
-void VectorToRepeatedPtrField(const std::vector<T>& src,
-                              google::protobuf::RepeatedPtrField<T>* dst) {
+void VectorToRepeatedPtrField(const std::vector<T> &src,
+                              google::protobuf::RepeatedPtrField<T> *dst) {
   *dst = google::protobuf::RepeatedPtrField<T>(src.begin(), src.end());
 }
 
 }  // namespace
 
-
 void HMIStatusHelper::ReportHardwareStatus(
-    const std::vector<HardwareStatus>& hardware_status) {
+    const std::vector<HardwareStatus> &hardware_status) {
   auto runtime_status = RuntimeStatus();
   VectorToRepeatedPtrField(hardware_status, runtime_status.mutable_hardware());
 
@@ -45,7 +44,7 @@ void HMIStatusHelper::ReportHardwareStatus(
   client.Post(runtime_status);
 }
 
-void HMIStatusHelper::ReportModuleStatus(const ModuleStatus& module_status) {
+void HMIStatusHelper::ReportModuleStatus(const ModuleStatus &module_status) {
   auto runtime_status = RuntimeStatus();
   *runtime_status.add_modules() = module_status;
 

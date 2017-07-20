@@ -24,6 +24,8 @@
 
 #include <map>
 #include <memory>
+#include <utility>
+
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 
@@ -53,7 +55,7 @@ namespace util {
  * IdentifierType to ProductCreator, by default std::unordered_map
  */
 template <typename IdentifierType, class AbstractProduct,
-          class ProductCreator = AbstractProduct* (*)(),
+          class ProductCreator = AbstractProduct *(*)(),
           class MapContainer = std::map<IdentifierType, ProductCreator>>
 class Factory {
  public:
@@ -65,7 +67,7 @@ class Factory {
    * the registered class
    * @return True iff the key id is still available
    */
-  bool Register(const IdentifierType& id, ProductCreator creator) {
+  bool Register(const IdentifierType &id, ProductCreator creator) {
     return producers_.insert(std::make_pair(id, creator)).second;
   }
 
@@ -73,7 +75,7 @@ class Factory {
    * @brief Unregisters the class with the given identifier
    * @param id The identifier of the class to be unregistered
    */
-  bool Unregister(const IdentifierType& id) {
+  bool Unregister(const IdentifierType &id) {
     return producers_.erase(id) == 1;
   }
 
@@ -82,7 +84,7 @@ class Factory {
    * Need to register id before CreateObject is called.
    * @param id The identifier of the class we which to instantiate
    */
-  std::unique_ptr<AbstractProduct> CreateObject(const IdentifierType& id) {
+  std::unique_ptr<AbstractProduct> CreateObject(const IdentifierType &id) {
     auto id_iter = producers_.find(id);
     if (id_iter == producers_.end()) {
       AERROR << "Factory could not create Object of type : " << id;

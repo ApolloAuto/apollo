@@ -59,5 +59,5 @@ TEST(Misc69Test, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

@@ -27,8 +27,8 @@ namespace lincoln {
 
 const int32_t Brake61::ID = 0x61;
 
-void Brake61::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis_detail) const {
+void Brake61::Parse(const std::uint8_t *bytes, int32_t length,
+                    ChassisDetail *chassis_detail) const {
   chassis_detail->mutable_brake()->set_brake_input(pedal_input(bytes, length));
   chassis_detail->mutable_brake()->set_brake_cmd(pedal_cmd(bytes, length));
   chassis_detail->mutable_brake()->set_brake_output(
@@ -59,19 +59,19 @@ void Brake61::Parse(const std::uint8_t* bytes, int32_t length,
       !is_driver_override(bytes, length));
 }
 
-double Brake61::pedal_input(const std::uint8_t* bytes, int32_t length) const {
+double Brake61::pedal_input(const std::uint8_t *bytes, int32_t length) const {
   DCHECK_GE(length, 2);
   // Pedal Input from the physical pedal
   return parse_two_frames(bytes[0], bytes[1]);
 }
 
-double Brake61::pedal_cmd(const std::uint8_t* bytes, int32_t length) const {
+double Brake61::pedal_cmd(const std::uint8_t *bytes, int32_t length) const {
   DCHECK_GE(length, 4);
   // Pedal Command from the command message
   return parse_two_frames(bytes[2], bytes[3]);
 }
 
-double Brake61::pedal_output(const std::uint8_t* bytes, int32_t length) const {
+double Brake61::pedal_output(const std::uint8_t *bytes, int32_t length) const {
   DCHECK_GE(length, 6);
   // Pedal Output is the maximum of PI and PC
   return parse_two_frames(bytes[4], bytes[5]);
@@ -90,30 +90,30 @@ double Brake61::parse_two_frames(const std::uint8_t low_byte,
   return output;
 }
 
-bool Brake61::boo_input(const std::uint8_t* bytes, int32_t length) const {
+bool Brake61::boo_input(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 6);
   // seems typo here
   return frame.is_bit_1(0);
 }
 
-bool Brake61::boo_cmd(const std::uint8_t* bytes, int32_t length) const {
+bool Brake61::boo_cmd(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 6);
   return frame.is_bit_1(1);
 }
 
-bool Brake61::boo_output(const std::uint8_t* bytes, int32_t length) const {
+bool Brake61::boo_output(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 6);
   // seems typo here
   return frame.is_bit_1(2);
 }
 
-bool Brake61::is_watchdog_counter_applying_brakes(const std::uint8_t* bytes,
+bool Brake61::is_watchdog_counter_applying_brakes(const std::uint8_t *bytes,
                                                   int32_t length) const {
   Byte frame(bytes + 6);
   return frame.is_bit_1(3);
 }
 
-int32_t Brake61::watchdog_counter_source(const std::uint8_t* bytes,
+int32_t Brake61::watchdog_counter_source(const std::uint8_t *bytes,
                                          int32_t length) const {
   // see table for status code
   Byte frame(bytes + 6);
@@ -121,48 +121,48 @@ int32_t Brake61::watchdog_counter_source(const std::uint8_t* bytes,
   return x;
 }
 
-bool Brake61::is_enabled(const std::uint8_t* bytes, int32_t length) const {
+bool Brake61::is_enabled(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 7);
   return frame.is_bit_1(0);
 }
 
-bool Brake61::is_driver_override(const std::uint8_t* bytes,
+bool Brake61::is_driver_override(const std::uint8_t *bytes,
                                  int32_t length) const {
   Byte frame(bytes + 7);
   return frame.is_bit_1(1);
 }
 
-bool Brake61::is_driver_activity(const std::uint8_t* bytes,
+bool Brake61::is_driver_activity(const std::uint8_t *bytes,
                                  int32_t length) const {
   Byte frame(bytes + 7);
   return frame.is_bit_1(2);
 }
 
-bool Brake61::is_watchdog_counter_fault(const std::uint8_t* bytes,
+bool Brake61::is_watchdog_counter_fault(const std::uint8_t *bytes,
                                         int32_t length) const {
   Byte frame(bytes + 7);
   return frame.is_bit_1(3);
 }
 
-bool Brake61::is_channel_1_fault(const std::uint8_t* bytes,
+bool Brake61::is_channel_1_fault(const std::uint8_t *bytes,
                                  int32_t length) const {
   Byte frame(bytes + 7);
   return frame.is_bit_1(4);
 }
 
-bool Brake61::is_channel_2_fault(const std::uint8_t* bytes,
+bool Brake61::is_channel_2_fault(const std::uint8_t *bytes,
                                  int32_t length) const {
   Byte frame(bytes + 7);
   return frame.is_bit_1(5);
 }
 
-bool Brake61::is_boo_switch_fault(const std::uint8_t* bytes,
+bool Brake61::is_boo_switch_fault(const std::uint8_t *bytes,
                                   int32_t length) const {
   Byte frame(bytes + 7);
   return frame.is_bit_1(6);
 }
 
-bool Brake61::is_connector_fault(const std::uint8_t* bytes,
+bool Brake61::is_connector_fault(const std::uint8_t *bytes,
                                  int32_t length) const {
   Byte frame(bytes + 7);
   return frame.is_bit_1(7);

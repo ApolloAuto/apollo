@@ -40,7 +40,7 @@ namespace util {
  *        with it.
  * @return Whether the original string ends with the specified pattern.
  */
-bool EndWith(const std::string& original, const std::string& pattern);
+bool EndWith(const std::string &original, const std::string &pattern);
 
 }  // namespace util
 }  // namespace common

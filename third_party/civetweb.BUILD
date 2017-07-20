@@ -17,6 +17,9 @@ cc_library(
         "include",
         "src",
     ],
+    copts = [
+        "-DUSE_WEBSOCKET",
+    ],
     linkopts = [
         "-lpthread",
         "-ldl",

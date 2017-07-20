@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/common/monitor/monitor.h"
 #include <string>
 #include <vector>
 #include "gtest/gtest.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/monitor/monitor.h"
 
 namespace apollo {
 namespace common {
@@ -25,16 +25,16 @@ namespace monitor {
 
 class MonitorTest : public Monitor {
  public:
-  explicit MonitorTest(const MonitorMessageItem::MessageSource& source)
+  explicit MonitorTest(const MonitorMessageItem::MessageSource &source)
       : Monitor(source) {}
 
  private:
-  void DoPublish(MonitorMessage*) const override {}
+  void DoPublish(MonitorMessage *) const override {}
 };
 
 TEST(MonitorTest, Publish) {
   MonitorTest monitor(MonitorMessageItem::CONTROL);
-  std::vector<std::pair<MonitorMessageItem::LogLevel, std::string> > items{
+  std::vector<std::pair<MonitorMessageItem::LogLevel, std::string>> items{
       {MonitorMessageItem::INFO, "info message"},
       {MonitorMessageItem::WARN, "warn message"},
       {MonitorMessageItem::ERROR, "error message"},
