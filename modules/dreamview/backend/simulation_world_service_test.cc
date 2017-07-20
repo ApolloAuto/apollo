@@ -112,7 +112,7 @@ TEST_F(InternalTest, UpdateChassisInfoTest) {
   chassis.set_throttle_percentage(50);
   chassis.set_brake_percentage(10);
   chassis.set_steering_percentage(25);
-  chassis.mutable_signal()->set_turn_signal(apollo::canbus::Signal::TURN_RIGHT);
+  chassis.mutable_signal()->set_turn_signal(apollo::common::VehicleSignal::TURN_RIGHT);
 
   // Commit the update.
   SimulationWorld world;
