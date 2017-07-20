@@ -3,12 +3,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "dp_poly_path",
     srcs = [
-        "dp_poly_path_config.cpp",
-        "dp_road_graph.cpp",
-        "graph_edge.cpp",
-        "graph_vertex.cpp",
-        "path_sampler.cpp",
-        "trajectory_cost.cpp",
+        "dp_poly_path_config.cc",
+        "dp_road_graph.cc",
+        "graph_edge.cc",
+        "graph_vertex.cc",
+        "path_sampler.cc",
+        "trajectory_cost.cc",
     ],
     hdrs = [
         "dp_poly_path_config.h",
