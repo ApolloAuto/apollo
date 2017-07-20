@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "modules/planning/common/speed/speed_point.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -47,6 +47,8 @@ class SpeedData {
   double total_time() const;
 
  private:
+  SpeedPoint interpolate(const SpeedPoint& left, const SpeedPoint& right,
+                         const double weight) const;
   std::size_t find_index(const double s) const;
 
   std::vector<SpeedPoint> speed_vector_;

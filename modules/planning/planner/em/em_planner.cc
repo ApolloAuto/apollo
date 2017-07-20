@@ -32,19 +32,18 @@ namespace planning {
 using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 
-EMPlanner::EMPlanner() {
-}
+EMPlanner::EMPlanner() {}
 
 bool EMPlanner::MakePlan(const TrajectoryPoint& start_point,
-                     std::vector<TrajectoryPoint>* discretized_trajectory) {
+                         std::vector<TrajectoryPoint>* discretized_trajectory) {
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
 
-//  frame->set_planning_data(task->create_planning_data_instance());
-//  frame->mutable_planning_data()->set_reference_line(reference_line);
-//  frame->mutable_planning_data()->set_decision_data(decision_data);
-//  frame->mutable_planning_data()->set_init_planning_point(
-//      frame->environment().vehicle_state_proxy().init_point(data_center->last_frame()));
+  //  frame->set_planning_data(task->create_planning_data_instance());
+  //  frame->mutable_planning_data()->set_reference_line(reference_line);
+  //  frame->mutable_planning_data()->set_decision_data(decision_data);
+  //  frame->mutable_planning_data()->set_init_planning_point(
+  //      frame->environment().vehicle_state_proxy().init_point(data_center->last_frame()));
 
   return true;
 }
@@ -76,9 +75,9 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
 
   // assume the time resolution is 0.1
   std::size_t num_time_steps =
-      static_cast<std::size_t>(FLAGS_trajectory_time_length
-          / FLAGS_trajectory_time_resolution) + 1;
-
+      static_cast<std::size_t>(FLAGS_trajectory_time_length /
+                               FLAGS_trajectory_time_resolution) +
+      1;
   std::vector<SpeedPoint> speed_profile;
   speed_profile.reserve(num_time_steps);
 
@@ -87,8 +86,14 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     double s = speed_curve.evaluate(0, t);
     double v = speed_curve.evaluate(1, t);
     double a = speed_curve.evaluate(2, t);
-    double j = speed_curve.evaluate(3, t);
-    speed_profile.emplace_back(s, t, v, a, j);
+    double da = speed_curve.evaluate(3, t);
+    SpeedPoint speed_point;
+    speed_point.mutable_st_point()->set_s(s);
+    speed_point.mutable_st_point()->set_t(t);
+    speed_point.set_v(v);
+    speed_point.set_a(a);
+    speed_point.set_da(da);
+    speed_profile.push_back(speed_point);
   }
   return std::move(speed_profile);
 }

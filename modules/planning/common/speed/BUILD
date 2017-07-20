@@ -1,18 +1,18 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "speed",
+    name = "speed_data",
     srcs = [
-        "st_point.cc",
-        "speed_point.cc",
         "speed_data.cc",
     ],
-    hdrs = glob([
-        "*.h",
-    ]),
+    hdrs = [
+        "speed_data.h",
+    ],
     deps = [
         "//external:gflags",
         "//modules/common/math",
         "//modules/planning/math:double",
+        "//modules/planning/proto:planning_proto",
+        "//modules/common/proto:path_point_proto",
     ],
 )

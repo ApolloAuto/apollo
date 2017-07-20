@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "modules/common/proto/path_point.pb.h"
-#include "modules/planning/common/speed/speed_point.h"
 #include "modules/planning/planner/planner.h"
+#include "modules/planning/proto/planning.pb.h"
 
 /**
  * @namespace apollo::planning
