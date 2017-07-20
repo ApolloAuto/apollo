@@ -47,15 +47,15 @@ class DiscretizedPath : public Path {
 
   int query_closest_point(const double param) const;
 
-  std::vector<common::PathPoint>* mutable_path_points();
+  std::vector<common::PathPoint> *mutable_path_points();
 
-  const std::vector<common::PathPoint>& path_points() const;
+  const std::vector<common::PathPoint> &path_points() const;
 
   std::size_t num_of_points() const;
 
-  const common::PathPoint& path_point_at(const std::size_t index) const;
+  const common::PathPoint &path_point_at(const std::size_t index) const;
 
-  common::PathPoint& path_point_at(const std::size_t index);
+  common::PathPoint &path_point_at(const std::size_t index);
 
  private:
   std::vector<common::PathPoint>::const_iterator query_lower_bound(
