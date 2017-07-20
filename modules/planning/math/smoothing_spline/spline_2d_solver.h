@@ -24,7 +24,7 @@
 #include <memory>
 #include <vector>
 
-#include "modules/planning/math/qp_solver/qp_solver.h"
+#include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_constraint.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_kernel.h"
@@ -51,7 +51,7 @@ class Spline2dSolver {
   Spline2d spline_;
   Spline2dKernel kernel_;
   Spline2dConstraint constraint_;
-  std::unique_ptr<QPSolver> qp_solver_ = nullptr;
+  std::unique_ptr<apollo::common::math::QPSolver> qp_solver_ = nullptr;
 };
 
 }  // namespace planning

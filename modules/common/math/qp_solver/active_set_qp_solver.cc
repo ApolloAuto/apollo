@@ -17,16 +17,17 @@
 /**
  * @file: active_set_qp_solver.cc
  **/
-#include "modules/planning/math/qp_solver/active_set_qp_solver.h"
+#include "modules/common/math/qp_solver/active_set_qp_solver.h"
 
 #include <algorithm>
 #include <climits>
 #include <vector>
 
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/common/math/qp_solver/qp_solver_gflags.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
 ActiveSetQPSolver::ActiveSetQPSolver(
     const Eigen::MatrixXd& kernel_matrix, const Eigen::MatrixXd& offset,
@@ -192,5 +193,6 @@ bool ActiveSetQPSolver::sanity_check() {
          affine_inequality_matrix_.rows() == affine_inequality_matrix_.rows();
 }
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo

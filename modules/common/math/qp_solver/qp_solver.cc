@@ -17,10 +17,11 @@
 /**
  * @file: qp_solver.cc
  **/
-#include "modules/planning/math/qp_solver/qp_solver.h"
+#include "modules/common/math/qp_solver/qp_solver.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
 QPSolver::QPSolver(const Eigen::MatrixXd& kernel_matrix,
                    const Eigen::MatrixXd& offset,
@@ -59,5 +60,6 @@ const Eigen::MatrixXd& QPSolver::affine_inequality_boundary() const {
   return affine_inequality_boundary_;
 }
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo
