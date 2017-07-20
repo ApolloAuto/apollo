@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <numeric>
 
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -24,12 +25,6 @@
 
 namespace apollo {
 namespace prediction {
-
-MLPEvaluator::MLPEvaluator() {
-}
-
-MLPEvaluator::~MLPEvaluator() {
-}
 
 void MLPEvaluator::Clear() {
   obstacle_feature_values_map_.clear();
