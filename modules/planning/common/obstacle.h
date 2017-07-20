@@ -26,64 +26,62 @@
 #include <vector>
 
 #include "modules/common/math/box2d.h"
-//#include "common/trajectory/prediction_trajectory.h"
+#include "modules/planning/common/trajectory/prediction_trajectory.h"
 
 namespace apollo {
 namespace planning {
 
 class Obstacle : public PlanningObject {
-public:
-    enum class ObstacleType {
-        UNKNOWN = 0,
-        UNKNOWN_MOVABLE = 1,
-        UNKNOWN_UNMOVABLE = 2,
-        PEDESTRIAN = 3,
-        BICYCLE = 4,
-        VEHICLE = 5,
-    };
+ public:
+  enum class ObstacleType {
+    UNKNOWN = 0,
+    UNKNOWN_MOVABLE = 1,
+    UNKNOWN_UNMOVABLE = 2,
+    PEDESTRIAN = 3,
+    BICYCLE = 4,
+    VEHICLE = 5,
+  };
 
-    Obstacle() = default;
+  Obstacle() = default;
 
-    int Id() const;
-    void SetId(int id);
+  int Id() const;
+  void SetId(int id);
 
-    const ObstacleType& Type() const;
-    void SetType(const ObstacleType& type);
+  const ObstacleType &Type() const;
+  void SetType(const ObstacleType &type);
 
-    double Height() const;
-    void SetHeight(const double height);
+  double Height() const;
+  void SetHeight(const double height);
 
-    double Width() const;
-    void SetWidth(const double width);
+  double Width() const;
+  void SetWidth(const double width);
 
-    double Length() const;
-    void SetLength(const double length);
+  double Length() const;
+  void SetLength(const double length);
 
-    double Heading() const;
-    void SetHeading(const double heading);
+  double Heading() const;
+  void SetHeading(const double heading);
 
-    ::apollo::common::math::Box2d BoundingBox() const;
+  ::apollo::common::math::Box2d BoundingBox() const;
 
-    // TODO: to be added
-    //const std::vector<PredictionTrajectory>& prediction_trajectories() const;
-    //void add_prediction_trajectory(
-    //        const PredictionTrajectory& prediction_trajectory);
-    //std::vector<PredictionTrajectory>* mutable_prediction_trajectories();
+  const std::vector<PredictionTrajectory> &prediction_trajectories() const;
+  void add_prediction_trajectory(
+      const PredictionTrajectory &prediction_trajectory);
+  std::vector<PredictionTrajectory> *mutable_prediction_trajectories();
 
-private:
-    int id_ = 0;
-    double height_ = 0.0;
-    double width_ = 0.0;
-    double length_ = 0.0;
-    double heading_ = 0.0;
+ private:
+  int id_ = 0;
+  double height_ = 0.0;
+  double width_ = 0.0;
+  double length_ = 0.0;
+  double heading_ = 0.0;
 
-    ::apollo::common::math::Vec2d center_;
-    // TODO: to be added
-    //std::vector<PredictionTrajectory> prediction_trajectories_;
-    ObstacleType type_ = ObstacleType::VEHICLE;
+  ::apollo::common::math::Vec2d center_;
+  std::vector<PredictionTrajectory> prediction_trajectories_;
+  ObstacleType type_ = ObstacleType::VEHICLE;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif // MODULES_PLANNING_COMMON_OBSTACLE_H
+#endif  // MODULES_PLANNING_COMMON_OBSTACLE_H
