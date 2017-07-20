@@ -40,11 +40,11 @@ cc_library(
     deps = [
         ":spiral_curve",
         ":spiral_formula",
+        "//modules/common:log",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:path_point_proto",
         "//modules/planning/math:integration",
         "@eigen//:eigen",
-        "@glog//:glog",
     ],
 )
 
@@ -59,10 +59,10 @@ cc_library(
     deps = [
         ":spiral_curve",
         ":spiral_formula",
+        "//modules/common:log",
         "//modules/common/proto:path_point_proto",
         "//modules/planning/math:integration",
         "@eigen//:eigen",
-        "@glog//:glog",
     ],
 )
 

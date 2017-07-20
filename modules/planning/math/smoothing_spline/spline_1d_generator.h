@@ -52,7 +52,6 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "glog/logging.h"
 
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_1d.h"

@@ -19,7 +19,8 @@
  **/
 
 #include "modules/planning/math/smoothing_spline/affine_constraint.h"
-#include "glog/logging.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -33,7 +34,7 @@ AffineConstraint::AffineConstraint(const Eigen::MatrixXd& constraint_matrix,
     : constraint_matrix_(constraint_matrix),
       constraint_boundary_(constraint_boundary),
       is_equality_(is_equality) {
-  CHECK(constraint_boundary.rows() == constraint_matrix.rows());
+  CHECK_EQ(constraint_boundary.rows(), constraint_matrix.rows());
 }
 
 void AffineConstraint::set_is_equality(const double is_equality) {
