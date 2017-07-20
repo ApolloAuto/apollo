@@ -2,6 +2,34 @@ syntax = "proto2";
 
 package apollo.common;
 
+message SLPoint {
+    optional double s = 1;
+    optional double l = 2;
+}
+
+message FrenetFramePoint {
+    optional double s = 1;
+    optional double l = 2;
+    optional double dl = 3;
+    optional double ddl = 4;
+}
+
+message Signals {
+  enum SignalType {
+    LEFT_TURN = 1;
+    RIGHT_TURN = 2;
+    LOW_BEAM_LIGHT = 3;
+    HIGH_BEAM_LIGHT = 4;
+    FOG_LIGHT = 5;
+    EMERGENCY_LIGHT = 6;
+  }
+  repeated SignalType signal = 1;
+}
+
+message EStop {
+  optional bool is_estop = 1;
+}
+
 message PathPoint {
   // coordinates
   optional double x = 1;
@@ -14,27 +42,21 @@ message PathPoint {
   optional double kappa = 5;
   // accumulated distance from beginning of the path
   optional double s = 6;
+
+  // derivative of kappa w.r.t s.
+  optional double dkappa = 7;
+  // derivative of derivative of kappa w.r.t s.
+  optional double ddkappa = 8;
 }
 
 message TrajectoryPoint {
-  // coordinates
-  optional double x = 1;
-  optional double y = 2;
-  optional double z = 3;
-
-  // derivative direction on the x-y plane
-  optional double theta = 4;
-  // curvature on the x-y planning
-  optional double kappa = 5;
-  // accumulated distance from beginning of the path
-  optional double s = 6;
+  // path point
+  optional PathPoint path_point = 1;
 
   // linear velocity
-  optional double v = 7;  // in [m/s]
+  optional double v = 2;  // in [m/s]
   // linear acceleration
-  optional double a = 8;
+  optional double a = 3;
   // relative time from beginning of the trajectory
-  optional double relative_time = 9;
-  // curvature change rate w.r.t. time
-  optional double dkappa = 10;
+  optional double relative_time = 4;
 }

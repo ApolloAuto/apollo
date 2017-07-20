@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/map/proto/map_geometry.proto";
+import "modules/map/proto/map_id.proto";
+
+// Crosswalk is a place designated for pedestrians to cross a road.
+message Crosswalk {
+  optional Id id = 1;
+
+  optional Polygon polygon = 2;
+
+  repeated Id overlap_id = 3;
+}

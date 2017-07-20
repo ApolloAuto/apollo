@@ -24,6 +24,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
 namespace apollo {
@@ -32,7 +33,7 @@ namespace lincoln {
 
 using apollo::common::ErrorCode;
 using apollo::control::ControlCommand;
-using apollo::canbus::Signal;
+using apollo::common::VehicleSignal;
 
 class LincolnControllerTest : public ::testing::Test {
  public:
@@ -50,7 +51,7 @@ class LincolnControllerTest : public ::testing::Test {
  protected:
   LincolnController controller_;
   ControlCommand control_cmd_;
-  Signal signal_;
+  VehicleSignal vehicle_signal_;
   CanSender sender_;
   LincolnMessageManager msg_manager_;
   CanbusConf canbus_conf_;

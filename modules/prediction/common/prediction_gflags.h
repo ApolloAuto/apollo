@@ -31,5 +31,11 @@ DECLARE_double(r_var);
 DECLARE_double(p_var);
 DECLARE_double(go_approach_rate);
 DECLARE_double(cutin_approach_rate);
+DECLARE_int32(still_obstacle_history_length);
+DECLARE_bool(enable_kf_tracking);
+DECLARE_double(still_obstacle_speed_threshold);
+DECLARE_double(still_obstacle_position_std);
+DECLARE_string(map_file);
+DECLARE_double(prediction_duration);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
