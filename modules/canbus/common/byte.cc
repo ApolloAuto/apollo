@@ -96,9 +96,7 @@ void Byte::set_value_high_4_bits(const uint8_t value) {
   set_value(value, 4, 4);
 }
 
-void Byte::set_value_low_4_bits(const uint8_t value) {
-  set_value(value, 0, 4);
-}
+void Byte::set_value_low_4_bits(const uint8_t value) { set_value(value, 0, 4); }
 
 void Byte::set_value(const uint8_t value, const int32_t start_pos,
                      const int32_t length) {
@@ -117,17 +115,11 @@ void Byte::set_value(const uint8_t value, const int32_t start_pos,
   *value_ = current_value_high + middle_value + current_value_low;
 }
 
-uint8_t Byte::get_byte() const {
-  return *value_;
-}
+uint8_t Byte::get_byte() const { return *value_; }
 
-uint8_t Byte::get_byte_high_4_bits() const {
-  return get_byte(4, 4);
-}
+uint8_t Byte::get_byte_high_4_bits() const { return get_byte(4, 4); }
 
-uint8_t Byte::get_byte_low_4_bits() const {
-  return get_byte(0, 4);
-}
+uint8_t Byte::get_byte_low_4_bits() const { return get_byte(0, 4); }
 
 uint8_t Byte::get_byte(const int32_t start_pos, const int32_t length) const {
   if (start_pos > BYTE_LENGTH - 1 || start_pos < 0 || length < 1) {
@@ -140,13 +132,9 @@ uint8_t Byte::get_byte(const int32_t start_pos, const int32_t length) const {
   return result;
 }
 
-std::string Byte::to_hex_string() const {
-  return byte_to_hex(*value_);
-}
+std::string Byte::to_hex_string() const { return byte_to_hex(*value_); }
 
-std::string Byte::to_binary_string() const {
-  return byte_to_binary(*value_);
-}
+std::string Byte::to_binary_string() const { return byte_to_binary(*value_); }
 
 }  // namespace canbus
 }  // namespace apollo

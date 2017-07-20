@@ -14,15 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-// @todo: complete this using gmock & gtest, capture logging contents and do checks.
+// @todo: complete this using gmock & gtest, capture logging contents and do
+// checks.
 
 #include "apollo/platform/log.h"
 
 using namespace apollo::platform::log;
 
-int main()
-{
-  LogModule m1 = {"test", 5, 10, platform_log_printf };
+int main() {
+  LogModule m1 = {"test", 5, 10, platform_log_printf};
   m1.set_log_lvl(7);
 
   PLATFORM_LOG(&m1, 3, "test");

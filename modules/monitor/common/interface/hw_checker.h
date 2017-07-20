@@ -72,9 +72,7 @@ struct HwCheckResult {
 class HwCheckerInterface {
  public:
   /// Returns HW class (one of pre-defined: CAN, Camera, ...).
-  virtual const int get_class() const {
-    return HW_CLASS_UNDEF;
-  }
+  virtual const int get_class() const { return HW_CLASS_UNDEF; }
 
   /// Returns the name of the HW this checker will check (e.g., ESD_CAN).
   virtual const std::string &get_name() const = 0;
