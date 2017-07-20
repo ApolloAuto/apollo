@@ -50,7 +50,7 @@ int main(int argc, const char *argv[]) {
   int can_id = 0;
   EsdCanChecker can_chk(can_id);
   std::vector<HwCheckResult> can_rslt;
-  can_chk.run_check(can_rslt);
+  can_chk.run_check(&can_rslt);
   assert(can_rslt.size() == 1);
 
 #ifdef DEBUG
