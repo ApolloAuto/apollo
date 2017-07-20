@@ -18,6 +18,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
+#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
@@ -115,13 +116,15 @@ void Planning::RunOnce() {
       apollo::common::time::ToSecond(apollo::common::time::Clock::Now()) +
       planning_cycle_time;
 
+  DataCenter::instance()->init_frame(AdapterManager::GetPlanning()->GetSeqNum() + 1);
+
   std::vector<TrajectoryPoint> planning_trajectory;
   bool res_planning = Plan(vehicle_state, is_on_auto_mode, execution_start_time,
                            &planning_trajectory);
   if (res_planning) {
     ADCTrajectory trajectory_pb =
         ToADCTrajectory(execution_start_time, planning_trajectory);
-    AdapterManager::PublishPlanningTrajectory(trajectory_pb);
+    AdapterManager::PublishPlanning(trajectory_pb);
     AINFO << "Planning succeeded";
   } else {
     AINFO << "Planning failed";
@@ -269,8 +272,8 @@ ADCTrajectory Planning::ToADCTrajectory(
     const double header_time,
     const std::vector<TrajectoryPoint>& discretized_trajectory) {
   ADCTrajectory trajectory_pb;
-  AdapterManager::FillPlanningTrajectoryHeader("planning",
-                                               trajectory_pb.mutable_header());
+  AdapterManager::FillPlanningHeader("planning",
+                                     trajectory_pb.mutable_header());
 
   trajectory_pb.mutable_header()->set_timestamp_sec(header_time);
 

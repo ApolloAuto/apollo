@@ -60,7 +60,7 @@ void UpdateSimulationWorld<apollo::common::adapter::ChassisAdapter>(
     const apollo::canbus::Chassis &chassis, SimulationWorld *world);
 
 template <>
-void UpdateSimulationWorld<apollo::common::adapter::PlanningTrajectoryAdapter>(
+void UpdateSimulationWorld<apollo::common::adapter::PlanningAdapter>(
     const apollo::planning::ADCTrajectory &trajectory, SimulationWorld *world);
 
 template<>

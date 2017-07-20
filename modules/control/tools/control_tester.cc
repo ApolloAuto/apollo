@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     AdapterManager::FeedChassisProtoFile(FLAGS_chassis_test_file);
     AdapterManager::FeedLocalizationProtoFile(FLAGS_l10n_test_file);
     AdapterManager::FeedPadProtoFile(FLAGS_pad_msg_test_file);
-    AdapterManager::FeedPlanningTrajectoryProtoFile(FLAGS_planning_test_file);
+    AdapterManager::FeedPlanningProtoFile(FLAGS_planning_test_file);
     sleep_for(std::chrono::milliseconds(1000 / FLAGS_feed_frequency));
   }
   AINFO << "Successfully fed proto files.";

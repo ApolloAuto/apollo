@@ -155,7 +155,7 @@ void Path::init() {
   init_lane_segments();
   init_point_index();
   init_width();
-  init_overlaps();
+  //  init_overlaps();
 }
 
 void Path::init_points() {
