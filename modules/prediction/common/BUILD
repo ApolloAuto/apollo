@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "prediction_common",
+    name = "prediction_gflags",
     srcs = ["prediction_gflags.cc"],
     hdrs = ["prediction_gflags.h"],
     deps = [
