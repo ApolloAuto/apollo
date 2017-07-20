@@ -39,12 +39,12 @@ namespace gnss {
 #define EPOCH_AND_SYSTEM_DIFF_SECONDS 315964800
 
 // A general pointer to a protobuf message.
-using MessagePtr = ::google::protobuf::Message*;
+using MessagePtr = ::google::protobuf::Message *;
 
 // A helper function that returns a pointer to a protobuf message of type T.
 template <class T>
-inline T* As(MessagePtr message_ptr) {
-  return dynamic_cast<T*>(message_ptr);
+inline T *As(MessagePtr message_ptr) {
+  return dynamic_cast<T *>(message_ptr);
 }
 
 // An abstract class of Parser.
@@ -52,23 +52,23 @@ inline T* As(MessagePtr message_ptr) {
 class Parser {
  public:
   // Return a pointer to a NovAtel parser. The caller should take ownership.
-  static Parser* create_novatel();
+  static Parser *create_novatel();
 
   // Return a pointer to a u-blox parser. The caller should take ownership.
-  static Parser* create_ublox();
+  static Parser *create_ublox();
 
   virtual ~Parser() {}
 
   // Updates the parser with new data. The caller must keep the data valid until
   // get_message()
   // returns NONE.
-  void update(const uint8_t* data, size_t length) {
+  void update(const uint8_t *data, size_t length) {
     _data = data;
     _data_end = data + length;
   }
 
-  void update(const std::string& data) {
-    update(reinterpret_cast<const uint8_t*>(data.data()), data.size());
+  void update(const std::string &data) {
+    update(reinterpret_cast<const uint8_t *>(data.data()), data.size());
   }
 
   enum class MessageType {
@@ -86,14 +86,14 @@ class Parser {
   // Gets a parsed protobuf message. The caller must consume the message before
   // calling another
   // get_message() or update();
-  virtual MessageType get_message(MessagePtr& message_ptr) = 0;
+  virtual MessageType get_message(MessagePtr &message_ptr) = 0;
 
  protected:
   Parser() {}
 
   // Point to the beginning and end of data. Do not take ownership.
-  const uint8_t* _data = nullptr;
-  const uint8_t* _data_end = nullptr;
+  const uint8_t *_data = nullptr;
+  const uint8_t *_data_end = nullptr;
 
  private:
   DISABLE_COPY_AND_ASSIGN(Parser);

@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <iostream>
-#include <memory>
 #include <stdio.h>
 #include <termios.h>
+#include <iostream>
+#include <memory>
 #include <thread>
 
 #include "ros/include/ros/ros.h"
@@ -121,7 +121,7 @@ class Teleop {
     bool parking_brake = false;
     Chassis::GearPosition gear = Chassis::GEAR_INVALID;
     PadMessage pad_msg;
-    ControlCommand& control_command_ = control_command();
+    ControlCommand &control_command_ = control_command();
 
     // get the console in raw mode
     tcgetattr(_kfd, &_cooked);
@@ -253,7 +253,7 @@ class Teleop {
     return;
   }  // end of keyboard loop thread
 
-  ControlCommand& control_command() { return control_command_; }
+  ControlCommand &control_command() { return control_command_; }
 
   Chassis::GearPosition GetGear(int32_t gear) {
     switch (gear) {
@@ -276,7 +276,7 @@ class Teleop {
     }
   }
 
-  void GetPadMessage(PadMessage& pad_msg, int32_t int_action) {
+  void GetPadMessage(PadMessage &pad_msg, int32_t int_action) {
     apollo::control::DrivingAction action =
         apollo::control::DrivingAction::RESET;
     switch (int_action) {
@@ -328,7 +328,7 @@ class Teleop {
     control_command_.set_gear_location(Chassis::GEAR_INVALID);
   }
 
-  void OnChassis(const Chassis& chassis) { Send(); }
+  void OnChassis(const Chassis &chassis) { Send(); }
 
   int32_t Start() {
     if (is_running_) {
@@ -383,7 +383,7 @@ void signal_handler(int32_t signal_num) {
 
 }  // namespace
 
-int main(int32_t argc, char** argv) {
+int main(int32_t argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
@@ -396,14 +396,14 @@ int main(int32_t argc, char** argv) {
   apollo::common::adapter::AdapterManagerConfig config;
   config.set_is_ros(true);
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
     sub_config->set_type(
         apollo::common::adapter::AdapterConfig::CONTROL_COMMAND);
   }
 
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(apollo::common::adapter::AdapterConfig::CHASSIS);
   }

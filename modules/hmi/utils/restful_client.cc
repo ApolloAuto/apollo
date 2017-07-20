@@ -29,7 +29,7 @@ namespace apollo {
 namespace hmi {
 
 RestfulClient::STATUS RestfulClient::Post(
-    const google::protobuf::Message& proto) {
+    const google::protobuf::Message &proto) {
   std::string json;
   const auto status = google::protobuf::util::MessageToJsonString(proto, &json);
   CHECK(status.ok()) << status.error_message();
@@ -45,10 +45,10 @@ RestfulClient::STATUS RestfulClient::Post(
     request.setOpt(new curlpp::options::PostFields(json));
     request.setOpt(new curlpp::options::PostFieldSize(json.length()));
     request.perform();
-  } catch (curlpp::LogicError& e) {
+  } catch (curlpp::LogicError &e) {
     AERROR << "LogicError: " << e.what();
     return LOGIC_ERROR;
-  } catch (curlpp::RuntimeError& e) {
+  } catch (curlpp::RuntimeError &e) {
     AERROR << "RuntimeError: " << e.what();
     return RUNTIME_ERROR;
   }

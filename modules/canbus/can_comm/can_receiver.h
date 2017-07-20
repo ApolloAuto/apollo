@@ -61,8 +61,8 @@ class CanReceiver {
    * @param enable_log If log the essential information during running.
    * @return An error code indicating the status of this initialization.
    */
-  ::apollo::common::ErrorCode Init(CanClient* can_client,
-                                   MessageManager* pt_manager, bool enable_log);
+  ::apollo::common::ErrorCode Init(CanClient *can_client,
+                                   MessageManager *pt_manager, bool enable_log);
 
   /**
    * @brief Get the working status of this CAN receiver.
@@ -91,8 +91,8 @@ class CanReceiver {
   std::unique_ptr<std::thread> thread_;
   bool is_running_ = false;
   // CanClient, MessageManager pointer life is managed by outer program
-  CanClient* can_client_ = nullptr;
-  MessageManager* pt_manager_ = nullptr;
+  CanClient *can_client_ = nullptr;
+  MessageManager *pt_manager_ = nullptr;
   bool enable_log_ = false;
   bool is_init_ = false;
 

@@ -137,7 +137,7 @@ void LonController::LoadControlCalibrationTable(
   AINFO << "Control calibration table size is "
         << control_table.calibration_size();
   Interpolation2D::DataType xyz;
-  for (const auto& calibration : control_table.calibration()) {
+  for (const auto &calibration : control_table.calibration()) {
     xyz.push_back(std::make_tuple(calibration.speed(),
                                   calibration.acceleration(),
                                   calibration.command()));

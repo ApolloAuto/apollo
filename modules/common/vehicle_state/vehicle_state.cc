@@ -16,9 +16,9 @@
 
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include <cmath>
+#include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace common {

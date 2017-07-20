@@ -45,13 +45,13 @@ class HMIStatusHelper {
    * @param hardware_status the vector of hardware status
    */
   static void ReportHardwareStatus(
-      const std::vector<HardwareStatus>& hardware_status);
+      const std::vector<HardwareStatus> &hardware_status);
 
   /*
    * @brief Report module status to HMI.
    * @param module_status the status of the module
    */
-  static void ReportModuleStatus(const ModuleStatus& module_status);
+  static void ReportModuleStatus(const ModuleStatus &module_status);
 };
 
 }  // namespace hmi

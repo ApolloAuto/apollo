@@ -30,9 +30,7 @@ double LinearFunc(double x) { return 2.0 * x; }
 
 double SquareFunc(double x) { return x * x; }
 
-double CubicFunc(double x) {
-  return (x - 1.0) * (x - 2.0) * (x - 3.0);
-}
+double CubicFunc(double x) { return (x - 1.0) * (x - 2.0) * (x - 3.0); }
 
 double SinFunc(double x) { return std::sin(x); }
 

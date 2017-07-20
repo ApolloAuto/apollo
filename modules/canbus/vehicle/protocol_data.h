@@ -45,7 +45,7 @@ class ProtocolData {
    * @param length the length of the input array
    * @return the value of checksum
    */
-  static std::uint8_t CalculateCheckSum(const uint8_t* input,
+  static std::uint8_t CalculateCheckSum(const uint8_t *input,
                                         const uint32_t length);
   /**
    * @brief construct protocol data.
@@ -75,8 +75,8 @@ class ProtocolData {
    * @param length the length of the input bytes
    * @param car_status the parsed car_status
    */
-  virtual void Parse(const uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const uint8_t *bytes, int32_t length,
+                     ChassisDetail *car_status) const;
 
   /*
    * @brief parse received data
@@ -85,14 +85,14 @@ class ProtocolData {
    * @param timestamp the timestamp of input data
    * @param car_status the parsed car_status
    */
-  virtual void Parse(const uint8_t* bytes, int32_t length,
-                     const struct timeval& timestamp,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const uint8_t *bytes, int32_t length,
+                     const struct timeval &timestamp,
+                     ChassisDetail *car_status) const;
 
   /*
    * @brief update the data
    */
-  virtual void UpdateData(uint8_t* data);
+  virtual void UpdateData(uint8_t *data);
 
   /*
    * @brief reset the protocol data

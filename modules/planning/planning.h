@@ -45,9 +45,9 @@ class Planning {
    * @param is_on_auto_mode whether the current system is on auto-driving mode
    * @param publishable_trajectory the computed planning trajectory
    */
-  bool Plan(const common::vehicle_state::VehicleState& vehicle_state,
+  bool Plan(const common::vehicle_state::VehicleState &vehicle_state,
             const bool is_on_auto_mode, const double publish_time,
-            std::vector<common::TrajectoryPoint>* discretized_trajectory);
+            std::vector<common::TrajectoryPoint> *discretized_trajectory);
 
   /**
    * @brief Reset the planner to initial state.
@@ -59,7 +59,7 @@ class Planning {
   ComputeStartingPointFromLastTrajectory(const double curr_time) const;
 
   common::TrajectoryPoint ComputeStartingPointFromVehicleState(
-      const common::vehicle_state::VehicleState& vehicle_state,
+      const common::vehicle_state::VehicleState &vehicle_state,
       const double forward_time) const;
 
   std::vector<common::TrajectoryPoint> GetOverheadTrajectory(

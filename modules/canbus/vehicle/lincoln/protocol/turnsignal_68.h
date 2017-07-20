@@ -57,7 +57,7 @@ class Turnsignal68 : public ProtocolData {
    * @brief update the data
    * @param data a pointer to the data to be updated
    */
-  virtual void UpdateData(uint8_t* data);
+  virtual void UpdateData(uint8_t *data);
 
   /**
    * @brief reset the private variables
@@ -68,19 +68,19 @@ class Turnsignal68 : public ProtocolData {
    * @brief set no-turn based on pedal command
    * @return a this pointer to the instance itself
    */
-  Turnsignal68* set_turn_none();
+  Turnsignal68 *set_turn_none();
 
   /**
    * @brief set turn left based on pedal command
    * @return a this pointer to the instance itself
    */
-  Turnsignal68* set_turn_left();
+  Turnsignal68 *set_turn_left();
 
   /**
    * @brief set turn right based on pedal command
    * @return a this pointer to the instance itself
    */
-  Turnsignal68* set_turn_right();
+  Turnsignal68 *set_turn_right();
 
  private:
   /**
@@ -88,7 +88,7 @@ class Turnsignal68 : public ProtocolData {
    * 2, 'f_type': 'value', 'is_signed_var': False, 'physical_range': '[0|0]',
    * 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '""'}
    */
-  void set_turn_cmd_p(uint8_t* data, int32_t trncmd);
+  void set_turn_cmd_p(uint8_t *data, int32_t trncmd);
 
  private:
   int32_t turn_cmd_ = 0;

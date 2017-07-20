@@ -33,7 +33,7 @@ void AdapterManager::Observe() {
 
 void AdapterManager::Init() { Init(FLAGS_adapter_config_path); }
 
-void AdapterManager::Init(const std::string& adapter_config_filename) {
+void AdapterManager::Init(const std::string &adapter_config_filename) {
   // Parse config file
   AdapterManagerConfig configs;
   CHECK(
@@ -43,12 +43,12 @@ void AdapterManager::Init(const std::string& adapter_config_filename) {
   Init(configs);
 }
 
-void AdapterManager::Init(const AdapterManagerConfig& configs) {
+void AdapterManager::Init(const AdapterManagerConfig &configs) {
   if (configs.is_ros()) {
     instance()->node_handle_.reset(new ros::NodeHandle());
   }
 
-  for (const auto& config : configs.config()) {
+  for (const auto &config : configs.config()) {
     switch (config.type()) {
       case AdapterConfig::GPS:
         EnableGps(FLAGS_gps_topic, config.mode(),

@@ -149,8 +149,7 @@ class Clock {
    * @return a Timestamp object representing the current time.
    */
   static Timestamp Now() {
-    return instance()->is_system_clock_ ? SystemNow()
-                                               : instance()->mock_now_;
+    return instance()->is_system_clock_ ? SystemNow() : instance()->mock_now_;
   }
 
   /**

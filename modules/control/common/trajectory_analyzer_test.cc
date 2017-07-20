@@ -35,33 +35,33 @@ class TrajectoryAnalyzerTest : public ::testing::Test {
   virtual void SetUp() {}
 };
 
-void SetTrajectory(const std::vector<double>& xs, const std::vector<double>& ys,
-                   planning::ADCTrajectory* adc_trajectory) {
+void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
+                   planning::ADCTrajectory *adc_trajectory) {
   for (size_t i = 0; i < xs.size(); ++i) {
-    auto* point = adc_trajectory->add_adc_trajectory_point();
+    auto *point = adc_trajectory->add_adc_trajectory_point();
     point->set_x(xs[i]);
     point->set_y(ys[i]);
   }
   adc_trajectory->mutable_header()->set_sequence_num(123);
 }
 
-void SetTrajectoryWithTime(const std::vector<double>& xs,
-                           const std::vector<double>& ys,
-                           const std::vector<double>& ts,
-                           planning::ADCTrajectory* adc_trajectory) {
+void SetTrajectoryWithTime(const std::vector<double> &xs,
+                           const std::vector<double> &ys,
+                           const std::vector<double> &ts,
+                           planning::ADCTrajectory *adc_trajectory) {
   for (size_t i = 0; i < xs.size(); ++i) {
-    auto* point = adc_trajectory->add_adc_trajectory_point();
+    auto *point = adc_trajectory->add_adc_trajectory_point();
     point->set_x(xs[i]);
     point->set_y(ys[i]);
     point->set_relative_time(ts[i]);
   }
 }
 
-void SetTrajectory(const std::vector<double>& xs, const std::vector<double>& ys,
-                   const std::vector<double>& ss,
-                   planning::ADCTrajectory* adc_trajectory) {
+void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
+                   const std::vector<double> &ss,
+                   planning::ADCTrajectory *adc_trajectory) {
   for (size_t i = 0; i < xs.size(); ++i) {
-    auto* point = adc_trajectory->add_adc_trajectory_point();
+    auto *point = adc_trajectory->add_adc_trajectory_point();
     point->set_x(xs[i]);
     point->set_y(ys[i]);
     point->set_accumulated_s(ss[i]);
@@ -90,7 +90,7 @@ TEST_F(TrajectoryAnalyzerTest, Constructor) {
   TrajectoryAnalyzer trajectory_analyzer(&adc_trajectory);
   EXPECT_EQ(trajectory_analyzer.trajectory_points().size(), 5);
   int i = 0;
-  for (auto& point : trajectory_analyzer.trajectory_points()) {
+  for (auto &point : trajectory_analyzer.trajectory_points()) {
     EXPECT_EQ(xs[i], point.x());
     EXPECT_EQ(ys[i], point.y());
     ++i;
