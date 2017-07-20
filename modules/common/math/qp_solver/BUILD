@@ -3,6 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "qp_solver_gflags",
+    srcs = [
+        "qp_solver_gflags.cc",
+    ],
+    hdrs = [
+        "qp_solver_gflags.h",
+    ],
+    deps = [
+        "//external:gflags",
+    ],
+)
+
+cc_library(
     name = "qp_solver",
     srcs = [
         "qp_solver.cc",
@@ -25,7 +38,7 @@ cc_library(
     ],
     deps = [
         ":qp_solver",
-        "//modules/planning/common:planning_gflags",
+        "//modules/common/math/qp_solver:qp_solver_gflags",
         "@eigen//:eigen",
         "//third_party/qp_oases",
     ],

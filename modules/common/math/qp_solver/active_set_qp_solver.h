@@ -18,15 +18,16 @@
  * @file: active_set_qp_solver.h
  * @brief: wrapper class for active set method in qpOases
  **/
-#ifndef MODULES_PLANNING_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
-#define MODULES_PLANNING_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
+#ifndef MODULES_COMMON_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
+#define MODULES_COMMON_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
 
 #include "qpOASES/include/qpOASES.hpp"
 
-#include "modules/planning/math/qp_solver/qp_solver.h"
+#include "modules/common/math/qp_solver/qp_solver.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
 class ActiveSetQPSolver : public QPSolver {
  public:
@@ -82,6 +83,7 @@ class ActiveSetQPSolver : public QPSolver {
   int max_iteration_ = 1000;
 };
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo
-#endif  // MODULES_PLANNING_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
+#endif  // MODULES_COMMON_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_

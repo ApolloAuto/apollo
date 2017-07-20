@@ -14,17 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
-#define MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
+#include "modules/common/math/qp_solver/qp_solver_gflags.h"
 
-#include "gflags/gflags.h"
-
-DECLARE_string(planning_config_file);
-DECLARE_int32(planning_loop_rate);
-DECLARE_string(rtk_trajectory_filename);
-DECLARE_uint64(rtk_trajectory_backward);
-DECLARE_uint64(rtk_trajectory_forward);
-DECLARE_double(replanning_threshold);
-DECLARE_double(trajectory_resolution);
-
-#endif /* MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_ */
+// math : active set solver
+DEFINE_double(default_active_set_eps_num, 1e-7,
+              "qpOases wrapper error control numerator");
+DEFINE_double(default_active_set_eps_den, 1e-7,
+              "qpOases wrapper error control numerator");
+DEFINE_double(default_active_set_eps_iter_ref, 1e-7,
+              "qpOases wrapper error control numerator");
+DEFINE_bool(default_enable_active_set_debug_info, false,
+            "Enable print information");
