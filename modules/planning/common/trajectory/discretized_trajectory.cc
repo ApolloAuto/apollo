@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file discretized_trajectory.cpp
+ * @file discretized_trajectory.cc
  **/
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
