@@ -43,7 +43,8 @@ class DpRoadGraph {
  public:
   explicit DpRoadGraph(
       const DpPolyPathConfig &config,
-      const ::apollo::common::TrajectoryPoint &init_point);
+      const ::apollo::common::TrajectoryPoint &init_point,
+      const SpeedData& speed_data);
   ~DpRoadGraph() = default;
   ::apollo::common::ErrorCode find_tunnel(
       const DataCenter &data_center,
@@ -64,6 +65,7 @@ class DpRoadGraph {
  private:
   DpPolyPathConfig _config;
   ::apollo::common::TrajectoryPoint _init_point;
+  SpeedData _heuristic_speed_data;
   std::vector<GraphVertex> _vertices;
   std::vector<GraphEdge> _edges;
   ::apollo::common::SLPoint _init_sl_point;
