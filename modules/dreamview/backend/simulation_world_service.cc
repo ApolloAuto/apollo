@@ -45,6 +45,8 @@ using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::common::TrajectoryPoint;
 using apollo::canbus::Chassis;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
@@ -84,6 +86,64 @@ Object::DisengageType DeduceDisengageType(const ::Chassis &chassis) {
   }
 
   return Object::DISENGAGE_UNKNOWN;
+}
+
+void SetObstacleInfo(const PerceptionObstacle &obstacle, Object *world_object) {
+    if (world_object == nullptr) {
+        return;
+    }
+
+    world_object->set_id(std::to_string(obstacle.id()));
+    world_object->set_position_x(obstacle.position().x());
+    world_object->set_position_y(obstacle.position().y());
+    world_object->set_heading(obstacle.theta());
+    world_object->set_length(obstacle.length());
+    world_object->set_width(obstacle.width());
+    world_object->set_height(obstacle.height());
+    world_object->set_timestamp_sec(obstacle.timestamp());
+}
+
+void SetObstaclePolygon(const PerceptionObstacle &obstacle,
+                        Object *world_object) {
+    if (world_object == nullptr) {
+        return;
+    }
+
+    world_object->clear_polygon_point();
+    for (const auto& point : obstacle.polygon_point()) {
+        PolygonPoint *poly_pt = world_object->add_polygon_point();
+        poly_pt->set_x(point.x());
+        poly_pt->set_y(point.y());
+    }
+}
+
+void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
+    if (world_object == nullptr) {
+        return;
+    }
+
+    switch (obstacle.type()) {
+    case PerceptionObstacle::UNKNOWN:
+        world_object->set_type(Object_Type_UNKNOWN);
+        break;
+    case PerceptionObstacle::UNKNOWN_MOVABLE:
+        world_object->set_type(Object_Type_UNKNOWN_MOVABLE);
+        break;
+    case PerceptionObstacle::UNKNOWN_UNMOVABLE:
+        world_object->set_type(Object_Type_UNKNOWN_UNMOVABLE);
+        break;
+    case PerceptionObstacle::PEDESTRIAN:
+        world_object->set_type(Object_Type_PEDESTRIAN);
+        break;
+    case PerceptionObstacle::BICYCLE:
+        world_object->set_type(Object_Type_BICYCLE);
+        break;
+    case PerceptionObstacle::VEHICLE:
+        world_object->set_type(Object_Type_VEHICLE);
+        break;
+    default:
+        world_object->set_type(Object_Type_UNKNOWN);
+    }
 }
 
 }  // namespace
@@ -147,7 +207,8 @@ void UpdateSimulationWorld<LocalizationAdapter>(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
-  world->set_timestamp_sec(localization.header().timestamp_sec());
+  world->set_timestamp_sec(
+      std::max(world->timestamp_sec(), localization.header().timestamp_sec()));
 }
 
 template <>
@@ -186,8 +247,8 @@ void UpdateSimulationWorld<ChassisAdapter>(const Chassis &chassis,
   // Updates the timestamp with the timestamp inside the chassis
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
-  auto_driving_car->set_timestamp_sec(chassis.header().timestamp_sec());
-  world->set_timestamp_sec(chassis.header().timestamp_sec());
+  world->set_timestamp_sec(
+      std::max(world->timestamp_sec(), chassis.header().timestamp_sec()));
 }
 
 template <>
@@ -234,7 +295,20 @@ void UpdateSimulationWorld<PlanningTrajectoryAdapter>(
     }
   }
 
-  world->set_timestamp_sec(header_time);
+  world->set_timestamp_sec(std::max(world->timestamp_sec(), header_time));
+}
+
+template <>
+void UpdateSimulationWorld<apollo::common::adapter::PerceptionObstaclesAdapter>(
+    const PerceptionObstacles &obstacles, SimulationWorld *world) {
+  for (const auto &obstacle : obstacles.perception_obstacle()) {
+    Object *world_obj = world->add_object();
+    SetObstacleInfo(obstacle, world_obj);
+    SetObstaclePolygon(obstacle, world_obj);
+    SetObstacleType(obstacle, world_obj);
+  }
+  world->set_timestamp_sec(
+      std::max(world->timestamp_sec(), obstacles.header().timestamp_sec()));
 }
 
 }  // namespace internal
@@ -257,7 +331,8 @@ const SimulationWorld &SimulationWorldService::Update() {
                            &world_);
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanningTrajectory(),
                            &world_);
-
+  UpdateWithLatestObserved("PerceptionObstacles",
+                           AdapterManager::GetPerceptionObstacles(), &world_);
   return world_;
 }
 

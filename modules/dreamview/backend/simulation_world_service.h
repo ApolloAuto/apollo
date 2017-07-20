@@ -63,6 +63,11 @@ template <>
 void UpdateSimulationWorld<apollo::common::adapter::PlanningTrajectoryAdapter>(
     const apollo::planning::ADCTrajectory &trajectory, SimulationWorld *world);
 
+template<>
+void UpdateSimulationWorld<apollo::common::adapter::PerceptionObstaclesAdapter>(
+    const apollo::perception::PerceptionObstacles &obstacles,
+    SimulationWorld *world);
+
 }  // namespace internal
 
 /**

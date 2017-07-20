@@ -27,15 +27,20 @@ using apollo::common::adapter::ChassisAdapter;
 using apollo::common::adapter::LocalizationAdapter;
 using apollo::common::adapter::PlanningTrajectoryAdapter;
 using apollo::common::monitor::MonitorMessage;
+using apollo::common::adapter::PerceptionObstaclesAdapter;
 using apollo::canbus::Chassis;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::common::TrajectoryPoint;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 
 namespace apollo {
 namespace dreamview {
 
 namespace internal {
+
+const float kEpsilon = 0.0001;
 
 class InternalTest : public ::testing::Test {
  public:
@@ -196,6 +201,60 @@ TEST_F(InternalTest, UpdatePlanningTrajectoryTest) {
     EXPECT_EQ(point.polygon_point_size(), 4);
   }
 }
+
+TEST_F(InternalTest, UpdatePerceptionObstaclesTest) {
+  PerceptionObstacles obstacles;
+  PerceptionObstacle* obstacle1 = obstacles.add_perception_obstacle();
+  obstacle1->set_id(1);
+  apollo::perception::Point* point1 = obstacle1->add_polygon_point();
+  point1->set_x(0.0);
+  point1->set_y(0.0);
+  apollo::perception::Point* point2 = obstacle1->add_polygon_point();
+  point2->set_x(0.0);
+  point2->set_y(1.0);
+  apollo::perception::Point* point3 = obstacle1->add_polygon_point();
+  point3->set_x(-1.0);
+  point3->set_y(0.0);
+  obstacle1->set_timestamp(1489794020.123);
+  obstacle1->set_type(
+      apollo::perception::PerceptionObstacle_Type_UNKNOWN);
+  apollo::perception::PerceptionObstacle* obstacle2 = obstacles
+      .add_perception_obstacle();
+  obstacle2->set_id(2);
+  apollo::perception::Point* point = obstacle2->mutable_position();
+  point->set_x(1.0);
+  point->set_y(2.0);
+  obstacle2->set_theta(3.0);
+  obstacle2->set_length(4.0);
+  obstacle2->set_width(5.0);
+  obstacle2->set_height(6.0);
+  obstacle2->set_type(
+      apollo::perception::PerceptionObstacle_Type_VEHICLE);
+
+  SimulationWorld world;
+  UpdateSimulationWorld<PerceptionObstaclesAdapter>(obstacles, &world);
+  EXPECT_EQ(2, world.object_size());
+
+  for (const auto& object : world.object()) {
+    if (object.id() == "1") {
+      EXPECT_NEAR(1489794020.123, object.timestamp_sec(), kEpsilon);
+      EXPECT_EQ(3, object.polygon_point_size());
+      EXPECT_EQ(Object_Type_UNKNOWN, object.type());
+    } else if (object.id() == "2") {
+      EXPECT_NEAR(1.0, object.position_x(), kEpsilon);
+      EXPECT_NEAR(2.0, object.position_y(), kEpsilon);
+      EXPECT_NEAR(3.0, object.heading(), kEpsilon);
+      EXPECT_NEAR(4.0, object.length(), kEpsilon);
+      EXPECT_NEAR(5.0, object.width(), kEpsilon);
+      EXPECT_NEAR(6.0, object.height(), kEpsilon);
+      EXPECT_EQ(0, object.polygon_point_size());
+      EXPECT_EQ(Object_Type_VEHICLE, object.type());
+    } else {
+      EXPECT_TRUE(false) << "Unexpected object id " << object.id();
+    }
+  }
+}
+
 }  // namespace internal
 
 }  // namespace dreamview
