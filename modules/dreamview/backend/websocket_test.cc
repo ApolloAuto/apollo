@@ -42,7 +42,7 @@ class MockClient {
  private:
   static int OnMessage(struct mg_connection *conn, int bits, char *data,
                        size_t data_len, void *cbdata) {
-    LOG(INFO) << "Get " << *data;
+    AINFO << "Get " << *data;
     received_messages_.emplace_back(data);
     return 1;
   }
