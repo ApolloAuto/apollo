@@ -21,7 +21,8 @@
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 #include <string>
-#include "glog/logging.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -79,7 +80,7 @@ double QuarticPolynomialCurve1d::param_length() const { return param_; }
 void QuarticPolynomialCurve1d::compute_coefficients(
     const double x0, const double dx0, const double ddx0, const double dx1,
     const double ddx1, const double p) {
-  CHECK(p > 0.0);
+  CHECK_GT(p, 0.0);
 
   param_ = p;
 

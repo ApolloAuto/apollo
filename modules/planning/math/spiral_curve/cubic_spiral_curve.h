@@ -33,6 +33,7 @@
 #define MODULES_PLANNING_MATH_SPIRAL_CURVE_CUBIC_SPIRAL_CURVE_H_
 
 #include <vector>
+
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/math/spiral_curve/spiral_curve.h"

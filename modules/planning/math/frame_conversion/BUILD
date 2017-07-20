@@ -11,9 +11,9 @@ cc_library(
         "cartesian_frenet_conversion.h",
     ],
     deps = [
+        "//modules/common:log",
         "//modules/common/math:vec2d",
         "//modules/common/math:math_utils",
-        "@glog//:glog",
     ],
 )
 
