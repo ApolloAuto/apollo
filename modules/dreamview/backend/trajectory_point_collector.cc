@@ -24,24 +24,26 @@
 using ::apollo::common::config::VehicleConfigHelper;
 using ::apollo::common::math::Box2d;
 using ::apollo::common::math::Vec2d;
-using ::apollo::planning::ADCTrajectoryPoint;
+using ::apollo::common::TrajectoryPoint;
 
 namespace apollo {
 namespace dreamview {
 namespace util {
 
-void TrajectoryPointCollector::Collect(const ADCTrajectoryPoint &point) {
+void TrajectoryPointCollector::Collect(const TrajectoryPoint &point) {
   if (has_previous_) {
     Object *trajectory = world_->add_planning_trajectory();
-    trajectory->set_position_x(previous_.x());
-    trajectory->set_position_y(previous_.y());
+    trajectory->set_position_x(previous_.path_point().x());
+    trajectory->set_position_y(previous_.path_point().y());
     trajectory->set_heading(
-        atan2(point.y() - previous_.y(), point.x() - previous_.x()));
+        atan2(point.path_point().y() - previous_.path_point().y(),
+              point.path_point().x() - previous_.path_point().x()));
 
     const auto &vehicle_param =
         VehicleConfigHelper::GetConfig().vehicle_param();
-    Box2d trajectory_box({previous_.x(), previous_.y()}, trajectory->heading(),
-                         vehicle_param.length(), vehicle_param.width());
+    Box2d trajectory_box(
+        {previous_.path_point().x(), previous_.path_point().y()},
+        trajectory->heading(), vehicle_param.length(), vehicle_param.width());
 
     std::vector<Vec2d> corners;
     trajectory_box.GetAllCorners(&corners);

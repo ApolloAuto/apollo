@@ -42,7 +42,7 @@ using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::planning::ADCTrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::canbus::Chassis;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
@@ -193,14 +193,14 @@ void UpdateSimulationWorld<PlanningTrajectoryAdapter>(
     const ADCTrajectory &trajectory, SimulationWorld *world) {
   const double cutoff_time = world->auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
-  const size_t trajectory_length = trajectory.adc_trajectory_point_size();
+  const size_t trajectory_length = trajectory.trajectory_point_size();
 
   util::TrajectoryPointCollector collector(world);
 
   size_t i = 0;
   bool collecting_started = false;
   while (i < trajectory_length) {
-    const ADCTrajectoryPoint &point = trajectory.adc_trajectory_point(i);
+    const TrajectoryPoint &point = trajectory.trajectory_point(i);
     // Trajectory points with a timestamp older than the cutoff time
     // (which is effectively the timestamp of the most up-to-date
     // localization/chassis message) will be dropped.

@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 
-using ::apollo::planning::ADCTrajectoryPoint;
+using ::apollo::common::TrajectoryPoint;
 
 namespace apollo {
 namespace dreamview {
@@ -29,9 +29,7 @@ namespace util {
 
 class TrajectoryPointCollectorTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    apollo::common::config::VehicleConfigHelper::Init();
-  }
+  virtual void SetUp() { apollo::common::config::VehicleConfigHelper::Init(); }
 };
 
 TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
@@ -39,9 +37,9 @@ TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
   TrajectoryPointCollector collector(&world);
 
   for (int i = 0; i < 4; ++i) {
-    ADCTrajectoryPoint point;
-    point.set_x(i * 100.0);
-    point.set_y(i * 100.0 + 100.0);
+    TrajectoryPoint point;
+    point.mutable_path_point()->set_x(i * 100.0);
+    point.mutable_path_point()->set_y(i * 100.0 + 100.0);
     collector.Collect(point);
   }
 
