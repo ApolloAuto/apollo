@@ -285,8 +285,8 @@ Status LonController::ComputeControlCommand(
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
 
-  if (std::abs(vehicle_state_.linear_velocity())
-      <= FLAGS_max_abs_speed_when_stopped ||
+  if (std::abs(vehicle_state_.linear_velocity()) <=
+          FLAGS_max_abs_speed_when_stopped ||
       chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == ::apollo::canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(trajectory_message_->gear());

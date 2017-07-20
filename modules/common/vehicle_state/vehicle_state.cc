@@ -113,7 +113,7 @@ void VehicleState::set_angular_velocity(const double angular_velocity) {
 }
 
 void VehicleState::set_gear(
-  const ::apollo::canbus::Chassis::GearPosition gear_position) {
+    const ::apollo::canbus::Chassis::GearPosition gear_position) {
   gear_ = gear_position;
 }
 
@@ -121,15 +121,14 @@ Eigen::Vector2d VehicleState::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
   double v = linear_v_;
   if (gear_ == ::apollo::canbus::Chassis::GEAR_REVERSE) {
-    v = - linear_v_;
+    v = -linear_v_;
   }
   // Predict distance travel vector
   if (std::fabs(angular_v_) < 0.0001) {
     vec_distance[0] = 0.0;
     vec_distance[1] = v * t;
   } else {
-    vec_distance[0] =
-        -v / angular_v_ * (1.0 - std::cos(angular_v_ * t));
+    vec_distance[0] = -v / angular_v_ * (1.0 - std::cos(angular_v_ * t));
     vec_distance[1] = std::sin(angular_v_ * t) * v / angular_v_;
   }
 
