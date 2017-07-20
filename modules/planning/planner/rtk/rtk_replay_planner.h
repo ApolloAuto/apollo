@@ -17,8 +17,6 @@
 #ifndef MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
 
-#include "modules/planning/planner/planner.h"
-
 #include <string>
 #include <vector>
 

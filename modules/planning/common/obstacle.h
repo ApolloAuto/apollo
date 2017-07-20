@@ -18,13 +18,12 @@
  * @file obstacle.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_OBSTACLE_H
-#define MODULES_PLANNING_COMMON_OBSTACLE_H
-
-#include "modules/planning/common/planning_object.h"
+#ifndef MODULES_PLANNING_COMMON_OBSTACLE_H_
+#define MODULES_PLANNING_COMMON_OBSTACLE_H_
 
 #include <vector>
 
+#include "modules/planning/common/planning_object.h"
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/trajectory/prediction_trajectory.h"
 
@@ -47,8 +46,8 @@ class Obstacle : public PlanningObject {
   int Id() const;
   void SetId(int id);
 
-  const ObstacleType &Type() const;
-  void SetType(const ObstacleType &type);
+  const ObstacleType& Type() const;
+  void SetType(const ObstacleType& type);
 
   double Height() const;
   void SetHeight(const double height);
@@ -84,4 +83,4 @@ class Obstacle : public PlanningObject {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_OBSTACLE_H
+#endif  // MODULES_PLANNING_COMMON_OBSTACLE_H_

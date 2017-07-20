@@ -30,13 +30,12 @@ apollo::common::Status RoutingProxy::Init() {
 
 void RoutingProxy::set_routing(
         const ::apollo::hdmap::RoutingResult& routing_result) {
-    routing_.CopyFrom(routing_result);
+  routing_.CopyFrom(routing_result);
 }
 
 const ::apollo::hdmap::RoutingResult& RoutingProxy::routing() const {
-    return routing_;
+  return routing_;
 }
 
-} // namespace planning
-} // namespace apollo
-
+}  // namespace planning
+}  // namespace apollo
