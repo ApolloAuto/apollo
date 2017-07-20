@@ -38,7 +38,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 
 namespace apollo {
-namespace common {
+namespace hdmap {
 
 // class LaneInfo;
 // class OverlapInfo;
@@ -322,7 +322,7 @@ class Path {
   std::vector<PathOverlap> _speed_bump_overlaps;
 };
 
-}  // namespace common
+}  // namespace hdmap
 }  // namespace apollo
 
 #endif  // MODULES_MAP_PNC_MAP_TRAJECTORY_H_
