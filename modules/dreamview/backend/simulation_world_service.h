@@ -122,13 +122,37 @@ class SimulationWorldService {
   void RegisterDataCallback(const std::string &adapter_name,
                             AdapterType *adapter) {
     if (adapter == nullptr) {
-      AFATAL << adapter_name << " adapter is not correctly initialized. "
-                                "Please check the adapter manager ";
+      AERROR << adapter_name << " adapter is not correctly initialized. "
+                                "Please check the adapter manager "
+                                "configuration.";
     }
 
     adapter->SetCallback(
         std::bind(&internal::UpdateSimulationWorld<AdapterType>,
                   std::placeholders::_1, &world_));
+  }
+
+  /**
+   * @brief Get the latest observed data from the adatper manager to update the
+   * SimulationWorld object when triggered by refresh timer.
+   */
+  template <typename AdapterType>
+  void UpdateWithLatestObserved(const std::string &adapter_name,
+                                AdapterType *adapter, SimulationWorld *world) {
+    if (adapter == nullptr) {
+      AERROR << adapter_name << " adapter is not correctly initialized. "
+                                "Please check the adapter manager "
+                                "configuration.";
+      return;
+    }
+
+    if (adapter->Empty()) {
+      AINFO << adapter_name << " adapter has not received any data yet.";
+      return;
+    }
+
+    internal::UpdateSimulationWorld<AdapterType>(adapter->GetLatestObserved(),
+                                                 world);
   }
 
   // The underlying SimulationWorld object, owned by the
