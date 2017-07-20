@@ -9,6 +9,16 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
 
+message SpeedPoint {
+  optional apollo.common.STPoint st_point = 1;
+  // speed (m/s)
+  optional double v = 2;
+  // acceleration (m/s^2)
+  optional double a = 3;
+  // jerk (m/s^3)
+  optional double da = 4;
+}
+
 // TODO(aaron): Migrate to apollo::common::TrajectoryPoint.
 message ADCTrajectoryPoint {
   optional double x = 1;  // in meters.

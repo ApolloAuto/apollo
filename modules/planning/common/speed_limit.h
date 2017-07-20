@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "modules/planning/common/speed/speed_point.h"
+#include "modules/planning/proto/planning.pb.h"
 
 #ifndef MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
 #define MODULES_PLANNING_COMMON_SPEED_LIMIT_H_

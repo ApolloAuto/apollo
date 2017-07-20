@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file speed_data.cpp
+ * @file speed_data.cc
  **/
 
 #include "modules/planning/common/speed/speed_data.h"
@@ -30,7 +30,7 @@ namespace planning {
 
 namespace {
 bool speed_time_comp(const double t, const SpeedPoint& speed_point) {
-  return t < speed_point.t();
+  return t < speed_point.st_point().t();
 }
 }
 
@@ -56,21 +56,22 @@ bool SpeedData::get_speed_point_with_time(const double t,
     return false;
   }
   std::size_t index = find_index(t);
-  if (Double::compare(t, speed_vector_[index].t()) < 0 ||
+  if (Double::compare(t, speed_vector_[index].st_point().t()) < 0 ||
       index + 1 >= speed_vector_.size()) {
     return false;
   }
 
   // index index + 1
   double weight = 0.0;
-  if (Double::compare(speed_vector_[index + 1].t(), speed_vector_[index].t()) >
-      0) {
-    weight = (t - speed_vector_[index].t()) /
-             (speed_vector_[index].t() - speed_vector_[index + 1].t());
+  if (Double::compare(speed_vector_[index + 1].st_point().t(),
+                      speed_vector_[index].st_point().t()) > 0) {
+    weight = (t - speed_vector_[index].st_point().t()) /
+             (speed_vector_[index].st_point().t() -
+              speed_vector_[index + 1].st_point().t());
   }
 
-  *speed_point = SpeedPoint::interpolate(speed_vector_[index],
-                                         speed_vector_[index + 1], weight);
+  *speed_point =
+      interpolate(speed_vector_[index], speed_vector_[index + 1], weight);
   return true;
 }
 
@@ -78,7 +79,8 @@ double SpeedData::total_time() const {
   if (speed_vector_.empty()) {
     return 0.0;
   }
-  return speed_vector_.back().t() - speed_vector_.front().t();
+  return speed_vector_.back().st_point().t() -
+         speed_vector_.front().st_point().t();
 }
 
 std::string SpeedData::DebugString() const {
@@ -102,6 +104,24 @@ std::size_t SpeedData::find_index(const double t) const {
              speed_vector_.size() - 1,
              static_cast<std::size_t>(upper_bound - speed_vector_.begin())) -
          1;
+}
+
+SpeedPoint SpeedData::interpolate(const SpeedPoint& left,
+                                  const SpeedPoint& right,
+                                  const double weight) const {
+  double s = (1 - weight) * left.st_point().s() + weight * right.st_point().s();
+  double t = (1 - weight) * left.st_point().t() + weight * right.st_point().t();
+  double v = (1 - weight) * left.v() + weight * right.v();
+  double a = (1 - weight) * left.a() + weight * right.a();
+  double da = (1 - weight) * left.da() + weight * right.da();
+  SpeedPoint speed_point;
+  speed_point.mutable_st_point()->set_s(s);
+  speed_point.mutable_st_point()->set_t(t);
+  speed_point.set_v(v);
+  speed_point.set_a(a);
+  speed_point.set_da(da);
+
+  return speed_point;
 }
 
 }  // namespace planning

@@ -16,10 +16,10 @@
 
 #include "modules/map/pnc_map/path.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <limits>
 #include <unordered_map>
-#include <algorithm>
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/math_utils.h"
@@ -331,8 +331,11 @@ void Path::get_all_overlaps(
         return overlap1.start_s < overlap2.start_s;
       });
 }
+*/
 
 void Path::init_overlaps() {
+  // TODO: implement this function. (Liangliang)
+  /*
   get_all_overlaps(std::bind(&LaneInfo::cross_lanes, _1), &_lane_overlaps);
   get_all_overlaps(std::bind(&LaneInfo::signals, _1), &_signal_overlaps);
   get_all_overlaps(std::bind(&LaneInfo::yield_signs, _1),
@@ -344,8 +347,8 @@ void Path::init_overlaps() {
   get_all_overlaps(std::bind(&LaneInfo::junctions, _1), &_junction_overlaps);
   get_all_overlaps(std::bind(&LaneInfo::speed_bumps, _1),
                    &_speed_bump_overlaps);
+  */
 }
-*/
 
 PathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
   CHECK_GE(index.id, 0);
