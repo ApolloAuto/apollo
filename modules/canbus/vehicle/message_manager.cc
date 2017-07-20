@@ -49,7 +49,7 @@ void MessageManager::Parse(const uint32_t message_id, const uint8_t *data,
     std::lock_guard<std::mutex> lock(chassis_detail_mutex_);
     protocol_data->Parse(data, length, &chassis_detail_);
   } else {
-    // TODO: only lincoln implemented this virtual function
+    // TODO(Authors): only lincoln implemented this virtual function
     std::lock_guard<std::mutex> lock(chassis_detail_mutex_);
     protocol_data->Parse(data, length, timestamp, &chassis_detail_);
   }

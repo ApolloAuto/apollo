@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include <syslog.h>
 
-#include "common_defs.h"
+#include "modules/monitor/common/common_defs.h"
 
 /**
  * @namespace apollo::platform::log

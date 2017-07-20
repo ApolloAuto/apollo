@@ -19,6 +19,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include "modules/canbus/common/canbus_consts.h"
 #include "modules/common/log.h"

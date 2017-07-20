@@ -17,10 +17,10 @@
 #ifndef MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
 
-#include "planner.h"
-
 #include <string>
 #include <vector>
+
+#include "modules/planning/planner/planner.h"
 
 /**
  * @namespace apollo::planning
@@ -73,6 +73,6 @@ class RTKReplayPlanner : public Planner {
 };
 
 }  // namespace planning
-}  // nameapace apollo
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_ */

@@ -197,5 +197,5 @@ TEST_F(LincolnMessageManagerTest, Wheelspeed6a) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

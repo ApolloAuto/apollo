@@ -38,5 +38,5 @@ TEST(Gps6eTest, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo
