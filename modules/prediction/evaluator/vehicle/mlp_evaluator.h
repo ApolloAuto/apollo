@@ -41,12 +41,12 @@ class MLPEvaluator : public Evaluator {
   void Clear();
 
  private:
-  void SetObstacleFeatureValues(Obstacle* obstacle,
+  void SetObstacleFeatureValues(Obstacle* obstacle_ptr,
                                 std::vector<double>* feature_values);
 
-  void SetLaneFeatureValues(Obstacle* obstacle,
-                            LaneSequence* lane_sequence,
-                            std::vector<double>* features);
+  void SetLaneFeatureValues(Obstacle* obstacle_ptr,
+                            LaneSequence* lane_sequence_ptr,
+                            std::vector<double>* feature_values);
 
  private:
   std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
