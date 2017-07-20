@@ -28,32 +28,32 @@
 namespace apollo {
 namespace planning {
 
-void PathData::set_path(const DiscretizedPath& path) { path_ = path; }
+void PathData::set_path(const DiscretizedPath &path) { path_ = path; }
 
-void PathData::set_frenet_path(const FrenetFramePath& frenet_path) {
+void PathData::set_frenet_path(const FrenetFramePath &frenet_path) {
   frenet_path_ = frenet_path;
 }
 
-DiscretizedPath* PathData::mutable_path() { return &path_; }
+DiscretizedPath *PathData::mutable_path() { return &path_; }
 
-const DiscretizedPath& PathData::path() const { return path_; }
+const DiscretizedPath &PathData::path() const { return path_; }
 
-FrenetFramePath* PathData::mutable_frenet_frame_path() { return &frenet_path_; }
+FrenetFramePath *PathData::mutable_frenet_frame_path() { return &frenet_path_; }
 
-const FrenetFramePath& PathData::frenet_frame_path() const {
+const FrenetFramePath &PathData::frenet_frame_path() const {
   return frenet_path_;
 }
 
 bool PathData::get_path_point_with_path_s(
-    const double s, common::PathPoint* const path_point) const {
-  const auto& path_points = path_.path_points();
+    const double s, common::PathPoint *const path_point) const {
+  const auto &path_points = path_.path_points();
 
   if (path_points.size() < 2 || s < path_points.front().s() ||
       path_points.back().s() < s) {
     return false;
   }
 
-  auto comp = [](const common::PathPoint& path_point, const double s) {
+  auto comp = [](const common::PathPoint &path_point, const double s) {
     return path_point.s() < s;
   };
 
@@ -72,14 +72,14 @@ bool PathData::get_path_point_with_path_s(
 }
 
 bool PathData::get_path_point_with_ref_s(
-    const double ref_s, common::PathPoint* const path_point) const {
-  const auto& frenet_points = frenet_path_.points();
+    const double ref_s, common::PathPoint *const path_point) const {
+  const auto &frenet_points = frenet_path_.points();
   if (frenet_points.size() < 2 || ref_s < frenet_points.front().s() ||
       frenet_points.back().s() < ref_s) {
     return false;
   }
 
-  auto comp = [](const common::FrenetFramePoint& frenet_point,
+  auto comp = [](const common::FrenetFramePoint &frenet_point,
                  const double ref_s) { return frenet_point.s() < ref_s; };
 
   auto it_lower =

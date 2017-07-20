@@ -23,17 +23,16 @@
 namespace apollo {
 namespace planning {
 
-Decision::Decision(const double& buffer, const DecisionType type)
-        : buffer_(buffer)
-        , type_(type) {
+Decision::Decision(const double &buffer, const DecisionType type)
+    : buffer_(buffer), type_(type) {
 }
 
 double Decision::Buffer() const {
-    return buffer_;
+  return buffer_;
 }
 
-const Decision::DecisionType& Decision::Type() const {
-    return type_;
+const Decision::DecisionType &Decision::Type() const {
+  return type_;
 }
 
 }  // namespace planning

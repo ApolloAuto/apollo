@@ -23,36 +23,36 @@
 namespace apollo {
 namespace planning {
 
-const std::vector<Obstacle>& DecisionData::Obstacles() const {
+const std::vector<Obstacle> &DecisionData::Obstacles() const {
   return obstacles_;
 }
 
-std::vector<Obstacle>* DecisionData::MutableObstacles() {
+std::vector<Obstacle> *DecisionData::MutableObstacles() {
   return &obstacles_;
 }
 
-std::vector<const Obstacle*> DecisionData::StaticObstacles() const {
-  return std::vector<const Obstacle*>();
+std::vector<const Obstacle *> DecisionData::StaticObstacles() const {
+  return std::vector<const Obstacle *>();
 }
 
-std::vector<Obstacle*> DecisionData::MutableStaticObstacles() const {
-  return std::vector<Obstacle*>();
+std::vector<Obstacle *> DecisionData::MutableStaticObstacles() const {
+  return std::vector<Obstacle *>();
 }
 
-std::vector<const Obstacle*> DecisionData::DynamicObstacles() const {
-  return std::vector<const Obstacle*>();
+std::vector<const Obstacle *> DecisionData::DynamicObstacles() const {
+  return std::vector<const Obstacle *>();
 }
 
-std::vector<Obstacle*> DecisionData::MutableDynamicObstacles() const {
-  return std::vector<Obstacle*>();
+std::vector<Obstacle *> DecisionData::MutableDynamicObstacles() const {
+  return std::vector<Obstacle *>();
 }
 
-std::vector<const MapObject*> DecisionData::MapObjects() const {
-  return std::vector<const MapObject*>();
+std::vector<const MapObject *> DecisionData::MapObjects() const {
+  return std::vector<const MapObject *>();
 }
 
-std::vector<MapObject*> DecisionData::MutableMapObjects() const {
-  return std::vector<MapObject*>();
+std::vector<MapObject *> DecisionData::MutableMapObjects() const {
+  return std::vector<MapObject *>();
 }
 
 }  // namespace planning

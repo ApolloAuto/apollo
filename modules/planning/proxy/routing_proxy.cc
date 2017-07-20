@@ -23,17 +23,17 @@ apollo::common::Status RoutingProxy::Init() {
 
   if (!::apollo::common::util::GetProtoFromFile(routing_file, &routing_)) {
     return Status(ErrorCode::PLANNING_ERROR,
-                "Unable to load routing file: " + routing_file);
+                  "Unable to load routing file: " + routing_file);
   }
   return Status::OK();
 }
 
 void RoutingProxy::set_routing(
-        const ::apollo::hdmap::RoutingResult& routing_result) {
+    const ::apollo::hdmap::RoutingResult &routing_result) {
   routing_.CopyFrom(routing_result);
 }
 
-const ::apollo::hdmap::RoutingResult& RoutingProxy::routing() const {
+const ::apollo::hdmap::RoutingResult &RoutingProxy::routing() const {
   return routing_;
 }
 

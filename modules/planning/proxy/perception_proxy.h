@@ -33,10 +33,10 @@ class PerceptionProxy {
  public:
   PerceptionProxy() = default;
   void add_perception_obstacles(
-      const apollo::perception::PerceptionObstacles& perception_obstacles);
-  apollo::perception::PerceptionObstacles* get_latest_perception_frame();
-  const std::list<apollo::perception::PerceptionObstacles>& perception_frame()
-      const;
+      const apollo::perception::PerceptionObstacles &perception_obstacles);
+  apollo::perception::PerceptionObstacles *get_latest_perception_frame();
+  const std::list<apollo::perception::PerceptionObstacles> &perception_frame()
+  const;
 
  private:
   std::list<apollo::perception::PerceptionObstacles> _perception_frame;

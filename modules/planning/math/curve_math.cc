@@ -46,7 +46,7 @@ double CurveMath::compute_curvature_derivative(
 
   double dkappa =
       (a_dot * b - a * b_dot) /
-      (dx_dy_norm_square * dx_dy_norm_square * dx_dy_norm_square * dx_dy_norm);
+          (dx_dy_norm_square * dx_dy_norm_square * dx_dy_norm_square * dx_dy_norm);
   return dkappa;
 }
 
