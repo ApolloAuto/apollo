@@ -24,7 +24,7 @@
 #include <array>
 #include <cmath>
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/math/hermite_spline.h"
 
@@ -80,9 +80,9 @@ inline std::array<T, N> Interpolation::hermite(const std::array<T, N>& x0,
                                                const std::array<T, N>& x1,
                                                const double p1,
                                                const double p) {
-  CHECK((N == 2 || N == 3) &&
-        "Error: currently hermite interpolation "
-        "only supports cubic and quintic!");
+  CHECK(N == 2 || N == 3)
+      << "Error: currently hermite interpolation only supports cubic and "
+         "quintic!";
 
   HermiteSpline<T, 2 * N - 1> hermite_spline(x0, x1, p0, p1);
   std::array<T, N> x;

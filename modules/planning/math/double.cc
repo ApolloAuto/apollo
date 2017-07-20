@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {

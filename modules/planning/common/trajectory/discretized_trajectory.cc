@@ -22,7 +22,7 @@
 
 #include <climits>
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 #include "modules/planning/common/path/path_point_util.h"
 
 namespace apollo {
@@ -120,7 +120,7 @@ void DiscretizedTrajectory::add_trajectory_point(
 
 const TrajectoryPoint& DiscretizedTrajectory::trajectory_point_at(
     const std::size_t index) const {
-  CHECK(index < num_of_points());
+  CHECK_LT(index, num_of_points());
   return _trajectory_points[index];
 }
 
