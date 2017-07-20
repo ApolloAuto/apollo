@@ -16,8 +16,6 @@
 
 #include "modules/canbus/vehicle/lincoln/lincoln_controller.h"
 
-#include "modules/common/log.h"
-
 #include "modules/canbus/can_comm/can_sender.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
@@ -26,6 +24,8 @@
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/common/log.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 
 namespace apollo {
@@ -218,15 +218,19 @@ Chassis LincolnController::chassis() {
   if (chassis_detail.light().has_turn_light_type() &&
       chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
     if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
-      chassis_.mutable_signal()->set_turn_signal(Signal::TURN_LEFT);
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_LEFT);
     } else if (chassis_detail.light().turn_light_type() ==
                Light::TURN_RIGHT_ON) {
-      chassis_.mutable_signal()->set_turn_signal(Signal::TURN_RIGHT);
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_RIGHT);
     } else {
-      chassis_.mutable_signal()->set_turn_signal(Signal::TURN_NONE);
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_NONE);
     }
   } else {
-    chassis_.mutable_signal()->set_turn_signal(Signal::TURN_NONE);
+    chassis_.mutable_signal()->set_turn_signal(
+        common::VehicleSignal::TURN_NONE);
   }
   // 18
   if (chassis_detail.light().has_is_horn_on() &&
@@ -472,9 +476,9 @@ void LincolnController::SetHorn(const ControlCommand& command) {
 void LincolnController::SetTurningSignal(const ControlCommand& command) {
   // Set Turn Signal
   auto signal = command.signal().turn_signal();
-  if (signal == Signal::TURN_LEFT) {
+  if (signal == common::VehicleSignal::TURN_LEFT) {
     turnsignal_68_->set_turn_left();
-  } else if (signal == Signal::TURN_RIGHT) {
+  } else if (signal == common::VehicleSignal::TURN_RIGHT) {
     turnsignal_68_->set_turn_right();
   } else {
     turnsignal_68_->set_turn_none();

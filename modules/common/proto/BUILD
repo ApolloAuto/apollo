@@ -21,6 +21,13 @@ cc_proto_library(
 )
 
 cc_proto_library(
+    name = "vehicle_signal_proto",
+    protos = [
+        "vehicle_signal.proto",
+    ],
+)
+
+cc_proto_library(
     name = "common_proto",
     protos = [
         "geometry.proto",
