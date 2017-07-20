@@ -44,11 +44,11 @@ using MessageItem = std::pair<MonitorMessageItem::LogLevel, std::string>;
 class Monitor;
 
 #define REG_MSG_TYPE(TYPE)                            \
-  MonitorBuffer& TYPE(const std::string& msg) {       \
+  MonitorBuffer &TYPE(const std::string &msg) {       \
     AddMonitorMsgItem(MonitorMessageItem::TYPE, msg); \
     return *this;                                     \
   }                                                   \
-  MonitorBuffer& TYPE() {                             \
+  MonitorBuffer &TYPE() {                             \
     level_ = MonitorMessageItem::TYPE;                \
     return *this;                                     \
   }
@@ -66,7 +66,7 @@ class MonitorBuffer {
    * @brief The constructor of MonitorBuffer.
    * @param a Monitor instance pointer;
    */
-  explicit MonitorBuffer(Monitor* monitor);
+  explicit MonitorBuffer(Monitor *monitor);
 
   virtual ~MonitorBuffer();
 
@@ -101,13 +101,13 @@ class MonitorBuffer {
    * @param msg the string to send to monitor
    */
   void AddMonitorMsgItem(const MonitorMessageItem::LogLevel log_level,
-                         const std::string& msg);
+                         const std::string &msg);
 
   /**
    * @brief overload operator << to help join messages
    */
   template <typename T>
-  MonitorBuffer& operator<<(const T& msg) {
+  MonitorBuffer &operator<<(const T &msg) {
     if (monitor_msg_items_.empty() ||
         monitor_msg_items_.back().first != level_) {
       AddMonitorMsgItem(level_, std::to_string(msg));
@@ -120,12 +120,12 @@ class MonitorBuffer {
   /**
    * @brief overload operator << to help join string messages
    */
-  MonitorBuffer& operator<<(const std::string& msg);
+  MonitorBuffer &operator<<(const std::string &msg);
 
   /**
    * @brief overload operator << to help join char messages
    */
-  MonitorBuffer& operator<<(const char* msg);
+  MonitorBuffer &operator<<(const char *msg);
 
   /**
    * @brief publish the monitor messages
@@ -133,7 +133,7 @@ class MonitorBuffer {
   void Publish();
 
  private:
-  Monitor* monitor_ = nullptr;
+  Monitor *monitor_ = nullptr;
   MonitorMessageItem::LogLevel level_ = MonitorMessageItem::INFO;
   std::vector<MessageItem> monitor_msg_items_;
 

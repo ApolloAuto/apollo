@@ -22,8 +22,8 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_
 #define MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_
 
+#include "modules/common/proto/path_point.pb.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
-#include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
 
@@ -62,7 +62,7 @@ class TrajectoryPointCollector {
    * point and the previous point.
    * @param point The trajectory point to be added.
    */
-  void Collect(const planning::ADCTrajectoryPoint &point);
+  void Collect(const ::apollo::common::TrajectoryPoint &point);
 
  private:
   // Does not own the SimulationWorld instance. This is stored as the
@@ -71,7 +71,7 @@ class TrajectoryPointCollector {
 
   // Cache (copied) of the previously collected trajectory point. See
   // class documentation for the reason of caching it.
-  planning::ADCTrajectoryPoint previous_;
+  ::apollo::common::TrajectoryPoint previous_;
 
   // Indicates whether there has been any collected points.
   bool has_previous_ = false;

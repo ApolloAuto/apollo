@@ -8,6 +8,8 @@ cc_library(
     hdrs = ["pose_container.h"],
     deps = [
         "//modules/prediction/container:container",
+        "//modules/perception/proto:perception_proto",
+        "//modules/localization/proto:localization_proto",
     ]
 )
 

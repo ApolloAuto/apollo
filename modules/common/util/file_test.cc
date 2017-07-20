@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
-#include "modules/common/util/testing/simple.pb.h"
+#include "modules/common/util/testdata/simple.pb.h"
 
 namespace apollo {
 namespace common {
@@ -77,6 +77,6 @@ TEST_F(FileTest, RemoveAllFiles) {
   EXPECT_FALSE(GetProtoFromASCIIFile(path2, &message));
 }
 
-}  // namespace file
+}  // namespace util
 }  // namespace common
 }  // namespace apollo

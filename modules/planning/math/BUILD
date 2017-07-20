@@ -7,11 +7,83 @@ cc_library(
     srcs = [
         "double.cc",
     ],
-    hdrs = glob([
+    hdrs = [
         "double.h",
-    ]),
+    ],
     deps = [
-        "@glog//:glog",
+        "//modules/common:log",
+    ],
+)
+
+cc_library(
+    name = "curve_math",
+    srcs = [
+        "curve_math.cc",
+    ],
+    hdrs = [
+        "curve_math.h",
+    ],
+)
+
+cc_library(
+    name = "integration",
+    srcs = [
+        "integration.cc",
+    ],
+    hdrs = [
+        "integration.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cc_library(
+    name = "polynomial_xd",
+    srcs = [
+        "polynomial_xd.cc",
+    ],
+    hdrs = [
+        "polynomial_xd.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cc_library(
+    name = "sl_analytic_transformation",
+    srcs = [
+        "sl_analytic_transformation.cc",
+    ],
+    hdrs = [
+        "sl_analytic_transformation.h",
+    ],
+    deps = [
+        ":double",
+        "@eigen//:eigen",
+    ],
+)
+
+cc_library(
+    name = "interpolation",
+    hdrs = [
+        "interpolation.h",
+    ],
+    deps = [
+        ":hermite_spline",
+        "//modules/common:log",
+        "//modules/common/math:math_utils",
+    ],
+)
+
+cc_library(
+    name = "hermite_spline",
+    hdrs = [
+        "hermite_spline.h",
+    ],
+    deps = [
+        "//modules/common:log",
     ],
 )
 

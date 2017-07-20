@@ -17,7 +17,7 @@
 #ifndef MODULES_PLATFORM_HW_ESDCAN_UTILS_H_
 #define MODULES_PLATFORM_HW_ESDCAN_UTILS_H_
 
-#include "esdcan_test.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
 #include <ostream>
 
@@ -31,8 +31,7 @@ namespace hw {
 
 void esdcan_print_summary(std::ostream &os, const EsdCanDetails &details);
 
-void esdcan_print_test_result(
-    std::ostream &os, const EsdCanDetails &details);
+void esdcan_print_test_result(std::ostream &os, const EsdCanDetails &details);
 
 void esdcan_print_if_status(int id, const CAN_IF_STATUS &if_status);
 

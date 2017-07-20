@@ -50,7 +50,7 @@ Status Canbus::Init() {
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
   // Init can client
-  auto* can_factory = CanClientFactory::instance();
+  auto *can_factory = CanClientFactory::instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(canbus_conf_.can_card_parameter());
   if (!can_client_) {
@@ -155,7 +155,7 @@ void Canbus::PublishChassisDetail() {
   AdapterManager::PublishChassisDetail(chassis_detail);
 }
 
-void Canbus::OnTimer(const ros::TimerEvent&) {
+void Canbus::OnTimer(const ros::TimerEvent &) {
   PublishChassis();
   if (FLAGS_enable_chassis_detail_pub) {
     PublishChassisDetail();
@@ -171,7 +171,7 @@ void Canbus::Stop() {
   vehicle_controller_->Stop();
 }
 
-void Canbus::OnControlCommand(const ControlCommand& control_command) {
+void Canbus::OnControlCommand(const ControlCommand &control_command) {
   int64_t current_timestamp =
       apollo::common::time::AsInt64<::apollo::common::time::micros>(
           Clock::Now());
@@ -198,7 +198,7 @@ void Canbus::OnControlCommand(const ControlCommand& control_command) {
 }
 
 // Send the error to monitor and return it
-Status Canbus::OnError(const std::string& error_msg) {
+Status Canbus::OnError(const std::string &error_msg) {
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
   buffer.ERROR(error_msg);
   return Status(ErrorCode::CANBUS_ERROR, error_msg);

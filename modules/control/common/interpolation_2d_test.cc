@@ -72,25 +72,24 @@ TEST_F(Interpolation2DTest, normal) {
 }
 
 TEST_F(Interpolation2DTest, calibration_table) {
-  const auto& calibration_table =
+  const auto &calibration_table =
       control_conf_.lon_controller_conf().calibration_table();
   AINFO << "Throttle calibration table:" << calibration_table.DebugString();
 
   Interpolation2D::DataType xyz;
 
-  for (const auto& calibration : calibration_table.calibration()) {
-    xyz.push_back(
-        std::make_tuple(calibration.speed(),
-                        calibration.acceleration(),
-                        calibration.command()));
+  for (const auto &calibration : calibration_table.calibration()) {
+    xyz.push_back(std::make_tuple(calibration.speed(),
+                                  calibration.acceleration(),
+                                  calibration.command()));
   }
   Interpolation2D estimator;
   EXPECT_TRUE(estimator.Init(xyz));
 
-  for (const auto& elem : xyz) {
+  for (const auto &elem : xyz) {
     EXPECT_DOUBLE_EQ(std::get<2>(elem),
-                     estimator.Interpolate(std::make_pair(
-                         std::get<0>(elem), std::get<1>(elem))));
+                     estimator.Interpolate(
+                         std::make_pair(std::get<0>(elem), std::get<1>(elem))));
   }
 }
 

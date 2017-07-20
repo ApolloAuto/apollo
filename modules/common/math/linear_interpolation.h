@@ -56,8 +56,8 @@ double lerp(const double x0, const double t0, const double x1, const double t1,
  * @param y The y coordinate of the interpolated 2-D point.
  */
 void lerp(const double x0, const double y0, const double t0, const double x1,
-          const double y1, const double t1, const double t, double* x,
-          double* y);
+          const double y1, const double t1, const double t, double *x,
+          double *y);
 
 /**
  * @brief Spherical linear interpolation between two angles.

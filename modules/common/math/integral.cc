@@ -20,9 +20,8 @@ namespace apollo {
 namespace common {
 namespace math {
 
-double GaussLegendre(const std::function<double(double)>& func,
-                     const double lower_bound,
-                     const double upper_bound) {
+double GaussLegendre(const std::function<double(double)> &func,
+                     const double lower_bound, const double upper_bound) {
   double t = (upper_bound - lower_bound) * 0.5;
   double m = (upper_bound + lower_bound) * 0.5;
 

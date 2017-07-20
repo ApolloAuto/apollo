@@ -25,6 +25,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/proto/geometry.pb.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/dreamview/backend/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
@@ -42,7 +43,7 @@ using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::planning::ADCTrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::canbus::Chassis;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
@@ -165,10 +166,11 @@ void UpdateSimulationWorld<ChassisAdapter>(const Chassis &chassis,
   }
   auto_driving_car->set_steering_angle(angle_percentage);
 
-  if (chassis.signal().turn_signal() == ::apollo::canbus::Signal::TURN_LEFT) {
+  if (chassis.signal().turn_signal() ==
+      ::apollo::common::VehicleSignal::TURN_LEFT) {
     auto_driving_car->set_current_signal("LEFT");
   } else if (chassis.signal().turn_signal() ==
-             ::apollo::canbus::Signal::TURN_RIGHT) {
+             ::apollo::common::VehicleSignal::TURN_RIGHT) {
     auto_driving_car->set_current_signal("RIGHT");
   } else {
     auto_driving_car->set_current_signal("");
@@ -193,14 +195,14 @@ void UpdateSimulationWorld<PlanningTrajectoryAdapter>(
     const ADCTrajectory &trajectory, SimulationWorld *world) {
   const double cutoff_time = world->auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
-  const size_t trajectory_length = trajectory.adc_trajectory_point_size();
+  const size_t trajectory_length = trajectory.trajectory_point_size();
 
   util::TrajectoryPointCollector collector(world);
 
   size_t i = 0;
   bool collecting_started = false;
   while (i < trajectory_length) {
-    const ADCTrajectoryPoint &point = trajectory.adc_trajectory_point(i);
+    const TrajectoryPoint &point = trajectory.trajectory_point(i);
     // Trajectory points with a timestamp older than the cutoff time
     // (which is effectively the timestamp of the most up-to-date
     // localization/chassis message) will be dropped.

@@ -45,7 +45,7 @@ struct EsdCanDetails {
   /// Bits flag indicating which fields are valid.
   unsigned int valid_flag;
 
-  explicit EsdCanDetails() : result(NTCAN_NET_NOT_FOUND), valid_flag(0) {}
+  EsdCanDetails() : result(NTCAN_NET_NOT_FOUND), valid_flag(0) {}
 
   /// Invalidates all fields.
   inline void invalidate() {
@@ -54,9 +54,7 @@ struct EsdCanDetails {
   }
 
   /// Marks a specific field of the given mask as valid.
-  inline void add_valid_field(ValidMasks mask) {
-    valid_flag |= mask;
-  }
+  inline void add_valid_field(ValidMasks mask) { valid_flag |= mask; }
 };
 
 /// Test (check) esdcan of the given id.
