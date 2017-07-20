@@ -18,31 +18,29 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_PROXY_ROUTING_PROXY_H
-#define MODULES_PLANNING_PROXY_ROUTING_PROXY_H
+#ifndef MODULES_PLANNING_PROXY_ROUTING_PROXY_H_
+#define MODULES_PLANNING_PROXY_ROUTING_PROXY_H_
+
+#include <string>
 
 #include "modules/common/status/status.h"
-
 #include "modules/map/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
 
 class RoutingProxy {
-public:
-    RoutingProxy() = default;
+ public:
+  RoutingProxy() = default;
+  apollo::common::Status Init();
+  void set_routing(const ::apollo::hdmap::RoutingResult& routing);
+  const ::apollo::hdmap::RoutingResult& routing() const;
 
-    apollo::common::Status Init();
-
-    void set_routing(const ::apollo::hdmap::RoutingResult& routing);
-    const ::apollo::hdmap::RoutingResult& routing() const;
-
-private:
-    ::apollo::hdmap::RoutingResult routing_;
+ private:
+  ::apollo::hdmap::RoutingResult routing_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif // MODULES_PLANNING_PROXY_ROUTING_PROXY_H
-
+#endif  // MODULES_PLANNING_PROXY_ROUTING_PROXY_H_

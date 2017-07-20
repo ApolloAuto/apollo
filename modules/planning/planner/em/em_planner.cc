@@ -40,7 +40,7 @@ bool EMPlanner::MakePlan(const TrajectoryPoint& start_point,
 
 std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     const double init_v, const double init_a) {
-  // TODO: this is a dummy simple hot start, need refine later
+  // TODO(@lianglia_apollo): this is a dummy simple hot start, need refine later
   std::array<double, 3> start_state;
 
   // distance 0.0
@@ -66,8 +66,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   // assume the time resolution is 0.1
   std::size_t num_time_steps =
       static_cast<std::size_t>(FLAGS_trajectory_time_length /
-                               FLAGS_trajectory_time_resolution) +
-      1;
+                               FLAGS_trajectory_time_resolution) + 1;
 
   std::vector<SpeedPoint> speed_profile;
   speed_profile.reserve(num_time_steps);
@@ -82,5 +81,6 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   }
   return std::move(speed_profile);
 }
+
 }  // namespace planning
-}  // nameapace apollo
+}  // namespace apollo

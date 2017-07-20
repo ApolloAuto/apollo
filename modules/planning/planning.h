@@ -18,6 +18,9 @@
 #define MODULES_PLANNING_PLANNING_H_
 
 #include <memory>
+#include <utility>
+#include <string>
+#include <vector>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/proto/path_point.pb.h"

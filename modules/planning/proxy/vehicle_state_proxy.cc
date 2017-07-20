@@ -171,7 +171,8 @@ const ::apollo::common::TrajectoryPoint VehicleStateProxy::init_point(
 void VehicleStateProxy::init(
     const ::apollo::common::config::VehicleConfig& config) {
   _config = config;
-  // TODO: if the car is driving uphill or downhill, the velocity in the z axis
+  // TODO(@lianglia_apollo):
+  // if the car is driving uphill or downhill, the velocity in the z axis
   // is not 0.
   const auto& velocity3d = _localization_estimate.pose().linear_velocity();
   Eigen::Vector2d velocity2d(velocity3d.x(), velocity3d.y());
@@ -182,7 +183,7 @@ void VehicleStateProxy::init(
   if (std::isnan(acceleration3d.x()) || std::isnan(acceleration3d.y())) {
     _linear_acceleration = 0.0;
   } else {
-    // TODO: verify the acceleration in the z axis.
+    // TODO(@lianglia_apollo): verify the acceleration in the z axis.
     Eigen::Vector2d acceleration2d(acceleration3d.x(), acceleration3d.y());
     if (_linear_velocity > 0.0) {
       _linear_acceleration = acceleration2d.dot(velocity2d) / _linear_velocity;

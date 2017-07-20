@@ -18,8 +18,10 @@
  * @file map_object.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_MAP_OBJECT_H
-#define MODULES_PLANNING_COMMON_MAP_OBJECT_H
+#ifndef MODULES_PLANNING_COMMON_MAP_OBJECT_H_
+#define MODULES_PLANNING_COMMON_MAP_OBJECT_H_
+
+#include <string>
 
 #include "modules/planning/common/planning_object.h"
 
@@ -35,7 +37,7 @@ class MapObject : public PlanningObject {
   std::string id_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_MAP_OBJECT_H
+#endif  // MODULES_PLANNING_COMMON_MAP_OBJECT_H_

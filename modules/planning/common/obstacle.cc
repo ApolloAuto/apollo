@@ -69,11 +69,11 @@ void Obstacle::SetHeading(const double heading) {
   return ::apollo::common::math::Box2d(center_, heading_, length_, width_);
 }
 
-const Obstacle::ObstacleType &Obstacle::Type() const {
+const Obstacle::ObstacleType& Obstacle::Type() const {
   return type_;
 }
 
-void Obstacle::SetType(const ObstacleType &type) {
+void Obstacle::SetType(const ObstacleType& type) {
   type_ = type;
 }
 

@@ -14,13 +14,13 @@
   * limitations under the License.
   *****************************************************************************/
 
+#include <string>
+
 #include "gflags/gflags.h"
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/map/proto/map.pb.h"
-
-#include <string>
 
 DEFINE_string(map_file, "modules/map/data/base_map.txt", "map file");
 DEFINE_double(x_offset, 352904.810943, "x offset");
@@ -29,8 +29,8 @@ DEFINE_string(output_dir, "/tmp/", "output map directory");
 
 using apollo::hdmap::Map;
 
-void ShiftMap(Map& map_pb) {
-  for (auto& lane : *(map_pb.mutable_lane())) {
+void ShiftMap(Map* map_pb) {
+  for (auto& lane : *(map_pb->mutable_lane())) {
     for (auto& segment : *(lane.mutable_central_curve()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
@@ -38,7 +38,7 @@ void ShiftMap(Map& map_pb) {
       }
     }
   }
-  for (auto& stop_sign : *(map_pb.mutable_stop_sign())) {
+  for (auto& stop_sign : *(map_pb->mutable_stop_sign())) {
     for (auto& segment : *(stop_sign.mutable_stop_line()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
@@ -74,7 +74,7 @@ int main(int32_t argc, char** argv) {
     AERROR << "Fail to open:" << FLAGS_map_file;
     return 1;
   }
-  ShiftMap(map_pb);
+  ShiftMap(&map_pb);
   OutputMap(map_pb);
   AINFO << "modified map at:" << FLAGS_output_dir;
 }
