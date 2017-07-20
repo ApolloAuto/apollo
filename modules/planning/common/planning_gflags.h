@@ -143,7 +143,7 @@ DECLARE_int32(nearby_obstacle_num);
 // Kalman Filter
 DECLARE_double(beta);
 DECLARE_double(cut_in_beta);
-DECLARE_double(q_var); // for simplicity, Q11=Q22=q_var, Q12=Q21=0
+DECLARE_double(q_var);  // for simplicity, Q11=Q22=q_var, Q12=Q21=0
 DECLARE_double(r_var);
 DECLARE_double(p_var);
 DECLARE_double(kf_endl);

@@ -115,30 +115,39 @@ DEFINE_double(stgraph_max_deceleration_divide_factor_level_2, 2.0,
 
 DEFINE_int32(adc_id, -1, "Obstacle id for the global adc");
 DEFINE_bool(local_debug, false, "enabling local debug will disabling xlogging");
-DEFINE_string(new_pobs_dump_file, "/data/new_pobs_dump.bag","bag file for newly merged pobs");
+DEFINE_string(new_pobs_dump_file, "/data/new_pobs_dump.bag",
+              "bag file for newly merged pobs");
 DEFINE_double(pcd_merge_thred, 0.25, "iou threshold for pcd merge");
 DEFINE_double(vehicle_min_l, 3.5, "vehicle min l");
 DEFINE_double(vehicle_min_w, 2.2, "vehicle min w");
 DEFINE_double(vehicle_min_h, 1.5, "vehicle min h");
-DEFINE_int32(good_pcd_size, 50, "at least these many points to make a reasonable pcd");
-DEFINE_int32(good_pcd_labeling_size, 500, "at least these many points for labeling");
+DEFINE_int32(good_pcd_size, 50,
+             "at least these many points to make a reasonable pcd");
+DEFINE_int32(good_pcd_labeling_size, 500,
+             "at least these many points for labeling");
 DEFINE_double(front_sector_angle, 0.5236, "40 degree front sector");
 DEFINE_double(max_reasonable_l, 15.0, "max reasonable l");
 DEFINE_double(min_reasonable_l, 1.5, "min reasonable l");
 DEFINE_double(max_reasonable_w, 3.5, "max reasonable w");
 DEFINE_double(min_reasonable_w, 1.2, "min reasonable w");
-DEFINE_double(merge_range, 30.0, "Radius of range for considering obstacle-merge centering at ADC");
-DEFINE_double(pcd_labeling_range, 30.0, "Radius of range for labeling pcd centering at ADC");
-DEFINE_bool(enable_merge_obstacle, true, "enabling local debug will disabling xlogging");
-DEFINE_bool(enable_new_pobs_dump, true, "dump merged perception obstacles to a bag file");
+DEFINE_double(
+    merge_range, 30.0,
+    "Radius of range for considering obstacle-merge centering at ADC");
+DEFINE_double(pcd_labeling_range, 30.0,
+              "Radius of range for labeling pcd centering at ADC");
+DEFINE_bool(enable_merge_obstacle, true,
+            "enabling local debug will disabling xlogging");
+DEFINE_bool(enable_new_pobs_dump, true,
+            "dump merged perception obstacles to a bag file");
 DEFINE_bool(enable_pcd_labeling, false, "enabling generate pcd labeling image");
-DEFINE_string(pcd_image_file_prefix, "/home/liyun/pcd_data/prediction_pcd_", "prefix for prediction generated pcd files");
+DEFINE_string(pcd_image_file_prefix, "/home/liyun/pcd_data/prediction_pcd_",
+              "prefix for prediction generated pcd files");
 
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
-DEFINE_double(prediction_pedestrian_total_time, 10.0, "Total prediction time for pedestrians");
+DEFINE_double(prediction_pedestrian_total_time, 10.0,
+              "Total prediction time for pedestrians");
 DEFINE_double(prediction_model_time, 3.0, "Total prediction modeling time");
 DEFINE_double(prediction_freq, 0.1, "Prediction frequency.");
-
 
 // The following gflags are for internal use
 DEFINE_bool(enable_unknown_obstacle, true, "Disable unknown obstacle.");
@@ -148,8 +157,9 @@ DEFINE_bool(enable_acc, true, "Enable calculating speed by acc");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 
 // Cyclist UKF
-DEFINE_double(road_heading_impact, 0.5,
-              "Influence of the road heading (when available) in the state update");
+DEFINE_double(
+    road_heading_impact, 0.5,
+    "Influence of the road heading (when available) in the state update");
 DEFINE_double(process_noise_diag, 0.01,
               "Diagonal for process noise of cyclist UKF");
 DEFINE_double(measurement_noise_diag, 0.01,
@@ -167,13 +177,19 @@ DEFINE_double(min_pedestrian_acc, -4.0, "minimum pedestrian acceleration");
 DEFINE_double(max_pedestrian_acc, 2.0, "maximum pedestrian acceleration");
 DEFINE_double(default_heading, 6.2831, "Defalut heading");
 DEFINE_int32(max_obstacle_size, 1000, "Maximum number of obstacles");
-DEFINE_double(max_prediction_length, 100.0, "Maximum trajectory length for any obstacle");
-DEFINE_double(lane_search_radius, 3.0, "The radius for searching candidate lanes");
-DEFINE_double(junction_search_radius, 10.0, "The radius for searching candidate junctions.");
-DEFINE_double(min_lane_change_distance, 20.0, "The shortest distance for lane change.");
+DEFINE_double(max_prediction_length, 100.0,
+              "Maximum trajectory length for any obstacle");
+DEFINE_double(lane_search_radius, 3.0,
+              "The radius for searching candidate lanes");
+DEFINE_double(junction_search_radius, 10.0,
+              "The radius for searching candidate junctions.");
+DEFINE_double(min_lane_change_distance, 20.0,
+              "The shortest distance for lane change.");
 DEFINE_double(proto_double_precision, 1e-6, "Precision of proto double fields");
-DEFINE_double(nearby_obstacle_range, 60, "Search range for considering nearby obstacles as feature");
-DEFINE_int32(nearby_obstacle_num, 1, "Maximal number of nearby obstacles to search.");
+DEFINE_double(nearby_obstacle_range, 60,
+              "Search range for considering nearby obstacles as feature");
+DEFINE_int32(nearby_obstacle_num, 1,
+             "Maximal number of nearby obstacles to search.");
 
 // Kalman Filter
 DEFINE_double(beta, 0.99, "l coefficient for state transferring of (s,l)");
@@ -181,16 +197,22 @@ DEFINE_double(cut_in_beta, 0.98, "l coefficient for cut in state transition.");
 DEFINE_double(q_var, 0.01, "Q variance for processing");
 DEFINE_double(r_var, 0.01, "R variance for measurement");
 DEFINE_double(p_var, 0.1, "p variance for prediction");
-DEFINE_double(kf_endl, 0.1, "Minimum L close enough with lane central reference line");
+DEFINE_double(kf_endl, 0.1,
+              "Minimum L close enough with lane central reference line");
 
 // Trajectory
-DEFINE_bool(enable_rule_layer, true, "enable rule for trajectory before model computation");
+DEFINE_bool(enable_rule_layer, true,
+            "enable rule for trajectory before model computation");
 DEFINE_double(car_length, 4.0, "Length of car");
-DEFINE_int32(trajectory_num_frame, 50, "Maximum number of frames in trajectory");
-DEFINE_double(trajectory_stretch, 0.5, "Percent of extra stretch of trajectory");
+DEFINE_int32(trajectory_num_frame, 50,
+             "Maximum number of frames in trajectory");
+DEFINE_double(trajectory_stretch, 0.5,
+              "Percent of extra stretch of trajectory");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
-DEFINE_bool(enable_velocity_from_history, false, "whether to ge speed from feature history");
-DEFINE_int32(num_trajectory_still_pedestrian, 6, "number of trajectories for static pedestrian");
+DEFINE_bool(enable_velocity_from_history, false,
+            "whether to ge speed from feature history");
+DEFINE_int32(num_trajectory_still_pedestrian, 6,
+             "number of trajectories for static pedestrian");
 
 // Offline model
 DEFINE_bool(running_middle_mode, false, "Running middle mode");
@@ -199,40 +221,55 @@ DEFINE_string(feature_middle_file, "/data/example_features.label.bin",
 DEFINE_string(hdf5_file, "/data/final_feature_label.h5",
               "Final hdf5 file for neural network training");
 DEFINE_bool(enable_labelling, false, "Enable labelling data and output result");
-DEFINE_bool(enable_feature_to_file, false, "Enable to output the extracted feature to txt files");
+DEFINE_bool(enable_feature_to_file, false,
+            "Enable to output the extracted feature to txt files");
 DEFINE_bool(enable_evaluation, false, "Enable dumping evaluational features");
-DEFINE_int32(num_evaluation_frame, 30, "Number of frames for evaluation network");
-DEFINE_string(feature_file_path, "/data/features.bin", "Path for feature files");
-DEFINE_string(feature_file_format, "binary", "format of the output feature file [binary / json]");
+DEFINE_int32(num_evaluation_frame, 30,
+             "Number of frames for evaluation network");
+DEFINE_string(feature_file_path, "/data/features.bin",
+              "Path for feature files");
+DEFINE_string(feature_file_format, "binary",
+              "format of the output feature file [binary / json]");
 DEFINE_double(close_time, 0.1, "close in terms of time");
 DEFINE_double(close_dist, 0.1, "close in terms of dist");
 
 // Online model
 DEFINE_double(target_lane_gap, 5.0, "target lane gap length");
 DEFINE_double(model_prob_cutoff, 0.5, "Model probability cutoff");
-DEFINE_double(prediction_feature_timeframe, 3.0, "Timeframe for generating features in modeling");
-DEFINE_double(threshold_label_time_delta, 2.0, "Time threshold to select the labelled feature");
-DEFINE_double(prediction_label_timeframe, 3.0, "Timeframe for generating label in modeling");
-DEFINE_double(prediction_buffer_timeframe, 1.0, "Buffer Timeframe in case of message gets late");
-DEFINE_int32(pedestrian_static_length, 30, "min # of frames to check that a pedestrian is still");
+DEFINE_double(prediction_feature_timeframe, 3.0,
+              "Timeframe for generating features in modeling");
+DEFINE_double(threshold_label_time_delta, 2.0,
+              "Time threshold to select the labelled feature");
+DEFINE_double(prediction_label_timeframe, 3.0,
+              "Timeframe for generating label in modeling");
+DEFINE_double(prediction_buffer_timeframe, 1.0,
+              "Buffer Timeframe in case of message gets late");
+DEFINE_int32(pedestrian_static_length, 30,
+             "min # of frames to check that a pedestrian is still");
 DEFINE_double(still_speed, 0.01, "speed considered to be still for pedestrian");
-DEFINE_string(default_vehicle_model_file_path, "/prediction/parameters/default_model.bin",
+DEFINE_string(default_vehicle_model_file_path,
+              "/prediction/parameters/default_model.bin",
               "default model file path");
 DEFINE_string(user_vehicle_model_name, "MlpPlugin", "user model for vehicle");
-DEFINE_string(user_vehicle_model_file_path, "/prediction/parameters/mlp_model.bin",
-              "user model file path");
+DEFINE_string(user_vehicle_model_file_path,
+              "/prediction/parameters/mlp_model.bin", "user model file path");
 DEFINE_double(kf_max_speed, 20.0, "Maximum speed for tracking");
 DEFINE_double(kf_min_speed, 0.5, "Minumum speed for tracking");
-DEFINE_double(kf_still_position_diff, 0.5, "Default position difference for still obstacle");
+DEFINE_double(kf_still_position_diff, 0.5,
+              "Default position difference for still obstacle");
 DEFINE_double(max_angle_diff, 1.57, "Maximum angle diff is Pi/3");
 DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
 DEFINE_double(pedestrian_min_speed, 0.1, "min speed for still pedestrian");
-DEFINE_int32(obstacle_static_length, 20, "stored frames to judge if a obstacle is static");
-DEFINE_double(static_speed_threshold, 1.0, "speed threshold to judge if a obstacle is static");
+DEFINE_int32(obstacle_static_length, 20,
+             "stored frames to judge if a obstacle is static");
+DEFINE_double(static_speed_threshold, 1.0,
+              "speed threshold to judge if a obstacle is static");
 
 // Setting
-DEFINE_bool(enable_p_speed_override, false, "Override p_speed with tracked prediction speed");
-DEFINE_double(threshold_timestamp_diff, 0.50, "Maximum timestamp gap between perception and prediction.");
+DEFINE_bool(enable_p_speed_override, false,
+            "Override p_speed with tracked prediction speed");
+DEFINE_double(threshold_timestamp_diff, 0.50,
+              "Maximum timestamp gap between perception and prediction.");
 DEFINE_double(pc_pob_tolerance, 0.15, "Time diff tolerance for pcd and pobs");
 
 // Traffic law
@@ -240,14 +277,18 @@ DEFINE_bool(enable_traffic_light_law, true, "enable traffic light law.");
 DEFINE_bool(enable_crosswalk_law, true, "enable crosswalk law.");
 DEFINE_bool(enable_clear_zone_law, true, "enable clear zone law.");
 DEFINE_double(polygon_length_box_length_max_diff, 2.0,
-              "max length diff of polygon and box for checking sl point is right in uturn");
+              "max length diff of polygon and box for checking sl point is "
+              "right in uturn");
 
 // Traffic light law
-DEFINE_double(length_of_passing_stop_line_buffer, 4, "passing stop line buffer length");
+DEFINE_double(length_of_passing_stop_line_buffer, 4,
+              "passing stop line buffer length");
 DEFINE_double(master_min_speed, 0.1, "min speed when compute deacceleration");
-DEFINE_double(max_deacceleration_for_red_light_stop, 6.0,
-              "treat red light as red when deceleration (abstract value in m/s^2)"
-                  " is less than this threshold, otherwise treated as green light");
-DEFINE_double(max_deacceleration_for_yellow_light_stop, 2.0,
-              "treat yellow light as red when deceleration (abstract value in m/s^2)"
-                  " is less than this threshold; otherwise treated as green light");
+DEFINE_double(
+    max_deacceleration_for_red_light_stop, 6.0,
+    "treat red light as red when deceleration (abstract value in m/s^2)"
+    " is less than this threshold, otherwise treated as green light");
+DEFINE_double(
+    max_deacceleration_for_yellow_light_stop, 2.0,
+    "treat yellow light as red when deceleration (abstract value in m/s^2)"
+    " is less than this threshold; otherwise treated as green light");
