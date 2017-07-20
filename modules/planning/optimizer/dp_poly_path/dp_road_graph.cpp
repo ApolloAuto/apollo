@@ -1,0 +1,314 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+/**
+ * @file dp_road_graph.h
+ **/
+
+#include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
+
+#include "modules/planning/common/path/frenet_frame_path.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/math/sl_analytic_transformation.h"
+#include "modules/planning/math/double.h"
+#include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
+#include "modules/planning/optimizer/dp_poly_path/trajectory_cost.h"
+#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/common/log.h"
+#include "modules/planning/math/sl_analytic_transformation.h"
+
+namespace apollo {
+namespace planning {
+
+DpRoadGraph::DpRoadGraph(
+    const DpPolyPathConfig &config,
+    const ::apollo::common::TrajectoryPoint &init_point) :
+    _config(config),
+    _init_point(init_point) {
+}
+
+::apollo::common::ErrorCode DpRoadGraph::find_tunnel(
+    const DataCenter &data_center,
+    const ReferenceLine &reference_line,
+    DecisionData *const decision_data,
+    PathData *const path_data) {
+  CHECK_NOTNULL(path_data);
+  ::apollo::common::ErrorCode ret = ::apollo::common::ErrorCode::PLANNING_OK;
+  if (init(reference_line) != ::apollo::common::ErrorCode::PLANNING_OK) {
+    AERROR << "Fail to init dp road graph!";
+    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  }
+  if (generate_graph(reference_line) != ::apollo::common::ErrorCode::PLANNING_OK) {
+    AERROR << "Fail to generate graph!";
+    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  }
+  std::vector<size_t> min_cost_edges;
+  if (find_best_trajectory(data_center, reference_line, *decision_data, &min_cost_edges) !=
+      ::apollo::common::ErrorCode::PLANNING_OK) {
+    AERROR << "Fail to find best trajectory!";
+    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  }
+  FrenetFramePath tunnel;
+  std::vector<::apollo::common::FrenetFramePoint> frenet_path;
+  frenet_path.push_back(_vertices[0].frame_point());
+  double accumulated_s = 0.0;
+  for (size_t i = 0; i < min_cost_edges.size(); ++i) {
+    GraphEdge edge = _edges[min_cost_edges[i]];
+    GraphVertex end_vertex = _vertices[edge.to_vertex()];
+    double step = 0.1; // TODO: get from config.
+    double current_s = step;
+    while (Double::compare(current_s, end_vertex.frame_point().s()) < 0.0) {
+      current_s += step;
+      const double l = edge.poly_path().evaluate(1, current_s);
+      const double dl = edge.poly_path().evaluate(2, current_s);
+      const double ddl = edge.poly_path().evaluate(3, current_s);
+      ::apollo::common::FrenetFramePoint frenet_frame_point;
+      frenet_frame_point.set_s(accumulated_s + current_s);
+      frenet_frame_point.set_l(l);
+      frenet_frame_point.set_dl(dl);
+      frenet_frame_point.set_ddl(ddl);
+      frenet_path.push_back(frenet_frame_point);
+    }
+    frenet_path.push_back(end_vertex.frame_point());
+    accumulated_s += end_vertex.frame_point().s();
+  }
+  tunnel.set_frenet_points(frenet_path);
+  path_data->set_frenet_path(tunnel);
+  // convert frenet path to path by reference line
+  std::vector<::apollo::common::PathPoint> path_points;
+  for (const ::apollo::common::FrenetFramePoint &frenet_point : frenet_path) {
+    Eigen::Vector2d xy_point;
+    ::apollo::common::SLPoint sl_point;
+    sl_point.set_s(frenet_point.s());
+    sl_point.set_l(frenet_point.l());
+
+    if (!reference_line.get_point_in_Cartesian_frame(sl_point, &xy_point)) {
+      AERROR << "Fail to convert sl point to xy point";
+      return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+
+    }
+    ReferencePoint ref_point = reference_line.get_reference_point(frenet_point.s());
+    double theta = SLAnalyticTransformation::calculate_theta(
+        ref_point.heading(), ref_point.kappa(), frenet_point.l(), frenet_point.dl());
+    //TODO comment out unused variable
+    //double kappa = SLAnalyticTransformation::calculate_kappa(ref_point.kappa(),
+    //                                                         ref_point.dkappa(),
+    //                                                        frenet_point.l(),
+    //                                                         frenet_point.dl(),
+    //                                                         frenet_point.ddl());
+
+    ::apollo::common::PathPoint path_point;//(xy_point, theta, kappa, 0.0, 0.0, 0.0);
+    path_point.set_x(xy_point[0]);
+    path_point.set_y(xy_point[1]);
+    path_point.set_theta(theta);
+    path_point.set_dkappa(0.0);
+    path_point.set_ddkappa(0.0);
+    path_point.set_s(0.0);
+    path_point.set_z(0.0);
+
+    if (path_points.size() != 0) {
+      Eigen::Vector2d last(path_points.back().x(), path_points.back().y());
+      Eigen::Vector2d current(path_point.x(), path_point.y());
+      double distance = (last - current).norm();
+      path_point.set_s(path_points.back().s() + distance);
+    }
+    path_points.push_back(std::move(path_point));
+  }
+  *(path_data->mutable_path()->mutable_path_points()) = path_points;
+  return ret;
+}
+
+::apollo::common::ErrorCode DpRoadGraph::init(const ReferenceLine &reference_line) {
+  _vertices.clear();
+  _edges.clear();
+  Eigen::Vector2d xy_point(_init_point.path_point().x(), _init_point.path_point().y());
+
+  if (!reference_line.get_point_in_Frenet_frame(xy_point, &_init_sl_point)) {
+    AERROR << "Fail to map init point to sl coordinate!";
+    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  }
+
+  ReferencePoint reference_point = reference_line.get_reference_point(_init_sl_point.s());
+
+  double init_dl = SLAnalyticTransformation().calculate_lateral_derivative(
+      reference_point.heading(), _init_point.path_point().theta(),
+      _init_sl_point.l(), reference_point.kappa());
+  double init_ddl = SLAnalyticTransformation().calculate_second_order_lateral_derivative(
+      reference_point.heading(), _init_point.path_point().theta(),
+      reference_point.kappa(), _init_point.path_point().kappa(),
+      reference_point.dkappa(), _init_sl_point.l());
+  ::apollo::common::FrenetFramePoint init_frenet_frame_point;
+  init_frenet_frame_point.set_s(_init_sl_point.s());
+  init_frenet_frame_point.set_l(_init_sl_point.l());
+  init_frenet_frame_point.set_dl(init_dl);
+  init_frenet_frame_point.set_ddl(init_ddl);
+
+  _vertices.emplace_back(init_frenet_frame_point, 0, 0);
+  _vertices.back().set_type(GraphVertex::Type::GRAPH_HEAD);
+  _vertices.back().set_accumulated_cost(0.0);
+  return ::apollo::common::ErrorCode::PLANNING_OK;
+}
+
+::apollo::common::ErrorCode DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {
+  ::apollo::common::ErrorCode ret = ::apollo::common::ErrorCode::PLANNING_OK;
+  std::vector<std::vector<::apollo::common::SLPoint>> points;
+  PathSampler path_sampler(_config);
+  ret = path_sampler.sample(reference_line, _init_point, _init_sl_point, &points);
+  if (ret != ::apollo::common::ErrorCode::PLANNING_OK) {
+    AERROR << "Fail to sampling point with path sampler!";
+    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  }
+
+  int vertex_num_previous_level = 1;
+  size_t accumulated_prev_level_size = 0;
+  size_t accumulated_index = 0;
+  for (size_t i = 0; i < points.size(); ++i) {
+    int vertex_num_current_level = 0;
+    ReferencePoint reference_point = reference_line.get_reference_point(points[i][0].s());
+    for (size_t j = 0; j < points[i].size(); ++j) {
+      if (!add_vertex(points[i][j], reference_point, i + 1)) {
+        continue;
+      }
+      bool is_connected = false;
+      for (int n = 0; n < vertex_num_previous_level; ++n) {
+        const size_t index_start = accumulated_prev_level_size + n;
+        const size_t index_end = accumulated_prev_level_size +
+            vertex_num_previous_level + vertex_num_current_level;
+        if (connect_vertex(index_start, index_end)) {
+          is_connected = true;
+        }
+      }
+      if (is_connected) {
+        ++vertex_num_current_level;
+        if (i + 1 == points.size()) {
+          _vertices.back().set_type(GraphVertex::Type::DEAD_END);
+        }
+        ++accumulated_index;
+      } else {
+        _vertices.pop_back();
+      }
+      if (vertex_num_current_level == 0) {
+        return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+      }
+    }
+    accumulated_prev_level_size += vertex_num_previous_level;
+    vertex_num_previous_level = vertex_num_current_level;
+  }
+  return ret;
+}
+
+::apollo::common::ErrorCode DpRoadGraph::find_best_trajectory(
+    const DataCenter &data_center,
+    const ReferenceLine &reference_line,
+    const DecisionData &decision_data,
+    std::vector<size_t> *const min_cost_edges) {
+  CHECK_NOTNULL(min_cost_edges);
+  std::unordered_map<size_t, size_t> vertex_connect_table;
+  GraphVertex &head = _vertices[0];
+  head.set_accumulated_cost(0.0);
+  size_t best_trajectory_end_index = 0;
+  double min_trajectory_cost = std::numeric_limits<double>::max();
+  SpeedData heuristic_speed_data; // need to create
+  TrajectoryCost trajectory_cost(_config, heuristic_speed_data, decision_data);
+
+  for (size_t i = 0; i < _vertices.size(); ++i) {
+    const GraphVertex &vertex = _vertices[i];
+    const std::vector<size_t> edges = vertex.edges_out();
+    for (size_t j = 0; j < edges.size(); ++j) {
+      double start_s = vertex.frame_point().s();
+      double end_s = _vertices[_edges[j].to_vertex()].frame_point().s();
+      double cost = trajectory_cost.calculate(
+          _edges[j].poly_path(), start_s, end_s,
+          4.933, //TODO length change to vehicle_config
+          2.11, //TODO width change to vehicle_config
+          reference_line);
+      GraphVertex &vertex_end = _vertices[_edges[j].to_vertex()];
+      if (vertex_connect_table.find(vertex_end.index()) == vertex_connect_table.end()) {
+        vertex_end.set_accumulated_cost(vertex.accumulated_cost() + cost);
+        vertex_connect_table[vertex_end.index()] = vertex.index();
+      } else {
+        if (Double::compare(
+            vertex.accumulated_cost() + cost, vertex_end.accumulated_cost()) < 0) {
+          vertex_end.set_accumulated_cost(vertex.accumulated_cost() + cost);
+          vertex_connect_table[vertex_end.index()] = vertex.index();
+        }
+      }
+    }
+    if (vertex.is_dead_end()
+        && Double::compare(vertex.accumulated_cost(), min_trajectory_cost) <= 0) {
+      best_trajectory_end_index = vertex.index();
+      min_trajectory_cost = vertex.accumulated_cost();
+    }
+  }
+  while (best_trajectory_end_index != 0) {
+    min_cost_edges->push_back(best_trajectory_end_index);
+    best_trajectory_end_index = vertex_connect_table[best_trajectory_end_index];
+  }
+  min_cost_edges->push_back(0);
+  std::reverse(min_cost_edges->begin(), min_cost_edges->end());
+  return ::apollo::common::ErrorCode::PLANNING_OK;
+}
+
+bool DpRoadGraph::add_vertex(const ::apollo::common::SLPoint &sl_point,
+                             const ReferencePoint &reference_point, const size_t level) {
+  double kappa = reference_point.kappa();
+  double kappa_range_upper = 0.23;
+  double kappa_range_lower = -kappa_range_upper;
+
+  if (Double::compare(kappa * sl_point.l(), 1.0) == 0) {
+    kappa = 0.0;
+  } else {
+    kappa = kappa / (1 - kappa * sl_point.l());
+    if (kappa < kappa_range_lower || kappa > kappa_range_upper) {
+      //Invalid sample point
+      return false;
+    }
+    kappa = std::max(kappa_range_lower, kappa);
+    kappa = std::min(kappa_range_upper, kappa);
+  }
+
+  ::apollo::common::FrenetFramePoint frenet_frame_point;
+  frenet_frame_point.set_s(sl_point.s());
+  frenet_frame_point.set_l(sl_point.l());
+  frenet_frame_point.set_dl(0.0);
+  frenet_frame_point.set_ddl(0.0);
+
+  _vertices.emplace_back(frenet_frame_point, _vertices.size(), level);
+  return true;
+}
+
+bool DpRoadGraph::connect_vertex(const size_t start, const size_t end) {
+  GraphVertex &v_start = _vertices[start];
+  GraphVertex &v_end = _vertices[end];
+  QuinticPolynomialCurve1d curve(
+      v_start.frame_point().l(), v_start.frame_point().dl(), v_start.frame_point().ddl(),
+      v_end.frame_point().l(), v_end.frame_point().dl(), v_end.frame_point().ddl(),
+      v_end.frame_point().s() - v_start.frame_point().s());
+  v_start.add_out_vertex(end);
+  v_start.add_out_edge(_edges.size());
+
+  v_end.add_in_vertex(start);
+  v_end.add_in_edge(_edges.size());
+
+  _edges.emplace_back(start, end, v_start.level());
+  _edges.back().set_edge_index(_edges.size() - 1);
+  _edges.back().set_poly_path(curve);
+  return true;
+}
+
+}  // namespace planning
+}  // namespace apollo
