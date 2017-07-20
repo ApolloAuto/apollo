@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/map/pnc_map/trajectory.h"
+#include "modules/common/path/path.h"
 
 #include <cstdlib>
 #include <limits>
@@ -26,8 +26,7 @@
 #include "modules/common/math/vec2d.h"
 
 namespace apollo {
-namespace hdmap {
-namespace pnc_map {
+namespace common {
 
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Polygon2d;
@@ -41,7 +40,7 @@ namespace {
 
 const double kSampleDistance = 0.25;
 
-bool find_lane_segment(const TrajectoryPoint& p1, const TrajectoryPoint& p2,
+bool find_lane_segment(const PathPoint& p1, const PathPoint& p2,
                        LaneSegment* const lane_segment) {
   for (const auto& wp1 : p1.lane_waypoints()) {
     for (const auto& wp2 : p2.lane_waypoints()) {
@@ -77,7 +76,7 @@ std::string LaneSegment::debug_string() const {
   return sout.str();
 }
 
-std::string TrajectoryPoint::debug_string() const {
+std::string PathPoint::debug_string() const {
   std::ostringstream sout;
   sout << "x = " << x_ << "  y = " << y_ << "  heading = " << _heading
        << "  lwp = {";
@@ -94,11 +93,11 @@ std::string TrajectoryPoint::debug_string() const {
   return sout.str();
 }
 
-std::string Trajectory::debug_string() const {
+std::string Path::debug_string() const {
   std::ostringstream sout;
   sout << "num_points = " << _num_points << "  points = {";
   bool first_point = true;
-  for (const auto& point : _trajectory_points) {
+  for (const auto& point : _path_points) {
     sout << "(" << point.debug_string() << ")";
     if (!first_point) {
       sout << ", ";
@@ -120,38 +119,37 @@ std::string Trajectory::debug_string() const {
   return sout.str();
 }
 
-std::string TrajectoryOverlap::debug_string() const {
+std::string PathOverlap::debug_string() const {
   std::ostringstream sout;
   sout << object_id << " " << start_s << " " << end_s;
   sout.flush();
   return sout.str();
 }
 
-Trajectory::Trajectory(std::vector<TrajectoryPoint> trajectory_points)
-    : _trajectory_points(std::move(trajectory_points)) {
+Path::Path(std::vector<PathPoint> path_points)
+    : _path_points(std::move(path_points)) {
   init();
 }
 
-Trajectory::Trajectory(std::vector<TrajectoryPoint> trajectory_points,
-                       std::vector<LaneSegment> lane_segments)
-    : _trajectory_points(std::move(trajectory_points)),
+Path::Path(std::vector<PathPoint> path_points,
+           std::vector<LaneSegment> lane_segments)
+    : _path_points(std::move(path_points)),
       _lane_segments(std::move(lane_segments)) {
   init();
 }
 
-Trajectory::Trajectory(std::vector<TrajectoryPoint> trajectory_points,
-                       std::vector<LaneSegment> lane_segments,
-                       const double max_approximation_error)
-    : _trajectory_points(std::move(trajectory_points)),
+Path::Path(std::vector<PathPoint> path_points,
+           std::vector<LaneSegment> lane_segments,
+           const double max_approximation_error)
+    : _path_points(std::move(path_points)),
       _lane_segments(std::move(lane_segments)) {
   init();
   if (max_approximation_error > 0.0) {
-    _approximation.reset(
-        new TrajectoryApproximation(*this, max_approximation_error));
+    _approximation.reset(new PathApproximation(*this, max_approximation_error));
   }
 }
 
-void Trajectory::init() {
+void Path::init() {
   init_points();
   init_lane_segments();
   init_point_index();
@@ -159,8 +157,8 @@ void Trajectory::init() {
   init_overlaps();
 }
 
-void Trajectory::init_points() {
-  _num_points = static_cast<int>(_trajectory_points.size());
+void Path::init_points() {
+  _num_points = static_cast<int>(_path_points.size());
   CHECK_GE(_num_points, 2);
 
   _accumulated_s.clear();
@@ -174,14 +172,14 @@ void Trajectory::init_points() {
     _accumulated_s.push_back(s);
     Vec2d heading;
     if (i + 1 >= _num_points) {
-      heading = _trajectory_points[i] - _trajectory_points[i - 1];
+      heading = _path_points[i] - _path_points[i - 1];
     } else {
-      _segments.emplace_back(_trajectory_points[i], _trajectory_points[i + 1]);
-      heading = _trajectory_points[i + 1] - _trajectory_points[i];
+      _segments.emplace_back(_path_points[i], _path_points[i + 1]);
+      heading = _path_points[i + 1] - _path_points[i];
       // TODO: use heading.length when all adjacent lanes are guarantee to be
       // connected.
       LaneSegment lane_segment;
-      if (find_lane_segment(_trajectory_points[i], _trajectory_points[i + 1],
+      if (find_lane_segment(_path_points[i], _path_points[i + 1],
                             &lane_segment)) {
         s += lane_segment.end_s - lane_segment.start_s;
       } else {
@@ -200,12 +198,12 @@ void Trajectory::init_points() {
   CHECK_EQ(_segments.size(), _num_segments);
 }
 
-void Trajectory::init_lane_segments() {
+void Path::init_lane_segments() {
   if (_lane_segments.empty()) {
     _lane_segments.reserve(_num_points);
     for (int i = 0; i + 1 < _num_points; ++i) {
       LaneSegment lane_segment;
-      if (find_lane_segment(_trajectory_points[i], _trajectory_points[i + 1],
+      if (find_lane_segment(_path_points[i], _path_points[i + 1],
                             &lane_segment)) {
         _lane_segments.push_back(lane_segment);
       }
@@ -216,7 +214,7 @@ void Trajectory::init_lane_segments() {
   _lane_segments_to_next_point.reserve(_num_points);
   for (int i = 0; i + 1 < _num_points; ++i) {
     LaneSegment lane_segment;
-    if (find_lane_segment(_trajectory_points[i], _trajectory_points[i + 1],
+    if (find_lane_segment(_path_points[i], _path_points[i + 1],
                           &lane_segment)) {
       _lane_segments_to_next_point.push_back(lane_segment);
     } else {
@@ -226,7 +224,7 @@ void Trajectory::init_lane_segments() {
   CHECK_EQ(_lane_segments_to_next_point.size(), _num_segments);
 }
 
-void Trajectory::init_width() {
+void Path::init_width() {
   _left_width.clear();
   _left_width.reserve(_num_sample_points);
   _right_width.clear();
@@ -234,7 +232,7 @@ void Trajectory::init_width() {
 
   double s = 0;
   for (int i = 0; i < _num_sample_points; ++i) {
-    const TrajectoryPoint point = get_smooth_point(s);
+    const PathPoint point = get_smooth_point(s);
     if (point.lane_waypoints().empty()) {
       _left_width.push_back(0.0);
       _right_width.push_back(0.0);
@@ -253,7 +251,7 @@ void Trajectory::init_width() {
   CHECK_EQ(_right_width.size(), _num_sample_points);
 }
 
-void Trajectory::init_point_index() {
+void Path::init_point_index() {
   _last_point_index.clear();
   _last_point_index.reserve(_num_sample_points);
   double s = 0.0;
@@ -270,9 +268,9 @@ void Trajectory::init_point_index() {
 }
 
 /*
-void Trajectory::get_all_overlaps(
+void Path::get_all_overlaps(
     GetOverlapFromLaneFunc get_overlaps_from_lane,
-    std::vector<TrajectoryOverlap>* const overlaps) const {
+    std::vector<PathOverlap>* const overlaps) const {
   if (overlaps == nullptr) {
     return;
   }
@@ -327,12 +325,12 @@ void Trajectory::get_all_overlaps(
   }
   std::sort(
       overlaps->begin(), overlaps->end(),
-      [](const TrajectoryOverlap& overlap1, const TrajectoryOverlap& overlap2) {
+      [](const PathOverlap& overlap1, const PathOverlap& overlap2) {
         return overlap1.start_s < overlap2.start_s;
       });
 }
 
-void Trajectory::init_overlaps() {
+void Path::init_overlaps() {
   get_all_overlaps(std::bind(&LaneInfo::cross_lanes, _1), &_lane_overlaps);
   get_all_overlaps(std::bind(&LaneInfo::signals, _1), &_signal_overlaps);
   get_all_overlaps(std::bind(&LaneInfo::yield_signs, _1),
@@ -347,17 +345,15 @@ void Trajectory::init_overlaps() {
 }
 */
 
-TrajectoryPoint Trajectory::get_smooth_point(
-    const InterpolatedIndex& index) const {
+PathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
   CHECK_GE(index.id, 0);
   CHECK_LT(index.id, _num_points);
 
-  const TrajectoryPoint& ref_point = _trajectory_points[index.id];
+  const PathPoint& ref_point = _path_points[index.id];
   if (std::abs(index.offset) > kMathEpsilon) {
     const Vec2d delta = _unit_directions[index.id] * index.offset;
-    TrajectoryPoint point(
-        {ref_point.x() + delta.x(), ref_point.y() + delta.y()},
-        ref_point.heading());
+    PathPoint point({ref_point.x() + delta.x(), ref_point.y() + delta.y()},
+                    ref_point.heading());
     if (index.id < _num_segments) {
       const LaneSegment& lane_segment = _lane_segments_to_next_point[index.id];
       if (lane_segment.lane != nullptr) {
@@ -371,11 +367,11 @@ TrajectoryPoint Trajectory::get_smooth_point(
   }
 }
 
-TrajectoryPoint Trajectory::get_smooth_point(double s) const {
+PathPoint Path::get_smooth_point(double s) const {
   return get_smooth_point(get_index_from_s(s));
 }
 
-double Trajectory::get_s_from_index(const InterpolatedIndex& index) const {
+double Path::get_s_from_index(const InterpolatedIndex& index) const {
   if (index.id < 0) {
     return 0.0;
   }
@@ -385,7 +381,7 @@ double Trajectory::get_s_from_index(const InterpolatedIndex& index) const {
   return _accumulated_s[index.id] + index.offset;
 }
 
-InterpolatedIndex Trajectory::get_index_from_s(double s) const {
+InterpolatedIndex Path::get_index_from_s(double s) const {
   if (s <= 0.0) {
     return {0, 0.0};
   }
@@ -413,36 +409,35 @@ InterpolatedIndex Trajectory::get_index_from_s(double s) const {
   return {low, s - _accumulated_s[low]};
 }
 
-bool Trajectory::get_nearest_point(const Vec2d& point, double* accumulate_s,
-                                   double* lateral) const {
+bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
+                             double* lateral) const {
   double distance = 0.0;
   return get_nearest_point(point, accumulate_s, lateral, &distance);
 }
 
-bool Trajectory::get_nearest_point(const Vec2d& point, double* accumulate_s,
-                                   double* lateral,
-                                   double* min_distance) const {
+bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
+                             double* lateral, double* min_distance) const {
   if (!get_projection(point, accumulate_s, lateral, min_distance)) {
     return false;
   }
   if (*accumulate_s < 0.0) {
     *accumulate_s = 0.0;
-    *min_distance = point.DistanceTo(_trajectory_points[0]);
+    *min_distance = point.DistanceTo(_path_points[0]);
   } else if (*accumulate_s > _length) {
     *accumulate_s = _length;
-    *min_distance = point.DistanceTo(_trajectory_points.back());
+    *min_distance = point.DistanceTo(_path_points.back());
   }
   return true;
 }
 
-bool Trajectory::get_projection(const apollo::common::math::Vec2d& point,
-                                double* accumulate_s, double* lateral) const {
+bool Path::get_projection(const apollo::common::math::Vec2d& point,
+                          double* accumulate_s, double* lateral) const {
   double distance = 0.0;
   return get_projection(point, accumulate_s, lateral, &distance);
 }
 
-bool Trajectory::get_projection(const Vec2d& point, double* accumulate_s,
-                                double* lateral, double* min_distance) const {
+bool Path::get_projection(const Vec2d& point, double* accumulate_s,
+                          double* lateral, double* min_distance) const {
   if (_segments.empty()) {
     return false;
   }
@@ -490,8 +485,7 @@ bool Trajectory::get_projection(const Vec2d& point, double* accumulate_s,
   return true;
 }
 
-bool Trajectory::get_heading_along_trajectory(const Vec2d& point,
-                                              double* heading) const {
+bool Path::get_heading_along_path(const Vec2d& point, double* heading) const {
   if (heading == nullptr) {
     return false;
   }
@@ -504,16 +498,16 @@ bool Trajectory::get_heading_along_trajectory(const Vec2d& point,
   return false;
 }
 
-double Trajectory::get_left_width(const double s) const {
+double Path::get_left_width(const double s) const {
   return get_sample(_left_width, s);
 }
 
-double Trajectory::get_right_width(const double s) const {
+double Path::get_right_width(const double s) const {
   return get_sample(_right_width, s);
 }
 
-bool Trajectory::get_width(const double s, double* left_width,
-                           double* right_width) const {
+bool Path::get_width(const double s, double* left_width,
+                     double* right_width) const {
   CHECK_NOTNULL(left_width);
   CHECK_NOTNULL(right_width);
 
@@ -525,8 +519,8 @@ bool Trajectory::get_width(const double s, double* left_width,
   return true;
 }
 
-double Trajectory::get_sample(const std::vector<double>& samples,
-                              const double s) const {
+double Path::get_sample(const std::vector<double>& samples,
+                        const double s) const {
   if (samples.empty()) {
     return 0.0;
   }
@@ -541,7 +535,7 @@ double Trajectory::get_sample(const std::vector<double>& samples,
   return samples[idx] * (1.0 - ratio) + samples[idx + 1] * ratio;
 }
 
-bool Trajectory::is_on_trajectory(const Vec2d& point) const {
+bool Path::is_on_path(const Vec2d& point) const {
   double accumulate_s = 0.0;
   double lateral = 0.0;
   if (!get_projection(point, &accumulate_s, &lateral)) {
@@ -558,19 +552,19 @@ bool Trajectory::is_on_trajectory(const Vec2d& point) const {
   return false;
 }
 
-bool Trajectory::is_on_trajectory(const Box2d& box) const {
+bool Path::is_on_path(const Box2d& box) const {
   std::vector<Vec2d> corners;
   box.GetAllCorners(&corners);
   for (const auto& corner : corners) {
-    if (!is_on_trajectory(corner)) {
+    if (!is_on_path(corner)) {
       return false;
     }
   }
   return true;
 }
 
-bool Trajectory::overlap_with(const apollo::common::math::Box2d& box,
-                              double width) const {
+bool Path::overlap_with(const apollo::common::math::Box2d& box,
+                        double width) const {
   if (_approximation != nullptr) {
     return _approximation->overlap_with(*this, box, width);
   }
@@ -587,12 +581,12 @@ bool Trajectory::overlap_with(const apollo::common::math::Box2d& box,
   return false;
 }
 
-double TrajectoryApproximation::compute_max_error(const Trajectory& trajectory,
-                                                  const int s, const int t) {
+double PathApproximation::compute_max_error(const Path& path, const int s,
+                                            const int t) {
   if (s + 1 >= t) {
     return 0.0;
   }
-  const auto& points = trajectory.trajectory_points();
+  const auto& points = path.path_points();
   const LineSegment2d segment(points[s], points[t]);
   double max_distance_sqr = 0.0;
   for (int i = s + 1; i < t; ++i) {
@@ -602,12 +596,12 @@ double TrajectoryApproximation::compute_max_error(const Trajectory& trajectory,
   return sqrt(max_distance_sqr);
 }
 
-bool TrajectoryApproximation::is_within_max_error(const Trajectory& trajectory,
-                                                  const int s, const int t) {
+bool PathApproximation::is_within_max_error(const Path& path, const int s,
+                                            const int t) {
   if (s + 1 >= t) {
     return true;
   }
-  const auto& points = trajectory.trajectory_points();
+  const auto& points = path.path_points();
   const LineSegment2d segment(points[s], points[t]);
   for (int i = s + 1; i < t; ++i) {
     if (segment.DistanceSquareTo(points[i]) > _max_sqr_error) {
@@ -617,13 +611,13 @@ bool TrajectoryApproximation::is_within_max_error(const Trajectory& trajectory,
   return true;
 }
 
-void TrajectoryApproximation::init(const Trajectory& trajectory) {
-  init_dilute(trajectory);
-  init_projections(trajectory);
+void PathApproximation::init(const Path& path) {
+  init_dilute(path);
+  init_projections(path);
 }
 
-void TrajectoryApproximation::init_dilute(const Trajectory& trajectory) {
-  const int num_original_points = trajectory.num_points();
+void PathApproximation::init_dilute(const Path& path) {
+  const int num_original_points = path.num_points();
   _original_ids.clear();
   int last_idx = 0;
   while (last_idx < num_original_points - 1) {
@@ -631,14 +625,14 @@ void TrajectoryApproximation::init_dilute(const Trajectory& trajectory) {
     int next_idx = last_idx + 1;
     int delta = 2;
     for (; last_idx + delta < num_original_points; delta *= 2) {
-      if (!is_within_max_error(trajectory, last_idx, last_idx + delta)) {
+      if (!is_within_max_error(path, last_idx, last_idx + delta)) {
         break;
       }
       next_idx = last_idx + delta;
     }
     for (; delta > 0; delta /= 2) {
       if (next_idx + delta < num_original_points &&
-          is_within_max_error(trajectory, last_idx, next_idx + delta)) {
+          is_within_max_error(path, last_idx, next_idx + delta)) {
         next_idx += delta;
       }
     }
@@ -653,19 +647,18 @@ void TrajectoryApproximation::init_dilute(const Trajectory& trajectory) {
   _segments.clear();
   _segments.reserve(_num_points - 1);
   for (int i = 0; i < _num_points - 1; ++i) {
-    _segments.emplace_back(
-        trajectory.trajectory_points()[_original_ids[i]],
-        trajectory.trajectory_points()[_original_ids[i + 1]]);
+    _segments.emplace_back(path.path_points()[_original_ids[i]],
+                           path.path_points()[_original_ids[i + 1]]);
   }
   _max_error_per_segment.clear();
   _max_error_per_segment.reserve(_num_points - 1);
   for (int i = 0; i < _num_points - 1; ++i) {
     _max_error_per_segment.push_back(
-        compute_max_error(trajectory, _original_ids[i], _original_ids[i + 1]));
+        compute_max_error(path, _original_ids[i], _original_ids[i + 1]));
   }
 }
 
-void TrajectoryApproximation::init_projections(const Trajectory& trajectory) {
+void PathApproximation::init_projections(const Path& path) {
   if (_num_points == 0) {
     return;
   }
@@ -677,7 +670,7 @@ void TrajectoryApproximation::init_projections(const Trajectory& trajectory) {
     s += segment.length();
     _projections.push_back(s);
   }
-  const auto& original_points = trajectory.trajectory_points();
+  const auto& original_points = path.path_points();
   const int num_original_points = original_points.size();
   _original_projections.clear();
   ;
@@ -738,9 +731,10 @@ void TrajectoryApproximation::init_projections(const Trajectory& trajectory) {
            _num_projection_samples);
 }
 
-bool TrajectoryApproximation::get_projection(
-    const Trajectory& trajectory, const apollo::common::math::Vec2d& point,
-    double* accumulate_s, double* lateral, double* min_distance) const {
+bool PathApproximation::get_projection(const Path& path,
+                                       const apollo::common::math::Vec2d& point,
+                                       double* accumulate_s, double* lateral,
+                                       double* min_distance) const {
   if (_num_points == 0) {
     return false;
   }
@@ -763,9 +757,9 @@ bool TrajectoryApproximation::get_projection(
   if (estimate_nearest_segment_idx < 0) {
     return false;
   }
-  const auto& original_segments = trajectory.segments();
+  const auto& original_segments = path.segments();
   const int num_original_segments = static_cast<int>(original_segments.size());
-  const auto& original_accumulated_s = trajectory.accumulated_s();
+  const auto& original_accumulated_s = path.accumulated_s();
   double min_distance_sqr_with_error =
       Sqr(sqrt(min_distance_sqr) +
           _max_error_per_segment[estimate_nearest_segment_idx] + _max_error);
@@ -872,16 +866,15 @@ bool TrajectoryApproximation::get_projection(
   return false;
 }
 
-bool TrajectoryApproximation::overlap_with(const Trajectory& trajectory,
-                                           const Box2d& box,
-                                           double width) const {
+bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
+                                     double width) const {
   if (_num_points == 0) {
     return false;
   }
   const Vec2d center = box.center();
   const double radius = box.diagonal() / 2.0 + width;
   const double radius_sqr = Sqr(radius);
-  const auto& original_segments = trajectory.segments();
+  const auto& original_segments = path.segments();
   for (size_t i = 0; i < _segments.size(); ++i) {
     const LineSegment2d& segment = _segments[i];
     const double max_error = _max_error_per_segment[i];
@@ -940,6 +933,5 @@ bool TrajectoryApproximation::overlap_with(const Trajectory& trajectory,
   return false;
 }
 
-}  // namespace pnc_map
-}  // namespace hdmap
+}  // namespace common
 }  // namespace apollo

@@ -34,20 +34,18 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
-//#include "modules/map/pnc_map/pnc_map.h"
 
 namespace apollo {
-namespace hdmap {
-namespace pnc_map {
+namespace common {
 
 // class LaneInfo;
 // class OverlapInfo;
 
 struct LaneWaypoint {
   LaneWaypoint() = default;
-  LaneWaypoint(const LaneInfo* lane, const double s)
+  LaneWaypoint(const apollo::hdmap::LaneInfo* lane, const double s)
       : lane(CHECK_NOTNULL(lane)), s(s) {}
-  const LaneInfo* lane = nullptr;
+  const apollo::hdmap::LaneInfo* lane = nullptr;
   double s = 0.0;
 
   std::string debug_string() const;
@@ -55,19 +53,19 @@ struct LaneWaypoint {
 
 struct LaneSegment {
   LaneSegment() = default;
-  LaneSegment(const LaneInfo* lane, const double start_s, const double end_s)
+  LaneSegment(const apollo::hdmap::LaneInfo* lane, const double start_s,
+              const double end_s)
       : lane(CHECK_NOTNULL(lane)), start_s(start_s), end_s(end_s) {}
-  const LaneInfo* lane = nullptr;
+  const apollo::hdmap::LaneInfo* lane = nullptr;
   double start_s = 0.0;
   double end_s = 0.0;
 
   std::string debug_string() const;
 };
 
-struct TrajectoryOverlap {
-  TrajectoryOverlap() = default;
-  TrajectoryOverlap(std::string object_id, const double start_s,
-                    const double end_s)
+struct PathOverlap {
+  PathOverlap() = default;
+  PathOverlap(std::string object_id, const double start_s, const double end_s)
       : object_id(std::move(object_id)), start_s(start_s), end_s(end_s) {}
 
   std::string object_id;
@@ -77,18 +75,18 @@ struct TrajectoryOverlap {
   std::string debug_string() const;
 };
 
-class TrajectoryPoint : public apollo::common::math::Vec2d {
+class PathPoint : public apollo::common::math::Vec2d {
  public:
-  TrajectoryPoint() = default;
-  TrajectoryPoint(const apollo::common::math::Vec2d& point, double heading)
+  PathPoint() = default;
+  PathPoint(const apollo::common::math::Vec2d& point, double heading)
       : Vec2d(point.x(), point.y()), _heading(heading) {}
-  TrajectoryPoint(const apollo::common::math::Vec2d& point, double heading,
-                  LaneWaypoint lane_waypoint)
+  PathPoint(const apollo::common::math::Vec2d& point, double heading,
+            LaneWaypoint lane_waypoint)
       : Vec2d(point.x(), point.y()), _heading(heading) {
     _lane_waypoints.emplace_back(std::move(lane_waypoint));
   }
-  TrajectoryPoint(const apollo::common::math::Vec2d& point, double heading,
-                  std::vector<LaneWaypoint> lane_waypoints)
+  PathPoint(const apollo::common::math::Vec2d& point, double heading,
+            std::vector<LaneWaypoint> lane_waypoints)
       : Vec2d(point.x(), point.y()),
         _heading(heading),
         _lane_waypoints(std::move(lane_waypoints)) {}
@@ -119,13 +117,13 @@ class TrajectoryPoint : public apollo::common::math::Vec2d {
   std::vector<LaneWaypoint> _lane_waypoints;
 };
 
-class Trajectory;
+class Path;
 
-class TrajectoryApproximation {
+class PathApproximation {
  public:
-  TrajectoryApproximation(const Trajectory& trajectory, const double max_error)
+  PathApproximation(const Path& path, const double max_error)
       : _max_error(max_error), _max_sqr_error(max_error * max_error) {
-    init(trajectory);
+    init(path);
   }
   double max_error() const { return _max_error; }
   const std::vector<int>& original_ids() const { return _original_ids; }
@@ -133,23 +131,21 @@ class TrajectoryApproximation {
     return _segments;
   }
 
-  bool get_projection(const Trajectory& trajectory,
+  bool get_projection(const Path& path,
                       const apollo::common::math::Vec2d& point,
                       double* accumulate_s, double* lateral,
                       double* distance) const;
 
-  bool overlap_with(const Trajectory& trajectory,
-                    const apollo::common::math::Box2d& box, double width) const;
+  bool overlap_with(const Path& path, const apollo::common::math::Box2d& box,
+                    double width) const;
 
  protected:
-  void init(const Trajectory& trajectory);
-  bool is_within_max_error(const Trajectory& trajectory, const int s,
-                           const int t);
-  double compute_max_error(const Trajectory& trajectory, const int s,
-                           const int t);
+  void init(const Path& path);
+  bool is_within_max_error(const Path& path, const int s, const int t);
+  double compute_max_error(const Path& path, const int s, const int t);
 
-  void init_dilute(const Trajectory& trajectory);
-  void init_projections(const Trajectory& trajectory);
+  void init_dilute(const Path& path);
+  void init_projections(const Path& path);
 
  protected:
   const double _max_error;
@@ -184,25 +180,25 @@ class InterpolatedIndex {
   double offset = 0.0;
 };
 
-class Trajectory {
+class Path {
  public:
-  Trajectory() = default;
+  Path() = default;
 
-  Trajectory(const Trajectory& rhs) = delete;
-  Trajectory& operator=(const Trajectory& rhs) = delete;
-  Trajectory(Trajectory&&) = default;
-  Trajectory& operator=(Trajectory&&) = default;
+  Path(const Path& rhs) = delete;
+  Path& operator=(const Path& rhs) = delete;
+  Path(Path&&) = default;
+  Path& operator=(Path&&) = default;
 
-  Trajectory(std::vector<TrajectoryPoint> trajectory_points);
-  Trajectory(std::vector<TrajectoryPoint> trajectory_points,
-             std::vector<LaneSegment> lane_segments);
-  Trajectory(std::vector<TrajectoryPoint> trajectory_points,
-             std::vector<LaneSegment> lane_segments,
-             const double max_approximation_error);
+  Path(std::vector<PathPoint> path_points);
+  Path(std::vector<PathPoint> path_points,
+       std::vector<LaneSegment> lane_segments);
+  Path(std::vector<PathPoint> path_points,
+       std::vector<LaneSegment> lane_segments,
+       const double max_approximation_error);
 
   // Return smooth coordinate by interpolated index or accumulate_s.
-  TrajectoryPoint get_smooth_point(const InterpolatedIndex& index) const;
-  TrajectoryPoint get_smooth_point(double s) const;
+  PathPoint get_smooth_point(const InterpolatedIndex& index) const;
+  PathPoint get_smooth_point(double s) const;
 
   // Compute accumulate s value of the index.
   double get_s_from_index(const InterpolatedIndex& index) const;
@@ -220,14 +216,12 @@ class Trajectory {
                       double* accumulate_s, double* lateral,
                       double* distance) const;
 
-  bool get_heading_along_trajectory(const apollo::common::math::Vec2d& point,
-                                    double* heading) const;
+  bool get_heading_along_path(const apollo::common::math::Vec2d& point,
+                              double* heading) const;
 
   int num_points() const { return _num_points; }
   int num_segments() const { return _num_segments; }
-  const std::vector<TrajectoryPoint>& trajectory_points() const {
-    return _trajectory_points;
-  }
+  const std::vector<PathPoint>& path_points() const { return _path_points; }
   const std::vector<LaneSegment>& lane_segments() const {
     return _lane_segments;
   }
@@ -241,33 +235,33 @@ class Trajectory {
   const std::vector<apollo::common::math::LineSegment2d>& segments() const {
     return _segments;
   }
-  const TrajectoryApproximation* approximation() const {
+  const PathApproximation* approximation() const {
     return _approximation.get();
   }
   double length() const { return _length; }
 
-  const std::vector<TrajectoryOverlap>& lane_overlaps() const {
+  const std::vector<PathOverlap>& lane_overlaps() const {
     return _lane_overlaps;
   }
-  const std::vector<TrajectoryOverlap>& signal_overlaps() const {
+  const std::vector<PathOverlap>& signal_overlaps() const {
     return _signal_overlaps;
   }
-  const std::vector<TrajectoryOverlap>& yield_sign_overlaps() const {
+  const std::vector<PathOverlap>& yield_sign_overlaps() const {
     return _yield_sign_overlaps;
   }
-  const std::vector<TrajectoryOverlap>& stop_sign_overlaps() const {
+  const std::vector<PathOverlap>& stop_sign_overlaps() const {
     return _stop_sign_overlaps;
   }
-  const std::vector<TrajectoryOverlap>& crosswalk_overlaps() const {
+  const std::vector<PathOverlap>& crosswalk_overlaps() const {
     return _crosswalk_overlaps;
   }
-  const std::vector<TrajectoryOverlap>& parking_space_overlaps() const {
+  const std::vector<PathOverlap>& parking_space_overlaps() const {
     return _parking_space_overlaps;
   }
-  const std::vector<TrajectoryOverlap>& junction_overlaps() const {
+  const std::vector<PathOverlap>& junction_overlaps() const {
     return _junction_overlaps;
   }
-  const std::vector<TrajectoryOverlap>& speed_bump_overlaps() const {
+  const std::vector<PathOverlap>& speed_bump_overlaps() const {
     return _speed_bump_overlaps;
   }
 
@@ -275,9 +269,9 @@ class Trajectory {
   double get_right_width(const double s) const;
   bool get_width(const double s, double* left_width, double* right_width) const;
 
-  bool is_on_trajectory(const apollo::common::math::Vec2d& point) const;
-  // requires all corners of the box on trajectory.
-  bool is_on_trajectory(const apollo::common::math::Box2d& box) const;
+  bool is_on_path(const apollo::common::math::Vec2d& point) const;
+  // requires all corners of the box on path.
+  bool is_on_path(const apollo::common::math::Box2d& box) const;
   bool overlap_with(const apollo::common::math::Box2d& box, double width) const;
 
   std::string debug_string() const;
@@ -293,21 +287,22 @@ class Trajectory {
   double get_sample(const std::vector<double>& samples, const double s) const;
 
   using GetOverlapFromLaneFunc =
-      std::function<const std::vector<const OverlapInfo*>&(const LaneInfo&)>;
+      std::function<const std::vector<const apollo::hdmap::OverlapInfo*>&(
+          const apollo::hdmap::LaneInfo&)>;
   void get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
-                        std::vector<TrajectoryOverlap>* const overlaps) const;
+                        std::vector<PathOverlap>* const overlaps) const;
 
  protected:
   int _num_points = 0;
   int _num_segments = 0;
-  std::vector<TrajectoryPoint> _trajectory_points;
+  std::vector<PathPoint> _path_points;
   std::vector<LaneSegment> _lane_segments;
   std::vector<LaneSegment> _lane_segments_to_next_point;
   std::vector<apollo::common::math::Vec2d> _unit_directions;
   double _length = 0.0;
   std::vector<double> _accumulated_s;
   std::vector<apollo::common::math::LineSegment2d> _segments;
-  std::unique_ptr<TrajectoryApproximation> _approximation;
+  std::unique_ptr<PathApproximation> _approximation;
 
   // Sampled every fixed length.
   int _num_sample_points = 0;
@@ -315,18 +310,17 @@ class Trajectory {
   std::vector<double> _right_width;
   std::vector<int> _last_point_index;
 
-  std::vector<TrajectoryOverlap> _lane_overlaps;
-  std::vector<TrajectoryOverlap> _signal_overlaps;
-  std::vector<TrajectoryOverlap> _yield_sign_overlaps;
-  std::vector<TrajectoryOverlap> _stop_sign_overlaps;
-  std::vector<TrajectoryOverlap> _crosswalk_overlaps;
-  std::vector<TrajectoryOverlap> _parking_space_overlaps;
-  std::vector<TrajectoryOverlap> _junction_overlaps;
-  std::vector<TrajectoryOverlap> _speed_bump_overlaps;
+  std::vector<PathOverlap> _lane_overlaps;
+  std::vector<PathOverlap> _signal_overlaps;
+  std::vector<PathOverlap> _yield_sign_overlaps;
+  std::vector<PathOverlap> _stop_sign_overlaps;
+  std::vector<PathOverlap> _crosswalk_overlaps;
+  std::vector<PathOverlap> _parking_space_overlaps;
+  std::vector<PathOverlap> _junction_overlaps;
+  std::vector<PathOverlap> _speed_bump_overlaps;
 };
 
-}  // namespace pnc_map
-}  // namespace hdmap
+}  // namespace common
 }  // namespace apollo
 
 #endif  // MODULES_MAP_PNC_MAP_TRAJECTORY_H_
