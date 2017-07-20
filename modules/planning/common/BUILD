@@ -107,6 +107,14 @@ cc_library(
     hdrs = [
         "planning_data.h",
     ],
+    deps = [
+        ":decision_data",
+        "//modules/common/proto:path_point_proto",
+        "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/reference_line:lib_reference_line",
+        "//modules/map/proto:map_proto",
+        "@eigen//:eigen",
+    ],
 )
 
 cc_library(
@@ -159,7 +167,6 @@ cc_library(
     deps = [
         ":environment",
         ":frame",
-        ":planning_data",
         ":planning_gflags",
         "//modules/common",
         "//modules/common/status",
