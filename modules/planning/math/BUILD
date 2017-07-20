@@ -66,18 +66,6 @@ cc_library(
 )
 
 cc_library(
-    name = "interpolation",
-    hdrs = [
-        "interpolation.h",
-    ],
-    deps = [
-        ":hermite_spline",
-        "//modules/common:log",
-        "//modules/common/math:math_utils",
-    ],
-)
-
-cc_library(
     name = "hermite_spline",
     hdrs = [
         "hermite_spline.h",
