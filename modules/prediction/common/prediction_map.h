@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_MAP_PREDICTION_MAP_H_
-#define MODULES_PREDICTION_MAP_PREDICTION_MAP_H_
+#ifndef MODULES_PREDICTION_COMMON_PREDICTION_MAP_H_
+#define MODULES_PREDICTION_COMMON_PREDICTION_MAP_H_
 
 #include <memory>
 
@@ -47,4 +47,4 @@ class PredictionMap {
 }  // namespace apollo
 
 
-#endif  // MODULES_PREDICTION_MAP_PREDICTION_MAP_H_
+#endif  // MODULES_PREDICTION_COMMON_PREDICTION_MAP_H_
