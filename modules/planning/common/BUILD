@@ -168,7 +168,7 @@ cc_library(
 )
 
 cc_library(
-    name = "lib_planning_common",
+    name = "planning_common",
     deps = [
         "@eigen//:eigen",
         ":frame",

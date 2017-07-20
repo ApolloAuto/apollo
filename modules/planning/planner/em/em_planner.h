@@ -20,8 +20,9 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/planner/planner.h"
+#include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/common/speed/speed_point.h"
+#include "modules/planning/planner/planner.h"
 
 /**
  * @namespace apollo::planning
@@ -53,13 +54,13 @@ class EMPlanner : public Planner {
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  bool Plan(const apollo::common::TrajectoryPoint& start_point,
-            std::vector<apollo::common::TrajectoryPoint>* trajectory) override;
+  bool MakePlan(
+      const apollo::common::TrajectoryPoint& start_point,
+      std::vector<apollo::common::TrajectoryPoint>* trajectory) override;
 
  private:
-  std::vector<SpeedPoint> generate_init_speed_profile(const double init_v,
-                                                      const double init_a);
-
+  std::vector<SpeedPoint> GenerateInitSpeedProfile(const double init_v,
+                                                   const double init_a);
 };
 
 }  // namespace planning

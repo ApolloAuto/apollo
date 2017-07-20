@@ -56,9 +56,9 @@ class RTKReplayPlanner : public Planner {
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  bool Plan(
-      const apollo::common::TrajectoryPoint &start_point,
-      std::vector<apollo::common::TrajectoryPoint> *ptr_trajectory) override;
+  bool MakePlan(
+      const apollo::common::TrajectoryPoint& start_point,
+      std::vector<apollo::common::TrajectoryPoint>* ptr_trajectory) override;
 
   /**
    * @brief Read the recorded trajectory file.
