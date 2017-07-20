@@ -190,6 +190,7 @@ cc_library(
         ":frame",
         ":planning_gflags",
         ":speed_limit",
+        ":em_planning_data",
         "//modules/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
