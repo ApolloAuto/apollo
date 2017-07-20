@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planner/rtk_replay_planner.h"
+#include "modules/planning/planner/rtk/rtk_replay_planner.h"
 
 #include <fstream>
 
@@ -32,7 +32,7 @@ RTKReplayPlanner::RTKReplayPlanner() {
   ReadTrajectoryFile(FLAGS_rtk_trajectory_filename);
 }
 
-bool RTKReplayPlanner::Plan(
+bool RTKReplayPlanner::MakePlan(
     const TrajectoryPoint& start_point,
     std::vector<TrajectoryPoint>* ptr_discretized_trajectory) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {

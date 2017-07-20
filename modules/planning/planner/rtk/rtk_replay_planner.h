@@ -14,14 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNER_EM_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_EM_PLANNER_H_
+#ifndef MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
+#define MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
+
+#include "modules/planning/planner/planner.h"
 
 #include <string>
 #include <vector>
-
-#include "modules/planning/planner/planner.h"
-#include "modules/planning/common/speed/speed_point.h"
 
 /**
  * @namespace apollo::planning
@@ -31,21 +30,23 @@ namespace apollo {
 namespace planning {
 
 /**
- * @class EMPlanner
- * @brief EMPlanner is an expectation maximization planner.
+ * @class RTKReplayPlanner
+ * @brief RTKReplayPlanner is a derived class of Planner.
+ *        It reads a recorded trajectory from a trajectory file and
+ *        outputs proper segment of the trajectory according to vehicle
+ * position.
  */
-
-class EMPlanner : public Planner {
+class RTKReplayPlanner : public Planner {
  public:
   /**
    * @brief Constructor
    */
-  EMPlanner();
+  RTKReplayPlanner();
 
   /**
    * @brief Destructor
    */
-  virtual ~EMPlanner() = default;
+  virtual ~RTKReplayPlanner() = default;
 
   /**
    * @brief Overrode function Plan in parent class Planner.
@@ -53,16 +54,25 @@ class EMPlanner : public Planner {
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  bool Plan(const apollo::common::TrajectoryPoint& start_point,
-            std::vector<apollo::common::TrajectoryPoint>* trajectory) override;
+  bool MakePlan(
+      const apollo::common::TrajectoryPoint& start_point,
+      std::vector<apollo::common::TrajectoryPoint>* ptr_trajectory) override;
+
+  /**
+   * @brief Read the recorded trajectory file.
+   * @param filename The name of the trajectory file.
+   */
+  void ReadTrajectoryFile(const std::string& filename);
 
  private:
-  std::vector<SpeedPoint> generate_init_speed_profile(const double init_v,
-                                                      const double init_a);
+  std::size_t QueryPositionMatchedPoint(
+      const apollo::common::TrajectoryPoint& start_point,
+      const std::vector<apollo::common::TrajectoryPoint>& trajectory) const;
 
+  std::vector<apollo::common::TrajectoryPoint> complete_rtk_trajectory_;
 };
 
 }  // namespace planning
 }  // nameapace apollo
 
-#endif /* MODULES_PLANNING_PLANNER_EM_PLANNER_H_ */
+#endif /* MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_ */
