@@ -60,5 +60,5 @@ TEST(Brake61Test, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

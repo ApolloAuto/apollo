@@ -64,5 +64,6 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   std::vector<TrajectoryPoint> trajectory;
   EXPECT_TRUE(!planner_with_error_csv.Plan(start_point, &trajectory));
 }
-}  // namespace control
+
+}  // namespace planning
 }  // namespace apollo

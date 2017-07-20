@@ -99,5 +99,5 @@ TEST_F(PlanningTest, PlannerFactory) {
   EXPECT_TRUE(ptr_planner == nullptr);
 }
 
-}  // namespace control
+}  // namespace planning
 }  // namespace apollo

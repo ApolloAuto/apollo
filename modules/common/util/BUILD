@@ -79,7 +79,7 @@ cc_test(
     ],
     deps = [
         ":util",
-        "//modules/common/util/testing:simple_proto",
+        "//modules/common/util/testdata:simple_proto",
         "@gtest//:main",
     ],
 )
