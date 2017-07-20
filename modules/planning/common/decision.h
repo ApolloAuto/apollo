@@ -18,33 +18,32 @@
  * @file decision.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_DECISION_H
-#define MODULES_PLANNING_COMMON_DECISION_H
+#ifndef MODULES_PLANNING_COMMON_DECISION_H_
+#define MODULES_PLANNING_COMMON_DECISION_H_
 
 namespace apollo {
 namespace planning {
 
 class Decision {
-public:
-  // TODO: to be updated soon
-    enum class DecisionType {
-        GO_LEFT = 0,
-        GO_RIGHT = 1,
-        GO_UP = 2,
-        GO_DOWN = 3,
-    };
+ public:
+  enum class DecisionType {
+    GO_LEFT = 0,
+    GO_RIGHT = 1,
+    GO_UP = 2,
+    GO_DOWN = 3,
+  };
 
-public:
-    explicit Decision(const double& buffer, const DecisionType type);
-    double Buffer() const;
-    const DecisionType& Type() const;
+ public:
+  explicit Decision(const double& buffer, const DecisionType type);
+  double Buffer() const;
+  const DecisionType& Type() const;
 
-private:
-    double buffer_ = 0.0;
-    DecisionType type_;
+ private:
+  double buffer_ = 0.0;
+  DecisionType type_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_DECISION_H
+#endif  // MODULES_PLANNING_COMMON_DECISION_H_
