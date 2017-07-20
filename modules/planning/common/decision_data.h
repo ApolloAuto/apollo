@@ -33,15 +33,15 @@ class DecisionData {
  public:
   DecisionData() = default;
 
-  std::vector<const Obstacle*> StaticObstacles() const;
-  std::vector<Obstacle*> MutableStaticObstacles() const;
+  std::vector<const Obstacle *> StaticObstacles() const;
+  std::vector<Obstacle *> MutableStaticObstacles() const;
 
-  std::vector<const Obstacle*> DynamicObstacles() const;
-  std::vector<Obstacle*> MutableDynamicObstacles() const;
-  std::vector<const MapObject*> MapObjects() const;
-  std::vector<MapObject*> MutableMapObjects() const;
-  const std::vector<Obstacle>& Obstacles() const;
-  std::vector<Obstacle>* MutableObstacles();
+  std::vector<const Obstacle *> DynamicObstacles() const;
+  std::vector<Obstacle *> MutableDynamicObstacles() const;
+  std::vector<const MapObject *> MapObjects() const;
+  std::vector<MapObject *> MutableMapObjects() const;
+  const std::vector<Obstacle> &Obstacles() const;
+  std::vector<Obstacle> *MutableObstacles();
 
  private:
   std::vector<Obstacle> obstacles_;

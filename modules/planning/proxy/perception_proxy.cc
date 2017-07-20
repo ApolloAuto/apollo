@@ -26,7 +26,7 @@ namespace apollo {
 namespace planning {
 
 void PerceptionProxy::add_perception_obstacles(
-    const apollo::perception::PerceptionObstacles& perception_obstacles) {
+    const apollo::perception::PerceptionObstacles &perception_obstacles) {
   if (_perception_frame.size() >
       static_cast<std::size_t>(FLAGS_max_frame_size)) {
     _perception_frame.pop_front();
@@ -35,7 +35,7 @@ void PerceptionProxy::add_perception_obstacles(
   return;
 }
 
-apollo::perception::PerceptionObstacles*
+apollo::perception::PerceptionObstacles *
 PerceptionProxy::get_latest_perception_frame() {
   if (_perception_frame.size() == 0) {
     return nullptr;
@@ -43,7 +43,7 @@ PerceptionProxy::get_latest_perception_frame() {
   return &(*(_perception_frame.rbegin()));
 }
 
-const std::list<apollo::perception::PerceptionObstacles>&
+const std::list<apollo::perception::PerceptionObstacles> &
 PerceptionProxy::perception_frame() const {
   return _perception_frame;
 }

@@ -35,12 +35,12 @@ class VehicleStateProxy {
   VehicleStateProxy() = default;
 
   void set_vehicle_chassis(
-      const ::apollo::common::config::VehicleConfig& config,
-      const ::apollo::localization::LocalizationEstimate& localization_estimate,
-      const ::apollo::canbus::Chassis& chassis);
+      const ::apollo::common::config::VehicleConfig &config,
+      const ::apollo::localization::LocalizationEstimate &localization_estimate,
+      const ::apollo::canbus::Chassis &chassis);
 
-  const ::apollo::localization::LocalizationEstimate& localization_estimate();
-  const ::apollo::canbus::Chassis& vehicle_chassis() const;
+  const ::apollo::localization::LocalizationEstimate &localization_estimate();
+  const ::apollo::canbus::Chassis &vehicle_chassis() const;
   const ::apollo::canbus::Chassis::GearPosition gear() const;
 
   // adc stand for autonomous driving car detected status
@@ -55,11 +55,11 @@ class VehicleStateProxy {
   // init_point with adc_status and index = 0 is returned;
   // init point relative time with respect to current car status proto
   const ::apollo::common::TrajectoryPoint init_point(
-      const Frame* const prev_frame) const;
-  bool need_planner_reinit(const Frame* const prev_frame) const;
+      const Frame *const prev_frame) const;
+  bool need_planner_reinit(const Frame *const prev_frame) const;
 
  private:
-  void init(const ::apollo::common::config::VehicleConfig& config);
+  void init(const ::apollo::common::config::VehicleConfig &config);
 
  private:
   ::apollo::common::config::VehicleConfig _config;

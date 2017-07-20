@@ -34,9 +34,9 @@ class Decision {
   };
 
  public:
-  explicit Decision(const double& buffer, const DecisionType type);
+  explicit Decision(const double &buffer, const DecisionType type);
   double Buffer() const;
-  const DecisionType& Type() const;
+  const DecisionType &Type() const;
 
  private:
   double buffer_ = 0.0;

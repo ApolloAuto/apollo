@@ -33,7 +33,7 @@ namespace util {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
-PathPoint interpolate(const PathPoint& p0, const PathPoint& p1,
+PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
                       const double s) {
   double s0 = p0.s();
   double s1 = p1.s();
@@ -52,9 +52,9 @@ PathPoint interpolate(const PathPoint& p0, const PathPoint& p1,
   };
 
   double x = p0.x() + apollo::common::math::IntegrateByGaussLegendre(
-                          func_cos_theta, s0, s);
+      func_cos_theta, s0, s);
   double y = p0.y() + apollo::common::math::IntegrateByGaussLegendre(
-                          func_sin_theta, s0, s);
+      func_sin_theta, s0, s);
   double theta = geometry_spline.evaluate(0, s);
   double kappa = geometry_spline.evaluate(1, s);
   double dkappa = geometry_spline.evaluate(2, s);
@@ -71,8 +71,8 @@ PathPoint interpolate(const PathPoint& p0, const PathPoint& p1,
   return std::move(p);
 }
 
-PathPoint interpolate_linear_approximation(const PathPoint& p0,
-                                           const PathPoint& p1,
+PathPoint interpolate_linear_approximation(const PathPoint &p0,
+                                           const PathPoint &p1,
                                            const double s) {
   double s0 = p0.s();
   double s1 = p1.s();
@@ -99,10 +99,10 @@ PathPoint interpolate_linear_approximation(const PathPoint& p0,
   return path_point;
 }
 
-TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
-                            const TrajectoryPoint& tp1, const double t) {
-  const PathPoint& pp0 = tp0.path_point();
-  const PathPoint& pp1 = tp1.path_point();
+TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
+                            const TrajectoryPoint &tp1, const double t) {
+  const PathPoint &pp0 = tp0.path_point();
+  const PathPoint &pp1 = tp1.path_point();
   double t0 = tp0.relative_time();
   double t1 = tp1.relative_time();
 
@@ -133,9 +133,9 @@ TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
   };
 
   double x = pp0.x() + apollo::common::math::IntegrateByGaussLegendre(
-                           func_cos_theta, s0, s);
+      func_cos_theta, s0, s);
   double y = pp0.y() + apollo::common::math::IntegrateByGaussLegendre(
-                           func_sin_theta, s0, s);
+      func_sin_theta, s0, s);
   double theta = geometry_spline.evaluate(0, s);
   double kappa = geometry_spline.evaluate(1, s);
   double dkappa = geometry_spline.evaluate(2, s);
@@ -145,7 +145,7 @@ TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
   tp.set_v(v);
   tp.set_a(a);
 
-  PathPoint* path_point = tp.mutable_path_point();
+  PathPoint *path_point = tp.mutable_path_point();
   path_point->set_x(x);
   path_point->set_y(y);
   path_point->set_theta(theta);
@@ -158,11 +158,11 @@ TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
   return tp;
 }
 
-TrajectoryPoint interpolate_linear_approximation(const TrajectoryPoint& tp0,
-                                                 const TrajectoryPoint& tp1,
+TrajectoryPoint interpolate_linear_approximation(const TrajectoryPoint &tp0,
+                                                 const TrajectoryPoint &tp1,
                                                  const double t) {
-  const PathPoint& pp0 = tp0.path_point();
-  const PathPoint& pp1 = tp1.path_point();
+  const PathPoint &pp0 = tp0.path_point();
+  const PathPoint &pp1 = tp1.path_point();
   double t0 = tp0.relative_time();
   double t1 = tp1.relative_time();
 
@@ -171,7 +171,7 @@ TrajectoryPoint interpolate_linear_approximation(const TrajectoryPoint& tp0,
   tp.set_a(apollo::common::math::lerp(tp0.a(), t0, tp1.a(), t1, t));
   tp.set_relative_time(t);
 
-  PathPoint* path_point = tp.mutable_path_point();
+  PathPoint *path_point = tp.mutable_path_point();
   path_point->set_x(apollo::common::math::lerp(pp0.x(), t0, pp1.x(), t1, t));
   path_point->set_y(apollo::common::math::lerp(pp0.y(), t0, pp1.y(), t1, t));
   path_point->set_theta(

@@ -24,8 +24,8 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-common::SLPoint interpolate(const common::SLPoint& start,
-                            const common::SLPoint& end, const double weight) {
+common::SLPoint interpolate(const common::SLPoint &start,
+                            const common::SLPoint &end, const double weight) {
   common::SLPoint point;
   double s = start.s() * (1 - weight) + end.s() * weight;
   double l = start.l() * (1 - weight) + end.l() * weight;
