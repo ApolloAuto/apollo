@@ -20,7 +20,7 @@
 
 #include "modules/planning/common/logic_node.h"
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {

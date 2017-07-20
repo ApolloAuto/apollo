@@ -7,8 +7,6 @@ cc_library(
     hdrs = [
         "curve1d.h",
     ],
-    deps = [
-    ],
 )
 
 cc_library(
@@ -30,8 +28,8 @@ cc_library(
         "quartic_polynomial_curve1d.h",
     ],
     deps = [
-        "polynomial_curve1d",
-        "@glog//:glog",
+        ":polynomial_curve1d",
+        "//modules/common:log",
     ],
 )
 
@@ -44,8 +42,8 @@ cc_library(
         "quintic_polynomial_curve1d.h",
     ],
     deps = [
-        "polynomial_curve1d",
-        "@glog//:glog",
+        ":polynomial_curve1d",
+        "//modules/common:log",
     ],
 )
 

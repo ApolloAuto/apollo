@@ -21,8 +21,8 @@
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 #include <cmath>
-#include "glog/logging.h"
 
+#include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 
 namespace apollo {

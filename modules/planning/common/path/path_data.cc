@@ -21,8 +21,8 @@
 #include "modules/planning/common/path/path_data.h"
 
 #include <sstream>
-#include "glog/logging.h"
 
+#include "modules/common/log.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
@@ -64,7 +64,7 @@ bool PathData::get_path_point_with_path_s(
   } else {
     double s0 = (it_lower - 1)->s();
     double s1 = it_lower->s();
-    CHECK(s0 < s1);
+    CHECK_LT(s0, s1);
     *path_point =
         util::interpolate_linear_approximation(*(it_lower - 1), *it_lower, s);
   }
@@ -93,7 +93,7 @@ bool PathData::get_path_point_with_ref_s(
     //        double ref_s0 = (it_lower - 1)->s();
     //        double ref_s1 = it_lower->s();
     //
-    //        CHECK(ref_s0 < ref_s1);
+    //        CHECK_LT(ref_s0, ref_s1);
     //        double weight = (ref_s - ref_s0) / (ref_s1 - ref_s0);
     //        *path_point =
     //        common::PathPoint::interpolate_linear_approximation(path_.path_point_at(index_lower

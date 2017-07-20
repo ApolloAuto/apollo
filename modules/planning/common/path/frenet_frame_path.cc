@@ -20,8 +20,8 @@
 #include "modules/planning/common/path/frenet_frame_path.h"
 
 #include <utility>
-#include "glog/logging.h"
 
+#include "modules/common/log.h"
 #include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
@@ -49,12 +49,12 @@ std::size_t FrenetFramePath::num_points() const { return points_.size(); }
 
 const common::FrenetFramePoint& FrenetFramePath::point_at(
     const std::size_t index) const {
-  CHECK(index < points_.size());
+  CHECK_LT(index, points_.size());
   return points_[index];
 }
 
 common::FrenetFramePoint& FrenetFramePath::point_at(const std::size_t index) {
-  CHECK(index < points_.size());
+  CHECK_LT(index, points_.size());
   return points_[index];
 }
 
