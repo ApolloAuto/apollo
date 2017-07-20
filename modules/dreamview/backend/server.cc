@@ -20,66 +20,15 @@
 
 #include "CivetServer.h"
 #include "gflags/gflags.h"
-#include "google/protobuf/util/json_util.h"
 
-#include "modules/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/dreamview/backend/simulation_world_service.h"
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/dreamview/backend/simulation_world_updater.h"
 #include "modules/dreamview/backend/websocket.h"
 
 DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
               "The path to the dreamview distribution directory. The default "
               "value points to built-in version from the Apollo project.");
 DEFINE_int32(server_port, 8888, "The port of backend webserver");
-
-namespace apollo {
-namespace dreamview {
-
-using apollo::common::time::AsInt64;
-using apollo::common::time::Clock;
-using apollo::common::time::millis;
-
-using Json = nlohmann::json;
-
-/**
- * @class SimulationWorldUpdater
- * @brief A wrapper around SimulationWorldService and WebSocketHandler to keep
- * pushing SimulationWorld to frontend via websocket while handling the response
- * from frontend.
- */
-class SimulationWorldUpdater {
- public:
-  /**
-   * @brief Constructor with the websocket handler.
-   * @param websocket Pointer of the websocket handler that has been attached to
-   * the server.
-   */
-  explicit SimulationWorldUpdater(WebSocketHandler *websocket)
-      : sim_world_service_(), websocket_(websocket) {}
-
-  /**
-   * @brief The callback function to get updates from SimulationWorldService,
-   * and push them to the frontend clients via websocket when the periodic timer
-   * is triggered.
-   * @param event Timer event
-   */
-  void OnPushTimer(const ros::TimerEvent &event) {
-    sim_world_service_.Update();
-    if (!sim_world_service_.ReadyToPush()) {
-      AWARN << "Not sending simulation world as the data is not ready!";
-      return;
-    }
-    auto json = sim_world_service_.GetUpdateAsJson();
-    websocket_->SendData(json.dump());
-  }
-
- private:
-  SimulationWorldService sim_world_service_;
-  WebSocketHandler *websocket_;
-};
-
-}  // namespace dreamview
-}  // namespace apollo
 
 /// Time interval, in seconds, between pushing SimulationWorld to frontend.
 static constexpr double kTimeInterval = 0.1;

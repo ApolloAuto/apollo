@@ -17,7 +17,8 @@ limitations under the License.
 
 #include <sstream>
 #include <vector>
-#include "glog/logging.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace dreamview {
@@ -27,8 +28,7 @@ void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
     std::unique_lock<std::mutex> lock(mutex_);
     connections_.insert(conn);
   }
-  LOG(INFO) << "Accepted connection. Total connections: "
-            << connections_.size();
+  AINFO << "Accepted connection. Total connections: " << connections_.size();
 }
 
 void WebSocketHandler::handleClose(CivetServer *server,
@@ -38,7 +38,7 @@ void WebSocketHandler::handleClose(CivetServer *server,
     // Remove from the store of currently open connections.
     connections_.erase(const_cast<Connection *>(conn));
   }
-  LOG(INFO) << "Connection closed. Total connections: " << connections_.size();
+  AINFO << "Connection closed. Total connections: " << connections_.size();
 }
 
 bool WebSocketHandler::SendData(const std::string &data) {
@@ -79,7 +79,7 @@ bool WebSocketHandler::SendData(const std::string &data, Connection *conn) {
          << " bytes";
       msg = os.str();
     }
-    LOG(WARNING) << "Failed to send data via websocket connection. Reason: "
+    AWARN << "Failed to send data via websocket connection. Reason: "
                  << msg;
     return false;
   }
@@ -98,7 +98,7 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
   auto type = json["type"];
 
   if (message_handlers_.find(type) == message_handlers_.end()) {
-    LOG(ERROR) << "No message handler found for message type " << type
+    AERROR << "No message handler found for message type " << type
                << ". The message will be discarded!";
     return true;
   }
