@@ -16,7 +16,7 @@ cc_library(
         "//modules/common/proto:path_point_proto",
         "//modules/planning/math:hermite_spline",
         "//modules/planning/math:integration",
-        "//modules/planning/math:interpolation",
+        "//modules/common/math:math",
         "@eigen//:eigen",
     ],
 )
