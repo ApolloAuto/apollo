@@ -44,5 +44,5 @@ TEST_F(Accel6bTest, Parse) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

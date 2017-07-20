@@ -83,9 +83,9 @@ class Canbus : public apollo::common::ApolloApp {
  private:
   void PublishChassis();
   void PublishChassisDetail();
-  void OnTimer(const ros::TimerEvent& event);
-  void OnControlCommand(const apollo::control::ControlCommand& control_command);
-  apollo::common::Status OnError(const std::string& error_msg);
+  void OnTimer(const ros::TimerEvent &event);
+  void OnControlCommand(const apollo::control::ControlCommand &control_command);
+  apollo::common::Status OnError(const std::string &error_msg);
   void RegisterCanClients();
 
   CanbusConf canbus_conf_;

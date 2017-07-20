@@ -48,7 +48,7 @@ class LatControllerTest : public ::testing::Test, LatController {
         "modules/control/testdata/conf/lincoln.pb.txt";
     ControlConf control_conf;
     CHECK(apollo::common::util::GetProtoFromFile(control_conf_file,
-                                                       &control_conf));
+                                                 &control_conf));
     lateral_conf_ = control_conf.lat_controller_conf();
 
     timestamp_ = apollo::common::time::ToSecond(Clock::Now());
@@ -56,14 +56,14 @@ class LatControllerTest : public ::testing::Test, LatController {
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
-                            const TrajectoryAnalyzer& trajectory_analyzer,
-                            SimpleLateralDebug* debug) const {
+                            const TrajectoryAnalyzer &trajectory_analyzer,
+                            SimpleLateralDebug *debug) const {
     LatController::ComputeLateralErrors(x, y, theta, linear_v, angular_v,
                                         trajectory_analyzer, debug);
   }
 
  protected:
-  LocalizationPb LoadLocalizaionPb(const std::string& filename) {
+  LocalizationPb LoadLocalizaionPb(const std::string &filename) {
     LocalizationPb localization_pb;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &localization_pb))
         << "Failed to open file " << filename;
@@ -71,7 +71,7 @@ class LatControllerTest : public ::testing::Test, LatController {
     return std::move(localization_pb);
   }
 
-  ChassisPb LoadChassisPb(const std::string& filename) {
+  ChassisPb LoadChassisPb(const std::string &filename) {
     ChassisPb chassis_pb;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
@@ -79,7 +79,7 @@ class LatControllerTest : public ::testing::Test, LatController {
     return std::move(chassis_pb);
   }
 
-  PlanningTrajectoryPb LoadPlanningTrajectoryPb(const std::string& filename) {
+  PlanningTrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
     PlanningTrajectoryPb planning_trajectory_pb;
     CHECK(apollo::common::util::GetProtoFromFile(filename,
                                                  &planning_trajectory_pb))
@@ -110,7 +110,7 @@ TEST_F(LatControllerTest, ComputeLateralErrors) {
   TrajectoryAnalyzer trajectory_analyzer(&planning_trajectory_pb);
 
   ControlCommand cmd;
-  SimpleLateralDebug* debug = cmd.mutable_debug()->mutable_simple_lat_debug();
+  SimpleLateralDebug *debug = cmd.mutable_debug()->mutable_simple_lat_debug();
 
   ComputeLateralErrors(vehicle_state.x(), vehicle_state.y(),
                        vehicle_state.heading(), vehicle_state.linear_velocity(),

@@ -82,22 +82,22 @@ class Control : public apollo::common::ApolloApp {
 
  private:
   // Upon receiving pad message
-  void OnPad(const apollo::control::PadMessage& pad);
+  void OnPad(const apollo::control::PadMessage &pad);
 
   // Upon receiving monitor message
   void OnMonitor(
-      const apollo::common::monitor::MonitorMessage& monitor_message);
+      const apollo::common::monitor::MonitorMessage &monitor_message);
 
   // Watch dog timer
-  void OnTimer(const ros::TimerEvent&);
+  void OnTimer(const ros::TimerEvent &);
 
-  Status ProduceControlCommand(ControlCommand* control_command);
+  Status ProduceControlCommand(ControlCommand *control_command);
   Status CheckInput();
   Status CheckTimestamp();
   Status CheckPad();
 
   void Alert();
-  void SendCmd(ControlCommand* control_command);
+  void SendCmd(ControlCommand *control_command);
 
  private:
   ::apollo::localization::LocalizationEstimate localization_;

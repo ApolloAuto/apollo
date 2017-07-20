@@ -23,10 +23,10 @@
 #include <cstddef>
 
 // Put this in the declarations for a class to be uncopyable.
-#define DISABLE_COPY(TypeName) TypeName(const TypeName&) = delete
+#define DISABLE_COPY(TypeName) TypeName(const TypeName &) = delete
 
 // Put this in the declarations for a class to be unassignable.
-#define DISABLE_ASSIGN(TypeName) void operator=(const TypeName&) = delete
+#define DISABLE_ASSIGN(TypeName) void operator=(const TypeName &) = delete
 
 // A macro to disallow the copy constructor and operator= functions.
 // This should be used in the private: declarations for a class.
@@ -47,7 +47,7 @@
 // Creates a thread-safe singleton.
 #define MAKE_SINGLETON(TypeName) \
  public:                         \
-  static TypeName* instance() {  \
+  static TypeName *instance() {  \
     static TypeName instance;    \
     return &instance;            \
   }                              \

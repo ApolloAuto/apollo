@@ -55,7 +55,7 @@ class SenderMessage {
    * @param protocol_data A pointer of ProtocolData
    *        which contains the content to send.
    */
-  SenderMessage(const uint32_t message_id, ProtocolData* protocol_data);
+  SenderMessage(const uint32_t message_id, ProtocolData *protocol_data);
 
   /**
    * @brief Constructor which takes message ID and protocol data and
@@ -66,7 +66,7 @@ class SenderMessage {
    * @param init_with_one If it is true, then initialize all bits in
    *        the protocal data as one.
    */
-  SenderMessage(const uint32_t message_id, ProtocolData* protocol_data,
+  SenderMessage(const uint32_t message_id, ProtocolData *protocol_data,
                 bool init_with_one);
 
   /**
@@ -107,7 +107,7 @@ class SenderMessage {
 
  private:
   uint32_t message_id_ = 0;
-  ProtocolData* protocol_data_ = nullptr;
+  ProtocolData *protocol_data_ = nullptr;
 
   int32_t period_ = 0;
   int32_t curr_period_ = 0;
@@ -140,7 +140,7 @@ class CanSender {
    * @param enable_log whether enable record the send can frame log
    * @return An error code indicating the status of this initialization.
    */
-  ::apollo::common::ErrorCode Init(CanClient* can_client, bool enable_log);
+  ::apollo::common::ErrorCode Init(CanClient *can_client, bool enable_log);
 
   /**
    * @brief Add a message with its ID, protocol data.
@@ -150,7 +150,7 @@ class CanSender {
    * @param init_with_one If it is true, then initialize all bits in
    *        the protocal data as one. By default, it is false.
    */
-  void AddMessage(uint32_t message_id, ProtocolData* protocol_data,
+  void AddMessage(uint32_t message_id, ProtocolData *protocol_data,
                   bool init_one = false);
 
   /**
@@ -182,11 +182,11 @@ class CanSender {
  private:
   void PowerSendThreadFunc();
 
-  bool NeedSend(const SenderMessage& msg, const int32_t delta_period);
+  bool NeedSend(const SenderMessage &msg, const int32_t delta_period);
   bool is_init_ = false;
   bool is_running_ = false;
 
-  CanClient* can_client_ = nullptr;  // Owned by global canbus.cc
+  CanClient *can_client_ = nullptr;  // Owned by global canbus.cc
   std::vector<SenderMessage> send_messages_;
   std::unique_ptr<std::thread> thread_;
   bool enable_log_ = false;

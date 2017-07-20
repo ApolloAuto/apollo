@@ -45,10 +45,9 @@ class WebSocketEndpoint {
 // the webserver plus one.
 function deduceWebsocketServer() {
     const server = window.location.origin;
-    const websocket_port = parseInt(window.location.port) + 1;
     const link = document.createElement("a");
     link.href = server;
-    return `ws://${link.hostname}:${websocket_port}`;
+    return `ws://${link.hostname}:${window.location.port}/websocket`;
 }
 
 // NOTE: process.env.NODE_ENV will be set to "production" by webpack when

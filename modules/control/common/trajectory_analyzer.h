@@ -53,7 +53,7 @@ class TrajectoryAnalyzer {
    * planning module
    */
   TrajectoryAnalyzer(
-      const planning::ADCTrajectory* planning_published_trajectory);
+      const planning::ADCTrajectory *planning_published_trajectory);
 
   /**
    * @brief destructor
@@ -102,8 +102,8 @@ class TrajectoryAnalyzer {
    * @return a point on trajectory, the point may be a point of trajectory
    * or interpolated by two adjacent points of trajectory
    */
-  apollo::common::PathPoint QueryMatchedPathPoint(
-      const double x, const double y) const;
+  apollo::common::PathPoint QueryMatchedPathPoint(const double x,
+                                                  const double y) const;
 
   /**
    * @brief convert a position with theta and speed to trajectory frame,
@@ -120,21 +120,21 @@ class TrajectoryAnalyzer {
    */
   void ToTrajectoryFrame(const double x, const double y, const double theta,
                          const double v,
-                         const apollo::common::PathPoint& matched_point,
-                         double* ptr_s, double* ptr_s_dot, double* ptr_d,
-                         double* ptr_d_dot) const;
+                         const apollo::common::PathPoint &matched_point,
+                         double *ptr_s, double *ptr_s_dot, double *ptr_d,
+                         double *ptr_d_dot) const;
 
   /**
    * @brief get all points of the trajectory
    * @return a vector of trajectory points
    */
-  const std::vector<apollo::common::TrajectoryPoint>& trajectory_points() const;
+  const std::vector<apollo::common::TrajectoryPoint> &trajectory_points() const;
 
  private:
   apollo::common::PathPoint FindMinDistancePoint(
-      const apollo::common::TrajectoryPoint& p0,
-      const apollo::common::TrajectoryPoint& p1,
-      const double x, const double y) const;
+      const apollo::common::TrajectoryPoint &p0,
+      const apollo::common::TrajectoryPoint &p1, const double x,
+      const double y) const;
 
   std::vector<apollo::common::TrajectoryPoint> trajectory_points_;
 

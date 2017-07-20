@@ -25,4 +25,4 @@ So far, many build problems are related to environment setting. You can run the 
 
 ## Which ports need be white list to run Apollo in public cloud instance?
 8887: HMI
-8888, 8889: Dreamview
+8888: Dreamview

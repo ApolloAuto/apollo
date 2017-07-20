@@ -47,8 +47,8 @@ class DigitalFilter {
    * @param denominators The denominators of the DigitalFilter.
    * @param numerators The numerators of the DigitalFilter.
    */
-  DigitalFilter(const std::vector<double>& denominators,
-                const std::vector<double>& numerators);
+  DigitalFilter(const std::vector<double> &denominators,
+                const std::vector<double> &numerators);
 
   /**
    * @brief Default destructor.
@@ -75,21 +75,21 @@ class DigitalFilter {
    * @brief set denominators by an input vector
    * @param denominators The denominators of filter
    */
-  void set_denominators(const std::vector<double>& denominators);
+  void set_denominators(const std::vector<double> &denominators);
 
   /**
    * @brief set numerators by an input vector
    * @param numerators The numerators of filter
    */
-  void set_numerators(const std::vector<double>& numerators);
+  void set_numerators(const std::vector<double> &numerators);
 
   /**
    * @brief set denominators and numerators
    * @param denominators The denominators of filter
    * @param numerators The numerators of filter
    */
-  void set_coefficients(const std::vector<double>& denominators,
-                        const std::vector<double>& numerators);
+  void set_coefficients(const std::vector<double> &denominators,
+                        const std::vector<double> &numerators);
 
   /**
    * @brief set filter deadzone
@@ -101,13 +101,13 @@ class DigitalFilter {
    * @brief get denominators
    * @return vector<double> The denominators of filter
    */
-  const std::vector<double>& denominators() const;
+  const std::vector<double> &denominators() const;
 
   /**
    * @brief get numerators
    * @return vector<double> The numerators of filter
    */
-  const std::vector<double>& numerators() const;
+  const std::vector<double> &numerators() const;
 
   /**
    * @brief get dead_zone
@@ -126,8 +126,8 @@ class DigitalFilter {
    * @desc: Compute the inner product of values[coeff_start : coeff_end] and
    *        coefficients[coeff_start : coeff_end]
    */
-  double Compute(const std::deque<double>& values,
-                 const std::vector<double>& coefficients,
+  double Compute(const std::deque<double> &values,
+                 const std::vector<double> &coefficients,
                  const std::size_t coeff_start, const std::size_t coeff_end);
 
   // Front is latest, back is oldest.

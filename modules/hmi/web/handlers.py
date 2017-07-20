@@ -36,12 +36,6 @@ app.secret_key = str(datetime.datetime.now())
 socketio = flask_socketio.SocketIO(app)
 
 
-@app.template_filter('log_file_shortcut')
-def log_file_shortcut(filename):
-    HEADING = 'data/log/'
-    return filename[len(HEADING):] if filename.startswith(HEADING) else filename
-
-
 # Web page handlers.
 @app.route('/')
 def index_page():

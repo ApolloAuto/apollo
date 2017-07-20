@@ -51,7 +51,7 @@ std::string GetLogFileName() {
   return std::string(name_buffer);
 }
 
-void WriteHeaders(std::ofstream& file_stream) {
+void WriteHeaders(std::ofstream &file_stream) {
   file_stream << "current_lateral_error,"
               << "current_ref_heading,"
               << "current_heading,"
@@ -83,7 +83,7 @@ LatController::LatController() : name_("LQR-based Lateral Controller") {
 
 LatController::~LatController() { CloseLogFile(); }
 
-bool LatController::LoadControlConf(const ControlConf* control_conf) {
+bool LatController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
     AERROR << "[LatController] control_conf == nullptr";
     return false;
@@ -117,8 +117,8 @@ bool LatController::LoadControlConf(const ControlConf* control_conf) {
   return true;
 }
 
-void LatController::ProcessLogs(const SimpleLateralDebug* debug,
-                                const canbus::Chassis* chassis) {
+void LatController::ProcessLogs(const SimpleLateralDebug *debug,
+                                const canbus::Chassis *chassis) {
   std::stringstream log_stream;
   log_stream << debug->lateral_error() << "," << debug->ref_heading() << ","
              << vehicle_state_.heading() << "," << debug->heading_error() << ","
@@ -147,7 +147,7 @@ void LatController::LogInitParameters() {
         << " lr_: " << lr_;
 }
 
-void LatController::InitializeFilters(const ControlConf* control_conf) {
+void LatController::InitializeFilters(const ControlConf *control_conf) {
   // Low pass filter
   std::vector<double> den(3, 0.0);
   std::vector<double> num(3, 0.0);
@@ -163,7 +163,7 @@ void LatController::InitializeFilters(const ControlConf* control_conf) {
       MeanFilter(control_conf->lat_controller_conf().mean_filter_window_size());
 }
 
-Status LatController::Init(const ControlConf* control_conf) {
+Status LatController::Init(const ControlConf *control_conf) {
   if (!LoadControlConf(control_conf)) {
     AERROR << "failed to load control conf";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
@@ -228,10 +228,10 @@ void LatController::Stop() { CloseLogFile(); }
 std::string LatController::Name() const { return name_; }
 
 Status LatController::ComputeControlCommand(
-    const localization::LocalizationEstimate* localization,
-    const canbus::Chassis* chassis,
-    const planning::ADCTrajectory* planning_published_trajectory,
-    ControlCommand* cmd) {
+    const localization::LocalizationEstimate *localization,
+    const canbus::Chassis *chassis,
+    const planning::ADCTrajectory *planning_published_trajectory,
+    ControlCommand *cmd) {
   vehicle_state_ = std::move(VehicleState(localization, chassis));
   vehicle_state_.set_linear_velocity(
       std::max(vehicle_state_.linear_velocity(), 1.0));
@@ -239,7 +239,7 @@ Status LatController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
 
-  SimpleLateralDebug* debug = cmd->mutable_debug()->mutable_simple_lat_debug();
+  SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
   debug->Clear();
 
   // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
@@ -272,13 +272,14 @@ Status LatController::ComputeControlCommand(
   steer_angle = apollo::common::math::Clamp(steer_angle, -100.0, 100.0);
 
   double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
-       (vehicle_state_.linear_velocity() * vehicle_state_.linear_velocity())) *
-       steer_transmission_ratio_ * 180 / M_PI /
-       steer_single_direction_max_degree_;
+                                 (vehicle_state_.linear_velocity() *
+                                  vehicle_state_.linear_velocity())) *
+                       steer_transmission_ratio_ * 180 / M_PI /
+                       steer_single_direction_max_degree_;
 
   // Clamp the steer angle
-  double steer_angle_limited = apollo::common::math::Clamp(steer_angle,
-                               -steer_limit, steer_limit);
+  double steer_angle_limited =
+      apollo::common::math::Clamp(steer_angle, -steer_limit, steer_limit);
 
   steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
   cmd->set_steering_target(steer_angle_limited);
@@ -328,7 +329,7 @@ Status LatController::Reset() {
 
 // state = [Lateral Error, Lateral Error Rate, Heading Error, Heading Error
 // Rate, Preview Lateral1, Preview Lateral2, ...]
-void LatController::UpdateState(SimpleLateralDebug* debug) {
+void LatController::UpdateState(SimpleLateralDebug *debug) {
   TrajectoryPoint traj_point;
   Eigen::Vector2d com = vehicle_state_.ComputeCOMPosition(lr_);
   double raw_lateral_error = GetLateralError(com, &traj_point);
@@ -346,6 +347,11 @@ void LatController::UpdateState(SimpleLateralDebug* debug) {
   //    common::math::NormalizeAngle(vehicle_state_.heading() - ref_heading_);
   debug->set_heading_error(common::math::NormalizeAngle(
       vehicle_state_.heading() - traj_point.theta()));
+
+  // Reverse heading error if vehicle is going in reverse
+  if (vehicle_state_.gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+    debug->set_heading_error(-debug->heading_error());
+  }
 
   // heading_error_rate_ = (heading_error_ - previous_heading_error_) / ts_;
   debug->set_heading_error_rate(
@@ -376,7 +382,7 @@ void LatController::UpdateState(SimpleLateralDebug* debug) {
   // preview matrix update;
 }
 
-void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug* debug) {
+void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
   Eigen::Vector2d com = vehicle_state_.ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(), vehicle_state_.heading(),
                        vehicle_state_.linear_velocity(),
@@ -455,13 +461,13 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
  *  left to the ref_line, L is +
  * right to the ref_line, L is -
  */
-double LatController::GetLateralError(const Eigen::Vector2d& point,
-                                      TrajectoryPoint* traj_point) const {
+double LatController::GetLateralError(const Eigen::Vector2d &point,
+                                      TrajectoryPoint *traj_point) const {
   auto closest =
       trajectory_analyzer_.QueryNearestPointByPosition(point.x(), point.y());
 
-  double point_angle = std::atan2(point.y() - closest.y(),
-                                  point.x() - closest.x());
+  double point_angle =
+      std::atan2(point.y() - closest.y(), point.x() - closest.x());
   double point2path_angle = point_angle - closest.theta();
   if (traj_point != nullptr) {
     *traj_point = closest;
@@ -474,8 +480,8 @@ double LatController::GetLateralError(const Eigen::Vector2d& point,
 
 void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
-    const double angular_v, const TrajectoryAnalyzer& trajectory_analyzer,
-    SimpleLateralDebug* debug) const {
+    const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
+    SimpleLateralDebug *debug) const {
   auto matched_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
 
   double dx = x - matched_point.x();
