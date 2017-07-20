@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/path/path.h"
+#include "modules/map/pnc_map/path.h"
 
 #include <cstdlib>
 #include <limits>
@@ -27,7 +27,7 @@
 #include "modules/common/math/vec2d.h"
 
 namespace apollo {
-namespace common {
+namespace hdmap {
 
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Polygon2d;
@@ -934,5 +934,5 @@ bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
   return false;
 }
 
-}  // namespace common
+}  // namespace hdmap
 }  // namespace apollo
