@@ -6,6 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
 import "modules/common/proto/path_point.proto";
 import "modules/canbus/proto/chassis.proto";
+import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
 
 // TODO(aaron): Migrate to apollo::common::TrajectoryPoint.
@@ -73,4 +74,5 @@ message ADCTrajectory {
   // Specify trajectory gear
   optional apollo.canbus.Chassis.GearPosition gear = 10;
   optional apollo.common.VehicleSignal signal = 11;
+  optional apollo.planning.DecisionResult decision = 14;
 }
