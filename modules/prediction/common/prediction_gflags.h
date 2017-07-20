@@ -36,5 +36,6 @@ DECLARE_bool(enable_kf_tracking);
 DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
 DECLARE_string(map_file);
+DECLARE_double(prediction_duration);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

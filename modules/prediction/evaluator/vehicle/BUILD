@@ -14,6 +14,8 @@ cc_library(
         "//modules/prediction/evaluator:evaluator",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:lane_graph_proto",
+        "//modules/prediction/common:prediction_common",
+        "//modules/common/math:math_utils",
     ],
 )
 
