@@ -23,26 +23,26 @@
 namespace apollo {
 namespace planning {
 
-ReferencePoint::ReferencePoint(const ::adu::common::math::Vec2d& point,
+ReferencePoint::ReferencePoint(const ::apollo::common::math::Vec2d& point,
                                const double heading, const double kappa,
                                const double dkappa, const double lower_bound,
                                const double upper_bound)
-    : ::adu::hdmap::TrajectoryPoint(point, heading),
+    : ::apollo::common::PathPoint(point, heading),
       _kappa(kappa),
       _dkappa(dkappa),
       _lower_bound(lower_bound),
       _upper_bound(upper_bound) {}
 
-ReferencePoint::ReferencePoint(const adu::common::math::Vec2d& point,
-                               const double heading,
-                               const ::adu::hdmap::LaneWaypoint lane_waypoint)
-    : ::adu::hdmap::TrajectoryPoint(point, heading, lane_waypoint) {}
+ReferencePoint::ReferencePoint(
+    const apollo::common::math::Vec2d& point, const double heading,
+    const ::apollo::common::LaneWaypoint lane_waypoint)
+    : ::apollo::common::PathPoint(point, heading, lane_waypoint) {}
 
-ReferencePoint::ReferencePoint(const adu::common::math::Vec2d& point,
-                               const double heading, const double kappa,
-                               const double dkappa,
-                               const ::adu::hdmap::LaneWaypoint lane_waypoint)
-    : ::adu::hdmap::TrajectoryPoint(point, heading, lane_waypoint),
+ReferencePoint::ReferencePoint(
+    const apollo::common::math::Vec2d& point, const double heading,
+    const double kappa, const double dkappa,
+    const ::apollo::common::LaneWaypoint lane_waypoint)
+    : ::apollo::common::PathPoint(point, heading, lane_waypoint),
       _kappa(kappa),
       _dkappa(dkappa) {}
 
@@ -65,8 +65,6 @@ double ReferencePoint::dkappa() const { return _dkappa; }
 double ReferencePoint::lower_bound() const { return _lower_bound; }
 
 double ReferencePoint::upper_bound() const { return _upper_bound; }
-
-std::string ReferencePoint::to_json() const { return ""; }
 
 }  // namespace planning
 }  // namespace apollo
