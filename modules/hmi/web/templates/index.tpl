@@ -99,14 +99,6 @@
     $.get(url);
   }
 
-  // Execute the ros request at background.
-  function ros_request(cmd_name) {
-    // The pattern is generated at template compiling time.
-    url_pattern = '{{ url_for('rosserviceapi', cmd_name='CMD_NAME') }}';
-    url = url_pattern.replace('CMD_NAME', cmd_name);
-    $.get(url);
-  }
-
   function goto_dreamview() {
     javascript:window.location.port = 8888;
   }

@@ -30,13 +30,13 @@ namespace math {
 
 namespace {
 
-bool ProjectByXSlow(const std::vector<Vec2d>& points, double x,
-                    double* const min_y, double* const max_y) {
+bool ProjectByXSlow(const std::vector<Vec2d> &points, double x,
+                    double *const min_y, double *const max_y) {
   *min_y = std::numeric_limits<double>::infinity();
   *max_y = -std::numeric_limits<double>::infinity();
-  for (const Vec2d& p1 : points) {
+  for (const Vec2d &p1 : points) {
     if (p1.x() < x) {
-      for (const Vec2d& p2 : points) {
+      for (const Vec2d &p2 : points) {
         if (p2.x() > x) {
           const double y = ((p2.x() - x) * p1.y() + (x - p1.x()) * p2.y()) /
                            (p2.x() - p1.x());
@@ -537,8 +537,8 @@ TEST(Polygon2dTest, Overlap) {
     for (int x0 = 0; x0 <= kRange; ++x0) {
       key_points.push_back(x0);
     }
-    for (const auto& line_segment1 : polygon1.line_segments()) {
-      for (const auto& line_segment2 : polygon2.line_segments()) {
+    for (const auto &line_segment1 : polygon1.line_segments()) {
+      for (const auto &line_segment2 : polygon2.line_segments()) {
         Vec2d pt;
         if (line_segment1.GetIntersect(line_segment2, &pt)) {
           key_points.push_back(pt.x());

@@ -1,0 +1,23 @@
+header {
+  module_name: "routing"
+  timestamp_sec: 1234.5
+  sequence_num: 1
+}
+routing_request {
+    end {
+        id: "1_-1"
+        s: 153.87421245705966
+        pose {
+            x: 200
+            y: 2
+        }
+    }
+}
+route {
+      id: "1_-1"
+      start_s: 0.0
+      end_s: 153.87421245705966
+}
+measurement {
+     distance: 153.87421245705966
+}

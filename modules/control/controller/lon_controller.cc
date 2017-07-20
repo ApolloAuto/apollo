@@ -104,6 +104,7 @@ Status LonController::Init(const ControlConf *control_conf) {
 
   LoadControlCalibrationTable(lon_controller_conf);
   controller_initialized_ = true;
+
   return Status::OK();
 }
 
@@ -136,7 +137,7 @@ void LonController::LoadControlCalibrationTable(
   AINFO << "Control calibration table size is "
         << control_table.calibration_size();
   Interpolation2D::DataType xyz;
-  for (const auto& calibration : control_table.calibration()) {
+  for (const auto &calibration : control_table.calibration()) {
     xyz.push_back(std::make_tuple(calibration.speed(),
                                   calibration.acceleration(),
                                   calibration.command()));
@@ -283,6 +284,16 @@ Status LonController::ComputeControlCommand(
 
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
+
+  if (std::abs(vehicle_state_.linear_velocity())
+      <= FLAGS_max_abs_speed_when_stopped ||
+      chassis->gear_location() == trajectory_message_->gear() ||
+      chassis->gear_location() == ::apollo::canbus::Chassis::GEAR_NEUTRAL) {
+    cmd->set_gear_location(trajectory_message_->gear());
+  } else {
+    cmd->set_gear_location(chassis->gear_location());
+  }
+
   return Status::OK();
 }
 
@@ -329,12 +340,12 @@ void LonController::ComputeLongitudinalErrors(
   ADEBUG << "matched point:" << matched_point.DebugString();
   ADEBUG << "reference point:" << reference_point.DebugString();
   ADEBUG << "preview point:" << preview_point.DebugString();
-  debug->set_station_error(reference_point.s() - s_matched);
+  debug->set_station_error(reference_point.path_point().s() - s_matched);
   debug->set_speed_error(reference_point.v() - s_dot_matched);
 
-  debug->set_station_reference(reference_point.s());
+  debug->set_station_reference(reference_point.path_point().s());
   debug->set_speed_reference(reference_point.v());
-  debug->set_preview_station_error(preview_point.s() - s_matched);
+  debug->set_preview_station_error(preview_point.path_point().s() - s_matched);
   debug->set_preview_speed_error(preview_point.v() - s_dot_matched);
   debug->set_preview_speed_reference(preview_point.v());
   debug->set_preview_acceleration_reference(preview_point.a());

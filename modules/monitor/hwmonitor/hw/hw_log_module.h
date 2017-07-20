@@ -33,9 +33,7 @@ namespace hw {
 extern log::LogModule _shrd_hw_log_mod PRIVATE;
 
 /// Get pointer to the shared HW log module.
-inline log::LogModule *get_log_module() {
-  return &_shrd_hw_log_mod;
-}
+inline log::LogModule *get_log_module() { return &_shrd_hw_log_mod; }
 
 /// Configs the shared HW log module
 /// @param log_lvl log level

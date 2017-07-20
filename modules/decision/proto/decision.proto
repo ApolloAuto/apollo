@@ -4,8 +4,8 @@ package apollo.decision;
 
 import "modules/common/proto/header.proto";
 import "modules/common/proto/geometry.proto";
+import "modules/common/proto/vehicle_signal.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
-import "modules/canbus/proto/chassis.proto";
 
 message Range {
   optional double start = 1;
@@ -316,7 +316,6 @@ message DecisionResult {
   optional ObjectDecisions object_decision = 2;
   optional MainDecision main_decision = 3;
   optional Debug debug = 4;
+  optional apollo.common.VehicleSignal vehicle_signal = 5;
   optional Stats stats = 6;
-  optional apollo.canbus.Signal signal = 7;
-  optional LightSignal light_signal = 5 [deprecated = true];
 }

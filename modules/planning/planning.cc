@@ -13,26 +13,126 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/planning/planning.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planner_factory.h"
+#include "modules/planning/planner/em/em_planner.h"
+#include "modules/planning/planner/rtk/rtk_replay_planner.h"
+#include "modules/planning/planning.h"
 #include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::TrajectoryPoint;
+using apollo::common::vehicle_state::VehicleState;
 using apollo::common::adapter::AdapterManager;
-using TrajectoryPb = ADCTrajectory;
+using apollo::common::time::Clock;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
-Planning::Planning() {
-  ptr_planner_ = PlannerFactory::CreateInstance(PlannerType::RTK_PLANNER);
+std::string Planning::Name() const { return "planning"; }
+
+void Planning::RegisterPlanners() {
+  planner_factory_.Register(
+      PlanningConfig::RTK, []() -> Planner* { return new RTKReplayPlanner(); });
+  planner_factory_.Register(PlanningConfig::EM,
+                            []() -> Planner* { return new EMPlanner(); });
 }
+
+Status Planning::Init() {
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
+                                              &config_)) {
+    AERROR << "failed to load planning config file "
+           << FLAGS_planning_config_file;
+    return Status(
+        ErrorCode::PLANNING_ERROR,
+        "failed to load planning config file: " + FLAGS_planning_config_file);
+  }
+
+  AdapterManager::Init(FLAGS_adapter_config_path);
+
+  RegisterPlanners();
+  planner_ = planner_factory_.CreateObject(config_.planner_type());
+  if (!planner_) {
+    return Status(
+        ErrorCode::PLANNING_ERROR,
+        "planning is not initialized with config : " + config_.DebugString());
+  }
+
+  return Status::OK();
+}
+
+Status Planning::Start() {
+  static ros::Rate loop_rate(FLAGS_planning_loop_rate);
+  while (ros::ok()) {
+    RunOnce();
+    ros::spinOnce();
+    loop_rate.sleep();
+  }
+
+  return Status::OK();
+}
+
+void Planning::RunOnce() {
+  AdapterManager::Observe();
+  if (AdapterManager::GetLocalization() == nullptr) {
+    AERROR << "Localization is not available; skip the planning cycle";
+    return;
+  }
+  if (AdapterManager::GetLocalization()->Empty()) {
+    AERROR << "localization messages are missing; skip the planning cycle";
+    return;
+  } else {
+    AINFO << "Get localization message;";
+  }
+
+  if (AdapterManager::GetChassis() == nullptr) {
+    AERROR << "Chassis is not available; skip the planning cycle";
+    return;
+  }
+  if (AdapterManager::GetChassis()->Empty()) {
+    AERROR << "Chassis messages are missing; skip the planning cycle";
+    return;
+  } else {
+    AINFO << "Get localization message;";
+  }
+
+  AINFO << "Start planning ...";
+
+  const auto& localization =
+      AdapterManager::GetLocalization()->GetLatestObserved();
+  VehicleState vehicle_state(localization);
+
+  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
+  bool is_on_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
+
+  double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+  // the execution_start_time is the estimated time when the planned trajectory
+  // will be executed by the controller.
+  double execution_start_time =
+      apollo::common::time::ToSecond(apollo::common::time::Clock::Now()) +
+      planning_cycle_time;
+
+  std::vector<TrajectoryPoint> planning_trajectory;
+  bool res_planning = Plan(vehicle_state, is_on_auto_mode, execution_start_time,
+                           &planning_trajectory);
+  if (res_planning) {
+    ADCTrajectory trajectory_pb =
+        ToADCTrajectory(execution_start_time, planning_trajectory);
+    AdapterManager::PublishPlanningTrajectory(trajectory_pb);
+    AINFO << "Planning succeeded";
+  } else {
+    AINFO << "Planning failed";
+  }
+}
+
+void Planning::Stop() {}
 
 bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
                     const bool is_on_auto_mode, const double publish_time,
-                    std::vector<TrajectoryPoint>* planning_trajectory) {
+                    std::vector<TrajectoryPoint> *planning_trajectory) {
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   double execution_start_time = publish_time;
 
@@ -52,15 +152,15 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
     // position and target vehicle position.
     // If the deviation exceeds a specific threshold,
     // it will be unsafe to planning from the matched point.
-    double dx = matched_point.x() - vehicle_state.x();
-    double dy = matched_point.y() - vehicle_state.y();
+    double dx = matched_point.path_point().x() - vehicle_state.x();
+    double dy = matched_point.path_point().y() - vehicle_state.y();
     double position_deviation = std::sqrt(dx * dx + dy * dy);
 
     if (position_deviation < FLAGS_replanning_threshold) {
       // planned trajectory from the matched point, the matched point has
       // relative time 0.
       bool planning_succeeded =
-          ptr_planner_->Plan(matched_point, planning_trajectory);
+          planner_->MakePlan(matched_point, planning_trajectory);
 
       if (!planning_succeeded) {
         last_trajectory_.clear();
@@ -90,7 +190,7 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
       ComputeStartingPointFromVehicleState(vehicle_state, planning_cycle_time);
 
   bool planning_succeeded =
-      ptr_planner_->Plan(vehicle_state_point, planning_trajectory);
+      planner_->MakePlan(vehicle_state_point, planning_trajectory);
   if (!planning_succeeded) {
     last_trajectory_.clear();
     return false;
@@ -104,7 +204,7 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
 std::pair<TrajectoryPoint, std::size_t>
 Planning::ComputeStartingPointFromLastTrajectory(
     const double start_time) const {
-  auto comp = [](const TrajectoryPoint& p, const double t) {
+  auto comp = [](const TrajectoryPoint &p, const double t) {
     return p.relative_time() < t;
   };
 
@@ -119,26 +219,26 @@ Planning::ComputeStartingPointFromLastTrajectory(
 }
 
 TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
-    const common::vehicle_state::VehicleState& vehicle_state,
+    const common::vehicle_state::VehicleState &vehicle_state,
     const double forward_time) const {
   // Eigen::Vector2d estimated_position =
   // vehicle_state.EstimateFuturePosition(forward_time);
   TrajectoryPoint point;
   // point.set_x(estimated_position.x());
   // point.set_y(estimated_position.y());
-  point.set_x(vehicle_state.x());
-  point.set_y(vehicle_state.y());
-  point.set_z(vehicle_state.z());
+  point.mutable_path_point()->set_x(vehicle_state.x());
+  point.mutable_path_point()->set_y(vehicle_state.y());
+  point.mutable_path_point()->set_z(vehicle_state.z());
   point.set_v(vehicle_state.linear_velocity());
   point.set_a(vehicle_state.linear_acceleration());
-  point.set_kappa(0.0);
+  point.mutable_path_point()->set_kappa(0.0);
   const double speed_threshold = 0.1;
   if (point.v() > speed_threshold) {
-    point.set_kappa(
-        vehicle_state.angular_velocity() / vehicle_state.linear_velocity());
+    point.mutable_path_point()->set_kappa(vehicle_state.angular_velocity() /
+                                          vehicle_state.linear_velocity());
   }
-  point.set_dkappa(0.0);
-  point.set_s(0.0);
+  point.mutable_path_point()->set_dkappa(0.0);
+  point.mutable_path_point()->set_s(0.0);
   point.set_relative_time(0.0);
   return point;
 }
@@ -159,10 +259,26 @@ std::vector<TrajectoryPoint> Planning::GetOverheadTrajectory(
 
   double zero_relative_time = last_trajectory_[matched_index].relative_time();
   // reset relative time
-  for (auto& p : overhead_trajectory) {
+  for (auto &p : overhead_trajectory) {
     p.set_relative_time(p.relative_time() - zero_relative_time);
   }
   return overhead_trajectory;
+}
+
+ADCTrajectory Planning::ToADCTrajectory(
+    const double header_time,
+    const std::vector<TrajectoryPoint>& discretized_trajectory) {
+  ADCTrajectory trajectory_pb;
+  AdapterManager::FillPlanningTrajectoryHeader("planning",
+                                               trajectory_pb.mutable_header());
+
+  trajectory_pb.mutable_header()->set_timestamp_sec(header_time);
+
+  for (const auto& trajectory_point : discretized_trajectory) {
+    auto ptr_trajectory_point_pb = trajectory_pb.add_trajectory_point();
+    ptr_trajectory_point_pb->CopyFrom(trajectory_point);
+  }
+  return std::move(trajectory_pb);
 }
 
 }  // namespace planning

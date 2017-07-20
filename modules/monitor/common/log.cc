@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "log.h"
+#include "modules/monitor/common/log.h"
 
 #include <stdio.h>
 
@@ -22,22 +22,19 @@ namespace apollo {
 namespace platform {
 namespace log {
 
-void platform_log_printf(int, const char *format, va_list ap)
-{
+void platform_log_printf(int, const char *format, va_list ap) {
   vprintf(format, ap);
 }
 
-
-void platform_log_write(const LogModule *mod, int priority, const char *format, ...)
-{
+void platform_log_write(const LogModule *mod, int priority, const char *format,
+                        ...) {
   va_list args;
   va_start(args, format);
   mod->log_fn(priority, format, args);
   va_end(args);
 }
 
-void init_syslog(const char *tag)
-{
+void init_syslog(const char *tag) {
   openlog(tag, LOG_CONS | LOG_PID | LOG_DAEMON, LOG_USER);
 }
 

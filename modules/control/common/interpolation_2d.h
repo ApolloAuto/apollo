@@ -50,17 +50,17 @@ class Interpolation2D {
    * @param xyz passing interpolation initialization table data
    * @return true if init is ok.
    */
-  bool Init(const DataType& xyz);
+  bool Init(const DataType &xyz);
 
   /**
    * @brief linear interpolate from 2D key (double, double) to one double value.
    * @param xyz passing interpolation initialization table data
    * @return true if init is ok.
    */
-  double Interpolate(const KeyType& xy) const;
+  double Interpolate(const KeyType &xy) const;
 
  private:
-  double InterpolateYz(const std::map<double, double>& yz_table,
+  double InterpolateYz(const std::map<double, double> &yz_table,
                        double y) const;
 
   double InterpolateValue(const double value_before, const double dist_before,

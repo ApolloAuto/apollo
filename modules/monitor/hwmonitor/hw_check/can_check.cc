@@ -36,7 +36,7 @@ int main(int argc, const char *argv[]) {
   // For other modules that uses glog.
   ::google::InitGoogleLogging("platform");
   apollo::platform::log::init_syslog();
-  // @todo make log level configurable or set lower level here.
+// @todo make log level configurable or set lower level here.
 #ifdef DEBUG
   apollo::platform::hw::config_log(apollo::platform::log::LVL_DBG,
                                    apollo::platform::log::DBG_VERBOSE,
@@ -50,17 +50,16 @@ int main(int argc, const char *argv[]) {
   int can_id = 0;
   EsdCanChecker can_chk(can_id);
   std::vector<HwCheckResult> can_rslt;
-  can_chk.run_check(can_rslt);
+  can_chk.run_check(&can_rslt);
   assert(can_rslt.size() == 1);
 
 #ifdef DEBUG
   apollo::platform::hw::esdcan_print_summary(
       std::cout, *(const EsdCanDetails *)((can_rslt[0].details.get())));
 #else
-  PLATFORM_LOG(apollo::platform::hw::get_log_module(),
-               apollo::platform::log::LVL_DBG,
-               "Done checking ESD-CAN-%d, status: %d",
-               can_id, can_rslt[0].status);
+  PLATFORM_LOG(
+      apollo::platform::hw::get_log_module(), apollo::platform::log::LVL_DBG,
+      "Done checking ESD-CAN-%d, status: %d", can_id, can_rslt[0].status);
 #endif
 
   std::vector<HardwareStatus> hw_status;
