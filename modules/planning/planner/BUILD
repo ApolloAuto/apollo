@@ -17,6 +17,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/common/vehicle_state",
         "//modules/planning/common:lib_planning_common",
+        "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "@eigen//:eigen",
     ],
 )

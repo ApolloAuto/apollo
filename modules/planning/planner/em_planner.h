@@ -17,10 +17,11 @@
 #ifndef MODULES_PLANNING_PLANNER_EM_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_EM_PLANNER_H_
 
-#include "modules/planning/planner/planner.h"
-
 #include <string>
 #include <vector>
+
+#include "modules/planning/planner/planner.h"
+#include "modules/planning/common/speed/speed_point.h"
 
 /**
  * @namespace apollo::planning
@@ -56,6 +57,9 @@ class EMPlanner : public Planner {
             std::vector<apollo::common::TrajectoryPoint>* trajectory) override;
 
  private:
+  std::vector<SpeedPoint> generate_init_speed_profile(const double init_v,
+                                                      const double init_a);
+
 };
 
 }  // namespace planning

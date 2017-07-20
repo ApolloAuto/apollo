@@ -21,6 +21,7 @@
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 namespace apollo {
 namespace planning {
@@ -35,5 +36,46 @@ bool EMPlanner::Plan(const TrajectoryPoint& start_point,
   return true;
 }
 
+std::vector<SpeedPoint> EMPlanner::generate_init_speed_profile(const double init_v,
+                                                               const double init_a) {
+    //TODO: this is a dummy simple hot start, need refine later
+    std::array<double, 3> start_state;
+
+    // distance 0.0
+    start_state[0] = 0.0;
+
+    // start velocity
+    start_state[1] = init_v;
+
+    // start acceleration
+    start_state[2] = init_a;
+
+    std::array<double, 2> end_state;
+    // end state velocity
+    end_state[0] = 10.0;
+
+    // end state acceleration
+    end_state[1] = 0.0;
+
+    // pre assume the curve time is 8 second, can be change later
+    QuarticPolynomialCurve1d speed_curve(start_state, end_state, FLAGS_trajectory_time_length);
+
+    // assume the time resolution is 0.1
+    std::size_t num_time_steps = static_cast<std::size_t>(FLAGS_trajectory_time_length
+            / FLAGS_trajectory_time_resolution) + 1;
+
+    std::vector<SpeedPoint> speed_profile;
+    speed_profile.reserve(num_time_steps);
+
+    for (std::size_t i = 0; i < num_time_steps; ++i) {
+        double t = i * FLAGS_trajectory_time_resolution;
+        double s = speed_curve.evaluate(0, t);
+        double v = speed_curve.evaluate(1, t);
+        double a = speed_curve.evaluate(2, t);
+        double j = speed_curve.evaluate(3, t);
+        speed_profile.emplace_back(s, t, v, a, j);
+    }
+    return std::move(speed_profile);
+}
 }  // namespace planning
 }  // nameapace apollo
