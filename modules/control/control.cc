@@ -75,8 +75,8 @@ Status Control::Init() {
 
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
 
-  CHECK(AdapterManager::GetPlanningTrajectory())
-      << "PlanningTrajectory is not initialized.";
+  CHECK(AdapterManager::GetPlanning())
+      << "Planning is not initialized.";
 
   CHECK(AdapterManager::GetPad()) << "Pad is not initialized.";
 
@@ -244,7 +244,7 @@ Status Control::CheckInput() {
   chassis_ = chassis_adapter->GetLatestObserved();
   ADEBUG << "Received chassis:" << chassis_.ShortDebugString();
 
-  auto trajectory_adapter = AdapterManager::GetPlanningTrajectory();
+  auto trajectory_adapter = AdapterManager::GetPlanning();
   if (trajectory_adapter->Empty()) {
     AINFO << "No planning msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");

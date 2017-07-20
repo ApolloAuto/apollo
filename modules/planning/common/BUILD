@@ -111,10 +111,27 @@ cc_library(
         ":decision_data",
         "//modules/common/proto:path_point_proto",
         "//modules/planning/common/trajectory:publishable_trajectory",
-        "//modules/planning/reference_line:lib_reference_line",
+        "//modules/planning/reference_line",
         "//modules/map/proto:map_proto",
         "@eigen//:eigen",
     ],
+)
+
+cc_library(
+    name = "em_planning_data",
+    srcs = [
+        "em_planning_data.cc",
+    ],
+    hdrs = [
+        "em_planning_data.h",
+    ],
+    deps = [
+        ":planning_data",
+        "//modules/common/proto:path_point_proto",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed",
+        "//modules/planning/math:double",
+    ]
 )
 
 cc_library(

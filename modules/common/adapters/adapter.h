@@ -232,6 +232,10 @@ class Adapter {
     header->set_sequence_num(++seq_num_);
   }
 
+  uint32_t GetSeqNum() const {
+    return seq_num_;
+  }
+
  private:
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>

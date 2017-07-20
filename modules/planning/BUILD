@@ -19,6 +19,7 @@ cc_library(
         "//modules/common/vehicle_state",
         "//modules/decision/proto:decision_proto",
         "//modules/perception/proto:perception_proto",
+        "//modules/planning/common:data_center",
         "//modules/planning/common:planning_common",
         "//modules/planning/planner/em:em_planner",
         "//modules/planning/planner/rtk:rtk_planner",

@@ -37,7 +37,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::MonitorAdapter;
 using apollo::common::adapter::LocalizationAdapter;
 using apollo::common::adapter::ChassisAdapter;
-using apollo::common::adapter::PlanningTrajectoryAdapter;
+using apollo::common::adapter::PlanningAdapter;
 using apollo::common::config::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
@@ -252,7 +252,7 @@ void UpdateSimulationWorld<ChassisAdapter>(const Chassis &chassis,
 }
 
 template <>
-void UpdateSimulationWorld<PlanningTrajectoryAdapter>(
+void UpdateSimulationWorld<PlanningAdapter>(
     const ADCTrajectory &trajectory, SimulationWorld *world) {
   const double cutoff_time = world->auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
@@ -329,7 +329,7 @@ const SimulationWorld &SimulationWorldService::Update() {
   UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis(), &world_);
   UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization(),
                            &world_);
-  UpdateWithLatestObserved("Planning", AdapterManager::GetPlanningTrajectory(),
+  UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning(),
                            &world_);
   UpdateWithLatestObserved("PerceptionObstacles",
                            AdapterManager::GetPerceptionObstacles(), &world_);

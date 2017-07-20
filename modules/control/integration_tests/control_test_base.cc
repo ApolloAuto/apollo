@@ -76,8 +76,8 @@ bool ControlTestBase::test_control() {
                                               FLAGS_test_localization_file);
   }
   if (!FLAGS_test_planning_file.empty()) {
-    AdapterManager::FeedPlanningTrajectoryProtoFile(FLAGS_test_data_dir +
-                                                    FLAGS_test_planning_file);
+    AdapterManager::FeedPlanningProtoFile(FLAGS_test_data_dir +
+                                          FLAGS_test_planning_file);
   }
   if (!FLAGS_test_chassis_file.empty()) {
     AdapterManager::FeedChassisProtoFile(FLAGS_test_data_dir +

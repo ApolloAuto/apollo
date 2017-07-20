@@ -84,8 +84,8 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
                              config.message_history_limit());
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
-        EnablePlanningTrajectory(FLAGS_planning_trajectory_topic, config.mode(),
-                                 config.message_history_limit());
+        EnablePlanning(FLAGS_planning_trajectory_topic, config.mode(),
+                       config.message_history_limit());
         break;
       case AdapterConfig::PREDICTION:
         EnablePrediction(FLAGS_prediction_topic, config.mode(),
