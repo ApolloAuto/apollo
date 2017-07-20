@@ -23,6 +23,7 @@
 #define MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
 
 #include <vector>
+#include <string>
 
 #include "google/protobuf/message.h"
 #include "modules/prediction/container/obstacles/obstacle.h"

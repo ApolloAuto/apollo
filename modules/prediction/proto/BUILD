@@ -45,6 +45,25 @@ cc_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "fnn_model_base_proto",
+    protos = [
+        "fnn_model_base.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
+    name = "fnn_vehicle_model_proto",
+    protos = [
+        "fnn_vehicle_model.proto",
+    ],
+    deps = [
+        "//modules/prediction/proto:fnn_model_base_proto",
+    ],
+)
+
 py_proto_compile(
     name = "prediction_proto_pylib",
     protos = [
