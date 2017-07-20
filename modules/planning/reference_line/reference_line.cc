@@ -24,8 +24,9 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/angle.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/math/double.h"
-#include "modules/planning/math/interpolation.h"
+//#include "modules/planning/math/interpolation.h"
 
 namespace apollo {
 namespace planning {
@@ -194,11 +195,12 @@ ReferencePoint ReferenceLine::interpolate(const ReferencePoint& p0,
                                           const ReferencePoint& p1,
                                           const double s1, const double s) {
   ReferencePoint p = p1;
-  p.set_x(Interpolation::lerp(p0.x(), s0, p1.x(), s1, s));
-  p.set_y(Interpolation::lerp(p0.y(), s0, p1.y(), s1, s));
-  p.set_heading(Interpolation::slerp(p0.heading(), s0, p1.heading(), s1, s));
-  p.set_kappa(Interpolation::lerp(p0.kappa(), s0, p1.kappa(), s1, s));
-  p.set_dkappa(Interpolation::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s));
+  p.set_x(apollo::common::math::lerp(p0.x(), s0, p1.x(), s1, s));
+  p.set_y(apollo::common::math::lerp(p0.y(), s0, p1.y(), s1, s));
+  p.set_heading(
+      apollo::common::math::slerp(p0.heading(), s0, p1.heading(), s1, s));
+  p.set_kappa(apollo::common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s));
+  p.set_dkappa(apollo::common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s));
 
   // lane boundary info, lane info will be the same as the p1.
   return p;

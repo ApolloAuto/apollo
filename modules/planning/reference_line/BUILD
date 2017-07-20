@@ -16,6 +16,5 @@ cc_library(
         "//modules/map/pnc_map:pnc_path",
         "//modules/common/math:math",
         "//modules/planning/math:double",
-        "//modules/planning/math:interpolation",
     ],
 )
