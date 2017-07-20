@@ -3,6 +3,57 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "decision_data",
+    srcs = [
+        "decision_data.cc",
+    ],
+    hdrs = [
+        "decision_data.h",
+    ],
+    deps = [
+        "//modules/planning/common:map_object",
+        "//modules/planning/common:obstacle",
+    ],
+)
+
+cc_library(
+    name = "decision",
+    srcs = [
+        "decision.cc",
+    ],
+    hdrs = [
+        "decision.h",
+    ],
+)
+
+cc_library(
+    name = "map_object",
+    srcs = [
+        "map_object.cc",
+    ],
+    hdrs = [
+        "map_object.h",
+    ],
+    deps = [
+        "//modules/planning/common:planning_object",
+    ],
+)
+
+cc_library(
+    name = "obstacle",
+    srcs = [
+        "obstacle.cc",
+    ],
+    hdrs = [
+        "obstacle.h",
+    ],
+    deps = [
+        "//modules/common/math:box2d",
+        "//modules/planning/common:planning_object",
+    ],
+)
+
+cc_library(
     name = "planning_gflags",
     srcs = [
         "planning_gflags.cc",
@@ -12,6 +63,20 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
+    ],
+)
+
+cc_library(
+    name = "planning_object",
+    srcs = [
+        "planning_object.cc",
+    ],
+    hdrs = [
+        "planning_object.h",
+    ],
+    deps = [
+        "//modules/common/math:polygon2d",
+        "//modules/planning/common:decision",
     ],
 )
 
