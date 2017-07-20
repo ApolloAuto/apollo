@@ -1,2 +1,2 @@
-EvaluatorType: MLP_EVAL
+EvaluatorType: MLP_EVALUATOR
 PredictorType: LANE_SEQUENCE_PREDICTOR
