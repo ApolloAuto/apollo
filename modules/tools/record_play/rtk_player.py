@@ -241,7 +241,7 @@ class RtkPlayer(object):
             self.data['s'][self.start]
         planningdata.total_path_time = self.data['time'][self.end] - \
             self.data['time'][self.start]
-        planningdata.gear = int(self.data['gear'][self.start])
+        planningdata.gear = int(self.data['gear'][closest_time()])
 
         self.planning_pub.publish(planningdata)
         self.logger.debug("Generated Planning Sequence: " +
