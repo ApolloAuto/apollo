@@ -97,3 +97,8 @@ RUN apt-get update && apt-get install shellcheck
 
 # https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
 RUN ln -s -f /bin/true /usr/bin/chfn
+
+# install pcl and opencv
+RUN apt-get install -y \
+    libpcl-1.7-all \
+    libopencv-dev
