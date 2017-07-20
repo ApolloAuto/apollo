@@ -9,17 +9,16 @@ cc_proto_library(
         "decision.proto",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/perception/proto:perception_proto",
-        "//modules/prediction/proto:prediction_proto",
+        "//modules/common/proto:common_proto",
     ],
 )
 
 py_proto_compile(
     name = "decision_proto_pylib",
-    protos = ["decision.proto"],
+    protos = [
+        "decision.proto"
+    ],
     deps = [
-        "//modules/perception/proto:perception_proto_pylib",
-        "//modules/prediction/proto:prediction_proto_pylib",
+        "//modules/common/proto:common_proto_pylib",
     ],
 )

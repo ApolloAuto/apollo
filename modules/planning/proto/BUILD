@@ -6,6 +6,7 @@ load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
 cc_proto_library(
     name = "planning_proto",
     protos = [
+        "decision.proto",
         "planning.proto",
         "planning_config.proto",
         "planning_internal.proto",
@@ -24,6 +25,7 @@ cc_proto_library(
 py_proto_compile(
     name = "planning_proto_pylib",
     protos = [
+        "decision.proto",
         "planning.proto",
         "planning_config.proto",
         "planning_internal.proto",

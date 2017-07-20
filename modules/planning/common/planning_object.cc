@@ -32,11 +32,11 @@ PlanningObject::PlanningObjectType* PlanningObject::MutableObjectType() {
   return &object_type_;
 }
 
-const std::vector<Decision>& PlanningObject::Decisions() const {
+const std::vector<ObjectDecisionType>& PlanningObject::Decisions() const {
   return decisions_;
 }
 
-std::vector<Decision>* PlanningObject::MutableDecisions() {
+std::vector<ObjectDecisionType>* PlanningObject::MutableDecisions() {
   return &decisions_;
 }
 
