@@ -8,6 +8,7 @@ cc_library(
     srcs = ["evaluator_factory.cc"],
     deps = [
         "//modules/prediction/evaluator:evaluator",
+        "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/common/util:factory",
         "//modules/common:macro",
