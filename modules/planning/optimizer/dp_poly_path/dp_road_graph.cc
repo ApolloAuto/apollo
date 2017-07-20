@@ -36,9 +36,11 @@ namespace planning {
 
 DpRoadGraph::DpRoadGraph(
     const DpPolyPathConfig &config,
-    const ::apollo::common::TrajectoryPoint &init_point) :
+    const ::apollo::common::TrajectoryPoint &init_point,
+    const SpeedData& speed_data) :
     _config(config),
-    _init_point(init_point) {
+    _init_point(init_point),
+    _heuristic_speed_data(speed_data){
 }
 
 ::apollo::common::ErrorCode DpRoadGraph::find_tunnel(
@@ -222,8 +224,7 @@ DpRoadGraph::DpRoadGraph(
   head.set_accumulated_cost(0.0);
   size_t best_trajectory_end_index = 0;
   double min_trajectory_cost = std::numeric_limits<double>::max();
-  SpeedData heuristic_speed_data; // need to create
-  TrajectoryCost trajectory_cost(_config, heuristic_speed_data, decision_data);
+  TrajectoryCost trajectory_cost(_config, _heuristic_speed_data, decision_data);
 
   for (size_t i = 0; i < _vertices.size(); ++i) {
     const GraphVertex &vertex = _vertices[i];
