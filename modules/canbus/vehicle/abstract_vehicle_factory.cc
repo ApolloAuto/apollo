@@ -20,7 +20,7 @@ namespace apollo {
 namespace canbus {
 
 void AbstractVehicleFactory::SetVehicleParameter(
-    const VehicleParameter& vehicle_parameter) {
+    const VehicleParameter &vehicle_parameter) {
   vehicle_parameter_ = vehicle_parameter;
 }
 

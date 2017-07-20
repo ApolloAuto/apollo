@@ -37,8 +37,8 @@ double lerp(const double x0, const double t0, const double x1, const double t1,
 }
 
 void lerp(const double x0, const double y0, const double t0, const double x1,
-          const double y1, const double t1, const double t, double* x,
-          double* y) {
+          const double y1, const double t1, const double t, double *x,
+          double *y) {
   *x = lerp(x0, t0, x1, t1, t);
   *y = lerp(y0, t0, y1, t1, t);
 }

@@ -30,7 +30,7 @@ uint32_t Brake60::GetPeriod() const {
   return PERIOD;
 }
 
-void Brake60::UpdateData(uint8_t* data) {
+void Brake60::UpdateData(uint8_t *data) {
   set_pedal_p(data, pedal_cmd_);
   set_boo_cmd_p(data, boo_cmd_);
   set_enable_p(data, pedal_enable_);
@@ -47,7 +47,7 @@ void Brake60::Reset() {
   watchdog_counter_ = 0;
 }
 
-Brake60* Brake60::set_pedal(double pedal) {
+Brake60 *Brake60::set_pedal(double pedal) {
   pedal_cmd_ = pedal;
   if (pedal_cmd_ < 1e-3) {
     disable_boo_cmd();
@@ -57,27 +57,27 @@ Brake60* Brake60::set_pedal(double pedal) {
   return this;
 }
 
-Brake60* Brake60::enable_boo_cmd() {
+Brake60 *Brake60::enable_boo_cmd() {
   boo_cmd_ = true;
   return this;
 }
 
-Brake60* Brake60::disable_boo_cmd() {
+Brake60 *Brake60::disable_boo_cmd() {
   boo_cmd_ = false;
   return this;
 }
 
-Brake60* Brake60::set_enable() {
+Brake60 *Brake60::set_enable() {
   pedal_enable_ = true;
   return this;
 }
 
-Brake60* Brake60::set_disable() {
+Brake60 *Brake60::set_disable() {
   pedal_enable_ = false;
   return this;
 }
 
-void Brake60::set_pedal_p(uint8_t* data, double pedal) {
+void Brake60::set_pedal_p(uint8_t *data, double pedal) {
   // change from [0-100] to [0.00-1.00]
   // and a rough mapping
   pedal /= 100.;
@@ -95,7 +95,7 @@ void Brake60::set_pedal_p(uint8_t* data, double pedal) {
   frame_high.set_value(t, 0, 8);
 }
 
-void Brake60::set_boo_cmd_p(uint8_t* bytes, bool boo_cmd) {
+void Brake60::set_boo_cmd_p(uint8_t *bytes, bool boo_cmd) {
   Byte frame(bytes + 2);
   if (boo_cmd) {
     frame.set_bit_1(0);
@@ -104,7 +104,7 @@ void Brake60::set_boo_cmd_p(uint8_t* bytes, bool boo_cmd) {
   }
 }
 
-void Brake60::set_enable_p(uint8_t* bytes, bool enable) {
+void Brake60::set_enable_p(uint8_t *bytes, bool enable) {
   Byte frame(bytes + 3);
   if (enable) {
     frame.set_bit_1(0);
@@ -113,7 +113,7 @@ void Brake60::set_enable_p(uint8_t* bytes, bool enable) {
   }
 }
 
-void Brake60::set_clear_driver_override_flag_p(uint8_t* bytes, bool clear) {
+void Brake60::set_clear_driver_override_flag_p(uint8_t *bytes, bool clear) {
   Byte frame(bytes + 3);
   if (clear) {
     frame.set_bit_1(1);
@@ -122,7 +122,7 @@ void Brake60::set_clear_driver_override_flag_p(uint8_t* bytes, bool clear) {
   }
 }
 
-void Brake60::set_watchdog_counter_p(uint8_t* data, int32_t count) {
+void Brake60::set_watchdog_counter_p(uint8_t *data, int32_t count) {
   count = ProtocolData::BoundedValue(0, 255, count);
   Byte frame(data + 7);
   frame.set_value(count, 0, 8);

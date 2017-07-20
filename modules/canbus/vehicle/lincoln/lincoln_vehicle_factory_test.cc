@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln_vehicle_factory.h"
+#include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
 
 #include "gtest/gtest.h"
 

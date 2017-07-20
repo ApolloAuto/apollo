@@ -38,5 +38,5 @@ TEST(Steering64Test, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

@@ -99,7 +99,7 @@ class CanClient {
    * @param parameter CAN card parameters to initialize the CAN client.
    * @return If the initialization is successful.
    */
-  virtual bool Init(const CANCardParameter& parameter) = 0;
+  virtual bool Init(const CANCardParameter &parameter) = 0;
 
   /**
    * @brief Start the CAN client.
@@ -120,8 +120,8 @@ class CanClient {
    * @return The status of the sending action which is defined by
    *         apollo::common::ErrorCode.
    */
-  virtual apollo::common::ErrorCode Send(const std::vector<CanFrame>& frames,
-                                         int32_t* const frame_num) = 0;
+  virtual apollo::common::ErrorCode Send(const std::vector<CanFrame> &frames,
+                                         int32_t *const frame_num) = 0;
 
   /**
    * @brief Send a single message.
@@ -130,7 +130,7 @@ class CanClient {
    *         apollo::common::ErrorCode.
    */
   virtual apollo::common::ErrorCode SendSingleFrame(
-      const std::vector<CanFrame>& frames) {
+      const std::vector<CanFrame> &frames) {
     CHECK_EQ(frames.size(), 1);
     int32_t n = 1;
     return Send(frames, &n);
@@ -143,8 +143,8 @@ class CanClient {
    * @return The status of the receiving action which is defined by
    *         apollo::common::ErrorCode.
    */
-  virtual apollo::common::ErrorCode Receive(std::vector<CanFrame>* const frames,
-                                            int32_t* const frame_num) = 0;
+  virtual apollo::common::ErrorCode Receive(std::vector<CanFrame> *const frames,
+                                            int32_t *const frame_num) = 0;
 
   /**
    * @brief Get the error string.

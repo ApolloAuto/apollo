@@ -52,5 +52,5 @@ TEST_F(Brakeinfo74Test, simple) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

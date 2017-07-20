@@ -111,6 +111,12 @@ class VehicleState {
   double linear_acceleration() const;
 
   /**
+   * @brief Get the vehicle's gear position.
+   * @return The vehicle's gear position.
+   */
+  double gear() const;
+
+  /**
    * @brief Set the x-coordinate of vehicle position.
    * @param x The x-coordinate of vehicle position.
    */
@@ -147,6 +153,13 @@ class VehicleState {
    * @param angular_velocity The vehicle's angular velocity.
    */
   void set_angular_velocity(const double angular_velocity);
+
+  /**
+   * @brief Set the vehicle's gear position.
+   * @param gear_position The vehicle's gear position.
+   */
+  void set_gear(const ::apollo::canbus::Chassis::GearPosition gear_position);
+
   /**
    * @brief Estimate future position from current position and heading,
    *        along a period of time, by constant linear velocity,
@@ -182,6 +195,8 @@ class VehicleState {
   double angular_v_ = 0.0;
 
   double linear_a_ = 0.0;
+
+  ::apollo::canbus::Chassis::GearPosition gear_;
 
   const localization::LocalizationEstimate *localization_ptr_ = nullptr;
 };

@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include <syslog.h>
 
-#include "common_defs.h"
+#include "modules/monitor/common/common_defs.h"
 
 /**
  * @namespace apollo::platform::log
@@ -30,7 +30,8 @@ namespace apollo {
 namespace platform {
 
 /// Logging support.
-/// Features: (1) modules -- different modules may have different logging levels and log writers,
+/// Features: (1) modules -- different modules may have different logging levels
+/// and log writers,
 /// very handy for debugging;
 /// (2) separation of log writer from logging logic;
 /// (3) debug logging that can be completely compiled out.
@@ -57,7 +58,7 @@ enum {
 };
 
 /// Type of log writer function.
-typedef void (LogFn)(int priority, const char *format, va_list ap);
+typedef void(LogFn)(int priority, const char *format, va_list ap);
 
 struct LogModule {
   const char *name;
@@ -78,14 +79,15 @@ struct LogModule {
 
   /// Sets log function of this module.
   /// @return old log function.
-  MEMBER_SET_AND_RETURN(LogFn*, log_fn);
+  MEMBER_SET_AND_RETURN(LogFn *, log_fn);
 };
 
 /// Log function that just uses plain printf.
 void platform_log_printf(int, const char *format, va_list ap);
 
 /// Log function that writes to syslog.
-void platform_log_write(const LogModule *mod, int priority, const char *format, ...);
+void platform_log_write(const LogModule *mod, int priority, const char *format,
+                        ...);
 
 /// Init syslog for logging to syslog.
 /// @param tag tag (name) to use in syslog.
@@ -96,23 +98,25 @@ void init_syslog(const char *tag = "apollo-pl");
 
 }  // namespace log
 
-
 /// Logging function.
-#define PLATFORM_LOG(mod, lvl, fmt, args...)  \
-if (lvl <= (mod)->log_lvl) {  \
-    platform_log_write((mod), lvl, "%s:%d@%s:%d: " fmt "\n", \
-        (mod)->name, lvl, __FILE__, __LINE__, ##args); }
-
+#define PLATFORM_LOG(mod, lvl, fmt, args...)                                   \
+  if (lvl <= (mod)->log_lvl) {                                                 \
+    platform_log_write((mod), lvl, "%s:%d@%s:%d: " fmt "\n", (mod)->name, lvl, \
+                       __FILE__, __LINE__, ##args);                            \
+  }
 
 #ifdef DEBUG
 /// Debug logging function.
-#define PLATFORM_DBG(mod, lvl, fmt, args...)  \
-if (lvl <= (mod)->dbg_lvl) {  \
-    platform_log_write((mod), lvl, "%s:%d@%s:%d: " fmt "\n", \
-        (mod)->name, lvl, __FILE__, __LINE__, ##args); }
+#define PLATFORM_DBG(mod, lvl, fmt, args...)                                   \
+  if (lvl <= (mod)->dbg_lvl) {                                                 \
+    platform_log_write((mod), lvl, "%s:%d@%s:%d: " fmt "\n", (mod)->name, lvl, \
+                       __FILE__, __LINE__, ##args);                            \
+  }
 #else
 // PLATFORM_DBG() has 0-overhead in non-debug mode.
-#define PLATFORM_DBG(args...) do{}while(0)
+#define PLATFORM_DBG(args...) \
+  do {                        \
+  } while (0)
 #endif
 
 }  // namespace platform

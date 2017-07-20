@@ -52,5 +52,5 @@ TEST(Steering65Test, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

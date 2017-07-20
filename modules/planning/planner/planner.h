@@ -54,8 +54,8 @@ class Planner {
    * @return true if planning succeeds; false otherwise.
    */
   virtual bool Plan(
-      const apollo::common::TrajectoryPoint& start_point,
-      std::vector<apollo::common::TrajectoryPoint>* discretized_trajectory) = 0;
+      const apollo::common::TrajectoryPoint &start_point,
+      std::vector<apollo::common::TrajectoryPoint> *discretized_trajectory) = 0;
 };
 
 }  // namespace planning

@@ -16,6 +16,8 @@
 
 #include "modules/canbus/can_comm/can_sender.h"
 
+#include <algorithm>
+
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 
@@ -34,11 +36,11 @@ const uint32_t kSenderInterval = 6000;
 std::mutex SenderMessage::mutex_;
 
 SenderMessage::SenderMessage(const uint32_t message_id,
-                             ProtocolData* protocol_data)
+                             ProtocolData *protocol_data)
     : SenderMessage(message_id, protocol_data, false) {}
 
 SenderMessage::SenderMessage(const uint32_t message_id,
-                             ProtocolData* protocol_data, bool init_with_one)
+                             ProtocolData *protocol_data, bool init_with_one)
     : message_id_(message_id), protocol_data_(protocol_data) {
   if (init_with_one) {
     for (int32_t i = 0; i < protocol_data->GetLength(); ++i) {
@@ -100,7 +102,7 @@ void CanSender::PowerSendThreadFunc() {
     tm_start = ::apollo::common::time::AsInt64<micros>(Clock::Now());
     new_delta_period = INIT_PERIOD;
 
-    for (auto& message : send_messages_) {
+    for (auto &message : send_messages_) {
       bool need_send = NeedSend(message, delta_period);
       message.UpdateCurrPeriod(delta_period);
       new_delta_period = std::min(new_delta_period, message.curr_period());
@@ -133,7 +135,7 @@ void CanSender::PowerSendThreadFunc() {
   AINFO << "Can client sender thread stopped!";
 }
 
-ErrorCode CanSender::Init(CanClient* can_client, bool enable_log) {
+ErrorCode CanSender::Init(CanClient *can_client, bool enable_log) {
   if (is_init_) {
     AERROR << "Duplicated Init request.";
     return ErrorCode::CANBUS_ERROR;
@@ -148,7 +150,7 @@ ErrorCode CanSender::Init(CanClient* can_client, bool enable_log) {
   return ErrorCode::OK;
 }
 
-void CanSender::AddMessage(uint32_t message_id, ProtocolData* protocol_data,
+void CanSender::AddMessage(uint32_t message_id, ProtocolData *protocol_data,
                            bool init_with_one) {
   if (protocol_data == nullptr) {
     AERROR << "invalid protocol data.";
@@ -171,7 +173,7 @@ ErrorCode CanSender::Start() {
 }
 
 void CanSender::Update() {
-  for (auto& message : send_messages_) {
+  for (auto &message : send_messages_) {
     message.Update();
   }
 }
@@ -195,7 +197,7 @@ bool CanSender::IsRunning() const { return is_running_; }
 
 bool CanSender::enable_log() const { return enable_log_; }
 
-bool CanSender::NeedSend(const SenderMessage& msg, const int32_t delta_period) {
+bool CanSender::NeedSend(const SenderMessage &msg, const int32_t delta_period) {
   return msg.curr_period() <= delta_period;
 }
 

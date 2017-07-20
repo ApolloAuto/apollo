@@ -45,5 +45,5 @@ TEST(Throttle63Test, General) {
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

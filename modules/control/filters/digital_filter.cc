@@ -29,25 +29,25 @@ const double kDoubleEpsilon = 1.0e-6;
 namespace apollo {
 namespace control {
 
-DigitalFilter::DigitalFilter(const std::vector<double>& denominators,
-                             const std::vector<double>& numerators) {
+DigitalFilter::DigitalFilter(const std::vector<double> &denominators,
+                             const std::vector<double> &numerators) {
   dead_zone_ = 0.0;
   last_ = 0.0;
   set_coefficients(denominators, numerators);
 }
 
-void DigitalFilter::set_denominators(const std::vector<double>& denominators) {
+void DigitalFilter::set_denominators(const std::vector<double> &denominators) {
   denominators_ = denominators;
   y_values_.resize(denominators_.size(), 0.0);
 }
 
-void DigitalFilter::set_numerators(const std::vector<double>& numerators) {
+void DigitalFilter::set_numerators(const std::vector<double> &numerators) {
   numerators_ = numerators;
   x_values_.resize(numerators_.size(), 0.0);
 }
 
-void DigitalFilter::set_coefficients(const std::vector<double>& denominators,
-                                     const std::vector<double>& numerators) {
+void DigitalFilter::set_coefficients(const std::vector<double> &denominators,
+                                     const std::vector<double> &numerators) {
   set_denominators(denominators);
   set_numerators(numerators);
 }
@@ -89,8 +89,8 @@ double DigitalFilter::UpdateLast(const double input) {
   }
 }
 
-double DigitalFilter::Compute(const std::deque<double>& values,
-                              const std::vector<double>& coefficients,
+double DigitalFilter::Compute(const std::deque<double> &values,
+                              const std::vector<double> &coefficients,
                               const std::size_t coeff_start,
                               const std::size_t coeff_end) {
   if (coeff_start > coeff_end || coeff_end >= coefficients.size()) {
@@ -103,18 +103,18 @@ double DigitalFilter::Compute(const std::deque<double>& values,
   }
   double sum = 0.0;
   int i = coeff_start;
-  for (auto& value : values) {
+  for (auto &value : values) {
     sum += value * coefficients[i];
     ++i;
   }
   return sum;
 }
 
-const std::vector<double>& DigitalFilter::denominators() const {
+const std::vector<double> &DigitalFilter::denominators() const {
   return denominators_;
 }
 
-const std::vector<double>& DigitalFilter::numerators() const {
+const std::vector<double> &DigitalFilter::numerators() const {
   return numerators_;
 }
 

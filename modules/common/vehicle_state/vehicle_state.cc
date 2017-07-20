@@ -16,9 +16,9 @@
 
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include <cmath>
+#include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace common {
@@ -30,8 +30,10 @@ VehicleState::VehicleState(
   if (localization.has_pose() && localization.pose().has_linear_velocity()) {
     double linear_v_x = localization.pose().linear_velocity().x();
     double linear_v_y = localization.pose().linear_velocity().y();
-    linear_v_ = std::hypot(linear_v_x, linear_v_y);
+    double linear_v_z = localization.pose().linear_velocity().z();
+    linear_v_ = std::hypot(std::hypot(linear_v_x, linear_v_y), linear_v_z);
   }
+  gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
 }
 
 VehicleState::VehicleState(
@@ -40,6 +42,11 @@ VehicleState::VehicleState(
   ConstructExceptLinearVelocity(localization);
   if (chassis != nullptr && chassis->has_speed_mps()) {
     linear_v_ = chassis->speed_mps();
+  }
+  if (chassis != nullptr && chassis->has_gear_location()) {
+    gear_ = chassis->gear_location();
+  } else {
+    gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
   }
 }
 
@@ -87,6 +94,8 @@ double VehicleState::angular_velocity() const { return angular_v_; }
 
 double VehicleState::linear_acceleration() const { return linear_a_; }
 
+double VehicleState::gear() const { return gear_; }
+
 void VehicleState::set_x(const double x) { x_ = x; }
 
 void VehicleState::set_y(const double y) { y_ = y; }
@@ -103,16 +112,25 @@ void VehicleState::set_angular_velocity(const double angular_velocity) {
   angular_v_ = angular_velocity;
 }
 
+void VehicleState::set_gear(
+  const ::apollo::canbus::Chassis::GearPosition gear_position) {
+  gear_ = gear_position;
+}
+
 Eigen::Vector2d VehicleState::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
+  double v = linear_v_;
+  if (gear_ == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+    v = - linear_v_;
+  }
   // Predict distance travel vector
   if (std::fabs(angular_v_) < 0.0001) {
     vec_distance[0] = 0.0;
-    vec_distance[1] = linear_v_ * t;
+    vec_distance[1] = v * t;
   } else {
     vec_distance[0] =
-        -linear_v_ / angular_v_ * (1.0 - std::cos(angular_v_ * t));
-    vec_distance[1] = std::sin(angular_v_ * t) * linear_v_ / angular_v_;
+        -v / angular_v_ * (1.0 - std::cos(angular_v_ * t));
+    vec_distance[1] = std::sin(angular_v_ * t) * v / angular_v_;
   }
 
   // If we have rotation information, take it into consideration.

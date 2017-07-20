@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "esdcan_utils.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +22,7 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
-#include "esdcan_err_str.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
 
 namespace apollo {
 namespace platform {
@@ -48,10 +48,10 @@ void esdcan_print_summary(std::ostream &os, const EsdCanDetails &details) {
        << "Err frames      : " << details.stats.err_frames << std::endl
        << "Aborted frames  : " << details.stats.aborted_frames << std::endl
        << "Err counter     : (Rx/Tx): "
-       << (int)details.ctrl_state.rcv_err_counter << "/"
-       << (int)details.ctrl_state.xmit_err_counter << std::endl
-       << "Status          : " << std::hex << (int)details.ctrl_state.status
-       << std::endl
+       << static_cast<int>(details.ctrl_state.rcv_err_counter) << "/"
+       << static_cast<int>(details.ctrl_state.xmit_err_counter) << std::endl
+       << "Status          : " << std::hex
+       << static_cast<int>(details.ctrl_state.status) << std::endl
        << "Rcv bits        : " << std::dec << details.stats.bit_count
        << std::endl;
   } else {
@@ -60,8 +60,7 @@ void esdcan_print_summary(std::ostream &os, const EsdCanDetails &details) {
   }
 }
 
-void esdcan_print_test_result(
-    std::ostream &os, const EsdCanDetails &details) {
+void esdcan_print_test_result(std::ostream &os, const EsdCanDetails &details) {
   if (details.result == NTCAN_SUCCESS) {
     os << "ESD-CAN test PASSED\n" << std::endl;
   } else {
@@ -89,21 +88,26 @@ void esdcan_print_if_status(int id, const CAN_IF_STATUS &if_status) {
       (unsigned int)if_status.boardstatus);
 }
 
-
 void esdcan_print_stats(const NTCAN_BUS_STATISTIC &stats) {
   printf("CAN bus statistics:\n");
   printf("Rcv frames      : Std(Data/RTR): %ld/%ld Ext(Data/RTR) %ld/%ld\n",
-         (long)stats.rcv_count.std_data, (long)stats.rcv_count.std_rtr,
-         (long)stats.rcv_count.ext_data, (long)stats.rcv_count.ext_rtr);
+         static_cast<int64>(stats.rcv_count.std_data),
+         static_cast<int64>(stats.rcv_count.std_rtr),
+         static_cast<int64>(stats.rcv_count.ext_data),
+         static_cast<int64>(stats.rcv_count.ext_rtr));
   printf("Xmit frames     : Std(Data/RTR): %ld/%ld Ext(Data/RTR) %ld/%ld\n",
-         (long)stats.xmit_count.std_data, (long)stats.xmit_count.std_rtr,
-         (long)stats.xmit_count.ext_data, (long)stats.xmit_count.ext_rtr);
-  printf("Bytes           : (Rcv/Xmit): %ld/%ld\n", (long)stats.rcv_byte_count,
-         (long)stats.xmit_byte_count);
-  printf("Overruns        : (Controller/FIFO): %ld/%ld\n", (long)stats.ctrl_ovr,
-         (long)stats.fifo_ovr);
-  printf("Err frames      : %ld\n", (long)stats.err_frames);
-  printf("Aborted frames  : %ld\n", (long)stats.aborted_frames);
+         static_cast<int64>(stats.xmit_count.std_data),
+         static_cast<int64>(stats.xmit_count.std_rtr),
+         static_cast<int64>(stats.xmit_count.ext_data),
+         static_cast<int64>(stats.xmit_count.ext_rtr));
+  printf("Bytes           : (Rcv/Xmit): %ld/%ld\n",
+         static_cast<int64>(stats.rcv_byte_count),
+         static_cast<int64>(stats.xmit_byte_count));
+  printf("Overruns        : (Controller/FIFO): %ld/%ld\n",
+         static_cast<int64>(stats.ctrl_ovr),
+         static_cast<int64>(stats.fifo_ovr));
+  printf("Err frames      : %ld\n", static_cast<int64>(stats.err_frames));
+  printf("Aborted frames  : %ld\n", static_cast<int64>(stats.aborted_frames));
   printf("Rcv bits        : %" PRIu64 "\n", stats.bit_count);
 }
 
@@ -114,22 +118,30 @@ void esdcan_print_ctrl_state(const NTCAN_CTRL_STATE &c_state) {
 
 void esdcan_print_bitrate(const NTCAN_BITRATE &bitrate) {
   printf("CAN bitrate:\n");
-  printf("Value set by canSetBaudrate()  : 0x%08lX\n", (long)bitrate.baud);
+  printf("Value set by canSetBaudrate()  : 0x%08lX\n",
+         static_cast<int64>(bitrate.baud));
   if (NTCAN_SUCCESS == bitrate.valid) {
-    printf("Actual Bitrate                 : %ld Bits/s\n", (long)bitrate.rate);
+    printf("Actual Bitrate                 : %ld Bits/s\n",
+           static_cast<int64>(bitrate.rate));
     printf("Timequantas per Bit            : %ld\n",
-           (long)(bitrate.tq_pre_sp + bitrate.tq_post_sp));
-    printf("Timequantas before samplepoint : %ld\n", (long)bitrate.tq_pre_sp);
-    printf("Timequantas after samplepoint  : %ld\n", (long)bitrate.tq_post_sp);
-    printf("Syncronization Jump Width      : %ld\n", (long)bitrate.sjw);
-    printf("Additional flags               : 0x%08lX\n", (long)bitrate.flags);
-    long sp = (long)((bitrate.tq_pre_sp * 10000) /
-                     (bitrate.tq_pre_sp + bitrate.tq_post_sp));
+           static_cast<int64>(bitrate.tq_pre_sp + bitrate.tq_post_sp));
+    printf("Timequantas before samplepoint : %ld\n",
+           static_cast<int64>(bitrate.tq_pre_sp));
+    printf("Timequantas after samplepoint  : %ld\n",
+           static_cast<int64>(bitrate.tq_post_sp));
+    printf("Syncronization Jump Width      : %ld\n",
+           static_cast<int64>(bitrate.sjw));
+    printf("Additional flags               : 0x%08lX\n",
+           static_cast<int64>(bitrate.flags));
+    int64 sp = static_cast<int64>(bitrate.tq_pre_sp * 10000) /
+               static_cast<int64>(bitrate.tq_pre_sp + bitrate.tq_post_sp);
     printf("Position samplepoint           : %ld.%ld%%\n", sp / 100, sp % 100);
     printf("Deviation from configured rate : %ld.%02ld%%\n",
-           (long)(bitrate.error / 100), (long)(bitrate.error % 100));
+           static_cast<int64>(bitrate.error / 100),
+           static_cast<int64>(bitrate.error % 100));
     printf("Controller clockrate           : %ld.%ldMHz\n",
-           (long)(bitrate.clock / 1000000), (long)(bitrate.clock % 1000000));
+           static_cast<int64>(bitrate.clock / 1000000),
+           static_cast<int64>(bitrate.clock % 1000000));
   }
 }
 

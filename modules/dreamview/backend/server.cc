@@ -43,21 +43,19 @@ using Json = nlohmann::json;
 
 /**
  * @class SimulationWorldUpdater
- * @brief A wrapper around SimulationWorldService and WebsocketServer to keep
+ * @brief A wrapper around SimulationWorldService and WebSocketHandler to keep
  * pushing SimulationWorld to frontend via websocket while handling the response
  * from frontend.
  */
 class SimulationWorldUpdater {
  public:
   /**
-   * @brief Constructor with the websocket server port.
-   * @param port The port on which the websocket server will be launched.
+   * @brief Constructor with the websocket handler.
+   * @param websocket Pointer of the websocket handler that has been attached to
+   * the server.
    */
-  explicit SimulationWorldUpdater(int websocket_port)
-      : sim_world_service_(),
-        websocket_(websocket_port, WebsocketServer::NO_LOG) {
-    websocket_.Run();
-  }
+  explicit SimulationWorldUpdater(WebSocketHandler *websocket)
+      : sim_world_service_(), websocket_(websocket) {}
 
   /**
    * @brief The callback function to get updates from SimulationWorldService,
@@ -65,18 +63,18 @@ class SimulationWorldUpdater {
    * is triggered.
    * @param event Timer event
    */
-  void OnPushTimer(const ros::TimerEvent& event) {
+  void OnPushTimer(const ros::TimerEvent &event) {
     if (!sim_world_service_.ReadyToPush()) {
       AWARN << "Not sending simulation world as the data is not ready!";
       return;
     }
     auto json = sim_world_service_.GetUpdateAsJson();
-    websocket_.SendData(json.dump());
+    websocket_->SendData(json.dump());
   }
 
  private:
   SimulationWorldService sim_world_service_;
-  WebsocketServer websocket_;
+  WebSocketHandler *websocket_;
 };
 
 }  // namespace dreamview
@@ -85,21 +83,23 @@ class SimulationWorldUpdater {
 /// Time interval, in seconds, between pushing SimulationWorld to frontend.
 static constexpr double kTimeInterval = 0.1;
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   using apollo::common::adapter::AdapterManager;
   using apollo::dreamview::SimulationWorldUpdater;
+  using apollo::dreamview::WebSocketHandler;
 
   ::google::InitGoogleLogging("dreamview");
   ::google::ParseCommandLineFlags(&argc, &argv, true);
   ros::init(argc, argv, "dreamview");
 
-  // Initialize and run the static file server which serves the
-  // dreamview htmls and javascripts.
+  // Initialize and run the web server which serves the
+  // dreamview htmls and javascripts and handles websocket requests.
   CivetServer server({"document_root", FLAGS_static_file_dir, "listening_ports",
                       std::to_string(FLAGS_server_port)});
+  WebSocketHandler websocket;
+  server.addWebSocketHandler("/websocket", websocket);
 
-  // Websocket port number is web server port number + 1.
-  SimulationWorldUpdater updater(FLAGS_server_port + 1);
+  SimulationWorldUpdater updater(&websocket);
   auto timer = AdapterManager::CreateTimer(ros::Duration(kTimeInterval),
                                            &SimulationWorldUpdater::OnPushTimer,
                                            &updater);

@@ -14,8 +14,8 @@ cc_library(
         "//modules/common/time",
         "//modules/decision/common:decision_common",
         "//modules/decision/proto:decision_proto",
-        "@ros//:ros_common",
         "@glog//:glog",
+        "@ros//:ros_common",
     ],
 )
 

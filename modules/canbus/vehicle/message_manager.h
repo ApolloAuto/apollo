@@ -69,7 +69,7 @@ class MessageManager {
    * @param length the length of data array
    * @param timestamp the timestamp of data
    */
-  virtual void Parse(const uint32_t message_id, const uint8_t* data,
+  virtual void Parse(const uint32_t message_id, const uint8_t *data,
                      int32_t length, struct timeval timestamp);
 
   /**
@@ -77,7 +77,7 @@ class MessageManager {
    * @param message_id the id of the message
    * @return a pointer to the protocol data
    */
-  ProtocolData* GetMutableProtocolDataById(const uint32_t message_id);
+  ProtocolData *GetMutableProtocolDataById(const uint32_t message_id);
 
   /**
    * @brief get chassis detail. used lock_guard in this function to avoid
@@ -85,7 +85,7 @@ class MessageManager {
    * @param chassis_detail chassis_detail to be filled.
    */
   ::apollo::common::ErrorCode GetChassisDetail(
-      ChassisDetail* const chassis_detail);
+      ChassisDetail *const chassis_detail);
 
   /*
    * @brief reset send messages
@@ -103,7 +103,7 @@ class MessageManager {
   std::vector<std::unique_ptr<ProtocolData>> send_protocol_data_;
   std::vector<std::unique_ptr<ProtocolData>> recv_protocol_data_;
 
-  std::unordered_map<uint32_t, ProtocolData*> protocol_data_map_;
+  std::unordered_map<uint32_t, ProtocolData *> protocol_data_map_;
   std::unordered_map<uint32_t, CheckIdArg> check_ids_;
   std::set<uint32_t> received_ids_;
 
@@ -115,7 +115,7 @@ class MessageManager {
 template <class T, bool need_check>
 void MessageManager::AddRecvProtocolData() {
   recv_protocol_data_.emplace_back(new T());
-  auto* dt = recv_protocol_data_.back().get();
+  auto *dt = recv_protocol_data_.back().get();
   if (dt == nullptr) {
     return;
   }
@@ -131,7 +131,7 @@ void MessageManager::AddRecvProtocolData() {
 template <class T, bool need_check>
 void MessageManager::AddSendProtocolData() {
   send_protocol_data_.emplace_back(new T());
-  auto* dt = send_protocol_data_.back().get();
+  auto *dt = send_protocol_data_.back().get();
   if (dt == nullptr) {
     return;
   }

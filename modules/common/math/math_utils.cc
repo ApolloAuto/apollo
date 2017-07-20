@@ -24,13 +24,13 @@ namespace apollo {
 namespace common {
 namespace math {
 
-double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2) {
+double CrossProd(const Vec2d &start_point, const Vec2d &end_point_1,
+                 const Vec2d &end_point_2) {
   return (end_point_1 - start_point).CrossProd(end_point_2 - start_point);
 }
 
-double InnerProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2) {
+double InnerProd(const Vec2d &start_point, const Vec2d &end_point_1,
+                 const Vec2d &end_point_2) {
   return (end_point_1 - start_point).InnerProd(end_point_2 - start_point);
 }
 

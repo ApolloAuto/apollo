@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
@@ -13,7 +15,9 @@ cc_binary(
         "//modules/control/common",
         "//modules/control/proto:control_proto",
         "//modules/hmi/proto:ros_node_proto",
-        "@ros//:ros_common",
         "@com_github_google_protobuf//:protobuf",
+        "@ros//:ros_common",
     ],
 )
+
+cpplint()

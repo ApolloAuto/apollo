@@ -28,11 +28,8 @@
 #include <thread>
 #include <unordered_map>
 
+#include "CivetServer.h"
 #include "third_party/json/json.hpp"
-#include "websocketpp/client.hpp"
-#include "websocketpp/config/asio_no_tls.hpp"
-#include "websocketpp/config/asio_no_tls_client.hpp"
-#include "websocketpp/server.hpp"
 
 /**
  * @namespace apollo::dreamview
@@ -42,73 +39,70 @@ namespace apollo {
 namespace dreamview {
 
 /**
- * @class WebsocketServer
+ * @class WebSocketHandler
  *
- * @brief The WebsocketServer, built on top of the websocketpp library,
- * represents a server endpoint that follows the websocket protocol.
- * When started, it will launch an acceptor to accept incoming connections,
- * and manages a pool of connections when running. Each connection is between
+ * @brief The WebSocketHandler, built on top of CivetWebSocketHandler,
+ * is a websocket handler that handles different types of websocket related
+ * events.
  * the server and a client endpoint. The SendData() method is used to push data
  * to all the connected clients.
  */
-class WebsocketServer {
+class WebSocketHandler : public CivetWebSocketHandler {
  public:
-  using ConnectionHandle = websocketpp::connection_hdl;
-  using ConnectionSet =
-      std::set<ConnectionHandle, std::owner_less<ConnectionHandle>>;
-  using ServerEndpoint = websocketpp::server<websocketpp::config::asio>;
-  using MessagePtr = websocketpp::config::asio_client::message_type::ptr;
   using Json = nlohmann::json;
-  using MessageHandler = std::function<void(const Json &)>;
-
-  /// With the DEFAULT_LOG_LEVEL setting, websocketpp library logs the event
-  /// when a client gets connected, disconnected, or pushed with data payload.
-  static constexpr websocketpp::log::level DEFAULT_LOG_LEVEL =
-      (websocketpp::log::alevel::connect |
-       websocketpp::log::alevel::disconnect |
-       websocketpp::log::alevel::message_payload);
-
-  /// With the NO_LOG configuration, nothing will be logged by the websocketpp
-  /// library.
-  static constexpr websocketpp::log::level NO_LOG =
-      websocketpp::log::alevel::none;
+  using Connection = struct mg_connection;
+  using MessageHandler = std::function<void(const Json &, Connection *)>;
 
   /**
-   * @brief Constructor in which you can specify the log level.
-   * @param port The port on which the server will be launched.
-   * @param log_level The log level for which the events will be logged by the
-   * websocketpp library, could use DEFAULT_LOG_LEVEL or NO_LOG defined above.
-   */
-  WebsocketServer(int port, websocketpp::log::level log_level);
-
-  /**
-   * @brief Constructor with the default log level.
-   * @param port The port on which the server will be launched.
-   */
-  explicit WebsocketServer(int port)
-      : WebsocketServer(port, DEFAULT_LOG_LEVEL) {}
-
-  ~WebsocketServer();
-
-  /**
-   * @brief Call this method to actually run the server. This method will
-   * create a BACKGROUND THREAD for the server listeners and event handlers.
+   * @brief Callback method for when the client intends to establish a websocket
+   * connection, before websocket handshake.
    *
-   * NOTE: This method does not block.
+   * @param server the calling server
+   * @param conn the connection information
+   * @returns true to keep socket open, false to close it
    */
-  void Run();
+  bool handleConnection(CivetServer *server, const Connection *conn) override {
+    return true;
+  }
 
   /**
-   * @brief This method will stop listening for new connections, close all the
-   * current connections, and finally stop the BACKGROUND THREAD of the server.
+   * @brief Callback method for when websocket handshake is successfully
+   * completed, and connection is ready for data exchange.
+   *
+   * @param server the calling server
+   * @param conn the connection information
    */
-  void Stop();
+  void handleReadyState(CivetServer *server, Connection *conn) override;
+
+  /**
+   * @brief Callback method for when a data frame has been received from the
+   * client.
+   *
+   * @param server the calling server
+   * @param conn the connection information
+   * @param bits first byte of the websocket frame, see websocket RFC at
+   *             http://tools.ietf.org/html/rfc6455, section 5.2
+   * @param data payload, with mask (if any) already applied.
+   * @param data_len length of data
+   * @returns true to keep socket open, false to close it
+   */
+  bool handleData(CivetServer *server, Connection *conn, int bits, char *data,
+                  size_t data_len) override;
+
+  /**
+   * @brief Callback method for when the connection is closed.
+   *
+   * @param server the calling server
+   * @param conn the connection information
+   */
+  void handleClose(CivetServer *server, const Connection *conn) override;
 
   /**
    * @brief Sends the provided data to all the connected clients.
    * @param data The message string to be sent.
    */
   bool SendData(const std::string &data);
+  bool SendData(const std::string &data, Connection *conn);
 
   /**
    * @brief Add a new message handler for a message type.
@@ -120,33 +114,6 @@ class WebsocketServer {
   }
 
  private:
-  // OnAcceptConnection() will be called upon connection request
-  // (handshake) from a new client. It returns true if the connection
-  // is accepted, or false if it is rejected.
-  bool OnAcceptConnection(ConnectionHandle handle);
-
-  // OnFail() will be called when a websocket connection attempt by
-  // client fails.
-  void OnFail(ConnectionHandle handle);
-
-  // OnClose() will be called when a client gets disconnected, either
-  // proactively or passively.
-  void OnClose(ConnectionHandle handle);
-
-  // OnMessage will be called when the server receives a message from
-  // client, it will dispatch the message to the corresponding handler
-  // based on the message type.
-  void OnMessage(ConnectionHandle handle, MessagePtr message);
-
-  // The server endpoint.
-  ServerEndpoint server_;
-
-  // The thread for the server (listeners and handlers).
-  std::unique_ptr<std::thread> server_thread_;
-
-  // The pool of all maintained connections.
-  ConnectionSet connections_;
-
   // Message handlers keyed by message type.
   std::unordered_map<std::string, MessageHandler> message_handlers_;
 
@@ -154,9 +121,12 @@ class WebsocketServer {
   // write lock, as the server is not expected to get many clients
   // (connections).
   mutable std::mutex mutex_;
+
+  // The pool of all maintained connections.
+  std::set<Connection *> connections_;
 };
 
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_WEBSOCKET_H_
+#endif /* MODULES_DREAMVIEW_BACKEND_WEBSOCKET_H_ */

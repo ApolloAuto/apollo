@@ -58,8 +58,8 @@ cc_test(
         ":digital_filter",
         ":digital_filter_coefficients",
         "//modules/common",
-        "@ros//:ros_common",
         "@gtest//:main",
+        "@ros//:ros_common",
     ],
 )
 

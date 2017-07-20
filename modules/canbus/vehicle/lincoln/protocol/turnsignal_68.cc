@@ -29,34 +29,32 @@ uint32_t Turnsignal68::GetPeriod() const {
   return PERIOD;
 }
 
-int32_t Turnsignal68::turn_cmd() const {
-  return turn_cmd_;
-}
+int32_t Turnsignal68::turn_cmd() const { return turn_cmd_; }
 
-void Turnsignal68::UpdateData(uint8_t* data) {
+void Turnsignal68::UpdateData(uint8_t *data) {
   set_turn_cmd_p(data, turn_cmd_);
 }
 
 void Turnsignal68::Reset() { turn_cmd_ = 0; }
 
-Turnsignal68* Turnsignal68::set_turn_none() {
+Turnsignal68 *Turnsignal68::set_turn_none() {
   turn_cmd_ = 0x00;
   return this;
 }
 
-Turnsignal68* Turnsignal68::set_turn_left() {
+Turnsignal68 *Turnsignal68::set_turn_left() {
   turn_cmd_ = 0x01;
   return this;
 }
 
-Turnsignal68* Turnsignal68::set_turn_right() {
+Turnsignal68 *Turnsignal68::set_turn_right() {
   turn_cmd_ = 0x02;
   return this;
 }
 // 0x03 not used
 
 // private
-void Turnsignal68::set_turn_cmd_p(uint8_t* data, int32_t turn_cmd) {
+void Turnsignal68::set_turn_cmd_p(uint8_t *data, int32_t turn_cmd) {
   turn_cmd = ProtocolData::BoundedValue(0, 3, turn_cmd);
   Byte frame(data + 0);
   frame.set_value(turn_cmd, 0, 2);

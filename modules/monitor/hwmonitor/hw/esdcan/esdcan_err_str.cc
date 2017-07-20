@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "esdcan_err_str.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
 
 namespace apollo {
 namespace platform {
