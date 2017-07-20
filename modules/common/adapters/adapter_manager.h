@@ -187,7 +187,7 @@ class AdapterManager {
   REGISTER_ADAPTER(Monitor);
   REGISTER_ADAPTER(Pad);
   REGISTER_ADAPTER(PerceptionObstacles);
-  REGISTER_ADAPTER(PlanningTrajectory);
+  REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
 

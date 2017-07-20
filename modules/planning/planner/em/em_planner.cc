@@ -22,6 +22,7 @@
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/planning/common/data_center.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
@@ -31,10 +32,20 @@ namespace planning {
 using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 
-EMPlanner::EMPlanner() {}
+EMPlanner::EMPlanner() {
+}
 
 bool EMPlanner::MakePlan(const TrajectoryPoint& start_point,
-                         std::vector<TrajectoryPoint>* discretized_trajectory) {
+                     std::vector<TrajectoryPoint>* discretized_trajectory) {
+  DataCenter* data_center = DataCenter::instance();
+  Frame* frame = data_center->current_frame();
+
+//  frame->set_planning_data(task->create_planning_data_instance());
+//  frame->mutable_planning_data()->set_reference_line(reference_line);
+//  frame->mutable_planning_data()->set_decision_data(decision_data);
+//  frame->mutable_planning_data()->set_init_planning_point(
+//      frame->environment().vehicle_state_proxy().init_point(data_center->last_frame()));
+
   return true;
 }
 
@@ -65,8 +76,8 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
 
   // assume the time resolution is 0.1
   std::size_t num_time_steps =
-      static_cast<std::size_t>(FLAGS_trajectory_time_length /
-                               FLAGS_trajectory_time_resolution) + 1;
+      static_cast<std::size_t>(FLAGS_trajectory_time_length
+          / FLAGS_trajectory_time_resolution) + 1;
 
   std::vector<SpeedPoint> speed_profile;
   speed_profile.reserve(num_time_steps);

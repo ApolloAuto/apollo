@@ -15,13 +15,14 @@
  *****************************************************************************/
 
 /**
- * @file planning_data.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_COMMON_PLANNING_DATA_H_
 #define MODULES_PLANNING_COMMON_PLANNING_DATA_H_
 
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/reference_line/reference_line.h"

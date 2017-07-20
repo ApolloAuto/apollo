@@ -284,7 +284,7 @@ class Path {
   void init_lane_segments();
   void init_width();
   void init_point_index();
-  void init_overlaps();
+  //  void init_overlaps();
 
   double get_sample(const std::vector<double>& samples, const double s) const;
 

@@ -55,7 +55,7 @@ using MonitorAdapter = Adapter<apollo::common::monitor::MonitorMessage>;
 using PadAdapter = Adapter<::apollo::control::PadMessage>;
 using PerceptionObstaclesAdapter =
     Adapter<::apollo::perception::PerceptionObstacles>;
-using PlanningTrajectoryAdapter = Adapter<::apollo::planning::ADCTrajectory>;
+using PlanningAdapter = Adapter<::apollo::planning::ADCTrajectory>;
 using PredictionAdapter = Adapter<::apollo::prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter =
     Adapter<::apollo::perception::TrafficLightDetection>;

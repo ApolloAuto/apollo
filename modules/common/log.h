@@ -22,11 +22,21 @@
 #define MODULES_COMMON_LOG_H_
 
 #include "glog/logging.h"
+#include "glog/raw_logging.h"
 
 #define ADEBUG VLOG(4) << "[DEBUG] "
 #define AINFO VLOG(3) << "[INFO] "
 #define AWARN LOG(WARNING)
 #define AERROR LOG(ERROR)
 #define AFATAL LOG(FATAL)
+
+// quit if condition is met
+#define QUIT_IF(CONDITION, RET, LEVEL, MSG, ...) \
+do { \
+    if (CONDITION) { \
+        RAW_LOG(LEVEL, MSG, ##__VA_ARGS__); \
+        return RET; \
+    } \
+} while (0);
 
 #endif  // MODULES_COMMON_LOG_H_

@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "lib_reference_line",
+    name = "reference_line",
     srcs = [
         "reference_point.cc",
         "reference_line.cc",
