@@ -35,6 +35,8 @@ namespace apollo {
 namespace common {
 namespace math {
 
+double Sqr(const double x);
+
 /**
  * @brief Cross product between two 2-D vectors from the common start point,
  *        and end at two other points.

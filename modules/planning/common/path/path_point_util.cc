@@ -98,15 +98,14 @@ PathPoint interpolate_linear_approximation(const PathPoint& p0,
 }
 
 TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
-                            const TrajectoryPoint& tp1,
-                            const double t) {
+                            const TrajectoryPoint& tp1, const double t) {
   const PathPoint& pp0 = tp0.path_point();
   const PathPoint& pp1 = tp1.path_point();
   double t0 = tp0.relative_time();
   double t1 = tp1.relative_time();
 
-  std::array<double, 2> dx0 { { tp0.v(), tp0.a() } };
-  std::array<double, 2> dx1 { { tp1.v(), tp1.a() } };
+  std::array<double, 2> dx0{{tp0.v(), tp0.a()}};
+  std::array<double, 2> dx1{{tp1.v(), tp1.a()}};
   HermiteSpline<double, 3> dynamic_spline(dx0, dx1, t0, t1);
 
   double s0 = 0.0;
@@ -119,8 +118,8 @@ TrajectoryPoint interpolate(const TrajectoryPoint& tp0,
   double v = dynamic_spline.evaluate(0, t);
   double a = dynamic_spline.evaluate(1, t);
 
-  std::array<double, 2> gx0 { { pp0.theta(), pp0.kappa() } };
-  std::array<double, 2> gx1 { { pp1.theta(), pp1.kappa() } };
+  std::array<double, 2> gx0{{pp0.theta(), pp0.kappa()}};
+  std::array<double, 2> gx1{{pp1.theta(), pp1.kappa()}};
   HermiteSpline<double, 3> geometry_spline(gx0, gx1, s0, s1);
   auto func_cos_theta = [&geometry_spline](const double s) {
     auto theta = geometry_spline.evaluate(0, s);
@@ -167,7 +166,6 @@ TrajectoryPoint interpolate_linear_approximation(const TrajectoryPoint& tp0,
   tp.set_v(Interpolation::lerp(tp0.v(), t0, tp1.v(), t1, t));
   tp.set_a(Interpolation::lerp(tp0.a(), t0, tp1.a(), t1, t));
   tp.set_relative_time(t);
-  tp.set_dkappa(Interpolation::lerp(tp0.dkappa(), t0, tp1.dkappa(), t1, t));
 
   PathPoint* path_point = tp.mutable_path_point();
   path_point->set_x(Interpolation::lerp(pp0.x(), t0, pp1.x(), t1, t));

@@ -43,9 +43,9 @@ message PathPoint {
   // accumulated distance from beginning of the path
   optional double s = 6;
 
-  // derivative of kappa.
+  // derivative of kappa w.r.t s.
   optional double dkappa = 7;
-  // derivative of derivative of kappa.
+  // derivative of derivative of kappa w.r.t s.
   optional double ddkappa = 8;
 }
 
@@ -59,6 +59,4 @@ message TrajectoryPoint {
   optional double a = 3;
   // relative time from beginning of the trajectory
   optional double relative_time = 4;
-  // curvature change rate w.r.t. time
-  optional double dkappa = 5;
 }
