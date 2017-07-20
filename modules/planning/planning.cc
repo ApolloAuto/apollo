@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/planning/planning.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/rtk_replay_planner.h"
+#include "modules/planning/planning.h"
 #include "modules/planning/planning.h"
 
 namespace apollo {
@@ -27,7 +27,6 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
-using TrajectoryPb = ADCTrajectory;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 
@@ -116,8 +115,8 @@ void Planning::RunOnce() {
   bool res_planning = Plan(vehicle_state, is_on_auto_mode, execution_start_time,
                            &planning_trajectory);
   if (res_planning) {
-    TrajectoryPb trajectory_pb =
-        ToTrajectoryPb(execution_start_time, planning_trajectory);
+    ADCTrajectory trajectory_pb =
+        ToADCTrajectory(execution_start_time, planning_trajectory);
     AdapterManager::PublishPlanningTrajectory(trajectory_pb);
     AINFO << "Planning succeeded";
   } else {
@@ -262,28 +261,18 @@ std::vector<TrajectoryPoint> Planning::GetOverheadTrajectory(
   return overhead_trajectory;
 }
 
-TrajectoryPb Planning::ToTrajectoryPb(
+ADCTrajectory Planning::ToADCTrajectory(
     const double header_time,
     const std::vector<TrajectoryPoint>& discretized_trajectory) {
-  TrajectoryPb trajectory_pb;
+  ADCTrajectory trajectory_pb;
   AdapterManager::FillPlanningTrajectoryHeader("planning",
                                                trajectory_pb.mutable_header());
 
   trajectory_pb.mutable_header()->set_timestamp_sec(header_time);
 
   for (const auto& trajectory_point : discretized_trajectory) {
-    auto ptr_trajectory_point_pb = trajectory_pb.add_adc_trajectory_point();
-    ptr_trajectory_point_pb->set_x(trajectory_point.path_point().x());
-    ptr_trajectory_point_pb->set_y(trajectory_point.path_point().y());
-    ptr_trajectory_point_pb->set_theta(trajectory_point.path_point().theta());
-    ptr_trajectory_point_pb->set_curvature(
-        trajectory_point.path_point().kappa());
-    ptr_trajectory_point_pb->set_relative_time(
-        trajectory_point.relative_time());
-    ptr_trajectory_point_pb->set_speed(trajectory_point.v());
-    ptr_trajectory_point_pb->set_acceleration_s(trajectory_point.a());
-    ptr_trajectory_point_pb->set_accumulated_s(
-        trajectory_point.path_point().s());
+    auto ptr_trajectory_point_pb = trajectory_pb.add_trajectory_point();
+    ptr_trajectory_point_pb->CopyFrom(trajectory_point);
   }
   return std::move(trajectory_pb);
 }

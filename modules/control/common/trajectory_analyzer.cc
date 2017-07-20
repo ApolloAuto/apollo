@@ -55,24 +55,10 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
   header_time_ = planning_published_trajectory->header().timestamp_sec();
   seq_num_ = planning_published_trajectory->header().sequence_num();
 
-  int num_points = planning_published_trajectory->adc_trajectory_point_size();
-  trajectory_points_.reserve(num_points);
-
-  for (const auto& published_trajectory_point :
-       planning_published_trajectory->adc_trajectory_point()) {
-    TrajectoryPoint point;
-    point.mutable_path_point()->set_s(
-        published_trajectory_point.accumulated_s());
-    point.mutable_path_point()->set_x(published_trajectory_point.x());
-    point.mutable_path_point()->set_y(published_trajectory_point.y());
-    point.mutable_path_point()->set_theta(published_trajectory_point.theta());
-    point.mutable_path_point()->set_kappa(
-        published_trajectory_point.curvature());
-    point.set_v(published_trajectory_point.speed());
-    point.set_a(published_trajectory_point.acceleration_s());
-    point.set_relative_time(published_trajectory_point.relative_time());
-
-    trajectory_points_.push_back(std::move(point));
+  for (int i = 0; i < planning_published_trajectory->trajectory_point_size();
+       ++i) {
+    trajectory_points_.push_back(
+        planning_published_trajectory->trajectory_point(i));
   }
 }
 
