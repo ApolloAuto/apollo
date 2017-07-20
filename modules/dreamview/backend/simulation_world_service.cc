@@ -240,8 +240,10 @@ void UpdateSimulationWorld<PlanningTrajectoryAdapter>(
 }  // namespace internal
 
 constexpr int SimulationWorldService::kMaxMonitorItems;
+constexpr double SimulationWorldService::kMapRadius;
 
-SimulationWorldService::SimulationWorldService() {
+SimulationWorldService::SimulationWorldService(MapService *map_service)
+    : map_service_(map_service) {
   world_.set_map_md5("initialize");
   AdapterManager::Init();
   VehicleConfigHelper::Init();
@@ -263,10 +265,19 @@ Json SimulationWorldService::GetUpdateAsJson() const {
   std::string sim_world_json;
   ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
 
+  // Gather required map element ids based on current location.
+  apollo::hdmap::Point point;
+  point.set_x(world_.auto_driving_car().position_x());
+  point.set_y(world_.auto_driving_car().position_y());
+  MapElementIds map_element_ids =
+      map_service_->CollectMapElements(point, kMapRadius);
+
   Json update;
   update["type"] = "sim_world_update";
-  update["world"] = Json::parse(sim_world_json);
   update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
+  update["world"] = Json::parse(sim_world_json);
+  update["mapElements"] = map_element_ids.Json();
+  update["mapHash"] = map_element_ids.Hash();
 
   return update;
 }

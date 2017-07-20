@@ -26,6 +26,7 @@
 
 #include "third_party/json/json.hpp"
 
+#include "modules/dreamview/backend/map_service.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -80,16 +81,23 @@ class SimulationWorldService {
   // SimulationWorld.
   static constexpr int kMaxMonitorItems = 30;
 
+  // The radius within which Dreamview will find all the map elements around the
+  // car.
+  static constexpr double kMapRadius = 200.0;
+
   /**
-   * @brief Default constructor.
+   * @brief Constructor of SimulationWorldService.
+   * @param map_service the pointer of MapService.
    */
-  SimulationWorldService();
+  explicit SimulationWorldService(MapService *map_service);
 
   /**
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const { return world_; }
+  inline const SimulationWorld &world() const {
+    return world_;
+  }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
@@ -110,7 +118,9 @@ class SimulationWorldService {
    * The backend won't push the SimulationWorld to frontend if it is not ready.
    * @return True if the object is ready to push.
    */
-  bool ReadyToPush() const { return world_.has_auto_driving_car(); }
+  bool ReadyToPush() const {
+    return world_.has_auto_driving_car();
+  }
 
  private:
   /**
@@ -158,6 +168,9 @@ class SimulationWorldService {
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
+
+  // The handle of MapService, not woned by SimulationWorldService.
+  MapService *map_service_;
 };
 
 }  // namespace dreamview
