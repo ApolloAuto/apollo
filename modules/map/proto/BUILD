@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
@@ -14,6 +16,7 @@ cc_proto_library(
         "map_junction.proto",
         "map_lane.proto",
         "map_overlap.proto",
+        "map_parking_space.proto",
         "map_signal.proto",
         "map_speed_bump.proto",
         "map_stop_sign.proto",
@@ -36,6 +39,7 @@ py_proto_compile(
         "map_junction.proto",
         "map_lane.proto",
         "map_overlap.proto",
+        "map_parking_space.proto",
         "map_signal.proto",
         "map_speed_bump.proto",
         "map_stop_sign.proto",
@@ -46,3 +50,5 @@ py_proto_compile(
         "//modules/common/proto:common_proto_pylib",
     ],
 )
+
+cpplint()
