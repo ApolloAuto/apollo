@@ -19,10 +19,13 @@
 
 #include <vector>
 #include <unordered_map>
+#include <string>
+#include <memory>
 
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/prediction/proto/fnn_vehicle_model.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -38,6 +41,8 @@ class MLPEvaluator : public Evaluator {
   void ExtractFeatureValues(Obstacle* obstacle_ptr,
                             LaneSequence* lane_sequence_ptr);
 
+  void Predict(Obstacle* obstacle_ptr);
+
   void Clear();
 
  private:
@@ -48,10 +53,16 @@ class MLPEvaluator : public Evaluator {
                             LaneSequence* lane_sequence_ptr,
                             std::vector<double>* feature_values);
 
+  void LoadModel(const std::string& model_file);
+
+  double ComputeProbability();
+
  private:
   std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
   static const size_t OBSTACLE_FEATURE_SIZE = 18;
   static const size_t LANE_FEATURE_SIZE = 20;
+
+  std::unique_ptr<FnnVehicleModel> model_ptr_;
 };
 
 }  // namespace prediction

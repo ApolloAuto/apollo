@@ -253,5 +253,14 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
   }
 }
 
+void MLPEvaluator::LoadModel(const std::string& model_file) {
+  // TODO(kechxu) implement
+}
+
+double MLPEvaluator::ComputeProbability() {
+  // TODO(kechxu) implement
+  return 0.0;
+}
+
 }  // namespace prediction
 }  // namespace apollo
