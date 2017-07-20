@@ -6,6 +6,7 @@ cc_library(
     name = "lib_planner",
     srcs = [
         "rtk_replay_planner.cc",
+        "em_planner.cc",
     ],
     hdrs = glob([
         "*.h",
@@ -15,8 +16,10 @@ cc_library(
         "//modules/common:log",
         "//modules/common/proto:path_point_proto",
         "//modules/common/util",
+        "//modules/common/util:factory",
         "//modules/common/vehicle_state",
         "//modules/planning/common:lib_planning_common",
+        "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "@eigen//:eigen",
     ],
 )
