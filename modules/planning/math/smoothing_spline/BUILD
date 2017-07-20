@@ -107,7 +107,6 @@ cc_library(
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen//:eigen",
-        "@glog//:glog",
     ],
 )
 
@@ -137,7 +136,6 @@ cc_library(
         ":spline_2d_seg",
         "//modules/planning/math:polynomial_xd",
         "@eigen//:eigen",
-        "@glog//:glog",
     ],
 )
 

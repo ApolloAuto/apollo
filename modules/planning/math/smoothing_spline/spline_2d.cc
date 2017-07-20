@@ -148,8 +148,7 @@ std::size_t Spline2d::spline_order() const { return spline_order_; }
 std::size_t Spline2d::find_index(const double t) const {
   auto upper_bound = std::upper_bound(t_knots_.begin() + 1, t_knots_.end(), t);
   return std::min(t_knots_.size() - 1,
-                  static_cast<std::size_t>(upper_bound - t_knots_.begin())) -
-         1;
+                  static_cast<std::size_t>(upper_bound - t_knots_.begin())) - 1;
 }
 
 }  // namespace planning

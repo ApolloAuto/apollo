@@ -23,7 +23,7 @@
 
 #include <utility>
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -54,8 +54,8 @@ inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
                                           std::array<T, (N + 1) / 2> x1,
                                           const double z0, const double z1)
     : _x0(std::move(x0)), _x1(std::move(x1)), _z0(z0), delta_z_(z1 - z0) {
-  CHECK((N == 3 || N == 5) &&
-        "Error: currently we only support cubic and quintic hermite splines!");
+  CHECK(N == 3 || N == 5)
+      << "Error: currently we only support cubic and quintic hermite splines!";
 }
 
 template <typename T, std::size_t N>
@@ -174,7 +174,7 @@ inline T HermiteSpline<T, N>::evaluate(const std::size_t order,
       default: { break; }
     }
   }
-  CHECK(false && "Error: unsupported order of spline or derivative!");
+  AFATAL << "Error: unsupported order of spline or derivative!";
   T t;
   return t;
 }
