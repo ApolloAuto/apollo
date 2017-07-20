@@ -21,12 +21,12 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_POINT_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_POINT_H_
 
-#include "modules/common/path/path.h"
+#include "modules/map/pnc_map/path.h"
 
 namespace apollo {
 namespace planning {
 
-class ReferencePoint : public ::apollo::common::PathPoint {
+class ReferencePoint : public ::apollo::hdmap::PathPoint {
  public:
   ReferencePoint() = default;
 
@@ -35,11 +35,11 @@ class ReferencePoint : public ::apollo::common::PathPoint {
                  const double lower_bound, const double upper_bound);
 
   ReferencePoint(const apollo::common::math::Vec2d& point, const double heading,
-                 const ::apollo::common::LaneWaypoint lane_waypoint);
+                 const ::apollo::hdmap::LaneWaypoint lane_waypoint);
 
   ReferencePoint(const apollo::common::math::Vec2d& point, const double heading,
                  const double kappa, const double dkappa,
-                 const ::apollo::common::LaneWaypoint lane_waypoint);
+                 const ::apollo::hdmap::LaneWaypoint lane_waypoint);
 
   void set_kappa(const double kappa);
   void set_dkappa(const double dkappa);

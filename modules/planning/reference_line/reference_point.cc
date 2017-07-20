@@ -27,7 +27,7 @@ ReferencePoint::ReferencePoint(const ::apollo::common::math::Vec2d& point,
                                const double heading, const double kappa,
                                const double dkappa, const double lower_bound,
                                const double upper_bound)
-    : ::apollo::common::PathPoint(point, heading),
+    : ::apollo::hdmap::PathPoint(point, heading),
       _kappa(kappa),
       _dkappa(dkappa),
       _lower_bound(lower_bound),
@@ -35,14 +35,14 @@ ReferencePoint::ReferencePoint(const ::apollo::common::math::Vec2d& point,
 
 ReferencePoint::ReferencePoint(
     const apollo::common::math::Vec2d& point, const double heading,
-    const ::apollo::common::LaneWaypoint lane_waypoint)
-    : ::apollo::common::PathPoint(point, heading, lane_waypoint) {}
+    const ::apollo::hdmap::LaneWaypoint lane_waypoint)
+    : ::apollo::hdmap::PathPoint(point, heading, lane_waypoint) {}
 
 ReferencePoint::ReferencePoint(
     const apollo::common::math::Vec2d& point, const double heading,
     const double kappa, const double dkappa,
-    const ::apollo::common::LaneWaypoint lane_waypoint)
-    : ::apollo::common::PathPoint(point, heading, lane_waypoint),
+    const ::apollo::hdmap::LaneWaypoint lane_waypoint)
+    : ::apollo::hdmap::PathPoint(point, heading, lane_waypoint),
       _kappa(kappa),
       _dkappa(dkappa) {}
 
