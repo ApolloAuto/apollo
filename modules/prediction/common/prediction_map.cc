@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/map/prediction_map.h"
+#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/map/hdmap/hdmap.h"
 

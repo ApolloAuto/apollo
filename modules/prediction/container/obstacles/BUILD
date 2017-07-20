@@ -22,7 +22,7 @@ cc_library(
         "//modules/common/math:math_utils",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/proto:feature_proto",
-        "//modules/prediction/common:prediction_common",
+        "//modules/prediction/common:prediction_gflags",
     ],
 )
 

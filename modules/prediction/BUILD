@@ -16,7 +16,7 @@ cc_library(
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
         "//modules/perception/proto:perception_proto",
-        "//modules/prediction/common:prediction_common",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/proto:prediction_conf_proto",
     ],
