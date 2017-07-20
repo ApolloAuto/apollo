@@ -2,6 +2,11 @@ syntax = "proto2";
 
 package apollo.common;
 
+message STPoint {
+    optional double s = 1;
+    optional double t = 2;
+}
+
 message SLPoint {
     optional double s = 1;
     optional double l = 2;

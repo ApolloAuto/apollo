@@ -17,7 +17,9 @@ limitations under the License.
 
 #include <chrono>
 #include <string>
-#include "glog/logging.h"
+
+#include "modules/common/log.h"
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
