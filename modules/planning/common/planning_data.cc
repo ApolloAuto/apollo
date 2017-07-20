@@ -21,5 +21,50 @@
 #include "modules/planning/common/planning_data.h"
 
 namespace apollo {
-namespace planning {}  // namespace planning
+namespace planning {
+
+const ReferenceLine& PlanningData::reference_line() const {
+  return *_reference_line.get();
+}
+
+const DecisionData& PlanningData::decision_data() const {
+  return *_decision_data.get();
+}
+
+const PublishableTrajectory& PlanningData::computed_trajectory() const {
+  return _computed_trajectory;
+}
+
+const TrajectoryPoint& PlanningData::init_planning_point() const {
+  return _init_planning_point;
+}
+
+DecisionData* PlanningData::mutable_decision_data() const {
+  return _decision_data.get();
+}
+
+PublishableTrajectory* PlanningData::mutable_computed_trajectory() {
+  return &_computed_trajectory;
+};
+
+void PlanningData::set_init_planning_point(
+    const TrajectoryPoint& init_planning_point) {
+  _init_planning_point = init_planning_point;
+}
+
+void PlanningData::set_reference_line(
+    std::unique_ptr<ReferenceLine>& reference_line) {
+  _reference_line = std::move(reference_line);
+}
+void PlanningData::set_decision_data(
+    std::unique_ptr<DecisionData>& decision_data) {
+  _decision_data = std::move(decision_data);
+}
+
+void PlanningData::set_computed_trajectory(
+    PublishableTrajectory publishable_trajectory) {
+  _computed_trajectory = std::move(publishable_trajectory);
+}
+
+}  // namespace planning
 }  // namespace apollo
