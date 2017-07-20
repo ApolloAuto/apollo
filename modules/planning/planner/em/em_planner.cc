@@ -37,7 +37,7 @@ EMPlanner::EMPlanner() {}
 bool EMPlanner::MakePlan(const TrajectoryPoint& start_point,
                          std::vector<TrajectoryPoint>* discretized_trajectory) {
   DataCenter* data_center = DataCenter::instance();
-  Frame* frame = data_center->current_frame();
+  // Frame* frame = data_center->current_frame();
 
   //  frame->set_planning_data(task->create_planning_data_instance());
   //  frame->mutable_planning_data()->set_reference_line(reference_line);

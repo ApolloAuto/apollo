@@ -119,7 +119,7 @@ cc_library(
         ":planning_data",
         "//modules/common/proto:path_point_proto",
         "//modules/planning/common/path:path_data",
-        "//modules/planning/common/speed",
+        "//modules/planning/common/speed:speed_data",
         "//modules/planning/math:double",
     ]
 )
