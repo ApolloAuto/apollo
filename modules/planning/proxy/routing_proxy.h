@@ -33,8 +33,8 @@ class RoutingProxy {
  public:
   RoutingProxy() = default;
   apollo::common::Status Init();
-  void set_routing(const ::apollo::hdmap::RoutingResult& routing);
-  const ::apollo::hdmap::RoutingResult& routing() const;
+  void set_routing(const ::apollo::hdmap::RoutingResult &routing);
+  const ::apollo::hdmap::RoutingResult &routing() const;
 
  private:
   ::apollo::hdmap::RoutingResult routing_;

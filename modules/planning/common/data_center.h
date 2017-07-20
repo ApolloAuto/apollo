@@ -37,16 +37,16 @@ namespace planning {
 class DataCenter {
  public:
   ~DataCenter() = default;
-  Frame* frame(const uint32_t sequence_num) const;
+  Frame *frame(const uint32_t sequence_num) const;
  public:
   apollo::common::Status init_frame(const uint32_t sequence_num);
-  Frame* current_frame() const;
+  Frame *current_frame() const;
   void save_frame();
 
-  Environment* mutable_environment();
-  MasterStateMachine* mutable_master() const;
+  Environment *mutable_environment();
+  MasterStateMachine *mutable_master() const;
 
-  const Frame* last_frame() const;
+  const Frame *last_frame() const;
  private:
   std::unordered_map<uint32_t, std::unique_ptr<Frame>> _frames;
   std::list<uint32_t> _sequence_queue;
@@ -54,7 +54,7 @@ class DataCenter {
   std::unique_ptr<Frame> _frame = nullptr;
   std::unique_ptr<MasterStateMachine> _master = nullptr;
  private:
-  DECLARE_SINGLETON(DataCenter);
+ DECLARE_SINGLETON(DataCenter);
 };
 
 }  // namespace planning

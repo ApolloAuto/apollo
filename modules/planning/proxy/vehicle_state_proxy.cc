@@ -33,20 +33,20 @@ namespace apollo {
 namespace planning {
 
 void VehicleStateProxy::set_vehicle_chassis(
-    const ::apollo::common::config::VehicleConfig& config,
-    const ::apollo::localization::LocalizationEstimate& localization_estimate,
-    const ::apollo::canbus::Chassis& chassis) {
+    const ::apollo::common::config::VehicleConfig &config,
+    const ::apollo::localization::LocalizationEstimate &localization_estimate,
+    const ::apollo::canbus::Chassis &chassis) {
   _localization_estimate.CopyFrom(localization_estimate);
   _chassis.CopyFrom(chassis);
   init(config);
 }
 
-const ::apollo::localization::LocalizationEstimate&
+const ::apollo::localization::LocalizationEstimate &
 VehicleStateProxy::localization_estimate() {
   return _localization_estimate;
 }
 
-const ::apollo::canbus::Chassis& VehicleStateProxy::vehicle_chassis() const {
+const ::apollo::canbus::Chassis &VehicleStateProxy::vehicle_chassis() const {
   return _chassis;
 }
 
@@ -74,7 +74,7 @@ double VehicleStateProxy::timestamp() const {
 // related places.
 
 bool VehicleStateProxy::need_planner_reinit(
-    const Frame* const prev_frame) const {
+    const Frame *const prev_frame) const {
   // judge if the replanning is needed here
   /*
   if (prev_frame == nullptr) {
@@ -113,7 +113,7 @@ bool VehicleStateProxy::need_planner_reinit(
 }
 
 const ::apollo::common::TrajectoryPoint VehicleStateProxy::init_point(
-    const Frame* const prev_frame) const {
+    const Frame *const prev_frame) const {
   ::apollo::common::TrajectoryPoint init_point;
   /*
    init_point.mutable_path_point()->set_x(
@@ -169,16 +169,16 @@ const ::apollo::common::TrajectoryPoint VehicleStateProxy::init_point(
 }
 
 void VehicleStateProxy::init(
-    const ::apollo::common::config::VehicleConfig& config) {
+    const ::apollo::common::config::VehicleConfig &config) {
   _config = config;
   // TODO(@lianglia_apollo):
   // if the car is driving uphill or downhill, the velocity in the z axis
   // is not 0.
-  const auto& velocity3d = _localization_estimate.pose().linear_velocity();
+  const auto &velocity3d = _localization_estimate.pose().linear_velocity();
   Eigen::Vector2d velocity2d(velocity3d.x(), velocity3d.y());
   _linear_velocity = velocity2d.norm();
 
-  const auto& acceleration3d =
+  const auto &acceleration3d =
       _localization_estimate.pose().linear_acceleration();
   if (std::isnan(acceleration3d.x()) || std::isnan(acceleration3d.y())) {
     _linear_acceleration = 0.0;
@@ -192,13 +192,13 @@ void VehicleStateProxy::init(
     }
   }
 
-  const auto& quaternion = _localization_estimate.pose().orientation();
+  const auto &quaternion = _localization_estimate.pose().orientation();
   _heading = std::atan2(2.0 * (quaternion.qw() * quaternion.qz() +
-                               quaternion.qx() * quaternion.qy()),
+                            quaternion.qx() * quaternion.qy()),
                         1.0 -
                             2.0 * (quaternion.qy() * quaternion.qy() +
-                                   quaternion.qz() * quaternion.qz())) +
-             M_PI / 2.0;
+                                quaternion.qz() * quaternion.qz())) +
+      M_PI / 2.0;
 
   CHECK(_config.has_vehicle_param());
   CHECK(_config.vehicle_param().has_steer_ratio());
@@ -210,9 +210,9 @@ void VehicleStateProxy::init(
     _curvature = 0.0;
   } else {
     _curvature = std::tan(_chassis.steering_percentage() *
-                          _config.vehicle_param().max_steer_angle() /
-                          _config.vehicle_param().steer_ratio()) /
-                 _config.vehicle_param().wheel_base();
+        _config.vehicle_param().max_steer_angle() /
+        _config.vehicle_param().steer_ratio()) /
+        _config.vehicle_param().wheel_base();
   }
 }
 

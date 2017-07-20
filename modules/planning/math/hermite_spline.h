@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-template <typename T, std::size_t N>
+template<typename T, std::size_t N>
 class HermiteSpline {
  public:
   HermiteSpline(std::array<T, (N + 1) / 2> x0, std::array<T, (N + 1) / 2> x1,
@@ -49,16 +49,16 @@ class HermiteSpline {
   double delta_z_ = 0.0;
 };
 
-template <typename T, std::size_t N>
+template<typename T, std::size_t N>
 inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
                                           std::array<T, (N + 1) / 2> x1,
                                           const double z0, const double z1)
     : _x0(std::move(x0)), _x1(std::move(x1)), _z0(z0), delta_z_(z1 - z0) {
   CHECK(N == 3 || N == 5)
-      << "Error: currently we only support cubic and quintic hermite splines!";
+  << "Error: currently we only support cubic and quintic hermite splines!";
 }
 
-template <typename T, std::size_t N>
+template<typename T, std::size_t N>
 inline T HermiteSpline<T, N>::evaluate(const std::size_t order,
                                        const double z) const {
   CHECK_LE(_z0, z);
@@ -77,19 +77,19 @@ inline T HermiteSpline<T, N>::evaluate(const std::size_t order,
         double t3 = t2 * t;
 
         return (2.0 * t3 - 3.0 * t2 + 1.0) * p0 + (t3 - 2 * t2 + t) * v0 +
-               (-2.0 * t3 + 3.0 * t2) * p1 + (t3 - t2) * v1;
+            (-2.0 * t3 + 3.0 * t2) * p1 + (t3 - t2) * v1;
       }
       case 1: {
         double t = (z - _z0) / delta_z_;
         double t2 = t * t;
 
         return (6.0 * t2 - 6.0 * t) * p0 + (3.0 * t2 - 4 * t + 1.0) * v0 +
-               (-6.0 * t2 + 6.0 * t) * p1 + (3.0 * t2 - 2.0 * t) * v1;
+            (-6.0 * t2 + 6.0 * t) * p1 + (3.0 * t2 - 2.0 * t) * v1;
       }
       case 2: {
         double t = (z - _z0) / delta_z_;
         return (12.0 * t - 6.0) * p0 + (6.0 * t - 4.0) * v0 +
-               (-12.0 * t + 6.0) * p1 + (6.0 * t - 2.0) * v1;
+            (-12.0 * t + 6.0) * p1 + (6.0 * t - 2.0) * v1;
       }
       case 3: {
         return 12.0 * p0 + 6.0 * v0 - 12.0 * p1 + 6.0 * v1;
@@ -153,7 +153,7 @@ inline T HermiteSpline<T, N>::evaluate(const std::size_t order,
         double ddh5 = 3.0 * t - 12.0 * t2 + 10.0 * t3;
 
         return ddh0 * p0 + ddh1 * v0 + ddh2 * a0 + ddh3 * p1 + ddh4 * v1 +
-               ddh5 * a1;
+            ddh5 * a1;
       }
       case 3: {
         double t = (z - _z0) / delta_z_;
@@ -167,10 +167,10 @@ inline T HermiteSpline<T, N>::evaluate(const std::size_t order,
         double dddh5 = 3.0 - 24.0 * t + 30.0 * t2;
 
         return dddh0 * p0 + dddh1 * v0 + dddh2 * a0 + dddh3 * p1 + dddh4 * v1 +
-               dddh5 * a1;
+            dddh5 * a1;
       }
-      // TODO(fanhaoyang): the derive higher order derivative for
-      // quintic hermite spline
+        // TODO(fanhaoyang): the derive higher order derivative for
+        // quintic hermite spline
       default: { break; }
     }
   }

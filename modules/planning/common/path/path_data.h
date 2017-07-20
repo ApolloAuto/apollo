@@ -33,23 +33,23 @@ class PathData {
  public:
   PathData() = default;
 
-  void set_path(const DiscretizedPath& path);
+  void set_path(const DiscretizedPath &path);
 
-  void set_frenet_path(const FrenetFramePath& frenet_path);
+  void set_frenet_path(const FrenetFramePath &frenet_path);
 
-  DiscretizedPath* mutable_path();
+  DiscretizedPath *mutable_path();
 
-  const DiscretizedPath& path() const;
+  const DiscretizedPath &path() const;
 
-  FrenetFramePath* mutable_frenet_frame_path();
+  FrenetFramePath *mutable_frenet_frame_path();
 
-  const FrenetFramePath& frenet_frame_path() const;
+  const FrenetFramePath &frenet_frame_path() const;
 
   bool get_path_point_with_path_s(const double s,
-                                  common::PathPoint* const path_point) const;
+                                  common::PathPoint *const path_point) const;
 
   bool get_path_point_with_ref_s(const double ref_s,
-                                 common::PathPoint* const path_point) const;
+                                 common::PathPoint *const path_point) const;
 
   // TODO(fanhaoyang) add check if the path data is valid
  private:
