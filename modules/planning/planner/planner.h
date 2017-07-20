@@ -53,7 +53,7 @@ class Planner {
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  virtual bool Plan(
+  virtual bool MakePlan(
       const apollo::common::TrajectoryPoint& start_point,
       std::vector<apollo::common::TrajectoryPoint>* discretized_trajectory) = 0;
 };
