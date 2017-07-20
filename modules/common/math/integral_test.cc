@@ -37,13 +37,13 @@ double SinFunc(double x) { return std::sin(x); }
 }  // namespace
 
 TEST(IntegralTest, Integration) {
-  double linear_integral = GaussLegendre(LinearFunc, 0.0, 1.0);
+  double linear_integral = IntegrateByGaussLegendre(LinearFunc, 0.0, 1.0);
   EXPECT_NEAR(linear_integral, 1.0, 1e-5);
-  double square_integral = GaussLegendre(SquareFunc, 0.0, 1.0);
+  double square_integral = IntegrateByGaussLegendre(SquareFunc, 0.0, 1.0);
   EXPECT_NEAR(square_integral, 1.0 / 3.0, 1e-5);
-  double cubic_integral = GaussLegendre(CubicFunc, 0.0, 1.0);
+  double cubic_integral = IntegrateByGaussLegendre(CubicFunc, 0.0, 1.0);
   EXPECT_NEAR(cubic_integral, 1.0 / 4.0, 1e-5);
-  double sin_integral = GaussLegendre(SinFunc, 0.0, 0.5 * M_PI);
+  double sin_integral = IntegrateByGaussLegendre(SinFunc, 0.0, 0.5 * M_PI);
   EXPECT_NEAR(sin_integral, 1.0, 1e-5);
 }
 
