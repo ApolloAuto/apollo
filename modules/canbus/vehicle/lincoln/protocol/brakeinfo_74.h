@@ -48,8 +48,8 @@ class Brakeinfo74 : public ProtocolData {
    * @param timestamp the timestamp of input data
    * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const override;
+  void Parse(const std::uint8_t *bytes, int32_t length,
+             ChassisDetail *chassis_detail) const override;
 
  private:
   /*

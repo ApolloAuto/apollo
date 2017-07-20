@@ -211,7 +211,7 @@ Chassis LincolnController::chassis() {
   } else {
     chassis_.set_parking_brake(false);
   }
-  // TODO: lincoln beam
+  // TODO(Authors): lincoln beam
   // 14, 15
 
   // 16, 17
@@ -346,7 +346,6 @@ void LincolnController::Gear(Chassis::GearPosition gear_position) {
   // we need to apply a brake
   // which needs to be done by human or
   // some canbus cmd
-  // TODO
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
       gear_66_->set_gear_neutral();
@@ -390,8 +389,6 @@ void LincolnController::Gear(Chassis::GearPosition gear_position) {
 // acceleration_spd:60 ~ 100, suggest: 90
 // -> pedal
 void LincolnController::Brake(double pedal) {
-  // double real_value = params_.max_acc() * acceleration / 100;
-  // TODO
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";
