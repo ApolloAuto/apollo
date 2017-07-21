@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /**
- * @file path_optimizer.h
+ * @file speed_optimizer.h
  **/
 
-#ifndef MODULES_PLANNING_OPTIMIZER_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_OPTIMIZER_PATH_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_SPEED_OPTIMIZER_H_
+#define MODULES_PLANNING_OPTIMIZER_SPEED_OPTIMIZER_H_
 
 #include "modules/planning/optimizer/optimizer.h"
 
@@ -28,24 +28,24 @@
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
+#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
 
-class PathOptimizer : public Optimizer {
+class SpeedOptimizer : public Optimizer {
  public:
-  explicit PathOptimizer(const std::string &name);
-  virtual ~PathOptimizer() = default;
-  virtual apollo::common::ErrorCode optimize(
-      const DataCenter &data_center, const SpeedData &speed_data,
-      const ReferenceLine &reference_line,
-      const ::apollo::planning::TrajectoryPoint &init_point,
-      DecisionData *const decision_data, PathData *const path_data) const = 0;
+  explicit SpeedOptimizer(const std::string& name);
+  virtual ~SpeedOptimizer() = default;
+  virtual common::ErrorCode optimize(const DataCenter& data_center,
+                                     const PathData& path_data,
+                                     const TrajectoryPoint& init_point,
+                                     DecisionData* const decision_data,
+                                     SpeedData* const speed_data) const = 0;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPTIMIZER_PATH_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_SPEED_OPTIMIZER_H_
