@@ -289,7 +289,7 @@ class Polygon2d {
    */
   std::string DebugString() const;
 
- private:
+ protected:
   void BuildFromPoints();
   int Next(int at) const;
   int Prev(int at) const;
