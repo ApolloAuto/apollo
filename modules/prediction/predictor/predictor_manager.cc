@@ -16,6 +16,8 @@
 
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/predictor/predictor_factory.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -35,9 +37,15 @@ Predictor* PredictorManager::GetPredictor(
 void PredictorManager::Run(
     const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles_.Clear();
+  ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::instance()->mutable_container("ObstaclesContainer"));
+  CHECK_NOTNULL(container);
+
   Predictor *predictor = nullptr;
-  for (const auto& obstacle : perception_obstacles.perception_obstacle()) {
-    switch (obstacle.type()) {
+  for (const auto& perception_obstacle :
+      perception_obstacles.perception_obstacle()) {
+    int id = perception_obstacle.id();
+    switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
         predictor = GetPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
         break;
@@ -52,7 +60,8 @@ void PredictorManager::Run(
       }
     }
     if (predictor != nullptr) {
-      predictor->Predict();
+      Obstacle* obstacle = container->GetObstacle(id);
+      predictor->Predict(obstacle);
       prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
         predictor->prediction_obstacle());
     }

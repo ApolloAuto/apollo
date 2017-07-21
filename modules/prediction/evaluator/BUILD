@@ -22,8 +22,13 @@ cc_library(
     hdrs = ["evaluator_manager.h"],
     deps = [
         "//modules/prediction/evaluator:evaluator",
+        "//modules/prediction/evaluator:evaluator_factory",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/proto:prediction_conf_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/common:macro",
+        "//modules/common:log",
         "@glog//:glog",
     ]
 )

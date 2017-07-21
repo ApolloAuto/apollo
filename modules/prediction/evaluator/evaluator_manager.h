@@ -26,6 +26,7 @@
 
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/common/macro.h"
 
 /**
@@ -46,7 +47,7 @@ class EvaluatorManager {
    * @brief Get evaluator
    * @return Pointer to the evaluator
    */
-  const Evaluator* GetEvaluator();
+  Evaluator* GetEvaluator(const ObstacleConf::EvaluatorType& type);
 
   void Run(
       const ::apollo::perception::PerceptionObstacles& perception_obstacles);
