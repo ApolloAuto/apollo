@@ -90,10 +90,8 @@ class Adapter {
    * adapter stores. Older messages will be removed upon calls to
    * Adapter::OnReceive().
    */
-  Adapter(const std::string& adapter_name,
-          const std::string& topic_name,
-          size_t message_num,
-          const std::string& dump_dir = "/tmp")
+  Adapter(const std::string& adapter_name, const std::string& topic_name,
+          size_t message_num, const std::string& dump_dir = "/tmp")
       : topic_name_(topic_name),
         message_num_(message_num),
         enable_dump_(FLAGS_enable_adapter_dump && HasSequenceNumber<D>()),
@@ -134,7 +132,7 @@ class Adapter {
    * the adapter.
    * @param data the input data.
    */
-  void FeedProto(const D& data) { EnqueueData(data); }
+  void FeedData(const D& data) { EnqueueData(data); }
 
   /**
    * @brief the callback that will be invoked whenever a new
@@ -242,7 +240,7 @@ class Adapter {
       AERROR << "Unable to parse input pb file " << message_file;
       return false;
     }
-    FeedProto(data);
+    FeedData(data);
     return true;
   }
   bool FeedFile(const std::string& message_file,
