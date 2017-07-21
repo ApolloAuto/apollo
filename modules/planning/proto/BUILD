@@ -11,6 +11,7 @@ cc_proto_library(
         "planning_config.proto",
         "planning_internal.proto",
         "st_boundary_config.proto",
+        "qp_spline_st_speed_config.proto",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
