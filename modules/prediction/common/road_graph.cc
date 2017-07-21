@@ -69,7 +69,7 @@ ErrorCode RoadGraph::BuildLaneGraph(LaneGraph* lane_graph_ptr) {
 
 void RoadGraph::ComputeLaneSequence(
     double accumulated_s, double start_s,
-    apollo::hdmap::LaneInfo* lane_info_ptr,
+    const apollo::hdmap::LaneInfo* lane_info_ptr,
     std::vector<LaneSegment>* lane_segments,
     LaneGraph* lane_graph_ptr) const {
   if (lane_info_ptr == nullptr) {
@@ -104,7 +104,7 @@ void RoadGraph::ComputeLaneSequence(
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
       double successor_accumulated_s =
           accumulated_s + lane_info_ptr->total_length() - start_s;
-      LaneInfo* successor_lane = map->LaneById(successor_lane_id);
+      const LaneInfo* successor_lane = map->LaneById(successor_lane_id);
       ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
           lane_segments, lane_graph_ptr);
     }
