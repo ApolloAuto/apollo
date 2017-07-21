@@ -6,6 +6,7 @@ import AutoDrivingCar from "renderer/adc";
 import Ground from "renderer/ground";
 import Map from "renderer/map";
 import PlanningTrajectory from "renderer/trajectory.js";
+import PerceptionObstacles from "renderer/obstacles.js";
 
 class Renderer {
     constructor() {
@@ -43,6 +44,9 @@ class Renderer {
 
         // The planning tranjectory.
         this.planningTrajectory = new PlanningTrajectory();
+        
+        // The perception obstacles.
+        this.perceptionObstacles = new PerceptionObstacles();
     }
 
     initialize(canvasId, width, height) {
@@ -141,6 +145,8 @@ class Renderer {
     updateWorld(world) {
         this.adc.update(world, this.coordinates);
         this.planningTrajectory.update(world, this.coordinates, this.scene);
+        this.perceptionObstacles.update(world, this.coordinates,
+                this.adc.mesh.rotation, this.scene);
     }
 
     updateMap(newData) {
