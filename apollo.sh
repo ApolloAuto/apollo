@@ -85,6 +85,10 @@ function check_esd_files() {
 function generate_build_targets() {
   BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
     | grep -v "_cpplint$" | grep -v "release" | grep -v "kernel")
+  if [ $? -ne 0 ]; then
+    fail 'Build failed!'
+  fi
+
   if ! $USE_ESD_CAN; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
@@ -92,6 +96,10 @@ function generate_build_targets() {
 
 function generate_test_targets() {
   TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party" | grep -v "kernel")
+  if [ $? -ne 0 ]; then
+    fail 'Test failed!'
+  fi
+
   if ! $USE_ESD_CAN; then
      TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
@@ -254,8 +262,6 @@ function gen_coverage() {
 function run_test() {
   START_TIME=$(get_now)
 
-  # FIXME(all): when all unit test passed, switch back.
-  # bazel test --config=unit_test -c dbg //...
   generate_test_targets
   echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings
   if [ $? -eq 0 ]; then
