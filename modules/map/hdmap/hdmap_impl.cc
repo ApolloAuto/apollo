@@ -123,10 +123,10 @@ OverlapInfoConstPtr HDMapImpl::get_overlap_by_id(
 int HDMapImpl::get_lanes(const apollo::hdmap::Point& point,
                      double distance,
                      std::vector<LaneInfoConstPtr>* lanes) const {
-  return get_lanes({point.x(), point.y()}, distance, lanes);
+  return get_lanes(PointToVec(point), distance, lanes);
 }
 
-int HDMapImpl::get_lanes(const apollo::common::math::Vec2d &point,
+int HDMapImpl::get_lanes(const apollo::common::Vec2D &point,
                     double distance,
                     std::vector<LaneInfoConstPtr> *lanes) const {
   if (lanes == nullptr || _lane_segment_kdtree == nullptr) {
@@ -150,10 +150,10 @@ int HDMapImpl::get_lanes(const apollo::common::math::Vec2d &point,
 int HDMapImpl::get_junctions(const apollo::hdmap::Point& point,
                          double distance,
                          std::vector<JunctionInfoConstPtr>* junctions) const {
-return get_junctions({point.x(), point.y()}, distance, junctions);
+return get_junctions(PointToVec(point), distance, junctions);
 }
 
-int HDMapImpl::get_junctions(const apollo::common::math::Vec2d& point,
+int HDMapImpl::get_junctions(const apollo::common::Vec2D& point,
                           double distance,
                           std::vector<JunctionInfoConstPtr>* junctions) const {
     if (junctions == nullptr || _junction_polygon_kdtree == nullptr) {
@@ -175,10 +175,10 @@ int HDMapImpl::get_junctions(const apollo::common::math::Vec2d& point,
 int HDMapImpl::get_signals(const apollo::hdmap::Point& point,
                        double distance,
                        std::vector<SignalInfoConstPtr>* signals) const {
-    return get_signals({point.x(), point.y()}, distance, signals);
+    return get_signals(PointToVec(point), distance, signals);
 }
 
-int HDMapImpl::get_signals(const apollo::common::math::Vec2d& point,
+int HDMapImpl::get_signals(const apollo::common::Vec2D& point,
                         double distance,
                         std::vector<SignalInfoConstPtr>* signals) const {
     if (signals == nullptr || _signal_segment_kdtree == nullptr) {
@@ -200,10 +200,10 @@ int HDMapImpl::get_signals(const apollo::common::math::Vec2d& point,
 int HDMapImpl::get_crosswalks(const apollo::hdmap::Point& point,
                         double distance,
                         std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
-    return get_crosswalks({point.x(), point.y()}, distance, crosswalks);
+    return get_crosswalks(PointToVec(point), distance, crosswalks);
 }
 
-int HDMapImpl::get_crosswalks(const apollo::common::math::Vec2d& point,
+int HDMapImpl::get_crosswalks(const apollo::common::Vec2D& point,
                         double distance,
                         std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
     if (crosswalks == nullptr || _crosswalk_polygon_kdtree == nullptr) {
@@ -225,10 +225,10 @@ int HDMapImpl::get_crosswalks(const apollo::common::math::Vec2d& point,
 int HDMapImpl::get_stop_signs(const apollo::hdmap::Point& point,
                           double distance,
                           std::vector<StopSignInfoConstPtr>* stop_signs) const {
-    return get_stop_signs({point.x(), point.y()}, distance, stop_signs);
+    return get_stop_signs(PointToVec(point), distance, stop_signs);
 }
 
-int HDMapImpl::get_stop_signs(const apollo::common::math::Vec2d& point,
+int HDMapImpl::get_stop_signs(const apollo::common::Vec2D& point,
                         double distance,
                         std::vector<StopSignInfoConstPtr>* stop_signs) const {
     if (stop_signs == nullptr || _stop_sign_segment_kdtree == nullptr) {
@@ -250,10 +250,10 @@ int HDMapImpl::get_stop_signs(const apollo::common::math::Vec2d& point,
 int HDMapImpl::get_yield_signs(const apollo::hdmap::Point& point,
                         double distance,
                         std::vector<YieldSignInfoConstPtr>* yield_signs) const {
-    return get_yield_signs({point.x(), point.y()}, distance, yield_signs);
+    return get_yield_signs(PointToVec(point), distance, yield_signs);
 }
 
-int HDMapImpl::get_yield_signs(const apollo::common::math::Vec2d& point,
+int HDMapImpl::get_yield_signs(const apollo::common::Vec2D& point,
                         double distance,
                         std::vector<YieldSignInfoConstPtr>* yield_signs) const {
     if (yield_signs == nullptr || _yield_sign_segment_kdtree == nullptr) {
@@ -354,7 +354,7 @@ void HDMapImpl::build_yield_sign_segment_kdtree() {
 }
 
 template<class KDTree>
-int HDMapImpl::search_objects(const apollo::common::math::Vec2d& center,
+int HDMapImpl::search_objects(const apollo::common::Vec2D& center,
                             const double radius,
                             const KDTree& kdtree,
                             std::vector<std::string>* const results) {
@@ -374,11 +374,11 @@ int HDMapImpl::get_nearest_lane(const apollo::hdmap::Point& point,
                 LaneInfoConstPtr* nearest_lane,
                 double* nearest_s,
                 double* nearest_l) {
-    return get_nearest_lane(apollo::common::math::Vec2d(point.x(), point.y()),
-                nearest_lane, nearest_s, nearest_l);
+    return get_nearest_lane(PointToVec(point),
+                            nearest_lane, nearest_s, nearest_l);
 }
 
-int HDMapImpl::get_nearest_lane(const apollo::common::math::Vec2d &point,
+int HDMapImpl::get_nearest_lane(const apollo::common::Vec2D &point,
                             LaneInfoConstPtr* nearest_lane,
                             double *nearest_s, double *nearest_l) const {
     // CHECK(nearest_lane == nullptr);
@@ -395,11 +395,12 @@ int HDMapImpl::get_nearest_lane(const apollo::common::math::Vec2d &point,
     // *nearest_lane = segment_object->object();
     const int id = segment_object->id();
     const auto &segment = (*nearest_lane)->segments()[id];
-    apollo::common::math::Vec2d nearest_pt;
+    apollo::common::Vec2D nearest_pt;
     segment.DistanceTo(point, &nearest_pt);
     *nearest_s = (*nearest_lane)->accumulate_s()[id] +
-                nearest_pt.DistanceTo(segment.start());
-    *nearest_l = segment.unit_direction().CrossProd(point - segment.start());
+                apollo::common::math::VecDistance(nearest_pt, segment.start());
+    *nearest_l = apollo::common::math::VecCrossProd(segment.unit_direction(),
+                                                    point - segment.start());
 
     return 0;
 }

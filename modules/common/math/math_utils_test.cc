@@ -23,22 +23,35 @@ namespace common {
 namespace math {
 
 TEST(MathUtilsTest, CrossProd) {
-  EXPECT_NEAR(CrossProd({0, 0}, {0, 1}, {1, 0}), -1.0, 1e-5);
-  EXPECT_NEAR(CrossProd({0, 0}, {1, 0}, {0, 1}), 1.0, 1e-5);
-  EXPECT_NEAR(CrossProd({0, 1}, {0, 0}, {1, 0}), 1.0, 1e-5);
-  EXPECT_NEAR(CrossProd({1, 2}, {3, 4}, {5, 6}), 0.0, 1e-5);
-  EXPECT_NEAR(CrossProd({1, 2}, {3, 4}, {6, 5}), -4.0, 1e-5);
-  EXPECT_NEAR(CrossProd({2, 2}, {7, 5}, {3, 4}), 7.0, 1e-5);
+  EXPECT_NEAR(CrossProd(Vec2DCtor(0, 0), Vec2DCtor(0, 1), Vec2DCtor(1, 0)),
+              -1.0, 1e-5);
+  EXPECT_NEAR(CrossProd(Vec2DCtor(0, 0), Vec2DCtor(1, 0), Vec2DCtor(0, 1)),
+              1.0, 1e-5);
+  EXPECT_NEAR(CrossProd(Vec2DCtor(0, 1), Vec2DCtor(0, 0), Vec2DCtor(1, 0)),
+              1.0, 1e-5);
+  EXPECT_NEAR(CrossProd(Vec2DCtor(1, 2), Vec2DCtor(3, 4), Vec2DCtor(5, 6)),
+              0.0, 1e-5);
+  EXPECT_NEAR(CrossProd(Vec2DCtor(1, 2), Vec2DCtor(3, 4), Vec2DCtor(6, 5)),
+              -4.0, 1e-5);
+  EXPECT_NEAR(CrossProd(Vec2DCtor(2, 2), Vec2DCtor(7, 5), Vec2DCtor(3, 4)),
+              7.0, 1e-5);
 }
 
 TEST(MathUtilsTest, InnerProd) {
-  EXPECT_NEAR(InnerProd({0, 0}, {0, 1}, {1, 0}), 0.0, 1e-5);
-  EXPECT_NEAR(InnerProd({0, 0}, {1, 0}, {0, 1}), 0.0, 1e-5);
-  EXPECT_NEAR(InnerProd({0, 1}, {0, 0}, {1, 0}), 1.0, 1e-5);
-  EXPECT_NEAR(InnerProd({1, 2}, {3, 4}, {5, 6}), 16.0, 1e-5);
-  EXPECT_NEAR(InnerProd({1, 2}, {3, 4}, {6, 5}), 16.0, 1e-5);
-  EXPECT_NEAR(InnerProd({2, 2}, {7, 5}, {3, 4}), 11.0, 1e-5);
-  EXPECT_NEAR(InnerProd({2, 2}, {0, 0}, {3, 4}), -6.0, 1e-5);
+  EXPECT_NEAR(InnerProd(Vec2DCtor(0, 0), Vec2DCtor(0, 1), Vec2DCtor(1, 0)),
+              0.0, 1e-5);
+  EXPECT_NEAR(InnerProd(Vec2DCtor(0, 0), Vec2DCtor(1, 0), Vec2DCtor(0, 1)),
+              0.0, 1e-5);
+  EXPECT_NEAR(InnerProd(Vec2DCtor(0, 1), Vec2DCtor(0, 0), Vec2DCtor(1, 0)),
+              1.0, 1e-5);
+  EXPECT_NEAR(InnerProd(Vec2DCtor(1, 2), Vec2DCtor(3, 4), Vec2DCtor(5, 6)),
+              16.0, 1e-5);
+  EXPECT_NEAR(InnerProd(Vec2DCtor(1, 2), Vec2DCtor(3, 4), Vec2DCtor(6, 5)),
+              16.0, 1e-5);
+  EXPECT_NEAR(InnerProd(Vec2DCtor(2, 2), Vec2DCtor(7, 5), Vec2DCtor(3, 4)),
+              11.0, 1e-5);
+  EXPECT_NEAR(InnerProd(Vec2DCtor(2, 2), Vec2DCtor(0, 0), Vec2DCtor(3, 4)),
+              -6.0, 1e-5);
 }
 
 TEST(MathUtilsTest, WrapAngle) {

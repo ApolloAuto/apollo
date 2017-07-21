@@ -33,14 +33,14 @@ class Object {
  public:
   Object(const double x1, const double y1, const double x2, const double y2,
          const int id)
-      : aabox_({x1, y1}, {x2, y2}),
-        line_segment_({x1, y1}, {x2, y2}),
+      : aabox_(Vec2DCtor(x1, y1), Vec2DCtor(x2, y2)),
+        line_segment_(Vec2DCtor(x1, y1), Vec2DCtor(x2, y2)),
         id_(id) {}
   const AABox2d &aabox() const { return aabox_; }
-  double DistanceTo(const Vec2d &point) const {
+  double DistanceTo(const Vec2D &point) const {
     return line_segment_.DistanceTo(point);
   }
-  double DistanceSquareTo(const Vec2d &point) const {
+  double DistanceSquareTo(const Vec2D &point) const {
     return line_segment_.DistanceSquareTo(point);
   }
   int id() const { return id_; }
@@ -77,8 +77,8 @@ TEST(AABoxKDTree2dNode, OverallTests) {
       kdtrees[i].reset(new AABoxKDTree2d<Object>(objects, kdtree_params[i]));
     }
     for (int i = 0; i < kNumQueries; ++i) {
-      const Vec2d point(RandomDouble(-kSize * 1.5, kSize * 1.5),
-                        RandomDouble(-kSize * 1.5, kSize * 1.5));
+      const Vec2D point = Vec2DCtor(RandomDouble(-kSize * 1.5, kSize * 1.5),
+                                    RandomDouble(-kSize * 1.5, kSize * 1.5));
       double expected_distance = std::numeric_limits<double>::infinity();
       for (const auto &object : objects) {
         expected_distance =
@@ -91,8 +91,8 @@ TEST(AABoxKDTree2dNode, OverallTests) {
       }
     }
     for (int i = 0; i < kNumQueries; ++i) {
-      const Vec2d point(RandomDouble(-kSize * 1.5, kSize * 1.5),
-                        RandomDouble(-kSize * 1.5, kSize * 1.5));
+      const Vec2D point = Vec2DCtor(RandomDouble(-kSize * 1.5, kSize * 1.5),
+                                    RandomDouble(-kSize * 1.5, kSize * 1.5));
       const double distance = RandomDouble(0, kSize * 2.0);
       for (int k = 0; k < kNumTrees; ++k) {
         std::vector<const Object *> result_objects =

@@ -23,7 +23,7 @@
 namespace apollo {
 namespace planning {
 
-ReferencePoint::ReferencePoint(const ::apollo::common::math::Vec2d& point,
+ReferencePoint::ReferencePoint(const ::apollo::common::Vec2D& point,
                                const double heading, const double kappa,
                                const double dkappa, const double lower_bound,
                                const double upper_bound)
@@ -34,12 +34,12 @@ ReferencePoint::ReferencePoint(const ::apollo::common::math::Vec2d& point,
       _upper_bound(upper_bound) {}
 
 ReferencePoint::ReferencePoint(
-    const apollo::common::math::Vec2d& point, const double heading,
+    const apollo::common::Vec2D& point, const double heading,
     const ::apollo::hdmap::LaneWaypoint lane_waypoint)
     : ::apollo::hdmap::PathPoint(point, heading, lane_waypoint) {}
 
 ReferencePoint::ReferencePoint(
-    const apollo::common::math::Vec2d& point, const double heading,
+    const apollo::common::Vec2D& point, const double heading,
     const double kappa, const double dkappa,
     const ::apollo::hdmap::LaneWaypoint lane_waypoint)
     : ::apollo::hdmap::PathPoint(point, heading, lane_waypoint),

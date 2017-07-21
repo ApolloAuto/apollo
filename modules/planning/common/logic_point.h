@@ -22,7 +22,8 @@
 #define MODULES_PLANNING_COMMON_LOGIC_POINT_H_
 
 #include <string>
-#include "modules/common/math/vec2d.h"
+
+#include "modules/common/math/vec2d_utils.h"
 
 /**
  * @namespace apollo::planning
@@ -31,7 +32,7 @@
 namespace apollo {
 namespace planning {
 
-class LogicPoint : public ::apollo::common::math::Vec2d {
+class LogicPoint {
  public:
   explicit LogicPoint(const double x, const double y, const double s,
                       const double heading, const double kappa,
@@ -44,6 +45,7 @@ class LogicPoint : public ::apollo::common::math::Vec2d {
   void set_lane_id(const std::string &lane_id);
 
  private:
+  apollo::common::Vec2D _point;
   double _s;
   double _heading;
   double _kappa;

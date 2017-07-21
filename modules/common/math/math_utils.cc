@@ -26,14 +26,14 @@ namespace math {
 
 double Sqr(const double x) { return x * x; }
 
-double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2) {
-  return (end_point_1 - start_point).CrossProd(end_point_2 - start_point);
+double CrossProd(const Vec2D& start_point, const Vec2D& end_point_1,
+                 const Vec2D& end_point_2) {
+  return VecCrossProd(end_point_1 - start_point, end_point_2 - start_point);
 }
 
-double InnerProd(const Vec2d &start_point, const Vec2d &end_point_1,
-                 const Vec2d &end_point_2) {
-  return (end_point_1 - start_point).InnerProd(end_point_2 - start_point);
+double InnerProd(const Vec2D &start_point, const Vec2D &end_point_1,
+                 const Vec2D &end_point_2) {
+  return VecInnerProd(end_point_1 - start_point, end_point_2 - start_point);
 }
 
 double CrossProd(const double x0, const double y0, const double x1,

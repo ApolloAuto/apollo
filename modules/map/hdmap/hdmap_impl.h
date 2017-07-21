@@ -25,7 +25,7 @@ limitations under the License.
 #include "modules/common/math/aaboxkdtree2d.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/line_segment2d.h"
-#include "modules/common/math/vec2d.h"
+#include "modules/common/math/vec2d_utils.h"
 #include "modules/map/proto/map.pb.h"
 #include "modules/map/proto/map_geometry.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
@@ -94,25 +94,25 @@ class HDMapImpl {
                     double* nearest_l);
 
  private:
-    int get_lanes(const apollo::common::math::Vec2d& point,
+    int get_lanes(const apollo::common::Vec2D& point,
                 double distance,
                 std::vector<LaneInfoConstPtr>* lanes) const;
-    int get_junctions(const apollo::common::math::Vec2d& point,
+    int get_junctions(const apollo::common::Vec2D& point,
                 double distance,
                 std::vector<JunctionInfoConstPtr>* junctions) const;
-    int get_crosswalks(const apollo::common::math::Vec2d& point,
+    int get_crosswalks(const apollo::common::Vec2D& point,
                     double distance,
                     std::vector<CrosswalkInfoConstPtr>* crosswalks) const;
-    int get_signals(const apollo::common::math::Vec2d& point,
+    int get_signals(const apollo::common::Vec2D& point,
                     double distance,
                     std::vector<SignalInfoConstPtr>* signals) const;
-    int get_stop_signs(const apollo::common::math::Vec2d& point,
+    int get_stop_signs(const apollo::common::Vec2D& point,
                     double distance,
                     std::vector<StopSignInfoConstPtr>* stop_signs) const;
-    int get_yield_signs(const apollo::common::math::Vec2d& point,
+    int get_yield_signs(const apollo::common::Vec2D& point,
                     double distance,
                     std::vector<YieldSignInfoConstPtr>* yield_signs) const;
-    int get_nearest_lane(const apollo::common::math::Vec2d &point,
+    int get_nearest_lane(const apollo::common::Vec2D &point,
                     LaneInfoConstPtr* nearest_lane,
                     double *nearest_s,
                     double *nearest_l) const;
@@ -137,7 +137,7 @@ class HDMapImpl {
     void build_yield_sign_segment_kdtree();
 
     template<class KDTree>
-    static int search_objects(const apollo::common::math::Vec2d& center,
+    static int search_objects(const apollo::common::Vec2D& center,
                     const double radius,
                     const KDTree& kdtree,
                     std::vector<std::string>* const results);

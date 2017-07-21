@@ -31,7 +31,7 @@ namespace planning {
 LogicPoint::LogicPoint(const double x, const double y, const double s,
                        const double heading, const double kappa,
                        const double dkappa)
-    : ::apollo::common::math::Vec2d(x, y),
+    : _point(::apollo::common::math::Vec2DCtor(x, y)),
       _s(s),
       _heading(heading),
       _kappa(kappa),

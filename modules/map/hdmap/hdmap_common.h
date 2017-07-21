@@ -21,7 +21,7 @@ limitations under the License.
 #include <utility>
 
 #include "modules/common/math/aabox2d.h"
-#include "modules/common/math/vec2d.h"
+#include "modules/common/math/vec2d_utils.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/aaboxkdtree2d.h"
 #include "modules/common/math/math_utils.h"
@@ -36,6 +36,8 @@ limitations under the License.
 namespace apollo {
 namespace hdmap {
 
+apollo::common::Vec2D PointToVec(const Point &point);
+
 template <class Object, class GeoObject> class ObjectWithAABox {
  public:
     ObjectWithAABox(const apollo::common::math::AABox2d &aabox,
@@ -44,10 +46,10 @@ template <class Object, class GeoObject> class ObjectWithAABox {
         : _aabox(aabox), _object(object), _geo_object(geo_object), _id(id) {}
     ~ObjectWithAABox() {}
     const apollo::common::math::AABox2d &aabox() const { return _aabox; }
-    double DistanceTo(const apollo::common::math::Vec2d &point) const {
+    double DistanceTo(const apollo::common::Vec2D &point) const {
         return _geo_object->DistanceTo(point);
     }
-    double DistanceSquareTo(const apollo::common::math::Vec2d &point) const {
+    double DistanceSquareTo(const apollo::common::Vec2D &point) const {
         return _geo_object->DistanceSquareTo(point);
     }
     const Object *object() const { return _object; }
@@ -67,10 +69,10 @@ class LaneInfo {
 
     const apollo::hdmap::Id &id() const { return _lane.id(); }
     const apollo::hdmap::Lane &lane() const { return _lane; }
-    const std::vector<apollo::common::math::Vec2d> &points() const {
+    const std::vector<apollo::common::Vec2D> &points() const {
         return _points;
     }
-    const std::vector<apollo::common::math::Vec2d> &unit_directions() const {
+    const std::vector<apollo::common::Vec2D> &unit_directions() const {
         return _unit_directions;
     }
     const std::vector<double> &headings() const { return _headings; }
@@ -101,8 +103,8 @@ class LaneInfo {
 
  private:
     const apollo::hdmap::Lane &_lane;
-    std::vector<apollo::common::math::Vec2d> _points;
-    std::vector<apollo::common::math::Vec2d> _unit_directions;
+    std::vector<apollo::common::Vec2D> _points;
+    std::vector<apollo::common::Vec2D> _unit_directions;
     std::vector<double> _headings;
     std::vector<apollo::common::math::LineSegment2d> _segments;
     std::vector<double> _accumulated_s;

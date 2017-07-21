@@ -26,7 +26,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Vec2d;
+using apollo::common::Vec2D;
 
 Spline2dConstraint::Spline2dConstraint(const std::vector<double>& t_knots,
                                        const std::size_t order)
@@ -58,7 +58,7 @@ bool Spline2dConstraint::add_equality_constraint(
 **/
 bool Spline2dConstraint::add_2d_boundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
-    const std::vector<Vec2d>& ref_point,
+    const std::vector<Vec2D>& ref_point,
     const std::vector<double>& longitidinal_bound,
     const std::vector<double>& lateral_bound) {
   if (t_coord.size() != angle.size() || angle.size() != ref_point.size() ||
@@ -99,7 +99,7 @@ bool Spline2dConstraint::add_2d_boundary(
 
 bool Spline2dConstraint::add_2d_derivative_boundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
-    const std::vector<Vec2d>& ref_point,
+    const std::vector<Vec2D>& ref_point,
     const std::vector<double>& longitidinal_bound,
     const std::vector<double>& lateral_bound) {
   if (t_coord.size() != angle.size() || angle.size() != ref_point.size() ||
@@ -141,7 +141,7 @@ bool Spline2dConstraint::add_2d_derivative_boundary(
 
 bool Spline2dConstraint::add_2d_second_derivative_boundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
-    const std::vector<Vec2d>& ref_point,
+    const std::vector<Vec2D>& ref_point,
     const std::vector<double>& longitidinal_bound,
     const std::vector<double>& lateral_bound) {
   if (t_coord.size() != angle.size() || angle.size() != ref_point.size() ||
@@ -184,7 +184,7 @@ bool Spline2dConstraint::add_2d_second_derivative_boundary(
 
 bool Spline2dConstraint::add_2d_third_derivative_boundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
-    const std::vector<Vec2d>& ref_point,
+    const std::vector<Vec2D>& ref_point,
     const std::vector<double>& longitidinal_bound,
     const std::vector<double>& lateral_bound) {
   if (t_coord.size() != angle.size() || angle.size() != ref_point.size() ||
@@ -491,7 +491,7 @@ std::vector<double> Spline2dConstraint::affine_third_derivative_coef(
   return result;
 }
 
-double Spline2dConstraint::sign_distance(const Vec2d& xy_point,
+double Spline2dConstraint::sign_distance(const Vec2D& xy_point,
                                          const double angle) const {
   return -std::sin(angle) * xy_point.x() + std::cos(angle) * xy_point.y();
 }
