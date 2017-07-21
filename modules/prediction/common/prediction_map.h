@@ -47,9 +47,9 @@ class PredictionMap {
   double LaneTotalWidth(const apollo::hdmap::LaneInfo* lane_info_ptr,
                         const double s);
 
-  apollo::hdmap::LaneInfo* LaneById(const apollo::hdmap::Id& id);
+  const apollo::hdmap::LaneInfo* LaneById(const apollo::hdmap::Id& id);
 
-  apollo::hdmap::LaneInfo* LaneById(const std::string& id);
+  const apollo::hdmap::LaneInfo* LaneById(const std::string& str_id);
 
   void GetProjection(const Eigen::Vector2d& position,
                      const apollo::hdmap::LaneInfo* lane_info_ptr,
@@ -81,7 +81,7 @@ class PredictionMap {
 
   bool IsLeftNeighborLane(
       const apollo::hdmap::LaneInfo* left_lane,
-      const apollo::hdmap::LaneInfo* lane);
+      const apollo::hdmap::LaneInfo* curr_lane);
 
   bool IsLeftNeighborLane(
       const apollo::hdmap::LaneInfo* left_lane,
@@ -89,34 +89,34 @@ class PredictionMap {
 
   bool IsRightNeighborLane(
       const apollo::hdmap::LaneInfo* right_lane,
-      const apollo::hdmap::LaneInfo* lane);
+      const apollo::hdmap::LaneInfo* curr_lane);
 
   bool IsRightNeighborLane(
-      const apollo::hdmap::LaneInfo* left_lane,
+      const apollo::hdmap::LaneInfo* right_lane,
       const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
 
   bool IsSuccessorLane(
       const apollo::hdmap::LaneInfo* succ_lane,
-      const apollo::hdmap::LaneInfo* lane);
+      const apollo::hdmap::LaneInfo* curr_lane);
 
   bool IsSuccessorLane(
-      const apollo::hdmap::LaneInfo* left_lane,
+      const apollo::hdmap::LaneInfo* succ_lane,
       const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
 
   bool IsPredecessorLane(
       const apollo::hdmap::LaneInfo* pred_lane,
-      const apollo::hdmap::LaneInfo* lane);
+      const apollo::hdmap::LaneInfo* curr_lane);
 
   bool IsPredecessorLane(
-      const apollo::hdmap::LaneInfo* left_lane,
+      const apollo::hdmap::LaneInfo* pred_lane,
       const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
 
   bool IsIdenticalLane(
       const apollo::hdmap::LaneInfo* other_lane,
-      const apollo::hdmap::LaneInfo* lane);
+      const apollo::hdmap::LaneInfo* curr_lane);
 
   bool IsIdenticalLane(
-      const apollo::hdmap::LaneInfo* left_lane,
+      const apollo::hdmap::LaneInfo* other_lane,
       const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
 
   int LaneTurnType(const apollo::hdmap::Id& id);
