@@ -3,20 +3,20 @@ syntax = "proto2";
 package apollo.common;
 
 message STPoint {
-    optional double s = 1 [default = 0.0];
-    optional double t = 2 [default = 0.0];
+    optional double s = 1;
+    optional double t = 2;
 }
 
 message SLPoint {
-    optional double s = 1 [default = 0.0];
-    optional double l = 2 [default = 0.0];
+    optional double s = 1;
+    optional double l = 2;
 }
 
 message FrenetFramePoint {
-    optional double s = 1 [default = 0.0];
-    optional double l = 2 [default = 0.0];
-    optional double dl = 3 [default = 0.0];
-    optional double ddl = 4 [default = 0.0];
+    optional double s = 1;
+    optional double l = 2;
+    optional double dl = 3;
+    optional double ddl = 4;
 }
 
 message Signals {
