@@ -19,28 +19,28 @@
  * @brief Define lane sequence predictor
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
+#ifndef MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_
+#define MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_
 
 #include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
 namespace prediction {
 
-class LaneSequencePredictor : public Predictor {
+class FreeMovePredictor : public Predictor {
  public:
   /**
    * @brief Constructor
    */
-  LaneSequencePredictor() = default;
+  FreeMovePredictor() = default;
 
   /**
    * @brief Destructor
    */
-  virtual ~LaneSequencePredictor() = default;
+  virtual ~FreeMovePredictor() = default;
 };
 
 }  // prediction
 }  // apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
+#endif  // MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_

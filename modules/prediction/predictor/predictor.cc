@@ -14,33 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- * @brief Define lane sequence predictor
- */
-
-#ifndef MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
-
 #include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
 namespace prediction {
 
-class LaneSequencePredictor : public Predictor {
- public:
-  /**
-   * @brief Constructor
-   */
-  LaneSequencePredictor() = default;
-
-  /**
-   * @brief Destructor
-   */
-  virtual ~LaneSequencePredictor() = default;
-};
+const PredictionObstacle& Predictor::prediction_obstacle() {
+  return prediction_obstacle_;
+}
 
 }  // prediction
 }  // apollo
-
-#endif  // MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_

@@ -8,7 +8,16 @@ cc_library(
     srcs = ["lane_sequence_predictor.cc"],
     deps = [
         "//modules/prediction/predictor:predictor",
-        "//modules/prediction/proto:prediction_proto",
+        "@glog//:glog",
+    ]
+)
+
+cc_library(
+    name = "free_move_predictor",
+    hdrs = ["free_move_predictor.h"],
+    srcs = ["free_move_predictor.cc"],
+    deps = [
+        "//modules/prediction/predictor:predictor",
         "@glog//:glog",
     ]
 )

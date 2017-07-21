@@ -30,8 +30,9 @@ cc_library(
 cc_library(
     name = "predictor",
     hdrs = ["predictor.h"],
+    srcs = ["predictor.cc"],
     deps = [
-    
+        "//modules/prediction/proto:prediction_proto",
     ]
 )
 
