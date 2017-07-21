@@ -20,6 +20,7 @@ message AdapterConfig {
     CHASSIS_DETAIL = 13;
     DECISION = 14;
     CANBUS = 15;
+    ROUTING_RESULT = 16;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
