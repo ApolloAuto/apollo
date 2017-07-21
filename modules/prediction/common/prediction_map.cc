@@ -17,11 +17,13 @@
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/map/proto/map_id.pb.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::hdmap::LaneInfo;
+using apollo::hdmap::Id;
 
 PredictionMap::PredictionMap() : hdmap_(nullptr) {
   LoadMap();
@@ -40,6 +42,12 @@ void PredictionMap::LoadMap() {
 
 void PredictionMap::Clear() {
   hdmap_.reset();
+}
+
+Id PredictionMap::id(const std::string& str_id) {
+  Id id;
+  id.set_id(str_id);
+  return id;
 }
 
 }  // namespace prediction
