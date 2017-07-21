@@ -72,12 +72,16 @@ cc_library(
 )
 
 cc_library(
-    name = "logic_node",
+    name = "logic_map",
     srcs = [
+        "logic_info.cc",
         "logic_node.cc",
+        "logic_point.cc",
     ],
     hdrs = [
+        "logic_info.h",
         "logic_node.h",
+        "logic_point.h",
     ],
     deps = [
         "//modules/common/math",
