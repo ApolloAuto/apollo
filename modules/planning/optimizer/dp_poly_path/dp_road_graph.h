@@ -54,7 +54,7 @@ class DpRoadGraph {
   ::apollo::common::ErrorCode find_best_trajectory(
       const ReferenceLine &reference_line, const DecisionData &decision_data,
       std::vector<size_t> *const min_cost_edges);
-  bool add_vertex(const ::apollo::common::SLPoint &sl_point,
+  bool add_vertex(const common::SLPoint &sl_point,
                   const ReferencePoint &reference_point, const size_t level);
   bool connect_vertex(const size_t start, const size_t end);
 
@@ -64,7 +64,7 @@ class DpRoadGraph {
   SpeedData _heuristic_speed_data;
   std::vector<GraphVertex> _vertices;
   std::vector<GraphEdge> _edges;
-  ::apollo::common::SLPoint _init_sl_point;
+  common::SLPoint _init_sl_point;
 };
 
 }  // namespace planning

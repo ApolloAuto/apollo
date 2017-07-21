@@ -27,10 +27,10 @@
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_configuration.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_cost.h"
 #include "modules/planning/optimizer/st_graph/st_graph_data.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

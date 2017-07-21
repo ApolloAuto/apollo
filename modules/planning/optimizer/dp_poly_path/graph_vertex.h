@@ -36,12 +36,12 @@ class GraphVertex {
     DEAD_END
   };
 
-  explicit GraphVertex(const ::apollo::common::FrenetFramePoint &frame_point,
+  explicit GraphVertex(const common::FrenetFramePoint &frame_point,
                        const size_t index, const size_t level);
   ~GraphVertex() = default;
 
-  const ::apollo::common::FrenetFramePoint &frame_point() const;
-  ::apollo::common::FrenetFramePoint *mutable_frame_point();
+  const common::FrenetFramePoint &frame_point() const;
+  common::FrenetFramePoint *mutable_frame_point();
 
   void set_type(const Type type);
   void set_index(const size_t index);
@@ -72,7 +72,7 @@ class GraphVertex {
   void add_out_edge(const std::vector<size_t> &edges);
 
  private:
-  ::apollo::common::FrenetFramePoint _frame_point;
+  common::FrenetFramePoint _frame_point;
   size_t _index = 0;
   size_t _level = 0;
   Type _type = Type::REGULAR;

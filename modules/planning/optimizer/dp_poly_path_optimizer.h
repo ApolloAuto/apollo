@@ -30,12 +30,10 @@ namespace planning {
 class DpPolyPathOptimizer : public PathOptimizer {
  public:
   explicit DpPolyPathOptimizer(const std::string &name);
-  bool SetConfig(const std::string &config_file) override;
   virtual ::apollo::common::ErrorCode optimize(
       const SpeedData &speed_data, const ReferenceLine &reference_line,
       const ::apollo::planning::TrajectoryPoint &init_point,
-      DecisionData *const decision_data,
-      PathData *const path_data) const override;
+      DecisionData *const decision_data, PathData *const path_data) override;
 
  private:
   DpPolyPathConfig config_;

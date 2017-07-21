@@ -40,7 +40,7 @@ class PathOptimizer : public Optimizer {
   virtual apollo::common::ErrorCode optimize(
       const SpeedData &speed_data, const ReferenceLine &reference_line,
       const ::apollo::planning::TrajectoryPoint &init_point,
-      DecisionData *const decision_data, PathData *const path_data) const = 0;
+      DecisionData *const decision_data, PathData *const path_data) = 0;
 };
 
 }  // namespace planning

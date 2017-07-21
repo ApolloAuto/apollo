@@ -16,10 +16,6 @@
 
 #include "modules/planning/common/planning_gflags.h"
 
-DEFINE_string(planning_config_file,
-              "modules/planning/conf/planning_config.pb.txt",
-              "planning config file");
-
 DEFINE_int32(planning_loop_rate, 5, "Loop rate for planning node");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
@@ -293,3 +289,13 @@ DEFINE_double(
     "treat yellow light as red when deceleration (abstract value in m/s^2)"
     " is less than this threshold; otherwise treated as green light");
 
+DEFINE_string(planning_config_file,
+              "modules/planning/conf/planning_config.pb.txt",
+              "planning config file");
+
+DEFINE_string(qp_spline_path_config_file,
+              "modules/planning/conf/qp_spline_path_config.pb.txt",
+              "Qp spline path config file");
+DEFINE_string(dp_poly_path_config_file,
+              "modules/planning/conf/dp_poly_path_config.pb.txt",
+              "Dp poly path config file");

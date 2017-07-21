@@ -17,27 +17,28 @@
 /**
  * @file qp_spline_path_optimizer.cpp
  **/
-#include "optimizer/qp_spline_path_optimizer.h"
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
+
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-QPSplinePathOptimizer::QPSplinePathOptimizer(
-    const std::string& name, const boost::property_tree::ptree& ptree)
-    : PathOptimizer(name) {
-  _path_generator.reset(new QPSplinePathGenerator(ptree));
-}
+using ErrorCode = common::ErrorCode;
 
-ErrorCode QPSplinePathOptimizer::optimize(
-    const DataCenter& data_center, const SpeedData& speed_data,
-    const ReferenceLine& reference_line,
-    const ::adu::planning::TrajectoryPoint& init_point,
-    DecisionData* const decision_data, PathData* const path_data) const {
-  const Environment& env = data_center.current_frame()->environment();
-  QUIT_IF(!_path_generator->generate(env, reference_line, *decision_data,
-                                     speed_data, init_point, path_data),
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "failed to generate spline path!");
+QPSplinePathOptimizer::QPSplinePathOptimizer(const std::string& name)
+    : PathOptimizer(name) {}
+
+common::ErrorCode QPSplinePathOptimizer::optimize(
+    const SpeedData& speed_data, const ReferenceLine& reference_line,
+    const common::TrajectoryPoint& init_point,
+    DecisionData* const decision_data, PathData* const path_data) {
+  _path_generator.SetConfig(FLAGS_qp_spline_path_config_file);
+  if (!_path_generator.generate(reference_line, *decision_data, speed_data,
+                                init_point, path_data)) {
+    AERROR << "failed to generate spline path!";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
   return ErrorCode::PLANNING_OK;
 }
 

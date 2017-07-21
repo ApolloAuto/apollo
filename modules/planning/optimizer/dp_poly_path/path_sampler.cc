@@ -33,8 +33,8 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
 ::apollo::common::ErrorCode PathSampler::sample(
     const ReferenceLine &reference_line,
     const ::apollo::common::TrajectoryPoint &init_point,
-    const ::apollo::common::SLPoint &init_sl_point,
-    std::vector<std::vector<::apollo::common::SLPoint>> *const points) {
+    const common::SLPoint &init_sl_point,
+    std::vector<std::vector<common::SLPoint>> *const points) {
   CHECK_NOTNULL(points);
   double step_length = init_point.v();
   step_length = std::min(step_length, _config.step_length_max());
@@ -42,7 +42,7 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
   double center_l = init_sl_point.l();
   double accumulated_s = init_sl_point.s();
   for (size_t i = 0; i < _config.sample_level(); ++i) {
-    std::vector<::apollo::common::SLPoint> level_points;
+    std::vector<common::SLPoint> level_points;
     if (center_l < _config.lateral_sample_offset()) {
       center_l = 0.0;
     } else {
@@ -57,7 +57,7 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
       // TODO: the lateral value is incorrect
 
       // TODO: no checker no protection
-      ::apollo::common::SLPoint sl_point;
+      common::SLPoint sl_point;
       sl_point.set_s(accumulated_s);
       sl_point.set_l(level_start_l + _config.lateral_sample_offset());
       if (reference_line.is_on_road(sl_point)) {

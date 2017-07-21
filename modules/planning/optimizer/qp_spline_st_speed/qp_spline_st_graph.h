@@ -35,9 +35,9 @@
 namespace apollo {
 namespace planning {
 
-class QpSplineStGraph {
+class QPSplineStGraph {
  public:
-  QpSplineStGraph(const QpSplineStSpeedConfig& qp_config,
+  QPSplineStGraph(const QPSplineStSpeedConfig& qp_config,
                   const apollo::common::config::VehicleParam& veh_param);
 
   common::ErrorCode search(const STGraphData& st_graph_data,
@@ -66,7 +66,7 @@ class QpSplineStGraph {
 
  private:
   // qp st configuration
-  QpSplineStSpeedConfig _qp_spline_st_speed_config;
+  QPSplineStSpeedConfig _qp_spline_st_speed_config;
 
   // initial status
   common::TrajectoryPoint _init_point;

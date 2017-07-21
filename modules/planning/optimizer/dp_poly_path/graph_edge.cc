@@ -24,16 +24,15 @@
 namespace apollo {
 namespace planning {
 
-GraphEdge::GraphEdge() : GraphEdge(0, 0, 0) {
-}
+GraphEdge::GraphEdge() : GraphEdge(0, 0, 0) {}
 
-GraphEdge::GraphEdge(const size_t from_vertex, const size_t to_vertex, const size_t level) :
-    _edge_index(0),
-    _from_vertex(from_vertex),
-    _to_vertex(to_vertex),
-    _level(level),
-    _cost(0.0) {
-}
+GraphEdge::GraphEdge(const size_t from_vertex, const size_t to_vertex,
+                     const size_t level)
+    : _edge_index(0),
+      _from_vertex(from_vertex),
+      _to_vertex(to_vertex),
+      _level(level),
+      _cost(0.0) {}
 
 void GraphEdge::set_from_vertex(const size_t from_vertex) {
   _from_vertex = from_vertex;
@@ -43,11 +42,10 @@ void GraphEdge::set_to_vertex(const size_t to_vertex) {
   _to_vertex = to_vertex;
 }
 
-void GraphEdge::set_level(const size_t level) {
-  _level = level;
-}
+void GraphEdge::set_level(const size_t level) { _level = level; }
 
-void GraphEdge::set_path(const std::vector<::apollo::common::FrenetFramePoint> &path) {
+void GraphEdge::set_path(
+    const std::vector<common::FrenetFramePoint> &path) {
   _path = path;
 }
 
@@ -55,27 +53,17 @@ void GraphEdge::set_poly_path(const QuinticPolynomialCurve1d &ploy_path) {
   _poly_path = ploy_path;
 }
 
-void GraphEdge::set_edge_index(const size_t index) {
-  _edge_index = index;
-}
+void GraphEdge::set_edge_index(const size_t index) { _edge_index = index; }
 
-void GraphEdge::set_cost(const double cost) {
-  _cost = cost;
-}
+void GraphEdge::set_cost(const double cost) { _cost = cost; }
 
-size_t GraphEdge::from_vertex() const {
-  return _from_vertex;
-}
+size_t GraphEdge::from_vertex() const { return _from_vertex; }
 
-size_t GraphEdge::to_vertex() const {
-  return _to_vertex;
-}
+size_t GraphEdge::to_vertex() const { return _to_vertex; }
 
-size_t GraphEdge::level() const {
-  return _level;
-}
+size_t GraphEdge::level() const { return _level; }
 
-const std::vector<::apollo::common::FrenetFramePoint> &GraphEdge::path() const {
+const std::vector<common::FrenetFramePoint> &GraphEdge::path() const {
   return _path;
 }
 
@@ -83,15 +71,9 @@ const QuinticPolynomialCurve1d &GraphEdge::poly_path() const {
   return _poly_path;
 }
 
-size_t GraphEdge::edge_index() const {
-  return _edge_index;
-}
+size_t GraphEdge::edge_index() const { return _edge_index; }
 
-double GraphEdge::cost() const {
-  return _cost;
-}
+double GraphEdge::cost() const { return _cost; }
 
-} // planning
-} // adu
-
-/* vim: set expandtab ts=4 sw=4 sts=4 tw=100: */
+}  // namespace planning
+}  // namespace apollo
