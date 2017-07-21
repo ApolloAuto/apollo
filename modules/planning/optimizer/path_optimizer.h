@@ -25,7 +25,6 @@
 
 #include "modules/common/proto/error_code.pb.h"
 
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -39,8 +38,7 @@ class PathOptimizer : public Optimizer {
   explicit PathOptimizer(const std::string &name);
   virtual ~PathOptimizer() = default;
   virtual apollo::common::ErrorCode optimize(
-      const DataCenter &data_center, const SpeedData &speed_data,
-      const ReferenceLine &reference_line,
+      const SpeedData &speed_data, const ReferenceLine &reference_line,
       const ::apollo::planning::TrajectoryPoint &init_point,
       DecisionData *const decision_data, PathData *const path_data) const = 0;
 };

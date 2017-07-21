@@ -38,15 +38,13 @@ bool DpPolyPathOptimizer::SetConfig(const std::string &config_file) {
 }
 
 ::apollo::common::ErrorCode DpPolyPathOptimizer::optimize(
-    const DataCenter &data_center, const SpeedData &speed_data,
-    const ReferenceLine &reference_line,
+    const SpeedData &speed_data, const ReferenceLine &reference_line,
     const ::apollo::planning::TrajectoryPoint &init_point,
     DecisionData *const decision_data, PathData *const path_data) const {
   CHECK_NOTNULL(decision_data);
   CHECK_NOTNULL(path_data);
   DpRoadGraph dp_road_graph(config_, init_point, speed_data);
-  dp_road_graph.find_tunnel(data_center, reference_line, decision_data,
-                            path_data);
+  dp_road_graph.find_tunnel(reference_line, decision_data, path_data);
   return ::apollo::common::ErrorCode::PLANNING_OK;
 }
 

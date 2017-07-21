@@ -32,8 +32,7 @@ class DpPolyPathOptimizer : public PathOptimizer {
   explicit DpPolyPathOptimizer(const std::string &name);
   bool SetConfig(const std::string &config_file) override;
   virtual ::apollo::common::ErrorCode optimize(
-      const DataCenter &data_center, const SpeedData &speed_data,
-      const ReferenceLine &reference_line,
+      const SpeedData &speed_data, const ReferenceLine &reference_line,
       const ::apollo::planning::TrajectoryPoint &init_point,
       DecisionData *const decision_data,
       PathData *const path_data) const override;
