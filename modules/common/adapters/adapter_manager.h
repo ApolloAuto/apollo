@@ -61,10 +61,12 @@ namespace adapter {
   static name##Adapter *Get##name() {                                          \
     return instance()->InternalGet##name();                                    \
   }                                                                            \
-  static void Feed##name##ProtoFile(const std::string &proto_file) {           \
-    CHECK(instance()->name##_)                                                 \
-        << "Initialize adapter before feeding protobuf";                       \
-    Get##name()->FeedFile(proto_file);                                         \
+  static bool Feed##name##File(const std::string &proto_file) {                \
+    if (!instance()->name##_) {                                                \
+      AERROR << "Initialize adapter before feeding protobuf";                  \
+      return false;                                                            \
+    }                                                                          \
+    return Get##name()->FeedFile(proto_file);                                  \
   }                                                                            \
   static void Publish##name(const name##Adapter::DataType &data) {             \
     instance()->InternalPublish##name(data);                                   \
