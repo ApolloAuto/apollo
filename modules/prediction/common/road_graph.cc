@@ -104,7 +104,7 @@ void RoadGraph::ComputeLaneSequence(
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
       double successor_accumulated_s =
           accumulated_s + lane_info_ptr->total_length() - start_s;
-      LaneInfo* successor_lane = map->lane_by_id(successor_lane_id);
+      LaneInfo* successor_lane = map->LaneById(successor_lane_id);
       ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
           lane_segments, lane_graph_ptr);
     }

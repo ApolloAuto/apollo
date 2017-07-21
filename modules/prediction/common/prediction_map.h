@@ -19,12 +19,14 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Eigen/Dense"
 
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/pnc_map/path.h"
 
 namespace apollo {
 namespace prediction {
@@ -37,10 +39,94 @@ class PredictionMap {
 
   void Clear();
 
+  apollo::hdmap::Id id(const std::string& str_id);
+
   Eigen::Vector2d PositionOnLane(const apollo::hdmap::LaneInfo& lane_info,
                                  const double s);
 
-  apollo::hdmap::LaneInfo* lane_by_id(const apollo::hdmap::Id& id);
+  double LaneTotalWidth(const apollo::hdmap::LaneInfo* lane_info_ptr,
+                        const double s);
+
+  apollo::hdmap::LaneInfo* LaneById(const apollo::hdmap::Id& id);
+
+  apollo::hdmap::LaneInfo* LaneById(const std::string& id);
+
+  void GetProjection(const Eigen::Vector2d& position,
+                     const apollo::hdmap::LaneInfo* lane_info_ptr,
+                     double* s, double* l);
+
+  bool ProjectionFromLane(
+      const apollo::hdmap::LaneInfo* lane_info_ptr,
+      apollo::hdmap::PathPoint* path_point,
+      double* s);
+
+  void OnLane(
+      const std::vector<const apollo::hdmap::LaneInfo*>& prev_lanes,
+      const Eigen::Vector2d& point,
+      const double heading,
+      const double radius,
+      std::vector<const apollo::hdmap::LaneInfo*>* lanes);
+
+  int SmoothPointFromLane(
+      const apollo::hdmap::Id& id,
+      const double s,
+      const double l,
+      Eigen::Vector2d* point,
+      double* heading);
+
+  void NearbyLanesByCurrentLanes(
+      const Eigen::Vector2d& point,
+      const std::vector<const apollo::hdmap::LaneInfo*>& lanes,
+      std::vector<const apollo::hdmap::LaneInfo*>* nearby_lanes);
+
+  bool IsLeftNeighborLane(
+      const apollo::hdmap::LaneInfo* left_lane,
+      const apollo::hdmap::LaneInfo* lane);
+
+  bool IsLeftNeighborLane(
+      const apollo::hdmap::LaneInfo* left_lane,
+      const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
+
+  bool IsRightNeighborLane(
+      const apollo::hdmap::LaneInfo* right_lane,
+      const apollo::hdmap::LaneInfo* lane);
+
+  bool IsRightNeighborLane(
+      const apollo::hdmap::LaneInfo* left_lane,
+      const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
+
+  bool IsSuccessorLane(
+      const apollo::hdmap::LaneInfo* succ_lane,
+      const apollo::hdmap::LaneInfo* lane);
+
+  bool IsSuccessorLane(
+      const apollo::hdmap::LaneInfo* left_lane,
+      const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
+
+  bool IsPredecessorLane(
+      const apollo::hdmap::LaneInfo* pred_lane,
+      const apollo::hdmap::LaneInfo* lane);
+
+  bool IsPredecessorLane(
+      const apollo::hdmap::LaneInfo* left_lane,
+      const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
+
+  bool IsIdenticalLane(
+      const apollo::hdmap::LaneInfo* other_lane,
+      const apollo::hdmap::LaneInfo* lane);
+
+  bool IsIdenticalLane(
+      const apollo::hdmap::LaneInfo* left_lane,
+      const std::vector<const apollo::hdmap::LaneInfo*>& lanes);
+
+  int LaneTurnType(const apollo::hdmap::Id& id);
+
+  int LaneTurnType(const std::string& lane_id);
+
+  template<class MapInfo>
+  std::string id_string(const MapInfo* info) {
+    return info->id().id();
+  }
 
  private:
   std::unique_ptr<apollo::hdmap::HDMapImpl> hdmap_;

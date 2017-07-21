@@ -28,6 +28,7 @@ cc_library(
         "//modules/map/hdmap:hdmap",
         "//modules/common:macro",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/map/pnc_map:pnc_path",
     ],
 
 )
