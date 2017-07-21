@@ -11,9 +11,9 @@ cc_library(
         "path.h",
     ],
     deps = [
+        "//modules/common/math",
+        "//modules/map/hdmap",
         "//modules/map/proto:map_proto",
-        "//modules/map/hdmap:hdmap",
-        "//modules/common/math:math",
     ],
 )
 

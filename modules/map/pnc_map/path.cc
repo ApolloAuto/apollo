@@ -146,7 +146,8 @@ Path::Path(std::vector<PathPoint> path_points,
       _lane_segments(std::move(lane_segments)) {
   init();
   if (max_approximation_error > 0.0) {
-    _approximation.reset(new PathApproximation(*this, max_approximation_error));
+    _use_path_approximation = true;
+    _approximation = PathApproximation(*this, max_approximation_error);
   }
 }
 
@@ -450,9 +451,9 @@ bool Path::get_projection(const Vec2d& point, double* accumulate_s,
       min_distance == nullptr) {
     return false;
   }
-  if (_approximation != nullptr) {
-    return _approximation->get_projection(*this, point, accumulate_s, lateral,
-                                          min_distance);
+  if (_use_path_approximation) {
+    return _approximation.get_projection(*this, point, accumulate_s, lateral,
+                                         min_distance);
   }
   CHECK_GE(_num_points, 2);
   *min_distance = std::numeric_limits<double>::infinity();
@@ -570,8 +571,8 @@ bool Path::is_on_path(const Box2d& box) const {
 
 bool Path::overlap_with(const apollo::common::math::Box2d& box,
                         double width) const {
-  if (_approximation != nullptr) {
-    return _approximation->overlap_with(*this, box, width);
+  if (_use_path_approximation) {
+    return _approximation.overlap_with(*this, box, width);
   }
   const Vec2d center = box.center();
   const double radius_sqr = Sqr(box.diagonal() / 2.0 + width) + kMathEpsilon;
