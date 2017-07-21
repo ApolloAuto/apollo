@@ -53,20 +53,6 @@ cc_library(
 )
 
 cc_library(
-    name = "vec2d_utils",
-    srcs = [
-        "vec2d_utils.cc",
-    ],
-    hdrs = [
-        "vec2d_utils.h",
-    ],
-    deps = [
-        "//modules/common:log",
-        "//modules/common/proto:vector_proto",
-    ],
-)
-
-cc_library(
     name = "aabox2d",
     srcs = [
         "aabox2d.cc",
@@ -364,18 +350,6 @@ cc_test(
     ],
     deps = [
         ":vec2d",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "vec2d_utils_test",
-    size = "small",
-    srcs = [
-        "vec2d_utils_test.cc",
-    ],
-    deps = [
-        ":vec2d_utils",
         "@gtest//:main",
     ],
 )

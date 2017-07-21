@@ -1,8 +1,0 @@
-syntax = "proto2";
-
-package apollo.common;
-
-message Vec2D {
-  optional double x = 1;
-  optional double y = 2;
-}
