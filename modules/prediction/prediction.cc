@@ -83,7 +83,8 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
       ->mutable_container("Obstacles")->Insert(perception_obstacles);
   EvaluatorManager::instance()->Run(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
-  // AdapterManager::PublishPrediction(PredictorManager::instance()->GetPredictions());
+  AdapterManager::PublishPrediction(
+      PredictorManager::instance()->prediction_obstacles());
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
