@@ -6,9 +6,11 @@ class WebSocketEndpoint {
     constructor(server) {
         this.server = server;
         this.websocket = null;
+        this.counter = 0;
     }
 
     initialize() {
+        this.counter = 0;
         try {
             this.websocket = new WebSocket(this.server);
         } catch (error) {
@@ -28,6 +30,16 @@ class WebSocketEndpoint {
                     RENDERER.updateWorld(message.world);
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
+                    if (message.mapHash && (this.counter % 10 === 0)) {
+                        // NOTE: This is a hack to limit the rate
+                        // of map updates.
+                        this.counter = 0;
+                        RENDERER.updateMapIndex(
+                            message.mapHash, message.mapElements);
+                    }
+                    break;
+                case "MapData":
+                    RENDERER.updateMap(message.data);
                     break;
             }
         };
@@ -36,6 +48,13 @@ class WebSocketEndpoint {
                 this.initialize();
             }, 1000);
         };
+    }
+
+    requestMapData(elements) {
+        this.websocket.send(JSON.stringify({
+            type: "RetrieveMapData",
+            elements: elements,
+        }));
     }
 }
 

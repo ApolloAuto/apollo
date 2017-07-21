@@ -118,7 +118,9 @@ nlohmann::json MapElementIds::Json() const {
 }
 
 MapService::MapService(const std::string &map_filename) {
-  hdmap_.load_map_from_file(map_filename);
+  if (hdmap_.load_map_from_file(map_filename)) {
+    AFATAL << "Failed to load map: " << map_filename;
+  }
   AINFO << "HDMap loaded, Map: " << map_filename;
 }
 
@@ -128,6 +130,7 @@ MapElementIds MapService::CollectMapElements(const Point &point,
 
   std::vector<LaneInfoConstPtr> lanes;
   hdmap_.get_lanes(point, radius, &lanes);
+
   ExtractIds(lanes, &result.lane);
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;

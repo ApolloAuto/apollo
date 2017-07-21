@@ -9,17 +9,29 @@ const mtlLoader = new THREE.MTLLoader();
 const objLoader = new THREE.OBJLoader();
 const textureLoader = new THREE.TextureLoader();
 
+const loadedMaterialAndObject = {};
+
 export function loadObject(materialFile, objectFile, scale, callback) {
-    mtlLoader.load(materialFile, materials => {
-        materials.preload();
-        objLoader.setMaterials(materials);
-        objLoader.load(objectFile, loaded => {
-            const object = loaded.clone();
-            object.name = objectFile;
-            object.scale.set(scale.x, scale.y, scale.z);
+    function placeMtlAndObj(loaded) {
+        const object = loaded.clone();
+        object.scale.set(scale.x, scale.y, scale.z);
+        if (callback) {
             callback(object);
+        }
+    }
+    if (loadedMaterialAndObject[objectFile]) {
+        placeMtlAndObj(loadedMaterialAndObject[objectFile]);
+    } else {
+        mtlLoader.load(materialFile, materials => {
+            materials.preload();
+            objLoader.setMaterials(materials);
+            objLoader.load(objectFile, loaded => {
+                loaded.name = objectFile;
+                loadedMaterialAndObject[objectFile] = loaded;
+                placeMtlAndObj(loaded);
+            });
         });
-    });
+    }
 }
 
 export function loadTexture(textureFile, callback) {
