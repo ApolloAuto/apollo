@@ -123,6 +123,7 @@ class Path;
 
 class PathApproximation {
  public:
+  PathApproximation() = default;
   PathApproximation(const Path& path, const double max_error)
       : _max_error(max_error), _max_sqr_error(max_error * max_error) {
     init(path);
@@ -150,8 +151,8 @@ class PathApproximation {
   void init_projections(const Path& path);
 
  protected:
-  const double _max_error;
-  const double _max_sqr_error;
+  double _max_error = 0;
+  double _max_sqr_error = 0;
 
   int _num_points = 0;
   std::vector<int> _original_ids;
@@ -163,7 +164,7 @@ class PathApproximation {
   // Projection of points onto the diluated segments.
   std::vector<double> _projections;
   double _max_projection;
-  int _num_projection_samples;
+  int _num_projection_samples = 0;
 
   // The original_projection is the projection of original points onto the
   // diluated segments.
@@ -185,9 +186,6 @@ class InterpolatedIndex {
 class Path {
  public:
   Path() = default;
-
-  Path(const Path& rhs) = delete;
-  Path& operator=(const Path& rhs) = delete;
   Path(Path&&) = default;
   Path& operator=(Path&&) = default;
 
@@ -237,9 +235,7 @@ class Path {
   const std::vector<apollo::common::math::LineSegment2d>& segments() const {
     return _segments;
   }
-  const PathApproximation* approximation() const {
-    return _approximation.get();
-  }
+  const PathApproximation* approximation() const { return &_approximation; }
   double length() const { return _length; }
 
   const std::vector<PathOverlap>& lane_overlaps() const {
@@ -304,7 +300,8 @@ class Path {
   double _length = 0.0;
   std::vector<double> _accumulated_s;
   std::vector<apollo::common::math::LineSegment2d> _segments;
-  std::unique_ptr<PathApproximation> _approximation;
+  bool _use_path_approximation = false;
+  PathApproximation _approximation;
 
   // Sampled every fixed length.
   int _num_sample_points = 0;
