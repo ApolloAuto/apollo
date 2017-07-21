@@ -37,6 +37,20 @@ void ShiftMap(Map* map_pb) {
         point.set_y(point.y() + FLAGS_y_offset);
       }
     }
+    for (auto& segment :
+        *(lane.mutable_left_boundary()->mutable_curve()->mutable_segment())) {
+      for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
+        point.set_x(point.x() + FLAGS_x_offset);
+        point.set_y(point.y() + FLAGS_y_offset);
+      }
+    }
+    for (auto& segment :
+        *(lane.mutable_right_boundary()->mutable_curve()->mutable_segment())) {
+      for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
+        point.set_x(point.x() + FLAGS_x_offset);
+        point.set_y(point.y() + FLAGS_y_offset);
+      }
+    }
   }
   for (auto& stop_sign : *(map_pb->mutable_stop_sign())) {
     for (auto& segment : *(stop_sign.mutable_stop_line()->mutable_segment())) {
