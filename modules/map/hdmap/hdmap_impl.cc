@@ -19,19 +19,16 @@ limitations under the License.
 #include <iostream>
 #include <unordered_set>
 
-namespace {
+#include "modules/common/util/file.h"
 
-bool read_map_from_bin_file(const std::string& file,
-                            apollo::hdmap::Map* const map) {
-    std::fstream input(file, std::ios::in | std::ios::binary);
-    return map->ParseFromIstream(&input);
-}
+namespace {
 
 apollo::hdmap::Id create_hdmap_id(const std::string& string_id) {
     apollo::hdmap::Id id;
     id.set_id(string_id);
     return id;
 }
+
 }  // namespace
 
 namespace apollo {
@@ -40,7 +37,8 @@ namespace hdmap {
 int HDMapImpl::load_map_from_file(const std::string& map_filename) {
     clear();
 
-    if (!read_map_from_bin_file(map_filename, &_map)) {
+    using apollo::common::util::GetProtoFromFile;
+    if (!GetProtoFromFile(map_filename, &_map)) {
         return -1;
     }
 

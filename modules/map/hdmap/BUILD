@@ -17,6 +17,7 @@ cc_library(
     deps = [
         "@glog//:glog",
         "//modules/common/math",
+        "//modules/common/util",
         "//modules/common:macro",
         "//modules/map/proto:map_proto",
     ],
