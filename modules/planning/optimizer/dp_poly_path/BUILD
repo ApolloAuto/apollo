@@ -17,11 +17,12 @@ cc_library(
         "trajectory_cost.h",
     ],
     deps = [
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/map/proto:map_proto",
-        "//modules/planning/common:data_center",
         "//modules/planning/common:decision_data",
         "//modules/planning/common:obstacle",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/common/path",
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/path:frenet_frame_path",

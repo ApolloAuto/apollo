@@ -44,9 +44,9 @@ QpSplineStBoundaryMapper::QpSplineStBoundaryMapper(
     : StBoundaryMapper(st_boundary_config, veh_param) {}
 
 ErrorCode QpSplineStBoundaryMapper::get_graph_boundary(
-    const DataCenter& data_center, const DecisionData& decision_data,
-    const PathData& path_data, const double planning_distance,
-    const double planning_time,
+    const common::TrajectoryPoint& initial_planning_point,
+    const DecisionData& decision_data, const PathData& path_data,
+    const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const obs_boundary) const {
   if (planning_time < 0.0) {
     AERROR << "Fail to get params because planning_time < 0.";
@@ -82,9 +82,10 @@ ErrorCode QpSplineStBoundaryMapper::get_graph_boundary(
     if (dynamic_obs_vec[i] == nullptr) {
       continue;
     }
-    if (map_obstacle_with_trajectory(
-            data_center, *dynamic_obs_vec[i], path_data, planning_distance,
-            planning_time, obs_boundary) != ErrorCode::PLANNING_OK) {
+    if (map_obstacle_with_trajectory(initial_planning_point,
+                                     *dynamic_obs_vec[i], path_data,
+                                     planning_distance, planning_time,
+                                     obs_boundary) != ErrorCode::PLANNING_OK) {
       AERROR << "Fail to map dynamic obstacle with id "
              << dynamic_obs_vec[i]->Id();
       return ErrorCode::PLANNING_ERROR_FAILED;
@@ -95,9 +96,9 @@ ErrorCode QpSplineStBoundaryMapper::get_graph_boundary(
 }
 
 ErrorCode QpSplineStBoundaryMapper::map_obstacle_with_trajectory(
-    const DataCenter& data_center, const Obstacle& obstacle,
-    const PathData& path_data, const double planning_distance,
-    const double planning_time,
+    const common::TrajectoryPoint& init_planning_point,
+    const Obstacle& obstacle, const PathData& path_data,
+    const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const boundary) const {
   std::vector<STPoint> boundary_points;
   // lower and upper bound for st boundary
@@ -233,14 +234,8 @@ ErrorCode QpSplineStBoundaryMapper::map_obstacle_with_trajectory(
         double control_throttle_release_time = 0.1;
         double control_brake_full_time = 0.2;
         double t_delay = compute_delay_time + control_cmd_delay_time;
-        const double init_acc = data_center.current_frame()
-                                    ->planning_data()
-                                    .init_planning_point()
-                                    .a();
-        const double init_speed = data_center.current_frame()
-                                      ->planning_data()
-                                      .init_planning_point()
-                                      .v();
+        const double init_acc = init_planning_point.a();
+        const double init_speed = init_planning_point.v();
         if (init_acc > 0.3) {
           t_delay += control_throttle_release_time;
         }

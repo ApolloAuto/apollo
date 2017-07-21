@@ -23,7 +23,6 @@
 
 #include "common/speed/st_point.h"
 #include "math/double.h"
-#include "util/data_center.h"
 
 namespace apollo {
 namespace planning {
