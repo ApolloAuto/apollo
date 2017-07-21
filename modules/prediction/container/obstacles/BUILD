@@ -8,7 +8,8 @@ cc_library(
     hdrs = ["obstacles_container.h"],
     deps = [
         "//modules/prediction/container:container",
-    ]
+        "//modules/prediction/container/obstacles:obstacle",
+    ],
 )
 
 cc_library(

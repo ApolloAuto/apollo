@@ -24,6 +24,8 @@
 
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
+#include "modules/prediction/container/obstacles/obstacle.h"
+
 /**
  * @namespace apollo::prediction
  * @brief apollo::prediction
@@ -51,7 +53,7 @@ class Predictor {
   /**
    * @brief Make prediction
    */
-  virtual void Predict() const = 0;
+  virtual void Predict(Obstacle* obstacle) const = 0;
 
  protected:
   PredictionObstacle prediction_obstacle_;

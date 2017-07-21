@@ -42,7 +42,7 @@ class LaneSequencePredictor : public Predictor {
   /**
    * @brief Make prediction
    */
-  void Predict() const override;
+  void Predict(Obstacle* obstacle) const override;
 };
 
 }  // namespace prediction

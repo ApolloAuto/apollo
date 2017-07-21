@@ -16,17 +16,48 @@
 
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
+#include "modules/prediction/evaluator/evaluator_factory.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace prediction {
 
+using ::apollo::perception::PerceptionObstacles;
+using ::apollo::perception::PerceptionObstacle;
+
 EvaluatorManager::EvaluatorManager() {}
 
-const Evaluator* EvaluatorManager::GetEvaluator() {
-  return nullptr;
+Evaluator* EvaluatorManager::GetEvaluator(
+    const ObstacleConf::EvaluatorType& type) {
+  return EvaluatorFactory::instance()->CreateEvaluator(type).get();
 }
 
 void EvaluatorManager::Run(
-    const ::apollo::perception::PerceptionObstacles& perception_obstacles) {}
+    const ::apollo::perception::PerceptionObstacles& perception_obstacles) {
+  ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::instance()->mutable_container("ObstaclesContainer"));
+  CHECK_NOTNULL(container);
+
+  for (const auto& perception_obstacle :
+      perception_obstacles.perception_obstacle()) {
+    int id = perception_obstacle.id();
+    switch(perception_obstacle.type()) {
+      case PerceptionObstacle::VEHICLE: {
+        Evaluator *evaluator = GetEvaluator(ObstacleConf::MLP_EVALUATOR);
+        CHECK_NOTNULL(evaluator);
+        Obstacle *obstacle = container->GetObstacle(id);
+        CHECK_NOTNULL(obstacle);
+        evaluator->Evaluate(obstacle);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+}
 
 }  // namespace prediction
 }  // namespace apollo

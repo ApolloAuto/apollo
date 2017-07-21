@@ -52,7 +52,7 @@ class EvaluatorFactory
    * @return A pointer to the given evaluator
    */
   std::unique_ptr<Evaluator> CreateEvaluator(
-      const ObstacleConf::EvaluatorType& eval);
+      const ObstacleConf::EvaluatorType& type);
 
  private:
   DECLARE_SINGLETON(EvaluatorFactory);
