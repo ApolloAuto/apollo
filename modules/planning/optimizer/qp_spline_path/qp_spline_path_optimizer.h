@@ -18,35 +18,32 @@
  * @file qp_path_optimizer.h
  **/
 
-#ifndef BAIDU_IDG_HOUSTON_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_H_
-#define BAIDU_IDG_HOUSTON_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_H_
+#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_H_
 
-#include "optimizer/path_optimizer.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/planning/optimizer/path_optimizer.h"
 
-#include "boost/property_tree/ptree.hpp"
-
-#include "optimizer/qp_spline_path_optimizer/qp_spline_path_generator.h"
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
 
 namespace apollo {
 namespace planning {
 
 class QPSplinePathOptimizer : public PathOptimizer {
  public:
-  explicit QPSplinePathOptimizer(const std::string& name,
-                                 const boost::property_tree::ptree& ptree);
+  explicit QPSplinePathOptimizer(const std::string& name);
 
-  virtual ErrorCode optimize(const DataCenter& data_center,
-                             const SpeedData& speed_data,
-                             const ReferenceLine& reference_line,
-                             const ::adu::planning::TrajectoryPoint& init_point,
-                             DecisionData* const decision_data,
-                             PathData* const path_data) const override;
+  virtual common::ErrorCode optimize(const SpeedData& speed_data,
+                                     const ReferenceLine& reference_line,
+                                     const common::TrajectoryPoint& init_point,
+                                     DecisionData* const decision_data,
+                                     PathData* const path_data) override;
 
  private:
-  std::unique_ptr<QPSplinePathGenerator> _path_generator = nullptr;
+  QPSplinePathGenerator _path_generator;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // BAIDU_IDG_HOUSTON_OPTIMIZER_SPLINE_QP_PATH_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_SPLINE_QP_PATH_OPTIMIZER_H_

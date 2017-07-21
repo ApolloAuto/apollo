@@ -38,7 +38,7 @@ class GraphEdge {
   void set_from_vertex(const size_t index);
   void set_to_vertex(const size_t index);
   void set_level(const size_t level);
-  void set_path(const std::vector<::apollo::common::FrenetFramePoint> &path);
+  void set_path(const std::vector<common::FrenetFramePoint> &path);
   void set_poly_path(const QuinticPolynomialCurve1d &ploy_path);
   void set_edge_index(const size_t index);
   void set_cost(const double cost);
@@ -46,7 +46,7 @@ class GraphEdge {
   size_t from_vertex() const;
   size_t to_vertex() const;
   size_t level() const;
-  const std::vector<::apollo::common::FrenetFramePoint> &path() const;
+  const std::vector<common::FrenetFramePoint> &path() const;
   const QuinticPolynomialCurve1d &poly_path() const;
   size_t edge_index() const;
   double cost() const;
@@ -57,7 +57,7 @@ class GraphEdge {
   size_t _to_vertex;
   size_t _level;
   double _cost;
-  std::vector<::apollo::common::FrenetFramePoint> _path;
+  std::vector<common::FrenetFramePoint> _path;
   QuinticPolynomialCurve1d _poly_path;
 };
 

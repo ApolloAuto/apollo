@@ -36,8 +36,8 @@ class PathSampler {
   ::apollo::common::ErrorCode sample(
       const ReferenceLine &reference_line,
       const ::apollo::common::TrajectoryPoint &init_point,
-      const ::apollo::common::SLPoint &init_sl_point,
-      std::vector<std::vector<::apollo::common::SLPoint>> *const points);
+      const common::SLPoint &init_sl_point,
+      std::vector<std::vector<common::SLPoint>> *const points);
 
  private:
   DpPolyPathConfig _config;

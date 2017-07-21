@@ -63,7 +63,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
     return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
   }
   FrenetFramePath tunnel;
-  std::vector<::apollo::common::FrenetFramePoint> frenet_path;
+  std::vector<common::FrenetFramePoint> frenet_path;
   frenet_path.push_back(_vertices[0].frame_point());
   double accumulated_s = 0.0;
   for (size_t i = 0; i < min_cost_edges.size(); ++i) {
@@ -76,7 +76,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
       const double l = edge.poly_path().evaluate(1, current_s);
       const double dl = edge.poly_path().evaluate(2, current_s);
       const double ddl = edge.poly_path().evaluate(3, current_s);
-      ::apollo::common::FrenetFramePoint frenet_frame_point;
+      common::FrenetFramePoint frenet_frame_point;
       frenet_frame_point.set_s(accumulated_s + current_s);
       frenet_frame_point.set_l(l);
       frenet_frame_point.set_dl(dl);
@@ -90,9 +90,9 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
   path_data->set_frenet_path(tunnel);
   // convert frenet path to path by reference line
   std::vector<::apollo::common::PathPoint> path_points;
-  for (const ::apollo::common::FrenetFramePoint &frenet_point : frenet_path) {
+  for (const common::FrenetFramePoint &frenet_point : frenet_path) {
     Eigen::Vector2d xy_point;
-    ::apollo::common::SLPoint sl_point;
+    common::SLPoint sl_point;
     sl_point.set_s(frenet_point.s());
     sl_point.set_l(frenet_point.l());
 
@@ -158,7 +158,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
           reference_point.heading(), _init_point.path_point().theta(),
           reference_point.kappa(), _init_point.path_point().kappa(),
           reference_point.dkappa(), _init_sl_point.l());
-  ::apollo::common::FrenetFramePoint init_frenet_frame_point;
+  common::FrenetFramePoint init_frenet_frame_point;
   init_frenet_frame_point.set_s(_init_sl_point.s());
   init_frenet_frame_point.set_l(_init_sl_point.l());
   init_frenet_frame_point.set_dl(init_dl);
@@ -173,7 +173,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
 ::apollo::common::ErrorCode DpRoadGraph::generate_graph(
     const ReferenceLine &reference_line) {
   ::apollo::common::ErrorCode ret = ::apollo::common::ErrorCode::PLANNING_OK;
-  std::vector<std::vector<::apollo::common::SLPoint>> points;
+  std::vector<std::vector<common::SLPoint>> points;
   PathSampler path_sampler(_config);
   ret =
       path_sampler.sample(reference_line, _init_point, _init_sl_point, &points);
@@ -275,7 +275,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
   return ::apollo::common::ErrorCode::PLANNING_OK;
 }
 
-bool DpRoadGraph::add_vertex(const ::apollo::common::SLPoint &sl_point,
+bool DpRoadGraph::add_vertex(const common::SLPoint &sl_point,
                              const ReferencePoint &reference_point,
                              const size_t level) {
   double kappa = reference_point.kappa();
@@ -294,7 +294,7 @@ bool DpRoadGraph::add_vertex(const ::apollo::common::SLPoint &sl_point,
     kappa = std::min(kappa_range_upper, kappa);
   }
 
-  ::apollo::common::FrenetFramePoint frenet_frame_point;
+  common::FrenetFramePoint frenet_frame_point;
   frenet_frame_point.set_s(sl_point.s());
   frenet_frame_point.set_l(sl_point.l());
   frenet_frame_point.set_dl(0.0);

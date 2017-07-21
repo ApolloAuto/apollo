@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message QpSplineStSpeedConfig {
+message QPSplineStSpeedConfig {
   optional double total_path_length = 1 [ default = 80.0 ];
   optional double total_time = 2 [ default = 8.0 ];
   optional double output_time_resolution = 3 [ default = 0.05 ];

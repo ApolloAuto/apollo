@@ -39,8 +39,8 @@ cc_library(
     deps = [
         ":qp_solver",
         "//modules/common/math/qp_solver:qp_solver_gflags",
-        "@eigen//:eigen",
         "//third_party/qp_oases",
+        "@eigen//:eigen",
     ],
 )
 
