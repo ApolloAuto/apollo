@@ -15,18 +15,53 @@
  *****************************************************************************/
 
 #include "modules/prediction/predictor/predictor_manager.h"
+#include "modules/prediction/predictor/predictor_factory.h"
 
 namespace apollo {
 namespace prediction {
 
-PredictorManager::PredictorManager() {}
+using ::apollo::perception::PerceptionObstacles;
+using ::apollo::perception::PerceptionObstacle;
 
-const Predictor* PredictorManager::GetPredictor() {
-  return nullptr;
+PredictorManager::PredictorManager() {
+  PredictorFactory::instance()->RegisterPredictor();
+}
+
+Predictor* PredictorManager::GetPredictor(
+    const ObstacleConf::PredictorType& type) {
+  return PredictorFactory::instance()->CreatePredictor(type).get();
 }
 
 void PredictorManager::Run(
-    const ::apollo::perception::PerceptionObstacles& perception_obstacles) {}
+    const PerceptionObstacles& perception_obstacles) {
+  prediction_obstacles_.Clear();
+  Predictor *predictor = nullptr;
+  for (const auto& obstacle : perception_obstacles.perception_obstacle()) {
+    switch (obstacle.type()) {
+      case PerceptionObstacle::VEHICLE: {
+        predictor = GetPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
+        break;
+      }
+      case PerceptionObstacle::PEDESTRIAN: {
+        predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+        break;
+      }
+      default: {
+        predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+        break;
+      }
+    }
+    if (predictor != nullptr) {
+      predictor->Predict();
+      prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
+        predictor->prediction_obstacle());
+    }
+  }
+}
+
+const PredictionObstacles& PredictorManager::prediction_obstacles() {
+  return prediction_obstacles_;
+}
 
 }  // namespace prediction
 }  // namespace apollo

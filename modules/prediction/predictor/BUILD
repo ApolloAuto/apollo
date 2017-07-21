@@ -8,6 +8,8 @@ cc_library(
     srcs = ["predictor_factory.cc"],
     deps = [
         "//modules/prediction/predictor:predictor",
+        "//modules/prediction/predictor/vehicle:lane_sequence_predictor",
+        "//modules/prediction/predictor/vehicle:free_move_predictor",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/common/util:factory",
         "//modules/common:macro",
@@ -21,7 +23,10 @@ cc_library(
     hdrs = ["predictor_manager.h"],
     deps = [
         "//modules/prediction/predictor:predictor",
+        "//modules/prediction/predictor:predictor_factory",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/proto:prediction_conf_proto",
         "//modules/common:macro",
         "@glog//:glog"
     ]

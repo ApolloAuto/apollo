@@ -25,17 +25,17 @@ namespace prediction {
 EvaluatorFactory::EvaluatorFactory() {}
 
 void EvaluatorFactory::RegisterEvaluator() {
-  Register(ObstacleConf::MLP_EVAL,
+  Register(ObstacleConf::MLP_EVALUATOR,
         []() -> Evaluator* { return new MLPEvaluator(); });
 }
 
 std::unique_ptr<Evaluator> EvaluatorFactory::CreateEvaluator(
-    const ObstacleConf::Eval& eval) {
-  auto evaluator = CreateObject(eval);
+    const ObstacleConf::EvaluatorType& type) {
+  auto evaluator = CreateObject(type);
   if (!evaluator) {
-    AERROR << "Failed to create an evaluator with " << eval;
+    AERROR << "Failed to create an evaluator with " << type;
   } else {
-    ADEBUG << "Succeeded in creating an evaluator with " << eval;
+    ADEBUG << "Succeeded in creating an evaluator with " << type;
   }
   return evaluator;
 }
