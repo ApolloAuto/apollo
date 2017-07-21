@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include "gtest/gtest.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
@@ -25,7 +26,7 @@
 using apollo::common::adapter::MonitorAdapter;
 using apollo::common::adapter::ChassisAdapter;
 using apollo::common::adapter::LocalizationAdapter;
-using apollo::common::adapter::PlanningTrajectoryAdapter;
+using apollo::common::adapter::PlanningAdapter;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::adapter::PerceptionObstaclesAdapter;
 using apollo::canbus::Chassis;
@@ -125,7 +126,7 @@ TEST_F(InternalTest, UpdateChassisInfoTest) {
   UpdateSimulationWorld<ChassisAdapter>(chassis, &world);
 
   // Check the update reuslt.
-  const Object &car = world.auto_driving_car();
+  const Object& car = world.auto_driving_car();
   EXPECT_DOUBLE_EQ(4.933, car.length());
   EXPECT_DOUBLE_EQ(2.11, car.width());
   EXPECT_DOUBLE_EQ(1.48, car.height());
@@ -158,7 +159,7 @@ TEST_F(InternalTest, UpdateLocalizationTest) {
   UpdateSimulationWorld<LocalizationAdapter>(localization, &world);
 
   // Check the update result.
-  const Object &car = world.auto_driving_car();
+  const Object& car = world.auto_driving_car();
   EXPECT_DOUBLE_EQ(1.0, car.position_x());
   EXPECT_DOUBLE_EQ(1.5, car.position_y());
   EXPECT_DOUBLE_EQ(
@@ -171,14 +172,14 @@ TEST_F(InternalTest, UpdatePlanningTrajectoryTest) {
   // SimulationWorld object.
   ADCTrajectory planning_trajectory;
   for (int i = 0; i < 30; ++i) {
-    TrajectoryPoint *point = planning_trajectory.add_trajectory_point();
+    TrajectoryPoint* point = planning_trajectory.add_trajectory_point();
     point->mutable_path_point()->set_x(i * 10);
     point->mutable_path_point()->set_y(i * 10 + 10);
   }
 
   // Commit the update.
   SimulationWorld world;
-  UpdateSimulationWorld<PlanningTrajectoryAdapter>(planning_trajectory, &world);
+  UpdateSimulationWorld<PlanningAdapter>(planning_trajectory, &world);
 
   // Check the update result.
   EXPECT_EQ(world.planning_trajectory_size(), 4);
@@ -216,10 +217,9 @@ TEST_F(InternalTest, UpdatePerceptionObstaclesTest) {
   point3->set_x(-1.0);
   point3->set_y(0.0);
   obstacle1->set_timestamp(1489794020.123);
-  obstacle1->set_type(
-      apollo::perception::PerceptionObstacle_Type_UNKNOWN);
-  apollo::perception::PerceptionObstacle* obstacle2 = obstacles
-      .add_perception_obstacle();
+  obstacle1->set_type(apollo::perception::PerceptionObstacle_Type_UNKNOWN);
+  apollo::perception::PerceptionObstacle* obstacle2 =
+      obstacles.add_perception_obstacle();
   obstacle2->set_id(2);
   apollo::perception::Point* point = obstacle2->mutable_position();
   point->set_x(1.0);
@@ -228,8 +228,7 @@ TEST_F(InternalTest, UpdatePerceptionObstaclesTest) {
   obstacle2->set_length(4.0);
   obstacle2->set_width(5.0);
   obstacle2->set_height(6.0);
-  obstacle2->set_type(
-      apollo::perception::PerceptionObstacle_Type_VEHICLE);
+  obstacle2->set_type(apollo::perception::PerceptionObstacle_Type_VEHICLE);
 
   SimulationWorld world;
   UpdateSimulationWorld<PerceptionObstaclesAdapter>(obstacles, &world);
