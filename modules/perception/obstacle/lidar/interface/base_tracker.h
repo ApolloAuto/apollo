@@ -1,0 +1,106 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TRACKER_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TRACKER_H_
+
+// SAMPLE CODE:
+//
+// class MyTracker : public BaseTracker {
+// public:
+//     MyTracker() : BaseTracker() {}
+//     virtual ~MyTracker() {}
+//
+//     virtual bool init() override {
+//         // Do something.
+//         return true;
+//     }
+//
+//     virtual bool track(
+//              const std::vector<Object>& objects,
+//              double timestamp,
+//              const TrackerOptions& options,
+//              std::vector<ObjectPtr>* tracked_objects) override {
+//          // Do something.
+//          return true;
+//      }
+//
+//      virtual std::string name() const override {
+//          return "MyTracker";
+//      }
+//
+// };
+//
+// // Register plugin.
+// REGISTER_TRACKER(MyTracker);
+////////////////////////////////////////////////////////
+// USING CODE:
+//
+// BaseTracker* tracker =
+//          BaseTrackerRegisterer::get_instance_by_name("MyTracker");
+// using tracker to do somethings.
+// ////////////////////////////////////////////////////
+
+#include <string>
+#include <vector>
+
+#include "modules/common/macro.h"
+#include "modules/perception/lib/base/registerer.h"
+#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/obstacle/base/hdmap_struct.h"
+#include "modules/perception/obstacle/base/object.h"
+
+namespace apollo {
+namespace perception {
+namespace obstacle {
+
+struct TrackerOptions {
+  TrackerOptions() = default;
+  explicit TrackerOptions(Eigen::Matrix4d* pose) : velodyne2world_pose(pose) {}
+
+  std::shared_ptr<const Eigen::Matrix4d> velodyne2world_pose;
+  HdmapStructPtr hdmap_input = nullptr;
+};
+
+class BaseTracker {
+ public:
+  BaseTracker() {}
+  virtual ~BaseTracker() {}
+
+  virtual bool Init() = 0;
+
+  // @brief: tracking objects.
+  // @param [in]: current frame object list.
+  // @param [in]: timestamp.
+  // @param [in]: options.
+  // @param [out]: current tracked objects.
+  virtual bool Track(const std::vector<ObjectPtr> &objects, double timestamp,
+                     const TrackerOptions &options,
+                     std::vector<ObjectPtr> *tracked_objects) = 0;
+
+  virtual std::string name() const = 0;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseTracker);
+};
+
+REGISTER_REGISTERER(BaseTracker);
+#define REGISTER_TRACKER(name) REGISTER_CLASS(BaseTracker, name)
+
+}  // namespace obstacle
+}  // namespace perception
+}  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TRACKER_H_
