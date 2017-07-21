@@ -22,7 +22,7 @@
 
 #include <cmath>
 
-#include "modules/common/math/vec2d.h"
+#include "modules/common/math/vec2d_utils.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -44,8 +44,8 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
     std::vector<::apollo::common::math::Box2d> obstacle_by_time;
     ::apollo::common::TrajectoryPoint traj_point =
         static_obstacles[i]->prediction_trajectories()[0].evaluate(0.0);
-    ::apollo::common::math::Vec2d center_point = {traj_point.path_point().x(),
-                                                  traj_point.path_point().y()};
+    auto center_point = apollo::common::math::Vec2DCtor(
+        traj_point.path_point().x(), traj_point.path_point().y());
     ::apollo::common::math::Box2d obstacle_box = {
         center_point, traj_point.path_point().theta(),
         static_obstacles[i]->BoundingBox().length(),
@@ -67,8 +67,8 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
       for (size_t time = 0; time <= _evaluate_times; ++time) {
         TrajectoryPoint traj_point =
             trajectory.evaluate(time * config.eval_time_interval());
-        ::apollo::common::math::Vec2d center_point = {
-            traj_point.path_point().x(), traj_point.path_point().y()};
+        auto center_point = apollo::common::math::Vec2DCtor(
+            traj_point.path_point().x(), traj_point.path_point().y());
         ::apollo::common::math::Box2d obstacle_box = {
             center_point, traj_point.path_point().theta(),
             static_obstacles[i]->BoundingBox().length(),
@@ -101,7 +101,8 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
     double l = curve.evaluate(1, speed_point.st_point().s() - start_s);
     total_cost += l;  // need refine l cost;
 
-    ::apollo::common::math::Vec2d car_point = {speed_point.st_point().s(), l};
+    auto car_point = apollo::common::math::Vec2DCtor(speed_point.st_point().s(),
+                                                     l);
     ReferencePoint reference_point =
         reference_line.get_reference_point(car_point.x());
     ::apollo::common::math::Box2d car_box = {

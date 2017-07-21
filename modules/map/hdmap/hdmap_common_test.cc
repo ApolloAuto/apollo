@@ -279,8 +279,10 @@ TEST_F(HDMapCommonTestSuite, lane_info) {
   ASSERT_EQ(lane_info.unit_directions().size(),
             lane_info.segments().size() + 1);
   for (std::size_t i = 0; i < lane_info.segments().size(); ++i) {
-    ASSERT_EQ(lane_info.segments()[i].unit_direction(),
-              lane_info.unit_directions()[i]);
+    // DON'T use ASSERT_EQ as the '==' is only accessible from ::apollo
+    // namespace while not in gtest.
+    ASSERT_TRUE(lane_info.segments()[i].unit_direction() ==
+                lane_info.unit_directions()[i]);
   }
   ASSERT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
             lane_info.accumulate_s().size());
@@ -290,8 +292,8 @@ TEST_F(HDMapCommonTestSuite, lane_info) {
   ASSERT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
             lane_info.headings().size());
   for (std::size_t i = 0; i < lane_info.headings().size(); ++i) {
-    ASSERT_NEAR(lane_info.unit_directions()[i].Angle(), lane_info.headings()[i],
-                1E-3);
+    ASSERT_NEAR(apollo::common::math::VecAngle(lane_info.unit_directions()[i]),
+                lane_info.headings()[i], 1E-3);
   }
   double left_width = 0.0;
   double right_width = 0.0;

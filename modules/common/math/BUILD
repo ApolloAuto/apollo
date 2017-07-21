@@ -21,7 +21,7 @@ cc_library(
         ":quaternion",
         ":search",
         ":sin_table",
-        ":vec2d",
+        ":vec2d_utils",
     ],
 )
 
@@ -34,20 +34,7 @@ cc_library(
         "math_utils.h",
     ],
     deps = [
-        ":vec2d",
-        "//modules/common:log",
-    ],
-)
-
-cc_library(
-    name = "vec2d",
-    srcs = [
-        "vec2d.cc",
-    ],
-    hdrs = [
-        "vec2d.h",
-    ],
-    deps = [
+        ":vec2d_utils",
         "//modules/common:log",
     ],
 )
@@ -76,7 +63,7 @@ cc_library(
     ],
     deps = [
         ":math_utils",
-        ":vec2d",
+        ":vec2d_utils",
         "//modules/common:log",
     ],
 )
@@ -94,7 +81,7 @@ cc_library(
         ":line_segment2d",
         ":math_utils",
         ":polygon2d",
-        ":vec2d",
+        ":vec2d_utils",
         "//modules/common:log",
     ],
 )
@@ -129,7 +116,7 @@ cc_library(
     ],
     deps = [
         ":math_utils",
-        ":vec2d",
+        ":vec2d_utils",
         "@eigen//:eigen",
     ],
 )
@@ -142,7 +129,7 @@ cc_library(
     deps = [
         ":aabox2d",
         ":math_utils",
-        ":vec2d",
+        ":vec2d_utils",
         "//modules/common:log",
     ],
 )
@@ -155,7 +142,7 @@ cc_library(
     deps = [
         ":euler_angles_zxy",
         ":math_utils",
-        ":vec2d",
+        ":vec2d_utils",
         "//modules/common/proto:common_proto",
         "@eigen//:eigen",
     ],
@@ -205,7 +192,7 @@ cc_library(
     ],
     deps = [
         "math_utils",
-        ":vec2d",
+        ":vec2d_utils",
         "//modules/common:log",
     ],
 )
@@ -224,7 +211,7 @@ cc_library(
         ":aabox2d",
         ":line_segment2d",
         ":math_utils",
-        ":vec2d",
+        ":vec2d_utils",
         "//modules/common:log",
     ],
 )
@@ -352,18 +339,6 @@ cc_test(
     ],
     deps = [
         ":integral",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "vec2d_test",
-    size = "small",
-    srcs = [
-        "vec2d_test.cc",
-    ],
-    deps = [
-        ":vec2d",
         "@gtest//:main",
     ],
 )

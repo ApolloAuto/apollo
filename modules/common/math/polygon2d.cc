@@ -35,11 +35,11 @@ Polygon2d::Polygon2d(const Box2d &box) {
   BuildFromPoints();
 }
 
-Polygon2d::Polygon2d(std::vector<Vec2d> points) : points_(std::move(points)) {
+Polygon2d::Polygon2d(std::vector<Vec2D> points) : points_(std::move(points)) {
   BuildFromPoints();
 }
 
-double Polygon2d::DistanceTo(const Vec2d &point) const {
+double Polygon2d::DistanceTo(const Vec2D &point) const {
   CHECK_GE(points_.size(), 3);
   if (IsPointIn(point)) {
     return 0.0;
@@ -51,7 +51,7 @@ double Polygon2d::DistanceTo(const Vec2d &point) const {
   return distance;
 }
 
-double Polygon2d::DistanceSquareTo(const Vec2d &point) const {
+double Polygon2d::DistanceSquareTo(const Vec2D &point) const {
   CHECK_GE(points_.size(), 3);
   if (IsPointIn(point)) {
     return 0.0;
@@ -109,7 +109,7 @@ double Polygon2d::DistanceTo(const Polygon2d &polygon) const {
   return distance;
 }
 
-double Polygon2d::DistanceToBoundary(const Vec2d &point) const {
+double Polygon2d::DistanceToBoundary(const Vec2D &point) const {
   double distance = std::numeric_limits<double>::infinity();
   for (int i = 0; i < num_points_; ++i) {
     distance = std::min(distance, line_segments_[i].DistanceTo(point));
@@ -117,14 +117,14 @@ double Polygon2d::DistanceToBoundary(const Vec2d &point) const {
   return distance;
 }
 
-bool Polygon2d::IsPointOnBoundary(const Vec2d &point) const {
+bool Polygon2d::IsPointOnBoundary(const Vec2D &point) const {
   CHECK_GE(points_.size(), 3);
   return std::any_of(
       line_segments_.begin(), line_segments_.end(),
       [&](const LineSegment2d &poly_seg) { return poly_seg.IsPointIn(point); });
 }
 
-bool Polygon2d::IsPointIn(const Vec2d &point) const {
+bool Polygon2d::IsPointIn(const Vec2D &point) const {
   CHECK_GE(points_.size(), 3);
   if (IsPointOnBoundary(point)) {
     return true;
@@ -234,7 +234,7 @@ void Polygon2d::BuildFromPoints() {
   }
 }
 
-bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
+bool Polygon2d::ComputeConvexHull(const std::vector<Vec2D> &points,
                                   Polygon2d *const polygon) {
   CHECK_NOTNULL(polygon);
   const int n = points.size();
@@ -247,8 +247,8 @@ bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
   }
   std::sort(sorted_indices.begin(), sorted_indices.end(),
             [&](const int idx1, const int idx2) {
-              const Vec2d &pt1 = points[idx1];
-              const Vec2d &pt2 = points[idx2];
+              const Vec2D &pt1 = points[idx1];
+              const Vec2D &pt2 = points[idx2];
               const double dx = pt1.x() - pt2.x();
               if (std::abs(dx) > kMathEpsilon) {
                 return dx < 0.0;
@@ -264,7 +264,7 @@ bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
       last_count = count;
     }
     const int idx = sorted_indices[(i < n) ? i : (n + n - 1 - i)];
-    const Vec2d &pt = points[idx];
+    const Vec2D &pt = points[idx];
     while (count > last_count &&
            CrossProd(points[results[count - 2]], points[results[count - 1]],
                      pt) <= kMathEpsilon) {
@@ -278,7 +278,7 @@ bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
   if (count < 3) {
     return false;
   }
-  std::vector<Vec2d> result_points;
+  std::vector<Vec2D> result_points;
   result_points.reserve(count);
   for (int i = 0; i < count; ++i) {
     result_points.push_back(points[results[i]]);
@@ -288,7 +288,7 @@ bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
 }
 
 bool Polygon2d::ClipConvexHull(const LineSegment2d &line_segment,
-                               std::vector<Vec2d> *const points) {
+                               std::vector<Vec2D> *const points) {
   if (line_segment.length() <= kMathEpsilon) {
     return true;
   }
@@ -308,7 +308,7 @@ bool Polygon2d::ClipConvexHull(const LineSegment2d &line_segment,
     }
   }
 
-  std::vector<Vec2d> new_points;
+  std::vector<Vec2D> new_points;
   for (int i = 0; i < n; ++i) {
     if (side[i] >= 0) {
       new_points.push_back((*points)[i]);
@@ -316,9 +316,9 @@ bool Polygon2d::ClipConvexHull(const LineSegment2d &line_segment,
     const int j = ((i == n - 1) ? 0 : (i + 1));
     if (side[i] * side[j] < 0) {
       const double ratio = prod[j] / (prod[j] - prod[i]);
-      new_points.emplace_back(
+      new_points.push_back(Vec2DCtor(
           (*points)[i].x() * ratio + (*points)[j].x() * (1.0 - ratio),
-          (*points)[i].y() * ratio + (*points)[j].y() * (1.0 - ratio));
+          (*points)[i].y() * ratio + (*points)[j].y() * (1.0 - ratio)));
     }
   }
 
@@ -331,7 +331,7 @@ bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
   CHECK_GE(points_.size(), 3);
   CHECK_NOTNULL(overlap_polygon);
   CHECK(is_convex_ && other_polygon.is_convex());
-  std::vector<Vec2d> points = other_polygon.points();
+  std::vector<Vec2D> points = other_polygon.points();
   for (int i = 0; i < num_points_; ++i) {
     if (!ClipConvexHull(line_segments_[i], &points)) {
       return false;
@@ -342,13 +342,13 @@ bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
 
 bool Polygon2d::HasOverlap(const LineSegment2d &line_segment) const {
   CHECK_GE(points_.size(), 3);
-  Vec2d first;
-  Vec2d last;
+  Vec2D first;
+  Vec2D last;
   return GetOverlap(line_segment, &first, &last);
 }
 
 bool Polygon2d::GetOverlap(const LineSegment2d &line_segment,
-                           Vec2d *const first, Vec2d *const last) const {
+                           Vec2D *const first, Vec2D *const last) const {
   CHECK_GE(points_.size(), 3);
   CHECK_NOTNULL(first);
   CHECK_NOTNULL(last);
@@ -373,7 +373,7 @@ bool Polygon2d::GetOverlap(const LineSegment2d &line_segment,
     max_proj = line_segment.length();
   }
   for (const auto &poly_seg : line_segments_) {
-    Vec2d pt;
+    Vec2D pt;
     if (poly_seg.GetIntersect(line_segment, &pt)) {
       const double proj = line_segment.ProjectOntoUnit(pt);
       if (proj < min_proj) {
@@ -408,7 +408,7 @@ std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
     projections.push_back(line_segment.length());
   }
   for (const auto &poly_seg : line_segments_) {
-    Vec2d pt;
+    Vec2D pt;
     if (poly_seg.GetIntersect(line_segment, &pt)) {
       projections.push_back(line_segment.ProjectOntoUnit(pt));
     }
@@ -421,7 +421,7 @@ std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
     if (end_proj - start_proj <= kMathEpsilon) {
       continue;
     }
-    const Vec2d reference_point =
+    const Vec2D reference_point =
         line_segment.start() +
         (start_proj + end_proj) / 2.0 * line_segment.unit_direction();
     if (!IsPointIn(reference_point)) {
@@ -443,17 +443,17 @@ std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
   return overlap_line_segments;
 }
 
-void Polygon2d::ExtremePoints(const double heading, Vec2d *const first,
-                              Vec2d *const last) const {
+void Polygon2d::ExtremePoints(const double heading, Vec2D *const first,
+                              Vec2D *const last) const {
   CHECK_GE(points_.size(), 3);
   CHECK_NOTNULL(first);
   CHECK_NOTNULL(last);
 
-  const Vec2d direction_vec = Vec2d::CreateUnitVec2d(heading);
+  const Vec2D direction_vec = Vec2DUnit(heading);
   double min_proj = std::numeric_limits<double>::infinity();
   double max_proj = -std::numeric_limits<double>::infinity();
   for (const auto &pt : points_) {
-    const double proj = pt.InnerProd(direction_vec);
+    const double proj = VecInnerProd(pt, direction_vec);
     if (proj < min_proj) {
       min_proj = proj;
       *first = pt;
@@ -466,25 +466,25 @@ void Polygon2d::ExtremePoints(const double heading, Vec2d *const first,
 }
 
 AABox2d Polygon2d::AABoundingBox() const {
-  return AABox2d({min_x_, min_y_}, {max_x_, max_y_});
+  return AABox2d(Vec2DCtor(min_x_, min_y_), Vec2DCtor(max_x_, max_y_));
 }
 
 Box2d Polygon2d::BoundingBoxWithHeading(const double heading) const {
   CHECK_GE(points_.size(), 3);
-  const Vec2d direction_vec = Vec2d::CreateUnitVec2d(heading);
-  Vec2d px1;
-  Vec2d px2;
-  Vec2d py1;
-  Vec2d py2;
+  const Vec2D direction_vec = Vec2DUnit(heading);
+  Vec2D px1;
+  Vec2D px2;
+  Vec2D py1;
+  Vec2D py2;
   ExtremePoints(heading, &px1, &px2);
   ExtremePoints(heading - M_PI_2, &py1, &py2);
-  const double x1 = px1.InnerProd(direction_vec);
-  const double x2 = px2.InnerProd(direction_vec);
-  const double y1 = py1.CrossProd(direction_vec);
-  const double y2 = py2.CrossProd(direction_vec);
+  const double x1 = VecInnerProd(px1, direction_vec);
+  const double x2 = VecInnerProd(px2, direction_vec);
+  const double y1 = VecCrossProd(py1, direction_vec);
+  const double y2 = VecCrossProd(py2, direction_vec);
   return Box2d(
       (x1 + x2) / 2.0 * direction_vec +
-          (y1 + y2) / 2.0 * Vec2d(direction_vec.y(), -direction_vec.x()),
+          (y1 + y2) / 2.0 * Vec2DCtor(direction_vec.y(), -direction_vec.x()),
       heading, x2 - x1, y2 - y1);
 }
 
@@ -555,21 +555,21 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
     return convex_polygon.ExpandByDistance(distance);
   }
   const double kMinAngle = 0.1;
-  std::vector<Vec2d> points;
+  std::vector<Vec2D> points;
   for (int i = 0; i < num_points_; ++i) {
     const double start_angle = line_segments_[Prev(i)].heading() - M_PI_2;
     const double end_angle = line_segments_[i].heading() - M_PI_2;
     const double diff = WrapAngle(end_angle - start_angle);
     if (diff <= kMathEpsilon) {
       points.push_back(points_[i] +
-                       Vec2d::CreateUnitVec2d(start_angle) * distance);
+                       Vec2DUnit(start_angle) * distance);
     } else {
       const int count = static_cast<int>(diff / kMinAngle) + 1;
       for (int k = 0; k <= count; ++k) {
         const double angle =
             start_angle +
             diff * static_cast<double>(k) / static_cast<double>(count);
-        points.push_back(points_[i] + Vec2d::CreateUnitVec2d(angle) * distance);
+        points.push_back(points_[i] + Vec2DUnit(angle) * distance);
       }
     }
   }

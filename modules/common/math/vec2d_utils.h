@@ -58,6 +58,8 @@ namespace math {
 
 constexpr double kMathEpsilon = 1e-10;
 
+Vec2D Vec2DCtor(const double x, const double y);
+
 //! Creates a unit-vector with a given angle to the positive x semi-axis
 Vec2D Vec2DUnit(const double angle);
 
