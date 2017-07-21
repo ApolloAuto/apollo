@@ -23,29 +23,26 @@
 
 #include <vector>
 
-#include "modules/planning/common/decision_data.h"
-#include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/common/obstacle.h"
 #include "modules/common/math/box2d.h"
+#include "modules/planning/common/decision_data.h"
+#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_config.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "dp_poly_path_config.h"
 
 namespace apollo {
 namespace planning {
 
 class TrajectoryCost {
  public:
-  explicit TrajectoryCost(
-      const DpPolyPathConfig &config,
-      const SpeedData &heuristic_speed_data,
-      const DecisionData &decision_data);
-  double calculate(
-      const QuinticPolynomialCurve1d &curve,
-      const double start_s, const double end_s,
-      const double length, const double width,
-      const ReferenceLine &reference_line) const;
+  explicit TrajectoryCost(const DpPolyPathConfig &config,
+                          const SpeedData &heuristic_speed_data,
+                          const DecisionData &decision_data);
+  double calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
+                   const double end_s, const double length, const double width,
+                   const ReferenceLine &reference_line) const;
+
  private:
   DpPolyPathConfig _config;
   SpeedData _heuristic_speed_data;

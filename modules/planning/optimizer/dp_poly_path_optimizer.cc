@@ -20,28 +20,33 @@
 
 #include "modules/planning/optimizer/dp_poly_path_optimizer.h"
 
+#include "modules/common/util/file.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
 
 namespace apollo {
 namespace planning {
 
-DpPolyPathOptimizer::DpPolyPathOptimizer(
-    const std::string &name,
-    const boost::property_tree::ptree &ptree) : PathOptimizer(name) {
+DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
+    : PathOptimizer(name) {}
+
+bool DpPolyPathOptimizer::SetConfig(const std::string &config_file) {
+  if (!common::util::GetProtoFromFile(config_file, &config_)) {
+    AERROR << "failed to load config file " << config_file;
+    return false;
+  }
+  return true;
 }
 
 ::apollo::common::ErrorCode DpPolyPathOptimizer::optimize(
-    const DataCenter &data_center,
-    const SpeedData &speed_data,
+    const DataCenter &data_center, const SpeedData &speed_data,
     const ReferenceLine &reference_line,
     const ::apollo::planning::TrajectoryPoint &init_point,
-    DecisionData *const decision_data,
-    PathData *const path_data) const {
+    DecisionData *const decision_data, PathData *const path_data) const {
   CHECK_NOTNULL(decision_data);
   CHECK_NOTNULL(path_data);
-  DpPolyPathConfig dp_poly_path_config;
-  DpRoadGraph dp_road_graph(dp_poly_path_config, init_point, speed_data);
-  dp_road_graph.find_tunnel(data_center, reference_line, decision_data, path_data);
+  DpRoadGraph dp_road_graph(config_, init_point, speed_data);
+  dp_road_graph.find_tunnel(data_center, reference_line, decision_data,
+                            path_data);
   return ::apollo::common::ErrorCode::PLANNING_OK;
 }
 

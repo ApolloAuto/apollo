@@ -20,16 +20,15 @@
 
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
 
-#include "modules/planning/math/double.h"
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/common/log.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/planning/math/double.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
 
-PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {
-}
+PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
 
 ::apollo::common::ErrorCode PathSampler::sample(
     const ReferenceLine &reference_line,
@@ -50,8 +49,10 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {
       center_l = center_l * _config.lateral_adjust_coeff();
     }
     accumulated_s += step_length;
-    double level_start_l = center_l
-        - _config.lateral_sample_offset() * ((_config.sample_points_num_each_level() - 1) >> 1);
+    double level_start_l =
+        center_l -
+        _config.lateral_sample_offset() *
+            ((_config.sample_points_num_each_level() - 1) >> 1);
     for (size_t j = 0; j < _config.sample_points_num_each_level(); ++j) {
       // TODO: the lateral value is incorrect
 
@@ -67,5 +68,5 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {
   }
   return ::apollo::common::ErrorCode::PLANNING_OK;
 }
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
