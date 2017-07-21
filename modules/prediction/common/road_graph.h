@@ -43,14 +43,14 @@ class RoadGraph {
  private:
   void ComputeLaneSequence(double accumulated_s,
                            double start_s,
-                           apollo::hdmap::LaneInfo* lane_info_ptr,
+                           const apollo::hdmap::LaneInfo* lane_info_ptr,
                            std::vector<LaneSegment>* lane_segments,
                            LaneGraph* lane_graph_ptr) const;
 
  private:
   double start_s_;
   double length_;
-  apollo::hdmap::LaneInfo* lane_info_ptr_;
+  const apollo::hdmap::LaneInfo* lane_info_ptr_;
 };
 
 }  // namespace prediction
