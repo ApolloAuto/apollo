@@ -22,9 +22,8 @@
 
 #include <limits>
 
-#include "modules/common/proto/vector.pb.h"
-
 #include "modules/common/math/line_segment2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
@@ -73,7 +72,7 @@ bool STBoundaryMapper::check_overlap(
   const double y =
       path_point.y() - mid_to_rear_center * std::sin(path_point.theta());
   const apollo::common::math::Box2d adc_box = apollo::common::math::Box2d(
-      apollo::common::math::Vec2DCtor(x, y), path_point.theta(),
+      {x, y}, path_point.theta(),
       params.length() + 2 * buffer, params.width() + 2 * buffer);
   return obs_box.HasOverlap(adc_box);
 }
