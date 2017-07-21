@@ -29,3 +29,20 @@ cc_library(
         ":st_graph_point",
     ],
 )
+
+cc_library(
+    name = "st_graph_data",
+    srcs = [
+        "st_graph_data.cc",
+    ],
+    hdrs = [
+        "st_graph_data.h",
+    ],
+    deps = [
+        ":st_graph_boundary",
+        "//modules/common/proto:path_point_proto",
+        "//modules/planning/common:planning_gflags",
+    ],
+)
+
+
