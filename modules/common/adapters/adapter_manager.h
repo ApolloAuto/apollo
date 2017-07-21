@@ -64,7 +64,7 @@ namespace adapter {
   static void Feed##name##ProtoFile(const std::string &proto_file) {           \
     CHECK(instance()->name##_)                                                 \
         << "Initialize adapter before feeding protobuf";                       \
-    Get##name()->FeedProtoFile(proto_file);                                    \
+    Get##name()->FeedFile(proto_file);                                         \
   }                                                                            \
   static void Publish##name(const name##Adapter::DataType &data) {             \
     instance()->InternalPublish##name(data);                                   \
@@ -188,6 +188,7 @@ class AdapterManager {
   REGISTER_ADAPTER(Pad);
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
+  REGISTER_ADAPTER(PointCloud);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
 

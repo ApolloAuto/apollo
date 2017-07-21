@@ -17,6 +17,8 @@
 #ifndef MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 #define MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 
+#include <sensor_msgs/PointCloud2.h>
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/adapters/adapter.h"
@@ -56,6 +58,7 @@ using PadAdapter = Adapter<::apollo::control::PadMessage>;
 using PerceptionObstaclesAdapter =
     Adapter<::apollo::perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<::apollo::planning::ADCTrajectory>;
+using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using PredictionAdapter = Adapter<::apollo::prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter =
     Adapter<::apollo::perception::TrafficLightDetection>;

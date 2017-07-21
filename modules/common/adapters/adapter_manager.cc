@@ -50,6 +50,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
 
   for (const auto &config : configs.config()) {
     switch (config.type()) {
+      case AdapterConfig::POINT_CLOUD:
+        EnablePointCloud(FLAGS_pointcloud_topic, config.mode(),
+                        config.message_history_limit());
+        break;
       case AdapterConfig::GPS:
         EnableGps(FLAGS_gps_topic, config.mode(),
                   config.message_history_limit());
