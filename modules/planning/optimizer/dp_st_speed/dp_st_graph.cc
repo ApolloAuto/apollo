@@ -286,15 +286,17 @@ ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
     PlanningObject* object_ptr = nullptr;
 
     // TODO: to be fixed
-    // DataCenter::instance()->mutable_object_table()->get_obstacle(obs_it->id(),
+    // DataCenter::instance()->mutable_object_table()->get_obstacle(obs_it->Id(),
     //                                                             &object_ptr);
-    DataCenter::instance()->current_frame()->mutable_planning_data()
+    DataCenter::instance()
+        ->current_frame()
+        ->mutable_planning_data()
         ->get_obstacle_by_id(obs_it->id(), &object_ptr);
 
     if (obs_it->points().front().x() <= 0) {
       object_ptr->MutableDecisions()->emplace_back(
           _dp_st_configuration.go_down_buffer(),
-           Decision::DecisionType::YIELD_DOWN);
+          Decision::DecisionType::YIELD_DOWN);
       continue;
     }
     double start_t = 0.0;

@@ -124,7 +124,7 @@ ErrorCode ReferenceLineDecider::init(const DataCenter& data_center) {
   // 4. judge if the s in the range of lane change.
   next_route_index = _current_route_index + 1;
   if (next_route_index < _route_reference_lines.size()) {
-    SLPoint sl_point;
+    common::SLPoint sl_point;
     if (_route_reference_lines[next_route_index].get_point_in_Frenet_frame(
             location, &sl_point)) {
       // 5. if yes, put the next reference lane in the front of reference.

@@ -26,7 +26,7 @@
 namespace apollo {
 namespace planning {
 
-GraphVertex::GraphVertex(const ::apollo::common::FrenetFramePoint &frame_point,
+GraphVertex::GraphVertex(const common::FrenetFramePoint &frame_point,
                          const size_t index, const size_t level) :
     _frame_point(frame_point),
     _index(index),
@@ -35,11 +35,11 @@ GraphVertex::GraphVertex(const ::apollo::common::FrenetFramePoint &frame_point,
     _accumulated_cost(std::numeric_limits<double>::max()) {
 }
 
-const ::apollo::common::FrenetFramePoint &GraphVertex::frame_point() const {
+const common::FrenetFramePoint &GraphVertex::frame_point() const {
   return _frame_point;
 }
 
-::apollo::common::FrenetFramePoint *GraphVertex::mutable_frame_point() {
+common::FrenetFramePoint *GraphVertex::mutable_frame_point() {
   return &_frame_point;
 }
 

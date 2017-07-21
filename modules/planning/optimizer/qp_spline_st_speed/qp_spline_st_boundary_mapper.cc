@@ -38,11 +38,11 @@ using ErrorCode = apollo::common::ErrorCode;
 using VehicleParam = apollo::common::config::VehicleParam;
 using PathPoint = apollo::common::PathPoint;
 
-QpSplineSTBoundaryMapper::QpSplineSTBoundaryMapper(
+QPSplineSTBoundaryMapper::QPSplineSTBoundaryMapper(
     const STBoundaryConfig& st_boundary_config, const VehicleParam& veh_param)
     : STBoundaryMapper(st_boundary_config, veh_param) {}
 
-ErrorCode QpSplineSTBoundaryMapper::get_graph_boundary(
+ErrorCode QPSplineSTBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
     const double planning_distance, const double planning_time,
@@ -94,7 +94,7 @@ ErrorCode QpSplineSTBoundaryMapper::get_graph_boundary(
   return ErrorCode::PLANNING_OK;
 }
 
-ErrorCode QpSplineSTBoundaryMapper::map_obstacle_with_trajectory(
+ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_trajectory(
     const common::TrajectoryPoint& init_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
@@ -309,7 +309,7 @@ ErrorCode QpSplineSTBoundaryMapper::map_obstacle_with_trajectory(
   return ErrorCode::PLANNING_OK;
 }
 
-ErrorCode QpSplineSTBoundaryMapper::map_obstacle_without_trajectory(
+ErrorCode QPSplineSTBoundaryMapper::map_obstacle_without_trajectory(
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const boundary) const {

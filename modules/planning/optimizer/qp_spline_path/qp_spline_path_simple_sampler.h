@@ -18,25 +18,23 @@
  * @file qp_spline_path_sampler.h
  **/
 
-#ifndef BAIDU_IDG_HOUSTON_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
-#define BAIDU_IDG_HOUSTON_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
+#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
 
-#include "optimizer/qp_spline_path_optimizer/qp_spline_path_sampler.h"
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_sampler.h"
 
 namespace apollo {
 namespace planning {
 
-class QPSplinePathSimpleSampler final : public QPSplinePathSampler {
+class QPSplinePathSimpleSampler : public QPSplinePathSampler {
  public:
-  virtual ErrorCode sample(const Environment& environment,
-                           const FrenetFramePoint& init_point,
-                           const ReferenceLine& reference_line,
-                           const std::size_t num_of_sampling_point,
-                           const double s_lower_bound,
-                           const double s_upper_bound,
-                           std::vector<double>* const sampling_point) override;
+  virtual bool sample(const common::FrenetFramePoint& init_point,
+                      const ReferenceLine& reference_line,
+                      const std::size_t num_of_sampling_point,
+                      const double s_lower_bound, const double s_upper_bound,
+                      std::vector<double>* const sampling_point) override;
 };
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // BAIDU_IDG_HOUSTON_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_

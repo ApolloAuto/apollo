@@ -19,16 +19,19 @@
  * @brief: natural coordinate system
  **/
 
-#ifndef BAIDU_IDG_HOUSTON_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_
-#define BAIDU_IDG_HOUSTON_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_
+#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_
 
-#include <Eigen/Core>
 #include <memory>
-#include "common/em_planning_data.h"
-#include "common/environment.h"
-#include "common/obstacle.h"
-#include "common/speed/speed_data.h"
-#include "reference_line/reference_line.h"
+
+#include "Eigen/Core"
+
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/common/em_planning_data.h"
+#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
@@ -41,12 +44,11 @@ class QpFrenetFrame {
  public:
   QpFrenetFrame() = default;
 
-  ErrorCode init(const Environment& environment,
-                 const ReferenceLine& reference_line,
-                 const DecisionData& decision_data, const SpeedData& speed_data,
-                 const FrenetFramePoint& init_frenet_point,
-                 const double start_s, const double end_s,
-                 const double time_resolution, const std::size_t num_points);
+  bool Init(const ReferenceLine& reference_line,
+            const DecisionData& decision_data, const SpeedData& speed_data,
+            const common::FrenetFramePoint& init_frenet_point,
+            const double start_s, const double end_s,
+            const double time_resolution, const std::size_t num_points);
 
   const ReferenceLine* reference_line() const;
 
@@ -74,19 +76,18 @@ class QpFrenetFrame {
 
   bool mapping_static_obstacle_with_decision(const Obstacle& obstacle);
 
-  ErrorCode mapping_polygon(
-      const std::vector<::adu::common::math::Vec2d>& corners,
-      const double buffer, const bool nudge_side,
-      std::vector<std::pair<double, double>>* const bound_map);
+  bool mapping_polygon(const std::vector<common::math::Vec2d>& corners,
+                       const double buffer, const bool nudge_side,
+                       std::vector<std::pair<double, double>>* const bound_map);
 
   // nudge_side > 0 update upper bound, nudge_side < 0 update lower_bound
   // nudge_side == 0 out of bound
-  ErrorCode map_line(const SLPoint& start, const SLPoint& end,
-                     const int nudge_side,
-                     std::vector<std::pair<double, double>>* const constraint);
+  bool map_line(const common::SLPoint& start, const common::SLPoint& end,
+                const int nudge_side,
+                std::vector<std::pair<double, double>>* const constraint);
 
-  std::pair<double, double> map_lateral_constraint(const SLPoint& start,
-                                                   const SLPoint& end,
+  std::pair<double, double> map_lateral_constraint(const common::SLPoint& start,
+                                                   const common::SLPoint& end,
                                                    const int nudge_side,
                                                    const double s_start,
                                                    const double s_end);
@@ -109,14 +110,12 @@ class QpFrenetFrame {
  private:
   const ReferenceLine* _reference_line = nullptr;
 
-  const Environment* _environment = nullptr;
-
   const SpeedData* _speed_profile = nullptr;
 
   const DecisionData* _decision_data = nullptr;
 
-  ::adu::common::config::VehicleParam _veh_config;
-  FrenetFramePoint _init_frenet_point;
+  common::config::VehicleParam _vehicle_param;
+  common::FrenetFramePoint _init_frenet_point;
 
   double _feasible_longitudinal_upper_bound = 0.0;
   double _start_s = 0.0;
@@ -132,4 +131,4 @@ class QpFrenetFrame {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // BAIDU_IDG_HOUSTON_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_

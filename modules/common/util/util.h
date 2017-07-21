@@ -22,6 +22,7 @@
 #ifndef MODULES_COMMON_UTIL_H_
 #define MODULES_COMMON_UTIL_H_
 
+#include <iostream>
 #include <string>
 
 #include "modules/common/proto/path_point.pb.h"
@@ -42,11 +43,32 @@ namespace util {
  *        with it.
  * @return Whether the original string ends with the specified pattern.
  */
-bool EndWith(const std::string &original, const std::string &pattern);
+bool EndWith(const std::string& original, const std::string& pattern);
+
+/**
+ * @brief create a SL point
+ * @param s the s value
+ * @param l the l value
+ * @return a SLPoint instance
+ */
 apollo::common::SLPoint MakeSLPoint(const double s, const double l);
+
+/**
+ * calculate the distance beteween PathPoint a and PathPoint b
+ * @param a one path point
+ * @param b another path point
+ * @return sqrt((a.x-b.x)^2 + (a.y-b.y)^2), i.e., the Euclid distance on XY
+ * dimension
+ */
+double Distance2D(const PathPoint& a, const PathPoint& b);
 
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
+
+template <typename A, typename B>
+std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {
+  return os << "first: " << p.first << ", second: " << p.second;
+}
 
 #endif  // MODULES_COMMON_UTIL_H_

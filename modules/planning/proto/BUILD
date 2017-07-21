@@ -10,8 +10,8 @@ cc_proto_library(
         "planning.proto",
         "planning_config.proto",
         "planning_internal.proto",
-        "st_boundary_config.proto",
         "qp_spline_st_speed_config.proto",
+        "st_boundary_config.proto",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -67,5 +67,19 @@ py_proto_compile(
     name = "dp_poly_path_config_proto_pylib",
     protos = [
         "dp_poly_path_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "qp_spline_path_config_proto",
+    protos = [
+        "qp_spline_path_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "qp_spline_path_config_proto_pylib",
+    protos = [
+        "qp_spline_path_config.proto",
     ],
 )

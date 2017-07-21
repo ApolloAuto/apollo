@@ -32,9 +32,9 @@
 namespace apollo {
 namespace planning {
 
-class QpSplineSTBoundaryMapper : public STBoundaryMapper {
+class QPSplineSTBoundaryMapper : public STBoundaryMapper {
  public:
-  QpSplineSTBoundaryMapper(
+  QPSplineSTBoundaryMapper(
       const STBoundaryConfig& st_boundary_config,
       const apollo::common::config::VehicleParam& veh_param);
 

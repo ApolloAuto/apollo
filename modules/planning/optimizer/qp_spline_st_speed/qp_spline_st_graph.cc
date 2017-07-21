@@ -29,12 +29,12 @@ namespace planning {
 using ErrorCode = apollo::common::ErrorCode;
 using VehicleParam = apollo::common::config::VehicleParam;
 
-QpSplineStGraph::QpSplineStGraph(
-    const QpSplineStSpeedConfig& qp_spline_st_speed_config,
+QPSplineStGraph::QPSplineStGraph(
+    const QPSplineStSpeedConfig& qp_spline_st_speed_config,
     const apollo::common::config::VehicleParam& veh_param)
     : _qp_spline_st_speed_config(qp_spline_st_speed_config) {}
 
-ErrorCode QpSplineStGraph::search(const STGraphData& st_graph_data,
+ErrorCode QPSplineStGraph::search(const STGraphData& st_graph_data,
                                   const PathData& path_data,
                                   SpeedData* const speed_data) {
   _init_point = st_graph_data.init_point();
@@ -92,7 +92,7 @@ ErrorCode QpSplineStGraph::search(const STGraphData& st_graph_data,
   return ErrorCode::PLANNING_OK;
 }
 
-ErrorCode QpSplineStGraph::apply_constraint(
+ErrorCode QPSplineStGraph::apply_constraint(
     const std::vector<STGraphBoundary>& boundaries) {
   Spline1dConstraint* constraint =
       _spline_generator->mutable_spline_constraint();
@@ -159,7 +159,7 @@ ErrorCode QpSplineStGraph::apply_constraint(
   return ErrorCode::PLANNING_OK;
 }
 
-ErrorCode QpSplineStGraph::apply_kernel() {
+ErrorCode QPSplineStGraph::apply_kernel() {
   Spline1dKernel* spline_kernel = _spline_generator->mutable_spline_kernel();
 
   if (_qp_spline_st_speed_config.speed_kernel_weight() > 0) {
@@ -193,12 +193,12 @@ ErrorCode QpSplineStGraph::apply_kernel() {
   return ErrorCode::PLANNING_OK;
 }
 
-ErrorCode QpSplineStGraph::solve() {
+ErrorCode QPSplineStGraph::solve() {
   return _spline_generator->solve() ? ErrorCode::PLANNING_OK
                                     : ErrorCode::PLANNING_ERROR_FAILED;
 }
 
-ErrorCode QpSplineStGraph::get_s_constraints_by_time(
+ErrorCode QPSplineStGraph::get_s_constraints_by_time(
     const std::vector<STGraphBoundary>& boundaries, const double time,
     const double total_path_s, double* const s_upper_bound,
     double* const s_lower_bound) const {
