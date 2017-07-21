@@ -19,4 +19,29 @@ cc_library(
     deps = [],
 )
 
+cc_library(
+    name = "prediction_map",
+    hdrs = ["prediction_map.h"],
+    srcs = ["prediction_map.cc"],
+    deps = [
+        "@eigen//:eigen",
+        "//modules/map/hdmap:hdmap",
+        "//modules/common:macro",
+        "//modules/prediction/common:prediction_gflags",
+    ],
+
+)
+
+cc_library(
+    name = "road_graph",
+    srcs = ["road_graph.cc"],
+    hdrs = ["road_graph.h"],
+    deps = [
+        "//modules/prediction/proto:lane_graph_proto",
+        "//modules/map/hdmap:hdmap",
+        "//modules/common/proto:error_code_proto",
+        "//modules/prediction/common:prediction_map",
+    ],
+)
+
 cpplint()
