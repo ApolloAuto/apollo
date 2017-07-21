@@ -28,7 +28,7 @@ namespace apollo {
 namespace common {
 namespace math {
 
-AABox2d::AABox2d(const Vec2D &center, const double length, const double width)
+AABox2d::AABox2d(const Vec2d &center, const double length, const double width)
     : center_(center),
       length_(length),
       width_(width),
@@ -38,12 +38,12 @@ AABox2d::AABox2d(const Vec2D &center, const double length, const double width)
   CHECK_GT(width_, -kMathEpsilon);
 }
 
-AABox2d::AABox2d(const Vec2D &one_corner, const Vec2D &opposite_corner)
+AABox2d::AABox2d(const Vec2d &one_corner, const Vec2d &opposite_corner)
     : AABox2d((one_corner + opposite_corner) / 2.0,
               std::abs(one_corner.x() - opposite_corner.x()),
               std::abs(one_corner.y() - opposite_corner.y())) {}
 
-AABox2d::AABox2d(const std::vector<Vec2D> &points) {
+AABox2d::AABox2d(const std::vector<Vec2d> &points) {
   CHECK(!points.empty());
   double min_x = points[0].x();
   double max_x = points[0].x();
@@ -56,32 +56,28 @@ AABox2d::AABox2d(const std::vector<Vec2D> &points) {
     max_y = std::max(max_y, point.y());
   }
 
-  center_ = Vec2DCtor((min_x + max_x) / 2.0, (min_y + max_y) / 2.0);
+  center_ = {(min_x + max_x) / 2.0, (min_y + max_y) / 2.0};
   length_ = max_x - min_x;
   width_ = max_y - min_y;
   half_length_ = length_ / 2.0;
   half_width_ = width_ / 2.0;
 }
 
-void AABox2d::GetAllCorners(std::vector<Vec2D> *const corners) const {
+void AABox2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   CHECK_NOTNULL(corners)->clear();
   corners->reserve(4);
-  corners->push_back(
-      Vec2DCtor(center_.x() + half_length_, center_.y() - half_width_));
-  corners->push_back(
-      Vec2DCtor(center_.x() + half_length_, center_.y() + half_width_));
-  corners->push_back(
-      Vec2DCtor(center_.x() - half_length_, center_.y() + half_width_));
-  corners->push_back(
-      Vec2DCtor(center_.x() - half_length_, center_.y() - half_width_));
+  corners->emplace_back(center_.x() + half_length_, center_.y() - half_width_);
+  corners->emplace_back(center_.x() + half_length_, center_.y() + half_width_);
+  corners->emplace_back(center_.x() - half_length_, center_.y() + half_width_);
+  corners->emplace_back(center_.x() - half_length_, center_.y() - half_width_);
 }
 
-bool AABox2d::IsPointIn(const Vec2D &point) const {
+bool AABox2d::IsPointIn(const Vec2d &point) const {
   return std::abs(point.x() - center_.x()) <= half_length_ + kMathEpsilon &&
          std::abs(point.y() - center_.y()) <= half_width_ + kMathEpsilon;
 }
 
-bool AABox2d::IsPointOnBoundary(const Vec2D &point) const {
+bool AABox2d::IsPointOnBoundary(const Vec2d &point) const {
   const double dx = std::abs(point.x() - center_.x());
   const double dy = std::abs(point.y() - center_.y());
   return (std::abs(dx - half_length_) <= kMathEpsilon &&
@@ -90,7 +86,7 @@ bool AABox2d::IsPointOnBoundary(const Vec2D &point) const {
           dx <= half_length_ + kMathEpsilon);
 }
 
-double AABox2d::DistanceTo(const Vec2D &point) const {
+double AABox2d::DistanceTo(const Vec2d &point) const {
   const double dx = std::abs(point.x() - center_.x()) - half_length_;
   const double dy = std::abs(point.y() - center_.y()) - half_width_;
   if (dx <= 0.0) {
@@ -123,26 +119,26 @@ bool AABox2d::HasOverlap(const AABox2d &box) const {
              box.half_width() + half_width_;
 }
 
-void AABox2d::Shift(const Vec2D &shift_vec) { center_ += shift_vec; }
+void AABox2d::Shift(const Vec2d &shift_vec) { center_ += shift_vec; }
 
 void AABox2d::MergeFrom(const AABox2d &other_box) {
   const double x1 = std::min(min_x(), other_box.min_x());
   const double x2 = std::max(max_x(), other_box.max_x());
   const double y1 = std::min(min_y(), other_box.min_y());
   const double y2 = std::max(max_y(), other_box.max_y());
-  center_ = Vec2DCtor((x1 + x2) / 2.0, (y1 + y2) / 2.0);
+  center_ = Vec2d((x1 + x2) / 2.0, (y1 + y2) / 2.0);
   length_ = x2 - x1;
   width_ = y2 - y1;
   half_length_ = length_ / 2.0;
   half_width_ = width_ / 2.0;
 }
 
-void AABox2d::MergeFrom(const Vec2D &other_point) {
+void AABox2d::MergeFrom(const Vec2d &other_point) {
   const double x1 = std::min(min_x(), other_point.x());
   const double x2 = std::max(max_x(), other_point.x());
   const double y1 = std::min(min_y(), other_point.y());
   const double y2 = std::max(max_y(), other_point.y());
-  center_ = Vec2DCtor((x1 + x2) / 2.0, (y1 + y2) / 2.0);
+  center_ = Vec2d((x1 + x2) / 2.0, (y1 + y2) / 2.0);
   length_ = x2 - x1;
   width_ = y2 - y1;
   half_length_ = length_ / 2.0;

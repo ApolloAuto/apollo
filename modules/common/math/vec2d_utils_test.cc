@@ -25,20 +25,23 @@ namespace common {
 namespace math {
 
 TEST(Vec2DUtilsTest, NomralCases) {
-  Vec2D pt0 = Vec2DCtor(2, 3);
+  Vec2D pt0;
+  pt0.set_x(2);
+  pt0.set_y(3);  // pt0 = (2, 3)
   EXPECT_NEAR(VecLength(pt0), std::sqrt(13.0), 1e-5);
   EXPECT_NEAR(VecLengthSquare(pt0), 13.0, 1e-5);
   EXPECT_NEAR(VecAngle(pt0), std::atan2(3, 2), 1e-5);
 
-  Vec2D pt1 = Vec2DCtor(0, 0);  // pt1 = (0, 0)
+  Vec2D pt1;  // pt1 = (0, 0)
   EXPECT_NEAR(VecDistance(pt0, pt1), std::sqrt(13.0), 1e-5);
   EXPECT_NEAR(VecDistanceSquare(pt0, pt1), 13.0, 1e-5);
 
-  pt1 = Vec2DCtor(0, 2);
+  pt1.set_y(2);  // pt1 = (0, 2)
   EXPECT_NEAR(VecDistance(pt0, pt1), std::sqrt(5.0), 1e-5);
   EXPECT_NEAR(VecDistanceSquare(pt0, pt1), 5.0, 1e-5);
 
-  pt1 = Vec2DCtor(4, 5);
+  pt1.set_x(4);
+  pt1.set_y(5);  // pt1 = (4, 5)
   EXPECT_NEAR(VecCrossProd(pt0, pt1), -2, 1e-5);
   EXPECT_NEAR(VecInnerProd(pt0, pt1), 23, 1e-5);
   EXPECT_NEAR(VecLength(pt1), std::sqrt(41.0), 1e-5);
@@ -49,8 +52,10 @@ TEST(Vec2DUtilsTest, NomralCases) {
   EXPECT_NEAR(pt1.x(), 4.0 / std::sqrt(41.0), 1e-5);
   EXPECT_NEAR(pt1.y(), 5.0 / std::sqrt(41.0), 1e-5);
 
-  pt0 = Vec2DCtor(0.5, 1.5);
-  pt1 = Vec2DCtor(2.5, 3.5);
+  pt0.set_x(0.5);
+  pt0.set_y(1.5);  // pt0 = (0.5, 1.5)
+  pt1.set_x(2.5);
+  pt1.set_y(3.5);  // pt1 = (2.5, 3.5)
 
   const Vec2D d = pt0 + pt1;
   EXPECT_NEAR(d.x(), 3.0, 1e-5);

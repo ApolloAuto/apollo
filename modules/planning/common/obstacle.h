@@ -75,7 +75,7 @@ class Obstacle : public PlanningObject {
   double length_ = 0.0;
   double heading_ = 0.0;
 
-  ::apollo::common::Vec2D center_;
+  ::apollo::common::math::Vec2d center_;
   std::vector<PredictionTrajectory> prediction_trajectories_;
   ObstacleType type_ = ObstacleType::VEHICLE;
 };

@@ -50,7 +50,7 @@ double PtSegDistance(double query_x, double query_y, double start_x,
 
 }  // namespace
 
-Box2d::Box2d(const Vec2D &center, const double heading, const double length,
+Box2d::Box2d(const Vec2d &center, const double heading, const double length,
              const double width)
     : center_(center),
       length_(length),
@@ -90,17 +90,16 @@ Box2d::Box2d(const AABox2d &aabox)
   CHECK_GT(width_, -kMathEpsilon);
 }
 
-Box2d Box2d::CreateAABox(const Vec2D &one_corner,
-                         const Vec2D &opposite_corner) {
+Box2d Box2d::CreateAABox(const Vec2d &one_corner,
+                         const Vec2d &opposite_corner) {
   const double x1 = std::min(one_corner.x(), opposite_corner.x());
   const double x2 = std::max(one_corner.x(), opposite_corner.x());
   const double y1 = std::min(one_corner.y(), opposite_corner.y());
   const double y2 = std::max(one_corner.y(), opposite_corner.y());
-  return Box2d(Vec2DCtor((x1 + x2) / 2.0, (y1 + y2) / 2.0),
-               0.0, x2 - x1, y2 - y1);
+  return Box2d({(x1 + x2) / 2.0, (y1 + y2) / 2.0}, 0.0, x2 - x1, y2 - y1);
 }
 
-void Box2d::GetAllCorners(std::vector<Vec2D> *const corners) const {
+void Box2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   if (corners == nullptr) {
     return;
   }
@@ -110,17 +109,13 @@ void Box2d::GetAllCorners(std::vector<Vec2D> *const corners) const {
   const double dy2 = -cos_heading_ * half_width_;
   corners->clear();
   corners->reserve(4);
-  corners->push_back(
-      Vec2DCtor(center_.x() + dx1 + dx2, center_.y() + dy1 + dy2));
-  corners->push_back(
-      Vec2DCtor(center_.x() + dx1 - dx2, center_.y() + dy1 - dy2));
-  corners->push_back(
-      Vec2DCtor(center_.x() - dx1 - dx2, center_.y() - dy1 - dy2));
-  corners->push_back(
-      Vec2DCtor(center_.x() - dx1 + dx2, center_.y() - dy1 + dy2));
+  corners->emplace_back(center_.x() + dx1 + dx2, center_.y() + dy1 + dy2);
+  corners->emplace_back(center_.x() + dx1 - dx2, center_.y() + dy1 - dy2);
+  corners->emplace_back(center_.x() - dx1 - dx2, center_.y() - dy1 - dy2);
+  corners->emplace_back(center_.x() - dx1 + dx2, center_.y() - dy1 + dy2);
 }
 
-bool Box2d::IsPointIn(const Vec2D &point) const {
+bool Box2d::IsPointIn(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
   const double y0 = point.y() - center_.y();
   const double dx = std::abs(x0 * cos_heading_ + y0 * sin_heading_);
@@ -128,7 +123,7 @@ bool Box2d::IsPointIn(const Vec2D &point) const {
   return dx <= half_length_ + kMathEpsilon && dy <= half_width_ + kMathEpsilon;
 }
 
-bool Box2d::IsPointOnBoundary(const Vec2D &point) const {
+bool Box2d::IsPointOnBoundary(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
   const double y0 = point.y() - center_.y();
   const double dx = std::abs(x0 * cos_heading_ + y0 * sin_heading_);
@@ -139,7 +134,7 @@ bool Box2d::IsPointOnBoundary(const Vec2D &point) const {
           dx <= half_length_ + kMathEpsilon);
 }
 
-double Box2d::DistanceTo(const Vec2D &point) const {
+double Box2d::DistanceTo(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
   const double y0 = point.y() - center_.y();
   const double dx =
@@ -220,18 +215,15 @@ double Box2d::DistanceTo(const LineSegment2d &line_segment) const {
                          : PtSegDistance(box_x, box_y, x1, y1, x2, y2,
                                          line_segment.length());
       case -1:
-        return CrossProd(Vec2DCtor(x1, y1), Vec2DCtor(x2, y2),
-                         Vec2DCtor(box_x, -box_y)) >= 0.0
+        return CrossProd({x1, y1}, {x2, y2}, {box_x, -box_y}) >= 0.0
                    ? 0.0
                    : PtSegDistance(box_x, -box_y, x1, y1, x2, y2,
                                    line_segment.length());
       case -4:
-        return CrossProd(Vec2DCtor(x1, y1), Vec2DCtor(x2, y2),
-                         Vec2DCtor(box_x, -box_y)) <= 0.0
+        return CrossProd({x1, y1}, {x2, y2}, {box_x, -box_y}) <= 0.0
                    ? PtSegDistance(box_x, -box_y, x1, y1, x2, y2,
                                    line_segment.length())
-                   : (CrossProd(Vec2DCtor(x1, y1), Vec2DCtor(x2, y2),
-                                Vec2DCtor(-box_x, box_y)) <= 0.0
+                   : (CrossProd({x1, y1}, {x2, y2}, {-box_x, box_y}) <= 0.0
                           ? 0.0
                           : PtSegDistance(-box_x, box_y, x1, y1, x2, y2,
                                           line_segment.length()));
@@ -246,8 +238,7 @@ double Box2d::DistanceTo(const LineSegment2d &line_segment) const {
         return std::min(x1, x2) - box_x;
       case 1:
       case -2:
-        return CrossProd(Vec2DCtor(x1, y1), Vec2DCtor(x2, y2),
-                         Vec2DCtor(box_x, box_y)) <= 0.0
+        return CrossProd({x1, y1}, {x2, y2}, {box_x, box_y}) <= 0.0
                    ? 0.0
                    : PtSegDistance(box_x, box_y, x1, y1, x2, y2,
                                    line_segment.length());
@@ -309,7 +300,7 @@ void Box2d::RotateFromCenter(const double rotate_angle) {
   sin_heading_ = std::sin(heading_);
 }
 
-void Box2d::Shift(const Vec2D &shift_vec) { center_ += shift_vec; }
+void Box2d::Shift(const Vec2d &shift_vec) { center_ += shift_vec; }
 
 std::string Box2d::DebugString() const {
   std::ostringstream sout;

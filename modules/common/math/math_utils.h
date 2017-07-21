@@ -25,7 +25,7 @@
 #include <limits>
 #include <utility>
 
-#include "modules/common/math/vec2d_utils.h"
+#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::common::math
@@ -46,8 +46,8 @@ double Sqr(const double x);
  *
  * @return The cross product result.
  */
-double CrossProd(const Vec2D &start_point, const Vec2D &end_point_1,
-                 const Vec2D &end_point_2);
+double CrossProd(const Vec2d &start_point, const Vec2d &end_point_1,
+                 const Vec2d &end_point_2);
 
 /**
  * @brief Inner product between two 2-D vectors from the common start point,
@@ -58,8 +58,8 @@ double CrossProd(const Vec2D &start_point, const Vec2D &end_point_1,
  *
  * @return The inner product result.
  */
-double InnerProd(const Vec2D &start_point, const Vec2D &end_point_1,
-                 const Vec2D &end_point_2);
+double InnerProd(const Vec2d &start_point, const Vec2d &end_point_1,
+                 const Vec2d &end_point_2);
 
 /**
  * @brief Cross product between two vectors.
