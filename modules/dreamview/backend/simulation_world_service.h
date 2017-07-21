@@ -140,6 +140,7 @@ class SimulationWorldService {
       AERROR << adapter_name << " adapter is not correctly initialized. "
                                 "Please check the adapter manager "
                                 "configuration.";
+      return;
     }
 
     adapter->SetCallback(
