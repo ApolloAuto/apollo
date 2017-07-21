@@ -11,11 +11,11 @@
   "rules": {
     // Require a semi colon at the end of a statement.
     "semi": ["error", "always"],
-    // Maximum line length is 80.
-    "max-len": ["error", 80],
+    // Maximum line length is 100.
+    "max-len": ["error", 100],
     // Always require curly brackets.
     "curly": "error",
-    
+
     // Require the use of `===` and `!==`.
     "eqeqeq": "error",
     // Disallow the use of `eval()`.
