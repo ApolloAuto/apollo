@@ -1,12 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "base",
+    name = "common",
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [
-        "//modules/common:common",
-        "//modules/common:log",
-        "//external:gflags",
+        "//modules/perception/lib/pcl_util:pcl_util",
+        "@eigen//:eigen"
     ],
 )
