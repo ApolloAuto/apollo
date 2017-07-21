@@ -19,9 +19,5 @@
 namespace apollo {
 namespace prediction {
 
-const PredictionObstacle& LaneSequencePredictor::get_prediction_obstacle() {
-  return prediction_obstacle_;
-}
-
 }  // prediction
 }  // apollo

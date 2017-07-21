@@ -22,7 +22,7 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
 
-#include <google/protobuf/message.h>
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -42,6 +42,14 @@ class Predictor {
    * @brief Destructor
    */
   virtual ~Predictor() = default;
+
+  /**
+   * @brief Get prediction obstacle
+   */
+  virtual const PredictionObstacle& prediction_obstacle();
+
+ protected:
+  PredictionObstacle prediction_obstacle_;
 };
 
 }  // namespace prediction
