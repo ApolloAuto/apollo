@@ -120,11 +120,23 @@ class Adapter {
    * @param message_file the path to the file that contains a (usually
    * proto) message of DataType.
    */
-  void FeedProtoFile(const std::string &message_file) {
+  template<class U=D>
+  void FeedFile(const std::string &message_file, 
+                     typename std::enable_if<std::is_base_of< ::google::protobuf::Message, U>::value>::type* = 0) {
     D data;
     CHECK(apollo::common::util::GetProtoFromFile(message_file, &data))
         << "Unable to parse input pb file " << message_file;
     FeedProto(data);
+  }
+
+  /**
+   * @brief reads the ros message from the file, and push it into
+   * the adapter's data queue.
+   * @param message_file the path to the file that contains a (usually
+   * proto) message of DataType.
+   */
+  void FeedFile(const std::string &message_file) {
+    //FIXME: specific processing logic for ros Message
   }
 
   /**
