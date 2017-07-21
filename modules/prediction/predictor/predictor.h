@@ -48,6 +48,11 @@ class Predictor {
    */
   virtual const PredictionObstacle& prediction_obstacle();
 
+  /**
+   * @brief Make prediction
+   */
+  virtual void Predict() const = 0;
+
  protected:
   PredictionObstacle prediction_obstacle_;
 };

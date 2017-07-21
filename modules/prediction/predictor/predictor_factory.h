@@ -38,7 +38,7 @@ namespace apollo {
 namespace prediction {
 
 class PredictorFactory
-    : public apollo::common::util::Factory<ObstacleConf::Pred,
+    : public apollo::common::util::Factory<ObstacleConf::PredictorType,
                                            Predictor> {
  public:
   /**
@@ -51,7 +51,8 @@ class PredictorFactory
    * @param Predictor name
    * @return A pointer to the given predictor
    */
-  std::unique_ptr<Predictor> CreatePredictor(const ObstacleConf::Pred& pred);
+  std::unique_ptr<Predictor> CreatePredictor(
+      const ObstacleConf::PredictorType& type);
 
  private:
   DECLARE_SINGLETON(PredictorFactory);

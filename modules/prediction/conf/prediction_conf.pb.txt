@@ -1,2 +1,2 @@
-Eval: MLP_EVAL
-VehicleModel: DEF_VEHICLE_MODEL
+EvaluatorType: MLP_EVAL
+PredictorType: LANE_SEQUENCE_PREDICTOR

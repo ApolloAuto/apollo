@@ -38,6 +38,11 @@ class FreeMovePredictor : public Predictor {
    * @brief Destructor
    */
   virtual ~FreeMovePredictor() = default;
+
+  /**
+   * @brief Make prediction
+   */
+  void Predict() const override;
 };
 
 }  // prediction

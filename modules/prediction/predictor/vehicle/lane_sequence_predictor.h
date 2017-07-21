@@ -38,6 +38,11 @@ class LaneSequencePredictor : public Predictor {
    * @brief Destructor
    */
   virtual ~LaneSequencePredictor() = default;
+
+  /**
+   * @brief Make prediction
+   */
+  void Predict() const override;
 };
 
 }  // prediction
