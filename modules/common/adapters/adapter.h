@@ -120,9 +120,11 @@ class Adapter {
    * @param message_file the path to the file that contains a (usually
    * proto) message of DataType.
    */
-  template<class U=D>
-  void FeedFile(const std::string &message_file, 
-                     typename std::enable_if<std::is_base_of< ::google::protobuf::Message, U>::value>::type* = 0) {
+  template <class U = D>
+  void FeedFile(
+      const std::string &message_file,
+      typename std::enable_if<
+          std::is_base_of<::google::protobuf::Message, U>::value>::type * = 0) {
     D data;
     CHECK(apollo::common::util::GetProtoFromFile(message_file, &data))
         << "Unable to parse input pb file " << message_file;
@@ -136,7 +138,7 @@ class Adapter {
    * proto) message of DataType.
    */
   void FeedFile(const std::string &message_file) {
-    //FIXME: specific processing logic for ros Message
+    // FIXME: specific processing logic for ros Message
   }
 
   /**
@@ -244,9 +246,7 @@ class Adapter {
     header->set_sequence_num(++seq_num_);
   }
 
-  uint32_t GetSeqNum() const {
-    return seq_num_;
-  }
+  uint32_t GetSeqNum() const { return seq_num_; }
 
  private:
   // HasSequenceNumber returns false for non-proto-message data types.

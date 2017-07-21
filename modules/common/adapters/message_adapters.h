@@ -30,6 +30,7 @@
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/map/proto/routing.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -62,6 +63,7 @@ using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using PredictionAdapter = Adapter<::apollo::prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter =
     Adapter<::apollo::perception::TrafficLightDetection>;
+using RoutingResultAdapter = Adapter<::apollo::hdmap::RoutingResult>;
 
 }  // namespace adapter
 }  // namespace common
