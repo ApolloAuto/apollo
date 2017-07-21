@@ -86,6 +86,15 @@ double STGraphBoundary::characteristic_length() const {
   return _characteristic_length;
 }
 
+Decision::DecisionType STGraphBoundary::decision_type() const {
+  return _decision_type;
+}
+
+void STGraphBoundary::set_decision_type(
+    const Decision::DecisionType& decision_type) {
+  _decision_type = decision_type;
+}
+
 void STGraphBoundary::set_characteristic_length(
     const double characteristic_length) {
   _characteristic_length = characteristic_length;

@@ -32,11 +32,11 @@ PlanningObject::PlanningObjectType* PlanningObject::MutableObjectType() {
   return &object_type_;
 }
 
-const std::vector<ObjectDecisionType>& PlanningObject::Decisions() const {
+const std::vector<Decision>& PlanningObject::Decisions() const {
   return decisions_;
 }
 
-std::vector<ObjectDecisionType>* PlanningObject::MutableDecisions() {
+std::vector<Decision>* PlanningObject::MutableDecisions() {
   return &decisions_;
 }
 
@@ -50,4 +50,3 @@ const ::apollo::common::math::Polygon2d& PlanningObject::Polygon() const {
 
 }  // namespace planning
 }  // namespace apollo
-

@@ -20,9 +20,18 @@ namespace apollo {
 namespace common {
 namespace util {
 
+using STPoint = apollo::common::STPoint;
+
 bool EndWith(const std::string &original, const std::string &pattern) {
   return original.length() >= pattern.length() &&
          original.substr(original.length() - pattern.length()) == pattern;
+}
+
+STPoint MakeSTPoint(const double s, const double t) {
+  STPoint st;
+  st.set_s(s);
+  st.set_t(t);
+  return st;
 }
 
 }  // namespace util

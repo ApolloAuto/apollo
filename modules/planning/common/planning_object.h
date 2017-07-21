@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "modules/common/math/polygon2d.h"
-#include "modules/planning/proto/decision.pb.h"
+#include "modules/planning/common/decision.h"
 
 namespace apollo {
 namespace planning {
@@ -33,21 +33,23 @@ namespace planning {
 class PlanningObject {
  public:
   enum class PlanningObjectType {
-      OBSTACLE = 0,
-      MAP_OBJECT = 1,
+    OBSTACLE = 0,
+    MAP_OBJECT = 1,
   };
+
  public:
   PlanningObject() = default;
   virtual PlanningObjectType ObjectType() const;
   virtual PlanningObjectType* MutableObjectType();
   virtual const ::apollo::common::math::Polygon2d& Polygon() const;
   virtual ::apollo::common::math::Polygon2d* MutablePolygon();
-  virtual const std::vector<ObjectDecisionType>& Decisions() const;
-  virtual std::vector<ObjectDecisionType>* MutableDecisions();
+  virtual const std::vector<Decision>& Decisions() const;
+  virtual std::vector<Decision>* MutableDecisions();
+
  private:
   PlanningObjectType object_type_;
   ::apollo::common::math::Polygon2d polygon_;
-  std::vector<ObjectDecisionType> decisions_;
+  std::vector<Decision> decisions_;
 };
 
 }  // namespace planning

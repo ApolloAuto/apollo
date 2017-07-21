@@ -23,10 +23,11 @@ cc_library(
         "st_graph_boundary.h",
     ],
     deps = [
-        "//modules/common:log",
-        "//modules/common/math:math",
-        "//modules/planning/proto:planning_proto",
         ":st_graph_point",
+        "//modules/common:log",
+        "//modules/common/math",
+        "//modules/planning/common:decision",
+        "//modules/planning/proto:planning_proto",
     ],
 )
 
@@ -55,21 +56,19 @@ cc_library(
     ],
     deps = [
         ":st_graph_boundary",
-        "//modules/map/proto:map_proto",
         "//modules/common/configs/proto:vehicle_config_proto",
-        "//modules/map/hdmap:hdmap",
-        "//modules/planning/reference_line:reference_line",
+        "//modules/common/proto:path_point_proto",
+        "//modules/map/hdmap",
+        "//modules/map/proto:map_proto",
         "//modules/planning/common:data_center",
-        "//modules/planning/common/path:path_data",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:speed_limit",
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/path:frenet_frame_path",
-        "//modules/planning/common:speed_limit",
+        "//modules/planning/common/path:path_data",
         "//modules/planning/math:double",
-        "//modules/planning/state_machine:master_state_machine",
-        "//modules/common/proto:path_point_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/common:planning_gflags",
+        "//modules/planning/reference_line",
+        "//modules/planning/state_machine:master_state_machine",
     ],
 )
-
-

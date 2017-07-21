@@ -38,12 +38,12 @@
 namespace apollo {
 namespace planning {
 
-class STBoundaryMapper {
+class StBoundaryMapper {
  public:
-  STBoundaryMapper(const apollo::planning::StBoundaryConfig& st_boundary_config,
+  StBoundaryMapper(const apollo::planning::StBoundaryConfig& st_boundary_config,
                    const apollo::common::config::VehicleParam& veh_param);
 
-  virtual ~STBoundaryMapper() = default;
+  virtual ~StBoundaryMapper() = default;
 
   virtual common::ErrorCode get_graph_boundary(
       const DataCenter& data_center, const DecisionData& decision_data,

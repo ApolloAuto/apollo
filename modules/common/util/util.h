@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include "modules/common/proto/path_point.pb.h"
+
 /**
  * @namespace apollo::common::util
  * @brief apollo::common::util
@@ -41,6 +43,7 @@ namespace util {
  * @return Whether the original string ends with the specified pattern.
  */
 bool EndWith(const std::string &original, const std::string &pattern);
+apollo::common::STPoint MakeSTPoint(const double s, const double t);
 
 }  // namespace util
 }  // namespace common
