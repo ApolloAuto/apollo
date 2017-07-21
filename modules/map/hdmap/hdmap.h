@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MAP_MAP_LOADER_INC_HDMAP_H
-#define MODULES_MAP_MAP_LOADER_INC_HDMAP_H
+#ifndef MODULES_MAP_HDMAP_HDMAP_H_
+#define MODULES_MAP_HDMAP_HDMAP_H_
 
 #include <memory>
 #include <string>
@@ -75,4 +75,4 @@ class HDMap {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_INC_HDMAP_H
+#endif  // MODULES_MAP_HDMAP_HDMAP_H_

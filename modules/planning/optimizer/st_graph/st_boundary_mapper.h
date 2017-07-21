@@ -15,20 +15,22 @@
  *****************************************************************************/
 
 /**
-*   @file: st_boundary_mapper.h
-**/
+ *   @file: st_boundary_mapper.h
+ **/
 
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 
-#include "config.pb.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/proto/path_point.pb.h"
+#include "modules/localization/proto/pose.pb.h"
+#include "modules/planning/proto/st_boundary_config.pb.h"
+
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/decision_data.h"
-#include "modules/planning/common/environment.h"
 #include "modules/planning/common/path/path_data.h"
-#include "modules/planning/common/planning_error.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/optimizer/st_graph/st_boundary_config.h"
 #include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
 #include "modules/planning/optimizer/st_graph/st_graph_point.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -38,41 +40,38 @@ namespace planning {
 
 class STBoundaryMapper {
  public:
-  STBoundaryMapper(const STBoundaryConfig& st_boundary_config,
-                   const ::adu::common::config::VehicleParam& veh_param);
+  STBoundaryMapper(const apollo::planning::StBoundaryConfig& st_boundary_config,
+                   const apollo::common::config::VehicleParam& veh_param);
 
   virtual ~STBoundaryMapper() = default;
 
-  // TODO: combine two interfaces together to provide a st graph data type
-  // TODO: data_center -> planning_data or environment, or whatever you need
-  virtual ErrorCode get_graph_boundary(
+  virtual common::ErrorCode get_graph_boundary(
       const DataCenter& data_center, const DecisionData& decision_data,
       const PathData& path_data, const double planning_distance,
       const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const = 0;
 
-  virtual ErrorCode get_speed_limits(const Environment& environment,
-                                     const LogicMap& map,
-                                     const PathData& path_data,
-                                     const double planning_distance,
-                                     const std::size_t matrix_dimension_s,
-                                     const double default_speed_limit,
-                                     SpeedLimit* const speed_limit_data) const;
+  virtual common::ErrorCode get_speed_limits(
+      const apollo::localization::Pose& pose, apollo::hdmap::HDMap& map,
+      const PathData& path_data, const double planning_distance,
+      const std::size_t matrix_dimension_s, const double default_speed_limit,
+      SpeedLimit* const speed_limit_data);
 
-  const STBoundaryConfig& st_boundary_config() const;
-  const ::adu::common::config::VehicleParam& vehicle_param() const;
+  const apollo::planning::StBoundaryConfig& st_boundary_config() const;
+  const apollo::common::config::VehicleParam& vehicle_param() const;
 
  protected:
-  double get_area(const std::vector<STPoint>& boundary_points) const;
+  double get_area(
+      const std::vector<apollo::common::STPoint>& boundary_points) const;
 
-  bool check_overlap(const PathPoint& path_point,
-                     const ::adu::common::config::VehicleParam& params,
-                     const ::adu::common::math::Box2d& obs_box,
+  bool check_overlap(const apollo::common::PathPoint& path_point,
+                     const apollo::common::config::VehicleParam& params,
+                     const apollo::common::math::Box2d& obs_box,
                      const double buffer) const;
 
  private:
-  STBoundaryConfig _st_boundary_config;
-  ::adu::common::config::VehicleParam _veh_param;
+  apollo::planning::StBoundaryConfig _st_boundary_config;
+  apollo::common::config::VehicleParam _veh_param;
 };
 
 }  // namespace planning

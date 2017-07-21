@@ -18,23 +18,29 @@
  *   @file: st_boundary_mapper.cc
  **/
 
-#include "optimizer/st_graph/st_boundary_mapper.h"
+#include "modules/planning/optimizer/st_graph/st_boundary_mapper.h"
 
 #include <limits>
 
-#include "common/houston_gflags.h"
-//#include "map/pnc_map.h"
-#include "math/double.h"
-#include "math/segment2d.h"
-#include "math/vec2d.h"
-#include "util/data_center.h"
+#include "modules/common/proto/vector.pb.h"
 
-namespace adu {
+#include "modules/common/math/line_segment2d.h"
+#include "modules/planning/common/data_center.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/double.h"
+
+namespace apollo {
 namespace planning {
 
+using ErrorCode = apollo::common::ErrorCode;
+using STPoint = apollo::common::STPoint;
+using PathPoint = apollo::common::PathPoint;
+using HDMap = apollo::hdmap::HDMap;
+using Pose = apollo::localization::Pose;
+
 STBoundaryMapper::STBoundaryMapper(
-    const STBoundaryConfig& st_boundary_config,
-    const ::adu::common::config::VehicleParam& veh_param)
+    const StBoundaryConfig& st_boundary_config,
+    const apollo::common::config::VehicleParam& veh_param)
     : _st_boundary_config(st_boundary_config), _veh_param(veh_param) {}
 
 double STBoundaryMapper::get_area(
@@ -46,11 +52,11 @@ double STBoundaryMapper::get_area(
   double area = 0.0;
 
   for (size_t i = 1; i < boundary_points.size(); ++i) {
-    const double dx1 = boundary_points[i - 1].x() - boundary_points[0].x();
-    const double dy1 = boundary_points[i].y() - boundary_points[0].y();
-    const double dx2 = boundary_points[i].x() - boundary_points[0].x();
-    const double dy2 = boundary_points[i - 1].y() - boundary_points[0].y();
-    area += (dx1 * dy1 - dx2 * dy2);
+    const double ds1 = boundary_points[i - 1].s() - boundary_points[0].s();
+    const double dt1 = boundary_points[i].t() - boundary_points[0].t();
+    const double ds2 = boundary_points[i].s() - boundary_points[0].s();
+    const double dt2 = boundary_points[i - 1].t() - boundary_points[0].t();
+    area += (ds1 * dt1 - ds2 * dt2);
   }
 
   return fabs(area);
@@ -58,56 +64,61 @@ double STBoundaryMapper::get_area(
 
 bool STBoundaryMapper::check_overlap(
     const PathPoint& path_point,
-    const ::adu::common::config::VehicleParam& params,
-    const ::adu::common::math::Box2d& obs_box, const double buffer) const {
+    const apollo::common::config::VehicleParam& params,
+    const apollo::common::math::Box2d& obs_box, const double buffer) const {
   const double mid_to_rear_center =
       params.length() / 2.0 - params.front_edge_to_center();
   const double x =
       path_point.x() - mid_to_rear_center * std::cos(path_point.theta());
   const double y =
       path_point.y() - mid_to_rear_center * std::sin(path_point.theta());
-  const ::adu::common::math::Box2d adc_box = ::adu::common::math::Box2d(
-      ::adu::common::math::Vec2d(x, y), path_point.theta(),
+  const apollo::common::math::Box2d adc_box = apollo::common::math::Box2d(
+      apollo::common::math::Vec2DCtor(x, y), path_point.theta(),
       params.length() + 2 * buffer, params.width() + 2 * buffer);
-  return obs_box.has_overlap(adc_box);
+  return obs_box.HasOverlap(adc_box);
 }
 
 ErrorCode STBoundaryMapper::get_speed_limits(
-    const Environment& environment, const LogicMap& map,
-    const PathData& path_data, const double planning_distance,
-    const std::size_t matrix_dimension_s, const double default_speed_limit,
-    SpeedLimit* const speed_limit_data) const {
-  const auto& adc_position =
-      environment.vehicle_state_proxy().vehicle_state().pose().position();
+    const Pose& pose, HDMap& map, const PathData& path_data,
+    const double planning_distance, const std::size_t matrix_dimension_s,
+    const double default_speed_limit, SpeedLimit* const speed_limit_data) {
+  const auto& adc_position = pose.position();
 
-  ::adu::common::hdmap::Point adc_point;
+  apollo::hdmap::Point adc_point;
   adc_point.set_x(adc_position.x());
   adc_point.set_y(adc_position.y());
   adc_point.set_z(adc_position.z());
-  std::vector<const ::adu::hdmap::LaneInfo*> lanes;
+  // std::vector<const apollo::hdmap::LaneInfo*> lanes;
+  std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
   int ret = map.get_lanes(adc_point, 1.0, &lanes);
-  QUIT_IF(ret != 0, ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "Fail to get lanes for point [%lf, %lf]", adc_position.x(),
-          adc_position.y());
+  if (ret != 0) {
+    AERROR << "Fail to get lanes for point [" << adc_position.x() << ", "
+           << adc_position.y() << "].";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
 
   std::vector<double> speed_limits;
   for (const auto& point : path_data.path().path_points()) {
     speed_limits.push_back(_st_boundary_config.maximal_speed());
-    for (const auto* lane : lanes) {
+    for (auto& lane : lanes) {
+      // TODO: waiting for hdmap to support is_on_lane.
+      /*
       if (lane->is_on_lane({point.x(), point.y()})) {
         speed_limits.back() =
             std::fmin(speed_limits.back(), lane->lane().speed_limit());
-        if (lane->lane().turn() == ::adu::common::hdmap::Lane::U_TURN) {
+        if (lane->lane().turn() == apollo::hdmap::Lane::U_TURN) {
           speed_limits.back() = std::fmin(
               speed_limits.back(), _st_boundary_config.speed_limit_on_u_turn());
         }
       }
+      */
     }
   }
 
-  QUIT_IF(planning_distance > path_data.path().path_points().back().s(),
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "path length cannot be less than planning_distance");
+  if (planning_distance > path_data.path().path_points().back().s()) {
+    AERROR << "path length cannot be less than planning_distance";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
 
   double s = 0.0;
   const double unit_s = planning_distance / matrix_dimension_s;
@@ -145,11 +156,15 @@ ErrorCode STBoundaryMapper::get_speed_limits(
           std::fmax(curr_speed_limit, _st_boundary_config.lowest_speed());
       auto* mutable_speed_limits_data =
           speed_limit_data->mutable_speed_limits();
-      mutable_speed_limits_data->push_back(
-          SpeedPoint(s, 0.0, curr_speed_limit, 0.0, 0.0));
 
-      IDG_LOG(Level::INFO, "speed_limit i:%u, j:%u, v[%lf], kappa[%lf]", i, j,
-              curr_speed_limit, kappa);
+      SpeedPoint speed_point;
+      speed_point.mutable_st_point()->set_s(s);
+      speed_point.mutable_st_point()->set_t(0.0);
+      speed_point.set_v(curr_speed_limit);
+      speed_point.set_a(0.0);
+      speed_point.set_da(0.0);
+      mutable_speed_limits_data->push_back(speed_point);
+
       s += unit_s;
       ++i;
     }
@@ -157,36 +172,14 @@ ErrorCode STBoundaryMapper::get_speed_limits(
 
   return ErrorCode::PLANNING_OK;
 }
-const STBoundaryConfig& STBoundaryMapper::st_boundary_config() const {
+const StBoundaryConfig& STBoundaryMapper::st_boundary_config() const {
   return _st_boundary_config;
 }
 
-const ::adu::common::config::VehicleParam& STBoundaryMapper::vehicle_param()
+const apollo::common::config::VehicleParam& STBoundaryMapper::vehicle_param()
     const {
   return _veh_param;
 }
 
-std::string STBoundaryMapper::to_json(
-    std::vector<STGraphBoundary>* const obs_boundary) const {
-  std::ostringstream sout;
-  sout << "[" << std::endl;
-
-  for (std::size_t i = 0; i < obs_boundary->size(); ++i) {
-    const auto& boundary = obs_boundary->at(i);
-
-    if (i > 0) {
-      sout << ", " << std::endl;
-    }
-
-    sout << boundary.to_json().c_str() << std::endl;
-  }
-
-  sout << "]" << std::endl;
-  sout.flush();
-  return sout.str();
-}
-
 }  // namespace planning
-}  // namespace adu
-
-/* vim: set expandtab ts=4 sw=4 sts=4 tw=100: */
+}  // namespace apollo
