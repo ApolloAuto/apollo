@@ -23,5 +23,5 @@ const PredictionObstacle& Predictor::prediction_obstacle() {
   return prediction_obstacle_;
 }
 
-}  // prediction
-}  // apollo
+}  // namespace prediction
+}  // namespace apollo
