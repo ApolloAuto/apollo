@@ -344,6 +344,7 @@ Json SimulationWorldService::GetUpdateAsJson() const {
   apollo::hdmap::Point point;
   point.set_x(world_.auto_driving_car().position_x());
   point.set_y(world_.auto_driving_car().position_y());
+
   MapElementIds map_element_ids =
       map_service_->CollectMapElements(point, kMapRadius);
 

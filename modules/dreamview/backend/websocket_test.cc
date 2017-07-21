@@ -22,6 +22,7 @@ limitations under the License.
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "modules/common/log.h"
 
 using ::testing::ElementsAre;
 
