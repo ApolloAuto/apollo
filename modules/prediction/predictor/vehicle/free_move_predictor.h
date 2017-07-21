@@ -38,14 +38,11 @@ class FreeMovePredictor : public Predictor {
    * @brief Destructor
    */
   virtual ~FreeMovePredictor() = default;
-<<<<<<< HEAD
 
   /**
    * @brief Make prediction
    */
   void Predict() const override;
-=======
->>>>>>> Added lane sequence and free move predictor framework (#127)
 };
 
 }  // prediction
