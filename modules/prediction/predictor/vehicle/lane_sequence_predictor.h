@@ -45,7 +45,7 @@ class LaneSequencePredictor : public Predictor {
   void Predict() const override;
 };
 
-}  // prediction
-}  // apollo
+}  // namespace prediction
+}  // namespace apollo
 
 #endif  // MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
