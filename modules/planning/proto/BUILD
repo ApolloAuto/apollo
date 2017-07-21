@@ -10,6 +10,7 @@ cc_proto_library(
         "planning.proto",
         "planning_config.proto",
         "planning_internal.proto",
+        "st_boundary_config.proto",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
