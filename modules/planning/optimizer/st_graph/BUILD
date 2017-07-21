@@ -13,3 +13,19 @@ cc_library(
         "//modules/planning/common:planning_gflags",
     ],
 )
+
+cc_library(
+    name = "st_graph_boundary",
+    srcs = [
+        "st_graph_boundary.cc",
+    ],
+    hdrs = [
+        "st_graph_boundary.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/math:math",
+        "//modules/planning/proto:planning_proto",
+        ":st_graph_point",
+    ],
+)
