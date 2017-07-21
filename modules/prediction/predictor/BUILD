@@ -24,6 +24,8 @@ cc_library(
     deps = [
         "//modules/prediction/predictor:predictor",
         "//modules/prediction/predictor:predictor_factory",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/proto:prediction_conf_proto",
@@ -38,6 +40,7 @@ cc_library(
     srcs = ["predictor.cc"],
     deps = [
         "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/container/obstacles:obstacle",
     ]
 )
 

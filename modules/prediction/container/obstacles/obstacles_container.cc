@@ -21,5 +21,9 @@ namespace prediction {
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {}
 
+Obstacle* ObstaclesContainer::GetObstacle(int id) {
+  return nullptr;
 }
-}
+
+}  // prediction
+}  // apollo

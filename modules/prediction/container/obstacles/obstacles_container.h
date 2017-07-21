@@ -23,6 +23,7 @@
 #define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
 
 #include "modules/prediction/container/container.h"
+#include "modules/prediction/container/obstacles/obstacle.h"
 
 namespace apollo {
 namespace prediction {
@@ -44,6 +45,8 @@ class ObstaclesContainer : public Container {
    * @param Data message to be inserted in protobuf
    */
   void Insert(const ::google::protobuf::Message& message) override;
+
+  Obstacle* GetObstacle(int id);
 };
 
 }  // namespace prediction
