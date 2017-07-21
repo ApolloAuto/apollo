@@ -22,10 +22,10 @@ cc_library(
         "path_optimizer.h",
     ],
     deps = [
-        "@eigen//:eigen",
         "//modules/common/proto:error_code_proto",
         "//modules/planning/optimizer",
         "//modules/planning/optimizer/dp_poly_path",
+        "@eigen//:eigen",
     ],
 )
 
@@ -38,8 +38,10 @@ cc_library(
         "dp_poly_path_optimizer.h",
     ],
     deps = [
+        "//modules/common/util",
         "//modules/planning/optimizer",
         "//modules/planning/optimizer:path_optimizer",
+        "//modules/planning/proto:dp_poly_path_config_proto",
     ],
 )
 
@@ -49,16 +51,16 @@ cc_library(
         "speed_optimizer.cc",
     ],
     hdrs = [
-        "speed_optimizer.h",
         "optimizer.h",
+        "speed_optimizer.h",
     ],
     deps = [
-        "@eigen//:eigen",
         "//modules/common/proto:error_code_proto",
         "//modules/planning/common:data_center",
         "//modules/planning/common:decision_data",
         "//modules/planning/common:planning_data",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
+        "@eigen//:eigen",
     ],
 )

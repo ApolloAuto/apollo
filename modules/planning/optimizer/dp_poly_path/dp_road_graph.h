@@ -22,46 +22,45 @@
 #define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H
 
 #include <vector>
-#include "boost/property_tree/ptree.hpp"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/common/data_center.h"
+#include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/optimizer/dp_poly_path/graph_edge.h"
 #include "modules/planning/optimizer/dp_poly_path/graph_vertex.h"
-#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_config.h"
-#include "modules/planning/common/decision_data.h"
-#include "modules/planning/reference_line/reference_point.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
+#include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
 namespace planning {
 
 class DpRoadGraph {
  public:
-  explicit DpRoadGraph(
-      const DpPolyPathConfig &config,
-      const ::apollo::common::TrajectoryPoint &init_point,
-      const SpeedData& speed_data);
+  explicit DpRoadGraph(const DpPolyPathConfig &config,
+                       const ::apollo::common::TrajectoryPoint &init_point,
+                       const SpeedData &speed_data);
   ~DpRoadGraph() = default;
-  ::apollo::common::ErrorCode find_tunnel(
-      const DataCenter &data_center,
-      const ReferenceLine &reference_line,
-      DecisionData *const decision_data,
-      PathData *const path_data);
+  ::apollo::common::ErrorCode find_tunnel(const DataCenter &data_center,
+                                          const ReferenceLine &reference_line,
+                                          DecisionData *const decision_data,
+                                          PathData *const path_data);
+
  private:
   ::apollo::common::ErrorCode init(const ReferenceLine &reference_line);
-  ::apollo::common::ErrorCode generate_graph(const ReferenceLine &reference_line);
+  ::apollo::common::ErrorCode generate_graph(
+      const ReferenceLine &reference_line);
   ::apollo::common::ErrorCode find_best_trajectory(
-      const DataCenter &data_center,
-      const ReferenceLine &reference_line,
+      const DataCenter &data_center, const ReferenceLine &reference_line,
       const DecisionData &decision_data,
       std::vector<size_t> *const min_cost_edges);
   bool add_vertex(const ::apollo::common::SLPoint &sl_point,
                   const ReferencePoint &reference_point, const size_t level);
   bool connect_vertex(const size_t start, const size_t end);
+
  private:
   DpPolyPathConfig _config;
   ::apollo::common::TrajectoryPoint _init_point;

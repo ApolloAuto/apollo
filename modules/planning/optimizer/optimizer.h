@@ -34,6 +34,8 @@ class Optimizer {
   virtual ~Optimizer() = default;
   virtual const std::string& name() const;
 
+  virtual bool SetConfig(const std::string& config_file);
+
  private:
   const std::string _name;
 };

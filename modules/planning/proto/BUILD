@@ -55,3 +55,17 @@ py_proto_compile(
         "spiral_curve_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "dp_poly_path_config_proto",
+    protos = [
+        "dp_poly_path_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "dp_poly_path_config_proto_pylib",
+    protos = [
+        "dp_poly_path_config.proto",
+    ],
+)

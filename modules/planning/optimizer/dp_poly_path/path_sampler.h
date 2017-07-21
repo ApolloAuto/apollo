@@ -22,10 +22,9 @@
 #define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_SAMPLER_H
 
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_config.h"
-#include "modules/planning/common/data_center.h"
-#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_config.h"
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/common/data_center.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -40,6 +39,7 @@ class PathSampler {
       const ::apollo::common::TrajectoryPoint &init_point,
       const ::apollo::common::SLPoint &init_sl_point,
       std::vector<std::vector<::apollo::common::SLPoint>> *const points);
+
  private:
   DpPolyPathConfig _config;
 };
