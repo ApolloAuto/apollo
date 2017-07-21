@@ -27,15 +27,14 @@ const double kSegmentationEpsilon = 0.2;
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
 
-void remove_duplicates(std::vector<apollo::common::Vec2D> *points) {
+void remove_duplicates(std::vector<apollo::common::math::Vec2d> *points) {
   CHECK_NOTNULL(points);
 
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
   for (size_t i = 0; i < points->size(); ++i) {
-    const double dist_square = apollo::common::math::VecDistanceSquare(
-        (*points)[i], (*points)[count - 1]);
-    if (count == 0 || dist_square > limit) {
+    if (count == 0 ||
+        (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
       (*points)[count++] = (*points)[i];
     }
   }
@@ -43,13 +42,13 @@ void remove_duplicates(std::vector<apollo::common::Vec2D> *points) {
 }
 
 void points_from_curve(const apollo::hdmap::Curve &input_curve,
-                       std::vector<apollo::common::Vec2D> *points) {
+                       std::vector<apollo::common::math::Vec2d> *points) {
   CHECK_NOTNULL(points)->clear();
 
   for (const auto &curve : input_curve.segment()) {
     if (curve.has_line_segment()) {
       for (const auto &point : curve.line_segment().point()) {
-        points->push_back(apollo::hdmap::PointToVec(point));
+        points->emplace_back(point.x(), point.y());
       }
     } else {
       LOG(FATAL) << "Can not handle curve type.";
@@ -60,14 +59,14 @@ void points_from_curve(const apollo::hdmap::Curve &input_curve,
 
 apollo::common::math::Polygon2d convert_to_polygon2d(
     const apollo::hdmap::Polygon &polygon) {
-  std::vector<apollo::common::Vec2D> points;
+  std::vector<apollo::common::math::Vec2d> points;
   points.reserve(polygon.point_size());
   for (const auto &point : polygon.point()) {
-    points.push_back(apollo::hdmap::PointToVec(point));
+    points.emplace_back(point.x(), point.y());
   }
   remove_duplicates(&points);
   while (points.size() >= 2 &&
-         apollo::common::math::VecDistance(points[0], points.back()) <=
+         points[0].DistanceTo(points.back()) <=
              apollo::common::math::kMathEpsilon) {
     points.pop_back();
   }
@@ -77,7 +76,7 @@ apollo::common::math::Polygon2d convert_to_polygon2d(
 void segments_from_curve(
     const apollo::hdmap::Curve &curve,
     std::vector<apollo::common::math::LineSegment2d> *segments) {
-  std::vector<apollo::common::Vec2D> points;
+  std::vector<apollo::common::math::Vec2d> points;
   points_from_curve(curve, &points);
   for (size_t i = 0; i + 1 < points.size(); ++i) {
     segments->emplace_back(points[i], points[i + 1]);
@@ -87,10 +86,6 @@ void segments_from_curve(
 
 namespace apollo {
 namespace hdmap {
-
-apollo::common::Vec2D PointToVec(const Point &point) {
-  return apollo::common::math::Vec2DCtor(point.x(), point.y());
-}
 
 LaneInfo::LaneInfo(const apollo::hdmap::Lane &lane) : _lane(lane) { init(); }
 
@@ -114,7 +109,7 @@ void LaneInfo::init() {
   CHECK(!_unit_directions.empty());
   _unit_directions.push_back(_unit_directions.back());
   for (const auto &direction : _unit_directions) {
-    _headings.push_back(apollo::common::math::VecAngle(direction));
+    _headings.push_back(direction.Angle());
   }
   CHECK(!_segments.empty());
 
@@ -198,7 +193,7 @@ void SignalInfo::init() {
     segments_from_curve(stop_line, &_segments);
   }
   CHECK(!_segments.empty());
-  std::vector<apollo::common::Vec2D> points;
+  std::vector<apollo::common::math::Vec2d> points;
   for (const auto &segment : _segments) {
     points.emplace_back(segment.start());
     points.emplace_back(segment.end());

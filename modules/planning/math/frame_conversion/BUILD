@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/math:vec2d",
         "//modules/common/math:math_utils",
     ],
 )
