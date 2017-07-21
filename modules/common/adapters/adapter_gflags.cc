@@ -35,10 +35,13 @@ DEFINE_string(pad_topic, "/apollo/control/pad",
               "control pad message topic name");
 DEFINE_string(control_command_topic, "/apollo/control",
               "control command topic name");
-DEFINE_string(pointcloud_topic, "/apollo/compensator/pointcloud", "pointcloud topic name");
+DEFINE_string(pointcloud_topic, "/apollo/compensator/pointcloud",
+              "pointcloud topic name");
 DEFINE_string(prediction_topic, "/apollo/prediction", "prediction topic name");
 DEFINE_string(perception_obstacle_topic, "/apollo/perception/obstacles",
               "perception obstacle topic name");
 DEFINE_string(traffic_light_detection_topic, "/apollo/perception/traffic_light",
               "traffic light detection topic name");
 DEFINE_string(decision_topic, "/apollo/decision", "decision topic name");
+DEFINE_string(routing_result_topic, "/apollo/routing_result",
+              "routing result topic name");
