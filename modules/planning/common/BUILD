@@ -183,6 +183,16 @@ cc_library(
 )
 
 cc_library(
+    name = "decision",
+    srcs = [
+        "decision.cc",
+    ],
+    hdrs = [
+        "decision.h",
+    ],
+)
+
+cc_library(
     name = "planning_common",
     deps = [
         "@eigen//:eigen",
