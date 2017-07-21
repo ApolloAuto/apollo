@@ -91,16 +91,16 @@ cc_library(
         "speed_optimizer.cc",
     ],
     hdrs = [
-        "speed_optimizer.h",
         "optimizer.h",
+        "speed_optimizer.h",
     ],
     deps = [
-        "@eigen//:eigen",
         "//modules/common/proto:error_code_proto",
         "//modules/planning/common:data_center",
         "//modules/planning/common:decision_data",
         "//modules/planning/common:planning_data",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
+        "@eigen//:eigen",
     ],
 )
