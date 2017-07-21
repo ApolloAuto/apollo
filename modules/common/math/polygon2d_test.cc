@@ -30,13 +30,13 @@ namespace math {
 
 namespace {
 
-bool ProjectByXSlow(const std::vector<Vec2D> &points, double x,
+bool ProjectByXSlow(const std::vector<Vec2d> &points, double x,
                     double *const min_y, double *const max_y) {
   *min_y = std::numeric_limits<double>::infinity();
   *max_y = -std::numeric_limits<double>::infinity();
-  for (const Vec2D &p1 : points) {
+  for (const Vec2d &p1 : points) {
     if (p1.x() < x) {
-      for (const Vec2D &p2 : points) {
+      for (const Vec2d &p2 : points) {
         if (p2.x() > x) {
           const double y = ((p2.x() - x) * p1.y() + (x - p1.x()) * p2.y()) /
                            (p2.x() - p1.x());
@@ -52,113 +52,109 @@ bool ProjectByXSlow(const std::vector<Vec2D> &points, double x,
 }  // namespace
 
 TEST(Polygon2dTest, polygon_IsPointIn) {
-  const Polygon2d poly1(Box2d::CreateAABox(Vec2DCtor(0, 0), Vec2DCtor(1, 1)));
+  const Polygon2d poly1(Box2d::CreateAABox({0, 0}, {1, 1}));
   EXPECT_EQ(poly1.DebugString(),
-            "polygon2d (  num_points = 4  "
-            "points = ( x: 1\ny: 0\n x: 1\ny: 1\n x: 0\ny: 1\n x: 0\ny: 0\n )  "
-            "convex  area = 1 )");
-  EXPECT_TRUE(poly1.IsPointIn(Vec2DCtor(0.5, 0.5)));
-  EXPECT_TRUE(poly1.IsPointIn(Vec2DCtor(0.2, 0.2)));
-  EXPECT_TRUE(poly1.IsPointIn(Vec2DCtor(0.2, 0.8)));
-  EXPECT_TRUE(poly1.IsPointIn(Vec2DCtor(0.8, 0.2)));
-  EXPECT_TRUE(poly1.IsPointIn(Vec2DCtor(0.8, 0.8)));
+            "polygon2d (  num_points = 4  points = ( vec2d ( x = 1  y = 0 ) "
+            "vec2d ( x = 1  y = 1 ) vec2d ( x = 0  y = 1 ) vec2d ( x = 0  y = "
+            "0 ) )  convex  area = 1 )");
+  EXPECT_TRUE(poly1.IsPointIn({0.5, 0.5}));
+  EXPECT_TRUE(poly1.IsPointIn({0.2, 0.2}));
+  EXPECT_TRUE(poly1.IsPointIn({0.2, 0.8}));
+  EXPECT_TRUE(poly1.IsPointIn({0.8, 0.2}));
+  EXPECT_TRUE(poly1.IsPointIn({0.8, 0.8}));
 
-  EXPECT_TRUE(poly1.IsPointOnBoundary(Vec2DCtor(0.0, 0.0)));
-  EXPECT_TRUE(poly1.IsPointIn(Vec2DCtor(0.0, 0.0)));
-  EXPECT_TRUE(poly1.IsPointOnBoundary(Vec2DCtor(0.0, 0.5)));
-  EXPECT_TRUE(poly1.IsPointIn(Vec2DCtor(0.0, 0.5)));
-  EXPECT_TRUE(poly1.IsPointOnBoundary(Vec2DCtor(1.0, 0.5)));
-  EXPECT_TRUE(poly1.IsPointIn(Vec2DCtor(1.0, 0.5)));
+  EXPECT_TRUE(poly1.IsPointOnBoundary({0.0, 0.0}));
+  EXPECT_TRUE(poly1.IsPointIn({0.0, 0.0}));
+  EXPECT_TRUE(poly1.IsPointOnBoundary({0.0, 0.5}));
+  EXPECT_TRUE(poly1.IsPointIn({0.0, 0.5}));
+  EXPECT_TRUE(poly1.IsPointOnBoundary({1.0, 0.5}));
+  EXPECT_TRUE(poly1.IsPointIn({1.0, 0.5}));
 
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(-0.2, 0.5)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(1.2, 0.5)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(0.5, -0.2)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(0.5, 1.2)));
+  EXPECT_FALSE(poly1.IsPointIn({-0.2, 0.5}));
+  EXPECT_FALSE(poly1.IsPointIn({1.2, 0.5}));
+  EXPECT_FALSE(poly1.IsPointIn({0.5, -0.2}));
+  EXPECT_FALSE(poly1.IsPointIn({0.5, 1.2}));
 
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(0, -0.1)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(-0.1, 0)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(1.0, -0.1)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(-0.1, 1.0)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(0, 1.1)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(1.1, 0)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(1.0, 1.1)));
-  EXPECT_FALSE(poly1.IsPointIn(Vec2DCtor(1.1, 1.0)));
+  EXPECT_FALSE(poly1.IsPointIn({0, -0.1}));
+  EXPECT_FALSE(poly1.IsPointIn({-0.1, 0}));
+  EXPECT_FALSE(poly1.IsPointIn({1.0, -0.1}));
+  EXPECT_FALSE(poly1.IsPointIn({-0.1, 1.0}));
+  EXPECT_FALSE(poly1.IsPointIn({0, 1.1}));
+  EXPECT_FALSE(poly1.IsPointIn({1.1, 0}));
+  EXPECT_FALSE(poly1.IsPointIn({1.0, 1.1}));
+  EXPECT_FALSE(poly1.IsPointIn({1.1, 1.0}));
 
-  const Polygon2d poly2({Vec2DCtor(0, 1), Vec2DCtor(1, 0),
-                         Vec2DCtor(0, -1), Vec2DCtor(-1, 0)});
-  EXPECT_TRUE(poly2.IsPointIn(Vec2DCtor(0, 0)));
-  EXPECT_TRUE(poly2.IsPointIn(Vec2DCtor(0, 0.9)));
-  EXPECT_TRUE(poly2.IsPointIn(Vec2DCtor(0.9, 0)));
-  EXPECT_TRUE(poly2.IsPointIn(Vec2DCtor(0, -0.9)));
-  EXPECT_TRUE(poly2.IsPointIn(Vec2DCtor(-0.9, 0)));
+  const Polygon2d poly2({{0, 1}, {1, 0}, {0, -1}, {-1, 0}});
+  EXPECT_TRUE(poly2.IsPointIn({0, 0}));
+  EXPECT_TRUE(poly2.IsPointIn({0, 0.9}));
+  EXPECT_TRUE(poly2.IsPointIn({0.9, 0}));
+  EXPECT_TRUE(poly2.IsPointIn({0, -0.9}));
+  EXPECT_TRUE(poly2.IsPointIn({-0.9, 0}));
 
-  EXPECT_FALSE(poly2.IsPointIn(Vec2DCtor(0, 1.1)));
-  EXPECT_FALSE(poly2.IsPointIn(Vec2DCtor(1.1, 0)));
-  EXPECT_FALSE(poly2.IsPointIn(Vec2DCtor(0, -1.1)));
-  EXPECT_FALSE(poly2.IsPointIn(Vec2DCtor(-1.1, 0)));
+  EXPECT_FALSE(poly2.IsPointIn({0, 1.1}));
+  EXPECT_FALSE(poly2.IsPointIn({1.1, 0}));
+  EXPECT_FALSE(poly2.IsPointIn({0, -1.1}));
+  EXPECT_FALSE(poly2.IsPointIn({-1.1, 0}));
 
-  const Polygon2d poly3({Vec2DCtor(4, 4), Vec2DCtor(5, 6), Vec2DCtor(6, 6)});
-  EXPECT_FALSE(poly3.IsPointIn(Vec2DCtor(5, 4.5)));
-  EXPECT_FALSE(poly3.IsPointOnBoundary(Vec2DCtor(5, 4.5)));
-  EXPECT_TRUE(poly3.IsPointIn(Vec2DCtor(5, 5)));
-  EXPECT_TRUE(poly3.IsPointOnBoundary(Vec2DCtor(5, 5)));
-  EXPECT_TRUE(poly3.IsPointIn(Vec2DCtor(5, 5.5)));
-  EXPECT_FALSE(poly3.IsPointOnBoundary(Vec2DCtor(5, 5.5)));
-  EXPECT_TRUE(poly3.IsPointIn(Vec2DCtor(5, 6)));
-  EXPECT_TRUE(poly3.IsPointOnBoundary(Vec2DCtor(5, 6)));
-  EXPECT_FALSE(poly3.IsPointIn(Vec2DCtor(5, 6.5)));
-  EXPECT_FALSE(poly3.IsPointOnBoundary(Vec2DCtor(5, 6.5)));
+  const Polygon2d poly3({{4, 4}, {5, 6}, {6, 6}});
+  EXPECT_FALSE(poly3.IsPointIn({5, 4.5}));
+  EXPECT_FALSE(poly3.IsPointOnBoundary({5, 4.5}));
+  EXPECT_TRUE(poly3.IsPointIn({5, 5}));
+  EXPECT_TRUE(poly3.IsPointOnBoundary({5, 5}));
+  EXPECT_TRUE(poly3.IsPointIn({5, 5.5}));
+  EXPECT_FALSE(poly3.IsPointOnBoundary({5, 5.5}));
+  EXPECT_TRUE(poly3.IsPointIn({5, 6}));
+  EXPECT_TRUE(poly3.IsPointOnBoundary({5, 6}));
+  EXPECT_FALSE(poly3.IsPointIn({5, 6.5}));
+  EXPECT_FALSE(poly3.IsPointOnBoundary({5, 6.5}));
 
   // Concave polygons.
-  const Polygon2d poly4({Vec2DCtor(0, 0), Vec2DCtor(2, 0), Vec2DCtor(2, 2),
-                         Vec2DCtor(1, 1), Vec2DCtor(0, 2)});
-  EXPECT_TRUE(poly4.IsPointIn(Vec2DCtor(0.5, 1.5)));
-  EXPECT_TRUE(poly4.IsPointOnBoundary(Vec2DCtor(0.5, 1.5)));
-  EXPECT_FALSE(poly4.IsPointIn(Vec2DCtor(1.0, 1.5)));
-  EXPECT_TRUE(poly4.IsPointIn(Vec2DCtor(1.5, 1.5)));
-  EXPECT_TRUE(poly4.IsPointOnBoundary(Vec2DCtor(1.5, 1.5)));
+  const Polygon2d poly4({{0, 0}, {2, 0}, {2, 2}, {1, 1}, {0, 2}});
+  EXPECT_TRUE(poly4.IsPointIn({0.5, 1.5}));
+  EXPECT_TRUE(poly4.IsPointOnBoundary({0.5, 1.5}));
+  EXPECT_FALSE(poly4.IsPointIn({1.0, 1.5}));
+  EXPECT_TRUE(poly4.IsPointIn({1.5, 1.5}));
+  EXPECT_TRUE(poly4.IsPointOnBoundary({1.5, 1.5}));
 
   const Polygon2d poly5(
-      {Vec2DCtor(0, 0), Vec2DCtor(4, 0), Vec2DCtor(4, 2), Vec2DCtor(3, 2),
-       Vec2DCtor(2, 1), Vec2DCtor(1, 2), Vec2DCtor(0, 2)});
-  EXPECT_FALSE(poly5.IsPointIn(Vec2DCtor(-0.5, 2.0)));
-  EXPECT_TRUE(poly5.IsPointIn(Vec2DCtor(0.5, 2.0)));
-  EXPECT_FALSE(poly5.IsPointIn(Vec2DCtor(1.5, 2.0)));
-  EXPECT_FALSE(poly5.IsPointIn(Vec2DCtor(2.0, 2.0)));
-  EXPECT_FALSE(poly5.IsPointIn(Vec2DCtor(2.5, 2.0)));
-  EXPECT_TRUE(poly5.IsPointIn(Vec2DCtor(3.5, 2.0)));
-  EXPECT_FALSE(poly5.IsPointIn(Vec2DCtor(4.5, 2.0)));
+      {{0, 0}, {4, 0}, {4, 2}, {3, 2}, {2, 1}, {1, 2}, {0, 2}});
+  EXPECT_FALSE(poly5.IsPointIn({-0.5, 2.0}));
+  EXPECT_TRUE(poly5.IsPointIn({0.5, 2.0}));
+  EXPECT_FALSE(poly5.IsPointIn({1.5, 2.0}));
+  EXPECT_FALSE(poly5.IsPointIn({2.0, 2.0}));
+  EXPECT_FALSE(poly5.IsPointIn({2.5, 2.0}));
+  EXPECT_TRUE(poly5.IsPointIn({3.5, 2.0}));
+  EXPECT_FALSE(poly5.IsPointIn({4.5, 2.0}));
 }
 
 TEST(Polygon2dTest, DistanceToPoint) {
-  const Box2d box1(Box2d::CreateAABox(Vec2DCtor(0, 0), Vec2DCtor(1, 1)));
+  const Box2d box1(Box2d::CreateAABox({0, 0}, {1, 1}));
   const Polygon2d poly1(box1);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(0.5, 0.5)), 0.0, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({0.5, 0.5}), 0.0, 1e-5);
 
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(-0.2, 0.5)), 0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(1.2, 0.5)), 0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(0.5, -0.2)), 0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(0.5, 1.2)), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({-0.2, 0.5}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({1.2, 0.5}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({0.5, -0.2}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({0.5, 1.2}), 0.2, 1e-5);
 
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(0, -0.1)), 0.1, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(-0.1, 0)), 0.1, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(1.0, -0.1)), 0.1, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(-0.1, 1.0)), 0.1, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(0, 1.1)), 0.1, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(1.1, 0)), 0.1, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(1.0, 1.1)), 0.1, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(1.1, 1.0)), 0.1, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({0, -0.1}), 0.1, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({-0.1, 0}), 0.1, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({1.0, -0.1}), 0.1, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({-0.1, 1.0}), 0.1, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({0, 1.1}), 0.1, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({1.1, 0}), 0.1, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({1.0, 1.1}), 0.1, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({1.1, 1.0}), 0.1, 1e-5);
 
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(-0.1, -0.1)), 0.1 * sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(-0.1, 1.1)), 0.1 * sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(1.1, -0.1)), 0.1 * sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(1.1, 1.1)), 0.1 * sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({-0.1, -0.1}), 0.1 * sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({-0.1, 1.1}), 0.1 * sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({1.1, -0.1}), 0.1 * sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({1.1, 1.1}), 0.1 * sqrt(2.0), 1e-5);
 
   for (int iter = 0; iter < 10000; ++iter) {
     const double x = RandomDouble(-10, 10);
     const double y = RandomDouble(-10, 10);
-    EXPECT_NEAR(poly1.DistanceTo(Vec2DCtor(x, y)),
-                box1.DistanceTo(Vec2DCtor(x, y)), 1e-5);
+    EXPECT_NEAR(poly1.DistanceTo({x, y}), box1.DistanceTo({x, y}), 1e-5);
   }
   for (int iter = 0; iter < 100; ++iter) {
     const double center_x = RandomDouble(-10, 10);
@@ -166,123 +162,94 @@ TEST(Polygon2dTest, DistanceToPoint) {
     const double heading = RandomDouble(0, M_PI * 2.0);
     const double length = RandomDouble(1, 5);
     const double width = RandomDouble(1, 5);
-    const Box2d box(Vec2DCtor(center_x, center_y), heading, length, width);
+    const Box2d box({center_x, center_y}, heading, length, width);
     const Polygon2d polygon(box);
     for (int iter2 = 0; iter2 < 100; ++iter2) {
       const double x = RandomDouble(-20, 20);
       const double y = RandomDouble(-20, 20);
-      EXPECT_NEAR(polygon.DistanceTo(Vec2DCtor(x, y)),
-                  box.DistanceTo(Vec2DCtor(x, y)), 1e-5);
+      EXPECT_NEAR(polygon.DistanceTo({x, y}), box.DistanceTo({x, y}), 1e-5);
     }
   }
 
-  const Polygon2d poly2({Vec2DCtor(0, 1), Vec2DCtor(1, 0),
-                         Vec2DCtor(0, -1), Vec2DCtor(-1, 0)});
-  EXPECT_NEAR(poly2.DistanceTo(Vec2DCtor(0, 0)), 0.0, 1e-5);
+  const Polygon2d poly2({{0, 1}, {1, 0}, {0, -1}, {-1, 0}});
+  EXPECT_NEAR(poly2.DistanceTo({0, 0}), 0.0, 1e-5);
 
-  EXPECT_NEAR(poly2.DistanceTo(Vec2DCtor(0, 1.1)), 0.1, 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo(Vec2DCtor(1.1, 0)), 0.1, 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo(Vec2DCtor(0, -1.1)), 0.1, 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo(Vec2DCtor(-1.1, 0)), 0.1, 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({0, 1.1}), 0.1, 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({1.1, 0}), 0.1, 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({0, -1.1}), 0.1, 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({-1.1, 0}), 0.1, 1e-5);
 
-  EXPECT_NEAR(poly2.DistanceTo(Vec2DCtor(0.5, 0.5)), 0.0, 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo(Vec2DCtor(0.6, 0.6)), 0.1 * sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({0.5, 0.5}), 0.0, 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({0.6, 0.6}), 0.1 * sqrt(2.0), 1e-5);
 
   const Polygon2d poly3(
-      {Vec2DCtor(0, 0), Vec2DCtor(4, 0), Vec2DCtor(4, 2), Vec2DCtor(3, 2),
-       Vec2DCtor(2, 1), Vec2DCtor(1, 2), Vec2DCtor(0, 2)});
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(-0.5, 2.0)), 0.5, 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(0.5, 2.0)), 0.0, 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(1.5, 2.0)), 0.5 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(2.0, 2.0)), 1.0 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(2.5, 2.0)), 0.5 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(3.5, 2.0)), 0.0, 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(4.5, 2.0)), 0.5, 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(-0.5, 1.0)), 0.5, 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(2.0, 1.0)), 0.0, 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo(Vec2DCtor(4.5, 1.0)), 0.5, 1e-5);
+      {{0, 0}, {4, 0}, {4, 2}, {3, 2}, {2, 1}, {1, 2}, {0, 2}});
+  EXPECT_NEAR(poly3.DistanceTo({-0.5, 2.0}), 0.5, 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({0.5, 2.0}), 0.0, 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({1.5, 2.0}), 0.5 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({2.0, 2.0}), 1.0 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({2.5, 2.0}), 0.5 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({3.5, 2.0}), 0.0, 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({4.5, 2.0}), 0.5, 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({-0.5, 1.0}), 0.5, 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({2.0, 1.0}), 0.0, 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({4.5, 1.0}), 0.5, 1e-5);
 }
 
 TEST(Polygon2dTest, DistanceToLineSegment) {
-  const Polygon2d poly1(Box2d::CreateAABox(Vec2DCtor(0, 0), Vec2DCtor(1, 1)));
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(0.5, 0.5), Vec2DCtor(1.0, 1.0)}),
-              0.0, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(-0.2, 0.5), Vec2DCtor(1.2, 0.5)}),
-              0.0, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(-2.0, -2.0), Vec2DCtor(2.0, 2.0)}),
-              0.0, 1e-5);
+  const Polygon2d poly1(Box2d::CreateAABox({0, 0}, {1, 1}));
+  EXPECT_NEAR(poly1.DistanceTo({{0.5, 0.5}, {1.0, 1.0}}), 0.0, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{-0.2, 0.5}, {1.2, 0.5}}), 0.0, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{-2.0, -2.0}, {2.0, 2.0}}), 0.0, 1e-5);
 
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(-0.2, 0.5), Vec2DCtor(-0.2, 0.8)}),
-              0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(1.2, 0.5), Vec2DCtor(1.2, 0.3)}),
-              0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(0.5, -0.2), Vec2DCtor(0.8, -0.2)}),
-              0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(0.5, 1.2), Vec2DCtor(0.3, 1.2)}),
-              0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{-0.2, 0.5}, {-0.2, 0.8}}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{1.2, 0.5}, {1.2, 0.3}}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{0.5, -0.2}, {0.8, -0.2}}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{0.5, 1.2}, {0.3, 1.2}}), 0.2, 1e-5);
 
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(-0.3, 0.5), Vec2DCtor(-0.2, 0.8)}),
-              0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(1.2, 0.5), Vec2DCtor(1.3, 0.3)}),
-              0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(0.5, -0.3), Vec2DCtor(0.8, -0.2)}),
-              0.2, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(0.5, 1.2), Vec2DCtor(0.3, 1.3)}),
-              0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{-0.3, 0.5}, {-0.2, 0.8}}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{1.2, 0.5}, {1.3, 0.3}}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{0.5, -0.3}, {0.8, -0.2}}), 0.2, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{0.5, 1.2}, {0.3, 1.3}}), 0.2, 1e-5);
 
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(0, -0.1), Vec2DCtor(-0.1, 0)}),
-              0.1 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(1.0, 1.1), Vec2DCtor(1.1, 1.0)}),
-              0.1 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{0, -0.1}, {-0.1, 0}}), 0.1 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{1.0, 1.1}, {1.1, 1.0}}), 0.1 / sqrt(2.0),
+              1e-5);
 
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(-10.0, 0.5), Vec2DCtor(2.0, 0.5)}),
-              0.0, 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(-1.0, 0.5), Vec2DCtor(10.0, 0.5)}),
-              0.0, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{-10.0, 0.5}, {2.0, 0.5}}), 0.0, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{-1.0, 0.5}, {10.0, 0.5}}), 0.0, 1e-5);
 
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(-1.0, 2.0), Vec2DCtor(-1.0, 2.0)}),
-              sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly1.DistanceTo({Vec2DCtor(0.5, 0.5), Vec2DCtor(0.5, 0.5)}),
-              0.0, 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{-1.0, 2.0}, {-1.0, 2.0}}), sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly1.DistanceTo({{0.5, 0.5}, {0.5, 0.5}}), 0.0, 1e-5);
 
-  const Polygon2d poly2({Vec2DCtor(0, 1), Vec2DCtor(1, 0),
-                         Vec2DCtor(0, -1), Vec2DCtor(-1, 0)});
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(-2, 0), Vec2DCtor(2, 0)}), 0.0, 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(0, -2), Vec2DCtor(0, 2)}), 0.0, 1e-5);
+  const Polygon2d poly2({{0, 1}, {1, 0}, {0, -1}, {-1, 0}});
+  EXPECT_NEAR(poly2.DistanceTo({{-2, 0}, {2, 0}}), 0.0, 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({{0, -2}, {0, 2}}), 0.0, 1e-5);
 
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(0, 1.1), Vec2DCtor(1.1, 0)}),
-              0.1 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(0, 1.1), Vec2DCtor(-1.1, 0)}),
-              0.1 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(0, -1.1), Vec2DCtor(1.1, 0)}),
-              0.1 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(0, -1.1), Vec2DCtor(-1.1, 0)}),
-              0.1 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(0.6, 0.6), Vec2DCtor(0.7, 0.7)}),
-              0.1 * sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(-0.6, -0.6), Vec2DCtor(-0.7, -0.7)}),
-              0.1 * sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly2.DistanceTo({Vec2DCtor(-0.6, -0.6), Vec2DCtor(0.7, 0.7)}),
-              0.0, 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({{0, 1.1}, {1.1, 0}}), 0.1 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({{0, 1.1}, {-1.1, 0}}), 0.1 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({{0, -1.1}, {1.1, 0}}), 0.1 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({{0, -1.1}, {-1.1, 0}}), 0.1 / sqrt(2.0), 1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({{0.6, 0.6}, {0.7, 0.7}}), 0.1 * sqrt(2.0),
+              1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({{-0.6, -0.6}, {-0.7, -0.7}}), 0.1 * sqrt(2.0),
+              1e-5);
+  EXPECT_NEAR(poly2.DistanceTo({{-0.6, -0.6}, {0.7, 0.7}}), 0.0, 1e-5);
 
-  const Polygon2d poly3({Vec2DCtor(0, 0), Vec2DCtor(2, 0), Vec2DCtor(2, 2),
-                         Vec2DCtor(1, 1), Vec2DCtor(0, 2)});
-  EXPECT_NEAR(poly3.DistanceTo({Vec2DCtor(-2, 0), Vec2DCtor(2, 0)}), 0.0, 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo({Vec2DCtor(0.7, 2.0), Vec2DCtor(1.2, 2.0)}),
-              0.7 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo({Vec2DCtor(0.7, 2.0), Vec2DCtor(1.4, 2.0)}),
-              0.6 / sqrt(2.0), 1e-5);
-  EXPECT_NEAR(poly3.DistanceTo({Vec2DCtor(0.7, 1.5), Vec2DCtor(1.6, 1.5)}),
-              0.0, 1e-5);
+  const Polygon2d poly3({{0, 0}, {2, 0}, {2, 2}, {1, 1}, {0, 2}});
+  EXPECT_NEAR(poly3.DistanceTo({{-2, 0}, {2, 0}}), 0.0, 1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({{0.7, 2.0}, {1.2, 2.0}}), 0.7 / sqrt(2.0),
+              1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({{0.7, 2.0}, {1.4, 2.0}}), 0.6 / sqrt(2.0),
+              1e-5);
+  EXPECT_NEAR(poly3.DistanceTo({{0.7, 1.5}, {1.6, 1.5}}), 0.0, 1e-5);
 }
 
 TEST(Polygon2dTest, DistanceToPolygon) {
-  const Polygon2d poly1(Box2d::CreateAABox(Vec2DCtor(0, 0), Vec2DCtor(1, 1)));
-  const Polygon2d poly2({Vec2DCtor(0, 1), Vec2DCtor(1, 0),
-                         Vec2DCtor(0, -1), Vec2DCtor(-1, 0)});
-  const Polygon2d poly3(Box2d::CreateAABox(Vec2DCtor(2, 2), Vec2DCtor(3, 3)));
-  const Polygon2d poly4(Box2d::CreateAABox(Vec2DCtor(-10, -10),
-                                           Vec2DCtor(10, 10)));
+  const Polygon2d poly1(Box2d::CreateAABox({0, 0}, {1, 1}));
+  const Polygon2d poly2({{0, 1}, {1, 0}, {0, -1}, {-1, 0}});
+  const Polygon2d poly3(Box2d::CreateAABox({2, 2}, {3, 3}));
+  const Polygon2d poly4(Box2d::CreateAABox({-10, -10}, {10, 10}));
 
   EXPECT_NEAR(poly1.DistanceTo(poly2), 0.0, 1e-5);
   EXPECT_NEAR(poly1.DistanceTo(poly3), sqrt(2.0), 1e-5);
@@ -293,12 +260,10 @@ TEST(Polygon2dTest, DistanceToPolygon) {
 }
 
 TEST(Polygon2dTest, ContainPolygon) {
-  const Polygon2d poly1(Box2d::CreateAABox(Vec2DCtor(0, 0), Vec2DCtor(3, 3)));
-  const Polygon2d poly2(Box2d::CreateAABox(Vec2DCtor(1, 1), Vec2DCtor(2, 2)));
-  const Polygon2d poly3(Box2d::CreateAABox(Vec2DCtor(1.5, 1.5),
-                                           Vec2DCtor(4, 4)));
-  const Polygon2d poly4(Box2d::CreateAABox(Vec2DCtor(-10, -10),
-                                           Vec2DCtor(10, 10)));
+  const Polygon2d poly1(Box2d::CreateAABox({0, 0}, {3, 3}));
+  const Polygon2d poly2(Box2d::CreateAABox({1, 1}, {2, 2}));
+  const Polygon2d poly3(Box2d::CreateAABox({1.5, 1.5}, {4, 4}));
+  const Polygon2d poly4(Box2d::CreateAABox({-10, -10}, {10, 10}));
   EXPECT_TRUE(poly1.IsContain(poly2));
   EXPECT_FALSE(poly2.IsContain(poly1));
 
@@ -312,16 +277,11 @@ TEST(Polygon2dTest, ContainPolygon) {
   EXPECT_TRUE(poly4.IsContain(poly3));
 
   const Polygon2d poly5(
-      {Vec2DCtor(0, 0), Vec2DCtor(4, 0), Vec2DCtor(4, 2), Vec2DCtor(3, 2),
-       Vec2DCtor(2, 1), Vec2DCtor(1, 2), Vec2DCtor(0, 2)});
-  const Polygon2d poly6({Vec2DCtor(0, 1), Vec2DCtor(4, 1),
-                         Vec2DCtor(4, 2), Vec2DCtor(0, 2)});
-  const Polygon2d poly7({Vec2DCtor(0, 1), Vec2DCtor(1, 1),
-                         Vec2DCtor(1, 2), Vec2DCtor(0, 2)});
-  const Polygon2d poly8({Vec2DCtor(3, 1), Vec2DCtor(4, 1),
-                         Vec2DCtor(4, 2), Vec2DCtor(3, 2)});
-  const Polygon2d poly9({Vec2DCtor(0, 0), Vec2DCtor(4, 0),
-                         Vec2DCtor(4, 1), Vec2DCtor(0, 1)});
+      {{0, 0}, {4, 0}, {4, 2}, {3, 2}, {2, 1}, {1, 2}, {0, 2}});
+  const Polygon2d poly6({{0, 1}, {4, 1}, {4, 2}, {0, 2}});
+  const Polygon2d poly7({{0, 1}, {1, 1}, {1, 2}, {0, 2}});
+  const Polygon2d poly8({{3, 1}, {4, 1}, {4, 2}, {3, 2}});
+  const Polygon2d poly9({{0, 0}, {4, 0}, {4, 1}, {0, 1}});
   EXPECT_FALSE(poly5.IsContain(poly6));
   EXPECT_TRUE(poly5.IsContain(poly7));
   EXPECT_TRUE(poly5.IsContain(poly8));
@@ -331,31 +291,27 @@ TEST(Polygon2dTest, ContainPolygon) {
 TEST(Polygon2dTest, ConvexHull) {
   Polygon2d polygon;
   EXPECT_FALSE(Polygon2d::ComputeConvexHull({}, &polygon));
-  EXPECT_FALSE(Polygon2d::ComputeConvexHull({Vec2DCtor(1, 2)}, &polygon));
-  EXPECT_FALSE(Polygon2d::ComputeConvexHull({Vec2DCtor(3, 4), Vec2DCtor(5, 6)},
-               &polygon));
-  EXPECT_FALSE(Polygon2d::ComputeConvexHull({Vec2DCtor(3, 4), Vec2DCtor(3, 4),
-                   Vec2DCtor(5, 6), Vec2DCtor(5, 6)}, &polygon));
+  EXPECT_FALSE(Polygon2d::ComputeConvexHull({{1, 2}}, &polygon));
+  EXPECT_FALSE(Polygon2d::ComputeConvexHull({{3, 4}, {5, 6}}, &polygon));
+  EXPECT_FALSE(
+      Polygon2d::ComputeConvexHull({{3, 4}, {3, 4}, {5, 6}, {5, 6}}, &polygon));
 
-  EXPECT_TRUE(Polygon2d::ComputeConvexHull({Vec2DCtor(0, 0), Vec2DCtor(0, 4),
-                  Vec2DCtor(3, 0)}, &polygon));
+  EXPECT_TRUE(Polygon2d::ComputeConvexHull({{0, 0}, {0, 4}, {3, 0}}, &polygon));
   EXPECT_TRUE(polygon.is_convex());
   EXPECT_NEAR(6.0, polygon.area(), 1e-5);
 
-  EXPECT_TRUE(Polygon2d::ComputeConvexHull({Vec2DCtor(0, 0), Vec2DCtor(0, 4),
-                  Vec2DCtor(3, 0), Vec2DCtor(3, 4)}, &polygon));
+  EXPECT_TRUE(
+      Polygon2d::ComputeConvexHull({{0, 0}, {0, 4}, {3, 0}, {3, 4}}, &polygon));
   EXPECT_TRUE(polygon.is_convex());
   EXPECT_NEAR(12.0, polygon.area(), 1e-5);
 
   EXPECT_TRUE(Polygon2d::ComputeConvexHull(
-      {Vec2DCtor(0, 0), Vec2DCtor(2, 2), Vec2DCtor(1, 1), Vec2DCtor(0, 4),
-       Vec2DCtor(3, 0), Vec2DCtor(3, 4)}, &polygon));
+      {{0, 0}, {2, 2}, {1, 1}, {0, 4}, {3, 0}, {3, 4}}, &polygon));
   EXPECT_TRUE(polygon.is_convex());
   EXPECT_NEAR(12.0, polygon.area(), 1e-5);
 
   EXPECT_TRUE(Polygon2d::ComputeConvexHull(
-      {Vec2DCtor(0, 0), Vec2DCtor(0, 4), Vec2DCtor(0, 1), Vec2DCtor(0, 3),
-       Vec2DCtor(0, 2), Vec2DCtor(1, 0), Vec2DCtor(3, 0), Vec2DCtor(2, 0)},
+      {{0, 0}, {0, 4}, {0, 1}, {0, 3}, {0, 2}, {1, 0}, {3, 0}, {2, 0}},
       &polygon));
   EXPECT_TRUE(polygon.is_convex());
   EXPECT_NEAR(6.0, polygon.area(), 1e-5);
@@ -363,9 +319,9 @@ TEST(Polygon2dTest, ConvexHull) {
   for (int iter = 0; iter < 10000; ++iter) {
     const int kRange = 10;
     const int n = RandomInt(3, 10);
-    std::vector<Vec2D> points;
+    std::vector<Vec2d> points;
     for (int i = 0; i < n; ++i) {
-      points.push_back(Vec2DCtor(RandomInt(0, kRange), RandomInt(0, kRange)));
+      points.emplace_back(RandomInt(0, kRange), RandomInt(0, kRange));
     }
     double area = 0;
     for (int x0 = 0; x0 < kRange; ++x0) {
@@ -386,10 +342,10 @@ TEST(Polygon2dTest, ConvexHull) {
 }
 
 TEST(Polygon2dTest, Overlap) {
-  const Polygon2d poly1(Box2d::CreateAABox(Vec2DCtor(0, 0), Vec2DCtor(2, 2)));
-  const Polygon2d poly2(Box2d::CreateAABox(Vec2DCtor(1, 1), Vec2DCtor(3, 3)));
-  const Polygon2d poly3(Box2d::CreateAABox(Vec2DCtor(2, 0), Vec2DCtor(4, 2)));
-  const Polygon2d poly4(Box2d(Vec2DCtor(2, 2), M_PI_4, sqrt(2.0), sqrt(2.0)));
+  const Polygon2d poly1(Box2d::CreateAABox({0, 0}, {2, 2}));
+  const Polygon2d poly2(Box2d::CreateAABox({1, 1}, {3, 3}));
+  const Polygon2d poly3(Box2d::CreateAABox({2, 0}, {4, 2}));
+  const Polygon2d poly4(Box2d({2, 2}, M_PI_4, sqrt(2.0), sqrt(2.0)));
   Polygon2d overlap_polygon;
 
   EXPECT_TRUE(poly1.ComputeOverlap(poly2, &overlap_polygon));
@@ -420,67 +376,56 @@ TEST(Polygon2dTest, Overlap) {
   EXPECT_TRUE(poly4.ComputeOverlap(poly3, &overlap_polygon));
   EXPECT_NEAR(overlap_polygon.area(), 0.5, 1e-5);
 
-  Vec2D first_intersect;
-  Vec2D last_intersect;
-  EXPECT_FALSE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(-1, 0), Vec2DCtor(-1, 2)),
-      &first_intersect, &last_intersect));
-  EXPECT_FALSE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(-1, 1), Vec2DCtor(-3, 1)),
-      &first_intersect, &last_intersect));
-  EXPECT_FALSE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(1, 3), Vec2DCtor(1, 5)),
-      &first_intersect, &last_intersect));
+  Vec2d first_intersect;
+  Vec2d last_intersect;
+  EXPECT_FALSE(poly1.GetOverlap(LineSegment2d({-1, 0}, {-1, 2}),
+                                &first_intersect, &last_intersect));
+  EXPECT_FALSE(poly1.GetOverlap(LineSegment2d({-1, 1}, {-3, 1}),
+                                &first_intersect, &last_intersect));
+  EXPECT_FALSE(poly1.GetOverlap(LineSegment2d({1, 3}, {1, 5}), &first_intersect,
+                                &last_intersect));
 
-  EXPECT_TRUE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(1, -1), Vec2DCtor(1, 3)),
-      &first_intersect, &last_intersect));
+  EXPECT_TRUE(poly1.GetOverlap(LineSegment2d({1, -1}, {1, 3}), &first_intersect,
+                               &last_intersect));
   EXPECT_NEAR(1.0, first_intersect.x(), 1e-5);
   EXPECT_NEAR(0.0, first_intersect.y(), 1e-5);
   EXPECT_NEAR(1.0, last_intersect.x(), 1e-5);
   EXPECT_NEAR(2.0, last_intersect.y(), 1e-5);
 
-  EXPECT_TRUE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(1, 1), Vec2DCtor(1, 3)),
-      &first_intersect, &last_intersect));
+  EXPECT_TRUE(poly1.GetOverlap(LineSegment2d({1, 1}, {1, 3}), &first_intersect,
+                               &last_intersect));
   EXPECT_NEAR(1.0, first_intersect.x(), 1e-5);
   EXPECT_NEAR(1.0, first_intersect.y(), 1e-5);
   EXPECT_NEAR(1.0, last_intersect.x(), 1e-5);
   EXPECT_NEAR(2.0, last_intersect.y(), 1e-5);
 
-  EXPECT_TRUE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(1, -1), Vec2DCtor(1, 1)),
-      &first_intersect, &last_intersect));
+  EXPECT_TRUE(poly1.GetOverlap(LineSegment2d({1, -1}, {1, 1}), &first_intersect,
+                               &last_intersect));
   EXPECT_NEAR(1.0, first_intersect.x(), 1e-5);
   EXPECT_NEAR(0.0, first_intersect.y(), 1e-5);
   EXPECT_NEAR(1.0, last_intersect.x(), 1e-5);
   EXPECT_NEAR(1.0, last_intersect.y(), 1e-5);
 
-  EXPECT_TRUE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(1, 3), Vec2DCtor(3, 1)),
-      &first_intersect, &last_intersect));
+  EXPECT_TRUE(poly1.GetOverlap(LineSegment2d({1, 3}, {3, 1}), &first_intersect,
+                               &last_intersect));
   EXPECT_NEAR(2.0, first_intersect.x(), 1e-5);
   EXPECT_NEAR(2.0, first_intersect.y(), 1e-5);
   EXPECT_NEAR(2.0, last_intersect.x(), 1e-5);
   EXPECT_NEAR(2.0, last_intersect.y(), 1e-5);
 
-  EXPECT_FALSE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(4, 3), Vec2DCtor(4, 3)),
-      &first_intersect, &last_intersect));
-  EXPECT_TRUE(poly1.GetOverlap(
-      LineSegment2d(Vec2DCtor(1, 1), Vec2DCtor(1, 1)),
-      &first_intersect, &last_intersect));
+  EXPECT_FALSE(poly1.GetOverlap(LineSegment2d({4, 3}, {4, 3}), &first_intersect,
+                                &last_intersect));
+  EXPECT_TRUE(poly1.GetOverlap(LineSegment2d({1, 1}, {1, 1}), &first_intersect,
+                               &last_intersect));
   EXPECT_NEAR(1.0, first_intersect.x(), 1e-5);
   EXPECT_NEAR(1.0, first_intersect.y(), 1e-5);
   EXPECT_NEAR(1.0, last_intersect.x(), 1e-5);
   EXPECT_NEAR(1.0, last_intersect.y(), 1e-5);
 
   const Polygon2d poly5(
-      {Vec2DCtor(0, 0), Vec2DCtor(4, 0), Vec2DCtor(4, 2), Vec2DCtor(3, 2),
-       Vec2DCtor(2, 1), Vec2DCtor(1, 2), Vec2DCtor(0, 2)});
+      {{0, 0}, {4, 0}, {4, 2}, {3, 2}, {2, 1}, {1, 2}, {0, 2}});
   std::vector<LineSegment2d> overlap_line_segments =
-      poly5.GetAllOverlaps(
-          LineSegment2d(Vec2DCtor(-10, 1.5), Vec2DCtor(10, 1.5)));
+      poly5.GetAllOverlaps(LineSegment2d({-10, 1.5}, {10, 1.5}));
   EXPECT_EQ(2, overlap_line_segments.size());
   EXPECT_NEAR(0.0, overlap_line_segments[0].start().x(), 1e-5);
   EXPECT_NEAR(1.5, overlap_line_segments[0].start().y(), 1e-5);
@@ -492,64 +437,59 @@ TEST(Polygon2dTest, Overlap) {
   EXPECT_NEAR(1.5, overlap_line_segments[1].end().y(), 1e-5);
 
   overlap_line_segments =
-      poly5.GetAllOverlaps(LineSegment2d(Vec2DCtor(-10, 1), Vec2DCtor(10, 1)));
+      poly5.GetAllOverlaps(LineSegment2d({-10, 1}, {10, 1}));
   EXPECT_EQ(1, overlap_line_segments.size());
   EXPECT_NEAR(0.0, overlap_line_segments[0].start().x(), 1e-5);
   EXPECT_NEAR(1.0, overlap_line_segments[0].start().y(), 1e-5);
   EXPECT_NEAR(4.0, overlap_line_segments[0].end().x(), 1e-5);
   EXPECT_NEAR(1.0, overlap_line_segments[0].end().y(), 1e-5);
 
-  overlap_line_segments = poly5.GetAllOverlaps(
-      LineSegment2d(Vec2DCtor(-10, 0.5), Vec2DCtor(10, 0.5)));
+  overlap_line_segments =
+      poly5.GetAllOverlaps(LineSegment2d({-10, 0.5}, {10, 0.5}));
   EXPECT_EQ(1, overlap_line_segments.size());
   EXPECT_NEAR(0.0, overlap_line_segments[0].start().x(), 1e-5);
   EXPECT_NEAR(0.5, overlap_line_segments[0].start().y(), 1e-5);
   EXPECT_NEAR(4.0, overlap_line_segments[0].end().x(), 1e-5);
   EXPECT_NEAR(0.5, overlap_line_segments[0].end().y(), 1e-5);
 
-  overlap_line_segments = poly5.GetAllOverlaps(
-      LineSegment2d(Vec2DCtor(-10, -0.5), Vec2DCtor(10, -0.5)));
+  overlap_line_segments =
+      poly5.GetAllOverlaps(LineSegment2d({-10, -0.5}, {10, -0.5}));
   EXPECT_EQ(0, overlap_line_segments.size());
-  overlap_line_segments = poly5.GetAllOverlaps(
-      LineSegment2d(Vec2DCtor(-10, 2.5), Vec2DCtor(10, 2.5)));
+  overlap_line_segments =
+      poly5.GetAllOverlaps(LineSegment2d({-10, 2.5}, {10, 2.5}));
   EXPECT_EQ(0, overlap_line_segments.size());
 
   overlap_line_segments =
-      poly5.GetAllOverlaps(LineSegment2d(Vec2DCtor(2, 0.5), Vec2DCtor(2, 0.5)));
+      poly5.GetAllOverlaps(LineSegment2d({2, 0.5}, {2, 0.5}));
   EXPECT_EQ(1, overlap_line_segments.size());
   EXPECT_NEAR(2.0, overlap_line_segments[0].start().x(), 1e-5);
   EXPECT_NEAR(0.5, overlap_line_segments[0].start().y(), 1e-5);
   EXPECT_NEAR(2.0, overlap_line_segments[0].end().x(), 1e-5);
   EXPECT_NEAR(0.5, overlap_line_segments[0].end().y(), 1e-5);
   overlap_line_segments =
-      poly5.GetAllOverlaps(LineSegment2d(Vec2DCtor(5, 0.5), Vec2DCtor(5, 0.5)));
+      poly5.GetAllOverlaps(LineSegment2d({5, 0.5}, {5, 0.5}));
   EXPECT_EQ(0, overlap_line_segments.size());
 
-  EXPECT_TRUE(Polygon2d({Vec2DCtor(0, 0), Vec2DCtor(0, 4), Vec2DCtor(4, 0)})
-      .ComputeOverlap(Polygon2d(
-          {Vec2DCtor(1, 1), Vec2DCtor(1, 3), Vec2DCtor(3, 1)}),
-          &overlap_polygon));
+  EXPECT_TRUE(Polygon2d({{0, 0}, {0, 4}, {4, 0}})
+                  .ComputeOverlap(Polygon2d({{1, 1}, {1, 3}, {3, 1}}),
+                                  &overlap_polygon));
   EXPECT_NEAR(overlap_polygon.area(), 2.0, 1e-5);
 
-  EXPECT_TRUE(Polygon2d({Vec2DCtor(0, 0), Vec2DCtor(0, 4), Vec2DCtor(4, 0)})
-      .ComputeOverlap(Polygon2d(
-          {Vec2DCtor(1, 1), Vec2DCtor(-1, 1), Vec2DCtor(1, 3)}),
-          &overlap_polygon));
+  EXPECT_TRUE(Polygon2d({{0, 0}, {0, 4}, {4, 0}})
+                  .ComputeOverlap(Polygon2d({{1, 1}, {-1, 1}, {1, 3}}),
+                                  &overlap_polygon));
   EXPECT_NEAR(overlap_polygon.area(), 1.5, 1e-5);
-  EXPECT_TRUE(Polygon2d({Vec2DCtor(0, 0), Vec2DCtor(0, 4), Vec2DCtor(4, 0)})
-      .ComputeOverlap(Polygon2d(
-          {Vec2DCtor(2, 1), Vec2DCtor(-1, 1), Vec2DCtor(2, 4)}),
-          &overlap_polygon));
+  EXPECT_TRUE(Polygon2d({{0, 0}, {0, 4}, {4, 0}})
+                  .ComputeOverlap(Polygon2d({{2, 1}, {-1, 1}, {2, 4}}),
+                                  &overlap_polygon));
   EXPECT_NEAR(overlap_polygon.area(), 3.0, 1e-5);
-  EXPECT_TRUE(Polygon2d({Vec2DCtor(0, 0), Vec2DCtor(0, 4), Vec2DCtor(4, 0)})
-      .ComputeOverlap(Polygon2d(
-          {Vec2DCtor(3, 1), Vec2DCtor(-1, 1), Vec2DCtor(3, 5)}),
-          &overlap_polygon));
+  EXPECT_TRUE(Polygon2d({{0, 0}, {0, 4}, {4, 0}})
+                  .ComputeOverlap(Polygon2d({{3, 1}, {-1, 1}, {3, 5}}),
+                                  &overlap_polygon));
   EXPECT_NEAR(overlap_polygon.area(), 3.5, 1e-5);
-  EXPECT_TRUE(Polygon2d({Vec2DCtor(0, 0), Vec2DCtor(0, 4), Vec2DCtor(4, 0)})
-      .ComputeOverlap(Polygon2d(
-          {Vec2DCtor(4, 1), Vec2DCtor(-1, 1), Vec2DCtor(4, 6)}),
-          &overlap_polygon));
+  EXPECT_TRUE(Polygon2d({{0, 0}, {0, 4}, {4, 0}})
+                  .ComputeOverlap(Polygon2d({{4, 1}, {-1, 1}, {4, 6}}),
+                                  &overlap_polygon));
   EXPECT_NEAR(overlap_polygon.area(), 3.5, 1e-5);
 
   for (int iter = 0; iter < 10000; ++iter) {
@@ -563,10 +503,10 @@ TEST(Polygon2dTest, Overlap) {
     const double l2 = RandomDouble(1, 5);
     const double w1 = RandomDouble(1, 5);
     const double w2 = RandomDouble(1, 5);
-    Box2d box1(Vec2DCtor(x1, y1), heading1, l1, w1);
-    Box2d box2(Vec2DCtor(x2, y2), heading2, l2, w2);
-    Box2d shrinked_box2(Vec2DCtor(x2, y2), heading2, l2 - 0.2, w2 - 0.2);
-    Box2d extended_box2(Vec2DCtor(x2, y2), heading2, l2 + 0.2, w2 + 0.2);
+    Box2d box1({x1, y1}, heading1, l1, w1);
+    Box2d box2({x2, y2}, heading2, l2, w2);
+    Box2d shrinked_box2({x2, y2}, heading2, l2 - 0.2, w2 - 0.2);
+    Box2d extended_box2({x2, y2}, heading2, l2 + 0.2, w2 + 0.2);
     if (!box1.HasOverlap(extended_box2)) {
       EXPECT_FALSE(
           Polygon2d(box1).ComputeOverlap(Polygon2d(box2), &overlap_polygon));
@@ -580,12 +520,12 @@ TEST(Polygon2dTest, Overlap) {
     const int kRange = 10;
     const int n1 = RandomInt(3, 10);
     const int n2 = RandomInt(3, 10);
-    std::vector<Vec2D> points1, points2;
+    std::vector<Vec2d> points1, points2;
     for (int i = 0; i < n1; ++i) {
-      points1.push_back(Vec2DCtor(RandomInt(0, kRange), RandomInt(0, kRange)));
+      points1.emplace_back(RandomInt(0, kRange), RandomInt(0, kRange));
     }
     for (int i = 0; i < n2; ++i) {
-      points2.push_back(Vec2DCtor(RandomInt(0, kRange), RandomInt(0, kRange)));
+      points2.emplace_back(RandomInt(0, kRange), RandomInt(0, kRange));
     }
     Polygon2d polygon1;
     Polygon2d polygon2;
@@ -599,7 +539,7 @@ TEST(Polygon2dTest, Overlap) {
     }
     for (const auto &line_segment1 : polygon1.line_segments()) {
       for (const auto &line_segment2 : polygon2.line_segments()) {
-        Vec2D pt;
+        Vec2d pt;
         if (line_segment1.GetIntersect(line_segment2, &pt)) {
           key_points.push_back(pt.x());
         }
@@ -637,7 +577,7 @@ TEST(Polygon2dTest, Overlap) {
 }
 
 TEST(Polygon2dTest, BoundingBox) {
-  Polygon2d poly1(Box2d::CreateAABox(Vec2DCtor(0, 0), Vec2DCtor(2, 2)));
+  Polygon2d poly1(Box2d::CreateAABox({0, 0}, {2, 2}));
   Box2d box = poly1.BoundingBoxWithHeading(0.0);
   EXPECT_NEAR(1.0, box.center().x(), 1e-5);
   EXPECT_NEAR(1.0, box.center().y(), 1e-5);
@@ -662,8 +602,7 @@ TEST(Polygon2dTest, BoundingBox) {
   EXPECT_NEAR(4.0, box.area(), 1e-5);
   EXPECT_TRUE(Polygon2d(box).IsContain(poly1));
 
-  Polygon2d poly2({Vec2DCtor(1, 0), Vec2DCtor(0, 1),
-                   Vec2DCtor(-1, 0), Vec2DCtor(0, -1)});
+  Polygon2d poly2({{1, 0}, {0, 1}, {-1, 0}, {0, -1}});
   box = poly2.BoundingBoxWithHeading(0.0);
   EXPECT_NEAR(0.0, box.center().x(), 1e-5);
   EXPECT_NEAR(0.0, box.center().y(), 1e-5);
@@ -690,11 +629,11 @@ TEST(Polygon2dTest, BoundingBox) {
 
   for (int iter = 0; iter < 1000; ++iter) {
     const int num_sample_points = RandomInt(3, 10);
-    std::vector<Vec2D> points;
+    std::vector<Vec2d> points;
     for (int i = 0; i < num_sample_points; ++i) {
       const double x = RandomInt(-10, 10);
       const double y = RandomInt(-10, 10);
-      points.push_back(Vec2DCtor(x, y));
+      points.emplace_back(x, y);
     }
     Polygon2d polygon;
     if (!Polygon2d::ComputeConvexHull(points, &polygon)) {
@@ -715,7 +654,7 @@ TEST(Polygon2dTest, BoundingBox) {
 
 TEST(Polygon2dTest, Expand) {
   {
-    const Polygon2d poly(Box2d::CreateAABox(Vec2DCtor(0, 0), Vec2DCtor(2, 2)));
+    const Polygon2d poly(Box2d::CreateAABox({0, 0}, {2, 2}));
     const Polygon2d exp_poly = poly.ExpandByDistance(1.0);
     EXPECT_TRUE(exp_poly.is_convex());
     const Box2d box = exp_poly.BoundingBoxWithHeading(0.0);
@@ -726,9 +665,7 @@ TEST(Polygon2dTest, Expand) {
     EXPECT_NEAR(exp_poly.area(), 12 + M_PI, 0.1);
   }
   {
-    const std::vector<Vec2D> points{
-        Vec2DCtor(0, 0), Vec2DCtor(2, 0), Vec2DCtor(2, 2),
-        Vec2DCtor(0, 2), Vec2DCtor(1, 1)};
+    const std::vector<Vec2d> points{{0, 0}, {2, 0}, {2, 2}, {0, 2}, {1, 1}};
     const Polygon2d poly(points);
     const Polygon2d exp_poly = poly.ExpandByDistance(1.0);
     EXPECT_TRUE(exp_poly.is_convex());

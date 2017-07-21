@@ -24,7 +24,7 @@
 #include <vector>
 #include "Eigen/Core"
 
-#include "modules/common/math/vec2d_utils.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
 
 namespace apollo {
@@ -55,7 +55,7 @@ class Spline2dKernel {
   // reference line kernel, x_coord in strictly increasing order
   bool add_reference_line_kernel_matrix(
       const std::vector<double>& t_coord,
-      const std::vector<common::Vec2D>& ref_points, const double weight);
+      const std::vector<common::math::Vec2d>& ref_points, const double weight);
 
  private:
   std::size_t find_index(const double x) const;

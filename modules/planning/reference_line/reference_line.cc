@@ -175,9 +175,8 @@ bool ReferenceLine::get_point_in_Frenet_frame(
   CHECK_NOTNULL(sl_point);
   double s = 0;
   double l = 0;
-  if (!_reference_map_line.get_nearest_point(
-          apollo::common::math::Vec2DCtor(xy_point.x(), xy_point.y()),
-          &s, &l)) {
+  if (!_reference_map_line.get_nearest_point({xy_point.x(), xy_point.y()}, &s,
+                                             &l)) {
     AERROR << "Can't get nearest point from path.";
     return false;
   }

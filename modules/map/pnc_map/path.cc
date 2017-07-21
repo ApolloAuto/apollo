@@ -24,14 +24,14 @@
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d_utils.h"
+#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace hdmap {
 
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Polygon2d;
-using apollo::common::Vec2D;
+using apollo::common::math::Vec2d;
 using apollo::common::math::Box2d;
 using apollo::common::math::kMathEpsilon;
 using apollo::common::math::Sqr;
@@ -79,7 +79,7 @@ std::string LaneSegment::debug_string() const {
 
 std::string PathPoint::debug_string() const {
   std::ostringstream sout;
-  sout << _point.DebugString() << "  heading = " << _heading
+  sout << "x = " << x_ << "  y = " << y_ << "  heading = " << _heading
        << "  lwp = {";
   bool first_lwp = true;
   for (const auto& lwp : _lane_waypoints) {
@@ -172,13 +172,12 @@ void Path::init_points() {
   double s = 0.0;
   for (int i = 0; i < _num_points; ++i) {
     _accumulated_s.push_back(s);
-    Vec2D heading;
+    Vec2d heading;
     if (i + 1 >= _num_points) {
-      heading = _path_points[i].point() - _path_points[i - 1].point();
+      heading = _path_points[i] - _path_points[i - 1];
     } else {
-      _segments.emplace_back(_path_points[i].point(),
-                             _path_points[i + 1].point());
-      heading = _path_points[i + 1].point() - _path_points[i].point();
+      _segments.emplace_back(_path_points[i], _path_points[i + 1]);
+      heading = _path_points[i + 1] - _path_points[i];
       // TODO(lianglia_apollo):
       // use heading.length when all adjacent lanes are guarantee to be
       // connected.
@@ -187,10 +186,10 @@ void Path::init_points() {
                             &lane_segment)) {
         s += lane_segment.end_s - lane_segment.start_s;
       } else {
-        s += apollo::common::math::VecLength(heading);
+        s += heading.Length();
       }
     }
-    apollo::common::math::VecNormalize(&heading);
+    heading.Normalize();
     _unit_directions.push_back(heading);
   }
   _length = s;
@@ -336,7 +335,7 @@ void Path::get_all_overlaps(
 */
 
 void Path::init_overlaps() {
-  // TODO(Liangliang): implement this function.
+  // TODO: implement this function. (Liangliang)
   /*
   get_all_overlaps(std::bind(&LaneInfo::cross_lanes, _1), &_lane_overlaps);
   get_all_overlaps(std::bind(&LaneInfo::signals, _1), &_signal_overlaps);
@@ -358,8 +357,9 @@ PathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
 
   const PathPoint& ref_point = _path_points[index.id];
   if (std::abs(index.offset) > kMathEpsilon) {
-    const Vec2D delta = _unit_directions[index.id] * index.offset;
-    PathPoint point(ref_point.point() + delta, ref_point.heading());
+    const Vec2d delta = _unit_directions[index.id] * index.offset;
+    PathPoint point({ref_point.x() + delta.x(), ref_point.y() + delta.y()},
+                    ref_point.heading());
     if (index.id < _num_segments) {
       const LaneSegment& lane_segment = _lane_segments_to_next_point[index.id];
       if (lane_segment.lane != nullptr) {
@@ -415,36 +415,34 @@ InterpolatedIndex Path::get_index_from_s(double s) const {
   return {low, s - _accumulated_s[low]};
 }
 
-bool Path::get_nearest_point(const Vec2D& point, double* accumulate_s,
+bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
                              double* lateral) const {
   double distance = 0.0;
   return get_nearest_point(point, accumulate_s, lateral, &distance);
 }
 
-bool Path::get_nearest_point(const Vec2D& point, double* accumulate_s,
+bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
                              double* lateral, double* min_distance) const {
   if (!get_projection(point, accumulate_s, lateral, min_distance)) {
     return false;
   }
   if (*accumulate_s < 0.0) {
     *accumulate_s = 0.0;
-    *min_distance = apollo::common::math::VecDistance(
-        point, _path_points[0].point());
+    *min_distance = point.DistanceTo(_path_points[0]);
   } else if (*accumulate_s > _length) {
     *accumulate_s = _length;
-    *min_distance = apollo::common::math::VecDistance(
-        point, _path_points.back().point());
+    *min_distance = point.DistanceTo(_path_points.back());
   }
   return true;
 }
 
-bool Path::get_projection(const apollo::common::Vec2D& point,
+bool Path::get_projection(const apollo::common::math::Vec2d& point,
                           double* accumulate_s, double* lateral) const {
   double distance = 0.0;
   return get_projection(point, accumulate_s, lateral, &distance);
 }
 
-bool Path::get_projection(const Vec2D& point, double* accumulate_s,
+bool Path::get_projection(const Vec2d& point, double* accumulate_s,
                           double* lateral, double* min_distance) const {
   if (_segments.empty()) {
     return false;
@@ -470,9 +468,8 @@ bool Path::get_projection(const Vec2D& point, double* accumulate_s,
       }
       if (proj > segment.length() && i + 1 < _num_segments) {
         const auto& next_segment = _segments[i + 1];
-        if (apollo::common::math::VecInnerProd(point - next_segment.start(),
-                                               next_segment.unit_direction())
-            >= 0.0) {
+        if ((point - next_segment.start())
+                .InnerProd(next_segment.unit_direction()) >= 0.0) {
           continue;
         }
       }
@@ -494,7 +491,7 @@ bool Path::get_projection(const Vec2D& point, double* accumulate_s,
   return true;
 }
 
-bool Path::get_heading_along_path(const Vec2D& point, double* heading) const {
+bool Path::get_heading_along_path(const Vec2d& point, double* heading) const {
   if (heading == nullptr) {
     return false;
   }
@@ -544,7 +541,7 @@ double Path::get_sample(const std::vector<double>& samples,
   return samples[idx] * (1.0 - ratio) + samples[idx + 1] * ratio;
 }
 
-bool Path::is_on_path(const Vec2D& point) const {
+bool Path::is_on_path(const Vec2d& point) const {
   double accumulate_s = 0.0;
   double lateral = 0.0;
   if (!get_projection(point, &accumulate_s, &lateral)) {
@@ -562,7 +559,7 @@ bool Path::is_on_path(const Vec2D& point) const {
 }
 
 bool Path::is_on_path(const Box2d& box) const {
-  std::vector<Vec2D> corners;
+  std::vector<Vec2d> corners;
   box.GetAllCorners(&corners);
   for (const auto& corner : corners) {
     if (!is_on_path(corner)) {
@@ -577,7 +574,7 @@ bool Path::overlap_with(const apollo::common::math::Box2d& box,
   if (_use_path_approximation) {
     return _approximation.overlap_with(*this, box, width);
   }
-  const Vec2D center = box.center();
+  const Vec2d center = box.center();
   const double radius_sqr = Sqr(box.diagonal() / 2.0 + width) + kMathEpsilon;
   for (const auto& segment : _segments) {
     if (segment.DistanceSquareTo(center) > radius_sqr) {
@@ -596,11 +593,11 @@ double PathApproximation::compute_max_error(const Path& path, const int s,
     return 0.0;
   }
   const auto& points = path.path_points();
-  const LineSegment2d segment(points[s].point(), points[t].point());
+  const LineSegment2d segment(points[s], points[t]);
   double max_distance_sqr = 0.0;
   for (int i = s + 1; i < t; ++i) {
     max_distance_sqr =
-        std::max(max_distance_sqr, segment.DistanceSquareTo(points[i].point()));
+        std::max(max_distance_sqr, segment.DistanceSquareTo(points[i]));
   }
   return sqrt(max_distance_sqr);
 }
@@ -611,9 +608,9 @@ bool PathApproximation::is_within_max_error(const Path& path, const int s,
     return true;
   }
   const auto& points = path.path_points();
-  const LineSegment2d segment(points[s].point(), points[t].point());
+  const LineSegment2d segment(points[s], points[t]);
   for (int i = s + 1; i < t; ++i) {
-    if (segment.DistanceSquareTo(points[i].point()) > _max_sqr_error) {
+    if (segment.DistanceSquareTo(points[i]) > _max_sqr_error) {
       return false;
     }
   }
@@ -656,8 +653,8 @@ void PathApproximation::init_dilute(const Path& path) {
   _segments.clear();
   _segments.reserve(_num_points - 1);
   for (int i = 0; i < _num_points - 1; ++i) {
-    _segments.emplace_back(path.path_points()[_original_ids[i]].point(),
-                           path.path_points()[_original_ids[i + 1]].point());
+    _segments.emplace_back(path.path_points()[_original_ids[i]],
+                           path.path_points()[_original_ids[i + 1]]);
   }
   _max_error_per_segment.clear();
   _max_error_per_segment.reserve(_num_points - 1);
@@ -688,8 +685,7 @@ void PathApproximation::init_projections(const Path& path) {
     if (i + 1 < _projections.size()) {
       const auto& segment = _segments[i];
       for (int idx = _original_ids[i] + 1; idx < _original_ids[i + 1]; ++idx) {
-        const double proj = segment.ProjectOntoUnit(
-            original_points[idx].point());
+        const double proj = segment.ProjectOntoUnit(original_points[idx]);
         _original_projections.push_back(
             _projections[i] + std::max(0.0, std::min(proj, segment.length())));
       }
@@ -741,7 +737,7 @@ void PathApproximation::init_projections(const Path& path) {
 }
 
 bool PathApproximation::get_projection(const Path& path,
-                                       const Vec2D& point,
+                                       const apollo::common::math::Vec2d& point,
                                        double* accumulate_s, double* lateral,
                                        double* min_distance) const {
   if (_num_points == 0) {
@@ -840,8 +836,7 @@ bool PathApproximation::get_projection(const Path& path,
         if (idx != last_segment_idx) {
           continue;
         }
-        distance = apollo::common::math::VecDistance(original_segment.end(),
-                                                     point);
+        distance = original_segment.end().DistanceTo(point);
       }
       if (distance < *min_distance) {
         min_distance_updated = true;
@@ -881,7 +876,7 @@ bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
   if (_num_points == 0) {
     return false;
   }
-  const Vec2D center = box.center();
+  const Vec2d center = box.center();
   const double radius = box.diagonal() / 2.0 + width;
   const double radius_sqr = Sqr(radius);
   const auto& original_segments = path.segments();

@@ -24,7 +24,7 @@
 #include <vector>
 #include "Eigen/Core"
 
-#include "modules/common/math/vec2d_utils.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/math/smoothing_spline/affine_constraint.h"
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
 
@@ -50,28 +50,28 @@ class Spline2dConstraint {
   **/
   bool add_2d_boundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
-      const std::vector<apollo::common::Vec2D>& ref_point,
+      const std::vector<apollo::common::math::Vec2d>& ref_point,
       const std::vector<double>& longitidinal_bound,
       const std::vector<double>& lateral_bound);
 
   // ref point refer to derivative reference point
   bool add_2d_derivative_boundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
-      const std::vector<apollo::common::Vec2D>& ref_point,
+      const std::vector<apollo::common::math::Vec2d>& ref_point,
       const std::vector<double>& longitidinal_bound,
       const std::vector<double>& lateral_bound);
 
   // ref point refer to second derivative ref point
   bool add_2d_second_derivative_boundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
-      const std::vector<apollo::common::Vec2D>& ref_point,
+      const std::vector<apollo::common::math::Vec2d>& ref_point,
       const std::vector<double>& longitidinal_bound,
       const std::vector<double>& lateral_bound);
 
   // ref point refer to third derivative ref point
   bool add_2d_third_derivative_boundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
-      const std::vector<apollo::common::Vec2D>& ref_point,
+      const std::vector<apollo::common::math::Vec2d>& ref_point,
       const std::vector<double>& longitidinal_bound,
       const std::vector<double>& lateral_bound);
 
@@ -109,7 +109,7 @@ class Spline2dConstraint {
   std::vector<double> derivative_coef(const double t) const;
   std::vector<double> second_derivative_coef(const double t) const;
   std::vector<double> third_derivative_coef(const double t) const;
-  double sign_distance(const apollo::common::Vec2D& xy_point,
+  double sign_distance(const apollo::common::math::Vec2d& xy_point,
                        const double angle) const;
 
  private:

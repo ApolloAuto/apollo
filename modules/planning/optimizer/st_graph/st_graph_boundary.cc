@@ -28,41 +28,43 @@ namespace apollo {
 namespace planning {
 
 using STPoint = apollo::common::STPoint;
-using Vec2d = apollo::common::Vec2D;
+using Vec2d = apollo::common::math::Vec2d;
 
 STGraphBoundary::STGraphBoundary(const std::vector<STPoint>& points)
     : _boundary_type(BoundaryType::UNKNOWN) {
   CHECK_GE(points.size(), 4);
   for (const auto& point : points) {
-    points_.push_back(apollo::common::math::Vec2DCtor(point.t(), point.s()));
+    points_.emplace_back(point.t(), point.s());
   }
   BuildFromPoints();
 }
 
 STGraphBoundary::STGraphBoundary(
-    const std::vector<::apollo::common::Vec2D>& points)
+    const std::vector<::apollo::common::math::Vec2d>& points)
     : Polygon2d(points), _boundary_type(BoundaryType::UNKNOWN) {
   CHECK_GE(points.size(), 4);
 }
 
 bool STGraphBoundary::IsPointInBoundary(
     const STGraphPoint& st_graph_point) const {
-  auto vec2d = apollo::common::math::Vec2DCtor(st_graph_point.point().t(),
-                                               st_graph_point.point().s());
+  ::apollo::common::math::Vec2d vec2d = {st_graph_point.point().t(),
+                                         st_graph_point.point().s()};
   return IsPointIn(vec2d);
 }
 
 bool STGraphBoundary::IsPointInBoundary(const STPoint& st_point) const {
-  auto vec2d = apollo::common::math::Vec2DCtor(st_point.t(), st_point.s());
+  ::apollo::common::math::Vec2d vec2d = {st_point.t(), st_point.s()};
   return IsPointIn(vec2d);
 }
 
-const ::apollo::common::Vec2D STGraphBoundary::point(const size_t index) const {
+const ::apollo::common::math::Vec2d STGraphBoundary::point(
+    const size_t index) const {
   CHECK_LT(index, points_.size());
   return points_[index];
 }
 
-const std::vector<::apollo::common::Vec2D>& STGraphBoundary::points() const {
+const std::vector<::apollo::common::math::Vec2d>& STGraphBoundary::points()
+    const {
   return points_;
 }
 
@@ -93,8 +95,7 @@ bool STGraphBoundary::get_s_boundary_position(const double curr_time,
                                               double* s_upper,
                                               double* s_lower) const {
   const ::apollo::common::math::LineSegment2d segment = {
-      apollo::common::math::Vec2DCtor(curr_time, 0.0),
-      apollo::common::math::Vec2DCtor(curr_time, _s_high_limit)};
+      Vec2d(curr_time, 0.0), Vec2d(curr_time, _s_high_limit)};
   *s_upper = _s_high_limit;
   *s_lower = 0.0;
 
@@ -121,8 +122,7 @@ bool STGraphBoundary::get_boundary_s_range_by_time(const double curr_time,
                                                    double* s_upper,
                                                    double* s_lower) const {
   const ::apollo::common::math::LineSegment2d segment = {
-      apollo::common::math::Vec2DCtor(curr_time, 0.0),
-      apollo::common::math::Vec2DCtor(curr_time, _s_high_limit)};
+      Vec2d(curr_time, 0.0), Vec2d(curr_time, _s_high_limit)};
   *s_upper = _s_high_limit;
   *s_lower = 0.0;
 

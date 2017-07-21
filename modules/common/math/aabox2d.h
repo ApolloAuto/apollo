@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/math/vec2d_utils.h"
+#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::common::math
@@ -54,26 +54,26 @@ class AABox2d {
    * @param length The size of the box along the x-axis
    * @param width The size of the box along the y-axis
    */
-  AABox2d(const Vec2D &center, const double length, const double width);
+  AABox2d(const Vec2d &center, const double length, const double width);
   /**
    * @brief Parametrized constructor.
    * Creates an axes-aligned box from two opposite corners.
    * @param one_corner One corner of the box
    * @param opposite_corner The opposite corner to the first one
    */
-  AABox2d(const Vec2D &one_corner, const Vec2D &opposite_corner);
+  AABox2d(const Vec2d &one_corner, const Vec2d &opposite_corner);
   /**
    * @brief Parametrized constructor.
    * Creates an axes-aligned box containing all points in a given vector.
    * @param points Vector of points to be included inside the box.
    */
-  explicit AABox2d(const std::vector<Vec2D> &points);
+  explicit AABox2d(const std::vector<Vec2d> &points);
 
   /**
    * @brief Getter of center_
    * @return Center of the box
    */
-  const Vec2D &center() const { return center_; }
+  const Vec2d &center() const { return center_; }
 
   /**
   * @brief Getter of x-component of center_
@@ -150,28 +150,28 @@ class AABox2d {
   *
   * @param corners Output where the corners are written
   */
-  void GetAllCorners(std::vector<Vec2D> *const corners) const;
+  void GetAllCorners(std::vector<Vec2d> *const corners) const;
 
   /**
   * @brief Determines whether a given point is in the box.
   *
   * @param point The point we wish to test for containment in the box
   */
-  bool IsPointIn(const Vec2D &point) const;
+  bool IsPointIn(const Vec2d &point) const;
 
   /**
   * @brief Determines whether a given point is on the boundary of the box.
   *
   * @param point The point we wish to test for boundary membership
   */
-  bool IsPointOnBoundary(const Vec2D &point) const;
+  bool IsPointOnBoundary(const Vec2d &point) const;
 
   /**
   * @brief Determines the distance between a point and the box.
   *
   * @param point The point whose distance to the box we wish to determine.
   */
-  double DistanceTo(const Vec2D &point) const;
+  double DistanceTo(const Vec2d &point) const;
 
   /**
   * @brief Determines the distance between two boxes.
@@ -192,7 +192,7 @@ class AABox2d {
   *
   * @param shift_vec The vector by which we wish to shift the box
   */
-  void Shift(const Vec2D &shift_vec);
+  void Shift(const Vec2d &shift_vec);
 
   /**
   * @brief Changes box to include another given box, as well as the current one.
@@ -206,7 +206,7 @@ class AABox2d {
   *
   * @param other_point Another point
   */
-  void MergeFrom(const Vec2D &other_point);
+  void MergeFrom(const Vec2d &other_point);
 
   /**
   * @brief Gets a human-readable debug string
@@ -216,7 +216,7 @@ class AABox2d {
   std::string DebugString() const;
 
  private:
-  Vec2D center_;
+  Vec2d center_;
   double length_ = 0.0;
   double width_ = 0.0;
   double half_length_ = 0.0;
