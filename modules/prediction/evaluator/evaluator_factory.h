@@ -38,7 +38,7 @@ namespace apollo {
 namespace prediction {
 
 class EvaluatorFactory
-    : public apollo::common::util::Factory<ObstacleConf::Eval,
+    : public apollo::common::util::Factory<ObstacleConf::EvaluatorType,
                                            Evaluator> {
  public:
   /**
@@ -51,7 +51,8 @@ class EvaluatorFactory
    * @param Evaluator name
    * @return A pointer to the given evaluator
    */
-  std::unique_ptr<Evaluator> CreateEvaluator(const ObstacleConf::Eval& eval);
+  std::unique_ptr<Evaluator> CreateEvaluator(
+      const ObstacleConf::EvaluatorType& eval);
 
  private:
   DECLARE_SINGLETON(EvaluatorFactory);

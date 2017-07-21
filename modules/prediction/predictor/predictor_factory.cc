@@ -16,6 +16,9 @@
 
 #include "modules/prediction/predictor/predictor_factory.h"
 
+#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
+#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -24,17 +27,19 @@ namespace prediction {
 PredictorFactory::PredictorFactory() {}
 
 void PredictorFactory::RegisterPredictor() {
-    Register(ObstacleConf::DEF_VEHICLE_PRED,
-        []() -> Predictor* { return nullptr; });
+    Register(ObstacleConf::LANE_SEQUENCE_PREDICTOR,
+        []() -> Predictor* { return new LaneSequencePredictor(); });
+    Register(ObstacleConf::FREE_MOVE_PREDICTOR,
+        []() -> Predictor* { return new FreeMovePredictor(); });
 }
 
 std::unique_ptr<Predictor> PredictorFactory::CreatePredictor(
-    const ObstacleConf::Pred& pred) {
-  auto predictor = CreateObject(pred);
+    const ObstacleConf::PredictorType& type) {
+  auto predictor = CreateObject(type);
   if (!predictor) {
-    AERROR << "Failed to create a predictor with " << pred;
+    AERROR << "Failed to create a predictor with " << type;
   } else {
-    ADEBUG << "Succeeded in creating a predictor with " << pred;
+    ADEBUG << "Succeeded in creating a predictor with " << type;
   }
   return predictor;
 }

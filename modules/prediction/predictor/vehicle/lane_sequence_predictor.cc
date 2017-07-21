@@ -19,5 +19,7 @@
 namespace apollo {
 namespace prediction {
 
+void LaneSequencePredictor::Predict() const {}
+
 }  // prediction
 }  // apollo

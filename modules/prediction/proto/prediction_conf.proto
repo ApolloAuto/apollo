@@ -2,31 +2,23 @@ syntax = "proto2";
 
 package apollo.prediction;
 
+import "modules/perception/proto/perception_obstacle.proto";
+
 message ObstacleConf {
-  enum Type {
-    VEHICLE = 0;
-    PERDESTRIAN = 1;
+  enum EvaluatorType {
+    MLP_EVALUATOR = 0;
   }
 
-  enum Eval {
-    MLP_EVAL = 0;
+  enum PredictorType {
+    LANE_SEQUENCE_PREDICTOR = 0;
+    FREE_MOVE_PREDICTOR = 1;
   }
 
-  enum Model {
-    DEF_VEHICLE_MODEL = 0;
-  }
-
-  enum Pred {
-    DEF_VEHICLE_PRED = 0;
-    DEF_PEDESTRIAN_PRED = 1;
-  }
-
-  optional Type type = 1;
-  optional Eval eval = 2;
-  optional Model model = 3;
-  optional Pred pred = 4;
+  optional apollo.perception.PerceptionObstacle.Type obstacle_type = 1;
+  optional EvaluatorType evaluator_type = 2;
+  optional PredictorType predictor_type = 3;
 }
 
 message PredictionConf {
-  optional ObstacleConf obstacle_conf = 1; 
+  repeated ObstacleConf obstacle_conf = 1; 
 }

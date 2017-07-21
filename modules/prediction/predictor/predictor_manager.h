@@ -26,6 +26,8 @@
 
 #include "modules/prediction/predictor/predictor.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/common/macro.h"
 
 /**
@@ -46,10 +48,23 @@ class PredictorManager {
    * @brief Get predictor
    * @return Pointer to the predictor
    */
-  const Predictor* GetPredictor();
+  Predictor* GetPredictor(const ObstacleConf::PredictorType& type);
 
+  /**
+   * @brief Execute the predictor generation on perception obstacles
+   * @param Perception obstacles
+   */
   void Run(
       const ::apollo::perception::PerceptionObstacles& perception_obstacles);
+
+  /**
+   * @brief Get prediction obstacles
+   * @return Prediction obstacles
+   */
+  const PredictionObstacles& prediction_obstacles();
+
+ private:
+  PredictionObstacles prediction_obstacles_;
 
   DECLARE_SINGLETON(PredictorManager)
 };

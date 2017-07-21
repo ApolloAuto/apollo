@@ -19,5 +19,7 @@
 namespace apollo {
 namespace prediction {
 
+void FreeMovePredictor::Predict() const {}
+
 }  // prediction
 }  // apollo
