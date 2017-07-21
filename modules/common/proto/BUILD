@@ -4,13 +4,6 @@ load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
 load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
 
 cc_proto_library(
-    name = "vector_proto",
-    protos = [
-        "vector.proto",
-    ],
-)
-
-cc_proto_library(
     name = "error_code_proto",
     protos = [
         "error_code.proto",
