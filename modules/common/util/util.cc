@@ -21,6 +21,7 @@ namespace common {
 namespace util {
 
 using STPoint = apollo::common::STPoint;
+using SLPoint = apollo::common::SLPoint;
 
 bool EndWith(const std::string &original, const std::string &pattern) {
   return original.length() >= pattern.length() &&
@@ -32,6 +33,13 @@ STPoint MakeSTPoint(const double s, const double t) {
   st.set_s(s);
   st.set_t(t);
   return st;
+}
+
+SLPoint MakeSLPoint(const double s, const double l) {
+  SLPoint sl;
+  sl.set_s(s);
+  sl.set_l(l);
+  return sl;
 }
 
 }  // namespace util

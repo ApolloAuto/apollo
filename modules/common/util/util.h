@@ -44,6 +44,7 @@ namespace util {
  */
 bool EndWith(const std::string &original, const std::string &pattern);
 apollo::common::STPoint MakeSTPoint(const double s, const double t);
+apollo::common::SLPoint MakeSLPoint(const double s, const double l);
 
 }  // namespace util
 }  // namespace common
