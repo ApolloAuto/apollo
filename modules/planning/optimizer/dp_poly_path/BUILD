@@ -3,7 +3,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "dp_poly_path",
     srcs = [
-        "dp_poly_path_config.cc",
         "dp_road_graph.cc",
         "graph_edge.cc",
         "graph_vertex.cc",
@@ -11,7 +10,6 @@ cc_library(
         "trajectory_cost.cc",
     ],
     hdrs = [
-        "dp_poly_path_config.h",
         "dp_road_graph.h",
         "graph_edge.h",
         "graph_vertex.h",
@@ -19,7 +17,6 @@ cc_library(
         "trajectory_cost.h",
     ],
     deps = [
-        "@eigen//:eigen",
         "//modules/common/math",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:data_center",
@@ -33,6 +30,8 @@ cc_library(
         "//modules/planning/math:sl_analytic_transformation",
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
+        "//modules/planning/proto:dp_poly_path_config_proto",
         "//modules/planning/reference_line",
+        "@eigen//:eigen",
     ],
 )
