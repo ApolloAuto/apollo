@@ -43,7 +43,6 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
     return Status(ErrorCode::CONTROL_INIT_ERROR, "Failed to load config");
   }
   control_conf_ = control_conf;
-  AINFO << control_conf_->DebugString();
   for (auto controller_type : control_conf_->active_controllers()) {
     auto controller = controller_factory_.CreateObject(
         static_cast<ControlConf::ControllerType>(controller_type));
