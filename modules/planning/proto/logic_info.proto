@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/common/proto/vector.proto";
+
+message LogicPoint {
+    optional apollo.common.Vec2D pos = 1;
+    optional double s = 2;
+    optional double heading = 3;
+    optional double kappa = 4;
+    optional double dkappa = 5;
+    optional string lane_id = 6;
+}
+
+message LogicInfo {
+    repeated LogicPoint reference_line_1 = 1;
+    repeated LogicPoint reference_line_2 = 2;
+}
