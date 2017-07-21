@@ -16,6 +16,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
+        "//modules/common/proto:path_point_proto",
         "//modules/common/time",
     ],
 )

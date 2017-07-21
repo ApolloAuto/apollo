@@ -66,6 +66,7 @@ cc_library(
         "planning_object.h",
     ],
     deps = [
+        ":decision",
         "//modules/common/math:polygon2d",
         "//modules/planning/proto:planning_proto",
     ],
@@ -100,9 +101,9 @@ cc_library(
     deps = [
         ":decision_data",
         "//modules/common/proto:path_point_proto",
+        "//modules/map/proto:map_proto",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
-        "//modules/map/proto:map_proto",
         "@eigen//:eigen",
     ],
 )
@@ -121,7 +122,7 @@ cc_library(
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/math:double",
-    ]
+    ],
 )
 
 cc_library(
@@ -159,8 +160,8 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
-        "//modules/planning/proto:planning_proto",
         "//modules/planning/common/speed:speed_data",
+        "//modules/planning/proto:planning_proto",
     ],
 )
 
@@ -195,15 +196,15 @@ cc_library(
 cc_library(
     name = "planning_common",
     deps = [
-        "@eigen//:eigen",
         ":data_center",
+        ":em_planning_data",
         ":frame",
         ":planning_gflags",
         ":speed_limit",
-        ":em_planning_data",
         "//modules/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
+        "@eigen//:eigen",
     ],
 )
 
