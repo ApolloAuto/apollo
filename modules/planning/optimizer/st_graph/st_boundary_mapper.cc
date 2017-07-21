@@ -24,7 +24,6 @@
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 

@@ -23,7 +23,6 @@
 
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 

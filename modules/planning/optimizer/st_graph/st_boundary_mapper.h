@@ -27,7 +27,6 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed_limit.h"
@@ -46,9 +45,9 @@ class StBoundaryMapper {
   virtual ~StBoundaryMapper() = default;
 
   virtual common::ErrorCode get_graph_boundary(
-      const DataCenter& data_center, const DecisionData& decision_data,
-      const PathData& path_data, const double planning_distance,
-      const double planning_time,
+      const common::TrajectoryPoint& initial_planning_point,
+      const DecisionData& decision_data, const PathData& path_data,
+      const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const = 0;
 
   virtual common::ErrorCode get_speed_limits(

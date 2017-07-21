@@ -27,7 +27,6 @@
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/decision_data.h"
 
 namespace apollo {
@@ -41,16 +40,16 @@ class QpSplineStBoundaryMapper : public StBoundaryMapper {
 
   // TODO: combine two interfaces together to provide a st graph data type
   virtual common::ErrorCode get_graph_boundary(
-      const DataCenter& data_center, const DecisionData& decision_data,
-      const PathData& path_data, const double planning_distance,
-      const double planning_time,
+      const common::TrajectoryPoint& initial_planning_point,
+      const DecisionData& decision_data, const PathData& path_data,
+      const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const override;
 
  private:
   common::ErrorCode map_obstacle_with_trajectory(
-      const DataCenter& data_center, const Obstacle& obstacle,
-      const PathData& path_data, const double planning_distance,
-      const double planning_time,
+      const common::TrajectoryPoint& initial_planning_point,
+      const Obstacle& obstacle, const PathData& path_data,
+      const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const;
 
   common::ErrorCode map_obstacle_without_trajectory(

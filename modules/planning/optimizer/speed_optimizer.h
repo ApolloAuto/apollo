@@ -24,8 +24,6 @@
 #include "modules/planning/optimizer/optimizer.h"
 
 #include "modules/common/proto/error_code.pb.h"
-
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_data.h"
@@ -38,8 +36,7 @@ class SpeedOptimizer : public Optimizer {
  public:
   explicit SpeedOptimizer(const std::string& name);
   virtual ~SpeedOptimizer() = default;
-  virtual common::ErrorCode optimize(const DataCenter& data_center,
-                                     const PathData& path_data,
+  virtual common::ErrorCode optimize(const PathData& path_data,
                                      const TrajectoryPoint& init_point,
                                      DecisionData* const decision_data,
                                      SpeedData* const speed_data) const = 0;

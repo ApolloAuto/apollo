@@ -51,7 +51,7 @@ cc_library(
         "prediction_trajectory.h",
     ],
     deps = [
-        "//modules/common/proto:path_point_proto",
         ":discretized_trajectory",
+        "//modules/common/proto:path_point_proto",
     ],
 )

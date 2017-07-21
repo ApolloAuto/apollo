@@ -23,10 +23,7 @@
 namespace apollo {
 namespace planning {
 
-PathOptimizer::PathOptimizer(const std::string &name) : Optimizer(name) {
-}
+PathOptimizer::PathOptimizer(const std::string &name) : Optimizer(name) {}
 
 }  // namespace planning
 }  // namespace adu
-
-
