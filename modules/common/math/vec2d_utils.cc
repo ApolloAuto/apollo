@@ -28,27 +28,19 @@ constexpr double kMathEpsilon = 1e-10;
 
 //! Sums two Vec2D
 Vec2D operator+(const Vec2D &v0, const Vec2D &v1) {
-  Vec2D ret;
-  ret.set_x(v0.x() + v1.x());
-  ret.set_y(v0.y() + v1.y());
-  return ret;
+  return common::math::Vec2DCtor(v0.x() + v1.x(), v0.y() + v1.y());
 }
 
 //! Subtracts two Vec2D
 Vec2D operator-(const Vec2D &v0, const Vec2D &v1) {
-  Vec2D ret;
-  ret.set_x(v0.x() - v1.x());
-  ret.set_y(v0.y() - v1.y());
-  return ret;
+  return common::math::Vec2DCtor(v0.x() - v1.x(), v0.y() - v1.y());
 }
 
 //! Multiplies Vec2D by a scalar
 Vec2D operator*(const Vec2D &v, const double ratio) {
-  Vec2D ret;
-  ret.set_x(v.x() * ratio);
-  ret.set_y(v.y() * ratio);
-  return ret;
+  return common::math::Vec2DCtor(v.x() * ratio, v.y() * ratio);
 }
+
 Vec2D operator*(const double ratio, const Vec2D &v) {
   return v * ratio;
 }
@@ -56,10 +48,7 @@ Vec2D operator*(const double ratio, const Vec2D &v) {
 //! Divides Vec2D by a scalar
 Vec2D operator/(const Vec2D &v, const double ratio) {
   CHECK_GT(std::abs(ratio), kMathEpsilon) << "Devides by 0!";
-  Vec2D ret;
-  ret.set_x(v.x() / ratio);
-  ret.set_y(v.y() / ratio);
-  return ret;
+  return common::math::Vec2DCtor(v.x() / ratio, v.y() / ratio);
 }
 
 //! Sums another Vec2D to the current one
@@ -100,12 +89,16 @@ bool operator==(const Vec2D &v0, const Vec2D &v1) {
 namespace common {
 namespace math {
 
+Vec2D Vec2DCtor(const double x, const double y) {
+  Vec2D ret;
+  ret.set_x(x);
+  ret.set_y(y);
+  return ret;
+}
+
 //! Creates a unit-vector with a given angle to the positive x semi-axis
 Vec2D Vec2DUnit(const double angle) {
-  Vec2D ret;
-  ret.set_x(cos(angle));
-  ret.set_y(sin(angle));
-  return ret;
+  return Vec2DCtor(cos(angle), sin(angle));
 }
 
 //! Gets the length of the vector

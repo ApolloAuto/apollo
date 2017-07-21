@@ -150,7 +150,7 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_2d",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:vec2d_utils",
         "@eigen//:eigen",
     ],
 )
@@ -166,7 +166,7 @@ cc_library(
     deps = [
         ":spline_2d",
         ":spline_seg_kernel",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:vec2d_utils",
         "@eigen//:eigen",
     ],
 )
@@ -183,7 +183,7 @@ cc_library(
         ":spline_2d",
         ":spline_2d_constraint",
         ":spline_2d_kernel",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:vec2d_utils",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen//:eigen",

@@ -19,11 +19,11 @@
 #include <vector>
 
 #include "modules/common/math/box2d.h"
-#include "modules/common/math/vec2d.h"
+#include "modules/common/math/vec2d_utils.h"
 
 using ::apollo::common::config::VehicleConfigHelper;
 using ::apollo::common::math::Box2d;
-using ::apollo::common::math::Vec2d;
+using ::apollo::common::Vec2D;
 using ::apollo::common::TrajectoryPoint;
 
 namespace apollo {
@@ -42,10 +42,11 @@ void TrajectoryPointCollector::Collect(const TrajectoryPoint &point) {
     const auto &vehicle_param =
         VehicleConfigHelper::GetConfig().vehicle_param();
     Box2d trajectory_box(
-        {previous_.path_point().x(), previous_.path_point().y()},
+        apollo::common::math::Vec2DCtor(previous_.path_point().x(),
+                                        previous_.path_point().y()),
         trajectory->heading(), vehicle_param.length(), vehicle_param.width());
 
-    std::vector<Vec2d> corners;
+    std::vector<Vec2D> corners;
     trajectory_box.GetAllCorners(&corners);
     for (const auto &corner : corners) {
       PolygonPoint *polygon_point = trajectory->add_polygon_point();

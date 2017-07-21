@@ -37,7 +37,7 @@ bool CheckBoxOverlapSlow(const Box2d &box1, const Box2d &box2,
     const double heading = headings[k];
     const double cos_heading = cos(heading);
     const double sin_heading = sin(heading);
-    std::vector<Vec2d> c1, c2;
+    std::vector<Vec2D> c1, c2;
     box1.GetAllCorners(&c1);
     box2.GetAllCorners(&c2);
     double s1 = std::numeric_limits<double>::infinity();
@@ -64,29 +64,29 @@ bool CheckBoxOverlapSlow(const Box2d &box1, const Box2d &box2,
   return true;
 }
 
-Box2d box1({0, 0}, 0, 4, 2);
-Box2d box2({5, 2}, 0, 4, 2);
-Box2d box3(LineSegment2d({2, 3}, {6, 3}), 2);
-Box2d box4({7, 8}, M_PI_4, 5.0, 3.0);
-Box2d box5({-2, -3}, -M_PI, 0.0, 0.0);
-Box2d box6(LineSegment2d({2, 3}, {6, 3}), 0.0);
-Box2d box7(AABox2d({4, 5}, 0, 0));
+Box2d box1(Vec2DCtor(0, 0), 0, 4, 2);
+Box2d box2(Vec2DCtor(5, 2), 0, 4, 2);
+Box2d box3(LineSegment2d(Vec2DCtor(2, 3), Vec2DCtor(6, 3)), 2);
+Box2d box4(Vec2DCtor(7, 8), M_PI_4, 5.0, 3.0);
+Box2d box5(Vec2DCtor(-2, -3), -M_PI, 0.0, 0.0);
+Box2d box6(LineSegment2d(Vec2DCtor(2, 3), Vec2DCtor(6, 3)), 0.0);
+Box2d box7(AABox2d(Vec2DCtor(4, 5), 0, 0));
 
 }  // namespace
 
 TEST(Box2dTest, DebugString) {
-  Box2d box1({0, 0}, 0, 4, 2);
-  Box2d box2({5, 2}, 0, 4, 2);
+  Box2d box1(Vec2DCtor(0, 0), 0, 4, 2);
+  Box2d box2(Vec2DCtor(5, 2), 0, 4, 2);
   EXPECT_EQ(box1.DebugString(),
-            "box2d ( center = vec2d ( x = 0  y = 0 )  heading = 0  length = 4  "
-            "width = 2 )");
+            "box2d ( center = x: 0\ny: 0\n  heading = 0  length = 4 "
+            " width = 2 )");
   EXPECT_EQ(box2.DebugString(),
-            "box2d ( center = vec2d ( x = 5  y = 2 )  heading = 0  length = 4  "
+            "box2d ( center = x: 5\ny: 2\n  heading = 0  length = 4  "
             "width = 2 )");
 }
 
 TEST(Box2dTest, GetAllCorners) {
-  std::vector<Vec2d> corners1;
+  std::vector<Vec2D> corners1;
   box1.GetAllCorners(&corners1);
   EXPECT_NEAR(corners1[0].x(), 2.0, 1e-5);
   EXPECT_NEAR(corners1[0].y(), -1.0, 1e-5);
@@ -97,7 +97,7 @@ TEST(Box2dTest, GetAllCorners) {
   EXPECT_NEAR(corners1[3].x(), -2.0, 1e-5);
   EXPECT_NEAR(corners1[3].y(), -1.0, 1e-5);
 
-  std::vector<Vec2d> corners2;
+  std::vector<Vec2D> corners2;
   box3.GetAllCorners(&corners2);
   EXPECT_NEAR(corners2[0].x(), 6.0, 1e-5);
   EXPECT_NEAR(corners2[0].y(), 2.0, 1e-5);
@@ -126,14 +126,22 @@ TEST(Box2dTest, HasOverlap) {
   EXPECT_FALSE(box2.HasOverlap(box4));
   EXPECT_FALSE(box3.HasOverlap(box4));
 
-  EXPECT_TRUE(box1.HasOverlap(LineSegment2d({0, 0}, {1, 1})));
-  EXPECT_TRUE(box1.HasOverlap(LineSegment2d({0, 0}, {3, 3})));
-  EXPECT_TRUE(box1.HasOverlap(LineSegment2d({0, -3}, {0, 3})));
-  EXPECT_TRUE(box1.HasOverlap(LineSegment2d({4, 0}, {-4, 0})));
-  EXPECT_TRUE(box1.HasOverlap(LineSegment2d({-4, -4}, {4, 4})));
-  EXPECT_TRUE(box1.HasOverlap(LineSegment2d({4, -4}, {-4, 4})));
-  EXPECT_FALSE(box1.HasOverlap(LineSegment2d({-4, -4}, {4, -4})));
-  EXPECT_FALSE(box1.HasOverlap(LineSegment2d({4, -4}, {4, 4})));
+  EXPECT_TRUE(box1.HasOverlap(
+      LineSegment2d(Vec2DCtor(0, 0), Vec2DCtor(1, 1))));
+  EXPECT_TRUE(box1.HasOverlap(
+      LineSegment2d(Vec2DCtor(0, 0), Vec2DCtor(3, 3))));
+  EXPECT_TRUE(box1.HasOverlap(
+      LineSegment2d(Vec2DCtor(0, -3), Vec2DCtor(0, 3))));
+  EXPECT_TRUE(box1.HasOverlap(
+      LineSegment2d(Vec2DCtor(4, 0), Vec2DCtor(-4, 0))));
+  EXPECT_TRUE(box1.HasOverlap(
+      LineSegment2d(Vec2DCtor(-4, -4), Vec2DCtor(4, 4))));
+  EXPECT_TRUE(box1.HasOverlap(
+      LineSegment2d(Vec2DCtor(4, -4), Vec2DCtor(-4, 4))));
+  EXPECT_FALSE(box1.HasOverlap(
+      LineSegment2d(Vec2DCtor(-4, -4), Vec2DCtor(4, -4))));
+  EXPECT_FALSE(box1.HasOverlap(
+      LineSegment2d(Vec2DCtor(4, -4), Vec2DCtor(4, 4))));
 }
 
 TEST(Box2dTest, GetAABox) {
@@ -160,47 +168,51 @@ TEST(Box2dTest, GetAABox) {
 }
 
 TEST(Box2dTest, DistanceTo) {
-  EXPECT_NEAR(box1.DistanceTo({3, 0}), 1.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo({-3, 0}), 1.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo({0, 2}), 1.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo({0, -2}), 1.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo({0, 0}), 0.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo({0, 1}), 0.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo({1, 0}), 0.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo({0, -1}), 0.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo({-1, 0}), 0.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(3, 0)), 1.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(-3, 0)), 1.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(0, 2)), 1.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(0, -2)), 1.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(0, 0)), 0.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(0, 1)), 0.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(1, 0)), 0.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(0, -1)), 0.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(Vec2DCtor(-1, 0)), 0.0, 1e-5);
 
-  EXPECT_NEAR(box1.DistanceTo(LineSegment2d({-4, -4}, {4, 4})), 0.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo(LineSegment2d({4, -4}, {-4, 4})), 0.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo(LineSegment2d({0, 2}, {4, 4})), 1.0, 1e-5);
-  EXPECT_NEAR(box1.DistanceTo(LineSegment2d({2, 2}, {3, 1})),
-              std::sqrt(2.0) / 2.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(
+      LineSegment2d(Vec2DCtor(-4, -4), Vec2DCtor(4, 4))), 0.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(
+      LineSegment2d(Vec2DCtor(4, -4), Vec2DCtor(-4, 4))), 0.0, 1e-5);
+  EXPECT_NEAR(box1.DistanceTo(
+      LineSegment2d(Vec2DCtor(0, 2), Vec2DCtor(4, 4))), 1.0, 1e-5);
+  EXPECT_NEAR(
+      box1.DistanceTo(LineSegment2d(Vec2DCtor(2, 2), Vec2DCtor(3, 1))),
+      std::sqrt(2.0) / 2.0, 1e-5);
 }
 
 TEST(Box2dTest, IsPointIn) {
-  EXPECT_TRUE(box1.IsPointIn({0, 0}));
-  EXPECT_TRUE(box1.IsPointIn({1, 0.5}));
-  EXPECT_TRUE(box1.IsPointIn({-0.5, -1}));
-  EXPECT_TRUE(box1.IsPointIn({2, 1}));
-  EXPECT_FALSE(box1.IsPointIn({-3, 0}));
-  EXPECT_FALSE(box1.IsPointIn({0, 2}));
-  EXPECT_FALSE(box1.IsPointIn({-4, -2}));
+  EXPECT_TRUE(box1.IsPointIn(Vec2DCtor(0, 0)));
+  EXPECT_TRUE(box1.IsPointIn(Vec2DCtor(1, 0.5)));
+  EXPECT_TRUE(box1.IsPointIn(Vec2DCtor(-0.5, -1)));
+  EXPECT_TRUE(box1.IsPointIn(Vec2DCtor(2, 1)));
+  EXPECT_FALSE(box1.IsPointIn(Vec2DCtor(-3, 0)));
+  EXPECT_FALSE(box1.IsPointIn(Vec2DCtor(0, 2)));
+  EXPECT_FALSE(box1.IsPointIn(Vec2DCtor(-4, -2)));
 }
 
 TEST(Box2dTest, IsPointOnBoundary) {
-  EXPECT_FALSE(box1.IsPointOnBoundary({0, 0}));
-  EXPECT_FALSE(box1.IsPointOnBoundary({1, 0.5}));
-  EXPECT_TRUE(box1.IsPointOnBoundary({-0.5, -1}));
-  EXPECT_TRUE(box1.IsPointOnBoundary({2, 0.5}));
-  EXPECT_TRUE(box1.IsPointOnBoundary({-2, 1}));
-  EXPECT_FALSE(box1.IsPointOnBoundary({-3, 0}));
-  EXPECT_FALSE(box1.IsPointOnBoundary({0, 2}));
-  EXPECT_FALSE(box1.IsPointOnBoundary({-4, -2}));
+  EXPECT_FALSE(box1.IsPointOnBoundary(Vec2DCtor(0, 0)));
+  EXPECT_FALSE(box1.IsPointOnBoundary(Vec2DCtor(1, 0.5)));
+  EXPECT_TRUE(box1.IsPointOnBoundary(Vec2DCtor(-0.5, -1)));
+  EXPECT_TRUE(box1.IsPointOnBoundary(Vec2DCtor(2, 0.5)));
+  EXPECT_TRUE(box1.IsPointOnBoundary(Vec2DCtor(-2, 1)));
+  EXPECT_FALSE(box1.IsPointOnBoundary(Vec2DCtor(-3, 0)));
+  EXPECT_FALSE(box1.IsPointOnBoundary(Vec2DCtor(0, 2)));
+  EXPECT_FALSE(box1.IsPointOnBoundary(Vec2DCtor(-4, -2)));
 }
 
 TEST(Box2dTest, RotateFromCenterAndShift) {
-  Box2d box({0, 0}, 0, 4, 2);
-  std::vector<Vec2d> corners;
+  Box2d box(Vec2DCtor(0, 0), 0, 4, 2);
+  std::vector<Vec2D> corners;
   EXPECT_NEAR(box.heading(), 0.0, 1e-5);
   box.RotateFromCenter(M_PI_2);
   EXPECT_NEAR(box.heading(), M_PI_2, 1e-5);
@@ -214,7 +226,7 @@ TEST(Box2dTest, RotateFromCenterAndShift) {
   EXPECT_NEAR(corners[3].x(), 1.0, 1e-5);
   EXPECT_NEAR(corners[3].y(), -2.0, 1e-5);
 
-  box.Shift({30, 40});
+  box.Shift(Vec2DCtor(30, 40));
   box.GetAllCorners(&corners);
   EXPECT_NEAR(corners[0].x(), 31.0, 1e-5);
   EXPECT_NEAR(corners[0].y(), 42.0, 1e-5);
@@ -239,8 +251,8 @@ TEST(Box2dTest, TestByRandom) {
     const double l2 = RandomDouble(1, 5);
     const double w1 = RandomDouble(1, 5);
     const double w2 = RandomDouble(1, 5);
-    const Box2d box1({x1, y1}, heading1, l1, w1);
-    const Box2d box2({x2, y2}, heading2, l2, w2);
+    const Box2d box1(Vec2DCtor(x1, y1), heading1, l1, w1);
+    const Box2d box2(Vec2DCtor(x2, y2), heading2, l2, w2);
     bool overlap = CheckBoxOverlapSlow(box1, box2, &ambiguous);
     if (!ambiguous) {
       EXPECT_EQ(overlap, box1.HasOverlap(box2));
@@ -252,18 +264,21 @@ TEST(Box2dTest, TestByRandom) {
     const double heading = RandomDouble(0, M_PI * 2.0);
     const double length = RandomDouble(1, 5);
     const double width = RandomDouble(1, 5);
-    const Box2d box({x, y}, heading, length, width);
+    const Box2d box(Vec2DCtor(x, y), heading, length, width);
     const Polygon2d poly(box);
     for (int iter2 = 0; iter2 < 1000; ++iter2) {
       const double x = RandomDouble(-20, 20);
       const double y = RandomDouble(-20, 20);
-      EXPECT_EQ(box.IsPointIn({x, y}), poly.IsPointIn({x, y}));
-      EXPECT_EQ(box.IsPointOnBoundary({x, y}), poly.IsPointOnBoundary({x, y}));
-      EXPECT_NEAR(box.DistanceTo({x, y}), poly.DistanceTo({x, y}), 1e-3);
+      EXPECT_EQ(box.IsPointIn(
+          Vec2DCtor(x, y)), poly.IsPointIn(Vec2DCtor(x, y)));
+      EXPECT_EQ(box.IsPointOnBoundary(
+          Vec2DCtor(x, y)), poly.IsPointOnBoundary(Vec2DCtor(x, y)));
+      EXPECT_NEAR(box.DistanceTo(
+          Vec2DCtor(x, y)), poly.DistanceTo(Vec2DCtor(x, y)), 1e-3);
 
       const double other_x = RandomDouble(-20, 20);
       const double other_y = RandomDouble(-20, 20);
-      const LineSegment2d segment({x, y}, {other_x, other_y});
+      const LineSegment2d segment(Vec2DCtor(x, y), Vec2DCtor(other_x, other_y));
       EXPECT_EQ(box.HasOverlap(segment), poly.HasOverlap(segment));
       EXPECT_NEAR(box.DistanceTo(segment), poly.DistanceTo(segment), 1e-3);
     }

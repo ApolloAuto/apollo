@@ -27,7 +27,7 @@
 #include <vector>
 #include "modules/common/math/aabox2d.h"
 #include "modules/common/math/line_segment2d.h"
-#include "modules/common/math/vec2d.h"
+#include "modules/common/math/vec2d_utils.h"
 
 /**
  * @namespace apollo::common::math
@@ -58,7 +58,7 @@ class Box2d {
    * @param length The size of the heading-axis.
    * @param width The size of the axis perpendicular to the heading-axis.
    */
-  Box2d(const Vec2d &center, const double heading, const double length,
+  Box2d(const Vec2D &center, const double heading, const double length,
         const double width);
 
   /**
@@ -81,14 +81,14 @@ class Box2d {
    * @param opposite_corner The opposite corner to the first one
    * @return An axes-aligned Box2d
    */
-  static Box2d CreateAABox(const Vec2d &one_corner,
-                           const Vec2d &opposite_corner);
+  static Box2d CreateAABox(const Vec2D &one_corner,
+                           const Vec2D &opposite_corner);
 
   /**
    * @brief Getter of the center of the box
    * @return The center of the box
    */
-  const Vec2d &center() const { return center_; }
+  const Vec2D &center() const { return center_; }
 
   /**
    * @brief Getter of the x-coordinate of the center of the box
@@ -160,28 +160,28 @@ class Box2d {
    * @brief Getter of the corners of the box
    * @param corners The vector where the corners are listed
    */
-  void GetAllCorners(std::vector<Vec2d> *const corners) const;
+  void GetAllCorners(std::vector<Vec2D> *const corners) const;
 
   /**
    * @brief Tests points for membership in the box
    * @param point A point that we wish to test for membership in the box
    * @return True iff the point is contained in the box
    */
-  bool IsPointIn(const Vec2d &point) const;
+  bool IsPointIn(const Vec2D &point) const;
 
   /**
    * @brief Tests points for membership in the boundary of the box
    * @param point A point that we wish to test for membership in the boundary
    * @return Truee iff the point is a boundary point of the box
    */
-  bool IsPointOnBoundary(const Vec2d &point) const;
+  bool IsPointOnBoundary(const Vec2D &point) const;
 
   /**
    * @brief Determines the distance between the box and a given point
    * @param point The point whose distance to the box we wish to compute
    * @return A distance
    */
-  double DistanceTo(const Vec2d &point) const;
+  double DistanceTo(const Vec2D &point) const;
 
   /**
    * @brief Determines the distance between the box and a given line segment
@@ -228,7 +228,7 @@ class Box2d {
    * @brief Shifts this box by a given vector
    * @param shift_vec The vector determining the shift
    */
-  void Shift(const Vec2d &shift_vec);
+  void Shift(const Vec2D &shift_vec);
 
   /**
    * @brief Gets a human-readable description of the box
@@ -237,7 +237,7 @@ class Box2d {
   std::string DebugString() const;
 
  private:
-  Vec2d center_;
+  Vec2D center_;
   double length_ = 0.0;
   double width_ = 0.0;
   double half_length_ = 0.0;

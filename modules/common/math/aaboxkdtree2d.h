@@ -101,7 +101,7 @@ class AABoxKDTree2dNode {
    * @param point The target point. Search it's nearest object.
    * @return The nearest object to the target point.
    */
-  ObjectPtr GetNearestObject(const Vec2d &point) const {
+  ObjectPtr GetNearestObject(const Vec2D &point) const {
     ObjectPtr nearest_object = nullptr;
     double min_distance_sqr = std::numeric_limits<double>::infinity();
     GetNearestObjectInternal(point, &min_distance_sqr, &nearest_object);
@@ -115,7 +115,7 @@ class AABoxKDTree2dNode {
    * @param distance The radius of the range to search objects.
    * @return All objects within the specified distance to the specified point.
    */
-  std::vector<ObjectPtr> GetObjects(const Vec2d &point,
+  std::vector<ObjectPtr> GetObjects(const Vec2D &point,
                                     const double distance) const {
     std::vector<ObjectPtr> result_objects;
     GetObjectsInternal(point, distance, Square(distance), &result_objects);
@@ -177,7 +177,7 @@ class AABoxKDTree2dNode {
     return true;
   }
 
-  double LowerDistanceSquareToPoint(const Vec2d &point) const {
+  double LowerDistanceSquareToPoint(const Vec2D &point) const {
     double dx = 0.0;
     if (point.x() < min_x_) {
       dx = min_x_ - point.x();
@@ -193,7 +193,7 @@ class AABoxKDTree2dNode {
     return dx * dx + dy * dy;
   }
 
-  double UpperDistanceSquareToPoint(const Vec2d &point) const {
+  double UpperDistanceSquareToPoint(const Vec2D &point) const {
     const double dx =
         (point.x() > mid_x_ ? (point.x() - min_x_) : (point.x() - max_x_));
     const double dy =
@@ -213,7 +213,7 @@ class AABoxKDTree2dNode {
     }
   }
 
-  void GetObjectsInternal(const Vec2d &point, const double distance,
+  void GetObjectsInternal(const Vec2D &point, const double distance,
                           const double distance_sqr,
                           std::vector<ObjectPtr> *const result_objects) const {
     if (LowerDistanceSquareToPoint(point) > distance_sqr) {
@@ -257,7 +257,7 @@ class AABoxKDTree2dNode {
     }
   }
 
-  void GetNearestObjectInternal(const Vec2d &point,
+  void GetNearestObjectInternal(const Vec2D &point,
                                 double *const min_distance_sqr,
                                 ObjectPtr *const nearest_object) const {
     if (LowerDistanceSquareToPoint(point) >= *min_distance_sqr - kMathEpsilon) {
@@ -434,7 +434,7 @@ class AABoxKDTree2d {
    * @param point The target point. Search it's nearest object.
    * @return The nearest object to the target point.
    */
-  ObjectPtr GetNearestObject(const Vec2d &point) const {
+  ObjectPtr GetNearestObject(const Vec2D &point) const {
     return root_ == nullptr ? nullptr : root_->GetNearestObject(point);
   }
 
@@ -444,7 +444,7 @@ class AABoxKDTree2d {
    * @param distance The radius of the range to search objects.
    * @return All objects within the specified distance to the specified point.
    */
-  std::vector<ObjectPtr> GetObjects(const Vec2d &point,
+  std::vector<ObjectPtr> GetObjects(const Vec2D &point,
                                     const double distance) const {
     if (root_ == nullptr) {
       return {};

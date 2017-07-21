@@ -27,7 +27,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Vec2d;
+using apollo::common::Vec2D;
 
 Spline2dKernel::Spline2dKernel(const std::vector<double>& t_knots,
                                const std::size_t spline_order)
@@ -122,7 +122,7 @@ void Spline2dKernel::add_third_order_derivative_matrix(const double weight) {
 // reference line kernel, t_coord in strictly increasing order (for path
 // optimizer)
 bool Spline2dKernel::add_reference_line_kernel_matrix(
-    const std::vector<double>& t_coord, const std::vector<Vec2d>& ref_points,
+    const std::vector<double>& t_coord, const std::vector<Vec2D>& ref_points,
     const double weight) {
   if (ref_points.size() != t_coord.size()) {
     return false;
