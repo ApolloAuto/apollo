@@ -66,6 +66,8 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK(lane_sequence_ptr != nullptr);
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr);
+    double probability = ComputeProbability();
+    lane_sequence_ptr->set_probability(probability);
   }
 }
 
