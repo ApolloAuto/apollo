@@ -28,6 +28,8 @@
 #include <string>
 #include <type_traits>
 
+#include <sensor_msgs/PointCloud2.h>
+
 #include "glog/logging.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
@@ -120,25 +122,9 @@ class Adapter {
    * @param message_file the path to the file that contains a (usually
    * proto) message of DataType.
    */
-  template <class U = D>
-  void FeedFile(
-      const std::string &message_file,
-      typename std::enable_if<
-          std::is_base_of<::google::protobuf::Message, U>::value>::type * = 0) {
-    D data;
-    CHECK(apollo::common::util::GetProtoFromFile(message_file, &data))
-        << "Unable to parse input pb file " << message_file;
-    FeedProto(data);
-  }
-
-  /**
-   * @brief reads the ros message from the file, and push it into
-   * the adapter's data queue.
-   * @param message_file the path to the file that contains a (usually
-   * proto) message of DataType.
-   */
-  void FeedFile(const std::string &message_file) {
-    // FIXME: specific processing logic for ros Message
+  template <class T = D>
+  bool FeedFile(const std::string &message_file) {
+    return FeedFile(message_file, IdentifierType<T>());
   }
 
   /**
@@ -249,6 +235,24 @@ class Adapter {
   uint32_t GetSeqNum() const { return seq_num_; }
 
  private:
+  template <typename T>
+  struct IdentifierType {};
+
+  template <class T>
+  bool FeedFile(const std::string &message_file, IdentifierType<T>) {
+    D data;
+    if (!apollo::common::util::GetProtoFromFile(message_file, &data)) {
+      AERROR << "Unable to parse input pb file " << message_file;
+      return false;
+    }
+    FeedProto(data);
+    return true;
+  }
+  bool FeedFile(const std::string &message_file,
+                IdentifierType<::sensor_msgs::PointCloud2>) {
+    return false;
+  }
+
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
