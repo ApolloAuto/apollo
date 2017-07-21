@@ -280,6 +280,14 @@ function run_lint() {
   START_TIME=$(get_now)
   run_cpp_lint
 
+  # Add cpplint rule to BUILD files that do not contain it.
+  for file in $(find modules -name BUILD | \
+    xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
+  do
+    sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file
+    sed -i -e '$a\\ncpplint()' $file
+  done
+
   if [ $? -eq 0 ]; then
     success 'Lint passed!'
   else
