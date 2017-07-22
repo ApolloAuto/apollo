@@ -35,12 +35,12 @@ using PathPoint = apollo::common::PathPoint;
 using HDMap = apollo::hdmap::HDMap;
 using Pose = apollo::localization::Pose;
 
-StBoundaryMapper::StBoundaryMapper(
-    const StBoundaryConfig& st_boundary_config,
+STBoundaryMapper::STBoundaryMapper(
+    const STBoundaryConfig& st_boundary_config,
     const apollo::common::config::VehicleParam& veh_param)
     : _st_boundary_config(st_boundary_config), _veh_param(veh_param) {}
 
-double StBoundaryMapper::get_area(
+double STBoundaryMapper::get_area(
     const std::vector<STPoint>& boundary_points) const {
   if (boundary_points.size() < 3) {
     return 0.0;
@@ -59,7 +59,7 @@ double StBoundaryMapper::get_area(
   return fabs(area);
 }
 
-bool StBoundaryMapper::check_overlap(
+bool STBoundaryMapper::check_overlap(
     const PathPoint& path_point,
     const apollo::common::config::VehicleParam& params,
     const apollo::common::math::Box2d& obs_box, const double buffer) const {
@@ -75,7 +75,7 @@ bool StBoundaryMapper::check_overlap(
   return obs_box.HasOverlap(adc_box);
 }
 
-ErrorCode StBoundaryMapper::get_speed_limits(
+ErrorCode STBoundaryMapper::get_speed_limits(
     const Pose& pose, HDMap& map, const PathData& path_data,
     const double planning_distance, const std::size_t matrix_dimension_s,
     const double default_speed_limit, SpeedLimit* const speed_limit_data) {
@@ -169,11 +169,11 @@ ErrorCode StBoundaryMapper::get_speed_limits(
 
   return ErrorCode::PLANNING_OK;
 }
-const StBoundaryConfig& StBoundaryMapper::st_boundary_config() const {
+const STBoundaryConfig& STBoundaryMapper::st_boundary_config() const {
   return _st_boundary_config;
 }
 
-const apollo::common::config::VehicleParam& StBoundaryMapper::vehicle_param()
+const apollo::common::config::VehicleParam& STBoundaryMapper::vehicle_param()
     const {
   return _veh_param;
 }

@@ -15,21 +15,23 @@
  *****************************************************************************/
 
 /**
- * @file qp_st_cost.h
+ * @file dp_st_cost.h
  **/
 
-#ifndef BAIDU_IDG_HOUSTON_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_DP_ST_COST_H_
-#define BAIDU_IDG_HOUSTON_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_DP_ST_COST_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_COST_H_
+#define MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_COST_H_
 
-#include "optimizer/dp_st_speed_optimizer/dp_st_configuration.h"
-#include "optimizer/st_graph/st_graph_boundary.h"
+#include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/common/speed/st_point.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_configuration.h"
+#include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
 
 namespace apollo {
 namespace planning {
 
 class DpStCost {
  public:
-  DpStCost(const DpStConfiguration& dp_st_configuration);
+  explicit DpStCost(const DpStConfiguration& dp_st_configuration);
 
   double obstacle_cost(const STPoint& point,
                        const std::vector<STGraphBoundary>& obs_boundary) const;
@@ -68,4 +70,4 @@ class DpStCost {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // BAIDU_IDG_HOUSTON_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_DP_ST_COST_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_COST_H_

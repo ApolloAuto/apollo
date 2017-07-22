@@ -24,6 +24,7 @@
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/common/decision_data.h"
+#include "modules/planning/common/planning_object.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -49,6 +50,10 @@ class PlanningData {
   PublishableTrajectory* mutable_computed_trajectory();
 
   virtual std::string type() const = 0;
+
+  // TODO: to be fixed
+  int get_obstacle_by_id(const uint32_t id,
+                         PlanningObject** const planning_object);
 
  protected:
   std::unique_ptr<ReferenceLine> _reference_line;
