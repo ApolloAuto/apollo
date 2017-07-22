@@ -32,10 +32,10 @@
 namespace apollo {
 namespace planning {
 
-class QpSplineStBoundaryMapper : public StBoundaryMapper {
+class QpSplineSTBoundaryMapper : public STBoundaryMapper {
  public:
-  QpSplineStBoundaryMapper(
-      const StBoundaryConfig& st_boundary_config,
+  QpSplineSTBoundaryMapper(
+      const STBoundaryConfig& st_boundary_config,
       const apollo::common::config::VehicleParam& veh_param);
 
   // TODO: combine two interfaces together to provide a st graph data type

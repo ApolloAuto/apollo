@@ -18,25 +18,29 @@
 *   @file: dp_st_boundary_mapper.h
 **/
 
-#ifndef BAIDU_IDG_HOUSTON_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_DP_ST_BOUNDARY_MAPPER_H_
-#define BAIDU_IDG_HOUSTON_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_DP_ST_BOUNDARY_MAPPER_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_BOUNDARY_MAPPER_H_
+#define MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_BOUNDARY_MAPPER_H_
 
-#include "optimizer/st_graph/st_boundary_mapper.h"
-#include "util/data_center.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/planning/common/data_center.h"
+#include "modules/planning/optimizer/st_graph/st_boundary_mapper.h"
+#include "modules/planning/proto/st_boundary_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
-class DPSTBoundaryMapper : public StBoundaryMapper {
+using ErrorCode = apollo::common::ErrorCode;
+
+class DPSTBoundaryMapper : public STBoundaryMapper {
  public:
   DPSTBoundaryMapper(const STBoundaryConfig& st_boundary_config,
-                     const ::adu::common::config::VehicleParam& veh_param);
+                     const ::apollo::common::config::VehicleParam& veh_param);
 
   // TODO: combine two interfaces together to provide a st graph data type
-  virtual ErrorCode get_graph_boundary(
-      const DataCenter& data_center, const DecisionData& decision_data,
-      const PathData& path_data, const double planning_distance,
-      const double planning_time,
+  common::ErrorCode get_graph_boundary(
+      const common::TrajectoryPoint& initial_planning_point,
+      const DecisionData& decision_data, const PathData& path_data,
+      const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const override;
 
  private:
@@ -54,4 +58,4 @@ class DPSTBoundaryMapper : public StBoundaryMapper {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // BAIDU_IDG_HOUSTON_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_BOUNDARY_MAPPER_H_

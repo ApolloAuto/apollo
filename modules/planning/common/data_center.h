@@ -54,7 +54,7 @@ class DataCenter {
   std::unique_ptr<Frame> _frame = nullptr;
   std::unique_ptr<MasterStateMachine> _master = nullptr;
  private:
- DECLARE_SINGLETON(DataCenter);
+  DECLARE_SINGLETON(DataCenter);
 };
 
 }  // namespace planning

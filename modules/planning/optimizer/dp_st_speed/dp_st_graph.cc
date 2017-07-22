@@ -15,18 +15,19 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_graph.h
+ * @file dp_st_graph.cc
  **/
-
-#include "optimizer/dp_st_speed_optimizer/dp_st_graph.h"
-#include "common/planning_macros.h"
-#include "math/double.h"
+#include <limits>
+#include "modules/common/log.h"
+#include "modules/planning/common/data_center.h"
+#include "modules/planning/math/double.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 
 namespace apollo {
 namespace planning {
 
 DPSTGraph::DPSTGraph(const DpStConfiguration& dp_config,
-                     const ::adu::common::config::VehicleParam& veh_param)
+                     const apollo::common::config::VehicleParam& veh_param)
     : _dp_st_configuration(dp_config), _dp_st_cost(dp_config) {}
 
 ErrorCode DPSTGraph::search(const STGraphData& st_graph_data,
@@ -40,27 +41,32 @@ ErrorCode DPSTGraph::search(const STGraphData& st_graph_data,
         st_graph_data.path_data_length());
   }
 
-  QUIT_IF(init_cost_table() != ErrorCode::PLANNING_OK,
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "Initialize cost table failed")
+  if (init_cost_table() != ErrorCode::PLANNING_OK) {
+    AERROR << "Initialize cost table failed.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
 
-  QUIT_IF(calculate_pointwise_cost(st_graph_data.obs_boundary()) !=
-              ErrorCode::PLANNING_OK,
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "Calculate pointwise cost failed");
+  if (calculate_pointwise_cost(st_graph_data.obs_boundary()) !=
+      ErrorCode::PLANNING_OK) {
+    AERROR << "Calculate pointwise cost failed.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
 
-  QUIT_IF(calculate_total_cost() != ErrorCode::PLANNING_OK,
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "calculate total cost failed!");
+  if (calculate_total_cost() != ErrorCode::PLANNING_OK) {
+    AERROR << "Calculate total cost failed.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
 
-  QUIT_IF(retrieve_speed_profile(speed_data) != ErrorCode::PLANNING_OK,
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "Retrieve best speed profile failed!");
+  if (retrieve_speed_profile(speed_data) != ErrorCode::PLANNING_OK) {
+    AERROR << "Retrieve best speed profile failed.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
 
-  QUIT_IF(
-      get_object_decision(st_graph_data, *speed_data) != ErrorCode::PLANNING_OK,
-      ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-      "Get object decision by speed profile failed!");
+  if (get_object_decision(st_graph_data, *speed_data) !=
+      ErrorCode::PLANNING_OK) {
+    AERROR << "Get object decision by speed profile failed.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
 
   return ErrorCode::PLANNING_OK;
 }
@@ -86,7 +92,10 @@ ErrorCode DPSTGraph::init_cost_table() {
 
   for (std::size_t i = 0; i < _cost_table.size(); ++i) {
     for (std::size_t j = 0; j < _cost_table[i].size(); ++j) {
-      _cost_table[i][j].init(i, j, STPoint(_unit_s * j, _unit_t * i));
+      STPoint st_point;
+      st_point.set_s(_unit_s * j);
+      st_point.set_t(_unit_t * i);
+      _cost_table[i][j].init(i, j, st_point);
     }
   }
 
@@ -173,7 +182,7 @@ void DPSTGraph::calculate_total_cost(const std::size_t r, const std::size_t c) {
                               static_cast<double>(c), &lower_bound,
                               &upper_bound)) {
       continue;
-    };
+    }
 
     for (std::size_t c_prepre = lower_bound; c_prepre <= upper_bound;
          ++c_prepre) {
@@ -229,29 +238,44 @@ ErrorCode DPSTGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
       best_end_point = &cur_point;
     }
   }
-  QUIT_IF(best_end_point == nullptr, ErrorCode::PLANNING_ERROR_FAILED,
-          Level::ERROR, "Fail to find the best feasible trajectory!");
+
+  if (best_end_point == nullptr) {
+    AERROR << "Fail to find the best feasible trajectory.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
+
   std::vector<SpeedPoint> speed_profile;
   const STGraphPoint* cur_point = best_end_point;
   while (cur_point != nullptr) {
-    speed_profile.emplace_back(cur_point->point().s(), cur_point->point().t(),
-                               0, 0, 0);
+    SpeedPoint speed_point;
+    speed_point.set_s(cur_point->point().s());
+    speed_point.set_t(cur_point->point().t());
+    speed_point.set_v(0);
+    speed_point.set_a(0);
+    speed_point.set_da(0);
+    speed_profile.emplace_back(speed_point);
+
     cur_point = cur_point->pre_point();
   }
   std::reverse(speed_profile.begin(), speed_profile.end());
-  QUIT_IF(Double::compare(speed_profile.front().t(), 0.0) != 0 ||
-              Double::compare(speed_profile.front().s(), 0.0) != 0,
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "Fail to retrieve speed profile");
+
+  if (Double::compare(speed_profile.front().t(), 0.0) != 0 ||
+      Double::compare(speed_profile.front().s(), 0.0) != 0) {
+    AERROR << "Fail to retrieve speed profile.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
+
   speed_data->set_speed_vector(speed_profile);
   return ErrorCode::PLANNING_OK;
 }
 
 ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
                                          const SpeedData& speed_profile) const {
-  QUIT_IF(speed_profile.speed_vector().size() < 2,
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "dp_st_graph failed to get speed profile");
+  if (speed_profile.speed_vector().size() < 2) {
+    AERROR << "dp_st_graph failed to get speed profile.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
+
   const std::vector<STGraphBoundary>& obs_boundaries =
       st_graph_data.obs_boundary();
   const std::vector<SpeedPoint>& speed_points = speed_profile.speed_vector();
@@ -259,13 +283,18 @@ ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
            obs_boundaries.begin();
        obs_it != obs_boundaries.end(); ++obs_it) {
     CHECK_GE(obs_it->points().size(), 4);
-    Obstacle* object_ptr = nullptr;
-    DataCenter::instance()->mutable_object_table()->get_obstacle(obs_it->id(),
-                                                                 &object_ptr);
+    PlanningObject* object_ptr = nullptr;
+
+    // TODO: to be fixed
+    // DataCenter::instance()->mutable_object_table()->get_obstacle(obs_it->id(),
+    //                                                             &object_ptr);
+    DataCenter::instance()->current_frame()->mutable_planning_data()
+        ->get_obstacle_by_id(obs_it->id(), &object_ptr);
+
     if (obs_it->points().front().x() <= 0) {
-      object_ptr->mutable_decision()->emplace_back(
+      object_ptr->MutableDecisions()->emplace_back(
           _dp_st_configuration.go_down_buffer(),
-          Decision::DecisionType::YIELD_DOWN);
+           Decision::DecisionType::YIELD_DOWN);
       continue;
     }
     double start_t = 0.0;
@@ -281,9 +310,13 @@ ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
       if (st_it->t() > end_t) {
         break;
       }
-      QUIT_IF(obs_it->is_point_in_boundary(*st_it),
-              ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-              "dp_st_graph failed: speed profile cross obs_boundary");
+
+      STPoint st_point(st_it->s(), st_it->t());
+      if (obs_it->IsPointInBoundary(st_point)) {
+        AERROR << "dp_st_graph failed: speed profile cross obs_boundary.";
+        return ErrorCode::PLANNING_ERROR_FAILED;
+      }
+
       double s_upper = _dp_st_configuration.total_path_length();
       double s_lower = 0.0;
       if (obs_it->get_boundary_s_range_by_time(st_it->t(), &s_upper,
@@ -296,11 +329,11 @@ ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
       }
     }
     if (go_down) {
-      object_ptr->mutable_decision()->emplace_back(
+      object_ptr->MutableDecisions()->emplace_back(
           _dp_st_configuration.go_down_buffer(),
           Decision::DecisionType::YIELD_DOWN);
     } else {
-      object_ptr->mutable_decision()->emplace_back(
+      object_ptr->MutableDecisions()->emplace_back(
           _dp_st_configuration.go_up_buffer(), Decision::DecisionType::GO_UP);
     }
   }
@@ -319,8 +352,8 @@ double DPSTGraph::calculate_edge_cost(const STPoint& first,
 
 double DPSTGraph::calculate_edge_cost_for_second_row(
     const size_t col, const double speed_limit) const {
-  double init_speed = _init_point.velocity();
-  double init_acc = _init_point.acceleration();
+  double init_speed = _init_point.v();
+  double init_acc = _init_point.a();
   const STPoint& pre_point = _cost_table[0][0].point();
   const STPoint& curr_point = _cost_table[1][col].point();
   return _dp_st_cost.speed_cost(pre_point, curr_point, speed_limit) +
@@ -333,7 +366,7 @@ double DPSTGraph::calculate_edge_cost_for_second_row(
 double DPSTGraph::calculate_edge_cost_for_third_row(
     const size_t curr_col, const size_t pre_col,
     const double speed_limit) const {
-  double init_speed = _init_point.velocity();
+  double init_speed = _init_point.v();
   const STPoint& first = _cost_table[0][0].point();
   const STPoint& second = _cost_table[1][pre_col].point();
   const STPoint& third = _cost_table[2][curr_col].point();
