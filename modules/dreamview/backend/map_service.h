@@ -70,13 +70,12 @@ class MapService {
   // javascript clients.
   ::apollo::hdmap::Map RetrieveMapElements(const MapElementIds &ids) const;
 
-  const ::apollo::hdmap::HDMapImpl &hdmap() {
+  const ::apollo::hdmap::HDMap &hdmap() {
     return hdmap_;
   }
 
  private:
-  // TODO(siyangy): Switch to HDMap when it can be used?
-  ::apollo::hdmap::HDMapImpl hdmap_;
+  ::apollo::hdmap::HDMap hdmap_;
 };
 
 }  // namespace dreamview
