@@ -17,6 +17,7 @@ cc_library(
     srcs = ["obstacle.cc"],
     hdrs = ["obstacle.h"],
     deps = [
+        "@eigen//:eigen",
         "//modules/common:log",
         "//modules/common/math:kalman_filter",
         "//modules/common/proto:error_code_proto",
@@ -24,6 +25,8 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_map",
+        "//modules/map/hdmap:hdmap",
     ],
 )
 
