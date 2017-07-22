@@ -40,9 +40,9 @@ export default class PerceptionObstacles {
 
     update(world, coordinates, rotation, scene) {
         if (!STORE.options.showObstacles) {
-            hideArrayObjects(arrows);
-            hideArrayObjects(cubes);
-            hideArrayObjects(extrusionFaces);
+            hideArrayObjects(this.arrows);
+            hideArrayObjects(this.cubes);
+            hideArrayObjects(this.extrusionFaces);
             return;
         }
 
@@ -64,7 +64,8 @@ export default class PerceptionObstacles {
                                       obstacle.positionY,
                                       (obstacle.height || DEFAULT_HEIGHT) / 2));
             const color = ObstacleColorMapping[obstacle.type] || DEFAULT_COLOR;
-            const arrowMesh = this.updateArrow(position, obstacle.heading, color, arrowIdx++, scene);
+            const arrowMesh = this.updateArrow(position, obstacle.heading,
+                    color, arrowIdx++, scene);
             const polygon = obstacle.polygonPoint;
             if (polygon.length > 0) {
                 const scale = this.updatePolygon(polygon, obstacle.height, color, coordinates,

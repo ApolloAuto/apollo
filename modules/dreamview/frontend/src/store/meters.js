@@ -23,6 +23,7 @@ export default class Meters {
     @observable speed = 0;
     @observable steeringAngle = 0;
     @observable drivingMode = "?";
+    @observable turnSignal = "";
 
     @action update(world) {
         if (world.autoDrivingCar) {
@@ -52,8 +53,10 @@ export default class Meters {
                 this.drivingMode =
                     toDrivingMode(world.autoDrivingCar.disengageType);
             }
-            /* TODO Turn signal is not working. Please check and make sure
-             * that it is set correctly in the backend.*/
+
+            if (world.autoDrivingCar.currentSignal) {
+                this.turnSignal = world.autoDrivingCar.currentSignal;
+            }
         }
     }
 }
