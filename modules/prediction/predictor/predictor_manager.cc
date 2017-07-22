@@ -62,10 +62,16 @@ void PredictorManager::Run(
     if (predictor != nullptr) {
       Obstacle* obstacle = container->GetObstacle(id);
       predictor->Predict(obstacle);
-      prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
-        predictor->prediction_obstacle());
+      PredictionObstacle prediction_obstacle;
+      prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
+      prediction_obstacle.mutable_perception_obstacle()->
+          CopyFrom(perception_obstacle);
+      prediction_obstacles_.add_prediction_obstacle()->
+          CopyFrom(prediction_obstacle);
     }
   }
+  prediction_obstacles_.set_perception_error_code(
+      perception_obstacles.error_code());
 }
 
 const PredictionObstacles& PredictorManager::prediction_obstacles() {

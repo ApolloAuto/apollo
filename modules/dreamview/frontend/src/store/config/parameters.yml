@@ -23,7 +23,7 @@ options:
   defaults:
     showConsole: false
     showPlanning: true
-    showObstacles: true
+    showingObstacles: true
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
