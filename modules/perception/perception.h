@@ -22,9 +22,11 @@
 #define MODEULES_PERCEPTION_PERCEPTION_H_
 
 #include <string>
+#include <sensor_msgs/PointCloud2.h>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
+#include "modules/perception/obstacle/lidar/onboard/lidar_preprocessing.h"
 #include "ros/include/ros/ros.h"
 
 /**
@@ -40,6 +42,17 @@ class Perception : public apollo::common::ApolloApp {
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
   void Stop() override;
+
+ private:
+   // Upon receiving point cloud data
+  void OnPointCloud(
+      const sensor_msgs::PointCloud2& message);
+
+  LidarPreprocessing preprocessor_;
+  //LidarSegmentation segmentor_;
+  //LidarObjectBuilder objectbuilder_;
+  //LidarTracker tracker_;
+
 };
 
 }  // namespace perception

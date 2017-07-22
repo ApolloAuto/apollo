@@ -41,8 +41,8 @@ enum SensorType {
     UNKNOWN_SENSOR_TYPE = 10,
 };
 
-typedef PointCloud PolygonType;
-typedef PointDCloud PolygonDType;
+typedef pcl_util::PointCloud PolygonType;
+typedef pcl_util::PointDCloud PolygonDType;
 
 const double PI = 3.1415926535898;
 

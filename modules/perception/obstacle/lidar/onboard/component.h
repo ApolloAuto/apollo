@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/obstacle/base/types.h"
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_COMMON_SUBNODE_H_
+#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_COMMON_SUBNODE_H_
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
 
-std::string GetSensorType(SensorType sensor_type) {
-    switch (sensor_type) {
-        case VELODYNE_64 :
-            return "velodyne_64";
-        case VELODYNE_16 :
-            return "velodyne_16";
-        case RADAR :
-            return "radar";
-        case CAMERA :
-            return "camera";
-        case UNKNOWN_SENSOR_TYPE :
-            return "unknown_sensor_type";
-    }
-    return "";
-}
+class Component {
+public:
+	virtual bool Init() = 0;
+	virtual std::string Name() const = 0;
+
+protected:	
+	virtual bool InitConfig() = 0;
+	virtual bool InitAlgorithmPlugin() = 0;
+};
 
 }  // namespace perception
 }  // namespace apollo
+
+#endif // MODULES_PERCEPTION_OBSTACLE_ONBOARD_COMMON_SUBNODE_H_
