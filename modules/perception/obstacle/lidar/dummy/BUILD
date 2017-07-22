@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_algorithm_dummy",
+    name = "perception_obstacle_lidar_dummy",
     srcs = [
         "dummy_algorithms.cc"
     ],
@@ -10,8 +10,8 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/perception/obstacle/lidar/interface:interface",
-        "//modules/perception/obstacle/common:common",
+        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
+        "//modules/perception/obstacle/common:perception_obstacle_common",
         "@pcl//:pcl",
         "@eigen//:eigen",
     ],

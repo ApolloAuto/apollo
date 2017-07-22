@@ -64,14 +64,13 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 struct TrackerOptions {
   TrackerOptions() = default;
-  explicit TrackerOptions(Eigen::Matrix4d* pose) : velodyne2world_pose(pose) {}
+  explicit TrackerOptions(Eigen::Matrix4d *pose) : velodyne_trans(pose) {}
 
-  std::shared_ptr<const Eigen::Matrix4d> velodyne2world_pose;
-  HdmapStructPtr hdmap_input = nullptr;
+  std::shared_ptr<const Eigen::Matrix4d> velodyne_trans;
+  HdmapStructPtr hdmap = nullptr;
 };
 
 class BaseTracker {
@@ -99,7 +98,6 @@ class BaseTracker {
 REGISTER_REGISTERER(BaseTracker);
 #define REGISTER_TRACKER(name) REGISTER_CLASS(BaseTracker, name)
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

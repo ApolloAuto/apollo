@@ -6,6 +6,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//modules/perception/lib/pcl_util:pcl_util",
+        "//modules/perception/common:perception_common",
         "//modules/common:common",
         "@eigen//:eigen",
     ],

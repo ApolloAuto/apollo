@@ -28,9 +28,9 @@
 //     }
 //
 //     virtual bool filter(
-//              const PointCloudPtr& cloud,
-//              const std::vector<PolygonType>& map_polygons,
-//              PointCloudPtr* roi_cloud) override {
+//              const pcl_util::PointCloudPtr& cloud,
+//              const ROIFilterOptions &roi_filter_options,
+//              pcl_util::PointCloudPtr* roi_cloud) override {
 //
 //          // Do something.
 //          return true;
@@ -52,6 +52,7 @@
 // using roi_filter to do somethings.
 // ////////////////////////////////////////////////////
 
+#include <Eigen/Core>
 #include <string>
 #include <vector>
 
@@ -64,7 +65,16 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
+
+struct ROIFilterOptions {
+  ROIFilterOptions() {
+    velodyne_trans = nullptr;
+    hdmap = nullptr;
+  }
+
+  HdmapStructConstPtr hdmap;
+  std::shared_ptr<const Eigen::Matrix4d> velodyne_trans;
+};
 
 class BaseROIFilter {
  public:
@@ -74,8 +84,7 @@ class BaseROIFilter {
   virtual bool Init() = 0;
 
   virtual bool Filter(const pcl_util::PointCloudPtr &cloud,
-                      const Eigen::Matrix4d &trans_velodyne_to_world,
-                      HdmapStructConstPtr hdmap_input,
+                      const ROIFilterOptions &roi_filter_options,
                       pcl_util::PointIndicesPtr roi_indices) = 0;
 
   virtual std::string name() const = 0;
@@ -87,7 +96,6 @@ class BaseROIFilter {
 REGISTER_REGISTERER(BaseROIFilter);
 #define REGISTER_ROIFILTER(name) REGISTER_CLASS(BaseROIFilter, name)
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

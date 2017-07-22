@@ -24,7 +24,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 struct alignas(16) RoadBoundary {
     PolygonDType left_boundary;
@@ -39,7 +38,6 @@ struct alignas(16) HdmapStruct {
 typedef std::shared_ptr<HdmapStruct> HdmapStructPtr;
 typedef std::shared_ptr<const HdmapStruct> HdmapStructConstPtr;
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 
