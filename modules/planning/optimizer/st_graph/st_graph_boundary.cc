@@ -27,7 +27,6 @@
 namespace apollo {
 namespace planning {
 
-using STPoint = apollo::common::STPoint;
 using Vec2d = apollo::common::math::Vec2d;
 
 STGraphBoundary::STGraphBoundary(const std::vector<STPoint>& points)

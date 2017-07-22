@@ -36,7 +36,6 @@ namespace planning {
 
 using ErrorCode = apollo::common::ErrorCode;
 using VehicleParam = apollo::common::config::VehicleParam;
-using STPoint = apollo::common::STPoint;
 using PathPoint = apollo::common::PathPoint;
 
 QpSplineStBoundaryMapper::QpSplineStBoundaryMapper(
@@ -165,10 +164,10 @@ ErrorCode QpSplineStBoundaryMapper::map_obstacle_with_trajectory(
           continue;
         } else {
           skip = false;
-          lower_points.push_back(common::util::MakeSTPoint(
-              s_lower, cur_obs_point.relative_time()));
-          upper_points.push_back(common::util::MakeSTPoint(
-              s_upper, cur_obs_point.relative_time()));
+          lower_points.push_back(
+              STPoint(s_lower, cur_obs_point.relative_time()));
+          upper_points.push_back(
+              STPoint(s_upper, cur_obs_point.relative_time()));
         }
       }
     }
@@ -178,15 +177,15 @@ ErrorCode QpSplineStBoundaryMapper::map_obstacle_with_trajectory(
     if (lower_points.size() > 0) {
       boundary_points.clear();
       const double follow_buffer = st_boundary_config().follow_buffer();
-      boundary_points.push_back(common::util::MakeSTPoint(
-          lower_points.at(0).s() - follow_buffer, lower_points.at(0).t()));
-      boundary_points.push_back(common::util::MakeSTPoint(
-          lower_points.back().s() - follow_buffer, lower_points.back().t()));
-      boundary_points.push_back(common::util::MakeSTPoint(
-          upper_points.back().s() + follow_buffer + boundary_buffer,
-          upper_points.back().t()));
-      boundary_points.push_back(common::util::MakeSTPoint(
-          upper_points.at(0).s() + follow_buffer, upper_points.at(0).t()));
+      boundary_points.push_back(STPoint(lower_points.at(0).s() - follow_buffer,
+                                        lower_points.at(0).t()));
+      boundary_points.push_back(STPoint(lower_points.back().s() - follow_buffer,
+                                        lower_points.back().t()));
+      boundary_points.push_back(
+          STPoint(upper_points.back().s() + follow_buffer + boundary_buffer,
+                  upper_points.back().t()));
+      boundary_points.push_back(STPoint(upper_points.at(0).s() + follow_buffer,
+                                        upper_points.at(0).t()));
 
       if (lower_points.at(0).t() > lower_points.back().t() ||
           upper_points.at(0).t() > upper_points.back().t()) {
@@ -246,49 +245,49 @@ ErrorCode QpSplineStBoundaryMapper::map_obstacle_with_trajectory(
         }
 
         if (decision_type == Decision::DecisionType::YIELD_DOWN) {
-          left_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              std::fmax((boundary_points[0].s() - s_delay), 0.1),
-              boundary_points[0].t() - 1.0));
-          left_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              std::fmax((boundary_points[0].s() - s_delay), 0.1) + 0.2,
-              boundary_points[0].t()));
-          left_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[3].s(), boundary_points[3].t()));
           left_buffer_boundary_points.push_back(
-              common::util::MakeSTPoint(left_buffer_boundary_points[0].s(),
-                                        left_buffer_boundary_points[0].t()));
+              STPoint(std::fmax((boundary_points[0].s() - s_delay), 0.1),
+                      boundary_points[0].t() - 1.0));
+          left_buffer_boundary_points.push_back(
+              STPoint(std::fmax((boundary_points[0].s() - s_delay), 0.1) + 0.2,
+                      boundary_points[0].t()));
+          left_buffer_boundary_points.push_back(
+              STPoint(boundary_points[3].s(), boundary_points[3].t()));
+          left_buffer_boundary_points.push_back(
+              STPoint(left_buffer_boundary_points[0].s(),
+                      left_buffer_boundary_points[0].t()));
 
-          right_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[1].s(), boundary_points[1].t()));
-          right_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[1].s(), boundary_points[1].t() + 1.0));
           right_buffer_boundary_points.push_back(
-              common::util::MakeSTPoint(right_buffer_boundary_points[1].s(),
-                                        right_buffer_boundary_points[1].t()));
-          right_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[2].s(), boundary_points[2].t()));
+              STPoint(boundary_points[1].s(), boundary_points[1].t()));
+          right_buffer_boundary_points.push_back(
+              STPoint(boundary_points[1].s(), boundary_points[1].t() + 1.0));
+          right_buffer_boundary_points.push_back(
+              STPoint(right_buffer_boundary_points[1].s(),
+                      right_buffer_boundary_points[1].t()));
+          right_buffer_boundary_points.push_back(
+              STPoint(boundary_points[2].s(), boundary_points[2].t()));
         }
         if (decision_type == Decision::DecisionType::GO_UP) {
-          left_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[3].s(),
-              std::max(boundary_points[3].t() - 0.5, 0.1)));
-          left_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[0].s(), boundary_points[0].t()));
-          left_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[3].s(), boundary_points[3].t()));
           left_buffer_boundary_points.push_back(
-              common::util::MakeSTPoint(left_buffer_boundary_points[0].s(),
-                                        left_buffer_boundary_points[0].t()));
+              STPoint(boundary_points[3].s(),
+                      std::max(boundary_points[3].t() - 0.5, 0.1)));
+          left_buffer_boundary_points.push_back(
+              STPoint(boundary_points[0].s(), boundary_points[0].t()));
+          left_buffer_boundary_points.push_back(
+              STPoint(boundary_points[3].s(), boundary_points[3].t()));
+          left_buffer_boundary_points.push_back(
+              STPoint(left_buffer_boundary_points[0].s(),
+                      left_buffer_boundary_points[0].t()));
 
-          right_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[1].s(), boundary_points[1].t()));
-          right_buffer_boundary_points.push_back(common::util::MakeSTPoint(
+          right_buffer_boundary_points.push_back(
+              STPoint(boundary_points[1].s(), boundary_points[1].t()));
+          right_buffer_boundary_points.push_back(STPoint(
               boundary_points[2].s() + 1.0, boundary_points[2].t() + 1.0));
           right_buffer_boundary_points.push_back(
-              common::util::MakeSTPoint(right_buffer_boundary_points[1].s(),
-                                        right_buffer_boundary_points[1].t()));
-          right_buffer_boundary_points.push_back(common::util::MakeSTPoint(
-              boundary_points[2].s(), boundary_points[2].t()));
+              STPoint(right_buffer_boundary_points[1].s(),
+                      right_buffer_boundary_points[1].t()));
+          right_buffer_boundary_points.push_back(
+              STPoint(boundary_points[2].s(), boundary_points[2].t()));
         }
 
         boundary->emplace_back(left_buffer_boundary_points);
@@ -362,12 +361,10 @@ ErrorCode QpSplineStBoundaryMapper::map_obstacle_without_trajectory(
     if (Double::compare(s_lower, s_upper) >= 0) {
       return ErrorCode::PLANNING_OK;
     } else {
-      boundary_points.push_back(common::util::MakeSTPoint(s_lower, 0.0));
-      boundary_points.push_back(
-          common::util::MakeSTPoint(s_lower, planning_time));
-      boundary_points.push_back(
-          common::util::MakeSTPoint(s_upper, planning_time));
-      boundary_points.push_back(common::util::MakeSTPoint(s_upper, 0.0));
+      boundary_points.push_back(STPoint(s_lower, 0.0));
+      boundary_points.push_back(STPoint(s_lower, planning_time));
+      boundary_points.push_back(STPoint(s_upper, planning_time));
+      boundary_points.push_back(STPoint(s_upper, 0.0));
 
       boundary->emplace_back(boundary_points);
       boundary->back().set_decision_type(Decision::DecisionType::YIELD_DOWN);

@@ -89,8 +89,8 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     double a = speed_curve.evaluate(2, t);
     double da = speed_curve.evaluate(3, t);
     SpeedPoint speed_point;
-    speed_point.mutable_st_point()->set_s(s);
-    speed_point.mutable_st_point()->set_t(t);
+    speed_point.set_s(s);
+    speed_point.set_t(t);
     speed_point.set_v(v);
     speed_point.set_a(a);
     speed_point.set_da(da);

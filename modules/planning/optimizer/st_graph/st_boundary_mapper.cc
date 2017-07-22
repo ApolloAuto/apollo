@@ -31,7 +31,6 @@ namespace apollo {
 namespace planning {
 
 using ErrorCode = apollo::common::ErrorCode;
-using STPoint = apollo::common::STPoint;
 using PathPoint = apollo::common::PathPoint;
 using HDMap = apollo::hdmap::HDMap;
 using Pose = apollo::localization::Pose;
@@ -156,8 +155,8 @@ ErrorCode StBoundaryMapper::get_speed_limits(
           speed_limit_data->mutable_speed_limits();
 
       SpeedPoint speed_point;
-      speed_point.mutable_st_point()->set_s(s);
-      speed_point.mutable_st_point()->set_t(0.0);
+      speed_point.set_s(s);
+      speed_point.set_t(0.0);
       speed_point.set_v(curr_speed_limit);
       speed_point.set_a(0.0);
       speed_point.set_da(0.0);
