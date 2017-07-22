@@ -371,7 +371,7 @@ int HDMapImpl::search_objects(const apollo::common::math::Vec2d& center,
 int HDMapImpl::get_nearest_lane(const apollo::hdmap::Point& point,
                 LaneInfoConstPtr* nearest_lane,
                 double* nearest_s,
-                double* nearest_l) {
+                double* nearest_l) const {
     return get_nearest_lane(apollo::common::math::Vec2d(point.x(), point.y()),
                 nearest_lane, nearest_s, nearest_l);
 }

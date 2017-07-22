@@ -50,7 +50,7 @@ namespace tools {
 class MapUtil {
  public:
   explicit MapUtil(const std::string &map_filename) : _map_client(nullptr) {
-    _map_client.reset(new apollo::hdmap::HDMapImpl());
+    _map_client.reset(new apollo::hdmap::HDMap());
     _map_client->load_map_from_file(map_filename);
   }
 
@@ -138,12 +138,12 @@ class MapUtil {
             vec2d.x(), vec2d.y());
     return 0;
   }
-  const ::apollo::hdmap::HDMapImpl *get_map_client() const {
+  const ::apollo::hdmap::HDMap *get_map_client() const {
     return _map_client.get();
   }
 
  private:
-  std::unique_ptr<apollo::hdmap::HDMapImpl> _map_client;
+  std::unique_ptr<apollo::hdmap::HDMap> _map_client;
 };
 
 }  // namespace tools

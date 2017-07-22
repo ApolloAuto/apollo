@@ -21,74 +21,74 @@ int HDMap::load_map_from_file(const std::string& map_filename) {
     return _impl.load_map_from_file(map_filename);
 }
 
-LaneInfoConstPtr HDMap::get_lane_by_id(const apollo::hdmap::Id& id) {
+LaneInfoConstPtr HDMap::get_lane_by_id(const apollo::hdmap::Id& id) const {
     return _impl.get_lane_by_id(id);
 }
 
-JunctionInfoConstPtr HDMap::get_junction_by_id(const apollo::hdmap::Id& id) {
+JunctionInfoConstPtr HDMap::get_junction_by_id(const apollo::hdmap::Id& id) const {
     return _impl.get_junction_by_id(id);
 }
 
-SignalInfoConstPtr HDMap::get_signal_by_id(const apollo::hdmap::Id& id) {
+SignalInfoConstPtr HDMap::get_signal_by_id(const apollo::hdmap::Id& id) const {
     return _impl.get_signal_by_id(id);
 }
 
-CrosswalkInfoConstPtr HDMap::get_crosswalk_by_id(const apollo::hdmap::Id& id) {
+CrosswalkInfoConstPtr HDMap::get_crosswalk_by_id(const apollo::hdmap::Id& id) const {
     return _impl.get_crosswalk_by_id(id);
 }
 
-StopSignInfoConstPtr HDMap::get_stop_sign_by_id(const apollo::hdmap::Id& id) {
+StopSignInfoConstPtr HDMap::get_stop_sign_by_id(const apollo::hdmap::Id& id) const {
     return _impl.get_stop_sign_by_id(id);
 }
 
-YieldSignInfoConstPtr HDMap::get_yield_sign_by_id(const apollo::hdmap::Id& id) {
+YieldSignInfoConstPtr HDMap::get_yield_sign_by_id(const apollo::hdmap::Id& id) const {
     return _impl.get_yield_sign_by_id(id);
 }
 
-OverlapInfoConstPtr HDMap::get_overlap_by_id(const apollo::hdmap::Id& id) {
+OverlapInfoConstPtr HDMap::get_overlap_by_id(const apollo::hdmap::Id& id) const {
     return _impl.get_overlap_by_id(id);
 }
 
 int HDMap::get_lanes(const apollo::hdmap::Point& point,
                      double distance,
-                     std::vector<LaneInfoConstPtr>* lanes) {
+                     std::vector<LaneInfoConstPtr>* lanes) const {
     return _impl.get_lanes(point, distance, lanes);
 }
 
 int HDMap::get_junctions(const apollo::hdmap::Point& point,
                          double distance,
-                         std::vector<JunctionInfoConstPtr>* junctions) {
+                         std::vector<JunctionInfoConstPtr>* junctions) const {
     return _impl.get_junctions(point, distance, junctions);
 }
 
 int HDMap::get_signals(const apollo::hdmap::Point& point,
                        double distance,
-                       std::vector<SignalInfoConstPtr>* signals) {
+                       std::vector<SignalInfoConstPtr>* signals) const {
     return _impl.get_signals(point, distance, signals);
 }
 
 int HDMap::get_crosswalks(const apollo::hdmap::Point& point,
                           double distance,
-                          std::vector<CrosswalkInfoConstPtr>* crosswalks) {
+                          std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
     return _impl.get_crosswalks(point, distance, crosswalks);
 }
 
 int HDMap::get_stop_signs(const apollo::hdmap::Point& point,
                           double distance,
-                          std::vector<StopSignInfoConstPtr>* stop_signs) {
+                          std::vector<StopSignInfoConstPtr>* stop_signs) const {
     return _impl.get_stop_signs(point, distance, stop_signs);
 }
 
 int HDMap::get_yield_signs(const apollo::hdmap::Point& point,
                            double distance,
-                           std::vector<YieldSignInfoConstPtr>* yield_signs) {
+                           std::vector<YieldSignInfoConstPtr>* yield_signs) const {
     return _impl.get_yield_signs(point, distance, yield_signs);
 }
 
 int HDMap::get_nearest_lane(const ::apollo::hdmap::Point& point,
                 LaneInfoConstPtr* nearest_lane,
                 double* nearest_s,
-                double* nearest_l) {
+                double* nearest_l) const {
     return _impl.get_nearest_lane(point, nearest_lane, nearest_s, nearest_l);
 }
 

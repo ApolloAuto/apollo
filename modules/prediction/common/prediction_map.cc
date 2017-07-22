@@ -38,7 +38,7 @@ PredictionMap::~PredictionMap() {
 }
 
 void PredictionMap::LoadMap() {
-  hdmap_.reset(new apollo::hdmap::HDMapImpl());
+  hdmap_.reset(new apollo::hdmap::HDMap());
   CHECK(hdmap_ != nullptr);
   hdmap_->load_map_from_file(FLAGS_map_file);
   ADEBUG << "Load map file: " << FLAGS_map_file;

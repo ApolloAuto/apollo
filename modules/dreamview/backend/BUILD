@@ -118,6 +118,7 @@ cc_library(
 
 cc_test(
     name = "map_service_test",
+    size = "small",
     srcs = [
         "map_service_test.cc",
     ],
