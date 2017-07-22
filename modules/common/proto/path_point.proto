@@ -2,11 +2,6 @@ syntax = "proto2";
 
 package apollo.common;
 
-message STPoint {
-    optional double s = 1;
-    optional double t = 2;
-}
-
 message SLPoint {
     optional double s = 1;
     optional double l = 2;
@@ -17,18 +12,6 @@ message FrenetFramePoint {
     optional double l = 2;
     optional double dl = 3;
     optional double ddl = 4;
-}
-
-message Signals {
-  enum SignalType {
-    LEFT_TURN = 1;
-    RIGHT_TURN = 2;
-    LOW_BEAM_LIGHT = 3;
-    HIGH_BEAM_LIGHT = 4;
-    FOG_LIGHT = 5;
-    EMERGENCY_LIGHT = 6;
-  }
-  repeated SignalType signal = 1;
 }
 
 message EStop {
