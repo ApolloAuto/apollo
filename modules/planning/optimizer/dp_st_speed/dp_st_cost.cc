@@ -15,14 +15,15 @@
  *****************************************************************************/
 
 /**
- * @file qp_st_cost.cpp
+ * @file dp_st_cost.cc
  **/
-#include "optimizer/dp_st_speed_optimizer/dp_st_cost.h"
 
 #include <limits>
+#include <vector>
 
-#include "common/speed/st_point.h"
-#include "math/double.h"
+#include "modules/planning/common/data_center.h"
+#include "modules/planning/math/double.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_cost.h"
 
 namespace apollo {
 namespace planning {
@@ -41,10 +42,11 @@ double DpStCost::obstacle_cost(
     const std::vector<STGraphBoundary>& obs_boundary) const {
   double total_cost = 0.0;
   for (const STGraphBoundary& boundary : obs_boundary) {
-    if (point.s() < 0 || boundary.is_point_in_boundary(point)) {
+    if (point.s() < 0 || boundary.IsPointInBoundary(point)) {
       total_cost += _dp_st_configuration.st_graph_default_point_cost();
     } else {
-      double distance = boundary.distance_to(point);
+      ::apollo::common::math::Vec2d vec2d = {point.t(), point.s()};
+      double distance = boundary.DistanceTo(vec2d);
       total_cost += _dp_st_configuration.st_graph_default_point_cost() *
                     std::exp(_dp_st_configuration.obstacle_cost_factor() /
                              boundary.characteristic_length() * distance);

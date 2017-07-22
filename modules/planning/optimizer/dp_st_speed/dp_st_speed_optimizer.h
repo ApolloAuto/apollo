@@ -18,24 +18,25 @@
  * @file dp_st_speed_optimizer.h
  **/
 
-#ifndef BAIDU_IDG_HOUSTON_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_H_
-#define BAIDU_IDG_HOUSTON_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_SPEED_OPTIMIZER_H_
+#define MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_SPEED_OPTIMIZER_H_
 
-#include "optimizer/speed_optimizer.h"
-
-#include "boost/property_tree/ptree.hpp"
+// #include "boost/property_tree/ptree.hpp"
+#include "modules/planning/optimizer/speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
 
 class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
-  explicit DpStSpeedOptimizer(const std::string& name,
-                              const boost::property_tree::ptree& ptree);
+  // TODO: to be fixed
+  // explicit DpStSpeedOptimizer(const std::string& name,
+  //                            const boost::property_tree::ptree& ptree);
+  explicit DpStSpeedOptimizer(const std::string& name);
 
   virtual ErrorCode optimize(const DataCenter& data_center,
                              const PathData& path_data,
-                             const ::adu::planning::TrajectoryPoint& init_point,
+                             const TrajectoryPoint& init_point,
                              DecisionData* const decision_data,
                              SpeedData* const speed_data) const;
 };
@@ -43,4 +44,4 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // BAIDU_IDG_HOUSTON_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_SPEED_OPTIMIZER_H_

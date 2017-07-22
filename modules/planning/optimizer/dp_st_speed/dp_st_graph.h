@@ -15,29 +15,33 @@
  *****************************************************************************/
 
 /**
- * @file qp_st_graph.h
+ * @file dp_st_graph.h
  **/
 
-#ifndef BAIDU_IDG_HOUSTON_OPTIMIZER_QP_ST_SPEED_OPTIMIZER_DP_ST_GRAPH_H_
-#define BAIDU_IDG_HOUSTON_OPTIMIZER_QP_ST_SPEED_OPTIMIZER_DP_ST_GRAPH_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_QP_ST_SPEED_DP_ST_GRAPH_H_
+#define MODULES_PLANNING_OPTIMIZER_QP_ST_SPEED_DP_ST_GRAPH_H_
 
-#include "optimizer/st_graph/st_graph.h"
-
-#include "config.pb.h"
-#include "planning_halo.pb.h"
-
-#include "optimizer/dp_st_speed_optimizer/dp_st_configuration.h"
-#include "optimizer/dp_st_speed_optimizer/dp_st_cost.h"
-#include "optimizer/st_graph/st_graph_data.h"
+#include <vector>
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/planning/common/decision_data.h"
+#include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/common/speed/st_point.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_configuration.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_cost.h"
+#include "modules/planning/optimizer/st_graph/st_graph_data.h"
 
 namespace apollo {
 namespace planning {
 
-class DPSTGraph : public STGraph {
+using ErrorCode = apollo::common::ErrorCode;
+
+class DPSTGraph {
  public:
   DPSTGraph(const DpStConfiguration& dp_config,
             // const STBoundaryConfig& mapper_config,
-            const ::adu::common::config::VehicleParam& veh_param);
+            const apollo::common::config::VehicleParam& veh_param);
 
   ErrorCode search(const STGraphData& st_graph_data,
                    DecisionData* const decision_data,
@@ -94,4 +98,4 @@ class DPSTGraph : public STGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // BAIDU_IDG_HOUSTON_OPTIMIZER_QP_ST_SPEED_OPTIMIZER_QP_ST_GRAPH_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_QP_ST_SPEED_DP_ST_GRAPH_H_

@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -76,3 +78,5 @@ cc_library(
         "//modules/planning/state_machine:master_state_machine",
     ],
 )
+
+cpplint()

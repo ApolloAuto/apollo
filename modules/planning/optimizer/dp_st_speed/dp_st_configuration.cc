@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_configuration.h
+ * @file dp_st_configuration.cc
  **/
 
-#include "optimizer/dp_st_speed_optimizer/dp_st_configuration.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_configuration.h"
 
 namespace apollo {
 namespace planning {

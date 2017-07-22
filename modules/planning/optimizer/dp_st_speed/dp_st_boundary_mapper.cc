@@ -15,70 +15,79 @@
  *****************************************************************************/
 
 /**
-*   @file: dp_st_boundary_mapper.cpp
+*   @file: dp_st_boundary_mapper.cc
 **/
 
-#include "optimizer/dp_st_speed_optimizer/dp_st_boundary_mapper.h"
-
+#include <algorithm>
 #include <limits>
-
-#include "common/houston_gflags.h"
-#include "math/double.h"
-#include "math/segment2d.h"
-#include "math/vec2d.h"
+#include <vector>
+#include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/double.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_boundary_mapper.h"
 
 namespace apollo {
 namespace planning {
 
+using PathPoint = apollo::common::PathPoint;
+
 DPSTBoundaryMapper::DPSTBoundaryMapper(
     const STBoundaryConfig& st_boundary_config,
-    const ::adu::common::config::VehicleParam& veh_param)
-    : StBoundaryMapper(st_boundary_config, veh_param) {}
+    const ::apollo::common::config::VehicleParam& veh_param)
+    : STBoundaryMapper(st_boundary_config, veh_param) {}
 
 ErrorCode DPSTBoundaryMapper::get_graph_boundary(
-    const DataCenter& data_center, const DecisionData& decision_data,
-    const PathData& path_data, const double planning_distance,
-    const double planning_time,
+    const common::TrajectoryPoint& initial_planning_point,
+    const DecisionData& decision_data, const PathData& path_data,
+    const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const obs_boundary) const {
-  QUIT_IF(planning_time < 0.0, ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "Fail to get params since planning_time < 0.");
-  QUIT_IF(path_data.path().num_of_points() < 2,
-          ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-          "Fail to get params since path has %lu points.",
-          path_data.path().num_of_points());
+  if (planning_time < 0.0) {
+    AERROR << "Fail to get params since planning_time < 0.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
+
+  if (path_data.path().num_of_points() < 2) {
+    AERROR << "Fail to get params since path has "
+        <<  path_data.path().num_of_points() << " points.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
+
   obs_boundary->clear();
 
   // TODO: add mapping main decision and map obstacle here
   const std::vector<const Obstacle*>& static_obs_vec =
-      decision_data.static_obstacle();
+      decision_data.StaticObstacles();
   const std::vector<const Obstacle*>& dynamic_obs_vec =
-      decision_data.dynamic_obstacle();
+      decision_data.DynamicObstacles();
 
   for (std::size_t i = 0; i < static_obs_vec.size(); ++i) {
     if (static_obs_vec[i] == nullptr) {
       continue;
     }
-    QUIT_IF(map_obstacle_without_trajectory(
-                *static_obs_vec[i], path_data, planning_distance, planning_time,
-                obs_boundary) != ErrorCode::PLANNING_OK,
-            ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-            "Fail to map static obstacle with id %d", static_obs_vec[i]->id());
+    if (map_obstacle_without_trajectory(
+        *static_obs_vec[i], path_data, planning_distance, planning_time,
+        obs_boundary) != ErrorCode::PLANNING_OK) {
+      AERROR << "Fail to map static obstacle with id "
+          << static_obs_vec[i]->Id();
+      return ErrorCode::PLANNING_ERROR_FAILED;
+    }
   }
 
   for (std::size_t i = 0; i < dynamic_obs_vec.size(); ++i) {
     if (dynamic_obs_vec[i] == nullptr) {
       continue;
     }
-    QUIT_IF(map_obstacle_with_trajectory(
-                *dynamic_obs_vec[i], path_data, planning_distance,
-                planning_time, obs_boundary) != ErrorCode::PLANNING_OK,
-            ErrorCode::PLANNING_ERROR_FAILED, Level::ERROR,
-            "Fail to map dynamic obstacle with id %d",
-            dynamic_obs_vec[i]->id());
+    if (map_obstacle_with_trajectory(
+        *dynamic_obs_vec[i], path_data, planning_distance,
+        planning_time, obs_boundary) != ErrorCode::PLANNING_OK) {
+      AERROR << "Fail to map dynamic obstacle with id "
+          << dynamic_obs_vec[i]->Id();
+      return ErrorCode::PLANNING_ERROR_FAILED;
+    }
   }
 
   return ErrorCode::PLANNING_OK;
-  ;
 }
 
 ErrorCode DPSTBoundaryMapper::map_obstacle_with_trajectory(
@@ -95,9 +104,10 @@ ErrorCode DPSTBoundaryMapper::map_obstacle_with_trajectory(
     for (std::size_t j = 0; j < pred_traj.num_of_points(); ++j) {
       TrajectoryPoint cur_obs_point = pred_traj.trajectory_point_at(j);
       // construct bounding box
-      ::adu::common::math::Box2d obs_box({cur_obs_point.x(), cur_obs_point.y()},
-                                         cur_obs_point.theta(),
-                                         obstacle.length(), obstacle.width());
+      ::apollo::common::math::Box2d obs_box({cur_obs_point.path_point().x(),
+          cur_obs_point.path_point().y()},
+          cur_obs_point.path_point().theta(),
+          obstacle.Length(), obstacle.Width());
 
       // loop path data to find the lower and upper bound
       const double buffer = st_boundary_config().boundary_buffer();
@@ -167,12 +177,14 @@ ErrorCode DPSTBoundaryMapper::map_obstacle_without_trajectory(
   // Static obstacle only have yield option
   const std::vector<PathPoint>& veh_path = path_data.path().path_points();
 
-  ::adu::common::math::Box2d obs_box = obstacle.bounding_box();
+  ::apollo::common::math::Box2d obs_box = obstacle.BoundingBox();
 
   const double buffer = st_boundary_config().boundary_buffer();
 
-  QUIT_IF(veh_path.size() == 0, ErrorCode::PLANNING_ERROR_NOT_FOUND,
-          Level::ERROR, "[DP_ST_BOUNDARY_MAPPER] Vehicle path empty!");
+  if (veh_path.size() == 0) {
+    AERROR << "[DP_ST_BOUNDARY_MAPPER] Vehicle path empty.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
 
   std::size_t low_index = 0;
   std::size_t high_index = veh_path.size() - 1;

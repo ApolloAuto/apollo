@@ -37,12 +37,12 @@
 namespace apollo {
 namespace planning {
 
-class StBoundaryMapper {
+class STBoundaryMapper {
  public:
-  StBoundaryMapper(const apollo::planning::StBoundaryConfig& st_boundary_config,
+  STBoundaryMapper(const apollo::planning::STBoundaryConfig& st_boundary_config,
                    const apollo::common::config::VehicleParam& veh_param);
 
-  virtual ~StBoundaryMapper() = default;
+  virtual ~STBoundaryMapper() = default;
 
   virtual common::ErrorCode get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
@@ -56,7 +56,7 @@ class StBoundaryMapper {
       const std::size_t matrix_dimension_s, const double default_speed_limit,
       SpeedLimit* const speed_limit_data);
 
-  const apollo::planning::StBoundaryConfig& st_boundary_config() const;
+  const apollo::planning::STBoundaryConfig& st_boundary_config() const;
   const apollo::common::config::VehicleParam& vehicle_param() const;
 
  protected:
@@ -69,7 +69,7 @@ class StBoundaryMapper {
                      const double buffer) const;
 
  private:
-  apollo::planning::StBoundaryConfig _st_boundary_config;
+  apollo::planning::STBoundaryConfig _st_boundary_config;
   apollo::common::config::VehicleParam _veh_param;
 };
 
