@@ -21,10 +21,14 @@
 #include <unordered_set>
 #include <utility>
 #include <algorithm>
+#include <limits>
+
+#include "Eigen/Dense"
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -33,6 +37,7 @@ using apollo::perception::PerceptionObstacle;
 using apollo::common::math::KalmanFilter;
 using apollo::common::ErrorCode;
 using apollo::common::Point3D;
+using apollo::hdmap::LaneInfo;
 
 std::mutex Obstacle::mutex_;
 
@@ -58,7 +63,7 @@ Obstacle::~Obstacle() {
   feature_history_.clear();
   kf_lane_trackers_.clear();
   kf_motion_tracker_enabled_ = false;
-  // TODO(author) current_lanes_.clear();
+  current_lanes_.clear();
 }
 
 int Obstacle::id() const {
@@ -598,7 +603,64 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
 }
 
 void Obstacle::SetCurrentLanes(Feature* feature) {
-  // TODO(kechxu) implement
+  PredictionMap* map = PredictionMap::instance();
+  if (map == nullptr) {
+    AERROR << "Map is missing.";
+    return;
+  }
+  Eigen::Vector2d point(feature->position().x(), feature->position().y());
+  double heading = feature->theta();
+  if (FLAGS_enable_kf_tracking) {
+    point[0] = feature->t_position().x();
+    point[1] = feature->t_position().y();
+    heading = feature->t_velocity_heading();
+  }
+  std::vector<const LaneInfo*> current_lanes;
+  map->OnLane(current_lanes, point, heading,
+              FLAGS_search_radius, &current_lanes);
+  current_lanes_ = current_lanes;
+  if (current_lanes_.empty()) {
+    ADEBUG << "Unable to find current lane.";
+    return;
+  }
+  Lane lane;
+  if (feature->has_lane()) {
+    lane = feature->lane();
+  }
+  double min_heading_diff = std::numeric_limits<double>::infinity();
+  for (const LaneInfo* current_lane : current_lanes) {
+    int turn_type = map->LaneTurnType(current_lane->id());
+    std::string lane_id = current_lane->id().id();
+    double s = 0.0;
+    double l = 0.0;
+    map->GetProjection(point, current_lane, &s, &l);
+    double nearest_point_heading = 0.0;
+    //     TODO(kechxu) current_lane->get_nearest_point(point).heading();
+    double angle_diff = 0.0;
+        apollo::common::math::AngleDiff(heading, nearest_point_heading);
+    double left = 0.0;
+    double right = 0.0;
+    current_lane->get_width(s, &left, &right);
+    LaneFeature* lane_feature = lane.add_current_lane_feature();
+    lane_feature->set_lane_turn_type(turn_type);
+    lane_feature->set_lane_id(lane_id);
+    lane_feature->set_lane_s(s);
+    lane_feature->set_lane_l(l);
+    lane_feature->set_angle_diff(angle_diff);
+    lane_feature->set_dist_to_left_boundary(left - l);
+    lane_feature->set_dist_to_right_boundary(right + l);
+    if (std::fabs(angle_diff) < min_heading_diff) {
+      lane.mutable_lane_feature()->CopyFrom(*lane_feature);
+      min_heading_diff = std::fabs(angle_diff);
+    }
+  }
+
+  if (lane.has_lane_feature()) {
+    ADEBUG << "Obstacle [" << id_ << "] has one current lane ["
+           << lane.lane_feature().lane_id() << "].";
+  }
+
+  feature->mutable_lane()->CopyFrom(lane);
 }
 
 void Obstacle::SetNearbyLanes(Feature* feature) {

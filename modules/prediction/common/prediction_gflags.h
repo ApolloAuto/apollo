@@ -37,5 +37,6 @@ DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
 DECLARE_string(map_file);
 DECLARE_double(prediction_duration);
+DECLARE_double(search_radius);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
