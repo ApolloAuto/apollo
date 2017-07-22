@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/define.h"
 
 namespace apollo {
 namespace perception {
@@ -43,8 +44,6 @@ enum SensorType {
 
 typedef pcl_util::PointCloud PolygonType;
 typedef pcl_util::PointDCloud PolygonDType;
-
-const double PI = 3.1415926535898;
 
 using SeqId = uint32_t;
 

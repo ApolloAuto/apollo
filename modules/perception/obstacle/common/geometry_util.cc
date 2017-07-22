@@ -17,7 +17,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 void TransAffineToMatrix4(
     const Eigen::Vector3d& translation,
@@ -41,6 +40,5 @@ void TransAffineToMatrix4(
                      0, 0, 0, 1;
 }
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
