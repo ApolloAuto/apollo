@@ -21,7 +21,7 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_POINT_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_POINT_H_
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/common/speed/st_point.h"
 
 namespace apollo {
 namespace planning {
@@ -34,7 +34,7 @@ class STGraphPoint {
   std::size_t index_s() const;
   std::size_t index_t() const;
 
-  const apollo::common::STPoint& point() const;
+  const STPoint& point() const;
   const STGraphPoint* pre_point() const;
 
   double reference_cost() const;
@@ -42,7 +42,7 @@ class STGraphPoint {
   double total_cost() const;
 
   void init(const std::size_t index_t, const std::size_t index_s,
-            const apollo::common::STPoint& st_point);
+            const STPoint& st_point);
 
   // given reference speed profile, reach the cost, including position
   void set_reference_cost(const double reference_cost);
@@ -55,10 +55,10 @@ class STGraphPoint {
 
   void set_pre_point(const STGraphPoint& pre_point);
 
-  apollo::common::STPoint* mutable_point();
+  STPoint* mutable_point();
 
  private:
-  apollo::common::STPoint _point;
+  STPoint _point;
   const STGraphPoint* _pre_point = nullptr;
   std::size_t _index_s = 0;
   std::size_t _index_t = 0;

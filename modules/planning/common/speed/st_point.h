@@ -15,38 +15,29 @@
  *****************************************************************************/
 
 /**
- * @file
- * @brief Some util functions.
- */
+ * @file st_point.h
+ **/
 
-#ifndef MODULES_COMMON_UTIL_H_
-#define MODULES_COMMON_UTIL_H_
+#ifndef MODULES_PLANNING_COMMON_SPEED_ST_POINT_H_
+#define MODULES_PLANNING_COMMON_SPEED_ST_POINT_H_
 
-#include <string>
+#include "modules/common/math/vec2d.h"
 
-#include "modules/common/proto/path_point.pb.h"
-
-/**
- * @namespace apollo::common::util
- * @brief apollo::common::util
- */
 namespace apollo {
-namespace common {
-namespace util {
+namespace planning {
 
-/**
- * @brief Check if a string ends with a pattern.
- * @param original The original string. To see if it ends with some
- *        specified pattern.
- * @param pattern The target pattern. To see if the original string ends
- *        with it.
- * @return Whether the original string ends with the specified pattern.
- */
-bool EndWith(const std::string &original, const std::string &pattern);
-apollo::common::SLPoint MakeSLPoint(const double s, const double l);
+class STPoint : public common::math::Vec2d {
+ public:
+  STPoint() = default;
+  STPoint(const double s, const double t);
+  double s() const;
+  double t() const;
+  void set_s(const double s);
+  void set_t(const double t);
+  std::string DebugString() const;
+};
 
-}  // namespace util
-}  // namespace common
+}  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_H_
+#endif  // MODULES_PLANNING_COMMON_SPEED_ST_POINT_H_

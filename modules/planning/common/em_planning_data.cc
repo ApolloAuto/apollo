@@ -75,21 +75,21 @@ bool EMPlanningData::aggregate(const double time_resolution) {
     apollo::common::PathPoint path_point;
     // TODO temp fix speed point s out of path point bound, need further refine
     // later
-    if (speed_point.st_point().s() > path_data.path().param_length()) {
+    if (speed_point.s() > path_data.path().param_length()) {
       break;
     }
-    QUIT_IF(!path_data.get_path_point_with_path_s(speed_point.st_point().s(),
+    QUIT_IF(!path_data.get_path_point_with_path_s(speed_point.s(),
                                                   &path_point),
             false, ERROR,
             "Fail to get path data with s %f, path total length %f",
-            speed_point.st_point().s(), path_data.path().param_length());
+            speed_point.s(), path_data.path().param_length());
 
     apollo::common::TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed_point.v());
     trajectory_point.set_a(speed_point.a());
     trajectory_point.set_relative_time(_init_planning_point.relative_time() +
-                                       speed_point.st_point().t());
+                                       speed_point.t());
     _computed_trajectory.add_trajectory_point(trajectory_point);
   }
   return true;

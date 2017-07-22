@@ -25,7 +25,6 @@
 namespace apollo {
 namespace planning {
 
-using STPoint = apollo::common::STPoint;
 
 std::size_t STGraphPoint::index_s() const { return _index_s; }
 

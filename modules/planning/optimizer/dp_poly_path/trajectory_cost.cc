@@ -92,16 +92,16 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
     SpeedPoint speed_point;
     if (!_heuristic_speed_data.get_speed_point_with_time(eval_time,
                                                          &speed_point) ||
-        start_s <= speed_point.st_point().s()) {
+        start_s <= speed_point.s()) {
       continue;
     }
-    if (speed_point.st_point().s() >= end_s) {
+    if (speed_point.s() >= end_s) {
       break;
     }
-    double l = curve.evaluate(1, speed_point.st_point().s() - start_s);
+    double l = curve.evaluate(1, speed_point.s() - start_s);
     total_cost += l;  // need refine l cost;
 
-    ::apollo::common::math::Vec2d car_point = {speed_point.st_point().s(), l};
+    ::apollo::common::math::Vec2d car_point = {speed_point.s(), l};
     ReferencePoint reference_point =
         reference_line.get_reference_point(car_point.x());
     ::apollo::common::math::Box2d car_box = {

@@ -44,14 +44,14 @@ class STGraphBoundary final : public ::apollo::common::math::Polygon2d {
     UNKNOWN
   };
 
-  STGraphBoundary(const std::vector<apollo::common::STPoint>& points);
+  STGraphBoundary(const std::vector<STPoint>& points);
   STGraphBoundary(const std::vector<::apollo::common::math::Vec2d>& points);
 
   ~STGraphBoundary() = default;
 
   bool is_empty() const;
   bool IsPointInBoundary(const STGraphPoint& st_graph_point) const;
-  bool IsPointInBoundary(const apollo::common::STPoint& st_point) const;
+  bool IsPointInBoundary(const STPoint& st_point) const;
 
   const ::apollo::common::math::Vec2d point(const size_t index) const;
   const std::vector<::apollo::common::math::Vec2d>& points() const;

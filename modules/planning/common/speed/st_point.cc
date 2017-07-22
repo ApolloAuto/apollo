@@ -14,25 +14,34 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/util/planning_util.h"
+/**
+ * @file st_point.cpp
+ **/
+
+#include "modules/planning/common/speed/st_point.h"
+
+#include <iomanip>
+#include <sstream>
 
 namespace apollo {
 namespace planning {
-namespace util {
 
-using SpeedPoint = apollo::planning::SpeedPoint;
+STPoint::STPoint(const double s, const double t) : Vec2d(t, s){};
 
-SpeedPoint MakeSpeedPoint(const double s, const double t, double v, double a,
-                          double da) {
-  SpeedPoint point;
-  point.set_s(s);
-  point.set_t(t);
-  point.set_v(v);
-  point.set_a(a);
-  point.set_da(da);
-  return point;
+double STPoint::s() const { return y_; }
+
+double STPoint::t() const { return x_; }
+
+void STPoint::set_s(const double s) { return set_y(s); }
+
+void STPoint::set_t(const double t) { return set_x(t); }
+
+std::string STPoint::DebugString() const {
+  std::ostringstream sout;
+  sout << "{ \"s\" : " << std::setprecision(6) << s()
+       << ", \"t\" : " << std::setprecision(6) << t() << " }";
+  return sout.str();
 }
 
-}  // namespace util
 }  // namespace planning
 }  // namespace apollo

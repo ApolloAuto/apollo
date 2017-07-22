@@ -9,8 +9,8 @@ cc_library(
         "st_graph_point.h",
     ],
     deps = [
-        "//modules/common/proto:path_point_proto",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/speed:st_point",
     ],
 )
 
@@ -41,7 +41,6 @@ cc_library(
     ],
     deps = [
         ":st_graph_boundary",
-        "//modules/common/proto:path_point_proto",
         "//modules/planning/common:planning_gflags",
     ],
 )

@@ -10,13 +10,14 @@ import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
 
 message SpeedPoint {
-  optional apollo.common.STPoint st_point = 1;
+  optional double s = 1;
+  optional double t = 2;
   // speed (m/s)
-  optional double v = 2;
+  optional double v = 3;
   // acceleration (m/s^2)
-  optional double a = 3;
+  optional double a = 4;
   // jerk (m/s^3)
-  optional double da = 4;
+  optional double da = 5;
 }
 
 // TODO(aaron): Migrate to apollo::common::TrajectoryPoint.
