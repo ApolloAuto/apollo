@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/perception.h"
+#include <sensor_msgs/PointCloud2.h>
 
+#include "modules/perception/perception.h"
+//#include "modules/perception/obstacle/lidar/onboard/lidar_predetection_data.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "ros/include/ros/ros.h"
@@ -29,28 +31,27 @@ using apollo::common::Status;
 std::string Perception::Name() const { return "perception"; }
 
 Status Perception::Init() {
-  AdapterManager::Init();
+  
+  AdapterManager::Init(FLAGS_adapter_config_path);
+//  preprocessor_.Init(FLAGS_perception_flag);
+
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  AdapterManager::SetPointCloudCallback(&Perception::OnPointCloud, this);
   return Status::OK();
 }
 
-Status Perception::Start() {
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
-  ros::waitForShutdown();
-  spinner.stop();
-  ros::Rate loop_rate(FLAGS_perception_loop_rate);
-  while (ros::ok()) {
-    AdapterManager::Observe();
-    PerceptionObstacles perceptionObstacles;
-    AdapterManager::FillPerceptionObstaclesHeader(
-        Name(), perceptionObstacles.mutable_header());
-    AdapterManager::PublishPerceptionObstacles(perceptionObstacles);
+void Perception::OnPointCloud(const sensor_msgs::PointCloud2& message) {
+  AINFO << "get point cloud callback";
+  //auto predetection_data = std::make_shared<LidarPredectionData>();
 
-    TrafficLightDetection trafficLightDetection;
-    AdapterManager::FillTrafficLightDetectionHeader(
-        Name(), trafficLightDetection.mutable_header());
-    AdapterManager::PublishTrafficLightDetection(trafficLightDetection);
-  }
+  //if(preprocessor_.Proc(message, &predetection_data) != Status.OK()) {
+  //  return Status(ERROR_CODE::PERCEPTION_ERROR, "preprocessing failure in perception");
+  //}
+
+  //adding other logic here
+}
+
+Status Perception::Start() {
   return Status::OK();
 }
 

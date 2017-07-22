@@ -22,7 +22,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 // using apollo::common::perception::PerceptionObstacle;
 // using apollo::common::perception::PerceptionErrorCode_Name;
@@ -36,7 +35,7 @@ Object::Object() {
   direction = Vector3d(1, 0, 0);
   center = Vector3d::Zero();
   velocity = Vector3d::Zero();
-  cloud.reset(new PointCloud);
+  cloud.reset(new pcl_util::PointCloud);
   type_probs.resize(MAX_OBJECT_TYPE, 0);
 }
 
@@ -81,7 +80,7 @@ Object& Object::operator = (const Object& rhs) {
 
 void Object::clone(const Object& rhs) {
   id = rhs.id;
-  pcl::copyPointCloud<Point, Point>(*(rhs.cloud), *cloud);
+  pcl::copyPointCloud<pcl_util::Point, pcl_util::Point>(*(rhs.cloud), *cloud);
   polygon = rhs.polygon;
   direction = rhs.direction;
   theta = rhs.theta;
@@ -197,6 +196,5 @@ string Object::to_string() const {
 //   return true;
 // }
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

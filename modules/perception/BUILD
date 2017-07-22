@@ -10,6 +10,7 @@ cc_library(
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/common:perception_common",
+        "//modules/perception/obstacle/lidar/onboard:perception_obstacle_onboard",
     ],
 )
 

@@ -27,7 +27,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 struct alignas(16) Object {
   Object();
@@ -44,7 +43,7 @@ struct alignas(16) Object {
   // object id per frame
   int id = 0;
   // point cloud of the object
-  PointCloudPtr cloud;
+  pcl_util::PointCloudPtr cloud;
   // convex hull of the object
   PolygonDType polygon;
 
@@ -82,7 +81,6 @@ struct alignas(16) Object {
 typedef std::shared_ptr<Object> ObjectPtr;
 typedef std::shared_ptr<const Object> ObjectConstPtr;
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

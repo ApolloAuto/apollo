@@ -73,10 +73,10 @@ class BaseROIFilter {
 
   virtual bool Init() = 0;
 
-  virtual bool Filter(const PointCloudPtr &cloud,
+  virtual bool Filter(const pcl_util::PointCloudPtr &cloud,
                       const Eigen::Matrix4d &trans_velodyne_to_world,
                       HdmapStructConstPtr hdmap_input,
-                      PointIndicesPtr roi_indices) = 0;
+                      pcl_util::PointIndicesPtr roi_indices) = 0;
 
   virtual std::string name() const = 0;
 

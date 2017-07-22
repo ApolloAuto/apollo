@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PREPROCESSING_DATA_H
+#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PREPROCESSING_DATA_H
+
+#include <Eigen/Core>
+
+#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
 
-std::string GetSensorType(SensorType sensor_type) {
-    switch (sensor_type) {
-        case VELODYNE_64 :
-            return "velodyne_64";
-        case VELODYNE_16 :
-            return "velodyne_16";
-        case RADAR :
-            return "radar";
-        case CAMERA :
-            return "camera";
-        case UNKNOWN_SENSOR_TYPE :
-            return "unknown_sensor_type";
+struct LidarPredetectionData {
+    LidarPredetectionData() {
+        lidar2world_pose = Eigen::Matrix4d::Zero();
     }
-    return "";
-}
+
+    double timestamp = 0.0;
+    SeqId seq_num = 0;
+    pcl_util::PointCloudPtr cloud;
+    pcl_util::PointCloudPtr roi_cloud;
+    pcl_util::PointIndices non_ground_indices;
+    Eigen::Matrix4d lidar2world_pose;
+};
 
 }  // namespace perception
 }  // namespace apollo
+
+#endif  // ADU_PERCEPTION_OBSTACLE_ONBOARD_PREPROCESSING_SHARED_DATA_H

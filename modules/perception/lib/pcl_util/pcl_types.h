@@ -22,9 +22,12 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/search/impl/kdtree.hpp>
+#include <pcl/common/transforms.h>
+//#include <pcl_conversions/pcl_conversions.h>
 
 namespace apollo {
 namespace perception {
+namespace pcl_util {  
 
 typedef pcl::PointIndices PointIndices;
 typedef pcl::PointIndices::Ptr PointIndicesPtr;
@@ -145,38 +148,39 @@ struct PointXYZITd {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW  // make sure our new allocators are aligned
 } EIGEN_ALIGN16;  // enforce SSE padding for correct memory alignment
 
+} // namespace pcl
 }  // namespace perception
 }  // namespace apollo
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
-    apollo::perception::PointD,
+    apollo::perception::pcl_util::PointD,
     (double, x, x)(double, y, y)(double, z, z)(uint8_t, intensity, intensity))
 
-POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::PointXYZIH,
+POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::pcl_util::PointXYZIH,
                                   (float, x, x)(float, y, y)(float, z, z)(
                                       float, intensity, intensity)(float, h, h))
 
-POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::PointXYZIT,
+POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::pcl_util::PointXYZIT,
                                   (float, x, x)(float, y, y)(float, z, z)(
                                       uint8_t, intensity,
                                       intensity)(double, timestamp, timestamp))
-POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::RawPointXYZIT,
+POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::pcl_util::RawPointXYZIT,
                                   (float, x, x)(float, y, y)(float, z, z)(
                                       uint8_t, intensity,
                                       intensity)(double, timestamp, timestamp))
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
-    apollo::perception::PointXYZIRT,
+    apollo::perception::pcl_util::PointXYZIRT,
     (float, x, x)(float, y, y)(float, z, z)(uint8_t, intensity, intensity)(
         uint8_t, ring, ring)(double, timestamp, timestamp))
 
-POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::PointXYZITd,
+POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::pcl_util::PointXYZITd,
                                   (double, x, x)(double, y, y)(double, z, z)(
                                       uint8_t, intensity,
                                       intensity)(double, timestamp, timestamp))
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
-    apollo::perception::PointXYZIRTd,
+    apollo::perception::pcl_util::PointXYZIRTd,
     (double, x, x)(double, y, y)(double, z, z)(uint8_t, intensity, intensity)(
         uint8_t, ring, ring)(double, timestamp, timestamp))
 
