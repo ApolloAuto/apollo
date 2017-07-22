@@ -28,21 +28,23 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 class DummyROIFilter : public BaseROIFilter {
  public:
   DummyROIFilter() : BaseROIFilter() {}
   ~DummyROIFilter() = default;
 
-  bool Init() override { return result_init_; }
+  bool Init() override {
+    return result_init_;
+  }
 
-  bool Filter(const PointCloudPtr &cloud,
-              const Eigen::Matrix4d &trans_velodyne_to_world,
-              HdmapStructConstPtr hdmap_input,
-              PointIndicesPtr roi_indices) override;
+  bool Filter(const pcl_util::PointCloudPtr &cloud,
+              const ROIFilterOptions &roi_filter_options,
+              pcl_util::PointIndicesPtr roi_indices) override;
 
-  std::string name() const override { return "DummyROIFilter"; }
+  std::string name() const override {
+    return "DummyROIFilter";
+  }
 
  private:
   // for ut
@@ -57,13 +59,17 @@ class DummyGroundDetector : public BaseGroundDetector {
   DummyGroundDetector() : BaseGroundDetector() {}
   ~DummyGroundDetector() = default;
 
-  bool Init() override { return result_init_; }
+  bool Init() override {
+    return result_init_;
+  }
 
   bool Detect(const GroundDetectorOptions &options,
-              PointCloudPtr cloud,
-              PointIndicesPtr non_ground_indices) override;
+              pcl_util::PointCloudPtr cloud,
+              pcl_util::PointIndicesPtr non_ground_indices) override;
 
-  std::string name() const override { return "DummyGroundDetector"; }
+  std::string name() const override {
+    return "DummyGroundDetector";
+  }
 
  private:
   // for unit test
@@ -78,17 +84,21 @@ class DummySegmentation : public BaseSegmentation {
   DummySegmentation() : BaseSegmentation() {}
   ~DummySegmentation() = default;
 
-  bool Init() override { return result_init_; }
+  bool Init() override {
+    return result_init_;
+  }
 
-  bool Segment(const PointCloudPtr &cloud,
-               const PointIndices &non_ground_indices,
+  bool Segment(const pcl_util::PointCloudPtr &cloud,
+               const pcl_util::PointIndices &non_ground_indices,
                const SegmentationOptions &options,
                std::vector<ObjectPtr> *objects) override;
 
-  std::string name() const override { return "DummySegmentation"; }
+  std::string name() const override {
+    return "DummySegmentation";
+  }
 
  private:
-  bool result_init_= true;
+  bool result_init_ = true;
   bool result_segment_ = true;
 
   DISALLOW_COPY_AND_ASSIGN(DummySegmentation);
@@ -99,17 +109,22 @@ class DummyObjectBuilder : public BaseObjectBuilder {
   DummyObjectBuilder() : BaseObjectBuilder() {}
   ~DummyObjectBuilder() = default;
 
-  bool Init() override { return result_init_; }
+  bool Init() override {
+    return result_init_;
+  }
 
   bool Build(const ObjectBuilderOptions &options,
              std::vector<ObjectPtr> *objects) override;
 
-  std::string name() const override { return "DummyObjectBuilder"; }
+  std::string name() const override {
+    return "DummyObjectBuilder";
+  }
+
  protected:
-  void BuildObject(const ObjectBuilderOptions &options,
-                   ObjectPtr object);
+  void BuildObject(const ObjectBuilderOptions &options, ObjectPtr object);
+
  private:
-  bool result_init_= true;
+  bool result_init_ = true;
   bool result_build_ = true;
 
   DISALLOW_COPY_AND_ASSIGN(DummyObjectBuilder);
@@ -120,15 +135,19 @@ class DummyObjectFilter : public BaseObjectFilter {
   DummyObjectFilter() : BaseObjectFilter() {}
   ~DummyObjectFilter() {}
 
-  bool Init() override { return result_init_; }
+  bool Init() override {
+    return result_init_;
+  }
 
   bool Filter(const ObjectFilterOptions &obj_filter_options,
               std::vector<ObjectPtr> *objects) override;
 
-  std::string name() const override { return "DummyObjectFilter"; }
+  std::string name() const override {
+    return "DummyObjectFilter";
+  }
 
  private:
-  bool result_init_= true;
+  bool result_init_ = true;
   bool result_object_filter_ = true;
 
   DISALLOW_COPY_AND_ASSIGN(DummyObjectFilter);
@@ -139,24 +158,26 @@ class DummyTracker : public BaseTracker {
   DummyTracker() : BaseTracker() {}
   ~DummyTracker() = default;
 
-  bool Init() override { return result_init_; }
+  bool Init() override {
+    return result_init_;
+  }
 
   bool Track(const std::vector<ObjectPtr> &objects, double timestamp,
              const TrackerOptions &options,
              std::vector<ObjectPtr> *tracked_objects) override;
 
-  std::string name() const override { return "DummyTracker"; }
+  std::string name() const override {
+    return "DummyTracker";
+  }
 
  private:
-  bool result_init_= true;
-  bool result_track_= true;
+  bool result_init_ = true;
+  bool result_track_ = true;
 
   DISALLOW_COPY_AND_ASSIGN(DummyTracker);
 };
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
-
 
 #endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_DUMMY_DUMMY_ALGORITHMS_H_

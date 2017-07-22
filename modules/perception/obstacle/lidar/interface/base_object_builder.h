@@ -62,7 +62,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 struct ObjectBuilderOptions {
   Eigen::Vector3d ref_center;
@@ -84,10 +83,10 @@ class BaseObjectBuilder {
   virtual std::string name() const = 0;
 
  protected:
-  virtual void SetDefaultValue(PointCloudPtr cloud, ObjectPtr obj,
+  virtual void SetDefaultValue(pcl_util::PointCloudPtr cloud, ObjectPtr obj,
                                Eigen::Vector4f &min_pt,
                                Eigen::Vector4f &max_pt) {
-    GetCloudMinMax3D<Point>(cloud, &min_pt, &max_pt);
+    GetCloudMinMax3D<pcl_util::Point>(cloud, &min_pt, &max_pt);
     Eigen::Vector3f center((min_pt[0] + max_pt[0]) / 2,
                            (min_pt[1] + max_pt[1]) / 2,
                            (min_pt[2] + max_pt[2]) / 2);
@@ -147,7 +146,6 @@ class BaseObjectBuilder {
 REGISTER_REGISTERER(BaseObjectBuilder);
 #define REGISTER_OBJECTBUILDER(name) REGISTER_CLASS(BaseObjectBuilder, name)
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

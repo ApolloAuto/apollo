@@ -29,8 +29,8 @@
 //     }
 //
 //     virtual bool segment(
-//              const PointCloudPtr& cloud,
-//              const PointIndices& non_ground_indices,
+//              const pcl_util::PointCloudPtr& cloud,
+//              const pcl_util::PointIndices& non_ground_indices,
 //              const SegmentationOptions& options,
 //              std::vector<ObjectPtr>* objects) override {
 //
@@ -64,16 +64,8 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
-struct SegmentationOptions {
-  // original point cloud without roi or static map filtering
-  PointCloudPtr origin_cloud;
-  // indices of roi-filtered cloud in original cloud if enabled
-  PointIndicesPtr roi_cloud_indices;
-  // indices of static-map filtered cloud in original cloud if enabled
-  PointIndicesPtr dynamic_cloud_indices;
-};
+struct SegmentationOptions {};
 
 class BaseSegmentation {
  public:
@@ -87,8 +79,8 @@ class BaseSegmentation {
   // @param [in]: non ground points index.
   // @param [in]: some options
   // @param [out]: segmented object.
-  virtual bool Segment(const PointCloudPtr &cloud,
-                       const PointIndices &non_ground_indices,
+  virtual bool Segment(const pcl_util::PointCloudPtr &cloud,
+                       const pcl_util::PointIndices &non_ground_indices,
                        const SegmentationOptions &options,
                        std::vector<ObjectPtr> *objects) = 0;
 
@@ -101,7 +93,6 @@ class BaseSegmentation {
 REGISTER_REGISTERER(BaseSegmentation);
 #define REGISTER_SEGMENTATION(name) REGISTER_CLASS(BaseSegmentation, name)
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

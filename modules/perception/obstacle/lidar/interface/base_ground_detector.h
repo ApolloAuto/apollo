@@ -29,9 +29,9 @@
 //     }
 //
 //     virtual bool detect(
-//              PointCloudPtr& cloud,
+//              pcl_util::PointCloudPtr& cloud,
 //              const GroundDetectorOptions& options,
-//              PointIndices* non_ground_indices) override {
+//              pcl_util::PointIndices* non_ground_indices) override {
 //
 //          // Do something.
 //          return true;
@@ -60,7 +60,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 struct GroundDetectorOptions {
   GroundDetectorOptions() {
@@ -72,8 +71,8 @@ struct GroundDetectorOptions {
     velodyne_ground_position.z = 0.0;
   }
 
-  Point velodyne_position;
-  Point velodyne_ground_position;
+  pcl_util::Point velodyne_position;
+  pcl_util::Point velodyne_ground_position;
   Eigen::Matrix4d trans_velodyne_to_world;
 };
 
@@ -90,8 +89,8 @@ class BaseGroundDetector {
   // @param [in]: options
   // @param [out]: non ground points index.
   virtual bool Detect(const GroundDetectorOptions &options,
-                      PointCloudPtr cloud,
-                      PointIndicesPtr non_ground_indices) = 0;
+                      pcl_util::PointCloudPtr cloud,
+                      pcl_util::PointIndicesPtr non_ground_indices) = 0;
 
   virtual std::string name() const = 0;
 
@@ -102,7 +101,6 @@ class BaseGroundDetector {
 REGISTER_REGISTERER(BaseGroundDetector);
 #define REGISTER_GROUNDDETECTOR(name) REGISTER_CLASS(BaseGroundDetector, name)
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

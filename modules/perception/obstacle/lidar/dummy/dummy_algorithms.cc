@@ -18,22 +18,26 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 using std::vector;
+using pcl_util::Point;
+using pcl_util::PointD;
+using pcl_util::PointCloud;
+using pcl_util::PointCloudPtr;
+using pcl_util::PointIndices;
+using pcl_util::PointIndicesPtr;
 
-static void extract_pointcloud_indices(const PointCloudPtr& cloud,
+static void extract_pointcloud_indices(const PointCloudPtr &cloud,
                                        PointIndicesPtr out_indices) {
   const size_t vec_size = cloud->size();
-  auto& indices = out_indices->indices;
+  auto &indices = out_indices->indices;
   indices.resize(vec_size);
 
   std::iota(indices.begin(), indices.end(), 0);
 }
 
 bool DummyROIFilter::Filter(const PointCloudPtr &cloud,
-                            const Eigen::Matrix4d &trans_velodyne_to_world,
-                            HdmapStructConstPtr hdmap_input,
+                            const ROIFilterOptions &roi_filter_options,
                             PointIndicesPtr roi_indices) {
   extract_pointcloud_indices(cloud, roi_indices);
   return result_filter_;
@@ -55,43 +59,43 @@ bool DummySegmentation::Segment(const PointCloudPtr &cloud,
 
 void DummyObjectBuilder::BuildObject(const ObjectBuilderOptions &options,
                                      ObjectPtr obj) {
-    Eigen::Vector4f min_pt;
-    Eigen::Vector4f max_pt;
-    PointCloudPtr cloud = obj->cloud;
+  Eigen::Vector4f min_pt;
+  Eigen::Vector4f max_pt;
+  PointCloudPtr cloud = obj->cloud;
   SetDefaultValue(cloud, obj, min_pt, max_pt);
-    if (cloud->points.size() < 4u) {
-        return;
-    }
-    obj->polygon.points.resize(4);
-    obj->polygon.points[0].x = static_cast<double>(min_pt[0]);
-    obj->polygon.points[0].y = static_cast<double>(min_pt[1]);
-    obj->polygon.points[0].z = static_cast<double>(min_pt[2]);
+  if (cloud->points.size() < 4u) {
+    return;
+  }
+  obj->polygon.points.resize(4);
+  obj->polygon.points[0].x = static_cast<double>(min_pt[0]);
+  obj->polygon.points[0].y = static_cast<double>(min_pt[1]);
+  obj->polygon.points[0].z = static_cast<double>(min_pt[2]);
 
-    obj->polygon.points[1].x = static_cast<double>(min_pt[0]);
-    obj->polygon.points[1].y = static_cast<double>(max_pt[1]);
-    obj->polygon.points[1].z = static_cast<double>(min_pt[2]);
+  obj->polygon.points[1].x = static_cast<double>(min_pt[0]);
+  obj->polygon.points[1].y = static_cast<double>(max_pt[1]);
+  obj->polygon.points[1].z = static_cast<double>(min_pt[2]);
 
-    obj->polygon.points[2].x = static_cast<double>(max_pt[0]);
-    obj->polygon.points[2].y = static_cast<double>(max_pt[1]);
-    obj->polygon.points[2].z = static_cast<double>(min_pt[2]);
+  obj->polygon.points[2].x = static_cast<double>(max_pt[0]);
+  obj->polygon.points[2].y = static_cast<double>(max_pt[1]);
+  obj->polygon.points[2].z = static_cast<double>(min_pt[2]);
 
-    obj->polygon.points[3].x = static_cast<double>(max_pt[0]);
-    obj->polygon.points[3].y = static_cast<double>(min_pt[1]);
-    obj->polygon.points[3].z = static_cast<double>(min_pt[2]);
-    obj->anchor_point = obj->center;
+  obj->polygon.points[3].x = static_cast<double>(max_pt[0]);
+  obj->polygon.points[3].y = static_cast<double>(min_pt[1]);
+  obj->polygon.points[3].z = static_cast<double>(min_pt[2]);
+  obj->anchor_point = obj->center;
 }
 
 bool DummyObjectBuilder::Build(const ObjectBuilderOptions &options,
                                vector<ObjectPtr> *objects) {
   if (objects == NULL) {
-      return false;
+    return false;
   }
 
   for (size_t i = 0; i < objects->size(); ++i) {
-      if ((*objects)[i]) {
-          (*objects)[i]->id = static_cast<int>(i);
-        BuildObject(options, (*objects)[i]);
-      }
+    if ((*objects)[i]) {
+      (*objects)[i]->id = static_cast<int>(i);
+      BuildObject(options, (*objects)[i]);
+    }
   }
 
   return result_build_;
@@ -105,20 +109,20 @@ bool DummyObjectFilter::Filter(const ObjectFilterOptions &obj_filter_options,
 bool DummyTracker::Track(const vector<ObjectPtr> &objects, double timestamp,
                          const TrackerOptions &options,
                          vector<ObjectPtr> *tracked_objects) {
-  if (tracked_objects == nullptr || options.velodyne2world_pose == nullptr) {
+  if (tracked_objects == nullptr || options.velodyne_trans == nullptr) {
     return result_track_;
   }
 
-  Eigen::Matrix4d pose = *(options.velodyne2world_pose);
+  Eigen::Matrix4d pose = *(options.velodyne_trans);
   // transform objects
   (*tracked_objects).resize(objects.size());
   for (size_t i = 0; i < objects.size(); i++) {
     ObjectPtr obj(new Object());
     obj->clone(*objects[i]);
-    const Eigen::Vector3d& dir = obj->direction;
+    const Eigen::Vector3d &dir = obj->direction;
     obj->direction =
         (pose * Eigen::Vector4d(dir[0], dir[1], dir[2], 0)).head(3);
-    const Eigen::Vector3d& center = obj->center;
+    const Eigen::Vector3d &center = obj->center;
     obj->center =
         (pose * Eigen::Vector4d(center[0], center[1], center[2], 1)).head(3);
     // obj->anchor_point = obj->center;
@@ -147,6 +151,5 @@ REGISTER_OBJECTBUILDER(DummyObjectBuilder);
 REGISTER_TRACKER(DummyTracker);
 REGISTER_OBJECTFILTER(DummyObjectFilter);
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

@@ -62,7 +62,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 struct ObjectFilterOptions {
   ObjectFilterOptions() = default;
@@ -93,7 +92,6 @@ class BaseObjectFilter {
 REGISTER_REGISTERER(BaseObjectFilter);
 #define REGISTER_OBJECTFILTER(name) REGISTER_CLASS(BaseObjectFilter, name)
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

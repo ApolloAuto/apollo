@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "common",
+    name = "perception_obstacle_common",
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [

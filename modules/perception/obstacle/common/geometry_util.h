@@ -18,12 +18,12 @@
 
 #include <Eigen/Core>
 #include <algorithm>
+#include <float.h>
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 void TransAffineToMatrix4(const Eigen::Vector3d& translation,
                           const Eigen::Vector4d& rotation,
@@ -75,7 +75,6 @@ void GetCloudMinMax3D(typename pcl::PointCloud<PointT>::Ptr cloud,
   }
 }
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_COMMON_SUBNODE_H_
-#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_COMMON_SUBNODE_H_
 
-#include "modules/common/log.h"
+#ifndef MODULES_PERCEPTION_COMMON_DEFINE_H_
+#define MODULES_PERCEPTION_COMMON_DEFINE_H_
 
 namespace apollo {
 namespace perception {
 
-class Component {
-public:
-	virtual bool Init() = 0;
-	virtual std::string Name() const = 0;
+const double PI = 3.1415926535898;
+const double kRadianToDegree = 57.29577951308232;
 
-protected:	
-	virtual bool InitConfig() = 0;
-	virtual bool InitAlgorithmPlugin() = 0;
+// Error code definition
+enum StatusCode {
+  SUCC = 0,
+  // Common error, process will proceeding and warning log will be printed.
+  // Under most circumstances, function should return this code when a error
+  // occurs.
+  FAIL = 1,
+  // Fatal error, process will be terminated and fatal log will be printed.
+  // Generated only when a fatal error occurs, such as config loading error.
+  FATAL = 2,
+  TAIL = 3,
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_ONBOARD_COMMON_SUBNODE_H_
+#endif  // MODULES_PERCEPTION_COMMON_DEFINE_H_
