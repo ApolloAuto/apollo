@@ -44,7 +44,7 @@ class Renderer {
 
         // The planning tranjectory.
         this.planningTrajectory = new PlanningTrajectory();
-        
+
         // The perception obstacles.
         this.perceptionObstacles = new PerceptionObstacles();
     }
