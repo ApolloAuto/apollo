@@ -129,7 +129,7 @@ class PredictionMap {
   }
 
  private:
-  std::unique_ptr<apollo::hdmap::HDMapImpl> hdmap_;
+  std::unique_ptr<apollo::hdmap::HDMap> hdmap_;
   DECLARE_SINGLETON(PredictionMap);
 };
 

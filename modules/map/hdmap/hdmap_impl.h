@@ -91,7 +91,7 @@ class HDMapImpl {
     int get_nearest_lane(const apollo::hdmap::Point& point,
                     LaneInfoConstPtr* nearest_lane,
                     double* nearest_s,
-                    double* nearest_l);
+                    double* nearest_l) const;
 
  private:
     int get_lanes(const apollo::common::math::Vec2d& point,
