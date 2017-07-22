@@ -31,8 +31,8 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/common/proto/error_code.pb.h"
-
 #include "modules/common/math/kalman_filter.h"
+#include "modules/map/hdmap/hdmap_common.h"
 
 namespace apollo {
 namespace prediction {
@@ -131,7 +131,7 @@ class Obstacle {
   bool kf_motion_tracker_enabled_;
   std::unordered_map<std::string,
       apollo::common::math::KalmanFilter<double, 4, 2, 0>> kf_lane_trackers_;
-  // TODO(author) std::vector<const adu::hdmap::LaneInfo*> _current_lanes;
+  std::vector<const apollo::hdmap::LaneInfo*> current_lanes_;
   static std::mutex mutex_;
 };
 

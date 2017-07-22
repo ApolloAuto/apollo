@@ -26,7 +26,7 @@ cc_binary(
     name = "prediction",
     srcs = ["main.cc"],
     deps = [
-        ":prediction_lib",
+        "//modules/prediction:prediction_lib",
         "//external:gflags",
     ],
 )
