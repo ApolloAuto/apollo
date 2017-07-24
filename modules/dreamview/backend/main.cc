@@ -14,17 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/dreamview.h"
 
-DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
-
-// TODO(siyangy): Use garage map temporarily
-DEFINE_string(dreamview_map, "modules/map/data/base_map.txt",
-              "file path for the map file to be rendered in frontend.");
-
-DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
-              "The path to the dreamview distribution directory. The default "
-              "value points to built-in version from the Apollo project.");
-
-DEFINE_int32(server_port, 8888, "The port of backend webserver");
-
+APOLLO_MAIN(apollo::dreamview::Dreamview);
