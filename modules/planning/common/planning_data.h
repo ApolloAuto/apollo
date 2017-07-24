@@ -57,10 +57,6 @@ class PlanningData {
 
   virtual std::string type() const = 0;
 
-  // TODO: to be fixed
-  int get_obstacle_by_id(const uint32_t id,
-                         PlanningObject** const planning_object);
-
   const PathData& path_data() const;
   const SpeedData& speed_data() const;
 

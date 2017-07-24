@@ -68,12 +68,6 @@ void PlanningData::set_computed_trajectory(
   _computed_trajectory = std::move(publishable_trajectory);
 }
 
-// TODO: to be fixed
-int PlanningData::get_obstacle_by_id(const uint32_t id,
-                                     PlanningObject** const obstacle) {
-  return 0;
-}
-
 const PathData& PlanningData::path_data() const { return _path_data; }
 
 const SpeedData& PlanningData::speed_data() const { return _speed_data; }

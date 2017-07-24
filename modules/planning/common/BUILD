@@ -17,6 +17,13 @@ cc_library(
 )
 
 cc_library(
+    name = "lru_cache",
+    hdrs = [
+        "lru_cache.h",
+    ],
+)
+
+cc_library(
     name = "map_object",
     srcs = [
         "map_object.cc",
@@ -26,6 +33,23 @@ cc_library(
     ],
     deps = [
         "//modules/planning/common:planning_object",
+    ],
+)
+
+
+cc_library(
+    name = "object_table",
+    srcs = [
+        "object_table.cc",
+    ],
+    hdrs = [
+        "object_table.h",
+    ],
+    deps = [
+        ":lru_cache",
+        ":map_object",
+        ":obstacle",
+        ":planning_gflags",
     ],
 )
 
@@ -175,6 +199,7 @@ cc_library(
     deps = [
         ":environment",
         ":frame",
+        ":object_table",
         ":planning_gflags",
         "//modules/common",
         "//modules/common/status",

@@ -33,6 +33,7 @@ namespace planning {
 using apollo::common::Status;
 
 DataCenter::DataCenter() {
+  _object_table.reset(new ObjectTable());
   _master.reset(new MasterStateMachine());
 
   AINFO << "Data Center is ready!";
@@ -86,6 +87,14 @@ const Frame *DataCenter::last_frame() const {
 
 MasterStateMachine *DataCenter::mutable_master() const {
   return _master.get();
+}
+
+ObjectTable* DataCenter::mutable_object_table() const {
+    return _object_table.get();
+}
+
+const ObjectTable& DataCenter::object_table() const {
+    return *(_object_table.get());
 }
 
 }  // namespace planning
