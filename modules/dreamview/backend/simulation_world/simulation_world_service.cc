@@ -22,7 +22,6 @@
 
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
@@ -319,8 +318,6 @@ constexpr double SimulationWorldService::kMapRadius;
 SimulationWorldService::SimulationWorldService(MapService *map_service)
     : map_service_(map_service) {
   world_.set_map_md5("initialize");
-  AdapterManager::Init();
-  VehicleConfigHelper::Init();
   RegisterDataCallback("Monitor", AdapterManager::GetMonitor());
 }
 

@@ -21,6 +21,8 @@
 
 DECLARE_string(dreamview_map);
 
+DECLARE_string(dreamview_module_name);
+
 DECLARE_string(static_file_dir);
 
 DECLARE_int32(server_port);
