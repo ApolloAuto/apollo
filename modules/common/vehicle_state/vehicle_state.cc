@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include <cmath>
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -40,9 +40,14 @@ VehicleState::VehicleState(
     const localization::LocalizationEstimate *localization,
     const canbus::Chassis *chassis) {
   ConstructExceptLinearVelocity(localization);
+  if (chassis != nullptr && chassis->has_header() &&
+      chassis->header().has_timestamp_sec()) {
+    timestamp_ = chassis->header().timestamp_sec();
+  }
   if (chassis != nullptr && chassis->has_speed_mps()) {
     linear_v_ = chassis->speed_mps();
   }
+
   if (chassis != nullptr && chassis->has_gear_location()) {
     gear_ = chassis->gear_location();
   } else {
