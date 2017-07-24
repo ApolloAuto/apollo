@@ -14,16 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/simulation_world_updater.h"
+#include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
 #include <string>
 
-#include "gflags/gflags.h"
 #include "google/protobuf/util/json_util.h"
-
-// TODO(siyangy): Use garage map temporarily
-DEFINE_string(dreamview_map, "modules/map/data/base_map.txt",
-              "file path for the map file to be rendered in frontend.");
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 namespace apollo {
 namespace dreamview {
