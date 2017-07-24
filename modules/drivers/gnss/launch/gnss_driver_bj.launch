@@ -17,4 +17,8 @@
         <param name="gnss_conf" value="$(arg gnss_conf)" />
         <param name="proj4_text" value="$(arg proj4_text)" />
     </node>
+
+    <node pkg="nodelet" type="nodelet" name="tf_broadcaster_nodelet"
+        args="load gnss_driver/TFBroadcasterNodelet gnss_nodelet_manager" output="screen">
+    </node>
 </launch>
