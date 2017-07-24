@@ -19,11 +19,67 @@
 namespace apollo {
 namespace prediction {
 
-void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {}
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
+
+std::mutex ObstaclesContainer::g_mutex_;
+
+void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
+  const PerceptionObstacles& perception_obstacles =
+      dynamic_cast<const PerceptionObstacles&>(message);
+  double timestamp = 0.0;
+  if (perception_obstacles.has_header() &&
+      perception_obstacles.header().has_timestamp_sec()) {
+    timestamp = perception_obstacles.header().timestamp_sec();
+  }
+  for (const PerceptionObstacle& perception_obstacle :
+      perception_obstacles.perception_obstacle()) {
+    InsertPerceptionObstacle(perception_obstacle, timestamp);
+  }
+
+  SetObstacleLaneGraphFeatures(perception_obstacles);
+}
 
 Obstacle* ObstaclesContainer::GetObstacle(int id) {
   return nullptr;
 }
 
-}  // prediction
-}  // apollo
+void ObstaclesContainer::InsertPerceptionObstacle(
+    const PerceptionObstacle& perception_obstacle, const double timestamp) {
+  std::lock_guard<std::mutex> lock(g_mutex_);
+  int id = perception_obstacle.id();
+  if (id < -1) {
+    AERROR << "Invalid ID [" << id << "]";
+    return;
+  }
+  if (!IsPredictable(perception_obstacle)) {
+    ADEBUG << "Obstacle [" << id << "] is not predictable.";
+    return;
+  }
+  Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
+  if (obstacle_ptr != nullptr) {
+    obstacle_ptr->Insert(perception_obstacle, timestamp);
+  } else {
+    Obstacle obstacle;
+    obstacle.Insert(perception_obstacle, timestamp);
+    obstacles_.Put(id, std::move(obstacle));
+  }
+  ADEBUG << "Obstacle [" << id << "] was inserted.";
+}
+
+bool ObstaclesContainer::IsPredictable(
+    const PerceptionObstacle& perception_obstacle) {
+  if (!perception_obstacle.has_type() ||
+      perception_obstacle.type() == PerceptionObstacle::UNKNOWN_MOVABLE) {
+    return false;
+  }
+  return true;
+}
+
+void ObstaclesContainer::SetObstacleLaneGraphFeatures(
+    const PerceptionObstacles& perception_obstacles) {
+  // TODO(kechxu) Implement
+}
+
+}  // namespace prediction
+}  // namespace apollo

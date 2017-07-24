@@ -78,6 +78,7 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
            << "].";
     ContainerManager::instance()
         ->mutable_container("Pose")->Insert(localization);
+    // TODO(kechxu) transform pose to perception obstacle
   }
   ContainerManager::instance()
       ->mutable_container("Obstacles")->Insert(perception_obstacles);
