@@ -718,12 +718,74 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
   }
 
   if (feature->lane().has_lane_graph()) {
-    SetTargetLaneFeature(feature);
+    SetLanePoints(feature);
   }
 }
 
-void Obstacle::SetTargetLaneFeature(Feature* feature) {
-  // TODO(kechxu) implement
+void Obstacle::SetLanePoints(Feature* feature) {
+  if (feature == nullptr || !feature->has_theta()) {
+    AERROR << "Null feature or no theta.";
+    return;
+  }
+  PredictionMap* map = PredictionMap::instance();
+  if (map == nullptr) {
+    AERROR << "Missing prediction map.";
+    return;
+  }
+
+  LaneGraph* lane_graph = feature->mutable_lane()
+                                 ->mutable_lane_graph();
+  double heading = feature->theta();
+  double x = feature->position().x();
+  double y = feature->position().y();
+  if (FLAGS_enable_kf_tracking) {
+    x = feature->t_position().x();
+    y = feature->t_position().y();
+  }
+  Eigen::Vector2d position(x, y);
+  for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
+    LaneSequence* lane_sequence = lane_graph->mutable_lane_sequence(i);
+    if (lane_sequence->lane_segment_size() <= 0) {
+      continue;
+    }
+    int lane_index = 0;
+    double start_s = lane_sequence->lane_segment(lane_index).start_s();
+    double total_s = 0.0;
+    while (lane_index < lane_sequence->lane_segment_size()) {
+      double s = start_s + total_s;
+      LaneSegment* lane_segment =
+          lane_sequence->mutable_lane_segment(lane_index);
+      if (s <= lane_segment->end_s()) {
+        std::string lane_id = lane_segment->lane_id();
+        const LaneInfo* lane_info = map->LaneById(lane_id);
+        if (lane_info == nullptr) {
+          break;
+        }
+        LanePoint lane_point;
+        Eigen::Vector2d lane_point_pos = map->PositionOnLane(*lane_info, s);
+        double lane_point_heading = map->HeadingOnLane(*lane_info, s);
+        double lane_point_width = map->LaneTotalWidth(lane_info, s);
+        double lane_point_angle_diff =
+            apollo::common::math::AngleDiff(lane_point_heading, heading);
+        lane_point.mutable_position()->set_x(lane_point_pos[0]);
+        lane_point.mutable_position()->set_y(lane_point_pos[1]);
+        lane_point.set_heading(lane_point_heading);
+        lane_point.set_width(lane_point_width);
+        double lane_s = -1.0;
+        double lane_l = 0.0;
+        map->GetProjection(position, lane_info, &lane_s, &lane_l);
+        lane_point.set_relative_s(total_s);
+        lane_point.set_relative_l(0.0 - lane_l);
+        lane_point.set_angle_diff(lane_point_angle_diff);
+        lane_segment->set_lane_turn_type(map->LaneTurnType(lane_id));
+        lane_segment->add_lane_point()->CopyFrom(lane_point);
+        total_s += FLAGS_target_lane_gap;
+      } else {
+        start_s = s - lane_segment->end_s();
+        ++lane_index;
+      }
+    }
+  }
 }
 
 void Obstacle::SetMotionStatus() {
