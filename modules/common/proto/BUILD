@@ -63,5 +63,6 @@ py_proto_compile(
         "geometry.proto",
         "header.proto",
         "path_point.proto",
+        "vehicle_signal.proto",
     ],
 )

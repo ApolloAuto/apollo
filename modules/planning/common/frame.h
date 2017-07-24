@@ -43,6 +43,7 @@ class Frame {
   const PlanningData &planning_data() const;
 
   PlanningData *mutable_planning_data();
+  std::string DebugString() const;
 
  private:
   uint32_t _sequence_num;
