@@ -21,6 +21,9 @@
 #ifndef MODULES_PLANNING_COMMON_EM_PLANNING_DATA_H
 #define MODULES_PLANNING_COMMON_EM_PLANNING_DATA_H
 
+#include <string>
+#include <vector>
+
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -54,4 +57,4 @@ class EMPlanningData : public PlanningData {
 }  // namespace planning
 }  // namespace apollo
 
-#endif // MODULES_PLANNING_COMMON_EM_PLANNING_DATA_H
+#endif  // MODULES_PLANNING_COMMON_EM_PLANNING_DATA_H

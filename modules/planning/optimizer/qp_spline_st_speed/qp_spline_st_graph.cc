@@ -20,6 +20,9 @@
 
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_graph.h"
 
+#include <algorithm>
+#include <utility>
+
 #include "modules/common/log.h"
 #include "modules/planning/util/planning_util.h"
 

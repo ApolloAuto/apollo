@@ -21,6 +21,9 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_SPEED_QP_SPLINE_ST_GRAPH_H_
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_SPEED_QP_SPLINE_ST_GRAPH_H_
 
+#include <memory>
+#include <vector>
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"

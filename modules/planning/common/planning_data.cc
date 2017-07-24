@@ -20,6 +20,8 @@
 
 #include "modules/planning/common/planning_data.h"
 
+#include <utility>
+
 namespace apollo {
 namespace planning {
 
@@ -45,7 +47,7 @@ DecisionData* PlanningData::mutable_decision_data() const {
 
 PublishableTrajectory* PlanningData::mutable_computed_trajectory() {
   return &_computed_trajectory;
-};
+}
 
 void PlanningData::set_init_planning_point(
     const TrajectoryPoint& init_planning_point) {

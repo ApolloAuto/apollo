@@ -20,6 +20,8 @@
 
 #include "modules/planning/proxy/perception_proxy.h"
 
+#include <utility>
+
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
