@@ -36,6 +36,11 @@ DataCenter::DataCenter() {
   _master.reset(new MasterStateMachine());
 
   AINFO << "Data Center is ready!";
+
+  if (map_.load_map_from_file(FLAGS_map_filename)) {
+    AFATAL << "Failed to load map: " << FLAGS_map_filename;
+  }
+  AINFO << "map loaded, Map file: " << FLAGS_map_filename;
 }
 
 Frame *DataCenter::frame(const uint32_t sequence_num) const {
@@ -85,4 +90,3 @@ MasterStateMachine *DataCenter::mutable_master() const {
 
 }  // namespace planning
 }  // namespace apollo
-

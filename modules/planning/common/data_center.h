@@ -27,6 +27,7 @@
 
 #include "modules/common/macro.h"
 #include "modules/common/status/status.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/environment.h"
 #include "modules/planning/state_machine/master_state_machine.h"
@@ -42,6 +43,9 @@ class DataCenter {
   apollo::common::Status init_frame(const uint32_t sequence_num);
   Frame *current_frame() const;
   void save_frame();
+  const ::apollo::hdmap::HDMap &map() {
+     return map_;
+  }
 
   Environment *mutable_environment();
   MasterStateMachine *mutable_master() const;
@@ -53,6 +57,8 @@ class DataCenter {
   Environment _environment;
   std::unique_ptr<Frame> _frame = nullptr;
   std::unique_ptr<MasterStateMachine> _master = nullptr;
+  ::apollo::hdmap::HDMap map_;
+
  private:
   DECLARE_SINGLETON(DataCenter);
 };

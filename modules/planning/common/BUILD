@@ -179,6 +179,7 @@ cc_library(
         ":planning_gflags",
         "//modules/common",
         "//modules/common/status",
+        "//modules/map/hdmap",
         "//modules/planning/state_machine:master_state_machine",
     ],
 )
