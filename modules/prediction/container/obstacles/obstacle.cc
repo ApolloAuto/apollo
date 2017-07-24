@@ -29,6 +29,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/common/road_graph.h"
 
 namespace apollo {
 namespace prediction {
@@ -682,6 +683,46 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 }
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
+  PredictionMap* map = PredictionMap::instance();
+  if (map == nullptr) {
+    AERROR << "Missing prediction map.";
+    return;
+  }
+  for (auto& lane : feature->lane().current_lane_feature()) {
+    const LaneInfo* lane_info = map->LaneById(lane.lane_id());
+    RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
+    LaneGraph lane_graph;
+    road_graph.BuildLaneGraph(&lane_graph);
+    for (auto& lane_seq : lane_graph.lane_sequence()) {
+      feature->mutable_lane()
+             ->mutable_lane_graph()
+             ->add_lane_sequence()
+             ->CopyFrom(lane_seq);
+    }
+  }
+  for (auto& lane : feature->lane().nearby_lane_feature()) {
+    const LaneInfo* lane_info = map->LaneById(lane.lane_id());
+    RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
+    LaneGraph lane_graph;
+    road_graph.BuildLaneGraph(&lane_graph);
+    for (auto& lane_seq : lane_graph.lane_sequence()) {
+      feature->mutable_lane()
+             ->mutable_lane_graph()
+             ->add_lane_sequence()
+             ->CopyFrom(lane_seq);
+    }
+  }
+
+  if (history_size() <= 0) {
+    return;
+  }
+
+  if (feature->lane().has_lane_graph()) {
+    SetTargetLaneFeature(feature);
+  }
+}
+
+void Obstacle::SetTargetLaneFeature(Feature* feature) {
   // TODO(kechxu) implement
 }
 
