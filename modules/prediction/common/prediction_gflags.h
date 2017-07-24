@@ -40,5 +40,6 @@ DECLARE_double(prediction_duration);
 DECLARE_double(search_radius);
 DECLARE_double(max_history_time);
 DECLARE_double(max_prediction_length);
+DECLARE_double(target_lane_gap);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

@@ -44,6 +44,9 @@ class PredictionMap {
   Eigen::Vector2d PositionOnLane(const apollo::hdmap::LaneInfo& lane_info,
                                  const double s);
 
+  double HeadingOnLane(const apollo::hdmap::LaneInfo& lane_info,
+                       const double s);
+
   double LaneTotalWidth(const apollo::hdmap::LaneInfo* lane_info_ptr,
                         const double s);
 
