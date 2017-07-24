@@ -10,6 +10,8 @@ cc_library(
         "//modules/prediction/container:container",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/common/util:lru_cache",
+        "//modules/common/math:math_utils",
+        "//modules/prediction/container/pose:pose_container",
     ],
 )
 

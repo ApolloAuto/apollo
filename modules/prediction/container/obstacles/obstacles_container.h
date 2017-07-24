@@ -27,6 +27,7 @@
 #include "modules/common/util/lru_cache.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -36,7 +37,7 @@ class ObstaclesContainer : public Container {
   /**
    * @brief Constructor
    */
-  ObstaclesContainer() = default;
+  ObstaclesContainer();
 
   /**
    * @brief Destructor
@@ -48,6 +49,8 @@ class ObstaclesContainer : public Container {
    * @param Data message to be inserted in protobuf
    */
   void Insert(const ::google::protobuf::Message& message) override;
+
+  void InsertPose(PoseContainer* pose_container);
 
   Obstacle* GetObstacle(int id);
 
@@ -63,6 +66,7 @@ class ObstaclesContainer : public Container {
       const apollo::perception::PerceptionObstacles& perception_obstacles);
 
  private:
+  double timestamp_;
   apollo::common::util::LRUCache<int, Obstacle> obstacles_;
   static std::mutex g_mutex_;
 };

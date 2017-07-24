@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace prediction {
@@ -24,6 +25,10 @@ using apollo::perception::PerceptionObstacles;
 
 std::mutex ObstaclesContainer::g_mutex_;
 
+ObstaclesContainer::ObstaclesContainer() {
+  timestamp_ = 0.0;
+}
+
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   const PerceptionObstacles& perception_obstacles =
       dynamic_cast<const PerceptionObstacles&>(message);
@@ -32,12 +37,27 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
       perception_obstacles.header().has_timestamp_sec()) {
     timestamp = perception_obstacles.header().timestamp_sec();
   }
+  if (apollo::common::math::DoubleCompare(timestamp, timestamp_) < 0) {
+    AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev ["
+           << timestamp_ << "].";
+  } else {
+  	timestamp_ = timestamp;
+  }
   for (const PerceptionObstacle& perception_obstacle :
       perception_obstacles.perception_obstacle()) {
-    InsertPerceptionObstacle(perception_obstacle, timestamp);
+    InsertPerceptionObstacle(perception_obstacle, timestamp_);
   }
 
   SetObstacleLaneGraphFeatures(perception_obstacles);
+}
+
+void ObstaclesContainer::InsertPose(PoseContainer* pose_container) {
+  if (pose_container == nullptr) {
+  	AERROR << "Unable to find pose.";
+  	return;
+  }
+  InsertPerceptionObstacle(
+      *(pose_container->ToPerceptionObstacle()), timestamp_);
 }
 
 Obstacle* ObstaclesContainer::GetObstacle(int id) {
