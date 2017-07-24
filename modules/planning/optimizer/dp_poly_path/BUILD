@@ -36,3 +36,17 @@ cc_library(
         "@eigen//:eigen",
     ],
 )
+
+cc_library(
+    name = "dp_poly_path_optimizer",
+    srcs = [
+        "dp_poly_path_optimizer.cc",
+    ],
+    hdrs = [
+        "dp_poly_path_optimizer.h",
+    ],
+    deps = [
+        ":dp_poly_path",
+        "//modules/planning/optimizer:path_optimizer",
+    ],
+)
