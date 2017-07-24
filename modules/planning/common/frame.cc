@@ -53,5 +53,9 @@ PlanningData *Frame::mutable_planning_data() {
   return _planning_data.get();
 }
 
+std::string Frame::DebugString() const {
+  return std::to_string(_sequence_num);
+}
+
 }  // namespace planning
 }  // namespace apollo
