@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include <cmath>
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -33,7 +33,7 @@ VehicleState::VehicleState(
     double linear_v_z = localization.pose().linear_velocity().z();
     linear_v_ = std::hypot(std::hypot(linear_v_x, linear_v_y), linear_v_z);
   }
-  gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
+  gear_ = canbus::Chassis::GEAR_NONE;
 }
 
 VehicleState::VehicleState(
@@ -46,7 +46,7 @@ VehicleState::VehicleState(
   if (chassis != nullptr && chassis->has_gear_location()) {
     gear_ = chassis->gear_location();
   } else {
-    gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
+    gear_ = canbus::Chassis::GEAR_NONE;
   }
 }
 
@@ -67,7 +67,7 @@ void VehicleState::ConstructExceptLinearVelocity(
     heading_ = localization->pose().heading();
   } else {
     const auto &orientation = localization->pose().orientation();
-    heading_ = ::apollo::common::math::QuaternionToHeading(
+    heading_ = common::math::QuaternionToHeading(
         orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
   }
 
@@ -94,7 +94,7 @@ double VehicleState::angular_velocity() const { return angular_v_; }
 
 double VehicleState::linear_acceleration() const { return linear_a_; }
 
-double VehicleState::gear() const { return gear_; }
+canbus::Chassis::GearPosition VehicleState::gear() const { return gear_; }
 
 void VehicleState::set_x(const double x) { x_ = x; }
 
@@ -112,15 +112,14 @@ void VehicleState::set_angular_velocity(const double angular_velocity) {
   angular_v_ = angular_velocity;
 }
 
-void VehicleState::set_gear(
-    const ::apollo::canbus::Chassis::GearPosition gear_position) {
+void VehicleState::set_gear(const canbus::Chassis::GearPosition gear_position) {
   gear_ = gear_position;
 }
 
 Eigen::Vector2d VehicleState::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
   double v = linear_v_;
-  if (gear_ == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+  if (gear_ == canbus::Chassis::GEAR_REVERSE) {
     v = -linear_v_;
   }
   // Predict distance travel vector
