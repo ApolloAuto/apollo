@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -17,6 +19,7 @@ cc_library(
         "trajectory_cost.h",
     ],
     deps = [
+        "@eigen//:eigen",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/map/proto:map_proto",
@@ -33,7 +36,6 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/proto:dp_poly_path_config_proto",
         "//modules/planning/reference_line",
-        "@eigen//:eigen",
     ],
 )
 
@@ -50,3 +52,5 @@ cc_library(
         "//modules/planning/optimizer:path_optimizer",
     ],
 )
+
+cpplint()

@@ -17,9 +17,10 @@
 /**
  * @file sampler.cpp
  **/
+#include <algorithm>
+#include <vector>
 
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
-
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/math/double.h"
@@ -54,9 +55,9 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
         _config.lateral_sample_offset() *
             ((_config.sample_points_num_each_level() - 1) >> 1);
     for (size_t j = 0; j < _config.sample_points_num_each_level(); ++j) {
-      // TODO: the lateral value is incorrect
+      // TODO(haoyang): the lateral value is incorrect
 
-      // TODO: no checker no protection
+      // TODO(haoyang): no checker no protection
       common::SLPoint sl_point;
       sl_point.set_s(accumulated_s);
       sl_point.set_l(level_start_l + _config.lateral_sample_offset());
