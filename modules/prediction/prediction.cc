@@ -70,8 +70,8 @@ void Prediction::Stop() {}
 
 void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   auto localization_adapter = AdapterManager::GetLocalization();
-  Container* obstacles_container =
-      ContainerManager::instance()->mutable_container("Obstacles");
+  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::instance()->mutable_container("Obstacles"));
   if (localization_adapter->Empty()) {
     AINFO << "No localization message.";
   } else {
@@ -80,11 +80,12 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
     ADEBUG << "Received localization message ["
            << localization.ShortDebugString()
            << "].";
-    Container* pose_container =
-        ContainerManager::instance()->mutable_container("Pose");
+    PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
+        ContainerManager::instance()->mutable_container("Pose"));
     pose_container->Insert(localization);
-    dynamic_cast<ObstaclesContainer*>(obstacles_container)->InsertPose(
-        dynamic_cast<PoseContainer*>(pose_container));
+    obstacles_container->InsertPerceptionObstacle(
+        *(pose_container->ToPerceptionObstacle()),
+        pose_container->GetTimestamp());
   }
   obstacles_container->Insert(perception_obstacles);
   EvaluatorManager::instance()->Run(perception_obstacles);

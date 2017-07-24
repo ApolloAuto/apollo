@@ -50,15 +50,23 @@ class ObstaclesContainer : public Container {
    */
   void Insert(const ::google::protobuf::Message& message) override;
 
-  void InsertPose(PoseContainer* pose_container);
-
-  Obstacle* GetObstacle(int id);
-
- private:
+  /**
+   * @brief Insert an perception obstacle
+   * @param Perception obstacle
+   *        Timestamp
+   */
   void InsertPerceptionObstacle(
       const apollo::perception::PerceptionObstacle& perception_obstacle,
       const double timestamp);
 
+  /**
+   * @brief Get obstacle pointer
+   * @param Obstacle ID
+   * @return Obstacle pointer
+   */
+  Obstacle* GetObstacle(int id);
+
+ private:
   bool IsPredictable(
       const apollo::perception::PerceptionObstacle& perception_obstacle);
 

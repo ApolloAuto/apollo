@@ -40,24 +40,16 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   if (apollo::common::math::DoubleCompare(timestamp, timestamp_) < 0) {
     AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev ["
            << timestamp_ << "].";
-  } else {
-  	timestamp_ = timestamp;
+    return;
   }
+  
+  timestamp_ = timestamp;
   for (const PerceptionObstacle& perception_obstacle :
       perception_obstacles.perception_obstacle()) {
     InsertPerceptionObstacle(perception_obstacle, timestamp_);
   }
 
   SetObstacleLaneGraphFeatures(perception_obstacles);
-}
-
-void ObstaclesContainer::InsertPose(PoseContainer* pose_container) {
-  if (pose_container == nullptr) {
-  	AERROR << "Unable to find pose.";
-  	return;
-  }
-  InsertPerceptionObstacle(
-      *(pose_container->ToPerceptionObstacle()), timestamp_);
 }
 
 Obstacle* ObstaclesContainer::GetObstacle(int id) {
