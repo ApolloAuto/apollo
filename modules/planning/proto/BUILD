@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
@@ -83,3 +85,19 @@ py_proto_compile(
         "qp_spline_path_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "reference_line_smoother_config_proto",
+    protos = [
+        "reference_line_smoother_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "reference_line_smoother_config_proto_pylib",
+    protos = [
+        "reference_line_smoother_config.proto",
+    ],
+)
+
+cpplint()

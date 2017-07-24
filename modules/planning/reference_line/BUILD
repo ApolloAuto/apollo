@@ -3,18 +3,40 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "reference_line",
     srcs = [
-        "reference_point.cc",
         "reference_line.cc",
+        "reference_point.cc",
     ],
     hdrs = [
-        "reference_point.h",
         "reference_line.h",
+        "reference_point.h",
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/math",
         "//modules/common/proto:path_point_proto",
         "//modules/map/pnc_map:pnc_path",
-        "//modules/common/math:math",
         "//modules/planning/math:double",
+    ],
+)
+
+cc_library(
+    name = "reference_line_smoother",
+    srcs = [
+        "reference_line_smoother.cc",
+    ],
+    hdrs = [
+        "reference_line_smoother.h",
+    ],
+    deps = [
+        ":reference_line",
+        "//modules/planning/math:curve_math",
+        "//modules/planning/math:polynomial_xd",
+        "//modules/planning/math/smoothing_spline:spline_2d",
+        "//modules/planning/math/smoothing_spline:spline_2d_constraint",
+        "//modules/planning/math/smoothing_spline:spline_2d_kernel",
+        "//modules/planning/math/smoothing_spline:spline_2d_solver",
+        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:reference_line_smoother_config_proto",
+        "@eigen//:eigen",
     ],
 )

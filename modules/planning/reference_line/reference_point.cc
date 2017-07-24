@@ -23,48 +23,55 @@
 namespace apollo {
 namespace planning {
 
-ReferencePoint::ReferencePoint(const ::apollo::common::math::Vec2d& point,
+ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
                                const double heading, const double kappa,
                                const double dkappa, const double lower_bound,
                                const double upper_bound)
-    : ::apollo::hdmap::PathPoint(point, heading),
-      _kappa(kappa),
-      _dkappa(dkappa),
-      _lower_bound(lower_bound),
-      _upper_bound(upper_bound) {}
+    : hdmap::PathPoint(point, heading),
+      kappa_(kappa),
+      dkappa_(dkappa),
+      lower_bound_(lower_bound),
+      upper_bound_(upper_bound) {}
+
+ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
+                               const double heading,
+                               const hdmap::LaneWaypoint lane_waypoint)
+    : hdmap::PathPoint(point, heading, lane_waypoint) {}
+
+ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
+                               const double heading, const double kappa,
+                               const double dkappa,
+                               const hdmap::LaneWaypoint lane_waypoint)
+    : hdmap::PathPoint(point, heading, lane_waypoint),
+      kappa_(kappa),
+      dkappa_(dkappa) {}
 
 ReferencePoint::ReferencePoint(
-    const apollo::common::math::Vec2d& point, const double heading,
-    const ::apollo::hdmap::LaneWaypoint lane_waypoint)
-    : ::apollo::hdmap::PathPoint(point, heading, lane_waypoint) {}
+    const common::math::Vec2d& point, const double heading, const double kappa,
+    const double dkappa, const std::vector<hdmap::LaneWaypoint>& lane_waypoints)
+    : hdmap::PathPoint(point, heading, lane_waypoints),
+      kappa_(kappa),
+      dkappa_(dkappa) {}
 
-ReferencePoint::ReferencePoint(
-    const apollo::common::math::Vec2d& point, const double heading,
-    const double kappa, const double dkappa,
-    const ::apollo::hdmap::LaneWaypoint lane_waypoint)
-    : ::apollo::hdmap::PathPoint(point, heading, lane_waypoint),
-      _kappa(kappa),
-      _dkappa(dkappa) {}
+void ReferencePoint::set_kappa(const double kappa) { kappa_ = kappa; }
 
-void ReferencePoint::set_kappa(const double kappa) { _kappa = kappa; }
-
-void ReferencePoint::set_dkappa(const double dkappa) { _dkappa = dkappa; }
+void ReferencePoint::set_dkappa(const double dkappa) { dkappa_ = dkappa; }
 
 void ReferencePoint::set_lower_bound(const double lower_bound) {
-  _lower_bound = lower_bound;
+  lower_bound_ = lower_bound;
 }
 
 void ReferencePoint::set_upper_bound(const double upper_bound) {
-  _upper_bound = upper_bound;
+  upper_bound_ = upper_bound;
 }
 
-double ReferencePoint::kappa() const { return _kappa; }
+double ReferencePoint::kappa() const { return kappa_; }
 
-double ReferencePoint::dkappa() const { return _dkappa; }
+double ReferencePoint::dkappa() const { return dkappa_; }
 
-double ReferencePoint::lower_bound() const { return _lower_bound; }
+double ReferencePoint::lower_bound() const { return lower_bound_; }
 
-double ReferencePoint::upper_bound() const { return _upper_bound; }
+double ReferencePoint::upper_bound() const { return upper_bound_; }
 
 }  // namespace planning
 }  // namespace apollo
