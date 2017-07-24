@@ -161,6 +161,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   UpdateKFLaneTrackers(&feature);
   InsertFeatureToHistory(&feature);
   SetMotionStatus();
+  Trim();
 }
 
 ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
@@ -760,6 +761,19 @@ void Obstacle::SetMotionStatus() {
 void Obstacle::InsertFeatureToHistory(Feature* feature) {
   feature_history_.push_front(std::move(*feature));
   ADEBUG << "Obstacle [" << id_ << "] inserted a frame into the history.";
+}
+
+void Obstacle::Trim() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (feature_history_.size() < 2) {
+    return;
+  }
+  double latest_ts = feature_history_.front().timestamp();
+  while (!feature_history_.empty() &&
+      latest_ts - feature_history_.back().timestamp() >=
+          FLAGS_max_history_time) {
+    feature_history_.pop_back();
+  }
 }
 
 }  // namespace prediction

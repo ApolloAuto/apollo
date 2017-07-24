@@ -125,6 +125,8 @@ class Obstacle {
 
   void InsertFeatureToHistory(Feature* feature);
 
+  void Trim();
+
  private:
   int id_;
   apollo::perception::PerceptionObstacle::Type type_;

@@ -45,3 +45,4 @@ DEFINE_double(still_obstacle_position_std, 1.0,
 DEFINE_string(map_file, "/path/to/map_file", "Path to map file");
 DEFINE_double(prediction_duration, 1.0, "Prediction duration (in seconds)");
 DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
+DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
