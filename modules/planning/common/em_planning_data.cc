@@ -18,9 +18,9 @@
  * @file
  **/
 
-#include "glog/logging.h"
 #include "modules/planning/common/em_planning_data.h"
 
+#include "glog/logging.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/math/double.h"
 
@@ -60,8 +60,8 @@ SpeedData* EMPlanningData::mutable_speed_data(const std::size_t index) {
 }
 
 bool EMPlanningData::aggregate(const double time_resolution) {
-  CHECK(time_resolution > 0.0);
-  CHECK(_computed_trajectory.num_of_points() == 0);
+  CHECK_GT(time_resolution, 0.0);
+  CHECK_EQ(_computed_trajectory.num_of_points(), 0);
 
   const SpeedData& speed_data = _speed_data_vec.back();
   const PathData& path_data = _path_data_vec.back();

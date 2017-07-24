@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 
+#include <vector>
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/localization/proto/pose.pb.h"
@@ -51,7 +53,7 @@ class STBoundaryMapper {
       std::vector<STGraphBoundary>* const boundary) const = 0;
 
   virtual common::ErrorCode get_speed_limits(
-      const apollo::localization::Pose& pose, apollo::hdmap::HDMap& map,
+      const apollo::localization::Pose& pose, const apollo::hdmap::HDMap& map,
       const PathData& path_data, const double planning_distance,
       const std::size_t matrix_dimension_s, const double default_speed_limit,
       SpeedLimit* const speed_limit_data);

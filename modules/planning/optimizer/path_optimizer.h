@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_PATH_OPTIMIZER_H_
 #define MODULES_PLANNING_OPTIMIZER_PATH_OPTIMIZER_H_
 
+#include <string>
+
 #include "modules/planning/optimizer/optimizer.h"
 
 #include "modules/common/proto/error_code.pb.h"

@@ -20,6 +20,7 @@
 
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_boundary_mapper.h"
 
+#include <algorithm>
 #include <limits>
 
 #include "modules/planning/proto/decision.pb.h"

@@ -19,7 +19,6 @@
  **/
 
 #include <limits>
-#include <vector>
 
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/math/double.h"

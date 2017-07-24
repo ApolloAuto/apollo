@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_BOUNDARY_MAPPER_H_
 
+#include <vector>
+
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/optimizer/st_graph/st_boundary_mapper.h"

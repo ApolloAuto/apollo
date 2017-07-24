@@ -21,5 +21,5 @@ namespace prediction {
 
 void RegionalPredictor::Predict(Obstacle* obstacle) const {}
 
-}  // prediction
-}  // apollo
+}  // namespace prediction
+}  // namespace apollo

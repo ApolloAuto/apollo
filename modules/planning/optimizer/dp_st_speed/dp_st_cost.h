@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_COST_H_
 #define MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_COST_H_
 
+#include <vector>
+
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_configuration.h"

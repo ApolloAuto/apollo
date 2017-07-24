@@ -21,6 +21,7 @@
 #include "modules/planning/optimizer/st_graph/st_boundary_mapper.h"
 
 #include <limits>
+#include <memory>
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
@@ -76,7 +77,7 @@ bool STBoundaryMapper::check_overlap(
 }
 
 ErrorCode STBoundaryMapper::get_speed_limits(
-    const Pose& pose, HDMap& map, const PathData& path_data,
+    const Pose& pose, const HDMap& map, const PathData& path_data,
     const double planning_distance, const std::size_t matrix_dimension_s,
     const double default_speed_limit, SpeedLimit* const speed_limit_data) {
   const auto& adc_position = pose.position();

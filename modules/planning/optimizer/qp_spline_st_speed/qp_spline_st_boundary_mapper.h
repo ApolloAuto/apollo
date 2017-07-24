@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_SPEED_QP_SPLINE_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_SPEED_QP_SPLINE_ST_BOUNDARY_MAPPER_H_
 
+#include <vector>
+
 #include "modules/planning/optimizer/st_graph/st_boundary_mapper.h"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -38,7 +40,7 @@ class QPSplineSTBoundaryMapper : public STBoundaryMapper {
       const STBoundaryConfig& st_boundary_config,
       const apollo::common::config::VehicleParam& veh_param);
 
-  virtual common::ErrorCode get_graph_boundary(
+  common::ErrorCode get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
       const double planning_distance, const double planning_time,

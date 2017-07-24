@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_H_
 #define MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_OPTIMIZER_H_
 
+#include <string>
+
 #include "modules/planning/optimizer/speed_optimizer.h"
 
 namespace apollo {
