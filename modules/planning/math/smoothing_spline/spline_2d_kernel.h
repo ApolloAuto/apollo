@@ -33,7 +33,7 @@ namespace planning {
 class Spline2dKernel {
  public:
   Spline2dKernel(const std::vector<double>& t_knots,
-                 const std::size_t spline_order);
+                 const std::uint32_t spline_order);
 
   // customized input output
   void add_regularization(const double regularization_param);
@@ -58,14 +58,14 @@ class Spline2dKernel {
       const std::vector<common::math::Vec2d>& ref_points, const double weight);
 
  private:
-  std::size_t find_index(const double x) const;
+  std::uint32_t find_index(const double x) const;
 
  private:
   Eigen::MatrixXd kernel_matrix_;
   Eigen::MatrixXd offset_;
   std::vector<double> t_knots_;
-  std::size_t spline_order_;
-  std::size_t total_params_;
+  std::uint32_t spline_order_;
+  std::uint32_t total_params_;
 };
 
 }  // namespace planning

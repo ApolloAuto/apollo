@@ -49,7 +49,7 @@ double STBoundaryMapper::get_area(
 
   double area = 0.0;
 
-  for (size_t i = 1; i < boundary_points.size(); ++i) {
+  for (uint32_t i = 1; i < boundary_points.size(); ++i) {
     const double ds1 = boundary_points[i - 1].s() - boundary_points[0].s();
     const double dt1 = boundary_points[i].t() - boundary_points[0].t();
     const double ds2 = boundary_points[i].s() - boundary_points[0].s();
@@ -78,7 +78,7 @@ bool STBoundaryMapper::check_overlap(
 
 ErrorCode STBoundaryMapper::get_speed_limits(
     const Pose& pose, const HDMap& map, const PathData& path_data,
-    const double planning_distance, const std::size_t matrix_dimension_s,
+    const double planning_distance, const std::uint32_t matrix_dimension_s,
     const double default_speed_limit, SpeedLimit* const speed_limit_data) {
   const auto& adc_position = pose.position();
 
@@ -119,8 +119,8 @@ ErrorCode STBoundaryMapper::get_speed_limits(
 
   double s = 0.0;
   const double unit_s = planning_distance / matrix_dimension_s;
-  std::size_t i = 0;
-  std::size_t j = 1;
+  std::uint32_t i = 0;
+  std::uint32_t j = 1;
   const auto& path_points = path_data.path().path_points();
   while (i < matrix_dimension_s && j < path_points.size()) {
     const auto& point = path_points[j];

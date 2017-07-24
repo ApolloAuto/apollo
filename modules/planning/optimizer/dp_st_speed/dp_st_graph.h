@@ -60,21 +60,21 @@ class DPSTGraph {
   ErrorCode get_object_decision(const STGraphData& st_graph_data,
                                 const SpeedData& speed_profile) const;
 
-  void calculate_total_cost(const std::size_t r, const std::size_t c);
+  void calculate_total_cost(const std::uint32_t r, const std::uint32_t c);
 
   double calculate_edge_cost(const STPoint& first, const STPoint& second,
                              const STPoint& third, const STPoint& forth,
                              const double speed_limit) const;
-  double calculate_edge_cost_for_second_row(const size_t col,
+  double calculate_edge_cost_for_second_row(const uint32_t col,
                                             const double speed_limit) const;
-  double calculate_edge_cost_for_third_row(const size_t curr_c,
-                                           const size_t pre_c,
+  double calculate_edge_cost_for_third_row(const uint32_t curr_c,
+                                           const uint32_t pre_c,
                                            const double speed_limit) const;
 
   // feasible c_prepre range given c_pre, c
   bool feasible_accel_range(const double c_pre, const double c_cur,
-                            std::size_t* const lower_bound,
-                            std::size_t* const upper_bound) const;
+                            std::uint32_t* const lower_bound,
+                            std::uint32_t* const upper_bound) const;
 
  private:
   // dp st configuration

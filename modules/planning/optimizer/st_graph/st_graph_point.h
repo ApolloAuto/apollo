@@ -31,8 +31,8 @@ class STGraphPoint {
   ~STGraphPoint() = default;
 
  public:
-  std::size_t index_s() const;
-  std::size_t index_t() const;
+  std::uint32_t index_s() const;
+  std::uint32_t index_t() const;
 
   const STPoint& point() const;
   const STGraphPoint* pre_point() const;
@@ -41,7 +41,7 @@ class STGraphPoint {
   double obstacle_cost() const;
   double total_cost() const;
 
-  void init(const std::size_t index_t, const std::size_t index_s,
+  void init(const std::uint32_t index_t, const std::uint32_t index_s,
             const STPoint& st_point);
 
   // given reference speed profile, reach the cost, including position
@@ -60,8 +60,8 @@ class STGraphPoint {
  private:
   STPoint _point;
   const STGraphPoint* _pre_point = nullptr;
-  std::size_t _index_s = 0;
-  std::size_t _index_t = 0;
+  std::uint32_t _index_s = 0;
+  std::uint32_t _index_t = 0;
 
   double _reference_cost = 0.0;
   double _obstacle_cost = 0.0;

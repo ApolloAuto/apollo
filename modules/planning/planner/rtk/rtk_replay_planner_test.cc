@@ -41,7 +41,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
 
   EXPECT_TRUE(planning_succeeded);
   EXPECT_TRUE(!trajectory.empty());
-  EXPECT_EQ(trajectory.size(), (std::size_t)FLAGS_rtk_trajectory_forward);
+  EXPECT_EQ(trajectory.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward);
 
   auto first_point = trajectory.front();
   EXPECT_DOUBLE_EQ(first_point.path_point().x(), 586385.782841);

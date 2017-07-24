@@ -27,7 +27,7 @@ namespace apollo {
 namespace planning {
 
 GraphVertex::GraphVertex(const common::FrenetFramePoint &frame_point,
-                         const size_t index, const size_t level) :
+                         const uint32_t index, const uint32_t level) :
     _frame_point(frame_point),
     _index(index),
     _level(level),
@@ -51,11 +51,11 @@ void GraphVertex::set_accumulated_cost(const double accumulated_cost) {
   _accumulated_cost = accumulated_cost;
 }
 
-void GraphVertex::set_index(const size_t index) {
+void GraphVertex::set_index(const uint32_t index) {
   _index = index;
 }
 
-void GraphVertex::set_level(const size_t level) {
+void GraphVertex::set_level(const uint32_t level) {
   _level = level;
 }
 
@@ -71,59 +71,59 @@ double GraphVertex::accumulated_cost() const {
   return _accumulated_cost;
 }
 
-size_t GraphVertex::index() const {
+uint32_t GraphVertex::index() const {
   return _index;
 }
 
-size_t GraphVertex::level() const {
+uint32_t GraphVertex::level() const {
   return _level;
 }
 
-void GraphVertex::add_out_vertex(const size_t vertex_index) {
+void GraphVertex::add_out_vertex(const uint32_t vertex_index) {
   _vertices_out.push_back(vertex_index);
 }
 
-void GraphVertex::add_out_vertex(const std::vector<size_t> &vertices) {
+void GraphVertex::add_out_vertex(const std::vector<uint32_t> &vertices) {
   _vertices_out.insert(_vertices_out.end(), vertices.begin(), vertices.end());
 }
 
-void GraphVertex::add_in_vertex(const size_t vertex_index) {
+void GraphVertex::add_in_vertex(const uint32_t vertex_index) {
   _vertices_in.push_back(vertex_index);
 }
 
-void GraphVertex::add_in_vertex(const std::vector<size_t> &vertices) {
+void GraphVertex::add_in_vertex(const std::vector<uint32_t> &vertices) {
   _vertices_in.insert(_vertices_in.end(), vertices.begin(), vertices.end());
 }
 
-void GraphVertex::add_out_edge(const size_t edge_index) {
+void GraphVertex::add_out_edge(const uint32_t edge_index) {
   _edges_out.push_back(edge_index);
 }
 
-void GraphVertex::add_out_edge(const std::vector<size_t> &edges) {
+void GraphVertex::add_out_edge(const std::vector<uint32_t> &edges) {
   _edges_out.insert(_edges_out.end(), edges.begin(), edges.end());
 }
 
-void GraphVertex::add_in_edge(const size_t edge_index) {
+void GraphVertex::add_in_edge(const uint32_t edge_index) {
   _edges_in.push_back(edge_index);
 }
 
-void GraphVertex::add_in_edge(const std::vector<size_t> &edges) {
+void GraphVertex::add_in_edge(const std::vector<uint32_t> &edges) {
   _edges_in.insert(_edges_in.end(), edges.begin(), edges.end());
 }
 
-const std::vector<size_t> &GraphVertex::vertices_out() const {
+const std::vector<uint32_t> &GraphVertex::vertices_out() const {
   return _vertices_out;
 }
 
-const std::vector<size_t> &GraphVertex::vertices_in() const {
+const std::vector<uint32_t> &GraphVertex::vertices_in() const {
   return _vertices_in;
 }
 
-const std::vector<size_t> &GraphVertex::edges_out() const {
+const std::vector<uint32_t> &GraphVertex::edges_out() const {
   return _edges_out;
 }
 
-const std::vector<size_t> &GraphVertex::edges_in() const {
+const std::vector<uint32_t> &GraphVertex::edges_in() const {
   return _edges_in;
 }
 

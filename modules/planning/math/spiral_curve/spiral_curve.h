@@ -35,7 +35,7 @@ namespace planning {
 class SpiralCurve {
  public:
   explicit SpiralCurve(const common::PathPoint& s, const common::PathPoint& e,
-                       const std::size_t order);
+                       const std::uint32_t order);
   virtual ~SpiralCurve();
 
   /**
@@ -64,7 +64,7 @@ class SpiralCurve {
   *   @return: sequence of sampling points
   **/
   virtual common::ErrorCode get_path_vec(
-      const std::size_t n,
+      const std::uint32_t n,
       std::vector<common::PathPoint>* path_points) const = 0;
   /**
   *   @brief: calcualate quintic path point at s locations

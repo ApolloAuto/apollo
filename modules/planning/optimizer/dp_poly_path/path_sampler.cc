@@ -42,7 +42,7 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
   step_length = std::max(step_length, _config.step_length_min());
   double center_l = init_sl_point.l();
   double accumulated_s = init_sl_point.s();
-  for (size_t i = 0; i < _config.sample_level(); ++i) {
+  for (uint32_t i = 0; i < _config.sample_level(); ++i) {
     std::vector<common::SLPoint> level_points;
     if (center_l < _config.lateral_sample_offset()) {
       center_l = 0.0;
@@ -54,7 +54,7 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
         center_l -
         _config.lateral_sample_offset() *
             ((_config.sample_points_num_each_level() - 1) >> 1);
-    for (size_t j = 0; j < _config.sample_points_num_each_level(); ++j) {
+    for (uint32_t j = 0; j < _config.sample_points_num_each_level(); ++j) {
       // TODO(haoyang): the lateral value is incorrect
 
       // TODO(haoyang): no checker no protection

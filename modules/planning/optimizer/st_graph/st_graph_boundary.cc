@@ -57,7 +57,7 @@ bool STGraphBoundary::IsPointInBoundary(const STPoint& st_point) const {
 }
 
 const ::apollo::common::math::Vec2d STGraphBoundary::point(
-    const size_t index) const {
+    const uint32_t index) const {
   CHECK_LT(index, points_.size());
   return points_[index];
 }

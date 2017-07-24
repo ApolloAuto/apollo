@@ -65,7 +65,7 @@ class RTKReplayPlanner : public Planner {
   void ReadTrajectoryFile(const std::string &filename);
 
  private:
-  std::size_t QueryPositionMatchedPoint(
+  std::uint32_t QueryPositionMatchedPoint(
       const apollo::common::TrajectoryPoint &start_point,
       const std::vector<apollo::common::TrajectoryPoint> &trajectory) const;
 

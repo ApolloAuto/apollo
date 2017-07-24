@@ -37,7 +37,7 @@ public:
   apollo::common::TrajectoryPoint evaluate_linear_approximation_absolute_time(
       const double abs_time) const;
 
-  std::size_t query_nearest_point_absolute_time(const double abs_time) const;
+  std::uint32_t query_nearest_point_absolute_time(const double abs_time) const;
 
   double header_time() const;
 

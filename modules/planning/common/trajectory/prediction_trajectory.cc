@@ -41,7 +41,7 @@ void PredictionTrajectory::set_start_timestamp(const double ts) {
 	_start_timestamp = ts;
 }
 
-TrajectoryPoint* PredictionTrajectory::trajectory_point_ptr(const std::size_t index) {
+TrajectoryPoint* PredictionTrajectory::trajectory_point_ptr(const std::uint32_t index) {
     if (index >= _trajectory_points.size()) {
 		return nullptr;
 	}

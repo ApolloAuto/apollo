@@ -29,11 +29,11 @@ double DpStConfiguration::total_path_length() const {
 
 double DpStConfiguration::total_time() const { return _total_time; }
 
-std::size_t DpStConfiguration::matrix_dimension_s() const {
+std::uint32_t DpStConfiguration::matrix_dimension_s() const {
   return _matrix_dimension_s;
 }
 
-std::size_t DpStConfiguration::matrix_dimension_t() const {
+std::uint32_t DpStConfiguration::matrix_dimension_t() const {
   return _matrix_dimension_t;
 }
 

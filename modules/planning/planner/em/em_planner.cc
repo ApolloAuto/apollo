@@ -79,14 +79,14 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
                                        FLAGS_trajectory_time_length);
 
   // assume the time resolution is 0.1
-  std::size_t num_time_steps =
-      static_cast<std::size_t>(FLAGS_trajectory_time_length /
+  std::uint32_t num_time_steps =
+      static_cast<std::uint32_t>(FLAGS_trajectory_time_length /
                                FLAGS_trajectory_time_resolution) +
       1;
   std::vector<SpeedPoint> speed_profile;
   speed_profile.reserve(num_time_steps);
 
-  for (std::size_t i = 0; i < num_time_steps; ++i) {
+  for (std::uint32_t i = 0; i < num_time_steps; ++i) {
     double t = i * FLAGS_trajectory_time_resolution;
     double s = speed_curve.evaluate(0, t);
     double v = speed_curve.evaluate(1, t);

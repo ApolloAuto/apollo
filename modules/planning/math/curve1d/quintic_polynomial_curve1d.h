@@ -47,7 +47,7 @@ class QuinticPolynomialCurve1d : public PolynomialCurve1d {
 
   virtual ~QuinticPolynomialCurve1d() = default;
 
-  double evaluate(const std::size_t order, const double p) const override;
+  double evaluate(const std::uint32_t order, const double p) const override;
 
   double param_length() const override;
 

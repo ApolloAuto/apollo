@@ -150,7 +150,7 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
     auto matched_info =
         ComputeStartingPointFromLastTrajectory(execution_start_time);
     TrajectoryPoint matched_point = matched_info.first;
-    std::size_t matched_index = matched_info.second;
+    std::uint32_t matched_index = matched_info.second;
 
     // Compute the position deviation between current vehicle
     // position and target vehicle position.
@@ -174,7 +174,7 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
       // a segment of last trajectory to be attached to planned trajectory in
       // case controller needs.
       auto overhead_trajectory = GetOverheadTrajectory(
-          matched_index, (std::size_t)FLAGS_rtk_trajectory_backward);
+          matched_index, (std::uint32_t)FLAGS_rtk_trajectory_backward);
       planning_trajectory->insert(planning_trajectory->begin(),
                                   overhead_trajectory.begin(),
                                   overhead_trajectory.end());
@@ -205,7 +205,7 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
   return true;
 }
 
-std::pair<TrajectoryPoint, std::size_t>
+std::pair<TrajectoryPoint, std::uint32_t>
 Planning::ComputeStartingPointFromLastTrajectory(
     const double start_time) const {
   auto comp = [](const TrajectoryPoint &p, const double t) {
@@ -218,8 +218,8 @@ Planning::ComputeStartingPointFromLastTrajectory(
   if (it_lower == last_trajectory_.end()) {
     it_lower--;
   }
-  std::size_t index = it_lower - last_trajectory_.begin();
-  return std::pair<TrajectoryPoint, std::size_t>(*it_lower, index);
+  std::uint32_t index = it_lower - last_trajectory_.begin();
+  return std::pair<TrajectoryPoint, std::uint32_t>(*it_lower, index);
 }
 
 TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
@@ -253,8 +253,8 @@ void Planning::Reset() {
 }
 
 std::vector<TrajectoryPoint> Planning::GetOverheadTrajectory(
-    const std::size_t matched_index, const std::size_t buffer_size) {
-  const std::size_t start_index =
+    const std::uint32_t matched_index, const std::uint32_t buffer_size) {
+  const std::uint32_t start_index =
       matched_index < buffer_size ? 0 : matched_index - buffer_size;
 
   std::vector<TrajectoryPoint> overhead_trajectory(

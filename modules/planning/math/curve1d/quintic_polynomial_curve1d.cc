@@ -51,7 +51,7 @@ QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
   return;
 }
 
-double QuinticPolynomialCurve1d::evaluate(const size_t order,
+double QuinticPolynomialCurve1d::evaluate(const uint32_t order,
                                           const double p) const {
   switch (order) {
     case 0: {
@@ -113,7 +113,7 @@ double QuinticPolynomialCurve1d::param_length() const { return param_; }
 
 std::string QuinticPolynomialCurve1d::to_string() const {
   std::string s = "";
-  for (size_t i = 0; i < coef_.size(); ++i) {
+  for (uint32_t i = 0; i < coef_.size(); ++i) {
     s += std::to_string(coef_[i]) + "\t";
   }
   s += std::to_string(param_);

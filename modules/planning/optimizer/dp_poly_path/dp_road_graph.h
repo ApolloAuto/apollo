@@ -53,10 +53,10 @@ class DpRoadGraph {
       const ReferenceLine &reference_line);
   ::apollo::common::ErrorCode find_best_trajectory(
       const ReferenceLine &reference_line, const DecisionData &decision_data,
-      std::vector<size_t> *const min_cost_edges);
+      std::vector<uint32_t> *const min_cost_edges);
   bool add_vertex(const common::SLPoint &sl_point,
-                  const ReferencePoint &reference_point, const size_t level);
-  bool connect_vertex(const size_t start, const size_t end);
+                  const ReferencePoint &reference_point, const uint32_t level);
+  bool connect_vertex(const uint32_t start, const uint32_t end);
 
  private:
   DpPolyPathConfig _config;

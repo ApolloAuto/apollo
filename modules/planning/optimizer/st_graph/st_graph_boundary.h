@@ -54,7 +54,7 @@ class STGraphBoundary final : public ::apollo::common::math::Polygon2d {
   bool IsPointInBoundary(const STGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;
 
-  const ::apollo::common::math::Vec2d point(const size_t index) const;
+  const ::apollo::common::math::Vec2d point(const uint32_t index) const;
   const std::vector<::apollo::common::math::Vec2d>& points() const;
 
   BoundaryType boundary_type() const;

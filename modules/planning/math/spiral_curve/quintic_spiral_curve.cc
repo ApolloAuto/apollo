@@ -191,7 +191,7 @@ bool QuinticSpiralCurve::calculate_path() {
 }
 
 common::ErrorCode QuinticSpiralCurve::get_path_vec(
-    const std::size_t n, std::vector<common::PathPoint>* path_points) const {
+    const std::uint32_t n, std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   if (n <= 1 || error() > spiral_config().newton_raphson_tol()) {
@@ -216,7 +216,7 @@ common::ErrorCode QuinticSpiralCurve::get_path_vec(
   std::copy(p_params().begin(), p_params().end(), p_value.begin());
   std::array<double, 6> a_params = SpiralFormula::p_to_a_k5(sg(), p_value);
 
-  for (std::size_t i = 1; i < n; ++i) {
+  for (std::uint32_t i = 1; i < n; ++i) {
     result[i].set_s(s);
     result[i].set_theta(SpiralFormula::theta_func_k5_a(s, a_params) +
                         result[0].theta());
@@ -229,7 +229,7 @@ common::ErrorCode QuinticSpiralCurve::get_path_vec(
   double dx = 0.0;
   double dy = 0.0;
 
-  for (std::size_t k = 1; k < n; ++k) {
+  for (std::uint32_t k = 1; k < n; ++k) {
     dx = (dx / k) * (k - 1) +
          (std::cos(std::fmod(result[k].theta(), s_two_pi_)) +
           std::cos(std::fmod(result[k - 1].theta(), s_two_pi_))) /
@@ -258,7 +258,7 @@ common::ErrorCode QuinticSpiralCurve::get_path_vec_with_s(
     return common::ErrorCode::OK;
   }
 
-  const std::size_t n = vec_s.size();
+  const std::uint32_t n = vec_s.size();
 
   common::PathPoint ref_point = start_point();
 
@@ -268,7 +268,7 @@ common::ErrorCode QuinticSpiralCurve::get_path_vec_with_s(
   std::copy(p_params().begin(), p_params().end(), p_value.begin());
   std::array<double, 6> a_params = SpiralFormula::p_to_a_k5(sg(), p_value);
 
-  for (std::size_t i = 0; i < n; ++i) {
+  for (std::uint32_t i = 0; i < n; ++i) {
     result[i].set_s(vec_s[i]);
     result[i].set_theta(SpiralFormula::theta_func_k5_a(vec_s[i], a_params) +
                         ref_point.theta());
@@ -290,7 +290,7 @@ common::ErrorCode QuinticSpiralCurve::get_path_vec_with_s(
         2.0;
   result[0].set_x(dx + ref_point.x());
   result[0].set_y(dy + ref_point.y());
-  for (std::size_t k = 1; k < n; ++k) {
+  for (std::uint32_t k = 1; k < n; ++k) {
     dx += (vec_s[k] - vec_s[k - 1]) *
           (std::cos(std::fmod(result[k - 1].theta(), s_two_pi_)) +
            std::cos(std::fmod(result[k].theta(), s_two_pi_))) /

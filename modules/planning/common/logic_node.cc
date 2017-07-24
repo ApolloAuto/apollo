@@ -25,10 +25,10 @@
 namespace apollo {
 namespace planning {
 
-LogicNode::LogicNode(const std::size_t node_id, const std::string &lane_id)
+LogicNode::LogicNode(const std::uint32_t node_id, const std::string &lane_id)
     : _node_id(node_id), _lane_id(lane_id) {}
 
-std::size_t LogicNode::node_id() const { return _node_id; }
+std::uint32_t LogicNode::node_id() const { return _node_id; }
 
 const std::string &LogicNode::lane_id() const { return _lane_id; }
 
@@ -46,7 +46,7 @@ void LogicNode::connect(const LogicNode &node) {
 }
 
 common::ErrorCode LogicNode::get_next_node(const std::string &lane_id,
-                                           std::size_t *const node_id) {
+                                           std::uint32_t *const node_id) {
   CHECK_NOTNULL(node_id);
   *node_id = 0;
   if (_edge.find(lane_id) == _edge.end()) {

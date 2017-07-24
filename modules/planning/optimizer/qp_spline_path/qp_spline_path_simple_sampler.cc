@@ -29,7 +29,7 @@ namespace planning {
 bool QPSplinePathSimpleSampler::sample(
     const common::FrenetFramePoint& init_point,
     const ReferenceLine& reference_line,
-    const std::size_t number_of_sampling_point, const double s_lower_bound,
+    const std::uint32_t number_of_sampling_point, const double s_lower_bound,
     const double s_upper_bound, std::vector<double>* const sampling_point) {
   // TODO: Haoyang Fan, change to a configurable version
   double sampling_distance =
@@ -58,7 +58,7 @@ bool QPSplinePathSimpleSampler::sample(
   }
   const double delta_s = sampling_distance / number_of_sampling_point;
 
-  for (std::size_t i = 1; i <= number_of_sampling_point; ++i) {
+  for (std::uint32_t i = 1; i <= number_of_sampling_point; ++i) {
     sampling_point->emplace_back(delta_s * i + start_s);
   }
   return true;

@@ -26,12 +26,12 @@
 namespace apollo {
 namespace planning {
 
-PolynomialXd::PolynomialXd(const std::size_t order) : params_(order, 0.0) {}
+PolynomialXd::PolynomialXd(const std::uint32_t order) : params_(order, 0.0) {}
 
 PolynomialXd::PolynomialXd(const std::vector<double>& params)
     : params_(params) {}
 
-std::size_t PolynomialXd::order() const { return params_.size(); }
+std::uint32_t PolynomialXd::order() const { return params_.size(); }
 
 void PolynomialXd::set_params(const std::vector<double>& params) {
   params_ = params;
@@ -44,7 +44,7 @@ void PolynomialXd::derived_from(const PolynomialXd& base) {
     params_.clear();
   } else {
     params_.resize(base.order() - 1);
-    for (std::size_t i = 1; i < base.order(); ++i) {
+    for (std::uint32_t i = 1; i < base.order(); ++i) {
       params_[i - 1] = base[i] * i;
     }
   }
@@ -53,7 +53,7 @@ void PolynomialXd::derived_from(const PolynomialXd& base) {
 void PolynomialXd::integrated_from(const PolynomialXd& base) {
   params_.resize(base.order() + 1);
   params_[0] = 0.0;
-  for (std::size_t i = 0; i < base.order(); ++i) {
+  for (std::uint32_t i = 0; i < base.order(); ++i) {
     params_[i + 1] = base[i] / (i + 1);
   }
 }
@@ -62,7 +62,7 @@ void PolynomialXd::integrated_from(const PolynomialXd& base,
                                    const double intercept) {
   params_.resize(base.order() + 1);
   params_[0] = intercept;
-  for (std::size_t i = 0; i < base.order(); ++i) {
+  for (std::uint32_t i = 0; i < base.order(); ++i) {
     params_[i + 1] = base[i] / (i + 1);
   }
 }
@@ -76,7 +76,7 @@ double PolynomialXd::operator()(const double value) const {
   return result;
 }
 
-double PolynomialXd::operator[](const std::size_t index) const {
+double PolynomialXd::operator[](const std::uint32_t index) const {
   if (index >= params_.size()) {
     return 0.0;
   } else {

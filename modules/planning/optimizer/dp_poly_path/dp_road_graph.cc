@@ -59,7 +59,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
     AERROR << "Fail to generate graph!";
     return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
   }
-  std::vector<size_t> min_cost_edges;
+  std::vector<uint32_t> min_cost_edges;
   if (find_best_trajectory(reference_line, *decision_data, &min_cost_edges) !=
       ::apollo::common::ErrorCode::PLANNING_OK) {
     AERROR << "Fail to find best trajectory!";
@@ -69,7 +69,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
   std::vector<common::FrenetFramePoint> frenet_path;
   frenet_path.push_back(_vertices[0].frame_point());
   double accumulated_s = 0.0;
-  for (size_t i = 0; i < min_cost_edges.size(); ++i) {
+  for (uint32_t i = 0; i < min_cost_edges.size(); ++i) {
     GraphEdge edge = _edges[min_cost_edges[i]];
     GraphVertex end_vertex = _vertices[edge.to_vertex()];
     double step = 0.1;  // TODO(yifei): get from config.
@@ -186,20 +186,20 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
   }
 
   int vertex_num_previous_level = 1;
-  size_t accumulated_prev_level_size = 0;
-  size_t accumulated_index = 0;
-  for (size_t i = 0; i < points.size(); ++i) {
+  uint32_t accumulated_prev_level_size = 0;
+  uint32_t accumulated_index = 0;
+  for (uint32_t i = 0; i < points.size(); ++i) {
     int vertex_num_current_level = 0;
     ReferencePoint reference_point =
         reference_line.get_reference_point(points[i][0].s());
-    for (size_t j = 0; j < points[i].size(); ++j) {
+    for (uint32_t j = 0; j < points[i].size(); ++j) {
       if (!add_vertex(points[i][j], reference_point, i + 1)) {
         continue;
       }
       bool is_connected = false;
       for (int n = 0; n < vertex_num_previous_level; ++n) {
-        const size_t index_start = accumulated_prev_level_size + n;
-        const size_t index_end = accumulated_prev_level_size +
+        const uint32_t index_start = accumulated_prev_level_size + n;
+        const uint32_t index_end = accumulated_prev_level_size +
                                  vertex_num_previous_level +
                                  vertex_num_current_level;
         if (connect_vertex(index_start, index_end)) {
@@ -227,12 +227,12 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
 
 ::apollo::common::ErrorCode DpRoadGraph::find_best_trajectory(
     const ReferenceLine &reference_line, const DecisionData &decision_data,
-    std::vector<size_t> *const min_cost_edges) {
+    std::vector<uint32_t> *const min_cost_edges) {
   CHECK_NOTNULL(min_cost_edges);
-  std::unordered_map<size_t, size_t> vertex_connect_table;
+  std::unordered_map<uint32_t, uint32_t> vertex_connect_table;
   GraphVertex &head = _vertices[0];
   head.set_accumulated_cost(0.0);
-  size_t best_trajectory_end_index = 0;
+  uint32_t best_trajectory_end_index = 0;
   double min_trajectory_cost = std::numeric_limits<double>::max();
   TrajectoryCost trajectory_cost(_config, _heuristic_speed_data, decision_data);
 
@@ -241,10 +241,10 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
       vehicle_config->GetConfig().vehicle_param().length();
   const double vehicle_width =
       vehicle_config->GetConfig().vehicle_param().length();
-  for (size_t i = 0; i < _vertices.size(); ++i) {
+  for (uint32_t i = 0; i < _vertices.size(); ++i) {
     const GraphVertex &vertex = _vertices[i];
-    const std::vector<size_t> edges = vertex.edges_out();
-    for (size_t j = 0; j < edges.size(); ++j) {
+    const std::vector<uint32_t> edges = vertex.edges_out();
+    for (uint32_t j = 0; j < edges.size(); ++j) {
       double start_s = vertex.frame_point().s();
       double end_s = _vertices[_edges[j].to_vertex()].frame_point().s();
       double cost = trajectory_cost.calculate(_edges[j].poly_path(), start_s,
@@ -280,7 +280,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
 
 bool DpRoadGraph::add_vertex(const common::SLPoint &sl_point,
                              const ReferencePoint &reference_point,
-                             const size_t level) {
+                             const uint32_t level) {
   double kappa = reference_point.kappa();
   double kappa_range_upper = 0.23;
   double kappa_range_lower = -kappa_range_upper;
@@ -307,7 +307,7 @@ bool DpRoadGraph::add_vertex(const common::SLPoint &sl_point,
   return true;
 }
 
-bool DpRoadGraph::connect_vertex(const size_t start, const size_t end) {
+bool DpRoadGraph::connect_vertex(const uint32_t start, const uint32_t end) {
   GraphVertex &v_start = _vertices[start];
   GraphVertex &v_end = _vertices[end];
   QuinticPolynomialCurve1d curve(

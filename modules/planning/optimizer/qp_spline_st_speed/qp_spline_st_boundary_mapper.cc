@@ -38,6 +38,8 @@ namespace planning {
 using ErrorCode = apollo::common::ErrorCode;
 using VehicleParam = apollo::common::config::VehicleParam;
 using PathPoint = apollo::common::PathPoint;
+using Box2d = apollo::common::math::Box2d;
+using Vec2d = apollo::common::math::Vec2d;
 
 QPSplineSTBoundaryMapper::QPSplineSTBoundaryMapper(
     const STBoundaryConfig& st_boundary_config, const VehicleParam& veh_param)
@@ -180,11 +182,31 @@ ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
   double follow_distance = -1.0;
   if (obj_decision.has_follow()) {
     follow_distance = std::fmax(speed * minimal_follow_time,
-                                std::fabs(obj_decision.follow().distance_s()));
-    // vehicle_param.front_edge_to_center();
+                                std::fabs(obj_decision.follow().distance_s())) +
+                      vehicle_param().front_edge_to_center();
   }
 
   bool skip = true;
+  std::vector<STPoint> boundary_points;
+
+  for (uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
+    const auto& trajectory = obstacle.prediction_trajectories()[i];
+    for (uint32_t j = 0; j < trajectory.num_of_points(); ++i) {
+      const auto& trajectory_point = trajectory.trajectory_point_at(j);
+      // TODO: fix trajectory point relative time issue.
+      double trajectory_point_time =
+          trajectory_point.relative_time() +
+          trajectory.start_timestamp();  // -curr_timestamp.
+      const Box2d obs_box(
+          Vec2d(trajectory_point.path_point().x(),
+                trajectory_point.path_point().y()),
+          trajectory_point.path_point().theta(),
+          obstacle.Length() * st_boundary_config().expending_coeff(),
+          obstacle.Width() * st_boundary_config().expending_coeff());
+      uint64_t low = 0;
+      uint64_t high = path_data.path().num_of_points() - 1;
+    }
+  }
 
   return ErrorCode::PLANNING_OK;
 }

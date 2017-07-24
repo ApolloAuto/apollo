@@ -28,7 +28,7 @@ namespace apollo {
 namespace planning {
 
 class DiscretizedTrajectory : public Trajectory {
-public:
+ public:
   DiscretizedTrajectory() = default;
 
   DiscretizedTrajectory(
@@ -48,20 +48,19 @@ public:
   virtual apollo::common::TrajectoryPoint evaluate_linear_approximation(
       const double relative_time) const;
 
-  virtual std::size_t query_nearest_point(const double relative_time) const;
+  virtual uint32_t query_nearest_point(const double relative_time) const;
 
-  virtual std::size_t query_nearest_point(
-      const Eigen::Vector2d& position) const;
+  virtual uint32_t query_nearest_point(const Eigen::Vector2d& position) const;
 
   virtual void add_trajectory_point(
       const apollo::common::TrajectoryPoint& trajectory_point);
 
   const apollo::common::TrajectoryPoint& trajectory_point_at(
-      const std::size_t index) const;
+      const std::uint32_t index) const;
 
-  std::size_t num_of_points() const;
+  uint32_t num_of_points() const;
 
-protected:
+ protected:
   std::vector<apollo::common::TrajectoryPoint> _trajectory_points;
 };
 

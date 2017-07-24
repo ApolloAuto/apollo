@@ -29,14 +29,14 @@ namespace planning {
 
 std::string EMPlanningData::type() const { return "EMPlanningData"; }
 
-void EMPlanningData::init(const std::size_t num_iter) {
+void EMPlanningData::init(const std::uint32_t num_iter) {
   _num_iter = num_iter;
   // TODO: need to modify this part base on data flow
   _path_data_vec = std::vector<PathData>(num_iter, PathData());
   _speed_data_vec = std::vector<SpeedData>(num_iter + 1, SpeedData());
 }
 
-std::size_t EMPlanningData::num_iter() const { return _num_iter; }
+std::uint32_t EMPlanningData::num_iter() const { return _num_iter; }
 
 bool EMPlanningData::aggregate(const double time_resolution) {
   CHECK_GT(time_resolution, 0.0);

@@ -48,7 +48,7 @@ class QpFrenetFrame {
             const DecisionData& decision_data, const SpeedData& speed_data,
             const common::FrenetFramePoint& init_frenet_point,
             const double start_s, const double end_s,
-            const double time_resolution, const std::size_t num_points);
+            const double time_resolution, const std::uint32_t num_points);
 
   const ReferenceLine* reference_line() const;
 
@@ -92,7 +92,7 @@ class QpFrenetFrame {
                                                    const double s_start,
                                                    const double s_end);
 
-  std::pair<std::size_t, std::size_t> find_interval(const double start,
+  std::pair<std::uint32_t, std::uint32_t> find_interval(const double start,
                                                     const double end) const;
 
   bool calculate_hd_map_bound();
@@ -105,7 +105,7 @@ class QpFrenetFrame {
                  const std::vector<std::pair<double, double>>& bound_map,
                  std::pair<double, double>* const bound) const;
 
-  std::size_t find_index(const double s) const;
+  std::uint32_t find_index(const double s) const;
 
  private:
   const ReferenceLine* _reference_line = nullptr;

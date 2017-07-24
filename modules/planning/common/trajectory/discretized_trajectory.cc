@@ -81,7 +81,7 @@ TrajectoryPoint DiscretizedTrajectory::evaluate_linear_approximation(
                                                 relative_time);
 }
 
-std::size_t DiscretizedTrajectory::query_nearest_point(
+std::uint32_t DiscretizedTrajectory::query_nearest_point(
     const double relative_time) const {
   auto func = [](const TrajectoryPoint& tp, const double relative_time) {
     return tp.relative_time() < relative_time;
@@ -89,14 +89,14 @@ std::size_t DiscretizedTrajectory::query_nearest_point(
   auto it_lower = std::lower_bound(_trajectory_points.begin(),
                                    _trajectory_points.end(),
                                    relative_time, func);
-  return (std::size_t)(it_lower - _trajectory_points.begin());
+  return (std::uint32_t)(it_lower - _trajectory_points.begin());
 }
 
-std::size_t DiscretizedTrajectory::query_nearest_point(
+std::uint32_t DiscretizedTrajectory::query_nearest_point(
     const Eigen::Vector2d& position) const {
   double dist_min = std::numeric_limits<double>::max();
-  std::size_t index_min = 0;
-  for (std::size_t i = 0; i < _trajectory_points.size(); ++i) {
+  std::uint32_t index_min = 0;
+  for (std::uint32_t i = 0; i < _trajectory_points.size(); ++i) {
     const Eigen::Vector2d coordinate(_trajectory_points[i].path_point().x(),
                                      _trajectory_points[i].path_point().y());
     Eigen::Vector2d dist_vec = coordinate - position;
@@ -119,7 +119,7 @@ void DiscretizedTrajectory::add_trajectory_point(
 }
 
 const TrajectoryPoint& DiscretizedTrajectory::trajectory_point_at(
-    const std::size_t index) const {
+    const std::uint32_t index) const {
   CHECK_LT(index, num_of_points());
   return _trajectory_points[index];
 }
@@ -134,7 +134,7 @@ TrajectoryPoint DiscretizedTrajectory::end_point() const {
   return _trajectory_points.back();
 }
 
-std::size_t DiscretizedTrajectory::num_of_points() const {
+std::uint32_t DiscretizedTrajectory::num_of_points() const {
   return _trajectory_points.size();
 }
 

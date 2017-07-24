@@ -91,7 +91,7 @@ class Planning : public apollo::common::ApolloApp {
   void RegisterPlanners();
   void RunOnce();
 
-  std::pair<common::TrajectoryPoint, std::size_t>
+  std::pair<common::TrajectoryPoint, std::uint32_t>
   ComputeStartingPointFromLastTrajectory(const double curr_time) const;
 
   common::TrajectoryPoint ComputeStartingPointFromVehicleState(
@@ -99,7 +99,7 @@ class Planning : public apollo::common::ApolloApp {
       const double forward_time) const;
 
   std::vector<common::TrajectoryPoint> GetOverheadTrajectory(
-      const std::size_t matched_index, const std::size_t buffer_size);
+      const std::uint32_t matched_index, const std::uint32_t buffer_size);
 
   ADCTrajectory ToADCTrajectory(
       const double header_time,

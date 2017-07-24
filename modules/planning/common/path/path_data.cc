@@ -87,7 +87,7 @@ bool PathData::get_path_point_with_ref_s(
   if (it_lower == frenet_points.begin()) {
     *path_point = path_.path_points().front();
   } else {
-    //        std::size_t index_lower = (std::size_t)(it_lower -
+    //        std::uint32_t index_lower = (std::uint32_t)(it_lower -
     //        frenet_points.begin());
     //
     //        double ref_s0 = (it_lower - 1)->s();

@@ -35,7 +35,7 @@ namespace planning {
 
 class Spline2d {
  public:
-  Spline2d(const std::vector<double>& t_knots, const std::size_t order);
+  Spline2d(const std::vector<double>& t_knots, const std::uint32_t order);
   std::pair<double, double> operator()(const double t) const;
   double x(const double t) const;
   double y(const double t) const;
@@ -45,19 +45,19 @@ class Spline2d {
   double second_derivative_y(const double t) const;
   double third_derivative_x(const double t) const;
   double third_derivative_y(const double t) const;
-  bool set_splines(const Eigen::MatrixXd& params, const std::size_t order);
-  Spline2dSeg* mutable_smoothing_spline(const std::size_t index);
-  const Spline2dSeg& smoothing_spline(const std::size_t index) const;
+  bool set_splines(const Eigen::MatrixXd& params, const std::uint32_t order);
+  Spline2dSeg* mutable_smoothing_spline(const std::uint32_t index);
+  const Spline2dSeg& smoothing_spline(const std::uint32_t index) const;
   const std::vector<double>& t_knots() const;
-  std::size_t spline_order() const;
+  std::uint32_t spline_order() const;
 
  private:
-  std::size_t find_index(const double x) const;
+  std::uint32_t find_index(const double x) const;
 
  private:
   std::vector<Spline2dSeg> splines_;
   std::vector<double> t_knots_;
-  std::size_t spline_order_;
+  std::uint32_t spline_order_;
 };
 
 }  // namespace planning

@@ -49,7 +49,7 @@ class SpeedData {
  private:
   SpeedPoint interpolate(const SpeedPoint& left, const SpeedPoint& right,
                          const double weight) const;
-  std::size_t find_index(const double s) const;
+  std::uint32_t find_index(const double s) const;
 
   std::vector<SpeedPoint> speed_vector_;
 };
