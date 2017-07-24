@@ -18,7 +18,7 @@
  * @file dp_poly_path_optimizer.cpp
  **/
 
-#include "modules/planning/optimizer/dp_poly_path_optimizer.h"
+#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
 
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
