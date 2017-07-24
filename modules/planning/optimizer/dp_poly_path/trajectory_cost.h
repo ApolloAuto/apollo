@@ -48,7 +48,7 @@ class TrajectoryCost {
   SpeedData _heuristic_speed_data;
   std::vector<std::vector<::apollo::common::math::Box2d>> _obstacle_trajectory;
   std::vector<double> _obstacle_probability;
-  size_t _evaluate_times;
+  uint32_t _evaluate_times;
 };
 
 }  // namespace planning

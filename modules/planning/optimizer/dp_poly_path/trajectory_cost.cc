@@ -37,10 +37,10 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
   const double total_time =
       std::min(_heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
   _evaluate_times =
-      static_cast<size_t>(std::floor(total_time / config.eval_time_interval()));
+      static_cast<uint32_t>(std::floor(total_time / config.eval_time_interval()));
 
   // Mapping Static obstacle
-  for (size_t i = 0; i < static_obstacles.size(); ++i) {
+  for (uint32_t i = 0; i < static_obstacles.size(); ++i) {
     std::vector<::apollo::common::math::Box2d> obstacle_by_time;
     ::apollo::common::TrajectoryPoint traj_point =
         static_obstacles[i]->prediction_trajectories()[0].evaluate(0.0);
@@ -50,7 +50,7 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
         center_point, traj_point.path_point().theta(),
         static_obstacles[i]->BoundingBox().length(),
         static_obstacles[i]->BoundingBox().width()};
-    for (size_t j = 0; i <= _evaluate_times; ++j) {
+    for (uint32_t j = 0; i <= _evaluate_times; ++j) {
       obstacle_by_time.push_back(obstacle_box);
     }
     _obstacle_trajectory.push_back(obstacle_by_time);
@@ -59,12 +59,12 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
 
   // Mapping dynamic obstacle
   const auto &dynamic_obstacles = decision_data.DynamicObstacles();
-  for (size_t i = 0; i < dynamic_obstacles.size(); ++i) {
+  for (uint32_t i = 0; i < dynamic_obstacles.size(); ++i) {
     const auto &trajectories = dynamic_obstacles[i]->prediction_trajectories();
-    for (size_t j = 0; j < trajectories.size(); ++j) {
+    for (uint32_t j = 0; j < trajectories.size(); ++j) {
       const auto &trajectory = trajectories[j];
       std::vector<::apollo::common::math::Box2d> obstacle_by_time;
-      for (size_t time = 0; time <= _evaluate_times; ++time) {
+      for (uint32_t time = 0; time <= _evaluate_times; ++time) {
         TrajectoryPoint traj_point =
             trajectory.evaluate(time * config.eval_time_interval());
         ::apollo::common::math::Vec2d center_point = {
@@ -87,7 +87,7 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
                                  const double length, const double width,
                                  const ReferenceLine &reference_line) const {
   double total_cost = 0.0;
-  for (size_t i = 0; i < _evaluate_times; ++i) {
+  for (uint32_t i = 0; i < _evaluate_times; ++i) {
     double eval_time = i * _config.eval_time_interval();
     SpeedPoint speed_point;
     if (!_heuristic_speed_data.get_speed_point_with_time(eval_time,
@@ -106,7 +106,7 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
         reference_line.get_reference_point(car_point.x());
     ::apollo::common::math::Box2d car_box = {
         car_point, reference_point.heading(), length, width};
-    for (size_t j = 0; j < _obstacle_trajectory.size(); ++j) {
+    for (uint32_t j = 0; j < _obstacle_trajectory.size(); ++j) {
       ::apollo::common::math::Box2d obstacle_box = _obstacle_trajectory[j][i];
       double distance = car_box.DistanceTo(obstacle_box);
       total_cost += distance * _obstacle_probability[j];  // obstacle cost

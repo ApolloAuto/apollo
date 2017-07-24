@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_CONFIGURATION_H_
 #define MODULES_PLANNING_OPTIMIZER_DP_ST_SPEED_DP_ST_CONFIGURATION_H_
 
+#include <cinttypes>
 #include <cstddef>
 #include <limits>
 
@@ -34,8 +35,8 @@ class DpStConfiguration {
   double total_path_length() const;
   double total_time() const;
 
-  std::size_t matrix_dimension_s() const;
-  std::size_t matrix_dimension_t() const;
+  std::uint32_t matrix_dimension_s() const;
+  std::uint32_t matrix_dimension_t() const;
 
   double speed_weight() const;
   double accel_weight() const;
@@ -70,8 +71,8 @@ class DpStConfiguration {
   double _total_path_length = 80.0;
   double _total_time = 8.0;
 
-  std::size_t _matrix_dimension_s = 100;
-  std::size_t _matrix_dimension_t = 10;
+  std::uint32_t _matrix_dimension_s = 100;
+  std::uint32_t _matrix_dimension_t = 10;
 
   double _speed_weight = 0.0;
   double _accel_weight = 10.0;

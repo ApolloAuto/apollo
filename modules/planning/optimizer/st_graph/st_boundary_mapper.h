@@ -55,15 +55,14 @@ class STBoundaryMapper {
   virtual common::ErrorCode get_speed_limits(
       const apollo::localization::Pose& pose, const apollo::hdmap::HDMap& map,
       const PathData& path_data, const double planning_distance,
-      const std::size_t matrix_dimension_s, const double default_speed_limit,
+      const std::uint32_t matrix_dimension_s, const double default_speed_limit,
       SpeedLimit* const speed_limit_data);
 
   const apollo::planning::STBoundaryConfig& st_boundary_config() const;
   const apollo::common::config::VehicleParam& vehicle_param() const;
 
  protected:
-  double get_area(
-      const std::vector<STPoint>& boundary_points) const;
+  double get_area(const std::vector<STPoint>& boundary_points) const;
 
   bool check_overlap(const apollo::common::PathPoint& path_point,
                      const apollo::common::config::VehicleParam& params,

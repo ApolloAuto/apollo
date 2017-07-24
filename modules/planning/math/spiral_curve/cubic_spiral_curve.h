@@ -47,7 +47,7 @@ class CubicSpiralCurve : public SpiralCurve {
   ~CubicSpiralCurve() = default;
   bool calculate_path();
   common::ErrorCode get_path_vec(
-      const std::size_t n,
+      const std::uint32_t n,
       std::vector<common::PathPoint>* path_points) const override;
   common::ErrorCode get_path_vec_with_s(
       const std::vector<double>& vec_s,

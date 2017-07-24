@@ -30,7 +30,7 @@ namespace planning {
 void PerceptionProxy::add_perception_obstacles(
     const apollo::perception::PerceptionObstacles &perception_obstacles) {
   if (_perception_frame.size() >
-      static_cast<std::size_t>(FLAGS_max_frame_size)) {
+      static_cast<std::uint32_t>(FLAGS_max_frame_size)) {
     _perception_frame.pop_front();
   }
   _perception_frame.emplace_back(std::move(perception_obstacles));

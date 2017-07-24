@@ -33,21 +33,21 @@ namespace planning {
 
 class LogicNode {
  public:
-  explicit LogicNode(const std::size_t node_id, const std::string &lane_id);
+  explicit LogicNode(const std::uint32_t node_id, const std::string &lane_id);
   const std::string &lane_id() const;
-  std::size_t node_id() const;
+  std::uint32_t node_id() const;
   const std::unordered_set<std::string> &lane_name() const;
   void connect(const LogicNode &node);
   void add_lane_name(const std::string &lane_name);
   common::ErrorCode get_next_node(const std::string &lane_id,
-                                  std::size_t *const node_id);
+                                  std::uint32_t *const node_id);
   void f() {}
 
  private:
-  std::size_t _node_id;
+  std::uint32_t _node_id;
   std::string _lane_id;
   std::unordered_set<std::string> _lane_name;
-  std::unordered_map<std::string, std::size_t> _edge;
+  std::unordered_map<std::string, std::uint32_t> _edge;
 };
 
 }  // namespace planning

@@ -40,7 +40,7 @@ class ReferenceLineDecider {
   apollo::common::ErrorCode init(const DataCenter& data_center);
   bool has_next() const;
   std::unique_ptr<ReferenceLine> next_reference_line();
-  std::size_t num_of_reference_lines() const;
+  std::uint32_t num_of_reference_lines() const;
 
  private:
   apollo::common::ErrorCode build_reference_lines(
@@ -49,7 +49,7 @@ class ReferenceLineDecider {
 
   double _last_route_timestamp = 0.0;
   int64_t _last_route_sequence_num = -1;
-  std::size_t _current_route_index = 0;
+  std::uint32_t _current_route_index = 0;
   double _current_s = 0.0;
   std::vector<ReferenceLine> _route_reference_lines;
   std::list<std::unique_ptr<ReferenceLine>> _reference_lines;

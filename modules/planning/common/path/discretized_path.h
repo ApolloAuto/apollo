@@ -51,11 +51,11 @@ class DiscretizedPath : public Path {
 
   const std::vector<common::PathPoint> &path_points() const;
 
-  std::size_t num_of_points() const;
+  std::uint32_t num_of_points() const;
 
-  const common::PathPoint &path_point_at(const std::size_t index) const;
+  const common::PathPoint &path_point_at(const std::uint32_t index) const;
 
-  common::PathPoint &path_point_at(const std::size_t index);
+  common::PathPoint &path_point_at(const std::uint32_t index);
 
  private:
   std::vector<common::PathPoint>::const_iterator query_lower_bound(

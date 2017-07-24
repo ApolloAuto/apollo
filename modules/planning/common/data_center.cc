@@ -70,7 +70,7 @@ void DataCenter::save_frame() {
   _sequence_queue.push_back(_frame->sequence_num());
   _frames[_frame->sequence_num()] = std::move(_frame);
   if (_sequence_queue.size() >
-      static_cast<size_t>(FLAGS_max_history_result)) {
+      static_cast<uint32_t>(FLAGS_max_history_result)) {
     _frames.erase(_sequence_queue.front());
     _sequence_queue.pop_front();
   }

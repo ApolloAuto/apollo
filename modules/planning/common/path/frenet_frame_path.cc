@@ -45,15 +45,15 @@ const std::vector<common::FrenetFramePoint> &FrenetFramePath::points() const {
   return points_;
 }
 
-std::size_t FrenetFramePath::num_points() const { return points_.size(); }
+std::uint32_t FrenetFramePath::num_points() const { return points_.size(); }
 
 const common::FrenetFramePoint &FrenetFramePath::point_at(
-    const std::size_t index) const {
+    const std::uint32_t index) const {
   CHECK_LT(index, points_.size());
   return points_[index];
 }
 
-common::FrenetFramePoint &FrenetFramePath::point_at(const std::size_t index) {
+common::FrenetFramePoint &FrenetFramePath::point_at(const std::uint32_t index) {
   CHECK_LT(index, points_.size());
   return points_[index];
 }

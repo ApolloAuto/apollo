@@ -41,7 +41,7 @@ namespace planning {
 
 class Spline1d {
  public:
-  Spline1d(const std::vector<double>& x_knots, const std::size_t order);
+  Spline1d(const std::vector<double>& x_knots, const std::uint32_t order);
 
   // @brief: given x return f(x) value, derivative, second order derivative and
   // the third order;
@@ -51,19 +51,19 @@ class Spline1d {
   double third_order_derivative(const double x) const;
 
   // @brief: set spline segments
-  bool set_spline_segs(const Eigen::MatrixXd& params, const std::size_t order);
-  Spline1dSeg* mutable_smoothing_spline(const std::size_t index);
+  bool set_spline_segs(const Eigen::MatrixXd& params, const std::uint32_t order);
+  Spline1dSeg* mutable_smoothing_spline(const std::uint32_t index);
 
   const std::vector<double>& x_knots() const;
-  std::size_t spline_order() const;
+  std::uint32_t spline_order() const;
 
  private:
-  std::size_t find_index(const double x) const;
+  std::uint32_t find_index(const double x) const;
 
  private:
   std::vector<Spline1dSeg> splines_;
   std::vector<double> x_knots_;
-  std::size_t spline_order_;
+  std::uint32_t spline_order_;
 };
 
 }  // namespace planning

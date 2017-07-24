@@ -23,26 +23,26 @@
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
-namespace apollo{
+namespace apollo {
 namespace planning {
 
 using apollo::common::TrajectoryPoint;
 
 class PredictionTrajectory : public DiscretizedTrajectory {
-public:
-	double probability() const;
+ public:
+  double probability() const;
 
-	double start_timestamp() const;
+  double start_timestamp() const;
 
-	void set_probability(const double prob);
+  void set_probability(const double prob);
 
-    void set_start_timestamp(const double ts);
+  void set_start_timestamp(const double ts);
 
-    TrajectoryPoint* trajectory_point_ptr(const std::size_t index);
+  TrajectoryPoint* trajectory_point_ptr(const std::uint32_t index);
 
-private:
-	double _probability;
-	double _start_timestamp;
+ private:
+  double _probability;
+  double _start_timestamp;
 };
 
 }  // namespace planning

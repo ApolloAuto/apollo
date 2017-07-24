@@ -88,8 +88,8 @@ ErrorCode ReferenceLineDecider::init(const DataCenter& data_center) {
   std::vector<SLPoint> sl_points;
   Eigen::Vector2d location(state.pose().position().x(),
                            state.pose().position().y());
-  std::size_t next_route_index = _current_route_index;
-  for (std::size_t i = _current_route_index;
+  std::uint32_t next_route_index = _current_route_index;
+  for (std::uint32_t i = _current_route_index;
        i < _route_reference_lines.size() && i - _current_route_index < 2; ++i) {
     sl_points.emplace_back();
     if (!_route_reference_lines[i].get_point_in_Frenet_frame(
@@ -197,7 +197,7 @@ bool ReferenceLineDecider::has_next() const {
 
 std::string ReferenceLineDecider::to_json() const { return ""; }
 
-std::size_t ReferenceLineDecider::num_of_reference_lines() const {
+std::uint32_t ReferenceLineDecider::num_of_reference_lines() const {
   return _reference_lines.size();
 }
 

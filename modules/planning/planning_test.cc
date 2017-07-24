@@ -52,7 +52,7 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   planning.Init();
   planning.Plan(vehicle_state, false, time1, &trajectory1);
 
-  EXPECT_EQ(trajectory1.size(), (std::size_t)FLAGS_rtk_trajectory_forward);
+  EXPECT_EQ(trajectory1.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward);
   const auto& p1_start = trajectory1.front();
   const auto& p1_end = trajectory1.back();
 
@@ -63,7 +63,7 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   double time2 = 0.5;
   planning.Plan(vehicle_state, true, time2, &trajectory2);
 
-  EXPECT_EQ(trajectory2.size(), (std::size_t)FLAGS_rtk_trajectory_forward +
+  EXPECT_EQ(trajectory2.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward +
                                     (int)FLAGS_rtk_trajectory_backward);
 
   const auto &p2_backward = trajectory2.front();
