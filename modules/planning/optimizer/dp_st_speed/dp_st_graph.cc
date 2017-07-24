@@ -335,9 +335,8 @@ ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
       dec.mutable_yield();
       object_ptr->MutableDecisions()->push_back(dec);
     } else {
-      // was GO_UP
       ObjectDecisionType dec;
-      dec.mutable_avoid();
+      dec.mutable_overtake();
       object_ptr->MutableDecisions()->push_back(dec);
     }
   }

@@ -146,8 +146,8 @@ ErrorCode QPSplineSTBoundaryMapper::get_graph_boundary(
         }
       } else if (obj_decision.has_overtake() || obj_decision.has_yield()) {
         ErrorCode err = map_obstacle_with_prediction_trajectory(
-            initial_planning_point, *obs, path_data, planning_distance,
-            planning_time, obs_boundary);
+            initial_planning_point, *obs, obj_decision, path_data,
+            planning_distance, planning_time, obs_boundary);
         if (err != ErrorCode::PLANNING_OK) {
           AERROR << "Fail to map dynamic obstacle with id " << obs->Id() << ".";
           return ErrorCode::PLANNING_OK;
@@ -168,9 +168,24 @@ ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_planning(
 
 ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
     const common::TrajectoryPoint& initial_planning_point,
-    const Obstacle& obstacle, const PathData& path_data,
-    const double planning_distance, const double planning_time,
+    const Obstacle& obstacle, const ObjectDecisionType obj_decision,
+    const PathData& path_data, const double planning_distance,
+    const double planning_time,
     std::vector<STGraphBoundary>* const boundary) const {
+  std::vector<STPoint> lower_points;
+  std::vector<STPoint> upper_points;
+
+  const double speed = obstacle.Speed();
+  const double minimal_follow_time = st_boundary_config().minimal_follow_time();
+  double follow_distance = -1.0;
+  if (obj_decision.has_follow()) {
+    follow_distance = std::fmax(speed * minimal_follow_time,
+                                std::fabs(obj_decision.follow().distance_s()));
+    // vehicle_param.front_edge_to_center();
+  }
+
+  bool skip = true;
+
   return ErrorCode::PLANNING_OK;
 }
 

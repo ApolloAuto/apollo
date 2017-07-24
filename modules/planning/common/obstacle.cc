@@ -25,69 +25,49 @@
 namespace apollo {
 namespace planning {
 
-int Obstacle::Id() const {
-  return id_;
-}
+int Obstacle::Id() const { return id_; }
 
-void Obstacle::SetId(int id) {
-  id_ = id;
-}
+void Obstacle::SetId(int id) { id_ = id; }
 
-double Obstacle::Height() const {
-  return height_;
-}
+double Obstacle::Height() const { return height_; }
 
-void Obstacle::SetHeight(const double height) {
-  height_ = height;
-}
+void Obstacle::SetHeight(const double height) { height_ = height; }
 
-double Obstacle::Width() const {
-  return width_;
-}
+double Obstacle::Width() const { return width_; }
 
-void Obstacle::SetWidth(const double width) {
-  width_ = width;
-}
+void Obstacle::SetWidth(const double width) { width_ = width; }
 
-double Obstacle::Length() const {
-  return length_;
-}
+double Obstacle::Length() const { return length_; }
 
-void Obstacle::SetLength(const double length) {
-  length_ = length;
-}
+void Obstacle::SetLength(const double length) { length_ = length; }
 
-double Obstacle::Heading() const {
-  return heading_;
-}
+double Obstacle::Heading() const { return heading_; }
 
-void Obstacle::SetHeading(const double heading) {
-  heading_ = heading;
-}
+void Obstacle::SetHeading(const double heading) { heading_ = heading; }
 
 ::apollo::common::math::Box2d Obstacle::BoundingBox() const {
   return ::apollo::common::math::Box2d(center_, heading_, length_, width_);
 }
 
-const Obstacle::ObstacleType& Obstacle::Type() const {
-  return type_;
-}
+const Obstacle::ObstacleType& Obstacle::Type() const { return type_; }
 
-void Obstacle::SetType(const ObstacleType& type) {
-  type_ = type;
-}
+void Obstacle::SetType(const ObstacleType& type) { type_ = type; }
 
-const std::vector<PredictionTrajectory> &
-Obstacle::prediction_trajectories() const {
+double Obstacle::Speed() const { return speed_; }
+
+void Obstacle::SetSpeed(const double speed) { speed_ = speed; }
+
+const std::vector<PredictionTrajectory>& Obstacle::prediction_trajectories()
+    const {
   return prediction_trajectories_;
 }
 
 void Obstacle::add_prediction_trajectory(
-    const PredictionTrajectory &prediction_trajectory) {
+    const PredictionTrajectory& prediction_trajectory) {
   prediction_trajectories_.push_back(prediction_trajectory);
 }
 
-std::vector<PredictionTrajectory> *Obstacle::mutable_prediction_trajectories() {
+std::vector<PredictionTrajectory>* Obstacle::mutable_prediction_trajectories() {
   return &prediction_trajectories_;
 }
 

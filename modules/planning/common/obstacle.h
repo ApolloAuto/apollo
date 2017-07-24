@@ -23,8 +23,8 @@
 
 #include <vector>
 
-#include "modules/planning/common/planning_object.h"
 #include "modules/common/math/box2d.h"
+#include "modules/planning/common/planning_object.h"
 #include "modules/planning/common/trajectory/prediction_trajectory.h"
 
 namespace apollo {
@@ -46,8 +46,8 @@ class Obstacle : public PlanningObject {
   int Id() const;
   void SetId(int id);
 
-  const ObstacleType& Type() const;
-  void SetType(const ObstacleType& type);
+  const ObstacleType &Type() const;
+  void SetType(const ObstacleType &type);
 
   double Height() const;
   void SetHeight(const double height);
@@ -60,6 +60,9 @@ class Obstacle : public PlanningObject {
 
   double Heading() const;
   void SetHeading(const double heading);
+
+  double Speed() const;
+  void SetSpeed(const double speed);
 
   ::apollo::common::math::Box2d BoundingBox() const;
 
@@ -74,6 +77,8 @@ class Obstacle : public PlanningObject {
   double width_ = 0.0;
   double length_ = 0.0;
   double heading_ = 0.0;
+  // NOTICE: check is speed_ is set before usage.
+  double speed_ = 0.0;
 
   ::apollo::common::math::Vec2d center_;
   std::vector<PredictionTrajectory> prediction_trajectories_;
@@ -84,4 +89,3 @@ class Obstacle : public PlanningObject {
 }  // namespace apollo
 
 #endif  // MODULES_PLANNING_COMMON_OBSTACLE_H_
-
