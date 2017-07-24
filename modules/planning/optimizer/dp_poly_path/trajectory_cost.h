@@ -51,7 +51,7 @@ class TrajectoryCost {
   size_t _evaluate_times;
 };
 
-}  // planning
-}  // apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_TRAJECTORY_COST_H

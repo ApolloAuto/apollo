@@ -18,10 +18,10 @@
  * @file trjactory_cost.h
  **/
 
-#include "modules/planning/optimizer/dp_poly_path/trajectory_cost.h"
-
+#include <algorithm>
 #include <cmath>
 
+#include "modules/planning/optimizer/dp_poly_path/trajectory_cost.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"

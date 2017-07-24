@@ -18,8 +18,12 @@
  * @file dp_road_graph.h
  **/
 
-#include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
+#include <unordered_map>
+#include <limits>
+#include <utility>
+#include <algorithm>
 
+#include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
@@ -27,7 +31,6 @@
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/math/double.h"
-#include "modules/planning/math/sl_analytic_transformation.h"
 #include "modules/planning/math/sl_analytic_transformation.h"
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
 #include "modules/planning/optimizer/dp_poly_path/trajectory_cost.h"
@@ -69,7 +72,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
   for (size_t i = 0; i < min_cost_edges.size(); ++i) {
     GraphEdge edge = _edges[min_cost_edges[i]];
     GraphVertex end_vertex = _vertices[edge.to_vertex()];
-    double step = 0.1;  // TODO: get from config.
+    double step = 0.1;  // TODO(yifei): get from config.
     double current_s = step;
     while (Double::compare(current_s, end_vertex.frame_point().s()) < 0.0) {
       current_s += step;
@@ -105,7 +108,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
     double theta = SLAnalyticTransformation::calculate_theta(
         ref_point.heading(), ref_point.kappa(), frenet_point.l(),
         frenet_point.dl());
-    // TODO comment out unused variable
+    // TODO(yifei) comment out unused variable
     // double kappa =
     // SLAnalyticTransformation::calculate_kappa(ref_point.kappa(),
     //                                                         ref_point.dkappa(),
@@ -114,7 +117,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
     //                                                         frenet_point.ddl());
 
     ::apollo::common::PathPoint
-        path_point;  //(xy_point, theta, kappa, 0.0, 0.0, 0.0);
+        path_point;  // (xy_point, theta, kappa, 0.0, 0.0, 0.0);
     path_point.set_x(xy_point[0]);
     path_point.set_y(xy_point[1]);
     path_point.set_theta(theta);

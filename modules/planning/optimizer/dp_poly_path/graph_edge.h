@@ -31,8 +31,10 @@ namespace planning {
 
 class GraphEdge {
  public:
-  explicit GraphEdge();
-  explicit GraphEdge(const size_t from_vertex, const size_t to_vertex, const size_t level);
+  GraphEdge();
+  explicit GraphEdge(const size_t from_vertex,
+                     const size_t to_vertex,
+                     const size_t level);
   ~GraphEdge() = default;
 
   void set_from_vertex(const size_t index);
@@ -61,7 +63,7 @@ class GraphEdge {
   QuinticPolynomialCurve1d _poly_path;
 };
 
-}  // planning
-}  // apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_GRAPH_EDGE_H
