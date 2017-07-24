@@ -18,12 +18,12 @@
   </class>
 </library>
 
-<library path="lib/libnovatel_ros_parser_nodelet">
-  <class name="gnss_driver/NovatelRosParserNodelet"
-         type="apollo::drivers::gnss::NovatelRosParserNodelet"
+<library path="lib/libtf_broadcaster_nodelet">
+  <class name="gnss_driver/TFBroadcasterNodelet"
+         type="apollo::drivers::gnss::TFBroadcasterNodelet"
          base_class_type="nodelet::Nodelet">
     <description>
-    Receive gnss raw data, and parse raw data to novatel ros msg.
+    Receive odometry msg, then convert to stamped transfrom and sent to tf.
     </description>
   </class>
 </library>
