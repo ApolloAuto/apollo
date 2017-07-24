@@ -22,6 +22,7 @@ cc_proto_library(
     deps = [
         "//modules/common/proto:common_proto",
         "//modules/perception/proto:perception_proto",
+        "//modules/common/proto:path_point_proto",
     ],
 )
 

@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/prediction/container:container",
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/common/util:lru_cache",
     ],
 )
 

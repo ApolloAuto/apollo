@@ -22,6 +22,9 @@
 #ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
 #define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
 
+#include <mutex>
+
+#include "modules/common/util/lru_cache.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 
@@ -47,6 +50,21 @@ class ObstaclesContainer : public Container {
   void Insert(const ::google::protobuf::Message& message) override;
 
   Obstacle* GetObstacle(int id);
+
+ private:
+  void InsertPerceptionObstacle(
+      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      const double timestamp);
+
+  bool IsPredictable(
+      const apollo::perception::PerceptionObstacle& perception_obstacle);
+
+  void SetObstacleLaneGraphFeatures(
+      const apollo::perception::PerceptionObstacles& perception_obstacles);
+
+ private:
+  apollo::common::util::LRUCache<int, Obstacle> obstacles_;
+  static std::mutex g_mutex_;
 };
 
 }  // namespace prediction
