@@ -53,6 +53,14 @@ void PoseContainer::Update(
   obstacle_ptr_->set_timestamp(localization.measurement_time());
 }
 
+double PoseContainer::GetTimestamp() {
+  if (obstacle_ptr_ != nullptr) {
+    return obstacle_ptr_->timestamp();
+  } else {
+    return 0.0;
+  }
+}
+
 PerceptionObstacle* PoseContainer::ToPerceptionObstacle() {
   std::lock_guard<std::mutex> lock(g_mutex_);
   return obstacle_ptr_.get();
