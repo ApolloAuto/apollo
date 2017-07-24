@@ -31,18 +31,13 @@ namespace planning {
 
 using apollo::common::config::VehicleConfigHelper;
 
-// TODO: to be fixed
-// DpStSpeedOptimizer::DpStSpeedOptimizer(
-//    const std::string& name, const ::boost::property_tree::ptree& ptree)
-//    : SpeedOptimizer(name) {}
 DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
-ErrorCode DpStSpeedOptimizer::process(const DataCenter& data_center,
-                                      const PathData& path_data,
-                                      const TrajectoryPoint& init_point,
-                                      DecisionData* const decision_data,
-                                      SpeedData* const speed_data) const {
+ErrorCode DpStSpeedOptimizer::process(const PathData& path_data,
+                                       const TrajectoryPoint& init_point,
+                                       DecisionData* const decision_data,
+                                       SpeedData* const speed_data) const {
   ::apollo::common::config::VehicleParam veh_param =
       VehicleConfigHelper::GetConfig().vehicle_param();
 
@@ -54,12 +49,14 @@ ErrorCode DpStSpeedOptimizer::process(const DataCenter& data_center,
   DPSTBoundaryMapper st_mapper(st_boundary_config, veh_param);
   std::vector<STGraphBoundary> boundaries;
 
-  // TODO: to be fixed
-  // if (st_mapper.get_graph_boundary(data_center, *decision_data, path_data,
-  //                                 dp_st_configuration.total_path_length(),
-  //                                 dp_st_configuration.total_time(),
-  //                                 &boundaries) != ErrorCode::PLANNING_OK) {
-  if (0) {
+  common::TrajectoryPoint initial_planning_point = DataCenter::instance()
+      ->current_frame()->mutable_planning_data()->init_planning_point();
+  if (st_mapper.get_graph_boundary(initial_planning_point,
+                                   *decision_data,
+                                   path_data,
+                                   dp_st_configuration.total_path_length(),
+                                   dp_st_configuration.total_time(),
+                                   &boundaries) != ErrorCode::PLANNING_OK) {
     AERROR << "Mapping obstacle for dp st speed optimizer failed.";
     return ErrorCode::PLANNING_ERROR_FAILED;
   }

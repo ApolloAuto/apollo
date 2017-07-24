@@ -283,16 +283,10 @@ ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
            obs_boundaries.begin();
        obs_it != obs_boundaries.end(); ++obs_it) {
     CHECK_GE(obs_it->points().size(), 4);
-    PlanningObject* object_ptr = nullptr;
 
-    // TODO: to be fixed
-    // DataCenter::instance()->mutable_object_table()->get_obstacle(obs_it->Id(),
-    //                                                             &object_ptr);
-    DataCenter::instance()
-        ->current_frame()
-        ->mutable_planning_data()
-        ->get_obstacle_by_id(obs_it->id(), &object_ptr);
-
+    Obstacle* object_ptr = nullptr;
+    DataCenter::instance()->mutable_object_table()->get_obstacle(obs_it->id(),
+                                                                 &object_ptr);
     if (obs_it->points().front().x() <= 0) {
       ObjectDecisionType dec;
       dec.mutable_yield();
