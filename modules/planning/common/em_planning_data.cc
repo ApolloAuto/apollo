@@ -31,33 +31,12 @@ std::string EMPlanningData::type() const { return "EMPlanningData"; }
 
 void EMPlanningData::init(const std::size_t num_iter) {
   _num_iter = num_iter;
+  // TODO: need to modify this part base on data flow
   _path_data_vec = std::vector<PathData>(num_iter, PathData());
   _speed_data_vec = std::vector<SpeedData>(num_iter + 1, SpeedData());
 }
 
 std::size_t EMPlanningData::num_iter() const { return _num_iter; }
-
-const PathData& EMPlanningData::path_data(const std::size_t index) const {
-  return _path_data_vec[index];
-}
-
-const SpeedData& EMPlanningData::speed_data(const std::size_t index) const {
-  return _speed_data_vec[index];
-}
-
-PathData* EMPlanningData::mutable_path_data(const std::size_t index) {
-  if (index >= _path_data_vec.size()) {
-    return nullptr;
-  }
-  return &_path_data_vec[index];
-}
-
-SpeedData* EMPlanningData::mutable_speed_data(const std::size_t index) {
-  if (index >= _speed_data_vec.size()) {
-    return nullptr;
-  }
-  return &_speed_data_vec[index];
-}
 
 bool EMPlanningData::aggregate(const double time_resolution) {
   CHECK_GT(time_resolution, 0.0);
@@ -78,8 +57,7 @@ bool EMPlanningData::aggregate(const double time_resolution) {
     if (speed_point.s() > path_data.path().param_length()) {
       break;
     }
-    QUIT_IF(!path_data.get_path_point_with_path_s(speed_point.s(),
-                                                  &path_point),
+    QUIT_IF(!path_data.get_path_point_with_path_s(speed_point.s(), &path_point),
             false, ERROR,
             "Fail to get path data with s %f, path total length %f",
             speed_point.s(), path_data.path().param_length());

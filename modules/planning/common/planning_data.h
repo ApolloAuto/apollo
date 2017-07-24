@@ -25,8 +25,12 @@
 #include <string>
 
 #include "modules/common/proto/path_point.pb.h"
+
 #include "modules/planning/common/decision_data.h"
+#include "modules/planning/common/path/path_data.h"
+#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/planning_object.h"
+#include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -57,11 +61,19 @@ class PlanningData {
   int get_obstacle_by_id(const uint32_t id,
                          PlanningObject** const planning_object);
 
+  const PathData& path_data() const;
+  const SpeedData& speed_data() const;
+
+  PathData* mutable_path_data();
+  SpeedData* mutable_speed_data();
+
  protected:
   std::unique_ptr<ReferenceLine> _reference_line;
   std::unique_ptr<DecisionData> _decision_data;
   PublishableTrajectory _computed_trajectory;
   TrajectoryPoint _init_planning_point;
+  PathData _path_data;
+  SpeedData _speed_data;
 };
 
 }  // namespace planning

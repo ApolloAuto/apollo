@@ -19,9 +19,9 @@
  **/
 #include <string>
 
-#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
 
 namespace apollo {
@@ -30,7 +30,7 @@ namespace planning {
 DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
     : PathOptimizer(name) {}
 
-common::ErrorCode DpPolyPathOptimizer::optimize(
+common::ErrorCode DpPolyPathOptimizer::process(
     const SpeedData &speed_data, const ReferenceLine &reference_line,
     const ::apollo::planning::TrajectoryPoint &init_point,
     DecisionData *const decision_data, PathData *const path_data) {

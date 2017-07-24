@@ -74,5 +74,13 @@ int PlanningData::get_obstacle_by_id(const uint32_t id,
   return 0;
 }
 
+const PathData& PlanningData::path_data() const { return _path_data; }
+
+const SpeedData& PlanningData::speed_data() const { return _speed_data; }
+
+PathData* PlanningData::mutable_path_data() { return &_path_data; }
+
+SpeedData* PlanningData::mutable_speed_data() { return &_speed_data; }
+
 }  // namespace planning
 }  // namespace apollo

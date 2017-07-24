@@ -23,7 +23,14 @@
 namespace apollo {
 namespace planning {
 
-PathOptimizer::PathOptimizer(const std::string &name) : Optimizer(name) {}
+PathOptimizer::PathOptimizer(const std::string& name) : Optimizer(name) {}
+
+apollo::common::ErrorCode PathOptimizer::optimize(PlanningData* planning_data) {
+  return process(planning_data->speed_data(), planning_data->reference_line(),
+                 planning_data->init_planning_point(),
+                 planning_data->mutable_decision_data(),
+                 planning_data->mutable_path_data());
+}
 
 }  // namespace planning
 }  // namespace apollo

@@ -26,6 +26,12 @@ namespace apollo {
 namespace planning {
 
 SpeedOptimizer::SpeedOptimizer(const std::string& name) : Optimizer(name) {}
+common::ErrorCode SpeedOptimizer::optimize(PlanningData* planning_data) {
+  return process(planning_data->path_data(),
+                 planning_data->init_planning_point(),
+                 planning_data->mutable_decision_data(),
+                 planning_data->mutable_speed_data());
+}
 
 }  // namespace planning
 }  // namespace apollo

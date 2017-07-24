@@ -38,11 +38,11 @@ using apollo::common::config::VehicleConfigHelper;
 DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
-ErrorCode DpStSpeedOptimizer::optimize(const DataCenter& data_center,
-                                       const PathData& path_data,
-                                       const TrajectoryPoint& init_point,
-                                       DecisionData* const decision_data,
-                                       SpeedData* const speed_data) const {
+ErrorCode DpStSpeedOptimizer::process(const DataCenter& data_center,
+                                      const PathData& path_data,
+                                      const TrajectoryPoint& init_point,
+                                      DecisionData* const decision_data,
+                                      SpeedData* const speed_data) const {
   ::apollo::common::config::VehicleParam veh_param =
       VehicleConfigHelper::GetConfig().vehicle_param();
 

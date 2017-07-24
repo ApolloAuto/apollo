@@ -31,7 +31,9 @@ namespace planning {
 class DpPolyPathOptimizer : public PathOptimizer {
  public:
   explicit DpPolyPathOptimizer(const std::string &name);
-  ::apollo::common::ErrorCode optimize(
+
+ private:
+  virtual ::apollo::common::ErrorCode process(
       const SpeedData &speed_data, const ReferenceLine &reference_line,
       const ::apollo::planning::TrajectoryPoint &init_point,
       DecisionData *const decision_data, PathData *const path_data) override;
