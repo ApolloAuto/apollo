@@ -61,6 +61,8 @@ class VehicleState {
   VehicleState(const localization::LocalizationEstimate *localization,
                const canbus::Chassis *chassis);
 
+  double timestamp() const { return timestamp_; };
+
   /**
    * @brief Default destructor.
    */
@@ -199,6 +201,8 @@ class VehicleState {
   ::apollo::canbus::Chassis::GearPosition gear_;
 
   const localization::LocalizationEstimate *localization_ptr_ = nullptr;
+
+  double timestamp_ = 0.0;
 };
 
 }  // namespace vehicle_state
