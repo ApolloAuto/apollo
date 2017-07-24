@@ -31,7 +31,7 @@ RoadGraph::RoadGraph()
 }
 
 RoadGraph::RoadGraph(double start_s, double length,
-                     apollo::hdmap::LaneInfo* lane_info_ptr)
+                     const apollo::hdmap::LaneInfo* lane_info_ptr)
     : start_s_(start_s), length_(length), lane_info_ptr_(lane_info_ptr) {
 }
 

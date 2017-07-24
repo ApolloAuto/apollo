@@ -31,7 +31,7 @@ class RoadGraph {
   RoadGraph();
 
   RoadGraph(double start_s, double length,
-            apollo::hdmap::LaneInfo* lane_info_ptr);
+            const apollo::hdmap::LaneInfo* lane_info_ptr);
 
   virtual ~RoadGraph();
 

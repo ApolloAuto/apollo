@@ -121,6 +121,8 @@ class Obstacle {
 
   void SetLaneGraphFeature(Feature* feature);
 
+  void SetTargetLaneFeature(Feature* feature);
+
   void SetMotionStatus();
 
   void InsertFeatureToHistory(Feature* feature);
