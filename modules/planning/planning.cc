@@ -226,7 +226,7 @@ Planning::ComputeStartingPointFromLastTrajectory(
 
 TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
     const double forward_time) const {
-  // Eigen::Vector2d estimated_position =
+  // common::math::Vec2d estimated_position =
   // VehicleState::instance()->EstimateFuturePosition(forward_time);
   TrajectoryPoint point;
   // point.set_x(estimated_position.x());

@@ -18,6 +18,9 @@
  * @file reference_point.cc
  **/
 
+#include <string>
+#include <vector>
+
 #include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
@@ -72,6 +75,15 @@ double ReferencePoint::dkappa() const { return dkappa_; }
 double ReferencePoint::lower_bound() const { return lower_bound_; }
 
 double ReferencePoint::upper_bound() const { return upper_bound_; }
+
+const std::string ReferencePoint::DebugString() const {
+  std::stringstream ss;
+  ss << "{x: " << x() << ", y: " << y() << ", theta: " << heading()
+     << ", kappa: " << kappa() << ", dkappa: " << dkappa()
+     << ", upper_bound: " << upper_bound() << ", lower_bound: " << lower_bound()
+     << "}";
+  return ss.str();
+}
 
 }  // namespace planning
 }  // namespace apollo

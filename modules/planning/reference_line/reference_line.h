@@ -21,10 +21,13 @@
 #ifndef MODULES_PLANNING_MATH_REFERENCE_LINE_H_
 #define MODULES_PLANNING_MATH_REFERENCE_LINE_H_
 
-#include "Eigen/Dense"
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/common/proto/path_point.pb.h"
 
+#include "modules/common/math/vec2d.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/reference_line/reference_point.h"
 
@@ -34,7 +37,7 @@ namespace planning {
 class ReferenceLine {
  public:
   ReferenceLine() = default;
-  ReferenceLine(const std::vector<ReferencePoint>& reference_points);
+  explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   ReferenceLine(const std::vector<ReferencePoint>& reference_points,
                 const std::vector<hdmap::LaneSegment>& lane_segments,
                 const double max_approximation_error);
@@ -47,8 +50,8 @@ class ReferenceLine {
   ReferencePoint get_reference_point(const double x, const double y) const;
 
   bool get_point_in_Cartesian_frame(const common::SLPoint& sl_point,
-                                    Eigen::Vector2d* const xy_point) const;
-  bool get_point_in_Frenet_frame(const Eigen::Vector2d& xy_point,
+                                    common::math::Vec2d* const xy_point) const;
+  bool get_point_in_Frenet_frame(const common::math::Vec2d& xy_point,
                                  common::SLPoint* const sl_point) const;
 
   double get_lane_width(const double s) const;

@@ -86,7 +86,7 @@ ErrorCode ReferenceLineDecider::init(const DataCenter& data_center) {
   // 1. from current_route_index to size of route_reference_line, calculate the
   // sl point.
   std::vector<SLPoint> sl_points;
-  Eigen::Vector2d location(state.pose().position().x(),
+  common::math::Vec2d location(state.pose().position().x(),
                            state.pose().position().y());
   std::uint32_t next_route_index = current_route_index_;
   for (std::uint32_t i = current_route_index_;

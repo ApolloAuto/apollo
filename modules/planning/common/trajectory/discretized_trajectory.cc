@@ -48,15 +48,15 @@ TrajectoryPoint DiscretizedTrajectory::evaluate(
   CHECK(!_trajectory_points.empty());
   CHECK(_trajectory_points.front().relative_time() <= relative_time &&
         _trajectory_points.back().relative_time() <= relative_time)
-        << "Invalid relative time input!";
+      << "Invalid relative time input!";
 
   auto comp = [](const TrajectoryPoint& p, const double relative_time) {
     return p.relative_time() < relative_time;
   };
 
-  auto it_lower = std::lower_bound(_trajectory_points.begin(),
-                                   _trajectory_points.end(),
-                                   relative_time, comp);
+  auto it_lower =
+      std::lower_bound(_trajectory_points.begin(), _trajectory_points.end(),
+                       relative_time, comp);
 
   if (it_lower == _trajectory_points.begin()) {
     return _trajectory_points.front();
@@ -70,9 +70,9 @@ TrajectoryPoint DiscretizedTrajectory::evaluate_linear_approximation(
     return p.relative_time() < relative_time;
   };
 
-  auto it_lower = std::lower_bound(_trajectory_points.begin(),
-                                   _trajectory_points.end(),
-                                   relative_time, comp);
+  auto it_lower =
+      std::lower_bound(_trajectory_points.begin(), _trajectory_points.end(),
+                       relative_time, comp);
 
   if (it_lower == _trajectory_points.begin()) {
     return _trajectory_points.front();
@@ -86,21 +86,22 @@ std::uint32_t DiscretizedTrajectory::query_nearest_point(
   auto func = [](const TrajectoryPoint& tp, const double relative_time) {
     return tp.relative_time() < relative_time;
   };
-  auto it_lower = std::lower_bound(_trajectory_points.begin(),
-                                   _trajectory_points.end(),
-                                   relative_time, func);
+  auto it_lower =
+      std::lower_bound(_trajectory_points.begin(), _trajectory_points.end(),
+                       relative_time, func);
   return (std::uint32_t)(it_lower - _trajectory_points.begin());
 }
 
 std::uint32_t DiscretizedTrajectory::query_nearest_point(
-    const Eigen::Vector2d& position) const {
+    const common::math::Vec2d& position) const {
   double dist_min = std::numeric_limits<double>::max();
   std::uint32_t index_min = 0;
   for (std::uint32_t i = 0; i < _trajectory_points.size(); ++i) {
-    const Eigen::Vector2d coordinate(_trajectory_points[i].path_point().x(),
-                                     _trajectory_points[i].path_point().y());
-    Eigen::Vector2d dist_vec = coordinate - position;
-    double dist = dist_vec.dot(dist_vec);
+    const common::math::Vec2d coordinate(
+        _trajectory_points[i].path_point().x(),
+        _trajectory_points[i].path_point().y());
+    common::math::Vec2d dist_vec = coordinate - position;
+    double dist = dist_vec.InnerProd(dist_vec);
     if (dist < dist_min) {
       dist_min = dist;
       index_min = i;

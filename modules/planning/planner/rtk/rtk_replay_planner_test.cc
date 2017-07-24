@@ -62,9 +62,9 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
   std::vector<TrajectoryPoint> trajectory;
-  EXPECT_TRUE(!(planner_with_error_csv.MakePlan(start_point, &trajectory)).ok());
+  EXPECT_TRUE(
+      !(planner_with_error_csv.MakePlan(start_point, &trajectory)).ok());
 }
 
 }  // namespace planning
 }  // namespace apollo
-

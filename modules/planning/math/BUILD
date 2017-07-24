@@ -48,7 +48,7 @@ cc_library(
     ],
     deps = [
         ":double",
-        "@eigen//:eigen",
+        "//modules/common/math:vec2d",
     ],
 )
 

@@ -20,13 +20,16 @@
 
 #include "modules/planning/reference_line/reference_line.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "boost/math/tools/minima.hpp"
 
 #include "modules/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/math/double.h"
-//#include "modules/planning/math/interpolation.h"
 
 namespace apollo {
 namespace planning {
@@ -113,7 +116,7 @@ double ReferenceLine::find_min_distance_point(const ReferencePoint& p0,
 
 ReferencePoint ReferenceLine::get_reference_point(const double x,
                                                   const double y) const {
-  CHECK(reference_points_.size() > 0);
+  CHECK_GE(reference_points_.size(), 0);
 
   auto func_distance_square = [](const ReferencePoint& point, const double x,
                                  const double y) {
@@ -151,7 +154,8 @@ ReferencePoint ReferenceLine::get_reference_point(const double x,
 }
 
 bool ReferenceLine::get_point_in_Cartesian_frame(
-    const common::SLPoint& sl_point, Eigen::Vector2d* const xy_point) const {
+    const common::SLPoint& sl_point,
+    common::math::Vec2d* const xy_point) const {
   CHECK_NOTNULL(xy_point);
   if (reference_map_line_.num_points() < 2) {
     AERROR << "The reference line has too few points.";
@@ -160,15 +164,16 @@ bool ReferenceLine::get_point_in_Cartesian_frame(
 
   const auto matched_point = get_reference_point(sl_point.s());
   const auto angle = common::math::Angle16::from_rad(matched_point.heading());
-  (*xy_point)[0] =
-      (matched_point.x() - common::math::sin(angle) * sl_point.l());
-  (*xy_point)[1] =
-      (matched_point.y() + common::math::cos(angle) * sl_point.l());
+  (*xy_point).set_x(matched_point.x() -
+                    common::math::sin(angle) * sl_point.l());
+  (*xy_point).set_y(matched_point.y() +
+                    common::math::cos(angle) * sl_point.l());
   return true;
 }
 
 bool ReferenceLine::get_point_in_Frenet_frame(
-    const Eigen::Vector2d& xy_point, common::SLPoint* const sl_point) const {
+    const common::math::Vec2d& xy_point,
+    common::SLPoint* const sl_point) const {
   CHECK_NOTNULL(sl_point);
   double s = 0;
   double l = 0;
@@ -211,12 +216,12 @@ const ReferenceMapLine& ReferenceLine::reference_map_line() const {
 }
 
 double ReferenceLine::get_lane_width(const double s) const {
-  // TODO : need implement;
+  // TODO(startcode) : need implement;
   return 4.0;
 }
 
 bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
-  // TODO : need implement;
+  // TODO(startcode) : need implement;
   return true;
 }
 

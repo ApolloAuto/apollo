@@ -22,10 +22,12 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
 
+#include <vector>
+
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
-#include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/prediction/container/obstacles/obstacle.h"
 
 /**
  * @namespace apollo::prediction
@@ -71,7 +73,7 @@ class Predictor {
    */
   void GenerateTrajectory(
       const std::vector<::apollo::common::TrajectoryPoint>& points,
-      Trajectory *trajectory);
+      Trajectory* trajectory);
 
   void SetEqualProbability(double probability, int start_index);
 
