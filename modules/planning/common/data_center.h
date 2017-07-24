@@ -39,6 +39,7 @@ class DataCenter {
  public:
   ~DataCenter() = default;
   Frame *frame(const uint32_t sequence_num) const;
+
  public:
   apollo::common::Status init_frame(const uint32_t sequence_num);
   Frame *current_frame() const;
@@ -51,6 +52,7 @@ class DataCenter {
   MasterStateMachine *mutable_master() const;
 
   const Frame *last_frame() const;
+
  private:
   std::unordered_map<uint32_t, std::unique_ptr<Frame>> _frames;
   std::list<uint32_t> _sequence_queue;

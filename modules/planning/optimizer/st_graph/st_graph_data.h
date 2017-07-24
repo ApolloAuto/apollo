@@ -22,6 +22,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_DATA_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_DATA_H_
 
+#include <vector>
+
 #include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
 
 #include "modules/common/proto/path_point.pb.h"

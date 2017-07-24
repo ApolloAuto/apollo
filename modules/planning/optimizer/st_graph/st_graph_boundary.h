@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_BOUNDARY_H_
 
 #include <memory>
+#include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
 
@@ -43,8 +44,9 @@ class STGraphBoundary final : public ::apollo::common::math::Polygon2d {
     UNKNOWN
   };
 
-  STGraphBoundary(const std::vector<STPoint>& points);
-  STGraphBoundary(const std::vector<::apollo::common::math::Vec2d>& points);
+  explicit STGraphBoundary(const std::vector<STPoint>& points);
+  explicit STGraphBoundary(
+      const std::vector<::apollo::common::math::Vec2d>& points);
 
   ~STGraphBoundary() = default;
 

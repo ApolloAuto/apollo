@@ -47,6 +47,6 @@ class RegionalPredictor : public Predictor {
 };
 
 }  // namespace prediction
-}  // apollo
+}  // namespace apollo
 
 # endif  // MODULES_PREDICTION_PREDICTOR_PEDESTRIAN_REGIONAL_PREDICTOR_H_

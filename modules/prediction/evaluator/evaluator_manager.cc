@@ -43,7 +43,7 @@ void EvaluatorManager::Run(
   for (const auto& perception_obstacle :
       perception_obstacles.perception_obstacle()) {
     int id = perception_obstacle.id();
-    switch(perception_obstacle.type()) {
+    switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
         Evaluator *evaluator = GetEvaluator(ObstacleConf::MLP_EVALUATOR);
         CHECK_NOTNULL(evaluator);

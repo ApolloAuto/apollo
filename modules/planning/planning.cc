@@ -116,7 +116,8 @@ void Planning::RunOnce() {
       apollo::common::time::ToSecond(apollo::common::time::Clock::Now()) +
       planning_cycle_time;
 
-  DataCenter::instance()->init_frame(AdapterManager::GetPlanning()->GetSeqNum() + 1);
+  DataCenter::instance()->init_frame(
+      AdapterManager::GetPlanning()->GetSeqNum() + 1);
 
   std::vector<TrajectoryPoint> planning_trajectory;
   bool res_planning = Plan(vehicle_state, is_on_auto_mode, execution_start_time,

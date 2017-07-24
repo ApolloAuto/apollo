@@ -647,7 +647,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     double l = 0.0;
     map->GetProjection(point, current_lane, &s, &l);
     double nearest_point_heading = 0.0;
-    //     TODO(kechxu) current_lane->get_nearest_point(point).heading();
+    // TODO(kechxu): current_lane->get_nearest_point(point).heading();
     double angle_diff = 0.0;
         apollo::common::math::AngleDiff(heading, nearest_point_heading);
     double left = 0.0;

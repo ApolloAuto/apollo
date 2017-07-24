@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <string>
+#include <utility>
 
 #include "modules/common/proto/path_point.pb.h"
 
