@@ -230,6 +230,8 @@ function release() {
 }
 
 function gen_coverage() {
+  START_TIME=$(get_now)
+
   bazel clean
   generate_test_targets
   echo "$TEST_TARGETS" | xargs bazel test --define ARCH="$(uname -m)" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --config=coverage
@@ -256,7 +258,8 @@ function gen_coverage() {
       "tools/*" \
       -o $COV_DIR/stripped_conv.info
   genhtml $COV_DIR/stripped_conv.info --output-directory $COV_DIR/report
-  echo "Generated coverage report in $COV_DIR/report/index.html"
+
+  success 'Generated coverage report in $COV_DIR/report/index.html'
 }
 
 function run_test() {
@@ -284,7 +287,6 @@ function run_bash_lint() {
 
 function run_lint() {
   START_TIME=$(get_now)
-  run_cpp_lint
 
   # Add cpplint rule to BUILD files that do not contain it.
   for file in $(find modules -name BUILD | \
@@ -293,6 +295,8 @@ function run_lint() {
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file
     sed -i -e '$a\\ncpplint()' $file
   done
+
+  run_cpp_lint
 
   if [ $? -eq 0 ]; then
     success 'Lint passed!'
