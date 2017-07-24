@@ -19,6 +19,7 @@
 import argparse
 import matplotlib.pyplot as plt
 from map import Map
+from localization import Localization
 
 if __name__ == "__main__":
 
@@ -35,6 +36,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-l", "--laneid", nargs='+',
         help="Show specific lane id(s) in map")
+    parser.add_argument(
+        "--loc", action="store", type=str, required=False,
+        help="Specify the localization pb file in txt format")
 
     args = parser.parse_args()
 
@@ -44,5 +48,11 @@ if __name__ == "__main__":
     if lane_ids is None:
         lane_ids = []
     map.draw_lanes(plt, args.showlaneids, lane_ids)
+
+    if args.loc is not None:
+        localization = Localization()
+        localization.load(args.loc)
+        localization.plot_vehicle(plt)
+
     plt.axis('equal')
     plt.show()
