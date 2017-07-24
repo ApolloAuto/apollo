@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -40,3 +42,19 @@ cc_library(
         "@eigen//:eigen",
     ],
 )
+
+cc_test(
+    name = "reference_line_smoother_test",
+    size = "small",
+    srcs = [
+        "reference_line_smoother_test.cc",
+    ],
+    data = ["//modules/planning:planning_testdata"],
+    deps = [
+        ":reference_line_smoother",
+        "//modules/map/hdmap",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()

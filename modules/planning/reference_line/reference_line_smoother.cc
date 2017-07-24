@@ -19,24 +19,37 @@
  **/
 #include "modules/planning/reference_line/reference_line_smoother.h"
 
-#include "Eigen/Core"
+#include <algorithm>
+#include <limits>
+#include <string>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/common/util/file.h"
 #include "modules/planning/math/curve_math.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
 
-ReferenceLineSmoother::ReferenceLineSmoother(
-    const ReferenceLineSmootherConfig& ref_config) noexcept
-    : smoother_config_(ref_config) {}
+bool ReferenceLineSmoother::SetConfig(const std::string& config_file) {
+  if (!common::util::GetProtoFromFile(config_file, &smoother_config_)) {
+    AERROR << "failed to load config file " << config_file;
+    return false;
+  }
+  return true;
+}
+
+void ReferenceLineSmoother::SetConfig(
+    const ReferenceLineSmootherConfig& config) {
+  smoother_config_ = config;
+}
 
 bool ReferenceLineSmoother::smooth(
     const ReferenceLine& raw_reference_line,
-    const Eigen::Vector2d& vehicle_position,
+    const common::math::Vec2d& vehicle_position,
     std::vector<ReferencePoint>* const smoothed_ref_line) {
   // calculate sampling range
   common::SLPoint sl_point;
@@ -85,7 +98,7 @@ bool ReferenceLineSmoother::smooth(
   const double start_t = t_knots_.front();
   const double end_t = t_knots_.back();
 
-  // TODO : here change output to configurable version
+  // TODO(fanhaoyang) : here change output to configurable version
   const double resolution = (end_t - start_t) / 499;
   for (std::uint32_t i = 0; i < 500; ++i) {
     const double t = i * resolution;
@@ -142,7 +155,6 @@ bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line,
 bool ReferenceLineSmoother::apply_constraint(
     const ReferenceLine& raw_reference_line) {
   const double t_length = t_knots_.back() - t_knots_.front();
-  // TODO set to configuration
   double dt = t_length / (smoother_config_.num_evaluated_points() - 1);
   std::vector<double> evaluated_t;
   for (std::uint32_t i = 0; i < smoother_config_.num_evaluated_points(); ++i) {
@@ -200,7 +212,7 @@ bool ReferenceLineSmoother::apply_kernel() {
         smoother_config_.third_derivative_weight());
   }
 
-  // TODO: change to a configurable param
+  // TODO(fanhaoyang): change to a configurable param
   kernel->add_regularization(0.01);
   return true;
 }
@@ -250,5 +262,5 @@ std::uint32_t ReferenceLineSmoother::find_index(const double t) const {
          1;
 }
 
-}  // namespace apollo
 }  // namespace planning
+}  // namespace apollo

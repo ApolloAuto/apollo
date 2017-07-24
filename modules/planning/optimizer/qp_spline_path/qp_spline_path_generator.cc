@@ -99,8 +99,8 @@ bool QPSplinePathGenerator::generate(const ReferenceLine& reference_line,
   double start_l = spline(_init_point.s());
   ReferencePoint ref_point =
       reference_line.get_reference_point(_init_point.s());
-  Eigen::Vector2d xy_point = SLAnalyticTransformation::calculate_xypoint(
-      ref_point.heading(), Eigen::Vector2d(ref_point.x(), ref_point.y()),
+  common::math::Vec2d xy_point = SLAnalyticTransformation::calculate_xypoint(
+      ref_point.heading(), common::math::Vec2d(ref_point.x(), ref_point.y()),
       start_l);
 
   double x_diff = xy_point.x() - init_point.path_point().x();
@@ -111,10 +111,11 @@ bool QPSplinePathGenerator::generate(const ReferenceLine& reference_line,
     double dl = spline.derivative(s);
     double ddl = spline.second_order_derivative(s);
     ReferencePoint ref_point = reference_line.get_reference_point(s);
-    Eigen::Vector2d xy_point = SLAnalyticTransformation::calculate_xypoint(
-        ref_point.heading(), Eigen::Vector2d(ref_point.x(), ref_point.y()), l);
-    xy_point.x() = (xy_point.x() - x_diff);
-    xy_point.y() = (xy_point.y() - y_diff);
+    common::math::Vec2d xy_point = SLAnalyticTransformation::calculate_xypoint(
+        ref_point.heading(), common::math::Vec2d(ref_point.x(), ref_point.y()),
+        l);
+    xy_point.set_x(xy_point.x() - x_diff);
+    xy_point.set_y(xy_point.y() - y_diff);
     double theta = SLAnalyticTransformation::calculate_theta(
         ref_point.heading(), ref_point.kappa(), l, dl);
     double kappa = SLAnalyticTransformation::calculate_kappa(

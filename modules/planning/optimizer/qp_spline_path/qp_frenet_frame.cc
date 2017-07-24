@@ -209,7 +209,7 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
 
       for (std::uint32_t i = 0; i < corners.size(); ++i) {
         common::SLPoint cur_point;
-        Eigen::Vector2d xy_point(corners[i].x(), corners[i].y());
+        common::math::Vec2d xy_point(corners[i].x(), corners[i].y());
         if (!_reference_line->get_point_in_Frenet_frame(xy_point, &cur_point)) {
           AERROR << "Fail to map xy point " << corners[i].DebugString()
                  << " to " << cur_point.ShortDebugString();
@@ -303,7 +303,7 @@ bool QpFrenetFrame::mapping_polygon(
 
   for (std::uint32_t i = 0; i < corners.size(); ++i) {
     common::SLPoint cur_point;
-    Eigen::Vector2d xy_point(corners[i].x(), corners[i].y());
+    common::math::Vec2d xy_point(corners[i].x(), corners[i].y());
     if (!_reference_line->get_point_in_Frenet_frame(xy_point, &cur_point)) {
       AERROR << "Fail to map xy point " << corners[i].DebugString() << " to "
              << cur_point.DebugString();

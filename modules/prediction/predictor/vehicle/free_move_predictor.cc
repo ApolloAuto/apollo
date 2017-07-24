@@ -51,7 +51,8 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   std::vector<TrajectoryPoint> points(0);
   double total_time = FLAGS_prediction_duration;
   // TODO(kechxu):
-  // draw_free_move_trajectory(position, velocity, obstacle->kf_motion_tracker(),
+  // draw_free_move_trajectory(position, velocity,
+  // obstacle->kf_motion_tracker(),
   //                           total_time, points);
   Trajectory trajectory;
   GenerateTrajectory(points, &trajectory);
@@ -61,5 +62,5 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   SetEqualProbability(1.0, start_index);
 }
 
-}  // prediction
-}  // apollo
+}  // namespace prediction
+}  // namespace apollo

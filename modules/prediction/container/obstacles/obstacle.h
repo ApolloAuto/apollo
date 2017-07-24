@@ -23,16 +23,16 @@
 #define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
 
 #include <deque>
+#include <mutex>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
-#include <mutex>
 
+#include "modules/common/math/kalman_filter.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/common/math/kalman_filter.h"
-#include "modules/map/hdmap/hdmap_common.h"
 
 namespace apollo {
 namespace prediction {
@@ -43,9 +43,8 @@ class Obstacle {
 
   virtual ~Obstacle();
 
-  void Insert(
-    const apollo::perception::PerceptionObstacle& perception_obstacle,
-    const double timestamp);
+  void Insert(const apollo::perception::PerceptionObstacle& perception_obstacle,
+              const double timestamp);
 
   int id() const;
 
@@ -64,7 +63,8 @@ class Obstacle {
   const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf_lane_tracker(
       const std::string& lane_id);
 
-  const apollo::common::math::KalmanFilter<double, 6, 2, 0>& kf_motion_tracker();
+  const apollo::common::math::KalmanFilter<double, 6, 2, 0>&
+  kf_motion_tracker();
 
   bool IsOnLane();
 
@@ -78,8 +78,7 @@ class Obstacle {
 
   void SetTimestamp(
       const apollo::perception::PerceptionObstacle& perception_obstacle,
-      const double timestamp,
-      Feature* feature);
+      const double timestamp, Feature* feature);
 
   void SetPosition(
       const apollo::perception::PerceptionObstacle& perception_obstacle,
@@ -109,11 +108,10 @@ class Obstacle {
 
   void UpdateKFLaneTrackers(Feature* feature);
 
-  void UpdateKFLaneTracker(
-      const std::string& lane_id,
-      const double lane_s, const double lane_l,
-      const double lane_speed, const double lane_acc,
-      const double timestamp, const double beta);
+  void UpdateKFLaneTracker(const std::string& lane_id, const double lane_s,
+                           const double lane_l, const double lane_speed,
+                           const double lane_acc, const double timestamp,
+                           const double beta);
 
   void UpdateLaneBelief(Feature* feature);
 
@@ -138,7 +136,8 @@ class Obstacle {
   apollo::common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
   bool kf_motion_tracker_enabled_;
   std::unordered_map<std::string,
-      apollo::common::math::KalmanFilter<double, 4, 2, 0>> kf_lane_trackers_;
+                     apollo::common::math::KalmanFilter<double, 4, 2, 0>>
+      kf_lane_trackers_;
   std::vector<const apollo::hdmap::LaneInfo*> current_lanes_;
   static std::mutex mutex_;
 };

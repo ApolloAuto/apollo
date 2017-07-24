@@ -21,6 +21,9 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_POINT_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_POINT_H_
 
+#include <string>
+#include <vector>
+
 #include "modules/map/pnc_map/path.h"
 
 namespace apollo {
@@ -55,6 +58,8 @@ class ReferencePoint : public hdmap::PathPoint {
 
   double lower_bound() const;
   double upper_bound() const;
+
+  const std::string DebugString() const;
 
  private:
   double kappa_ = 0.0;

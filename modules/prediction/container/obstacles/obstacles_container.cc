@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+
+#include <utility>
+
 #include "modules/common/math/math_utils.h"
 
 namespace apollo {
@@ -25,9 +28,7 @@ using apollo::perception::PerceptionObstacles;
 
 std::mutex ObstaclesContainer::g_mutex_;
 
-ObstaclesContainer::ObstaclesContainer() {
-  timestamp_ = 0.0;
-}
+ObstaclesContainer::ObstaclesContainer() { timestamp_ = 0.0; }
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   const PerceptionObstacles& perception_obstacles =
@@ -42,17 +43,15 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
            << timestamp_ << "].";
     return;
   }
-  
+
   timestamp_ = timestamp;
   for (const PerceptionObstacle& perception_obstacle :
-      perception_obstacles.perception_obstacle()) {
+       perception_obstacles.perception_obstacle()) {
     InsertPerceptionObstacle(perception_obstacle, timestamp_);
   }
 }
 
-Obstacle* ObstaclesContainer::GetObstacle(int id) {
-  return nullptr;
-}
+Obstacle* ObstaclesContainer::GetObstacle(int id) { return nullptr; }
 
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {

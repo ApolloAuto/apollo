@@ -34,7 +34,7 @@
 
 #include <cstddef>
 
-#include "Eigen/Dense"
+#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace planning {
@@ -47,9 +47,9 @@ class SLAnalyticTransformation {
   static double calculate_kappa(const double kappa_ref, const double dkappa_ref,
                                 const double l, const double dl,
                                 const double ddl);
-  static Eigen::Vector2d calculate_xypoint(const double theta_ref,
-                                           const Eigen::Vector2d& point_ref,
-                                           const double l);
+  static common::math::Vec2d calculate_xypoint(
+      const double theta_ref, const common::math::Vec2d& point_ref,
+      const double l);
   /**
   *   @brief: given sl, theta, and road's theta, kappa, extract derivative l,
   *second order derivative l:
