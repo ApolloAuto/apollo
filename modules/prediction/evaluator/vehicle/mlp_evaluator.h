@@ -57,12 +57,6 @@ class MLPEvaluator : public Evaluator {
                             LaneSequence* lane_sequence_ptr);
 
   /**
-   * @brief Predict the probability
-   * @param Obstacle pointer
-   */
-  void Predict(Obstacle* obstacle_ptr);
-
-  /**
    * @brief Clear obstacle feature map
    */
   void Clear();

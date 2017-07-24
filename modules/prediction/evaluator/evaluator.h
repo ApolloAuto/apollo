@@ -46,6 +46,10 @@ class Evaluator {
    */
   virtual ~Evaluator() = default;
 
+  /**
+   * @brief Evaluate an obstacle
+   * @param Obstacle pointer
+   */
   virtual void Evaluate(Obstacle* obstacle) = 0;
 
  protected:
