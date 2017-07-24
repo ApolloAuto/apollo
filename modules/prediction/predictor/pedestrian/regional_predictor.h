@@ -16,51 +16,37 @@
 
 /**
  * @file
- * @brief Define the data container base class
+ * @brief Define pedestrian predictor
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
+#ifndef MODULES_PREDICTION_PREDICTOR_PEDESTRIAN_REGIONAL_PREDICTOR_H_
+#define MODULES_PREDICTION_PREDICTOR_PEDESTRIAN_REGIONAL_PREDICTOR_H_
 
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/predictor/predictor.h"
 
-#include "modules/prediction/container/obstacles/obstacle.h"
-
-/**
- * @namespace apollo::prediction
- * @brief apollo::prediction
- */
 namespace apollo {
 namespace prediction {
 
-class Predictor {
+class RegionalPredictor : public Predictor {
  public:
   /**
    * @brief Constructor
    */
-  Predictor() = default;
+  RegionalPredictor() = default;
 
   /**
-   * @brief Destructor
+   * @breif Destructor
    */
-  virtual ~Predictor() = default;
-
-  /**
-   * @brief Get prediction obstacle
-   */
-  virtual const PredictionObstacle& prediction_obstacle();
+  virtual ~RegionalPredictor() = default;
 
   /**
    * @brief Make prediction
    * @param Obstacle pointer
    */
-  virtual void Predict(Obstacle* obstacle) const = 0;
-
- protected:
-  PredictionObstacle prediction_obstacle_;
+  void Predict(Obstacle* obstacle) const override;
 };
 
 }  // namespace prediction
-}  // namespace apollo
+}  // apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
+# endif  // MODULES_PREDICTION_PREDICTOR_PEDESTRIAN_REGIONAL_PREDICTOR_H_

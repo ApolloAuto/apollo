@@ -1,0 +1,15 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "regional_predictor",
+    hdrs = ["regional_predictor.h"],
+    srcs = ["regional_predictor.cc"],
+    deps = [
+        "//modules/prediction/predictor:predictor",
+        "@glog//:glog",
+    ]
+)
+
+cpplint()
