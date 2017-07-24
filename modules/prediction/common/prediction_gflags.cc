@@ -48,3 +48,4 @@ DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(max_prediction_length, 100.0,
     "Max length of prediction trajectory");
+DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
