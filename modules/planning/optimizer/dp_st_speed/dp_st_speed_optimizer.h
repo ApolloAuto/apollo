@@ -30,17 +30,12 @@ namespace planning {
 
 class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
-  // TODO: to be fixed
-  // explicit DpStSpeedOptimizer(const std::string& name,
-  //                            const boost::property_tree::ptree& ptree);
   explicit DpStSpeedOptimizer(const std::string& name);
 
- private:
-  virtual ErrorCode process(const DataCenter& data_center,
-                            const PathData& path_data,
-                            const TrajectoryPoint& init_point,
-                            DecisionData* const decision_data,
-                            SpeedData* const speed_data) const;
+  virtual ErrorCode process(const PathData& path_data,
+                             const TrajectoryPoint& init_point,
+                             DecisionData* const decision_data,
+                             SpeedData* const speed_data) const;
 };
 
 }  // namespace planning
