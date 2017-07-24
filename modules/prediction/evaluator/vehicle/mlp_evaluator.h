@@ -32,29 +32,69 @@ namespace prediction {
 
 class MLPEvaluator : public Evaluator {
  public:
+  /**
+   * @brief Constructor
+   */
   MLPEvaluator() = default;
 
+  /**
+   * @brief Destructor
+   */
   virtual ~MLPEvaluator() = default;
 
-  void Evaluate(Obstacle* obstacle_ptr);
+  /**
+   * @brief Override Evaluate
+   * @param Obstacle pointer
+   */
+  void Evaluate(Obstacle* obstacle_ptr) override;
 
+  /**
+   * @brief Extract feature vector
+   * @param Obstacle pointer
+   *        Lane Sequence pointer
+   */
   void ExtractFeatureValues(Obstacle* obstacle_ptr,
                             LaneSequence* lane_sequence_ptr);
 
+  /**
+   * @brief Predict the probability
+   * @param Obstacle pointer
+   */
   void Predict(Obstacle* obstacle_ptr);
 
+  /**
+   * @brief Clear obstacle feature map
+   */
   void Clear();
 
  private:
+  /**
+   * @brief Set obstacle feature vector
+   * @param Obstacle pointer
+   *        Feature container in a vector for receiving the feature values
+   */
   void SetObstacleFeatureValues(Obstacle* obstacle_ptr,
                                 std::vector<double>* feature_values);
 
+  /**
+   * @brief Set lane feature vector
+   * @param Obstacle pointer
+   *        Lane sequence pointer
+   *        Feature container in a vector for receiving the feature values
+   */
   void SetLaneFeatureValues(Obstacle* obstacle_ptr,
                             LaneSequence* lane_sequence_ptr,
                             std::vector<double>* feature_values);
 
+  /**
+   * @brief Load mode file
+   * @param Model file name
+   */
   void LoadModel(const std::string& model_file);
 
+  /**
+   * @brief Compute probability
+   */
   double ComputeProbability();
 
  private:
