@@ -29,7 +29,7 @@ using ErrorCode = common::ErrorCode;
 QPSplinePathOptimizer::QPSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
-common::ErrorCode QPSplinePathOptimizer::optimize(
+common::ErrorCode QPSplinePathOptimizer::process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point,
     DecisionData* const decision_data, PathData* const path_data) {

@@ -35,11 +35,12 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
   //                            const boost::property_tree::ptree& ptree);
   explicit DpStSpeedOptimizer(const std::string& name);
 
-  virtual ErrorCode optimize(const DataCenter& data_center,
-                             const PathData& path_data,
-                             const TrajectoryPoint& init_point,
-                             DecisionData* const decision_data,
-                             SpeedData* const speed_data) const;
+ private:
+  virtual ErrorCode process(const DataCenter& data_center,
+                            const PathData& path_data,
+                            const TrajectoryPoint& init_point,
+                            DecisionData* const decision_data,
+                            SpeedData* const speed_data) const;
 };
 
 }  // namespace planning
