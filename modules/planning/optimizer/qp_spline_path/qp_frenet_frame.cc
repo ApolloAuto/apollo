@@ -17,16 +17,17 @@
 /**
  * @file qp_frenet_frame.cpp
  **/
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/optimizer/qp_spline_path/qp_frenet_frame.h"
 
 #include <algorithm>
 #include <limits>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/macro.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/path/sl_point_util.h"
 #include "modules/planning/math/double.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -175,23 +176,20 @@ bool QpFrenetFrame::calcualate_discretized_veh_loc() {
 
 bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
     const Obstacle& obstacle) {
-  const std::vector<Decision>& decision = obstacle.Decisions();
+  const std::vector<ObjectDecisionType>& decision = obstacle.Decisions();
 
   if (decision.size() != obstacle.prediction_trajectories().size()) {
     return false;
   }
 
   for (std::size_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
-    int nudge_side = 0;
-    double buffer = decision[i].buffer();
-    if (decision[i].decision_type() == Decision::DecisionType::GO_LEFT) {
-      nudge_side = -1;
-    } else if (decision[i].decision_type() ==
-               Decision::DecisionType::GO_RIGHT) {
-      nudge_side = 1;
-    } else {
+    if (!decision[i].has_nudge()) {
       continue;
     }
+    const auto& nudge = decision[i].nudge();
+    double buffer = std::fabs(nudge.distance_l());
+
+    int nudge_side = nudge.type() == ObjectNudge::RIGHT_NUDGE ? 1 : -1;
     const PredictionTrajectory& predicted_trajectory =
         obstacle.prediction_trajectories()[i];
 
@@ -263,25 +261,29 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
 
 bool QpFrenetFrame::mapping_static_obstacle_with_decision(
     const Obstacle& obstacle) {
-  const std::vector<Decision>& object_decisions = obstacle.Decisions();
+  const std::vector<ObjectDecisionType>& object_decisions =
+      obstacle.Decisions();
 
-  for (const Decision& decision : object_decisions) {
-    if (decision.decision_type() == Decision::DecisionType::GO_LEFT) {
+  for (const auto& decision : object_decisions) {
+    if (!decision.has_nudge()) {
+      continue;
+    }
+    const auto& nudge = decision.nudge();
+    const double buffer = std::fabs(nudge.distance_l());
+    if (nudge.type() == ObjectNudge::RIGHT_NUDGE) {
       common::math::Box2d box = obstacle.BoundingBox();
       std::vector<common::math::Vec2d> corners;
       box.GetAllCorners(&corners);
-      if (!mapping_polygon(corners, decision.buffer(), -1,
-                           &_static_obstacle_bound)) {
+      if (!mapping_polygon(corners, buffer, -1, &_static_obstacle_bound)) {
         AERROR << "fail to map polygon with id " << obstacle.Id()
                << " in qp frenet frame";
         return false;
       }
-    } else if (decision.decision_type() == Decision::DecisionType::GO_LEFT) {
+    } else {
       common::math::Box2d box = obstacle.BoundingBox();
       std::vector<common::math::Vec2d> corners;
       box.GetAllCorners(&corners);
-      if (!mapping_polygon(corners, decision.buffer(), 1,
-                           &_static_obstacle_bound)) {
+      if (!mapping_polygon(corners, buffer, 1, &_static_obstacle_bound)) {
         AERROR << "fail to map polygon with id " << obstacle.Id()
                << "in qp frenet frame";
         return false;
