@@ -85,6 +85,10 @@ function check_esd_files() {
 function generate_build_targets() {
   BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
     | grep -v "_cpplint$" | grep -v "release" | grep -v "kernel")
+  if [ $? -ne 0 ]; then
+    fail 'Build failed!'
+  fi
+
   if ! $USE_ESD_CAN; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
@@ -92,6 +96,10 @@ function generate_build_targets() {
 
 function generate_test_targets() {
   TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party" | grep -v "kernel")
+  if [ $? -ne 0 ]; then
+    fail 'Test failed!'
+  fi
+
   if ! $USE_ESD_CAN; then
      TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
@@ -254,8 +262,6 @@ function gen_coverage() {
 function run_test() {
   START_TIME=$(get_now)
 
-  # FIXME(all): when all unit test passed, switch back.
-  # bazel test --config=unit_test -c dbg //...
   generate_test_targets
   echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings
   if [ $? -eq 0 ]; then
@@ -279,6 +285,14 @@ function run_bash_lint() {
 function run_lint() {
   START_TIME=$(get_now)
   run_cpp_lint
+
+  # Add cpplint rule to BUILD files that do not contain it.
+  for file in $(find modules -name BUILD | \
+    xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
+  do
+    sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file
+    sed -i -e '$a\\ncpplint()' $file
+  done
 
   if [ $? -eq 0 ]; then
     success 'Lint passed!'
