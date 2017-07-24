@@ -29,6 +29,7 @@ cc_library(
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
+        "//modules/prediction/common:road_graph",
         "//modules/map/hdmap:hdmap",
     ],
 )
