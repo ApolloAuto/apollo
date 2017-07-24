@@ -36,23 +36,23 @@ class ReferenceLine {
   ReferenceLine() = default;
   ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   ReferenceLine(const std::vector<ReferencePoint>& reference_points,
-                const std::vector<::apollo::hdmap::LaneSegment>& lane_segments,
+                const std::vector<hdmap::LaneSegment>& lane_segments,
                 const double max_approximation_error);
   void move(const ReferenceLine& reference_line);
   void move(const ReferenceLine&& reference_line);
-  const ::apollo::hdmap::Path& reference_map_line() const;
+  const hdmap::Path& reference_map_line() const;
   const std::vector<ReferencePoint>& reference_points() const;
 
   ReferencePoint get_reference_point(const double s) const;
   ReferencePoint get_reference_point(const double x, const double y) const;
 
-  bool get_point_in_Cartesian_frame(const apollo::common::SLPoint& sl_point,
+  bool get_point_in_Cartesian_frame(const common::SLPoint& sl_point,
                                     Eigen::Vector2d* const xy_point) const;
   bool get_point_in_Frenet_frame(const Eigen::Vector2d& xy_point,
-                                 apollo::common::SLPoint* const sl_point) const;
+                                 common::SLPoint* const sl_point) const;
 
   double get_lane_width(const double s) const;
-  bool is_on_road(const apollo::common::SLPoint& sl_point) const;
+  bool is_on_road(const common::SLPoint& sl_point) const;
 
  private:
   static ReferencePoint interpolate(const ReferencePoint& p0, const double s0,
@@ -65,8 +65,8 @@ class ReferenceLine {
                                         const double s1, const double x,
                                         const double y);
 
-  std::vector<ReferencePoint> _reference_points;
-  ::apollo::hdmap::Path _reference_map_line;
+  std::vector<ReferencePoint> reference_points_;
+  hdmap::Path reference_map_line_;
 };
 
 }  // namespace planning
