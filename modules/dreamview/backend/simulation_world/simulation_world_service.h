@@ -18,15 +18,15 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_SIM_WORLD_H_
-#define MODULES_DREAMVIEW_BACKEND_SIM_WORLD_H_
+#ifndef MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_
+#define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_
 
 #include <functional>
 #include <string>
 
 #include "third_party/json/json.hpp"
 
-#include "modules/dreamview/backend/map_service.h"
+#include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -182,4 +182,4 @@ class SimulationWorldService {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_SIM_WORLD_H_
+#endif  // MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_

@@ -19,16 +19,11 @@
 #include <thread>
 
 #include "CivetServer.h"
-#include "gflags/gflags.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/dreamview/backend/simulation_world_updater.h"
-#include "modules/dreamview/backend/websocket.h"
-
-DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
-              "The path to the dreamview distribution directory. The default "
-              "value points to built-in version from the Apollo project.");
-DEFINE_int32(server_port, 8888, "The port of backend webserver");
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
+#include "modules/dreamview/backend/websocket/websocket.h"
 
 /// Time interval, in seconds, between pushing SimulationWorld to frontend.
 static constexpr double kTimeInterval = 0.1;
@@ -42,8 +37,8 @@ int main(int argc, char **argv) {
   ::google::ParseCommandLineFlags(&argc, &argv, true);
   ros::init(argc, argv, "dreamview");
 
-  // Initialize and run the web server which serves the
-  // dreamview htmls and javascripts and handles websocket requests.
+  // Initialize and run the web server which serves the dreamview htmls and
+  // javascripts and handles websocket requests.
   CivetServer server({"document_root", FLAGS_static_file_dir, "listening_ports",
                       std::to_string(FLAGS_server_port)});
   WebSocketHandler websocket;

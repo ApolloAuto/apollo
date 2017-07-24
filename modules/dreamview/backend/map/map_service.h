@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_MAP_SERVICE_H_
-#define MODULES_DREAMVIEW_BACKEND_MAP_SERVICE_H_
+#ifndef MODULES_DREAMVIEW_BACKEND_MAP_MAP_SERVICE_H_
+#define MODULES_DREAMVIEW_BACKEND_MAP_MAP_SERVICE_H_
 
 #include <string>
 #include <vector>
@@ -81,4 +81,4 @@ class MapService {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_MAP_SERVICE_H_
+#endif  // MODULES_DREAMVIEW_BACKEND_MAP_MAP_SERVICE_H_

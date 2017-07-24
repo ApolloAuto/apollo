@@ -19,8 +19,8 @@
  * @brief the class of TrajectoryPointCollector
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_
-#define MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_
+#ifndef MODULES_DREAMVIEW_BACKEND_SIM_WORLD_TRAJECTORY_POINT_COLLECTOR_H_
+#define MODULES_DREAMVIEW_BACKEND_SIM_WORLD_TRAJECTORY_POINT_COLLECTOR_H_
 
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
@@ -81,4 +81,4 @@ class TrajectoryPointCollector {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_TRAJECTORY_POINT_COLLECTOR_H_
+#endif  // MODULES_DREAMVIEW_BACKEND_SIM_WORLD_TRAJECTORY_POINT_COLLECTOR_H_
