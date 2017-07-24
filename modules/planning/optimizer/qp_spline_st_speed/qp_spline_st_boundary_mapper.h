@@ -55,8 +55,9 @@ class QPSplineSTBoundaryMapper : public STBoundaryMapper {
 
   common::ErrorCode map_obstacle_with_prediction_trajectory(
       const common::TrajectoryPoint& initial_planning_point,
-      const Obstacle& obstacle, const PathData& path_data,
-      const double planning_distance, const double planning_time,
+      const Obstacle& obstacle, const ObjectDecisionType obj_decision,
+      const PathData& path_data, const double planning_distance,
+      const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const;
 
   common::ErrorCode map_obstacle_without_trajectory(
