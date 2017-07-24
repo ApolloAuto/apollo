@@ -157,6 +157,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   UpdateKFMotionTracker(&feature);
   SetCurrentLanes(&feature);
   SetNearbyLanes(&feature);
+  SetLaneGraphFeature(&feature);
   UpdateKFLaneTrackers(&feature);
   InsertFeatureToHistory(&feature);
   SetMotionStatus();
@@ -676,6 +677,10 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
 }
 
 void Obstacle::SetNearbyLanes(Feature* feature) {
+  // TODO(kechxu) implement
+}
+
+void Obstacle::SetLaneGraphFeature(Feature* feature) {
   // TODO(kechxu) implement
 }
 
