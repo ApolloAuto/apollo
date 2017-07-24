@@ -70,9 +70,6 @@ class ObstaclesContainer : public Container {
   bool IsPredictable(
       const apollo::perception::PerceptionObstacle& perception_obstacle);
 
-  void SetObstacleLaneGraphFeatures(
-      const apollo::perception::PerceptionObstacles& perception_obstacles);
-
  private:
   double timestamp_;
   apollo::common::util::LRUCache<int, Obstacle> obstacles_;

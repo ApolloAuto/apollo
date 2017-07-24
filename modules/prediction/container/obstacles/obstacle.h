@@ -64,8 +64,6 @@ class Obstacle {
   const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf_lane_tracker(
       const std::string& lane_id);
 
-  // TODO(author) void SetLaneGraphFeature(ObstacleClusters* p_cluster);
-
   bool IsOnLane();
 
  private:
@@ -120,6 +118,8 @@ class Obstacle {
   void SetCurrentLanes(Feature* feature);
 
   void SetNearbyLanes(Feature* feature);
+
+  void SetLaneGraphFeature(Feature* feature);
 
   void SetMotionStatus();
 

@@ -48,8 +48,6 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
       perception_obstacles.perception_obstacle()) {
     InsertPerceptionObstacle(perception_obstacle, timestamp_);
   }
-
-  SetObstacleLaneGraphFeatures(perception_obstacles);
 }
 
 Obstacle* ObstaclesContainer::GetObstacle(int id) {
@@ -86,11 +84,6 @@ bool ObstaclesContainer::IsPredictable(
     return false;
   }
   return true;
-}
-
-void ObstaclesContainer::SetObstacleLaneGraphFeatures(
-    const PerceptionObstacles& perception_obstacles) {
-  // TODO(kechxu) Implement
 }
 
 }  // namespace prediction
