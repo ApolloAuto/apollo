@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/map_service.h"
+#include "modules/dreamview/backend/map/map_service.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

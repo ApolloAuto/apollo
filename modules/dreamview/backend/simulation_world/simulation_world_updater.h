@@ -18,13 +18,13 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_SIM_WORLD_UPDATER_H_
-#define MODULES_DREAMVIEW_BACKEND_SIM_WORLD_UPDATER_H_
+#ifndef MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
+#define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
 
 #include "modules/common/log.h"
-#include "modules/dreamview/backend/map_service.h"
-#include "modules/dreamview/backend/simulation_world_service.h"
-#include "modules/dreamview/backend/websocket.h"
+#include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
+#include "modules/dreamview/backend/websocket/websocket.h"
 
 /**
  * @namespace apollo::dreamview
@@ -65,4 +65,4 @@ class SimulationWorldUpdater {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_SIM_WORLD_UPDATER_H_
+#endif  // MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_

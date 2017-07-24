@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/simulation_world_service.h"
+#include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 
 #include <iostream>
 #include "gtest/gtest.h"

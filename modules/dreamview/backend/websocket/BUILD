@@ -1,0 +1,33 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "websocket",
+    srcs = [
+        "websocket.cc",
+    ],
+    hdrs = [
+        "websocket.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//third_party/json",
+        "@civetweb//:civetweb++",
+    ],
+)
+
+cc_test(
+    name = "websocket_test",
+    size = "small",
+    srcs = [
+        "websocket_test.cc",
+    ],
+    deps = [
+        ":websocket",
+        "//modules/common:log",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()
