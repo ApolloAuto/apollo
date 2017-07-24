@@ -26,7 +26,6 @@
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/math/polygon2d.h"
-#include "modules/planning/common/decision.h"
 #include "modules/planning/optimizer/st_graph/st_graph_point.h"
 
 namespace apollo {
@@ -59,11 +58,9 @@ class STGraphBoundary final : public ::apollo::common::math::Polygon2d {
   BoundaryType boundary_type() const;
   uint32_t id() const;
   double characteristic_length() const;
-  Decision::DecisionType decision_type() const;
 
   void set_id(const uint32_t id);
   void set_boundary_type(const BoundaryType& boundary_type);
-  void set_decision_type(const Decision::DecisionType& decision_type);
   void set_characteristic_length(const double characteristic_length);
 
   bool get_s_boundary_position(const double curr_time, double* s_upper,
@@ -77,7 +74,6 @@ class STGraphBoundary final : public ::apollo::common::math::Polygon2d {
  private:
   BoundaryType _boundary_type;
   uint32_t _id = 0;
-  Decision::DecisionType _decision_type;
   double _characteristic_length = 1.0;
   double _s_high_limit = 200.0;
 };

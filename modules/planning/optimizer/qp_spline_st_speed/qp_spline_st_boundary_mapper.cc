@@ -47,329 +47,137 @@ ErrorCode QPSplineSTBoundaryMapper::get_graph_boundary(
     const DecisionData& decision_data, const PathData& path_data,
     const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const obs_boundary) const {
+  if (obs_boundary) {
+    AERROR << "obs_boundary is NULL.";
+    return ErrorCode::PLANNING_ERROR_FAILED;
+  }
+
   if (planning_time < 0.0) {
-    AERROR << "Fail to get params because planning_time < 0.";
+    AERROR << "Fail to get params since planning_time < 0.";
     return ErrorCode::PLANNING_ERROR_FAILED;
   }
+
   if (path_data.path().num_of_points() < 2) {
-    AERROR << "Fail to get params since path has "
-           << path_data.path().num_of_points() << "points.";
+    AERROR << "Fail to get params because of too few path points. path points "
+              "size: "
+           << path_data.path().num_of_points() << ".";
     return ErrorCode::PLANNING_ERROR_FAILED;
   }
+
   obs_boundary->clear();
 
-  // TODO: add mapping main decision and map obstacle here
-  const std::vector<const Obstacle*>& static_obs_vec =
-      decision_data.StaticObstacles();
-  const std::vector<const Obstacle*>& dynamic_obs_vec =
-      decision_data.DynamicObstacles();
+  /*
+  const auto& planning_data = processed_data.planning_data();
+  const auto& main_decision = planning_data.main_decision();
+  QUIT_IF(!planning_data.has_main_decision(), ErrorCode::PLANNING_SKIP,
+          Level::X_ERROR, "Skip mapping because no decision. \n%s",
+          planning_data.DebugString().c_str());
 
-  for (std::size_t i = 0; i < static_obs_vec.size(); ++i) {
-    if (static_obs_vec[i] == nullptr) {
+  ErrorCode ret = ErrorCode::PLANNING_OK;
+
+  if (main_decision.has_stop()) {
+    ret = map_main_decision_stop(
+        main_decision.stop(), processed_data_proxy.target_reference_line_raw(),
+        planning_distance, planning_time, obs_boundary);
+    QUIT_IF(ret != ErrorCode::PLANNING_OK && ret != ErrorCode::PLANNING_SKIP,
+            ret, Level::X_ERROR,
+            "Failed to get_params since map_main_decision_stop error.");
+    obs_boundary->back().set_id("main decision stop");
+  } else if (main_decision.has_change_lane()) {
+    if (main_decision.change_lane().has_default_lane_stop()) {
+      ret = map_main_decision_stop(
+          main_decision.change_lane().default_lane_stop(),
+          processed_data_proxy.default_reference_line_raw(), planning_distance,
+          planning_time, obs_boundary);
+      QUIT_IF(ret != ErrorCode::PLANNING_OK && ret != ErrorCode::PLANNING_SKIP,
+              ret, Level::X_ERROR,
+              "Fail to get_params due to map default lane stop error.");
+      obs_boundary->back().set_id("default_lane stop");
+    }
+    if (main_decision.change_lane().has_target_lane_stop()) {
+      ret = map_main_decision_stop(
+          main_decision.change_lane().target_lane_stop(),
+          processed_data_proxy.target_reference_line_raw(), planning_distance,
+          planning_time, obs_boundary);
+      QUIT_IF(ret != ErrorCode::PLANNING_OK && ret != ErrorCode::PLANNING_SKIP,
+              ret, Level::X_ERROR,
+              "Fail to get_params due to map target lane stop error.");
+      obs_boundary->back().set_id("target_lane stop");
+    }
+  } else if (main_decision.has_mission_complete()) {
+    ret = map_main_decision_mission_complete(
+        processed_data_proxy.target_reference_line_raw(), planning_distance,
+        planning_time, obs_boundary);
+    QUIT_IF(ret != ErrorCode::PLANNING_OK && ret != ErrorCode::PLANNING_SKIP,
+            ret, Level::X_ERROR,
+            "Failed to get_params since map_mission_complete error.");
+  }
+  */
+
+  const auto& static_obs_vec = decision_data.StaticObstacles();
+  for (const auto* obs : static_obs_vec) {
+    if (obs == nullptr) {
       continue;
     }
-    if (map_obstacle_without_trajectory(
-            *static_obs_vec[i], path_data, planning_distance, planning_time,
-            obs_boundary) != ErrorCode::PLANNING_OK) {
-      AERROR << "Fail to map static obstacle with id "
-             << static_obs_vec[i]->Id();
+    ErrorCode err = map_obstacle_without_trajectory(
+        initial_planning_point, *obs, path_data, planning_distance,
+        planning_time, obs_boundary);
+    if (err != ErrorCode::PLANNING_OK) {
+      AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
       return ErrorCode::PLANNING_ERROR_FAILED;
     }
   }
 
-  for (std::size_t i = 0; i < dynamic_obs_vec.size(); ++i) {
-    if (dynamic_obs_vec[i] == nullptr) {
+  const auto& dynamic_obs_vec = decision_data.DynamicObstacles();
+  for (const auto* obs : dynamic_obs_vec) {
+    if (obs == nullptr) {
       continue;
     }
-    if (map_obstacle_with_trajectory(initial_planning_point,
-                                     *dynamic_obs_vec[i], path_data,
-                                     planning_distance, planning_time,
-                                     obs_boundary) != ErrorCode::PLANNING_OK) {
-      AERROR << "Fail to map dynamic obstacle with id "
-             << dynamic_obs_vec[i]->Id();
-      return ErrorCode::PLANNING_ERROR_FAILED;
+    for (auto& obj_decision : obs->Decisions()) {
+      if (obj_decision.has_follow()) {
+        ErrorCode err = map_obstacle_with_planning(initial_planning_point, *obs,
+                                                   path_data, planning_distance,
+                                                   planning_time, obs_boundary);
+        if (err != ErrorCode::PLANNING_OK) {
+          AERROR << "Fail to map follow dynamic obstacle with id " << obs->Id()
+                 << ".";
+          return ErrorCode::PLANNING_ERROR_FAILED;
+        }
+      } else if (obj_decision.has_overtake() || obj_decision.has_yield()) {
+        ErrorCode err = map_obstacle_with_prediction_trajectory(
+            initial_planning_point, *obs, path_data, planning_distance,
+            planning_time, obs_boundary);
+        if (err != ErrorCode::PLANNING_OK) {
+          AERROR << "Fail to map dynamic obstacle with id " << obs->Id() << ".";
+          return ErrorCode::PLANNING_OK;
+        }
+      }
     }
   }
-
   return ErrorCode::PLANNING_OK;
 }
 
-ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_trajectory(
-    const common::TrajectoryPoint& init_planning_point,
+ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_planning(
+    const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const boundary) const {
-  std::vector<STPoint> boundary_points;
-  // lower and upper bound for st boundary
-  std::vector<STPoint> lower_points;
-  std::vector<STPoint> upper_points;
-  const std::vector<PathPoint>& veh_path = path_data.path().path_points();
-  const std::vector<Decision>& decision = obstacle.Decisions();
-  for (std::size_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
-    PredictionTrajectory pred_traj = obstacle.prediction_trajectories()[i];
-    bool skip = true;
-    const double boundary_buffer = st_boundary_config().boundary_buffer();
+  return ErrorCode::PLANNING_OK;
+}
 
-    for (std::size_t j = 0; j < pred_traj.num_of_points(); ++j) {
-      TrajectoryPoint cur_obs_point = pred_traj.trajectory_point_at(j);
-      // construct bounding box
-      apollo::common::math::Box2d obs_box(
-          {cur_obs_point.path_point().x(), cur_obs_point.path_point().y()},
-          cur_obs_point.path_point().theta(),
-          obstacle.Length() * st_boundary_config().expending_coeff(),
-          obstacle.Width() * st_boundary_config().expending_coeff());
-
-      // loop path data to find the lower and upper bound
-      if (veh_path.size() == 0) {
-        return ErrorCode::PLANNING_OK;
-      }
-
-      std::size_t low_index = 0;
-      std::size_t high_index = veh_path.size() - 1;
-      bool find_low = false;
-      bool find_high = false;
-
-      while (high_index >= low_index) {
-        if (find_high && find_low) {
-          break;
-        }
-
-        if (!find_low) {
-          if (!check_overlap(veh_path[low_index], vehicle_param(), obs_box,
-                             boundary_buffer)) {
-            ++low_index;
-          } else {
-            find_low = true;
-          }
-        }
-
-        if (!find_high) {
-          if (!check_overlap(veh_path[high_index], vehicle_param(), obs_box,
-                             boundary_buffer)) {
-            --high_index;
-          } else {
-            find_high = true;
-          }
-        }
-      }
-
-      if (find_high && find_low) {
-        double s_upper = std::min(
-            veh_path[high_index].s() + st_boundary_config().point_extension(),
-            planning_distance);
-        double s_lower = std::min(
-            veh_path[low_index].s() - st_boundary_config().point_extension(),
-            planning_distance);
-        if (Double::compare(s_lower, s_upper) >= 0) {
-          continue;
-        } else {
-          skip = false;
-          lower_points.push_back(
-              STPoint(s_lower, cur_obs_point.relative_time()));
-          upper_points.push_back(
-              STPoint(s_upper, cur_obs_point.relative_time()));
-        }
-      }
-    }
-    if (skip) {
-      continue;
-    }
-    if (lower_points.size() > 0) {
-      boundary_points.clear();
-      const double follow_buffer = st_boundary_config().follow_buffer();
-      boundary_points.push_back(STPoint(lower_points.at(0).s() - follow_buffer,
-                                        lower_points.at(0).t()));
-      boundary_points.push_back(STPoint(lower_points.back().s() - follow_buffer,
-                                        lower_points.back().t()));
-      boundary_points.push_back(
-          STPoint(upper_points.back().s() + follow_buffer + boundary_buffer,
-                  upper_points.back().t()));
-      boundary_points.push_back(STPoint(upper_points.at(0).s() + follow_buffer,
-                                        upper_points.at(0).t()));
-
-      if (lower_points.at(0).t() > lower_points.back().t() ||
-          upper_points.at(0).t() > upper_points.back().t()) {
-        AINFO << "Warning: reverse t vs s. t: lower (first:"
-              << lower_points.at(0).t() << ", back:" << lower_points.back().t()
-              << "), upper (first:" << upper_points.at(0).t()
-              << ", back:" << upper_points.back().t() << ")";
-      }
-      const double decision_buffer = decision[i].buffer();
-      Decision::DecisionType decision_type;
-      if (decision[i].decision_type() == Decision::DecisionType::YIELD_DOWN ||
-          decision[i].decision_type() == Decision::DecisionType::STOP_DOWN ||
-          decision[i].decision_type() == Decision::DecisionType::FOLLOW_DOWN) {
-        if (boundary_points[0].s() - decision_buffer < 0.0) {
-          boundary_points[0].set_s(
-              std::fmax(boundary_points[0].s() - 2.0, 0.0));
-        } else {
-          boundary_points[0].set_s(
-              std::fmax(boundary_points[0].s() - decision_buffer, 0.0));
-        }
-        if (boundary_points[1].s() - decision_buffer < 0.0) {
-          boundary_points[1].set_s(
-              std::fmax(boundary_points[1].s() - 4.0, 0.0));
-        } else {
-          boundary_points[1].set_s(
-              std::fmax(boundary_points[1].s() - decision_buffer, 0.0));
-        }
-        decision_type = Decision::DecisionType::YIELD_DOWN;
-      } else if (decision[i].decision_type() == Decision::DecisionType::GO_UP) {
-        boundary_points[2].set_s(boundary_points[2].s() + decision_buffer);
-        boundary_points[3].set_s(boundary_points[3].s() + decision_buffer);
-        decision_type = Decision::DecisionType::GO_UP;
-      }
-      const double area = get_area(boundary_points);
-      if (Double::compare(area, 0.0) > 0) {
-        // main boundary
-        boundary->emplace_back(boundary_points);
-        boundary->back().set_decision_type(decision_type);
-
-        // buffer boundary
-        std::vector<STPoint> left_buffer_boundary_points;
-        std::vector<STPoint> right_buffer_boundary_points;
-        double compute_delay_time = 0.3;
-        double control_cmd_delay_time = 0.3;
-        double control_throttle_release_time = 0.1;
-        double control_brake_full_time = 0.2;
-        double t_delay = compute_delay_time + control_cmd_delay_time;
-        const double init_acc = init_planning_point.a();
-        const double init_speed = init_planning_point.v();
-        if (init_acc > 0.3) {
-          t_delay += control_throttle_release_time;
-        }
-        t_delay += control_brake_full_time;
-        double s_delay = init_speed * t_delay;
-        if (init_acc > 0.1) {
-          s_delay += 0.5 * init_acc * t_delay * t_delay;
-        }
-
-        if (decision_type == Decision::DecisionType::YIELD_DOWN) {
-          left_buffer_boundary_points.push_back(
-              STPoint(std::fmax((boundary_points[0].s() - s_delay), 0.1),
-                      boundary_points[0].t() - 1.0));
-          left_buffer_boundary_points.push_back(
-              STPoint(std::fmax((boundary_points[0].s() - s_delay), 0.1) + 0.2,
-                      boundary_points[0].t()));
-          left_buffer_boundary_points.push_back(
-              STPoint(boundary_points[3].s(), boundary_points[3].t()));
-          left_buffer_boundary_points.push_back(
-              STPoint(left_buffer_boundary_points[0].s(),
-                      left_buffer_boundary_points[0].t()));
-
-          right_buffer_boundary_points.push_back(
-              STPoint(boundary_points[1].s(), boundary_points[1].t()));
-          right_buffer_boundary_points.push_back(
-              STPoint(boundary_points[1].s(), boundary_points[1].t() + 1.0));
-          right_buffer_boundary_points.push_back(
-              STPoint(right_buffer_boundary_points[1].s(),
-                      right_buffer_boundary_points[1].t()));
-          right_buffer_boundary_points.push_back(
-              STPoint(boundary_points[2].s(), boundary_points[2].t()));
-        }
-        if (decision_type == Decision::DecisionType::GO_UP) {
-          left_buffer_boundary_points.push_back(
-              STPoint(boundary_points[3].s(),
-                      std::max(boundary_points[3].t() - 0.5, 0.1)));
-          left_buffer_boundary_points.push_back(
-              STPoint(boundary_points[0].s(), boundary_points[0].t()));
-          left_buffer_boundary_points.push_back(
-              STPoint(boundary_points[3].s(), boundary_points[3].t()));
-          left_buffer_boundary_points.push_back(
-              STPoint(left_buffer_boundary_points[0].s(),
-                      left_buffer_boundary_points[0].t()));
-
-          right_buffer_boundary_points.push_back(
-              STPoint(boundary_points[1].s(), boundary_points[1].t()));
-          right_buffer_boundary_points.push_back(STPoint(
-              boundary_points[2].s() + 1.0, boundary_points[2].t() + 1.0));
-          right_buffer_boundary_points.push_back(
-              STPoint(right_buffer_boundary_points[1].s(),
-                      right_buffer_boundary_points[1].t()));
-          right_buffer_boundary_points.push_back(
-              STPoint(boundary_points[2].s(), boundary_points[2].t()));
-        }
-
-        boundary->emplace_back(left_buffer_boundary_points);
-        boundary->back().set_decision_type(decision_type);
-        boundary->emplace_back(right_buffer_boundary_points);
-        boundary->back().set_decision_type(decision_type);
-      } else {
-        AWARN << "Can not map one of prediction trajectory to ST graph. ["
-              << i + 1 << "/" << obstacle.prediction_trajectories().size()
-              << "].";
-      }
-    } else {
-      AWARN << "Did not find a overlap along the trajecotry of prediction. ["
-            << i + 1 << "/" << obstacle.prediction_trajectories().size()
-            << "].";
-    }
-  }
-
+ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
+    const common::TrajectoryPoint& initial_planning_point,
+    const Obstacle& obstacle, const PathData& path_data,
+    const double planning_distance, const double planning_time,
+    std::vector<STGraphBoundary>* const boundary) const {
   return ErrorCode::PLANNING_OK;
 }
 
 ErrorCode QPSplineSTBoundaryMapper::map_obstacle_without_trajectory(
+    const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const boundary) const {
-  // Static obstacle only have yield option
-  const std::vector<PathPoint>& veh_path = path_data.path().path_points();
-
-  apollo::common::math::Box2d obs_box = obstacle.BoundingBox();
-
-  const double buffer = st_boundary_config().boundary_buffer();
-
-  if (veh_path.size() == 0) {
-    return ErrorCode::PLANNING_OK;
-  }
-
-  std::size_t low_index = 0;
-  std::size_t high_index = veh_path.size() - 1;
-  bool find_low = false;
-  bool find_high = false;
-
-  while (high_index >= low_index) {
-    if (find_high && find_low) {
-      break;
-    }
-
-    if (!find_low) {
-      if (!check_overlap(veh_path[low_index], vehicle_param(), obs_box,
-                         buffer)) {
-        ++low_index;
-      } else {
-        find_low = true;
-      }
-    }
-
-    if (!find_high) {
-      if (!check_overlap(veh_path[high_index], vehicle_param(), obs_box,
-                         buffer)) {
-        --high_index;
-      } else {
-        find_high = true;
-      }
-    }
-  }
-
-  std::vector<STPoint> boundary_points;
-  if (find_high && find_low) {
-    double s_upper = std::min(veh_path[high_index].s(), planning_distance);
-    double s_lower = std::min(veh_path[low_index].s(), planning_distance);
-
-    if (Double::compare(s_lower, s_upper) >= 0) {
-      return ErrorCode::PLANNING_OK;
-    } else {
-      boundary_points.push_back(STPoint(s_lower, 0.0));
-      boundary_points.push_back(STPoint(s_lower, planning_time));
-      boundary_points.push_back(STPoint(s_upper, planning_time));
-      boundary_points.push_back(STPoint(s_upper, 0.0));
-
-      boundary->emplace_back(boundary_points);
-      boundary->back().set_decision_type(Decision::DecisionType::YIELD_DOWN);
-    }
-  }
   return ErrorCode::PLANNING_OK;
 }
 
