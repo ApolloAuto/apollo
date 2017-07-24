@@ -66,6 +66,8 @@ class Obstacle {
 
   // TODO(author) void SetLaneGraphFeature(ObstacleClusters* p_cluster);
 
+  bool IsOnLane();
+
  private:
   apollo::common::ErrorCode SetId(
       const apollo::perception::PerceptionObstacle& perception_obstacle,
