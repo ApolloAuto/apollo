@@ -101,6 +101,8 @@ cc_library(
         ":decision_data",
         "//modules/common/proto:path_point_proto",
         "//modules/map/proto:map_proto",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
         "@eigen//:eigen",
@@ -118,8 +120,6 @@ cc_library(
     deps = [
         ":planning_data",
         "//modules/common/proto:path_point_proto",
-        "//modules/planning/common/path:path_data",
-        "//modules/planning/common/speed:speed_data",
         "//modules/planning/math:double",
     ],
 )

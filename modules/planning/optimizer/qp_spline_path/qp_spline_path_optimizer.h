@@ -33,11 +33,12 @@ class QPSplinePathOptimizer : public PathOptimizer {
  public:
   explicit QPSplinePathOptimizer(const std::string& name);
 
-  virtual common::ErrorCode optimize(const SpeedData& speed_data,
-                                     const ReferenceLine& reference_line,
-                                     const common::TrajectoryPoint& init_point,
-                                     DecisionData* const decision_data,
-                                     PathData* const path_data) override;
+ private:
+  virtual common::ErrorCode process(const SpeedData& speed_data,
+                                    const ReferenceLine& reference_line,
+                                    const common::TrajectoryPoint& init_point,
+                                    DecisionData* const decision_data,
+                                    PathData* const path_data) override;
 
  private:
   QPSplinePathGenerator _path_generator;

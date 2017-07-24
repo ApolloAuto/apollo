@@ -24,8 +24,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/path/path_data.h"
+#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 
 namespace apollo {
@@ -39,14 +39,15 @@ class EMPlanningData : public PlanningData {
   void init(const std::size_t num_iter);
 
   std::size_t num_iter() const;
-  const PathData& path_data(const std::size_t index) const;
-  const SpeedData& speed_data(const std::size_t index) const;
-
-  PathData* mutable_path_data(const std::size_t index);
-  SpeedData* mutable_speed_data(const std::size_t index);
 
   // aggregate final result together by some configuration
   bool aggregate(const double time_resolution);
+
+  const PathData& get_path_data_with_index(const std::size_t index) const;
+  const SpeedData& get_speed_data_with_index(const std::size_t index) const;
+
+  PathData* get_mutable_path_data_with_index(const std::size_t index);
+  SpeedData* get_mutable_speed_data_with_index(const std::size_t index);
 
  private:
   std::size_t _num_iter = 0;
