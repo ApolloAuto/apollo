@@ -294,9 +294,9 @@ ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
         ->get_obstacle_by_id(obs_it->id(), &object_ptr);
 
     if (obs_it->points().front().x() <= 0) {
-      object_ptr->MutableDecisions()->emplace_back(
-          _dp_st_configuration.go_down_buffer(),
-          Decision::DecisionType::YIELD_DOWN);
+      ObjectDecisionType dec;
+      dec.mutable_yield();
+      object_ptr->MutableDecisions()->push_back(dec);
       continue;
     }
     double start_t = 0.0;
@@ -331,12 +331,14 @@ ErrorCode DPSTGraph::get_object_decision(const STGraphData& st_graph_data,
       }
     }
     if (go_down) {
-      object_ptr->MutableDecisions()->emplace_back(
-          _dp_st_configuration.go_down_buffer(),
-          Decision::DecisionType::YIELD_DOWN);
+      ObjectDecisionType dec;
+      dec.mutable_yield();
+      object_ptr->MutableDecisions()->push_back(dec);
     } else {
-      object_ptr->MutableDecisions()->emplace_back(
-          _dp_st_configuration.go_up_buffer(), Decision::DecisionType::GO_UP);
+      // was GO_UP
+      ObjectDecisionType dec;
+      dec.mutable_avoid();
+      object_ptr->MutableDecisions()->push_back(dec);
     }
   }
   return ErrorCode::PLANNING_OK;

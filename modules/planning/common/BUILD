@@ -66,7 +66,6 @@ cc_library(
         "planning_object.h",
     ],
     deps = [
-        ":decision",
         "//modules/common/math:polygon2d",
         "//modules/planning/proto:planning_proto",
     ],
@@ -181,16 +180,6 @@ cc_library(
         "//modules/common/status",
         "//modules/map/hdmap",
         "//modules/planning/state_machine:master_state_machine",
-    ],
-)
-
-cc_library(
-    name = "decision",
-    srcs = [
-        "decision.cc",
-    ],
-    hdrs = [
-        "decision.h",
     ],
 )
 

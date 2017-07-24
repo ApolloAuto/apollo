@@ -28,7 +28,6 @@ cc_library(
         ":st_graph_point",
         "//modules/common:log",
         "//modules/common/math",
-        "//modules/planning/common:decision",
         "//modules/planning/proto:planning_proto",
     ],
 )
