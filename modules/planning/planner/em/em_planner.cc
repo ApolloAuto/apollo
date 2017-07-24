@@ -41,10 +41,14 @@ bool EMPlanner::MakePlan(const TrajectoryPoint& start_point,
   Frame* frame = data_center->current_frame();
 
   frame->set_planning_data(new EMPlanningData());
-//  frame->mutable_planning_data()->set_reference_line(reference_line);
-//  frame->mutable_planning_data()->set_decision_data(decision_data);
-//  frame->mutable_planning_data()->set_init_planning_point(
-//      frame->environment().vehicle_state_proxy().init_point(data_center->last_frame()));
+  if (data_center->last_frame()) {
+    ADEBUG << "last frame:" << data_center->last_frame()->DebugString();
+  }
+  ADEBUG << "start point:" << start_point.DebugString();
+  frame->mutable_planning_data()->set_init_planning_point(start_point);
+
+  //  frame->mutable_planning_data()->set_reference_line(reference_line);
+  //  frame->mutable_planning_data()->set_decision_data(decision_data);
 
   return true;
 }
