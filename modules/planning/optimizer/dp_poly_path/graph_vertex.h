@@ -22,7 +22,7 @@
 #define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_GRAPH_VERTEX_H
 
 #include <vector>
-
+#include <string>
 #include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
@@ -85,7 +85,7 @@ class GraphVertex {
   double _accumulated_cost = 0.0;
 };
 
-}  // planning
-}  // apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_GRAPH_VERTEX_H

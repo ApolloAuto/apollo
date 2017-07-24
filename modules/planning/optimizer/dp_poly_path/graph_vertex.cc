@@ -18,10 +18,10 @@
  * @file sgraph_vertex.cpp
  **/
 
-#include "modules/planning/optimizer/dp_poly_path/graph_vertex.h"
-
 #include <limits>
 #include <sstream>
+#include <string>
+#include "modules/planning/optimizer/dp_poly_path/graph_vertex.h"
 
 namespace apollo {
 namespace planning {
@@ -139,5 +139,5 @@ std::string GraphVertex::to_string() const {
   return sout.str();
 }
 
-}  // planning
-}  // apollo
+}  // namespace planning
+}  // namespace apollo

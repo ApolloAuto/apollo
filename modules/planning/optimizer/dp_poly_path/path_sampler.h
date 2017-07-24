@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_SAMPLER_H
 #define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_SAMPLER_H
 
+#include <vector>
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
