@@ -188,6 +188,11 @@ ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
 
   bool skip = true;
   std::vector<STPoint> boundary_points;
+  const auto& adc_path_points = path_data.path().path_points();
+  if (obstacle.prediction_trajectories().size() == 0) {
+    AWARN << "Obstacle (id = " << obstacle.Id()
+          << ") has NO prediction trajectory.";
+  }
 
   for (uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
     const auto& trajectory = obstacle.prediction_trajectories()[i];
@@ -203,12 +208,105 @@ ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
           trajectory_point.path_point().theta(),
           obstacle.Length() * st_boundary_config().expending_coeff(),
           obstacle.Width() * st_boundary_config().expending_coeff());
-      uint64_t low = 0;
-      uint64_t high = path_data.path().num_of_points() - 1;
+      int64_t low = 0;
+      int64_t high = static_cast<int64_t>(path_data.path().num_of_points()) - 1;
+      bool find_low = false;
+      bool find_high = false;
+      while (low < high) {
+        if (find_low && find_high) {
+          break;
+        }
+        if (!find_low) {
+          if (!check_overlap(adc_path_points[low], vehicle_param(), obs_box,
+                             st_boundary_config().boundary_buffer())) {
+            ++low;
+          } else {
+            find_low = true;
+          }
+        }
+        if (!find_high) {
+          if (!check_overlap(adc_path_points[high], vehicle_param(), obs_box,
+                             st_boundary_config().boundary_buffer())) {
+            --high;
+          } else {
+            find_high = true;
+          }
+        }
+      }
+      if (find_high && find_low) {
+        lower_points.emplace_back(
+            adc_path_points[low].s() - st_boundary_config().point_extension(),
+            trajectory_point_time);
+        upper_points.emplace_back(
+            adc_path_points[high].s() + st_boundary_config().point_extension(),
+            trajectory_point_time);
+      } else {
+        if (obj_decision.has_yield() || obj_decision.has_overtake()) {
+          AINFO << "Point[" << j << "] cannot find low or high index.";
+        }
+      }
+
+      if (lower_points.size() > 0) {
+        boundary_points.clear();
+        const double buffer = st_boundary_config().follow_buffer();
+        boundary_points.emplace_back(lower_points.at(0).s() - buffer,
+                                     lower_points.at(0).t());
+        boundary_points.emplace_back(lower_points.back().s() - buffer,
+                                     lower_points.back().t());
+        boundary_points.emplace_back(upper_points.back().s() + buffer +
+                                         st_boundary_config().boundary_buffer(),
+                                     upper_points.back().t());
+        boundary_points.emplace_back(upper_points.at(0).s() + buffer,
+                                     upper_points.at(0).t());
+        if (lower_points.at(0).t() > lower_points.back().t() ||
+            upper_points.at(0).t() > upper_points.back().t()) {
+          AWARN << "lower/upper points are reversed.";
+        }
+
+        // change boundary according to obj_decision.
+        STGraphBoundary::BoundaryType b_type =
+            STGraphBoundary::BoundaryType::UNKNOWN;
+        if (obj_decision.has_follow()) {
+          boundary_points.at(0).set_s(boundary_points.at(0).s() -
+                                      follow_distance);
+          boundary_points.at(1).set_s(boundary_points.at(1).s() -
+                                      follow_distance);
+          boundary_points.at(3).set_t(-1.0);
+          b_type = STGraphBoundary::BoundaryType::FOLLOW;
+        } else if (obj_decision.has_yield()) {
+          const double dis = std::fabs(obj_decision.yield().distance_s());
+          // TODO: remove the arbitrary numbers in this part.
+          if (boundary_points.at(0).s() - dis < 0.0) {
+            boundary_points.at(0).set_s(
+                std::fmax(boundary_points.at(0).s() - 2.0, 0.0));
+          } else {
+            boundary_points.at(0).set_s(
+                std::fmax(boundary_points.at(0).s() - dis, 0.0));
+          }
+          if (boundary_points.at(1).s() - dis < 0.0) {
+            boundary_points.at(1).set_s(
+                std::fmax(boundary_points.at(0).s() - 4.0, 0.0));
+          } else {
+            boundary_points.at(1).set_s(
+                std::fmax(boundary_points.at(0).s() - dis, 0.0));
+          }
+          b_type = STGraphBoundary::BoundaryType::YIELD;
+        } else if (obj_decision.has_overtake()) {
+          const double dis = std::fabs(obj_decision.overtake().distance_s());
+          boundary_points.at(2).set_s(boundary_points.at(2).s() + dis);
+          boundary_points.at(3).set_s(boundary_points.at(3).s() + dis);
+        }
+
+        const double area = get_area(boundary_points);
+        if (Double::compare(area, 0.0) > 0) {
+          boundary->emplace_back(boundary_points);
+          boundary->back().set_boundary_type(b_type);
+          skip = false;
+        }
+      }
     }
   }
-
-  return ErrorCode::PLANNING_OK;
+  return skip ? ErrorCode::PLANNING_SKIP : ErrorCode::PLANNING_OK;
 }
 
 ErrorCode QPSplineSTBoundaryMapper::map_obstacle_without_trajectory(
