@@ -56,6 +56,11 @@ class PoseContainer : public Container {
    */
   apollo::perception::PerceptionObstacle* ToPerceptionObstacle();
 
+  /**
+   * @brief Get timestamp
+   */
+  double GetTimestamp();
+
  private:
   void Update(const localization::LocalizationEstimate &localization);
 
