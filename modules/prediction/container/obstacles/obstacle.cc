@@ -112,8 +112,20 @@ size_t Obstacle::history_size() const {
 
 const KalmanFilter<double, 4, 2, 0>& Obstacle::kf_lane_tracker(
     const std::string& lane_id) {
+  std::lock_guard<std::mutex> lock(mutex_);
   CHECK(kf_lane_trackers_.find(lane_id) != kf_lane_trackers_.end());
   return kf_lane_trackers_[lane_id];
+}
+
+bool Obstacle::IsOnLane() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (feature_history_.size() > 0) {
+    if (feature_history_.front().has_lane() &&
+        feature_history_.front().lane().has_lane_feature()) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,

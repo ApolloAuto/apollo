@@ -45,9 +45,15 @@ void PredictorManager::Run(
   for (const auto& perception_obstacle :
       perception_obstacles.perception_obstacle()) {
     int id = perception_obstacle.id();
+    Obstacle* obstacle = container->GetObstacle(id);
+    CHECK_NOTNULL(obstacle);
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
-        predictor = GetPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
+        if (obstacle->IsOnLane()) {
+          predictor = GetPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
+        } else {
+          predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+        }
         break;
       }
       case PerceptionObstacle::PEDESTRIAN: {
@@ -60,7 +66,6 @@ void PredictorManager::Run(
       }
     }
     if (predictor != nullptr) {
-      Obstacle* obstacle = container->GetObstacle(id);
       predictor->Predict(obstacle);
       PredictionObstacle prediction_obstacle;
       prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
