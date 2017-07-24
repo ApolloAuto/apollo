@@ -32,32 +32,32 @@ namespace planning {
 class GraphEdge {
  public:
   GraphEdge();
-  explicit GraphEdge(const size_t from_vertex,
-                     const size_t to_vertex,
-                     const size_t level);
+  explicit GraphEdge(const uint32_t from_vertex,
+                     const uint32_t to_vertex,
+                     const uint32_t level);
   ~GraphEdge() = default;
 
-  void set_from_vertex(const size_t index);
-  void set_to_vertex(const size_t index);
-  void set_level(const size_t level);
+  void set_from_vertex(const uint32_t index);
+  void set_to_vertex(const uint32_t index);
+  void set_level(const uint32_t level);
   void set_path(const std::vector<common::FrenetFramePoint> &path);
   void set_poly_path(const QuinticPolynomialCurve1d &ploy_path);
-  void set_edge_index(const size_t index);
+  void set_edge_index(const uint32_t index);
   void set_cost(const double cost);
 
-  size_t from_vertex() const;
-  size_t to_vertex() const;
-  size_t level() const;
+  uint32_t from_vertex() const;
+  uint32_t to_vertex() const;
+  uint32_t level() const;
   const std::vector<common::FrenetFramePoint> &path() const;
   const QuinticPolynomialCurve1d &poly_path() const;
-  size_t edge_index() const;
+  uint32_t edge_index() const;
   double cost() const;
 
  private:
-  size_t _edge_index;
-  size_t _from_vertex;
-  size_t _to_vertex;
-  size_t _level;
+  uint32_t _edge_index;
+  uint32_t _from_vertex;
+  uint32_t _to_vertex;
+  uint32_t _level;
   double _cost;
   std::vector<common::FrenetFramePoint> _path;
   QuinticPolynomialCurve1d _poly_path;

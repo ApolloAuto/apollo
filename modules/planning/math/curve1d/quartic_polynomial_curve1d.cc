@@ -50,7 +50,7 @@ QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(
   coef_ = other.coef_;
 }
 
-double QuarticPolynomialCurve1d::evaluate(const std::size_t order,
+double QuarticPolynomialCurve1d::evaluate(const std::uint32_t order,
                                           const double p) const {
   switch (order) {
     case 0: {
@@ -103,7 +103,7 @@ void QuarticPolynomialCurve1d::compute_coefficients(
 
 std::string QuarticPolynomialCurve1d::to_string() const {
   std::string s = "";
-  for (size_t i = 0; i < coef_.size(); ++i) {
+  for (uint32_t i = 0; i < coef_.size(); ++i) {
     s += std::to_string(coef_[i]) + "\t";
   }
   s += std::to_string(param_);

@@ -24,7 +24,7 @@
 
 namespace apollo {
 namespace planning {
-Spline2dSeg::Spline2dSeg(const std::size_t order)
+Spline2dSeg::Spline2dSeg(const std::uint32_t order)
     : spline_func_x_(order), spline_func_y_(order) {
   derivative_x_.derived_from(spline_func_x_);
   derivative_y_.derived_from(spline_func_y_);

@@ -28,7 +28,7 @@ namespace planning {
 using apollo::common::PathPoint;
 
 SpiralCurve::SpiralCurve(const common::PathPoint& s, const common::PathPoint& e,
-                         const std::size_t order)
+                         const std::uint32_t order)
     : p_params_(order + 1, 0.0),
       sg_(0.0),
       error_(std::numeric_limits<double>::infinity()) {

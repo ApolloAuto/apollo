@@ -61,7 +61,7 @@ ErrorCode DPSTBoundaryMapper::get_graph_boundary(
   const std::vector<const Obstacle*>& dynamic_obs_vec =
       decision_data.DynamicObstacles();
 
-  for (std::size_t i = 0; i < static_obs_vec.size(); ++i) {
+  for (std::uint32_t i = 0; i < static_obs_vec.size(); ++i) {
     if (static_obs_vec[i] == nullptr) {
       continue;
     }
@@ -74,7 +74,7 @@ ErrorCode DPSTBoundaryMapper::get_graph_boundary(
     }
   }
 
-  for (std::size_t i = 0; i < dynamic_obs_vec.size(); ++i) {
+  for (std::uint32_t i = 0; i < dynamic_obs_vec.size(); ++i) {
     if (dynamic_obs_vec[i] == nullptr) {
       continue;
     }
@@ -98,10 +98,10 @@ ErrorCode DPSTBoundaryMapper::map_obstacle_with_trajectory(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
   const std::vector<PathPoint>& veh_path = path_data.path().path_points();
-  for (std::size_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
+  for (std::uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
     PredictionTrajectory pred_traj = obstacle.prediction_trajectories()[i];
     bool skip = true;
-    for (std::size_t j = 0; j < pred_traj.num_of_points(); ++j) {
+    for (std::uint32_t j = 0; j < pred_traj.num_of_points(); ++j) {
       TrajectoryPoint cur_obs_point = pred_traj.trajectory_point_at(j);
       // construct bounding box
       ::apollo::common::math::Box2d obs_box({cur_obs_point.path_point().x(),
@@ -116,8 +116,8 @@ ErrorCode DPSTBoundaryMapper::map_obstacle_with_trajectory(
         return ErrorCode::PLANNING_OK;
       }
 
-      std::size_t low_index = 0;
-      std::size_t high_index = veh_path.size() - 1;
+      std::uint32_t low_index = 0;
+      std::uint32_t high_index = veh_path.size() - 1;
       bool find_low = false;
       bool find_high = false;
 
@@ -186,8 +186,8 @@ ErrorCode DPSTBoundaryMapper::map_obstacle_without_trajectory(
     return ErrorCode::PLANNING_ERROR_FAILED;
   }
 
-  std::size_t low_index = 0;
-  std::size_t high_index = veh_path.size() - 1;
+  std::uint32_t low_index = 0;
+  std::uint32_t high_index = veh_path.size() - 1;
   bool find_low = false;
   bool find_high = false;
 

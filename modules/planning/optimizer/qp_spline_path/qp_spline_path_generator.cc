@@ -105,7 +105,7 @@ bool QPSplinePathGenerator::generate(const ReferenceLine& reference_line,
 
   double x_diff = xy_point.x() - init_point.path_point().x();
   double y_diff = xy_point.y() - init_point.path_point().y();
-  for (std::size_t i = 0; i <= _qp_spline_path_config.num_output(); ++i) {
+  for (std::uint32_t i = 0; i <= _qp_spline_path_config.num_output(); ++i) {
     double s = _init_point.s() + s_resolution * i;
     double l = spline(s);
     double dl = spline.derivative(s);
@@ -195,7 +195,7 @@ bool QPSplinePathGenerator::init_coord_range(double* const start_s,
 bool QPSplinePathGenerator::init_smoothing_spline(
     const ReferenceLine& reference_line, const double start_s,
     const double end_s) {
-  std::size_t num_knots = _qp_spline_path_config.number_of_spline();
+  std::uint32_t num_knots = _qp_spline_path_config.number_of_spline();
   QPSplinePathSimpleSampler simple_sampler;
 
   // TODO refine here, add end_s tolorence here
@@ -249,7 +249,7 @@ bool QPSplinePathGenerator::setup_constraint() {
     return false;
   }
 
-  std::size_t num_fx_bound =
+  std::uint32_t num_fx_bound =
       _qp_spline_path_config.number_of_fx_constraint_knots();
   std::vector<double> boundary_low;
   std::vector<double> boundary_high;
@@ -258,7 +258,7 @@ bool QPSplinePathGenerator::setup_constraint() {
   if (num_fx_bound > 1) {
     double ds = (sampling_knots.back() - sampling_knots.front()) / num_fx_bound;
 
-    for (std::size_t i = 0; i < num_fx_bound + 1; ++i) {
+    for (std::uint32_t i = 0; i < num_fx_bound + 1; ++i) {
       double s = sampling_knots.front() + i * ds;
       fx_knots.push_back(s);
       std::pair<double, double> boundary = std::make_pair(0.0, 0.0);

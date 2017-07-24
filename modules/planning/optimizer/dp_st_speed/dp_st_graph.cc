@@ -72,13 +72,13 @@ ErrorCode DPSTGraph::search(const STGraphData& st_graph_data,
 }
 
 ErrorCode DPSTGraph::init_cost_table() {
-  std::size_t dim_s = _dp_st_configuration.matrix_dimension_s();
-  std::size_t dim_t = _dp_st_configuration.matrix_dimension_t();
+  std::uint32_t dim_s = _dp_st_configuration.matrix_dimension_s();
+  std::uint32_t dim_t = _dp_st_configuration.matrix_dimension_t();
 
   if (Double::compare(_dp_st_configuration.total_path_length(), 0.0) == 0) {
     _unit_s = 1e-8;
-    std::size_t dim_s = std::min(
-        dim_s, static_cast<std::size_t>(
+    std::uint32_t dim_s = std::min(
+        dim_s, static_cast<std::uint32_t>(
                    _dp_st_configuration.total_path_length() / _unit_s) +
                    1);
   } else {
@@ -90,8 +90,8 @@ ErrorCode DPSTGraph::init_cost_table() {
   _cost_table = std::vector<std::vector<STGraphPoint>>(
       dim_t, std::vector<STGraphPoint>(dim_s, STGraphPoint()));
 
-  for (std::size_t i = 0; i < _cost_table.size(); ++i) {
-    for (std::size_t j = 0; j < _cost_table[i].size(); ++j) {
+  for (std::uint32_t i = 0; i < _cost_table.size(); ++i) {
+    for (std::uint32_t j = 0; j < _cost_table[i].size(); ++j) {
       STPoint st_point;
       st_point.set_s(_unit_s * j);
       st_point.set_t(_unit_t * i);
@@ -106,13 +106,13 @@ ErrorCode DPSTGraph::calculate_pointwise_cost(
     const std::vector<STGraphBoundary>& boundaries) {
   // TODO: extract reference line from decision first
   std::vector<STPoint> reference_points;
-  for (std::size_t i = 0; i < _cost_table.size(); ++i) {
+  for (std::uint32_t i = 0; i < _cost_table.size(); ++i) {
     reference_points.emplace_back(
         _unit_t * i * _dp_st_configuration.max_speed(), _unit_t * i);
   }
 
-  for (std::size_t i = 0; i < _cost_table.size(); ++i) {
-    for (std::size_t j = 0; j < _cost_table[i].size(); ++j) {
+  for (std::uint32_t i = 0; i < _cost_table.size(); ++i) {
+    for (std::uint32_t j = 0; j < _cost_table[i].size(); ++j) {
       double ref_cost = _dp_st_cost.reference_cost(_cost_table[i][j].point(),
                                                    reference_points[i]);
       double obs_cost =
@@ -128,8 +128,8 @@ ErrorCode DPSTGraph::calculate_pointwise_cost(
 
 ErrorCode DPSTGraph::calculate_total_cost() {
   // time corresponding to row, s corresponding to col
-  for (std::size_t r = 0; r < _cost_table.size(); ++r) {
-    for (std::size_t c = 0; c < _cost_table[r].size(); ++c) {
+  for (std::uint32_t r = 0; r < _cost_table.size(); ++r) {
+    for (std::uint32_t c = 0; c < _cost_table[r].size(); ++c) {
       calculate_total_cost(r, c);
     }
   }
@@ -137,7 +137,7 @@ ErrorCode DPSTGraph::calculate_total_cost() {
   return ErrorCode::PLANNING_OK;
 }
 
-void DPSTGraph::calculate_total_cost(const std::size_t r, const std::size_t c) {
+void DPSTGraph::calculate_total_cost(const std::uint32_t r, const std::uint32_t c) {
   if (r == 0) {
     if (c == 0) {
       _cost_table[r][c].set_total_cost(0.0);
@@ -157,12 +157,12 @@ void DPSTGraph::calculate_total_cost(const std::size_t r, const std::size_t c) {
     return;
   }
 
-  std::size_t max_s_diff = static_cast<std::size_t>(
+  std::uint32_t max_s_diff = static_cast<std::uint32_t>(
       _dp_st_configuration.max_speed() * _unit_t / _unit_s);
-  std::size_t c_low = (max_s_diff < c ? c - max_s_diff : 0);
+  std::uint32_t c_low = (max_s_diff < c ? c - max_s_diff : 0);
 
   if (r == 2) {
-    for (std::size_t c_pre = c_low; c_pre <= c; ++c_pre) {
+    for (std::uint32_t c_pre = c_low; c_pre <= c; ++c_pre) {
       double cost = _cost_table[r][c].obstacle_cost() +
                     _cost_table[r - 1][c_pre].total_cost() +
                     calculate_edge_cost_for_third_row(c, c_pre, speed_limit);
@@ -175,16 +175,16 @@ void DPSTGraph::calculate_total_cost(const std::size_t r, const std::size_t c) {
     return;
   }
 
-  for (std::size_t c_pre = c_low; c_pre <= c; ++c_pre) {
-    std::size_t lower_bound = 0;
-    std::size_t upper_bound = 0;
+  for (std::uint32_t c_pre = c_low; c_pre <= c; ++c_pre) {
+    std::uint32_t lower_bound = 0;
+    std::uint32_t upper_bound = 0;
     if (!feasible_accel_range(static_cast<double>(c_pre),
                               static_cast<double>(c), &lower_bound,
                               &upper_bound)) {
       continue;
     }
 
-    for (std::size_t c_prepre = lower_bound; c_prepre <= upper_bound;
+    for (std::uint32_t c_prepre = lower_bound; c_prepre <= upper_bound;
          ++c_prepre) {
       const STGraphPoint& prepre_graph_point = _cost_table[r - 2][c_prepre];
       if (!prepre_graph_point.pre_point()) {
@@ -210,8 +210,8 @@ void DPSTGraph::calculate_total_cost(const std::size_t r, const std::size_t c) {
 }
 
 bool DPSTGraph::feasible_accel_range(const double c_pre, const double c_cur,
-                                     std::size_t* const lower_bound,
-                                     std::size_t* const upper_bound) const {
+                                     std::uint32_t* const lower_bound,
+                                     std::uint32_t* const upper_bound) const {
   double tcoef = _unit_t * _unit_t / _unit_s;
   // TODO change 4.5 to configurable version
   double lval = std::max(
@@ -223,16 +223,16 @@ bool DPSTGraph::feasible_accel_range(const double c_pre, const double c_cur,
   if (rval < lval) {
     return false;
   }
-  *lower_bound = static_cast<std::size_t>(lval);
-  *upper_bound = static_cast<std::size_t>(rval);
+  *lower_bound = static_cast<std::uint32_t>(lval);
+  *upper_bound = static_cast<std::uint32_t>(rval);
   return true;
 }
 
 ErrorCode DPSTGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
   double min_cost = std::numeric_limits<double>::infinity();
-  std::size_t n = _cost_table.back().size();
+  std::uint32_t n = _cost_table.back().size();
   const STGraphPoint* best_end_point = nullptr;
-  for (std::size_t j = 0; j < n; ++j) {
+  for (std::uint32_t j = 0; j < n; ++j) {
     const STGraphPoint& cur_point = _cost_table.back()[j];
     if (cur_point.total_cost() < min_cost) {
       best_end_point = &cur_point;
@@ -354,7 +354,7 @@ double DPSTGraph::calculate_edge_cost(const STPoint& first,
 }
 
 double DPSTGraph::calculate_edge_cost_for_second_row(
-    const size_t col, const double speed_limit) const {
+    const uint32_t col, const double speed_limit) const {
   double init_speed = _init_point.v();
   double init_acc = _init_point.a();
   const STPoint& pre_point = _cost_table[0][0].point();
@@ -367,7 +367,7 @@ double DPSTGraph::calculate_edge_cost_for_second_row(
 }
 
 double DPSTGraph::calculate_edge_cost_for_third_row(
-    const size_t curr_col, const size_t pre_col,
+    const uint32_t curr_col, const uint32_t pre_col,
     const double speed_limit) const {
   double init_speed = _init_point.v();
   const STPoint& first = _cost_table[0][0].point();

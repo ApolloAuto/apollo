@@ -38,7 +38,7 @@ Spline1dKernel::Spline1dKernel(const Spline1d& spline1d)
 }
 
 Spline1dKernel::Spline1dKernel(const std::vector<double>& x_knots,
-                               const std::size_t spline_order)
+                               const std::uint32_t spline_order)
     : x_knots_(x_knots), spline_order_(spline_order) {
   total_params_ =
       (x_knots.size() > 1 ? (x_knots.size() - 1) * spline_order_ : 0);
@@ -85,7 +85,7 @@ const Eigen::MatrixXd& Spline1dKernel::offset() const { return offset_; }
 
 // build-in kernel methods
 void Spline1dKernel::add_derivative_kernel_matrix(const double weight) {
-  for (std::size_t i = 0; i + 1 < x_knots_.size(); ++i) {
+  for (std::uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
     Eigen::MatrixXd cur_kernel =
         SplineSegKernel::instance()->kernel_derivative(
             spline_order_, x_knots_[i + 1] - x_knots_[i]) *
@@ -96,7 +96,7 @@ void Spline1dKernel::add_derivative_kernel_matrix(const double weight) {
 }
 
 void Spline1dKernel::add_second_order_derivative_matrix(const double weight) {
-  for (std::size_t i = 0; i + 1 < x_knots_.size(); ++i) {
+  for (std::uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
     Eigen::MatrixXd cur_kernel =
         SplineSegKernel::instance()->kernel_second_order_derivative(
             spline_order_, x_knots_[i + 1] - x_knots_[i]) *
@@ -107,7 +107,7 @@ void Spline1dKernel::add_second_order_derivative_matrix(const double weight) {
 }
 
 void Spline1dKernel::add_third_order_derivative_matrix(const double weight) {
-  for (std::size_t i = 0; i + 1 < x_knots_.size(); ++i) {
+  for (std::uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
     Eigen::MatrixXd cur_kernel =
         SplineSegKernel::instance()->kernel_third_order_derivative(
             spline_order_, x_knots_[i + 1] - x_knots_[i]) *
@@ -124,12 +124,12 @@ bool Spline1dKernel::add_reference_line_kernel_matrix(
     return false;
   }
 
-  for (std::size_t i = 0; i < x_coord.size(); ++i) {
+  for (std::uint32_t i = 0; i < x_coord.size(); ++i) {
     double cur_index = find_index(x_coord[i]);
     double cur_rel_x = x_coord[i] - x_knots_[cur_index];
     // update offset
     double offset_coef = -ref_x[i] * weight;
-    for (std::size_t j = 0; j < spline_order_; ++j) {
+    for (std::uint32_t j = 0; j < spline_order_; ++j) {
       offset_(j + cur_index * spline_order_, 0) = offset_coef;
       offset_coef *= cur_rel_x;
     }
@@ -138,13 +138,13 @@ bool Spline1dKernel::add_reference_line_kernel_matrix(
 
     double cur_x = 1.0;
     std::vector<double> power_x;
-    for (std::size_t n = 0; n + 1 < 2 * spline_order_; ++n) {
+    for (std::uint32_t n = 0; n + 1 < 2 * spline_order_; ++n) {
       power_x.emplace_back(cur_x);
       cur_x *= cur_rel_x;
     }
 
-    for (std::size_t r = 0; r < spline_order_; ++r) {
-      for (std::size_t c = 0; c < spline_order_; ++c) {
+    for (std::uint32_t r = 0; r < spline_order_; ++r) {
+      for (std::uint32_t c = 0; c < spline_order_; ++c) {
         ref_kernel(r, c) = power_x[r + c];
       }
     }
@@ -155,18 +155,18 @@ bool Spline1dKernel::add_reference_line_kernel_matrix(
   return true;
 }
 
-std::size_t Spline1dKernel::find_index(const double x) const {
+std::uint32_t Spline1dKernel::find_index(const double x) const {
   auto upper_bound = std::upper_bound(x_knots_.begin() + 1, x_knots_.end(), x);
-  return std::min(x_knots_.size() - 1,
-                  static_cast<std::size_t>(upper_bound - x_knots_.begin())) -
+  return std::min(static_cast<std::uint32_t>(x_knots_.size() - 1),
+                  static_cast<std::uint32_t>(upper_bound - x_knots_.begin())) -
          1;
 }
 
 void Spline1dKernel::add_distance_offset(const double weight) {
-  for (std::size_t i = 1; i < x_knots_.size(); ++i) {
+  for (std::uint32_t i = 1; i < x_knots_.size(); ++i) {
     const double cur_x = x_knots_[i] - x_knots_[i - 1];
     double pw_x = weight;
-    for (std::size_t j = 0; j < spline_order_; ++j) {
+    for (std::uint32_t j = 0; j < spline_order_; ++j) {
       offset_((i - 1) * spline_order_ + j, 0) -= pw_x;
       pw_x *= cur_x;
     }

@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-template<typename T, std::size_t N>
+template<typename T, std::uint32_t N>
 class HermiteSpline {
  public:
   HermiteSpline(std::array<T, (N + 1) / 2> x0, std::array<T, (N + 1) / 2> x1,
@@ -36,7 +36,7 @@ class HermiteSpline {
 
   virtual ~HermiteSpline() = default;
 
-  virtual T evaluate(const std::size_t order, const double z) const;
+  virtual T evaluate(const std::uint32_t order, const double z) const;
 
   // virtual std::array<T, N> evaluate(const double z) const;
  private:
@@ -49,7 +49,7 @@ class HermiteSpline {
   double delta_z_ = 0.0;
 };
 
-template<typename T, std::size_t N>
+template<typename T, std::uint32_t N>
 inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
                                           std::array<T, (N + 1) / 2> x1,
                                           const double z0, const double z1)
@@ -58,8 +58,8 @@ inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
   << "Error: currently we only support cubic and quintic hermite splines!";
 }
 
-template<typename T, std::size_t N>
-inline T HermiteSpline<T, N>::evaluate(const std::size_t order,
+template<typename T, std::uint32_t N>
+inline T HermiteSpline<T, N>::evaluate(const std::uint32_t order,
                                        const double z) const {
   CHECK_LE(_z0, z);
   CHECK_LE(z, _z0 + delta_z_);

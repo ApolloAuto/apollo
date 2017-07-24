@@ -42,11 +42,11 @@ class FrenetFramePath {
 
   const std::vector<common::FrenetFramePoint> &points() const;
 
-  std::size_t num_points() const;
+  std::uint32_t num_points() const;
 
-  const common::FrenetFramePoint &point_at(const std::size_t index) const;
+  const common::FrenetFramePoint &point_at(const std::uint32_t index) const;
 
-  common::FrenetFramePoint &point_at(const std::size_t index);
+  common::FrenetFramePoint &point_at(const std::uint32_t index);
 
  private:
   std::vector<common::FrenetFramePoint> points_;

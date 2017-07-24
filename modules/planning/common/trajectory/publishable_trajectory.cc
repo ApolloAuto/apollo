@@ -36,7 +36,7 @@ PublishableTrajectory::evaluate_linear_approximation_absolute_time(
   return evaluate_linear_approximation(abs_time - _header_time);
 }
 
-std::size_t PublishableTrajectory::query_nearest_point_absolute_time(
+std::uint32_t PublishableTrajectory::query_nearest_point_absolute_time(
     const double abs_time) const {
   return query_nearest_point(abs_time - _header_time);
 }

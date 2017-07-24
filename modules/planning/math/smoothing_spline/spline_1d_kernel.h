@@ -35,7 +35,7 @@ class Spline1dKernel {
  public:
   explicit Spline1dKernel(const Spline1d& spline1d);
   explicit Spline1dKernel(const std::vector<double>& x_knots,
-                          const std::size_t spline_order);
+                          const std::uint32_t spline_order);
 
   // customized input / output method
   void add_regularization(const double regularized_param);
@@ -65,14 +65,14 @@ class Spline1dKernel {
   void add_distance_offset(const double weight);
 
  private:
-  std::size_t find_index(const double x) const;
+  std::uint32_t find_index(const double x) const;
 
  private:
   Eigen::MatrixXd kernel_matrix_;
   Eigen::MatrixXd offset_;
   std::vector<double> x_knots_;
-  std::size_t spline_order_;
-  std::size_t total_params_;
+  std::uint32_t spline_order_;
+  std::uint32_t total_params_;
 };
 
 }  // namespace planning

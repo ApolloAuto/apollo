@@ -36,21 +36,21 @@ class EMPlanningData : public PlanningData {
   EMPlanningData() = default;
   virtual std::string type() const;
 
-  void init(const std::size_t num_iter);
+  void init(const std::uint32_t num_iter);
 
-  std::size_t num_iter() const;
+  std::uint32_t num_iter() const;
 
   // aggregate final result together by some configuration
   bool aggregate(const double time_resolution);
 
-  const PathData& get_path_data_with_index(const std::size_t index) const;
-  const SpeedData& get_speed_data_with_index(const std::size_t index) const;
+  const PathData& get_path_data_with_index(const std::uint32_t index) const;
+  const SpeedData& get_speed_data_with_index(const std::uint32_t index) const;
 
-  PathData* get_mutable_path_data_with_index(const std::size_t index);
-  SpeedData* get_mutable_speed_data_with_index(const std::size_t index);
+  PathData* get_mutable_path_data_with_index(const std::uint32_t index);
+  SpeedData* get_mutable_speed_data_with_index(const std::uint32_t index);
 
  private:
-  std::size_t _num_iter = 0;
+  std::uint32_t _num_iter = 0;
   std::vector<PathData> _path_data_vec;
   std::vector<SpeedData> _speed_data_vec;
 };

@@ -55,7 +55,7 @@ bool SpeedData::get_speed_point_with_time(const double t,
   if (speed_vector_.size() < 2) {
     return false;
   }
-  std::size_t index = find_index(t);
+  std::uint32_t index = find_index(t);
   if (Double::compare(t, speed_vector_[index].t()) < 0 ||
       index + 1 >= speed_vector_.size()) {
     return false;
@@ -84,7 +84,7 @@ double SpeedData::total_time() const {
 std::string SpeedData::DebugString() const {
   std::ostringstream sout;
   sout << "[" << std::endl;
-  for (std::size_t i = 0; i < speed_vector_.size(); ++i) {
+  for (std::uint32_t i = 0; i < speed_vector_.size(); ++i) {
     if (i > 0) {
       sout << "," << std::endl;
     }
@@ -95,12 +95,12 @@ std::string SpeedData::DebugString() const {
   return sout.str();
 }
 
-std::size_t SpeedData::find_index(const double t) const {
+std::uint32_t SpeedData::find_index(const double t) const {
   auto upper_bound = std::upper_bound(speed_vector_.begin() + 1,
                                       speed_vector_.end(), t, speed_time_comp);
   return std::min(
-             speed_vector_.size() - 1,
-             static_cast<std::size_t>(upper_bound - speed_vector_.begin())) -
+             static_cast<std::uint32_t>(speed_vector_.size() - 1),
+             static_cast<std::uint32_t>(upper_bound - speed_vector_.begin())) -
          1;
 }
 

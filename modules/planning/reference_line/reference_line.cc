@@ -84,7 +84,7 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
   if (it_lower == accumulated_s.begin()) {
     return _reference_points.front();
   } else {
-    std::size_t index = (std::size_t)(it_lower - accumulated_s.begin());
+    std::uint32_t index = (std::uint32_t)(it_lower - accumulated_s.begin());
     auto p0 = _reference_points[index - 1];
     auto p1 = _reference_points[index];
 
@@ -125,7 +125,7 @@ ReferencePoint ReferenceLine::get_reference_point(const double x,
   double d_min = func_distance_square(_reference_points.front(), x, y);
   double index_min = 0;
 
-  for (size_t i = 1; i < _reference_points.size(); ++i) {
+  for (uint32_t i = 1; i < _reference_points.size(); ++i) {
     double d_temp = func_distance_square(_reference_points[i], x, y);
     if (d_temp < d_min) {
       d_min = d_temp;
@@ -133,8 +133,8 @@ ReferencePoint ReferenceLine::get_reference_point(const double x,
     }
   }
 
-  size_t index_start = index_min == 0 ? index_min : index_min - 1;
-  size_t index_end =
+  uint32_t index_start = index_min == 0 ? index_min : index_min - 1;
+  uint32_t index_end =
       index_min + 1 == _reference_points.size() ? index_min : index_min + 1;
 
   if (index_start == index_end) return _reference_points[index_start];

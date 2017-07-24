@@ -181,7 +181,7 @@ bool CubicSpiralCurve::calculate_path() {
 }
 
 ErrorCode CubicSpiralCurve::get_path_vec(
-    const std::size_t n, std::vector<common::PathPoint>* path_points) const {
+    const std::uint32_t n, std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   // initialization
@@ -209,7 +209,7 @@ ErrorCode CubicSpiralCurve::get_path_vec(
   // calculate heading kappa along the path
   std::array<double, 4> a_params = SpiralFormula::p_to_a_k3(sg(), p_value);
 
-  for (std::size_t i = 1; i < n; ++i) {
+  for (std::uint32_t i = 1; i < n; ++i) {
     result[i].set_s(s);
     result[i].set_theta(SpiralFormula::theta_func_k3_a(s, a_params) +
                         result[0].theta());
@@ -222,7 +222,7 @@ ErrorCode CubicSpiralCurve::get_path_vec(
   double dx = 0;
   double dy = 0;
 
-  for (std::size_t k = 1; k < n; ++k) {
+  for (std::uint32_t k = 1; k < n; ++k) {
     dx = (dx / k) * (k - 1) +
          (std::cos(std::fmod(result[k].theta(), s_two_pi_)) +
           std::cos(std::fmod(result[k - 1].theta(), s_two_pi_))) /
@@ -247,7 +247,7 @@ ErrorCode CubicSpiralCurve::get_path_vec_with_s(
     return ErrorCode::PLANNING_ERROR;
   }
 
-  const std::size_t n = vec_s.size();
+  const std::uint32_t n = vec_s.size();
   std::vector<common::PathPoint>& result = *path_points;
   result.resize(n);
 
@@ -259,7 +259,7 @@ ErrorCode CubicSpiralCurve::get_path_vec_with_s(
   ref_point.set_s(0.0);
   std::array<double, 4> a_params = SpiralFormula::p_to_a_k3(sg(), p_value);
 
-  for (std::size_t i = 0; i < n; ++i) {
+  for (std::uint32_t i = 0; i < n; ++i) {
     result[i].set_s(vec_s[i]);
     result[i].set_theta(
         planning::SpiralFormula::theta_func_k3_a(vec_s[i], a_params) +
@@ -284,7 +284,7 @@ ErrorCode CubicSpiralCurve::get_path_vec_with_s(
   result[0].set_x(dx + ref_point.x());
   result[0].set_y(dy + ref_point.y());
 
-  for (std::size_t k = 1; k < n; ++k) {
+  for (std::uint32_t k = 1; k < n; ++k) {
     dx += (vec_s[k] - vec_s[k - 1]) *
           (std::cos(std::fmod(result[k - 1].theta(), s_two_pi_)) +
            std::cos(std::fmod(result[k].theta(), s_two_pi_))) /

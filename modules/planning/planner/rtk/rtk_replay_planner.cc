@@ -42,11 +42,11 @@ bool RTKReplayPlanner::MakePlan(
     return false;
   }
 
-  std::size_t matched_index =
+  std::uint32_t matched_index =
       QueryPositionMatchedPoint(start_point, complete_rtk_trajectory_);
 
-  std::size_t forward_buffer = FLAGS_rtk_trajectory_forward;
-  std::size_t end_index =
+  std::uint32_t forward_buffer = FLAGS_rtk_trajectory_forward;
+  std::uint32_t end_index =
       matched_index + forward_buffer >= complete_rtk_trajectory_.size()
           ? complete_rtk_trajectory_.size() - 1
           : matched_index + forward_buffer - 1;
@@ -124,7 +124,7 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string &filename) {
   file_in.close();
 }
 
-std::size_t RTKReplayPlanner::QueryPositionMatchedPoint(
+std::uint32_t RTKReplayPlanner::QueryPositionMatchedPoint(
     const TrajectoryPoint &start_point,
     const std::vector<TrajectoryPoint> &trajectory) const {
   auto func_distance_square = [](const TrajectoryPoint &point, const double x,
@@ -136,8 +136,8 @@ std::size_t RTKReplayPlanner::QueryPositionMatchedPoint(
   double d_min =
       func_distance_square(trajectory.front(), start_point.path_point().x(),
                            start_point.path_point().y());
-  std::size_t index_min = 0;
-  for (std::size_t i = 1; i < trajectory.size(); ++i) {
+  std::uint32_t index_min = 0;
+  for (std::uint32_t i = 1; i < trajectory.size(); ++i) {
     double d_temp =
         func_distance_square(trajectory[i], start_point.path_point().x(),
                              start_point.path_point().y());

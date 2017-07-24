@@ -37,7 +37,7 @@ class Spline1dConstraint {
  public:
   explicit Spline1dConstraint(const Spline1d& pss);
   Spline1dConstraint(const std::vector<double>& x_knots,
-                     const std::size_t order);
+                     const std::uint32_t order);
 
   // direct methods
   bool add_inequality_constraint(const Eigen::MatrixXd& constraint_matrix,
@@ -110,7 +110,7 @@ class Spline1dConstraint {
   const AffineConstraint& equality_constraint() const;
 
  private:
-  std::size_t find_index(const double x) const;
+  std::uint32_t find_index(const double x) const;
 
   bool filter_constraints(const std::vector<double>& x_coord,
                           const std::vector<double>& lower_bound,
@@ -119,14 +119,14 @@ class Spline1dConstraint {
                           std::vector<double>* const filtered_lower_bound,
                           std::vector<double>* const filtered_upper_bound_x,
                           std::vector<double>* const filtered_upper_bound);
-  void generate_power_x(const double x, const std::size_t order,
+  void generate_power_x(const double x, const std::uint32_t order,
                         std::vector<double>* const power_x) const;
 
  private:
   AffineConstraint inequality_constraint_;
   AffineConstraint equality_constraint_;
   std::vector<double> x_knots_;
-  std::size_t spline_order_;
+  std::uint32_t spline_order_;
 };
 
 }  // namespace planning

@@ -31,7 +31,7 @@ class QPSplinePathSampler {
  public:
   virtual bool sample(const common::FrenetFramePoint& init_point,
                       const ReferenceLine& reference_line,
-                      const std::size_t num_of_sampling_point,
+                      const std::uint32_t num_of_sampling_point,
                       const double s_lower_bound, const double s_upper_bound,
                       std::vector<double>* const sampling_point) = 0;
 };
