@@ -37,23 +37,22 @@ namespace planning {
 class ReferenceLineDecider {
  public:
   ReferenceLineDecider();
-  apollo::common::ErrorCode init(const DataCenter& data_center);
+  common::ErrorCode init(const DataCenter& data_center);
   bool has_next() const;
   std::unique_ptr<ReferenceLine> next_reference_line();
   std::uint32_t num_of_reference_lines() const;
 
  private:
-  apollo::common::ErrorCode build_reference_lines(
-      const DataCenter& data_center,
-      const apollo::hdmap::RoutingResult& routing);
+  common::ErrorCode build_reference_lines(const DataCenter& data_center,
+                                          const hdmap::RoutingResult& routing);
 
-  double _last_route_timestamp = 0.0;
-  int64_t _last_route_sequence_num = -1;
-  std::uint32_t _current_route_index = 0;
-  double _current_s = 0.0;
-  std::vector<ReferenceLine> _route_reference_lines;
-  std::list<std::unique_ptr<ReferenceLine>> _reference_lines;
-  std::list<std::unique_ptr<ReferenceLine>>::iterator _it;
+  double last_route_timestamp_ = 0.0;
+  int64_t last_route_sequence_num_ = -1;
+  std::uint32_t current_route_index_ = 0;
+  double current_s_ = 0.0;
+  std::vector<ReferenceLine> route_reference_lines_;
+  std::list<std::unique_ptr<ReferenceLine>> reference_lines_;
+  std::list<std::unique_ptr<ReferenceLine>>::iterator it_;
 };
 
 }  // namespace planning

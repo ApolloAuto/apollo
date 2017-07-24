@@ -26,20 +26,24 @@
 namespace apollo {
 namespace planning {
 
-class ReferencePoint : public ::apollo::hdmap::PathPoint {
+class ReferencePoint : public hdmap::PathPoint {
  public:
   ReferencePoint() = default;
 
-  ReferencePoint(const ::apollo::common::math::Vec2d& point,
-                 const double heading, const double kappa, const double dkappa,
+  ReferencePoint(const common::math::Vec2d& point, const double heading,
+                 const double kappa, const double dkappa,
                  const double lower_bound, const double upper_bound);
 
-  ReferencePoint(const apollo::common::math::Vec2d& point, const double heading,
-                 const ::apollo::hdmap::LaneWaypoint lane_waypoint);
+  ReferencePoint(const common::math::Vec2d& point, const double heading,
+                 const hdmap::LaneWaypoint lane_waypoint);
 
-  ReferencePoint(const apollo::common::math::Vec2d& point, const double heading,
+  ReferencePoint(const common::math::Vec2d& point, const double heading,
                  const double kappa, const double dkappa,
-                 const ::apollo::hdmap::LaneWaypoint lane_waypoint);
+                 const hdmap::LaneWaypoint lane_waypoint);
+
+  ReferencePoint(const common::math::Vec2d& point, const double heading,
+                 const double kappa, const double dkappa,
+                 const std::vector<hdmap::LaneWaypoint>& lane_waypoints);
 
   void set_kappa(const double kappa);
   void set_dkappa(const double dkappa);
@@ -53,11 +57,11 @@ class ReferencePoint : public ::apollo::hdmap::PathPoint {
   double upper_bound() const;
 
  private:
-  double _kappa = 0.0;
-  double _dkappa = 0.0;
+  double kappa_ = 0.0;
+  double dkappa_ = 0.0;
   // boundary relative to the reference point
-  double _lower_bound = 0.0;
-  double _upper_bound = 0.0;
+  double lower_bound_ = 0.0;
+  double upper_bound_ = 0.0;
 };
 
 }  // namespace planning
