@@ -65,7 +65,7 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
   }
   std::vector<uint32_t> min_cost_edges;
   if (!find_best_trajectory(reference_line, *decision_data, &min_cost_edges)
-      .ok()) {
+           .ok()) {
     const std::string msg = "Fail to find best trajectory!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
@@ -99,7 +99,7 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
   // convert frenet path to path by reference line
   std::vector<::apollo::common::PathPoint> path_points;
   for (const common::FrenetFramePoint &frenet_point : frenet_path) {
-    Eigen::Vector2d xy_point;
+    common::math::Vec2d xy_point;
     common::SLPoint sl_point;
     sl_point.set_s(frenet_point.s());
     sl_point.set_l(frenet_point.l());
@@ -124,8 +124,8 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
 
     ::apollo::common::PathPoint
         path_point;  // (xy_point, theta, kappa, 0.0, 0.0, 0.0);
-    path_point.set_x(xy_point[0]);
-    path_point.set_y(xy_point[1]);
+    path_point.set_x(xy_point.x());
+    path_point.set_y(xy_point.y());
     path_point.set_theta(theta);
     path_point.set_dkappa(0.0);
     path_point.set_ddkappa(0.0);
@@ -133,9 +133,9 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
     path_point.set_z(0.0);
 
     if (path_points.size() != 0) {
-      Eigen::Vector2d last(path_points.back().x(), path_points.back().y());
-      Eigen::Vector2d current(path_point.x(), path_point.y());
-      double distance = (last - current).norm();
+      common::math::Vec2d last(path_points.back().x(), path_points.back().y());
+      common::math::Vec2d current(path_point.x(), path_point.y());
+      double distance = (last - current).Length();
       path_point.set_s(path_points.back().s() + distance);
     }
     path_points.push_back(std::move(path_point));
@@ -147,8 +147,8 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
 Status DpRoadGraph::init(const ReferenceLine &reference_line) {
   _vertices.clear();
   _edges.clear();
-  Eigen::Vector2d xy_point(_init_point.path_point().x(),
-                           _init_point.path_point().y());
+  common::math::Vec2d xy_point(_init_point.path_point().x(),
+                               _init_point.path_point().y());
 
   if (!reference_line.get_point_in_Frenet_frame(xy_point, &_init_sl_point)) {
     const std::string msg = "Fail to map init point to sl coordinate!";
@@ -183,7 +183,7 @@ Status DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {
   std::vector<std::vector<common::SLPoint>> points;
   PathSampler path_sampler(_config);
   if (!path_sampler.sample(reference_line, _init_point, _init_sl_point, &points)
-      .ok()) {
+           .ok()) {
     const std::string msg = "Fail to sampling point with path sampler!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
@@ -204,8 +204,8 @@ Status DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {
       for (int n = 0; n < vertex_num_previous_level; ++n) {
         const uint32_t index_start = accumulated_prev_level_size + n;
         const uint32_t index_end = accumulated_prev_level_size +
-                                 vertex_num_previous_level +
-                                 vertex_num_current_level;
+                                   vertex_num_previous_level +
+                                   vertex_num_current_level;
         if (connect_vertex(index_start, index_end)) {
           is_connected = true;
         }

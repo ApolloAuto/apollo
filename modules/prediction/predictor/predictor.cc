@@ -16,6 +16,8 @@
 
 #include "modules/prediction/predictor/predictor.h"
 
+#include <vector>
+
 namespace apollo {
 namespace prediction {
 
@@ -28,8 +30,8 @@ int Predictor::GetTrajectorySize() {
 }
 
 void Predictor::GenerateTrajectory(
-      const std::vector<::apollo::common::TrajectoryPoint>& points,
-      Trajectory *trajectory) {
+    const std::vector<::apollo::common::TrajectoryPoint>& points,
+    Trajectory* trajectory) {
   if (points.size() <= 0) {
     return;
   }
@@ -42,7 +44,7 @@ void Predictor::GenerateTrajectory(
 void Predictor::SetEqualProbability(double probability, int start_index) {
   int num = GetTrajectorySize();
   if (start_index >= 0 && num > 0 && num > start_index) {
-    probability = probability / (double(num - start_index));
+    probability = probability / static_cast<double>(num - start_index);
     for (int i = start_index; i < num; ++i) {
       prediction_obstacle_.mutable_trajectory(i)->set_probability(probability);
     }

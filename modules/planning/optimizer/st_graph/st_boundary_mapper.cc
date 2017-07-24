@@ -22,6 +22,7 @@
 
 #include <limits>
 #include <memory>
+#include <string>
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
@@ -98,7 +99,7 @@ Status STBoundaryMapper::get_speed_limits(
   }
 
   std::vector<double> speed_limits;
-  // TODO: waiting for hdmap to support is_on_lane.
+  // TODO(zhangliangliang): waiting for hdmap to support is_on_lane.
   // for (const auto& point : path_data.path().path_points()) {
   //   speed_limits.push_back(_st_boundary_config.maximal_speed());
   //   for (auto& lane : lanes) {

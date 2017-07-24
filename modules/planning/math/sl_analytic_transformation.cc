@@ -51,11 +51,11 @@ double SLAnalyticTransformation::calculate_kappa(const double kappa_ref,
   return numerator / denominator;
 }
 
-Eigen::Vector2d SLAnalyticTransformation::calculate_xypoint(
-    const double theta, const Eigen::Vector2d& point_ref, const double l) {
+common::math::Vec2d SLAnalyticTransformation::calculate_xypoint(
+    const double theta, const common::math::Vec2d& point_ref, const double l) {
   double x = point_ref.x() - l * std::sin(theta);
   double y = point_ref.y() + l * std::cos(theta);
-  Eigen::Vector2d result{x, y};
+  common::math::Vec2d result{x, y};
   return result;
 }
 

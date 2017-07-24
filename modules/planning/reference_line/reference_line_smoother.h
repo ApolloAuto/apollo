@@ -21,7 +21,10 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_SMOOTHER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_SMOOTHER_H_
 
+#include <memory>
+#include <string>
 #include <vector>
+
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
@@ -33,10 +36,11 @@ namespace planning {
 
 class ReferenceLineSmoother {
  public:
-  ReferenceLineSmoother(
-      const ReferenceLineSmootherConfig& refline_smooth_config) noexcept;
+  ReferenceLineSmoother() = default;
+  bool SetConfig(const std::string& config_file);
+  void SetConfig(const ReferenceLineSmootherConfig& refline_smooth_config);
   bool smooth(const ReferenceLine& raw_reference_line,
-              const Eigen::Vector2d& vehicle_position,
+              const common::math::Vec2d& vehicle_position,
               std::vector<ReferencePoint>* const smoothed_ref_line);
 
  private:

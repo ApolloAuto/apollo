@@ -21,7 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_TRAJECTORY_DISCRETIZED_TRAJECTORY_H
 #define MODULES_PLANNING_COMMON_TRAJECTORY_DISCRETIZED_TRAJECTORY_H
 
-#include "Eigen/Core"
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/common/trajectory/trajectory.h"
 
 namespace apollo {
@@ -50,7 +50,8 @@ class DiscretizedTrajectory : public Trajectory {
 
   virtual uint32_t query_nearest_point(const double relative_time) const;
 
-  virtual uint32_t query_nearest_point(const Eigen::Vector2d& position) const;
+  virtual uint32_t query_nearest_point(
+      const common::math::Vec2d& position) const;
 
   virtual void add_trajectory_point(
       const apollo::common::TrajectoryPoint& trajectory_point);
