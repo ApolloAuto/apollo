@@ -38,7 +38,6 @@ class QPSplineSTBoundaryMapper : public STBoundaryMapper {
       const STBoundaryConfig& st_boundary_config,
       const apollo::common::config::VehicleParam& veh_param);
 
-  // TODO: combine two interfaces together to provide a st graph data type
   virtual common::ErrorCode get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
@@ -46,13 +45,20 @@ class QPSplineSTBoundaryMapper : public STBoundaryMapper {
       std::vector<STGraphBoundary>* const boundary) const override;
 
  private:
-  common::ErrorCode map_obstacle_with_trajectory(
+  common::ErrorCode map_obstacle_with_planning(
+      const common::TrajectoryPoint& initial_planning_point,
+      const Obstacle& obstacle, const PathData& path_data,
+      const double planning_distance, const double planning_time,
+      std::vector<STGraphBoundary>* const boundary) const;
+
+  common::ErrorCode map_obstacle_with_prediction_trajectory(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const;
 
   common::ErrorCode map_obstacle_without_trajectory(
+      const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const;
