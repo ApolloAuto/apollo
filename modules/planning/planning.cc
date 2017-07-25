@@ -62,7 +62,7 @@ Status Planning::Init() {
         "planning is not initialized with config : " + config_.DebugString());
   }
 
-  return Status::OK();
+  return planner_->Init(config_);
 }
 
 Status Planning::Start() {
