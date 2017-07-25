@@ -49,6 +49,14 @@ PlanningData *Frame::mutable_planning_data() {
   return _planning_data.get();
 }
 
+void Frame::set_computed_trajectory(const PublishableTrajectory &trajectory) {
+  _computed_trajectory = trajectory;
+}
+
+const PublishableTrajectory &Frame::computed_trajectory() const {
+  return _computed_trajectory;
+}
+
 std::string Frame::DebugString() const { return std::to_string(_sequence_num); }
 
 }  // namespace planning
