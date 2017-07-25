@@ -35,10 +35,11 @@ using apollo::common::Status;
 DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
     : PathOptimizer(name) {}
 
-Status DpPolyPathOptimizer::Process(
-    const SpeedData &speed_data, const ReferenceLine &reference_line,
-    const ::apollo::planning::TrajectoryPoint &init_point,
-    DecisionData *const decision_data, PathData *const path_data) {
+Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
+                                    const ReferenceLine &reference_line,
+                                    const common::TrajectoryPoint &init_point,
+                                    DecisionData *const decision_data,
+                                    PathData *const path_data) {
   CHECK_NOTNULL(decision_data);
   CHECK_NOTNULL(path_data);
   if (!common::util::GetProtoFromFile(FLAGS_dp_poly_path_config_file,
