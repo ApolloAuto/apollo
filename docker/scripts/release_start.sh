@@ -82,9 +82,6 @@ function main() {
         sudo mknod --mode=a+rw /dev/can0 c 52 0
     fi
 
-    # enable coredump
-    echo "${APOLLO_ROOT_DIR}/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
-
     local devices=""
     devices="${devices} $(find_device ttyUSB*)"
     devices="${devices} $(find_device ttyS*)"
