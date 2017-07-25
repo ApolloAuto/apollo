@@ -24,19 +24,9 @@ namespace apollo {
 namespace common {
 namespace vehicle_state {
 
-VehicleState::VehicleState(
-    const localization::LocalizationEstimate &localization) {
-  ConstructExceptLinearVelocity(&localization);
-  if (localization.has_pose() && localization.pose().has_linear_velocity()) {
-    double linear_v_x = localization.pose().linear_velocity().x();
-    double linear_v_y = localization.pose().linear_velocity().y();
-    double linear_v_z = localization.pose().linear_velocity().z();
-    linear_v_ = std::hypot(std::hypot(linear_v_x, linear_v_y), linear_v_z);
-  }
-  gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
-}
+VehicleState::VehicleState() {}
 
-VehicleState::VehicleState(
+void VehicleState::Update(
     const localization::LocalizationEstimate *localization,
     const canbus::Chassis *chassis) {
   ConstructExceptLinearVelocity(localization);

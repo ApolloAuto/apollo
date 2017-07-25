@@ -15,12 +15,15 @@
  *****************************************************************************/
 
 #include "modules/planning/planning.h"
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning.pb.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+#include "modules/planning/proto/planning.pb.h"
+
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -39,18 +42,17 @@ class PlanningTest : public ::testing::Test {
 TEST_F(PlanningTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
   Planning planning;
-  common::vehicle_state::VehicleState vehicle_state;
-  vehicle_state.set_x(586385.782841);
-  vehicle_state.set_y(4140674.76065);
+  common::vehicle_state::VehicleState::instance()->set_x(586385.782841);
+  common::vehicle_state::VehicleState::instance()->set_y(4140674.76065);
 
-  vehicle_state.set_heading(2.836888814);
-  vehicle_state.set_linear_velocity(0.15);
-  vehicle_state.set_angular_velocity(0.0);
+  common::vehicle_state::VehicleState::instance()->set_heading(2.836888814);
+  common::vehicle_state::VehicleState::instance()->set_linear_velocity(0.15);
+  common::vehicle_state::VehicleState::instance()->set_angular_velocity(0.0);
 
   std::vector<TrajectoryPoint> trajectory1;
   double time1 = 0.1;
   planning.Init();
-  planning.Plan(vehicle_state, false, time1, &trajectory1);
+  planning.Plan(false, time1, &trajectory1);
 
   EXPECT_EQ(trajectory1.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward);
   const auto& p1_start = trajectory1.front();
@@ -61,14 +63,14 @@ TEST_F(PlanningTest, ComputeTrajectory) {
 
   std::vector<TrajectoryPoint> trajectory2;
   double time2 = 0.5;
-  planning.Plan(vehicle_state, true, time2, &trajectory2);
+  planning.Plan(true, time2, &trajectory2);
 
   EXPECT_EQ(trajectory2.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward +
                                     (int)FLAGS_rtk_trajectory_backward);
 
-  const auto &p2_backward = trajectory2.front();
-  const auto &p2_start = trajectory2[FLAGS_rtk_trajectory_backward];
-  const auto &p2_end = trajectory2.back();
+  const auto& p2_backward = trajectory2.front();
+  const auto& p2_start = trajectory2[FLAGS_rtk_trajectory_backward];
+  const auto& p2_end = trajectory2.back();
 
   EXPECT_DOUBLE_EQ(p2_backward.path_point().x(), 586385.577255);
   EXPECT_DOUBLE_EQ(p2_start.path_point().x(), 586385.486723);
@@ -86,17 +88,16 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
   Planning planning;
   planning.Init();
 
-  common::vehicle_state::VehicleState vehicle_state;
-  vehicle_state.set_x(586385.782841);
-  vehicle_state.set_y(4140674.76065);
+  common::vehicle_state::VehicleState::instance()->set_x(586385.782841);
+  common::vehicle_state::VehicleState::instance()->set_y(4140674.76065);
 
-  vehicle_state.set_heading(2.836888814);
-  vehicle_state.set_linear_velocity(0.0);
-  vehicle_state.set_angular_velocity(0.0);
+  common::vehicle_state::VehicleState::instance()->set_heading(2.836888814);
+  common::vehicle_state::VehicleState::instance()->set_linear_velocity(0.0);
+  common::vehicle_state::VehicleState::instance()->set_angular_velocity(0.0);
 
   double time = 0.1;
   std::vector<TrajectoryPoint> trajectory;
-  bool res_planning = planning.Plan(vehicle_state, false, time, &trajectory);
+  bool res_planning = planning.Plan(false, time, &trajectory);
   EXPECT_FALSE(res_planning);
 
   // check Reset runs gracefully.

@@ -122,9 +122,6 @@ class LatController : public Controller {
 
   void CloseLogFile();
 
-  // a proxy to access vehicle movement state
-  ::apollo::common::vehicle_state::VehicleState vehicle_state_;
-
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
 
