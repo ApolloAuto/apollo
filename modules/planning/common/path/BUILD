@@ -68,6 +68,7 @@ cc_library(
     deps = [
         ":discretized_path",
         ":frenet_frame_path",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/math:double",
     ],
 )
