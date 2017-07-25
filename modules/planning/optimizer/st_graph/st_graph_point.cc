@@ -26,44 +26,44 @@ namespace apollo {
 namespace planning {
 
 
-std::uint32_t STGraphPoint::index_s() const { return _index_s; }
+std::uint32_t StGraphPoint::index_s() const { return _index_s; }
 
-std::uint32_t STGraphPoint::index_t() const { return _index_t; }
+std::uint32_t StGraphPoint::index_t() const { return _index_t; }
 
-const STPoint& STGraphPoint::point() const { return _point; }
+const STPoint& StGraphPoint::point() const { return _point; }
 
-const STGraphPoint* STGraphPoint::pre_point() const { return _pre_point; }
+const StGraphPoint* StGraphPoint::pre_point() const { return _pre_point; }
 
-double STGraphPoint::reference_cost() const { return _reference_cost; }
+double StGraphPoint::reference_cost() const { return _reference_cost; }
 
-double STGraphPoint::obstacle_cost() const { return _obstacle_cost; }
+double StGraphPoint::obstacle_cost() const { return _obstacle_cost; }
 
-double STGraphPoint::total_cost() const { return _total_cost; }
+double StGraphPoint::total_cost() const { return _total_cost; }
 
-void STGraphPoint::init(const std::uint32_t index_t, const std::uint32_t index_s,
+void StGraphPoint::init(const std::uint32_t index_t, const std::uint32_t index_s,
                         const STPoint& st_point) {
   _index_t = index_t;
   _index_s = index_s;
   _point = st_point;
 }
 
-void STGraphPoint::set_reference_cost(const double reference_cost) {
+void StGraphPoint::set_reference_cost(const double reference_cost) {
   _reference_cost = reference_cost;
 }
 
-void STGraphPoint::set_obstacle_cost(const double obs_cost) {
+void StGraphPoint::set_obstacle_cost(const double obs_cost) {
   _obstacle_cost = obs_cost;
 }
 
-void STGraphPoint::set_total_cost(const double total_cost) {
+void StGraphPoint::set_total_cost(const double total_cost) {
   _total_cost = total_cost;
 }
 
-void STGraphPoint::set_pre_point(const STGraphPoint& pre_point) {
+void StGraphPoint::set_pre_point(const StGraphPoint& pre_point) {
   _pre_point = &pre_point;
 }
 
-STPoint* STGraphPoint::mutable_point() { return &_point; }
+STPoint* StGraphPoint::mutable_point() { return &_point; }
 
 }  // namespace planning
 }  // namespace apollo

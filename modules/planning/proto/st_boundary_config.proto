@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message STBoundaryConfig {
+message StBoundaryConfig {
   optional double boundary_buffer = 1 [ default = 0.1 ];
   optional double minimal_follow_time = 2 [ default = 3.0 ];
   optional double follow_buffer = 3 [ default = 1.0 ];

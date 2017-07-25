@@ -25,39 +25,39 @@ namespace planning {
 
 using TrajectoryPoint = apollo::common::TrajectoryPoint;
 
-STGraphData::STGraphData(const std::vector<STGraphBoundary>& obs_boundary,
+StGraphData::StGraphData(const std::vector<StGraphBoundary>& obs_boundary,
                          const TrajectoryPoint& init_point,
-                         const double speed_limit,
+                         const SpeedLimit& speed_limit,
                          const double path_data_length)
     : _obs_boundary(obs_boundary),
       _init_point(init_point),
       _speed_limit(speed_limit),
       _path_data_length(path_data_length) {}
 
-const std::vector<STGraphBoundary>& STGraphData::obs_boundary() const {
+const std::vector<StGraphBoundary>& StGraphData::obs_boundary() const {
   return _obs_boundary;
 }
 
-const TrajectoryPoint& STGraphData::init_point() const { return _init_point; }
+const TrajectoryPoint& StGraphData::init_point() const { return _init_point; }
 
-double STGraphData::speed_limit() const { return _speed_limit; }
+const SpeedLimit StGraphData::speed_limit() const { return _speed_limit; }
 
-double STGraphData::path_data_length() const { return _path_data_length; }
+double StGraphData::path_data_length() const { return _path_data_length; }
 
-void STGraphData::set_speed_limit(const double speed_limit) {
+void StGraphData::set_speed_limit(const SpeedLimit& speed_limit) {
   _speed_limit = speed_limit;
 }
 
-void STGraphData::set_obs_boundary(
-    const std::vector<STGraphBoundary>& obs_boundary) {
+void StGraphData::set_obs_boundary(
+    const std::vector<StGraphBoundary>& obs_boundary) {
   _obs_boundary = obs_boundary;
 }
 
-void STGraphData::set_init_point(const TrajectoryPoint& init_point) {
+void StGraphData::set_init_point(const TrajectoryPoint& init_point) {
   _init_point = init_point;
 }
 
-void STGraphData::set_path_data_length(const double path_data_length) {
+void StGraphData::set_path_data_length(const double path_data_length) {
   _path_data_length = path_data_length;
 }
 
