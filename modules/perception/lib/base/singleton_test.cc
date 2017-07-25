@@ -14,43 +14,39 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
+#include "modules/perception/lib/base/singleton.h"
+#include <gtest/gtest.h>
 
-#ifndef MODEULES_PERCEPTION_PERCEPTION_H_
-#define MODEULES_PERCEPTION_PERCEPTION_H_
 
-#include <sensor_msgs/PointCloud2.h>
-#include <string>
-
-#include "modules/common/apollo_app.h"
-#include "modules/common/macro.h"
-#include "modules/perception/obstacle/onboard/lidar_process.h"
-#include "ros/include/ros/ros.h"
-
-/**
- * @namespace apollo::perception
- * @brief apollo::perception
- */
 namespace apollo {
 namespace perception {
 
-class Perception : public apollo::common::ApolloApp {
- public:
-  std::string Name() const override;
-  apollo::common::Status Init() override;
-  apollo::common::Status Start() override;
-  void Stop() override;
+class SingletonClass {
+public:
+    int GetValue() const {
+        return value_;
+    }
 
- private:
-  // Upon receiving point cloud data
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+    void SetValue(int value) {
+        value_ = value;
+    }
 
-  std::unique_ptr<LidarProcess> lidar_process_;
+private:
+    SingletonClass() : value_(0) {}
+    ~SingletonClass() {}
+    friend class Singleton<SingletonClass>;
+
+    int value_;
 };
+
+TEST(SingletonTest, test) {
+    SingletonClass* clas1 = Singleton<SingletonClass>::Get();
+    SingletonClass* clas2 = Singleton<SingletonClass>::Get();
+    EXPECT_EQ(clas1, clas2);
+
+    clas1->SetValue(10);
+    EXPECT_EQ(clas1->GetValue(), clas2->GetValue());
+}
 
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // MODULES_PERCEPTION_PERCEPTION_H_

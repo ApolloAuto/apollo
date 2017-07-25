@@ -15,7 +15,8 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/onboard/lidar_process.h"
- #include <pcl_conversions/pcl_conversions.h>
+#include <eigen_conversions/eigen_msg.h>
+#include <pcl_conversions/pcl_conversions.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
@@ -42,6 +43,8 @@ DEFINE_int32(tf2_buff_in_ms, 10, "the tf2 buff size in ms");
 DEFINE_string(lidar_tf2_frame_id, "world", "the tf2 transform frame id");
 DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
               "the tf2 transform child frame id");
+DEFINE_string(obstacle_module_name, "perception_obstacle",
+              "perception obstacle module name");
 
 using pcl_util::Point;
 using pcl_util::PointD;
@@ -71,20 +74,17 @@ bool LidarProcess::Init() {
   return true;
 }
 
-bool LidarProcess::Process(const sensor_msgs::PointCloud2& message,
-                           std::vector<ObjectPtr>* tracked_objects) {
-  if (!tracked_objects) {
-    AERROR << "tracked_objects can not be NULL.";
-    return false;
-  }
-
+bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
+  objects_.clear();
   const double kTimeStamp = message.header.stamp.toSec();
+  timestamp_ = kTimeStamp;
   seq_num_++;
 
   /// get velodyne2world transfrom
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
     AERROR << "failed to get trans at timestamp: " << kTimeStamp;
+    error_code_ = apollo::common::PERCEPTION_ERROR_TF;
     return false;
   }
 
@@ -112,6 +112,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message,
       pcl::copyPointCloud(*point_cloud, *roi_indices, *roi_cloud);
     } else {
       AERROR << "failed to call roi filter.";
+      error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
@@ -127,6 +128,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message,
     if (!segmentor_->Segment(roi_cloud, non_ground_indices,
                              segmentation_options, &objects)) {
       AERROR << "failed to call segmention.";
+      error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
@@ -136,6 +138,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message,
     ObjectBuilderOptions object_builder_options;
     if (!object_builder_->Build(object_builder_options, &objects)) {
       AERROR << "failed to call object builder.";
+      error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
@@ -145,14 +148,14 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message,
     TrackerOptions tracker_options;
     tracker_options.velodyne_trans = velodyne_trans;
     tracker_options.hdmap = hdmap;
-    if (!tracker_->Track(objects, kTimeStamp, tracker_options,
-                         tracked_objects)) {
+    if (!tracker_->Track(objects, kTimeStamp, tracker_options, &objects_)) {
       AERROR << "failed to call tracker.";
+      error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
 
-  AINFO << "lidar process succ, there are " << tracked_objects->size()
+  AINFO << "lidar process succ, there are " << objects_.size()
         << " tracked objects.";
   return true;
 }
@@ -245,8 +248,8 @@ bool LidarProcess::InitAlgorithmPlugin() {
   return true;
 }
 
-void LidarProcess::TransPointCloudToPCL(
-    const sensor_msgs::PointCloud2& in_msg, PointCloudPtr* out_cloud) {
+void LidarProcess::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
+                                        PointCloudPtr* out_cloud) {
   // transform from ros to pcl
   pcl::PointCloud<pcl_util::PointXYZIT> in_cloud;
   pcl::fromROSMsg(in_msg, in_cloud);
@@ -273,7 +276,6 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
     return false;
   }
 
-  /*
   ros::Time query_stamp(query_time);
   static tf2_ros::Buffer tf2_buffer;
   static tf2_ros::TransformListener tf2Listener(tf2_buffer);
@@ -304,7 +306,31 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
 
   AINFO << "get " << FLAGS_lidar_tf2_frame_id << " to "
         << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
-  */
+  return true;
+}
+
+bool LidarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
+  double publish_time = ros::Time::now().toSec();
+  apollo::common::Header* header = obstacles->mutable_header();
+  header->set_timestamp_sec(publish_time);
+  header->set_module_name(FLAGS_obstacle_module_name);
+  header->set_sequence_num(seq_num_);
+  header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
+  header->set_camera_timestamp(0);
+  header->set_radar_timestamp(0);
+
+  obstacles->set_error_code(error_code_);
+
+  for (const auto& obj : objects_) {
+    PerceptionObstacle* obstacle = obstacles->add_perception_obstacle();
+    if (!obj->serialize(obstacle)) {
+      AERROR << "Failed gen PerceptionObstacle. Object:" << obj->to_string();
+      return false;
+    }
+    obstacle->set_timestamp(obstacle->timestamp() * 1000);
+  }
+
+  ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();
   return true;
 }
 

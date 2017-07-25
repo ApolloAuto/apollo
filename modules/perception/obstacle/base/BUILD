@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/perception/lib/pcl_util:pcl_util",
         "//modules/perception/common:perception_common",
+        "//modules/perception/proto:perception_proto",
         "//modules/common:common",
         "@eigen//:eigen",
     ],
