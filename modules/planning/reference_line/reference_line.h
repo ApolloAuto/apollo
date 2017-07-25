@@ -18,8 +18,8 @@
  * @file reference_line.h
  **/
 
-#ifndef MODULES_PLANNING_MATH_REFERENCE_LINE_H_
-#define MODULES_PLANNING_MATH_REFERENCE_LINE_H_
+#ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_H_
+#define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_H_
 
 #include <string>
 #include <utility>
@@ -41,8 +41,8 @@ class ReferenceLine {
   ReferenceLine(const std::vector<ReferencePoint>& reference_points,
                 const std::vector<hdmap::LaneSegment>& lane_segments,
                 const double max_approximation_error);
-  void move(const ReferenceLine& reference_line);
-  void move(const ReferenceLine&& reference_line);
+  // void move(const ReferenceLine& reference_line);
+  // void move(const ReferenceLine&& reference_line);
   const hdmap::Path& reference_map_line() const;
   const std::vector<ReferencePoint>& reference_points() const;
 
@@ -77,4 +77,4 @@ class ReferenceLine {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_REFERENCE_LINE_H_
+#endif  // MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_H_
