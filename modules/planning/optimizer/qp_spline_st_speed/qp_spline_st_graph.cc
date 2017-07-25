@@ -29,17 +29,18 @@
 namespace apollo {
 namespace planning {
 
-using ErrorCode = apollo::common::ErrorCode;
-using VehicleParam = apollo::common::config::VehicleParam;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::config::VehicleParam;
 
 QPSplineStGraph::QPSplineStGraph(
     const QPSplineStSpeedConfig& qp_spline_st_speed_config,
     const apollo::common::config::VehicleParam& veh_param)
     : _qp_spline_st_speed_config(qp_spline_st_speed_config) {}
 
-ErrorCode QPSplineStGraph::search(const STGraphData& st_graph_data,
-                                  const PathData& path_data,
-                                  SpeedData* const speed_data) {
+Status QPSplineStGraph::search(const STGraphData& st_graph_data,
+                               const PathData& path_data,
+                               SpeedData* const speed_data) {
   _init_point = st_graph_data.init_point();
   if (st_graph_data.path_data_length() <
       _qp_spline_st_speed_config.total_path_length()) {
@@ -61,20 +62,22 @@ ErrorCode QPSplineStGraph::search(const STGraphData& st_graph_data,
   _spline_generator.reset(new Spline1dGenerator(
       t_knots, _qp_spline_st_speed_config.spline_order()));
 
-  if (apply_constraint(st_graph_data.obs_boundary()) !=
-      ErrorCode::PLANNING_OK) {
-    AERROR << "Apply constraint failed!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+  if (!apply_constraint(st_graph_data.obs_boundary()).ok()) {
+    const std::string msg = "Apply constraint failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
-  if (apply_kernel() != ErrorCode::PLANNING_OK) {
-    AERROR << "Apply kernel failed!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+  if (!apply_kernel().ok()) {
+    const std::string msg = "Apply kernel failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
-  if (solve() != ErrorCode::PLANNING_OK) {
-    AERROR << "Solve qp problem failed!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+  if (!solve().ok()) {
+    const std::string msg = "Solve qp problem failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   // extract output
@@ -92,46 +95,52 @@ ErrorCode QPSplineStGraph::search(const STGraphData& st_graph_data,
         util::MakeSpeedPoint(s, time, v, a, da));
   }
 
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
-ErrorCode QPSplineStGraph::apply_constraint(
+Status QPSplineStGraph::apply_constraint(
     const std::vector<STGraphBoundary>& boundaries) {
   Spline1dConstraint* constraint =
       _spline_generator->mutable_spline_constraint();
   // position, velocity, acceleration
   if (!constraint->add_point_fx_constraint(0.0, 0.0)) {
-    AERROR << "add st start point constraint failed";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "add st start point constraint failed";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   if (!constraint->add_point_derivative_constraint(0.0, _init_point.v())) {
-    AERROR << "add st start point velocity constraint failed!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "add st start point velocity constraint failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   if (!constraint->add_point_second_derivative_constraint(0.0,
                                                           _init_point.a())) {
-    AERROR << "add st start point acceleration constraint failed!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "add st start point acceleration constraint failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   if (!constraint->add_point_second_derivative_constraint(
           _spline_generator->spline().x_knots().back(), 0.0)) {
-    AERROR << "add st end point acceleration constraint failed!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "add st end point acceleration constraint failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   // monotone constraint
   if (!constraint->add_monotone_fx_inequality_constraint_at_knots()) {
-    AERROR << "add monotonicity constraint failed!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "add monotonicity constraint failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   // smoothness constraint
   if (!constraint->add_third_derivative_smooth_constraint()) {
-    AERROR << "add smoothness joint constraint failed!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "add smoothness joint constraint failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   // boundary constraint
@@ -155,14 +164,15 @@ ErrorCode QPSplineStGraph::apply_constraint(
   }
   if (!constraint->add_fx_boundary(evaluated_knots, s_lower_bound,
                                    s_upper_bound)) {
-    AERROR << "Fail to apply obstacle constraint";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "Fail to apply obstacle constraint";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
   // TODO: add speed constraint
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
-ErrorCode QPSplineStGraph::apply_kernel() {
+Status QPSplineStGraph::apply_kernel() {
   Spline1dKernel* spline_kernel = _spline_generator->mutable_spline_kernel();
 
   if (_qp_spline_st_speed_config.speed_kernel_weight() > 0) {
@@ -193,15 +203,16 @@ ErrorCode QPSplineStGraph::apply_kernel() {
 
   spline_kernel->add_reference_line_kernel_matrix(t_knots, s_vec, 1);
 
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
-ErrorCode QPSplineStGraph::solve() {
-  return _spline_generator->solve() ? ErrorCode::PLANNING_OK
-                                    : ErrorCode::PLANNING_ERROR_FAILED;
+Status QPSplineStGraph::solve() {
+  return _spline_generator->solve() ?
+      Status::OK() :
+      Status(ErrorCode::PLANNING_ERROR_FAILED, "QPSplineStGraph::solve");
 }
 
-ErrorCode QPSplineStGraph::get_s_constraints_by_time(
+Status QPSplineStGraph::get_s_constraints_by_time(
     const std::vector<STGraphBoundary>& boundaries, const double time,
     const double total_path_s, double* const s_upper_bound,
     double* const s_lower_bound) const {
@@ -225,7 +236,7 @@ ErrorCode QPSplineStGraph::get_s_constraints_by_time(
     }
   }
 
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 }  // namespace planning
 }  // namespace apollo

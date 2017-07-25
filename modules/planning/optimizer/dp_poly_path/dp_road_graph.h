@@ -22,8 +22,9 @@
 #define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H
 
 #include <vector>
-#include "modules/common/proto/error_code.pb.h"
+
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -43,15 +44,15 @@ class DpRoadGraph {
                        const ::apollo::common::TrajectoryPoint &init_point,
                        const SpeedData &speed_data);
   ~DpRoadGraph() = default;
-  ::apollo::common::ErrorCode find_tunnel(const ReferenceLine &reference_line,
-                                          DecisionData *const decision_data,
-                                          PathData *const path_data);
+  ::apollo::common::Status find_tunnel(const ReferenceLine &reference_line,
+                                       DecisionData *const decision_data,
+                                       PathData *const path_data);
 
  private:
-  ::apollo::common::ErrorCode init(const ReferenceLine &reference_line);
-  ::apollo::common::ErrorCode generate_graph(
+  ::apollo::common::Status init(const ReferenceLine &reference_line);
+  ::apollo::common::Status generate_graph(
       const ReferenceLine &reference_line);
-  ::apollo::common::ErrorCode find_best_trajectory(
+  ::apollo::common::Status find_best_trajectory(
       const ReferenceLine &reference_line, const DecisionData &decision_data,
       std::vector<uint32_t> *const min_cost_edges);
   bool add_vertex(const common::SLPoint &sl_point,

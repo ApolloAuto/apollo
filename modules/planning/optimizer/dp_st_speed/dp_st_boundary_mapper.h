@@ -23,7 +23,6 @@
 
 #include <vector>
 
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/optimizer/st_graph/st_boundary_mapper.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
@@ -31,27 +30,25 @@
 namespace apollo {
 namespace planning {
 
-using ErrorCode = apollo::common::ErrorCode;
-
 class DPSTBoundaryMapper : public STBoundaryMapper {
  public:
   DPSTBoundaryMapper(const STBoundaryConfig& st_boundary_config,
                      const ::apollo::common::config::VehicleParam& veh_param);
 
   // TODO: combine two interfaces together to provide a st graph data type
-  common::ErrorCode get_graph_boundary(
+  apollo::common::Status get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
       const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const override;
 
  private:
-  ErrorCode map_obstacle_with_trajectory(
+  apollo::common::Status map_obstacle_with_trajectory(
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const;
 
-  ErrorCode map_obstacle_without_trajectory(
+  apollo::common::Status map_obstacle_without_trajectory(
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const;

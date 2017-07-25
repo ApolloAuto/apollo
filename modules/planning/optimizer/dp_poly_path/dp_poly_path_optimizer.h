@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_OPTIMIZER_H_
 
 #include <string>
+
 #include "modules/planning/optimizer/path_optimizer.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 
@@ -33,7 +34,7 @@ class DpPolyPathOptimizer : public PathOptimizer {
   explicit DpPolyPathOptimizer(const std::string &name);
 
  private:
-  virtual ::apollo::common::ErrorCode process(
+  apollo::common::Status process(
       const SpeedData &speed_data, const ReferenceLine &reference_line,
       const ::apollo::planning::TrajectoryPoint &init_point,
       DecisionData *const decision_data, PathData *const path_data) override;
