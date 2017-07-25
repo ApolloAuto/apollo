@@ -23,7 +23,6 @@
 
 #include <vector>
 
-#include "modules/common/proto/path_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
