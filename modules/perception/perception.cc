@@ -15,9 +15,11 @@
  *****************************************************************************/
 
 #include "modules/perception/perception.h"
-
+#include <sensor_msgs/PointCloud2.h>
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
+// #include "modules/perception/obstacle/base/object.h"
 #include "ros/include/ros/ros.h"
 
 namespace apollo {
@@ -26,31 +28,33 @@ namespace perception {
 using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
 
-std::string Perception::Name() const { return "perception"; }
+std::string Perception::Name() const {
+  return "perception";
+}
 
 Status Perception::Init() {
-  AdapterManager::Init();
+  AdapterManager::Init(FLAGS_adapter_config_path);
+
+  // lidar_process_.reset(new LidarProcess());
+  // lidar_process_->Init();
+
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  AdapterManager::SetPointCloudCallback(&Perception::OnPointCloud, this);
   return Status::OK();
 }
 
-Status Perception::Start() {
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
-  ros::waitForShutdown();
-  spinner.stop();
-  ros::Rate loop_rate(FLAGS_perception_loop_rate);
-  while (ros::ok()) {
-    AdapterManager::Observe();
-    PerceptionObstacles perceptionObstacles;
-    AdapterManager::FillPerceptionObstaclesHeader(
-        Name(), perceptionObstacles.mutable_header());
-    AdapterManager::PublishPerceptionObstacles(perceptionObstacles);
+void Perception::OnPointCloud(const sensor_msgs::PointCloud2& message) {
+  AINFO << "get point cloud callback";
 
-    TrafficLightDetection trafficLightDetection;
-    AdapterManager::FillTrafficLightDetectionHeader(
-        Name(), trafficLightDetection.mutable_header());
-    AdapterManager::PublishTrafficLightDetection(trafficLightDetection);
-  }
+  // std::vector<ObjectPtr> objects;
+  // if (lidar_process_ != nullptr && lidar_process_->IsInit()) {
+  //   lidar_process_->Process(message, &objects);
+  // }
+
+  /// public obstacle message
+}
+
+Status Perception::Start() {
   return Status::OK();
 }
 

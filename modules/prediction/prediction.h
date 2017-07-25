@@ -25,8 +25,9 @@
 
 #include "ros/include/ros/ros.h"
 
-#include "modules/common/apollo_app.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/common/apollo_app.h"
 
 /**
  * @namespace apollo::prediction
@@ -37,16 +38,42 @@ namespace prediction {
 
 class Prediction : public apollo::common::ApolloApp {
  public:
+  /**
+   * @brief Destructor
+   */
   ~Prediction() = default;
 
+  /**
+   * @brief Get name of the node
+   * @return Name of the node
+   */
   std::string Name() const override;
-  common::Status Init() override;
-  common::Status Start() override;
+
+  /**
+   * @brief Initialize the node
+   * @return Status of the initialization
+   */
+  ::apollo::common::Status Init() override;
+
+  /**
+   * @brief Start the node
+   * @return Status of the starting process
+   */
+  ::apollo::common::Status Start() override;
+
+  /**
+   * @brief Stop the node
+   */
   void Stop() override;
 
  private:
+  ::apollo::common::Status OnError(const std::string& error_msg);
+
   void OnPerception(
       const perception::PerceptionObstacles &perception_obstacles);
+
+ private:
+  PredictionConf conf_;
 };
 
 }  // namespace prediction

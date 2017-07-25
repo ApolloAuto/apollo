@@ -6,11 +6,18 @@ import wheelImage from "assets/images/wheel/wheel.png";
 import wheelBackground from "assets/images/wheel/wheel_background.png";
 import leftArrowOff from "assets/images/wheel/left_off";
 import rightArrowOff from "assets/images/wheel/right_off";
+import leftArrowOn from "assets/images/wheel/left_on";
+import rightArrowOn from "assets/images/wheel/right_on";
 
 @observer
 export default class Wheel extends React.Component {
     render() {
-        const { steeringAngle } = this.props;
+        const { steeringAngle, turnSignal } = this.props;
+
+        const leftArrowSrc = (turnSignal === 'LEFT' || turnSignal === 'EMERGENCY')
+                             ? leftArrowOn : leftArrowOff;
+        const rightArrowSrc = (turnSignal === 'RIGHT' || turnSignal === 'EMERGENCY')
+                              ? rightArrowOn : rightArrowOff;
 
         return (
             <div className="wheel">
@@ -19,9 +26,9 @@ export default class Wheel extends React.Component {
                 <Image image={wheelImage}
                        style={{transform: `rotate(${steeringAngle}deg)`}}
                        className="wheel-image" />
-                <Image image={leftArrowOff}
+                <Image image={leftArrowSrc}
                        className="left-arrow"/>
-                <Image image={rightArrowOff}
+                <Image image={rightArrowSrc}
                        className="right-arrow"/>
                 <span className="left-label-text label-text">
                     Left

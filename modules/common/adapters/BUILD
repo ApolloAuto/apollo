@@ -46,6 +46,7 @@ cc_library(
         "//modules/common/time",
         "//modules/common/util",
         "@com_github_google_protobuf//:protobuf",
+        "@ros//:ros_common",
         "@glog//:glog",
     ],
 )
@@ -63,6 +64,7 @@ cc_test(
         ":adapter",
         ":adapter_gflags",
         "//modules/localization/proto:localization_proto",
+        "@ros//:ros_common",
         "@gtest//:main",
     ],
 )
@@ -82,6 +84,7 @@ cc_library(
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "//modules/localization/proto:localization_proto",
+        "//modules/map/proto:map_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",

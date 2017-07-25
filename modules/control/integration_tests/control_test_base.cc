@@ -67,21 +67,36 @@ bool ControlTestBase::test_control() {
   AdapterManager::Init(FLAGS_adapter_config_path);
   if (!FLAGS_test_pad_file.empty()) {
     PadMessage pad_message;
-    apollo::common::util::GetProtoFromFile(
-        FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message);
+    if (!apollo::common::util::GetProtoFromFile(
+            FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message)) {
+      AERROR << "Failed to load PadMesssage from file " << FLAGS_test_data_dir
+             << FLAGS_test_pad_file;
+      return false;
+    }
     control_.OnPad(pad_message);
   }
   if (!FLAGS_test_localization_file.empty()) {
-    AdapterManager::FeedLocalizationProtoFile(FLAGS_test_data_dir +
-                                              FLAGS_test_localization_file);
+    if (!AdapterManager::FeedLocalizationFile(FLAGS_test_data_dir +
+                                              FLAGS_test_localization_file)) {
+      AERROR << "Failed to load localization file " << FLAGS_test_data_dir
+             << FLAGS_test_localization_file;
+      return false;
+    }
   }
   if (!FLAGS_test_planning_file.empty()) {
-    AdapterManager::FeedPlanningTrajectoryProtoFile(FLAGS_test_data_dir +
-                                                    FLAGS_test_planning_file);
+    if (!AdapterManager::FeedPlanningFile(FLAGS_test_data_dir +
+                                          FLAGS_test_planning_file)) {
+      AERROR << "Failed to load planning file " << FLAGS_test_data_dir
+             << FLAGS_test_planning_file;
+      return false;
+    }
   }
   if (!FLAGS_test_chassis_file.empty()) {
-    AdapterManager::FeedChassisProtoFile(FLAGS_test_data_dir +
-                                         FLAGS_test_chassis_file);
+    if (!AdapterManager::FeedChassisFile(FLAGS_test_data_dir +
+                                         FLAGS_test_chassis_file)) {
+      AERROR << "Failed to load chassis file " << FLAGS_test_data_dir
+             << FLAGS_test_chassis_file;
+    }
   }
   if (!FLAGS_test_monitor_file.empty()) {
     MonitorMessage monitor_message;

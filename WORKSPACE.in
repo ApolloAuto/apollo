@@ -148,6 +148,15 @@ new_http_archive(
     url = "https://bitbucket.org/eigen/eigen/get/3.2.10.tar.gz",
 )
 
+# websocket++/websocketpp
+new_http_archive(
+    name = "websocketpp",
+    build_file = "third_party/websocketpp.BUILD",
+    sha256 = "07b3364ad30cda022d91759d4b83ff902e1ebadb796969e58b59caa535a03923",
+    strip_prefix = "websocketpp-0.7.0",
+    url = "https://github.com/zaphoyd/websocketpp/archive/0.7.0.tar.gz",
+)
+
 # CivetWeb (web server)
 new_http_archive(
     name = "civetweb",
@@ -171,5 +180,41 @@ new_http_archive(
     name = "ros",
     build_file = "third_party/ros.BUILD",
     strip_prefix = "ros",
-    url = "https://github.com/ApolloAuto/apollo-platform/releases/download/1.0.0/ros-indigo-apollo-1.0.0.MACHINE_ARCH.tar.gz",
+    # url = "https://github.com/ApolloAuto/apollo-platform/releases/download/1.0.0/ros-indigo-apollo-1.0.0.MACHINE_ARCH.tar.gz",
+    # temporary ros archive for apollo-1.5
+    url = "https://github.com/fengqikai1414/apollo-platform/files/1171045/ros-indigo-apollo-1.5-x86_64-dev.tar.gz",
+)
+
+# OpenCV 2.4.13.2
+new_http_archive(
+    name = "opencv2",
+    build_file = "third_party/opencv2.BUILD",
+    strip_prefix = "opencv-2.4.13.2",
+    url = "https://github.com/opencv/opencv/archive/2.4.13.2.zip",
+)
+
+# PCL 1.7
+# =======
+# This requires libpcl-dev to be installed in your Ubuntu/Debian.
+new_local_repository(
+    name = "pcl",
+    build_file = "third_party/pcl.BUILD",
+    path = "/usr/include/pcl-1.7",
+)
+
+# YAML-CPP
+new_http_archive(
+    name = "yaml_cpp",
+    build_file = "third_party/yaml_cpp.BUILD",
+    strip_prefix = "yaml-cpp-yaml-cpp-0.5.3",
+    url = "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.5.3.zip",
+)
+
+# qpOASES
+new_http_archive(
+    name = "qp_oases",
+    build_file = "third_party/qp_oases.BUILD",
+    sha256 = "ae15eee80455c26d0c26078498893582b67b1d71df18f14f12591023561e5f88",
+    strip_prefix = "qpOASES-3.2.1",
+    url = "https://www.coin-or.org/download/source/qpOASES/qpOASES-3.2.1.zip",
 )

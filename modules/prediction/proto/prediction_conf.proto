@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/perception/proto/perception_obstacle.proto";
+
+message ObstacleConf {
+  enum EvaluatorType {
+    MLP_EVALUATOR = 0;
+  }
+
+  enum PredictorType {
+    LANE_SEQUENCE_PREDICTOR = 0;
+    FREE_MOVE_PREDICTOR = 1;
+  }
+
+  optional apollo.perception.PerceptionObstacle.Type obstacle_type = 1;
+  optional EvaluatorType evaluator_type = 2;
+  optional PredictorType predictor_type = 3;
+}
+
+message PredictionConf {
+  repeated ObstacleConf obstacle_conf = 1; 
+}

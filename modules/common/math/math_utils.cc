@@ -24,8 +24,10 @@ namespace apollo {
 namespace common {
 namespace math {
 
-double CrossProd(const Vec2d &start_point, const Vec2d &end_point_1,
-                 const Vec2d &end_point_2) {
+double Sqr(const double x) { return x * x; }
+
+double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
+                 const Vec2d& end_point_2) {
   return (end_point_1 - start_point).CrossProd(end_point_2 - start_point);
 }
 
@@ -52,6 +54,14 @@ double WrapAngle(const double angle) {
 double NormalizeAngle(const double angle) {
   const double new_angle = std::fmod(angle + M_PI, M_PI * 2.0);
   return (new_angle < 0 ? new_angle + M_PI * 2.0 : new_angle) - M_PI;
+}
+
+double AngleDiff(const double from, const double to) {
+  double angle = std::fmod((to - from) + M_PI, 2.0 * M_PI);
+  if (angle < 0.0) {
+    angle += (2.0 * M_PI);
+  }
+  return angle - M_PI;
 }
 
 int RandomInt(const int s, const int t, unsigned int rand_seed) {

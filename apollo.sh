@@ -353,10 +353,14 @@ function version() {
 
 function build_gnss() {
   CURRENT_PATH=$(pwd)
-  MACHINE_ARCH="$(uname -m)"
-  INSTALL_PATH="${CURRENT_PATH}/third_party/ros_${MACHINE_ARCH}"
+  if [ -d "${CURRENT_PATH}/bazel-apollo/external/ros" ]; then
+    ROS_PATH="${CURRENT_PATH}/bazel-apollo/external/ros"
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
 
-  source "${INSTALL_PATH}/setup.bash"
+  source "${ROS_PATH}/setup.bash"
 
   protoc modules/common/proto/error_code.proto --cpp_out=./
   protoc modules/common/proto/header.proto --cpp_out=./
@@ -375,9 +379,9 @@ function build_gnss() {
 
   cd modules
   catkin_make_isolated --install --source drivers \
-    --install-space "${INSTALL_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
     --cmake-args --no-warn-unused-cli
-  find "${INSTALL_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
   cd -
 
   rm -rf modules/common/proto/*.pb.cc

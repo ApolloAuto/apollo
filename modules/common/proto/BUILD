@@ -21,6 +21,13 @@ cc_proto_library(
 )
 
 cc_proto_library(
+    name = "vehicle_signal_proto",
+    protos = [
+        "vehicle_signal.proto",
+    ],
+)
+
+cc_proto_library(
     name = "common_proto",
     protos = [
         "geometry.proto",
@@ -55,5 +62,7 @@ py_proto_compile(
         "error_code.proto",
         "geometry.proto",
         "header.proto",
+        "path_point.proto",
+        "vehicle_signal.proto",
     ],
 )

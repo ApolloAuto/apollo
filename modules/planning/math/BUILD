@@ -1,0 +1,65 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "double",
+    srcs = [
+        "double.cc",
+    ],
+    hdrs = [
+        "double.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cc_library(
+    name = "curve_math",
+    srcs = [
+        "curve_math.cc",
+    ],
+    hdrs = [
+        "curve_math.h",
+    ],
+)
+
+cc_library(
+    name = "polynomial_xd",
+    srcs = [
+        "polynomial_xd.cc",
+    ],
+    hdrs = [
+        "polynomial_xd.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cc_library(
+    name = "sl_analytic_transformation",
+    srcs = [
+        "sl_analytic_transformation.cc",
+    ],
+    hdrs = [
+        "sl_analytic_transformation.h",
+    ],
+    deps = [
+        ":double",
+        "@eigen//:eigen",
+    ],
+)
+
+cc_library(
+    name = "hermite_spline",
+    hdrs = [
+        "hermite_spline.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cpplint()

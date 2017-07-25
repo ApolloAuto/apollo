@@ -23,6 +23,7 @@
 #define MODULES_COMMON_MATH_INTEGRATION_H_
 
 #include <functional>
+#include <vector>
 
 /**
  * @namespace apollo::common::math
@@ -31,6 +32,12 @@
 namespace apollo {
 namespace common {
 namespace math {
+
+double IntegrateBySimpson(const std::vector<double>& funv_vec, const double dx,
+                          const std::size_t nsteps);
+
+double IntegrateByTrapezoidal(const std::vector<double>& funv_vec,
+                              const double dx, const std::size_t nsteps);
 
 // Given a target function and integral lower and upper bound,
 // compute the integral approximation using 5th order Gauss-Legendre
@@ -52,8 +59,9 @@ namespace math {
  * @param upper_bound The upper bound of the integral
  * @return The integral result
  */
-double GaussLegendre(const std::function<double(double)> &func,
-                     const double lower_bound, const double upper_bound);
+double IntegrateByGaussLegendre(const std::function<double(double)>& func,
+                                const double lower_bound,
+                                const double upper_bound);
 
 }  // namespace math
 }  // namespace common

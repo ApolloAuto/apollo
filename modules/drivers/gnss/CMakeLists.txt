@@ -5,11 +5,12 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
   roscpp
   std_msgs
+  tf2_ros
 )
 
 catkin_package(
    LIBRARIES ${catkin_LIBRARIES} roscpp
-   CATKIN_DEPENDS roscpp std_msgs
+   CATKIN_DEPENDS roscpp std_msgs tf2_ros
    DEPENDS  protobuf
 )
 
@@ -65,6 +66,9 @@ add_library(parser_nodelet src/parser_nodelet.cpp src/data_parser.cpp src/impl/n
 add_dependencies(parser_nodelet novatel_msgs_generate_messages_cpp)
 target_link_libraries(parser_nodelet utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES} proj)
 
+add_library(tf_broadcaster_nodelet src/tf_broadcaster_nodelet.cpp src/tf_broadcaster.cpp)
+target_link_libraries(tf_broadcaster_nodelet utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
+
 add_executable(parser_cli tests/parser_cli.cpp src/impl/novatel_parser.cpp)
 target_link_libraries(parser_cli utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
@@ -72,7 +76,7 @@ add_executable(test_monitor tests/test_monitor.cpp)
 target_link_libraries(test_monitor utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 install(
-     TARGETS stream_nodelet parser_nodelet utils test_monitor
+     TARGETS stream_nodelet parser_nodelet tf_broadcaster_nodelet utils test_monitor
      ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
      LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
      RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

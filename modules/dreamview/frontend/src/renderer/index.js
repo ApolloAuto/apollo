@@ -4,7 +4,9 @@ import PARAMETERS from "store/config/parameters.yml";
 import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
 import Ground from "renderer/ground";
+import Map from "renderer/map";
 import PlanningTrajectory from "renderer/trajectory.js";
+import PerceptionObstacles from "renderer/obstacles.js";
 
 class Renderer {
     constructor() {
@@ -28,8 +30,11 @@ class Renderer {
         );
         this.scene.add(this.camera);
 
-        // The ground.
+        // The ground. (grid for now)
         this.ground = new Ground();
+
+        // The map.
+        this.map = new Map();
 
         // The main autonomous driving car.
         this.adc = new AutoDrivingCar();
@@ -39,6 +44,9 @@ class Renderer {
 
         // The planning tranjectory.
         this.planningTrajectory = new PlanningTrajectory();
+
+        // The perception obstacles.
+        this.perceptionObstacles = new PerceptionObstacles();
     }
 
     initialize(canvasId, width, height) {
@@ -137,6 +145,16 @@ class Renderer {
     updateWorld(world) {
         this.adc.update(world, this.coordinates);
         this.planningTrajectory.update(world, this.coordinates, this.scene);
+        this.perceptionObstacles.update(world, this.coordinates,
+                this.adc.mesh.rotation, this.scene);
+    }
+
+    updateMap(newData) {
+        this.map.appendMapData(newData, this.coordinates, this.scene);
+    }
+
+    updateMapIndex(hash, elements) {
+        this.map.updateIndex(hash, elements, this.scene);
     }
 }
 

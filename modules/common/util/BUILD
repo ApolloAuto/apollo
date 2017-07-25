@@ -16,8 +16,14 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
+        "//modules/common/proto:path_point_proto",
         "//modules/common/time",
     ],
+)
+
+cc_library(
+    name = "lru_cache",
+    hdrs = ["lru_cache.h"],
 )
 
 cc_test(
@@ -80,6 +86,18 @@ cc_test(
     deps = [
         ":util",
         "//modules/common/util/testdata:simple_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "lru_cache_test",
+    size = "small",
+    srcs = [
+        "lru_cache_test.cc",
+    ],
+    deps = [
+        "//modules/common/util:lru_cache",
         "@gtest//:main",
     ],
 )

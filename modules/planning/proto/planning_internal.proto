@@ -3,10 +3,11 @@ syntax = "proto2";
 package apollo.planning_internal;
 
 import "modules/common/proto/header.proto";
-import "modules/decision/proto/decision.proto";
+import "modules/common/proto/error_code.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/localization/proto/pose.proto";
 import "modules/perception/proto/perception_obstacle.proto";
+import "modules/planning/proto/decision.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
 
 message PlanningObstacle {
@@ -40,27 +41,19 @@ message PlanningObstacle {
   // from prediction
   repeated apollo.prediction.Trajectory prediction_trajectory = 15;
 
-  // object type in decision
-  optional apollo.decision.ObjectDecision.ObjectType decision_object_type = 16;
-  optional apollo.decision.ObjectDecisionType object_decision =
+  optional apollo.planning.ObjectDecision.ObjectType decision_object_type = 16;
+  optional apollo.planning.ObjectDecisionType object_decision =
       17 [deprecated = true];
-  repeated apollo.decision.ObjectDecisionType planning_object_decision = 18;
+  repeated apollo.planning.ObjectDecisionType planning_object_decision = 18;
 }
 
 message Debug {
-  enum ErrorCode {
-    OK = 0; ERR_NOT_READY = 1; ERR_ESTOP = 2; ERR_PATH_OPTIMIZER = 3;
-    ERR_SPEED_OPTIMIZER = 4;
-    ERR_ST_GRAPH = 5;
-    ERR_SANITY_CHECK = 6;
-  }
-
   /*
       PLEASE add id here
       id = 1: st_graph_info
   */
   message DebugMessage {
-    optional ErrorCode error_code = 1 [default = OK];
+    optional apollo.common.ErrorCode error_code = 1;
     optional int32 id = 2;
     oneof debug_string {
       string trace = 3;
@@ -71,17 +64,26 @@ message Debug {
     }
   }
 
-  optional ErrorCode error_code = 1 [default = OK];
+  optional apollo.common.ErrorCode error_code = 1;
   optional PlanningData planning_data = 2;
   repeated DebugMessage debug_message = 3;
+}
+
+message LightSignal {
+  optional bool emergency = 1; // hazard signal
+  enum TurnSignal {
+    NO_TURN = 1;
+    LEFT_TURN = 2;
+    RIGHT_TURN = 3;
+  };
+  optional TurnSignal turn_signal = 2 [default = NO_TURN];
 }
 
 message PlanningData {
   optional apollo.common.Header header = 1;
   optional apollo.localization.Pose init_status = 2;  // initial status of adc
-  optional apollo.decision.MainDecision main_decision = 3;  // from decision
+  optional apollo.planning.MainDecision main_decision = 3 [deprecated = true];
   // processed planning_obstacles
   repeated PlanningObstacle planning_obstacle = 4;
-  optional apollo.decision.LightSignal light_signal =
-      5;  // light signal from decision
+  optional LightSignal light_signal = 5 [deprecated = true];
 }

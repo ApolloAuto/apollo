@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/planning/planning.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planner_factory.h"
 #include "modules/planning/proto/planning.pb.h"
 
 #include "gmock/gmock.h"
@@ -28,7 +28,13 @@ namespace planning {
 using TrajectoryPb = ADCTrajectory;
 using apollo::common::TrajectoryPoint;
 
-class PlanningTest : public ::testing::Test {};
+class PlanningTest : public ::testing::Test {
+  virtual void SetUp() {
+    FLAGS_planning_config_file =
+        "modules/planning/testdata/conf/planning_config.pb.txt";
+    FLAGS_adapter_config_path = "modules/planning/testdata/conf/adapter.conf";
+  }
+};
 
 TEST_F(PlanningTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
@@ -43,29 +49,30 @@ TEST_F(PlanningTest, ComputeTrajectory) {
 
   std::vector<TrajectoryPoint> trajectory1;
   double time1 = 0.1;
+  planning.Init();
   planning.Plan(vehicle_state, false, time1, &trajectory1);
 
-  EXPECT_EQ(trajectory1.size(), (std::size_t)FLAGS_rtk_trajectory_forward);
-  const auto &p1_start = trajectory1.front();
-  const auto &p1_end = trajectory1.back();
+  EXPECT_EQ(trajectory1.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward);
+  const auto& p1_start = trajectory1.front();
+  const auto& p1_end = trajectory1.back();
 
-  EXPECT_DOUBLE_EQ(p1_start.x(), 586385.782841);
-  EXPECT_DOUBLE_EQ(p1_end.x(), 586355.063786);
+  EXPECT_DOUBLE_EQ(p1_start.path_point().x(), 586385.782841);
+  EXPECT_DOUBLE_EQ(p1_end.path_point().x(), 586355.063786);
 
   std::vector<TrajectoryPoint> trajectory2;
   double time2 = 0.5;
   planning.Plan(vehicle_state, true, time2, &trajectory2);
 
-  EXPECT_EQ(trajectory2.size(), (std::size_t)FLAGS_rtk_trajectory_forward +
+  EXPECT_EQ(trajectory2.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward +
                                     (int)FLAGS_rtk_trajectory_backward);
 
   const auto &p2_backward = trajectory2.front();
   const auto &p2_start = trajectory2[FLAGS_rtk_trajectory_backward];
   const auto &p2_end = trajectory2.back();
 
-  EXPECT_DOUBLE_EQ(p2_backward.x(), 586385.577255);
-  EXPECT_DOUBLE_EQ(p2_start.x(), 586385.486723);
-  EXPECT_DOUBLE_EQ(p2_end.x(), 586353.262913);
+  EXPECT_DOUBLE_EQ(p2_backward.path_point().x(), 586385.577255);
+  EXPECT_DOUBLE_EQ(p2_start.path_point().x(), 586385.486723);
+  EXPECT_DOUBLE_EQ(p2_end.path_point().x(), 586353.262913);
 
   double absolute_time1 = trajectory1[100].relative_time() + time1;
   double absolute_time2 =
@@ -77,6 +84,8 @@ TEST_F(PlanningTest, ComputeTrajectory) {
 TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
   FLAGS_rtk_trajectory_filename = "";
   Planning planning;
+  planning.Init();
+
   common::vehicle_state::VehicleState vehicle_state;
   vehicle_state.set_x(586385.782841);
   vehicle_state.set_y(4140674.76065);
@@ -92,11 +101,6 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
 
   // check Reset runs gracefully.
   planning.Reset();
-}
-
-TEST_F(PlanningTest, PlannerFactory) {
-  auto ptr_planner = PlannerFactory::CreateInstance(PlannerType::OTHER);
-  EXPECT_TRUE(ptr_planner == nullptr);
 }
 
 }  // namespace planning

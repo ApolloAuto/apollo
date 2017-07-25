@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
@@ -6,12 +8,17 @@ load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
 cc_proto_library(
     name = "planning_proto",
     protos = [
+        "decision.proto",
         "planning.proto",
+        "planning_config.proto",
         "planning_internal.proto",
+        "qp_spline_st_speed_config.proto",
+        "st_boundary_config.proto",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/proto:common_proto",
+        "//modules/common/proto:path_point_proto",
         "//modules/decision/proto:decision_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
@@ -22,7 +29,9 @@ cc_proto_library(
 py_proto_compile(
     name = "planning_proto_pylib",
     protos = [
+        "decision.proto",
         "planning.proto",
+        "planning_config.proto",
         "planning_internal.proto",
     ],
     deps = [
@@ -34,3 +43,61 @@ py_proto_compile(
         "//modules/prediction/proto:prediction_proto_pylib",
     ],
 )
+
+cc_proto_library(
+    name = "spiral_curve_config_proto",
+    protos = [
+        "spiral_curve_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "sprial_curve_config_proto_pylib",
+    protos = [
+        "spiral_curve_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "dp_poly_path_config_proto",
+    protos = [
+        "dp_poly_path_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "dp_poly_path_config_proto_pylib",
+    protos = [
+        "dp_poly_path_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "qp_spline_path_config_proto",
+    protos = [
+        "qp_spline_path_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "qp_spline_path_config_proto_pylib",
+    protos = [
+        "qp_spline_path_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "reference_line_smoother_config_proto",
+    protos = [
+        "reference_line_smoother_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "reference_line_smoother_config_proto_pylib",
+    protos = [
+        "reference_line_smoother_config.proto",
+    ],
+)
+
+cpplint()

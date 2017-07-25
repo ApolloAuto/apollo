@@ -17,6 +17,8 @@
 #ifndef MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 #define MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 
+#include <sensor_msgs/PointCloud2.h>
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/adapters/adapter.h"
@@ -28,6 +30,7 @@
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/map/proto/routing.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -55,10 +58,12 @@ using MonitorAdapter = Adapter<apollo::common::monitor::MonitorMessage>;
 using PadAdapter = Adapter<::apollo::control::PadMessage>;
 using PerceptionObstaclesAdapter =
     Adapter<::apollo::perception::PerceptionObstacles>;
-using PlanningTrajectoryAdapter = Adapter<::apollo::planning::ADCTrajectory>;
+using PlanningAdapter = Adapter<::apollo::planning::ADCTrajectory>;
+using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using PredictionAdapter = Adapter<::apollo::prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter =
     Adapter<::apollo::perception::TrafficLightDetection>;
+using RoutingResultAdapter = Adapter<::apollo::hdmap::RoutingResult>;
 
 }  // namespace adapter
 }  // namespace common

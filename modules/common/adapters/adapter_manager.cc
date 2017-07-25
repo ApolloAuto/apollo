@@ -50,6 +50,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
 
   for (const auto &config : configs.config()) {
     switch (config.type()) {
+      case AdapterConfig::POINT_CLOUD:
+        EnablePointCloud(FLAGS_pointcloud_topic, config.mode(),
+                         config.message_history_limit());
+        break;
       case AdapterConfig::GPS:
         EnableGps(FLAGS_gps_topic, config.mode(),
                   config.message_history_limit());
@@ -84,8 +88,8 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
                              config.message_history_limit());
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
-        EnablePlanningTrajectory(FLAGS_planning_trajectory_topic, config.mode(),
-                                 config.message_history_limit());
+        EnablePlanning(FLAGS_planning_trajectory_topic, config.mode(),
+                       config.message_history_limit());
         break;
       case AdapterConfig::PREDICTION:
         EnablePrediction(FLAGS_prediction_topic, config.mode(),
@@ -102,6 +106,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::DECISION:
         EnableDecision(FLAGS_decision_topic, config.mode(),
                        config.message_history_limit());
+        break;
+      case AdapterConfig::ROUTING_RESULT:
+        EnableRoutingResult(FLAGS_routing_result_topic, config.mode(),
+                      config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";
