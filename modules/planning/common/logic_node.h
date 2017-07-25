@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common/status/status.h"
 
 namespace apollo {
 namespace planning {
@@ -39,8 +39,8 @@ class LogicNode {
   const std::unordered_set<std::string> &lane_name() const;
   void connect(const LogicNode &node);
   void add_lane_name(const std::string &lane_name);
-  common::ErrorCode get_next_node(const std::string &lane_id,
-                                  std::uint32_t *const node_id);
+  common::Status get_next_node(const std::string &lane_id,
+                               std::uint32_t *const node_id);
   void f() {}
 
  private:

@@ -30,7 +30,8 @@
 namespace apollo {
 namespace planning {
 
-using ::apollo::common::ErrorCode;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 CubicSpiralCurve::CubicSpiralCurve(const common::PathPoint& s,
                                    const common::PathPoint& e)
@@ -180,13 +181,13 @@ bool CubicSpiralCurve::calculate_path() {
   return diff < spiral_config().newton_raphson_tol() && result_sanity_check();
 }
 
-ErrorCode CubicSpiralCurve::get_path_vec(
+Status CubicSpiralCurve::get_path_vec(
     const std::uint32_t n, std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   // initialization
   if (n < 2 || error() > spiral_config().newton_raphson_tol()) {
-    return ErrorCode::PLANNING_ERROR;
+    return Status(ErrorCode::PLANNING_ERROR, "CubicSpiralCurve::get_path_vec");
   }
 
   path_points->resize(n);
@@ -235,16 +236,17 @@ ErrorCode CubicSpiralCurve::get_path_vec(
     result[k].set_y(result[k].s() * dy + result[0].y());
   }
 
-  return ErrorCode::OK;
+  return Status::OK();
 }
 
-ErrorCode CubicSpiralCurve::get_path_vec_with_s(
+Status CubicSpiralCurve::get_path_vec_with_s(
     const std::vector<double>& vec_s,
     std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   if (vec_s.empty() || error() > spiral_config().newton_raphson_tol()) {
-    return ErrorCode::PLANNING_ERROR;
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "CubicSpiralCurve::get_path_vec_with_s");
   }
 
   const std::uint32_t n = vec_s.size();
@@ -297,7 +299,7 @@ ErrorCode CubicSpiralCurve::get_path_vec_with_s(
     result[k].set_y(dy + ref_point.y());
   }
 
-  return ErrorCode::OK;
+  return Status::OK();
 }
 }  // namespace planning
 }  // namespace apollo
