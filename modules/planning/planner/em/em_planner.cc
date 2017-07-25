@@ -17,6 +17,7 @@
 #include "modules/planning/planner/em/em_planner.h"
 
 #include <fstream>
+#include <memory>
 #include <utility>
 
 #include "modules/common/log.h"
@@ -26,16 +27,44 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/em_planning_data.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
+#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
+// #include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
+// #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 
-EMPlanner::EMPlanner() {}
+EMPlanner::EMPlanner() {
 
-bool EMPlanner::MakePlan(const TrajectoryPoint& start_point,
+}
+
+void EMPlanner::RegisterOptimizers() {
+  optimizer_factory_.Register(
+      DP_POLY_PATH_OPTIMIZER,
+      []() -> Optimizer* { return new DpPolyPathOptimizer("DpPolyPathOptimizer"); });
+  // optimizer_factory_.Register(
+  //     DP_ST_SPEED_OPTIMIZER,
+  //     []() -> Optimizer* { return new DpStSpeedOptimizer("DpStSpeedOptimizer"); });
+  // optimizer_factory_.Register(
+  //     QP_SPLINE_PATH_OPTIMIZER,
+  //     []() -> Optimizer* { return new QPSplinePathOptimizer("QPSplinePathOptimizer"); });
+}
+
+Status EMPlanner::Init(const PlanningConfig& config) {
+  RegisterOptimizers();
+  for (int i = 0; i < config.em_planner_config().optimizer_size(); ++i) {
+    optimizers_.emplace_back(optimizer_factory_.CreateObject(
+        config.em_planner_config().optimizer(i)));
+  }
+  return Status::OK();
+}
+
+Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
                          std::vector<TrajectoryPoint>* discretized_trajectory) {
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
@@ -50,7 +79,7 @@ bool EMPlanner::MakePlan(const TrajectoryPoint& start_point,
   //  frame->mutable_planning_data()->set_reference_line(reference_line);
   //  frame->mutable_planning_data()->set_decision_data(decision_data);
 
-  return true;
+  return Status::OK();
 }
 
 std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(

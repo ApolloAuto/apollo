@@ -163,10 +163,10 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
     if (position_deviation < FLAGS_replanning_threshold) {
       // planned trajectory from the matched point, the matched point has
       // relative time 0.
-      bool planning_succeeded =
+      auto status =
           planner_->MakePlan(matched_point, planning_trajectory);
 
-      if (!planning_succeeded) {
+      if (!status.ok()) {
         last_trajectory_.clear();
         return false;
       }
@@ -193,9 +193,9 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
   TrajectoryPoint vehicle_state_point =
       ComputeStartingPointFromVehicleState(vehicle_state, planning_cycle_time);
 
-  bool planning_succeeded =
+  auto status =
       planner_->MakePlan(vehicle_state_point, planning_trajectory);
-  if (!planning_succeeded) {
+  if (!status.ok()) {
     last_trajectory_.clear();
     return false;
   }
