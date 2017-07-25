@@ -11,8 +11,8 @@ cc_library(
         "spiral_curve.h",
     ],
     deps = [
-        "//modules/common/proto:error_code_proto",
         "//modules/common/proto:path_point_proto",
+        "//modules/common/status",
         "//modules/planning/proto:spiral_curve_config_proto",
     ],
 )

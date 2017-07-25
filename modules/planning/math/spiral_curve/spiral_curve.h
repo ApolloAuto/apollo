@@ -25,8 +25,8 @@
 #include <cmath>
 #include <vector>
 
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/planning/proto/spiral_curve_config.pb.h"
 
 namespace apollo {
@@ -63,7 +63,7 @@ class SpiralCurve {
   *   @brief : get path vector with sampling size n
   *   @return: sequence of sampling points
   **/
-  virtual common::ErrorCode get_path_vec(
+  virtual common::Status get_path_vec(
       const std::uint32_t n,
       std::vector<common::PathPoint>* path_points) const = 0;
   /**
@@ -71,7 +71,7 @@ class SpiralCurve {
   *   along the whole path.
   *   @return: vector of path points
   **/
-  virtual common::ErrorCode get_path_vec_with_s(
+  virtual common::Status get_path_vec_with_s(
       const std::vector<double>& vec_s,
       std::vector<common::PathPoint>* path_points) const = 0;
 
