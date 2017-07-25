@@ -22,16 +22,17 @@
 
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
 #include "modules/common/log.h"
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/math/double.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
+
 PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
 
-::apollo::common::ErrorCode PathSampler::sample(
+Status PathSampler::sample(
     const ReferenceLine &reference_line,
     const ::apollo::common::TrajectoryPoint &init_point,
     const common::SLPoint &init_sl_point,
@@ -67,7 +68,7 @@ PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
     }
     points->push_back(level_points);
   }
-  return ::apollo::common::ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 }  // namespace planning
 }  // namespace apollo

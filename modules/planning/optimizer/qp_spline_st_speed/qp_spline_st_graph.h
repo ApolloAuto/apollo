@@ -25,8 +25,8 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
 
 #include "modules/planning/common/path/path_data.h"
@@ -43,29 +43,29 @@ class QPSplineStGraph {
   QPSplineStGraph(const QPSplineStSpeedConfig& qp_config,
                   const apollo::common::config::VehicleParam& veh_param);
 
-  common::ErrorCode search(const STGraphData& st_graph_data,
-                           const PathData& path_data,
-                           SpeedData* const speed_data);
+  common::Status search(const STGraphData& st_graph_data,
+                        const PathData& path_data,
+                        SpeedData* const speed_data);
 
  private:
   // apply st graph constraint
-  common::ErrorCode apply_constraint(
+  common::Status apply_constraint(
       const std::vector<STGraphBoundary>& boundaries);
 
   // apply objective function
-  common::ErrorCode apply_kernel();
+  common::Status apply_kernel();
 
   // solve
-  common::ErrorCode solve();
+  common::Status solve();
 
   // extract upper lower bound for constraint;
-  common::ErrorCode get_s_constraints_by_time(
+  common::Status get_s_constraints_by_time(
       const std::vector<STGraphBoundary>& boundaries, const double time,
       const double total_path_s, double* const s_upper_bound,
       double* const s_lower_bound) const;
 
   // generate reference speed profile
-  common::ErrorCode apply_reference_speed_profile();
+  common::Status apply_reference_speed_profile();
 
  private:
   // qp st configuration

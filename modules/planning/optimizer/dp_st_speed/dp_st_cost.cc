@@ -18,11 +18,12 @@
  * @file dp_st_cost.cc
  **/
 
+#include "modules/planning/optimizer/dp_st_speed/dp_st_cost.h"
+
 #include <limits>
 
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/math/double.h"
-#include "modules/planning/optimizer/dp_st_speed/dp_st_cost.h"
 
 namespace apollo {
 namespace planning {

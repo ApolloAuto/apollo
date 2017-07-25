@@ -26,7 +26,6 @@
 #include "modules/planning/optimizer/st_graph/st_boundary_mapper.h"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/planning/common/decision_data.h"
@@ -40,27 +39,27 @@ class QPSplineSTBoundaryMapper : public STBoundaryMapper {
       const STBoundaryConfig& st_boundary_config,
       const apollo::common::config::VehicleParam& veh_param);
 
-  common::ErrorCode get_graph_boundary(
+  apollo::common::Status get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
       const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const override;
 
  private:
-  common::ErrorCode map_obstacle_with_planning(
+  apollo::common::Status map_obstacle_with_planning(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const;
 
-  common::ErrorCode map_obstacle_with_prediction_trajectory(
+  apollo::common::Status map_obstacle_with_prediction_trajectory(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const ObjectDecisionType obj_decision,
       const PathData& path_data, const double planning_distance,
       const double planning_time,
       std::vector<STGraphBoundary>* const boundary) const;
 
-  common::ErrorCode map_obstacle_without_trajectory(
+  apollo::common::Status map_obstacle_without_trajectory(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,

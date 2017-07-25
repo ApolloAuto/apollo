@@ -58,6 +58,7 @@ cc_library(
         ":st_graph_boundary",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:path_point_proto",
+        "//modules/common/status",
         "//modules/map/hdmap",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:decision_data",

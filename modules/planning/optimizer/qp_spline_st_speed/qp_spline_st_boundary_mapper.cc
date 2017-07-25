@@ -35,40 +35,45 @@
 namespace apollo {
 namespace planning {
 
-using ErrorCode = apollo::common::ErrorCode;
-using VehicleParam = apollo::common::config::VehicleParam;
-using PathPoint = apollo::common::PathPoint;
-using Box2d = apollo::common::math::Box2d;
-using Vec2d = apollo::common::math::Vec2d;
+using apollo::common::ErrorCode;
+using apollo::common::PathPoint;
+using apollo::common::Status;
+using apollo::common::config::VehicleParam;
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
 
 QPSplineSTBoundaryMapper::QPSplineSTBoundaryMapper(
     const STBoundaryConfig& st_boundary_config, const VehicleParam& veh_param)
     : STBoundaryMapper(st_boundary_config, veh_param) {}
 
-ErrorCode QPSplineSTBoundaryMapper::get_graph_boundary(
+Status QPSplineSTBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
     const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const obs_boundary) const {
   if (obs_boundary) {
-    AERROR << "obs_boundary is NULL.";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "obs_boundary is NULL.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   if (planning_time < 0.0) {
-    AERROR << "Fail to get params since planning_time < 0.";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "Fail to get params since planning_time < 0.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   if (path_data.path().num_of_points() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
            << path_data.path().num_of_points() << ".";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED,
+                  "Fail to get params because of too few path points");
   }
 
   obs_boundary->clear();
 
+  Status ret;
   /*
   const auto& planning_data = processed_data.planning_data();
   const auto& main_decision = planning_data.main_decision();
@@ -122,12 +127,13 @@ ErrorCode QPSplineSTBoundaryMapper::get_graph_boundary(
     if (obs == nullptr) {
       continue;
     }
-    ErrorCode err = map_obstacle_without_trajectory(
+    ret = map_obstacle_without_trajectory(
         initial_planning_point, *obs, path_data, planning_distance,
         planning_time, obs_boundary);
-    if (err != ErrorCode::PLANNING_OK) {
+    if (!ret.ok()) {
       AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
-      return ErrorCode::PLANNING_ERROR_FAILED;
+      return Status(ErrorCode::PLANNING_ERROR_FAILED,
+                    "Fail to map static obstacle");
     }
   }
 
@@ -138,37 +144,39 @@ ErrorCode QPSplineSTBoundaryMapper::get_graph_boundary(
     }
     for (auto& obj_decision : obs->Decisions()) {
       if (obj_decision.has_follow()) {
-        ErrorCode err = map_obstacle_with_planning(initial_planning_point, *obs,
-                                                   path_data, planning_distance,
-                                                   planning_time, obs_boundary);
-        if (err != ErrorCode::PLANNING_OK) {
+        ret = map_obstacle_with_planning(initial_planning_point, *obs,
+                                         path_data, planning_distance,
+                                         planning_time, obs_boundary);
+        if (!ret.ok()) {
           AERROR << "Fail to map follow dynamic obstacle with id " << obs->Id()
                  << ".";
-          return ErrorCode::PLANNING_ERROR_FAILED;
+          return Status(ErrorCode::PLANNING_ERROR_FAILED,
+                        "Fail to map follow dynamic obstacle");
         }
       } else if (obj_decision.has_overtake() || obj_decision.has_yield()) {
-        ErrorCode err = map_obstacle_with_prediction_trajectory(
+        ret = map_obstacle_with_prediction_trajectory(
             initial_planning_point, *obs, obj_decision, path_data,
             planning_distance, planning_time, obs_boundary);
-        if (err != ErrorCode::PLANNING_OK) {
+        if (!ret.ok()) {
           AERROR << "Fail to map dynamic obstacle with id " << obs->Id() << ".";
-          return ErrorCode::PLANNING_OK;
+          // Return OK by intention.
+          return Status::OK();
         }
       }
     }
   }
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
-ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_planning(
+Status QPSplineSTBoundaryMapper::map_obstacle_with_planning(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const boundary) const {
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
-ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
+Status QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const ObjectDecisionType obj_decision,
     const PathData& path_data, const double planning_distance,
@@ -306,15 +314,16 @@ ErrorCode QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
       }
     }
   }
-  return skip ? ErrorCode::PLANNING_SKIP : ErrorCode::PLANNING_OK;
+  return skip ?
+      Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP") : Status::OK();
 }
 
-ErrorCode QPSplineSTBoundaryMapper::map_obstacle_without_trajectory(
+Status QPSplineSTBoundaryMapper::map_obstacle_without_trajectory(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
     std::vector<STGraphBoundary>* const boundary) const {
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
 }  // namespace planning

@@ -24,22 +24,24 @@
 namespace apollo {
 namespace planning {
 
-using ErrorCode = common::ErrorCode;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 QPSplinePathOptimizer::QPSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
-common::ErrorCode QPSplinePathOptimizer::process(
+Status QPSplinePathOptimizer::process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point,
     DecisionData* const decision_data, PathData* const path_data) {
   _path_generator.SetConfig(FLAGS_qp_spline_path_config_file);
   if (!_path_generator.generate(reference_line, *decision_data, speed_data,
                                 init_point, path_data)) {
-    AERROR << "failed to generate spline path!";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "failed to generate spline path!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
 }  // namespace planning
