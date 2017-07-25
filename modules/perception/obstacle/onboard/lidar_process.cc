@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/onboard/lidar_process.h"
-// #include <pcl/ros/conversions.h>
+ #include <pcl_conversions/pcl_conversions.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
@@ -247,7 +247,6 @@ bool LidarProcess::InitAlgorithmPlugin() {
 
 void LidarProcess::TransPointCloudToPCL(
     const sensor_msgs::PointCloud2& in_msg, PointCloudPtr* out_cloud) {
-  /*
   // transform from ros to pcl
   pcl::PointCloud<pcl_util::PointXYZIT> in_cloud;
   pcl::fromROSMsg(in_msg, in_cloud);
@@ -266,7 +265,6 @@ void LidarProcess::TransPointCloudToPCL(
     cloud->points[idx].z = in_cloud.points[idx].z;
     cloud->points[idx].intensity = in_cloud.points[idx].intensity;
   }
-  */
 }
 
 bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
