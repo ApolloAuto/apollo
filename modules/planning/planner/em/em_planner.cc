@@ -27,7 +27,7 @@
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/em_planning_data.h"
+#include "modules/planning/common/planning_data.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
@@ -77,21 +77,30 @@ Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
 
-  frame->set_planning_data(new EMPlanningData());
+  frame->set_planning_data(new PlanningData());
   if (data_center->last_frame()) {
     ADEBUG << "last frame:" << data_center->last_frame()->DebugString();
   }
   ADEBUG << "start point:" << start_point.DebugString();
-  frame->mutable_planning_data()->set_init_planning_point(start_point);
+  auto planning_data = frame->mutable_planning_data();
+  planning_data->set_init_planning_point(start_point);
 
   if (reference_line_) {
     ADEBUG << "reference line:" << reference_line_->DebugString();
   }
-  frame->mutable_planning_data()->set_reference_line(reference_line_);
-  //  frame->mutable_planning_data()->set_decision_data(decision_data);
+  planning_data->set_reference_line(reference_line_);
+  std::shared_ptr<DecisionData> decision_data(new DecisionData());
+
+  frame->mutable_planning_data()->set_decision_data(decision_data);
   for (auto& optimizer : optimizers_) {
-    optimizer->Optimize(frame->mutable_planning_data());
+    optimizer->Optimize(planning_data);
   }
+  if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution)) {
+    std::string msg("Fail to aggregate planning trajectory.");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  *discretized_trajectory = planning_data->computed_trajectory().trajectory_points();
   return Status::OK();
 }
 
