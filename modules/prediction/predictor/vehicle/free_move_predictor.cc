@@ -50,14 +50,15 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 
   std::vector<TrajectoryPoint> points(0);
   double total_time = FLAGS_prediction_duration;
-  // TODO(jinghao):
+  // TODO(kechxu):
   // draw_free_move_trajectory(position, velocity, obstacle->kf_motion_tracker(),
   //                           total_time, points);
   Trajectory trajectory;
   GenerateTrajectory(points, &trajectory);
-  trajectory.set_probability(1.0);
+  int start_index = 0;
   prediction_obstacle_.set_predicted_period(total_time);
   prediction_obstacle_.add_trajectory()->CopyFrom(trajectory);
+  SetEqualProbability(1.0, start_index);
 }
 
 }  // prediction
