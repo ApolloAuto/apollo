@@ -35,9 +35,12 @@ class Optimizer {
   virtual ~Optimizer() = default;
   virtual const std::string& name() const;
 
-  virtual apollo::common::Status Optimize(PlanningData *planning_data);
+  virtual apollo::common::Status Optimize(PlanningData* planning_data);
 
-  virtual bool SetConfig(const std::string& config_file);
+  virtual bool Init();
+
+ protected:
+  bool is_init_ = false;
 
  private:
   const std::string _name;
