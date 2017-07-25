@@ -66,7 +66,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     const std::string msg =
         "Mapping obstacle for dp st speed optimizer failed.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // step 2 perform graph search
@@ -80,7 +80,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   if (!st_graph.search(st_graph_data, decision_data, speed_data).ok()) {
     const std::string msg = "Failed to search graph with dynamic programming.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   return Status::OK();

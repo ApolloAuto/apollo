@@ -49,13 +49,13 @@ Status DpStBoundaryMapper::get_graph_boundary(
   if (planning_time < 0.0) {
     const std::string msg = "Fail to get params since planning_time < 0.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (path_data.path().num_of_points() < 2) {
     AERROR << "Fail to get params since path has "
         <<  path_data.path().num_of_points() << " points.";
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, "Fail to get params");
+    return Status(ErrorCode::PLANNING_ERROR, "Fail to get params");
   }
 
   obs_boundary->clear();
@@ -75,7 +75,7 @@ Status DpStBoundaryMapper::get_graph_boundary(
         obs_boundary).ok()) {
       AERROR << "Fail to map static obstacle with id "
           << static_obs_vec[i]->Id();
-      return Status(ErrorCode::PLANNING_ERROR_FAILED,
+      return Status(ErrorCode::PLANNING_ERROR,
                     "Fail to map static obstacle with id");
     }
   }
@@ -89,7 +89,7 @@ Status DpStBoundaryMapper::get_graph_boundary(
         planning_time, obs_boundary).ok()) {
       AERROR << "Fail to map dynamic obstacle with id "
           << dynamic_obs_vec[i]->Id();
-      return Status(ErrorCode::PLANNING_ERROR_FAILED,
+      return Status(ErrorCode::PLANNING_ERROR,
                     "Fail to map dynamic obstacle with id");
     }
   }
@@ -191,7 +191,7 @@ Status DpStBoundaryMapper::map_obstacle_without_trajectory(
   if (veh_path.size() == 0) {
     const std::string msg = "[DP_ST_BOUNDARY_MAPPER] Vehicle path empty.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   std::uint32_t low_index = 0;

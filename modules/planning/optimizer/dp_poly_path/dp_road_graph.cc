@@ -56,19 +56,19 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
   if (!init(reference_line)) {
     const std::string msg = "Fail to init dp road graph!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   if (!generate_graph(reference_line).ok()) {
     const std::string msg = "Fail to generate graph!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   std::vector<uint32_t> min_cost_edges;
   if (!find_best_trajectory(reference_line, *decision_data, &min_cost_edges)
            .ok()) {
     const std::string msg = "Fail to find best trajectory!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   FrenetFramePath tunnel;
   std::vector<common::FrenetFramePoint> frenet_path;
@@ -107,7 +107,7 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
     if (!reference_line.get_point_in_Cartesian_frame(sl_point, &xy_point)) {
       const std::string msg = "Fail to convert sl point to xy point";
       AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     ReferencePoint ref_point =
         reference_line.get_reference_point(frenet_point.s());
@@ -185,7 +185,7 @@ Status DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {
            .ok()) {
     const std::string msg = "Fail to sampling point with path sampler!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   int vertex_num_previous_level = 1;
@@ -219,8 +219,7 @@ Status DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {
         _vertices.pop_back();
       }
       if (vertex_num_current_level == 0) {
-        return Status(ErrorCode::PLANNING_ERROR_FAILED,
-                      "DpRoadGraph::generate_graph");
+        return Status(ErrorCode::PLANNING_ERROR, "DpRoadGraph::generate_graph");
       }
     }
     accumulated_prev_level_size += vertex_num_previous_level;

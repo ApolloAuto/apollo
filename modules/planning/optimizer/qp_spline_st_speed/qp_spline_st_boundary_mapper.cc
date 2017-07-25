@@ -55,20 +55,20 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
   if (obs_boundary) {
     const std::string msg = "obs_boundary is NULL.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (planning_time < 0.0) {
     const std::string msg = "Fail to get params since planning_time < 0.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (path_data.path().num_of_points() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
            << path_data.path().num_of_points() << ".";
-    return Status(ErrorCode::PLANNING_ERROR_FAILED,
+    return Status(ErrorCode::PLANNING_ERROR,
                   "Fail to get params because of too few path points");
   }
 
@@ -133,8 +133,7 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
                                           planning_time, obs_boundary);
     if (!ret.ok()) {
       AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
-      return Status(ErrorCode::PLANNING_ERROR_FAILED,
-                    "Fail to map static obstacle");
+      return Status(ErrorCode::PLANNING_ERROR, "Fail to map static obstacle");
     }
   }
 
@@ -151,7 +150,7 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
         if (!ret.ok()) {
           AERROR << "Fail to map follow dynamic obstacle with id " << obs->Id()
                  << ".";
-          return Status(ErrorCode::PLANNING_ERROR_FAILED,
+          return Status(ErrorCode::PLANNING_ERROR,
                         "Fail to map follow dynamic obstacle");
         }
       } else if (obj_decision.has_overtake() || obj_decision.has_yield()) {
