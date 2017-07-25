@@ -29,11 +29,9 @@ Optimizer::Optimizer(const std::string& name) : _name(name) {}
 
 const std::string& Optimizer::name() const { return _name; }
 
-bool Optimizer::SetConfig(const std::string&) { return true; }
+bool Optimizer::Init() { return true; }
 
-Status Optimizer::Optimize(PlanningData *planning_data) {
-  return Status::OK();
-}
+Status Optimizer::Optimize(PlanningData* planning_data) { return Status::OK(); }
 
 }  // namespace planning
 }  // namespace apollo
