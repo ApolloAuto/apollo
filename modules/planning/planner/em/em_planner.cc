@@ -22,6 +22,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/data_center.h"
@@ -67,8 +68,6 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   }
   routing_proxy_.Init();
   smoother_.SetConfig(smoother_config_);  // use the default value in config.
-  // FIXME(all): switch to real routing when it is ready
-  GenerateReferenceLineFromRouting(routing_proxy_);
   return Status::OK();
 }
 
@@ -76,6 +75,9 @@ Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
                          std::vector<TrajectoryPoint>* discretized_trajectory) {
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
+
+  // FIXME(all): switch to real routing when it is ready
+  GenerateReferenceLineFromRouting(routing_proxy_);
 
   frame->set_planning_data(new PlanningData());
   if (data_center->last_frame()) {
@@ -91,7 +93,7 @@ Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
   planning_data->set_reference_line(reference_line_);
   std::shared_ptr<DecisionData> decision_data(new DecisionData());
 
-  frame->mutable_planning_data()->set_decision_data(decision_data);
+  planning_data->set_decision_data(decision_data);
   for (auto& optimizer : optimizers_) {
     optimizer->Optimize(planning_data);
   }
@@ -164,6 +166,9 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
   common::math::Vec2d vehicle_position;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
 
+  vehicle_position.set_x(common::vehicle_state::VehicleState::instance()->x());
+  vehicle_position.set_y(common::vehicle_state::VehicleState::instance()->y());
+
   for (const auto& lane : routing_result.route()) {
     hdmap::Id lane_id;
     lane_id.set_id(lane.id());
@@ -179,8 +184,6 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
     for (size_t i = 0; i < points.size(); ++i) {
       ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, -2.0, 2.0);
     }
-    // FIXME(all): need vehicle position to smooth?
-    vehicle_position = points[0];
   }
   if (ref_points.empty()) {
     std::string msg("Found no reference points from map");
