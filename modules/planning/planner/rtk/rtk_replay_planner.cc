@@ -27,19 +27,26 @@ namespace planning {
 
 using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 RTKReplayPlanner::RTKReplayPlanner() {
   ReadTrajectoryFile(FLAGS_rtk_trajectory_filename);
 }
 
-bool RTKReplayPlanner::MakePlan(
+Status RTKReplayPlanner::Init(const PlanningConfig& config) {
+  return Status::OK();
+}
+
+Status RTKReplayPlanner::MakePlan(
     const TrajectoryPoint& start_point,
     std::vector<TrajectoryPoint>* ptr_discretized_trajectory) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
-    AERROR << "RTKReplayPlanner doesn't have a recorded trajectory or "
+    std::string msg("RTKReplayPlanner doesn't have a recorded trajectory or "
               "the recorded trajectory doesn't have enough valid trajectory "
-              "points.";
-    return false;
+              "points.");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   std::uint32_t matched_index =
@@ -70,7 +77,7 @@ bool RTKReplayPlanner::MakePlan(
     last_point.set_relative_time(last_point.relative_time() +
                                  FLAGS_trajectory_resolution);
   }
-  return true;
+  return Status::OK();
 }
 
 void RTKReplayPlanner::ReadTrajectoryFile(const std::string &filename) {

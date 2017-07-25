@@ -20,6 +20,8 @@
 #include <vector>
 
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 
 /**
@@ -47,13 +49,15 @@ class Planner {
    */
   virtual ~Planner() = default;
 
+  virtual apollo::common::Status Init(const PlanningConfig& config) = 0;
+
   /**
    * @brief Compute a trajectory for execution.
    * @param start_point The trajectory point where planning starts
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  virtual bool MakePlan(
+  virtual apollo::common::Status MakePlan(
       const apollo::common::TrajectoryPoint& start_point,
       std::vector<apollo::common::TrajectoryPoint>* discretized_trajectory) = 0;
 };

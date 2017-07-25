@@ -27,7 +27,7 @@ Optimizer::Optimizer(const std::string& name) : _name(name) {}
 
 const std::string& Optimizer::name() const { return _name; }
 
-bool SetConfig(const std::string&) { return true; }
+bool Optimizer::SetConfig(const std::string&) { return true; }
 
 }  // namespace planning
 }  // namespace apollo
