@@ -59,6 +59,7 @@ void EMPlanner::RegisterOptimizers() {
 }
 
 Status EMPlanner::Init(const PlanningConfig& config) {
+  AINFO << "In EMPlanner::Init()";
   RegisterOptimizers();
   for (int i = 0; i < config.em_planner_config().optimizer_size(); ++i) {
     optimizers_.emplace_back(optimizer_factory_.CreateObject(
@@ -157,6 +158,7 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
   for (const auto& lane : routing_result.route()) {
     hdmap::Id lane_id;
     lane_id.set_id(lane.id());
+    ADEBUG << "Added lane from routing:" << lane.id();
     lane_info_ptr = map.get_lane_by_id(lane_id);
     if (!lane_info_ptr) {
       std::string msg("failed to find lane " + lane.id() + " from map ");
@@ -184,6 +186,7 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
   reference_line_.reset(new ReferenceLine(smoothed_ref_points));
   return Status::OK();
 }

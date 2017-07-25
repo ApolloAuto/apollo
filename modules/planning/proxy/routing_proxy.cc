@@ -19,11 +19,12 @@ using apollo::common::ErrorCode;
 
 apollo::common::Status RoutingProxy::Init() {
   // FIXME(all): change to use real routing server
-  std::string routing_file("modules/map/data/garage.pb.txt");
+  std::string routing_file("modules/map/data/garage_routing.pb.txt");
 
   if (!::apollo::common::util::GetProtoFromFile(routing_file, &routing_)) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Unable to load routing file: " + routing_file);
+    std::string msg("Unable to load routing file: " + routing_file);
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   return Status::OK();
 }
