@@ -25,6 +25,8 @@
 
 #include "modules/planning/optimizer/optimizer.h"
 
+#include "modules/common/proto/path_point.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -41,7 +43,7 @@ class PathOptimizer : public Optimizer {
  protected:
   virtual apollo::common::Status Process(
       const SpeedData &speed_data, const ReferenceLine &reference_line,
-      const ::apollo::planning::TrajectoryPoint &init_point,
+      const common::TrajectoryPoint &init_point,
       DecisionData *const decision_data, PathData *const path_data) = 0;
 };
 
