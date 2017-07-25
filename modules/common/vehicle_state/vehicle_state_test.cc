@@ -55,6 +55,7 @@ TEST_F(VehicleStateTest, Accessors) {
   EXPECT_DOUBLE_EQ(vehicle_state.x(), 357.51331791372041);
   EXPECT_DOUBLE_EQ(vehicle_state.y(), 96.165912376788725);
   EXPECT_DOUBLE_EQ(vehicle_state.heading(), -1.8388082455104939);
+  EXPECT_DOUBLE_EQ(vehicle_state.pitch(), -0.010712737572581465);
   EXPECT_DOUBLE_EQ(vehicle_state.linear_velocity(), 3.0);
   EXPECT_DOUBLE_EQ(vehicle_state.angular_velocity(), -0.0079623083093763921);
   EXPECT_DOUBLE_EQ(vehicle_state.linear_acceleration(), -0.079383290718229638);
