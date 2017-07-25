@@ -34,23 +34,13 @@ namespace planning {
 
 class QpSplineStSpeedOptimizer : public SpeedOptimizer {
  public:
-  explicit QpSplineStSpeedOptimizer(
-      const std::string& name,
-      const QpSplineStSpeedConfig& qp_spline_st_speed_config,
-      const apollo::localization::Pose& pose, const apollo::hdmap::HDMap& map,
-      const apollo::common::config::VehicleParam& veh_param);
+  explicit QpSplineStSpeedOptimizer(const std::string& name);
 
  private:
   virtual common::Status process(
       const PathData& path_data,
       const apollo::common::TrajectoryPoint& init_point,
       DecisionData* const decision_data, SpeedData* const speed_data) const;
-
- private:
-  const QpSplineStSpeedConfig& _qp_spline_st_speed_config;
-  const apollo::localization::Pose _pose;
-  const apollo::hdmap::HDMap& _hdmap;
-  const apollo::common::config::VehicleParam& veh_param_;
 };
 
 }  // namespace planning

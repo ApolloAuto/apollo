@@ -52,6 +52,7 @@ cc_library(
         ":qp_spline_st_boundary_mapper",
         ":qp_spline_st_graph",
         "//modules/common:log",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:path_point_proto",
         "//modules/localization/proto:pose_proto",
