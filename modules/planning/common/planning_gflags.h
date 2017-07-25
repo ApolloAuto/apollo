@@ -70,12 +70,6 @@ DECLARE_double(lateral_jerk_bound);
 DECLARE_double(longitudinal_jerk_lower_bound);
 DECLARE_double(longitudinal_jerk_upper_bound);
 
-// Math : active set solver
-DECLARE_double(default_active_set_eps_num);
-DECLARE_double(default_active_set_eps_den);
-DECLARE_double(default_active_set_eps_iter_ref);
-DECLARE_bool(default_enable_active_set_debug_info);
-
 // STGraph
 DECLARE_double(stgraph_default_point_cost);
 DECLARE_double(stgraph_max_acceleration_divide_factor_level_1);

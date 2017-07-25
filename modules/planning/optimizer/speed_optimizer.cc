@@ -27,8 +27,8 @@ namespace planning {
 
 SpeedOptimizer::SpeedOptimizer(const std::string& name) : Optimizer(name) {}
 
-apollo::common::Status SpeedOptimizer::optimize(PlanningData* planning_data) {
-  return process(planning_data->path_data(),
+apollo::common::Status SpeedOptimizer::Optimize(PlanningData* planning_data) {
+  return Process(planning_data->path_data(),
                  planning_data->init_planning_point(),
                  planning_data->mutable_decision_data(),
                  planning_data->mutable_speed_data());

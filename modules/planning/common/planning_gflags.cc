@@ -91,15 +91,6 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
 DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
 
-DEFINE_double(default_active_set_eps_num, 1e-7,
-              "qpOases wrapper error control numerator");
-DEFINE_double(default_active_set_eps_den, 1e-7,
-              "qpOases wrapper error control numerator");
-DEFINE_double(default_active_set_eps_iter_ref, 1e-7,
-              "qpOases wrapper error control numerator");
-DEFINE_bool(default_enable_active_set_debug_info, false,
-            "Enable print information");
-
 DEFINE_double(stgraph_default_point_cost, 1e10,
               "The default stgraph point cost.");
 DEFINE_double(stgraph_max_acceleration_divide_factor_level_1, 2.0,

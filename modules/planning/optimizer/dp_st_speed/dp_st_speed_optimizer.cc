@@ -38,7 +38,7 @@ using apollo::common::config::VehicleConfigHelper;
 DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
-Status DpStSpeedOptimizer::process(const PathData& path_data,
+Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    const TrajectoryPoint& init_point,
                                    DecisionData* const decision_data,
                                    SpeedData* const speed_data) const {
