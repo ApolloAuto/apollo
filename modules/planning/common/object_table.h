@@ -23,9 +23,8 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
-#include "modules/common/util/lru_cache.h"
-#include "modules/planning/common/map_object.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -34,20 +33,13 @@ namespace planning {
 
 class ObjectTable {
  public:
-  ObjectTable()
-      : _obstacle_cache(FLAGS_object_table_obstacle_capacity),
-        _map_object_cache(FLAGS_object_table_obstacle_capacity) {}
-
-  bool get_obstacle(const uint32_t id, Obstacle** const obstacle);
-  void put_obstacle(std::unique_ptr<Obstacle> obstacle);
-  bool get_map_object(const std::string& id, MapObject** const map_object);
-  void put_map_object(std::unique_ptr<MapObject>& map_object);
+  ObjectTable() = default;
+  Obstacle* get_obstacle(const uint32_t id);
+  Obstacle* get_obstacle(const std::string& id);
+  void add_obstacle(const Obstacle& obstacle);
 
  private:
-  apollo::common::util::LRUCache<uint32_t, std::unique_ptr<Obstacle>>
-      _obstacle_cache;
-  apollo::common::util::LRUCache<std::string, std::unique_ptr<MapObject>>
-      _map_object_cache;
+  std::unordered_map<std::string, std::unique_ptr<Obstacle>> _obstacle_cache;
 };
 
 }  // namespace planning

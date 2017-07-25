@@ -49,11 +49,6 @@ DEFINE_int32(max_frame_size, 30, "max size for prediction window");
 DEFINE_int32(state_fail_threshold, 5,
              "This is continuous fail threshold for FSM change to fail state.");
 
-DEFINE_int32(object_table_obstacle_capacity, 200,
-             "The number of obstacles we hold in the object table.");
-DEFINE_int32(object_table_map_object_capacity, 200,
-             "The number of map objects we hold in the object table.");
-
 DEFINE_bool(use_stitch, true, "Use trajectory stitch if possible.");
 DEFINE_double(forward_predict_time, 0.2,
               "The forward predict time in each planning cycle.");

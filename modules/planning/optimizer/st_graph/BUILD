@@ -63,7 +63,6 @@ cc_library(
         "//modules/map/hdmap",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:decision_data",
-        "//modules/planning/common:map_object",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:planning_object",

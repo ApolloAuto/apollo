@@ -23,7 +23,6 @@
 
 #include <vector>
 
-#include "modules/planning/common/map_object.h"
 #include "modules/planning/common/obstacle.h"
 
 namespace apollo {
@@ -41,15 +40,12 @@ class DecisionData {
 
   std::vector<const Obstacle *> DynamicObstacles() const;
   std::vector<Obstacle *> MutableDynamicObstacles() const;
-  std::vector<const MapObject *> MapObjects() const;
-  std::vector<MapObject *> MutableMapObjects() const;
   const std::vector<Obstacle> &Obstacles() const;
   std::vector<Obstacle> *MutableObstacles();
 
  private:
   MainDecision main_decision_;
   std::vector<Obstacle> obstacles_;
-  std::vector<MapObject> map_objects_;
 };
 
 }  // namespace planning

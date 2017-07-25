@@ -51,11 +51,11 @@ class SLAnalyticTransformation {
       const double theta_ref, const common::math::Vec2d& point_ref,
       const double l);
   /**
-  *   @brief: given sl, theta, and road's theta, kappa, extract derivative l,
-  *second order derivative l:
-  *   @reference:  in paper: optimal trajectory generation for dynamic street
-  *scenarios in a frenet frame
-  **/
+   * @brief: given sl, theta, and road's theta, kappa, extract derivative l,
+   *second order derivative l:
+   * @reference:  in paper: optimal trajectory generation for dynamic street
+   * scenarios in a frenet frame
+   **/
   static double calculate_lateral_derivative(const double theta_ref,
                                              const double theta, const double l,
                                              const double kappa_ref);
