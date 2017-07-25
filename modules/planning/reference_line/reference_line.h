@@ -57,6 +57,8 @@ class ReferenceLine {
   double get_lane_width(const double s) const;
   bool is_on_road(const common::SLPoint& sl_point) const;
 
+  std::string DebugString() const;
+
  private:
   static ReferencePoint interpolate(const ReferencePoint& p0, const double s0,
                                     const ReferencePoint& p1, const double s1,

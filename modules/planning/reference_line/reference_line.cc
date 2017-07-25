@@ -20,6 +20,7 @@
 
 #include "modules/planning/reference_line/reference_line.h"
 
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -223,6 +224,12 @@ double ReferenceLine::get_lane_width(const double s) const {
 bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
   // TODO(startcode) : need implement;
   return true;
+}
+
+std::string ReferenceLine::DebugString() const {
+  std::ostringstream ss;
+  ss << "point num:" << reference_points_.size();
+  return ss.str();
 }
 
 }  // namespace planning
