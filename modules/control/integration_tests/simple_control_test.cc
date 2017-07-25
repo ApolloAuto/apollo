@@ -78,5 +78,3 @@ TEST_F(SimpleControlTest, monitor_fatal) {
 
 }  // namespace control
 }  // namespace apollo
-
-TMAIN;
