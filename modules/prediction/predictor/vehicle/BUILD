@@ -8,7 +8,13 @@ cc_library(
     srcs = ["lane_sequence_predictor.cc"],
     deps = [
         "//modules/prediction/predictor:predictor",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_map",
+        "//modules/prediction/proto:lane_graph_proto",
+        "//modules/common/proto:path_point_proto",
         "//modules/common:log",
+        "//modules/common/math:math_utils",
+        "@eigen//:eigen",
     ]
 )
 

@@ -30,9 +30,6 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::math::KalmanFilter;
-
 class FreeMovePredictor : public Predictor {
  public:
   /**
@@ -61,13 +58,14 @@ class FreeMovePredictor : public Predictor {
    * @param Total time
    * @param Generated trajectory points
    */
-  void DrawFreeMoveTrajectoryPoints(const Eigen::Vector2d& position,
-                                    const Eigen::Vector2d& velocity,
-                                    const Eigen::Vector2d& acc,
-                                    const KalmanFilter<double, 6, 2, 0>& kf,
-                                    double total_time,
-                                    double freq,
-                                    std::vector<TrajectoryPoint> *points);
+  void DrawFreeMoveTrajectoryPoints(
+      const Eigen::Vector2d& position,
+      const Eigen::Vector2d& velocity,
+      const Eigen::Vector2d& acc,
+      const ::apollo::common::math::KalmanFilter<double, 6, 2, 0>& kf,
+      double total_time,
+      double freq,
+      std::vector<::apollo::common::TrajectoryPoint> *points);
 };
 
 }  // namespace prediction
