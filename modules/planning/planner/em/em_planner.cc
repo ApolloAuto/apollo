@@ -22,6 +22,8 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"
+#include "modules/map/hdmap/hdmap.h"
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -62,6 +64,10 @@ Status EMPlanner::Init(const PlanningConfig& config) {
     optimizers_.emplace_back(optimizer_factory_.CreateObject(
         config.em_planner_config().optimizer(i)));
   }
+  routing_proxy_.Init();
+  smoother_.SetConfig(smoother_config_);  // use the default value in config.
+  // FIXME(all): switch to real routing when it is ready
+  GenerateReferenceLineFromRouting(routing_proxy_);
   return Status::OK();
 }
 
@@ -77,7 +83,10 @@ Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
   ADEBUG << "start point:" << start_point.DebugString();
   frame->mutable_planning_data()->set_init_planning_point(start_point);
 
-  //  frame->mutable_planning_data()->set_reference_line(reference_line);
+  if (reference_line_) {
+    ADEBUG << "reference line:" << reference_line_->DebugString();
+  }
+  frame->mutable_planning_data()->set_reference_line(reference_line_);
   //  frame->mutable_planning_data()->set_decision_data(decision_data);
   for (auto& optimizer : optimizers_) {
     optimizer->Optimize(frame->mutable_planning_data());
@@ -134,6 +143,51 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   }
   return std::move(speed_profile);
 }
+
+Status EMPlanner::GenerateReferenceLineFromRouting(
+    const RoutingProxy& routing_proxy) {
+  DataCenter* data_center = DataCenter::instance();
+
+  const auto& routing_result = routing_proxy.routing();
+  const auto& map = data_center->map();
+  std::vector<ReferencePoint> ref_points;
+  common::math::Vec2d vehicle_position;
+  hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
+
+  for (const auto& lane : routing_result.route()) {
+    hdmap::Id lane_id;
+    lane_id.set_id(lane.id());
+    lane_info_ptr = map.get_lane_by_id(lane_id);
+    if (!lane_info_ptr) {
+      std::string msg("failed to find lane " + lane.id() + " from map ");
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+    const auto& points = lane_info_ptr->points();
+    const auto& headings = lane_info_ptr->headings();
+    for (size_t i = 0; i < points.size(); ++i) {
+      ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, -2.0, 2.0);
+    }
+    // FIXME(all): need vehicle position to smooth?
+    vehicle_position = points[0];
+  }
+  if (ref_points.empty()) {
+    std::string msg("Found no reference points from map");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
+  std::vector<ReferencePoint> smoothed_ref_points;
+  if (!smoother_.smooth(*reference_line, vehicle_position, &smoothed_ref_points)) {
+    std::string msg("Fail to smooth a reference line from map");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  reference_line_.reset(new ReferenceLine(smoothed_ref_points));
+  return Status::OK();
+}
+
 
 }  // namespace planning
 }  // namespace apollo
