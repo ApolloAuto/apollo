@@ -88,7 +88,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   auto localization_adapter = AdapterManager::GetLocalization();
   if (localization_adapter->Empty()) {
     AINFO << "No Localization msg yet. ";
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, "No localization msg");
+    return Status(ErrorCode::PLANNING_ERROR, "No localization msg");
   }
   LocalizationEstimate localization = localization_adapter->GetLatestObserved();
 
@@ -100,7 +100,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
       dp_st_speed_config.max_speed(),
       &speed_limit) != Status::OK()) {
     AERROR << "Getting speed limits for dp st speed optimizer failed!";
-    return Status(ErrorCode::PLANNING_ERROR_FAILED,
+    return Status(ErrorCode::PLANNING_ERROR,
                   "Getting speed limits for dp st speed optimizer failed!");
 
   }
