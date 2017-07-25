@@ -9,7 +9,9 @@ cc_library(
     ],
     deps = [
         "//modules/common/proto:path_point_proto",
+        "//modules/common/status",
         "//modules/common/vehicle_state",
+        "//modules/planning/proto:planning_proto",
     ],
 )
 

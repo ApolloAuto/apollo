@@ -37,9 +37,9 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_y(4140674.76063);
 
   std::vector<TrajectoryPoint> trajectory;
-  bool planning_succeeded = planner.MakePlan(start_point, &trajectory);
+  auto status = planner.MakePlan(start_point, &trajectory);
 
-  EXPECT_TRUE(planning_succeeded);
+  EXPECT_TRUE(status.ok());
   EXPECT_TRUE(!trajectory.empty());
   EXPECT_EQ(trajectory.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward);
 
@@ -62,7 +62,7 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
   std::vector<TrajectoryPoint> trajectory;
-  EXPECT_TRUE(!planner_with_error_csv.MakePlan(start_point, &trajectory));
+  EXPECT_TRUE(!(planner_with_error_csv.MakePlan(start_point, &trajectory)).ok());
 }
 
 }  // namespace planning

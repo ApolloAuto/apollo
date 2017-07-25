@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "modules/planning/planner/planner.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -48,13 +49,15 @@ class RTKReplayPlanner : public Planner {
    */
   virtual ~RTKReplayPlanner() = default;
 
+  apollo::common::Status Init(const PlanningConfig& config) override;
+
   /**
    * @brief Overrode function Plan in parent class Planner.
    * @param start_point The trajectory point where planning starts
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  bool MakePlan(
+  apollo::common::Status MakePlan(
       const apollo::common::TrajectoryPoint& start_point,
       std::vector<apollo::common::TrajectoryPoint>* ptr_trajectory) override;
 

@@ -17,12 +17,17 @@
 #ifndef MODULES_PLANNING_PLANNER_EM_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_EM_PLANNER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/common/status/status.h"
+#include "modules/common/util/factory.h"
+#include "modules/planning/optimizer/optimizer.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -48,19 +53,28 @@ class EMPlanner : public Planner {
    */
   virtual ~EMPlanner() = default;
 
+  apollo::common::Status Init(const PlanningConfig& config) override;
+
   /**
    * @brief Overrode function Plan in parent class Planner.
    * @param start_point The trajectory point where planning starts
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  bool MakePlan(
+  apollo::common::Status MakePlan(
       const apollo::common::TrajectoryPoint& start_point,
       std::vector<apollo::common::TrajectoryPoint>* trajectory) override;
 
  private:
+  void RegisterOptimizers();
+
   std::vector<SpeedPoint> GenerateInitSpeedProfile(const double init_v,
                                                    const double init_a);
+
+
+ private:
+  apollo::common::util::Factory<OptimizerType, Optimizer> optimizer_factory_;
+  std::vector<std::unique_ptr<Optimizer>> optimizers_;
 };
 
 }  // namespace planning

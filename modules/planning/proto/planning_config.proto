@@ -2,10 +2,23 @@ syntax = "proto2";
 
 package apollo.planning;
 
+enum OptimizerType {
+  DP_POLY_PATH_OPTIMIZER = 0;
+  DP_ST_SPEED_OPTIMIZER = 1;
+  QP_SPLINE_PATH_OPTIMIZER = 2;
+  QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
+};
+
+message EMPlannerConfig {
+  repeated OptimizerType optimizer = 1;
+}
+
 message PlanningConfig {
   enum PlannerType {
     RTK = 0;
     EM = 1;  // expectation maximization
   };
   optional PlannerType planner_type = 1 [default = EM];
+
+  optional EMPlannerConfig em_planner_config = 2;
 }
