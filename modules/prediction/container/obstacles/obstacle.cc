@@ -623,10 +623,8 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
 
 void Obstacle::SetCurrentLanes(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
-  if (map == nullptr) {
-    AERROR << "Map is missing.";
-    return;
-  }
+  CHECK_NOTNULL(map);
+
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
   double heading = feature->theta();
   if (FLAGS_enable_kf_tracking) {
@@ -688,10 +686,8 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
 
 void Obstacle::SetNearbyLanes(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
-  if (map == nullptr) {
-    AERROR << "Missing prediction map.";
-    return;
-  }
+  CHECK_NOTNULL(map);
+
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
   if (FLAGS_enable_kf_tracking) {
     point[0] = feature->t_position().x();
@@ -746,10 +742,8 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
-  if (map == nullptr) {
-    AERROR << "Missing prediction map.";
-    return;
-  }
+  CHECK_NOTNULL(map);
+
   for (auto& lane : feature->lane().current_lane_feature()) {
     const LaneInfo* lane_info = map->LaneById(lane.lane_id());
     RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
@@ -790,10 +784,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
     return;
   }
   PredictionMap* map = PredictionMap::instance();
-  if (map == nullptr) {
-    AERROR << "Missing prediction map.";
-    return;
-  }
+  CHECK_NOTNULL(map);
 
   LaneGraph* lane_graph = feature->mutable_lane()
                                  ->mutable_lane_graph();
