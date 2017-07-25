@@ -22,12 +22,12 @@
 
 #include <vector>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_boundary_mapper.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_configuration.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 #include "modules/planning/optimizer/st_graph/st_graph_data.h"
-#include "modules/common/adapters/adapter_manager.h"
 
 namespace apollo {
 namespace planning {
@@ -51,9 +51,9 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   // TODO: load boundary mapper and st graph configuration
   StBoundaryConfig st_boundary_config;
   DpStConfiguration dp_st_speed_config;
-  //TODO(yifei) will change to pb later
-  //DpStSpeedConfig dp_st_speed_config;
-  //if (!common::util::GetProtoFromFile(FLAGS_dp_st_speed_config_file,
+  // TODO(yifei) will change to pb later
+  // DpStSpeedConfig dp_st_speed_config;
+  // if (!common::util::GetProtoFromFile(FLAGS_dp_st_speed_config_file,
   //                                    &dp_st_speed_config)) {
   //  AERROR << "failed to load config file " << FLAGS_dp_st_speed_config_file;
   //  return Status(ErrorCode::PLANNING_ERROR,
@@ -92,17 +92,13 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   }
   LocalizationEstimate localization = localization_adapter->GetLatestObserved();
 
-  if (st_mapper.get_speed_limits( localization.pose(),
-      DataCenter::instance()->map(),
-      path_data,
-      planning_distance,
-      dp_st_speed_config.matrix_dimension_s(),
-      dp_st_speed_config.max_speed(),
-      &speed_limit) != Status::OK()) {
+  if (st_mapper.get_speed_limits(
+          localization.pose(), DataCenter::instance()->map(), path_data,
+          planning_distance, dp_st_speed_config.matrix_dimension_s(),
+          dp_st_speed_config.max_speed(), &speed_limit) != Status::OK()) {
     AERROR << "Getting speed limits for dp st speed optimizer failed!";
     return Status(ErrorCode::PLANNING_ERROR,
                   "Getting speed limits for dp st speed optimizer failed!");
-
   }
 
   StGraphData st_graph_data(boundaries, init_point, speed_limit,
