@@ -148,15 +148,6 @@ new_http_archive(
     url = "https://bitbucket.org/eigen/eigen/get/3.2.10.tar.gz",
 )
 
-# websocket++/websocketpp
-new_http_archive(
-    name = "websocketpp",
-    build_file = "third_party/websocketpp.BUILD",
-    sha256 = "07b3364ad30cda022d91759d4b83ff902e1ebadb796969e58b59caa535a03923",
-    strip_prefix = "websocketpp-0.7.0",
-    url = "https://github.com/zaphoyd/websocketpp/archive/0.7.0.tar.gz",
-)
-
 # CivetWeb (web server)
 new_http_archive(
     name = "civetweb",
