@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 
 #include "modules/planning/common/planning_data.h"
 

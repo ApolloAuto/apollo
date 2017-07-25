@@ -146,7 +146,8 @@ Status DpStGraph::calculate_total_cost() {
   return Status::OK();
 }
 
-void DpStGraph::calculate_total_cost(const std::uint32_t r, const std::uint32_t c) {
+void DpStGraph::calculate_total_cost(const std::uint32_t r,
+                                     const std::uint32_t c) {
   if (r == 0) {
     if (c == 0) {
       _cost_table[r][c].set_total_cost(0.0);
@@ -277,11 +278,11 @@ Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
   }
 
   speed_data->set_speed_vector(speed_profile);
-  return  Status::OK();
+  return Status::OK();
 }
 
 Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
-                                         const SpeedData& speed_profile) const {
+                                      const SpeedData& speed_profile) const {
   if (speed_profile.speed_vector().size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
@@ -296,9 +297,14 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
        obs_it != obs_boundaries.end(); ++obs_it) {
     CHECK_GE(obs_it->points().size(), 4);
 
-    Obstacle* object_ptr = nullptr;
-    DataCenter::instance()->mutable_object_table()->get_obstacle(obs_it->id(),
-                                                                 &object_ptr);
+    Obstacle* object_ptr =
+        DataCenter::instance()->mutable_object_table()->get_obstacle(
+            obs_it->id());
+    if (!object_ptr) {
+      AERROR << "Failed to find object " << obs_it->id();
+      return Status(ErrorCode::PLANNING_ERROR_FAILED,
+                    "failed to find object from object_table");
+    }
     if (obs_it->points().front().x() <= 0) {
       ObjectDecisionType dec;
       dec.mutable_yield();

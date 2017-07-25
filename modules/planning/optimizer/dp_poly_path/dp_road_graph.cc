@@ -53,7 +53,7 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
                                 DecisionData *const decision_data,
                                 PathData *const path_data) {
   CHECK_NOTNULL(path_data);
-  if (!init(reference_line).ok()) {
+  if (!init(reference_line)) {
     const std::string msg = "Fail to init dp road graph!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
@@ -144,26 +144,25 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
   return Status::OK();
 }
 
-Status DpRoadGraph::init(const ReferenceLine &reference_line) {
+bool DpRoadGraph::init(const ReferenceLine &reference_line) {
   _vertices.clear();
   _edges.clear();
   common::math::Vec2d xy_point(_init_point.path_point().x(),
                                _init_point.path_point().y());
 
   if (!reference_line.get_point_in_Frenet_frame(xy_point, &_init_sl_point)) {
-    const std::string msg = "Fail to map init point to sl coordinate!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    AERROR << "Fail to map init point to sl coordinate!";
+    return false;
   }
 
   ReferencePoint reference_point =
       reference_line.get_reference_point(_init_sl_point.s());
 
-  double init_dl = SLAnalyticTransformation().calculate_lateral_derivative(
+  double init_dl = SLAnalyticTransformation::calculate_lateral_derivative(
       reference_point.heading(), _init_point.path_point().theta(),
       _init_sl_point.l(), reference_point.kappa());
   double init_ddl =
-      SLAnalyticTransformation().calculate_second_order_lateral_derivative(
+      SLAnalyticTransformation::calculate_second_order_lateral_derivative(
           reference_point.heading(), _init_point.path_point().theta(),
           reference_point.kappa(), _init_point.path_point().kappa(),
           reference_point.dkappa(), _init_sl_point.l());
@@ -176,7 +175,7 @@ Status DpRoadGraph::init(const ReferenceLine &reference_line) {
   _vertices.emplace_back(init_frenet_frame_point, 0, 0);
   _vertices.back().set_type(GraphVertex::Type::GRAPH_HEAD);
   _vertices.back().set_accumulated_cost(0.0);
-  return Status::OK();
+  return true;
 }
 
 Status DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {

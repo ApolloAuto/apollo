@@ -51,13 +51,5 @@ std::vector<Obstacle *> DecisionData::MutableDynamicObstacles() const {
   return std::vector<Obstacle *>();
 }
 
-std::vector<const MapObject *> DecisionData::MapObjects() const {
-  return std::vector<const MapObject *>();
-}
-
-std::vector<MapObject *> DecisionData::MutableMapObjects() const {
-  return std::vector<MapObject *>();
-}
-
 }  // namespace planning
 }  // namespace apollo

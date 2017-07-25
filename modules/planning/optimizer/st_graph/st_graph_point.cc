@@ -25,7 +25,6 @@
 namespace apollo {
 namespace planning {
 
-
 std::uint32_t StGraphPoint::index_s() const { return _index_s; }
 
 std::uint32_t StGraphPoint::index_t() const { return _index_t; }
@@ -40,8 +39,8 @@ double StGraphPoint::obstacle_cost() const { return _obstacle_cost; }
 
 double StGraphPoint::total_cost() const { return _total_cost; }
 
-void StGraphPoint::init(const std::uint32_t index_t, const std::uint32_t index_s,
-                        const STPoint& st_point) {
+void StGraphPoint::init(const std::uint32_t index_t,
+                        const std::uint32_t index_s, const STPoint& st_point) {
   _index_t = index_t;
   _index_s = index_s;
   _point = st_point;

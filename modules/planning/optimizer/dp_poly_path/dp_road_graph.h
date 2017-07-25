@@ -49,9 +49,8 @@ class DpRoadGraph {
                                        PathData *const path_data);
 
  private:
-  ::apollo::common::Status init(const ReferenceLine &reference_line);
-  ::apollo::common::Status generate_graph(
-      const ReferenceLine &reference_line);
+  bool init(const ReferenceLine &reference_line);
+  ::apollo::common::Status generate_graph(const ReferenceLine &reference_line);
   ::apollo::common::Status find_best_trajectory(
       const ReferenceLine &reference_line, const DecisionData &decision_data,
       std::vector<uint32_t> *const min_cost_edges);

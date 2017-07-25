@@ -20,37 +20,31 @@
 
 #include "modules/planning/common/object_table.h"
 
+#include <memory>
+
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace planning {
 
-bool ObjectTable::get_obstacle(const uint32_t id, Obstacle** const obstacle) {
-  auto *obstacle_from_cache = _obstacle_cache.Get(id);
-  if (!obstacle_from_cache) {
-    return false;
+Obstacle* ObjectTable::get_obstacle(const uint32_t id) {
+  return get_obstacle(std::to_string(id));
+}
+
+Obstacle* ObjectTable::get_obstacle(const std::string& id) {
+  auto iter = _obstacle_cache.find(id);
+  if (iter != _obstacle_cache.end()) {
+    return iter->second.get();
+  } else {
+    AERROR << "Failed to find object " << id;
+    return nullptr;
   }
-
-  *obstacle = obstacle_from_cache->get();
-  return true;
 }
 
-void ObjectTable::put_obstacle(std::unique_ptr<Obstacle> obstacle) {
-  _obstacle_cache.Put(obstacle->Id(), std::move(obstacle));
-}
-
-bool ObjectTable::get_map_object(const std::string& id,
-                                 MapObject** const map_object) {
-  auto *map_object_from_cache = _map_object_cache.Get(id);
-  if (!map_object_from_cache) {
-    return false;
-  }
-
-  *map_object = map_object_from_cache->get();
-
-  return true;
-}
-
-void ObjectTable::put_map_object(std::unique_ptr<MapObject>& map_object) {
-  _map_object_cache.Put(map_object->Id(), std::move(map_object));
+void ObjectTable::add_obstacle(const Obstacle& obstacle) {
+  auto ptr = std::unique_ptr<Obstacle>();
+  *ptr = obstacle;
+  _obstacle_cache[ptr->Id()] = std::move(ptr);
 }
 
 }  // namespace planning
