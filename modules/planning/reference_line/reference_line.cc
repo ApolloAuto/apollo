@@ -30,8 +30,8 @@
 #include "modules/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/planning/math/double.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
@@ -42,8 +42,8 @@ ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points)
     : reference_points_(reference_points) {
   std::vector<hdmap::MapPathPoint> points(reference_points.begin(),
-                                       reference_points.end());
-  reference_map_line_ = std::move(ReferenceMapLine(std::move(points)));
+                                          reference_points.end());
+  reference_map_line_ = ReferenceMapLine(points);
 }
 
 ReferenceLine::ReferenceLine(
@@ -52,11 +52,12 @@ ReferenceLine::ReferenceLine(
     const double max_approximation_error)
     : reference_points_(reference_points) {
   std::vector<hdmap::MapPathPoint> points(reference_points.begin(),
-                                       reference_points.end());
-  reference_map_line_ = std::move(ReferenceMapLine(
-      std::move(points), lane_segments, max_approximation_error));
+                                          reference_points.end());
+  reference_map_line_ =
+      ReferenceMapLine(points, lane_segments, max_approximation_error);
 }
 
+/*
 void ReferenceLine::move(const ReferenceLine& reference_line) {
   reference_map_line_ =
       ReferenceMapLine(reference_line.reference_map_line().path_points());
@@ -68,6 +69,7 @@ void ReferenceLine::move(const ReferenceLine&& reference_line) {
       ReferenceMapLine(reference_line.reference_map_line().path_points());
   reference_points_ = reference_line.reference_points();
 }
+*/
 
 ReferencePoint ReferenceLine::get_reference_point(const double s) const {
   const auto& accumulated_s = reference_map_line_.accumulated_s();
@@ -230,8 +232,9 @@ bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
 std::string ReferenceLine::DebugString() const {
   std::ostringstream ss;
   ss << "point num:" << reference_points_.size();
-  for (unsigned i = 0; i < reference_points_.size() &&
-      i < FLAGS_trajectory_point_num_for_debug; ++i) {
+  for (int32_t i = 0; i < static_cast<int32_t>(reference_points_.size()) &&
+                      i < FLAGS_trajectory_point_num_for_debug;
+       ++i) {
     ss << reference_points_[i].DebugString();
   }
   return ss.str();
