@@ -23,8 +23,10 @@
 
 #include <functional>
 #include <string>
+#include <unordered_map>
 
 #include "third_party/json/json.hpp"
+#include "gtest/gtest_prod.h"
 
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
@@ -38,37 +40,6 @@
  */
 namespace apollo {
 namespace dreamview {
-
-namespace internal {
-
-template <typename AdapterType>
-void UpdateSimulationWorld(const typename AdapterType::DataType &data,
-                           SimulationWorld *world);
-
-template <>
-void UpdateSimulationWorld<apollo::common::adapter::MonitorAdapter>(
-    const apollo::common::monitor::MonitorMessage &monitor_msg,
-    SimulationWorld *world);
-
-template <>
-void UpdateSimulationWorld<apollo::common::adapter::LocalizationAdapter>(
-    const apollo::localization::LocalizationEstimate &localization,
-    SimulationWorld *world);
-
-template <>
-void UpdateSimulationWorld<apollo::common::adapter::ChassisAdapter>(
-    const apollo::canbus::Chassis &chassis, SimulationWorld *world);
-
-template <>
-void UpdateSimulationWorld<apollo::common::adapter::PlanningAdapter>(
-    const apollo::planning::ADCTrajectory &trajectory, SimulationWorld *world);
-
-template<>
-void UpdateSimulationWorld<apollo::common::adapter::PerceptionObstaclesAdapter>(
-    const apollo::perception::PerceptionObstacles &obstacles,
-    SimulationWorld *world);
-
-}  // namespace internal
 
 /**
  * @class SimulationWorldService
@@ -143,9 +114,8 @@ class SimulationWorldService {
       return;
     }
 
-    adapter->SetCallback(
-        std::bind(&internal::UpdateSimulationWorld<AdapterType>,
-                  std::placeholders::_1, &world_));
+    adapter->SetCallback([this](typename AdapterType::DataType d)
+        { return SimulationWorldService::UpdateSimulationWorld(d);});
   }
 
   /**
@@ -154,7 +124,7 @@ class SimulationWorldService {
    */
   template <typename AdapterType>
   void UpdateWithLatestObserved(const std::string &adapter_name,
-                                AdapterType *adapter, SimulationWorld *world) {
+                                AdapterType *adapter) {
     if (adapter == nullptr) {
       AERROR << adapter_name << " adapter is not correctly initialized. "
                                 "Please check the adapter manager "
@@ -167,16 +137,42 @@ class SimulationWorldService {
       return;
     }
 
-    internal::UpdateSimulationWorld<AdapterType>(adapter->GetLatestObserved(),
-                                                 world);
+    UpdateSimulationWorld(adapter->GetLatestObserved());
   }
+
+  /*template <typename AdapterType>
+  void UpdateSimulationWorld(const typename AdapterType::DataType &data);*/
+
+  void UpdateSimulationWorld(
+      const apollo::common::monitor::MonitorMessage &monitor_msg);
+
+  void UpdateSimulationWorld(
+      const apollo::localization::LocalizationEstimate &localization);
+
+  void UpdateSimulationWorld(
+      const apollo::canbus::Chassis &chassis);
+
+  void UpdateSimulationWorld(
+      const apollo::planning::ADCTrajectory &trajectory);
+
+  void UpdateSimulationWorld(
+      const apollo::perception::PerceptionObstacles &obstacles);
 
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
+  std::unordered_map<std::string, Object> obj_map_;
 
-  // The handle of MapService, not woned by SimulationWorldService.
+  // The handle of MapService, not owned by SimulationWorldService.
   MapService *map_service_;
+
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorTruncate);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateChassisInfo);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateLocalization);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdatePerceptionObstacles);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdatePlanningTrajectory);
 };
 
 }  // namespace dreamview
