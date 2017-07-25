@@ -76,18 +76,18 @@ struct PathOverlap {
   std::string debug_string() const;
 };
 
-class PathPoint : public apollo::common::math::Vec2d {
+class MapPathPoint : public apollo::common::math::Vec2d {
  public:
-  PathPoint() = default;
-  PathPoint(const apollo::common::math::Vec2d& point, double heading)
+  MapPathPoint() = default;
+  MapPathPoint(const apollo::common::math::Vec2d& point, double heading)
       : Vec2d(point.x(), point.y()), _heading(heading) {}
-  PathPoint(const apollo::common::math::Vec2d& point, double heading,
-            LaneWaypoint lane_waypoint)
+  MapPathPoint(const apollo::common::math::Vec2d& point, double heading,
+               LaneWaypoint lane_waypoint)
       : Vec2d(point.x(), point.y()), _heading(heading) {
     _lane_waypoints.emplace_back(std::move(lane_waypoint));
   }
-  PathPoint(const apollo::common::math::Vec2d& point, double heading,
-            std::vector<LaneWaypoint> lane_waypoints)
+  MapPathPoint(const apollo::common::math::Vec2d& point, double heading,
+               std::vector<LaneWaypoint> lane_waypoints)
       : Vec2d(point.x(), point.y()),
         _heading(heading),
         _lane_waypoints(std::move(lane_waypoints)) {}
@@ -188,16 +188,16 @@ class Path {
   Path(Path&&) = default;
   Path& operator=(Path&&) = default;
 
-  explicit Path(std::vector<PathPoint> path_points);
-  Path(std::vector<PathPoint> path_points,
+  explicit Path(std::vector<MapPathPoint> path_points);
+  Path(std::vector<MapPathPoint> path_points,
        std::vector<LaneSegment> lane_segments);
-  Path(std::vector<PathPoint> path_points,
+  Path(std::vector<MapPathPoint> path_points,
        std::vector<LaneSegment> lane_segments,
        const double max_approximation_error);
 
   // Return smooth coordinate by interpolated index or accumulate_s.
-  PathPoint get_smooth_point(const InterpolatedIndex& index) const;
-  PathPoint get_smooth_point(double s) const;
+  MapPathPoint get_smooth_point(const InterpolatedIndex& index) const;
+  MapPathPoint get_smooth_point(double s) const;
 
   // Compute accumulate s value of the index.
   double get_s_from_index(const InterpolatedIndex& index) const;
@@ -220,7 +220,7 @@ class Path {
 
   int num_points() const { return _num_points; }
   int num_segments() const { return _num_segments; }
-  const std::vector<PathPoint>& path_points() const { return _path_points; }
+  const std::vector<MapPathPoint>& path_points() const { return _path_points; }
   const std::vector<LaneSegment>& lane_segments() const {
     return _lane_segments;
   }
@@ -292,7 +292,7 @@ class Path {
  protected:
   int _num_points = 0;
   int _num_segments = 0;
-  std::vector<PathPoint> _path_points;
+  std::vector<MapPathPoint> _path_points;
   std::vector<LaneSegment> _lane_segments;
   std::vector<LaneSegment> _lane_segments_to_next_point;
   std::vector<apollo::common::math::Vec2d> _unit_directions;

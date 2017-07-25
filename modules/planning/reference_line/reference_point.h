@@ -29,7 +29,7 @@
 namespace apollo {
 namespace planning {
 
-class ReferencePoint : public hdmap::PathPoint {
+class ReferencePoint : public hdmap::MapPathPoint {
  public:
   ReferencePoint() = default;
 

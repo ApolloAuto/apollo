@@ -41,7 +41,7 @@ namespace {
 
 const double kSampleDistance = 0.25;
 
-bool find_lane_segment(const PathPoint& p1, const PathPoint& p2,
+bool find_lane_segment(const MapPathPoint& p1, const MapPathPoint& p2,
                        LaneSegment* const lane_segment) {
   for (const auto& wp1 : p1.lane_waypoints()) {
     for (const auto& wp2 : p2.lane_waypoints()) {
@@ -77,7 +77,7 @@ std::string LaneSegment::debug_string() const {
   return sout.str();
 }
 
-std::string PathPoint::debug_string() const {
+std::string MapPathPoint::debug_string() const {
   std::ostringstream sout;
   sout << "x = " << x_ << "  y = " << y_ << "  heading = " << _heading
        << "  lwp = {";
@@ -127,19 +127,19 @@ std::string PathOverlap::debug_string() const {
   return sout.str();
 }
 
-Path::Path(std::vector<PathPoint> path_points)
+Path::Path(std::vector<MapPathPoint> path_points)
     : _path_points(std::move(path_points)) {
   init();
 }
 
-Path::Path(std::vector<PathPoint> path_points,
+Path::Path(std::vector<MapPathPoint> path_points,
            std::vector<LaneSegment> lane_segments)
     : _path_points(std::move(path_points)),
       _lane_segments(std::move(lane_segments)) {
   init();
 }
 
-Path::Path(std::vector<PathPoint> path_points,
+Path::Path(std::vector<MapPathPoint> path_points,
            std::vector<LaneSegment> lane_segments,
            const double max_approximation_error)
     : _path_points(std::move(path_points)),
@@ -235,7 +235,7 @@ void Path::init_width() {
 
   double s = 0;
   for (int i = 0; i < _num_sample_points; ++i) {
-    const PathPoint point = get_smooth_point(s);
+    const MapPathPoint point = get_smooth_point(s);
     if (point.lane_waypoints().empty()) {
       _left_width.push_back(0.0);
       _right_width.push_back(0.0);
@@ -351,15 +351,15 @@ void Path::init_overlaps() {
   */
 }
 
-PathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
+MapPathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
   CHECK_GE(index.id, 0);
   CHECK_LT(index.id, _num_points);
 
-  const PathPoint& ref_point = _path_points[index.id];
+  const MapPathPoint& ref_point = _path_points[index.id];
   if (std::abs(index.offset) > kMathEpsilon) {
     const Vec2d delta = _unit_directions[index.id] * index.offset;
-    PathPoint point({ref_point.x() + delta.x(), ref_point.y() + delta.y()},
-                    ref_point.heading());
+    MapPathPoint point({ref_point.x() + delta.x(), ref_point.y() + delta.y()},
+                       ref_point.heading());
     if (index.id < _num_segments) {
       const LaneSegment& lane_segment = _lane_segments_to_next_point[index.id];
       if (lane_segment.lane != nullptr) {
@@ -373,7 +373,7 @@ PathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
   }
 }
 
-PathPoint Path::get_smooth_point(double s) const {
+MapPathPoint Path::get_smooth_point(double s) const {
   return get_smooth_point(get_index_from_s(s));
 }
 

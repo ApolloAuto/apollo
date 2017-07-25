@@ -39,7 +39,7 @@ using ReferenceMapLine = hdmap::Path;
 ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points)
     : reference_points_(reference_points) {
-  std::vector<hdmap::PathPoint> points(reference_points.begin(),
+  std::vector<hdmap::MapPathPoint> points(reference_points.begin(),
                                        reference_points.end());
   reference_map_line_ = std::move(ReferenceMapLine(std::move(points)));
 }
@@ -49,7 +49,7 @@ ReferenceLine::ReferenceLine(
     const std::vector<hdmap::LaneSegment>& lane_segments,
     const double max_approximation_error)
     : reference_points_(reference_points) {
-  std::vector<hdmap::PathPoint> points(reference_points.begin(),
+  std::vector<hdmap::MapPathPoint> points(reference_points.begin(),
                                        reference_points.end());
   reference_map_line_ = std::move(ReferenceMapLine(
       std::move(points), lane_segments, max_approximation_error));
