@@ -26,14 +26,6 @@
 #include "modules/control/control.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-#define TMAIN                                            \
-  int main(int argc, char **argv) {                      \
-    ::testing::InitGoogleTest(&argc, argv);              \
-    google::InitGoogleLogging(argv[0]);                  \
-    ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    return RUN_ALL_TESTS();                              \
-  }
-
 #define RUN_GOLDEN_TEST                                            \
   {                                                                \
     const ::testing::TestInfo *const test_info =                   \
