@@ -17,7 +17,6 @@
 #include "modules/planning/planner/em/em_planner.h"
 
 #include <fstream>
-#include <memory>
 #include <utility>
 
 #include "modules/common/log.h"
@@ -27,8 +26,8 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_data.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
@@ -42,21 +41,23 @@ using apollo::common::ErrorCode;
 using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 
-EMPlanner::EMPlanner() {
-
-}
+EMPlanner::EMPlanner() {}
 
 void EMPlanner::RegisterOptimizers() {
-  optimizer_factory_.Register(
-      DP_POLY_PATH_OPTIMIZER,
-      []() -> Optimizer* { return new DpPolyPathOptimizer("DpPolyPathOptimizer"); });
-  optimizer_factory_.Register(
-      DP_ST_SPEED_OPTIMIZER,
-      []() -> Optimizer* { return new DpStSpeedOptimizer("DpStSpeedOptimizer"); });
-  optimizer_factory_.Register(
-      QP_SPLINE_PATH_OPTIMIZER,
-      []() -> Optimizer* { return new QPSplinePathOptimizer("QPSplinePathOptimizer"); });
-  // TODO(all): add QP_SPLINE_ST_SPEED_OPTIMIZER
+  optimizer_factory_.Register(DP_POLY_PATH_OPTIMIZER, []() -> Optimizer* {
+    return new DpPolyPathOptimizer("DpPolyPathOptimizer");
+  });
+  optimizer_factory_.Register(DP_ST_SPEED_OPTIMIZER, []() -> Optimizer* {
+    return new DpStSpeedOptimizer("DpStSpeedOptimizer");
+  });
+  optimizer_factory_.Register(QP_SPLINE_PATH_OPTIMIZER, []() -> Optimizer* {
+    return new QPSplinePathOptimizer("QPSplinePathOptimizer");
+  });
+  // TODO (all) : fix the function to register QpSplineStSpeedOptimizer."
+  // optimizer_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() ->
+  // Optimizer* {
+  //  return new QpSplineStSpeedOptimizer("QpSplineStSpeedOptimizer");
+  //});
 }
 
 Status EMPlanner::Init(const PlanningConfig& config) {
@@ -71,8 +72,9 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
-                         std::vector<TrajectoryPoint>* discretized_trajectory) {
+Status EMPlanner::MakePlan(
+    const TrajectoryPoint& start_point,
+    std::vector<TrajectoryPoint>* discretized_trajectory) {
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
 
@@ -102,7 +104,8 @@ Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  *discretized_trajectory = planning_data->computed_trajectory().trajectory_points();
+  *discretized_trajectory =
+      planning_data->computed_trajectory().trajectory_points();
   return Status::OK();
 }
 
@@ -134,7 +137,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   // assume the time resolution is 0.1
   std::uint32_t num_time_steps =
       static_cast<std::uint32_t>(FLAGS_trajectory_time_length /
-                               FLAGS_trajectory_time_resolution) +
+                                 FLAGS_trajectory_time_resolution) +
       1;
   std::vector<SpeedPoint> speed_profile;
   speed_profile.reserve(num_time_steps);
@@ -193,7 +196,8 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
 
   std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
   std::vector<ReferencePoint> smoothed_ref_points;
-  if (!smoother_.smooth(*reference_line, vehicle_position, &smoothed_ref_points)) {
+  if (!smoother_.smooth(*reference_line, vehicle_position,
+                        &smoothed_ref_points)) {
     std::string msg("Fail to smooth a reference line from map");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -202,7 +206,6 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
   reference_line_.reset(new ReferenceLine(smoothed_ref_points));
   return Status::OK();
 }
-
 
 }  // namespace planning
 }  // namespace apollo
