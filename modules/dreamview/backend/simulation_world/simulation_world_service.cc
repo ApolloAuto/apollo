@@ -36,6 +36,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::MonitorAdapter;
 using apollo::common::adapter::LocalizationAdapter;
 using apollo::common::adapter::ChassisAdapter;
+using apollo::common::adapter::PerceptionObstaclesAdapter;
 using apollo::common::adapter::PlanningAdapter;
 using apollo::common::config::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
@@ -88,61 +89,61 @@ Object::DisengageType DeduceDisengageType(const ::Chassis &chassis) {
 }
 
 void SetObstacleInfo(const PerceptionObstacle &obstacle, Object *world_object) {
-    if (world_object == nullptr) {
-        return;
-    }
+  if (world_object == nullptr) {
+    return;
+  }
 
-    world_object->set_id(std::to_string(obstacle.id()));
-    world_object->set_position_x(obstacle.position().x());
-    world_object->set_position_y(obstacle.position().y());
-    world_object->set_heading(obstacle.theta());
-    world_object->set_length(obstacle.length());
-    world_object->set_width(obstacle.width());
-    world_object->set_height(obstacle.height());
-    world_object->set_timestamp_sec(obstacle.timestamp());
+  world_object->set_id(std::to_string(obstacle.id()));
+  world_object->set_position_x(obstacle.position().x());
+  world_object->set_position_y(obstacle.position().y());
+  world_object->set_heading(obstacle.theta());
+  world_object->set_length(obstacle.length());
+  world_object->set_width(obstacle.width());
+  world_object->set_height(obstacle.height());
+  world_object->set_timestamp_sec(obstacle.timestamp());
 }
 
 void SetObstaclePolygon(const PerceptionObstacle &obstacle,
                         Object *world_object) {
-    if (world_object == nullptr) {
-        return;
-    }
+  if (world_object == nullptr) {
+    return;
+  }
 
-    world_object->clear_polygon_point();
-    for (const auto& point : obstacle.polygon_point()) {
-        PolygonPoint *poly_pt = world_object->add_polygon_point();
-        poly_pt->set_x(point.x());
-        poly_pt->set_y(point.y());
-    }
+  world_object->clear_polygon_point();
+  for (const auto &point : obstacle.polygon_point()) {
+    PolygonPoint *poly_pt = world_object->add_polygon_point();
+    poly_pt->set_x(point.x());
+    poly_pt->set_y(point.y());
+  }
 }
 
 void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
-    if (world_object == nullptr) {
-        return;
-    }
+  if (world_object == nullptr) {
+    return;
+  }
 
-    switch (obstacle.type()) {
+  switch (obstacle.type()) {
     case PerceptionObstacle::UNKNOWN:
-        world_object->set_type(Object_Type_UNKNOWN);
-        break;
+      world_object->set_type(Object_Type_UNKNOWN);
+      break;
     case PerceptionObstacle::UNKNOWN_MOVABLE:
-        world_object->set_type(Object_Type_UNKNOWN_MOVABLE);
-        break;
+      world_object->set_type(Object_Type_UNKNOWN_MOVABLE);
+      break;
     case PerceptionObstacle::UNKNOWN_UNMOVABLE:
-        world_object->set_type(Object_Type_UNKNOWN_UNMOVABLE);
-        break;
+      world_object->set_type(Object_Type_UNKNOWN_UNMOVABLE);
+      break;
     case PerceptionObstacle::PEDESTRIAN:
-        world_object->set_type(Object_Type_PEDESTRIAN);
-        break;
+      world_object->set_type(Object_Type_PEDESTRIAN);
+      break;
     case PerceptionObstacle::BICYCLE:
-        world_object->set_type(Object_Type_BICYCLE);
-        break;
+      world_object->set_type(Object_Type_BICYCLE);
+      break;
     case PerceptionObstacle::VEHICLE:
-        world_object->set_type(Object_Type_VEHICLE);
-        break;
+      world_object->set_type(Object_Type_VEHICLE);
+      break;
     default:
-        world_object->set_type(Object_Type_UNKNOWN);
-    }
+      world_object->set_type(Object_Type_UNKNOWN);
+  }
 }
 
 }  // namespace
@@ -153,7 +154,7 @@ constexpr double SimulationWorldService::kMapRadius;
 SimulationWorldService::SimulationWorldService(MapService *map_service)
     : map_service_(map_service) {
   world_.set_map_md5("initialize");
-  RegisterDataCallback("Monitor", AdapterManager::GetMonitor());
+  RegisterMonitorCallback();
 }
 
 const SimulationWorld &SimulationWorldService::Update() {
@@ -188,6 +189,7 @@ Json SimulationWorldService::GetUpdateAsJson() const {
   return update;
 }
 
+template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const MonitorMessage &monitor_msg) {
   std::vector<MonitorMessageItem> updated;
@@ -220,6 +222,7 @@ void SimulationWorldService::UpdateSimulationWorld(
       ToSecond(Clock::Now()));
 }
 
+template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const LocalizationEstimate &localization) {
   Object *auto_driving_car = world_.mutable_auto_driving_car();
@@ -247,8 +250,8 @@ void SimulationWorldService::UpdateSimulationWorld(
       std::max(world_.timestamp_sec(), localization.header().timestamp_sec()));
 }
 
-void SimulationWorldService::UpdateSimulationWorld(
-    const Chassis &chassis) {
+template <>
+void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   Object *auto_driving_car = world_.mutable_auto_driving_car();
 
   auto_driving_car->set_speed(chassis.speed_mps());
@@ -288,6 +291,7 @@ void SimulationWorldService::UpdateSimulationWorld(
       std::max(world_.timestamp_sec(), chassis.header().timestamp_sec()));
 }
 
+template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const ADCTrajectory &trajectory) {
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
@@ -334,6 +338,7 @@ void SimulationWorldService::UpdateSimulationWorld(
   world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
 }
 
+template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const PerceptionObstacles &obstacles) {
   for (const auto &obstacle : obstacles.perception_obstacle()) {
@@ -344,6 +349,13 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
   world_.set_timestamp_sec(
       std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
+}
+
+void SimulationWorldService::RegisterMonitorCallback() {
+  if (CheckAdapterInitialized("Monitor", AdapterManager::GetMonitor())) {
+    AdapterManager::SetMonitorCallback(
+        &SimulationWorldService::UpdateSimulationWorld, this);
+  }
 }
 
 }  // namespace dreamview

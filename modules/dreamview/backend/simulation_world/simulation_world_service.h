@@ -25,8 +25,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "third_party/json/json.hpp"
 #include "gtest/gtest_prod.h"
+#include "third_party/json/json.hpp"
 
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
@@ -99,23 +99,22 @@ class SimulationWorldService {
   }
 
  private:
+  template <typename DataType>
+  void UpdateSimulationWorld(const DataType &data);
+
   /**
-   * @brief Register a callback on the adatper manager to update the
-   * SimulationWorld object upon receiving a new message. This is not
-   * guarded by lock since we are using single threaded ROS spinner.
+   * @brief Check whether a particular adapter has been initialized correctly.
    */
   template <typename AdapterType>
-  void RegisterDataCallback(const std::string &adapter_name,
-                            AdapterType *adapter) {
+  bool CheckAdapterInitialized(const std::string &adapter_name,
+                               AdapterType *adapter) {
     if (adapter == nullptr) {
       AERROR << adapter_name << " adapter is not correctly initialized. "
                                 "Please check the adapter manager "
                                 "configuration.";
-      return;
+      return false;
     }
-
-    adapter->SetCallback([this](typename AdapterType::DataType d)
-        { return SimulationWorldService::UpdateSimulationWorld(d);});
+    return true;
   }
 
   /**
@@ -125,10 +124,7 @@ class SimulationWorldService {
   template <typename AdapterType>
   void UpdateWithLatestObserved(const std::string &adapter_name,
                                 AdapterType *adapter) {
-    if (adapter == nullptr) {
-      AERROR << adapter_name << " adapter is not correctly initialized. "
-                                "Please check the adapter manager "
-                                "configuration.";
+    if (!CheckAdapterInitialized(adapter_name, adapter)) {
       return;
     }
 
@@ -140,23 +136,7 @@ class SimulationWorldService {
     UpdateSimulationWorld(adapter->GetLatestObserved());
   }
 
-  /*template <typename AdapterType>
-  void UpdateSimulationWorld(const typename AdapterType::DataType &data);*/
-
-  void UpdateSimulationWorld(
-      const apollo::common::monitor::MonitorMessage &monitor_msg);
-
-  void UpdateSimulationWorld(
-      const apollo::localization::LocalizationEstimate &localization);
-
-  void UpdateSimulationWorld(
-      const apollo::canbus::Chassis &chassis);
-
-  void UpdateSimulationWorld(
-      const apollo::planning::ADCTrajectory &trajectory);
-
-  void UpdateSimulationWorld(
-      const apollo::perception::PerceptionObstacles &obstacles);
+  void RegisterMonitorCallback();
 
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
