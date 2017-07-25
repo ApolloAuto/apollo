@@ -23,13 +23,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 
-using apollo::common::adapter::MonitorAdapter;
-using apollo::common::adapter::ChassisAdapter;
-using apollo::common::adapter::LocalizationAdapter;
-using apollo::common::adapter::PlanningAdapter;
-using apollo::common::monitor::MonitorMessage;
-using apollo::common::adapter::PerceptionObstaclesAdapter;
 using apollo::canbus::Chassis;
+using apollo::common::monitor::MonitorMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::common::TrajectoryPoint;
@@ -39,56 +34,69 @@ using apollo::perception::PerceptionObstacles;
 namespace apollo {
 namespace dreamview {
 
-namespace internal {
-
 const float kEpsilon = 0.0001;
 
-class InternalTest : public ::testing::Test {
+class SimulationWorldServiceTest : public ::testing::Test {
  public:
-  virtual void SetUp() { apollo::common::config::VehicleConfigHelper::Init(); }
+  virtual void SetUp() {
+    apollo::common::config::VehicleConfigHelper::Init();
+    sim_world_service_.reset(new SimulationWorldService(&map_service_));
+  }
+ protected:
+  SimulationWorldServiceTest()
+      : map_service_("modules/dreamview/backend/testdata/garage.bin") {
+  }
+
+  MapService map_service_;
+  std::unique_ptr<SimulationWorldService> sim_world_service_;
 };
 
-TEST_F(InternalTest, UpdateMonitorSuccessTest) {
+TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
   MonitorMessage monitor;
   monitor.add_item()->set_msg("I am the latest message.");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  SimulationWorld world;
-  world.mutable_monitor()->mutable_header()->set_timestamp_sec(1990);
-  world.mutable_monitor()->add_item()->set_msg("I am the previous message.");
+  sim_world_service_->world_.mutable_monitor()->mutable_header()
+      ->set_timestamp_sec(1990);
+  sim_world_service_->world_.mutable_monitor()->add_item()->set_msg(
+      "I am the previous message.");
 
-  UpdateSimulationWorld<MonitorAdapter>(monitor, &world);
-  EXPECT_EQ(2, world.monitor().item_size());
-  EXPECT_EQ("I am the latest message.", world.monitor().item(0).msg());
-  EXPECT_EQ("I am the previous message.", world.monitor().item(1).msg());
+  sim_world_service_->UpdateSimulationWorld(monitor);
+  EXPECT_EQ(2, sim_world_service_->world_.monitor().item_size());
+  EXPECT_EQ("I am the latest message.",
+            sim_world_service_->world_.monitor().item(0).msg());
+  EXPECT_EQ("I am the previous message.",
+            sim_world_service_->world_.monitor().item(1).msg());
 }
 
-TEST_F(InternalTest, UpdateMonitorRemoveTest) {
+TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
   MonitorMessage monitor;
   monitor.add_item()->set_msg("I am message -2");
   monitor.add_item()->set_msg("I am message -1");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  SimulationWorld world;
-  world.mutable_monitor()->mutable_header()->set_timestamp_sec(1990);
+  sim_world_service_->world_.mutable_monitor()->mutable_header()
+      ->set_timestamp_sec(1990);
   for (int i = 0; i < SimulationWorldService::kMaxMonitorItems; ++i) {
-    world.mutable_monitor()->add_item()->set_msg("I am message " +
-                                                 std::to_string(i));
+    sim_world_service_->world_.mutable_monitor()->add_item()->set_msg(
+        "I am message " + std::to_string(i));
   }
   int last = SimulationWorldService::kMaxMonitorItems - 1;
   EXPECT_EQ("I am message " + std::to_string(last),
-            world.monitor().item(last).msg());
+            sim_world_service_->world_.monitor().item(last).msg());
 
-  UpdateSimulationWorld<MonitorAdapter>(monitor, &world);
+  sim_world_service_->UpdateSimulationWorld(monitor);
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
-            world.monitor().item_size());
-  EXPECT_EQ("I am message -2", world.monitor().item(0).msg());
-  EXPECT_EQ("I am message -1", world.monitor().item(1).msg());
+            sim_world_service_->world_.monitor().item_size());
+  EXPECT_EQ("I am message -2",
+            sim_world_service_->world_.monitor().item(0).msg());
+  EXPECT_EQ("I am message -1",
+            sim_world_service_->world_.monitor().item(1).msg());
   EXPECT_EQ("I am message " + std::to_string(last - monitor.item_size()),
-            world.monitor().item(last).msg());
+            sim_world_service_->world_.monitor().item(last).msg());
 }
 
-TEST_F(InternalTest, UpdateMonitorTruncateTest) {
+TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
   MonitorMessage monitor;
   int large_size = SimulationWorldService::kMaxMonitorItems + 10;
   for (int i = 0; i < large_size; ++i) {
@@ -98,19 +106,20 @@ TEST_F(InternalTest, UpdateMonitorTruncateTest) {
   EXPECT_EQ(large_size, monitor.item_size());
   EXPECT_EQ("I am message " + std::to_string(large_size - 1),
             monitor.item(large_size - 1).msg());
-  SimulationWorld world;
-  world.mutable_monitor()->mutable_header()->set_timestamp_sec(1990);
+  sim_world_service_->world_.mutable_monitor()->mutable_header()
+      ->set_timestamp_sec(1990);
 
-  UpdateSimulationWorld<MonitorAdapter>(monitor, &world);
+  sim_world_service_->UpdateSimulationWorld(monitor);
   int last = SimulationWorldService::kMaxMonitorItems - 1;
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
-            world.monitor().item_size());
-  EXPECT_EQ("I am message 0", world.monitor().item(0).msg());
+            sim_world_service_->world_.monitor().item_size());
+  EXPECT_EQ("I am message 0",
+            sim_world_service_->world_.monitor().item(0).msg());
   EXPECT_EQ("I am message " + std::to_string(last),
-            world.monitor().item(last).msg());
+            sim_world_service_->world_.monitor().item(last).msg());
 }
 
-TEST_F(InternalTest, UpdateChassisInfoTest) {
+TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   // Prepare the chassis message that will be used to update the
   // SimulationWorld object.
   ::apollo::canbus::Chassis chassis;
@@ -122,11 +131,10 @@ TEST_F(InternalTest, UpdateChassisInfoTest) {
       apollo::common::VehicleSignal::TURN_RIGHT);
 
   // Commit the update.
-  SimulationWorld world;
-  UpdateSimulationWorld<ChassisAdapter>(chassis, &world);
+  sim_world_service_->UpdateSimulationWorld(chassis);
 
   // Check the update reuslt.
-  const Object& car = world.auto_driving_car();
+  const Object& car = sim_world_service_->world_.auto_driving_car();
   EXPECT_DOUBLE_EQ(4.933, car.length());
   EXPECT_DOUBLE_EQ(2.11, car.width());
   EXPECT_DOUBLE_EQ(1.48, car.height());
@@ -137,7 +145,7 @@ TEST_F(InternalTest, UpdateChassisInfoTest) {
   EXPECT_EQ("RIGHT", car.current_signal());
 }
 
-TEST_F(InternalTest, UpdateLocalizationTest) {
+TEST_F(SimulationWorldServiceTest, UpdateLocalization) {
   // Prepare the localization message that will be used to update the
   // SimulationWorld object.
   ::apollo::localization::LocalizationEstimate localization;
@@ -155,11 +163,10 @@ TEST_F(InternalTest, UpdateLocalizationTest) {
   localization.mutable_pose()->set_heading(heading);
 
   // Commit the update.
-  SimulationWorld world;
-  UpdateSimulationWorld<LocalizationAdapter>(localization, &world);
+  sim_world_service_->UpdateSimulationWorld(localization);
 
   // Check the update result.
-  const Object& car = world.auto_driving_car();
+  const Object& car = sim_world_service_->world_.auto_driving_car();
   EXPECT_DOUBLE_EQ(1.0, car.position_x());
   EXPECT_DOUBLE_EQ(1.5, car.position_y());
   EXPECT_DOUBLE_EQ(
@@ -167,7 +174,7 @@ TEST_F(InternalTest, UpdateLocalizationTest) {
       car.heading());
 }
 
-TEST_F(InternalTest, UpdatePlanningTrajectoryTest) {
+TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
   // Prepare the trajectory message that will be used to update the
   // SimulationWorld object.
   ADCTrajectory planning_trajectory;
@@ -178,15 +185,14 @@ TEST_F(InternalTest, UpdatePlanningTrajectoryTest) {
   }
 
   // Commit the update.
-  SimulationWorld world;
-  UpdateSimulationWorld<PlanningAdapter>(planning_trajectory, &world);
+  sim_world_service_->UpdateSimulationWorld(planning_trajectory);
 
   // Check the update result.
-  EXPECT_EQ(world.planning_trajectory_size(), 4);
+  EXPECT_EQ(sim_world_service_->world_.planning_trajectory_size(), 4);
 
   // Check first point.
   {
-    const Object point = world.planning_trajectory(0);
+    const Object point = sim_world_service_->world_.planning_trajectory(0);
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(10.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
@@ -195,7 +201,7 @@ TEST_F(InternalTest, UpdatePlanningTrajectoryTest) {
 
   // Check last point.
   {
-    const Object point = world.planning_trajectory(3);
+    const Object point = sim_world_service_->world_.planning_trajectory(3);
     EXPECT_DOUBLE_EQ(280.0, point.position_x());
     EXPECT_DOUBLE_EQ(290.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
@@ -203,7 +209,7 @@ TEST_F(InternalTest, UpdatePlanningTrajectoryTest) {
   }
 }
 
-TEST_F(InternalTest, UpdatePerceptionObstaclesTest) {
+TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
   PerceptionObstacles obstacles;
   PerceptionObstacle* obstacle1 = obstacles.add_perception_obstacle();
   obstacle1->set_id(1);
@@ -218,8 +224,8 @@ TEST_F(InternalTest, UpdatePerceptionObstaclesTest) {
   point3->set_y(0.0);
   obstacle1->set_timestamp(1489794020.123);
   obstacle1->set_type(apollo::perception::PerceptionObstacle_Type_UNKNOWN);
-  apollo::perception::PerceptionObstacle* obstacle2 =
-      obstacles.add_perception_obstacle();
+  apollo::perception::PerceptionObstacle* obstacle2 = obstacles
+      .add_perception_obstacle();
   obstacle2->set_id(2);
   apollo::perception::Point* point = obstacle2->mutable_position();
   point->set_x(1.0);
@@ -230,11 +236,10 @@ TEST_F(InternalTest, UpdatePerceptionObstaclesTest) {
   obstacle2->set_height(6.0);
   obstacle2->set_type(apollo::perception::PerceptionObstacle_Type_VEHICLE);
 
-  SimulationWorld world;
-  UpdateSimulationWorld<PerceptionObstaclesAdapter>(obstacles, &world);
-  EXPECT_EQ(2, world.object_size());
+  sim_world_service_->UpdateSimulationWorld(obstacles);
+  EXPECT_EQ(2, sim_world_service_->world_.object_size());
 
-  for (const auto& object : world.object()) {
+  for (const auto& object : sim_world_service_->world_.object()) {
     if (object.id() == "1") {
       EXPECT_NEAR(1489794020.123, object.timestamp_sec(), kEpsilon);
       EXPECT_EQ(3, object.polygon_point_size());
@@ -253,8 +258,6 @@ TEST_F(InternalTest, UpdatePerceptionObstaclesTest) {
     }
   }
 }
-
-}  // namespace internal
 
 }  // namespace dreamview
 }  // namespace apollo
