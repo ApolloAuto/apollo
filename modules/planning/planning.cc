@@ -78,33 +78,26 @@ Status Planning::Start() {
 
 void Planning::RunOnce() {
   AdapterManager::Observe();
-  if (AdapterManager::GetLocalization() == nullptr) {
+  if (AdapterManager::GetLocalization() == nullptr ||
+      AdapterManager::GetLocalization()->Empty()) {
     AERROR << "Localization is not available; skip the planning cycle";
     return;
   }
-  if (AdapterManager::GetLocalization()->Empty()) {
-    AERROR << "localization messages are missing; skip the planning cycle";
-    return;
-  } else {
-    AINFO << "Get localization message;";
-  }
 
-  if (AdapterManager::GetChassis() == nullptr) {
+  if (AdapterManager::GetChassis() == nullptr ||
+      AdapterManager::GetChassis()->Empty()) {
     AERROR << "Chassis is not available; skip the planning cycle";
     return;
-  }
-  if (AdapterManager::GetChassis()->Empty()) {
-    AERROR << "Chassis messages are missing; skip the planning cycle";
-    return;
-  } else {
-    AINFO << "Get localization message;";
   }
 
   AINFO << "Start planning ...";
 
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
+  ADEBUG << "Get localization:" << localization.DebugString();
+
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
+  ADEBUG << "Get chassis:" << chassis.DebugString();
 
   common::vehicle_state::VehicleState::instance()->Update(&localization,
                                                           &chassis);
@@ -127,9 +120,9 @@ void Planning::RunOnce() {
     ADCTrajectory trajectory_pb =
         ToADCTrajectory(execution_start_time, planning_trajectory);
     AdapterManager::PublishPlanning(trajectory_pb);
-    AINFO << "Planning succeeded";
+    ADEBUG << "Planning succeeded:" << trajectory_pb.DebugString();
   } else {
-    AINFO << "Planning failed";
+    AERROR << "Planning failed";
   }
 }
 

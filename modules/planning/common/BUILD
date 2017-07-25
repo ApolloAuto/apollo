@@ -127,21 +127,6 @@ cc_library(
 )
 
 cc_library(
-    name = "em_planning_data",
-    srcs = [
-        "em_planning_data.cc",
-    ],
-    hdrs = [
-        "em_planning_data.h",
-    ],
-    deps = [
-        ":planning_data",
-        "//modules/common/proto:path_point_proto",
-        "//modules/planning/math:double",
-    ],
-)
-
-cc_library(
     name = "environment",
     srcs = [
         "environment.cc",
@@ -205,7 +190,6 @@ cc_library(
     name = "planning_common",
     deps = [
         ":data_center",
-        ":em_planning_data",
         ":frame",
         ":planning_gflags",
         ":speed_limit",

@@ -43,7 +43,7 @@ class PlanningData {
 
   // copy reference line to planning data
   void set_reference_line(std::unique_ptr<ReferenceLine>& reference_line);
-  void set_decision_data(std::unique_ptr<DecisionData>& decision_data);
+  void set_decision_data(std::shared_ptr<DecisionData>& decision_data);
   void set_init_planning_point(const TrajectoryPoint& init_planning_point);
   void set_computed_trajectory(PublishableTrajectory computed_trajectory);
 
@@ -55,8 +55,6 @@ class PlanningData {
   DecisionData* mutable_decision_data() const;
   PublishableTrajectory* mutable_computed_trajectory();
 
-  virtual std::string type() const = 0;
-
   const PathData& path_data() const;
   const SpeedData& speed_data() const;
 
@@ -65,13 +63,16 @@ class PlanningData {
 
   double timestamp() const;
 
+  // aggregate final result together by some configuration
+  bool aggregate(const double time_resolution);
+
  protected:
-  std::unique_ptr<ReferenceLine> _reference_line;
-  std::unique_ptr<DecisionData> _decision_data;
-  PublishableTrajectory _computed_trajectory;
-  TrajectoryPoint _init_planning_point;
-  PathData _path_data;
-  SpeedData _speed_data;
+  std::unique_ptr<ReferenceLine> reference_line_ = nullptr;
+  std::shared_ptr<DecisionData> decision_data_ = nullptr;
+  PublishableTrajectory computed_trajectory_;
+  TrajectoryPoint init_planning_point_;
+  PathData path_data_;
+  SpeedData speed_data_;
   double timestamp_ = 0.0;
 };
 

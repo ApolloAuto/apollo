@@ -26,55 +26,89 @@ namespace apollo {
 namespace planning {
 
 const ReferenceLine& PlanningData::reference_line() const {
-  return *_reference_line.get();
+  return *reference_line_.get();
 }
 
 const DecisionData& PlanningData::decision_data() const {
-  return *_decision_data.get();
+  return *decision_data_.get();
 }
 
 const PublishableTrajectory& PlanningData::computed_trajectory() const {
-  return _computed_trajectory;
+  return computed_trajectory_;
 }
 
 const TrajectoryPoint& PlanningData::init_planning_point() const {
-  return _init_planning_point;
+  return init_planning_point_;
 }
 
 DecisionData* PlanningData::mutable_decision_data() const {
-  return _decision_data.get();
+  return decision_data_.get();
 }
 
 PublishableTrajectory* PlanningData::mutable_computed_trajectory() {
-  return &_computed_trajectory;
+  return &computed_trajectory_;
 }
 
 void PlanningData::set_init_planning_point(
     const TrajectoryPoint& init_planning_point) {
-  _init_planning_point = init_planning_point;
+  init_planning_point_ = init_planning_point;
 }
 
 void PlanningData::set_reference_line(
     std::unique_ptr<ReferenceLine>& reference_line) {
-  _reference_line = std::move(reference_line);
+  reference_line_ = std::move(reference_line);
 }
 void PlanningData::set_decision_data(
-    std::unique_ptr<DecisionData>& decision_data) {
-  _decision_data = std::move(decision_data);
+    std::shared_ptr<DecisionData>& decision_data) {
+  decision_data_ = decision_data;
 }
 
 void PlanningData::set_computed_trajectory(
     PublishableTrajectory publishable_trajectory) {
-  _computed_trajectory = std::move(publishable_trajectory);
+  computed_trajectory_ = std::move(publishable_trajectory);
 }
 
-const PathData& PlanningData::path_data() const { return _path_data; }
+const PathData& PlanningData::path_data() const { return path_data_; }
 
-const SpeedData& PlanningData::speed_data() const { return _speed_data; }
+const SpeedData& PlanningData::speed_data() const { return speed_data_; }
 
-PathData* PlanningData::mutable_path_data() { return &_path_data; }
+PathData* PlanningData::mutable_path_data() { return &path_data_; }
 
-SpeedData* PlanningData::mutable_speed_data() { return &_speed_data; }
+SpeedData* PlanningData::mutable_speed_data() { return &speed_data_; }
+
+bool PlanningData::aggregate(const double time_resolution) {
+  CHECK_GT(time_resolution, 0.0);
+  CHECK_EQ(computed_trajectory_.num_of_points(), 0);
+
+  for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.total_time();
+       cur_rel_time += time_resolution) {
+    SpeedPoint speed_point;
+    QUIT_IF(!speed_data_.get_speed_point_with_time(cur_rel_time, &speed_point),
+            false, ERROR, "Fail to get speed point with relative time %f",
+            cur_rel_time);
+
+    apollo::common::PathPoint path_point;
+    // TODO temp fix speed point s out of path point bound, need further refine
+    // later
+    if (speed_point.s() > path_data_.path().param_length()) {
+      break;
+    }
+    QUIT_IF(!path_data_.get_path_point_with_path_s(speed_point.s(), &path_point),
+            false, ERROR,
+            "Fail to get path data with s %f, path total length %f",
+            speed_point.s(), path_data_.path().param_length());
+
+    apollo::common::TrajectoryPoint trajectory_point;
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(speed_point.v());
+    trajectory_point.set_a(speed_point.a());
+    trajectory_point.set_relative_time(init_planning_point_.relative_time() +
+                                       speed_point.t());
+    computed_trajectory_.add_trajectory_point(trajectory_point);
+  }
+  return true;
+}
+
 
 }  // namespace planning
 }  // namespace apollo

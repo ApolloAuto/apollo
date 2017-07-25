@@ -31,6 +31,7 @@
 #include "modules/common/math/angle.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/math/double.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -229,6 +230,10 @@ bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
 std::string ReferenceLine::DebugString() const {
   std::ostringstream ss;
   ss << "point num:" << reference_points_.size();
+  for (unsigned i = 0; i < reference_points_.size() &&
+      i < FLAGS_trajectory_point_num_for_debug; ++i) {
+    ss << reference_points_[i].DebugString();
+  }
   return ss.str();
 }
 
