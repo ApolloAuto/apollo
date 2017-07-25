@@ -108,8 +108,10 @@ std::string PathData::DebugString() const {
   std::ostringstream sout;
   sout << "[" << std::endl;
   const auto &path_points = path_.path_points();
-  for (std::uint32_t i = 0; i < path_points.size() &&
-         i < FLAGS_trajectory_point_num_for_debug; ++i) {
+  for (std::size_t i = 0;
+       i < path_points.size() &&
+       i < static_cast<std::size_t>(FLAGS_trajectory_point_num_for_debug);
+       ++i) {
     if (i > 0) {
       sout << "," << std::endl;
     }

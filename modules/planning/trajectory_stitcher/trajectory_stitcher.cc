@@ -57,8 +57,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
   if (prev_frame == nullptr) {
     return compute_reinit_stitching_trajectory(vehicle_state);
   }
-  const auto& prev_trajectory =
-      prev_frame->planning_data().computed_trajectory();
+  const auto& prev_trajectory = prev_frame->computed_trajectory();
   std::size_t prev_trajectory_size = prev_trajectory.num_of_points();
 
   // previous planning is failed

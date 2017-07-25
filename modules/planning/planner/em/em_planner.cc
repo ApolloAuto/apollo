@@ -99,13 +99,15 @@ Status EMPlanner::MakePlan(
     optimizer->Optimize(planning_data);
     ADEBUG << planning_data->DebugString();
   }
-  if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution)) {
+  PublishableTrajectory computed_trajectory;
+  if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution,
+                                &computed_trajectory)) {
     std::string msg("Fail to aggregate planning trajectory.");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  *discretized_trajectory =
-      planning_data->computed_trajectory().trajectory_points();
+  frame->set_computed_trajectory(computed_trajectory);
+  *discretized_trajectory = computed_trajectory.trajectory_points();
   return Status::OK();
 }
 
@@ -198,7 +200,8 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
 
   std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
   std::vector<ReferencePoint> smoothed_ref_points;
-  if (!smoother.smooth(*reference_line, vehicle_position, &smoothed_ref_points)) {
+  if (!smoother.smooth(*reference_line, vehicle_position,
+                       &smoothed_ref_points)) {
     std::string msg("Fail to smooth a reference line from map");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
