@@ -16,11 +16,6 @@ limitations under the License.
 #include <gtest/gtest.h>
 #include "modules/map/hdmap/hdmap_impl.h"
 
-int main(int argc, char** argv) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
-
 namespace apollo {
 namespace hdmap {
 

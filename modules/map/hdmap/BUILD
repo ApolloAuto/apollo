@@ -26,7 +26,7 @@ cc_library(
 filegroup(
     name = "testdata",
     srcs = glob([
-        "test-data/*.v2",
+        "test-data/*",
     ]),
 )
 
