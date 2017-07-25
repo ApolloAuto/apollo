@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <utility>
 
 #include "modules/common/proto/path_point.pb.h"
@@ -45,6 +46,18 @@ namespace util {
  * @return Whether the original string ends with the specified pattern.
  */
 bool EndWith(const std::string& original, const std::string& pattern);
+
+/**
+ * @brief Concat parameters to a string, e.g.: StrCat("age = ", 32)
+ * @return String of concated parameters.
+ */
+template <typename ...T>
+std::string StrCat(const T& ...args) {
+  std::ostringstream oss;
+  // Expand args and pass to oss.
+  std::initializer_list<char>{(oss << args, ' ') ... };
+  return oss.str();
+}
 
 /**
  * @brief create a SL point
