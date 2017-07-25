@@ -68,7 +68,6 @@ Status EMPlanner::Init(const PlanningConfig& config) {
         config.em_planner_config().optimizer(i)));
   }
   routing_proxy_.Init();
-  smoother_.SetConfig(smoother_config_);  // use the default value in config.
   return Status::OK();
 }
 
@@ -168,6 +167,8 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
   std::vector<ReferencePoint> ref_points;
   common::math::Vec2d vehicle_position;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
+  ReferenceLineSmoother smoother;
+  smoother.SetConfig(smoother_config_);  // use the default value in config.
 
   vehicle_position.set_x(common::vehicle_state::VehicleState::instance()->x());
   vehicle_position.set_y(common::vehicle_state::VehicleState::instance()->y());
@@ -196,8 +197,7 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
 
   std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
   std::vector<ReferencePoint> smoothed_ref_points;
-  if (!smoother_.smooth(*reference_line, vehicle_position,
-                        &smoothed_ref_points)) {
+  if (!smoother.smooth(*reference_line, vehicle_position, &smoothed_ref_points)) {
     std::string msg("Fail to smooth a reference line from map");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
