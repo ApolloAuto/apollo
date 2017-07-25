@@ -25,6 +25,7 @@
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -38,8 +39,9 @@ class LidarProcess {
   bool IsInit() {
     return inited_;
   }
-  bool Process(const sensor_msgs::PointCloud2& message,
-               std::vector<ObjectPtr>* tracked_objects);
+  bool Process(const sensor_msgs::PointCloud2& message);
+
+  bool GeneratePbMsg(PerceptionObstacles* obstacles);
 
  private:
   bool InitFrameDependence();
@@ -51,6 +53,9 @@ class LidarProcess {
 
   bool inited_ = false;
   size_t seq_num_ = 0;
+  double timestamp_;
+  apollo::common::ErrorCode error_code_ = apollo::common::OK;
+  std::vector<ObjectPtr> objects_;
   HDMapInput* hdmap_input_ = NULL;
   std::unique_ptr<BaseROIFilter> roi_filter_;
   std::unique_ptr<BaseSegmentation> segmentor_;
