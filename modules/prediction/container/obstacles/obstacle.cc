@@ -679,7 +679,61 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
 }
 
 void Obstacle::SetNearbyLanes(Feature* feature) {
-  // TODO(kechxu) implement
+  PredictionMap* map = PredictionMap::instance();
+  if (map == nullptr) {
+    AERROR << "Missing prediction map.";
+    return;
+  }
+  Eigen::Vector2d point(feature->position().x(), feature->position().y());
+  if (FLAGS_enable_kf_tracking) {
+    point[0] = feature->t_position().x();
+    point[1] = feature->t_position().y();
+  }
+
+  std::vector<const LaneInfo*> nearby_lanes;
+  map->NearbyLanesByCurrentLanes(point, current_lanes_, &nearby_lanes);
+  if (nearby_lanes.empty()) {
+    ADEBUG << "Unable to find nearby lanes.";
+    return;
+  }
+
+  for (const LaneInfo* nearby_lane : nearby_lanes) {
+    if (nearby_lane == nullptr) {
+      continue;
+    }
+    double s = -1.0;
+    double l = 0.0;
+    map->GetProjection(point, nearby_lane, &s, &l);
+    if (s < 0.0 || s >= nearby_lane->total_length()) {
+      continue;
+    }
+    int turn_type = map->LaneTurnType(nearby_lane->id());
+    double heading = feature->theta();
+    if (FLAGS_enable_kf_tracking) {
+      heading = feature->t_velocity_heading();
+    }
+    double angle_diff = 0.0;
+    apollo::hdmap::PathPoint nearest_point;
+    if (!map->ProjectionFromLane(nearby_lane, &nearest_point, &s)) {
+      angle_diff =
+          apollo::common::math::AngleDiff(nearest_point.heading(), heading);
+    }
+
+    double left = 0.0;
+    double right = 0.0;
+    nearby_lane->get_width(s, &left, &right);
+
+    LaneFeature* lane_feature =
+        feature->mutable_lane()->add_nearby_lane_feature();
+
+    lane_feature->set_lane_turn_type(turn_type);
+    lane_feature->set_lane_id(nearby_lane->id().id());
+    lane_feature->set_lane_s(s);
+    lane_feature->set_lane_l(l);
+    lane_feature->set_angle_diff(angle_diff);
+    lane_feature->set_dist_to_left_boundary(left - l);
+    lane_feature->set_dist_to_right_boundary(right + l);
+  }
 }
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
