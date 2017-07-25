@@ -139,42 +139,35 @@ class KalmanFilter {
    *
    * @return Transition matrix.
    */
-  const Eigen::Matrix<T, XN, XN> &GetTransitionMatrix() { return F_; }
+  const Eigen::Matrix<T, XN, XN> &GetTransitionMatrix() const { return F_; }
 
   /**
    * @brief Get the covariance matrix of the transition noise.
    *
    * @return Covariance matrix
    */
-  const Eigen::Matrix<T, XN, XN> &GetTransitionNoise() { return Q_; }
+  const Eigen::Matrix<T, XN, XN> &GetTransitionNoise() const { return Q_; }
 
   /**
    * @brief Get the observation matrix, which maps states to observations.
    *
    * @return Observation matrix
    */
-  const Eigen::Matrix<T, ZN, XN> &GetObservationMatrix() { return H_; }
+  const Eigen::Matrix<T, ZN, XN> &GetObservationMatrix() const { return H_; }
 
   /**
    * @brief Get the covariance matrix of the observation noise.
    *
    * @return Covariance matrix
    */
-  const Eigen::Matrix<T, ZN, ZN> &GetObservationNoise() { return R_; }
-
-  /**
-   * @brief Get the covariance matrix of current state belief distribution.
-   *
-   * @return State covariance matrix
-   */
-  const Eigen::Matrix<T, XN, XN> &GetStateCovariance() { return P_; }
+  const Eigen::Matrix<T, ZN, ZN> &GetObservationNoise() const { return R_; }
 
   /**
    * @brief Get the control matrix in the state transition rule.
    *
    * @return Control matrix
    */
-  const Eigen::Matrix<T, XN, UN> &GetControlMatrix() { return B_; }
+  const Eigen::Matrix<T, XN, UN> &GetControlMatrix() const { return B_; }
 
   /**
    * @brief Updates the state belief distribution given the control input u.

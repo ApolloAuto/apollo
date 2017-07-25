@@ -22,14 +22,13 @@
 #include <utility>
 #include <algorithm>
 #include <limits>
-
 #include "Eigen/Dense"
 
-#include "modules/common/log.h"
-#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
+#include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace prediction {
