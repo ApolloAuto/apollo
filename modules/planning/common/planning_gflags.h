@@ -204,7 +204,9 @@ DECLARE_double(max_deacceleration_for_yellow_light_stop);
 DECLARE_string(qp_spline_path_config_file);
 DECLARE_string(dp_poly_path_config_file);
 DECLARE_string(dp_st_speed_config_file);
+DECLARE_string(st_boundary_config_file);
+DECLARE_string(qp_spline_st_speed_config_file);
 
 DECLARE_int32(trajectory_point_num_for_debug);
 
-#endif /* MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_ */
+#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

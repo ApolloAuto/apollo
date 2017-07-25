@@ -20,6 +20,11 @@
 
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/util/file.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/data_center.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_boundary_mapper.h"
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_graph.h"
 #include "modules/planning/optimizer/st_graph/st_graph_data.h"
@@ -31,50 +36,61 @@ using Status = apollo::common::Status;
 using ErrorCode = apollo::common::ErrorCode;
 using TrajectoryPoint = apollo::common::TrajectoryPoint;
 
-QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(
-    const std::string& name,
-    const QpSplineStSpeedConfig& qp_spline_st_speed_config,
-    const apollo::localization::Pose& pose, const apollo::hdmap::HDMap& hdmap,
-    const apollo::common::config::VehicleParam& veh_param)
-    : SpeedOptimizer(name),
-      _qp_spline_st_speed_config(qp_spline_st_speed_config),
-      _pose(pose),
-      _hdmap(hdmap),
-      veh_param_(veh_param) {}
+QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const std::string& name)
+    : SpeedOptimizer(name) {}
 
 Status QpSplineStSpeedOptimizer::process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          DecisionData* const decision_data,
                                          SpeedData* const speed_data) const {
-  double total_length = std::min(_qp_spline_st_speed_config.total_path_length(),
+  // load boundary mapper
+  StBoundaryConfig st_boundary_config;
+  if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
+                                      &st_boundary_config)) {
+    AERROR << "Failed to load config file: " << FLAGS_st_boundary_config_file;
+    return Status(ErrorCode::PLANNING_ERROR, "Failed to load config file.");
+  }
+
+  // load qp_spline_st_speed_config
+  QpSplineStSpeedConfig qp_spline_st_speed_config;
+  if (!common::util::GetProtoFromFile(FLAGS_qp_spline_st_speed_config_file,
+                                      &qp_spline_st_speed_config)) {
+    AERROR << "Failed to load config file: "
+           << FLAGS_qp_spline_st_speed_config_file;
+    return Status(ErrorCode::PLANNING_ERROR, "Failed to load config file.");
+  }
+
+  double total_length = std::min(qp_spline_st_speed_config.total_path_length(),
                                  path_data.path().param_length());
 
-  // TODO: load boundary mapper and st graph configuration
-  StBoundaryConfig st_boundary_config;
-
   // step 1 get boundaries
-  QpSplineStBoundaryMapper st_mapper(st_boundary_config, veh_param_);
+  const auto& veh_param =
+      common::config::VehicleConfigHelper::GetConfig().vehicle_param();
+  QpSplineStBoundaryMapper st_mapper(st_boundary_config, veh_param);
   std::vector<StGraphBoundary> boundaries;
   if (st_mapper.get_graph_boundary(
           init_point, *decision_data, path_data,
-          _qp_spline_st_speed_config.total_path_length(),
-          _qp_spline_st_speed_config.total_time(),
+          qp_spline_st_speed_config.total_path_length(),
+          qp_spline_st_speed_config.total_time(),
           &boundaries) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
 
   SpeedLimit speed_limits;
-  if (st_mapper.get_speed_limits(_pose, _hdmap, path_data, total_length,
-                                 _qp_spline_st_speed_config.total_time(),
-                                 _qp_spline_st_speed_config.max_speed(),
+  const auto& pose =
+      apollo::common::vehicle_state::VehicleState::instance()->pose();
+  const auto& hdmap = apollo::planning::DataCenter::instance()->map();
+  if (st_mapper.get_speed_limits(pose, hdmap, path_data, total_length,
+                                 qp_spline_st_speed_config.total_time(),
+                                 qp_spline_st_speed_config.max_speed(),
                                  &speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
 
   // step 2 perform graph search
-  QpSplineStGraph st_graph(_qp_spline_st_speed_config, veh_param_);
+  QpSplineStGraph st_graph(qp_spline_st_speed_config, veh_param);
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
                             path_data.path().param_length());

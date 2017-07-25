@@ -54,6 +54,10 @@ class VehicleState {
 
   double timestamp() const { return timestamp_; };
 
+  const apollo::localization::Pose pose() const {
+    return localization_ptr_->pose();
+  };
+
   /**
    * @brief Default destructor.
    */
