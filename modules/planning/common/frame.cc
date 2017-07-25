@@ -31,17 +31,11 @@ void Frame::set_sequence_num(const uint32_t sequence_num) {
   _sequence_num = sequence_num;
 }
 
-void Frame::set_environment(const Environment &environment) {
-  _environment = environment;
-}
-
 void Frame::set_planning_data(PlanningData *const planning_data) {
   _planning_data.reset(planning_data);
 }
 
 uint32_t Frame::sequence_num() const { return _sequence_num; }
-
-const Environment &Frame::environment() const { return _environment; }
 
 const PlanningData &Frame::planning_data() const {
   CHECK_NOTNULL(_planning_data.get());
@@ -53,9 +47,7 @@ PlanningData *Frame::mutable_planning_data() {
   return _planning_data.get();
 }
 
-std::string Frame::DebugString() const {
-  return std::to_string(_sequence_num);
-}
+std::string Frame::DebugString() const { return std::to_string(_sequence_num); }
 
 }  // namespace planning
 }  // namespace apollo
