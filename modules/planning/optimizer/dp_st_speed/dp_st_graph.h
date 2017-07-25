@@ -35,13 +35,13 @@
 namespace apollo {
 namespace planning {
 
-class DPSTGraph {
+class DpStGraph {
  public:
-  DPSTGraph(const DpStConfiguration& dp_config,
-            // const STBoundaryConfig& mapper_config,
+  DpStGraph(const DpStConfiguration& dp_config,
+            // const StBoundaryConfig& mapper_config,
             const apollo::common::config::VehicleParam& veh_param);
 
-  apollo::common::Status search(const STGraphData& st_graph_data,
+  apollo::common::Status search(const StGraphData& st_graph_data,
                                 DecisionData* const decision_data,
                                 SpeedData* const speed_data);
 
@@ -49,7 +49,7 @@ class DPSTGraph {
   apollo::common::Status init_cost_table();
 
   apollo::common::Status calculate_pointwise_cost(
-      const std::vector<STGraphBoundary>& boundaries);
+      const std::vector<StGraphBoundary>& boundaries);
 
   apollo::common::Status calculate_total_cost();
 
@@ -57,7 +57,7 @@ class DPSTGraph {
       SpeedData* const speed_data) const;
 
   apollo::common::Status get_object_decision(
-      const STGraphData& st_graph_data,
+      const StGraphData& st_graph_data,
       const SpeedData& speed_profile) const;
 
   void calculate_total_cost(const std::uint32_t r, const std::uint32_t c);
@@ -87,12 +87,12 @@ class DPSTGraph {
   TrajectoryPoint _init_point;
 
   // mappign obstacle to st graph
-  // std::unique_ptr<STBoundaryMapper> _st_mapper = nullptr;
+  // std::unique_ptr<StBoundaryMapper> _st_mapper = nullptr;
 
   double _unit_s = 0.0;
   double _unit_t = 0.0;
 
-  std::vector<std::vector<STGraphPoint> > _cost_table;
+  std::vector<std::vector<StGraphPoint> > _cost_table;
 };
 
 }  // namespace planning

@@ -24,42 +24,44 @@
 
 #include <vector>
 
-#include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
-
 #include "modules/common/proto/path_point.pb.h"
+
+#include "modules/planning/common/speed_limit.h"
+#include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
 
 namespace apollo {
 namespace planning {
 
-class STGraphData {
+class StGraphData {
  public:
-  STGraphData() = default;
+  StGraphData() = default;
 
-  explicit STGraphData(const std::vector<STGraphBoundary>& obs_boundary,
+  explicit StGraphData(const std::vector<StGraphBoundary>& obs_boundary,
                        const apollo::common::TrajectoryPoint& init_point,
-                       const double speed_limit, const double path_data_length);
+                       const SpeedLimit& speed_limit,
+                       const double path_data_length);
 
-  const std::vector<STGraphBoundary>& obs_boundary() const;
+  const std::vector<StGraphBoundary>& obs_boundary() const;
 
   const apollo::common::TrajectoryPoint& init_point() const;
 
-  double speed_limit() const;
+  const SpeedLimit speed_limit() const;
 
   double path_data_length() const;
 
-  void set_speed_limit(const double speed_limit);
+  void set_speed_limit(const SpeedLimit& speed_limit);
 
-  void set_obs_boundary(const std::vector<STGraphBoundary>& obs_boundary);
+  void set_obs_boundary(const std::vector<StGraphBoundary>& obs_boundary);
 
   void set_init_point(const apollo::common::TrajectoryPoint& init_point);
 
   void set_path_data_length(const double path_data_length);
 
  private:
-  std::vector<STGraphBoundary> _obs_boundary;
+  std::vector<StGraphBoundary> _obs_boundary;
   apollo::common::TrajectoryPoint _init_point;
 
-  double _speed_limit = 0.0;
+  SpeedLimit _speed_limit;
   double _path_data_length = 0.0;
 };
 

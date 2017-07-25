@@ -33,12 +33,12 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::config::VehicleParam;
 
-QPSplineStGraph::QPSplineStGraph(
-    const QPSplineStSpeedConfig& qp_spline_st_speed_config,
+QpSplineStGraph::QpSplineStGraph(
+    const QpSplineStSpeedConfig& qp_spline_st_speed_config,
     const apollo::common::config::VehicleParam& veh_param)
     : _qp_spline_st_speed_config(qp_spline_st_speed_config) {}
 
-Status QPSplineStGraph::search(const STGraphData& st_graph_data,
+Status QpSplineStGraph::search(const StGraphData& st_graph_data,
                                const PathData& path_data,
                                SpeedData* const speed_data) {
   _init_point = st_graph_data.init_point();
@@ -98,8 +98,8 @@ Status QPSplineStGraph::search(const STGraphData& st_graph_data,
   return Status::OK();
 }
 
-Status QPSplineStGraph::apply_constraint(
-    const std::vector<STGraphBoundary>& boundaries) {
+Status QpSplineStGraph::apply_constraint(
+    const std::vector<StGraphBoundary>& boundaries) {
   Spline1dConstraint* constraint =
       _spline_generator->mutable_spline_constraint();
   // position, velocity, acceleration
@@ -117,7 +117,8 @@ Status QPSplineStGraph::apply_constraint(
 
   if (!constraint->add_point_second_derivative_constraint(0.0,
                                                           _init_point.a())) {
-    const std::string msg = "add st start point acceleration constraint failed!";
+    const std::string msg =
+        "add st start point acceleration constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
@@ -172,7 +173,7 @@ Status QPSplineStGraph::apply_constraint(
   return Status::OK();
 }
 
-Status QPSplineStGraph::apply_kernel() {
+Status QpSplineStGraph::apply_kernel() {
   Spline1dKernel* spline_kernel = _spline_generator->mutable_spline_kernel();
 
   if (_qp_spline_st_speed_config.speed_kernel_weight() > 0) {
@@ -206,20 +207,20 @@ Status QPSplineStGraph::apply_kernel() {
   return Status::OK();
 }
 
-Status QPSplineStGraph::solve() {
-  return _spline_generator->solve() ?
-      Status::OK() :
-      Status(ErrorCode::PLANNING_ERROR_FAILED, "QPSplineStGraph::solve");
+Status QpSplineStGraph::solve() {
+  return _spline_generator->solve() ? Status::OK()
+                                    : Status(ErrorCode::PLANNING_ERROR_FAILED,
+                                             "QpSplineStGraph::solve");
 }
 
-Status QPSplineStGraph::get_s_constraints_by_time(
-    const std::vector<STGraphBoundary>& boundaries, const double time,
+Status QpSplineStGraph::get_s_constraints_by_time(
+    const std::vector<StGraphBoundary>& boundaries, const double time,
     const double total_path_s, double* const s_upper_bound,
     double* const s_lower_bound) const {
   *s_upper_bound =
       std::min(total_path_s, time * _qp_spline_st_speed_config.max_speed());
 
-  for (const STGraphBoundary& boundary : boundaries) {
+  for (const StGraphBoundary& boundary : boundaries) {
     double s_upper = 0.0;
     double s_lower = 0.0;
 
@@ -227,9 +228,9 @@ Status QPSplineStGraph::get_s_constraints_by_time(
       continue;
     }
 
-    if (boundary.boundary_type() == STGraphBoundary::BoundaryType::STOP ||
-        boundary.boundary_type() == STGraphBoundary::BoundaryType::FOLLOW ||
-        boundary.boundary_type() == STGraphBoundary::BoundaryType::YIELD) {
+    if (boundary.boundary_type() == StGraphBoundary::BoundaryType::STOP ||
+        boundary.boundary_type() == StGraphBoundary::BoundaryType::FOLLOW ||
+        boundary.boundary_type() == StGraphBoundary::BoundaryType::YIELD) {
       *s_upper_bound = std::fmin(*s_upper_bound, s_upper);
     } else {
       *s_lower_bound = std::fmax(*s_lower_bound, s_lower);

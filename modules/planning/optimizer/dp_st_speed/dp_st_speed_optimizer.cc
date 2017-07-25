@@ -46,21 +46,23 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
       VehicleConfigHelper::GetConfig().vehicle_param();
 
   // TODO: load boundary mapper and st graph configuration
-  STBoundaryConfig st_boundary_config;
+  StBoundaryConfig st_boundary_config;
   DpStConfiguration dp_st_configuration;
 
   // step 1 get boundaries
-  DPSTBoundaryMapper st_mapper(st_boundary_config, veh_param);
-  std::vector<STGraphBoundary> boundaries;
+  DpStBoundaryMapper st_mapper(st_boundary_config, veh_param);
+  std::vector<StGraphBoundary> boundaries;
 
   common::TrajectoryPoint initial_planning_point = DataCenter::instance()
-      ->current_frame()->mutable_planning_data()->init_planning_point();
-  if (!st_mapper.get_graph_boundary(initial_planning_point,
-                                    *decision_data,
-                                    path_data,
-                                    dp_st_configuration.total_path_length(),
-                                    dp_st_configuration.total_time(),
-                                    &boundaries).ok()) {
+                                                       ->current_frame()
+                                                       ->mutable_planning_data()
+                                                       ->init_planning_point();
+  if (!st_mapper
+           .get_graph_boundary(initial_planning_point, *decision_data,
+                               path_data,
+                               dp_st_configuration.total_path_length(),
+                               dp_st_configuration.total_time(), &boundaries)
+           .ok()) {
     const std::string msg =
         "Mapping obstacle for dp st speed optimizer failed.";
     AERROR << msg;
@@ -69,11 +71,11 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 2 perform graph search
   // TODO: here change the speed limit
-  double speed_limit = 20.0;
-  STGraphData st_graph_data(boundaries, init_point, speed_limit,
+  SpeedLimit speed_limit;
+  StGraphData st_graph_data(boundaries, init_point, speed_limit,
                             path_data.path().param_length());
 
-  DPSTGraph st_graph(dp_st_configuration, veh_param);
+  DpStGraph st_graph(dp_st_configuration, veh_param);
 
   if (!st_graph.search(st_graph_data, decision_data, speed_data).ok()) {
     const std::string msg = "Failed to search graph with dynamic programming.";

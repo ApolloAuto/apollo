@@ -26,16 +26,16 @@
 namespace apollo {
 namespace planning {
 
-class STGraphPoint {
+class StGraphPoint {
  public:
-  ~STGraphPoint() = default;
+  ~StGraphPoint() = default;
 
  public:
   std::uint32_t index_s() const;
   std::uint32_t index_t() const;
 
   const STPoint& point() const;
-  const STGraphPoint* pre_point() const;
+  const StGraphPoint* pre_point() const;
 
   double reference_cost() const;
   double obstacle_cost() const;
@@ -53,13 +53,13 @@ class STGraphPoint {
   // total cost
   void set_total_cost(const double total_cost);
 
-  void set_pre_point(const STGraphPoint& pre_point);
+  void set_pre_point(const StGraphPoint& pre_point);
 
   STPoint* mutable_point();
 
  private:
   STPoint _point;
-  const STGraphPoint* _pre_point = nullptr;
+  const StGraphPoint* _pre_point = nullptr;
   std::uint32_t _index_s = 0;
   std::uint32_t _index_t = 0;
 

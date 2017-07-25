@@ -32,7 +32,7 @@
 namespace apollo {
 namespace planning {
 
-class STGraphBoundary final : public ::apollo::common::math::Polygon2d {
+class StGraphBoundary final : public ::apollo::common::math::Polygon2d {
  public:
   enum class BoundaryType {
     STOP,
@@ -44,14 +44,14 @@ class STGraphBoundary final : public ::apollo::common::math::Polygon2d {
     UNKNOWN
   };
 
-  explicit STGraphBoundary(const std::vector<STPoint>& points);
-  explicit STGraphBoundary(
+  explicit StGraphBoundary(const std::vector<STPoint>& points);
+  explicit StGraphBoundary(
       const std::vector<::apollo::common::math::Vec2d>& points);
 
-  ~STGraphBoundary() = default;
+  ~StGraphBoundary() = default;
 
   bool is_empty() const;
-  bool IsPointInBoundary(const STGraphPoint& st_graph_point) const;
+  bool IsPointInBoundary(const StGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;
 
   const ::apollo::common::math::Vec2d point(const uint32_t index) const;

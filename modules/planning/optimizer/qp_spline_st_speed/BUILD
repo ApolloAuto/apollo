@@ -12,8 +12,8 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/vehicle_state",
         "//modules/common/util",
+        "//modules/common/vehicle_state",
         "//modules/planning/optimizer/st_graph:st_boundary_mapper",
     ],
 )
@@ -37,6 +37,27 @@ cc_library(
         "//modules/planning/math/smoothing_spline:spline_1d_generator",
         "//modules/planning/optimizer/st_graph:st_graph_data",
         "//modules/planning/util:planning_util",
+    ],
+)
+
+cc_library(
+    name = "qp_spline_st_speed_optimizer",
+    srcs = [
+        "qp_spline_st_speed_optimizer.cc",
+    ],
+    hdrs = [
+        "qp_spline_st_speed_optimizer.h",
+    ],
+    deps = [
+        ":qp_spline_st_boundary_mapper",
+        ":qp_spline_st_graph",
+        "//modules/common:log",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/proto:path_point_proto",
+        "//modules/localization/proto:pose_proto",
+        "//modules/map/hdmap",
+        "//modules/planning/optimizer:speed_optimizer",
+        "//modules/planning/proto:planning_proto",
     ],
 )
 

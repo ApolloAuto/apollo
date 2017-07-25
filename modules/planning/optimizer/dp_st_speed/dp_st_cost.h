@@ -36,7 +36,7 @@ class DpStCost {
   explicit DpStCost(const DpStConfiguration& dp_st_configuration);
 
   double obstacle_cost(const STPoint& point,
-                       const std::vector<STGraphBoundary>& obs_boundary) const;
+                       const std::vector<StGraphBoundary>& obs_boundary) const;
 
   double reference_cost(const STPoint& point,
                         const STPoint& reference_point) const;
