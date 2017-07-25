@@ -20,19 +20,10 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 
-namespace {
-
-constexpr char kMapFilename[] = "modules/map/hdmap/test-data/map_data.dat.v2";
-
-}  // namespace
+constexpr char kMapFilename[] = "modules/map/hdmap/test-data/map_data.dat.v2.bin";
 
 namespace apollo {
 namespace hdmap {
-
-int main(int argc, char** argv) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
 
 class HDMapImplTestSuite : public ::testing::Test {
  public:
@@ -269,7 +260,7 @@ TEST_F(HDMapImplTestSuite, get_nearest_lane) {
   LaneInfoConstPtr lane;
   double s = 0.0;
   double l = 0.0;
-  
+
   apollo::hdmap::Point point;
 
   point.set_x(2.5);
