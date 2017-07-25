@@ -15,6 +15,7 @@
 #include "modules/common/math/mpc_solver.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "modules/common/log.h"
 
@@ -23,6 +24,8 @@ namespace common {
 namespace math {
 
 using Matrix = Eigen::MatrixXd;
+using ::apollo::common::math::QPSolver;
+using ::apollo::common::math::ActiveSetQPSolver;
 
 // discrete linear predictive control solver, with control format
 // x(i + 1) = A * x(i) + B * u (i) + C
@@ -110,62 +113,40 @@ void SolveLinearMPC(const Matrix &matrix_a,
   Matrix matrix_m1 = matrix_k.transpose() * matrix_qq * matrix_k + matrix_rr;
   Matrix matrix_m2 = matrix_k.transpose() * matrix_qq * (matrix_m - matrix_t);
 
+  // Method 1: QPOASES
+  Eigen::MatrixXd matrix_inequality_constrain_ll = - Eigen::MatrixXd::Identity(matrix_ll.rows(),
+            matrix_ll.rows());
+  Eigen::MatrixXd matrix_inequality_constrain_uu = Eigen::MatrixXd::Identity(matrix_uu.rows(),
+            matrix_uu.rows());
+  Eigen::MatrixXd matrix_inequality_constrain = Eigen::MatrixXd::Zero(matrix_ll.rows()
+            + matrix_uu.rows(), matrix_ll.rows());
+  matrix_inequality_constrain << matrix_inequality_constrain_ll,
+                                matrix_inequality_constrain_uu;
+  Eigen::MatrixXd matrix_inequality_boundary = Eigen::MatrixXd::Zero(matrix_ll.rows()
+            + matrix_uu.rows(), matrix_ll.cols());
+  matrix_inequality_boundary << matrix_ll,
+                                matrix_uu;
+  Eigen::MatrixXd matrix_equality_constrain = Eigen::MatrixXd::Zero(matrix_ll.rows()
+            + matrix_uu.rows(), matrix_ll.rows());
+  Eigen::MatrixXd matrix_equality_boundary = Eigen::MatrixXd::Zero(matrix_ll.rows()
+            + matrix_uu.rows(), matrix_ll.cols());
+  std::unique_ptr<QPSolver> qp_solver(new ActiveSetQPSolver(matrix_m1,
+                matrix_m2,
+                matrix_inequality_constrain,
+                matrix_inequality_boundary,
+                matrix_equality_constrain,
+                matrix_equality_boundary));
+  qp_solver->solve();
+  matrix_v = qp_solver->params();
+
+  /*
   // Method 2: QP_SMO_Solver
   SolveQPSMO(matrix_m1, matrix_m2, matrix_ll, matrix_uu, eps, max_iter,
              &matrix_v);
+  i*/
   for (unsigned int i = 0; i < horizon; ++i) {
     (*control)[i] =
         matrix_v.block(i * (*control)[0].rows(), 0, (*control)[0].rows(), 1);
-  }
-}
-
-void SolveQPSMO(const Matrix& matrix_q,
-                const Matrix& matrix_b,
-                const Matrix& matrix_lower,
-                const Matrix& matrix_upper,
-                const double& eps,
-                const int& max_iter,
-                Matrix* matrix_v) {
-  // Warning: Skipped the sanity check since this is designed for solely used by
-  // mpc_solver.
-  // TODO(Capri2014): Replace this with available QP solver
-  Matrix matrix_df = matrix_q * (* matrix_v) + matrix_b;
-  Matrix matrix_q_inv = matrix_q.inverse();
-  for (int iter = 0; iter < max_iter; ++iter) {
-    double max_df = 0;
-    int best_r = 0;
-    for (int r = 0; r < matrix_q.rows(); ++r) {
-      if ((*matrix_v)(r) <= matrix_lower(r) && matrix_df(r) > 0) {
-        continue;
-      } else if ((*matrix_v)(r) >= matrix_upper(r) && matrix_df(r) < 0) {
-        continue;
-      } else if (std::abs(matrix_df(r)) > max_df) {
-        best_r = r;
-        max_df = std::abs(matrix_df(r));
-      }
-    }
-
-    int r = best_r;
-    {
-      const double old_alpha = (*matrix_v)(r);
-      (*matrix_v)(r) =
-          -(matrix_df(r) - matrix_q(r, r) * (*matrix_v)(r)) * matrix_q_inv(r);
-      if ((*matrix_v)(r) < matrix_lower(r)) {
-        (*matrix_v)(r) = matrix_lower(r);
-      } else if ((*matrix_v)(r) > matrix_upper(r)) {
-        (*matrix_v)(r) = matrix_upper(r);
-      }
-      const double delta = old_alpha - (*matrix_v)(r);
-
-      // Gradient update.
-      for (int k = 0; k < matrix_df.rows(); ++k) {
-        matrix_df(k) -= matrix_q(r, k) * delta;
-      }
-    }
-
-    if (max_df < eps) {
-      break;
-    }
   }
 }
 
