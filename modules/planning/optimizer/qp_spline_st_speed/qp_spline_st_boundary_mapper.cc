@@ -29,6 +29,7 @@
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
@@ -208,8 +209,8 @@ Status QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
       const auto& trajectory_point = trajectory.trajectory_point_at(j);
       // TODO: fix trajectory point relative time issue.
       double trajectory_point_time =
-          trajectory_point.relative_time() +
-          trajectory.start_timestamp();  // -curr_timestamp.
+          trajectory_point.relative_time() + trajectory.start_timestamp() -
+          common::vehicle_state::VehicleState::instance()->timestamp();
       const Box2d obs_box(
           Vec2d(trajectory_point.path_point().x(),
                 trajectory_point.path_point().y()),

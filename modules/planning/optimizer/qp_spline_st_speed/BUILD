@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/vehicle_state",
         "//modules/common/util",
         "//modules/planning/optimizer/st_graph:st_boundary_mapper",
     ],
