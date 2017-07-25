@@ -39,23 +39,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "vehicle_state_proxy",
-    srcs = [
-        "vehicle_state_proxy.cc",
-    ],
-    hdrs = [
-        "vehicle_state_proxy.h",
-    ],
-    deps = [
-        "//modules/common:log",
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:path_point_proto",
-        "//modules/common/configs:vehicle_config_helper",
-        "//modules/planning/common:planning_common",
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/localization/proto:localization_proto",
-    ],
-)
-
 cpplint()
