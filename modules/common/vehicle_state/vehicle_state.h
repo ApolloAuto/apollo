@@ -77,6 +77,8 @@ class VehicleState {
    */
   double z() const;
 
+  double kappa() const;
+
   /**
    * @brief Get the heading of vehicle position, which is the angle
    *        between the vehicle's heading direction and the x-axis.
@@ -135,6 +137,8 @@ class VehicleState {
    */
   void set_heading(const double heading);
 
+  void set_kappa(const double kappa) { kappa_ = kappa; }
+
   /**
    * @brief Set the vehicle's linear velocity.
    * @param linear_velocity The value to set the vehicle's linear velocity.
@@ -181,6 +185,8 @@ class VehicleState {
   double y_ = 0.0;
   double z_ = 0.0;
   double heading_ = 0.0;
+  // TODO: check the setting of kappa_
+  double kappa_ = 0.0;
   double linear_v_ = 0.0;
   double angular_v_ = 0.0;
   double linear_a_ = 0.0;

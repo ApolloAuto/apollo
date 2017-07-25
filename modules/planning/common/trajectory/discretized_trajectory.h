@@ -61,6 +61,10 @@ class DiscretizedTrajectory : public Trajectory {
 
   uint32_t num_of_points() const;
 
+  const std::vector<apollo::common::TrajectoryPoint> trajectory_points() const {
+    return _trajectory_points;
+  }
+
  protected:
   std::vector<apollo::common::TrajectoryPoint> _trajectory_points;
 };
