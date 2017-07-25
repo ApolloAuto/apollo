@@ -118,6 +118,11 @@ const KalmanFilter<double, 4, 2, 0>& Obstacle::kf_lane_tracker(
   return kf_lane_trackers_[lane_id];
 }
 
+const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  return kf_motion_tracker_;
+}
+
 bool Obstacle::IsOnLane() {
   std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0) {

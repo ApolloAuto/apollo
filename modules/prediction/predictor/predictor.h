@@ -25,6 +25,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 #include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/common/proto/path_point.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -54,7 +55,25 @@ class Predictor {
    * @brief Make prediction
    * @param Obstacle pointer
    */
-  virtual void Predict(Obstacle* obstacle) const = 0;
+  virtual void Predict(Obstacle* obstacle) = 0;
+
+  /**
+   * @brief Get trajectory size
+   * @return Size of trajectories
+   */
+  int GetTrajectorySize();
+
+ protected:
+  /**
+   * @brief Generate trajectory from trajectory points
+   * @param A vector of trajectory points
+   *        A pointer to generated trajectory
+   */
+  void GenerateTrajectory(
+      const std::vector<::apollo::common::TrajectoryPoint>& points,
+      Trajectory *trajectory);
+
+  void SetEqualProbability(double probability, int start_index);
 
  protected:
   PredictionObstacle prediction_obstacle_;

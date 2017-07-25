@@ -41,6 +41,7 @@ cc_library(
     deps = [
         "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/common/proto:path_point_proto",
     ]
 )
 
