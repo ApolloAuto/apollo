@@ -17,15 +17,18 @@
 #include "modules/prediction/predictor/vehicle/free_move_predictor.h"
 
 #include <vector>
+#include <cmath>
+#include <limits>
 #include "Eigen/Dense"
 
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/proto/feature.pb.h"
+#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace prediction {
 
 using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::PathPoint;
 
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
   CHECK_NOTNULL(obstacle);
@@ -41,25 +44,121 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
+  Eigen::Vector2d acc(feature.acceleration().x(), feature.acceleration().y());
   if (FLAGS_enable_kf_tracking) {
     position(0) = feature.t_position().x();
     position(1) = feature.t_position().y();
     velocity(0) = feature.t_velocity().x();
     velocity(1) = feature.t_velocity().y();
+    acc(0) = feature.t_acceleration().x();
+    acc(1) = feature.t_acceleration().y();
   }
 
   std::vector<TrajectoryPoint> points(0);
-  double total_time = FLAGS_prediction_duration;
-  // TODO(kechxu):
-  // draw_free_move_trajectory(position, velocity,
-  // obstacle->kf_motion_tracker(),
-  //                           total_time, points);
+
+  DrawFreeMoveTrajectoryPoints(position, velocity, acc,
+                               obstacle->kf_motion_tracker(),
+                               FLAGS_prediction_duration,
+                               FLAGS_prediction_freq,
+                               &points);
+
   Trajectory trajectory;
   GenerateTrajectory(points, &trajectory);
   int start_index = 0;
-  prediction_obstacle_.set_predicted_period(total_time);
+  prediction_obstacle_.set_predicted_period(FLAGS_prediction_duration);
   prediction_obstacle_.add_trajectory()->CopyFrom(trajectory);
   SetEqualProbability(1.0, start_index);
+}
+
+void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
+    const Eigen::Vector2d& position,
+    const Eigen::Vector2d& velocity,
+    const Eigen::Vector2d& acc,
+    const KalmanFilter<double, 6, 2, 0>& kf,
+    double total_time,
+    double freq,
+    std::vector<TrajectoryPoint> *points) {
+  double theta = std::atan2(velocity(1), velocity(0));
+
+  Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
+  state(0, 0) = position(0);
+  state(1, 0) = position(1);
+  state(2, 0) = velocity(0);
+  state(3, 0) = velocity(1);
+  state(4, 0) = ::apollo::common::math::Clamp(
+      acc(0), FLAGS_min_acc, FLAGS_max_acc);
+  state(5, 0) = ::apollo::common::math::Clamp(
+      acc(1), FLAGS_min_acc, FLAGS_max_acc);
+
+  Eigen::Matrix<double, 6, 6> transition(kf.GetTransitionMatrix());
+  transition(0, 2) = freq;
+  transition(0, 4) = 0.5 * freq * freq;
+  transition(1, 3) = freq;
+  transition(1, 5) = 0.5 * freq * freq;
+  transition(2, 4) = freq;
+  transition(3, 5) = freq;
+
+  double x = state(0, 0);
+  double y = state(1, 0);
+  double v_x = state(2, 0);
+  double v_y = state(3, 0);
+  double acc_x = state(4, 0);
+  double acc_y = state(5, 0);
+  for (size_t i = 0; i < static_cast<size_t>(total_time / freq); ++i) {
+    double speed = std::hypot(v_x, v_y);
+    if (speed <= std::numeric_limits<double>::epsilon()) {
+        speed = 0.0;
+        v_x = 0.0;
+        v_y = 0.0;
+        acc_x = 0.0;
+        acc_y = 0.0;
+    } else if (speed > FLAGS_max_speed) {
+        speed = FLAGS_max_speed;
+    }
+
+    // update theta
+    if (speed > std::numeric_limits<double>::epsilon()) {
+      if (points->size() > 0) {
+        PathPoint *prev_point = points->back().mutable_path_point();
+        theta = std::atan2(x - prev_point->x(), y - prev_point->y());
+        prev_point->set_theta(theta);
+      }
+    } else {
+      if (points->size() > 0) {
+        theta = points->back().path_point().theta();
+      }
+    }
+
+    // update velocity and acc
+    state(2, 0) = v_x;
+    state(3, 0) = v_y;
+    state(4, 0) = acc_x;
+    state(5, 0) = acc_y;
+
+    // update position
+    x = state(0, 0);
+    y = state(1, 0);
+
+    // Generate trajectory point
+    TrajectoryPoint trajectory_point;
+    trajectory_point.mutable_path_point()->set_x(x);
+    trajectory_point.mutable_path_point()->set_y(y);
+    trajectory_point.mutable_path_point()->set_z(0.0);
+    trajectory_point.mutable_path_point()->set_theta(theta);
+    trajectory_point.set_v(speed);
+    trajectory_point.set_a(std::hypot(acc_x, acc_y));
+    trajectory_point.set_relative_time(static_cast<double>(i) * freq);
+    points->emplace_back(std::move(trajectory_point));
+
+    // Update position, velocity and acceleration
+    state = transition * state;
+    x = state(0, 0);
+    y = state(1, 0);
+    v_x = state(2, 0);
+    v_y = state(3, 0);
+    acc_x = state(4, 0);
+    acc_y = state(5, 0);
+  }
 }
 
 }  // namespace prediction
