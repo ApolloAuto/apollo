@@ -35,7 +35,6 @@ limitations under the License.
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
-
 #include "modules/map/hdmap/hdmap_common.h"
 
 namespace apollo {
@@ -92,6 +91,18 @@ class HDMapImpl {
                     LaneInfoConstPtr* nearest_lane,
                     double* nearest_s,
                     double* nearest_l) const;
+    int get_nearest_lane_with_heading(const apollo::hdmap::Point& point,
+                                    const double distance,
+                                    const double central_heading,
+                                    const double max_heading_difference,
+                                    LaneInfoConstPtr* nearest_lane,
+                                    double* nearest_s,
+                                    double* nearest_l) const;
+    int get_lanes_with_heading(const apollo::hdmap::Point& point,
+                               const double distance,
+                               const double central_heading,
+                               const double max_heading_difference,
+                               std::vector<LaneInfoConstPtr>* lanes) const;
 
  private:
     int get_lanes(const apollo::common::math::Vec2d& point,
@@ -116,6 +127,18 @@ class HDMapImpl {
                     LaneInfoConstPtr* nearest_lane,
                     double *nearest_s,
                     double *nearest_l) const;
+    int get_nearest_lane_with_heading(const apollo::common::math::Vec2d& point,
+                                  const double distance,
+                                  const double central_heading,
+                                  const double max_heading_difference,
+                                  LaneInfoConstPtr* nearest_lane,
+                                  double* nearest_s,
+                                  double* nearest_l) const;
+    int get_lanes_with_heading(const apollo::common::math::Vec2d &point,
+                                const double distance,
+                                const double central_heading,
+                                const double max_heading_difference,
+                                std::vector<LaneInfoConstPtr> *lanes) const;
 
     template<class Table, class BoxTable, class KDTree>
     static void build_segment_kdtree(const Table& table,

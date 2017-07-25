@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "modules/common/macro.h"
-
+#include "modules/common/proto/geometry.pb.h"
 #include "modules/map/proto/map_crosswalk.pb.h"
 #include "modules/map/proto/map_junction.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
@@ -30,12 +30,25 @@
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-
+#include "modules/map/proto/map_road.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 
 namespace apollo {
 namespace hdmap {
+
+struct RoadROIBoundary {
+    apollo::hdmap::Id id;
+    std::vector<apollo::hdmap::RoadBoundary> road_boundary;
+};
+
+using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
+
+struct JunctionBoundary {
+    const JunctionInfo* junction_info;
+};
+
+using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
 
 class HDMap {
  public:
@@ -65,6 +78,22 @@ class HDMap {
   int get_nearest_lane(const apollo::hdmap::Point& point,
                        LaneInfoConstPtr* nearest_lane, double* nearest_s,
                        double* nearest_l) const;
+  int get_nearest_lane_with_heading(const apollo::hdmap::Point& point,
+                                  const double distance,
+                                  const double central_heading,
+                                  const double max_heading_difference,
+                                  LaneInfoConstPtr* nearest_lane,
+                                  double* nearest_s,
+                                  double* nearest_l) const;
+  int get_lanes_with_heading(const apollo::hdmap::Point& point,
+                            const double distance,
+                            const double central_heading,
+                            const double max_heading_difference,
+                            std::vector<LaneInfoConstPtr>* lanes) const;
+  int get_road_boundaries(const apollo::hdmap::Point& point,
+                          double radius,
+                          std::vector<RoadROIBoundaryPtr>* road_boundaries,
+                          std::vector<JunctionInfoConstPtr>* junctions) const;
 
  private:
   HDMapImpl _impl;
