@@ -24,7 +24,7 @@ namespace apollo {
 namespace planning {
 
 bool ObjectTable::get_obstacle(const uint32_t id, Obstacle** const obstacle) {
-  auto *obstacle_from_cache = _obstacle_cache.get(id);
+  auto *obstacle_from_cache = _obstacle_cache.Get(id);
   if (!obstacle_from_cache) {
     return false;
   }
@@ -34,12 +34,12 @@ bool ObjectTable::get_obstacle(const uint32_t id, Obstacle** const obstacle) {
 }
 
 void ObjectTable::put_obstacle(std::unique_ptr<Obstacle> obstacle) {
-  _obstacle_cache.put(obstacle->Id(), std::move(obstacle));
+  _obstacle_cache.Put(obstacle->Id(), std::move(obstacle));
 }
 
 bool ObjectTable::get_map_object(const std::string& id,
                                  MapObject** const map_object) {
-  auto *map_object_from_cache = _map_object_cache.get(id);
+  auto *map_object_from_cache = _map_object_cache.Get(id);
   if (!map_object_from_cache) {
     return false;
   }
@@ -50,7 +50,7 @@ bool ObjectTable::get_map_object(const std::string& id,
 }
 
 void ObjectTable::put_map_object(std::unique_ptr<MapObject>& map_object) {
-  _map_object_cache.put(map_object->Id(), std::move(map_object));
+  _map_object_cache.Put(map_object->Id(), std::move(map_object));
 }
 
 }  // namespace planning

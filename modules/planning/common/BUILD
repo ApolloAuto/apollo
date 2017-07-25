@@ -17,13 +17,6 @@ cc_library(
 )
 
 cc_library(
-    name = "lru_cache",
-    hdrs = [
-        "lru_cache.h",
-    ],
-)
-
-cc_library(
     name = "map_object",
     srcs = [
         "map_object.cc",
@@ -46,7 +39,7 @@ cc_library(
         "object_table.h",
     ],
     deps = [
-        ":lru_cache",
+        "//modules/common/util:lru_cache",
         ":map_object",
         ":obstacle",
         ":planning_gflags",
