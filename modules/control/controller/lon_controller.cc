@@ -154,7 +154,7 @@ Status LonController::ComputeControlCommand(
     ::apollo::control::ControlCommand *cmd) {
   localization_ = localization;
   chassis_ = chassis;
-  vehicle_state_ = std::move(VehicleState(localization, chassis));
+  VehicleState::instance()->Update(localization, chassis);
 
   trajectory_message_ = planning_published_trajectory;
   if (!control_interpolation_) {
@@ -184,8 +184,7 @@ Status LonController::ComputeControlCommand(
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
                   "Invalid preview time:" + std::to_string(preview_time));
   }
-  ComputeLongitudinalErrors(vehicle_state_, trajectory_analyzer_.get(),
-                            preview_time, debug);
+  ComputeLongitudinalErrors(trajectory_analyzer_.get(), preview_time, debug);
 
   double station_error_limit = lon_controller_conf.station_error_limit();
   double station_error_limited = 0.0;
@@ -214,7 +213,8 @@ Status LonController::ComputeControlCommand(
       speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
-  if (vehicle_state_.linear_velocity() <= lon_controller_conf.switch_speed()) {
+  if (VehicleState::instance()->linear_velocity() <=
+      lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
     acceleration_cmd_closeloop =
         speed_pid_controller_.Control(speed_controller_input_limited, ts);
@@ -285,7 +285,7 @@ Status LonController::ComputeControlCommand(
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
 
-  if (std::abs(vehicle_state_.linear_velocity()) <=
+  if (std::abs(VehicleState::instance()->linear_velocity()) <=
           FLAGS_max_abs_speed_when_stopped ||
       chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == ::apollo::canbus::Chassis::GEAR_NEUTRAL) {
@@ -306,7 +306,6 @@ Status LonController::Reset() {
 std::string LonController::Name() const { return name_; }
 
 void LonController::ComputeLongitudinalErrors(
-    const VehicleState &vehicle_state,
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
     SimpleLongitudinalDebug *debug) {
   // the decomposed vehicle motion onto Frenet frame
@@ -320,11 +319,12 @@ void LonController::ComputeLongitudinalErrors(
   double d_dot_matched = 0.0;
 
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      vehicle_state.x(), vehicle_state.y());
+      VehicleState::instance()->x(), VehicleState::instance()->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      vehicle_state.x(), vehicle_state.y(), vehicle_state.heading(),
-      vehicle_state.linear_velocity(), matched_point, &s_matched,
+      VehicleState::instance()->x(), VehicleState::instance()->y(),
+      VehicleState::instance()->heading(),
+      VehicleState::instance()->linear_velocity(), matched_point, &s_matched,
       &s_dot_matched, &d_matched, &d_dot_matched);
 
   double current_control_time = apollo::common::time::ToSecond(Clock::Now());

@@ -99,10 +99,9 @@ class LonController : public Controller {
   std::string Name() const override;
 
  protected:
-  void ComputeLongitudinalErrors(
-      const ::apollo::common::vehicle_state::VehicleState &vehicle_state,
-      const TrajectoryAnalyzer *trajectory, const double preview_time,
-      SimpleLongitudinalDebug *debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
+                                 const double preview_time,
+                                 SimpleLongitudinalDebug *debug);
 
  private:
   void SetDigitalFilterAcceleration(
@@ -122,7 +121,6 @@ class LonController : public Controller {
 
   const ::apollo::localization::LocalizationEstimate *localization_ = nullptr;
   const ::apollo::canbus::Chassis *chassis_ = nullptr;
-  ::apollo::common::vehicle_state::VehicleState vehicle_state_;
 
   std::unique_ptr<Interpolation2D> control_interpolation_;
   const ::apollo::planning::ADCTrajectory *trajectory_message_ = nullptr;

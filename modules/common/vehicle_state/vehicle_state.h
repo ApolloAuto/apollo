@@ -21,10 +21,12 @@
 #ifndef MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 #define MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 
+#include "Eigen/Core"
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 
-#include "Eigen/Core"
+#include "modules/common/macro.h"
 
 /**
  * @namespace apollo::common::vehicle_state
@@ -43,23 +45,12 @@ namespace vehicle_state {
 class VehicleState {
  public:
   /**
-   * @brief Empty constructor.
-   */
-  VehicleState() = default;
-
-  /**
-   * @brief Constructor only by information of localization.
-   * @param localization Localization information of the vehicle.
-   */
-  explicit VehicleState(const localization::LocalizationEstimate &localization);
-
-  /**
    * @brief Constructor by information of localization and chassis.
    * @param localization Localization information of the vehicle.
    * @param chassis Chassis information of the vehicle.
    */
-  VehicleState(const localization::LocalizationEstimate *localization,
-               const canbus::Chassis *chassis);
+  void Update(const localization::LocalizationEstimate* localization,
+              const canbus::Chassis* chassis);
 
   double timestamp() const { return timestamp_; };
 
@@ -181,26 +172,21 @@ class VehicleState {
   Eigen::Vector2d ComputeCOMPosition(const double rear_to_com_distance) const;
 
  private:
+  DECLARE_SINGLETON(VehicleState);
+
   void ConstructExceptLinearVelocity(
-      const localization::LocalizationEstimate *localization);
+      const localization::LocalizationEstimate* localization);
 
   double x_ = 0.0;
-
   double y_ = 0.0;
-
   double z_ = 0.0;
-
   double heading_ = 0.0;
-
   double linear_v_ = 0.0;
-
   double angular_v_ = 0.0;
-
   double linear_a_ = 0.0;
 
   ::apollo::canbus::Chassis::GearPosition gear_;
-
-  const localization::LocalizationEstimate *localization_ptr_ = nullptr;
+  const localization::LocalizationEstimate* localization_ptr_ = nullptr;
 
   double timestamp_ = 0.0;
 };

@@ -18,8 +18,8 @@
 #define MODULES_PLANNING_PLANNING_H_
 
 #include <memory>
-#include <utility>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/common/apollo_app.h"
@@ -72,14 +72,10 @@ class Planning : public apollo::common::ApolloApp {
 
   /**
    * @brief Plan the trajectory given current vehicle state
-   * @param vehicle_state variable describes the vehicle state, including
-   * position,
-   *        velocity, acceleration, heading, etc
    * @param is_on_auto_mode whether the current system is on auto-driving mode
    * @param publishable_trajectory the computed planning trajectory
    */
-  bool Plan(const common::vehicle_state::VehicleState &vehicle_state,
-            const bool is_on_auto_mode, const double publish_time,
+  bool Plan(const bool is_on_auto_mode, const double publish_time,
             std::vector<common::TrajectoryPoint> *discretized_trajectory);
 
   /**
@@ -95,7 +91,6 @@ class Planning : public apollo::common::ApolloApp {
   ComputeStartingPointFromLastTrajectory(const double curr_time) const;
 
   common::TrajectoryPoint ComputeStartingPointFromVehicleState(
-      const common::vehicle_state::VehicleState &vehicle_state,
       const double forward_time) const;
 
   std::vector<common::TrajectoryPoint> GetOverheadTrajectory(
@@ -103,7 +98,7 @@ class Planning : public apollo::common::ApolloApp {
 
   ADCTrajectory ToADCTrajectory(
       const double header_time,
-      const std::vector<common::TrajectoryPoint>& discretized_trajectory);
+      const std::vector<common::TrajectoryPoint> &discretized_trajectory);
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;

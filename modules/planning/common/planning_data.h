@@ -63,6 +63,8 @@ class PlanningData {
   PathData* mutable_path_data();
   SpeedData* mutable_speed_data();
 
+  double timestamp() const;
+
  protected:
   std::unique_ptr<ReferenceLine> _reference_line;
   std::unique_ptr<DecisionData> _decision_data;
@@ -70,6 +72,7 @@ class PlanningData {
   TrajectoryPoint _init_planning_point;
   PathData _path_data;
   SpeedData _speed_data;
+  double timestamp_ = 0.0;
 };
 
 }  // namespace planning
