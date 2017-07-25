@@ -45,8 +45,8 @@ DataCenter::DataCenter() {
 }
 
 Frame *DataCenter::frame(const uint32_t sequence_num) const {
-  std::unordered_map<uint32_t, std::unique_ptr<Frame>>::const_iterator it
-      = _frames.find(sequence_num);
+  std::unordered_map<uint32_t, std::unique_ptr<Frame>>::const_iterator it =
+      _frames.find(sequence_num);
   if (it != _frames.end()) {
     return it->second.get();
   }
@@ -55,23 +55,15 @@ Frame *DataCenter::frame(const uint32_t sequence_num) const {
 
 apollo::common::Status DataCenter::init_frame(const uint32_t sequence_num) {
   _frame.reset(new Frame(sequence_num));
-  _frame->set_environment(_environment);
   return Status::OK();
 }
 
-Environment *DataCenter::mutable_environment() {
-  return &_environment;
-}
-
-Frame *DataCenter::current_frame() const {
-  return _frame.get();
-}
+Frame *DataCenter::current_frame() const { return _frame.get(); }
 
 void DataCenter::save_frame() {
   _sequence_queue.push_back(_frame->sequence_num());
   _frames[_frame->sequence_num()] = std::move(_frame);
-  if (_sequence_queue.size() >
-      static_cast<uint32_t>(FLAGS_max_history_result)) {
+  if (_sequence_queue.size() > static_cast<size_t>(FLAGS_max_history_result)) {
     _frames.erase(_sequence_queue.front());
     _sequence_queue.pop_front();
   }
@@ -85,16 +77,14 @@ const Frame *DataCenter::last_frame() const {
   return _frames.find(sequence_num)->second.get();
 }
 
-MasterStateMachine *DataCenter::mutable_master() const {
-  return _master.get();
+MasterStateMachine *DataCenter::mutable_master() const { return _master.get(); }
+
+ObjectTable *DataCenter::mutable_object_table() const {
+  return _object_table.get();
 }
 
-ObjectTable* DataCenter::mutable_object_table() const {
-    return _object_table.get();
-}
-
-const ObjectTable& DataCenter::object_table() const {
-    return *(_object_table.get());
+const ObjectTable &DataCenter::object_table() const {
+  return *(_object_table.get());
 }
 
 }  // namespace planning

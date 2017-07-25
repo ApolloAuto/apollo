@@ -29,7 +29,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "object_table",
     srcs = [
@@ -39,10 +38,10 @@ cc_library(
         "object_table.h",
     ],
     deps = [
-        "//modules/common/util:lru_cache",
         ":map_object",
         ":obstacle",
         ":planning_gflags",
+        "//modules/common/util:lru_cache",
     ],
 )
 
@@ -127,16 +126,6 @@ cc_library(
 )
 
 cc_library(
-    name = "environment",
-    srcs = [
-        "environment.cc",
-    ],
-    hdrs = [
-        "environment.h",
-    ],
-)
-
-cc_library(
     name = "frame",
     srcs = [
         "frame.cc",
@@ -146,7 +135,6 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/planning/common:environment",
         "//modules/planning/common:planning_data",
     ],
 )
@@ -175,7 +163,6 @@ cc_library(
         "data_center.h",
     ],
     deps = [
-        ":environment",
         ":frame",
         ":object_table",
         ":planning_gflags",

@@ -190,11 +190,9 @@ class VehicleState {
   double linear_v_ = 0.0;
   double angular_v_ = 0.0;
   double linear_a_ = 0.0;
-
-  ::apollo::canbus::Chassis::GearPosition gear_;
-  const localization::LocalizationEstimate* localization_ptr_ = nullptr;
-
   double timestamp_ = 0.0;
+  canbus::Chassis::GearPosition gear_;
+  const localization::LocalizationEstimate* localization_ptr_ = nullptr;
 };
 
 }  // namespace vehicle_state
