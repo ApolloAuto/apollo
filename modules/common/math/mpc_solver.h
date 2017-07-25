@@ -26,6 +26,10 @@
 #include "Eigen/Core"
 #include "Eigen/LU"
 
+#include "modules/common/math/qp_solver/qp_solver.h"
+#include "modules/common/math/qp_solver/active_set_qp_solver.h"
+
+
 /**
  * @namespace apollo::common::math
  * @brief apollo::common::math
@@ -36,14 +40,18 @@ namespace common {
 namespace math {
 /**
  * @brief Solver for discrete-time model predictive control problem.
- * @param A The system dynamic matrix
- * @param B The control matrix
- * @param Q The cost matrix for system state
- * @param R The cost matrix for control output
- * @param tolerance The numerical tolerance for solving
- *        Algebraic Riccati equation (ARE)
- * @param max_num_iteration The maximum iterations for solving ARE
- * @param ptr_K The feedback control matrix (pointer)
+ * @param matrix_a The system dynamic matrix
+ * @param matrix_b The control matrix
+ * @param matrix_c The disturbance matrix
+ * @param matrix_q The cost matrix for control state
+ * @param matrix_lower The lower bound control constrain matrix
+ * @param matrix_upper The upper bound control constrain matrix
+ * @param matrix_upper The upper bound control constrain matrix
+ * @param matrix_initial_state The intial state matrix
+ * @param reference The control reference vector with respect to time
+ * @param eps The control convergence tolerance
+ * @param max_iter The maximum iterations for solving ARE
+ * @param control The feedback control matrix (pointer)
  */
 void SolveLinearMPC(const Eigen::MatrixXd &matrix_a,
                     const Eigen::MatrixXd &matrix_b,
@@ -52,19 +60,11 @@ void SolveLinearMPC(const Eigen::MatrixXd &matrix_a,
                     const Eigen::MatrixXd &matrix_r,
                     const Eigen::MatrixXd &matrix_lower,
                     const Eigen::MatrixXd &matrix_upper,
-                    const Eigen::MatrixXd &_matrix_initial_state,
+                    const Eigen::MatrixXd &matrix_initial_state,
                     const std::vector<Eigen::MatrixXd> &reference,
                     const double eps,
                     const int max_iter,
                     std::vector<Eigen::MatrixXd> *control);
-
-void SolveQPSMO(const Eigen::MatrixXd& matrix_q,
-                const Eigen::MatrixXd& matrix_b,
-                const Eigen::MatrixXd& matrix_lower,
-                const Eigen::MatrixXd& matrix_upper,
-                const double& eps,
-                const int& max_iter,
-                Eigen::MatrixXd* matrix_alpha);
 
 }  // namespace math
 }  // namespace common
