@@ -70,6 +70,8 @@ DECLARE_double(lateral_jerk_bound);
 DECLARE_double(longitudinal_jerk_lower_bound);
 DECLARE_double(longitudinal_jerk_upper_bound);
 
+DECLARE_double(kappa_bound);
+
 // STGraph
 DECLARE_double(stgraph_default_point_cost);
 DECLARE_double(stgraph_max_acceleration_divide_factor_level_1);
