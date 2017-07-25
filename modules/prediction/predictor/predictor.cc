@@ -23,5 +23,31 @@ const PredictionObstacle& Predictor::prediction_obstacle() {
   return prediction_obstacle_;
 }
 
+int Predictor::GetTrajectorySize() {
+  return prediction_obstacle_.trajectory_size();
+}
+
+void Predictor::GenerateTrajectory(
+      const std::vector<::apollo::common::TrajectoryPoint>& points,
+      Trajectory *trajectory) {
+  if (points.size() <= 0) {
+    return;
+  }
+
+  for (const auto& point : points) {
+    trajectory->add_trajectory_point()->CopyFrom(point);
+  }
+}
+
+void Predictor::SetEqualProbability(double probability, int start_index) {
+  int num = GetTrajectorySize();
+  if (start_index > 0 && num > 0 && num > start_index) {
+    probability = probability / (double(num - start_index));
+    for (int i = start_index; i < num; ++i) {
+      prediction_obstacle_.mutable_trajectory(i)->set_probability(probability);
+    }
+  }
+}
+
 }  // namespace prediction
 }  // namespace apollo
