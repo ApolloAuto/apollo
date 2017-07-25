@@ -77,10 +77,8 @@ void RoadGraph::ComputeLaneSequence(
     return;
   }
   PredictionMap* map = PredictionMap::instance();
-  if (map == nullptr) {
-    AERROR << "Missing map.";
-    return;
-  }
+  CHECK_NOTNULL(map);
+
   LaneSegment lane_segment;
   lane_segment.set_lane_id(lane_info_ptr->id().id());
   lane_segment.set_start_s(start_s);
