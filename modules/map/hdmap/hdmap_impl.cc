@@ -12,23 +12,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-
 #include "modules/map/hdmap/hdmap_impl.h"
-
 #include <fstream>
 #include <iostream>
 #include <unordered_set>
-
 #include "modules/common/util/file.h"
 
 namespace {
-
 apollo::hdmap::Id create_hdmap_id(const std::string& string_id) {
     apollo::hdmap::Id id;
     id.set_id(string_id);
     return id;
 }
-
 }  // namespace
 
 namespace apollo {
@@ -65,6 +60,10 @@ int HDMapImpl::load_map_from_file(const std::string& map_filename) {
     }
     for (const auto& overlap : _map.overlap()) {
         _overlap_table[overlap.id().id()].reset(new OverlapInfo(overlap));
+    }
+
+    for (const auto& lane_ptr_pair : _lane_table) {
+        lane_ptr_pair.second->post_process(*this);
     }
 
     build_lane_segment_kdtree();
@@ -148,32 +147,32 @@ int HDMapImpl::get_lanes(const apollo::common::math::Vec2d &point,
 int HDMapImpl::get_junctions(const apollo::hdmap::Point& point,
                          double distance,
                          std::vector<JunctionInfoConstPtr>* junctions) const {
-return get_junctions({point.x(), point.y()}, distance, junctions);
+  return get_junctions({point.x(), point.y()}, distance, junctions);
 }
 
 int HDMapImpl::get_junctions(const apollo::common::math::Vec2d& point,
                           double distance,
                           std::vector<JunctionInfoConstPtr>* junctions) const {
-    if (junctions == nullptr || _junction_polygon_kdtree == nullptr) {
-        return -1;
-    }
-    junctions->clear();
-    std::vector<std::string> ids;
-    const int status = search_objects(point, distance,
+  if (junctions == nullptr || _junction_polygon_kdtree == nullptr) {
+    return -1;
+  }
+  junctions->clear();
+  std::vector<std::string> ids;
+  const int status = search_objects(point, distance,
                                     *_junction_polygon_kdtree, &ids);
-    if (status < 0) {
-        return status;
-    }
-    for (const auto& id : ids) {
-        junctions->emplace_back(get_junction_by_id(create_hdmap_id(id)));
-    }
-    return 0;
+  if (status < 0) {
+    return status;
+  }
+  for (const auto& id : ids) {
+    junctions->emplace_back(get_junction_by_id(create_hdmap_id(id)));
+  }
+  return 0;
 }
 
 int HDMapImpl::get_signals(const apollo::hdmap::Point& point,
                        double distance,
                        std::vector<SignalInfoConstPtr>* signals) const {
-    return get_signals({point.x(), point.y()}, distance, signals);
+  return get_signals({point.x(), point.y()}, distance, signals);
 }
 
 int HDMapImpl::get_signals(const apollo::common::math::Vec2d& point,
@@ -379,18 +378,17 @@ int HDMapImpl::get_nearest_lane(const apollo::hdmap::Point& point,
 int HDMapImpl::get_nearest_lane(const apollo::common::math::Vec2d &point,
                             LaneInfoConstPtr* nearest_lane,
                             double *nearest_s, double *nearest_l) const {
-    // CHECK(nearest_lane == nullptr);
+    CHECK(nearest_lane != nullptr);
     CHECK_NOTNULL(nearest_s);
     CHECK_NOTNULL(nearest_l);
     const auto *segment_object =
-                _lane_segment_kdtree->GetNearestObject(point);
+                                _lane_segment_kdtree->GetNearestObject(point);
     if (segment_object == nullptr) {
         return -1;
     }
     const apollo::hdmap::Id& lane_id = segment_object->object()->id();
     *nearest_lane = get_lane_by_id(lane_id);
     CHECK(*nearest_lane != nullptr);
-    // *nearest_lane = segment_object->object();
     const int id = segment_object->id();
     const auto &segment = (*nearest_lane)->segments()[id];
     apollo::common::math::Vec2d nearest_pt;
@@ -400,6 +398,108 @@ int HDMapImpl::get_nearest_lane(const apollo::common::math::Vec2d &point,
     *nearest_l = segment.unit_direction().CrossProd(point - segment.start());
 
     return 0;
+}
+
+int HDMapImpl::get_nearest_lane_with_heading(const apollo::hdmap::Point& point,
+                                  const double distance,
+                                  const double central_heading,
+                                  const double max_heading_difference,
+                                  LaneInfoConstPtr* nearest_lane,
+                                  double* nearest_s,
+                                  double* nearest_l) const {
+  return get_nearest_lane_with_heading(apollo::common::math::Vec2d(point.x(),
+    point.y()), distance, central_heading, max_heading_difference,
+    nearest_lane, nearest_s, nearest_l);
+}
+
+int HDMapImpl::get_nearest_lane_with_heading(
+                                  const apollo::common::math::Vec2d& point,
+                                  const double distance,
+                                  const double central_heading,
+                                  const double max_heading_difference,
+                                  LaneInfoConstPtr* nearest_lane,
+                                  double* nearest_s,
+                                  double* nearest_l) const {
+  CHECK_NOTNULL(nearest_lane);
+  CHECK_NOTNULL(nearest_s);
+  CHECK_NOTNULL(nearest_l);
+
+  std::vector<LaneInfoConstPtr> lanes;
+  if (get_lanes_with_heading(point, distance, central_heading,
+                             max_heading_difference, &lanes) != 0) {
+    return -1;
+  }
+
+  double s = 0;
+  size_t s_index = 0;
+  apollo::common::math::Vec2d map_point;
+  double min_distance = distance;
+  for (const auto &lane : lanes) {
+    double s_offset = 0.0;
+    int s_offset_index = 0;
+    double distance = lane->distance_to(point, &map_point, &s_offset,
+                                        &s_offset_index);
+    if (distance < min_distance) {
+      min_distance = distance;
+      *nearest_lane = lane;
+      s = s_offset;
+      s_index = s_offset_index;
+    }
+  }
+
+  if (*nearest_lane == nullptr) {
+    return -1;
+  }
+
+  *nearest_s = s;
+  int segment_index = s_index >= (*nearest_lane)->segments().size() ?
+                            (*nearest_lane)->segments().size() - 1 : s_index;
+  const auto& segment_2d = (*nearest_lane)->segments()[segment_index];
+  *nearest_l = segment_2d.unit_direction().CrossProd(
+                                                    point - segment_2d.start());
+
+  return 0;
+}
+
+int HDMapImpl::get_lanes_with_heading(const apollo::hdmap::Point& point,
+                            const double distance,
+                            const double central_heading,
+                            const double max_heading_difference,
+                            std::vector<LaneInfoConstPtr>* lanes) const {
+  return get_lanes_with_heading(apollo::common::math::Vec2d(point.x(),
+        point.y()), distance, central_heading, max_heading_difference, lanes);
+}
+
+int HDMapImpl::get_lanes_with_heading(const apollo::common::math::Vec2d &point,
+                                const double distance,
+                                const double central_heading,
+                                const double max_heading_difference,
+                                std::vector<LaneInfoConstPtr> *lanes) const {
+  CHECK_NOTNULL(lanes);
+  std::vector<LaneInfoConstPtr> all_lanes;
+  const int status = get_lanes(point, distance, &all_lanes);
+  if (status < 0 || all_lanes.size() <= 0) {
+    return -1;
+  }
+
+  lanes->clear();
+  for (auto& lane : all_lanes) {
+    apollo::common::math::Vec2d proj_pt(0.0, 0.0);
+    double s_offset = 0.0;
+    int s_offset_index = 0;
+    double dis = lane->distance_to(point, &proj_pt,
+                                    &s_offset, &s_offset_index);
+    if (dis <= distance) {
+      double heading_diff =
+                fabs(lane->headings()[s_offset_index] - central_heading);
+      if (fabs(apollo::common::math::NormalizeAngle(heading_diff))
+                                                    <= max_heading_difference) {
+        lanes->push_back(lane);
+      }
+    }
+  }
+
+  return 0;
 }
 
 void HDMapImpl::clear() {
