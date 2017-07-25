@@ -43,7 +43,7 @@ class LaneSequencePredictor : public Predictor {
    * @brief Make prediction
    * @param Obstacle pointer
    */
-  void Predict(Obstacle* obstacle) const override;
+  void Predict(Obstacle* obstacle) override;
 };
 
 }  // namespace prediction

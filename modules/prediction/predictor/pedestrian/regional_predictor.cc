@@ -19,7 +19,7 @@
 namespace apollo {
 namespace prediction {
 
-void RegionalPredictor::Predict(Obstacle* obstacle) const {}
+void RegionalPredictor::Predict(Obstacle* obstacle) {}
 
 }  // namespace prediction
 }  // namespace apollo
