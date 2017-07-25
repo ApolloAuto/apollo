@@ -1,0 +1,8 @@
+//
+// Created by zhujun08 on 7/23/17.
+//
+
+#ifndef APOLLO_CNN_SEGMENTATION_H
+#define APOLLO_CNN_SEGMENTATION_H
+
+#endif //APOLLO_CNN_SEGMENTATION_H
