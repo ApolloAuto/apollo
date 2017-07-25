@@ -57,3 +57,7 @@ DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
 DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
     "Max angle difference for a candiate lane");
+
+// Obstacle trajectory
+DEFINE_double(lane_sequence_threshold, 0.5,
+    "Threshold for trimming lane sequence trajectories");
