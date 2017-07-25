@@ -150,16 +150,10 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
                !IsRightNeighborLane(candidate_lane.get(), prev_lanes)) {
       continue;
     } else {
-      // TODO(kechxu) Implement get nearest point with its heading
       apollo::hdmap::Point nearest_point =
           candidate_lane->get_nearest_point(vec_point);
-      double s = -1.0;
-      double l = 0.0;
-      apollo::common::math::Vec2d vec_nearest_point;
-      vec_nearest_point.set_x(nearest_point.x());
-      vec_nearest_point.set_y(nearest_point.y());
-      candidate_lane->get_projection(vec_nearest_point, &s, &l);
-      double nearest_point_heading = HeadingOnLane(candidate_lane.get(), s);
+      double nearest_point_heading =
+          PathHeading(candidate_lane.get(), nearest_point);
       double diff = std::fabs(
           apollo::common::math::AngleDiff(heading, nearest_point_heading));
       if (diff <= FLAGS_max_lane_angle_diff) {
@@ -167,6 +161,17 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
       }
     }
   }
+}
+
+double PredictionMap::PathHeading(const LaneInfo* lane_info_ptr,
+                               const apollo::hdmap::Point& point) {
+  apollo::common::math::Vec2d vec_point;
+  vec_point.set_x(point.x());
+  vec_point.set_y(point.y());
+  double s = -1.0;
+  double l = 0.0;
+  lane_info_ptr->get_projection(vec_point, &s, &l);
+  return HeadingOnLane(lane_info_ptr, s);
 }
 
 void PredictionMap::NearbyLanesByCurrentLanes(
