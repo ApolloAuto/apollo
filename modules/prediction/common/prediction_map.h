@@ -66,6 +66,9 @@ class PredictionMap {
               const double radius,
               std::vector<const apollo::hdmap::LaneInfo*>* lanes);
 
+  double PathHeading(const apollo::hdmap::LaneInfo* lane_info_ptr,
+                     const apollo::hdmap::Point& point);
+
   int SmoothPointFromLane(const apollo::hdmap::Id& id, const double s,
                           const double l, Eigen::Vector2d* point,
                           double* heading);
