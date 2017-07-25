@@ -23,14 +23,17 @@
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::PathPoint;
+using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::math::KalmanFilter;
 
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
+  prediction_obstacle_.Clear();
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
@@ -55,7 +58,6 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   }
 
   std::vector<TrajectoryPoint> points(0);
-
   DrawFreeMoveTrajectoryPoints(position, velocity, acc,
                                obstacle->kf_motion_tracker(),
                                FLAGS_prediction_duration,
@@ -120,7 +122,7 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     if (speed > std::numeric_limits<double>::epsilon()) {
       if (points->size() > 0) {
         PathPoint *prev_point = points->back().mutable_path_point();
-        theta = std::atan2(x - prev_point->x(), y - prev_point->y());
+        theta = std::atan2(y - prev_point->y(), x - prev_point->x());
         prev_point->set_theta(theta);
       }
     } else {
@@ -141,10 +143,12 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
 
     // Generate trajectory point
     TrajectoryPoint trajectory_point;
-    trajectory_point.mutable_path_point()->set_x(x);
-    trajectory_point.mutable_path_point()->set_y(y);
-    trajectory_point.mutable_path_point()->set_z(0.0);
-    trajectory_point.mutable_path_point()->set_theta(theta);
+    PathPoint path_point;
+    path_point.set_x(x);
+    path_point.set_y(y);
+    path_point.set_z(0.0);
+    path_point.set_theta(theta);
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed);
     trajectory_point.set_a(std::hypot(acc_x, acc_y));
     trajectory_point.set_relative_time(static_cast<double>(i) * freq);

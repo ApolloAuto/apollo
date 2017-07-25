@@ -49,4 +49,7 @@ DECLARE_double(max_history_time);
 DECLARE_double(target_lane_gap);
 DECLARE_double(max_lane_angle_diff);
 
+// Obstacle trajectory
+DECLARE_double(lane_sequence_threshold);
+
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

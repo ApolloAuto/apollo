@@ -24,6 +24,11 @@
 
 #include "modules/prediction/predictor/predictor.h"
 
+#include <string>
+
+#include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/common/proto/path_point.pb.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -44,6 +49,16 @@ class LaneSequencePredictor : public Predictor {
    * @param Obstacle pointer
    */
   void Predict(Obstacle* obstacle) override;
+
+ protected:
+  void DrawLaneSequenceTrajectoryPoints(
+      const ::apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
+      const LaneSequence& sequence,
+      double total_time,
+      double freq,
+      std::vector<::apollo::common::TrajectoryPoint> *points);
+
+  std::string ToString(const LaneSequence& sequence);
 };
 
 }  // namespace prediction
