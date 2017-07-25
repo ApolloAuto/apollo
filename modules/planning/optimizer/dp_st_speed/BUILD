@@ -11,7 +11,7 @@ cc_library(
         "dp_st_boundary_mapper.h",
     ],
     deps = [
-        "//modules/common/math:math",
+        "//modules/common/math",
         "//modules/common/proto:common_proto",
         "//modules/planning/common:data_center",
         "//modules/planning/optimizer/st_graph:st_boundary_mapper",
@@ -80,7 +80,9 @@ cc_library(
         ":dp_st_configuration",
         ":dp_st_cost",
         ":dp_st_graph",
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/localization/proto:localization_proto",
         "//modules/planning/optimizer:speed_optimizer",
         "//modules/planning/optimizer/st_graph:st_graph_data",
     ],
