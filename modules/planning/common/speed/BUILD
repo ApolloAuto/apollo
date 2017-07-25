@@ -30,6 +30,7 @@ cc_library(
         "//external:gflags",
         "//modules/common/math",
         "//modules/common/proto:path_point_proto",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/math:double",
         "//modules/planning/proto:planning_proto",
     ],

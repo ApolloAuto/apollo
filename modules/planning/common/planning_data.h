@@ -66,6 +66,8 @@ class PlanningData {
   // aggregate final result together by some configuration
   bool aggregate(const double time_resolution);
 
+  std::string DebugString() const;
+
  protected:
   std::unique_ptr<ReferenceLine> reference_line_ = nullptr;
   std::shared_ptr<DecisionData> decision_data_ = nullptr;
