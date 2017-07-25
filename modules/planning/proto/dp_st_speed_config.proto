@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message DpStSpeedConfig {
+  optional double total_path_length = 1 [ default = 0.1 ];
+  optional double total_time = 2 [ default = 3.0 ];
+  optional int32 matrix_dimension_s = 3 [ default = 100 ];
+  optional int32 matrix_dimension_t = 4 [ default = 10 ];
+
+  optional double speed_weight = 5 [ default = 0.0 ];
+  optional double accel_weight = 6 [ default = 10.0 ];
+  optional double jerk_weight = 7 [ default = 10.0 ];
+  optional double obstacle_weight = 8 [ default = 1.0 ];
+  optional double reference_weight = 9 [ default = 0.0 ];
+  optional double go_down_buffer = 10 [ default = 5.0 ];
+  optional double go_up_buffer = 11 [ default = 5.0 ];
+  optional double st_graph_default_point_cost = 12 [ default = 1e10 ];
+  optional double obstacle_damp_factor = 13 [ default = -300 ];
+  optional double exceed_speed_penalty = 14 [ default = 10.0 ];
+  optional double low_speed_penalty = 15 [ default = 2.5 ];
+  optional double accel_penalty = 16 [ default = 2.0 ];
+  optional double decel_penalty = 17 [ default = 2.0 ];
+  optional double positive_jerk_coeff = 18 [ default = 1.0 ];
+  optional double negative_jerk_coeff = 19 [ default = 300 ];
+  optional double max_speed = 20 [ default = 20 ];
+  optional double max_acceleration = 21 [ default = 4.5 ];
+  optional double max_deceleration = 22 [ default = -4.5 ];
+}

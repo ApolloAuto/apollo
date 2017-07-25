@@ -73,6 +73,20 @@ py_proto_compile(
 )
 
 cc_proto_library(
+    name = "dp_st_speed_config_proto",
+    protos = [
+        "dp_st_speed_config.proto",
+    ],
+)
+
+py_proto_compile(
+    name = "dp_st_speed_config_proto_pylib",
+    protos = [
+        "dp_st_speed_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "qp_spline_path_config_proto",
     protos = [
         "qp_spline_path_config.proto",
