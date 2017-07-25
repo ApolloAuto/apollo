@@ -22,8 +22,7 @@
 #include <vector>
 
 #include "modules/monitor/common/annotations.h"
-
-#include "hw_status.h"
+#include "modules/monitor/common/interface/hw_status.h"
 
 /**
  * @namespace apollo::platform
@@ -47,7 +46,7 @@ struct HwCheckResult {
   /// HW-specific details, may or may not be present.
   std::unique_ptr<void, void (*)(void *)> details;
 
-  explicit HwCheckResult()
+  HwCheckResult()
       : status(hw::Status::UNDEF), details(nullptr, [](void *) {}) {}
 
   HwCheckResult(const std::string &_name, int _status,
@@ -70,10 +69,10 @@ struct HwCheckResult {
         }) {}
 };
 
-class HwCheckerIntf {
+class HwCheckerInterface {
  public:
   /// Returns HW class (one of pre-defined: CAN, Camera, ...).
-  virtual const int get_class() const { return HW_CLASS_UNDEF; };
+  virtual const int get_class() const { return HW_CLASS_UNDEF; }
 
   /// Returns the name of the HW this checker will check (e.g., ESD_CAN).
   virtual const std::string &get_name() const = 0;
@@ -81,7 +80,7 @@ class HwCheckerIntf {
   /// Runs HW status check, stores results in results. We use a vector
   /// here because there may be multiple instances of a certain type
   /// of hw (e.g., cameras).
-  virtual void run_check(std::vector<HwCheckResult> &results) = 0;
+  virtual void run_check(std::vector<HwCheckResult> *results) = 0;
 };
 
 }  // namespace platform

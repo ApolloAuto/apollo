@@ -30,7 +30,6 @@ message Chassis {
     EMERGENCY_MODE = 4;
   }
 
-  // FIXME: To be merged with common::ErrorCode
   enum ErrorCode {
     NO_ERROR = 0;
 

@@ -55,14 +55,12 @@ tar zxvf linux-4.4.32-apollo-1.0.0.tar.gz
 cd install
 sudo ./install_kernel.sh
 ```
-3. Build the ESD CAN driver source code 
-
+3. Reboot your system by the `reboot` command
+4. Build the ESD CAN driver source code 
 Now you need to build the ESD CAN driver source code according to [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)
 
-4. Reboot your system by the `reboot` command:
-
 ## Build your own kernel.
-If have modifed the kernel, or the pre-built kernel is not the best for your platform, you can build your own kernel with the following steps.
+If have modified the kernel, or the pre-built kernel is not the best for your platform, you can build your own kernel with the following steps.
 
 1. Clone the code from repository
 ```
@@ -75,7 +73,7 @@ cd apollo-kernel
 ```
 bash build.sh
 ```
-4. Intall the kernel the same way as using a pre-built Apollo Kernel.
+4. Install the kernel the same way as using a pre-built Apollo Kernel.
 
 # Access the Apollo Dev Container
 

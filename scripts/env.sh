@@ -16,8 +16,24 @@
 # limitations under the License.
 ###############################################################################
 
+if [ -f /.dockerenv ]; then
+    APOLLO_IN_DOCKER=true
+else
+    APOLLO_IN_DOCKER=false
+fi
 
-set -x
-
-cp -Lr /root/mnt/* .
-echo 'export PYTHONPATH=/apollo/lib:${PYTHONPATH}' >> /root/.bashrc
+hostname
+if $APOLLO_IN_DOCKER; then
+  set -x
+  echo "Inside docker"
+  uname -a
+  pip list
+else
+  echo "Outside docker"
+  set -x
+  uname -a
+  docker --version
+  docker images | grep apollo
+fi
+echo "-----------env---------------"
+env

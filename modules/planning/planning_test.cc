@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planning.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner_factory.h"
+#include "modules/planning/proto/planning.pb.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -26,12 +26,11 @@ namespace apollo {
 namespace planning {
 
 using TrajectoryPb = ADCTrajectory;
+using apollo::common::TrajectoryPoint;
 
-class PlanningTest: public ::testing::Test {
-};
+class PlanningTest : public ::testing::Test {};
 
 TEST_F(PlanningTest, ComputeTrajectory) {
-
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
   Planning planning;
   common::vehicle_state::VehicleState vehicle_state;
@@ -46,41 +45,36 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   double time1 = 0.1;
   planning.Plan(vehicle_state, false, time1, &trajectory1);
 
-  EXPECT_EQ(trajectory1.size(),
-      (std::size_t)FLAGS_rtk_trajectory_forward);
-  auto p1_start = trajectory1.front();
-  auto p1_end = trajectory1.back();
+  EXPECT_EQ(trajectory1.size(), (std::size_t)FLAGS_rtk_trajectory_forward);
+  const auto &p1_start = trajectory1.front();
+  const auto &p1_end = trajectory1.back();
 
-  EXPECT_DOUBLE_EQ(p1_start.x, 586385.782841);
-  EXPECT_DOUBLE_EQ(p1_end.x, 586355.063786);
+  EXPECT_DOUBLE_EQ(p1_start.x(), 586385.782841);
+  EXPECT_DOUBLE_EQ(p1_end.x(), 586355.063786);
 
   std::vector<TrajectoryPoint> trajectory2;
   double time2 = 0.5;
   planning.Plan(vehicle_state, true, time2, &trajectory2);
 
-  EXPECT_EQ(trajectory2.size(),
-      (std::size_t)FLAGS_rtk_trajectory_forward +
-      (int)FLAGS_rtk_trajectory_backward);
+  EXPECT_EQ(trajectory2.size(), (std::size_t)FLAGS_rtk_trajectory_forward +
+                                    (int)FLAGS_rtk_trajectory_backward);
 
-  auto p2_backward = trajectory2.front();
-  auto p2_start = trajectory2[(std::size_t)FLAGS_rtk_trajectory_backward];
-  auto p2_end = trajectory2.back();
+  const auto &p2_backward = trajectory2.front();
+  const auto &p2_start = trajectory2[FLAGS_rtk_trajectory_backward];
+  const auto &p2_end = trajectory2.back();
 
-  EXPECT_DOUBLE_EQ(p2_backward.x, 586385.577255);
-  EXPECT_DOUBLE_EQ(p2_start.x, 586385.486723);
-  EXPECT_DOUBLE_EQ(p2_end.x, 586353.262913);
+  EXPECT_DOUBLE_EQ(p2_backward.x(), 586385.577255);
+  EXPECT_DOUBLE_EQ(p2_start.x(), 586385.486723);
+  EXPECT_DOUBLE_EQ(p2_end.x(), 586353.262913);
 
-  double absolute_time1 = trajectory1[100].relative_time
-      + time1;
-  double absolute_time2 = trajectory2[
-      60 + (std::size_t) FLAGS_rtk_trajectory_backward].relative_time
-      + time2;
+  double absolute_time1 = trajectory1[100].relative_time() + time1;
+  double absolute_time2 =
+      trajectory2[60 + FLAGS_rtk_trajectory_backward].relative_time() + time2;
 
   EXPECT_NEAR(absolute_time1, absolute_time2, 0.001);
 }
 
 TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
-
   FLAGS_rtk_trajectory_filename = "";
   Planning planning;
   common::vehicle_state::VehicleState vehicle_state;
@@ -105,5 +99,5 @@ TEST_F(PlanningTest, PlannerFactory) {
   EXPECT_TRUE(ptr_planner == nullptr);
 }
 
-}  // namespace control
+}  // namespace planning
 }  // namespace apollo

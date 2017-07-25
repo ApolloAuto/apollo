@@ -24,13 +24,18 @@
 #endif
 
 #ifdef __GNUC__
-#define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
+#define UNUSED(x) UNUSED_##x __attribute__((__unused__))
 #else
-#define UNUSED(x) UNUSED_ ## x
+#define UNUSED(x) UNUSED_##x
 #endif
 
-#define DO_ONCE(args...) do {\
-  static int __##__FILE__##__LINE__ = 0; if (__##__FILE__##__LINE__ ++ < 1) {args;} }while(0)
+#define DO_ONCE(args...)                   \
+  do {                                     \
+    static int __##__FILE__##__LINE__ = 0; \
+    if (__##__FILE__##__LINE__++ < 1) {    \
+      args;                                \
+    }                                      \
+  } while (0)
 
 #ifndef PARAM_IN
 #define PARAM_IN
@@ -47,18 +52,22 @@
 
 #ifdef _DEBUG
 #define DBG_VAR(t, v) t v
-#define DBG_ONLY(args...) do{args; } while(0)
+#define DBG_ONLY(args...) \
+  do {                    \
+    args;                 \
+  } while (0)
 #else
 #define DBG_VAR(t, v)
 #define DBG_ONLY(args...)
 #endif
 
-/// Convenient helper macro to create a setter member function which returns the old value.
+/// Convenient helper macro to create a setter member function which returns the
+/// old value.
 #define MEMBER_SET_AND_RETURN(T, var) \
-  T set_##var(T val) { \
-    T old_val = std::move(var); \
-    var = std::move(val); \
-    return old_val; \
+  T set_##var(T val) {                \
+    T old_val = std::move(var);       \
+    var = std::move(val);             \
+    return old_val;                   \
   }
 
 #endif  // MODULES_PLATFORM_COMMON_DEFS_H_

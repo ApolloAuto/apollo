@@ -25,5 +25,5 @@ fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-export PYTHONPATH="${DIR}/../../bazel-genfiles:${PYTHONPATH}"
+export PYTHONPATH="${DIR}/../../../bazel-genfiles:${PYTHONPATH}"
 eval "python ${DIR}/main.py $1 $2"

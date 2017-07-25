@@ -21,12 +21,13 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/planning/proto/planning.pb.h"
 
 DEFINE_string(
     chassis_test_file, "modules/control/testdata/control_tester/chassis.pb.txt",

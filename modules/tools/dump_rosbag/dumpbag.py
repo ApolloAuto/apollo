@@ -63,8 +63,7 @@ if __name__ == "__main__":
         "--topic",
         action="store",
         help="""the topic that you want to dump. If this option is not provided,
-        the tool will dump all the messages regardless of the message topic."""
-    )
+        the tool will dump all the messages regardless of the message topic.""")
     args = parser.parse_args()
 
     if os.path.exists(args.out_dir):

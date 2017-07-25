@@ -19,6 +19,7 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/common/time",
         "@glog//:glog",
+        "@gtest//:gtest",
     ],
 )
 

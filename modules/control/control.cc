@@ -17,20 +17,20 @@
 
 #include <string>
 
+#include "ros/include/std_msgs/String.h"
+
+#include "modules/localization/proto/localization.pb.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "third_party/ros/include/std_msgs/String.h"
 
 namespace apollo {
 namespace control {
 
 using ::apollo::canbus::Chassis;
-using ::apollo::common::ErrorCode;
-using ::apollo::common::Status;
 using ::apollo::common::adapter::AdapterManager;
 using ::apollo::common::monitor::MonitorMessageItem;
 using ::apollo::common::time::Clock;
@@ -114,7 +114,7 @@ Status Control::Start() {
   return Status::OK();
 }
 
-void Control::OnPad(const apollo::control::PadMessage& pad) {
+void Control::OnPad(const apollo::control::PadMessage &pad) {
   pad_msg_ = pad;
   AINFO << "Received Pad Msg:" << pad.DebugString();
 
@@ -130,8 +130,8 @@ void Control::OnPad(const apollo::control::PadMessage& pad) {
 }
 
 void Control::OnMonitor(
-    const apollo::common::monitor::MonitorMessage& monitor_message) {
-  for (const auto& item : monitor_message.item()) {
+    const apollo::common::monitor::MonitorMessage &monitor_message) {
+  for (const auto &item : monitor_message.item()) {
     if (item.log_level() == MonitorMessageItem::FATAL) {
       estop_ = true;
       return;
@@ -139,7 +139,7 @@ void Control::OnMonitor(
   }
 }
 
-Status Control::ProduceControlCommand(ControlCommand* control_command) {
+Status Control::ProduceControlCommand(ControlCommand *control_command) {
   Status status = CheckInput();
   // check data
   if (!status.ok()) {
@@ -192,6 +192,7 @@ Status Control::ProduceControlCommand(ControlCommand* control_command) {
     control_command->set_speed(0);
     control_command->set_throttle(0);
     control_command->set_brake(control_conf_.soft_estop_brake());
+    control_command->set_gear_location(::apollo::canbus::Chassis::GEAR_DRIVE);
   }
   // check signal
   if (trajectory_.has_signal()) {
@@ -200,12 +201,10 @@ Status Control::ProduceControlCommand(ControlCommand* control_command) {
   return status;
 }
 
-void Control::OnTimer(const ros::TimerEvent&) {
+void Control::OnTimer(const ros::TimerEvent &) {
   double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
 
   ControlCommand control_command;
-
-  control_command.set_gear_location(::apollo::canbus::Chassis::GEAR_DRIVE);
 
   Status status = ProduceControlCommand(&control_command);
   if (!status.ok()) {
@@ -219,10 +218,9 @@ void Control::OnTimer(const ros::TimerEvent&) {
     pad_received_ = false;
   }
 
-  control_command.mutable_latency_stats()->set_total_time_ms(
-      (end_timestamp - start_timestamp) * 1000);
-  AINFO << "control cycle time is: " << (end_timestamp - start_timestamp) * 1000
-        << " ms.";
+  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  AINFO << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 
   SendCmd(&control_command);
@@ -290,7 +288,7 @@ Status Control::CheckTimestamp() {
   return Status::OK();
 }
 
-void Control::SendCmd(ControlCommand* control_command) {
+void Control::SendCmd(ControlCommand *control_command) {
   // set header
   AdapterManager::FillControlCommandHeader(Name(),
                                            control_command->mutable_header());

@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/planning/planning.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner_factory.h"
-#include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
 using TrajectoryPb = ADCTrajectory;
 
@@ -29,9 +30,9 @@ Planning::Planning() {
   ptr_planner_ = PlannerFactory::CreateInstance(PlannerType::RTK_PLANNER);
 }
 
-bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
+bool Planning::Plan(const common::vehicle_state::VehicleState &vehicle_state,
                     const bool is_on_auto_mode, const double publish_time,
-                    std::vector<TrajectoryPoint>* planning_trajectory) {
+                    std::vector<TrajectoryPoint> *planning_trajectory) {
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   double execution_start_time = publish_time;
 
@@ -51,8 +52,8 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
     // position and target vehicle position.
     // If the deviation exceeds a specific threshold,
     // it will be unsafe to planning from the matched point.
-    double dx = matched_point.x - vehicle_state.x();
-    double dy = matched_point.y - vehicle_state.y();
+    double dx = matched_point.x() - vehicle_state.x();
+    double dy = matched_point.y() - vehicle_state.y();
     double position_deviation = std::sqrt(dx * dx + dy * dy);
 
     if (position_deviation < FLAGS_replanning_threshold) {
@@ -103,8 +104,8 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
 std::pair<TrajectoryPoint, std::size_t>
 Planning::ComputeStartingPointFromLastTrajectory(
     const double start_time) const {
-  auto comp = [](const TrajectoryPoint& p, const double t) {
-    return p.relative_time < t;
+  auto comp = [](const TrajectoryPoint &p, const double t) {
+    return p.relative_time() < t;
   };
 
   auto it_lower =
@@ -118,26 +119,27 @@ Planning::ComputeStartingPointFromLastTrajectory(
 }
 
 TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
-    const common::vehicle_state::VehicleState& vehicle_state,
+    const common::vehicle_state::VehicleState &vehicle_state,
     const double forward_time) const {
   // Eigen::Vector2d estimated_position =
   // vehicle_state.EstimateFuturePosition(forward_time);
   TrajectoryPoint point;
-  // point.x = estimated_position.x();
-  // point.y = estimated_position.y();
-  point.x = vehicle_state.x();
-  point.y = vehicle_state.y();
-  point.z = vehicle_state.z();
-  point.v = vehicle_state.linear_velocity();
-  point.a = vehicle_state.linear_acceleration();
-  point.kappa = 0.0;
-  if (point.v > 0.1) {
-    point.kappa =
-        vehicle_state.angular_velocity() / vehicle_state.linear_velocity();
+  // point.set_x(estimated_position.x());
+  // point.set_y(estimated_position.y());
+  point.set_x(vehicle_state.x());
+  point.set_y(vehicle_state.y());
+  point.set_z(vehicle_state.z());
+  point.set_v(vehicle_state.linear_velocity());
+  point.set_a(vehicle_state.linear_acceleration());
+  point.set_kappa(0.0);
+  const double speed_threshold = 0.1;
+  if (point.v() > speed_threshold) {
+    point.set_kappa(vehicle_state.angular_velocity() /
+                    vehicle_state.linear_velocity());
   }
-  point.dkappa = 0.0;
-  point.s = 0.0;
-  point.relative_time = 0.0;
+  point.set_dkappa(0.0);
+  point.set_s(0.0);
+  point.set_relative_time(0.0);
   return point;
 }
 
@@ -151,14 +153,14 @@ std::vector<TrajectoryPoint> Planning::GetOverheadTrajectory(
   const std::size_t start_index =
       matched_index < buffer_size ? 0 : matched_index - buffer_size;
 
-  auto overhead_trajectory =
-      std::vector<TrajectoryPoint>(last_trajectory_.begin() + start_index,
-                                   last_trajectory_.begin() + matched_index);
+  std::vector<TrajectoryPoint> overhead_trajectory(
+      last_trajectory_.begin() + start_index,
+      last_trajectory_.begin() + matched_index);
 
-  double zero_relative_time = last_trajectory_[matched_index].relative_time;
+  double zero_relative_time = last_trajectory_[matched_index].relative_time();
   // reset relative time
-  for (auto& p : overhead_trajectory) {
-    p.relative_time -= zero_relative_time;
+  for (auto &p : overhead_trajectory) {
+    p.set_relative_time(p.relative_time() - zero_relative_time);
   }
   return overhead_trajectory;
 }

@@ -23,15 +23,27 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Throttle63Test, General) {
-  uint8_t data = 0x01;
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   int32_t length = 8;
   ChassisDetail cd;
   Throttle63 throttle;
-  throttle.Parse(&data, length, &cd);
+  throttle.Parse(data, length, &cd);
 
+  EXPECT_DOUBLE_EQ(cd.gas().throttle_input(), 38.439002059967905);
+  EXPECT_DOUBLE_EQ(cd.gas().throttle_cmd(), 39.21416037232008);
+  EXPECT_DOUBLE_EQ(cd.gas().throttle_output(), 32.155336842908326);
+  EXPECT_EQ(cd.gas().watchdog_source(), 5);
   EXPECT_FALSE(cd.gas().throttle_enabled());
+  EXPECT_FALSE(cd.gas().driver_override());
+  EXPECT_TRUE(cd.gas().driver_activity());
+  EXPECT_FALSE(cd.gas().watchdog_fault());
+  EXPECT_TRUE(cd.gas().channel_1_fault());
+  EXPECT_FALSE(cd.gas().channel_2_fault());
+  EXPECT_FALSE(cd.gas().connector_fault());
+
+  EXPECT_TRUE(cd.check_response().is_vcu_online());
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

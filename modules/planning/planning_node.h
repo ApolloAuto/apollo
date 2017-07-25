@@ -19,8 +19,8 @@
 
 #include <vector>
 
+#include "modules/common/proto/path_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/common/base_types.h"
 #include "modules/planning/planning.h"
 #include "modules/planning/proto/planning.pb.h"
 
@@ -63,7 +63,7 @@ class PlanningNode {
 
   ADCTrajectory ToTrajectoryPb(
       const double header_time,
-      const std::vector<TrajectoryPoint>& discretized_trajectory);
+      const std::vector<common::TrajectoryPoint> &discretized_trajectory);
 
   Planning planning_;
 };

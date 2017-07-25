@@ -39,7 +39,7 @@ cc_binary(
         "//modules/canbus/common:canbus_common",
         "//modules/common:log",
         "//modules/common/monitor",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 

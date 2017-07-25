@@ -46,10 +46,10 @@ class Fuellevel72 : public ProtocolData {
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
    * @param timestamp the timestamp of input data
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
  private:
   /**
@@ -62,7 +62,7 @@ class Fuellevel72 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of fuel level
    */
-  double fuel_level(const std::uint8_t* bytes, int32_t length) const;
+  double fuel_level(const std::uint8_t *bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

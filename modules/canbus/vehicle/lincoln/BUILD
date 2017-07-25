@@ -1,4 +1,21 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "lincoln_vehicle_factory",
+    srcs = [
+        "lincoln_vehicle_factory.cc",
+    ],
+    hdrs = [
+        "lincoln_vehicle_factory.h",
+    ],
+    deps = [
+        ":lincoln_controller",
+        ":lincoln_message_manager",
+        "//modules/canbus/vehicle:abstract_vehicle_factory",
+    ],
+)
 
 cc_library(
     name = "lincoln_message_manager",
@@ -32,6 +49,7 @@ cc_library(
         "//modules/canbus/vehicle:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:gtest",
     ],
 )
 
@@ -59,3 +77,15 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cc_test(
+    name = "lincoln_vehicle_factory_test",
+    size = "small",
+    srcs = ["lincoln_vehicle_factory_test.cc"],
+    deps = [
+        ":lincoln_vehicle_factory",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()

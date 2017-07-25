@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "hw_log_module.h"
+#include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
 namespace apollo {
 namespace platform {

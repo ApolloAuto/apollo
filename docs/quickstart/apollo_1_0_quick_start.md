@@ -82,7 +82,7 @@ cd apollo
 
 ```
 
-2. Set up environmen variable `APOLLO_HOME` by the following command:
+2. Set up environment variable `APOLLO_HOME` by the following command:
 
 ```
 echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc

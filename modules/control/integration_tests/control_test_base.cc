@@ -27,7 +27,7 @@
 #include "modules/common/util/file.h"
 #include "modules/control/integration_tests/control_test_base.h"
 #include "modules/control/proto/control_cmd.pb.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 DEFINE_string(test_chassis_file, "", "chassis input file");
 DEFINE_string(test_data_dir, "", "the test data folder");
@@ -100,11 +100,11 @@ bool ControlTestBase::test_control() {
   return true;
 }
 
-void ControlTestBase::trim_control_command(ControlCommand* origin) {
+void ControlTestBase::trim_control_command(ControlCommand *origin) {
   origin->mutable_header()->clear_timestamp_sec();
 }
 
-bool ControlTestBase::test_control(const std::string& test_case_name,
+bool ControlTestBase::test_control(const std::string &test_case_name,
                                    int case_num) {
   std::string golden_result_file("result_" + test_case_name + "_" +
                                  std::to_string(case_num) + ".pb.txt");

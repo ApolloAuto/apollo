@@ -39,9 +39,6 @@ class Renderer {
 
         // The planning tranjectory.
         this.planningTrajectory = new PlanningTrajectory();
-
-        // Stores the current rendering loop handle.
-        this.renderingLoop = null;
     }
 
     initialize(canvasId, width, height) {
@@ -131,23 +128,10 @@ class Renderer {
     }
 
     animate() {
-        this.renderingLoop = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
             this.animate();
         });
         this.render();
-    }
-
-    startAnimate() {
-        if (!this.renderingLoop) {
-            this.animate();
-        }
-    }
-
-    stopAnimate() {
-        if (this.renderingLoop) {
-            cancelAnimationFrame(this.renderingLoop);
-            this.renderingLoop = null;
-        }
     }
 
     updateWorld(world) {

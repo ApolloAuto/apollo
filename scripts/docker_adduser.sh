@@ -17,7 +17,11 @@
 ###############################################################################
 
 
+addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP"
 adduser --disabled-password --gecos '' "$DOCKER_USER" \
-    --uid "$DOCKER_USER_ID"
+    --uid "$DOCKER_USER_ID" --gid "$DOCKER_GRP_ID" 2>/dev/null
 usermod -aG sudo "$DOCKER_USER"
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+cp -r /etc/skel/. /home/${DOCKER_USER}
+echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${DOCKER_USER}/.bashrc"
+chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"

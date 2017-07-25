@@ -24,13 +24,13 @@ namespace apollo {
 namespace common {
 namespace math {
 
-double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2) {
+double CrossProd(const Vec2d &start_point, const Vec2d &end_point_1,
+                 const Vec2d &end_point_2) {
   return (end_point_1 - start_point).CrossProd(end_point_2 - start_point);
 }
 
-double InnerProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2) {
+double InnerProd(const Vec2d &start_point, const Vec2d &end_point_1,
+                 const Vec2d &end_point_2) {
   return (end_point_1 - start_point).InnerProd(end_point_2 - start_point);
 }
 
@@ -65,7 +65,7 @@ double RandomDouble(const double s, const double t, unsigned int rand_seed) {
   return s + (t - s) / 16383.0 * (rand_r(&rand_seed) & 16383);
 }
 
-int double_compare(const double d1, const double d2, const double epsilon) {
+int DoubleCompare(const double d1, const double d2, const double epsilon) {
   DCHECK(!std::isnan(d1));
   DCHECK(!std::isnan(d2));
 

@@ -18,7 +18,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace perception {
@@ -26,9 +26,7 @@ namespace perception {
 using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
 
-std::string Perception::Name() const {
-  return "perception";
-}
+std::string Perception::Name() const { return "perception"; }
 
 Status Perception::Init() {
   AdapterManager::Init();

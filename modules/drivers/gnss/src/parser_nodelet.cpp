@@ -14,70 +14,70 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <pluginlib/class_list_macros.h>
-#include <nodelet/nodelet.h>
 
-#include "gnss/parser.h"
 #include "data_parser.h"
+#include "gnss/parser.h"
 
 namespace apollo {
-namespace drivers{
+namespace drivers {
 namespace gnss {
 
 class ParserNodelet : public nodelet::Nodelet {
-public:
-    ParserNodelet() {}
-    ~ParserNodelet() {}
+ public:
+  ParserNodelet() {}
+  ~ParserNodelet() {}
 
-private:
-    virtual void onInit();
+ private:
+  virtual void onInit();
 
-    std::unique_ptr<DataParser> _data_parser;
+  std::unique_ptr<DataParser> _data_parser;
 };
 
 void ParserNodelet::onInit() {
-    ros::NodeHandle& nh = getPrivateNodeHandle();
-    std::string gnss_conf;
-    std::string raw_data_topic;
-    std::string gpgga_topic;
-    std::string corr_imu_topic;
-    std::string odometry_topic;
-    std::string gnss_status_topic;
-    std::string ins_status_topic;
+  ros::NodeHandle& nh = getPrivateNodeHandle();
+  std::string gnss_conf;
+  std::string raw_data_topic;
+  std::string gpgga_topic;
+  std::string corr_imu_topic;
+  std::string odometry_topic;
+  std::string gnss_status_topic;
+  std::string ins_status_topic;
 
-    nh.param("gnss_conf", gnss_conf, std::string("./conf/gnss_conf.txt"));
-    nh.param("raw_data_topic", raw_data_topic, std::string("/apollo/sensor/gnss/raw_data"));
-    nh.param("gpgga_topic", gpgga_topic, std::string("/apollo/sensor/gnss/gpgga"));
-    nh.param("corr_imu_topic", corr_imu_topic, std::string("/apollo/sensor/gnss/corrected_imu"));
-    nh.param("odometry_topic", odometry_topic, std::string("/apollo/sensor/gnss/odometry"));
-    nh.param("gnss_status_topic", gnss_status_topic, std::string("/apollo/sensor/gnss/gnss_status"));
-    nh.param("ins_status_topic", ins_status_topic, std::string("/apollo/sensor/gnss/ins_status"));
+  nh.param("gnss_conf", gnss_conf, std::string("./conf/gnss_conf.txt"));
+  nh.param("raw_data_topic", raw_data_topic,
+           std::string("/apollo/sensor/gnss/raw_data"));
+  nh.param("gpgga_topic", gpgga_topic,
+           std::string("/apollo/sensor/gnss/gpgga"));
+  nh.param("corr_imu_topic", corr_imu_topic,
+           std::string("/apollo/sensor/gnss/corrected_imu"));
+  nh.param("odometry_topic", odometry_topic,
+           std::string("/apollo/sensor/gnss/odometry"));
+  nh.param("gnss_status_topic", gnss_status_topic,
+           std::string("/apollo/sensor/gnss/gnss_status"));
+  nh.param("ins_status_topic", ins_status_topic,
+           std::string("/apollo/sensor/gnss/ins_status"));
 
-    _data_parser.reset(new DataParser(
-                                nh,
-                                raw_data_topic,
-                                gpgga_topic,
-                                corr_imu_topic,
-                                odometry_topic,
-                                gnss_status_topic,
-                                ins_status_topic));
-    if (!_data_parser->init(gnss_conf)) {
-        ROS_ERROR("Init parser nodelet failed.");
-        ROS_ERROR_STREAM("Init parser nodelet failed.");
-        return;
-    }
-    ROS_INFO("Init parser nodelet success.");
+  _data_parser.reset(new DataParser(nh, raw_data_topic, gpgga_topic,
+                                    corr_imu_topic, odometry_topic,
+                                    gnss_status_topic, ins_status_topic));
+  if (!_data_parser->init(gnss_conf)) {
+    ROS_ERROR("Init parser nodelet failed.");
+    ROS_ERROR_STREAM("Init parser nodelet failed.");
+    return;
+  }
+  ROS_INFO("Init parser nodelet success.");
 }
 
-}
-}
-}
+}  // namespace gnss
+}  // namespace drivers
+}  // namespace apollo
 
 // Register this plugin with pluginlib.  Names must match nodelet_gnss.xml.
 //
 // parameters: package, class name, class type, base class type
 PLUGINLIB_DECLARE_CLASS(gnss_driver, ParserNodelet,
-        apollo::drivers::gnss::ParserNodelet, nodelet::Nodelet);
-
+                        apollo::drivers::gnss::ParserNodelet, nodelet::Nodelet);

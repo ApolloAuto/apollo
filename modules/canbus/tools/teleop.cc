@@ -19,13 +19,16 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+
+#include "ros/include/ros/ros.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time.h"
-#include "modules/control/proto/control_cmd.pb.h"
-#include "third_party/ros/include/ros/ros.h"
 
 // gflags
 DEFINE_double(throttle_inc_delta, 2.0,
@@ -118,7 +121,7 @@ class Teleop {
     bool parking_brake = false;
     Chassis::GearPosition gear = Chassis::GEAR_INVALID;
     PadMessage pad_msg;
-    ControlCommand& control_command_ = control_command();
+    ControlCommand &control_command_ = control_command();
 
     // get the console in raw mode
     tcgetattr(_kfd, &_cooked);
@@ -231,7 +234,7 @@ class Teleop {
             exit(-1);
           }
           level = c - KEYCODE_ZERO;
-          GetPadMessage(pad_msg, level);
+          GetPadMessage(&pad_msg, level);
           control_command_.mutable_pad_msg()->CopyFrom(pad_msg);
           sleep(1);
           control_command_.mutable_pad_msg()->Clear();
@@ -250,7 +253,7 @@ class Teleop {
     return;
   }  // end of keyboard loop thread
 
-  ControlCommand& control_command() { return control_command_; }
+  ControlCommand &control_command() { return control_command_; }
 
   Chassis::GearPosition GetGear(int32_t gear) {
     switch (gear) {
@@ -273,7 +276,7 @@ class Teleop {
     }
   }
 
-  void GetPadMessage(PadMessage& pad_msg, int32_t int_action) {
+  void GetPadMessage(PadMessage *pad_msg, int32_t int_action) {
     apollo::control::DrivingAction action =
         apollo::control::DrivingAction::RESET;
     switch (int_action) {
@@ -289,7 +292,7 @@ class Teleop {
         printf("unknown action:%d, use default RESET\n", int_action);
         break;
     }
-    pad_msg.set_action(action);
+    pad_msg->set_action(action);
     return;
   }
 
@@ -325,7 +328,7 @@ class Teleop {
     control_command_.set_gear_location(Chassis::GEAR_INVALID);
   }
 
-  void OnChassis(const Chassis& chassis) { Send(); }
+  void OnChassis(const Chassis &chassis) { Send(); }
 
   int32_t Start() {
     if (is_running_) {
@@ -378,9 +381,9 @@ void signal_handler(int32_t signal_num) {
   ros::shutdown();
 }
 
-}  // end of namespace;
+}  // namespace
 
-int main(int32_t argc, char** argv) {
+int main(int32_t argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
@@ -393,14 +396,14 @@ int main(int32_t argc, char** argv) {
   apollo::common::adapter::AdapterManagerConfig config;
   config.set_is_ros(true);
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
     sub_config->set_type(
         apollo::common::adapter::AdapterConfig::CONTROL_COMMAND);
   }
 
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(apollo::common::adapter::AdapterConfig::CHASSIS);
   }

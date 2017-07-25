@@ -46,10 +46,10 @@ class Gps6e : public ProtocolData {
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
    * @param timestamp the timestamp of input data
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
   /**
    * @brief get year from byte array
@@ -60,7 +60,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of year
    */
-  int32_t year(const std::uint8_t* bytes, int32_t length) const;
+  int32_t year(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get month from byte array
@@ -71,7 +71,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of month
    */
-  int32_t month(const std::uint8_t* bytes, int32_t length) const;
+  int32_t month(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get day from byte array
@@ -82,7 +82,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of day
    */
-  int32_t day(const std::uint8_t* bytes, int32_t length) const;
+  int32_t day(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get hours from byte array
@@ -93,7 +93,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of hours
    */
-  int32_t hours(const std::uint8_t* bytes, int32_t length) const;
+  int32_t hours(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get minutes from byte array
@@ -104,7 +104,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of minutes
    */
-  int32_t minutes(const std::uint8_t* bytes, int32_t length) const;
+  int32_t minutes(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get year from byte array
@@ -115,7 +115,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of minutes
    */
-  int32_t seconds(const std::uint8_t* bytes, int32_t length) const;
+  int32_t seconds(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get compass direction from byte array
@@ -127,7 +127,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of compass direction
    */
-  double compass_direction(const std::uint8_t* bytes, int32_t length) const;
+  double compass_direction(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get pdop from byte array
@@ -138,7 +138,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of pdop
    */
-  double pdop(const std::uint8_t* bytes, int32_t length) const;
+  double pdop(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief check gps fault from byte array
@@ -149,7 +149,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of gps fault
    */
-  bool is_gps_fault(const std::uint8_t* bytes, int32_t length) const;
+  bool is_gps_fault(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get inferred position from byte array
@@ -160,7 +160,7 @@ class Gps6e : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of inferred position
    */
-  bool is_inferred_position(const std::uint8_t* bytes, int32_t length) const;
+  bool is_inferred_position(const std::uint8_t *bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

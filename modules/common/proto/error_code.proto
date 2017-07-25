@@ -22,6 +22,14 @@ enum ErrorCode {
 
   // Localization module error codes start from here.
   LOCALIZATION_ERROR = 3000;
+
+  // Perception module error codes start from here.
+  PERCEPTION_ERROR = 4000;
+  PERCEPTION_ERROR_TF = 4001;
+  PERCEPTION_ERROR_PROCESS = 4002;
+
+  // Prediction module error codes start from here.
+  PREDICTION_ERROR = 5000;
 }
 
 message StatusPb {

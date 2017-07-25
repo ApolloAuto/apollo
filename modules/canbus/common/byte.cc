@@ -15,9 +15,11 @@
  *****************************************************************************/
 
 #include "modules/canbus/common/byte.h"
-#include "modules/common/log.h"
 
+#include <algorithm>
 #include <bitset>
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace canbus {
@@ -26,7 +28,7 @@ namespace {
 
 constexpr int32_t BYTE_LENGTH = sizeof(int8_t) * 8;
 
-const std::string HEX = "0123456789ABCDEF";
+const char HEX[] = "0123456789ABCDEF";
 
 const uint8_t BIT_MASK_1[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 const uint8_t BIT_MASK_0[] = {0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0x7F};
@@ -37,16 +39,16 @@ const uint8_t RANG_MASK_0_L[] = {0xFE, 0XFC, 0xF8, 0xF0,
 
 }  // namespace
 
-Byte::Byte(const uint8_t* value) : value_(const_cast<uint8_t*>(value)) {}
+Byte::Byte(const uint8_t *value) : value_(const_cast<uint8_t *>(value)) {}
 
-Byte::Byte(const Byte& value) : value_(value.value_) {}
+Byte::Byte(const Byte &value) : value_(value.value_) {}
 
 std::string Byte::byte_to_hex(const uint8_t value) {
   uint8_t high = value >> 4;
   uint8_t low = value & 0x0F;
   std::string result = "";
-  result += HEX.at(high);
-  result += HEX.at(low);
+  result += HEX[high];
+  result += HEX[low];
   return result;
 }
 

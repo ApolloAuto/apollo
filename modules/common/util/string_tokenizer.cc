@@ -20,8 +20,8 @@ namespace apollo {
 namespace common {
 namespace util {
 
-StringTokenizer::StringTokenizer(const std::string& s,
-                                 const std::string& delims) {
+StringTokenizer::StringTokenizer(const std::string &s,
+                                 const std::string &delims) {
   s_ = s;
   delims_ = delims;
 
@@ -29,8 +29,8 @@ StringTokenizer::StringTokenizer(const std::string& s,
   index_ = s_.find_first_of(delims, last_index_);
 }
 
-std::vector<std::string> StringTokenizer::Split(const std::string& str,
-                                                const std::string& delims) {
+std::vector<std::string> StringTokenizer::Split(const std::string &str,
+                                                const std::string &delims) {
   std::vector<std::string> tokens;
   std::string::size_type last_index = str.find_first_not_of(delims, 0);
   std::string::size_type index = str.find_first_of(delims, last_index);

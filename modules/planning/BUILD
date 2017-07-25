@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -14,6 +16,7 @@ cc_library(
         "//modules/common",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/proto:path_point_proto",
         "//modules/common/vehicle_state",
         "//modules/decision/proto:decision_proto",
         "//modules/perception/proto:perception_proto",
@@ -21,7 +24,7 @@ cc_library(
         "//modules/planning/planner:lib_planner",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 
@@ -56,3 +59,5 @@ filegroup(
         "testdata/**",
     ]),
 )
+
+cpplint()

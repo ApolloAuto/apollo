@@ -23,17 +23,20 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Gps6eTest, General) {
-  uint8_t data = 0x01;
+  uint8_t data[8] = {0x56, 0x52, 0x53, 0x54, 0xF1, 0xF2, 0xF3, 0xF4};
   int32_t length = 8;
   ChassisDetail cd;
   Gps6e gps;
-  gps.Parse(&data, length, &cd);
+  gps.Parse(data, length, &cd);
 
-  EXPECT_EQ(cd.basic().year(), 1);
-  EXPECT_EQ(cd.basic().month(), 8);
-  EXPECT_EQ(cd.basic().month(), 8);
+  EXPECT_EQ(cd.basic().year(), 86);
+  EXPECT_EQ(cd.basic().month(), 2);
+  EXPECT_EQ(cd.basic().day(), 19);
+  EXPECT_EQ(cd.basic().hours(), 20);
+  EXPECT_EQ(cd.basic().minutes(), 49);
+  EXPECT_EQ(cd.basic().seconds(), 50);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

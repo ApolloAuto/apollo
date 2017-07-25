@@ -15,14 +15,18 @@
  *****************************************************************************/
 
 #include <iostream>
+#include <thread>
+
+#include "ros/include/ros/ros.h"
+#include "std_msgs/String.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/proto/pad_msg.pb.h"
-#include "std_msgs/String.h"
-#include "third_party/ros/include/ros/ros.h"
 
 namespace {
 
@@ -59,7 +63,7 @@ void send(int cmd_type) {
   AINFO << "send pad_message OK";
 }
 
-void on_chassis(const apollo::canbus::Chassis& chassis) {
+void on_chassis(const apollo::canbus::Chassis &chassis) {
   static bool is_first_emergency_mode = true;
   static int64_t count_start = 0;
   static bool waiting_reset = false;
@@ -97,7 +101,7 @@ void on_chassis(const apollo::canbus::Chassis& chassis) {
   }
 }
 
-void* terminal_thread(void* arg) {
+void terminal_thread_func() {
   int mode = 0;
   bool should_exit = false;
   while (std::cin >> mode) {
@@ -119,12 +123,11 @@ void* terminal_thread(void* arg) {
       break;
     }
   }
-  return NULL;
 }
 
 }  // end of namespace
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
@@ -136,19 +139,19 @@ int main(int argc, char** argv) {
   apollo::common::adapter::AdapterManagerConfig config;
   config.set_is_ros(true);
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
     sub_config->set_type(apollo::common::adapter::AdapterConfig::PAD);
   }
 
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(apollo::common::adapter::AdapterConfig::CHASSIS);
   }
 
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(apollo::common::adapter::AdapterConfig::LOCALIZATION);
   }
@@ -157,11 +160,8 @@ int main(int argc, char** argv) {
   AdapterManager::SetChassisCallback(on_chassis);
 
   help();
-  pthread_t pid;
-  if (pthread_create(&pid, NULL, terminal_thread, NULL) != 0) {
-    AINFO << "create terminal thread failed.";
-    exit(0);
-  }
+  std::thread terminal_thread(terminal_thread_func);
   ros::spin();
+  terminal_thread.join();
   return 0;
 }

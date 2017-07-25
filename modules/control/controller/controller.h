@@ -25,13 +25,11 @@
 #include <cmath>
 #include <string>
 
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/control/proto/control_cmd.pb.h"
+#include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-
-#include "modules/control/common/definitions.h"
-#include "modules/control/proto/control_conf.pb.h"
 
 /**
  * @namespace apollo::control
@@ -39,6 +37,9 @@
  */
 namespace apollo {
 namespace control {
+
+using ErrorCode = ::apollo::common::ErrorCode;
+using Status = ::apollo::common::Status;
 
 /**
  * @class Controller

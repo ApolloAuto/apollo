@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/control/common/interpolation_2d.h"
 
 #include <cmath>
@@ -28,18 +29,18 @@ const double kDoubleEpsilon = 1.0e-6;
 namespace apollo {
 namespace control {
 
-bool Interpolation2D::Init(const DataType& xyz) {
+bool Interpolation2D::Init(const DataType &xyz) {
   if (xyz.empty()) {
     AERROR << "empty input.";
     return false;
   }
-  for (const auto& t : xyz) {
+  for (const auto &t : xyz) {
     xyz_[std::get<0>(t)][std::get<1>(t)] = std::get<2>(t);
   }
   return true;
 }
 
-double Interpolation2D::Interpolate(const KeyType& xy) const {
+double Interpolation2D::Interpolate(const KeyType &xy) const {
   double max_x = xyz_.rbegin()->first;
   double min_x = xyz_.begin()->first;
   if (xy.first >= max_x - kDoubleEpsilon) {
@@ -64,7 +65,7 @@ double Interpolation2D::Interpolate(const KeyType& xy) const {
   return InterpolateValue(z_before, x_diff_before, z_after, x_diff_after);
 }
 
-double Interpolation2D::InterpolateYz(const std::map<double, double>& yz_table,
+double Interpolation2D::InterpolateYz(const std::map<double, double> &yz_table,
                                       double y) const {
   double max_y = yz_table.rbegin()->first;
   double min_y = yz_table.begin()->first;

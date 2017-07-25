@@ -23,19 +23,23 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Throttleinfo75Test, General) {
-  uint8_t data = 0x01;
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   int32_t length = 8;
   ChassisDetail cd;
   Throttleinfo75 throttle_info;
-  throttle_info.Parse(&data, length, &cd);
+  throttle_info.Parse(data, length, &cd);
 
   EXPECT_TRUE(cd.has_ems());
   EXPECT_TRUE(cd.ems().has_engine_rpm());
   EXPECT_TRUE(cd.has_gas());
   EXPECT_TRUE(cd.gas().has_accelerator_pedal());
   EXPECT_TRUE(cd.gas().has_accelerator_pedal_rate());
+
+  EXPECT_DOUBLE_EQ(cd.ems().engine_rpm(), 6297.75);
+  EXPECT_DOUBLE_EQ(cd.gas().accelerator_pedal(), 9.9);
+  EXPECT_DOUBLE_EQ(cd.gas().accelerator_pedal_rate(), -7);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

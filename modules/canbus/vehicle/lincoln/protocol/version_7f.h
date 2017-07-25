@@ -45,10 +45,10 @@ class Version7f : public ProtocolData {
    * @brief parse received data
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
   /**
    * @brief get module name based on byte array.
@@ -56,7 +56,7 @@ class Version7f : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of byte input
    */
-  int32_t module_name(const std::uint8_t* bytes, int32_t length) const;
+  int32_t module_name(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get major version based on byte array.
@@ -64,7 +64,7 @@ class Version7f : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of major version
    */
-  int32_t major_version(const std::uint8_t* bytes, int32_t length) const;
+  int32_t major_version(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get minor version based on byte array.
@@ -72,7 +72,7 @@ class Version7f : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of minor version
    */
-  int32_t minor_version(const std::uint8_t* bytes, int32_t length) const;
+  int32_t minor_version(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get build number based on byte array.
@@ -80,7 +80,7 @@ class Version7f : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of build number
    */
-  int32_t build_number(const std::uint8_t* bytes, int32_t length) const;
+  int32_t build_number(const std::uint8_t *bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

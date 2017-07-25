@@ -23,9 +23,12 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
+USR_NAME=$(id -u -n)
+GRP_NAME=$(id -g -n)
+
 # grant caros user to access GPS device
 if [ -e /dev/ttyUSB0 ]; then
-    sudo chown ${USER}:${USER} /dev/ttyUSB0 /dev/ttyUSB1
+    sudo chown ${USR_NAME}:${GRP_NAME} /dev/ttyUSB0 /dev/ttyUSB1
 fi
 
 # setup can device
@@ -34,7 +37,7 @@ if [ ! -e /dev/can0 ]; then
 fi
 
 if [ -e /dev/can0 ]; then
-    sudo chown ${USER}:${USER} /dev/can0
+    sudo chown ${USR_NAME}:${GRP_NAME} /dev/can0
 fi
 
 # enable coredump

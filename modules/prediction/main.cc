@@ -16,7 +16,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 #include "modules/prediction/prediction.h"
 

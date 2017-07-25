@@ -18,7 +18,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);

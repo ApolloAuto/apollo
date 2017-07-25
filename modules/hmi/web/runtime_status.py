@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 """Global runtime status."""
 
 import os
@@ -46,6 +45,7 @@ class RuntimeStatus(object):
     @classmethod
     def reset(cls, check_playable_file=False):
         """Reset runtime status to start."""
+        ToolStatus = runtime_status_pb2.ToolStatus
         cls.pb_singleton.Clear()
         cls.pb_fingerprint = 0
         cls.module_dict.clear()
@@ -53,11 +53,11 @@ class RuntimeStatus(object):
 
         tool_status = cls.get_tools()
         if check_playable_file and cls.stat_playable_duration() > 0:
-            tool_status.recording_status = runtime_status_pb2.ToolStatus.RECORDING_FINISHED
-            tool_status.playing_status = runtime_status_pb2.ToolStatus.PLAYING_READY_TO_CHECK
+            tool_status.recording_status = ToolStatus.RECORDING_FINISHED
+            tool_status.playing_status = ToolStatus.PLAYING_READY_TO_CHECK
         else:
-            tool_status.recording_status = runtime_status_pb2.ToolStatus.RECORDING_READY_TO_CHECK
-            tool_status.playing_status = runtime_status_pb2.ToolStatus.PLAYING_NOT_READY
+            tool_status.recording_status = ToolStatus.RECORDING_READY_TO_CHECK
+            tool_status.playing_status = ToolStatus.PLAYING_NOT_READY
         cls._calculate()
 
     @classmethod
@@ -111,18 +111,15 @@ class RuntimeStatus(object):
         cls._calculate()
         new_fingerprint = hash(str(cls.pb_singleton))
         if cls.pb_fingerprint != new_fingerprint:
-            flask_socketio.emit(
-                'new_status',
-                cls.status_json(),
-                broadcast=True,
-                namespace='/runtime_status')
+            flask_socketio.emit('new_status',
+                                cls.status_json(),
+                                broadcast=True,
+                                namespace='/runtime_status')
             cls.pb_fingerprint = new_fingerprint
 
     @classmethod
     def _calculate(cls):
         """Update runtime status fields which need to be calculated."""
-        conf_pb = config.Config.get_pb()
-
         modules_and_hardware_ready = cls.are_all_modules_ready(
         ) and cls.are_all_hardware_ready()
         cls._calculate_recording_status(modules_and_hardware_ready)
@@ -154,7 +151,7 @@ class RuntimeStatus(object):
         if os.path.exists(file_to_play):
             with open(file_to_play, 'r') as f:
                 kFreq = 100
-                cls.playable_duration = sum([1 for line in f]) / kFreq
+                cls.playable_duration = sum([1 for _ in f]) / kFreq
         else:
             cls.playable_duration = 0
         return cls.playable_duration
@@ -169,7 +166,8 @@ class RuntimeStatus(object):
         recording_status = tool_status.recording_status
         if recording_status == CHECKING and modules_and_hardware_ready:
             tool_status.recording_status = READY_TO_START
-        elif recording_status == READY_TO_START and not modules_and_hardware_ready:
+        elif recording_status == READY_TO_START and \
+             not modules_and_hardware_ready:
             tool_status.recording_status = CHECKING
 
     @classmethod
@@ -182,18 +180,17 @@ class RuntimeStatus(object):
         if tool_status.playing_status == ToolStatus.PLAYING_NOT_READY:
             if tool_status.recording_status == ToolStatus.RECORDING_FINISHED:
                 if cls.playable_duration > 0:
-                    tool_status.playing_status = ToolStatus.PLAYING_READY_TO_CHECK
+                    tool_status.playing_status = \
+                    ToolStatus.PLAYING_READY_TO_CHECK
                 else:
-                    glog.info(
-                        'RuntimeStatus::_calculate_playing_status: No file to play'
-                    )
-        elif (playing_status == ToolStatus.PLAYING_CHECKING
-              and modules_and_hardware_ready
-              and tool_status.planning_ready):
+                    glog.info('RuntimeStatus::_calculate_playing_status: ' \
+                              'No file to play')
+        elif (playing_status == ToolStatus.PLAYING_CHECKING and
+              modules_and_hardware_ready and tool_status.planning_ready):
             tool_status.playing_status = ToolStatus.PLAYING_READY_TO_START
             glog.info(
-                'RuntimeStatus::_calculate_playing_status: All modules/hardware are ready'
-            )
+                'RuntimeStatus::_calculate_playing_status: ' \
+                'All modules/hardware are ready')
         elif playing_status == ToolStatus.PLAYING_READY_TO_START and not (
                 modules_and_hardware_ready and tool_status.planning_ready):
             tool_status.playing_status = ToolStatus.PLAYING_CHECKING
@@ -207,10 +204,12 @@ class RuntimeStatus(object):
         tool_status = cls.get_tools()
 
         if tool_status.recording_status == ToolStatus.RECORDING_READY_TO_CHECK:
-            tool_status.message = 'Before recording, you need to setup the system.'
+            tool_status.message = 'Before recording, you need to setup the ' \
+                                  'system.'
         elif tool_status.recording_status == ToolStatus.RECORDING_CHECKING:
             tool_status.message = 'Waiting for modules and hardware.'
-        elif tool_status.recording_status == ToolStatus.RECORDING_READY_TO_START:
+        elif tool_status.recording_status == \
+             ToolStatus.RECORDING_READY_TO_START:
             tool_status.message = 'Now you are ready to record.'
         elif (tool_status.recording_status == ToolStatus.RECORDING or
               tool_status.playing_status == ToolStatus.PLAYING):
@@ -219,8 +218,9 @@ class RuntimeStatus(object):
                 tool_status.message = str(cls._current_timestamp())
         elif (tool_status.recording_status == ToolStatus.RECORDING_FINISHED and
               tool_status.playing_status == ToolStatus.PLAYING_NOT_READY):
-            tool_status.message = 'The recorded data/log/garage.csv is invalid.<br/>' \
-                                  'Please fix, or simply try recording again by clicking "New".'
+            tool_status.message = 'The recorded data/log/garage.csv is ' \
+                                  'invalid.<br/>Please fix, or simply try ' \
+                                  'recording again by clicking "New".'
         elif tool_status.playing_status == ToolStatus.PLAYING_CHECKING:
             if tool_status.planning_ready:
                 tool_status.message = 'Waiting for modules and hardware.'
@@ -231,9 +231,11 @@ class RuntimeStatus(object):
                                   'Before playing, please setup the system.' \
                                   .format(cls.playable_duration)
         elif tool_status.playing_status == ToolStatus.PLAYING_READY_TO_START:
-            tool_status.message = 'Make sure the OPERATOR is ready! Now you are good to go.'
+            tool_status.message = 'Make sure the OPERATOR is ready! ' \
+                                  'Now you are good to go.'
         else:
-            tool_status.message = 'Something goes wrong.<br/>Please record again or RESET ALL.'
+            tool_status.message = 'Something goes wrong.<br/>' \
+                                  'Please record again or RESET ALL.'
 
     @classmethod
     def _current_timestamp(cls):

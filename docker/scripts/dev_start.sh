@@ -16,10 +16,21 @@
 # limitations under the License.
 ###############################################################################
 
-VERSION=dev-latest
+VERSION=""
+ARCH=$(uname -m)
+VERSION_X86_64="dev-x86_64-20170707_1129"
+VERSION_AARCH64="dev-aarch64-20170712_1533"
 if [[ $# == 1 ]];then
     VERSION=$1
+elif [ ${ARCH} == "x86_64" ]; then
+    VERSION=${VERSION_X86_64}
+elif [ ${ARCH} == "aarch64" ]; then
+    VERSION=${VERSION_AARCH64}
+else
+    echo "Unknown architecture: ${ARCH}"
+    exit 0
 fi
+
 if [ -z "${DOCKER_REPO}" ]; then
     DOCKER_REPO=apolloauto/apollo
 fi
@@ -56,10 +67,12 @@ function find_device() {
 
 function main(){
     docker pull $IMG
-
-    docker stop apollo_dev
-    docker rm -f apollo_dev
-
+    
+    docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
+    if [ $? == 0 ]; then
+        docker stop apollo_dev 1>/dev/null
+        docker rm -f apollo_dev 1>/dev/null
+    fi
     local display=""
     if [[ -z ${DISPLAY} ]];then
         display=":0"
@@ -69,7 +82,9 @@ function main(){
 
 
     # setup CAN device
-    sudo mknod --mode=a+rw /dev/can0 c 52 0
+    if [ ! -e /dev/can0 ]; then
+        sudo mknod --mode=a+rw /dev/can0 c 52 0
+    fi
     # enable coredump
     echo "${LOCAL_DIR}/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 
@@ -81,7 +96,16 @@ function main(){
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
     USER_ID=$(id -u)
+    GRP=$(id -g -n)
+    GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
+    DOCKER_HOME="/home/$USER"
+    if [ "$USER" == "root" ];then
+        DOCKER_HOME="/root"
+    fi
+    if [ ! -d "$HOME/.cache" ];then
+        mkdir "$HOME/.cache"
+    fi
     docker run -it \
         -d \
         --name apollo_dev \
@@ -89,10 +113,12 @@ function main(){
         -e DOCKER_USER=$USER \
         -e USER=$USER \
         -e DOCKER_USER_ID=$USER_ID \
+        -e DOCKER_GRP=$GRP \
+        -e DOCKER_GRP_ID=$GRP_ID \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $LOCAL_DIR:/apollo \
         -v /media:/media \
-        -v $HOME:/home/$USER \
+        -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
         --net host \
         -w /apollo \
@@ -102,10 +128,9 @@ function main(){
         --hostname in_dev_docker \
         --shm-size 512M \
         $IMG
-    docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
-    docker exec apollo_dev bash -c 'rm -rf /apollo/third_party/ros_*'
-    docker exec apollo_dev bash -c 'cp -Lr /root/ros_* /apollo/third_party/'
-    docker exec apollo_dev bash -c "chown -R ${USER}:${USER} /apollo"
+    if [ "${USER}" != "root" ]; then
+        docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
+    fi
 }
 
 main
