@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <cmath>
+
 #include "modules/prediction/common/prediction_gflags.h"
 
 // System gflags
@@ -49,3 +51,5 @@ DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(max_prediction_length, 100.0,
     "Max length of prediction trajectory");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
+DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
+    "Max angle difference for a candiate lane");

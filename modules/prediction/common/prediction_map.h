@@ -59,7 +59,7 @@ class PredictionMap {
                      double* l);
 
   bool ProjectionFromLane(const apollo::hdmap::LaneInfo* lane_info_ptr,
-                          apollo::hdmap::MapPathPoint* path_point, double* s);
+                          double s, apollo::hdmap::MapPathPoint* path_point);
 
   void OnLane(const std::vector<const apollo::hdmap::LaneInfo*>& prev_lanes,
               const Eigen::Vector2d& point, const double heading,
