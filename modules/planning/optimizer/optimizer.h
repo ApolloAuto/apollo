@@ -22,15 +22,20 @@
 #define MODULES_PLANNING_OPTIMIZER_OPTIMIZER_H_
 
 #include <string>
+#include "modules/common/status/status.h"
 
 namespace apollo {
 namespace planning {
+
+class PlanningData;
 
 class Optimizer {
  public:
   explicit Optimizer(const std::string& name);
   virtual ~Optimizer() = default;
   virtual const std::string& name() const;
+
+  virtual apollo::common::Status Optimize(PlanningData *planning_data);
 
   virtual bool SetConfig(const std::string& config_file);
 

@@ -30,7 +30,7 @@ using apollo::common::Status;
 QPSplinePathOptimizer::QPSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
-Status QPSplinePathOptimizer::process(
+Status QPSplinePathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point,
     DecisionData* const decision_data, PathData* const path_data) {

@@ -35,7 +35,7 @@ using apollo::common::Status;
 DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
     : PathOptimizer(name) {}
 
-Status DpPolyPathOptimizer::process(
+Status DpPolyPathOptimizer::Process(
     const SpeedData &speed_data, const ReferenceLine &reference_line,
     const ::apollo::planning::TrajectoryPoint &init_point,
     DecisionData *const decision_data, PathData *const path_data) {
