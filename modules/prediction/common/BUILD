@@ -29,6 +29,8 @@ cc_library(
         "//modules/common:macro",
         "//modules/prediction/common:prediction_gflags",
         "//modules/map/pnc_map:pnc_path",
+        "//modules/common/math:linear_interpolation",
+        "//modules/common/math:vec2d",
     ],
 
 )
