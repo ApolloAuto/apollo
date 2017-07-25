@@ -45,12 +45,12 @@
 // };
 //
 // // Register plugin.
-// REGISTER_SEGMENTATION(NCutSegmentation);
+// REGISTER_SEGMENTATION(CNNSegmentation);
 ////////////////////////////////////////////////////////
 // USING CODE:
 //
 // BaseSegmentation* segmentation =
-//    BaseSegmentationRegisterer::get_instance_by_name("NCutSegmentation");
+//    BaseSegmentationRegisterer::get_instance_by_name("CNNSegmentation");
 // using segmentation to do somethings.
 // ////////////////////////////////////////////////////
 

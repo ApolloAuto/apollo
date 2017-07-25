@@ -25,7 +25,8 @@ RUN apt-get update && apt-get install -y \
    software-properties-common \
    unzip \
    wget \
-   zip
+   zip \
+   cmake
 
 RUN add-apt-repository ppa:webupd8team/java
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
@@ -102,3 +103,51 @@ RUN ln -s -f /bin/true /usr/bin/chfn
 RUN apt-get install -y \
     libpcl-1.7-all \
     libopencv-dev
+
+# install boost 1.56 (required for Caffe)
+RUN apt-get install -y \
+    mpi-default-dev \
+    libicu-dev
+
+WORKDIR /tmp
+RUN wget https://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz
+RUN tar xzf boost_1_56_0.tar.gz
+WORKDIR /tmp/boost_1_56_0
+RUN bash bootstrap.sh --with-toolset=gcc --with-libraries=filesystem,system,thread
+RUN ./b2 install
+
+# install Caffe (CPU_ONLY mode)
+RUN apt-get install -y \
+   libleveldb-dev \
+   libsnappy-dev \
+   libhdf5-serial-dev \
+   libatlas-base-dev \
+   liblmdb-dev
+
+WORKDIR /tmp
+RUN wget https://github.com/google/glog/archive/v0.3.5.tar.gz
+RUN tar xzf v0.3.5.tar.gz
+WORKDIR /tmp/glog-0.3.5
+RUN ./configure && make && make install
+
+WORKDIR /tmp
+RUN wget https://github.com/gflags/gflags/archive/v2.2.0.tar.gz
+RUN tar xzf v2.2.0.tar.gz
+WORKDIR /tmp/gflags-2.2.0
+RUN mkdir build
+WORKDIR /tmp/gflags-2.2.0/build
+RUN CXXFLAGS="-fPIC" cmake .. && make && make install
+
+RUN mkdir /third_party
+WORKDIR /third_party
+# FIXME: use ARG instead of ENV once DockerHub supports this
+# (https://github.com/docker/hub-feedback/issues/460)
+ENV CLONE_TAG=1.0
+RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/BVLC/caffe.git && \
+    cd caffe && mkdir build && cd build && \
+    cmake -DCPU_ONLY=ON -DBUILD_python=OFF .. && \
+    make -j"$(nproc)"
+
+ENV CAFFE_ROOT=/third_party/caffe
+ENV PATH $CAFFE_ROOT/build/tools:$PATH
+RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
