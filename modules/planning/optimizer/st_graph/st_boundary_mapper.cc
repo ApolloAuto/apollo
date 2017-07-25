@@ -38,12 +38,12 @@ using apollo::common::Status;
 using apollo::hdmap::HDMap;
 using apollo::localization::Pose;
 
-STBoundaryMapper::STBoundaryMapper(
-    const STBoundaryConfig& st_boundary_config,
+StBoundaryMapper::StBoundaryMapper(
+    const StBoundaryConfig& st_boundary_config,
     const apollo::common::config::VehicleParam& veh_param)
     : _st_boundary_config(st_boundary_config), _veh_param(veh_param) {}
 
-double STBoundaryMapper::get_area(
+double StBoundaryMapper::get_area(
     const std::vector<STPoint>& boundary_points) const {
   if (boundary_points.size() < 3) {
     return 0.0;
@@ -62,7 +62,7 @@ double STBoundaryMapper::get_area(
   return fabs(area);
 }
 
-bool STBoundaryMapper::check_overlap(
+bool StBoundaryMapper::check_overlap(
     const PathPoint& path_point,
     const apollo::common::config::VehicleParam& params,
     const apollo::common::math::Box2d& obs_box, const double buffer) const {
@@ -78,7 +78,7 @@ bool STBoundaryMapper::check_overlap(
   return obs_box.HasOverlap(adc_box);
 }
 
-Status STBoundaryMapper::get_speed_limits(
+Status StBoundaryMapper::get_speed_limits(
     const Pose& pose, const HDMap& map, const PathData& path_data,
     const double planning_distance, const std::uint32_t matrix_dimension_s,
     const double default_speed_limit, SpeedLimit* const speed_limit_data) {
@@ -95,7 +95,7 @@ Status STBoundaryMapper::get_speed_limits(
     AERROR << "Fail to get lanes for point [" << adc_position.x() << ", "
            << adc_position.y() << "].";
     return Status(ErrorCode::PLANNING_ERROR_FAILED,
-                  "STBoundaryMapper::get_speed_limits");
+                  "StBoundaryMapper::get_speed_limits");
   }
 
   std::vector<double> speed_limits;
@@ -174,11 +174,11 @@ Status STBoundaryMapper::get_speed_limits(
   return Status::OK();
 }
 
-const STBoundaryConfig& STBoundaryMapper::st_boundary_config() const {
+const StBoundaryConfig& StBoundaryMapper::st_boundary_config() const {
   return _st_boundary_config;
 }
 
-const apollo::common::config::VehicleParam& STBoundaryMapper::vehicle_param()
+const apollo::common::config::VehicleParam& StBoundaryMapper::vehicle_param()
     const {
   return _veh_param;
 }

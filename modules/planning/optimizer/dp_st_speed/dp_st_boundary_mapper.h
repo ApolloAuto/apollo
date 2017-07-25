@@ -30,9 +30,9 @@
 namespace apollo {
 namespace planning {
 
-class DPSTBoundaryMapper : public STBoundaryMapper {
+class DpStBoundaryMapper : public StBoundaryMapper {
  public:
-  DPSTBoundaryMapper(const STBoundaryConfig& st_boundary_config,
+  DpStBoundaryMapper(const StBoundaryConfig& st_boundary_config,
                      const ::apollo::common::config::VehicleParam& veh_param);
 
   // TODO: combine two interfaces together to provide a st graph data type
@@ -40,18 +40,18 @@ class DPSTBoundaryMapper : public STBoundaryMapper {
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
       const double planning_distance, const double planning_time,
-      std::vector<STGraphBoundary>* const boundary) const override;
+      std::vector<StGraphBoundary>* const boundary) const override;
 
  private:
   apollo::common::Status map_obstacle_with_trajectory(
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
-      std::vector<STGraphBoundary>* const boundary) const;
+      std::vector<StGraphBoundary>* const boundary) const;
 
   apollo::common::Status map_obstacle_without_trajectory(
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
-      std::vector<STGraphBoundary>* const boundary) const;
+      std::vector<StGraphBoundary>* const boundary) const;
 };
 
 }  // namespace planning

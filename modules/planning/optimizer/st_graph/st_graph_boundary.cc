@@ -29,7 +29,7 @@ namespace planning {
 
 using Vec2d = apollo::common::math::Vec2d;
 
-STGraphBoundary::STGraphBoundary(const std::vector<STPoint>& points)
+StGraphBoundary::StGraphBoundary(const std::vector<STPoint>& points)
     : _boundary_type(BoundaryType::UNKNOWN) {
   CHECK_GE(points.size(), 4);
   for (const auto& point : points) {
@@ -38,59 +38,59 @@ STGraphBoundary::STGraphBoundary(const std::vector<STPoint>& points)
   BuildFromPoints();
 }
 
-STGraphBoundary::STGraphBoundary(
+StGraphBoundary::StGraphBoundary(
     const std::vector<::apollo::common::math::Vec2d>& points)
     : Polygon2d(points), _boundary_type(BoundaryType::UNKNOWN) {
   CHECK_GE(points.size(), 4);
 }
 
-bool STGraphBoundary::IsPointInBoundary(
-    const STGraphPoint& st_graph_point) const {
+bool StGraphBoundary::IsPointInBoundary(
+    const StGraphPoint& st_graph_point) const {
   ::apollo::common::math::Vec2d vec2d = {st_graph_point.point().t(),
                                          st_graph_point.point().s()};
   return IsPointIn(vec2d);
 }
 
-bool STGraphBoundary::IsPointInBoundary(const STPoint& st_point) const {
+bool StGraphBoundary::IsPointInBoundary(const STPoint& st_point) const {
   ::apollo::common::math::Vec2d vec2d = {st_point.t(), st_point.s()};
   return IsPointIn(vec2d);
 }
 
-const ::apollo::common::math::Vec2d STGraphBoundary::point(
+const ::apollo::common::math::Vec2d StGraphBoundary::point(
     const uint32_t index) const {
   CHECK_LT(index, points_.size());
   return points_[index];
 }
 
-const std::vector<::apollo::common::math::Vec2d>& STGraphBoundary::points()
+const std::vector<::apollo::common::math::Vec2d>& StGraphBoundary::points()
     const {
   return points_;
 }
 
-bool STGraphBoundary::is_empty() const { return points_.empty(); }
+bool StGraphBoundary::is_empty() const { return points_.empty(); }
 
-STGraphBoundary::BoundaryType STGraphBoundary::boundary_type() const {
+StGraphBoundary::BoundaryType StGraphBoundary::boundary_type() const {
   return _boundary_type;
 }
 
-void STGraphBoundary::set_boundary_type(const BoundaryType& boundary_type) {
+void StGraphBoundary::set_boundary_type(const BoundaryType& boundary_type) {
   _boundary_type = boundary_type;
 }
 
-uint32_t STGraphBoundary::id() const { return _id; }
+uint32_t StGraphBoundary::id() const { return _id; }
 
-void STGraphBoundary::set_id(const uint32_t id) { _id = id; }
+void StGraphBoundary::set_id(const uint32_t id) { _id = id; }
 
-double STGraphBoundary::characteristic_length() const {
+double StGraphBoundary::characteristic_length() const {
   return _characteristic_length;
 }
 
-void STGraphBoundary::set_characteristic_length(
+void StGraphBoundary::set_characteristic_length(
     const double characteristic_length) {
   _characteristic_length = characteristic_length;
 }
 
-bool STGraphBoundary::get_s_boundary_position(const double curr_time,
+bool StGraphBoundary::get_s_boundary_position(const double curr_time,
                                               double* s_upper,
                                               double* s_lower) const {
   const ::apollo::common::math::LineSegment2d segment = {
@@ -117,7 +117,7 @@ bool STGraphBoundary::get_s_boundary_position(const double curr_time,
   return true;
 }
 
-bool STGraphBoundary::get_boundary_s_range_by_time(const double curr_time,
+bool StGraphBoundary::get_boundary_s_range_by_time(const double curr_time,
                                                    double* s_upper,
                                                    double* s_lower) const {
   const ::apollo::common::math::LineSegment2d segment = {
@@ -137,7 +137,7 @@ bool STGraphBoundary::get_boundary_s_range_by_time(const double curr_time,
   return true;
 }
 
-void STGraphBoundary::get_boundary_time_scope(double* start_t,
+void StGraphBoundary::get_boundary_time_scope(double* start_t,
                                               double* end_t) const {
   *start_t = std::fmin(points_.front().y(), points_.back().y());
   *end_t = std::fmax(points_.at(1).y(), points_.at(2).y());

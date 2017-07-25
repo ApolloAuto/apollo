@@ -33,37 +33,37 @@
 namespace apollo {
 namespace planning {
 
-class QPSplineSTBoundaryMapper : public STBoundaryMapper {
+class QpSplineStBoundaryMapper : public StBoundaryMapper {
  public:
-  QPSplineSTBoundaryMapper(
-      const STBoundaryConfig& st_boundary_config,
+  QpSplineStBoundaryMapper(
+      const StBoundaryConfig& st_boundary_config,
       const apollo::common::config::VehicleParam& veh_param);
 
   apollo::common::Status get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
       const double planning_distance, const double planning_time,
-      std::vector<STGraphBoundary>* const boundary) const override;
+      std::vector<StGraphBoundary>* const boundary) const override;
 
  private:
   apollo::common::Status map_obstacle_with_planning(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
-      std::vector<STGraphBoundary>* const boundary) const;
+      std::vector<StGraphBoundary>* const boundary) const;
 
   apollo::common::Status map_obstacle_with_prediction_trajectory(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const ObjectDecisionType obj_decision,
       const PathData& path_data, const double planning_distance,
       const double planning_time,
-      std::vector<STGraphBoundary>* const boundary) const;
+      std::vector<StGraphBoundary>* const boundary) const;
 
   apollo::common::Status map_obstacle_without_trajectory(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const PathData& path_data,
       const double planning_distance, const double planning_time,
-      std::vector<STGraphBoundary>* const boundary) const;
+      std::vector<StGraphBoundary>* const boundary) const;
 };
 
 }  // namespace planning

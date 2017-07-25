@@ -43,6 +43,7 @@ cc_library(
     deps = [
         ":st_graph_boundary",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:speed_limit",
     ],
 )
 

@@ -36,16 +36,16 @@ using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::Status;
 
-DPSTBoundaryMapper::DPSTBoundaryMapper(
-    const STBoundaryConfig& st_boundary_config,
+DpStBoundaryMapper::DpStBoundaryMapper(
+    const StBoundaryConfig& st_boundary_config,
     const ::apollo::common::config::VehicleParam& veh_param)
-    : STBoundaryMapper(st_boundary_config, veh_param) {}
+    : StBoundaryMapper(st_boundary_config, veh_param) {}
 
-Status DPSTBoundaryMapper::get_graph_boundary(
+Status DpStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
     const double planning_distance, const double planning_time,
-    std::vector<STGraphBoundary>* const obs_boundary) const {
+    std::vector<StGraphBoundary>* const obs_boundary) const {
   if (planning_time < 0.0) {
     const std::string msg = "Fail to get params since planning_time < 0.";
     AERROR << msg;
@@ -97,10 +97,10 @@ Status DPSTBoundaryMapper::get_graph_boundary(
   return Status::OK();
 }
 
-Status DPSTBoundaryMapper::map_obstacle_with_trajectory(
+Status DpStBoundaryMapper::map_obstacle_with_trajectory(
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
-    std::vector<STGraphBoundary>* const boundary) const {
+    std::vector<StGraphBoundary>* const boundary) const {
   // lower and upper bound for st boundary
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
@@ -177,10 +177,10 @@ Status DPSTBoundaryMapper::map_obstacle_with_trajectory(
   return Status::OK();
 }
 
-Status DPSTBoundaryMapper::map_obstacle_without_trajectory(
+Status DpStBoundaryMapper::map_obstacle_without_trajectory(
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
-    std::vector<STGraphBoundary>* const boundary) const {
+    std::vector<StGraphBoundary>* const boundary) const {
   // Static obstacle only have yield option
   const std::vector<PathPoint>& veh_path = path_data.path().path_points();
 

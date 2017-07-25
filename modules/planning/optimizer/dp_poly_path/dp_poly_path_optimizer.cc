@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file dp_poly_path_optimizer.cpp
+ * @file
  **/
 
 #include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"

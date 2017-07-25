@@ -43,15 +43,15 @@ using apollo::common::config::VehicleParam;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
-QPSplineSTBoundaryMapper::QPSplineSTBoundaryMapper(
-    const STBoundaryConfig& st_boundary_config, const VehicleParam& veh_param)
-    : STBoundaryMapper(st_boundary_config, veh_param) {}
+QpSplineStBoundaryMapper::QpSplineStBoundaryMapper(
+    const StBoundaryConfig& st_boundary_config, const VehicleParam& veh_param)
+    : StBoundaryMapper(st_boundary_config, veh_param) {}
 
-Status QPSplineSTBoundaryMapper::get_graph_boundary(
+Status QpSplineStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
     const double planning_distance, const double planning_time,
-    std::vector<STGraphBoundary>* const obs_boundary) const {
+    std::vector<StGraphBoundary>* const obs_boundary) const {
   if (obs_boundary) {
     const std::string msg = "obs_boundary is NULL.";
     AERROR << msg;
@@ -128,9 +128,9 @@ Status QPSplineSTBoundaryMapper::get_graph_boundary(
     if (obs == nullptr) {
       continue;
     }
-    ret = map_obstacle_without_trajectory(
-        initial_planning_point, *obs, path_data, planning_distance,
-        planning_time, obs_boundary);
+    ret = map_obstacle_without_trajectory(initial_planning_point, *obs,
+                                          path_data, planning_distance,
+                                          planning_time, obs_boundary);
     if (!ret.ok()) {
       AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
       return Status(ErrorCode::PLANNING_ERROR_FAILED,
@@ -169,20 +169,20 @@ Status QPSplineSTBoundaryMapper::get_graph_boundary(
   return Status::OK();
 }
 
-Status QPSplineSTBoundaryMapper::map_obstacle_with_planning(
+Status QpSplineStBoundaryMapper::map_obstacle_with_planning(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
-    std::vector<STGraphBoundary>* const boundary) const {
+    std::vector<StGraphBoundary>* const boundary) const {
   return Status::OK();
 }
 
-Status QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
+Status QpSplineStBoundaryMapper::map_obstacle_with_prediction_trajectory(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const ObjectDecisionType obj_decision,
     const PathData& path_data, const double planning_distance,
     const double planning_time,
-    std::vector<STGraphBoundary>* const boundary) const {
+    std::vector<StGraphBoundary>* const boundary) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
@@ -273,15 +273,15 @@ Status QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
         }
 
         // change boundary according to obj_decision.
-        STGraphBoundary::BoundaryType b_type =
-            STGraphBoundary::BoundaryType::UNKNOWN;
+        StGraphBoundary::BoundaryType b_type =
+            StGraphBoundary::BoundaryType::UNKNOWN;
         if (obj_decision.has_follow()) {
           boundary_points.at(0).set_s(boundary_points.at(0).s() -
                                       follow_distance);
           boundary_points.at(1).set_s(boundary_points.at(1).s() -
                                       follow_distance);
           boundary_points.at(3).set_t(-1.0);
-          b_type = STGraphBoundary::BoundaryType::FOLLOW;
+          b_type = StGraphBoundary::BoundaryType::FOLLOW;
         } else if (obj_decision.has_yield()) {
           const double dis = std::fabs(obj_decision.yield().distance_s());
           // TODO: remove the arbitrary numbers in this part.
@@ -299,7 +299,7 @@ Status QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
             boundary_points.at(1).set_s(
                 std::fmax(boundary_points.at(0).s() - dis, 0.0));
           }
-          b_type = STGraphBoundary::BoundaryType::YIELD;
+          b_type = StGraphBoundary::BoundaryType::YIELD;
         } else if (obj_decision.has_overtake()) {
           const double dis = std::fabs(obj_decision.overtake().distance_s());
           boundary_points.at(2).set_s(boundary_points.at(2).s() + dis);
@@ -315,15 +315,15 @@ Status QPSplineSTBoundaryMapper::map_obstacle_with_prediction_trajectory(
       }
     }
   }
-  return skip ?
-      Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP") : Status::OK();
+  return skip ? Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP")
+              : Status::OK();
 }
 
-Status QPSplineSTBoundaryMapper::map_obstacle_without_trajectory(
+Status QpSplineStBoundaryMapper::map_obstacle_without_trajectory(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
-    std::vector<STGraphBoundary>* const boundary) const {
+    std::vector<StGraphBoundary>* const boundary) const {
   return Status::OK();
 }
 

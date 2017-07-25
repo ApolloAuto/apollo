@@ -72,7 +72,7 @@ DECLARE_double(longitudinal_jerk_upper_bound);
 
 DECLARE_double(kappa_bound);
 
-// STGraph
+// StGraph
 DECLARE_double(stgraph_default_point_cost);
 DECLARE_double(stgraph_max_acceleration_divide_factor_level_1);
 DECLARE_double(stgraph_max_deceleration_divide_factor_level_1);

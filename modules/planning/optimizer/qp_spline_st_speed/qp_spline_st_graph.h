@@ -38,19 +38,18 @@
 namespace apollo {
 namespace planning {
 
-class QPSplineStGraph {
+class QpSplineStGraph {
  public:
-  QPSplineStGraph(const QPSplineStSpeedConfig& qp_config,
+  QpSplineStGraph(const QpSplineStSpeedConfig& qp_config,
                   const apollo::common::config::VehicleParam& veh_param);
 
-  common::Status search(const STGraphData& st_graph_data,
-                        const PathData& path_data,
-                        SpeedData* const speed_data);
+  common::Status search(const StGraphData& st_graph_data,
+                        const PathData& path_data, SpeedData* const speed_data);
 
  private:
   // apply st graph constraint
   common::Status apply_constraint(
-      const std::vector<STGraphBoundary>& boundaries);
+      const std::vector<StGraphBoundary>& boundaries);
 
   // apply objective function
   common::Status apply_kernel();
@@ -60,7 +59,7 @@ class QPSplineStGraph {
 
   // extract upper lower bound for constraint;
   common::Status get_s_constraints_by_time(
-      const std::vector<STGraphBoundary>& boundaries, const double time,
+      const std::vector<StGraphBoundary>& boundaries, const double time,
       const double total_path_s, double* const s_upper_bound,
       double* const s_lower_bound) const;
 
@@ -69,7 +68,7 @@ class QPSplineStGraph {
 
  private:
   // qp st configuration
-  QPSplineStSpeedConfig _qp_spline_st_speed_config;
+  QpSplineStSpeedConfig _qp_spline_st_speed_config;
 
   // initial status
   common::TrajectoryPoint _init_point;
