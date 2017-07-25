@@ -94,7 +94,7 @@ Status StBoundaryMapper::get_speed_limits(
   if (ret != 0) {
     AERROR << "Fail to get lanes for point [" << adc_position.x() << ", "
            << adc_position.y() << "].";
-    return Status(ErrorCode::PLANNING_ERROR_FAILED,
+    return Status(ErrorCode::PLANNING_ERROR,
                   "StBoundaryMapper::get_speed_limits");
   }
 
@@ -118,7 +118,7 @@ Status StBoundaryMapper::get_speed_limits(
   if (planning_distance > path_data.path().path_points().back().s()) {
     const std::string msg = "path length cannot be less than planning_distance";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   double s = 0.0;

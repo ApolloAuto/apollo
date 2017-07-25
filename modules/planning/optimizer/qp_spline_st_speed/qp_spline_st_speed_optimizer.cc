@@ -60,7 +60,7 @@ Status QpSplineStSpeedOptimizer::process(const PathData& path_data,
           _qp_spline_st_speed_config.total_path_length(),
           _qp_spline_st_speed_config.total_time(),
           &boundaries) != Status::OK()) {
-    return Status(ErrorCode::PLANNING_ERROR_FAILED,
+    return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
 
@@ -69,7 +69,7 @@ Status QpSplineStSpeedOptimizer::process(const PathData& path_data,
                                  _qp_spline_st_speed_config.total_time(),
                                  _qp_spline_st_speed_config.max_speed(),
                                  &speed_limits) != Status::OK()) {
-    return Status(ErrorCode::PLANNING_ERROR_FAILED,
+    return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
 
@@ -79,7 +79,7 @@ Status QpSplineStSpeedOptimizer::process(const PathData& path_data,
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
                             path_data.path().param_length());
   if (st_graph.search(st_graph_data, path_data, speed_data) != Status::OK()) {
-    return Status(ErrorCode::PLANNING_ERROR_FAILED,
+    return Status(ErrorCode::PLANNING_ERROR,
                   "Failed to search graph with dynamic programming!");
   }
   return Status::OK();

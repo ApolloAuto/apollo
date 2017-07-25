@@ -39,7 +39,7 @@ Status QPSplinePathOptimizer::Process(
                                 init_point, path_data)) {
     const std::string msg = "failed to generate spline path!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   return Status::OK();
 }
