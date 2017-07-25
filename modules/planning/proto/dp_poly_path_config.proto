@@ -11,4 +11,5 @@ message DpPolyPathConfig {
   optional double lateral_adjust_coeff = 6 [default = 0.5];
   // Trajectory Cost Config
   optional double eval_time_interval = 7 [default = 0.1];
+  optional double path_resolution = 8 [default = 0.1];
 }
