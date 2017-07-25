@@ -16,11 +16,16 @@
 
 #include <string>
 #include <unordered_set>
+#include <vector>
+#include <cmath>
+#include <memory>
 
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/common/math/linear_interpolation.h"
+#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace prediction {
@@ -50,13 +55,31 @@ Id PredictionMap::id(const std::string& str_id) {
 
 Eigen::Vector2d PredictionMap::PositionOnLane(const LaneInfo* lane_info,
                                               const double s) {
-  // TODO(kechxu) implement
-  return Eigen::Vector2d(0.0, 0.0);
+  apollo::hdmap::Point point = lane_info->get_smooth_point(s);
+  return {point.x(), point.y()};
 }
 
 double PredictionMap::HeadingOnLane(const LaneInfo* lane_info, const double s) {
-  // TODO(kechxu) implement
-  return 0.0;
+  const std::vector<double>& headings = lane_info->headings();
+  const std::vector<double>& accumulated_s = lane_info->accumulate_s();
+  CHECK(headings.size() == accumulated_s.size());
+  size_t size = headings.size();
+  if (size == 0) {
+    return 0.0;
+  }
+  if (size == 1) {
+    return headings[0];
+  }
+  const auto low_itr =
+      std::lower_bound(accumulated_s.begin(), accumulated_s.end(), s);
+  CHECK(low_itr != accumulated_s.end());
+  size_t index = low_itr - accumulated_s.begin();
+  if (index == size - 1) {
+    return headings.back();
+  }
+  return apollo::common::math::slerp(
+             headings[index], accumulated_s[index],
+             headings[index + 1], accumulated_s[index + 1], s);
 }
 
 double PredictionMap::LaneTotalWidth(
@@ -80,12 +103,23 @@ const LaneInfo* PredictionMap::LaneById(const std::string& str_id) {
 void PredictionMap::GetProjection(const Eigen::Vector2d& position,
                                   const LaneInfo* lane_info_ptr, double* s,
                                   double* l) {
-  // TODO(kechxu) implement
+  if (lane_info_ptr == nullptr) {
+    return;
+  }
+  apollo::common::math::Vec2d pos(position[0], position[1]);
+  lane_info_ptr->get_projection(pos, s, l);
 }
 
 bool PredictionMap::ProjectionFromLane(const LaneInfo* lane_info_ptr,
-                                       MapPathPoint* path_point, double* s) {
-  // TODO(kechxu) implement
+                                       double s, MapPathPoint* path_point) {
+  if (lane_info_ptr == nullptr) {
+    return false;
+  }
+  apollo::hdmap::Point point = lane_info_ptr->get_smooth_point(s);
+  double heading = HeadingOnLane(lane_info_ptr, s);
+  path_point->set_x(point.x());
+  path_point->set_y(point.y());
+  path_point->set_heading(heading);
   return true;
 }
 
@@ -93,26 +127,44 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
                            const Eigen::Vector2d& point, const double heading,
                            const double radius,
                            std::vector<const LaneInfo*>* lanes) {
-  std::vector<const LaneInfo*> candidate_lanes;
-  // if (hdmap_->get_lanes_with_heading(
-  //         point, radius, heading, M_PI, &candidate_lanes) != 0) {
-  //   return;
-  // }
-  for (auto& candidate_lane : candidate_lanes) {
+  std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
+  // TODO(kechxu) clean the messy code of this function
+  apollo::hdmap::Point hdmap_point;
+  hdmap_point.set_x(point[0]);
+  hdmap_point.set_y(point[1]);
+  apollo::common::math::Vec2d vec_point;
+  vec_point.set_x(point[0]);
+  vec_point.set_y(point[1]);
+  if (hdmap_->get_lanes_with_heading(
+          hdmap_point, radius, heading, M_PI, &candidate_lanes) != 0) {
+    return;
+  }
+  for (auto candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
-      continue;  // TODO(kechxu) else if point is on candidate_lane
-    } else if (!IsIdenticalLane(candidate_lane, prev_lanes) &&
-               !IsSuccessorLane(candidate_lane, prev_lanes) &&
-               !IsLeftNeighborLane(candidate_lane, prev_lanes) &&
-               !IsRightNeighborLane(candidate_lane, prev_lanes)) {
+      continue;
+    } else if (candidate_lane->is_on_lane(vec_point)) {
+      continue;
+    } else if (!IsIdenticalLane(candidate_lane.get(), prev_lanes) &&
+               !IsSuccessorLane(candidate_lane.get(), prev_lanes) &&
+               !IsLeftNeighborLane(candidate_lane.get(), prev_lanes) &&
+               !IsRightNeighborLane(candidate_lane.get(), prev_lanes)) {
       continue;
     } else {
-      // MapPathPoint nearest_point = candidate_lane->get_nearest_point(point);
-      // double diff = fabs(math_util::angle_diff(
-      //                       heading, nearest_point.heading()));
-      // if (diff <= FLAGS_max_lane_angle_diff) {
-      //   lanes->emplace_back(candidate_lane);
-      // }
+      // TODO(kechxu) Implement get nearest point with its heading
+      apollo::hdmap::Point nearest_point =
+          candidate_lane->get_nearest_point(vec_point);
+      double s = -1.0;
+      double l = 0.0;
+      apollo::common::math::Vec2d vec_nearest_point;
+      vec_nearest_point.set_x(nearest_point.x());
+      vec_nearest_point.set_y(nearest_point.y());
+      candidate_lane->get_projection(vec_nearest_point, &s, &l);
+      double nearest_point_heading = HeadingOnLane(candidate_lane.get(), s);
+      double diff = std::fabs(
+          apollo::common::math::AngleDiff(heading, nearest_point_heading));
+      if (diff <= FLAGS_max_lane_angle_diff) {
+        lanes->emplace_back(candidate_lane.get());
+      }
     }
   }
 }
