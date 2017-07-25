@@ -31,10 +31,11 @@
 namespace apollo {
 namespace planning {
 
-using ErrorCode = apollo::common::ErrorCode;
-using PathPoint = apollo::common::PathPoint;
-using HDMap = apollo::hdmap::HDMap;
-using Pose = apollo::localization::Pose;
+using apollo::common::ErrorCode;
+using apollo::common::PathPoint;
+using apollo::common::Status;
+using apollo::hdmap::HDMap;
+using apollo::localization::Pose;
 
 STBoundaryMapper::STBoundaryMapper(
     const STBoundaryConfig& st_boundary_config,
@@ -76,7 +77,7 @@ bool STBoundaryMapper::check_overlap(
   return obs_box.HasOverlap(adc_box);
 }
 
-ErrorCode STBoundaryMapper::get_speed_limits(
+Status STBoundaryMapper::get_speed_limits(
     const Pose& pose, const HDMap& map, const PathData& path_data,
     const double planning_distance, const std::uint32_t matrix_dimension_s,
     const double default_speed_limit, SpeedLimit* const speed_limit_data) {
@@ -92,7 +93,8 @@ ErrorCode STBoundaryMapper::get_speed_limits(
   if (ret != 0) {
     AERROR << "Fail to get lanes for point [" << adc_position.x() << ", "
            << adc_position.y() << "].";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED,
+                  "STBoundaryMapper::get_speed_limits");
   }
 
   std::vector<double> speed_limits;
@@ -113,8 +115,9 @@ ErrorCode STBoundaryMapper::get_speed_limits(
   // }
 
   if (planning_distance > path_data.path().path_points().back().s()) {
-    AERROR << "path length cannot be less than planning_distance";
-    return ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "path length cannot be less than planning_distance";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   double s = 0.0;
@@ -167,8 +170,9 @@ ErrorCode STBoundaryMapper::get_speed_limits(
     }
   }
 
-  return ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
+
 const STBoundaryConfig& STBoundaryMapper::st_boundary_config() const {
   return _st_boundary_config;
 }

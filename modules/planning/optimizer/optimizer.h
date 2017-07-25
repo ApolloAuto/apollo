@@ -23,8 +23,6 @@
 
 #include <string>
 
-#include "modules/common/proto/error_code.pb.h"
-
 namespace apollo {
 namespace planning {
 

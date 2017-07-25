@@ -23,7 +23,7 @@
 
 #include <vector>
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
@@ -35,30 +35,30 @@
 namespace apollo {
 namespace planning {
 
-using ErrorCode = apollo::common::ErrorCode;
-
 class DPSTGraph {
  public:
   DPSTGraph(const DpStConfiguration& dp_config,
             // const STBoundaryConfig& mapper_config,
             const apollo::common::config::VehicleParam& veh_param);
 
-  ErrorCode search(const STGraphData& st_graph_data,
-                   DecisionData* const decision_data,
-                   SpeedData* const speed_data);
+  apollo::common::Status search(const STGraphData& st_graph_data,
+                                DecisionData* const decision_data,
+                                SpeedData* const speed_data);
 
  private:
-  ErrorCode init_cost_table();
+  apollo::common::Status init_cost_table();
 
-  ErrorCode calculate_pointwise_cost(
+  apollo::common::Status calculate_pointwise_cost(
       const std::vector<STGraphBoundary>& boundaries);
 
-  ErrorCode calculate_total_cost();
+  apollo::common::Status calculate_total_cost();
 
-  ErrorCode retrieve_speed_profile(SpeedData* const speed_data) const;
+  apollo::common::Status retrieve_speed_profile(
+      SpeedData* const speed_data) const;
 
-  ErrorCode get_object_decision(const STGraphData& st_graph_data,
-                                const SpeedData& speed_profile) const;
+  apollo::common::Status get_object_decision(
+      const STGraphData& st_graph_data,
+      const SpeedData& speed_profile) const;
 
   void calculate_total_cost(const std::uint32_t r, const std::uint32_t c);
 

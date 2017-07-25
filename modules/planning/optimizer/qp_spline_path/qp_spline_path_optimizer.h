@@ -21,7 +21,6 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_H_
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_H_
 
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/optimizer/path_optimizer.h"
 
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
@@ -34,11 +33,11 @@ class QPSplinePathOptimizer : public PathOptimizer {
   explicit QPSplinePathOptimizer(const std::string& name);
 
  private:
-  virtual common::ErrorCode process(const SpeedData& speed_data,
-                                    const ReferenceLine& reference_line,
-                                    const common::TrajectoryPoint& init_point,
-                                    DecisionData* const decision_data,
-                                    PathData* const path_data) override;
+  apollo::common::Status process(const SpeedData& speed_data,
+                                 const ReferenceLine& reference_line,
+                                 const common::TrajectoryPoint& init_point,
+                                 DecisionData* const decision_data,
+                                 PathData* const path_data) override;
 
  private:
   QPSplinePathGenerator _path_generator;

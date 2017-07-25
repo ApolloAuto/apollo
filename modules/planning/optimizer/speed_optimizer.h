@@ -25,7 +25,7 @@
 
 #include "modules/planning/optimizer/optimizer.h"
 
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/planning/common/planning_data.h"
 
 namespace apollo {
@@ -35,13 +35,13 @@ class SpeedOptimizer : public Optimizer {
  public:
   explicit SpeedOptimizer(const std::string& name);
   virtual ~SpeedOptimizer() = default;
-  virtual apollo::common::ErrorCode optimize(PlanningData* planning_data);
+  virtual apollo::common::Status optimize(PlanningData* planning_data);
 
  protected:
-  virtual common::ErrorCode process(const PathData& path_data,
-                                    const TrajectoryPoint& init_point,
-                                    DecisionData* const decision_data,
-                                    SpeedData* const speed_data) const = 0;
+  virtual apollo::common::Status process(const PathData& path_data,
+                                         const TrajectoryPoint& init_point,
+                                         DecisionData* const decision_data,
+                                         SpeedData* const speed_data) const = 0;
 };
 
 }  // namespace planning

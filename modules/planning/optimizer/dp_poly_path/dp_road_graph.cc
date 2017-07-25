@@ -18,12 +18,13 @@
  * @file dp_road_graph.h
  **/
 
-#include <unordered_map>
-#include <limits>
-#include <utility>
-#include <algorithm>
-
 #include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
+
+#include <algorithm>
+#include <limits>
+#include <unordered_map>
+#include <utility>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
@@ -38,6 +39,9 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+
 DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
                          const ::apollo::common::TrajectoryPoint &init_point,
                          const SpeedData &speed_data)
@@ -45,25 +49,26 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
       _init_point(init_point),
       _heuristic_speed_data(speed_data) {}
 
-::apollo::common::ErrorCode DpRoadGraph::find_tunnel(
-    const ReferenceLine &reference_line, DecisionData *const decision_data,
-    PathData *const path_data) {
+Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
+                                DecisionData *const decision_data,
+                                PathData *const path_data) {
   CHECK_NOTNULL(path_data);
-  ::apollo::common::ErrorCode ret = ::apollo::common::ErrorCode::PLANNING_OK;
-  if (init(reference_line) != ::apollo::common::ErrorCode::PLANNING_OK) {
-    AERROR << "Fail to init dp road graph!";
-    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  if (!init(reference_line).ok()) {
+    const std::string msg = "Fail to init dp road graph!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
-  if (generate_graph(reference_line) !=
-      ::apollo::common::ErrorCode::PLANNING_OK) {
-    AERROR << "Fail to generate graph!";
-    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  if (!generate_graph(reference_line).ok()) {
+    const std::string msg = "Fail to generate graph!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
   std::vector<uint32_t> min_cost_edges;
-  if (find_best_trajectory(reference_line, *decision_data, &min_cost_edges) !=
-      ::apollo::common::ErrorCode::PLANNING_OK) {
-    AERROR << "Fail to find best trajectory!";
-    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  if (!find_best_trajectory(reference_line, *decision_data, &min_cost_edges)
+      .ok()) {
+    const std::string msg = "Fail to find best trajectory!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
   FrenetFramePath tunnel;
   std::vector<common::FrenetFramePoint> frenet_path;
@@ -100,8 +105,9 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
     sl_point.set_l(frenet_point.l());
 
     if (!reference_line.get_point_in_Cartesian_frame(sl_point, &xy_point)) {
-      AERROR << "Fail to convert sl point to xy point";
-      return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+      const std::string msg = "Fail to convert sl point to xy point";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
     }
     ReferencePoint ref_point =
         reference_line.get_reference_point(frenet_point.s());
@@ -111,10 +117,10 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
     // TODO(yifei) comment out unused variable
     // double kappa =
     // SLAnalyticTransformation::calculate_kappa(ref_point.kappa(),
-    //                                                         ref_point.dkappa(),
-    //                                                        frenet_point.l(),
-    //                                                         frenet_point.dl(),
-    //                                                         frenet_point.ddl());
+    //                                           ref_point.dkappa(),
+    //                                           frenet_point.l(),
+    //                                           frenet_point.dl(),
+    //                                           frenet_point.ddl());
 
     ::apollo::common::PathPoint
         path_point;  // (xy_point, theta, kappa, 0.0, 0.0, 0.0);
@@ -135,19 +141,19 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
     path_points.push_back(std::move(path_point));
   }
   *(path_data->mutable_path()->mutable_path_points()) = path_points;
-  return ret;
+  return Status::OK();
 }
 
-::apollo::common::ErrorCode DpRoadGraph::init(
-    const ReferenceLine &reference_line) {
+Status DpRoadGraph::init(const ReferenceLine &reference_line) {
   _vertices.clear();
   _edges.clear();
   Eigen::Vector2d xy_point(_init_point.path_point().x(),
                            _init_point.path_point().y());
 
   if (!reference_line.get_point_in_Frenet_frame(xy_point, &_init_sl_point)) {
-    AERROR << "Fail to map init point to sl coordinate!";
-    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+    const std::string msg = "Fail to map init point to sl coordinate!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   ReferencePoint reference_point =
@@ -170,19 +176,17 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
   _vertices.emplace_back(init_frenet_frame_point, 0, 0);
   _vertices.back().set_type(GraphVertex::Type::GRAPH_HEAD);
   _vertices.back().set_accumulated_cost(0.0);
-  return ::apollo::common::ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
-::apollo::common::ErrorCode DpRoadGraph::generate_graph(
-    const ReferenceLine &reference_line) {
-  ::apollo::common::ErrorCode ret = ::apollo::common::ErrorCode::PLANNING_OK;
+Status DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {
   std::vector<std::vector<common::SLPoint>> points;
   PathSampler path_sampler(_config);
-  ret =
-      path_sampler.sample(reference_line, _init_point, _init_sl_point, &points);
-  if (ret != ::apollo::common::ErrorCode::PLANNING_OK) {
-    AERROR << "Fail to sampling point with path sampler!";
-    return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+  if (!path_sampler.sample(reference_line, _init_point, _init_sl_point, &points)
+      .ok()) {
+    const std::string msg = "Fail to sampling point with path sampler!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
   }
 
   int vertex_num_previous_level = 1;
@@ -216,16 +220,17 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
         _vertices.pop_back();
       }
       if (vertex_num_current_level == 0) {
-        return ::apollo::common::ErrorCode::PLANNING_ERROR_FAILED;
+        return Status(ErrorCode::PLANNING_ERROR_FAILED,
+                      "DpRoadGraph::generate_graph");
       }
     }
     accumulated_prev_level_size += vertex_num_previous_level;
     vertex_num_previous_level = vertex_num_current_level;
   }
-  return ret;
+  return Status::OK();
 }
 
-::apollo::common::ErrorCode DpRoadGraph::find_best_trajectory(
+Status DpRoadGraph::find_best_trajectory(
     const ReferenceLine &reference_line, const DecisionData &decision_data,
     std::vector<uint32_t> *const min_cost_edges) {
   CHECK_NOTNULL(min_cost_edges);
@@ -275,7 +280,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
   }
   min_cost_edges->push_back(0);
   std::reverse(min_cost_edges->begin(), min_cost_edges->end());
-  return ::apollo::common::ErrorCode::PLANNING_OK;
+  return Status::OK();
 }
 
 bool DpRoadGraph::add_vertex(const common::SLPoint &sl_point,

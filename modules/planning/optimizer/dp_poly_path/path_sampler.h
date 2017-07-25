@@ -22,8 +22,9 @@
 #define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_SAMPLER_H
 
 #include <vector>
-#include "modules/common/proto/error_code.pb.h"
+
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -34,7 +35,7 @@ class PathSampler {
  public:
   explicit PathSampler(const DpPolyPathConfig &config);
   ~PathSampler() = default;
-  ::apollo::common::ErrorCode sample(
+  apollo::common::Status sample(
       const ReferenceLine &reference_line,
       const ::apollo::common::TrajectoryPoint &init_point,
       const common::SLPoint &init_sl_point,

@@ -22,6 +22,7 @@ cc_library(
         "@eigen//:eigen",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
+        "//modules/common/status",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:decision_data",
         "//modules/planning/common:obstacle",
