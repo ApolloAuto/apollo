@@ -35,8 +35,8 @@
 #include "modules/common/log.h"
 
 /**
- * @namespace apollo::dreamview::internal
- * @brief apollo::dreamview::internal
+ * @namespace apollo::dreamview
+ * @brief apollo::dreamview
  */
 namespace apollo {
 namespace dreamview {
@@ -99,6 +99,10 @@ class SimulationWorldService {
   }
 
  private:
+  /**
+   * @brief Update simulation world with incoming data, e.g., chassis,
+   * localization, planning, perception, etc.
+   */
   template <typename DataType>
   void UpdateSimulationWorld(const DataType &data);
 
@@ -136,15 +140,19 @@ class SimulationWorldService {
     UpdateSimulationWorld(adapter->GetLatestObserved());
   }
 
+  /**
+   * @brief Register monitor message data callback.
+   */
   void RegisterMonitorCallback();
 
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
-  std::unordered_map<std::string, Object> obj_map_;
 
   // The handle of MapService, not owned by SimulationWorldService.
   MapService *map_service_;
+
+  std::unordered_map<std::string, Object> obj_map_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

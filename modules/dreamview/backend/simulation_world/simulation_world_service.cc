@@ -231,11 +231,6 @@ void SimulationWorldService::UpdateSimulationWorld(
   // Updates position with the input localization message.
   auto_driving_car->set_position_x(pose.position().x());
   auto_driving_car->set_position_y(pose.position().y());
-
-  // Updates heading with the input localization message. The pose
-  // within the localization message can carry the heading information
-  // in either heading() or orientation(). Which one to use depends on
-  // which one is correctly set.
   auto_driving_car->set_heading(pose.heading());
 
   // Updates acceleration with the input localization message.
@@ -284,9 +279,7 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   auto_driving_car->set_width(vehicle_param.width());
   auto_driving_car->set_length(vehicle_param.length());
 
-  // Updates the timestamp with the timestamp inside the chassis
-  // message header. It is done on both the SimulationWorld object
-  // itself and its auto_driving_car() field.
+  // Updates the timestamp with the timestamp inside the chassis message header.
   world_.set_timestamp_sec(
       std::max(world_.timestamp_sec(), chassis.header().timestamp_sec()));
 }
