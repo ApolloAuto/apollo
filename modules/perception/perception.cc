@@ -19,7 +19,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-// #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/base/object.h"
 #include "ros/include/ros/ros.h"
 
 namespace apollo {
@@ -27,6 +27,7 @@ namespace perception {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 std::string Perception::Name() const {
   return "perception";
@@ -35,8 +36,11 @@ std::string Perception::Name() const {
 Status Perception::Init() {
   AdapterManager::Init(FLAGS_adapter_config_path);
 
-  // lidar_process_.reset(new LidarProcess());
-  // lidar_process_->Init();
+  lidar_process_.reset(new LidarProcess());
+  if (lidar_process_ != nullptr && !lidar_process_->Init()) {
+    AERROR << "failed to init lidar_process.";
+    return Status(ErrorCode::PERCEPTION_ERROR, "failed to init lidar_process.");
+  }
 
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
   AdapterManager::SetPointCloudCallback(&Perception::OnPointCloud, this);
@@ -46,12 +50,15 @@ Status Perception::Init() {
 void Perception::OnPointCloud(const sensor_msgs::PointCloud2& message) {
   AINFO << "get point cloud callback";
 
-  // std::vector<ObjectPtr> objects;
-  // if (lidar_process_ != nullptr && lidar_process_->IsInit()) {
-  //   lidar_process_->Process(message, &objects);
-  // }
+  if (lidar_process_ != nullptr && lidar_process_->IsInit()) {
+    lidar_process_->Process(message);
 
   /// public obstacle message
+    PerceptionObstacles obstacles;
+    if (lidar_process_->GeneratePbMsg(&obstacles)) {
+      AdapterManager::PublishPerceptionObstacles(obstacles);
+    }
+  }
 }
 
 Status Perception::Start() {

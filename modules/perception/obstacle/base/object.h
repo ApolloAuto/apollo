@@ -23,7 +23,7 @@
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/types.h"
-// #include "modules/perception/perception_obstacle.pb.h"  // from adu/common
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -37,8 +37,8 @@ struct alignas(16) Object {
   void clone(const Object& rhs);
   std::string to_string() const;
 
-  // bool serialize(adu::common::perception::PerceptionObstacle* pb_obj) const;
-  // bool deserialize(const adu::common::perception::PerceptionObstacle& pb_obs);
+  bool serialize(PerceptionObstacle* pb_obj) const;
+  bool deserialize(const PerceptionObstacle& pb_obs);
 
   // object id per frame
   int id = 0;

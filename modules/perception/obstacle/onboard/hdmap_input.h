@@ -23,6 +23,7 @@
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/lib/base/singleton.h"
+#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 
@@ -48,9 +49,10 @@ class HDMapInput {
 
   int MergeBoundaryJunction(
       std::vector<apollo::hdmap::RoadBoundaryPtr>& boundaries,
-      std::vector<apollo::hdmap::JunctionBoundaryPtr>& junctions,
+      std::vector<apollo::hdmap::JunctionInfoConstPtr>& junctions,
       HdmapStructPtr mapptr);
   */
+
   friend class Singleton<HDMapInput>;
 
   bool inited_ = false;

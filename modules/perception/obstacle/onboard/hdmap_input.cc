@@ -20,7 +20,6 @@
 #include <vector>
 
 #include "modules/common/log.h"
-#include "modules/common/math/vec2d.h"
 #include "modules/perception/common/define.h"
 
 namespace apollo {
@@ -41,13 +40,18 @@ bool HDMapInput::GetROI(const pcl_util::PointD& pointd, HdmapStructPtr mapptr) {
 
 /*
 using apollo::hdmap::LineSegment;
+using apollo::hdmap::BoundaryEdge;
 using apollo::hdmap::RoadBoundaryPtr;
-using apollo::hdmap::JunctionBoundaryPtr;
+using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::hdmap::BoundaryEdge_Type_LEFT_BOUNDARY;
+using apollo::hdmap::BoundaryEdge_Type_RIGHT_BOUNDARY;
 using apollo::common::math::Vec2d;
 using apollo::common::math::Polygon2d;
+using pcl_util::PointD;
+using pcl_util::PointDCloud;
+using pcl_util::PointDCloudPtr;
 using std::string;
 using std::vector;
-using pcl_util::PointD;
 
 // HDMapInput
 bool HDMapInput::Init() {
@@ -79,7 +83,7 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr mapptr) {
   point.set_y(pointd.y);
   point.set_z(pointd.z);
   std::vector<RoadBoundaryPtr> boundary_vec;
-  std::vector<JunctionBoundaryPtr> junctions_vec;
+  std::vector<JunctionInfoConstPtr> junctions_vec;
 
   int status = hdmap_->get_road_boundaries(point, FLAGS_map_radius,
                                            &boundary_vec, &junctions_vec);
@@ -99,7 +103,7 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr mapptr) {
 
 int HDMapInput::MergeBoundaryJunction(
     std::vector<RoadBoundaryPtr>& boundaries,
-    std::vector<JunctionBoundaryPtr>& junctions, HdmapStructPtr mapptr) {
+    std::vector<JunctionInfoConstPtr>& junctions, HdmapStructPtr mapptr) {
   if (mapptr == nullptr) {
     AERROR << "the HdmapStructPtr mapptr is null";
     return FAIL;
@@ -108,14 +112,37 @@ int HDMapInput::MergeBoundaryJunction(
   mapptr->junction.resize(junctions.size());
 
   for (size_t i = 0; i < boundaries.size(); i++) {
-    DownSampleBoundary(boundaries[i]->left_boundary,
-                       &(mapptr->road_boundary[i].left_boundary));
-    DownSampleBoundary(boundaries[i]->right_boundary,
-                       &(mapptr->road_boundary[i].right_boundary));
+    for (size_t rbi = 0; rbi < boundaries[i]->road_boundary.size(); ++rbi) {
+      const apollo::hdmap::RoadBoundary& kRoadBoundary =
+          boundaries[i]->road_boundary[rbi];
+      if (kRoadBoundary.has_outer_polygon() &&
+          kRoadBoundary.outer_polygon().edge_size() > 0) {
+        for (int j = 0; j < kRoadBoundary.outer_polygon().edge_size(); ++j) {
+          const BoundaryEdge& edge = kRoadBoundary.outer_polygon().edge(j);
+          if (edge.type() == BoundaryEdge_Type_LEFT_BOUNDARY &&
+              edge.has_curve()) {
+            for (int k = 0; k < edge.curve().segment_size(); ++k) {
+              if (edge.curve().segment(k).has_line_segment()) {
+                DownSampleBoundary(edge.curve().segment(k).line_segment(),
+                                   &(mapptr->road_boundary[i].left_boundary));
+              }
+            }
+          } else if (edge.type() == BoundaryEdge_Type_RIGHT_BOUNDARY &&
+                     edge.has_curve()) {
+            for (int k = 0; k < edge.curve().segment_size(); ++k) {
+              if (edge.curve().segment(k).has_line_segment()) {
+                DownSampleBoundary(edge.curve().segment(k).line_segment(),
+                                   &(mapptr->road_boundary[i].right_boundary));
+              }
+            }
+          }
+        }
+      }
+    }
   }
-  for (int i = 0; i < junctions; i++) {
-    const JunctionInfo* junction_info = junctions[i]->junction_info;
-    const Polygon2d& polygon = junction_info->polygon();
+
+  for (size_t i = 0; i < junctions.size(); i++) {
+    const Polygon2d& polygon = junctions[i]->polygon();
     const vector<Vec2d>& points = polygon.points();
     mapptr->junction[i].reserve(points.size());
     for (size_t idj = 0; idj < points.size(); ++idj) {
@@ -136,9 +163,9 @@ void HDMapInput::DownSampleBoundary(const apollo::hdmap::LineSegment& line,
   for (int i = 0; i < line.point_size(); ++i) {
     if (i % FLAGS_map_sample_step == 0) {
       PointD pointd;
-      pointd.x = left_boundary.point(i).x();
-      pointd.y = left_boundary.point(i).y();
-      pointd.z = left_boundary.point(i).z();
+      pointd.x = line.point(i).x();
+      pointd.y = line.point(i).y();
+      pointd.z = line.point(i).z();
       raw_cloud->push_back(pointd);
     }
   }
@@ -151,9 +178,10 @@ void HDMapInput::DownSampleBoundary(const apollo::hdmap::LineSegment& line,
     AINFO << "Points num < 3, so no need to downsample.";
     return;
   }
-  out_boundary_line->points.reserve(raw_cloud_size);
+  out_boundary_line->points.reserve(out_boundary_line->points.size() +
+                                    raw_cloud_size);
   // the first point
-  out_boundary_line->push_back(raw_cloud[0]);
+  out_boundary_line->push_back(raw_cloud->points[0]);
   for (size_t i = 2; i < raw_cloud_size; ++i) {
     const PointD& point_0 = raw_cloud->points[spt];
     const PointD& point_1 = raw_cloud->points[i - 1];
