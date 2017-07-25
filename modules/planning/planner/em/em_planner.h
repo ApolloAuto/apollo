@@ -86,7 +86,6 @@ class EMPlanner : public Planner {
   // routing is ready.
   RoutingProxy routing_proxy_;
   ReferenceLineSmootherConfig smoother_config_;
-  ReferenceLineSmoother smoother_;
   std::unique_ptr<ReferenceLine> reference_line_;
 };
 
