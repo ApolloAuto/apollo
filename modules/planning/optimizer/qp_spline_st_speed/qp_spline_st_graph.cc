@@ -65,19 +65,19 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
   if (!apply_constraint(st_graph_data.obs_boundary()).ok()) {
     const std::string msg = "Apply constraint failed!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!apply_kernel().ok()) {
     const std::string msg = "Apply kernel failed!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!solve().ok()) {
     const std::string msg = "Solve qp problem failed!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // extract output
@@ -106,13 +106,13 @@ Status QpSplineStGraph::apply_constraint(
   if (!constraint->add_point_fx_constraint(0.0, 0.0)) {
     const std::string msg = "add st start point constraint failed";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!constraint->add_point_derivative_constraint(0.0, _init_point.v())) {
     const std::string msg = "add st start point velocity constraint failed!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!constraint->add_point_second_derivative_constraint(0.0,
@@ -120,28 +120,28 @@ Status QpSplineStGraph::apply_constraint(
     const std::string msg =
         "add st start point acceleration constraint failed!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!constraint->add_point_second_derivative_constraint(
           _spline_generator->spline().x_knots().back(), 0.0)) {
     const std::string msg = "add st end point acceleration constraint failed!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // monotone constraint
   if (!constraint->add_monotone_fx_inequality_constraint_at_knots()) {
     const std::string msg = "add monotonicity constraint failed!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // smoothness constraint
   if (!constraint->add_third_derivative_smooth_constraint()) {
     const std::string msg = "add smoothness joint constraint failed!";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // boundary constraint
@@ -167,7 +167,7 @@ Status QpSplineStGraph::apply_constraint(
                                    s_upper_bound)) {
     const std::string msg = "Fail to apply obstacle constraint";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   // TODO: add speed constraint
   return Status::OK();
@@ -208,9 +208,9 @@ Status QpSplineStGraph::apply_kernel() {
 }
 
 Status QpSplineStGraph::solve() {
-  return _spline_generator->solve() ? Status::OK()
-                                    : Status(ErrorCode::PLANNING_ERROR_FAILED,
-                                             "QpSplineStGraph::solve");
+  return _spline_generator->solve() ?
+      Status::OK() :
+      Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::solve");
 }
 
 Status QpSplineStGraph::get_s_constraints_by_time(

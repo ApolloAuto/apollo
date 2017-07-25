@@ -50,31 +50,31 @@ Status DpStGraph::search(const StGraphData& st_graph_data,
   if (!init_cost_table().ok()) {
     const std::string msg = "Initialize cost table failed.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!calculate_pointwise_cost(st_graph_data.obs_boundary()).ok()) {
     const std::string msg = "Calculate pointwise cost failed.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!calculate_total_cost().ok()) {
     const std::string msg = "Calculate total cost failed.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!retrieve_speed_profile(speed_data).ok()) {
     const std::string msg = "Retrieve best speed profile failed.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!get_object_decision(st_graph_data, *speed_data).ok()) {
     const std::string msg = "Get object decision by speed profile failed.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   return Status::OK();
@@ -252,7 +252,7 @@ Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
   if (best_end_point == nullptr) {
     const std::string msg = "Fail to find the best feasible trajectory.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   std::vector<SpeedPoint> speed_profile;
@@ -274,7 +274,7 @@ Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
       Double::compare(speed_profile.front().s(), 0.0) != 0) {
     const std::string msg = "Fail to retrieve speed profile.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   speed_data->set_speed_vector(speed_profile);
@@ -286,7 +286,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
   if (speed_profile.speed_vector().size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   const std::vector<StGraphBoundary>& obs_boundaries =
@@ -302,7 +302,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
             obs_it->id());
     if (!object_ptr) {
       AERROR << "Failed to find object " << obs_it->id();
-      return Status(ErrorCode::PLANNING_ERROR_FAILED,
+      return Status(ErrorCode::PLANNING_ERROR,
                     "failed to find object from object_table");
     }
     if (obs_it->points().front().x() <= 0) {
@@ -330,7 +330,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
         const std::string msg =
             "dp_st_graph failed: speed profile cross obs_boundary.";
         AERROR << msg;
-        return Status(ErrorCode::PLANNING_ERROR_FAILED, msg);
+        return Status(ErrorCode::PLANNING_ERROR, msg);
       }
 
       double s_upper = _dp_st_configuration.total_path_length();

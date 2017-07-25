@@ -45,8 +45,7 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
   if (!common::util::GetProtoFromFile(FLAGS_dp_poly_path_config_file,
                                       &config_)) {
     AERROR << "failed to load config file " << FLAGS_dp_poly_path_config_file;
-    return Status(ErrorCode::PLANNING_ERROR_FAILED,
-                  "failed to load config file");
+    return Status(ErrorCode::PLANNING_ERROR, "failed to load config file");
   }
   DpRoadGraph dp_road_graph(config_, init_point, speed_data);
   dp_road_graph.find_tunnel(reference_line, decision_data, path_data);
