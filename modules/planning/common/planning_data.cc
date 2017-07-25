@@ -95,8 +95,8 @@ bool PlanningData::aggregate(const double time_resolution) {
     }
     QUIT_IF(!path_data_.get_path_point_with_path_s(speed_point.s(), &path_point),
             false, ERROR,
-            "Fail to get path data with s %f, path total length %f",
-            speed_point.s(), path_data_.path().param_length());
+            "Fail to get path data with s %f, path total length %f time: %f",
+            speed_point.s(), path_data_.path().param_length(), cur_rel_time);
 
     apollo::common::TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
@@ -107,6 +107,13 @@ bool PlanningData::aggregate(const double time_resolution) {
     computed_trajectory_.add_trajectory_point(trajectory_point);
   }
   return true;
+}
+
+std::string PlanningData::DebugString() const {
+  std::ostringstream ss;
+  ss << "path_data:" << path_data_.DebugString();
+  ss << "speed_data:" << speed_data_.DebugString();
+  return ss.str();
 }
 
 

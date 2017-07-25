@@ -19,6 +19,7 @@
  **/
 
 #include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/common/planning_gflags.h"
 
 #include <algorithm>
 #include <sstream>
@@ -66,7 +67,7 @@ bool SpeedData::get_speed_point_with_time(const double t,
   if (Double::compare(speed_vector_[index + 1].t(), speed_vector_[index].t()) >
       0) {
     weight = (t - speed_vector_[index].t()) /
-             (speed_vector_[index].t() - speed_vector_[index + 1].t());
+             (speed_vector_[index + 1].t() - speed_vector_[index].t());
   }
 
   *speed_point =
@@ -84,7 +85,8 @@ double SpeedData::total_time() const {
 std::string SpeedData::DebugString() const {
   std::ostringstream sout;
   sout << "[" << std::endl;
-  for (std::uint32_t i = 0; i < speed_vector_.size(); ++i) {
+  for (int i = 0; i < static_cast<int>(speed_vector_.size()) &&
+         i < FLAGS_trajectory_point_num_for_debug; ++i) {
     if (i > 0) {
       sout << "," << std::endl;
     }

@@ -97,6 +97,7 @@ Status EMPlanner::MakePlan(
   planning_data->set_decision_data(decision_data);
   for (auto& optimizer : optimizers_) {
     optimizer->Optimize(planning_data);
+    ADEBUG << planning_data->DebugString();
   }
   if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution)) {
     std::string msg("Fail to aggregate planning trajectory.");

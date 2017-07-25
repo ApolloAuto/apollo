@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
@@ -101,6 +102,22 @@ bool PathData::get_path_point_with_ref_s(
     //                path_.path_point_at(index_lower), weight);
   }
   return true;
+}
+
+std::string PathData::DebugString() const {
+  std::ostringstream sout;
+  sout << "[" << std::endl;
+  const auto &path_points = path_.path_points();
+  for (std::uint32_t i = 0; i < path_points.size() &&
+         i < FLAGS_trajectory_point_num_for_debug; ++i) {
+    if (i > 0) {
+      sout << "," << std::endl;
+    }
+    sout << path_points[i].DebugString();
+  }
+  sout << "]" << std::endl;
+  sout.flush();
+  return sout.str();
 }
 
 }  // namespace planning
