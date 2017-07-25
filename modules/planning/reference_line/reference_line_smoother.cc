@@ -47,10 +47,17 @@ void ReferenceLineSmoother::SetConfig(
   smoother_config_ = config;
 }
 
+void ReferenceLineSmoother::Reset() {
+  t_knots_.clear();
+  ref_points_.clear();
+  spline_solver_.reset(nullptr);
+}
+
 bool ReferenceLineSmoother::smooth(
     const ReferenceLine& raw_reference_line,
     const common::math::Vec2d& vehicle_position,
     std::vector<ReferencePoint>* const smoothed_ref_line) {
+  Reset();
   // calculate sampling range
   common::SLPoint sl_point;
   if (!raw_reference_line.get_point_in_Frenet_frame(vehicle_position,

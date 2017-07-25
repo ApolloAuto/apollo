@@ -44,6 +44,8 @@ class ReferenceLineSmoother {
               std::vector<ReferencePoint>* const smoothed_ref_line);
 
  private:
+  void Reset();
+
   bool sampling(const ReferenceLine& raw_reference_line, const double start_s,
                 const double end_s);
 
