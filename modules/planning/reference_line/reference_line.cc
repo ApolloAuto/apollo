@@ -40,36 +40,19 @@ using ReferenceMapLine = hdmap::Path;
 
 ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points)
-    : reference_points_(reference_points) {
-  std::vector<hdmap::MapPathPoint> points(reference_points.begin(),
-                                          reference_points.end());
-  reference_map_line_ = ReferenceMapLine(points);
-}
+    : reference_points_(reference_points),
+      reference_map_line_(ReferenceMapLine(std::vector<hdmap::MapPathPoint>(
+          reference_points.begin(), reference_points.end()))) {}
 
 ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points,
     const std::vector<hdmap::LaneSegment>& lane_segments,
     const double max_approximation_error)
-    : reference_points_(reference_points) {
-  std::vector<hdmap::MapPathPoint> points(reference_points.begin(),
-                                          reference_points.end());
-  reference_map_line_ =
-      ReferenceMapLine(points, lane_segments, max_approximation_error);
-}
-
-/*
-void ReferenceLine::move(const ReferenceLine& reference_line) {
-  reference_map_line_ =
-      ReferenceMapLine(reference_line.reference_map_line().path_points());
-  reference_points_ = reference_line.reference_points();
-}
-
-void ReferenceLine::move(const ReferenceLine&& reference_line) {
-  reference_map_line_ =
-      ReferenceMapLine(reference_line.reference_map_line().path_points());
-  reference_points_ = reference_line.reference_points();
-}
-*/
+    : reference_points_(reference_points),
+      reference_map_line_(ReferenceMapLine(
+          std::vector<hdmap::MapPathPoint>(reference_points.begin(),
+                                           reference_points.end()),
+          lane_segments, max_approximation_error)) {}
 
 ReferencePoint ReferenceLine::get_reference_point(const double s) const {
   const auto& accumulated_s = reference_map_line_.accumulated_s();
@@ -80,9 +63,9 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
     return reference_points_.front();
   }
   if (s > accumulated_s.back()) {
-    AWARN
-        << "The requested s exceeds the reference line; reference line ends at "
-        << accumulated_s.back() << "requested " << s << " .";
+    AWARN << "The requested s exceeds the reference line; reference line "
+             "ends at "
+          << accumulated_s.back() << "requested " << s << " .";
     return reference_points_.back();
   }
 
@@ -91,7 +74,8 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
   if (it_lower == accumulated_s.begin()) {
     return reference_points_.front();
   } else {
-    std::uint32_t index = (std::uint32_t)(it_lower - accumulated_s.begin());
+    std::uint32_t index =
+        static_cast<std::uint32_t>(it_lower - accumulated_s.begin());
     auto p0 = reference_points_[index - 1];
     auto p1 = reference_points_[index];
 
@@ -140,11 +124,13 @@ ReferencePoint ReferenceLine::get_reference_point(const double x,
     }
   }
 
-  uint32_t index_start = index_min == 0 ? index_min : index_min - 1;
+  uint32_t index_start = (index_min == 0 ? index_min : index_min - 1);
   uint32_t index_end =
-      index_min + 1 == reference_points_.size() ? index_min : index_min + 1;
+      (index_min + 1 == reference_points_.size() ? index_min : index_min + 1);
 
-  if (index_start == index_end) return reference_points_[index_start];
+  if (index_start == index_end) {
+    return reference_points_[index_start];
+  }
 
   double s0 = reference_map_line_.accumulated_s()[index_start];
   double s1 = reference_map_line_.accumulated_s()[index_end];
@@ -168,10 +154,8 @@ bool ReferenceLine::get_point_in_Cartesian_frame(
 
   const auto matched_point = get_reference_point(sl_point.s());
   const auto angle = common::math::Angle16::from_rad(matched_point.heading());
-  (*xy_point).set_x(matched_point.x() -
-                    common::math::sin(angle) * sl_point.l());
-  (*xy_point).set_y(matched_point.y() +
-                    common::math::cos(angle) * sl_point.l());
+  xy_point->set_x(matched_point.x() - common::math::sin(angle) * sl_point.l());
+  xy_point->set_y(matched_point.y() + common::math::cos(angle) * sl_point.l());
   return true;
 }
 

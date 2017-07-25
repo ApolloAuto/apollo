@@ -22,16 +22,18 @@
 #include <vector>
 
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/optimizer/optimizer.h"
 #include "modules/planning/planner/planner.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proxy/routing_proxy.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
+
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
