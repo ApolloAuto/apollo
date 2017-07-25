@@ -33,7 +33,7 @@ class QPSplinePathOptimizer : public PathOptimizer {
   explicit QPSplinePathOptimizer(const std::string& name);
 
  private:
-  apollo::common::Status process(const SpeedData& speed_data,
+  apollo::common::Status Process(const SpeedData& speed_data,
                                  const ReferenceLine& reference_line,
                                  const common::TrajectoryPoint& init_point,
                                  DecisionData* const decision_data,

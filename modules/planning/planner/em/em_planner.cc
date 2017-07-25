@@ -28,8 +28,8 @@
 #include "modules/planning/common/em_planning_data.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
-// #include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
-// #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -47,12 +47,13 @@ void EMPlanner::RegisterOptimizers() {
   optimizer_factory_.Register(
       DP_POLY_PATH_OPTIMIZER,
       []() -> Optimizer* { return new DpPolyPathOptimizer("DpPolyPathOptimizer"); });
-  // optimizer_factory_.Register(
-  //     DP_ST_SPEED_OPTIMIZER,
-  //     []() -> Optimizer* { return new DpStSpeedOptimizer("DpStSpeedOptimizer"); });
-  // optimizer_factory_.Register(
-  //     QP_SPLINE_PATH_OPTIMIZER,
-  //     []() -> Optimizer* { return new QPSplinePathOptimizer("QPSplinePathOptimizer"); });
+  optimizer_factory_.Register(
+      DP_ST_SPEED_OPTIMIZER,
+      []() -> Optimizer* { return new DpStSpeedOptimizer("DpStSpeedOptimizer"); });
+  optimizer_factory_.Register(
+      QP_SPLINE_PATH_OPTIMIZER,
+      []() -> Optimizer* { return new QPSplinePathOptimizer("QPSplinePathOptimizer"); });
+  // TODO(all): add QP_SPLINE_ST_SPEED_OPTIMIZER
 }
 
 Status EMPlanner::Init(const PlanningConfig& config) {
@@ -78,7 +79,9 @@ Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
 
   //  frame->mutable_planning_data()->set_reference_line(reference_line);
   //  frame->mutable_planning_data()->set_decision_data(decision_data);
-
+  for (auto& optimizer : optimizers_) {
+    optimizer->Optimize(frame->mutable_planning_data());
+  }
   return Status::OK();
 }
 

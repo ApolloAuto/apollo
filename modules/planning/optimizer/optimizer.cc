@@ -23,11 +23,17 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
+
 Optimizer::Optimizer(const std::string& name) : _name(name) {}
 
 const std::string& Optimizer::name() const { return _name; }
 
 bool Optimizer::SetConfig(const std::string&) { return true; }
+
+Status Optimizer::Optimize(PlanningData *planning_data) {
+  return Status::OK();
+}
 
 }  // namespace planning
 }  // namespace apollo

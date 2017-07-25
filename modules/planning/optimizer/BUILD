@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "optimizer.h",
     ],
+    deps = [
+        "//modules/common/status",
+    ],
 )
 
 cc_library(

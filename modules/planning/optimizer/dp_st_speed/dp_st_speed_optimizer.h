@@ -32,7 +32,7 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
   explicit DpStSpeedOptimizer(const std::string& name);
 
-  virtual apollo::common::Status process(const PathData& path_data,
+  virtual apollo::common::Status Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          DecisionData* const decision_data,
                                          SpeedData* const speed_data) const;

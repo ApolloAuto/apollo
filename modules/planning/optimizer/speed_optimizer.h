@@ -35,10 +35,10 @@ class SpeedOptimizer : public Optimizer {
  public:
   explicit SpeedOptimizer(const std::string& name);
   virtual ~SpeedOptimizer() = default;
-  virtual apollo::common::Status optimize(PlanningData* planning_data);
+  apollo::common::Status Optimize(PlanningData* planning_data) override;
 
  protected:
-  virtual apollo::common::Status process(const PathData& path_data,
+  virtual apollo::common::Status Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          DecisionData* const decision_data,
                                          SpeedData* const speed_data) const = 0;
