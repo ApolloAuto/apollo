@@ -21,6 +21,7 @@ cc_proto_library(
         "map_speed_bump.proto",
         "map_stop_sign.proto",
         "map_yield_sign.proto",
+        "map_road.proto",
         "routing.proto",
     ],
     deps = [

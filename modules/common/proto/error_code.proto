@@ -43,6 +43,9 @@ enum ErrorCode {
   PLANNING_ERROR_NAN = 6008;
   PLANNING_ERROR_TIMEOUT = 6009;
   PLANNING_ERROR_FAILED = 60010;
+
+  // HDMap module error codes start from here
+  HDMAP_DATA_ERROR = 7000;
 }
 
 message StatusPb {
