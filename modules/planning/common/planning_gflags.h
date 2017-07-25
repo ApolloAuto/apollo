@@ -35,10 +35,6 @@ DECLARE_int32(max_frame_size);
 // Finite State Machine
 DECLARE_int32(state_fail_threshold);
 
-// Object Table
-DECLARE_int32(object_table_obstacle_capacity);
-DECLARE_int32(object_table_map_object_capacity);
-
 // parameters for trajectory stitching and reinit planning starting point.
 DECLARE_bool(use_stitch);
 DECLARE_double(forward_predict_time);
@@ -209,6 +205,5 @@ DECLARE_string(qp_spline_path_config_file);
 DECLARE_string(dp_poly_path_config_file);
 
 DECLARE_int32(trajectory_point_num_for_debug);
-
 
 #endif /* MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_ */

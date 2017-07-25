@@ -11,21 +11,7 @@ cc_library(
         "decision_data.h",
     ],
     deps = [
-        "//modules/planning/common:map_object",
         "//modules/planning/common:obstacle",
-    ],
-)
-
-cc_library(
-    name = "map_object",
-    srcs = [
-        "map_object.cc",
-    ],
-    hdrs = [
-        "map_object.h",
-    ],
-    deps = [
-        "//modules/planning/common:planning_object",
     ],
 )
 
@@ -38,10 +24,8 @@ cc_library(
         "object_table.h",
     ],
     deps = [
-        ":map_object",
         ":obstacle",
         ":planning_gflags",
-        "//modules/common/util:lru_cache",
     ],
 )
 

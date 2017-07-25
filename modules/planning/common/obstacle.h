@@ -43,8 +43,9 @@ class Obstacle : public PlanningObject {
 
   Obstacle() = default;
 
-  int Id() const;
+  const std::string &Id() const;
   void SetId(int id);
+  void SetId(const std::string &id);
 
   const ObstacleType &Type() const;
   void SetType(const ObstacleType &type);
@@ -72,7 +73,7 @@ class Obstacle : public PlanningObject {
   std::vector<PredictionTrajectory> *mutable_prediction_trajectories();
 
  private:
-  int id_ = 0;
+  std::string id_ = 0;
   double height_ = 0.0;
   double width_ = 0.0;
   double length_ = 0.0;

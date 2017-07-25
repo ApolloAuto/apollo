@@ -20,6 +20,8 @@
 
 #include "modules/planning/common/frame.h"
 
+#include <string>
+
 #include "modules/common/log.h"
 
 namespace apollo {
