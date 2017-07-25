@@ -55,13 +55,13 @@ Id PredictionMap::id(const std::string& str_id) {
 }
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
-    const LaneInfo& lane_info, const double s) {
+    const LaneInfo* lane_info, const double s) {
   // TODO(kechxu) implement
   return Eigen::Vector2d(0.0, 0.0);
 }
 
 double PredictionMap::HeadingOnLane(
-    const LaneInfo& lane_info, const double s) {
+    const LaneInfo* lane_info, const double s) {
   // TODO(kechxu) implement
   return 0.0;
 }

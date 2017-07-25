@@ -762,8 +762,8 @@ void Obstacle::SetLanePoints(Feature* feature) {
           break;
         }
         LanePoint lane_point;
-        Eigen::Vector2d lane_point_pos = map->PositionOnLane(*lane_info, s);
-        double lane_point_heading = map->HeadingOnLane(*lane_info, s);
+        Eigen::Vector2d lane_point_pos = map->PositionOnLane(lane_info, s);
+        double lane_point_heading = map->HeadingOnLane(lane_info, s);
         double lane_point_width = map->LaneTotalWidth(lane_info, s);
         double lane_point_angle_diff =
             apollo::common::math::AngleDiff(lane_point_heading, heading);
