@@ -31,4 +31,11 @@ cc_binary(
     ],
 )
 
+filegroup(
+    name = "perception_testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
+)
+
 cpplint()

@@ -18,4 +18,24 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "min_box_test",
+    size = "small",
+    srcs = [
+        "min_box_test.cc",
+    ],
+    data = ["//modules/perception:perception_testdata"],
+    linkopts = [
+        "-lqhull",
+    ],
+    deps = [
+        ":perception_obstacle_lidar_object_builder_min_box",
+        "//modules/perception/lib/pcl_util:pcl_util",
+        "//modules/perception/common:perception_common",
+        "//modules/perception/obstacle/common:perception_obstacle_common",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
+

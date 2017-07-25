@@ -6,6 +6,10 @@ cc_library(
     name = "base",
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
+    linkopts = [
+        "-lboost_filesystem",
+        "-lboost_system",
+    ],
     deps = [
         "//modules/common:common",
         "//modules/common:log",

@@ -94,15 +94,16 @@ function generate_build_targets() {
   fi
 }
 
-function generate_test_targets() {
-  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party" | grep -v "kernel")
-  if [ $? -ne 0 ]; then
-    fail 'Test failed!'
-  fi
-
+function generate_test_targets_dbg() {
+  #because of pcl seg fault of 1.7.2 exclude perception on debug build of test
+  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party" | grep -v "kernel" | grep -v "perception")
   if ! $USE_ESD_CAN; then
      TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
+}
+
+function generate_test_targets_opt() {
+  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep "perception")
 }
 
 #=================================================
@@ -231,11 +232,18 @@ function release() {
 
 function gen_coverage() {
   bazel clean
-  generate_test_targets
+  generate_test_targets_dbg
   echo "$TEST_TARGETS" | xargs bazel test --define ARCH="$(uname -m)" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --config=coverage
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
+  
+  generate_test_targets_opt
+  echo "$TEST_TARGETS" | xargs bazel test --define ARCH="$(uname -m)" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --config=coverage
+  if [ $? -ne 0 ]; then
+    fail 'run test failed!'
+  fi
+
   COV_DIR=data/cov
   rm -rf $COV_DIR
   files=$(find bazel-out/local-dbg/bin/modules/ -iname "*.gcda" -o -iname "*.gcno" | grep -v external)
@@ -262,9 +270,16 @@ function gen_coverage() {
 function run_test() {
   START_TIME=$(get_now)
 
-  generate_test_targets
+  # FIXME(all): when all unit test passed, switch back.
+  # bazel test --config=unit_test -c dbg //...
+  generate_test_targets_dbg
   echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings
-  if [ $? -eq 0 ]; then
+  RES1=$?
+  
+  generate_test_targets_opt
+  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --test_verbose_timeout_warnings
+  RES2=$?
+  if [ $RES1 -eq 0 ] && [ $RES2 -eq 0 ]; then
     success 'Test passed!'
     return 0
   else
