@@ -19,8 +19,8 @@
  * @brief: quadratic programming base class
  *
  *        min_x  : q(x) = 0.5 * x^T * Q * x  + x^T c
- *        with respect to:  A * x = b (inequality constraint)
- *                          C * x >= d (equality constraint)
+ *        with respect to:  A * x = b (equality constraint)
+ *                          C * x >= d (inequality constraint)
  **/
 
 #ifndef MODULES_COMMON_MATH_QP_SOLVER_QP_SOLVER_H_

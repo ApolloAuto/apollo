@@ -120,16 +120,17 @@ void SolveLinearMPC(const Matrix &matrix_a,
             matrix_uu.rows());
   Eigen::MatrixXd matrix_inequality_constrain = Eigen::MatrixXd::Zero(matrix_ll.rows()
             + matrix_uu.rows(), matrix_ll.rows());
-  matrix_inequality_constrain << matrix_inequality_constrain_ll,
-                                matrix_inequality_constrain_uu;
+  matrix_inequality_constrain << - matrix_inequality_constrain_ll,
+                                 - matrix_inequality_constrain_uu;
   Eigen::MatrixXd matrix_inequality_boundary = Eigen::MatrixXd::Zero(matrix_ll.rows()
             + matrix_uu.rows(), matrix_ll.cols());
   matrix_inequality_boundary << matrix_ll,
-                                matrix_uu;
+                                 - matrix_uu;
   Eigen::MatrixXd matrix_equality_constrain = Eigen::MatrixXd::Zero(matrix_ll.rows()
             + matrix_uu.rows(), matrix_ll.rows());
   Eigen::MatrixXd matrix_equality_boundary = Eigen::MatrixXd::Zero(matrix_ll.rows()
             + matrix_uu.rows(), matrix_ll.cols());
+
   std::unique_ptr<QPSolver> qp_solver(new ActiveSetQPSolver(matrix_m1,
                 matrix_m2,
                 matrix_inequality_constrain,
@@ -139,11 +140,6 @@ void SolveLinearMPC(const Matrix &matrix_a,
   qp_solver->solve();
   matrix_v = qp_solver->params();
 
-  /*
-  // Method 2: QP_SMO_Solver
-  SolveQPSMO(matrix_m1, matrix_m2, matrix_ll, matrix_uu, eps, max_iter,
-             &matrix_v);
-  i*/
   for (unsigned int i = 0; i < horizon; ++i) {
     (*control)[i] =
         matrix_v.block(i * (*control)[0].rows(), 0, (*control)[0].rows(), 1);
