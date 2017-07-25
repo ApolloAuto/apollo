@@ -64,12 +64,10 @@ class LonControllerTest : public ::testing::Test, LonController {
     controller_.reset(new LonController());
   }
 
-  void ComputeLongitudinalErrors(
-      const ::apollo::common::vehicle_state::VehicleState &vehicle_state,
-      const TrajectoryAnalyzer *trajectory, const double preview_time,
-      SimpleLongitudinalDebug *debug) {
-    LonController::ComputeLongitudinalErrors(vehicle_state, trajectory,
-                                             preview_time, debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
+                                 const double preview_time,
+                                 SimpleLongitudinalDebug *debug) {
+    LonController::ComputeLongitudinalErrors(trajectory, preview_time, debug);
   }
 
   Status Init(const ControlConf *control_conf) {
@@ -119,15 +117,15 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   double time_now = apollo::common::time::ToSecond(Clock::Now());
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  VehicleState vehicle_state(&localization_pb, &chassis_pb);
+  auto *vehicle_state = VehicleState::instance();
+  vehicle_state->Update(&localization_pb, &chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 
   double ts = longitudinal_conf_.ts();
   double preview_time = longitudinal_conf_.preview_window() * ts;
 
   SimpleLongitudinalDebug debug;
-  ComputeLongitudinalErrors(vehicle_state, &trajectory_analyzer, preview_time,
-                            &debug);
+  ComputeLongitudinalErrors(&trajectory_analyzer, preview_time, &debug);
 
   double station_reference_expected = 0.16716666937000002;
   double speed_reference_expected = 1.70833337307;

@@ -18,6 +18,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/em/em_planner.h"
@@ -27,7 +28,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::vehicle_state::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::common::Status;
@@ -104,9 +104,10 @@ void Planning::RunOnce() {
 
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
-  VehicleState vehicle_state(localization);
-
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
+
+  common::vehicle_state::VehicleState::instance()->Update(&localization,
+                                                          &chassis);
   bool is_on_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
 
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
@@ -120,8 +121,8 @@ void Planning::RunOnce() {
       AdapterManager::GetPlanning()->GetSeqNum() + 1);
 
   std::vector<TrajectoryPoint> planning_trajectory;
-  bool res_planning = Plan(vehicle_state, is_on_auto_mode, execution_start_time,
-                           &planning_trajectory);
+  bool res_planning =
+      Plan(is_on_auto_mode, execution_start_time, &planning_trajectory);
   if (res_planning) {
     ADCTrajectory trajectory_pb =
         ToADCTrajectory(execution_start_time, planning_trajectory);
@@ -134,9 +135,8 @@ void Planning::RunOnce() {
 
 void Planning::Stop() {}
 
-bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
-                    const bool is_on_auto_mode, const double publish_time,
-                    std::vector<TrajectoryPoint> *planning_trajectory) {
+bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
+                    std::vector<TrajectoryPoint>* planning_trajectory) {
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   double execution_start_time = publish_time;
 
@@ -156,8 +156,10 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
     // position and target vehicle position.
     // If the deviation exceeds a specific threshold,
     // it will be unsafe to planning from the matched point.
-    double dx = matched_point.path_point().x() - vehicle_state.x();
-    double dy = matched_point.path_point().y() - vehicle_state.y();
+    double dx = matched_point.path_point().x() -
+                common::vehicle_state::VehicleState::instance()->x();
+    double dy = matched_point.path_point().y() -
+                common::vehicle_state::VehicleState::instance()->y();
     double position_deviation = std::sqrt(dx * dx + dy * dy);
 
     if (position_deviation < FLAGS_replanning_threshold) {
@@ -191,7 +193,7 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
   //    3. the position deviation from actual and target is too high
   // then planning from current vehicle state.
   TrajectoryPoint vehicle_state_point =
-      ComputeStartingPointFromVehicleState(vehicle_state, planning_cycle_time);
+      ComputeStartingPointFromVehicleState(planning_cycle_time);
 
   auto status =
       planner_->MakePlan(vehicle_state_point, planning_trajectory);
@@ -208,7 +210,7 @@ bool Planning::Plan(const common::vehicle_state::VehicleState& vehicle_state,
 std::pair<TrajectoryPoint, std::uint32_t>
 Planning::ComputeStartingPointFromLastTrajectory(
     const double start_time) const {
-  auto comp = [](const TrajectoryPoint &p, const double t) {
+  auto comp = [](const TrajectoryPoint& p, const double t) {
     return p.relative_time() < t;
   };
 
@@ -223,23 +225,28 @@ Planning::ComputeStartingPointFromLastTrajectory(
 }
 
 TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
-    const common::vehicle_state::VehicleState &vehicle_state,
     const double forward_time) const {
   // Eigen::Vector2d estimated_position =
-  // vehicle_state.EstimateFuturePosition(forward_time);
+  // VehicleState::instance()->EstimateFuturePosition(forward_time);
   TrajectoryPoint point;
   // point.set_x(estimated_position.x());
   // point.set_y(estimated_position.y());
-  point.mutable_path_point()->set_x(vehicle_state.x());
-  point.mutable_path_point()->set_y(vehicle_state.y());
-  point.mutable_path_point()->set_z(vehicle_state.z());
-  point.set_v(vehicle_state.linear_velocity());
-  point.set_a(vehicle_state.linear_acceleration());
+  point.mutable_path_point()->set_x(
+      common::vehicle_state::VehicleState::instance()->x());
+  point.mutable_path_point()->set_y(
+      common::vehicle_state::VehicleState::instance()->y());
+  point.mutable_path_point()->set_z(
+      common::vehicle_state::VehicleState::instance()->z());
+  point.set_v(
+      common::vehicle_state::VehicleState::instance()->linear_velocity());
+  point.set_a(
+      common::vehicle_state::VehicleState::instance()->linear_acceleration());
   point.mutable_path_point()->set_kappa(0.0);
   const double speed_threshold = 0.1;
   if (point.v() > speed_threshold) {
-    point.mutable_path_point()->set_kappa(vehicle_state.angular_velocity() /
-                                          vehicle_state.linear_velocity());
+    point.mutable_path_point()->set_kappa(
+        common::vehicle_state::VehicleState::instance()->angular_velocity() /
+        common::vehicle_state::VehicleState::instance()->linear_velocity());
   }
   point.mutable_path_point()->set_dkappa(0.0);
   point.mutable_path_point()->set_s(0.0);
@@ -263,7 +270,7 @@ std::vector<TrajectoryPoint> Planning::GetOverheadTrajectory(
 
   double zero_relative_time = last_trajectory_[matched_index].relative_time();
   // reset relative time
-  for (auto &p : overhead_trajectory) {
+  for (auto& p : overhead_trajectory) {
     p.set_relative_time(p.relative_time() - zero_relative_time);
   }
   return overhead_trajectory;
