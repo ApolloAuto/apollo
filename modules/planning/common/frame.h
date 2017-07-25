@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <memory>
 
-#include "modules/planning/common/environment.h"
 #include "modules/planning/common/planning_data.h"
 
 namespace apollo {
@@ -35,11 +34,9 @@ class Frame {
   explicit Frame(uint32_t sequence_num);
 
   void set_sequence_num(const uint32_t sequence_num);
-  void set_environment(const Environment &environment);
   void set_planning_data(PlanningData *const planning_data);
 
   uint32_t sequence_num() const;
-  const Environment &environment() const;
   const PlanningData &planning_data() const;
 
   PlanningData *mutable_planning_data();
@@ -47,7 +44,6 @@ class Frame {
 
  private:
   uint32_t _sequence_num;
-  Environment _environment;
   std::unique_ptr<PlanningData> _planning_data;
 };
 
