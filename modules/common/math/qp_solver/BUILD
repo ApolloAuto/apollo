@@ -41,6 +41,7 @@ cc_library(
         "//modules/common/math/qp_solver:qp_solver_gflags",
         "@eigen//:eigen",
         "@qp_oases//:qp_oases",
+        "//modules/common:log",
     ],
 )
 
