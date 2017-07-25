@@ -80,14 +80,10 @@ function main(){
         display="${DISPLAY}"
     fi
 
-
     # setup CAN device
     if [ ! -e /dev/can0 ]; then
         sudo mknod --mode=a+rw /dev/can0 c 52 0
     fi
-    # enable coredump
-    echo "${LOCAL_DIR}/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
-
 
     local devices=""
     devices="${devices} $(find_device ttyUSB*)"
