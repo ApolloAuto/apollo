@@ -51,7 +51,7 @@ class EsdCanChecker : public HwCheckerInterface {
   const std::string &get_name() const override { return name_; };
 
   /// Runs HW status check, stores results in results.
-  void run_check(std::vector<HwCheckResult> &results) override;
+  void run_check(std::vector<HwCheckResult> *results) override;
 
  private:
   int can_id_ = 0;
