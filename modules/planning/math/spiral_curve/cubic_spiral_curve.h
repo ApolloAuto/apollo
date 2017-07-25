@@ -34,7 +34,6 @@
 
 #include <vector>
 
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/math/spiral_curve/spiral_curve.h"
 
@@ -46,10 +45,10 @@ class CubicSpiralCurve : public SpiralCurve {
   CubicSpiralCurve(const common::PathPoint& s, const common::PathPoint& e);
   ~CubicSpiralCurve() = default;
   bool calculate_path();
-  common::ErrorCode get_path_vec(
+  common::Status get_path_vec(
       const std::uint32_t n,
       std::vector<common::PathPoint>* path_points) const override;
-  common::ErrorCode get_path_vec_with_s(
+  common::Status get_path_vec_with_s(
       const std::vector<double>& vec_s,
       std::vector<common::PathPoint>* path_points) const override;
 };

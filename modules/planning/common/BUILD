@@ -85,7 +85,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
-        "//modules/common/proto:error_code_proto",
+        "//modules/common/status",
     ],
 )
 
