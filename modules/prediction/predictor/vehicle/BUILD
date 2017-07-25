@@ -20,6 +20,8 @@ cc_library(
         "//modules/prediction/predictor:predictor",
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/common/proto:path_point_proto",
+        "//modules/common/math:math_utils",
         "//modules/common:log",
         "@eigen//:eigen",
     ]

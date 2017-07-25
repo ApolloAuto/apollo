@@ -22,10 +22,16 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_
 
+#include <vector>
+
 #include "modules/prediction/predictor/predictor.h"
+#include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
 namespace prediction {
+
+using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::math::KalmanFilter;
 
 class FreeMovePredictor : public Predictor {
  public:
@@ -44,6 +50,24 @@ class FreeMovePredictor : public Predictor {
    * @param Obstacle pointer
    */
   void Predict(Obstacle* obstacle) override;
+
+ private:
+  /**
+   * @brief Generate free move trajectory
+   * @param Position
+   * @param Velocity
+   * @param Acceleration
+   * @param Kalman Filter
+   * @param Total time
+   * @param Generated trajectory points
+   */
+  void DrawFreeMoveTrajectoryPoints(const Eigen::Vector2d& position,
+                                    const Eigen::Vector2d& velocity,
+                                    const Eigen::Vector2d& acc,
+                                    const KalmanFilter<double, 6, 2, 0>& kf,
+                                    double total_time,
+                                    double freq,
+                                    std::vector<TrajectoryPoint> *points);
 };
 
 }  // namespace prediction

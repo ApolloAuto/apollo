@@ -23,23 +23,29 @@
 DECLARE_string(prediction_module_name);
 DECLARE_string(prediction_conf_file);
 
+DECLARE_double(prediction_duration);
+DECLARE_double(prediction_freq);
 DECLARE_double(double_precision);
+DECLARE_double(max_prediction_length);
+
+// Map
+DECLARE_string(map_file);
+DECLARE_double(search_radius);
+
+// Obstacle features
+DECLARE_bool(enable_kf_tracking);
 DECLARE_double(max_acc);
 DECLARE_double(min_acc);
+DECLARE_double(max_speed);
 DECLARE_double(q_var);
 DECLARE_double(r_var);
 DECLARE_double(p_var);
 DECLARE_double(go_approach_rate);
 DECLARE_double(cutin_approach_rate);
 DECLARE_int32(still_obstacle_history_length);
-DECLARE_bool(enable_kf_tracking);
 DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
-DECLARE_string(map_file);
-DECLARE_double(prediction_duration);
-DECLARE_double(search_radius);
 DECLARE_double(max_history_time);
-DECLARE_double(max_prediction_length);
 DECLARE_double(target_lane_gap);
 DECLARE_double(max_lane_angle_diff);
 

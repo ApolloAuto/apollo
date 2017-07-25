@@ -60,11 +60,11 @@ class Obstacle {
 
   size_t history_size() const;
 
-  const apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf_lane_tracker(
-      const std::string& lane_id);
+  const apollo::common::math::KalmanFilter<double, 4, 2, 0>&
+      kf_lane_tracker(const std::string& lane_id);
 
   const apollo::common::math::KalmanFilter<double, 6, 2, 0>&
-  kf_motion_tracker();
+      kf_motion_tracker();
 
   bool IsOnLane();
 
