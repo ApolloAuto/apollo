@@ -14,28 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <unordered_set>
 #include <string>
+#include <unordered_set>
 
-#include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/proto/map_id.pb.h"
+#include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
-using apollo::hdmap::PathPoint;
+using apollo::hdmap::MapPathPoint;
 
-PredictionMap::PredictionMap() : hdmap_(nullptr) {
-  LoadMap();
-}
+PredictionMap::PredictionMap() : hdmap_(nullptr) { LoadMap(); }
 
-PredictionMap::~PredictionMap() {
-  Clear();
-}
+PredictionMap::~PredictionMap() { Clear(); }
 
 void PredictionMap::LoadMap() {
   hdmap_.reset(new apollo::hdmap::HDMap());
@@ -44,9 +40,7 @@ void PredictionMap::LoadMap() {
   ADEBUG << "Load map file: " << FLAGS_map_file;
 }
 
-void PredictionMap::Clear() {
-  hdmap_.reset();
-}
+void PredictionMap::Clear() { hdmap_.reset(); }
 
 Id PredictionMap::id(const std::string& str_id) {
   Id id;
@@ -54,14 +48,13 @@ Id PredictionMap::id(const std::string& str_id) {
   return id;
 }
 
-Eigen::Vector2d PredictionMap::PositionOnLane(
-    const LaneInfo* lane_info, const double s) {
+Eigen::Vector2d PredictionMap::PositionOnLane(const LaneInfo* lane_info,
+                                              const double s) {
   // TODO(kechxu) implement
   return Eigen::Vector2d(0.0, 0.0);
 }
 
-double PredictionMap::HeadingOnLane(
-    const LaneInfo* lane_info, const double s) {
+double PredictionMap::HeadingOnLane(const LaneInfo* lane_info, const double s) {
   // TODO(kechxu) implement
   return 0.0;
 }
@@ -85,23 +78,21 @@ const LaneInfo* PredictionMap::LaneById(const std::string& str_id) {
 }
 
 void PredictionMap::GetProjection(const Eigen::Vector2d& position,
-                                  const LaneInfo* lane_info_ptr,
-                                  double* s, double* l) {
+                                  const LaneInfo* lane_info_ptr, double* s,
+                                  double* l) {
   // TODO(kechxu) implement
 }
 
-bool PredictionMap::ProjectionFromLane(
-    const LaneInfo* lane_info_ptr, PathPoint* path_point, double* s) {
+bool PredictionMap::ProjectionFromLane(const LaneInfo* lane_info_ptr,
+                                       MapPathPoint* path_point, double* s) {
   // TODO(kechxu) implement
   return true;
 }
 
-void PredictionMap::OnLane(
-    const std::vector<const LaneInfo*>& prev_lanes,
-    const Eigen::Vector2d& point,
-    const double heading,
-    const double radius,
-    std::vector<const LaneInfo*>* lanes) {
+void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
+                           const Eigen::Vector2d& point, const double heading,
+                           const double radius,
+                           std::vector<const LaneInfo*>* lanes) {
   std::vector<const LaneInfo*> candidate_lanes;
   // if (hdmap_->get_lanes_with_heading(
   //         point, radius, heading, M_PI, &candidate_lanes) != 0) {
@@ -116,7 +107,7 @@ void PredictionMap::OnLane(
                !IsRightNeighborLane(candidate_lane, prev_lanes)) {
       continue;
     } else {
-      // PathPoint nearest_point = candidate_lane->get_nearest_point(point);
+      // MapPathPoint nearest_point = candidate_lane->get_nearest_point(point);
       // double diff = fabs(math_util::angle_diff(
       //                       heading, nearest_point.heading()));
       // if (diff <= FLAGS_max_lane_angle_diff) {
@@ -154,8 +145,8 @@ void PredictionMap::NearbyLanesByCurrentLanes(
   }
 }
 
-bool PredictionMap::IsLeftNeighborLane(
-    const LaneInfo* left_lane, const LaneInfo* curr_lane) {
+bool PredictionMap::IsLeftNeighborLane(const LaneInfo* left_lane,
+                                       const LaneInfo* curr_lane) {
   if (curr_lane == nullptr) {
     return true;
   }
@@ -183,8 +174,8 @@ bool PredictionMap::IsLeftNeighborLane(
   return false;
 }
 
-bool PredictionMap::IsRightNeighborLane(
-    const LaneInfo* right_lane, const LaneInfo* curr_lane) {
+bool PredictionMap::IsRightNeighborLane(const LaneInfo* right_lane,
+                                        const LaneInfo* curr_lane) {
   if (curr_lane == nullptr) {
     return true;
   }
@@ -192,7 +183,7 @@ bool PredictionMap::IsRightNeighborLane(
     return false;
   }
   for (auto& right_lane_id :
-      curr_lane->lane().right_neighbor_forward_lane_id()) {
+       curr_lane->lane().right_neighbor_forward_lane_id()) {
     if (id_string(right_lane) == right_lane_id.id()) {
       return true;
     }
@@ -213,8 +204,8 @@ bool PredictionMap::IsRightNeighborLane(
   return false;
 }
 
-bool PredictionMap::IsSuccessorLane(
-    const LaneInfo* succ_lane, const LaneInfo* curr_lane) {
+bool PredictionMap::IsSuccessorLane(const LaneInfo* succ_lane,
+                                    const LaneInfo* curr_lane) {
   if (curr_lane == nullptr) {
     return true;
   }
@@ -229,8 +220,8 @@ bool PredictionMap::IsSuccessorLane(
   return false;
 }
 
-bool PredictionMap::IsSuccessorLane(
-    const LaneInfo* succ_lane, const std::vector<const LaneInfo*>& lanes) {
+bool PredictionMap::IsSuccessorLane(const LaneInfo* succ_lane,
+                                    const std::vector<const LaneInfo*>& lanes) {
   if (lanes.size() == 0) {
     return true;
   }
@@ -242,8 +233,8 @@ bool PredictionMap::IsSuccessorLane(
   return false;
 }
 
-bool PredictionMap::IsPredecessorLane(
-    const LaneInfo* pred_lane, const LaneInfo* curr_lane) {
+bool PredictionMap::IsPredecessorLane(const LaneInfo* pred_lane,
+                                      const LaneInfo* curr_lane) {
   if (curr_lane == nullptr) {
     return true;
   }
@@ -271,16 +262,16 @@ bool PredictionMap::IsPredecessorLane(
   return false;
 }
 
-bool PredictionMap::IsIdenticalLane(
-    const LaneInfo* other_lane, const LaneInfo* curr_lane) {
+bool PredictionMap::IsIdenticalLane(const LaneInfo* other_lane,
+                                    const LaneInfo* curr_lane) {
   if (curr_lane == nullptr || other_lane == nullptr) {
     return false;
   }
   return id_string(other_lane) == id_string(curr_lane);
 }
 
-bool PredictionMap::IsIdenticalLane(
-    const LaneInfo* other_lane, const std::vector<const LaneInfo*>& lanes) {
+bool PredictionMap::IsIdenticalLane(const LaneInfo* other_lane,
+                                    const std::vector<const LaneInfo*>& lanes) {
   if (lanes.size() == 0) {
     return true;
   }

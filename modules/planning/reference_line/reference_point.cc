@@ -30,7 +30,7 @@ ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
                                const double heading, const double kappa,
                                const double dkappa, const double lower_bound,
                                const double upper_bound)
-    : hdmap::PathPoint(point, heading),
+    : hdmap::MapPathPoint(point, heading),
       kappa_(kappa),
       dkappa_(dkappa),
       lower_bound_(lower_bound),
@@ -39,20 +39,20 @@ ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
 ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
                                const double heading,
                                const hdmap::LaneWaypoint lane_waypoint)
-    : hdmap::PathPoint(point, heading, lane_waypoint) {}
+    : hdmap::MapPathPoint(point, heading, lane_waypoint) {}
 
 ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
                                const double heading, const double kappa,
                                const double dkappa,
                                const hdmap::LaneWaypoint lane_waypoint)
-    : hdmap::PathPoint(point, heading, lane_waypoint),
+    : hdmap::MapPathPoint(point, heading, lane_waypoint),
       kappa_(kappa),
       dkappa_(dkappa) {}
 
 ReferencePoint::ReferencePoint(
     const common::math::Vec2d& point, const double heading, const double kappa,
     const double dkappa, const std::vector<hdmap::LaneWaypoint>& lane_waypoints)
-    : hdmap::PathPoint(point, heading, lane_waypoints),
+    : hdmap::MapPathPoint(point, heading, lane_waypoints),
       kappa_(kappa),
       dkappa_(dkappa) {}
 

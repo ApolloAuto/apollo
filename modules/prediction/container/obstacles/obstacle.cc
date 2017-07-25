@@ -718,7 +718,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
       heading = feature->t_velocity_heading();
     }
     double angle_diff = 0.0;
-    apollo::hdmap::PathPoint nearest_point;
+    apollo::hdmap::MapPathPoint nearest_point;
     if (!map->ProjectionFromLane(nearby_lane, &nearest_point, &s)) {
       angle_diff =
           apollo::common::math::AngleDiff(nearest_point.heading(), heading);
