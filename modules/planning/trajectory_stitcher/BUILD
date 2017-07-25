@@ -19,4 +19,22 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "constraint_checker",
+    srcs = [
+        "constraint_checker.cc",
+    ],
+    hdrs = [
+        "constraint_checker.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/proto:path_point_proto",
+        "//modules/common/vehicle_state",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+    ],
+)
+
 cpplint()

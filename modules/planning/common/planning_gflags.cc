@@ -20,8 +20,7 @@ DEFINE_int32(planning_loop_rate, 5, "Loop rate for planning node");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
-DEFINE_string(map_filename, "modules/map/data/base_map.txt",
-              "map data file");
+DEFINE_string(map_filename, "modules/map/data/base_map.txt", "map data file");
 
 DEFINE_uint64(rtk_trajectory_backward, 10,
               "The number of points to be included in RTK trajectory "
@@ -90,6 +89,8 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
+
+DEFINE_double(kappa_bound, 0.23, "The bound for vehicle curvature");
 
 DEFINE_double(stgraph_default_point_cost, 1e10,
               "The default stgraph point cost.");
