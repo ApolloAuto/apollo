@@ -178,17 +178,18 @@ bool ReferenceLine::get_point_in_Cartesian_frame(
 bool ReferenceLine::get_point_in_Frenet_frame(
     const common::math::Vec2d& xy_point,
     common::SLPoint* const sl_point) const {
-  CHECK_NOTNULL(sl_point);
+  DCHECK_NOTNULL(sl_point);
   double s = 0;
   double l = 0;
-  if (!reference_map_line_.get_nearest_point({xy_point.x(), xy_point.y()}, &s,
-                                             &l)) {
+  if (!reference_map_line_.get_nearest_point(xy_point, &s, &l)) {
     AERROR << "Can't get nearest point from path.";
     return false;
   }
 
   if (s > reference_map_line_.accumulated_s().back()) {
-    AERROR << "The s of point is bigger than the length of current path.";
+    AERROR << "The s of point is bigger than the length of current path. s: "
+           << s << ", curr path length: "
+           << reference_map_line_.accumulated_s().back() << ".";
     return false;
   }
   sl_point->set_s(s);
