@@ -18,6 +18,7 @@ cc_library(
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state",
+        "//modules/map/hdmap",
         "//modules/planning/common:planning_common",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/optimizer",
@@ -28,6 +29,9 @@ cc_library(
         "//modules/planning/optimizer/qp_spline_path",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/proxy:routing_proxy",
+        "//modules/planning/reference_line",
+        "//modules/planning/reference_line:reference_line_smoother",
         "@eigen//:eigen",
     ],
 )
