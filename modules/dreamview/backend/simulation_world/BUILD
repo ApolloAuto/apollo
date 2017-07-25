@@ -60,6 +60,9 @@ cc_test(
     srcs = [
         "simulation_world_service_test.cc",
     ],
+    data = [
+        "//modules/dreamview/backend/testdata",
+    ],
     deps = [
         ":simulation_world_service",
         "//modules/common/adapters:adapter_manager",

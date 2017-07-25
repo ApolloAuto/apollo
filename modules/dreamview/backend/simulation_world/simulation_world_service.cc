@@ -147,11 +147,49 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
 
 }  // namespace
 
-namespace internal {
+constexpr int SimulationWorldService::kMaxMonitorItems;
+constexpr double SimulationWorldService::kMapRadius;
 
-template <>
-void UpdateSimulationWorld<MonitorAdapter>(const MonitorMessage &monitor_msg,
-                                           SimulationWorld *world) {
+SimulationWorldService::SimulationWorldService(MapService *map_service)
+    : map_service_(map_service) {
+  world_.set_map_md5("initialize");
+  RegisterDataCallback("Monitor", AdapterManager::GetMonitor());
+}
+
+const SimulationWorld &SimulationWorldService::Update() {
+  AdapterManager::Observe();
+  UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis());
+  UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization());
+  UpdateWithLatestObserved("PerceptionObstacles",
+                           AdapterManager::GetPerceptionObstacles());
+  UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
+  return world_;
+}
+
+Json SimulationWorldService::GetUpdateAsJson() const {
+  std::string sim_world_json;
+  ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
+
+  // Gather required map element ids based on current location.
+  apollo::hdmap::Point point;
+  point.set_x(world_.auto_driving_car().position_x());
+  point.set_y(world_.auto_driving_car().position_y());
+
+  MapElementIds map_element_ids =
+      map_service_->CollectMapElements(point, kMapRadius);
+
+  Json update;
+  update["type"] = "sim_world_update";
+  update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
+  update["world"] = Json::parse(sim_world_json);
+  update["mapElements"] = map_element_ids.Json();
+  update["mapHash"] = map_element_ids.Hash();
+
+  return update;
+}
+
+void SimulationWorldService::UpdateSimulationWorld(
+    const MonitorMessage &monitor_msg) {
   std::vector<MonitorMessageItem> updated;
   updated.reserve(SimulationWorldService::kMaxMonitorItems);
   // Save the latest messages at the top of the history.
@@ -165,7 +203,7 @@ void UpdateSimulationWorld<MonitorAdapter>(const MonitorMessage &monitor_msg,
 
   // Copy over the previous messages until there is no more history or
   // the max number of total messages has been hit.
-  auto history = world->monitor().item();
+  auto history = world_.monitor().item();
   remove_size = history.size() + monitor_msg.item_size() -
                 SimulationWorldService::kMaxMonitorItems;
   if (remove_size < 0) {
@@ -177,15 +215,14 @@ void UpdateSimulationWorld<MonitorAdapter>(const MonitorMessage &monitor_msg,
   // Refresh the monitor message list in simulation_world.
   ::google::protobuf::RepeatedPtrField<MonitorMessageItem> items(
       updated.begin(), updated.end());
-  world->mutable_monitor()->mutable_item()->Swap(&items);
-  world->mutable_monitor()->mutable_header()->set_timestamp_sec(
+  world_.mutable_monitor()->mutable_item()->Swap(&items);
+  world_.mutable_monitor()->mutable_header()->set_timestamp_sec(
       ToSecond(Clock::Now()));
 }
 
-template <>
-void UpdateSimulationWorld<LocalizationAdapter>(
-    const LocalizationEstimate &localization, SimulationWorld *world) {
-  Object *auto_driving_car = world->mutable_auto_driving_car();
+void SimulationWorldService::UpdateSimulationWorld(
+    const LocalizationEstimate &localization) {
+  Object *auto_driving_car = world_.mutable_auto_driving_car();
   const auto &pose = localization.pose();
 
   // Updates position with the input localization message.
@@ -206,14 +243,13 @@ void UpdateSimulationWorld<LocalizationAdapter>(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
-  world->set_timestamp_sec(
-      std::max(world->timestamp_sec(), localization.header().timestamp_sec()));
+  world_.set_timestamp_sec(
+      std::max(world_.timestamp_sec(), localization.header().timestamp_sec()));
 }
 
-template <>
-void UpdateSimulationWorld<ChassisAdapter>(const Chassis &chassis,
-                                           SimulationWorld *world) {
-  Object *auto_driving_car = world->mutable_auto_driving_car();
+void SimulationWorldService::UpdateSimulationWorld(
+    const Chassis &chassis) {
+  Object *auto_driving_car = world_.mutable_auto_driving_car();
 
   auto_driving_car->set_speed(chassis.speed_mps());
   auto_driving_car->set_throttle_percentage(chassis.throttle_percentage());
@@ -232,6 +268,8 @@ void UpdateSimulationWorld<ChassisAdapter>(const Chassis &chassis,
   } else if (chassis.signal().turn_signal() ==
              ::apollo::common::VehicleSignal::TURN_RIGHT) {
     auto_driving_car->set_current_signal("RIGHT");
+  } else if (chassis.signal().emergency_light()) {
+    auto_driving_car->set_current_signal("EMERGENCY");
   } else {
     auto_driving_car->set_current_signal("");
   }
@@ -246,18 +284,17 @@ void UpdateSimulationWorld<ChassisAdapter>(const Chassis &chassis,
   // Updates the timestamp with the timestamp inside the chassis
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
-  world->set_timestamp_sec(
-      std::max(world->timestamp_sec(), chassis.header().timestamp_sec()));
+  world_.set_timestamp_sec(
+      std::max(world_.timestamp_sec(), chassis.header().timestamp_sec()));
 }
 
-template <>
-void UpdateSimulationWorld<PlanningAdapter>(
-    const ADCTrajectory &trajectory, SimulationWorld *world) {
-  const double cutoff_time = world->auto_driving_car().timestamp_sec();
+void SimulationWorldService::UpdateSimulationWorld(
+    const ADCTrajectory &trajectory) {
+  const double cutoff_time = world_.auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
   const size_t trajectory_length = trajectory.trajectory_point_size();
 
-  util::TrajectoryPointCollector collector(world);
+  util::TrajectoryPointCollector collector(&world_);
 
   size_t i = 0;
   bool collecting_started = false;
@@ -294,65 +331,19 @@ void UpdateSimulationWorld<PlanningAdapter>(
     }
   }
 
-  world->set_timestamp_sec(std::max(world->timestamp_sec(), header_time));
+  world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
 }
 
-template <>
-void UpdateSimulationWorld<apollo::common::adapter::PerceptionObstaclesAdapter>(
-    const PerceptionObstacles &obstacles, SimulationWorld *world) {
+void SimulationWorldService::UpdateSimulationWorld(
+    const PerceptionObstacles &obstacles) {
   for (const auto &obstacle : obstacles.perception_obstacle()) {
-    Object *world_obj = world->add_object();
+    Object *world_obj = world_.add_object();
     SetObstacleInfo(obstacle, world_obj);
     SetObstaclePolygon(obstacle, world_obj);
     SetObstacleType(obstacle, world_obj);
   }
-  world->set_timestamp_sec(
-      std::max(world->timestamp_sec(), obstacles.header().timestamp_sec()));
-}
-
-}  // namespace internal
-
-constexpr int SimulationWorldService::kMaxMonitorItems;
-constexpr double SimulationWorldService::kMapRadius;
-
-SimulationWorldService::SimulationWorldService(MapService *map_service)
-    : map_service_(map_service) {
-  world_.set_map_md5("initialize");
-  RegisterDataCallback("Monitor", AdapterManager::GetMonitor());
-}
-
-const SimulationWorld &SimulationWorldService::Update() {
-  AdapterManager::Observe();
-  UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis(), &world_);
-  UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization(),
-                           &world_);
-  UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning(),
-                           &world_);
-  UpdateWithLatestObserved("PerceptionObstacles",
-                           AdapterManager::GetPerceptionObstacles(), &world_);
-  return world_;
-}
-
-Json SimulationWorldService::GetUpdateAsJson() const {
-  std::string sim_world_json;
-  ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
-
-  // Gather required map element ids based on current location.
-  apollo::hdmap::Point point;
-  point.set_x(world_.auto_driving_car().position_x());
-  point.set_y(world_.auto_driving_car().position_y());
-
-  MapElementIds map_element_ids =
-      map_service_->CollectMapElements(point, kMapRadius);
-
-  Json update;
-  update["type"] = "sim_world_update";
-  update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
-  update["world"] = Json::parse(sim_world_json);
-  update["mapElements"] = map_element_ids.Json();
-  update["mapHash"] = map_element_ids.Hash();
-
-  return update;
+  world_.set_timestamp_sec(
+      std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
 }
 
 }  // namespace dreamview
