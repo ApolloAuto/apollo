@@ -78,7 +78,7 @@ double ReferencePoint::upper_bound() const { return upper_bound_; }
 
 const std::string ReferencePoint::DebugString() const {
   std::stringstream ss;
-  ss << "{x: " << x() << ", y: " << y() << ", theta: " << heading()
+  ss << "{x: " << std::fixed << x() << ", y: " << y() << ", theta: " << heading()
      << ", kappa: " << kappa() << ", dkappa: " << dkappa()
      << ", upper_bound: " << upper_bound() << ", lower_bound: " << lower_bound()
      << "}";
