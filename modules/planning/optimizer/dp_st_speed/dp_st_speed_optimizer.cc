@@ -56,7 +56,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   //if (!common::util::GetProtoFromFile(FLAGS_dp_st_speed_config_file,
   //                                    &dp_st_speed_config)) {
   //  AERROR << "failed to load config file " << FLAGS_dp_st_speed_config_file;
-  //  return Status(ErrorCode::PLANNING_ERROR_FAILED,
+  //  return Status(ErrorCode::PLANNING_ERROR,
   //                "failed to load config file");
   //}
 

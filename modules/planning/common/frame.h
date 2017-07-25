@@ -43,8 +43,12 @@ class Frame {
   PlanningData *mutable_planning_data();
   std::string DebugString() const;
 
+  void set_computed_trajectory(const PublishableTrajectory &trajectory);
+  const PublishableTrajectory &computed_trajectory() const;
+
  private:
   uint32_t _sequence_num;
+  PublishableTrajectory _computed_trajectory;
   std::unique_ptr<PlanningData> _planning_data;
 };
 
