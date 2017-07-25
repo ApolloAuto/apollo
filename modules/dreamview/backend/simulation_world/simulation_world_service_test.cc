@@ -42,10 +42,10 @@ class SimulationWorldServiceTest : public ::testing::Test {
     apollo::common::config::VehicleConfigHelper::Init();
     sim_world_service_.reset(new SimulationWorldService(&map_service_));
   }
+
  protected:
   SimulationWorldServiceTest()
-      : map_service_("modules/dreamview/backend/testdata/garage.bin") {
-  }
+      : map_service_("modules/dreamview/backend/testdata/garage.bin") {}
 
   MapService map_service_;
   std::unique_ptr<SimulationWorldService> sim_world_service_;
@@ -56,7 +56,8 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
   monitor.add_item()->set_msg("I am the latest message.");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  sim_world_service_->world_.mutable_monitor()->mutable_header()
+  sim_world_service_->world_.mutable_monitor()
+      ->mutable_header()
       ->set_timestamp_sec(1990);
   sim_world_service_->world_.mutable_monitor()->add_item()->set_msg(
       "I am the previous message.");
@@ -75,7 +76,8 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
   monitor.add_item()->set_msg("I am message -1");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  sim_world_service_->world_.mutable_monitor()->mutable_header()
+  sim_world_service_->world_.mutable_monitor()
+      ->mutable_header()
       ->set_timestamp_sec(1990);
   for (int i = 0; i < SimulationWorldService::kMaxMonitorItems; ++i) {
     sim_world_service_->world_.mutable_monitor()->add_item()->set_msg(
@@ -106,7 +108,8 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
   EXPECT_EQ(large_size, monitor.item_size());
   EXPECT_EQ("I am message " + std::to_string(large_size - 1),
             monitor.item(large_size - 1).msg());
-  sim_world_service_->world_.mutable_monitor()->mutable_header()
+  sim_world_service_->world_.mutable_monitor()
+      ->mutable_header()
       ->set_timestamp_sec(1990);
 
   sim_world_service_->UpdateSimulationWorld(monitor);
@@ -224,8 +227,8 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
   point3->set_y(0.0);
   obstacle1->set_timestamp(1489794020.123);
   obstacle1->set_type(apollo::perception::PerceptionObstacle_Type_UNKNOWN);
-  apollo::perception::PerceptionObstacle* obstacle2 = obstacles
-      .add_perception_obstacle();
+  apollo::perception::PerceptionObstacle* obstacle2 =
+      obstacles.add_perception_obstacle();
   obstacle2->set_id(2);
   apollo::perception::Point* point = obstacle2->mutable_position();
   point->set_x(1.0);
