@@ -52,6 +52,7 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
 Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
                                 DecisionData *const decision_data,
                                 PathData *const path_data) {
+  CHECK_NOTNULL(decision_data);
   CHECK_NOTNULL(path_data);
   if (!init(reference_line)) {
     const std::string msg = "Fail to init dp road graph!";
@@ -147,6 +148,7 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
 bool DpRoadGraph::init(const ReferenceLine &reference_line) {
   _vertices.clear();
   _edges.clear();
+  _init_point.Clear();
   common::math::Vec2d xy_point(_init_point.path_point().x(),
                                _init_point.path_point().y());
 
