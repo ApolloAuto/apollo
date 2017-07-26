@@ -50,6 +50,20 @@ class RegionalPredictor : public Predictor {
    */
   void Predict(Obstacle* obstacle) override;
 
+  void GenerateStillTrajectory(
+      const Eigen::Vector2d& position,
+      const double heading, const double speed, const double total_time,
+      std::vector<apollo::common::TrajectoryPoint>* points);
+
+  void GenerateMovingTrajectory(
+      const Eigen::Vector2d& position,
+      const Eigen::Vector2d& velocity,
+      const Eigen::Vector2d& acceleration,
+      const apollo::common::math::KalmanFilter<double, 2, 2, 4>& kf,
+      const double total_time,
+      std::vector<apollo::common::TrajectoryPoint>* left_points,
+      std::vector<apollo::common::TrajectoryPoint>* right_points);
+
   void GetTrajectoryCandidatePoints(
       const Eigen::Vector2d& position,
       const Eigen::Vector2d& velocity,

@@ -70,6 +70,71 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
   // TODO(kechxu) implement
 }
 
+void RegionalPredictor::GenerateStillTrajectory(
+    const Eigen::Vector2d& position,
+    const double heading, const double speed, const double total_time,
+    std::vector<TrajectoryPoint>* points) {
+  double delta_ts = FLAGS_prediction_freq;
+  double x = position[0];
+  double y = position[1];
+  double direction_x = std::cos(heading);
+  double direction_y = std::sin(heading);
+  for (int i = 0; i < static_cast<int>(total_time / delta_ts); ++i) {
+    TrajectoryPoint point;
+    point.mutable_path_point()->set_x(x);
+    point.mutable_path_point()->set_y(y);
+    point.mutable_path_point()->set_theta(heading);
+    point.set_v(speed);
+    point.set_relative_time(i * delta_ts);
+    points->push_back(std::move(point));
+    x += direction_x * speed * delta_ts;
+    y += direction_y * speed * delta_ts;
+  }
+}
+
+void RegionalPredictor::GenerateMovingTrajectory(
+    const Eigen::Vector2d& position,
+    const Eigen::Vector2d& velocity,
+    const Eigen::Vector2d& acceleration,
+    const apollo::common::math::KalmanFilter<double, 2, 2, 4>& kf,
+    const double total_time,
+    std::vector<TrajectoryPoint>* left_points,
+    std::vector<TrajectoryPoint>* right_points) {
+
+  double delta_ts = FLAGS_prediction_freq;
+  Eigen::Vector2d vel = velocity;
+  CompressVector2d(FLAGS_pedestrian_max_speed, &vel);
+  Eigen::Vector2d acc = acceleration;
+  CompressVector2d(FLAGS_pedestrian_max_acc, &acc);
+  double speed = std::hypot(vel[0], vel[1]);
+
+  // candidate point sequences
+  std::vector<TrajectoryPoint> middle_points;
+  std::vector<TrajectoryPoint> boundary_points;
+
+  TrajectoryPoint starting_point;
+  starting_point.mutable_path_point()->set_x(0.0);
+  starting_point.mutable_path_point()->set_y(0.0);
+  starting_point.set_v(speed);
+
+  Eigen::Vector2d translated_vec(0.0, 0.0);
+  GetTrajectoryCandidatePoints(
+      translated_vec, vel, acc, kf, total_time,
+      &middle_points, &boundary_points);
+
+  if (middle_points.empty() || boundary_points.size() < 2) {
+    ADEBUG << "No valid points found.";
+    return;
+  }
+
+  UpdateTrajectoryPoints(starting_point, vel, delta_ts,
+      middle_points, boundary_points, left_points, right_points);
+  for (size_t i = 0; i < left_points->size(); ++i) {
+    TranslatePoint(position[0], position[1], &(left_points->operator[](i)));
+    TranslatePoint(position[0], position[1], &(right_points->operator[](i)));
+  }
+}
+
 void RegionalPredictor::GetTrajectoryCandidatePoints(
     const Eigen::Vector2d& position,
     const Eigen::Vector2d& velocity,
