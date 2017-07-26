@@ -42,18 +42,27 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     return;
   }
 
-  for (const auto& sequence : feature.lane().lane_graph().lane_sequence()) {
+  std::string lane_id = "";
+  if (feature.lane().has_lane_feature()) {
+    lane_id = feature.lane().lane_feature().lane_id();
+  }
+  int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
+  std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
+  FilterLaneSequences(feature.lane().lane_graph(),
+                      lane_id,
+                      &enable_lane_sequence);
+
+  for (int i = 0; i < num_lane_sequence; ++i) {
+    const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
     if (sequence.lane_segment_size() == 0) {
       AERROR << "Empty lane segments.";
       continue;
     }
 
-    if (!sequence.has_probability() ||
-        sequence.probability() < FLAGS_lane_sequence_threshold) {
-      AERROR << "Lane sequence [" << ToString(sequence)
-             << "] has probability [" << sequence.probability()
-             << "] less than threshold [" << FLAGS_lane_sequence_threshold
-             << "]";
+    if (!enable_lane_sequence[i]) {
+      ADEBUG << "Lane sequence [" << ToString(sequence)
+             << "] with probability ["
+             <<sequence.probability() << "] is disqualified.";
       continue;
     }
 
@@ -68,7 +77,76 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     trajectory.set_probability(sequence.probability());
     prediction_obstacle_.set_predicted_period(FLAGS_prediction_duration);
     prediction_obstacle_.add_trajectory()->CopyFrom(trajectory);
+    ADEBUG << "Obstacle [" << obstacle->id()
+           << "] has " << prediction_obstacle_.trajectory_size()
+           << " trajectories.";
   }
+}
+
+void LaneSequencePredictor::FilterLaneSequences(
+    const LaneGraph& lane_graph,
+    const std::string& lane_id,
+    std::vector<bool> *enable_lane_sequence) {  
+  int num_lane_sequence = lane_graph.lane_sequence_size();
+  std::vector<int> lane_change_type(num_lane_sequence, -1);
+  std::pair<int, double> change(-1, -1.0);
+  std::pair<int, double> all(-1, -1.0);
+
+  for (int i = 0; i < num_lane_sequence; ++i) {
+    const LaneSequence& sequence = lane_graph.lane_sequence(i);
+
+    // Get lane change type
+    int lane_change = GetLaneChangeType(lane_id, sequence);
+    lane_change_type[i] = lane_change;
+
+    double probability = sequence.probability();
+
+    if (::apollo::common::math::DoubleCompare(probability, all.second) > 0 ||
+        (::apollo::common::math::DoubleCompare(probability, all.second) == 0 &&
+         lane_change_type[i] == 0)) {
+      all.first = i;
+      all.second = probability;
+    }
+    if (lane_change_type[i] > 0 &&
+        ::apollo::common::math::DoubleCompare(probability, change.second) > 0) {
+      change.first = i;
+      change.second = probability;
+    }
+  }
+
+  for (int i = 0; i < num_lane_sequence; ++i) {
+    const LaneSequence& sequence = lane_graph.lane_sequence(i);
+    double probability = sequence.probability();
+    if (::apollo::common::math::DoubleCompare(
+        probability, FLAGS_lane_sequence_threshold) < 0 &&
+        i != all.first) {
+      (*enable_lane_sequence)[i] = false;
+    } else if (lane_change_type[i] > 0 &&
+               lane_change_type[i] != change.first) {
+      (*enable_lane_sequence)[i] = false;
+    }
+  }
+}
+
+int LaneSequencePredictor::GetLaneChangeType(
+    const std::string& lane_id,
+    const LaneSequence& lane_sequence) {
+  PredictionMap *map = PredictionMap::instance();
+  CHECK_NOTNULL(map);
+
+  std::string lane_change_id = lane_sequence.lane_segment(0).lane_id();
+  if (lane_id == lane_change_id) {
+    return 0;
+  } else {
+    if (map->IsLeftNeighborLane(map->LaneById(lane_change_id),
+                                map->LaneById(lane_id))) {
+      return 1;
+    } else if (map->IsRightNeighborLane(
+        map->LaneById(lane_change_id), map->LaneById(lane_id))) {
+      return 2;
+    }
+  }
+  return -1;
 }
 
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
@@ -168,9 +246,12 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
 }
 
 std::string LaneSequencePredictor::ToString(const LaneSequence& sequence) {
-  std::string str_lane_sequence;
-  for (const auto& lane_segment: sequence.lane_segment()) {
-    str_lane_sequence = str_lane_sequence + "->" + lane_segment.lane_id();
+  std::string str_lane_sequence = "";
+  if (sequence.lane_segment_size() > 0) {
+    str_lane_sequence += sequence.lane_segment(0).lane_id();
+  }
+  for (int i = 1; i < sequence.lane_segment_size(); ++i) {
+    str_lane_sequence += ("->" + sequence.lane_segment(i).lane_id());
   }
   return str_lane_sequence;
 }
