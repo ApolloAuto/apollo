@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
 using TrajectoryPb = planning::ADCTrajectory;
-using VehicleState = common::vehicle_state::VehicleState;
+using VehicleState = common::VehicleState;
 
 const char data_path[] =
     "modules/control/testdata/longitudinal_controller_test/";
@@ -118,7 +118,7 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
   auto *vehicle_state = VehicleState::instance();
-  vehicle_state->Update(&localization_pb, &chassis_pb);
+  vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 
   double ts = longitudinal_conf_.ts();

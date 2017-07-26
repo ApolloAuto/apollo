@@ -16,6 +16,7 @@
 
 #include "modules/control/common/trajectory_analyzer.h"
 
+#include <algorithm>
 #include <cmath>
 #include <utility>
 
@@ -33,14 +34,14 @@ namespace control {
 namespace {
 
 // Squared distance from the point to (x, y).
-double PointDistanceSquare(const TrajectoryPoint& point, const double x,
+double PointDistanceSquare(const TrajectoryPoint &point, const double x,
                            const double y) {
   const double dx = point.path_point().x() - x;
   const double dy = point.path_point().y() - y;
   return dx * dx + dy * dy;
 }
 
-PathPoint TrajectoryPointToPathPoint(const TrajectoryPoint& point) {
+PathPoint TrajectoryPointToPathPoint(const TrajectoryPoint &point) {
   if (point.has_path_point()) {
     return point.path_point();
   } else {
@@ -168,9 +169,8 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
   auto it_lower = it_low - 1;
   if (it_low->relative_time() - t < t - it_lower->relative_time()) {
     return *it_low;
-  } else {
-    return *it_lower;
   }
+  return *it_lower;
 }
 
 TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByPosition(

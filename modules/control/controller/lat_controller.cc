@@ -37,7 +37,7 @@ namespace control {
 
 using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::Point3D;
-using ::apollo::common::vehicle_state::VehicleState;
+using ::apollo::common::VehicleState;
 using Matrix = Eigen::MatrixXd;
 
 namespace {
@@ -120,21 +120,16 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 void LatController::ProcessLogs(const SimpleLateralDebug *debug,
                                 const canbus::Chassis *chassis) {
   const std::string log_str = apollo::common::util::StrCat(
-      debug->lateral_error(), ",",
-      debug->ref_heading(), ",",
-      VehicleState::instance()->heading(), ",",
-      debug->heading_error(), ",",
-      debug->heading_error_rate(), ",",
-      debug->lateral_error_rate(), ",",
-      debug->curvature(), ",",
-      debug->steer_angle(), ",",
+      debug->lateral_error(), ",", debug->ref_heading(), ",",
+      VehicleState::instance()->heading(), ",", debug->heading_error(), ",",
+      debug->heading_error_rate(), ",", debug->lateral_error_rate(), ",",
+      debug->curvature(), ",", debug->steer_angle(), ",",
       debug->steer_angle_feedforward(), ",",
       debug->steer_angle_lateral_contribution(), ",",
       debug->steer_angle_lateral_rate_contribution(), ",",
       debug->steer_angle_heading_contribution(), ",",
       debug->steer_angle_heading_rate_contribution(), ",",
-      debug->steer_angle_feedback(), ",",
-      chassis->steering_percentage(), ",",
+      debug->steer_angle_feedback(), ",", chassis->steering_percentage(), ",",
       VehicleState::instance()->linear_velocity());
   if (FLAGS_enable_csv_debug) {
     steer_log_file_ << log_str << std::endl;
@@ -236,7 +231,6 @@ Status LatController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
-  VehicleState::instance()->Update(localization, chassis);
   VehicleState::instance()->set_linear_velocity(
       std::max(VehicleState::instance()->linear_velocity(), 1.0));
 
@@ -336,8 +330,8 @@ Status LatController::Reset() {
 // Rate, Preview Lateral1, Preview Lateral2, ...]
 void LatController::UpdateState(SimpleLateralDebug *debug) {
   TrajectoryPoint traj_point;
-  Eigen::Vector2d com = VehicleState::instance()->ComputeCOMPosition(lr_);
-  double raw_lateral_error = GetLateralError(com, &traj_point);
+  const auto &position = VehicleState::instance()->ComputeCOMPosition(lr_);
+  double raw_lateral_error = GetLateralError(position, &traj_point);
 
   // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
   debug->set_lateral_error(lateral_error_filter_.Update(raw_lateral_error));
@@ -381,7 +375,7 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
   // Next elements are depending on preview window size;
   for (int i = 0; i < preview_window_; ++i) {
     double preview_time = ts_ * (i + 1);
-    Eigen::Vector2d future_position_estimate =
+    const auto &future_position_estimate =
         VehicleState::instance()->EstimateFuturePosition(preview_time);
     double preview_lateral = GetLateralError(future_position_estimate, nullptr);
     matrix_state_(basic_state_size_ + i, 0) = preview_lateral;
@@ -390,7 +384,7 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
-  Eigen::Vector2d com = VehicleState::instance()->ComputeCOMPosition(lr_);
+  const auto &com = VehicleState::instance()->ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(), VehicleState::instance()->heading(),
                        VehicleState::instance()->linear_velocity(),
                        VehicleState::instance()->angular_velocity(),
@@ -468,7 +462,7 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
  *  left to the ref_line, L is +
  * right to the ref_line, L is -
  */
-double LatController::GetLateralError(const Eigen::Vector2d &point,
+double LatController::GetLateralError(const common::math::Vec2d &point,
                                       TrajectoryPoint *traj_point) const {
   auto closest =
       trajectory_analyzer_.QueryNearestPointByPosition(point.x(), point.y());
