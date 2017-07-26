@@ -18,18 +18,23 @@
  * @file sampler.cpp
  **/
 #include <algorithm>
-#include <vector>
-#include <memory>
 #include <cmath>
+#include <memory>
+#include <vector>
 
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
+
+#include "modules/common/proto/path_point.pb.h"
+
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
+using Status = apollo::common::Status;
+using SLPoint = apollo::common::SLPoint;
 
-PathSampler::PathSampler(const DpPolyPathConfig &config) : _config(config) {}
+PathSampler::PathSampler(const DpPolyPathConfig& config) : _config(config) {}
 
 Status PathSampler::sample(
     const ReferenceLine& reference_line,
@@ -39,45 +44,30 @@ Status PathSampler::sample(
   CHECK_NOTNULL(points);
   const double reference_line_length =
       reference_line.reference_map_line().accumulated_s().back();
-  const double lateral_sample_offset = _config.lateral_sample_offset();
-  double step_length = init_point.v();
-  step_length = std::min(step_length, _config.step_length_max());
-  step_length = std::max(step_length, _config.step_length_min());
-  double center_l = init_sl_point.l();
+  double level_distance =
+      std::fmax(_config.step_length_min(),
+                std::fmin(init_point.v(), _config.step_length_max()));
+
   double accumulated_s = init_sl_point.s();
-  for (size_t i = 0; i < _config.sample_level(); ++i) {
-    std::vector<::apollo::common::SLPoint> level_points;
-    if (std::abs(center_l) < lateral_sample_offset) {
-      center_l = 0.0;
-    } else {
-      center_l = center_l * _config.lateral_adjust_coeff();
-    }
-    accumulated_s += step_length;
-    const double level_start_l = center_l
-        - lateral_sample_offset
-            * (_config.sample_points_num_each_level() - 1) / 2;
-    for (size_t j = 0; j < _config.sample_points_num_each_level(); ++j) {
-      ::apollo::common::SLPoint sl_point;
-      sl_point.set_s(accumulated_s);
-      sl_point.set_l(level_start_l + j * lateral_sample_offset);
-      if (reference_line.is_on_road(sl_point)) {
-        level_points.push_back(sl_point);
+  for (size_t i = 0;
+       i < _config.sample_level() && accumulated_s < reference_line_length;
+       ++i) {
+    std::vector<SLPoint> level_points;
+    accumulated_s += level_distance;
+    double s = std::fmin(accumulated_s, reference_line_length);
+
+    int32_t num =
+        static_cast<int32_t>(_config.sample_points_num_each_level() / 2);
+    for (int32_t j = -num; j < num + 1; ++j) {
+      double l = _config.lateral_sample_offset() * j;
+      SLPoint sl = common::util::MakeSLPoint(s, l);
+      if (reference_line.is_on_road(sl)) {
+        level_points.push_back(sl);
       }
-    }
-    if (level_points.empty()) {
-    	const double level_s = std::fmin(accumulated_s, reference_line_length);
-    	for (const auto level_l : {-lateral_sample_offset, 0.0, lateral_sample_offset}) {
-            ::apollo::common::SLPoint sl_point;
-            sl_point.set_s(level_s);
-            sl_point.set_l(level_l);
-            level_points.push_back(sl_point);
-    	}
-        if (accumulated_s > reference_line_length) {
-           return Status::OK();
-        }
     }
     points->push_back(level_points);
   }
+
   return Status::OK();
 }
 }  // namespace planning
