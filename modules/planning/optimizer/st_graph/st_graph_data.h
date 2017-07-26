@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file: st_map_data.h
+ * @file: st_graph_data.h
  * @brief: data with map info and obstacle info
  **/
 

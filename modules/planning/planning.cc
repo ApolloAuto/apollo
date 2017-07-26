@@ -55,7 +55,33 @@ Status Planning::Init() {
   }
 
   AdapterManager::Init(FLAGS_adapter_config_path);
-
+  if (AdapterManager::GetLocalization() == nullptr) {
+    std::string error_msg("Localization is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
+  if (AdapterManager::GetChassis() == nullptr) {
+    std::string error_msg("chassis is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
+  if (AdapterManager::GetRoutingResult() == nullptr) {
+    std::string error_msg("RoutingResult is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
+  // TODO(all) temporarily use the offline routing data.
+  if (!AdapterManager::GetRoutingResult()->HasReceived()) {
+    if (!AdapterManager::GetRoutingResult()->FeedFile(
+            FLAGS_offline_routing_file)) {
+      auto error_msg = common::util::StrCat(
+          "Failed to load offline routing file ", FLAGS_offline_routing_file);
+      AERROR << error_msg;
+      return Status(ErrorCode::PLANNING_ERROR, error_msg);
+    } else {
+      AWARN << "Using offline prouting file " << FLAGS_offline_routing_file;
+    }
+  }
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
   if (!planner_) {
@@ -80,34 +106,19 @@ Status Planning::Start() {
 
 void Planning::RunOnce() {
   AdapterManager::Observe();
-  if (AdapterManager::GetLocalization() == nullptr ||
-      AdapterManager::GetLocalization()->Empty()) {
+  if (AdapterManager::GetLocalization()->Empty()) {
     AERROR << "Localization is not available; skip the planning cycle";
     return;
   }
 
-  if (AdapterManager::GetChassis() == nullptr ||
-      AdapterManager::GetChassis()->Empty()) {
+  if (AdapterManager::GetChassis()->Empty()) {
     AERROR << "Chassis is not available; skip the planning cycle";
     return;
   }
-
-  if (AdapterManager::GetRoutingResult() == nullptr) {
-    AERROR << "RoutingResult is not registered";
+  if (AdapterManager::GetRoutingResult()->Empty()) {
+    AERROR << "RoutingResult is not available; skip the planning cycle";
     return;
   }
-  if (AdapterManager::GetRoutingResult()->Empty()) {
-    // TODO(all) temporarily use the offline routing data.
-    if (!AdapterManager::GetRoutingResult()->FeedFile(
-            FLAGS_offline_routing_file)) {
-      AERROR << "Failed to load offline routing file "
-             << FLAGS_offline_routing_file;
-      return;
-    } else {
-      AWARN << "Using offline prouting file " << FLAGS_offline_routing_file;
-    }
-  }
-  AdapterManager::Observe();
 
   AINFO << "Start planning ...";
 
