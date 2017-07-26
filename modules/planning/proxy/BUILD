@@ -21,22 +21,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "routing_proxy",
-    srcs = [
-        "routing_proxy.cc",
-    ],
-    hdrs = [
-        "routing_proxy.h",
-    ],
-    data = ["//modules/map:map_data"],
-    deps = [
-        "//external:gflags",
-        "//modules/common/math",
-        "//modules/common/status",
-        "//modules/common/util",
-        "//modules/map/proto:map_proto",
-    ],
-)
-
 cpplint()
