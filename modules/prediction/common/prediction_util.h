@@ -17,6 +17,8 @@
 #ifndef MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 #define MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 
+#include <vector>
+
 namespace apollo {
 namespace prediction {
 namespace util {
@@ -26,6 +28,9 @@ double Normalize(const double value, const double mean, const double std);
 double Sigmoid(const double value);
 
 double Relu(const double value);
+
+int SolveQuadraticEquation(const std::vector<double>& coefficients,
+                           std::pair<double, double>* roots);
 
 }  // namespace util
 }  // namespace prediction

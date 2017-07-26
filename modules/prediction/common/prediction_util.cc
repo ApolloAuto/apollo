@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <limits>
 
 #include "modules/prediction/common/prediction_util.h"
 
@@ -33,6 +34,28 @@ double Sigmoid(const double value) {
 
 double Relu(const double value) {
   return (value > 0.0) ? value : 0.0;
+}
+
+int SolveQuadraticEquation(const std::vector<double>& coefficients,
+                           std::pair<double, double>* roots) {
+  if (coefficients.size() != 3) {
+    return -1;
+  }
+  double a = coefficients[0];
+  double b = coefficients[1];
+  double c = coefficients[2];
+  if (std::fabs(a) <= std::numeric_limits<double>::epsilon()) {
+    return -1;
+  }
+
+  double delta = b * b - 4.0 * a * c;
+  if (delta < 0.0) {
+    return -1;
+  }
+
+  roots->first = (0.0 - b + std::sqrt(delta)) / (2.0 * a);
+  roots->second = (0.0 - b - std::sqrt(delta)) / (2.0 * a);
+  return 0;
 }
 
 }  // namespace util
