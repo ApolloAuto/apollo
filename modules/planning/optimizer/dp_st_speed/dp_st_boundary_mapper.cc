@@ -37,9 +37,8 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 
 DpStBoundaryMapper::DpStBoundaryMapper(
-    const StBoundaryConfig& st_boundary_config,
-    const ::apollo::common::config::VehicleParam& veh_param)
-    : StBoundaryMapper(st_boundary_config, veh_param) {}
+    const StBoundaryConfig& st_boundary_config)
+    : StBoundaryMapper(st_boundary_config) {}
 
 Status DpStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
@@ -131,7 +130,6 @@ Status DpStBoundaryMapper::map_obstacle_with_trajectory(
       std::uint32_t high_index = veh_path.size() - 1;
       bool find_low = false;
       bool find_high = false;
-
       while (high_index >= low_index) {
         if (find_high && find_low) {
           break;
@@ -202,7 +200,6 @@ Status DpStBoundaryMapper::map_obstacle_without_trajectory(
   std::uint32_t high_index = veh_path.size() - 1;
   bool find_low = false;
   bool find_high = false;
-
   while (high_index >= low_index) {
     if (find_high && find_low) {
       break;

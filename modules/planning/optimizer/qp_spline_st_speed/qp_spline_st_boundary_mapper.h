@@ -35,9 +35,7 @@ namespace planning {
 
 class QpSplineStBoundaryMapper : public StBoundaryMapper {
  public:
-  QpSplineStBoundaryMapper(
-      const StBoundaryConfig& st_boundary_config,
-      const apollo::common::config::VehicleParam& veh_param);
+  QpSplineStBoundaryMapper(const StBoundaryConfig& st_boundary_config);
 
   apollo::common::Status get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
