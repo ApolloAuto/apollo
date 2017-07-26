@@ -41,7 +41,7 @@ namespace planning {
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 using apollo::common::TrajectoryPoint;
-using apollo::common::vehicle_state::VehicleState;
+using apollo::common::VehicleState;
 
 EMPlanner::EMPlanner() {}
 
@@ -70,9 +70,10 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   routing_proxy_.Init();
   for (auto& optimizer : optimizers_) {
     if (!optimizer->Init()) {
-      AERROR << common::util::StrCat("Init optimizer[", optimizer->name(),
-                                     "] failed.");
-      return Status(ErrorCode::PLANNING_ERROR, "Init optimizer failed.");
+      std::string msg(common::util::StrCat("Init optimizer[", optimizer->name(),
+                                     "] failed."));
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
   return Status::OK();
@@ -104,7 +105,8 @@ Status EMPlanner::MakePlan(
   planning_data->set_decision_data(decision_data);
   for (auto& optimizer : optimizers_) {
     optimizer->Optimize(planning_data);
-    ADEBUG << planning_data->DebugString();
+    ADEBUG << "after optimizer " << optimizer->name()
+        << ":" << planning_data->DebugString();
   }
   PublishableTrajectory computed_trajectory;
   if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution,
@@ -180,8 +182,8 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
   ReferenceLineSmoother smoother;
   smoother.SetConfig(smoother_config_);  // use the default value in config.
 
-  vehicle_position.set_x(common::vehicle_state::VehicleState::instance()->x());
-  vehicle_position.set_y(common::vehicle_state::VehicleState::instance()->y());
+  vehicle_position.set_x(common::VehicleState::instance()->x());
+  vehicle_position.set_y(common::VehicleState::instance()->y());
 
   for (const auto& lane : routing_result.route()) {
     hdmap::Id lane_id;

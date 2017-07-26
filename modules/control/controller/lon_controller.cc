@@ -29,7 +29,7 @@ namespace control {
 
 using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::time::Clock;
-using ::apollo::common::vehicle_state::VehicleState;
+using ::apollo::common::VehicleState;
 
 LonController::LonController()
     : name_(ControlConf_ControllerType_Name(ControlConf::LON_CONTROLLER)) {
@@ -154,7 +154,6 @@ Status LonController::ComputeControlCommand(
     ::apollo::control::ControlCommand *cmd) {
   localization_ = localization;
   chassis_ = chassis;
-  VehicleState::instance()->Update(localization, chassis);
 
   trajectory_message_ = planning_published_trajectory;
   if (!control_interpolation_) {

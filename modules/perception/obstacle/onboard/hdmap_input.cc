@@ -186,8 +186,8 @@ void HDMapInput::DownSampleBoundary(const apollo::hdmap::LineSegment& line,
     const PointD& point_0 = raw_cloud->points[spt];
     const PointD& point_1 = raw_cloud->points[i - 1];
     const PointD& point_2 = raw_cloud->points[i];
-    Eigen::Vector2d v1(point_1.x - point_0.x, point_1.y - point_0.y);
-    Eigen::Vector2d v2(point_2.x - point_1.x, point_2.y - point_1.y);
+    common::math::Vec2d v1(point_1.x - point_0.x, point_1.y - point_0.y);
+    common::math::Vec2d v2(point_2.x - point_1.x, point_2.y - point_1.y);
     double vector_dist =
         sqrt(v1.cwiseProduct(v1).sum()) * sqrt(v2.cwiseProduct(v2).sum());
     // judge duplicate points
