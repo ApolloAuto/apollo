@@ -32,9 +32,9 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-DpStGraph::DpStGraph(const DpStConfiguration& dp_config,
+DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config,
                      const apollo::common::config::VehicleParam& veh_param)
-    : _dp_st_configuration(dp_config), _dp_st_cost(dp_config) {}
+    : _dp_st_speed_config(dp_config), _dp_st_cost(dp_config) {}
 
 Status DpStGraph::search(const StGraphData& st_graph_data,
                          DecisionData* const decision_data,
@@ -42,9 +42,8 @@ Status DpStGraph::search(const StGraphData& st_graph_data,
   _init_point = st_graph_data.init_point();
 
   if (st_graph_data.path_data_length() <
-      _dp_st_configuration.total_path_length()) {
-    _dp_st_configuration.set_total_path_length(
-        st_graph_data.path_data_length());
+      _dp_st_speed_config.total_path_length()) {
+    _dp_st_speed_config.set_total_path_length(st_graph_data.path_data_length());
   }
 
   if (!init_cost_table().ok()) {
@@ -81,21 +80,21 @@ Status DpStGraph::search(const StGraphData& st_graph_data,
 }
 
 Status DpStGraph::init_cost_table() {
-  std::uint32_t dim_s = _dp_st_configuration.matrix_dimension_s();
-  std::uint32_t dim_t = _dp_st_configuration.matrix_dimension_t();
+  std::uint32_t dim_s = _dp_st_speed_config.matrix_dimension_s();
+  std::uint32_t dim_t = _dp_st_speed_config.matrix_dimension_t();
 
-  if (Double::compare(_dp_st_configuration.total_path_length(), 0.0) == 0) {
+  if (Double::compare(_dp_st_speed_config.total_path_length(), 0.0) == 0) {
     _unit_s = 1e-8;
-    std::uint32_t dim_s = std::min(
-        dim_s, static_cast<std::uint32_t>(
-                   _dp_st_configuration.total_path_length() / _unit_s) +
-                   1);
+    std::uint32_t dim_s =
+        std::min(dim_s, static_cast<std::uint32_t>(
+                            _dp_st_speed_config.total_path_length() / _unit_s) +
+                            1);
   } else {
-    _unit_s = _dp_st_configuration.total_path_length() / dim_s;
+    _unit_s = _dp_st_speed_config.total_path_length() / dim_s;
   }
 
-  _unit_t = _dp_st_configuration.total_time() /
-            _dp_st_configuration.matrix_dimension_t();
+  _unit_t = _dp_st_speed_config.total_time() /
+            _dp_st_speed_config.matrix_dimension_t();
   _cost_table = std::vector<std::vector<StGraphPoint>>(
       dim_t, std::vector<StGraphPoint>(dim_s, StGraphPoint()));
 
@@ -116,8 +115,8 @@ Status DpStGraph::calculate_pointwise_cost(
   // TODO: extract reference line from decision first
   std::vector<STPoint> reference_points;
   for (std::uint32_t i = 0; i < _cost_table.size(); ++i) {
-    reference_points.emplace_back(
-        _unit_t * i * _dp_st_configuration.max_speed(), _unit_t * i);
+    reference_points.emplace_back(_unit_t * i * _dp_st_speed_config.max_speed(),
+                                  _unit_t * i);
   }
 
   for (std::uint32_t i = 0; i < _cost_table.size(); ++i) {
@@ -158,7 +157,7 @@ void DpStGraph::calculate_total_cost(const std::uint32_t r,
     return;
   }
   // TODO: get speed limit from mapper @Liu Changchun
-  double speed_limit = _dp_st_configuration.max_speed();
+  double speed_limit = _dp_st_speed_config.max_speed();
   if (r == 1) {
     _cost_table[r][c].set_total_cost(
         _cost_table[r][c].obstacle_cost() + _cost_table[0][0].total_cost() +
@@ -168,7 +167,7 @@ void DpStGraph::calculate_total_cost(const std::uint32_t r,
   }
 
   std::uint32_t max_s_diff = static_cast<std::uint32_t>(
-      _dp_st_configuration.max_speed() * _unit_t / _unit_s);
+      _dp_st_speed_config.max_speed() * _unit_t / _unit_s);
   std::uint32_t c_low = (max_s_diff < c ? c - max_s_diff : 0);
 
   if (r == 2) {
@@ -225,9 +224,9 @@ bool DpStGraph::feasible_accel_range(const double c_pre, const double c_cur,
   double tcoef = _unit_t * _unit_t / _unit_s;
   // TODO change 4.5 to configurable version
   double lval = std::max(
-      2 * c_pre - c_cur + _dp_st_configuration.max_deceleration() * tcoef, 0.0);
+      2 * c_pre - c_cur + _dp_st_speed_config.max_deceleration() * tcoef, 0.0);
   double rval = std::min(
-      2 * c_pre - c_cur + _dp_st_configuration.max_acceleration() * tcoef,
+      2 * c_pre - c_cur + _dp_st_speed_config.max_acceleration() * tcoef,
       c_pre);
 
   if (rval < lval) {
@@ -333,7 +332,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
 
-      double s_upper = _dp_st_configuration.total_path_length();
+      double s_upper = _dp_st_speed_config.total_path_length();
       double s_lower = 0.0;
       if (obs_it->get_boundary_s_range_by_time(st_it->t(), &s_upper,
                                                &s_lower)) {
