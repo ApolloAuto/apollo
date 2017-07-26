@@ -32,21 +32,20 @@
 namespace apollo {
 namespace planning {
 
-class StGraphBoundary final : public ::apollo::common::math::Polygon2d {
+class StGraphBoundary : public common::math::Polygon2d {
  public:
   enum class BoundaryType {
+    UNKNOWN,
     STOP,
     FOLLOW,
     YIELD,
     OVERTAKE,
     SIDEPASSFOLLOW,
     SIDEPASSLEAD,
-    UNKNOWN
   };
 
   explicit StGraphBoundary(const std::vector<STPoint>& points);
-  explicit StGraphBoundary(
-      const std::vector<::apollo::common::math::Vec2d>& points);
+  explicit StGraphBoundary(const std::vector<common::math::Vec2d>& points);
 
   ~StGraphBoundary() = default;
 
@@ -54,8 +53,8 @@ class StGraphBoundary final : public ::apollo::common::math::Polygon2d {
   bool IsPointInBoundary(const StGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;
 
-  const ::apollo::common::math::Vec2d point(const uint32_t index) const;
-  const std::vector<::apollo::common::math::Vec2d>& points() const;
+  const common::math::Vec2d point(const uint32_t index) const;
+  const std::vector<common::math::Vec2d>& points() const;
 
   BoundaryType boundary_type() const;
   uint32_t id() const;
@@ -74,7 +73,7 @@ class StGraphBoundary final : public ::apollo::common::math::Polygon2d {
   void get_boundary_time_scope(double* start_t, double* end_t) const;
 
  private:
-  BoundaryType _boundary_type;
+  BoundaryType _boundary_type = BoundaryType::UNKNOWN;
   uint32_t _id = 0;
   double _characteristic_length = 1.0;
   double _s_high_limit = 200.0;

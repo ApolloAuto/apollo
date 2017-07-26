@@ -162,6 +162,14 @@ class Adapter {
   }
 
   /**
+   * @brief returns TRUE if the adapter has received any message.
+   */
+  bool HasReceived() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return data_queue_.empty();
+  }
+
+  /**
    * @brief returns the most recent message in the observing queue.
    *
    * /note
