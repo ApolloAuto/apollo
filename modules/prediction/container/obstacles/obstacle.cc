@@ -126,6 +126,11 @@ const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() {
   return kf_motion_tracker_;
 }
 
+const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  return kf_pedestrian_tracker_;
+}
+
 bool Obstacle::IsOnLane() {
   std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0) {
@@ -414,49 +419,6 @@ void Obstacle::InitKFMotionTracker(Feature* feature) {
   kf_motion_tracker_enabled_ = true;
 }
 
-void Obstacle::InitKFPedestrianTracker(Feature* feature) {
-  // Set transition matrix F
-  Eigen::Matrix<double, 2, 2> F;
-  F.setIdentity();
-  kf_pedestrian_tracker_.SetTransitionMatrix(F);
-
-  // Set observation matrix H
-  Eigen::Matrix<double, 2, 2> H;
-  H.setIdentity();
-  kf_pedestrian_tracker_.SetObservationMatrix(H);
-
-  // Set control matrix
-  Eigen::Matrix<double, 2, 4> B;
-  B.setZero();
-  kf_pedestrian_tracker_.SetControlMatrix(B);
-
-  // Set covariance of transition noise matrix Q
-  Eigen::Matrix<double, 2, 2> Q;
-  Q.setIdentity();
-  Q *= FLAGS_q_var;
-  kf_pedestrian_tracker_.SetTransitionNoise(Q);
-
-  // Set observation noise matrix R
-  Eigen::Matrix<double, 2, 2> R;
-  R.setIdentity();
-  R *= FLAGS_r_var;
-  kf_pedestrian_tracker_.SetObservationNoise(R);
-
-  // Set current state covariance matrix P
-  Eigen::Matrix<double, 2, 2> P;
-  P.setIdentity();
-  P *= FLAGS_p_var;
-
-  // Set initial state
-  Eigen::Matrix<double, 2, 1> x;
-  x(0, 0) = feature->position().x();
-  x(1, 0) = feature->position().y();
-
-  kf_pedestrian_tracker_.SetStateEstimate(x, P);
-
-  kf_pedestrian_tracker_enabled_ = true;
-}
-
 void Obstacle::UpdateKFMotionTracker(Feature* feature) {
   double delta_ts = 0.0;
   if (feature_history_.size() > 0) {
@@ -483,45 +445,6 @@ void Obstacle::UpdateKFMotionTracker(Feature* feature) {
   kf_motion_tracker_.Correct(z);
 
   UpdateMotionBelief(feature);
-}
-
-void Obstacle::UpdateKFPedestrianTracker(Feature* feature) {
-  double delta_ts = 0.0;
-  if (!feature_history_.empty()) {
-    delta_ts = feature->timestamp() - feature_history_.front().timestamp();
-  }
-  if (delta_ts <= std::numeric_limits<double>::epsilon()) {
-    return;
-  }
-  Eigen::Matrix<double, 2, 4> B = kf_pedestrian_tracker_.GetControlMatrix();
-  B(0, 0) = delta_ts;
-  B(0, 2) = 0.5 * delta_ts * delta_ts;
-  B(1, 1) = delta_ts;
-  B(1, 3) = 0.5 * delta_ts * delta_ts;
-  kf_pedestrian_tracker_.SetControlMatrix(B);
-
-  // Set control vector
-  Eigen::Matrix<double, 4, 1> u;
-  u(0, 0) = feature->t_velocity().x();
-  u(1, 0) = feature->t_velocity().y();
-  if (FLAGS_enable_pedestrian_acc) {
-    u(2, 0) = feature->t_acceleration().x();
-    u(3, 0) = feature->t_acceleration().y();
-  }
-
-  kf_pedestrian_tracker_.Predict(u);
-
-  // Set observation vector
-  Eigen::Matrix<double, 2, 1> z;
-  z(0, 0) = feature->position().x();
-  z(1, 0) = feature->position().y();
-  kf_pedestrian_tracker_.Correct(z);
-
-  // Update feature by Kalman filter
-  feature->mutable_t_position()->set_x(
-      kf_pedestrian_tracker_.GetStateEstimate()(0, 0));
-  feature->mutable_t_position()->set_y(
-      kf_pedestrian_tracker_.GetStateEstimate()(1, 0));
 }
 
 void Obstacle::UpdateMotionBelief(Feature* feature) {
@@ -711,6 +634,88 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
 
   ADEBUG << "Obstacle [" << id_ << "] set tracked speed [" << lane_speed
          << " and tracked acc [" << lane_acc << "]";
+}
+
+void Obstacle::InitKFPedestrianTracker(Feature* feature) {
+  // Set transition matrix F
+  Eigen::Matrix<double, 2, 2> F;
+  F.setIdentity();
+  kf_pedestrian_tracker_.SetTransitionMatrix(F);
+
+  // Set observation matrix H
+  Eigen::Matrix<double, 2, 2> H;
+  H.setIdentity();
+  kf_pedestrian_tracker_.SetObservationMatrix(H);
+
+  // Set control matrix
+  Eigen::Matrix<double, 2, 4> B;
+  B.setZero();
+  kf_pedestrian_tracker_.SetControlMatrix(B);
+
+  // Set covariance of transition noise matrix Q
+  Eigen::Matrix<double, 2, 2> Q;
+  Q.setIdentity();
+  Q *= FLAGS_q_var;
+  kf_pedestrian_tracker_.SetTransitionNoise(Q);
+
+  // Set observation noise matrix R
+  Eigen::Matrix<double, 2, 2> R;
+  R.setIdentity();
+  R *= FLAGS_r_var;
+  kf_pedestrian_tracker_.SetObservationNoise(R);
+
+  // Set current state covariance matrix P
+  Eigen::Matrix<double, 2, 2> P;
+  P.setIdentity();
+  P *= FLAGS_p_var;
+
+  // Set initial state
+  Eigen::Matrix<double, 2, 1> x;
+  x(0, 0) = feature->position().x();
+  x(1, 0) = feature->position().y();
+
+  kf_pedestrian_tracker_.SetStateEstimate(x, P);
+
+  kf_pedestrian_tracker_enabled_ = true;
+}
+
+void Obstacle::UpdateKFPedestrianTracker(Feature* feature) {
+  double delta_ts = 0.0;
+  if (!feature_history_.empty()) {
+    delta_ts = feature->timestamp() - feature_history_.front().timestamp();
+  }
+  if (delta_ts <= std::numeric_limits<double>::epsilon()) {
+    return;
+  }
+  Eigen::Matrix<double, 2, 4> B = kf_pedestrian_tracker_.GetControlMatrix();
+  B(0, 0) = delta_ts;
+  B(0, 2) = 0.5 * delta_ts * delta_ts;
+  B(1, 1) = delta_ts;
+  B(1, 3) = 0.5 * delta_ts * delta_ts;
+  kf_pedestrian_tracker_.SetControlMatrix(B);
+
+  // Set control vector
+  Eigen::Matrix<double, 4, 1> u;
+  u(0, 0) = feature->t_velocity().x();
+  u(1, 0) = feature->t_velocity().y();
+  if (FLAGS_enable_pedestrian_acc) {
+    u(2, 0) = feature->t_acceleration().x();
+    u(3, 0) = feature->t_acceleration().y();
+  }
+
+  kf_pedestrian_tracker_.Predict(u);
+
+  // Set observation vector
+  Eigen::Matrix<double, 2, 1> z;
+  z(0, 0) = feature->position().x();
+  z(1, 0) = feature->position().y();
+  kf_pedestrian_tracker_.Correct(z);
+
+  // Update feature by Kalman filter
+  feature->mutable_t_position()->set_x(
+      kf_pedestrian_tracker_.GetStateEstimate()(0, 0));
+  feature->mutable_t_position()->set_y(
+      kf_pedestrian_tracker_.GetStateEstimate()(1, 0));
 }
 
 void Obstacle::SetCurrentLanes(Feature* feature) {
