@@ -66,14 +66,14 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   for (int i = 0; i < config.em_planner_config().optimizer_size(); ++i) {
     optimizers_.emplace_back(optimizer_factory_.CreateObject(
         config.em_planner_config().optimizer(i)));
-    optimizers_.back()->Init();
   }
   routing_proxy_.Init();
   for (auto& optimizer : optimizers_) {
     if (!optimizer->Init()) {
-      AERROR << common::util::StrCat("Init optimizer[", optimizer->name(),
-                                     "] failed.");
-      return Status(ErrorCode::PLANNING_ERROR, "Init optimizer failed.");
+      std::string msg(common::util::StrCat("Init optimizer[", optimizer->name(),
+                                     "] failed."));
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
   return Status::OK();
