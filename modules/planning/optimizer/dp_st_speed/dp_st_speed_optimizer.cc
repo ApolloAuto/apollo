@@ -59,7 +59,7 @@ bool DpStSpeedOptimizer::Init() {
 Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    const TrajectoryPoint& init_point,
                                    DecisionData* const decision_data,
-                                   SpeedData* const speed_data) const {
+                                   SpeedData* const speed_data) {
   ::apollo::common::config::VehicleParam veh_param =
       VehicleConfigHelper::GetConfig().vehicle_param();
 
