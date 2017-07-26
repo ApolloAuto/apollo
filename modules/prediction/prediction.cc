@@ -43,8 +43,11 @@ Status Prediction::Init() {
   conf_.Clear();
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
                                                 &conf_)) {
-    return OnError("Unable to load prediction conf file" +
+    return OnError("Unable to load prediction conf file: " +
                    FLAGS_prediction_conf_file);
+  } else {
+    ADEBUG << "Config file is loaded into: "
+           << conf_.ShortDebugString();
   }
 
   // Initialize the adapters
