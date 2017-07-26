@@ -41,7 +41,7 @@ class SpeedOptimizer : public Optimizer {
   virtual apollo::common::Status Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          DecisionData* const decision_data,
-                                         SpeedData* const speed_data) const = 0;
+                                         SpeedData* const speed_data) = 0;
 };
 
 }  // namespace planning
