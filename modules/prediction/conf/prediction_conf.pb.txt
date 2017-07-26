@@ -1,7 +1,7 @@
 obstacle_conf {
   obstacle_type: VEHICLE
-  evaluator_type: MLP_EVALUATOR
   status: ON_LANE
+  evaluator_type: MLP_EVALUATOR
   predictor_type: LANE_SEQUENCE_PREDICTOR
 }
 obstacle_conf {
