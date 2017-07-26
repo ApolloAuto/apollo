@@ -38,8 +38,6 @@ class QPSplinePathGenerator {
  public:
   QPSplinePathGenerator() = default;
   bool SetConfig(const std::string& config_file);
-  void SetConfig(const QPSplinePathConfig& config);
-
   bool generate(const ReferenceLine& reference_line,
                 const DecisionData& decision_data, const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,

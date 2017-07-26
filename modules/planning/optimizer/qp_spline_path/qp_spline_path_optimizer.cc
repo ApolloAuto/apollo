@@ -31,6 +31,10 @@ QPSplinePathOptimizer::QPSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
 bool QPSplinePathOptimizer::Init() {
+  if (!_path_generator.SetConfig(FLAGS_qp_spline_path_config_file)) {
+    AERROR << "Fail to set config file for path generator.";
+    return false;
+  }
   is_init_ = true;
   return true;
 }
@@ -40,7 +44,11 @@ Status QPSplinePathOptimizer::Process(const SpeedData& speed_data,
                                       const common::TrajectoryPoint& init_point,
                                       DecisionData* const decision_data,
                                       PathData* const path_data) {
-  _path_generator.SetConfig(FLAGS_qp_spline_path_config_file);
+  if (!is_init_) {
+    AERROR << "Please call Init() before Process.";
+    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
+  }
+
   if (!_path_generator.generate(reference_line, *decision_data, speed_data,
                                 init_point, path_data)) {
     const std::string msg = "failed to generate spline path!";
