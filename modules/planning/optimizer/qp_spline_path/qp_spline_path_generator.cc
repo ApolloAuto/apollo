@@ -31,10 +31,6 @@
 namespace apollo {
 namespace planning {
 
-void QPSplinePathGenerator::SetConfig(const QPSplinePathConfig& config) {
-  _qp_spline_path_config = config;
-}
-
 bool QPSplinePathGenerator::SetConfig(const std::string& config_file) {
   if (!common::util::GetProtoFromFile(config_file, &_qp_spline_path_config)) {
     AERROR << "Failed to load config file " << config_file;
