@@ -25,7 +25,6 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/optimizer/dp_st_speed/dp_st_boundary_mapper.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 #include "modules/planning/optimizer/st_graph/st_graph_data.h"
 
@@ -42,9 +41,7 @@ DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
 bool DpStSpeedOptimizer::Init() {
-  // TOOD: complete this function.
-  if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
-                                      &st_boundary_config_)) {
+  if (!boundary_mapper_.SetConfig(FLAGS_st_boundary_config_file)) {
     AERROR << "failed to load config file " << FLAGS_dp_st_speed_config_file;
     return false;
   }
@@ -63,7 +60,6 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    DecisionData* const decision_data,
                                    SpeedData* const speed_data) {
   // step 1 get boundaries
-  DpStBoundaryMapper st_mapper(st_boundary_config_);
   double planning_distance = std::min(dp_st_speed_config_.total_path_length(),
                                       path_data.path().param_length());
   std::vector<StGraphBoundary> boundaries;
@@ -71,7 +67,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                                        ->current_frame()
                                                        ->mutable_planning_data()
                                                        ->init_planning_point();
-  if (!st_mapper
+  if (!boundary_mapper_
            .get_graph_boundary(initial_planning_point, *decision_data,
                                path_data, reference_line,
                                dp_st_speed_config_.total_path_length(),
@@ -85,7 +81,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 2 perform graph search
   SpeedLimit speed_limit;
-  if (st_mapper.get_speed_limits(
+  if (boundary_mapper_.get_speed_limits(
           common::VehicleState::instance()->pose(),
           DataCenter::instance()->map(), path_data, planning_distance,
           dp_st_speed_config_.matrix_dimension_s(),

@@ -28,6 +28,7 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_boundary_mapper.h"
 
 namespace apollo {
 namespace planning {
@@ -44,7 +45,7 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
       const apollo::common::TrajectoryPoint& init_point,
       const ReferenceLine& reference_line, DecisionData* const decision_data,
       SpeedData* const speed_data) override;
-  StBoundaryConfig st_boundary_config_;
+  QpSplineStBoundaryMapper boundary_mapper_;
   QpSplineStSpeedConfig qp_spline_st_speed_config_;
 };
 

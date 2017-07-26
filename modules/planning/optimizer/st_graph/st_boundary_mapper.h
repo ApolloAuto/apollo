@@ -42,11 +42,10 @@ namespace planning {
 
 class StBoundaryMapper {
  public:
-  StBoundaryMapper(
-      const apollo::planning::StBoundaryConfig& st_boundary_config);
-
+  StBoundaryMapper() = default;
   virtual ~StBoundaryMapper() = default;
 
+  bool SetConfig(const std::string& config_file);
   virtual apollo::common::Status get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
