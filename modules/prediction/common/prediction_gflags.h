@@ -53,6 +53,7 @@ DECLARE_double(coeff_mul_sigma);
 DECLARE_double(pedestrian_max_speed);
 DECLARE_double(pedestrian_min_acc);
 DECLARE_double(pedestrian_max_acc);
+DECLARE_double(prediction_pedestrian_total_time);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);

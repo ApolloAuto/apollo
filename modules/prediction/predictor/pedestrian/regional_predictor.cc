@@ -67,10 +67,58 @@ double CrossProduct(const Eigen::Vector2d& vec1, const Eigen::Vector2d& vec2) {
 }  // namespace
 
 void RegionalPredictor::Predict(Obstacle* obstacle) {
+
   // TODO(kechxu) implement
 }
 
-void RegionalPredictor::GenerateStillTrajectory(
+void RegionalPredictor::GenerateMovingTrajectory(
+    const Obstacle* obstacle, double probability) {
+  if (obstacle == nullptr) {
+    AERROR << "Missing obstacle.";
+    return;
+  }
+  const Feature& feature = obstacle->latest_feature();
+  if (!feature.has_position() ||
+      !feature.position().has_x() ||
+      !feature.position().has_y() ||
+      !feature.has_velocity()) {
+    AERROR << "Missing position or velocity.";
+    return;
+  }
+
+  Eigen::Vector2d position(feature.position().x(), feature.position().y());
+  Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
+  Eigen::Vector2d acc(0.0, 0.0);
+  if (FLAGS_enable_kf_tracking) {
+    velocity[0] = feature.t_velocity().x();
+    velocity[1] = feature.t_velocity().y();
+  }
+  if (FLAGS_enable_pedestrian_acc) {
+    acc = {feature.acceleration().x(), feature.acceleration().y()};
+    if (FLAGS_enable_kf_tracking) {
+      acc = {feature.t_acceleration().x(), feature.t_acceleration().y()};
+    }
+  }
+
+  double total_time = FLAGS_prediction_pedestrian_total_time;
+  std::vector<TrajectoryPoint> left_points;
+  std::vector<TrajectoryPoint> right_points;
+
+  DrawMovingTrajectory(position, velocity, acc,
+      obstacle->kf_pedestrian_tracker(), total_time,
+      &left_points, &right_points);
+  int start_index = GetTrajectorySize();
+  
+  Trajectory left_trajectory;
+  Trajectory right_trajectory;
+  GenerateTrajectory(left_points, &left_trajectory);
+  GenerateTrajectory(right_points, &right_trajectory);
+  prediction_obstacle_.add_trajectory()->CopyFrom(left_trajectory);
+  prediction_obstacle_.add_trajectory()->CopyFrom(right_trajectory);
+  SetEqualProbability(probability, start_index);
+}
+
+void RegionalPredictor::DrawStillTrajectory(
     const Eigen::Vector2d& position,
     const double heading, const double speed, const double total_time,
     std::vector<TrajectoryPoint>* points) {
@@ -92,7 +140,7 @@ void RegionalPredictor::GenerateStillTrajectory(
   }
 }
 
-void RegionalPredictor::GenerateMovingTrajectory(
+void RegionalPredictor::DrawMovingTrajectory(
     const Eigen::Vector2d& position,
     const Eigen::Vector2d& velocity,
     const Eigen::Vector2d& acceleration,
