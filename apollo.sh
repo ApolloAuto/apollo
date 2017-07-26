@@ -71,7 +71,6 @@ function check_esd_files() {
   CAN_CARD="fake_can"
 
   if [ -f ./third_party/can_card_library/esd_can/include/ntcan.h \
-      -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so \
       -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4 \
       -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4.0.1 ]; then
       USE_ESD_CAN=true
