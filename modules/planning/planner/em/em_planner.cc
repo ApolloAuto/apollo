@@ -66,6 +66,7 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   for (int i = 0; i < config.em_planner_config().optimizer_size(); ++i) {
     optimizers_.emplace_back(optimizer_factory_.CreateObject(
         config.em_planner_config().optimizer(i)));
+    AINFO << "Created optimizer:" << optimizers_.back()->name();
   }
   routing_proxy_.Init();
   for (auto& optimizer : optimizers_) {
