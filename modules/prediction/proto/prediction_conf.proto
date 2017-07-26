@@ -5,15 +5,15 @@ package apollo.prediction;
 import "modules/perception/proto/perception_obstacle.proto";
 
 message ObstacleConf {
-  enum EvaluatorType {
-    MLP_EVALUATOR = 0;
-  }
-
-  enum Status {
+   enum Status {
     ON_LANE = 0;
     OFF_LANE = 1;
     STATIONARY = 3;
     MOVING = 4;
+  }
+
+  enum EvaluatorType {
+    MLP_EVALUATOR = 0;
   }
 
   enum PredictorType {

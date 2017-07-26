@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/prediction.h"
-
 #include "gtest/gtest.h"
+
+#include "modules/prediction/prediction.h"
 
 namespace apollo {
 namespace prediction {
@@ -24,13 +24,15 @@ namespace prediction {
 using ::apollo::common::Status;
 
 class PredictionTest : public ::testing::Test {
+ public:
   virtual void SetUp() {}
+
+ protected:
+  Prediction prediction_;
 };
 
 TEST_F(PredictionTest, Simple) {
-  Prediction prediction;
-  EXPECT_EQ(prediction.Name(), "prediction");
-  prediction.Init();
+  EXPECT_EQ(prediction_.Name(), "prediction");
 }
 
 }  // namespace prediction
