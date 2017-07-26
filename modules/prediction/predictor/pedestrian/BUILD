@@ -4,16 +4,16 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "regional_predictor",
-    hdrs = ["regional_predictor.h"],
     srcs = ["regional_predictor.cc"],
+    hdrs = ["regional_predictor.h"],
     deps = [
-        "//modules/prediction/predictor:predictor",
-        "//modules/prediction/common:prediction_util",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/common/proto:path_point_proto",
         "//modules/common/math:kalman_filter",
+        "//modules/common/proto:path_point_proto",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/predictor",
         "@glog//:glog",
-    ]
+    ],
 )
 
 cpplint()

@@ -19,7 +19,6 @@ cc_library(
         "trajectory_cost.h",
     ],
     deps = [
-        "@eigen//:eigen",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/status",
@@ -37,6 +36,7 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/proto:dp_poly_path_config_proto",
         "//modules/planning/reference_line",
+        "@eigen//:eigen",
     ],
 )
 

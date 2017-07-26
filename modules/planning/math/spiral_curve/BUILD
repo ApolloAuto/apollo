@@ -41,9 +41,9 @@ cc_library(
         ":spiral_curve",
         ":spiral_formula",
         "//modules/common:log",
+        "//modules/common/math",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:path_point_proto",
-        "//modules/common/math:math",
         "@eigen//:eigen",
     ],
 )
@@ -60,8 +60,8 @@ cc_library(
         ":spiral_curve",
         ":spiral_formula",
         "//modules/common:log",
+        "//modules/common/math",
         "//modules/common/proto:path_point_proto",
-        "//modules/common/math:math",
         "@eigen//:eigen",
     ],
 )

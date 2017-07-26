@@ -7,19 +7,19 @@ cc_library(
     srcs = ["container_manager.cc"],
     hdrs = ["container_manager.h"],
     deps = [
+        "//modules/common:macro",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
-        "//modules/common:macro",
-        "@glog//:glog"
-    ]
+        "@glog//:glog",
+    ],
 )
 
 cc_library(
     name = "container",
     hdrs = ["container.h"],
     deps = [
-        "@com_github_google_protobuf//:protobuf"
-    ]
+        "@com_github_google_protobuf//:protobuf",
+    ],
 )
 
 cpplint()

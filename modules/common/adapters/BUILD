@@ -46,8 +46,8 @@ cc_library(
         "//modules/common/time",
         "//modules/common/util",
         "@com_github_google_protobuf//:protobuf",
-        "@ros//:ros_common",
         "@glog//:glog",
+        "@ros//:ros_common",
     ],
 )
 
@@ -64,8 +64,8 @@ cc_test(
         ":adapter",
         ":adapter_gflags",
         "//modules/localization/proto:localization_proto",
-        "@ros//:ros_common",
         "@gtest//:main",
+        "@ros//:ros_common",
     ],
 )
 

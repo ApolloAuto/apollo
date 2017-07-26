@@ -16,7 +16,7 @@ cc_proto_library(
 py_proto_compile(
     name = "decision_proto_pylib",
     protos = [
-        "decision.proto"
+        "decision.proto",
     ],
     deps = [
         "//modules/common/proto:common_proto_pylib",

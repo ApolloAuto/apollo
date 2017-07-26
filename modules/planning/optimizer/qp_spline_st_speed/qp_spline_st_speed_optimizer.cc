@@ -72,11 +72,12 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
-  if (boundary_mapper_.get_graph_boundary(
-          init_point, *decision_data, path_data, reference_line,
-          qp_spline_st_speed_config_.total_path_length(),
-          qp_spline_st_speed_config_.total_time(),
-          &boundaries) != Status::OK()) {
+  if (!boundary_mapper_
+           .get_graph_boundary(
+               init_point, *decision_data, path_data, reference_line,
+               qp_spline_st_speed_config_.total_path_length(),
+               qp_spline_st_speed_config_.total_time(), &boundaries)
+           .ok()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
