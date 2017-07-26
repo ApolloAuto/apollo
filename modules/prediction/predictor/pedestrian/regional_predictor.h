@@ -22,7 +22,12 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_PEDESTRIAN_REGIONAL_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_PEDESTRIAN_REGIONAL_PREDICTOR_H_
 
+#include <vector>
+
+#include "Eigen/Dense"
+
 #include "modules/prediction/predictor/predictor.h"
+#include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -44,6 +49,58 @@ class RegionalPredictor : public Predictor {
    * @param Obstacle pointer
    */
   void Predict(Obstacle* obstacle) override;
+
+  void GetTrajectoryCandidatePoints(
+      const Eigen::Vector2d& position,
+      const Eigen::Vector2d& velocity,
+      const Eigen::Vector2d& acceleration,
+      const apollo::common::math::KalmanFilter<double, 2, 2, 4>& kf,
+      const double total_time,
+      std::vector<apollo::common::TrajectoryPoint>* middle_points,
+      std::vector<apollo::common::TrajectoryPoint>* boundary_points);
+
+  void UpdateTrajectoryPoints(
+      const apollo::common::TrajectoryPoint& starting_point,
+      const Eigen::Vector2d& velocity,
+      const double delta_ts,
+      const std::vector<apollo::common::TrajectoryPoint>& middle_points,
+      const std::vector<apollo::common::TrajectoryPoint>& boundary_points,
+      std::vector<apollo::common::TrajectoryPoint>* left_points,
+      std::vector<apollo::common::TrajectoryPoint>* right_points);
+
+  void InsertTrajectoryPoint(
+      const apollo::common::TrajectoryPoint& prev_middle_point,
+      const Eigen::Vector2d& middle_direction,
+      const apollo::common::TrajectoryPoint& boundary_point,
+      const double speed,
+      const double delta_ts,
+      int* left_i,
+      int* right_i,
+      double* left_heading,
+      double* right_heading,
+      std::vector<apollo::common::TrajectoryPoint>* left_points,
+      std::vector<apollo::common::TrajectoryPoint>* right_points);
+
+  void GetTwoEllipsePoints(
+      const double position_x, const double position_y,
+      const double direction_x, const double direction_y,
+      const double ellipse_len_x, const double ellipse_len_y,
+      apollo::common::TrajectoryPoint* ellipse_point_1,
+      apollo::common::TrajectoryPoint* ellipse_point_2);
+
+  void GetQuadraticCoefficients(
+      const double position_x, const double position_y,
+      const double direction_x, const double direction_y,
+      const double ellipse_len_1, const double ellipse_len_2,
+      std::vector<double>* coefficients);
+
+  void UpdateHeading(
+      const apollo::common::TrajectoryPoint& curr_point,
+      std::vector<apollo::common::TrajectoryPoint>* points);
+
+  void TranslatePoint(
+      const double translate_x, const double translate_y,
+      apollo::common::TrajectoryPoint* point);
 };
 
 }  // namespace prediction
