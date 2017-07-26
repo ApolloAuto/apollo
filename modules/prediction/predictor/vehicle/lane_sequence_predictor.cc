@@ -66,6 +66,11 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
       continue;
     }
 
+    ADEBUG << "Obstacle [" << obstacle->id()
+           << "] will draw a lane sequence trajectory ["
+           << ToString(sequence) << "] with probability ["
+           << sequence.probability() << "].";
+
     std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
     DrawLaneSequenceTrajectoryPoints(
@@ -77,10 +82,10 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     trajectory.set_probability(sequence.probability());
     prediction_obstacle_.set_predicted_period(FLAGS_prediction_duration);
     prediction_obstacle_.add_trajectory()->CopyFrom(trajectory);
-    ADEBUG << "Obstacle [" << obstacle->id()
-           << "] has " << prediction_obstacle_.trajectory_size()
-           << " trajectories.";
   }
+  ADEBUG << "Obstacle [" << obstacle->id()
+         << "] has total " << prediction_obstacle_.trajectory_size()
+         << " trajectories.";
 }
 
 void LaneSequencePredictor::FilterLaneSequences(
