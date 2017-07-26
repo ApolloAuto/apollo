@@ -166,7 +166,7 @@ class Adapter {
    */
   bool HasReceived() const {
     std::lock_guard<std::mutex> lock(mutex_);
-    return data_queue_.empty();
+    return !data_queue_.empty();
   }
 
   /**
