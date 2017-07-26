@@ -99,21 +99,19 @@ Status StBoundaryMapper::get_speed_limits(
   }
 
   std::vector<double> speed_limits;
-  // TODO(zhangliangliang): waiting for hdmap to support is_on_lane.
-  // for (const auto& point : path_data.path().path_points()) {
-  //   speed_limits.push_back(_st_boundary_config.maximal_speed());
-  //   for (auto& lane : lanes) {
-  //     if (lane->is_on_lane({point.x(), point.y()})) {
-  //       speed_limits.back() =
-  //           std::fmin(speed_limits.back(), lane->lane().speed_limit());
-  //       if (lane->lane().turn() == apollo::hdmap::Lane::U_TURN) {
-  //         speed_limits.back() = std::fmin(
-  //             speed_limits.back(),
-  //             _st_boundary_config.speed_limit_on_u_turn());
-  //       }
-  //     }
-  //   }
-  // }
+  for (const auto& point : path_data.path().path_points()) {
+    speed_limits.push_back(_st_boundary_config.maximal_speed());
+    for (auto& lane : lanes) {
+      if (lane->is_on_lane( { point.x(), point.y() })) {
+        speed_limits.back() = std::fmin(speed_limits.back(),
+                                        lane->lane().speed_limit());
+        if (lane->lane().turn() == apollo::hdmap::Lane::U_TURN) {
+          speed_limits.back() = std::fmin(
+              speed_limits.back(), _st_boundary_config.speed_limit_on_u_turn());
+        }
+      }
+    }
+  }
 
   if (planning_distance > path_data.path().path_points().back().s()) {
     const std::string msg = "path length cannot be less than planning_distance";
