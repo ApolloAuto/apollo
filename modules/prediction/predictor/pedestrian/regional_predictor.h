@@ -50,12 +50,15 @@ class RegionalPredictor : public Predictor {
    */
   void Predict(Obstacle* obstacle) override;
 
-  void GenerateStillTrajectory(
+  void GenerateMovingTrajectory(
+      const Obstacle* obstacle, double probability);
+
+  void DrawStillTrajectory(
       const Eigen::Vector2d& position,
       const double heading, const double speed, const double total_time,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
-  void GenerateMovingTrajectory(
+  void DrawMovingTrajectory(
       const Eigen::Vector2d& position,
       const Eigen::Vector2d& velocity,
       const Eigen::Vector2d& acceleration,

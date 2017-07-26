@@ -54,7 +54,7 @@ class Obstacle {
 
   Feature* mutable_feature(size_t i);
 
-  const Feature& latest_feature();
+  const Feature& latest_feature() const;
 
   Feature* mutable_latest_feature();
 
@@ -67,7 +67,7 @@ class Obstacle {
       kf_motion_tracker();
 
   const apollo::common::math::KalmanFilter<double, 2, 2, 4>&
-      kf_pedestrian_tracker();
+      kf_pedestrian_tracker() const;
 
   bool IsOnLane();
 
