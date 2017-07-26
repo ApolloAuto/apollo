@@ -33,17 +33,14 @@
 
 using apollo::common::Point3D;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::MonitorAdapter;
-using apollo::common::adapter::LocalizationAdapter;
-using apollo::common::adapter::ChassisAdapter;
-using apollo::common::adapter::PerceptionObstaclesAdapter;
-using apollo::common::adapter::PlanningAdapter;
 using apollo::common::config::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::common::TrajectoryPoint;
+using apollo::planning::DecisionResult;
+using apollo::planning::StopReasonCode;
 using apollo::canbus::Chassis;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
@@ -146,6 +143,99 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
   }
 }
 
+void SetStopReason(const StopReasonCode &reason_code, Decision *decision) {
+  switch (reason_code) {
+    case StopReasonCode::STOP_REASON_HEAD_VEHICLE:
+      decision->set_stopreason(Decision::STOP_REASON_HEAD_VEHICLE);
+      break;
+    case StopReasonCode::STOP_REASON_DESTINATION:
+      decision->set_stopreason(Decision::STOP_REASON_DESTINATION);
+      break;
+    case StopReasonCode::STOP_REASON_PEDESTRIAN:
+      decision->set_stopreason(Decision::STOP_REASON_PEDESTRIAN);
+      break;
+    case StopReasonCode::STOP_REASON_OBSTACLE:
+      decision->set_stopreason(Decision::STOP_REASON_OBSTACLE);
+      break;
+    case StopReasonCode::STOP_REASON_SIGNAL:
+      decision->set_stopreason(Decision::STOP_REASON_SIGNAL);
+      break;
+    case StopReasonCode::STOP_REASON_STOP_SIGN:
+      decision->set_stopreason(Decision::STOP_REASON_STOP_SIGN);
+      break;
+    case StopReasonCode::STOP_REASON_YIELD_SIGN:
+      decision->set_stopreason(Decision::STOP_REASON_YIELD_SIGN);
+      break;
+    case StopReasonCode::STOP_REASON_CLEAR_ZONE:
+      decision->set_stopreason(Decision::STOP_REASON_CLEAR_ZONE);
+      break;
+    case StopReasonCode::STOP_REASON_CROSSWALK:
+      decision->set_stopreason(Decision::STOP_REASON_CROSSWALK);
+      break;
+    default:
+      AWARN<< "Unrecognizable stop reason code:" << reason_code;
+    }
+}
+
+void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
+                      Object *auto_driving_car) {
+  if (signal.turn_signal() == apollo::common::VehicleSignal::TURN_LEFT) {
+    auto_driving_car->set_current_signal("LEFT");
+  } else if (signal.turn_signal()
+      == apollo::common::VehicleSignal::TURN_RIGHT) {
+    auto_driving_car->set_current_signal("RIGHT");
+  } else if (signal.emergency_light()) {
+    auto_driving_car->set_current_signal("EMERGENCY");
+  } else {
+    auto_driving_car->set_current_signal("");
+  }
+}
+
+bool LocateMarker(const apollo::planning::ObjectDecisionType& decision,
+                  double heading, Decision* world_decision) {
+  apollo::common::PointENU fence_point;
+  if (decision.has_stop() && decision.stop().has_stop_point()) {
+    world_decision->set_type(Decision_Type_STOP);
+    fence_point = decision.stop().stop_point();
+  } else if (decision.has_follow() && decision.follow().has_follow_point()) {
+    world_decision->set_type(Decision_Type_FOLLOW);
+    fence_point = decision.follow().follow_point();
+  } else if (decision.has_yield() && decision.yield().has_yield_point()) {
+    world_decision->set_type(Decision_Type_YIELD);
+    fence_point = decision.yield().yield_point();
+  } else if (decision.has_overtake()
+      && decision.overtake().has_overtake_point()) {
+    world_decision->set_type(Decision_Type_OVERTAKE);
+    fence_point = decision.overtake().overtake_point();
+  } else {
+    return false;
+  }
+
+  world_decision->set_position_x(fence_point.x());
+  world_decision->set_position_y(fence_point.y());
+  world_decision->set_heading(heading);
+  return true;
+}
+
+void FindNudgeRegion(const apollo::planning::ObjectDecisionType& decision,
+                     const Object& world_obj, Decision* world_decision) {
+  std::vector<apollo::common::math::Vec2d> points;
+  for (auto &polygon_pt : world_obj.polygon_point()) {
+    points.emplace_back(polygon_pt.x(), polygon_pt.y());
+  }
+  const apollo::common::math::Polygon2d obj_polygon(points);
+  const apollo::common::math::Polygon2d &nudge_polygon = obj_polygon
+      .ExpandByDistance(fabs(decision.nudge().distance_l()));
+  const std::vector<apollo::common::math::Vec2d> &nudge_points = nudge_polygon
+      .points();
+  for (auto &nudge_pt : nudge_points) {
+    PolygonPoint* poly_pt = world_decision->add_polygon_point();
+    poly_pt->set_x(nudge_pt.x());
+    poly_pt->set_y(nudge_pt.y());
+  }
+  world_decision->set_type(Decision_Type_NUDGE);
+}
+
 }  // namespace
 
 constexpr int SimulationWorldService::kMaxMonitorItems;
@@ -161,9 +251,14 @@ const SimulationWorld &SimulationWorldService::Update() {
   AdapterManager::Observe();
   UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis());
   UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization());
+  obj_map_.clear();
   UpdateWithLatestObserved("PerceptionObstacles",
                            AdapterManager::GetPerceptionObstacles());
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
+  world_.clear_object();
+  for (auto &kv : obj_map_) {
+    *world_.add_object() = kv.second;
+  }
   return world_;
 }
 
@@ -260,17 +355,7 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   }
   auto_driving_car->set_steering_angle(angle_percentage);
 
-  if (chassis.signal().turn_signal() ==
-      ::apollo::common::VehicleSignal::TURN_LEFT) {
-    auto_driving_car->set_current_signal("LEFT");
-  } else if (chassis.signal().turn_signal() ==
-             ::apollo::common::VehicleSignal::TURN_RIGHT) {
-    auto_driving_car->set_current_signal("RIGHT");
-  } else if (chassis.signal().emergency_light()) {
-    auto_driving_car->set_current_signal("EMERGENCY");
-  } else {
-    auto_driving_car->set_current_signal("");
-  }
+  UpdateTurnSignal(chassis.signal(), auto_driving_car);
 
   auto_driving_car->set_disengage_type(DeduceDisengageType(chassis));
 
@@ -284,16 +369,38 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
       std::max(world_.timestamp_sec(), chassis.header().timestamp_sec()));
 }
 
+Object &SimulationWorldService::CreateWorldObject(
+    const PerceptionObstacle &obstacle) {
+  const std::string id = std::to_string(obstacle.id());
+  // Create a new world object if the id does not exists in the map yet.
+  if (obj_map_.find(id) == obj_map_.end()) {
+    Object &world_obj = obj_map_[id];
+    SetObstacleInfo(obstacle, &world_obj);
+    SetObstaclePolygon(obstacle, &world_obj);
+    SetObstacleType(obstacle, &world_obj);
+  }
+  return obj_map_[id];
+}
+
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
+    const PerceptionObstacles &obstacles) {
+  for (const auto &obstacle : obstacles.perception_obstacle()) {
+    CreateWorldObject(obstacle);
+  }
+  world_.set_timestamp_sec(
+      std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
+}
+
+void SimulationWorldService::UpdatePlanningTrajectory(
     const ADCTrajectory &trajectory) {
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
-  const size_t trajectory_length = trajectory.trajectory_point_size();
 
   util::TrajectoryPointCollector collector(&world_);
 
   size_t i = 0;
+  const size_t trajectory_length = trajectory.trajectory_point_size();
   bool collecting_started = false;
   while (i < trajectory_length) {
     const TrajectoryPoint &point = trajectory.trajectory_point(i);
@@ -302,8 +409,8 @@ void SimulationWorldService::UpdateSimulationWorld(
     // localization/chassis message) will be dropped.
     //
     // Note that the last two points are always included.
-    if (collecting_started ||
-        point.relative_time() + header_time >= cutoff_time) {
+    if (collecting_started
+        || point.relative_time() + header_time >= cutoff_time) {
       collecting_started = true;
       collector.Collect(point);
       if (i == trajectory_length - 1) {
@@ -327,21 +434,120 @@ void SimulationWorldService::UpdateSimulationWorld(
       ++i;
     }
   }
+}
 
-  world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
+void SimulationWorldService::UpdateMainDecision(
+    const apollo::planning::MainDecision &main_decision,
+    double update_timestamp_sec, Object *world_main_stop) {
+  apollo::common::math::Vec2d stop_pt;
+  double stop_heading = 0.0;
+  if (main_decision.has_not_ready()) {
+    // The car is not ready!
+    // Use the current ADC pose since it is better not to self-drive.
+    stop_pt.set_x(world_.auto_driving_car().position_x());
+    stop_pt.set_y(world_.auto_driving_car().position_y());
+    stop_heading = world_.auto_driving_car().heading();
+    world_main_stop->add_decision()->set_stopreason(
+        Decision::STOP_REASON_NOT_READY);
+  } else if (main_decision.has_estop()) {
+    // Emergency stop.
+    // Use the current ADC pose since it is better to stop immediately.
+    stop_pt.set_x(world_.auto_driving_car().position_x());
+    stop_pt.set_y(world_.auto_driving_car().position_y());
+    stop_heading = world_.auto_driving_car().heading();
+    world_main_stop->add_decision()->set_stopreason(
+        Decision::STOP_REASON_EMERGENCY);
+    world_.mutable_auto_driving_car()->set_current_signal("EMERGENCY");
+  } else {
+    // Normal stop.
+    const apollo::planning::MainStop& stop = main_decision.stop();
+    stop_pt.set_x(stop.stop_point().x());
+    stop_pt.set_y(stop.stop_point().y());
+    stop_heading = stop.stop_heading();
+    if (stop.has_reason_code()) {
+      SetStopReason(stop.reason_code(), world_main_stop->add_decision());
+    }
+  }
+  world_main_stop->set_position_x(stop_pt.x());
+  world_main_stop->set_position_y(stop_pt.y());
+  world_main_stop->set_heading(stop_heading);
+  world_main_stop->set_timestamp_sec(update_timestamp_sec);
+}
+
+void SimulationWorldService::UpdateDecision(
+    const DecisionResult &decision_res, double header_time) {
+  // Update turn signal.
+  UpdateTurnSignal(decision_res.vehicle_signal(),
+                   world_.mutable_auto_driving_car());
+
+  apollo::planning::MainDecision main_decision = decision_res.main_decision();
+
+  // Update speed limit.
+  if (main_decision.target_lane_size() > 0) {
+    world_.set_speed_limit(main_decision.target_lane(0).speed_limit());
+  }
+
+  // Update relevant main stop with reason.
+  world_.clear_main_stop();
+  if (main_decision.has_not_ready() || main_decision.has_estop()
+      || main_decision.has_stop()) {
+    Object* world_main_stop = world_.mutable_main_stop();
+    UpdateMainDecision(main_decision, header_time, world_main_stop);
+  }
+
+  // Update obstacle decision.
+  for (const auto &obj_decision : decision_res.object_decision().decision()) {
+    if (obj_decision.has_prediction()) {
+      const auto &p_obj = obj_decision.prediction().perception_obstacle();
+      const std::string id = std::to_string(p_obj.id());
+      // If the object does not exist in the map yet, it could be extra virtual
+      // objects created by prediction/decision modules.
+      if (obj_map_.find(id) == obj_map_.end()) {
+        CreateWorldObject(p_obj);
+      }
+      Object &world_obj = obj_map_[id];
+      if (obj_decision.type()
+          == apollo::planning::ObjectDecision_ObjectType_VIRTUAL) {
+        world_obj.set_type(Object_Type_VIRTUAL);
+      }
+      for (const auto &decision : obj_decision.object_decision()) {
+        Decision* world_decision = world_obj.add_decision();
+        world_decision->set_type(Decision_Type_IGNORE);
+        if (decision.has_stop() || decision.has_follow() || decision.has_yield()
+            || decision.has_overtake()) {
+          if (!LocateMarker(decision, world_.auto_driving_car().heading(),
+                            world_decision)) {
+            AWARN<< "No decision marker position found for object id="
+            << world_obj.id();
+            continue;
+          }
+        } else if (decision.has_nudge()) {
+          if (world_obj.polygon_point_size() == 0) {
+            AWARN << "No polygon points found for object id=" << world_obj.id();
+            continue;
+          }
+          FindNudgeRegion(decision, world_obj, world_decision);
+        } else if (decision.has_sidepass()) {
+          world_decision->set_type(Decision_Type_SIDEPASS);
+        }
+      }
+
+      world_obj.set_timestamp_sec(
+          std::max(world_obj.timestamp_sec(), header_time));
+    }
+  }
 }
 
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
-    const PerceptionObstacles &obstacles) {
-  for (const auto &obstacle : obstacles.perception_obstacle()) {
-    Object *world_obj = world_.add_object();
-    SetObstacleInfo(obstacle, world_obj);
-    SetObstaclePolygon(obstacle, world_obj);
-    SetObstacleType(obstacle, world_obj);
-  }
-  world_.set_timestamp_sec(
-      std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
+    const ADCTrajectory &trajectory) {
+  const double header_time = trajectory.header().timestamp_sec();
+
+  UpdatePlanningTrajectory(trajectory);
+
+  UpdateDecision(trajectory.decision(), header_time);
+
+  world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
 }
 
 void SimulationWorldService::RegisterMonitorCallback() {
