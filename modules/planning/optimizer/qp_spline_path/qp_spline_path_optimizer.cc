@@ -30,10 +30,16 @@ using apollo::common::Status;
 QPSplinePathOptimizer::QPSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
-Status QPSplinePathOptimizer::Process(
-    const SpeedData& speed_data, const ReferenceLine& reference_line,
-    const common::TrajectoryPoint& init_point,
-    DecisionData* const decision_data, PathData* const path_data) {
+bool QPSplinePathOptimizer::Init() {
+  is_init_ = true;
+  return true;
+}
+
+Status QPSplinePathOptimizer::Process(const SpeedData& speed_data,
+                                      const ReferenceLine& reference_line,
+                                      const common::TrajectoryPoint& init_point,
+                                      DecisionData* const decision_data,
+                                      PathData* const path_data) {
   _path_generator.SetConfig(FLAGS_qp_spline_path_config_file);
   if (!_path_generator.generate(reference_line, *decision_data, speed_data,
                                 init_point, path_data)) {

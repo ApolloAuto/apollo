@@ -31,6 +31,7 @@ namespace planning {
 class QPSplinePathOptimizer : public PathOptimizer {
  public:
   explicit QPSplinePathOptimizer(const std::string& name);
+  virtual bool Init() override;
 
  private:
   apollo::common::Status Process(const SpeedData& speed_data,
