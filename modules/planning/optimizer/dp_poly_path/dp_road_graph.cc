@@ -236,14 +236,12 @@ Status DpRoadGraph::find_best_trajectory(
   GraphVertex &head = _vertices[0];
   head.set_accumulated_cost(0.0);
   uint32_t best_trajectory_end_index = 0;
+  const auto &vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
   double min_trajectory_cost = std::numeric_limits<double>::max();
-  TrajectoryCost trajectory_cost(_config, _heuristic_speed_data, decision_data);
+  TrajectoryCost trajectory_cost(_config, vehicle_config.vehicle_param(),
+                                 _heuristic_speed_data, decision_data);
 
-  const auto *vehicle_config = common::config::VehicleConfigHelper::instance();
-  const double vehicle_length =
-      vehicle_config->GetConfig().vehicle_param().length();
-  const double vehicle_width =
-      vehicle_config->GetConfig().vehicle_param().length();
   for (uint32_t i = 0; i < _vertices.size(); ++i) {
     const GraphVertex &vertex = _vertices[i];
     const std::vector<uint32_t> edges = vertex.edges_out();
@@ -251,8 +249,7 @@ Status DpRoadGraph::find_best_trajectory(
       double start_s = vertex.frame_point().s();
       double end_s = _vertices[_edges[j].to_vertex()].frame_point().s();
       double cost = trajectory_cost.calculate(_edges[j].poly_path(), start_s,
-                                              end_s, vehicle_length,
-                                              vehicle_width, reference_line);
+                                              end_s, reference_line);
       GraphVertex &vertex_end = _vertices[_edges[j].to_vertex()];
       if (vertex_connect_table.find(vertex_end.index()) ==
           vertex_connect_table.end()) {

@@ -14,13 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/file.h"
 
 namespace apollo {
 namespace common {
-namespace config {
 
 VehicleConfig VehicleConfigHelper::vehicle_config_;
 
@@ -43,6 +42,5 @@ const VehicleConfig &VehicleConfigHelper::GetConfig() {
   return vehicle_config_;
 }
 
-}  // namespace config
 }  // namespace common
 }  // namespace apollo

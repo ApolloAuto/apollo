@@ -32,7 +32,6 @@
  */
 namespace apollo {
 namespace common {
-namespace config {
 
 /**
  * @class VehicleConfigHelper
@@ -79,7 +78,6 @@ class VehicleConfigHelper {
   DECLARE_SINGLETON(VehicleConfigHelper);
 };
 
-}  // namespace config
 }  // namespace common
 }  // namespace apollo
 

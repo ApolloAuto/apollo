@@ -18,10 +18,11 @@
  * @file trjactory_cost.h
  **/
 
+#include "modules/planning/optimizer/dp_poly_path/trajectory_cost.h"
+
 #include <algorithm>
 #include <cmath>
 
-#include "modules/planning/optimizer/dp_poly_path/trajectory_cost.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -30,14 +31,17 @@ namespace apollo {
 namespace planning {
 
 TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
+                               const common::VehicleParam &vehicle_param,
                                const SpeedData &heuristic_speed_data,
                                const DecisionData &decision_data)
-    : _config(config), _heuristic_speed_data(heuristic_speed_data) {
+    : _config(config),
+      _vehicle_param(vehicle_param),
+      _heuristic_speed_data(heuristic_speed_data) {
   const auto &static_obstacles = decision_data.StaticObstacles();
   const double total_time =
       std::min(_heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
-  _evaluate_times =
-      static_cast<uint32_t>(std::floor(total_time / config.eval_time_interval()));
+  _evaluate_times = static_cast<uint32_t>(
+      std::floor(total_time / config.eval_time_interval()));
 
   // Mapping Static obstacle
   for (uint32_t i = 0; i < static_obstacles.size(); ++i) {
@@ -84,8 +88,9 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
 
 double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
                                  const double start_s, const double end_s,
-                                 const double length, const double width,
                                  const ReferenceLine &reference_line) const {
+  const double length = _vehicle_param.length();
+  const double width = _vehicle_param.width();
   double total_cost = 0.0;
   for (uint32_t i = 0; i < _evaluate_times; ++i) {
     double eval_time = i * _config.eval_time_interval();

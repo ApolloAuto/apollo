@@ -114,7 +114,7 @@ class QpFrenetFrame {
 
   const DecisionData* _decision_data = nullptr;
 
-  common::config::VehicleParam _vehicle_param;
+  common::VehicleParam _vehicle_param;
   common::FrenetFramePoint _init_frenet_point;
 
   double _feasible_longitudinal_upper_bound = 0.0;

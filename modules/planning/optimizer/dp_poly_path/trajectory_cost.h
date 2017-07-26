@@ -23,12 +23,14 @@
 
 #include <vector>
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -37,14 +39,16 @@ namespace planning {
 class TrajectoryCost {
  public:
   explicit TrajectoryCost(const DpPolyPathConfig &config,
+                          const common::VehicleParam &vehicle_param,
                           const SpeedData &heuristic_speed_data,
                           const DecisionData &decision_data);
   double calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
-                   const double end_s, const double length, const double width,
+                   const double end_s,
                    const ReferenceLine &reference_line) const;
 
  private:
-  DpPolyPathConfig _config;
+  const DpPolyPathConfig _config;
+  const common::VehicleParam _vehicle_param;
   SpeedData _heuristic_speed_data;
   std::vector<std::vector<::apollo::common::math::Box2d>> _obstacle_trajectory;
   std::vector<double> _obstacle_probability;

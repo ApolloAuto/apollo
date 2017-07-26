@@ -41,7 +41,7 @@ namespace planning {
 class QpSplineStGraph {
  public:
   QpSplineStGraph(const QpSplineStSpeedConfig& qp_config,
-                  const apollo::common::config::VehicleParam& veh_param);
+                  const apollo::common::VehicleParam& veh_param);
 
   common::Status search(const StGraphData& st_graph_data,
                         const PathData& path_data, SpeedData* const speed_data);

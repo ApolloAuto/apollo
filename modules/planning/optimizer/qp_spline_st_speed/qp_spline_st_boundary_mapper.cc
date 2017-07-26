@@ -43,10 +43,10 @@ using ErrorCode = apollo::common::ErrorCode;
 using Status = apollo::common::Status;
 using PathPoint = apollo::common::PathPoint;
 using SLPoint = apollo::common::SLPoint;
-using VehicleParam = apollo::common::config::VehicleParam;
+using VehicleParam = apollo::common::VehicleParam;
 using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
-using VehicleConfigHelper = apollo::common::config::VehicleConfigHelper;
+using VehicleConfigHelper = apollo::common::VehicleConfigHelper;
 
 Status QpSplineStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
