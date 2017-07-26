@@ -1,2 +1,15 @@
-EvaluatorType: MLP_EVALUATOR
-PredictorType: LANE_SEQUENCE_PREDICTOR
+obstacle_conf {
+  obstacle_type: VEHICLE
+  evaluator_type: MLP_EVALUATOR
+  status: ON_LANE
+  predictor_type: LANE_SEQUENCE_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: VEHICLE
+  status: OFF_LANE
+  predictor_type: FREE_MOVE_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: PEDESTRIAN
+  predictor_type: REGIONAL_PREDICTOR
+}
