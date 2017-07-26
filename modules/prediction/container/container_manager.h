@@ -56,8 +56,17 @@ class ContainerManager {
   Container* mutable_container(const std::string& name);
 
  private:
+  /**
+   * @brief Create a container
+   * @param Container name
+   * @return Container pointer
+   */
   std::unique_ptr<Container> CreateContainer(const std::string& name);
 
+  /**
+   * @breif Register a container
+   * @param Container name
+   */
   void RegisterContainer(const std::string& name);
 
  private:
