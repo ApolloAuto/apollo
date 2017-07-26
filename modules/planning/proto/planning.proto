@@ -20,7 +20,7 @@ message SpeedPoint {
   optional double da = 5;
 }
 
-// TODO(aaron): Migrate to apollo::common::TrajectoryPoint.
+// Deprecated: replaced by apollo.common.TrajectoryPoint
 message ADCTrajectoryPoint {
   optional double x = 1;  // in meters.
   optional double y = 2;  // in meters.
@@ -43,7 +43,7 @@ message ADCTrajectoryPoint {
   optional double l = 5 [deprecated = true];
 }
 
-// TODO(aaron): Migrate to apollo::common::PathPoint.
+// Deprecated: replaced by apollo.common.PathPoint
 message ADCPathPoint {
   optional double x = 1;  // in meters
   optional double y = 2;  // in meters
@@ -70,6 +70,7 @@ message EStop {
   optional bool is_estop = 1;
 }
 
+// next id: 15
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
   optional double total_path_length = 2; // in meters
@@ -85,6 +86,8 @@ message ADCTrajectory {
   optional apollo.common.VehicleSignal signal = 11;
   optional apollo.planning.DecisionResult decision = 14;
 
+  // replaced by path_point
   repeated ADCPathPoint adc_path_point = 7 [deprecated=true];
+  // replaced by trajectory_point
   repeated ADCTrajectoryPoint adc_trajectory_point = 4 [deprecated=true];
 }

@@ -37,6 +37,10 @@ message PathPoint {
   optional double ddkappa = 8;
 }
 
+message Path {
+  repeated PathPoint path_point = 1;
+}
+
 message TrajectoryPoint {
   // path point
   optional PathPoint path_point = 1;
