@@ -30,11 +30,11 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::config::VehicleParam;
+using apollo::common::VehicleParam;
 
 QpSplineStGraph::QpSplineStGraph(
     const QpSplineStSpeedConfig& qp_spline_st_speed_config,
-    const apollo::common::config::VehicleParam& veh_param)
+    const apollo::common::VehicleParam& veh_param)
     : _qp_spline_st_speed_config(qp_spline_st_speed_config) {}
 
 Status QpSplineStGraph::search(const StGraphData& st_graph_data,

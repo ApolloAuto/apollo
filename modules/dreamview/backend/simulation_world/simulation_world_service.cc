@@ -33,7 +33,12 @@
 
 using apollo::common::Point3D;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::config::VehicleConfigHelper;
+using apollo::common::adapter::MonitorAdapter;
+using apollo::common::adapter::LocalizationAdapter;
+using apollo::common::adapter::ChassisAdapter;
+using apollo::common::adapter::PerceptionObstaclesAdapter;
+using apollo::common::adapter::PlanningAdapter;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::localization::LocalizationEstimate;
@@ -173,16 +178,16 @@ void SetStopReason(const StopReasonCode &reason_code, Decision *decision) {
       decision->set_stopreason(Decision::STOP_REASON_CROSSWALK);
       break;
     default:
-      AWARN<< "Unrecognizable stop reason code:" << reason_code;
-    }
+      AWARN << "Unrecognizable stop reason code:" << reason_code;
+  }
 }
 
 void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
                       Object *auto_driving_car) {
   if (signal.turn_signal() == apollo::common::VehicleSignal::TURN_LEFT) {
     auto_driving_car->set_current_signal("LEFT");
-  } else if (signal.turn_signal()
-      == apollo::common::VehicleSignal::TURN_RIGHT) {
+  } else if (signal.turn_signal() ==
+             apollo::common::VehicleSignal::TURN_RIGHT) {
     auto_driving_car->set_current_signal("RIGHT");
   } else if (signal.emergency_light()) {
     auto_driving_car->set_current_signal("EMERGENCY");
@@ -191,8 +196,8 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-bool LocateMarker(const apollo::planning::ObjectDecisionType& decision,
-                  double heading, Decision* world_decision) {
+bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
+                  double heading, Decision *world_decision) {
   apollo::common::PointENU fence_point;
   if (decision.has_stop() && decision.stop().has_stop_point()) {
     world_decision->set_type(Decision_Type_STOP);
@@ -203,8 +208,8 @@ bool LocateMarker(const apollo::planning::ObjectDecisionType& decision,
   } else if (decision.has_yield() && decision.yield().has_yield_point()) {
     world_decision->set_type(Decision_Type_YIELD);
     fence_point = decision.yield().yield_point();
-  } else if (decision.has_overtake()
-      && decision.overtake().has_overtake_point()) {
+  } else if (decision.has_overtake() &&
+             decision.overtake().has_overtake_point()) {
     world_decision->set_type(Decision_Type_OVERTAKE);
     fence_point = decision.overtake().overtake_point();
   } else {
@@ -217,19 +222,19 @@ bool LocateMarker(const apollo::planning::ObjectDecisionType& decision,
   return true;
 }
 
-void FindNudgeRegion(const apollo::planning::ObjectDecisionType& decision,
-                     const Object& world_obj, Decision* world_decision) {
+void FindNudgeRegion(const apollo::planning::ObjectDecisionType &decision,
+                     const Object &world_obj, Decision *world_decision) {
   std::vector<apollo::common::math::Vec2d> points;
   for (auto &polygon_pt : world_obj.polygon_point()) {
     points.emplace_back(polygon_pt.x(), polygon_pt.y());
   }
   const apollo::common::math::Polygon2d obj_polygon(points);
-  const apollo::common::math::Polygon2d &nudge_polygon = obj_polygon
-      .ExpandByDistance(fabs(decision.nudge().distance_l()));
-  const std::vector<apollo::common::math::Vec2d> &nudge_points = nudge_polygon
-      .points();
+  const apollo::common::math::Polygon2d &nudge_polygon =
+      obj_polygon.ExpandByDistance(fabs(decision.nudge().distance_l()));
+  const std::vector<apollo::common::math::Vec2d> &nudge_points =
+      nudge_polygon.points();
   for (auto &nudge_pt : nudge_points) {
-    PolygonPoint* poly_pt = world_decision->add_polygon_point();
+    PolygonPoint *poly_pt = world_decision->add_polygon_point();
     poly_pt->set_x(nudge_pt.x());
     poly_pt->set_y(nudge_pt.y());
   }
@@ -409,8 +414,8 @@ void SimulationWorldService::UpdatePlanningTrajectory(
     // localization/chassis message) will be dropped.
     //
     // Note that the last two points are always included.
-    if (collecting_started
-        || point.relative_time() + header_time >= cutoff_time) {
+    if (collecting_started ||
+        point.relative_time() + header_time >= cutoff_time) {
       collecting_started = true;
       collector.Collect(point);
       if (i == trajectory_length - 1) {
@@ -460,7 +465,7 @@ void SimulationWorldService::UpdateMainDecision(
     world_.mutable_auto_driving_car()->set_current_signal("EMERGENCY");
   } else {
     // Normal stop.
-    const apollo::planning::MainStop& stop = main_decision.stop();
+    const apollo::planning::MainStop &stop = main_decision.stop();
     stop_pt.set_x(stop.stop_point().x());
     stop_pt.set_y(stop.stop_point().y());
     stop_heading = stop.stop_heading();
@@ -474,8 +479,8 @@ void SimulationWorldService::UpdateMainDecision(
   world_main_stop->set_timestamp_sec(update_timestamp_sec);
 }
 
-void SimulationWorldService::UpdateDecision(
-    const DecisionResult &decision_res, double header_time) {
+void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
+                                            double header_time) {
   // Update turn signal.
   UpdateTurnSignal(decision_res.vehicle_signal(),
                    world_.mutable_auto_driving_car());
@@ -489,9 +494,9 @@ void SimulationWorldService::UpdateDecision(
 
   // Update relevant main stop with reason.
   world_.clear_main_stop();
-  if (main_decision.has_not_ready() || main_decision.has_estop()
-      || main_decision.has_stop()) {
-    Object* world_main_stop = world_.mutable_main_stop();
+  if (main_decision.has_not_ready() || main_decision.has_estop() ||
+      main_decision.has_stop()) {
+    Object *world_main_stop = world_.mutable_main_stop();
     UpdateMainDecision(main_decision, header_time, world_main_stop);
   }
 
@@ -506,19 +511,19 @@ void SimulationWorldService::UpdateDecision(
         CreateWorldObject(p_obj);
       }
       Object &world_obj = obj_map_[id];
-      if (obj_decision.type()
-          == apollo::planning::ObjectDecision_ObjectType_VIRTUAL) {
+      if (obj_decision.type() ==
+          apollo::planning::ObjectDecision_ObjectType_VIRTUAL) {
         world_obj.set_type(Object_Type_VIRTUAL);
       }
       for (const auto &decision : obj_decision.object_decision()) {
-        Decision* world_decision = world_obj.add_decision();
+        Decision *world_decision = world_obj.add_decision();
         world_decision->set_type(Decision_Type_IGNORE);
-        if (decision.has_stop() || decision.has_follow() || decision.has_yield()
-            || decision.has_overtake()) {
+        if (decision.has_stop() || decision.has_follow() ||
+            decision.has_yield() || decision.has_overtake()) {
           if (!LocateMarker(decision, world_.auto_driving_car().heading(),
                             world_decision)) {
-            AWARN<< "No decision marker position found for object id="
-            << world_obj.id();
+            AWARN << "No decision marker position found for object id="
+                  << world_obj.id();
             continue;
           }
         } else if (decision.has_nudge()) {

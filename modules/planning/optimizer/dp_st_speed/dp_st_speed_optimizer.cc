@@ -33,7 +33,7 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::config::VehicleConfigHelper;
+using apollo::common::VehicleConfigHelper;
 using ::apollo::common::adapter::AdapterManager;
 using ::apollo::localization::LocalizationEstimate;
 

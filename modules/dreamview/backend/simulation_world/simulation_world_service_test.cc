@@ -40,7 +40,7 @@ const float kEpsilon = 0.0001;
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    apollo::common::config::VehicleConfigHelper::Init();
+    apollo::common::VehicleConfigHelper::Init();
     sim_world_service_.reset(new SimulationWorldService(&map_service_));
   }
 

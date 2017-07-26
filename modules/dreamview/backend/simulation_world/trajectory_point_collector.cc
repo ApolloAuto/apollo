@@ -21,7 +21,7 @@
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 
-using ::apollo::common::config::VehicleConfigHelper;
+using ::apollo::common::VehicleConfigHelper;
 using ::apollo::common::math::Box2d;
 using ::apollo::common::math::Vec2d;
 using ::apollo::common::TrajectoryPoint;

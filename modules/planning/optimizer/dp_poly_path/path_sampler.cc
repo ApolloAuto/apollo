@@ -19,6 +19,8 @@
  **/
 #include <algorithm>
 #include <vector>
+#include <memory>
+#include <cmath>
 
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
 
@@ -35,8 +37,9 @@ Status PathSampler::sample(
     const ::apollo::common::SLPoint& init_sl_point,
     std::vector<std::vector<::apollo::common::SLPoint>>* const points) {
   CHECK_NOTNULL(points);
-  double reference_line_length =
+  const double reference_line_length =
       reference_line.reference_map_line().accumulated_s().back();
+  const double lateral_sample_offset = _config.lateral_sample_offset();
   double step_length = init_point.v();
   step_length = std::min(step_length, _config.step_length_max());
   step_length = std::max(step_length, _config.step_length_min());
@@ -44,58 +47,34 @@ Status PathSampler::sample(
   double accumulated_s = init_sl_point.s();
   for (size_t i = 0; i < _config.sample_level(); ++i) {
     std::vector<::apollo::common::SLPoint> level_points;
-    if (std::abs(center_l) < _config.lateral_sample_offset()) {
+    if (std::abs(center_l) < lateral_sample_offset) {
       center_l = 0.0;
     } else {
       center_l = center_l * _config.lateral_adjust_coeff();
     }
     accumulated_s += step_length;
-    double level_start_l = center_l
-        - _config.lateral_sample_offset()
-            * ((_config.sample_points_num_each_level() - 1) >> 1);
+    const double level_start_l = center_l
+        - lateral_sample_offset
+            * (_config.sample_points_num_each_level() - 1) / 2;
     for (size_t j = 0; j < _config.sample_points_num_each_level(); ++j) {
       ::apollo::common::SLPoint sl_point;
       sl_point.set_s(accumulated_s);
-      sl_point.set_l(level_start_l + j * _config.lateral_sample_offset());
+      sl_point.set_l(level_start_l + j * lateral_sample_offset);
       if (reference_line.is_on_road(sl_point)) {
-        level_points.push_back(std::move(sl_point));
+        level_points.push_back(sl_point);
       }
     }
     if (level_points.empty()) {
-      if (accumulated_s > reference_line_length) {
-        ::apollo::common::SLPoint sl_point;
-        sl_point.set_s(reference_line_length);
-        sl_point.set_l(-_config.lateral_sample_offset());
-        level_points.emplace_back(std::move(sl_point));
-
-        ::apollo::common::SLPoint sl_point2;
-        sl_point2.set_s(reference_line_length);
-        sl_point2.set_l(0.0);
-        level_points.emplace_back(std::move(sl_point2));
-
-        ::apollo::common::SLPoint sl_point3;
-        sl_point3.set_s(reference_line_length);
-        sl_point3.set_l(_config.lateral_sample_offset());
-        level_points.emplace_back(std::move(sl_point3));
-
-        points->push_back(level_points);
-        return Status::OK();
-      } else {
-        ::apollo::common::SLPoint sl_point;
-        sl_point.set_s(accumulated_s);
-        sl_point.set_l(-_config.lateral_sample_offset());
-        level_points.emplace_back(std::move(sl_point));
-
-        ::apollo::common::SLPoint sl_point2;
-        sl_point2.set_s(accumulated_s);
-        sl_point2.set_l(0.0);
-        level_points.emplace_back(std::move(sl_point2));
-
-        ::apollo::common::SLPoint sl_point3;
-        sl_point3.set_s(accumulated_s);
-        sl_point3.set_l(_config.lateral_sample_offset());
-        level_points.emplace_back(std::move(sl_point3));
-      }
+    	const double level_s = std::fmin(accumulated_s, reference_line_length);
+    	for (const auto level_l : {-lateral_sample_offset, 0.0, lateral_sample_offset}) {
+            ::apollo::common::SLPoint sl_point;
+            sl_point.set_s(level_s);
+            sl_point.set_l(level_l);
+            level_points.push_back(sl_point);
+    	}
+        if (accumulated_s > reference_line_length) {
+           return Status::OK();
+        }
     }
     points->push_back(level_points);
   }
