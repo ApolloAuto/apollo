@@ -217,9 +217,7 @@ def perception_publisher(perception_topic, files, period):
     while not rospy.is_shutdown():
         perception = generate_perception(perception_description, perception)
         print str(perception)
-        s = String()
-        s.data = perception.SerializeToString()
-        pub.publish(s)
+        pub.publish(perception)
         rate.sleep()
 
 
@@ -228,7 +226,7 @@ if __name__ == '__main__':
             prog="replay_perception.py")
     parser.add_argument("files", action="store", type=str, nargs="*",
             help="obstacle description files")
-    parser.add_argument("-t", "--topic", action="store", type=str, default="/perception/obstacles",
+    parser.add_argument("-t", "--topic", action="store", type=str, default="/apollo/perception/obstacles",
             help="set the perception topic")
     parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
             help="set the perception topic publish time duration")
