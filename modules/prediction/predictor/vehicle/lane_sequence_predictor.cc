@@ -126,8 +126,10 @@ void LaneSequencePredictor::FilterLaneSequences(
         probability, FLAGS_lane_sequence_threshold) < 0 &&
         i != all.first) {
       (*enable_lane_sequence)[i] = false;
-    } else if (lane_change_type[i] > 0 &&
-               lane_change_type[i] != change.first) {
+    } else if (change.first >= 0 &&
+               change.first < num_lane_sequence &&
+               lane_change_type[i] > 0 &&
+               lane_change_type[i] != lane_change_type[change.first]) {
       (*enable_lane_sequence)[i] = false;
     }
   }
