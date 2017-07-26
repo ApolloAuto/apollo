@@ -18,8 +18,9 @@
  * @file speed_data.cc
  **/
 
-#include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/speed/speed_data.h"
 
 #include <algorithm>
 #include <sstream>
@@ -35,12 +36,14 @@ bool speed_time_comp(const double t, const SpeedPoint& speed_point) {
 }
 }
 
-SpeedData::SpeedData(std::vector<SpeedPoint> speed_points) {
-  speed_vector_ = std::move(speed_points);
+void SpeedData::add_speed_point(const double s, const double time,
+                                const double v, const double a,
+                                const double da) {
+  speed_vector_.push_back(util::MakeSpeedPoint(s, time, v, a, da));
 }
 
-std::vector<SpeedPoint>* SpeedData::mutable_speed_vector() {
-  return &speed_vector_;
+SpeedData::SpeedData(std::vector<SpeedPoint> speed_points) {
+  speed_vector_ = std::move(speed_points);
 }
 
 const std::vector<SpeedPoint>& SpeedData::speed_vector() const {
@@ -86,7 +89,8 @@ std::string SpeedData::DebugString() const {
   std::ostringstream sout;
   sout << "[" << std::endl;
   for (int i = 0; i < static_cast<int>(speed_vector_.size()) &&
-         i < FLAGS_trajectory_point_num_for_debug; ++i) {
+                  i < FLAGS_trajectory_point_num_for_debug;
+       ++i) {
     if (i > 0) {
       sout << "," << std::endl;
     }

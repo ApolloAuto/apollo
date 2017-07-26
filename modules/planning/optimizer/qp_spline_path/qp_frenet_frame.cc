@@ -25,7 +25,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/macro.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/common/path/sl_point_util.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
 #include "modules/planning/proto/planning.pb.h"
 

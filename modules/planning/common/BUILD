@@ -171,4 +171,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "planning_util",
+    srcs = [
+        "planning_util.cc",
+    ],
+    hdrs = [
+        "planning_util.h",
+    ],
+    deps = [
+        "//modules/common/math",
+        "//modules/common/proto:path_point_proto",
+        "//modules/planning/math:hermite_spline",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
 cpplint()

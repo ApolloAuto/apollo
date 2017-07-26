@@ -24,7 +24,6 @@
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/planning/util/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -91,8 +90,7 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
     double v = spline.derivative(time);
     double a = spline.second_order_derivative(time);
     double da = spline.third_order_derivative(time);
-    speed_data->mutable_speed_vector()->push_back(
-        util::MakeSpeedPoint(s, time, v, a, da));
+    speed_data->add_speed_point(s, time, v, a, da);
   }
 
   return Status::OK();
@@ -208,9 +206,9 @@ Status QpSplineStGraph::apply_kernel() {
 }
 
 Status QpSplineStGraph::solve() {
-  return _spline_generator->solve() ?
-      Status::OK() :
-      Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::solve");
+  return _spline_generator->solve()
+             ? Status::OK()
+             : Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::solve");
 }
 
 Status QpSplineStGraph::get_s_constraints_by_time(
