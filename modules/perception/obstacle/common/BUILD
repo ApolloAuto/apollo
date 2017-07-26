@@ -4,11 +4,29 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "perception_obstacle_common",
-    srcs = glob(["*.cc"]),
-    hdrs = glob(["*.h"]),
+    srcs = [
+        "geometry_util.cc",
+        ],
+    hdrs = [
+        "geometry_util.h",
+        "convex_hullxy.h",
+        ],
     deps = [
+        "//modules/common:log",
         "//modules/perception/lib/pcl_util:pcl_util",
         "@eigen//:eigen"
+    ],
+)
+
+cc_test(
+    name = "perception_obstacle_common_test",
+    size = "small",
+    srcs = [
+        "geometry_util_test.cc",
+        ],
+    deps = [
+        ":perception_obstacle_common",
+        "@gtest//:main",
     ],
 )
 
