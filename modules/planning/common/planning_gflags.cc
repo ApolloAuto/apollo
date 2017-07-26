@@ -300,3 +300,6 @@ DEFINE_string(qp_spline_st_speed_config_file,
 
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
+
+DEFINE_string(offline_routing_file, "modules/map/data/garage_routing.pb.txt",
+              "offline routing file");

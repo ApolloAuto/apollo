@@ -30,7 +30,6 @@ cc_library(
         "//modules/planning/optimizer/qp_spline_st_speed:qp_spline_st_speed_optimizer",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/proxy:routing_proxy",
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:reference_line_smoother",
         "@eigen//:eigen",

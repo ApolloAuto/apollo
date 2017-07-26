@@ -77,7 +77,6 @@ Status Planning::Start() {
 }
 
 void Planning::RunOnce() {
-  AdapterManager::Observe();
   if (AdapterManager::GetLocalization() == nullptr ||
       AdapterManager::GetLocalization()->Empty()) {
     AERROR << "Localization is not available; skip the planning cycle";
@@ -90,6 +89,23 @@ void Planning::RunOnce() {
     return;
   }
 
+  if (AdapterManager::GetRoutingResult() == nullptr) {
+    AERROR << "RoutingResult is not registered";
+    return;
+  }
+  if (AdapterManager::GetRoutingResult()->Empty()) {
+    // TODO(all) temporarily use the offline routing data.
+    if (!AdapterManager::GetRoutingResult()->FeedFile(
+            FLAGS_offline_routing_file)) {
+      AERROR << "Failed to load offline routing file "
+             << FLAGS_offline_routing_file;
+      return;
+    } else {
+      AWARN << "Using offline prouting file " << FLAGS_offline_routing_file;
+    }
+  }
+  AdapterManager::Observe();
+
   AINFO << "Start planning ...";
 
   const auto& localization =
@@ -99,8 +115,7 @@ void Planning::RunOnce() {
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
-  common::VehicleState::instance()->Update(localization,
-                                                          chassis);
+  common::VehicleState::instance()->Update(localization, chassis);
   bool is_on_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
 
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
@@ -149,10 +164,10 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     // position and target vehicle position.
     // If the deviation exceeds a specific threshold,
     // it will be unsafe to planning from the matched point.
-    double dx = matched_point.path_point().x() -
-                common::VehicleState::instance()->x();
-    double dy = matched_point.path_point().y() -
-                common::VehicleState::instance()->y();
+    double dx =
+        matched_point.path_point().x() - common::VehicleState::instance()->x();
+    double dy =
+        matched_point.path_point().y() - common::VehicleState::instance()->y();
     double position_deviation = std::sqrt(dx * dx + dy * dy);
 
     if (position_deviation < FLAGS_replanning_threshold) {
@@ -222,16 +237,11 @@ TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
   TrajectoryPoint point;
   // point.set_x(estimated_position.x());
   // point.set_y(estimated_position.y());
-  point.mutable_path_point()->set_x(
-      common::VehicleState::instance()->x());
-  point.mutable_path_point()->set_y(
-      common::VehicleState::instance()->y());
-  point.mutable_path_point()->set_z(
-      common::VehicleState::instance()->z());
-  point.set_v(
-      common::VehicleState::instance()->linear_velocity());
-  point.set_a(
-      common::VehicleState::instance()->linear_acceleration());
+  point.mutable_path_point()->set_x(common::VehicleState::instance()->x());
+  point.mutable_path_point()->set_y(common::VehicleState::instance()->y());
+  point.mutable_path_point()->set_z(common::VehicleState::instance()->z());
+  point.set_v(common::VehicleState::instance()->linear_velocity());
+  point.set_a(common::VehicleState::instance()->linear_acceleration());
   point.mutable_path_point()->set_kappa(0.0);
   const double speed_threshold = 0.1;
   if (point.v() > speed_threshold) {
