@@ -26,6 +26,7 @@
 #include <utility>
 
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/map/proto/map_id.pb.h"
 
 /**
  * @namespace apollo::common::util
@@ -51,6 +52,13 @@ apollo::common::SLPoint MakeSLPoint(const double s, const double l);
  * dimension
  */
 double Distance2D(const PathPoint& a, const PathPoint& b);
+
+/**
+ * @brief create a Map ID given a string.
+ * @param id a string id
+ * @return a Map ID instance
+ */
+apollo::hdmap::Id MakeMapId(const std::string& id);
 
 }  // namespace util
 }  // namespace common
