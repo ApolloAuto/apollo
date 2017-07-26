@@ -24,7 +24,6 @@
 #include <vector>
 
 #include "modules/planning/common/path/path.h"
-#include "modules/planning/common/path/path_point_util.h"
 
 namespace apollo {
 namespace planning {

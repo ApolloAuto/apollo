@@ -20,10 +20,12 @@
 
 #include "modules/planning/common/path/path_data.h"
 
+#include <algorithm>
 #include <sstream>
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {

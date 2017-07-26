@@ -20,6 +20,7 @@
 
 #include "modules/planning/reference_line/reference_line.h"
 
+#include <algorithm>
 #include <sstream>
 #include <string>
 #include <utility>
