@@ -23,28 +23,14 @@
 #include <tf_conversions/tf_eigen.h>
 #include <Eigen/Core>
 #include <string>
-#include "gflags/gflags.h"
 
 #include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace perception {
-
-DEFINE_bool(enable_hdmap_input, false, "enable hdmap input for roi filter");
-DEFINE_string(onboard_roi_filter, "DummyROIFilter", "onboard roi filter");
-DEFINE_string(onboard_segmentor, "DummySegmentation", "onboard segmentation");
-DEFINE_string(onboard_object_builder, "DummyObjectBuilder",
-              "onboard object builder");
-DEFINE_string(onboard_tracker, "DummyTracker", "onboard tracker");
-
-DEFINE_int32(tf2_buff_in_ms, 10, "the tf2 buff size in ms");
-DEFINE_string(lidar_tf2_frame_id, "world", "the tf2 transform frame id");
-DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
-              "the tf2 transform child frame id");
-DEFINE_string(obstacle_module_name, "perception_obstacle",
-              "perception obstacle module name");
 
 using pcl_util::Point;
 using pcl_util::PointD;

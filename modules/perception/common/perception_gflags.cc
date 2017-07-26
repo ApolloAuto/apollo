@@ -19,3 +19,29 @@
 DEFINE_int32(perception_loop_rate, 10, "Loop rate for perception node, in Hz.");
 
 DEFINE_string(node_name, "perception", "The perception module name in proto");
+
+/// lib/config_manager/config_manager.cc 
+DEFINE_string(config_manager_path, "./conf/config_manager.config",
+              "The ModelConfig config paths file.");
+DEFINE_string(work_root, "", "Project work root direcotry.");
+
+/// obstacle/onboard/hdmap_input.cc
+DEFINE_double(map_radius, 60.0, "get map radius of car center");
+DEFINE_string(map_file, "", "map file name.");
+DEFINE_int32(map_sample_step, 1, "step for sample road boundary points");
+
+/// obstacle/onboard/lidar_process.cc
+DEFINE_bool(enable_hdmap_input, false, "enable hdmap input for roi filter");
+DEFINE_string(onboard_roi_filter, "DummyROIFilter", "onboard roi filter");
+DEFINE_string(onboard_segmentor, "DummySegmentation", "onboard segmentation");
+DEFINE_string(onboard_object_builder, "DummyObjectBuilder",
+              "onboard object builder");
+DEFINE_string(onboard_tracker, "DummyTracker", "onboard tracker");
+
+DEFINE_int32(tf2_buff_in_ms, 10, "the tf2 buff size in ms");
+DEFINE_string(lidar_tf2_frame_id, "world", "the tf2 transform frame id");
+DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
+              "the tf2 transform child frame id");
+DEFINE_string(obstacle_module_name, "perception_obstacle",
+              "perception obstacle module name");
+

@@ -20,17 +20,13 @@
 #include <mutex>
 #include <utility>
 #include <vector>
-#include "gflags/gflags.h"
 #include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/proto/config_schema.pb.h"
 
 namespace apollo {
 namespace perception {
-
-DEFINE_string(config_manager_path, "./conf/config_manager.config",
-              "The ModelConfig config paths file.");
-DEFINE_string(work_root, "", "Project work root direcotry.");
 
 using google::protobuf::TextFormat;
 

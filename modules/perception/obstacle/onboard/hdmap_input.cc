@@ -21,13 +21,10 @@
 
 #include "modules/common/log.h"
 #include "modules/perception/common/define.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
-
-DEFINE_double(map_radius, 60.0, "get map radius of car center");
-DEFINE_string(map_file, "", "map file name.");
-DEFINE_int32(map_sample_step, 1, "step for sample road boundary points");
 
 bool HDMapInput::Init() {
   inited_ = true;

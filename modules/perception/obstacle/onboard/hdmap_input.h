@@ -18,8 +18,6 @@
 #define MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
 
 #include <mutex>
-#include "gflags/gflags.h"
-
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/lib/base/singleton.h"
