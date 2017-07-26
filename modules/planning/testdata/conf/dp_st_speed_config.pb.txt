@@ -1,0 +1,29 @@
+total_path_length: 0.1
+total_time: 3.0
+matrix_dimension_s: 100
+matrix_dimension_t: 10
+
+speed_weight: 0.0
+accel_weight: 10.0
+jerk_weight: 10.0
+obstacle_weight: 1.0
+reference_weight: 0.0
+go_down_buffer: 5.0
+go_up_buffer: 5.0
+
+st_graph_default_point_cost: 1e10
+obstacle_cost_factor: -300
+
+default_speed_cost: 1.0
+exceed_speed_penalty: 10.0
+low_speed_penalty: 2.5
+
+accel_penalty: 2.0
+decel_penalty: 2.0
+
+positive_jerk_coeff: 1.0
+negative_jerk_coeff: 300.0
+
+max_speed: 20.0
+max_acceleration: 4.5
+max_deceleration: -4.5
