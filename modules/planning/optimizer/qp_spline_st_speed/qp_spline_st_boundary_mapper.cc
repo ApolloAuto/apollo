@@ -54,7 +54,7 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
     const ReferenceLine& reference_line, const double planning_distance,
     const double planning_time,
     std::vector<StGraphBoundary>* const obs_boundary) const {
-  if (obs_boundary) {
+  if (obs_boundary == nullptr) {
     const std::string msg = "obs_boundary is NULL.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
