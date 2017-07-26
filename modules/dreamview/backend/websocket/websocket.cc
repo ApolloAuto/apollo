@@ -15,10 +15,10 @@ limitations under the License.
 
 #include "modules/dreamview/backend/websocket/websocket.h"
 
-#include <sstream>
 #include <vector>
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace dreamview {
@@ -74,13 +74,10 @@ bool WebSocketHandler::SendData(const std::string &data, Connection *conn) {
     } else if (ret < 0) {
       msg = "Send Error";
     } else {
-      std::ostringstream os;
-      os << "Expect to send " << data.size() << " bytes. But sent " << ret
-         << " bytes";
-      msg = os.str();
+      msg = apollo::common::util::StrCat(
+          "Expect to send ", data.size(), " bytes. But sent ", ret, " bytes");
     }
-    AWARN << "Failed to send data via websocket connection. Reason: "
-                 << msg;
+    AWARN << "Failed to send data via websocket connection. Reason: " << msg;
     return false;
   }
 

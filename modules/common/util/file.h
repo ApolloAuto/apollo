@@ -32,7 +32,7 @@
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
 #include "modules/common/log.h"
-#include "modules/common/util/util.h"
+#include "modules/common/util/string_util.h"
 
 /**
  * @namespace apollo::common::util
