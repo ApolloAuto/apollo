@@ -41,6 +41,11 @@ using ::apollo::localization::LocalizationEstimate;
 DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
+bool DpStSpeedOptimizer::Init() {
+  // TOOD: complete this function.
+  return true;
+}
+
 Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    const TrajectoryPoint& init_point,
                                    DecisionData* const decision_data,
