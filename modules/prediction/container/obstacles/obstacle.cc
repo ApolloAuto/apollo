@@ -96,7 +96,7 @@ Feature* Obstacle::mutable_feature(size_t i) {
   return &feature_history_[i];
 }
 
-const Feature& Obstacle::latest_feature() {
+const Feature& Obstacle::latest_feature() const {
   std::lock_guard<std::mutex> lock(mutex_);
   CHECK_GT(feature_history_.size(), 0);
   return feature_history_.front();
@@ -126,7 +126,7 @@ const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() {
   return kf_motion_tracker_;
 }
 
-const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() {
+const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() const {
   std::lock_guard<std::mutex> lock(mutex_);
   return kf_pedestrian_tracker_;
 }
