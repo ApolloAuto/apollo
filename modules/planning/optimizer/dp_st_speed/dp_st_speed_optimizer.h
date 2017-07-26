@@ -23,6 +23,9 @@
 
 #include <string>
 
+#include "modules/planning/proto/dp_st_speed_config.pb.h"
+#include "modules/planning/proto/st_boundary_config.pb.h"
+
 #include "modules/planning/optimizer/speed_optimizer.h"
 
 namespace apollo {
@@ -39,6 +42,8 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
                                          const TrajectoryPoint& init_point,
                                          DecisionData* const decision_data,
                                          SpeedData* const speed_data) const;
+  StBoundaryConfig st_boundary_config_;
+  DpStSpeedConfig dp_st_speed_config_;
 };
 
 }  // namespace planning
