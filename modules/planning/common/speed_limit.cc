@@ -23,8 +23,19 @@
 namespace apollo {
 namespace planning {
 
-std::vector<SpeedPoint>* SpeedLimit::mutable_speed_limits() {
-  return &_speed_point;
+void SpeedLimit::add_speed_limit(const SpeedPoint& speed_point) {
+  _speed_point.push_back(speed_point);
+}
+
+void SpeedLimit::add_speed_limit(const double s, const double t, const double v,
+                                 const double a, const double da) {
+  SpeedPoint speed_point;
+  speed_point.set_s(s);
+  speed_point.set_t(t);
+  speed_point.set_v(v);
+  speed_point.set_a(a);
+  speed_point.set_da(da);
+  _speed_point.push_back(speed_point);
 }
 
 const std::vector<SpeedPoint>& SpeedLimit::speed_limits() const {

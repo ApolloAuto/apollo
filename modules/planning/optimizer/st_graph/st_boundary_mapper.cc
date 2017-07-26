@@ -102,9 +102,9 @@ Status StBoundaryMapper::get_speed_limits(
   for (const auto& point : path_data.path().path_points()) {
     speed_limits.push_back(_st_boundary_config.maximal_speed());
     for (auto& lane : lanes) {
-      if (lane->is_on_lane( { point.x(), point.y() })) {
-        speed_limits.back() = std::fmin(speed_limits.back(),
-                                        lane->lane().speed_limit());
+      if (lane->is_on_lane({point.x(), point.y()})) {
+        speed_limits.back() =
+            std::fmin(speed_limits.back(), lane->lane().speed_limit());
         if (lane->lane().turn() == apollo::hdmap::Lane::U_TURN) {
           speed_limits.back() = std::fmin(
               speed_limits.back(), _st_boundary_config.speed_limit_on_u_turn());
@@ -153,8 +153,6 @@ Status StBoundaryMapper::get_speed_limits(
       curr_speed_limit *= _st_boundary_config.speed_multiply_buffer();
       curr_speed_limit =
           std::fmax(curr_speed_limit, _st_boundary_config.lowest_speed());
-      auto* mutable_speed_limits_data =
-          speed_limit_data->mutable_speed_limits();
 
       SpeedPoint speed_point;
       speed_point.set_s(s);
@@ -162,7 +160,7 @@ Status StBoundaryMapper::get_speed_limits(
       speed_point.set_v(curr_speed_limit);
       speed_point.set_a(0.0);
       speed_point.set_da(0.0);
-      mutable_speed_limits_data->push_back(speed_point);
+      speed_limit_data->add_speed_limit(speed_point);
 
       s += unit_s;
       ++i;
