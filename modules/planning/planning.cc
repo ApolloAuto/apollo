@@ -79,6 +79,7 @@ Status Planning::Start() {
 }
 
 void Planning::RunOnce() {
+  AdapterManager::Observe();
   if (AdapterManager::GetLocalization() == nullptr ||
       AdapterManager::GetLocalization()->Empty()) {
     AERROR << "Localization is not available; skip the planning cycle";
