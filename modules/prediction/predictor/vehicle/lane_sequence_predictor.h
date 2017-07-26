@@ -25,6 +25,7 @@
 #include "modules/prediction/predictor/predictor.h"
 
 #include <string>
+#include <vector>
 
 #include "modules/prediction/proto/lane_graph.pb.h"
 #include "modules/common/proto/path_point.pb.h"
@@ -51,6 +52,37 @@ class LaneSequencePredictor : public Predictor {
   void Predict(Obstacle* obstacle) override;
 
  protected:
+  /**
+   * @brief Filter lane sequences
+   * @param Lane graph
+   * @param Current lane id
+   * @param Vector of boolean indicating if a lane sequence is disqualified
+   */
+  void FilterLaneSequences(const LaneGraph& lane_graph,
+                           const std::string& lane_id,
+                           std::vector<bool> *enable_lane_sequence);
+
+  /**
+   * @brief Get lane change type
+   * @param Current lane id
+   * @param Lane sequence
+   * @return Integer indicating lane change type:
+   *         0: no lane change
+   *         1: left lane change
+   *         2: right lane change
+   *        -1: other
+   */
+  int GetLaneChangeType(const std::string& lane_id,
+                        const LaneSequence& lane_sequence);
+
+  /**
+   * @brief Draw lane sequence trajectory points
+   * @param Kalman filter
+   * @param Lane sequence
+   * @param Total prediction time
+   * @param Prediction frequency
+   * @param A vector of generated trajectory points
+   */
   void DrawLaneSequenceTrajectoryPoints(
       const ::apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
       const LaneSequence& sequence,
@@ -58,6 +90,11 @@ class LaneSequencePredictor : public Predictor {
       double freq,
       std::vector<::apollo::common::TrajectoryPoint> *points);
 
+  /**
+   * @brief Convert a lane sequence to string
+   * @param Lane sequence
+   * @return String describing the lane sequence
+   */
   std::string ToString(const LaneSequence& sequence);
 };
 

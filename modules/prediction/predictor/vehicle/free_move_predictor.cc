@@ -70,6 +70,9 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   prediction_obstacle_.set_predicted_period(FLAGS_prediction_duration);
   prediction_obstacle_.add_trajectory()->CopyFrom(trajectory);
   SetEqualProbability(1.0, start_index);
+  ADEBUG << "Obstacle [" << obstacle->id()
+           << "] has " << prediction_obstacle_.trajectory_size()
+           << " trajectories.";
 }
 
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
