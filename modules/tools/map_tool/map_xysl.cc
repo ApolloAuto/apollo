@@ -23,7 +23,7 @@
 #include "modules/map/proto/map_geometry.pb.h"
 #include "modules/common/log.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/hdmap/hdmap.h"
+#include "modules/map/hdmap/hdmap_impl.h"
 
 DEFINE_string(map_file, "modules/map/data/base_map.txt", "the map file");
 DEFINE_bool(xy_to_sl, false, "calculate xy to sl");
@@ -50,7 +50,7 @@ namespace tools {
 class MapUtil {
  public:
   explicit MapUtil(const std::string &map_filename) : _map_client(nullptr) {
-    _map_client.reset(new apollo::hdmap::HDMap());
+    _map_client.reset(new apollo::hdmap::HDMapImpl());
     _map_client->load_map_from_file(map_filename);
   }
 
@@ -109,15 +109,14 @@ class MapUtil {
                   double *heading) {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
-    ::apollo::common::math::Vec2d vec2d;
-    // TODO(yifei) map api is not available
-    int ret = -1;
-    // int ret = _map_client.get_smooth_point_from_lane(
-    //     create_id(lane_id), s, l, &vec2d, heading);
-    QUIT_IF(ret != 0, -3, ERROR, "get_smooth_point_from_lane[%s] failed",
+    ::apollo::hdmap::Id id;
+    id.set_id(lane_id);
+    const ::apollo::hdmap::LaneInfo* lane_info_ptr
+        = _map_client->get_lane_by_id(id).get();
+    QUIT_IF(lane_info_ptr == nullptr, -3,
+            ERROR, "get_smooth_point_from_lane[%s] failed",
             lane_id.c_str());
-    point->set_x(vec2d.x());
-    point->set_y(vec2d.y());
+    *point = lane_info_ptr->get_smooth_point(s);
     return 0;
   }
 
@@ -129,21 +128,19 @@ class MapUtil {
         _map_client->get_lane_by_id(create_id(lane_id)).get();
     QUIT_IF(lane == nullptr, -2, ERROR, "get_lane_by_id[%s] failed",
             lane_id.c_str());
-    // TODO(yifei) map api is not available
-    bool ret = false;
-    // bool ret = lane->get_projection(vec2d, s, l);
+    bool ret = lane->get_projection(vec2d, s, l);
     QUIT_IF(!ret, -3, ERROR,
             "lane[%s] get projection for point[%f, %f] failed",
             lane_id.c_str(),
             vec2d.x(), vec2d.y());
     return 0;
   }
-  const ::apollo::hdmap::HDMap *get_map_client() const {
+  const ::apollo::hdmap::HDMapImpl *get_map_client() const {
     return _map_client.get();
   }
 
  private:
-  std::unique_ptr<apollo::hdmap::HDMap> _map_client;
+  std::unique_ptr<apollo::hdmap::HDMapImpl> _map_client;
 };
 
 }  // namespace tools
@@ -257,8 +254,7 @@ int main(int argc, char *argv[]) {
               << "] overlap[" << lane.overlap_id()
               << "] crosswalk[" << lane.crosswalk_id()
               << "] yield_sign[" << lane.yield_sign_id()
-              // TODO(yifei)
-              // << "] stop_sign num:[" << lane_ptr->stop_signs().size()
+               << "] stop_sign num:[" << lane_ptr->stop_signs().size()
               << "]"
               << " start point(x,y,heading):" << start_point.x() << ","
               << start_point.y() << "," << start_heading
@@ -282,10 +278,10 @@ int main(int argc, char *argv[]) {
     }
   }
   if (!FLAGS_print_map.empty()) {
-    // const auto *map_client = map_util.get_map_client();
+    //const auto *map_client = map_util.get_map_client();
     std::ofstream ofs(FLAGS_print_map);
     // TODO(yifei) map api is not available
-    // ofs << map_client->_map.DebugString();
+    //ofs << map_client->_map.DebugString();
     ofs.close();
   }
   if (!FLAGS_print_map_bin.empty()) {
