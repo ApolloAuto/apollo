@@ -38,10 +38,8 @@ using apollo::common::Status;
 using apollo::hdmap::HDMap;
 using apollo::localization::Pose;
 
-StBoundaryMapper::StBoundaryMapper(
-    const StBoundaryConfig& st_boundary_config,
-    const apollo::common::config::VehicleParam& veh_param)
-    : _st_boundary_config(st_boundary_config), _veh_param(veh_param) {}
+StBoundaryMapper::StBoundaryMapper(const StBoundaryConfig& st_boundary_config)
+    : _st_boundary_config(st_boundary_config) {}
 
 double StBoundaryMapper::get_area(
     const std::vector<STPoint>& boundary_points) const {
@@ -172,11 +170,6 @@ Status StBoundaryMapper::get_speed_limits(
 
 const StBoundaryConfig& StBoundaryMapper::st_boundary_config() const {
   return _st_boundary_config;
-}
-
-const apollo::common::config::VehicleParam& StBoundaryMapper::vehicle_param()
-    const {
-  return _veh_param;
 }
 
 }  // namespace planning

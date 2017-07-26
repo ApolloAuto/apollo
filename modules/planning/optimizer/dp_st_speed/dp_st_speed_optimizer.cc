@@ -62,10 +62,8 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    const ReferenceLine& reference_line,
                                    DecisionData* const decision_data,
                                    SpeedData* const speed_data) {
-  const auto& veh_param = VehicleConfigHelper::GetConfig().vehicle_param();
-
   // step 1 get boundaries
-  DpStBoundaryMapper st_mapper(st_boundary_config_, veh_param);
+  DpStBoundaryMapper st_mapper(st_boundary_config_);
   double planning_distance = std::min(dp_st_speed_config_.total_path_length(),
                                       path_data.path().param_length());
   std::vector<StGraphBoundary> boundaries;
