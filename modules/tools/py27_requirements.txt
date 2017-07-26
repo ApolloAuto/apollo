@@ -7,7 +7,7 @@ glog
 google-apputils
 grpc >= 0.3
 grpcio
-protobuf == 3.1.0.post1
+protobuf == 3.1
 python-gflags
 
 # Web utils.
@@ -16,6 +16,7 @@ flask
 flask-restful
 flask-socketio
 requests >= 2.18
+simplejson
 
 # ROS env.
 PyYAML
