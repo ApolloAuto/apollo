@@ -82,12 +82,15 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
     ret =
         map_main_decision_stop(main_decision.stop(), reference_line,
                                planning_distance, planning_time, obs_boundary);
-    if (ret != Status::OK() && ret != Status(ErrorCode::PLANNING_SKIP, "")) {
-      return ret;
+    if (ret != Status::OK() && ret != Status(ErrorCode::PLANNING_SKIP)) {
+      return Status(ErrorCode::PLANNING_ERROR);
     }
   } else if (main_decision.has_mission_complete()) {
-    // TODO: fill in this function.
-    // ret = map_main_decision_mission_complete();
+    ret = map_mission_complete(reference_line, planning_distance, planning_time,
+                               obs_boundary);
+    if (ret != Status::OK() && ret != Status(ErrorCode::PLANNING_SKIP)) {
+      return Status(ErrorCode::PLANNING_ERROR);
+    }
   }
 
   const auto& static_obs_vec = decision_data.StaticObstacles();
@@ -139,8 +142,6 @@ Status QpSplineStBoundaryMapper::map_main_decision_stop(
     const MainStop& main_stop, const ReferenceLine& reference_line,
     const double planning_distance, const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
-  // TODO: complete this function.
-
   const auto lane_id =
       common::util::MakeMapId(main_stop.enforced_line().lane_id());
   const auto lane_info = DataCenter::instance()->map().get_lane_by_id(lane_id);
@@ -149,7 +150,8 @@ Status QpSplineStBoundaryMapper::map_main_decision_stop(
   SLPoint sl_point;
   if (!reference_line.get_point_in_Frenet_frame(
           Vec2d(map_point.x(), map_point.y()), &sl_point)) {
-    AERROR << "Fail to map_main_decision_stop since xy_to_sl_point failed.";
+    AERROR << "Fail to map_main_decision_stop since get_point_in_Frenet_frame "
+              "failed.";
     return Status(ErrorCode::PLANNING_ERROR);
   }
   sl_point.set_s(sl_point.s() - FLAGS_backward_routing_distance);
@@ -197,6 +199,33 @@ Status QpSplineStBoundaryMapper::map_obstacle_with_planning(
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
+  return Status::OK();
+}
+
+Status QpSplineStBoundaryMapper::map_mission_complete(
+    const ReferenceLine& reference_line, const double planning_distance,
+    const double planning_time,
+    std::vector<StGraphBoundary>* const boundary) const {
+  const double s_min = st_boundary_config().success_tunnel();
+  const double s_max =
+      std::fmin(planning_distance,
+                reference_line.length() - FLAGS_backward_routing_distance);
+
+  std::vector<STPoint> boundary_points;
+  boundary_points.emplace_back(s_min, 0.0);
+  boundary_points.emplace_back(s_max, 0.0);
+  boundary_points.emplace_back(s_max + st_boundary_config().boundary_buffer(),
+                               planning_time);
+  boundary_points.emplace_back(s_min, planning_time);
+
+  const double area = get_area(boundary_points);
+  if (Double::compare(area, 0.0) <= 0) {
+    return Status(ErrorCode::PLANNING_SKIP);
+  }
+  boundary->emplace_back(boundary_points);
+  boundary->back().set_characteristic_length(
+      st_boundary_config().boundary_buffer());
+  boundary->back().set_boundary_type(StGraphBoundary::BoundaryType::STOP);
   return Status::OK();
 }
 
