@@ -51,7 +51,7 @@ class VehicleStateTest : public ::testing::Test {
 
 TEST_F(VehicleStateTest, Accessors) {
   auto* vehicle_state = VehicleState::instance();
-  vehicle_state->Update(&localization_, &chassis_);
+  vehicle_state->Update(localization_, chassis_);
   EXPECT_DOUBLE_EQ(vehicle_state->x(), 357.51331791372041);
   EXPECT_DOUBLE_EQ(vehicle_state->y(), 96.165912376788725);
   EXPECT_DOUBLE_EQ(vehicle_state->heading(), -1.8388082455104939);
@@ -62,13 +62,14 @@ TEST_F(VehicleStateTest, Accessors) {
 
 TEST_F(VehicleStateTest, EstimateFuturePosition) {
   auto* vehicle_state = VehicleState::instance();
-  vehicle_state->Update(&localization_, &chassis_);
-  Eigen::Vector2d future_position = vehicle_state->EstimateFuturePosition(1.0);
-  EXPECT_NEAR(future_position[0], 356.707, 1e-3);
-  EXPECT_NEAR(future_position[1], 93.276, 1e-3);
+  vehicle_state->Update(localization_, chassis_);
+  common::math::Vec2d future_position =
+      vehicle_state->EstimateFuturePosition(1.0);
+  EXPECT_NEAR(future_position.x(), 356.707, 1e-3);
+  EXPECT_NEAR(future_position.y(), 93.276, 1e-3);
   future_position = vehicle_state->EstimateFuturePosition(2.0);
-  EXPECT_NEAR(future_position[0], 355.879, 1e-3);
-  EXPECT_NEAR(future_position[1], 90.393, 1e-3);
+  EXPECT_NEAR(future_position.x(), 355.879, 1e-3);
+  EXPECT_NEAR(future_position.y(), 90.393, 1e-3);
 }
 
 }  // namespace vehicle_state

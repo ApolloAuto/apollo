@@ -25,6 +25,8 @@
 #include <fstream>
 #include <string>
 
+#include "Eigen/Core"
+
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/filters/digital_filter.h"
@@ -107,7 +109,7 @@ class LatController : public Controller {
   double ComputeFeedForward(double ref_curvature) const;
 
   double GetLateralError(
-      const Eigen::Vector2d &point,
+      const common::math::Vec2d &point,
       apollo::common::TrajectoryPoint *trajectory_point) const;
 
   void ComputeLateralErrors(const double x, const double y, const double theta,

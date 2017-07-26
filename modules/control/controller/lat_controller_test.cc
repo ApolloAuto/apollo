@@ -38,7 +38,7 @@ using apollo::common::time::Clock;
 using PlanningTrajectoryPb = planning::ADCTrajectory;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
-using apollo::common::vehicle_state::VehicleState;
+using apollo::common::VehicleState;
 
 class LatControllerTest : public ::testing::Test, LatController {
  public:
@@ -101,7 +101,7 @@ TEST_F(LatControllerTest, ComputeLateralErrors) {
       "modules/control/testdata/longitudinal_controller_test/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
   auto *vehicle_state = VehicleState::instance();
-  vehicle_state->Update(&localization_pb, &chassis_pb);
+  vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(
       "modules/control/testdata/longitudinal_controller_test/"
