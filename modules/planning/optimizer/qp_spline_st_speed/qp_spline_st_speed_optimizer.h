@@ -42,7 +42,8 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
   virtual common::Status Process(
       const PathData& path_data,
       const apollo::common::TrajectoryPoint& init_point,
-      DecisionData* const decision_data, SpeedData* const speed_data) override;
+      const ReferenceLine& reference_line, DecisionData* const decision_data,
+      SpeedData* const speed_data) override;
   StBoundaryConfig st_boundary_config_;
   QpSplineStSpeedConfig qp_spline_st_speed_config_;
 };

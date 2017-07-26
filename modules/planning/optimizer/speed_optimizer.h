@@ -40,6 +40,7 @@ class SpeedOptimizer : public Optimizer {
  protected:
   virtual apollo::common::Status Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
+                                         const ReferenceLine& reference_line,
                                          DecisionData* const decision_data,
                                          SpeedData* const speed_data) = 0;
 };

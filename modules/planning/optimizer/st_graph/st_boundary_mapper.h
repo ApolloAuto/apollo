@@ -24,8 +24,8 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/status/status.h"
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
@@ -50,7 +50,8 @@ class StBoundaryMapper {
   virtual apollo::common::Status get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
-      const double planning_distance, const double planning_time,
+      const ReferenceLine& reference_line, const double planning_distance,
+      const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const = 0;
 
   virtual apollo::common::Status get_speed_limits(
