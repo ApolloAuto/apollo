@@ -14,7 +14,6 @@ cc_library(
         "//modules/common:log",
         "//modules/common:common",
         "//modules/map/hdmap:hdmap",
-        "//external:gflags",
         "@eigen//:eigen",
     ],
 )
@@ -34,7 +33,6 @@ cc_library(
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
         "//modules/common:log",
         "//modules/common:common",
-        "//external:gflags",
         "@eigen//:eigen",
         "@ros//:ros_common",
     ],
