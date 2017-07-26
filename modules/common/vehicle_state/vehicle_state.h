@@ -21,20 +21,17 @@
 #ifndef MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 #define MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 
-#include "Eigen/Core"
-
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/macro.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/localization/proto/localization.pb.h"
 
-#include "modules/common/macro.h"
-
 /**
- * @namespace apollo::common::vehicle_state
- * @brief apollo::common::vehicle_state
+ * @namespace apollo::common
+ * @brief apollo::common
  */
 namespace apollo {
 namespace common {
-namespace vehicle_state {
 
 /**
  * @class VehicleState
@@ -49,14 +46,12 @@ class VehicleState {
    * @param localization Localization information of the vehicle.
    * @param chassis Chassis information of the vehicle.
    */
-  void Update(const localization::LocalizationEstimate* localization,
-              const canbus::Chassis* chassis);
+  void Update(const localization::LocalizationEstimate& localization,
+              const canbus::Chassis& chassis);
 
   double timestamp() const { return timestamp_; };
 
-  const apollo::localization::Pose& pose() const {
-    return localization_ptr_->pose();
-  };
+  const apollo::localization::Pose& pose() const { return pose_; };
 
   /**
    * @brief Default destructor.
@@ -168,7 +163,7 @@ class VehicleState {
    * @param t The length of time period.
    * @return The estimated future position in time t.
    */
-  Eigen::Vector2d EstimateFuturePosition(const double t) const;
+  common::math::Vec2d EstimateFuturePosition(const double t) const;
 
   /**
  * @brief Compute the position of center of mass(COM) of the vehicle,
@@ -177,13 +172,14 @@ class VehicleState {
  *        the vehicle's center of mass.
  * @return The position of the vehicle's center of mass.
  */
-  Eigen::Vector2d ComputeCOMPosition(const double rear_to_com_distance) const;
+  common::math::Vec2d ComputeCOMPosition(
+      const double rear_to_com_distance) const;
 
  private:
   DECLARE_SINGLETON(VehicleState);
 
   void ConstructExceptLinearVelocity(
-      const localization::LocalizationEstimate* localization);
+      const localization::LocalizationEstimate& localization);
 
   double x_ = 0.0;
   double y_ = 0.0;
@@ -196,10 +192,9 @@ class VehicleState {
   double linear_a_ = 0.0;
   double timestamp_ = 0.0;
   canbus::Chassis::GearPosition gear_;
-  const localization::LocalizationEstimate* localization_ptr_ = nullptr;
+  localization::Pose pose_;
 };
 
-}  // namespace vehicle_state
 }  // namespace common
 }  // namespace apollo
 
