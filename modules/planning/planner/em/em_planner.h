@@ -30,7 +30,6 @@
 #include "modules/planning/optimizer/optimizer.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
 
 /**
@@ -75,13 +74,9 @@ class EMPlanner : public Planner {
   std::vector<SpeedPoint> GenerateInitSpeedProfile(const double init_v,
                                                    const double init_a);
 
-  apollo::common::Status GenerateReferenceLineFromRouting();
-
  private:
   apollo::common::util::Factory<OptimizerType, Optimizer> optimizer_factory_;
   std::vector<std::unique_ptr<Optimizer>> optimizers_;
-  ReferenceLineSmootherConfig smoother_config_;
-  std::unique_ptr<ReferenceLine> reference_line_;
 };
 
 }  // namespace planning
