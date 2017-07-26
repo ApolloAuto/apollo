@@ -66,6 +66,7 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   for (int i = 0; i < config.em_planner_config().optimizer_size(); ++i) {
     optimizers_.emplace_back(optimizer_factory_.CreateObject(
         config.em_planner_config().optimizer(i)));
+    optimizers_.back()->Init();
   }
   routing_proxy_.Init();
   return Status::OK();
@@ -97,7 +98,8 @@ Status EMPlanner::MakePlan(
   planning_data->set_decision_data(decision_data);
   for (auto& optimizer : optimizers_) {
     optimizer->Optimize(planning_data);
-    ADEBUG << planning_data->DebugString();
+    ADEBUG << "after optimizer " << optimizer->name()
+        << ":" << planning_data->DebugString();
   }
   PublishableTrajectory computed_trajectory;
   if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution,

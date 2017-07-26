@@ -120,7 +120,7 @@ void Planning::RunOnce() {
     ADCTrajectory trajectory_pb =
         ToADCTrajectory(execution_start_time, planning_trajectory);
     AdapterManager::PublishPlanning(trajectory_pb);
-    ADEBUG << "Planning succeeded:" << trajectory_pb.DebugString();
+    ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
   } else {
     AERROR << "Planning failed";
   }
