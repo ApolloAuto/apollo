@@ -59,6 +59,10 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    const ReferenceLine& reference_line,
                                    DecisionData* const decision_data,
                                    SpeedData* const speed_data) {
+  if (!is_init_) {
+    AERROR << "Please call Init() before process DpStSpeedOptimizer.";
+    return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
+  }
   // step 1 get boundaries
   double planning_distance = std::min(dp_st_speed_config_.total_path_length(),
                                       path_data.path().param_length());
@@ -86,9 +90,10 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
           DataCenter::instance()->map(), path_data, planning_distance,
           dp_st_speed_config_.matrix_dimension_s(),
           dp_st_speed_config_.max_speed(), &speed_limit) != Status::OK()) {
-    AERROR << "Getting speed limits for dp st speed optimizer failed!";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Getting speed limits for dp st speed optimizer failed!");
+    const std::string msg
+        = "Getting speed limits for dp st speed optimizer failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   StGraphData st_graph_data(boundaries, init_point, speed_limit,
