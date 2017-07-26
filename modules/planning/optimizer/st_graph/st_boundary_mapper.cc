@@ -26,6 +26,7 @@
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
@@ -38,8 +39,13 @@ using apollo::common::Status;
 using apollo::hdmap::HDMap;
 using apollo::localization::Pose;
 
-StBoundaryMapper::StBoundaryMapper(const StBoundaryConfig& st_boundary_config)
-    : _st_boundary_config(st_boundary_config) {}
+bool StBoundaryMapper::SetConfig(const std::string& config_file) {
+  if (!common::util::GetProtoFromFile(config_file, &_st_boundary_config)) {
+    AERROR << "Failed to load config file " << config_file;
+    return false;
+  }
+  return true;
+}
 
 double StBoundaryMapper::get_area(
     const std::vector<STPoint>& boundary_points) const {

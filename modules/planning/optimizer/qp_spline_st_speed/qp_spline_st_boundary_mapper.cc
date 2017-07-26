@@ -43,10 +43,6 @@ using VehicleParam = apollo::common::config::VehicleParam;
 using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
 
-QpSplineStBoundaryMapper::QpSplineStBoundaryMapper(
-    const StBoundaryConfig& st_boundary_config)
-    : StBoundaryMapper(st_boundary_config) {}
-
 Status QpSplineStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
