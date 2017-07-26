@@ -36,10 +36,6 @@ using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::Status;
 
-DpStBoundaryMapper::DpStBoundaryMapper(
-    const StBoundaryConfig& st_boundary_config)
-    : StBoundaryMapper(st_boundary_config) {}
-
 Status DpStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
