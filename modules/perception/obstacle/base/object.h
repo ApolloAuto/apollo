@@ -35,10 +35,10 @@ struct alignas(16) Object {
   Object& operator = (const Object& rhs);
   // deep copy
   void clone(const Object& rhs);
-  std::string to_string() const;
+  std::string ToString() const;
 
-  bool serialize(PerceptionObstacle* pb_obj) const;
-  bool deserialize(const PerceptionObstacle& pb_obs);
+  bool Serialize(PerceptionObstacle* pb_obj) const;
+  bool Deserialize(const PerceptionObstacle& pb_obs);
 
   // object id per frame
   int id = 0;

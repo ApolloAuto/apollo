@@ -92,7 +92,7 @@ void Object::clone(const Object& rhs) {
   latest_tracked_time = rhs.latest_tracked_time;
 }
 
-string Object::to_string() const {
+string Object::ToString() const {
   return apollo::common::util::StrCat(
       "Object[id: ", id, ", "
       "track_id: ", track_id, ", "
@@ -110,7 +110,7 @@ string Object::to_string() const {
   // "latest_tracked_time: ", GLOG_TIMESTAMP(latest_tracked_time)
 }
 
-bool Object::serialize(PerceptionObstacle* pb_obj) const {
+bool Object::Serialize(PerceptionObstacle* pb_obj) const {
   CHECK(pb_obj != NULL);
   pb_obj->set_id(track_id);
   pb_obj->set_theta(theta);
@@ -149,7 +149,7 @@ bool Object::serialize(PerceptionObstacle* pb_obj) const {
   return true;
 }
 
-bool Object::deserialize(const PerceptionObstacle& pb_obs) {
+bool Object::Deserialize(const PerceptionObstacle& pb_obs) {
   track_id = pb_obs.id();
   theta = pb_obs.theta();
 

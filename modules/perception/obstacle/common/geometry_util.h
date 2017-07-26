@@ -76,8 +76,8 @@ void GetCloudMinMax3D(typename pcl::PointCloud<PointT>::Ptr cloud,
 }
 
 void TransformCloud(pcl_util::PointCloudPtr cloud,
-    std::vector<int> indices,
-    pcl_util::PointDCloud& trans_cloud);
+    const std::vector<int>& indices,
+    pcl_util::PointDCloud* trans_cloud);
 
 }  // namespace perception
 }  // namespace apollo
