@@ -14,12 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file path_point_util.cc
- **/
+#include "modules/planning/common/planning_util.h"
 
-#include "modules/planning/common/path/path_point_util.h"
-
+#include <array>
+#include <cmath>
+#include <memory>
 #include <utility>
 
 #include "modules/common/math/integral.h"
@@ -30,8 +29,19 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-using apollo::common::PathPoint;
-using apollo::common::TrajectoryPoint;
+using common::PathPoint;
+using common::TrajectoryPoint;
+
+SpeedPoint MakeSpeedPoint(const double s, const double t, double v, double a,
+                          double da) {
+  SpeedPoint point;
+  point.set_s(s);
+  point.set_t(t);
+  point.set_v(v);
+  point.set_a(a);
+  point.set_da(da);
+  return point;
+}
 
 PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
                       const double s) {
@@ -51,10 +61,10 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
     return std::sin(theta);
   };
 
-  double x = p0.x() + apollo::common::math::IntegrateByGaussLegendre(
-      func_cos_theta, s0, s);
-  double y = p0.y() + apollo::common::math::IntegrateByGaussLegendre(
-      func_sin_theta, s0, s);
+  double x =
+      p0.x() + common::math::IntegrateByGaussLegendre(func_cos_theta, s0, s);
+  double y =
+      p0.y() + common::math::IntegrateByGaussLegendre(func_sin_theta, s0, s);
   double theta = geometry_spline.evaluate(0, s);
   double kappa = geometry_spline.evaluate(1, s);
   double dkappa = geometry_spline.evaluate(2, s);
@@ -68,7 +78,7 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   p.set_dkappa(dkappa);
   p.set_ddkappa(d2kappa);
   p.set_s(s);
-  return std::move(p);
+  return p;
 }
 
 PathPoint interpolate_linear_approximation(const PathPoint &p0,
@@ -114,8 +124,8 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   auto func_v = [&dynamic_spline](const double t) {
     return dynamic_spline.evaluate(0, t);
   };
-  double s1 = apollo::common::math::IntegrateByGaussLegendre(func_v, t0, t1);
-  double s = apollo::common::math::IntegrateByGaussLegendre(func_v, t0, t);
+  double s1 = common::math::IntegrateByGaussLegendre(func_v, t0, t1);
+  double s = common::math::IntegrateByGaussLegendre(func_v, t0, t);
 
   double v = dynamic_spline.evaluate(0, t);
   double a = dynamic_spline.evaluate(1, t);
@@ -132,10 +142,10 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
     return std::sin(theta);
   };
 
-  double x = pp0.x() + apollo::common::math::IntegrateByGaussLegendre(
-      func_cos_theta, s0, s);
-  double y = pp0.y() + apollo::common::math::IntegrateByGaussLegendre(
-      func_sin_theta, s0, s);
+  double x =
+      pp0.x() + common::math::IntegrateByGaussLegendre(func_cos_theta, s0, s);
+  double y =
+      pp0.y() + common::math::IntegrateByGaussLegendre(func_sin_theta, s0, s);
   double theta = geometry_spline.evaluate(0, s);
   double kappa = geometry_spline.evaluate(1, s);
   double dkappa = geometry_spline.evaluate(2, s);
@@ -167,24 +177,34 @@ TrajectoryPoint interpolate_linear_approximation(const TrajectoryPoint &tp0,
   double t1 = tp1.relative_time();
 
   TrajectoryPoint tp;
-  tp.set_v(apollo::common::math::lerp(tp0.v(), t0, tp1.v(), t1, t));
-  tp.set_a(apollo::common::math::lerp(tp0.a(), t0, tp1.a(), t1, t));
+  tp.set_v(common::math::lerp(tp0.v(), t0, tp1.v(), t1, t));
+  tp.set_a(common::math::lerp(tp0.a(), t0, tp1.a(), t1, t));
   tp.set_relative_time(t);
 
   PathPoint *path_point = tp.mutable_path_point();
-  path_point->set_x(apollo::common::math::lerp(pp0.x(), t0, pp1.x(), t1, t));
-  path_point->set_y(apollo::common::math::lerp(pp0.y(), t0, pp1.y(), t1, t));
+  path_point->set_x(common::math::lerp(pp0.x(), t0, pp1.x(), t1, t));
+  path_point->set_y(common::math::lerp(pp0.y(), t0, pp1.y(), t1, t));
   path_point->set_theta(
-      apollo::common::math::lerp(pp0.theta(), t0, pp1.theta(), t1, t));
+      common::math::lerp(pp0.theta(), t0, pp1.theta(), t1, t));
   path_point->set_kappa(
-      apollo::common::math::lerp(pp0.kappa(), t0, pp1.kappa(), t1, t));
+      common::math::lerp(pp0.kappa(), t0, pp1.kappa(), t1, t));
   path_point->set_dkappa(
-      apollo::common::math::lerp(pp0.dkappa(), t0, pp1.dkappa(), t1, t));
+      common::math::lerp(pp0.dkappa(), t0, pp1.dkappa(), t1, t));
   path_point->set_ddkappa(
-      apollo::common::math::lerp(pp0.ddkappa(), t0, pp1.ddkappa(), t1, t));
-  path_point->set_s(apollo::common::math::lerp(pp0.s(), t0, pp1.s(), t1, t));
+      common::math::lerp(pp0.ddkappa(), t0, pp1.ddkappa(), t1, t));
+  path_point->set_s(common::math::lerp(pp0.s(), t0, pp1.s(), t1, t));
 
   return tp;
+}
+
+common::SLPoint interpolate(const common::SLPoint &start,
+                            const common::SLPoint &end, const double weight) {
+  common::SLPoint point;
+  double s = start.s() * (1 - weight) + end.s() * weight;
+  double l = start.l() * (1 - weight) + end.l() * weight;
+  point.set_s(s);
+  point.set_l(l);
+  return point;
 }
 
 }  // namespace util

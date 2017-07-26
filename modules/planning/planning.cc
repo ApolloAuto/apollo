@@ -16,6 +16,8 @@
 
 #include "modules/planning/planning.h"
 
+#include <algorithm>
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state.h"

@@ -31,6 +31,7 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:path_point_proto",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:planning_util",
         "//modules/planning/math:double",
         "//modules/planning/proto:planning_proto",
     ],

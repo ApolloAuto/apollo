@@ -15,42 +15,49 @@
  *****************************************************************************/
 
 /**
- * @file path_point_util.h
- **/
+ * @file planning_util.h
+ */
 
-#ifndef MODULES_PLANNING_COMMON_PATH_PATH_POINT_H_
-#define MODULES_PLANNING_COMMON_PATH_PATH_POINT_H_
+#ifndef MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
+#define MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
 
-#include "Eigen/Dense"
+#include <string>
 
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
+/**
+ * @namespace apollo::common::util
+ * @brief apollo::common::util
+ */
 namespace apollo {
 namespace planning {
 namespace util {
 
-apollo::common::PathPoint interpolate(
-    const apollo::common::PathPoint &p0,
-    const apollo::common::PathPoint &p1, const double s);
+SpeedPoint MakeSpeedPoint(const double s, const double l, double v, double a,
+                          double da);
+
+common::SLPoint interpolate(const common::SLPoint &start,
+                            const common::SLPoint &end, const double weight);
+
+apollo::common::PathPoint interpolate(const apollo::common::PathPoint &p0,
+                                      const apollo::common::PathPoint &p1,
+                                      const double s);
 
 // @ weight shall between 1 and 0
 apollo::common::PathPoint interpolate_linear_approximation(
-    const apollo::common::PathPoint &p0,
-    const apollo::common::PathPoint &p1,
+    const apollo::common::PathPoint &p0, const apollo::common::PathPoint &p1,
     const double s);
 
 apollo::common::TrajectoryPoint interpolate(
     const apollo::common::TrajectoryPoint &tp0,
-    const apollo::common::TrajectoryPoint &tp1,
-    const double t);
+    const apollo::common::TrajectoryPoint &tp1, const double t);
 
 apollo::common::TrajectoryPoint interpolate_linear_approximation(
     const apollo::common::TrajectoryPoint &tp0,
-    const apollo::common::TrajectoryPoint &tp1,
-    const double t);
-
+    const apollo::common::TrajectoryPoint &tp1, const double t);
 }  // namespace util
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_PATH_PATH_POINT_H_
+#endif  // MODULES_PLANNING_UTIL_PLANNING_UTIL_H_

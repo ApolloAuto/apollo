@@ -33,13 +33,14 @@ class SpeedData {
 
   SpeedData(std::vector<SpeedPoint> speed_points);
 
-  std::vector<SpeedPoint>* mutable_speed_vector();
-
   const std::vector<SpeedPoint>& speed_vector() const;
 
   void set_speed_vector(const std::vector<SpeedPoint>& speed_points);
 
   virtual std::string DebugString() const;
+
+  void add_speed_point(const double s, const double time, const double v,
+                       const double a, const double da);
 
   bool get_speed_point_with_time(const double time,
                                  SpeedPoint* const speed_point) const;

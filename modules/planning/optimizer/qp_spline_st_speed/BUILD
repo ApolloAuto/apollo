@@ -34,9 +34,9 @@ cc_library(
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:path_point_proto",
         "//modules/common/util",
+        "//modules/planning/common:planning_util",
         "//modules/planning/math/smoothing_spline:spline_1d_generator",
         "//modules/planning/optimizer/st_graph:st_graph_data",
-        "//modules/planning/util:planning_util",
     ],
 )
 

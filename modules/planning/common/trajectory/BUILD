@@ -25,7 +25,7 @@ cc_library(
     deps = [
         ":trajectory",
         "//modules/common/proto:path_point_proto",
-        "//modules/planning/common/path:path_point_util",
+        "//modules/planning/common:planning_util",
         "@eigen//:eigen",
     ],
 )
