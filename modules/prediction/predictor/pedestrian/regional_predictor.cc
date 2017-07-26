@@ -67,8 +67,57 @@ double CrossProduct(const Eigen::Vector2d& vec1, const Eigen::Vector2d& vec2) {
 }  // namespace
 
 void RegionalPredictor::Predict(Obstacle* obstacle) {
+  if (obstacle == nullptr) {
+    AERROR << "Missing obstacle.";
+    return;
+  }
+  double speed = 0.0;
+  const Feature& feature = obstacle->latest_feature();
+  if (feature.has_speed()) {
+    speed = feature.speed();
+  }
+  if (FLAGS_enable_kf_tracking && feature.has_t_speed()) {
+    speed = feature.t_speed();
+  }
+  if (speed > FLAGS_still_speed) {
+    GenerateMovingTrajectory(obstacle, 1.0);
+  } else {
+    GenerateStillTrajectory(obstacle, 1.0);
+  }
+}
 
-  // TODO(kechxu) implement
+void RegionalPredictor::GenerateStillTrajectory(
+    const Obstacle* obstacle, double probability) {
+  if (obstacle == nullptr) {
+    AERROR << "Missing obstacle.";
+    return;
+  }
+  const Feature& feature = obstacle->latest_feature();
+  if (!feature.has_position() ||
+      !feature.position().has_x() ||
+      !feature.position().has_y() ||
+      !feature.has_velocity()) {
+    AERROR << "Missing position or velocity.";
+    return;
+  }
+  
+  Eigen::Vector2d position(feature.position().x(), feature.position().y());
+  double heading = 0.0 - M_PI;
+  int num_traj = FLAGS_num_trajectory_still_pedestrian;
+  double delta_heading = 2.0 * M_PI / num_traj;
+  double speed = FLAGS_pedestrian_min_speed;
+  double total_time = FLAGS_prediction_pedestrian_total_time;
+  int start_index = GetTrajectorySize();
+
+  for (int i = 0; i < num_traj; ++i) {
+    std::vector<TrajectoryPoint> points;
+    DrawStillTrajectory(position, heading, speed, total_time, &points);
+    Trajectory trajectory;
+    GenerateTrajectory(points, &trajectory);
+    prediction_obstacle_.add_trajectory()->CopyFrom(std::move(trajectory));
+    heading += delta_heading;
+  }
+  SetEqualProbability(probability, start_index);
 }
 
 void RegionalPredictor::GenerateMovingTrajectory(
@@ -113,8 +162,8 @@ void RegionalPredictor::GenerateMovingTrajectory(
   Trajectory right_trajectory;
   GenerateTrajectory(left_points, &left_trajectory);
   GenerateTrajectory(right_points, &right_trajectory);
-  prediction_obstacle_.add_trajectory()->CopyFrom(left_trajectory);
-  prediction_obstacle_.add_trajectory()->CopyFrom(right_trajectory);
+  prediction_obstacle_.add_trajectory()->CopyFrom(std::move(left_trajectory));
+  prediction_obstacle_.add_trajectory()->CopyFrom(std::move(right_trajectory));
   SetEqualProbability(probability, start_index);
 }
 
