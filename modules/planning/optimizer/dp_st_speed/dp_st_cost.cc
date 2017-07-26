@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-DpStCost::DpStCost(const DpStConfiguration& dp_st_configuration)
+DpStCost::DpStCost(const DpStSpeedConfig& dp_st_configuration)
     : _dp_st_configuration(dp_st_configuration) {
   _unit_s = _dp_st_configuration.total_path_length() /
             _dp_st_configuration.matrix_dimension_s();

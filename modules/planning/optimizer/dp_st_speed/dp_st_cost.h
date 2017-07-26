@@ -24,8 +24,9 @@
 #include <vector>
 
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/proto/dp_st_speed_config.pb.h"
+
 #include "modules/planning/common/speed/st_point.h"
-#include "modules/planning/optimizer/dp_st_speed/dp_st_configuration.h"
 #include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
 
 namespace apollo {
@@ -33,7 +34,7 @@ namespace planning {
 
 class DpStCost {
  public:
-  explicit DpStCost(const DpStConfiguration& dp_st_configuration);
+  explicit DpStCost(const DpStSpeedConfig& dp_st_configuration);
 
   double obstacle_cost(const STPoint& point,
                        const std::vector<StGraphBoundary>& obs_boundary) const;
@@ -64,7 +65,7 @@ class DpStCost {
                                   const STPoint& forth) const;
 
  private:
-  DpStConfiguration _dp_st_configuration;
+  DpStSpeedConfig _dp_st_configuration;
   double _unit_s = 0.0;
   double _unit_t = 0.0;
 };

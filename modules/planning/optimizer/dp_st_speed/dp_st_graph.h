@@ -22,22 +22,24 @@
 #define MODULES_PLANNING_OPTIMIZER_QP_ST_SPEED_DP_ST_GRAPH_H_
 
 #include <vector>
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/planning/proto/dp_st_speed_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
-#include "modules/planning/optimizer/dp_st_speed/dp_st_configuration.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_cost.h"
 #include "modules/planning/optimizer/st_graph/st_graph_data.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const DpStConfiguration& dp_config,
+  DpStGraph(const DpStSpeedConfig& dp_config,
             // const StBoundaryConfig& mapper_config,
             const apollo::common::config::VehicleParam& veh_param);
 
@@ -57,8 +59,7 @@ class DpStGraph {
       SpeedData* const speed_data) const;
 
   apollo::common::Status get_object_decision(
-      const StGraphData& st_graph_data,
-      const SpeedData& speed_profile) const;
+      const StGraphData& st_graph_data, const SpeedData& speed_profile) const;
 
   void calculate_total_cost(const std::uint32_t r, const std::uint32_t c);
 
@@ -78,7 +79,7 @@ class DpStGraph {
 
  private:
   // dp st configuration
-  DpStConfiguration _dp_st_configuration;
+  DpStSpeedConfig _dp_st_speed_config;
 
   // cost utility with configuration;
   DpStCost _dp_st_cost;
