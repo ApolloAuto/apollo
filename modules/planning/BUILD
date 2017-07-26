@@ -44,7 +44,10 @@ cc_test(
     srcs = [
         "planning_test.cc",
     ],
-    data = ["//modules/planning:planning_testdata"],
+    data = [
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
     deps = [
         ":planning_impl",
         "//modules/common:log",
