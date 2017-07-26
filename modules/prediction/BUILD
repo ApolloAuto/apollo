@@ -22,6 +22,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "prediction_test",
+    size = "small",
+    srcs = ["prediction_test.cc"],
+    deps = [
+        "//modules/prediction:prediction_lib",
+        "@gtest//:main",
+    ]
+)
+
 cc_binary(
     name = "prediction",
     srcs = ["main.cc"],
