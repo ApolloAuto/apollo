@@ -16,16 +16,14 @@
 
 /**
  * @file
- * @brief Some util functions.
+ * @brief Some string util functions.
  */
 
-#ifndef MODULES_COMMON_UTIL_H_
-#define MODULES_COMMON_UTIL_H_
+#ifndef MODULES_COMMON_STRING_UTIL_H_
+#define MODULES_COMMON_STRING_UTIL_H_
 
-#include <iostream>
-#include <utility>
-
-#include "modules/common/proto/path_point.pb.h"
+#include <sstream>
+#include <string>
 
 /**
  * @namespace apollo::common::util
@@ -36,29 +34,29 @@ namespace common {
 namespace util {
 
 /**
- * @brief create a SL point
- * @param s the s value
- * @param l the l value
- * @return a SLPoint instance
+ * @brief Check if a string ends with a pattern.
+ * @param original The original string. To see if it ends with some
+ *        specified pattern.
+ * @param pattern The target pattern. To see if the original string ends
+ *        with it.
+ * @return Whether the original string ends with the specified pattern.
  */
-apollo::common::SLPoint MakeSLPoint(const double s, const double l);
+bool EndWith(const std::string& original, const std::string& pattern);
 
 /**
- * calculate the distance beteween PathPoint a and PathPoint b
- * @param a one path point
- * @param b another path point
- * @return sqrt((a.x-b.x)^2 + (a.y-b.y)^2), i.e., the Euclid distance on XY
- * dimension
+ * @brief Concat parameters to a string, e.g.: StrCat("age = ", 32)
+ * @return String of concated parameters.
  */
-double Distance2D(const PathPoint& a, const PathPoint& b);
+template <typename ...T>
+std::string StrCat(const T& ...args) {
+  std::ostringstream oss;
+  // Expand args and pass to oss.
+  std::initializer_list<char>{(oss << args, ' ') ... };
+  return oss.str();
+}
 
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
 
-template <typename A, typename B>
-std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {
-  return os << "first: " << p.first << ", second: " << p.second;
-}
-
-#endif  // MODULES_COMMON_UTIL_H_
+#endif  // MODULES_COMMON_STRING_UTIL_H_

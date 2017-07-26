@@ -49,6 +49,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/util:string_util",
     ],
 )
 
@@ -165,6 +166,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/math:matrix_operations",
+        "//modules/common/util:string_util",
         "@eigen//:eigen",
     ],
 )

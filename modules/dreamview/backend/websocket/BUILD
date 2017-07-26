@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/util:string_util",
         "//third_party/json",
         "@civetweb//:civetweb++",
     ],

@@ -25,6 +25,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace hdmap {
@@ -60,21 +61,17 @@ std::string LaneWaypoint::debug_string() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
-  std::ostringstream sout;
-  sout << "id = " << lane->id().id() << "  s = " << s;
-  sout.flush();
-  return sout.str();
+  return apollo::common::util::StrCat("id = ", lane->id().id(), "  s = ", s);
 }
 
 std::string LaneSegment::debug_string() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
-  std::ostringstream sout;
-  sout << "id = " << lane->id().id() << "  start_s = " << start_s
-       << "  end_s = " << end_s;
-  sout.flush();
-  return sout.str();
+  return apollo::common::util::StrCat(
+      "id = ", lane->id().id(), "  "
+      "start_s = ", start_s, "  "
+      "end_s = ", end_s);
 }
 
 std::string MapPathPoint::debug_string() const {
@@ -121,10 +118,7 @@ std::string Path::debug_string() const {
 }
 
 std::string PathOverlap::debug_string() const {
-  std::ostringstream sout;
-  sout << object_id << " " << start_s << " " << end_s;
-  sout.flush();
-  return sout.str();
+  return apollo::common::util::StrCat(object_id, " ", start_s, " ", end_s);
 }
 
 Path::Path(std::vector<MapPathPoint> path_points)

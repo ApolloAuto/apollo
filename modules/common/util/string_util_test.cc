@@ -14,34 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file st_point.cpp
- **/
-
-#include "modules/planning/common/speed/st_point.h"
-
-#include <iomanip>
-
 #include "modules/common/util/string_util.h"
 
+#include "gtest/gtest.h"
+
 namespace apollo {
-namespace planning {
+namespace common {
+namespace util {
 
-STPoint::STPoint(const double s, const double t) : Vec2d(t, s){};
-
-double STPoint::s() const { return y_; }
-
-double STPoint::t() const { return x_; }
-
-void STPoint::set_s(const double s) { return set_y(s); }
-
-void STPoint::set_t(const double t) { return set_x(t); }
-
-std::string STPoint::DebugString() const {
-  return apollo::common::util::StrCat(
-      "{ \"s\" : ", std::setprecision(6), s(), ", "
-      "\"t\" : ", std::setprecision(6), t(), " }");
+TEST(UtilTest, EndWith) {
+  EXPECT_TRUE(EndWith("abc.def", "def"));
+  EXPECT_TRUE(EndWith("abc.def", ".def"));
+  EXPECT_FALSE(EndWith("abc.def", "abc"));
+  EXPECT_FALSE(EndWith("abc.def", "de"));
 }
 
-}  // namespace planning
+TEST(UtilTest, StrCat) {
+  EXPECT_EQ(StrCat("string", "32"), "string32");  // string, string
+  EXPECT_EQ(StrCat("string", 32, 3.2f), "string323.2");  // string, int, float
+  EXPECT_EQ(StrCat(3.2, ' ', true), "3.2 1");  // double, char, bool
+}
+
+}  // namespace util
+}  // namespace common
 }  // namespace apollo

@@ -24,11 +24,6 @@ namespace util {
 
 using SLPoint = apollo::common::SLPoint;
 
-bool EndWith(const std::string& original, const std::string& pattern) {
-  return original.length() >= pattern.length() &&
-         original.substr(original.length() - pattern.length()) == pattern;
-}
-
 SLPoint MakeSLPoint(const double s, const double l) {
   SLPoint sl;
   sl.set_s(s);

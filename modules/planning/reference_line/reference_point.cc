@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/util/string_util.h"
 #include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
@@ -77,12 +78,14 @@ double ReferencePoint::lower_bound() const { return lower_bound_; }
 double ReferencePoint::upper_bound() const { return upper_bound_; }
 
 const std::string ReferencePoint::DebugString() const {
-  std::stringstream ss;
-  ss << "{x: " << std::fixed << x() << ", y: " << y() << ", theta: " << heading()
-     << ", kappa: " << kappa() << ", dkappa: " << dkappa()
-     << ", upper_bound: " << upper_bound() << ", lower_bound: " << lower_bound()
-     << "}";
-  return ss.str();
+  return apollo::common::util::StrCat(
+      "{x: ", std::fixed, x(), ", "
+      "y: ", y(), ", "
+      "theta: ", heading(), ", "
+      "kappa: ", kappa(), ", "
+      "dkappa: ", dkappa(), ", "
+      "upper_bound: ", upper_bound(), ", "
+      "lower_bound: ", lower_bound(), "}");
 }
 
 }  // namespace planning

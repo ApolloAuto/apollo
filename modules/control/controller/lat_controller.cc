@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <cmath>
 #include <iomanip>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -30,6 +29,7 @@
 #include "modules/common/math/linear_quadratic_regulator.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -119,24 +119,27 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
 void LatController::ProcessLogs(const SimpleLateralDebug *debug,
                                 const canbus::Chassis *chassis) {
-  std::stringstream log_stream;
-  log_stream << debug->lateral_error() << "," << debug->ref_heading() << ","
-             << VehicleState::instance()->heading() << ","
-             << debug->heading_error() << "," << debug->heading_error_rate()
-             << "," << debug->lateral_error_rate() << "," << debug->curvature()
-             << "," << debug->steer_angle() << ","
-             << debug->steer_angle_feedforward() << ","
-             << debug->steer_angle_lateral_contribution() << ","
-             << debug->steer_angle_lateral_rate_contribution() << ","
-             << debug->steer_angle_heading_contribution() << ","
-             << debug->steer_angle_heading_rate_contribution() << ","
-             << debug->steer_angle_feedback() << ","
-             << chassis->steering_percentage() << ","
-             << VehicleState::instance()->linear_velocity();
+  const std::string log_str = apollo::common::util::StrCat(
+      debug->lateral_error(), ",",
+      debug->ref_heading(), ",",
+      VehicleState::instance()->heading(), ",",
+      debug->heading_error(), ",",
+      debug->heading_error_rate(), ",",
+      debug->lateral_error_rate(), ",",
+      debug->curvature(), ",",
+      debug->steer_angle(), ",",
+      debug->steer_angle_feedforward(), ",",
+      debug->steer_angle_lateral_contribution(), ",",
+      debug->steer_angle_lateral_rate_contribution(), ",",
+      debug->steer_angle_heading_contribution(), ",",
+      debug->steer_angle_heading_rate_contribution(), ",",
+      debug->steer_angle_feedback(), ",",
+      chassis->steering_percentage(), ",",
+      VehicleState::instance()->linear_velocity());
   if (FLAGS_enable_csv_debug) {
-    steer_log_file_ << log_stream.str() << std::endl;
+    steer_log_file_ << log_str << std::endl;
   }
-  AINFO << "Steer_Control_Detail: " << log_stream.str();
+  AINFO << "Steer_Control_Detail: " << log_str;
 }
 
 void LatController::LogInitParameters() {

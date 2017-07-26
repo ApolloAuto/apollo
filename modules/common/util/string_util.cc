@@ -14,24 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/util/util.h"
-#include "gtest/gtest.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace common {
 namespace util {
 
-TEST(UtilTest, EndWith) {
-  EXPECT_TRUE(EndWith("abc.def", "def"));
-  EXPECT_TRUE(EndWith("abc.def", ".def"));
-  EXPECT_FALSE(EndWith("abc.def", "abc"));
-  EXPECT_FALSE(EndWith("abc.def", "de"));
-}
-
-TEST(UtilTest, StrCat) {
-  EXPECT_EQ(StrCat("string", "32"), "string32");  // string, string
-  EXPECT_EQ(StrCat("string", 32, 3.2f), "string323.2");  // string, int, float
-  EXPECT_EQ(StrCat(3.2, ' ', true), "3.2 1");  // double, char, bool
+bool EndWith(const std::string& original, const std::string& pattern) {
+  return original.length() >= pattern.length() &&
+         original.substr(original.length() - pattern.length()) == pattern;
 }
 
 }  // namespace util
