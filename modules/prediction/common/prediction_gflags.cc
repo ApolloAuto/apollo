@@ -58,6 +58,7 @@ DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
 DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
     "Max angle difference for a candiate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
+DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
