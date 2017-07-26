@@ -23,12 +23,12 @@
 
 #include <vector>
 
-#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
@@ -42,8 +42,8 @@ namespace planning {
 
 class StBoundaryMapper {
  public:
-  StBoundaryMapper(const apollo::planning::StBoundaryConfig& st_boundary_config,
-                   const apollo::common::config::VehicleParam& veh_param);
+  StBoundaryMapper(
+      const apollo::planning::StBoundaryConfig& st_boundary_config);
 
   virtual ~StBoundaryMapper() = default;
 
@@ -60,12 +60,13 @@ class StBoundaryMapper {
       const std::uint32_t matrix_dimension_s, const double default_speed_limit,
       SpeedLimit* const speed_limit_data);
 
-  const apollo::planning::StBoundaryConfig& st_boundary_config() const;
-  const apollo::common::config::VehicleParam& vehicle_param() const;
-
  protected:
-  double get_area(const std::vector<STPoint>& boundary_points) const;
+  const apollo::planning::StBoundaryConfig& st_boundary_config() const;
+  const apollo::common::config::VehicleParam& vehicle_param() const {
+    return common::config::VehicleConfigHelper::GetConfig().vehicle_param();
+  }
 
+  double get_area(const std::vector<STPoint>& boundary_points) const;
   bool check_overlap(const apollo::common::PathPoint& path_point,
                      const apollo::common::config::VehicleParam& params,
                      const apollo::common::math::Box2d& obs_box,
@@ -73,7 +74,6 @@ class StBoundaryMapper {
 
  private:
   apollo::planning::StBoundaryConfig _st_boundary_config;
-  apollo::common::config::VehicleParam _veh_param;
 };
 
 }  // namespace planning

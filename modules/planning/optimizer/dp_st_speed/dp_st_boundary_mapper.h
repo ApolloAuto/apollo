@@ -32,8 +32,7 @@ namespace planning {
 
 class DpStBoundaryMapper : public StBoundaryMapper {
  public:
-  DpStBoundaryMapper(const StBoundaryConfig& st_boundary_config,
-                     const ::apollo::common::config::VehicleParam& veh_param);
+  DpStBoundaryMapper(const StBoundaryConfig& st_boundary_config);
 
   // TODO: combine two interfaces together to provide a st graph data type
   apollo::common::Status get_graph_boundary(

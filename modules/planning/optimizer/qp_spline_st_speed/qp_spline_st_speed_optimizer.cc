@@ -67,13 +67,12 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
+
   double total_length = std::min(qp_spline_st_speed_config_.total_path_length(),
                                  path_data.path().param_length());
 
   // step 1 get boundaries
-  const auto& veh_param =
-      common::config::VehicleConfigHelper::GetConfig().vehicle_param();
-  QpSplineStBoundaryMapper st_mapper(st_boundary_config_, veh_param);
+  QpSplineStBoundaryMapper st_mapper(st_boundary_config_);
   std::vector<StGraphBoundary> boundaries;
   if (st_mapper.get_graph_boundary(
           init_point, *decision_data, path_data, reference_line,
@@ -96,6 +95,8 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
   }
 
   // step 2 perform graph search
+  const auto& veh_param =
+      common::config::VehicleConfigHelper::GetConfig().vehicle_param();
   QpSplineStGraph st_graph(qp_spline_st_speed_config_, veh_param);
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
