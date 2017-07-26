@@ -20,7 +20,6 @@ cc_library(
     deps = [
         "//modules/common:common",
         "//modules/common:log",
-        "//external:gflags",
     ],
 )
 

@@ -10,8 +10,19 @@ cc_library(
         "//modules/common:log",
         "//modules/perception/lib/base:base",
         "//modules/perception/lib/config_manager/proto:config_proto",
-        "//external:gflags",
-        "@glog//:glog",
+        "//modules/perception/common:perception_common",
+    ],
+)
+
+cc_test(
+    name = "config_manager_test",
+    srcs = ["config_manager_test.cc",],
+    size = "small",
+    data = ["//modules/perception:perception_testdata"],
+    deps = [
+        ":config_manager",
+        "//modules/perception/common:perception_common",
+        "@gtest//:main",
     ],
 )
 

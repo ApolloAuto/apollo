@@ -18,13 +18,10 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-#include "gflags/gflags.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
-
-DECLARE_string(config_manager_path);
-DECLARE_string(work_root);
 
 class ConfigManagerTest : public testing::Test {
  protected:
