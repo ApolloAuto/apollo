@@ -66,6 +66,9 @@ class Obstacle {
   const apollo::common::math::KalmanFilter<double, 6, 2, 0>&
       kf_motion_tracker();
 
+  const apollo::common::math::KalmanFilter<double, 2, 2, 4>&
+      kf_pedestrian_tracker();
+
   bool IsOnLane();
 
  private:
