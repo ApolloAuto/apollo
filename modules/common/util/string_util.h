@@ -35,13 +35,14 @@ namespace util {
 
 /**
  * @brief Check if a string ends with a pattern.
- * @param original The original string. To see if it ends with some
- *        specified pattern.
- * @param pattern The target pattern. To see if the original string ends
- *        with it.
+ * @param ori The original string. To see if it ends with a specified pattern.
+ * @param pat The target pattern. To see if the original string ends with it.
  * @return Whether the original string ends with the specified pattern.
  */
-bool EndWith(const std::string& original, const std::string& pattern);
+inline bool EndWith(const std::string& ori, const std::string& pat) {
+  return ori.length() >= pat.length() &&
+      ori.compare(ori.length() - pat.length(), pat.length(), pat) == 0;
+}
 
 /**
  * @brief Concat parameters to a string, e.g.: StrCat("age = ", 32)
