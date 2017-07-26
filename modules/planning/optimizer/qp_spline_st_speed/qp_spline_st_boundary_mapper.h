@@ -42,10 +42,16 @@ class QpSplineStBoundaryMapper : public StBoundaryMapper {
   apollo::common::Status get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
-      const double planning_distance, const double planning_time,
+      const ReferenceLine& reference_line, const double planning_distance,
+      const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const override;
 
  private:
+  apollo::common::Status map_main_decision_stop(
+      const MainStop& main_stop, const ReferenceLine& reference_line,
+      const double planning_distance, const double planning_time,
+      std::vector<StGraphBoundary>* const boundary) const;
+
   apollo::common::Status map_obstacle_with_planning(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const PathData& path_data,

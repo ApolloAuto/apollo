@@ -24,10 +24,10 @@
 #include <limits>
 #include <vector>
 
+#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
-#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace planning {
@@ -44,7 +44,8 @@ DpStBoundaryMapper::DpStBoundaryMapper(
 Status DpStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
-    const double planning_distance, const double planning_time,
+    const ReferenceLine& reference_line, const double planning_distance,
+    const double planning_time,
     std::vector<StGraphBoundary>* const obs_boundary) const {
   if (planning_time < 0.0) {
     const std::string msg = "Fail to get params since planning_time < 0.";
@@ -54,7 +55,7 @@ Status DpStBoundaryMapper::get_graph_boundary(
 
   if (path_data.path().num_of_points() < 2) {
     AERROR << "Fail to get params since path has "
-        <<  path_data.path().num_of_points() << " points.";
+           << path_data.path().num_of_points() << " points.";
     return Status(ErrorCode::PLANNING_ERROR, "Fail to get params");
   }
 
@@ -70,11 +71,12 @@ Status DpStBoundaryMapper::get_graph_boundary(
     if (static_obs_vec[i] == nullptr) {
       continue;
     }
-    if (!map_obstacle_without_trajectory(
-        *static_obs_vec[i], path_data, planning_distance, planning_time,
-        obs_boundary).ok()) {
+    if (!map_obstacle_without_trajectory(*static_obs_vec[i], path_data,
+                                         planning_distance, planning_time,
+                                         obs_boundary)
+             .ok()) {
       AERROR << "Fail to map static obstacle with id "
-          << static_obs_vec[i]->Id();
+             << static_obs_vec[i]->Id();
       return Status(ErrorCode::PLANNING_ERROR,
                     "Fail to map static obstacle with id");
     }
@@ -84,11 +86,12 @@ Status DpStBoundaryMapper::get_graph_boundary(
     if (dynamic_obs_vec[i] == nullptr) {
       continue;
     }
-    if (!map_obstacle_with_trajectory(
-        *dynamic_obs_vec[i], path_data, planning_distance,
-        planning_time, obs_boundary).ok()) {
+    if (!map_obstacle_with_trajectory(*dynamic_obs_vec[i], path_data,
+                                      planning_distance, planning_time,
+                                      obs_boundary)
+             .ok()) {
       AERROR << "Fail to map dynamic obstacle with id "
-          << dynamic_obs_vec[i]->Id();
+             << dynamic_obs_vec[i]->Id();
       return Status(ErrorCode::PLANNING_ERROR,
                     "Fail to map dynamic obstacle with id");
     }
@@ -105,16 +108,17 @@ Status DpStBoundaryMapper::map_obstacle_with_trajectory(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
   const std::vector<PathPoint>& veh_path = path_data.path().path_points();
-  for (std::uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
+  for (std::uint32_t i = 0; i < obstacle.prediction_trajectories().size();
+       ++i) {
     PredictionTrajectory pred_traj = obstacle.prediction_trajectories()[i];
     bool skip = true;
     for (std::uint32_t j = 0; j < pred_traj.num_of_points(); ++j) {
       TrajectoryPoint cur_obs_point = pred_traj.trajectory_point_at(j);
       // construct bounding box
-      ::apollo::common::math::Box2d obs_box({cur_obs_point.path_point().x(),
-          cur_obs_point.path_point().y()},
-          cur_obs_point.path_point().theta(),
-          obstacle.Length(), obstacle.Width());
+      ::apollo::common::math::Box2d obs_box(
+          {cur_obs_point.path_point().x(), cur_obs_point.path_point().y()},
+          cur_obs_point.path_point().theta(), obstacle.Length(),
+          obstacle.Width());
 
       // loop path data to find the lower and upper bound
       const double buffer = st_boundary_config().boundary_buffer();

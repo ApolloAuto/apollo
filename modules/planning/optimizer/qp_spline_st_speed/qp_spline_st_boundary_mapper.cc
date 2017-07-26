@@ -36,12 +36,12 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::ErrorCode;
-using apollo::common::PathPoint;
-using apollo::common::Status;
-using apollo::common::config::VehicleParam;
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
+using ErrorCode = apollo::common::ErrorCode;
+using Status = apollo::common::Status;
+using PathPoint = apollo::common::PathPoint;
+using VehicleParam = apollo::common::config::VehicleParam;
+using Box2d = apollo::common::math::Box2d;
+using Vec2d = apollo::common::math::Vec2d;
 
 QpSplineStBoundaryMapper::QpSplineStBoundaryMapper(
     const StBoundaryConfig& st_boundary_config, const VehicleParam& veh_param)
@@ -50,7 +50,8 @@ QpSplineStBoundaryMapper::QpSplineStBoundaryMapper(
 Status QpSplineStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
-    const double planning_distance, const double planning_time,
+    const ReferenceLine& reference_line, const double planning_distance,
+    const double planning_time,
     std::vector<StGraphBoundary>* const obs_boundary) const {
   if (obs_boundary) {
     const std::string msg = "obs_boundary is NULL.";
@@ -73,55 +74,20 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
   }
 
   obs_boundary->clear();
+  Status ret = Status::OK();
 
-  Status ret;
-  /*
-  const auto& planning_data = processed_data.planning_data();
-  const auto& main_decision = planning_data.main_decision();
-  QUIT_IF(!planning_data.has_main_decision(), ErrorCode::PLANNING_SKIP,
-          Level::X_ERROR, "Skip mapping because no decision. \n%s",
-          planning_data.DebugString().c_str());
-
-  ErrorCode ret = ErrorCode::PLANNING_OK;
-
+  const auto& main_decision = decision_data.main_decision();
   if (main_decision.has_stop()) {
-    ret = map_main_decision_stop(
-        main_decision.stop(), processed_data_proxy.target_reference_line_raw(),
-        planning_distance, planning_time, obs_boundary);
-    QUIT_IF(ret != ErrorCode::PLANNING_OK && ret != ErrorCode::PLANNING_SKIP,
-            ret, Level::X_ERROR,
-            "Failed to get_params since map_main_decision_stop error.");
-    obs_boundary->back().set_id("main decision stop");
-  } else if (main_decision.has_change_lane()) {
-    if (main_decision.change_lane().has_default_lane_stop()) {
-      ret = map_main_decision_stop(
-          main_decision.change_lane().default_lane_stop(),
-          processed_data_proxy.default_reference_line_raw(), planning_distance,
-          planning_time, obs_boundary);
-      QUIT_IF(ret != ErrorCode::PLANNING_OK && ret != ErrorCode::PLANNING_SKIP,
-              ret, Level::X_ERROR,
-              "Fail to get_params due to map default lane stop error.");
-      obs_boundary->back().set_id("default_lane stop");
-    }
-    if (main_decision.change_lane().has_target_lane_stop()) {
-      ret = map_main_decision_stop(
-          main_decision.change_lane().target_lane_stop(),
-          processed_data_proxy.target_reference_line_raw(), planning_distance,
-          planning_time, obs_boundary);
-      QUIT_IF(ret != ErrorCode::PLANNING_OK && ret != ErrorCode::PLANNING_SKIP,
-              ret, Level::X_ERROR,
-              "Fail to get_params due to map target lane stop error.");
-      obs_boundary->back().set_id("target_lane stop");
+    ret =
+        map_main_decision_stop(main_decision.stop(), reference_line,
+                               planning_distance, planning_time, obs_boundary);
+    if (ret != Status::OK() && ret != Status(ErrorCode::PLANNING_SKIP, "")) {
+      return ret;
     }
   } else if (main_decision.has_mission_complete()) {
-    ret = map_main_decision_mission_complete(
-        processed_data_proxy.target_reference_line_raw(), planning_distance,
-        planning_time, obs_boundary);
-    QUIT_IF(ret != ErrorCode::PLANNING_OK && ret != ErrorCode::PLANNING_SKIP,
-            ret, Level::X_ERROR,
-            "Failed to get_params since map_mission_complete error.");
+    // TODO: fill in this function.
+    // ret = map_main_decision_mission_complete();
   }
-  */
 
   const auto& static_obs_vec = decision_data.StaticObstacles();
   for (const auto* obs : static_obs_vec) {
@@ -165,6 +131,14 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
       }
     }
   }
+  return Status::OK();
+}
+
+Status QpSplineStBoundaryMapper::map_main_decision_stop(
+    const MainStop& main_stop, const ReferenceLine& reference_line,
+    const double planning_distance, const double planning_time,
+    std::vector<StGraphBoundary>* const boundary) const {
+  // TODO: complete this function.
   return Status::OK();
 }
 

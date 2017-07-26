@@ -59,6 +59,7 @@ bool DpStSpeedOptimizer::Init() {
 
 Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    const TrajectoryPoint& init_point,
+                                   const ReferenceLine& reference_line,
                                    DecisionData* const decision_data,
                                    SpeedData* const speed_data) {
   const auto& veh_param = VehicleConfigHelper::GetConfig().vehicle_param();
@@ -74,7 +75,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                                        ->init_planning_point();
   if (!st_mapper
            .get_graph_boundary(initial_planning_point, *decision_data,
-                               path_data,
+                               path_data, reference_line,
                                dp_st_speed_config_.total_path_length(),
                                dp_st_speed_config_.total_time(), &boundaries)
            .ok()) {
