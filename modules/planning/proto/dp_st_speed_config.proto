@@ -15,15 +15,26 @@ message DpStSpeedConfig {
   optional double reference_weight = 9 [ default = 0.0 ];
   optional double go_down_buffer = 10 [ default = 5.0 ];
   optional double go_up_buffer = 11 [ default = 5.0 ];
+
+  // obstacle cost config
   optional double st_graph_default_point_cost = 12 [ default = 1e10 ];
-  optional double obstacle_damp_factor = 13 [ default = -300 ];
-  optional double exceed_speed_penalty = 14 [ default = 10.0 ];
-  optional double low_speed_penalty = 15 [ default = 2.5 ];
-  optional double accel_penalty = 16 [ default = 2.0 ];
-  optional double decel_penalty = 17 [ default = 2.0 ];
-  optional double positive_jerk_coeff = 18 [ default = 1.0 ];
-  optional double negative_jerk_coeff = 19 [ default = 300 ];
-  optional double max_speed = 20 [ default = 20 ];
-  optional double max_acceleration = 21 [ default = 4.5 ];
-  optional double max_deceleration = 22 [ default = -4.5 ];
+  optional double obstacle_cost_factor = 13 [ default = -300 ];
+
+  // speed cost config
+  optional double default_speed_cost = 14 [ default = 1.0 ];
+  optional double exceed_speed_penalty = 15 [ default = 10.0 ];
+  optional double low_speed_penalty = 16 [ default = 2.5 ];
+
+  // accel cost config
+  optional double accel_penalty = 17 [ default = 2.0 ];
+  optional double decel_penalty = 18 [ default = 2.0 ];
+
+  // jerk cost config
+  optional double positive_jerk_coeff = 19 [ default = 1.0 ];
+  optional double negative_jerk_coeff = 20 [ default = 300.0 ];
+
+  // other constraint
+  optional double max_speed = 21 [ default = 20.0 ];
+  optional double max_acceleration = 22 [ default = 4.5 ];
+  optional double max_deceleration = 23 [ default = -4.5 ];
 }
