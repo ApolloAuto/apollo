@@ -7,10 +7,10 @@ cc_library(
     srcs = ["pose_container.cc"],
     hdrs = ["pose_container.h"],
     deps = [
-        "//modules/prediction/container:container",
-        "//modules/perception/proto:perception_proto",
         "//modules/localization/proto:localization_proto",
-    ]
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/container",
+    ],
 )
 
 cpplint()

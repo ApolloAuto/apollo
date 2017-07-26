@@ -4,16 +4,16 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "evaluator_factory",
-    hdrs = ["evaluator_factory.h"],
     srcs = ["evaluator_factory.cc"],
+    hdrs = ["evaluator_factory.h"],
     deps = [
-        "//modules/prediction/evaluator:evaluator",
+        "//modules/common:macro",
+        "//modules/common/util:factory",
+        "//modules/prediction/evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/proto:prediction_conf_proto",
-        "//modules/common/util:factory",
-        "//modules/common:macro",
         "@glog//:glog",
-    ]
+    ],
 )
 
 cc_library(
@@ -21,24 +21,24 @@ cc_library(
     srcs = ["evaluator_manager.cc"],
     hdrs = ["evaluator_manager.h"],
     deps = [
-        "//modules/prediction/evaluator:evaluator",
-        "//modules/prediction/evaluator:evaluator_factory",
+        "//modules/common:log",
+        "//modules/common:macro",
+        "//modules/perception/proto:perception_proto",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator",
+        "//modules/prediction/evaluator:evaluator_factory",
         "//modules/prediction/proto:prediction_conf_proto",
-        "//modules/perception/proto:perception_proto",
-        "//modules/common:macro",
-        "//modules/common:log",
         "@glog//:glog",
-    ]
+    ],
 )
 
 cc_library(
     name = "evaluator",
     hdrs = ["evaluator.h"],
     deps = [
-        "//modules/prediction/container/obstacles:obstacle"
-    ]
+        "//modules/prediction/container/obstacles:obstacle",
+    ],
 )
 
 cpplint()

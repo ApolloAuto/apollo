@@ -4,14 +4,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "map_service",
-    hdrs = [
-        "map_service.h"
-    ],
     srcs = [
-        "map_service.cc"
+        "map_service.cc",
+    ],
+    hdrs = [
+        "map_service.h",
     ],
     deps = [
-        "//modules/map/hdmap:hdmap",
+        "//modules/map/hdmap",
         "//third_party/json",
         "@glog//:glog",
     ],

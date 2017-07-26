@@ -63,6 +63,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     AERROR << "Please call Init() before process DpStSpeedOptimizer.";
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
+
   // step 1 get boundaries
   double planning_distance = std::min(dp_st_speed_config_.total_path_length(),
                                       path_data.path().param_length());
@@ -85,13 +86,15 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 2 perform graph search
   SpeedLimit speed_limit;
-  if (boundary_mapper_.get_speed_limits(
-          common::VehicleState::instance()->pose(),
-          DataCenter::instance()->map(), path_data, planning_distance,
-          dp_st_speed_config_.matrix_dimension_s(),
-          dp_st_speed_config_.max_speed(), &speed_limit) != Status::OK()) {
-    const std::string msg
-        = "Getting speed limits for dp st speed optimizer failed!";
+  if (!boundary_mapper_
+           .get_speed_limits(common::VehicleState::instance()->pose(),
+                             DataCenter::instance()->map(), path_data,
+                             planning_distance,
+                             dp_st_speed_config_.matrix_dimension_s(),
+                             dp_st_speed_config_.max_speed(), &speed_limit)
+           .ok()) {
+    const std::string msg =
+        "Getting speed limits for dp st speed optimizer failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
