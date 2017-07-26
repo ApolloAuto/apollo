@@ -208,7 +208,7 @@ def generate_perception(perception_description, prev_perception):
 def perception_publisher(perception_topic, files, period):
     """publisher"""
     rospy.init_node('perception', anonymous=True)
-    pub = rospy.Publisher(perception_topic, String, queue_size=1)
+    pub = rospy.Publisher(perception_topic, PerceptionObstacles, queue_size=1)
     perception_description = load_descrptions(files)
     rate = rospy.Rate(int(1.0 / period)) # 10hz
     global _s_delta_t
