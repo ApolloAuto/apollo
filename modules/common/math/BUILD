@@ -279,7 +279,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/math/qp_solver:qp_solver",
+        "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen//:eigen",
     ],
@@ -293,7 +293,7 @@ cc_test(
     ],
     deps = [
         ":mpc",
-        "//modules/common/math/qp_solver:qp_solver",
+        "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "@gtest//:main",
     ],

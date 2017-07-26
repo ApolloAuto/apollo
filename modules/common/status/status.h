@@ -84,7 +84,9 @@ class Status {
   /**
    * @brief defines the logic of testing if two Status are equal
    */
-  bool operator==(const Status &rh) const { return (this->code_ == rh.code_); }
+  bool operator==(const Status &rh) const {
+    return (this->code_ == rh.code_) && (this->msg_ == rh.msg_);
+  }
 
   /**
    * @brief defines the logic of testing if two Status are unequal

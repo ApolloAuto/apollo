@@ -7,10 +7,10 @@ cc_library(
     srcs = ["obstacles_container.cc"],
     hdrs = ["obstacles_container.h"],
     deps = [
-        "//modules/prediction/container:container",
-        "//modules/prediction/container/obstacles:obstacle",
-        "//modules/common/util:lru_cache",
         "//modules/common/math:math_utils",
+        "//modules/common/util:lru_cache",
+        "//modules/prediction/container",
+        "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/container/pose:pose_container",
     ],
 )
@@ -20,17 +20,17 @@ cc_library(
     srcs = ["obstacle.cc"],
     hdrs = ["obstacle.h"],
     deps = [
-        "@eigen//:eigen",
         "//modules/common:log",
         "//modules/common/math:kalman_filter",
-        "//modules/common/proto:error_code_proto",
         "//modules/common/math:math_utils",
+        "//modules/common/proto:error_code_proto",
+        "//modules/map/hdmap",
         "//modules/perception/proto:perception_proto",
-        "//modules/prediction/proto:feature_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:road_graph",
-        "//modules/map/hdmap:hdmap",
+        "//modules/prediction/proto:feature_proto",
+        "@eigen//:eigen",
     ],
 )
 

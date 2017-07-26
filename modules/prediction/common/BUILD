@@ -21,18 +21,17 @@ cc_library(
 
 cc_library(
     name = "prediction_map",
-    hdrs = ["prediction_map.h"],
     srcs = ["prediction_map.cc"],
+    hdrs = ["prediction_map.h"],
     deps = [
-        "@eigen//:eigen",
-        "//modules/map/hdmap:hdmap",
         "//modules/common:macro",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/map/pnc_map:pnc_path",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:vec2d",
+        "//modules/map/hdmap",
+        "//modules/map/pnc_map:pnc_path",
+        "//modules/prediction/common:prediction_gflags",
+        "@eigen//:eigen",
     ],
-
 )
 
 cc_library(
@@ -40,10 +39,10 @@ cc_library(
     srcs = ["road_graph.cc"],
     hdrs = ["road_graph.h"],
     deps = [
-        "//modules/prediction/proto:lane_graph_proto",
-        "//modules/map/hdmap:hdmap",
         "//modules/common/proto:error_code_proto",
+        "//modules/map/hdmap",
         "//modules/prediction/common:prediction_map",
+        "//modules/prediction/proto:lane_graph_proto",
     ],
 )
 

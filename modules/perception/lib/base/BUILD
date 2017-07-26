@@ -18,7 +18,7 @@ cc_library(
         "-lboost_system",
     ],
     deps = [
-        "//modules/common:common",
+        "//modules/common",
         "//modules/common:log",
     ],
 )
@@ -36,5 +36,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
-  
+
 cpplint()

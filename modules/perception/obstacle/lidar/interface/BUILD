@@ -7,11 +7,11 @@ cc_library(
     srcs = [],
     hdrs = glob(["*.h"]),
     deps = [
-        "//modules/perception/lib/pcl_util:pcl_util",
-        "//modules/perception/lib/base:base",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "@eigen//:eigen",
-    ]
+    ],
 )
 
 cpplint()

@@ -7,13 +7,13 @@ cc_library(
     srcs = ["min_box.cc"],
     hdrs = ["min_box.h"],
     deps = [
-        "//modules/perception/lib/base:base",
-        "//modules/perception/lib/pcl_util:pcl_util",
+        "//modules/common",
+        "//modules/common:log",
         "//modules/perception/common:perception_common",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "//modules/common:log",
-        "//modules/common:common",
         "@eigen//:eigen",
     ],
 )
@@ -30,12 +30,11 @@ cc_test(
     ],
     deps = [
         ":perception_obstacle_lidar_object_builder_min_box",
-        "//modules/perception/lib/pcl_util:pcl_util",
         "//modules/perception/common:perception_common",
+        "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "@gtest//:main",
     ],
 )
 
 cpplint()
-

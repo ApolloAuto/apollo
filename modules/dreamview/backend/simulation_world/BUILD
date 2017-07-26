@@ -73,11 +73,11 @@ cc_test(
 
 cc_library(
     name = "simulation_world_updater",
-    hdrs = [
-        "simulation_world_updater.h"
-    ],
     srcs = [
         "simulation_world_updater.cc",
+    ],
+    hdrs = [
+        "simulation_world_updater.h",
     ],
     deps = [
         ":simulation_world_service",

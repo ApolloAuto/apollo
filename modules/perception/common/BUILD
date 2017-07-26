@@ -11,7 +11,7 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//modules/common:common"
+        "//modules/common",
     ],
 )
 

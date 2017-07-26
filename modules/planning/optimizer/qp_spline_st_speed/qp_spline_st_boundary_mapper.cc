@@ -82,13 +82,13 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
     ret =
         map_main_decision_stop(main_decision.stop(), reference_line,
                                planning_distance, planning_time, obs_boundary);
-    if (ret != Status::OK() && ret != Status(ErrorCode::PLANNING_SKIP)) {
+    if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
       return Status(ErrorCode::PLANNING_ERROR);
     }
   } else if (main_decision.has_mission_complete()) {
     ret = map_mission_complete(reference_line, planning_distance, planning_time,
                                obs_boundary);
-    if (ret != Status::OK() && ret != Status(ErrorCode::PLANNING_SKIP)) {
+    if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
       return Status(ErrorCode::PLANNING_ERROR);
     }
   }
