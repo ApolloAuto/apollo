@@ -70,6 +70,7 @@ cc_library(
         ":dp_st_graph",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/vehicle_state",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/optimizer:speed_optimizer",
         "//modules/planning/optimizer/st_graph:st_graph_data",

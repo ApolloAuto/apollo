@@ -32,8 +32,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config,
-                     const apollo::common::config::VehicleParam& veh_param)
+DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config)
     : _dp_st_speed_config(dp_config), _dp_st_cost(dp_config) {}
 
 Status DpStGraph::search(const StGraphData& st_graph_data,

@@ -39,9 +39,7 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const DpStSpeedConfig& dp_config,
-            // const StBoundaryConfig& mapper_config,
-            const apollo::common::config::VehicleParam& veh_param);
+  DpStGraph(const DpStSpeedConfig& dp_config);
 
   apollo::common::Status search(const StGraphData& st_graph_data,
                                 DecisionData* const decision_data,

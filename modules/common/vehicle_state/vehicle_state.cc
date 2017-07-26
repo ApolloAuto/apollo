@@ -159,7 +159,6 @@ common::math::Vec2d VehicleState::ComputeCOMPosition(
     // Update the COM position with rotation
     com_pos_3d = quaternion.toRotationMatrix() * v + pos_vec;
   }
-
   return common::math::Vec2d(com_pos_3d[0], com_pos_3d[1]);
 }
 
