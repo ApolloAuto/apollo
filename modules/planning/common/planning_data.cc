@@ -22,6 +22,9 @@
 
 #include <utility>
 
+#include "modules/planning/common/path/path_data.h"
+#include "modules/planning/proto/planning.pb.h"
+
 namespace apollo {
 namespace planning {
 
@@ -47,9 +50,10 @@ void PlanningData::set_init_planning_point(
 }
 
 void PlanningData::set_reference_line(
-    std::unique_ptr<ReferenceLine>& reference_line) {
-  reference_line_ = std::move(reference_line);
+    const std::vector<ReferencePoint>& ref_points) {
+  reference_line_.reset(new ReferenceLine(ref_points));
 }
+
 void PlanningData::set_decision_data(
     std::shared_ptr<DecisionData>& decision_data) {
   decision_data_ = decision_data;

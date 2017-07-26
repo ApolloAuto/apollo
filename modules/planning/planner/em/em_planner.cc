@@ -39,11 +39,11 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::ErrorCode;
-using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleState;
+using common::Status;
+using common::adapter::AdapterManager;
+using common::ErrorCode;
+using common::TrajectoryPoint;
+using common::VehicleState;
 
 EMPlanner::EMPlanner() {}
 
@@ -87,9 +87,6 @@ Status EMPlanner::MakePlan(
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
 
-  GenerateReferenceLineFromRouting();
-
-  frame->set_planning_data(new PlanningData());
   if (data_center->last_frame()) {
     ADEBUG << "last frame:" << data_center->last_frame()->DebugString();
   }
@@ -97,10 +94,6 @@ Status EMPlanner::MakePlan(
   auto planning_data = frame->mutable_planning_data();
   planning_data->set_init_planning_point(start_point);
 
-  if (reference_line_) {
-    ADEBUG << "reference line:" << reference_line_->DebugString();
-  }
-  planning_data->set_reference_line(reference_line_);
   std::shared_ptr<DecisionData> decision_data(new DecisionData());
 
   planning_data->set_decision_data(decision_data);
@@ -169,57 +162,6 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     speed_profile.push_back(speed_point);
   }
   return std::move(speed_profile);
-}
-
-Status EMPlanner::GenerateReferenceLineFromRouting() {
-  DataCenter* data_center = DataCenter::instance();
-
-  const auto& routing_result =
-      AdapterManager::GetRoutingResult()->GetLatestObserved();
-
-  const auto& map = data_center->map();
-  std::vector<ReferencePoint> ref_points;
-  common::math::Vec2d vehicle_position;
-  hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
-  ReferenceLineSmoother smoother;
-  smoother.SetConfig(smoother_config_);  // use the default value in config.
-
-  vehicle_position.set_x(common::VehicleState::instance()->x());
-  vehicle_position.set_y(common::VehicleState::instance()->y());
-
-  for (const auto& lane : routing_result.route()) {
-    hdmap::Id lane_id;
-    lane_id.set_id(lane.id());
-    ADEBUG << "Added lane from routing:" << lane.id();
-    lane_info_ptr = map.get_lane_by_id(lane_id);
-    if (!lane_info_ptr) {
-      std::string msg("failed to find lane " + lane.id() + " from map ");
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
-    }
-    const auto& points = lane_info_ptr->points();
-    const auto& headings = lane_info_ptr->headings();
-    for (size_t i = 0; i < points.size(); ++i) {
-      ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, -2.0, 2.0);
-    }
-  }
-  if (ref_points.empty()) {
-    std::string msg("Found no reference points from map");
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
-  std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
-  std::vector<ReferencePoint> smoothed_ref_points;
-  if (!smoother.smooth(*reference_line, vehicle_position,
-                       &smoothed_ref_points)) {
-    std::string msg("Fail to smooth a reference line from map");
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-  ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
-  reference_line_.reset(new ReferenceLine(smoothed_ref_points));
-  return Status::OK();
 }
 
 }  // namespace planning
