@@ -23,13 +23,16 @@
 #include <algorithm>
 #include <limits>
 
+#include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"
 
 #include "modules/common/log.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
@@ -39,9 +42,11 @@ namespace planning {
 using ErrorCode = apollo::common::ErrorCode;
 using Status = apollo::common::Status;
 using PathPoint = apollo::common::PathPoint;
+using SLPoint = apollo::common::SLPoint;
 using VehicleParam = apollo::common::config::VehicleParam;
 using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
+using VehicleConfigHelper = apollo::common::config::VehicleConfigHelper;
 
 Status QpSplineStBoundaryMapper::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
@@ -135,6 +140,55 @@ Status QpSplineStBoundaryMapper::map_main_decision_stop(
     const double planning_distance, const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
   // TODO: complete this function.
+
+  const auto lane_id =
+      common::util::MakeMapId(main_stop.enforced_line().lane_id());
+  const auto lane_info = DataCenter::instance()->map().get_lane_by_id(lane_id);
+  const auto& map_point =
+      lane_info->get_smooth_point(main_stop.enforced_line().distance_s());
+  SLPoint sl_point;
+  if (!reference_line.get_point_in_Frenet_frame(
+          Vec2d(map_point.x(), map_point.y()), &sl_point)) {
+    AERROR << "Fail to map_main_decision_stop since xy_to_sl_point failed.";
+    return Status(ErrorCode::PLANNING_ERROR);
+  }
+  sl_point.set_s(sl_point.s() - FLAGS_backward_routing_distance);
+  const double stop_rear_center_s =
+      sl_point.s() - FLAGS_decision_valid_stop_range -
+      VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center();
+  if (Double::compare(stop_rear_center_s, 0.0) < 0) {
+    AERROR << common::util::StrCat(
+        "Fail to map main_decision_stop since stop_rear_center_s[",
+        stop_rear_center_s, "] behind adc.");
+  } else {
+    if (stop_rear_center_s >=
+        reference_line.length() - FLAGS_backward_routing_distance) {
+      AWARN << common::util::StrCat(
+          "Skip to map_main_decision_stop since stop_rear_center_s[",
+          stop_rear_center_s, "] > path length[", reference_line.length(),
+          "].");
+      return Status(ErrorCode::PLANNING_SKIP);
+    }
+  }
+  const double s_min = (stop_rear_center_s > 0.0 ? stop_rear_center_s : 0.0);
+  const double s_max = std::fmax(
+      s_min + 1.0, std::fmax(planning_distance, reference_line.length()));
+
+  std::vector<STPoint> boundary_points;
+  boundary_points.emplace_back(s_min, 0.0);
+  boundary_points.emplace_back(s_min, planning_time);
+  boundary_points.emplace_back(s_max + st_boundary_config().boundary_buffer(),
+                               planning_time);
+  boundary_points.emplace_back(s_max, 0.0);
+
+  const double area = get_area(boundary_points);
+  if (Double::compare(area, 0.0) <= 0) {
+    return Status(ErrorCode::PLANNING_SKIP);
+  }
+  boundary->emplace_back(boundary_points);
+  boundary->back().set_characteristic_length(
+      st_boundary_config().boundary_buffer());
+  boundary->back().set_boundary_type(StGraphBoundary::BoundaryType::STOP);
   return Status::OK();
 }
 

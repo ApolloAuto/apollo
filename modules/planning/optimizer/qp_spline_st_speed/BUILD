@@ -14,6 +14,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/util",
         "//modules/common/vehicle_state",
+        "//modules/planning/common:data_center",
         "//modules/planning/optimizer/st_graph:st_boundary_mapper",
     ],
 )
