@@ -24,8 +24,8 @@
 #include "modules/planning/optimizer/speed_optimizer.h"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
+#include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
 
@@ -36,11 +36,15 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
  public:
   explicit QpSplineStSpeedOptimizer(const std::string& name);
 
+  virtual bool Init() override;
+
  private:
   virtual common::Status process(
       const PathData& path_data,
       const apollo::common::TrajectoryPoint& init_point,
       DecisionData* const decision_data, SpeedData* const speed_data) const;
+  StBoundaryConfig st_boundary_config_;
+  QpSplineStSpeedConfig qp_spline_st_speed_config_;
 };
 
 }  // namespace planning
