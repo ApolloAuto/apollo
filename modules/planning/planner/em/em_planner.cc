@@ -21,6 +21,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"
+#include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
@@ -32,6 +33,7 @@
 #include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
+#include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -53,11 +55,9 @@ void EMPlanner::RegisterOptimizers() {
   optimizer_factory_.Register(QP_SPLINE_PATH_OPTIMIZER, []() -> Optimizer* {
     return new QPSplinePathOptimizer("QPSplinePathOptimizer");
   });
-  // TODO (all) : fix the function to register QpSplineStSpeedOptimizer."
-  // optimizer_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() ->
-  // Optimizer* {
-  //  return new QpSplineStSpeedOptimizer("QpSplineStSpeedOptimizer");
-  //});
+  optimizer_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Optimizer* {
+    return new QpSplineStSpeedOptimizer("QpSplineStSpeedOptimizer");
+  });
 }
 
 Status EMPlanner::Init(const PlanningConfig& config) {
@@ -69,6 +69,13 @@ Status EMPlanner::Init(const PlanningConfig& config) {
     optimizers_.back()->Init();
   }
   routing_proxy_.Init();
+  for (auto& optimizer : optimizers_) {
+    if (!optimizer->Init()) {
+      AERROR << common::util::StrCat("Init optimizer[", optimizer->name(),
+                                     "] failed.");
+      return Status(ErrorCode::PLANNING_ERROR, "Init optimizer failed.");
+    }
+  }
   return Status::OK();
 }
 
@@ -115,7 +122,7 @@ Status EMPlanner::MakePlan(
 
 std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     const double init_v, const double init_a) {
-  // TODO(@lianglia_apollo): this is a dummy simple hot start, need refine later
+  // TODO(@lianglia-apollo): this is a dummy simple hot start, need refine later
   std::array<double, 3> start_state;
 
   // distance 0.0
