@@ -60,6 +60,7 @@ bool QpSplineStSpeedOptimizer::Init() {
 
 Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
+                                         const ReferenceLine& reference_line,
                                          DecisionData* const decision_data,
                                          SpeedData* const speed_data) {
   if (!is_init_) {
@@ -75,7 +76,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
   QpSplineStBoundaryMapper st_mapper(st_boundary_config_, veh_param);
   std::vector<StGraphBoundary> boundaries;
   if (st_mapper.get_graph_boundary(
-          init_point, *decision_data, path_data,
+          init_point, *decision_data, path_data, reference_line,
           qp_spline_st_speed_config_.total_path_length(),
           qp_spline_st_speed_config_.total_time(),
           &boundaries) != Status::OK()) {
@@ -84,8 +85,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
   }
 
   SpeedLimit speed_limits;
-  const auto& pose =
-      apollo::common::VehicleState::instance()->pose();
+  const auto& pose = apollo::common::VehicleState::instance()->pose();
   const auto& hdmap = apollo::planning::DataCenter::instance()->map();
   if (st_mapper.get_speed_limits(pose, hdmap, path_data, total_length,
                                  qp_spline_st_speed_config_.total_time(),
