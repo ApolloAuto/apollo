@@ -33,6 +33,8 @@ py_proto_compile(
         "planning.proto",
         "planning_config.proto",
         "planning_internal.proto",
+        "qp_spline_st_speed_config.proto",
+        "st_boundary_config.proto",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto_pylib",

@@ -20,16 +20,6 @@ cc_library(
 )
 
 cc_library(
-    name = "dp_st_configuration",
-    srcs = [
-        "dp_st_configuration.cc",
-    ],
-    hdrs = [
-        "dp_st_configuration.h",
-    ],
-)
-
-cc_library(
     name = "dp_st_cost",
     srcs = [
         "dp_st_cost.cc",
@@ -38,11 +28,11 @@ cc_library(
         "dp_st_cost.h",
     ],
     deps = [
-        ":dp_st_configuration",
         "//modules/common/proto:path_point_proto",
         "//modules/planning/common:data_center",
         "//modules/planning/math:double",
         "//modules/planning/optimizer/st_graph:st_graph_boundary",
+        "//modules/planning/proto:dp_st_speed_config_proto",
     ],
 )
 
@@ -55,7 +45,6 @@ cc_library(
         "dp_st_graph.h",
     ],
     deps = [
-        ":dp_st_configuration",
         ":dp_st_cost",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:common_proto",
@@ -77,7 +66,6 @@ cc_library(
     ],
     deps = [
         ":dp_st_boundary_mapper",
-        ":dp_st_configuration",
         ":dp_st_cost",
         ":dp_st_graph",
         "//modules/common/adapters:adapter_manager",
@@ -86,6 +74,7 @@ cc_library(
         "//modules/planning/optimizer:speed_optimizer",
         "//modules/planning/optimizer/st_graph:st_graph_data",
         "//modules/planning/proto:dp_st_speed_config_proto",
+        "//modules/planning/proto:planning_proto",
     ],
 )
 
