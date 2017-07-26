@@ -39,39 +39,45 @@ using TrajectoryPoint = apollo::common::TrajectoryPoint;
 QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
+bool QpSplineStSpeedOptimizer::Init() {
+  // load boundary mapper
+  if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
+                                      &st_boundary_config_)) {
+    AERROR << "Failed to load config file: " << FLAGS_st_boundary_config_file;
+    return false;
+  }
+
+  // load qp_spline_st_speed_config_
+  if (!common::util::GetProtoFromFile(FLAGS_qp_spline_st_speed_config_file,
+                                      &qp_spline_st_speed_config_)) {
+    AERROR << "Failed to load config file: "
+           << FLAGS_qp_spline_st_speed_config_file;
+    return false;
+  }
+  is_init_ = true;
+  return true;
+}
+
 Status QpSplineStSpeedOptimizer::process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          DecisionData* const decision_data,
                                          SpeedData* const speed_data) const {
-  // load boundary mapper
-  StBoundaryConfig st_boundary_config;
-  if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
-                                      &st_boundary_config)) {
-    AERROR << "Failed to load config file: " << FLAGS_st_boundary_config_file;
-    return Status(ErrorCode::PLANNING_ERROR, "Failed to load config file.");
+  if (!is_init_) {
+    AERROR << "Please call Init() before Process.";
+    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
-
-  // load qp_spline_st_speed_config
-  QpSplineStSpeedConfig qp_spline_st_speed_config;
-  if (!common::util::GetProtoFromFile(FLAGS_qp_spline_st_speed_config_file,
-                                      &qp_spline_st_speed_config)) {
-    AERROR << "Failed to load config file: "
-           << FLAGS_qp_spline_st_speed_config_file;
-    return Status(ErrorCode::PLANNING_ERROR, "Failed to load config file.");
-  }
-
-  double total_length = std::min(qp_spline_st_speed_config.total_path_length(),
+  double total_length = std::min(qp_spline_st_speed_config_.total_path_length(),
                                  path_data.path().param_length());
 
   // step 1 get boundaries
   const auto& veh_param =
       common::config::VehicleConfigHelper::GetConfig().vehicle_param();
-  QpSplineStBoundaryMapper st_mapper(st_boundary_config, veh_param);
+  QpSplineStBoundaryMapper st_mapper(st_boundary_config_, veh_param);
   std::vector<StGraphBoundary> boundaries;
   if (st_mapper.get_graph_boundary(
           init_point, *decision_data, path_data,
-          qp_spline_st_speed_config.total_path_length(),
-          qp_spline_st_speed_config.total_time(),
+          qp_spline_st_speed_config_.total_path_length(),
+          qp_spline_st_speed_config_.total_time(),
           &boundaries) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
@@ -82,15 +88,15 @@ Status QpSplineStSpeedOptimizer::process(const PathData& path_data,
       apollo::common::vehicle_state::VehicleState::instance()->pose();
   const auto& hdmap = apollo::planning::DataCenter::instance()->map();
   if (st_mapper.get_speed_limits(pose, hdmap, path_data, total_length,
-                                 qp_spline_st_speed_config.total_time(),
-                                 qp_spline_st_speed_config.max_speed(),
+                                 qp_spline_st_speed_config_.total_time(),
+                                 qp_spline_st_speed_config_.max_speed(),
                                  &speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
 
   // step 2 perform graph search
-  QpSplineStGraph st_graph(qp_spline_st_speed_config, veh_param);
+  QpSplineStGraph st_graph(qp_spline_st_speed_config_, veh_param);
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
                             path_data.path().param_length());
