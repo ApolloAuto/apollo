@@ -61,7 +61,7 @@ bool QpSplineStSpeedOptimizer::Init() {
 Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          DecisionData* const decision_data,
-                                         SpeedData* const speed_data) const {
+                                         SpeedData* const speed_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
