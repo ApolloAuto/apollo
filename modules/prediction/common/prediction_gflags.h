@@ -48,6 +48,7 @@ DECLARE_double(still_obstacle_position_std);
 DECLARE_double(max_history_time);
 DECLARE_double(target_lane_gap);
 DECLARE_double(max_lane_angle_diff);
+DECLARE_bool(enable_pedestrian_acc);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);

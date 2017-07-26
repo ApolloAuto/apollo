@@ -123,6 +123,10 @@ class Obstacle {
 
   void SetLanePoints(Feature* feature);
 
+  void InitKFPedestrianTracker(Feature* feature);
+
+  void UpdateKFPedestrianTracker(Feature* feature);
+
   void SetMotionStatus();
 
   void InsertFeatureToHistory(Feature* feature);
@@ -134,7 +138,9 @@ class Obstacle {
   apollo::perception::PerceptionObstacle::Type type_;
   std::deque<Feature> feature_history_;
   apollo::common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
+  apollo::common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
   bool kf_motion_tracker_enabled_;
+  bool kf_pedestrian_tracker_enabled_;
   std::unordered_map<std::string,
                      apollo::common::math::KalmanFilter<double, 4, 2, 0>>
       kf_lane_trackers_;
