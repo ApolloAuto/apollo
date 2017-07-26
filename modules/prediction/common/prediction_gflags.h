@@ -50,10 +50,13 @@ DECLARE_double(target_lane_gap);
 DECLARE_double(max_lane_angle_diff);
 DECLARE_bool(enable_pedestrian_acc);
 DECLARE_double(coeff_mul_sigma);
+DECLARE_double(pedestrian_min_speed);
 DECLARE_double(pedestrian_max_speed);
 DECLARE_double(pedestrian_min_acc);
 DECLARE_double(pedestrian_max_acc);
 DECLARE_double(prediction_pedestrian_total_time);
+DECLARE_int32(num_trajectory_still_pedestrian);
+DECLARE_double(still_speed);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
