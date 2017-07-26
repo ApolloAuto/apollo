@@ -19,6 +19,7 @@
 #include <fstream>
 #include <utility>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
@@ -39,6 +40,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::ErrorCode;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
@@ -68,11 +70,10 @@ Status EMPlanner::Init(const PlanningConfig& config) {
         config.em_planner_config().optimizer(i)));
     AINFO << "Created optimizer:" << optimizers_.back()->name();
   }
-  routing_proxy_.Init();
   for (auto& optimizer : optimizers_) {
     if (!optimizer->Init()) {
       std::string msg(common::util::StrCat("Init optimizer[", optimizer->name(),
-                                     "] failed."));
+                                           "] failed."));
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -86,8 +87,7 @@ Status EMPlanner::MakePlan(
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
 
-  // FIXME(all): switch to real routing when it is ready
-  GenerateReferenceLineFromRouting(routing_proxy_);
+  GenerateReferenceLineFromRouting();
 
   frame->set_planning_data(new PlanningData());
   if (data_center->last_frame()) {
@@ -106,8 +106,8 @@ Status EMPlanner::MakePlan(
   planning_data->set_decision_data(decision_data);
   for (auto& optimizer : optimizers_) {
     optimizer->Optimize(planning_data);
-    ADEBUG << "after optimizer " << optimizer->name()
-        << ":" << planning_data->DebugString();
+    ADEBUG << "after optimizer " << optimizer->name() << ":"
+           << planning_data->DebugString();
   }
   PublishableTrajectory computed_trajectory;
   if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution,
@@ -171,11 +171,12 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   return std::move(speed_profile);
 }
 
-Status EMPlanner::GenerateReferenceLineFromRouting(
-    const RoutingProxy& routing_proxy) {
+Status EMPlanner::GenerateReferenceLineFromRouting() {
   DataCenter* data_center = DataCenter::instance();
 
-  const auto& routing_result = routing_proxy.routing();
+  const auto& routing_result =
+      AdapterManager::GetRoutingResult()->GetLatestObserved();
+
   const auto& map = data_center->map();
   std::vector<ReferencePoint> ref_points;
   common::math::Vec2d vehicle_position;

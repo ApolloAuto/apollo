@@ -208,5 +208,6 @@ DECLARE_string(st_boundary_config_file);
 DECLARE_string(qp_spline_st_speed_config_file);
 
 DECLARE_int32(trajectory_point_num_for_debug);
+DECLARE_string(offline_routing_file);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
