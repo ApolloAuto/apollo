@@ -41,15 +41,15 @@ void TransAffineToMatrix4(const Eigen::Vector3d& translation,
       1 - 2 * (qx * qx + qy * qy), t_z, 0, 0, 0, 1;
 }
 
-void TransformCloud(pcl_util::PointCloudPtr cloud, std::vector<int> indices,
-                    pcl_util::PointDCloud& trans_cloud) {
-  if (trans_cloud.size() != indices.size()) {
-    trans_cloud.resize(indices.size());
+void TransformCloud(pcl_util::PointCloudPtr cloud, const std::vector<int>& indices,
+                    pcl_util::PointDCloud* trans_cloud) {
+  if (trans_cloud->size() != indices.size()) {
+    trans_cloud->resize(indices.size());
   }
   for (size_t i = 0; i < indices.size(); ++i) {
     const Point& p = cloud->at(indices[i]);
     Eigen::Vector3d v(p.x, p.y, p.z);
-    pcl_util::PointD& tp = trans_cloud.at(i);
+    pcl_util::PointD& tp = trans_cloud->at(i);
     tp.x = v.x();
     tp.y = v.y();
     tp.z = v.z();

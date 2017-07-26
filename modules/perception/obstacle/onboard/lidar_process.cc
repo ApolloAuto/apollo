@@ -323,8 +323,8 @@ bool LidarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
 
   for (const auto& obj : objects_) {
     PerceptionObstacle* obstacle = obstacles->add_perception_obstacle();
-    if (!obj->serialize(obstacle)) {
-      AERROR << "Failed gen PerceptionObstacle. Object:" << obj->to_string();
+    if (!obj->Serialize(obstacle)) {
+      AERROR << "Failed gen PerceptionObstacle. Object:" << obj->ToString();
       return false;
     }
     obstacle->set_timestamp(obstacle->timestamp() * 1000);
