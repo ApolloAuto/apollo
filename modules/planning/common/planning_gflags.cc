@@ -303,3 +303,7 @@ DEFINE_int32(trajectory_point_num_for_debug, 10,
 
 DEFINE_string(offline_routing_file, "modules/map/data/garage_routing.pb.txt",
               "offline routing file");
+DEFINE_double(backward_routing_distance, 100.0,
+              "The backward routing distance.");
+DEFINE_double(decision_valid_stop_range, 0.5,
+              "The valid stop range in decision.");

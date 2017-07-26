@@ -35,6 +35,12 @@ double Distance2D(const PathPoint& a, const PathPoint& b) {
   return std::hypot(a.x() - b.x(), a.y() - b.y());
 }
 
+apollo::hdmap::Id MakeMapId(const std::string& id) {
+  apollo::hdmap::Id map_id;
+  map_id.set_id(id);
+  return map_id;
+}
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
