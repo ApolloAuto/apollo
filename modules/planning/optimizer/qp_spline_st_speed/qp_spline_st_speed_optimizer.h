@@ -39,7 +39,7 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
   virtual bool Init() override;
 
  private:
-  virtual common::Status process(
+  virtual common::Status Process(
       const PathData& path_data,
       const apollo::common::TrajectoryPoint& init_point,
       DecisionData* const decision_data, SpeedData* const speed_data) const;

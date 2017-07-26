@@ -27,6 +27,7 @@ cc_library(
         "//modules/planning/optimizer/dp_poly_path:dp_poly_path_optimizer",
         "//modules/planning/optimizer/dp_st_speed:dp_st_speed_optimizer",
         "//modules/planning/optimizer/qp_spline_path",
+        "//modules/planning/optimizer/qp_spline_st_speed:qp_spline_st_speed_optimizer",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proxy:routing_proxy",
