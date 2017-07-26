@@ -5,6 +5,7 @@ CONTROL control_cmd_pb2.ControlCommand() /apollo/control 10
 LOCALIZATION localization_pb2.LocalizationEstimate() /apollo/localization/pose 10
 MONITOR monitor_pb2.MonitorMessage() /apollo/monitor 10
 PLANNING planning_pb2.ADCTrajectory() /apollo/planning 200
+PERCEPTION perception_obstacle_pb2.PerceptionObstacles() /apollo/perception/obstacles 200
 Pad pad_msg_pb2.PadMessage() /apollo/control/pad 500
 Odometry gps_pb2.Gps() /apollo/sensor/gnss/odometry 10
 IMU imu_pb2.Imu() /apollo/sensor/gnss/corrected_imu 10
