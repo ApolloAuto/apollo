@@ -106,6 +106,15 @@ class SimulationWorldService {
   template <typename DataType>
   void UpdateSimulationWorld(const DataType &data);
 
+  Object &CreateWorldObject(
+      const apollo::perception::PerceptionObstacle &obstacle);
+  void UpdatePlanningTrajectory(
+      const apollo::planning::ADCTrajectory &trajectory);
+  void UpdateDecision(
+      const apollo::planning::DecisionResult &decision_res, double header_time);
+  void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
+          double update_timestamp_sec, Object *world_main_stop);
+
   /**
    * @brief Check whether a particular adapter has been initialized correctly.
    */
@@ -152,6 +161,7 @@ class SimulationWorldService {
   // The handle of MapService, not owned by SimulationWorldService.
   MapService *map_service_;
 
+  // The map holding obstacle string id to the actual object
   std::unordered_map<std::string, Object> obj_map_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
@@ -161,6 +171,7 @@ class SimulationWorldService {
   FRIEND_TEST(SimulationWorldServiceTest, UpdateLocalization);
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePerceptionObstacles);
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePlanningTrajectory);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateDecision);
 };
 
 }  // namespace dreamview
