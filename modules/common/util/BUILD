@@ -28,12 +28,7 @@ cc_library(
 
 cc_library(
     name = "string_util",
-    srcs = [
-        "string_util.cc",
-    ],
-    hdrs = [
-        "string_util.h",
-    ],
+    hdrs = ["string_util.h"],
 )
 
 cc_test(
