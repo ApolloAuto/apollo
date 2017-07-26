@@ -57,7 +57,7 @@ Obstacle::Obstacle()
       kf_pedestrian_tracker_(),
       kf_motion_tracker_enabled_(false),
       kf_pedestrian_tracker_enabled_(false),
-      kf_lane_trackers_(0), 
+      kf_lane_trackers_(0),
       current_lanes_(0) {}
 
 Obstacle::~Obstacle() {
@@ -748,12 +748,13 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     double s = 0.0;
     double l = 0.0;
     map->GetProjection(point, current_lane, &s, &l);
-    
+
     // TODO(kechxu) clean the follow code
     apollo::common::math::Vec2d vec_point(point[0], point[1]);
     apollo::hdmap::Point nearest_point =
         current_lane->get_nearest_point(vec_point);
-    double nearest_point_heading = map->PathHeading(current_lane, nearest_point);
+    double nearest_point_heading = map->PathHeading(
+        current_lane, nearest_point);
     double angle_diff =
         apollo::common::math::AngleDiff(heading, nearest_point_heading);
     double left = 0.0;

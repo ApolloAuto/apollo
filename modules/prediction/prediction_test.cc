@@ -30,6 +30,7 @@ class PredictionTest : public ::testing::Test {
 TEST_F(PredictionTest, Simple) {
   Prediction prediction;
   EXPECT_EQ(prediction.Name(), "prediction");
+  prediction.Init();
 }
 
 }  // namespace prediction

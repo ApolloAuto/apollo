@@ -17,6 +17,7 @@
 #include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
 
 #include <cmath>
+#include <utility>
 #include "Eigen/Dense"
 
 #include "modules/prediction/common/prediction_gflags.h"
@@ -91,7 +92,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 void LaneSequencePredictor::FilterLaneSequences(
     const LaneGraph& lane_graph,
     const std::string& lane_id,
-    std::vector<bool> *enable_lane_sequence) {  
+    std::vector<bool> *enable_lane_sequence) {
   int num_lane_sequence = lane_graph.lane_sequence_size();
   std::vector<int> lane_change_type(num_lane_sequence, -1);
   std::pair<int, double> change(-1, -1.0);
@@ -195,7 +196,6 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
       double y_diff = point.y() - prev_point->y();
       if (::apollo::common::math::DoubleCompare(x_diff, 0.0) != 0 ||
           ::apollo::common::math::DoubleCompare(y_diff, 0.0) != 0) {
-        
         theta = std::atan2(y_diff, x_diff);
         prev_point->set_theta(theta);
       } else {
@@ -263,5 +263,5 @@ std::string LaneSequencePredictor::ToString(const LaneSequence& sequence) {
   return str_lane_sequence;
 }
 
-}  // prediction
-}  // apollo
+}  // namespace prediction
+}  // namespace apollo

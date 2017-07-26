@@ -22,11 +22,10 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
 
-#include "modules/prediction/predictor/predictor.h"
-
 #include <string>
 #include <vector>
 
+#include "modules/prediction/predictor/predictor.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
 #include "modules/common/proto/path_point.pb.h"
 

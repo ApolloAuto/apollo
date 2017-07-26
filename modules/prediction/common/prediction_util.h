@@ -18,6 +18,7 @@
 #define MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 
 #include <vector>
+#include <utility>
 
 namespace apollo {
 namespace prediction {
