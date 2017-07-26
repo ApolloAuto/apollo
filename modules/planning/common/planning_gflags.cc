@@ -38,6 +38,10 @@ DEFINE_double(trajectory_resolution, 0.01,
               "The time resolution of "
               "output trajectory.");
 
+DEFINE_string(reference_line_smoother_config_file,
+              "modules/planning/conf/reference_line_smoother_config.pb.txt",
+              "The reference line smoother config file");
+
 DEFINE_double(cycle_duration_in_sec, 0.002, "# of seconds per planning cycle.");
 DEFINE_double(maximal_delay_sec, 0.005, "# of seconds for delay.");
 

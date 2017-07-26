@@ -151,8 +151,12 @@ cc_library(
         ":object_table",
         ":planning_gflags",
         "//modules/common",
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/status",
+        "//modules/common/vehicle_state",
         "//modules/map/hdmap",
+        "//modules/planning/proto:reference_line_smoother_config_proto",
+        "//modules/planning/reference_line:reference_line_smoother",
         "//modules/planning/state_machine:master_state_machine",
     ],
 )

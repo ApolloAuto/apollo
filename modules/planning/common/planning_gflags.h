@@ -200,6 +200,8 @@ DECLARE_double(master_min_speed);
 DECLARE_double(max_deacceleration_for_red_light_stop);
 DECLARE_double(max_deacceleration_for_yellow_light_stop);
 
+DECLARE_string(reference_line_smoother_config_file);
+
 // Optimizers
 DECLARE_string(qp_spline_path_config_file);
 DECLARE_string(dp_poly_path_config_file);

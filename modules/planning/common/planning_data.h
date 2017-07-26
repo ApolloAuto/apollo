@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/common/proto/path_point.pb.h"
 
@@ -42,7 +43,7 @@ class PlanningData {
   PlanningData() = default;
 
   // copy reference line to planning data
-  void set_reference_line(std::unique_ptr<ReferenceLine>& reference_line);
+  void set_reference_line(const std::vector<ReferencePoint>& ref_points);
   void set_decision_data(std::shared_ptr<DecisionData>& decision_data);
   void set_init_planning_point(const TrajectoryPoint& init_planning_point);
 
