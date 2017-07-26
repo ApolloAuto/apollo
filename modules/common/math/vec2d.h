@@ -38,8 +38,7 @@ constexpr double kMathEpsilon = 1e-10;
 /**
  * @class Vec2d
  *
- * @brief Implements a class of 2-dimensional vectors,
- * similar to Eigen::Vector2d.
+ * @brief Implements a class of 2-dimensional vectors.
  */
 class Vec2d {
  public:

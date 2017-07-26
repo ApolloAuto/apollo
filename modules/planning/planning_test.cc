@@ -42,12 +42,12 @@ class PlanningTest : public ::testing::Test {
 TEST_F(PlanningTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
   Planning planning;
-  common::vehicle_state::VehicleState::instance()->set_x(586385.782841);
-  common::vehicle_state::VehicleState::instance()->set_y(4140674.76065);
+  common::VehicleState::instance()->set_x(586385.782841);
+  common::VehicleState::instance()->set_y(4140674.76065);
 
-  common::vehicle_state::VehicleState::instance()->set_heading(2.836888814);
-  common::vehicle_state::VehicleState::instance()->set_linear_velocity(0.15);
-  common::vehicle_state::VehicleState::instance()->set_angular_velocity(0.0);
+  common::VehicleState::instance()->set_heading(2.836888814);
+  common::VehicleState::instance()->set_linear_velocity(0.15);
+  common::VehicleState::instance()->set_angular_velocity(0.0);
 
   std::vector<TrajectoryPoint> trajectory1;
   double time1 = 0.1;
@@ -88,12 +88,12 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
   Planning planning;
   planning.Init();
 
-  common::vehicle_state::VehicleState::instance()->set_x(586385.782841);
-  common::vehicle_state::VehicleState::instance()->set_y(4140674.76065);
+  common::VehicleState::instance()->set_x(586385.782841);
+  common::VehicleState::instance()->set_y(4140674.76065);
 
-  common::vehicle_state::VehicleState::instance()->set_heading(2.836888814);
-  common::vehicle_state::VehicleState::instance()->set_linear_velocity(0.0);
-  common::vehicle_state::VehicleState::instance()->set_angular_velocity(0.0);
+  common::VehicleState::instance()->set_heading(2.836888814);
+  common::VehicleState::instance()->set_linear_velocity(0.0);
+  common::VehicleState::instance()->set_angular_velocity(0.0);
 
   double time = 0.1;
   std::vector<TrajectoryPoint> trajectory;
