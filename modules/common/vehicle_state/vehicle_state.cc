@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include <cmath>
+
+#include "Eigen/Core"
+
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
@@ -22,56 +25,54 @@
 
 namespace apollo {
 namespace common {
-namespace vehicle_state {
 
 VehicleState::VehicleState() {}
 
 void VehicleState::Update(
-    const localization::LocalizationEstimate *localization,
-    const canbus::Chassis *chassis) {
+    const localization::LocalizationEstimate &localization,
+    const canbus::Chassis &chassis) {
   ConstructExceptLinearVelocity(localization);
-  if (chassis != nullptr && chassis->has_header() &&
-      chassis->header().has_timestamp_sec()) {
-    timestamp_ = chassis->header().timestamp_sec();
+  if (chassis.has_header() && chassis.header().has_timestamp_sec()) {
+    timestamp_ = chassis.header().timestamp_sec();
   }
-  if (chassis != nullptr && chassis->has_speed_mps()) {
-    linear_v_ = chassis->speed_mps();
+  if (chassis.has_speed_mps()) {
+    linear_v_ = chassis.speed_mps();
   }
 
-  if (chassis != nullptr && chassis->has_gear_location()) {
-    gear_ = chassis->gear_location();
+  if (chassis.has_gear_location()) {
+    gear_ = chassis.gear_location();
   } else {
     gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
   }
 }
 
 void VehicleState::ConstructExceptLinearVelocity(
-    const localization::LocalizationEstimate *localization) {
-  if (localization == nullptr || !localization->has_pose()) {
+    const localization::LocalizationEstimate &localization) {
+  if (!localization.has_pose()) {
     AERROR << "Invalid localization input.";
     return;
   }
-  localization_ptr_ = localization;
-  if (localization->pose().has_position()) {
-    x_ = localization->pose().position().x();
-    y_ = localization->pose().position().y();
-    z_ = localization->pose().position().z();
+  pose_ = localization.pose();
+  if (localization.pose().has_position()) {
+    x_ = localization.pose().position().x();
+    y_ = localization.pose().position().y();
+    z_ = localization.pose().position().z();
   }
 
-  if (localization->pose().has_heading()) {
-    heading_ = localization->pose().heading();
+  if (localization.pose().has_heading()) {
+    heading_ = localization.pose().heading();
   } else {
-    const auto &orientation = localization->pose().orientation();
+    const auto &orientation = localization.pose().orientation();
     heading_ = ::apollo::common::math::QuaternionToHeading(
         orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
   }
 
   if (FLAGS_enable_map_reference_unify) {
-    angular_v_ = localization->pose().angular_velocity_vrf().z();
-    linear_a_ = localization->pose().linear_acceleration_vrf().y();
+    angular_v_ = localization.pose().angular_velocity_vrf().z();
+    linear_a_ = localization.pose().linear_acceleration_vrf().y();
   } else {
-    angular_v_ = localization->pose().angular_velocity().z();
-    linear_a_ = localization->pose().linear_acceleration().y();
+    angular_v_ = localization.pose().angular_velocity().z();
+    linear_a_ = localization.pose().linear_acceleration().y();
   }
 }
 
@@ -112,7 +113,7 @@ void VehicleState::set_gear(
   gear_ = gear_position;
 }
 
-Eigen::Vector2d VehicleState::EstimateFuturePosition(const double t) const {
+common::math::Vec2d VehicleState::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
   double v = linear_v_;
   if (gear_ == ::apollo::canbus::Chassis::GEAR_REVERSE) {
@@ -128,22 +129,21 @@ Eigen::Vector2d VehicleState::EstimateFuturePosition(const double t) const {
   }
 
   // If we have rotation information, take it into consideration.
-  if (localization_ptr_ != nullptr && localization_ptr_->has_pose() &&
-      localization_ptr_->pose().has_orientation()) {
-    const auto &orientation = localization_ptr_->pose().orientation();
+  if (pose_.has_orientation()) {
+    const auto &orientation = pose_.orientation();
     Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                          orientation.qy(), orientation.qz());
     Eigen::Vector3d pos_vec(x_, y_, z_);
     auto future_pos_3d = quaternion.toRotationMatrix() * vec_distance + pos_vec;
-    return Eigen::Vector2d(future_pos_3d[0], future_pos_3d[1]);
+    return common::math::Vec2d(future_pos_3d[0], future_pos_3d[1]);
   }
 
   // If no valid rotation information provided from localization,
   // return the estimated future position without rotation.
-  return Eigen::Vector2d(vec_distance[0] + x_, vec_distance[1] + y_);
+  return common::math::Vec2d(vec_distance[0] + x_, vec_distance[1] + y_);
 }
 
-Eigen::Vector2d VehicleState::ComputeCOMPosition(
+common::math::Vec2d VehicleState::ComputeCOMPosition(
     const double rear_to_com_distance) const {
   // set length as distance between rear wheel and center of mass.
   Eigen::Vector3d v(0.0, rear_to_com_distance, 0.0);
@@ -152,18 +152,16 @@ Eigen::Vector2d VehicleState::ComputeCOMPosition(
   Eigen::Vector3d com_pos_3d = v + pos_vec;
 
   // If we have rotation information, take it into consideration.
-  if (localization_ptr_ != nullptr && localization_ptr_->has_pose() &&
-      localization_ptr_->pose().has_orientation()) {
-    const auto &orientation = localization_ptr_->pose().orientation();
+  if (pose_.has_orientation()) {
+    const auto &orientation = pose_.orientation();
     Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                          orientation.qy(), orientation.qz());
     // Update the COM position with rotation
     com_pos_3d = quaternion.toRotationMatrix() * v + pos_vec;
   }
 
-  return Eigen::Vector2d(com_pos_3d[0], com_pos_3d[1]);
+  return common::math::Vec2d(com_pos_3d[0], com_pos_3d[1]);
 }
 
-}  // namespace vehicle_state
 }  // namespace common
 }  // namespace apollo

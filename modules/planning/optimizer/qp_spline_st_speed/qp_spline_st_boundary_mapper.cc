@@ -209,7 +209,7 @@ Status QpSplineStBoundaryMapper::map_obstacle_with_prediction_trajectory(
       // TODO: fix trajectory point relative time issue.
       double trajectory_point_time =
           trajectory_point.relative_time() + trajectory.start_timestamp() -
-          common::vehicle_state::VehicleState::instance()->timestamp();
+          common::VehicleState::instance()->timestamp();
       const Box2d obs_box(
           Vec2d(trajectory_point.path_point().x(),
                 trajectory_point.path_point().y()),

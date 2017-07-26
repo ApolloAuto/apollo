@@ -29,7 +29,7 @@
 namespace apollo {
 namespace planning {
 
-using VehicleState = apollo::common::vehicle_state::VehicleState;
+using VehicleState = apollo::common::VehicleState;
 
 std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
     const VehicleState& vehicle_state, const Frame* const prev_frame) {
@@ -84,9 +84,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
 
   auto matched_point = prev_trajectory.trajectory_point_at(matched_index);
   double position_diff =
-      Eigen::Vector2d(matched_point.path_point().x() - vehicle_state.x(),
-                      matched_point.path_point().y() - vehicle_state.y())
-          .norm();
+      common::math::Vec2d(matched_point.path_point().x() - vehicle_state.x(),
+                          matched_point.path_point().y() - vehicle_state.y())
+          .Length();
 
   // the distance between matched point and actual position is too large
   if (position_diff > FLAGS_replan_distance_threshold) {

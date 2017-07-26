@@ -41,7 +41,7 @@ namespace planning {
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 using apollo::common::TrajectoryPoint;
-using apollo::common::vehicle_state::VehicleState;
+using apollo::common::VehicleState;
 
 EMPlanner::EMPlanner() {}
 
@@ -182,8 +182,8 @@ Status EMPlanner::GenerateReferenceLineFromRouting(
   ReferenceLineSmoother smoother;
   smoother.SetConfig(smoother_config_);  // use the default value in config.
 
-  vehicle_position.set_x(common::vehicle_state::VehicleState::instance()->x());
-  vehicle_position.set_y(common::vehicle_state::VehicleState::instance()->y());
+  vehicle_position.set_x(common::VehicleState::instance()->x());
+  vehicle_position.set_y(common::VehicleState::instance()->y());
 
   for (const auto& lane : routing_result.route()) {
     hdmap::Id lane_id;
