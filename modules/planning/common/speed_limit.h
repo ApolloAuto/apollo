@@ -31,7 +31,9 @@ namespace planning {
 class SpeedLimit {
  public:
   SpeedLimit() = default;
-  std::vector<SpeedPoint>* mutable_speed_limits();
+  void add_speed_limit(const SpeedPoint& speed_point);
+  void add_speed_limit(const double s, const double t, const double v,
+                       const double a, const double da);
   const std::vector<SpeedPoint>& speed_limits() const;
 
  private:
