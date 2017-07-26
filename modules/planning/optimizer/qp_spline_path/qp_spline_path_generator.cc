@@ -197,8 +197,8 @@ bool QPSplinePathGenerator::init_smoothing_spline(
 
   // TODO refine here, add end_s tolorence here
   std::vector<double> sampling_point;
-  if (simple_sampler.sample(_init_point, reference_line, num_knots, start_s,
-                            end_s - 0.1, &sampling_point)) {
+  if (!simple_sampler.sample(_init_point, reference_line, num_knots, start_s,
+                             end_s - 0.1, &sampling_point)) {
     AERROR << "Qp spline sampler failed!";
     return false;
   }
