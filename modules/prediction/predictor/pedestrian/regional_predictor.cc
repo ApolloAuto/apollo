@@ -16,9 +16,11 @@
 
 #include <limits>
 #include <cmath>
+#include <utility>
 
 #include "modules/prediction/predictor/pedestrian/regional_predictor.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/common/math/kalman_filter.h"
 
 namespace apollo {
@@ -43,8 +45,8 @@ Eigen::Vector2d GetUnitVector2d(
 
   double norm = std::hypot(delta_x, delta_y);
   if (norm > 1e-10) {
-  	delta_x /= norm;
-  	delta_y /= norm;
+    delta_x /= norm;
+    delta_y /= norm;
   }
   return {delta_x, delta_y};
 }
@@ -52,25 +54,81 @@ Eigen::Vector2d GetUnitVector2d(
 void CompressVector2d(const double to_length, Eigen::Vector2d* vec) {
   double norm = std::hypot(vec->operator[](0), vec->operator[](1));
   if (norm > to_length) {
-  	double ratio = to_length / norm;
-  	vec->operator[](0) *= ratio;
-  	vec->operator[](1) *= ratio;
+    double ratio = to_length / norm;
+    vec->operator[](0) *= ratio;
+    vec->operator[](1) *= ratio;
   }
+}
+
+double CrossProduct(const Eigen::Vector2d& vec1, const Eigen::Vector2d& vec2) {
+  return vec1[0] * vec2[1] - vec1[1] * vec2[0];
 }
 
 }  // namespace
 
-void RegionalPredictor::Predict(Obstacle* obstacle) {}
+void RegionalPredictor::Predict(Obstacle* obstacle) {
+  // TODO(kechxu) implement
+}
 
 void RegionalPredictor::GetTrajectoryCandidatePoints(
     const Eigen::Vector2d& position,
     const Eigen::Vector2d& velocity,
     const Eigen::Vector2d& acceleration,
-    const KalmanFilter<double, 2, 2, 4>& kf,
+    const KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker,
     const double total_time,
     std::vector<TrajectoryPoint>* middle_points,
     std::vector<TrajectoryPoint>* boundary_points) {
-  // TODO(kechxu) implement
+
+  double delta_ts = FLAGS_prediction_freq;
+  KalmanFilter<double, 2, 2, 4> kf = kf_pedestrian_tracker;
+  // set the control matrix and control vector
+  Eigen::Matrix<double, 2, 4> B;
+  B(0, 0) = delta_ts;
+  B(0, 2) = 0.5 * delta_ts * delta_ts;
+  B(1, 1) = delta_ts;
+  B(1, 3) = 0.5 * delta_ts * delta_ts;
+  Eigen::Matrix<double, 4, 1> u;
+  u.setZero();
+  u(0, 0) = velocity.x();
+  u(1, 0) = velocity.y();
+  if (FLAGS_enable_pedestrian_acc) {
+    u(2, 0) = acceleration.x();
+    u(3, 0) = acceleration.y();
+  }
+
+  kf.SetControlMatrix(B);
+
+  TrajectoryPoint prev_middle_point;
+  prev_middle_point.mutable_path_point()->set_x(position[0]);
+  prev_middle_point.mutable_path_point()->set_y(position[1]);
+
+  for (int i = 0; i < static_cast<int>(total_time / delta_ts); ++i) {
+    kf.Predict(u);
+    Eigen::Matrix<double, 2, 2> P = kf.GetStateCovariance();
+    double ellipse_len_x = std::sqrt(std::fabs(P(0, 0)));
+    double ellipse_len_y = std::sqrt(std::fabs(P(1, 1)));
+    ellipse_len_x *= FLAGS_coeff_mul_sigma;
+    ellipse_len_y *= FLAGS_coeff_mul_sigma;
+
+    Eigen::Matrix<double, 2, 1> state = kf.GetStateEstimate();
+    double middle_point_x = state(0, 0);
+    double middle_point_y = state(1, 0);
+    TrajectoryPoint middle_point;
+    middle_point.mutable_path_point()->set_x(middle_point_x);
+    middle_point.mutable_path_point()->set_y(middle_point_y);
+    TrajectoryPoint boundary_point_1;
+    TrajectoryPoint boundary_point_2;
+    Eigen::Vector2d direction =
+        GetUnitVector2d(prev_middle_point, middle_point);
+    GetTwoEllipsePoints(middle_point_x, middle_point_y,
+        direction[0], direction[1], ellipse_len_x, ellipse_len_y,
+        &boundary_point_1, &boundary_point_2);
+    prev_middle_point = middle_point;
+
+    middle_points->push_back(std::move(middle_point));
+    boundary_points->push_back(std::move(boundary_point_1));
+    boundary_points->push_back(std::move(boundary_point_2));
+  }
 }
 
 void RegionalPredictor::UpdateTrajectoryPoints(
@@ -81,12 +139,51 @@ void RegionalPredictor::UpdateTrajectoryPoints(
     const std::vector<TrajectoryPoint>& boundary_points,
     std::vector<TrajectoryPoint>* left_points,
     std::vector<TrajectoryPoint>* right_points) {
+
   if (2 * middle_points.size() != boundary_points.size()) {
-    AERROR << "Middle and ellipse points sizes not match";
+    AWARN << "Middle and ellipse points sizes not match";
+  }
+  double speed = std::hypot(velocity[0], velocity[1]);
+  double left_heading = std::atan2(velocity[1], velocity[0]);
+  double right_heading = std::atan2(velocity[1], velocity[0]);
+
+  TrajectoryPoint left_starting_point = starting_point;
+  left_points->push_back(std::move(left_starting_point));
+  TrajectoryPoint right_starting_point = starting_point;
+  right_points->push_back(std::move(right_starting_point));
+
+  int left_i = 0;
+  int right_i = 0;
+  for (size_t i = 0; i < middle_points.size(); ++i) {
+    TrajectoryPoint prev_middle_point = starting_point;
+    if (i > 0) {
+      prev_middle_point = middle_points[i - 1];
+    }
+    Eigen::Vector2d middle_direction =
+        GetUnitVector2d(prev_middle_point, middle_points[i]);
+    if (2 * i > boundary_points.size()) {
+      break;
+    }
+    TrajectoryPoint boundary_point_1 = boundary_points[2 * i];
+    InsertTrajectoryPoint(prev_middle_point, middle_direction,
+        boundary_point_1, speed, delta_ts, &left_i, &right_i,
+        &left_heading, &right_heading, left_points, right_points);
+    if (2 * i + 1 >= boundary_points.size()) {
+      break;
+    }
+    TrajectoryPoint boundary_point_2 = boundary_points[2 * i + 1];
+    InsertTrajectoryPoint(prev_middle_point, middle_direction,
+        boundary_point_2, speed, delta_ts, &left_i, &right_i,
+        &left_heading, &right_heading, left_points, right_points);
   }
 
-  // double speed = std::hypot(velocity[0], velocity[1]);
-  // TODO(kechxu) continue implementing
+  left_points->back().set_v(speed);
+  left_points->back().set_relative_time(left_i * delta_ts);
+  left_points->back().mutable_path_point()->set_theta(left_heading);
+
+  right_points->back().set_v(speed);
+  right_points->back().set_relative_time(right_i * delta_ts);
+  right_points->back().mutable_path_point()->set_theta(right_heading);
 }
 
 void RegionalPredictor::InsertTrajectoryPoint(
@@ -101,7 +198,33 @@ void RegionalPredictor::InsertTrajectoryPoint(
     double* right_heading,
     std::vector<TrajectoryPoint>* left_points,
     std::vector<TrajectoryPoint>* right_points) {
-  // TODO(kechxu) implement
+
+  Eigen::Vector2d boundary_direction =
+      GetUnitVector2d(prev_middle_point, boundary_point);
+  double cross_product = CrossProduct(boundary_direction, middle_direction);
+  if (cross_product < 0.0) {
+    if (!left_points->empty()) {
+      TrajectoryPoint& prev_point = left_points->back();
+      Eigen::Vector2d dir = GetUnitVector2d(prev_point, boundary_point);
+      *left_heading = std::atan2(dir[1], dir[0]);
+      prev_point.mutable_path_point()->set_theta(*left_heading);
+      prev_point.set_v(speed);
+      prev_point.set_relative_time((*left_i) * delta_ts);
+      ++left_i;
+    }
+    left_points->push_back(boundary_point);
+  } else {
+    if (!right_points->empty()) {
+      TrajectoryPoint& prev_point = right_points->back();
+      Eigen::Vector2d dir = GetUnitVector2d(prev_point, boundary_point);
+      *right_heading = std::atan2(dir[1], dir[0]);
+      prev_point.mutable_path_point()->set_theta(*right_heading);
+      prev_point.set_v(speed);
+      prev_point.set_relative_time((*right_i) * delta_ts);
+      ++right_i;
+    }
+    right_points->push_back(boundary_point);
+  }
 }
 
 void RegionalPredictor::GetTwoEllipsePoints(
