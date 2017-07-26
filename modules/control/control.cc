@@ -15,6 +15,7 @@
   *****************************************************************************/
 #include "modules/control/control.h"
 
+#include <iomanip>
 #include <string>
 
 #include "ros/include/std_msgs/String.h"
@@ -25,6 +26,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -75,8 +77,7 @@ Status Control::Init() {
 
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
 
-  CHECK(AdapterManager::GetPlanning())
-      << "Planning is not initialized.";
+  CHECK(AdapterManager::GetPlanning()) << "Planning is not initialized.";
 
   CHECK(AdapterManager::GetPad()) << "Pad is not initialized.";
 
@@ -250,6 +251,8 @@ Status Control::CheckInput() {
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");
   }
   trajectory_ = trajectory_adapter->GetLatestObserved();
+
+  common::VehicleState::instance()->Update(localization_, chassis_);
 
   return Status::OK();
 }

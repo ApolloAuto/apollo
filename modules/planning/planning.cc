@@ -99,8 +99,8 @@ void Planning::RunOnce() {
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
-  common::vehicle_state::VehicleState::instance()->Update(&localization,
-                                                          &chassis);
+  common::VehicleState::instance()->Update(localization,
+                                                          chassis);
   bool is_on_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
 
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
@@ -120,7 +120,7 @@ void Planning::RunOnce() {
     ADCTrajectory trajectory_pb =
         ToADCTrajectory(execution_start_time, planning_trajectory);
     AdapterManager::PublishPlanning(trajectory_pb);
-    ADEBUG << "Planning succeeded:" << trajectory_pb.DebugString();
+    ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
   } else {
     AERROR << "Planning failed";
   }
@@ -150,16 +150,15 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     // If the deviation exceeds a specific threshold,
     // it will be unsafe to planning from the matched point.
     double dx = matched_point.path_point().x() -
-                common::vehicle_state::VehicleState::instance()->x();
+                common::VehicleState::instance()->x();
     double dy = matched_point.path_point().y() -
-                common::vehicle_state::VehicleState::instance()->y();
+                common::VehicleState::instance()->y();
     double position_deviation = std::sqrt(dx * dx + dy * dy);
 
     if (position_deviation < FLAGS_replanning_threshold) {
       // planned trajectory from the matched point, the matched point has
       // relative time 0.
-      auto status =
-          planner_->MakePlan(matched_point, planning_trajectory);
+      auto status = planner_->MakePlan(matched_point, planning_trajectory);
 
       if (!status.ok()) {
         last_trajectory_.clear();
@@ -188,8 +187,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   TrajectoryPoint vehicle_state_point =
       ComputeStartingPointFromVehicleState(planning_cycle_time);
 
-  auto status =
-      planner_->MakePlan(vehicle_state_point, planning_trajectory);
+  auto status = planner_->MakePlan(vehicle_state_point, planning_trajectory);
   if (!status.ok()) {
     last_trajectory_.clear();
     return false;
@@ -225,21 +223,21 @@ TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
   // point.set_x(estimated_position.x());
   // point.set_y(estimated_position.y());
   point.mutable_path_point()->set_x(
-      common::vehicle_state::VehicleState::instance()->x());
+      common::VehicleState::instance()->x());
   point.mutable_path_point()->set_y(
-      common::vehicle_state::VehicleState::instance()->y());
+      common::VehicleState::instance()->y());
   point.mutable_path_point()->set_z(
-      common::vehicle_state::VehicleState::instance()->z());
+      common::VehicleState::instance()->z());
   point.set_v(
-      common::vehicle_state::VehicleState::instance()->linear_velocity());
+      common::VehicleState::instance()->linear_velocity());
   point.set_a(
-      common::vehicle_state::VehicleState::instance()->linear_acceleration());
+      common::VehicleState::instance()->linear_acceleration());
   point.mutable_path_point()->set_kappa(0.0);
   const double speed_threshold = 0.1;
   if (point.v() > speed_threshold) {
     point.mutable_path_point()->set_kappa(
-        common::vehicle_state::VehicleState::instance()->angular_velocity() /
-        common::vehicle_state::VehicleState::instance()->linear_velocity());
+        common::VehicleState::instance()->angular_velocity() /
+        common::VehicleState::instance()->linear_velocity());
   }
   point.mutable_path_point()->set_dkappa(0.0);
   point.mutable_path_point()->set_s(0.0);
