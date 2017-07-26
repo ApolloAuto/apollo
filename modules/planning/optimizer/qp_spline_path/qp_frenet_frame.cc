@@ -39,7 +39,7 @@ bool QpFrenetFrame::Init(const ReferenceLine& reference_line,
                          const double start_s, const double end_s,
                          const double time_resolution,
                          const std::uint32_t num_points) {
-  _vehicle_param = common::config::VehicleConfigHelper::instance()
+  _vehicle_param = common::VehicleConfigHelper::instance()
                        ->GetConfig()
                        .vehicle_param();
   _speed_profile = &speed_data;

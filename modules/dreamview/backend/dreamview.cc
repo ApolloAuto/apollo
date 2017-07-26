@@ -27,7 +27,7 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
-using apollo::common::config::VehicleConfigHelper;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::Status;
 using apollo::common::time::Clock;
 

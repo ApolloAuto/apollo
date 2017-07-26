@@ -61,13 +61,13 @@ class StBoundaryMapper {
 
  protected:
   const apollo::planning::StBoundaryConfig& st_boundary_config() const;
-  const apollo::common::config::VehicleParam& vehicle_param() const {
-    return common::config::VehicleConfigHelper::GetConfig().vehicle_param();
+  const apollo::common::VehicleParam& vehicle_param() const {
+    return common::VehicleConfigHelper::GetConfig().vehicle_param();
   }
 
   double get_area(const std::vector<STPoint>& boundary_points) const;
   bool check_overlap(const apollo::common::PathPoint& path_point,
-                     const apollo::common::config::VehicleParam& params,
+                     const apollo::common::VehicleParam& params,
                      const apollo::common::math::Box2d& obs_box,
                      const double buffer) const;
 

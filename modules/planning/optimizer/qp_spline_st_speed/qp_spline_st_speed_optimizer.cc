@@ -95,7 +95,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 2 perform graph search
   const auto& veh_param =
-      common::config::VehicleConfigHelper::GetConfig().vehicle_param();
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
   QpSplineStGraph st_graph(qp_spline_st_speed_config_, veh_param);
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,

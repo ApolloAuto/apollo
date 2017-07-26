@@ -68,7 +68,7 @@ double StBoundaryMapper::get_area(
 
 bool StBoundaryMapper::check_overlap(
     const PathPoint& path_point,
-    const apollo::common::config::VehicleParam& params,
+    const apollo::common::VehicleParam& params,
     const apollo::common::math::Box2d& obs_box, const double buffer) const {
   const double mid_to_rear_center =
       params.length() / 2.0 - params.front_edge_to_center();

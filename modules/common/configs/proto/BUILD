@@ -6,7 +6,6 @@ load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
 cc_proto_library(
     name = "vehicle_config_proto",
     protos = [
-        "config_extrinsics.proto",
         "vehicle_config.proto",
     ],
     deps = [
@@ -17,7 +16,6 @@ cc_proto_library(
 py_proto_compile(
     name = "vehicle_config_proto_pylib",
     protos = [
-        "config_extrinsics.proto",
         "vehicle_config.proto",
     ],
     deps = [
