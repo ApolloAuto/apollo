@@ -26,15 +26,4 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "config_manager_test",
-    srcs = ["config_manager_test.cc",],
-    size = "small",
-    data = ["//modules/perception:perception_testdata"],
-    deps = [
-        ":config_manager",
-        "@gtest//:main",
-    ],
-)
-
 cpplint()
