@@ -15,15 +15,13 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/base/object.h"
 
-#include <sstream>
-
 #include "modules/common/macro.h"
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace perception {
 
-using std::ostringstream;
 using std::string;
 using std::vector;
 using Eigen::Vector3d;
@@ -95,18 +93,21 @@ void Object::clone(const Object& rhs) {
 }
 
 string Object::to_string() const {
-  ostringstream oss;
-  oss << "Object[id: " << id << ", track_id: " << track_id
-    << ", cloud_size: " << cloud->size() << ", direction: "
-    << direction.transpose() << ", center: " << center.transpose()
-    << " velocity: " << velocity.transpose() << ", width: " << width
-    << ", length: " << length << ", height: " << height
-    << ", polygon_size: " << polygon.size()
-    << ", type: " << type << ", is_background: " << is_background << "]";
-    // << ", tracking_time: " << GLOG_TIMESTAMP(tracking_time)
-    // << ", latest_tracked_time: " << GLOG_TIMESTAMP(latest_tracked_time) << "]";
-
-  return oss.str();
+  return apollo::common::util::StrCat(
+      "Object[id: ", id, ", "
+      "track_id: ", track_id, ", "
+      "cloud_size: ", cloud->size(), ", "
+      "direction: ", direction.transpose(), ", "
+      "center: ", center.transpose(), ", "
+      "velocity: ", velocity.transpose(), ", "
+      "width: ", width, ", "
+      "length: ", length, ", "
+      "height: ", height, ", "
+      "polygon_size: ", polygon.size(), ", "
+      "type: ", type, ", "
+      "is_background: ", is_background, "]");
+  // "tracking_time: ", GLOG_TIMESTAMP(tracking_time)
+  // "latest_tracked_time: ", GLOG_TIMESTAMP(latest_tracked_time)
 }
 
 bool Object::serialize(PerceptionObstacle* pb_obj) const {

@@ -26,14 +26,24 @@ cc_library(
     hdrs = ["lru_cache.h"],
 )
 
+cc_library(
+    name = "string_util",
+    srcs = [
+        "string_util.cc",
+    ],
+    hdrs = [
+        "string_util.h",
+    ],
+)
+
 cc_test(
-    name = "util_test",
+    name = "string_util_test",
     size = "small",
     srcs = [
-        "util_test.cc",
+        "string_util_test.cc",
     ],
     deps = [
-        ":util",
+        ":string_util",
         "@gtest//:main",
     ],
 )

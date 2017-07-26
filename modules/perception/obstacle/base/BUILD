@@ -11,6 +11,7 @@ cc_library(
         "//modules/perception/common:perception_common",
         "//modules/perception/proto:perception_proto",
         "//modules/common:common",
+        "//modules/common/util:string_util",
         "@eigen//:eigen",
     ],
 )
