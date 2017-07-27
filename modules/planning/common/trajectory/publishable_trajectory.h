@@ -44,7 +44,6 @@ public:
   void set_header_time(const double header_time);
 
   ADCTrajectory to_trajectory_protobuf() const;
-  void populate_trajectory_protobuf(ADCTrajectory* trajectory_pb) const;
 
 private:
   double _header_time;

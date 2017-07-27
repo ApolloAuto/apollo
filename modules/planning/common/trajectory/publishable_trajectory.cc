@@ -57,14 +57,5 @@ ADCTrajectory PublishableTrajectory::to_trajectory_protobuf() const {
   return trajectory_pb;
 }
 
-void PublishableTrajectory::populate_trajectory_protobuf(
-    ADCTrajectory* trajectory_pb) const {
-  trajectory_pb->mutable_header()->set_timestamp_sec(_header_time);
-  for (const auto& tp : _trajectory_points) {
-    auto* trajectory_point = trajectory_pb->add_trajectory_point();
-    trajectory_point->CopyFrom(tp);
-  }
-}
-
 }  // namespace planning
 }  // namespace apollo
