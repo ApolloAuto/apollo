@@ -16,6 +16,8 @@
 
 #include "modules/planning/optimizer/optimizer_test_base.h"
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace planning {
 
@@ -34,6 +36,8 @@ void OptimizerTestBase::SetDataConfigs() {
       "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
   FLAGS_dp_poly_path_config_file =
       "modules/planning/testdata/conf/dp_poly_path_config.pb.txt";
+  FLAGS_v = 4;
+  FLAGS_alsologtostderr = true;
 }
 
 void OptimizerTestBase::SetUp() {
@@ -53,7 +57,7 @@ void OptimizerTestBase::SetUp() {
     return;
   }
   if (!common::util::GetProtoFromFile(FLAGS_dp_poly_path_config_file,
-                                      &config_)) {
+                                      &dp_poly_path_config_)) {
     AERROR << "Failed to load file " << FLAGS_dp_poly_path_config_file;
     return;
   }

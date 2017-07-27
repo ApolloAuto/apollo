@@ -50,27 +50,24 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
       _init_point(init_point),
       _heuristic_speed_data(speed_data) {}
 
-Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
-                                DecisionData *const decision_data,
-                                PathData *const path_data) {
+bool DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
+                              DecisionData *const decision_data,
+                              PathData *const path_data) {
   CHECK_NOTNULL(decision_data);
   CHECK_NOTNULL(path_data);
   if (!init(reference_line)) {
-    const std::string msg = "Fail to init dp road graph!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    AERROR << "Fail to init dp road graph!";
+    return false;
   }
   if (!generate_graph(reference_line).ok()) {
-    const std::string msg = "Fail to generate graph!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    AERROR << "Fail to generate graph!";
+    return false;
   }
   std::vector<uint32_t> min_cost_edges;
   if (!find_best_trajectory(reference_line, *decision_data, &min_cost_edges)
            .ok()) {
-    const std::string msg = "Fail to find best trajectory!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    AERROR << "Fail to find best trajectory!";
+    return false;
   }
   FrenetFramePath tunnel;
   std::vector<common::FrenetFramePoint> frenet_path;
@@ -107,32 +104,27 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
     sl_point.set_l(frenet_point.l());
 
     if (!reference_line.get_point_in_Cartesian_frame(sl_point, &xy_point)) {
-      const std::string msg = "Fail to convert sl point to xy point";
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+      AERROR << "Fail to convert sl point to xy point";
+      return false;
     }
     ReferencePoint ref_point =
         reference_line.get_reference_point(frenet_point.s());
     double theta = SLAnalyticTransformation::calculate_theta(
         ref_point.heading(), ref_point.kappa(), frenet_point.l(),
         frenet_point.dl());
-    // TODO(yifei) comment out unused variable
-    // double kappa =
-    // SLAnalyticTransformation::calculate_kappa(ref_point.kappa(),
-    //                                           ref_point.dkappa(),
-    //                                           frenet_point.l(),
-    //                                           frenet_point.dl(),
-    //                                           frenet_point.ddl());
+    double kappa = SLAnalyticTransformation::calculate_kappa(
+        ref_point.kappa(), ref_point.dkappa(), frenet_point.l(),
+        frenet_point.dl(), frenet_point.ddl());
 
-    ::apollo::common::PathPoint
-        path_point;  // (xy_point, theta, kappa, 0.0, 0.0, 0.0);
+    ::apollo::common::PathPoint path_point;
     path_point.set_x(xy_point.x());
     path_point.set_y(xy_point.y());
+    path_point.set_z(0.0);
     path_point.set_theta(theta);
+    path_point.set_kappa(kappa);
     path_point.set_dkappa(0.0);
     path_point.set_ddkappa(0.0);
     path_point.set_s(0.0);
-    path_point.set_z(0.0);
 
     if (path_points.size() != 0) {
       common::math::Vec2d last(path_points.back().x(), path_points.back().y());
@@ -143,13 +135,12 @@ Status DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
     path_points.push_back(std::move(path_point));
   }
   *(path_data->mutable_path()->mutable_path_points()) = path_points;
-  return Status::OK();
+  return true;
 }
 
 bool DpRoadGraph::init(const ReferenceLine &reference_line) {
   _vertices.clear();
   _edges.clear();
-  _init_point.Clear();
   common::math::Vec2d xy_point(_init_point.path_point().x(),
                                _init_point.path_point().y());
 
@@ -272,12 +263,24 @@ Status DpRoadGraph::find_best_trajectory(
       min_trajectory_cost = vertex.accumulated_cost();
     }
   }
+  std::vector<uint32_t> min_cost_vertex;
   while (best_trajectory_end_index != 0) {
-    min_cost_edges->push_back(best_trajectory_end_index);
+    min_cost_vertex.push_back(best_trajectory_end_index);
     best_trajectory_end_index = vertex_connect_table[best_trajectory_end_index];
   }
-  min_cost_edges->push_back(0);
-  std::reverse(min_cost_edges->begin(), min_cost_edges->end());
+  min_cost_vertex.push_back(0);
+  std::reverse(min_cost_vertex.begin(), min_cost_vertex.end());
+  for (uint32_t i = 1; i < min_cost_vertex.size(); ++i) {
+    AINFO << "Path vertex index " << min_cost_vertex[i];
+    const std::vector<uint32_t> &edges =
+        _vertices[min_cost_vertex[i - 1]].edges_out();
+    for (const uint32_t edge_index : edges) {
+      if (_edges[edge_index].to_vertex() == min_cost_vertex[i]) {
+        min_cost_edges->push_back(edge_index);
+        AINFO << "Path edge index " << edge_index;
+      }
+    }
+  }
   return Status::OK();
 }
 

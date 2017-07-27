@@ -45,9 +45,9 @@ class DpRoadGraph {
                        const ::apollo::common::TrajectoryPoint &init_point,
                        const SpeedData &speed_data);
   ~DpRoadGraph() = default;
-  ::apollo::common::Status find_tunnel(const ReferenceLine &reference_line,
-                                       DecisionData *const decision_data,
-                                       PathData *const path_data);
+  bool find_tunnel(const ReferenceLine &reference_line,
+                   DecisionData *const decision_data,
+                   PathData *const path_data);
 
  private:
   bool init(const ReferenceLine &reference_line);
