@@ -53,9 +53,8 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
   }
-
   double start_s = _init_point.s();
-  double end_s = std::min(reference_line.reference_map_line().length(),
+  double end_s = std::min(reference_line.length(),
                           _init_point.s() + FLAGS_planning_distance);
 
   if (!_qp_frenet_frame.Init(reference_line, decision_data, speed_data,
@@ -91,6 +90,9 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
     return false;
   }
 
+  AINFO << common::util::StrCat("Spline dl:", _init_point.dl(), ", ddl:",
+                                _init_point.ddl());
+
   // extract data
   const Spline1d& spline = _spline_generator->spline();
   double s_resolution =
@@ -106,8 +108,9 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
 
   double x_diff = xy_point.x() - init_point.path_point().x();
   double y_diff = xy_point.y() - init_point.path_point().y();
+
+  double s = _init_point.s();
   for (std::uint32_t i = 0; i <= _qp_spline_path_config.num_output(); ++i) {
-    double s = _init_point.s() + s_resolution * i;
     double l = spline(s);
     double dl = spline.derivative(s);
     double ddl = spline.second_order_derivative(s);
@@ -121,22 +124,17 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
         ref_point.heading(), ref_point.kappa(), l, dl);
     double kappa = SLAnalyticTransformation::calculate_kappa(
         ref_point.kappa(), ref_point.dkappa(), l, dl, ddl);
-    common::PathPoint path_point;
-    path_point.set_x(xy_point.x());
-    path_point.set_y(xy_point.y());
-    path_point.set_theta(theta);
-    path_point.set_kappa(kappa);
-    path_point.set_dkappa(0.0);
-    path_point.set_ddkappa(0.0);
+    common::PathPoint path_point = common::util::MakePathPoint(
+        xy_point.x(), xy_point.y(), 0.0, theta, kappa, 0.0, 0.0);
     if (path_points.size() != 0) {
       double distance =
           common::util::Distance2D(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
     }
     path_points.push_back(std::move(path_point));
+    s += s_resolution;
   }
-  *(path_data->mutable_path()->mutable_path_points()) = path_points;
-  // TODO(all): refine the path init point mapping error;
+  (*path_data->mutable_path()->mutable_path_points()) = path_points;
   return true;
 }
 
@@ -184,8 +182,8 @@ bool QpSplinePathGenerator::init_coord_range(double* const start_s,
     AERROR << "Could not retrieve reference line from frenet frame";
     return false;
   }
-  double end_point = std::min(reference_line->reference_map_line().length(),
-                              (*start_s + FLAGS_planning_distance));
+  double end_point =
+      std::min(reference_line->length(), *start_s + FLAGS_planning_distance);
 
   end_point =
       std::min(_qp_frenet_frame.feasible_longitudinal_upper_bound(), end_point);
@@ -228,12 +226,14 @@ bool QpSplinePathGenerator::setup_constraint() {
   const std::vector<double> spline_knots =
       _spline_generator->spline().x_knots();
   if (spline_knots.size() < 2) {
-    AERROR << "Smoothing spline knot size(" << spline_knots.size() << ") < 2";
+    AERROR << common::util::StrCat("Smoothing spline knot size(",
+                                   spline_knots.size(), ") < 2");
     return false;
   }
   double s_length = spline_knots.back() - spline_knots.front();
   if (s_length <= 0) {
-    AERROR << "Smoothing spline knot length(" << s_length << ") <= 0";
+    AERROR << common::util::StrCat("Smoothing spline knot length(", s_length,
+                                   ") <= 0");
     return false;
   }
 
@@ -243,8 +243,9 @@ bool QpSplinePathGenerator::setup_constraint() {
   spline_constraint->add_point_derivative_constraint(spline_knots.back(), 0.0);
   spline_constraint->add_point_second_derivative_constraint(spline_knots.back(),
                                                             0.0);
-  const std::vector<double> sampling_knots =
-      _spline_generator->spline().x_knots();
+  AINFO << "end frenet point:" << s_length << ", " << end_ref_l
+        << ", 0.0, 0.0.";
+  const std::vector<double> sampling_knots = spline_knots;
 
   if (sampling_knots.size() <= 2) {
     return false;
@@ -258,14 +259,15 @@ bool QpSplinePathGenerator::setup_constraint() {
 
   if (num_fx_bound > 1) {
     double ds = (sampling_knots.back() - sampling_knots.front()) / num_fx_bound;
+    double s = sampling_knots.front();
 
     for (std::uint32_t i = 0; i < num_fx_bound + 1; ++i) {
-      double s = sampling_knots.front() + i * ds;
       fx_knots.push_back(s);
       std::pair<double, double> boundary = std::make_pair(0.0, 0.0);
       _qp_frenet_frame.get_map_bound(s, &boundary);
       boundary_low.push_back(boundary.first);
       boundary_high.push_back(boundary.second);
+      s += ds;
       // calculate boundary here
     }
 
