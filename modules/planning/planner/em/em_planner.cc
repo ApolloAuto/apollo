@@ -113,8 +113,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
         auto* optimized_path =
             trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
         optimized_path->set_name(optimizer->name());
-        optimized_path->mutable_path()->mutable_path_point()->CopyFrom({
-            path_points.begin(), path_points.end()});
+        optimized_path->mutable_path_point()->CopyFrom({path_points.begin(),
+                                                        path_points.end()});
       }
     }
   }
@@ -130,13 +130,13 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
 
   // Add debug information.
   if (FLAGS_enable_record_debug) {
-    auto* debug_reference_line =
+    auto* reference_line =
         trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
-    debug_reference_line->set_name("planning_reference_line");
+    reference_line->set_name("planning_reference_line");
     const auto& reference_points =
         planning_data->reference_line().reference_points();
-    debug_reference_line->mutable_path()->mutable_path_point()->CopyFrom({
-        reference_points.begin(), reference_points.end()});
+    reference_line->mutable_path_point()->CopyFrom({reference_points.begin(),
+                                                    reference_points.end()});
   }
 
   return Status::OK();

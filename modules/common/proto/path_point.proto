@@ -38,7 +38,8 @@ message PathPoint {
 }
 
 message Path {
-  repeated PathPoint path_point = 1;
+  optional string name = 1;
+  repeated PathPoint path_point = 2;
 }
 
 message TrajectoryPoint {
