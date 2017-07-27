@@ -9,6 +9,7 @@ cc_library(
     ],
     hdrs = [
         "convex_hullxy.h",
+        "disjoint_set.h",
         "geometry_util.h",
     ],
     deps = [

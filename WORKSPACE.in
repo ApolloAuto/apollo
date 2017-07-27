@@ -193,6 +193,15 @@ new_local_repository(
     path = "/usr/include/pcl-1.7",
 )
 
+# Caffe
+# =====
+# This requires Caffe being installed in docker image.
+new_local_repository(
+    name = "caffe",
+    build_file = "third_party/caffe.BUILD",
+    path = "/third_party/caffe",
+)
+
 # YAML-CPP
 new_http_archive(
     name = "yaml_cpp",
