@@ -71,7 +71,8 @@ Status RTKReplayPlanner::MakePlan(const TrajectoryPoint& start_point,
   // check if the trajectory has enough points;
   // if not, append the last points multiple times and
   // adjust their corresponding time stamps.
-  while (trajectory_points->size() < FLAGS_rtk_trajectory_forward) {
+  while (trajectory_points->size() <
+         static_cast<int64_t>(FLAGS_rtk_trajectory_forward)) {
     const auto& last_point = *trajectory_points->rbegin();
     auto* new_point = trajectory_points->Add();
     *new_point = last_point;
