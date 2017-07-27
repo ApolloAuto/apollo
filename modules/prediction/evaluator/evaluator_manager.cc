@@ -50,27 +50,30 @@ void EvaluatorManager::Run(
     const ::apollo::perception::PerceptionObstacles& perception_obstacles) {
   AINFO << "Start run evaluator manager";
   ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->mutable_container("PerceptionObstacles"));
+      ContainerManager::instance()->GetContainer("PerceptionObstacles"));
   CHECK_NOTNULL(container);
   AINFO << "Start for loop";
+
+  Evaluator *evaluator = nullptr;
   for (const auto& perception_obstacle :
       perception_obstacles.perception_obstacle()) {
     int id = perception_obstacle.id();
+    Obstacle* obstacle = container->GetObstacle(id);
+    CHECK_NOTNULL(obstacle);
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
-        Evaluator *evaluator = GetEvaluator(ObstacleConf::MLP_EVALUATOR);
-        CHECK_NOTNULL(evaluator);
-        AINFO << "evaluator got";
-        Obstacle *obstacle = container->GetObstacle(id);
-        CHECK_NOTNULL(obstacle);
-        AINFO << "obstacle got with id = " << obstacle->id();
-        evaluator->Evaluate(obstacle);
-        AINFO << "evaluate done";
+        if (obstacle->IsOnLane()) {
+          evaluator = GetEvaluator(ObstacleConf::MLP_EVALUATOR);
+          CHECK_NOTNULL(evaluator);
+        }
         break;
       }
       default: {
         break;
       }
+    }
+    if (evaluator != nullptr) {
+      evaluator->Evaluate(obstacle);
     }
   }
 }

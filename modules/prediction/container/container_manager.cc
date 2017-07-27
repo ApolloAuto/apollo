@@ -36,7 +36,7 @@ void ContainerManager::RegisterContainers() {
   RegisterContainer("Pose");
 }
 
-Container* ContainerManager::mutable_container(const std::string& name) {
+Container* ContainerManager::GetContainer(const std::string& name) {
   if (containers_.find(name) != containers_.end()) {
     return containers_[name].get();
   } else {

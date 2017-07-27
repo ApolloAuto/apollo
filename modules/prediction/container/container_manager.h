@@ -53,7 +53,7 @@ class ContainerManager {
    * @param Name of the container
    * @return Pointer to the container given the name
    */
-  Container* mutable_container(const std::string& name);
+  Container* GetContainer(const std::string& name);
 
  private:
   /**
