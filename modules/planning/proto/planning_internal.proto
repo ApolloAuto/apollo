@@ -82,11 +82,6 @@ message LightSignal {
   optional TurnSignal turn_signal = 2 [default = NO_TURN];
 }
 
-message PathDebug {
-  optional string name = 1;
-  optional apollo.common.Path path = 2;
-}
-
 // next id: 12
 message PlanningData {
   optional apollo.common.Header header = 1;
@@ -101,7 +96,7 @@ message PlanningData {
   // processed planning_obstacles
   repeated PlanningObstacle planning_obstacle = 4;
 
-  repeated PathDebug path = 6;
+  repeated apollo.common.Path path = 6;
 
   optional apollo.localization.Pose init_status = 2 [deprecated = true];  // initial status of adc
   optional apollo.planning.MainDecision main_decision = 3 [deprecated = true];
