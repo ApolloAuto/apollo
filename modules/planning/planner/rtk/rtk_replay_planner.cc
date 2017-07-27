@@ -38,9 +38,8 @@ Status RTKReplayPlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status RTKReplayPlanner::MakePlan(
-    const TrajectoryPoint& start_point,
-    std::vector<TrajectoryPoint>* ptr_discretized_trajectory) {
+Status RTKReplayPlanner::MakePlan(const TrajectoryPoint& start_point,
+                                  ADCTrajectory* trajectory_pb) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg("RTKReplayPlanner doesn't have a recorded trajectory or "
               "the recorded trajectory doesn't have enough valid trajectory "
@@ -58,24 +57,25 @@ Status RTKReplayPlanner::MakePlan(
           ? complete_rtk_trajectory_.size() - 1
           : matched_index + forward_buffer - 1;
 
-  ptr_discretized_trajectory->assign(
-      complete_rtk_trajectory_.begin() + matched_index,
-      complete_rtk_trajectory_.begin() + end_index + 1);
+  auto* trajectory_points = trajectory_pb->mutable_trajectory_point();
+  *trajectory_points = {complete_rtk_trajectory_.begin() + matched_index,
+                        complete_rtk_trajectory_.begin() + end_index + 1};
 
   // reset relative time
   double zero_time = complete_rtk_trajectory_[matched_index].relative_time();
-  for (auto &trajectory : *ptr_discretized_trajectory) {
+  for (auto &trajectory : *trajectory_points) {
     trajectory.set_relative_time(trajectory.relative_time() - zero_time);
   }
 
   // check if the trajectory has enough points;
   // if not, append the last points multiple times and
   // adjust their corresponding time stamps.
-  while (ptr_discretized_trajectory->size() < FLAGS_rtk_trajectory_forward) {
-    ptr_discretized_trajectory->push_back(ptr_discretized_trajectory->back());
-    auto& last_point = ptr_discretized_trajectory->back();
-    last_point.set_relative_time(last_point.relative_time() +
-                                 FLAGS_trajectory_resolution);
+  while (trajectory_points->size() < (size_t)FLAGS_rtk_trajectory_forward) {
+    const auto& last_point = *trajectory_points->rbegin();
+    auto* new_point = trajectory_points->Add();
+    *new_point = last_point;
+    new_point->set_relative_time(
+        new_point->relative_time() + FLAGS_trajectory_resolution);
   }
   return Status::OK();
 }

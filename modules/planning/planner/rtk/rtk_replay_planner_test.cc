@@ -36,20 +36,20 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
 
-  std::vector<TrajectoryPoint> trajectory;
+  ADCTrajectory trajectory;
   auto status = planner.MakePlan(start_point, &trajectory);
 
   EXPECT_TRUE(status.ok());
-  EXPECT_TRUE(!trajectory.empty());
-  EXPECT_EQ(trajectory.size(), (std::uint32_t)FLAGS_rtk_trajectory_forward);
+  EXPECT_TRUE(!trajectory.trajectory_point().empty());
+  EXPECT_EQ(trajectory.trajectory_point_size(), FLAGS_rtk_trajectory_forward);
 
-  auto first_point = trajectory.front();
-  EXPECT_DOUBLE_EQ(first_point.path_point().x(), 586385.782841);
-  EXPECT_DOUBLE_EQ(first_point.path_point().y(), 4140674.76065);
+  auto first_point = trajectory.trajectory_point().begin();
+  EXPECT_DOUBLE_EQ(first_point->path_point().x(), 586385.782841);
+  EXPECT_DOUBLE_EQ(first_point->path_point().y(), 4140674.76065);
 
-  auto last_point = trajectory.back();
-  EXPECT_DOUBLE_EQ(last_point.path_point().x(), 586355.063786);
-  EXPECT_DOUBLE_EQ(last_point.path_point().y(), 4140681.98605);
+  auto last_point = trajectory.trajectory_point().rbegin();
+  EXPECT_DOUBLE_EQ(last_point->path_point().x(), 586355.063786);
+  EXPECT_DOUBLE_EQ(last_point->path_point().y(), 4140681.98605);
 }
 
 TEST_F(RTKReplayPlannerTest, ErrorTest) {
@@ -61,7 +61,7 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   TrajectoryPoint start_point;
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
-  std::vector<TrajectoryPoint> trajectory;
+  ADCTrajectory trajectory;
   EXPECT_TRUE(
       !(planner_with_error_csv.MakePlan(start_point, &trajectory)).ok());
 }
