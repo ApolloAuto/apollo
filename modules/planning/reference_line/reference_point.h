@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/proto/path_point.pb.h"
 #include "modules/map/pnc_map/path.h"
 
 namespace apollo {
@@ -47,6 +48,8 @@ class ReferencePoint : public hdmap::MapPathPoint {
   ReferencePoint(const common::math::Vec2d& point, const double heading,
                  const double kappa, const double dkappa,
                  const std::vector<hdmap::LaneWaypoint>& lane_waypoints);
+
+  operator apollo::common::PathPoint() const;
 
   void set_kappa(const double kappa);
   void set_dkappa(const double dkappa);

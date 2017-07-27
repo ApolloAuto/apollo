@@ -18,14 +18,17 @@
  * @file reference_point.cc
  **/
 
+#include "modules/planning/reference_line/reference_point.h"
+
 #include <string>
 #include <vector>
 
 #include "modules/common/util/string_util.h"
-#include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
 namespace planning {
+
+using apollo::common::PathPoint;
 
 ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
                                const double heading, const double kappa,
@@ -56,6 +59,16 @@ ReferencePoint::ReferencePoint(
     : hdmap::MapPathPoint(point, heading, lane_waypoints),
       kappa_(kappa),
       dkappa_(dkappa) {}
+
+ReferencePoint::operator PathPoint() const {
+  PathPoint result;
+  result.set_x(x());
+  result.set_y(y());
+  result.set_theta(heading());
+  result.set_kappa(kappa());
+  result.set_dkappa(dkappa());
+  return result;
+}
 
 void ReferencePoint::set_kappa(const double kappa) { kappa_ = kappa; }
 
