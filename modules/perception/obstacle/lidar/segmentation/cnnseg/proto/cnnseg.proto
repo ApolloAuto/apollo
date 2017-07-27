@@ -4,30 +4,22 @@ package apollo.perception.cnnseg;
 
 message CNNSegParam {
     required NetworkParam network_param = 1;
-
     required FeatureParam feature_param = 2;
 
-    //optional bool use_ground = 22 [default = true];
-    //optional bool trust_ground = 23 [default = true];
-    //optional float thresh = 24 [default = 0.5];
-    optional float confidence_thresh = 25 [default = 0];
-    optional float height_thresh = 26 [default = 0.5];
-    //optional bool use_spp_engine = 27 [default = false];
+    optional float objectness_thresh = 11 [default = 0.5];
+    optional bool use_all_grids_for_clustering = 12 [default = false];
+    optional float confidence_thresh = 13 [default = 0.0];
+    optional float height_thresh = 14 [default = 0.5];
+    optional uint32 min_pts_num = 15 [default = 3];
+    //optional bool return_bg = 16 [default = false];
 
-    //optional bool return_bg = 32 [default = false];
-    optional uint32 min_pts_num = 33 [default = 1];
+    //optional bool do_classification = 21 [default = false];
+    //optional string classification_strategy = 22 [default = "voting"];
+    //optional bool do_heading = 23 [default = false];
 
-    //optional string ground_detector = 41 [default = "MultiScaleGroundDetector"];
-    //optional float velodyne_ground_position = 42 [default = -1.7];
+    optional bool use_full_cloud = 31 [default = false];
 
-    //optional bool do_classification = 51 [default = false];
-    //optional string classification_strategy = 52 [default = "voting"];
-    //optional bool do_heading = 53 [default = false];
-
-    optional bool use_full_cloud = 61 [default = false];
-    //optional bool get_cnn_feature = 62 [default = false];
-
-    optional uint32 gpu_id = 71 [default = 0];
+    optional uint32 gpu_id = 41 [default = 0];
 }
 
 message NetworkParam {
@@ -42,8 +34,6 @@ message NetworkParam {
 }
 
 message FeatureParam {
-    //optional string feature_type = 1 [default = "BVReferenceFP32FeatureGenerator"];
-
     optional bool use_max_height = 11 [default = false];
     optional bool use_mean_height = 12 [default = false];
     optional bool use_log_count = 13 [default = false];
@@ -52,7 +42,6 @@ message FeatureParam {
     optional bool use_mean_intensity = 16 [default = false];
     optional bool use_distance = 17 [default = false];
     optional bool use_nonempty = 18 [default = false];
-
     //optional bool use_first_order = 19 [default = false];
     //optional bool use_second_order = 20 [default = false];
 

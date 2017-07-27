@@ -38,7 +38,7 @@ struct Obstacle {
     grids.clear();
     cloud.reset(new apollo::perception::pcl_util::PointCloud);
     score = 0.0;
-    height = 0.0;
+    height = -5.0;
   }
 };
 
@@ -52,10 +52,9 @@ class Cluster2D {
     scale_ = 0.5 * static_cast<float>(rows_) / range_;
     inv_res_x_ = 0.5 * static_cast<float>(cols_) / range_;
     inv_res_y_ = 0.5 * static_cast<float>(rows_) / range_;
-    //point2grid_.clear();
-    //obstacles_.clear();
-    //id_img_.assign(rows_ * cols_, -1);
-    //pc_ptr_ = nullptr;
+    point2grid_.clear();
+    obstacles_.clear();
+    id_img_.assign(grids_, -1);
     pc_ptr_.reset();
     valid_indices_in_pc_ = nullptr;
   }
@@ -63,7 +62,9 @@ class Cluster2D {
   void Cluster(const caffe::Blob<float>& category_pt_blob,
                const caffe::Blob<float>& instance_pt_blob,
                const apollo::perception::pcl_util::PointCloudPtr& pc_ptr,
-               const apollo::perception::pcl_util::PointIndices& valid_indices) {
+               const apollo::perception::pcl_util::PointIndices& valid_indices,
+               float objectness_thresh,
+               bool use_all_grids_for_clustering) {
     const float* category_pt_data = category_pt_blob.cpu_data();
     const float* instance_pt_x_data = instance_pt_blob.cpu_data();
     const float* instance_pt_y_data = instance_pt_blob.cpu_data()
@@ -74,22 +75,26 @@ class Cluster2D {
 
     // map points into grids
     size_t tot_point_num = pc_ptr_->size();
-    const std::vector<int>& indices = valid_indices.indices;
-    CHECK_LE(indices.size(), tot_point_num);
+    //const std::vector<int>& indices = valid_indices.indices;
+    //CHECK_LE(indices.size(), tot_point_num);
+    //point2grid_.assign(indices.size(), -1);
     valid_indices_in_pc_ = &(valid_indices.indices);
-    point2grid_.assign(indices.size(), -1);
+    CHECK_LE(valid_indices_in_pc_->size(), tot_point_num);
+    point2grid_.assign(valid_indices_in_pc_->size(), -1);
 
-    for (size_t i = 0; i < indices.size(); ++i) {
-      int point_id = indices[i];
+    for (size_t i = 0; i < valid_indices_in_pc_->size(); ++i) {
+      //int point_id = indices[i];
+      int point_id = valid_indices_in_pc_->at(i);
       CHECK_GE(point_id, 0);
       CHECK_LT(point_id, static_cast<int>(tot_point_num));
       const auto& point = pc_ptr_->points[point_id];
       // * the coordinates of x and y have been exchanged in feature generation step,
       // so we swap them back here.
-      int pos_x = F2I(point.y, range_, inv_res_x_);
-      int pos_y = F2I(point.x, range_, inv_res_y_);
+      int pos_x = F2I(point.y, range_, inv_res_x_);  // col
+      int pos_y = F2I(point.x, range_, inv_res_y_);  // row
       //if (pos_x < _cols && pos_x >= 0 && pos_y < _rows && pos_y >= 0) {
       if (IsValidRowCol(pos_y, pos_x)) {
+        // get grid index and count point number for corresponding node
         point2grid_[i] = RowCol2Grid(pos_y, pos_x);
         nodes[pos_y][pos_x].point_num++;
       }
@@ -98,12 +103,11 @@ class Cluster2D {
     // construct graph with center offset prediction and objectness
     for (int row = 0; row < rows_; row++) {
       for (int col = 0; col < cols_; col++) {
-        //int offset = row * cols_ + col;
         int grid = RowCol2Grid(row, col);
         Node* node = &nodes[row][col];
         apollo::perception::DisjointSetMakeSet(node);
-        node->is_object = (nodes[row][col].point_num > 0) &&
-                          (*(category_pt_data + grid) >= 0.5);
+        node->is_object = (use_all_grids_for_clustering || nodes[row][col].point_num > 0) &&
+                          (*(category_pt_data + grid) >= objectness_thresh);
         int center_row = std::round(row + instance_pt_x_data[grid] * scale_);
         int center_col = std::round(col + instance_pt_y_data[grid] * scale_);
         center_row = std::min(std::max(center_row, 0), rows_ - 1);
@@ -162,6 +166,7 @@ class Cluster2D {
         Node* root = apollo::perception::DisjointSetFind(node);
         if (root->obstacle_id < 0) {
           root->obstacle_id = count_obstacles++;
+          CHECK_EQ(static_cast<int>(obstacles_.size()), count_obstacles - 1);
           obstacles_.push_back(Obstacle());
         }
         //id_img_.at<int>(row, col) = root->obstacle_id;
@@ -190,6 +195,7 @@ class Cluster2D {
       }
       obs->score = score / static_cast<double>(obs->grids.size());
       obs->height = height / static_cast<double>(obs->grids.size());
+      obs->cloud.reset(new apollo::perception::pcl_util::PointCloud);
     }
   }
 
@@ -217,7 +223,6 @@ class Cluster2D {
     }
     */
 
-    //CHECK(pc_ptr_ != nullptr);
     CHECK(valid_indices_in_pc_ != nullptr);
 
     for (size_t i = 0; i < point2grid_.size(); ++i) {
