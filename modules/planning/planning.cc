@@ -105,6 +105,28 @@ Status Planning::Start() {
   return Status::OK();
 }
 
+void Planning:: RecordInput(ADCTrajectory* trajectory_pb) {
+  if (!FLAGS_enable_record_debug) {
+    ADEBUG << "Skip record input into debug";
+    return;
+  }
+  auto planning_data = trajectory_pb->mutable_debug()->mutable_planning_data();
+  auto adc_position = planning_data->mutable_adc_position();
+  const auto& localization =
+      AdapterManager::GetLocalization()->GetLatestObserved();
+  adc_position->CopyFrom(localization);
+
+  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
+  auto debug_chassis= planning_data->mutable_chassis();
+  debug_chassis->CopyFrom(chassis);
+
+  const auto &routing_result =
+      AdapterManager::GetRoutingResult()->GetLatestObserved();
+
+  auto debug_routing = planning_data->mutable_routing();
+  debug_routing->CopyFrom(routing_result);
+}
+
 void Planning::RunOnce() {
   AdapterManager::Observe();
   if (AdapterManager::GetLocalization()->Empty()) {
@@ -139,13 +161,15 @@ void Planning::RunOnce() {
       apollo::common::time::ToSecond(apollo::common::time::Clock::Now()) +
       planning_cycle_time;
 
+  ADCTrajectory trajectory_pb;
+  RecordInput(&trajectory_pb);
+
   if (!DataCenter::instance()->init_current_frame(
           AdapterManager::GetPlanning()->GetSeqNum() + 1)) {
     AERROR << "DataCenter init frame failed";
     return;
   }
 
-  ADCTrajectory trajectory_pb;
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
   bool res_planning = Plan(is_auto_mode, execution_start_time, &trajectory_pb);
   if (res_planning) {

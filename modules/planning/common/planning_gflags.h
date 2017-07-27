@@ -214,4 +214,6 @@ DECLARE_string(offline_routing_file);
 DECLARE_double(backward_routing_distance);
 DECLARE_double(decision_valid_stop_range);
 
+DECLARE_bool(enable_record_debug);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
