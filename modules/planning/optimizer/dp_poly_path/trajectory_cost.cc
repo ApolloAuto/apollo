@@ -31,10 +31,12 @@ namespace apollo {
 namespace planning {
 
 TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
+                               const ReferenceLine &reference_line,
                                const common::VehicleParam &vehicle_param,
                                const SpeedData &heuristic_speed_data,
                                const DecisionData &decision_data)
     : _config(config),
+      _reference_line(&reference_line),
       _vehicle_param(vehicle_param),
       _heuristic_speed_data(heuristic_speed_data) {
   const auto &static_obstacles = decision_data.StaticObstacles();
@@ -87,8 +89,8 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
 }
 
 double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
-                                 const double start_s, const double end_s,
-                                 const ReferenceLine &reference_line) const {
+                                 const double start_s,
+                                 const double end_s) const {
   // const double length = _vehicle_param.length();
   // const double width = _vehicle_param.width();
   double total_cost = 0.0;
@@ -112,7 +114,8 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
     // ::apollo::common::math::Box2d car_box = {
     //     car_point, reference_point.heading(), length, width};
     // for (uint32_t j = 0; j < _obstacle_trajectory.size(); ++j) {
-    //   ::apollo::common::math::Box2d obstacle_box = _obstacle_trajectory[j][i];
+    //   ::apollo::common::math::Box2d obstacle_box =
+    //   _obstacle_trajectory[j][i];
     //   double distance = car_box.DistanceTo(obstacle_box);
     //   total_cost += distance * _obstacle_probability[j];  // obstacle cost
     // }

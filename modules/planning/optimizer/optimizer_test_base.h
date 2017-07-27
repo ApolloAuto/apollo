@@ -63,6 +63,9 @@ class OptimizerTestBase : public ::testing::Test {
       const std::vector<std::vector<common::SLPoint>>& points,
       const std::string& filename);
 
+  static void export_path_data(const PathData& path_data,
+                               const std::string& filename);
+
  protected:
   DpPolyPathConfig dp_poly_path_config_;
   Frame* frame_ = nullptr;

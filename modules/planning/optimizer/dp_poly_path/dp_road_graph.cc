@@ -46,9 +46,7 @@ using apollo::common::Status;
 DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
                          const ::apollo::common::TrajectoryPoint &init_point,
                          const SpeedData &speed_data)
-  : _config(config),
-    _init_point(init_point),
-    _heuristic_speed_data(speed_data) {}
+    : _config(config), _init_point(init_point), _speed_data(speed_data) {}
 
 bool DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
                               DecisionData *const decision_data,
@@ -59,37 +57,31 @@ bool DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
     AERROR << "Fail to init dp road graph!";
     return false;
   }
-  if (!generate_graph(reference_line).ok()) {
+  std::vector<DpNode> min_cost_path;
+  if (!generate_graph(reference_line, decision_data, &min_cost_path)) {
     AERROR << "Fail to generate graph!";
     return false;
   }
-  std::vector<uint32_t> min_cost_edges;
-  if (!find_best_trajectory(reference_line, *decision_data, &min_cost_edges)
-      .ok()) {
-    AERROR << "Fail to find best trajectory!";
-    return false;
-  }
   std::vector<common::FrenetFramePoint> frenet_path;
-  double accumulated_s = _init_sl_point.s();
-
-  for (std::size_t i = 0; i < min_cost_edges.size(); ++i) {
-    GraphEdge edge = _edges[min_cost_edges[i]];
-    GraphVertex end_vertex = _vertices[edge.to_vertex()];
-    GraphVertex start_vertex = _vertices[edge.from_vertex()];
-    double path_length = end_vertex.frame_point().s() - start_vertex.frame_point().s();
+  double accumulated_s = _init_point.path_point().s();
+  const double path_resolution = _config.path_resolution();
+  for (size_t i = 1; i < min_cost_path.size(); ++i) {
+    const auto &prev_node = min_cost_path[i - 1];
+    const auto &cur_node = min_cost_path[i];
+    const double path_length = cur_node.sl_point.s() - prev_node.sl_point.s();
     double current_s = 0.0;
-    while (Double::compare(current_s, path_length) < 0) {
-      const double l = edge.poly_path().evaluate(0, current_s);
-      const double dl = edge.poly_path().evaluate(1, current_s);
-      const double ddl = edge.poly_path().evaluate(2, current_s);
+    const auto &curve = cur_node.min_cost_curve;
+    while (Double::compare(current_s, path_length) < 0.0) {
+      const double l = curve.evaluate(0, current_s);
+      const double dl = curve.evaluate(1, current_s);
+      const double ddl = curve.evaluate(2, current_s);
       common::FrenetFramePoint frenet_frame_point;
       frenet_frame_point.set_s(accumulated_s + current_s);
       frenet_frame_point.set_l(l);
       frenet_frame_point.set_dl(dl);
       frenet_frame_point.set_ddl(ddl);
       frenet_path.push_back(frenet_frame_point);
-      current_s += _config.path_resolution();
-      AERROR << "sl point " << frenet_frame_point.s() << "\t" << l << std::endl;
+      current_s += path_resolution;
     }
     accumulated_s += path_length;
   }
@@ -97,20 +89,24 @@ bool DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
   path_data->set_frenet_path(tunnel);
   // convert frenet path to cartesian path by reference line
   std::vector<::apollo::common::PathPoint> path_points;
-  for (const common::FrenetFramePoint& frenet_point : frenet_path) {
+  for (const common::FrenetFramePoint &frenet_point : frenet_path) {
     common::SLPoint sl_point;
     common::math::Vec2d cartesian_point;
     sl_point.set_s(frenet_point.s());
     sl_point.set_l(frenet_point.l());
-    if (!reference_line.get_point_in_Cartesian_frame(sl_point, &cartesian_point)) {
+    if (!reference_line.get_point_in_Cartesian_frame(sl_point,
+                                                     &cartesian_point)) {
       AERROR << "Fail to convert sl point to xy point";
       return false;
     }
-    ReferencePoint ref_point = reference_line.get_reference_point(frenet_point.s());
+    ReferencePoint ref_point =
+        reference_line.get_reference_point(frenet_point.s());
     double theta = SLAnalyticTransformation::calculate_theta(
-                     ref_point.heading(), ref_point.kappa(), frenet_point.l(), frenet_point.dl());
-    double kappa = SLAnalyticTransformation::calculate_kappa(ref_point.kappa(),
-                   ref_point.dkappa(), frenet_point.l(), frenet_point.dl(), frenet_point.ddl());
+        ref_point.heading(), ref_point.kappa(), frenet_point.l(),
+        frenet_point.dl());
+    double kappa = SLAnalyticTransformation::calculate_kappa(
+        ref_point.kappa(), ref_point.dkappa(), frenet_point.l(),
+        frenet_point.dl(), frenet_point.ddl());
     ::apollo::common::PathPoint path_point;
     path_point.set_x(cartesian_point.x());
     path_point.set_y(cartesian_point.y());
@@ -135,8 +131,6 @@ bool DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
 }
 
 bool DpRoadGraph::init(const ReferenceLine &reference_line) {
-  _vertices.clear();
-  _edges.clear();
   common::math::Vec2d xy_point(_init_point.path_point().x(),
                                _init_point.path_point().y());
 
@@ -146,186 +140,84 @@ bool DpRoadGraph::init(const ReferenceLine &reference_line) {
   }
 
   ReferencePoint reference_point =
-    reference_line.get_reference_point(_init_sl_point.s());
+      reference_line.get_reference_point(_init_sl_point.s());
 
   double init_dl = SLAnalyticTransformation::calculate_lateral_derivative(
-                     reference_point.heading(), _init_point.path_point().theta(),
-                     _init_sl_point.l(), reference_point.kappa());
-  double init_ddl =
-    SLAnalyticTransformation::calculate_second_order_lateral_derivative(
       reference_point.heading(), _init_point.path_point().theta(),
-      reference_point.kappa(), _init_point.path_point().kappa(),
-      reference_point.dkappa(), _init_sl_point.l());
+      _init_sl_point.l(), reference_point.kappa());
+  double init_ddl =
+      SLAnalyticTransformation::calculate_second_order_lateral_derivative(
+          reference_point.heading(), _init_point.path_point().theta(),
+          reference_point.kappa(), _init_point.path_point().kappa(),
+          reference_point.dkappa(), _init_sl_point.l());
   common::FrenetFramePoint init_frenet_frame_point;
   init_frenet_frame_point.set_s(_init_sl_point.s());
   init_frenet_frame_point.set_l(_init_sl_point.l());
   init_frenet_frame_point.set_dl(init_dl);
   init_frenet_frame_point.set_ddl(init_ddl);
 
-  _vertices.emplace_back(init_frenet_frame_point, 0, 0);
-  _vertices.back().set_type(GraphVertex::Type::GRAPH_HEAD);
-  _vertices.back().set_accumulated_cost(0.0);
   return true;
 }
 
-Status DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {
+bool DpRoadGraph::generate_graph(const ReferenceLine &reference_line,
+                                 DecisionData *const decision_data,
+                                 std::vector<DpNode> *min_cost_path) {
+  if (!min_cost_path) {
+    AERROR << "the provided min_cost_path is null";
+    return false;
+  }
   std::vector<std::vector<common::SLPoint>> points;
   PathSampler path_sampler(_config);
   if (!path_sampler.sample(reference_line, _init_point, _init_sl_point,
                            &points)) {
-    const std::string msg = "Fail to sampling point with path sampler!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    AERROR << "Fail to sampling point with path sampler!";
+    return false;
   }
-
-  int vertex_num_previous_level = 1;
-  uint32_t accumulated_prev_level_size = 0;
-  uint32_t accumulated_index = 0;
-  for (uint32_t i = 0; i < points.size(); ++i) {
-    int vertex_num_current_level = 0;
-    ReferencePoint reference_point =
-      reference_line.get_reference_point(points[i][0].s());
-    for (uint32_t j = 0; j < points[i].size(); ++j) {
-      if (!add_vertex(points[i][j], reference_point, i + 1)) {
-        continue;
-      }
-      bool is_connected = false;
-      for (int n = 0; n < vertex_num_previous_level; ++n) {
-        const uint32_t index_start = accumulated_prev_level_size + n;
-        const uint32_t index_end = accumulated_prev_level_size +
-                                   vertex_num_previous_level +
-                                   vertex_num_current_level;
-        if (connect_vertex(index_start, index_end)) {
-          is_connected = true;
-        }
-      }
-      if (is_connected) {
-        ++vertex_num_current_level;
-        if (i + 1 == points.size()) {
-          _vertices.back().set_type(GraphVertex::Type::DEAD_END);
-        }
-        ++accumulated_index;
-      } else {
-        _vertices.pop_back();
-      }
-      if (vertex_num_current_level == 0) {
-        return Status(ErrorCode::PLANNING_ERROR, "DpRoadGraph::generate_graph");
-      }
-    }
-    accumulated_prev_level_size += vertex_num_previous_level;
-    vertex_num_previous_level = vertex_num_current_level;
-  }
-  return Status::OK();
-}
-
-Status DpRoadGraph::find_best_trajectory(
-  const ReferenceLine &reference_line, const DecisionData &decision_data,
-  std::vector<uint32_t> *const min_cost_edges) {
-  CHECK_NOTNULL(min_cost_edges);
-  std::unordered_map<uint32_t, uint32_t> vertex_connect_table;
-  GraphVertex &head = _vertices[0];
-  head.set_accumulated_cost(0.0);
-  uint32_t best_trajectory_end_index = 0;
+  points.insert(points.begin(), std::vector<common::SLPoint>{_init_sl_point});
   const auto &vehicle_config =
-    common::VehicleConfigHelper::instance()->GetConfig();
-  double min_trajectory_cost = std::numeric_limits<double>::max();
-  TrajectoryCost trajectory_cost(_config, vehicle_config.vehicle_param(),
-                                 _heuristic_speed_data, decision_data);
-  for (uint32_t i = 0; i < _vertices.size(); ++i) {
-    const GraphVertex& vertex = _vertices[i];
-    const std::vector<uint32_t> edges = vertex.edges_out();
-    for (uint32_t j = 0; j < edges.size(); ++j) {
-      auto edge = _edges[edges[j]];
-      GraphVertex& vertex_end = _vertices[edge.to_vertex()];
-      double start_s = vertex.frame_point().s();
-      double end_s = vertex_end.frame_point().s();
-      double cost = trajectory_cost.calculate(_edges[j].poly_path(), start_s,
-                                              end_s, reference_line);
-      if (vertex_connect_table.find(vertex_end.index()) == vertex_connect_table.end()) {
-        vertex_end.set_accumulated_cost(vertex.accumulated_cost() + cost);
-        vertex_connect_table[vertex_end.index()] = vertex.index();
-      } else {
-        if (Double::compare(
-              vertex.accumulated_cost() + cost, vertex_end.accumulated_cost()) < 0) {
-          vertex_end.set_accumulated_cost(vertex.accumulated_cost() + cost);
-          vertex_connect_table[vertex_end.index()] = vertex.index();
-        }
-      }
-    }
-
-    if (vertex.is_dead_end()
-        && Double::compare(vertex.accumulated_cost(), min_trajectory_cost) <= 0) {
-      best_trajectory_end_index = vertex.index();
-      min_trajectory_cost = vertex.accumulated_cost();
-    }
-  }
-  std::vector<uint32_t> min_cost_vertex;
-  while (best_trajectory_end_index != 0) {
-    min_cost_vertex.push_back(best_trajectory_end_index);
-    best_trajectory_end_index = vertex_connect_table[best_trajectory_end_index];
-  }
-  min_cost_vertex.push_back(0);
-  std::reverse(min_cost_vertex.begin(), min_cost_vertex.end());
-  for (uint32_t i = 1; i < min_cost_vertex.size(); ++i) {
-    AINFO << "Path vertex index " << min_cost_vertex[i];
-    const std::vector<uint32_t> &edges =
-      _vertices[min_cost_vertex[i - 1]].edges_out();
-    for (const uint32_t edge_index : edges) {
-      if (_edges[edge_index].to_vertex() == min_cost_vertex[i]) {
-        min_cost_edges->push_back(edge_index);
-        AINFO << "Path edge index " << edge_index;
+      common::VehicleConfigHelper::instance()->GetConfig();
+  TrajectoryCost trajectory_cost(_config, reference_line,
+                                 vehicle_config.vehicle_param(), _speed_data,
+                                 *decision_data);
+  std::vector<std::vector<DpNode>> dp_nodes(points.size());
+  dp_nodes[0].push_back(DpNode(_init_sl_point, nullptr, 0.0));
+  const double zero_dl = 0.0;   // always use 0 dl
+  const double zero_ddl = 0.0;  // always use 0 ddl
+  for (std::size_t level = 1; level < points.size(); ++level) {
+    const auto &prev_dp_nodes = dp_nodes[level - 1];
+    const auto &level_points = points[level];
+    for (std::size_t i = 0; i < level_points.size(); ++i) {
+      const auto cur_sl_point = level_points[i];
+      dp_nodes[level].push_back(DpNode(cur_sl_point, nullptr));
+      auto *cur_node = &dp_nodes[level].back();
+      for (std::size_t j = 0; j < prev_dp_nodes.size(); ++j) {
+        const auto *prev_dp_node = &prev_dp_nodes[j];
+        const auto prev_sl_point = prev_dp_node->sl_point;
+        QuinticPolynomialCurve1d curve(prev_sl_point.l(), zero_dl, zero_ddl,
+                                       cur_sl_point.l(), zero_dl, zero_ddl,
+                                       cur_sl_point.s() - prev_sl_point.s());
+        const double cost = trajectory_cost.calculate(curve, prev_sl_point.s(),
+                                                      cur_sl_point.s()) +
+                            prev_dp_node->min_cost;
+        cur_node->update_cost(prev_dp_node, curve, cost);
       }
     }
   }
-  return Status::OK();
-}
 
-bool DpRoadGraph::add_vertex(const common::SLPoint & sl_point,
-                             const ReferencePoint & reference_point,
-                             const uint32_t level) {
-  double kappa = reference_point.kappa();
-  double kappa_range_upper = 0.23;
-  double kappa_range_lower = -kappa_range_upper;
-
-  if (Double::compare(kappa * sl_point.l(), 1.0) == 0) {
-    kappa = 0.0;
-  } else {
-    kappa = kappa / (1 - kappa * sl_point.l());
-    if (kappa < kappa_range_lower || kappa > kappa_range_upper) {
-      // Invalid sample point
-      return false;
-    }
-    kappa = std::max(kappa_range_lower, kappa);
-    kappa = std::min(kappa_range_upper, kappa);
+  // find best path
+  DpNode fake_head;
+  const auto &last_dp_nodes = dp_nodes.back();
+  for (std::size_t i = 0; i < last_dp_nodes.size(); ++i) {
+    const auto &cur_dp_node = last_dp_nodes[i];
+    fake_head.update_cost(&cur_dp_node, cur_dp_node.min_cost_curve,
+                          cur_dp_node.min_cost);
   }
-
-  common::FrenetFramePoint frenet_frame_point;
-  frenet_frame_point.set_s(sl_point.s());
-  frenet_frame_point.set_l(sl_point.l());
-  frenet_frame_point.set_dl(0.0);
-  frenet_frame_point.set_ddl(0.0);
-
-  _vertices.emplace_back(frenet_frame_point, _vertices.size(), level);
-  return true;
-}
-
-bool DpRoadGraph::connect_vertex(const uint32_t start, const uint32_t end) {
-  GraphVertex &v_start = _vertices[start];
-  GraphVertex &v_end = _vertices[end];
-  QuinticPolynomialCurve1d curve(
-    v_start.frame_point().l(), v_start.frame_point().dl(),
-    v_start.frame_point().ddl(), v_end.frame_point().l(),
-    v_end.frame_point().dl(), v_end.frame_point().ddl(),
-    v_end.frame_point().s() - v_start.frame_point().s());
-  v_start.add_out_vertex(end);
-  v_start.add_out_edge(_edges.size());
-
-  v_end.add_in_vertex(start);
-  v_end.add_in_edge(_edges.size());
-
-  _edges.emplace_back(start, end, v_start.level());
-  _edges.back().set_edge_index(_edges.size() - 1);
-  _edges.back().set_poly_path(curve);
+  const auto *min_cost_node = &fake_head;
+  while (min_cost_node->min_cost_prev_node) {
+    min_cost_node = min_cost_node->min_cost_prev_node;
+    min_cost_path->push_back(*min_cost_node);
+  }
+  std::reverse(min_cost_path->begin(), min_cost_path->end());
   return true;
 }
 

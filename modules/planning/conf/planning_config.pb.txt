@@ -1,7 +1,7 @@
 planner_type: EM
 em_planner_config {
-#  optimizer: DP_POLY_PATH_OPTIMIZER
+  optimizer: DP_POLY_PATH_OPTIMIZER
 #  optimizer: DP_ST_SPEED_OPTIMIZER
-  optimizer: QP_SPLINE_PATH_OPTIMIZER
+#  optimizer: QP_SPLINE_PATH_OPTIMIZER
   optimizer: QP_SPLINE_ST_SPEED_OPTIMIZER
 }
