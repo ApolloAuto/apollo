@@ -14,7 +14,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/lib/pcl_util:pcl_util",
         "@eigen//:eigen",
     ],
 )
@@ -25,15 +25,11 @@ cc_test(
     srcs = [
         "geometry_util_test.cc",
     ],
-    hdrs = [
-        "geometry_util.h",
-        "convex_hullxy.h",
-        ],
     deps = [
-        "//modules/common:log",
-        "//modules/perception/lib/pcl_util:pcl_util",
-        "@eigen//:eigen"
+        ":perception_obstacle_common",
+        "@gtest//:main"
     ],
 )
 
 cpplint()
+
