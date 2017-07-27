@@ -66,11 +66,7 @@ cc_test(
     ],
     deps = [
         ":dp_poly_path",
-        "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/common/util",
-        "//modules/planning/common:data_center",
-        "//modules/planning/proto:dp_poly_path_config_proto",
+        "//modules/planning/optimizer:optimizer_test_base",
         "@gtest//:main",
     ],
 )
