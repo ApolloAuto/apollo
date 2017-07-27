@@ -45,6 +45,12 @@ class EvaluatorManager {
   virtual ~EvaluatorManager() = default;
 
   /**
+   * @brief Initializer
+   * @param Prediction config
+   */
+  void Init(const PredictionConf& config);
+
+  /**
    * @brief Get evaluator
    * @return Pointer to the evaluator
    */
