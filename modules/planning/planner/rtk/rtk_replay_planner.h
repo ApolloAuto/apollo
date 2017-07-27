@@ -57,7 +57,7 @@ class RTKReplayPlanner : public Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status MakePlan(
+  apollo::common::Status Plan(
       const apollo::common::TrajectoryPoint& start_point,
       ADCTrajectory* trajectory_pb) override;
 

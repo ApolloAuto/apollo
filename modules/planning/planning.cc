@@ -80,7 +80,7 @@ Status Planning::Init() {
       AERROR << error_msg;
       return Status(ErrorCode::PLANNING_ERROR, error_msg);
     } else {
-      AWARN << "Using offline prouting file " << FLAGS_offline_routing_file;
+      AWARN << "Using offline routing file " << FLAGS_offline_routing_file;
     }
   }
   RegisterPlanners();
@@ -220,7 +220,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     if (position_deviation < FLAGS_replanning_threshold) {
       // planned trajectory from the matched point, the matched point has
       // relative time 0.
-      auto status = planner_->MakePlan(matched_point, trajectory_pb);
+      auto status = planner_->Plan(matched_point, trajectory_pb);
 
       if (!status.ok()) {
         last_trajectory_.clear();
@@ -229,8 +229,9 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
 
       // a segment of last trajectory to be attached to planned trajectory in
       // case controller needs.
-      GetOverheadTrajectory(matched_index, FLAGS_rtk_trajectory_backward,
-                            trajectory_pb);
+      GetOverheadTrajectory(static_cast<std::uint32_t>(matched_index),
+          static_cast<std::uint32_t>(FLAGS_rtk_trajectory_backward),
+          trajectory_pb);
 
       // store the planned trajectory and header info for next planning cycle.
       last_trajectory_ = {trajectory_pb->trajectory_point().begin(),
@@ -253,7 +254,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(true);
   }
 
-  auto status = planner_->MakePlan(vehicle_start_point, trajectory_pb);
+  auto status = planner_->Plan(vehicle_start_point, trajectory_pb);
   if (!status.ok()) {
     last_trajectory_.clear();
     return false;

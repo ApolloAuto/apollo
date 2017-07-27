@@ -58,7 +58,7 @@ class Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  virtual apollo::common::Status MakePlan(
+  virtual apollo::common::Status Plan(
       const apollo::common::TrajectoryPoint& start_point,
       ADCTrajectory* trajectory_pb) = 0;
 };

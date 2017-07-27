@@ -81,7 +81,7 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
+Status EMPlanner::Plan(const TrajectoryPoint& start_point,
                            ADCTrajectory* trajectory_pb) {
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();

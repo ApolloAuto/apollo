@@ -38,7 +38,7 @@ Status RTKReplayPlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status RTKReplayPlanner::MakePlan(const TrajectoryPoint& start_point,
+Status RTKReplayPlanner::Plan(const TrajectoryPoint& start_point,
                                   ADCTrajectory* trajectory_pb) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg(
