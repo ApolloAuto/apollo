@@ -142,7 +142,7 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
   for (auto candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
       continue;
-    } else if (candidate_lane->is_on_lane(vec_point)) {
+    } else if (!candidate_lane->is_on_lane(vec_point)) {
       continue;
     } else if (!IsIdenticalLane(candidate_lane.get(), prev_lanes) &&
                !IsSuccessorLane(candidate_lane.get(), prev_lanes) &&
@@ -157,6 +157,7 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
       double diff = std::fabs(
           apollo::common::math::AngleDiff(heading, nearest_point_heading));
       if (diff <= FLAGS_max_lane_angle_diff) {
+        AINFO << "insert candidate lane";
         lanes->emplace_back(candidate_lane.get());
       }
     }
