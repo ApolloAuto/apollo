@@ -259,6 +259,7 @@ TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
   point.mutable_path_point()->set_z(common::VehicleState::instance()->z());
   point.set_v(common::VehicleState::instance()->linear_velocity());
   point.set_a(common::VehicleState::instance()->linear_acceleration());
+  point.mutable_path_point()->set_theta(common::VehicleState::instance()->heading());  
   point.mutable_path_point()->set_kappa(0.0);
   const double speed_threshold = 0.1;
   if (point.v() > speed_threshold) {
