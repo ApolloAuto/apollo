@@ -25,3 +25,17 @@ echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
 echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${DOCKER_USER}/.bashrc"
 chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
+
+# grant caros user to access GPS device
+if [ -e /dev/ttyUSB0 ]; then
+    sudo chown ${DOCKER_USER}:${DOCKER_GRP} /dev/ttyUSB0 /dev/ttyUSB1
+fi
+
+# setup can device
+if [ ! -e /dev/can0 ]; then
+    sudo mknod --mode=a+rw /dev/can0 c 52 0
+fi
+
+if [ -e /dev/can0 ]; then
+    sudo chown ${DOCKER_USER}:${DOCKER_GRP} /dev/can0
+fi
