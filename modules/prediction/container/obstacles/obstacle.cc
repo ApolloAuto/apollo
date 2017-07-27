@@ -425,24 +425,23 @@ void Obstacle::UpdateKFMotionTracker(Feature* feature) {
     delta_ts = feature->timestamp() - feature_history_.front().timestamp();
   }
   if (delta_ts <= FLAGS_double_precision) {
-    return;
-  }
-  // Set tansition matrix and predict
-  auto F = kf_motion_tracker_.GetTransitionMatrix();
-  F(0, 2) = delta_ts;
-  F(0, 4) = delta_ts;
-  F(1, 3) = 0.5 * delta_ts * delta_ts;
-  F(1, 5) = 0.5 * delta_ts * delta_ts;
-  F(2, 4) = delta_ts;
-  F(3, 5) = delta_ts;
-  kf_motion_tracker_.SetTransitionMatrix(F);
-  kf_motion_tracker_.Predict();
+    // Set tansition matrix and predict
+    auto F = kf_motion_tracker_.GetTransitionMatrix();
+    F(0, 2) = delta_ts;
+    F(0, 4) = delta_ts;
+    F(1, 3) = 0.5 * delta_ts * delta_ts;
+    F(1, 5) = 0.5 * delta_ts * delta_ts;
+    F(2, 4) = delta_ts;
+    F(3, 5) = delta_ts;
+    kf_motion_tracker_.SetTransitionMatrix(F);
+    kf_motion_tracker_.Predict();
 
-  // Set observation and correct
-  Eigen::Matrix<double, 2, 1> z;
-  z(0, 0) = feature->position().x();
-  z(1, 0) = feature->position().y();
-  kf_motion_tracker_.Correct(z);
+    // Set observation and correct
+    Eigen::Matrix<double, 2, 1> z;
+    z(0, 0) = feature->position().x();
+    z(1, 0) = feature->position().y();
+    kf_motion_tracker_.Correct(z);
+  }
 
   UpdateMotionBelief(feature);
 }
@@ -685,32 +684,32 @@ void Obstacle::UpdateKFPedestrianTracker(Feature* feature) {
   if (!feature_history_.empty()) {
     delta_ts = feature->timestamp() - feature_history_.front().timestamp();
   }
-  if (delta_ts <= std::numeric_limits<double>::epsilon()) {
-    return;
+  if (delta_ts > std::numeric_limits<double>::epsilon()) {
+    
+    Eigen::Matrix<double, 2, 4> B = kf_pedestrian_tracker_.GetControlMatrix();
+    B(0, 0) = delta_ts;
+    B(0, 2) = 0.5 * delta_ts * delta_ts;
+    B(1, 1) = delta_ts;
+    B(1, 3) = 0.5 * delta_ts * delta_ts;
+    kf_pedestrian_tracker_.SetControlMatrix(B);
+
+    // Set control vector
+    Eigen::Matrix<double, 4, 1> u;
+    u(0, 0) = feature->t_velocity().x();
+    u(1, 0) = feature->t_velocity().y();
+    if (FLAGS_enable_pedestrian_acc) {
+      u(2, 0) = feature->t_acceleration().x();
+      u(3, 0) = feature->t_acceleration().y();
+    }
+
+    kf_pedestrian_tracker_.Predict(u);
+
+    // Set observation vector
+    Eigen::Matrix<double, 2, 1> z;
+    z(0, 0) = feature->position().x();
+    z(1, 0) = feature->position().y();
+    kf_pedestrian_tracker_.Correct(z);
   }
-  Eigen::Matrix<double, 2, 4> B = kf_pedestrian_tracker_.GetControlMatrix();
-  B(0, 0) = delta_ts;
-  B(0, 2) = 0.5 * delta_ts * delta_ts;
-  B(1, 1) = delta_ts;
-  B(1, 3) = 0.5 * delta_ts * delta_ts;
-  kf_pedestrian_tracker_.SetControlMatrix(B);
-
-  // Set control vector
-  Eigen::Matrix<double, 4, 1> u;
-  u(0, 0) = feature->t_velocity().x();
-  u(1, 0) = feature->t_velocity().y();
-  if (FLAGS_enable_pedestrian_acc) {
-    u(2, 0) = feature->t_acceleration().x();
-    u(3, 0) = feature->t_acceleration().y();
-  }
-
-  kf_pedestrian_tracker_.Predict(u);
-
-  // Set observation vector
-  Eigen::Matrix<double, 2, 1> z;
-  z(0, 0) = feature->position().x();
-  z(1, 0) = feature->position().y();
-  kf_pedestrian_tracker_.Correct(z);
 
   // Update feature by Kalman filter
   feature->mutable_t_position()->set_x(
