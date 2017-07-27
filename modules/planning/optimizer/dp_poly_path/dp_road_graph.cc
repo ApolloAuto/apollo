@@ -183,8 +183,8 @@ bool DpRoadGraph::init(const ReferenceLine &reference_line) {
 Status DpRoadGraph::generate_graph(const ReferenceLine &reference_line) {
   std::vector<std::vector<common::SLPoint>> points;
   PathSampler path_sampler(_config);
-  if (!path_sampler.sample(reference_line, _init_point, _init_sl_point, &points)
-           .ok()) {
+  if (!path_sampler.sample(reference_line, _init_point, _init_sl_point,
+                           &points)) {
     const std::string msg = "Fail to sampling point with path sampler!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

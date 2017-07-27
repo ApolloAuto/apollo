@@ -54,4 +54,25 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "path_sampler_test",
+    size = "small",
+    srcs = [
+        "path_sampler_test.cc",
+    ],
+    data = [
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":dp_poly_path",
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/util",
+        "//modules/planning/common:data_center",
+        "//modules/planning/proto:dp_poly_path_config_proto",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

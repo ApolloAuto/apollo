@@ -36,7 +36,7 @@ using SLPoint = apollo::common::SLPoint;
 
 PathSampler::PathSampler(const DpPolyPathConfig& config) : _config(config) {}
 
-Status PathSampler::sample(
+bool PathSampler::sample(
     const ReferenceLine& reference_line,
     const ::apollo::common::TrajectoryPoint& init_point,
     const ::apollo::common::SLPoint& init_sl_point,
@@ -67,8 +67,7 @@ Status PathSampler::sample(
     }
     points->push_back(level_points);
   }
-
-  return Status::OK();
+  return true;
 }
 }  // namespace planning
 }  // namespace apollo
