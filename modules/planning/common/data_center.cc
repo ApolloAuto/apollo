@@ -114,9 +114,8 @@ bool DataCenter::CreateReferenceLineFromMap() {
   return true;
 }
 
-bool DataCenter::init_frame(const uint32_t sequence_num) {
+bool DataCenter::init_current_frame(const uint32_t sequence_num) {
   _frame.reset(new Frame(sequence_num));
-  _frame->set_planning_data(new PlanningData());
 
   if (!CreateReferenceLineFromMap()) {
     AERROR << "failed to create reference line";

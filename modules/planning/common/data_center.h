@@ -41,7 +41,7 @@ class DataCenter {
   Frame *frame(const uint32_t sequence_num) const;
 
  public:
-  bool init_frame(const uint32_t sequence_num);
+  bool init_current_frame(const uint32_t sequence_num);
   Frame *current_frame() const;
   void save_frame();
   const ::apollo::hdmap::HDMap &map() { return map_; }

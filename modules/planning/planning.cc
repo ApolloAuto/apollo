@@ -139,7 +139,7 @@ void Planning::RunOnce() {
       apollo::common::time::ToSecond(apollo::common::time::Clock::Now()) +
       planning_cycle_time;
 
-  if (!DataCenter::instance()->init_frame(
+  if (!DataCenter::instance()->init_current_frame(
           AdapterManager::GetPlanning()->GetSeqNum() + 1)) {
     AERROR << "DataCenter init frame failed";
     return;

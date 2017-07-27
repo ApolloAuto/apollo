@@ -35,7 +35,6 @@ class Frame {
   explicit Frame(uint32_t sequence_num);
 
   void set_sequence_num(const uint32_t sequence_num);
-  void set_planning_data(PlanningData *const planning_data);
 
   uint32_t sequence_num() const;
   const PlanningData &planning_data() const;
@@ -49,7 +48,7 @@ class Frame {
  private:
   uint32_t _sequence_num;
   PublishableTrajectory _computed_trajectory;
-  std::unique_ptr<PlanningData> _planning_data;
+  PlanningData _planning_data;
 };
 
 }  // namespace planning
