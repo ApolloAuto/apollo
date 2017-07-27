@@ -62,6 +62,22 @@ int HDMapImpl::load_map_from_file(const std::string& map_filename) {
         _overlap_table[overlap.id().id()].reset(new OverlapInfo(overlap));
     }
 
+    for (const auto& road : _map.road()) {
+        _road_table[road.id().id()].reset(new RoadInfo(road));
+    }
+
+    for (const auto& road_ptr_pair : _road_table) {
+        const auto& road_id = road_ptr_pair.second->id();
+        for (size_t i = 0; i < road_ptr_pair.second->sections().size(); ++i) {
+            const auto& road_section = road_ptr_pair.second->sections()[i];
+            const auto& section_id = road_section.id();
+            for (int j = 0; j < road_section.lane_id_size(); ++j) {
+                const auto& lane_id = road_section.lane_id(j);
+                _lane_table[lane_id.id()]->set_road_id(road_id);
+                _lane_table[lane_id.id()]->set_section_id(section_id);
+            }
+        }
+    }
     for (const auto& lane_ptr_pair : _lane_table) {
         lane_ptr_pair.second->post_process(*this);
     }
@@ -117,6 +133,11 @@ OverlapInfoConstPtr HDMapImpl::get_overlap_by_id(
     return it != _overlap_table.end() ? it->second : nullptr;
 }
 
+RoadInfoConstPtr HDMapImpl::get_road_by_id(const apollo::hdmap::Id& id) const {
+    RoadTable::const_iterator it = _road_table.find(id.id());
+    return it != _road_table.end() ? it->second : nullptr;
+}
+
 int HDMapImpl::get_lanes(const apollo::hdmap::Point& point,
                      double distance,
                      std::vector<LaneInfoConstPtr>* lanes) const {
@@ -142,6 +163,33 @@ int HDMapImpl::get_lanes(const apollo::common::math::Vec2d &point,
     lanes->emplace_back(get_lane_by_id(create_hdmap_id(id)));
   }
   return 0;
+}
+
+int HDMapImpl::get_roads(const apollo::hdmap::Point& point,
+                double distance,
+                std::vector<RoadInfoConstPtr>* roads) const {
+  return get_roads({point.x(), point.y()}, distance, roads);
+}
+
+int HDMapImpl::get_roads(const apollo::common::math::Vec2d& point,
+                double distance,
+                std::vector<RoadInfoConstPtr>* roads) const {
+    std::vector<LaneInfoConstPtr> lanes;
+    if (get_lanes(point, distance, &lanes) != 0) {
+        return -1;
+    }
+    std::unordered_set<std::string> road_ids;
+    for (auto& lane : lanes) {
+        road_ids.insert(lane->road_id().id());
+    }
+
+    for (auto& road_id : road_ids) {
+        RoadInfoConstPtr road = get_road_by_id(create_hdmap_id(road_id));
+        CHECK_NOTNULL(road);
+        roads->push_back(road);
+    }
+
+    return 0;
 }
 
 int HDMapImpl::get_junctions(const apollo::hdmap::Point& point,
@@ -500,6 +548,63 @@ int HDMapImpl::get_lanes_with_heading(const apollo::common::math::Vec2d &point,
   }
 
   return 0;
+}
+
+int HDMapImpl::get_road_boundaries(const apollo::hdmap::Point& point,
+                        double radius,
+                        std::vector<RoadROIBoundaryPtr>* road_boundaries,
+                        std::vector<JunctionBoundaryPtr>* junctions) const {
+    CHECK_NOTNULL(road_boundaries);
+    CHECK_NOTNULL(junctions);
+
+    road_boundaries->clear();
+    junctions->clear();
+
+    std::vector<LaneInfoConstPtr> lanes;
+    if (get_lanes(point, radius, &lanes) != 0
+        || lanes.size() <= 0) {
+        return -1;
+    }
+
+    std::unordered_set<std::string> junction_id_set;
+    std::unordered_set<std::string> road_section_id_set;
+    for (const auto& lane : lanes) {
+        const auto road_id = lane->road_id();
+        const auto section_id = lane->section_id();
+        std::string unique_id = road_id.id();
+        unique_id += section_id.id();
+        if (road_section_id_set.count(unique_id) > 0) {
+            continue;
+        }
+        road_section_id_set.insert(unique_id);
+        const auto road_ptr = get_road_by_id(road_id);
+        CHECK_NOTNULL(road_ptr);
+        if (road_ptr->has_junction_id()) {
+            const apollo::hdmap::Id junction_id = road_ptr->junction_id();
+            if (junction_id_set.count(junction_id.id()) > 0) {
+                continue;
+            }
+            junction_id_set.insert(junction_id.id());
+            JunctionBoundaryPtr junction_boundary_ptr(new JunctionBoundary());
+            junction_boundary_ptr->junction_info =
+                                                get_junction_by_id(junction_id);
+            CHECK_NOTNULL(junction_boundary_ptr->junction_info);
+            junctions->push_back(junction_boundary_ptr);
+        } else {
+            RoadROIBoundaryPtr road_boundary_ptr(new RoadROIBoundary());
+            road_boundary_ptr->id = road_ptr->id();
+            for (size_t i = 0; i < road_ptr->sections().size(); ++i) {
+                const auto& section = road_ptr->sections()[i];
+                if (section.id().id() == section_id.id()) {
+                    road_boundary_ptr->road_boundaries.push_back(
+                                                            section.boundary());
+                }
+            }
+            road_boundaries->push_back(road_boundary_ptr);
+        }
+    }
+
+    return 0;
 }
 
 void HDMapImpl::clear() {

@@ -56,6 +56,8 @@ class HDMapImpl {
         std::unordered_map<std::string, std::shared_ptr<YieldSignInfo>>;
     using OverlapTable =
         std::unordered_map<std::string, std::shared_ptr<OverlapInfo>>;
+    using RoadTable =
+        std::unordered_map<std::string, std::shared_ptr<RoadInfo>>;
 
  public:
     int load_map_from_file(const std::string& map_filename);
@@ -67,6 +69,7 @@ class HDMapImpl {
     StopSignInfoConstPtr get_stop_sign_by_id(const Id& id) const;
     YieldSignInfoConstPtr get_yield_sign_by_id(const Id& id) const;
     OverlapInfoConstPtr get_overlap_by_id(const Id& id) const;
+    RoadInfoConstPtr get_road_by_id(const apollo::hdmap::Id& id) const;
 
     int get_lanes(const apollo::hdmap::Point& point,
                 double distance,
@@ -103,6 +106,12 @@ class HDMapImpl {
                                const double central_heading,
                                const double max_heading_difference,
                                std::vector<LaneInfoConstPtr>* lanes) const;
+    int get_roads(const apollo::hdmap::Point& point, double distance,
+                        std::vector<RoadInfoConstPtr>* roads) const;
+    int get_road_boundaries(const apollo::hdmap::Point& point,
+                            double radius,
+                            std::vector<RoadROIBoundaryPtr>* road_boundaries,
+                            std::vector<JunctionBoundaryPtr>* junctions) const;
 
  private:
     int get_lanes(const apollo::common::math::Vec2d& point,
@@ -139,6 +148,9 @@ class HDMapImpl {
                                 const double central_heading,
                                 const double max_heading_difference,
                                 std::vector<LaneInfoConstPtr> *lanes) const;
+    int get_roads(const apollo::common::math::Vec2d& point,
+                    double distance,
+                    std::vector<RoadInfoConstPtr>* roads) const;
 
     template<class Table, class BoxTable, class KDTree>
     static void build_segment_kdtree(const Table& table,
@@ -177,6 +189,7 @@ class HDMapImpl {
     StopSignTable       _stop_sign_table;
     YieldSignTable      _yield_sign_table;
     OverlapTable        _overlap_table;
+    RoadTable           _road_table;
 
     std::vector<LaneSegmentBox> _lane_segment_boxes;
     std::unique_ptr<LaneSegmentKDTree> _lane_segment_kdtree;

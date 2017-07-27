@@ -16,6 +16,11 @@ limitations under the License.
 #include <gtest/gtest.h>
 #include "modules/map/hdmap/hdmap_impl.h"
 
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
+
 namespace apollo {
 namespace hdmap {
 
@@ -31,6 +36,7 @@ class HDMapCommonTestSuite : public ::testing::Test {
   void init_crosswalk_obj(apollo::hdmap::Crosswalk* crosswalk);
   void init_stop_sign_obj(apollo::hdmap::StopSign* stop_sign);
   void init_yield_sign_obj(apollo::hdmap::YieldSign* yield_sign);
+  void init_road_obj(apollo::hdmap::Road* road);
 };
 
 void HDMapCommonTestSuite::init_lane_obj(apollo::hdmap::Lane* lane) {
@@ -251,6 +257,20 @@ void HDMapCommonTestSuite::init_yield_sign_obj(
   pt->set_x(2.0);
   pt->set_y(0.0);
   pt->set_z(0.0);
+}
+
+void HDMapCommonTestSuite::init_road_obj(apollo::hdmap::Road* road) {
+  road->mutable_id()->set_id("road_1");
+  road->mutable_junction_id()->set_id("junction_1");
+
+  apollo::hdmap::RoadSection* section = road->add_section();
+  section->mutable_id()->set_id("section_1");
+  section->add_lane_id()->set_id("section_1_1");
+  section->add_lane_id()->set_id("section_1_2");
+
+  section = road->add_section();
+  section->mutable_id()->set_id("section_2");
+  section->add_lane_id()->set_id("section_2_1");
 }
 
 TEST_F(HDMapCommonTestSuite, lane_info) {
@@ -516,6 +536,25 @@ TEST_F(HDMapCommonTestSuite, yield_sign_info) {
   for (std::size_t i = 0; i < yield_sign_info.segments().size(); ++i) {
     EXPECT_NEAR(1.0, yield_sign_info.segments()[i].length(), 1E-4);
   }
+}
+
+TEST_F(HDMapCommonTestSuite, road_info) {
+  apollo::hdmap::Road road;
+  init_road_obj(&road);
+  RoadInfo road_info(road);
+  EXPECT_EQ(road.id().id(), road_info.id().id());
+  EXPECT_EQ(2, road_info.sections().size());
+
+  const apollo::hdmap::RoadSection& section0 = road_info.sections()[0];
+  EXPECT_EQ(section0.id().id(), "section_1");
+  EXPECT_EQ(section0.lane_id_size(), 2);
+  EXPECT_EQ(section0.lane_id(0).id(), "section_1_1");
+  EXPECT_EQ(section0.lane_id(1).id(), "section_1_2");
+
+  const apollo::hdmap::RoadSection& section1 = road_info.sections()[1];
+  EXPECT_EQ(section1.id().id(), "section_2");
+  EXPECT_EQ(section1.lane_id_size(), 1);
+  EXPECT_EQ(section1.lane_id(0).id(), "section_2_1");
 }
 
 }  // namespace hdmap

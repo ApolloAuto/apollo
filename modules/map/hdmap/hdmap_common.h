@@ -34,7 +34,7 @@ limitations under the License.
 #include "modules/map/proto/map_yield_sign.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
 #include "modules/map/proto/map_id.pb.h"
-
+#include "modules/map/proto/map_road.pb.h"
 
 namespace apollo {
 namespace hdmap {
@@ -84,6 +84,8 @@ class LaneInfo {
   explicit LaneInfo(const apollo::hdmap::Lane &lane);
 
   const apollo::hdmap::Id &id() const { return _lane.id(); }
+  const apollo::hdmap::Id &road_id() const { return _road_id; }
+  const apollo::hdmap::Id &section_id() const { return _section_id; }
   const apollo::hdmap::Lane &lane() const { return _lane; }
   const std::vector<apollo::common::math::Vec2d> &points() const {
       return _points;
@@ -148,6 +150,7 @@ class LaneInfo {
 
  private:
   friend class HDMapImpl;
+  friend class RoadInfo;
   void init();
   void post_process(HDMapImpl& map_instance);
   void update_overlaps(HDMapImpl& map_instance);
@@ -155,6 +158,10 @@ class LaneInfo {
                           const std::vector<LaneInfo::SampledWidth>& samples,
                           const double s) const;
   void create_kdtree();
+  void set_road_id(const apollo::hdmap::Id& road_id) { _road_id = road_id; }
+  void set_section_id(const apollo::hdmap::Id& section_id) {
+      _section_id = section_id;
+  }
 
  private:
   const apollo::hdmap::Lane &_lane;
@@ -178,6 +185,9 @@ class LaneInfo {
 
   std::vector<LaneSegmentBox> _segment_box_list;
   std::unique_ptr<LaneSegmentKDTree> _lane_segment_kdtree;
+
+  apollo::hdmap::Id _road_id;
+  apollo::hdmap::Id _section_id;
 };
 
 class JunctionInfo {
@@ -303,6 +313,33 @@ class OverlapInfo {
   const apollo::hdmap::Overlap &_overlap;
 };
 
+class RoadInfo {
+ public:
+    explicit RoadInfo(const apollo::hdmap::Road& road);
+    const apollo::hdmap::Id& id() const {
+        return _road.id();
+    }
+
+    const apollo::hdmap::Road& road() const { return _road; }
+
+    const std::vector<apollo::hdmap::RoadSection>& sections() const {
+        return _sections;
+    }
+
+    const apollo::hdmap::Id& junction_id() const {
+        return _road.junction_id();
+    }
+
+    bool has_junction_id() const { return _road.has_junction_id(); }
+
+    const std::vector<apollo::hdmap::RoadBoundary>& get_boundaries() const;
+
+ private:
+    apollo::hdmap::Road _road;
+    std::vector<apollo::hdmap::RoadSection> _sections;
+    std::vector<apollo::hdmap::RoadBoundary> _road_boundaries;
+};
+
 typedef std::shared_ptr<const apollo::hdmap::LaneInfo>    LaneInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::JunctionInfo> JunctionInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::SignalInfo>    SignalInfoConstPtr;
@@ -312,6 +349,20 @@ typedef std::shared_ptr<const apollo::hdmap::StopSignInfo> StopSignInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::YieldSignInfo>
                                                         YieldSignInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::OverlapInfo>  OverlapInfoConstPtr;
+typedef std::shared_ptr<const apollo::hdmap::RoadInfo>  RoadInfoConstPtr;
+
+struct RoadROIBoundary {
+    apollo::hdmap::Id id;
+    std::vector<apollo::hdmap::RoadBoundary> road_boundaries;
+};
+
+using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
+
+struct JunctionBoundary {
+  JunctionInfoConstPtr junction_info;
+};
+
+using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
 
 }  // namespace hdmap
 }  // namespace apollo
