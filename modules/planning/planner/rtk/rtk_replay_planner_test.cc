@@ -37,7 +37,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_y(4140674.76063);
 
   ADCTrajectory trajectory;
-  auto status = planner.MakePlan(start_point, &trajectory);
+  auto status = planner.Plan(start_point, &trajectory);
 
   EXPECT_TRUE(status.ok());
   EXPECT_TRUE(!trajectory.trajectory_point().empty());
@@ -63,7 +63,7 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   start_point.mutable_path_point()->set_y(4140674.76063);
   ADCTrajectory trajectory;
   EXPECT_TRUE(
-      !(planner_with_error_csv.MakePlan(start_point, &trajectory)).ok());
+      !(planner_with_error_csv.Plan(start_point, &trajectory)).ok());
 }
 
 }  // namespace planning
