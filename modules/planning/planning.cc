@@ -17,8 +17,8 @@
 #include "modules/planning/planning.h"
 
 #include <algorithm>
-#include <google/protobuf/repeated_field.h>
 
+#include "google/protobuf/repeated_field.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
@@ -259,7 +259,8 @@ TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
   point.mutable_path_point()->set_z(common::VehicleState::instance()->z());
   point.set_v(common::VehicleState::instance()->linear_velocity());
   point.set_a(common::VehicleState::instance()->linear_acceleration());
-  point.mutable_path_point()->set_theta(common::VehicleState::instance()->heading());  
+  point.mutable_path_point()->set_theta(
+      common::VehicleState::instance()->heading());
   point.mutable_path_point()->set_kappa(0.0);
   const double speed_threshold = 0.1;
   if (point.v() > speed_threshold) {

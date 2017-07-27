@@ -14,6 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
 #include "ros/include/ros/ros.h"
 
@@ -57,7 +60,7 @@ class OptimizerTestBase : public ::testing::Test {
    * into a graphic visualizer.
    */
   static void export_sl_points(
-      std::vector<std::vector<common::SLPoint>>& points,
+      const std::vector<std::vector<common::SLPoint>>& points,
       const std::string& filename);
 
  protected:

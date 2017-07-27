@@ -20,6 +20,7 @@
 
 #include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
 
+#include <algorithm>
 #include <vector>
 
 #include "modules/common/adapters/adapter_manager.h"

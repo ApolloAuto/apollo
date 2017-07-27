@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 
+#include <string>
 #include <vector>
 
 #include "modules/common/proto/path_point.pb.h"

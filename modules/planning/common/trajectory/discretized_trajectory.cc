@@ -21,7 +21,8 @@
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 #include <algorithm>
-#include <climits>
+#include <limits>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_util.h"

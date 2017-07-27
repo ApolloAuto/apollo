@@ -43,13 +43,14 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
         init_point.mutable_path_point()->set_theta(vehicle_state.heading());
         init_point.mutable_path_point()->set_kappa(vehicle_state.kappa());
 
-        // TODO: the time is not correct, it should be
+        // TODO(all): the time is not correct, it should be
         // FLAGS_forward_predict_time.
         init_point.set_relative_time(0.0);
 
-        // TODO: the init point should be some future point, not current vehicle
-        // state
-        // TODO: need vehicle bicycle model to compute the overhead trajectory.
+        // TODO(all): the init point should be some future point, not current
+        // vehicle state
+        // TODO(all): need vehicle bicycle model to compute the overhead
+        // trajectory.
         return std::vector<TrajectoryPoint>(1, init_point);
       };
 

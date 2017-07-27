@@ -26,26 +26,27 @@ namespace planning {
 using apollo::common::TrajectoryPoint;
 
 double PredictionTrajectory::probability() const {
-    return _probability;
+  return _probability;
 }
 
 double PredictionTrajectory::start_timestamp() const {
-	return _start_timestamp;
+  return _start_timestamp;
 }
 
 void PredictionTrajectory::set_probability(const double prob) {
-	_probability = prob;
+  _probability = prob;
 }
 
 void PredictionTrajectory::set_start_timestamp(const double ts) {
-	_start_timestamp = ts;
+  _start_timestamp = ts;
 }
 
-TrajectoryPoint* PredictionTrajectory::trajectory_point_ptr(const std::uint32_t index) {
-    if (index >= _trajectory_points.size()) {
-		return nullptr;
-	}
-	return &_trajectory_points[index];
+TrajectoryPoint* PredictionTrajectory::trajectory_point_ptr(
+    const std::uint32_t index) {
+  if (index >= _trajectory_points.size()) {
+    return nullptr;
+  }
+  return &_trajectory_points[index];
 }
 
 }  // namespace planning

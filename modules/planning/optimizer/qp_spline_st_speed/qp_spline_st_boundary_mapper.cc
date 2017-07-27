@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"
@@ -259,7 +260,7 @@ Status QpSplineStBoundaryMapper::map_obstacle_with_prediction_trajectory(
     const auto& trajectory = obstacle.prediction_trajectories()[i];
     for (uint32_t j = 0; j < trajectory.num_of_points(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point_at(j);
-      // TODO: fix trajectory point relative time issue.
+      // TODO(all): fix trajectory point relative time issue.
       double trajectory_point_time =
           trajectory_point.relative_time() + trajectory.start_timestamp() -
           common::VehicleState::instance()->timestamp();
@@ -336,7 +337,7 @@ Status QpSplineStBoundaryMapper::map_obstacle_with_prediction_trajectory(
           b_type = StGraphBoundary::BoundaryType::FOLLOW;
         } else if (obj_decision.has_yield()) {
           const double dis = std::fabs(obj_decision.yield().distance_s());
-          // TODO: remove the arbitrary numbers in this part.
+          // TODO(all): remove the arbitrary numbers in this part.
           if (boundary_points.at(0).s() - dis < 0.0) {
             boundary_points.at(0).set_s(
                 std::fmax(boundary_points.at(0).s() - 2.0, 0.0));

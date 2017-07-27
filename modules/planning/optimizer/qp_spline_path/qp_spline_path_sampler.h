@@ -18,8 +18,10 @@
  * @file qp_spline_path_sampler.h
  **/
 
-#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SAMPLER_H_
-#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SAMPLER_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SAMPLER_H_
+#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SAMPLER_H_
+
+#include <vector>
 
 #include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -39,4 +41,4 @@ class QPSplinePathSampler {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SAMPLER_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SAMPLER_H_

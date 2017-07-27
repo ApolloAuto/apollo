@@ -18,8 +18,10 @@
  * @file qp_spline_path_sampler.h
  **/
 
-#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
-#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
+#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
+
+#include <vector>
 
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_sampler.h"
 
@@ -28,13 +30,14 @@ namespace planning {
 
 class QPSplinePathSimpleSampler : public QPSplinePathSampler {
  public:
-  virtual bool sample(const common::FrenetFramePoint& init_point,
-                      const ReferenceLine& reference_line,
-                      const std::uint32_t num_of_sampling_point,
-                      const double s_lower_bound, const double s_upper_bound,
-                      std::vector<double>* const sampling_point) override;
+  bool sample(const common::FrenetFramePoint& init_point,
+              const ReferenceLine& reference_line,
+              const std::uint32_t num_of_sampling_point,
+              const double s_lower_bound, const double s_upper_bound,
+              std::vector<double>* const sampling_point) override;
 };
+
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SIMPLE_SAMPLER_H_

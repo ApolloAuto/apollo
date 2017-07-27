@@ -36,14 +36,14 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
   explicit DpStSpeedOptimizer(const std::string& name);
 
-  virtual bool Init() override;
+  bool Init() override;
 
  private:
-  virtual apollo::common::Status Process(const PathData& path_data,
-                                         const TrajectoryPoint& init_point,
-                                         const ReferenceLine& reference_line,
-                                         DecisionData* const decision_data,
-                                         SpeedData* const speed_data) override;
+  apollo::common::Status Process(const PathData& path_data,
+                                 const TrajectoryPoint& init_point,
+                                 const ReferenceLine& reference_line,
+                                 DecisionData* const decision_data,
+                                 SpeedData* const speed_data) override;
   DpStBoundaryMapper boundary_mapper_;
   DpStSpeedConfig dp_st_speed_config_;
 };

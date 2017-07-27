@@ -28,7 +28,7 @@ namespace apollo {
 namespace planning {
 
 class PublishableTrajectory : public DiscretizedTrajectory {
-public:
+ public:
   virtual ~PublishableTrajectory() = default;
 
   apollo::common::TrajectoryPoint evaluate_absolute_time(
@@ -46,7 +46,7 @@ public:
   ADCTrajectory to_trajectory_protobuf() const;
   void populate_trajectory_protobuf(ADCTrajectory* trajectory_pb) const;
 
-private:
+ private:
   double _header_time;
 };
 

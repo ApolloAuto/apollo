@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_QP_SPLINE_ST_SPEED_OPTIMIZER_H_
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_QP_SPLINE_ST_SPEED_OPTIMIZER_H_
 
+#include <string>
+
 #include "modules/planning/optimizer/speed_optimizer.h"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -37,10 +39,10 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
  public:
   explicit QpSplineStSpeedOptimizer(const std::string& name);
 
-  virtual bool Init() override;
+  bool Init() override;
 
  private:
-  virtual common::Status Process(
+  common::Status Process(
       const PathData& path_data,
       const apollo::common::TrajectoryPoint& init_point,
       const ReferenceLine& reference_line, DecisionData* const decision_data,

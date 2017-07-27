@@ -114,22 +114,21 @@ void SolveLinearMPC(const Matrix &matrix_a,
   Matrix matrix_m2 = matrix_k.transpose() * matrix_qq * (matrix_m - matrix_t);
 
   // Method 1: QPOASES
-  Eigen::MatrixXd matrix_inequality_constrain_ll = - Eigen::MatrixXd::Identity(matrix_ll.rows(),
-            matrix_ll.rows());
-  Eigen::MatrixXd matrix_inequality_constrain_uu = Eigen::MatrixXd::Identity(matrix_uu.rows(),
-            matrix_uu.rows());
-  Eigen::MatrixXd matrix_inequality_constrain = Eigen::MatrixXd::Zero(matrix_ll.rows()
-            + matrix_uu.rows(), matrix_ll.rows());
+  Eigen::MatrixXd matrix_inequality_constrain_ll = - Eigen::MatrixXd::Identity(
+      matrix_ll.rows(), matrix_ll.rows());
+  Eigen::MatrixXd matrix_inequality_constrain_uu = Eigen::MatrixXd::Identity(
+      matrix_uu.rows(), matrix_uu.rows());
+  Eigen::MatrixXd matrix_inequality_constrain = Eigen::MatrixXd::Zero(
+      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
   matrix_inequality_constrain << - matrix_inequality_constrain_ll,
                                  - matrix_inequality_constrain_uu;
-  Eigen::MatrixXd matrix_inequality_boundary = Eigen::MatrixXd::Zero(matrix_ll.rows()
-            + matrix_uu.rows(), matrix_ll.cols());
-  matrix_inequality_boundary << matrix_ll,
-                                 - matrix_uu;
-  Eigen::MatrixXd matrix_equality_constrain = Eigen::MatrixXd::Zero(matrix_ll.rows()
-            + matrix_uu.rows(), matrix_ll.rows());
-  Eigen::MatrixXd matrix_equality_boundary = Eigen::MatrixXd::Zero(matrix_ll.rows()
-            + matrix_uu.rows(), matrix_ll.cols());
+  Eigen::MatrixXd matrix_inequality_boundary = Eigen::MatrixXd::Zero(
+      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
+  matrix_inequality_boundary << matrix_ll, - matrix_uu;
+  Eigen::MatrixXd matrix_equality_constrain = Eigen::MatrixXd::Zero(
+      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
+  Eigen::MatrixXd matrix_equality_boundary = Eigen::MatrixXd::Zero(
+      matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
 
   std::unique_ptr<QPSolver> qp_solver(new ActiveSetQPSolver(matrix_m1,
                 matrix_m2,
