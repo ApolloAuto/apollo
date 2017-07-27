@@ -42,6 +42,7 @@ cc_test(
     name = "perception_obstacle_onboard_test",
     srcs = [
         "lidar_process_test.cc",
+        "hdmap_input_test.cc",
         ],
     size = "small",
     data = ["//modules/perception:perception_testdata"],

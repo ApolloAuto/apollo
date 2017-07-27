@@ -22,8 +22,8 @@
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/lib/base/singleton.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
+#include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
@@ -36,7 +36,7 @@ class HDMapInput {
 
   // @brief: get roi polygon
   //         all points are in the world frame
-  bool GetROI(const pcl_util::PointD& pointd, HdmapStructPtr mapptr);
+  bool GetROI(const pcl_util::PointD& pointd, HdmapStructPtr* mapptr);
 
  private:
   HDMapInput() = default;
@@ -46,8 +46,8 @@ class HDMapInput {
 
   int MergeBoundaryJunction(
       std::vector<apollo::hdmap::RoadROIBoundaryPtr>& boundaries,
-      std::vector<apollo::hdmap::JunctionInfoConstPtr>& junctions,
-      HdmapStructPtr mapptr);
+      std::vector<apollo::hdmap::JunctionBoundaryPtr>& junctions,
+      HdmapStructPtr* mapptr);
 
   friend class Singleton<HDMapInput>;
 
