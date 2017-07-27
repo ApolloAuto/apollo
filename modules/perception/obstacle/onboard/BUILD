@@ -7,7 +7,7 @@ cc_library(
     srcs = ["hdmap_input.cc"],
     hdrs = ["hdmap_input.h"],
     deps = [
-        "//modules/common",
+        "//modules/common:common",
         "//modules/common:log",
         "//modules/map/hdmap",
         "//modules/perception/common:perception_common",
@@ -24,7 +24,7 @@ cc_library(
     hdrs = ["lidar_process.h"],
     deps = [
         ":perception_obstacle_hdmapinput",
-        "//modules/common",
+        "//modules/common:common",
         "//modules/common:log",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/base",
@@ -35,6 +35,21 @@ cc_library(
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
         "@eigen//:eigen",
         "@ros//:ros_common",
+    ],
+)
+
+cc_test(
+    name = "perception_obstacle_onboard_test",
+    srcs = [
+        "lidar_process_test.cc",
+        ],
+    size = "small",
+    data = ["//modules/perception:perception_testdata"],
+    deps = [
+        ":perception_obstacle_hdmapinput",
+        ":perception_obstacle_lidar_process",
+        "//modules/perception/common:perception_common",
+        "@gtest//:main",
     ],
 )
 
