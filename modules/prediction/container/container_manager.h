@@ -45,6 +45,12 @@ class ContainerManager {
   virtual ~ContainerManager();
 
   /**
+   * @brief Container manager initialization
+   * @param Adapter config
+   */
+  void Init(const ::apollo::common::adapter::AdapterManagerConfig& config);
+
+  /**
    * @brief Get mutable container
    * @param Type of the container
    * @return Pointer to the container given the name
@@ -76,6 +82,8 @@ class ContainerManager {
  private:
   std::map<::apollo::common::adapter::AdapterConfig::MessageType,
     std::unique_ptr<Container>> containers_;
+
+  ::apollo::common::adapter::AdapterManagerConfig config_;
 
   DECLARE_SINGLETON(ContainerManager)
 };
