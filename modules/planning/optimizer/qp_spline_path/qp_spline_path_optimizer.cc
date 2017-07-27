@@ -27,10 +27,10 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-QPSplinePathOptimizer::QPSplinePathOptimizer(const std::string& name)
+QpSplinePathOptimizer::QpSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
-bool QPSplinePathOptimizer::Init() {
+bool QpSplinePathOptimizer::Init() {
   if (!_path_generator.SetConfig(FLAGS_qp_spline_path_config_file)) {
     AERROR << "Fail to set config file for path generator.";
     return false;
@@ -39,7 +39,7 @@ bool QPSplinePathOptimizer::Init() {
   return true;
 }
 
-Status QPSplinePathOptimizer::Process(const SpeedData& speed_data,
+Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
                                       const ReferenceLine& reference_line,
                                       const common::TrajectoryPoint& init_point,
                                       DecisionData* const decision_data,

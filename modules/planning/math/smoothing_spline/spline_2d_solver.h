@@ -51,7 +51,7 @@ class Spline2dSolver {
   Spline2d spline_;
   Spline2dKernel kernel_;
   Spline2dConstraint constraint_;
-  std::unique_ptr<apollo::common::math::QPSolver> qp_solver_ = nullptr;
+  std::unique_ptr<apollo::common::math::QpSolver> qp_solver_ = nullptr;
 };
 
 }  // namespace planning

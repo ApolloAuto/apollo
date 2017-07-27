@@ -29,13 +29,13 @@ namespace apollo {
 namespace common {
 namespace math {
 
-ActiveSetQPSolver::ActiveSetQPSolver(
+ActiveSetQpSolver::ActiveSetQpSolver(
     const Eigen::MatrixXd& kernel_matrix, const Eigen::MatrixXd& offset,
     const Eigen::MatrixXd& affine_inequality_matrix,
     const Eigen::MatrixXd& affine_inequality_boundary,
     const Eigen::MatrixXd& affine_equality_matrix,
     const Eigen::MatrixXd& affine_equality_boundary)
-    : QPSolver(kernel_matrix, offset, affine_inequality_matrix,
+    : QpSolver(kernel_matrix, offset, affine_inequality_matrix,
                affine_inequality_boundary, affine_equality_matrix,
                affine_equality_boundary) {
   num_param_ = kernel_matrix.rows();
@@ -48,7 +48,7 @@ ActiveSetQPSolver::ActiveSetQPSolver(
   debug_info_ = FLAGS_default_enable_active_set_debug_info;
 }
 
-bool ActiveSetQPSolver::solve() {
+bool ActiveSetQpSolver::solve() {
   ::qpOASES::QProblem qp_problem(num_param_, num_constraint_);
   ::qpOASES::Options my_options;
   my_options.epsNum = qp_eps_num_;
@@ -138,54 +138,54 @@ bool ActiveSetQPSolver::solve() {
   return false;
 }
 
-void ActiveSetQPSolver::set_qp_eps_num(const double eps) { qp_eps_num_ = eps; }
+void ActiveSetQpSolver::set_qp_eps_num(const double eps) { qp_eps_num_ = eps; }
 
-void ActiveSetQPSolver::set_qp_eps_den(const double eps) { qp_eps_den_ = eps; }
+void ActiveSetQpSolver::set_qp_eps_den(const double eps) { qp_eps_den_ = eps; }
 
-void ActiveSetQPSolver::set_qp_eps_iter_ref(const double eps) {
+void ActiveSetQpSolver::set_qp_eps_iter_ref(const double eps) {
   qp_eps_iter_ref_ = eps;
 }
 
-void ActiveSetQPSolver::set_debug_info(const bool enable) {
+void ActiveSetQpSolver::set_debug_info(const bool enable) {
   debug_info_ = enable;
 }
 
-void ActiveSetQPSolver::set_l_lower_bound(const double l_lower_bound) {
+void ActiveSetQpSolver::set_l_lower_bound(const double l_lower_bound) {
   l_lower_bound_ = l_lower_bound;
 }
 
-void ActiveSetQPSolver::set_l_upper_bound(const double l_upper_bound) {
+void ActiveSetQpSolver::set_l_upper_bound(const double l_upper_bound) {
   l_upper_bound_ = l_upper_bound;
 }
 
-void ActiveSetQPSolver::set_constraint_upper_bound(
+void ActiveSetQpSolver::set_constraint_upper_bound(
     const double la_upper_bound) {
   constraint_upper_bound_ = la_upper_bound;
 }
 
-void ActiveSetQPSolver::set_max_iteration(const int max_iter) {
+void ActiveSetQpSolver::set_max_iteration(const int max_iter) {
   max_iteration_ = max_iter;
 }
 
-double ActiveSetQPSolver::qp_eps_num() const { return qp_eps_num_; }
+double ActiveSetQpSolver::qp_eps_num() const { return qp_eps_num_; }
 
-double ActiveSetQPSolver::qp_eps_den() const { return qp_eps_den_; }
+double ActiveSetQpSolver::qp_eps_den() const { return qp_eps_den_; }
 
-double ActiveSetQPSolver::qp_eps_iter_ref() const { return qp_eps_iter_ref_; }
+double ActiveSetQpSolver::qp_eps_iter_ref() const { return qp_eps_iter_ref_; }
 
-bool ActiveSetQPSolver::debug_info() const { return debug_info_; }
+bool ActiveSetQpSolver::debug_info() const { return debug_info_; }
 
-double ActiveSetQPSolver::l_lower_bound() const { return l_lower_bound_; }
+double ActiveSetQpSolver::l_lower_bound() const { return l_lower_bound_; }
 
-double ActiveSetQPSolver::l_upper_bound() const { return l_upper_bound_; }
+double ActiveSetQpSolver::l_upper_bound() const { return l_upper_bound_; }
 
-double ActiveSetQPSolver::constraint_upper_bound() const {
+double ActiveSetQpSolver::constraint_upper_bound() const {
   return constraint_upper_bound_;
 }
 
-int ActiveSetQPSolver::max_iteration() const { return max_iteration_; }
+int ActiveSetQpSolver::max_iteration() const { return max_iteration_; }
 // pure virtual
-bool ActiveSetQPSolver::sanity_check() {
+bool ActiveSetQpSolver::sanity_check() {
   return kernel_matrix_.rows() == kernel_matrix_.cols() &&
          kernel_matrix_.rows() == affine_inequality_matrix_.cols() &&
          kernel_matrix_.rows() == affine_equality_matrix_.cols() &&
