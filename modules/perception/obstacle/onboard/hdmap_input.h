@@ -41,15 +41,13 @@ class HDMapInput {
  private:
   HDMapInput() = default;
 
-  /*
   void DownSampleBoundary(const apollo::hdmap::LineSegment& line,
                           PolygonDType* out_boundary_line) const;
 
   int MergeBoundaryJunction(
-      std::vector<apollo::hdmap::RoadBoundaryPtr>& boundaries,
+      std::vector<apollo::hdmap::RoadROIBoundaryPtr>& boundaries,
       std::vector<apollo::hdmap::JunctionInfoConstPtr>& junctions,
       HdmapStructPtr mapptr);
-  */
 
   friend class Singleton<HDMapInput>;
 
