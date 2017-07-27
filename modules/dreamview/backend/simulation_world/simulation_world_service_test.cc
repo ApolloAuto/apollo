@@ -31,6 +31,8 @@ using apollo::common::TrajectoryPoint;
 using apollo::planning::DecisionResult;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::prediction::PredictionObstacle;
+using apollo::prediction::PredictionObstacles;
 
 namespace apollo {
 namespace dreamview {
@@ -65,7 +67,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
 
   sim_world_service_->UpdateSimulationWorld(monitor);
 
-  const SimulationWorld &world = sim_world_service_->world();
+  const SimulationWorld& world = sim_world_service_->world();
   EXPECT_EQ(2, world.monitor().item_size());
   EXPECT_EQ("I am the latest message.", world.monitor().item(0).msg());
   EXPECT_EQ("I am the previous message.", world.monitor().item(1).msg());
@@ -90,7 +92,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
 
   sim_world_service_->UpdateSimulationWorld(monitor);
 
-  const SimulationWorld &world = sim_world_service_->world();
+  const SimulationWorld& world = sim_world_service_->world();
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
             world.monitor().item_size());
   EXPECT_EQ("I am message -2", world.monitor().item(0).msg());
@@ -115,7 +117,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
 
   sim_world_service_->UpdateSimulationWorld(monitor);
 
-  const SimulationWorld &world = sim_world_service_->world();
+  const SimulationWorld& world = sim_world_service_->world();
   int last = SimulationWorldService::kMaxMonitorItems - 1;
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
             world.monitor().item_size());
@@ -194,8 +196,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
   point3->set_y(0.0);
   obstacle1->set_timestamp(1489794020.123);
   obstacle1->set_type(apollo::perception::PerceptionObstacle_Type_UNKNOWN);
-  PerceptionObstacle* obstacle2 =
-      obstacles.add_perception_obstacle();
+  PerceptionObstacle* obstacle2 = obstacles.add_perception_obstacle();
   obstacle2->set_id(2);
   apollo::perception::Point* point = obstacle2->mutable_position();
   point->set_x(1.0);
@@ -208,12 +209,12 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
 
   sim_world_service_->UpdateSimulationWorld(obstacles);
   sim_world_service_->world_.clear_object();
-  for (auto &kv : sim_world_service_->obj_map_) {
+  for (auto& kv : sim_world_service_->obj_map_) {
     *sim_world_service_->world_.add_object() = kv.second;
   }
   EXPECT_EQ(2, sim_world_service_->world_.object_size());
 
-  for (const auto &object : sim_world_service_->world_.object()) {
+  for (const auto& object : sim_world_service_->world_.object()) {
     if (object.id() == "1") {
       EXPECT_DOUBLE_EQ(1489794020.123, object.timestamp_sec());
       EXPECT_EQ(3, object.polygon_point_size());
@@ -247,7 +248,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
   sim_world_service_->UpdatePlanningTrajectory(planning_trajectory);
 
   // Check the update result.
-  const SimulationWorld &world = sim_world_service_->world();
+  const SimulationWorld& world = sim_world_service_->world();
   EXPECT_EQ(4, world.planning_trajectory_size());
 
   // Check first point.
@@ -275,8 +276,8 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   decision_res.mutable_vehicle_signal()->set_turn_signal(
       apollo::common::VehicleSignal::TURN_RIGHT);
 
-  apollo::planning::MainDecision* main_decision = decision_res
-      .mutable_main_decision();
+  apollo::planning::MainDecision* main_decision =
+      decision_res.mutable_main_decision();
   main_decision->add_target_lane()->set_speed_limit(35);
   apollo::planning::MainStop* main_stop = main_decision->mutable_stop();
   main_stop->mutable_stop_point()->set_x(45678.9);
@@ -285,14 +286,14 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   main_stop->set_reason_code(
       apollo::planning::StopReasonCode::STOP_REASON_CROSSWALK);
 
-  apollo::planning::ObjectDecisions *obj_decisions = decision_res
-      .mutable_object_decision();
+  apollo::planning::ObjectDecisions* obj_decisions =
+      decision_res.mutable_object_decision();
   // The 1st obstacle has two decisions: nudge or sidepass.
-  apollo::planning::ObjectDecision *obj_decision1 =
+  apollo::planning::ObjectDecision* obj_decision1 =
       obj_decisions->add_decision();
   obj_decision1->set_type(apollo::planning::ObjectDecision_ObjectType_VIRTUAL);
-  PerceptionObstacle* perception1 = obj_decision1->mutable_prediction()
-      ->mutable_perception_obstacle();
+  PerceptionObstacle* perception1 =
+      obj_decision1->mutable_prediction()->mutable_perception_obstacle();
   perception1->set_id(1);
   perception1->mutable_position()->set_x(1.0);
   perception1->mutable_position()->set_y(2.0);
@@ -317,13 +318,13 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
       obj_decisions->add_decision();
   obj_decision2->set_type(
       apollo::planning::ObjectDecision_ObjectType_PERCEPTION);
-  PerceptionObstacle* perception2 = obj_decision2->mutable_prediction()
-      ->mutable_perception_obstacle();
+  PerceptionObstacle* perception2 =
+      obj_decision2->mutable_prediction()->mutable_perception_obstacle();
   perception2->set_id(2);
   perception2->mutable_position()->set_x(-1860.48981629632);
   perception2->mutable_position()->set_y(-3001.9591838696506);
-  apollo::planning::ObjectFollow* follow = obj_decision2->add_object_decision()
-      ->mutable_follow();
+  apollo::planning::ObjectFollow* follow =
+      obj_decision2->add_object_decision()->mutable_follow();
   follow->set_distance_s(2.0);
   apollo::common::PointENU* follow_point = follow->mutable_follow_point();
   follow_point->set_x(-1859.98);
@@ -331,11 +332,11 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
 
   sim_world_service_->UpdateDecision(decision_res, 1501095053);
 
-  const SimulationWorld &world = sim_world_service_->world();
+  const SimulationWorld& world = sim_world_service_->world();
   EXPECT_EQ("RIGHT", world.auto_driving_car().current_signal());
   EXPECT_EQ(35, world.speed_limit());
 
-  const Object &world_main_stop = world.main_stop();
+  const Object& world_main_stop = world.main_stop();
   EXPECT_EQ(world_main_stop.decision(0).stopreason(),
             Decision::STOP_REASON_CROSSWALK);
   EXPECT_DOUBLE_EQ(45678.9, world_main_stop.position_x());
@@ -343,13 +344,13 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   EXPECT_DOUBLE_EQ(1.234, world_main_stop.heading());
 
   sim_world_service_->world_.clear_object();
-  for (auto &kv : sim_world_service_->obj_map_) {
+  for (auto& kv : sim_world_service_->obj_map_) {
     *sim_world_service_->world_.add_object() = kv.second;
   }
   EXPECT_EQ(world.object_size(), 2);
 
   for (int i = 0; i < 2; ++i) {
-    const Object &obj_dec = world.object(i);
+    const Object& obj_dec = world.object(i);
     if (obj_dec.id() == "1") {
       EXPECT_EQ(Object_Type_VIRTUAL, obj_dec.type());
       EXPECT_DOUBLE_EQ(1.0, obj_dec.position_x());
@@ -371,12 +372,62 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
     } else {
       EXPECT_NE(Object_Type_VIRTUAL, obj_dec.type());
       EXPECT_EQ(1, obj_dec.decision_size());
-      const Decision &decision = obj_dec.decision(0);
+      const Decision& decision = obj_dec.decision(0);
       EXPECT_EQ(Decision_Type_FOLLOW, decision.type());
       EXPECT_DOUBLE_EQ(-1859.98, decision.position_x());
       EXPECT_DOUBLE_EQ(-3000.03, decision.position_y());
       EXPECT_DOUBLE_EQ(0.0, decision.heading());
     }
+  }
+}
+
+TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
+  // Update with prediction obstacles
+  PredictionObstacles prediction_obstacles;
+  for (int i = 0; i < 3; ++i) {
+    auto* obstacle = prediction_obstacles.add_prediction_obstacle();
+    auto* perception_obstacle = obstacle->mutable_perception_obstacle();
+    perception_obstacle->set_id(i);
+    for (int j = 0; j < 5; ++j) {
+      auto* traj = obstacle->add_trajectory();
+      traj->set_probability(i * 0.1 + j);
+      for (int k = 0; k < 8; ++k) {
+        auto* traj_pt = traj->add_trajectory_point()->mutable_path_point();
+        int pt = j * 10 + k;
+        traj_pt->set_x(pt);
+        traj_pt->set_y(pt);
+        traj_pt->set_z(pt);
+      }
+    }
+    obstacle->set_time_stamp(123.456);
+  }
+  sim_world_service_->UpdateSimulationWorld(prediction_obstacles);
+  sim_world_service_->world_.clear_object();
+  for (auto& kv : sim_world_service_->obj_map_) {
+    *sim_world_service_->world_.add_object() = kv.second;
+  }
+
+  // Verify
+  const auto& sim_world = sim_world_service_->world();
+  EXPECT_EQ(3, sim_world.object_size());
+  for (int i = 0; i < sim_world.object_size(); ++i) {
+    const Object& obj = sim_world.object(i);
+    EXPECT_EQ(5, obj.prediction_size());
+
+    for (int j = 0; j < obj.prediction_size(); ++j) {
+      const Prediction& prediction = obj.prediction(j);
+      EXPECT_NEAR((sim_world.object_size() - i - 1) * 0.1 + j,
+                  prediction.probability(), kEpsilon);
+      EXPECT_EQ(prediction.predicted_trajectory_size(), 8);
+      for (int k = 0; k < prediction.predicted_trajectory_size(); ++k) {
+        const auto& pt = prediction.predicted_trajectory(k);
+        int val = j * 10 + k;
+        EXPECT_NEAR(val, pt.x(), kEpsilon);
+        EXPECT_NEAR(val, pt.y(), kEpsilon);
+        EXPECT_NEAR(val, pt.z(), kEpsilon);
+      }
+    }
+    EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
   }
 }
 

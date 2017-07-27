@@ -30,6 +30,7 @@
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 using apollo::common::Point3D;
 using apollo::common::adapter::AdapterManager;
@@ -49,6 +50,8 @@ using apollo::planning::StopReasonCode;
 using apollo::canbus::Chassis;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::prediction::PredictionObstacle;
+using apollo::prediction::PredictionObstacles;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
@@ -241,6 +244,20 @@ void FindNudgeRegion(const apollo::planning::ObjectDecisionType &decision,
   world_decision->set_type(Decision_Type_NUDGE);
 }
 
+void CreatePredictionTrajectory(Object *world_object,
+                                const PredictionObstacle &obstacle) {
+  for (const auto &traj : obstacle.trajectory()) {
+    Prediction *prediction = world_object->add_prediction();
+    prediction->set_probability(traj.probability());
+    for (const auto &point : traj.trajectory_point()) {
+      PolygonPoint *world_point = prediction->add_predicted_trajectory();
+      world_point->set_x(point.path_point().x());
+      world_point->set_y(point.path_point().y());
+      world_point->set_z(point.path_point().z());
+    }
+  }
+}
+
 }  // namespace
 
 constexpr int SimulationWorldService::kMaxMonitorItems;
@@ -256,14 +273,22 @@ const SimulationWorld &SimulationWorldService::Update() {
   AdapterManager::Observe();
   UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis());
   UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization());
+
+  // Clear objects received from last frame and populate with the new objects.
+  // TODO(siyangy, unacao): For now we are assembling the simulation_world with
+  // latest received perception, prediction and planning message. However, they
+  // may not always be perfectly aligned and belong to the same frame.
   obj_map_.clear();
-  UpdateWithLatestObserved("PerceptionObstacles",
-                           AdapterManager::GetPerceptionObstacles());
-  UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
   world_.clear_object();
-  for (auto &kv : obj_map_) {
+  UpdateWithLatestObserved("Perception",
+                           AdapterManager::GetPerceptionObstacles());
+  UpdateWithLatestObserved("PredictionObstacles",
+                           AdapterManager::GetPrediction());
+  UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
+  for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
   }
+
   return world_;
 }
 
@@ -374,10 +399,11 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
       std::max(world_.timestamp_sec(), chassis.header().timestamp_sec()));
 }
 
-Object &SimulationWorldService::CreateWorldObject(
+Object &SimulationWorldService::CreateWorldObjectIfAbsent(
     const PerceptionObstacle &obstacle) {
   const std::string id = std::to_string(obstacle.id());
-  // Create a new world object if the id does not exists in the map yet.
+  // Create a new world object and put it into object map if the id does not
+  // exist in the map yet.
   if (obj_map_.find(id) == obj_map_.end()) {
     Object &world_obj = obj_map_[id];
     SetObstacleInfo(obstacle, &world_obj);
@@ -391,7 +417,7 @@ template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const PerceptionObstacles &obstacles) {
   for (const auto &obstacle : obstacles.perception_obstacle()) {
-    CreateWorldObject(obstacle);
+    CreateWorldObjectIfAbsent(obstacle);
   }
   world_.set_timestamp_sec(
       std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
@@ -505,16 +531,15 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
     if (obj_decision.has_prediction()) {
       const auto &p_obj = obj_decision.prediction().perception_obstacle();
       const std::string id = std::to_string(p_obj.id());
+      Object &world_obj = CreateWorldObjectIfAbsent(p_obj);
+
       // If the object does not exist in the map yet, it could be extra virtual
-      // objects created by prediction/decision modules.
-      if (obj_map_.find(id) == obj_map_.end()) {
-        CreateWorldObject(p_obj);
-      }
-      Object &world_obj = obj_map_[id];
+      // objects created by decision modules.
       if (obj_decision.type() ==
           apollo::planning::ObjectDecision_ObjectType_VIRTUAL) {
         world_obj.set_type(Object_Type_VIRTUAL);
       }
+
       for (const auto &decision : obj_decision.object_decision()) {
         Decision *world_decision = world_obj.add_decision();
         world_decision->set_type(Decision_Type_IGNORE);
@@ -553,6 +578,26 @@ void SimulationWorldService::UpdateSimulationWorld(
   UpdateDecision(trajectory.decision(), header_time);
 
   world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const PredictionObstacles &obstacles) {
+  for (const auto &obstacle : obstacles.prediction_obstacle()) {
+    // Note: There's a perfect one-to-one mapping between the perception
+    // obstacles and prediction obstacles within the same frame. Creating a new
+    // world object here is only possible when we happen to be processing a
+    // percpetion and prediction message from two frames.
+    auto &world_obj = CreateWorldObjectIfAbsent(obstacle.perception_obstacle());
+
+    // Add prediction trajectory to the object.
+    CreatePredictionTrajectory(&world_obj, obstacle);
+
+    world_obj.set_timestamp_sec(
+        std::max(obstacle.time_stamp(), world_obj.timestamp_sec()));
+  }
+  world_.set_timestamp_sec(
+      std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
 }
 
 void SimulationWorldService::RegisterMonitorCallback() {
