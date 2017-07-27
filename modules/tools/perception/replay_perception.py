@@ -43,13 +43,13 @@ def generate_polygon(point, heading, length, width):
     sin_h = math.sin(heading)
     cos_h = math.cos(heading)
     vectors = [(half_l * cos_h - half_w * sin_h,
-                point.y + half_l * sin_h + half_w * cos_h),
+                half_l * sin_h + half_w * cos_h),
                (-half_l * cos_h - half_w * sin_h,
-                point.y - half_l * sin_h + half_w * cos_h),
+                - half_l * sin_h + half_w * cos_h),
                (-half_l * cos_h + half_w * sin_h,
-                point.y - half_l * sin_h - half_w * cos_h),
+                - half_l * sin_h - half_w * cos_h),
                (half_l * cos_h + half_w * sin_h,
-                point.y + half_l * sin_h - half_w * cos_h)]
+                half_l * sin_h - half_w * cos_h)]
     for x, y in vectors:
         p = Point()
         p.x = point.x + x
