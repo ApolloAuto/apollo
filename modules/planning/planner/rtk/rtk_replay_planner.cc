@@ -41,9 +41,10 @@ Status RTKReplayPlanner::Init(const PlanningConfig& config) {
 Status RTKReplayPlanner::MakePlan(const TrajectoryPoint& start_point,
                                   ADCTrajectory* trajectory_pb) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
-    std::string msg("RTKReplayPlanner doesn't have a recorded trajectory or "
-              "the recorded trajectory doesn't have enough valid trajectory "
-              "points.");
+    std::string msg(
+        "RTKReplayPlanner doesn't have a recorded trajectory or "
+        "the recorded trajectory doesn't have enough valid trajectory "
+        "points.");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -63,24 +64,24 @@ Status RTKReplayPlanner::MakePlan(const TrajectoryPoint& start_point,
 
   // reset relative time
   double zero_time = complete_rtk_trajectory_[matched_index].relative_time();
-  for (auto &trajectory : *trajectory_points) {
+  for (auto& trajectory : *trajectory_points) {
     trajectory.set_relative_time(trajectory.relative_time() - zero_time);
   }
 
   // check if the trajectory has enough points;
   // if not, append the last points multiple times and
   // adjust their corresponding time stamps.
-  while (trajectory_points->size() < (size_t)FLAGS_rtk_trajectory_forward) {
+  while (trajectory_points->size() < FLAGS_rtk_trajectory_forward) {
     const auto& last_point = *trajectory_points->rbegin();
     auto* new_point = trajectory_points->Add();
     *new_point = last_point;
-    new_point->set_relative_time(
-        new_point->relative_time() + FLAGS_trajectory_resolution);
+    new_point->set_relative_time(new_point->relative_time() +
+                                 FLAGS_trajectory_resolution);
   }
   return Status::OK();
 }
 
-void RTKReplayPlanner::ReadTrajectoryFile(const std::string &filename) {
+void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
   if (!complete_rtk_trajectory_.empty()) {
     complete_rtk_trajectory_.clear();
   }
@@ -132,9 +133,9 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string &filename) {
 }
 
 std::uint32_t RTKReplayPlanner::QueryPositionMatchedPoint(
-    const TrajectoryPoint &start_point,
-    const std::vector<TrajectoryPoint> &trajectory) const {
-  auto func_distance_square = [](const TrajectoryPoint &point, const double x,
+    const TrajectoryPoint& start_point,
+    const std::vector<TrajectoryPoint>& trajectory) const {
+  auto func_distance_square = [](const TrajectoryPoint& point, const double x,
                                  const double y) {
     double dx = point.path_point().x() - x;
     double dy = point.path_point().y() - y;

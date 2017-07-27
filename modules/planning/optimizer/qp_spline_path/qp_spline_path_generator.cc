@@ -15,21 +15,23 @@
  *****************************************************************************/
 
 /**
- * @file qp_spline_path_generator.cpp
+ * @file qp_spline_path_generator.cc
  **/
 #include <algorithm>
 #include <utility>
 #include <vector>
 
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
+
+#include "modules/common/proto/path_point.pb.h"
+
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
-#include "modules/common/proto/path_point.pb.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/sl_analytic_transformation.h"
-#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
-#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_simple_sampler.h"
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_sampler.h"
 
 namespace apollo {
 namespace planning {
@@ -195,13 +197,12 @@ bool QPSplinePathGenerator::init_coord_range(double* const start_s,
 bool QPSplinePathGenerator::init_smoothing_spline(
     const ReferenceLine& reference_line, const double start_s,
     const double end_s) {
-  std::uint32_t num_knots = _qp_spline_path_config.number_of_spline();
-  QPSplinePathSimpleSampler simple_sampler;
+  QpSplinePathSampler sampler(_qp_spline_path_config);
 
   // TODO(all): refine here, add end_s tolorence here
   std::vector<double> sampling_point;
-  if (!simple_sampler.sample(_init_point, reference_line, num_knots, start_s,
-                             end_s - 0.1, &sampling_point)) {
+  if (!sampler.Sample(_init_point, reference_line, start_s, end_s - 0.1,
+                      &sampling_point)) {
     AERROR << "Qp spline sampler failed!";
     return false;
   }
