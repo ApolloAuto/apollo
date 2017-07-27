@@ -47,6 +47,12 @@ class PredictorManager {
   virtual ~PredictorManager() = default;
 
   /**
+   * @brief Initializer
+   * @param Prediction config
+   */
+  void Init(const PredictionConf& config);
+
+  /**
    * @brief Get predictor
    * @return Pointer to the predictor
    */

@@ -36,6 +36,10 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::MLP_EVALUATOR);
 }
 
+void EvaluatorManager::Init(const PredictionConf& config) {
+  
+}
+
 Evaluator* EvaluatorManager::GetEvaluator(
     const ObstacleConf::EvaluatorType& type) {
   if (evaluators_.find(type) != evaluators_.end()) {

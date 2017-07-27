@@ -41,6 +41,10 @@ void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
 }
 
+void PredictorManager::Init(const PredictionConf& config) {
+
+}
+
 Predictor* PredictorManager::GetPredictor(
     const ObstacleConf::PredictorType& type) {
   if (predictors_.find(type) != predictors_.end()) {
