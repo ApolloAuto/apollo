@@ -223,7 +223,6 @@ bool DpStGraph::feasible_accel_range(const double c_pre, const double c_cur,
                                      std::uint32_t* const lower_bound,
                                      std::uint32_t* const upper_bound) const {
   double tcoef = _unit_t * _unit_t / _unit_s;
-  // TODO(all): change 4.5 to configurable version
   double lval = std::max(
       2 * c_pre - c_cur + _dp_st_speed_config.max_deceleration() * tcoef, 0.0);
   double rval = std::min(

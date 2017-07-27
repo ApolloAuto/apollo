@@ -23,6 +23,7 @@
 #include <limits>
 
 #include "modules/planning/common/data_center.h"
+#include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
@@ -45,8 +46,7 @@ double DpStCost::obstacle_cost(
     if (point.s() < 0 || boundary.IsPointInBoundary(point)) {
       total_cost += _dp_st_configuration.st_graph_default_point_cost();
     } else {
-      ::apollo::common::math::Vec2d vec2d = {point.t(), point.s()};
-      double distance = boundary.DistanceTo(vec2d);
+      double distance = boundary.DistanceTo(point);
       total_cost += _dp_st_configuration.st_graph_default_point_cost() *
                     std::exp(_dp_st_configuration.obstacle_cost_factor() /
                              boundary.characteristic_length() * distance);

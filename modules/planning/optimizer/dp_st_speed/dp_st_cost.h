@@ -45,13 +45,11 @@ class DpStCost {
   double speed_cost(const STPoint& first, const STPoint& second,
                     const double speed_limit) const;
 
-  double accel_cost(const double accel) const;
   double accel_cost_by_two_points(const double pre_speed, const STPoint& first,
                                   const STPoint& second) const;
   double accel_cost_by_three_points(const STPoint& first, const STPoint& second,
                                     const STPoint& third) const;
 
-  double jerk_cost(const double jerk) const;
   double jerk_cost_by_two_points(const double pre_speed, const double pre_acc,
                                  const STPoint& pre_point,
                                  const STPoint& curr_point) const;
@@ -65,7 +63,10 @@ class DpStCost {
                                   const STPoint& forth) const;
 
  private:
-  DpStSpeedConfig _dp_st_configuration;
+  double accel_cost(const double accel) const;
+  double jerk_cost(const double jerk) const;
+
+  const DpStSpeedConfig& _dp_st_configuration;
   double _unit_s = 0.0;
   double _unit_t = 0.0;
 };
