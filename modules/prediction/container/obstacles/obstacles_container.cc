@@ -31,8 +31,10 @@ std::mutex ObstaclesContainer::g_mutex_;
 ObstaclesContainer::ObstaclesContainer() { timestamp_ = 0.0; }
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
+  AINFO << "message: " << message.ShortDebugString();
   const PerceptionObstacles& perception_obstacles =
       dynamic_cast<const PerceptionObstacles&>(message);
+  AINFO << "perception obstacles: " << perception_obstacles.ShortDebugString();
   double timestamp = 0.0;
   if (perception_obstacles.has_header() &&
       perception_obstacles.header().has_timestamp_sec()) {
@@ -45,13 +47,20 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
 
   timestamp_ = timestamp;
+  AINFO << "timestamp = " << timestamp_;
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
+    AINFO << "Start to inserted perception obstacle ["
+           << perception_obstacle.id() << "]";
     InsertPerceptionObstacle(perception_obstacle, timestamp_);
+    AINFO << "Inserted perception obstacle ["
+           << perception_obstacle.id() << "]";
   }
 }
 
-Obstacle* ObstaclesContainer::GetObstacle(int id) { return nullptr; }
+Obstacle* ObstaclesContainer::GetObstacle(int id) {
+  return obstacles_.GetSilently(id);
+}
 
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {

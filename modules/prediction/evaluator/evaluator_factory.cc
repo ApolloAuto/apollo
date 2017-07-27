@@ -22,7 +22,9 @@
 namespace apollo {
 namespace prediction {
 
-EvaluatorFactory::EvaluatorFactory() {}
+EvaluatorFactory::EvaluatorFactory() {
+  RegisterEvaluator();
+}
 
 void EvaluatorFactory::RegisterEvaluator() {
   Register(ObstacleConf::MLP_EVALUATOR,

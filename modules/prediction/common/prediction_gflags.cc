@@ -32,7 +32,7 @@ DEFINE_double(max_prediction_length, 100.0,
     "Max length of prediction trajectory");
 
 // Map
-DEFINE_string(map_file, "/path/to/map_file", "Path to map file");
+DEFINE_string(map_file, "modules/map/data/base_map.txt", "Path to map file");
 DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
 
 // Obstacle features
@@ -68,6 +68,8 @@ DEFINE_double(prediction_pedestrian_total_time, 10.0,
 DEFINE_int32(num_trajectory_still_pedestrian, 6,
     "number of trajectories for static pedestrian");
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
+DEFINE_string(vehicle_model_file,
+    "modules/prediction/data/mlp_vehicle_model.bin", "Vehicle model file");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,

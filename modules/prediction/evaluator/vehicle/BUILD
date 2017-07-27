@@ -18,6 +18,7 @@ cc_library(
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
         "//modules/prediction/proto:lane_graph_proto",
+        "//modules/map/proto:map_proto",
     ],
 )
 

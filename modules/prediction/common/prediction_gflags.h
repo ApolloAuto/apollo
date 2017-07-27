@@ -57,6 +57,7 @@ DECLARE_double(pedestrian_max_acc);
 DECLARE_double(prediction_pedestrian_total_time);
 DECLARE_int32(num_trajectory_still_pedestrian);
 DECLARE_double(still_speed);
+DECLARE_string(vehicle_model_file);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
