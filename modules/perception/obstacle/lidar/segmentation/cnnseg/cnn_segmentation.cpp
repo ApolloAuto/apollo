@@ -125,7 +125,10 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   network_time_ = timer_.Toc(true);
 
   // clutser points and construct segments/objects
-  cluster2d_->Cluster(*category_pt_blob_, *instance_pt_blob_, pc_ptr, valid_indices);
+  cluster2d_->Cluster(*category_pt_blob_, *instance_pt_blob_,
+                      pc_ptr, valid_indices,
+                      cnnseg_param_.objectness_thresh(),
+                      cnnseg_param_.use_all_grids_for_clustering());
   clust_time_ = timer_.Toc(true);
   cluster2d_->Filter(*confidence_pt_blob_, *height_pt_blob_);
   cluster2d_->GetObjects(cnnseg_param_.confidence_thresh(),
