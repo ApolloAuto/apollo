@@ -160,7 +160,7 @@ bool ReferenceLine::get_point_in_Cartesian_frame(
   return true;
 }
 
-bool ReferenceLine::get_point_in_Frenet_frame(
+bool ReferenceLine::get_point_in_frenet_frame(
     const common::math::Vec2d& xy_point,
     common::SLPoint* const sl_point) const {
   DCHECK_NOTNULL(sl_point);

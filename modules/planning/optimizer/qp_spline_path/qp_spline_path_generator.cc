@@ -140,7 +140,7 @@ bool QPSplinePathGenerator::calculate_sl_point(
     const common::TrajectoryPoint& traj_point,
     common::FrenetFramePoint* const frenet_frame_point) {
   common::SLPoint sl_point;
-  if (!reference_line.get_point_in_Frenet_frame(
+  if (!reference_line.get_point_in_frenet_frame(
           {traj_point.path_point().x(), traj_point.path_point().y()},
           &sl_point)) {
     return false;
