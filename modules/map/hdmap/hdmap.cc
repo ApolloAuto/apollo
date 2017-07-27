@@ -54,6 +54,10 @@ OverlapInfoConstPtr HDMap::get_overlap_by_id(
     return _impl.get_overlap_by_id(id);
 }
 
+RoadInfoConstPtr HDMap::get_road_by_id(const apollo::hdmap::Id& id) const {
+    return _impl.get_road_by_id(id);
+}
+
 int HDMap::get_lanes(const apollo::hdmap::Point& point,
                      double distance,
                      std::vector<LaneInfoConstPtr>* lanes) const {
@@ -90,6 +94,11 @@ int HDMap::get_yield_signs(const apollo::hdmap::Point& point,
   return _impl.get_yield_signs(point, distance, yield_signs);
 }
 
+int HDMap::get_roads(const apollo::hdmap::Point& point, double distance,
+                                std::vector<RoadInfoConstPtr>* roads) const {
+  return _impl.get_roads(point, distance, roads);
+}
+
 int HDMap::get_nearest_lane(const ::apollo::hdmap::Point& point,
                 LaneInfoConstPtr* nearest_lane,
                 double* nearest_s,
@@ -121,8 +130,8 @@ int HDMap::get_lanes_with_heading(const apollo::hdmap::Point& point,
 int HDMap::get_road_boundaries(const apollo::hdmap::Point& point,
                           double radius,
                           std::vector<RoadROIBoundaryPtr>* road_boundaries,
-                          std::vector<JunctionInfoConstPtr>* junctions) const {
-  return -1;
+                          std::vector<JunctionBoundaryPtr>* junctions) const {
+  return _impl.get_road_boundaries(point, radius, road_boundaries, junctions);
 }
 
 }  // namespace hdmap

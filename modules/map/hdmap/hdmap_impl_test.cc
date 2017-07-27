@@ -20,10 +20,21 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 
-constexpr char kMapFilename[] = "modules/map/hdmap/test-data/map_data.dat.v2.bin";
+namespace {
+
+constexpr char kMapFilename[] = "modules/map/hdmap/test-data/map_data.dat.v2";
+constexpr char kBoundaryMapFilename[] =
+                          "modules/map/hdmap/test-data/map_road_boundary.txt";
+
+}  // namespace
 
 namespace apollo {
 namespace hdmap {
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
 
 class HDMapImplTestSuite : public ::testing::Test {
  public:
@@ -36,12 +47,18 @@ class HDMapImplTestSuite : public ::testing::Test {
   virtual void TearDown() {
   }
   void initial_context();
+  void initial_boundary_context();
  public:
     HDMapImpl _hdmap_impl;
 };
 
 void HDMapImplTestSuite::initial_context() {
   int ret = _hdmap_impl.load_map_from_file(kMapFilename);
+  ASSERT_EQ(0, ret);
+}
+
+void HDMapImplTestSuite::initial_boundary_context() {
+  int ret = _hdmap_impl.load_map_from_file(kBoundaryMapFilename);
   ASSERT_EQ(0, ret);
 }
 
@@ -124,6 +141,17 @@ TEST_F(HDMapImplTestSuite, get_overlap_by_id) {
   OverlapInfoConstPtr overlap_ptr = _hdmap_impl.get_overlap_by_id(overlap_id);
   EXPECT_TRUE(nullptr != overlap_ptr);
   EXPECT_STREQ(overlap_id.id().c_str(), overlap_ptr->id().id().c_str());
+}
+
+TEST_F(HDMapImplTestSuite, get_road_by_id) {
+  initial_boundary_context();
+  Id road_id;
+  road_id.set_id("road_1");
+  EXPECT_TRUE(nullptr == _hdmap_impl.get_road_by_id(road_id));
+  road_id.set_id("99");
+  RoadInfoConstPtr road_ptr = _hdmap_impl.get_road_by_id(road_id);
+  EXPECT_TRUE(nullptr != road_ptr);
+  EXPECT_STREQ(road_id.id().c_str(), road_ptr->id().id().c_str());
 }
 
 TEST_F(HDMapImplTestSuite, get_lanes) {
@@ -255,12 +283,40 @@ TEST_F(HDMapImplTestSuite, get_yield_signs) {
   EXPECT_EQ(0, yield_signs.size());
 }
 
+TEST_F(HDMapImplTestSuite, get_roads) {
+  initial_boundary_context();
+  std::vector<RoadInfoConstPtr> roads;
+
+  apollo::hdmap::Point point;
+  point.set_x(435730.0);
+  point.set_y(4436777.0);
+  point.set_z(0.0);
+  EXPECT_EQ(0, _hdmap_impl.get_roads(point, 3.0, &roads));
+  EXPECT_EQ(1, roads.size());
+
+  EXPECT_EQ(roads[0]->id().id(), "87");
+  EXPECT_TRUE(!roads[0]->has_junction_id());
+
+  EXPECT_EQ(1, roads[0]->sections().size());
+  const apollo::hdmap::RoadSection& section = roads[0]->sections()[0];
+  EXPECT_EQ(section.id().id(), "1");
+  EXPECT_EQ(section.lane_id_size(), 2);
+
+  std::set<std::string> lane_ids;
+  lane_ids.insert("87_1_0");
+  lane_ids.insert("87_1_1");
+  for (int i = 0; i < section.lane_id_size(); ++i) {
+    const apollo::hdmap::Id& lane_id = section.lane_id(i);
+    EXPECT_TRUE(lane_ids.count(lane_id.id()) > 0);
+  }
+}
+
 TEST_F(HDMapImplTestSuite, get_nearest_lane) {
   initial_context();
   LaneInfoConstPtr lane;
   double s = 0.0;
   double l = 0.0;
-
+  
   apollo::hdmap::Point point;
 
   point.set_x(2.5);
@@ -278,6 +334,37 @@ TEST_F(HDMapImplTestSuite, get_nearest_lane) {
   EXPECT_EQ("14791047360960_2_-1", lane->id().id());
   EXPECT_NEAR(s, 285.365, 1e-3);
   EXPECT_NEAR(l, -4.734, 1e-3);
+}
+
+TEST_F(HDMapImplTestSuite, get_road_boundaries) {
+  initial_boundary_context();
+  apollo::hdmap::Point point;
+  point.set_x(435798.0);
+  point.set_y(4436768.0);
+  point.set_z(0.0);
+  std::vector<RoadROIBoundaryPtr> road_boundaries;
+  std::vector<JunctionBoundaryPtr> junctions;
+  EXPECT_EQ(-1, _hdmap_impl.get_road_boundaries(point, 10.0,
+                                        &road_boundaries,
+                                        &junctions));
+
+  point.set_x(435730.0);
+  point.set_y(4436777.0);
+  point.set_z(0.0);
+  EXPECT_EQ(0, _hdmap_impl.get_road_boundaries(point, 10.0,
+                                        &road_boundaries,
+                                        &junctions));
+  EXPECT_EQ(1, road_boundaries.size());
+  EXPECT_EQ(0, junctions.size());
+
+  point.set_x(435776.9);
+  point.set_y(4436640.7);
+  point.set_z(0.0);
+  EXPECT_EQ(0, _hdmap_impl.get_road_boundaries(point, 3.0,
+                                        &road_boundaries,
+                                        &junctions));
+  EXPECT_EQ(0, road_boundaries.size());
+  EXPECT_EQ(1, junctions.size());
 }
 
 }  // namespace hdmap

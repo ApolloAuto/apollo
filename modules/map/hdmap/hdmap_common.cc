@@ -459,5 +459,18 @@ const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
   return nullptr;
 }
 
+RoadInfo::RoadInfo(const apollo::hdmap::Road& road)
+  : _road(road) {
+  for (int i = 0; i < _road.section_size(); ++i) {
+    _sections.push_back(_road.section(i));
+    _road_boundaries.push_back(_road.section(i).boundary());
+  }
+}
+
+const std::vector<apollo::hdmap::RoadBoundary>& RoadInfo::get_boundaries()
+                                                                        const {
+  return _road_boundaries;
+}
+
 }  // namespace hdmap
 }  // namespace apollo

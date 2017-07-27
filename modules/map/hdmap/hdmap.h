@@ -37,19 +37,6 @@
 namespace apollo {
 namespace hdmap {
 
-struct RoadROIBoundary {
-    apollo::hdmap::Id id;
-    std::vector<apollo::hdmap::RoadBoundary> road_boundary;
-};
-
-using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
-
-struct JunctionBoundary {
-    const JunctionInfo* junction_info;
-};
-
-using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
-
 class HDMap {
  public:
   int load_map_from_file(const std::string& map_filename);
@@ -61,6 +48,7 @@ class HDMap {
   StopSignInfoConstPtr get_stop_sign_by_id(const apollo::hdmap::Id& id) const;
   YieldSignInfoConstPtr get_yield_sign_by_id(const apollo::hdmap::Id& id) const;
   OverlapInfoConstPtr get_overlap_by_id(const apollo::hdmap::Id& id) const;
+  RoadInfoConstPtr get_road_by_id(const apollo::hdmap::Id& id) const;
 
   int get_lanes(const apollo::hdmap::Point& point, double distance,
                 std::vector<LaneInfoConstPtr>* lanes) const;
@@ -74,6 +62,8 @@ class HDMap {
                      std::vector<StopSignInfoConstPtr>* stop_signs) const;
   int get_yield_signs(const apollo::hdmap::Point& point, double distance,
                       std::vector<YieldSignInfoConstPtr>* yield_signs) const;
+  int get_roads(const apollo::hdmap::Point& point, double distance,
+                      std::vector<RoadInfoConstPtr>* roads) const;
 
   int get_nearest_lane(const apollo::hdmap::Point& point,
                        LaneInfoConstPtr* nearest_lane, double* nearest_s,
@@ -93,7 +83,7 @@ class HDMap {
   int get_road_boundaries(const apollo::hdmap::Point& point,
                           double radius,
                           std::vector<RoadROIBoundaryPtr>* road_boundaries,
-                          std::vector<JunctionInfoConstPtr>* junctions) const;
+                          std::vector<JunctionBoundaryPtr>* junctions) const;
 
  private:
   HDMapImpl _impl;
