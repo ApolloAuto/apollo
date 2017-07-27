@@ -71,4 +71,21 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "dp_road_graph_test",
+    size = "small",
+    srcs = [
+        "dp_road_graph_test.cc",
+    ],
+    data = [
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":dp_poly_path",
+        "//modules/planning/optimizer:optimizer_test_base",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
