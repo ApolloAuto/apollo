@@ -53,7 +53,7 @@ def callback(data):
         QP_LINE_X = []
         QP_LINE_Y = []
         #TODO(yifei) path name need to be updated
-        if path_debug.name == "ref":
+        if path_debug.name == "planning_reference_line":
             for path_point in path_debug.path:
                 REF_LINE_X.append(path_point.x)
                 REF_LINE_Y.append(path_point.y)
