@@ -1,0 +1,36 @@
+<library path="lib/libconvert_nodelet">
+  <class name="velodyne_pointcloud/ConvertNodelet"
+         type="apollo::drivers::velodyne::ConvertNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      Aggregates points from multiple packets, publishing PointCloud2.
+    </description>
+  </class>
+</library>
+<library path="lib/libpointcloud_dump_nodelet">
+  <class name="velodyne_pointcloud/PointCloudDumpNodelet"
+         type="apollo::drivers::velodyne::PointCloudDumpNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      save point cloud msg to file
+    </description>
+  </class>
+</library>
+<library path="lib/libpcd_exporter_nodelet">
+  <class name="velodyne_pointcloud/PCDExporterNodelet"
+         type="apollo::drivers::velodyne::PCDExporterNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      save PointCloud2 to pcd files.
+    </description>
+  </class>
+</library>
+<library path="lib/libcompensator_nodelet">
+  <class name="velodyne_pointcloud/CompensatorNodelet"
+         type="apollo::drivers::velodyne::CompensatorNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      motion compensator for point cloud
+    </description>
+  </class>
+</library>
