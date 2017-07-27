@@ -106,6 +106,7 @@ PathPoint interpolate_linear_approximation(const PathPoint &p0,
   path_point.set_kappa(kappa);
   path_point.set_dkappa(dkappa);
   path_point.set_ddkappa(ddkappa);
+  path_point.set_s(s);
   return path_point;
 }
 
