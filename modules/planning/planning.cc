@@ -144,6 +144,7 @@ void Planning::RunOnce() {
   }
 
   AINFO << "Start planning ...";
+  const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
 
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
@@ -172,6 +173,12 @@ void Planning::RunOnce() {
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
   bool res_planning = Plan(is_auto_mode, execution_start_time, &trajectory_pb);
+
+  const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  trajectory_pb.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
+
   if (res_planning) {
     AdapterManager::FillPlanningHeader("planning",
                                        trajectory_pb.mutable_header());

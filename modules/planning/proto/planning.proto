@@ -70,7 +70,11 @@ message EStop {
   optional bool is_estop = 1;
 }
 
-// next id: 15
+message LatencyStats {
+  optional double total_time_ms = 1;
+}
+
+// next id: 16
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
   optional double total_path_length = 2; // in meters
@@ -85,6 +89,7 @@ message ADCTrajectory {
   optional apollo.canbus.Chassis.GearPosition gear = 10;
   optional apollo.common.VehicleSignal signal = 11;
   optional apollo.planning.DecisionResult decision = 14;
+  optional LatencyStats latency_stats = 15;
 
   // replaced by path_point
   repeated ADCPathPoint adc_path_point = 7 [deprecated=true];
