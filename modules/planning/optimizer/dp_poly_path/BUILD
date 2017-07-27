@@ -6,15 +6,11 @@ cc_library(
     name = "dp_poly_path",
     srcs = [
         "dp_road_graph.cc",
-        "graph_edge.cc",
-        "graph_vertex.cc",
         "path_sampler.cc",
         "trajectory_cost.cc",
     ],
     hdrs = [
         "dp_road_graph.h",
-        "graph_edge.h",
-        "graph_vertex.h",
         "path_sampler.h",
         "trajectory_cost.h",
     ],

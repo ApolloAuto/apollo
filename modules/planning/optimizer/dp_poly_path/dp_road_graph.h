@@ -30,8 +30,7 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/optimizer/dp_poly_path/graph_edge.h"
-#include "modules/planning/optimizer/dp_poly_path/graph_vertex.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -50,21 +49,44 @@ class DpRoadGraph {
                    PathData *const path_data);
 
  private:
+  /**
+   * an private inner stuct for the dp algorithm
+   */
+  struct DpNode {
+   public:
+    DpNode() = default;
+    DpNode(const common::SLPoint point_sl, const DpNode *node_prev)
+        : sl_point(point_sl), min_cost_prev_node(node_prev) {}
+    DpNode(const common::SLPoint point_sl, const DpNode *node_prev,
+           const double cost)
+        : sl_point(point_sl), min_cost_prev_node(node_prev), min_cost(cost) {}
+    bool update_cost(const DpNode *node_prev,
+                     const QuinticPolynomialCurve1d &curve, double cost) {
+      if (cost > min_cost) {
+        return false;
+      } else {
+        min_cost = cost;
+        min_cost_prev_node = node_prev;
+        min_cost_curve = curve;
+        return true;
+      }
+    }
+
+    common::SLPoint sl_point;
+    const DpNode *min_cost_prev_node = nullptr;
+    double min_cost = std::numeric_limits<double>::infinity();
+    QuinticPolynomialCurve1d min_cost_curve;
+  };
+
   bool init(const ReferenceLine &reference_line);
-  ::apollo::common::Status generate_graph(const ReferenceLine &reference_line);
-  ::apollo::common::Status find_best_trajectory(
-      const ReferenceLine &reference_line, const DecisionData &decision_data,
-      std::vector<uint32_t> *const min_cost_edges);
-  bool add_vertex(const common::SLPoint &sl_point,
-                  const ReferencePoint &reference_point, const uint32_t level);
-  bool connect_vertex(const uint32_t start, const uint32_t end);
+  bool generate_graph(const ReferenceLine &reference_line,
+                      DecisionData *const decision_data,
+                      std::vector<DpNode> *min_cost_path);
 
  private:
   DpPolyPathConfig _config;
   ::apollo::common::TrajectoryPoint _init_point;
-  SpeedData _heuristic_speed_data;
-  std::vector<GraphVertex> _vertices;
-  std::vector<GraphEdge> _edges;
+  SpeedData _speed_data;
   common::SLPoint _init_sl_point;
 };
 
