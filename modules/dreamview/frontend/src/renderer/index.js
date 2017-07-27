@@ -145,8 +145,7 @@ class Renderer {
     updateWorld(world) {
         this.adc.update(world, this.coordinates);
         this.planningTrajectory.update(world, this.coordinates, this.scene);
-        this.perceptionObstacles.update(world, this.coordinates,
-                this.adc.mesh.rotation, this.scene);
+        this.perceptionObstacles.update(world, this.coordinates, this.scene);
     }
 
     updateMap(newData) {
