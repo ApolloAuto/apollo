@@ -200,6 +200,11 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     auto matched_info =
         ComputeStartingPointFromLastTrajectory(execution_start_time);
     TrajectoryPoint matched_point = matched_info.first;
+    if (FLAGS_enable_record_debug) {
+      trajectory_pb->mutable_debug()->mutable_planning_data()
+          ->mutable_init_point()->CopyFrom(matched_point);
+    }
+
     std::uint32_t matched_index = matched_info.second;
 
     // Compute the position deviation between current vehicle
@@ -239,10 +244,15 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   //    2. we don't have the trajectory from last planning cycle or
   //    3. the position deviation from actual and target is too high
   // then planning from current vehicle state.
-  TrajectoryPoint vehicle_state_point =
+  TrajectoryPoint vehicle_start_point =
       ComputeStartingPointFromVehicleState(planning_cycle_time);
 
-  auto status = planner_->MakePlan(vehicle_state_point, trajectory_pb);
+  if (FLAGS_enable_record_debug) {
+    trajectory_pb->mutable_debug()->mutable_planning_data()
+        ->mutable_init_point()->CopyFrom(vehicle_start_point);
+  }
+
+  auto status = planner_->MakePlan(vehicle_start_point, trajectory_pb);
   if (!status.ok()) {
     last_trajectory_.clear();
     return false;

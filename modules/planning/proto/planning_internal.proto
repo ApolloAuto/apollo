@@ -87,7 +87,7 @@ message PathDebug {
   optional apollo.common.Path path = 2;
 }
 
-// next id: 10
+// next id: 11
 message PlanningData {
   optional apollo.common.Header header = 1;
 
@@ -95,13 +95,14 @@ message PlanningData {
   optional apollo.localization.LocalizationEstimate adc_position = 7;
   optional apollo.canbus.Chassis chassis = 8;
   optional apollo.hdmap.RoutingResult routing = 9;
+  optional apollo.common.TrajectoryPoint init_point = 10;
 
-  optional apollo.localization.Pose init_status = 2;  // initial status of adc
   // processed planning_obstacles
   repeated PlanningObstacle planning_obstacle = 4;
 
   repeated PathDebug path = 6;
 
+  optional apollo.localization.Pose init_status = 2 [deprecated = true];  // initial status of adc
   optional apollo.planning.MainDecision main_decision = 3 [deprecated = true];
   optional LightSignal light_signal = 5 [deprecated = true];
 }
