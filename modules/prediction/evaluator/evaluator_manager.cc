@@ -28,11 +28,22 @@ namespace prediction {
 using ::apollo::perception::PerceptionObstacles;
 using ::apollo::perception::PerceptionObstacle;
 
-EvaluatorManager::EvaluatorManager() {}
+EvaluatorManager::EvaluatorManager() {
+  RegisterEvaluators();
+}
+
+void EvaluatorManager::RegisterEvaluators() {
+  RegisterEvaluator(ObstacleConf::MLP_EVALUATOR);
+}
 
 Evaluator* EvaluatorManager::GetEvaluator(
     const ObstacleConf::EvaluatorType& type) {
-  return EvaluatorFactory::instance()->CreateEvaluator(type).get();
+  // return EvaluatorFactory::instance()->CreateEvaluator(type).get();
+  if (evaluators_.find(type) != evaluators_.end()) {
+    return evaluators_[type].get();
+  } else {
+    return nullptr;
+  }
 }
 
 void EvaluatorManager::Run(
@@ -48,14 +59,12 @@ void EvaluatorManager::Run(
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
         Evaluator *evaluator = GetEvaluator(ObstacleConf::MLP_EVALUATOR);
-        // MLPEvaluator *evaluator = dynamic_cast<MLPEvaluator*>(
-        //     GetEvaluator(ObstacleConf::MLP_EVALUATOR));
         CHECK_NOTNULL(evaluator);
         AINFO << "evaluator got";
         Obstacle *obstacle = container->GetObstacle(id);
         CHECK_NOTNULL(obstacle);
         AINFO << "obstacle got with id = " << obstacle->id();
-        // evaluator->Evaluate(obstacle);
+        evaluator->Evaluate(obstacle);
         AINFO << "evaluate done";
         break;
       }
@@ -64,6 +73,27 @@ void EvaluatorManager::Run(
       }
     }
   }
+}
+
+std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
+    const ObstacleConf::EvaluatorType& type) {
+  std::unique_ptr<Evaluator> evaluator_ptr(nullptr);
+  switch (type) {
+    case ObstacleConf::MLP_EVALUATOR: {
+      evaluator_ptr.reset(new MLPEvaluator());
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  return evaluator_ptr;
+}
+
+void EvaluatorManager::RegisterEvaluator(
+    const ObstacleConf::EvaluatorType& type) {
+  evaluators_[type] = CreateEvaluator(type);
+  ADEBUG << "Evaluator [" << type << "] is registered.";
 }
 
 }  // namespace prediction
