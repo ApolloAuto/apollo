@@ -38,7 +38,7 @@ export default class PerceptionObstacles {
         this.extrusionFaces = []; // for obstacles with polygon points
     }
 
-    update(world, coordinates, rotation, scene) {
+    update(world, coordinates, scene) {
         if (!STORE.options.showObstacles) {
             hideArrayObjects(this.arrows);
             hideArrayObjects(this.cubes);
@@ -74,12 +74,10 @@ export default class PerceptionObstacles {
                 arrowMesh.scale.set(scale, scale, scale);
             } else if (obstacle.length && obstacle.width && obstacle.height) {
                 this.updateCube(obstacle.length, obstacle.width, obstacle.height, position,
-                        obstacle.heading, color, cubeIdx++);
+                        obstacle.heading, color, cubeIdx++, scene);
                 arrowMesh.scale.set(obstacle.width, obstacle.length, obstacle.height);
             }
             arrowMesh.visible = (obstacle.type && obstacle.type !== 'UNKNOWN_UNMOVABLE');
-            this.updateId(obstacle.id, new THREE.Vector3(position.x, position.y, obstacle.height),
-                    rotation, scene);
         }
         hideArrayObjects(this.arrows, arrowIdx);
         hideArrayObjects(this.cubes, cubeIdx);
@@ -118,17 +116,13 @@ export default class PerceptionObstacles {
         return 1.0 * edgeDistanceSum / points.length;
     }
 
-    updateCube(length, width, height, position, heading, color, cubeIdx) {
+    updateCube(length, width, height, position, heading, color, cubeIdx, scene) {
         const cubeMesh = this.getCube(cubeIdx, scene);
         cubeMesh.position.set(position.x, position.y, position.z);
         cubeMesh.scale.set(length, width, height);
         cubeMesh.material.color.setHex(color);
         cubeMesh.rotation.set(0, 0, heading);
         cubeMesh.visible = true;
-    }
-
-    updateId(id, position, rotation, scene) {
-        // TODO (caoyu05): display obstacle id with text
     }
 
     getArrow(index, scene) {
