@@ -24,6 +24,7 @@ options:
     showConsole: false
     showPlanning: true
     showObstacles: true
+    showDecision: true
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
