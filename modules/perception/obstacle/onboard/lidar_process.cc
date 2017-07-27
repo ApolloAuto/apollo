@@ -84,7 +84,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
     Affine3d temp_trans(*velodyne_trans);
     PointD velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
     hdmap.reset(new HdmapStruct);
-    hdmap_input_->GetROI(velodyne_pose_world, hdmap);
+    hdmap_input_->GetROI(velodyne_pose_world, &hdmap);
   }
 
   /// call roi_filter
