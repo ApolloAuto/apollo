@@ -296,7 +296,13 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
 }
 
 bool LidarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
-  double publish_time = ros::Time::now().toSec();
+  // double publish_time = ros::Time::now().toSec();
+  double publish_time = timestamp_;
+  try {
+    publish_time = ros::Time::now().toSec();
+  } catch (ros::Exception& ex) {
+    AERROR << "Exception: " << ex.what();
+  }
   apollo::common::Header* header = obstacles->mutable_header();
   header->set_timestamp_sec(publish_time);
   header->set_module_name(FLAGS_obstacle_module_name);
