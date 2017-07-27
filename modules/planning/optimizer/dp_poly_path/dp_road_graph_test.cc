@@ -85,9 +85,8 @@ TEST_F(DpRoadGraphTest, speed_road_graph) {
   ASSERT_TRUE(reference_line_ != nullptr);
   bool result =
       road_graph.find_tunnel(*reference_line_, &decision_data_, &path_data_);
-
   EXPECT_TRUE(result);
-  // export_sl_points(sampled_points_, "/tmp/points.txt");
+  export_path_data(path_data_, "/tmp/path.txt");
 }
 
 }  // namespace planning
