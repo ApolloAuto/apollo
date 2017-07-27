@@ -7,7 +7,6 @@ cc_library(
     srcs = [
         "build/lib/libcaffe.so",
         "build/lib/libproto.a",
-        #"build/include/caffe/proto/caffe.ph.cc",
     ],
     hdrs = glob([
         "include/caffe/*.hpp",
@@ -20,8 +19,4 @@ cc_library(
         "include",
         "build/include"
     ],
-    #linkopts = [
-    #    "-lrt",
-    #    "-lboost_system",
-    #],
 )
