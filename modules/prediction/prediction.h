@@ -27,6 +27,7 @@
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/apollo_app.h"
 
 /**
@@ -74,6 +75,7 @@ class Prediction : public apollo::common::ApolloApp {
 
  private:
   PredictionConf prediction_conf_;
+  ::apollo::common::adapter::AdapterManagerConfig adapter_conf_;
 };
 
 }  // namespace prediction

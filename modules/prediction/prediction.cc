@@ -16,7 +16,6 @@
 
 #include "modules/prediction/prediction.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
@@ -24,7 +23,8 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
-
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/file.h"
 
 namespace apollo {
@@ -49,12 +49,23 @@ Status Prediction::Init() {
     return OnError("Unable to load prediction conf file: " +
                    FLAGS_prediction_conf_file);
   } else {
-    ADEBUG << "Config file is loaded into: "
+    ADEBUG << "Prediction config file is loaded into: "
            << prediction_conf_.ShortDebugString();
   }
 
-  // Initialize the adapters
+  adapter_conf_.Clear();
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_adapter_config_path,
+                                                &adapter_conf_)) {
+    return OnError("Unable to load adapter conf file: " +
+                   FLAGS_adapter_config_path);
+  } else {
+    ADEBUG << "Adapter config file is loaded into: "
+           << adapter_conf_.ShortDebugString();
+  }
+
+  // Initialization of all managers
   AdapterManager::instance()->Init();
+  ContainerManager::instance()->Init(adapter_conf_);
 
   CHECK(AdapterManager::GetLocalization())
       << "Localization is not ready.";
@@ -79,6 +90,7 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
       AdapterConfig::PERCEPTION_OBSTACLES));
+  CHECK_NOTNULL(obstacles_container);
   if (localization_adapter->Empty()) {
     ADEBUG << "No localization message.";
   } else {

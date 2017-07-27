@@ -11,6 +11,8 @@ cc_library(
         "//modules/common:apollo_app",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
