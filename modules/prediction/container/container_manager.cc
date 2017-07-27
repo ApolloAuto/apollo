@@ -23,6 +23,8 @@
 namespace apollo {
 namespace prediction {
 
+using ::apollo::common::adapter::AdapterConfig;
+
 ContainerManager::ContainerManager() {
   RegisterContainers();
 }
@@ -32,32 +34,34 @@ ContainerManager::~ContainerManager() {
 }
 
 void ContainerManager::RegisterContainers() {
-  RegisterContainer("PerceptionObstacles");
-  RegisterContainer("Pose");
+  RegisterContainer(AdapterConfig::PERCEPTION_OBSTACLES);
+  RegisterContainer(AdapterConfig::LOCALIZATION);
 }
 
-Container* ContainerManager::GetContainer(const std::string& name) {
-  if (containers_.find(name) != containers_.end()) {
-    return containers_[name].get();
+Container* ContainerManager::GetContainer(
+    const ::apollo::common::adapter::AdapterConfig::MessageType &type) {
+  if (containers_.find(type) != containers_.end()) {
+    return containers_[type].get();
   } else {
     return nullptr;
   }
 }
 
 std::unique_ptr<Container> ContainerManager::CreateContainer(
-    const std::string& name) {
+    const ::apollo::common::adapter::AdapterConfig::MessageType &type) {
   std::unique_ptr<Container> container_ptr(nullptr);
-  if (name == "PerceptionObstacles") {
+  if (type == AdapterConfig::PERCEPTION_OBSTACLES) {
     container_ptr.reset(new ObstaclesContainer());
-  } else if (name == "Pose") {
+  } else if (type == AdapterConfig::LOCALIZATION) {
     container_ptr.reset(new PoseContainer());
   }
   return container_ptr;
 }
 
-void ContainerManager::RegisterContainer(const std::string& name) {
-  containers_[name] = CreateContainer(name);
-  ADEBUG << "Container [" << name << "] is registered.";
+void ContainerManager::RegisterContainer(
+    const ::apollo::common::adapter::AdapterConfig::MessageType &type) {
+  containers_[type] = CreateContainer(type);
+  ADEBUG << "Container [" << type << "] is registered.";
 }
 
 }  // namespace prediction

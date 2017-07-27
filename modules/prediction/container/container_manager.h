@@ -22,11 +22,12 @@
 #ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
 #define MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
 
-#include <unordered_map>
+#include <map>
 #include <string>
 #include <memory>
 
 #include "modules/prediction/container/container.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/macro.h"
 
 /**
@@ -45,24 +46,27 @@ class ContainerManager {
 
   /**
    * @brief Get mutable container
-   * @param Name of the container
+   * @param Type of the container
    * @return Pointer to the container given the name
    */
-  Container* GetContainer(const std::string& name);
+  Container* GetContainer(
+      const ::apollo::common::adapter::AdapterConfig::MessageType &type);
 
  private:
   /**
    * @breif Register a container
-   * @param Container name
+   * @param Container type
    */
-  void RegisterContainer(const std::string& name);
+  void RegisterContainer(
+      const ::apollo::common::adapter::AdapterConfig::MessageType &type);
 
   /**
    * @brief Create a container
-   * @param Container name
+   * @param Container type
    * @return Container pointer
    */
-  std::unique_ptr<Container> CreateContainer(const std::string& name);
+  std::unique_ptr<Container> CreateContainer(
+      const ::apollo::common::adapter::AdapterConfig::MessageType &type);
 
   /**
    * @brief Register all containers
@@ -70,7 +74,8 @@ class ContainerManager {
   void RegisterContainers();
 
  private:
-  std::unordered_map<std::string, std::unique_ptr<Container>> containers_;
+  std::map<::apollo::common::adapter::AdapterConfig::MessageType,
+    std::unique_ptr<Container>> containers_;
 
   DECLARE_SINGLETON(ContainerManager)
 };

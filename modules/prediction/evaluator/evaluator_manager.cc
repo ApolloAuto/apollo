@@ -26,6 +26,7 @@ namespace prediction {
 
 using ::apollo::perception::PerceptionObstacles;
 using ::apollo::perception::PerceptionObstacle;
+using ::apollo::common::adapter::AdapterConfig;
 
 EvaluatorManager::EvaluatorManager() {
   RegisterEvaluators();
@@ -48,7 +49,8 @@ void EvaluatorManager::Run(
     const ::apollo::perception::PerceptionObstacles& perception_obstacles) {
   AINFO << "Start run evaluator manager";
   ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer("PerceptionObstacles"));
+      ContainerManager::instance()->GetContainer(
+      AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(container);
   AINFO << "Start for loop";
 

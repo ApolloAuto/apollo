@@ -73,7 +73,7 @@ class Prediction : public apollo::common::ApolloApp {
       const perception::PerceptionObstacles &perception_obstacles);
 
  private:
-  PredictionConf conf_;
+  PredictionConf prediction_conf_;
 };
 
 }  // namespace prediction
