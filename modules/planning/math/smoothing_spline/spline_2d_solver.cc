@@ -52,7 +52,7 @@ bool Spline2dSolver::solve() {
   const Eigen::MatrixXd& equality_constraint_boundary =
       constraint_.equality_constraint().constraint_boundary();
 
-  qp_solver_.reset(new apollo::common::math::ActiveSetQPSolver(
+  qp_solver_.reset(new apollo::common::math::ActiveSetQpSolver(
       kernel_matrix, offset, inequality_constraint_matrix,
       inequality_constraint_boundary, equality_constraint_matrix,
       equality_constraint_boundary));

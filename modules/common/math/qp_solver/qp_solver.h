@@ -33,9 +33,9 @@ namespace apollo {
 namespace common {
 namespace math {
 
-class QPSolver {
+class QpSolver {
  public:
-  QPSolver(const Eigen::MatrixXd& kernel_matrix, const Eigen::MatrixXd& offset,
+  QpSolver(const Eigen::MatrixXd& kernel_matrix, const Eigen::MatrixXd& offset,
            const Eigen::MatrixXd& affine_inequality_matrix,
            const Eigen::MatrixXd& affine_inequality_boundary,
            const Eigen::MatrixXd& affine_equality_matrix,

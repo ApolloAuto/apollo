@@ -24,8 +24,8 @@ namespace common {
 namespace math {
 
 using Matrix = Eigen::MatrixXd;
-using ::apollo::common::math::QPSolver;
-using ::apollo::common::math::ActiveSetQPSolver;
+using ::apollo::common::math::QpSolver;
+using ::apollo::common::math::ActiveSetQpSolver;
 
 // discrete linear predictive control solver, with control format
 // x(i + 1) = A * x(i) + B * u (i) + C
@@ -130,7 +130,7 @@ void SolveLinearMPC(const Matrix &matrix_a,
   Eigen::MatrixXd matrix_equality_boundary = Eigen::MatrixXd::Zero(
       matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
 
-  std::unique_ptr<QPSolver> qp_solver(new ActiveSetQPSolver(matrix_m1,
+  std::unique_ptr<QpSolver> qp_solver(new ActiveSetQpSolver(matrix_m1,
                 matrix_m2,
                 matrix_inequality_constrain,
                 matrix_inequality_boundary,

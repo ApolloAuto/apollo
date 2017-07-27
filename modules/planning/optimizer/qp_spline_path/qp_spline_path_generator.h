@@ -36,9 +36,9 @@
 namespace apollo {
 namespace planning {
 
-class QPSplinePathGenerator {
+class QpSplinePathGenerator {
  public:
-  QPSplinePathGenerator() = default;
+  QpSplinePathGenerator() = default;
   bool SetConfig(const std::string& config_file);
   bool generate(const ReferenceLine& reference_line,
                 const DecisionData& decision_data, const SpeedData& speed_data,
@@ -68,7 +68,7 @@ class QPSplinePathGenerator {
                                double* const y_diff) const;
 
  private:
-  QPSplinePathConfig _qp_spline_path_config;
+  QpSplinePathConfig _qp_spline_path_config;
   common::FrenetFramePoint _init_point;
   QpFrenetFrame _qp_frenet_frame;
   std::unique_ptr<Spline1dGenerator> _spline_generator;
