@@ -265,7 +265,7 @@ bool ReferenceLineSmoother::get_s_from_param_t(const double t,
 std::uint32_t ReferenceLineSmoother::find_index(const double t) const {
   auto upper_bound = std::upper_bound(t_knots_.begin() + 1, t_knots_.end(), t);
   return std::min(t_knots_.size() - 1,
-                  static_cast<size_t>(upper_bound - t_knots_.begin())) -
+                  static_cast<std::size_t>(upper_bound - t_knots_.begin())) -
          1;
 }
 

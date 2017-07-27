@@ -47,7 +47,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
     const auto& headings = lane_info_ptr->headings();
-    for (size_t i = 0; i < points.size(); ++i) {
+    for (std::size_t i = 0; i < points.size(); ++i) {
       ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, -2.0, 2.0);
     }
     reference_line_.reset(new ReferenceLine(ref_points));
