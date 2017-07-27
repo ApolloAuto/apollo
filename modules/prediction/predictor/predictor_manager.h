@@ -64,6 +64,17 @@ class PredictorManager {
   const PredictionObstacles& prediction_obstacles();
 
  private:
+  void RegisterPredictor(const ObstacleConf::PredictorType& type);
+
+  std::unique_ptr<Predictor> CreatePredictor(
+      const ObstacleConf::PredictorType& type);
+
+  void RegisterPredictors();
+
+ private:
+  std::map<ObstacleConf::PredictorType,
+      std::unique_ptr<Predictor>> predictors_;
+
   PredictionObstacles prediction_obstacles_;
 
   DECLARE_SINGLETON(PredictorManager)

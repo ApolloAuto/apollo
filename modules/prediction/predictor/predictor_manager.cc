@@ -15,6 +15,10 @@
  *****************************************************************************/
 
 #include "modules/prediction/predictor/predictor_manager.h"
+
+#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
+#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
+#include "modules/prediction/predictor/pedestrian/regional_predictor.h"
 #include "modules/prediction/predictor/predictor_factory.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
@@ -26,12 +30,23 @@ using ::apollo::perception::PerceptionObstacles;
 using ::apollo::perception::PerceptionObstacle;
 
 PredictorManager::PredictorManager() {
-  PredictorFactory::instance()->RegisterPredictor();
+  RegisterPredictors();
+}
+
+void PredictorManager::RegisterPredictors() {
+  RegisterPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
+  RegisterPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+  RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
 }
 
 Predictor* PredictorManager::GetPredictor(
     const ObstacleConf::PredictorType& type) {
-  return PredictorFactory::instance()->CreatePredictor(type).get();
+  // return PredictorFactory::instance()->CreatePredictor(type).get();
+  if (predictors_.find(type) != predictors_.end()) {
+    return predictors_[type].get();
+  } else {
+    return nullptr;
+  }
 }
 
 void PredictorManager::Run(
@@ -66,10 +81,10 @@ void PredictorManager::Run(
       }
     }
     PredictionObstacle prediction_obstacle;
-    // if (predictor != nullptr) {
-    //   predictor->Predict(obstacle);
-    //   prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
-    // }
+    if (predictor != nullptr) {
+      predictor->Predict(obstacle);
+      prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
+    }
     prediction_obstacle.mutable_perception_obstacle()->
         CopyFrom(perception_obstacle);
     prediction_obstacles_.add_prediction_obstacle()->
@@ -77,6 +92,35 @@ void PredictorManager::Run(
   }
   prediction_obstacles_.set_perception_error_code(
       perception_obstacles.error_code());
+}
+
+std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
+    const ObstacleConf::PredictorType& type) {
+  std::unique_ptr<Predictor> predictor_ptr(nullptr);
+  switch (type) {
+    case ObstacleConf::LANE_SEQUENCE_PREDICTOR: {
+      predictor_ptr.reset(new LaneSequencePredictor());
+      break;
+    }
+    case ObstacleConf::FREE_MOVE_PREDICTOR: {
+      predictor_ptr.reset(new FreeMovePredictor());
+      break;
+    }
+    case ObstacleConf::REGIONAL_PREDICTOR: {
+      predictor_ptr.reset(new RegionalPredictor());
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  return predictor_ptr;
+}
+
+void PredictorManager::RegisterPredictor(
+    const ObstacleConf::PredictorType& type) {
+  predictors_[type] = CreatePredictor(type);
+  ADEBUG << "Predictor [" << type << "] is registered.";
 }
 
 const PredictionObstacles& PredictorManager::prediction_obstacles() {

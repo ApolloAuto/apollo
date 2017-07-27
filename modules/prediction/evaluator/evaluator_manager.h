@@ -22,7 +22,8 @@
 #ifndef MODULES_PREDICTION_EVALUATOR_EVALUATOR_MANAGER_H_
 #define MODULES_PREDICTION_EVALUATOR_EVALUATOR_MANAGER_H_
 
-#include <unordered_map>
+#include <map>
+#include <memory>
 
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -51,6 +52,18 @@ class EvaluatorManager {
 
   void Run(
       const ::apollo::perception::PerceptionObstacles& perception_obstacles);
+
+ private:
+  void RegisterEvaluator(const ObstacleConf::EvaluatorType& type);
+
+  std::unique_ptr<Evaluator> CreateEvaluator(
+      const ObstacleConf::EvaluatorType& type);
+
+  void RegisterEvaluators();
+
+ private:
+  std::map<ObstacleConf::EvaluatorType,
+      std::unique_ptr<Evaluator>> evaluators_;
 
   DECLARE_SINGLETON(EvaluatorManager)
 };

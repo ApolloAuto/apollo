@@ -34,7 +34,6 @@ ContainerManager::~ContainerManager() {
 void ContainerManager::RegisterContainers() {
   RegisterContainer("PerceptionObstacles");
   RegisterContainer("Pose");
-  CHECK_NOTNULL(containers_["PerceptionObstacles"].get());
 }
 
 Container* ContainerManager::mutable_container(const std::string& name) {
