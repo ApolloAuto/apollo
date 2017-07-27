@@ -26,45 +26,28 @@ from map import Map
 
 from modules.planning.proto import planning_pb2
 
-REF_LINE_X = []
-REF_LINE_Y = []
-DP_LINE_X = []
-DP_LINE_Y = []
-QP_LINE_X = []
-QP_LINE_Y = []
+DATAX = {}
+DATAY = {}
 
 FLAGS = gflags.FLAGS
-gflags.DEFINE_integer("data_length", 80, "Control plot data length")
+gflags.DEFINE_integer("data_length", 500, "Control plot data length")
 
 
 def callback(data):
-    #print "callback()"
-    global REF_LINE_X, REF_LINE_Y
-    global DP_LINE_X, DP_LINE_Y
-    global QP_LINE_X, QP_LINE_Y
+    global DATAX, DATAY
     planning_pb = planning_pb2.ADCTrajectory()
     planning_pb.CopyFrom(data)
-
+    DATAX = {}
+    DATAY = {}
     for path_debug in planning_pb.debug.planning_data.path:
-        REF_LINE_X = []
-        REF_LINE_Y = []
-        DP_LINE_X = []
-        DP_LINE_Y = []
-        QP_LINE_X = []
-        QP_LINE_Y = []
-        #TODO(yifei) path name need to be updated
-        if path_debug.name == "planning_reference_line":
-            for path_point in path_debug.path:
-                REF_LINE_X.append(path_point.x)
-                REF_LINE_Y.append(path_point.y)
-        if path_debug.name == "dp":
-            for path_point in path_debug.path:
-                DP_LINE_X.append(path_point.x)
-                DP_LINE_Y.append(path_point.y)
-        if path_debug.name == "qp":
-            for path_point in path_debug.path:
-                QP_LINE_X.append(path_point.x)
-                QP_LINE_Y.append(path_point.y)
+        name = path_debug.name
+        DATAX[name] = []
+        DATAY[name] = []
+        for path_point in path_debug.path.path_point:
+            DATAX[name].append(path_point.x)
+            DATAY[name].append(path_point.y)
+        #print len(DATAX[name])
+        #print len(DATAY[name])
 
 
 def listener():
@@ -78,53 +61,38 @@ def compensate(data_list):
     if len(data_list) > FLAGS.data_length:
         data_list = data_list[0:FLAGS.data_length]
     else:
-        for i in range(FLAGS.data_length - len(data_list)):
-            data_list.append(data_list[-1])
+        diff = FLAGS.data_length - len(data_list)
+        last = data_list[-1]
+        for i in range(diff):
+            data_list.append(last)
     return data_list
 
 
 def update(frame_number):
-    #print frame_number, len(REF_LINE_X)
-    if len(REF_LINE_X) == 0:
-        ref_line.set_visible(False)
-    else:
-        ref_line.set_visible(True)
+    for line in line_pool:
+        line.set_visible(False)
+        line.set_label(None)
+    cnt = 0
+    for name in DATAX.keys():
+        if cnt >= len(line_pool):
+            print "Number of lines is more than 4! "
+            continue
+        line = line_pool[cnt]
+        line.set_visible(True)
+        line.set_xdata(compensate(DATAX[name]))
+        line.set_ydata(compensate(DATAY[name]))
+        line.set_label(name)
+        cnt += 1
 
-        ref_line_x = compensate(REF_LINE_X)
-        ref_line.set_xdata(ref_line_x)
-
-        ref_line_y = compensate(REF_LINE_Y)
-        ref_line.set_ydata(ref_line_y)
-
-    if len(DP_LINE_X) == 0:
-        dp_line.set_visible(False)
-    else:
-        dp_line.set_visible(True)
-
-        dp_line_x = compensate(DP_LINE_X)
-        dp_line.set_xdata(dp_line_x)
-
-        dp_line_y = compensate(DP_LINE_Y)
-        dp_line.set_ydata(dp_line_y)
-
-    if len(QP_LINE_X) == 0:
-        qp_line.set_visible(False)
-    else:
-        qp_line.set_visible(True)
-
-        qp_line_x = compensate(QP_LINE_X)
-        qp_line.set_xdata(qp_line_x)
-
-        qp_line_y = compensate(QP_LINE_Y)
-        qp_line.set_ydata(qp_line_y)
     ax.relim()
     # update ax.viewLim using the new dataLim
     ax.autoscale_view()
+    ax.legend(loc="upper left")
 
 
 if __name__ == '__main__':
     argv = FLAGS(sys.argv)
-    #listener()
+    listener()
     fig, ax = plt.subplots()
     X = range(FLAGS.data_length)
     Xs = [i * -1 for i in X]
@@ -136,17 +104,25 @@ if __name__ == '__main__':
     central_y = sum(ax.get_ylim())/2
     central_x = sum(ax.get_xlim())/2
 
-    ref_line, = ax.plot(
+    line_pool = []
+    line1, = ax.plot(
         [central_x] * FLAGS.data_length, [central_y] * FLAGS.data_length,
-        'b', lw=3, alpha=0.5, label='reference')
-    dp_line, = ax.plot(
+        'b', lw=3, alpha=0.5)
+    line2, = ax.plot(
         [central_x] * FLAGS.data_length, [central_y] * FLAGS.data_length,
-        'g', lw=3, alpha=0.5, label='dp path')
-    qp_line, = ax.plot(
+        'g', lw=3, alpha=0.5)
+    line3, = ax.plot(
         [central_x] * FLAGS.data_length, [central_y] * FLAGS.data_length,
-        'r', lw=3, alpha=0.5, label='qp path')
+        'r', lw=3, alpha=0.5)
+    line4, = ax.plot(
+        [central_x] * FLAGS.data_length, [central_y] * FLAGS.data_length,
+        'k', lw=3, alpha=0.5)
+    line_pool.append(line1)
+    line_pool.append(line2)
+    line_pool.append(line3)
+    line_pool.append(line4)
 
-    ani = animation.FuncAnimation(fig, update, interval=100)
+    ani = animation.FuncAnimation(fig, update, interval=200)
 
     ax.legend(loc="upper left")
     ax.axis('equal')
