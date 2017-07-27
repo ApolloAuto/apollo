@@ -34,11 +34,10 @@ class PathSampler {
  public:
   explicit PathSampler(const DpPolyPathConfig &config);
   ~PathSampler() = default;
-  apollo::common::Status sample(
-      const ReferenceLine &reference_line,
-      const ::apollo::common::TrajectoryPoint &init_point,
-      const common::SLPoint &init_sl_point,
-      std::vector<std::vector<common::SLPoint>> *const points);
+  bool sample(const ReferenceLine &reference_line,
+              const common::TrajectoryPoint &init_point,
+              const common::SLPoint &init_sl_point,
+              std::vector<std::vector<common::SLPoint>> *const points);
 
  private:
   DpPolyPathConfig _config;
