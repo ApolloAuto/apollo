@@ -18,20 +18,15 @@
 
 import sys
 import rospy
-import gflags
-from gflags import FLAGS
+import argparse
+import threading
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from map import Map
-import threading
 from modules.planning.proto import planning_pb2
 
 DATAX = {}
 DATAY = {}
-
-FLAGS = gflags.FLAGS
-gflags.DEFINE_integer("data_length", 500, "Control plot data length")
-
 PATHLOCK = threading.Lock()
 line_pool = []
 line_pool_size = 4
@@ -56,7 +51,7 @@ def callback(data):
     PATHLOCK.release()
 
 
-def listener():
+def add_listener():
     rospy.init_node('plot_planning', anonymous=True)
     rospy.Subscriber('/apollo/planning',
                      planning_pb2.ADCTrajectory,
@@ -96,12 +91,18 @@ def init_line_pool(central_x, central_y):
 
 
 if __name__ == '__main__':
-    argv = FLAGS(sys.argv)
-    listener()
-    fig, ax = plt.subplots()
+    parser = argparse.ArgumentParser(
+        description="plot_planning is a tool to display planning trajs on a map.",
+        prog="plot_planning.py")
+    parser.add_argument(
+        "-m", "--map", action="store", type=str, required=True,
+        help="Specify the map file in txt or binary format")
+    args = parser.parse_args()
 
+    add_listener()
+    fig, ax = plt.subplots()
     map = Map()
-    map.load("../../map/data/base_map.txt")
+    map.load(args.map)
     map.draw_lanes(ax, False, [])
     central_y = sum(ax.get_ylim())/2
     central_x = sum(ax.get_xlim())/2
