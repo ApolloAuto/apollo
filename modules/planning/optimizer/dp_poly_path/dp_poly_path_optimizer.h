@@ -34,10 +34,10 @@ class DpPolyPathOptimizer : public PathOptimizer {
  public:
   explicit DpPolyPathOptimizer(const std::string &name);
 
-  virtual bool Init() override;
+  bool Init() override;
 
  private:
-  virtual apollo::common::Status Process(
+  apollo::common::Status Process(
       const SpeedData &speed_data, const ReferenceLine &reference_line,
       const common::TrajectoryPoint &init_point,
       DecisionData *const decision_data, PathData *const path_data) override;

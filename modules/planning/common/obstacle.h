@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_OBSTACLE_H_
 #define MODULES_PLANNING_COMMON_OBSTACLE_H_
 
+#include <string>
 #include <vector>
 
 #include "modules/common/math/box2d.h"

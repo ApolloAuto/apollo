@@ -20,6 +20,7 @@
 #ifndef MODULES_PLANNING_COMMON_SPEED_SPEED_DATA_H_
 #define MODULES_PLANNING_COMMON_SPEED_SPEED_DATA_H_
 
+#include <string>
 #include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
@@ -31,7 +32,7 @@ class SpeedData {
  public:
   SpeedData() = default;
 
-  SpeedData(std::vector<SpeedPoint> speed_points);
+  explicit SpeedData(const std::vector<SpeedPoint>& speed_points);
 
   const std::vector<SpeedPoint>& speed_vector() const;
 

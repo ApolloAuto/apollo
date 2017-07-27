@@ -86,8 +86,8 @@ bool PlanningData::aggregate(const double time_resolution,
             cur_rel_time);
 
     common::PathPoint path_point;
-    // TODO temp fix speed point s out of path point bound, need further refine
-    // later
+    // TODO(all): temp fix speed point s out of path point bound, need further
+    // refine later
     if (speed_point.s() > path_data_.path().param_length()) {
       break;
     }

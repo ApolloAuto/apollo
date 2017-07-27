@@ -19,10 +19,12 @@
  * @brief: natural coordinate system
  **/
 
-#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_
-#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_FRENET_FRAME_H_
+#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_FRENET_FRAME_H_
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 #include "Eigen/Core"
 
@@ -35,10 +37,6 @@
 
 namespace apollo {
 namespace planning {
-
-namespace {
-constexpr double kEpsilontol = 1e-6;
-}
 
 class QpFrenetFrame {
  public:
@@ -128,7 +126,8 @@ class QpFrenetFrame {
   std::vector<std::pair<double, double>> _static_obstacle_bound;
   std::vector<std::pair<double, double>> _dynamic_obstacle_bound;
 };
+
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_QP_FRENET_FRAME_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_FRENET_FRAME_H_

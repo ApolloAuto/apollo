@@ -51,7 +51,8 @@ class Spline1d {
   double third_order_derivative(const double x) const;
 
   // @brief: set spline segments
-  bool set_spline_segs(const Eigen::MatrixXd& params, const std::uint32_t order);
+  bool set_spline_segs(const Eigen::MatrixXd& params,
+                       const std::uint32_t order);
   Spline1dSeg* mutable_smoothing_spline(const std::uint32_t index);
 
   const std::vector<double>& x_knots() const;

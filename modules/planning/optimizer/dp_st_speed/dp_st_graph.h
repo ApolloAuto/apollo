@@ -39,7 +39,7 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const DpStSpeedConfig& dp_config);
+  explicit DpStGraph(const DpStSpeedConfig& dp_config);
 
   apollo::common::Status search(const StGraphData& st_graph_data,
                                 DecisionData* const decision_data,

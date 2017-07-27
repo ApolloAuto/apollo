@@ -20,6 +20,9 @@
 
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 
+#include <algorithm>
+#include <vector>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state.h"

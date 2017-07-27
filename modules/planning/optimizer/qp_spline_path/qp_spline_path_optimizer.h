@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_H_
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_OPTIMIZER_H_
 
+#include <string>
+
 #include "modules/planning/optimizer/path_optimizer.h"
 
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
@@ -31,7 +33,7 @@ namespace planning {
 class QPSplinePathOptimizer : public PathOptimizer {
  public:
   explicit QPSplinePathOptimizer(const std::string& name);
-  virtual bool Init() override;
+  bool Init() override;
 
  private:
   apollo::common::Status Process(const SpeedData& speed_data,

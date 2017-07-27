@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_PATH_PATH_DATA_H_
 #define MODULES_PLANNING_COMMON_PATH_PATH_DATA_H_
 
+#include <string>
 #include <vector>
 
 #include "modules/planning/common/path/discretized_path.h"

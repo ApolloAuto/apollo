@@ -17,6 +17,9 @@
 /**
  * @file qp_spline_path_generator.cpp
  **/
+#include <algorithm>
+#include <utility>
+#include <vector>
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -131,7 +134,7 @@ bool QPSplinePathGenerator::generate(const ReferenceLine& reference_line,
     path_points.push_back(std::move(path_point));
   }
   *(path_data->mutable_path()->mutable_path_points()) = path_points;
-  // TODO: refine the path init point mapping error;
+  // TODO(all): refine the path init point mapping error;
   return true;
 }
 
@@ -144,7 +147,7 @@ bool QPSplinePathGenerator::calculate_sl_point(
           {traj_point.path_point().x(), traj_point.path_point().y()},
           &sl_point)) {
     return false;
-  };
+  }
   frenet_frame_point->set_s(sl_point.s());
   frenet_frame_point->set_l(sl_point.l());
   const double theta = traj_point.path_point().theta();
@@ -170,7 +173,7 @@ bool QPSplinePathGenerator::calculate_sl_point(
 
 bool QPSplinePathGenerator::init_coord_range(double* const start_s,
                                              double* const end_s) {
-  // TODO: step 1 get current sl coordinate - with init coordinate point
+  // TODO(all): step 1 get current sl coordinate - with init coordinate point
   double start_point = std::max(_init_point.s() - 5.0, 0.0);
 
   const ReferenceLine* reference_line = _qp_frenet_frame.reference_line();
@@ -195,7 +198,7 @@ bool QPSplinePathGenerator::init_smoothing_spline(
   std::uint32_t num_knots = _qp_spline_path_config.number_of_spline();
   QPSplinePathSimpleSampler simple_sampler;
 
-  // TODO refine here, add end_s tolorence here
+  // TODO(all): refine here, add end_s tolorence here
   std::vector<double> sampling_point;
   if (!simple_sampler.sample(_init_point, reference_line, num_knots, start_s,
                              end_s - 0.1, &sampling_point)) {
@@ -303,7 +306,7 @@ bool QPSplinePathGenerator::setup_kernel() {
         _qp_spline_path_config.third_derivative_weight());
   }
 
-  // TODO: Add reference line kernel here
+  // TODO(all): Add reference line kernel here
   return true;
 }
 

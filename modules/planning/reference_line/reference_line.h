@@ -56,7 +56,7 @@ class ReferenceLine {
   double get_lane_width(const double s) const;
   bool is_on_road(const common::SLPoint& sl_point) const;
 
-  double length() const { return reference_map_line_.length(); };
+  double length() const { return reference_map_line_.length(); }
 
   std::string DebugString() const;
 

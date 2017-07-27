@@ -18,23 +18,26 @@
  * @file speed_data.cc
  **/
 
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/speed/speed_data.h"
 
 #include <algorithm>
 #include <sstream>
+#include <utility>
 
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
 
 namespace {
+
 bool speed_time_comp(const double t, const SpeedPoint& speed_point) {
   return t < speed_point.t();
 }
-}
+
+}  // namespace
 
 void SpeedData::add_speed_point(const double s, const double time,
                                 const double v, const double a,
@@ -42,8 +45,8 @@ void SpeedData::add_speed_point(const double s, const double time,
   speed_vector_.push_back(util::MakeSpeedPoint(s, time, v, a, da));
 }
 
-SpeedData::SpeedData(std::vector<SpeedPoint> speed_points) {
-  speed_vector_ = std::move(speed_points);
+SpeedData::SpeedData(const std::vector<SpeedPoint>& speed_points)
+    : speed_vector_(speed_points) {
 }
 
 const std::vector<SpeedPoint>& SpeedData::speed_vector() const {

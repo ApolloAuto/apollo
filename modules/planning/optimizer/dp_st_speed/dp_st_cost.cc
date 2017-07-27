@@ -36,7 +36,7 @@ DpStCost::DpStCost(const DpStSpeedConfig& dp_st_configuration)
             _dp_st_configuration.matrix_dimension_t();
 }
 
-// TODO : normalize cost with time
+// TODO(all): normalize cost with time
 double DpStCost::obstacle_cost(
     const STPoint& point,
     const std::vector<StGraphBoundary>& obs_boundary) const {

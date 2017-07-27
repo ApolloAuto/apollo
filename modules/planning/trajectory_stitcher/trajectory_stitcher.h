@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_TRAJECTORY_STITCHER_H_
 #define MODULES_PLANNING_TRAJECTORY_STITCHER_H_
 
+#include <vector>
+
 #include "modules/common/proto/path_point.pb.h"
 
 #include "modules/common/vehicle_state/vehicle_state.h"

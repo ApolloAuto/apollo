@@ -22,7 +22,7 @@
 
 #include <fstream>
 #include <utility>
-#include <utility>
+#include <vector>
 
 #include "modules/map/proto/map_id.pb.h"
 
@@ -31,7 +31,6 @@
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 

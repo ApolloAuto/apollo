@@ -21,6 +21,7 @@
 #include "modules/planning/common/object_table.h"
 
 #include <memory>
+#include <utility>
 
 #include "modules/common/log.h"
 
