@@ -49,16 +49,18 @@ EMPlanner::EMPlanner() {}
 
 void EMPlanner::RegisterOptimizers() {
   optimizer_factory_.Register(DP_POLY_PATH_OPTIMIZER, []() -> Optimizer* {
-    return new DpPolyPathOptimizer("DpPolyPathOptimizer");
+    return new DpPolyPathOptimizer(OptimizerType_Name(DP_POLY_PATH_OPTIMIZER));
   });
   optimizer_factory_.Register(DP_ST_SPEED_OPTIMIZER, []() -> Optimizer* {
-    return new DpStSpeedOptimizer("DpStSpeedOptimizer");
+    return new DpStSpeedOptimizer(OptimizerType_Name(DP_ST_SPEED_OPTIMIZER));
   });
   optimizer_factory_.Register(QP_SPLINE_PATH_OPTIMIZER, []() -> Optimizer* {
-    return new QpSplinePathOptimizer("QpSplinePathOptimizer");
+    return new QpSplinePathOptimizer(
+        OptimizerType_Name(QP_SPLINE_PATH_OPTIMIZER));
   });
   optimizer_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Optimizer* {
-    return new QpSplineStSpeedOptimizer("QpSplineStSpeedOptimizer");
+    return new QpSplineStSpeedOptimizer(
+        OptimizerType_Name(QP_SPLINE_ST_SPEED_OPTIMIZER));
   });
 }
 
@@ -100,6 +102,21 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
     optimizer->Optimize(planning_data);
     ADEBUG << "after optimizer " << optimizer->name() << ":"
            << planning_data->DebugString();
+
+    if (FLAGS_enable_record_debug) {
+      // Save each path after path-optimizers .
+      OptimizerType type;
+      CHECK(OptimizerType_Parse(optimizer->name(), &type));
+      if (type == DP_POLY_PATH_OPTIMIZER || type == QP_SPLINE_PATH_OPTIMIZER) {
+        const auto& path_points =
+            planning_data->path_data().path().path_points();
+        auto* optimized_path =
+            trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
+        optimized_path->set_name(optimizer->name());
+        optimized_path->mutable_path()->mutable_path_point()->CopyFrom({
+            path_points.begin(), path_points.end()});
+      }
+    }
   }
   PublishableTrajectory computed_trajectory;
   if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution,
