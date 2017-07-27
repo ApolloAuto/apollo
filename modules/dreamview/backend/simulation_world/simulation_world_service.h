@@ -106,7 +106,7 @@ class SimulationWorldService {
   template <typename DataType>
   void UpdateSimulationWorld(const DataType &data);
 
-  Object &CreateWorldObject(
+  Object &CreateWorldObjectIfAbsent(
       const apollo::perception::PerceptionObstacle &obstacle);
   void UpdatePlanningTrajectory(
       const apollo::planning::ADCTrajectory &trajectory);
@@ -172,6 +172,7 @@ class SimulationWorldService {
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePerceptionObstacles);
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePlanningTrajectory);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateDecision);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdatePrediction);
 };
 
 }  // namespace dreamview
