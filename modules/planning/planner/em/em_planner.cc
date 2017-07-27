@@ -81,8 +81,9 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
-                           ADCTrajectory* trajectory_pb) {
+Status EMPlanner::MakePlan(
+    const TrajectoryPoint& start_point,
+    std::vector<TrajectoryPoint>* discretized_trajectory) {
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
 
@@ -109,7 +110,7 @@ Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   frame->set_computed_trajectory(computed_trajectory);
-  computed_trajectory.populate_trajectory_protobuf(trajectory_pb);
+  *discretized_trajectory = computed_trajectory.trajectory_points();
   return Status::OK();
 }
 
