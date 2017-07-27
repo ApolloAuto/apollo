@@ -32,6 +32,8 @@
 namespace apollo {
 namespace planning {
 
+constexpr double kEpsilontol = 1e-6;
+
 bool QpFrenetFrame::Init(const ReferenceLine& reference_line,
                          const DecisionData& decision_data,
                          const SpeedData& speed_data,
@@ -152,7 +154,7 @@ bool QpFrenetFrame::find_longitudinal_distance(const double time,
 
   if (!_speed_profile->get_speed_point_with_time(time, speed_point)) {
     return false;
-  };
+  }
 
   return true;
 }

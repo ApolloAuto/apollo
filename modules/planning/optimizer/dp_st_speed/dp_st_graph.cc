@@ -20,7 +20,9 @@
 
 #include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 
+#include <algorithm>
 #include <limits>
+#include <string>
 
 #include "modules/common/log.h"
 #include "modules/planning/common/data_center.h"
@@ -111,7 +113,7 @@ Status DpStGraph::init_cost_table() {
 
 Status DpStGraph::calculate_pointwise_cost(
     const std::vector<StGraphBoundary>& boundaries) {
-  // TODO: extract reference line from decision first
+  // TODO(all): extract reference line from decision first
   std::vector<STPoint> reference_points;
   for (std::uint32_t i = 0; i < _cost_table.size(); ++i) {
     reference_points.emplace_back(_unit_t * i * _dp_st_speed_config.max_speed(),
@@ -155,7 +157,7 @@ void DpStGraph::calculate_total_cost(const std::uint32_t r,
 
     return;
   }
-  // TODO: get speed limit from mapper @Liu Changchun
+  // TODO(all): get speed limit from mapper @Liu Changchun
   double speed_limit = _dp_st_speed_config.max_speed();
   if (r == 1) {
     _cost_table[r][c].set_total_cost(
@@ -221,7 +223,7 @@ bool DpStGraph::feasible_accel_range(const double c_pre, const double c_cur,
                                      std::uint32_t* const lower_bound,
                                      std::uint32_t* const upper_bound) const {
   double tcoef = _unit_t * _unit_t / _unit_s;
-  // TODO change 4.5 to configurable version
+  // TODO(all): change 4.5 to configurable version
   double lval = std::max(
       2 * c_pre - c_cur + _dp_st_speed_config.max_deceleration() * tcoef, 0.0);
   double rval = std::min(

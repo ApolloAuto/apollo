@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_COMMON_TRAJECTORY_DISCRETIZED_TRAJECTORY_H
 #define MODULES_PLANNING_COMMON_TRAJECTORY_DISCRETIZED_TRAJECTORY_H
 
+#include <vector>
+
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/trajectory/trajectory.h"
 
@@ -36,14 +38,14 @@ class DiscretizedTrajectory : public Trajectory {
 
   virtual ~DiscretizedTrajectory() = default;
 
-  virtual double time_length() const override;
+  double time_length() const override;
 
-  virtual apollo::common::TrajectoryPoint evaluate(
+  apollo::common::TrajectoryPoint evaluate(
       const double relative_time) const override;
 
-  virtual apollo::common::TrajectoryPoint start_point() const override;
+  apollo::common::TrajectoryPoint start_point() const override;
 
-  virtual apollo::common::TrajectoryPoint end_point() const override;
+  apollo::common::TrajectoryPoint end_point() const override;
 
   virtual apollo::common::TrajectoryPoint evaluate_linear_approximation(
       const double relative_time) const;

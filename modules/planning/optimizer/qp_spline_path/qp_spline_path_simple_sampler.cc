@@ -20,6 +20,8 @@
 
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_simple_sampler.h"
 
+#include <algorithm>
+
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
@@ -31,7 +33,7 @@ bool QPSplinePathSimpleSampler::sample(
     const ReferenceLine& reference_line,
     const std::uint32_t number_of_sampling_point, const double s_lower_bound,
     const double s_upper_bound, std::vector<double>* const sampling_point) {
-  // TODO: Haoyang Fan, change to a configurable version
+  // TODO(all): Haoyang Fan, change to a configurable version
   double sampling_distance =
       std::min(reference_line.reference_map_line().length(), s_upper_bound) -
       init_point.s();

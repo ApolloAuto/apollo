@@ -62,7 +62,7 @@ void OptimizerTestBase::SetUp() {
 }
 
 void OptimizerTestBase::export_sl_points(
-    std::vector<std::vector<common::SLPoint>>& points,
+    const std::vector<std::vector<common::SLPoint>>& points,
     const std::string& filename) {
   std::ofstream ofs(filename);
   ofs << "level, s, l" << std::endl;

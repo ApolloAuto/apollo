@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_COMMON_SPEED_ST_POINT_H_
 #define MODULES_PLANNING_COMMON_SPEED_ST_POINT_H_
 
+#include <string>
+
 #include "modules/common/math/vec2d.h"
 
 namespace apollo {

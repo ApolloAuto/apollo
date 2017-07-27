@@ -21,6 +21,7 @@
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_graph.h"
 
 #include <algorithm>
+#include <string>
 #include <utility>
 
 #include "modules/common/log.h"
@@ -47,9 +48,8 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
         st_graph_data.path_data_length());
   }
 
-  // TODO: update speed limit here
-  // TODO: update config through veh physical limit here
-  // generate knots
+  // TODO(all): update speed limit here
+  // TODO(all): update config through veh physical limit here generate knots
   std::vector<double> t_knots;
   double t_resolution = _qp_spline_st_speed_config.total_time() /
                         _qp_spline_st_speed_config.number_of_discrete_graph_t();
@@ -167,7 +167,7 @@ Status QpSplineStGraph::apply_constraint(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  // TODO: add speed constraint
+  // TODO(all): add speed constraint
   return Status::OK();
 }
 
@@ -189,7 +189,7 @@ Status QpSplineStGraph::apply_kernel() {
         _qp_spline_st_speed_config.jerk_kernel_weight());
   }
 
-  // TODO add reference speed profile for different main decision
+  // TODO(all): add reference speed profile for different main decision
   std::vector<double> t_knots;
   std::vector<double> s_vec;
   double t_resolution = _qp_spline_st_speed_config.total_time() /

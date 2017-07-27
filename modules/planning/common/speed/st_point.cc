@@ -27,7 +27,7 @@
 namespace apollo {
 namespace planning {
 
-STPoint::STPoint(const double s, const double t) : Vec2d(t, s){};
+STPoint::STPoint(const double s, const double t) : Vec2d(t, s) {}
 
 double STPoint::s() const { return y_; }
 
