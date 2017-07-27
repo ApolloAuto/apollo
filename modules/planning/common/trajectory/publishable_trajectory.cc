@@ -50,11 +50,16 @@ void PublishableTrajectory::set_header_time(const double header_time) {
 ADCTrajectory PublishableTrajectory::to_trajectory_protobuf() const {
   ADCTrajectory trajectory_pb;
   trajectory_pb.mutable_header()->set_timestamp_sec(_header_time);
-  for (const auto& tp : _trajectory_points) {
-    auto* trajectory_point = trajectory_pb.add_trajectory_point();
-    trajectory_point->CopyFrom(tp);
-  }
+  trajectory_pb.mutable_trajectory_point()->MergeFrom(
+      {_trajectory_points.begin(), _trajectory_points.end()});
   return trajectory_pb;
+}
+
+void PublishableTrajectory::populate_trajectory_protobuf(
+    ADCTrajectory* trajectory_pb) const {
+  trajectory_pb->mutable_header()->set_timestamp_sec(_header_time);
+  trajectory_pb->mutable_trajectory_point()->MergeFrom(
+      {_trajectory_points.begin(), _trajectory_points.end()});
 }
 
 }  // namespace planning
