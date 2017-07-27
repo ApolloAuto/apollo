@@ -17,6 +17,7 @@
 #include "modules/planning/planning.h"
 
 #include <algorithm>
+#include <google/protobuf/repeated_field.h>
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
@@ -130,7 +131,6 @@ void Planning::RunOnce() {
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
   common::VehicleState::instance()->Update(localization, chassis);
-  bool is_on_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
 
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   // the execution_start_time is the estimated time when the planned trajectory
@@ -145,12 +145,13 @@ void Planning::RunOnce() {
     return;
   }
 
-  std::vector<TrajectoryPoint> planning_trajectory;
-  bool res_planning =
-      Plan(is_on_auto_mode, execution_start_time, &planning_trajectory);
+  ADCTrajectory trajectory_pb;
+  bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
+  bool res_planning = Plan(is_auto_mode, execution_start_time, &trajectory_pb);
   if (res_planning) {
-    ADCTrajectory trajectory_pb =
-        ToADCTrajectory(execution_start_time, planning_trajectory);
+    AdapterManager::FillPlanningHeader("planning",
+                                       trajectory_pb.mutable_header());
+    trajectory_pb.mutable_header()->set_timestamp_sec(execution_start_time);
     AdapterManager::PublishPlanning(trajectory_pb);
     ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
   } else {
@@ -161,7 +162,7 @@ void Planning::RunOnce() {
 void Planning::Stop() {}
 
 bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
-                    std::vector<TrajectoryPoint>* planning_trajectory) {
+                    ADCTrajectory* trajectory_pb) {
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   double execution_start_time = publish_time;
 
@@ -190,7 +191,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     if (position_deviation < FLAGS_replanning_threshold) {
       // planned trajectory from the matched point, the matched point has
       // relative time 0.
-      auto status = planner_->MakePlan(matched_point, planning_trajectory);
+      auto status = planner_->MakePlan(matched_point, trajectory_pb);
 
       if (!status.ok()) {
         last_trajectory_.clear();
@@ -199,14 +200,12 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
 
       // a segment of last trajectory to be attached to planned trajectory in
       // case controller needs.
-      auto overhead_trajectory = GetOverheadTrajectory(
-          matched_index, (std::uint32_t)FLAGS_rtk_trajectory_backward);
-      planning_trajectory->insert(planning_trajectory->begin(),
-                                  overhead_trajectory.begin(),
-                                  overhead_trajectory.end());
+      GetOverheadTrajectory(matched_index, FLAGS_rtk_trajectory_backward,
+                            trajectory_pb);
 
       // store the planned trajectory and header info for next planning cycle.
-      last_trajectory_ = *planning_trajectory;
+      last_trajectory_ = {trajectory_pb->trajectory_point().begin(),
+                          trajectory_pb->trajectory_point().end()};
       last_header_time_ = execution_start_time;
       return true;
     }
@@ -219,13 +218,14 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   TrajectoryPoint vehicle_state_point =
       ComputeStartingPointFromVehicleState(planning_cycle_time);
 
-  auto status = planner_->MakePlan(vehicle_state_point, planning_trajectory);
+  auto status = planner_->MakePlan(vehicle_state_point, trajectory_pb);
   if (!status.ok()) {
     last_trajectory_.clear();
     return false;
   }
   // store the planned trajectory and header info for next planning cycle.
-  last_trajectory_ = *planning_trajectory;
+  last_trajectory_ = {trajectory_pb->trajectory_point().begin(),
+                      trajectory_pb->trajectory_point().end()};
   last_header_time_ = execution_start_time;
   return true;
 }
@@ -278,12 +278,13 @@ void Planning::Reset() {
   last_trajectory_.clear();
 }
 
-std::vector<TrajectoryPoint> Planning::GetOverheadTrajectory(
-    const std::uint32_t matched_index, const std::uint32_t buffer_size) {
+void Planning::GetOverheadTrajectory(const std::uint32_t matched_index,
+                                     const std::uint32_t buffer_size,
+                                     ADCTrajectory* trajectory_pb) {
   const std::uint32_t start_index =
       matched_index < buffer_size ? 0 : matched_index - buffer_size;
 
-  std::vector<TrajectoryPoint> overhead_trajectory(
+  google::protobuf::RepeatedPtrField<TrajectoryPoint> overhead_trajectory(
       last_trajectory_.begin() + start_index,
       last_trajectory_.begin() + matched_index);
 
@@ -292,23 +293,10 @@ std::vector<TrajectoryPoint> Planning::GetOverheadTrajectory(
   for (auto& p : overhead_trajectory) {
     p.set_relative_time(p.relative_time() - zero_relative_time);
   }
-  return overhead_trajectory;
-}
 
-ADCTrajectory Planning::ToADCTrajectory(
-    const double header_time,
-    const std::vector<TrajectoryPoint>& discretized_trajectory) {
-  ADCTrajectory trajectory_pb;
-  AdapterManager::FillPlanningHeader("planning",
-                                     trajectory_pb.mutable_header());
-
-  trajectory_pb.mutable_header()->set_timestamp_sec(header_time);
-
-  for (const auto& trajectory_point : discretized_trajectory) {
-    auto ptr_trajectory_point_pb = trajectory_pb.add_trajectory_point();
-    ptr_trajectory_point_pb->CopyFrom(trajectory_point);
-  }
-  return std::move(trajectory_pb);
+  // Insert the overhead_trajectory to the head of trajectory_pb.
+  overhead_trajectory.MergeFrom(trajectory_pb->trajectory_point());
+  trajectory_pb->mutable_trajectory_point()->Swap(&overhead_trajectory);
 }
 
 }  // namespace planning
