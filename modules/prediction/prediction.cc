@@ -97,8 +97,11 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   obstacles_container->Insert(perception_obstacles);
   EvaluatorManager::instance()->Run(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
-  AdapterManager::PublishPrediction(
-      PredictorManager::instance()->prediction_obstacles());
+  const PredictionObstacles& prediction_obstacles =
+      PredictorManager::instance()->prediction_obstacles();
+  AdapterManager::PublishPrediction(prediction_obstacles);
+  ADEBUG << "Published a prediction message ["
+         << prediction_obstacles.ShortDebugString() << "].";
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
