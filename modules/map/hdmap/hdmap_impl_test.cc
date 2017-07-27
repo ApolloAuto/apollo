@@ -22,7 +22,8 @@ limitations under the License.
 
 namespace {
 
-constexpr char kMapFilename[] = "modules/map/hdmap/test-data/map_data.dat.v2";
+constexpr char kMapFilename[] =
+                          "modules/map/hdmap/test-data/map_data.dat.v2.bin";
 constexpr char kBoundaryMapFilename[] =
                           "modules/map/hdmap/test-data/map_road_boundary.txt";
 
