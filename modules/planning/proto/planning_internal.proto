@@ -2,11 +2,13 @@ syntax = "proto2";
 
 package apollo.planning_internal;
 
+import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/header.proto";
 import "modules/common/proto/error_code.proto";
 import "modules/common/proto/path_point.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/localization/proto/pose.proto";
+import "modules/map/proto/routing.proto";
 import "modules/perception/proto/perception_obstacle.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
@@ -85,9 +87,15 @@ message PathDebug {
   optional apollo.common.Path path = 2;
 }
 
-// next id: 7
+// next id: 10
 message PlanningData {
   optional apollo.common.Header header = 1;
+
+  // input
+  optional apollo.localization.LocalizationEstimate adc_position = 7;
+  optional apollo.canbus.Chassis chassis = 8;
+  optional apollo.hdmap.RoutingResult routing = 9;
+
   optional apollo.localization.Pose init_status = 2;  // initial status of adc
   // processed planning_obstacles
   repeated PlanningObstacle planning_obstacle = 4;
