@@ -29,6 +29,7 @@ namespace prediction {
 
 using ::apollo::perception::PerceptionObstacles;
 using ::apollo::perception::PerceptionObstacle;
+using ::apollo::common::adapter::AdapterConfig;
 
 PredictorManager::PredictorManager() {
   RegisterPredictors();
@@ -53,7 +54,8 @@ void PredictorManager::Run(
     const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles_.Clear();
   ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer("PerceptionObstacles"));
+      ContainerManager::instance()->GetContainer(
+      AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(container);
 
   Predictor *predictor = nullptr;

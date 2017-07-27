@@ -33,21 +33,24 @@ namespace prediction {
 using ::apollo::perception::PerceptionObstacles;
 using ::apollo::localization::LocalizationEstimate;
 using ::apollo::common::adapter::AdapterManager;
+using ::apollo::common::adapter::AdapterConfig;
 using ::apollo::common::Status;
 using ::apollo::common::ErrorCode;
 
-std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
+std::string Prediction::Name() const {
+  return FLAGS_prediction_module_name;
+}
 
 Status Prediction::Init() {
   // Load prediction conf
-  conf_.Clear();
+  prediction_conf_.Clear();
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
-                                                &conf_)) {
+                                                &prediction_conf_)) {
     return OnError("Unable to load prediction conf file: " +
                    FLAGS_prediction_conf_file);
   } else {
     ADEBUG << "Config file is loaded into: "
-           << conf_.ShortDebugString();
+           << prediction_conf_.ShortDebugString();
   }
 
   // Initialize the adapters
@@ -74,7 +77,8 @@ void Prediction::Stop() {}
 void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   auto localization_adapter = AdapterManager::GetLocalization();
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer("PerceptionObstacles"));
+      ContainerManager::instance()->GetContainer(
+      AdapterConfig::PERCEPTION_OBSTACLES));
   if (localization_adapter->Empty()) {
     ADEBUG << "No localization message.";
   } else {
@@ -84,7 +88,8 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
            << localization.ShortDebugString()
            << "].";
     PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-        ContainerManager::instance()->GetContainer("Pose"));
+        ContainerManager::instance()->GetContainer(
+        AdapterConfig::LOCALIZATION));
     pose_container->Insert(localization);
     obstacles_container->InsertPerceptionObstacle(
         *(pose_container->ToPerceptionObstacle()),
