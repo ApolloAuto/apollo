@@ -61,12 +61,12 @@ class EMPlanner : public Planner {
   /**
    * @brief Overrode function Plan in parent class Planner.
    * @param start_point The trajectory point where planning starts
-   * @param trajectory_pb The computed trajectory
-   * @return OK if planning succeeds; error otherwise.
+   * @param discretized_trajectory The computed trajectory
+   * @return true if planning succeeds; false otherwise.
    */
   apollo::common::Status MakePlan(
       const apollo::common::TrajectoryPoint& start_point,
-      ADCTrajectory* trajectory_pb) override;
+      std::vector<apollo::common::TrajectoryPoint>* trajectory) override;
 
  private:
   void RegisterOptimizers();
