@@ -53,7 +53,7 @@ void PredictorManager::Run(
     const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles_.Clear();
   ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->mutable_container("PerceptionObstacles"));
+      ContainerManager::instance()->GetContainer("PerceptionObstacles"));
   CHECK_NOTNULL(container);
 
   Predictor *predictor = nullptr;
