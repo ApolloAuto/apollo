@@ -112,13 +112,15 @@ Status EMPlanner::MakePlan(const TrajectoryPoint& start_point,
   computed_trajectory.populate_trajectory_protobuf(trajectory_pb);
 
   // Add debug information.
-  auto* debug_reference_line =
-      trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
-  debug_reference_line->set_name("planning_reference_line");
-  const auto& reference_points =
-      planning_data->reference_line().reference_points();
-  debug_reference_line->mutable_path()->mutable_path_point()->CopyFrom({
-      reference_points.begin(), reference_points.end()});
+  if (FLAGS_enable_record_debug) {
+    auto* debug_reference_line =
+        trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
+    debug_reference_line->set_name("planning_reference_line");
+    const auto& reference_points =
+        planning_data->reference_line().reference_points();
+    debug_reference_line->mutable_path()->mutable_path_point()->CopyFrom({
+        reference_points.begin(), reference_points.end()});
+  }
 
   return Status::OK();
 }
