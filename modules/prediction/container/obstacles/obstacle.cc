@@ -483,6 +483,7 @@ void Obstacle::InitKFLaneTracker(const std::string& lane_id,
 
   // observation matrix
   Eigen::Matrix<double, 2, 4> H;
+  H.setZero();
   H(0, 0) = 1.0;
   H(1, 1) = 1.0;
   kf.SetObservationMatrix(H);
@@ -537,7 +538,7 @@ void Obstacle::UpdateKFLaneTrackers(Feature* feature) {
   }
 
   double ts = feature->timestamp();
-  double speed = feature->timestamp();
+  double speed = feature->speed();
   double acc = feature->acc();
   for (auto& lane_feature : feature->lane().current_lane_feature()) {
     std::string lane_id = lane_feature.lane_id();
@@ -633,7 +634,7 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
   feature->set_t_acc(lane_acc);
 
   ADEBUG << "Obstacle [" << id_ << "] set tracked speed [" << lane_speed
-         << " and tracked acc [" << lane_acc << "]";
+         << " ] and tracked acc [" << lane_acc << "]";
 }
 
 void Obstacle::InitKFPedestrianTracker(Feature* feature) {
