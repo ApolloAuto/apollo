@@ -22,15 +22,23 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/map/proto/map_lane.pb.h"
 
 namespace apollo {
 namespace prediction {
+
+using HDMapLane = apollo::hdmap::Lane;
+
+MLPEvaluator::MLPEvaluator() {
+  LoadModel(FLAGS_vehicle_model_file);
+}
 
 void MLPEvaluator::Clear() {
   obstacle_feature_values_map_.clear();
 }
 
 void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+  AINFO << "Start mlp evaluate";
   Clear();
   if (obstacle_ptr == nullptr) {
     AERROR << "Invalid obstacle.";
@@ -61,13 +69,18 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  AINFO << "Start for-loop on lane sequences";
   for (int i = 0;
       i < latest_feature.lane().lane_graph().lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK(lane_sequence_ptr != nullptr);
+    AINFO << "Start to extract feature values";
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr);
+    AINFO << "Start to compute probability";
     double probability = ComputeProbability();
+    AINFO << "probability = " << probability;
     lane_sequence_ptr->set_probability(probability);
+    AINFO << "probability set done";
   }
 }
 
@@ -189,14 +202,14 @@ void MLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(dist_rbs.front());
   feature_values->push_back(dist_rb_rate);
   feature_values->push_back(time_to_rb);
-  // feature_values->push_back(lane_types.front() == HDMapLane::NO_TURN ? 1.0
-  //                                                                    : 0.0);
-  // feature_values->push_back(lane_types.front() == HDMapLane::LEFT_TURN ? 1.0
-  //                                                                     : 0.0);
-  // feature_values->push_back(lane_types.front() == HDMapLane::RIGHT_TURN ? 1.0
-  //                                                                   : 0.0);
-  // feature_values->push_back(lane_types.front() == HDMapLane::U_TURN ? 1.0
-  //                                                                   : 0.0);
+  feature_values->push_back(lane_types.front() == HDMapLane::NO_TURN ? 1.0
+                                                                     : 0.0);
+  feature_values->push_back(lane_types.front() == HDMapLane::LEFT_TURN ? 1.0
+                                                                      : 0.0);
+  feature_values->push_back(lane_types.front() == HDMapLane::RIGHT_TURN ? 1.0
+                                                                    : 0.0);
+  feature_values->push_back(lane_types.front() == HDMapLane::U_TURN ? 1.0
+                                                                    : 0.0);
 }
 
 void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
