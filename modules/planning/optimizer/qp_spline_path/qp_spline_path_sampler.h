@@ -21,21 +21,24 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SAMPLER_H_
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SAMPLER_H_
 
-#include <vector>
-
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/proto/qp_spline_path_config.pb.h"
+
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
 
-class QPSplinePathSampler {
+class QpSplinePathSampler {
  public:
-  virtual bool sample(const common::FrenetFramePoint& init_point,
-                      const ReferenceLine& reference_line,
-                      const std::uint32_t num_of_sampling_point,
-                      const double s_lower_bound, const double s_upper_bound,
-                      std::vector<double>* const sampling_point) = 0;
+  explicit QpSplinePathSampler(const QPSplinePathConfig& config);
+  bool Sample(const common::FrenetFramePoint& init_point,
+              const ReferenceLine& reference_line, const double s_lower_bound,
+              const double s_upper_bound,
+              std::vector<double>* const sampling_point);
+
+ private:
+  const QPSplinePathConfig config_;
 };
 
 }  // namespace planning

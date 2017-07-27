@@ -25,12 +25,13 @@
 #include <string>
 
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/proto/qp_spline_path_config.pb.h"
+
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 #include "modules/planning/optimizer/qp_spline_path/qp_frenet_frame.h"
-#include "modules/planning/proto/qp_spline_path_config.pb.h"
 
 namespace apollo {
 namespace planning {

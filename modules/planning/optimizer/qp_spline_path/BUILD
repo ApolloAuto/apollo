@@ -8,14 +8,13 @@ cc_library(
         "qp_frenet_frame.cc",
         "qp_spline_path_generator.cc",
         "qp_spline_path_optimizer.cc",
-        "qp_spline_path_simple_sampler.cc",
+        "qp_spline_path_sampler.cc",
     ],
     hdrs = [
         "qp_frenet_frame.h",
         "qp_spline_path_generator.h",
         "qp_spline_path_optimizer.h",
         "qp_spline_path_sampler.h",
-        "qp_spline_path_simple_sampler.h",
     ],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
