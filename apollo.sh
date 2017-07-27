@@ -411,6 +411,29 @@ function build_gnss() {
   rm -rf modules/devel_isolated/
 }
 
+function build_velodyne() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${CURRENT_PATH}/bazel-apollo/external/ros" ]; then
+    ROS_PATH="${CURRENT_PATH}/bazel-apollo/external/ros"
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/velodyne \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
 function config() {
   ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
@@ -433,6 +456,9 @@ function main() {
       ;;
     buildgnss)
       build_gnss
+      ;;
+    buildvelodyne)
+      build_velodyne
       ;;
     config)
       config

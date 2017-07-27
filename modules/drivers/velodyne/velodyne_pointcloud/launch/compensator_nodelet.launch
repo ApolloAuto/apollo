@@ -1,0 +1,12 @@
+<launch>
+  <arg name="topic_pointcloud" default="/dusensor/velodyne/points"/>
+  <arg name="topic_compensated_pointcloud" default="/dusensor/velodyne/compensated_points"/>
+  <arg name="node_name" default="compensator_nodelet"/>
+  <arg name="child_frame_id" default="velodyne"/>
+  <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
+        args="load velodyne_pointcloud/CompensatorNodelet velodyne_nodelet_manager" output="screen">
+    <param name="topic_pointcloud" value="$(arg topic_pointcloud)"/>
+    <param name="topic_compensated_pointcloud" value="$(arg topic_compensated_pointcloud)"/>
+    <param name="child_frame_id" value="$(arg child_frame_id)"/>
+  </node>
+</launch>

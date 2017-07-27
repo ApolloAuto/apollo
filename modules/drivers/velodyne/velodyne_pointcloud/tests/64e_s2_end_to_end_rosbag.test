@@ -1,0 +1,75 @@
+<launch>
+
+  <!-- start rosbag replay -->
+  <include file="$(find velodyne_pointcloud)/launch/rosbag_replay.launch">
+    <arg name="rate" default="1" />
+    <arg name="start" default="0" />
+    <arg name="bag" default="$(find velodyne_pointcloud)/tests/64e_s2_test.bag"/>
+  </include> 
+  
+  <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
+  </include>
+  
+  <!-- start transform to convert old scan message to new scan message structure -->
+  <include file="$(find velodyne_pointcloud)/launch/scan_msg_transform_nodelet.launch">
+    <arg name="model" default="64E_S2" />
+  </include>
+  
+  <!-- start cloud nodelet using test calibration file -->
+  <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
+    <arg name="model" default="64E_S2" />
+    <arg name="calibration" default="$(find velodyne_pointcloud)/params/64E_S2_calibration_example.yaml" />
+    <arg name="organized" default="true"/>
+    <arg name="min_range" default="5.0" />
+    <arg name="max_range" default="70.0" />
+  </include>
+  
+  <!-- save pointcloud message to file -->
+  <include file="$(find velodyne_pointcloud)/launch/pointcloud_dump_nodelet.launch">
+    <arg name="save_folder" default="$(find velodyne_pointcloud)/tests/velodyne_test_msg_files" />
+    <arg name="topic_name" default="/dusensor/velodyne/points" />
+    <arg name="file_prefix" default="64e_pointcloud_out_" />
+  </include>
+
+  <!-- verify PointCloud2 convert -->
+  <node pkg="velodyne_pointcloud" type="verify_pointcloud" name="verify_pointcloud" output="screen">
+    <param name="run_save_folder" value="$(find velodyne_pointcloud)/tests/velodyne_test_msg_files"/>
+    <param name="expected_save_folder" value="$(find velodyne_pointcloud)/tests/velodyne_test_msg_files"/>
+    <param name="run_file_prefix" value="64e_pointcloud_out_"/>
+    <param name="expected_file_prefix" value="excepted_ordered_msg_"/>
+    <param name="start_seq" value="43367" />
+    <param name="end_seq" value="43367" />
+    <param name="wait_time" value="7" />
+  </node>
+  
+  <!-- start novatel to broadcast transform -->
+  <param name="use_sim_time" value="false" />
+  <param name="proj4_text"
+         value="+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs " />
+  <param name="srid" value="23870" />
+  <include file="$(find novatel_preprocess)/launch/novatel_republish.launch"/>
+  
+  <!-- start compensator nodelet -->
+  <include file="$(find velodyne_pointcloud)/launch/compensator_nodelet.launch">
+  </include>
+  
+  <!-- save compensator message to file -->
+  <include file="$(find velodyne_pointcloud)/launch/pointcloud_dump_nodelet.launch">
+    <arg name="save_folder" default="$(find velodyne_pointcloud)/tests/velodyne_test_msg_files" />
+    <arg name="topic_name" default="/dusensor/velodyne/compensated_points" />
+    <arg name="file_prefix" default="64e_compensator_out_" />
+    <arg name="required" default="true" />
+  </include>
+
+  <!-- verify PointCloud2 compensator -->
+  <node pkg="velodyne_pointcloud" type="verify_compensator" name="verify_compensator" output="screen" required="true">
+    <param name="run_save_folder" value="$(find velodyne_pointcloud)/tests/velodyne_test_msg_files"/>
+    <param name="expected_save_folder" value="$(find velodyne_pointcloud)/tests/velodyne_test_msg_files"/>
+    <param name="run_file_prefix" value="64e_compensator_out_"/>
+    <param name="expected_file_prefix" value="excepted_compensator_msg_"/>
+    <param name="start_seq" value="43367" />
+    <param name="end_seq" value="43367" />
+    <param name="wait_time" value="7" />
+  </node>
+
+</launch>
