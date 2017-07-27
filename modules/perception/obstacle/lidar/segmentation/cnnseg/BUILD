@@ -36,8 +36,9 @@ cc_library(
          "@caffe//:caffe",
          "//modules/common:log",
          "//modules/perception/lib/pcl_util:pcl_util",
+         "@eigen//:eigen",
          "//modules/perception/obstacle/lidar/segmentation/cnnseg/proto:cnnseg_proto",
-         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_util",
+         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_util"
     ],
 )
 
