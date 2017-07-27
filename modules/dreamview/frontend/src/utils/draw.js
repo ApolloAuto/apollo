@@ -6,12 +6,22 @@ const _ = require('lodash');
 const DELTA_Z_OFFSET = 0.04;
 const Line = ThreeLine2D(THREE);
 const BasicShader = ThreeLine2DBasicShader(THREE);
+const textureLoader = new THREE.TextureLoader();
 
 export function addOffsetZ(mesh, value) {
     if (value) {
         const zOffset = value * DELTA_Z_OFFSET;
         mesh.position.z += zOffset;
     }
+}
+
+export function drawImage(img, width, height, x = 0, y = 0, z = 0) {
+    const material = new THREE.MeshBasicMaterial({map: textureLoader.load(img)});
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
+    mesh.position.set(x, y, z);
+    mesh.overdraw = true;
+
+    return mesh;
 }
 
 export function drawDashedLineFromPoints(

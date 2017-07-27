@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import STORE from "store";
-import PARAMETERS from "store/config/parameters.yml";
+import { copyProperty, hideArrayObjects } from "utils/misc";
 import { drawSegmentsFromPoints, drawBox, drawArrow } from "utils/draw";
 const _ = require('lodash');
 
@@ -14,22 +14,6 @@ const ObstacleColorMapping = {
         VIRTUAL: 0x800000
 };
 const LINE_THICKNESS = 1.5;
-
-function copyProperty(toObj, fromObj) {
-    for (const property in fromObj) {
-        if (fromObj.hasOwnProperty(property)) {
-            toObj[property] = fromObj[property];
-        }
-    }
-}
-
-function hideArrayObjects(objects, startIdx = 0) {
-    if (objects.constructor === Array && objects.length > 0) {
-        for (;startIdx < objects.length; startIdx++) {
-            objects[startIdx].visible = false;
-        }
-    }
-}
 
 export default class PerceptionObstacles {
     constructor() {
