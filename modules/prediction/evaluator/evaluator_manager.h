@@ -50,15 +50,31 @@ class EvaluatorManager {
    */
   Evaluator* GetEvaluator(const ObstacleConf::EvaluatorType& type);
 
+  /**
+   * @brief Run evaluators
+   * @param Perception obstacles
+   */
   void Run(
       const ::apollo::perception::PerceptionObstacles& perception_obstacles);
 
  private:
+  /**
+   * @brief Register an evaluator by type
+   * @param Evaluator type
+   */
   void RegisterEvaluator(const ObstacleConf::EvaluatorType& type);
 
+  /**
+   * @brief Create an evaluator by type
+   * @param Evaluator type
+   * @return A unique pointer to the evaluator
+   */
   std::unique_ptr<Evaluator> CreateEvaluator(
       const ObstacleConf::EvaluatorType& type);
 
+  /**
+   * @brief Register all evaluators
+   */
   void RegisterEvaluators();
 
  private:

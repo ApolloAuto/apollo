@@ -17,7 +17,6 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
-#include "modules/prediction/evaluator/evaluator_factory.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/common/log.h"
@@ -38,7 +37,6 @@ void EvaluatorManager::RegisterEvaluators() {
 
 Evaluator* EvaluatorManager::GetEvaluator(
     const ObstacleConf::EvaluatorType& type) {
-  // return EvaluatorFactory::instance()->CreateEvaluator(type).get();
   if (evaluators_.find(type) != evaluators_.end()) {
     return evaluators_[type].get();
   } else {

@@ -21,7 +21,6 @@
 #include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/vehicle/free_move_predictor.h"
 #include "modules/prediction/predictor/pedestrian/regional_predictor.h"
-#include "modules/prediction/predictor/predictor_factory.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
@@ -43,7 +42,6 @@ void PredictorManager::RegisterPredictors() {
 
 Predictor* PredictorManager::GetPredictor(
     const ObstacleConf::PredictorType& type) {
-  // return PredictorFactory::instance()->CreatePredictor(type).get();
   if (predictors_.find(type) != predictors_.end()) {
     return predictors_[type].get();
   } else {

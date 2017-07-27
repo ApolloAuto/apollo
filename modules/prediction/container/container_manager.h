@@ -44,11 +44,6 @@ class ContainerManager {
   virtual ~ContainerManager();
 
   /**
-   * @brief Register all containers
-   */
-  void RegisterContainers();
-
-  /**
    * @brief Get mutable container
    * @param Name of the container
    * @return Pointer to the container given the name
@@ -57,6 +52,12 @@ class ContainerManager {
 
  private:
   /**
+   * @breif Register a container
+   * @param Container name
+   */
+  void RegisterContainer(const std::string& name);
+
+  /**
    * @brief Create a container
    * @param Container name
    * @return Container pointer
@@ -64,10 +65,9 @@ class ContainerManager {
   std::unique_ptr<Container> CreateContainer(const std::string& name);
 
   /**
-   * @breif Register a container
-   * @param Container name
+   * @brief Register all containers
    */
-  void RegisterContainer(const std::string& name);
+  void RegisterContainers();
 
  private:
   std::unordered_map<std::string, std::unique_ptr<Container>> containers_;

@@ -66,11 +66,23 @@ class PredictorManager {
   const PredictionObstacles& prediction_obstacles();
 
  private:
+  /**
+   * @brief Register a predictor by type
+   * @param Predictor type
+   */
   void RegisterPredictor(const ObstacleConf::PredictorType& type);
 
+  /**
+   * @brief Create a predictor by type
+   * @param Predictor type
+   * @return A unique pointer to the predictor
+   */
   std::unique_ptr<Predictor> CreatePredictor(
       const ObstacleConf::PredictorType& type);
 
+  /**
+   * @brief Register all predictors
+   */
   void RegisterPredictors();
 
  private:
