@@ -60,7 +60,7 @@ bool ReferenceLineSmoother::smooth(
   Reset();
   // calculate sampling range
   common::SLPoint sl_point;
-  if (!raw_reference_line.get_point_in_Frenet_frame(vehicle_position,
+  if (!raw_reference_line.get_point_in_frenet_frame(vehicle_position,
                                                     &sl_point)) {
     AERROR << "Fail to map init point on raw reference line!";
     return false;
