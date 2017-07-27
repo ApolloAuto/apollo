@@ -55,7 +55,7 @@ void EMPlanner::RegisterOptimizers() {
     return new DpStSpeedOptimizer("DpStSpeedOptimizer");
   });
   optimizer_factory_.Register(QP_SPLINE_PATH_OPTIMIZER, []() -> Optimizer* {
-    return new QPSplinePathOptimizer("QPSplinePathOptimizer");
+    return new QpSplinePathOptimizer("QpSplinePathOptimizer");
   });
   optimizer_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Optimizer* {
     return new QpSplineStSpeedOptimizer("QpSplineStSpeedOptimizer");

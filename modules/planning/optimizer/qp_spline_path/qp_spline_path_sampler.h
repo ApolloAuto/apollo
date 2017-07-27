@@ -31,14 +31,14 @@ namespace planning {
 
 class QpSplinePathSampler {
  public:
-  explicit QpSplinePathSampler(const QPSplinePathConfig& config);
+  explicit QpSplinePathSampler(const QpSplinePathConfig& config);
   bool Sample(const common::FrenetFramePoint& init_point,
               const ReferenceLine& reference_line, const double s_lower_bound,
               const double s_upper_bound,
               std::vector<double>* const sampling_point);
 
  private:
-  const QPSplinePathConfig config_;
+  const QpSplinePathConfig config_;
 };
 
 }  // namespace planning

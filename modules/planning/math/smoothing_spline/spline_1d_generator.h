@@ -88,7 +88,7 @@ class Spline1dGenerator {
   Spline1dConstraint spline_constraint_;
   Spline1dKernel spline_kernel_;
 
-  std::unique_ptr<apollo::common::math::QPSolver> qp_solver_ = nullptr;
+  std::unique_ptr<apollo::common::math::QpSolver> qp_solver_ = nullptr;
   Eigen::MatrixXd init_x_;
   Eigen::MatrixXd init_y_;
   Eigen::MatrixXd init_z_;

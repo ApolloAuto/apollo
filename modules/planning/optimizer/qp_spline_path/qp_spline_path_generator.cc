@@ -36,7 +36,7 @@
 namespace apollo {
 namespace planning {
 
-bool QPSplinePathGenerator::SetConfig(const std::string& config_file) {
+bool QpSplinePathGenerator::SetConfig(const std::string& config_file) {
   if (!common::util::GetProtoFromFile(config_file, &_qp_spline_path_config)) {
     AERROR << "Failed to load config file " << config_file;
     return false;
@@ -44,7 +44,7 @@ bool QPSplinePathGenerator::SetConfig(const std::string& config_file) {
   return true;
 }
 
-bool QPSplinePathGenerator::generate(const ReferenceLine& reference_line,
+bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
                                      const DecisionData& decision_data,
                                      const SpeedData& speed_data,
                                      const common::TrajectoryPoint& init_point,
@@ -140,7 +140,7 @@ bool QPSplinePathGenerator::generate(const ReferenceLine& reference_line,
   return true;
 }
 
-bool QPSplinePathGenerator::calculate_sl_point(
+bool QpSplinePathGenerator::calculate_sl_point(
     const ReferenceLine& reference_line,
     const common::TrajectoryPoint& traj_point,
     common::FrenetFramePoint* const frenet_frame_point) {
@@ -173,7 +173,7 @@ bool QPSplinePathGenerator::calculate_sl_point(
   return true;
 }
 
-bool QPSplinePathGenerator::init_coord_range(double* const start_s,
+bool QpSplinePathGenerator::init_coord_range(double* const start_s,
                                              double* const end_s) {
   // TODO(all): step 1 get current sl coordinate - with init coordinate point
   double start_point = std::max(_init_point.s() - 5.0, 0.0);
@@ -194,7 +194,7 @@ bool QPSplinePathGenerator::init_coord_range(double* const start_s,
   return true;
 }
 
-bool QPSplinePathGenerator::init_smoothing_spline(
+bool QpSplinePathGenerator::init_smoothing_spline(
     const ReferenceLine& reference_line, const double start_s,
     const double end_s) {
   QpSplinePathSampler sampler(_qp_spline_path_config);
@@ -212,7 +212,7 @@ bool QPSplinePathGenerator::init_smoothing_spline(
   return true;
 }
 
-bool QPSplinePathGenerator::setup_constraint() {
+bool QpSplinePathGenerator::setup_constraint() {
   Spline1dConstraint* spline_constraint =
       _spline_generator->mutable_spline_constraint();
   // add init status constraint
@@ -284,7 +284,7 @@ bool QPSplinePathGenerator::setup_constraint() {
   return true;
 }
 
-bool QPSplinePathGenerator::setup_kernel() {
+bool QpSplinePathGenerator::setup_kernel() {
   Spline1dKernel* spline_kernel = _spline_generator->mutable_spline_kernel();
 
   if (_qp_spline_path_config.regularization_weight() > 0) {
@@ -311,7 +311,7 @@ bool QPSplinePathGenerator::setup_kernel() {
   return true;
 }
 
-bool QPSplinePathGenerator::solve() {
+bool QpSplinePathGenerator::solve() {
   if (!_spline_generator->solve()) {
     AERROR << "Could not solve the qp problem in spline path generator.";
     return false;

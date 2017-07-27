@@ -30,9 +30,9 @@
 namespace apollo {
 namespace planning {
 
-class QPSplinePathOptimizer : public PathOptimizer {
+class QpSplinePathOptimizer : public PathOptimizer {
  public:
-  explicit QPSplinePathOptimizer(const std::string& name);
+  explicit QpSplinePathOptimizer(const std::string& name);
   bool Init() override;
 
  private:
@@ -43,7 +43,7 @@ class QPSplinePathOptimizer : public PathOptimizer {
                                  PathData* const path_data) override;
 
  private:
-  QPSplinePathGenerator _path_generator;
+  QpSplinePathGenerator _path_generator;
 };
 
 }  // namespace planning

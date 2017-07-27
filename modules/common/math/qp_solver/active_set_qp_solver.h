@@ -29,9 +29,9 @@ namespace apollo {
 namespace common {
 namespace math {
 
-class ActiveSetQPSolver : public QPSolver {
+class ActiveSetQpSolver : public QpSolver {
  public:
-  ActiveSetQPSolver(const Eigen::MatrixXd& kernel_matrix,
+  ActiveSetQpSolver(const Eigen::MatrixXd& kernel_matrix,
                     const Eigen::MatrixXd& offset,
                     const Eigen::MatrixXd& affine_inequality_matrix,
                     const Eigen::MatrixXd& affine_inequality_boundary,

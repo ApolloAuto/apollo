@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-QpSplinePathSampler::QpSplinePathSampler(const QPSplinePathConfig& config)
+QpSplinePathSampler::QpSplinePathSampler(const QpSplinePathConfig& config)
     : config_(config) {}
 
 bool QpSplinePathSampler::Sample(const common::FrenetFramePoint& init_point,
