@@ -839,6 +839,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 }
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
+  AINFO << "Start set lane graph feature";
   PredictionMap* map = PredictionMap::instance();
   CHECK_NOTNULL(map);
 
@@ -867,7 +868,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     }
   }
 
-  if (history_size() <= 0) {
+  if (feature_history_.empty()) {
     return;
   }
 
@@ -877,6 +878,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
 }
 
 void Obstacle::SetLanePoints(Feature* feature) {
+  AINFO << "Start set lane points";
   if (feature == nullptr || !feature->has_theta()) {
     AERROR << "Null feature or no theta.";
     return;
@@ -1018,7 +1020,7 @@ void Obstacle::InsertFeatureToHistory(Feature* feature) {
 }
 
 void Obstacle::Trim() {
-  std::lock_guard<std::mutex> lock(mutex_);
+  // std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() < 2) {
     return;
   }

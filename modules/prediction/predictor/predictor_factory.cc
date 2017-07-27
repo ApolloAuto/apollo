@@ -24,7 +24,9 @@
 namespace apollo {
 namespace prediction {
 
-PredictorFactory::PredictorFactory() {}
+PredictorFactory::PredictorFactory() {
+  RegisterPredictor();
+}
 
 void PredictorFactory::RegisterPredictor() {
     Register(ObstacleConf::LANE_SEQUENCE_PREDICTOR,

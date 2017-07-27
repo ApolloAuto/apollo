@@ -35,7 +35,7 @@ class MLPEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  MLPEvaluator() = default;
+  MLPEvaluator();
 
   /**
    * @brief Destructor
