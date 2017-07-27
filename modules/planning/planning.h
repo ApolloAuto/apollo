@@ -86,6 +86,7 @@ class Planning : public apollo::common::ApolloApp {
  private:
   void RegisterPlanners();
   void RunOnce();
+  void RecordInput(ADCTrajectory* trajectory_pb);
 
   std::pair<common::TrajectoryPoint, std::uint32_t>
   ComputeStartingPointFromLastTrajectory(const double curr_time) const;

@@ -311,3 +311,5 @@ DEFINE_double(backward_routing_distance, 100.0,
               "The backward routing distance.");
 DEFINE_double(decision_valid_stop_range, 0.5,
               "The valid stop range in decision.");
+DEFINE_bool(enable_record_debug, true,
+            "True to enable record debug into debug protobuf.");

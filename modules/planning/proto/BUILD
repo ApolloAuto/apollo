@@ -21,6 +21,7 @@ cc_proto_library(
         "//modules/common/proto:path_point_proto",
         "//modules/decision/proto:decision_proto",
         "//modules/localization/proto:localization_proto",
+        "//modules/map/proto:map_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/proto:prediction_proto",
     ],
