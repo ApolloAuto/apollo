@@ -50,7 +50,7 @@ class ReferenceLine {
 
   bool get_point_in_Cartesian_frame(const common::SLPoint& sl_point,
                                     common::math::Vec2d* const xy_point) const;
-  bool get_point_in_Frenet_frame(const common::math::Vec2d& xy_point,
+  bool get_point_in_frenet_frame(const common::math::Vec2d& xy_point,
                                  common::SLPoint* const sl_point) const;
 
   double get_lane_width(const double s) const;

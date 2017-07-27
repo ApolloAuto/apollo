@@ -52,6 +52,20 @@ double DiscretizedPath::param_length() const {
   return path_points_.back().s() - path_points_.front().s();
 }
 
+common::PathPoint DiscretizedPath::evaluate_linear_approximation(
+    const double param) const {
+  CHECK(!path_points_.empty());
+  auto it_lower = query_lower_bound(param);
+  if (it_lower == path_points_.begin()) {
+    return path_points_.front();
+  }
+  if (it_lower == path_points_.end()) {
+    return path_points_.back();
+  }
+  return util::interpolate_linear_approximation(*(it_lower - 1), *it_lower,
+                                                param);
+}
+
 int DiscretizedPath::query_closest_point(const double param) const {
   if (path_points_.empty()) {
     return -1;

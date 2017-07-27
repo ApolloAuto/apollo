@@ -44,6 +44,8 @@ class DiscretizedPath : public Path {
 
   common::PathPoint end_point() const override;
 
+  common::PathPoint evaluate_linear_approximation(const double param) const;
+
   int query_closest_point(const double param) const;
 
   std::vector<common::PathPoint> *mutable_path_points();

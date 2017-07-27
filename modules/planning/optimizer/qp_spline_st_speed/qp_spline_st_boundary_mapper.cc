@@ -148,9 +148,9 @@ Status QpSplineStBoundaryMapper::map_main_decision_stop(
   const auto& map_point =
       lane_info->get_smooth_point(main_stop.enforced_line().distance_s());
   SLPoint sl_point;
-  if (!reference_line.get_point_in_Frenet_frame(
+  if (!reference_line.get_point_in_frenet_frame(
           Vec2d(map_point.x(), map_point.y()), &sl_point)) {
-    AERROR << "Fail to map_main_decision_stop since get_point_in_Frenet_frame "
+    AERROR << "Fail to map_main_decision_stop since get_point_in_frenet_frame "
               "failed.";
     return Status(ErrorCode::PLANNING_ERROR);
   }

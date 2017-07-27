@@ -49,27 +49,12 @@ const FrenetFramePath &PathData::frenet_frame_path() const {
 
 bool PathData::get_path_point_with_path_s(
     const double s, common::PathPoint *const path_point) const {
-  const auto &path_points = path_.path_points();
-
-  if (path_points.size() < 2 || s < path_points.front().s() ||
-      path_points.back().s() < s) {
+  const double epsilon_proximity = 1.0e-4;
+  *path_point = path_.evaluate_linear_approximation(s);
+  if (std::abs(path_point->s() - s) > epsilon_proximity) {
+    AERROR << "Path point error [" << std::abs(path_point->s() - s)
+           << "] is greater than threshold[" << epsilon_proximity << "].";
     return false;
-  }
-
-  auto comp = [](const common::PathPoint &path_point, const double s) {
-    return path_point.s() < s;
-  };
-
-  auto it_lower =
-      std::lower_bound(path_points.begin(), path_points.end(), s, comp);
-  if (it_lower == path_points.begin()) {
-    *path_point = *it_lower;
-  } else {
-    double s0 = (it_lower - 1)->s();
-    double s1 = it_lower->s();
-    CHECK_LT(s0, s1);
-    *path_point =
-        util::interpolate_linear_approximation(*(it_lower - 1), *it_lower, s);
   }
   return true;
 }

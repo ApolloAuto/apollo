@@ -152,7 +152,7 @@ bool DpRoadGraph::init(const ReferenceLine &reference_line) {
   common::math::Vec2d xy_point(_init_point.path_point().x(),
                                _init_point.path_point().y());
 
-  if (!reference_line.get_point_in_Frenet_frame(xy_point, &_init_sl_point)) {
+  if (!reference_line.get_point_in_frenet_frame(xy_point, &_init_sl_point)) {
     AERROR << "Fail to map init point to sl coordinate!";
     return false;
   }
