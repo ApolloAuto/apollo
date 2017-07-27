@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file qp_spline_path_simple_sampler.cpp
+ * @file qp_spline_path_simple_sampler.cc
  **/
 
-#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_simple_sampler.h"
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_sampler.h"
 
 #include <algorithm>
 
@@ -28,16 +28,19 @@
 namespace apollo {
 namespace planning {
 
-bool QPSplinePathSimpleSampler::sample(
-    const common::FrenetFramePoint& init_point,
-    const ReferenceLine& reference_line,
-    const std::uint32_t number_of_sampling_point, const double s_lower_bound,
-    const double s_upper_bound, std::vector<double>* const sampling_point) {
-  // TODO(all): Haoyang Fan, change to a configurable version
+QpSplinePathSampler::QpSplinePathSampler(const QPSplinePathConfig& config)
+    : config_(config) {}
+
+bool QpSplinePathSampler::Sample(const common::FrenetFramePoint& init_point,
+                                 const ReferenceLine& reference_line,
+                                 const double s_lower_bound,
+                                 const double s_upper_bound,
+                                 std::vector<double>* const sampling_point) {
   double sampling_distance =
       std::min(reference_line.reference_map_line().length(), s_upper_bound) -
       init_point.s();
   sampling_distance = std::min(sampling_distance, FLAGS_planning_distance);
+
   if (Double::compare(sampling_distance, 0.0) <= 0) {
     AERROR << "Failed to allocate init trajectory point SL("
            << init_point.ShortDebugString() << ") on target lane with length "
@@ -53,15 +56,18 @@ bool QPSplinePathSimpleSampler::sample(
 
   double start_s = init_point.s();
   sampling_point->emplace_back(start_s);
+
   // map sampling point
-  if (number_of_sampling_point == 0) {
+  if (config_.number_of_spline() == 0) {
     AERROR << "sampling point shall greater than 0";
     return false;
   }
-  const double delta_s = sampling_distance / number_of_sampling_point;
+  const double delta_s = sampling_distance / config_.number_of_spline();
 
-  for (std::uint32_t i = 1; i <= number_of_sampling_point; ++i) {
-    sampling_point->emplace_back(delta_s * i + start_s);
+  double s = start_s + delta_s;
+  for (uint32_t i = 1; i <= config_.number_of_spline(); ++i) {
+    sampling_point->emplace_back(s);
+    s += delta_s;
   }
   return true;
 }
