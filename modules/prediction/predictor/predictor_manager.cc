@@ -38,7 +38,7 @@ void PredictorManager::Run(
     const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles_.Clear();
   ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->mutable_container("ObstaclesContainer"));
+      ContainerManager::instance()->mutable_container("PerceptionObstacles"));
   CHECK_NOTNULL(container);
 
   Predictor *predictor = nullptr;
@@ -65,15 +65,15 @@ void PredictorManager::Run(
         break;
       }
     }
-    if (predictor != nullptr) {
-      predictor->Predict(obstacle);
-      PredictionObstacle prediction_obstacle;
-      prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
-      prediction_obstacle.mutable_perception_obstacle()->
-          CopyFrom(perception_obstacle);
-      prediction_obstacles_.add_prediction_obstacle()->
-          CopyFrom(prediction_obstacle);
-    }
+    PredictionObstacle prediction_obstacle;
+    // if (predictor != nullptr) {
+    //   predictor->Predict(obstacle);
+    //   prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
+    // }
+    prediction_obstacle.mutable_perception_obstacle()->
+        CopyFrom(perception_obstacle);
+    prediction_obstacles_.add_prediction_obstacle()->
+        CopyFrom(prediction_obstacle);
   }
   prediction_obstacles_.set_perception_error_code(
       perception_obstacles.error_code());
