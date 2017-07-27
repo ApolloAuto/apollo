@@ -250,6 +250,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   if (FLAGS_enable_record_debug) {
     trajectory_pb->mutable_debug()->mutable_planning_data()
         ->mutable_init_point()->CopyFrom(vehicle_start_point);
+    trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(true);
   }
 
   auto status = planner_->MakePlan(vehicle_start_point, trajectory_pb);
