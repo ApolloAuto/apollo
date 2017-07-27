@@ -23,8 +23,6 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-source "${DIR}/apollo_init.sh"
-
 function start() {
     echo "Start roscore..."
     ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
