@@ -89,8 +89,8 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
 double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
                                  const double start_s, const double end_s,
                                  const ReferenceLine &reference_line) const {
-  const double length = _vehicle_param.length();
-  const double width = _vehicle_param.width();
+  // const double length = _vehicle_param.length();
+  // const double width = _vehicle_param.width();
   double total_cost = 0.0;
   for (uint32_t i = 0; i < _evaluate_times; ++i) {
     double eval_time = i * _config.eval_time_interval();
@@ -103,19 +103,19 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
     if (speed_point.s() >= end_s) {
       break;
     }
-    double l = curve.evaluate(1, speed_point.s() - start_s);
+    double l = std::fabs(curve.evaluate(0, speed_point.s() - start_s));
     total_cost += l;  // need refine l cost;
 
-    ::apollo::common::math::Vec2d car_point = {speed_point.s(), l};
-    ReferencePoint reference_point =
-        reference_line.get_reference_point(car_point.x());
-    ::apollo::common::math::Box2d car_box = {
-        car_point, reference_point.heading(), length, width};
-    for (uint32_t j = 0; j < _obstacle_trajectory.size(); ++j) {
-      ::apollo::common::math::Box2d obstacle_box = _obstacle_trajectory[j][i];
-      double distance = car_box.DistanceTo(obstacle_box);
-      total_cost += distance * _obstacle_probability[j];  // obstacle cost
-    }
+    // ::apollo::common::math::Vec2d car_point = {speed_point.s(), l};
+    // ReferencePoint reference_point =
+    //     reference_line.get_reference_point(car_point.x());
+    // ::apollo::common::math::Box2d car_box = {
+    //     car_point, reference_point.heading(), length, width};
+    // for (uint32_t j = 0; j < _obstacle_trajectory.size(); ++j) {
+    //   ::apollo::common::math::Box2d obstacle_box = _obstacle_trajectory[j][i];
+    //   double distance = car_box.DistanceTo(obstacle_box);
+    //   total_cost += distance * _obstacle_probability[j];  // obstacle cost
+    // }
   }
   return total_cost;
 }
