@@ -28,7 +28,6 @@ cc_library(
         "//modules/prediction/predictor/pedestrian:regional_predictor",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "//modules/prediction/predictor:predictor_factory",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
         "@glog//:glog",
