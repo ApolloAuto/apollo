@@ -16,6 +16,7 @@
 
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
+#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/evaluator_factory.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
@@ -47,12 +48,14 @@ void EvaluatorManager::Run(
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
         Evaluator *evaluator = GetEvaluator(ObstacleConf::MLP_EVALUATOR);
+        // MLPEvaluator *evaluator = dynamic_cast<MLPEvaluator*>(
+        //     GetEvaluator(ObstacleConf::MLP_EVALUATOR));
         CHECK_NOTNULL(evaluator);
         AINFO << "evaluator got";
         Obstacle *obstacle = container->GetObstacle(id);
         CHECK_NOTNULL(obstacle);
         AINFO << "obstacle got with id = " << obstacle->id();
-        evaluator->Evaluate(obstacle);
+        // evaluator->Evaluate(obstacle);
         AINFO << "evaluate done";
         break;
       }
