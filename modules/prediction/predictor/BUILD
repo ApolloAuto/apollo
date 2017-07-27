@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//modules/common:macro",
         "//modules/common/util:factory",
-        "//modules/prediction/predictor",
         "//modules/prediction/predictor/vehicle:free_move_predictor",
         "//modules/prediction/predictor/vehicle:lane_sequence_predictor",
         "//modules/prediction/proto:prediction_conf_proto",
@@ -24,9 +23,11 @@ cc_library(
     deps = [
         "//modules/common:macro",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/predictor/vehicle:lane_sequence_predictor",
+        "//modules/prediction/predictor/vehicle:free_move_predictor",
+        "//modules/prediction/predictor/pedestrian:regional_predictor",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "//modules/prediction/predictor",
         "//modules/prediction/predictor:predictor_factory",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",

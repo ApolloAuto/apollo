@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//modules/common:macro",
         "//modules/common/util:factory",
-        "//modules/prediction/evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/proto:prediction_conf_proto",
         "@glog//:glog",
@@ -23,13 +22,12 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common:macro",
-        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "//modules/prediction/evaluator/vehicle:mlp_evaluator",
-        "//modules/prediction/evaluator",
         "//modules/prediction/evaluator:evaluator_factory",
         "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/perception/proto:perception_proto",
         "@glog//:glog",
     ],
 )
