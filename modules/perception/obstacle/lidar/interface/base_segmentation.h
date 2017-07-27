@@ -65,7 +65,14 @@
 namespace apollo {
 namespace perception {
 
-struct SegmentationOptions {};
+struct SegmentationOptions {
+  // original point cloud without ROI filtering
+  pcl_util::PointCloudPtr origin_cloud;
+  // indices of roi-filtered cloud in original cloud if enabled
+  pcl_util::PointIndicesPtr roi_cloud_indices;
+  // indices of non-ground points in original clound if enabled
+  pcl_util::PointIndicesPtr non_ground_indices;
+};
 
 class BaseSegmentation {
  public:
@@ -76,11 +83,11 @@ class BaseSegmentation {
 
   // @brief: segment the point cloud.
   // @param [in]: input point cloud.
-  // @param [in]: non ground points index.
-  // @param [in]: some options
+  // @param [in]: valid indices of points for segmentation.
+  // @param [in]: segmentation options
   // @param [out]: segmented object.
   virtual bool Segment(const pcl_util::PointCloudPtr &cloud,
-                       const pcl_util::PointIndices &non_ground_indices,
+                       const pcl_util::PointIndices &valid_indices,
                        const SegmentationOptions &options,
                        std::vector<ObjectPtr> *objects) = 0;
 

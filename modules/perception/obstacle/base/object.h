@@ -59,6 +59,9 @@ struct alignas(16) Object {
   double width = 0.0;
   double height = 0.0;
 
+  // foreground score/probability
+  float score = 0.0;
+
   // Object classification type.
   ObjectType type;
   // Probability of each type, used for track type.
