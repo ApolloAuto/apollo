@@ -74,7 +74,7 @@ void Prediction::Stop() {}
 void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   auto localization_adapter = AdapterManager::GetLocalization();
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->mutable_container("PerceptionObstacles"));
+      ContainerManager::instance()->GetContainer("PerceptionObstacles"));
   if (localization_adapter->Empty()) {
     ADEBUG << "No localization message.";
   } else {
@@ -84,7 +84,7 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
            << localization.ShortDebugString()
            << "].";
     PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-        ContainerManager::instance()->mutable_container("Pose"));
+        ContainerManager::instance()->GetContainer("Pose"));
     pose_container->Insert(localization);
     obstacles_container->InsertPerceptionObstacle(
         *(pose_container->ToPerceptionObstacle()),
