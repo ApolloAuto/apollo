@@ -57,7 +57,10 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
   CHECK_NOTNULL(decision_data);
   CHECK_NOTNULL(path_data);
   DpRoadGraph dp_road_graph(config_, init_point, speed_data);
-  dp_road_graph.find_tunnel(reference_line, decision_data, path_data);
+  if (!dp_road_graph.find_tunnel(reference_line, decision_data, path_data)) {
+    AERROR << "Failed to find tunnel in road graph";
+    return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph failed");
+  }
   return Status::OK();
 }
 

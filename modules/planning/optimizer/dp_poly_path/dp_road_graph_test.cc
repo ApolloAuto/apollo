@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <iostream>
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "ros/include/ros/ros.h"
@@ -26,6 +28,7 @@
 #include "modules/common/util/file.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
 #include "modules/planning/optimizer/optimizer_test_base.h"
 
@@ -34,54 +37,56 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-class PathSamplerTest : public OptimizerTestBase {
+class DpRoadGraphTest : public OptimizerTestBase {
  public:
-  virtual void SetUp() {
-    OptimizerTestBase::SetUp();
-    sampled_points_.clear();
+  void SetInitPointWithVelocity(const double velocity) {
     init_point_.mutable_path_point()->set_x(586392.84003);
     init_point_.mutable_path_point()->set_y(4140673.01232);
-    init_sl_point_.set_s(0.0);
-    init_sl_point_.set_l(0.0);
+    init_point_.set_v(velocity);
+    init_point_.set_a(0.0);
+    init_point_.set_relative_time(0.0);
+  }
+
+  void SetSpeedDataWithConstVeolocity(const double velocity) {
+    // speed point params: s, time, v, a, da
+    double t = 0.0;
+    const double delta_s = 1.0;
+    if (velocity > 0.0) {
+      for (double s = 0.0; s < 100.0; s += delta_s) {
+        speed_data_.add_speed_point(s, t, velocity, 0.0, 0.0);
+        t += delta_s / velocity;
+      }
+    } else {  // when velocity = 0, stand still
+      for (double t = 0.0; t < 10.0; t += 0.1) {
+        speed_data_.add_speed_point(0.0, t, 0.0, 0.0, 0.0);
+      }
+    }
+  }
+
+  virtual void SetUp() {
+    google::InitGoogleLogging("DpRoadGraphTest");
+    OptimizerTestBase::SetUp();
     reference_line_ = &(frame_->planning_data().reference_line());
   }
 
  protected:
-  std::vector<std::vector<common::SLPoint>> sampled_points_;
-  common::TrajectoryPoint init_point_;
-  common::SLPoint init_sl_point_;
   const ReferenceLine* reference_line_ = nullptr;
+  common::TrajectoryPoint init_point_;
+  DecisionData decision_data_;
+  SpeedData speed_data_;  // input
+  PathData path_data_;    // output
 };
 
-TEST_F(PathSamplerTest, sample_one_point) {
-  dp_poly_path_config_.set_sample_points_num_each_level(1);
-  PathSampler sampler(dp_poly_path_config_);
-  bool sample_result = sampler.sample(*reference_line_, init_point_,
-                                      init_sl_point_, &sampled_points_);
-  EXPECT_TRUE(sample_result);
-  EXPECT_EQ(8, sampled_points_.size());
-  EXPECT_EQ(1, sampled_points_[0].size());
-  EXPECT_EQ(1, sampled_points_[7].size());
-  EXPECT_FLOAT_EQ(40, sampled_points_[7][0].s());
-  EXPECT_FLOAT_EQ(0, sampled_points_[7][0].l());
-  // export_sl_points(sampled_points_, "/tmp/points.txt");
-}
+TEST_F(DpRoadGraphTest, speed_road_graph) {
+  SetInitPointWithVelocity(10.0);
+  SetSpeedDataWithConstVeolocity(10.0);
 
-TEST_F(PathSamplerTest, sample_three_points) {
-  dp_poly_path_config_.set_sample_points_num_each_level(3);
-  PathSampler sampler(dp_poly_path_config_);
-  bool sample_result = sampler.sample(*reference_line_, init_point_,
-                                      init_sl_point_, &sampled_points_);
-  EXPECT_TRUE(sample_result);
-  EXPECT_EQ(8, sampled_points_.size());
-  EXPECT_EQ(3, sampled_points_[0].size());
-  ASSERT_EQ(3, sampled_points_[7].size());
-  EXPECT_FLOAT_EQ(40, sampled_points_[7][0].s());
-  EXPECT_FLOAT_EQ(-0.5, sampled_points_[7][0].l());
-  EXPECT_FLOAT_EQ(40, sampled_points_[7][1].s());
-  EXPECT_FLOAT_EQ(0, sampled_points_[7][1].l());
-  EXPECT_FLOAT_EQ(40, sampled_points_[7][2].s());
-  EXPECT_FLOAT_EQ(0.5, sampled_points_[7][2].l());
+  DpRoadGraph road_graph(dp_poly_path_config_, init_point_, speed_data_);
+  ASSERT_TRUE(reference_line_ != nullptr);
+  bool result =
+      road_graph.find_tunnel(*reference_line_, &decision_data_, &path_data_);
+
+  EXPECT_TRUE(result);
   // export_sl_points(sampled_points_, "/tmp/points.txt");
 }
 

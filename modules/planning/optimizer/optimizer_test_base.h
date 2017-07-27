@@ -64,7 +64,7 @@ class OptimizerTestBase : public ::testing::Test {
       const std::string& filename);
 
  protected:
-  DpPolyPathConfig config_;
+  DpPolyPathConfig dp_poly_path_config_;
   Frame* frame_ = nullptr;
 };
 
