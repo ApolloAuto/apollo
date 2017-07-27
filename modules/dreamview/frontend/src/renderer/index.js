@@ -7,6 +7,7 @@ import Ground from "renderer/ground";
 import Map from "renderer/map";
 import PlanningTrajectory from "renderer/trajectory.js";
 import PerceptionObstacles from "renderer/obstacles.js";
+import Decision from "renderer/decision.js";
 
 class Renderer {
     constructor() {
@@ -47,6 +48,9 @@ class Renderer {
 
         // The perception obstacles.
         this.perceptionObstacles = new PerceptionObstacles();
+
+        // The decision.
+        this.decision = new Decision();
     }
 
     initialize(canvasId, width, height) {
@@ -146,6 +150,7 @@ class Renderer {
         this.adc.update(world, this.coordinates);
         this.planningTrajectory.update(world, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
+        this.decision.update(world, this.coordinates, this.scene);
     }
 
     updateMap(newData) {
