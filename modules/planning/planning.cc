@@ -303,11 +303,19 @@ ADCTrajectory Planning::ToADCTrajectory(
                                      trajectory_pb.mutable_header());
 
   trajectory_pb.mutable_header()->set_timestamp_sec(header_time);
+  trajectory_pb.mutable_trajectory_point()->MergeFrom(
+      {discretized_trajectory.begin(), discretized_trajectory.end()});
 
-  for (const auto& trajectory_point : discretized_trajectory) {
-    auto ptr_trajectory_point_pb = trajectory_pb.add_trajectory_point();
-    ptr_trajectory_point_pb->CopyFrom(trajectory_point);
-  }
+  // Add debug information.
+  auto* debug_reference_line =
+      trajectory_pb.mutable_debug()->mutable_planning_data()->add_path();
+  debug_reference_line->set_name("planning_reference_line");
+  const auto& reference_points =
+      DataCenter::instance()->current_frame()->planning_data()
+          .reference_line().reference_points();
+  debug_reference_line->mutable_path()->mutable_path_point()->CopyFrom({
+      reference_points.begin(), reference_points.end()});
+
   return std::move(trajectory_pb);
 }
 
