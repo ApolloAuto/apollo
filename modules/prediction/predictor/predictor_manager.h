@@ -23,6 +23,8 @@
 #define MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
 
 #include <unordered_map>
+#include <map>
+#include <memory>
 
 #include "modules/prediction/predictor/predictor.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
