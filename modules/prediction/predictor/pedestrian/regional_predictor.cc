@@ -100,7 +100,7 @@ void RegionalPredictor::GenerateStillTrajectory(
     AERROR << "Missing position or velocity.";
     return;
   }
-  
+
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   double heading = 0.0 - M_PI;
   int num_traj = FLAGS_num_trajectory_still_pedestrian;
@@ -157,7 +157,7 @@ void RegionalPredictor::GenerateMovingTrajectory(
       obstacle->kf_pedestrian_tracker(), total_time,
       &left_points, &right_points);
   int start_index = GetTrajectorySize();
-  
+
   Trajectory left_trajectory;
   Trajectory right_trajectory;
   GenerateTrajectory(left_points, &left_trajectory);
