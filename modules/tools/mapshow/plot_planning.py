@@ -16,27 +16,33 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
+import os
 import rospy
 import argparse
 import threading
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from map import Map
+from localization import Localization
 from modules.planning.proto import planning_pb2
+from modules.localization.proto import localization_pb2
 
 DATAX = {}
 DATAY = {}
 PATHLOCK = threading.Lock()
 line_pool = []
 line_pool_size = 4
+vehicle_position_line = None
+vehicle_polygon_line = None
+localization_pb_buff = None
 
+def localization_callback(localization_pb):
+    global localization_pb_buff
+    localization_pb_buff = localization_pb
 
-def callback(data):
+def planning_callback(planning_pb):
     global DATAX, DATAY
     PATHLOCK.acquire()
-    planning_pb = planning_pb2.ADCTrajectory()
-    planning_pb.CopyFrom(data)
     DATAX = {}
     DATAY = {}
     for path_debug in planning_pb.debug.planning_data.path:
@@ -46,8 +52,6 @@ def callback(data):
         for path_point in path_debug.path.path_point:
             DATAX[name].append(path_point.x)
             DATAY[name].append(path_point.y)
-        #print len(DATAX[name])
-        #print len(DATAY[name])
     PATHLOCK.release()
 
 
@@ -55,7 +59,10 @@ def add_listener():
     rospy.init_node('plot_planning', anonymous=True)
     rospy.Subscriber('/apollo/planning',
                      planning_pb2.ADCTrajectory,
-                     callback)
+                     planning_callback)
+    rospy.Subscriber('/apollo/localization/pose',
+                     localization_pb2.LocalizationEstimate,
+                     localization_callback)
 
 
 def update(frame_number):
@@ -63,6 +70,8 @@ def update(frame_number):
     for line in line_pool:
         line.set_visible(False)
         line.set_label(None)
+    vehicle_position_line.set_visible(False)
+    vehicle_polygon_line.set_visible(False)
     cnt = 0
     for name in DATAX.keys():
         if cnt >= len(line_pool):
@@ -75,6 +84,11 @@ def update(frame_number):
         line.set_label(name)
         cnt += 1
     PATHLOCK.release()
+    if localization_pb_buff is not None:
+        vehicle_position_line.set_visible(True)
+        vehicle_polygon_line.set_visible(True)
+        Localization(localization_pb_buff)\
+            .replot_vehicle(vehicle_position_line, vehicle_polygon_line)
 
     ax.relim()
     # update ax.viewLim using the new dataLim
@@ -83,19 +97,26 @@ def update(frame_number):
 
 
 def init_line_pool(central_x, central_y):
+    global vehicle_position_line, vehicle_polygon_line
     colors = ['b', 'g', 'r', 'k']
     for i in range(line_pool_size):
         line, = ax.plot([central_x], [central_y],
                         colors[i % len(colors)], lw=3, alpha=0.5)
         line_pool.append(line)
 
+    vehicle_position_line, = ax.plot([central_x], [central_y], 'go', alpha=0.3)
+    vehicle_polygon_line, = ax.plot([central_x], [central_y], 'g-')
+
 
 if __name__ == '__main__':
+    default_map_path = os.path.dirname(os.path.realpath(__file__))
+    default_map_path += "/../../map/data/base_map.txt"
+
     parser = argparse.ArgumentParser(
         description="plot_planning is a tool to display planning trajs on a map.",
         prog="plot_planning.py")
     parser.add_argument(
-        "-m", "--map", action="store", type=str, required=True,
+        "-m", "--map", action="store", type=str, required=False, default=default_map_path,
         help="Specify the map file in txt or binary format")
     args = parser.parse_args()
 

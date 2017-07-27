@@ -3,8 +3,8 @@ from google.protobuf import text_format
 from modules.localization.proto import localization_pb2
 
 class Localization:
-    def __init__(self):
-        self.localization_pb = None
+    def __init__(self, localization_pb=None):
+        self.localization_pb = localization_pb
 
     def load(self, localization_file_name):
         self.localization_pb = localization_pb2.LocalizationEstimate()
@@ -17,11 +17,36 @@ class Localization:
         self.plot_vehicle_polygon(ax)
         self.show_annotation(ax)
 
+    def replot_vehicle(self, position_line, polygon_line):
+        self.replot_vehicle_position(position_line)
+        self.replot_vehicle_polygon(polygon_line)
+
     def plot_vehicle_position(self, ax):
         loc_x = [self.localization_pb.pose.position.x]
         loc_y = [self.localization_pb.pose.position.y]
         ax.plot(loc_x, loc_y, "bo")
 
+    def replot_vehicle_position(self, line):
+        loc_x = [self.localization_pb.pose.position.x]
+        loc_y = [self.localization_pb.pose.position.y]
+        line.set_xdata(loc_x)
+        line.set_ydata(loc_y)
+
+    def replot_vehicle_polygon(self, line):
+        position = []
+        position.append(self.localization_pb.pose.position.x)
+        position.append(self.localization_pb.pose.position.y)
+        position.append(self.localization_pb.pose.position.z)
+
+        polygon = self.get_vehicle_polygon(position,
+                                           self.localization_pb.pose.heading)
+        px = []
+        py = []
+        for point in polygon:
+            px.append(point[0])
+            py.append(point[1])
+        line.set_xdata(px)
+        line.set_ydata(py)
 
     def plot_vehicle_polygon(self, ax):
         position = []
@@ -57,9 +82,6 @@ class Localization:
         for point in polygon:
             px.append(point[0])
             py.append(point[1])
-        point = polygon[0]
-        px.append(point[0])
-        py.append(point[1])
         ax.plot(px, py, "g-")
 
     def get_vehicle_polygon(self, position, heading):
@@ -90,4 +112,5 @@ class Localization:
         polygon.append([p1_x + x, p1_y + y, 0])
         polygon.append([p2_x + x, p2_y + y, 0])
         polygon.append([p3_x + x, p3_y + y, 0])
+        polygon.append([p0_x + x, p0_y + y, 0])
         return polygon
