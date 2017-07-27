@@ -23,7 +23,7 @@ from gflags import FLAGS
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from map import Map
-
+import threading
 from modules.planning.proto import planning_pb2
 
 DATAX = {}
@@ -32,9 +32,14 @@ DATAY = {}
 FLAGS = gflags.FLAGS
 gflags.DEFINE_integer("data_length", 500, "Control plot data length")
 
+PATHLOCK = threading.Lock()
+line_pool = []
+line_pool_size = 4
+
 
 def callback(data):
     global DATAX, DATAY
+    PATHLOCK.acquire()
     planning_pb = planning_pb2.ADCTrajectory()
     planning_pb.CopyFrom(data)
     DATAX = {}
@@ -48,6 +53,7 @@ def callback(data):
             DATAY[name].append(path_point.y)
         #print len(DATAX[name])
         #print len(DATAY[name])
+    PATHLOCK.release()
 
 
 def listener():
@@ -57,18 +63,8 @@ def listener():
                      callback)
 
 
-def compensate(data_list):
-    if len(data_list) > FLAGS.data_length:
-        data_list = data_list[0:FLAGS.data_length]
-    else:
-        diff = FLAGS.data_length - len(data_list)
-        last = data_list[-1]
-        for i in range(diff):
-            data_list.append(last)
-    return data_list
-
-
 def update(frame_number):
+    PATHLOCK.acquire()
     for line in line_pool:
         line.set_visible(False)
         line.set_label(None)
@@ -79,10 +75,11 @@ def update(frame_number):
             continue
         line = line_pool[cnt]
         line.set_visible(True)
-        line.set_xdata(compensate(DATAX[name]))
-        line.set_ydata(compensate(DATAY[name]))
+        line.set_xdata(DATAX[name])
+        line.set_ydata(DATAY[name])
         line.set_label(name)
         cnt += 1
+    PATHLOCK.release()
 
     ax.relim()
     # update ax.viewLim using the new dataLim
@@ -90,13 +87,18 @@ def update(frame_number):
     ax.legend(loc="upper left")
 
 
+def init_line_pool(central_x, central_y):
+    colors = ['b', 'g', 'r', 'k']
+    for i in range(line_pool_size):
+        line, = ax.plot([central_x], [central_y],
+                        colors[i % len(colors)], lw=3, alpha=0.5)
+        line_pool.append(line)
+
+
 if __name__ == '__main__':
     argv = FLAGS(sys.argv)
     listener()
     fig, ax = plt.subplots()
-    X = range(FLAGS.data_length)
-    Xs = [i * -1 for i in X]
-    Xs.sort()
 
     map = Map()
     map.load("../../map/data/base_map.txt")
@@ -104,25 +106,9 @@ if __name__ == '__main__':
     central_y = sum(ax.get_ylim())/2
     central_x = sum(ax.get_xlim())/2
 
-    line_pool = []
-    line1, = ax.plot(
-        [central_x] * FLAGS.data_length, [central_y] * FLAGS.data_length,
-        'b', lw=3, alpha=0.5)
-    line2, = ax.plot(
-        [central_x] * FLAGS.data_length, [central_y] * FLAGS.data_length,
-        'g', lw=3, alpha=0.5)
-    line3, = ax.plot(
-        [central_x] * FLAGS.data_length, [central_y] * FLAGS.data_length,
-        'r', lw=3, alpha=0.5)
-    line4, = ax.plot(
-        [central_x] * FLAGS.data_length, [central_y] * FLAGS.data_length,
-        'k', lw=3, alpha=0.5)
-    line_pool.append(line1)
-    line_pool.append(line2)
-    line_pool.append(line3)
-    line_pool.append(line4)
+    init_line_pool(central_x, central_y)
 
-    ani = animation.FuncAnimation(fig, update, interval=200)
+    ani = animation.FuncAnimation(fig, update, interval=100)
 
     ax.legend(loc="upper left")
     ax.axis('equal')
