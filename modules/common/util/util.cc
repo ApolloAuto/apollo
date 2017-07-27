@@ -23,12 +23,38 @@ namespace common {
 namespace util {
 
 using SLPoint = apollo::common::SLPoint;
+using PathPoint = apollo::common::PathPoint;
+using TrajectoryPoint = apollo::common::TrajectoryPoint;
 
 SLPoint MakeSLPoint(const double s, const double l) {
   SLPoint sl;
   sl.set_s(s);
   sl.set_l(l);
   return sl;
+}
+
+PathPoint MakePathPoint(const double x, const double y, const double z,
+                        const double theta, const double kappa,
+                        const double dkappa, const double ddkappa) {
+  PathPoint path_point;
+  path_point.set_x(x);
+  path_point.set_y(y);
+  path_point.set_z(z);
+  path_point.set_theta(theta);
+  path_point.set_kappa(kappa);
+  path_point.set_dkappa(dkappa);
+  path_point.set_ddkappa(ddkappa);
+  return path_point;
+}
+TrajectoryPoint MakeTrajectoryPoint(const apollo::common::PathPoint& path_point,
+                                    const double v, const double a,
+                                    const double relative_time) {
+  TrajectoryPoint point;
+  point.mutable_path_point()->CopyFrom(path_point);
+  point.set_v(v);
+  point.set_a(a);
+  point.set_relative_time(relative_time);
+  return point;
 }
 
 double Distance2D(const PathPoint& a, const PathPoint& b) {

@@ -44,6 +44,15 @@ namespace util {
  */
 apollo::common::SLPoint MakeSLPoint(const double s, const double l);
 
+apollo::common::PathPoint MakePathPoint(const double x, const double y,
+                                        const double z, const double theta,
+                                        const double kappa, const double dkappa,
+                                        const double ddkappa);
+
+apollo::common::TrajectoryPoint MakeTrajectoryPoint(
+    const apollo::common::PathPoint& path_point, const double v, const double a,
+    const double relative_time);
+
 /**
  * calculate the distance beteween PathPoint a and PathPoint b
  * @param a one path point
