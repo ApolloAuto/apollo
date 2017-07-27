@@ -31,6 +31,7 @@ using apollo::hdmap::LineSegment;
 using apollo::hdmap::BoundaryEdge;
 using apollo::hdmap::RoadROIBoundaryPtr;
 using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::hdmap::JunctionBoundaryPtr;
 using apollo::hdmap::BoundaryEdge_Type_LEFT_BOUNDARY;
 using apollo::hdmap::BoundaryEdge_Type_RIGHT_BOUNDARY;
 using apollo::common::math::Vec2d;
@@ -61,17 +62,17 @@ bool HDMapInput::Init() {
   return true;
 }
 
-bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr mapptr) {
+bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   std::unique_lock<std::mutex> lock(mutex_);
-  if (mapptr == nullptr) {
-    mapptr.reset(new HdmapStruct);
+  if (mapptr != NULL && *mapptr == nullptr) {
+    (*mapptr).reset(new HdmapStruct);
   }
   apollo::hdmap::Point point;
   point.set_x(pointd.x);
   point.set_y(pointd.y);
   point.set_z(pointd.z);
   std::vector<RoadROIBoundaryPtr> boundary_vec;
-  std::vector<JunctionInfoConstPtr> junctions_vec;
+  std::vector<JunctionBoundaryPtr> junctions_vec;
 
   int status = hdmap_->get_road_boundaries(point, FLAGS_map_radius,
                                            &boundary_vec, &junctions_vec);
@@ -91,18 +92,18 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr mapptr) {
 
 int HDMapInput::MergeBoundaryJunction(
     std::vector<RoadROIBoundaryPtr>& boundaries,
-    std::vector<JunctionInfoConstPtr>& junctions, HdmapStructPtr mapptr) {
-  if (mapptr == nullptr) {
+    std::vector<JunctionBoundaryPtr>& junctions, HdmapStructPtr* mapptr) {
+  if (*mapptr == nullptr) {
     AERROR << "the HdmapStructPtr mapptr is null";
     return FAIL;
   }
-  mapptr->road_boundary.resize(boundaries.size());
-  mapptr->junction.resize(junctions.size());
+  (*mapptr)->road_boundary.resize(boundaries.size());
+  (*mapptr)->junction.resize(junctions.size());
 
   for (size_t i = 0; i < boundaries.size(); i++) {
-    for (size_t rbi = 0; rbi < boundaries[i]->road_boundary.size(); ++rbi) {
+    for (size_t rbi = 0; rbi < boundaries[i]->road_boundaries.size(); ++rbi) {
       const apollo::hdmap::RoadBoundary& kRoadBoundary =
-          boundaries[i]->road_boundary[rbi];
+          boundaries[i]->road_boundaries[rbi];
       if (kRoadBoundary.has_outer_polygon() &&
           kRoadBoundary.outer_polygon().edge_size() > 0) {
         for (int j = 0; j < kRoadBoundary.outer_polygon().edge_size(); ++j) {
@@ -111,16 +112,18 @@ int HDMapInput::MergeBoundaryJunction(
               edge.has_curve()) {
             for (int k = 0; k < edge.curve().segment_size(); ++k) {
               if (edge.curve().segment(k).has_line_segment()) {
-                DownSampleBoundary(edge.curve().segment(k).line_segment(),
-                                   &(mapptr->road_boundary[i].left_boundary));
+                DownSampleBoundary(
+                    edge.curve().segment(k).line_segment(),
+                    &((*mapptr)->road_boundary[i].left_boundary));
               }
             }
           } else if (edge.type() == BoundaryEdge_Type_RIGHT_BOUNDARY &&
                      edge.has_curve()) {
             for (int k = 0; k < edge.curve().segment_size(); ++k) {
               if (edge.curve().segment(k).has_line_segment()) {
-                DownSampleBoundary(edge.curve().segment(k).line_segment(),
-                                   &(mapptr->road_boundary[i].right_boundary));
+                DownSampleBoundary(
+                    edge.curve().segment(k).line_segment(),
+                    &((*mapptr)->road_boundary[i].right_boundary));
               }
             }
           }
@@ -130,15 +133,15 @@ int HDMapInput::MergeBoundaryJunction(
   }
 
   for (size_t i = 0; i < junctions.size(); i++) {
-    const Polygon2d& polygon = junctions[i]->polygon();
+    const Polygon2d& polygon = junctions[i]->junction_info->polygon();
     const vector<Vec2d>& points = polygon.points();
-    mapptr->junction[i].reserve(points.size());
+    (*mapptr)->junction[i].reserve(points.size());
     for (size_t idj = 0; idj < points.size(); ++idj) {
       PointD pointd;
       pointd.x = points[idj].x();
       pointd.y = points[idj].y();
       pointd.z = 0.0;
-      mapptr->junction[i].push_back(pointd);
+      (*mapptr)->junction[i].push_back(pointd);
     }
   }
 
