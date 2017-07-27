@@ -55,6 +55,7 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
   return Status::OK();
 }
 
