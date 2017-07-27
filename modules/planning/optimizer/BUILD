@@ -55,4 +55,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "optimizer_test_base",
+    srcs = [
+        "optimizer_test_base.cc",
+    ],
+    hdrs = [
+        "optimizer_test_base.h",
+    ],
+    data = [
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/util",
+        "//modules/planning/common:data_center",
+        "//modules/planning/proto:dp_poly_path_config_proto",
+        "@gtest//:gtest",
+    ],
+)
+
 cpplint()
