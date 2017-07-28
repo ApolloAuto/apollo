@@ -71,7 +71,6 @@ class Obstacle : public PlanningObject {
   const std::vector<PredictionTrajectory> &prediction_trajectories() const;
   void add_prediction_trajectory(
       const PredictionTrajectory &prediction_trajectory);
-  std::vector<PredictionTrajectory> *mutable_prediction_trajectories();
 
  private:
   std::string id_ = 0;

@@ -57,8 +57,6 @@ const SpiralCurveConfig& SpiralCurve::spiral_config() const {
   return spiral_config_;
 }
 
-std::vector<double>* SpiralCurve::mutable_p_params() { return &p_params_; }
-
 void SpiralCurve::set_sg(const double sg) { sg_ = sg; }
 
 void SpiralCurve::set_error(const double error) { error_ = error; }
