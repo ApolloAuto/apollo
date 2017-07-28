@@ -868,10 +868,6 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     }
   }
 
-  if (feature_history_.empty()) {
-    return;
-  }
-
   if (feature->lane().has_lane_graph()) {
     SetLanePoints(feature);
   }
