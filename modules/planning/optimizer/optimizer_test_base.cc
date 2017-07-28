@@ -68,6 +68,7 @@ void OptimizerTestBase::SetUp() {
 void OptimizerTestBase::export_sl_points(
     const std::vector<std::vector<common::SLPoint>>& points,
     const std::string& filename) {
+  AINFO << "Write sl_points to file " << filename;
   std::ofstream ofs(filename);
   ofs << "level, s, l" << std::endl;
   int level = 0;
@@ -82,6 +83,7 @@ void OptimizerTestBase::export_sl_points(
 
 void OptimizerTestBase::export_path_data(const PathData& path_data,
                                          const std::string& filename) {
+  AINFO << "Write path_data to file " << filename;
   std::ofstream ofs(filename);
   ofs << "s, l, dl, ddl, x, y, z" << std::endl;
   const auto& frenet_path = path_data.frenet_frame_path();
