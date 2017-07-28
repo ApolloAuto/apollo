@@ -110,7 +110,8 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
   double y_diff = xy_point.y() - init_point.path_point().y();
 
   double s = _init_point.s();
-  for (std::uint32_t i = 0; i <= _qp_spline_path_config.num_output(); ++i) {
+  for (std::uint32_t i = 0; i <= _qp_spline_path_config.num_output() &&
+       s <= end_s; ++i) {
     double l = spline(s);
     double dl = spline.derivative(s);
     double ddl = spline.second_order_derivative(s);
@@ -132,7 +133,7 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
       path_point.set_s(path_points.back().s() + distance);
     }
     path_points.push_back(std::move(path_point));
-    s += s_resolution;
+    s = _init_point.s() + (i + 1) * s_resolution;
   }
   path_data->set_discretized_path(path_points);
   return true;
