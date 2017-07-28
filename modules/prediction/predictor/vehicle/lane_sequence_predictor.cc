@@ -55,7 +55,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
-    if (sequence.lane_segment_size() == 0) {
+    if (sequence.lane_segment_size() <= 0) {
       AERROR << "Empty lane segments.";
       continue;
     }
@@ -73,10 +73,12 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
            << sequence.probability() << "].";
 
     std::string curr_lane_id = sequence.lane_segment(0).lane_id();
+    AINFO << "curr lane id = " << curr_lane_id;
     std::vector<TrajectoryPoint> points;
     DrawLaneSequenceTrajectoryPoints(
         obstacle->kf_lane_tracker(curr_lane_id), sequence,
         FLAGS_prediction_duration, FLAGS_prediction_freq, &points);
+    AINFO << "points size = " << points.size();
 
     Trajectory trajectory;
     GenerateTrajectory(points, &trajectory);
@@ -244,9 +246,9 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
 
     // find next lane id
     while (lane_s > map->LaneById(lane_id)->total_length() &&
-           lane_segment_index < sequence.lane_segment_size()) {
-      lane_s = lane_s - map->LaneById(lane_id)->total_length();
+           lane_segment_index + 1 < sequence.lane_segment_size()) {
       lane_segment_index += 1;
+      lane_s = lane_s - map->LaneById(lane_id)->total_length();      
       lane_id = sequence.lane_segment(lane_segment_index).lane_id();
     }
   }
