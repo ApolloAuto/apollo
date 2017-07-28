@@ -33,4 +33,8 @@ export default class Coordinates {
         return new THREE.Vector2(point.x - this.offset.x,
                                  point.y - this.offset.y);
     }
+
+    applyOffsetToArray(points) {
+        return points.map(point => this.applyOffset(point));
+    }
 }

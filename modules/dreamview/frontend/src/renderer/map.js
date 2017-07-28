@@ -80,9 +80,7 @@ function addLane(lane, coordinates, scene) {
 
     const centralLine = lane.centralCurve.segment;
     centralLine.forEach(segment => {
-        const points = segment.lineSegment.point.map(point =>
-            coordinates.applyOffset(point)
-        );
+        const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
         const centerLine = drawSegmentsFromPoints(
             points, colorMapping.GREEN, 1, 1, false);
         scene.add(centerLine);
@@ -91,9 +89,7 @@ function addLane(lane, coordinates, scene) {
 
     const rightLaneType = lane.rightBoundary.type;
     lane.rightBoundary.curve.segment.forEach((segment, index) => {
-        const points = segment.lineSegment.point.map(point =>
-            coordinates.applyOffset(point)
-        );
+        const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
         const boundary = addLaneMesh(rightLaneType, points);
         scene.add(boundary);
         drewObjects.push(boundary);
@@ -101,9 +97,7 @@ function addLane(lane, coordinates, scene) {
 
     const leftLaneType = lane.leftBoundary.type;
     lane.leftBoundary.curve.segment.forEach((segment, index) => {
-        const points = segment.lineSegment.point.map(point =>
-            coordinates.applyOffset(point)
-        );
+        const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
         const boundary = addLaneMesh(leftLaneType, points);
         scene.add(boundary);
         drewObjects.push(boundary);
@@ -115,9 +109,7 @@ function addLane(lane, coordinates, scene) {
 function addCrossWalk(crosswalk, coordinates, scene) {
     const drewObjects = [];
 
-    const border = crosswalk.polygon.point.map(point =>
-        coordinates.applyOffset(point)
-    );
+    const border = coordinates.applyOffsetToArray(crosswalk.polygon.point);
     border.push(border[0]);
 
     const crosswalkMaterial = new THREE.MeshBasicMaterial({
@@ -203,9 +195,7 @@ function getSignalPositionAndHeading(signal, overlapMap, laneHeading, coordinate
 function drawStopLine(stopLines, drewObjects, coordinates, scene) {
     stopLines.forEach(stopLine => {
         _.each(stopLine.segment, segment => {
-            const points = segment.lineSegment.point.map(point =>
-                coordinates.applyOffset(point)
-            );
+            const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
             const mesh = drawSegmentsFromPoints(points, colorMapping.PURE_WHITE, 5, 3, false);
             scene.add(mesh);
             drewObjects.push(mesh);
