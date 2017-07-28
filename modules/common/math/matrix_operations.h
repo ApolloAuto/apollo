@@ -69,7 +69,7 @@ template <typename T, unsigned int M, unsigned int N>
 Eigen::Matrix<T, N, M> PseudoInverse(const Eigen::Matrix<T, M, N>& m,
         const double epsilon = 1.0e-6) {
     Eigen::Matrix<T, M, M> t = m * m.transpose();
-    return m.transpose() * PseudoInverse(t);
+    return m.transpose() * PseudoInverse<T, M>(t);
 }
 
 /**
