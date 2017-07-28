@@ -30,8 +30,8 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/path_point.pb.h"
-#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -91,7 +91,7 @@ class QpFrenetFrame {
                                                    const double s_end);
 
   std::pair<std::uint32_t, std::uint32_t> find_interval(const double start,
-                                                    const double end) const;
+                                                        const double end) const;
 
   bool calculate_hd_map_bound();
 
@@ -104,6 +104,8 @@ class QpFrenetFrame {
                  std::pair<double, double>* const bound) const;
 
   std::uint32_t find_index(const double s) const;
+
+  void clear_data();
 
  private:
   const ReferenceLine* _reference_line = nullptr;
