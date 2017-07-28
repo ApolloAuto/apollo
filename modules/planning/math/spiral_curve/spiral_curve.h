@@ -84,10 +84,13 @@ class SpiralCurve {
   SpiralCurveConfig spiral_config_;
 
  protected:
-  std::vector<double>* mutable_p_params();
   void set_sg(const double sg);
   void set_error(const double error);
   bool result_sanity_check() const;
+  template <typename T>
+  void prepend_to_p_params(T begin, T end) {
+    std::copy(begin, end, p_params_.begin());
+  }
   static constexpr double s_two_pi_ = 2 * M_PI;
 };
 

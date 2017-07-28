@@ -185,7 +185,7 @@ bool QuinticSpiralCurve::calculate_path() {
   }
 
   // update params
-  std::copy(p_shoot.begin(), p_shoot.end(), (*mutable_p_params()).begin());
+  prepend_to_p_params(p_shoot.begin(), p_shoot.end());
   set_sg(sg);
   set_error(diff);
 
