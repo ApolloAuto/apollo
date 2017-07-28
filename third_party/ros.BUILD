@@ -20,6 +20,7 @@ cc_library(
         "lib/libtf2_ros.so",
         "lib/libeigen_conversions.so",
         "lib/liborocos-kdl.so.1.3",
+        "lib/libactionlib.so",
     ],
     hdrs = glob([
         "include/*/*.h",
