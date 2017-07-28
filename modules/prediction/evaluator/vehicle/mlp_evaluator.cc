@@ -285,7 +285,9 @@ double MLPEvaluator::ComputeProbability() {
   double probability = 0.0;
 
   if (model_ptr_->dim_input() != static_cast<int>(feature_values_.size())) {
-    AERROR << "Model feature size not consistent with model proto definition.";
+    AERROR << "Model feature size not consistent with model proto definition. "
+           << "model input dim = " << model_ptr_->dim_input()
+           << "; feature value size = " << feature_values_.size();
     return probability;
   }
   std::vector<double> layer_input;
@@ -302,8 +304,8 @@ double MLPEvaluator::ComputeProbability() {
 
   for (int i = 0; i < model_ptr_->num_layer(); ++i) {
     if (i > 0) {
-      layer_input.clear();
-      layer_output.swap(layer_output);
+      layer_input.swap(layer_output);
+      layer_output.clear();
     }
     const Layer& layer = model_ptr_->layer(i);
     for (int col = 0; col < layer.layer_output_dim(); ++col) {
