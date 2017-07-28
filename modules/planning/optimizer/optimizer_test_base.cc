@@ -86,11 +86,11 @@ void OptimizerTestBase::export_path_data(const PathData& path_data,
   ofs << "s, l, dl, ddl, x, y, z" << std::endl;
   const auto& frenet_path = path_data.frenet_frame_path();
   const auto& discrete_path = path_data.path();
-  if (frenet_path.num_points() != discrete_path.num_of_points()) {
+  if (frenet_path.number_of_points() != discrete_path.num_of_points()) {
     AERROR << "frenet_path and discrete path have different number of points";
     return;
   }
-  for (uint32_t i = 0; i < frenet_path.num_points(); ++i) {
+  for (uint32_t i = 0; i < frenet_path.number_of_points(); ++i) {
     const auto& frenet_point = frenet_path.point_at(i);
     const auto& discrete_point = discrete_path.path_point_at(i);
     ofs << frenet_point.s() << ", " << frenet_point.l() << ", "

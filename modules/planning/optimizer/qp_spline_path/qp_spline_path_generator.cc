@@ -134,7 +134,7 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
     path_points.push_back(std::move(path_point));
     s += s_resolution;
   }
-  (*path_data->mutable_path()->mutable_path_points()) = path_points;
+  path_data->set_path_points(path_points);
   return true;
 }
 

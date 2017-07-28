@@ -45,7 +45,9 @@ const std::vector<common::FrenetFramePoint> &FrenetFramePath::points() const {
   return points_;
 }
 
-std::uint32_t FrenetFramePath::num_points() const { return points_.size(); }
+std::uint32_t FrenetFramePath::number_of_points() const {
+  return points_.size();
+}
 
 const common::FrenetFramePoint &FrenetFramePath::point_at(
     const std::uint32_t index) const {
