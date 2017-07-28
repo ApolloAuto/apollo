@@ -73,12 +73,10 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
            << sequence.probability() << "].";
 
     std::string curr_lane_id = sequence.lane_segment(0).lane_id();
-    AINFO << "curr lane id = " << curr_lane_id;
     std::vector<TrajectoryPoint> points;
     DrawLaneSequenceTrajectoryPoints(
         obstacle->kf_lane_tracker(curr_lane_id), sequence,
         FLAGS_prediction_duration, FLAGS_prediction_freq, &points);
-    AINFO << "points size = " << points.size();
 
     Trajectory trajectory;
     GenerateTrajectory(points, &trajectory);

@@ -51,12 +51,10 @@ Evaluator* EvaluatorManager::GetEvaluator(
 
 void EvaluatorManager::Run(
     const ::apollo::perception::PerceptionObstacles& perception_obstacles) {
-  AINFO << "Start run evaluator manager";
   ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
       AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(container);
-  AINFO << "Start for loop";
 
   Evaluator *evaluator = nullptr;
   for (const auto& perception_obstacle :
