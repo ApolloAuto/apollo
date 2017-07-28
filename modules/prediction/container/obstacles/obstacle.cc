@@ -652,7 +652,7 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
 
   double lane_speed = kf_ptr->GetStateEstimate()(2, 0);
   double lane_acc = apollo::common::math::Clamp(
-      kf_ptr->GetStateEstimate()(2, 0), FLAGS_min_acc, FLAGS_max_acc);
+      kf_ptr->GetStateEstimate()(3, 0), FLAGS_min_acc, FLAGS_max_acc);
   feature->set_t_speed(lane_speed);
   feature->set_t_acc(lane_acc);
 
