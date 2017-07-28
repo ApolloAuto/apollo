@@ -39,6 +39,8 @@ namespace planning {
 
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::math::Vec2d;
+using apollo::common::VehicleState;
 
 DataCenter::DataCenter() {
   _object_table.reset(new ObjectTable());
@@ -70,7 +72,6 @@ bool DataCenter::CreateReferenceLineFromMap() {
       AdapterManager::GetRoutingResult()->GetLatestObserved();
 
   std::vector<ReferencePoint> ref_points;
-  common::math::Vec2d vehicle_position;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
   ReferenceLineSmoother smoother;
   if (!smoother.Init(FLAGS_reference_line_smoother_config_file)) {
@@ -78,9 +79,6 @@ bool DataCenter::CreateReferenceLineFromMap() {
            << FLAGS_reference_line_smoother_config_file;
     return false;
   }
-
-  vehicle_position.set_x(common::VehicleState::instance()->x());
-  vehicle_position.set_y(common::VehicleState::instance()->y());
 
   for (const auto &lane : routing_result.route()) {
     auto lane_id = common::util::MakeMapId(lane.id());
@@ -95,8 +93,7 @@ bool DataCenter::CreateReferenceLineFromMap() {
     const auto &headings = lane_info_ptr->headings();
     for (size_t i = 0; i < points.size(); ++i) {
       hdmap::LaneWaypoint lane_waypoint(lane_info_ptr.get(), accumulate_s[i]);
-      // TODO(fanhaoyang) figure out a reason for number -2.0, 2.0
-      ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, lane_waypoint);
+      ref_points.emplace_back(points[i], headings[i], lane_waypoint);
     }
   }
   if (ref_points.empty()) {
