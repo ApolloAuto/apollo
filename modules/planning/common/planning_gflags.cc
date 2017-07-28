@@ -63,6 +63,9 @@ DEFINE_double(replan_s_threshold, 5.0,
 DEFINE_double(replan_l_threshold, 2.5,
               "The l difference to real position threshold of replan");
 
+DEFINE_double(default_reference_line_width, 4.0,
+              "Default reference line width");
+
 DEFINE_double(planning_distance, 100, "Planning distance");
 
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
