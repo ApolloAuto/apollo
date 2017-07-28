@@ -35,6 +35,8 @@ class PathData {
 
   void set_path(const DiscretizedPath &path);
 
+  void set_path_points(const std::vector<common::PathPoint> &path_points);
+
   void set_frenet_path(const FrenetFramePath &frenet_path);
 
   DiscretizedPath *mutable_path();

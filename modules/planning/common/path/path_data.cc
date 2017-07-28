@@ -39,6 +39,11 @@ void PathData::set_frenet_path(const FrenetFramePath &frenet_path) {
 
 DiscretizedPath *PathData::mutable_path() { return &path_; }
 
+void PathData::set_path_points(
+    const std::vector<common::PathPoint> &path_points) {
+  path_.set_points(path_points);
+}
+
 const DiscretizedPath &PathData::path() const { return path_; }
 
 FrenetFramePath *PathData::mutable_frenet_frame_path() { return &frenet_path_; }
