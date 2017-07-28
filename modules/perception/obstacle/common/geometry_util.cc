@@ -57,5 +57,91 @@ void TransformCloud(pcl_util::PointCloudPtr cloud, const std::vector<int>& indic
   }
 }
 
+double vector_cos_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {                           
+    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());                              
+    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());                              
+    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);             
+    return cos_theta;                                                                               
+}                                                                                                   
+                                                                                                     
+double vector_cos_theta_2d_xy(Eigen::Vector4f& v1, Eigen::Vector4f& v2) {                           
+    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());                              
+    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());                              
+    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);             
+    return cos_theta;                                                                               
+}       
+
+ float dist_xy_to_bbox(const Eigen::Vector3f& center, const Eigen::Vector3f& dir,                    
+    const Eigen::Vector3f& size, const Eigen::Vector3f& point) {                                    
+                                                                                                
+    Eigen::Vector3f dir2d(dir[0], dir[1], 0);                                                       
+    dir2d.normalize();                                                                              
+    Eigen::Vector3f diff = point - center;                                                          
+    float dx = std::max<float>(0.0f, fabs(dir2d.dot(diff)) - size[0] / 2);                          
+                                                                                                
+    Eigen::Vector3f odir(-dir2d[1], dir2d[0], 0);                                                   
+    float dy = std::max<float>(0.0f, fabs(odir.dot(diff)) - size[1] / 2);                           
+                                                                                                
+    return sqrt(dx*dx + dy*dy);                                                                     
+}     
+
+void max_min_distance_xy_bbox_to_bbox(const Eigen::Vector3f& center0, const Eigen::Vector3f& dir0,  
+    const Eigen::Vector3f& size0, const Eigen::Vector3f& center1,                                   
+    const Eigen::Vector3f& dir1, const Eigen::Vector3f& size1,                                      
+    float& max_dist, float& min_dist) {                                                             
+                                                                                                
+    max_dist = 0;                                                                                   
+    min_dist = 9999999;                                                                             
+    float cx[4] = {-1, 1, -1, 1};                                                                   
+    float cy[4] = {-1, -1, 1, 1};                                                                   
+    Eigen::Vector3f dir0_2d(dir0[0], dir0[1], 0);                                                   
+    dir0_2d.normalize();                                                                            
+    Eigen::Vector3f odir0(-dir0_2d[1], dir0_2d[0], 0);                                              
+                                                                                                
+    Eigen::Vector3f dir1_2d(dir1[0], dir1[1], 0);                                                   
+    dir1_2d.normalize();                                                                            
+    Eigen::Vector3f odir1(-dir1_2d[1], -dir1_2d[0], 0);                                             
+    float hl = size1[0] / 2;                                                                        
+    float hw = size1[1] / 2;                                                                        
+    for (int i = 0; i < 4; i++) {                                                                   
+        Eigen::Vector3f diff = center0 + dir0_2d * cx[i] * size0[0] / 2                             
+            + odir0 * cy[i] * size0[1] / 2 - center1;                                               
+        float dx = fabs(diff.dot(dir1_2d));                                                         
+        float dist = 0;                                                                             
+        if (dx > hl) {                                                                              
+            dist = dx - hl;                                                                         
+        }                                                                                           
+                                                                                                
+        float dy = fabs(diff.dot(odir1));                                                           
+        if (dy > hw) {                                                                              
+            if (dist < dy - hw) {                                                                   
+                dist = dy - hw;                                                                     
+            }                                                                                       
+        }                                                                                           
+                                                                                                
+        if (max_dist < dist) {                                                                      
+            max_dist = dist;                                                                        
+        }                                                                                           
+        if (min_dist > dist) {                                                                      
+            min_dist = dist;                                                                        
+        }                                                                                           
+    }                                                                                               
+}               
+
+//compute the angle of two vector                                                                   
+double vector_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {                               
+    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());                              
+    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());                              
+    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);             
+    double sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);                         
+    if (cos_theta > 1) {cos_theta = 1;}                                                             
+    if (cos_theta < -1) {cos_theta = -1;}                                                           
+    double theta = acos(cos_theta);                                                                 
+    if (sin_theta < 0) {                                                                            
+        theta = -theta;                                                                             
+    }                                                                                               
+    return theta;                                                                                   
+}         
+
 }  // namespace perception
 }  // namespace apollo
