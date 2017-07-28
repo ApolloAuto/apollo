@@ -256,12 +256,10 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
 void MLPEvaluator::LoadModel(const std::string& model_file) {
   model_ptr_.reset(new FnnVehicleModel());
   CHECK(model_ptr_ != nullptr);
+  CHECK(::apollo::common::util::GetProtoFromFile(
+      model_file, model_ptr_.get()))
+      << "Unable to load model file: " << model_file << ".";
 
-  if (!::apollo::common::util::GetProtoFromFile(model_file,
-                                                model_ptr_.get())) {
-    AERROR << "Unable to load model file: " << model_file << ".";
-    return;
-  }
   AINFO << "Succeeded in loading the model file: " << model_file << ".";
 }
 
@@ -299,15 +297,16 @@ double MLPEvaluator::ComputeProbability() {
         double weight = layer.layer_input_weight().rows(row).columns(col);
         neuron_output += (layer_input[row] * weight);
       }
-      if (layer.layer_activation_type() == Layer::RELU) {
+      if (layer.layer_activation_type() == "relu") {
         neuron_output = apollo::prediction::util::Relu(neuron_output);
-      } else if (layer.layer_activation_type() == Layer::SIGMOID) {
+      } else if (layer.layer_activation_type() == "sigmoid") {
         neuron_output = apollo::prediction::util::Sigmoid(neuron_output);
-      } else if (layer.layer_activation_type() == Layer::TANH) {
+      } else if (layer.layer_activation_type() == "tanh") {
         neuron_output = std::tanh(neuron_output);
       } else {
-        AERROR << "Undefined activation type. "
-               << "A default sigmoid will be used instead.";
+        AERROR << "Undefined activation type ["
+               << layer.layer_activation_type()
+               << "]. A default sigmoid will be used instead.";
         neuron_output = apollo::prediction::util::Sigmoid(neuron_output);
       }
       layer_output.push_back(neuron_output);
