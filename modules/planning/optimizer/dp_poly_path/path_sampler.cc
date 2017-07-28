@@ -34,7 +34,7 @@ namespace planning {
 using Status = apollo::common::Status;
 using SLPoint = apollo::common::SLPoint;
 
-PathSampler::PathSampler(const DpPolyPathConfig& config) : _config(config) {}
+PathSampler::PathSampler(const DpPolyPathConfig& config) : config_(config) {}
 
 bool PathSampler::sample(
     const ReferenceLine& reference_line,
@@ -45,21 +45,21 @@ bool PathSampler::sample(
   const double reference_line_length =
       reference_line.reference_map_line().accumulated_s().back();
   double level_distance =
-      std::fmax(_config.step_length_min(),
-                std::fmin(init_point.v(), _config.step_length_max()));
+      std::fmax(config_.step_length_min(),
+                std::fmin(init_point.v(), config_.step_length_max()));
 
   double accumulated_s = init_sl_point.s();
   for (size_t i = 0;
-       i < _config.sample_level() && accumulated_s < reference_line_length;
+       i < config_.sample_level() && accumulated_s < reference_line_length;
        ++i) {
     std::vector<SLPoint> level_points;
     accumulated_s += level_distance;
     double s = std::fmin(accumulated_s, reference_line_length);
 
     int32_t num =
-        static_cast<int32_t>(_config.sample_points_num_each_level() / 2);
+        static_cast<int32_t>(config_.sample_points_num_each_level() / 2);
     for (int32_t j = -num; j < num + 1; ++j) {
-      double l = _config.lateral_sample_offset() * j;
+      double l = config_.lateral_sample_offset() * j;
       SLPoint sl = common::util::MakeSLPoint(s, l);
       if (reference_line.is_on_road(sl)) {
         level_points.push_back(sl);

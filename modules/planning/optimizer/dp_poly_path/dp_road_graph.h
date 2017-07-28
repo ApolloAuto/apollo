@@ -84,10 +84,10 @@ class DpRoadGraph {
                       std::vector<DpNode> *min_cost_path);
 
  private:
-  DpPolyPathConfig _config;
-  ::apollo::common::TrajectoryPoint _init_point;
-  SpeedData _speed_data;
-  common::SLPoint _init_sl_point;
+  DpPolyPathConfig config_;
+  ::apollo::common::TrajectoryPoint init_point_;
+  SpeedData speed_data_;
+  common::SLPoint init_sl_point_;
 };
 
 }  // namespace planning
