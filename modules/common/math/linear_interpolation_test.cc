@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/common/math/linear_interpolation.h"
 
+#include "Eigen/Dense"
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -36,21 +37,21 @@ TEST(LinearInterpolationTest, LerpOneDim) {
 TEST(LinearInterpolationTest, LerpTwoDim) {
   double t0 = 0.0;
   double t1 = 1.0;
-  double x0 = 2.0;
-  double x1 = 4.0;
-  double y0 = 1.0;
-  double y1 = 5.0;
-  double x = 0.0;
-  double y = 0.0;
-  lerp(x0, y0, t0, x1, y1, t1, 0.4, &x, &y);
-  EXPECT_NEAR(x, 2.8, 1e-6);
-  EXPECT_NEAR(y, 2.6, 1e-6);
-  lerp(x0, y0, t0, x1, y1, t1, 1.2, &x, &y);
-  EXPECT_NEAR(x, 4.4, 1e-6);
-  EXPECT_NEAR(y, 5.8, 1e-6);
-  lerp(x0, y0, t0, x1, y1, t1, -0.5, &x, &y);
-  EXPECT_NEAR(x, 1.0, 1e-6);
-  EXPECT_NEAR(y, -1.0, 1e-6);
+
+  Eigen::Vector2d x0(2.0, 1.0);
+  Eigen::Vector2d x1(4.0, 5.0);
+
+  Eigen::Vector2d x = lerp(x0, t0, x1, t1, 0.4);
+  EXPECT_NEAR(x.x(), 2.8, 1e-6);
+  EXPECT_NEAR(x.y(), 2.6, 1e-6);
+
+  x = lerp(x0, t0, x1, t1, 1.2);
+  EXPECT_NEAR(x.x(), 4.4, 1e-6);
+  EXPECT_NEAR(x.y(), 5.8, 1e-6);
+
+  x = lerp(x0, t0, x1, t1, -0.5);
+  EXPECT_NEAR(x.x(), 1.0, 1e-6);
+  EXPECT_NEAR(x.y(), -1.0, 1e-6);
 }
 
 TEST(LinearInterpolationTest, SlerpCaseOne) {

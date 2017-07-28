@@ -320,6 +320,7 @@ cc_test(
     deps = [
         ":linear_interpolation",
         "//modules/common:log",
+        "@eigen//:eigen",
         "@gtest//:main",
     ],
 )
