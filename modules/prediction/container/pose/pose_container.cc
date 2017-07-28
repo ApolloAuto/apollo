@@ -16,6 +16,8 @@
 
 #include "modules/prediction/container/pose/pose_container.h"
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -33,6 +35,7 @@ void PoseContainer::Insert(const ::google::protobuf::Message& message) {
 
 void PoseContainer::Update(
     const localization::LocalizationEstimate &localization) {
+  std::lock_guard<std::mutex> lock(g_mutex_);
   if (obstacle_ptr_.get() == nullptr) {
     obstacle_ptr_.reset(new PerceptionObstacle());
   }
@@ -51,6 +54,8 @@ void PoseContainer::Update(
 
   obstacle_ptr_->set_type(type_);
   obstacle_ptr_->set_timestamp(localization.measurement_time());
+
+  ADEBUG << "ADC obstacle [" << obstacle_ptr_->ShortDebugString() << "].";
 }
 
 double PoseContainer::GetTimestamp() {

@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:math_utils",
+        "//modules/common/util:util",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/container/obstacles:obstacle",
