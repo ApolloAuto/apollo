@@ -34,6 +34,8 @@ class DiscretizedPath : public Path {
 
   explicit DiscretizedPath(std::vector<common::PathPoint> path_points);
 
+  void set_points(std::vector<common::PathPoint> path_points);
+
   virtual ~DiscretizedPath() = default;
 
   common::PathPoint evaluate(const double param) const override;

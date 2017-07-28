@@ -33,6 +33,10 @@ DiscretizedPath::DiscretizedPath(std::vector<common::PathPoint> path_points) {
   path_points_ = std::move(path_points);
 }
 
+void DiscretizedPath::set_points(std::vector<common::PathPoint> path_points) {
+  path_points_ = path_points;
+}
+
 common::PathPoint DiscretizedPath::evaluate(const double param) const {
   CHECK_GT(path_points_.size(), 1);
   CHECK(path_points_.front().s() <= param && path_points_.back().s() <= param);
