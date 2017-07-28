@@ -63,7 +63,7 @@ TEST_F(PathSamplerTest, sample_one_point) {
   ASSERT_EQ(8, sampled_points_.size());
   ASSERT_EQ(1, sampled_points_[0].size());
   ASSERT_EQ(1, sampled_points_[7].size());
-  EXPECT_FLOAT_EQ(70.419151, sampled_points_[7][0].s());
+  EXPECT_FLOAT_EQ(72.00795, sampled_points_[7][0].s());
   EXPECT_FLOAT_EQ(0, sampled_points_[7][0].l());
 }
 
@@ -73,15 +73,15 @@ TEST_F(PathSamplerTest, sample_three_points) {
   bool sample_result =
       sampler.sample(*reference_line_, init_point_, &sampled_points_);
   EXPECT_TRUE(sample_result);
-  // export_sl_points(sampled_points_, "/tmp/points.txt");
+  export_sl_points(sampled_points_, "/tmp/points.txt");
   ASSERT_EQ(8, sampled_points_.size());
-  ASSERT_EQ(3, sampled_points_[0].size());
+  ASSERT_EQ(1, sampled_points_[0].size());
   ASSERT_EQ(3, sampled_points_[7].size());
-  EXPECT_FLOAT_EQ(70.419151, sampled_points_[7][0].s());
+  EXPECT_FLOAT_EQ(72.00795, sampled_points_[7][0].s());
   EXPECT_FLOAT_EQ(-0.5, sampled_points_[7][0].l());
-  EXPECT_FLOAT_EQ(70.419151, sampled_points_[7][1].s());
+  EXPECT_FLOAT_EQ(72.00795, sampled_points_[7][1].s());
   EXPECT_FLOAT_EQ(0, sampled_points_[7][1].l());
-  EXPECT_FLOAT_EQ(70.419151, sampled_points_[7][2].s());
+  EXPECT_FLOAT_EQ(72.00795, sampled_points_[7][2].s());
   EXPECT_FLOAT_EQ(0.5, sampled_points_[7][2].l());
 }
 

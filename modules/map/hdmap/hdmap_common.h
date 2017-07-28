@@ -16,30 +16,31 @@ limitations under the License.
 #ifndef MODULES_MAP_MAP_LOADER_INC_HDMAP_COMMON_H
 #define MODULES_MAP_MAP_LOADER_INC_HDMAP_COMMON_H
 
-#include <vector>
 #include <memory>
-#include <utility>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/common/math/aabox2d.h"
-#include "modules/common/math/vec2d.h"
-#include "modules/common/math/polygon2d.h"
 #include "modules/common/math/aaboxkdtree2d.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/map/proto/map_lane.pb.h"
-#include "modules/map/proto/map_junction.pb.h"
-#include "modules/map/proto/map_signal.pb.h"
+#include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/map/proto/map_crosswalk.pb.h"
+#include "modules/map/proto/map_id.pb.h"
+#include "modules/map/proto/map_junction.pb.h"
+#include "modules/map/proto/map_lane.pb.h"
+#include "modules/map/proto/map_overlap.pb.h"
+#include "modules/map/proto/map_road.pb.h"
+#include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_overlap.pb.h"
-#include "modules/map/proto/map_id.pb.h"
-#include "modules/map/proto/map_road.pb.h"
 
 namespace apollo {
 namespace hdmap {
 
-template <class Object, class GeoObject> class ObjectWithAABox {
+template <class Object, class GeoObject>
+class ObjectWithAABox {
  public:
   ObjectWithAABox(const apollo::common::math::AABox2d &aabox,
                   const Object *object, const GeoObject *geo_object,
@@ -48,10 +49,10 @@ template <class Object, class GeoObject> class ObjectWithAABox {
   ~ObjectWithAABox() {}
   const apollo::common::math::AABox2d &aabox() const { return _aabox; }
   double DistanceTo(const apollo::common::math::Vec2d &point) const {
-      return _geo_object->DistanceTo(point);
+    return _geo_object->DistanceTo(point);
   }
   double DistanceSquareTo(const apollo::common::math::Vec2d &point) const {
-      return _geo_object->DistanceSquareTo(point);
+    return _geo_object->DistanceSquareTo(point);
   }
   const Object *object() const { return _object; }
   const GeoObject *geo_object() const { return _geo_object; }
@@ -76,7 +77,7 @@ class ClearAreaInfo;
 class HDMapImpl;
 
 using LaneSegmentBox =
-  ObjectWithAABox<LaneInfo, apollo::common::math::LineSegment2d>;
+    ObjectWithAABox<LaneInfo, apollo::common::math::LineSegment2d>;
 using LaneSegmentKDTree = apollo::common::math::AABoxKDTree2d<LaneSegmentBox>;
 
 class LaneInfo {
@@ -88,79 +89,70 @@ class LaneInfo {
   const apollo::hdmap::Id &section_id() const { return _section_id; }
   const apollo::hdmap::Lane &lane() const { return _lane; }
   const std::vector<apollo::common::math::Vec2d> &points() const {
-      return _points;
+    return _points;
   }
   const std::vector<apollo::common::math::Vec2d> &unit_directions() const {
-      return _unit_directions;
+    return _unit_directions;
   }
   const std::vector<double> &headings() const { return _headings; }
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-      return _segments;
+    return _segments;
   }
   const std::vector<double> &accumulate_s() const { return _accumulated_s; }
-  const std::vector<apollo::hdmap::Id>& overlaps() const {
-      return _overlaps;
+  const std::vector<apollo::hdmap::Id> &overlaps() const { return _overlaps; }
+  const std::vector<apollo::hdmap::Id> &cross_lanes() const {
+    return _cross_lanes;
   }
-  const std::vector<apollo::hdmap::Id>& cross_lanes() const {
-      return _cross_lanes;
+  const std::vector<apollo::hdmap::Id> &signals() const { return _signals; }
+  const std::vector<apollo::hdmap::Id> &yield_signs() const {
+    return _yield_signs;
   }
-  const std::vector<apollo::hdmap::Id>& signals() const {
-      return _signals;
+  const std::vector<apollo::hdmap::Id> &stop_signs() const {
+    return _stop_signs;
   }
-  const std::vector<apollo::hdmap::Id>& yield_signs() const {
-      return _yield_signs;
+  const std::vector<apollo::hdmap::Id> &crosswalks() const {
+    return _crosswalks;
   }
-  const std::vector<apollo::hdmap::Id>& stop_signs() const {
-      return _stop_signs;
-  }
-  const std::vector<apollo::hdmap::Id>& crosswalks() const {
-      return _crosswalks;
-  }
-  const std::vector<apollo::hdmap::Id>& junctions() const {
-      return _junctions;
-  }
+  const std::vector<apollo::hdmap::Id> &junctions() const { return _junctions; }
 
   double total_length() const { return _total_length; }
 
   using SampledWidth = std::pair<double, double>;
   const std::vector<SampledWidth> &sampled_left_width() const {
-      return _sampled_left_width;
+    return _sampled_left_width;
   }
   const std::vector<SampledWidth> &sampled_right_width() const {
-      return _sampled_right_width;
+    return _sampled_right_width;
   }
-  void get_width(const double s, double *left_width,
-                                          double *right_width) const;
+  void get_width(const double s, double *left_width, double *right_width) const;
   double get_width(const double s) const;
   double get_effective_width(const double s) const;
 
-  bool is_on_lane(const apollo::common::math::Vec2d& point) const;
-  bool is_on_lane(const apollo::common::math::Box2d& box) const;
+  bool is_on_lane(const apollo::common::math::Vec2d &point) const;
+  bool is_on_lane(const apollo::common::math::Box2d &box) const;
 
   apollo::hdmap::Point get_smooth_point(double s) const;
-  double distance_to(const apollo::common::math::Vec2d& point) const;
-  double distance_to(const apollo::common::math::Vec2d& point,
-                       apollo::common::math::Vec2d* map_point,
-                       double* s_offset,
-                       int* s_offset_index) const;
+  double distance_to(const apollo::common::math::Vec2d &point) const;
+  double distance_to(const apollo::common::math::Vec2d &point,
+                     apollo::common::math::Vec2d *map_point, double *s_offset,
+                     int *s_offset_index) const;
   apollo::hdmap::Point get_nearest_point(
-                    const apollo::common::math::Vec2d& point) const;
-  bool get_projection(const apollo::common::math::Vec2d& point,
-                    double *accumulate_s, double *lateral) const;
+      const apollo::common::math::Vec2d &point, double *distance) const;
+  bool get_projection(const apollo::common::math::Vec2d &point,
+                      double *accumulate_s, double *lateral) const;
 
  private:
   friend class HDMapImpl;
   friend class RoadInfo;
   void init();
-  void post_process(HDMapImpl& map_instance);
-  void update_overlaps(HDMapImpl& map_instance);
+  void post_process(HDMapImpl &map_instance);
+  void update_overlaps(HDMapImpl &map_instance);
   double get_width_from_sample(
-                          const std::vector<LaneInfo::SampledWidth>& samples,
-                          const double s) const;
+      const std::vector<LaneInfo::SampledWidth> &samples, const double s) const;
   void create_kdtree();
-  void set_road_id(const apollo::hdmap::Id& road_id) { _road_id = road_id; }
-  void set_section_id(const apollo::hdmap::Id& section_id) {
-      _section_id = section_id;
+  void set_road_id(const apollo::hdmap::Id &road_id) { _road_id = road_id; }
+  void set_section_id(const apollo::hdmap::Id &section_id) {
+    _section_id = section_id;
   }
 
  private:
@@ -197,7 +189,7 @@ class JunctionInfo {
   const apollo::hdmap::Id &id() const { return _junction.id(); }
   const apollo::hdmap::Junction &junction() const { return _junction; }
   const apollo::common::math::Polygon2d &polygon() const { return _polygon; }
-  const apollo::common::math::AABox2d& mbr() const { return _mbr; }
+  const apollo::common::math::AABox2d &mbr() const { return _mbr; }
 
  private:
   void init();
@@ -208,9 +200,9 @@ class JunctionInfo {
   apollo::common::math::AABox2d _mbr;
 };
 using JunctionPolygonBox =
-  ObjectWithAABox<JunctionInfo, apollo::common::math::Polygon2d>;
+    ObjectWithAABox<JunctionInfo, apollo::common::math::Polygon2d>;
 using JunctionPolygonKDTree =
-  apollo::common::math::AABoxKDTree2d<JunctionPolygonBox>;
+    apollo::common::math::AABoxKDTree2d<JunctionPolygonBox>;
 
 class SignalInfo {
  public:
@@ -281,9 +273,7 @@ class YieldSignInfo {
   explicit YieldSignInfo(const apollo::hdmap::YieldSign &yield_sign);
 
   const apollo::hdmap::Id &id() const { return _yield_sign.id(); }
-  const apollo::hdmap::YieldSign &yield_sign() const {
-    return _yield_sign;
-  }
+  const apollo::hdmap::YieldSign &yield_sign() const { return _yield_sign; }
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
     return _segments;
   }
@@ -306,8 +296,8 @@ class OverlapInfo {
 
   const apollo::hdmap::Id &id() const { return _overlap.id(); }
   const apollo::hdmap::Overlap &overlap() const { return _overlap; }
-  const apollo::hdmap::ObjectOverlapInfo *
-  get_object_overlap_info(const apollo::hdmap::Id &id) const;
+  const apollo::hdmap::ObjectOverlapInfo *get_object_overlap_info(
+      const apollo::hdmap::Id &id) const;
 
  private:
   const apollo::hdmap::Overlap &_overlap;
@@ -315,45 +305,41 @@ class OverlapInfo {
 
 class RoadInfo {
  public:
-    explicit RoadInfo(const apollo::hdmap::Road& road);
-    const apollo::hdmap::Id& id() const {
-        return _road.id();
-    }
+  explicit RoadInfo(const apollo::hdmap::Road &road);
+  const apollo::hdmap::Id &id() const { return _road.id(); }
 
-    const apollo::hdmap::Road& road() const { return _road; }
+  const apollo::hdmap::Road &road() const { return _road; }
 
-    const std::vector<apollo::hdmap::RoadSection>& sections() const {
-        return _sections;
-    }
+  const std::vector<apollo::hdmap::RoadSection> &sections() const {
+    return _sections;
+  }
 
-    const apollo::hdmap::Id& junction_id() const {
-        return _road.junction_id();
-    }
+  const apollo::hdmap::Id &junction_id() const { return _road.junction_id(); }
 
-    bool has_junction_id() const { return _road.has_junction_id(); }
+  bool has_junction_id() const { return _road.has_junction_id(); }
 
-    const std::vector<apollo::hdmap::RoadBoundary>& get_boundaries() const;
+  const std::vector<apollo::hdmap::RoadBoundary> &get_boundaries() const;
 
  private:
-    apollo::hdmap::Road _road;
-    std::vector<apollo::hdmap::RoadSection> _sections;
-    std::vector<apollo::hdmap::RoadBoundary> _road_boundaries;
+  apollo::hdmap::Road _road;
+  std::vector<apollo::hdmap::RoadSection> _sections;
+  std::vector<apollo::hdmap::RoadBoundary> _road_boundaries;
 };
 
-typedef std::shared_ptr<const apollo::hdmap::LaneInfo>    LaneInfoConstPtr;
+typedef std::shared_ptr<const apollo::hdmap::LaneInfo> LaneInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::JunctionInfo> JunctionInfoConstPtr;
-typedef std::shared_ptr<const apollo::hdmap::SignalInfo>    SignalInfoConstPtr;
+typedef std::shared_ptr<const apollo::hdmap::SignalInfo> SignalInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::CrosswalkInfo>
-                                                        CrosswalkInfoConstPtr;
+    CrosswalkInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::StopSignInfo> StopSignInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::YieldSignInfo>
-                                                        YieldSignInfoConstPtr;
-typedef std::shared_ptr<const apollo::hdmap::OverlapInfo>  OverlapInfoConstPtr;
-typedef std::shared_ptr<const apollo::hdmap::RoadInfo>  RoadInfoConstPtr;
+    YieldSignInfoConstPtr;
+typedef std::shared_ptr<const apollo::hdmap::OverlapInfo> OverlapInfoConstPtr;
+typedef std::shared_ptr<const apollo::hdmap::RoadInfo> RoadInfoConstPtr;
 
 struct RoadROIBoundary {
-    apollo::hdmap::Id id;
-    std::vector<apollo::hdmap::RoadBoundary> road_boundaries;
+  apollo::hdmap::Id id;
+  std::vector<apollo::hdmap::RoadBoundary> road_boundaries;
 };
 
 using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;

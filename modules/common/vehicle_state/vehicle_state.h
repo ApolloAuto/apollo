@@ -49,6 +49,14 @@ class VehicleState {
   void Update(const localization::LocalizationEstimate& localization,
               const canbus::Chassis& chassis);
 
+  /**
+   * @brief Update VehicleState instance by protobuf files.
+   * @param localization_file the localization protobuf file.
+   * @param chassis_file The chassis protobuf file
+   */
+  void Update(const std::string& localization_file,
+              const std::string& chassis_file);
+
   double timestamp() const { return timestamp_; };
 
   const apollo::localization::Pose& pose() const { return pose_; };

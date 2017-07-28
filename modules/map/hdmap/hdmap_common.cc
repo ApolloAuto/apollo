@@ -84,15 +84,16 @@ void segments_from_curve(
 }
 
 apollo::hdmap::Point point_from_vec2d(
-                                    const apollo::common::math::Vec2d& point) {
+    const apollo::common::math::Vec2d &point) {
   apollo::hdmap::Point pt;
   pt.set_x(point.x());
   pt.set_y(point.y());
   return pt;
 }
 apollo::common::math::Vec2d vec2d_from_point(
-                                          const apollo::hdmap::Point& point) {
-  return apollo::common::math::Vec2d(point.x(), point.y());;
+    const apollo::hdmap::Point &point) {
+  return apollo::common::math::Vec2d(point.x(), point.y());
+  ;
 }
 
 }  // namespace
@@ -125,7 +126,7 @@ void LaneInfo::init() {
   for (const auto &direction : _unit_directions) {
     _headings.push_back(direction.Angle());
   }
-  for (const auto& overlap_id : _lane.overlap_id()) {
+  for (const auto &overlap_id : _lane.overlap_id()) {
     _overlap_ids.emplace_back(overlap_id.id());
   }
   CHECK(!_segments.empty());
@@ -193,14 +194,11 @@ double LaneInfo::get_width_from_sample(
   return sample1.second * ratio + sample2.second * (1.0 - ratio);
 }
 
-bool LaneInfo::is_on_lane(const apollo::common::math::Vec2d& point) const {
+bool LaneInfo::is_on_lane(const apollo::common::math::Vec2d &point) const {
   apollo::common::math::Vec2d map_point(0.0, 0.0);
   double s_offset = 0.0;
   int s_offset_index = 0;
-  double dist = distance_to(point,
-                       &map_point,
-                       &s_offset,
-                       &s_offset_index);
+  double dist = distance_to(point, &map_point, &s_offset, &s_offset_index);
 
   double left_width = 0.0;
   double right_width = 0.0;
@@ -211,13 +209,13 @@ bool LaneInfo::is_on_lane(const apollo::common::math::Vec2d& point) const {
   return false;
 }
 
-bool LaneInfo::is_on_lane(const apollo::common::math::Box2d& box) const {
+bool LaneInfo::is_on_lane(const apollo::common::math::Box2d &box) const {
   std::vector<apollo::common::math::Vec2d> corners;
   box.GetAllCorners(&corners);
-  for (const auto& corner : corners) {
-      if (!is_on_lane(corner)) {
-          return false;
-      }
+  for (const auto &corner : corners) {
+    if (!is_on_lane(corner)) {
+      return false;
+    }
   }
   return true;
 }
@@ -232,8 +230,8 @@ apollo::hdmap::Point LaneInfo::get_smooth_point(double s) const {
     return point_from_vec2d(_points.back());
   }
 
-  const auto low_itr = std::lower_bound(_accumulated_s.begin(),
-                      _accumulated_s.end(), s);
+  const auto low_itr =
+      std::lower_bound(_accumulated_s.begin(), _accumulated_s.end(), s);
   CHECK(low_itr != _accumulated_s.end());
   size_t index = low_itr - _accumulated_s.begin();
   double delta_s = *low_itr - s;
@@ -246,142 +244,138 @@ apollo::hdmap::Point LaneInfo::get_smooth_point(double s) const {
   return point_from_vec2d(smooth_point);
 }
 
-double LaneInfo::distance_to(const apollo::common::math::Vec2d& point) const {
+double LaneInfo::distance_to(const apollo::common::math::Vec2d &point) const {
   const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
   return segment_box->DistanceTo(point);
 }
 
-double LaneInfo::distance_to(const apollo::common::math::Vec2d& point,
-                             apollo::common::math::Vec2d* map_point,
-                             double* s_offset,
-                             int* s_offset_index) const {
+double LaneInfo::distance_to(const apollo::common::math::Vec2d &point,
+                             apollo::common::math::Vec2d *map_point,
+                             double *s_offset, int *s_offset_index) const {
   const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
   int index = segment_box->id();
   double distance = _segments[index].DistanceTo(point, map_point);
   *s_offset_index = index;
-  *s_offset = _accumulated_s[index]
-              + _segments[index].start().DistanceTo(*map_point);
+  *s_offset =
+      _accumulated_s[index] + _segments[index].start().DistanceTo(*map_point);
   return distance;
 }
 
 apollo::hdmap::Point LaneInfo::get_nearest_point(
-                              const apollo::common::math::Vec2d& point) const {
+    const apollo::common::math::Vec2d &point, double *distance) const {
   const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
   int index = segment_box->id();
   apollo::common::math::Vec2d nearest_point;
-  _segments[index].DistanceTo(point, &nearest_point);
+  *distance = _segments[index].DistanceTo(point, &nearest_point);
 
   return point_from_vec2d(nearest_point);
 }
 
-bool LaneInfo::get_projection(const apollo::common::math::Vec2d& point,
+bool LaneInfo::get_projection(const apollo::common::math::Vec2d &point,
                               double *accumulate_s, double *lateral) const {
-    CHECK_NOTNULL(accumulate_s);
-    CHECK_NOTNULL(lateral);
+  CHECK_NOTNULL(accumulate_s);
+  CHECK_NOTNULL(lateral);
 
-    if (_segments.empty()) {
-      return false;
-    }
-    double min_distance = std::numeric_limits<double>::infinity();
-    std::size_t min_index = 0;
-    double min_proj = 0.0;
-    std::size_t num_segments = _segments.size();
-    for (std::size_t i = 0; i < num_segments; ++i) {
-      const auto &segment = _segments[i];
-      const double distance = segment.DistanceTo(point);
-      if (distance < min_distance) {
-        const double proj = segment.ProjectOntoUnit(point);
-        if (proj < 0.0 && i > 0) {
+  if (_segments.empty()) {
+    return false;
+  }
+  double min_distance = std::numeric_limits<double>::infinity();
+  std::size_t min_index = 0;
+  double min_proj = 0.0;
+  std::size_t num_segments = _segments.size();
+  for (std::size_t i = 0; i < num_segments; ++i) {
+    const auto &segment = _segments[i];
+    const double distance = segment.DistanceTo(point);
+    if (distance < min_distance) {
+      const double proj = segment.ProjectOntoUnit(point);
+      if (proj < 0.0 && i > 0) {
+        continue;
+      }
+      if (proj > segment.length() && i + 1 < num_segments) {
+        const auto &next_segment = _segments[i + 1];
+        if ((point - next_segment.start())
+                .InnerProd(next_segment.unit_direction()) >= 0.0) {
           continue;
         }
-        if (proj > segment.length() && i + 1 < num_segments) {
-          const auto &next_segment = _segments[i + 1];
-          if ((point - next_segment.start())
-                  .InnerProd(next_segment.unit_direction()) >= 0.0) {
-            continue;
-          }
-        }
-        min_distance = distance;
-        min_index = i;
-        min_proj = proj;
       }
+      min_distance = distance;
+      min_index = i;
+      min_proj = proj;
     }
+  }
 
-    const auto &segment = _segments[min_index];
-    if (min_index + 1 >= num_segments) {
-        *accumulate_s = _accumulated_s[min_index] + min_proj;
-    } else {
-        *accumulate_s = _accumulated_s[min_index]
-                        + std::min(min_proj, segment.length());
-    }
-    const double prod = segment.ProductOntoUnit(point);
-    if ((min_index == 0 && min_proj < 0.0) ||
-          (min_index + 1 == num_segments && min_proj > segment.length())) {
-        *lateral = prod;
-      } else {
-        *lateral = (prod > 0.0 ? min_distance : -min_distance);
-      }
+  const auto &segment = _segments[min_index];
+  if (min_index + 1 >= num_segments) {
+    *accumulate_s = _accumulated_s[min_index] + min_proj;
+  } else {
+    *accumulate_s =
+        _accumulated_s[min_index] + std::min(min_proj, segment.length());
+  }
+  const double prod = segment.ProductOntoUnit(point);
+  if ((min_index == 0 && min_proj < 0.0) ||
+      (min_index + 1 == num_segments && min_proj > segment.length())) {
+    *lateral = prod;
+  } else {
+    *lateral = (prod > 0.0 ? min_distance : -min_distance);
+  }
 
-    return true;
+  return true;
 }
 
-void LaneInfo::post_process(HDMapImpl& map_instance) {
+void LaneInfo::post_process(HDMapImpl &map_instance) {
   update_overlaps(map_instance);
 }
 
-void LaneInfo::update_overlaps(HDMapImpl& map_instance) {
-    for (const auto& lane_overlap_id : _overlap_ids) {
-        apollo::hdmap::Id overlap_id;
-        overlap_id.set_id(lane_overlap_id);
-        OverlapInfoConstPtr overlap_ptr =
-                                    map_instance.get_overlap_by_id(overlap_id);
-        if (overlap_ptr == nullptr) {
-            continue;
-        }
-        _overlaps.emplace_back(overlap_id);
-        for (const auto& object : overlap_ptr->overlap().object()) {
-            const auto& object_id = object.id();
-            if (object_id.id() == _lane.id().id()) {
-                continue;
-            }
-            if (map_instance.get_lane_by_id(object_id) != nullptr) {
-                _cross_lanes.emplace_back(object_id);
-            }
-            if (map_instance.get_signal_by_id(object_id) != nullptr) {
-                _signals.emplace_back(object_id);
-            }
-            if (map_instance.get_yield_sign_by_id(object_id) != nullptr) {
-                _yield_signs.emplace_back(object_id);
-            }
-            if (map_instance.get_stop_sign_by_id(object_id) != nullptr) {
-                _stop_signs.emplace_back(object_id);
-            }
-            if (map_instance.get_crosswalk_by_id(object_id) != nullptr) {
-                _crosswalks.emplace_back(object_id);
-            }
-            if (map_instance.get_junction_by_id(object_id) != nullptr) {
-                _junctions.emplace_back(object_id);
-            }
-        }
+void LaneInfo::update_overlaps(HDMapImpl &map_instance) {
+  for (const auto &lane_overlap_id : _overlap_ids) {
+    apollo::hdmap::Id overlap_id;
+    overlap_id.set_id(lane_overlap_id);
+    OverlapInfoConstPtr overlap_ptr =
+        map_instance.get_overlap_by_id(overlap_id);
+    if (overlap_ptr == nullptr) {
+      continue;
     }
+    _overlaps.emplace_back(overlap_id);
+    for (const auto &object : overlap_ptr->overlap().object()) {
+      const auto &object_id = object.id();
+      if (object_id.id() == _lane.id().id()) {
+        continue;
+      }
+      if (map_instance.get_lane_by_id(object_id) != nullptr) {
+        _cross_lanes.emplace_back(object_id);
+      }
+      if (map_instance.get_signal_by_id(object_id) != nullptr) {
+        _signals.emplace_back(object_id);
+      }
+      if (map_instance.get_yield_sign_by_id(object_id) != nullptr) {
+        _yield_signs.emplace_back(object_id);
+      }
+      if (map_instance.get_stop_sign_by_id(object_id) != nullptr) {
+        _stop_signs.emplace_back(object_id);
+      }
+      if (map_instance.get_crosswalk_by_id(object_id) != nullptr) {
+        _crosswalks.emplace_back(object_id);
+      }
+      if (map_instance.get_junction_by_id(object_id) != nullptr) {
+        _junctions.emplace_back(object_id);
+      }
+    }
+  }
 }
 
 void LaneInfo::create_kdtree() {
-    apollo::common::math::AABoxKDTreeParams params;
-    params.max_leaf_dimension = 5.0;  // meters.
-    params.max_leaf_size = 16;
+  apollo::common::math::AABoxKDTreeParams params;
+  params.max_leaf_dimension = 5.0;  // meters.
+  params.max_leaf_size = 16;
 
-    _segment_box_list.clear();
-    for (size_t id = 0; id < _segments.size(); ++id) {
-        const auto& segment = _segments[id];
-        _segment_box_list.emplace_back(
-            apollo::common::math::AABox2d(segment.start(), segment.end()),
-                                       this,
-                                       &segment,
-                                       id);
-    }
-    _lane_segment_kdtree.reset(new LaneSegmentKDTree(_segment_box_list,
-                              params));
+  _segment_box_list.clear();
+  for (size_t id = 0; id < _segments.size(); ++id) {
+    const auto &segment = _segments[id];
+    _segment_box_list.emplace_back(
+        apollo::common::math::AABox2d(segment.start(), segment.end()), this,
+        &segment, id);
+  }
+  _lane_segment_kdtree.reset(new LaneSegmentKDTree(_segment_box_list, params));
 }
 
 JunctionInfo::JunctionInfo(const apollo::hdmap::Junction &junction)
@@ -459,16 +453,15 @@ const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
   return nullptr;
 }
 
-RoadInfo::RoadInfo(const apollo::hdmap::Road& road)
-  : _road(road) {
+RoadInfo::RoadInfo(const apollo::hdmap::Road &road) : _road(road) {
   for (int i = 0; i < _road.section_size(); ++i) {
     _sections.push_back(_road.section(i));
     _road_boundaries.push_back(_road.section(i).boundary());
   }
 }
 
-const std::vector<apollo::hdmap::RoadBoundary>& RoadInfo::get_boundaries()
-                                                                        const {
+const std::vector<apollo::hdmap::RoadBoundary> &RoadInfo::get_boundaries()
+    const {
   return _road_boundaries;
 }
 

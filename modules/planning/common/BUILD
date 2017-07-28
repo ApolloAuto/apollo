@@ -59,6 +59,22 @@ cc_library(
 )
 
 cc_library(
+    name = "routing_helper",
+    srcs = [
+        "routing_helper.cc",
+    ],
+    hdrs = [
+        "routing_helper.h",
+    ],
+    deps = [
+        ":planning_gflags",
+        "//modules/map/hdmap",
+        "//modules/map/pnc_map:path",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
+cc_library(
     name = "planning_object",
     srcs = [
         "planning_object.cc",
@@ -101,8 +117,13 @@ cc_library(
         "frame.h",
     ],
     deps = [
+        ":routing_helper",
         "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/vehicle_state",
         "//modules/planning/common:planning_data",
+        "//modules/planning/proto:reference_line_smoother_config_proto",
+        "//modules/planning/reference_line:reference_line_smoother",
     ],
 )
 
@@ -136,10 +157,7 @@ cc_library(
         "//modules/common",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/status",
-        "//modules/common/vehicle_state",
         "//modules/map/hdmap",
-        "//modules/planning/proto:reference_line_smoother_config_proto",
-        "//modules/planning/reference_line:reference_line_smoother",
         "//modules/planning/state_machine:master_state_machine",
     ],
 )

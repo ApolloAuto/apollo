@@ -77,8 +77,8 @@ class DpRoadGraphTest : public OptimizerTestBase {
 
  protected:
   const ReferenceLine* reference_line_ = nullptr;
-  common::TrajectoryPoint init_point_;
   DecisionData decision_data_;
+  common::TrajectoryPoint init_point_;
   SpeedData speed_data_;  // input
   PathData path_data_;    // output
 };
@@ -91,8 +91,7 @@ TEST_F(DpRoadGraphTest, speed_road_graph) {
   EXPECT_TRUE(result);
   EXPECT_EQ(648, path_data_.discretized_path().num_of_points());
   EXPECT_EQ(648, path_data_.frenet_frame_path().number_of_points());
-  EXPECT_FLOAT_EQ(70.419151,
-                  path_data_.frenet_frame_path().points().back().s());
+  EXPECT_FLOAT_EQ(72.00795, path_data_.frenet_frame_path().points().back().s());
   EXPECT_FLOAT_EQ(0.0, path_data_.frenet_frame_path().points().back().l());
   // export_path_data(path_data_, "/tmp/path.txt");
 }

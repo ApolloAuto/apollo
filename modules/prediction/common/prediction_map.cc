@@ -14,18 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <cmath>
+#include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <cmath>
-#include <memory>
 
+#include "modules/common/math/linear_interpolation.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/common/math/linear_interpolation.h"
-#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace prediction {
@@ -34,9 +34,7 @@ using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::hdmap::MapPathPoint;
 
-PredictionMap::PredictionMap() : hdmap_(nullptr) {
-  LoadMap();
-}
+PredictionMap::PredictionMap() : hdmap_(nullptr) { LoadMap(); }
 
 PredictionMap::~PredictionMap() { Clear(); }
 
@@ -79,9 +77,9 @@ double PredictionMap::HeadingOnLane(const LaneInfo* lane_info, const double s) {
   if (index == size - 1) {
     return headings.back();
   }
-  return apollo::common::math::slerp(
-             headings[index], accumulated_s[index],
-             headings[index + 1], accumulated_s[index + 1], s);
+  return apollo::common::math::slerp(headings[index], accumulated_s[index],
+                                     headings[index + 1],
+                                     accumulated_s[index + 1], s);
 }
 
 double PredictionMap::LaneTotalWidth(
@@ -112,8 +110,8 @@ void PredictionMap::GetProjection(const Eigen::Vector2d& position,
   lane_info_ptr->get_projection(pos, s, l);
 }
 
-bool PredictionMap::ProjectionFromLane(const LaneInfo* lane_info_ptr,
-                                       double s, MapPathPoint* path_point) {
+bool PredictionMap::ProjectionFromLane(const LaneInfo* lane_info_ptr, double s,
+                                       MapPathPoint* path_point) {
   if (lane_info_ptr == nullptr) {
     return false;
   }
@@ -137,8 +135,8 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
   apollo::common::math::Vec2d vec_point;
   vec_point.set_x(point[0]);
   vec_point.set_y(point[1]);
-  if (hdmap_->get_lanes_with_heading(
-          hdmap_point, radius, heading, M_PI, &candidate_lanes) != 0) {
+  if (hdmap_->get_lanes_with_heading(hdmap_point, radius, heading, M_PI,
+                                     &candidate_lanes) != 0) {
     return;
   }
   for (auto candidate_lane : candidate_lanes) {
@@ -152,8 +150,9 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
                !IsRightNeighborLane(candidate_lane.get(), prev_lanes)) {
       continue;
     } else {
+      double distance = 0.0;
       apollo::hdmap::Point nearest_point =
-          candidate_lane->get_nearest_point(vec_point);
+          candidate_lane->get_nearest_point(vec_point, &distance);
       double nearest_point_heading =
           PathHeading(candidate_lane.get(), nearest_point);
       double diff = std::fabs(
@@ -166,7 +165,7 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
 }
 
 double PredictionMap::PathHeading(const LaneInfo* lane_info_ptr,
-                               const apollo::hdmap::Point& point) {
+                                  const apollo::hdmap::Point& point) {
   apollo::common::math::Vec2d vec_point;
   vec_point.set_x(point.x());
   vec_point.set_y(point.y());
@@ -176,9 +175,10 @@ double PredictionMap::PathHeading(const LaneInfo* lane_info_ptr,
   return HeadingOnLane(lane_info_ptr, s);
 }
 
-int PredictionMap::SmoothPointFromLane(
-    const apollo::hdmap::Id& id, const double s, const double l,
-    Eigen::Vector2d* point, double* heading) {
+int PredictionMap::SmoothPointFromLane(const apollo::hdmap::Id& id,
+                                       const double s, const double l,
+                                       Eigen::Vector2d* point,
+                                       double* heading) {
   // TODO(kechxu) Double check this implement
   if (point == nullptr || heading == nullptr) {
     return -1;
