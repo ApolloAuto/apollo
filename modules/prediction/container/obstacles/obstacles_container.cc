@@ -47,14 +47,14 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
 
   timestamp_ = timestamp;
-  AINFO << "timestamp = " << timestamp_;
+  ADEBUG << "Current timestamp is [" << timestamp_ << "]";
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
-    AINFO << "Start to inserted perception obstacle ["
-           << perception_obstacle.id() << "]";
+    ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "]"
+           << " was detected";
     InsertPerceptionObstacle(perception_obstacle, timestamp_);
-    AINFO << "Inserted perception obstacle ["
-           << perception_obstacle.id() << "]";
+    ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "]"
+           << " was inserted";
   }
 }
 
@@ -71,7 +71,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     return;
   }
   if (!IsPredictable(perception_obstacle)) {
-    ADEBUG << "Obstacle [" << id << "] is not predictable.";
+    ADEBUG << "Perception obstacle [" << id << "] is not predictable.";
     return;
   }
   Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
@@ -82,7 +82,6 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     obstacle.Insert(perception_obstacle, timestamp);
     obstacles_.Put(id, std::move(obstacle));
   }
-  ADEBUG << "Obstacle [" << id << "] was inserted.";
 }
 
 bool ObstaclesContainer::IsPredictable(
