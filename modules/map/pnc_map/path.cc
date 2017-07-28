@@ -30,12 +30,12 @@
 namespace apollo {
 namespace hdmap {
 
-using apollo::common::math::LineSegment2d;
-using apollo::common::math::Polygon2d;
-using apollo::common::math::Vec2d;
-using apollo::common::math::Box2d;
-using apollo::common::math::kMathEpsilon;
-using apollo::common::math::Sqr;
+using common::math::LineSegment2d;
+using common::math::Polygon2d;
+using common::math::Vec2d;
+using common::math::Box2d;
+using common::math::kMathEpsilon;
+using common::math::Sqr;
 using std::placeholders::_1;
 
 namespace {
@@ -61,17 +61,20 @@ std::string LaneWaypoint::debug_string() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
-  return apollo::common::util::StrCat("id = ", lane->id().id(), "  s = ", s);
+  return common::util::StrCat("id = ", lane->id().id(), "  s = ", s);
 }
 
 std::string LaneSegment::debug_string() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
-  return apollo::common::util::StrCat(
-      "id = ", lane->id().id(), "  "
-      "start_s = ", start_s, "  "
-      "end_s = ", end_s);
+  return common::util::StrCat("id = ", lane->id().id(),
+                              "  "
+                              "start_s = ",
+                              start_s,
+                              "  "
+                              "end_s = ",
+                              end_s);
 }
 
 std::string MapPathPoint::debug_string() const {
@@ -118,7 +121,7 @@ std::string Path::debug_string() const {
 }
 
 std::string PathOverlap::debug_string() const {
-  return apollo::common::util::StrCat(object_id, " ", start_s, " ", end_s);
+  return common::util::StrCat(object_id, " ", start_s, " ", end_s);
 }
 
 Path::Path(std::vector<MapPathPoint> path_points)
@@ -279,7 +282,7 @@ void Path::get_all_overlaps(
     if (lane_segment.lane == nullptr) {
       continue;
     }
-    for (const OverlapInfo* overlap :
+    for (OverlapInfoConstPtr overlap :
          get_overlaps_from_lane(*lane_segment.lane)) {
       const auto* overlap_info =
           overlap->get_object_overlap_info(lane_segment.lane->id());
@@ -331,16 +334,21 @@ void Path::get_all_overlaps(
 void Path::init_overlaps() {
   // TODO: implement this function. (Liangliang)
   /*
-  get_all_overlaps(std::bind(&LaneInfo::cross_lanes, _1), &_lane_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::signals, _1), &_signal_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::yield_signs, _1),
+  get_all_overlaps(std::bind(&LaneInfoConstPtr::cross_lanes, _1),
+  &_lane_overlaps);
+  get_all_overlaps(std::bind(&LaneInfoConstPtr::signals, _1),
+  &_signal_overlaps);
+  get_all_overlaps(std::bind(&LaneInfoConstPtr::yield_signs, _1),
                    &_yield_sign_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::stop_signs, _1), &_stop_sign_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::crosswalks, _1), &_crosswalk_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::parking_spaces, _1),
+  get_all_overlaps(std::bind(&LaneInfoConstPtr::stop_signs, _1),
+  &_stop_sign_overlaps);
+  get_all_overlaps(std::bind(&LaneInfoConstPtr::crosswalks, _1),
+  &_crosswalk_overlaps);
+  get_all_overlaps(std::bind(&LaneInfoConstPtr::parking_spaces, _1),
                    &_parking_space_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::junctions, _1), &_junction_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::speed_bumps, _1),
+  get_all_overlaps(std::bind(&LaneInfoConstPtr::junctions, _1),
+  &_junction_overlaps);
+  get_all_overlaps(std::bind(&LaneInfoConstPtr::speed_bumps, _1),
                    &_speed_bump_overlaps);
   */
 }
@@ -430,7 +438,7 @@ bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
   return true;
 }
 
-bool Path::get_projection(const apollo::common::math::Vec2d& point,
+bool Path::get_projection(const common::math::Vec2d& point,
                           double* accumulate_s, double* lateral) const {
   double distance = 0.0;
   return get_projection(point, accumulate_s, lateral, &distance);
@@ -563,8 +571,7 @@ bool Path::is_on_path(const Box2d& box) const {
   return true;
 }
 
-bool Path::overlap_with(const apollo::common::math::Box2d& box,
-                        double width) const {
+bool Path::overlap_with(const common::math::Box2d& box, double width) const {
   if (_use_path_approximation) {
     return _approximation.overlap_with(*this, box, width);
   }
@@ -731,7 +738,7 @@ void PathApproximation::init_projections(const Path& path) {
 }
 
 bool PathApproximation::get_projection(const Path& path,
-                                       const apollo::common::math::Vec2d& point,
+                                       const common::math::Vec2d& point,
                                        double* accumulate_s, double* lateral,
                                        double* min_distance) const {
   if (_num_points == 0) {
