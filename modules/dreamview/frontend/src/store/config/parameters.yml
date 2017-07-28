@@ -25,6 +25,8 @@ options:
     showPlanning: true
     showObstacles: true
     showDecision: true
+    showPredictionMajor: true
+    showPredictionMinor: false
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false

@@ -6,8 +6,8 @@ import { drawSegmentsFromPoints, drawBox, drawArrow } from "utils/draw";
 const _ = require('lodash');
 
 const DEFAULT_HEIGHT = 1.5;
-const DEFAULT_COLOR = 0xad21fe;
-const ObstacleColorMapping = {
+export const DEFAULT_COLOR = 0xad21fe;
+export const ObstacleColorMapping = {
         PEDESTRIAN: 0xffea00,
         BICYCLE: 0x0febff,
         VEHICLE: 0x48dc6b,
