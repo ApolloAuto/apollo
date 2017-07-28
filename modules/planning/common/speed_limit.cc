@@ -19,6 +19,8 @@
  **/
 
 #include "modules/planning/common/speed_limit.h"
+#include <algorithm>
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -42,5 +44,39 @@ const std::vector<SpeedPoint>& SpeedLimit::speed_limits() const {
   return _speed_point;
 }
 
+double SpeedLimit::get_speed_limit(const double s) const {
+  double ref_s = s;
+  if (_speed_point.size() == 0) {
+    return 0.0;
+  }
+
+  if (_speed_point.size() == 1) {
+    return _speed_point.front().v();
+  }
+
+  if (ref_s > _speed_point.back().s()) {
+    return _speed_point.back().v();
+  }
+
+  if (ref_s < _speed_point.front().s()) {
+    return _speed_point.front().v();
+  }
+
+  auto func = [](const SpeedPoint & sp, const double s) {
+    return sp.s() < s;
+  };
+
+  auto it_lower = std::lower_bound(_speed_point.begin(), _speed_point.end(), s, func);
+  if (it_lower == _speed_point.begin()) {
+    return _speed_point.front().v();
+  }
+
+  double weight = 0.0;
+  double range = (*it_lower).s() - (*(it_lower - 1)).s();
+  if (range > 0) {
+    weight = (s - (*(it_lower - 1)).s()) / range;
+  }
+  return util::interpolate(*(it_lower - 1), *it_lower, weight).v();
+}
 }  // namespace planning
 }  // namespace apollo

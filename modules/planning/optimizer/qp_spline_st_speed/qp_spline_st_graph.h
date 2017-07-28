@@ -52,7 +52,7 @@ class QpSplineStGraph {
       const std::vector<StGraphBoundary>& boundaries);
 
   // apply objective function
-  common::Status apply_kernel();
+  common::Status apply_kernel(const SpeedLimit& speed_limit);
 
   // solve
   common::Status solve();

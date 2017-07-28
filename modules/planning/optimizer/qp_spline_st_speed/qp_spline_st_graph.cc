@@ -25,7 +25,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
-
+#include "modules/planning/common/planning_util.h"
 namespace apollo {
 namespace planning {
 
@@ -67,7 +67,7 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!apply_kernel().ok()) {
+  if (!apply_kernel(st_graph_data.speed_limit()).ok()) {
     const std::string msg = "Apply kernel failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -171,7 +171,7 @@ Status QpSplineStGraph::apply_constraint(
   return Status::OK();
 }
 
-Status QpSplineStGraph::apply_kernel() {
+Status QpSplineStGraph::apply_kernel(const SpeedLimit& speed_limit) {
   Spline1dKernel* spline_kernel = _spline_generator->mutable_spline_kernel();
 
   if (_qp_spline_st_speed_config.speed_kernel_weight() > 0) {
@@ -194,14 +194,20 @@ Status QpSplineStGraph::apply_kernel() {
   std::vector<double> s_vec;
   double t_resolution = _qp_spline_st_speed_config.total_time() /
                         _qp_spline_st_speed_config.number_of_discrete_graph_t();
-  for (int32_t i = 0;
-       i <= _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
-    t_knots.push_back(i * t_resolution);
-    s_vec.push_back(i * t_resolution * 10);
+
+  // TODO: change reference line kernel to configurable version
+  if (speed_limit.speed_limits().size() == 0) {
+    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::apply_kernel");
   }
 
+  double dist_ref = 0.0;
+  for (int i = 0; i <=
+       _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
+      t_knots.push_back(i * t_resolution);
+      s_vec.push_back(dist_ref);
+      dist_ref += t_resolution * speed_limit.get_speed_limit(dist_ref);
+  }
   spline_kernel->add_reference_line_kernel_matrix(t_knots, s_vec, 1);
-
   return Status::OK();
 }
 
