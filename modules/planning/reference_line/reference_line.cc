@@ -210,8 +210,26 @@ double ReferenceLine::get_lane_width(const double s) const {
   return 4.0;
 }
 
+bool ReferenceLine::get_lane_width(const double s, double* const left_width,
+                                   double* const right_width) const {
+  return reference_map_line_.get_width(s, left_width, right_width);
+}
+
 bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
-  // TODO(startcode) : need implement;
+  if (sl_point.s() <= 0 || sl_point.s() > reference_map_line_.length()) {
+    return false;
+  }
+  double left_width = 0.0;
+  double right_width = 0.0;
+
+  if (!get_lane_width(sl_point.s(), &left_width, &right_width)) {
+    return false;
+  }
+
+  if (sl_point.l() <= -right_width || sl_point.l() >= left_width) {
+    return false;
+  }
+
   return true;
 }
 

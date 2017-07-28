@@ -25,6 +25,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/macro.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -434,6 +435,19 @@ std::pair<std::uint32_t, std::uint32_t> QpFrenetFrame::find_interval(
 }
 
 bool QpFrenetFrame::calculate_hd_map_bound() {
+  for (uint32_t i = 0; i < _hdmap_bound.size(); ++i) {
+    double left_bound = 0.0;
+    double right_bound = 0.0;
+    bool suc = _reference_line->get_lane_width(_evaluated_knots[i], &left_bound,
+                                               &right_bound);
+    AERROR << suc << "bound" << left_bound << "\t" << right_bound << std::endl;
+    if (!suc) {
+      left_bound = FLAGS_default_reference_line_width / 2;
+      right_bound = FLAGS_default_reference_line_width / 2;
+    }
+    _hdmap_bound[i].first = -right_bound;
+    _hdmap_bound[i].second = left_bound;
+  }
   for (std::uint32_t i = 0; i < _hdmap_bound.size(); ++i) {
     _hdmap_bound[i].first = -4.0;
     _hdmap_bound[i].second = 4.0;
@@ -523,6 +537,17 @@ std::uint32_t QpFrenetFrame::find_index(const double s) const {
                   static_cast<std::uint32_t>(upper_bound -
                                              _evaluated_knots.begin())) -
          1;
+}
+
+void QpFrenetFrame::clear_data() {
+  _reference_line = nullptr;
+  _speed_profile = nullptr;
+  _decision_data = nullptr;
+  _evaluated_knots.clear();
+  _discretized_veh_loc.clear();
+  _hdmap_bound.clear();
+  _static_obstacle_bound.clear();
+  _dynamic_obstacle_bound.clear();
 }
 
 }  // namespace planning

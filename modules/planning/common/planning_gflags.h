@@ -42,6 +42,9 @@ DECLARE_double(replan_distance_threshold);
 DECLARE_double(replan_s_threshold);
 DECLARE_double(replan_l_threshold);
 
+// parameter for reference line
+DECLARE_double(default_reference_line_width);
+
 // parameters for task manager
 DECLARE_string(reference_line_decider);
 
