@@ -47,13 +47,14 @@ class TrajectoryCost {
                    const double end_s) const;
 
  private:
-  const DpPolyPathConfig _config;
-  const ReferenceLine *_reference_line = nullptr;
-  const common::VehicleParam _vehicle_param;
-  SpeedData _heuristic_speed_data;
-  std::vector<std::vector<::apollo::common::math::Box2d>> _obstacle_trajectory;
-  std::vector<double> _obstacle_probability;
-  uint32_t _evaluate_times;
+  const DpPolyPathConfig config_;
+  const ReferenceLine *reference_line_ = nullptr;
+  const common::VehicleParam vehicle_param_;
+  SpeedData heuristic_speed_data_;
+  std::vector<::apollo::common::math::Box2d> static_obstacle_boxes_;
+  std::vector<std::vector<::apollo::common::math::Box2d>> dynamic_obstacle_trajectory_;
+  std::vector<double> dynamic_obstacle_probability_;
+  uint32_t evaluate_times_;
 };
 
 }  // namespace planning

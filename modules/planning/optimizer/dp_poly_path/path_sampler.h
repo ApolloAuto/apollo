@@ -40,7 +40,7 @@ class PathSampler {
               std::vector<std::vector<common::SLPoint>> *const points);
 
  private:
-  DpPolyPathConfig _config;
+  DpPolyPathConfig config_;
 };
 
 }  // namespace planning

@@ -5,8 +5,8 @@ package apollo.planning;
 message DpPolyPathConfig {
   optional uint32 sample_level = 1 [default = 8];
   optional uint32 sample_points_num_each_level = 2 [default = 9];
-  optional double step_length_max = 3 [default = 10.0];
-  optional double step_length_min = 4 [default = 5.0];
+  optional double step_length_max = 3 [default = 15.0];
+  optional double step_length_min = 4 [default = 8.0];
   optional double lateral_sample_offset = 5 [default = 0.5];
   optional double lateral_adjust_coeff = 6 [default = 0.5];
   // Trajectory Cost Config
