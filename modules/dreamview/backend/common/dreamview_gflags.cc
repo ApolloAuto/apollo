@@ -35,5 +35,5 @@ DEFINE_bool(
 DEFINE_string(routing_request_file, "modules/map/data/garage_routing.pb.txt",
               "File path of the routing request that SimControl will read the "
               "start point from. If this is absent, SimControl will directly "
-              "take the RoutingRequest directly from ROS to determine the "
+              "take the RoutingResult directly from ROS to determine the "
               "start point.");
