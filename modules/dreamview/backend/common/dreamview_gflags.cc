@@ -20,7 +20,7 @@ DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 
 // TODO(siyangy): Use garage map temporarily
 DEFINE_string(dreamview_map, "modules/map/data/base_map.txt",
-              "file path for the map file to be rendered in frontend.");
+              "File path for the map file to be rendered in frontend.");
 
 DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
               "The path to the dreamview distribution directory. The default "
@@ -28,3 +28,12 @@ DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
 
 DEFINE_int32(server_port, 8888, "The port of backend webserver");
 
+DEFINE_bool(
+    enable_sim_control, false,
+    "Whether to enable SimControl to publish localiztion and chassis message.");
+
+DEFINE_string(routing_request_file, "modules/map/data/garage_routing.pb.txt",
+              "File path of the routing request that SimControl will read the "
+              "start point from. If this is absent, SimControl will directly "
+              "take the RoutingRequest directly from ROS to determine the "
+              "start point.");

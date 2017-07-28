@@ -27,9 +27,10 @@ namespace dreamview {
 using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
-SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket)
-    : map_service_(FLAGS_dreamview_map),
-      sim_world_service_(&map_service_),
+SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
+                                               MapService *map_service)
+    : sim_world_service_(map_service),
+      map_service_(map_service),
       websocket_(websocket) {
   websocket_->RegisterMessageHandler(
       "RetrieveMapData",
@@ -37,7 +38,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket)
         auto iter = json.find("elements");
         if (iter != json.end()) {
           MapElementIds map_element_ids(*iter);
-          auto retrieved = map_service_.RetrieveMapElements(map_element_ids);
+          auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
 
           std::string retrieved_json_string;
           MessageToJsonString(retrieved, &retrieved_json_string);

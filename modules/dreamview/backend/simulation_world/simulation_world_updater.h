@@ -45,8 +45,10 @@ class SimulationWorldUpdater {
    * @brief Constructor with the websocket handler.
    * @param websocket Pointer of the websocket handler that has been attached to
    * the server.
+   * @param map_service Pointer of the map service to provide a high-level API
+   * of hdmap
    */
-  explicit SimulationWorldUpdater(WebSocketHandler *websocket);
+  SimulationWorldUpdater(WebSocketHandler *websocket, MapService *map_service);
 
   /**
    * @brief The callback function to get updates from SimulationWorldService,
@@ -57,8 +59,8 @@ class SimulationWorldUpdater {
   void OnPushTimer(const ros::TimerEvent &event);
 
  private:
-  MapService map_service_;
   SimulationWorldService sim_world_service_;
+  MapService *map_service_;
   WebSocketHandler *websocket_;
 };
 

@@ -47,14 +47,16 @@ Status Dreamview::Init() {
   websocket_.reset(new WebSocketHandler());
   server_->addWebSocketHandler("/websocket", *websocket_);
 
-  sim_world_updater_.reset(new SimulationWorldUpdater(websocket_.get()));
+  map_service_.reset(new MapService(FLAGS_dreamview_map));
+  sim_world_updater_.reset(
+      new SimulationWorldUpdater(websocket_.get(), map_service_.get()));
 
   return Status::OK();
 }
 
 Status Dreamview::Start() {
   // start ROS timer, one-shot = false, auto-start = true
-  timer_ = AdapterManager::CreateTimer(ros::Duration(kTimeInterval),
+  timer_ = AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeInterval),
                                        &SimulationWorldUpdater::OnPushTimer,
                                        sim_world_updater_.get());
   return Status::OK();
