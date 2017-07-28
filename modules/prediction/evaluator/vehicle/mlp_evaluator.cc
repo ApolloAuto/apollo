@@ -23,6 +23,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/map/proto/map_lane.pb.h"
+#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace prediction {
@@ -38,49 +39,40 @@ void MLPEvaluator::Clear() {
 }
 
 void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
-  AINFO << "Start mlp evaluate";
   Clear();
-  if (obstacle_ptr == nullptr) {
-    AERROR << "Invalid obstacle.";
-    return;
-  }
+  CHECK_NOTNULL(obstacle_ptr);
 
   int id = obstacle_ptr->id();
-  Feature latest_feature = obstacle_ptr->latest_feature();
-  if (!latest_feature.IsInitialized()) {
-    ADEBUG << "Obstacle [" << id << "] has no latest feature.";
+  if (!obstacle_ptr->latest_feature().IsInitialized()) {
+    AERROR << "Obstacle [" << id << "] has no latest feature.";
     return;
   }
 
-  Lane* lane_ptr = latest_feature.mutable_lane();
-  if (!latest_feature.has_lane() || lane_ptr == nullptr) {
-    ADEBUG << "Obstacle [" << id << "] has no lane feature.";
+  Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
+  CHECK_NOTNULL(latest_feature_ptr);
+  if (!latest_feature_ptr->has_lane() ||
+      !latest_feature_ptr->lane().has_lane_graph()) {
+    AERROR << "Obstacle [" << id << "] has no lane graph.";
     return;
   }
 
-  LaneGraph* lane_graph_ptr = lane_ptr->mutable_lane_graph();
-  if (!latest_feature.lane().has_lane_graph() || lane_graph_ptr == nullptr) {
-    ADEBUG << "Obstacle [" << id << "] has no lane graph.";
+  LaneGraph* lane_graph_ptr =
+      latest_feature_ptr->mutable_lane()->mutable_lane_graph();
+  CHECK_NOTNULL(lane_graph_ptr);
+  if (lane_graph_ptr->lane_sequence_size() == 0) {
+    AERROR << "Obstacle [" << id << "] has no lane sequences.";
     return;
   }
 
-  if (latest_feature.lane().lane_graph().lane_sequence_size() == 0) {
-    ADEBUG << "Obstacle [" << id << "] has no lane sequences.";
-    return;
-  }
-
-  AINFO << "Start for-loop on lane sequences";
-  for (int i = 0;
-      i < latest_feature.lane().lane_graph().lane_sequence_size(); ++i) {
+  for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK(lane_sequence_ptr != nullptr);
-    AINFO << "Start to extract feature values";
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr);
-    AINFO << "Start to compute probability";
     double probability = ComputeProbability();
-    AINFO << "probability = " << probability;
     lane_sequence_ptr->set_probability(probability);
-    AINFO << "probability set done";
+    ADEBUG << "Obstacle [" << id << "] has lane sequence ["
+           << lane_sequence_ptr->ShortDebugString()
+           << "].";
   }
 }
 
@@ -97,7 +89,7 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   }
 
   if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
-    ADEBUG << "Obstacle [" << id << "] has fewer than "
+    AERROR << "Obstacle [" << id << "] has fewer than "
            << "expected obstacle feature_values "
            << obstacle_feature_values.size() << ".";
     return;
@@ -106,7 +98,7 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   std::vector<double> lane_feature_values;
   SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
   if (lane_feature_values.size() != LANE_FEATURE_SIZE) {
-    ADEBUG << "Obstacle [" << id << "] has fewer than "
+    AERROR << "Obstacle [" << id << "] has fewer than "
            << "expected lane feature_values"
            << lane_feature_values.size() << ".";
     return;
@@ -202,14 +194,10 @@ void MLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(dist_rbs.front());
   feature_values->push_back(dist_rb_rate);
   feature_values->push_back(time_to_rb);
-  feature_values->push_back(lane_types.front() == HDMapLane::NO_TURN ? 1.0
-                                                                     : 0.0);
-  feature_values->push_back(lane_types.front() == HDMapLane::LEFT_TURN ? 1.0
-                                                                      : 0.0);
-  feature_values->push_back(lane_types.front() == HDMapLane::RIGHT_TURN ? 1.0
-                                                                    : 0.0);
-  feature_values->push_back(lane_types.front() == HDMapLane::U_TURN ? 1.0
-                                                                    : 0.0);
+  feature_values->push_back(lane_types.front() == 0 ? 1.0 : 0.0);
+  feature_values->push_back(lane_types.front() == 1 ? 1.0 : 0.0);
+  feature_values->push_back(lane_types.front() == 2 ? 1.0 : 0.0);
+  feature_values->push_back(lane_types.front() == 3 ? 1.0 : 0.0);
 }
 
 void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
@@ -268,20 +256,17 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
 void MLPEvaluator::LoadModel(const std::string& model_file) {
   model_ptr_.reset(new FnnVehicleModel());
   CHECK(model_ptr_ != nullptr);
-  std::fstream file_stream(model_file, std::ios::in | std::ios::binary);
-  if (!file_stream.good()) {
-    AERROR << "Unable to open the model file: " << model_file << ".";
+
+  if (!::apollo::common::util::GetProtoFromFile(model_file,
+                                                model_ptr_.get())) {
+    AERROR << "Unable to load model file: " << model_file << ".";
     return;
   }
-  if (!model_ptr_->ParseFromIstream(&file_stream)) {
-    AERROR << "Unable to load the model file: " << model_file << ".";
-    return;
-  }
-  ADEBUG << "Succeeded in loading the model file: " << model_file << ".";
+  AINFO << "Succeeded in loading the model file: " << model_file << ".";
 }
 
 double MLPEvaluator::ComputeProbability() {
-  CHECK(model_ptr_.get() != nullptr);
+  CHECK_NOTNULL(model_ptr_.get());
   double probability = 0.0;
 
   if (model_ptr_->dim_input() != static_cast<int>(feature_values_.size())) {
@@ -314,16 +299,15 @@ double MLPEvaluator::ComputeProbability() {
         double weight = layer.layer_input_weight().rows(row).columns(col);
         neuron_output += (layer_input[row] * weight);
       }
-      if (layer.layer_activation_type() == "relu") {
+      if (layer.layer_activation_type() == Layer::RELU) {
         neuron_output = apollo::prediction::util::Relu(neuron_output);
-      } else if (layer.layer_activation_type() == "sigmoid") {
+      } else if (layer.layer_activation_type() == Layer::SIGMOID) {
         neuron_output = apollo::prediction::util::Sigmoid(neuron_output);
-      } else if (layer.layer_activation_type() == "tanh") {
+      } else if (layer.layer_activation_type() == Layer::TANH) {
         neuron_output = std::tanh(neuron_output);
       } else {
-        LOG(ERROR) << "Undefined activation func: "
-                   << layer.layer_activation_type()
-                   << ", and default sigmoid will be used instead.";
+        AERROR << "Undefined activation type. "
+               << "A default sigmoid will be used instead.";
         neuron_output = apollo::prediction::util::Sigmoid(neuron_output);
       }
       layer_output.push_back(neuron_output);

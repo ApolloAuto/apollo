@@ -34,7 +34,9 @@ using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::hdmap::MapPathPoint;
 
-PredictionMap::PredictionMap() : hdmap_(nullptr) { LoadMap(); }
+PredictionMap::PredictionMap() : hdmap_(nullptr) {
+  LoadMap();
+}
 
 PredictionMap::~PredictionMap() { Clear(); }
 
@@ -42,7 +44,7 @@ void PredictionMap::LoadMap() {
   hdmap_.reset(new apollo::hdmap::HDMap());
   CHECK(hdmap_ != nullptr);
   hdmap_->load_map_from_file(FLAGS_map_file);
-  ADEBUG << "Load map file: " << FLAGS_map_file;
+  AINFO << "Succeeded in loading map file: " << FLAGS_map_file << ".";
 }
 
 void PredictionMap::Clear() { hdmap_.reset(); }
@@ -97,7 +99,7 @@ const LaneInfo* PredictionMap::LaneById(const Id& id) {
 const LaneInfo* PredictionMap::LaneById(const std::string& str_id) {
   Id id;
   id.set_id(str_id);
-  return hdmap_->get_lane_by_id(id).get();
+  return LaneById(id);
 }
 
 void PredictionMap::GetProjection(const Eigen::Vector2d& position,

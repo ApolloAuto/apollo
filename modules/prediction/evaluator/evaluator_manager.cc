@@ -100,7 +100,7 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
 void EvaluatorManager::RegisterEvaluator(
     const ObstacleConf::EvaluatorType& type) {
   evaluators_[type] = CreateEvaluator(type);
-  ADEBUG << "Evaluator [" << type << "] is registered.";
+  AINFO << "Evaluator [" << type << "] is registered.";
 }
 
 }  // namespace prediction
