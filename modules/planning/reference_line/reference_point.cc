@@ -30,6 +30,15 @@ namespace planning {
 
 using apollo::common::PathPoint;
 
+ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
+                 const double kappa, const double dkappa,
+                 const double lower_bound, const double upper_bound)
+    : hdmap::MapPathPoint(map_path_point),
+      kappa_(kappa),
+      dkappa_(dkappa),
+      lower_bound_(lower_bound),
+      upper_bound_(upper_bound) {}
+
 ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
                                const double heading, const double kappa,
                                const double dkappa, const double lower_bound,
