@@ -39,10 +39,9 @@ filegroup(
 )
 
 filegroup(
-    name = "perception_conf",
+    name = "perception_data",
     srcs = glob([
-        "conf/*",
-        "data/**",
+        "data/**"
     ]),
 )
 

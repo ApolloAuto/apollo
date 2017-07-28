@@ -44,6 +44,7 @@ Object::Object(const Object& rhs) {
   length = rhs.length;
   width = rhs.width;
   height = rhs.height;
+  shape_features = rhs.shape_features;
   type = rhs.type;
   type_probs = rhs.type_probs;
   is_background = rhs.is_background;
@@ -63,6 +64,7 @@ Object& Object::operator = (const Object& rhs) {
   length = rhs.length;
   width = rhs.width;
   height = rhs.height;
+  shape_features = rhs.shape_features;
   type = rhs.type;
   type_probs = rhs.type_probs;
   is_background = rhs.is_background;
@@ -83,6 +85,7 @@ void Object::clone(const Object& rhs) {
   length = rhs.length;
   width = rhs.width;
   height = rhs.height;
+  shape_features = rhs.shape_features;
   type = rhs.type;
   type_probs = rhs.type_probs;
   is_background = rhs.is_background;

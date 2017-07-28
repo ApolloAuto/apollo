@@ -79,6 +79,84 @@ void TransformCloud(pcl_util::PointCloudPtr cloud,
     const std::vector<int>& indices,
     pcl_util::PointDCloud* trans_cloud);
 
+template <typename PointT>
+void compute_bbox_size_center_xy(typename pcl::PointCloud<PointT>::Ptr cloud,
+    const Eigen::Vector3d& direction, Eigen::Vector3d& size, Eigen::Vector3d& center) {
+    Eigen::Vector3d dir(direction[0], direction[1], 0);                                             
+    dir.normalize();                                                                                
+    Eigen::Vector3d ortho_dir(-dir[1], dir[0], 0.0);                                                
+                                                                                                  
+    Eigen::Vector3d z_dir(dir.cross(ortho_dir));                                                    
+    Eigen::Vector3d min_pt(DBL_MAX, DBL_MAX, DBL_MAX);                                              
+    Eigen::Vector3d max_pt(-DBL_MAX, -DBL_MAX, -DBL_MAX);                                           
+                                                                                 
+    Eigen::Vector3d loc_pt;                                                                         
+    for (int i = 0; i < cloud->size(); i++) {                                                       
+        Eigen::Vector3d pt = Eigen::Vector3d(cloud->points[i].x,                                    
+        cloud->points[i].y, cloud->points[i].z);                                                
+        loc_pt[0] = pt.dot(dir);                                                                    
+        loc_pt[1] = pt.dot(ortho_dir);                                                              
+        loc_pt[2] = pt.dot(z_dir);                                                                  
+        for (int j = 0; j < 3; j++) {                                                               
+            min_pt[j] = std::min(min_pt[j], loc_pt[j]);                                             
+            max_pt[j] = std::max(max_pt[j], loc_pt[j]);                                             
+        }                                                                                           
+    }                                                                                               
+    size = max_pt - min_pt;                                                                         
+    center = dir * ((max_pt[0] + min_pt[0]) * 0.5) + 
+        ortho_dir * ((max_pt[1] + min_pt[1]) * 0.5) + 
+        z_dir * min_pt[2];  
+}
+
+template <typename PointT>
+Eigen::Vector3d get_barycenter(typename pcl::PointCloud<PointT>::Ptr cloud) {
+    int point_num = cloud->points.size();                                                           
+    Eigen::Vector3d barycenter(0, 0, 0);                                                            
+                                                                                              
+    for (int i = 0; i < point_num; i++) {                                                           
+        const PointT& pt = cloud->points[i];                                                        
+        barycenter[0] += pt.x;                                                                      
+        barycenter[1] += pt.y;                                                                      
+        barycenter[2] += pt.z;                                                                      
+    }                                                                                               
+                                                                                               
+    if (point_num > 0) {                                                                            
+        barycenter[0] /= point_num;                                                                 
+        barycenter[1] /= point_num;                                                                 
+        barycenter[2] /= point_num;                                                                 
+    }                                                                                               
+    return barycenter;
+}
+
+template <typename PointType>                                                                       
+void transform_point_cloud(pcl::PointCloud<PointType>& cloud_in_out,
+    const Eigen::Matrix4d& trans_mat) {                                                             
+    for (int i = 0; i < cloud_in_out.size(); ++i) {                                                 
+        PointType& p = cloud_in_out.at(i);                                                          
+        Eigen::Vector4d v(p.x, p.y, p.z, 1);                                                        
+        v = trans_mat * v;                                                                          
+        p.x = v.x();                                                                                
+        p.y = v.y();                                                                                
+        p.z = v.z();                                                                                
+    }                                                                                               
+}      
+
+void TransformCloud(pcl_util::PointCloudPtr cloud,
+    std::vector<int> indices,
+    pcl_util::PointDCloud& trans_cloud);
+
+double vector_cos_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
+double vector_cos_theta_2d_xy(Eigen::Vector4f& v1, Eigen::Vector4f& v2);
+double vector_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
+
+void max_min_distance_xy_bbox_to_bbox(const Eigen::Vector3f& center0, const Eigen::Vector3f& dir0,  
+    const Eigen::Vector3f& size0, const Eigen::Vector3f& center1,                                   
+    const Eigen::Vector3f& dir1, const Eigen::Vector3f& size1,                                      
+    float& max_dist, float& min_dist); 
+
+float dist_xy_to_bbox(const Eigen::Vector3f& center, const Eigen::Vector3f& dir,
+    const Eigen::Vector3f& size, const Eigen::Vector3f& point);
+
 }  // namespace perception
 }  // namespace apollo
 
