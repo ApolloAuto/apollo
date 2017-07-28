@@ -34,39 +34,40 @@ namespace planning {
 
 class DpStCost {
  public:
-  explicit DpStCost(const DpStSpeedConfig& dp_st_configuration);
+  explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config);
 
-  double obstacle_cost(const STPoint& point,
-                       const std::vector<StGraphBoundary>& obs_boundary) const;
+  double GetObstacleCost(
+      const STPoint& point,
+      const std::vector<StGraphBoundary>& obs_boundary) const;
 
-  double reference_cost(const STPoint& point,
-                        const STPoint& reference_point) const;
+  double GetReferenceCost(const STPoint& point,
+                          const STPoint& reference_point) const;
 
-  double speed_cost(const STPoint& first, const STPoint& second,
-                    const double speed_limit) const;
+  double GetSpeedCost(const STPoint& first, const STPoint& second,
+                      const double speed_limit) const;
 
-  double accel_cost_by_two_points(const double pre_speed, const STPoint& first,
-                                  const STPoint& second) const;
-  double accel_cost_by_three_points(const STPoint& first, const STPoint& second,
-                                    const STPoint& third) const;
+  double GetAccelCostByTwoPoints(const double pre_speed, const STPoint& first,
+                                 const STPoint& second) const;
+  double GetAccelCostByThreePoints(const STPoint& first, const STPoint& second,
+                                   const STPoint& third) const;
 
-  double jerk_cost_by_two_points(const double pre_speed, const double pre_acc,
-                                 const STPoint& pre_point,
-                                 const STPoint& curr_point) const;
-  double jerk_cost_by_three_points(const double first_speed,
-                                   const STPoint& first_point,
-                                   const STPoint& second_point,
-                                   const STPoint& third_point) const;
+  double GetJerkCostByTwoPoints(const double pre_speed, const double pre_acc,
+                                const STPoint& pre_point,
+                                const STPoint& curr_point) const;
+  double GetJerkCostByThreePoints(const double first_speed,
+                                  const STPoint& first_point,
+                                  const STPoint& second_point,
+                                  const STPoint& third_point) const;
 
-  double jerk_cost_by_four_points(const STPoint& first, const STPoint& second,
-                                  const STPoint& third,
-                                  const STPoint& forth) const;
+  double GetJerkCostByFourPoints(const STPoint& first, const STPoint& second,
+                                 const STPoint& third,
+                                 const STPoint& forth) const;
 
  private:
-  double accel_cost(const double accel) const;
-  double jerk_cost(const double jerk) const;
+  double GetAccelCost(const double accel) const;
+  double JerkCost(const double jerk) const;
 
-  const DpStSpeedConfig& _dp_st_configuration;
+  const DpStSpeedConfig& _dp_st_speed_config;
   double _unit_s = 0.0;
   double _unit_t = 0.0;
 };

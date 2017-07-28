@@ -82,9 +82,9 @@ bool ReferenceLineSmoother::smooth(
   const double start_t = t_knots_.front();
   const double end_t = t_knots_.back();
 
-  // TODO(fanhaoyang) : here change output to configurable version
-  const double resolution = (end_t - start_t) / 499;
-  for (std::uint32_t i = 0; i < 500; ++i) {
+  const double resolution =
+      (end_t - start_t) / (smoother_config_.num_of_total_points() - 1);
+  for (std::uint32_t i = 0; i < smoother_config_.num_of_total_points(); ++i) {
     const double t = i * resolution;
     std::pair<double, double> xy = spline_solver_->spline()(t);
     const double heading = std::atan2(spline_solver_->spline().derivative_y(t),

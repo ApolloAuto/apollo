@@ -41,17 +41,17 @@ class DpStGraph {
  public:
   explicit DpStGraph(const DpStSpeedConfig& dp_config);
 
-  apollo::common::Status search(const StGraphData& st_graph_data,
+  apollo::common::Status Search(const StGraphData& st_graph_data,
                                 DecisionData* const decision_data,
                                 SpeedData* const speed_data);
 
  private:
-  apollo::common::Status init_cost_table();
+  apollo::common::Status InitCostTable();
 
-  apollo::common::Status calculate_pointwise_cost(
+  apollo::common::Status CalculatePointwiseCost(
       const std::vector<StGraphBoundary>& boundaries);
 
-  apollo::common::Status calculate_total_cost();
+  apollo::common::Status CalculateTotalCost();
 
   apollo::common::Status retrieve_speed_profile(
       SpeedData* const speed_data) const;
@@ -59,21 +59,21 @@ class DpStGraph {
   apollo::common::Status get_object_decision(
       const StGraphData& st_graph_data, const SpeedData& speed_profile) const;
 
-  void calculate_total_cost(const std::uint32_t r, const std::uint32_t c);
+  void CalculateTotalCost(const std::uint32_t r, const std::uint32_t c);
 
-  double calculate_edge_cost(const STPoint& first, const STPoint& second,
-                             const STPoint& third, const STPoint& forth,
-                             const double speed_limit) const;
-  double calculate_edge_cost_for_second_row(const uint32_t col,
-                                            const double speed_limit) const;
-  double calculate_edge_cost_for_third_row(const uint32_t curr_c,
-                                           const uint32_t pre_c,
-                                           const double speed_limit) const;
+  double CalculateEdgeCost(const STPoint& first, const STPoint& second,
+                           const STPoint& third, const STPoint& forth,
+                           const double speed_limit) const;
+  double CalculateEdgeCostForSecondRow(const uint32_t col,
+                                       const double speed_limit) const;
+  double CalculateEdgeCostForThirdRow(const uint32_t curr_c,
+                                      const uint32_t pre_c,
+                                      const double speed_limit) const;
 
   // feasible c_prepre range given c_pre, c
-  bool feasible_accel_range(const double c_pre, const double c_cur,
-                            std::uint32_t* const lower_bound,
-                            std::uint32_t* const upper_bound) const;
+  bool CalculateFeasibleAccelRange(const double c_pre, const double c_cur,
+                                   std::uint32_t* const lower_bound,
+                                   std::uint32_t* const upper_bound) const;
 
  private:
   // dp st configuration
