@@ -23,12 +23,12 @@
 
 #include <vector>
 
-#include "modules/planning/common/path/path.h"
+#include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
 namespace planning {
 
-class DiscretizedPath : public Path {
+class DiscretizedPath {
  public:
   DiscretizedPath() = default;
 
@@ -38,13 +38,13 @@ class DiscretizedPath : public Path {
 
   virtual ~DiscretizedPath() = default;
 
-  common::PathPoint evaluate(const double param) const override;
+  common::PathPoint evaluate(const double param) const;
 
-  double length() const override;
+  double length() const;
 
-  common::PathPoint start_point() const override;
+  common::PathPoint start_point() const;
 
-  common::PathPoint end_point() const override;
+  common::PathPoint end_point() const;
 
   common::PathPoint evaluate_linear_approximation(const double param) const;
 
