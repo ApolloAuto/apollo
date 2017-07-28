@@ -34,10 +34,10 @@ class FrenetFramePath {
   explicit FrenetFramePath(std::vector<common::FrenetFramePoint> sl_points);
   virtual ~FrenetFramePath() = default;
 
-  void set_frenet_points(const std::vector<common::FrenetFramePoint> &points);
-  std::vector<common::FrenetFramePoint> *mutable_points();
+  void set_points(const std::vector<common::FrenetFramePoint> &points);
   const std::vector<common::FrenetFramePoint> &points() const;
   std::uint32_t number_of_points() const;
+  double length() const;
   const common::FrenetFramePoint &point_at(const std::uint32_t index) const;
   common::FrenetFramePoint &point_at(const std::uint32_t index);
 

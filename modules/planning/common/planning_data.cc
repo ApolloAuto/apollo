@@ -88,13 +88,15 @@ bool PlanningData::aggregate(const double time_resolution,
     common::PathPoint path_point;
     // TODO(all): temp fix speed point s out of path point bound, need further
     // refine later
-    if (speed_point.s() > path_data_.path().param_length()) {
+    if (speed_point.s() > path_data_.discretized_path().length()) {
       break;
     }
-    QUIT_IF(
-        !path_data_.get_path_point_with_path_s(speed_point.s(), &path_point),
-        false, ERROR, "Fail to get path data with s %f, path total length %f",
-        speed_point.s(), path_data_.path().param_length());
+    if (!path_data_.get_path_point_with_path_s(speed_point.s(), &path_point)) {
+      AERROR << "Fail to get path data with s " << speed_point.s()
+             << "path total length " << path_data_.discretized_path().length();
+      ;
+      return false;
+    }
 
     common::TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->CopyFrom(path_point);

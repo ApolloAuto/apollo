@@ -71,7 +71,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
   }
 
   double total_length = std::min(qp_spline_st_speed_config_.total_path_length(),
-                                 path_data.path().param_length());
+                                 path_data.discretized_path().length());
 
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
@@ -102,7 +102,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
   QpSplineStGraph st_graph(qp_spline_st_speed_config_, veh_param);
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
-                            path_data.path().param_length());
+                            path_data.discretized_path().length());
   if (st_graph.search(st_graph_data, path_data, speed_data) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Failed to search graph with dynamic programming!");

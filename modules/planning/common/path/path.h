@@ -34,7 +34,7 @@ class Path {
 
   virtual common::PathPoint evaluate(const double param) const = 0;
 
-  virtual double param_length() const = 0;
+  virtual double length() const = 0;
 
   virtual common::PathPoint start_point() const = 0;
 

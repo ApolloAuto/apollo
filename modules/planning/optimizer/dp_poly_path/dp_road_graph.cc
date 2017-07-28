@@ -125,8 +125,7 @@ bool DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
     }
     path_points.push_back(std::move(path_point));
   }
-  DiscretizedPath discretized_path(path_points);
-  path_data->set_path(discretized_path);
+  path_data->set_discretized_path(path_points);
   return true;
 }
 

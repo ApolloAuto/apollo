@@ -49,9 +49,9 @@ Status DpStBoundaryMapper::get_graph_boundary(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (path_data.path().num_of_points() < 2) {
+  if (path_data.discretized_path().num_of_points() < 2) {
     AERROR << "Fail to get params since path has "
-           << path_data.path().num_of_points() << " points.";
+           << path_data.discretized_path().num_of_points() << " points.";
     return Status(ErrorCode::PLANNING_ERROR, "Fail to get params");
   }
 
@@ -103,7 +103,8 @@ Status DpStBoundaryMapper::map_obstacle_with_trajectory(
   // lower and upper bound for st boundary
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
-  const std::vector<PathPoint>& veh_path = path_data.path().path_points();
+  const std::vector<PathPoint>& veh_path =
+      path_data.discretized_path().points();
   for (std::uint32_t i = 0; i < obstacle.prediction_trajectories().size();
        ++i) {
     PredictionTrajectory pred_traj = obstacle.prediction_trajectories()[i];
@@ -181,7 +182,8 @@ Status DpStBoundaryMapper::map_obstacle_without_trajectory(
     const double planning_distance, const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
   // Static obstacle only have yield option
-  const std::vector<PathPoint>& veh_path = path_data.path().path_points();
+  const std::vector<PathPoint>& veh_path =
+      path_data.discretized_path().points();
 
   ::apollo::common::math::Box2d obs_box = obstacle.BoundingBox();
 

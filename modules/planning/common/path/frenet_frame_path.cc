@@ -32,17 +32,20 @@ FrenetFramePath::FrenetFramePath(
   points_ = std::move(sl_points);
 }
 
-void FrenetFramePath::set_frenet_points(
+void FrenetFramePath::set_points(
     const std::vector<common::FrenetFramePoint> &points) {
   points_ = points;
 }
 
-std::vector<common::FrenetFramePoint> *FrenetFramePath::mutable_points() {
-  return &points_;
-}
-
 const std::vector<common::FrenetFramePoint> &FrenetFramePath::points() const {
   return points_;
+}
+
+double FrenetFramePath::length() const {
+  if (points_.empty()) {
+    return 0.0;
+  }
+  return points_.back().s() - points_.front().s();
 }
 
 std::uint32_t FrenetFramePath::number_of_points() const {

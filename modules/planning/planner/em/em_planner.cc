@@ -84,7 +84,7 @@ Status EMPlanner::Init(const PlanningConfig& config) {
 }
 
 Status EMPlanner::Plan(const TrajectoryPoint& start_point,
-                           ADCTrajectory* trajectory_pb) {
+                       ADCTrajectory* trajectory_pb) {
   DataCenter* data_center = DataCenter::instance();
   Frame* frame = data_center->current_frame();
 
@@ -109,12 +109,12 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
       CHECK(OptimizerType_Parse(optimizer->name(), &type));
       if (type == DP_POLY_PATH_OPTIMIZER || type == QP_SPLINE_PATH_OPTIMIZER) {
         const auto& path_points =
-            planning_data->path_data().path().path_points();
+            planning_data->path_data().discretized_path().points();
         auto* optimized_path =
             trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
         optimized_path->set_name(optimizer->name());
-        optimized_path->mutable_path_point()->CopyFrom({path_points.begin(),
-                                                        path_points.end()});
+        optimized_path->mutable_path_point()->CopyFrom(
+            {path_points.begin(), path_points.end()});
       }
     }
   }
@@ -135,8 +135,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
     reference_line->set_name("planning_reference_line");
     const auto& reference_points =
         planning_data->reference_line().reference_points();
-    reference_line->mutable_path_point()->CopyFrom({reference_points.begin(),
-                                                    reference_points.end()});
+    reference_line->mutable_path_point()->CopyFrom(
+        {reference_points.begin(), reference_points.end()});
   }
 
   return Status::OK();

@@ -65,9 +65,10 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
 
+  const double path_length = path_data.discretized_path().length();
   // step 1 get boundaries
-  double planning_distance = std::min(dp_st_speed_config_.total_path_length(),
-                                      path_data.path().param_length());
+  double planning_distance =
+      std::min(dp_st_speed_config_.total_path_length(), path_length);
   std::vector<StGraphBoundary> boundaries;
   common::TrajectoryPoint initial_planning_point = DataCenter::instance()
                                                        ->current_frame()
@@ -100,8 +101,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  StGraphData st_graph_data(boundaries, init_point, speed_limit,
-                            path_data.path().param_length());
+  StGraphData st_graph_data(boundaries, init_point, speed_limit, path_length);
 
   DpStGraph st_graph(dp_st_speed_config_);
   if (!st_graph.search(st_graph_data, decision_data, speed_data).ok()) {
