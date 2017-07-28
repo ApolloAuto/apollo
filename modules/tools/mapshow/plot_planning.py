@@ -36,12 +36,16 @@ vehicle_position_line = None
 vehicle_polygon_line = None
 localization_pb_buff = None
 
+SPEED_S = []
+SPEED = []
+s_speed_line = None
+
 def localization_callback(localization_pb):
     global localization_pb_buff
     localization_pb_buff = localization_pb
 
 def planning_callback(planning_pb):
-    global DATAX, DATAY
+    global DATAX, DATAY, SPEED_S, SPEED
     PATHLOCK.acquire()
     DATAX = {}
     DATAY = {}
@@ -52,6 +56,12 @@ def planning_callback(planning_pb):
         for path_point in path_debug.path_point:
             DATAX[name].append(path_point.x)
             DATAY[name].append(path_point.y)
+    # speed data
+    SPEED_S = []
+    SPEED = []
+    for traj_point in planning_pb.trajectory_point:
+        SPEED.append(traj_point.v)
+        SPEED_S.append(traj_point.relative_time)
     PATHLOCK.release()
 
 
@@ -85,13 +95,14 @@ def update(frame_number):
         line.set_ydata(DATAY[name])
         line.set_label(name)
         cnt += 1
+    s_speed_line.set_xdata(SPEED_S)
+    s_speed_line.set_ydata(SPEED)
     PATHLOCK.release()
     if localization_pb_buff is not None:
         vehicle_position_line.set_visible(True)
         vehicle_polygon_line.set_visible(True)
         Localization(localization_pb_buff)\
             .replot_vehicle(vehicle_position_line, vehicle_polygon_line)
-
     ax.relim()
     # update ax.viewLim using the new dataLim
     ax.autoscale_view()
@@ -99,7 +110,7 @@ def update(frame_number):
 
 
 def init_line_pool(central_x, central_y):
-    global vehicle_position_line, vehicle_polygon_line
+    global vehicle_position_line, vehicle_polygon_line, s_speed_line
     colors = ['b', 'g', 'r', 'k']
     for i in range(line_pool_size):
         line, = ax.plot([central_x], [central_y],
@@ -108,6 +119,8 @@ def init_line_pool(central_x, central_y):
 
     vehicle_position_line, = ax.plot([central_x], [central_y], 'go', alpha=0.3)
     vehicle_polygon_line, = ax.plot([central_x], [central_y], 'g-')
+    s_speed_line, = ax1.plot([0], [0], 'b.')
+
 
 
 if __name__ == '__main__':
@@ -123,7 +136,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     add_listener()
-    fig, ax = plt.subplots()
+    fig = plt.figure()
+    ax = plt.subplot2grid((2, 3), (0, 0), rowspan=2, colspan=2)
+    ax1 = plt.subplot2grid((2, 3), (0, 2))
+    ax1.set_xlabel("t (second)")
+    ax1.set_xlim([-2, 10])
+    ax1.set_ylim([-1, 10])
+    ax1.set_ylabel("speed (m/s)")
+
+#fig, ax = plt.subplots()
     map = Map()
     map.load(args.map)
     map.draw_lanes(ax, False, [])
@@ -131,6 +152,7 @@ if __name__ == '__main__':
     central_x = sum(ax.get_xlim())/2
 
     init_line_pool(central_x, central_y)
+
 
     ani = animation.FuncAnimation(fig, update, interval=100)
 
