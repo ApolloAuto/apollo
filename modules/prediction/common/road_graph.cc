@@ -62,7 +62,7 @@ ErrorCode RoadGraph::BuildLaneGraph(LaneGraph* lane_graph_ptr) {
   std::vector<LaneSegment> lane_segments;
   double accumulated_s = 0.0;
   ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_,
-                      &lane_segments, lane_graph_ptr);
+      &lane_segments, lane_graph_ptr);
 
   return ErrorCode::OK;
 }
@@ -82,7 +82,7 @@ void RoadGraph::ComputeLaneSequence(
   LaneSegment lane_segment;
   lane_segment.set_lane_id(lane_info_ptr->id().id());
   lane_segment.set_start_s(start_s);
-  // lane_segment.set_lane_turn_type(map->lane_turn_type(lane_info_ptr->id()));
+  lane_segment.set_lane_turn_type(map->LaneTurnType(lane_info_ptr->id()));
   if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_) {
     lane_segment.set_end_s(length_ - accumulated_s + start_s);
   } else {

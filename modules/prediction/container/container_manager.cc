@@ -75,7 +75,7 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
 void ContainerManager::RegisterContainer(
     const ::apollo::common::adapter::AdapterConfig::MessageType &type) {
   containers_[type] = CreateContainer(type);
-  ADEBUG << "Container [" << type << "] is registered.";
+  AINFO << "Container [" << type << "] is registered.";
 }
 
 }  // namespace prediction

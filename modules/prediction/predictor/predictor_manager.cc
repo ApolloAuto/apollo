@@ -126,7 +126,7 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
 void PredictorManager::RegisterPredictor(
     const ObstacleConf::PredictorType& type) {
   predictors_[type] = CreatePredictor(type);
-  ADEBUG << "Predictor [" << type << "] is registered.";
+  AINFO << "Predictor [" << type << "] is registered.";
 }
 
 const PredictionObstacles& PredictorManager::prediction_obstacles() {
