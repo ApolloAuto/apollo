@@ -22,6 +22,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/planning/proto/reference_line_smoother_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -42,7 +43,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
              << map_file;
       return;
     }
-    smoother_.SetConfig(config_);  // use the default value in config.
+    smoother_.Init(config_);  // use the default value in config.
 
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
@@ -66,8 +67,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
 
 TEST_F(ReferenceLineSmootherTest, smooth) {
   std::vector<ReferencePoint> smoothed_ref_points;
-  EXPECT_TRUE(smoother_.smooth(*reference_line_, vehicle_position_,
-                               &smoothed_ref_points));
+  EXPECT_TRUE(smoother_.smooth(*reference_line_, &smoothed_ref_points));
   EXPECT_FALSE(smoothed_ref_points.empty());
 }
 

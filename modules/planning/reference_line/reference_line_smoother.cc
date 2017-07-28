@@ -34,7 +34,7 @@
 namespace apollo {
 namespace planning {
 
-bool ReferenceLineSmoother::SetConfig(const std::string& config_file) {
+bool ReferenceLineSmoother::Init(const std::string& config_file) {
   if (!common::util::GetProtoFromFile(config_file, &smoother_config_)) {
     AERROR << "failed to load config file " << config_file;
     return false;
@@ -42,8 +42,7 @@ bool ReferenceLineSmoother::SetConfig(const std::string& config_file) {
   return true;
 }
 
-void ReferenceLineSmoother::SetConfig(
-    const ReferenceLineSmootherConfig& config) {
+void ReferenceLineSmoother::Init(const ReferenceLineSmootherConfig& config) {
   smoother_config_ = config;
 }
 
@@ -55,31 +54,9 @@ void ReferenceLineSmoother::Reset() {
 
 bool ReferenceLineSmoother::smooth(
     const ReferenceLine& raw_reference_line,
-    const common::math::Vec2d& vehicle_position,
     std::vector<ReferencePoint>* const smoothed_ref_line) {
   Reset();
-  // calculate sampling range
-  common::SLPoint sl_point;
-  if (!raw_reference_line.get_point_in_frenet_frame(vehicle_position,
-                                                    &sl_point)) {
-    AERROR << "Fail to map init point on raw reference line!";
-    return false;
-  }
-
-  double start_s = sl_point.s();
-  double speed_limit = std::numeric_limits<double>::infinity();
-  ReferencePoint rlp = raw_reference_line.get_reference_point(sl_point.s());
-  for (const auto& lane_waypoint : rlp.lane_waypoints()) {
-    speed_limit =
-        std::min(speed_limit, lane_waypoint.lane->lane().speed_limit());
-  }
-  if (rlp.lane_waypoints().size() == 0) {
-    speed_limit = 10.0;
-  }
-  double end_s = std::min(raw_reference_line.reference_map_line().length(),
-                          40 + speed_limit * 3 + start_s);
-
-  if (!sampling(raw_reference_line, start_s, end_s)) {
+  if (!sampling(raw_reference_line)) {
     AERROR << "Fail to sample reference line smoother points!";
     return false;
   }
@@ -137,22 +114,16 @@ bool ReferenceLineSmoother::smooth(
   return true;
 }
 
-bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line,
-                                     const double start_s, const double end_s) {
-  double length = end_s - start_s;
-  if (end_s < start_s) {
-    AERROR << "end_s " << end_s << " is less than start_s " << start_s;
-    return false;
-  }
+bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
+  const double length = raw_reference_line.length();
   const double resolution = length / smoother_config_.num_spline();
   for (std::uint32_t i = 0; i <= smoother_config_.num_spline(); ++i) {
-    ReferencePoint rlp =
-        raw_reference_line.get_reference_point(start_s + resolution * i);
+    ReferencePoint rlp = raw_reference_line.get_reference_point(resolution * i);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
     path_point.set_y(rlp.y());
     path_point.set_theta(rlp.heading());
-    path_point.set_s(start_s + i * resolution);
+    path_point.set_s(i * resolution);
     ref_points_.push_back(std::move(path_point));
     t_knots_.push_back(i);
   }
