@@ -67,9 +67,5 @@ void Obstacle::add_prediction_trajectory(
   prediction_trajectories_.push_back(prediction_trajectory);
 }
 
-std::vector<PredictionTrajectory>* Obstacle::mutable_prediction_trajectories() {
-  return &prediction_trajectories_;
-}
-
 }  // namespace planning
 }  // namespace apollo
