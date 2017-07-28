@@ -104,6 +104,7 @@ function main(){
     fi
     docker run -it \
         -d \
+        --privileged \
         --name apollo_dev \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
