@@ -15,6 +15,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/proto:path_point_proto",
         "//modules/common/status",
+        "//modules/common/time",
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state",

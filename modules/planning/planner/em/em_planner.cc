@@ -21,6 +21,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
@@ -41,6 +42,7 @@ namespace planning {
 
 using common::Status;
 using common::adapter::AdapterManager;
+using common::time::Clock;
 using common::ErrorCode;
 using common::TrajectoryPoint;
 using common::VehicleState;
@@ -99,7 +101,11 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
 
   planning_data->set_decision_data(decision_data);
   for (auto& optimizer : optimizers_) {
+    const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
     optimizer->Optimize(planning_data);
+    const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
+    const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+
     ADEBUG << "after optimizer " << optimizer->name() << ":"
            << planning_data->DebugString();
 
@@ -116,6 +122,9 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
         optimized_path->mutable_path_point()->CopyFrom(
             {path_points.begin(), path_points.end()});
       }
+      auto stats = trajectory_pb->mutable_latency_stats()->add_processor_stats();
+      stats->set_name(optimizer->name());
+      stats->set_time_ms(time_diff_ms);
     }
   }
   PublishableTrajectory computed_trajectory;
