@@ -113,7 +113,7 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   }
 
   feature_values_.insert(feature_values_.end(),
-      lane_feature_values.begin(), lane_feature_values.end());
+      obstacle_feature_values.begin(), obstacle_feature_values.end());
   feature_values_.insert(feature_values_.end(),
       lane_feature_values.begin(), lane_feature_values.end());
 }
