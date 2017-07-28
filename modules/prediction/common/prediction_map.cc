@@ -159,7 +159,6 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
       double diff = std::fabs(
           apollo::common::math::AngleDiff(heading, nearest_point_heading));
       if (diff <= FLAGS_max_lane_angle_diff) {
-        AINFO << "insert candidate lane";
         lanes->emplace_back(candidate_lane.get());
       }
     }

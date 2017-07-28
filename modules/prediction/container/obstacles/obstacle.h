@@ -50,7 +50,7 @@ class Obstacle {
 
   double timestamp() const;
 
-  const Feature& feature(size_t i);
+  const Feature& feature(size_t i) const;
 
   Feature* mutable_feature(size_t i);
 
@@ -64,7 +64,7 @@ class Obstacle {
       kf_lane_tracker(const std::string& lane_id);
 
   const apollo::common::math::KalmanFilter<double, 6, 2, 0>&
-      kf_motion_tracker();
+      kf_motion_tracker() const;
 
   const apollo::common::math::KalmanFilter<double, 2, 2, 4>&
       kf_pedestrian_tracker() const;
