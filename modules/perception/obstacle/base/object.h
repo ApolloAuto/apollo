@@ -58,6 +58,8 @@ struct alignas(16) Object {
   double length = 0.0;
   double width = 0.0;
   double height = 0.0;
+  // shape feature used for tracking
+  std::vector<float> shape_features;
 
   // foreground score/probability
   float score = 0.0;
