@@ -91,9 +91,12 @@ bool DataCenter::CreateReferenceLineFromMap() {
       return false;
     }
     const auto &points = lane_info_ptr->points();
+    const auto &accumulate_s = lane_info_ptr->accumulate_s();
     const auto &headings = lane_info_ptr->headings();
     for (size_t i = 0; i < points.size(); ++i) {
-      ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, -2.0, 2.0);
+      hdmap::LaneWaypoint lane_waypoint(lane_info_ptr.get(), accumulate_s[i]);
+      // TODO(fanhaoyang) figure out a reason for number -2.0, 2.0
+      ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, lane_waypoint);
     }
   }
   if (ref_points.empty()) {
