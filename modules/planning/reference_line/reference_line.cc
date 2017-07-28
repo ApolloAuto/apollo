@@ -61,13 +61,17 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
     AWARN << "The requested s is nearer than the start point of the reference "
              "line; reference line starts at "
           << accumulated_s.back() << ", requested " << s << ".";
-    return reference_points_.front();
+    ReferencePoint ref_point(reference_map_line_.get_smooth_point(s),
+                             0.0, 0.0, 0.0, 0.0);
+    return ref_point;
   }
   if (s > accumulated_s.back()) {
     AWARN << "The requested s exceeds the reference line; reference line "
              "ends at "
           << accumulated_s.back() << "requested " << s << " .";
-    return reference_points_.back();
+    ReferencePoint ref_point(reference_map_line_.get_smooth_point(s),
+                             0.0, 0.0, 0.0, 0.0);
+    return ref_point;
   }
 
   auto it_lower =
@@ -166,7 +170,7 @@ bool ReferenceLine::get_point_in_frenet_frame(
   DCHECK_NOTNULL(sl_point);
   double s = 0;
   double l = 0;
-  if (!reference_map_line_.get_nearest_point(xy_point, &s, &l)) {
+  if (!reference_map_line_.get_projection(xy_point, &s, &l)) {
     AERROR << "Can't get nearest point from path.";
     return false;
   }
