@@ -84,6 +84,7 @@ void OptimizerTestBase::SetUp() {
   common::VehicleState::instance()->Update(
       AdapterManager::GetLocalization()->GetLatestObserved(),
       AdapterManager::GetChassis()->GetLatestObserved());
+  pose_ = common::VehicleState::instance()->pose();
 
   auto* data_center = DataCenter::instance();
   if (!data_center->init_current_frame(0)) {
@@ -95,7 +96,6 @@ void OptimizerTestBase::SetUp() {
     AERROR << "Failed to load file " << FLAGS_dp_poly_path_config_file;
     return;
   }
-  pose_ = common::VehicleState::instance()->pose();
   frame_ = data_center->current_frame();
   ASSERT_TRUE(frame_ != nullptr);
 }

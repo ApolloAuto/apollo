@@ -54,7 +54,7 @@ class DataCenter {
   ObjectTable *mutable_object_table() const;
 
  private:
-  bool CreateReferenceLineFromMap();
+  bool CreateReferenceLineFromRouting();
 
   std::unordered_map<uint32_t, std::unique_ptr<Frame>> _frames;
   std::list<uint32_t> _sequence_queue;

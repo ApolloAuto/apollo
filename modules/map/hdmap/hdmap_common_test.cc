@@ -361,11 +361,11 @@ TEST_F(HDMapCommonTestSuite, box_is_on_lane) {
   LaneInfo lane_info(lane);
 
   apollo::common::math::Box2d target_in_box(
-                    apollo::common::math::LineSegment2d({2, 1}, {3, 1}), 0.5);
+      apollo::common::math::LineSegment2d({2, 1}, {3, 1}), 0.5);
   EXPECT_TRUE(lane_info.is_on_lane(target_in_box));
 
   apollo::common::math::Box2d target_out_box(
-                    apollo::common::math::LineSegment2d({2, 1}, {3, 1}), 4);
+      apollo::common::math::LineSegment2d({2, 1}, {3, 1}), 4);
   EXPECT_TRUE(!lane_info.is_on_lane(target_out_box));
 }
 
@@ -402,16 +402,16 @@ TEST_F(HDMapCommonTestSuite, distance_to_with_more_info) {
   double s_offset = 0.0;
   int s_offset_index = 0;
   apollo::common::math::Vec2d point_1(2.5, 3.0);
-  double distance = lane_info.distance_to(point_1, &foot_point,
-                                          &s_offset, &s_offset_index);
+  double distance =
+      lane_info.distance_to(point_1, &foot_point, &s_offset, &s_offset_index);
   EXPECT_NEAR(distance, 2.0, 1E-3);
   EXPECT_NEAR(foot_point.x(), 2.5, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
   EXPECT_NEAR(s_offset, 1.5, 1E-3);
 
   apollo::common::math::Vec2d point_2(0.5, 3.0);
-  distance = lane_info.distance_to(point_2, &foot_point,
-                                  &s_offset, &s_offset_index);
+  distance =
+      lane_info.distance_to(point_2, &foot_point, &s_offset, &s_offset_index);
   EXPECT_NEAR(distance, 2.06155, 1E-3);
   EXPECT_NEAR(foot_point.x(), 1.0, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
@@ -424,17 +424,18 @@ TEST_F(HDMapCommonTestSuite, get_nearest_point) {
   LaneInfo lane_info(lane);
 
   apollo::common::math::Vec2d point_1(2.4, 3.0);
-  auto nearest_point = lane_info.get_nearest_point(point_1);
+  double distance = 0.0;
+  auto nearest_point = lane_info.get_nearest_point(point_1, &distance);
   EXPECT_NEAR(nearest_point.x(), 2.4, 1E-3);
   EXPECT_NEAR(nearest_point.y(), 1.0, 1E-3);
 
   apollo::common::math::Vec2d point_2(0.5, 3.0);
-  nearest_point = lane_info.get_nearest_point(point_2);
+  nearest_point = lane_info.get_nearest_point(point_2, &distance);
   EXPECT_NEAR(nearest_point.x(), 1.0, 1E-3);
   EXPECT_NEAR(nearest_point.y(), 1.0, 1E-3);
 
   apollo::common::math::Vec2d point_3(10.5, 3.0);
-  nearest_point = lane_info.get_nearest_point(point_3);
+  nearest_point = lane_info.get_nearest_point(point_3, &distance);
   EXPECT_NEAR(nearest_point.x(), 5.0, 1E-3);
   EXPECT_NEAR(nearest_point.y(), 1.0, 1E-3);
 }

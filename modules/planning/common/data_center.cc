@@ -32,14 +32,13 @@
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/reference_line/reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Vec2d;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::VehicleState;
 
 DataCenter::DataCenter() {
@@ -63,60 +62,18 @@ Frame *DataCenter::frame(const uint32_t sequence_num) const {
   return nullptr;
 }
 
-bool DataCenter::CreateReferenceLineFromMap() {
+bool DataCenter::init_current_frame(const uint32_t sequence_num) {
   if (AdapterManager::GetRoutingResult()->Empty()) {
     AERROR << "Routing is empty";
     return false;
   }
-  const auto &routing_result =
-      AdapterManager::GetRoutingResult()->GetLatestObserved();
-
-  std::vector<ReferencePoint> ref_points;
-  hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
-  ReferenceLineSmoother smoother;
-  if (!smoother.Init(FLAGS_reference_line_smoother_config_file)) {
-    AERROR << "Failed to load file "
-           << FLAGS_reference_line_smoother_config_file;
-    return false;
-  }
-
-  for (const auto &lane : routing_result.route()) {
-    auto lane_id = common::util::MakeMapId(lane.id());
-    ADEBUG << "Added lane from routing:" << lane.id();
-    lane_info_ptr = map_.get_lane_by_id(lane_id);
-    if (!lane_info_ptr) {
-      AERROR << "failed to find lane " + lane.id() + " from map ";
-      return false;
-    }
-    const auto &points = lane_info_ptr->points();
-    const auto &accumulate_s = lane_info_ptr->accumulate_s();
-    const auto &headings = lane_info_ptr->headings();
-    for (size_t i = 0; i < points.size(); ++i) {
-      hdmap::LaneWaypoint lane_waypoint(lane_info_ptr, accumulate_s[i]);
-      ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, lane_waypoint);
-    }
-  }
-  if (ref_points.empty()) {
-    AERROR << "Found no reference points from map";
-    return false;
-  }
-
-  std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
-  std::vector<ReferencePoint> smoothed_ref_points;
-  if (!smoother.smooth(*reference_line, &smoothed_ref_points)) {
-    AERROR << "Fail to smooth a reference line from map";
-    return false;
-  }
-  ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
-  _frame->mutable_planning_data()->set_reference_line(smoothed_ref_points);
-  return true;
-}
-
-bool DataCenter::init_current_frame(const uint32_t sequence_num) {
   _frame.reset(new Frame(sequence_num));
-
-  if (!CreateReferenceLineFromMap()) {
-    AERROR << "failed to create reference line";
+  _frame->SetMap(&map_);
+  common::TrajectoryPoint point;
+  _frame->SetInitPose(VehicleState::instance()->pose());
+  _frame->SetRouting(AdapterManager::GetRoutingResult()->GetLatestObserved());
+  if (!_frame->Init()) {
+    AERROR << "failed to init frame";
     return false;
   }
   return true;

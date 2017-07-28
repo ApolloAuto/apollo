@@ -27,6 +27,8 @@ DECLARE_uint64(rtk_trajectory_backward);
 DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(replanning_threshold);
 DECLARE_double(trajectory_resolution);
+DECLARE_double(look_backward_distance);
+DECLARE_double(look_forward_distance);
 
 DECLARE_double(cycle_duration_in_sec);
 DECLARE_double(maximal_delay_sec);
