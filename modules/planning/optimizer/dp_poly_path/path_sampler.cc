@@ -65,7 +65,9 @@ bool PathSampler::sample(
         level_points.push_back(sl);
       }
     }
-    points->push_back(level_points);
+    if (!level_points.empty()) {
+      points->push_back(level_points);
+    }
   }
   return true;
 }
