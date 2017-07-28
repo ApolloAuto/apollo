@@ -39,7 +39,7 @@ namespace planning {
 class QpSplinePathGenerator {
  public:
   QpSplinePathGenerator() = default;
-  bool SetConfig(const std::string& config_file);
+  bool Init(const std::string& config_file);
   bool generate(const ReferenceLine& reference_line,
                 const DecisionData& decision_data, const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,

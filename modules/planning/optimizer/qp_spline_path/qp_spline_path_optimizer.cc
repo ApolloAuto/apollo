@@ -31,7 +31,7 @@ QpSplinePathOptimizer::QpSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
 bool QpSplinePathOptimizer::Init() {
-  if (!_path_generator.SetConfig(FLAGS_qp_spline_path_config_file)) {
+  if (!_path_generator.Init(FLAGS_qp_spline_path_config_file)) {
     AERROR << "Fail to set config file for path generator.";
     return false;
   }
