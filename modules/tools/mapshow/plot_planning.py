@@ -49,7 +49,7 @@ def planning_callback(planning_pb):
         name = path_debug.name
         DATAX[name] = []
         DATAY[name] = []
-        for path_point in path_debug.path.path_point:
+        for path_point in path_debug.path_point:
             DATAX[name].append(path_point.x)
             DATAY[name].append(path_point.y)
     PATHLOCK.release()
@@ -79,6 +79,8 @@ def update(frame_number):
             continue
         line = line_pool[cnt]
         line.set_visible(True)
+        if len(DATAX[name]) <= 1:
+            continue
         line.set_xdata(DATAX[name])
         line.set_ydata(DATAY[name])
         line.set_label(name)
