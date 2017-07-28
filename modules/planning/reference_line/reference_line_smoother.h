@@ -37,17 +37,15 @@ namespace planning {
 class ReferenceLineSmoother {
  public:
   ReferenceLineSmoother() = default;
-  bool SetConfig(const std::string& config_file);
-  void SetConfig(const ReferenceLineSmootherConfig& refline_smooth_config);
+  bool Init(const std::string& config_file);
+  void Init(const ReferenceLineSmootherConfig& refline_smooth_config);
   bool smooth(const ReferenceLine& raw_reference_line,
-              const common::math::Vec2d& vehicle_position,
               std::vector<ReferencePoint>* const smoothed_ref_line);
 
  private:
   void Reset();
 
-  bool sampling(const ReferenceLine& raw_reference_line, const double start_s,
-                const double end_s);
+  bool sampling(const ReferenceLine& raw_reference_line);
 
   bool apply_constraint(const ReferenceLine& raw_reference_line);
 

@@ -73,7 +73,7 @@ bool DataCenter::CreateReferenceLineFromMap() {
   common::math::Vec2d vehicle_position;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
   ReferenceLineSmoother smoother;
-  if (!smoother.SetConfig(FLAGS_reference_line_smoother_config_file)) {
+  if (!smoother.Init(FLAGS_reference_line_smoother_config_file)) {
     AERROR << "Failed to load file "
            << FLAGS_reference_line_smoother_config_file;
     return false;
@@ -106,8 +106,7 @@ bool DataCenter::CreateReferenceLineFromMap() {
 
   std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
   std::vector<ReferencePoint> smoothed_ref_points;
-  if (!smoother.smooth(*reference_line, vehicle_position,
-                       &smoothed_ref_points)) {
+  if (!smoother.smooth(*reference_line, &smoothed_ref_points)) {
     AERROR << "Fail to smooth a reference line from map";
     return false;
   }
