@@ -658,7 +658,7 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
 
   ADEBUG << "Obstacle [" << id_ << "] set tracked lane speed ["
          << std::fixed << std::setprecision(6) << lane_speed << "]";
-  ADEBUG << "Obstacle [" << id_ << "] set tracked lane acceleration [" 
+  ADEBUG << "Obstacle [" << id_ << "] set tracked lane acceleration ["
          << std::fixed << std::setprecision(6) << lane_acc << "]";
 }
 
@@ -711,7 +711,6 @@ void Obstacle::UpdateKFPedestrianTracker(Feature* feature) {
     delta_ts = feature->timestamp() - feature_history_.front().timestamp();
   }
   if (delta_ts > std::numeric_limits<double>::epsilon()) {
-    
     Eigen::Matrix<double, 2, 4> B = kf_pedestrian_tracker_.GetControlMatrix();
     B(0, 0) = delta_ts;
     B(0, 2) = 0.5 * delta_ts * delta_ts;
