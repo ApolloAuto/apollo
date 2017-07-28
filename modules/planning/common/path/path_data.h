@@ -33,17 +33,13 @@ class PathData {
  public:
   PathData() = default;
 
-  void set_path(const DiscretizedPath &path);
+  void set_discretized_path(const DiscretizedPath &path);
 
-  void set_path_points(const std::vector<common::PathPoint> &path_points);
+  void set_discretized_path(const std::vector<common::PathPoint> &path_points);
 
   void set_frenet_path(const FrenetFramePath &frenet_path);
 
-  DiscretizedPath *mutable_path();
-
-  const DiscretizedPath &path() const;
-
-  FrenetFramePath *mutable_frenet_frame_path();
+  const DiscretizedPath &discretized_path() const;
 
   const FrenetFramePath &frenet_frame_path() const;
 
@@ -57,7 +53,7 @@ class PathData {
 
   // TODO(fanhaoyang) add check if the path data is valid
  private:
-  DiscretizedPath path_;
+  DiscretizedPath discretized_path_;
 
   FrenetFramePath frenet_path_;
 };

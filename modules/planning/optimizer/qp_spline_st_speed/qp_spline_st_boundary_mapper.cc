@@ -67,10 +67,10 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (path_data.path().num_of_points() < 2) {
+  if (path_data.discretized_path().num_of_points() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
-           << path_data.path().num_of_points() << ".";
+           << path_data.discretized_path().num_of_points() << ".";
     return Status(ErrorCode::PLANNING_ERROR,
                   "Fail to get params because of too few path points");
   }
@@ -250,7 +250,7 @@ Status QpSplineStBoundaryMapper::map_obstacle_with_prediction_trajectory(
 
   bool skip = true;
   std::vector<STPoint> boundary_points;
-  const auto& adc_path_points = path_data.path().path_points();
+  const auto& adc_path_points = path_data.discretized_path().points();
   if (obstacle.prediction_trajectories().size() == 0) {
     AWARN << "Obstacle (id = " << obstacle.Id()
           << ") has NO prediction trajectory.";
@@ -271,7 +271,7 @@ Status QpSplineStBoundaryMapper::map_obstacle_with_prediction_trajectory(
           obstacle.Length() * st_boundary_config().expending_coeff(),
           obstacle.Width() * st_boundary_config().expending_coeff());
       int64_t low = 0;
-      int64_t high = static_cast<int64_t>(path_data.path().num_of_points()) - 1;
+      int64_t high = adc_path_points.size() - 1;
       bool find_low = false;
       bool find_high = false;
       while (low < high) {

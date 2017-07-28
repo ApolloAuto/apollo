@@ -40,7 +40,7 @@ class DiscretizedPath : public Path {
 
   common::PathPoint evaluate(const double param) const override;
 
-  double param_length() const override;
+  double length() const override;
 
   common::PathPoint start_point() const override;
 
@@ -50,9 +50,7 @@ class DiscretizedPath : public Path {
 
   int query_closest_point(const double param) const;
 
-  std::vector<common::PathPoint> *mutable_path_points();
-
-  const std::vector<common::PathPoint> &path_points() const;
+  const std::vector<common::PathPoint> &points() const;
 
   std::uint32_t num_of_points() const;
 

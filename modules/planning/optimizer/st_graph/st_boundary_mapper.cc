@@ -66,10 +66,10 @@ double StBoundaryMapper::get_area(
   return fabs(area);
 }
 
-bool StBoundaryMapper::check_overlap(
-    const PathPoint& path_point,
-    const apollo::common::VehicleParam& params,
-    const apollo::common::math::Box2d& obs_box, const double buffer) const {
+bool StBoundaryMapper::check_overlap(const PathPoint& path_point,
+                                     const apollo::common::VehicleParam& params,
+                                     const apollo::common::math::Box2d& obs_box,
+                                     const double buffer) const {
   const double mid_to_rear_center =
       params.length() / 2.0 - params.front_edge_to_center();
   const double x =
@@ -103,7 +103,8 @@ Status StBoundaryMapper::get_speed_limits(
   }
 
   std::vector<double> speed_limits;
-  for (const auto& point : path_data.path().path_points()) {
+  const auto& path_points = path_data.discretized_path().points();
+  for (const auto& point : path_points) {
     speed_limits.push_back(_st_boundary_config.maximal_speed());
     for (auto& lane : lanes) {
       if (lane->is_on_lane({point.x(), point.y()})) {
@@ -117,7 +118,7 @@ Status StBoundaryMapper::get_speed_limits(
     }
   }
 
-  if (planning_distance > path_data.path().path_points().back().s()) {
+  if (planning_distance > path_points.back().s()) {
     const std::string msg = "path length cannot be less than planning_distance";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -127,7 +128,6 @@ Status StBoundaryMapper::get_speed_limits(
   const double unit_s = planning_distance / matrix_dimension_s;
   std::uint32_t i = 0;
   std::uint32_t j = 1;
-  const auto& path_points = path_data.path().path_points();
   while (i < matrix_dimension_s && j < path_points.size()) {
     const auto& point = path_points[j];
     const auto& pre_point = path_points[j - 1];
@@ -153,7 +153,6 @@ Status StBoundaryMapper::get_speed_limits(
             std::fmin(curr_speed_limit,
                       std::fmin(_st_boundary_config.maximal_speed(), speed));
       }
-
       curr_speed_limit *= _st_boundary_config.speed_multiply_buffer();
       curr_speed_limit =
           std::fmax(curr_speed_limit, _st_boundary_config.lowest_speed());

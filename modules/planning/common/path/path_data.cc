@@ -31,22 +31,22 @@
 namespace apollo {
 namespace planning {
 
-void PathData::set_path(const DiscretizedPath &path) { path_ = path; }
+void PathData::set_discretized_path(const DiscretizedPath &path) {
+  discretized_path_ = path;
+}
 
 void PathData::set_frenet_path(const FrenetFramePath &frenet_path) {
   frenet_path_ = frenet_path;
 }
 
-DiscretizedPath *PathData::mutable_path() { return &path_; }
-
-void PathData::set_path_points(
+void PathData::set_discretized_path(
     const std::vector<common::PathPoint> &path_points) {
-  path_.set_points(path_points);
+  discretized_path_.set_points(path_points);
 }
 
-const DiscretizedPath &PathData::path() const { return path_; }
-
-FrenetFramePath *PathData::mutable_frenet_frame_path() { return &frenet_path_; }
+const DiscretizedPath &PathData::discretized_path() const {
+  return discretized_path_;
+}
 
 const FrenetFramePath &PathData::frenet_frame_path() const {
   return frenet_path_;
@@ -54,7 +54,7 @@ const FrenetFramePath &PathData::frenet_frame_path() const {
 
 bool PathData::get_path_point_with_path_s(
     const double s, common::PathPoint *const path_point) const {
-  *path_point = path_.evaluate_linear_approximation(s);
+  *path_point = discretized_path_.evaluate_linear_approximation(s);
   return true;
 }
 
@@ -72,7 +72,7 @@ bool PathData::get_path_point_with_ref_s(
   auto it_lower =
       std::lower_bound(frenet_points.begin(), frenet_points.end(), ref_s, comp);
   if (it_lower == frenet_points.begin()) {
-    *path_point = path_.path_points().front();
+    *path_point = discretized_path_.points().front();
   } else {
     //        std::uint32_t index_lower = (std::uint32_t)(it_lower -
     //        frenet_points.begin());
@@ -93,7 +93,7 @@ bool PathData::get_path_point_with_ref_s(
 std::string PathData::DebugString() const {
   std::ostringstream sout;
   sout << "[" << std::endl;
-  const auto &path_points = path_.path_points();
+  const auto &path_points = discretized_path_.points();
   for (std::size_t i = 0;
        i < path_points.size() &&
        i < static_cast<std::size_t>(FLAGS_trajectory_point_num_for_debug);
