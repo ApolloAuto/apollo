@@ -78,7 +78,7 @@ void PredictorManager::Run(
         break;
       }
       case PerceptionObstacle::PEDESTRIAN: {
-        predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+        predictor = GetPredictor(ObstacleConf::REGIONAL_PREDICTOR);
         break;
       }
       default: {
