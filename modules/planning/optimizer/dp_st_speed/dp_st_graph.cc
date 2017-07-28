@@ -37,7 +37,7 @@ using apollo::common::Status;
 DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config)
     : _dp_st_speed_config(dp_config), _dp_st_cost(dp_config) {}
 
-Status DpStGraph::search(const StGraphData& st_graph_data,
+Status DpStGraph::Search(const StGraphData& st_graph_data,
                          DecisionData* const decision_data,
                          SpeedData* const speed_data) {
   _init_point = st_graph_data.init_point();
@@ -47,19 +47,19 @@ Status DpStGraph::search(const StGraphData& st_graph_data,
     _dp_st_speed_config.set_total_path_length(st_graph_data.path_data_length());
   }
 
-  if (!init_cost_table().ok()) {
+  if (!InitCostTable().ok()) {
     const std::string msg = "Initialize cost table failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!calculate_pointwise_cost(st_graph_data.obs_boundary()).ok()) {
+  if (!CalculatePointwiseCost(st_graph_data.obs_boundary()).ok()) {
     const std::string msg = "Calculate pointwise cost failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!calculate_total_cost().ok()) {
+  if (!CalculateTotalCost().ok()) {
     const std::string msg = "Calculate total cost failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -80,7 +80,7 @@ Status DpStGraph::search(const StGraphData& st_graph_data,
   return Status::OK();
 }
 
-Status DpStGraph::init_cost_table() {
+Status DpStGraph::InitCostTable() {
   std::uint32_t dim_s = _dp_st_speed_config.matrix_dimension_s();
   std::uint32_t dim_t = _dp_st_speed_config.matrix_dimension_t();
 
@@ -111,7 +111,7 @@ Status DpStGraph::init_cost_table() {
   return Status::OK();
 }
 
-Status DpStGraph::calculate_pointwise_cost(
+Status DpStGraph::CalculatePointwiseCost(
     const std::vector<StGraphBoundary>& boundaries) {
   // TODO(all): extract reference line from decision first
   std::vector<STPoint> reference_points;
@@ -122,10 +122,10 @@ Status DpStGraph::calculate_pointwise_cost(
 
   for (std::uint32_t i = 0; i < _cost_table.size(); ++i) {
     for (std::uint32_t j = 0; j < _cost_table[i].size(); ++j) {
-      double ref_cost = _dp_st_cost.reference_cost(_cost_table[i][j].point(),
-                                                   reference_points[i]);
+      double ref_cost = _dp_st_cost.GetReferenceCost(_cost_table[i][j].point(),
+                                                     reference_points[i]);
       double obs_cost =
-          _dp_st_cost.obstacle_cost(_cost_table[i][j].point(), boundaries);
+          _dp_st_cost.GetObstacleCost(_cost_table[i][j].point(), boundaries);
       _cost_table[i][j].set_reference_cost(ref_cost);
       _cost_table[i][j].set_obstacle_cost(obs_cost);
       _cost_table[i][j].set_total_cost(std::numeric_limits<double>::infinity());
@@ -135,19 +135,19 @@ Status DpStGraph::calculate_pointwise_cost(
   return Status::OK();
 }
 
-Status DpStGraph::calculate_total_cost() {
+Status DpStGraph::CalculateTotalCost() {
   // time corresponding to row, s corresponding to col
   for (std::uint32_t r = 0; r < _cost_table.size(); ++r) {
     for (std::uint32_t c = 0; c < _cost_table[r].size(); ++c) {
-      calculate_total_cost(r, c);
+      CalculateTotalCost(r, c);
     }
   }
 
   return Status::OK();
 }
 
-void DpStGraph::calculate_total_cost(const std::uint32_t r,
-                                     const std::uint32_t c) {
+void DpStGraph::CalculateTotalCost(const std::uint32_t r,
+                                   const std::uint32_t c) {
   if (r == 0) {
     if (c == 0) {
       _cost_table[r][c].set_total_cost(0.0);
@@ -162,7 +162,7 @@ void DpStGraph::calculate_total_cost(const std::uint32_t r,
   if (r == 1) {
     _cost_table[r][c].set_total_cost(
         _cost_table[r][c].obstacle_cost() + _cost_table[0][0].total_cost() +
-        calculate_edge_cost_for_second_row(c, speed_limit));
+        CalculateEdgeCostForSecondRow(c, speed_limit));
     _cost_table[r][c].set_pre_point(_cost_table[0][0]);
     return;
   }
@@ -175,7 +175,7 @@ void DpStGraph::calculate_total_cost(const std::uint32_t r,
     for (std::uint32_t c_pre = c_low; c_pre <= c; ++c_pre) {
       double cost = _cost_table[r][c].obstacle_cost() +
                     _cost_table[r - 1][c_pre].total_cost() +
-                    calculate_edge_cost_for_third_row(c, c_pre, speed_limit);
+                    CalculateEdgeCostForThirdRow(c, c_pre, speed_limit);
 
       if (cost < _cost_table[r][c].total_cost()) {
         _cost_table[r][c].set_total_cost(cost);
@@ -188,9 +188,9 @@ void DpStGraph::calculate_total_cost(const std::uint32_t r,
   for (std::uint32_t c_pre = c_low; c_pre <= c; ++c_pre) {
     std::uint32_t lower_bound = 0;
     std::uint32_t upper_bound = 0;
-    if (!feasible_accel_range(static_cast<double>(c_pre),
-                              static_cast<double>(c), &lower_bound,
-                              &upper_bound)) {
+    if (!CalculateFeasibleAccelRange(static_cast<double>(c_pre),
+                                     static_cast<double>(c), &lower_bound,
+                                     &upper_bound)) {
       continue;
     }
 
@@ -207,8 +207,8 @@ void DpStGraph::calculate_total_cost(const std::uint32_t r,
         const STPoint& curr_point = _cost_table[r][c].point();
         double cost = _cost_table[r][c].obstacle_cost() +
                       _cost_table[r - 1][c_pre].total_cost() +
-                      calculate_edge_cost(triple_pre_point, prepre_point,
-                                          pre_point, curr_point, speed_limit);
+                      CalculateEdgeCost(triple_pre_point, prepre_point,
+                                        pre_point, curr_point, speed_limit);
 
         if (cost < _cost_table[r][c].total_cost()) {
           _cost_table[r][c].set_total_cost(cost);
@@ -219,9 +219,9 @@ void DpStGraph::calculate_total_cost(const std::uint32_t r,
   }
 }
 
-bool DpStGraph::feasible_accel_range(const double c_pre, const double c_cur,
-                                     std::uint32_t* const lower_bound,
-                                     std::uint32_t* const upper_bound) const {
+bool DpStGraph::CalculateFeasibleAccelRange(
+    const double c_pre, const double c_cur, std::uint32_t* const lower_bound,
+    std::uint32_t* const upper_bound) const {
   double tcoef = _unit_t * _unit_t / _unit_s;
   double lval = std::max(
       2 * c_pre - c_cur + _dp_st_speed_config.max_deceleration() * tcoef, 0.0);
@@ -356,40 +356,37 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
   return Status::OK();
 }
 
-double DpStGraph::calculate_edge_cost(const STPoint& first,
-                                      const STPoint& second,
-                                      const STPoint& third,
-                                      const STPoint& forth,
-                                      const double speed_limit) const {
-  return _dp_st_cost.speed_cost(third, forth, speed_limit) +
-         _dp_st_cost.accel_cost_by_three_points(second, third, forth) +
-         _dp_st_cost.jerk_cost_by_four_points(first, second, third, forth);
+double DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
+                                    const STPoint& third, const STPoint& forth,
+                                    const double speed_limit) const {
+  return _dp_st_cost.GetSpeedCost(third, forth, speed_limit) +
+         _dp_st_cost.GetAccelCostByThreePoints(second, third, forth) +
+         _dp_st_cost.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
-double DpStGraph::calculate_edge_cost_for_second_row(
+double DpStGraph::CalculateEdgeCostForSecondRow(
     const uint32_t col, const double speed_limit) const {
   double init_speed = _init_point.v();
   double init_acc = _init_point.a();
   const STPoint& pre_point = _cost_table[0][0].point();
   const STPoint& curr_point = _cost_table[1][col].point();
-  return _dp_st_cost.speed_cost(pre_point, curr_point, speed_limit) +
-         _dp_st_cost.accel_cost_by_two_points(init_speed, pre_point,
-                                              curr_point) +
-         _dp_st_cost.jerk_cost_by_two_points(init_speed, init_acc, pre_point,
-                                             curr_point);
+  return _dp_st_cost.GetSpeedCost(pre_point, curr_point, speed_limit) +
+         _dp_st_cost.GetAccelCostByTwoPoints(init_speed, pre_point,
+                                             curr_point) +
+         _dp_st_cost.GetJerkCostByTwoPoints(init_speed, init_acc, pre_point,
+                                            curr_point);
 }
 
-double DpStGraph::calculate_edge_cost_for_third_row(
-    const uint32_t curr_col, const uint32_t pre_col,
-    const double speed_limit) const {
+double DpStGraph::CalculateEdgeCostForThirdRow(const uint32_t curr_col,
+                                               const uint32_t pre_col,
+                                               const double speed_limit) const {
   double init_speed = _init_point.v();
   const STPoint& first = _cost_table[0][0].point();
   const STPoint& second = _cost_table[1][pre_col].point();
   const STPoint& third = _cost_table[2][curr_col].point();
-  return _dp_st_cost.speed_cost(second, third, speed_limit) +
-         _dp_st_cost.accel_cost_by_three_points(first, second, third) +
-         _dp_st_cost.jerk_cost_by_three_points(init_speed, first, second,
-                                               third);
+  return _dp_st_cost.GetSpeedCost(second, third, speed_limit) +
+         _dp_st_cost.GetAccelCostByThreePoints(first, second, third) +
+         _dp_st_cost.GetJerkCostByThreePoints(init_speed, first, second, third);
 }
 
 }  // namespace planning
