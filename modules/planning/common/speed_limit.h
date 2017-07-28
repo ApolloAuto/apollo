@@ -35,7 +35,7 @@ class SpeedLimit {
   void add_speed_limit(const double s, const double t, const double v,
                        const double a, const double da);
   const std::vector<SpeedPoint>& speed_limits() const;
-
+  double get_speed_limit(const double s) const;
  private:
   std::vector<SpeedPoint> _speed_point;
 };

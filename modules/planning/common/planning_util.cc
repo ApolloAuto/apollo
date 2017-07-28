@@ -81,6 +81,17 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   return p;
 }
 
+SpeedPoint interpolate(const SpeedPoint& start, const SpeedPoint& end,
+                       const double weight) {
+  SpeedPoint speed_point;
+  speed_point.set_s((1 - weight) * start.s() + weight * end.s());
+  speed_point.set_t((1 - weight) * start.t() + weight * end.t());
+  speed_point.set_v((1 - weight) * start.v() + weight * end.v());
+  speed_point.set_a((1 - weight) * start.a() + weight * end.a());
+  speed_point.set_da((1 - weight) * start.da() + weight * end.da());
+  return speed_point;
+}
+
 PathPoint interpolate_linear_approximation(const PathPoint &p0,
                                            const PathPoint &p1,
                                            const double s) {
