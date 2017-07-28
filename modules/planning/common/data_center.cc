@@ -92,8 +92,8 @@ bool DataCenter::CreateReferenceLineFromMap() {
     const auto &accumulate_s = lane_info_ptr->accumulate_s();
     const auto &headings = lane_info_ptr->headings();
     for (size_t i = 0; i < points.size(); ++i) {
-      hdmap::LaneWaypoint lane_waypoint(lane_info_ptr.get(), accumulate_s[i]);
-      ref_points.emplace_back(points[i], headings[i], lane_waypoint);
+      hdmap::LaneWaypoint lane_waypoint(lane_info_ptr, accumulate_s[i]);
+      ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, lane_waypoint);
     }
   }
   if (ref_points.empty()) {

@@ -39,14 +39,14 @@
 namespace apollo {
 namespace hdmap {
 
-// class LaneInfo;
-// class OverlapInfo;
+// class LaneInfoConstPtr;
+// class OverlapInfoConstPtr;
 
 struct LaneWaypoint {
   LaneWaypoint() = default;
-  LaneWaypoint(const apollo::hdmap::LaneInfo* lane, const double s)
+  LaneWaypoint(LaneInfoConstPtr lane, const double s)
       : lane(CHECK_NOTNULL(lane)), s(s) {}
-  const apollo::hdmap::LaneInfo* lane = nullptr;
+  LaneInfoConstPtr lane = nullptr;
   double s = 0.0;
 
   std::string debug_string() const;
@@ -54,10 +54,9 @@ struct LaneWaypoint {
 
 struct LaneSegment {
   LaneSegment() = default;
-  LaneSegment(const apollo::hdmap::LaneInfo* lane, const double start_s,
-              const double end_s)
+  LaneSegment(LaneInfoConstPtr lane, const double start_s, const double end_s)
       : lane(CHECK_NOTNULL(lane)), start_s(start_s), end_s(end_s) {}
-  const apollo::hdmap::LaneInfo* lane = nullptr;
+  LaneInfoConstPtr lane = nullptr;
   double start_s = 0.0;
   double end_s = 0.0;
 
@@ -76,17 +75,17 @@ struct PathOverlap {
   std::string debug_string() const;
 };
 
-class MapPathPoint : public apollo::common::math::Vec2d {
+class MapPathPoint : public common::math::Vec2d {
  public:
   MapPathPoint() = default;
-  MapPathPoint(const apollo::common::math::Vec2d& point, double heading)
+  MapPathPoint(const common::math::Vec2d& point, double heading)
       : Vec2d(point.x(), point.y()), _heading(heading) {}
-  MapPathPoint(const apollo::common::math::Vec2d& point, double heading,
+  MapPathPoint(const common::math::Vec2d& point, double heading,
                LaneWaypoint lane_waypoint)
       : Vec2d(point.x(), point.y()), _heading(heading) {
     _lane_waypoints.emplace_back(std::move(lane_waypoint));
   }
-  MapPathPoint(const apollo::common::math::Vec2d& point, double heading,
+  MapPathPoint(const common::math::Vec2d& point, double heading,
                std::vector<LaneWaypoint> lane_waypoints)
       : Vec2d(point.x(), point.y()),
         _heading(heading),
@@ -129,16 +128,15 @@ class PathApproximation {
   }
   double max_error() const { return _max_error; }
   const std::vector<int>& original_ids() const { return _original_ids; }
-  const std::vector<apollo::common::math::LineSegment2d>& segments() const {
+  const std::vector<common::math::LineSegment2d>& segments() const {
     return _segments;
   }
 
-  bool get_projection(const Path& path,
-                      const apollo::common::math::Vec2d& point,
+  bool get_projection(const Path& path, const common::math::Vec2d& point,
                       double* accumulate_s, double* lateral,
                       double* distance) const;
 
-  bool overlap_with(const Path& path, const apollo::common::math::Box2d& box,
+  bool overlap_with(const Path& path, const common::math::Box2d& box,
                     double width) const;
 
  protected:
@@ -155,7 +153,7 @@ class PathApproximation {
 
   int _num_points = 0;
   std::vector<int> _original_ids;
-  std::vector<apollo::common::math::LineSegment2d> _segments;
+  std::vector<common::math::LineSegment2d> _segments;
   std::vector<double> _max_error_per_segment;
 
   // TODO(@lianglia_apollo): use direction change checks to early stop.
@@ -204,18 +202,16 @@ class Path {
   // Compute interpolated index by accumulate_s.
   InterpolatedIndex get_index_from_s(double s) const;
 
-  bool get_nearest_point(const apollo::common::math::Vec2d& point,
-                         double* accumulate_s, double* lateral) const;
-  bool get_nearest_point(const apollo::common::math::Vec2d& point,
-                         double* accumulate_s, double* lateral,
-                         double* distance) const;
-  bool get_projection(const apollo::common::math::Vec2d& point,
-                      double* accumulate_s, double* lateral) const;
-  bool get_projection(const apollo::common::math::Vec2d& point,
-                      double* accumulate_s, double* lateral,
-                      double* distance) const;
+  bool get_nearest_point(const common::math::Vec2d& point, double* accumulate_s,
+                         double* lateral) const;
+  bool get_nearest_point(const common::math::Vec2d& point, double* accumulate_s,
+                         double* lateral, double* distance) const;
+  bool get_projection(const common::math::Vec2d& point, double* accumulate_s,
+                      double* lateral) const;
+  bool get_projection(const common::math::Vec2d& point, double* accumulate_s,
+                      double* lateral, double* distance) const;
 
-  bool get_heading_along_path(const apollo::common::math::Vec2d& point,
+  bool get_heading_along_path(const common::math::Vec2d& point,
                               double* heading) const;
 
   int num_points() const { return _num_points; }
@@ -227,11 +223,11 @@ class Path {
   const std::vector<LaneSegment>& lane_segments_to_next_point() const {
     return _lane_segments_to_next_point;
   }
-  const std::vector<apollo::common::math::Vec2d>& unit_directions() const {
+  const std::vector<common::math::Vec2d>& unit_directions() const {
     return _unit_directions;
   }
   const std::vector<double>& accumulated_s() const { return _accumulated_s; }
-  const std::vector<apollo::common::math::LineSegment2d>& segments() const {
+  const std::vector<common::math::LineSegment2d>& segments() const {
     return _segments;
   }
   const PathApproximation* approximation() const { return &_approximation; }
@@ -266,10 +262,10 @@ class Path {
   double get_right_width(const double s) const;
   bool get_width(const double s, double* left_width, double* right_width) const;
 
-  bool is_on_path(const apollo::common::math::Vec2d& point) const;
+  bool is_on_path(const common::math::Vec2d& point) const;
   // requires all corners of the box on path.
-  bool is_on_path(const apollo::common::math::Box2d& box) const;
-  bool overlap_with(const apollo::common::math::Box2d& box, double width) const;
+  bool is_on_path(const common::math::Box2d& box) const;
+  bool overlap_with(const common::math::Box2d& box, double width) const;
 
   std::string debug_string() const;
 
@@ -284,8 +280,7 @@ class Path {
   double get_sample(const std::vector<double>& samples, const double s) const;
 
   using GetOverlapFromLaneFunc =
-      std::function<const std::vector<const apollo::hdmap::OverlapInfo*>&(
-          const apollo::hdmap::LaneInfo&)>;
+      std::function<const std::vector<OverlapInfoConstPtr>&(LaneInfoConstPtr&)>;
   void get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
                         std::vector<PathOverlap>* const overlaps) const;
 
@@ -295,10 +290,10 @@ class Path {
   std::vector<MapPathPoint> _path_points;
   std::vector<LaneSegment> _lane_segments;
   std::vector<LaneSegment> _lane_segments_to_next_point;
-  std::vector<apollo::common::math::Vec2d> _unit_directions;
+  std::vector<common::math::Vec2d> _unit_directions;
   double _length = 0.0;
   std::vector<double> _accumulated_s;
-  std::vector<apollo::common::math::LineSegment2d> _segments;
+  std::vector<common::math::LineSegment2d> _segments;
   bool _use_path_approximation = false;
   PathApproximation _approximation;
 
