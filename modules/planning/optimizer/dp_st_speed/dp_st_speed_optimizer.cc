@@ -42,7 +42,7 @@ DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
 bool DpStSpeedOptimizer::Init() {
-  if (!boundary_mapper_.SetConfig(FLAGS_st_boundary_config_file)) {
+  if (!boundary_mapper_.Init(FLAGS_st_boundary_config_file)) {
     AERROR << "failed to load config file " << FLAGS_dp_st_speed_config_file;
     return false;
   }

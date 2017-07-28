@@ -39,7 +39,7 @@ using apollo::common::Status;
 using apollo::hdmap::HDMap;
 using apollo::localization::Pose;
 
-bool StBoundaryMapper::SetConfig(const std::string& config_file) {
+bool StBoundaryMapper::Init(const std::string& config_file) {
   if (!common::util::GetProtoFromFile(config_file, &_st_boundary_config)) {
     AERROR << "Failed to load config file " << config_file;
     return false;

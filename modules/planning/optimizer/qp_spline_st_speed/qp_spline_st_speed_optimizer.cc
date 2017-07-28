@@ -44,7 +44,7 @@ QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const std::string& name)
 
 bool QpSplineStSpeedOptimizer::Init() {
   // load boundary mapper
-  if (!boundary_mapper_.SetConfig(FLAGS_st_boundary_config_file)) {
+  if (!boundary_mapper_.Init(FLAGS_st_boundary_config_file)) {
     AERROR << "Failed to load config file: " << FLAGS_st_boundary_config_file;
     return false;
   }
