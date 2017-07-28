@@ -38,4 +38,12 @@ filegroup(
     ]),
 )
 
+filegroup(
+    name = "perception_conf",
+    srcs = glob([
+        "conf/*",
+        "data/**",
+    ]),
+)
+
 cpplint()
