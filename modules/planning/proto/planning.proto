@@ -70,8 +70,14 @@ message EStop {
   optional bool is_estop = 1;
 }
 
+message ProcessorStats {
+  optional string name = 1;
+  optional double time_ms = 2;
+}
+
 message LatencyStats {
   optional double total_time_ms = 1;
+  repeated ProcessorStats processor_stats = 2;
 }
 
 // next id: 16
