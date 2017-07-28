@@ -6,8 +6,3 @@ filegroup(
         "adapter.conf",
     ],
 )
-
-filegroup(
-    name = "perception_cnn_segmentation_config",
-    srcs = ["cnn_segmentation.conf"],
-)
