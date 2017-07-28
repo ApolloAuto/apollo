@@ -34,6 +34,7 @@ Compensator::Compensator(ros::NodeHandle node, ros::NodeHandle private_nh)
                    _topic_compensated_pointcloud, TOPIC_COMPENSATED_POINTCLOUD);
   private_nh.param("topic_pointcloud", _topic_pointcloud, TOPIC_POINTCLOUD);
   private_nh.param("queue_size", _queue_size, 10);
+  private_nh.param("tf_query_timeout", _tf_timeout, float(0.1));
 
   // advertise output point cloud (before subscribing to input data)
   _compensation_pub = node.advertise<sensor_msgs::PointCloud2>(
@@ -155,7 +156,7 @@ bool Compensator::query_pose_affine_from_tf2(const double& timestamp,
   ros::Time query_time(timestamp);
   std::string err_string;
   if (!_tf2_buffer.canTransform("world", _child_frame_id, query_time,
-                                ros::Duration(0.1), &err_string)) {
+                                ros::Duration(_tf_timeout), &err_string)) {
     ROS_WARN_STREAM("Can not find transform. "
                     << std::fixed << timestamp
                     << " Error info: " << err_string);
