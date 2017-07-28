@@ -71,13 +71,13 @@ bool QpFrenetFrame::Init(const ReferenceLine& reference_line,
   }
 
   const double inf = std::numeric_limits<double>::infinity();
-
-  for (std::uint32_t i = 0; i <= num_points; ++i) {
-    double s = _start_s + i * resolution;
+  double s = _start_s;
+  for (std::uint32_t i = 0; i <= num_points && s <= _end_s; ++i) {
     _evaluated_knots.push_back(std::move(s));
     _hdmap_bound.push_back(std::make_pair(-inf, inf));
     _static_obstacle_bound.push_back(std::make_pair(-inf, inf));
     _dynamic_obstacle_bound.push_back(std::make_pair(-inf, inf));
+    s = _start_s + (i + 1) * resolution;
   }
 
   // initialize calculation here
@@ -440,7 +440,6 @@ bool QpFrenetFrame::calculate_hd_map_bound() {
     double right_bound = 0.0;
     bool suc = _reference_line->get_lane_width(_evaluated_knots[i], &left_bound,
                                                &right_bound);
-    ADEBUG << suc << " bound left:" << left_bound << " right:" << right_bound;
     if (!suc) {
       left_bound = FLAGS_default_reference_line_width / 2;
       right_bound = FLAGS_default_reference_line_width / 2;

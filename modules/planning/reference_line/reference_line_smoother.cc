@@ -84,8 +84,9 @@ bool ReferenceLineSmoother::smooth(
 
   const double resolution =
       (end_t - start_t) / (smoother_config_.num_of_total_points() - 1);
-  for (std::uint32_t i = 0; i < smoother_config_.num_of_total_points(); ++i) {
-    const double t = i * resolution;
+  double t = start_t;
+  for (std::uint32_t i = 0; i < smoother_config_.num_of_total_points() &&
+       t < end_t; ++i) {
     std::pair<double, double> xy = spline_solver_->spline()(t);
     const double heading = std::atan2(spline_solver_->spline().derivative_y(t),
                                       spline_solver_->spline().derivative_x(t));
@@ -110,6 +111,7 @@ bool ReferenceLineSmoother::smooth(
     ReferencePoint new_rlp(common::math::Vec2d(xy.first, xy.second), heading,
                            kappa, dkappa, rlp.lane_waypoints());
     smoothed_ref_line->push_back(std::move(new_rlp));
+    t = start_t + (i + 1) * resolution;
   }
   return true;
 }
@@ -117,7 +119,8 @@ bool ReferenceLineSmoother::smooth(
 bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.length();
   const double resolution = length / smoother_config_.num_spline();
-  for (std::uint32_t i = 0; i <= smoother_config_.num_spline(); ++i) {
+  for (std::uint32_t i = 0; i <= smoother_config_.num_spline() &&
+       i * resolution <= length; ++i) {
     ReferencePoint rlp = raw_reference_line.get_reference_point(resolution * i);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
