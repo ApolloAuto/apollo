@@ -3,13 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "path",
-    hdrs = [
-        "path.h",
-    ],
-)
-
-cc_library(
     name = "discretized_path",
     srcs = [
         "discretized_path.cc",
@@ -18,7 +11,6 @@ cc_library(
         "discretized_path.h",
     ],
     deps = [
-        ":path",
         "//modules/common/proto:path_point_proto",
         "//modules/planning/common:planning_util",
     ],
@@ -33,7 +25,6 @@ cc_library(
         "frenet_frame_path.h",
     ],
     deps = [
-        ":path",
         "//modules/common/proto:path_point_proto",
         "//modules/planning/common:planning_util",
     ],
