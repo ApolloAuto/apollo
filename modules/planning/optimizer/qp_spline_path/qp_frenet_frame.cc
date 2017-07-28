@@ -440,11 +440,12 @@ bool QpFrenetFrame::calculate_hd_map_bound() {
     double right_bound = 0.0;
     bool suc = _reference_line->get_lane_width(_evaluated_knots[i], &left_bound,
                                                &right_bound);
-    AERROR << suc << "bound" << left_bound << "\t" << right_bound << std::endl;
+    ADEBUG << suc << " bound left:" << left_bound << " right:" << right_bound;
     if (!suc) {
       left_bound = FLAGS_default_reference_line_width / 2;
       right_bound = FLAGS_default_reference_line_width / 2;
     }
+
     _hdmap_bound[i].first = -right_bound;
     _hdmap_bound[i].second = left_bound;
   }
