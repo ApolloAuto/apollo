@@ -28,7 +28,7 @@ cc_library(
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:vec2d",
         "//modules/map/hdmap",
-        "//modules/map/pnc_map:pnc_path",
+        "//modules/map/pnc_map:path",
         "//modules/prediction/common:prediction_gflags",
         "@eigen//:eigen",
     ],

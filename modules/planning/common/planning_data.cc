@@ -30,7 +30,7 @@ namespace apollo {
 namespace planning {
 
 const ReferenceLine& PlanningData::reference_line() const {
-  return *reference_line_.get();
+  return *reference_line_;
 }
 
 const DecisionData& PlanningData::decision_data() const {

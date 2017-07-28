@@ -16,19 +16,19 @@
 
 #include "modules/prediction/container/obstacles/obstacle.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
+#include <limits>
 #include <unordered_set>
 #include <utility>
-#include <algorithm>
-#include <limits>
 #include "Eigen/Dense"
 
+#include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
-#include "modules/common/log.h"
-#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace prediction {
@@ -755,8 +755,8 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     heading = feature->t_velocity_heading();
   }
   std::vector<const LaneInfo*> current_lanes;
-  map->OnLane(current_lanes_, point, heading,
-              FLAGS_search_radius, &current_lanes);
+  map->OnLane(current_lanes_, point, heading, FLAGS_search_radius,
+              &current_lanes);
   current_lanes_ = current_lanes;
   if (current_lanes_.empty()) {
     ADEBUG << "Unable to find current lane.";
@@ -776,10 +776,11 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
 
     // TODO(kechxu) clean the follow code
     apollo::common::math::Vec2d vec_point(point[0], point[1]);
+    double distance = 0.0;
     apollo::hdmap::Point nearest_point =
-        current_lane->get_nearest_point(vec_point);
-    double nearest_point_heading = map->PathHeading(
-        current_lane, nearest_point);
+        current_lane->get_nearest_point(vec_point, &distance);
+    double nearest_point_heading =
+        map->PathHeading(current_lane, nearest_point);
     double angle_diff =
         apollo::common::math::AngleDiff(heading, nearest_point_heading);
     double left = 0.0;
@@ -876,9 +877,9 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     road_graph.BuildLaneGraph(&lane_graph);
     for (auto& lane_seq : lane_graph.lane_sequence()) {
       feature->mutable_lane()
-             ->mutable_lane_graph()
-             ->add_lane_sequence()
-             ->CopyFrom(lane_seq);
+          ->mutable_lane_graph()
+          ->add_lane_sequence()
+          ->CopyFrom(lane_seq);
     }
   }
   for (auto& lane : feature->lane().nearby_lane_feature()) {
@@ -888,9 +889,9 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     road_graph.BuildLaneGraph(&lane_graph);
     for (auto& lane_seq : lane_graph.lane_sequence()) {
       feature->mutable_lane()
-             ->mutable_lane_graph()
-             ->add_lane_sequence()
-             ->CopyFrom(lane_seq);
+          ->mutable_lane_graph()
+          ->add_lane_sequence()
+          ->CopyFrom(lane_seq);
     }
   }
 
@@ -909,8 +910,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
   CHECK_NOTNULL(map);
 
-  LaneGraph* lane_graph = feature->mutable_lane()
-                                 ->mutable_lane_graph();
+  LaneGraph* lane_graph = feature->mutable_lane()->mutable_lane_graph();
   double heading = feature->theta();
   double x = feature->position().x();
   double y = feature->position().y();
@@ -1047,8 +1047,8 @@ void Obstacle::Trim() {
   int count = 0;
   double latest_ts = feature_history_.front().timestamp();
   while (!feature_history_.empty() &&
-      latest_ts - feature_history_.back().timestamp() >=
-          FLAGS_max_history_time) {
+         latest_ts - feature_history_.back().timestamp() >=
+             FLAGS_max_history_time) {
     feature_history_.pop_back();
     ++count;
   }
