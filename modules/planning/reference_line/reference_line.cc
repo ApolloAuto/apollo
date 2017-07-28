@@ -61,16 +61,22 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
     AWARN << "The requested s is nearer than the start point of the reference "
              "line; reference line starts at "
           << accumulated_s.back() << ", requested " << s << ".";
-    ReferencePoint ref_point(reference_map_line_.get_smooth_point(s),
-                             0.0, 0.0, 0.0, 0.0);
+    ReferencePoint ref_point(reference_map_line_.get_smooth_point(s), 0.0, 0.0,
+                             0.0, 0.0);
+    if (ref_point.lane_waypoints().empty()) {
+      ref_point.add_lane_waypoints(reference_points_.front().lane_waypoints());
+    }
     return ref_point;
   }
   if (s > accumulated_s.back()) {
     AWARN << "The requested s exceeds the reference line; reference line "
              "ends at "
           << accumulated_s.back() << "requested " << s << " .";
-    ReferencePoint ref_point(reference_map_line_.get_smooth_point(s),
-                             0.0, 0.0, 0.0, 0.0);
+    ReferencePoint ref_point(reference_map_line_.get_smooth_point(s), 0.0, 0.0,
+                             0.0, 0.0);
+    if (ref_point.lane_waypoints().empty()) {
+      ref_point.add_lane_waypoints(reference_points_.back().lane_waypoints());
+    }
     return ref_point;
   }
 
