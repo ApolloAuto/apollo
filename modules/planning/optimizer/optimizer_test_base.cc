@@ -85,7 +85,7 @@ void OptimizerTestBase::export_path_data(const PathData& path_data,
   std::ofstream ofs(filename);
   ofs << "s, l, dl, ddl, x, y, z" << std::endl;
   const auto& frenet_path = path_data.frenet_frame_path();
-  const auto& discrete_path = path_data.path();
+  const auto& discrete_path = path_data.discretized_path();
   if (frenet_path.number_of_points() != discrete_path.num_of_points()) {
     AERROR << "frenet_path and discrete path have different number of points";
     return;

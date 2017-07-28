@@ -49,7 +49,7 @@ common::PathPoint DiscretizedPath::evaluate(const double param) const {
   return util::interpolate(*(it_lower - 1), *it_lower, param);
 }
 
-double DiscretizedPath::param_length() const {
+double DiscretizedPath::length() const {
   if (path_points_.empty()) {
     return 0.0;
   }
@@ -93,11 +93,7 @@ int DiscretizedPath::query_closest_point(const double param) const {
   }
 }
 
-std::vector<common::PathPoint> *DiscretizedPath::mutable_path_points() {
-  return &path_points_;
-}
-
-const std::vector<common::PathPoint> &DiscretizedPath::path_points() const {
+const std::vector<common::PathPoint> &DiscretizedPath::points() const {
   return path_points_;
 }
 
