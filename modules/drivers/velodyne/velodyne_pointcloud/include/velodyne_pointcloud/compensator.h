@@ -84,6 +84,7 @@ class Compensator {
   tf2_ros::TransformListener _tf2_transform_listener;
   // transform child frame id(world -> child frame)
   std::string _child_frame_id;
+  float _tf_timeout;
 
   // varibes for point fields value, we get point x,y,z by these offset
   int _x_offset;
