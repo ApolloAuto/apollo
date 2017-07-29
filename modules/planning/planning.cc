@@ -143,7 +143,7 @@ void Planning::RunOnce() {
     return;
   }
 
-  if (AdapterManager::GetPrediction()->Empty()) {
+  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
     AERROR << "Prediction is not available; skip the planning cycle";
     return;
   }
@@ -160,10 +160,12 @@ void Planning::RunOnce() {
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
-  // prediction
-  const auto& prediction = AdapterManager::GetPrediction()->GetLatestObserved();
-  ADEBUG << "Get prediction:" << prediction.DebugString();
-
+  if (FLAGS_enable_prediction) {
+    // prediction
+    const auto& prediction = AdapterManager::GetPrediction()->GetLatestObserved();
+    ADEBUG << "Get prediction:" << prediction.DebugString();
+  }
+  
   common::VehicleState::instance()->Update(localization, chassis);
 
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;

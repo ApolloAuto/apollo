@@ -316,3 +316,5 @@ DEFINE_double(decision_valid_stop_range, 0.5,
               "The valid stop range in decision.");
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
+DEFINE_bool(enable_prediction, false,
+            "True to enable prediction input.");
