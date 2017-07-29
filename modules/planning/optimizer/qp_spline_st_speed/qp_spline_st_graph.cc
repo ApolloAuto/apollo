@@ -80,6 +80,7 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
   }
 
   // extract output
+  speed_data->Clear();
   const Spline1d& spline = _spline_generator->spline();
 
   double time_resolution = _qp_spline_st_speed_config.output_time_resolution();
