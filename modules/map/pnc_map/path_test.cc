@@ -37,6 +37,7 @@ using AABox2d = apollo::common::math::AABox2d;
 using Box2d = apollo::common::math::Box2d;
 using Polygon2d = apollo::common::math::Polygon2d;
 using Vec2d = apollo::common::math::Vec2d;
+using LaneWaypoint = apollo::hdmap::LaneWaypoint;
 
 DECLARE_bool(validate_routing_result_for_trajectories);
 
@@ -633,6 +634,125 @@ TEST(TestSuite, hdmap_s_path) {
     EXPECT_NEAR(path.get_smooth_point(accumulate_s).DistanceTo({x, y}),
                 distance, 1e-6);
   }
+}
+
+TEST(TestSuite, hdmap_path_get_smooth_point) {
+  const double kRadius = 50.0;
+  const int kNumSegments = 100;
+  std::vector<MapPathPoint> points;
+  for (int i = 0; i <= kNumSegments; ++i) {
+    if (i <= kNumSegments / 2) {
+      const double p = -M_PI_2 +
+                       2.0 * M_PI * static_cast<double>(i) /
+                           static_cast<double>(kNumSegments);
+      points.push_back(
+          make_map_path_point(kRadius * cos(p), kRadius * (sin(p) - 1.0)));
+    } else {
+      const double p = M_PI_2 -
+                       2.0 * M_PI * static_cast<double>(i) /
+                           static_cast<double>(kNumSegments);
+      points.push_back(
+          make_map_path_point(kRadius * cos(p), kRadius * (sin(p) + 1.0)));
+    }
+  }
+  const double segment_length = points[0].DistanceTo(points[1]);
+  std::vector<Lane> original_lanes;
+  std::vector<apollo::hdmap::LaneInfoConstPtr> lanes;
+  for (int i = 0; i < kNumSegments; ++i) {
+    Lane lane;
+    lane.mutable_id()->set_id(to_string(i));
+    auto* segment =
+        lane.mutable_central_curve()->add_segment()->mutable_line_segment();
+    auto* point1 = segment->add_point();
+    point1->set_x(points[i].x());
+    point1->set_y(points[i].y());
+    auto* point2 = segment->add_point();
+    point2->set_x(points[i + 1].x());
+    point2->set_y(points[i + 1].y());
+    original_lanes.push_back(lane);
+  }
+  for (int i = 0; i < kNumSegments; ++i) {
+    lanes.push_back(
+        apollo::hdmap::LaneInfoConstPtr(new LaneInfo(original_lanes[i])));
+  }
+  for (int i = 0; i <= kNumSegments; ++i) {
+    points[i].set_heading((i < kNumSegments)
+                              ? (points[i + 1] - points[i]).Angle()
+                              : (points[i] - points[i - 1]).Angle());
+    if (i > 0) {
+      points[i].add_lane_waypoint(LaneWaypoint(lanes[i - 1], segment_length));
+    }
+    if (i < kNumSegments) {
+      points[i].add_lane_waypoint(LaneWaypoint(lanes[i], 0.0));
+    }
+  }
+  const Path path(points);
+  EXPECT_EQ(path.num_points(), kNumSegments + 1);
+  EXPECT_EQ(path.num_segments(), kNumSegments);
+  EXPECT_EQ(path.path_points().size(), kNumSegments + 1);
+  EXPECT_EQ(path.segments().size(), kNumSegments);
+  EXPECT_EQ(path.lane_segments_to_next_point().size(), kNumSegments);
+
+  EXPECT_NEAR(path.length(), segment_length * kNumSegments, 1e-6);
+  for (int i = 0; i <= kNumSegments; ++i) {
+    MapPathPoint point = path.get_smooth_point(segment_length * i);
+    EXPECT_NEAR(point.x(), points[i].x(), 1e-6);
+    EXPECT_NEAR(point.y(), points[i].y(), 1e-6);
+    EXPECT_NEAR(point.heading(), points[i].heading(), 1e-6);
+    if (i == 0) {
+      EXPECT_EQ(point.lane_waypoints().size(), 1);
+      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), to_string(i));
+      EXPECT_NEAR(point.lane_waypoints()[0].s, 0.0, 1e-6);
+    } else if (i == kNumSegments) {
+      EXPECT_EQ(point.lane_waypoints().size(), 1);
+      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), to_string(i - 1));
+      EXPECT_NEAR(point.lane_waypoints()[0].s, segment_length, 1e-6);
+    } else {
+      EXPECT_EQ(point.lane_waypoints().size(), 2);
+      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), to_string(i - 1));
+      EXPECT_NEAR(point.lane_waypoints()[0].s, segment_length, 1e-6);
+      EXPECT_EQ(point.lane_waypoints()[1].lane->id().id(), to_string(i));
+      EXPECT_NEAR(point.lane_waypoints()[1].s, 0.0, 1e-6);
+    }
+
+    if (i < kNumSegments) {
+      for (int case_id = 0; case_id < 20; ++case_id) {
+        const double offset = random_double(0.01, 0.99) * segment_length;
+        const double s = segment_length * i + offset;
+        point = path.get_smooth_point(s);
+        EXPECT_NEAR(point.x(),
+                    points[i].x() + offset * cos(points[i].heading()), 1e-6);
+        EXPECT_NEAR(point.y(),
+                    points[i].y() + offset * sin(points[i].heading()), 1e-6);
+        EXPECT_NEAR(point.heading(), points[i].heading(), 1e-6);
+        EXPECT_EQ(point.lane_waypoints().size(), 1);
+        EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), to_string(i));
+        EXPECT_NEAR(point.lane_waypoints()[0].s, offset, 1e-6);
+        const InterpolatedIndex index = path.get_index_from_s(s);
+        EXPECT_EQ(index.id, i);
+        EXPECT_NEAR(index.offset, offset, 1e-6);
+        EXPECT_NEAR(path.get_s_from_index(index), s, 1e-6);
+      }
+    }
+  }
+  InterpolatedIndex index = path.get_index_from_s(0.0);
+  EXPECT_EQ(index.id, 0);
+  EXPECT_NEAR(index.offset, 0, 1e-6);
+  EXPECT_NEAR(path.get_s_from_index(index), 0.0, 1e-6);
+  index = path.get_index_from_s(-0.1);
+  EXPECT_EQ(index.id, 0);
+  EXPECT_NEAR(index.offset, 0, 1e-6);
+  EXPECT_NEAR(path.get_s_from_index(index), 0.0, 1e-6);
+  index = path.get_index_from_s(segment_length * kNumSegments);
+  EXPECT_EQ(index.id, kNumSegments);
+  EXPECT_NEAR(index.offset, 0, 1e-6);
+  EXPECT_NEAR(path.get_s_from_index(index), segment_length * kNumSegments,
+              1e-6);
+  index = path.get_index_from_s(segment_length * kNumSegments + 0.2);
+  EXPECT_EQ(index.id, kNumSegments);
+  EXPECT_NEAR(index.offset, 0, 1e-6);
+  EXPECT_NEAR(path.get_s_from_index(index), segment_length * kNumSegments,
+              1e-6);
 }
 
 }  // hdmap
