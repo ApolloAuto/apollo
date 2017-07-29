@@ -86,6 +86,35 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
+void EMPlanner::RecordProcessorDebug(const std::string& name,
+                                     PlanningData* planning_data,
+                                     double time_diff_ms,
+                                     ADCTrajectory* trajectory_pb) {
+  OptimizerType type;
+  DCHECK(OptimizerType_Parse(name, &type));
+  if (type == DP_POLY_PATH_OPTIMIZER || type == QP_SPLINE_PATH_OPTIMIZER) {
+    const auto& path_points =
+        planning_data->path_data().discretized_path().points();
+    auto* optimized_path =
+        trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
+    optimized_path->set_name(name);
+    optimized_path->mutable_path_point()->CopyFrom(
+        {path_points.begin(), path_points.end()});
+  } else if (type == DP_ST_SPEED_OPTIMIZER ||
+             type == QP_SPLINE_ST_SPEED_OPTIMIZER) {
+    const auto& speed_points = planning_data->speed_data().speed_vector();
+    auto* speed_plan = trajectory_pb->mutable_debug()
+                           ->mutable_planning_data()
+                           ->add_speed_plan();
+    speed_plan->set_name(name);
+    speed_plan->mutable_speed_point()->CopyFrom(
+        {speed_points.begin(), speed_points.end()});
+  }
+  auto stats = trajectory_pb->mutable_latency_stats()->add_processor_stats();
+  stats->set_name(name);
+  stats->set_time_ms(time_diff_ms);
+}
+
 Status EMPlanner::Plan(const TrajectoryPoint& start_point,
                        ADCTrajectory* trajectory_pb) {
   DataCenter* data_center = DataCenter::instance();
@@ -111,21 +140,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
            << planning_data->DebugString();
 
     if (FLAGS_enable_record_debug) {
-      // Save each path after path-optimizers .
-      OptimizerType type;
-      CHECK(OptimizerType_Parse(optimizer->name(), &type));
-      if (type == DP_POLY_PATH_OPTIMIZER || type == QP_SPLINE_PATH_OPTIMIZER) {
-        const auto& path_points =
-            planning_data->path_data().discretized_path().points();
-        auto* optimized_path =
-            trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
-        optimized_path->set_name(optimizer->name());
-        optimized_path->mutable_path_point()->CopyFrom(
-            {path_points.begin(), path_points.end()});
-      }
-      auto stats = trajectory_pb->mutable_latency_stats()->add_processor_stats();
-      stats->set_name(optimizer->name());
-      stats->set_time_ms(time_diff_ms);
+      RecordProcessorDebug(optimizer->name(), planning_data, time_diff_ms,
+                           trajectory_pb);
     }
   }
   PublishableTrajectory computed_trajectory;
