@@ -21,9 +21,9 @@
 #include "modules/planning/common/speed/speed_data.h"
 
 #include <algorithm>
-#include <sstream>
 #include <utility>
 
+#include "modules/common/util/string_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
@@ -93,19 +93,14 @@ void SpeedData::Clear() {
 }
 
 std::string SpeedData::DebugString() const {
-  std::ostringstream sout;
-  sout << "[" << std::endl;
-  for (int i = 0; i < static_cast<int>(speed_vector_.size()) &&
-                  i < FLAGS_trajectory_point_num_for_debug;
-       ++i) {
-    if (i > 0) {
-      sout << "," << std::endl;
-    }
-    sout << speed_vector_[i].DebugString();
-  }
-  sout << "]" << std::endl;
-  sout.flush();
-  return sout.str();
+  const auto limit = std::min(
+      speed_vector_.size(),
+      static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
+  return apollo::common::util::StrCat(
+      "[\n",
+      apollo::common::util::PrintDebugStringIter(
+          speed_vector_.begin(), speed_vector_.begin() + limit, ",\n"),
+      "]\n");
 }
 
 std::uint32_t SpeedData::find_index(const double t) const {

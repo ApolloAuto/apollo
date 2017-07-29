@@ -21,9 +21,9 @@
 #include "modules/planning/common/path/path_data.h"
 
 #include <algorithm>
-#include <sstream>
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
@@ -96,21 +96,16 @@ void PathData::Clear() {
 }
 
 std::string PathData::DebugString() const {
-  std::ostringstream sout;
-  sout << "[" << std::endl;
   const auto &path_points = discretized_path_.points();
-  for (std::size_t i = 0;
-       i < path_points.size() &&
-       i < static_cast<std::size_t>(FLAGS_trajectory_point_num_for_debug);
-       ++i) {
-    if (i > 0) {
-      sout << "," << std::endl;
-    }
-    sout << path_points[i].DebugString();
-  }
-  sout << "]" << std::endl;
-  sout.flush();
-  return sout.str();
+  const auto limit = std::min(
+      path_points.size(),
+      static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
+
+  return apollo::common::util::StrCat(
+      "[\n",
+      apollo::common::util::PrintDebugStringIter(
+          path_points.begin(), path_points.begin() + limit, ",\n"),
+      "]\n");
 }
 
 }  // namespace planning

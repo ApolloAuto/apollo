@@ -16,6 +16,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math",
         "//modules/common/proto:path_point_proto",
+        "//modules/common/util:string_util",
         "//modules/map/pnc_map:pnc_path",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:double",
