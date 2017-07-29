@@ -74,6 +74,12 @@ void VehicleState::ConstructExceptLinearVelocity(
     angular_v_ = localization.pose().angular_velocity().z();
     linear_a_ = localization.pose().linear_acceleration().y();
   }
+
+  if (!(linear_v_ > 0.0)) {
+      kappa_ = 0.0;
+  } else {
+      kappa_ = angular_v_ / linear_v_;
+  }
 }
 
 double VehicleState::x() const { return x_; }
@@ -83,6 +89,8 @@ double VehicleState::y() const { return y_; }
 double VehicleState::z() const { return z_; }
 
 double VehicleState::heading() const { return heading_; }
+
+double VehicleState::kappa() const { return kappa_; }
 
 double VehicleState::linear_velocity() const { return linear_v_; }
 

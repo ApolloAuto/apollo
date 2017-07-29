@@ -36,7 +36,6 @@ class TrajectoryStitcher {
   TrajectoryStitcher() = delete;
 
   static std::vector<TrajectoryPoint> compute_stitching_trajectory(
-      const common::VehicleState& vehicle_state,
       const Frame* const prev_frame);
 };
 
