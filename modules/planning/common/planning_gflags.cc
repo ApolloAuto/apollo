@@ -22,8 +22,8 @@ DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
 DEFINE_string(map_filename, "modules/map/data/base_map.txt", "map data file");
 
-DEFINE_uint64(rtk_trajectory_backward, 10,
-              "The number of points to be included in RTK trajectory "
+DEFINE_uint64(backward_trajectory_point_num, 10,
+              "The number of points to be included in planning trajectory "
               "before the matched point");
 
 DEFINE_uint64(rtk_trajectory_forward, 800,
