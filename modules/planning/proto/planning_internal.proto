@@ -82,7 +82,12 @@ message LightSignal {
   optional TurnSignal turn_signal = 2 [default = NO_TURN];
 }
 
-// next id: 12
+message SpeedPlan {
+  optional string name = 1;
+  repeated apollo.common.SpeedPoint speed_point = 2;
+}
+
+// next id: 14
 message PlanningData {
   optional apollo.common.Header header = 1;
 
@@ -97,6 +102,7 @@ message PlanningData {
   repeated PlanningObstacle planning_obstacle = 4;
 
   repeated apollo.common.Path path = 6;
+  repeated SpeedPlan speed_plan = 13;
 
   optional apollo.localization.Pose init_status = 2 [deprecated = true];  // initial status of adc
   optional apollo.planning.MainDecision main_decision = 3 [deprecated = true];
