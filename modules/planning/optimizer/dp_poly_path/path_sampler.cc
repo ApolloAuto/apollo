@@ -39,9 +39,20 @@ PathSampler::PathSampler(const DpPolyPathConfig& config) : config_(config) {}
 bool PathSampler::sample(
     const ReferenceLine& reference_line,
     const ::apollo::common::TrajectoryPoint& init_point,
-    const ::apollo::common::SLPoint& init_sl_point,
     std::vector<std::vector<::apollo::common::SLPoint>>* const points) {
-  CHECK_NOTNULL(points);
+  if (!points) {
+    AERROR << "The provided points are null";
+    return false;
+  }
+  ::apollo::common::SLPoint init_sl_point;
+  common::math::Vec2d init_point_vec2d{init_point.path_point().x(),
+                                       init_point.path_point().y()};
+  if (!reference_line.get_point_in_frenet_frame(init_point_vec2d,
+                                                &init_sl_point)) {
+    AERROR << "Failed to get sl point from point "
+           << init_point_vec2d.DebugString();
+    return false;
+  }
   const double reference_line_length =
       reference_line.reference_map_line().accumulated_s().back();
   double level_distance =
