@@ -158,7 +158,7 @@ TEST_F(HDMapImplTestSuite, get_road_by_id) {
 TEST_F(HDMapImplTestSuite, get_lanes) {
   initial_context();
   std::vector<LaneInfoConstPtr> lanes;
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(0.0);
   point.set_y(0.0);
   point.set_z(0.0);
@@ -179,7 +179,7 @@ TEST_F(HDMapImplTestSuite, get_lanes) {
 
 TEST_F(HDMapImplTestSuite, get_nearest_lane_with_heading) {
   initial_context();
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(0.0);
   point.set_y(0.0);
   point.set_z(0.0);
@@ -199,7 +199,7 @@ TEST_F(HDMapImplTestSuite, get_nearest_lane_with_heading) {
 
 TEST_F(HDMapImplTestSuite, get_lanes_with_heading) {
   initial_context();
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(0.0);
   point.set_y(0.0);
   point.set_z(0.0);
@@ -217,7 +217,7 @@ TEST_F(HDMapImplTestSuite, get_lanes_with_heading) {
 TEST_F(HDMapImplTestSuite, get_junctions) {
   initial_context();
   std::vector<JunctionInfoConstPtr> junctions;
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(-36.0);
   point.set_y(-28.0);
   point.set_z(0.0);
@@ -231,7 +231,7 @@ TEST_F(HDMapImplTestSuite, get_junctions) {
 TEST_F(HDMapImplTestSuite, get_crosswalks) {
   initial_context();
   std::vector<CrosswalkInfoConstPtr> crosswalks;
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(199.0);
   point.set_y(-440.0);
   point.set_z(0.0);
@@ -246,7 +246,7 @@ TEST_F(HDMapImplTestSuite, get_signals) {
   initial_context();
   std::vector<SignalInfoConstPtr> signals;
 
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(-250.0);
   point.set_y(405.0);
   point.set_z(0.0);
@@ -263,7 +263,7 @@ TEST_F(HDMapImplTestSuite, get_stop_signs) {
   initial_context();
   std::vector<StopSignInfoConstPtr> stop_signs;
 
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(0.0);
   point.set_y(0.0);
   point.set_z(0.0);
@@ -276,7 +276,7 @@ TEST_F(HDMapImplTestSuite, get_yield_signs) {
   initial_context();
   std::vector<YieldSignInfoConstPtr> yield_signs;
 
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(0.0);
   point.set_y(0.0);
   point.set_z(0.0);
@@ -288,7 +288,7 @@ TEST_F(HDMapImplTestSuite, get_roads) {
   initial_boundary_context();
   std::vector<RoadInfoConstPtr> roads;
 
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(435730.0);
   point.set_y(4436777.0);
   point.set_z(0.0);
@@ -318,7 +318,7 @@ TEST_F(HDMapImplTestSuite, get_nearest_lane) {
   double s = 0.0;
   double l = 0.0;
   
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
 
   point.set_x(2.5);
   point.set_y(-20.0);
@@ -339,7 +339,7 @@ TEST_F(HDMapImplTestSuite, get_nearest_lane) {
 
 TEST_F(HDMapImplTestSuite, get_road_boundaries) {
   initial_boundary_context();
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(435798.0);
   point.set_y(4436768.0);
   point.set_z(0.0);

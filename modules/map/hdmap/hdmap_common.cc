@@ -83,15 +83,15 @@ void segments_from_curve(
   }
 }
 
-apollo::hdmap::Point point_from_vec2d(
+apollo::common::PointENU point_from_vec2d(
     const apollo::common::math::Vec2d &point) {
-  apollo::hdmap::Point pt;
+  apollo::common::PointENU pt;
   pt.set_x(point.x());
   pt.set_y(point.y());
   return pt;
 }
 apollo::common::math::Vec2d vec2d_from_point(
-    const apollo::hdmap::Point &point) {
+    const apollo::common::PointENU &point) {
   return apollo::common::math::Vec2d(point.x(), point.y());
   ;
 }
@@ -220,7 +220,7 @@ bool LaneInfo::is_on_lane(const apollo::common::math::Box2d &box) const {
   return true;
 }
 
-apollo::hdmap::Point LaneInfo::get_smooth_point(double s) const {
+apollo::common::PointENU LaneInfo::get_smooth_point(double s) const {
   CHECK_GE(_points.size(), 2);
   if (s <= 0.0) {
     return point_from_vec2d(_points[0]);
@@ -261,7 +261,7 @@ double LaneInfo::distance_to(const apollo::common::math::Vec2d &point,
   return distance;
 }
 
-apollo::hdmap::Point LaneInfo::get_nearest_point(
+apollo::common::PointENU LaneInfo::get_nearest_point(
     const apollo::common::math::Vec2d &point, double *distance) const {
   const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
   int index = segment_box->id();

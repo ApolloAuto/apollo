@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.hdmap;
 
+import "modules/common/proto/geometry.proto";
 import "modules/map/proto/map_geometry.proto";
 import "modules/map/proto/map_id.proto";
 
@@ -21,7 +22,7 @@ message Subsignal {
   optional Type type = 2;
 
   // Location of the center of the bulb. now no data support.
-  optional Point location = 3;
+  optional apollo.common.PointENU location = 3;
 }
 
 message Signal {

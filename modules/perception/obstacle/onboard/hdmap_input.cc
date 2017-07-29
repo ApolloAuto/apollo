@@ -67,7 +67,7 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   if (mapptr != NULL && *mapptr == nullptr) {
     (*mapptr).reset(new HdmapStruct);
   }
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(pointd.x);
   point.set_y(pointd.y);
   point.set_z(pointd.z);

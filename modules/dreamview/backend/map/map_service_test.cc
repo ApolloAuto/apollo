@@ -21,7 +21,7 @@
 
 using ::apollo::hdmap::Id;
 using ::apollo::hdmap::Map;
-using ::apollo::hdmap::Point;
+using ::apollo::common::PointENU;
 using ::testing::UnorderedElementsAre;
 
 namespace apollo {
@@ -73,7 +73,9 @@ TEST_F(MapServiceTest, LoadMap) {
 }
 
 TEST_F(MapServiceTest, CollectMapElements) {
-  Point p;
+  PointENU p;
+  p.set_x(0.0);
+  p.set_y(0.0);
   MapElementIds map_element_ids = map_service.CollectMapElements(p, 20000.0);
 
   EXPECT_THAT(map_element_ids.lane, UnorderedElementsAre("l1"));

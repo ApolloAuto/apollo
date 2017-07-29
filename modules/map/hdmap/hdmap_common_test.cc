@@ -45,7 +45,7 @@ void HDMapCommonTestSuite::init_lane_obj(apollo::hdmap::Lane* lane) {
       lane->mutable_central_curve()->add_segment();
   apollo::hdmap::LineSegment* line_segment =
       curve_segment->mutable_line_segment();
-  apollo::hdmap::Point* pt = line_segment->add_point();
+  apollo::common::PointENU* pt = line_segment->add_point();
   pt->set_x(1.0);
   pt->set_y(1.0);
   pt = line_segment->add_point();
@@ -97,7 +97,7 @@ void HDMapCommonTestSuite::init_junction_obj(
     apollo::hdmap::Junction* junction) {
   junction->mutable_id()->set_id("junction_1");
   apollo::hdmap::Polygon* polygon = junction->mutable_polygon();
-  apollo::hdmap::Point* pt = polygon->add_point();
+  apollo::common::PointENU* pt = polygon->add_point();
   pt->set_x(1.0);
   pt->set_y(1.0);
   pt = polygon->add_point();
@@ -129,7 +129,7 @@ void HDMapCommonTestSuite::init_junction_obj(
 void HDMapCommonTestSuite::init_signal_obj(apollo::hdmap::Signal* signal) {
   signal->mutable_id()->set_id("signal_1");
   apollo::hdmap::Polygon* polygon = signal->mutable_boundary();
-  apollo::hdmap::Point* pt = polygon->add_point();
+  apollo::common::PointENU* pt = polygon->add_point();
   pt->set_x(1.0);
   pt->set_y(1.0);
   pt->set_z(1.0);
@@ -201,7 +201,7 @@ void HDMapCommonTestSuite::init_crosswalk_obj(
     apollo::hdmap::Crosswalk* crosswalk) {
   crosswalk->mutable_id()->set_id("crosswalk_1");
   apollo::hdmap::Polygon* polygon = crosswalk->mutable_polygon();
-  apollo::hdmap::Point* pt = polygon->add_point();
+  apollo::common::PointENU* pt = polygon->add_point();
   pt->set_x(0.0);
   pt->set_y(0.0);
   pt->set_z(0.0);
@@ -225,7 +225,7 @@ void HDMapCommonTestSuite::init_stop_sign_obj(
       stop_sign->mutable_stop_line()->add_segment();
   apollo::hdmap::LineSegment* line_segment =
       curve_segment->mutable_line_segment();
-  apollo::hdmap::Point* pt = line_segment->add_point();
+  apollo::common::PointENU* pt = line_segment->add_point();
   pt->set_x(0.0);
   pt->set_y(0.0);
   pt->set_z(0.0);
@@ -245,7 +245,7 @@ void HDMapCommonTestSuite::init_yield_sign_obj(
       yield_sign->mutable_stop_line()->add_segment();
   apollo::hdmap::LineSegment* line_segment =
       curve_segment->mutable_line_segment();
-  apollo::hdmap::Point* pt = line_segment->add_point();
+  apollo::common::PointENU* pt = line_segment->add_point();
   pt->set_x(0.0);
   pt->set_y(0.0);
   pt->set_z(0.0);

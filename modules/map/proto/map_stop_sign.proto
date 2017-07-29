@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.hdmap;
 
+import "modules/common/proto/geometry.proto";
 import "modules/map/proto/map_geometry.proto";
 import "modules/map/proto/map_id.proto";
 
@@ -22,7 +23,7 @@ message StopSign {
   optional Curve stop_line = 2;
 
   // Location of the stand point.
-  optional Point location = 3;
+  optional apollo.common.PointENU location = 3;
 
   repeated Id overlap_id = 4;
 

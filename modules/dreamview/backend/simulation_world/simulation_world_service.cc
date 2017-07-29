@@ -297,7 +297,7 @@ Json SimulationWorldService::GetUpdateAsJson() const {
   ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
 
   // Gather required map element ids based on current location.
-  apollo::hdmap::Point point;
+  apollo::common::PointENU point;
   point.set_x(world_.auto_driving_car().position_x());
   point.set_y(world_.auto_driving_car().position_y());
 
