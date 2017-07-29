@@ -41,7 +41,42 @@ void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
 }
 
-void PredictorManager::Init(const PredictionConf& config) {}
+void PredictorManager::Init(const PredictionConf& config) {
+  for (const auto& obstacle_conf : config.obstacle_conf()) {
+    if (!obstacle_conf.has_obstacle_type()) {
+      ADEBUG << "Obstacle config ["
+             << obstacle_conf.ShortDebugString()
+             << "] has not defined obstacle type.";
+      continue;
+    }
+
+    if (obstacle_conf.obstacle_type() == PerceptionObstacle::VEHICLE) {
+      if (!obstacle_conf.has_obstacle_status() ||
+          !obstacle_conf.has_predictor_type()) {
+        ADEBUG << "Vehicle obstacle config ["
+               << obstacle_conf.ShortDebugString()
+               << "] has not defined obstacle status or predictor type.";
+        continue;
+      } else if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+        vehicle_on_lane_predictor_ = obstacle_conf.predictor_type();
+      } else if (obstacle_conf.obstacle_status() == ObstacleConf::OFF_LANE) {
+        vehicle_off_lane_predictor_ = obstacle_conf.predictor_type();
+      }
+    } else if (obstacle_conf.obstacle_type() ==
+          PerceptionObstacle::PEDESTRIAN) {
+      pedestrian_predictor_ = obstacle_conf.predictor_type();
+    }
+  }
+
+  AINFO << "Defined vehicle on lane obstacle predictor ["
+        << vehicle_on_lane_predictor_ << "].";
+  AINFO << "Defined vehicle off lane obstacle predictor ["
+        << vehicle_off_lane_predictor_ << "].";
+  AINFO << "Defined pedestrian obstacle predictor ["
+        << pedestrian_predictor_ << "].";
+  AINFO << "Defined default obstacle predictor ["
+        << default_predictor_ << "].";
+}
 
 Predictor* PredictorManager::GetPredictor(
     const ObstacleConf::PredictorType& type) {
@@ -69,18 +104,18 @@ void PredictorManager::Run(
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
         if (obstacle->IsOnLane()) {
-          predictor = GetPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
+          predictor = GetPredictor(vehicle_on_lane_predictor_);
         } else {
-          predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+          predictor = GetPredictor(vehicle_off_lane_predictor_);
         }
         break;
       }
       case PerceptionObstacle::PEDESTRIAN: {
-        predictor = GetPredictor(ObstacleConf::REGIONAL_PREDICTOR);
+        predictor = GetPredictor(pedestrian_predictor_);
         break;
       }
       default: {
-        predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+        predictor = GetPredictor(default_predictor_);
         break;
       }
     }
