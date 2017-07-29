@@ -36,7 +36,7 @@ DEFINE_string(map_file, "modules/map/data/base_map.txt", "Path to map file");
 DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
 
 // Obstacle features
-DEFINE_bool(enable_kf_tracking, true, "Use measurements with KF tracking");
+DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
 DEFINE_double(max_acc, 4.0, "Upper bound of acceleration");
 DEFINE_double(min_acc, -4.0, "Lower bound of deceleration");
 DEFINE_double(max_speed, 15.0, "Max speed");
