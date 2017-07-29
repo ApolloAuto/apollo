@@ -91,7 +91,7 @@ class MapUtil {
     return ret.get();
   }
 
-  int point_to_sl(const ::apollo::hdmap::Point &point,
+  int point_to_sl(const ::apollo::common::PointENU &point,
                   std::string *lane_id, double *s, double *l) {
     QUIT_IF(lane_id == nullptr, -1, ERROR, "arg lane id is null");
     QUIT_IF(s == nullptr, -2, ERROR, "arg s is null");
@@ -105,7 +105,7 @@ class MapUtil {
   }
 
   int sl_to_point(const std::string &lane_id, const double s,
-                  const double l, ::apollo::hdmap::Point *point,
+                  const double l, ::apollo::common::PointENU *point,
                   double *heading) {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
   if (FLAGS_xy_to_sl) {
     double x = FLAGS_x;
     double y = FLAGS_y;
-    ::apollo::hdmap::Point point;
+    ::apollo::common::PointENU point;
     point.set_x(x);
     point.set_y(y);
     point.set_z(0);
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
            lane_id.c_str(), s, l, heading);
   }
   if (FLAGS_sl_to_xy) {
-    ::apollo::hdmap::Point point;
+    ::apollo::common::PointENU point;
     double heading = 0.0;
     map_util.sl_to_point(FLAGS_lane, FLAGS_s, FLAGS_l, &point, &heading);
     printf("x[%f] y[%f], heading[%f]\n", point.x(), point.y(), heading);
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
     printf("lane[%s] s[%f], l[%f]\n", FLAGS_lane.c_str(), s, l);
   }
   if (FLAGS_lane_to_lane) {
-    ::apollo::hdmap::Point point;
+    ::apollo::common::PointENU point;
     double heading = 0.0;
     map_util.sl_to_point(FLAGS_from_lane, FLAGS_s, 0.0, &point, &heading);
     double target_s = 0.0;
@@ -227,11 +227,11 @@ int main(int argc, char *argv[]) {
     const auto *lane_ptr = map_util.get_lane(FLAGS_lane_info);
     const auto &lane = lane_ptr->lane();
 
-    ::apollo::hdmap::Point start_point;
+    ::apollo::common::PointENU start_point;
     double start_heading = 0.0;
     map_util.sl_to_point(FLAGS_lane_info, 0, 0, &start_point, &start_heading);
 
-    ::apollo::hdmap::Point end_point;
+    ::apollo::common::PointENU end_point;
     double end_heading = 0.0;
     map_util.sl_to_point(FLAGS_lane_info, lane_ptr->total_length(), 0,
                          &end_point, &end_heading);

@@ -39,7 +39,7 @@ typedef ::apollo::hdmap::ClearArea     PbClearArea;
 typedef ::apollo::hdmap::LineSegment   PbLineSegment;
 typedef ::apollo::hdmap::CurveSegment  PbCurveSegment;
 typedef ::apollo::hdmap::Curve         PbCurve;
-typedef ::apollo::hdmap::Point         PbPoint3D;
+typedef ::apollo::common::PointENU         PbPoint3D;
 typedef ::apollo::hdmap::Lane_LaneType PbLaneType;
 typedef ::apollo::hdmap::Lane_LaneTurn PbTurnType;
 typedef ::apollo::hdmap::Id            PbID;

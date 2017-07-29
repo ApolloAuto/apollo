@@ -62,7 +62,7 @@ struct MapElementIds {
 class MapService {
  public:
   explicit MapService(const std::string &map_filename);
-  MapElementIds CollectMapElements(const apollo::hdmap::Point &point,
+  MapElementIds CollectMapElements(const apollo::common::PointENU &point,
                                    double raidus) const;
 
   // The returned value is of a ::apollo::hdmap::Map proto. This

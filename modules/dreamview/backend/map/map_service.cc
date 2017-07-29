@@ -21,7 +21,7 @@
 namespace apollo {
 namespace dreamview {
 
-using ::apollo::hdmap::Point;
+using ::apollo::common::PointENU;
 using ::apollo::hdmap::Map;
 using ::apollo::hdmap::Id;
 using ::apollo::hdmap::LaneInfoConstPtr;
@@ -124,7 +124,7 @@ MapService::MapService(const std::string &map_filename) {
   AINFO << "HDMap loaded, Map: " << map_filename;
 }
 
-MapElementIds MapService::CollectMapElements(const Point &point,
+MapElementIds MapService::CollectMapElements(const PointENU &point,
                                              double radius) const {
   MapElementIds result;
 

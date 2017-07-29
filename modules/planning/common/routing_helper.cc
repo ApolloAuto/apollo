@@ -157,7 +157,7 @@ bool RoutingHelper::validate_routing(
 }
 
 bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
-                                          const hdmap::Point &point,
+                                          const common::PointENU &point,
                                           const double backward_length,
                                           const double forward_length,
                                           hdmap::Path *path) const {
@@ -193,7 +193,7 @@ bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
       continue;
     }
     double distance = 0.0;
-    hdmap::Point map_point =
+    common::PointENU map_point =
         lane->get_nearest_point({point.x(), point.y()}, &distance);
     if (distance < min_distance) {
       min_distance = distance;
