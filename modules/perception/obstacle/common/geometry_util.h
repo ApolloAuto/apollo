@@ -128,6 +128,20 @@ Eigen::Vector3d get_barycenter(typename pcl::PointCloud<PointT>::Ptr cloud) {
     return barycenter;
 }
 
+template <typename PointType>
+void transform_point_cloud(
+        const PointType& point_in,
+        PointType& point_out,
+        const Eigen::Matrix4d& trans_mat) {
+    Eigen::Vector4d v(point_in.x, point_in.y, point_in.z, 1);
+    v = trans_mat * v;
+    point_out = point_in;
+    point_out.x = v.x();
+    point_out.y = v.y();
+    point_out.z = v.z();
+}
+
+
 template <typename PointType>                                                                       
 void transform_point_cloud(pcl::PointCloud<PointType>& cloud_in_out,
     const Eigen::Matrix4d& trans_mat) {                                                             
@@ -140,6 +154,25 @@ void transform_point_cloud(pcl::PointCloud<PointType>& cloud_in_out,
         p.z = v.z();                                                                                
     }                                                                                               
 }      
+
+template <typename PointType>
+void transform_point_cloud(const pcl::PointCloud<PointType>& cloud_in,
+                           pcl::PointCloud<PointType>& cloud_out,
+                           const Eigen::Matrix4d& trans_mat) {
+  if (cloud_out.points.size() < cloud_in.points.size()) {
+    cloud_out.points.resize(cloud_in.points.size());
+  }
+  for (int i = 0; i < cloud_in.size(); ++i) {
+    const PointType& p = cloud_in.at(i);
+    Eigen::Vector4d v(p.x, p.y, p.z, 1);
+    v = trans_mat * v;
+    PointType& pd = cloud_out.points[i];
+    pd.x = v.x();
+    pd.y = v.y();
+    pd.z = v.z();
+  }
+}
+
 
 void TransformCloud(pcl_util::PointCloudPtr cloud,
     std::vector<int> indices,
@@ -156,6 +189,21 @@ void max_min_distance_xy_bbox_to_bbox(const Eigen::Vector3f& center0, const Eige
 
 float dist_xy_to_bbox(const Eigen::Vector3f& center, const Eigen::Vector3f& dir,
     const Eigen::Vector3f& size, const Eigen::Vector3f& point);
+
+template <typename VectorIn, typename MatrixOut>
+MatrixOut vector_rot_mat_2d_xy(VectorIn& v1, VectorIn& v2) {
+  double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
+  double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
+  double cos_theta =
+      (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
+  double sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);
+
+  MatrixOut rot_mat;
+  rot_mat << cos_theta, sin_theta, 0, -sin_theta, cos_theta, 0, 0, 0, 1;
+  // std::cout << "drew theta : " << acos(cos_theta) << std::endl;
+  return rot_mat;
+}
+
 
 }  // namespace perception
 }  // namespace apollo
