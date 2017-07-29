@@ -71,7 +71,7 @@ class EMPlanner : public Planner {
  private:
   void RegisterOptimizers();
 
-  std::vector<SpeedPoint> GenerateInitSpeedProfile(const double init_v,
+  std::vector<common::SpeedPoint> GenerateInitSpeedProfile(const double init_v,
                                                    const double init_a);
 
  private:

@@ -25,6 +25,7 @@
 #include <string>
 
 #include "modules/common/log.h"
+#include "modules/common/proto/path_point.pb.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/math/double.h"
 
@@ -32,6 +33,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
+using apollo::common::SpeedPoint;
 using apollo::common::Status;
 
 DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config)

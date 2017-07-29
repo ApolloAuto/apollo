@@ -9,17 +9,6 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
 
-message SpeedPoint {
-  optional double s = 1;
-  optional double t = 2;
-  // speed (m/s)
-  optional double v = 3;
-  // acceleration (m/s^2)
-  optional double a = 4;
-  // jerk (m/s^3)
-  optional double da = 5;
-}
-
 // Deprecated: replaced by apollo.common.TrajectoryPoint
 message ADCTrajectoryPoint {
   optional double x = 1;  // in meters.

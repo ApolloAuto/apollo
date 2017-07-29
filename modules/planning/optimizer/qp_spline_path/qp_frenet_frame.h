@@ -66,7 +66,7 @@ class QpFrenetFrame {
 
  private:
   bool find_longitudinal_distance(const double time,
-                                  SpeedPoint* const speed_point);
+                                  common::SpeedPoint* const speed_point);
 
   bool calcualate_discretized_veh_loc();
 
@@ -123,7 +123,7 @@ class QpFrenetFrame {
   double _time_resolution = 0.1;
 
   std::vector<double> _evaluated_knots;
-  std::vector<SpeedPoint> _discretized_veh_loc;
+  std::vector<common::SpeedPoint> _discretized_veh_loc;
   std::vector<std::pair<double, double>> _hdmap_bound;
   std::vector<std::pair<double, double>> _static_obstacle_bound;
   std::vector<std::pair<double, double>> _dynamic_obstacle_bound;
