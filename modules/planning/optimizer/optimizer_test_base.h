@@ -69,6 +69,8 @@ class OptimizerTestBase : public ::testing::Test {
                                const std::string& filename);
 
  protected:
+  bool SetUpAdapters();
+
   DpPolyPathConfig dp_poly_path_config_;
   localization::Pose pose_;
   Frame* frame_ = nullptr;
