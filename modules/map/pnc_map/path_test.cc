@@ -38,6 +38,7 @@ using Box2d = apollo::common::math::Box2d;
 using Polygon2d = apollo::common::math::Polygon2d;
 using Vec2d = apollo::common::math::Vec2d;
 using LaneWaypoint = apollo::hdmap::LaneWaypoint;
+using LaneInfoConstPtr = apollo::hdmap::LaneInfoConstPtr;
 
 DECLARE_bool(validate_routing_result_for_trajectories);
 
@@ -141,7 +142,7 @@ TEST(TestSuite, hdmap_line_path) {
   *lane.add_right_sample() = make_sample(2.0, 8.0);
   *lane.add_right_sample() = make_sample(3.0, 5.0);
 
-  apollo::hdmap::LaneInfoConstPtr lane_info(new LaneInfo(lane));
+  LaneInfoConstPtr lane_info(new LaneInfo(lane));
 
   const std::vector<MapPathPoint> points{
       make_map_path_point(0, 0, M_PI_2, LaneWaypoint(lane_info, 0)),
@@ -657,7 +658,7 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
   }
   const double segment_length = points[0].DistanceTo(points[1]);
   std::vector<Lane> original_lanes;
-  std::vector<apollo::hdmap::LaneInfoConstPtr> lanes;
+  std::vector<LaneInfoConstPtr> lanes;
   for (int i = 0; i < kNumSegments; ++i) {
     Lane lane;
     lane.mutable_id()->set_id(to_string(i));
@@ -672,8 +673,7 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
     original_lanes.push_back(lane);
   }
   for (int i = 0; i < kNumSegments; ++i) {
-    lanes.push_back(
-        apollo::hdmap::LaneInfoConstPtr(new LaneInfo(original_lanes[i])));
+    lanes.push_back(LaneInfoConstPtr(new LaneInfo(original_lanes[i])));
   }
   for (int i = 0; i <= kNumSegments; ++i) {
     points[i].set_heading((i < kNumSegments)
@@ -753,6 +753,38 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
   EXPECT_NEAR(index.offset, 0, 1e-6);
   EXPECT_NEAR(path.get_s_from_index(index), segment_length * kNumSegments,
               1e-6);
+}
+
+TEST(TestSuite, compute_lane_segments_from_points) {
+  std::vector<MapPathPoint> points{make_map_path_point(2, 0),
+                                   make_map_path_point(2, 1),
+                                   make_map_path_point(2, 2)};
+  Lane lane1;
+  lane1.mutable_id()->set_id("id1");
+  auto* curve = lane1.mutable_central_curve();
+  auto* segment = curve->add_segment()->mutable_line_segment();
+  *segment->add_point() = make_point(0, 0, 0);
+  *segment->add_point() = make_point(1, 0, 0);
+  // const LaneInfo lane_info1(lane1);
+  LaneInfoConstPtr lane_info1(new LaneInfo(lane1));
+
+  Lane lane2 = lane1;
+  lane2.mutable_id()->set_id("id2");
+  // const LaneInfo lane_info2(lane2);
+  LaneInfoConstPtr lane_info2(new LaneInfo(lane2));
+
+  points[0].add_lane_waypoint(LaneWaypoint(lane_info1, 0.1));
+  points[1].add_lane_waypoint(LaneWaypoint(lane_info1, 0.7));
+  points[1].add_lane_waypoint(LaneWaypoint(lane_info2, 0.0));
+  points[2].add_lane_waypoint(LaneWaypoint(lane_info2, 0.4));
+  const Path path(points);
+  EXPECT_EQ(path.lane_segments().size(), 2);
+  EXPECT_EQ(path.lane_segments()[0].lane->id().id(), "id1");
+  EXPECT_NEAR(path.lane_segments()[0].start_s, 0.1, 1e-6);
+  EXPECT_NEAR(path.lane_segments()[0].end_s, 0.7, 1e-6);
+  EXPECT_EQ(path.lane_segments()[1].lane->id().id(), "id2");
+  EXPECT_NEAR(path.lane_segments()[1].start_s, 0.0, 1e-6);
+  EXPECT_NEAR(path.lane_segments()[1].end_s, 0.4, 1e-6);
 }
 
 }  // hdmap
