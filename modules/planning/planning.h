@@ -88,25 +88,26 @@ class Planning : public apollo::common::ApolloApp {
   void RunOnce();
   void RecordInput(ADCTrajectory* trajectory_pb);
 
-  std::pair<common::TrajectoryPoint, std::uint32_t>
-  ComputeStartingPointFromLastTrajectory(const double curr_time) const;
-
-  common::TrajectoryPoint ComputeStartingPointFromVehicleState(
-      const double forward_time) const;
-
-  void GetOverheadTrajectory(const std::uint32_t matched_index,
-                             const std::uint32_t buffer_size,
-                             ADCTrajectory* trajectory_pb);
+//  std::pair<common::TrajectoryPoint, std::uint32_t>
+//  ComputeStartingPointFromLastTrajectory(const double curr_time) const;
+//
+//  common::TrajectoryPoint ComputeStartingPointFromVehicleState(
+//      const double forward_time) const;
+//
+//  void GetOverheadTrajectory(const std::uint32_t matched_index,
+//                             const std::uint32_t buffer_size,
+//                             ADCTrajectory* trajectory_pb);
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
+
   PlanningConfig config_;
 
   std::unique_ptr<Planner> planner_;
 
-  std::vector<common::TrajectoryPoint> last_trajectory_;
+//  std::vector<common::TrajectoryPoint> last_trajectory_;
 
-  double last_header_time_ = 0.0;
+//  double last_header_time_ = 0.0;
 };
 
 }  // namespace planning

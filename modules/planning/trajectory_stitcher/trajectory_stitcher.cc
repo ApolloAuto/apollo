@@ -32,16 +32,16 @@ namespace planning {
 using VehicleState = apollo::common::VehicleState;
 
 std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
-    const VehicleState& vehicle_state, const Frame* const prev_frame) {
+    const Frame* const prev_frame) {
   auto compute_reinit_stitching_trajectory =
-      [](const VehicleState& vehicle_state) {
+      []() {
         TrajectoryPoint init_point;
-        init_point.mutable_path_point()->set_x(vehicle_state.x());
-        init_point.mutable_path_point()->set_y(vehicle_state.y());
-        init_point.set_v(vehicle_state.linear_velocity());
-        init_point.set_a(vehicle_state.linear_acceleration());
-        init_point.mutable_path_point()->set_theta(vehicle_state.heading());
-        init_point.mutable_path_point()->set_kappa(vehicle_state.kappa());
+        init_point.mutable_path_point()->set_x(VehicleState::instance()->x());
+        init_point.mutable_path_point()->set_y(VehicleState::instance()->y());
+        init_point.set_v(VehicleState::instance()->linear_velocity());
+        init_point.set_a(VehicleState::instance()->linear_acceleration());
+        init_point.mutable_path_point()->set_theta(VehicleState::instance()->heading());
+        init_point.mutable_path_point()->set_kappa(VehicleState::instance()->kappa());
 
         // TODO(all): the time is not correct, it should be
         // FLAGS_forward_predict_time.
@@ -56,7 +56,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
 
   // no planning history
   if (prev_frame == nullptr) {
-    return compute_reinit_stitching_trajectory(vehicle_state);
+    return compute_reinit_stitching_trajectory();
   }
   const auto& prev_trajectory = prev_frame->computed_trajectory();
   std::size_t prev_trajectory_size = prev_trajectory.num_of_points();
@@ -65,33 +65,33 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
   if (prev_trajectory_size == 0) {
     AWARN << "Projected trajectory at time [" << prev_trajectory.header_time()
           << "] size is zero! Use origin car status instead.";
-    return compute_reinit_stitching_trajectory(vehicle_state);
+    return compute_reinit_stitching_trajectory();
   }
 
   const double veh_rel_time =
-      vehicle_state.timestamp() - prev_trajectory.header_time();
+      VehicleState::instance()->timestamp() - prev_trajectory.header_time();
   std::size_t matched_index = prev_trajectory.query_nearest_point(veh_rel_time);
 
   // the previous trajectory is not long enough; something is seriously wrong.
   if (matched_index == prev_trajectory_size) {
-    return compute_reinit_stitching_trajectory(vehicle_state);
+    return compute_reinit_stitching_trajectory();
   }
 
   // the previous trajectory doesn't cover current time;
   if (matched_index == 0 &&
       veh_rel_time < prev_trajectory.start_point().relative_time()) {
-    return compute_reinit_stitching_trajectory(vehicle_state);
+    return compute_reinit_stitching_trajectory();
   }
 
   auto matched_point = prev_trajectory.trajectory_point_at(matched_index);
   double position_diff =
-      common::math::Vec2d(matched_point.path_point().x() - vehicle_state.x(),
-                          matched_point.path_point().y() - vehicle_state.y())
+      common::math::Vec2d(matched_point.path_point().x() - VehicleState::instance()->x(),
+                          matched_point.path_point().y() - VehicleState::instance()->y())
           .Length();
 
   // the distance between matched point and actual position is too large
   if (position_diff > FLAGS_replan_distance_threshold) {
-    return compute_reinit_stitching_trajectory(vehicle_state);
+    return compute_reinit_stitching_trajectory();
   }
 
   double forward_rel_time = veh_rel_time + FLAGS_forward_predict_time;

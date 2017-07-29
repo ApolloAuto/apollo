@@ -26,6 +26,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
+#include "modules/planning/trajectory_stitcher/trajectory_stitcher.h"
 
 namespace apollo {
 namespace planning {
@@ -107,7 +108,6 @@ Status Planning::Start() {
     ros::spinOnce();
     loop_rate.sleep();
   }
-
   return Status::OK();
 }
 
@@ -208,157 +208,28 @@ void Planning::Stop() {}
 
 bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
                     ADCTrajectory* trajectory_pb) {
-  double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
-  double execution_start_time = publish_time;
-
-  if (is_on_auto_mode && !last_trajectory_.empty()) {
-    // if the auto-driving mode is on and we have the trajectory from last
-    // cycle, then
-    // find the planning starting point from the last planning result.
-    // this ensures the smoothness of planning output and
-    // therefore the smoothness of control execution.
-
-    auto matched_info =
-        ComputeStartingPointFromLastTrajectory(execution_start_time);
-    TrajectoryPoint matched_point = matched_info.first;
-    if (FLAGS_enable_record_debug) {
-      trajectory_pb->mutable_debug()->mutable_planning_data()
-          ->mutable_init_point()->CopyFrom(matched_point);
-    }
-
-    std::uint32_t matched_index = matched_info.second;
-
-    // Compute the position deviation between current vehicle
-    // position and target vehicle position.
-    // If the deviation exceeds a specific threshold,
-    // it will be unsafe to planning from the matched point.
-    double dx =
-        matched_point.path_point().x() - common::VehicleState::instance()->x();
-    double dy =
-        matched_point.path_point().y() - common::VehicleState::instance()->y();
-    double position_deviation = std::sqrt(dx * dx + dy * dy);
-
-    if (position_deviation < FLAGS_replanning_threshold) {
-      // planned trajectory from the matched point, the matched point has
-      // relative time 0.
-      auto status = planner_->Plan(matched_point, trajectory_pb);
-
-      if (!status.ok()) {
-        last_trajectory_.clear();
-        return false;
-      }
-
-      // a segment of last trajectory to be attached to planned trajectory in
-      // case controller needs.
-      GetOverheadTrajectory(static_cast<std::uint32_t>(matched_index),
-          static_cast<std::uint32_t>(FLAGS_backward_trajectory_point_num),
-          trajectory_pb);
-
-      // store the planned trajectory and header info for next planning cycle.
-      last_trajectory_ = {trajectory_pb->trajectory_point().begin(),
-                          trajectory_pb->trajectory_point().end()};
-      last_header_time_ = execution_start_time;
-      return true;
-    }
-  }
-
   // if 1. the auto-driving mode is off or
   //    2. we don't have the trajectory from last planning cycle or
   //    3. the position deviation from actual and target is too high
   // then planning from current vehicle state.
-  TrajectoryPoint vehicle_start_point =
-      ComputeStartingPointFromVehicleState(planning_cycle_time);
+
+  auto overhead_trajectory = TrajectoryStitcher::compute_stitching_trajectory(
+          DataCenter::instance()->last_frame());
+
+  auto planning_start_point = overhead_trajectory.back();
 
   if (FLAGS_enable_record_debug) {
     trajectory_pb->mutable_debug()->mutable_planning_data()
-        ->mutable_init_point()->CopyFrom(vehicle_start_point);
+        ->mutable_init_point()->CopyFrom(overhead_trajectory.back());
     trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(true);
   }
 
-  auto status = planner_->Plan(vehicle_start_point, trajectory_pb);
-  if (!status.ok()) {
-    last_trajectory_.clear();
-    return false;
-  }
-  // store the planned trajectory and header info for next planning cycle.
-  last_trajectory_ = {trajectory_pb->trajectory_point().begin(),
-                      trajectory_pb->trajectory_point().end()};
-  last_header_time_ = execution_start_time;
-  return true;
-}
-
-std::pair<TrajectoryPoint, std::uint32_t>
-Planning::ComputeStartingPointFromLastTrajectory(
-    const double start_time) const {
-  auto comp = [](const TrajectoryPoint& p, const double t) {
-    return p.relative_time() < t;
-  };
-
-  auto it_lower =
-      std::lower_bound(last_trajectory_.begin(), last_trajectory_.end(),
-                       start_time - last_header_time_, comp);
-  if (it_lower == last_trajectory_.end()) {
-    it_lower--;
-  }
-  std::uint32_t index = it_lower - last_trajectory_.begin();
-  return std::pair<TrajectoryPoint, std::uint32_t>(*it_lower, index);
-}
-
-TrajectoryPoint Planning::ComputeStartingPointFromVehicleState(
-    const double forward_time) const {
-  // common::math::Vec2d estimated_position =
-  // VehicleState::instance()->EstimateFuturePosition(forward_time);
-  TrajectoryPoint point;
-  // point.set_x(estimated_position.x());
-  // point.set_y(estimated_position.y());
-  point.mutable_path_point()->set_x(common::VehicleState::instance()->x());
-  point.mutable_path_point()->set_y(common::VehicleState::instance()->y());
-  point.mutable_path_point()->set_z(common::VehicleState::instance()->z());
-  point.set_v(common::VehicleState::instance()->linear_velocity());
-  point.set_a(common::VehicleState::instance()->linear_acceleration());
-  point.mutable_path_point()->set_theta(
-      common::VehicleState::instance()->heading());
-  point.mutable_path_point()->set_kappa(0.0);
-  const double speed_threshold = 0.1;
-  if (point.v() > speed_threshold) {
-    point.mutable_path_point()->set_kappa(
-        common::VehicleState::instance()->angular_velocity() /
-        common::VehicleState::instance()->linear_velocity());
-  }
-  point.mutable_path_point()->set_dkappa(0.0);
-  point.mutable_path_point()->set_s(0.0);
-  point.set_relative_time(0.0);
-  return point;
+  auto status = planner_->Plan(planning_start_point, trajectory_pb);
+  return status == Status::OK();
 }
 
 void Planning::Reset() {
-  last_header_time_ = 0.0;
-  last_trajectory_.clear();
-}
 
-void Planning::GetOverheadTrajectory(const std::uint32_t matched_index,
-                                     const std::uint32_t buffer_size,
-                                     ADCTrajectory* trajectory_pb) {
-  if (!FLAGS_use_stitch) {
-    ADEBUG << "Skip trajectory stich.";
-    return;
-  }
-  const std::uint32_t start_index =
-      matched_index < buffer_size ? 0 : matched_index - buffer_size;
-
-  google::protobuf::RepeatedPtrField<TrajectoryPoint> overhead_trajectory(
-      last_trajectory_.begin() + start_index,
-      last_trajectory_.begin() + matched_index);
-
-  double zero_relative_time = last_trajectory_[matched_index].relative_time();
-  // reset relative time
-  for (auto& p : overhead_trajectory) {
-    p.set_relative_time(p.relative_time() - zero_relative_time);
-  }
-
-  // Insert the overhead_trajectory to the head of trajectory_pb.
-  overhead_trajectory.MergeFrom(trajectory_pb->trajectory_point());
-  trajectory_pb->mutable_trajectory_point()->Swap(&overhead_trajectory);
 }
 
 }  // namespace planning
