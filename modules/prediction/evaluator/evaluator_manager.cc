@@ -36,7 +36,31 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::MLP_EVALUATOR);
 }
 
-void EvaluatorManager::Init(const PredictionConf& config) {}
+void EvaluatorManager::Init(const PredictionConf& config) {
+  for (const auto& obstacle_conf : config.obstacle_conf()) {
+    if (!obstacle_conf.has_obstacle_type()) {
+      ADEBUG << "Obstacle config ["
+             << obstacle_conf.ShortDebugString()
+             << "] has not defined obstacle type, status or evaluator type.";
+      continue;
+    }
+
+    if (obstacle_conf.obstacle_type() == PerceptionObstacle::VEHICLE) {
+      if (!obstacle_conf.has_obstacle_status() ||
+          !obstacle_conf.has_evaluator_type()) {
+        ADEBUG << "Vehicle obstacle config ["
+               << obstacle_conf.ShortDebugString()
+               << "] has not defined obstacle status and evaluator type.";
+        continue;
+      } else if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+        vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+      }
+    }
+  }
+
+  AINFO << "Defined vehicle on lane obstacle evaluator ["
+        << vehicle_on_lane_evaluator_ << "]";
+}
 
 Evaluator* EvaluatorManager::GetEvaluator(
     const ObstacleConf::EvaluatorType& type) {
@@ -63,7 +87,7 @@ void EvaluatorManager::Run(
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
         if (obstacle->IsOnLane()) {
-          evaluator = GetEvaluator(ObstacleConf::MLP_EVALUATOR);
+          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
           CHECK_NOTNULL(evaluator);
         }
         break;

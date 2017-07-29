@@ -87,6 +87,9 @@ class EvaluatorManager {
   std::map<ObstacleConf::EvaluatorType,
       std::unique_ptr<Evaluator>> evaluators_;
 
+  ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ =
+      ObstacleConf::MLP_EVALUATOR;
+
   DECLARE_SINGLETON(EvaluatorManager)
 };
 
