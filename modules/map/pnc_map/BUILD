@@ -17,4 +17,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "pnc_path_test",
+    size = "small",
+    srcs = [
+        "path_test.cc",
+    ],
+    data = ["//modules/planning:planning_testdata"],
+    deps = [
+        ":pnc_path",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
