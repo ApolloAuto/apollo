@@ -1,28 +1,35 @@
 <launch>
-    <arg name="param_folder" default="$(find velodyne_pointcloud)/params"/>
-    <arg name="velodyne64_calibration_file" default="$(arg param_folder)/64E_S3_calibration_example.yaml"/> 
-    <arg name="extrinsics_velodyne64" default="$(arg param_folder)/velodyne64_novatel_extrinsics_example.yaml"/>
+    <arg name="velodyne64_calibration_file" default="$(find velodyne_pointcloud)/params/64E_S3_calibration_example.yaml"/>
+    <arg name="extrinsics_velodyne64" default="$(find velodyne_pointcloud)/params/velodyne64_novatel_extrinsics_example.yaml"/>
+    <arg name="velodyne64_frame_id" default="velodyne64"/>
     <arg name="organized" default="false"/>
     <arg name="min_range" default="0.9" />
     <arg name="max_range_64" default="70.0" />
     <arg name="rpm" default="600"/>
+    <!-- 64E_S3D_STRONGEST | 64E_S3D_LATEST | 64E_S3D_DUAL -->
+    <arg name="model" default="64E_S3D_STRONGEST" />
+    <!-- beijing    UTC+8:00 -->
+    <!-- california UTC-8:00 -->
     <arg name="time_zone" default="-8" />
+    <!-- 100ms -->
     <arg name="tf_query_timeout" default="0.1"/>
-    <arg name="velodyne64_frame_id" default="velodyne64"/> 
-
-    <!-- start rosbag replay -->
-  <include file="$(find velodyne_pointcloud)/launch/rosbag_replay.launch">
-    <arg name="rate" default="1" />
-    <arg name="start" default="0" />
-    <arg name="bag" value=""/>
-  </include> 
 
   <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
   </include>
-    <!--  HDL64E -->  
+    <!--  HDL64E -->
+    <!--  driver nodelets -->
+  <include file="$(find velodyne_driver)/launch/driver_nodelet.launch">
+    <arg name="node_name" value="sensor_velodyne64_driver"/>
+    <arg name="model" value="$(arg model)"/>
+    <arg name="rpm" value="$(arg rpm)"/>
+    <arg name="frame_id" value="$(arg velodyne64_frame_id)"/>
+    <arg name="topic" value="/apollo/sensor/velodyne64/VelodyneScanUnified"/>    
+  </include>
+  
   <!-- start cloud nodelet using test calibration file -->
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
-    <arg name="model" default="64E_S3D_STRONGEST" />
+    <arg name="node_name" value="sensor_velodyne64_convert"/>
+    <arg name="model" value="$(arg model)"/>
     <arg name="calibration" default="$(arg velodyne64_calibration_file)" />
     <arg name="organized" default="$(arg organized)"/>
     <arg name="min_range" default="$(arg min_range)" />
@@ -30,9 +37,8 @@
     <arg name="time_zone" default="$(arg time_zone)" />
     <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
     <arg name="topic_packets" default="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
-    <arg name="node_name" value="sensor_velodyne64_convert"/>
   </include>
-
+  
    <!-- start 64 compensator nodelet -->
   <include file="$(find velodyne_pointcloud)/launch/compensator_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_compensator"/>
@@ -44,9 +50,7 @@
 
   <node pkg="velodyne_pointcloud" type="extrinsics_broadcaster.py"
     args="$(arg extrinsics_velodyne64)" name="static_transform_velodyne64" />
-  
-  <node pkg="nodelet" type="nodelet" name="tf_broadcaster_nodelet"
-        args="load gnss_driver/TFBroadcasterNodelet velodyne_nodelet_manager" output="screen">
-  </node>
+
+  <node pkg="velodyne_pointcloud" type="velodyne_check.py" name="sensor_velodyne_check" />
 
 </launch>

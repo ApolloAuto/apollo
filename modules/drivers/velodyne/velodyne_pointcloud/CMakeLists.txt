@@ -138,7 +138,9 @@ if (CATKIN_ENABLE_TESTING)
   roslaunch_add_file_check(launch)
 endif(CATKIN_ENABLE_TESTING)
 
-catkin_install_python(PROGRAMS src/extrinsics_broadcaster.py
+catkin_install_python(PROGRAMS 
+    src/extrinsics_broadcaster.py
+    src/velodyne_check.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(
@@ -146,10 +148,10 @@ install(
     convert_node
     compensator_node
     convert_nodelet 
+    compensator_nodelet
     pointcloud_dump_nodelet 
     verify_pointcloud 
     pcd_exporter_nodelet
-    compensator_nodelet
     velodyne_parser_utest
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -165,6 +167,6 @@ install(DIRECTORY params/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/params)
 install(DIRECTORY tests/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/tests
-        FILES_MATCHING PATTERN "*.msg" PATTERN "*.bag" PATTERN "*.test")
+        FILES_MATCHING PATTERN "*.msg")
 install(DIRECTORY scripts/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts)
