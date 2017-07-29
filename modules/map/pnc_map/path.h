@@ -183,6 +183,8 @@ class InterpolatedIndex {
 class Path {
  public:
   Path() = default;
+  Path(const Path& rhs) = delete;
+  Path& operator=(const Path& rhs) = delete;
   Path(Path&&) = default;
   Path& operator=(Path&&) = default;
 
