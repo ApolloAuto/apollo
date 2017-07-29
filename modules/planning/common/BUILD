@@ -39,6 +39,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:box2d",
+        "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_object",
         "//modules/planning/common/trajectory:prediction_trajectory",
     ],
