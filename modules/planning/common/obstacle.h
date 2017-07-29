@@ -25,31 +25,25 @@
 #include <vector>
 
 #include "modules/common/math/box2d.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_object.h"
 #include "modules/planning/common/trajectory/prediction_trajectory.h"
 
 namespace apollo {
 namespace planning {
 
+using PerceptionObstacle = apollo::perception::PerceptionObstacle;
+
 class Obstacle : public PlanningObject {
  public:
-  enum class ObstacleType {
-    UNKNOWN = 0,
-    UNKNOWN_MOVABLE = 1,
-    UNKNOWN_UNMOVABLE = 2,
-    PEDESTRIAN = 3,
-    BICYCLE = 4,
-    VEHICLE = 5,
-  };
-
   Obstacle() = default;
 
   const std::string &Id() const;
   void SetId(int id);
   void SetId(const std::string &id);
 
-  const ObstacleType &Type() const;
-  void SetType(const ObstacleType &type);
+  const PerceptionObstacle::Type& Type() const;
+  void SetType(const PerceptionObstacle::Type &type);
 
   double Height() const;
   void SetHeight(const double height);
@@ -83,7 +77,7 @@ class Obstacle : public PlanningObject {
 
   ::apollo::common::math::Vec2d center_;
   std::vector<PredictionTrajectory> prediction_trajectories_;
-  ObstacleType type_ = ObstacleType::VEHICLE;
+  PerceptionObstacle::Type type_ = PerceptionObstacle::VEHICLE;
 };
 
 }  // namespace planning

@@ -78,7 +78,7 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
   obs_boundary->clear();
   Status ret = Status::OK();
 
-  const auto& main_decision = decision_data.main_decision();
+  const auto& main_decision = decision_data.Decision().main_decision();
   if (main_decision.has_stop()) {
     ret =
         map_main_decision_stop(main_decision.stop(), reference_line,

@@ -23,11 +23,11 @@
 namespace apollo {
 namespace planning {
 
-const MainDecision DecisionData::main_decision() const {
-  return main_decision_;
+const DecisionResult DecisionData::Decision() const {
+  return decision_;
 }
 
-MainDecision *DecisionData::mutable_main_decision() { return &main_decision_; }
+DecisionResult *DecisionData::MutableDecision() { return &decision_; }
 
 const std::vector<Obstacle> &DecisionData::Obstacles() const {
   return obstacles_;
