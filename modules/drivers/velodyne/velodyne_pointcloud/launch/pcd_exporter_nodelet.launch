@@ -1,5 +1,5 @@
 <launch>
-    <arg name="pcd_folder" default="/home/work/pcd_files"/>
+    <arg name="pcd_folder" default="/apollo/data/pcd"/>
     <arg name="skip_static_frames" default="false"/>
     <arg name="child_frame_id" default="velodyne64"/>
     <arg name="stamp_file" default="$(arg pcd_folder)/stamp.txt"/>

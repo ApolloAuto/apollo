@@ -392,7 +392,7 @@ function build_gnss() {
   protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
 
   cd modules
-  catkin_make_isolated --install --source drivers \
+  catkin_make_isolated --install --source drivers/gnss \
     --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
     --cmake-args --no-warn-unused-cli
   find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf

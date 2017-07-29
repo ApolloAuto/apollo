@@ -1,13 +1,17 @@
 <launch>
     <arg name="velodyne64_calibration_file" default="$(find velodyne_pointcloud)/params/64E_S3_calibration_example.yaml"/>
-    <arg name="extrinsics_file" default="$(find velodyne_pointcloud)/params/velodyne_novatel_extrinsics_example.yaml"/>
+    <arg name="extrinsics_velodyne64" default="$(find velodyne_pointcloud)/params/velodyne64_novatel_extrinsics_example.yaml"/>
     <arg name="velodyne64_frame_id" default="velodyne64"/>
     <arg name="organized" default="false"/>
     <arg name="min_range" default="0.9" />
     <arg name="max_range_64" default="70.0" />
     <arg name="rpm" default="600"/>
+    <!-- 64E_S3D_STRONGEST | 64E_S3D_LATEST | 64E_S3D_DUAL -->
     <arg name="model" default="64E_S3D_STRONGEST" />
+    <!-- beijing    UTC+8:00 -->
+    <!-- california UTC-8:00 -->
     <arg name="time_zone" default="-8" />
+    <!-- 100ms -->
     <arg name="tf_query_timeout" default="0.1"/>
 
   <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
@@ -45,6 +49,6 @@
   </include>
 
   <node pkg="velodyne_pointcloud" type="extrinsics_broadcaster.py"
-    args="$(arg extrinsics_file)" name="static_transform_velodyne64" />
+    args="$(arg extrinsics_velodyne64)" name="static_transform_velodyne64" />
 
 </launch>
