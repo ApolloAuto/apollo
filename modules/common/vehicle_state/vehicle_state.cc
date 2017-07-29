@@ -20,6 +20,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -27,6 +28,23 @@ namespace apollo {
 namespace common {
 
 VehicleState::VehicleState() {}
+
+bool VehicleState::Update(const std::string &localization_file,
+                          const std::string &chassis_file) {
+  localization::LocalizationEstimate localization;
+  if (!common::util::GetProtoFromFile(localization_file, &localization)) {
+    AERROR << "Failed to load file " << localization_file;
+    return false;
+  }
+
+  canbus::Chassis chassis;
+  if (!common::util::GetProtoFromFile(chassis_file, &chassis)) {
+    AERROR << "Failed to load file " << chassis_file;
+    return false;
+  }
+  Update(localization, chassis);
+  return true;
+}
 
 void VehicleState::Update(
     const localization::LocalizationEstimate &localization,

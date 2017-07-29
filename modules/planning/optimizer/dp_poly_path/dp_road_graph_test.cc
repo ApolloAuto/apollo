@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 
 #include "gmock/gmock.h"
@@ -39,11 +41,13 @@ using common::adapter::AdapterManager;
 
 class DpRoadGraphTest : public OptimizerTestBase {
  public:
-  void SetInitPointWithVelocity(const double velocity) {
-    init_point_.mutable_path_point()->set_x(586392.84003);
-    init_point_.mutable_path_point()->set_y(4140673.01232);
-    init_point_.set_v(velocity);
-    init_point_.set_a(0.0);
+  void SetInitPoint() {
+    init_point_.mutable_path_point()->set_x(pose_.position().x());
+    init_point_.mutable_path_point()->set_y(pose_.position().y());
+    const auto& velocity = pose_.linear_velocity();
+    init_point_.set_v(std::hypot(velocity.x(), velocity.y()));
+    const auto& acc = pose_.linear_acceleration();
+    init_point_.set_a(std::hypot(acc.x(), acc.y()));
     init_point_.set_relative_time(0.0);
   }
 
@@ -66,6 +70,8 @@ class DpRoadGraphTest : public OptimizerTestBase {
   virtual void SetUp() {
     google::InitGoogleLogging("DpRoadGraphTest");
     OptimizerTestBase::SetUp();
+    SetInitPoint();
+    SetSpeedDataWithConstVeolocity(10.0);
     reference_line_ = &(frame_->planning_data().reference_line());
   }
 
@@ -78,17 +84,14 @@ class DpRoadGraphTest : public OptimizerTestBase {
 };
 
 TEST_F(DpRoadGraphTest, speed_road_graph) {
-  SetInitPointWithVelocity(10.0);
-  SetSpeedDataWithConstVeolocity(10.0);
-
   DpRoadGraph road_graph(dp_poly_path_config_, init_point_, speed_data_);
   ASSERT_TRUE(reference_line_ != nullptr);
   bool result =
       road_graph.find_tunnel(*reference_line_, &decision_data_, &path_data_);
   EXPECT_TRUE(result);
-  EXPECT_EQ(808, path_data_.discretized_path().num_of_points());
-  EXPECT_EQ(808, path_data_.frenet_frame_path().number_of_points());
-  EXPECT_FLOAT_EQ(80.0, path_data_.frenet_frame_path().points().back().s());
+  EXPECT_EQ(407, path_data_.discretized_path().num_of_points());
+  EXPECT_EQ(407, path_data_.frenet_frame_path().number_of_points());
+  EXPECT_FLOAT_EQ(40.0, path_data_.frenet_frame_path().points().back().s());
   EXPECT_FLOAT_EQ(0.0, path_data_.frenet_frame_path().points().back().l());
   // export_path_data(path_data_, "/tmp/path.txt");
 }
