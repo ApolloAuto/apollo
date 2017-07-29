@@ -14,7 +14,7 @@
   <include file="$(find velodyne_pointcloud)/launch/rosbag_replay.launch">
     <arg name="rate" default="1" />
     <arg name="start" default="0" />
-    <arg name="bag" default="/apollo/data/bag/"/>
+    <arg name="bag" value=""/>
   </include> 
 
   <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
@@ -47,6 +47,6 @@
   
   <node pkg="nodelet" type="nodelet" name="tf_broadcaster_nodelet"
         args="load gnss_driver/TFBroadcasterNodelet velodyne_nodelet_manager" output="screen">
-    </node>
+  </node>
 
 </launch>

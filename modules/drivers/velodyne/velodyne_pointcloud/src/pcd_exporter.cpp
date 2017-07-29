@@ -61,8 +61,13 @@ void PCDExporter::init() {
   ROS_INFO_STREAM("pcd_folder :" << _pcd_folder);
   // check output directory, if not exist create it
   if (!boost::filesystem::exists(_pcd_folder)) {
-    boost::filesystem::create_directory(_pcd_folder);
-    ROS_DEBUG_STREAM("Create pcd folder " << _pcd_folder);
+    ROS_INFO_STREAM("The directory " << _pcd_folder << " is not exists, create now");
+    if (boost::filesystem::create_directory(_pcd_folder)) {
+      ROS_INFO("Create directory success.");
+    } else {
+      ROS_ERROR("Create directory failed! ");
+      ROS_BREAK();
+    }
   }
 
   if (boost::filesystem::exists(_pose_file)) {
