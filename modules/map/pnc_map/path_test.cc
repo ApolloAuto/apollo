@@ -87,21 +87,21 @@ LaneSampleAssociation make_sample(double s, double width) {
 
 const LaneInfo kDefaultaLaneInfo(make_default_lane());
 
-MapPathPoint make_trajectory_point(double x, double y, double heading,
-                                   std::vector<LaneWaypoint> waypoints) {
+MapPathPoint make_map_path_point(double x, double y, double heading,
+                                 std::vector<LaneWaypoint> waypoints) {
   return MapPathPoint({x, y}, heading, waypoints);
 }
-MapPathPoint make_trajectory_point(double x, double y, double heading,
-                                   const LaneWaypoint& waypoint) {
+MapPathPoint make_map_path_point(double x, double y, double heading,
+                                 const LaneWaypoint& waypoint) {
   std::vector<LaneWaypoint> waypoints;
   waypoints.push_back(waypoint);
   return MapPathPoint({x, y}, heading, waypoints);
 }
-MapPathPoint make_trajectory_point(double x, double y, double heading) {
+MapPathPoint make_map_path_point(double x, double y, double heading) {
   return MapPathPoint({x, y}, heading);
 }
-MapPathPoint make_trajectory_point(double x, double y) {
-  return make_trajectory_point(x, y, 0);
+MapPathPoint make_map_path_point(double x, double y) {
+  return make_map_path_point(x, y, 0);
 }
 
 int random_int(int s, int t) {
@@ -125,5 +125,147 @@ std::string to_string(const T& val) {
 
 }  // namespace
 
+TEST(TestSuite, hdmap_line_path) {
+  Lane lane;
+  lane.mutable_id()->set_id("id");
+  auto* line_segment =
+      lane.mutable_central_curve()->add_segment()->mutable_line_segment();
+  *line_segment->add_point() = make_point(0, 0, 0);
+  *line_segment->add_point() = make_point(0, 3, 0);
+  lane.set_length(3.0);
+  *lane.add_left_sample() = make_sample(0.0, 4.0);
+  *lane.add_left_sample() = make_sample(1.0, 5.0);
+  *lane.add_left_sample() = make_sample(3.0, 6.0);
+  *lane.add_right_sample() = make_sample(0.0, 7.0);
+  *lane.add_right_sample() = make_sample(2.0, 8.0);
+  *lane.add_right_sample() = make_sample(3.0, 5.0);
+
+  apollo::hdmap::LaneInfoConstPtr lane_info(new LaneInfo(lane));
+
+  const std::vector<MapPathPoint> points{
+      make_map_path_point(0, 0, M_PI_2, LaneWaypoint(lane_info, 0)),
+      make_map_path_point(0, 1, M_PI_2, LaneWaypoint(lane_info, 1)),
+      make_map_path_point(0, 2, M_PI_2, LaneWaypoint(lane_info, 2)),
+      make_map_path_point(0, 3, M_PI_2, LaneWaypoint(lane_info, 3))};
+  const Path path(points, {}, 2.0);
+  EXPECT_EQ(path.num_points(), 4);
+  EXPECT_EQ(path.num_segments(), 3);
+  EXPECT_NEAR(path.path_points()[0].x(), 0, 1e-6);
+  EXPECT_NEAR(path.path_points()[0].y(), 0, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[0].x(), 0, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[0].y(), 1, 1e-6);
+  EXPECT_NEAR(path.accumulated_s()[0], 0, 1e-6);
+  EXPECT_NEAR(path.path_points()[1].x(), 0, 1e-6);
+  EXPECT_NEAR(path.path_points()[1].y(), 1, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[1].x(), 0, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[1].y(), 1, 1e-6);
+  EXPECT_NEAR(path.accumulated_s()[1], 1, 1e-6);
+  EXPECT_NEAR(path.path_points()[2].x(), 0, 1e-6);
+  EXPECT_NEAR(path.path_points()[2].y(), 2, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[2].x(), 0, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[2].y(), 1, 1e-6);
+  EXPECT_NEAR(path.accumulated_s()[2], 2, 1e-6);
+  EXPECT_NEAR(path.path_points()[3].x(), 0, 1e-6);
+  EXPECT_NEAR(path.path_points()[3].y(), 3, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[3].x(), 0, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[3].y(), 1, 1e-6);
+  EXPECT_NEAR(path.accumulated_s()[3], 3, 1e-6);
+  EXPECT_EQ(path.segments().size(), 3);
+  const auto* path_approximation = path.approximation();
+  EXPECT_NEAR(path_approximation->max_error(), 2.0, 1e-6);
+  EXPECT_EQ(path_approximation->original_ids().size(), 2);
+  EXPECT_EQ(path_approximation->original_ids()[0], 0);
+  EXPECT_EQ(path_approximation->original_ids()[1], 3);
+  EXPECT_EQ(path.lane_segments().size(), 3);
+
+  EXPECT_EQ(path.lane_segments_to_next_point().size(), 3);
+  EXPECT_EQ(path.lane_segments_to_next_point()[0].lane->id().id(), "id");
+  EXPECT_NEAR(path.lane_segments_to_next_point()[0].start_s, 0.0, 1e-6);
+  EXPECT_NEAR(path.lane_segments_to_next_point()[0].end_s, 1.0, 1e-6);
+  EXPECT_EQ(path.lane_segments_to_next_point()[1].lane->id().id(), "id");
+  EXPECT_NEAR(path.lane_segments_to_next_point()[1].start_s, 1.0, 1e-6);
+  EXPECT_NEAR(path.lane_segments_to_next_point()[1].end_s, 2.0, 1e-6);
+  EXPECT_EQ(path.lane_segments_to_next_point()[2].lane->id().id(), "id");
+  EXPECT_NEAR(path.lane_segments_to_next_point()[2].start_s, 2.0, 1e-6);
+  EXPECT_NEAR(path.lane_segments_to_next_point()[2].end_s, 3.0, 1e-6);
+
+  MapPathPoint point = path.get_smooth_point({1, 0.5});
+  EXPECT_NEAR(point.x(), 0, 1e-6);
+  EXPECT_NEAR(point.y(), 1.5, 1e-6);
+  point = path.get_smooth_point(2.3);
+  EXPECT_NEAR(point.x(), 0, 1e-6);
+  EXPECT_NEAR(point.y(), 2.3, 1e-6);
+  point = path.get_smooth_point(-0.5);
+  EXPECT_NEAR(point.x(), 0, 1e-6);
+  EXPECT_NEAR(point.y(), 0, 1e-6);
+  point = path.get_smooth_point(10.0);
+  EXPECT_NEAR(point.x(), 0, 1e-6);
+  EXPECT_NEAR(point.y(), 3, 1e-6);
+
+  EXPECT_NEAR(path.get_s_from_index({1, 0.4}), 1.4, 1e-6);
+  EXPECT_EQ(path.get_index_from_s(2.6).id, 2);
+  EXPECT_NEAR(path.get_index_from_s(2.6).offset, 0.6, 1e-6);
+
+  double accumulate_s;
+  double lateral;
+  double distance;
+  EXPECT_TRUE(
+      path.get_nearest_point({0.3, -1}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 0.0, 1e-6);
+  EXPECT_NEAR(lateral, -0.3, 1e-6);
+  EXPECT_NEAR(distance, hypot(0.3, 1.0), 1e-6);
+  EXPECT_TRUE(
+      path.get_nearest_point({-0.5, 1.5}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 1.5, 1e-6);
+  EXPECT_NEAR(lateral, 0.5, 1e-6);
+  EXPECT_NEAR(distance, 0.5, 1e-6);
+  EXPECT_TRUE(
+      path.get_nearest_point({0.0, 3.5}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 3.0, 1e-6);
+  EXPECT_NEAR(lateral, 0.0, 1e-6);
+  EXPECT_NEAR(distance, 0.5, 1e-6);
+
+  EXPECT_TRUE(
+      path.get_projection({0.3, -1}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, -1.0, 1e-6);
+  EXPECT_NEAR(lateral, -0.3, 1e-6);
+  EXPECT_NEAR(distance, hypot(0.3, 1.0), 1e-6);
+  EXPECT_TRUE(
+      path.get_projection({-0.5, 1.5}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 1.5, 1e-6);
+  EXPECT_NEAR(lateral, 0.5, 1e-6);
+  EXPECT_NEAR(distance, 0.5, 1e-6);
+  EXPECT_TRUE(
+      path.get_projection({0.0, 3.5}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 3.5, 1e-6);
+  EXPECT_NEAR(lateral, 0.0, 1e-6);
+  EXPECT_NEAR(distance, 0.5, 1e-6);
+
+  EXPECT_NEAR(path.get_left_width(-0.5), 4.0, 1e-6);
+  EXPECT_NEAR(path.get_left_width(0.0), 4.0, 1e-6);
+  EXPECT_NEAR(path.get_left_width(0.5), 4.5, 1e-6);
+  EXPECT_NEAR(path.get_left_width(1.0), 5.0, 1e-6);
+  EXPECT_NEAR(path.get_left_width(1.5), 5.25, 1e-6);
+  EXPECT_NEAR(path.get_left_width(2.0), 5.5, 1e-6);
+  EXPECT_NEAR(path.get_left_width(2.5), 5.75, 1e-6);
+  EXPECT_NEAR(path.get_left_width(3.0), 6.0, 1e-6);
+  EXPECT_NEAR(path.get_left_width(3.5), 6.0, 1e-6);
+
+  EXPECT_NEAR(path.get_right_width(-0.5), 7.0, 1e-6);
+  EXPECT_NEAR(path.get_right_width(0.0), 7.0, 1e-6);
+  EXPECT_NEAR(path.get_right_width(0.5), 7.25, 1e-6);
+  EXPECT_NEAR(path.get_right_width(1.0), 7.5, 1e-6);
+  EXPECT_NEAR(path.get_right_width(1.5), 7.75, 1e-6);
+  EXPECT_NEAR(path.get_right_width(2.0), 8.0, 1e-6);
+  EXPECT_NEAR(path.get_right_width(2.5), 6.5, 1e-6);
+  EXPECT_NEAR(path.get_right_width(3.0), 5.0, 1e-6);
+  EXPECT_NEAR(path.get_right_width(3.5), 5.0, 1e-6);
+}
+
 }  // hdmap
 }  // apollo
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
