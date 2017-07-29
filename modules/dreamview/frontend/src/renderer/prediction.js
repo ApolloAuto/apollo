@@ -52,7 +52,7 @@ export default class Prediction {
             const predictionMinor = predictions.slice(0, predictions.length - 1);
 
             if (STORE.options.showPredictionMajor) {
-                const predictedTrajectory = coordinates.applyOffsetToArray(
+                const predictedTraj = coordinates.applyOffsetToArray(
                     predictionMajor.predictedTrajectory);
                 const mesh = drawSegmentsFromPoints(predictedTraj,
                     predictionLineColor, majorThickness, 6);
@@ -61,7 +61,7 @@ export default class Prediction {
 
                 // Downsampling points to draw circles
                 for (let j = 0; j < predictedTraj.length; j += downsamplingRatio) {
-                    const circleMesh = getPredCircle();
+                    const circleMesh = this.getPredCircle();
                     circleMesh.position.set(predictedTraj[j].x, predictedTraj[j].y, 0.24);
                     circleMesh.material.color.setHex(predictionLineColor);
                     scene.add(circleMesh);
@@ -85,12 +85,11 @@ export default class Prediction {
     getPredCircle() {
         const material = new THREE.MeshBasicMaterial({
             color: 0xffffff,
-            linewidth: 5,
             transparent: false,
             opacity: 0.5
         });
         const circleMesh = drawCircle(0.2, material);
-        predCircles.push(circleMesh);
+        this.predCircles.push(circleMesh);
         return circleMesh;
     }
 }
