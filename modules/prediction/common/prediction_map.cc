@@ -55,7 +55,7 @@ Id PredictionMap::id(const std::string& str_id) {
 
 Eigen::Vector2d PredictionMap::PositionOnLane(const LaneInfo* lane_info,
                                               const double s) {
-  apollo::hdmap::Point point = lane_info->get_smooth_point(s);
+  apollo::common::PointENU point = lane_info->get_smooth_point(s);
   return {point.x(), point.y()};
 }
 
@@ -115,7 +115,7 @@ bool PredictionMap::ProjectionFromLane(const LaneInfo* lane_info_ptr, double s,
   if (lane_info_ptr == nullptr) {
     return false;
   }
-  apollo::hdmap::Point point = lane_info_ptr->get_smooth_point(s);
+  apollo::common::PointENU point = lane_info_ptr->get_smooth_point(s);
   double heading = HeadingOnLane(lane_info_ptr, s);
   path_point->set_x(point.x());
   path_point->set_y(point.y());
@@ -129,7 +129,7 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
                            std::vector<const LaneInfo*>* lanes) {
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
   // TODO(kechxu) clean the messy code of this function
-  apollo::hdmap::Point hdmap_point;
+  apollo::common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
   apollo::common::math::Vec2d vec_point;
@@ -151,7 +151,7 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
       continue;
     } else {
       double distance = 0.0;
-      apollo::hdmap::Point nearest_point =
+      apollo::common::PointENU nearest_point =
           candidate_lane->get_nearest_point(vec_point, &distance);
       double nearest_point_heading =
           PathHeading(candidate_lane.get(), nearest_point);
@@ -165,7 +165,7 @@ void PredictionMap::OnLane(const std::vector<const LaneInfo*>& prev_lanes,
 }
 
 double PredictionMap::PathHeading(const LaneInfo* lane_info_ptr,
-                                  const apollo::hdmap::Point& point) {
+                                  const apollo::common::PointENU& point) {
   apollo::common::math::Vec2d vec_point;
   vec_point.set_x(point.x());
   vec_point.set_y(point.y());
@@ -184,7 +184,7 @@ int PredictionMap::SmoothPointFromLane(const apollo::hdmap::Id& id,
     return -1;
   }
   const LaneInfo* lane = LaneById(id);
-  apollo::hdmap::Point hdmap_point = lane->get_smooth_point(s);
+  apollo::common::PointENU hdmap_point = lane->get_smooth_point(s);
   *heading = PathHeading(lane, hdmap_point);
   point->operator[](0) = hdmap_point.x() - std::sin(*heading) * l;
   point->operator[](1) = hdmap_point.y() + std::cos(*heading) * l;

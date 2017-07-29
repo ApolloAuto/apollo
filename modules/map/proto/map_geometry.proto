@@ -1,27 +1,21 @@
 syntax = "proto2";
 
-package apollo.hdmap;
+import "modules/common/proto/geometry.proto";
 
-// 3D points.
-// TODO: Use adu.common.PointENU instead of this.
-message Point {
-  optional double x = 1;  // in meters.
-  optional double y = 2;  // in meters.
-  optional double z = 3;  // height in meters.
-}
+package apollo.hdmap;
 
 // Polygon, not necessary convex.
 message Polygon {
-  repeated Point point = 1;
+  repeated apollo.common.PointENU point = 1;
 }
 
 // Straight line segment.
 message LineSegment {
-  repeated Point point = 1;
+  repeated apollo.common.PointENU point = 1;
 }
 
 message Arc {
-  optional Point center = 1;
+  optional apollo.common.PointENU center = 1;
   optional double radius = 2;
   optional double start_angle = 3;
   optional double end_angle = 4;
@@ -37,7 +31,7 @@ message Spline {
   optional int32 dimension = 1;
   optional int32 degree = 2;
   repeated double knot = 3 [packed = true];
-  repeated Point control = 4;
+  repeated apollo.common.PointENU control = 4;
 }
 
 message Poly3 {
@@ -54,7 +48,7 @@ message CurveSegment {
     Poly3 poly3 = 5;
   }
   optional double s = 6;  // start position (s-coordinate)
-  optional Point start_position = 7;
+  optional apollo.common.PointENU start_position = 7;
   optional double heading = 8; // start orientation
   optional double length = 9;
 }

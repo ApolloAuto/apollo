@@ -77,7 +77,7 @@ const PublishableTrajectory &Frame::computed_trajectory() const {
 }
 
 bool Frame::CreateReferenceLineFromRouting() {
-  hdmap::Point vehicle_position;
+  common::PointENU vehicle_position;
   vehicle_position.set_x(init_pose_.position().x());
   vehicle_position.set_y(init_pose_.position().y());
   vehicle_position.set_z(init_pose_.position().z());

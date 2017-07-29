@@ -89,7 +89,7 @@ Status StBoundaryMapper::get_speed_limits(
     const double default_speed_limit, SpeedLimit* const speed_limit_data) {
   const auto& adc_position = pose.position();
 
-  apollo::hdmap::Point adc_point;
+  apollo::common::PointENU adc_point;
   adc_point.set_x(adc_position.x());
   adc_point.set_y(adc_position.y());
   adc_point.set_z(adc_position.z());

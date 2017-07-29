@@ -38,7 +38,7 @@ class RoutingHelper {
   void SetMap(const hdmap::HDMap *map_ptr);
   ~RoutingHelper() = default;
   bool CreatePathFromRouting(const hdmap::RoutingResult &routing,
-                             const hdmap::Point &point,
+                             const common::PointENU &point,
                              const double backward_length,
                              const double forward_length,
                              hdmap::Path *path) const;

@@ -68,6 +68,7 @@ TEST_F(PathSamplerTest, sample_one_point) {
 }
 
 TEST_F(PathSamplerTest, sample_three_points) {
+  ReferenceLine ref = *reference_line_;
   dp_poly_path_config_.set_sample_points_num_each_level(3);
   PathSampler sampler(dp_poly_path_config_);
   bool sample_result =
