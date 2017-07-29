@@ -370,6 +370,121 @@ TEST(TestSuite, hdmap_curvy_path) {
   EXPECT_NEAR(distance, 0.1 * sqrt(2.0), 1e-6);
 }
 
+TEST(TestSuite, hdmap_circle_path) {
+  const double kRadius = 50.0;
+  const int kNumSegments = 100;
+  std::vector<MapPathPoint> points;
+  for (int i = 0; i <= kNumSegments; ++i) {
+    const double p =
+        M_PI_2 * static_cast<double>(i) / static_cast<double>(kNumSegments);
+    points.push_back(make_map_path_point(kRadius * cos(p), kRadius * sin(p)));
+  }
+  const Path path(points, {}, 2.0);
+  EXPECT_EQ(path.num_points(), kNumSegments + 1);
+  EXPECT_EQ(path.num_segments(), kNumSegments);
+  EXPECT_EQ(path.path_points().size(), kNumSegments + 1);
+  EXPECT_EQ(path.lane_segments().size(), 0);
+  EXPECT_EQ(path.segments().size(), kNumSegments);
+  const auto* path_approximation = path.approximation();
+  EXPECT_NEAR(path_approximation->max_error(), 2.0, 1e-6);
+  EXPECT_EQ(path_approximation->original_ids().size(), 4);
+  EXPECT_EQ(path_approximation->original_ids()[0], 0);
+  EXPECT_EQ(path_approximation->original_ids()[1], 36);
+  EXPECT_EQ(path_approximation->original_ids()[2], 72);
+  EXPECT_EQ(path_approximation->original_ids()[3], 100);
+  const double total_length = path.accumulated_s().back();
+
+  const double kLargeEps = 0.1;
+  double accumulate_s;
+  double lateral;
+  double distance;
+  EXPECT_TRUE(path.get_projection({kRadius + 1, -1}, &accumulate_s, &lateral,
+                                  &distance));
+  EXPECT_NEAR(accumulate_s, -1.0, kLargeEps);
+  EXPECT_NEAR(lateral, -1.0, kLargeEps);
+  EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
+
+  EXPECT_TRUE(path.get_projection({-1, kRadius - 1}, &accumulate_s, &lateral,
+                                  &distance));
+  EXPECT_NEAR(accumulate_s, total_length + 1.0, kLargeEps);
+  EXPECT_NEAR(lateral, 1.0, kLargeEps);
+  EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
+
+  EXPECT_TRUE(
+      path.get_projection({kRadius / sqrt(2.0) + 1, kRadius / sqrt(2.0) + 1},
+                          &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, total_length / 2.0, 1e-6);
+  EXPECT_NEAR(lateral, -sqrt(2.0), 1e-6);
+  EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
+
+  EXPECT_TRUE(path.get_projection({kRadius / sqrt(2.0), kRadius / sqrt(2.0)},
+                                  &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, total_length / 2.0, 1e-6);
+  EXPECT_NEAR(lateral, 0.0, 1e-6);
+  EXPECT_NEAR(distance, 0.0, 1e-6);
+
+  // Randomly generated test cases on path.approxmiation.
+  const Path path_no_approximation(points, {});
+  for (int case_id = 0; case_id < 10000; ++case_id) {
+    const double x = random_double(-kRadius * 0.5, kRadius * 1.5);
+    const double y = random_double(-kRadius * 0.5, kRadius * 1.5);
+    EXPECT_TRUE(
+        path.get_nearest_point({x, y}, &accumulate_s, &lateral, &distance));
+
+    double other_accumulate_s;
+    double other_lateral;
+    double other_distance;
+    EXPECT_TRUE(path_no_approximation.get_nearest_point(
+        {x, y}, &other_accumulate_s, &other_lateral, &other_distance));
+
+    EXPECT_NEAR(distance, other_distance, 1e-6);
+    EXPECT_NEAR(path.get_smooth_point(accumulate_s).DistanceTo({x, y}),
+                distance, 1e-6);
+  }
+
+  // Test path.get_smooth_point and get_s_from_index
+  for (int case_id = -10; case_id <= 80; ++case_id) {
+    const double ratio = static_cast<double>(case_id) / 70.0;
+    const double s = path.length() * ratio;
+    const auto index = path.get_index_from_s(s);
+
+    const double angle = M_PI_2 / static_cast<double>(kNumSegments);
+    ;
+    const double length = kRadius * sin(angle / 2.0) * 2.0;
+    if (s <= 0.0) {
+      EXPECT_EQ(0, index.id);
+      EXPECT_NEAR(0.0, index.offset, 1e-6);
+    } else if (s >= path.length()) {
+      EXPECT_EQ(kNumSegments, index.id);
+      EXPECT_NEAR(0.0, index.offset, 1e-6);
+    } else {
+      EXPECT_EQ(static_cast<int>(s / length), index.id);
+      EXPECT_NEAR(fmod(s, length), index.offset, 1e-6);
+    }
+    const MapPathPoint point = path.get_smooth_point(s);
+    Vec2d expected_point = points[index.id];
+    if (index.id + 1 < static_cast<int>(points.size())) {
+      Vec2d direction = points[index.id + 1] - points[index.id];
+      direction.Normalize();
+      expected_point += direction * index.offset;
+    }
+    EXPECT_NEAR(expected_point.x(), point.x(), 1e-6);
+    EXPECT_NEAR(expected_point.y(), point.y(), 1e-6);
+  }
+
+  // Test get_width, get_left_width, get_right_width
+  double delta_s = 0.1;
+  double cur_s = 0.0;
+  while (cur_s < path.accumulated_s().back()) {
+    double left_width = 0.0;
+    double right_width = 0.0;
+    EXPECT_TRUE(path.get_width(cur_s, &left_width, &right_width));
+    EXPECT_NEAR(left_width, path.get_left_width(cur_s), 1e-6);
+    EXPECT_NEAR(right_width, path.get_right_width(cur_s), 1e-6);
+    cur_s += delta_s;
+  }
+}
+
 }  // hdmap
 }  // apollo
 
