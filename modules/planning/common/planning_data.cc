@@ -81,7 +81,7 @@ bool PlanningData::aggregate(const double time_resolution,
 
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.total_time();
        cur_rel_time += time_resolution) {
-    SpeedPoint speed_point;
+    common::SpeedPoint speed_point;
     QUIT_IF(!speed_data_.get_speed_point_with_time(cur_rel_time, &speed_point),
             false, ERROR, "Fail to get speed point with relative time %f",
             cur_rel_time);

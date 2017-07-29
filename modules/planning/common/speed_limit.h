@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common/proto/path_point.pb.h"
 
 #ifndef MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
 #define MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
@@ -31,13 +31,13 @@ namespace planning {
 class SpeedLimit {
  public:
   SpeedLimit() = default;
-  void add_speed_limit(const SpeedPoint& speed_point);
+  void add_speed_limit(const common::SpeedPoint& speed_point);
   void add_speed_limit(const double s, const double t, const double v,
                        const double a, const double da);
-  const std::vector<SpeedPoint>& speed_limits() const;
+  const std::vector<common::SpeedPoint>& speed_limits() const;
   double get_speed_limit(const double s) const;
  private:
-  std::vector<SpeedPoint> _speed_point;
+  std::vector<common::SpeedPoint> _speed_point;
 };
 
 }  // namespace planning

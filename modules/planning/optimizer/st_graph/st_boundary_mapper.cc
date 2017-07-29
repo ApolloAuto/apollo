@@ -35,6 +35,7 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
+using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::hdmap::HDMap;
 using apollo::localization::Pose;

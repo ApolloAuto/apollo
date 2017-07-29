@@ -30,6 +30,7 @@ namespace planning {
 namespace util {
 
 using common::PathPoint;
+using common::SpeedPoint;
 using common::TrajectoryPoint;
 
 SpeedPoint MakeSpeedPoint(const double s, const double t, double v, double a,

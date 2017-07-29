@@ -24,6 +24,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/macro.h"
+#include "modules/common/proto/path_point.pb.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
@@ -32,6 +33,8 @@
 
 namespace apollo {
 namespace planning {
+
+using common::SpeedPoint;
 
 constexpr double kEpsilontol = 1e-6;
 

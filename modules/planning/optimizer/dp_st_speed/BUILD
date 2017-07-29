@@ -48,6 +48,7 @@ cc_library(
         ":dp_st_cost",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:common_proto",
+        "//modules/common/proto:path_point_proto",
         "//modules/planning/common:data_center",
         "//modules/planning/common:decision_data",
         "//modules/planning/common/speed:speed_data",

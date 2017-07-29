@@ -34,30 +34,29 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-SpeedPoint MakeSpeedPoint(const double s, const double t, double v, double a,
+common::SpeedPoint MakeSpeedPoint(const double s, const double t, double v, double a,
                           double da);
 
 common::SLPoint interpolate(const common::SLPoint &start,
                             const common::SLPoint &end, const double weight);
 
-apollo::common::PathPoint interpolate(const apollo::common::PathPoint &p0,
-                                      const apollo::common::PathPoint &p1,
-                                      const double s);
-SpeedPoint interpolate(const SpeedPoint& start, const SpeedPoint& end,
-                       const double weight);
+common::PathPoint interpolate(const common::PathPoint &p0,
+                              const common::PathPoint &p1, const double s);
+common::SpeedPoint interpolate(const common::SpeedPoint &start, const common::SpeedPoint &end,
+                               const double weight);
 
 // @ weight shall between 1 and 0
-apollo::common::PathPoint interpolate_linear_approximation(
-    const apollo::common::PathPoint &p0, const apollo::common::PathPoint &p1,
+common::PathPoint interpolate_linear_approximation(
+    const common::PathPoint &p0, const common::PathPoint &p1,
     const double s);
 
-apollo::common::TrajectoryPoint interpolate(
-    const apollo::common::TrajectoryPoint &tp0,
-    const apollo::common::TrajectoryPoint &tp1, const double t);
+common::TrajectoryPoint interpolate(
+    const common::TrajectoryPoint &tp0,
+    const common::TrajectoryPoint &tp1, const double t);
 
-apollo::common::TrajectoryPoint interpolate_linear_approximation(
-    const apollo::common::TrajectoryPoint &tp0,
-    const apollo::common::TrajectoryPoint &tp1, const double t);
+common::TrajectoryPoint interpolate_linear_approximation(
+    const common::TrajectoryPoint &tp0,
+    const common::TrajectoryPoint &tp1, const double t);
 }  // namespace util
 }  // namespace planning
 }  // namespace apollo
