@@ -19,12 +19,11 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
-#include <sstream>
 #include <utility>
 
 #include "modules/common/log.h"
-
 #include "modules/common/math/math_utils.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace common {
@@ -579,15 +578,10 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
 }
 
 std::string Polygon2d::DebugString() const {
-  std::ostringstream sout;
-  sout << "polygon2d (  num_points = " << num_points_ << "  points = (";
-  for (const auto &pt : points_) {
-    sout << " " << pt.DebugString();
-  }
-  sout << " )  " << (is_convex_ ? "convex" : "non-convex")
-       << "  area = " << area_ << " )";
-  sout.flush();
-  return sout.str();
+  return util::StrCat(
+      "polygon2d (  num_points = ", num_points_,
+      "  points = (", util::PrintDebugStringIter(points_), " )  ",
+      is_convex_ ? "convex" : "non-convex", "  area = ", area_, " )");
 }
 
 }  // namespace math

@@ -61,6 +61,34 @@ class IterPrinter {
   const std::string& delimiter_;
 };
 
+/**
+ * @brief Iterator printer which output iter->DebugString().
+ */
+template <typename Iter>
+class DebugStringIterPrinter {
+ public:
+  DebugStringIterPrinter(const Iter& begin, const Iter& end,
+                         const std::string& delimiter)
+      : begin_(begin), end_(end), delimiter_(delimiter) {}
+
+  std::ostream& Print(std::ostream& os) const {
+    for (Iter it = begin_; it != end_; ++it) {
+      // Print first item without delimiter.
+      if (it == begin_) {
+        os << it->DebugString();
+      } else {
+        os << delimiter_ << it->DebugString();
+      }
+    }
+    return os;
+  }
+
+ private:
+  const Iter begin_;
+  const Iter end_;
+  const std::string& delimiter_;
+};
+
 }  // namespace internal
 }  // namespace util
 }  // namespace common

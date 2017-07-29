@@ -21,7 +21,6 @@
 #include "modules/planning/reference_line/reference_line.h"
 
 #include <algorithm>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -31,6 +30,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/util/string_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
@@ -244,14 +244,13 @@ bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
 }
 
 std::string ReferenceLine::DebugString() const {
-  std::ostringstream ss;
-  ss << "point num:" << reference_points_.size();
-  for (int32_t i = 0; i < static_cast<int32_t>(reference_points_.size()) &&
-                      i < FLAGS_trajectory_point_num_for_debug;
-       ++i) {
-    ss << reference_points_[i].DebugString();
-  }
-  return ss.str();
+  const auto limit = std::min(
+      reference_points_.size(),
+      static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
+  return apollo::common::util::StrCat(
+      "point num:", reference_points_.size(),
+      apollo::common::util::PrintDebugStringIter(
+          reference_points_.begin(), reference_points_.begin() + limit, ""));
 }
 
 }  // namespace planning
