@@ -274,11 +274,15 @@ function run_test() {
   generate_test_targets_dbg
   echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings
   RES1=$?
-  
+  if [ $RES1 -ne 0 ]; then
+      fail "Test failed!"
+      return 1
+  fi
+
   generate_test_targets_opt
   echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --test_verbose_timeout_warnings
   RES2=$?
-  if [ $RES1 -eq 0 ] && [ $RES2 -eq 0 ]; then
+  if [ $RES2 -eq 0 ]; then
     success 'Test passed!'
     return 0
   else
