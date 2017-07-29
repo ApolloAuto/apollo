@@ -50,17 +50,41 @@ void OptimizerTestBase::SetDataConfigs() {
   FLAGS_alsologtostderr = true;
 }
 
-void OptimizerTestBase::SetUp() {
-  SetDataConfigs();
+bool OptimizerTestBase::SetUpAdapters() {
   AdapterManager::Init(FLAGS_adapter_config_path);
   if (!AdapterManager::GetRoutingResult()) {
     AERROR << "routing is not registered in adapter manager, check adapter "
               "config file "
            << FLAGS_adapter_config_path;
+    return false;
+  }
+  if (!AdapterManager::FeedRoutingResultFile(FLAGS_test_routing_result_file)) {
+    AERROR << "failed to routing file: " << FLAGS_test_routing_result_file;
+    return false;
+  }
+  if (!AdapterManager::FeedLocalizationFile(FLAGS_test_localization_file)) {
+    AERROR << "Failed to load localization file: "
+           << FLAGS_test_localization_file;
+    return false;
+  }
+  if (!AdapterManager::FeedChassisFile(FLAGS_test_chassis_file)) {
+    AERROR << "Failed to load chassis file: " << FLAGS_test_chassis_file;
+    return false;
+  }
+  AdapterManager::Observe();
+  return true;
+}
+
+void OptimizerTestBase::SetUp() {
+  SetDataConfigs();
+  if (!SetUpAdapters()) {
+    AERROR << "Failed to setup adapters";
     return;
   }
-  AdapterManager::FeedRoutingResultFile(FLAGS_test_routing_result_file);
-  AdapterManager::Observe();
+  common::VehicleState::instance()->Update(
+      AdapterManager::GetLocalization()->GetLatestObserved(),
+      AdapterManager::GetChassis()->GetLatestObserved());
+
   auto* data_center = DataCenter::instance();
   if (!data_center->init_current_frame(0)) {
     AERROR << "Failed to init frame";
@@ -70,15 +94,6 @@ void OptimizerTestBase::SetUp() {
                                       &dp_poly_path_config_)) {
     AERROR << "Failed to load file " << FLAGS_dp_poly_path_config_file;
     return;
-  }
-  if (AdapterManager::GetLocalization()->Empty() ||
-      AdapterManager::GetChassis()->Empty()) {
-    common::VehicleState::instance()->Update(FLAGS_test_localization_file,
-                                             FLAGS_test_chassis_file);
-  } else {
-    common::VehicleState::instance()->Update(
-        AdapterManager::GetLocalization()->GetLatestObserved(),
-        AdapterManager::GetChassis()->GetLatestObserved());
   }
   pose_ = common::VehicleState::instance()->pose();
   frame_ = data_center->current_frame();

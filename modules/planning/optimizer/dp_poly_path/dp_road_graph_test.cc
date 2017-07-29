@@ -89,9 +89,10 @@ TEST_F(DpRoadGraphTest, speed_road_graph) {
   bool result =
       road_graph.find_tunnel(*reference_line_, &decision_data_, &path_data_);
   EXPECT_TRUE(result);
-  EXPECT_EQ(407, path_data_.discretized_path().num_of_points());
-  EXPECT_EQ(407, path_data_.frenet_frame_path().number_of_points());
-  EXPECT_FLOAT_EQ(40.0, path_data_.frenet_frame_path().points().back().s());
+  EXPECT_EQ(648, path_data_.discretized_path().num_of_points());
+  EXPECT_EQ(648, path_data_.frenet_frame_path().number_of_points());
+  EXPECT_FLOAT_EQ(70.419151,
+                  path_data_.frenet_frame_path().points().back().s());
   EXPECT_FLOAT_EQ(0.0, path_data_.frenet_frame_path().points().back().l());
   // export_path_data(path_data_, "/tmp/path.txt");
 }

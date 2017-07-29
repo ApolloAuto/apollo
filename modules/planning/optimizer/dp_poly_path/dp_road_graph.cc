@@ -217,10 +217,6 @@ bool DpRoadGraph::generate_graph(const ReferenceLine &reference_line,
     min_cost_path->push_back(*min_cost_node);
   }
   std::reverse(min_cost_path->begin(), min_cost_path->end());
-  for (const auto &node : *min_cost_path) {
-    AINFO << "Best path : (" << node.sl_point.s() << ", "
-          << node.sl_point.l() << ")";
-  }
   return true;
 }
 
