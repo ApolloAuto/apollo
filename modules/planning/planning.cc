@@ -252,7 +252,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
       // a segment of last trajectory to be attached to planned trajectory in
       // case controller needs.
       GetOverheadTrajectory(static_cast<std::uint32_t>(matched_index),
-          static_cast<std::uint32_t>(FLAGS_rtk_trajectory_backward),
+          static_cast<std::uint32_t>(FLAGS_backward_trajectory_point_num),
           trajectory_pb);
 
       // store the planned trajectory and header info for next planning cycle.
@@ -340,6 +340,10 @@ void Planning::Reset() {
 void Planning::GetOverheadTrajectory(const std::uint32_t matched_index,
                                      const std::uint32_t buffer_size,
                                      ADCTrajectory* trajectory_pb) {
+  if (!FLAGS_use_stitch) {
+    ADEBUG << "Skip trajectory stich.";
+    return;
+  }
   const std::uint32_t start_index =
       matched_index < buffer_size ? 0 : matched_index - buffer_size;
 
