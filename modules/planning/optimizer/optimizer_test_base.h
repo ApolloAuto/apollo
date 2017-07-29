@@ -35,6 +35,8 @@ namespace planning {
 using common::adapter::AdapterManager;
 
 DECLARE_string(test_routing_result_file);
+DECLARE_string(test_localization_file);
+DECLARE_string(test_chassis_file);
 
 class OptimizerTestBase : public ::testing::Test {
  public:
@@ -68,6 +70,7 @@ class OptimizerTestBase : public ::testing::Test {
 
  protected:
   DpPolyPathConfig dp_poly_path_config_;
+  localization::Pose pose_;
   Frame* frame_ = nullptr;
 };
 

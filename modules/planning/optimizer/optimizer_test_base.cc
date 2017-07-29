@@ -17,6 +17,7 @@
 #include "modules/planning/optimizer/optimizer_test_base.h"
 
 #include "modules/common/log.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 
 namespace apollo {
 namespace planning {
@@ -26,6 +27,12 @@ using common::adapter::AdapterManager;
 DEFINE_string(test_routing_result_file,
               "modules/planning/testdata/garage_routing.pb.txt",
               "The routing file used in test");
+DEFINE_string(test_localization_file,
+              "modules/planning/testdata/garage_localization.pb.txt",
+              "The localization test file");
+DEFINE_string(test_chassis_file,
+              "modules/planning/testdata/garage_chassis.pb.txt",
+              "The chassis test file");
 
 void OptimizerTestBase::SetDataConfigs() {
   FLAGS_planning_config_file =
@@ -36,6 +43,9 @@ void OptimizerTestBase::SetDataConfigs() {
       "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
   FLAGS_dp_poly_path_config_file =
       "modules/planning/testdata/conf/dp_poly_path_config.pb.txt";
+  FLAGS_test_localization_file =
+      "modules/planning/testdata/garage_localization.pb.txt";
+  FLAGS_test_chassis_file = "modules/planning/testdata/garage_chassis.pb.txt",
   FLAGS_v = 4;
   FLAGS_alsologtostderr = true;
 }
@@ -61,6 +71,16 @@ void OptimizerTestBase::SetUp() {
     AERROR << "Failed to load file " << FLAGS_dp_poly_path_config_file;
     return;
   }
+  if (AdapterManager::GetLocalization()->Empty() ||
+      AdapterManager::GetChassis()->Empty()) {
+    common::VehicleState::instance()->Update(FLAGS_test_localization_file,
+                                             FLAGS_test_chassis_file);
+  } else {
+    common::VehicleState::instance()->Update(
+        AdapterManager::GetLocalization()->GetLatestObserved(),
+        AdapterManager::GetChassis()->GetLatestObserved());
+  }
+  pose_ = common::VehicleState::instance()->pose();
   frame_ = data_center->current_frame();
   ASSERT_TRUE(frame_ != nullptr);
 }
