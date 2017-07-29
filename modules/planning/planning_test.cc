@@ -66,11 +66,11 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   planning.Plan(true, time2, &trajectory2);
 
   EXPECT_EQ(trajectory2.trajectory_point_size(),
-            FLAGS_rtk_trajectory_forward + FLAGS_rtk_trajectory_backward);
+            FLAGS_rtk_trajectory_forward + FLAGS_backward_trajectory_point_num);
 
   const auto& p2_backward = trajectory2.trajectory_point().begin();
   const auto& p2_start =
-      trajectory2.trajectory_point(FLAGS_rtk_trajectory_backward);
+      trajectory2.trajectory_point(FLAGS_backward_trajectory_point_num);
   const auto& p2_end = trajectory2.trajectory_point().rbegin();
 
   EXPECT_DOUBLE_EQ(p2_backward->path_point().x(), 586385.577255);
@@ -80,8 +80,9 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   double absolute_time1 =
       trajectory1.trajectory_point(100).relative_time() + time1;
   double absolute_time2 =
-      trajectory2.trajectory_point(60 + FLAGS_rtk_trajectory_backward)
-          .relative_time() + time2;
+      trajectory2.trajectory_point(60 + FLAGS_backward_trajectory_point_num)
+          .relative_time() +
+      time2;
 
   EXPECT_NEAR(absolute_time1, absolute_time2, 0.001);
 }
