@@ -25,6 +25,8 @@
 namespace apollo {
 namespace planning {
 
+using common::SpeedPoint;
+
 void SpeedLimit::add_speed_limit(const SpeedPoint& speed_point) {
   _speed_point.push_back(speed_point);
 }

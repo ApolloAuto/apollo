@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common/proto/path_point.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -32,11 +32,11 @@ class SpeedData {
  public:
   SpeedData() = default;
 
-  explicit SpeedData(const std::vector<SpeedPoint>& speed_points);
+  explicit SpeedData(const std::vector<common::SpeedPoint>& speed_points);
 
-  const std::vector<SpeedPoint>& speed_vector() const;
+  const std::vector<common::SpeedPoint>& speed_vector() const;
 
-  void set_speed_vector(const std::vector<SpeedPoint>& speed_points);
+  void set_speed_vector(const std::vector<common::SpeedPoint>& speed_points);
 
   virtual std::string DebugString() const;
 
@@ -44,17 +44,18 @@ class SpeedData {
                        const double a, const double da);
 
   bool get_speed_point_with_time(const double time,
-                                 SpeedPoint* const speed_point) const;
+                                 common::SpeedPoint* const speed_point) const;
 
   double total_time() const;
 
   void Clear();
  private:
-  SpeedPoint interpolate(const SpeedPoint& left, const SpeedPoint& right,
-                         const double weight) const;
+  common::SpeedPoint interpolate(const common::SpeedPoint& left,
+                                 const common::SpeedPoint& right,
+                                 const double weight) const;
   std::uint32_t find_index(const double s) const;
 
-  std::vector<SpeedPoint> speed_vector_;
+  std::vector<common::SpeedPoint> speed_vector_;
 };
 
 }  // namespace planning

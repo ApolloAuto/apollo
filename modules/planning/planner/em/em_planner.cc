@@ -44,6 +44,7 @@ using common::Status;
 using common::adapter::AdapterManager;
 using common::time::Clock;
 using common::ErrorCode;
+using common::SpeedPoint;
 using common::TrajectoryPoint;
 using common::VehicleState;
 

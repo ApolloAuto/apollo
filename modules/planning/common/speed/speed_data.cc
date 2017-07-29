@@ -33,7 +33,7 @@ namespace planning {
 
 namespace {
 
-bool speed_time_comp(const double t, const SpeedPoint& speed_point) {
+bool speed_time_comp(const double t, const common::SpeedPoint& speed_point) {
   return t < speed_point.t();
 }
 
@@ -45,20 +45,20 @@ void SpeedData::add_speed_point(const double s, const double time,
   speed_vector_.push_back(util::MakeSpeedPoint(s, time, v, a, da));
 }
 
-SpeedData::SpeedData(const std::vector<SpeedPoint>& speed_points)
+SpeedData::SpeedData(const std::vector<common::SpeedPoint>& speed_points)
     : speed_vector_(speed_points) {
 }
 
-const std::vector<SpeedPoint>& SpeedData::speed_vector() const {
+const std::vector<common::SpeedPoint>& SpeedData::speed_vector() const {
   return speed_vector_;
 }
 
-void SpeedData::set_speed_vector(const std::vector<SpeedPoint>& speed_points) {
+void SpeedData::set_speed_vector(const std::vector<common::SpeedPoint>& speed_points) {
   speed_vector_ = std::move(speed_points);
 }
 
 bool SpeedData::get_speed_point_with_time(const double t,
-                                          SpeedPoint* const speed_point) const {
+                                         common::SpeedPoint* const speed_point) const {
   if (speed_vector_.size() < 2) {
     return false;
   }
@@ -112,15 +112,15 @@ std::uint32_t SpeedData::find_index(const double t) const {
          1;
 }
 
-SpeedPoint SpeedData::interpolate(const SpeedPoint& left,
-                                  const SpeedPoint& right,
+common::SpeedPoint SpeedData::interpolate(const common::SpeedPoint& left,
+                                  const common::SpeedPoint& right,
                                   const double weight) const {
   double s = (1 - weight) * left.s() + weight * right.s();
   double t = (1 - weight) * left.t() + weight * right.t();
   double v = (1 - weight) * left.v() + weight * right.v();
   double a = (1 - weight) * left.a() + weight * right.a();
   double da = (1 - weight) * left.da() + weight * right.da();
-  SpeedPoint speed_point;
+  common::SpeedPoint speed_point;
   speed_point.set_s(s);
   speed_point.set_t(t);
   speed_point.set_v(v);
