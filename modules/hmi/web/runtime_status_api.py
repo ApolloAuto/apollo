@@ -62,4 +62,4 @@ class RuntimeStatusApi(flask_restful.Resource):
         cur_status.get_tools().MergeFrom(new_status.tools)
 
         cur_status.broadcast_status_if_changed()
-        return 'OK', httplib.OK
+        return 'HMI::RuntimeStatusApi got new report', httplib.OK
