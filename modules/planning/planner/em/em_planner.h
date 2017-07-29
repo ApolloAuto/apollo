@@ -73,6 +73,8 @@ class EMPlanner : public Planner {
 
   std::vector<common::SpeedPoint> GenerateInitSpeedProfile(const double init_v,
                                                    const double init_a);
+  void RecordProcessorDebug(const std::string& name, PlanningData* planning_data,
+                            double time_diff_ms, ADCTrajectory* trajectory_pb);
 
  private:
   apollo::common::util::Factory<OptimizerType, Optimizer> optimizer_factory_;
