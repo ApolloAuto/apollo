@@ -485,6 +485,79 @@ TEST(TestSuite, hdmap_circle_path) {
   }
 }
 
+TEST(TestSuite, hdmap_jerky_path) {
+  const int kNumPaths = 100;
+  const int kCasesPerPath = 1000;
+  for (int path_id = 0; path_id < kNumPaths; ++path_id) {
+    const int num_segments = random_int(50, 100);
+    const double average_segment_length = random_double(0.5, 5.0);
+    const double max_y = random_double(0.5, 10.0);
+
+    std::vector<MapPathPoint> points;
+    double sum_x = 0;
+    for (int i = 0; i <= num_segments; ++i) {
+      points.push_back(
+          make_map_path_point(sum_x, random_double(-max_y, max_y)));
+      sum_x += random_double(average_segment_length * 0.1,
+                             average_segment_length * 1.9);
+    }
+    const double angle = random_double(0, M_PI);
+    const double cos_angle = cos(angle);
+    const double sin_angle = sin(angle);
+    for (auto& point : points) {
+      const double new_x = point.x() * cos_angle - point.y() * sin_angle;
+      const double new_y = point.x() * sin_angle + point.y() * cos_angle;
+      point.set_x(new_x);
+      point.set_y(new_y);
+    }
+    const Path path(points, {}, 2.0);
+    EXPECT_EQ(path.num_points(), num_segments + 1);
+    EXPECT_EQ(path.num_segments(), num_segments);
+    EXPECT_EQ(path.path_points().size(), num_segments + 1);
+    EXPECT_EQ(path.lane_segments().size(), 0);
+    EXPECT_EQ(path.segments().size(), num_segments);
+    const auto* path_approximation = path.approximation();
+    EXPECT_NEAR(path_approximation->max_error(), 2.0, 1e-6);
+
+    double accumulate_s;
+    double lateral;
+    double distance;
+    EXPECT_TRUE(
+        path.get_projection(points[0], &accumulate_s, &lateral, &distance));
+    EXPECT_NEAR(accumulate_s, 0.0, 1e-6);
+    EXPECT_NEAR(lateral, 0.0, 1e-6);
+    EXPECT_NEAR(distance, 0.0, 1e-6);
+    EXPECT_TRUE(path.get_projection(points[num_segments], &accumulate_s,
+                                    &lateral, &distance));
+    EXPECT_NEAR(accumulate_s, path.length(), 1e-6);
+    EXPECT_NEAR(lateral, 0.0, 1e-6);
+    EXPECT_NEAR(distance, 0.0, 1e-6);
+
+    std::vector<Vec2d> original_points;
+    for (const auto& point : points) {
+      original_points.push_back(point);
+    }
+    const AABox2d box(original_points);
+    const Path path_no_approximation(points, {});
+    for (int case_id = 0; case_id < kCasesPerPath; ++case_id) {
+      const double x = random_double(box.min_x(), box.max_x());
+      const double y = random_double(box.min_y(), box.max_y());
+      EXPECT_TRUE(
+          path.get_nearest_point({x, y}, &accumulate_s, &lateral, &distance));
+
+      double other_accumulate_s;
+      double other_lateral;
+      double other_distance;
+      EXPECT_TRUE(path_no_approximation.get_nearest_point(
+          {x, y}, &other_accumulate_s, &other_lateral, &other_distance));
+
+      EXPECT_NEAR(distance, other_distance, 1e-6);
+      EXPECT_NEAR(path.get_smooth_point(accumulate_s).DistanceTo({x, y}),
+                  distance, 1e-6);
+    }
+  }
+}
+
 }  // hdmap
 }  // apollo
 
