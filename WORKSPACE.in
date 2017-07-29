@@ -193,6 +193,12 @@ new_local_repository(
     path = "/usr/include/pcl-1.7",
 )
 
+new_local_repository(
+    name = "vtk",
+    build_file = "third_party/vtk.BUILD",
+    path = "/usr/include/vtk-5.8",
+)
+
 # Caffe
 # =====
 # This requires Caffe being installed in docker image.
