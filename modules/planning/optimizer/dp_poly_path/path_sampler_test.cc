@@ -39,49 +39,49 @@ class PathSamplerTest : public OptimizerTestBase {
   virtual void SetUp() {
     OptimizerTestBase::SetUp();
     sampled_points_.clear();
-    init_point_.mutable_path_point()->set_x(586392.84003);
-    init_point_.mutable_path_point()->set_y(4140673.01232);
-    init_sl_point_.set_s(0.0);
-    init_sl_point_.set_l(0.0);
+    init_point_.mutable_path_point()->set_x(pose_.position().x());
+    init_point_.mutable_path_point()->set_y(pose_.position().y());
+    init_point_.mutable_path_point()->set_z(0.0);
+    init_point_.set_a(0.0);
+    init_point_.set_v(0.0);
     reference_line_ = &(frame_->planning_data().reference_line());
   }
 
  protected:
   std::vector<std::vector<common::SLPoint>> sampled_points_;
   common::TrajectoryPoint init_point_;
-  common::SLPoint init_sl_point_;
   const ReferenceLine* reference_line_ = nullptr;
 };
 
 TEST_F(PathSamplerTest, sample_one_point) {
   dp_poly_path_config_.set_sample_points_num_each_level(1);
   PathSampler sampler(dp_poly_path_config_);
-  bool sample_result = sampler.sample(*reference_line_, init_point_,
-                                      init_sl_point_, &sampled_points_);
+  bool sample_result =
+      sampler.sample(*reference_line_, init_point_, &sampled_points_);
   EXPECT_TRUE(sample_result);
   // export_sl_points(sampled_points_, "/tmp/points.txt");
   ASSERT_EQ(8, sampled_points_.size());
   ASSERT_EQ(1, sampled_points_[0].size());
   ASSERT_EQ(1, sampled_points_[7].size());
-  EXPECT_FLOAT_EQ(64, sampled_points_[7][0].s());
+  EXPECT_FLOAT_EQ(70.419151, sampled_points_[7][0].s());
   EXPECT_FLOAT_EQ(0, sampled_points_[7][0].l());
 }
 
 TEST_F(PathSamplerTest, sample_three_points) {
   dp_poly_path_config_.set_sample_points_num_each_level(3);
   PathSampler sampler(dp_poly_path_config_);
-  bool sample_result = sampler.sample(*reference_line_, init_point_,
-                                      init_sl_point_, &sampled_points_);
+  bool sample_result =
+      sampler.sample(*reference_line_, init_point_, &sampled_points_);
   EXPECT_TRUE(sample_result);
   // export_sl_points(sampled_points_, "/tmp/points.txt");
   ASSERT_EQ(8, sampled_points_.size());
   ASSERT_EQ(3, sampled_points_[0].size());
   ASSERT_EQ(3, sampled_points_[7].size());
-  EXPECT_FLOAT_EQ(64, sampled_points_[7][0].s());
+  EXPECT_FLOAT_EQ(70.419151, sampled_points_[7][0].s());
   EXPECT_FLOAT_EQ(-0.5, sampled_points_[7][0].l());
-  EXPECT_FLOAT_EQ(64, sampled_points_[7][1].s());
+  EXPECT_FLOAT_EQ(70.419151, sampled_points_[7][1].s());
   EXPECT_FLOAT_EQ(0, sampled_points_[7][1].l());
-  EXPECT_FLOAT_EQ(64, sampled_points_[7][2].s());
+  EXPECT_FLOAT_EQ(70.419151, sampled_points_[7][2].s());
   EXPECT_FLOAT_EQ(0.5, sampled_points_[7][2].l());
 }
 
