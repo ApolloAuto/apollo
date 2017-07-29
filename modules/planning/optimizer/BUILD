@@ -71,6 +71,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/util",
+        "//modules/common/vehicle_state",
         "//modules/planning/common:data_center",
         "//modules/planning/proto:dp_poly_path_config_proto",
         "@gtest//:gtest",
