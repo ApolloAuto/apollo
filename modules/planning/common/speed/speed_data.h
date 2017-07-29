@@ -48,6 +48,7 @@ class SpeedData {
 
   double total_time() const;
 
+  void Clear();
  private:
   SpeedPoint interpolate(const SpeedPoint& left, const SpeedPoint& right,
                          const double weight) const;

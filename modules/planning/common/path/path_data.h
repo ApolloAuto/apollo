@@ -49,9 +49,10 @@ class PathData {
   bool get_path_point_with_ref_s(const double ref_s,
                                  common::PathPoint *const path_point) const;
 
+  void Clear();
+
   std::string DebugString() const;
 
-  // TODO(fanhaoyang) add check if the path data is valid
  private:
   DiscretizedPath discretized_path_;
 
