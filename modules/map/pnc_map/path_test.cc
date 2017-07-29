@@ -262,6 +262,114 @@ TEST(TestSuite, hdmap_line_path) {
   EXPECT_NEAR(path.get_right_width(3.5), 5.0, 1e-6);
 }
 
+TEST(TestSuite, hdmap_curvy_path) {
+  const std::vector<MapPathPoint> points{
+      make_map_path_point(2, 0), make_map_path_point(2, 1),
+      make_map_path_point(1, 2), make_map_path_point(0, 2)};
+  Path path(points, {}, 2.0);
+  EXPECT_EQ(path.num_points(), 4);
+  EXPECT_EQ(path.num_segments(), 3);
+  EXPECT_NEAR(path.path_points()[0].x(), 2, 1e-6);
+  EXPECT_NEAR(path.path_points()[0].y(), 0, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[0].x(), 0, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[0].y(), 1, 1e-6);
+  EXPECT_NEAR(path.accumulated_s()[0], 0, 1e-6);
+  EXPECT_NEAR(path.path_points()[1].x(), 2, 1e-6);
+  EXPECT_NEAR(path.path_points()[1].y(), 1, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[1].x(), -0.5 * sqrt(2.0), 1e-6);
+  EXPECT_NEAR(path.unit_directions()[1].y(), 0.5 * sqrt(2.0), 1e-6);
+  EXPECT_NEAR(path.accumulated_s()[1], 1, 1e-6);
+  EXPECT_NEAR(path.path_points()[2].x(), 1, 1e-6);
+  EXPECT_NEAR(path.path_points()[2].y(), 2, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[2].x(), -1, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[2].y(), 0, 1e-6);
+  EXPECT_NEAR(path.accumulated_s()[2], 1 + sqrt(2.0), 1e-6);
+  EXPECT_NEAR(path.path_points()[3].x(), 0, 1e-6);
+  EXPECT_NEAR(path.path_points()[3].y(), 2, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[3].x(), -1, 1e-6);
+  EXPECT_NEAR(path.unit_directions()[3].y(), 0, 1e-6);
+  EXPECT_NEAR(path.accumulated_s()[3], 2 + sqrt(2.0), 1e-6);
+  EXPECT_EQ(path.segments().size(), 3);
+  const auto* path_approximation = path.approximation();
+  EXPECT_NEAR(path_approximation->max_error(), 2.0, 1e-6);
+  EXPECT_EQ(path_approximation->original_ids().size(), 2);
+  EXPECT_EQ(path_approximation->original_ids()[0], 0);
+  EXPECT_EQ(path_approximation->original_ids()[1], 3);
+  EXPECT_EQ(path.lane_segments().size(), 0);
+
+  double accumulate_s;
+  double lateral;
+  double distance;
+  EXPECT_TRUE(
+      path.get_nearest_point({1.5, 0.5}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 0.5, 1e-6);
+  EXPECT_NEAR(lateral, 0.5, 1e-6);
+  EXPECT_NEAR(distance, 0.5, 1e-6);
+  EXPECT_TRUE(
+      path.get_nearest_point({2.5, 1.1}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 1.0, 1e-6);
+  EXPECT_NEAR(distance, hypot(0.5, 0.1), 1e-6);
+  EXPECT_TRUE(
+      path.get_nearest_point({1.6, 1.6}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 1.0 + 0.5 * sqrt(2.0), 1e-6);
+  EXPECT_NEAR(lateral, -0.1 * sqrt(2.0), 1e-6);
+  EXPECT_NEAR(distance, 0.1 * sqrt(2.0), 1e-6);
+
+  EXPECT_TRUE(
+      path.get_projection({1.5, 0.5}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 0.5, 1e-6);
+  EXPECT_NEAR(lateral, 0.5, 1e-6);
+  EXPECT_NEAR(distance, 0.5, 1e-6);
+  EXPECT_TRUE(
+      path.get_projection({2.5, 1.1}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 1.0, 1e-6);
+  EXPECT_NEAR(distance, hypot(0.5, 0.1), 1e-6);
+  EXPECT_TRUE(
+      path.get_projection({1.6, 1.6}, &accumulate_s, &lateral, &distance));
+  EXPECT_NEAR(accumulate_s, 1.0 + 0.5 * sqrt(2.0), 1e-6);
+  EXPECT_NEAR(lateral, -0.1 * sqrt(2.0), 1e-6);
+  EXPECT_NEAR(distance, 0.1 * sqrt(2.0), 1e-6);
+
+  EXPECT_NEAR(path.get_s_from_index({-1, 0.5}), 0.0, 1e-6);
+  EXPECT_NEAR(path.get_s_from_index({0, 0.5}), 0.5, 1e-6);
+  EXPECT_NEAR(path.get_s_from_index({1, 0.5}), 1.5, 1e-6);
+  EXPECT_NEAR(path.get_s_from_index({2, 0.5}), 1.5 + sqrt(2.0), 1e-6);
+  EXPECT_NEAR(path.get_s_from_index({3, 0.0}), 2 + sqrt(2.0), 1e-6);
+  EXPECT_NEAR(path.get_s_from_index({4, 0.0}), 2 + sqrt(2.0), 1e-6);
+
+  const auto& traj_points = path.path_points();
+  for (size_t i = 0; i < traj_points.size(); ++i) {
+    Vec2d point{traj_points[i].x(), traj_points[i].y()};
+    double heading = 0;
+    path.get_heading_along_path(point, &heading);
+    EXPECT_NEAR(heading, traj_points[i].heading(), 1e-5);
+  }
+
+  // Test move constructor.
+  Path other_path(std::move(path));
+  // TODO: check why path.approximation() is not nullptr here.
+  const auto* other_path_approximation = other_path.approximation();
+  EXPECT_NEAR(other_path_approximation->max_error(), 2.0, 1e-6);
+  EXPECT_EQ(other_path_approximation->original_ids().size(), 2);
+  EXPECT_EQ(other_path_approximation->original_ids()[0], 0);
+  EXPECT_EQ(other_path_approximation->original_ids()[1], 3);
+
+  EXPECT_TRUE(other_path.get_projection({1.5, 0.5}, &accumulate_s, &lateral,
+                                        &distance));
+  EXPECT_NEAR(accumulate_s, 0.5, 1e-6);
+  EXPECT_NEAR(lateral, 0.5, 1e-6);
+  EXPECT_NEAR(distance, 0.5, 1e-6);
+  EXPECT_TRUE(other_path.get_projection({2.5, 1.1}, &accumulate_s, &lateral,
+                                        &distance));
+  EXPECT_NEAR(accumulate_s, 1.0, 1e-6);
+  EXPECT_NEAR(distance, hypot(0.5, 0.1), 1e-6);
+  EXPECT_TRUE(other_path.get_projection({1.6, 1.6}, &accumulate_s, &lateral,
+                                        &distance));
+  EXPECT_NEAR(accumulate_s, 1.0 + 0.5 * sqrt(2.0), 1e-6);
+  EXPECT_NEAR(lateral, -0.1 * sqrt(2.0), 1e-6);
+  EXPECT_NEAR(distance, 0.1 * sqrt(2.0), 1e-6);
+}
+
 }  // hdmap
 }  // apollo
 
