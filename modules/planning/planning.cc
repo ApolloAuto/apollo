@@ -143,10 +143,11 @@ void Planning::RunOnce() {
     return;
   }
 
-  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
-    AERROR << "Prediction is not available; skip the planning cycle";
-    return;
-  }
+  // FIXME(all): enable prediction check when perception and prediction is ready.
+  // if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
+  //   AERROR << "Prediction is not available; skip the planning cycle";
+  //   return;
+  // }
 
   AINFO << "Start planning ...";
   const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
@@ -160,12 +161,13 @@ void Planning::RunOnce() {
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
-  if (FLAGS_enable_prediction) {
+  if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
     // prediction
-    const auto& prediction = AdapterManager::GetPrediction()->GetLatestObserved();
+    const auto& prediction =
+        AdapterManager::GetPrediction()->GetLatestObserved();
     ADEBUG << "Get prediction:" << prediction.DebugString();
   }
-  
+
   common::VehicleState::instance()->Update(localization, chassis);
 
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
