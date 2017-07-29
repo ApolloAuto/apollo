@@ -22,6 +22,7 @@
 #ifndef MODULES_COMMON_STRING_UTIL_H_
 #define MODULES_COMMON_STRING_UTIL_H_
 
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -32,6 +33,35 @@
 namespace apollo {
 namespace common {
 namespace util {
+namespace {
+
+/**
+ * @brief Iterator printer.
+ */
+template <typename Iter>
+class IterPrinter {
+ public:
+  IterPrinter(const Iter& begin, const Iter& end, const std::string& delimiter)
+      : begin_(begin), end_(end), delimiter_(delimiter) {}
+
+  std::ostream& Print(std::ostream& os) const {
+    for (Iter it = begin_; it != end_; ++it) {
+      // Print first item without delimiter.
+      if (it == begin_) {
+        os << *it;
+      } else {
+        os << delimiter_ << *it;
+      }
+    }
+  }
+
+ private:
+  const Iter begin_;
+  const Iter end_;
+  const std::string& delimiter_;
+};
+
+}  // namespace
 
 /**
  * @brief Check if a string ends with a pattern.
@@ -56,8 +86,56 @@ std::string StrCat(const T& ...args) {
   return oss.str();
 }
 
+/**
+ * @brief Make arrays, conatiners and iterators printable.
+ *
+ * Usage:
+ *   vector<int> vec = {1, 2, 3};
+ *   std::cout << PrintIter(vec);
+ *   std::cout << PrintIter(vec, ",");
+ *   std::cout << PrintIter(vec.begin(), vec.end());
+ *   std::cout << PrintIter(vec.begin(), vec.end(), "|");
+ *
+ *   int array[] = {1, 2, 3};
+ *   std::cout << PrintIter(array);
+ *   std::cout << PrintIter(array, "|");
+ *   std::cout << PrintIter(array + 0, array + 10, "|");
+ */
+template <typename Container,
+          typename Iter = typename Container::const_iterator>
+IterPrinter<Iter> PrintIter(const Container& container,
+                            const std::string& delimiter = " ") {
+  return IterPrinter<Iter>(container.begin(), container.end(), delimiter);
+}
+
+template <typename Iter>
+IterPrinter<Iter> PrintIter(const Iter& begin, const Iter& end,
+                            const std::string& delimiter = " ") {
+  return IterPrinter<Iter>(begin, end, delimiter);
+}
+
+template <typename T, int length>
+IterPrinter<T*> PrintIter(T (&array)[length],
+                          const std::string& delimiter = " ") {
+  return IterPrinter<T*>(array, array + length, delimiter);
+}
+
+template <typename T, int length>
+IterPrinter<T*> PrintIter(T (&array)[length], T* end,
+                          const std::string& delimiter = " ") {
+  return IterPrinter<T*>(array, end, delimiter);
+}
+
 }  // namespace util
 }  // namespace common
+
+// Operators should be globally visible in apollo namespace.
+template <typename Iter>
+std::ostream& operator<<(std::ostream& os,
+                         const common::util::IterPrinter<Iter>& printer) {
+  return printer.Print(os);
+}
+
 }  // namespace apollo
 
 #endif  // MODULES_COMMON_STRING_UTIL_H_

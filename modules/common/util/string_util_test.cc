@@ -16,6 +16,8 @@
 
 #include "modules/common/util/string_util.h"
 
+#include <vector>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -33,6 +35,23 @@ TEST(UtilTest, StrCat) {
   EXPECT_EQ(StrCat("string", "32"), "string32");  // string, string
   EXPECT_EQ(StrCat("string", 32, 3.2f), "string323.2");  // string, int, float
   EXPECT_EQ(StrCat(3.2, ' ', true), "3.2 1");  // double, char, bool
+}
+
+TEST(UtilTest, IterPrinter) {
+  // Container.
+  std::vector<std::string> vec;
+  EXPECT_EQ(StrCat(PrintIter(vec)), "");  // Empty string
+  vec.assign({"0", "1", "2"});
+  EXPECT_EQ(StrCat(PrintIter(vec)), "0 1 2");
+  EXPECT_EQ(StrCat(PrintIter(vec, "|")), "0|1|2");
+  EXPECT_EQ(StrCat(PrintIter(vec.begin(), vec.end(), ", ")), "0, 1, 2");
+  EXPECT_EQ(StrCat(PrintIter(vec.begin() + 1, vec.end() - 1, " ")), "1");
+
+  // Array.
+  int data[] = {0, 1, 2};
+  EXPECT_EQ(StrCat(PrintIter(data)), "0 1 2");
+  EXPECT_EQ(StrCat(PrintIter(data, data + 2, ", ")), "0, 1");
+  EXPECT_EQ(StrCat(PrintIter(data + 1, data + 2, ", ")), "1");
 }
 
 }  // namespace util
