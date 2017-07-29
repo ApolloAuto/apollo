@@ -90,6 +90,11 @@ bool PathData::get_path_point_with_ref_s(
   return true;
 }
 
+void PathData::Clear() {
+  discretized_path_ = DiscretizedPath();
+  frenet_path_ = FrenetFramePath();
+}
+
 std::string PathData::DebugString() const {
   std::ostringstream sout;
   sout << "[" << std::endl;

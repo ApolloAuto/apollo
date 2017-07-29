@@ -88,6 +88,10 @@ double SpeedData::total_time() const {
   return speed_vector_.back().t() - speed_vector_.front().t();
 }
 
+void SpeedData::Clear() {
+  speed_vector_.clear();
+}
+
 std::string SpeedData::DebugString() const {
   std::ostringstream sout;
   sout << "[" << std::endl;

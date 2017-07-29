@@ -50,7 +50,7 @@ void PublishableTrajectory::set_header_time(const double header_time) {
 ADCTrajectory PublishableTrajectory::to_trajectory_protobuf() const {
   ADCTrajectory trajectory_pb;
   trajectory_pb.mutable_header()->set_timestamp_sec(_header_time);
-  trajectory_pb.mutable_trajectory_point()->MergeFrom(
+  trajectory_pb.mutable_trajectory_point()->CopyFrom(
       {_trajectory_points.begin(), _trajectory_points.end()});
   return trajectory_pb;
 }
@@ -58,7 +58,7 @@ ADCTrajectory PublishableTrajectory::to_trajectory_protobuf() const {
 void PublishableTrajectory::populate_trajectory_protobuf(
     ADCTrajectory* trajectory_pb) const {
   trajectory_pb->mutable_header()->set_timestamp_sec(_header_time);
-  trajectory_pb->mutable_trajectory_point()->MergeFrom(
+  trajectory_pb->mutable_trajectory_point()->CopyFrom(
       {_trajectory_points.begin(), _trajectory_points.end()});
 }
 
