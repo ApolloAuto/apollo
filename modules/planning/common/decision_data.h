@@ -32,8 +32,8 @@ class DecisionData {
  public:
   DecisionData() = default;
 
-  const MainDecision main_decision() const;
-  MainDecision *mutable_main_decision();
+  const DecisionResult Decision() const;
+  DecisionResult *MutableDecision();
 
   std::vector<const Obstacle *> StaticObstacles() const;
   std::vector<Obstacle *> MutableStaticObstacles() const;
@@ -44,7 +44,7 @@ class DecisionData {
   std::vector<Obstacle> *MutableObstacles();
 
  private:
-  MainDecision main_decision_;
+  DecisionResult decision_;
   std::vector<Obstacle> obstacles_;
 };
 

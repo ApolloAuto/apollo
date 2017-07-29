@@ -143,15 +143,26 @@ void Planning::RunOnce() {
     return;
   }
 
+  if (AdapterManager::GetPrediction()->Empty()) {
+    AERROR << "Prediction is not available; skip the planning cycle";
+    return;
+  }
+
   AINFO << "Start planning ...";
   const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
 
+  // localization
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
   ADEBUG << "Get localization:" << localization.DebugString();
 
+  // chassis
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
+
+  // prediction
+  const auto& prediction = AdapterManager::GetPrediction()->GetLatestObserved();
+  ADEBUG << "Get prediction:" << prediction.DebugString();
 
   common::VehicleState::instance()->Update(localization, chassis);
 
