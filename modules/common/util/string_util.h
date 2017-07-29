@@ -98,6 +98,23 @@ internal::IterPrinter<T*> PrintIter(
   return {array, end, delimiter};
 }
 
+/**
+ * @brief Make conatiners and iterators printable. Similar to PrintIter but
+ *        output the DebugString().
+ */
+template <typename Container,
+          typename Iter = typename Container::const_iterator>
+internal::DebugStringIterPrinter<Iter> PrintDebugStringIter(
+    const Container& container, const std::string& delimiter = " ") {
+  return {container.begin(), container.end(), delimiter};
+}
+
+template <typename Iter>
+internal::DebugStringIterPrinter<Iter> PrintDebugStringIter(
+    const Iter& begin, const Iter& end, const std::string& delimiter = " ") {
+  return {begin, end, delimiter};
+}
+
 }  // namespace util
 }  // namespace common
 
@@ -106,6 +123,13 @@ template <typename Iter>
 std::ostream& operator<<(
     std::ostream& os,
     const common::util::internal::IterPrinter<Iter>& printer) {
+  return printer.Print(os);
+}
+
+template <typename Iter>
+std::ostream& operator<<(
+    std::ostream& os,
+    const common::util::internal::DebugStringIterPrinter<Iter>& printer) {
   return printer.Print(os);
 }
 

@@ -22,6 +22,7 @@
 
 #include <utility>
 
+#include "modules/common/util/string_util.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/proto/planning.pb.h"
 
@@ -94,7 +95,6 @@ bool PlanningData::aggregate(const double time_resolution,
     if (!path_data_.get_path_point_with_path_s(speed_point.s(), &path_point)) {
       AERROR << "Fail to get path data with s " << speed_point.s()
              << "path total length " << path_data_.discretized_path().length();
-      ;
       return false;
     }
 
@@ -110,10 +110,9 @@ bool PlanningData::aggregate(const double time_resolution,
 }
 
 std::string PlanningData::DebugString() const {
-  std::ostringstream ss;
-  ss << "path_data:" << path_data_.DebugString();
-  ss << "speed_data:" << speed_data_.DebugString();
-  return ss.str();
+  return apollo::common::util::StrCat(
+      "path_data:", path_data_.DebugString(),
+      "speed_data:", speed_data_.DebugString());
 }
 
 }  // namespace planning
