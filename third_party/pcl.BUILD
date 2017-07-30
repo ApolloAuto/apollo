@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "pcl",    
     defines = ["PCL_NO_PRECOMPILE"],
-    includes = [".", "/usr/include/vtk-5.8/"],
+    includes = ["."],
     linkopts = [
       "-lboost_system",
       "-lpcl_common",
