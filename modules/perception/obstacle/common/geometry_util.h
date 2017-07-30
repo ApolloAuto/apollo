@@ -173,6 +173,12 @@ void transform_point_cloud(const pcl::PointCloud<PointType>& cloud_in,
   }
 }
 
+/*
+use double in numerical computation for precision
+*/
+void transform_perception_cloud(pcl_util::PointCloudPtr cloud,
+                                const Eigen::Matrix4d& pose_velodyne,
+                                typename pcl_util::PointDCloudPtr trans_cloud);
 
 void TransformCloud(pcl_util::PointCloudPtr cloud,
     std::vector<int> indices,
