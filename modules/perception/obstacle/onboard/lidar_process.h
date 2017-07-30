@@ -46,6 +46,14 @@ class LidarProcess {
 
   bool GeneratePbMsg(PerceptionObstacles* obstacles);
 
+  std::vector<ObjectPtr> GetObjects() {
+    return objects_;
+  }
+
+  pcl_util::PointIndicesPtr GetROIIndices() {
+    return roi_indices_;
+  }
+
  private:
   bool InitFrameDependence();
   bool InitAlgorithmPlugin();
@@ -64,6 +72,7 @@ class LidarProcess {
   std::unique_ptr<BaseSegmentation> segmentor_;
   std::unique_ptr<BaseObjectBuilder> object_builder_;
   std::unique_ptr<BaseTracker> tracker_;
+  pcl_util::PointIndicesPtr roi_indices_;
 };
 
 }  // namespace perception

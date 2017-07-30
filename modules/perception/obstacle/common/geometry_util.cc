@@ -143,5 +143,25 @@ double vector_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {
     return theta;                                                                                   
 }         
 
+void transform_perception_cloud(pcl_util::PointCloudPtr cloud,
+                                const Eigen::Matrix4d& pose_velodyne,
+                                pcl_util::PointDCloudPtr trans_cloud) {
+    Eigen::Matrix4d pose = pose_velodyne;
+
+    if (trans_cloud->size() != cloud->size()) {
+        trans_cloud->resize(cloud->size());
+    }
+    for (size_t i = 0; i < cloud->points.size(); ++i) {
+        const Point& p = cloud->at(i);
+        Eigen::Vector4d v(p.x, p.y, p.z, 1);
+        v = pose * v;
+        pcl_util::PointD& tp = trans_cloud->at(i);
+        tp.x = v.x();
+        tp.y = v.y();
+        tp.z = v.z();
+        tp.intensity = p.intensity;
+    }
+}
+
 }  // namespace perception
 }  // namespace apollo

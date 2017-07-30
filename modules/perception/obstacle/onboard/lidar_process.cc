@@ -104,6 +104,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::sha
     roi_filter_options.hdmap = hdmap;
     if (roi_filter_->Filter(point_cloud, roi_filter_options, roi_indices)) {
       pcl::copyPointCloud(*point_cloud, *roi_indices, *roi_cloud);
+      roi_indices_ = roi_indices;
     } else {
       AERROR << "failed to call roi filter.";
       error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
