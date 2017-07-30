@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/control/common/interpolation_1d.h"
 
+#include <algorithm>
+
 #include "modules/common/log.h"
 
 namespace apollo {
