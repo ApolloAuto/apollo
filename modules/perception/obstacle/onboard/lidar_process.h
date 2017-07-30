@@ -17,6 +17,7 @@
 #ifndef MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
 #define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
 
+#include <Eigen/Core>
 #include <sensor_msgs/PointCloud2.h>
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -40,6 +41,8 @@ class LidarProcess {
     return inited_;
   }
   bool Process(const sensor_msgs::PointCloud2& message);
+
+  bool Process(double timestamp, pcl_util::PointCloudPtr cloud, std::shared_ptr<Eigen::Matrix4d> velodyne_trans);
 
   bool GeneratePbMsg(PerceptionObstacles* obstacles);
 
