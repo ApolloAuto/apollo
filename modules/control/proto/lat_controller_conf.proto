@@ -23,4 +23,15 @@ message LatControllerConf {
   optional int32 steer_single_direction_max_degree = 15;  // in degree
   optional int32 max_iteration = 16;  // maximum iteration for lqr solve
   optional double max_lateral_acceleration = 17;  // limit aggressive steering
+  optional LatGainScheduler lat_err_gain_scheduler = 18;
+  optional LatGainScheduler heading_err_gain_scheduler = 19;
+}
+
+message LatGainScheduler {
+  repeated LatGainSchedulerInfo scheduler = 1;
+}
+
+message LatGainSchedulerInfo {
+  optional double speed = 1; // m/s
+  optional double ratio = 2;
 }
