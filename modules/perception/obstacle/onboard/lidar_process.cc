@@ -77,6 +77,14 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
   PointCloudPtr point_cloud(new PointCloud);
   TransPointCloudToPCL(message, &point_cloud);
 
+  if(!Process(timestamp_, point_cloud, velodyne_trans)) {
+    AERROR << "faile to process msg at timestamp: "<< kTimeStamp;
+    return false;
+  }
+  return true;
+}
+
+bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::shared_ptr<Matrix4d> velodyne_trans) {
   /// call hdmap to get ROI
   HdmapStructPtr hdmap = nullptr;
   if (!hdmap_input_) {
@@ -134,7 +142,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
     TrackerOptions tracker_options;
     tracker_options.velodyne_trans = velodyne_trans;
     tracker_options.hdmap = hdmap;
-    if (!tracker_->Track(objects, kTimeStamp, tracker_options, &objects_)) {
+    if (!tracker_->Track(objects, timestamp, tracker_options, &objects_)) {
       AERROR << "failed to call tracker.";
       error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
       return false;
