@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include <cmath>
-#include <fstream>
 #include <numeric>
 
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
@@ -297,15 +296,15 @@ double MLPEvaluator::ComputeProbability() {
         double weight = layer.layer_input_weight().rows(row).columns(col);
         neuron_output += (layer_input[row] * weight);
       }
-      if (layer.layer_activation_type() == "relu") {
+      if (layer.layer_activation_func() == Layer::RELU) {
         neuron_output = apollo::prediction::util::Relu(neuron_output);
-      } else if (layer.layer_activation_type() == "sigmoid") {
+      } else if (layer.layer_activation_func() == Layer::SIGMOID) {
         neuron_output = apollo::prediction::util::Sigmoid(neuron_output);
-      } else if (layer.layer_activation_type() == "tanh") {
+      } else if (layer.layer_activation_func() == Layer::TANH) {
         neuron_output = std::tanh(neuron_output);
       } else {
-        AERROR << "Undefined activation type ["
-               << layer.layer_activation_type()
+        AERROR << "Undefined activation function ["
+               << layer.layer_activation_func()
                << "]. A default sigmoid will be used instead.";
         neuron_output = apollo::prediction::util::Sigmoid(neuron_output);
       }
