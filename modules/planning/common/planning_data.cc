@@ -103,7 +103,8 @@ bool PlanningData::aggregate(const double time_resolution,
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed_point.v());
     trajectory_point.set_a(speed_point.a());
-    trajectory_point.set_relative_time(speed_point.t());
+    trajectory_point.set_relative_time(speed_point.t()
+            + init_planning_point_.relative_time());
     trajectory->add_trajectory_point(trajectory_point);
   }
   return true;

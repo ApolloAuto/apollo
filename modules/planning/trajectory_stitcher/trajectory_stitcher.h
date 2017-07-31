@@ -27,6 +27,7 @@
 
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
 
 namespace apollo {
 namespace planning {
@@ -36,7 +37,7 @@ class TrajectoryStitcher {
   TrajectoryStitcher() = delete;
 
   static std::vector<TrajectoryPoint> compute_stitching_trajectory(
-      const Frame* const prev_frame);
+      const PublishableTrajectory& prev_trajectory);
 };
 
 }  // namespace planning

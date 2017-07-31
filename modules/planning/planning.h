@@ -27,6 +27,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -78,25 +79,15 @@ class Planning : public apollo::common::ApolloApp {
   bool Plan(const bool is_on_auto_mode, const double publish_time,
             ADCTrajectory* trajectory_pb);
 
-  /**
-   * @brief Reset the planner to initial state.
-   */
-  void Reset();
-
  private:
-  void RegisterPlanners();
-  void RunOnce();
-  void RecordInput(ADCTrajectory* trajectory_pb);
+  void InsertFrontTrajectoryPoints(ADCTrajectory* trajectory_pb,
+          const std::vector<apollo::common::TrajectoryPoint>& points) const;
 
-//  std::pair<common::TrajectoryPoint, std::uint32_t>
-//  ComputeStartingPointFromLastTrajectory(const double curr_time) const;
-//
-//  common::TrajectoryPoint ComputeStartingPointFromVehicleState(
-//      const double forward_time) const;
-//
-//  void GetOverheadTrajectory(const std::uint32_t matched_index,
-//                             const std::uint32_t buffer_size,
-//                             ADCTrajectory* trajectory_pb);
+  void RegisterPlanners();
+
+  void RunOnce();
+
+  void RecordInput(ADCTrajectory* trajectory_pb);
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
@@ -105,9 +96,8 @@ class Planning : public apollo::common::ApolloApp {
 
   std::unique_ptr<Planner> planner_;
 
-//  std::vector<common::TrajectoryPoint> last_trajectory_;
+  PublishableTrajectory last_publishable_trajectory_;
 
-//  double last_header_time_ = 0.0;
 };
 
 }  // namespace planning

@@ -208,28 +208,69 @@ void Planning::Stop() {}
 
 bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
                     ADCTrajectory* trajectory_pb) {
+
   // if 1. the auto-driving mode is off or
   //    2. we don't have the trajectory from last planning cycle or
   //    3. the position deviation from actual and target is too high
   // then planning from current vehicle state.
+  auto stitching_trajectory = TrajectoryStitcher::compute_stitching_trajectory(
+          last_publishable_trajectory_);
 
-  auto overhead_trajectory = TrajectoryStitcher::compute_stitching_trajectory(
-          DataCenter::instance()->last_frame());
-
-  auto planning_start_point = overhead_trajectory.back();
+  auto planning_start_point = stitching_trajectory.back();
 
   if (FLAGS_enable_record_debug) {
     trajectory_pb->mutable_debug()->mutable_planning_data()
-        ->mutable_init_point()->CopyFrom(overhead_trajectory.back());
+        ->mutable_init_point()->CopyFrom(stitching_trajectory.back());
     trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(true);
   }
 
   auto status = planner_->Plan(planning_start_point, trajectory_pb);
-  return status == Status::OK();
+  if (status != Status::OK()) {
+      last_publishable_trajectory_.Clear();
+      return false;
+  }
+
+  InsertFrontTrajectoryPoints(trajectory_pb,
+            std::vector<decltype(planning_start_point)>(stitching_trajectory.begin(),
+                    stitching_trajectory.end() - 1));
+
+  PublishableTrajectory publishable_trajectory;
+  for (int i = 0; i < trajectory_pb->trajectory_point_size(); ++i) {
+      publishable_trajectory.add_trajectory_point(trajectory_pb->trajectory_point(i));
+  }
+  publishable_trajectory.set_header_time(trajectory_pb->header().timestamp_sec());
+  last_publishable_trajectory_ = std::move(publishable_trajectory);
+  return true;
 }
 
-void Planning::Reset() {
+void Planning::InsertFrontTrajectoryPoints(ADCTrajectory* trajectory_pb,
+        const std::vector<apollo::common::TrajectoryPoint>& points) const {
+    if (points.empty()) {
+        return;
+    }
 
+    int existing_size = trajectory_pb->trajectory_point_size();
+    int i = 0;
+    while (i < existing_size / 2) {
+        trajectory_pb->mutable_trajectory_point()->SwapElements(i, existing_size - 1 - i);
+        ++i;
+    }
+
+    std::size_t append_size = points.size();
+    std::size_t j = 0;
+    while (append_size >= j + 1) {
+        auto ptr_trajectory_point = trajectory_pb->add_trajectory_point();
+        *ptr_trajectory_point = points[append_size - 1 - j];
+        j += 1;
+    }
+
+    int new_size = trajectory_pb->trajectory_point_size();
+    i = 0;
+    while (i < new_size / 2) {
+        trajectory_pb->mutable_trajectory_point()->SwapElements(i, new_size - 1 - i);
+        ++i;
+    }
+    return;
 }
 
 }  // namespace planning
