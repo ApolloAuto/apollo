@@ -197,7 +197,7 @@ ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
   int id = perception_obstacle.id();
   if (id_ < 0) {
     id_ = id;
-    ADEBUG << "Obstacle set id [" << id_ << "].";
+    ADEBUG << "Obstacle has id [" << id_ << "].";
   } else {
     if (id_ != id) {
       AERROR << "Obstacle [" << id_ << "] has a mismatched ID [" << id
@@ -213,7 +213,7 @@ ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
 ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle) {
   if (perception_obstacle.has_type()) {
     type_ = perception_obstacle.type();
-    ADEBUG << "Obstacle [" << id_ << "] set type [" << type_ << "].";
+    ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
   } else {
     AERROR << "Obstacle [" << id_ << "] has no type.";
     return ErrorCode::PREDICTION_ERROR;
@@ -230,7 +230,7 @@ void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
   }
   feature->set_timestamp(ts);
 
-  ADEBUG << "Obstacle [" << id_ << "] set timestamp ["
+  ADEBUG << "Obstacle [" << id_ << "] has timestamp ["
          << std::fixed << std::setprecision(6) << ts << "].";
 }
 
@@ -256,7 +256,7 @@ void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
   feature->mutable_position()->set_y(y);
   feature->mutable_position()->set_z(z);
 
-  ADEBUG << "Obstacle [" << id_ << "] set position [" << std::fixed
+  ADEBUG << "Obstacle [" << id_ << "] has position [" << std::fixed
          << std::setprecision(6) << x << ", " << std::fixed
          << std::setprecision(6) << y << ", " << std::fixed
          << std::setprecision(6) << z << "].";
@@ -289,13 +289,13 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   feature->set_velocity_heading(velocity_heading);
   feature->set_speed(speed);
 
-  ADEBUG << "Obstacle [" << id_ << "] set velocity ["
+  ADEBUG << "Obstacle [" << id_ << "] has velocity ["
          << std::fixed << std::setprecision(6) << velocity_x << ", "
          << std::fixed << std::setprecision(6) << velocity_y << ", "
          << std::fixed << std::setprecision(6) << velocity_z << "]";
-  ADEBUG << "Obstacle [" << id_ << "] set velocity heading ["
+  ADEBUG << "Obstacle [" << id_ << "] has velocity heading ["
          << std::fixed << std::setprecision(6) << velocity_heading << "] ";
-  ADEBUG << "Obstacle [" << id_ << "] set speed ["
+  ADEBUG << "Obstacle [" << id_ << "] has speed ["
          << std::fixed << std::setprecision(6) << speed << "].";
 }
 
@@ -335,11 +335,11 @@ void Obstacle::SetAcceleration(Feature* feature) {
   double acc = std::hypot(std::hypot(acc_x, acc_y), acc_z);
   feature->set_acc(acc);
 
-    ADEBUG << "Obstacle [" << id_ << "] set acceleration ["
+    ADEBUG << "Obstacle [" << id_ << "] has acceleration ["
            << std::fixed << std::setprecision(6) << acc_x << ", "
            << std::fixed << std::setprecision(6) << acc_y << ", "
            << std::fixed << std::setprecision(6) << acc_z << "]";
-    ADEBUG << "Obstacle [" << id_ << "] set acceleration value ["
+    ADEBUG << "Obstacle [" << id_ << "] has acceleration value ["
            << std::fixed << std::setprecision(6) << acc << "].";
 }
 
@@ -351,7 +351,7 @@ void Obstacle::SetTheta(const PerceptionObstacle& perception_obstacle,
   }
   feature->set_theta(theta);
 
-  ADEBUG << "Obstacle [" << id_ << "] set theta ["
+  ADEBUG << "Obstacle [" << id_ << "] has theta ["
          << std::fixed << std::setprecision(6) << theta << "].";
 }
 
@@ -375,7 +375,7 @@ void Obstacle::SetLengthWidthHeight(
   feature->set_width(width);
   feature->set_height(height);
 
-  ADEBUG << "Obstacle [" << id_ << "] set dimension [" << std::fixed
+  ADEBUG << "Obstacle [" << id_ << "] has dimension [" << std::fixed
          << std::setprecision(6) << length << ", " << std::fixed
          << std::setprecision(6) << width << ", " << std::fixed
          << std::setprecision(6) << height << "].";
@@ -468,28 +468,28 @@ void Obstacle::UpdateMotionBelief(Feature* feature) {
   feature->mutable_t_acceleration()->set_x(acc_x);
   feature->mutable_t_acceleration()->set_y(acc_y);
   feature->mutable_t_acceleration()->set_z(0.0);
-  ADEBUG << "Obstacle [" << id_ << "] set tracked position ["
+  ADEBUG << "Obstacle [" << id_ << "] has tracked position ["
          << std::fixed << std::setprecision(6)
          << feature->t_position().x() << ", "
          << std::fixed << std::setprecision(6)
          << feature->t_position().y() << ", "
          << std::fixed << std::setprecision(6)
          << feature->t_position().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] set tracked velocity ["
+  ADEBUG << "Obstacle [" << id_ << "] has tracked velocity ["
          << std::fixed << std::setprecision(6)
          << feature->t_velocity().x() << ", "
          << std::fixed << std::setprecision(6)
          << feature->t_velocity().y() << ", "
          << std::fixed << std::setprecision(6)
          << feature->t_velocity().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] set tracked acceleration ["
+  ADEBUG << "Obstacle [" << id_ << "] has tracked acceleration ["
          << std::fixed << std::setprecision(6)
          << feature->t_acceleration().x() << ", "
          << std::fixed << std::setprecision(6)
          << feature->t_acceleration().y() << ", "
          << std::fixed << std::setprecision(6)
          << feature->t_acceleration().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] set velocity heading ["
+  ADEBUG << "Obstacle [" << id_ << "] has velocity heading ["
          << std::fixed << std::setprecision(6)
          << feature->t_velocity_heading() << "].";
 }
@@ -656,9 +656,9 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
   feature->set_t_speed(lane_speed);
   feature->set_t_acc(lane_acc);
 
-  ADEBUG << "Obstacle [" << id_ << "] set tracked lane speed ["
+  ADEBUG << "Obstacle [" << id_ << "] has tracked lane speed ["
          << std::fixed << std::setprecision(6) << lane_speed << "]";
-  ADEBUG << "Obstacle [" << id_ << "] set tracked lane acceleration ["
+  ADEBUG << "Obstacle [" << id_ << "] has tracked lane acceleration ["
          << std::fixed << std::setprecision(6) << lane_acc << "]";
 }
 
@@ -759,7 +759,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
               &current_lanes);
   current_lanes_ = current_lanes;
   if (current_lanes_.empty()) {
-    ADEBUG << "Unable to find current lane.";
+    ADEBUG << "Obstacle [" << id_ << "] has no current lanes.";
     kf_lane_trackers_.clear();
     return;
   }
@@ -799,7 +799,8 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
       lane.mutable_lane_feature()->CopyFrom(*lane_feature);
       min_heading_diff = std::fabs(angle_diff);
     }
-    AINFO << lane_feature->ShortDebugString();
+    ADEBUG << "Obstacle [" << id_ << "] has lane feature "
+           << lane_feature->ShortDebugString();
   }
 
   if (lane.has_lane_feature()) {
@@ -901,7 +902,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     SetLanePoints(feature);
   }
 
-  ADEBUG << "Obstacle [" << id_ << "] set lane graph feature";
+  ADEBUG << "Obstacle [" << id_ << "] has lane graph feature";
 }
 
 void Obstacle::SetLanePoints(Feature* feature) {
@@ -964,7 +965,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
       }
     }
   }
-  ADEBUG << "Obstacle [" << id_ << "] set lane segments and points.";
+  ADEBUG << "Obstacle [" << id_ << "] has lane segments and points.";
 }
 
 void Obstacle::SetMotionStatus() {
@@ -1056,7 +1057,7 @@ void Obstacle::Trim() {
   }
   if (count > 0) {
     ADEBUG << "Obstacle [" << id_ << "] trim "
-           << count << "historical features";
+           << count << " historical features";
   }
 }
 

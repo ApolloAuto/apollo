@@ -109,9 +109,9 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
         *(pose_container->ToPerceptionObstacle()),
         pose_container->GetTimestamp());
   }
-  AINFO << "Start to insert perception obstacles";
   if (obstacles_container == nullptr) {
-    AINFO << "Null obstacles container";
+    AERROR << "Null obstacles container";
+    return;
   }
   obstacles_container->Insert(perception_obstacles);
   EvaluatorManager::instance()->Run(perception_obstacles);
@@ -123,18 +123,18 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   AdapterManager::FillPredictionHeader(
       Name(), prediction_obstacles.mutable_header());
   AdapterManager::PublishPrediction(prediction_obstacles);
-  // ADEBUG << "Published a prediction message ["
-  //        << prediction_obstacles.ShortDebugString() << "].";
-  for (const auto& pob : prediction_obstacles.prediction_obstacle()) {
-    for (const auto& traj : pob.trajectory()) {
-      for (const auto& traj_point : traj.trajectory_point()) {
-        AINFO << "[" << std::fixed << std::setprecision(6)
-              << traj_point.path_point().x() << ", "
-              << std::fixed << std::setprecision(6)
-              << traj_point.path_point().y() << "]";
-      }
-    }
-  }
+  ADEBUG << "Published a prediction message ["
+         << prediction_obstacles.ShortDebugString() << "].";
+  // for (const auto& pob : prediction_obstacles.prediction_obstacle()) {
+  //   for (const auto& traj : pob.trajectory()) {
+  //     for (const auto& traj_point : traj.trajectory_point()) {
+  //       AINFO << "[" << std::fixed << std::setprecision(6)
+  //             << traj_point.path_point().x() << ", "
+  //             << std::fixed << std::setprecision(6)
+  //             << traj_point.path_point().y() << "]";
+  //     }
+  //   }
+  // }
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
