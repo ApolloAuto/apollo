@@ -65,6 +65,11 @@ class ReferenceLine {
 
   std::string DebugString() const;
 
+  void get_s_range_from_box2d(
+    const ::apollo::common::math::Box2d& box2d,
+    double* max_s, double* min_s) const;
+
+
  private:
   static ReferencePoint interpolate(const ReferencePoint& p0, const double s0,
                                     const ReferencePoint& p1, const double s1,
