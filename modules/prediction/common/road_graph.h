@@ -18,6 +18,7 @@
 #define MODULES_PREDICTION_COMMON_ROAD_GRAPH_H_
 
 #include <vector>
+#include <memory>
 
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
@@ -31,26 +32,27 @@ class RoadGraph {
   RoadGraph();
 
   RoadGraph(double start_s, double length,
-            const apollo::hdmap::LaneInfo* lane_info_ptr);
+            std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
   virtual ~RoadGraph();
 
   void Set(double start_s, double length,
-           apollo::hdmap::LaneInfo* lane_info_ptr);
+           std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
   apollo::common::ErrorCode BuildLaneGraph(LaneGraph* lane_graph);
 
  private:
-  void ComputeLaneSequence(double accumulated_s,
-                           double start_s,
-                           const apollo::hdmap::LaneInfo* lane_info_ptr,
-                           std::vector<LaneSegment>* lane_segments,
-                           LaneGraph* lane_graph_ptr) const;
+  void ComputeLaneSequence(
+      double accumulated_s,
+      double start_s,
+      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
+      std::vector<LaneSegment>* lane_segments,
+      LaneGraph* lane_graph_ptr) const;
 
  private:
   double start_s_;
   double length_;
-  const apollo::hdmap::LaneInfo* lane_info_ptr_;
+  std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr_;
 };
 
 }  // namespace prediction
