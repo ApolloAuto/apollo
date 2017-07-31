@@ -27,6 +27,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 #include "modules/common/math/kalman_filter.h"
 #include "modules/common/proto/error_code.pb.h"
@@ -147,7 +148,7 @@ class Obstacle {
   std::unordered_map<std::string,
                      apollo::common::math::KalmanFilter<double, 4, 2, 0>>
       kf_lane_trackers_;
-  std::vector<const apollo::hdmap::LaneInfo*> current_lanes_;
+  std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> current_lanes_;
   static std::mutex mutex_;
 };
 
