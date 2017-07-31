@@ -194,12 +194,6 @@ int PredictionMap::SmoothPointFromLane(const apollo::hdmap::Id& id,
   std::shared_ptr<const LaneInfo> lane = LaneById(id);
   apollo::common::PointENU hdmap_point = lane->get_smooth_point(s);
   *heading = PathHeading(lane, hdmap_point);
-  AINFO << "lane_id = " << id.id() << ", "
-        << "lane_s = ["
-        << std::fixed << std::setprecision(6) << s << "], "
-        << "hdmap pt = ["
-        << std::fixed << std::setprecision(6)
-        << hdmap_point.x() << ", " << hdmap_point.y() << "]";
   point->operator[](0) = hdmap_point.x() - std::sin(*heading) * l;
   point->operator[](1) = hdmap_point.y() + std::cos(*heading) * l;
   return 0;
