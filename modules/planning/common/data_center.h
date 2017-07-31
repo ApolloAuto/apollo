@@ -28,6 +28,7 @@
 #include "modules/common/macro.h"
 #include "modules/common/status/status.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/object_table.h"
 #include "modules/planning/state_machine/master_state_machine.h"
@@ -58,10 +59,11 @@ class DataCenter {
 
   std::unordered_map<uint32_t, std::unique_ptr<Frame>> _frames;
   std::list<uint32_t> _sequence_queue;
+  std::unique_ptr<hdmap::PncMap> pnc_map_ = nullptr;
   std::unique_ptr<Frame> _frame = nullptr;
   std::unique_ptr<ObjectTable> _object_table = nullptr;
   std::unique_ptr<MasterStateMachine> _master = nullptr;
-  ::apollo::hdmap::HDMap map_;
+  apollo::hdmap::HDMap map_;
 
  private:
   DECLARE_SINGLETON(DataCenter);

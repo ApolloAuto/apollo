@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file:
+ * @file: pnc_map.cc
  **/
 
-#include "modules/planning/common/routing_helper.h"
+#include "modules/map/pnc_map/pnc_map.h"
 
 #include <fstream>
 #include <unordered_set>
@@ -31,10 +31,10 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/map/pnc_map/path.h"
 
 namespace apollo {
-namespace planning {
+namespace hdmap {
 
 namespace {
 
@@ -76,10 +76,9 @@ void remove_duplicates(std::vector<hdmap::MapPathPoint> *points) {
 }
 }
 
-RoutingHelper::RoutingHelper(const hdmap::HDMap *hdmap) : hdmap_(hdmap) {}
+PncMap::PncMap(const hdmap::HDMap *hdmap) : hdmap_(hdmap) {}
 
-bool RoutingHelper::validate_routing(
-    const hdmap::RoutingResult &routing) const {
+bool PncMap::validate_routing(const hdmap::RoutingResult &routing) const {
   const int num_routes = routing.route_size();
   if (num_routes == 0) {
     AERROR << "Route is empty.";
@@ -157,11 +156,11 @@ bool RoutingHelper::validate_routing(
   return true;
 }
 
-bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
-                                          const common::PointENU &point,
-                                          const double backward_length,
-                                          const double forward_length,
-                                          hdmap::Path *path) const {
+bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
+                                   const common::PointENU &point,
+                                   const double backward_length,
+                                   const double forward_length,
+                                   hdmap::Path *path) const {
   if (path == nullptr) {
     AERROR << "the provided Path is null";
     return false;
@@ -242,8 +241,8 @@ bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
   }
 }
 
-bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
-                                          hdmap::Path *path) const {
+bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
+                                   hdmap::Path *path) const {
   if (!validate_routing(routing)) {
     AERROR << "routing is invalid";
     return false;
@@ -263,9 +262,9 @@ bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
   return CreatePathFromRouting(routing, 0.0, length, path);
 }
 
-bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
-                                          double start_s, double end_s,
-                                          hdmap::Path *path) const {
+bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
+                                   double start_s, double end_s,
+                                   hdmap::Path *path) const {
   if (path == nullptr) {
     AERROR << "input path is null";
     return false;
@@ -371,7 +370,7 @@ bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
   return true;
 }
 
-void RoutingHelper::append_lane_to_points(
+void PncMap::append_lane_to_points(
     hdmap::LaneInfoConstPtr lane, const double start_s, const double end_s,
     std::vector<hdmap::MapPathPoint> *const points,
     std::vector<hdmap::LaneSegment> *const lane_segments) const {
@@ -407,5 +406,7 @@ void RoutingHelper::append_lane_to_points(
   }
 }
 
-}  // namespace planning
+const hdmap::HDMap *PncMap::HDMap() const { return hdmap_; }
+
+}  // namespace hdmap
 }  // namespace apollo

@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /**
- * @file: routing_helper.h
+ * @file: pnc_map.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_ROUTING_HELPER_H_
-#define MODULES_PLANNING_COMMON_ROUTING_HELPER_H_
+#ifndef MODULES_MAP_COMMON_PNC_MAP_H_
+#define MODULES_MAP_COMMON_PNC_MAP_H_
 
 #include <memory>
 #include <unordered_map>
@@ -29,14 +29,18 @@
 #include "modules/map/proto/routing.pb.h"
 
 namespace apollo {
-namespace planning {
+namespace hdmap {
 
-class RoutingHelper {
+class Path;
+
+class PncMap {
  public:
-  RoutingHelper() = default;
-  RoutingHelper(const hdmap::HDMap *map_ptr);
-  void SetMap(const hdmap::HDMap *map_ptr);
-  ~RoutingHelper() = default;
+  PncMap() = default;
+  ~PncMap() = default;
+  PncMap(const hdmap::HDMap *map_ptr);
+
+  const hdmap::HDMap *HDMap() const;
+
   bool CreatePathFromRouting(const hdmap::RoutingResult &routing,
                              const common::PointENU &point,
                              const double backward_length,
@@ -63,4 +67,4 @@ class RoutingHelper {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_ROUTING_HELPER_H_
+#endif  // MODULES_MAP_COMMON_PNC_MAP_H_
