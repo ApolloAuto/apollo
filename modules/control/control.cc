@@ -293,8 +293,7 @@ Status Control::CheckTimestamp() {
 
 void Control::SendCmd(ControlCommand *control_command) {
   // set header
-  AdapterManager::FillControlCommandHeader(Name(),
-                                           control_command->mutable_header());
+  AdapterManager::FillControlCommandHeader(Name(), control_command);
 
   ADEBUG << control_command->ShortDebugString();
   if (FLAGS_is_control_test_mode) {

@@ -48,7 +48,7 @@ void Decision::OnTimer(const ros::TimerEvent &) { PublishDecision(); }
 
 void Decision::PublishDecision() {
   DecisionResult decision_result;
-  AdapterManager::FillDecisionHeader(Name(), decision_result.mutable_header());
+  AdapterManager::FillDecisionHeader(Name(), &decision_result);
 
   AdapterManager::PublishDecision(decision_result);
 }

@@ -142,7 +142,7 @@ bool CameraLocalization::CreateLocalizationMsg(
 
   // header
   AdapterManager::FillLocalizationHeader(FLAGS_localization_module_name,
-                                         localization->mutable_header());
+                                         localization);
   if (FLAGS_enable_gps_timestamp) {
     // copy time stamp, do NOT use Clock::Now()
     localization->mutable_header()->set_timestamp_sec(

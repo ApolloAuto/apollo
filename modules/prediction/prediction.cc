@@ -120,8 +120,7 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   PredictionObstacles prediction_obstacles;
   prediction_obstacles.CopyFrom(
       PredictorManager::instance()->prediction_obstacles());
-  AdapterManager::FillPredictionHeader(
-      Name(), prediction_obstacles.mutable_header());
+  AdapterManager::FillPredictionHeader(Name(), &prediction_obstacles);
   AdapterManager::PublishPrediction(prediction_obstacles);
   ADEBUG << "Published a prediction message ["
          << prediction_obstacles.ShortDebugString() << "].";

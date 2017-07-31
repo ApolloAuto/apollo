@@ -71,9 +71,11 @@ namespace adapter {
   static void Publish##name(const name##Adapter::DataType &data) {             \
     instance()->InternalPublish##name(data);                                   \
   }                                                                            \
-  static void Fill##name##Header(const std::string &module_name,               \
-                                 apollo::common::Header *header) {             \
-    instance()->name##_->FillHeader(module_name, header);                      \
+  template <typename T>                                                        \
+  static void Fill##name##Header(const std::string &module_name, T *data) {    \
+    static_assert(std::is_same<name##Adapter::DataType, T>::value,             \
+                  "Data type must be the same with adapter's type!");          \
+    instance()->name##_->FillHeader(module_name, data);                        \
   }                                                                            \
   static void Set##name##Callback(name##Adapter::Callback callback) {          \
     CHECK(instance()->name##_)                                                 \
@@ -108,7 +110,9 @@ namespace adapter {
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
   }                                                                            \
-  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
+  name##Adapter *InternalGet##name() {                                         \
+    return name##_.get();                                                      \
+  }                                                                            \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     name##publisher_.publish(data);                                            \
   }
