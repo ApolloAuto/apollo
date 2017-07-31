@@ -42,7 +42,7 @@ class Obstacle : public PlanningObject {
   void SetId(int id);
   void SetId(const std::string &id);
 
-  const PerceptionObstacle::Type& Type() const;
+  const PerceptionObstacle::Type &Type() const;
   void SetType(const PerceptionObstacle::Type &type);
 
   double Height() const;

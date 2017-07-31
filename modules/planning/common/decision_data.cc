@@ -23,9 +23,7 @@
 namespace apollo {
 namespace planning {
 
-const DecisionResult& DecisionData::Decision() const {
-  return decision_;
-}
+const DecisionResult &DecisionData::Decision() const { return decision_; }
 
 DecisionResult *DecisionData::MutableDecision() { return &decision_; }
 
@@ -36,17 +34,17 @@ const std::vector<Obstacle> &DecisionData::Obstacles() const {
 void DecisionData::AddObstacle(Obstacle &obstacle) {
   obstacles_.push_back(obstacle);
   if (obstacle.Type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
-    static_obstacles_.push_back((const Obstacle*)&obstacle);
+    static_obstacles_.push_back((const Obstacle *)&obstacle);
   } else {
-    dynamic_obstacles_.push_back((const Obstacle*)&obstacle);
+    dynamic_obstacles_.push_back((const Obstacle *)&obstacle);
   }
 }
 
-const std::vector<const Obstacle*> &DecisionData::StaticObstacles() const {
+const std::vector<const Obstacle *> &DecisionData::StaticObstacles() const {
   return static_obstacles_;
 }
 
-const std::vector<const Obstacle*> &DecisionData::DynamicObstacles() const {
+const std::vector<const Obstacle *> &DecisionData::DynamicObstacles() const {
   return dynamic_obstacles_;
 }
 

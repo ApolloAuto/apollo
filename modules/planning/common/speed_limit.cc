@@ -64,11 +64,10 @@ double SpeedLimit::get_speed_limit(const double s) const {
     return _speed_point.front().v();
   }
 
-  auto func = [](const SpeedPoint & sp, const double s) {
-    return sp.s() < s;
-  };
+  auto func = [](const SpeedPoint& sp, const double s) { return sp.s() < s; };
 
-  auto it_lower = std::lower_bound(_speed_point.begin(), _speed_point.end(), s, func);
+  auto it_lower =
+      std::lower_bound(_speed_point.begin(), _speed_point.end(), s, func);
   if (it_lower == _speed_point.begin()) {
     return _speed_point.front().v();
   }

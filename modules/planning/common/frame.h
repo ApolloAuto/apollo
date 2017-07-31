@@ -27,9 +27,9 @@
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/localization/proto/pose.pb.h"
-#include "modules/map/proto/routing.pb.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/map/proto/routing.pb.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
