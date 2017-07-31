@@ -349,7 +349,7 @@ protected:
 
 
 int main(int argc, char* argv[]) {
-    FLAGS_flagfile = "./conf/offlinelidar_process__test.flag";
+    FLAGS_flagfile = "./offline_lidar_perception_test.flag";
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
     apollo::perception::OfflineLidarPerceptionTool tool;

@@ -3,8 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "perception_tool_offline_lidar_perception_tool",
+    name = "offline_lidar_perception_tool",
     srcs = ["offline_lidar_perception_tool.cc"],
+    data = [
+        "conf/config_manager.config",
+        "conf/offline_lidar_perception_test.flag",
+    ],
     deps = [
         "//modules/common",
         "//modules/common:log",
