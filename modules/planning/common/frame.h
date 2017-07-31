@@ -30,6 +30,7 @@
 #include "modules/map/proto/routing.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_data.h"
 
 namespace apollo {
@@ -37,9 +38,8 @@ namespace planning {
 
 class Frame {
  public:
-  Frame(const uint32_t sequence_num);
+  Frame(const uint32_t sequence_num, const hdmap::PncMap *pnc_map);
 
-  void SetMap(const hdmap::HDMap *hdmap);
   void SetInitPose(const localization::Pose &init_pose);
   void SetRouting(const hdmap::RoutingResult &routing);
   bool Init();
@@ -63,7 +63,7 @@ class Frame {
   localization::Pose init_pose_;
   PublishableTrajectory _computed_trajectory;
   PlanningData _planning_data;
-  const hdmap::HDMap *hdmap_ = nullptr;
+  const hdmap::PncMap *pnc_map_ = nullptr;
 };
 
 }  // namespace planning

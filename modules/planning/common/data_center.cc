@@ -51,6 +51,7 @@ DataCenter::DataCenter() {
     AFATAL << "Failed to load map: " << FLAGS_map_filename;
   }
   AINFO << "map loaded, Map file: " << FLAGS_map_filename;
+  pnc_map_.reset(new hdmap::PncMap(&map_));
 }
 
 Frame *DataCenter::frame(const uint32_t sequence_num) const {
@@ -67,8 +68,7 @@ bool DataCenter::init_current_frame(const uint32_t sequence_num) {
     AERROR << "Routing is empty";
     return false;
   }
-  _frame.reset(new Frame(sequence_num));
-  _frame->SetMap(&map_);
+  _frame.reset(new Frame(sequence_num, pnc_map_.get()));
   common::TrajectoryPoint point;
   _frame->SetInitPose(VehicleState::instance()->pose());
   _frame->SetRouting(AdapterManager::GetRoutingResult()->GetLatestObserved());
