@@ -278,20 +278,20 @@ void Path::get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
   std::unordered_map<std::string, std::vector<std::pair<double, double>>>
       overlaps_by_id;
   double s = 0.0;
-  /*
   for (const auto& lane_segment : _lane_segments) {
     if (lane_segment.lane == nullptr) {
       continue;
     }
+    // LaneInfoConstPtr get_lane_by_id(const apollo::hdmap::Id& id) const;
+    // OverlapInfoConstPtr get_overlap_by_id(const apollo::hdmap::Id& id) const;
     for (const auto overlap_id : get_overlaps_from_lane(*(lane_segment.lane))) {
-
-
-
-      const auto* overlap_info =
+      const auto& overlap = hdmap_->get_overlap_by_id(overlap_id);
+      const auto& overlap_info =
           overlap->get_object_overlap_info(lane_segment.lane->id());
       if (overlap_info == nullptr) {
         continue;
       }
+
       const auto& lane_overlap_info = overlap_info->lane_overlap_info();
       if (lane_overlap_info.start_s() < lane_segment.end_s &&
           lane_overlap_info.end_s() > lane_segment.start_s) {
@@ -330,26 +330,22 @@ void Path::get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
             [](const PathOverlap& overlap1, const PathOverlap& overlap2) {
               return overlap1.start_s < overlap2.start_s;
             });
-  */
 }
 
 void Path::init_overlaps() {
-  // TODO: implement this function. (Liangliang)
-  /*
   get_all_overlaps(std::bind(&LaneInfo::cross_lanes, _1), &_lane_overlaps);
-  get_all_overlaps(std::bind(LaneInfoConstPtr::signals, _1),
-                   &_signal_overlaps);
-  get_all_overlaps(std::bind(LaneInfoConstPtr::yield_signs, _1),
+  get_all_overlaps(std::bind(&LaneInfo::signals, _1), &_signal_overlaps);
+  get_all_overlaps(std::bind(&LaneInfo::yield_signs, _1),
                    &_yield_sign_overlaps);
-  get_all_overlaps(std::bind(LaneInfoConstPtr::stop_signs, _1),
-                   &_stop_sign_overlaps);
-  get_all_overlaps(std::bind(LaneInfoConstPtr::crosswalks, _1),
-                   &_crosswalk_overlaps);
-  get_all_overlaps(std::bind(LaneInfoConstPtr::parking_spaces, _1),
+  get_all_overlaps(std::bind(&LaneInfo::stop_signs, _1), &_stop_sign_overlaps);
+  get_all_overlaps(std::bind(&LaneInfo::crosswalks, _1), &_crosswalk_overlaps);
+  get_all_overlaps(std::bind(&LaneInfo::junctions, _1), &_junction_overlaps);
+
+  // TODO: add support for parking and speed bumps.
+  /*
+  get_all_overlaps(std::bind(&LaneInfo::parking_spaces, _1),
                    &_parking_space_overlaps);
-  get_all_overlaps(std::bind(LaneInfoConstPtr::junctions, _1),
-                   &_junction_overlaps);
-  get_all_overlaps(std::bind(LaneInfoConstPtr::speed_bumps, _1),
+  get_all_overlaps(std::bind(&LaneInfo::speed_bumps, _1),
                    &_speed_bump_overlaps);
   */
 }
