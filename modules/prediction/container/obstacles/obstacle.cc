@@ -754,7 +754,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     point[1] = feature->t_position().y();
     heading = feature->t_velocity_heading();
   }
-  std::vector<const LaneInfo*> current_lanes;
+  std::vector<std::shared_ptr<const LaneInfo>> current_lanes;
   map->OnLane(current_lanes_, point, heading, FLAGS_search_radius,
               &current_lanes);
   current_lanes_ = current_lanes;
@@ -767,7 +767,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     lane = feature->lane();
   }
   double min_heading_diff = std::numeric_limits<double>::infinity();
-  for (const LaneInfo* current_lane : current_lanes) {
+  for (std::shared_ptr<const LaneInfo> current_lane : current_lanes) {
     int turn_type = map->LaneTurnType(current_lane->id());
     std::string lane_id = current_lane->id().id();
     double s = 0.0;
@@ -818,14 +818,14 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     point[1] = feature->t_position().y();
   }
 
-  std::vector<const LaneInfo*> nearby_lanes;
+  std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
   map->NearbyLanesByCurrentLanes(point, current_lanes_, &nearby_lanes);
   if (nearby_lanes.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no nearby lanes.";
     return;
   }
 
-  for (const LaneInfo* nearby_lane : nearby_lanes) {
+  for (std::shared_ptr<const LaneInfo> nearby_lane : nearby_lanes) {
     if (nearby_lane == nullptr) {
       continue;
     }
@@ -871,7 +871,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
   CHECK_NOTNULL(map);
 
   for (auto& lane : feature->lane().current_lane_feature()) {
-    const LaneInfo* lane_info = map->LaneById(lane.lane_id());
+    std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane.lane_id());
     RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
@@ -883,7 +883,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     }
   }
   for (auto& lane : feature->lane().nearby_lane_feature()) {
-    const LaneInfo* lane_info = map->LaneById(lane.lane_id());
+    std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane.lane_id());
     RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
@@ -933,7 +933,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
           lane_sequence->mutable_lane_segment(lane_index);
       if (s <= lane_segment->end_s()) {
         std::string lane_id = lane_segment->lane_id();
-        const LaneInfo* lane_info = map->LaneById(lane_id);
+        std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane_id);
         if (lane_info == nullptr) {
           break;
         }
