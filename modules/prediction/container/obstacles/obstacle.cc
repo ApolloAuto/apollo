@@ -799,13 +799,13 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
       lane.mutable_lane_feature()->CopyFrom(*lane_feature);
       min_heading_diff = std::fabs(angle_diff);
     }
-    ADEBUG << "Obstacle [" << id_ << "] has lane feature "
-           << lane_feature->ShortDebugString();
+    ADEBUG << "Obstacle [" << id_ << "] has current lanes ["
+           << lane_feature->ShortDebugString() << "].";
   }
 
   if (lane.has_lane_feature()) {
     ADEBUG << "Obstacle [" << id_ << "] has one current lane ["
-           << lane.lane_feature().lane_id() << "].";
+           << lane.lane_feature().ShortDebugString() << "].";
   }
 
   feature->mutable_lane()->CopyFrom(lane);
@@ -864,8 +864,8 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     lane_feature->set_angle_diff(angle_diff);
     lane_feature->set_dist_to_left_boundary(left - l);
     lane_feature->set_dist_to_right_boundary(right + l);
-    ADEBUG << "Obstacle [" << id_ << "] has a nearby lane ["
-           << lane_feature->lane_id() << "]";
+    ADEBUG << "Obstacle [" << id_ << "] has nearby lanes ["
+           << lane_feature->ShortDebugString() << "]";
   }
 }
 
@@ -878,11 +878,11 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
-    for (auto& lane_seq : lane_graph.lane_sequence()) {
-      feature->mutable_lane()
-          ->mutable_lane_graph()
-          ->add_lane_sequence()
-          ->CopyFrom(lane_seq);
+    for (const auto& lane_seq : lane_graph.lane_sequence()) {
+      feature->mutable_lane()->mutable_lane_graph()
+          ->add_lane_sequence()->CopyFrom(lane_seq);
+      ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
+             << lane_seq.ShortDebugString() << "].";
     }
   }
   for (auto& lane : feature->lane().nearby_lane_feature()) {
@@ -890,19 +890,19 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
-    for (auto& lane_seq : lane_graph.lane_sequence()) {
-      feature->mutable_lane()
-          ->mutable_lane_graph()
-          ->add_lane_sequence()
-          ->CopyFrom(lane_seq);
+    for (const auto& lane_seq : lane_graph.lane_sequence()) {
+      feature->mutable_lane()->mutable_lane_graph()
+          ->add_lane_sequence()->CopyFrom(lane_seq);
+      ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
+             << lane_seq.ShortDebugString() << "].";
     }
   }
 
-  if (feature->lane().has_lane_graph()) {
+  if (feature->has_lane() && feature->lane().has_lane_graph()) {
     SetLanePoints(feature);
   }
 
-  ADEBUG << "Obstacle [" << id_ << "] has lane graph feature";
+  ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
 }
 
 void Obstacle::SetLanePoints(Feature* feature) {
@@ -973,7 +973,7 @@ void Obstacle::SetMotionStatus() {
   int history_size = static_cast<int>(feature_history_.size());
   if (history_size < 2) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
-           << "is considered still [default = true].";
+           << "is considered stationary [default = true].";
     if (history_size > 0) {
       feature_history_.front().set_is_still(is_still);
     }
@@ -1018,7 +1018,7 @@ void Obstacle::SetMotionStatus() {
   if (apollo::common::math::DoubleCompare(speed, speed_threshold) < 0) {
     is_still = true;
     ADEBUG << "Obstacle [" << id_
-           << "] has a small speed and is considered still.";
+           << "] has a small speed and is considered stationary.";
   } else if (apollo::common::math::DoubleCompare(speed_sensibility,
                                                  speed_threshold) < 0) {
     is_still = false;
@@ -1033,7 +1033,7 @@ void Obstacle::SetMotionStatus() {
       ADEBUG << "Obstacle [" << id_ << "] is moving.";
     } else {
       is_still = true;
-      ADEBUG << "Obstacle [" << id_ << "] is still.";
+      ADEBUG << "Obstacle [" << id_ << "] is stationary.";
     }
   }
 }
@@ -1056,7 +1056,7 @@ void Obstacle::Trim() {
     ++count;
   }
   if (count > 0) {
-    ADEBUG << "Obstacle [" << id_ << "] trim "
+    ADEBUG << "Obstacle [" << id_ << "] trimmed "
            << count << " historical features";
   }
 }
