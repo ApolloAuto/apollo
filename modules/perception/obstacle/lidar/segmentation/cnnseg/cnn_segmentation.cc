@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/base/file_util.h"
@@ -40,7 +41,6 @@ bool CNNSegmentation::Init() {
   AINFO << "--     proto_file: " << proto_file;
   AINFO << "--    weight_file: " << weight_file;
 
-  //cnnseg::load_text_proto_message_file(config_file, cnnseg_param_);
   if (!apollo::common::util::GetProtoFromFile(config_file, &cnnseg_param_)) {
     AERROR << "Failed to load config file of CNNSegmentation.";
   }
@@ -49,7 +49,7 @@ bool CNNSegmentation::Init() {
   apollo::perception::cnnseg::NetworkParam network_param = cnnseg_param_.network_param();
   apollo::perception::cnnseg::FeatureParam feature_param = cnnseg_param_.feature_param();
 
-  range_ = static_cast<int>(feature_param.point_cloud_range());
+  range_ = static_cast<float>(feature_param.point_cloud_range());
   width_ = static_cast<int>(feature_param.width());
   height_ = static_cast<int>(feature_param.height());
 
@@ -88,8 +88,12 @@ bool CNNSegmentation::Init() {
   CHECK(feature_blob_ != nullptr) << "`" << network_param.feature_blob()
                                   << "` not exists!";
 
-  cluster2d_->Init(height_, width_, range_);
+  cluster2d_.reset(new cnnseg::Cluster2D());
+  if (!cluster2d_->Init(height_, width_, range_)) {
+    AERROR << "Fail to init cluster2d for CNNSegmentation";
+  }
 
+  feature_generator_.reset(new cnnseg::FeatureGenerator<float>());
   if (!feature_generator_->Init(feature_param, feature_blob_.get())) {
     AERROR << "Fail to init feature generator for CNNSegmentation";
     return false;
@@ -109,7 +113,7 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
     return true;
   }
 
-  use_full_cloud_ = cnnseg_param_.use_full_cloud() && options.origin_cloud;
+  use_full_cloud_ = cnnseg_param_.use_full_cloud() && (options.origin_cloud != nullptr);
   timer_.Tic();
 
   // generate raw features
@@ -130,6 +134,7 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
                       cnnseg_param_.objectness_thresh(),
                       cnnseg_param_.use_all_grids_for_clustering());
   clust_time_ = timer_.Toc(true);
+
   cluster2d_->Filter(*confidence_pt_blob_, *height_pt_blob_);
   cluster2d_->GetObjects(cnnseg_param_.confidence_thresh(),
                          cnnseg_param_.height_thresh(),
@@ -152,6 +157,9 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
 bool CNNSegmentation::GetConfigs(string& config_file,
                                  string& proto_file,
                                  string& weight_file) {
+  FLAGS_work_root = "modules/perception/";
+  FLAGS_config_manager_path = "./conf/config_manager.config";
+
   ConfigManager *config_manager = Singleton<ConfigManager>::Get();
   CHECK_NOTNULL(config_manager);
 

@@ -19,6 +19,7 @@
 
 #include <vector>
 #include "caffe/caffe.hpp"
+#include "modules/common/log.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/common/disjoint_set.h"
@@ -44,7 +45,10 @@ struct Obstacle {
 
 class Cluster2D {
  public:
-  void Init(const int rows, const int cols, const float range) {
+  Cluster2D() {}
+  ~Cluster2D() {}
+
+  bool Init(int rows, int cols, float range) {
     rows_ = rows;
     cols_ = cols;
     grids_ = rows_ * cols_;
@@ -57,6 +61,7 @@ class Cluster2D {
     id_img_.assign(grids_, -1);
     pc_ptr_.reset();
     valid_indices_in_pc_ = nullptr;
+    return true;
   }
 
   void Cluster(const caffe::Blob<float>& category_pt_blob,
@@ -75,15 +80,11 @@ class Cluster2D {
 
     // map points into grids
     size_t tot_point_num = pc_ptr_->size();
-    //const std::vector<int>& indices = valid_indices.indices;
-    //CHECK_LE(indices.size(), tot_point_num);
-    //point2grid_.assign(indices.size(), -1);
     valid_indices_in_pc_ = &(valid_indices.indices);
     CHECK_LE(valid_indices_in_pc_->size(), tot_point_num);
     point2grid_.assign(valid_indices_in_pc_->size(), -1);
 
     for (size_t i = 0; i < valid_indices_in_pc_->size(); ++i) {
-      //int point_id = indices[i];
       int point_id = valid_indices_in_pc_->at(i);
       CHECK_GE(point_id, 0);
       CHECK_LT(point_id, static_cast<int>(tot_point_num));
@@ -92,7 +93,6 @@ class Cluster2D {
       // so we swap them back here.
       int pos_x = F2I(point.y, range_, inv_res_x_);  // col
       int pos_y = F2I(point.x, range_, inv_res_y_);  // row
-      //if (pos_x < _cols && pos_x >= 0 && pos_y < _rows && pos_y >= 0) {
       if (IsValidRowCol(pos_y, pos_x)) {
         // get grid index and count point number for corresponding node
         point2grid_[i] = RowCol2Grid(pos_y, pos_x);
@@ -133,16 +133,6 @@ class Cluster2D {
         }
         for (int row2 = row - 1; row2 <= row + 1; row2++) {
           for (int col2 = col - 1; col2 <= col + 1; col2++) {
-            /*
-            if (std::abs(row - row2) + std::abs(col - col2) <= 1 &&
-                row2 >= 0 && row2 < _rows &&
-                col2 >= 0 && col2 < _cols) {
-              Node* node2 = &_nodes[row2][col2];
-              if (node2->is_center) {
-                disjoint_set_union(node, node2);
-              }
-            }
-            */
             if ((row2 == row || col2 == col) && IsValidRowCol(row2, col2)) {
               Node* node2 = &nodes[row2][col2];
               if (node2->is_center) {
@@ -169,9 +159,8 @@ class Cluster2D {
           CHECK_EQ(static_cast<int>(obstacles_.size()), count_obstacles - 1);
           obstacles_.push_back(Obstacle());
         }
-        //id_img_.at<int>(row, col) = root->obstacle_id;
         int grid = RowCol2Grid(row, col);
-        //CHECK_GE(root->obstacle_id, 0);
+        CHECK_GE(root->obstacle_id, 0);
         id_img_[grid] = root->obstacle_id;
         obstacles_[root->obstacle_id].grids.push_back(grid);
       }
@@ -189,7 +178,6 @@ class Cluster2D {
       double score = 0.0;
       double height = 0.0;
       for (int grid : obs->grids) {
-        //int grid = obs->grids[grid_id];
         score += static_cast<double>(confidence_pt_data[grid]);
         height += static_cast<double>(height_pt_data[grid]);
       }
@@ -203,26 +191,6 @@ class Cluster2D {
                   const float height_thresh,
                   const int min_pts_num,
                   std::vector<ObjectPtr>* objects) {
-    /*
-    for (const auto point : pc_ptr->points) {
-      // * the coordinates of x and y have been exchanged in feature generation step,
-      // so we swap them back here.
-      int pos_x = F2I(point.y, _range, inv_res_x_);
-      int pos_y = F2I(point.x, _range, inv_res_y_);
-      //if (pos_x < _cols && pos_x >= 0 && pos_y < _rows && pos_y >= 0) {
-      if (IsValidRowCol(pos_y, pos_x)) {
-        //int obs_id = id_img_.at<int>(pos_y, pos_x);
-        int obstacle_id = id_img_[RowCol2Grid(pos_y, pos_x)];
-        if (obstacle_id >= 0 && obstacles_[obstacle_id].score >= confidence_thresh) {
-          if (height_thresh < 0 ||
-              point.z <= obstacles_[obstacle_id].height + height_thresh) {
-            obstacles_[obstacle_id].cloud->push_back(point);
-          }
-        }
-      }
-    }
-    */
-
     CHECK(valid_indices_in_pc_ != nullptr);
 
     for (size_t i = 0; i < point2grid_.size(); ++i) {

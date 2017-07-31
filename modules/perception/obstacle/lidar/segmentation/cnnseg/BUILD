@@ -6,11 +6,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "perception_obstacle_lidar_segmention_cnnseg",
-    srcs = ["cnn_segmentation.cpp"],
+    srcs = ["cnn_segmentation.cc"],
     hdrs = ["cnn_segmentation.h"],
     deps = [
         "@caffe//:caffe",
         "//modules/common:log",
+        "//modules/perception/common:perception_common",
         "//modules/common/util:util",
         "//modules/perception/lib/pcl_util:pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
@@ -20,7 +21,7 @@ cc_library(
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_feature_generator",
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_cluster2d",
         "//modules/perception/lib/base:base",
-        "//modules/perception/lib/config_manager:config_manager"
+        "//modules/perception/lib/config_manager:config_manager",
     ],
 )
 
@@ -32,7 +33,7 @@ cc_library(
 
 cc_library(
     name = "cnnseg_feature_generator",
-    srcs = ["feature_generator.cpp"],
+    srcs = ["feature_generator.cc"],
     hdrs = ["feature_generator.h"],
     deps = [
          "@caffe//:caffe",
@@ -49,6 +50,7 @@ cc_library(
     hdrs = ["cluster2d.h"],
     deps = [
          "@caffe//:caffe",
+         "//modules/common:log",
          "//modules/perception/lib/pcl_util:pcl_util",
          "//modules/perception/obstacle/base:perception_obstacle_base",
          "//modules/perception/obstacle/common:perception_obstacle_common",

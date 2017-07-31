@@ -105,8 +105,6 @@ class FeatureGenerator {
   int pc_gpu_size_ = 0;
   std::shared_ptr<caffe::Blob<Dtype>> log_table_blob_;
 #endif
-
-  //DISALLOW_COPY_AND_ASSIGN(FeatureGenerator);
 };
 
 typedef FeatureGenerator<float> FP32FeatureGenerator;
