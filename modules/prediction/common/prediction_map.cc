@@ -163,11 +163,8 @@ void PredictionMap::OnLane(
           candidate_lane->get_nearest_point(vec_point, &distance);
       double nearest_point_heading =
           PathHeading(candidate_lane, nearest_point);
-      AINFO << "heading = " << heading;
-      AINFO << "nearest point heading = " << nearest_point_heading;
       double diff = std::fabs(
           apollo::common::math::AngleDiff(heading, nearest_point_heading));
-      AINFO << "angle diff = " << diff;
       if (diff <= FLAGS_max_lane_angle_diff) {
         lanes->push_back(candidate_lane);
       }
@@ -197,7 +194,8 @@ int PredictionMap::SmoothPointFromLane(const apollo::hdmap::Id& id,
   std::shared_ptr<const LaneInfo> lane = LaneById(id);
   apollo::common::PointENU hdmap_point = lane->get_smooth_point(s);
   *heading = PathHeading(lane, hdmap_point);
-  AINFO << "lane_s = ["
+  AINFO << "lane_id = " << id.id() << ", "
+        << "lane_s = ["
         << std::fixed << std::setprecision(6) << s << "], "
         << "hdmap pt = ["
         << std::fixed << std::setprecision(6)
