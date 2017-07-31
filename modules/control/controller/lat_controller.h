@@ -26,11 +26,11 @@
 #include <memory>
 #include <string>
 
+#include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/filters/digital_filter.h"
 #include "modules/control/filters/digital_filter_coefficients.h"
-#include "modules/control/common/interpolation_1d.h"
 #include "modules/control/filters/mean_filter.h"
 
 /**
@@ -98,8 +98,6 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleLateralDebug *debug);
-
   void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
 
   void UpdateMatrix();

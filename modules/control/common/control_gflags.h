@@ -25,9 +25,6 @@ DECLARE_string(control_conf_file);
 DECLARE_double(min_alert_interval);
 DECLARE_bool(enable_csv_debug);
 
-// gflags for test purpose
-DECLARE_bool(use_state_exact_match);
-
 // temporary gflag for test purpose
 DECLARE_bool(enable_speed_station_preview);
 
