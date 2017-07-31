@@ -51,7 +51,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
     for (std::size_t i = 0; i < points.size(); ++i) {
       ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, -2.0, 2.0);
     }
-    reference_line_.reset(new ReferenceLine(ref_points));
+    reference_line_.reset(new ReferenceLine(hdmap_, ref_points));
     vehicle_position_ = points[0];
   }
 

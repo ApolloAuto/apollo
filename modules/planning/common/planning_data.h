@@ -43,7 +43,8 @@ class PlanningData {
   PlanningData() = default;
 
   // copy reference line to planning data
-  void set_reference_line(const std::vector<ReferencePoint>& ref_points);
+  void set_reference_line(const apollo::hdmap::HDMap& hdmap,
+                          const std::vector<ReferencePoint>& ref_points);
   void set_decision_data(std::shared_ptr<DecisionData>& decision_data);
   void set_init_planning_point(const TrajectoryPoint& init_planning_point);
 
