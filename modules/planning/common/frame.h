@@ -28,10 +28,10 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/map/proto/routing.pb.h"
-
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_data.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -42,6 +42,8 @@ class Frame {
 
   void SetInitPose(const localization::Pose &init_pose);
   void SetRouting(const hdmap::RoutingResult &routing);
+  void SetDecisionDataFromPrediction(
+      const prediction::PredictionObstacles &prediction_obstacles);
   bool Init();
 
   uint32_t sequence_num() const;

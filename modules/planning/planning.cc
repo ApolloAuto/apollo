@@ -62,7 +62,7 @@ Status Planning::Init() {
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
   if (AdapterManager::GetChassis() == nullptr) {
-    std::string error_msg("chassis is not registered");
+    std::string error_msg("Chassis is not registered");
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
@@ -83,6 +83,12 @@ Status Planning::Init() {
       AWARN << "Using offline routing file " << FLAGS_offline_routing_file;
     }
   }
+  if (AdapterManager::GetPrediction() == nullptr) {
+    std::string error_msg("Prediction is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
+
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
   if (!planner_) {
@@ -160,13 +166,6 @@ void Planning::RunOnce() {
   // chassis
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
-
-  if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
-    // prediction
-    const auto& prediction =
-        AdapterManager::GetPrediction()->GetLatestObserved();
-    ADEBUG << "Get prediction:" << prediction.DebugString();
-  }
 
   common::VehicleState::instance()->Update(localization, chassis);
 

@@ -39,6 +39,38 @@ void Frame::SetRouting(const hdmap::RoutingResult &routing) {
   routing_result_ = routing;
 }
 
+void Frame::SetDecisionDataFromPrediction(
+    const prediction::PredictionObstacles &prediction_obstacles) {
+  for (const auto &prediction_obstacle :
+      prediction_obstacles.prediction_obstacle()) {
+    Obstacle obstacle;
+    auto& perception_obstacle = prediction_obstacle.perception_obstacle();
+    obstacle.SetId(perception_obstacle.id());
+    obstacle.SetType(perception_obstacle.type());
+    obstacle.SetHeight(perception_obstacle.height());
+    obstacle.SetWidth(perception_obstacle.width());
+    obstacle.SetLength(perception_obstacle.length());
+    double theta = perception_obstacle.theta();
+    obstacle.SetHeading(theta);
+    double speed = perception_obstacle.velocity().x() * cos(theta) +
+        perception_obstacle.velocity().y() * sin(theta);
+    obstacle.SetSpeed(speed);
+
+    for (const auto &trajectory : prediction_obstacle.trajectory()) {
+      PredictionTrajectory prediction_trajectory;
+      prediction_trajectory.set_probability(trajectory.probability());
+      prediction_trajectory.set_start_timestamp(
+          prediction_obstacle.time_stamp());
+      for (const auto &trajectory_point : trajectory.trajectory_point()) {
+        prediction_trajectory.add_trajectory_point(trajectory_point);
+      }
+      obstacle.add_prediction_trajectory(prediction_trajectory);
+    }
+
+    mutable_planning_data()->mutable_decision_data()->AddObstacle(obstacle);
+  }
+}
+
 bool Frame::Init() {
   if (!pnc_map_) {
     AERROR << "map is null, call SetMap() first";
