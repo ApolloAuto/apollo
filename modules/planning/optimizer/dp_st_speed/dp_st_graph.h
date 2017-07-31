@@ -51,15 +51,15 @@ class DpStGraph {
   apollo::common::Status CalculatePointwiseCost(
       const std::vector<StGraphBoundary>& boundaries);
 
-  apollo::common::Status CalculateTotalCost();
-
   apollo::common::Status retrieve_speed_profile(
       SpeedData* const speed_data) const;
 
   apollo::common::Status get_object_decision(
       const StGraphData& st_graph_data, const SpeedData& speed_profile) const;
 
-  void CalculateTotalCost(const std::uint32_t r, const std::uint32_t c);
+  apollo::common::Status CalculateTotalCost(const StGraphData& st_graph_data);
+  void CalculateTotalCost(const StGraphData& st_graph_data, const uint32_t r,
+                          const uint32_t c);
 
   double CalculateEdgeCost(const STPoint& first, const STPoint& second,
                            const STPoint& third, const STPoint& forth,
@@ -72,26 +72,26 @@ class DpStGraph {
 
   // feasible c_prepre range given c_pre, c
   bool CalculateFeasibleAccelRange(const double c_pre, const double c_cur,
-                                   std::uint32_t* const lower_bound,
-                                   std::uint32_t* const upper_bound) const;
+                                   uint32_t* const lower_bound,
+                                   uint32_t* const upper_bound) const;
 
  private:
   // dp st configuration
-  DpStSpeedConfig _dp_st_speed_config;
+  DpStSpeedConfig dp_st_speed_config_;
 
   // cost utility with configuration;
-  DpStCost _dp_st_cost;
+  DpStCost dp_st_cost_;
 
   // initial status
-  TrajectoryPoint _init_point;
+  TrajectoryPoint init_point_;
 
   // mappign obstacle to st graph
   // std::unique_ptr<StBoundaryMapper> _st_mapper = nullptr;
 
-  double _unit_s = 0.0;
-  double _unit_t = 0.0;
+  double unit_s_ = 0.0;
+  double unit_t_ = 0.0;
 
-  std::vector<std::vector<StGraphPoint> > _cost_table;
+  std::vector<std::vector<StGraphPoint> > cost_table_;
 };
 
 }  // namespace planning
