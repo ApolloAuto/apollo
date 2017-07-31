@@ -25,6 +25,8 @@ echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
 echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${DOCKER_USER}/.bashrc"
 chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
+cp -r /root/modules_data/* /apollo/modules/
+chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
 
 # grant caros user to access GPS device
 if [ -e /dev/ttyUSB0 ]; then
