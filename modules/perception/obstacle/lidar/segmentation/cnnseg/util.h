@@ -62,17 +62,6 @@ inline float Pixel2Pc(int in_pixel, float in_size, float out_range) {
   return out_range - (static_cast<float>(in_pixel) + 0.5f) * res;
 }
 
-/*
-void load_text_proto_message_file(const std::string& path,
-                                  google::protobuf::Message& msg) {
-  int fd = open(path.c_str(), O_RDONLY);
-  PCHECK(fd >= 0) << "path[" << path << "]";
-  google::protobuf::io::FileInputStream file_in(fd);
-  CHECK(google::protobuf::TextFormat::Parse(&file_in, &msg)) << "path[" << path << "]";
-  PCHECK(0 == close(fd));
-}
-*/
-
 }  // namespace cnnseg
 }  // namespace perception
 }  // namespace apollo

@@ -10,6 +10,9 @@ cc_library(
     ],
     hdrs = glob([
         "include/caffe/*.hpp",
+        "include/caffe/layers/*.hpp",
+        "include/caffe/util/*.hpp",
+        "include/caffe/test/*.hpp",
         "build/include/caffe/proto/*.ph.h",
     ]),
     defines = [

@@ -35,48 +35,47 @@ namespace perception {
 
 class CNNSegmentation : public BaseSegmentation {
  public:
-  CNNSegmentation() : BaseSegmentation() {
-  }
+  CNNSegmentation() : BaseSegmentation() {}
+  ~CNNSegmentation() {}
 
-  ~CNNSegmentation() {
-  }
+  bool Init() override;
 
-  virtual bool Init() override;
-
-  virtual bool Segment(const pcl_util::PointCloudPtr& pc_ptr,
+  bool Segment(const pcl_util::PointCloudPtr& pc_ptr,
                        const pcl_util::PointIndices& valid_indices,
                        const SegmentationOptions& options,
                        std::vector<ObjectPtr>* objects) override;
 
-  virtual std::string name() const override {
-    return "CNNSegmentation";
-  }
+  std::string name() const override { return "CNNSegmentation"; }
+
+  float range() const { return range_; }
+  int width() const { return width_; }
+  int height() const { return height_; }
 
  private:
   bool GetConfigs(std::string& config_file,
                   std::string& proto_file,
                   std::string& weight_file);
 
-  int range_;
-  int width_;
-  int height_;
+  float range_;   // range of bird-view field (for each side)   
+  int width_;     // number of cells in bird-view width
+  int height_;    // number of cells in bird-view height
 
-  apollo::perception::cnnseg::CNNSegParam cnnseg_param_;
-  std::shared_ptr<caffe::Net<float> > caffe_net_;
+  apollo::perception::cnnseg::CNNSegParam cnnseg_param_;   // paramters of CNNSegmentation
+  std::shared_ptr<caffe::Net<float> > caffe_net_;          // Caffe network object
 
-  std::shared_ptr<cnnseg::FeatureGenerator<float>> feature_generator_;
+  std::shared_ptr<cnnseg::FeatureGenerator<float>> feature_generator_;   // bird-view raw feature generator
 
-  boost::shared_ptr<caffe::Blob<float> > instance_pt_blob_;          // center offset vector
-  boost::shared_ptr<caffe::Blob<float> > category_pt_blob_;          //
-  boost::shared_ptr<caffe::Blob<float> > confidence_pt_blob_;        //
-  boost::shared_ptr<caffe::Blob<float> > height_pt_blob_;
-  boost::shared_ptr<caffe::Blob<float> > feature_blob_;
+  boost::shared_ptr<caffe::Blob<float> > instance_pt_blob_;    // center offset prediction
+  boost::shared_ptr<caffe::Blob<float> > category_pt_blob_;    // objectness prediction
+  boost::shared_ptr<caffe::Blob<float> > confidence_pt_blob_;  // fg probability prediction
+  boost::shared_ptr<caffe::Blob<float> > height_pt_blob_;      // object height prediction
+  boost::shared_ptr<caffe::Blob<float> > feature_blob_;        // raw features to be input into network
 
-  bool use_full_cloud_;
+  bool use_full_cloud_;                                     // use all points of cloud to compute features
 
-  std::shared_ptr<cnnseg::Cluster2D> cluster2d_;
+  std::shared_ptr<cnnseg::Cluster2D> cluster2d_;            // clustering model for post-processing
 
-  cnnseg::Timer timer_;
+  cnnseg::Timer timer_;                                     // timer
   double feat_time_ = 0.0;
   double network_time_ = 0.0;
   double clust_time_ = 0.0;
