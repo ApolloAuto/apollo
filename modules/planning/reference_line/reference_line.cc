@@ -40,19 +40,22 @@ namespace planning {
 using ReferenceMapLine = hdmap::Path;
 
 ReferenceLine::ReferenceLine(
+    const apollo::hdmap::HDMap& hdmap,
     const std::vector<ReferencePoint>& reference_points)
     : reference_points_(reference_points),
-      reference_map_line_(ReferenceMapLine(std::vector<hdmap::MapPathPoint>(
-          reference_points.begin(), reference_points.end()))) {}
+      reference_map_line_(ReferenceMapLine(
+          &hdmap, std::vector<hdmap::MapPathPoint>(reference_points.begin(),
+                                                   reference_points.end()))) {}
 
 ReferenceLine::ReferenceLine(
+    const apollo::hdmap::HDMap& hdmap,
     const std::vector<ReferencePoint>& reference_points,
     const std::vector<hdmap::LaneSegment>& lane_segments,
     const double max_approximation_error)
     : reference_points_(reference_points),
       reference_map_line_(ReferenceMapLine(
-          std::vector<hdmap::MapPathPoint>(reference_points.begin(),
-                                           reference_points.end()),
+          &hdmap, std::vector<hdmap::MapPathPoint>(reference_points.begin(),
+                                                   reference_points.end()),
           lane_segments, max_approximation_error)) {}
 
 ReferencePoint ReferenceLine::get_reference_point(const double s) const {
@@ -244,9 +247,9 @@ bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
 }
 
 std::string ReferenceLine::DebugString() const {
-  const auto limit = std::min(
-      reference_points_.size(),
-      static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
+  const auto limit =
+      std::min(reference_points_.size(),
+               static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
   return apollo::common::util::StrCat(
       "point num:", reference_points_.size(),
       apollo::common::util::PrintDebugStringIter(

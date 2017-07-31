@@ -105,7 +105,8 @@ bool Frame::SmoothReferenceLine() {
     return false;
   }
 
-  std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
+  std::unique_ptr<ReferenceLine> reference_line(
+      new ReferenceLine(*hdmap_, ref_points));
   std::vector<ReferencePoint> smoothed_ref_points;
   ReferenceLineSmoother smoother;
   if (!smoother.Init(FLAGS_reference_line_smoother_config_file)) {
@@ -118,7 +119,7 @@ bool Frame::SmoothReferenceLine() {
     return false;
   }
   ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
-  _planning_data.set_reference_line(smoothed_ref_points);
+  _planning_data.set_reference_line(*hdmap_, smoothed_ref_points);
   return true;
 }
 
