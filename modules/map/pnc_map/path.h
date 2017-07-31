@@ -184,10 +184,11 @@ class Path {
  public:
   Path() = default;
 
-  explicit Path(std::vector<MapPathPoint> path_points);
-  Path(std::vector<MapPathPoint> path_points,
+  Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points);
+
+  Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points,
        std::vector<LaneSegment> lane_segments);
-  Path(std::vector<MapPathPoint> path_points,
+  Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points,
        std::vector<LaneSegment> lane_segments,
        const double max_approximation_error);
 
@@ -278,11 +279,13 @@ class Path {
   double get_sample(const std::vector<double>& samples, const double s) const;
 
   using GetOverlapFromLaneFunc =
-      std::function<const std::vector<OverlapInfoConstPtr>&(LaneInfoConstPtr&)>;
+      std::function<const std::vector<apollo::hdmap::Id>&(const LaneInfo&)>;
   void get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
                         std::vector<PathOverlap>* const overlaps) const;
 
  protected:
+  const HDMap* hdmap_;
+
   int _num_points = 0;
   int _num_segments = 0;
   std::vector<MapPathPoint> _path_points;
