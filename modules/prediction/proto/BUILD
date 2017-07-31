@@ -76,3 +76,14 @@ py_proto_compile(
         "//modules/perception/proto:perception_proto_pylib",
     ],
 )
+
+py_proto_compile(
+    name = "prediction_model_proto_pylib",
+    protos = [
+        "fnn_model_base.proto",
+        "fnn_vehicle_model.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_pylib",
+    ]
+)
