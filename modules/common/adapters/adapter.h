@@ -114,7 +114,9 @@ class Adapter {
   /**
    * @brief returns the topic name that this adapter listens to.
    */
-  const std::string& topic_name() const { return topic_name_; }
+  const std::string& topic_name() const {
+    return topic_name_;
+  }
 
   /**
    * @brief reads the proto message from the file, and push it into
@@ -132,7 +134,9 @@ class Adapter {
    * the adapter.
    * @param data the input data.
    */
-  void FeedData(const D& data) { EnqueueData(data); }
+  void FeedData(const D& data) {
+    EnqueueData(data);
+  }
 
   /**
    * @brief the callback that will be invoked whenever a new
@@ -205,14 +209,18 @@ class Adapter {
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator begin() const { return observed_queue_.begin(); }
+  Iterator begin() const {
+    return observed_queue_.begin();
+  }
 
   /**
    * @brief returns an iterator representing the tail of the observing
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator end() const { return observed_queue_.end(); }
+  Iterator end() const {
+    return observed_queue_.end();
+  }
 
   /**
    * @brief registers the provided callback function to the adapter,
@@ -220,14 +228,18 @@ class Adapter {
    * message hits the adapter.
    * @param callback the callback with signature void(const D &).
    */
-  void SetCallback(Callback callback) { receive_callback_ = callback; }
+  void SetCallback(Callback callback) {
+    receive_callback_ = callback;
+  }
 
   /**
    * @brief fills the fields module_name, timestamp_sec and
    * sequence_num in the header.
    */
-  void FillHeader(const std::string& module_name,
-                  apollo::common::Header* header) {
+  void FillHeader(const std::string& module_name, D* data) {
+    static_assert(std::is_base_of<google::protobuf::Message, D>::value,
+                  "Can only fill header to proto messages!");
+    auto* header = data->mutable_header();
     double timestamp =
         apollo::common::time::ToSecond(apollo::common::time::Clock::Now());
     header->set_module_name(module_name);
@@ -235,7 +247,9 @@ class Adapter {
     header->set_sequence_num(++seq_num_);
   }
 
-  uint32_t GetSeqNum() const { return seq_num_; }
+  uint32_t GetSeqNum() const {
+    return seq_num_;
+  }
 
  private:
   template <typename T>

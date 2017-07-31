@@ -44,7 +44,7 @@ void Monitor::Publish(const std::vector<MessageItem> &messages) const {
 }
 
 void Monitor::DoPublish(MonitorMessage *message) const {
-  AdapterManager::FillMonitorHeader("monitor", message->mutable_header());
+  AdapterManager::FillMonitorHeader("monitor", message);
   AdapterManager::PublishMonitor(*message);
 }
 

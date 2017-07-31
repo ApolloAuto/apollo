@@ -172,7 +172,7 @@ void SimControl::TimerCallback(const ros::TimerEvent& event) {
 
 void SimControl::PublishChassis(double lambda) {
   Chassis chassis;
-  AdapterManager::FillChassisHeader("SimControl", chassis.mutable_header());
+  AdapterManager::FillChassisHeader("SimControl", &chassis);
 
   chassis.set_engine_started(true);
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
@@ -188,8 +188,7 @@ void SimControl::PublishChassis(double lambda) {
 
 void SimControl::PublishLocalization(double lambda) {
   LocalizationEstimate localization;
-  AdapterManager::FillLocalizationHeader("SimControl",
-                                         localization.mutable_header());
+  AdapterManager::FillLocalizationHeader("SimControl", &localization);
 
   auto* pose = localization.mutable_pose();
   auto prev = prev_point_.path_point();

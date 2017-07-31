@@ -245,8 +245,7 @@ void Planning::RunOnce() {
   ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
 
   if (res_planning) {
-    AdapterManager::FillPlanningHeader("planning",
-                                       trajectory_pb.mutable_header());
+    AdapterManager::FillPlanningHeader("planning", &trajectory_pb);
     trajectory_pb.mutable_header()->set_timestamp_sec(execution_start_time);
     AdapterManager::PublishPlanning(trajectory_pb);
     ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();

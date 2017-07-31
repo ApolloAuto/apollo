@@ -47,11 +47,11 @@ namespace {
 static constexpr char kHMIRosNodeName[] = "hmi_ros_node_service";
 
 void SendPadMessage(DrivingAction action) {
-  control::PadMessage pb;
-  pb.set_action(action);
-  AINFO << "Sending PadMessage:\n" << pb.DebugString();
-  AdapterManager::FillPadHeader(kHMIRosNodeName, pb.mutable_header());
-  AdapterManager::PublishPad(pb);
+  control::PadMessage pad;
+  pad.set_action(action);
+  AINFO << "Sending PadMessage:\n" << pad.DebugString();
+  AdapterManager::FillPadHeader(kHMIRosNodeName, &pad);
+  AdapterManager::PublishPad(pad);
 }
 
 /**
