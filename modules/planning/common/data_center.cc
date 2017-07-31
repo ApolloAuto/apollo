@@ -75,7 +75,7 @@ bool DataCenter::init_current_frame(const uint32_t sequence_num) {
 
   if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
     // prediction
-    const auto& prediction =
+    const auto &prediction =
         AdapterManager::GetPrediction()->GetLatestObserved();
     ADEBUG << "Get prediction:" << prediction.DebugString();
     _frame->SetDecisionDataFromPrediction(prediction);

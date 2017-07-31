@@ -113,10 +113,12 @@ DEFINE_double(stgraph_max_deceleration_divide_factor_level_2, 2.0,
 
 // Decision Part
 DEFINE_double(static_decision_ignore_range, 3.0,
-    "threshold for judging nudge in dp path computing decision");
-DEFINE_double(static_decision_stop_buffer, 0.5,
+              "threshold for judging nudge in dp path computing decision");
+DEFINE_double(
+    static_decision_stop_buffer, 0.5,
     "added distance to vehicle width for static decision collision judgement");
-DEFINE_double(dp_path_decision_buffer, 0.65, "buffer in decision while dp path computing decision");
+DEFINE_double(dp_path_decision_buffer, 0.65,
+              "buffer in decision while dp path computing decision");
 
 // Prediction Part
 

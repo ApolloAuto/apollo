@@ -42,9 +42,9 @@ void Frame::SetRouting(const hdmap::RoutingResult &routing) {
 void Frame::SetDecisionDataFromPrediction(
     const prediction::PredictionObstacles &prediction_obstacles) {
   for (const auto &prediction_obstacle :
-      prediction_obstacles.prediction_obstacle()) {
+       prediction_obstacles.prediction_obstacle()) {
     Obstacle obstacle;
-    auto& perception_obstacle = prediction_obstacle.perception_obstacle();
+    auto &perception_obstacle = prediction_obstacle.perception_obstacle();
     obstacle.SetId(perception_obstacle.id());
     obstacle.SetType(perception_obstacle.type());
     obstacle.SetHeight(perception_obstacle.height());
@@ -53,7 +53,7 @@ void Frame::SetDecisionDataFromPrediction(
     double theta = perception_obstacle.theta();
     obstacle.SetHeading(theta);
     double speed = perception_obstacle.velocity().x() * cos(theta) +
-        perception_obstacle.velocity().y() * sin(theta);
+                   perception_obstacle.velocity().y() * sin(theta);
     obstacle.SetSpeed(speed);
 
     for (const auto &trajectory : prediction_obstacle.trajectory()) {

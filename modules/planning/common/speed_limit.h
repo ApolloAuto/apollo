@@ -36,6 +36,7 @@ class SpeedLimit {
                        const double a, const double da);
   const std::vector<common::SpeedPoint>& speed_limits() const;
   double get_speed_limit(const double s) const;
+
  private:
   std::vector<common::SpeedPoint> _speed_point;
 };

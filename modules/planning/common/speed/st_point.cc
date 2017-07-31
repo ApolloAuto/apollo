@@ -38,9 +38,10 @@ void STPoint::set_s(const double s) { return set_y(s); }
 void STPoint::set_t(const double t) { return set_x(t); }
 
 std::string STPoint::DebugString() const {
-  return apollo::common::util::StrCat(
-      "{ \"s\" : ", std::setprecision(6), s(), ", "
-      "\"t\" : ", std::setprecision(6), t(), " }");
+  return apollo::common::util::StrCat("{ \"s\" : ", std::setprecision(6), s(),
+                                      ", "
+                                      "\"t\" : ",
+                                      std::setprecision(6), t(), " }");
 }
 
 }  // namespace planning

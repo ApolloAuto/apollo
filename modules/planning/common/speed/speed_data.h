@@ -49,6 +49,7 @@ class SpeedData {
   double total_time() const;
 
   void Clear();
+
  private:
   common::SpeedPoint interpolate(const common::SpeedPoint& left,
                                  const common::SpeedPoint& right,

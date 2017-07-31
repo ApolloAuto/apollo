@@ -46,19 +46,19 @@ void SpeedData::add_speed_point(const double s, const double time,
 }
 
 SpeedData::SpeedData(const std::vector<common::SpeedPoint>& speed_points)
-    : speed_vector_(speed_points) {
-}
+    : speed_vector_(speed_points) {}
 
 const std::vector<common::SpeedPoint>& SpeedData::speed_vector() const {
   return speed_vector_;
 }
 
-void SpeedData::set_speed_vector(const std::vector<common::SpeedPoint>& speed_points) {
+void SpeedData::set_speed_vector(
+    const std::vector<common::SpeedPoint>& speed_points) {
   speed_vector_ = std::move(speed_points);
 }
 
-bool SpeedData::get_speed_point_with_time(const double t,
-                                         common::SpeedPoint* const speed_point) const {
+bool SpeedData::get_speed_point_with_time(
+    const double t, common::SpeedPoint* const speed_point) const {
   if (speed_vector_.size() < 2) {
     return false;
   }
@@ -88,18 +88,15 @@ double SpeedData::total_time() const {
   return speed_vector_.back().t() - speed_vector_.front().t();
 }
 
-void SpeedData::Clear() {
-  speed_vector_.clear();
-}
+void SpeedData::Clear() { speed_vector_.clear(); }
 
 std::string SpeedData::DebugString() const {
-  const auto limit = std::min(
-      speed_vector_.size(),
-      static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
+  const auto limit =
+      std::min(speed_vector_.size(),
+               static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
   return apollo::common::util::StrCat(
-      "[\n",
-      apollo::common::util::PrintDebugStringIter(
-          speed_vector_.begin(), speed_vector_.begin() + limit, ",\n"),
+      "[\n", apollo::common::util::PrintDebugStringIter(
+                 speed_vector_.begin(), speed_vector_.begin() + limit, ",\n"),
       "]\n");
 }
 
@@ -113,8 +110,8 @@ std::uint32_t SpeedData::find_index(const double t) const {
 }
 
 common::SpeedPoint SpeedData::interpolate(const common::SpeedPoint& left,
-                                  const common::SpeedPoint& right,
-                                  const double weight) const {
+                                          const common::SpeedPoint& right,
+                                          const double weight) const {
   double s = (1 - weight) * left.s() + weight * right.s();
   double t = (1 - weight) * left.t() + weight * right.t();
   double v = (1 - weight) * left.v() + weight * right.v();
