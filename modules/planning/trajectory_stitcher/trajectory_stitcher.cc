@@ -26,13 +26,15 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
+#include <iostream>
+
 namespace apollo {
 namespace planning {
 
 using VehicleState = apollo::common::VehicleState;
 
 std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
-    const Frame* const prev_frame) {
+        const PublishableTrajectory& prev_trajectory) {
   auto compute_reinit_stitching_trajectory =
       []() {
         TrajectoryPoint init_point;
@@ -55,10 +57,11 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
       };
 
   // no planning history
+  /**
   if (prev_frame == nullptr) {
     return compute_reinit_stitching_trajectory();
   }
-  const auto& prev_trajectory = prev_frame->computed_trajectory();
+  **/
   std::size_t prev_trajectory_size = prev_trajectory.num_of_points();
 
   // previous planning is failed
@@ -70,6 +73,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
 
   const double veh_rel_time =
       VehicleState::instance()->timestamp() - prev_trajectory.header_time();
+
   std::size_t matched_index = prev_trajectory.query_nearest_point(veh_rel_time);
 
   // the previous trajectory is not long enough; something is seriously wrong.
@@ -104,6 +108,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
 
   double zero_time =
       prev_trajectory.trajectory_point_at(matched_index).relative_time();
+
   std::for_each(stitching_trajectory.begin(), stitching_trajectory.end(),
                 [&zero_time](TrajectoryPoint& tp) {
                   tp.set_relative_time(tp.relative_time() - zero_time);
