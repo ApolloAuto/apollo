@@ -20,6 +20,8 @@
 #include <vector>
 #include <utility>
 
+#include "modules/common/proto/path_point.pb.h"
+
 namespace apollo {
 namespace prediction {
 namespace util {
@@ -32,6 +34,9 @@ double Relu(const double value);
 
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots);
+
+void TranslatePoint(const double translate_x, const double translate_y,
+                    apollo::common::TrajectoryPoint* point);
 
 }  // namespace util
 }  // namespace prediction
