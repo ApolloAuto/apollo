@@ -424,6 +424,10 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
                        vehicle_state_.linear_velocity(),
                        vehicle_state_.angular_velocity(), trajectory_analyzer_,
                        debug);
+  // Reverse heading error if vehicle is going in reverse
+  if (vehicle_state_.gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+    debug->set_heading_error(-debug->heading_error());
+  }
 
   // State matrix update;
   // First four elements are fixed;
