@@ -3,87 +3,15 @@
 # pcd path
 # type: string
 # default: ./pcd/
---pcd_path=/home/tim/Data/20160907/icode_format/pcd/
+--pcd_path=./pcd/
 
 # pose path
 # type: string
 # default: ./pose/
---pose_path=/home/tim/Data/20160907/icode_format/pose/
+--pose_path=./pose/
 
 # enable visualization
 # type: bool
 # default: true
 --enable_visualization=true
 
-# roi filter
-# type: string
-# default: HdmapROIFilter
-# others:  DummyROIFilter, StaticROIFilter, 
---roi_filter=StaticROIFilter
-
-# ground detector
-# type: string
-# default: MultiScaleGroundDetector
-#--ground_detector=MultiScaleGroundDetector
---ground_detector=MultiRegionGroundDetector
-
-# segmentor
-# type: string
-# default: MstSegmentation
---segmentor=NCutSegmentation
-
-# object builder
-# type: string
-# default: MinBoxObjectBuilder
---object_builder=MinBoxPlusObjectBuilder
-
-# classifier
-# type: string
-# default: RandomTreesClassifier
---classifier=RandomTreesClassifier
-
-# tracker
-# type: string
-# default: HmObjectTracker
---tracker=MbTracker
-
-# output path
-# type: string
-# default: ./output
---output_path=./output/
-
-#######################################################################
-# Flags from obstacle/lidar/roi_filter/static_roi_filter/static_roi_filter.cpp
-# File to perception map roi file
-# type: string
-# default: ""
---perception_map_roi_file=/home/boxiao/BoXiao/adu/icode/baidu/adu/adu-data/map/sunnyvaleloop/perception_roi.bin
-
-# Maximum distance from ROI to the road graph
-# type: int32
-# default: 5
---perception_map_roi_extension_distance=2
-
-#######################################################################
-# Flags from src/logging.cc
-# If specified, logfiles are written into this directory instead of
-# the default logging directory.
-# type: string
-# default: ""
---log_dir=./logs/
-
-# Show all VLOG(m) messages for m <= this. Overridable by --vmodule.
-# type: int32
-# default: 0
---v=0
-
-# Buffer log messages for at most this many seconds
-# type: int32
-# default: 30
---logbufsecs=3
-
-# Buffer log messages logged at this level or lower
-# (-1 means don't buffer; 0 means buffer INFO only; ...)
-# type: int32
-# default: 0
---logbuflevel=-1
