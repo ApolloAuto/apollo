@@ -123,8 +123,8 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   AdapterManager::FillPredictionHeader(
       Name(), prediction_obstacles.mutable_header());
   AdapterManager::PublishPrediction(prediction_obstacles);
-  ADEBUG << "Published a prediction message ["
-         << prediction_obstacles.ShortDebugString() << "].";
+  // ADEBUG << "Published a prediction message ["
+  //        << prediction_obstacles.ShortDebugString() << "].";
   for (const auto& pob : prediction_obstacles.prediction_obstacle()) {
     for (const auto& traj : pob.trajectory()) {
       for (const auto& traj_point : traj.trajectory_point()) {
