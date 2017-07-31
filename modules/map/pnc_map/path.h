@@ -283,7 +283,7 @@ class Path {
                         std::vector<PathOverlap>* const overlaps) const;
 
  protected:
-  const HDMap* hdmap_;
+  const HDMap* hdmap_ = nullptr;
 
   int _num_points = 0;
   int _num_segments = 0;

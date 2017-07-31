@@ -23,16 +23,15 @@
 #include <string>
 
 #include "modules/common/log.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/routing_helper.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
 
-Frame::Frame(const uint32_t sequence_num) : sequence_num_(sequence_num) {}
-
-void Frame::SetMap(const hdmap::HDMap *hdmap) { hdmap_ = hdmap; }
+Frame::Frame(const uint32_t sequence_num, const hdmap::PncMap *pnc_map)
+    : sequence_num_(sequence_num), pnc_map_(pnc_map) {}
 
 void Frame::SetInitPose(const localization::Pose &pose) { init_pose_ = pose; }
 
@@ -41,8 +40,8 @@ void Frame::SetRouting(const hdmap::RoutingResult &routing) {
 }
 
 bool Frame::Init() {
-  if (!hdmap_) {
-    AERROR << "hdmap is null, call SetMap() first";
+  if (!pnc_map_) {
+    AERROR << "map is null, call SetMap() first";
     return false;
   }
   const auto &point = init_pose_.position();
@@ -82,9 +81,7 @@ bool Frame::CreateReferenceLineFromRouting() {
   vehicle_position.set_y(init_pose_.position().y());
   vehicle_position.set_z(init_pose_.position().z());
 
-  RoutingHelper helper(hdmap_);
-
-  return helper.CreatePathFromRouting(
+  return pnc_map_->CreatePathFromRouting(
       routing_result_, vehicle_position, FLAGS_look_backward_distance,
       FLAGS_look_forward_distance, &hdmap_path_);
 }
@@ -106,7 +103,7 @@ bool Frame::SmoothReferenceLine() {
   }
 
   std::unique_ptr<ReferenceLine> reference_line(
-      new ReferenceLine(*hdmap_, ref_points));
+      new ReferenceLine(*pnc_map_->HDMap(), ref_points));
   std::vector<ReferencePoint> smoothed_ref_points;
   ReferenceLineSmoother smoother;
   if (!smoother.Init(FLAGS_reference_line_smoother_config_file)) {
@@ -119,7 +116,7 @@ bool Frame::SmoothReferenceLine() {
     return false;
   }
   ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
-  _planning_data.set_reference_line(*hdmap_, smoothed_ref_points);
+  _planning_data.set_reference_line(*pnc_map_->HDMap(), smoothed_ref_points);
   return true;
 }
 

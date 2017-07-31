@@ -17,6 +17,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "pnc_map",
+    srcs = [
+        "pnc_map.cc",
+    ],
+    hdrs = [
+        "pnc_map.h",
+    ],
+    deps = [
+        "//modules/map/hdmap",
+        "//modules/map/pnc_map:path",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
 cc_test(
     name = "pnc_path_test",
     size = "small",
