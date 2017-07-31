@@ -183,7 +183,6 @@ class InterpolatedIndex {
 class Path {
  public:
   Path() = default;
-
   Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points);
 
   Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points,
