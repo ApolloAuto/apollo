@@ -27,9 +27,10 @@
 
 #include "google/protobuf/text_format.h"
 
+#include "modules/map/proto/map_id.pb.h"
+
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
-#include "modules/map/proto/map_id.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -365,7 +366,8 @@ bool RoutingHelper::CreatePathFromRouting(const hdmap::RoutingResult &routing,
     }
   }
   remove_duplicates(&points);
-  *path = hdmap::Path(points, lane_segments, kTrajectoryApproximationMaxError);
+  *path = hdmap::Path(hdmap_, points, lane_segments,
+                      kTrajectoryApproximationMaxError);
   return true;
 }
 

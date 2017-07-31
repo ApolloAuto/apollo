@@ -51,8 +51,9 @@ void PlanningData::set_init_planning_point(
 }
 
 void PlanningData::set_reference_line(
+    const apollo::hdmap::HDMap& hdmap,
     const std::vector<ReferencePoint>& ref_points) {
-  reference_line_.reset(new ReferenceLine(ref_points));
+  reference_line_.reset(new ReferenceLine(hdmap, ref_points));
 }
 
 void PlanningData::set_decision_data(
@@ -109,9 +110,8 @@ bool PlanningData::aggregate(const double time_resolution,
 }
 
 std::string PlanningData::DebugString() const {
-  return apollo::common::util::StrCat(
-      "path_data:", path_data_.DebugString(),
-      "speed_data:", speed_data_.DebugString());
+  return apollo::common::util::StrCat("path_data:", path_data_.DebugString(),
+                                      "speed_data:", speed_data_.DebugString());
 }
 
 }  // namespace planning
