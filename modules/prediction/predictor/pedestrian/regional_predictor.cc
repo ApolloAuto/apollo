@@ -227,8 +227,10 @@ void RegionalPredictor::DrawMovingTrajectory(
   UpdateTrajectoryPoints(starting_point, vel, delta_ts,
       middle_points, boundary_points, left_points, right_points);
   for (size_t i = 0; i < left_points->size(); ++i) {
-    TranslatePoint(position[0], position[1], &(left_points->operator[](i)));
-    TranslatePoint(position[0], position[1], &(right_points->operator[](i)));
+    apollo::prediction::util::TranslatePoint(
+        position[0], position[1], &(left_points->operator[](i)));
+    apollo::prediction::util::TranslatePoint(
+        position[0], position[1], &(right_points->operator[](i)));
   }
 }
 
@@ -469,15 +471,6 @@ void RegionalPredictor::UpdateHeading(
   double delta_x = curr_point.path_point().x() - prev_point.path_point().x();
   double delta_y = curr_point.path_point().y() - prev_point.path_point().y();
   prev_point.mutable_path_point()->set_theta(std::atan2(delta_y, delta_x));
-}
-
-void RegionalPredictor::TranslatePoint(
-    const double translate_x, const double translate_y,
-    TrajectoryPoint* point) {
-  double original_x = point->path_point().x();
-  double original_y = point->path_point().y();
-  point->mutable_path_point()->set_x(original_x + translate_x);
-  point->mutable_path_point()->set_y(original_y + translate_y);
 }
 
 }  // namespace prediction

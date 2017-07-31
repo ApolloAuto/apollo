@@ -23,6 +23,7 @@
 #include "Eigen/Dense"
 
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_util.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/log.h"
 
@@ -87,8 +88,8 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   double theta = std::atan2(velocity(1), velocity(0));
 
   Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
-  state(0, 0) = position(0);
-  state(1, 0) = position(1);
+  state(0, 0) = 0.0;
+  state(1, 0) = 0.0;
   state(2, 0) = velocity(0);
   state(3, 0) = velocity(1);
   state(4, 0) = ::apollo::common::math::Clamp(
@@ -166,6 +167,11 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     v_y = state(3, 0);
     acc_x = state(4, 0);
     acc_y = state(5, 0);
+  }
+
+  for (size_t i = 0; i < points->size(); ++i) {
+    apollo::prediction::util::TranslatePoint(
+        position[0], position[1], &(points->operator[](i)));
   }
 }
 

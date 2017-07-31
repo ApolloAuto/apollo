@@ -117,10 +117,6 @@ class RegionalPredictor : public Predictor {
   void UpdateHeading(
       const apollo::common::TrajectoryPoint& curr_point,
       std::vector<apollo::common::TrajectoryPoint>* points);
-
-  void TranslatePoint(
-      const double translate_x, const double translate_y,
-      apollo::common::TrajectoryPoint* point);
 };
 
 }  // namespace prediction
