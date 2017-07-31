@@ -24,6 +24,7 @@
 
 #include "modules/map/proto/routing.pb.h"
 
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
 
 using Id = apollo::hdmap::Id;
@@ -46,8 +47,10 @@ namespace apollo {
 namespace hdmap {
 namespace {
 
-const std::string kMapFilename = "../data/example_intersection.graph";
-const std::string kMapBinaryFilename = "../data/example_intersection.bin";
+const std::string kMapFilename =
+    "modules/map/pnc_map/testdata/example_intersection.graph";
+const std::string kMapBinaryFilename =
+    "modules/map/pnc_map/testdata/example_intersection.bin";
 const std::string kSunnyvaleMapFilename = "../data/sunnyvale_map.txt";
 const std::string kSunnyvaleMapBinaryFilename = "../data/sunnyvale_map.bin";
 const std::string kSunnyvaleMapBinaryFilename_2 = "../data/sunnyvale_map_2.bin";
@@ -149,7 +152,8 @@ TEST(TestSuite, hdmap_line_path) {
       make_map_path_point(0, 1, M_PI_2, LaneWaypoint(lane_info, 1)),
       make_map_path_point(0, 2, M_PI_2, LaneWaypoint(lane_info, 2)),
       make_map_path_point(0, 3, M_PI_2, LaneWaypoint(lane_info, 3))};
-  const Path path(points, {}, 2.0);
+  HDMap hdmap;
+  const Path path(&hdmap, points, {}, 2.0);
   EXPECT_EQ(path.num_points(), 4);
   EXPECT_EQ(path.num_segments(), 3);
   EXPECT_NEAR(path.path_points()[0].x(), 0, 1e-6);
@@ -268,7 +272,8 @@ TEST(TestSuite, hdmap_curvy_path) {
   const std::vector<MapPathPoint> points{
       make_map_path_point(2, 0), make_map_path_point(2, 1),
       make_map_path_point(1, 2), make_map_path_point(0, 2)};
-  Path path(points, {}, 2.0);
+  HDMap hdmap;
+  Path path(&hdmap, points, {}, 2.0);
   EXPECT_EQ(path.num_points(), 4);
   EXPECT_EQ(path.num_segments(), 3);
   EXPECT_NEAR(path.path_points()[0].x(), 2, 1e-6);
@@ -381,7 +386,8 @@ TEST(TestSuite, hdmap_circle_path) {
         M_PI_2 * static_cast<double>(i) / static_cast<double>(kNumSegments);
     points.push_back(make_map_path_point(kRadius * cos(p), kRadius * sin(p)));
   }
-  const Path path(points, {}, 2.0);
+  HDMap hdmap;
+  const Path path(&hdmap, points, {}, 2.0);
   EXPECT_EQ(path.num_points(), kNumSegments + 1);
   EXPECT_EQ(path.num_segments(), kNumSegments);
   EXPECT_EQ(path.path_points().size(), kNumSegments + 1);
@@ -426,7 +432,7 @@ TEST(TestSuite, hdmap_circle_path) {
   EXPECT_NEAR(distance, 0.0, 1e-6);
 
   // Randomly generated test cases on path.approxmiation.
-  const Path path_no_approximation(points, {});
+  const Path path_no_approximation(&hdmap, points, {});
   for (int case_id = 0; case_id < 10000; ++case_id) {
     const double x = random_double(-kRadius * 0.5, kRadius * 1.5);
     const double y = random_double(-kRadius * 0.5, kRadius * 1.5);
@@ -512,7 +518,8 @@ TEST(TestSuite, hdmap_jerky_path) {
       point.set_x(new_x);
       point.set_y(new_y);
     }
-    const Path path(points, {}, 2.0);
+    HDMap hdmap;
+    const Path path(&hdmap, points, {}, 2.0);
     EXPECT_EQ(path.num_points(), num_segments + 1);
     EXPECT_EQ(path.num_segments(), num_segments);
     EXPECT_EQ(path.path_points().size(), num_segments + 1);
@@ -540,7 +547,7 @@ TEST(TestSuite, hdmap_jerky_path) {
       original_points.push_back(point);
     }
     const AABox2d box(original_points);
-    const Path path_no_approximation(points, {});
+    const Path path_no_approximation(&hdmap, points, {});
     for (int case_id = 0; case_id < kCasesPerPath; ++case_id) {
       const double x = random_double(box.min_x(), box.max_x());
       const double y = random_double(box.min_y(), box.max_y());
@@ -579,7 +586,9 @@ TEST(TestSuite, hdmap_s_path) {
           make_map_path_point(kRadius * cos(p), kRadius * (sin(p) + 1.0)));
     }
   }
-  const Path path(points, {}, 2.0);
+
+  HDMap hdmap;
+  const Path path(&hdmap, points, {}, 2.0);
   EXPECT_EQ(path.num_points(), kNumSegments + 1);
   EXPECT_EQ(path.num_segments(), kNumSegments);
   EXPECT_EQ(path.path_points().size(), kNumSegments + 1);
@@ -618,7 +627,7 @@ TEST(TestSuite, hdmap_s_path) {
   EXPECT_NEAR(lateral, 1.0, kLargeEps);
   EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
 
-  const Path path_no_approximation(points, {});
+  const Path path_no_approximation(&hdmap, points, {});
   for (int case_id = 0; case_id < 10000; ++case_id) {
     const double x = random_double(-kRadius * 1.5, kRadius * 1.5);
     const double y = random_double(-kRadius * 2.5, kRadius * 2.5);
@@ -686,7 +695,8 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
       points[i].add_lane_waypoint(LaneWaypoint(lanes[i], 0.0));
     }
   }
-  const Path path(points);
+  HDMap hdmap;
+  const Path path(&hdmap, points);
   EXPECT_EQ(path.num_points(), kNumSegments + 1);
   EXPECT_EQ(path.num_segments(), kNumSegments);
   EXPECT_EQ(path.path_points().size(), kNumSegments + 1);
@@ -765,19 +775,19 @@ TEST(TestSuite, compute_lane_segments_from_points) {
   auto* segment = curve->add_segment()->mutable_line_segment();
   *segment->add_point() = make_point(0, 0, 0);
   *segment->add_point() = make_point(1, 0, 0);
-  // const LaneInfo lane_info1(lane1);
   LaneInfoConstPtr lane_info1(new LaneInfo(lane1));
 
   Lane lane2 = lane1;
   lane2.mutable_id()->set_id("id2");
-  // const LaneInfo lane_info2(lane2);
   LaneInfoConstPtr lane_info2(new LaneInfo(lane2));
 
   points[0].add_lane_waypoint(LaneWaypoint(lane_info1, 0.1));
   points[1].add_lane_waypoint(LaneWaypoint(lane_info1, 0.7));
   points[1].add_lane_waypoint(LaneWaypoint(lane_info2, 0.0));
   points[2].add_lane_waypoint(LaneWaypoint(lane_info2, 0.4));
-  const Path path(points);
+
+  HDMap hdmap;
+  const Path path(&hdmap, points);
   EXPECT_EQ(path.lane_segments().size(), 2);
   EXPECT_EQ(path.lane_segments()[0].lane->id().id(), "id1");
   EXPECT_NEAR(path.lane_segments()[0].start_s, 0.1, 1e-6);
@@ -785,6 +795,157 @@ TEST(TestSuite, compute_lane_segments_from_points) {
   EXPECT_EQ(path.lane_segments()[1].lane->id().id(), "id2");
   EXPECT_NEAR(path.lane_segments()[1].start_s, 0.0, 1e-6);
   EXPECT_NEAR(path.lane_segments()[1].end_s, 0.4, 1e-6);
+}
+
+TEST(TestSuite, lane_info) {
+  Lane lane;
+  lane.mutable_id()->set_id("test-id");
+  auto* curve = lane.mutable_central_curve();
+  auto* segment1 = curve->add_segment()->mutable_line_segment();
+  auto* segment2 = curve->add_segment()->mutable_line_segment();
+  *segment1->add_point() = make_point(0, 0, 0);
+  *segment1->add_point() = make_point(1, 0, 0);
+  *segment1->add_point() = make_point(2, 0, 0);
+  *segment1->add_point() = make_point(3, 0, 0);
+  *segment2->add_point() = make_point(3, 0, 0);
+  *segment2->add_point() = make_point(3, 1, 0);
+  *segment2->add_point() = make_point(3, 2, 0);
+  *lane.add_left_sample() = make_sample(0.0, 0);
+  *lane.add_left_sample() = make_sample(1.0, 10);
+  *lane.add_left_sample() = make_sample(2.0, 20);
+  *lane.add_left_sample() = make_sample(3.0, 30);
+  *lane.add_right_sample() = make_sample(0.0, 30);
+  *lane.add_right_sample() = make_sample(1.0, 20);
+  *lane.add_right_sample() = make_sample(2.0, 10);
+  *lane.add_right_sample() = make_sample(3.0, 0);
+
+  // LaneInfo lane_info(lane);
+  LaneInfoConstPtr lane_info(new LaneInfo(lane));
+  EXPECT_EQ("test-id", lane_info->id().id());
+  EXPECT_EQ("test-id", lane_info->lane().id().id());
+  EXPECT_EQ(6, lane_info->points().size());
+  EXPECT_EQ(5, lane_info->segments().size());
+  EXPECT_EQ(6, lane_info->accumulate_s().size());
+  EXPECT_NEAR(lane_info->accumulate_s()[0], 0.0, 1e-6);
+  EXPECT_NEAR(lane_info->accumulate_s()[1], 1.0, 1e-6);
+  EXPECT_NEAR(lane_info->accumulate_s()[2], 2.0, 1e-6);
+  EXPECT_NEAR(lane_info->accumulate_s()[3], 3.0, 1e-6);
+  EXPECT_NEAR(lane_info->accumulate_s()[4], 4.0, 1e-6);
+  EXPECT_NEAR(lane_info->accumulate_s()[5], 5.0, 1e-6);
+  EXPECT_NEAR(lane_info->total_length(), 5.0, 1e-6);
+  double left_width = 0.0;
+  double right_width = 0.0;
+  double lane_width = 0.0;
+  double effective_width = 0.0;
+  lane_info->get_width(-0.5, &left_width, &right_width);
+  lane_width = lane_info->get_width(-0.5);
+  effective_width = lane_info->get_effective_width(-0.5);
+  EXPECT_NEAR(left_width, 0.0, 1e-6);
+  EXPECT_NEAR(right_width, 30.0, 1e-6);
+  EXPECT_NEAR(lane_width, 30.0, 1e-6);
+  EXPECT_NEAR(effective_width, 0.0, 1e-6);
+  lane_info->get_width(0.7, &left_width, &right_width);
+  lane_width = lane_info->get_width(0.7);
+  effective_width = lane_info->get_effective_width(0.7);
+  EXPECT_NEAR(left_width, 7.0, 1e-6);
+  EXPECT_NEAR(right_width, 23.0, 1e-6);
+  EXPECT_NEAR(lane_width, 30.0, 1e-6);
+  EXPECT_NEAR(effective_width, 14.0, 1e-6);
+  lane_info->get_width(2.1, &left_width, &right_width);
+  lane_width = lane_info->get_width(2.1);
+  effective_width = lane_info->get_effective_width(2.1);
+  EXPECT_NEAR(left_width, 21.0, 1e-6);
+  EXPECT_NEAR(right_width, 9.0, 1e-6);
+  EXPECT_NEAR(lane_width, 30.0, 1e-6);
+  EXPECT_NEAR(effective_width, 18.0, 1e-6);
+  lane_info->get_width(5.0, &left_width, &right_width);
+  lane_width = lane_info->get_width(5.0);
+  effective_width = lane_info->get_effective_width(5);
+  EXPECT_NEAR(left_width, 30.0, 1e-6);
+  EXPECT_NEAR(right_width, 0.0, 1e-6);
+  EXPECT_NEAR(lane_width, 30.0, 1e-6);
+  EXPECT_NEAR(effective_width, 0.0, 1e-6);
+
+  // TOOD: (Liangliang) add function to build path from lane info.
+  /*
+  HDMap hdmap;
+  EXPECT_EQ(hdmap.load_map_from_file(kMapFilename), 0);
+  LaneInfoConstPtr lane1 =
+      hdmap.get_lane_by_id(apollo::common::util::MakeMapId("l1"));
+  EXPECT_EQ("l1", lane1->id().id());
+  EXPECT_EQ(lane1->points().size(), 2);
+  EXPECT_NEAR(lane1->points()[0].x(), 2.0, 1e-6);
+  EXPECT_NEAR(lane1->points()[0].y(), -200.0, 1e-6);
+  EXPECT_NEAR(lane1->points()[1].x(), 2.0, 1e-6);
+  EXPECT_NEAR(lane1->points()[1].y(), -10.0, 1e-6);
+  EXPECT_EQ(lane1->unit_directions().size(), 2);
+  EXPECT_NEAR(lane1->unit_directions()[0].x(), 0.0, 1e-6);
+  EXPECT_NEAR(lane1->unit_directions()[0].y(), 1.0, 1e-6);
+  EXPECT_NEAR(lane1->unit_directions()[1].x(), 0.0, 1e-6);
+  EXPECT_NEAR(lane1->unit_directions()[1].y(), 1.0, 1e-6);
+  EXPECT_EQ(lane1->headings().size(), 2);
+  EXPECT_NEAR(lane1->headings()[0], M_PI_2, 1e-6);
+  EXPECT_NEAR(lane1->headings()[1], M_PI_2, 1e-6);
+  EXPECT_EQ(lane1->accumulate_s().size(), 2);
+  EXPECT_NEAR(lane1->accumulate_s()[0], 0, 1e-6);
+  EXPECT_NEAR(lane1->accumulate_s()[1], 190, 1e-6);
+  EXPECT_NEAR(lane1->total_length(), 190, 1e-6);
+
+  MapPathPoint point = lane1->get_smooth_point(50.0);
+  EXPECT_NEAR(point.x(), 2.0, 1e-6);
+  EXPECT_NEAR(point.y(), -150.0, 1e-6);
+  EXPECT_NEAR(point.heading(), M_PI_2, 1e-6);
+  EXPECT_EQ(point.lane_waypoints().size(), 1);
+  EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), "l1");
+  EXPECT_NEAR(point.lane_waypoints()[0].s, 50.0, 1e-6);
+
+  InterpolatedIndex index = lane1->get_index_from_s(30.0);
+  EXPECT_EQ(0, index.id);
+  EXPECT_NEAR(30.0, index.offset, 1e-6);
+
+  double distance = 0.0;
+  point = lane1->get_nearest_point({-50, -50}, &distance);
+  EXPECT_NEAR(point.x(), 2.0, 1e-6);
+  EXPECT_NEAR(point.y(), -50.0, 1e-6);
+  EXPECT_NEAR(point.heading(), M_PI_2, 1e-6);
+  EXPECT_EQ(point.lane_waypoints().size(), 1);
+  EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), "l1");
+  EXPECT_NEAR(point.lane_waypoints()[0].s, 150.0, 1e-6);
+
+  double s = 0.0;
+  double lateral = 0.0;
+  EXPECT_TRUE(lane1->get_projection({-50, -50}, &s, &lateral));
+  EXPECT_NEAR(s, 150.0, 1e-6);
+  EXPECT_NEAR(lateral, 52.0, 1e-6);
+
+  // EXPECT_NEAR(lane1->path().get_right_width(123.0), 1.9, 1e-6);
+  // EXPECT_NEAR(lane1->path().get_left_width(45.0), 1.9, 1e-6);
+
+  // Make sure overlaps are correctly computed.
+  // EXPECT_EQ(1, lane1->path().junction_overlaps().size());
+  // EXPECT_EQ(1, lane1->path().crosswalk_overlaps().size());
+
+  // Test is_on_lane, is_on_road
+  MapPathPoint cur_point = lane1->get_smooth_point(45.0);
+  EXPECT_TRUE(lane1->is_on_lane(cur_point));
+  EXPECT_TRUE(hdmap.is_on_road(cur_point));
+  Box2d small_box{
+      {cur_point.x(), cur_point.y()}, cur_point.heading(), 0.2, 0.5};
+  Box2d big_box{{cur_point.x(), cur_point.y()}, cur_point.heading(), 20, 50};
+  EXPECT_TRUE(lane1->is_on_lane(small_box));
+  EXPECT_FALSE(lane1->is_on_lane(big_box));
+  EXPECT_TRUE(hdmap.is_on_road(small_box));
+  EXPECT_FALSE(hdmap.is_on_road(big_box));
+
+  // 2 overlaps on the u-turn lane.
+  const LaneInfo* uturn_lane = hdmap.get_lane_by_id("int-l1-l2-uturn");
+  EXPECT_EQ("int-l1-l2-uturn", uturn_lane->id().id());
+  EXPECT_EQ(2, uturn_lane->crosswalks().size());
+  EXPECT_EQ("int-l1-l2-uturn-and-cross-l1-l2-part1",
+            uturn_lane->crosswalks()[0]->id().id());
+  EXPECT_EQ("int-l1-l2-uturn-and-cross-l1-l2-part2",
+            uturn_lane->crosswalks()[1]->id().id());
+  */
 }
 
 }  // hdmap
