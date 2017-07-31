@@ -25,9 +25,7 @@ namespace planning {
 
 using apollo::common::TrajectoryPoint;
 
-double PredictionTrajectory::probability() const {
-  return _probability;
-}
+double PredictionTrajectory::probability() const { return _probability; }
 
 double PredictionTrajectory::start_timestamp() const {
   return _start_timestamp;

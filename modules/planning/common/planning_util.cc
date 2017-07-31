@@ -82,7 +82,7 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   return p;
 }
 
-SpeedPoint interpolate(const SpeedPoint& start, const SpeedPoint& end,
+SpeedPoint interpolate(const SpeedPoint &start, const SpeedPoint &end,
                        const double weight) {
   SpeedPoint speed_point;
   speed_point.set_s((1 - weight) * start.s() + weight * end.s());

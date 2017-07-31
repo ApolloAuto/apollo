@@ -97,14 +97,13 @@ void PathData::Clear() {
 
 std::string PathData::DebugString() const {
   const auto &path_points = discretized_path_.points();
-  const auto limit = std::min(
-      path_points.size(),
-      static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
+  const auto limit =
+      std::min(path_points.size(),
+               static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
   return apollo::common::util::StrCat(
-      "[\n",
-      apollo::common::util::PrintDebugStringIter(
-          path_points.begin(), path_points.begin() + limit, ",\n"),
+      "[\n", apollo::common::util::PrintDebugStringIter(
+                 path_points.begin(), path_points.begin() + limit, ",\n"),
       "]\n");
 }
 
