@@ -27,6 +27,7 @@ cc_library(
         "//modules/common/math:math_utils",
         "//modules/common/proto:path_point_proto",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor",
         "//modules/prediction/proto:feature_proto",
         "@eigen//:eigen",
