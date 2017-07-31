@@ -182,7 +182,6 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
   for (size_t i = 0; i < static_cast<size_t>(total_time / freq); ++i) {
     Eigen::Vector2d point;
     double theta = M_PI;
-    AINFO << "lane_s = " << lane_s << " and lane_l = " << lane_l;
     if (map->SmoothPointFromLane(
         map->id(lane_id), lane_s, lane_l, &point, &theta) != 0) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
@@ -219,7 +218,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
 
     // update state
     if (::apollo::common::math::DoubleCompare(lane_speed, 0.0) <= 0) {
-      AINFO << "negative lane_speed tacked : " << lane_speed;
+      AINFO << "Non-positive lane_speed tacked : " << lane_speed;
       lane_speed = 0.0;
       lane_acc = 0.0;
       transition(1, 1) = 1.0;
