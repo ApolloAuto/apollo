@@ -19,50 +19,68 @@
 import os
 import rospy
 import argparse
-import threading
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from map import Map
 from localization import Localization
 from modules.planning.proto import planning_pb2
 from modules.localization.proto import localization_pb2
+import copy
 
-DATAX = {}
-DATAY = {}
-PATHLOCK = threading.Lock()
-line_pool = []
-line_pool_size = 4
+PATH_DATA_X = {}
+PATH_DATA_Y = {}
+path_line_pool = []
+path_line_pool_size = 4
+
+SPEED_DATA_TIME = {}
+SPEED_DATA_VAL = {}
+speed_line_pool = []
+speed_line_pool_size = 4
+
 vehicle_position_line = None
 vehicle_polygon_line = None
 localization_pb_buff = None
 
-SPEED_S = []
-SPEED = []
-s_speed_line = None
 
 def localization_callback(localization_pb):
     global localization_pb_buff
     localization_pb_buff = localization_pb
 
+
 def planning_callback(planning_pb):
-    global DATAX, DATAY, SPEED_S, SPEED
-    PATHLOCK.acquire()
-    DATAX = {}
-    DATAY = {}
+    global PATH_DATA_X, PATH_DATA_Y
+    global SPEED_DATA_TIME, SPEED_DATA_VAL
+    # path
+    path_data_x = {}
+    path_data_y = {}
     for path_debug in planning_pb.debug.planning_data.path:
         name = path_debug.name
-        DATAX[name] = []
-        DATAY[name] = []
+        path_data_x[name] = []
+        path_data_y[name] = []
         for path_point in path_debug.path_point:
-            DATAX[name].append(path_point.x)
-            DATAY[name].append(path_point.y)
-    # speed data
-    SPEED_S = []
-    SPEED = []
+            path_data_x[name].append(path_point.x)
+            path_data_y[name].append(path_point.y)
+    PATH_DATA_X = copy.deepcopy(path_data_x)
+    PATH_DATA_Y = copy.deepcopy(path_data_y)
+
+    # speed
+    speed_data_time = {}
+    speed_data_val = {}
+    for speed_plan in planning_pb.debug.planning_data.speed_plan:
+        name = speed_plan.name
+        speed_data_time[name] = []
+        speed_data_val[name] = []
+        for speed_point in speed_plan.speed_point:
+            speed_data_time[name].append(speed_point.t)
+            speed_data_val[name].append(speed_point.v)
+    name = "final_output"
+    speed_data_time[name] = []
+    speed_data_val[name] = []
     for traj_point in planning_pb.trajectory_point:
-        SPEED.append(traj_point.v)
-        SPEED_S.append(traj_point.relative_time)
-    PATHLOCK.release()
+        speed_data_time[name].append(traj_point.relative_time)
+        speed_data_val[name].append(traj_point.v)
+    SPEED_DATA_TIME = speed_data_time
+    SPEED_DATA_VAL = speed_data_val
 
 
 def add_listener():
@@ -76,51 +94,83 @@ def add_listener():
 
 
 def update(frame_number):
-    PATHLOCK.acquire()
-    for line in line_pool:
+    update_init()
+    update_path()
+    update_speed()
+    update_localization()
+    ax.relim()
+    ax.autoscale_view()
+    ax.legend(loc="upper left")
+    ax1.legend(loc="upper center", bbox_to_anchor=(0.5, 1.05))
+
+
+def update_init():
+    for line in speed_line_pool:
+        line.set_visible(False)
+        line.set_label(None)
+    for line in path_line_pool:
         line.set_visible(False)
         line.set_label(None)
     vehicle_position_line.set_visible(False)
     vehicle_polygon_line.set_visible(False)
+
+
+def update_speed():
     cnt = 0
-    for name in DATAX.keys():
-        if cnt >= len(line_pool):
+    for name in SPEED_DATA_TIME.keys():
+        if cnt >= len(speed_line_pool):
             print "Number of lines is more than 4! "
             continue
-        line = line_pool[cnt]
+        line = speed_line_pool[cnt]
         line.set_visible(True)
-        if len(DATAX[name]) <= 1:
+        if len(SPEED_DATA_TIME[name]) <= 1:
             continue
-        line.set_xdata(DATAX[name])
-        line.set_ydata(DATAY[name])
+        line.set_xdata(SPEED_DATA_TIME[name])
+        line.set_ydata(SPEED_DATA_VAL[name])
         line.set_label(name)
         cnt += 1
-    s_speed_line.set_xdata(SPEED_S)
-    s_speed_line.set_ydata(SPEED)
-    PATHLOCK.release()
+
+
+def update_path():
+    cnt = 0
+    for name in PATH_DATA_X.keys():
+        if cnt >= len(path_line_pool):
+            print "Number of lines is more than 4! "
+            continue
+        line = path_line_pool[cnt]
+        line.set_visible(True)
+        if len(PATH_DATA_X[name]) <= 1:
+            continue
+        line.set_xdata(PATH_DATA_X[name])
+        line.set_ydata(PATH_DATA_Y[name])
+        line.set_label(name)
+        cnt += 1
+
+
+def update_localization():
     if localization_pb_buff is not None:
         vehicle_position_line.set_visible(True)
         vehicle_polygon_line.set_visible(True)
-        Localization(localization_pb_buff)\
+        Localization(localization_pb_buff) \
             .replot_vehicle(vehicle_position_line, vehicle_polygon_line)
-    ax.relim()
-    # update ax.viewLim using the new dataLim
-    ax.autoscale_view()
-    ax.legend(loc="upper left")
 
 
 def init_line_pool(central_x, central_y):
     global vehicle_position_line, vehicle_polygon_line, s_speed_line
     colors = ['b', 'g', 'r', 'k']
-    for i in range(line_pool_size):
+
+    for i in range(path_line_pool_size):
         line, = ax.plot([central_x], [central_y],
                         colors[i % len(colors)], lw=3, alpha=0.5)
-        line_pool.append(line)
+        path_line_pool.append(line)
+
+    for i in range(speed_line_pool_size):
+        line, = ax1.plot([central_x], [central_y],
+                        colors[i % len(colors)]+".", lw=3, alpha=0.5)
+        speed_line_pool.append(line)
 
     vehicle_position_line, = ax.plot([central_x], [central_y], 'go', alpha=0.3)
     vehicle_polygon_line, = ax.plot([central_x], [central_y], 'g-')
-    s_speed_line, = ax1.plot([0], [0], 'b.')
-
 
 
 if __name__ == '__main__':
@@ -144,7 +194,6 @@ if __name__ == '__main__':
     ax1.set_ylim([-1, 10])
     ax1.set_ylabel("speed (m/s)")
 
-#fig, ax = plt.subplots()
     map = Map()
     map.load(args.map)
     map.draw_lanes(ax, False, [])
@@ -152,7 +201,6 @@ if __name__ == '__main__':
     central_x = sum(ax.get_xlim())/2
 
     init_line_pool(central_x, central_y)
-
 
     ani = animation.FuncAnimation(fig, update, interval=100)
 
