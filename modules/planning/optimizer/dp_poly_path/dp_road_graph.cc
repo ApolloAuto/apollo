@@ -30,6 +30,7 @@
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/path_point.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/math/double.h"
@@ -86,6 +87,18 @@ bool DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
     accumulated_s += path_length;
   }
   FrenetFramePath tunnel(frenet_path);
+
+  // compute decision data
+  if (compute_decision_from_path(
+    tunnel,
+    speed_data_,
+    reference_line,
+    decision_data)) {
+    AINFO << "Computing decision_data in dp path success";
+  } else {
+    AINFO << "Computing decision_data in dp path fail";
+  }
+
   path_data->set_frenet_path(tunnel);
   // convert frenet path to cartesian path by reference line
   std::vector<::apollo::common::PathPoint> path_points;
@@ -218,6 +231,152 @@ bool DpRoadGraph::generate_graph(const ReferenceLine &reference_line,
   std::reverse(min_cost_path->begin(), min_cost_path->end());
   return true;
 }
+
+bool DpRoadGraph::compute_decision_from_path(
+  const FrenetFramePath& tunnel,
+  const SpeedData& heuristic_speed_data,
+  const ReferenceLine& reference_line,
+  DecisionData* const decision_data) {
+  CHECK_NOTNULL(decision_data);
+  const std::vector<common::FrenetFramePoint>& frenet_frame_points = tunnel.points();
+
+  std::vector<Obstacle*> static_obstacles = decision_data->MutableStaticObstacles();
+
+  // Compute static obstacle decision
+  for (size_t i = 0; i < static_obstacles.size(); ++i) {
+    // Attention: assume that there is only 1 trajectory for static obstacle AND
+    // There is only one point for predicted static obstacles
+    TrajectoryPoint traj_point =
+      static_obstacles[i]->prediction_trajectories()[0].evaluate(0.0);
+    ::apollo::common::math::Vec2d static_center_point =
+      {traj_point.path_point().x(), traj_point.path_point().y()};
+    ::apollo::common::math::Box2d static_obstacle_box =
+      {static_center_point, traj_point.path_point().theta(),
+      static_obstacles[i]->BoundingBox().length(),
+      static_obstacles[i]->BoundingBox().width()};
+
+    common::SLPoint static_obstacle_sl_point;
+    reference_line.get_point_in_frenet_frame(
+      {traj_point.path_point().x(), traj_point.path_point().y()},
+      &static_obstacle_sl_point);
+    double static_obstacle_s = static_obstacle_sl_point.s();  
+    double static_obstacle_l = static_obstacle_sl_point.l();
+    double static_obstacle_s_min = std::numeric_limits<double>::max();
+    double static_obstacle_s_max = std::numeric_limits<double>::min();
+
+    reference_line.get_s_range_from_box2d(
+      static_obstacle_box, &static_obstacle_s_max, &static_obstacle_s_min);
+
+    const auto &vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+
+    static_obstacle_s_max += vehicle_config.vehicle_param().length();
+    static_obstacle_s_min -= vehicle_config.vehicle_param().length();
+
+    bool is_nudge = true;
+    double diff_s = std::numeric_limits<double>::max();
+    double diff_l = 0.0;
+    for (size_t j = 0; j <= frenet_frame_points.size(); ++j) {
+      // From each frame, get master frenet frame point corresponding xy-Box
+      const common::FrenetFramePoint& frenet_frame_point =
+        frenet_frame_points[j];
+      if (frenet_frame_point.s() < static_obstacle_s_min ||
+        frenet_frame_point.s() > static_obstacle_s_max) {
+        continue;
+      }
+
+      common::math::Vec2d ego_position_cartesian;
+      common::SLPoint sl_point;
+      sl_point.set_s(frenet_frame_point.s());
+      sl_point.set_l(frenet_frame_point.l());
+      reference_line.get_point_in_Cartesian_frame(
+        sl_point, &ego_position_cartesian);
+      ReferencePoint reference_point = reference_line.get_reference_point(
+        frenet_frame_point.s());
+
+      double one_minus_kappa_r_d = 1 -
+        reference_point.kappa() * frenet_frame_point.l();
+      double delta_theta = std::atan2(frenet_frame_point.dl(),
+        one_minus_kappa_r_d);
+      double theta = ::apollo::common::math::NormalizeAngle(
+        delta_theta + reference_point.heading());
+
+      ::apollo::common::math::Box2d ego_bounding_box =
+        {{ego_position_cartesian.x(), ego_position_cartesian.y()}, theta,
+        vehicle_config.vehicle_param().length(),
+        vehicle_config.vehicle_param().width()};
+
+      if (ego_bounding_box.DistanceTo(static_obstacle_box) <
+        vehicle_config.vehicle_param().width() +
+        FLAGS_static_decision_stop_buffer) {
+        // Potentially a STOP, not NUDGE or IGNORE
+          break;
+      }
+   
+      // compute decision
+      if (ego_bounding_box.DistanceTo(static_obstacle_box) <
+        FLAGS_static_decision_ignore_range) {
+        is_nudge = false;
+      }
+
+      if (std::fabs(frenet_frame_point.s() - static_obstacle_s) < diff_s) {
+        diff_s = std::fabs(frenet_frame_point.s() - static_obstacle_s);
+        diff_l = frenet_frame_point.l() - static_obstacle_l;
+      }
+    }
+
+    if (is_nudge) {
+      ObjectDecisionType object_nudge;
+      ObjectNudge* object_nudge_ptr = object_nudge.mutable_nudge();
+      if (diff_l > 0.0) {
+        // Left nudge to be distinguished
+        object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
+        object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
+        static_obstacles[i]->MutableDecisions()->push_back(object_nudge);
+      } else {
+        //Right nudge to be distinguished
+        object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
+        object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
+        static_obstacles[i]->MutableDecisions()->push_back(object_nudge);
+      }
+    } else {
+      // Ignore
+        ObjectDecisionType object_ignore;
+        ObjectIgnore* object_ignore_ptr = object_ignore.mutable_ignore();
+        CHECK_NOTNULL(object_ignore_ptr);
+        static_obstacles[i]->MutableDecisions()->push_back(object_ignore);
+    }
+  }
+
+  // Compute dynamic obstacle decision
+  // TBD
+  std::vector<Obstacle*> dynamic_obstacles =
+    decision_data->MutableDynamicObstacles();
+  const double total_time =
+    std::min(heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
+  size_t evaluate_times =
+  static_cast<size_t>(std::floor(total_time / config_.eval_time_interval()));
+  for (size_t i = 0; i < dynamic_obstacles.size(); ++i) {
+    const auto& trajectories = dynamic_obstacles[i]->prediction_trajectories();
+    for (size_t j = 0; j < trajectories.size(); ++j) {
+      const auto& trajectory = trajectories[j];
+      std::vector<::apollo::common::math::Box2d> obstacle_by_time;
+      for (size_t time = 0; time <= evaluate_times; ++time) {
+        TrajectoryPoint traj_point =
+          trajectory.evaluate(time * config_.eval_time_interval());
+        ::apollo::common::math::Vec2d center_point =
+          {traj_point.path_point().x(), traj_point.path_point().y()};
+        ::apollo::common::math::Box2d obstacle_box =
+          {center_point, traj_point.path_point().theta(),
+        dynamic_obstacles[i]->BoundingBox().length(),
+        dynamic_obstacles[i]->BoundingBox().width()};
+        obstacle_by_time.push_back(obstacle_box);
+      }
+    }
+  }
+  return true;
+}
+
 
 }  // namespace planning
 }  // namespace apollo
