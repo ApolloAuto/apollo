@@ -72,6 +72,15 @@ bool DataCenter::init_current_frame(const uint32_t sequence_num) {
   common::TrajectoryPoint point;
   _frame->SetInitPose(VehicleState::instance()->pose());
   _frame->SetRouting(AdapterManager::GetRoutingResult()->GetLatestObserved());
+
+  if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
+    // prediction
+    const auto& prediction =
+        AdapterManager::GetPrediction()->GetLatestObserved();
+    ADEBUG << "Get prediction:" << prediction.DebugString();
+    _frame->SetDecisionDataFromPrediction(prediction);
+  }
+
   if (!_frame->Init()) {
     AERROR << "failed to init frame";
     return false;
