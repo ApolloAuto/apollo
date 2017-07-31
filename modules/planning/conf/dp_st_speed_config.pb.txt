@@ -1,5 +1,5 @@
-total_path_length: 0.1
-total_time: 3.0
+total_path_length: 80
+total_time: 8.0
 matrix_dimension_s: 100
 matrix_dimension_t: 10
 
