@@ -19,6 +19,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <iomanip>
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
@@ -162,8 +163,11 @@ void PredictionMap::OnLane(
           candidate_lane->get_nearest_point(vec_point, &distance);
       double nearest_point_heading =
           PathHeading(candidate_lane, nearest_point);
+      AINFO << "heading = " << heading;
+      AINFO << "nearest point heading = " << nearest_point_heading;
       double diff = std::fabs(
           apollo::common::math::AngleDiff(heading, nearest_point_heading));
+      AINFO << "angle diff = " << diff;
       if (diff <= FLAGS_max_lane_angle_diff) {
         lanes->push_back(candidate_lane);
       }
@@ -193,6 +197,11 @@ int PredictionMap::SmoothPointFromLane(const apollo::hdmap::Id& id,
   std::shared_ptr<const LaneInfo> lane = LaneById(id);
   apollo::common::PointENU hdmap_point = lane->get_smooth_point(s);
   *heading = PathHeading(lane, hdmap_point);
+  AINFO << "lane_s = ["
+        << std::fixed << std::setprecision(6) << s << "], "
+        << "hdmap pt = ["
+        << std::fixed << std::setprecision(6)
+        << hdmap_point.x() << ", " << hdmap_point.y() << "]";
   point->operator[](0) = hdmap_point.x() - std::sin(*heading) * l;
   point->operator[](1) = hdmap_point.y() + std::cos(*heading) * l;
   return 0;

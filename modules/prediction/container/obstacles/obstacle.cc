@@ -760,6 +760,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
   current_lanes_ = current_lanes;
   if (current_lanes_.empty()) {
     ADEBUG << "Unable to find current lane.";
+    kf_lane_trackers_.clear();
     return;
   }
   Lane lane;
@@ -798,6 +799,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
       lane.mutable_lane_feature()->CopyFrom(*lane_feature);
       min_heading_diff = std::fabs(angle_diff);
     }
+    AINFO << lane_feature->ShortDebugString();
   }
 
   if (lane.has_lane_feature()) {
