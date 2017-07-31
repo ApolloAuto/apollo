@@ -272,11 +272,7 @@ Status LatController::ComputeControlCommand(
 
   // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
   // Error Rate, preview lateral error1 , preview lateral error2, ...]
-  if (FLAGS_use_state_exact_match) {
-    UpdateStateAnalyticalMatching(debug);
-  } else {
-    UpdateState(debug);
-  }
+  UpdateStateAnalyticalMatching(debug);
 
   UpdateMatrix();
 
@@ -363,75 +359,18 @@ Status LatController::Reset() {
   return Status::OK();
 }
 
-// state = [Lateral Error, Lateral Error Rate, Heading Error, Heading Error
-// Rate, Preview Lateral1, Preview Lateral2, ...]
-void LatController::UpdateState(SimpleLateralDebug *debug) {
-  TrajectoryPoint traj_point;
-  Eigen::Vector2d com = vehicle_state_.ComputeCOMPosition(lr_);
-  double raw_lateral_error = GetLateralError(com, &traj_point);
-
-  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
-  debug->set_lateral_error(lateral_error_filter_.Update(raw_lateral_error));
-
-  // ref_curvature_ = traj_point.kappa();
-  debug->set_curvature(traj_point.kappa());
-
-  // ref_heading_ = traj_point.theta;
-  debug->set_ref_heading(traj_point.theta());
-
-  // heading_error_ =
-  //    common::math::NormalizeAngle(vehicle_state_.heading() - ref_heading_);
-  debug->set_heading_error(common::math::NormalizeAngle(
-      vehicle_state_.heading() - traj_point.theta()));
-
-  // Reverse heading error if vehicle is going in reverse
-  if (vehicle_state_.gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
-    debug->set_heading_error(-debug->heading_error());
-  }
-
-  // heading_error_rate_ = (heading_error_ - previous_heading_error_) / ts_;
-  debug->set_heading_error_rate(
-      (debug->heading_error() - previous_heading_error_) / ts_);
-  // lateral_error_rate_ = (lateral_error_ - previous_lateral_error_) / ts_;
-  debug->set_lateral_error_rate(
-      (debug->lateral_error() - previous_lateral_error_) / ts_);
-
-  // Prepare for next iteration.
-  previous_heading_error_ = debug->heading_error();
-  previous_lateral_error_ = debug->lateral_error();
-
-  // State matrix update;
-  // First four elements are fixed;
-  matrix_state_(0, 0) = debug->lateral_error();
-  matrix_state_(1, 0) = debug->lateral_error_rate();
-  matrix_state_(2, 0) = debug->heading_error();
-  matrix_state_(3, 0) = debug->heading_error_rate();
-
-  // Next elements are depending on preview window size;
-  for (int i = 0; i < preview_window_; ++i) {
-    double preview_time = ts_ * (i + 1);
-    Eigen::Vector2d future_position_estimate =
-        vehicle_state_.EstimateFuturePosition(preview_time);
-    double preview_lateral = GetLateralError(future_position_estimate, nullptr);
-    matrix_state_(basic_state_size_ + i, 0) = preview_lateral;
-  }
-  // preview matrix update;
-}
-
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
   Eigen::Vector2d com = vehicle_state_.ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(), vehicle_state_.heading(),
                        vehicle_state_.linear_velocity(),
                        vehicle_state_.angular_velocity(), trajectory_analyzer_,
                        debug);
+
   // Reverse heading error if vehicle is going in reverse
   if (vehicle_state_.gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
-  // Reverse heading error if vehicle is going in reverse
-  if (vehicle_state_.gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
-    debug->set_heading_error(-debug->heading_error());
-  }
+
   // State matrix update;
   // First four elements are fixed;
   matrix_state_(0, 0) = debug->lateral_error();
