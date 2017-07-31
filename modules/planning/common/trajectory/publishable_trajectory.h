@@ -18,8 +18,8 @@
  * @file publishable_trajectory.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_TRAJECTORY_PUBLISHABLE_TRAJECTORY_H
-#define MODULES_PLANNING_COMMON_TRAJECTORY_PUBLISHABLE_TRAJECTORY_H
+#ifndef MODULES_PLANNING_COMMON_TRAJECTORY_PUBLISHABLE_TRAJECTORY_H_
+#define MODULES_PLANNING_COMMON_TRAJECTORY_PUBLISHABLE_TRAJECTORY_H_
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/proto/planning.pb.h"

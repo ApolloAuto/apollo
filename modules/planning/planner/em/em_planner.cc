@@ -151,6 +151,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  computed_trajectory.set_header_time(VehicleState::instance()->timestamp());
   frame->set_computed_trajectory(computed_trajectory);
   computed_trajectory.populate_trajectory_protobuf(trajectory_pb);
 

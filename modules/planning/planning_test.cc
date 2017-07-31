@@ -103,9 +103,6 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
   ADCTrajectory trajectory;
   bool res_planning = planning.Plan(false, time, &trajectory);
   EXPECT_FALSE(res_planning);
-
-  // check Reset runs gracefully.
-  planning.Reset();
 }
 
 }  // namespace planning
