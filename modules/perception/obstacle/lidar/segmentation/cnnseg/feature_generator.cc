@@ -107,7 +107,6 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 template <typename Dtype>
 void FeatureGenerator<Dtype>::GenerateByCpu(
     const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr) {
-  //Timer timer;
   const auto& points = pc_ptr->points;
 
   // DO NOT remove this line!!!
@@ -123,7 +122,6 @@ void FeatureGenerator<Dtype>::GenerateByCpu(
   caffe::caffe_set(siz, Dtype(0), mean_intensity_data_);
   caffe::caffe_set(siz, Dtype(0), nonempty_data_);
 
-  //AINFO << "\t** feature time: " << timer.toc(true) << "ms";
   map_idx_.resize(points.size());
   float inv_res_x = 0.5 * static_cast<float>(width_) / static_cast<float>(range_);
   float inv_res_y = 0.5 * static_cast<float>(height_) / static_cast<float>(range_);
@@ -134,8 +132,8 @@ void FeatureGenerator<Dtype>::GenerateByCpu(
       continue;
     }
     // * the coordinates of x and y are exchanged here (* row <-> x, column <-> y)
-    int pos_x = F2I(points[i].y, range_, inv_res_x);
-    int pos_y = F2I(points[i].x, range_, inv_res_y);
+    int pos_x = F2I(points[i].y, range_, inv_res_x);   // col
+    int pos_y = F2I(points[i].x, range_, inv_res_y);   // row
     if (pos_x >= width_ || pos_x < 0 || pos_y >= height_ || pos_y < 0) {
       map_idx_[i] = -1;
       continue;
@@ -153,7 +151,6 @@ void FeatureGenerator<Dtype>::GenerateByCpu(
     mean_intensity_data_[idx] += static_cast<Dtype>(pi);
     count_data_[idx] += Dtype(1);
   }
-  //AINFO << "\t** feature time: " << timer.toc(true) << "ms";
 
   for (int i = 0; i < siz; ++i) {
     if (count_data_[i] < EPS) {
@@ -165,7 +162,6 @@ void FeatureGenerator<Dtype>::GenerateByCpu(
     }
     count_data_[i] = LogCount(static_cast<int>(count_data_[i]));
   }
-  //AINFO << "\t** feature time: " << timer.toc() << "ms";
 }
 
 template bool FeatureGenerator<float>::Init(const FeatureParam& feature_param,
