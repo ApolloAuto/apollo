@@ -141,7 +141,7 @@ Status Canbus::Start() {
 
 void Canbus::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
-  AdapterManager::FillChassisHeader(FLAGS_node_name, chassis.mutable_header());
+  AdapterManager::FillChassisHeader(FLAGS_node_name, &chassis);
 
   AdapterManager::PublishChassis(chassis);
   ADEBUG << chassis.ShortDebugString();

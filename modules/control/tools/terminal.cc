@@ -50,16 +50,16 @@ void help() {
 }
 
 void send(int cmd_type) {
-  ::apollo::control::PadMessage pb;
+  ::apollo::control::PadMessage pad;
   if (cmd_type == RESET_COMMAND) {
-    pb.set_action(apollo::control::DrivingAction::RESET);
+    pad.set_action(apollo::control::DrivingAction::RESET);
     AINFO << "sending reset action command.";
   } else if (cmd_type == AUTO_DRIVE_COMMAND) {
-    pb.set_action(apollo::control::DrivingAction::START);
+    pad.set_action(apollo::control::DrivingAction::START);
     AINFO << "sending start action command.";
   }
-  AdapterManager::FillPadHeader("terminal", pb.mutable_header());
-  AdapterManager::PublishPad(pb);
+  AdapterManager::FillPadHeader("terminal", &pad);
+  AdapterManager::PublishPad(pad);
   AINFO << "send pad_message OK";
 }
 
