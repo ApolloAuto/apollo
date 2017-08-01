@@ -44,7 +44,7 @@ bool QpFrenetFrame::Init(const ReferenceLine& reference_line,
                          const common::FrenetFramePoint& init_frenet_point,
                          const double start_s, const double end_s,
                          const double time_resolution,
-                         const std::uint32_t num_points) {
+                         const uint32_t num_points) {
   _vehicle_param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   _speed_profile = &speed_data;
@@ -75,7 +75,7 @@ bool QpFrenetFrame::Init(const ReferenceLine& reference_line,
 
   const double inf = std::numeric_limits<double>::infinity();
   double s = _start_s;
-  for (std::uint32_t i = 0; i <= num_points && s <= _end_s; ++i) {
+  for (uint32_t i = 0; i <= num_points && s <= _end_s; ++i) {
     _evaluated_knots.push_back(std::move(s));
     _hdmap_bound.push_back(std::make_pair(-inf, inf));
     _static_obstacle_bound.push_back(std::make_pair(-inf, inf));
@@ -187,8 +187,7 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
     return false;
   }
 
-  for (std::uint32_t i = 0; i < obstacle.prediction_trajectories().size();
-       ++i) {
+  for (uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
     if (!decision[i].has_nudge()) {
       continue;
     }
@@ -212,7 +211,7 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
       obs_box.GetAllCorners(&corners);
       std::vector<common::SLPoint> sl_corners;
 
-      for (std::uint32_t i = 0; i < corners.size(); ++i) {
+      for (uint32_t i = 0; i < corners.size(); ++i) {
         common::SLPoint cur_point;
         common::math::Vec2d xy_point(corners[i].x(), corners[i].y());
         if (!_reference_line->get_point_in_frenet_frame(xy_point, &cur_point)) {
@@ -226,7 +225,7 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
         sl_corners.push_back(std::move(cur_point));
       }
 
-      for (std::uint32_t i = 0; i < sl_corners.size(); ++i) {
+      for (uint32_t i = 0; i < sl_corners.size(); ++i) {
         common::SLPoint sl_first = sl_corners[i % sl_corners.size()];
         common::SLPoint sl_second = sl_corners[(i + 1) % sl_corners.size()];
         if (sl_first.s() < sl_second.s()) {
@@ -248,10 +247,10 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
             update_start_s < _evaluated_knots.front()) {
           continue;
         }
-        std::pair<std::uint32_t, std::uint32_t> update_index_range =
+        std::pair<uint32_t, uint32_t> update_index_range =
             find_interval(update_start_s, update_end_s);
 
-        for (std::uint32_t j = update_index_range.first;
+        for (uint32_t j = update_index_range.first;
              j < update_index_range.second; ++j) {
           _dynamic_obstacle_bound[j].first =
               std::max(bound.first, _dynamic_obstacle_bound[j].first);
@@ -306,7 +305,7 @@ bool QpFrenetFrame::mapping_polygon(
     std::vector<std::pair<double, double>>* const bound_map) {
   std::vector<common::SLPoint> sl_corners;
 
-  for (std::uint32_t i = 0; i < corners.size(); ++i) {
+  for (uint32_t i = 0; i < corners.size(); ++i) {
     common::SLPoint cur_point;
     common::math::Vec2d xy_point(corners[i].x(), corners[i].y());
     if (!_reference_line->get_point_in_frenet_frame(xy_point, &cur_point)) {
@@ -319,7 +318,7 @@ bool QpFrenetFrame::mapping_polygon(
     sl_corners.push_back(std::move(cur_point));
   }
 
-  for (std::uint32_t i = 0; i < sl_corners.size(); ++i) {
+  for (uint32_t i = 0; i < sl_corners.size(); ++i) {
     if (!map_line(sl_corners[i % sl_corners.size()],
                   sl_corners[(i + 1) % sl_corners.size()], nudge_side,
                   bound_map)) {
@@ -337,7 +336,7 @@ bool QpFrenetFrame::map_line(
     std::vector<std::pair<double, double>>* const constraint) {
   common::SLPoint near_point = (start.s() < end.s() ? start : end);
   common::SLPoint further_point = (start.s() < end.s() ? end : start);
-  std::pair<std::uint32_t, std::uint32_t> impact_index =
+  std::pair<uint32_t, uint32_t> impact_index =
       find_interval(near_point.s(), further_point.s());
 
   if ((near_point.s() < _start_s - _vehicle_param.back_edge_to_center() &&
@@ -351,7 +350,7 @@ bool QpFrenetFrame::map_line(
       std::max(std::abs(near_point.s() - further_point.s()), 1e-8);
   double weight = 0.0;
 
-  for (std::uint32_t i = impact_index.first; i <= impact_index.second; ++i) {
+  for (uint32_t i = impact_index.first; i <= impact_index.second; ++i) {
     weight = std::abs((_evaluated_knots[i] - near_point.s())) / distance;
     weight = std::max(weight, 0.0);
     weight = std::min(weight, 1.0);
@@ -420,14 +419,14 @@ std::pair<double, double> QpFrenetFrame::map_lateral_constraint(
   return result;
 }
 
-std::pair<std::uint32_t, std::uint32_t> QpFrenetFrame::find_interval(
+std::pair<uint32_t, uint32_t> QpFrenetFrame::find_interval(
     const double start, const double end) const {
   double new_start = std::max(start - _vehicle_param.front_edge_to_center(),
                               _evaluated_knots.front());
   double new_end = std::min(end + _vehicle_param.back_edge_to_center(),
                             _evaluated_knots.back());
-  std::uint32_t start_index = find_index(new_start);
-  std::uint32_t end_index = find_index(new_end);
+  uint32_t start_index = find_index(new_start);
+  uint32_t end_index = find_index(new_end);
 
   if (end > _evaluated_knots[end_index] &&
       end_index + 1 != _evaluated_knots.size()) {
@@ -451,7 +450,7 @@ bool QpFrenetFrame::calculate_hd_map_bound() {
     _hdmap_bound[i].first = -right_bound;
     _hdmap_bound[i].second = left_bound;
   }
-  for (std::uint32_t i = 0; i < _hdmap_bound.size(); ++i) {
+  for (uint32_t i = 0; i < _hdmap_bound.size(); ++i) {
     _hdmap_bound[i].first = -4.0;
     _hdmap_bound[i].second = 4.0;
   }
@@ -462,9 +461,9 @@ bool QpFrenetFrame::calculate_static_obstacle_bound() {
   const std::vector<Obstacle*> static_obs_list =
       _decision_data->StaticObstacles();
 
-  for (std::uint32_t i = 0; i < static_obs_list.size(); ++i) {
+  for (uint32_t i = 0; i < static_obs_list.size(); ++i) {
     const Obstacle* cur_obstacle = static_obs_list[i];
-    if (mapping_static_obstacle_with_decision(*cur_obstacle)) {
+    if (!mapping_static_obstacle_with_decision(*cur_obstacle)) {
       AERROR << "mapping obstacle with id [" << cur_obstacle->Id()
              << "] failed in qp frenet frame.";
       return false;
@@ -477,9 +476,9 @@ bool QpFrenetFrame::calculate_dynamic_obstacle_bound() {
   const std::vector<Obstacle*> dynamic_obs_list =
       _decision_data->DynamicObstacles();
 
-  for (std::uint32_t i = 0; i < dynamic_obs_list.size(); ++i) {
+  for (uint32_t i = 0; i < dynamic_obs_list.size(); ++i) {
     const Obstacle* cur_obstacle = dynamic_obs_list[i];
-    if (mapping_dynamic_obstacle_with_decision(*cur_obstacle)) {
+    if (!mapping_dynamic_obstacle_with_decision(*cur_obstacle)) {
       AERROR << "mapping obstacle with id [" << cur_obstacle->Id()
              << "] failed in qp frenet frame.";
       return false;
@@ -500,7 +499,7 @@ bool QpFrenetFrame::get_bound(
   }
 
   // linear bound interpolation
-  std::uint32_t lower_index = find_index(s);
+  uint32_t lower_index = find_index(s);
   const double s_low = _evaluated_knots[lower_index];
   const double s_high = _evaluated_knots[lower_index + 1];
   double weight = (Double::compare(s_high, s_low, 1e-8) <= 0
@@ -533,12 +532,12 @@ bool QpFrenetFrame::get_bound(
   return true;
 }
 
-std::uint32_t QpFrenetFrame::find_index(const double s) const {
+uint32_t QpFrenetFrame::find_index(const double s) const {
   auto upper_bound =
       std::lower_bound(_evaluated_knots.begin() + 1, _evaluated_knots.end(), s);
-  return std::min(static_cast<std::uint32_t>(_evaluated_knots.size() - 1),
-                  static_cast<std::uint32_t>(upper_bound -
-                                             _evaluated_knots.begin())) -
+  return std::min(
+             static_cast<uint32_t>(_evaluated_knots.size() - 1),
+             static_cast<uint32_t>(upper_bound - _evaluated_knots.begin())) -
          1;
 }
 
