@@ -28,6 +28,11 @@ cc_test(
     name = "prediction_test",
     size = "small",
     srcs = ["prediction_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+        "//modules/prediction:prediction_conf",
+    ],
     deps = [
         "//modules/prediction:prediction_lib",
         "@gtest//:main",
@@ -46,6 +51,11 @@ cc_binary(
 filegroup(
     name = "prediction_data",
     srcs = glob(["data/**"]),
+)
+
+filegroup(
+    name = "prediction_conf",
+    srcs = glob(["conf/**"]),
 )
 
 filegroup(
