@@ -234,7 +234,10 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     return false;
   }
 
-  InsertFrontTrajectoryPoints(trajectory_pb, stitching_trajectory);
+  InsertFrontTrajectoryPoints(trajectory_pb,
+          std::vector<decltype(planning_start_point)>(
+                  stitching_trajectory.begin(),
+                  stitching_trajectory.end() - 1));
 
   // update last publishable trajectory;
   last_publishable_trajectory_.Clear();
