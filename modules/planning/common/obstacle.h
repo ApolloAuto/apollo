@@ -60,9 +60,9 @@ class Obstacle : public PlanningObject {
   double Speed() const;
   void SetSpeed(const double speed);
 
-  const apollo::common::math::Vec2d Center() const { return center_; };
+  apollo::common::math::Vec2d Center() const { return center_; };
 
-  const apollo::common::math::Box2d BoundingBox() const;
+  apollo::common::math::Box2d BoundingBox() const;
 
   const std::vector<PredictionTrajectory> &prediction_trajectories() const;
   void add_prediction_trajectory(
