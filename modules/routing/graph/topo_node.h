@@ -14,36 +14,36 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_GRAPH_TOPO_NODE_H
-#define BAIDU_ADU_ROUTING_GRAPH_TOPO_NODE_H
+#ifndef MODULES_ROUTING_GRAPH_TOPO_NODE_H
+#define MODULES_ROUTING_GRAPH_TOPO_NODE_H
 
 #include <unordered_map>
 #include <unordered_set>
 
-#include "map_lane.pb.h"
-#include "topo_graph.pb.h"
+#include "modules/routing/graph/map_lane.pb.h"
+#include "modules/routing/graph/topo_graph.pb.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class TopoEdge;
 
 class TopoNode {
  public:
-  explicit TopoNode(const ::adu::routing::common::Node& node);
+  explicit TopoNode(const ::apollo::routing::common::Node& node);
   explicit TopoNode(const TopoNode* topo_node);
 
   ~TopoNode();
 
-  const ::adu::routing::common::Node& node() const;
+  const ::apollo::routing::common::Node& node() const;
   double length() const;
   double cost() const;
   bool is_virtual() const;
 
   const std::string& lane_id() const;
   const std::string& road_id() const;
-  const ::adu::common::hdmap::Curve& central_curve() const;
-  const ::adu::common::hdmap::Point& anchor_point() const;
+  const ::apollo::common::hdmap::Curve& central_curve() const;
+  const ::apollo::common::hdmap::Point& anchor_point() const;
 
   const std::unordered_set<const TopoEdge*>& in_from_all_edge() const;
   const std::unordered_set<const TopoEdge*>& in_from_left_edge() const;
@@ -71,8 +71,8 @@ class TopoNode {
   void set_end_s(double end_s);
 
  private:
-  ::adu::routing::common::Node _pb_node;
-  ::adu::common::hdmap::Point _anchor_point;
+  ::apollo::routing::common::Node _pb_node;
+  ::apollo::common::hdmap::Point _anchor_point;
 
   double _start_s;
   double _end_s;
@@ -95,6 +95,6 @@ class TopoNode {
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_GRAPH_TOPO_NODE_H
+#endif  // MODULES_ROUTING_GRAPH_TOPO_NODE_H

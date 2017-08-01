@@ -14,13 +14,12 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "graph/topo_graph.h"
-#include "common/utils.h"
-#include "graph/topo_edge.h"
-#include "graph/topo_node.h"
-#include "ros/ros.h"
+#include "modules/routing/graph/topo_graph.h"
+#include "modules/routing/common/utils.h"
+#include "modules/routing/graph/topo_edge.h"
+#include "modules/routing/graph/topo_node.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 void TopoGraph::clear() {
@@ -29,7 +28,7 @@ void TopoGraph::clear() {
   _node_index_map.clear();
 }
 
-bool TopoGraph::load_nodes(const ::adu::routing::common::Graph& graph) {
+bool TopoGraph::load_nodes(const ::apollo::routing::common::Graph& graph) {
   if (graph.node_size() == 0) {
     ROS_ERROR("No nodes found in topology graph.");
     return false;
@@ -45,7 +44,7 @@ bool TopoGraph::load_nodes(const ::adu::routing::common::Graph& graph) {
 }
 
 // Need to execute load_nodes() firstly
-bool TopoGraph::load_edges(const ::adu::routing::common::Graph& graph) {
+bool TopoGraph::load_edges(const ::apollo::routing::common::Graph& graph) {
   if (graph.edge_size() == 0) {
     ROS_ERROR("No edges found in topology graph.");
     return false;
@@ -73,8 +72,8 @@ bool TopoGraph::load_edges(const ::adu::routing::common::Graph& graph) {
 bool TopoGraph::load_graph(const std::string& file_path) {
   clear();
 
-  ::adu::routing::common::Graph graph;
-  if (!::adu::routing::FileUtils::load_protobuf_data_from_file(file_path,
+  ::apollo::routing::common::Graph graph;
+  if (!::apollo::routing::FileUtils::load_protobuf_data_from_file(file_path,
                                                                &graph)) {
     ROS_ERROR("Failed to read topology graph from data.");
     return false;
@@ -118,4 +117,4 @@ void TopoGraph::get_nodes_by_road_id(
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
