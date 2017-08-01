@@ -55,6 +55,7 @@ class LidarProcess {
   }
 
  private:
+  void RegistAllAlgorithm();
   bool InitFrameDependence();
   bool InitAlgorithmPlugin();
 

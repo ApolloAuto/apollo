@@ -15,12 +15,13 @@
  *****************************************************************************/
 
 #include "modules/perception/perception.h"
-#include <sensor_msgs/PointCloud2.h>
+#include "sensor_msgs/PointCloud2.h"
+#include "ros/include/ros/ros.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/obstacle/onboard/lidar_process.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace perception {

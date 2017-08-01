@@ -394,8 +394,5 @@ void MinBoxObjectBuilder::BuildObject(
     ComputeGeometricFeature(options.ref_center, object);
 }
 
-// Register plugin.
-REGISTER_OBJECTBUILDER(MinBoxObjectBuilder);
-
 }  // namespace perception
 }  // namespace apollo

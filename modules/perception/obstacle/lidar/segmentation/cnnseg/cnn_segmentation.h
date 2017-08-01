@@ -84,6 +84,9 @@ class CNNSegmentation : public BaseSegmentation {
 
   DISALLOW_COPY_AND_ASSIGN(CNNSegmentation);
 };
+
+REGISTER_SEGMENTATION(CNNSegmentation);
+
 } // namespace perception
 } // namespace apollo
 

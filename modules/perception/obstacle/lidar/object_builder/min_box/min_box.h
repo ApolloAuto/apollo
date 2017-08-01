@@ -63,6 +63,9 @@ protected:
     DISALLOW_COPY_AND_ASSIGN(MinBoxObjectBuilder);
 };
 
+// Register plugin.
+REGISTER_OBJECTBUILDER(MinBoxObjectBuilder);
+
 }  // namespace perception
 }  // namespace apollo
 
