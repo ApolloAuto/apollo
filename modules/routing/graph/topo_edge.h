@@ -14,13 +14,13 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_GRAPH_TOPO_EDGE_H
-#define BAIDU_ADU_ROUTING_GRAPH_TOPO_EDGE_H
+#ifndef MODULES_ROUTING_GRAPH_TOPO_EDGE_H
+#define MODULES_ROUTING_GRAPH_TOPO_EDGE_H
 
 #include "map_lane.pb.h"
 #include "topo_graph.pb.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 enum TopoEdgeType {
@@ -33,12 +33,12 @@ class TopoNode;
 
 class TopoEdge {
  public:
-  TopoEdge(const ::adu::routing::common::Edge& edge, const TopoNode* from_node,
+  TopoEdge(const ::apollo::routing::common::Edge& edge, const TopoNode* from_node,
            const TopoNode* to_node);
 
   ~TopoEdge();
 
-  const ::adu::routing::common::Edge& edge() const;
+  const ::apollo::routing::common::Edge& edge() const;
   double cost() const;
   const std::string& from_lane_id() const;
   const std::string& to_lane_id() const;
@@ -48,12 +48,12 @@ class TopoEdge {
   const TopoNode* to_node() const;
 
  private:
-  ::adu::routing::common::Edge _pb_edge;
+  ::apollo::routing::common::Edge _pb_edge;
   const TopoNode* _from_node;
   const TopoNode* _to_node;
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_GRAPH_TOPO_EDGE_H
+#endif  // MODULES_ROUTING_GRAPH_TOPO_EDGE_H
