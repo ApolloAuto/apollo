@@ -14,13 +14,13 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_COMMON_UTILS_H
-#define BAIDU_ADU_ROUTING_COMMON_UTILS_H
+#ifndef MODULES_ROUTING_COMMON_UTILS_H_
+#define MODULES_ROUTING_COMMON_UTILS_H_
 
 #include <google/protobuf/message.h>
 #include <string>
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class FileUtils {
@@ -38,6 +38,6 @@ class FileUtils {
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_COMMON_UTILS_H
+#endif  // MODULES_ROUTING_COMMON_UTILS_H_

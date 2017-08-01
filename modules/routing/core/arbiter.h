@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_CORE_ARBITER_H
-#define BAIDU_ADU_ROUTING_CORE_ARBITER_H
+#ifndef MODULES_ROUTING_CORE_ARBITER_H_
+#define MODULES_ROUTING_CORE_ARBITER_H_
 
 #include <memory>
 #include "ros/ros.h"
@@ -24,7 +24,7 @@
 #include "common/routing_gflags.h"
 #include "common/routing_macros.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class Navigator;
@@ -51,6 +51,6 @@ class Arbiter {
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_CORE_ARBITER_H
+#endif  // MODULES_ROUTING_CORE_ARBITER_H_

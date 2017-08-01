@@ -1,11 +1,9 @@
-// Copyright (c) 2017 Baidu.com, Inc. All Rights Reserved
-//
-// @file topo_graph.proto
-// @author Fu, Xiaoxin(fuxiaoxin@baidu.com)
+syntax = "proto2";
 
-package adu.routing.common;
+package apollo.routing.common;
 
-import "map_geometry.proto";
+import "modules/common/proto/header.proto";
+import "modules/map/proto/map_geometry.proto";
 
 message CurvePoint {
     optional double s = 1;

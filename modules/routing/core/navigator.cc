@@ -32,16 +32,16 @@
 #include "graph/topo_node.h"
 #include "strategy/a_star_strategy.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 namespace {
 
-using ::adu::common::router::RoutingResult_Road;
-using ::adu::common::router::RoutingResult_Junction;
-using ::adu::common::router::RoutingResult_PassageRegion;
-using ::adu::common::router::RoutingResult_LaneSegment;
-using ::adu::common::router::RoutingResult_LaneChangeInfo;
+using ::apollo::router::RoutingResult_Road;
+using ::apollo::router::RoutingResult_Junction;
+using ::apollo::router::RoutingResult_PassageRegion;
+using ::apollo::router::RoutingResult_LaneSegment;
+using ::apollo::router::RoutingResult_LaneChangeInfo;
 
 void get_nodes_of_ways_based_on_virtual(
     const std::vector<const TopoNode*>& nodes,
@@ -165,7 +165,7 @@ void show_request_info(const T& request) {
 }
 
 void generate_black_set_from_road(
-    const ::adu::common::router::RoutingRequest& request,
+    const ::apollo::router::RoutingRequest& request,
     const TopoGraph* graph,
     std::unordered_set<const TopoNode*>* const black_list) {
   for (const auto& road_id : request.blacklisted_road()) {
@@ -268,8 +268,8 @@ bool Navigator::is_ready() const { return _is_ready; }
 
 // search new request to new response
 bool Navigator::search_route(
-    const ::adu::common::router::RoutingRequest& request,
-    ::adu::common::router::RoutingResult* response) const {
+    const ::apollo::router::RoutingRequest& request,
+    ::apollo::router::RoutingResult* response) const {
   if (!is_ready()) {
     ROS_ERROR("Topo graph is not ready!");
     return false;
@@ -311,8 +311,8 @@ bool Navigator::search_route(
 
 // search old request to old response
 bool Navigator::search_route(
-    const ::adu::common::routing::RoutingRequest& request,
-    ::adu::common::routing::RoutingResult* response) const {
+    const ::apollo::routing::RoutingRequest& request,
+    ::apollo::routing::RoutingResult* response) const {
   if (!is_ready()) {
     ROS_ERROR("Topo graph is not ready!");
     return false;
@@ -346,7 +346,7 @@ bool Navigator::search_route(
   }
 
   if (FLAGS_enable_debug_mode) {
-    ::adu::common::router::RoutingResult new_response;
+    ::apollo::router::RoutingResult new_response;
     generate_passage_region(result_nodes, black_list, range_manager,
                             &new_response);
     dump_debug_data(result_nodes, range_manager, new_response);
@@ -357,11 +357,11 @@ bool Navigator::search_route(
 
 // new request to new response
 bool Navigator::generate_passage_region(
-    const ::adu::common::router::RoutingRequest& request,
+    const ::apollo::router::RoutingRequest& request,
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     const NodeRangeManager& range_manager,
-    ::adu::common::router::RoutingResult* result) const {
+    ::apollo::router::RoutingResult* result) const {
   result->mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   result->mutable_header()->set_module_name(FLAGS_node_name);
   result->mutable_header()->set_sequence_num(1);
@@ -380,7 +380,7 @@ void Navigator::generate_passage_region(
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     const NodeRangeManager& range_manager,
-    ::adu::common::router::RoutingResult* result) const {
+    ::apollo::router::RoutingResult* result) const {
   std::vector<std::vector<const TopoNode*> > nodes_of_ways;
   if (FLAGS_use_road_id) {
     get_nodes_of_ways(nodes, &nodes_of_ways);
@@ -409,7 +409,6 @@ void Navigator::generate_passage_region(
       for (const auto& nodes_of_passage : nodes_of_basic_passages) {
         passage_lane_ids_to_passage_region(nodes_of_passage, range_manager,
                                            road.add_passage_region());
-        // TODO: set trajectory of region
       }
       for (size_t i = 0; i < lane_change_types.size(); ++i) {
         RoutingResult_LaneChangeInfo* lc_info = road.add_lane_change_info();
@@ -434,7 +433,6 @@ void Navigator::generate_passage_region(
         seg->set_start_s(range.start_s);
         seg->set_end_s(range.end_s);
       }
-      // TODO: set trajectory of region
       junction.mutable_passage_region()->CopyFrom(region);
       result->add_route()->mutable_junction_info()->CopyFrom(junction);
       ROS_INFO("Junction passage!!!");
@@ -448,11 +446,11 @@ void Navigator::generate_passage_region(
 
 // old request to old response
 bool Navigator::generate_passage_region(
-    const ::adu::common::routing::RoutingRequest& request,
+    const ::apollo::routing::RoutingRequest& request,
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     const NodeRangeManager& range_manager,
-    ::adu::common::routing::RoutingResult* result) const {
+    ::apollo::routing::RoutingResult* result) const {
   result->mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   result->mutable_header()->set_module_name(FLAGS_node_name);
   result->mutable_header()->set_sequence_num(1);
@@ -471,7 +469,7 @@ bool Navigator::generate_passage_region(
 void Navigator::dump_debug_data(
     const std::vector<const TopoNode*>& nodes,
     const NodeRangeManager& range_manager,
-    const ::adu::common::router::RoutingResult& response) const {
+    const ::apollo::router::RoutingResult& response) const {
   std::string debug_string;
   ROS_INFO("Route lane id\tis virtual\tstart s\tend s");
   for (const auto& node : nodes) {
@@ -497,4 +495,4 @@ void Navigator::dump_debug_data(
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo

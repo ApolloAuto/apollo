@@ -21,7 +21,7 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 using ::google::protobuf::io::FileInputStream;
@@ -69,4 +69,4 @@ bool FileUtils::dump_protobuf_data_to_file(
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo

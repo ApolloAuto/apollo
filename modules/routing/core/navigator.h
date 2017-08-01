@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_CORE_NAVIGATOR_H
-#define BAIDU_ADU_ROUTING_CORE_NAVIGATOR_H
+#ifndef MODULES_ROUTING_CORE_NAVIGATOR_H_
+#define MODULES_ROUTING_CORE_NAVIGATOR_H_
 
 #include <memory>
 
@@ -26,7 +26,7 @@
 
 #include <unordered_set>
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class TopoGraph;
@@ -39,41 +39,41 @@ class Navigator {
   bool is_ready() const;
 
   // search old request to old response
-  bool search_route(const ::adu::common::routing::RoutingRequest& request,
-                    ::adu::common::routing::RoutingResult* response) const;
+  bool search_route(const ::apollo::routing::RoutingRequest& request,
+                    ::apollo::routing::RoutingResult* response) const;
 
   // search new request to new response
-  bool search_route(const ::adu::common::router::RoutingRequest& request,
-                    ::adu::common::router::RoutingResult* response) const;
+  bool search_route(const ::apollo::router::RoutingRequest& request,
+                    ::apollo::router::RoutingResult* response) const;
 
  private:
   // new request to new response
   bool generate_passage_region(
-      const ::adu::common::router::RoutingRequest& request,
+      const ::apollo::router::RoutingRequest& request,
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
       const NodeRangeManager& range_manager,
-      ::adu::common::router::RoutingResult* result) const;
+      ::apollo::router::RoutingResult* result) const;
 
   // use internal generate result
   void generate_passage_region(
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
       const NodeRangeManager& range_manager,
-      ::adu::common::router::RoutingResult* result) const;
+      ::apollo::router::RoutingResult* result) const;
 
   // old request to old response
   bool generate_passage_region(
-      const ::adu::common::routing::RoutingRequest& request,
+      const ::apollo::routing::RoutingRequest& request,
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
       const NodeRangeManager& range_manager,
-      ::adu::common::routing::RoutingResult* result) const;
+      ::apollo::routing::RoutingResult* result) const;
 
   void dump_debug_data(
       const std::vector<const TopoNode*>& nodes,
       const NodeRangeManager& range_manager,
-      const ::adu::common::router::RoutingResult& response) const;
+      const ::apollo::router::RoutingResult& response) const;
 
  private:
   bool _is_ready;
@@ -81,6 +81,6 @@ class Navigator {
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_CORE_NAVIGATOR_H
+#endif  // MODULES_ROUTING_CORE_NAVIGATOR_H_

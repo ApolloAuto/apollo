@@ -20,7 +20,6 @@
 #include <limits>
 #include <queue>
 
-#include "boost/lexical_cast.hpp"
 #include "ros/ros.h"
 
 #include "graph/topo_edge.h"
@@ -28,7 +27,7 @@
 #include "graph/topo_node.h"
 #include "strategy/a_star_strategy.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 namespace {
@@ -159,4 +158,4 @@ bool AStarStrategy::search(
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
