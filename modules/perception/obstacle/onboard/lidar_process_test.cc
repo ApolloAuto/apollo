@@ -17,6 +17,7 @@
 #include <vector>
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 
 #define private public
 #include "modules/perception/obstacle/onboard/lidar_process.h"
@@ -30,7 +31,9 @@ class LidarProcessTest : public testing::Test {
  protected:
   LidarProcessTest() {}
   virtual ~LidarProcessTest() {}
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    lidar_process_.RegistAllAlgorithm();
+  }
 
  private:
   LidarProcess lidar_process_;

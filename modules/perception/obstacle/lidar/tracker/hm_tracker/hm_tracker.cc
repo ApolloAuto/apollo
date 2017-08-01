@@ -635,7 +635,5 @@ void HmObjectTracker::ComputeTrackIdsForRecentObjects(
     }
 }
 
-REGISTER_TRACKER(HmObjectTracker);
-
 }  // namespace perception
 }  // namespace apollo

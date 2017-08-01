@@ -191,7 +191,5 @@ bool CNNSegmentation::GetConfigs(string& config_file,
   return true;
 }
 
-REGISTER_SEGMENTATION(CNNSegmentation);
-
 }  // namespace perception
 }  // namespace apollo

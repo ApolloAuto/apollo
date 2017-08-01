@@ -144,12 +144,5 @@ bool DummyTracker::Track(const vector<ObjectPtr> &objects, double timestamp,
   return result_track_;
 }
 
-REGISTER_GROUNDDETECTOR(DummyGroundDetector);
-REGISTER_ROIFILTER(DummyROIFilter);
-REGISTER_SEGMENTATION(DummySegmentation);
-REGISTER_OBJECTBUILDER(DummyObjectBuilder);
-REGISTER_TRACKER(DummyTracker);
-REGISTER_OBJECTFILTER(DummyObjectFilter);
-
 }  // namespace perception
 }  // namespace apollo

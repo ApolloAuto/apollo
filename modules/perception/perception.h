@@ -26,8 +26,8 @@
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "modules/perception/obstacle/onboard/lidar_process.h"
 #include "ros/include/ros/ros.h"
+#include "modules/perception/obstacle/onboard/lidar_process.h"
 
 /**
  * @namespace apollo::perception
