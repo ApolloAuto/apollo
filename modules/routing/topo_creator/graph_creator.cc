@@ -14,25 +14,25 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "topo_creator/graph_creator.h"
+#include "modules/routing/topo_creator/topo_creator/graph_creator.h"
 
 #include "glog/logging.h"
 
 #include "common/utils.h"
-#include "topo_creator/edge_creator.h"
-#include "topo_creator/node_creator.h"
+#include "modules/routing/topo_creator/edge_creator.h"
+#include "modules/routing/topo_creator/node_creator.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 namespace {
 
 using ::google::protobuf::RepeatedPtrField;
 
-using ::adu::common::hdmap::Id;
+using ::apollo::common::hdmap::Id;
 
-using ::adu::routing::common::Node;
-using ::adu::routing::common::Edge;
+using ::apollo::routing::common::Node;
+using ::apollo::routing::common::Edge;
 
 std::string get_edge_id(const std::string& from_id, const std::string& to_id) {
   return from_id + "->" + to_id;
@@ -46,7 +46,7 @@ GraphCreator::GraphCreator(const std::string& base_map_file_path,
       _dump_topo_file_path(dump_topo_file_path) {}
 
 bool GraphCreator::create() {
-  if (!::adu::routing::FileUtils::load_protobuf_data_from_file(
+  if (!::apollo::routing::FileUtils::load_protobuf_data_from_file(
           _base_map_file_path, &_pbmap)) {
     LOG(ERROR) << "Failed to load base map file from " << _base_map_file_path;
     return false;
@@ -88,7 +88,7 @@ bool GraphCreator::create() {
     add_edge(from_node, lane.successor_id(), Edge::FORWARD);
   }
 
-  if (!::adu::routing::FileUtils::dump_protobuf_data_to_file(
+  if (!::apollo::routing::FileUtils::dump_protobuf_data_to_file(
           _dump_topo_file_path, _graph)) {
     LOG(ERROR) << "Failed to dump topo data into file " << _dump_topo_file_path;
     return false;
@@ -117,4 +117,4 @@ void GraphCreator::add_edge(const Node& from_node,
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo

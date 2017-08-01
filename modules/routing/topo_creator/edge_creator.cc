@@ -14,18 +14,18 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "topo_creator/edge_creator.h"
+#include "modules/routing/topo_creator/edge_creator.h"
 
 #include <math.h>
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 namespace {
 
-using ::adu::routing::common::Node;
-using ::adu::routing::common::Edge;
-using ::adu::routing::common::CurveRange;
+using ::apollo::routing::common::Node;
+using ::apollo::routing::common::Edge;
+using ::apollo::routing::common::CurveRange;
 
 const double CHANGE_PENALTY = 50;  // equal to 50 meter length
 const double BASE_CHANGING_LENGTH = 50;
@@ -65,4 +65,4 @@ void EdgeCreator::init_edge_cost(const Node& node_from, const Node& node_to,
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
