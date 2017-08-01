@@ -43,6 +43,23 @@ class RegionalPredictorTest : public ::testing::Test {
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
+TEST_F(RegionalPredictorTest, MovingPedestrian) {
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
+                   1501183430.161906);
+  apollo::perception::PerceptionObstacle perception_obstacle =
+      perception_obstacles_.perception_obstacle(0);
+  EXPECT_EQ(perception_obstacle.id(), 101);
+  ObstaclesContainer container;
+  container.Insert(perception_obstacles_);
+  Obstacle* obstacle_ptr = container.GetObstacle(101);
+  EXPECT_TRUE(obstacle_ptr != nullptr);
+  RegionalPredictor predictor;
+  // predictor.Predict(obstacle_ptr);
+  // const PredictionObstacle& prediction_obstacle =
+  //     predictor.prediction_obstacle();
+  // EXEPECT_EQ(prediction_obstacle.trajectory().trajectory_point_size(), 2);
+}
+
 TEST_F(RegionalPredictorTest, StationaryPedestrian) {
   EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
                    1501183430.161906);
@@ -57,7 +74,7 @@ TEST_F(RegionalPredictorTest, StationaryPedestrian) {
   predictor.Predict(obstacle_ptr);
   const PredictionObstacle& prediction_obstacle =
       predictor.prediction_obstacle();
-  EXEPECT_EQ(prediction_obstacle.trajectory().trajectory_point_size(),
+  EXPECT_EQ(prediction_obstacle.trajectory_size(),
              FLAGS_num_trajectory_still_pedestrian);
 }
 
