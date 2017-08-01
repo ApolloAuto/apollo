@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+
 #include "gtest/gtest.h"
 
 #include "modules/prediction/prediction.h"
@@ -36,4 +37,4 @@ TEST_F(PredictionTest, Simple) {
 }
 
 }  // namespace prediction
-}  // namespace apollo
+}  // namespace apoll
