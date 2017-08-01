@@ -89,6 +89,13 @@ class DpRoadGraph {
     const ReferenceLine &reference_line,
     DecisionData *const decision_data);
 
+bool fill_ego_by_time(
+  const FrenetFramePath &frenet_frame_path,
+  const ReferenceLine& reference_line,
+  const SpeedData& heuristic_speed_data,
+  int evaluate_times,
+  std::vector<::apollo::common::math::Box2d>* ego_by_time);
+
  private:
   DpPolyPathConfig config_;
   ::apollo::common::TrajectoryPoint init_point_;
