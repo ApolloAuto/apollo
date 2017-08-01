@@ -11,10 +11,8 @@ message Command {
   repeated string command = 2;
 
   // Log file paths.
-  // Note that only files under /apollo/data can be viewed from HMI.
   optional string stdout_file = 3 [default = '/dev/null'];
   optional string stderr_file = 4 [default = '/dev/null'];
-  repeated string log_files = 5;
 }
 
 message Component {
