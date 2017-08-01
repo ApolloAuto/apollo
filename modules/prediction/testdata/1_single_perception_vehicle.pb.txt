@@ -3,7 +3,6 @@ header {
   module_name: "perception"
   sequence_num: 15839
 }
-
 perception_obstacle {
   id: 1
   position {
@@ -24,4 +23,3 @@ perception_obstacle {
   type: VEHICLE
   timestamp: 1501183430.1619561
 }
-

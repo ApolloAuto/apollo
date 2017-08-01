@@ -322,5 +322,9 @@ double MLPEvaluator::ComputeProbability() {
   return probability;
 }
 
+const std::vector<double>& MLPEvaluator::feature_values() const {
+  return feature_values_;
+}
+
 }  // namespace prediction
 }  // namespace apollo
