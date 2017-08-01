@@ -81,7 +81,7 @@ class HmObjectTracker : public BaseTracker{
   // value
   // @params[IN] pose: v2world pose
   // @return nothing
-  void TransformPoseGlobal2Local(Eigen::Matrix4d& pose);
+  void TransformPoseGlobal2Local(Eigen::Matrix4d* pose);
 
   // @brief construct tracked objects via necessray transformation & feature
   // computing
@@ -90,26 +90,26 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
   void ConstructTrackedObjects(const std::vector<ObjectPtr>& objects,
-    std::vector<TrackedObjectPtr>& tracked_objects,
+    std::vector<TrackedObjectPtr>* tracked_objects,
     const Eigen::Matrix4d& pose);
 
   // @brief compute objects' shape feature
   // @params[IN] object: object for computing shape feature
   // @return nothing
-  void ComputeShapeFeatures(TrackedObjectPtr& obj);
+  void ComputeShapeFeatures(TrackedObjectPtr* obj);
 
   // @brief transform tracked object with given pose
   // @params[IN] obj: tracked object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
-  void TransformTrackedObject(TrackedObjectPtr& obj,
+  void TransformTrackedObject(TrackedObjectPtr* obj,
     const Eigen::Matrix4d& pose);
 
   // @brief transform object with given pose
   // @params[IN] obj: object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
-  void TransformObject(ObjectPtr& obj,
+  void TransformObject(ObjectPtr* obj,
     const Eigen::Matrix4d& pose);
 
   // @brief decompose foreground background from detected objects pool
@@ -117,15 +117,15 @@ class HmObjectTracker : public BaseTracker{
   // @params[OUT] fg_objects: foreground objects
   // @params[OUT] bg_objects: background objects
   void DecomposeForegroundBackgroundObjects(
-    std::vector<TrackedObjectPtr>& objects,
-    std::vector<TrackedObjectPtr>& fg_objects,
-    std::vector<TrackedObjectPtr>& bg_objects);
+    std::vector<TrackedObjectPtr>* objects,
+    std::vector<TrackedObjectPtr>* fg_objects,
+    std::vector<TrackedObjectPtr>* bg_objects);
 
   // @brief compute tracks' predict states
   // @params[OUT] tracks_predict: tracks' predict states
   // @params[IN] time_diff: time interval for predicting
   // @return nothing
-  void ComputeTracksPredict(std::vector<Eigen::VectorXf>& tracks_predict,
+  void ComputeTracksPredict(std::vector<Eigen::VectorXf>* tracks_predict,
     const double time_diff);
 
   // @brief update assigned tracks
@@ -134,8 +134,8 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] assignments: assignment pair of new objects & tracks
   // @params[IN] time_diff: time interval for updating
   // @return nothing
-  void UpdateAssignedTracks(std::vector<Eigen::VectorXf>& tracks_predict,
-    std::vector<TrackedObjectPtr>& new_objects,
+  void UpdateAssignedTracks(std::vector<Eigen::VectorXf>* tracks_predict,
+    std::vector<TrackedObjectPtr>* new_objects,
     const std::vector<TrackObjectPair>& assignments,
     const double time_diff);
 
@@ -197,11 +197,11 @@ class HmObjectTracker : public BaseTracker{
   Eigen::Matrix4d                             velodyne_to_local_pose_;
   Eigen::Vector3d                             global_to_local_offset_;
   double                                      time_stamp_;
-  unsigned long                               frame_number_;
+  bool                                        valid_;
   // local coordinate system
-  Eigen::Vector3f                             _ref_location;
-  Eigen::Vector3f                             _ref_orientation;
-  Eigen::Vector3f                             _ref_translation;
+  Eigen::Vector3f                             ref_location_;
+  Eigen::Vector3f                             ref_orientation_;
+  Eigen::Vector3f                             ref_translation_;
 
   DISALLOW_COPY_AND_ASSIGN(HmObjectTracker);
 };  // class HmObjectTracker

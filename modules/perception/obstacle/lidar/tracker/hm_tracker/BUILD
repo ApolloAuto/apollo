@@ -41,11 +41,16 @@ cc_test(
         "hm_tracker_test.cc",
     ],
     data = [
+        "//modules/perception:perception_data",
         "//modules/perception:perception_model",
         "//modules/perception/conf:perception_config",
     ],
+    linkopts = [
+        "-lqhull",
+    ],
     deps = [
         ":perception_obstacle_lidar_tracker_hm_tracker",
+        "//modules/perception/obstacle/lidar/object_builder/min_box:perception_obstacle_lidar_object_builder_min_box",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/common:log",
         "@gtest//:main",

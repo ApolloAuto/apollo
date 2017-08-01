@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef  MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_HM_OBJECT_TRACK_H_
-#define  MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_HM_OBJECT_TRACK_H_
+
+#ifndef  MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_OBJECT_TRACK_H_
+#define  MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_OBJECT_TRACK_H_
+
 #include <boost/shared_ptr.hpp>
 #include <Eigen/Core>
+#include <deque>
 #include <queue>
+#include <string>
+#include <vector>
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/common/circular_array.h"
@@ -28,181 +33,153 @@ namespace apollo {
 namespace perception {
 
 class ObjectTrack {
-public:
-    explicit ObjectTrack(TrackedObjectPtr obj);
-    ~ObjectTrack();
+ public:
+  explicit ObjectTrack(TrackedObjectPtr obj);
+  ~ObjectTrack();
 
-    // @brief set filter method for all the object track objects
-    // @params[IN] filter_method: method name of filtering algorithm
-    // @return nothing
-    static void set_filter_method(const std::string& filter_method);
-    
-    // @brief get next avaiable track id
-    // @return next avaiable track id
-    static int get_next_track_id();
-    
-    // @brief predict the state of track
-    // @params[IN] time_diff: time interval for predicting
-    // @return predicted states of track
-    Eigen::VectorXf predict(const double time_diff);   
-    
-    // @brief update track with object
-    // @params[IN] new_object: new object for current updating
-    // @params[IN] time_diff: time interval from last updating
-    // @return nothing
-    void update_with_object(TrackedObjectPtr& new_object, 
-            const double time_diff);
+  // @brief set filter method for all the object track objects
+  // @params[IN] filter_method: method name of filtering algorithm
+  // @return nothing
+  static void SetFilterMethod(const std::string& filter_method);
 
-    // @brief update track without object
-    // @params[IN] time_diff: time interval from last updating
-    // @return nothing
-    void update_without_object(const double time_diff);
+  // @brief get next avaiable track id
+  // @return next avaiable track id
+  static int GetNextTrackId();
 
-    // @brief update track without object with given predicted state
-    // @params[IN] predict_state: given predicted state of track
-    // @params[IN] time_diff: time interval from last updating
-    // @return nothing
-    void update_without_object(const Eigen::VectorXf& predict_state, 
-            const double time_diff);
+  // @brief predict the state of track
+  // @params[IN] time_diff: time interval for predicting
+  // @return predicted states of track
+  Eigen::VectorXf Predict(const double time_diff);
 
-protected:
-    /* update with object */
-    
-    // @brief check whether given measurement is outlier
-    // @params[IN] new_object: new detected object for updating
-    // @params[IN] time_diff: time interval from last updating
-    // @return true if given object is outlier, otherwise return false
-    bool check_measurement_outliers(TrackedObjectPtr& new_object, 
-            const double time_diff);
+  // @brief update track with object
+  // @params[IN] new_object: new object for current updating
+  // @params[IN] time_diff: time interval from last updating
+  // @return nothing
+  void UpdateWithObject(TrackedObjectPtr* new_object,
+    const double time_diff);
 
-    // @brief smooth velocity over track history
-    // @params[IN] new_object: new detected object for updating
-    // @params[IN] time_diff: time interval from last updating
-    // @return nothing
-    void smooth_track_velocity(TrackedObjectPtr& new_object,
-            const double time_diff);
+  // @brief update track without object
+  // @params[IN] time_diff: time interval from last updating
+  // @return nothing
+  void UpdateWithoutObject(const double time_diff);
 
-    // @brief smooth orientation over track history
-    // @return nothing
-    void smooth_track_orientation();
+  // @brief update track without object with given predicted state
+  // @params[IN] predict_state: given predicted state of track
+  // @params[IN] time_diff: time interval from last updating
+  // @return nothing
+  void UpdateWithoutObject(const Eigen::VectorXf& predict_state,
+    const double time_diff);
 
-    // @brief smooth track class idx over track history
-    // @return nothing
-    void smooth_track_class_idx();
+ protected:
+  // @brief smooth velocity over track history
+  // @params[IN] new_object: new detected object for updating
+  // @params[IN] time_diff: time interval from last updating
+  // @return nothing
+  void SmoothTrackVelocity(const TrackedObjectPtr& new_object,
+    const double time_diff);
 
-    // @brief check whether track is static or not
-    // @params[IN] new_object: new detected object just updated
-    // @params[IN] time_diff: time interval between last two updating
-    // @return true if track is static, otherwise return false
-    bool check_track_static_hypothesis(ObjectPtr& new_object, 
-            const double time_diff);
+  // @brief smooth orientation over track history
+  // @return nothing
+  void SmoothTrackOrientation();
 
-    // @brief sub strategy of checking whether track is static or not via considering bbox shift
-    // @params[IN] new_object: new detected object just updated
-    // @params[IN] time_diff: time interval between last two updating
-    // @return true if track is static, otherwise return false
-    bool check_track_static_hypothesis_by_bbox_shift(ObjectPtr& new_object,
-            const double time_diff);
+  // @brief smooth track class idx over track history
+  // @return nothing
+  void SmoothTrackClassIdx();
 
-    // @brief sub strategy of checking whether track is static or not via considering the
-    // consistancy of direction of velocity
-    // @params[IN] new_object: new detected object just updated
-    // @params[IN] time_diff: time interval between last two updating
-    // @return true if track is static, otherwise return false
-    bool check_track_static_hypothesis_by_history_velocity_consistancy(ObjectPtr& new_object,
-            const double time_diff);
+  // @brief check whether track is static or not
+  // @params[IN] new_object: new detected object just updated
+  // @params[IN] time_diff: time interval between last two updating
+  // @return true if track is static, otherwise return false
+  bool CheckTrackStaticHypothesis(const ObjectPtr& new_object,
+    const double time_diff);
 
-    // @brief sub strategy of checking whether track is static or not via considering the
-    // velocity angle change
-    // @params[IN] new_object: new detected object just updated
-    // @params[IN] time_diff: time interval between last two updating
-    // @return true if track is static, otherwise return false
-    bool check_track_static_hypothesis_by_velocity_angle_change(ObjectPtr& new_object,
-            const double time_diff);
+  // @brief sub strategy of checking whether track is static or not via
+  // considering the velocity angle change
+  // @params[IN] new_object: new detected object just updated
+  // @params[IN] time_diff: time interval between last two updating
+  // @return true if track is static, otherwise return false
+  bool CheckTrackStaticHypothesisByVelocityAngleChange(
+    const ObjectPtr& new_object,
+    const double time_diff);
 
-    // @brief post process track with rule-based tuning or onroad strategies
-    // @return nothing
-    void post_processing();
+ private:
+  ObjectTrack();
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(ObjectTrack);
-    ObjectTrack();
+ public:
+  // algorithm setup
+  static std::string                    s_filter_method_;
+  BaseFilter*                           filter_;
 
-public:
-    // algorithm setup
-    static std::string                  _s_filter_method;
+  // basic info
+  int                                   idx_;
+  int                                   age_;
+  int                                   total_visible_count_;
+  int                                   consecutive_invisible_count_;
+  double                                period_;
 
-    BaseFilter*                     _filter;
+  TrackedObjectPtr                      current_object_;
 
-    // basic info
-    int                                 _idx;
-    int                                 _age;
-    int                                 _total_visible_count;
-    int                                 _consecutive_invisible_count;
-    double                              _period;
+  // history
+  std::deque<TrackedObjectPtr>          history_objects_;
 
-    TrackedObjectPtr                    _current_object;
+  // history type info
+  std::vector<float>                    accumulated_type_probs_;
+  int                                   type_life_time_;
 
-    // history
-    std::deque<TrackedObjectPtr>        _history_objects;
+  // states
+  // NEED TO NOTICE: All the states would be collected mainly based on states
+  // of tracked object. Thus, update tracked object when you update the state
+  // of track !!!!!
+  bool                                  is_static_hypothesis_;
+  Eigen::Vector3f                       belief_anchor_point_;
+  Eigen::Vector3f                       belief_velocity_;
+  Eigen::Vector3f                       belief_velocity_accelaration_;
 
-    // history type info
-    std::vector<float>                  _accumulated_type_probs;
-    int                                 _type_life_time;
+ private:
+  // global setup
+  static int                            s_track_idx_;
+  static const int                      s_max_cached_object_size_ = 20;
+  static constexpr double               s_claping_speed_threshold_ = 0.4;
+  static constexpr double               s_claping_accelaration_threshold_ = 10;
 
-    // states
-    // NEED TO NOTICE: All the states would be collected mainly based on states of tracked object.
-    // Thus, update tracked object when you update the state of track !!!!!
-    bool                                _is_static_hypothesis;
-    Eigen::Vector3f                     _belief_anchor_point;
-    Eigen::Vector3f                     _belief_velocity;
-    Eigen::Vector3f                     _belief_velocity_accelaration;
-     
-private:
-    // global setup
-    static int                          _s_track_idx;  
-    static const int                    _s_max_cached_object_size = 20;
-    static constexpr double             _s_claping_speed_threshold = 0.4;
-    static constexpr double             _s_claping_accelaration_threshold = 10;
-
-}; // class ObjectTrack
+  DISALLOW_COPY_AND_ASSIGN(ObjectTrack);
+};  // class ObjectTrack
 
 typedef ObjectTrack* ObjectTrackPtr;
 
 class ObjectTrackSet{
-public:    
-    ObjectTrackSet(); 
-    ~ObjectTrackSet();
+ public:
+  ObjectTrackSet();
+  ~ObjectTrackSet();
 
-    inline std::vector<ObjectTrackPtr>& get_tracks() {
-        return _tracks;
-    }
-    
-    inline const std::vector<ObjectTrackPtr>& get_tracks() const {
-        return _tracks;
-    }
-    
-    inline int size() const {
-        return _tracks.size();
-    }
-    
-    void add_track(const ObjectTrackPtr& track){
-        _tracks.push_back(track);
-    }
-    
-    int remove_lost_tracks();
+  inline std::vector<ObjectTrackPtr>& get_tracks() {
+    return tracks_;
+  }
 
-    void clear();
-    
-private:
-    std::vector<ObjectTrackPtr>  _tracks;
-    int                          _age_threshold;
-    double                       _minimum_visible_ratio;
-    int                          _maximum_consecutive_invisible_count;
+  inline const std::vector<ObjectTrackPtr>& get_tracks() const {
+    return tracks_;
+  }
 
-}; // class ObjectTrackSet
+  inline int size() const {
+    return tracks_.size();
+  }
 
-} // namespace perception
-} // namespace apollo
+  void add_track(const ObjectTrackPtr& track) {
+    tracks_.push_back(track);
+  }
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_HM_OBJECT_TRACK_H_
+  int remove_lost_tracks();
+
+  void clear();
+
+ private:
+  std::vector<ObjectTrackPtr>           tracks_;
+  int                                   age_threshold_;
+  double                                minimum_visible_ratio_;
+  int                                   maximum_consecutive_invisible_count_;
+};  // class ObjectTrackSet
+
+}  // namespace perception
+}  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_OBJECT_TRACK_H_

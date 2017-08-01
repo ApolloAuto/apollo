@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
 
@@ -23,79 +24,79 @@ TrackedObject::TrackedObject() {
 }
 
 TrackedObject::TrackedObject(ObjectPtr obj_ptr) : object_ptr(obj_ptr) {
-    if (object_ptr!=nullptr) {
-        center = object_ptr->center.cast<float>();
-        direction = object_ptr->direction.cast<float>();
-        size = Eigen::Vector3f(object_ptr->length, object_ptr->width, object_ptr->height);
-        type = object_ptr->type;
-        barycenter = 
-            get_barycenter<apollo::perception::pcl_util::Point>(object_ptr->cloud).cast<float>();
-        
-        anchor_point = barycenter;
-    }
+  if (object_ptr != nullptr) {
+    center = object_ptr->center.cast<float>();
+    direction = object_ptr->direction.cast<float>();
+    size = Eigen::Vector3f(object_ptr->length, object_ptr->width,
+      object_ptr->height);
+    type = object_ptr->type;
+    barycenter = get_barycenter<apollo::perception::pcl_util::Point>(
+      object_ptr->cloud).cast<float>();
+    anchor_point = barycenter;
+  }
 }
 
 TrackedObject::TrackedObject(const TrackedObject& rhs) {
-    object_ptr = rhs.object_ptr;
-    center = rhs.center;
-    direction = rhs.direction;
-    size = rhs.size;
-    type = rhs.type;
-    barycenter = rhs.barycenter;
-    anchor_point = rhs.anchor_point;
-    distance_to_ref = rhs.distance_to_ref;
-    angle_to_ref = rhs.angle_to_ref;
-    velocity = rhs.velocity;
-    acceleration = rhs.acceleration;
-    angle = rhs.angle;
-    angular_velocity = rhs.angular_velocity;
-    type = rhs.type;
-    association_score = rhs.association_score;
+  object_ptr = rhs.object_ptr;
+  center = rhs.center;
+  direction = rhs.direction;
+  size = rhs.size;
+  type = rhs.type;
+  barycenter = rhs.barycenter;
+  anchor_point = rhs.anchor_point;
+  distance_to_ref = rhs.distance_to_ref;
+  angle_to_ref = rhs.angle_to_ref;
+  velocity = rhs.velocity;
+  acceleration = rhs.acceleration;
+  angle = rhs.angle;
+  angular_velocity = rhs.angular_velocity;
+  type = rhs.type;
+  association_score = rhs.association_score;
 }
 
 TrackedObject& TrackedObject::operator = (const TrackedObject& rhs) {
-    object_ptr = rhs.object_ptr;
-    center = rhs.center;
-    direction = rhs.direction;
-    size = rhs.size;
-    type = rhs.type;
-    barycenter = rhs.barycenter;
-    anchor_point = rhs.anchor_point;
-    distance_to_ref = rhs.distance_to_ref;
-    angle_to_ref = rhs.angle_to_ref;
-    velocity = rhs.velocity;
-    acceleration = rhs.acceleration;
-    angle = rhs.angle;
-    angular_velocity = rhs.angular_velocity;
-    type = rhs.type;
-    association_score = rhs.association_score;
-    return (*this);
+  object_ptr = rhs.object_ptr;
+  center = rhs.center;
+  direction = rhs.direction;
+  size = rhs.size;
+  type = rhs.type;
+  barycenter = rhs.barycenter;
+  anchor_point = rhs.anchor_point;
+  distance_to_ref = rhs.distance_to_ref;
+  angle_to_ref = rhs.angle_to_ref;
+  velocity = rhs.velocity;
+  acceleration = rhs.acceleration;
+  angle = rhs.angle;
+  angular_velocity = rhs.angular_velocity;
+  type = rhs.type;
+  association_score = rhs.association_score;
+  return (*this);
 }
 
 void TrackedObject::clone(const TrackedObject& rhs) {
-    object_ptr.reset(new Object());
-    object_ptr->clone(*rhs.object_ptr);
+  object_ptr.reset(new Object());
+  object_ptr->clone(*rhs.object_ptr);
 
-    center = rhs.center;
-    direction = rhs.direction;
-    size = rhs.size;
-    type = rhs.type;
-    barycenter = rhs.barycenter;
-    anchor_point = rhs.anchor_point;
-    distance_to_ref = rhs.distance_to_ref;
-    angle_to_ref = rhs.angle_to_ref;
-    velocity = rhs.velocity;
-    acceleration = rhs.acceleration;
-    angle = rhs.angle;
-    angular_velocity = rhs.angular_velocity;
-    type = rhs.type;
-    association_score = rhs.association_score;
+  center = rhs.center;
+  direction = rhs.direction;
+  size = rhs.size;
+  type = rhs.type;
+  barycenter = rhs.barycenter;
+  anchor_point = rhs.anchor_point;
+  distance_to_ref = rhs.distance_to_ref;
+  angle_to_ref = rhs.angle_to_ref;
+  velocity = rhs.velocity;
+  acceleration = rhs.acceleration;
+  angle = rhs.angle;
+  angular_velocity = rhs.angular_velocity;
+  type = rhs.type;
+  association_score = rhs.association_score;
 }
 
 std::string TrackedObject::to_string() const {
-    std::string txt;
-    return txt;
+  std::string txt;
+  return txt;
 }
 
-} // namespace perception
-} // namesapace apollo
+}  // namespace perception
+}  // namespace apollo
