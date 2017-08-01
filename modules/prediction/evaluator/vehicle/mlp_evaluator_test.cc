@@ -16,16 +16,26 @@
 
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 
+#include <string>
+
 #include "gtest/gtest.h"
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace prediction {
 
 class MLPEvaluatorTest : public ::testing::Test {
  public:
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    std::string file =
+        "modules/prediction/testdata/1_single_perception_vehicle.pb.txt";
+    apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
+  }
+ protected:
+  apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
 TEST_F(MLPEvaluatorTest, Constructor) {

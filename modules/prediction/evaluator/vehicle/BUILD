@@ -35,6 +35,8 @@ cc_test(
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "@gtest//:main",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/perception/proto:perception_proto",
+        "//modules/common/util:util",
     ],
 )
 
