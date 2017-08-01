@@ -34,6 +34,22 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "predictor_manager_test",
+    size = "small",
+    srcs = ["predictor_manager_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/predictor:predictor_manager",
+        "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/common/util:util",
+        "@gtest//:main",
+    ]
+)
+
 cc_library(
     name = "predictor",
     srcs = ["predictor.cc"],
