@@ -1,0 +1,5 @@
+<launch>
+  <env name="ROSCONSOLE_CONFIG_FILE" value = "$(find arbiter)/conf/ros_console.conf" />
+  <node pkg="arbiter" name="router" output="screen" args="--flagfile=$(find arbiter)/conf/gflags.conf" type="arbiter"/>
+</launch>
+
