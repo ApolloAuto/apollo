@@ -37,6 +37,24 @@ using apollo::common::time::Clock;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 
+namespace {
+
+template <typename Iter>
+void InsertFrontTrajectoryPoints(const Iter& start, const Iter& end,
+                                 ADCTrajectory* trajectory_pb) {
+  if (start == end) {
+    AINFO << "No points to prepend to ADCTrajectory.";
+    return;
+  }
+
+  using RepeatedPoints = google::protobuf::RepeatedPtrField<TrajectoryPoint>;
+  std::unique_ptr<RepeatedPoints> merged_points(new RepeatedPoints(start, end));
+  merged_points->MergeFrom(trajectory_pb->trajectory_point());
+  merged_points->Swap(trajectory_pb->mutable_trajectory_point());
+}
+
+}  // namespace
+
 std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
@@ -234,8 +252,9 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     return false;
   }
 
-  InsertFrontTrajectoryPoints(trajectory_pb, {stitching_trajectory.begin(),
-                                              stitching_trajectory.end() - 1});
+  InsertFrontTrajectoryPoints(stitching_trajectory.begin(),
+                              stitching_trajectory.end() - 1,
+                              trajectory_pb);
 
   // update last publishable trajectory;
   last_publishable_trajectory_.Clear();
@@ -246,38 +265,6 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   last_publishable_trajectory_.set_header_time(
       trajectory_pb->header().timestamp_sec());
   return true;
-}
-
-void Planning::InsertFrontTrajectoryPoints(
-    ADCTrajectory* trajectory_pb,
-    const std::vector<apollo::common::TrajectoryPoint>& points) const {
-  if (points.empty()) {
-    AINFO << "stitch points are empty";
-    return;
-  }
-
-  int i = 0;
-  int j = trajectory_pb->trajectory_point_size() - 1;
-  while (i < j) {
-    trajectory_pb->mutable_trajectory_point()->SwapElements(i, j);
-    ++i;
-    --j;
-  }
-
-  j = points.size() - 1;
-  while (j >= 0) {
-    trajectory_pb->add_trajectory_point()->CopyFrom(points[j]);
-    --j;
-  }
-
-  i = 0;
-  j = trajectory_pb->trajectory_point_size() - 1;
-  while (i < j) {
-    trajectory_pb->mutable_trajectory_point()->SwapElements(i, j);
-    ++i;
-    --j;
-  }
-  return;
 }
 
 }  // namespace planning
