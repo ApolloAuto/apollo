@@ -22,7 +22,7 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_SIM_WORLD_TRAJECTORY_POINT_COLLECTOR_H_
 #define MODULES_DREAMVIEW_BACKEND_SIM_WORLD_TRAJECTORY_POINT_COLLECTOR_H_
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"

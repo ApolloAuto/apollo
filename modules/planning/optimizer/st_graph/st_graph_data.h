@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/planning/common/speed_limit.h"
 #include "modules/planning/optimizer/st_graph/st_graph_boundary.h"

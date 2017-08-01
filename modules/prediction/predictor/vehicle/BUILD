@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/math:math_utils",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/predictor",
@@ -25,7 +25,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/math:math_utils",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor",

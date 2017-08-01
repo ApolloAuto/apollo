@@ -50,9 +50,9 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "path_point_proto",
+    name = "pnc_point_proto",
     protos = [
-        "path_point.proto",
+        "pnc_point.proto",
     ],
 )
 
@@ -62,7 +62,7 @@ py_proto_compile(
         "error_code.proto",
         "geometry.proto",
         "header.proto",
-        "path_point.proto",
+        "pnc_point.proto",
         "vehicle_signal.proto",
     ],
 )

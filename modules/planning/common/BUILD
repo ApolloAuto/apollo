@@ -82,7 +82,7 @@ cc_library(
     ],
     deps = [
         ":decision_data",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/map/proto:map_proto",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
@@ -170,7 +170,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/math:hermite_spline",
         "//modules/planning/proto:planning_proto",
     ],

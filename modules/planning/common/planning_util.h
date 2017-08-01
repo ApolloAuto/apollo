@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
 /**

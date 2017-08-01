@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/common:log",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",
         "//modules/common/util",

@@ -10,7 +10,7 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/common/math",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 
@@ -24,7 +24,7 @@ cc_library(
     ],
     deps = [
         ":trajectory",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_util",
         "@eigen//:eigen",
     ],
@@ -54,7 +54,7 @@ cc_library(
     ],
     deps = [
         ":discretized_trajectory",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 

@@ -26,7 +26,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/math/curve_math.h"
 #include "modules/planning/math/double.h"

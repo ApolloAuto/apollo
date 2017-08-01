@@ -29,7 +29,7 @@
 #include "Eigen/Core"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"

@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["regional_predictor.h"],
     deps = [
         "//modules/common/math:kalman_filter",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor",

@@ -26,7 +26,7 @@
 
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 /**
