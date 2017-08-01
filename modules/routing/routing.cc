@@ -24,15 +24,9 @@ namespace routing {
 
 Routing::Routing() {
   _node_handle_ptr.reset(new ros::NodeHandle(FLAGS_node_namespace));
-  if (FLAGS_enable_old_routing) {
-    ROS_INFO("Use old routing request and result!");
-    _service = _node_handle_ptr->advertiseService(
-        FLAGS_signal_probe_service, &Routing::on_request_old_routing, this);
-  } else {
-    ROS_INFO("Use new routing request and result!");
-    _service = _node_handle_ptr->advertiseService(FLAGS_signal_probe_service,
-                                                  &Routing::on_request, this);
-  }
+  ROS_INFO("Use new routing request and result!");
+  _service = _node_handle_ptr->advertiseService(FLAGS_signal_probe_service,
+          &Routing::on_request, this);
   _publisher = _node_handle_ptr->advertise<std_msgs::String>(
       FLAGS_route_topic_for_broadcast, 1);
   std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
@@ -48,34 +42,6 @@ Routing::~Routing() {}
 bool Routing::on_request(routing::routing_signal::Request& req,
                          routing::routing_signal::Response& res) {
   ROS_INFO("Get new routing request!!!");
-  ::apollo::router::RoutingRequest request_proto;
-  ::apollo::router::RoutingResult response_proto;
-  if (!request_proto.ParseFromString(req.routing_request.data)) {
-    ROS_ERROR("The request proto is invalid.");
-    return false;
-  }
-  if (!_navigator_ptr->search_route(request_proto, &response_proto)) {
-    ROS_ERROR("Failed to search route with navigator.");
-    return false;
-  }
-  if (!response_proto.SerializeToString(&(res.routing_response.data))) {
-    ROS_ERROR("Failed to serialize routing response.");
-    return false;
-  }
-  if (request_proto.broadcast()) {
-    std_msgs::String publish_msg;
-    if (!response_proto.SerializeToString(&(publish_msg.data))) {
-      ROS_ERROR("Failed to serialize routing response.");
-      return false;
-    }
-    _publisher.publish(publish_msg);
-  }
-  return true;
-}
-
-bool Routing::on_request_old_routing(routing::routing_signal::Request& req,
-                                     routing::routing_signal::Response& res) {
-  ROS_INFO("Get old routing request!!!");
   ::apollo::routing::RoutingRequest request_proto;
   ::apollo::routing::RoutingResult response_proto;
   if (!request_proto.ParseFromString(req.routing_request.data)) {

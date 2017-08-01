@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   creator_ptr.reset(new ::adu::routing::GraphCreator(
       FLAGS_base_map_dir + "/" + FLAGS_base_map_name, FLAGS_dump_topo_path));
   if (!creator_ptr->create()) {
-    LOG(ERROR) << "Create router topo failed!";
+    LOG(ERROR) << "Create routing topo failed!";
     return -1;
   }
   return 0;

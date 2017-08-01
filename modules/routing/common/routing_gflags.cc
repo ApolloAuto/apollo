@@ -16,13 +16,13 @@
 
 #include "common/routing_gflags.h"
 
-DEFINE_string(node_name, "router", "the name for this node");
-DEFINE_string(node_namespace, "router", "the namespace for this node");
-DEFINE_string(signal_probe_service, "/router/routing_signal",
+DEFINE_string(node_name, "routing", "the name for this node");
+DEFINE_string(node_namespace, "routing", "the namespace for this node");
+DEFINE_string(signal_probe_service, "/routing/routing_signal",
               "the service name for signal probe");
 
 DEFINE_bool(enable_old_routing, true, "enable old routing");
-DEFINE_string(route_topic_for_broadcast, "/router/routing",
+DEFINE_string(route_topic_for_broadcast, "/routing/routing",
               "the default routing topic");
 DEFINE_bool(use_road_id, true, "enable use road id to cut routing result");
 
