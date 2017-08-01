@@ -48,8 +48,7 @@ class DpStGraph {
  private:
   apollo::common::Status InitCostTable();
 
-  apollo::common::Status CalculatePointwiseCost(
-      const std::vector<StGraphBoundary>& boundaries);
+  void CalculatePointwiseCost(const std::vector<StGraphBoundary>& boundaries);
 
   apollo::common::Status retrieve_speed_profile(
       SpeedData* const speed_data) const;
@@ -58,20 +57,19 @@ class DpStGraph {
       const StGraphData& st_graph_data, const SpeedData& speed_profile) const;
 
   apollo::common::Status CalculateTotalCost(const StGraphData& st_graph_data);
-  void CalculateTotalCost(const StGraphData& st_graph_data, const uint32_t r,
-                          const uint32_t c);
+  void CalculateCostAt(const StGraphData& st_graph_data, const uint32_t r,
+                       const uint32_t c);
 
   double CalculateEdgeCost(const STPoint& first, const STPoint& second,
                            const STPoint& third, const STPoint& forth,
                            const double speed_limit) const;
-  double CalculateEdgeCostForSecondRow(const uint32_t col,
+  double CalculateEdgeCostForSecondCol(const uint32_t row,
                                        const double speed_limit) const;
-  double CalculateEdgeCostForThirdRow(const uint32_t curr_c,
-                                      const uint32_t pre_c,
+  double CalculateEdgeCostForThirdCol(const uint32_t curr_r,
+                                      const uint32_t pre_r,
                                       const double speed_limit) const;
 
-  // feasible c_prepre range given c_pre, c
-  bool CalculateFeasibleAccelRange(const double c_pre, const double c_cur,
+  bool CalculateFeasibleAccelRange(const double r_pre, const double r_cur,
                                    uint32_t* const lower_bound,
                                    uint32_t* const upper_bound) const;
 
@@ -91,6 +89,8 @@ class DpStGraph {
   double unit_s_ = 0.0;
   double unit_t_ = 0.0;
 
+  // cost_table_[t][s]
+  // row: s, col: t
   std::vector<std::vector<StGraphPoint> > cost_table_;
 };
 
