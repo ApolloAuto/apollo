@@ -30,7 +30,6 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -39,13 +38,11 @@ namespace planning {
 using apollo::common::Status;
 using apollo::common::math::Vec2d;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::VehicleState;
 
 DataCenter::DataCenter() {
   _object_table.reset(new ObjectTable());
 
   AINFO << "Data Center is ready!";
-  pnc_map_.reset(new hdmap::PncMap(FLAGS_map_filename));
 }
 
 Frame *DataCenter::frame(const uint32_t sequence_num) const {
@@ -56,33 +53,6 @@ Frame *DataCenter::frame(const uint32_t sequence_num) const {
   }
   return nullptr;
 }
-
-bool DataCenter::init_current_frame(const uint32_t sequence_num) {
-  if (AdapterManager::GetRoutingResult()->Empty()) {
-    AERROR << "Routing is empty";
-    return false;
-  }
-  _frame.reset(new Frame(sequence_num, pnc_map_.get()));
-  common::TrajectoryPoint point;
-  _frame->SetInitPose(VehicleState::instance()->pose());
-  _frame->SetRouting(AdapterManager::GetRoutingResult()->GetLatestObserved());
-
-  if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
-    // prediction
-    const auto &prediction =
-        AdapterManager::GetPrediction()->GetLatestObserved();
-    ADEBUG << "Get prediction:" << prediction.DebugString();
-    _frame->SetDecisionDataFromPrediction(prediction);
-  }
-
-  if (!_frame->Init()) {
-    AERROR << "failed to init frame";
-    return false;
-  }
-  return true;
-}
-
-Frame *DataCenter::current_frame() const { return _frame.get(); }
 
 void DataCenter::save_frame() {
   _sequence_queue.push_back(_frame->sequence_num());

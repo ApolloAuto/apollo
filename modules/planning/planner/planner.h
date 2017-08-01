@@ -26,6 +26,10 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
+#include "modules/common/status/status.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/frame.h"
+
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
@@ -59,9 +63,8 @@ class Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  virtual apollo::common::Status Plan(
-      const apollo::common::TrajectoryPoint& start_point,
-      PublishableTrajectory* ptr_publishable_trajectory) = 0;
+  virtual apollo::common::Status Plan(Frame* frame,
+                                      PublishableTrajectory* trajectory_pb) = 0;
 };
 
 }  // namespace planning

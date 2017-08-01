@@ -37,17 +37,8 @@ const DecisionData& PlanningData::decision_data() const {
   return *decision_data_.get();
 }
 
-const TrajectoryPoint& PlanningData::init_planning_point() const {
-  return init_planning_point_;
-}
-
 DecisionData* PlanningData::mutable_decision_data() const {
   return decision_data_.get();
-}
-
-void PlanningData::set_init_planning_point(
-    const TrajectoryPoint& init_planning_point) {
-  init_planning_point_ = init_planning_point;
 }
 
 void PlanningData::set_reference_line(
@@ -69,6 +60,7 @@ PathData* PlanningData::mutable_path_data() { return &path_data_; }
 SpeedData* PlanningData::mutable_speed_data() { return &speed_data_; }
 
 bool PlanningData::aggregate(const double time_resolution,
+                             const double relative_time,
                              PublishableTrajectory* trajectory) {
   if (time_resolution < 0.0) {
     AERROR << "time_resolution: " << time_resolution << " < 0.0";
@@ -102,8 +94,7 @@ bool PlanningData::aggregate(const double time_resolution,
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed_point.v());
     trajectory_point.set_a(speed_point.a());
-    trajectory_point.set_relative_time(speed_point.t() +
-                                       init_planning_point_.relative_time());
+    trajectory_point.set_relative_time(speed_point.t() + relative_time);
     trajectory->add_trajectory_point(trajectory_point);
   }
   return true;

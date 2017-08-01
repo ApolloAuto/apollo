@@ -23,16 +23,16 @@
 
 #include "modules/common/macro.h"
 #include "modules/common/proto/geometry.pb.h"
+#include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/proto/map_crosswalk.pb.h"
 #include "modules/map/proto/map_junction.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
+#include "modules/map/proto/map_road.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_road.pb.h"
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/hdmap/hdmap_impl.h"
 
 namespace apollo {
 namespace hdmap {
@@ -63,25 +63,23 @@ class HDMap {
   int get_yield_signs(const apollo::common::PointENU& point, double distance,
                       std::vector<YieldSignInfoConstPtr>* yield_signs) const;
   int get_roads(const apollo::common::PointENU& point, double distance,
-                      std::vector<RoadInfoConstPtr>* roads) const;
+                std::vector<RoadInfoConstPtr>* roads) const;
 
   int get_nearest_lane(const apollo::common::PointENU& point,
                        LaneInfoConstPtr* nearest_lane, double* nearest_s,
                        double* nearest_l) const;
   int get_nearest_lane_with_heading(const apollo::common::PointENU& point,
-                                  const double distance,
-                                  const double central_heading,
-                                  const double max_heading_difference,
-                                  LaneInfoConstPtr* nearest_lane,
-                                  double* nearest_s,
-                                  double* nearest_l) const;
+                                    const double distance,
+                                    const double central_heading,
+                                    const double max_heading_difference,
+                                    LaneInfoConstPtr* nearest_lane,
+                                    double* nearest_s, double* nearest_l) const;
   int get_lanes_with_heading(const apollo::common::PointENU& point,
-                            const double distance,
-                            const double central_heading,
-                            const double max_heading_difference,
-                            std::vector<LaneInfoConstPtr>* lanes) const;
-  int get_road_boundaries(const apollo::common::PointENU& point,
-                          double radius,
+                             const double distance,
+                             const double central_heading,
+                             const double max_heading_difference,
+                             std::vector<LaneInfoConstPtr>* lanes) const;
+  int get_road_boundaries(const apollo::common::PointENU& point, double radius,
                           std::vector<RoadROIBoundaryPtr>* road_boundaries,
                           std::vector<JunctionBoundaryPtr>* junctions) const;
 

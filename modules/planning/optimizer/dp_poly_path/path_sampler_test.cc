@@ -44,7 +44,9 @@ class PathSamplerTest : public OptimizerTestBase {
     init_point_.mutable_path_point()->set_z(0.0);
     init_point_.set_a(0.0);
     init_point_.set_v(0.0);
-    reference_line_ = &(frame_->planning_data().reference_line());
+    const auto* frame = planning_.GetFrame();
+    ASSERT_TRUE(frame != nullptr);
+    reference_line_ = &(frame->planning_data().reference_line());
   }
 
  protected:

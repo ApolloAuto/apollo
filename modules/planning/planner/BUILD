@@ -11,6 +11,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/vehicle_state",
+        "//modules/planning/common:frame",
         "//modules/planning/proto:planning_proto",
     ],
 )
