@@ -9,6 +9,7 @@ cc_library(
     ],
     hdrs = [
         "em_planner.h",
+        "em_planner_debugger.h"
     ],
     deps = [
         "//external:gflags",

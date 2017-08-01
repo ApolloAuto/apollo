@@ -65,6 +65,8 @@ class DiscretizedTrajectory : public Trajectory {
 
   const std::vector<apollo::common::TrajectoryPoint>& trajectory_points() const;
 
+  std::vector<apollo::common::TrajectoryPoint>& trajectory_points();
+
   virtual void Clear();
 
  protected:
