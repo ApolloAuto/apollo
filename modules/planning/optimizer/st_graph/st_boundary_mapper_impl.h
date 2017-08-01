@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /**
-*   @file: qp_spline_st_boundary_mapper.h
+*   @file: st_boundary_mapper_impl.h
 **/
 
-#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_SPEED_QP_SPLINE_ST_BOUNDARY_MAPPER_H_
-#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_SPEED_QP_SPLINE_ST_BOUNDARY_MAPPER_H_
+#ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_IMPL_H_
+#define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_IMPL_H_
 
 #include <vector>
 
@@ -33,7 +33,7 @@
 namespace apollo {
 namespace planning {
 
-class QpSplineStBoundaryMapper : public StBoundaryMapper {
+class StBoundaryMapperImpl : public StBoundaryMapper {
  public:
   apollo::common::Status get_graph_boundary(
       const common::TrajectoryPoint& initial_planning_point,
@@ -76,4 +76,4 @@ class QpSplineStBoundaryMapper : public StBoundaryMapper {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_SPEED_QP_SPLINE_ST_BOUNDARY_MAPPER_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_IMPL_H_

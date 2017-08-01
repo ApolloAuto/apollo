@@ -28,7 +28,6 @@
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_boundary_mapper.h"
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_graph.h"
 #include "modules/planning/optimizer/st_graph/st_graph_data.h"
 
