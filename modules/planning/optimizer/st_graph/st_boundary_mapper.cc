@@ -37,7 +37,7 @@ using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
-using apollo::hdmap::HDMap;
+using apollo::hdmap::PncMap;
 using apollo::localization::Pose;
 
 bool StBoundaryMapper::Init(const std::string& config_file) {
@@ -84,7 +84,7 @@ bool StBoundaryMapper::check_overlap(const PathPoint& path_point,
 }
 
 Status StBoundaryMapper::get_speed_limits(
-    const Pose& pose, const HDMap& map, const PathData& path_data,
+    const Pose& pose, const PncMap* pnc_map, const PathData& path_data,
     const double planning_distance, const std::uint32_t matrix_dimension_s,
     const double default_speed_limit, SpeedLimit* const speed_limit_data) {
   const auto& adc_position = pose.position();
@@ -95,7 +95,7 @@ Status StBoundaryMapper::get_speed_limits(
   adc_point.set_z(adc_position.z());
   // std::vector<const apollo::hdmap::LaneInfo*> lanes;
   std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
-  int ret = map.get_lanes(adc_point, 1.0, &lanes);
+  int ret = pnc_map->HDMap()->get_lanes(adc_point, 1.0, &lanes);
   if (ret != 0) {
     AERROR << "Fail to get lanes for point [" << adc_position.x() << ", "
            << adc_position.y() << "].";
