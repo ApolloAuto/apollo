@@ -69,6 +69,7 @@ function find_device() {
 }
 
 function main() {
+    docker login -u autoapollo -p baidu123
     docker pull "$IMG"
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
