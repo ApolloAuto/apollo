@@ -58,4 +58,26 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "cnnseg_test",
+    size = "small",
+    srcs = [
+        "cnnseg_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception/conf:perception_config",
+        "//modules/perception:perception_model",
+    ],
+    deps = [
+        "@gtest//:main",
+        "@pcl//:pcl",
+        "@opencv2//:core",
+        "//modules/common:log",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "perception_obstacle_lidar_segmention_cnnseg",
+    ],
+)
+
 cpplint()
