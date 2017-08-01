@@ -32,6 +32,7 @@
 #include "modules/control/filters/digital_filter.h"
 #include "modules/control/filters/digital_filter_coefficients.h"
 #include "modules/control/filters/mean_filter.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 
 /**
  * @namespace apollo::control
@@ -125,6 +126,9 @@ class LatController : public Controller {
 
   // a proxy to access vehicle movement state
   ::apollo::common::vehicle_state::VehicleState vehicle_state_;
+
+  // vehicle parameter
+  ::apollo::common::config::VehicleParam vehicle_param_;
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
