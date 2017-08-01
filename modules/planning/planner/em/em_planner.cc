@@ -124,7 +124,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& start_point,
     ADEBUG << "last frame:" << data_center->last_frame()->DebugString();
   }
   ADEBUG << "start point:" << start_point.DebugString();
-  auto planning_data = frame->mutable_planning_data();
+  auto* planning_data = frame->mutable_planning_data();
   planning_data->set_init_planning_point(start_point);
 
   std::shared_ptr<DecisionData> decision_data(new DecisionData());
