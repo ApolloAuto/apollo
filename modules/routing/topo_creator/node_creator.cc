@@ -14,24 +14,24 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "topo_creator/node_creator.h"
+#include "modules/routing/topo_creator/node_creator.h"
 
 #include <math.h>
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 namespace {
 
 using ::google::protobuf::RepeatedPtrField;
 
-using ::adu::common::hdmap::Lane;
-using ::adu::common::hdmap::LaneBoundary;
-using ::adu::common::hdmap::LaneBoundaryType;
+using ::apollo::common::hdmap::Lane;
+using ::apollo::common::hdmap::LaneBoundary;
+using ::apollo::common::hdmap::LaneBoundaryType;
 
-using ::adu::routing::common::Node;
-using ::adu::routing::common::Edge;
-using ::adu::routing::common::CurveRange;
+using ::apollo::routing::common::Node;
+using ::apollo::routing::common::Edge;
+using ::apollo::routing::common::CurveRange;
 
 const double BASE_SPEED = 4.167;       // 15kmh
 const double LEFT_TURN_PENALTY = 50;   // meter
@@ -113,11 +113,11 @@ void NodeCreator::init_node_cost(const Lane& lane, Node* const node) {
       (speed_limit >= BASE_SPEED) ? (1 / sqrt(speed_limit / BASE_SPEED)) : 1.0;
   double cost = lane_length * ratio;
   if (lane.has_turn()) {
-    if (lane.turn() == ::adu::common::hdmap::Lane::LEFT_TURN) {
+    if (lane.turn() == ::apollo::common::hdmap::Lane::LEFT_TURN) {
       cost += LEFT_TURN_PENALTY;
-    } else if (lane.turn() == ::adu::common::hdmap::Lane::RIGHT_TURN) {
+    } else if (lane.turn() == ::apollo::common::hdmap::Lane::RIGHT_TURN) {
       cost += RIGHT_TURN_PENALTY;
-    } else if (lane.turn() == ::adu::common::hdmap::Lane::U_TURN) {
+    } else if (lane.turn() == ::apollo::common::hdmap::Lane::U_TURN) {
       cost += UTURN_PENALTY;
     }
   }
@@ -125,4 +125,4 @@ void NodeCreator::init_node_cost(const Lane& lane, Node* const node) {
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo

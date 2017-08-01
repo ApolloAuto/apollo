@@ -14,35 +14,35 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
-#define BAIDU_ADU_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
+#ifndef MODULES_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
+#define MODULES_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
 
-#include "map_lane.pb.h"
-#include "topo_graph.pb.h"
+#include "modules/routing/topo_creator/map_lane.pb.h"
+#include "modules/routing/topo_creator/topo_graph.pb.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class NodeCreator {
  public:
-  static void get_pb_node(const ::adu::common::hdmap::Lane& lane,
+  static void get_pb_node(const ::apollo::common::hdmap::Lane& lane,
                           const std::string& road_id,
-                          ::adu::routing::common::Node* pb_node);
+                          ::apollo::routing::common::Node* pb_node);
 
  private:
   static void add_out_boundary(
-      const ::adu::common::hdmap::LaneBoundary& bound, double lane_length,
+      const ::apollo::common::hdmap::LaneBoundary& bound, double lane_length,
       ::google::protobuf::RepeatedPtrField<
-          ::adu::routing::common::CurveRange>* const out_range);
+          ::apollo::routing::common::CurveRange>* const out_range);
 
-  static void init_node_info(const ::adu::common::hdmap::Lane& lane,
+  static void init_node_info(const ::apollo::common::hdmap::Lane& lane,
                              const std::string& road_id,
-                             ::adu::routing::common::Node* const node);
-  static void init_node_cost(const ::adu::common::hdmap::Lane& lane,
-                             ::adu::routing::common::Node* const node);
+                             ::apollo::routing::common::Node* const node);
+  static void init_node_cost(const ::apollo::common::hdmap::Lane& lane,
+                             ::apollo::routing::common::Node* const node);
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
+#endif  // MODULES_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
