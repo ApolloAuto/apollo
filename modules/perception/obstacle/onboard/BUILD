@@ -48,7 +48,7 @@ cc_test(
         "hdmap_input_test.cc",
         ],
     size = "small",
-    data = ["//modules/perception:perception_testdata"],
+    data = ["//modules/perception:perception_data"],
     deps = [
         ":perception_obstacle_hdmapinput",
         ":perception_obstacle_lidar_process",

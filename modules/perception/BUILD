@@ -32,16 +32,16 @@ cc_binary(
 )
 
 filegroup(
-    name = "perception_testdata",
+    name = "perception_data",
     srcs = glob([
-        "testdata/**",
+        "data/**",
     ]),
 )
 
 filegroup(
-    name = "perception_data",
+    name = "perception_model",
     srcs = glob([
-        "data/**"
+        "model/**"
     ]),
 )
 
