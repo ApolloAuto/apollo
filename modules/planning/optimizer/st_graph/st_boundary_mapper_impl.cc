@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file: qp_spline_st_boundary_mapper.cc
+ * @file: st_boundary_mapper_impl.cc
  **/
 
-#include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_boundary_mapper.h"
+#include "modules/planning/optimizer/st_graph/st_boundary_mapper_impl.h"
 
 #include <algorithm>
 #include <limits>
@@ -49,7 +49,7 @@ using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
 using VehicleConfigHelper = apollo::common::VehicleConfigHelper;
 
-Status QpSplineStBoundaryMapper::get_graph_boundary(
+Status StBoundaryMapperImpl::get_graph_boundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
     const ReferenceLine& reference_line, const double planning_distance,
@@ -139,7 +139,7 @@ Status QpSplineStBoundaryMapper::get_graph_boundary(
   return Status::OK();
 }
 
-Status QpSplineStBoundaryMapper::map_main_decision_stop(
+Status StBoundaryMapperImpl::map_main_decision_stop(
     const MainStop& main_stop, const ReferenceLine& reference_line,
     const double planning_distance, const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
@@ -195,7 +195,7 @@ Status QpSplineStBoundaryMapper::map_main_decision_stop(
   return Status::OK();
 }
 
-Status QpSplineStBoundaryMapper::map_obstacle_with_planning(
+Status StBoundaryMapperImpl::map_obstacle_with_planning(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
@@ -203,7 +203,7 @@ Status QpSplineStBoundaryMapper::map_obstacle_with_planning(
   return Status::OK();
 }
 
-Status QpSplineStBoundaryMapper::map_mission_complete(
+Status StBoundaryMapperImpl::map_mission_complete(
     const ReferenceLine& reference_line, const double planning_distance,
     const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
@@ -230,7 +230,7 @@ Status QpSplineStBoundaryMapper::map_mission_complete(
   return Status::OK();
 }
 
-Status QpSplineStBoundaryMapper::map_obstacle_with_prediction_trajectory(
+Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const ObjectDecisionType obj_decision,
     const PathData& path_data, const double planning_distance,
@@ -372,7 +372,7 @@ Status QpSplineStBoundaryMapper::map_obstacle_with_prediction_trajectory(
               : Status::OK();
 }
 
-Status QpSplineStBoundaryMapper::map_obstacle_without_trajectory(
+Status StBoundaryMapperImpl::map_obstacle_without_trajectory(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const PathData& path_data,
     const double planning_distance, const double planning_time,
