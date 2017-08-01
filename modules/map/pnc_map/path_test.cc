@@ -152,8 +152,7 @@ TEST(TestSuite, hdmap_line_path) {
       make_map_path_point(0, 1, M_PI_2, LaneWaypoint(lane_info, 1)),
       make_map_path_point(0, 2, M_PI_2, LaneWaypoint(lane_info, 2)),
       make_map_path_point(0, 3, M_PI_2, LaneWaypoint(lane_info, 3))};
-  HDMap hdmap;
-  const Path path(&hdmap, points, {}, 2.0);
+  const Path path(points, {}, 2.0);
   EXPECT_EQ(path.num_points(), 4);
   EXPECT_EQ(path.num_segments(), 3);
   EXPECT_NEAR(path.path_points()[0].x(), 0, 1e-6);
@@ -272,8 +271,7 @@ TEST(TestSuite, hdmap_curvy_path) {
   const std::vector<MapPathPoint> points{
       make_map_path_point(2, 0), make_map_path_point(2, 1),
       make_map_path_point(1, 2), make_map_path_point(0, 2)};
-  HDMap hdmap;
-  Path path(&hdmap, points, {}, 2.0);
+  Path path(points, {}, 2.0);
   EXPECT_EQ(path.num_points(), 4);
   EXPECT_EQ(path.num_segments(), 3);
   EXPECT_NEAR(path.path_points()[0].x(), 2, 1e-6);
@@ -386,8 +384,7 @@ TEST(TestSuite, hdmap_circle_path) {
         M_PI_2 * static_cast<double>(i) / static_cast<double>(kNumSegments);
     points.push_back(make_map_path_point(kRadius * cos(p), kRadius * sin(p)));
   }
-  HDMap hdmap;
-  const Path path(&hdmap, points, {}, 2.0);
+  const Path path(points, {}, 2.0);
   EXPECT_EQ(path.num_points(), kNumSegments + 1);
   EXPECT_EQ(path.num_segments(), kNumSegments);
   EXPECT_EQ(path.path_points().size(), kNumSegments + 1);
@@ -432,7 +429,7 @@ TEST(TestSuite, hdmap_circle_path) {
   EXPECT_NEAR(distance, 0.0, 1e-6);
 
   // Randomly generated test cases on path.approxmiation.
-  const Path path_no_approximation(&hdmap, points, {});
+  const Path path_no_approximation(points, {});
   for (int case_id = 0; case_id < 10000; ++case_id) {
     const double x = random_double(-kRadius * 0.5, kRadius * 1.5);
     const double y = random_double(-kRadius * 0.5, kRadius * 1.5);
@@ -518,8 +515,7 @@ TEST(TestSuite, hdmap_jerky_path) {
       point.set_x(new_x);
       point.set_y(new_y);
     }
-    HDMap hdmap;
-    const Path path(&hdmap, points, {}, 2.0);
+    const Path path(points, {}, 2.0);
     EXPECT_EQ(path.num_points(), num_segments + 1);
     EXPECT_EQ(path.num_segments(), num_segments);
     EXPECT_EQ(path.path_points().size(), num_segments + 1);
@@ -547,7 +543,7 @@ TEST(TestSuite, hdmap_jerky_path) {
       original_points.push_back(point);
     }
     const AABox2d box(original_points);
-    const Path path_no_approximation(&hdmap, points, {});
+    const Path path_no_approximation(points, {});
     for (int case_id = 0; case_id < kCasesPerPath; ++case_id) {
       const double x = random_double(box.min_x(), box.max_x());
       const double y = random_double(box.min_y(), box.max_y());
@@ -587,8 +583,7 @@ TEST(TestSuite, hdmap_s_path) {
     }
   }
 
-  HDMap hdmap;
-  const Path path(&hdmap, points, {}, 2.0);
+  const Path path(points, {}, 2.0);
   EXPECT_EQ(path.num_points(), kNumSegments + 1);
   EXPECT_EQ(path.num_segments(), kNumSegments);
   EXPECT_EQ(path.path_points().size(), kNumSegments + 1);
@@ -627,7 +622,7 @@ TEST(TestSuite, hdmap_s_path) {
   EXPECT_NEAR(lateral, 1.0, kLargeEps);
   EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
 
-  const Path path_no_approximation(&hdmap, points, {});
+  const Path path_no_approximation(points, {});
   for (int case_id = 0; case_id < 10000; ++case_id) {
     const double x = random_double(-kRadius * 1.5, kRadius * 1.5);
     const double y = random_double(-kRadius * 2.5, kRadius * 2.5);
@@ -695,8 +690,7 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
       points[i].add_lane_waypoint(LaneWaypoint(lanes[i], 0.0));
     }
   }
-  HDMap hdmap;
-  const Path path(&hdmap, points);
+  const Path path(points);
   EXPECT_EQ(path.num_points(), kNumSegments + 1);
   EXPECT_EQ(path.num_segments(), kNumSegments);
   EXPECT_EQ(path.path_points().size(), kNumSegments + 1);
@@ -786,8 +780,7 @@ TEST(TestSuite, compute_lane_segments_from_points) {
   points[1].add_lane_waypoint(LaneWaypoint(lane_info2, 0.0));
   points[2].add_lane_waypoint(LaneWaypoint(lane_info2, 0.4));
 
-  HDMap hdmap;
-  const Path path(&hdmap, points);
+  const Path path(points);
   EXPECT_EQ(path.lane_segments().size(), 2);
   EXPECT_EQ(path.lane_segments()[0].lane->id().id(), "id1");
   EXPECT_NEAR(path.lane_segments()[0].start_s, 0.1, 1e-6);

@@ -37,34 +37,31 @@
 namespace apollo {
 namespace planning {
 
-using ReferenceMapLine = hdmap::Path;
+using MapPath = hdmap::Path;
 
 ReferenceLine::ReferenceLine(
-    const apollo::hdmap::HDMap& hdmap,
     const std::vector<ReferencePoint>& reference_points)
     : reference_points_(reference_points),
-      reference_map_line_(ReferenceMapLine(
-          &hdmap, std::vector<hdmap::MapPathPoint>(reference_points.begin(),
-                                                   reference_points.end()))) {}
+      map_path_(MapPath(std::vector<hdmap::MapPathPoint>(
+          reference_points.begin(), reference_points.end()))) {}
 
 ReferenceLine::ReferenceLine(
-    const apollo::hdmap::HDMap& hdmap,
     const std::vector<ReferencePoint>& reference_points,
     const std::vector<hdmap::LaneSegment>& lane_segments,
     const double max_approximation_error)
     : reference_points_(reference_points),
-      reference_map_line_(ReferenceMapLine(
-          &hdmap, std::vector<hdmap::MapPathPoint>(reference_points.begin(),
-                                                   reference_points.end()),
+      map_path_(MapPath(
+          std::vector<hdmap::MapPathPoint>(reference_points.begin(),
+                                           reference_points.end()),
           lane_segments, max_approximation_error)) {}
 
 ReferencePoint ReferenceLine::get_reference_point(const double s) const {
-  const auto& accumulated_s = reference_map_line_.accumulated_s();
+  const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front()) {
     AWARN << "The requested s is nearer than the start point of the reference "
              "line; reference line starts at "
           << accumulated_s.back() << ", requested " << s << ".";
-    ReferencePoint ref_point(reference_map_line_.get_smooth_point(s), 0.0, 0.0,
+    ReferencePoint ref_point(map_path_.get_smooth_point(s), 0.0, 0.0,
                              0.0, 0.0);
     if (ref_point.lane_waypoints().empty()) {
       ref_point.add_lane_waypoints(reference_points_.front().lane_waypoints());
@@ -75,7 +72,7 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
     AWARN << "The requested s exceeds the reference line; reference line "
              "ends at "
           << accumulated_s.back() << "requested " << s << " .";
-    ReferencePoint ref_point(reference_map_line_.get_smooth_point(s), 0.0, 0.0,
+    ReferencePoint ref_point(map_path_.get_smooth_point(s), 0.0, 0.0,
                              0.0, 0.0);
     if (ref_point.lane_waypoints().empty()) {
       ref_point.add_lane_waypoints(reference_points_.back().lane_waypoints());
@@ -146,8 +143,8 @@ ReferencePoint ReferenceLine::get_reference_point(const double x,
     return reference_points_[index_start];
   }
 
-  double s0 = reference_map_line_.accumulated_s()[index_start];
-  double s1 = reference_map_line_.accumulated_s()[index_end];
+  double s0 = map_path_.accumulated_s()[index_start];
+  double s1 = map_path_.accumulated_s()[index_end];
 
   double s = ReferenceLine::find_min_distance_point(
       reference_points_[index_start], s0, reference_points_[index_end], s1, x,
@@ -161,7 +158,7 @@ bool ReferenceLine::get_point_in_Cartesian_frame(
     const common::SLPoint& sl_point,
     common::math::Vec2d* const xy_point) const {
   CHECK_NOTNULL(xy_point);
-  if (reference_map_line_.num_points() < 2) {
+  if (map_path_.num_points() < 2) {
     AERROR << "The reference line has too few points.";
     return false;
   }
@@ -179,15 +176,15 @@ bool ReferenceLine::get_point_in_frenet_frame(
   DCHECK_NOTNULL(sl_point);
   double s = 0;
   double l = 0;
-  if (!reference_map_line_.get_projection(xy_point, &s, &l)) {
+  if (!map_path_.get_projection(xy_point, &s, &l)) {
     AERROR << "Can't get nearest point from path.";
     return false;
   }
 
-  if (s > reference_map_line_.accumulated_s().back()) {
+  if (s > map_path_.accumulated_s().back()) {
     AERROR << "The s of point is bigger than the length of current path. s: "
            << s << ", curr path length: "
-           << reference_map_line_.accumulated_s().back() << ".";
+           << map_path_.accumulated_s().back() << ".";
     return false;
   }
   sl_point->set_s(s);
@@ -214,8 +211,8 @@ const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {
   return reference_points_;
 }
 
-const ReferenceMapLine& ReferenceLine::reference_map_line() const {
-  return reference_map_line_;
+const MapPath& ReferenceLine::reference_map_line() const {
+  return map_path_;
 }
 
 double ReferenceLine::get_lane_width(const double s) const {
@@ -225,11 +222,11 @@ double ReferenceLine::get_lane_width(const double s) const {
 
 bool ReferenceLine::get_lane_width(const double s, double* const left_width,
                                    double* const right_width) const {
-  return reference_map_line_.get_width(s, left_width, right_width);
+  return map_path_.get_width(s, left_width, right_width);
 }
 
 bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
-  if (sl_point.s() <= 0 || sl_point.s() > reference_map_line_.length()) {
+  if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
     return false;
   }
   double left_width = 0.0;
@@ -257,8 +254,8 @@ std::string ReferenceLine::DebugString() const {
 }
 
 void ReferenceLine::get_s_range_from_box2d(
-  const ::apollo::common::math::Box2d& box2d,
-  double* max_s, double* min_s) const {
+    const ::apollo::common::math::Box2d& box2d, double* max_s,
+    double* min_s) const {
   std::vector<apollo::common::math::Vec2d> corners;
   box2d.GetAllCorners(&corners);
   double ret_max_s = std::numeric_limits<double>::min();
@@ -266,7 +263,7 @@ void ReferenceLine::get_s_range_from_box2d(
   for (auto& corner : corners) {
     ::apollo::common::SLPoint sl_point;
     get_point_in_frenet_frame(common::math::Vec2d(corner.x(), corner.y()),
-      &sl_point);
+                              &sl_point);
     if (sl_point.s() > ret_max_s) {
       *max_s = sl_point.s();
     }
