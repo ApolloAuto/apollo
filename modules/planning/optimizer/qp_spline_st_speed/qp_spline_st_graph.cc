@@ -36,7 +36,10 @@ using apollo::common::VehicleParam;
 QpSplineStGraph::QpSplineStGraph(
     const QpSplineStSpeedConfig& qp_spline_st_speed_config,
     const apollo::common::VehicleParam& veh_param)
-    : _qp_spline_st_speed_config(qp_spline_st_speed_config) {}
+    : _qp_spline_st_speed_config(qp_spline_st_speed_config),
+      time_resolution_(
+          _qp_spline_st_speed_config.total_time() /
+          _qp_spline_st_speed_config.number_of_discrete_graph_t()) {}
 
 Status QpSplineStGraph::search(const StGraphData& st_graph_data,
                                const PathData& path_data,
@@ -51,13 +54,11 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
   // TODO(all): update speed limit here
   // TODO(all): update config through veh physical limit here generate knots
   std::vector<double> t_knots;
-  double t_resolution = _qp_spline_st_speed_config.total_time() /
-                        _qp_spline_st_speed_config.number_of_discrete_graph_t();
   double curr_knot = 0.0;
   for (uint32_t i = 0;
        i <= _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
     t_knots.push_back(curr_knot);
-    curr_knot += t_resolution;
+    curr_knot += time_resolution_;
   }
 
   _spline_generator.reset(new Spline1dGenerator(
@@ -82,7 +83,7 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
   }
 
   // extract output
-  // speed_data->Clear();
+  speed_data->Clear();
   const Spline1d& spline = _spline_generator->spline();
 
   double time_resolution = _qp_spline_st_speed_config.output_time_resolution();
@@ -104,6 +105,7 @@ Status QpSplineStGraph::apply_constraint(
   Spline1dConstraint* constraint =
       _spline_generator->mutable_spline_constraint();
   // position, velocity, acceleration
+
   if (!constraint->add_point_fx_constraint(0.0, 0.0)) {
     const std::string msg = "add st start point constraint failed";
     AERROR << msg;
@@ -161,8 +163,8 @@ Status QpSplineStGraph::apply_constraint(
     get_s_constraints_by_time(boundaries, evaluated_knots.back(),
                               _qp_spline_st_speed_config.total_path_length(),
                               &upper_s, &lower_s);
-    s_upper_bound.push_back(std::move(upper_s));
-    s_lower_bound.push_back(std::move(lower_s));
+    s_upper_bound.push_back(upper_s);
+    s_lower_bound.push_back(lower_s);
   }
   if (!constraint->add_fx_boundary(evaluated_knots, s_lower_bound,
                                    s_upper_bound)) {
@@ -170,7 +172,8 @@ Status QpSplineStGraph::apply_constraint(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  // TODO(all): add speed constraint
+  // TODO(Liangliang):
+  // add speed constraint and other limits according to adu/planning
   return Status::OK();
 }
 
@@ -195,21 +198,20 @@ Status QpSplineStGraph::apply_kernel(const SpeedLimit& speed_limit) {
   // TODO(all): add reference speed profile for different main decision
   std::vector<double> t_knots;
   std::vector<double> s_vec;
-  double t_resolution = _qp_spline_st_speed_config.total_time() /
-                        _qp_spline_st_speed_config.number_of_discrete_graph_t();
-
-  // TODO: change reference line kernel to configurable version
   if (speed_limit.speed_limits().size() == 0) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::apply_kernel");
   }
 
   double dist_ref = 0.0;
+  double curr_knot = 0.0;
   for (uint32_t i = 0;
        i <= _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
-    t_knots.push_back(i * t_resolution);
+    t_knots.push_back(curr_knot);
     s_vec.push_back(dist_ref);
-    dist_ref += t_resolution * speed_limit.get_speed_limit(dist_ref);
+    dist_ref += time_resolution_ * speed_limit.get_speed_limit(dist_ref);
+    curr_knot += time_resolution_;
   }
+  // TODO: change reference line kernel to configurable version
   spline_kernel->add_reference_line_kernel_matrix(t_knots, s_vec, 1);
   return Status::OK();
 }

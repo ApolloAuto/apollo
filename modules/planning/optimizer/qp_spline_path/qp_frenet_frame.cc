@@ -15,21 +15,22 @@
  *****************************************************************************/
 
 /**
- * @file qp_frenet_frame.cpp
+ * @file qp_frenet_frame.cc
  **/
 #include "modules/planning/optimizer/qp_spline_path/qp_frenet_frame.h"
 
 #include <algorithm>
 #include <limits>
 
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/macro.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
-#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -184,7 +185,10 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
   const std::vector<ObjectDecisionType>& decision = obstacle.Decisions();
 
   if (decision.size() != obstacle.prediction_trajectories().size()) {
-    return false;
+    AERROR << "prediction_trajectories size["
+           << obstacle.prediction_trajectories().size()
+           << " does NOT match decision size[" << decision.size() << "].";
+    return true;
   }
 
   for (uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {

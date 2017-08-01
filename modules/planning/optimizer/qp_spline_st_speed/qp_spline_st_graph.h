@@ -75,6 +75,9 @@ class QpSplineStGraph {
 
   // solver
   std::unique_ptr<Spline1dGenerator> _spline_generator = nullptr;
+
+  // time resolution
+  double time_resolution_ = 0.0;
 };
 
 }  // namespace planning
