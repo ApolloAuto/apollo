@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "modules/common/math/polygon2d.h"
-
 #include "modules/planning/proto/decision.pb.h"
 
 namespace apollo {

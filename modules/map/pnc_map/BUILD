@@ -28,7 +28,6 @@ cc_library(
     deps = [
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 
@@ -38,7 +37,6 @@ cc_test(
     srcs = [
         "path_test.cc",
     ],
-    data = ["//modules/planning:planning_testdata"],
     deps = [
         ":path",
         "//modules/common:log",

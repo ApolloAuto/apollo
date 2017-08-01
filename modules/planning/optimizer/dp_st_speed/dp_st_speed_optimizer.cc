@@ -70,13 +70,9 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   double planning_distance =
       std::min(dp_st_speed_config_.total_path_length(), path_length);
   std::vector<StGraphBoundary> boundaries;
-  common::TrajectoryPoint initial_planning_point = DataCenter::instance()
-                                                       ->current_frame()
-                                                       ->mutable_planning_data()
-                                                       ->init_planning_point();
   if (!boundary_mapper_
-           .get_graph_boundary(initial_planning_point, *decision_data,
-                               path_data, reference_line,
+           .get_graph_boundary(init_point, *decision_data, path_data,
+                               reference_line,
                                dp_st_speed_config_.total_path_length(),
                                dp_st_speed_config_.total_time(), &boundaries)
            .ok()) {

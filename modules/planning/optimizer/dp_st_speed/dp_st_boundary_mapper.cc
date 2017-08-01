@@ -184,16 +184,15 @@ Status DpStBoundaryMapper::map_obstacle_without_trajectory(
   // Static obstacle only have yield option
   const std::vector<PathPoint>& veh_path =
       path_data.discretized_path().points();
-
-  ::apollo::common::math::Box2d obs_box = obstacle.BoundingBox();
-
-  const double buffer = st_boundary_config().boundary_buffer();
-
   if (veh_path.size() == 0) {
     const std::string msg = "[DP_ST_BOUNDARY_MAPPER] Vehicle path empty.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  ::apollo::common::math::Box2d obs_box = obstacle.BoundingBox();
+
+  const double buffer = st_boundary_config().boundary_buffer();
 
   std::uint32_t low_index = 0;
   std::uint32_t high_index = veh_path.size() - 1;
