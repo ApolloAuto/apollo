@@ -51,9 +51,8 @@ void PlanningData::set_init_planning_point(
 }
 
 void PlanningData::set_reference_line(
-    const apollo::hdmap::HDMap& hdmap,
     const std::vector<ReferencePoint>& ref_points) {
-  reference_line_.reset(new ReferenceLine(hdmap, ref_points));
+  reference_line_.reset(new ReferenceLine(ref_points));
 }
 
 void PlanningData::set_decision_data(
@@ -103,8 +102,8 @@ bool PlanningData::aggregate(const double time_resolution,
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed_point.v());
     trajectory_point.set_a(speed_point.a());
-    trajectory_point.set_relative_time(speed_point.t()
-            + init_planning_point_.relative_time());
+    trajectory_point.set_relative_time(speed_point.t() +
+                                       init_planning_point_.relative_time());
     trajectory->add_trajectory_point(trajectory_point);
   }
   return true;

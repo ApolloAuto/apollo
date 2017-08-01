@@ -365,8 +365,7 @@ bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
     }
   }
   remove_duplicates(&points);
-  *path = hdmap::Path(hdmap_, points, lane_segments,
-                      kTrajectoryApproximationMaxError);
+  *path = hdmap::Path(points, lane_segments, kTrajectoryApproximationMaxError);
   return true;
 }
 
