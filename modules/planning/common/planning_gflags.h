@@ -83,6 +83,7 @@ DECLARE_double(stgraph_max_deceleration_divide_factor_level_2);
 DECLARE_double(static_decision_ignore_range);
 DECLARE_double(static_decision_stop_buffer);
 DECLARE_double(dp_path_decision_buffer);
+DECLARE_double(dynamic_decision_follow_range);
 
 // Predeciton Part
 DECLARE_int32(adc_id);

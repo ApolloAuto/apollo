@@ -58,9 +58,9 @@ Status DpStBoundaryMapper::get_graph_boundary(
   obs_boundary->clear();
 
   // TODO(all): add mapping main decision and map obstacle here
-  const std::vector<const Obstacle*>& static_obs_vec =
+  const std::vector<Obstacle*>& static_obs_vec =
       decision_data.StaticObstacles();
-  const std::vector<const Obstacle*>& dynamic_obs_vec =
+  const std::vector<Obstacle*>& dynamic_obs_vec =
       decision_data.DynamicObstacles();
 
   for (std::uint32_t i = 0; i < static_obs_vec.size(); ++i) {

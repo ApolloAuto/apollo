@@ -236,21 +236,21 @@ bool DpRoadGraph::compute_decision_from_path(
   const std::vector<common::FrenetFramePoint> &frenet_frame_points =
       tunnel.points();
 
-  std::vector<Obstacle *> static_obstacles =
-      decision_data->MutableStaticObstacles();
+  std::vector<Obstacle*>* static_obstacles =
+    decision_data->MutableStaticObstacles();
 
   // Compute static obstacle decision
-  for (size_t i = 0; i < static_obstacles.size(); ++i) {
+  for (size_t i = 0; i < static_obstacles->size(); ++i) {
     // Attention: assume that there is only 1 trajectory for static obstacle AND
     // There is only one point for predicted static obstacles
     TrajectoryPoint traj_point =
-        static_obstacles[i]->prediction_trajectories()[0].evaluate(0.0);
-    ::apollo::common::math::Vec2d static_center_point = {
-        traj_point.path_point().x(), traj_point.path_point().y()};
-    ::apollo::common::math::Box2d static_obstacle_box = {
-        static_center_point, traj_point.path_point().theta(),
-        static_obstacles[i]->BoundingBox().length(),
-        static_obstacles[i]->BoundingBox().width()};
+      (*static_obstacles)[i]->prediction_trajectories()[0].evaluate(0.0);
+    ::apollo::common::math::Vec2d static_center_point =
+      {traj_point.path_point().x(), traj_point.path_point().y()};
+    ::apollo::common::math::Box2d static_obstacle_box =
+      {static_center_point, traj_point.path_point().theta(),
+      (*static_obstacles)[i]->BoundingBox().length(),
+      (*static_obstacles)[i]->BoundingBox().width()};
 
     common::SLPoint static_obstacle_sl_point;
     reference_line.get_point_in_frenet_frame(
@@ -330,44 +330,44 @@ bool DpRoadGraph::compute_decision_from_path(
         // Left nudge to be distinguished
         object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
         object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
-        static_obstacles[i]->MutableDecisions()->push_back(object_nudge);
+        (*static_obstacles)[i]->MutableDecisions()->push_back(object_nudge);
       } else {
         // Right nudge to be distinguished
         object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
         object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
-        static_obstacles[i]->MutableDecisions()->push_back(object_nudge);
+        (*static_obstacles)[i]->MutableDecisions()->push_back(object_nudge);
       }
     } else {
       // Ignore
       ObjectDecisionType object_ignore;
-      ObjectIgnore *object_ignore_ptr = object_ignore.mutable_ignore();
+      ObjectIgnore* object_ignore_ptr = object_ignore.mutable_ignore();
       CHECK_NOTNULL(object_ignore_ptr);
-      static_obstacles[i]->MutableDecisions()->push_back(object_ignore);
+      (*static_obstacles)[i]->MutableDecisions()->push_back(object_ignore);
     }
   }
 
   // Compute dynamic obstacle decision
   // TBD
-  std::vector<Obstacle *> dynamic_obstacles =
-      decision_data->MutableDynamicObstacles();
+  std::vector<Obstacle*> *dynamic_obstacles =
+    decision_data->MutableDynamicObstacles();
   const double total_time =
-      std::min(heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
-  size_t evaluate_times = static_cast<size_t>(
-      std::floor(total_time / config_.eval_time_interval()));
-  for (size_t i = 0; i < dynamic_obstacles.size(); ++i) {
-    const auto &trajectories = dynamic_obstacles[i]->prediction_trajectories();
+    std::min(heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
+  size_t evaluate_times =
+  static_cast<size_t>(std::floor(total_time / config_.eval_time_interval()));
+  for (size_t i = 0; i < dynamic_obstacles->size(); ++i) {
+    const auto& trajectories = (*dynamic_obstacles)[i]->prediction_trajectories();
     for (size_t j = 0; j < trajectories.size(); ++j) {
       const auto &trajectory = trajectories[j];
       std::vector<::apollo::common::math::Box2d> obstacle_by_time;
       for (size_t time = 0; time <= evaluate_times; ++time) {
         TrajectoryPoint traj_point =
-            trajectory.evaluate(time * config_.eval_time_interval());
-        ::apollo::common::math::Vec2d center_point = {
-            traj_point.path_point().x(), traj_point.path_point().y()};
-        ::apollo::common::math::Box2d obstacle_box = {
-            center_point, traj_point.path_point().theta(),
-            dynamic_obstacles[i]->BoundingBox().length(),
-            dynamic_obstacles[i]->BoundingBox().width()};
+          trajectory.evaluate(time * config_.eval_time_interval());
+        ::apollo::common::math::Vec2d center_point =
+          {traj_point.path_point().x(), traj_point.path_point().y()};
+        ::apollo::common::math::Box2d obstacle_box =
+          {center_point, traj_point.path_point().theta(),
+        (*dynamic_obstacles)[i]->BoundingBox().length(),
+        (*dynamic_obstacles)[i]->BoundingBox().width()};
         obstacle_by_time.push_back(obstacle_box);
       }
     }

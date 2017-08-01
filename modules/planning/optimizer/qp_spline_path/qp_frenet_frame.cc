@@ -459,7 +459,7 @@ bool QpFrenetFrame::calculate_hd_map_bound() {
 }
 
 bool QpFrenetFrame::calculate_static_obstacle_bound() {
-  const std::vector<const Obstacle*> static_obs_list =
+  const std::vector<Obstacle*> static_obs_list =
       _decision_data->StaticObstacles();
 
   for (std::uint32_t i = 0; i < static_obs_list.size(); ++i) {
@@ -474,7 +474,7 @@ bool QpFrenetFrame::calculate_static_obstacle_bound() {
 }
 
 bool QpFrenetFrame::calculate_dynamic_obstacle_bound() {
-  const std::vector<const Obstacle*> dynamic_obs_list =
+  const std::vector<Obstacle*> dynamic_obs_list =
       _decision_data->DynamicObstacles();
 
   for (std::uint32_t i = 0; i < dynamic_obs_list.size(); ++i) {
