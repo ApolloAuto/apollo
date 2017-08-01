@@ -21,29 +21,20 @@
 namespace adu {
 namespace routing {
 
-class SubTopoGraph;
 class TopoGraph;
 class TopoNode;
 
 class Strategy {
-public:
-    virtual ~Strategy() { };
+ public:
+  virtual ~Strategy(){};
 
-    virtual bool search(const TopoGraph* graph,
-                        const TopoNode* src_node,
-                        const TopoNode* dest_node,
-                        const std::unordered_set<const TopoNode*>& black_list,
-                        std::vector<const TopoNode*>* const result_nodes) = 0;
-
-    virtual bool search(const TopoGraph* graph,
-                        const SubTopoGraph* sub_graph,
-                        const TopoNode* src_node,
-                        const TopoNode* dest_node,
-                        std::vector<const TopoNode*>* const result_nodes) = 0;
+  virtual bool search(const TopoGraph* graph, const TopoNode* src_node,
+                      const TopoNode* dest_node,
+                      const std::unordered_set<const TopoNode*>& black_list,
+                      std::vector<const TopoNode*>* const result_nodes) = 0;
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_STRATEGY_STRATEGY_H
-
+#endif  // BAIDU_ADU_ROUTING_STRATEGY_STRATEGY_H

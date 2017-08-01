@@ -36,5 +36,4 @@ DECLARE_bool(enable_debug_mode);
 DECLARE_string(debug_route_path);
 DECLARE_string(debug_passage_region_path);
 
-#endif // BAIDU_ADU_ROUTING_COMMON_ROUTING_GFLAGS_H
-
+#endif  // BAIDU_ADU_ROUTING_COMMON_ROUTING_GFLAGS_H

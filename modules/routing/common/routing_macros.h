@@ -19,26 +19,25 @@
 
 #include <cstddef>
 
-#define DISALLOW_COPY_AND_ASSIGN(classname)\
-private:\
-classname(const classname&);\
-classname& operator = (const classname&);
+#define DISALLOW_COPY_AND_ASSIGN(classname) \
+ private:                                   \
+  classname(const classname&);              \
+  classname& operator=(const classname&);
 
-#define DISALLOW_IMPLICIT_CONSTRUCTORS(classname)\
-private:\
-classname();\
-DISALLOW_COPY_AND_ASSIGN(classname);
+#define DISALLOW_IMPLICIT_CONSTRUCTORS(classname) \
+ private:                                         \
+  classname();                                    \
+  DISALLOW_COPY_AND_ASSIGN(classname);
 
-#define DECLARE_ARBITER_SINGLETON(classname)\
-public:\
-    static classname * instance() {\
-        static classname instance;\
-        return &instance;\
-    };\
-\
-DISALLOW_IMPLICIT_CONSTRUCTORS(classname)\
-\
-private:
+#define DECLARE_ARBITER_SINGLETON(classname) \
+ public:                                     \
+  static classname* instance() {             \
+    static classname instance;               \
+    return &instance;                        \
+  };                                         \
+                                             \
+  DISALLOW_IMPLICIT_CONSTRUCTORS(classname)  \
+                                             \
+ private:
 
-#endif // BAIDU_ADU_ROUTING_COMMON_ROUTING_MACROS_H
-
+#endif  // BAIDU_ADU_ROUTING_COMMON_ROUTING_MACROS_H
