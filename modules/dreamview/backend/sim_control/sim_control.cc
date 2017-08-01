@@ -28,6 +28,7 @@ namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::HeadingToQuaternion;
+using apollo::common::math::QuaternionToHeading;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::time::Clock;
 using apollo::common::TrajectoryPoint;
@@ -202,16 +203,17 @@ void SimControl::PublishLocalization(double lambda) {
   double cur_z = Interpolate(prev.z(), next.z(), lambda);
   pose->mutable_position()->set_z(cur_z);
 
-  // Set orientation
+  // Set orientation and heading
   double cur_theta = NormalizeAngle(
       prev.theta() + lambda * NormalizeAngle(next.theta() - prev.theta()));
 
   Eigen::Quaternion<double> cur_orientation =
       HeadingToQuaternion<double>(cur_theta);
+  pose->mutable_orientation()->set_qw(cur_orientation.w());
   pose->mutable_orientation()->set_qx(cur_orientation.x());
   pose->mutable_orientation()->set_qy(cur_orientation.y());
   pose->mutable_orientation()->set_qz(cur_orientation.z());
-  pose->mutable_orientation()->set_qw(cur_orientation.w());
+  pose->set_heading(cur_theta);
 
   // Set linear_velocity
   double cur_speed = Interpolate(prev_point_.v(), next_point_.v(), lambda);
