@@ -48,13 +48,13 @@ class RosServiceApi(flask_restful.Resource):
 
         response = None
         status = runtime_status.RuntimeStatus
+        tool_status = status.get_tools()
         if cmd_name == 'reset':
             request = ros_node_pb2.ChangeDrivingModeRequest(
                 action=ros_node_pb2.ChangeDrivingModeRequest.RESET_TO_MANUAL)
             response = stub.ChangeDrivingMode(request)
 
             # Update runtime status.
-            tool_status = status.get_tools()
             if tool_status.playing_status != ToolStatus.PLAYING_NOT_READY:
                 tool_status.playing_status = ToolStatus.PLAYING_READY_TO_CHECK
 
@@ -64,7 +64,8 @@ class RosServiceApi(flask_restful.Resource):
             response = stub.ChangeDrivingMode(request)
 
             # Update runtime status.
-            status.get_tools().playing_status = ToolStatus.PLAYING
+            if tool_status.playing_status == ToolStatus.PLAYING_READY_TO_START:
+                tool_status.playing_status = ToolStatus.PLAYING
         else:
             error_msg = 'RosServiceApi: Unknown command "{}"'.format(cmd_name)
             glog.error(error_msg)

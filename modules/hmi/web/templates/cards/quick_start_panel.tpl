@@ -19,7 +19,7 @@
     }
 
     .quick_start_row {
-      margin: 40px 20px 0px 20px;
+      margin: 20px 20px 0px 20px;
       overflow: auto;
     }
 
@@ -74,7 +74,7 @@
     <div class="info_window"></div>
 
     <h4 class="quick_start_row">
-      Quick Record:
+      Quick Record
       <button type="button" id="reset_recording_btn" class="btn pull-right hmi_small_btn"
           onclick="exec_tool('reset_recording')" disabled>New</button>
     </h4>
@@ -97,7 +97,7 @@
       </div>
     </div>
 
-    <h4 class="quick_start_row">Quick Play:</h4>
+    <h4 class="quick_start_row">Quick Replay</h4>
 
     <div class="row quick_start_row playing">
       <div class="col-xs-4 quick_start_col1">
@@ -110,9 +110,24 @@
             onclick="exec_tool('start_playing'); goto_dreamview();" disabled>Start</button>
         <span class="glyphicon"></span>
       </div>
-      <div class="col-xs-4 quick_start_col2">
+      <div class="col-xs-4 quick_start_col3">
         <button type="button" class="btn hmi_large_btn finish_btn"
             onclick="exec_tool('stop_playing')" disabled>Stop</button>
+        <span class="glyphicon"></span>
+      </div>
+    </div>
+
+    <h4 class="quick_start_row">Apollo Dev</h4>
+
+    <div class="row quick_start_row">
+      <div class="col-xs-4 quick_start_col1">
+        <button type="button" class="btn hmi_large_btn"
+            onclick="exec_module_command('all', 'start')">Setup</button>
+        <span class="glyphicon"></span>
+      </div>
+      <div class="col-xs-4 quick_start_col2">
+        <button type="button" class="btn hmi_large_btn"
+            onclick="ros_request('start_auto_driving')">Start Auto</button>
         <span class="glyphicon"></span>
       </div>
     </div>
@@ -120,6 +135,14 @@
 </div>
 
 <script>
+  // Execute the ros request at background.
+  function ros_request(cmd_name) {
+    // The pattern is generated at template compiling time.
+    url_pattern = '{{ url_for('rosserviceapi', cmd_name='CMD_NAME') }}';
+    url = url_pattern.replace('CMD_NAME', cmd_name);
+    $.get(url);
+  }
+
   last_clock_start_timestamp = undefined;
   duration = undefined;
   clock_id = undefined;
