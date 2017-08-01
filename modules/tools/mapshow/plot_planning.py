@@ -19,13 +19,14 @@
 import os
 import rospy
 import argparse
+import threading
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from map import Map
 from localization import Localization
 from modules.planning.proto import planning_pb2
 from modules.localization.proto import localization_pb2
-import copy
+
 
 PATH_DATA_X = {}
 PATH_DATA_Y = {}
@@ -41,10 +42,15 @@ vehicle_position_line = None
 vehicle_polygon_line = None
 localization_pb_buff = None
 
+PATH_DATA_LOCK = threading.Lock()
+SPEED_DATA_LOCK = threading.Lock()
+LOCALIZATION_DATA_LOCK = threading.Lock()
 
 def localization_callback(localization_pb):
     global localization_pb_buff
+    LOCALIZATION_DATA_LOCK.acquire()
     localization_pb_buff = localization_pb
+    LOCALIZATION_DATA_LOCK.release()
 
 
 def planning_callback(planning_pb):
@@ -60,8 +66,10 @@ def planning_callback(planning_pb):
         for path_point in path_debug.path_point:
             path_data_x[name].append(path_point.x)
             path_data_y[name].append(path_point.y)
-    PATH_DATA_X = copy.deepcopy(path_data_x)
-    PATH_DATA_Y = copy.deepcopy(path_data_y)
+    PATH_DATA_LOCK.acquire()
+    PATH_DATA_X = path_data_x
+    PATH_DATA_Y = path_data_y
+    PATH_DATA_LOCK.release()
 
     # speed
     speed_data_time = {}
@@ -79,9 +87,10 @@ def planning_callback(planning_pb):
     for traj_point in planning_pb.trajectory_point:
         speed_data_time[name].append(traj_point.relative_time)
         speed_data_val[name].append(traj_point.v)
+    SPEED_DATA_LOCK.acquire()
     SPEED_DATA_TIME = speed_data_time
     SPEED_DATA_VAL = speed_data_val
-
+    SPEED_DATA_LOCK.release()
 
 def add_listener():
     rospy.init_node('plot_planning', anonymous=True)
@@ -117,6 +126,7 @@ def update_init():
 
 def update_speed():
     cnt = 0
+    SPEED_DATA_LOCK.acquire()
     for name in SPEED_DATA_TIME.keys():
         if cnt >= len(speed_line_pool):
             print "Number of lines is more than 4! "
@@ -129,10 +139,11 @@ def update_speed():
         line.set_ydata(SPEED_DATA_VAL[name])
         line.set_label(name)
         cnt += 1
-
+    SPEED_DATA_LOCK.release()
 
 def update_path():
     cnt = 0
+    PATH_DATA_LOCK.acquire()
     for name in PATH_DATA_X.keys():
         if cnt >= len(path_line_pool):
             print "Number of lines is more than 4! "
@@ -145,15 +156,16 @@ def update_path():
         line.set_ydata(PATH_DATA_Y[name])
         line.set_label(name)
         cnt += 1
-
+    PATH_DATA_LOCK.release()
 
 def update_localization():
+    LOCALIZATION_DATA_LOCK.acquire()
     if localization_pb_buff is not None:
         vehicle_position_line.set_visible(True)
         vehicle_polygon_line.set_visible(True)
         Localization(localization_pb_buff) \
             .replot_vehicle(vehicle_position_line, vehicle_polygon_line)
-
+    LOCALIZATION_DATA_LOCK.release()
 
 def init_line_pool(central_x, central_y):
     global vehicle_position_line, vehicle_polygon_line, s_speed_line
@@ -178,10 +190,12 @@ if __name__ == '__main__':
     default_map_path += "/../../map/data/base_map.txt"
 
     parser = argparse.ArgumentParser(
-        description="plot_planning is a tool to display planning trajs on a map.",
+        description="plot_planning is a tool to display "
+                    "planning trajs on a map.",
         prog="plot_planning.py")
     parser.add_argument(
-        "-m", "--map", action="store", type=str, required=False, default=default_map_path,
+        "-m", "--map", action="store", type=str, required=False,
+        default=default_map_path,
         help="Specify the map file in txt or binary format")
     args = parser.parse_args()
 
