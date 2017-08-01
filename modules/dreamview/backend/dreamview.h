@@ -26,6 +26,7 @@
 
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
+#include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/websocket/websocket.h"
 
 /**
@@ -44,12 +45,9 @@ class Dreamview : public apollo::common::ApolloApp {
   virtual ~Dreamview() = default;
 
  private:
-  // Time interval, in seconds, between pushing SimulationWorld to frontend.
-  static constexpr double kSimWorldTimeInterval = 0.1;
-
-  ros::Timer timer_;
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
   std::unique_ptr<CivetServer> server_;
+  std::unique_ptr<SimControl> sim_control_;
   std::unique_ptr<WebSocketHandler> websocket_;
   std::unique_ptr<MapService> map_service_;
 };
