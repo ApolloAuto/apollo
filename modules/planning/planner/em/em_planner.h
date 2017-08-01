@@ -27,8 +27,8 @@
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
-#include "modules/planning/planner/em/em_planner_debugger.h"
 #include "modules/planning/optimizer/optimizer.h"
+#include "modules/planning/planner/em/em_planner_debugger.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -65,22 +65,23 @@ class EMPlanner : public Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(
-      const apollo::common::TrajectoryPoint& start_point,
-      PublishableTrajectory* ptr_publishable_trajectory) override;
-
+  apollo::common::Status Plan(Frame* frame,
+                              PublishableTrajectory* trajectory_pb) override;
   EMPlannerDebugger& em_planner_debugger();
 
  private:
   void RegisterOptimizers();
 
   std::vector<common::SpeedPoint> GenerateInitSpeedProfile(const double init_v,
-                                                   const double init_a);
+                                                           const double init_a);
 
   void RecordDebugInfo(const std::string& name, PlanningData* planning_data,
-                            double time_diff_ms);
+                       double time_diff_ms);
 
   EMPlannerDebugger em_planner_debugger_;
+  void RecordProcessorDebug(const std::string& name,
+                            PlanningData* planning_data, double time_diff_ms,
+                            ADCTrajectory* trajectory_pb);
 
  private:
   apollo::common::util::Factory<OptimizerType, Optimizer> optimizer_factory_;

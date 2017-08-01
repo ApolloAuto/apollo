@@ -31,7 +31,10 @@ const std::string& Optimizer::name() const { return _name; }
 
 bool Optimizer::Init() { return true; }
 
-Status Optimizer::Optimize(PlanningData* planning_data) { return Status::OK(); }
+Status Optimizer::Optimize(Frame* frame) {
+  frame_ = frame;
+  return Status::OK();
+}
 
 }  // namespace planning
 }  // namespace apollo

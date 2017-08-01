@@ -26,6 +26,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -78,9 +79,12 @@ class Planning : public apollo::common::ApolloApp {
   bool Plan(const bool is_on_auto_mode, const double publish_time,
             ADCTrajectory* trajectory_pb);
 
+  const Frame* GetFrame() const;
+  const hdmap::PncMap* GetPncMap() const;
+  bool InitFrame(const uint32_t sequence_num);
+
  private:
   void RegisterPlanners();
-
   void RunOnce();
 
   void RecordInput(ADCTrajectory* trajectory_pb);
@@ -89,6 +93,10 @@ class Planning : public apollo::common::ApolloApp {
       planner_factory_;
 
   PlanningConfig config_;
+
+  std::unique_ptr<hdmap::PncMap> pnc_map_;
+
+  std::unique_ptr<Frame> frame_;
 
   std::unique_ptr<Planner> planner_;
 

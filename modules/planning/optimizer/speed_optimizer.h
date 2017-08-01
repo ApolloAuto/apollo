@@ -26,7 +26,6 @@
 #include "modules/planning/optimizer/optimizer.h"
 
 #include "modules/common/status/status.h"
-#include "modules/planning/common/planning_data.h"
 
 namespace apollo {
 namespace planning {
@@ -35,7 +34,7 @@ class SpeedOptimizer : public Optimizer {
  public:
   explicit SpeedOptimizer(const std::string& name);
   virtual ~SpeedOptimizer() = default;
-  apollo::common::Status Optimize(PlanningData* planning_data) override;
+  apollo::common::Status Optimize(Frame* frame) override;
 
  protected:
   virtual apollo::common::Status Process(const PathData& path_data,

@@ -30,13 +30,31 @@
 namespace apollo {
 namespace planning {
 
-Frame::Frame(const uint32_t sequence_num, const hdmap::PncMap *pnc_map)
-    : sequence_num_(sequence_num), pnc_map_(pnc_map) {}
+const hdmap::PncMap *Frame::pnc_map_ = nullptr;
 
-void Frame::SetInitPose(const localization::Pose &pose) { init_pose_ = pose; }
+void Frame::SetMap(hdmap::PncMap *pnc_map) { pnc_map_ = pnc_map; }
 
-void Frame::SetRouting(const hdmap::RoutingResult &routing) {
+Frame::Frame(const uint32_t sequence_num) : sequence_num_(sequence_num) {}
+
+void Frame::SetVehicleInitPose(const localization::Pose &pose) {
+  init_pose_ = pose;
+}
+
+void Frame::SetRoutingResult(const hdmap::RoutingResult &routing) {
   routing_result_ = routing;
+}
+
+void Frame::SetPlanningStartPoint(const TrajectoryPoint &start_point) {
+  planning_start_point_ = start_point;
+}
+
+const hdmap::PncMap *Frame::PncMap() {
+  CHECK(!pnc_map_) << "map is not setup in frame";
+  return pnc_map_;
+}
+
+const TrajectoryPoint &Frame::PlanningStartPoint() const {
+  return planning_start_point_;
 }
 
 void Frame::SetDecisionDataFromPrediction(
@@ -71,6 +89,10 @@ void Frame::SetDecisionDataFromPrediction(
   }
 }
 
+void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
+  prediction_ = prediction;
+}
+
 bool Frame::Init() {
   if (!pnc_map_) {
     AERROR << "map is null, call SetMap() first";
@@ -89,6 +111,9 @@ bool Frame::Init() {
   if (!SmoothReferenceLine()) {
     AERROR << "Failed to smooth reference line";
     return false;
+  }
+  if (FLAGS_enable_prediction) {
+    SetDecisionDataFromPrediction(prediction_);
   }
   return true;
 }

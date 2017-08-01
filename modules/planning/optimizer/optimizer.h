@@ -23,6 +23,7 @@
 
 #include <string>
 #include "modules/common/status/status.h"
+#include "modules/planning/common/frame.h"
 
 namespace apollo {
 namespace planning {
@@ -35,12 +36,13 @@ class Optimizer {
   virtual ~Optimizer() = default;
   virtual const std::string& name() const;
 
-  virtual apollo::common::Status Optimize(PlanningData* planning_data);
+  virtual apollo::common::Status Optimize(Frame* frame);
 
   virtual bool Init();
 
  protected:
   bool is_init_ = false;
+  Frame* frame_ = nullptr;
 
  private:
   const std::string _name;
