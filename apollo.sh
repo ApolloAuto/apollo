@@ -123,6 +123,10 @@ function apollo_build() {
     fail 'Build failed!'
   fi
   find bazel-genfiles/* -type d -exec touch "{}/__init__.py" \;
+  if [ -d "/root/conf" ];then
+    sudo cp -r /root/conf bazel-apollo/external/ros/share/gnss_driver/
+    sudo chown -R ${DOCKER_USER}:${DOCKER_GRP} "bazel-apollo/external/ros/share/gnss_driver/conf"
+  fi
 }
 
 function check() {
