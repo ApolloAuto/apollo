@@ -83,8 +83,8 @@ void AStarStrategy::clear() {
 
 double AStarStrategy::heuristic_cost(const TopoNode* src_node,
                                      const TopoNode* dest_node) {
-  const ::adu::common::hdmap::Point& src_point = src_node->anchor_point();
-  const ::adu::common::hdmap::Point& dest_point = dest_node->anchor_point();
+  const ::apollo::hdmap::Point& src_point = src_node->anchor_point();
+  const ::apollo::hdmap::Point& dest_point = dest_node->anchor_point();
   double distance = sqrt(pow(src_point.x() - dest_point.x(), 2) +
                          pow(src_point.y() - dest_point.y(), 2) +
                          pow(src_point.z() - dest_point.z(), 2));

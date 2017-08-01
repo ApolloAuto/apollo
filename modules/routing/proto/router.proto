@@ -110,7 +110,7 @@ message RoutingResult {
     }
   }
 
-  optional adu.common.header.Header header = 1;
+  optional apollo.common.Header header = 1;
   repeated Way route = 2;
   optional Measurement measurement = 3;
   optional RoutingRequest routing_request = 4;
