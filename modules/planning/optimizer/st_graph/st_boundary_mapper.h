@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"

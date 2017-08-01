@@ -21,7 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_H_
 #define MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_H_
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 namespace apollo {
 namespace planning {

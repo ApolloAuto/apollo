@@ -59,7 +59,7 @@ cc_library(
         ":st_graph_boundary",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/map/hdmap",
         "//modules/map/proto:map_proto",

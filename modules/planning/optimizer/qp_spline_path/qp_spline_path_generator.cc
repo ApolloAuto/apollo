@@ -23,7 +23,7 @@
 
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"

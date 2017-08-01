@@ -23,7 +23,7 @@
 
 #include <vector>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/decision_data.h"

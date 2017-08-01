@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 #ifndef MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
 #define MODULES_PLANNING_COMMON_SPEED_LIMIT_H_

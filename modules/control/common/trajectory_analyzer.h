@@ -26,7 +26,7 @@
 
 #include "modules/planning/proto/planning.pb.h"
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 
 /**

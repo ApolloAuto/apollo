@@ -34,7 +34,7 @@
 
 #include <vector>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/math/spiral_curve/spiral_curve.h"
 
 namespace apollo {

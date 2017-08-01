@@ -39,7 +39,7 @@ cc_library(
     srcs = ["predictor.cc"],
     hdrs = ["predictor.h"],
     deps = [
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:prediction_proto",
     ],

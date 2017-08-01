@@ -65,7 +65,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:search",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state",
         "//modules/planning/proto:planning_proto",
     ],
