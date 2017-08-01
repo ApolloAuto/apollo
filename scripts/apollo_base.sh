@@ -148,12 +148,14 @@ function is_stopped() {
 
 function start() {
     MODULE=$1
+    shift
+
     LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
     is_stopped "${MODULE}"
     if [ $? -eq 1 ]; then
         eval "nohup ${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE} \
             --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
-            --log_dir=${APOLLO_ROOT_DIR}/data/log  </dev/null >${LOG} 2>&1 &"
+            --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
         is_stopped "${MODULE}"
         if [ $? -eq 0 ]; then
             echo "Launched module ${MODULE}."
@@ -170,9 +172,11 @@ function start() {
 
 function start_fe() {
     MODULE=$1
+    shift
+
     eval "${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE} \
         --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
-        --log_dir=${APOLLO_ROOT_DIR}/data/log"
+        --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
 }
 
 function stop() {
@@ -198,21 +202,23 @@ function help() {
 
 # run command_name module_name
 function run() {
-    case $1 in
+    local cmd=$1
+    shift
+    case $cmd in
         start)
-            start "$2"
+            start "$@"
             ;;
         start_fe)
-            start_fe "$2"
+            start_fe "$@"
             ;;
         stop)
-            stop "$2"
+            stop "$1"
             ;;
         help)
             help
             ;;
         *)
-            start "$2"
+            start "$@"
             ;;
     esac
 }
