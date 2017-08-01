@@ -282,10 +282,7 @@ void Path::get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
     if (lane_segment.lane == nullptr) {
       continue;
     }
-    // LaneInfoConstPtr get_lane_by_id(const apollo::hdmap::Id& id) const;
-    // OverlapInfoConstPtr get_overlap_by_id(const apollo::hdmap::Id& id) const;
-    for (const auto overlap_id : get_overlaps_from_lane(*(lane_segment.lane))) {
-      const auto& overlap = hdmap_->get_overlap_by_id(overlap_id);
+    for (const auto& overlap : get_overlaps_from_lane(*(lane_segment.lane))) {
       const auto& overlap_info =
           overlap->get_object_overlap_info(lane_segment.lane->id());
       if (overlap_info == nullptr) {

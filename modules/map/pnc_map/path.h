@@ -278,7 +278,7 @@ class Path {
   double get_sample(const std::vector<double>& samples, const double s) const;
 
   using GetOverlapFromLaneFunc =
-      std::function<const std::vector<apollo::hdmap::Id>&(const LaneInfo&)>;
+      std::function<const std::vector<OverlapInfoConstPtr>&(const LaneInfo&)>;
   void get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
                         std::vector<PathOverlap>* const overlaps) const;
 
