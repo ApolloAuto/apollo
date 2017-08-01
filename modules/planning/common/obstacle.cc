@@ -45,7 +45,7 @@ double Obstacle::Heading() const { return heading_; }
 
 void Obstacle::SetHeading(const double heading) { heading_ = heading; }
 
-const common::math::Box2d Obstacle::BoundingBox() const {
+common::math::Box2d Obstacle::BoundingBox() const {
   return ::apollo::common::math::Box2d(center_, heading_, length_, width_);
 }
 
