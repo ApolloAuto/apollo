@@ -89,8 +89,9 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
     AERROR << "[LatController] control_conf == nullptr";
     return false;
   }
-  const auto &vehicle_param_ =
-      common::config::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  const auto &vehicle_param_ = common::config::VehicleConfigHelper::instance()
+                                   ->GetConfig()
+                                   .vehicle_param();
 
   ts_ = control_conf->lat_controller_conf().ts();
   CHECK_GT(ts_, 0.0) << "[LatController] Invalid control update interval.";
@@ -99,8 +100,9 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   preview_window_ = control_conf->lat_controller_conf().preview_window();
   wheelbase_ = vehicle_param_.wheel_base();
   steer_transmission_ratio_ = vehicle_param_.steer_ratio();
-  steer_single_direction_max_degree_ = vehicle_param_.max_steer_angle() / M_PI * 180;
-        max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
+  steer_single_direction_max_degree_ =
+      vehicle_param_.max_steer_angle() / M_PI * 180;
+  max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
 
   double mass_fl = control_conf->lat_controller_conf().mass_fl();
   double mass_fr = control_conf->lat_controller_conf().mass_fr();
