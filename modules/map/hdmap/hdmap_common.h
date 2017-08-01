@@ -80,6 +80,7 @@ using LaneSegmentBox =
     ObjectWithAABox<LaneInfo, apollo::common::math::LineSegment2d>;
 using LaneSegmentKDTree = apollo::common::math::AABoxKDTree2d<LaneSegmentBox>;
 
+typedef std::shared_ptr<const apollo::hdmap::OverlapInfo> OverlapInfoConstPtr;
 class LaneInfo {
  public:
   explicit LaneInfo(const apollo::hdmap::Lane &lane);
@@ -99,24 +100,24 @@ class LaneInfo {
     return _segments;
   }
   const std::vector<double> &accumulate_s() const { return _accumulated_s; }
-  const std::vector<apollo::hdmap::Id> &overlaps() const { return _overlaps; }
-  const std::vector<apollo::hdmap::Id> &cross_lanes() const {
+  const std::vector<OverlapInfoConstPtr> &overlaps() const { return _overlaps; }
+  const std::vector<OverlapInfoConstPtr> &cross_lanes() const {
     return _cross_lanes;
   }
-  const std::vector<apollo::hdmap::Id> &signals() const { return _signals; }
-  const std::vector<apollo::hdmap::Id> &yield_signs() const {
+  const std::vector<OverlapInfoConstPtr> &signals() const { return _signals; }
+  const std::vector<OverlapInfoConstPtr> &yield_signs() const {
     return _yield_signs;
   }
-  const std::vector<apollo::hdmap::Id> &stop_signs() const {
+  const std::vector<OverlapInfoConstPtr> &stop_signs() const {
     return _stop_signs;
   }
-  const std::vector<apollo::hdmap::Id> &crosswalks() const {
+  const std::vector<OverlapInfoConstPtr> &crosswalks() const {
     return _crosswalks;
   }
-  const std::vector<apollo::hdmap::Id> &junctions() const { return _junctions; }
-
+  const std::vector<OverlapInfoConstPtr> &junctions() const {
+    return _junctions;
+  }
   double total_length() const { return _total_length; }
-
   using SampledWidth = std::pair<double, double>;
   const std::vector<SampledWidth> &sampled_left_width() const {
     return _sampled_left_width;
@@ -145,8 +146,8 @@ class LaneInfo {
   friend class HDMapImpl;
   friend class RoadInfo;
   void init();
-  void post_process(HDMapImpl &map_instance);
-  void update_overlaps(HDMapImpl &map_instance);
+  void post_process(const HDMapImpl &map_instance);
+  void update_overlaps(const HDMapImpl &map_instance);
   double get_width_from_sample(
       const std::vector<LaneInfo::SampledWidth> &samples, const double s) const;
   void create_kdtree();
@@ -163,14 +164,14 @@ class LaneInfo {
   std::vector<apollo::common::math::LineSegment2d> _segments;
   std::vector<double> _accumulated_s;
   std::vector<std::string> _overlap_ids;
-  std::vector<apollo::hdmap::Id> _overlaps;
-  std::vector<apollo::hdmap::Id> _cross_lanes;
-  std::vector<apollo::hdmap::Id> _signals;
-  std::vector<apollo::hdmap::Id> _yield_signs;
-  std::vector<apollo::hdmap::Id> _stop_signs;
-  std::vector<apollo::hdmap::Id> _crosswalks;
-  std::vector<apollo::hdmap::Id> _parking_spaces;
-  std::vector<apollo::hdmap::Id> _junctions;
+  std::vector<OverlapInfoConstPtr> _overlaps;
+  std::vector<OverlapInfoConstPtr> _cross_lanes;
+  std::vector<OverlapInfoConstPtr> _signals;
+  std::vector<OverlapInfoConstPtr> _yield_signs;
+  std::vector<OverlapInfoConstPtr> _stop_signs;
+  std::vector<OverlapInfoConstPtr> _crosswalks;
+  std::vector<OverlapInfoConstPtr> _parking_spaces;
+  std::vector<OverlapInfoConstPtr> _junctions;
   double _total_length = 0.0;
   std::vector<SampledWidth> _sampled_left_width;
   std::vector<SampledWidth> _sampled_right_width;
@@ -334,7 +335,6 @@ typedef std::shared_ptr<const apollo::hdmap::CrosswalkInfo>
 typedef std::shared_ptr<const apollo::hdmap::StopSignInfo> StopSignInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::YieldSignInfo>
     YieldSignInfoConstPtr;
-typedef std::shared_ptr<const apollo::hdmap::OverlapInfo> OverlapInfoConstPtr;
 typedef std::shared_ptr<const apollo::hdmap::RoadInfo> RoadInfoConstPtr;
 
 struct RoadROIBoundary {
