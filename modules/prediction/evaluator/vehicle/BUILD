@@ -20,6 +20,21 @@ cc_library(
         "//modules/prediction/proto:fnn_vehicle_model_proto",
         "//modules/prediction/proto:lane_graph_proto",
         "//modules/map/proto:map_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "mlp_evaluator_test",
+    size = "small",
+    srcs = [
+        "mlp_evaluator_test.cc",
+    ],
+    data = ["//modules/prediction:prediction_data"],
+    deps = [
+        "//modules/prediction/evaluator/vehicle:mlp_evaluator",
+        "@gtest//:main",
+        "//modules/prediction/common:prediction_gflags",
     ],
 )
 
