@@ -12,11 +12,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
+
+#include "modules/map/hdmap/hdmap_common.h"
+
 #include <algorithm>
 #include <iostream>
 #include <limits>
+
 #include "glog/logging.h"
-#include "modules/map/hdmap/hdmap_common.h"
+
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 
 namespace {
@@ -322,43 +327,52 @@ bool LaneInfo::get_projection(const apollo::common::math::Vec2d &point,
   return true;
 }
 
-void LaneInfo::post_process(HDMapImpl &map_instance) {
+void LaneInfo::post_process(const HDMapImpl &map_instance) {
   update_overlaps(map_instance);
 }
 
-void LaneInfo::update_overlaps(HDMapImpl &map_instance) {
-  for (const auto &lane_overlap_id : _overlap_ids) {
-    apollo::hdmap::Id overlap_id;
-    overlap_id.set_id(lane_overlap_id);
-    OverlapInfoConstPtr overlap_ptr =
-        map_instance.get_overlap_by_id(overlap_id);
+void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
+  for (const auto &overlap_id : _overlap_ids) {
+    const auto &overlap_ptr = map_instance.get_overlap_by_id(
+        apollo::common::util::MakeMapId(overlap_id));
     if (overlap_ptr == nullptr) {
       continue;
     }
-    _overlaps.emplace_back(overlap_id);
+    _overlaps.emplace_back(overlap_ptr);
     for (const auto &object : overlap_ptr->overlap().object()) {
-      const auto &object_id = object.id();
-      if (object_id.id() == _lane.id().id()) {
+      const auto &object_id = object.id().id();
+      if (object_id == _lane.id().id()) {
         continue;
       }
-      if (map_instance.get_lane_by_id(object_id) != nullptr) {
-        _cross_lanes.emplace_back(object_id);
+      const auto &object_map_id = apollo::common::util::MakeMapId(object_id);
+      if (map_instance.get_lane_by_id(object_map_id) != nullptr) {
+        _cross_lanes.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_signal_by_id(object_id) != nullptr) {
-        _signals.emplace_back(object_id);
+      if (map_instance.get_signal_by_id(object_map_id) != nullptr) {
+        _signals.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_yield_sign_by_id(object_id) != nullptr) {
-        _yield_signs.emplace_back(object_id);
+      if (map_instance.get_yield_sign_by_id(object_map_id) != nullptr) {
+        _yield_signs.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_stop_sign_by_id(object_id) != nullptr) {
-        _stop_signs.emplace_back(object_id);
+      if (map_instance.get_stop_sign_by_id(object_map_id) != nullptr) {
+        _stop_signs.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_crosswalk_by_id(object_id) != nullptr) {
-        _crosswalks.emplace_back(object_id);
+      if (map_instance.get_crosswalk_by_id(object_map_id) != nullptr) {
+        _crosswalks.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_junction_by_id(object_id) != nullptr) {
-        _junctions.emplace_back(object_id);
+      if (map_instance.get_junction_by_id(object_map_id) != nullptr) {
+        _junctions.emplace_back(overlap_ptr);
       }
+
+      // TODO: support parking and speed bump
+      /*
+      if (map_instance.get_parking_space_by_id(object_map_id) != nullptr) {
+        _parking_spaces.emplace_back(overlap_ptr);
+      }
+      if (map_instance.get_speed_bump_by_id(object_map_id) != nullptr) {
+        _speed_bumps.emplace_back(overlap_ptr);
+      }
+      */
     }
   }
 }
