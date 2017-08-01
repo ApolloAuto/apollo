@@ -58,6 +58,8 @@ class HDMapInput {
   DISALLOW_COPY_AND_ASSIGN(HDMapInput);
 };
 
+typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
+
 }  // namespace perception
 }  // namespace apollo
 

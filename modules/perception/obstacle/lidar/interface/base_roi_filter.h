@@ -85,7 +85,7 @@ class BaseROIFilter {
 
   virtual bool Filter(const pcl_util::PointCloudPtr &cloud,
                       const ROIFilterOptions &roi_filter_options,
-                      pcl_util::PointIndicesPtr roi_indices) = 0;
+                      pcl_util::PointIndices* roi_indices) = 0;
 
   virtual std::string name() const = 0;
 

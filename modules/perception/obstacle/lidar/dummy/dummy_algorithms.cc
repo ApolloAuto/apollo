@@ -36,11 +36,11 @@ static void extract_pointcloud_indices(const PointCloudPtr &cloud,
   std::iota(indices.begin(), indices.end(), 0);
 }
 
-bool DummyROIFilter::Filter(const PointCloudPtr &cloud,
-                            const ROIFilterOptions &roi_filter_options,
-                            PointIndicesPtr roi_indices) {
-  extract_pointcloud_indices(cloud, roi_indices);
-  return result_filter_;
+bool DummyROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
+              const Eigen::Matrix4d& trans_velodyne_to_world,
+              HDMapInputPtr hdmap_input,
+              pcl_util::PointIndices* roi_indices) {
+  return true;
 }
 
 bool DummyGroundDetector::Detect(const GroundDetectorOptions &options,

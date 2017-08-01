@@ -38,9 +38,10 @@ class DummyROIFilter : public BaseROIFilter {
     return result_init_;
   }
 
-  bool Filter(const pcl_util::PointCloudPtr &cloud,
-              const ROIFilterOptions &roi_filter_options,
-              pcl_util::PointIndicesPtr roi_indices) override;
+  bool Filter(const pcl_util::PointCloudPtr& cloud,
+              const Eigen::Matrix4d& trans_velodyne_to_world,
+              HDMapInputPtr hdmap_input,
+              pcl_util::PointIndices* roi_indices) override;
 
   std::string name() const override {
     return "DummyROIFilter";
