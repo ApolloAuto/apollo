@@ -80,4 +80,21 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "dp_st_graph_test",
+    size = "small",
+    srcs = [
+        "dp_st_graph_test.cc",
+    ],
+    data = [
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":dp_st_graph",
+        "//modules/planning/optimizer:optimizer_test_base",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

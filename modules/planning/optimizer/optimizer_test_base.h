@@ -21,6 +21,7 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
+#include "modules/planning/proto/dp_st_speed_config.pb.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
@@ -72,6 +73,7 @@ class OptimizerTestBase : public ::testing::Test {
   bool SetUpAdapters();
 
   DpPolyPathConfig dp_poly_path_config_;
+  DpStSpeedConfig dp_st_speed_config_;
   localization::Pose pose_;
   Frame* frame_ = nullptr;
 };
