@@ -28,7 +28,7 @@ class ConfigManagerTest : public testing::Test {
   ConfigManagerTest() : config_manager_(NULL) {}
   virtual ~ConfigManagerTest() {}
   virtual void SetUp() {
-    FLAGS_work_root = "modules/perception/testdata";
+    FLAGS_work_root = "modules/perception/data";
     FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
     config_manager_ = Singleton<ConfigManager>::Get();
     ASSERT_TRUE(config_manager_ != NULL);
