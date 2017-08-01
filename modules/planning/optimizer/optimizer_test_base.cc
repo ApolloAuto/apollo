@@ -43,6 +43,8 @@ void OptimizerTestBase::SetDataConfigs() {
       "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
   FLAGS_dp_poly_path_config_file =
       "modules/planning/testdata/conf/dp_poly_path_config.pb.txt";
+  FLAGS_dp_st_speed_config_file =
+      "modules/planning/testdata/conf/dp_st_speed_config.pb.txt";
   FLAGS_test_localization_file =
       "modules/planning/testdata/garage_localization.pb.txt";
   FLAGS_test_chassis_file = "modules/planning/testdata/garage_chassis.pb.txt",
@@ -94,6 +96,11 @@ void OptimizerTestBase::SetUp() {
   if (!common::util::GetProtoFromFile(FLAGS_dp_poly_path_config_file,
                                       &dp_poly_path_config_)) {
     AERROR << "Failed to load file " << FLAGS_dp_poly_path_config_file;
+    return;
+  }
+  if (!common::util::GetProtoFromFile(FLAGS_dp_st_speed_config_file,
+                                      &dp_st_speed_config_)) {
+    AERROR << "Failed to load file " << FLAGS_dp_st_speed_config_file;
     return;
   }
   frame_ = data_center->current_frame();
