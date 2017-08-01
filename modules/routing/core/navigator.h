@@ -19,51 +19,68 @@
 
 #include <memory>
 
-#include "routing.pb.h"
 #include "router.pb.h"
+#include "routing.pb.h"
 
-#include "graph/topo_range_manager.h"
+#include "core/node_range_manager.h"
 
 #include <unordered_set>
 
 namespace adu {
 namespace routing {
 
-class RoutingResultGenerator;
-class RouterResultGenerator;
-class BlackListRangeGenerator;
 class TopoGraph;
 class TopoNode;
 
 class Navigator {
-public:
-    explicit Navigator(const std::string& topo_file_path);
-    ~Navigator();
-    bool is_ready() const;
+ public:
+  explicit Navigator(const std::string& topo_file_path);
+  ~Navigator();
+  bool is_ready() const;
 
-    // search old request to old response
-    bool search_route(const ::adu::common::routing::RoutingRequest& request,
-                      ::adu::common::routing::RoutingResult* response) const;
+  // search old request to old response
+  bool search_route(const ::adu::common::routing::RoutingRequest& request,
+                    ::adu::common::routing::RoutingResult* response) const;
 
-    // search new request to new response
-    bool search_route(const ::adu::common::router::RoutingRequest& request,
-                      ::adu::common::router::RoutingResult* response) const;
+  // search new request to new response
+  bool search_route(const ::adu::common::router::RoutingRequest& request,
+                    ::adu::common::router::RoutingResult* response) const;
 
-private:
-    void dump_debug_data(const std::vector<const TopoNode*>& nodes,
-                         const NodeSRangeManager& range_manager,
-                         const ::adu::common::router::RoutingResult& response) const;
+ private:
+  // new request to new response
+  bool generate_passage_region(
+      const ::adu::common::router::RoutingRequest& request,
+      const std::vector<const TopoNode*>& nodes,
+      const std::unordered_set<const TopoNode*>& black_list,
+      const NodeRangeManager& range_manager,
+      ::adu::common::router::RoutingResult* result) const;
 
-private:
-    bool _is_ready;
-    std::unique_ptr<TopoGraph> _graph;
-    std::unique_ptr<BlackListRangeGenerator> _black_list_generator;
-    std::unique_ptr<RoutingResultGenerator> _routing_result_generator;
-    std::unique_ptr<RouterResultGenerator> _router_result_generator;
+  // use internal generate result
+  void generate_passage_region(
+      const std::vector<const TopoNode*>& nodes,
+      const std::unordered_set<const TopoNode*>& black_list,
+      const NodeRangeManager& range_manager,
+      ::adu::common::router::RoutingResult* result) const;
+
+  // old request to old response
+  bool generate_passage_region(
+      const ::adu::common::routing::RoutingRequest& request,
+      const std::vector<const TopoNode*>& nodes,
+      const std::unordered_set<const TopoNode*>& black_list,
+      const NodeRangeManager& range_manager,
+      ::adu::common::routing::RoutingResult* result) const;
+
+  void dump_debug_data(
+      const std::vector<const TopoNode*>& nodes,
+      const NodeRangeManager& range_manager,
+      const ::adu::common::router::RoutingResult& response) const;
+
+ private:
+  bool _is_ready;
+  std::unique_ptr<TopoGraph> _graph;
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_CORE_NAVIGATOR_H
-
+#endif  // BAIDU_ADU_ROUTING_CORE_NAVIGATOR_H

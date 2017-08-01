@@ -14,27 +14,33 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_STRATEGY_STRATEGY_H
-#define BAIDU_ADU_ROUTING_STRATEGY_STRATEGY_H
-#include <unordered_set>
+#include <string>
+
+#include "common/utils.h"
+#include "gtest/gtest.h"
+
+#include "topo_graph.pb.h"
 
 namespace adu {
 namespace routing {
 
-class TopoGraph;
-class TopoNode;
+TEST(FileUtilsTestSuit, test1) {
+  std::string file_path = "./test.bin";
+  std::string map_version = "versionA";
 
-class Strategy {
- public:
-  virtual ~Strategy(){};
+  ::adu::routing::common::Graph graph_1;
+  graph_1.set_hdmap_version(map_version);
 
-  virtual bool search(const TopoGraph* graph, const TopoNode* src_node,
-                      const TopoNode* dest_node,
-                      const std::unordered_set<const TopoNode*>& black_list,
-                      std::vector<const TopoNode*>* const result_nodes) = 0;
-};
+  ::adu::routing::common::Graph graph_2;
+  ASSERT_TRUE(FileUtils::dump_protobuf_data_to_file(file_path, graph_1));
+  ASSERT_TRUE(FileUtils::load_protobuf_data_from_file(file_path, &graph_2));
+  ASSERT_EQ(map_version, graph_2.hdmap_version());
+}
 
 }  // namespace routing
 }  // namespace adu
 
-#endif  // BAIDU_ADU_ROUTING_STRATEGY_STRATEGY_H
+int main(int argc, char **argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

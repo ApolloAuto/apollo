@@ -14,26 +14,28 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_COMMON_ROUTING_GFLAGS_H
-#define BAIDU_ADU_ROUTING_COMMON_ROUTING_GFLAGS_H
+#include <memory>
 
 #include "gflags/gflags.h"
+#include "glog/logging.h"
 
-DECLARE_string(node_name);
-DECLARE_string(node_namespace);
-DECLARE_string(signal_probe_service);
+#include "topo_creator/graph_creator.h"
 
-DECLARE_bool(enable_old_routing);
-DECLARE_string(route_topic_for_broadcast);
-DECLARE_bool(use_road_id);
+DEFINE_string(base_map_dir, "/home/caros/adu_data/map",
+              "directory of base map");
+DEFINE_string(base_map_name, "base_map.bin", "file name of base map");
+DEFINE_string(dump_topo_path, "/home/fuxiaoxin/Desktop/routing_map.bin",
+              "dump path of routing topology file");
 
-DECLARE_string(graph_dir);
-DECLARE_string(graph_file_name);
-
-DECLARE_string(rosparam_name_routing_init_status);
-
-DECLARE_bool(enable_debug_mode);
-DECLARE_string(debug_route_path);
-DECLARE_string(debug_passage_region_path);
-
-#endif  // BAIDU_ADU_ROUTING_COMMON_ROUTING_GFLAGS_H
+int main(int argc, char **argv) {
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  std::unique_ptr<::adu::routing::GraphCreator> creator_ptr;
+  creator_ptr.reset(new ::adu::routing::GraphCreator(
+      FLAGS_base_map_dir + "/" + FLAGS_base_map_name, FLAGS_dump_topo_path));
+  if (!creator_ptr->create()) {
+    LOG(ERROR) << "Create router topo failed!";
+    return -1;
+  }
+  return 0;
+}

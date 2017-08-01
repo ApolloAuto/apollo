@@ -14,27 +14,19 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_STRATEGY_STRATEGY_H
-#define BAIDU_ADU_ROUTING_STRATEGY_STRATEGY_H
-#include <unordered_set>
+#include "gflags/gflags.h"
+#include "glog/logging.h"
 
-namespace adu {
-namespace routing {
+#include "core/arbiter.h"
 
-class TopoGraph;
-class TopoNode;
+int main(int argc, char **argv) {
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
 
-class Strategy {
- public:
-  virtual ~Strategy(){};
-
-  virtual bool search(const TopoGraph* graph, const TopoNode* src_node,
-                      const TopoNode* dest_node,
-                      const std::unordered_set<const TopoNode*>& black_list,
-                      std::vector<const TopoNode*>* const result_nodes) = 0;
-};
-
-}  // namespace routing
-}  // namespace adu
-
-#endif  // BAIDU_ADU_ROUTING_STRATEGY_STRATEGY_H
+  ros::init(argc, argv, FLAGS_node_name);
+  ROS_INFO("Start router!!!");
+  if (!::adu::routing::Arbiter::instance()->run()) {
+    return -1;
+  }
+  return 0;
+}

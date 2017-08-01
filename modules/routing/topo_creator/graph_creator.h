@@ -17,8 +17,8 @@
 #ifndef BAIDU_ADU_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
 #define BAIDU_ADU_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
 
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "map.pb.h"
 #include "topo_graph.pb.h"
@@ -27,29 +27,32 @@ namespace adu {
 namespace routing {
 
 class GraphCreator {
-public:
-    GraphCreator(const std::string& base_map_file_path, const std::string& dump_topo_file_path);
+ public:
+  GraphCreator(const std::string& base_map_file_path,
+               const std::string& dump_topo_file_path);
 
-    ~GraphCreator() = default;
+  ~GraphCreator() = default;
 
-    bool create();
+  bool create();
 
-private:
-    void add_edge(const ::adu::routing::common::Node& from_node,
-                  const ::google::protobuf::RepeatedPtrField<::adu::common::hdmap::Id>& to_node_vec,
-                  const ::adu::routing::common::Edge::DirectionType& type);
+ private:
+  void add_edge(
+      const ::adu::routing::common::Node& from_node,
+      const ::google::protobuf::RepeatedPtrField<::adu::common::hdmap::Id>&
+          to_node_vec,
+      const ::adu::routing::common::Edge::DirectionType& type);
 
-private:
-    std::string _base_map_file_path;
-    std::string _dump_topo_file_path;
-    ::adu::common::hdmap::Map _pbmap;
-    ::adu::routing::common::Graph _graph;
-    std::unordered_map<std::string, int> _node_index_map;
-    std::unordered_map<std::string, std::string> _road_id_map;
-    std::unordered_set<std::string> _showed_edge_id_set;
+ private:
+  std::string _base_map_file_path;
+  std::string _dump_topo_file_path;
+  ::adu::common::hdmap::Map _pbmap;
+  ::adu::routing::common::Graph _graph;
+  std::unordered_map<std::string, int> _node_index_map;
+  std::unordered_map<std::string, std::string> _road_id_map;
+  std::unordered_set<std::string> _showed_edge_id_set;
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
+#endif  // BAIDU_ADU_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H

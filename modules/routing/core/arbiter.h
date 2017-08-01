@@ -20,9 +20,9 @@
 #include <memory>
 #include "ros/ros.h"
 
+#include "arbiter/routing_signal.h"
 #include "common/routing_gflags.h"
 #include "common/routing_macros.h"
-#include "arbiter/routing_signal.h"
 
 namespace adu {
 namespace routing {
@@ -30,27 +30,27 @@ namespace routing {
 class Navigator;
 
 class Arbiter {
-public:
-    ~Arbiter();
-    bool run();
+ public:
+  ~Arbiter();
+  bool run();
 
-private:
-    bool on_request(arbiter::routing_signal::Request& req,
-                    arbiter::routing_signal::Response& res);
+ private:
+  bool on_request(arbiter::routing_signal::Request& req,
+                  arbiter::routing_signal::Response& res);
 
-    // for old routing request
-    bool on_request_old_routing(arbiter::routing_signal::Request& req,
-                                arbiter::routing_signal::Response& res);
-private:
-    std::unique_ptr<ros::NodeHandle> _node_handle_ptr;
-    ros::ServiceServer _service;
-    ros::Publisher _publisher;
-    std::unique_ptr<Navigator> _navigator_ptr;
-    DECLARE_ARBITER_SINGLETON(Arbiter);
+  // for old routing request
+  bool on_request_old_routing(arbiter::routing_signal::Request& req,
+                              arbiter::routing_signal::Response& res);
+
+ private:
+  std::unique_ptr<ros::NodeHandle> _node_handle_ptr;
+  ros::ServiceServer _service;
+  ros::Publisher _publisher;
+  std::unique_ptr<Navigator> _navigator_ptr;
+  DECLARE_ARBITER_SINGLETON(Arbiter);
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_CORE_ARBITER_H
-
+#endif  // BAIDU_ADU_ROUTING_CORE_ARBITER_H
