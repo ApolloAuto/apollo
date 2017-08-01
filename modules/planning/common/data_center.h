@@ -31,7 +31,6 @@
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/object_table.h"
-#include "modules/planning/state_machine/master_state_machine.h"
 
 namespace apollo {
 namespace planning {
@@ -47,8 +46,6 @@ class DataCenter {
   void save_frame();
   const ::apollo::hdmap::HDMap &map() { return map_; }
 
-  MasterStateMachine *mutable_master() const;
-
   const Frame *last_frame() const;
 
   const ObjectTable &object_table() const;
@@ -62,7 +59,6 @@ class DataCenter {
   std::unique_ptr<hdmap::PncMap> pnc_map_ = nullptr;
   std::unique_ptr<Frame> _frame = nullptr;
   std::unique_ptr<ObjectTable> _object_table = nullptr;
-  std::unique_ptr<MasterStateMachine> _master = nullptr;
   apollo::hdmap::HDMap map_;
 
  private:
