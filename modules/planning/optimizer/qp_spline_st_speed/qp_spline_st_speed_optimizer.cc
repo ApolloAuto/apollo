@@ -86,8 +86,8 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
 
   SpeedLimit speed_limits;
   const auto& pose = apollo::common::VehicleState::instance()->pose();
-  const auto& hdmap = apollo::planning::DataCenter::instance()->map();
-  if (boundary_mapper_.get_speed_limits(pose, hdmap, path_data, total_length,
+  const auto* pnc_map = apollo::planning::DataCenter::instance()->pnc_map();
+  if (boundary_mapper_.get_speed_limits(pose, pnc_map, path_data, total_length,
                                         qp_spline_st_speed_config_.total_time(),
                                         qp_spline_st_speed_config_.max_speed(),
                                         &speed_limits) != Status::OK()) {

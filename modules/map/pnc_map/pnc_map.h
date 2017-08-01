@@ -32,12 +32,14 @@ namespace apollo {
 namespace hdmap {
 
 class Path;
+class MapPathPoint;
+class LaneSegment;
 
 class PncMap {
  public:
   PncMap() = default;
   ~PncMap() = default;
-  PncMap(const hdmap::HDMap *map_ptr);
+  PncMap(const std::string &map_file);
 
   const hdmap::HDMap *HDMap() const;
 
@@ -61,7 +63,7 @@ class PncMap {
       hdmap::LaneInfoConstPtr lane, const double start_s, const double end_s,
       std::vector<hdmap::MapPathPoint> *const points,
       std::vector<hdmap::LaneSegment> *const lane_segments) const;
-  const hdmap::HDMap *hdmap_ = nullptr;
+  hdmap::HDMap hdmap_;
 };
 
 }  // namespace hdmap

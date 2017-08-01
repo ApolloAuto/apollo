@@ -61,7 +61,7 @@ cc_library(
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
-        "//modules/map/hdmap",
+        "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:decision_data",
         "//modules/planning/common:obstacle",

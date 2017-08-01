@@ -45,12 +45,7 @@ DataCenter::DataCenter() {
   _object_table.reset(new ObjectTable());
 
   AINFO << "Data Center is ready!";
-
-  if (map_.load_map_from_file(FLAGS_map_filename)) {
-    AFATAL << "Failed to load map: " << FLAGS_map_filename;
-  }
-  AINFO << "map loaded, Map file: " << FLAGS_map_filename;
-  pnc_map_.reset(new hdmap::PncMap(&map_));
+  pnc_map_.reset(new hdmap::PncMap(FLAGS_map_filename));
 }
 
 Frame *DataCenter::frame(const uint32_t sequence_num) const {
