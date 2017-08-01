@@ -3,23 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "dp_st_boundary_mapper",
-    srcs = [
-        "dp_st_boundary_mapper.cc",
-    ],
-    hdrs = [
-        "dp_st_boundary_mapper.h",
-    ],
-    deps = [
-        "//modules/common/math",
-        "//modules/common/proto:common_proto",
-        "//modules/planning/common:data_center",
-        "//modules/planning/optimizer/st_graph:st_boundary_mapper",
-        "//modules/planning/proto:planning_proto",
-    ],
-)
-
-cc_library(
     name = "dp_st_cost",
     srcs = [
         "dp_st_cost.cc",
@@ -66,7 +49,6 @@ cc_library(
         "dp_st_speed_optimizer.h",
     ],
     deps = [
-        ":dp_st_boundary_mapper",
         ":dp_st_cost",
         ":dp_st_graph",
         "//modules/common/adapters:adapter_manager",
@@ -74,6 +56,7 @@ cc_library(
         "//modules/common/vehicle_state",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/optimizer:speed_optimizer",
+        "//modules/planning/optimizer/st_graph:st_boundary_mapper_impl",
         "//modules/planning/optimizer/st_graph:st_graph_data",
         "//modules/planning/proto:dp_st_speed_config_proto",
         "//modules/planning/proto:planning_proto",
