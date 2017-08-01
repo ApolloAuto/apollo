@@ -76,7 +76,6 @@ cc_library(
         "//modules/planning/math:double",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
-        "//modules/planning/state_machine:master_state_machine",
     ],
 )
 

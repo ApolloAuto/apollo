@@ -43,7 +43,6 @@ using apollo::common::VehicleState;
 
 DataCenter::DataCenter() {
   _object_table.reset(new ObjectTable());
-  _master.reset(new MasterStateMachine());
 
   AINFO << "Data Center is ready!";
 
@@ -93,7 +92,8 @@ Frame *DataCenter::current_frame() const { return _frame.get(); }
 void DataCenter::save_frame() {
   _sequence_queue.push_back(_frame->sequence_num());
   _frames[_frame->sequence_num()] = std::move(_frame);
-  if (_sequence_queue.size() > static_cast<size_t>(FLAGS_max_history_result)) {
+  if (_sequence_queue.size() >
+      static_cast<std::size_t>(FLAGS_max_history_result)) {
     _frames.erase(_sequence_queue.front());
     _sequence_queue.pop_front();
   }
@@ -106,8 +106,6 @@ const Frame *DataCenter::last_frame() const {
   uint32_t sequence_num = _sequence_queue.back();
   return _frames.find(sequence_num)->second.get();
 }
-
-MasterStateMachine *DataCenter::mutable_master() const { return _master.get(); }
 
 ObjectTable *DataCenter::mutable_object_table() const {
   return _object_table.get();
