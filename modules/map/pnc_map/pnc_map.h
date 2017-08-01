@@ -64,7 +64,7 @@ class PncMap {
   const hdmap::HDMap *hdmap_ = nullptr;
 };
 
-}  // namespace planning
+}  // namespace hdmap
 }  // namespace apollo
 
 #endif  // MODULES_MAP_COMMON_PNC_MAP_H_
