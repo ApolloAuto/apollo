@@ -20,7 +20,7 @@ perception_obstacle {
   width: 0.5
   height: 1.8
   tracking_time: 1
-  type: VEHICLE
+  type: PEDESTRIAN
   timestamp: 1501183430.161906
 }
 perception_obstacle {
@@ -40,6 +40,6 @@ perception_obstacle {
   width: 0.5
   height: 1.6
   tracking_time: 1
-  type: VEHICLE
+  type: PEDESTRIAN
   timestamp: 1501183430.161906
 }
