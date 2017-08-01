@@ -94,19 +94,22 @@ Status StBoundaryMapperImpl::get_graph_boundary(
     }
   }
 
+  // TODO: enable mapping for static obstacles.
+  /*
   const auto& static_obs_vec = decision_data.StaticObstacles();
   for (const auto* obs : static_obs_vec) {
     if (obs == nullptr) {
       continue;
     }
-    ret = map_obstacle_without_trajectory(initial_planning_point, *obs,
-                                          path_data, planning_distance,
-                                          planning_time, obs_boundary);
+    ret = map_obstacle_without_prediction_trajectory(
+        initial_planning_point, *obs, path_data, planning_distance,
+        planning_time, obs_boundary);
     if (!ret.ok()) {
       AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
       return Status(ErrorCode::PLANNING_ERROR, "Fail to map static obstacle");
     }
   }
+  */
 
   const auto& dynamic_obs_vec = decision_data.DynamicObstacles();
   for (const auto* obs : dynamic_obs_vec) {
@@ -115,9 +118,9 @@ Status StBoundaryMapperImpl::get_graph_boundary(
     }
     for (auto& obj_decision : obs->Decisions()) {
       if (obj_decision.has_follow()) {
-        ret = map_obstacle_with_planning(initial_planning_point, *obs,
-                                         path_data, planning_distance,
-                                         planning_time, obs_boundary);
+        ret = map_obstacle_without_prediction_trajectory(
+            initial_planning_point, *obs, obj_decision, path_data,
+            reference_line, planning_distance, planning_time, obs_boundary);
         if (!ret.ok()) {
           AERROR << "Fail to map follow dynamic obstacle with id " << obs->Id()
                  << ".";
@@ -193,14 +196,6 @@ Status StBoundaryMapperImpl::map_main_decision_stop(
   boundary->back().set_characteristic_length(
       st_boundary_config().boundary_buffer());
   boundary->back().set_boundary_type(StGraphBoundary::BoundaryType::STOP);
-  return Status::OK();
-}
-
-Status StBoundaryMapperImpl::map_obstacle_with_planning(
-    const common::TrajectoryPoint& initial_planning_point,
-    const Obstacle& obstacle, const PathData& path_data,
-    const double planning_distance, const double planning_time,
-    std::vector<StGraphBoundary>* const boundary) const {
   return Status::OK();
 }
 
@@ -373,11 +368,92 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
               : Status::OK();
 }
 
-Status StBoundaryMapperImpl::map_obstacle_without_trajectory(
+Status StBoundaryMapperImpl::map_obstacle_without_prediction_trajectory(
     const common::TrajectoryPoint& initial_planning_point,
-    const Obstacle& obstacle, const PathData& path_data,
+    const Obstacle& obstacle, const ObjectDecisionType obj_decision,
+    const PathData& path_data, const ReferenceLine& reference_line,
     const double planning_distance, const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
+  if (!obj_decision.has_follow()) {
+    std::string msg = common::util::StrCat(
+        "Map obstacle without prediction trajectory is ONLY supported when the "
+        "object decision is follow. The current object decision is: \n",
+        obj_decision.DebugString());
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  const double speed = obstacle.Speed();
+  const double heading = obstacle.Heading();
+  const Vec2d center = obstacle.Center();
+  const Box2d box(center, heading,
+                  obstacle.Length() * st_boundary_config().expending_coeff(),
+                  obstacle.Width() * st_boundary_config().expending_coeff());
+
+  const PathPoint ref_point =
+      reference_line.get_reference_point(center.x(), center.y());
+  const double speed_coeff = std::cos(heading - ref_point.theta());
+  if (speed_coeff < 0.0) {
+    std::string msg = common::util::StrCat(
+        "Obstacle is moving opposite to the reference line. Obstacle heading: ",
+        heading, "; ref_point.theta(): ", ref_point.theta());
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  const auto& point = path_data.discretized_path().points()[0];
+  const PathPoint curr_point =
+      reference_line.get_reference_point(point.x(), point.y());
+  const double distance_to_obstacle =
+      ref_point.s() - curr_point.s() -
+      VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center() -
+      st_boundary_config().follow_buffer();
+
+  if (distance_to_obstacle > planning_distance) {
+    std::string msg = "obstacle is out of range.";
+    AINFO << msg;
+    return Status(ErrorCode::PLANNING_SKIP, msg);
+  }
+
+  double follow_speed = 0.0;
+  if (speed > st_boundary_config().follow_speed_threshold()) {
+    follow_speed = st_boundary_config().follow_speed_threshold() * speed_coeff;
+  } else {
+    follow_speed = speed * speed_coeff *
+                   st_boundary_config().follow_speed_damping_factor();
+  }
+
+  const double s_min_lower = distance_to_obstacle;
+  const double s_min_upper =
+      std::max(distance_to_obstacle + 1.0, planning_distance);
+  const double s_max_upper =
+      std::max(s_min_upper + planning_time * follow_speed, planning_distance);
+  const double s_max_lower = s_min_lower + planning_time * follow_speed;
+
+  std::vector<STPoint> boundary_points;
+  boundary_points.emplace_back(s_min_lower, 0.0);
+  boundary_points.emplace_back(s_max_lower, planning_time);
+  boundary_points.emplace_back(s_max_upper, planning_time);
+  boundary_points.emplace_back(s_min_upper, 0.0);
+
+  const double area = get_area(boundary_points);
+  if (Double::compare(area, 0.0) <= 0) {
+    std::string msg = "Do not need to map because area is zero.";
+    AINFO << msg;
+    return Status(ErrorCode::PLANNING_SKIP, msg);
+  }
+  boundary->emplace_back(boundary_points);
+
+  const double characteristic_length =
+      std::fmax(
+          speed * speed_coeff * st_boundary_config().minimal_follow_time(),
+          std::fabs(obj_decision.follow().distance_s())) +
+      VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center() +
+      st_boundary_config().follow_buffer();
+
+  boundary->back().set_characteristic_length(
+      characteristic_length * st_boundary_config().follow_coeff());
+  boundary->back().set_boundary_type(StGraphBoundary::BoundaryType::FOLLOW);
   return Status::OK();
 }
 
