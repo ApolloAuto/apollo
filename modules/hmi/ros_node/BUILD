@@ -6,7 +6,6 @@ cc_binary(
     name = "ros_node_service",
     srcs = [
         "ros_node_service.cc",
-        "ros_node_service.h",
     ],
     deps = [
         "//external:gflags",
