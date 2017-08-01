@@ -36,15 +36,17 @@ class DecisionData {
   DecisionResult *MutableDecision();
 
   const std::vector<Obstacle> &Obstacles() const;
-  const std::vector<const Obstacle *> &StaticObstacles() const;
-  const std::vector<const Obstacle *> &DynamicObstacles() const;
+  const std::vector<Obstacle *> &StaticObstacles() const ;
+  const std::vector<Obstacle *> &DynamicObstacles() const;
+  std::vector<Obstacle *> *MutableStaticObstacles();
+  std::vector<Obstacle *> *MutableDynamicObstacles();
   void AddObstacle(Obstacle &obstacle);
 
  private:
   DecisionResult decision_;
   std::vector<Obstacle> obstacles_;
-  std::vector<const Obstacle *> static_obstacles_;
-  std::vector<const Obstacle *> dynamic_obstacles_;
+  std::vector<Obstacle *> static_obstacles_;
+  std::vector<Obstacle *> dynamic_obstacles_;
 };
 
 }  // namespace planning

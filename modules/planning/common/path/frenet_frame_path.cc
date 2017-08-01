@@ -63,5 +63,10 @@ common::FrenetFramePoint &FrenetFramePath::point_at(const std::uint32_t index) {
   return points_[index];
 }
 
+// TODO: implement interpolate
+const common::FrenetFramePoint &FrenetFramePath::interpolate(double s) const {
+    return points_.front();
+}
+
 }  // namespace planning
 }  // namespace apollo
