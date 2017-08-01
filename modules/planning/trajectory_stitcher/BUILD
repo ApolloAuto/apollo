@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
@@ -29,7 +29,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory",

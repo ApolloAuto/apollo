@@ -17,7 +17,7 @@ cc_library(
     srcs = ["prediction_util.cc"],
     hdrs = ["prediction_util.h"],
     deps = [
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 

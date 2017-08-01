@@ -20,7 +20,7 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/math/qp_solver",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:data_center",

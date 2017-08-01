@@ -4,7 +4,7 @@ package apollo.planning;
 
 import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
-import "modules/common/proto/path_point.proto";
+import "modules/common/proto/pnc_point.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";

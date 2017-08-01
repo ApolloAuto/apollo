@@ -11,7 +11,7 @@ cc_library(
         "discretized_path.h",
     ],
     deps = [
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_util",
     ],
 )
@@ -25,7 +25,7 @@ cc_library(
         "frenet_frame_path.h",
     ],
     deps = [
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_util",
     ],
 )

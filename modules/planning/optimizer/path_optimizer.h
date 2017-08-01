@@ -25,7 +25,7 @@
 
 #include "modules/planning/optimizer/optimizer.h"
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_data.h"

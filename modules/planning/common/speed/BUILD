@@ -29,7 +29,7 @@ cc_library(
         ":st_point",
         "//external:gflags",
         "//modules/common/math",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:planning_util",
         "//modules/planning/math:double",

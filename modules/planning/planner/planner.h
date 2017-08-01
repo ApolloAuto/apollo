@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/proto/planning.pb.h"

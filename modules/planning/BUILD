@@ -15,7 +15,7 @@ cc_library(
         "//modules/common:apollo_app",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/proto:path_point_proto",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state",
         "//modules/decision/proto:decision_proto",
         "//modules/perception/proto:perception_proto",

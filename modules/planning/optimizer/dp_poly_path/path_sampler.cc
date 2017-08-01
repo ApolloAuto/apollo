@@ -24,7 +24,7 @@
 
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/util/util.h"
 

@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+// Defined Point types that are commoly used in PnC (Planning and Control) modules.
+
 package apollo.common;
 
 message SLPoint {

@@ -24,7 +24,7 @@
 #include <memory>
 #include <string>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
 
 #include "modules/planning/common/decision_data.h"

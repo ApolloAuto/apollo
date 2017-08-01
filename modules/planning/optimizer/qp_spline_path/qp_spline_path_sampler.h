@@ -21,7 +21,7 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SAMPLER_H_
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_SAMPLER_H_
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
 
 #include "modules/planning/reference_line/reference_line.h"
