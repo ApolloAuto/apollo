@@ -14,24 +14,24 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "core/arbiter.h"
+#include "modules/routing/routing.h"
 
-#include "core/navigator.h"
-#include "std_msgs/String.h"
+#include "modules/routing/core/navigator.h"
+#include "ros/include/std_msgs/String.h"
 
 namespace apollo {
 namespace routing {
 
-Arbiter::Arbiter() {
+Routing::Routing() {
   _node_handle_ptr.reset(new ros::NodeHandle(FLAGS_node_namespace));
   if (FLAGS_enable_old_routing) {
     ROS_INFO("Use old routing request and result!");
     _service = _node_handle_ptr->advertiseService(
-        FLAGS_signal_probe_service, &Arbiter::on_request_old_routing, this);
+        FLAGS_signal_probe_service, &Routing::on_request_old_routing, this);
   } else {
     ROS_INFO("Use new routing request and result!");
     _service = _node_handle_ptr->advertiseService(FLAGS_signal_probe_service,
-                                                  &Arbiter::on_request, this);
+                                                  &Routing::on_request, this);
   }
   _publisher = _node_handle_ptr->advertise<std_msgs::String>(
       FLAGS_route_topic_for_broadcast, 1);
@@ -43,10 +43,10 @@ Arbiter::Arbiter() {
   _node_handle_ptr->setParam(FLAGS_rosparam_name_routing_init_status, true);
 }
 
-Arbiter::~Arbiter() {}
+Routing::~Routing() {}
 
-bool Arbiter::on_request(arbiter::routing_signal::Request& req,
-                         arbiter::routing_signal::Response& res) {
+bool Routing::on_request(routing::routing_signal::Request& req,
+                         routing::routing_signal::Response& res) {
   ROS_INFO("Get new routing request!!!");
   ::apollo::router::RoutingRequest request_proto;
   ::apollo::router::RoutingResult response_proto;
@@ -73,8 +73,8 @@ bool Arbiter::on_request(arbiter::routing_signal::Request& req,
   return true;
 }
 
-bool Arbiter::on_request_old_routing(arbiter::routing_signal::Request& req,
-                                     arbiter::routing_signal::Response& res) {
+bool Routing::on_request_old_routing(routing::routing_signal::Request& req,
+                                     routing::routing_signal::Response& res) {
   ROS_INFO("Get old routing request!!!");
   ::apollo::routing::RoutingRequest request_proto;
   ::apollo::routing::RoutingResult response_proto;
@@ -101,7 +101,7 @@ bool Arbiter::on_request_old_routing(arbiter::routing_signal::Request& req,
   return true;
 }
 
-bool Arbiter::run() {
+bool Routing::run() {
   if (!_navigator_ptr->is_ready()) {
     ROS_ERROR("Navigator is not ready!");
     return false;

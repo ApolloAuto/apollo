@@ -14,13 +14,12 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_CORE_ARBITER_H_
-#define MODULES_ROUTING_CORE_ARBITER_H_
+#ifndef MODULES_ROUTING_ROUTING_H_
+#define MODULES_ROUTING_ROUTING_H_
 
 #include <memory>
-#include "ros/ros.h"
 
-#include "arbiter/routing_signal.h"
+#include "routing/routing_signal.h"
 #include "common/routing_gflags.h"
 #include "common/routing_macros.h"
 
@@ -29,28 +28,29 @@ namespace routing {
 
 class Navigator;
 
-class Arbiter {
+class Routing : public apollo::common::ApolloApp {
+  friend class RoutingTestBase;
  public:
-  ~Arbiter();
+  ~Routing();
   bool run();
 
  private:
-  bool on_request(arbiter::routing_signal::Request& req,
-                  arbiter::routing_signal::Response& res);
+  bool on_request(routing::routing_signal::Request& req,
+                  routing::routing_signal::Response& res);
 
   // for old routing request
-  bool on_request_old_routing(arbiter::routing_signal::Request& req,
-                              arbiter::routing_signal::Response& res);
+  bool on_request_old_routing(routing::routing_signal::Request& req,
+                              routing::routing_signal::Response& res);
 
  private:
   std::unique_ptr<ros::NodeHandle> _node_handle_ptr;
   ros::ServiceServer _service;
   ros::Publisher _publisher;
   std::unique_ptr<Navigator> _navigator_ptr;
-  DECLARE_ARBITER_SINGLETON(Arbiter);
+  DECLARE_ARBITER_SINGLETON(Routing);
 };
 
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_CORE_ARBITER_H_
+#endif  // MODULES_ROUTING_ROUTING_H_
