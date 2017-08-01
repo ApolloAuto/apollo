@@ -14,15 +14,15 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_STRATEGY_A_STAR_STRATEGY_H
-#define BAIDU_ADU_ROUTING_STRATEGY_A_STAR_STRATEGY_H
+#ifndef MODULES_ROUTING_STRATEGY_A_STAR_STRATEGY_H_
+#define MODULES_ROUTING_STRATEGY_A_STAR_STRATEGY_H_
 
 #include <unordered_map>
 #include <unordered_set>
 
 #include "strategy/strategy.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class AStarStrategy : public Strategy {
@@ -47,6 +47,6 @@ class AStarStrategy : public Strategy {
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_STRATEGY_A_STAR_STRATEGY_H
+#endif  // MODULES_ROUTING_STRATEGY_A_STAR_STRATEGY_H_

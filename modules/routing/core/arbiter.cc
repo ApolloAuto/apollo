@@ -19,7 +19,7 @@
 #include "core/navigator.h"
 #include "std_msgs/String.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 Arbiter::Arbiter() {
@@ -48,8 +48,8 @@ Arbiter::~Arbiter() {}
 bool Arbiter::on_request(arbiter::routing_signal::Request& req,
                          arbiter::routing_signal::Response& res) {
   ROS_INFO("Get new routing request!!!");
-  ::adu::common::router::RoutingRequest request_proto;
-  ::adu::common::router::RoutingResult response_proto;
+  ::apollo::router::RoutingRequest request_proto;
+  ::apollo::router::RoutingResult response_proto;
   if (!request_proto.ParseFromString(req.routing_request.data)) {
     ROS_ERROR("The request proto is invalid.");
     return false;
@@ -76,8 +76,8 @@ bool Arbiter::on_request(arbiter::routing_signal::Request& req,
 bool Arbiter::on_request_old_routing(arbiter::routing_signal::Request& req,
                                      arbiter::routing_signal::Response& res) {
   ROS_INFO("Get old routing request!!!");
-  ::adu::common::routing::RoutingRequest request_proto;
-  ::adu::common::routing::RoutingResult response_proto;
+  ::apollo::routing::RoutingRequest request_proto;
+  ::apollo::routing::RoutingResult response_proto;
   if (!request_proto.ParseFromString(req.routing_request.data)) {
     ROS_ERROR("The request proto is invalid.");
     return false;
@@ -112,4 +112,4 @@ bool Arbiter::run() {
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo

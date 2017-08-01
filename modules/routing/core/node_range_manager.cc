@@ -19,7 +19,7 @@
 #include "graph/topo_edge.h"
 #include "graph/topo_node.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 void NodeRangeManager::init_node_range(double start_node_s, double end_node_s,
@@ -86,4 +86,4 @@ void NodeRangeManager::init_out_neighbor(const TopoNode* cur_node,
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo

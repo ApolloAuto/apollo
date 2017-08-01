@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_COMMON_ROUTING_MACROS_H
-#define BAIDU_ADU_ROUTING_COMMON_ROUTING_MACROS_H
+#ifndef MODULES_ROUTING_COMMON_ROUTING_MACROS_H_
+#define MODULES_ROUTING_COMMON_ROUTING_MACROS_H_
 
 #include <cstddef>
 
@@ -40,4 +40,4 @@
                                              \
  private:
 
-#endif  // BAIDU_ADU_ROUTING_COMMON_ROUTING_MACROS_H
+#endif  // MODULES_ROUTING_COMMON_ROUTING_MACROS_H_

@@ -14,12 +14,12 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_CORE_NODE_RANGE_MANAGER_H
-#define BAIDU_ADU_ROUTING_CORE_NODE_RANGE_MANAGER_H
+#ifndef MODULES_ROUTING_CORE_NODE_RANGE_MANAGER_H_
+#define MODULES_ROUTING_CORE_NODE_RANGE_MANAGER_H_
 
 #include <unordered_map>
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 struct NodeRange {
@@ -53,6 +53,6 @@ class NodeRangeManager {
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_CORE_NODE_RANGE_MANAGER_H
+#endif  // MODULES_ROUTING_CORE_NODE_RANGE_MANAGER_H_

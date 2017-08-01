@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_COMMON_ROUTING_GFLAGS_H
-#define BAIDU_ADU_ROUTING_COMMON_ROUTING_GFLAGS_H
+#ifndef MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
+#define MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
 
 #include "gflags/gflags.h"
 
@@ -36,4 +36,4 @@ DECLARE_bool(enable_debug_mode);
 DECLARE_string(debug_route_path);
 DECLARE_string(debug_passage_region_path);
 
-#endif  // BAIDU_ADU_ROUTING_COMMON_ROUTING_GFLAGS_H
+#endif //MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
