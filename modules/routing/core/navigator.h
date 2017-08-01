@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include "router.pb.h"
+#include "routing.pb.h"
 #include "routing.pb.h"
 
 #include "core/node_range_manager.h"
@@ -38,33 +38,21 @@ class Navigator {
   ~Navigator();
   bool is_ready() const;
 
-  // search old request to old response
+  // search new request to new response
   bool search_route(const ::apollo::routing::RoutingRequest& request,
                     ::apollo::routing::RoutingResult* response) const;
-
-  // search new request to new response
-  bool search_route(const ::apollo::router::RoutingRequest& request,
-                    ::apollo::router::RoutingResult* response) const;
 
  private:
   // new request to new response
   bool generate_passage_region(
-      const ::apollo::router::RoutingRequest& request,
+      const ::apollo::routing::RoutingRequest& request,
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
       const NodeRangeManager& range_manager,
-      ::apollo::router::RoutingResult* result) const;
+      ::apollo::routing::RoutingResult* result) const;
 
   // use internal generate result
   void generate_passage_region(
-      const std::vector<const TopoNode*>& nodes,
-      const std::unordered_set<const TopoNode*>& black_list,
-      const NodeRangeManager& range_manager,
-      ::apollo::router::RoutingResult* result) const;
-
-  // old request to old response
-  bool generate_passage_region(
-      const ::apollo::routing::RoutingRequest& request,
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
       const NodeRangeManager& range_manager,
@@ -73,7 +61,7 @@ class Navigator {
   void dump_debug_data(
       const std::vector<const TopoNode*>& nodes,
       const NodeRangeManager& range_manager,
-      const ::apollo::router::RoutingResult& response) const;
+      const ::apollo::routing::RoutingResult& response) const;
 
  private:
   bool _is_ready;

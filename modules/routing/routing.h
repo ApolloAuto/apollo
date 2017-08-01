@@ -38,10 +38,6 @@ class Routing : public apollo::common::ApolloApp {
   bool on_request(routing::routing_signal::Request& req,
                   routing::routing_signal::Response& res);
 
-  // for old routing request
-  bool on_request_old_routing(routing::routing_signal::Request& req,
-                              routing::routing_signal::Response& res);
-
  private:
   std::unique_ptr<ros::NodeHandle> _node_handle_ptr;
   ros::ServiceServer _service;
