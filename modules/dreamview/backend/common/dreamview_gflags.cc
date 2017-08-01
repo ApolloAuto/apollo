@@ -28,12 +28,12 @@ DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
 
 DEFINE_int32(server_port, 8888, "The port of backend webserver");
 
+// TODO(siyangy): Make this directly configurable by script/dreamview
 DEFINE_bool(
     enable_sim_control, false,
     "Whether to enable SimControl to publish localiztion and chassis message.");
 
-DEFINE_string(routing_request_file, "modules/map/data/garage_routing.pb.txt",
-              "File path of the routing request that SimControl will read the "
+DEFINE_string(routing_result_file, "modules/map/data/garage_routing.pb.txt",
+              "File path of the routing result that SimControl will read the "
               "start point from. If this is absent, SimControl will directly "
-              "take the RoutingResult directly from ROS to determine the "
-              "start point.");
+              "take the RoutingResult from ROS to determine the start point.");

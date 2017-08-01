@@ -51,6 +51,12 @@ class SimulationWorldUpdater {
   SimulationWorldUpdater(WebSocketHandler *websocket, MapService *map_service);
 
   /**
+   * @brief Starts to push simulation_world to frontend.
+   */
+  void Start();
+
+ private:
+  /**
    * @brief The callback function to get updates from SimulationWorldService,
    * and push them to the frontend clients via websocket when the periodic timer
    * is triggered.
@@ -58,7 +64,10 @@ class SimulationWorldUpdater {
    */
   void OnPushTimer(const ros::TimerEvent &event);
 
- private:
+  // Time interval, in seconds, between pushing SimulationWorld to frontend.
+  static constexpr double kSimWorldTimeInterval = 0.1;
+
+  ros::Timer timer_;
   SimulationWorldService sim_world_service_;
   MapService *map_service_;
   WebSocketHandler *websocket_;
