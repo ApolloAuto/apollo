@@ -23,6 +23,7 @@ namespace common {
 namespace util {
 
 using SLPoint = apollo::common::SLPoint;
+using SpeedPoint = apollo::common::SpeedPoint;
 using PathPoint = apollo::common::PathPoint;
 using TrajectoryPoint = apollo::common::TrajectoryPoint;
 
@@ -31,6 +32,17 @@ SLPoint MakeSLPoint(const double s, const double l) {
   sl.set_s(s);
   sl.set_l(l);
   return sl;
+}
+
+SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
+                          const double a, const double da) {
+  SpeedPoint speed_point;
+  speed_point.set_s(s);
+  speed_point.set_t(t);
+  speed_point.set_v(v);
+  speed_point.set_a(a);
+  speed_point.set_da(da);
+  return speed_point;
 }
 
 PathPoint MakePathPoint(const double x, const double y, const double z,

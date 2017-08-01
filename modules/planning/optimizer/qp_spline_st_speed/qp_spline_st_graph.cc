@@ -53,9 +53,11 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
   std::vector<double> t_knots;
   double t_resolution = _qp_spline_st_speed_config.total_time() /
                         _qp_spline_st_speed_config.number_of_discrete_graph_t();
-  for (int32_t i = 0;
+  double curr_knot = 0.0;
+  for (uint32_t i = 0;
        i <= _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
-    t_knots.push_back(i * t_resolution);
+    t_knots.push_back(curr_knot);
+    curr_knot += t_resolution;
   }
 
   _spline_generator.reset(new Spline1dGenerator(
@@ -80,18 +82,18 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
   }
 
   // extract output
-  speed_data->Clear();
+  // speed_data->Clear();
   const Spline1d& spline = _spline_generator->spline();
 
   double time_resolution = _qp_spline_st_speed_config.output_time_resolution();
   double time = 0.0;
-  for (; time < _qp_spline_st_speed_config.total_time() + time_resolution;
-       time += time_resolution) {
+  while (time < _qp_spline_st_speed_config.total_time() + time_resolution) {
     double s = spline(time);
     double v = spline.derivative(time);
     double a = spline.second_order_derivative(time);
     double da = spline.third_order_derivative(time);
     speed_data->add_speed_point(s, time, v, a, da);
+    time += time_resolution;
   }
 
   return Status::OK();
@@ -151,7 +153,7 @@ Status QpSplineStGraph::apply_constraint(
   std::vector<double> evaluated_knots;
   std::vector<double> s_upper_bound;
   std::vector<double> s_lower_bound;
-  for (int32_t i = 1;
+  for (uint32_t i = 1;
        i <= _qp_spline_st_speed_config.number_of_evaluated_graph_t(); ++i) {
     evaluated_knots.push_back(i * evaluated_resolution);
     double lower_s = 0.0;
@@ -202,11 +204,11 @@ Status QpSplineStGraph::apply_kernel(const SpeedLimit& speed_limit) {
   }
 
   double dist_ref = 0.0;
-  for (int i = 0; i <=
-       _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
-      t_knots.push_back(i * t_resolution);
-      s_vec.push_back(dist_ref);
-      dist_ref += t_resolution * speed_limit.get_speed_limit(dist_ref);
+  for (uint32_t i = 0;
+       i <= _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
+    t_knots.push_back(i * t_resolution);
+    s_vec.push_back(dist_ref);
+    dist_ref += t_resolution * speed_limit.get_speed_limit(dist_ref);
   }
   spline_kernel->add_reference_line_kernel_matrix(t_knots, s_vec, 1);
   return Status::OK();

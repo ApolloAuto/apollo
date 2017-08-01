@@ -24,8 +24,9 @@
 #include <utility>
 
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
+//#include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
@@ -42,7 +43,7 @@ bool speed_time_comp(const double t, const common::SpeedPoint& speed_point) {
 void SpeedData::add_speed_point(const double s, const double time,
                                 const double v, const double a,
                                 const double da) {
-  speed_vector_.push_back(util::MakeSpeedPoint(s, time, v, a, da));
+  speed_vector_.push_back(common::util::MakeSpeedPoint(s, time, v, a, da));
 }
 
 SpeedData::SpeedData(const std::vector<common::SpeedPoint>& speed_points)
@@ -117,14 +118,7 @@ common::SpeedPoint SpeedData::interpolate(const common::SpeedPoint& left,
   double v = (1 - weight) * left.v() + weight * right.v();
   double a = (1 - weight) * left.a() + weight * right.a();
   double da = (1 - weight) * left.da() + weight * right.da();
-  common::SpeedPoint speed_point;
-  speed_point.set_s(s);
-  speed_point.set_t(t);
-  speed_point.set_v(v);
-  speed_point.set_a(a);
-  speed_point.set_da(da);
-
-  return speed_point;
+  return common::util::MakeSpeedPoint(s, t, v, a, da);
 }
 
 }  // namespace planning
