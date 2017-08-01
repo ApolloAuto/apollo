@@ -23,24 +23,27 @@ namespace adu {
 namespace routing {
 
 class EdgeCreator {
-public:
-    static void get_pb_edge(const ::adu::routing::common::Node& node_from,
-                            const ::adu::routing::common::Node& node_to,
-                            const ::adu::routing::common::Edge::DirectionType& type,
-                            ::adu::routing::common::Edge* pb_edge);
-private:
-    static void init_edge_info(const ::adu::routing::common::Node& node_from,
-                               const ::adu::routing::common::Node& node_to,
-                               const ::adu::routing::common::Edge::DirectionType& type,
-                               ::adu::routing::common::Edge* pb_edge);
-    static void init_edge_cost(const ::adu::routing::common::Node& node_from,
-                               const ::adu::routing::common::Node& node_to,
-                               const ::adu::routing::common::Edge::DirectionType& type,
-                               ::adu::routing::common::Edge* pb_edge);
+ public:
+  static void get_pb_edge(
+      const ::adu::routing::common::Node& node_from,
+      const ::adu::routing::common::Node& node_to,
+      const ::adu::routing::common::Edge::DirectionType& type,
+      ::adu::routing::common::Edge* pb_edge);
+
+ private:
+  static void init_edge_info(
+      const ::adu::routing::common::Node& node_from,
+      const ::adu::routing::common::Node& node_to,
+      const ::adu::routing::common::Edge::DirectionType& type,
+      ::adu::routing::common::Edge* pb_edge);
+  static void init_edge_cost(
+      const ::adu::routing::common::Node& node_from,
+      const ::adu::routing::common::Node& node_to,
+      const ::adu::routing::common::Edge::DirectionType& type,
+      ::adu::routing::common::Edge* pb_edge);
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
-
+#endif  // BAIDU_ADU_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H

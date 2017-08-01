@@ -17,25 +17,27 @@
 #ifndef BAIDU_ADU_ROUTING_COMMON_UTILS_H
 #define BAIDU_ADU_ROUTING_COMMON_UTILS_H
 
-#include <string>
 #include <google/protobuf/message.h>
+#include <string>
 
 namespace adu {
 namespace routing {
 
 class FileUtils {
-public:
-    static bool load_protobuf_data_from_file(const std::string& file_path,
-                                             ::google::protobuf::Message* const proto_data);
-    static bool dump_protobuf_data_to_file(const std::string& file_path,
-                                           const ::google::protobuf::Message& proto_data);
+ public:
+  static bool load_protobuf_data_from_file(
+      const std::string& file_path,
+      ::google::protobuf::Message* const proto_data);
+  static bool dump_protobuf_data_to_file(
+      const std::string& file_path,
+      const ::google::protobuf::Message& proto_data);
 
-    static bool dump_protobuf_data_to_file(const std::string& file_path,
-                                           const ::google::protobuf::Message* const proto_data);
+  static bool dump_protobuf_data_to_file(
+      const std::string& file_path,
+      const ::google::protobuf::Message* const proto_data);
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_COMMON_UTILS_H
-
+#endif  // BAIDU_ADU_ROUTING_COMMON_UTILS_H

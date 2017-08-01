@@ -24,38 +24,36 @@ namespace adu {
 namespace routing {
 
 enum TopoEdgeType {
-    TET_FORWARD,
-    TET_LEFT,
-    TET_RIGHT,
+  TET_FORWARD,
+  TET_LEFT,
+  TET_RIGHT,
 };
 
 class TopoNode;
 
 class TopoEdge {
-public:
-    TopoEdge(const ::adu::routing::common::Edge& edge,
-             const TopoNode* from_node,
-             const TopoNode* to_node);
+ public:
+  TopoEdge(const ::adu::routing::common::Edge& edge, const TopoNode* from_node,
+           const TopoNode* to_node);
 
-    ~TopoEdge();
+  ~TopoEdge();
 
-    const ::adu::routing::common::Edge& edge() const;
-    double cost() const;
-    const std::string& from_lane_id() const;
-    const std::string& to_lane_id() const;
-    TopoEdgeType type() const;
+  const ::adu::routing::common::Edge& edge() const;
+  double cost() const;
+  const std::string& from_lane_id() const;
+  const std::string& to_lane_id() const;
+  TopoEdgeType type() const;
 
-    const TopoNode* from_node() const;
-    const TopoNode* to_node() const;
+  const TopoNode* from_node() const;
+  const TopoNode* to_node() const;
 
-private:
-    ::adu::routing::common::Edge _pb_edge;
-    const TopoNode* _from_node;
-    const TopoNode* _to_node;
+ private:
+  ::adu::routing::common::Edge _pb_edge;
+  const TopoNode* _from_node;
+  const TopoNode* _to_node;
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_GRAPH_TOPO_EDGE_H
-
+#endif  // BAIDU_ADU_ROUTING_GRAPH_TOPO_EDGE_H

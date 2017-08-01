@@ -17,8 +17,8 @@
 #ifndef BAIDU_ADU_ROUTING_STRATEGY_A_STAR_STRATEGY_H
 #define BAIDU_ADU_ROUTING_STRATEGY_A_STAR_STRATEGY_H
 
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "strategy/strategy.h"
 
@@ -26,34 +26,27 @@ namespace adu {
 namespace routing {
 
 class AStarStrategy : public Strategy {
-public:
-    AStarStrategy() = default;
-    ~AStarStrategy() = default;
+ public:
+  AStarStrategy() = default;
+  ~AStarStrategy() = default;
 
-    virtual bool search(const TopoGraph* graph,
-                        const TopoNode* src_node,
-                        const TopoNode* dest_node,
-                        const std::unordered_set<const TopoNode*>& black_list,
-                        std::vector<const TopoNode*>* const result_nodes);
+  virtual bool search(const TopoGraph* graph, const TopoNode* src_node,
+                      const TopoNode* dest_node,
+                      const std::unordered_set<const TopoNode*>& black_list,
+                      std::vector<const TopoNode*>* const result_nodes);
 
-    virtual bool search(const TopoGraph* graph,
-                        const SubTopoGraph* sub_graph,
-                        const TopoNode* src_node,
-                        const TopoNode* dest_node,
-                        std::vector<const TopoNode*>* const result_nodes);
-private:
-    void clear();
-    double heuristic_cost(const TopoNode* src_node, const TopoNode* dest_node);
+ private:
+  void clear();
+  double heuristic_cost(const TopoNode* src_node, const TopoNode* dest_node);
 
-private:
-    std::unordered_set<const TopoNode*> _open_set;
-    std::unordered_set<const TopoNode*> _closed_set;
-    std::unordered_map<const TopoNode*, const TopoNode*> _came_from;
-    std::unordered_map<const TopoNode*, double> _g_score;
+ private:
+  std::unordered_set<const TopoNode*> _open_set;
+  std::unordered_set<const TopoNode*> _closed_set;
+  std::unordered_map<const TopoNode*, const TopoNode*> _came_from;
+  std::unordered_map<const TopoNode*, double> _g_score;
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_STRATEGY_A_STAR_STRATEGY_H
-
+#endif  // BAIDU_ADU_ROUTING_STRATEGY_A_STAR_STRATEGY_H

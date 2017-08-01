@@ -24,24 +24,25 @@ namespace adu {
 namespace routing {
 
 class NodeCreator {
-public:
-    static void get_pb_node(const ::adu::common::hdmap::Lane& lane,
-                            const std::string& road_id,
-                            ::adu::routing::common::Node* pb_node);
-private:
-    static void add_out_boundary(const ::adu::common::hdmap::LaneBoundary& bound,
-        double lane_length,
-        ::google::protobuf::RepeatedPtrField<::adu::routing::common::CurveRange>* const out_range);
+ public:
+  static void get_pb_node(const ::adu::common::hdmap::Lane& lane,
+                          const std::string& road_id,
+                          ::adu::routing::common::Node* pb_node);
 
-    static void init_node_info(const ::adu::common::hdmap::Lane& lane,
-                               const std::string& road_id,
-                               ::adu::routing::common::Node* const node);
-    static void init_node_cost(const ::adu::common::hdmap::Lane& lane,
-                               ::adu::routing::common::Node* const node);
+ private:
+  static void add_out_boundary(
+      const ::adu::common::hdmap::LaneBoundary& bound, double lane_length,
+      ::google::protobuf::RepeatedPtrField<
+          ::adu::routing::common::CurveRange>* const out_range);
+
+  static void init_node_info(const ::adu::common::hdmap::Lane& lane,
+                             const std::string& road_id,
+                             ::adu::routing::common::Node* const node);
+  static void init_node_cost(const ::adu::common::hdmap::Lane& lane,
+                             ::adu::routing::common::Node* const node);
 };
 
-} // namespace routing
-} // namespace adu
+}  // namespace routing
+}  // namespace adu
 
-#endif // BAIDU_ADU_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
-
+#endif  // BAIDU_ADU_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
