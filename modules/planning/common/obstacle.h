@@ -60,7 +60,9 @@ class Obstacle : public PlanningObject {
   double Speed() const;
   void SetSpeed(const double speed);
 
-  ::apollo::common::math::Box2d BoundingBox() const;
+  const apollo::common::math::Vec2d Center() const { return center_; };
+
+  const apollo::common::math::Box2d BoundingBox() const;
 
   const std::vector<PredictionTrajectory> &prediction_trajectories() const;
   void add_prediction_trajectory(
@@ -68,6 +70,8 @@ class Obstacle : public PlanningObject {
 
  private:
   std::string id_ = 0;
+
+  // TODO: (Liangliang) set those parameters.
   double height_ = 0.0;
   double width_ = 0.0;
   double length_ = 0.0;

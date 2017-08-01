@@ -53,12 +53,6 @@ class StBoundaryMapperImpl : public StBoundaryMapper {
       const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const;
 
-  apollo::common::Status map_obstacle_with_planning(
-      const common::TrajectoryPoint& initial_planning_point,
-      const Obstacle& obstacle, const PathData& path_data,
-      const double planning_distance, const double planning_time,
-      std::vector<StGraphBoundary>* const boundary) const;
-
   apollo::common::Status map_obstacle_with_prediction_trajectory(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const ObjectDecisionType obj_decision,
@@ -66,9 +60,10 @@ class StBoundaryMapperImpl : public StBoundaryMapper {
       const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const;
 
-  apollo::common::Status map_obstacle_without_trajectory(
+  apollo::common::Status map_obstacle_without_prediction_trajectory(
       const common::TrajectoryPoint& initial_planning_point,
-      const Obstacle& obstacle, const PathData& path_data,
+      const Obstacle& obstacle, const ObjectDecisionType obj_decision,
+      const PathData& path_data, const ReferenceLine& reference_line,
       const double planning_distance, const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const;
 };
