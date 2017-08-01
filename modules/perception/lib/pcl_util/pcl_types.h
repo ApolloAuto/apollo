@@ -27,7 +27,7 @@
 
 namespace apollo {
 namespace perception {
-namespace pcl_util {  
+namespace pcl_util {
 
 typedef pcl::PointIndices PointIndices;
 typedef pcl::PointIndices::Ptr PointIndicesPtr;
