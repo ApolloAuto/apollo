@@ -34,9 +34,6 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-common::SpeedPoint MakeSpeedPoint(const double s, const double t, double v,
-                                  double a, double da);
-
 common::SLPoint interpolate(const common::SLPoint &start,
                             const common::SLPoint &end, const double weight);
 

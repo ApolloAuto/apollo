@@ -45,6 +45,10 @@ namespace util {
  */
 apollo::common::SLPoint MakeSLPoint(const double s, const double l);
 
+apollo::common::SpeedPoint MakeSpeedPoint(const double s, const double t,
+                                          const double v, const double a,
+                                          const double da);
+
 apollo::common::PathPoint MakePathPoint(const double x, const double y,
                                         const double z, const double theta,
                                         const double kappa, const double dkappa,

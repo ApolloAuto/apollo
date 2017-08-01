@@ -33,17 +33,6 @@ using common::PathPoint;
 using common::SpeedPoint;
 using common::TrajectoryPoint;
 
-SpeedPoint MakeSpeedPoint(const double s, const double t, double v, double a,
-                          double da) {
-  SpeedPoint point;
-  point.set_s(s);
-  point.set_t(t);
-  point.set_v(v);
-  point.set_a(a);
-  point.set_da(da);
-  return point;
-}
-
 PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
                       const double s) {
   double s0 = p0.s();
