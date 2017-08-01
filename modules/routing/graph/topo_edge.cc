@@ -14,18 +14,18 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "graph/topo_edge.h"
+#include "modules/routing/graph/topo_edge.h"
+#include "modules/routing/graph/topo_node.h"
 
 #include <math.h>
 
-#include "graph/topo_node.h"
 
-namespace adu {
+namespace apollo{
 namespace routing {
 
-using ::adu::routing::common::Edge;
+using ::apollo::routing::common::Edge;
 
-TopoEdge::TopoEdge(const ::adu::routing::common::Edge& edge,
+TopoEdge::TopoEdge(const ::apollo::routing::common::Edge& edge,
                    const TopoNode* from_node, const TopoNode* to_node)
     : _pb_edge(edge), _from_node(from_node), _to_node(to_node) {}
 
@@ -48,14 +48,14 @@ const std::string& TopoEdge::to_lane_id() const {
 }
 
 TopoEdgeType TopoEdge::type() const {
-  if (_pb_edge.direction_type() == ::adu::routing::common::Edge::LEFT) {
+  if (_pb_edge.direction_type() == ::apollo::routing::common::Edge::LEFT) {
     return TET_LEFT;
   }
-  if (_pb_edge.direction_type() == ::adu::routing::common::Edge::RIGHT) {
+  if (_pb_edge.direction_type() == ::apollo::routing::common::Edge::RIGHT) {
     return TET_RIGHT;
   }
   return TET_FORWARD;
 }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo

@@ -14,19 +14,19 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "graph/topo_node.h"
+#include "modules/routing/graph/topo_node.h"
 
 #include <math.h>
 
-#include "graph/topo_edge.h"
+#include "modules/routing/graph/topo_edge.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 namespace {
 
-using ::adu::routing::common::Node;
-using ::adu::routing::common::Edge;
+using ::apollo::routing::common::Node;
+using ::apollo::routing::common::Edge;
 
 }  // namespace
 
@@ -63,11 +63,11 @@ const std::string& TopoNode::lane_id() const { return _pb_node.lane_id(); }
 
 const std::string& TopoNode::road_id() const { return _pb_node.road_id(); }
 
-const ::adu::common::hdmap::Curve& TopoNode::central_curve() const {
+const ::apollo::common::hdmap::Curve& TopoNode::central_curve() const {
   return _pb_node.central_curve();
 }
 
-const ::adu::common::hdmap::Point& TopoNode::anchor_point() const {
+const ::apollo::common::hdmap::Point& TopoNode::anchor_point() const {
   return _anchor_point;
 }
 
@@ -195,4 +195,4 @@ void TopoNode::set_start_s(double start_s) { _start_s = start_s; }
 void TopoNode::set_end_s(double end_s) { _end_s = end_s; }
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo

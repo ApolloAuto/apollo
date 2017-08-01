@@ -14,17 +14,17 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_GRAPH_TOPO_GRAPH_H
-#define BAIDU_ADU_ROUTING_GRAPH_TOPO_GRAPH_H
+#ifndef MODULES_ROUTING_GRAPH_TOPO_GRAPH_H
+#define MODULES_ROUTING_GRAPH_TOPO_GRAPH_H
 
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
-#include "topo_graph.pb.h"
+#include "modules/routing/graph/topo_graph.pb.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class TopoNode;
@@ -39,15 +39,15 @@ class TopoGraph {
 
   const std::string& map_version() const;
   const std::string& map_district() const;
-  const ::adu::routing::TopoNode* get_node(const std::string& id) const;
+  const ::apollo::routing::TopoNode* get_node(const std::string& id) const;
   void get_nodes_by_road_id(
       const std::string& road_id,
       std::unordered_set<const TopoNode*>* const node_in_road) const;
 
  private:
   void clear();
-  bool load_nodes(const ::adu::routing::common::Graph& graph);
-  bool load_edges(const ::adu::routing::common::Graph& graph);
+  bool load_nodes(const ::apollo::routing::common::Graph& graph);
+  bool load_edges(const ::apollo::routing::common::Graph& graph);
 
  private:
   std::string _map_version;
@@ -60,6 +60,6 @@ class TopoGraph {
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_GRAPH_TOPO_GRAPH_H
+#endif  // MODULES_ROUTING_GRAPH_TOPO_GRAPH_H
