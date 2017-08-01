@@ -4,20 +4,28 @@ header {
   sequence_num: 1
 }
 routing_request {
+    start {
+        id: "1_-1"
+        s: 0.0
+        pose {
+            x: 586392.840030
+            y: 4140673.012320
+        }
+    }
     end {
         id: "1_-1"
-        s: 153.87421245705966
+        s: 153.0
         pose {
-            x: 200
-            y: 2
+            x: 586367.706490
+            y: 4140785.357946
         }
     }
 }
 route {
       id: "1_-1"
       start_s: 0.0
-      end_s: 153.87421245705966
+      end_s: 153.0
 }
 measurement {
-     distance: 153.87421245705966
+     distance: 153.0
 }
