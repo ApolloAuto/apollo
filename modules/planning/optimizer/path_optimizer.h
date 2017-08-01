@@ -38,7 +38,7 @@ class PathOptimizer : public Optimizer {
  public:
   explicit PathOptimizer(const std::string &name);
   virtual ~PathOptimizer() = default;
-  apollo::common::Status Optimize(PlanningData *planning_data) override;
+  apollo::common::Status Optimize(Frame *frame) override;
 
  protected:
   virtual apollo::common::Status Process(

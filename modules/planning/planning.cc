@@ -22,6 +22,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/em/em_planner.h"
@@ -31,12 +32,12 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
-using apollo::common::VehicleState;
 
 namespace {
 
@@ -65,7 +66,37 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
 }
 
+const Frame* Planning::GetFrame() const { return frame_.get(); }
+const hdmap::PncMap* Planning::GetPncMap() const { return pnc_map_.get(); }
+
+bool Planning::InitFrame(const uint32_t sequence_num) {
+  if (AdapterManager::GetRoutingResult()->Empty()) {
+    AERROR << "Routing is empty";
+    return false;
+  }
+  frame_.reset(new Frame(sequence_num));
+  common::TrajectoryPoint point;
+  frame_->SetVehicleInitPose(VehicleState::instance()->pose());
+  frame_->SetRoutingResult(
+      AdapterManager::GetRoutingResult()->GetLatestObserved());
+  if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
+    const auto& prediction =
+        AdapterManager::GetPrediction()->GetLatestObserved();
+    frame_->SetPrediction(prediction);
+    ADEBUG << "Get prediction";
+  }
+
+  if (!frame_->Init()) {
+    AERROR << "failed to init frame";
+    return false;
+  }
+  return true;
+}
+
 Status Planning::Init() {
+  pnc_map_.reset(new hdmap::PncMap(FLAGS_map_filename));
+  Frame::SetMap(pnc_map_.get());
+
   if (!apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                               &config_)) {
     AERROR << "failed to load planning config file "
@@ -199,9 +230,9 @@ void Planning::RunOnce() {
   ADCTrajectory trajectory_pb;
   RecordInput(&trajectory_pb);
 
-  if (!DataCenter::instance()->init_current_frame(
-          AdapterManager::GetPlanning()->GetSeqNum() + 1)) {
-    AERROR << "DataCenter init frame failed";
+  const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
+  if (!InitFrame(frame_num)) {
+    AERROR << "Init frame failed";
     return;
   }
 
@@ -229,13 +260,14 @@ void Planning::Stop() {}
 bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
                     ADCTrajectory* trajectory_pb) {
   double vehicle_state_time = VehicleState::instance()->timestamp();
-  auto stitching_trajectory = TrajectoryStitcher::compute_stitching_trajectory(
-      is_on_auto_mode, vehicle_state_time, last_publishable_trajectory_);
+  const auto& stitching_trajectory =
+      TrajectoryStitcher::compute_stitching_trajectory(
+          is_on_auto_mode, vehicle_state_time, last_publishable_trajectory_);
 
-  auto planning_start_point = stitching_trajectory.back();
+  frame_->SetPlanningStartPoint(stitching_trajectory.back());
 
   PublishableTrajectory publishable_trajectory;
-  auto status = planner_->Plan(planning_start_point, &publishable_trajectory);
+  auto status = planner_->Plan(frame_.get(), &publishable_trajectory);
 
   if (FLAGS_enable_record_debug) {
     trajectory_pb->mutable_debug()

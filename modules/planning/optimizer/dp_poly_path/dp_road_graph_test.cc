@@ -72,7 +72,9 @@ class DpRoadGraphTest : public OptimizerTestBase {
     OptimizerTestBase::SetUp();
     SetInitPoint();
     SetSpeedDataWithConstVeolocity(10.0);
-    reference_line_ = &(frame_->planning_data().reference_line());
+    const auto* frame = planning_.GetFrame();
+    ASSERT_TRUE(frame != nullptr);
+    reference_line_ = &(frame->planning_data().reference_line());
   }
 
  protected:

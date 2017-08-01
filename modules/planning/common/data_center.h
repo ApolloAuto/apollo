@@ -41,8 +41,6 @@ class DataCenter {
   Frame *frame(const uint32_t sequence_num) const;
 
  public:
-  bool init_current_frame(const uint32_t sequence_num);
-  Frame *current_frame() const;
   void save_frame();
 
   const Frame *last_frame() const;
@@ -50,12 +48,9 @@ class DataCenter {
   const ObjectTable &object_table() const;
   ObjectTable *mutable_object_table() const;
 
-  const hdmap::PncMap *pnc_map() const { return pnc_map_.get(); }
-
  private:
   std::unordered_map<uint32_t, std::unique_ptr<Frame>> _frames;
   std::list<uint32_t> _sequence_queue;
-  std::unique_ptr<hdmap::PncMap> pnc_map_ = nullptr;
   std::unique_ptr<Frame> _frame = nullptr;
   std::unique_ptr<ObjectTable> _object_table = nullptr;
 

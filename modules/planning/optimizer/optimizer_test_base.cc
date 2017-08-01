@@ -35,6 +35,12 @@ DEFINE_string(test_chassis_file,
               "The chassis test file");
 
 void OptimizerTestBase::SetDataConfigs() {
+  FLAGS_qp_spline_path_config_file =
+      "modules/planning/testdata/conf/qp_spline_path_config.pb.txt";
+  FLAGS_qp_spline_st_speed_config_file =
+      "modules/planning/testdata/conf/qp_spline_st_speed_config_file.pb.txt";
+  FLAGS_st_boundary_config_file =
+      "modules/planning/testdata/conf/st_boundary_config_file.pb.txt";
   FLAGS_planning_config_file =
       "modules/planning/testdata/conf/planning_config.pb.txt";
   FLAGS_adapter_config_path = "modules/planning/testdata/conf/adapter.conf";
@@ -53,10 +59,12 @@ void OptimizerTestBase::SetDataConfigs() {
 }
 
 bool OptimizerTestBase::SetUpAdapters() {
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  if (!AdapterManager::Initialized()) {
+    AdapterManager::Init(FLAGS_adapter_config_path);
+  }
   if (!AdapterManager::GetRoutingResult()) {
     AERROR << "routing is not registered in adapter manager, check adapter "
-              "config file "
+              "config file."
            << FLAGS_adapter_config_path;
     return false;
   }
@@ -79,6 +87,7 @@ bool OptimizerTestBase::SetUpAdapters() {
 
 void OptimizerTestBase::SetUp() {
   SetDataConfigs();
+  planning_.Init();
   if (!SetUpAdapters()) {
     AERROR << "Failed to setup adapters";
     return;
@@ -87,12 +96,6 @@ void OptimizerTestBase::SetUp() {
       AdapterManager::GetLocalization()->GetLatestObserved(),
       AdapterManager::GetChassis()->GetLatestObserved());
   pose_ = common::VehicleState::instance()->pose();
-
-  auto* data_center = DataCenter::instance();
-  if (!data_center->init_current_frame(0)) {
-    AERROR << "Failed to init frame";
-    return;
-  }
   if (!common::util::GetProtoFromFile(FLAGS_dp_poly_path_config_file,
                                       &dp_poly_path_config_)) {
     AERROR << "Failed to load file " << FLAGS_dp_poly_path_config_file;
@@ -103,8 +106,10 @@ void OptimizerTestBase::SetUp() {
     AERROR << "Failed to load file " << FLAGS_dp_st_speed_config_file;
     return;
   }
-  frame_ = data_center->current_frame();
-  ASSERT_TRUE(frame_ != nullptr);
+  if (!planning_.InitFrame(1)) {
+    AERROR << "planning init frame failed";
+    return;
+  }
 }
 
 void OptimizerTestBase::export_sl_points(

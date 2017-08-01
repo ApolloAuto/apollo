@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/frame.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -57,20 +58,19 @@ class RTKReplayPlanner : public Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(
-      const apollo::common::TrajectoryPoint& start_point,
-      PublishableTrajectory* ptr_publishable_trajectory) override;
+  apollo::common::Status Plan(Frame* frame,
+                              PublishableTrajectory* trajectory_pb) override;
 
   /**
    * @brief Read the recorded trajectory file.
    * @param filename The name of the trajectory file.
    */
-  void ReadTrajectoryFile(const std::string &filename);
+  void ReadTrajectoryFile(const std::string& filename);
 
  private:
   std::uint32_t QueryPositionMatchedPoint(
-      const apollo::common::TrajectoryPoint &start_point,
-      const std::vector<apollo::common::TrajectoryPoint> &trajectory) const;
+      const apollo::common::TrajectoryPoint& start_point,
+      const std::vector<apollo::common::TrajectoryPoint>& trajectory) const;
 
   std::vector<apollo::common::TrajectoryPoint> complete_rtk_trajectory_;
 };

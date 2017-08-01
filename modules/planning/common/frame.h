@@ -38,13 +38,17 @@ namespace planning {
 
 class Frame {
  public:
-  Frame(const uint32_t sequence_num, const hdmap::PncMap *pnc_map);
+  Frame(const uint32_t sequence_num);
 
-  void SetInitPose(const localization::Pose &init_pose);
-  void SetRouting(const hdmap::RoutingResult &routing);
-  void SetDecisionDataFromPrediction(
-      const prediction::PredictionObstacles &prediction_obstacles);
+  void SetRoutingResult(const hdmap::RoutingResult &routing);
+  void SetPrediction(const prediction::PredictionObstacles &prediction);
+  void SetPlanningStartPoint(const TrajectoryPoint &start_point);
+  void SetVehicleInitPose(const localization::Pose &pose);
+  const TrajectoryPoint &PlanningStartPoint() const;
   bool Init();
+
+  static const hdmap::PncMap *PncMap();
+  static void SetMap(hdmap::PncMap *pnc_map);
 
   uint32_t sequence_num() const;
   const PlanningData &planning_data() const;
@@ -58,14 +62,20 @@ class Frame {
  private:
   bool CreateReferenceLineFromRouting();
   bool SmoothReferenceLine();
+  void SetDecisionDataFromPrediction(
+      const prediction::PredictionObstacles &prediction_obstacles);
+
+ private:
+  TrajectoryPoint planning_start_point_;
 
   hdmap::RoutingResult routing_result_;
+  prediction::PredictionObstacles prediction_;
   uint32_t sequence_num_ = 0;
   hdmap::Path hdmap_path_;
   localization::Pose init_pose_;
   PublishableTrajectory _computed_trajectory;
   PlanningData _planning_data;
-  const hdmap::PncMap *pnc_map_ = nullptr;
+  static const hdmap::PncMap *pnc_map_;
 };
 
 }  // namespace planning

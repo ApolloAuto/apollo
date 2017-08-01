@@ -148,8 +148,7 @@ Status StBoundaryMapperImpl::map_main_decision_stop(
     std::vector<StGraphBoundary>* const boundary) const {
   const auto lane_id =
       common::util::MakeMapId(main_stop.enforced_line().lane_id());
-  const auto lane_info =
-      DataCenter::instance()->pnc_map()->HDMap()->get_lane_by_id(lane_id);
+  const auto lane_info = Frame::PncMap()->HDMap()->get_lane_by_id(lane_id);
   const auto& map_point =
       lane_info->get_smooth_point(main_stop.enforced_line().distance_s());
   SLPoint sl_point;

@@ -27,8 +27,8 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {
@@ -71,11 +71,10 @@ class OptimizerTestBase : public ::testing::Test {
 
  protected:
   bool SetUpAdapters();
-
   DpPolyPathConfig dp_poly_path_config_;
   DpStSpeedConfig dp_st_speed_config_;
   localization::Pose pose_;
-  Frame* frame_ = nullptr;
+  Planning planning_;
 };
 
 }  // namespace planning
