@@ -20,7 +20,7 @@ message Node {
     repeated CurveRange left_out = 3;
     repeated CurveRange right_out = 4;
     optional double cost = 5;
-    optional adu.common.hdmap.Curve central_curve = 6;
+    optional apollo.hdmap.Curve central_curve = 6;
     optional bool is_virtual = 7 [default = true];
     optional string road_id = 8;
 }
