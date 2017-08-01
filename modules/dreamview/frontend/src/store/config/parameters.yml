@@ -26,7 +26,7 @@ options:
     showObstacles: true
     showDecision: true
     showPredictionMajor: true
-    showPredictionMinor: false
+    showPredictionMinor: true
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
