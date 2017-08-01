@@ -14,16 +14,16 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
-#define BAIDU_ADU_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
+#ifndef MODULES_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
+#define MODULES_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
 
 #include <unordered_map>
 #include <unordered_set>
 
-#include "map.pb.h"
-#include "topo_graph.pb.h"
+#include "modules/routing/topo_creator/map.pb.h"
+#include "modules/routing/topo_creator/topo_graph.pb.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class GraphCreator {
@@ -37,22 +37,22 @@ class GraphCreator {
 
  private:
   void add_edge(
-      const ::adu::routing::common::Node& from_node,
-      const ::google::protobuf::RepeatedPtrField<::adu::common::hdmap::Id>&
+      const ::apollo::routing::common::Node& from_node,
+      const ::google::protobuf::RepeatedPtrField<::apollo::common::hdmap::Id>&
           to_node_vec,
-      const ::adu::routing::common::Edge::DirectionType& type);
+      const ::apollo::routing::common::Edge::DirectionType& type);
 
  private:
   std::string _base_map_file_path;
   std::string _dump_topo_file_path;
-  ::adu::common::hdmap::Map _pbmap;
-  ::adu::routing::common::Graph _graph;
+  ::apollo::common::hdmap::Map _pbmap;
+  ::apollo::routing::common::Graph _graph;
   std::unordered_map<std::string, int> _node_index_map;
   std::unordered_map<std::string, std::string> _road_id_map;
   std::unordered_set<std::string> _showed_edge_id_set;
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
+#endif  // MODULES_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H

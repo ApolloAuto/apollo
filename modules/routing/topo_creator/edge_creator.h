@@ -14,36 +14,36 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef BAIDU_ADU_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
-#define BAIDU_ADU_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
+#ifndef MODULES_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
+#define MODULES_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
 
-#include "topo_graph.pb.h"
+#include "modules/routing/topo_creator/topo_graph.pb.h"
 
-namespace adu {
+namespace apollo {
 namespace routing {
 
 class EdgeCreator {
  public:
   static void get_pb_edge(
-      const ::adu::routing::common::Node& node_from,
-      const ::adu::routing::common::Node& node_to,
-      const ::adu::routing::common::Edge::DirectionType& type,
-      ::adu::routing::common::Edge* pb_edge);
+      const ::apollo::routing::common::Node& node_from,
+      const ::apollo::routing::common::Node& node_to,
+      const ::apollo::routing::common::Edge::DirectionType& type,
+      ::apollo::routing::common::Edge* pb_edge);
 
  private:
   static void init_edge_info(
-      const ::adu::routing::common::Node& node_from,
-      const ::adu::routing::common::Node& node_to,
-      const ::adu::routing::common::Edge::DirectionType& type,
-      ::adu::routing::common::Edge* pb_edge);
+      const ::apollo::routing::common::Node& node_from,
+      const ::apollo::routing::common::Node& node_to,
+      const ::apollo::routing::common::Edge::DirectionType& type,
+      ::apollo::routing::common::Edge* pb_edge);
   static void init_edge_cost(
-      const ::adu::routing::common::Node& node_from,
-      const ::adu::routing::common::Node& node_to,
-      const ::adu::routing::common::Edge::DirectionType& type,
-      ::adu::routing::common::Edge* pb_edge);
+      const ::apollo::routing::common::Node& node_from,
+      const ::apollo::routing::common::Node& node_to,
+      const ::apollo::routing::common::Edge::DirectionType& type,
+      ::apollo::routing::common::Edge* pb_edge);
 };
 
 }  // namespace routing
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // BAIDU_ADU_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
+#endif  // MODULES_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
