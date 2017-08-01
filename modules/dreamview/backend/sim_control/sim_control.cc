@@ -36,7 +36,11 @@ using apollo::hdmap::RoutingResult;
 using apollo::localization::LocalizationEstimate;
 using apollo::canbus::Chassis;
 
-SimControl::SimControl() {
+SimControl::SimControl()
+    : prev_point_index_(0),
+      next_point_index_(0),
+      received_planning_(false),
+      initial_start_(true) {
   if (FLAGS_enable_sim_control) {
     RoutingResult routing;
     if (!GetProtoFromFile(FLAGS_routing_result_file, &routing)) {
@@ -44,16 +48,15 @@ SimControl::SimControl() {
             << FLAGS_routing_result_file;
       return;
     }
-    SetStartPoint(routing, &next_point_);
+    SetStartPoint(routing);
   }
 }
 
-void SimControl::SetStartPoint(const RoutingResult& routing,
-                               TrajectoryPoint* point) {
-  point->set_v(0.0);
-  point->set_a(0.0);
+void SimControl::SetStartPoint(const RoutingResult& routing) {
+  next_point_.set_v(0.0);
+  next_point_.set_a(0.0);
 
-  auto* p = point->mutable_path_point();
+  auto* p = next_point_.mutable_path_point();
 
   p->set_x(routing.routing_request().start().pose().x());
   p->set_y(routing.routing_request().start().pose().y());
@@ -61,15 +64,28 @@ void SimControl::SetStartPoint(const RoutingResult& routing,
 
   // TODO(siyangy): Calculate the real theta when the API is ready.
   p->set_theta(0.0);
+  p->set_kappa(0.0);
+  p->set_s(0.0);
+
+  prev_point_index_ = next_point_index_ = 0;
+  received_planning_ = false;
+
+  Start();
 }
 
 void SimControl::Start() {
-  // Setup planning data callback.
-  AdapterManager::SetPlanningCallback(&SimControl::OnPlanning, this);
+  if (initial_start_) {
+    // Setup planning data callback.
+    AdapterManager::SetPlanningCallback(&SimControl::OnPlanning, this);
 
-  // Start timer to publish localiztion and chassis messages.
-  sim_control_timer_ = AdapterManager::CreateTimer(
-      ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
+    // Start timer to publish localiztion and chassis messages.
+    sim_control_timer_ = AdapterManager::CreateTimer(
+        ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
+
+    initial_start_ = false;
+  } else {
+    sim_control_timer_.start();
+  }
 }
 
 void SimControl::Stop() {
@@ -81,6 +97,7 @@ void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
   current_trajectory_ = trajectory;
   prev_point_index_ = 0;
   next_point_index_ = 0;
+  received_planning_ = true;
 }
 
 void SimControl::Freeze() {
@@ -100,13 +117,11 @@ bool SimControl::NextPointWithinRange() {
 }
 
 void SimControl::TimerCallback(const ros::TimerEvent& event) {
-  AdapterManager::Observe();
-
   // Result of the interpolation.
   double lambda = 0;
   auto current_time = apollo::common::time::ToSecond(Clock::Now());
 
-  if (AdapterManager::GetPlanning()->Empty()) {
+  if (!received_planning_) {
     prev_point_ = next_point_;
   } else {
     if (current_trajectory_.estop().is_estop() || !NextPointWithinRange()) {

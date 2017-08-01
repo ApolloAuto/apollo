@@ -35,7 +35,9 @@ namespace dreamview {
 
 /**
  * @class SimControl
- * @brief
+ * @brief A module that simulates a 'perfect control' algorithm, which assumes
+ * an ideal world where the car can be perfectly placed wherever the planning
+ * asks it to be, with the expected speed, acceleration, etc.
  */
 class SimControl {
  public:
@@ -55,8 +57,9 @@ class SimControl {
  private:
   void OnPlanning(const apollo::planning::ADCTrajectory &trajectory);
 
-  void SetStartPoint(const apollo::hdmap::RoutingResult &routing,
-                     apollo::common::TrajectoryPoint *point);
+  // Reset the start point according to the RoutingResult, which can be read
+  // from file or received from a publisher.
+  void SetStartPoint(const apollo::hdmap::RoutingResult &routing);
 
   void Freeze();
 
@@ -85,6 +88,12 @@ class SimControl {
   // current_trajectory.
   int prev_point_index_;
   int next_point_index_;
+
+  // Whether there's a planning received after the most recent routing.
+  bool received_planning_;
+
+  // Whether it is the first time the SimControl gets started.
+  bool initial_start_;
 
   apollo::common::TrajectoryPoint prev_point_;
   apollo::common::TrajectoryPoint next_point_;
