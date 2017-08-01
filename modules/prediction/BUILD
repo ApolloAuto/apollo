@@ -43,4 +43,14 @@ cc_binary(
     ],
 )
 
+filegroup(
+    name = "prediction_data",
+    srcs = glob(["data/**"]),
+)
+
+filegroup(
+    name = "prediction_testdata",
+    srcs = glob(["testdata/**"]),
+)
+
 cpplint()
