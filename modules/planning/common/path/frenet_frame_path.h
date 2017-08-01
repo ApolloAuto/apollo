@@ -40,6 +40,7 @@ class FrenetFramePath {
   double length() const;
   const common::FrenetFramePoint &point_at(const std::uint32_t index) const;
   common::FrenetFramePoint &point_at(const std::uint32_t index);
+  const common::FrenetFramePoint& interpolate(double s) const;
 
  private:
   std::vector<common::FrenetFramePoint> points_;

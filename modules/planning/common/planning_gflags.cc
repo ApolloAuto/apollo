@@ -119,6 +119,8 @@ DEFINE_double(
     "added distance to vehicle width for static decision collision judgement");
 DEFINE_double(dp_path_decision_buffer, 0.65,
               "buffer in decision while dp path computing decision");
+DEFINE_double(dynamic_decision_follow_range, 1.0,
+    "threshold for judging follow in dp path computing decision for static obstacles");
 
 // Prediction Part
 

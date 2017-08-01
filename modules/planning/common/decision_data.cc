@@ -31,22 +31,31 @@ const std::vector<Obstacle> &DecisionData::Obstacles() const {
   return obstacles_;
 }
 
-void DecisionData::AddObstacle(Obstacle &obstacle) {
-  obstacles_.push_back(obstacle);
-  if (obstacle.Type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
-    static_obstacles_.push_back((const Obstacle *)&obstacle);
-  } else {
-    dynamic_obstacles_.push_back((const Obstacle *)&obstacle);
-  }
-}
-
-const std::vector<const Obstacle *> &DecisionData::StaticObstacles() const {
+const std::vector<Obstacle*> &DecisionData::StaticObstacles() const {
   return static_obstacles_;
 }
 
-const std::vector<const Obstacle *> &DecisionData::DynamicObstacles() const {
+const std::vector<Obstacle*> &DecisionData::DynamicObstacles() const {
   return dynamic_obstacles_;
 }
+
+std::vector<Obstacle*> *DecisionData::MutableStaticObstacles() {
+  return &static_obstacles_;
+}
+ 
+std::vector<Obstacle*> *DecisionData::MutableDynamicObstacles() {
+  return &dynamic_obstacles_;
+}
+
+void DecisionData::AddObstacle(Obstacle &obstacle) {
+  obstacles_.push_back(obstacle);
+  if (obstacle.Type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
+    static_obstacles_.push_back(&obstacle);
+  } else {
+    dynamic_obstacles_.push_back(&obstacle);
+  }
+}
+
 
 }  // namespace planning
 }  // namespace apollo
