@@ -24,7 +24,7 @@ cc_test(
     srcs = [
         "min_box_test.cc",
     ],
-    data = ["//modules/perception:perception_testdata"],
+    data = ["//modules/perception:perception_data"],
     linkopts = [
         "-lqhull",
     ],
