@@ -37,11 +37,11 @@ namespace routing {
 
 namespace {
 
-using ::apollo::router::RoutingResult_Road;
-using ::apollo::router::RoutingResult_Junction;
-using ::apollo::router::RoutingResult_PassageRegion;
-using ::apollo::router::RoutingResult_LaneSegment;
-using ::apollo::router::RoutingResult_LaneChangeInfo;
+using ::apollo::routing::RoutingResult_Road;
+using ::apollo::routing::RoutingResult_Junction;
+using ::apollo::routing::RoutingResult_PassageRegion;
+using ::apollo::routing::RoutingResult_LaneSegment;
+using ::apollo::routing::RoutingResult_LaneChangeInfo;
 
 void get_nodes_of_ways_based_on_virtual(
     const std::vector<const TopoNode*>& nodes,
@@ -165,7 +165,7 @@ void show_request_info(const T& request) {
 }
 
 void generate_black_set_from_road(
-    const ::apollo::router::RoutingRequest& request,
+    const ::apollo::routing::RoutingRequest& request,
     const TopoGraph* graph,
     std::unordered_set<const TopoNode*>* const black_list) {
   for (const auto& road_id : request.blacklisted_road()) {
@@ -268,8 +268,8 @@ bool Navigator::is_ready() const { return _is_ready; }
 
 // search new request to new response
 bool Navigator::search_route(
-    const ::apollo::router::RoutingRequest& request,
-    ::apollo::router::RoutingResult* response) const {
+    const ::apollo::routing::RoutingRequest& request,
+    ::apollo::routing::RoutingResult* response) const {
   if (!is_ready()) {
     ROS_ERROR("Topo graph is not ready!");
     return false;
@@ -309,59 +309,13 @@ bool Navigator::search_route(
   return true;
 }
 
-// search old request to old response
-bool Navigator::search_route(
-    const ::apollo::routing::RoutingRequest& request,
-    ::apollo::routing::RoutingResult* response) const {
-  if (!is_ready()) {
-    ROS_ERROR("Topo graph is not ready!");
-    return false;
-  }
-  show_request_info(request);
-
-  std::vector<const TopoNode*> way_nodes;
-  NodeRangeManager range_manager;
-
-  if (!get_way_nodes(request, _graph.get(), &way_nodes, &range_manager)) {
-    ROS_ERROR("Can't find way point in graph!");
-    return false;
-  }
-
-  std::vector<const TopoNode*> result_nodes;
-  std::unordered_set<const TopoNode*> black_list;
-  generate_black_set_from_lane(request, _graph.get(), &black_list);
-
-  if (!search_route_by_strategy(_graph.get(), way_nodes, black_list,
-                                &result_nodes)) {
-    ROS_ERROR("Can't find route from request!");
-    return false;
-  }
-
-  if (!generate_passage_region(request, result_nodes, black_list, range_manager,
-                               response)) {
-    ROS_ERROR(
-        "Failed to generate new passage regions based on route result lane "
-        "ids");
-    return false;
-  }
-
-  if (FLAGS_enable_debug_mode) {
-    ::apollo::router::RoutingResult new_response;
-    generate_passage_region(result_nodes, black_list, range_manager,
-                            &new_response);
-    dump_debug_data(result_nodes, range_manager, new_response);
-  }
-
-  return true;
-}
-
 // new request to new response
 bool Navigator::generate_passage_region(
-    const ::apollo::router::RoutingRequest& request,
+    const ::apollo::routing::RoutingRequest& request,
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     const NodeRangeManager& range_manager,
-    ::apollo::router::RoutingResult* result) const {
+    ::apollo::routing::RoutingResult* result) const {
   result->mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   result->mutable_header()->set_module_name(FLAGS_node_name);
   result->mutable_header()->set_sequence_num(1);
@@ -380,7 +334,7 @@ void Navigator::generate_passage_region(
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     const NodeRangeManager& range_manager,
-    ::apollo::router::RoutingResult* result) const {
+    ::apollo::routing::RoutingResult* result) const {
   std::vector<std::vector<const TopoNode*> > nodes_of_ways;
   if (FLAGS_use_road_id) {
     get_nodes_of_ways(nodes, &nodes_of_ways);
@@ -444,32 +398,10 @@ void Navigator::generate_passage_region(
   }
 }
 
-// old request to old response
-bool Navigator::generate_passage_region(
-    const ::apollo::routing::RoutingRequest& request,
-    const std::vector<const TopoNode*>& nodes,
-    const std::unordered_set<const TopoNode*>& black_list,
-    const NodeRangeManager& range_manager,
-    ::apollo::routing::RoutingResult* result) const {
-  result->mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
-  result->mutable_header()->set_module_name(FLAGS_node_name);
-  result->mutable_header()->set_sequence_num(1);
-  for (const auto& node : nodes) {
-    auto* seg = result->add_route();
-    ;
-    seg->set_id(node->lane_id());
-    NodeRange range = range_manager.get_node_range(node);
-    seg->set_start_s(range.start_s);
-    seg->set_end_s(range.end_s);
-  }
-  result->mutable_routing_request()->CopyFrom(request);
-  return true;
-}
-
 void Navigator::dump_debug_data(
     const std::vector<const TopoNode*>& nodes,
     const NodeRangeManager& range_manager,
-    const ::apollo::router::RoutingResult& response) const {
+    const ::apollo::routing::RoutingResult& response) const {
   std::string debug_string;
   ROS_INFO("Route lane id\tis virtual\tstart s\tend s");
   for (const auto& node : nodes) {
