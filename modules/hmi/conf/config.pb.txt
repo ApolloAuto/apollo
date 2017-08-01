@@ -25,8 +25,6 @@ modules {
     command: "start"
     stdout_file: "data/log/control.stdout"
     stderr_file: "data/log/control.stderr"
-    log_files: "data/log/control.INFO"
-    log_files: "data/log/control.ERROR"
   }
   supported_commands {
     name: "stop"
@@ -45,8 +43,6 @@ modules {
     command: "start"
     stdout_file: "data/log/canbus.stdout"
     stderr_file: "data/log/canbus.stderr"
-    log_files: "data/log/canbus.INFO"
-    log_files: "data/log/canbus.ERROR"
   }
   supported_commands {
     name: "stop"
@@ -54,6 +50,42 @@ modules {
     command: "stop"
     stdout_file: "data/log/canbus.stdout"
     stderr_file: "data/log/canbus.stderr"
+  }
+}
+modules {
+  name: "prediction"
+  display_name: "Prediction"
+  supported_commands {
+    name: "start"
+    command: "scripts/prediction.sh"
+    command: "start"
+    stdout_file: "data/log/prediction.stdout"
+    stderr_file: "data/log/prediction.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/prediction.sh"
+    command: "stop"
+    stdout_file: "data/log/prediction.stdout"
+    stderr_file: "data/log/prediction.stderr"
+  }
+}
+modules {
+  name: "planning"
+  display_name: "Planning"
+  supported_commands {
+    name: "start"
+    command: "scripts/planning.sh"
+    command: "start"
+    stdout_file: "data/log/planning.stdout"
+    stderr_file: "data/log/planning.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/planning.sh"
+    command: "stop"
+    stdout_file: "data/log/planning.stdout"
+    stderr_file: "data/log/planning.stderr"
   }
 }
 modules {
@@ -65,8 +97,6 @@ modules {
     command: "start"
     stdout_file: "data/log/localization.stdout"
     stderr_file: "data/log/localization.stderr"
-    log_files: "data/log/localization.INFO"
-    log_files: "data/log/localization.ERROR"
   }
   supported_commands {
     name: "stop"
@@ -85,8 +115,6 @@ modules {
     command: "start"
     stdout_file: "data/log/dreamview.stdout"
     stderr_file: "data/log/dreamview.stderr"
-    log_files: "data/log/dreamview.INFO"
-    log_files: "data/log/dreamview.ERROR"
   }
   supported_commands {
     name: "stop"
