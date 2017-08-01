@@ -41,7 +41,7 @@ cc_test(
         "hm_tracker_test.cc",
     ],
     data = [
-        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
         "//modules/perception/conf:perception_config",
     ],
     deps = [
