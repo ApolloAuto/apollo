@@ -112,6 +112,19 @@ cc_library(
 )
 
 cc_library(
+    name = "planning_state",
+    srcs = [
+        "planning_state.cc",
+    ],
+    hdrs = [
+        "planning_state.h",
+    ],
+    deps = [
+        "//modules/common:macro",
+    ],
+)
+
+cc_library(
     name = "speed_limit",
     srcs = [
         "speed_limit.cc",
@@ -142,7 +155,6 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/status",
         "//modules/map/hdmap",
-        "//modules/planning/state_machine:master_state_machine",
     ],
 )
 
