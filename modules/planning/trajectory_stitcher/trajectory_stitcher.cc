@@ -33,41 +33,35 @@ namespace planning {
 
 using VehicleState = apollo::common::VehicleState;
 
+std::vector<TrajectoryPoint> compute_reinit_stitching_trajectory() {
+  TrajectoryPoint init_point;
+  init_point.mutable_path_point()->set_x(VehicleState::instance()->x());
+  init_point.mutable_path_point()->set_y(VehicleState::instance()->y());
+  init_point.set_v(VehicleState::instance()->linear_velocity());
+  init_point.set_a(VehicleState::instance()->linear_acceleration());
+  init_point.mutable_path_point()->set_theta(
+      VehicleState::instance()->heading());
+  init_point.mutable_path_point()->set_kappa(VehicleState::instance()->kappa());
+
+  // TODO(all): the time is not correct, it should be
+  // FLAGS_forward_predict_time.
+  init_point.set_relative_time(0.0);
+
+  // TODO(all): the init point should be some future point, not current
+  // vehicle state
+  // TODO(all): need vehicle bicycle model to compute the overhead
+  // trajectory.
+  return std::vector<TrajectoryPoint>(1, init_point);
+};
+
 std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
-        const PublishableTrajectory& prev_trajectory) {
-  auto compute_reinit_stitching_trajectory =
-      []() {
-        TrajectoryPoint init_point;
-        init_point.mutable_path_point()->set_x(VehicleState::instance()->x());
-        init_point.mutable_path_point()->set_y(VehicleState::instance()->y());
-        init_point.set_v(VehicleState::instance()->linear_velocity());
-        init_point.set_a(VehicleState::instance()->linear_acceleration());
-        init_point.mutable_path_point()->set_theta(VehicleState::instance()->heading());
-        init_point.mutable_path_point()->set_kappa(VehicleState::instance()->kappa());
-
-        // TODO(all): the time is not correct, it should be
-        // FLAGS_forward_predict_time.
-        init_point.set_relative_time(0.0);
-
-        // TODO(all): the init point should be some future point, not current
-        // vehicle state
-        // TODO(all): need vehicle bicycle model to compute the overhead
-        // trajectory.
-        return std::vector<TrajectoryPoint>(1, init_point);
-      };
-
-  // no planning history
-  /**
-  if (prev_frame == nullptr) {
-    return compute_reinit_stitching_trajectory();
-  }
-  **/
+    const PublishableTrajectory& prev_trajectory) {
   std::size_t prev_trajectory_size = prev_trajectory.num_of_points();
 
-  // previous planning is failed
   if (prev_trajectory_size == 0) {
     AWARN << "Projected trajectory at time [" << prev_trajectory.header_time()
-          << "] size is zero! Use origin car status instead.";
+          << "] size is zero! Previous planning not exist or failed. Use "
+             "origin car status instead.";
     return compute_reinit_stitching_trajectory();
   }
 
@@ -76,25 +70,27 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
 
   std::size_t matched_index = prev_trajectory.query_nearest_point(veh_rel_time);
 
-  // the previous trajectory is not long enough; something is seriously wrong.
   if (matched_index == prev_trajectory_size) {
+    AWARN << "The previous trajectory is not long enough, something is wrong";
     return compute_reinit_stitching_trajectory();
   }
 
-  // the previous trajectory doesn't cover current time;
   if (matched_index == 0 &&
       veh_rel_time < prev_trajectory.start_point().relative_time()) {
+    AWARN << "the previous trajectory doesn't cover current time";
     return compute_reinit_stitching_trajectory();
   }
 
   auto matched_point = prev_trajectory.trajectory_point_at(matched_index);
   double position_diff =
-      common::math::Vec2d(matched_point.path_point().x() - VehicleState::instance()->x(),
-                          matched_point.path_point().y() - VehicleState::instance()->y())
+      common::math::Vec2d(
+          matched_point.path_point().x() - VehicleState::instance()->x(),
+          matched_point.path_point().y() - VehicleState::instance()->y())
           .Length();
 
-  // the distance between matched point and actual position is too large
   if (position_diff > FLAGS_replan_distance_threshold) {
+    AWARN << "the distance between matched point and actual position is too "
+             "large";
     return compute_reinit_stitching_trajectory();
   }
 

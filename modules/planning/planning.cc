@@ -111,7 +111,7 @@ Status Planning::Start() {
   return Status::OK();
 }
 
-void Planning:: RecordInput(ADCTrajectory* trajectory_pb) {
+void Planning::RecordInput(ADCTrajectory* trajectory_pb) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record input into debug";
     return;
@@ -123,10 +123,10 @@ void Planning:: RecordInput(ADCTrajectory* trajectory_pb) {
   adc_position->CopyFrom(localization);
 
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
-  auto debug_chassis= planning_data->mutable_chassis();
+  auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  const auto &routing_result =
+  const auto& routing_result =
       AdapterManager::GetRoutingResult()->GetLatestObserved();
 
   auto debug_routing = planning_data->mutable_routing();
@@ -149,7 +149,8 @@ void Planning::RunOnce() {
     return;
   }
 
-  // FIXME(all): enable prediction check when perception and prediction is ready.
+  // FIXME(all): enable prediction check when perception and prediction is
+  // ready.
   // if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
   //   AERROR << "Prediction is not available; skip the planning cycle";
   //   return;
@@ -208,69 +209,74 @@ void Planning::Stop() {}
 
 bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
                     ADCTrajectory* trajectory_pb) {
-
   // if 1. the auto-driving mode is off or
   //    2. we don't have the trajectory from last planning cycle or
   //    3. the position deviation from actual and target is too high
   // then planning from current vehicle state.
   auto stitching_trajectory = TrajectoryStitcher::compute_stitching_trajectory(
-          last_publishable_trajectory_);
+      last_publishable_trajectory_);
 
   auto planning_start_point = stitching_trajectory.back();
 
   if (FLAGS_enable_record_debug) {
-    trajectory_pb->mutable_debug()->mutable_planning_data()
-        ->mutable_init_point()->CopyFrom(stitching_trajectory.back());
-    trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(true);
+    trajectory_pb->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_init_point()
+        ->CopyFrom(stitching_trajectory.back());
+    trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(
+        true);
   }
 
   auto status = planner_->Plan(planning_start_point, trajectory_pb);
   if (status != Status::OK()) {
-      last_publishable_trajectory_.Clear();
-      return false;
+    AERROR << "planner failed to make a driving plan";
+    last_publishable_trajectory_.Clear();
+    return false;
   }
 
-  InsertFrontTrajectoryPoints(trajectory_pb,
-            std::vector<decltype(planning_start_point)>(stitching_trajectory.begin(),
-                    stitching_trajectory.end() - 1));
+  InsertFrontTrajectoryPoints(trajectory_pb, stitching_trajectory);
 
-  PublishableTrajectory publishable_trajectory;
+  // update last publishable trajectory;
+  last_publishable_trajectory_.Clear();
   for (int i = 0; i < trajectory_pb->trajectory_point_size(); ++i) {
-      publishable_trajectory.add_trajectory_point(trajectory_pb->trajectory_point(i));
+    last_publishable_trajectory_.add_trajectory_point(
+        trajectory_pb->trajectory_point(i));
   }
-  publishable_trajectory.set_header_time(trajectory_pb->header().timestamp_sec());
-  last_publishable_trajectory_ = std::move(publishable_trajectory);
+  last_publishable_trajectory_.set_header_time(
+      trajectory_pb->header().timestamp_sec());
   return true;
 }
 
-void Planning::InsertFrontTrajectoryPoints(ADCTrajectory* trajectory_pb,
-        const std::vector<apollo::common::TrajectoryPoint>& points) const {
-    if (points.empty()) {
-        return;
-    }
-
-    int existing_size = trajectory_pb->trajectory_point_size();
-    int i = 0;
-    while (i < existing_size / 2) {
-        trajectory_pb->mutable_trajectory_point()->SwapElements(i, existing_size - 1 - i);
-        ++i;
-    }
-
-    std::size_t append_size = points.size();
-    std::size_t j = 0;
-    while (append_size >= j + 1) {
-        auto ptr_trajectory_point = trajectory_pb->add_trajectory_point();
-        *ptr_trajectory_point = points[append_size - 1 - j];
-        j += 1;
-    }
-
-    int new_size = trajectory_pb->trajectory_point_size();
-    i = 0;
-    while (i < new_size / 2) {
-        trajectory_pb->mutable_trajectory_point()->SwapElements(i, new_size - 1 - i);
-        ++i;
-    }
+void Planning::InsertFrontTrajectoryPoints(
+    ADCTrajectory* trajectory_pb,
+    const std::vector<apollo::common::TrajectoryPoint>& points) const {
+  if (points.empty()) {
+    AINFO << "stitch points are empty";
     return;
+  }
+
+  int i = 0;
+  int j = trajectory_pb->trajectory_point_size() - 1;
+  while (i < j) {
+    trajectory_pb->mutable_trajectory_point()->SwapElements(i, j);
+    ++i;
+    --j;
+  }
+
+  j = points.size() - 1;
+  while (j >= 0) {
+    trajectory_pb->add_trajectory_point()->CopyFrom(points[j]);
+    --j;
+  }
+
+  i = 0;
+  j = trajectory_pb->trajectory_point_size() - 1;
+  while (i < j) {
+    trajectory_pb->mutable_trajectory_point()->SwapElements(i, j);
+    ++i;
+    --j;
+  }
+  return;
 }
 
 }  // namespace planning
