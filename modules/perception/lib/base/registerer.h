@@ -177,7 +177,6 @@ bool GetRegisteredClasses(
   };
 
 #define REGISTER_CLASS(clazz, name)                                           \
-  namespace {                                                                 \
   class ObjectFactory##name : public apollo::perception::ObjectFactory {      \
    public:                                                                    \
     virtual ~ObjectFactory##name() {}                                         \
@@ -185,11 +184,10 @@ bool GetRegisteredClasses(
       return ::apollo::perception::Any(new name());                           \
     }                                                                         \
   };                                                                          \
-  __attribute__((constructor)) void register_factory_##name() {               \
+  inline void RegisterFactory##name() {                                       \
     ::apollo::perception::FactoryMap &map =                                   \
         ::apollo::perception::GlobalFactoryMap()[#clazz];                     \
     if (map.find(#name) == map.end()) map[#name] = new ObjectFactory##name(); \
-  }                                                                           \
   }
 
 #endif  // MODULES_PERCEPTION_LIB_BASE_REGISTERER_H_

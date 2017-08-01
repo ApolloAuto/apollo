@@ -23,11 +23,15 @@
 #include <tf_conversions/tf_eigen.h>
 #include <Eigen/Core>
 #include <string>
+#include "ros/include/ros/ros.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "ros/include/ros/ros.h"
+#include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
+// #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
+#include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
+#include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 
 namespace apollo {
 namespace perception {
@@ -46,6 +50,9 @@ bool LidarProcess::Init() {
   if (inited_) {
     return true;
   }
+
+  RegistAllAlgorithm();
+
   if (!InitFrameDependence()) {
     AERROR << "failed to init frame dependence.";
     return false;
@@ -153,6 +160,17 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::sha
   AINFO << "lidar process succ, there are " << objects_.size()
         << " tracked objects.";
   return true;
+}
+
+void LidarProcess::RegistAllAlgorithm() {
+  RegisterFactoryDummyROIFilter();
+  RegisterFactoryDummySegmentation();
+  RegisterFactoryDummyObjectBuilder();
+  RegisterFactoryDummyTracker();
+
+  // RegisterFactoryCNNSegmentation();
+  RegisterFactoryMinBoxObjectBuilder();
+  RegisterFactoryHmObjectTracker();
 }
 
 bool LidarProcess::InitFrameDependence() {

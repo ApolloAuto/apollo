@@ -52,6 +52,8 @@ class DerivedClass2 : BaseClass {
 REGISTER_TEST(DerivedClass2);
 
 TEST(RegistererTest, test) {
+  RegisterFactoryDerivedClass1();
+  RegisterFactoryDerivedClass2();
   BaseClass* ptr = nullptr;
   ptr = BaseClassRegisterer::GetInstanceByName("DerivedClass1");
   ASSERT_TRUE(ptr != nullptr);

@@ -177,6 +177,13 @@ class DummyTracker : public BaseTracker {
   DISALLOW_COPY_AND_ASSIGN(DummyTracker);
 };
 
+REGISTER_GROUNDDETECTOR(DummyGroundDetector);
+REGISTER_ROIFILTER(DummyROIFilter);
+REGISTER_SEGMENTATION(DummySegmentation);
+REGISTER_OBJECTBUILDER(DummyObjectBuilder);
+REGISTER_TRACKER(DummyTracker);
+REGISTER_OBJECTFILTER(DummyObjectFilter);
+
 }  // namespace perception
 }  // namespace apollo
 

@@ -206,6 +206,8 @@ class HmObjectTracker : public BaseTracker{
   DISALLOW_COPY_AND_ASSIGN(HmObjectTracker);
 };  // class HmObjectTracker
 
+REGISTER_TRACKER(HmObjectTracker);
+
 }  // namespace perception
 }  // namespace apollo
 

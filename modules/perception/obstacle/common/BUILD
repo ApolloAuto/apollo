@@ -21,6 +21,9 @@ cc_library(
         "hungarian_bigraph_matcher.h",
         "pose_util.h",
     ],
+    linkopts = [
+        "-lqhull",
+    ],
     deps = [
         "//modules/common:log",
         "//modules/perception/lib/pcl_util:pcl_util",
