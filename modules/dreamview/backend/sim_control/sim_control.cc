@@ -40,8 +40,9 @@ SimControl::SimControl()
     : prev_point_index_(0),
       next_point_index_(0),
       received_planning_(false),
-      initial_start_(true) {
-  if (FLAGS_enable_sim_control) {
+      initial_start_(true),
+      enabled_(FLAGS_enable_sim_control) {
+  if (enabled_) {
     RoutingResult routing;
     if (!GetProtoFromFile(FLAGS_routing_result_file, &routing)) {
       AWARN << "Unable to read start point from file: "
@@ -70,13 +71,16 @@ void SimControl::SetStartPoint(const RoutingResult& routing) {
   prev_point_index_ = next_point_index_ = 0;
   received_planning_ = false;
 
-  Start();
+  if (enabled_) {
+    Start();
+  }
 }
 
 void SimControl::Start() {
   if (initial_start_) {
-    // Setup planning data callback.
+    // Setup planning and routing result data callback.
     AdapterManager::SetPlanningCallback(&SimControl::OnPlanning, this);
+    AdapterManager::SetRoutingResultCallback(&SimControl::SetStartPoint, this);
 
     // Start timer to publish localiztion and chassis messages.
     sim_control_timer_ = AdapterManager::CreateTimer(
@@ -172,6 +176,8 @@ void SimControl::PublishChassis(double lambda) {
   chassis.set_engine_started(true);
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   chassis.set_gear_location(Chassis::GEAR_DRIVE);
+  // TODO(siyangy): set the real steering percentage.
+  chassis.set_steering_percentage(0.0);
 
   double cur_speed = Interpolate(prev_point_.v(), next_point_.v(), lambda);
   chassis.set_speed_mps(cur_speed);
