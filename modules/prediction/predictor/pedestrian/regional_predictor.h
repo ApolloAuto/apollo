@@ -56,6 +56,7 @@ class RegionalPredictor : public Predictor {
   void GenerateMovingTrajectory(
       const Obstacle* obstacle, double probability);
 
+ private:
   void DrawStillTrajectory(
       const Eigen::Vector2d& position,
       const double heading, const double speed, const double total_time,
