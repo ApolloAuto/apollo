@@ -150,7 +150,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
   // Obtain robust measurment via observation redundency
 
   // Observation I: anchor point velocity measurment
-  Eigen::Vector3f measured_anchor_point_velocity = 
+  Eigen::Vector3f measured_anchor_point_velocity =
     ComputeMeasuredAnchorPointVelocity(new_object, old_object, time_diff);
   // Observation II: bbox center velocity measurment
   Eigen::Vector3f measured_bbox_center_velocity =
@@ -158,12 +158,13 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
   // Observation III: bbox corner velocity measurment
   Eigen::Vector3f measured_bbox_corner_velocity =
     ComputeMeasuredBboxCornerVelocity(new_object, old_object, time_diff);
-  
+
   std::vector<Eigen::Vector3f> measured_candidates;
   measured_candidates.push_back(measured_anchor_point_velocity);
   measured_candidates.push_back(measured_bbox_center_velocity);
   measured_candidates.push_back(measured_bbox_corner_velocity);
-  Eigen::Vector3f measured_velocity = SelectMeasuredVelocity(measured_candidates);
+  Eigen::Vector3f measured_velocity = SelectMeasuredVelocity(
+    measured_candidates);
   return measured_velocity;
 }
 
@@ -218,7 +219,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
   compute_bbox_size_center_xy<pcl_util::Point>(new_object->object_ptr->cloud,
     old_dir, new_size, new_center);
   Eigen::Vector3d ortho_old_dir(-old_dir(1), old_dir(0), 0.0);
-  
+
   Eigen::Vector3d old_bbox_corner_list[4];
   Eigen::Vector3d new_bbox_corner_list[4];
   Eigen::Vector3d old_bbox_corner = old_center + old_dir * old_size(0) * 0.5 +
@@ -245,7 +246,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
     ortho_old_dir * new_size(1) * 0.5;
   old_bbox_corner_list[3] = old_bbox_corner;
   new_bbox_corner_list[3] = new_bbox_corner;
-  
+
   Eigen::Vector3f min_bbox_corner_velocity_on_project_dir =
     Eigen::Vector3f(100, 100, 0);
   float min_bbox_corner_velocity_on_project_dir_gain_norm =

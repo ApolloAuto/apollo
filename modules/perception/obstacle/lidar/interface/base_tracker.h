@@ -69,7 +69,7 @@ struct TrackerOptions {
   TrackerOptions() = default;
   explicit TrackerOptions(Eigen::Matrix4d *pose) : velodyne_trans(pose) {}
 
-  std::shared_ptr<const Eigen::Matrix4d> velodyne_trans;
+  std::shared_ptr<Eigen::Matrix4d> velodyne_trans;
   HdmapStructPtr hdmap = nullptr;
 };
 

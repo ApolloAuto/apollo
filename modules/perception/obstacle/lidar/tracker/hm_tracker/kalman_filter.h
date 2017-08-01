@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
 
@@ -117,7 +118,7 @@ class KalmanFilter : public BaseFilter {
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
     const double time_diff);
-  
+
   // @brief compute measured bbox center velocity
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
@@ -127,7 +128,7 @@ class KalmanFilter : public BaseFilter {
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
     const double time_diff);
-  
+
   // @brief compute measured bbox corner velocity
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
@@ -144,13 +145,13 @@ class KalmanFilter : public BaseFilter {
   Eigen::Vector3f SelectMeasuredVelocity(
     const std::vector<Eigen::Vector3f>& candidates);
 
-  // @brief select measured velocity among candidates according motion 
+  // @brief select measured velocity among candidates according motion
   // consistency
   // @params[IN] candidates: candidates of measured velocity
   // @return measured velocity
   Eigen::Vector3f SelectMeasuredVelocityAccordingMotionConsistency(
     const std::vector<Eigen::Vector3f>& candidates);
- 
+
   // @brief update filter
   // @params[IN] measured_anchor_point: anchor point of given measurement
   // @params[IN] measured_velocity: velocity of given measurement

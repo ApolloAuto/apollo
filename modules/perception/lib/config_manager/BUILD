@@ -18,7 +18,7 @@ cc_test(
     name = "config_manager_test",
     size = "small",
     srcs = ["config_manager_test.cc"],
-    data = ["//modules/perception:perception_testdata"],
+    data = ["//modules/perception:perception_data"],
     deps = [
         ":config_manager",
         "//modules/perception/common:perception_common",
