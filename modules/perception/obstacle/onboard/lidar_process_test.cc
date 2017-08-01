@@ -40,7 +40,7 @@ class LidarProcessTest : public testing::Test {
 };
 
 TEST_F(LidarProcessTest, test_InitFrameDependence) {
-  FLAGS_work_root = "modules/perception/testdata";
+  FLAGS_work_root = "modules/perception/data";
   FLAGS_enable_hdmap_input = false;
   EXPECT_FALSE(lidar_process_.InitFrameDependence());
   FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
