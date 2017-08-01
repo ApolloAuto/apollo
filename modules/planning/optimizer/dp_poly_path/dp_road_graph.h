@@ -83,11 +83,11 @@ class DpRoadGraph {
                       DecisionData *const decision_data,
                       std::vector<DpNode> *min_cost_path);
 
-  bool compute_decision_from_path(
-    const FrenetFramePath& tunnel,
-    const SpeedData& heuristic_speed_data,
-    const ReferenceLine& reference_line,
-    DecisionData* const decision_data);
+  bool compute_object_decision_from_path(
+    const PathData &path_data,
+    const SpeedData &heuristic_speed_data,
+    const ReferenceLine &reference_line,
+    DecisionData *const decision_data);
 
  private:
   DpPolyPathConfig config_;
