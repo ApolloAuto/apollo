@@ -124,24 +124,22 @@ std::string PathOverlap::debug_string() const {
   return common::util::StrCat(object_id, " ", start_s, " ", end_s);
 }
 
-Path::Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points)
-    : hdmap_(hdmap), _path_points(std::move(path_points)) {
+Path::Path(std::vector<MapPathPoint> path_points)
+    : _path_points(std::move(path_points)) {
   init();
 }
 
-Path::Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points,
+Path::Path(std::vector<MapPathPoint> path_points,
            std::vector<LaneSegment> lane_segments)
-    : hdmap_(hdmap),
-      _path_points(std::move(path_points)),
+    : _path_points(std::move(path_points)),
       _lane_segments(std::move(lane_segments)) {
   init();
 }
 
-Path::Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points,
+Path::Path(std::vector<MapPathPoint> path_points,
            std::vector<LaneSegment> lane_segments,
            const double max_approximation_error)
-    : hdmap_(hdmap),
-      _path_points(std::move(path_points)),
+    : _path_points(std::move(path_points)),
       _lane_segments(std::move(lane_segments)) {
   init();
   if (max_approximation_error > 0.0) {

@@ -37,10 +37,8 @@ namespace planning {
 class ReferenceLine {
  public:
   ReferenceLine() = default;
-  ReferenceLine(const apollo::hdmap::HDMap& hdmap,
-                const std::vector<ReferencePoint>& reference_points);
-  ReferenceLine(const apollo::hdmap::HDMap& hdmap,
-                const std::vector<ReferencePoint>& reference_points,
+  ReferenceLine(const std::vector<ReferencePoint>& reference_points);
+  ReferenceLine(const std::vector<ReferencePoint>& reference_points,
                 const std::vector<hdmap::LaneSegment>& lane_segments,
                 const double max_approximation_error);
 
@@ -61,14 +59,12 @@ class ReferenceLine {
                       double* const right_width) const;
   bool is_on_road(const common::SLPoint& sl_point) const;
 
-  double length() const { return reference_map_line_.length(); }
+  double length() const { return map_path_.length(); }
 
   std::string DebugString() const;
 
-  void get_s_range_from_box2d(
-    const ::apollo::common::math::Box2d& box2d,
-    double* max_s, double* min_s) const;
-
+  void get_s_range_from_box2d(const ::apollo::common::math::Box2d& box2d,
+                              double* max_s, double* min_s) const;
 
  private:
   static ReferencePoint interpolate(const ReferencePoint& p0, const double s0,
@@ -82,7 +78,7 @@ class ReferenceLine {
                                         const double y);
 
   std::vector<ReferencePoint> reference_points_;
-  hdmap::Path reference_map_line_;
+  hdmap::Path map_path_;
 };
 
 }  // namespace planning

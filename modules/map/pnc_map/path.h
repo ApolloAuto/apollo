@@ -183,11 +183,11 @@ class InterpolatedIndex {
 class Path {
  public:
   Path() = default;
-  Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points);
+  Path(std::vector<MapPathPoint> path_points);
 
-  Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points,
+  Path(std::vector<MapPathPoint> path_points,
        std::vector<LaneSegment> lane_segments);
-  Path(const HDMap* hdmap, std::vector<MapPathPoint> path_points,
+  Path(std::vector<MapPathPoint> path_points,
        std::vector<LaneSegment> lane_segments,
        const double max_approximation_error);
 
@@ -283,8 +283,6 @@ class Path {
                         std::vector<PathOverlap>* const overlaps) const;
 
  protected:
-  const HDMap* hdmap_ = nullptr;
-
   int _num_points = 0;
   int _num_segments = 0;
   std::vector<MapPathPoint> _path_points;
