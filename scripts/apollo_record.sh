@@ -35,12 +35,13 @@ function start() {
             /apollo/sensor/gnss/gnss_status \
             /apollo/sensor/gnss/odometry \
             /apollo/sensor/gnss/corrected_imu \
-            /apollo/planning \
-            /apollo/control \
-            /apollo/control/pad \
-            /apollo/localization/pose \
             /apollo/canbus/chassis \
             /apollo/canbus/chassis_detail \
+            /apollo/control \
+            /apollo/control/pad \
+            /apollo/planning \
+            /apollo/prediction \
+            /apollo/localization/pose \
             /apollo/monitor </dev/null >"${LOG}" 2>&1 &
     fi
 }
