@@ -23,13 +23,11 @@
 
 #include <string>
 
-#include "modules/planning/optimizer/speed_optimizer.h"
-
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
-#include "modules/map/hdmap/hdmap.h"
+#include "modules/planning/optimizer/speed_optimizer.h"
 #include "modules/planning/optimizer/st_graph/st_boundary_mapper_impl.h"
 
 namespace apollo {

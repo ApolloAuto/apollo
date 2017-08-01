@@ -80,8 +80,9 @@ class Planning : public apollo::common::ApolloApp {
             ADCTrajectory* trajectory_pb);
 
  private:
-  void InsertFrontTrajectoryPoints(ADCTrajectory* trajectory_pb,
-          const std::vector<apollo::common::TrajectoryPoint>& points) const;
+  void InsertFrontTrajectoryPoints(
+      ADCTrajectory* trajectory_pb,
+      const std::vector<apollo::common::TrajectoryPoint>& points) const;
 
   void RegisterPlanners();
 
@@ -97,7 +98,6 @@ class Planning : public apollo::common::ApolloApp {
   std::unique_ptr<Planner> planner_;
 
   PublishableTrajectory last_publishable_trajectory_;
-
 };
 
 }  // namespace planning

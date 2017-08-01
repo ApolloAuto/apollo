@@ -76,7 +76,11 @@ void remove_duplicates(std::vector<hdmap::MapPathPoint> *points) {
 }
 }
 
-PncMap::PncMap(const hdmap::HDMap *hdmap) : hdmap_(hdmap) {}
+PncMap::PncMap(const std::string &map_file) {
+  CHECK(!hdmap_.load_map_from_file(map_file)) << "Failed to load map file:"
+                                              << map_file;
+  AINFO << "map loaded, Map file: " << map_file;
+}
 
 bool PncMap::validate_routing(const hdmap::RoutingResult &routing) const {
   const int num_routes = routing.route_size();
@@ -88,7 +92,7 @@ bool PncMap::validate_routing(const hdmap::RoutingResult &routing) const {
   for (int i = 0; i < num_routes; ++i) {
     const auto &segment = routing.route(i);
     const auto lane =
-        hdmap_->get_lane_by_id(common::util::MakeMapId(segment.id()));
+        hdmap_.get_lane_by_id(common::util::MakeMapId(segment.id()));
     if (lane == nullptr) {
       AERROR << "Can not find lane with id = " + segment.id() + ".";
       return false;
@@ -138,7 +142,7 @@ bool PncMap::validate_routing(const hdmap::RoutingResult &routing) const {
     }
     const auto &segment = routing.route(i);
     const auto lane =
-        hdmap_->get_lane_by_id(common::util::MakeMapId(segment.id()));
+        hdmap_.get_lane_by_id(common::util::MakeMapId(segment.id()));
     const std::string next_id = routing.route(i + 1).id();
     bool is_successor = false;
     for (const auto &other_lane_id : lane->lane().successor_id()) {
@@ -177,7 +181,7 @@ bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
   }
   const double kMaxDistance = 20.0;  // meters.
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  const int status = hdmap_->get_lanes(point, kMaxDistance, &lanes);
+  const int status = hdmap_.get_lanes(point, kMaxDistance, &lanes);
   if (status < 0) {
     AERROR << "failed to get lane from point " << point.DebugString();
     return false;
@@ -284,7 +288,7 @@ bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
   if (start_s < 0) {
     const auto &first_segment = routing.route(0);
     auto lane =
-        hdmap_->get_lane_by_id(common::util::MakeMapId(first_segment.id()));
+        hdmap_.get_lane_by_id(common::util::MakeMapId(first_segment.id()));
     if (!lane) {
       AERROR << "failed to get lane from id " << first_segment.id();
       return false;
@@ -298,7 +302,7 @@ bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
           break;
         }
         const auto &next_lane_id = lane->lane().predecessor_id(0);
-        lane = hdmap_->get_lane_by_id(next_lane_id);
+        lane = hdmap_.get_lane_by_id(next_lane_id);
         if (lane == nullptr) {
           break;
         }
@@ -324,7 +328,7 @@ bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
         end_s - router_s + lane_segment.start_s(), lane_segment.end_s());
     if (adjusted_start_s < adjusted_end_s) {
       const auto lane_info =
-          hdmap_->get_lane_by_id(common::util::MakeMapId(lane_segment.id()));
+          hdmap_.get_lane_by_id(common::util::MakeMapId(lane_segment.id()));
       if (lane_info == nullptr) {
         AERROR << "Failed to find lane " << lane_segment.id() << " in map";
         return false;
@@ -344,7 +348,7 @@ bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
     double last_s = last_segment.end_s();
     while (router_s < end_s - kRouteEpsilon) {
       const auto lane =
-          hdmap_->get_lane_by_id(common::util::MakeMapId(last_lane_id));
+          hdmap_.get_lane_by_id(common::util::MakeMapId(last_lane_id));
       if (lane == nullptr) {
         break;
       }
@@ -405,7 +409,7 @@ void PncMap::append_lane_to_points(
   }
 }
 
-const hdmap::HDMap *PncMap::HDMap() const { return hdmap_; }
+const hdmap::HDMap *PncMap::HDMap() const { return &hdmap_; }
 
 }  // namespace hdmap
 }  // namespace apollo

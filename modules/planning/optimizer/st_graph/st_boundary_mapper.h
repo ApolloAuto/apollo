@@ -30,7 +30,7 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/map/hdmap/hdmap.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed_limit.h"
@@ -55,7 +55,7 @@ class StBoundaryMapper {
       std::vector<StGraphBoundary>* const boundary) const = 0;
 
   virtual apollo::common::Status get_speed_limits(
-      const apollo::localization::Pose& pose, const apollo::hdmap::HDMap& map,
+      const apollo::localization::Pose& pose, const apollo::hdmap::PncMap* map,
       const PathData& path_data, const double planning_distance,
       const std::uint32_t matrix_dimension_s, const double default_speed_limit,
       SpeedLimit* const speed_limit_data);
