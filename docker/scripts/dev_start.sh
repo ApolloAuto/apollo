@@ -66,6 +66,7 @@ function find_device() {
 }
 
 function main(){
+    #FIX ME: remove login when open source.
     docker login -u autoapollo -p baidu123
     docker pull $IMG
     
