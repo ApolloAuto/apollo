@@ -240,7 +240,7 @@ function gen_coverage() {
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
-  
+
   generate_test_targets_opt
   echo "$TEST_TARGETS" | xargs bazel test --define ARCH="$(uname -m)" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --config=coverage
   if [ $? -ne 0 ]; then
@@ -342,11 +342,18 @@ function buildify() {
   rm ~/.buildifier
 }
 
+function build_fe() {
+  cd modules/dreamview/frontend
+  yarn build
+  cd -
+}
+
 function print_usage() {
   echo 'Usage:
   ./apollo.sh [OPTION]'
   echo 'Options:
-  build : run build only
+  build: run build only
+  build_fe: compile frontend nodejs code, this requires all the node_modules to be installed already
   buildify: fix style of BUILD files
   check: run build/lint/test, please make sure it passes before checking in new code
   clean: runs Bazel clean
@@ -457,6 +464,9 @@ function main() {
       ;;
     build)
       apollo_build
+      ;;
+    build_fe)
+      build_fe
       ;;
     buildify)
       buildify
