@@ -53,7 +53,7 @@ TEST_F(HDMapInputTest, test_GetROI) {
   pcl_util::PointD velodyne_pose_world = {435730.0, 4436777.0, 0.0};
   EXPECT_FALSE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
   FLAGS_map_file =
-      "modules/perception/testdata/hdmap_input_test/"
+      "modules/perception/data/hdmap_input_test/"
       "base_map_with_boundary.txt";
   EXPECT_TRUE(hdmap_input_->Init());
   EXPECT_TRUE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
