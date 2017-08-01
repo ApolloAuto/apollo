@@ -48,7 +48,7 @@ if [[ $# == 1 ]];then
     VERSION=$1
 fi
 if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/apollo
+    DOCKER_REPO=apolloauto/internal
 fi
 IMG=${DOCKER_REPO}:$VERSION
 

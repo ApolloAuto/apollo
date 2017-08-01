@@ -18,7 +18,7 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20170724_1900"
+VERSION_X86_64="dev-x86_64-20170731_1713"
 VERSION_AARCH64="dev-aarch64-20170712_1533"
 if [[ $# == 1 ]];then
     VERSION=$1
@@ -32,7 +32,7 @@ else
 fi
 
 if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/apollo
+    DOCKER_REPO=apolloauto/internal
 fi
 
 IMG=${DOCKER_REPO}:$VERSION
