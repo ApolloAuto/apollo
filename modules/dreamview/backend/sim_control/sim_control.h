@@ -95,6 +95,10 @@ class SimControl {
   // Whether it is the first time the SimControl gets started.
   bool initial_start_;
 
+  // Whether the sim control is enabled.
+  // TODO(siyangy): This could be toggled by frontend.
+  bool enabled_;
+
   apollo::common::TrajectoryPoint prev_point_;
   apollo::common::TrajectoryPoint next_point_;
 };
