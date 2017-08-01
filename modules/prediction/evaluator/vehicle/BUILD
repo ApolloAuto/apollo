@@ -30,13 +30,17 @@ cc_test(
     srcs = [
         "mlp_evaluator_test.cc",
     ],
-    data = ["//modules/prediction:prediction_data"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
     deps = [
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "@gtest//:main",
         "//modules/prediction/common:prediction_gflags",
         "//modules/perception/proto:perception_proto",
         "//modules/common/util:util",
+        "//modules/prediction/container/obstacles:obstacles_container",
     ],
 )
 

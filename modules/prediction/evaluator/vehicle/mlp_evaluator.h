@@ -56,6 +56,8 @@ class MLPEvaluator : public Evaluator {
   void ExtractFeatureValues(Obstacle* obstacle_ptr,
                             LaneSequence* lane_sequence_ptr);
 
+  const std::vector<double>& feature_values() const;
+
   /**
    * @brief Clear obstacle feature map
    */
