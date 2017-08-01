@@ -59,7 +59,7 @@ class RTKReplayPlanner : public Planner {
    */
   apollo::common::Status Plan(
       const apollo::common::TrajectoryPoint& start_point,
-      ADCTrajectory* trajectory_pb) override;
+      PublishableTrajectory* ptr_publishable_trajectory) override;
 
   /**
    * @brief Read the recorded trajectory file.

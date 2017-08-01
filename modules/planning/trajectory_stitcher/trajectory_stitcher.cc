@@ -26,8 +26,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
-#include <iostream>
-
 namespace apollo {
 namespace planning {
 
@@ -43,19 +41,23 @@ std::vector<TrajectoryPoint> compute_reinit_stitching_trajectory() {
       VehicleState::instance()->heading());
   init_point.mutable_path_point()->set_kappa(VehicleState::instance()->kappa());
 
-  // TODO(all): the time is not correct, it should be
-  // FLAGS_forward_predict_time.
   init_point.set_relative_time(0.0);
-
-  // TODO(all): the init point should be some future point, not current
-  // vehicle state
-  // TODO(all): need vehicle bicycle model to compute the overhead
-  // trajectory.
   return std::vector<TrajectoryPoint>(1, init_point);
 };
 
+// Planning from current vehicle state:
+// if 1. the auto-driving mode is off or
+//    2. we don't have the trajectory from last planning cycle or
+//    3. the position deviation from actual and target is too high
 std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
+    const bool is_on_auto_mode,
+    const double vehicle_state_time,
     const PublishableTrajectory& prev_trajectory) {
+
+  if (!is_on_auto_mode) {
+    return compute_reinit_stitching_trajectory();
+  }
+
   std::size_t prev_trajectory_size = prev_trajectory.num_of_points();
 
   if (prev_trajectory_size == 0) {
@@ -66,7 +68,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
   }
 
   const double veh_rel_time =
-      VehicleState::instance()->timestamp() - prev_trajectory.header_time();
+      vehicle_state_time - prev_trajectory.header_time();
 
   std::size_t matched_index = prev_trajectory.query_nearest_point(veh_rel_time);
 
