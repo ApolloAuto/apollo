@@ -36,6 +36,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::VehicleState;
 
 namespace {
 
@@ -227,43 +228,80 @@ void Planning::Stop() {}
 
 bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
                     ADCTrajectory* trajectory_pb) {
-  // if 1. the auto-driving mode is off or
-  //    2. we don't have the trajectory from last planning cycle or
-  //    3. the position deviation from actual and target is too high
-  // then planning from current vehicle state.
+
+  double vehicle_state_time = VehicleState::instance()->timestamp();
   auto stitching_trajectory = TrajectoryStitcher::compute_stitching_trajectory(
+      is_on_auto_mode,
+      vehicle_state_time,
       last_publishable_trajectory_);
 
   auto planning_start_point = stitching_trajectory.back();
 
+  PublishableTrajectory publishable_trajectory;
+  auto status = planner_->Plan(planning_start_point, &publishable_trajectory);
+
   if (FLAGS_enable_record_debug) {
-    trajectory_pb->mutable_debug()
-        ->mutable_planning_data()
-        ->mutable_init_point()
-        ->CopyFrom(stitching_trajectory.back());
+    trajectory_pb->mutable_debug()->mutable_planning_data()->mutable_init_point()->CopyFrom(
+        stitching_trajectory.back());
     trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(
-        (stitching_trajectory.size() == 1));
+    stitching_trajectory.size() == 1);
+
+    //TODO: check whether current planner is EM planner.
+    auto& em_debugger =
+        dynamic_cast<EMPlanner*>(planner_.get())->em_planner_debugger();
+
+    for (auto it = em_debugger.paths_.begin(); it != em_debugger.paths_.end();
+        ++it) {
+      auto ptr_path_planning_info =
+          trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
+      ptr_path_planning_info->set_name(it->first);
+      ptr_path_planning_info->mutable_path_point()->CopyFrom(
+          { it->second.first.points().begin(), it->second.first.points().end() });
+
+      auto ptr_stats =
+          trajectory_pb->mutable_latency_stats()->add_processor_stats();
+      ptr_stats->set_name(it->first);
+      ptr_stats->set_time_ms(it->second.second);
+    }
+
+    for (auto it = em_debugger.speed_profiles_.begin();
+        it != em_debugger.speed_profiles_.end(); ++it) {
+      auto ptr_speed_planning_info =
+          trajectory_pb->mutable_debug()->mutable_planning_data()->add_speed_plan();
+      ptr_speed_planning_info->set_name(it->first);
+      ptr_speed_planning_info->mutable_speed_point()->CopyFrom(
+          { it->second.first.begin(), it->second.first.end() });
+
+      auto ptr_stats =
+          trajectory_pb->mutable_latency_stats()->add_processor_stats();
+      ptr_stats->set_name(it->first);
+      ptr_stats->set_time_ms(it->second.second);
+    }
+
+    auto ptr_reference_line =
+        trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
+    ptr_reference_line->set_name("planning_reference_line");
+
+    ptr_reference_line->mutable_path_point()->CopyFrom(
+        { em_debugger.reference_line_.begin(), em_debugger.reference_line_.end() });
   }
 
-  auto status = planner_->Plan(planning_start_point, trajectory_pb);
   if (status != Status::OK()) {
     AERROR << "planner failed to make a driving plan";
     last_publishable_trajectory_.Clear();
     return false;
   }
 
-  InsertFrontTrajectoryPoints(stitching_trajectory.begin(),
-                              stitching_trajectory.end() - 1,
-                              trajectory_pb);
+  auto& trajectory_points = publishable_trajectory.trajectory_points();
+  trajectory_points.insert(trajectory_points.begin(),
+      stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+
+  publishable_trajectory.set_header_time(vehicle_state_time);
+
+  publishable_trajectory.populate_trajectory_protobuf(trajectory_pb);
 
   // update last publishable trajectory;
-  last_publishable_trajectory_.Clear();
-  for (int i = 0; i < trajectory_pb->trajectory_point_size(); ++i) {
-    last_publishable_trajectory_.add_trajectory_point(
-        trajectory_pb->trajectory_point(i));
-  }
-  last_publishable_trajectory_.set_header_time(
-      trajectory_pb->header().timestamp_sec());
+  last_publishable_trajectory_ = std::move(publishable_trajectory);
   return true;
 }
 

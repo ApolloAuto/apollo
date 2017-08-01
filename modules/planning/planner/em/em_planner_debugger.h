@@ -14,35 +14,28 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file trajectory_stitcher.h
- **/
+#ifndef MODULES_PLANNING_PLANNER_EM_EM_PLANNER_DEBUGGER_H_
+#define MODULES_PLANNING_PLANNER_EM_EM_PLANNER_DEBUGGER_H_
 
-#ifndef MODULES_PLANNING_TRAJECTORY_STITCHER_H_
-#define MODULES_PLANNING_TRAJECTORY_STITCHER_H_
+#include <unordered_map>
+#include <string>
 
-#include <vector>
-
-#include "modules/common/proto/pnc_point.pb.h"
-
-#include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/common/path/discretized_path.h"
+#include "modules/planning/reference_line/reference_point.h"
 
 namespace apollo {
 namespace planning {
 
-class TrajectoryStitcher {
+class EMPlannerDebugger {
  public:
-  TrajectoryStitcher() = delete;
+  std::unordered_map<std::string, std::pair<DiscretizedPath, double>> paths_;
 
-  static std::vector<TrajectoryPoint> compute_stitching_trajectory(
-      const bool is_on_auto_mode,
-      const double vehicle_state_time,
-      const PublishableTrajectory& prev_trajectory);
+  std::unordered_map<std::string, std::pair<std::vector<common::SpeedPoint>, double>> speed_profiles_;
+
+  std::vector<ReferencePoint> reference_line_;
 };
 
-}  // namespace planning
-}  // namespace apollo
+} //namespace planning
+} //namespace apollo
 
-#endif  // MODULES_PLANNING_TRAJECTORY_STITCHER_H_
+#endif /* MODULES_PLANNING_PLANNER_EM_EM_PLANNER_DEBUGGER_H_ */
