@@ -246,6 +246,11 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
   double delta_ts = FLAGS_prediction_freq;
   KalmanFilter<double, 2, 2, 4> kf = kf_pedestrian_tracker;
   // set the control matrix and control vector
+  Eigen::Matrix<double, 2, 2> P = kf.GetStateCovariance();
+  Eigen::Matrix<double, 2, 1> x;
+  x.setZero();
+  kf.SetStateEstimate(x, P);
+
   Eigen::Matrix<double, 2, 4> B;
   B(0, 0) = delta_ts;
   B(0, 2) = 0.5 * delta_ts * delta_ts;
