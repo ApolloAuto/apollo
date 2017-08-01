@@ -39,6 +39,11 @@ Status Dreamview::Init() {
   AdapterManager::Init();
   VehicleConfigHelper::Init();
 
+  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  CHECK(AdapterManager::GetPlanning()) << "Planning is not initialized.";
+  CHECK(AdapterManager::GetLocalization())
+      << "Localization is not initialized.";
+
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
   server_.reset(
@@ -50,20 +55,22 @@ Status Dreamview::Init() {
   map_service_.reset(new MapService(FLAGS_dreamview_map));
   sim_world_updater_.reset(
       new SimulationWorldUpdater(websocket_.get(), map_service_.get()));
+  sim_control_.reset(new SimControl());
 
   return Status::OK();
 }
 
 Status Dreamview::Start() {
-  // start ROS timer, one-shot = false, auto-start = true
-  timer_ = AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeInterval),
-                                       &SimulationWorldUpdater::OnPushTimer,
-                                       sim_world_updater_.get());
+  sim_world_updater_->Start();
+  if (FLAGS_enable_sim_control) {
+    sim_control_->Start();
+  }
   return Status::OK();
 }
 
 void Dreamview::Stop() {
   server_->close();
+  sim_control_->Stop();
 }
 
 }  // namespace dreamview

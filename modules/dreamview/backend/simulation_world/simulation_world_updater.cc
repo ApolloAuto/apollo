@@ -24,6 +24,7 @@
 namespace apollo {
 namespace dreamview {
 
+using apollo::common::adapter::AdapterManager;
 using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
@@ -50,6 +51,13 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           websocket_->SendData(response.dump(), conn);
         }
       });
+}
+
+void SimulationWorldUpdater::Start() {
+  // start ROS timer, one-shot = false, auto-start = true
+  timer_ =
+      AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeInterval),
+                                  &SimulationWorldUpdater::OnPushTimer, this);
 }
 
 void SimulationWorldUpdater::OnPushTimer(const ros::TimerEvent &event) {

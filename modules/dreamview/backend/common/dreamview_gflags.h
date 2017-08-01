@@ -29,6 +29,6 @@ DECLARE_int32(server_port);
 
 DECLARE_bool(enable_sim_control);
 
-DECLARE_string(routing_request_file);
+DECLARE_string(routing_result_file);
 
 #endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
