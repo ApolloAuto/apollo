@@ -224,7 +224,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
         ->mutable_init_point()
         ->CopyFrom(stitching_trajectory.back());
     trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(
-        true);
+        (stitching_trajectory.size() == 1));
   }
 
   auto status = planner_->Plan(planning_start_point, trajectory_pb);
@@ -235,9 +235,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   }
 
   InsertFrontTrajectoryPoints(trajectory_pb,
-          std::vector<decltype(planning_start_point)>(
-                  stitching_trajectory.begin(),
-                  stitching_trajectory.end() - 1));
+      {stitching_trajectory.begin(), stitching_trajectory.end() - 1});
 
   // update last publishable trajectory;
   last_publishable_trajectory_.Clear();
