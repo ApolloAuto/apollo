@@ -20,7 +20,6 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -80,10 +79,6 @@ class Planning : public apollo::common::ApolloApp {
             ADCTrajectory* trajectory_pb);
 
  private:
-  void InsertFrontTrajectoryPoints(
-      ADCTrajectory* trajectory_pb,
-      const std::vector<apollo::common::TrajectoryPoint>& points) const;
-
   void RegisterPlanners();
 
   void RunOnce();
