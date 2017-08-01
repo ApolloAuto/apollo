@@ -353,7 +353,7 @@ function print_usage() {
   ./apollo.sh [OPTION]'
   echo 'Options:
   build: run build only
-  build_fe: compile frontend nodejs code, this requires all the node_modules to be installed already
+  build_fe: compile frontend javascript code, this requires all the node_modules to be installed already
   buildify: fix style of BUILD files
   check: run build/lint/test, please make sure it passes before checking in new code
   clean: runs Bazel clean
