@@ -19,7 +19,7 @@
 
 TIME=$(date  +%Y%m%d_%H%M)
 if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/apollo
+    DOCKER_REPO=apolloauto/internal
 fi
 
 
