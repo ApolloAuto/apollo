@@ -31,6 +31,8 @@ void AdapterManager::Observe() {
   }
 }
 
+bool AdapterManager::Initialized() { return instance()->initialized_; }
+
 void AdapterManager::Init() { Init(FLAGS_adapter_config_path); }
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {
@@ -44,6 +46,7 @@ void AdapterManager::Init(const std::string &adapter_config_filename) {
 }
 
 void AdapterManager::Init(const AdapterManagerConfig &configs) {
+  instance()->initialized_ = true;
   if (configs.is_ros()) {
     instance()->node_handle_.reset(new ros::NodeHandle());
   }
@@ -109,7 +112,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::ROUTING_RESULT:
         EnableRoutingResult(FLAGS_routing_result_topic, config.mode(),
-                      config.message_history_limit());
+                            config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";
