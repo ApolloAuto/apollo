@@ -47,6 +47,8 @@ class Obstacle {
   void Insert(const apollo::perception::PerceptionObstacle& perception_obstacle,
               const double timestamp);
 
+  apollo::perception::PerceptionObstacle::Type type() const;
+
   int id() const;
 
   double timestamp() const;
