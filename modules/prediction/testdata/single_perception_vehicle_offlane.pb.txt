@@ -4,7 +4,7 @@ header {
   sequence_num: 15839
 }
 perception_obstacle {
-  id: 1
+  id: 15
   position {
     x: -438.614,
     y: -173.366,
