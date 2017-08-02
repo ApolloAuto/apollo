@@ -143,9 +143,6 @@ cc_library(
 
 cc_library(
     name = "frame_history",
-    hdrs = [
-        "frame_hisotry.h",
-    ],
     deps = [
         ":frame",
         ":indexed_queue",
