@@ -51,11 +51,11 @@ const Frame* Planning::GetFrame() const { return frame_.get(); }
 const hdmap::PncMap* Planning::GetPncMap() const { return pnc_map_.get(); }
 
 bool Planning::InitFrame(const uint32_t sequence_num) {
+  frame_.reset(new Frame(sequence_num));
   if (AdapterManager::GetRoutingResult()->Empty()) {
     AERROR << "Routing is empty";
     return false;
   }
-  frame_.reset(new Frame(sequence_num));
   common::TrajectoryPoint point;
   frame_->SetVehicleInitPose(VehicleState::instance()->pose());
   frame_->SetRoutingResult(
