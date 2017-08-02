@@ -16,10 +16,10 @@
 
 #include <string>
 
-#include "common/utils.h"
 #include "gtest/gtest.h"
+#include "modules/routing/common/utils.h"
 
-#include "topo_graph.pb.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
