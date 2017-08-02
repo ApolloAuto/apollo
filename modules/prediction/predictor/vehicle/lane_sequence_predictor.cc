@@ -248,6 +248,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
            lane_segment_index + 1 < sequence.lane_segment_size()) {
       lane_segment_index += 1;
       lane_s = lane_s - map->LaneById(lane_id)->total_length();
+      state(0, 0) = lane_s;
       lane_id = sequence.lane_segment(lane_segment_index).lane_id();
     }
   }
