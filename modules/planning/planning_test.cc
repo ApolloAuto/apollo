@@ -53,10 +53,10 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   common::VehicleState::instance()->set_angular_velocity(0.0);
 
   ADCTrajectory trajectory1;
-  double time1 = 0.1;
   planning.Init();
   planning.InitFrame(1);
   /**
+  double time1 = 0.1;
   planning.Plan(false, time1, &trajectory1);
 
   EXPECT_EQ(trajectory1.trajectory_point_size(), FLAGS_rtk_trajectory_forward);
