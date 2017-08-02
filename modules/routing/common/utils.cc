@@ -14,12 +14,11 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "common/utils.h"
-#include "ros/ros.h"
-
+#include "modules/routing/common/utils.h"
 #include <fcntl.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace routing {
@@ -33,7 +32,7 @@ bool FileUtils::load_protobuf_data_from_file(
     ::google::protobuf::Message* const proto_data) {
   int fd = open(file_path.c_str(), O_RDONLY);
   if (fd == -1) {
-    ROS_ERROR("File %s not found", file_path.c_str());
+    AERROR << "File %s not found" << file_path.c_str();
     return false;
   }
   std::unique_ptr<ZeroCopyInputStream> raw_input(new FileInputStream(fd));
@@ -56,15 +55,15 @@ bool FileUtils::dump_protobuf_data_to_file(
     const ::google::protobuf::Message& proto_data) {
   int fd = open(file_path.c_str(), O_CREAT | O_TRUNC | O_RDWR, 0644);
   if (fd < 0 || !proto_data.SerializeToFileDescriptor(fd)) {
-    ROS_ERROR("Error occured while trying to write to file: %s",
-              file_path.c_str());
+    AERROR << "Error occured while trying to write to file: %s"
+           << file_path.c_str();
     return false;
   }
   if (close(fd) != 0) {
-    ROS_ERROR("Error occured while close fd. Please check the file!");
+    AERROR << "Error occured while close fd. Please check the file!";
     return false;
   }
-  ROS_INFO("Proto data dump done!");
+  AINFO << "Proto data dump done!";
   return true;
 }
 

@@ -14,7 +14,7 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "common/routing_gflags.h"
+#include "modules/routing/common/routing_gflags.h"
 
 DEFINE_string(node_name, "routing", "the name for this node");
 DEFINE_string(node_namespace, "routing", "the namespace for this node");
