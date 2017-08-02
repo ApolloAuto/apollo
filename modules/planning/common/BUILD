@@ -16,14 +16,19 @@ cc_library(
 )
 
 cc_library(
-    name = "object_table",
-    srcs = [
-        "object_table.cc",
+    name = "indexed_list",
+    hdrs = [
+        "indexed_list.h",
     ],
+)
+
+cc_library(
+    name = "object_table",
     hdrs = [
         "object_table.h",
     ],
     deps = [
+        ":indexed_list",
         ":obstacle",
         ":planning_gflags",
     ],

@@ -25,22 +25,14 @@
 #include <string>
 #include <unordered_map>
 
+#include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-class ObjectTable {
- public:
-  ObjectTable() = default;
-  Obstacle* get_obstacle(const uint32_t id);
-  Obstacle* get_obstacle(const std::string& id);
-  void add_obstacle(const Obstacle& obstacle);
-
- private:
-  std::unordered_map<std::string, std::unique_ptr<Obstacle>> _obstacle_cache;
-};
+using ObjectTable = IndexedList<uint32_t, Obstacle>;
 
 }  // namespace planning
 }  // namespace apollo
