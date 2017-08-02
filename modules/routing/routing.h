@@ -19,9 +19,12 @@
 
 #include <memory>
 
-#include "routing/routing_signal.h"
 #include "common/routing_gflags.h"
 #include "common/routing_macros.h"
+
+
+#include "modules/common/apollo_app.h"
+#include "modules/common/monitor/monitor.h"
 
 namespace apollo {
 namespace routing {
@@ -29,21 +32,42 @@ namespace routing {
 class Navigator;
 
 class Routing : public apollo::common::ApolloApp {
-  friend class RoutingTestBase;
+ // friend class RoutingTestBase;
  public:
-  ~Routing();
-  bool run();
+  Routing() : monitor_(apollo::common::monitor::MonitorMessageItem::Routing) {}
+
+  /**
+   * @brief module name
+   */
+  std::string Name() const override;
+
+  /**
+   * @brief module initialization function
+   * @return initialization status
+   */
+  apollo::common::Status Init() override;
+
+  /**
+   * @brief module start function
+   * @return start status
+   */
+  apollo::common::Status Start() override;
+
+  /**
+   * @brief module stop function
+   */
+  void Stop() override;
+
+  /**
+   * @brief destructor
+   */
+  virtual ~Routing() = default;
 
  private:
-  bool on_request(routing::routing_signal::Request& req,
-                  routing::routing_signal::Response& res);
+  void OnRouting_Request(const apollo::routing::RoutingRequest &routing_req);
 
  private:
-  std::unique_ptr<ros::NodeHandle> _node_handle_ptr;
-  ros::ServiceServer _service;
-  ros::Publisher _publisher;
   std::unique_ptr<Navigator> _navigator_ptr;
-  DECLARE_ARBITER_SINGLETON(Routing);
 };
 
 }  // namespace routing

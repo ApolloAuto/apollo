@@ -19,7 +19,7 @@
 #include "gflags/gflags.h"
 #include "glog/logging.h"
 
-#include "topo_creator/graph_creator.h"
+#include "modules/routing/topo_creator/graph_creator.h"
 
 DEFINE_string(base_map_dir, "/home/caros/adu_data/map",
               "directory of base map");
