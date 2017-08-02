@@ -73,9 +73,9 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   std::vector<StGraphBoundary> boundaries;
   if (!boundary_mapper_
            .GetGraphBoundary(init_point, *decision_data, path_data,
-                               reference_line,
-                               dp_st_speed_config_.total_path_length(),
-                               dp_st_speed_config_.total_time(), &boundaries)
+                             reference_line,
+                             dp_st_speed_config_.total_path_length(),
+                             dp_st_speed_config_.total_time(), &boundaries)
            .ok()) {
     const std::string msg =
         "Mapping obstacle for dp st speed optimizer failed.";
@@ -85,11 +85,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 2 perform graph search
   SpeedLimit speed_limit;
-  if (!boundary_mapper_
-           .GetSpeedLimits(common::VehicleState::instance()->pose(),
-                                  Frame::PncMap(), path_data, planning_distance,
-                                  dp_st_speed_config_.matrix_dimension_s(),
-                                  dp_st_speed_config_.max_speed(), &speed_limit)
+  if (!boundary_mapper_.GetSpeedLimits(reference_line, path_data, &speed_limit)
            .ok()) {
     const std::string msg =
         "Getting speed limits for dp st speed optimizer failed!";
