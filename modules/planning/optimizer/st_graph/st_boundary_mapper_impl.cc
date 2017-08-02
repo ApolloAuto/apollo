@@ -187,7 +187,7 @@ Status StBoundaryMapperImpl::map_main_decision_stop(
                                planning_time);
   boundary_points.emplace_back(s_max, 0.0);
 
-  const double area = get_area(boundary_points);
+  const double area = GetArea(boundary_points);
   if (Double::compare(area, 0.0) <= 0) {
     return Status(ErrorCode::PLANNING_SKIP);
   }
@@ -214,7 +214,7 @@ Status StBoundaryMapperImpl::map_mission_complete(
                                planning_time);
   boundary_points.emplace_back(s_min, planning_time);
 
-  const double area = get_area(boundary_points);
+  const double area = GetArea(boundary_points);
   if (Double::compare(area, 0.0) <= 0) {
     return Status(ErrorCode::PLANNING_SKIP);
   }
@@ -274,7 +274,7 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
           break;
         }
         if (!find_low) {
-          if (!check_overlap(adc_path_points[low], vehicle_param(), obs_box,
+          if (!CheckOverlap(adc_path_points[low], vehicle_param(), obs_box,
                              st_boundary_config().boundary_buffer())) {
             ++low;
           } else {
@@ -282,7 +282,7 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
           }
         }
         if (!find_high) {
-          if (!check_overlap(adc_path_points[high], vehicle_param(), obs_box,
+          if (!CheckOverlap(adc_path_points[high], vehicle_param(), obs_box,
                              st_boundary_config().boundary_buffer())) {
             --high;
           } else {
@@ -354,7 +354,7 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
           boundary_points.at(3).set_s(boundary_points.at(3).s() + dis);
         }
 
-        const double area = get_area(boundary_points);
+        const double area = GetArea(boundary_points);
         if (Double::compare(area, 0.0) > 0) {
           boundary->emplace_back(boundary_points);
           boundary->back().set_boundary_type(b_type);
@@ -435,7 +435,7 @@ Status StBoundaryMapperImpl::map_obstacle_without_prediction_trajectory(
   boundary_points.emplace_back(s_max_upper, planning_time);
   boundary_points.emplace_back(s_min_upper, 0.0);
 
-  const double area = get_area(boundary_points);
+  const double area = GetArea(boundary_points);
   if (Double::compare(area, 0.0) <= 0) {
     std::string msg = "Do not need to map because area is zero.";
     AINFO << msg;

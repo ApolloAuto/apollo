@@ -55,25 +55,23 @@ class StBoundaryMapper {
       std::vector<StGraphBoundary>* const boundary) const = 0;
 
   virtual apollo::common::Status GetSpeedLimits(
-      const apollo::localization::Pose& pose, const apollo::hdmap::PncMap* map,
-      const PathData& path_data, const double planning_distance,
-      const std::uint32_t matrix_dimension_s, const double default_speed_limit,
-      SpeedLimit* const speed_limit_data);
+      const ReferenceLine& reference_line, const PathData& path_data,
+      SpeedLimit* const speed_limit_data) const;
 
  protected:
-  const apollo::planning::StBoundaryConfig& st_boundary_config() const;
+  const StBoundaryConfig& st_boundary_config() const;
   const apollo::common::VehicleParam& vehicle_param() const {
     return common::VehicleConfigHelper::GetConfig().vehicle_param();
   }
 
-  double get_area(const std::vector<STPoint>& boundary_points) const;
-  bool check_overlap(const apollo::common::PathPoint& path_point,
-                     const apollo::common::VehicleParam& params,
-                     const apollo::common::math::Box2d& obs_box,
-                     const double buffer) const;
+  double GetArea(const std::vector<STPoint>& boundary_points) const;
+  bool CheckOverlap(const apollo::common::PathPoint& path_point,
+                    const apollo::common::VehicleParam& params,
+                    const apollo::common::math::Box2d& obs_box,
+                    const double buffer) const;
 
  private:
-  apollo::planning::StBoundaryConfig _st_boundary_config;
+  StBoundaryConfig st_boundary_config_;
 };
 
 }  // namespace planning
