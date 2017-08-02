@@ -37,17 +37,32 @@ QpSplineStGraph::QpSplineStGraph(
     const QpSplineStSpeedConfig& qp_spline_st_speed_config,
     const apollo::common::VehicleParam& veh_param)
     : qp_spline_st_speed_config_(qp_spline_st_speed_config),
-      time_resolution_(
+      time_resolution_(qp_spline_st_speed_config_.total_time() /
+                       qp_spline_st_speed_config_.number_of_discrete_graph_t()),
+      evaluation_time_resolution_(
           qp_spline_st_speed_config_.total_time() /
-          qp_spline_st_speed_config_.number_of_discrete_graph_t()) {}
+          qp_spline_st_speed_config_.number_of_evaluated_graph_t())
+
+{}
 
 void QpSplineStGraph::Init() {
+  // init knots
   double curr_t = 0.0;
   for (uint32_t i = 0;
        i <= qp_spline_st_speed_config_.number_of_discrete_graph_t(); ++i) {
     t_knots_.push_back(curr_t);
     curr_t += time_resolution_;
   }
+
+  // init evaluated t positions
+  curr_t = 0.0;
+  for (uint32_t i = 0;
+       i <= qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
+    t_evaluated_.push_back(curr_t);
+    curr_t += evaluation_time_resolution_;
+  }
+
+  // init spline generator
   spline_generator_.reset(new Spline1dGenerator(
       t_knots_, qp_spline_st_speed_config_.spline_order()));
 }
@@ -156,7 +171,7 @@ Status QpSplineStGraph::ApplyConstraint(
   std::vector<double> s_upper_bound;
   std::vector<double> s_lower_bound;
 
-  for (const double curr_t : t_knots_) {
+  for (const double curr_t : t_evaluated_) {
     double lower_s = 0.0;
     double upper_s = 0.0;
     GetSConstraintByTime(boundaries, curr_t,
@@ -165,7 +180,8 @@ Status QpSplineStGraph::ApplyConstraint(
     s_upper_bound.push_back(upper_s);
     s_lower_bound.push_back(lower_s);
   }
-  if (!constraint->add_fx_boundary(t_knots_, s_lower_bound, s_upper_bound)) {
+  if (!constraint->add_fx_boundary(t_evaluated_, s_lower_bound,
+                                   s_upper_bound)) {
     const std::string msg = "Fail to apply obstacle constraint";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

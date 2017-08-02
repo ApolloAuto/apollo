@@ -92,8 +92,12 @@ class QpSplineStGraph {
   // time resolution
   double time_resolution_ = 0.0;
 
-  // t_knots
+  // knots
   std::vector<double> t_knots_;
+
+  double evaluation_time_resolution_ = 0.0;
+  // evaluated points
+  std::vector<double> t_evaluated_;
 };
 
 }  // namespace planning
