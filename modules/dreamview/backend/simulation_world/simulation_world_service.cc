@@ -265,7 +265,6 @@ constexpr double SimulationWorldService::kMapRadius;
 
 SimulationWorldService::SimulationWorldService(MapService *map_service)
     : map_service_(map_service) {
-  world_.set_map_md5("initialize");
   RegisterMonitorCallback();
 }
 
