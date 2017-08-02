@@ -26,7 +26,7 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
-#include "modules/dreamview/backend/simulation_world/trajectory_point_collector.h"
+#include "modules/dreamview/backend/util/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"

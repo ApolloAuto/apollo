@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/simulation_world/trajectory_point_collector.h"
+#include "modules/dreamview/backend/util/trajectory_point_collector.h"
 
 #include <cmath>
 
