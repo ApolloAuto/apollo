@@ -127,7 +127,7 @@
       </div>
       <div class="col-xs-4 quick_start_col2">
         <button type="button" class="btn hmi_large_btn"
-            onclick="ros_request('start_auto_driving')">Start Auto</button>
+            onclick="ros_request('restart_auto_driving')">Start Auto</button>
         <span class="glyphicon"></span>
       </div>
     </div>
