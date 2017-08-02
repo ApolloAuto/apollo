@@ -16,8 +16,8 @@
 
 #include "modules/prediction/evaluator/evaluator_factory.h"
 
-#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/common/log.h"
+#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 
 namespace apollo {
 namespace prediction {

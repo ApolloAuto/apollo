@@ -16,10 +16,9 @@
 
 #include "modules/prediction/predictor/predictor_factory.h"
 
-#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
-#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
-
 #include "modules/common/log.h"
+#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
+#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
 
 namespace apollo {
 namespace prediction {

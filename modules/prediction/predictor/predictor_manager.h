@@ -22,7 +22,6 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
 #define MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
 
-#include <unordered_map>
 #include <map>
 #include <memory>
 
@@ -92,8 +91,7 @@ class PredictorManager {
   void RegisterPredictors();
 
  private:
-  std::map<ObstacleConf::PredictorType,
-      std::unique_ptr<Predictor>> predictors_;
+  std::map<ObstacleConf::PredictorType, std::unique_ptr<Predictor>> predictors_;
 
   ObstacleConf::PredictorType vehicle_on_lane_predictor_ =
       ObstacleConf::LANE_SEQUENCE_PREDICTOR;

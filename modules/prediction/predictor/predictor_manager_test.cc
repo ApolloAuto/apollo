@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/predictor/predictor_manager.h"
+
 #include <string>
 
 #include "gtest/gtest.h"
-
-#include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/common/util/file.h"
 
@@ -27,7 +27,7 @@ namespace prediction {
 
 class PredictorManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
+  void SetUp() override {
     manager_ = PredictorManager::instance();
   }
 
@@ -38,10 +38,8 @@ class PredictorManagerTest : public ::testing::Test {
 
 TEST_F(PredictorManagerTest, GetPredictor) {
   std::string conf_file = "modules/prediction/testdata/prediction_conf.pb.txt";
-  bool ret_load_conf = ::apollo::common::util::GetProtoFromFile(conf_file,
-                                                                &conf_);
-  EXPECT_TRUE(ret_load_conf);
-  EXPECT_TRUE(conf_.IsInitialized());
+  CHECK(apollo::common::util::GetProtoFromFile(conf_file, &conf_))
+      << "Failed to load " << conf_file;
 
   manager_->Init(conf_);
 

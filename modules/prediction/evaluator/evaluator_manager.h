@@ -84,8 +84,7 @@ class EvaluatorManager {
   void RegisterEvaluators();
 
  private:
-  std::map<ObstacleConf::EvaluatorType,
-      std::unique_ptr<Evaluator>> evaluators_;
+  std::map<ObstacleConf::EvaluatorType, std::unique_ptr<Evaluator>> evaluators_;
 
   ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;
