@@ -71,7 +71,8 @@ class DpStSpeedTest : public OptimizerTestBase {
     OptimizerTestBase::SetUp();
     SetInitPoint();
     SetPathDataWithStraightLine();
-    reference_line_ = &(frame_->planning_data().reference_line());
+    const auto* frame = planning_.GetFrame();
+    reference_line_ = &(frame->planning_data().reference_line());
   }
 
  protected:
