@@ -15,38 +15,42 @@
  *****************************************************************************/
 
 /**
- * @file object_table.cc
+ * @file indexed_list.h
  **/
 
-#include "modules/planning/common/object_table.h"
+#ifndef MODULES_PLANNING_COMMON_INDEXED_LIST_H_
+#define MODULES_PLANNING_COMMON_INDEXED_LIST_H_
 
 #include <memory>
-#include <utility>
-
-#include "modules/common/log.h"
+#include <unordered_map>
+#include <vector>
 
 namespace apollo {
 namespace planning {
 
-Obstacle* ObjectTable::get_obstacle(const uint32_t id) {
-  return get_obstacle(std::to_string(id));
-}
-
-Obstacle* ObjectTable::get_obstacle(const std::string& id) {
-  auto iter = _obstacle_cache.find(id);
-  if (iter != _obstacle_cache.end()) {
-    return iter->second.get();
-  } else {
-    AERROR << "Failed to find object " << id;
-    return nullptr;
+template <typename I, typename T>
+class IndexedList {
+ public:
+  void Add(const I id, std::unique_ptr<T> ptr) {
+    _object_list.push_back(ptr.get());
+    _object_dict[id] = std::move(ptr);
   }
-}
+  T* Find(const I id) {
+    auto iter = _object_dict.find(id);
+    if (iter == _object_dict.end()) {
+      return nullptr;
+    } else {
+      return iter->second.get();
+    }
+  }
+  const std::vector<T*>& Items() const { return _object_list; }
 
-void ObjectTable::add_obstacle(const Obstacle& obstacle) {
-  auto ptr = std::unique_ptr<Obstacle>();
-  *ptr = obstacle;
-  _obstacle_cache[ptr->Id()] = std::move(ptr);
-}
+ private:
+  std::vector<const T*> _object_list;
+  std::unordered_map<I, std::unique_ptr<T>> _object_dict;
+};
 
 }  // namespace planning
 }  // namespace apollo
+
+#endif  // MODULES_PLANNING_COMMON_INDEXED_LIST_H
