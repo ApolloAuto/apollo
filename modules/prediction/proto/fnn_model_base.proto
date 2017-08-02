@@ -20,5 +20,6 @@ message Layer {
     optional int32 layer_output_dim = 2;
     optional Matrix layer_input_weight = 3;     // weight matrix of |input_dim| x |output_dim|
     optional Vector layer_bias = 4;             // vector of bias, size of |output_dim|
+    optional string layer_activation_type = 5 [deprecated = true];
     optional ActivationFunc layer_activation_func = 6;
 }
