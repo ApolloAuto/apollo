@@ -27,7 +27,6 @@ cc_library(
     deps = [
         ":optimizer",
         "//modules/common/status",
-        "//modules/planning/common:data_center",
         "//modules/planning/common:decision_data",
         "//modules/planning/common:planning_data",
         "//modules/planning/common/path:path_data",
@@ -47,7 +46,6 @@ cc_library(
     deps = [
         ":optimizer",
         "//modules/common/status",
-        "//modules/planning/common:data_center",
         "//modules/planning/common:decision_data",
         "//modules/planning/common:planning_data",
         "//modules/planning/common/path:path_data",

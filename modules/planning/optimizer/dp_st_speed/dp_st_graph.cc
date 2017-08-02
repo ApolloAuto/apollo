@@ -26,7 +26,6 @@
 
 #include "modules/common/log.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {

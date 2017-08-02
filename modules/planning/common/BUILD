@@ -102,6 +102,7 @@ cc_library(
     ],
     deps = [
         ":indexed_list",
+        ":indexed_queue",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/vehicle_state",
@@ -141,9 +142,9 @@ cc_library(
 )
 
 cc_library(
-    name = "data_center",
+    name = "frame_history",
     hdrs = [
-        "data_center.h",
+        "frame_hisotry.h",
     ],
     deps = [
         ":frame",
@@ -155,7 +156,6 @@ cc_library(
 cc_library(
     name = "planning_common",
     deps = [
-        ":data_center",
         ":frame",
         ":planning_gflags",
         ":speed_limit",

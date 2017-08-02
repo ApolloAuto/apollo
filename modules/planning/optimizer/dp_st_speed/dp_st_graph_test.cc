@@ -28,7 +28,6 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
