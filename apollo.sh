@@ -83,11 +83,10 @@ function check_esd_files() {
 
 function generate_build_targets() {
   BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
-    | grep -v "_cpplint$" | grep -v "release" | grep -v "kernel")
+    | grep -v "_cpplint$" | grep -v "release" | grep -v "kernel" | grep -v "modules/routing")
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
-
   if ! $USE_ESD_CAN; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
