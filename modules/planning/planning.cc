@@ -38,24 +38,6 @@ using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-namespace {
-
-template <typename Iter>
-void InsertFrontTrajectoryPoints(const Iter& start, const Iter& end,
-                                 ADCTrajectory* trajectory_pb) {
-  if (start == end) {
-    AINFO << "No points to prepend to ADCTrajectory.";
-    return;
-  }
-
-  using RepeatedPoints = google::protobuf::RepeatedPtrField<TrajectoryPoint>;
-  std::unique_ptr<RepeatedPoints> merged_points(new RepeatedPoints(start, end));
-  merged_points->MergeFrom(trajectory_pb->trajectory_point());
-  merged_points->Swap(trajectory_pb->mutable_trajectory_point());
-}
-
-}  // namespace
-
 std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
