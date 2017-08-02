@@ -3,8 +3,8 @@ package(default_visibility = ["//visibility:public"])
 # gets the filepath to protobuf
 genquery(
     name = "protobuf-root",
-    expression = "@com_github_google_protobuf//:protobuf",
-    scope = ["@com_github_google_protobuf//:protobuf"],
+    expression = "@com_google_protobuf//:protobuf",
+    scope = ["@com_google_protobuf//:protobuf"],
     opts = ["--output=location"]
 )
 
@@ -14,8 +14,8 @@ genrule(
     srcs = [
         ":protobuf-root",
         ":CMakeLists.txt",
-        "@com_github_google_protobuf//:protoc",
-        "@com_github_google_protobuf//:protobuf",
+        "@com_google_protobuf//:protoc",
+        "@com_google_protobuf//:protobuf",
     ],
     outs = [
         "lib/libcaffe.so",
@@ -29,8 +29,8 @@ genrule(
         outdir=$$srcdir/$(@D);
 
         protobuf_incl=$$(grep -oP "^/\\\S*(?=/)" $(location :protobuf-root))/src;
-        protoc=$$srcdir/$(location @com_github_google_protobuf//:protoc);
-        protolib=$$srcdir/$$(echo "$(locations @com_github_google_protobuf//:protobuf)" | grep -o "\\\S*/libprotobuf.so"); ''' +
+        protoc=$$srcdir/$(location @com_google_protobuf//:protoc);
+        protolib=$$srcdir/$$(echo "$(locations @com_google_protobuf//:protobuf)" | grep -o "\\\S*/libprotobuf.so"); ''' +
 
         # configure cmake.
         '''
@@ -71,7 +71,7 @@ cc_library(
     hdrs = glob(["include/**"])
            + ["include/caffe/proto/caffe.pb.h"],
     deps = [
-        "@com_github_google_protobuf//:protobuf",
+        "@com_google_protobuf//:protobuf",
     ],
     defines = ["CPU_ONLY"],
     linkopts = [

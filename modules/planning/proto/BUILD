@@ -2,35 +2,16 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
-load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
-
 cc_proto_library(
     name = "planning_proto",
-    protos = [
-        "decision.proto",
-        "planning.proto",
-        "planning_config.proto",
-        "planning_internal.proto",
-        "qp_spline_st_speed_config.proto",
-        "st_boundary_config.proto",
-    ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/common/proto:common_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/decision/proto:decision_proto",
-        "//modules/localization/proto:localization_proto",
-        "//modules/map/proto:map_proto",
-        "//modules/perception/proto:perception_proto",
-        "//modules/prediction/proto:prediction_proto",
-        "//modules/routing/proto:routing_proto",
+        ":planning_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "planning_proto_pylib",
-    protos = [
+proto_library(
+    name = "planning_proto_lib",
+    srcs = [
         "decision.proto",
         "planning.proto",
         "planning_config.proto",
@@ -39,81 +20,88 @@ py_proto_compile(
         "st_boundary_config.proto",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto_pylib",
-        "//modules/common/proto:common_proto_pylib",
-        "//modules/decision/proto:decision_proto_pylib",
-        "//modules/localization/proto:localization_proto_pylib",
-        "//modules/perception/proto:perception_proto_pylib",
-        "//modules/prediction/proto:prediction_proto_pylib",
+        "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/common/proto:vehicle_signal_proto_lib",
+        "//modules/decision/proto:decision_proto_lib",
+        "//modules/localization/proto:localization_proto_lib",
+        "//modules/localization/proto:pose_proto_lib",
+        "//modules/map/proto:map_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:prediction_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
     ],
 )
 
 cc_proto_library(
     name = "spiral_curve_config_proto",
-    protos = [
-        "spiral_curve_config.proto",
+    deps = [
+        ":spiral_curve_config_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "sprial_curve_config_proto_pylib",
-    protos = [
+proto_library(
+    name = "spiral_curve_config_proto_lib",
+    srcs = [
         "spiral_curve_config.proto",
     ],
 )
 
 cc_proto_library(
     name = "dp_poly_path_config_proto",
-    protos = [
-        "dp_poly_path_config.proto",
+    deps = [
+        ":dp_poly_path_config_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "dp_poly_path_config_proto_pylib",
-    protos = [
+proto_library(
+    name = "dp_poly_path_config_proto_lib",
+    srcs = [
         "dp_poly_path_config.proto",
     ],
 )
 
 cc_proto_library(
     name = "dp_st_speed_config_proto",
-    protos = [
-        "dp_st_speed_config.proto",
+    deps = [
+        ":dp_st_speed_config_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "dp_st_speed_config_proto_pylib",
-    protos = [
+proto_library(
+    name = "dp_st_speed_config_proto_lib",
+    srcs = [
         "dp_st_speed_config.proto",
     ],
 )
 
 cc_proto_library(
     name = "qp_spline_path_config_proto",
-    protos = [
-        "qp_spline_path_config.proto",
+    deps = [
+        ":qp_spline_path_config_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "qp_spline_path_config_proto_pylib",
-    protos = [
+proto_library(
+    name = "qp_spline_path_config_proto_lib",
+    srcs = [
         "qp_spline_path_config.proto",
     ],
 )
 
 cc_proto_library(
     name = "reference_line_smoother_config_proto",
-    protos = [
-        "reference_line_smoother_config.proto",
+    deps = [
+        ":reference_line_smoother_config_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "reference_line_smoother_config_proto_pylib",
-    protos = [
+proto_library(
+    name = "reference_line_smoother_config_proto_lib",
+    srcs = [
         "reference_line_smoother_config.proto",
     ],
 )
