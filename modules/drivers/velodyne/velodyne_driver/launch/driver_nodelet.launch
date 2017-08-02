@@ -6,7 +6,7 @@
   <arg name="firing_data_port" default=""/>
   <arg name="rpm" default="600.0" />
   <arg name="frame_id" default="velodyne64" />
-  <arg name="topic" default="/apollo/sensor/veldyne64/VelodyneScanUnified" />
+  <arg name="topic" default="/apollo/sensor/velodyne64/VelodyneScanUnified" />
   <arg name="node_name" default="driver_nodelet"/>
 
   <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
