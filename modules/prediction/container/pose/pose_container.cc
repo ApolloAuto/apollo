@@ -35,6 +35,20 @@ void PoseContainer::Insert(const ::google::protobuf::Message& message) {
 
 void PoseContainer::Update(
     const localization::LocalizationEstimate &localization) {
+  if (!localization.has_measurement_time()) {
+    AERROR << "Localization message has no timestamp ["
+           << localization.ShortDebugString() << "].";
+    return;
+  } else if (!localization.has_pose()) {
+    AERROR << "Localization message has no pose ["
+           << localization.ShortDebugString() << "].";
+  } else if (!localization.pose().has_position() ||
+             !localization.pose().has_linear_velocity()) {
+    AERROR << "Localization message has no position or linear velocity ["
+           << localization.ShortDebugString() << "].";
+    return;
+  }
+
   std::lock_guard<std::mutex> lock(g_mutex_);
   if (obstacle_ptr_.get() == nullptr) {
     obstacle_ptr_.reset(new PerceptionObstacle());
@@ -47,10 +61,10 @@ void PoseContainer::Update(
   obstacle_ptr_->mutable_position()->CopyFrom(position);
 
   Point velocity;
-  position.set_x(localization.pose().linear_velocity().x());
-  position.set_y(localization.pose().linear_velocity().y());
-  position.set_z(localization.pose().linear_velocity().z());
-  obstacle_ptr_->mutable_position()->CopyFrom(position);
+  velocity.set_x(localization.pose().linear_velocity().x());
+  velocity.set_y(localization.pose().linear_velocity().y());
+  velocity.set_z(localization.pose().linear_velocity().z());
+  obstacle_ptr_->mutable_velocity()->CopyFrom(velocity);
 
   obstacle_ptr_->set_type(type_);
   obstacle_ptr_->set_timestamp(localization.measurement_time());
