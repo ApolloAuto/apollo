@@ -67,7 +67,8 @@ class EMPlanner : public Planner {
   apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
                               Frame* frame,
                               PublishableTrajectory* trajectory_pb,
-                              planning_internal::Debug* ptr_debug = nullptr) override;
+                              planning_internal::Debug* ptr_debug = nullptr,
+                              planning::LatencyStats* ptr_latency_stats = nullptr) override;
  private:
   void RegisterOptimizers();
 
@@ -77,7 +78,8 @@ class EMPlanner : public Planner {
   void RecordDebugInfo(const std::string& name,
                        const PlanningData* planning_data,
                        const double time_diff_ms,
-                       planning_internal::Debug* ptr_debug);
+                       planning_internal::Debug* ptr_debug,
+                       planning::LatencyStats* ptr_latency_stats);
 
   apollo::common::util::Factory<OptimizerType, Optimizer> optimizer_factory_;
   std::vector<std::unique_ptr<Optimizer>> optimizers_;

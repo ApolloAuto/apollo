@@ -67,7 +67,8 @@ class Planner {
   virtual apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
                                       Frame* frame,
                                       PublishableTrajectory* trajectory_pb,
-                                      planning_internal::Debug* = nullptr) = 0;
+                                      planning_internal::Debug* = nullptr,
+                                      planning::LatencyStats* = nullptr) = 0;
 };
 
 }  // namespace planning
