@@ -203,14 +203,6 @@ void Planning::RunOnce() {
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
-  /**
-  // the execution_start_time is the estimated time when the planned trajectory
-  // will be executed by the controller.
-  double execution_start_time =
-      apollo::common::time::ToSecond(apollo::common::time::Clock::Now()) +
-      planning_cycle_time;
-  **/
-
   ADCTrajectory trajectory_pb;
   RecordInput(&trajectory_pb);
 
@@ -255,56 +247,7 @@ bool Planning::Plan(const bool is_on_auto_mode,
 
   PublishableTrajectory publishable_trajectory;
   auto status = planner_->Plan(stitching_trajectory.back(),
-      frame_.get(), &publishable_trajectory);
-
-  if (FLAGS_enable_record_debug) {
-    trajectory_pb->mutable_debug()
-        ->mutable_planning_data()
-        ->mutable_init_point()
-        ->CopyFrom(stitching_trajectory.back());
-    trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
-
-    // TODO: check whether current planner is EM planner.
-    auto& em_debugger =
-        dynamic_cast<EMPlanner*>(planner_.get())->em_planner_debugger();
-
-    for (auto it = em_debugger.paths_.begin(); it != em_debugger.paths_.end();
-         ++it) {
-      auto ptr_path_planning_info =
-          trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
-      ptr_path_planning_info->set_name(it->first);
-      ptr_path_planning_info->mutable_path_point()->CopyFrom(
-          {it->second.first.points().begin(), it->second.first.points().end()});
-
-      auto ptr_stats =
-          trajectory_pb->mutable_latency_stats()->add_processor_stats();
-      ptr_stats->set_name(it->first);
-      ptr_stats->set_time_ms(it->second.second);
-    }
-
-    for (auto it = em_debugger.speed_profiles_.begin();
-         it != em_debugger.speed_profiles_.end(); ++it) {
-      auto ptr_speed_planning_info = trajectory_pb->mutable_debug()
-                                         ->mutable_planning_data()
-                                         ->add_speed_plan();
-      ptr_speed_planning_info->set_name(it->first);
-      ptr_speed_planning_info->mutable_speed_point()->CopyFrom(
-          {it->second.first.begin(), it->second.first.end()});
-
-      auto ptr_stats =
-          trajectory_pb->mutable_latency_stats()->add_processor_stats();
-      ptr_stats->set_name(it->first);
-      ptr_stats->set_time_ms(it->second.second);
-    }
-
-    auto ptr_reference_line =
-        trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
-    ptr_reference_line->set_name("planning_reference_line");
-
-    ptr_reference_line->mutable_path_point()->CopyFrom(
-        {em_debugger.reference_line_.begin(),
-         em_debugger.reference_line_.end()});
-  }
+      frame_.get(), &publishable_trajectory, trajectory_pb->mutable_debug());
 
   if (status != Status::OK()) {
     AERROR << "planner failed to make a driving plan";

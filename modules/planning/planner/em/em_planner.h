@@ -28,7 +28,6 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/optimizer/optimizer.h"
-#include "modules/planning/planner/em/em_planner_debugger.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -50,7 +49,7 @@ class EMPlanner : public Planner {
   /**
    * @brief Constructor
    */
-  EMPlanner();
+  EMPlanner() = default;
 
   /**
    * @brief Destructor
@@ -65,26 +64,21 @@ class EMPlanner : public Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      PublishableTrajectory* trajectory_pb) override;
-  EMPlannerDebugger& em_planner_debugger();
-
+  apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
+                              Frame* frame,
+                              PublishableTrajectory* trajectory_pb,
+                              planning_internal::Debug* ptr_debug = nullptr) override;
  private:
   void RegisterOptimizers();
 
   std::vector<common::SpeedPoint> GenerateInitSpeedProfile(const double init_v,
                                                            const double init_a);
 
-  void RecordDebugInfo(const std::string& name, PlanningData* planning_data,
-                       double time_diff_ms);
+  void RecordDebugInfo(const std::string& name,
+                       const PlanningData* planning_data,
+                       const double time_diff_ms,
+                       planning_internal::Debug* ptr_debug);
 
-  EMPlannerDebugger em_planner_debugger_;
-  void RecordProcessorDebug(const std::string& name,
-                            PlanningData* planning_data, double time_diff_ms,
-                            ADCTrajectory* trajectory_pb);
-
- private:
   apollo::common::util::Factory<OptimizerType, Optimizer> optimizer_factory_;
   std::vector<std::unique_ptr<Optimizer>> optimizers_;
 };
