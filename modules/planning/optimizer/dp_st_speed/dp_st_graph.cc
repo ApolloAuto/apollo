@@ -300,8 +300,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
     CHECK_EQ(boundary_it->points().size(), 4);
 
     Obstacle* object_ptr =
-        DataCenter::instance()->mutable_object_table()->get_obstacle(
-            boundary_it->id());
+        DataCenter::instance()->mutable_object_table()->Find(boundary_it->id());
     if (!object_ptr) {
       AERROR << "Failed to find object " << boundary_it->id();
       return Status(ErrorCode::PLANNING_ERROR,
