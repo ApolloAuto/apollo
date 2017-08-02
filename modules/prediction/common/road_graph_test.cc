@@ -23,7 +23,6 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
-#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace prediction {
@@ -110,8 +109,7 @@ TEST_F(RoadGraphTest, LengthLongerThanEnd) {
     for (const auto &lane_segment : lane_sequence.lane_segment()) {
       total_length += (lane_segment.end_s() - lane_segment.start_s());
     }
-    EXPECT_TRUE(::apollo::common::math::DoubleCompare(
-        total_length, length) < 0);
+    EXPECT_LT(total_length, length);
   }
 }
 

@@ -60,7 +60,6 @@ cc_test(
         "//modules/prediction/common:road_graph",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
-        "//modules/common/math:math_utils",
         "@gtest//:main",
     ]
 )
