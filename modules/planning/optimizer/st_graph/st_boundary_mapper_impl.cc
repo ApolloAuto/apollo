@@ -80,9 +80,9 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
 
   const auto& main_decision = decision_data.Decision().main_decision();
   if (main_decision.has_stop()) {
-    ret =
-        map_main_decision_stop(main_decision.stop(), reference_line,
-                               planning_distance, planning_time, st_graph_boundaries);
+    ret = map_main_decision_stop(main_decision.stop(), reference_line,
+                                 planning_distance, planning_time,
+                                 st_graph_boundaries);
     if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
       return Status(ErrorCode::PLANNING_ERROR);
     }
@@ -120,7 +120,8 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
       if (obj_decision.has_follow()) {
         ret = map_obstacle_without_prediction_trajectory(
             initial_planning_point, *obs, obj_decision, path_data,
-            reference_line, planning_distance, planning_time, st_graph_boundaries);
+            reference_line, planning_distance, planning_time,
+            st_graph_boundaries);
         if (!ret.ok()) {
           AERROR << "Fail to map follow dynamic obstacle with id " << obs->Id()
                  << ".";
@@ -253,8 +254,8 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
 
   for (uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
     const auto& trajectory = obstacle.prediction_trajectories()[i];
-    for (int j = 0; j < trajectory.trajectory_point_size(); ++i) {
-      const auto& trajectory_point = trajectory.trajectory_point(i);
+    for (int j = 0; j < trajectory.trajectory_point_size(); ++j) {
+      const auto& trajectory_point = trajectory.trajectory_point(j);
       // TODO(all): fix trajectory point relative time issue.
       double trajectory_point_time = trajectory_point.relative_time();
       const Box2d obs_box(
@@ -273,7 +274,7 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
         }
         if (!find_low) {
           if (!CheckOverlap(adc_path_points[low], vehicle_param(), obs_box,
-                             st_boundary_config().boundary_buffer())) {
+                            st_boundary_config().boundary_buffer())) {
             ++low;
           } else {
             find_low = true;
@@ -281,7 +282,7 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
         }
         if (!find_high) {
           if (!CheckOverlap(adc_path_points[high], vehicle_param(), obs_box,
-                             st_boundary_config().boundary_buffer())) {
+                            st_boundary_config().boundary_buffer())) {
             --high;
           } else {
             find_high = true;
