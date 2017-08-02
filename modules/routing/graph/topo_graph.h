@@ -22,7 +22,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "modules/routing/graph/topo_graph.pb.h"
+#include "modules/routing/proto/topo_graph.pb.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace routing {
@@ -46,8 +47,8 @@ class TopoGraph {
 
  private:
   void clear();
-  bool load_nodes(const ::apollo::routing::common::Graph& graph);
-  bool load_edges(const ::apollo::routing::common::Graph& graph);
+  bool load_nodes(const ::apollo::routing::Graph& graph);
+  bool load_edges(const ::apollo::routing::Graph& graph);
 
  private:
   std::string _map_version;
