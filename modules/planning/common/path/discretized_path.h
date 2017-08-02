@@ -58,7 +58,7 @@ class DiscretizedPath {
 
   common::PathPoint &path_point_at(const std::uint32_t index);
 
- private:
+ protected:
   std::vector<common::PathPoint>::const_iterator query_lower_bound(
       const double param) const;
 
