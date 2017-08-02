@@ -68,9 +68,6 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
 
-  double total_length = std::min(qp_spline_st_speed_config_.total_path_length(),
-                                 path_data.discretized_path().length());
-
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
   if (!boundary_mapper_
@@ -84,12 +81,8 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
   }
 
   SpeedLimit speed_limits;
-  const auto& pose = apollo::common::VehicleState::instance()->pose();
-  const auto* pnc_map = frame_->PncMap();
-  if (boundary_mapper_.GetSpeedLimits(pose, pnc_map, path_data, total_length,
-                                        qp_spline_st_speed_config_.total_time(),
-                                        qp_spline_st_speed_config_.max_speed(),
-                                        &speed_limits) != Status::OK()) {
+  if (boundary_mapper_.GetSpeedLimits(reference_line, path_data,
+                                      &speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }

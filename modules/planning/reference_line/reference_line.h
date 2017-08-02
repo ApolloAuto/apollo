@@ -66,6 +66,11 @@ class ReferenceLine {
   void get_s_range_from_box2d(const ::apollo::common::math::Box2d& box2d,
                               double* max_s, double* min_s) const;
 
+  double GetSpeedLimitFromS(const double s) const { return 10.0; };
+  double GetSpeedLimitFromPoint(const common::math::Vec2d& point) const {
+    return 10.0;
+  };
+
  private:
   static ReferencePoint interpolate(const ReferencePoint& p0, const double s0,
                                     const ReferencePoint& p1, const double s1,
