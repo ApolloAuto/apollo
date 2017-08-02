@@ -78,7 +78,6 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
         st_graph_data.path_data_length());
   }
 
-  // TODO(all): update speed limit here
   // TODO(all): update config through veh physical limit here generate knots
 
   // initialize time resolution and
@@ -188,6 +187,7 @@ Status QpSplineStGraph::ApplyConstraint(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
   // TODO(Liangliang):
   // add speed constraint and other limits according to adu/planning
   return Status::OK();
@@ -223,8 +223,9 @@ Status QpSplineStGraph::ApplyKernel(
   // TODO(all): add reference speed profile for different main decision
   std::vector<double> s_vec;
   if (speed_limit.speed_limits().size() == 0) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Fail to apply_kernel due to empty speed limits.");
+    std::string msg = "Fail to apply_kernel due to empty speed limits.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   double dist_ref = 0.0;
   for (uint32_t i = 0;
@@ -233,8 +234,9 @@ Status QpSplineStGraph::ApplyKernel(
     dist_ref +=
         t_knots_resolution_ * speed_limit.get_speed_limit_by_s(dist_ref);
   }
-  // TODO: change reference line kernel to configurable version
-  spline_kernel->add_reference_line_kernel_matrix(t_knots_, s_vec, 1);
+  spline_kernel->add_reference_line_kernel_matrix(
+      t_knots_, s_vec,
+      qp_spline_st_speed_config_.reference_line_kernel_weight());
 
   return Status::OK();
 }
