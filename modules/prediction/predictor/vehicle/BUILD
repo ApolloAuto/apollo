@@ -34,4 +34,25 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "free_move_predictor_test",
+    size = "small",
+    srcs = [
+        "free_move_predictor_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/predictor/vehicle:free_move_predictor",
+        "@gtest//:main",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/common/util:util",
+        "//modules/prediction/container/obstacles:obstacles_container",
+    ],
+)
+
 cpplint()
