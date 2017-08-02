@@ -45,43 +45,43 @@ class QpSplineStGraph {
   QpSplineStGraph(const QpSplineStSpeedConfig& qp_config,
                   const apollo::common::VehicleParam& veh_param);
 
-  common::Status search(const StGraphData& st_graph_data,
+  common::Status Search(const StGraphData& st_graph_data,
                         const PathData& path_data, SpeedData* const speed_data);
 
  private:
   void Init();
 
   // apply st graph constraint
-  common::Status apply_constraint(
+  common::Status ApplyConstraint(
       const std::vector<StGraphBoundary>& boundaries);
 
   // apply objective function
-  common::Status apply_kernel(const SpeedLimit& speed_limit);
+  common::Status ApplyKernel(const SpeedLimit& speed_limit);
 
   // solve
-  common::Status solve();
+  common::Status Solve();
 
   // extract upper lower bound for constraint;
-  common::Status get_s_constraints_by_time(
+  common::Status GetSConstraintByTime(
       const std::vector<StGraphBoundary>& boundaries, const double time,
       const double total_path_s, double* const s_upper_bound,
       double* const s_lower_bound) const;
 
   // generate reference speed profile
-  common::Status apply_reference_speed_profile();
+  // common::Status ApplyReferenceSpeedProfile();
 
   common::Status AddFollowReferenceLineKernel(
       const StGraphBoundary& follow_boundary);
 
  private:
   // qp st configuration
-  QpSplineStSpeedConfig _qp_spline_st_speed_config;
+  QpSplineStSpeedConfig qp_spline_st_speed_config_;
 
   // initial status
-  common::TrajectoryPoint _init_point;
+  common::TrajectoryPoint init_point_;
 
   // solver
-  std::unique_ptr<Spline1dGenerator> _spline_generator = nullptr;
+  std::unique_ptr<Spline1dGenerator> spline_generator_ = nullptr;
 
   // time resolution
   double time_resolution_ = 0.0;
