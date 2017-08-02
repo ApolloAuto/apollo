@@ -27,7 +27,7 @@ const DecisionResult &DecisionData::Decision() const { return decision_; }
 
 DecisionResult *DecisionData::MutableDecision() { return &decision_; }
 
-const std::vector<Obstacle> &DecisionData::Obstacles() const {
+const std::list<Obstacle> &DecisionData::Obstacles() const {
   return obstacles_;
 }
 
@@ -47,12 +47,12 @@ std::vector<Obstacle *> *DecisionData::MutableDynamicObstacles() {
   return &dynamic_obstacles_;
 }
 
-void DecisionData::AddObstacle(Obstacle &obstacle) {
+void DecisionData::AddObstacle(const Obstacle &obstacle) {
   obstacles_.push_back(obstacle);
   if (obstacle.Type() == perception::PerceptionObstacle::UNKNOWN_UNMOVABLE) {
-    static_obstacles_.push_back(&obstacle);
+    static_obstacles_.push_back(&(obstacles_.back()));
   } else {
-    dynamic_obstacles_.push_back(&obstacle);
+    dynamic_obstacles_.push_back(&(obstacles_.back()));
   }
 }
 

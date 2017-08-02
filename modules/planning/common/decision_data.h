@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_DECISION_DATA_H_
 #define MODULES_PLANNING_COMMON_DECISION_DATA_H_
 
+#include <list>
 #include <vector>
 
 #include "modules/planning/common/obstacle.h"
@@ -35,16 +36,16 @@ class DecisionData {
   const DecisionResult &Decision() const;
   DecisionResult *MutableDecision();
 
-  const std::vector<Obstacle> &Obstacles() const;
-  const std::vector<Obstacle *> &StaticObstacles() const ;
+  const std::list<Obstacle> &Obstacles() const;
+  const std::vector<Obstacle *> &StaticObstacles() const;
   const std::vector<Obstacle *> &DynamicObstacles() const;
   std::vector<Obstacle *> *MutableStaticObstacles();
   std::vector<Obstacle *> *MutableDynamicObstacles();
-  void AddObstacle(Obstacle &obstacle);
+  void AddObstacle(const Obstacle &obstacle);
 
  private:
   DecisionResult decision_;
-  std::vector<Obstacle> obstacles_;
+  std::list<Obstacle> obstacles_;
   std::vector<Obstacle *> static_obstacles_;
   std::vector<Obstacle *> dynamic_obstacles_;
 };
