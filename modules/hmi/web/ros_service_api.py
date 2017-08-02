@@ -20,49 +20,35 @@
 import httplib
 
 import flask_restful
-import gflags
 import glog
-import grpc
+import rospy
 
-import modules.hmi.proto.ros_node_pb2 as ros_node_pb2
-import modules.hmi.proto.runtime_status_pb2 as runtime_status_pb2
+from modules.hmi.proto.runtime_status_pb2 import ToolStatus
+import modules.control.proto.pad_msg_pb2 as pad_msg_pb2
 import runtime_status
-
-gflags.DEFINE_string('hmi_ros_node_service', '127.0.0.1:8897',
-                     'Address of HMI ros node grpc service.')
 
 
 class RosServiceApi(flask_restful.Resource):
     """HMI ros node service."""
+    pad_msg_pub = None
+    pad_msg_seq_num = 0
 
     def get(self, cmd_name):
-        """Run ros command by sending GRPC requests and return HTTP response."""
+        """Run ros command and return HTTP response."""
         return RosServiceApi.execute_cmd(cmd_name)
 
-    @staticmethod
-    def execute_cmd(cmd_name):
-        """Run ros command by sending GRPC requests and return HTTP response."""
-        ToolStatus = runtime_status_pb2.ToolStatus
-        channel = grpc.insecure_channel(gflags.FLAGS.hmi_ros_node_service)
-        stub = ros_node_pb2.HMIRosNodeStub(channel)
-
-        response = None
+    @classmethod
+    def execute_cmd(cls, cmd_name):
+        """Run ros command and return HTTP response."""
         status = runtime_status.RuntimeStatus
         tool_status = status.get_tools()
         if cmd_name == 'reset':
-            request = ros_node_pb2.ChangeDrivingModeRequest(
-                action=ros_node_pb2.ChangeDrivingModeRequest.RESET_TO_MANUAL)
-            response = stub.ChangeDrivingMode(request)
-
+            cls.perform_driving_action(pad_msg_pb2.RESET)
             # Update runtime status.
             if tool_status.playing_status != ToolStatus.PLAYING_NOT_READY:
                 tool_status.playing_status = ToolStatus.PLAYING_READY_TO_CHECK
-
         elif cmd_name == 'start_auto_driving':
-            request = ros_node_pb2.ChangeDrivingModeRequest(
-                action=ros_node_pb2.ChangeDrivingModeRequest.START_TO_AUTO)
-            response = stub.ChangeDrivingMode(request)
-
+            cls.perform_driving_action(pad_msg_pb2.START)
             # Update runtime status.
             if tool_status.playing_status == ToolStatus.PLAYING_READY_TO_START:
                 tool_status.playing_status = ToolStatus.PLAYING
@@ -72,6 +58,26 @@ class RosServiceApi(flask_restful.Resource):
             return error_msg, httplib.BAD_REQUEST
 
         status.broadcast_status_if_changed()
-        glog.info('Processed command "{}", and get response:{}'.format(
-            cmd_name, response))
+        glog.info('Processed command "{}"'.format(cmd_name))
         return 'OK', httplib.OK
+
+    @classmethod
+    def perform_driving_action(cls, driving_action):
+        """Request to perform driving action."""
+        if cls.pad_msg_pub is None:
+            rospy.init_node('hmi_ros_node_service', anonymous=True)
+            cls.pad_msg_pub = rospy.Publisher(
+                '/apollo/control/pad', pad_msg_pb2.PadMessage, queue_size=1)
+
+        pad_msg = pad_msg_pb2.PadMessage()
+        pad_msg.header.timestamp_sec = rospy.get_time()
+        pad_msg.header.module_name = "hmi_ros_node_service"
+        pad_msg.action = driving_action
+        # Send pad message 3 times.
+        for _ in range(3):
+            cls.pad_msg_seq_num += 1
+            pad_msg.header.sequence_num = cls.pad_msg_seq_num
+
+            glog.info('Publishing message: {}'.format(pad_msg))
+            cls.pad_msg_pub.publish(pad_msg)
+            rospy.sleep(0.5)

@@ -5,8 +5,6 @@
 # Google infras.
 glog
 google-apputils
-grpc >= 0.3
-grpcio
 protobuf == 3.1
 python-gflags
 
