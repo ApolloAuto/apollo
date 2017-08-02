@@ -39,7 +39,7 @@ DECLARE_string(test_routing_result_file);
 DECLARE_string(test_localization_file);
 DECLARE_string(test_chassis_file);
 
-class OptimizerTestBase : public ::testing::Test {
+class PlanningTestBase : public ::testing::Test {
  public:
   /**
    * @brief set common data settings, such as gflags path configurations.
@@ -49,7 +49,7 @@ class OptimizerTestBase : public ::testing::Test {
    * "new_routing.pb.txt", You can implement your own SetDataConfigs by
    * ```
    * virtual void SetDataConfigs() {
-   *   OptimizerTestBase::SetDataConfigs();
+   *   PlanningTestBase::SetDataConfigs();
    *   FLAGS_test_routing_result_file = "new_routing.pb.txt"
    * }
    * ```

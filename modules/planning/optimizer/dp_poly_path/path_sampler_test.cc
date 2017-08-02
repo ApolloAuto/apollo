@@ -27,17 +27,17 @@
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
-#include "modules/planning/optimizer/optimizer_test_base.h"
+#include "modules/planning/integration_tests/planning_test_base.h"
 
 namespace apollo {
 namespace planning {
 
 using common::adapter::AdapterManager;
 
-class PathSamplerTest : public OptimizerTestBase {
+class PathSamplerTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
-    OptimizerTestBase::SetUp();
+    PlanningTestBase::SetUp();
     sampled_points_.clear();
     init_point_.mutable_path_point()->set_x(pose_.position().x());
     init_point_.mutable_path_point()->set_y(pose_.position().y());
