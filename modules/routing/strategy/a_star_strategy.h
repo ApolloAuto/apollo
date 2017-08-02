@@ -20,7 +20,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "strategy/strategy.h"
+#include "modules/routing/strategy/strategy.h"
 
 namespace apollo {
 namespace routing {

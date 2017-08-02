@@ -17,29 +17,29 @@
 #ifndef MODULES_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
 #define MODULES_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
 
-#include "modules/routing/topo_creator/map_lane.pb.h"
-#include "modules/routing/topo_creator/topo_graph.pb.h"
+#include "modules/map/proto/map_lane.pb.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
 
 class NodeCreator {
  public:
-  static void get_pb_node(const ::apollo::common::hdmap::Lane& lane,
+  static void get_pb_node(const ::apollo::hdmap::Lane& lane,
                           const std::string& road_id,
-                          ::apollo::routing::common::Node* pb_node);
+                          ::apollo::routing::Node* pb_node);
 
  private:
   static void add_out_boundary(
-      const ::apollo::common::hdmap::LaneBoundary& bound, double lane_length,
+      const ::apollo::hdmap::LaneBoundary& bound, double lane_length,
       ::google::protobuf::RepeatedPtrField<
-          ::apollo::routing::common::CurveRange>* const out_range);
+          ::apollo::routing::CurveRange>* const out_range);
 
-  static void init_node_info(const ::apollo::common::hdmap::Lane& lane,
+  static void init_node_info(const ::apollo::hdmap::Lane& lane,
                              const std::string& road_id,
-                             ::apollo::routing::common::Node* const node);
-  static void init_node_cost(const ::apollo::common::hdmap::Lane& lane,
-                             ::apollo::routing::common::Node* const node);
+                             ::apollo::routing::Node* const node);
+  static void init_node_cost(const ::apollo::hdmap::Lane& lane,
+                             ::apollo::routing::Node* const node);
 };
 
 }  // namespace routing

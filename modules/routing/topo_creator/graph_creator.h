@@ -20,8 +20,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "modules/routing/topo_creator/map.pb.h"
-#include "modules/routing/topo_creator/topo_graph.pb.h"
+#include "modules/map/proto/map.pb.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -37,16 +37,16 @@ class GraphCreator {
 
  private:
   void add_edge(
-      const ::apollo::routing::common::Node& from_node,
-      const ::google::protobuf::RepeatedPtrField<::apollo::common::hdmap::Id>&
+      const ::apollo::routing::Node& from_node,
+      const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Id>&
           to_node_vec,
-      const ::apollo::routing::common::Edge::DirectionType& type);
+      const ::apollo::routing::Edge::DirectionType& type);
 
  private:
   std::string _base_map_file_path;
   std::string _dump_topo_file_path;
-  ::apollo::common::hdmap::Map _pbmap;
-  ::apollo::routing::common::Graph _graph;
+  ::apollo::hdmap::Map _pbmap;
+  ::apollo::routing::Graph _graph;
   std::unordered_map<std::string, int> _node_index_map;
   std::unordered_map<std::string, std::string> _road_id_map;
   std::unordered_set<std::string> _showed_edge_id_set;
