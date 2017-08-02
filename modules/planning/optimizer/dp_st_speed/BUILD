@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common:data_center",
+        "//modules/planning/common:frame",
         "//modules/planning/math:double",
         "//modules/planning/optimizer/st_graph:st_graph_boundary",
         "//modules/planning/proto:dp_st_speed_config_proto",
@@ -33,7 +33,6 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
-        "//modules/planning/common:data_center",
         "//modules/planning/common:decision_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/optimizer/st_graph:st_graph_data",

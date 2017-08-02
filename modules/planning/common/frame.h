@@ -31,6 +31,7 @@
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/map/proto/routing.pb.h"
 #include "modules/planning/common/indexed_list.h"
+#include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -84,6 +85,11 @@ class Frame {
   PublishableTrajectory _computed_trajectory;
   PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;
+};
+
+class FrameHistory : public IndexedQueue<uint32_t, Frame> {
+ private:
+  DECLARE_SINGLETON(FrameHistory);
 };
 
 }  // namespace planning

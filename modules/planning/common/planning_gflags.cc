@@ -53,8 +53,7 @@ DEFINE_double(
 DEFINE_double(cycle_duration_in_sec, 0.002, "# of seconds per planning cycle.");
 DEFINE_double(maximal_delay_sec, 0.005, "# of seconds for delay.");
 
-DEFINE_int32(max_history_result, 10,
-             "The maximal number of result in history.");
+DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
 DEFINE_bool(use_stitch, true, "Use trajectory stitch if possible.");
 DEFINE_double(forward_predict_time, 0.2,

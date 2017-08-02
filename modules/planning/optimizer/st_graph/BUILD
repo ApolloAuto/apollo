@@ -64,6 +64,7 @@ cc_library(
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:decision_data",
+        "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:planning_object",
@@ -91,7 +92,6 @@ cc_library(
         "//modules/common:log",
         "//modules/common/util",
         "//modules/common/vehicle_state",
-        "//modules/planning/common:data_center",
         "//modules/planning/optimizer/st_graph:st_boundary_mapper",
     ],
 )
