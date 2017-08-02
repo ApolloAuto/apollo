@@ -247,7 +247,8 @@ bool Planning::Plan(const bool is_on_auto_mode,
 
   PublishableTrajectory publishable_trajectory;
   auto status = planner_->Plan(stitching_trajectory.back(),
-      frame_.get(), &publishable_trajectory, trajectory_pb->mutable_debug());
+      frame_.get(), &publishable_trajectory, trajectory_pb->mutable_debug(),
+      trajectory_pb->mutable_latency_stats());
 
   if (status != Status::OK()) {
     AERROR << "planner failed to make a driving plan";
