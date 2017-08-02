@@ -72,7 +72,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
       std::min(dp_st_speed_config_.total_path_length(), path_length);
   std::vector<StGraphBoundary> boundaries;
   if (!boundary_mapper_
-           .get_graph_boundary(init_point, *decision_data, path_data,
+           .GetGraphBoundary(init_point, *decision_data, path_data,
                                reference_line,
                                dp_st_speed_config_.total_path_length(),
                                dp_st_speed_config_.total_time(), &boundaries)
@@ -86,7 +86,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   // step 2 perform graph search
   SpeedLimit speed_limit;
   if (!boundary_mapper_
-           .get_speed_limits(common::VehicleState::instance()->pose(),
+           .GetSpeedLimits(common::VehicleState::instance()->pose(),
                                   Frame::PncMap(), path_data, planning_distance,
                                   dp_st_speed_config_.matrix_dimension_s(),
                                   dp_st_speed_config_.max_speed(), &speed_limit)

@@ -90,12 +90,12 @@ class QpSplineStGraph {
   std::unique_ptr<Spline1dGenerator> spline_generator_ = nullptr;
 
   // time resolution
-  double time_resolution_ = 0.0;
+  double t_knots_resolution_ = 0.0;
 
   // knots
   std::vector<double> t_knots_;
 
-  double evaluation_time_resolution_ = 0.0;
+  double t_evaluated_resolution_ = 0.0;
   // evaluated points
   std::vector<double> t_evaluated_;
 };

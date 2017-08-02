@@ -35,7 +35,7 @@ namespace planning {
 
 class StBoundaryMapperImpl : public StBoundaryMapper {
  public:
-  apollo::common::Status get_graph_boundary(
+  apollo::common::Status GetGraphBoundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
       const ReferenceLine& reference_line, const double planning_distance,

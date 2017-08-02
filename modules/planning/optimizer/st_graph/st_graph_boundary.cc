@@ -29,42 +29,36 @@ namespace planning {
 
 using Vec2d = common::math::Vec2d;
 
-StGraphBoundary::StGraphBoundary(const std::vector<STPoint>& points) {
-  CHECK_GE(points.size(), 4);
-  for (const auto& point : points) {
-    points_.emplace_back(point.t(), point.s());
-  }
-  BuildFromPoints();
+StGraphBoundary::StGraphBoundary(const std::vector<STPoint>& points)
+    : Polygon2d(std::vector<Vec2d>(points.begin(), points.end())) {
+  CHECK_EQ(points.size(), 4)
+      << "StGraphBoundary must have exactly four points. Input points size: "
+      << points.size();
 }
 
 StGraphBoundary::StGraphBoundary(
     const std::vector<::apollo::common::math::Vec2d>& points)
     : Polygon2d(points) {
-  CHECK_GE(points.size(), 4);
+  CHECK_EQ(points.size(), 4)
+      << "StGraphBoundary must have exactly four points. Input points size: "
+      << points.size();
 }
 
 bool StGraphBoundary::IsPointInBoundary(
     const StGraphPoint& st_graph_point) const {
-  ::apollo::common::math::Vec2d vec2d = {st_graph_point.point().t(),
-                                         st_graph_point.point().s()};
-  return IsPointIn(vec2d);
+  return IsPointInBoundary(st_graph_point.point());
 }
 
 bool StGraphBoundary::IsPointInBoundary(const STPoint& st_point) const {
-  ::apollo::common::math::Vec2d vec2d = {st_point.t(), st_point.s()};
-  return IsPointIn(vec2d);
+  return IsPointIn(st_point);
 }
 
-const ::apollo::common::math::Vec2d StGraphBoundary::point(
-    const uint32_t index) const {
-  CHECK_LT(index, points_.size());
+Vec2d StGraphBoundary::point(const uint32_t index) const {
+  CHECK_LT(index, points_.size()) << "Index[" << index << "] is out of range.";
   return points_[index];
 }
 
-const std::vector<::apollo::common::math::Vec2d>& StGraphBoundary::points()
-    const {
-  return points_;
-}
+const std::vector<Vec2d>& StGraphBoundary::points() const { return points_; }
 
 bool StGraphBoundary::is_empty() const { return points_.empty(); }
 
