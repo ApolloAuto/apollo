@@ -14,11 +14,11 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "modules/routing/topo_creator/topo_creator/graph_creator.h"
+#include "modules/routing/topo_creator/graph_creator.h"
 
 #include "glog/logging.h"
 
-#include "common/utils.h"
+#include "modules/routing/common/utils.h"
 #include "modules/routing/topo_creator/edge_creator.h"
 #include "modules/routing/topo_creator/node_creator.h"
 
@@ -29,10 +29,10 @@ namespace {
 
 using ::google::protobuf::RepeatedPtrField;
 
-using ::apollo::common::hdmap::Id;
+using ::apollo::hdmap::Id;
 
-using ::apollo::routing::common::Node;
-using ::apollo::routing::common::Edge;
+using ::apollo::routing::Node;
+using ::apollo::routing::Edge;
 
 std::string get_edge_id(const std::string& from_id, const std::string& to_id) {
   return from_id + "->" + to_id;

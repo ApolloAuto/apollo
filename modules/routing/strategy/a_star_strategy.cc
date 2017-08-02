@@ -20,12 +20,9 @@
 #include <limits>
 #include <queue>
 
-#include "ros/ros.h"
-
-#include "graph/topo_edge.h"
-#include "graph/topo_graph.h"
-#include "graph/topo_node.h"
-#include "strategy/a_star_strategy.h"
+#include "modules/routing/graph/topo_graph.h"
+#include "modules/routing/graph/topo_node.h"
+#include "modules/routing/strategy/a_star_strategy.h"
 
 namespace apollo {
 namespace routing {
@@ -96,7 +93,7 @@ bool AStarStrategy::search(
     const std::unordered_set<const TopoNode*>& black_list,
     std::vector<const TopoNode*>* const result_nodes) {
   clear();
-  ROS_INFO("Start A* search algorithm.");
+  AINFO << "Start A* search algorithm.";
 
   _closed_set.insert(black_list.begin(), black_list.end());
 
@@ -114,7 +111,7 @@ bool AStarStrategy::search(
     current_node = open_set_detail.top();
     if (current_node == dest_node) {
       if (!reconstruct(_came_from, current_node.topo_node, result_nodes)) {
-        ROS_ERROR("Failed to reconstruct route.");
+        AERROR << "Failed to reconstruct route.";
         return false;
       }
       return true;
@@ -152,8 +149,7 @@ bool AStarStrategy::search(
       }
     }
   }
-  ROS_ERROR("Failed to find goal lane with id %s",
-            dest_node->lane_id().c_str());
+  AERROR << "Failed to find goal lane";
   return false;
 }
 

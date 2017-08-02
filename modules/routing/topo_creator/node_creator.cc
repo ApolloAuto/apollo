@@ -25,13 +25,13 @@ namespace {
 
 using ::google::protobuf::RepeatedPtrField;
 
-using ::apollo::common::hdmap::Lane;
-using ::apollo::common::hdmap::LaneBoundary;
-using ::apollo::common::hdmap::LaneBoundaryType;
+using ::apollo::hdmap::Lane;
+using ::apollo::hdmap::LaneBoundary;
+using ::apollo::hdmap::LaneBoundaryType;
 
-using ::apollo::routing::common::Node;
-using ::apollo::routing::common::Edge;
-using ::apollo::routing::common::CurveRange;
+using ::apollo::routing::Node;
+using ::apollo::routing::Edge;
+using ::apollo::routing::CurveRange;
 
 const double BASE_SPEED = 4.167;       // 15kmh
 const double LEFT_TURN_PENALTY = 50;   // meter
@@ -113,11 +113,11 @@ void NodeCreator::init_node_cost(const Lane& lane, Node* const node) {
       (speed_limit >= BASE_SPEED) ? (1 / sqrt(speed_limit / BASE_SPEED)) : 1.0;
   double cost = lane_length * ratio;
   if (lane.has_turn()) {
-    if (lane.turn() == ::apollo::common::hdmap::Lane::LEFT_TURN) {
+    if (lane.turn() == ::apollo::hdmap::Lane::LEFT_TURN) {
       cost += LEFT_TURN_PENALTY;
-    } else if (lane.turn() == ::apollo::common::hdmap::Lane::RIGHT_TURN) {
+    } else if (lane.turn() == ::apollo::hdmap::Lane::RIGHT_TURN) {
       cost += RIGHT_TURN_PENALTY;
-    } else if (lane.turn() == ::apollo::common::hdmap::Lane::U_TURN) {
+    } else if (lane.turn() == ::apollo::hdmap::Lane::U_TURN) {
       cost += UTURN_PENALTY;
     }
   }
