@@ -224,6 +224,8 @@ void Planning::RunOnce() {
   if (res_planning) {
     AdapterManager::FillPlanningHeader("planning", &trajectory_pb);
     trajectory_pb.mutable_header()->set_timestamp_sec(start_timestamp);
+    // TODO(all): integrate reverse gear
+    trajectory_pb.set_gear(canbus::Chassis::GEAR_DRIVE);
     AdapterManager::PublishPlanning(trajectory_pb);
     ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
   } else {
