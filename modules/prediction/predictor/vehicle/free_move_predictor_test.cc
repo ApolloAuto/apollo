@@ -38,12 +38,35 @@ class FreeMovePredictorTest : public ::testing::Test {
       "modules/prediction/testdata/single_perception_vehicle_offlane.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
     FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
+    FLAGS_p_var = 0.1;
+    FLAGS_q_var = 0.01;
+    FLAGS_r_var = 0.25;
   }
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
 TEST_F(FreeMovePredictorTest, General) {
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
+                   1501183430.161906);
+  apollo::perception::PerceptionObstacle perception_obstacle =
+      perception_obstacles_.perception_obstacle(0);
+  EXPECT_EQ(perception_obstacle.id(), 15);
+  ObstaclesContainer container;
+  container.Insert(perception_obstacles_);
+  Obstacle* obstacle_ptr = container.GetObstacle(15);
+  EXPECT_TRUE(obstacle_ptr != nullptr);
+  FreeMovePredictor predictor;
+  predictor.Predict(obstacle_ptr);
+  const PredictionObstacle& prediction_obstacle =
+      predictor.prediction_obstacle();
+  EXPECT_EQ(prediction_obstacle.trajectory_size(), 1);
+  EXPECT_NEAR(
+      prediction_obstacle.trajectory(0).trajectory_point(9).path_point().x(),
+      -432.459, 0.001);
+  EXPECT_NEAR(
+      prediction_obstacle.trajectory(0).trajectory_point(9).path_point().y(),
+      -156.451, 0.001);
 }
 
 }  // namespace prediction
