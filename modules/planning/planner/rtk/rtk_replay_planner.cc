@@ -38,7 +38,8 @@ Status RTKReplayPlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status RTKReplayPlanner::Plan(const TrajectoryPoint& start_point,
+Status RTKReplayPlanner::Plan(
+    const TrajectoryPoint& start_point,
     PublishableTrajectory* ptr_publishable_trajectory) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg(
@@ -58,7 +59,7 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& start_point,
           ? complete_rtk_trajectory_.size() - 1
           : matched_index + forward_buffer - 1;
 
-//  auto* trajectory_points = trajectory_pb->mutable_trajectory_point();
+  //  auto* trajectory_points = trajectory_pb->mutable_trajectory_point();
   std::vector<TrajectoryPoint> trajectory_points(
       complete_rtk_trajectory_.begin() + matched_index,
       complete_rtk_trajectory_.begin() + end_index + 1);
@@ -66,21 +67,22 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& start_point,
   // reset relative time
   double zero_time = complete_rtk_trajectory_[matched_index].relative_time();
   for (auto& trajectory_point : trajectory_points) {
-    trajectory_point.set_relative_time(trajectory_point.relative_time() - zero_time);
+    trajectory_point.set_relative_time(trajectory_point.relative_time() -
+                                       zero_time);
   }
 
   // check if the trajectory has enough points;
   // if not, append the last points multiple times and
   // adjust their corresponding time stamps.
   while (trajectory_points.size() <
-         static_cast<int64_t>(FLAGS_rtk_trajectory_forward)) {
+         static_cast<std::size_t>(FLAGS_rtk_trajectory_forward)) {
     const auto& last_point = trajectory_points.rbegin();
     auto new_point = last_point;
     new_point->set_relative_time(new_point->relative_time() +
                                  FLAGS_trajectory_resolution);
     trajectory_points.push_back(*new_point);
   }
-  ptr_publishable_trajectory->trajectory_points() = trajectory_points;
+  ptr_publishable_trajectory->SetTrajectoryPoints(trajectory_points);
   return Status::OK();
 }
 

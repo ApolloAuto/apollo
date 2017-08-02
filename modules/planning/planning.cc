@@ -228,12 +228,9 @@ void Planning::Stop() {}
 
 bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
                     ADCTrajectory* trajectory_pb) {
-
   double vehicle_state_time = VehicleState::instance()->timestamp();
   auto stitching_trajectory = TrajectoryStitcher::compute_stitching_trajectory(
-      is_on_auto_mode,
-      vehicle_state_time,
-      last_publishable_trajectory_);
+      is_on_auto_mode, vehicle_state_time, last_publishable_trajectory_);
 
   auto planning_start_point = stitching_trajectory.back();
 
@@ -241,22 +238,24 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   auto status = planner_->Plan(planning_start_point, &publishable_trajectory);
 
   if (FLAGS_enable_record_debug) {
-    trajectory_pb->mutable_debug()->mutable_planning_data()->mutable_init_point()->CopyFrom(
-        stitching_trajectory.back());
+    trajectory_pb->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_init_point()
+        ->CopyFrom(stitching_trajectory.back());
     trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(
-    stitching_trajectory.size() == 1);
+        stitching_trajectory.size() == 1);
 
-    //TODO: check whether current planner is EM planner.
+    // TODO: check whether current planner is EM planner.
     auto& em_debugger =
         dynamic_cast<EMPlanner*>(planner_.get())->em_planner_debugger();
 
     for (auto it = em_debugger.paths_.begin(); it != em_debugger.paths_.end();
-        ++it) {
+         ++it) {
       auto ptr_path_planning_info =
           trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
       ptr_path_planning_info->set_name(it->first);
       ptr_path_planning_info->mutable_path_point()->CopyFrom(
-          { it->second.first.points().begin(), it->second.first.points().end() });
+          {it->second.first.points().begin(), it->second.first.points().end()});
 
       auto ptr_stats =
           trajectory_pb->mutable_latency_stats()->add_processor_stats();
@@ -265,12 +264,13 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     }
 
     for (auto it = em_debugger.speed_profiles_.begin();
-        it != em_debugger.speed_profiles_.end(); ++it) {
-      auto ptr_speed_planning_info =
-          trajectory_pb->mutable_debug()->mutable_planning_data()->add_speed_plan();
+         it != em_debugger.speed_profiles_.end(); ++it) {
+      auto ptr_speed_planning_info = trajectory_pb->mutable_debug()
+                                         ->mutable_planning_data()
+                                         ->add_speed_plan();
       ptr_speed_planning_info->set_name(it->first);
       ptr_speed_planning_info->mutable_speed_point()->CopyFrom(
-          { it->second.first.begin(), it->second.first.end() });
+          {it->second.first.begin(), it->second.first.end()});
 
       auto ptr_stats =
           trajectory_pb->mutable_latency_stats()->add_processor_stats();
@@ -283,7 +283,8 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     ptr_reference_line->set_name("planning_reference_line");
 
     ptr_reference_line->mutable_path_point()->CopyFrom(
-        { em_debugger.reference_line_.begin(), em_debugger.reference_line_.end() });
+        {em_debugger.reference_line_.begin(),
+         em_debugger.reference_line_.end()});
   }
 
   if (status != Status::OK()) {
@@ -292,8 +293,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
     return false;
   }
 
-  auto& trajectory_points = publishable_trajectory.trajectory_points();
-  trajectory_points.insert(trajectory_points.begin(),
+  publishable_trajectory.prepend_trajectory_points(
       stitching_trajectory.begin(), stitching_trajectory.end() - 1);
 
   publishable_trajectory.set_header_time(vehicle_state_time);

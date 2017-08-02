@@ -43,6 +43,11 @@ class PublishableTrajectory : public DiscretizedTrajectory {
 
   void set_header_time(const double header_time);
 
+  template <typename Iter>
+  void prepend_trajectory_points(Iter begin, Iter end) {
+    _trajectory_points.insert(_trajectory_points.begin(), begin, end);
+  }
+
   ADCTrajectory to_trajectory_protobuf() const;
   void populate_trajectory_protobuf(ADCTrajectory* trajectory_pb) const;
 
