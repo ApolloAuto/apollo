@@ -53,6 +53,7 @@ class QpSplineStGraph {
 
   // apply st graph constraint
   common::Status ApplyConstraint(
+      const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
       const std::vector<StGraphBoundary>& boundaries);
 
   // apply objective function
@@ -75,8 +76,7 @@ class QpSplineStGraph {
       const StGraphBoundary& follow_boundary);
 
   common::Status EstimateSpeedConstraint(
-      const StGraphData& st_graph_data, const PathData& path_data,
-      const SpeedLimit& speed_limit,
+      const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
       std::vector<double>* speed_constraint) const;
 
  private:
