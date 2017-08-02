@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 /**
-*   @file: st_graph_boundary.h
-**/
+ *   @file: st_graph_boundary.h
+ **/
 
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_BOUNDARY_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_BOUNDARY_H_
@@ -47,7 +47,6 @@ class StGraphBoundary : public common::math::Polygon2d {
 
   ~StGraphBoundary() = default;
 
-  bool is_empty() const;
   bool IsPointInBoundary(const StGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;
 
@@ -62,11 +61,11 @@ class StGraphBoundary : public common::math::Polygon2d {
   void set_boundary_type(const BoundaryType& boundary_type);
   void set_characteristic_length(const double characteristic_length);
 
-  bool get_s_boundary_position(const double curr_time, double* s_upper,
-                               double* s_lower) const;
+  bool GetUnblockSRange(const double curr_time, double* s_upper,
+                        double* s_lower) const;
 
-  bool get_boundary_s_range_by_time(const double curr_time, double* s_upper,
-                                    double* s_lower) const;
+  bool GetBoundarySRange(const double curr_time, double* s_upper,
+                         double* s_lower) const;
 
   void get_boundary_time_scope(double* start_t, double* end_t) const;
 
@@ -80,4 +79,4 @@ class StGraphBoundary : public common::math::Polygon2d {
 }  // end namespace planning
 }  // end namespace apollo
 
-#endif  // BAIDU_ADU_PLANNING_OPTIMIZER_COMMON_ST_GRAPH_BOUNDARY_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_BOUNDARY_H_
