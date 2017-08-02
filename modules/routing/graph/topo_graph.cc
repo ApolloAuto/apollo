@@ -16,7 +16,6 @@
 
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/common/utils.h"
-#include "modules/routing/graph/topo_edge.h"
 #include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
@@ -28,9 +27,9 @@ void TopoGraph::clear() {
   _node_index_map.clear();
 }
 
-bool TopoGraph::load_nodes(const ::apollo::routing::common::Graph& graph) {
+bool TopoGraph::load_nodes(const ::apollo::routing::Graph& graph) {
   if (graph.node_size() == 0) {
-    ROS_ERROR("No nodes found in topology graph.");
+    AERROR << "No nodes found in topology graph.";
     return false;
   }
   for (const auto& node : graph.node()) {
@@ -44,9 +43,9 @@ bool TopoGraph::load_nodes(const ::apollo::routing::common::Graph& graph) {
 }
 
 // Need to execute load_nodes() firstly
-bool TopoGraph::load_edges(const ::apollo::routing::common::Graph& graph) {
+bool TopoGraph::load_edges(const ::apollo::routing::Graph& graph) {
   if (graph.edge_size() == 0) {
-    ROS_ERROR("No edges found in topology graph.");
+    AERROR << "No edges found in topology graph.";
     return false;
   }
   for (const auto& edge : graph.edge()) {
@@ -54,8 +53,6 @@ bool TopoGraph::load_edges(const ::apollo::routing::common::Graph& graph) {
     const std::string& to_lane_id = edge.to_lane_id();
     if (_node_index_map.count(from_lane_id) != 1 ||
         _node_index_map.count(to_lane_id) != 1) {
-      ROS_ERROR("Can't find edge: %s -> %s.", from_lane_id.c_str(),
-                to_lane_id.c_str());
       return false;
     }
     std::shared_ptr<TopoEdge> topo_edge;
@@ -72,24 +69,22 @@ bool TopoGraph::load_edges(const ::apollo::routing::common::Graph& graph) {
 bool TopoGraph::load_graph(const std::string& file_path) {
   clear();
 
-  ::apollo::routing::common::Graph graph;
+  ::apollo::routing::Graph graph;
   if (!::apollo::routing::FileUtils::load_protobuf_data_from_file(file_path,
                                                                &graph)) {
-    ROS_ERROR("Failed to read topology graph from data.");
+    AERROR << "Failed to read topology graph from data.";
     return false;
   }
 
   _map_version = graph.hdmap_version();
   _map_district = graph.hdmap_district();
-  ROS_INFO("Use map district: %s, version: %s", _map_district.c_str(),
-           _map_version.c_str());
 
   if (!load_nodes(graph)) {
-    ROS_ERROR("Failed to load nodes from topology graph.");
+    AERROR << "Failed to load nodes from topology graph.";
     return false;
   }
   if (!load_edges(graph)) {
-    ROS_ERROR("Failed to load edges from topology graph.");
+    AERROR << "Failed to load edges from topology graph.";
     return false;
   }
   return true;
