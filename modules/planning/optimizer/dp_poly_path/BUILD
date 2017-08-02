@@ -59,7 +59,7 @@ cc_test(
     ],
     deps = [
         ":dp_poly_path",
-        "//modules/planning/optimizer:optimizer_test_base",
+        "//modules/planning/integration_tests:planning_test_base",
         "@gtest//:main",
     ],
 )
@@ -76,7 +76,7 @@ cc_test(
     ],
     deps = [
         ":dp_poly_path",
-        "//modules/planning/optimizer:optimizer_test_base",
+        "//modules/planning/integration_tests:planning_test_base",
         "@gtest//:main",
     ],
 )

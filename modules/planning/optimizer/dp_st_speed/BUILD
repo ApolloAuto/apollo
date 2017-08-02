@@ -75,7 +75,7 @@ cc_test(
     ],
     deps = [
         ":dp_st_graph",
-        "//modules/planning/optimizer:optimizer_test_base",
+        "//modules/planning/integration_tests:planning_test_base",
         "@gtest//:main",
     ],
 )

@@ -32,14 +32,14 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
-#include "modules/planning/optimizer/optimizer_test_base.h"
+#include "modules/planning/integration_tests/planning_test_base.h"
 
 namespace apollo {
 namespace planning {
 
 using common::adapter::AdapterManager;
 
-class DpRoadGraphTest : public OptimizerTestBase {
+class DpRoadGraphTest : public PlanningTestBase {
  public:
   void SetInitPoint() {
     init_point_.mutable_path_point()->set_x(pose_.position().x());
@@ -69,7 +69,7 @@ class DpRoadGraphTest : public OptimizerTestBase {
 
   virtual void SetUp() {
     google::InitGoogleLogging("DpRoadGraphTest");
-    OptimizerTestBase::SetUp();
+    PlanningTestBase::SetUp();
     SetInitPoint();
     SetSpeedDataWithConstVeolocity(10.0);
     const auto* frame = planning_.GetFrame();

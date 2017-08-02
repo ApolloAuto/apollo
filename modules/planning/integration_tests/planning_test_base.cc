@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/optimizer/optimizer_test_base.h"
+#include "modules/planning/integration_tests/planning_test_base.h"
 
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
@@ -34,7 +34,7 @@ DEFINE_string(test_chassis_file,
               "modules/planning/testdata/garage_chassis.pb.txt",
               "The chassis test file");
 
-void OptimizerTestBase::SetDataConfigs() {
+void PlanningTestBase::SetDataConfigs() {
   FLAGS_qp_spline_path_config_file =
       "modules/planning/testdata/conf/qp_spline_path_config.pb.txt";
   FLAGS_qp_spline_st_speed_config_file =
@@ -58,7 +58,7 @@ void OptimizerTestBase::SetDataConfigs() {
   FLAGS_alsologtostderr = true;
 }
 
-bool OptimizerTestBase::SetUpAdapters() {
+bool PlanningTestBase::SetUpAdapters() {
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_adapter_config_path);
   }
@@ -85,7 +85,7 @@ bool OptimizerTestBase::SetUpAdapters() {
   return true;
 }
 
-void OptimizerTestBase::SetUp() {
+void PlanningTestBase::SetUp() {
   SetDataConfigs();
   planning_.Init();
   if (!SetUpAdapters()) {
@@ -112,7 +112,7 @@ void OptimizerTestBase::SetUp() {
   }
 }
 
-void OptimizerTestBase::export_sl_points(
+void PlanningTestBase::export_sl_points(
     const std::vector<std::vector<common::SLPoint>>& points,
     const std::string& filename) {
   AINFO << "Write sl_points to file " << filename;
@@ -128,8 +128,8 @@ void OptimizerTestBase::export_sl_points(
   ofs.close();
 }
 
-void OptimizerTestBase::export_path_data(const PathData& path_data,
-                                         const std::string& filename) {
+void PlanningTestBase::export_path_data(const PathData& path_data,
+                                        const std::string& filename) {
   AINFO << "Write path_data to file " << filename;
   std::ofstream ofs(filename);
   ofs << "s, l, dl, ddl, x, y, z" << std::endl;
