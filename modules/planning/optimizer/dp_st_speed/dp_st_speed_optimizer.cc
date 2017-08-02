@@ -96,7 +96,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   DpStGraph st_graph(dp_st_speed_config_);
   if (!st_graph
            .Search(st_graph_data, decision_data, speed_data,
-                   frame_->MutableObstacleTable())
+                   frame_->MutableObstacles())
            .ok()) {
     const std::string msg = "Failed to search graph with dynamic programming.";
     AERROR << msg;

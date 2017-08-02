@@ -185,14 +185,7 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
     const Obstacle& obstacle) {
   const std::vector<ObjectDecisionType>& decision = obstacle.Decisions();
 
-  if (decision.size() != obstacle.prediction_trajectories().size()) {
-    AERROR << "prediction_trajectories size["
-           << obstacle.prediction_trajectories().size()
-           << " does NOT match decision size[" << decision.size() << "].";
-    return true;
-  }
-
-  for (uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
+  for (uint32_t i = 0; i < decision.size(); ++i) {
     if (!decision[i].has_nudge()) {
       continue;
     }
@@ -200,18 +193,13 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
     double buffer = std::fabs(nudge.distance_l());
 
     int nudge_side = nudge.type() == ObjectNudge::RIGHT_NUDGE ? 1 : -1;
-    const prediction::Trajectory& predicted_trajectory =
-        obstacle.prediction_trajectories()[i];
 
     for (const SpeedPoint& veh_point : _discretized_veh_loc) {
       double time = veh_point.t();
-      common::TrajectoryPoint trajectory_point =
-          obstacle.get_point_at(predicted_trajectory, time);
+      common::TrajectoryPoint trajectory_point = obstacle.GetPointAtTime(time);
       common::math::Vec2d xy_point(trajectory_point.path_point().x(),
                                    trajectory_point.path_point().y());
-      common::math::Box2d obs_box(xy_point,
-                                  trajectory_point.path_point().theta(),
-                                  obstacle.Length(), obstacle.Width());
+      common::math::Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
       // project obs_box on reference line
       std::vector<common::math::Vec2d> corners;
       obs_box.GetAllCorners(&corners);
@@ -282,7 +270,7 @@ bool QpFrenetFrame::mapping_static_obstacle_with_decision(
     const auto& nudge = decision.nudge();
     const double buffer = std::fabs(nudge.distance_l());
     if (nudge.type() == ObjectNudge::RIGHT_NUDGE) {
-      common::math::Box2d box = obstacle.BoundingBox();
+      const auto& box = obstacle.PerceptionBoundingBox();
       std::vector<common::math::Vec2d> corners;
       box.GetAllCorners(&corners);
       if (!mapping_polygon(corners, buffer, -1, &_static_obstacle_bound)) {
@@ -291,7 +279,7 @@ bool QpFrenetFrame::mapping_static_obstacle_with_decision(
         return false;
       }
     } else {
-      common::math::Box2d box = obstacle.BoundingBox();
+      const auto& box = obstacle.PerceptionBoundingBox();
       std::vector<common::math::Vec2d> corners;
       box.GetAllCorners(&corners);
       if (!mapping_polygon(corners, buffer, 1, &_static_obstacle_bound)) {

@@ -40,7 +40,7 @@ DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config)
 
 Status DpStGraph::Search(const StGraphData& st_graph_data,
                          DecisionData* const decision_data,
-                         SpeedData* const speed_data, ObstacleTable* table) {
+                         SpeedData* const speed_data, Obstacles* table) {
   init_point_ = st_graph_data.init_point();
 
   if (st_graph_data.path_data_length() <
@@ -283,7 +283,7 @@ Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
 
 Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
                                       const SpeedData& speed_profile,
-                                      ObstacleTable* obstacles) const {
+                                      Obstacles* obstacles) const {
   if (speed_profile.speed_vector().size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
