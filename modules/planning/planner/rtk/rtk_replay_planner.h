@@ -61,7 +61,8 @@ class RTKReplayPlanner : public Planner {
   apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
                               Frame* frame,
                               PublishableTrajectory* trajectory_pb,
-                              planning_internal::Debug* ptr_debug = nullptr) override;
+                              planning_internal::Debug* ptr_debug = nullptr,
+                              planning::LatencyStats* = nullptr) override;
   /**
    * @brief Read the recorded trajectory file.
    * @param filename The name of the trajectory file.

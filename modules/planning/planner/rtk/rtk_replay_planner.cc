@@ -38,7 +38,8 @@ Status RTKReplayPlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
 Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
     Frame* frame, PublishableTrajectory* ptr_publishable_trajectory,
-    ::apollo::planning_internal::Debug* ptr_debug) {
+    planning_internal::Debug* ptr_debug,
+    planning::LatencyStats* ptr_latency_stats) {
 
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg(
