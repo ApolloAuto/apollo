@@ -33,9 +33,6 @@ DECLARE_double(look_forward_distance);
 DECLARE_double(cycle_duration_in_sec);
 DECLARE_double(maximal_delay_sec);
 DECLARE_int32(max_history_result);
-DECLARE_int32(max_frame_size);
-// Finite State Machine
-DECLARE_int32(state_fail_threshold);
 
 // parameters for trajectory stitching and reinit planning starting point.
 DECLARE_bool(use_stitch);
