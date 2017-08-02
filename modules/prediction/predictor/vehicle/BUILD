@@ -55,4 +55,26 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "lane_sequence_predictor_test",
+    size = "small",
+    srcs = [
+        "lane_sequence_predictor_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/evaluator/vehicle:mlp_evaluator",
+        "//modules/prediction/predictor/vehicle:lane_sequence_predictor",
+        "@gtest//:main",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/common/util:util",
+        "//modules/prediction/container/obstacles:obstacles_container",
+    ],
+)
+
 cpplint()
