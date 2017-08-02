@@ -21,72 +21,65 @@
 #ifndef MODULES_PLANNING_COMMON_OBSTACLE_H_
 #define MODULES_PLANNING_COMMON_OBSTACLE_H_
 
-#include <string>
+#include <list>
 #include <vector>
 
-#include "modules/common/math/box2d.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/common/planning_object.h"
+#include "modules/planning/proto/decision.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+#include "modules/common/math/box2d.h"
+#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace planning {
 
-class Obstacle : public PlanningObject {
+class Obstacle {
  public:
   Obstacle() = default;
 
+  Obstacle(const std::string &id,
+           const perception::PerceptionObstacle &perception,
+           const prediction::Trajectory &trajectory);
+
   const std::string &Id() const;
 
-  void SetId(const std::string &id);
+  common::TrajectoryPoint GetPointAtTime(const double time) const;
+  common::math::Box2d GetBoundingBox(
+      const common::TrajectoryPoint &point) const;
+  /**
+   * @brief get the perception bounding box
+   */
+  const common::math::Box2d &PerceptionBoundingBox() const;
 
-  const perception::PerceptionObstacle::Type &Type() const;
-  void SetType(const perception::PerceptionObstacle::Type &type);
+  const prediction::Trajectory &Trajectory() const;
 
-  double Height() const;
-  void SetHeight(const double height);
+  const perception::PerceptionObstacle &Perception() const;
 
-  double Width() const;
-  void SetWidth(const double width);
-
-  double Length() const;
-  void SetLength(const double length);
-
-  double Heading() const;
-  void SetHeading(const double heading);
-
-  double Speed() const;
-  void SetSpeed(const double speed);
-
-  apollo::common::math::Vec2d Center() const { return center_; };
-
-  apollo::common::math::Box2d BoundingBox() const;
-
-  const std::vector<prediction::Trajectory> &prediction_trajectories() const {
-    return trajectories_;
+  // FIXME fake functions, will be migrate out soon.
+  const std::vector<ObjectDecisionType> &Decisions() const {
+    return decisions_;
   }
-  void add_prediction_trajectory(
-      const prediction::Trajectory &prediction_trajectory) {
-    trajectories_.push_back(prediction_trajectory);
-  }
+  std::vector<ObjectDecisionType> *MutableDecisions() { return &decisions_; }
 
-  common::TrajectoryPoint get_point_at(const prediction::Trajectory &trajectory,
-                                       const double time) const;
+  /**
+   * @brief This is a helper function that can create obstacles from prediction
+   * data.  The original prediction may have multiple trajectories for each
+   * obstacle. But this function will create one obstacle for each trajectory.
+   * @param predictions The prediction results
+   * @param obstacles The output obstacles saved in a list of unique_ptr.
+   */
+  static void CreateObstacles(
+      const prediction::PredictionObstacles &predictions,
+      std::list<std::unique_ptr<Obstacle>> *obstacles);
 
  private:
   std::string id_ = 0;
-
-  // TODO: (Liangliang) set those parameters.
-  double height_ = 0.0;
-  double width_ = 0.0;
-  double length_ = 0.0;
-  double heading_ = 0.0;
-  // NOTICE: check is speed_ is set before usage.
-  double speed_ = 0.0;
-
-  std::vector<prediction::Trajectory> trajectories_;
-  ::apollo::common::math::Vec2d center_;
-  perception::PerceptionObstacle::Type type_ =
-      perception::PerceptionObstacle::VEHICLE;
+  prediction::Trajectory trajectory_;
+  perception::PerceptionObstacle perception_obstacle_;
+  // FIXME move out later
+  std::vector<ObjectDecisionType> decisions_;
+  common::math::Box2d perception_bounding_box_;
 };
 
 }  // namespace planning

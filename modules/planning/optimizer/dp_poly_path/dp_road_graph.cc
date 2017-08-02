@@ -264,7 +264,8 @@ bool DpRoadGraph::compute_object_decision_from_path(
 
   for (std::size_t i = 0; i < static_obstacles->size(); ++i) {
     bool ignore = true;
-    const auto &static_obstacle_box = (*static_obstacles)[i]->BoundingBox();
+    const auto &static_obstacle_box =
+        (*static_obstacles)[i]->PerceptionBoundingBox();
     common::SLPoint obs_sl;
 
     if (!reference_line.get_point_in_frenet_frame(
@@ -330,8 +331,7 @@ bool DpRoadGraph::compute_object_decision_from_path(
   size_t evaluate_times = static_cast<size_t>(
       std::floor(total_time / config_.eval_time_interval()));
   for (size_t i = 0; i < dynamic_obstacles->size(); ++i) {
-    const auto &trajectories =
-        (*dynamic_obstacles)[i]->prediction_trajectories();
+    auto *obstacle = (*dynamic_obstacles)[i];
 
     // list of Box2d for ego car given heuristic speed profile
     std::vector<::apollo::common::math::Box2d> ego_by_time;
@@ -340,40 +340,31 @@ bool DpRoadGraph::compute_object_decision_from_path(
       AERROR << "fill_ego_by_time error";
     }
 
-    for (size_t j = 0; j < trajectories.size(); ++j) {
-      const auto &trajectory = trajectories[j];
-      std::vector<::apollo::common::math::Box2d> obstacle_by_time;
-      for (size_t time = 0; time <= evaluate_times; ++time) {
-        auto traj_point = (*dynamic_obstacles)[i]->get_point_at(
-            trajectory, time * config_.eval_time_interval());
-        ::apollo::common::math::Vec2d center_point = {
-            traj_point.path_point().x(), traj_point.path_point().y()};
-        ::apollo::common::math::Box2d obstacle_box = {
-            center_point, traj_point.path_point().theta(),
-            (*dynamic_obstacles)[i]->BoundingBox().length(),
-            (*dynamic_obstacles)[i]->BoundingBox().width()};
-        obstacle_by_time.push_back(obstacle_box);
-      }
+    std::vector<::apollo::common::math::Box2d> obstacle_by_time;
+    for (size_t time = 0; time <= evaluate_times; ++time) {
+      auto traj_point =
+          obstacle->GetPointAtTime(time * config_.eval_time_interval());
+      obstacle_by_time.push_back(obstacle->GetBoundingBox(traj_point));
+    }
 
-      // if two lists of boxes collide
-      if (obstacle_by_time.size() != ego_by_time.size()) {
-        AINFO << "dynamic_obstacle_by_time size[" << obstacle_by_time.size()
-              << "] != ego_by_time[" << ego_by_time.size()
-              << "] from heuristic_speed_data";
-        continue;
-      }
+    // if two lists of boxes collide
+    if (obstacle_by_time.size() != ego_by_time.size()) {
+      AINFO << "dynamic_obstacle_by_time size[" << obstacle_by_time.size()
+            << "] != ego_by_time[" << ego_by_time.size()
+            << "] from heuristic_speed_data";
+      continue;
+    }
 
-      // judge for collision
-      for (size_t k = 0; k < obstacle_by_time.size(); ++k) {
-        if (ego_by_time[k].DistanceTo(obstacle_by_time[k]) <
-            FLAGS_dynamic_decision_follow_range) {
-          // Follow
-          ObjectDecisionType object_follow;
-          ObjectFollow *object_follow_ptr = object_follow.mutable_follow();
-          object_follow_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
-          (*dynamic_obstacles)[i]->MutableDecisions()->push_back(object_follow);
-          break;
-        }
+    // judge for collision
+    for (size_t k = 0; k < obstacle_by_time.size(); ++k) {
+      if (ego_by_time[k].DistanceTo(obstacle_by_time[k]) <
+          FLAGS_dynamic_decision_follow_range) {
+        // Follow
+        ObjectDecisionType object_follow;
+        ObjectFollow *object_follow_ptr = object_follow.mutable_follow();
+        object_follow_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
+        (*dynamic_obstacles)[i]->MutableDecisions()->push_back(object_follow);
+        break;
       }
     }
   }

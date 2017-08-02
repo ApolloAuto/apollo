@@ -39,9 +39,11 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:box2d",
+        "//modules/common/math:polygon2d",
         "//modules/perception/proto:perception_proto",
-        "//modules/planning/common:planning_object",
         "//modules/planning/common:planning_util",
+        "//modules/planning/proto:planning_proto",
+        "//modules/prediction/proto:prediction_proto",
     ],
 )
 
@@ -55,20 +57,6 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-    ],
-)
-
-cc_library(
-    name = "planning_object",
-    srcs = [
-        "planning_object.cc",
-    ],
-    hdrs = [
-        "planning_object.h",
-    ],
-    deps = [
-        "//modules/common/math:polygon2d",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 

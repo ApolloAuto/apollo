@@ -60,33 +60,17 @@ const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
   return planning_start_point_;
 }
 
-void Frame::SetDecisionDataFromPrediction(
-    const prediction::PredictionObstacles &prediction_obstacles) {
-  for (const auto &prediction_obstacle :
-       prediction_obstacles.prediction_obstacle()) {
-    Obstacle obstacle;
-    auto &perception_obstacle = prediction_obstacle.perception_obstacle();
-    obstacle.SetId(std::to_string(perception_obstacle.id()));
-    obstacle.SetType(perception_obstacle.type());
-    obstacle.SetHeight(perception_obstacle.height());
-    obstacle.SetWidth(perception_obstacle.width());
-    obstacle.SetLength(perception_obstacle.length());
-    double theta = perception_obstacle.theta();
-    obstacle.SetHeading(theta);
-    double speed = perception_obstacle.velocity().x() * cos(theta) +
-                   perception_obstacle.velocity().y() * sin(theta);
-    obstacle.SetSpeed(speed);
-
-    for (const auto &trajectory : prediction_obstacle.trajectory()) {
-      obstacle.add_prediction_trajectory(trajectory);
-    }
-
-    mutable_planning_data()->mutable_decision_data()->AddObstacle(obstacle);
-  }
-}
-
 void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
   prediction_ = prediction;
+}
+
+void Frame::CreateObstacles(const prediction::PredictionObstacles &prediction) {
+  std::list<std::unique_ptr<Obstacle> > obstacles;
+  Obstacle::CreateObstacles(prediction, &obstacles);
+  for (auto &ptr : obstacles) {
+    mutable_planning_data()->mutable_decision_data()->AddObstacle(ptr.get());
+    obstacles_.Add(ptr->Id(), std::move(ptr));
+  }
 }
 
 bool Frame::Init() {
@@ -109,7 +93,7 @@ bool Frame::Init() {
     return false;
   }
   if (FLAGS_enable_prediction) {
-    SetDecisionDataFromPrediction(prediction_);
+    CreateObstacles(prediction_);
   }
   return true;
 }
@@ -172,8 +156,8 @@ bool Frame::SmoothReferenceLine() {
   return true;
 }
 
-const ObstacleTable &Frame::GetObstacleTable() const { return obstacle_table_; }
-ObstacleTable *Frame::MutableObstacleTable() { return &obstacle_table_; }
+const Obstacles &Frame::GetObstacles() const { return obstacles_; }
+Obstacles *Frame::MutableObstacles() { return &obstacles_; }
 
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);

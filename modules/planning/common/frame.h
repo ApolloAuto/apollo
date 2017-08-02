@@ -39,7 +39,7 @@
 namespace apollo {
 namespace planning {
 
-using ObstacleTable = IndexedList<std::string, Obstacle>;
+using Obstacles = IndexedList<std::string, Obstacle>;
 
 class Frame {
  public:
@@ -61,8 +61,8 @@ class Frame {
   PlanningData *mutable_planning_data();
   std::string DebugString() const;
 
-  const ObstacleTable &GetObstacleTable() const;
-  ObstacleTable *MutableObstacleTable();
+  const Obstacles &GetObstacles() const;
+  Obstacles *MutableObstacles();
 
   void set_computed_trajectory(const PublishableTrajectory &trajectory);
   const PublishableTrajectory &computed_trajectory() const;
@@ -70,15 +70,14 @@ class Frame {
  private:
   bool CreateReferenceLineFromRouting();
   bool SmoothReferenceLine();
-  void SetDecisionDataFromPrediction(
-      const prediction::PredictionObstacles &prediction_obstacles);
+  void CreateObstacles(const prediction::PredictionObstacles &prediction);
 
  private:
   common::TrajectoryPoint planning_start_point_;
 
   hdmap::RoutingResponse routing_result_;
   prediction::PredictionObstacles prediction_;
-  ObstacleTable obstacle_table_;
+  Obstacles obstacles_;
   uint32_t sequence_num_ = 0;
   hdmap::Path hdmap_path_;
   localization::Pose init_pose_;

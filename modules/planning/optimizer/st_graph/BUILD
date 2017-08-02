@@ -67,7 +67,6 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:planning_object",
         "//modules/planning/common:speed_limit",
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/path:frenet_frame_path",
