@@ -38,7 +38,8 @@ class TrajectoryStitcher {
 
   static std::vector<TrajectoryPoint> compute_stitching_trajectory(
       const bool is_on_auto_mode,
-      const double vehicle_state_time,
+      const double current_timestamp,
+      const double planning_cycle_time,
       const PublishableTrajectory& prev_trajectory);
 };
 

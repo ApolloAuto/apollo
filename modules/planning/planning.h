@@ -77,7 +77,8 @@ class Planning : public apollo::common::ApolloApp {
    * @param trajectory_pb the computed planning trajectory
    */
   bool Plan(const bool is_on_auto_mode,
-            const double publish_time,
+            const double current_time_stamp,
+            const double planning_cycle_time,
             ADCTrajectory* trajectory_pb);
 
   const Frame* GetFrame() const;
