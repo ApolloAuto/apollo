@@ -56,7 +56,8 @@ class QpSplineStGraph {
       const std::vector<StGraphBoundary>& boundaries);
 
   // apply objective function
-  common::Status ApplyKernel(const SpeedLimit& speed_limit);
+  common::Status ApplyKernel(const std::vector<StGraphBoundary>& boundaries,
+                             const SpeedLimit& speed_limit);
 
   // solve
   common::Status Solve();
@@ -72,6 +73,11 @@ class QpSplineStGraph {
 
   common::Status AddFollowReferenceLineKernel(
       const StGraphBoundary& follow_boundary);
+
+  common::Status EstimateSpeedConstraint(
+      const StGraphData& st_graph_data, const PathData& path_data,
+      const SpeedLimit& speed_limit,
+      std::vector<double>* speed_constraint) const;
 
  private:
   // qp st configuration

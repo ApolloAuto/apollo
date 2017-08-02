@@ -88,9 +88,9 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   SpeedLimit speed_limit;
   if (!boundary_mapper_
            .get_speed_limits(common::VehicleState::instance()->pose(),
-                             Frame::PncMap(), path_data, planning_distance,
-                             dp_st_speed_config_.matrix_dimension_s(),
-                             dp_st_speed_config_.max_speed(), &speed_limit)
+                                  Frame::PncMap(), path_data, planning_distance,
+                                  dp_st_speed_config_.matrix_dimension_s(),
+                                  dp_st_speed_config_.max_speed(), &speed_limit)
            .ok()) {
     const std::string msg =
         "Getting speed limits for dp st speed optimizer failed!";
