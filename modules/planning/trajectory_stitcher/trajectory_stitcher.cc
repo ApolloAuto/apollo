@@ -51,7 +51,8 @@ std::vector<TrajectoryPoint> compute_reinit_stitching_trajectory() {
 //    3. the position deviation from actual and target is too high
 std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
     const bool is_on_auto_mode,
-    const double vehicle_state_time,
+    const double current_timestamp,
+    const double planning_cycle_time,
     const PublishableTrajectory& prev_trajectory) {
 
   if (!is_on_auto_mode) {
@@ -68,7 +69,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
   }
 
   const double veh_rel_time =
-      vehicle_state_time - prev_trajectory.header_time();
+      current_timestamp - prev_trajectory.header_time();
 
   std::size_t matched_index = prev_trajectory.query_nearest_point(veh_rel_time);
 
@@ -96,7 +97,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
     return compute_reinit_stitching_trajectory();
   }
 
-  double forward_rel_time = veh_rel_time + FLAGS_forward_predict_time;
+  double forward_rel_time = veh_rel_time + planning_cycle_time;
   std::size_t forward_index =
       prev_trajectory.query_nearest_point(forward_rel_time);
 
