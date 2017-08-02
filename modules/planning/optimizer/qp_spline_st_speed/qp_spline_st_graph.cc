@@ -25,7 +25,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/planning/common/planning_util.h"
+
 namespace apollo {
 namespace planning {
 
@@ -41,6 +41,17 @@ QpSplineStGraph::QpSplineStGraph(
           _qp_spline_st_speed_config.total_time() /
           _qp_spline_st_speed_config.number_of_discrete_graph_t()) {}
 
+void QpSplineStGraph::Init() {
+  double curr_t = 0.0;
+  for (uint32_t i = 0;
+       i <= _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
+    t_knots_.push_back(curr_t);
+    curr_t += time_resolution_;
+  }
+  _spline_generator.reset(new Spline1dGenerator(
+      t_knots_, _qp_spline_st_speed_config.spline_order()));
+}
+
 Status QpSplineStGraph::search(const StGraphData& st_graph_data,
                                const PathData& path_data,
                                SpeedData* const speed_data) {
@@ -53,16 +64,9 @@ Status QpSplineStGraph::search(const StGraphData& st_graph_data,
 
   // TODO(all): update speed limit here
   // TODO(all): update config through veh physical limit here generate knots
-  std::vector<double> t_knots;
-  double curr_knot = 0.0;
-  for (uint32_t i = 0;
-       i <= _qp_spline_st_speed_config.number_of_discrete_graph_t(); ++i) {
-    t_knots.push_back(curr_knot);
-    curr_knot += time_resolution_;
-  }
 
-  _spline_generator.reset(new Spline1dGenerator(
-      t_knots, _qp_spline_st_speed_config.spline_order()));
+  // initialize time resolution and
+  Init();
 
   if (!apply_constraint(st_graph_data.obs_boundary()).ok()) {
     const std::string msg = "Apply constraint failed!";
@@ -220,6 +224,25 @@ Status QpSplineStGraph::solve() {
   return _spline_generator->solve()
              ? Status::OK()
              : Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::solve");
+}
+
+Status QpSplineStGraph::AddFollowReferenceLineKernel(
+    const StGraphBoundary& follow_boundary) {
+  if (follow_boundary.boundary_type() !=
+      StGraphBoundary::BoundaryType::FOLLOW) {
+    std::string msg = common::util::StrCat(
+        "Fail to add follow reference line kernel because boundary type is ",
+        "incorrect. type: ", static_cast<int>(follow_boundary.boundary_type()),
+        ".");
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  // TODO: (Liangliang) implement this dummy function.
+  auto* spline_kernel = _spline_generator->mutable_spline_kernel();
+  const std::vector<double> t_coord;
+  const std::vector<double> ref_s;
+  spline_kernel->add_reference_line_kernel_matrix(t_coord, ref_s, 1.0);
+  return Status::OK();
 }
 
 Status QpSplineStGraph::get_s_constraints_by_time(
