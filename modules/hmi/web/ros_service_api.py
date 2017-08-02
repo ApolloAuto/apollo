@@ -18,6 +18,7 @@
 """HMI ros node service restful Api."""
 
 import httplib
+import time
 
 import flask_restful
 import glog
@@ -33,6 +34,14 @@ class RosServiceApi(flask_restful.Resource):
     pad_msg_pub = None
     pad_msg_seq_num = 0
 
+    @classmethod
+    def init_ros(cls):
+        """Init ros node."""
+        rospy.init_node('hmi_ros_node_service', anonymous=True)
+        cls.pad_msg_pub = rospy.Publisher(
+            '/apollo/control/pad', pad_msg_pb2.PadMessage, queue_size=1)
+
+    # Restful interface.
     def get(self, cmd_name):
         """Run ros command and return HTTP response."""
         return RosServiceApi.execute_cmd(cmd_name)
@@ -52,6 +61,12 @@ class RosServiceApi(flask_restful.Resource):
             # Update runtime status.
             if tool_status.playing_status == ToolStatus.PLAYING_READY_TO_START:
                 tool_status.playing_status = ToolStatus.PLAYING
+        elif cmd_name == 'restart_auto_driving':
+            # Send one RESET before entering AUTO mode, with 0.5s interval.
+            interval = 0.5
+            cls.perform_driving_action(pad_msg_pb2.RESET)
+            time.sleep(interval)
+            cls.execute_cmd('start_auto_driving')
         else:
             error_msg = 'RosServiceApi: Unknown command "{}"'.format(cmd_name)
             glog.error(error_msg)
@@ -64,20 +79,12 @@ class RosServiceApi(flask_restful.Resource):
     @classmethod
     def perform_driving_action(cls, driving_action):
         """Request to perform driving action."""
-        if cls.pad_msg_pub is None:
-            rospy.init_node('hmi_ros_node_service', anonymous=True)
-            cls.pad_msg_pub = rospy.Publisher(
-                '/apollo/control/pad', pad_msg_pb2.PadMessage, queue_size=1)
-
         pad_msg = pad_msg_pb2.PadMessage()
         pad_msg.header.timestamp_sec = rospy.get_time()
         pad_msg.header.module_name = "hmi_ros_node_service"
         pad_msg.action = driving_action
-        # Send pad message 3 times.
-        for _ in range(3):
-            cls.pad_msg_seq_num += 1
-            pad_msg.header.sequence_num = cls.pad_msg_seq_num
+        cls.pad_msg_seq_num += 1
+        pad_msg.header.sequence_num = cls.pad_msg_seq_num
 
-            glog.info('Publishing message: {}'.format(pad_msg))
-            cls.pad_msg_pub.publish(pad_msg)
-            rospy.sleep(0.5)
+        glog.info('Publishing message: {}'.format(pad_msg))
+        cls.pad_msg_pub.publish(pad_msg)

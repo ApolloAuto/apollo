@@ -21,6 +21,7 @@ import gflags
 import google.apputils.app
 
 import handlers
+import ros_service_api
 import runtime_status
 
 gflags.DEFINE_string('host', '0.0.0.0', 'Host of the HMI server.')
@@ -33,6 +34,7 @@ gflags.DEFINE_string(
 def main(argv):
     """App entry point."""
     runtime_status.RuntimeStatus.reset(True)
+    ros_service_api.RosServiceApi.init_ros()
 
     FLAGS = gflags.FLAGS
     # Start web server.
