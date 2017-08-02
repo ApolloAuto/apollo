@@ -49,7 +49,7 @@ void Frame::SetPlanningStartPoint(const TrajectoryPoint &start_point) {
 }
 
 const hdmap::PncMap *Frame::PncMap() {
-  CHECK(!pnc_map_) << "map is not setup in frame";
+  DCHECK(pnc_map_) << "map is not setup in frame";
   return pnc_map_;
 }
 
