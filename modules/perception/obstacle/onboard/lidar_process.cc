@@ -29,7 +29,8 @@
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
-// #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
+#include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 
@@ -73,6 +74,8 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
   timestamp_ = kTimeStamp;
   seq_num_++;
 
+  AINFO << "process the " << seq_num_ << " frame. timestamp: " << timestamp_;
+
   /// get velodyne2world transfrom
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
@@ -80,21 +83,25 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
     error_code_ = apollo::common::PERCEPTION_ERROR_TF;
     return false;
   }
+  ADEBUG << "get trans pose succ.";
 
   PointCloudPtr point_cloud(new PointCloud);
   TransPointCloudToPCL(message, &point_cloud);
+  ADEBUG << "transform pointcloud success. points num is: "
+         << point_cloud->points.size();
 
-  if(!Process(timestamp_, point_cloud, velodyne_trans)) {
-    AERROR << "faile to process msg at timestamp: "<< kTimeStamp;
+  if (!Process(timestamp_, point_cloud, velodyne_trans)) {
+    AERROR << "faile to process msg at timestamp: " << kTimeStamp;
     return false;
   }
   return true;
 }
 
-bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::shared_ptr<Matrix4d> velodyne_trans) {
+bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
+                           std::shared_ptr<Matrix4d> velodyne_trans) {
   /// call hdmap to get ROI
   HdmapStructPtr hdmap = nullptr;
-  if (!hdmap_input_) {
+  if (hdmap_input_) {
     PointD velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
     Affine3d temp_trans(*velodyne_trans);
     PointD velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
@@ -119,6 +126,9 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::sha
     }
   }
 
+  ADEBUG << "call roi_filter succ. The num of roi_cloud is: "
+         << roi_cloud->points.size();
+
   /// call segmentor
   std::vector<ObjectPtr> objects;
   if (segmentor_ != nullptr) {
@@ -134,6 +144,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::sha
       return false;
     }
   }
+  ADEBUG << "call segmentation succ. The num of objects is: " << objects.size();
 
   /// call object builder
   if (object_builder_ != nullptr) {
@@ -144,6 +155,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::sha
       return false;
     }
   }
+  ADEBUG << "call object_builder succ.";
 
   /// call tracker
   if (tracker_ != nullptr) {
@@ -156,9 +168,8 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::sha
       return false;
     }
   }
-
-  AINFO << "lidar process succ, there are " << objects_.size()
-        << " tracked objects.";
+  ADEBUG << "lidar process succ, there are " << objects_.size()
+         << " tracked objects.";
   return true;
 }
 
@@ -168,7 +179,8 @@ void LidarProcess::RegistAllAlgorithm() {
   RegisterFactoryDummyObjectBuilder();
   RegisterFactoryDummyTracker();
 
-  // RegisterFactoryCNNSegmentation();
+  RegisterFactoryHdmapROIFilter();
+  RegisterFactoryCNNSegmentation();
   RegisterFactoryMinBoxObjectBuilder();
   RegisterFactoryHmObjectTracker();
 }
@@ -198,6 +210,8 @@ bool LidarProcess::InitFrameDependence() {
       AERROR << "failed to init HDMapInput";
       return false;
     }
+
+    AINFO << "get and init hdmap_input succ.";
   }
   return true;
 }

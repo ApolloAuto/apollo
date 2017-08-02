@@ -65,6 +65,7 @@ protected:
     double extend_dist_;
 };
 
+REGISTER_ROIFILTER(HdmapROIFilter);
 
 } // perception
 } // apollo
