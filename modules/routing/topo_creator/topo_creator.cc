@@ -30,8 +30,8 @@ DEFINE_string(dump_topo_path, "/home/fuxiaoxin/Desktop/routing_map.bin",
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::unique_ptr<::adu::routing::GraphCreator> creator_ptr;
-  creator_ptr.reset(new ::adu::routing::GraphCreator(
+  std::unique_ptr<::apollo::routing::GraphCreator> creator_ptr;
+  creator_ptr.reset(new ::apollo::routing::GraphCreator(
       FLAGS_base_map_dir + "/" + FLAGS_base_map_name, FLAGS_dump_topo_path));
   if (!creator_ptr->create()) {
     LOG(ERROR) << "Create routing topo failed!";

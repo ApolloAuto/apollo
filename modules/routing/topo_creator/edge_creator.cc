@@ -23,9 +23,9 @@ namespace routing {
 
 namespace {
 
-using ::apollo::routing::common::Node;
-using ::apollo::routing::common::Edge;
-using ::apollo::routing::common::CurveRange;
+using ::apollo::routing::Node;
+using ::apollo::routing::Edge;
+using ::apollo::routing::CurveRange;
 
 const double CHANGE_PENALTY = 50;  // equal to 50 meter length
 const double BASE_CHANGING_LENGTH = 50;

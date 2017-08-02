@@ -25,22 +25,22 @@ namespace routing {
 class EdgeCreator {
  public:
   static void get_pb_edge(
-      const ::apollo::routing::common::Node& node_from,
-      const ::apollo::routing::common::Node& node_to,
-      const ::apollo::routing::common::Edge::DirectionType& type,
-      ::apollo::routing::common::Edge* pb_edge);
+      const ::apollo::routing::Node& node_from,
+      const ::apollo::routing::Node& node_to,
+      const ::apollo::routing::Edge::DirectionType& type,
+      ::apollo::routing::Edge* pb_edge);
 
  private:
   static void init_edge_info(
-      const ::apollo::routing::common::Node& node_from,
-      const ::apollo::routing::common::Node& node_to,
-      const ::apollo::routing::common::Edge::DirectionType& type,
-      ::apollo::routing::common::Edge* pb_edge);
+      const ::apollo::routing::Node& node_from,
+      const ::apollo::routing::Node& node_to,
+      const ::apollo::routing::Edge::DirectionType& type,
+      ::apollo::routing::Edge* pb_edge);
   static void init_edge_cost(
-      const ::apollo::routing::common::Node& node_from,
-      const ::apollo::routing::common::Node& node_to,
-      const ::apollo::routing::common::Edge::DirectionType& type,
-      ::apollo::routing::common::Edge* pb_edge);
+      const ::apollo::routing::Node& node_from,
+      const ::apollo::routing::Node& node_to,
+      const ::apollo::routing::Edge::DirectionType& type,
+      ::apollo::routing::Edge* pb_edge);
 };
 
 }  // namespace routing
