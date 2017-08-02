@@ -22,60 +22,46 @@
 namespace apollo {
 namespace routing {
 
-Routing::Routing() {
-  _node_handle_ptr.reset(new ros::NodeHandle(FLAGS_node_namespace));
-  ROS_INFO("Use new routing request and result!");
-  _service = _node_handle_ptr->advertiseService(FLAGS_signal_probe_service,
-          &Routing::on_request, this);
-  _publisher = _node_handle_ptr->advertise<std_msgs::String>(
-      FLAGS_route_topic_for_broadcast, 1);
-  std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
-  ROS_INFO("Use routing topology graph path: %s", graph_path.c_str());
-  _navigator_ptr.reset(new Navigator(graph_path));
+std::string Routing::Name() const { return FLAGS_node_name; }
 
-  // set init ok for ADS test, when it knows routing is ok, it can replay bags
-  _node_handle_ptr->setParam(FLAGS_rosparam_name_routing_init_status, true);
+Status Routing::Init() {
+  std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
+  _navigator_ptr.reset(new Navigator(graph_path));
+  return Status::OK();
 }
 
-Routing::~Routing() {}
+Status Control::Start() {
+  if (!_navigator_ptr->is_ready()) {
+    AERROR << "Navigator is not ready!";
+    return Status::ERROR();
+  }
+  ROS_INFO("Routing service is ready.");
 
-bool Routing::on_request(routing::routing_signal::Request& req,
-                         routing::routing_signal::Response& res) {
-  ROS_INFO("Get new routing request!!!");
+  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  buffer.INFO("Routing started");
+  return Status::OK();
+}
+
+void OnRouting_Request(const apollo::routing::RoutingRequest &routing_req) {
+  AINFO << "Get new routing request!!!";
   ::apollo::routing::RoutingRequest request_proto;
   ::apollo::routing::RoutingResult response_proto;
   if (!request_proto.ParseFromString(req.routing_request.data)) {
-    ROS_ERROR("The request proto is invalid.");
+    AERROR << "The request proto is invalid.";
     return false;
   }
   if (!_navigator_ptr->search_route(request_proto, &response_proto)) {
-    ROS_ERROR("Failed to search route with navigator.");
+    AERROR<< "Failed to search route with navigator.";
     return false;
   }
-  if (!response_proto.SerializeToString(&(res.routing_response.data))) {
-    ROS_ERROR("Failed to serialize routing response.");
-    return false;
-  }
+
   if (request_proto.broadcast()) {
-    std_msgs::String publish_msg;
-    if (!response_proto.SerializeToString(&(publish_msg.data))) {
-      ROS_ERROR("Failed to serialize routing response.");
-      return false;
-    }
-    _publisher.publish(publish_msg);
+    AdapterManager::PublishControlCommand(*control_command);
   }
   return true;
 }
 
-bool Routing::run() {
-  if (!_navigator_ptr->is_ready()) {
-    ROS_ERROR("Navigator is not ready!");
-    return false;
-  }
-  ROS_INFO("Routing service is ready.");
-  ros::spin();
-  return false;
-}
+void Routing::Stop() {}
 
 }  // namespace routing
 }  // namespace apollo
