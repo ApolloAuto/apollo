@@ -32,19 +32,14 @@ int Predictor::GetTrajectorySize() {
 void Predictor::GenerateTrajectory(
     const std::vector<::apollo::common::TrajectoryPoint>& points,
     Trajectory* trajectory) {
-  if (points.size() <= 0) {
-    return;
-  }
-
-  for (const auto& point : points) {
-    trajectory->add_trajectory_point()->CopyFrom(point);
-  }
+  trajectory->mutable_trajectory_point()->MergeFrom(
+      {points.begin(), points.end()});
 }
 
 void Predictor::SetEqualProbability(double probability, int start_index) {
   int num = GetTrajectorySize();
-  if (start_index >= 0 && num > 0 && num > start_index) {
-    probability = probability / static_cast<double>(num - start_index);
+  if (start_index >= 0 && num > start_index) {
+    probability /= static_cast<double>(num - start_index);
     for (int i = start_index; i < num; ++i) {
       prediction_obstacle_.mutable_trajectory(i)->set_probability(probability);
     }

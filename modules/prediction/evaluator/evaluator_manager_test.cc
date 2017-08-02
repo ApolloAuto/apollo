@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <string>
+#include "modules/prediction/evaluator/evaluator_manager.h"
 
+#include <string>
 #include "gtest/gtest.h"
 
-#include "modules/prediction/evaluator/evaluator_manager.h"
-#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/common/util/file.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -38,10 +38,8 @@ class EvaluatorManagerTest : public ::testing::Test {
 
 TEST_F(EvaluatorManagerTest, GetEvaluators) {
   std::string conf_file = "modules/prediction/testdata/prediction_conf.pb.txt";
-  bool ret_load_conf = ::apollo::common::util::GetProtoFromFile(conf_file,
-                                                                &conf_);
-  EXPECT_TRUE(ret_load_conf);
-  EXPECT_TRUE(conf_.IsInitialized());
+  CHECK(apollo::common::util::GetProtoFromFile(conf_file, &conf_))
+      << "Failed to load " << conf_file;
 
   manager_->Init(conf_);
 

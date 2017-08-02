@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <limits>
+#include "modules/prediction/predictor/pedestrian/regional_predictor.h"
+
 #include <cmath>
+#include <limits>
 #include <utility>
 
-#include "modules/prediction/predictor/pedestrian/regional_predictor.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/common/math/kalman_filter.h"
@@ -154,8 +155,8 @@ void RegionalPredictor::GenerateMovingTrajectory(
   std::vector<TrajectoryPoint> right_points;
 
   DrawMovingTrajectory(position, velocity, acc,
-      obstacle->kf_pedestrian_tracker(), total_time,
-      &left_points, &right_points);
+                       obstacle->kf_pedestrian_tracker(), total_time,
+                       &left_points, &right_points);
   int start_index = GetTrajectorySize();
 
   Trajectory left_trajectory;

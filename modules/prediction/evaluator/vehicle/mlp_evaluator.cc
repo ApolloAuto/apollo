@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
+
 #include <cmath>
 #include <numeric>
 
-#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/prediction/common/prediction_util.h"
-#include "modules/map/proto/map_lane.pb.h"
 #include "modules/common/util/file.h"
+#include "modules/map/proto/map_lane.pb.h"
+#include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_util.h"
 
 namespace apollo {
 namespace prediction {
@@ -80,11 +81,12 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   feature_values_.clear();
   int id = obstacle_ptr->id();
   std::vector<double> obstacle_feature_values;
-  if (obstacle_feature_values_map_.find(id) ==
-      obstacle_feature_values_map_.end()) {
+
+  auto it = obstacle_feature_values_map_.find(id);
+  if (it == obstacle_feature_values_map_.end()) {
     SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
   } else {
-    obstacle_feature_values = obstacle_feature_values_map_[id];
+    obstacle_feature_values = it->second;
   }
 
   if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {

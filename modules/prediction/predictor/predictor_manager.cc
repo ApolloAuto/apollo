@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <memory>
-
 #include "modules/prediction/predictor/predictor_manager.h"
+
+#include <memory>
 
 #include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/vehicle/free_move_predictor.h"
@@ -80,15 +80,11 @@ void PredictorManager::Init(const PredictionConf& config) {
 
 Predictor* PredictorManager::GetPredictor(
     const ObstacleConf::PredictorType& type) {
-  if (predictors_.find(type) != predictors_.end()) {
-    return predictors_[type].get();
-  } else {
-    return nullptr;
-  }
+  auto it = predictors_.find(type);
+  return it != predictors_.end() ? it->second.get() : nullptr;
 }
 
-void PredictorManager::Run(
-    const PerceptionObstacles& perception_obstacles) {
+void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles_.Clear();
   ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(

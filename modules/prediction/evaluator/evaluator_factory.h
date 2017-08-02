@@ -24,10 +24,10 @@
 
 #include <memory>
 
+#include "modules/common/macro.h"
+#include "modules/common/util/factory.h"
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
-#include "modules/common/util/factory.h"
-#include "modules/common/macro.h"
 
 /**
  * @namespace apollo::prediction

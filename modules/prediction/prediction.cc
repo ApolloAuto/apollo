@@ -69,11 +69,8 @@ Status Prediction::Init() {
   EvaluatorManager::instance()->Init(prediction_conf_);
   PredictorManager::instance()->Init(prediction_conf_);
 
-  CHECK(AdapterManager::GetLocalization())
-      << "Localization is not ready.";
-
-  CHECK(AdapterManager::GetPerceptionObstacles())
-      << "Perception is not ready.";
+  CHECK(AdapterManager::GetLocalization()) << "Localization is not ready.";
+  CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not ready.";
 
   // Set perception obstacle callback function
   AdapterManager::SetPerceptionObstaclesCallback(&Prediction::OnPerception,
