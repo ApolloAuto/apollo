@@ -157,9 +157,6 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
 bool CNNSegmentation::GetConfigs(string& config_file,
                                  string& proto_file,
                                  string& weight_file) {
-  FLAGS_work_root = "modules/perception/";
-  FLAGS_config_manager_path = "./conf/config_manager.config";
-
   ConfigManager *config_manager = Singleton<ConfigManager>::Get();
   CHECK_NOTNULL(config_manager);
 
