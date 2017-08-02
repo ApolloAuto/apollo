@@ -96,7 +96,6 @@ message PlanningData {
   optional apollo.canbus.Chassis chassis = 8;
   optional apollo.hdmap.RoutingResult routing = 9;
   optional apollo.common.TrajectoryPoint init_point = 10;
-  optional bool is_replan = 11;
 
   // processed planning_obstacles
   repeated PlanningObstacle planning_obstacle = 4;
@@ -107,4 +106,5 @@ message PlanningData {
   optional apollo.localization.Pose init_status = 2 [deprecated = true];  // initial status of adc
   optional apollo.planning.MainDecision main_decision = 3 [deprecated = true];
   optional LightSignal light_signal = 5 [deprecated = true];
+  optional bool is_replan = 11 [deprecated = true];
 }
