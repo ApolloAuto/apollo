@@ -21,6 +21,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "prediction_util_test",
+    size = "small",
+    srcs = ["prediction_util_test.cc"],
+    deps = [
+        "//modules/prediction/common:prediction_util",
+        "@gtest//:main",
+    ]
+)
+
 cc_library(
     name = "prediction_map",
     srcs = ["prediction_map.cc"],
