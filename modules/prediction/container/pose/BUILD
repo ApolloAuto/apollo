@@ -14,4 +14,14 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "pose_container_test",
+    size = "small",
+    srcs = ["pose_container_test.cc"],
+    deps = [
+        "//modules/prediction/container/pose:pose_container",
+        "@gtest//:main",
+    ]
+)
+
 cpplint()
