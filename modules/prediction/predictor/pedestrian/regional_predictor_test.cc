@@ -38,6 +38,9 @@ class RegionalPredictorTest : public ::testing::Test {
       "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
     FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
+    FLAGS_p_var = 0.1;
+    FLAGS_q_var = 0.01;
+    FLAGS_r_var = 0.25;
   }
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
