@@ -57,7 +57,8 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
   double end_s = std::min(reference_line.length(),
                           _init_point.s() + FLAGS_planning_distance);
 
-  if (!_qp_frenet_frame.Init(reference_line, decision_data, speed_data,
+  QpFrenetFrame qp_frenet_frame;
+  if (!qp_frenet_frame.Init(reference_line, decision_data, speed_data,
                              _init_point, start_s, end_s,
                              _qp_spline_path_config.time_resolution(),
                              _qp_spline_path_config.num_output())) {
@@ -65,7 +66,7 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
     return false;
   }
 
-  if (!init_coord_range(&start_s, &end_s)) {
+  if (!init_coord_range(qp_frenet_frame, &start_s, &end_s)) {
     AERROR << "Measure natural coord system with s range failed!";
     return false;
   }
@@ -77,7 +78,7 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
     return false;
   }
 
-  if (!setup_constraint()) {
+  if (!setup_constraint(qp_frenet_frame)) {
     AERROR << "Fail to setup pss path constraint.";
     return false;
   }
@@ -172,12 +173,13 @@ bool QpSplinePathGenerator::calculate_sl_point(
   return true;
 }
 
-bool QpSplinePathGenerator::init_coord_range(double* const start_s,
+bool QpSplinePathGenerator::init_coord_range(const QpFrenetFrame& qp_frenet_frame,
+                                             double* const start_s,
                                              double* const end_s) {
   // TODO(all): step 1 get current sl coordinate - with init coordinate point
   double start_point = std::max(_init_point.s() - 5.0, 0.0);
 
-  const ReferenceLine* reference_line = _qp_frenet_frame.reference_line();
+  const ReferenceLine* reference_line = qp_frenet_frame.reference_line();
 
   if (reference_line == nullptr) {
     AERROR << "Could not retrieve reference line from frenet frame";
@@ -187,7 +189,7 @@ bool QpSplinePathGenerator::init_coord_range(double* const start_s,
       std::min(reference_line->length(), *start_s + FLAGS_planning_distance);
 
   end_point =
-      std::min(_qp_frenet_frame.feasible_longitudinal_upper_bound(), end_point);
+      std::min(qp_frenet_frame.feasible_longitudinal_upper_bound(), end_point);
   *start_s = start_point;
   *end_s = end_point;
   return true;
@@ -211,7 +213,7 @@ bool QpSplinePathGenerator::init_smoothing_spline(
   return true;
 }
 
-bool QpSplinePathGenerator::setup_constraint() {
+bool QpSplinePathGenerator::setup_constraint(const QpFrenetFrame& qp_frenet_frame) {
   Spline1dConstraint* spline_constraint =
       _spline_generator->mutable_spline_constraint();
   // add init status constraint
@@ -265,7 +267,7 @@ bool QpSplinePathGenerator::setup_constraint() {
     for (std::uint32_t i = 0; i < num_fx_bound + 1; ++i) {
       fx_knots.push_back(s);
       std::pair<double, double> boundary = std::make_pair(0.0, 0.0);
-      _qp_frenet_frame.get_map_bound(s, &boundary);
+      qp_frenet_frame.get_map_bound(s, &boundary);
       boundary_low.push_back(boundary.first);
       boundary_high.push_back(boundary.second);
       s += ds;
