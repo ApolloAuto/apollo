@@ -109,7 +109,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud, std::sha
     ROIFilterOptions roi_filter_options;
     roi_filter_options.velodyne_trans = velodyne_trans;
     roi_filter_options.hdmap = hdmap;
-    if (roi_filter_->Filter(point_cloud, roi_filter_options, roi_indices)) {
+    if (roi_filter_->Filter(point_cloud, roi_filter_options, roi_indices.get())) {
       pcl::copyPointCloud(*point_cloud, *roi_indices, *roi_cloud);
       roi_indices_ = roi_indices;
     } else {

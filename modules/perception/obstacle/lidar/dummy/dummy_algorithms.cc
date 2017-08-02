@@ -37,9 +37,8 @@ static void extract_pointcloud_indices(const PointCloudPtr &cloud,
 }
 
 bool DummyROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
-              const Eigen::Matrix4d& trans_velodyne_to_world,
-              HDMapInputPtr hdmap_input,
-              pcl_util::PointIndices* roi_indices) {
+                            const ROIFilterOptions &roi_filter_options,
+                            pcl_util::PointIndices* roi_indices) {
   return true;
 }
 
