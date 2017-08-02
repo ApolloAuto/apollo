@@ -44,18 +44,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "prediction_trajectory",
-    srcs = [
-        "prediction_trajectory.cc",
-    ],
-    hdrs = [
-        "prediction_trajectory.h",
-    ],
-    deps = [
-        ":discretized_trajectory",
-        "//modules/common/proto:pnc_point_proto",
-    ],
-)
-
 cpplint()

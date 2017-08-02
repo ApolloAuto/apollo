@@ -130,8 +130,8 @@ bool DpRoadGraph::find_tunnel(const ReferenceLine &reference_line,
   path_data->set_discretized_path(path_points);
 
   // compute decision data
-  if (compute_object_decision_from_path(
-    *path_data, speed_data_, reference_line, decision_data)) {
+  if (compute_object_decision_from_path(*path_data, speed_data_, reference_line,
+                                        decision_data)) {
     AINFO << "Computing decision_data in dp path success";
   } else {
     AINFO << "Computing decision_data in dp path fail";
@@ -231,36 +231,32 @@ bool DpRoadGraph::generate_graph(const ReferenceLine &reference_line,
 }
 
 bool DpRoadGraph::compute_object_decision_from_path(
-  const PathData &path_data,
-  const SpeedData &heuristic_speed_data,
-  const ReferenceLine &reference_line,
-  DecisionData *const decision_data) {
+    const PathData &path_data, const SpeedData &heuristic_speed_data,
+    const ReferenceLine &reference_line, DecisionData *const decision_data) {
   CHECK_NOTNULL(decision_data);
 
   // Compute static obstacle decision
-  std::vector<Obstacle*> *static_obstacles =
-    decision_data->MutableStaticObstacles();
+  std::vector<Obstacle *> *static_obstacles =
+      decision_data->MutableStaticObstacles();
 
   std::vector<common::SLPoint> ego_sl_points;
   std::vector<::apollo::common::math::Box2d> ego_bounding_box;
 
   const auto &vehicle_config =
-    common::VehicleConfigHelper::instance()->GetConfig();
+      common::VehicleConfigHelper::instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().length();
 
-  for (const ::apollo::common::PathPoint& path_point :
-    path_data.discretized_path().points()) {
+  for (const ::apollo::common::PathPoint &path_point :
+       path_data.discretized_path().points()) {
     ego_bounding_box.emplace_back(
-      ::apollo::common::math::Vec2d{path_point.x(), path_point.y()},
-      path_point.theta(),
-      ego_length,
-      ego_width);
+        ::apollo::common::math::Vec2d{path_point.x(), path_point.y()},
+        path_point.theta(), ego_length, ego_width);
     common::SLPoint ego_sl;
-    if (!reference_line.get_point_in_frenet_frame({path_point.x(),
-      path_point.y()}, &ego_sl)) {
+    if (!reference_line.get_point_in_frenet_frame(
+            {path_point.x(), path_point.y()}, &ego_sl)) {
       AERROR << "get_point_in_Frenet_frame error for ego vehicle "
-        << path_point.x() << " " << path_point.y();
+             << path_point.x() << " " << path_point.y();
     } else {
       ego_sl_points.push_back(ego_sl);
     }
@@ -268,45 +264,46 @@ bool DpRoadGraph::compute_object_decision_from_path(
 
   for (std::size_t i = 0; i < static_obstacles->size(); ++i) {
     bool ignore = true;
-    const auto& static_obstacle_box = (*static_obstacles)[i]->BoundingBox();
+    const auto &static_obstacle_box = (*static_obstacles)[i]->BoundingBox();
     common::SLPoint obs_sl;
 
     if (!reference_line.get_point_in_frenet_frame(
-      {static_obstacle_box.center_x(), static_obstacle_box.center_y()},
-      &obs_sl)) {
+            {static_obstacle_box.center_x(), static_obstacle_box.center_y()},
+            &obs_sl)) {
       AERROR << "Fail to map obs in frenet frame";
     }
     for (std::size_t j = 0; j < ego_sl_points.size(); ++j) {
-      const auto& ego_sl = ego_sl_points[j];
-      if (ego_sl.s() < obs_sl.s() - static_obstacle_box.half_length()
-        || ego_sl.s() > obs_sl.s() + static_obstacle_box.half_length()) {
+      const auto &ego_sl = ego_sl_points[j];
+      if (ego_sl.s() < obs_sl.s() - static_obstacle_box.half_length() ||
+          ego_sl.s() > obs_sl.s() + static_obstacle_box.half_length()) {
         continue;
       } else {
-        if (static_obstacle_box.HasOverlap(ego_bounding_box[j])
-          && std::fabs(obs_sl.l()) < FLAGS_static_decision_stop_buffer) {
+        if (static_obstacle_box.HasOverlap(ego_bounding_box[j]) &&
+            std::fabs(obs_sl.l()) < FLAGS_static_decision_stop_buffer) {
           ObjectDecisionType object_stop;
           ObjectStop *object_stop_ptr = object_stop.mutable_stop();
           object_stop_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
           object_stop_ptr->set_reason_code(
-            StopReasonCode::STOP_REASON_OBSTACLE);
+              StopReasonCode::STOP_REASON_OBSTACLE);
           (*static_obstacles)[i]->MutableDecisions()->push_back(object_stop);
           ignore = false;
           break;
         } else {
           double diff_l = obs_sl.l() - ego_sl.l();
           if (diff_l > 0 && fabs(diff_l) < FLAGS_static_decision_ignore_range) {
-            //GO_RIGHT
+            // GO_RIGHT
             ObjectDecisionType object_nudge;
-            ObjectNudge* object_nudge_ptr = object_nudge.mutable_nudge();
+            ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
             object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
             object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
             (*static_obstacles)[i]->MutableDecisions()->push_back(object_nudge);
             ignore = false;
             break;
-          } else if (diff_l < 0 && fabs(diff_l) < FLAGS_static_decision_ignore_range) {
-            //GO_LEFT
+          } else if (diff_l < 0 &&
+                     fabs(diff_l) < FLAGS_static_decision_ignore_range) {
+            // GO_LEFT
             ObjectDecisionType object_nudge;
-            ObjectNudge* object_nudge_ptr = object_nudge.mutable_nudge();
+            ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
             object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
             object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
             (*static_obstacles)[i]->MutableDecisions()->push_back(object_nudge);
@@ -317,29 +314,29 @@ bool DpRoadGraph::compute_object_decision_from_path(
       }
     }
     if (ignore) {
-      //IGNORE
+      // IGNORE
       ObjectDecisionType object_ignore;
-      ObjectIgnore* object_ignore_ptr = object_ignore.mutable_ignore();
+      ObjectIgnore *object_ignore_ptr = object_ignore.mutable_ignore();
       CHECK_NOTNULL(object_ignore_ptr);
       (*static_obstacles)[i]->MutableDecisions()->push_back(object_ignore);
     }
   }
 
   // Compute dynamic obstacle decision
-  std::vector<Obstacle*> *dynamic_obstacles =
-    decision_data->MutableDynamicObstacles();
+  std::vector<Obstacle *> *dynamic_obstacles =
+      decision_data->MutableDynamicObstacles();
   const double total_time =
-    std::min(heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
-  size_t evaluate_times =
-  static_cast<size_t>(std::floor(total_time / config_.eval_time_interval()));
+      std::min(heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
+  size_t evaluate_times = static_cast<size_t>(
+      std::floor(total_time / config_.eval_time_interval()));
   for (size_t i = 0; i < dynamic_obstacles->size(); ++i) {
-    const auto& trajectories = (*dynamic_obstacles)[i]->prediction_trajectories();
+    const auto &trajectories =
+        (*dynamic_obstacles)[i]->prediction_trajectories();
 
     // list of Box2d for ego car given heuristic speed profile
     std::vector<::apollo::common::math::Box2d> ego_by_time;
-    if (!fill_ego_by_time(path_data.frenet_frame_path(),
-      reference_line, heuristic_speed_data,
-      evaluate_times, &ego_by_time)) {
+    if (!fill_ego_by_time(path_data.frenet_frame_path(), reference_line,
+                          heuristic_speed_data, evaluate_times, &ego_by_time)) {
       AERROR << "fill_ego_by_time error";
     }
 
@@ -347,32 +344,32 @@ bool DpRoadGraph::compute_object_decision_from_path(
       const auto &trajectory = trajectories[j];
       std::vector<::apollo::common::math::Box2d> obstacle_by_time;
       for (size_t time = 0; time <= evaluate_times; ++time) {
-        TrajectoryPoint traj_point =
-          trajectory.evaluate(time * config_.eval_time_interval());
-        ::apollo::common::math::Vec2d center_point =
-          {traj_point.path_point().x(), traj_point.path_point().y()};
-        ::apollo::common::math::Box2d obstacle_box =
-          {center_point, traj_point.path_point().theta(),
-        (*dynamic_obstacles)[i]->BoundingBox().length(),
-        (*dynamic_obstacles)[i]->BoundingBox().width()};
+        auto traj_point = (*dynamic_obstacles)[i]->get_point_at(
+            trajectory, time * config_.eval_time_interval());
+        ::apollo::common::math::Vec2d center_point = {
+            traj_point.path_point().x(), traj_point.path_point().y()};
+        ::apollo::common::math::Box2d obstacle_box = {
+            center_point, traj_point.path_point().theta(),
+            (*dynamic_obstacles)[i]->BoundingBox().length(),
+            (*dynamic_obstacles)[i]->BoundingBox().width()};
         obstacle_by_time.push_back(obstacle_box);
       }
 
       // if two lists of boxes collide
       if (obstacle_by_time.size() != ego_by_time.size()) {
         AINFO << "dynamic_obstacle_by_time size[" << obstacle_by_time.size()
-          << "] != ego_by_time[" << ego_by_time.size()
-          << "] from heuristic_speed_data";
+              << "] != ego_by_time[" << ego_by_time.size()
+              << "] from heuristic_speed_data";
         continue;
       }
 
       // judge for collision
       for (size_t k = 0; k < obstacle_by_time.size(); ++k) {
         if (ego_by_time[k].DistanceTo(obstacle_by_time[k]) <
-          FLAGS_dynamic_decision_follow_range) {
-            // Follow
+            FLAGS_dynamic_decision_follow_range) {
+          // Follow
           ObjectDecisionType object_follow;
-          ObjectFollow* object_follow_ptr = object_follow.mutable_follow();
+          ObjectFollow *object_follow_ptr = object_follow.mutable_follow();
           object_follow_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
           (*dynamic_obstacles)[i]->MutableDecisions()->push_back(object_follow);
           break;
@@ -384,29 +381,26 @@ bool DpRoadGraph::compute_object_decision_from_path(
 }
 
 bool DpRoadGraph::fill_ego_by_time(
-  const FrenetFramePath &frenet_frame_path,
-  const ReferenceLine& reference_line,
-  const SpeedData& heuristic_speed_data,
-  int evaluate_times,
-  std::vector<::apollo::common::math::Box2d>* ego_by_time) {
-
+    const FrenetFramePath &frenet_frame_path,
+    const ReferenceLine &reference_line, const SpeedData &heuristic_speed_data,
+    int evaluate_times,
+    std::vector<::apollo::common::math::Box2d> *ego_by_time) {
   const auto &vehicle_config =
-    common::VehicleConfigHelper::instance()->GetConfig();
+      common::VehicleConfigHelper::instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().length();
 
   for (int i = 0; i < evaluate_times; ++i) {
     double time_stamp = i * config_.eval_time_interval();
     common::SpeedPoint speed_point;
-    if (!heuristic_speed_data.get_speed_point_with_time(
-      time_stamp,&speed_point)) {
-      AINFO << "get_speed_point_with_time for time_stamp["
-        << time_stamp << "]";
+    if (!heuristic_speed_data.get_speed_point_with_time(time_stamp,
+                                                        &speed_point)) {
+      AINFO << "get_speed_point_with_time for time_stamp[" << time_stamp << "]";
       return false;
     }
 
-    const common::FrenetFramePoint& interpolated_frenet_point =
-      frenet_frame_path.interpolate(speed_point.s());
+    const common::FrenetFramePoint &interpolated_frenet_point =
+        frenet_frame_path.interpolate(speed_point.s());
     double s = interpolated_frenet_point.s();
     double l = interpolated_frenet_point.l();
     double dl = interpolated_frenet_point.dl();
@@ -415,25 +409,26 @@ bool DpRoadGraph::fill_ego_by_time(
     common::SLPoint sl_point;
     sl_point.set_s(s);
     sl_point.set_l(l);
-    reference_line.get_point_in_Cartesian_frame(
-      sl_point, &ego_position_cartesian);
+    reference_line.get_point_in_Cartesian_frame(sl_point,
+                                                &ego_position_cartesian);
 
     ReferencePoint reference_point = reference_line.get_reference_point(s);
 
     double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
     double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
     double theta = ::apollo::common::math::NormalizeAngle(
-      delta_theta + reference_point.heading());
+        delta_theta + reference_point.heading());
 
-    ::apollo::common::math::Box2d ego_bounding_box =
-      {{ego_position_cartesian.x(), ego_position_cartesian.y()}, theta,
-      ego_length, ego_width};
+    ::apollo::common::math::Box2d ego_bounding_box = {
+        {ego_position_cartesian.x(), ego_position_cartesian.y()},
+        theta,
+        ego_length,
+        ego_width};
 
     ego_by_time->emplace_back(std::move(ego_bounding_box));
   }
   return true;
 }
-
 
 }  // namespace planning
 }  // namespace apollo

@@ -20,7 +20,9 @@
 
 #include "modules/planning/common/obstacle.h"
 
-#include <sstream>
+#include <algorithm>
+
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -49,22 +51,33 @@ common::math::Box2d Obstacle::BoundingBox() const {
   return ::apollo::common::math::Box2d(center_, heading_, length_, width_);
 }
 
-const PerceptionObstacle::Type& Obstacle::Type() const { return type_; }
+const perception::PerceptionObstacle::Type& Obstacle::Type() const {
+  return type_;
+}
 
-void Obstacle::SetType(const PerceptionObstacle::Type& type) { type_ = type; }
+void Obstacle::SetType(const perception::PerceptionObstacle::Type& type) {
+  type_ = type;
+}
 
 double Obstacle::Speed() const { return speed_; }
 
 void Obstacle::SetSpeed(const double speed) { speed_ = speed; }
 
-const std::vector<PredictionTrajectory>& Obstacle::prediction_trajectories()
-    const {
-  return prediction_trajectories_;
-}
+common::TrajectoryPoint Obstacle::get_point_at(
+    const prediction::Trajectory& trajectory,
+    const double relative_time) const {
+  auto comp = [](const common::TrajectoryPoint p, const double relative_time) {
+    return p.relative_time() < relative_time;
+  };
 
-void Obstacle::add_prediction_trajectory(
-    const PredictionTrajectory& prediction_trajectory) {
-  prediction_trajectories_.push_back(prediction_trajectory);
+  const auto& points = trajectory.trajectory_point();
+  auto it_lower =
+      std::lower_bound(points.begin(), points.end(), relative_time, comp);
+
+  if (it_lower == points.begin()) {
+    return *points.begin();
+  }
+  return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
 }
 
 }  // namespace planning

@@ -50,46 +50,41 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
 
   // Mapping Static obstacle
   for (const auto ptr_static_obstacle : decision_data.StaticObstacles()) {
-    TrajectoryPoint traj_point = 
-        ptr_static_obstacle->prediction_trajectories()[0].evaluate(0.0);
-    Vec2d center_point = {traj_point.path_point().x(),
-                          traj_point.path_point().y()};
-    Box2d obstacle_box = {
-        center_point, traj_point.path_point().theta(),
-        ptr_static_obstacle->BoundingBox().length(),
-        ptr_static_obstacle->BoundingBox().width()};
-        static_obstacle_boxes_.push_back(std::move(obstacle_box));
+    Vec2d center_point = ptr_static_obstacle->Center();
+    Box2d obstacle_box = {center_point, ptr_static_obstacle->Heading(),
+                          ptr_static_obstacle->BoundingBox().length(),
+                          ptr_static_obstacle->BoundingBox().width()};
+    static_obstacle_boxes_.push_back(std::move(obstacle_box));
   }
 
   // Mapping dynamic obstacle
   for (const auto ptr_dynamic_obstacle : decision_data.DynamicObstacles()) {
     for (const auto trajectory :
-          ptr_dynamic_obstacle->prediction_trajectories()) {
+         ptr_dynamic_obstacle->prediction_trajectories()) {
       std::vector<Box2d> obstacle_by_time;
       for (std::size_t time = 0; time < evaluate_times_ + 1; ++time) {
-        TrajectoryPoint traj_point = 
-              trajectory.evaluate(time * config.eval_time_interval());
+        TrajectoryPoint traj_point = ptr_dynamic_obstacle->get_point_at(
+            trajectory, time * config.eval_time_interval());
         Vec2d center_point = {traj_point.path_point().x(),
-                            traj_point.path_point().y()};
-        Box2d obstacle_box = {
-              center_point, traj_point.path_point().theta(),
-              ptr_dynamic_obstacle->BoundingBox().length(),
-              ptr_dynamic_obstacle->BoundingBox().width()};
+                              traj_point.path_point().y()};
+        Box2d obstacle_box = {center_point, traj_point.path_point().theta(),
+                              ptr_dynamic_obstacle->BoundingBox().length(),
+                              ptr_dynamic_obstacle->BoundingBox().width()};
         obstacle_by_time.push_back(std::move(obstacle_box));
       }
-    dynamic_obstacle_trajectory_.push_back(std::move(obstacle_by_time));
-    dynamic_obstacle_probability_.push_back(trajectory.probability());
+      dynamic_obstacle_trajectory_.push_back(std::move(obstacle_by_time));
+      dynamic_obstacle_probability_.push_back(trajectory.probability());
     }
   }
-  CHECK(dynamic_obstacle_trajectory_.size()
-        ==  dynamic_obstacle_probability_.size());
+  CHECK(dynamic_obstacle_trajectory_.size() ==
+        dynamic_obstacle_probability_.size());
 }
 
 double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
                                  const double start_s,
                                  const double end_s) const {
   double total_cost = 0.0;
-  //path_cost
+  // path_cost
   double path_s = 0.0;
   while (path_s < (end_s - start_s)) {
     double l = std::fabs(curve.evaluate(0, path_s));
@@ -99,8 +94,8 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
     total_cost += dl;
 
     path_s += config_.path_resolution();
-  } 
-  //obstacle cost
+  }
+  // obstacle cost
   return total_cost;
 }
 

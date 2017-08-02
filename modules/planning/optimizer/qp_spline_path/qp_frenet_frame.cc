@@ -199,12 +199,13 @@ bool QpFrenetFrame::mapping_dynamic_obstacle_with_decision(
     double buffer = std::fabs(nudge.distance_l());
 
     int nudge_side = nudge.type() == ObjectNudge::RIGHT_NUDGE ? 1 : -1;
-    const PredictionTrajectory& predicted_trajectory =
+    const prediction::Trajectory& predicted_trajectory =
         obstacle.prediction_trajectories()[i];
 
     for (const SpeedPoint& veh_point : _discretized_veh_loc) {
       double time = veh_point.t();
-      TrajectoryPoint trajectory_point = predicted_trajectory.evaluate(time);
+      common::TrajectoryPoint trajectory_point =
+          obstacle.get_point_at(predicted_trajectory, time);
       common::math::Vec2d xy_point(trajectory_point.path_point().x(),
                                    trajectory_point.path_point().y());
       common::math::Box2d obs_box(xy_point,
