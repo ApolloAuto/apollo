@@ -48,4 +48,21 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "road_graph_test",
+    size = "small",
+    srcs = ["road_graph_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/common:road_graph",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_map",
+        "//modules/common/math:math_utils",
+        "@gtest//:main",
+    ]
+)
+
 cpplint()
