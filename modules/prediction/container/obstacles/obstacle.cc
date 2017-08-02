@@ -969,7 +969,6 @@ void Obstacle::SetLanePoints(Feature* feature) {
         lane_segment->add_lane_point()->CopyFrom(lane_point);
         total_s += FLAGS_target_lane_gap;
         lane_seg_s += FLAGS_target_lane_gap;
-        
       }
     }
   }
