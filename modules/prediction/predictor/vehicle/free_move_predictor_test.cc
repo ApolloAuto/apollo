@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
+#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
 
 #include <string>
 #include <vector>
@@ -22,6 +22,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
@@ -30,11 +31,11 @@
 namespace apollo {
 namespace prediction {
 
-class MLPEvaluatorTest : public ::testing::Test {
+class FreeMovePredictorTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string file =
-      "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+      "modules/prediction/testdata/single_perception_vehicle_offlane.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
     FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
   }
@@ -42,20 +43,7 @@ class MLPEvaluatorTest : public ::testing::Test {
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
-TEST_F(MLPEvaluatorTest, OnLaneCase) {
-  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
-                   1501183430.161906);
-  apollo::perception::PerceptionObstacle perception_obstacle =
-      perception_obstacles_.perception_obstacle(0);
-  EXPECT_EQ(perception_obstacle.id(), 1);
-  MLPEvaluator mlp_evaluator;
-  ObstaclesContainer container;
-  container.Insert(perception_obstacles_);
-  Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
-  mlp_evaluator.Evaluate(obstacle_ptr);
-  const std::vector<double> feature_values = mlp_evaluator.feature_values();
-  EXPECT_EQ(feature_values.size(), 38);
+TEST_F(FreeMovePredictorTest, General) {
 }
 
 }  // namespace prediction
