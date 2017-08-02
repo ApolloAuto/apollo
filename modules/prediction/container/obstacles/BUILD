@@ -34,4 +34,23 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "obstacles_container_test",
+    size = "small",
+    srcs = [
+        "obstacles_container_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "@gtest//:main",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/perception/proto:perception_proto",
+        "//modules/common/util:util",
+    ],
+)
+
 cpplint()

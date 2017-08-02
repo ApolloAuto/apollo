@@ -70,6 +70,10 @@ Obstacle::~Obstacle() {
   current_lanes_.clear();
 }
 
+PerceptionObstacle::Type Obstacle::type() const {
+  return type_;
+}
+
 int Obstacle::id() const {
   std::lock_guard<std::mutex> lock(mutex_);
   return id_;
