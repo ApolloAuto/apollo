@@ -34,12 +34,12 @@ class SpeedLimit {
   void add_speed_limit(const common::SpeedPoint& speed_point);
   void add_speed_limit(const double s, const double t, const double v,
                        const double a, const double da);
-  const std::vector<common::SpeedPoint>& speed_limits() const;
+  const std::vector<common::SpeedPoint>& speed_points() const;
   double get_speed_limit_by_s(const double s) const;
   double get_speed_limit_by_t(const double t) const;
 
  private:
-  std::vector<common::SpeedPoint> _speed_point;
+  std::vector<common::SpeedPoint> speed_points_;
 };
 
 }  // namespace planning

@@ -35,7 +35,7 @@ using apollo::common::VehicleParam;
 
 QpSplineStGraph::QpSplineStGraph(
     const QpSplineStSpeedConfig& qp_spline_st_speed_config,
-    const apollo::common::VehicleParam& veh_param)
+    const VehicleParam& veh_param)
     : qp_spline_st_speed_config_(qp_spline_st_speed_config),
       t_knots_resolution_(
           qp_spline_st_speed_config_.total_time() /
@@ -83,7 +83,9 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   // initialize time resolution and
   Init();
 
-  if (!ApplyConstraint(st_graph_data.obs_boundary()).ok()) {
+  if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
+                       st_graph_data.obs_boundary())
+           .ok()) {
     const std::string msg = "Apply constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -122,6 +124,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
 }
 
 Status QpSplineStGraph::ApplyConstraint(
+    const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     const std::vector<StGraphBoundary>& boundaries) {
   Spline1dConstraint* constraint =
       spline_generator_->mutable_spline_constraint();
@@ -190,6 +193,13 @@ Status QpSplineStGraph::ApplyConstraint(
 
   // TODO(Liangliang):
   // add speed constraint and other limits according to adu/planning
+  std::vector<double> speed_constraint;
+  if (!EstimateSpeedConstraint(init_point, speed_limit, &speed_constraint)
+           .ok()) {
+    std::string msg = "Fail to estimate speed constraint.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
   return Status::OK();
 }
 
@@ -222,7 +232,7 @@ Status QpSplineStGraph::ApplyKernel(
 
   // TODO(all): add reference speed profile for different main decision
   std::vector<double> s_vec;
-  if (speed_limit.speed_limits().size() == 0) {
+  if (speed_limit.speed_points().size() == 0) {
     std::string msg = "Fail to apply_kernel due to empty speed limits.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -301,10 +311,37 @@ Status QpSplineStGraph::GetSConstraintByTime(
 }
 
 Status QpSplineStGraph::EstimateSpeedConstraint(
-    const StGraphData& st_graph_data, const PathData& path_data,
-    const SpeedLimit& speed_limit,
+    const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     std::vector<double>* speed_constraint) const {
-  // TODO: (Liangliang) implement this function.
+  DCHECK_NOTNULL(speed_constraint);
+  speed_constraint->clear();
+
+  // use v to estimate position: not accurate, but feasible in cyclic
+  // processing. We can do the following process multiple times and use
+  // previous cycle's results for better estimation.
+  const double v = init_point.v();
+
+  uint32_t i = 0;
+  uint32_t j = 0;
+  double distance = 0.0;
+  const double kDistanceEpsilon = 1e-6;
+  while (i < t_evaluated_.size() && j + 1 < speed_limit.speed_points().size()) {
+    distance = v * t_evaluated_[i];
+    if (fabs(distance - speed_limit.speed_points()[j].s()) < kDistanceEpsilon) {
+      speed_constraint->push_back(speed_limit.speed_points()[j].v());
+      ++i;
+    } else if (speed_limit.speed_points()[j + 1].s() < distance) {
+      ++j;
+    } else {
+      speed_constraint->push_back(speed_limit.get_speed_limit_by_s(distance));
+      ++i;
+    }
+  }
+
+  for (uint32_t k = speed_constraint->size() - 1; k < t_evaluated_.size();
+       ++k) {
+    speed_constraint->push_back(qp_spline_st_speed_config_.max_speed());
+  }
   return Status::OK();
 }
 

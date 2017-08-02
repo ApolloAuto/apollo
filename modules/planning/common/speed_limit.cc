@@ -18,9 +18,12 @@
  * @file speed_limit.cc
  **/
 
-#include <algorithm>
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/speed_limit.h"
+
+#include <algorithm>
+
+#include "modules/common/util/util.h"
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -28,48 +31,42 @@ namespace planning {
 using common::SpeedPoint;
 
 void SpeedLimit::add_speed_limit(const SpeedPoint& speed_point) {
-  _speed_point.push_back(speed_point);
+  speed_points_.push_back(speed_point);
 }
 
 void SpeedLimit::add_speed_limit(const double s, const double t, const double v,
                                  const double a, const double da) {
-  SpeedPoint speed_point;
-  speed_point.set_s(s);
-  speed_point.set_t(t);
-  speed_point.set_v(v);
-  speed_point.set_a(a);
-  speed_point.set_da(da);
-  _speed_point.push_back(speed_point);
+  speed_points_.push_back(common::util::MakeSpeedPoint(s, t, v, a, da));
 }
 
-const std::vector<SpeedPoint>& SpeedLimit::speed_limits() const {
-  return _speed_point;
+const std::vector<SpeedPoint>& SpeedLimit::speed_points() const {
+  return speed_points_;
 }
 
 double SpeedLimit::get_speed_limit_by_s(const double s) const {
   double ref_s = s;
-  if (_speed_point.size() == 0) {
+  if (speed_points_.size() == 0) {
     return 0.0;
   }
 
-  if (_speed_point.size() == 1) {
-    return _speed_point.front().v();
+  if (speed_points_.size() == 1) {
+    return speed_points_.front().v();
   }
 
-  if (ref_s > _speed_point.back().s()) {
-    return _speed_point.back().v();
+  if (ref_s > speed_points_.back().s()) {
+    return speed_points_.back().v();
   }
 
-  if (ref_s < _speed_point.front().s()) {
-    return _speed_point.front().v();
+  if (ref_s < speed_points_.front().s()) {
+    return speed_points_.front().v();
   }
 
   auto func = [](const SpeedPoint& sp, const double s) { return sp.s() < s; };
 
   auto it_lower =
-      std::lower_bound(_speed_point.begin(), _speed_point.end(), s, func);
-  if (it_lower == _speed_point.begin()) {
-    return _speed_point.front().v();
+      std::lower_bound(speed_points_.begin(), speed_points_.end(), s, func);
+  if (it_lower == speed_points_.begin()) {
+    return speed_points_.front().v();
   }
 
   double weight = 0.0;
@@ -82,28 +79,28 @@ double SpeedLimit::get_speed_limit_by_s(const double s) const {
 
 double SpeedLimit::get_speed_limit_by_t(const double t) const {
   double ref_t = t;
-  if (_speed_point.size() == 0) {
+  if (speed_points_.size() == 0) {
     return 0.0;
   }
 
-  if (_speed_point.size() == 1) {
-    return _speed_point.front().v();
+  if (speed_points_.size() == 1) {
+    return speed_points_.front().v();
   }
 
-  if (ref_t > _speed_point.back().t()) {
-    return _speed_point.back().v();
+  if (ref_t > speed_points_.back().t()) {
+    return speed_points_.back().v();
   }
 
-  if (ref_t < _speed_point.front().t()) {
-    return _speed_point.front().v();
+  if (ref_t < speed_points_.front().t()) {
+    return speed_points_.front().v();
   }
 
   auto func = [](const SpeedPoint& sp, const double t) { return sp.t() < t; };
 
   auto it_lower =
-      std::lower_bound(_speed_point.begin(), _speed_point.end(), t, func);
-  if (it_lower == _speed_point.begin()) {
-    return _speed_point.front().v();
+      std::lower_bound(speed_points_.begin(), speed_points_.end(), t, func);
+  if (it_lower == speed_points_.begin()) {
+    return speed_points_.front().v();
   }
 
   double weight = 0.0;
