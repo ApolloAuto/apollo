@@ -32,6 +32,7 @@ cc_library(
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:common_proto",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/status",
         "//modules/planning/common:data_center",
         "//modules/planning/common:decision_data",
         "//modules/planning/common/speed:speed_data",

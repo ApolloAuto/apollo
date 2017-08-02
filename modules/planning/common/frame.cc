@@ -176,6 +176,9 @@ bool Frame::SmoothReferenceLine() {
   return true;
 }
 
+const ObstacleTable &Frame::GetObstacleTable() const { return obstacle_table_; }
+ObstacleTable *Frame::MutableObstacleTable() { return &obstacle_table_; }
+
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);
 }

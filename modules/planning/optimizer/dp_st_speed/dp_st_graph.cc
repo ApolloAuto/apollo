@@ -41,7 +41,7 @@ DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config)
 
 Status DpStGraph::Search(const StGraphData& st_graph_data,
                          DecisionData* const decision_data,
-                         SpeedData* const speed_data) {
+                         SpeedData* const speed_data, ObstacleTable* table) {
   init_point_ = st_graph_data.init_point();
 
   if (st_graph_data.path_data_length() <
@@ -69,7 +69,7 @@ Status DpStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!get_object_decision(st_graph_data, *speed_data).ok()) {
+  if (!get_object_decision(st_graph_data, *speed_data, table).ok()) {
     const std::string msg = "Get object decision by speed profile failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -283,7 +283,8 @@ Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
 }
 
 Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
-                                      const SpeedData& speed_profile) const {
+                                      const SpeedData& speed_profile,
+                                      ObstacleTable* obstacles) const {
   if (speed_profile.speed_vector().size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
@@ -299,8 +300,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
        boundary_it != obs_boundaries.end(); ++boundary_it) {
     CHECK_EQ(boundary_it->points().size(), 4);
 
-    Obstacle* object_ptr =
-        DataCenter::instance()->mutable_object_table()->Find(boundary_it->id());
+    Obstacle* object_ptr = obstacles->Find(boundary_it->id());
     if (!object_ptr) {
       AERROR << "Failed to find object " << boundary_it->id();
       return Status(ErrorCode::PLANNING_ERROR,
