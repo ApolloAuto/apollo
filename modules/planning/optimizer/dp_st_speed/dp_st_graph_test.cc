@@ -31,14 +31,14 @@
 #include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
-#include "modules/planning/optimizer/optimizer_test_base.h"
+#include "modules/planning/integration_tests/planning_test_base.h"
 
 namespace apollo {
 namespace planning {
 
 using common::adapter::AdapterManager;
 
-class DpStSpeedTest : public OptimizerTestBase {
+class DpStSpeedTest : public PlanningTestBase {
  public:
   void SetInitPoint() {
     init_point_.mutable_path_point()->set_x(pose_.position().x());
@@ -68,7 +68,7 @@ class DpStSpeedTest : public OptimizerTestBase {
 
   virtual void SetUp() {
     google::InitGoogleLogging("DpStSpeedTest");
-    OptimizerTestBase::SetUp();
+    PlanningTestBase::SetUp();
     SetInitPoint();
     SetPathDataWithStraightLine();
     const auto* frame = planning_.GetFrame();
