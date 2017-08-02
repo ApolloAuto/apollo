@@ -16,10 +16,10 @@
 
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
+#include "modules/common/log.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
@@ -64,11 +64,8 @@ void EvaluatorManager::Init(const PredictionConf& config) {
 
 Evaluator* EvaluatorManager::GetEvaluator(
     const ObstacleConf::EvaluatorType& type) {
-  if (evaluators_.find(type) != evaluators_.end()) {
-    return evaluators_[type].get();
-  } else {
-    return nullptr;
-  }
+  auto it = evaluators_.find(type);
+  return it != evaluators_.end() ? it->second.get() : nullptr;
 }
 
 void EvaluatorManager::Run(

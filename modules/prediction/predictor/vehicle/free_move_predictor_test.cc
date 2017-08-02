@@ -36,7 +36,7 @@ class FreeMovePredictorTest : public ::testing::Test {
   virtual void SetUp() {
     std::string file =
       "modules/prediction/testdata/single_perception_vehicle_offlane.pb.txt";
-    apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
+    CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
     FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.01;

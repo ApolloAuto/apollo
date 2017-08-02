@@ -16,10 +16,10 @@
 
 #include "modules/prediction/predictor/vehicle/free_move_predictor.h"
 
-#include <vector>
 #include <cmath>
 #include <limits>
 #include <utility>
+#include <vector>
 #include "Eigen/Dense"
 
 #include "modules/prediction/common/prediction_gflags.h"
@@ -114,13 +114,13 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   for (size_t i = 0; i < static_cast<size_t>(total_time / freq); ++i) {
     double speed = std::hypot(v_x, v_y);
     if (speed <= std::numeric_limits<double>::epsilon()) {
-        speed = 0.0;
-        v_x = 0.0;
-        v_y = 0.0;
-        acc_x = 0.0;
-        acc_y = 0.0;
+      speed = 0.0;
+      v_x = 0.0;
+      v_y = 0.0;
+      acc_x = 0.0;
+      acc_y = 0.0;
     } else if (speed > FLAGS_max_speed) {
-        speed = FLAGS_max_speed;
+      speed = FLAGS_max_speed;
     }
 
     // update theta

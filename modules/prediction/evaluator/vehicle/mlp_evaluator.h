@@ -17,15 +17,15 @@
 #ifndef MODULES_PREDICTION_EVALUATOR_VEHICLE_MLP_EVALUATOR_H_
 #define MODULES_PREDICTION_EVALUATOR_VEHICLE_MLP_EVALUATOR_H_
 
-#include <vector>
-#include <unordered_map>
-#include <string>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-#include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/fnn_vehicle_model.pb.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
