@@ -146,14 +146,12 @@ DiscretizedTrajectory::trajectory_points() const {
   return _trajectory_points;
 }
 
-std::vector<apollo::common::TrajectoryPoint>&
-DiscretizedTrajectory::trajectory_points() {
-  return _trajectory_points;
+void DiscretizedTrajectory::SetTrajectoryPoints(
+    const std::vector<apollo::common::TrajectoryPoint>& points) {
+  *this = DiscretizedTrajectory(points);
 }
 
-void DiscretizedTrajectory::Clear() {
-    _trajectory_points.clear();
-}
+void DiscretizedTrajectory::Clear() { _trajectory_points.clear(); }
 
 }  // namespace planning
 }  // namespace apollo
