@@ -56,11 +56,6 @@ DEFINE_double(maximal_delay_sec, 0.005, "# of seconds for delay.");
 DEFINE_int32(max_history_result, 10,
              "The maximal number of result in history.");
 
-DEFINE_int32(max_frame_size, 30, "max size for prediction window");
-
-DEFINE_int32(state_fail_threshold, 5,
-             "This is continuous fail threshold for FSM change to fail state.");
-
 DEFINE_bool(use_stitch, true, "Use trajectory stitch if possible.");
 DEFINE_double(forward_predict_time, 0.2,
               "The forward predict time in each planning cycle.");
@@ -120,7 +115,8 @@ DEFINE_double(
 DEFINE_double(dp_path_decision_buffer, 0.65,
               "buffer in decision while dp path computing decision");
 DEFINE_double(dynamic_decision_follow_range, 1.0,
-    "threshold for judging follow in dp path computing decision for static obstacles");
+              "threshold for judging follow in dp path computing decision for "
+              "static obstacles");
 
 // Prediction Part
 
