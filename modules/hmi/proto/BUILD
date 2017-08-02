@@ -17,15 +17,3 @@ py_proto_compile(
     name = "runtime_status_proto_pylib",
     protos = ["runtime_status.proto"],
 )
-
-cc_proto_library(
-    name = "ros_node_proto",
-    protos = ["ros_node.proto"],
-    with_grpc = True,
-)
-
-py_proto_compile(
-    name = "ros_node_proto_pylib",
-    protos = ["ros_node.proto"],
-    with_grpc = True,
-)
