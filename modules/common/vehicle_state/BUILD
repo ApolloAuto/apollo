@@ -14,6 +14,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
         "//modules/common/math:quaternion",
+        "//modules/common:macro",
         "//modules/localization/common:localization_common",
         "@eigen//:eigen",
     ],

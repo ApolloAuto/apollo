@@ -35,7 +35,7 @@ cc_library(
     name = "container",
     hdrs = ["container.h"],
     deps = [
-        "@com_github_google_protobuf//:protobuf",
+        "@com_google_protobuf_cc//:protobuf",
     ],
 )
 
