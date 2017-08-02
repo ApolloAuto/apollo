@@ -26,37 +26,13 @@
 #include <unordered_map>
 
 #include "modules/common/macro.h"
-#include "modules/common/status/status.h"
-#include "modules/map/hdmap/hdmap.h"
-#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/object_table.h"
+#include "modules/planning/common/indexed_queue.h"
 
 namespace apollo {
 namespace planning {
 
-class DataCenter {
- public:
-  ~DataCenter() = default;
-  Frame *frame(const uint32_t sequence_num) const;
-
- public:
-  void save_frame();
-
-  const Frame *last_frame() const;
-
-  const ObjectTable &object_table() const;
-  ObjectTable *mutable_object_table() const;
-
- private:
-  std::unordered_map<uint32_t, std::unique_ptr<Frame>> _frames;
-  std::list<uint32_t> _sequence_queue;
-  std::unique_ptr<Frame> _frame = nullptr;
-  std::unique_ptr<ObjectTable> _object_table = nullptr;
-
- private:
-  DECLARE_SINGLETON(DataCenter);
-};
+using DataCenter = IndexedQueue<uint32_t, Frame>;
 
 }  // namespace planning
 }  // namespace apollo

@@ -30,11 +30,15 @@
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/map/proto/routing.pb.h"
+#include "modules/planning/common/indexed_list.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace planning {
+
+using ObstacleTable = IndexedList<uint32_t, Obstacle>;
 
 class Frame {
  public:
@@ -56,6 +60,9 @@ class Frame {
   PlanningData *mutable_planning_data();
   std::string DebugString() const;
 
+  const ObstacleTable &GetObstacleTable() const;
+  ObstacleTable *MutableObstacleTable();
+
   void set_computed_trajectory(const PublishableTrajectory &trajectory);
   const PublishableTrajectory &computed_trajectory() const;
 
@@ -70,6 +77,7 @@ class Frame {
 
   hdmap::RoutingResult routing_result_;
   prediction::PredictionObstacles prediction_;
+  ObstacleTable obstacle_table_;
   uint32_t sequence_num_ = 0;
   hdmap::Path hdmap_path_;
   localization::Pose init_pose_;

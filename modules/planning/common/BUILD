@@ -23,14 +23,9 @@ cc_library(
 )
 
 cc_library(
-    name = "object_table",
+    name = "indexed_queue",
     hdrs = [
-        "object_table.h",
-    ],
-    deps = [
-        ":indexed_list",
-        ":obstacle",
-        ":planning_gflags",
+        "indexed_queue.h",
     ],
 )
 
@@ -106,6 +101,7 @@ cc_library(
         "frame.h",
     ],
     deps = [
+        ":indexed_list",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/vehicle_state",
@@ -146,20 +142,13 @@ cc_library(
 
 cc_library(
     name = "data_center",
-    srcs = [
-        "data_center.cc",
-    ],
     hdrs = [
         "data_center.h",
     ],
     deps = [
         ":frame",
-        ":object_table",
-        ":planning_gflags",
+        ":indexed_queue",
         "//modules/common",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/common/status",
-        "//modules/map/hdmap",
     ],
 )
 
