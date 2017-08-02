@@ -39,9 +39,9 @@ DpStCost::DpStCost(const DpStSpeedConfig& dp_st_speed_config)
 // TODO(all): normalize cost with time
 double DpStCost::GetObstacleCost(
     const STPoint& point,
-    const std::vector<StGraphBoundary>& obs_boundary) const {
+    const std::vector<StGraphBoundary>& st_graph_boundaries) const {
   double total_cost = 0.0;
-  for (const StGraphBoundary& boundary : obs_boundary) {
+  for (const StGraphBoundary& boundary : st_graph_boundaries) {
     if (point.s() < 0 || boundary.IsPointInBoundary(point)) {
       total_cost += _dp_st_speed_config.st_graph_default_point_cost();
     } else {
