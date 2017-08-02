@@ -40,8 +40,6 @@ class StGraphBoundary : public common::math::Polygon2d {
     FOLLOW,
     YIELD,
     OVERTAKE,
-    SIDEPASSFOLLOW,
-    SIDEPASSLEAD,
   };
 
   explicit StGraphBoundary(const std::vector<STPoint>& points);
@@ -53,7 +51,7 @@ class StGraphBoundary : public common::math::Polygon2d {
   bool IsPointInBoundary(const StGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;
 
-  const common::math::Vec2d point(const uint32_t index) const;
+  common::math::Vec2d point(const uint32_t index) const;
   const std::vector<common::math::Vec2d>& points() const;
 
   BoundaryType boundary_type() const;
@@ -82,4 +80,4 @@ class StGraphBoundary : public common::math::Polygon2d {
 }  // end namespace planning
 }  // end namespace apollo
 
-#endif  // BAIDU_ADU_PLANNING_OTIMIZER_COMMON_ST_GRAPH_BOUNDARY_H_
+#endif  // BAIDU_ADU_PLANNING_OPTIMIZER_COMMON_ST_GRAPH_BOUNDARY_H_

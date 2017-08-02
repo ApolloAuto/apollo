@@ -37,9 +37,10 @@ QpSplineStGraph::QpSplineStGraph(
     const QpSplineStSpeedConfig& qp_spline_st_speed_config,
     const apollo::common::VehicleParam& veh_param)
     : qp_spline_st_speed_config_(qp_spline_st_speed_config),
-      time_resolution_(qp_spline_st_speed_config_.total_time() /
-                       qp_spline_st_speed_config_.number_of_discrete_graph_t()),
-      evaluation_time_resolution_(
+      t_knots_resolution_(
+          qp_spline_st_speed_config_.total_time() /
+          qp_spline_st_speed_config_.number_of_discrete_graph_t()),
+      t_evaluated_resolution_(
           qp_spline_st_speed_config_.total_time() /
           qp_spline_st_speed_config_.number_of_evaluated_graph_t())
 
@@ -51,7 +52,7 @@ void QpSplineStGraph::Init() {
   for (uint32_t i = 0;
        i <= qp_spline_st_speed_config_.number_of_discrete_graph_t(); ++i) {
     t_knots_.push_back(curr_t);
-    curr_t += time_resolution_;
+    curr_t += t_knots_resolution_;
   }
 
   // init evaluated t positions
@@ -59,7 +60,7 @@ void QpSplineStGraph::Init() {
   for (uint32_t i = 0;
        i <= qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
     t_evaluated_.push_back(curr_t);
-    curr_t += evaluation_time_resolution_;
+    curr_t += t_evaluated_resolution_;
   }
 
   // init spline generator
@@ -106,15 +107,16 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   speed_data->Clear();
   const Spline1d& spline = spline_generator_->spline();
 
-  double time_resolution = qp_spline_st_speed_config_.output_time_resolution();
+  double t_output_resolution =
+      qp_spline_st_speed_config_.output_time_resolution();
   double time = 0.0;
-  while (time < qp_spline_st_speed_config_.total_time() + time_resolution) {
+  while (time < qp_spline_st_speed_config_.total_time() + t_output_resolution) {
     double s = spline(time);
     double v = spline.derivative(time);
     double a = spline.second_order_derivative(time);
     double da = spline.third_order_derivative(time);
     speed_data->add_speed_point(s, time, v, a, da);
-    time += time_resolution;
+    time += t_output_resolution;
   }
 
   return Status::OK();
@@ -228,7 +230,8 @@ Status QpSplineStGraph::ApplyKernel(
   for (uint32_t i = 0;
        i <= qp_spline_st_speed_config_.number_of_discrete_graph_t(); ++i) {
     s_vec.push_back(dist_ref);
-    dist_ref += time_resolution_ * speed_limit.get_speed_limit_by_s(dist_ref);
+    dist_ref +=
+        t_knots_resolution_ * speed_limit.get_speed_limit_by_s(dist_ref);
   }
   // TODO: change reference line kernel to configurable version
   spline_kernel->add_reference_line_kernel_matrix(t_knots_, s_vec, 1);

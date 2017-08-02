@@ -47,14 +47,14 @@ class StBoundaryMapper {
   virtual ~StBoundaryMapper() = default;
 
   bool Init(const std::string& config_file);
-  virtual apollo::common::Status get_graph_boundary(
+  virtual apollo::common::Status GetGraphBoundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
       const ReferenceLine& reference_line, const double planning_distance,
       const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const = 0;
 
-  virtual apollo::common::Status get_speed_limits(
+  virtual apollo::common::Status GetSpeedLimits(
       const apollo::localization::Pose& pose, const apollo::hdmap::PncMap* map,
       const PathData& path_data, const double planning_distance,
       const std::uint32_t matrix_dimension_s, const double default_speed_limit,
