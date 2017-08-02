@@ -28,10 +28,10 @@ TEST(FileUtilsTestSuit, test1) {
   std::string file_path = "./test.bin";
   std::string map_version = "versionA";
 
-  ::apollo::routing::common::Graph graph_1;
+  ::apollo::routing::Graph graph_1;
   graph_1.set_hdmap_version(map_version);
 
-  ::apollo::routing::common::Graph graph_2;
+  ::apollo::routing::Graph graph_2;
   ASSERT_TRUE(FileUtils::dump_protobuf_data_to_file(file_path, graph_1));
   ASSERT_TRUE(FileUtils::load_protobuf_data_from_file(file_path, &graph_2));
   ASSERT_EQ(map_version, graph_2.hdmap_version());

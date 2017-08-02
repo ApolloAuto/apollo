@@ -18,15 +18,13 @@
 
 #include <math.h>
 
-#include "modules/routing/graph/topo_edge.h"
-
 namespace apollo {
 namespace routing {
 
 namespace {
 
-using ::apollo::routing::common::Node;
-using ::apollo::routing::common::Edge;
+using ::apollo::routing::Node;
+using ::apollo::routing::Edge;
 
 }  // namespace
 
@@ -63,11 +61,11 @@ const std::string& TopoNode::lane_id() const { return _pb_node.lane_id(); }
 
 const std::string& TopoNode::road_id() const { return _pb_node.road_id(); }
 
-const ::apollo::common::hdmap::Curve& TopoNode::central_curve() const {
+const ::apollo::hdmap::Curve& TopoNode::central_curve() const {
   return _pb_node.central_curve();
 }
 
-const ::apollo::common::hdmap::Point& TopoNode::anchor_point() const {
+const ::apollo::common::PointENU& TopoNode::anchor_point() const {
   return _anchor_point;
 }
 
@@ -194,5 +192,36 @@ void TopoNode::set_start_s(double start_s) { _start_s = start_s; }
 
 void TopoNode::set_end_s(double end_s) { _end_s = end_s; }
 
+TopoEdge::TopoEdge(const ::apollo::routing::Edge& edge,
+                   const TopoNode* from_node, const TopoNode* to_node)
+    : _pb_edge(edge), _from_node(from_node), _to_node(to_node) {}
+
+TopoEdge::~TopoEdge() {}
+
+const Edge& TopoEdge::edge() const { return _pb_edge; }
+
+double TopoEdge::cost() const { return _pb_edge.cost(); }
+
+const TopoNode* TopoEdge::from_node() const { return _from_node; }
+
+const TopoNode* TopoEdge::to_node() const { return _to_node; }
+
+const std::string& TopoEdge::from_lane_id() const {
+  return _pb_edge.from_lane_id();
+}
+
+const std::string& TopoEdge::to_lane_id() const {
+  return _pb_edge.to_lane_id();
+}
+
+TopoEdgeType TopoEdge::type() const {
+  if (_pb_edge.direction_type() == ::apollo::routing::Edge::LEFT) {
+    return TET_LEFT;
+  }
+  if (_pb_edge.direction_type() == ::apollo::routing::Edge::RIGHT) {
+    return TET_RIGHT;
+  }
+  return TET_FORWARD;
+}
 }  // namespace routing
 }  // namespace apollo

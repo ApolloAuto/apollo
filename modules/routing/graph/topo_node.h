@@ -20,8 +20,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "modules/routing/graph/map_lane.pb.h"
-#include "modules/routing/graph/topo_graph.pb.h"
+#include "modules/map/proto/map_lane.pb.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -30,20 +30,20 @@ class TopoEdge;
 
 class TopoNode {
  public:
-  explicit TopoNode(const ::apollo::routing::common::Node& node);
+  explicit TopoNode(const ::apollo::routing::Node& node);
   explicit TopoNode(const TopoNode* topo_node);
 
   ~TopoNode();
 
-  const ::apollo::routing::common::Node& node() const;
+  const ::apollo::routing::Node& node() const;
   double length() const;
   double cost() const;
   bool is_virtual() const;
 
   const std::string& lane_id() const;
   const std::string& road_id() const;
-  const ::apollo::common::hdmap::Curve& central_curve() const;
-  const ::apollo::common::hdmap::Point& anchor_point() const;
+  const ::apollo::hdmap::Curve& central_curve() const;
+  const ::apollo::common::PointENU& anchor_point() const;
 
   const std::unordered_set<const TopoEdge*>& in_from_all_edge() const;
   const std::unordered_set<const TopoEdge*>& in_from_left_edge() const;
@@ -71,8 +71,8 @@ class TopoNode {
   void set_end_s(double end_s);
 
  private:
-  ::apollo::routing::common::Node _pb_node;
-  ::apollo::common::hdmap::Point _anchor_point;
+  ::apollo::routing::Node _pb_node;
+  ::apollo::common::PointENU _anchor_point;
 
   double _start_s;
   double _end_s;
@@ -92,6 +92,34 @@ class TopoNode {
   std::unordered_map<const TopoNode*, const TopoEdge*> _in_edge_map;
 
   const TopoNode* _origin_node;
+};
+
+enum TopoEdgeType {
+  TET_FORWARD,
+  TET_LEFT,
+  TET_RIGHT,
+};
+
+class TopoEdge {
+ public:
+  TopoEdge(const ::apollo::routing::Edge& edge, const TopoNode* from_node,
+           const TopoNode* to_node);
+
+  ~TopoEdge();
+
+  const ::apollo::routing::Edge& edge() const;
+  double cost() const;
+  const std::string& from_lane_id() const;
+  const std::string& to_lane_id() const;
+  TopoEdgeType type() const;
+
+  const TopoNode* from_node() const;
+  const TopoNode* to_node() const;
+
+ private:
+  ::apollo::routing::Edge _pb_edge;
+  const TopoNode* _from_node;
+  const TopoNode* _to_node;
 };
 
 }  // namespace routing
