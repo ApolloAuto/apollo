@@ -177,8 +177,6 @@ void SimControl::PublishChassis(double lambda) {
   chassis.set_engine_started(true);
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   chassis.set_gear_location(Chassis::GEAR_DRIVE);
-  // TODO(siyangy): set the real steering percentage.
-  chassis.set_steering_percentage(0.0);
 
   double cur_speed = Interpolate(prev_point_.v(), next_point_.v(), lambda);
   chassis.set_speed_mps(cur_speed);
