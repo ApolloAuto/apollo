@@ -174,7 +174,9 @@ Status QpSplineStGraph::ApplyConstraint(
   return Status::OK();
 }
 
-Status QpSplineStGraph::ApplyKernel(const SpeedLimit& speed_limit) {
+Status QpSplineStGraph::ApplyKernel(
+    const std::vector<StGraphBoundary>& boundaries,
+    const SpeedLimit& speed_limit) {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   if (qp_spline_st_speed_config_.speed_kernel_weight() > 0) {
@@ -192,6 +194,13 @@ Status QpSplineStGraph::ApplyKernel(const SpeedLimit& speed_limit) {
         qp_spline_st_speed_config_.jerk_kernel_weight());
   }
 
+  // add reference line for follow
+  for (const auto& boundary : boundaries) {
+    if (boundary.boundary_type() == StGraphBoundary::BoundaryType::FOLLOW) {
+      AddFollowReferenceLineKernel(boundary);
+    }
+  }
+
   // TODO(all): add reference speed profile for different main decision
   std::vector<double> s_vec;
   if (speed_limit.speed_limits().size() == 0) {
@@ -206,6 +215,7 @@ Status QpSplineStGraph::ApplyKernel(const SpeedLimit& speed_limit) {
   }
   // TODO: change reference line kernel to configurable version
   spline_kernel->add_reference_line_kernel_matrix(t_knots_, s_vec, 1);
+
   return Status::OK();
 }
 
