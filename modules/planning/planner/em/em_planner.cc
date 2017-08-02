@@ -88,31 +88,6 @@ Status EMPlanner::Init(const PlanningConfig& config) {
 void EMPlanner::RecordDebugInfo(const std::string& name,
                                 PlanningData* planning_data,
                                 double time_diff_ms) {
-  //  OptimizerType type;
-  //  DCHECK(OptimizerType_Parse(name, &type));
-  //  if (type == DP_POLY_PATH_OPTIMIZER || type == QP_SPLINE_PATH_OPTIMIZER) {
-  //    const auto& path_points =
-  //        planning_data->path_data().discretized_path().points();
-  //    auto* optimized_path =
-  //        trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
-  //    optimized_path->set_name(name);
-  //    optimized_path->mutable_path_point()->CopyFrom(
-  //        {path_points.begin(), path_points.end()});
-  //  } else if (type == DP_ST_SPEED_OPTIMIZER ||
-  //             type == QP_SPLINE_ST_SPEED_OPTIMIZER) {
-  //    const auto& speed_points = planning_data->speed_data().speed_vector();
-  //    auto* speed_plan = trajectory_pb->mutable_debug()
-  //                           ->mutable_planning_data()
-  //                           ->add_speed_plan();
-  //    speed_plan->set_name(name);
-  //    speed_plan->mutable_speed_point()->CopyFrom(
-  //        {speed_points.begin(), speed_points.end()});
-  //  }
-  //  auto stats =
-  //  trajectory_pb->mutable_latency_stats()->add_processor_stats();
-  //  stats->set_name(name);
-  //  stats->set_time_ms(time_diff_ms);
-
   OptimizerType type;
   DCHECK(OptimizerType_Parse(name, &type));
 
@@ -169,13 +144,6 @@ Status EMPlanner::Plan(Frame* frame,
 
   // Add debug information.
   if (FLAGS_enable_record_debug) {
-    //    auto* reference_line =
-    //        trajectory_pb->mutable_debug()->mutable_planning_data()->add_path();
-    //    reference_line->set_name("planning_reference_line");
-    //    const auto& reference_points =
-    //        planning_data->reference_line().reference_points();
-    //    reference_line->mutable_path_point()->CopyFrom(
-    //        {reference_points.begin(), reference_points.end()});
     em_planner_debugger_.reference_line_ =
         planning_data->reference_line().reference_points();
   }
