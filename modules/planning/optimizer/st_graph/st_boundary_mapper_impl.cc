@@ -33,7 +33,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/common/data_center.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 

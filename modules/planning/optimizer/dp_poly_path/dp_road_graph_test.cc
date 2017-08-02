@@ -28,7 +28,6 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/planning/common/data_center.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"

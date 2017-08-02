@@ -34,6 +34,9 @@ const hdmap::PncMap *Frame::pnc_map_ = nullptr;
 
 void Frame::SetMap(hdmap::PncMap *pnc_map) { pnc_map_ = pnc_map; }
 
+FrameHistory::FrameHistory()
+    : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
+
 Frame::Frame(const uint32_t sequence_num) : sequence_num_(sequence_num) {}
 
 void Frame::SetVehicleInitPose(const localization::Pose &pose) {
