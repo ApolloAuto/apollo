@@ -247,7 +247,8 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   frame_->SetPlanningStartPoint(stitching_trajectory.back());
 
   PublishableTrajectory publishable_trajectory;
-  auto status = planner_->Plan(frame_.get(), &publishable_trajectory);
+  auto status = planner_->Plan(stitching_trajectory.back(),
+      frame_.get(), &publishable_trajectory);
 
   if (FLAGS_enable_record_debug) {
     trajectory_pb->mutable_debug()

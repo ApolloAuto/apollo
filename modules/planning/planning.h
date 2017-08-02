@@ -76,7 +76,8 @@ class Planning : public apollo::common::ApolloApp {
    * @param is_on_auto_mode whether the current system is on auto-driving mode
    * @param trajectory_pb the computed planning trajectory
    */
-  bool Plan(const bool is_on_auto_mode, const double publish_time,
+  bool Plan(const bool is_on_auto_mode,
+            const double publish_time,
             ADCTrajectory* trajectory_pb);
 
   const Frame* GetFrame() const;

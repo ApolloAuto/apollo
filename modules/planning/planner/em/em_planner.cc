@@ -102,14 +102,14 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
   em_planner_debugger_.speed_profiles_[name].second = time_diff_ms;
 }
 
-Status EMPlanner::Plan(Frame* frame,
+Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
+                       Frame* frame,
                        PublishableTrajectory* ptr_publishable_trajectory) {
   if (!frame) {
     AERROR << "Frame is empty in EMPlanner";
     return Status(ErrorCode::PLANNING_ERROR, "Frame is null");
   }
 
-  const auto& planning_start_point = frame->PlanningStartPoint();
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   auto* planning_data = frame->mutable_planning_data();
 

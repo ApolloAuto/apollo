@@ -36,7 +36,7 @@ RTKReplayPlanner::RTKReplayPlanner() {
 
 Status RTKReplayPlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
-Status RTKReplayPlanner::Plan(
+Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
     Frame* frame, PublishableTrajectory* ptr_publishable_trajectory) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg(
@@ -46,10 +46,9 @@ Status RTKReplayPlanner::Plan(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  const TrajectoryPoint& start_point = frame->PlanningStartPoint();
 
   std::uint32_t matched_index =
-      QueryPositionMatchedPoint(start_point, complete_rtk_trajectory_);
+      QueryPositionMatchedPoint(planning_init_point, complete_rtk_trajectory_);
 
   std::uint32_t forward_buffer = FLAGS_rtk_trajectory_forward;
   std::uint32_t end_index =
