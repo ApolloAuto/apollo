@@ -149,6 +149,12 @@ class AdapterManager {
    * @param configs the adapter manager configuration proto.
    */
   static void Init(const AdapterManagerConfig &configs);
+
+  /**
+   * @brief check if the AdapterManager is initialized
+   */
+  static bool Initialized();
+
   static void Observe();
 
   /**
@@ -176,6 +182,8 @@ class AdapterManager {
   /// Observe() callbacks that will be used to to call the Observe()
   /// of enabled adapters.
   std::vector<std::function<void()>> observers_;
+
+  bool initialized_ = false;
 
   /// The following code registered all the adapters of interest.
   REGISTER_ADAPTER(Chassis);
