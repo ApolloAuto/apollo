@@ -36,4 +36,4 @@ DECLARE_bool(enable_debug_mode);
 DECLARE_string(debug_route_path);
 DECLARE_string(debug_passage_region_path);
 
-#endif //MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
+#endif  // MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
