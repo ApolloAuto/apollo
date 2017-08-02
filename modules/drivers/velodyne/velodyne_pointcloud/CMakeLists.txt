@@ -104,7 +104,7 @@ target_link_libraries(compensator_nodelet
 	${catkin_LIBRARIES}
     ${PCL_LIBRARIES})
 
-add_executable(velodyne_parser_utest tests/unit_test_velodyne_parser.cpp)
+add_executable(velodyne_parser_utest test/unit_test_velodyne_parser.cpp)
 target_link_libraries(
     velodyne_parser_utest 
     gtest
@@ -118,7 +118,7 @@ if (CATKIN_ENABLE_TESTING)
   find_package(roslaunch REQUIRED)
   find_package(rostest REQUIRED)
 
-  add_executable(verify_pointcloud tests/verify_pointcloud.cpp)
+  add_executable(verify_pointcloud test/verify_pointcloud.cpp)
   target_link_libraries(
     verify_pointcloud 
     gtest
@@ -126,7 +126,7 @@ if (CATKIN_ENABLE_TESTING)
     ${PROJ_LIBRARY} 
     velodyne_parser)
   
-  add_executable(verify_compensator tests/verify_compensator.cpp)
+  add_executable(verify_compensator test/verify_compensator.cpp)
   target_link_libraries(
     verify_compensator 
     gtest
@@ -165,8 +165,8 @@ install(DIRECTORY launch/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 install(DIRECTORY params/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/params)
-install(DIRECTORY tests/
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/tests
+install(DIRECTORY test/
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test
         FILES_MATCHING PATTERN "*.msg")
 install(DIRECTORY scripts/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts)
