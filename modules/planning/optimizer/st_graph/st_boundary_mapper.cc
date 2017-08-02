@@ -83,7 +83,7 @@ bool StBoundaryMapper::check_overlap(const PathPoint& path_point,
   return obs_box.HasOverlap(adc_box);
 }
 
-Status StBoundaryMapper::get_speed_limits(
+Status StBoundaryMapper::GetSpeedLimits(
     const Pose& pose, const PncMap* pnc_map, const PathData& path_data,
     const double planning_distance, const std::uint32_t matrix_dimension_s,
     const double default_speed_limit, SpeedLimit* const speed_limit_data) {
@@ -93,14 +93,14 @@ Status StBoundaryMapper::get_speed_limits(
   adc_point.set_x(adc_position.x());
   adc_point.set_y(adc_position.y());
   adc_point.set_z(adc_position.z());
-  // std::vector<const apollo::hdmap::LaneInfo*> lanes;
+
   std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
   int ret = pnc_map->HDMap()->get_lanes(adc_point, 1.0, &lanes);
   if (ret != 0) {
     AERROR << "Fail to get lanes for point [" << adc_position.x() << ", "
            << adc_position.y() << "].";
     return Status(ErrorCode::PLANNING_ERROR,
-                  "StBoundaryMapper::get_speed_limits");
+                  "StBoundaryMapper::GetSpeedLimits");
   }
 
   std::vector<double> speed_limits;

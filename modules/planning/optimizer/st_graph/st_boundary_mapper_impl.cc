@@ -49,7 +49,7 @@ using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
 using VehicleConfigHelper = apollo::common::VehicleConfigHelper;
 
-Status StBoundaryMapperImpl::get_graph_boundary(
+Status StBoundaryMapperImpl::GetGraphBoundary(
     const common::TrajectoryPoint& initial_planning_point,
     const DecisionData& decision_data, const PathData& path_data,
     const ReferenceLine& reference_line, const double planning_distance,
