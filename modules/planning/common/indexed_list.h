@@ -31,9 +31,13 @@ namespace planning {
 template <typename I, typename T>
 class IndexedList {
  public:
-  void Add(const I id, std::unique_ptr<T> ptr) {
+  bool Add(const I id, std::unique_ptr<T> ptr) {
+    if (Find(id)) {
+      return false;
+    }
     _object_list.push_back(ptr.get());
     _object_dict[id] = std::move(ptr);
+    return true;
   }
   T* Find(const I id) {
     auto iter = _object_dict.find(id);
