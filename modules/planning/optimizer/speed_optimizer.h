@@ -37,11 +37,10 @@ class SpeedOptimizer : public Optimizer {
   apollo::common::Status Optimize(Frame* frame) override;
 
  protected:
-  virtual apollo::common::Status Process(const PathData& path_data,
-                                         const TrajectoryPoint& init_point,
-                                         const ReferenceLine& reference_line,
-                                         DecisionData* const decision_data,
-                                         SpeedData* const speed_data) = 0;
+  virtual apollo::common::Status Process(
+      const PathData& path_data, const common::TrajectoryPoint& init_point,
+      const ReferenceLine& reference_line, DecisionData* const decision_data,
+      SpeedData* const speed_data) = 0;
 };
 
 }  // namespace planning

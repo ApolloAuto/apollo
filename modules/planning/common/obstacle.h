@@ -27,12 +27,9 @@
 #include "modules/common/math/box2d.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_object.h"
-#include "modules/planning/common/trajectory/prediction_trajectory.h"
 
 namespace apollo {
 namespace planning {
-
-using PerceptionObstacle = apollo::perception::PerceptionObstacle;
 
 class Obstacle : public PlanningObject {
  public:
@@ -42,8 +39,8 @@ class Obstacle : public PlanningObject {
   void SetId(int id);
   void SetId(const std::string &id);
 
-  const PerceptionObstacle::Type &Type() const;
-  void SetType(const PerceptionObstacle::Type &type);
+  const perception::PerceptionObstacle::Type &Type() const;
+  void SetType(const perception::PerceptionObstacle::Type &type);
 
   double Height() const;
   void SetHeight(const double height);
@@ -64,9 +61,16 @@ class Obstacle : public PlanningObject {
 
   apollo::common::math::Box2d BoundingBox() const;
 
-  const std::vector<PredictionTrajectory> &prediction_trajectories() const;
+  const std::vector<prediction::Trajectory> &prediction_trajectories() const {
+    return trajectories_;
+  }
   void add_prediction_trajectory(
-      const PredictionTrajectory &prediction_trajectory);
+      const prediction::Trajectory &prediction_trajectory) {
+    trajectories_.push_back(prediction_trajectory);
+  }
+
+  common::TrajectoryPoint get_point_at(const prediction::Trajectory &trajectory,
+                                       const double time) const;
 
  private:
   std::string id_ = 0;
@@ -79,9 +83,10 @@ class Obstacle : public PlanningObject {
   // NOTICE: check is speed_ is set before usage.
   double speed_ = 0.0;
 
+  std::vector<prediction::Trajectory> trajectories_;
   ::apollo::common::math::Vec2d center_;
-  std::vector<PredictionTrajectory> prediction_trajectories_;
-  PerceptionObstacle::Type type_ = PerceptionObstacle::VEHICLE;
+  perception::PerceptionObstacle::Type type_ =
+      perception::PerceptionObstacle::VEHICLE;
 };
 
 }  // namespace planning

@@ -84,7 +84,7 @@ class DpStGraph {
   DpStCost dp_st_cost_;
 
   // initial status
-  TrajectoryPoint init_point_;
+  common::TrajectoryPoint init_point_;
 
   // mappign obstacle to st graph
   // std::unique_ptr<StBoundaryMapper> _st_mapper = nullptr;

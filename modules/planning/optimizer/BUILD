@@ -13,6 +13,8 @@ cc_library(
     deps = [
         "//modules/common/status",
         "//modules/planning/common:frame",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
     ],
 )
 

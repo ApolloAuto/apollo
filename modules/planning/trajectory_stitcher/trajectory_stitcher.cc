@@ -31,8 +31,8 @@ namespace planning {
 
 using VehicleState = apollo::common::VehicleState;
 
-std::vector<TrajectoryPoint> compute_reinit_stitching_trajectory() {
-  TrajectoryPoint init_point;
+std::vector<common::TrajectoryPoint> compute_reinit_stitching_trajectory() {
+  common::TrajectoryPoint init_point;
   init_point.mutable_path_point()->set_x(VehicleState::instance()->x());
   init_point.mutable_path_point()->set_y(VehicleState::instance()->y());
   init_point.set_v(VehicleState::instance()->linear_velocity());
@@ -42,19 +42,18 @@ std::vector<TrajectoryPoint> compute_reinit_stitching_trajectory() {
   init_point.mutable_path_point()->set_kappa(VehicleState::instance()->kappa());
 
   init_point.set_relative_time(0.0);
-  return std::vector<TrajectoryPoint>(1, init_point);
+  return std::vector<common::TrajectoryPoint>(1, init_point);
 };
 
 // Planning from current vehicle state:
 // if 1. the auto-driving mode is off or
 //    2. we don't have the trajectory from last planning cycle or
 //    3. the position deviation from actual and target is too high
-std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
-    const bool is_on_auto_mode,
-    const double current_timestamp,
+std::vector<common::TrajectoryPoint>
+TrajectoryStitcher::compute_stitching_trajectory(
+    const bool is_on_auto_mode, const double current_timestamp,
     const double planning_cycle_time,
     const PublishableTrajectory& prev_trajectory) {
-
   if (!is_on_auto_mode) {
     return compute_reinit_stitching_trajectory();
   }
@@ -68,8 +67,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
     return compute_reinit_stitching_trajectory();
   }
 
-  const double veh_rel_time =
-      current_timestamp - prev_trajectory.header_time();
+  const double veh_rel_time = current_timestamp - prev_trajectory.header_time();
 
   std::size_t matched_index = prev_trajectory.query_nearest_point(veh_rel_time);
 
@@ -101,7 +99,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
   std::size_t forward_index =
       prev_trajectory.query_nearest_point(forward_rel_time);
 
-  std::vector<TrajectoryPoint> stitching_trajectory(
+  std::vector<common::TrajectoryPoint> stitching_trajectory(
       prev_trajectory.trajectory_points().begin() + matched_index,
       prev_trajectory.trajectory_points().begin() + forward_index + 1);
 
@@ -109,7 +107,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::compute_stitching_trajectory(
       prev_trajectory.trajectory_point_at(matched_index).relative_time();
 
   std::for_each(stitching_trajectory.begin(), stitching_trajectory.end(),
-                [&zero_time](TrajectoryPoint& tp) {
+                [&zero_time](common::TrajectoryPoint& tp) {
                   tp.set_relative_time(tp.relative_time() - zero_time);
                 });
 

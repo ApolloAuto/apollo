@@ -41,7 +41,7 @@ cc_library(
         "//modules/common/math:box2d",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_object",
-        "//modules/planning/common/trajectory:prediction_trajectory",
+        "//modules/planning/common:planning_util",
     ],
 )
 
@@ -86,6 +86,7 @@ cc_library(
         "//modules/map/proto:map_proto",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
+        "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
         "@eigen//:eigen",
@@ -108,6 +109,8 @@ cc_library(
         "//modules/common/vehicle_state",
         "//modules/map/pnc_map",
         "//modules/planning/common:planning_data",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:reference_line_smoother_config_proto",
         "//modules/planning/reference_line:reference_line_smoother",
     ],
@@ -138,15 +141,6 @@ cc_library(
         "//modules/common/math",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_proto",
-    ],
-)
-
-cc_library(
-    name = "frame_history",
-    deps = [
-        ":frame",
-        ":indexed_queue",
-        "//modules/common",
     ],
 )
 

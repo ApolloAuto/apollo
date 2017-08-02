@@ -57,7 +57,7 @@ bool DpStSpeedOptimizer::Init() {
 }
 
 Status DpStSpeedOptimizer::Process(const PathData& path_data,
-                                   const TrajectoryPoint& init_point,
+                                   const common::TrajectoryPoint& init_point,
                                    const ReferenceLine& reference_line,
                                    DecisionData* const decision_data,
                                    SpeedData* const speed_data) {
@@ -68,8 +68,6 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
 
   const double path_length = path_data.discretized_path().length();
   // step 1 get boundaries
-  double planning_distance =
-      std::min(dp_st_speed_config_.total_path_length(), path_length);
   std::vector<StGraphBoundary> boundaries;
   if (!boundary_mapper_
            .GetGraphBoundary(init_point, *decision_data, path_data,

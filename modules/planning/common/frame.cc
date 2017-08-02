@@ -47,7 +47,7 @@ void Frame::SetRoutingResult(const hdmap::RoutingResult &routing) {
   routing_result_ = routing;
 }
 
-void Frame::SetPlanningStartPoint(const TrajectoryPoint &start_point) {
+void Frame::SetPlanningStartPoint(const common::TrajectoryPoint &start_point) {
   planning_start_point_ = start_point;
 }
 
@@ -56,7 +56,7 @@ const hdmap::PncMap *Frame::PncMap() {
   return pnc_map_;
 }
 
-const TrajectoryPoint &Frame::PlanningStartPoint() const {
+const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
   return planning_start_point_;
 }
 
@@ -78,14 +78,7 @@ void Frame::SetDecisionDataFromPrediction(
     obstacle.SetSpeed(speed);
 
     for (const auto &trajectory : prediction_obstacle.trajectory()) {
-      PredictionTrajectory prediction_trajectory;
-      prediction_trajectory.set_probability(trajectory.probability());
-      prediction_trajectory.set_start_timestamp(
-          prediction_obstacle.time_stamp());
-      for (const auto &trajectory_point : trajectory.trajectory_point()) {
-        prediction_trajectory.add_trajectory_point(trajectory_point);
-      }
-      obstacle.add_prediction_trajectory(prediction_trajectory);
+      obstacle.add_prediction_trajectory(trajectory);
     }
 
     mutable_planning_data()->mutable_decision_data()->AddObstacle(obstacle);

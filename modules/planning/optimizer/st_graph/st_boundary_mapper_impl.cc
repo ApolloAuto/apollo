@@ -253,12 +253,10 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
 
   for (uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
     const auto& trajectory = obstacle.prediction_trajectories()[i];
-    for (uint32_t j = 0; j < trajectory.num_of_points(); ++i) {
-      const auto& trajectory_point = trajectory.trajectory_point_at(j);
+    for (int j = 0; j < trajectory.trajectory_point_size(); ++i) {
+      const auto& trajectory_point = trajectory.trajectory_point(i);
       // TODO(all): fix trajectory point relative time issue.
-      double trajectory_point_time =
-          trajectory_point.relative_time() + trajectory.start_timestamp() -
-          common::VehicleState::instance()->timestamp();
+      double trajectory_point_time = trajectory_point.relative_time();
       const Box2d obs_box(
           Vec2d(trajectory_point.path_point().x(),
                 trajectory_point.path_point().y()),
