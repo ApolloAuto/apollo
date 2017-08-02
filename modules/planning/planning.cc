@@ -262,8 +262,7 @@ bool Planning::Plan(const bool is_on_auto_mode,
         ->mutable_planning_data()
         ->mutable_init_point()
         ->CopyFrom(stitching_trajectory.back());
-    trajectory_pb->mutable_debug()->mutable_planning_data()->set_is_replan(
-        stitching_trajectory.size() == 1);
+    trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
 
     // TODO: check whether current planner is EM planner.
     auto& em_debugger =
