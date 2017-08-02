@@ -271,7 +271,7 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
   for (const double curr_t : t_knots_) {
     double s_upper = 0.0;
     double s_lower = 0.0;
-    if (follow_boundary.get_s_boundary_position(curr_t, &s_upper, &s_lower)) {
+    if (follow_boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
       ref_s.push_back(s_upper - follow_boundary.characteristic_length());
     }
     ref_s.push_back(s_upper);
@@ -292,7 +292,7 @@ Status QpSplineStGraph::GetSConstraintByTime(
     double s_upper = 0.0;
     double s_lower = 0.0;
 
-    if (!boundary.get_s_boundary_position(time, &s_upper, &s_lower)) {
+    if (!boundary.GetUnblockSRange(time, &s_upper, &s_lower)) {
       continue;
     }
 

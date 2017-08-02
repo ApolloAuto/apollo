@@ -335,8 +335,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
 
       double s_upper = dp_st_speed_config_.total_path_length();
       double s_lower = 0.0;
-      if (boundary_it->get_boundary_s_range_by_time(st_it->t(), &s_upper,
-                                                    &s_lower)) {
+      if (boundary_it->GetBoundarySRange(st_it->t(), &s_upper, &s_lower)) {
         if (s_lower > st_it->s()) {
           go_down = true;
         } else if (s_upper < st_it->s()) {

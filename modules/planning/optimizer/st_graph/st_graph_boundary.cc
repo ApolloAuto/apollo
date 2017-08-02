@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 /**
-*   @file: obstacle_st_boundary.cc
-**/
+  * @file: obstacle_st_boundary.cc
+  **/
 
 #include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
 
@@ -60,8 +60,6 @@ Vec2d StGraphBoundary::point(const uint32_t index) const {
 
 const std::vector<Vec2d>& StGraphBoundary::points() const { return points_; }
 
-bool StGraphBoundary::is_empty() const { return points_.empty(); }
-
 StGraphBoundary::BoundaryType StGraphBoundary::boundary_type() const {
   return _boundary_type;
 }
@@ -83,16 +81,15 @@ void StGraphBoundary::set_characteristic_length(
   _characteristic_length = characteristic_length;
 }
 
-bool StGraphBoundary::get_s_boundary_position(const double curr_time,
-                                              double* s_upper,
-                                              double* s_lower) const {
+bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
+                                       double* s_lower) const {
   const common::math::LineSegment2d segment = {Vec2d(curr_time, 0.0),
                                                Vec2d(curr_time, _s_high_limit)};
   *s_upper = _s_high_limit;
   *s_lower = 0.0;
-
   Vec2d p_s_first;
   Vec2d p_s_second;
+
   if (!GetOverlap(segment, &p_s_first, &p_s_second)) {
     AERROR << "curr_time[" << curr_time
            << "] is out of the coverage scope of the boundary.";
@@ -103,16 +100,19 @@ bool StGraphBoundary::get_s_boundary_position(const double curr_time,
       _boundary_type == BoundaryType::FOLLOW ||
       _boundary_type == BoundaryType::UNKNOWN) {
     *s_upper = std::fmin(*s_upper, std::fmin(p_s_first.y(), p_s_second.y()));
-  } else {
+  } else if (_boundary_type == BoundaryType::OVERTAKE) {
     // overtake
     *s_lower = std::fmax(*s_lower, std::fmax(p_s_first.y(), p_s_second.y()));
+  } else {
+    AERROR << "boundary_type is not supported. boundary_type: "
+           << static_cast<int>(_boundary_type);
+    return false;
   }
   return true;
 }
 
-bool StGraphBoundary::get_boundary_s_range_by_time(const double curr_time,
-                                                   double* s_upper,
-                                                   double* s_lower) const {
+bool StGraphBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
+                                        double* s_lower) const {
   const common::math::LineSegment2d segment = {Vec2d(curr_time, 0.0),
                                                Vec2d(curr_time, _s_high_limit)};
   *s_upper = _s_high_limit;
@@ -121,7 +121,7 @@ bool StGraphBoundary::get_boundary_s_range_by_time(const double curr_time,
   Vec2d p_s_first;
   Vec2d p_s_second;
   if (!GetOverlap(segment, &p_s_first, &p_s_second)) {
-    AERROR << "curr_time[ " << curr_time
+    AERROR << "curr_time[" << curr_time
            << "] is out of the coverage scope of the boundary.";
     return false;
   }
