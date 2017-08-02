@@ -201,12 +201,15 @@ void Planning::RunOnce() {
 
   common::VehicleState::instance()->Update(localization, chassis);
 
-  double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+  const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+
+  /**
   // the execution_start_time is the estimated time when the planned trajectory
   // will be executed by the controller.
   double execution_start_time =
       apollo::common::time::ToSecond(apollo::common::time::Clock::Now()) +
       planning_cycle_time;
+  **/
 
   ADCTrajectory trajectory_pb;
   RecordInput(&trajectory_pb);
@@ -218,7 +221,8 @@ void Planning::RunOnce() {
   }
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
-  bool res_planning = Plan(is_auto_mode, execution_start_time, &trajectory_pb);
+  bool res_planning = Plan(is_auto_mode, start_timestamp, planning_cycle_time,
+      &trajectory_pb);
 
   const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
@@ -227,7 +231,7 @@ void Planning::RunOnce() {
 
   if (res_planning) {
     AdapterManager::FillPlanningHeader("planning", &trajectory_pb);
-    trajectory_pb.mutable_header()->set_timestamp_sec(execution_start_time);
+    trajectory_pb.mutable_header()->set_timestamp_sec(start_timestamp);
     AdapterManager::PublishPlanning(trajectory_pb);
     ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
   } else {
@@ -237,12 +241,15 @@ void Planning::RunOnce() {
 
 void Planning::Stop() {}
 
-bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
+bool Planning::Plan(const bool is_on_auto_mode,
+                    const double current_time_stamp,
+                    const double planning_cycle_time,
                     ADCTrajectory* trajectory_pb) {
-  double vehicle_state_time = VehicleState::instance()->timestamp();
+
   const auto& stitching_trajectory =
       TrajectoryStitcher::compute_stitching_trajectory(
-          is_on_auto_mode, vehicle_state_time, last_publishable_trajectory_);
+          is_on_auto_mode, current_time_stamp, planning_cycle_time,
+          last_publishable_trajectory_);
 
   frame_->SetPlanningStartPoint(stitching_trajectory.back());
 
@@ -309,7 +316,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double publish_time,
   publishable_trajectory.prepend_trajectory_points(
       stitching_trajectory.begin(), stitching_trajectory.end() - 1);
 
-  publishable_trajectory.set_header_time(vehicle_state_time);
+  publishable_trajectory.set_header_time(current_time_stamp);
 
   publishable_trajectory.populate_trajectory_protobuf(trajectory_pb);
 
