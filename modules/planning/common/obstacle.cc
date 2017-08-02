@@ -22,6 +22,7 @@
 
 #include <algorithm>
 
+#include "modules/common/log.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
@@ -29,48 +30,25 @@ namespace planning {
 
 const std::string& Obstacle::Id() const { return id_; }
 
-void Obstacle::SetId(const std::string& id) { id_ = id; }
+Obstacle::Obstacle(const std::string& id,
+                   const perception::PerceptionObstacle& perception_obstacle,
+                   const prediction::Trajectory& trajectory)
+    : id_(id),
+      trajectory_(trajectory),
+      perception_obstacle_(perception_obstacle),
+      perception_bounding_box_({perception_obstacle_.position().x(),
+                                perception_obstacle_.position().y()},
+                               perception_obstacle_.theta(),
+                               perception_obstacle_.length(),
+                               perception_obstacle_.width()) {}
 
-double Obstacle::Height() const { return height_; }
-
-void Obstacle::SetHeight(const double height) { height_ = height; }
-
-double Obstacle::Width() const { return width_; }
-
-void Obstacle::SetWidth(const double width) { width_ = width; }
-
-double Obstacle::Length() const { return length_; }
-
-void Obstacle::SetLength(const double length) { length_ = length; }
-
-double Obstacle::Heading() const { return heading_; }
-
-void Obstacle::SetHeading(const double heading) { heading_ = heading; }
-
-common::math::Box2d Obstacle::BoundingBox() const {
-  return ::apollo::common::math::Box2d(center_, heading_, length_, width_);
-}
-
-const perception::PerceptionObstacle::Type& Obstacle::Type() const {
-  return type_;
-}
-
-void Obstacle::SetType(const perception::PerceptionObstacle::Type& type) {
-  type_ = type;
-}
-
-double Obstacle::Speed() const { return speed_; }
-
-void Obstacle::SetSpeed(const double speed) { speed_ = speed; }
-
-common::TrajectoryPoint Obstacle::get_point_at(
-    const prediction::Trajectory& trajectory,
+common::TrajectoryPoint Obstacle::GetPointAtTime(
     const double relative_time) const {
   auto comp = [](const common::TrajectoryPoint p, const double relative_time) {
     return p.relative_time() < relative_time;
   };
 
-  const auto& points = trajectory.trajectory_point();
+  const auto& points = trajectory_.trajectory_point();
   auto it_lower =
       std::lower_bound(points.begin(), points.end(), relative_time, comp);
 
@@ -78,6 +56,45 @@ common::TrajectoryPoint Obstacle::get_point_at(
     return *points.begin();
   }
   return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
+}
+
+common::math::Box2d Obstacle::GetBoundingBox(
+    const common::TrajectoryPoint& point) const {
+  return common::math::Box2d({point.path_point().x(), point.path_point().y()},
+                             point.path_point().theta(),
+                             perception_obstacle_.length(),
+                             perception_obstacle_.width());
+}
+
+const common::math::Box2d& Obstacle::PerceptionBoundingBox() const {
+  return perception_bounding_box_;
+}
+
+const prediction::Trajectory& Obstacle::Trajectory() const {
+  return trajectory_;
+}
+
+const perception::PerceptionObstacle& Obstacle::Perception() const {
+  return perception_obstacle_;
+}
+
+void Obstacle::CreateObstacles(
+    const prediction::PredictionObstacles& predictions,
+    std::list<std::unique_ptr<Obstacle>>* obstacles) {
+  if (!obstacles) {
+    AERROR << "the provided obstacles is empty";
+    return;
+  }
+  for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
+    const auto perception_id = prediction_obstacle.perception_obstacle().id();
+    int trajectory_index = 0;
+    for (const auto& trajectory : prediction_obstacle.trajectory()) {
+      std::string obstacle_id = std::to_string(perception_id) + "_" +
+                                std::to_string(trajectory_index);
+      obstacles->emplace_back(std::unique_ptr<Obstacle>(new Obstacle(
+          obstacle_id, prediction_obstacle.perception_obstacle(), trajectory)));
+    }
+  }
 }
 
 }  // namespace planning

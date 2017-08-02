@@ -235,11 +235,12 @@ Status StBoundaryMapperImpl::MapObstacleWithPredictionTrajectory(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  const double speed = obstacle.Speed();
+  const auto& speed = obstacle.Perception().velocity();
+  const double scalar_speed = std::hypot(speed.x(), speed.y());
   const double minimal_follow_time = st_boundary_config().minimal_follow_time();
   double follow_distance = -1.0;
   if (obj_decision.has_follow()) {
-    follow_distance = std::fmax(speed * minimal_follow_time,
+    follow_distance = std::fmax(scalar_speed * minimal_follow_time,
                                 std::fabs(obj_decision.follow().distance_s())) +
                       vehicle_param().front_edge_to_center();
   }
@@ -247,118 +248,111 @@ Status StBoundaryMapperImpl::MapObstacleWithPredictionTrajectory(
   bool skip = true;
   std::vector<STPoint> boundary_points;
   const auto& adc_path_points = path_data.discretized_path().points();
-  if (obstacle.prediction_trajectories().size() == 0) {
+  const auto& trajectory = obstacle.Trajectory();
+  if (trajectory.trajectory_point_size() == 0) {
     AWARN << "Obstacle (id = " << obstacle.Id()
           << ") has NO prediction trajectory.";
   }
 
-  for (uint32_t i = 0; i < obstacle.prediction_trajectories().size(); ++i) {
-    const auto& trajectory = obstacle.prediction_trajectories()[i];
-    for (int j = 0; j < trajectory.trajectory_point_size(); ++j) {
-      const auto& trajectory_point = trajectory.trajectory_point(j);
-      // TODO(all): fix trajectory point relative time issue.
-      double trajectory_point_time = trajectory_point.relative_time();
-      const Box2d obs_box(
-          Vec2d(trajectory_point.path_point().x(),
-                trajectory_point.path_point().y()),
-          trajectory_point.path_point().theta(),
-          obstacle.Length() * st_boundary_config().expending_coeff(),
-          obstacle.Width() * st_boundary_config().expending_coeff());
-      int64_t low = 0;
-      int64_t high = adc_path_points.size() - 1;
-      bool find_low = false;
-      bool find_high = false;
-      while (low < high) {
-        if (find_low && find_high) {
-          break;
-        }
-        if (!find_low) {
-          if (!CheckOverlap(adc_path_points[low], vehicle_param(), obs_box,
-                            st_boundary_config().boundary_buffer())) {
-            ++low;
-          } else {
-            find_low = true;
-          }
-        }
-        if (!find_high) {
-          if (!CheckOverlap(adc_path_points[high], vehicle_param(), obs_box,
-                            st_boundary_config().boundary_buffer())) {
-            --high;
-          } else {
-            find_high = true;
-          }
+  for (int j = 0; j < trajectory.trajectory_point_size(); ++j) {
+    const auto& trajectory_point = trajectory.trajectory_point(j);
+    // TODO(all): fix trajectory point relative time issue.
+    double trajectory_point_time = trajectory_point.relative_time();
+    const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
+    int64_t low = 0;
+    int64_t high = adc_path_points.size() - 1;
+    bool find_low = false;
+    bool find_high = false;
+    while (low < high) {
+      if (find_low && find_high) {
+        break;
+      }
+      if (!find_low) {
+        if (!CheckOverlap(adc_path_points[low], vehicle_param(), obs_box,
+                          st_boundary_config().boundary_buffer())) {
+          ++low;
+        } else {
+          find_low = true;
         }
       }
-      if (find_high && find_low) {
-        lower_points.emplace_back(
-            adc_path_points[low].s() - st_boundary_config().point_extension(),
-            trajectory_point_time);
-        upper_points.emplace_back(
-            adc_path_points[high].s() + st_boundary_config().point_extension(),
-            trajectory_point_time);
-      } else {
-        if (obj_decision.has_yield() || obj_decision.has_overtake()) {
-          AINFO << "Point[" << j << "] cannot find low or high index.";
+      if (!find_high) {
+        if (!CheckOverlap(adc_path_points[high], vehicle_param(), obs_box,
+                          st_boundary_config().boundary_buffer())) {
+          --high;
+        } else {
+          find_high = true;
         }
       }
+    }
+    if (find_high && find_low) {
+      lower_points.emplace_back(
+          adc_path_points[low].s() - st_boundary_config().point_extension(),
+          trajectory_point_time);
+      upper_points.emplace_back(
+          adc_path_points[high].s() + st_boundary_config().point_extension(),
+          trajectory_point_time);
+    } else {
+      if (obj_decision.has_yield() || obj_decision.has_overtake()) {
+        AINFO << "Point[" << j << "] cannot find low or high index.";
+      }
+    }
 
-      if (lower_points.size() > 0) {
-        boundary_points.clear();
-        const double buffer = st_boundary_config().follow_buffer();
-        boundary_points.emplace_back(lower_points.at(0).s() - buffer,
-                                     lower_points.at(0).t());
-        boundary_points.emplace_back(lower_points.back().s() - buffer,
-                                     lower_points.back().t());
-        boundary_points.emplace_back(upper_points.back().s() + buffer +
-                                         st_boundary_config().boundary_buffer(),
-                                     upper_points.back().t());
-        boundary_points.emplace_back(upper_points.at(0).s() + buffer,
-                                     upper_points.at(0).t());
-        if (lower_points.at(0).t() > lower_points.back().t() ||
-            upper_points.at(0).t() > upper_points.back().t()) {
-          AWARN << "lower/upper points are reversed.";
-        }
+    if (lower_points.size() > 0) {
+      boundary_points.clear();
+      const double buffer = st_boundary_config().follow_buffer();
+      boundary_points.emplace_back(lower_points.at(0).s() - buffer,
+                                   lower_points.at(0).t());
+      boundary_points.emplace_back(lower_points.back().s() - buffer,
+                                   lower_points.back().t());
+      boundary_points.emplace_back(upper_points.back().s() + buffer +
+                                       st_boundary_config().boundary_buffer(),
+                                   upper_points.back().t());
+      boundary_points.emplace_back(upper_points.at(0).s() + buffer,
+                                   upper_points.at(0).t());
+      if (lower_points.at(0).t() > lower_points.back().t() ||
+          upper_points.at(0).t() > upper_points.back().t()) {
+        AWARN << "lower/upper points are reversed.";
+      }
 
-        // change boundary according to obj_decision.
-        StGraphBoundary::BoundaryType b_type =
-            StGraphBoundary::BoundaryType::UNKNOWN;
-        if (obj_decision.has_follow()) {
-          boundary_points.at(0).set_s(boundary_points.at(0).s() -
-                                      follow_distance);
-          boundary_points.at(1).set_s(boundary_points.at(1).s() -
-                                      follow_distance);
-          boundary_points.at(3).set_t(-1.0);
-          b_type = StGraphBoundary::BoundaryType::FOLLOW;
-        } else if (obj_decision.has_yield()) {
-          const double dis = std::fabs(obj_decision.yield().distance_s());
-          // TODO(all): remove the arbitrary numbers in this part.
-          if (boundary_points.at(0).s() - dis < 0.0) {
-            boundary_points.at(0).set_s(
-                std::fmax(boundary_points.at(0).s() - 2.0, 0.0));
-          } else {
-            boundary_points.at(0).set_s(
-                std::fmax(boundary_points.at(0).s() - dis, 0.0));
-          }
-          if (boundary_points.at(1).s() - dis < 0.0) {
-            boundary_points.at(1).set_s(
-                std::fmax(boundary_points.at(0).s() - 4.0, 0.0));
-          } else {
-            boundary_points.at(1).set_s(
-                std::fmax(boundary_points.at(0).s() - dis, 0.0));
-          }
-          b_type = StGraphBoundary::BoundaryType::YIELD;
-        } else if (obj_decision.has_overtake()) {
-          const double dis = std::fabs(obj_decision.overtake().distance_s());
-          boundary_points.at(2).set_s(boundary_points.at(2).s() + dis);
-          boundary_points.at(3).set_s(boundary_points.at(3).s() + dis);
+      // change boundary according to obj_decision.
+      StGraphBoundary::BoundaryType b_type =
+          StGraphBoundary::BoundaryType::UNKNOWN;
+      if (obj_decision.has_follow()) {
+        boundary_points.at(0).set_s(boundary_points.at(0).s() -
+                                    follow_distance);
+        boundary_points.at(1).set_s(boundary_points.at(1).s() -
+                                    follow_distance);
+        boundary_points.at(3).set_t(-1.0);
+        b_type = StGraphBoundary::BoundaryType::FOLLOW;
+      } else if (obj_decision.has_yield()) {
+        const double dis = std::fabs(obj_decision.yield().distance_s());
+        // TODO(all): remove the arbitrary numbers in this part.
+        if (boundary_points.at(0).s() - dis < 0.0) {
+          boundary_points.at(0).set_s(
+              std::fmax(boundary_points.at(0).s() - 2.0, 0.0));
+        } else {
+          boundary_points.at(0).set_s(
+              std::fmax(boundary_points.at(0).s() - dis, 0.0));
         }
+        if (boundary_points.at(1).s() - dis < 0.0) {
+          boundary_points.at(1).set_s(
+              std::fmax(boundary_points.at(0).s() - 4.0, 0.0));
+        } else {
+          boundary_points.at(1).set_s(
+              std::fmax(boundary_points.at(0).s() - dis, 0.0));
+        }
+        b_type = StGraphBoundary::BoundaryType::YIELD;
+      } else if (obj_decision.has_overtake()) {
+        const double dis = std::fabs(obj_decision.overtake().distance_s());
+        boundary_points.at(2).set_s(boundary_points.at(2).s() + dis);
+        boundary_points.at(3).set_s(boundary_points.at(3).s() + dis);
+      }
 
-        const double area = GetArea(boundary_points);
-        if (Double::compare(area, 0.0) > 0) {
-          boundary->emplace_back(boundary_points);
-          boundary->back().set_boundary_type(b_type);
-          skip = false;
-        }
+      const double area = GetArea(boundary_points);
+      if (Double::compare(area, 0.0) > 0) {
+        boundary->emplace_back(boundary_points);
+        boundary->back().set_boundary_type(b_type);
+        skip = false;
       }
     }
   }
@@ -381,22 +375,18 @@ Status StBoundaryMapperImpl::MapObstacleWithoutPredictionTrajectory(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  const double speed = obstacle.Speed();
-  const double heading = obstacle.Heading();
-  const Vec2d center = obstacle.Center();
-  const Box2d box(center, heading,
-                  obstacle.Length() * st_boundary_config().expending_coeff(),
-                  obstacle.Width() * st_boundary_config().expending_coeff());
+  const auto& speed = obstacle.Perception().velocity();
+  const double scalar_speed = std::hypot(speed.x(), speed.y());
 
-  const PathPoint ref_point =
-      reference_line.get_reference_point(center.x(), center.y());
-  const double speed_coeff = std::cos(heading - ref_point.theta());
+  const auto& perception = obstacle.Perception();
+  const PathPoint ref_point = reference_line.get_reference_point(
+      perception.position().x(), perception.position().y());
+  const double speed_coeff = std::cos(perception.theta() - ref_point.theta());
   if (speed_coeff < 0.0) {
-    std::string msg = common::util::StrCat(
-        "Obstacle is moving opposite to the reference line. Obstacle heading: ",
-        heading, "; ref_point.theta(): ", ref_point.theta());
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    AERROR << "Obstacle is moving opposite to the reference line. Obstacle: "
+           << perception.DebugString();
+    return common::Status(ErrorCode::PLANNING_ERROR,
+                          "obstacle is moving opposite the reference line");
   }
 
   const auto& point = path_data.discretized_path().points()[0];
@@ -414,10 +404,10 @@ Status StBoundaryMapperImpl::MapObstacleWithoutPredictionTrajectory(
   }
 
   double follow_speed = 0.0;
-  if (speed > st_boundary_config().follow_speed_threshold()) {
+  if (scalar_speed > st_boundary_config().follow_speed_threshold()) {
     follow_speed = st_boundary_config().follow_speed_threshold() * speed_coeff;
   } else {
-    follow_speed = speed * speed_coeff *
+    follow_speed = scalar_speed * speed_coeff *
                    st_boundary_config().follow_speed_damping_factor();
   }
 
@@ -443,9 +433,9 @@ Status StBoundaryMapperImpl::MapObstacleWithoutPredictionTrajectory(
   boundary->emplace_back(boundary_points);
 
   const double characteristic_length =
-      std::fmax(
-          speed * speed_coeff * st_boundary_config().minimal_follow_time(),
-          std::fabs(obj_decision.follow().distance_s())) +
+      std::fmax(scalar_speed * speed_coeff *
+                    st_boundary_config().minimal_follow_time(),
+                std::fabs(obj_decision.follow().distance_s())) +
       VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center() +
       st_boundary_config().follow_buffer();
 

@@ -30,7 +30,6 @@
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_data.h"
-#include "modules/planning/common/planning_object.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/reference_line/reference_line.h"

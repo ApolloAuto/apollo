@@ -50,31 +50,22 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
 
   // Mapping Static obstacle
   for (const auto ptr_static_obstacle : decision_data.StaticObstacles()) {
-    Vec2d center_point = ptr_static_obstacle->Center();
-    Box2d obstacle_box = {center_point, ptr_static_obstacle->Heading(),
-                          ptr_static_obstacle->BoundingBox().length(),
-                          ptr_static_obstacle->BoundingBox().width()};
-    static_obstacle_boxes_.push_back(std::move(obstacle_box));
+    static_obstacle_boxes_.push_back(
+        ptr_static_obstacle->PerceptionBoundingBox());
   }
 
   // Mapping dynamic obstacle
   for (const auto ptr_dynamic_obstacle : decision_data.DynamicObstacles()) {
-    for (const auto trajectory :
-         ptr_dynamic_obstacle->prediction_trajectories()) {
-      std::vector<Box2d> obstacle_by_time;
-      for (std::size_t time = 0; time < evaluate_times_ + 1; ++time) {
-        TrajectoryPoint traj_point = ptr_dynamic_obstacle->get_point_at(
-            trajectory, time * config.eval_time_interval());
-        Vec2d center_point = {traj_point.path_point().x(),
-                              traj_point.path_point().y()};
-        Box2d obstacle_box = {center_point, traj_point.path_point().theta(),
-                              ptr_dynamic_obstacle->BoundingBox().length(),
-                              ptr_dynamic_obstacle->BoundingBox().width()};
-        obstacle_by_time.push_back(std::move(obstacle_box));
-      }
-      dynamic_obstacle_trajectory_.push_back(std::move(obstacle_by_time));
-      dynamic_obstacle_probability_.push_back(trajectory.probability());
+    const auto &trajectory = ptr_dynamic_obstacle->Trajectory();
+    std::vector<Box2d> obstacle_by_time;
+    for (std::size_t time = 0; time < evaluate_times_ + 1; ++time) {
+      TrajectoryPoint traj_point = ptr_dynamic_obstacle->GetPointAtTime(
+          time * config.eval_time_interval());
+      obstacle_by_time.push_back(
+          ptr_dynamic_obstacle->GetBoundingBox(traj_point));
     }
+    dynamic_obstacle_trajectory_.push_back(std::move(obstacle_by_time));
+    dynamic_obstacle_probability_.push_back(trajectory.probability());
   }
   CHECK(dynamic_obstacle_trajectory_.size() ==
         dynamic_obstacle_probability_.size());
