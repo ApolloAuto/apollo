@@ -16,6 +16,7 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
+        "//modules/common:log",
     ],
 )
 
