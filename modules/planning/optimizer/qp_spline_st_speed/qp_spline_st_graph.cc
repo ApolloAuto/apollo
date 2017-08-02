@@ -74,7 +74,8 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!ApplyKernel(st_graph_data.speed_limit()).ok()) {
+  if (!ApplyKernel(st_graph_data.obs_boundary(), st_graph_data.speed_limit())
+           .ok()) {
     const std::string msg = "Apply kernel failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -211,7 +212,7 @@ Status QpSplineStGraph::ApplyKernel(
   for (uint32_t i = 0;
        i <= qp_spline_st_speed_config_.number_of_discrete_graph_t(); ++i) {
     s_vec.push_back(dist_ref);
-    dist_ref += time_resolution_ * speed_limit.get_speed_limit(dist_ref);
+    dist_ref += time_resolution_ * speed_limit.get_speed_limit_by_s(dist_ref);
   }
   // TODO: change reference line kernel to configurable version
   spline_kernel->add_reference_line_kernel_matrix(t_knots_, s_vec, 1);
@@ -277,5 +278,14 @@ Status QpSplineStGraph::GetSConstraintByTime(
 
   return Status::OK();
 }
+
+Status QpSplineStGraph::EstimateSpeedConstraint(
+    const StGraphData& st_graph_data, const PathData& path_data,
+    const SpeedLimit& speed_limit,
+    std::vector<double>* speed_constraint) const {
+  // TODO: (Liangliang) implement this function.
+  return Status::OK();
+}
+
 }  // namespace planning
 }  // namespace apollo

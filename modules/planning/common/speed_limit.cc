@@ -18,9 +18,9 @@
  * @file speed_limit.cc
  **/
 
-#include "modules/planning/common/speed_limit.h"
 #include <algorithm>
 #include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/speed_limit.h"
 
 namespace apollo {
 namespace planning {
@@ -46,7 +46,7 @@ const std::vector<SpeedPoint>& SpeedLimit::speed_limits() const {
   return _speed_point;
 }
 
-double SpeedLimit::get_speed_limit(const double s) const {
+double SpeedLimit::get_speed_limit_by_s(const double s) const {
   double ref_s = s;
   if (_speed_point.size() == 0) {
     return 0.0;
@@ -79,5 +79,40 @@ double SpeedLimit::get_speed_limit(const double s) const {
   }
   return util::interpolate(*(it_lower - 1), *it_lower, weight).v();
 }
+
+double SpeedLimit::get_speed_limit_by_t(const double t) const {
+  double ref_t = t;
+  if (_speed_point.size() == 0) {
+    return 0.0;
+  }
+
+  if (_speed_point.size() == 1) {
+    return _speed_point.front().v();
+  }
+
+  if (ref_t > _speed_point.back().t()) {
+    return _speed_point.back().v();
+  }
+
+  if (ref_t < _speed_point.front().t()) {
+    return _speed_point.front().v();
+  }
+
+  auto func = [](const SpeedPoint& sp, const double t) { return sp.t() < t; };
+
+  auto it_lower =
+      std::lower_bound(_speed_point.begin(), _speed_point.end(), t, func);
+  if (it_lower == _speed_point.begin()) {
+    return _speed_point.front().v();
+  }
+
+  double weight = 0.0;
+  double range = (*it_lower).t() - (*(it_lower - 1)).t();
+  if (range > 0) {
+    weight = (t - (*(it_lower - 1)).t()) / range;
+  }
+  return util::interpolate(*(it_lower - 1), *it_lower, weight).v();
+}
+
 }  // namespace planning
 }  // namespace apollo
