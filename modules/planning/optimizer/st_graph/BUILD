@@ -73,7 +73,6 @@ cc_library(
         "//modules/planning/common/path:frenet_frame_path",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/common/trajectory:prediction_trajectory",
         "//modules/planning/math:double",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",

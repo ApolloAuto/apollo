@@ -63,9 +63,9 @@ class Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  virtual apollo::common::Status Plan(const TrajectoryPoint& planning_init_point,
-                                      Frame* frame,
-                                      PublishableTrajectory* trajectory_pb) = 0;
+  virtual apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      PublishableTrajectory* trajectory_pb) = 0;
 };
 
 }  // namespace planning

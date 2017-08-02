@@ -36,8 +36,9 @@ RTKReplayPlanner::RTKReplayPlanner() {
 
 Status RTKReplayPlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
-Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
-    Frame* frame, PublishableTrajectory* ptr_publishable_trajectory) {
+Status RTKReplayPlanner::Plan(
+    const TrajectoryPoint& planning_init_point, Frame* frame,
+    PublishableTrajectory* ptr_publishable_trajectory) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg(
         "RTKReplayPlanner doesn't have a recorded trajectory or "

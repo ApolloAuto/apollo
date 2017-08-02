@@ -47,9 +47,9 @@ class Frame {
 
   void SetRoutingResult(const hdmap::RoutingResult &routing);
   void SetPrediction(const prediction::PredictionObstacles &prediction);
-  void SetPlanningStartPoint(const TrajectoryPoint &start_point);
+  void SetPlanningStartPoint(const common::TrajectoryPoint &start_point);
   void SetVehicleInitPose(const localization::Pose &pose);
-  const TrajectoryPoint &PlanningStartPoint() const;
+  const common::TrajectoryPoint &PlanningStartPoint() const;
   bool Init();
 
   static const hdmap::PncMap *PncMap();
@@ -74,7 +74,7 @@ class Frame {
       const prediction::PredictionObstacles &prediction_obstacles);
 
  private:
-  TrajectoryPoint planning_start_point_;
+  common::TrajectoryPoint planning_start_point_;
 
   hdmap::RoutingResult routing_result_;
   prediction::PredictionObstacles prediction_;
