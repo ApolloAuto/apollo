@@ -84,14 +84,14 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   Init();
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
-                       st_graph_data.obs_boundary())
+                       st_graph_data.st_graph_boundaries())
            .ok()) {
     const std::string msg = "Apply constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!ApplyKernel(st_graph_data.obs_boundary(), st_graph_data.speed_limit())
+  if (!ApplyKernel(st_graph_data.st_graph_boundaries(), st_graph_data.speed_limit())
            .ok()) {
     const std::string msg = "Apply kernel failed!";
     AERROR << msg;
@@ -191,8 +191,6 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  // TODO(Liangliang):
-  // add speed constraint and other limits according to adu/planning
   std::vector<double> speed_constraint;
   if (!EstimateSpeedConstraint(init_point, speed_limit, &speed_constraint)
            .ok()) {

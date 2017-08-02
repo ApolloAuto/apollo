@@ -54,9 +54,9 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
     const DecisionData& decision_data, const PathData& path_data,
     const ReferenceLine& reference_line, const double planning_distance,
     const double planning_time,
-    std::vector<StGraphBoundary>* const obs_boundary) const {
-  if (obs_boundary == nullptr) {
-    const std::string msg = "obs_boundary is NULL.";
+    std::vector<StGraphBoundary>* const st_graph_boundaries) const {
+  if (st_graph_boundaries == nullptr) {
+    const std::string msg = "st_graph_boundaries is NULL.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -75,20 +75,20 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
                   "Fail to get params because of too few path points");
   }
 
-  obs_boundary->clear();
+  st_graph_boundaries->clear();
   Status ret = Status::OK();
 
   const auto& main_decision = decision_data.Decision().main_decision();
   if (main_decision.has_stop()) {
     ret =
         map_main_decision_stop(main_decision.stop(), reference_line,
-                               planning_distance, planning_time, obs_boundary);
+                               planning_distance, planning_time, st_graph_boundaries);
     if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
       return Status(ErrorCode::PLANNING_ERROR);
     }
   } else if (main_decision.has_mission_complete()) {
     ret = map_mission_complete(reference_line, planning_distance, planning_time,
-                               obs_boundary);
+                               st_graph_boundaries);
     if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
       return Status(ErrorCode::PLANNING_ERROR);
     }
@@ -103,7 +103,7 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
     }
     ret = map_obstacle_without_prediction_trajectory(
         initial_planning_point, *obs, path_data, planning_distance,
-        planning_time, obs_boundary);
+        planning_time, st_graph_boundaries);
     if (!ret.ok()) {
       AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
       return Status(ErrorCode::PLANNING_ERROR, "Fail to map static obstacle");
@@ -120,7 +120,7 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
       if (obj_decision.has_follow()) {
         ret = map_obstacle_without_prediction_trajectory(
             initial_planning_point, *obs, obj_decision, path_data,
-            reference_line, planning_distance, planning_time, obs_boundary);
+            reference_line, planning_distance, planning_time, st_graph_boundaries);
         if (!ret.ok()) {
           AERROR << "Fail to map follow dynamic obstacle with id " << obs->Id()
                  << ".";
@@ -130,7 +130,7 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
       } else if (obj_decision.has_overtake() || obj_decision.has_yield()) {
         ret = map_obstacle_with_prediction_trajectory(
             initial_planning_point, *obs, obj_decision, path_data,
-            planning_distance, planning_time, obs_boundary);
+            planning_distance, planning_time, st_graph_boundaries);
         if (!ret.ok()) {
           AERROR << "Fail to map dynamic obstacle with id " << obs->Id() << ".";
           // Return OK by intention.
