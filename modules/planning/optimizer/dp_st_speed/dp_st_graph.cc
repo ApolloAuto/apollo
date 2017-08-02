@@ -54,7 +54,7 @@ Status DpStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  CalculatePointwiseCost(st_graph_data.obs_boundary());
+  CalculatePointwiseCost(st_graph_data.st_graph_boundaries());
 
   if (!CalculateTotalCost(st_graph_data).ok()) {
     const std::string msg = "Calculate total cost failed.";
@@ -291,7 +291,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
   }
 
   const std::vector<StGraphBoundary>& obs_boundaries =
-      st_graph_data.obs_boundary();
+      st_graph_data.st_graph_boundaries();
   const std::vector<SpeedPoint>& speed_points = speed_profile.speed_vector();
 
   for (std::vector<StGraphBoundary>::const_iterator boundary_it =
@@ -328,7 +328,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
       STPoint st_point(st_it->s(), st_it->t());
       if (boundary_it->IsPointInBoundary(st_point)) {
         const std::string msg =
-            "dp_st_graph failed: speed profile cross obs_boundary.";
+            "dp_st_graph failed: speed profile cross st_graph_boundaries.";
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }

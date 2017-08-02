@@ -25,41 +25,24 @@ namespace planning {
 
 using TrajectoryPoint = apollo::common::TrajectoryPoint;
 
-StGraphData::StGraphData(const std::vector<StGraphBoundary>& obs_boundary,
-                         const TrajectoryPoint& init_point,
-                         const SpeedLimit& speed_limit,
-                         const double path_data_length)
-    : _obs_boundary(obs_boundary),
-      _init_point(init_point),
-      _speed_limit(speed_limit),
-      _path_data_length(path_data_length) {}
+StGraphData::StGraphData(
+    const std::vector<StGraphBoundary>& st_graph_boundaries,
+    const TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
+    const double path_data_length)
+    : st_graph_boundaries_(st_graph_boundaries),
+      init_point_(init_point),
+      speed_limit_(speed_limit),
+      path_data_length_(path_data_length) {}
 
-const std::vector<StGraphBoundary>& StGraphData::obs_boundary() const {
-  return _obs_boundary;
+const std::vector<StGraphBoundary>& StGraphData::st_graph_boundaries() const {
+  return st_graph_boundaries_;
 }
 
-const TrajectoryPoint& StGraphData::init_point() const { return _init_point; }
+const TrajectoryPoint& StGraphData::init_point() const { return init_point_; }
 
-const SpeedLimit StGraphData::speed_limit() const { return _speed_limit; }
+const SpeedLimit StGraphData::speed_limit() const { return speed_limit_; }
 
-double StGraphData::path_data_length() const { return _path_data_length; }
-
-void StGraphData::set_speed_limit(const SpeedLimit& speed_limit) {
-  _speed_limit = speed_limit;
-}
-
-void StGraphData::set_obs_boundary(
-    const std::vector<StGraphBoundary>& obs_boundary) {
-  _obs_boundary = obs_boundary;
-}
-
-void StGraphData::set_init_point(const TrajectoryPoint& init_point) {
-  _init_point = init_point;
-}
-
-void StGraphData::set_path_data_length(const double path_data_length) {
-  _path_data_length = path_data_length;
-}
+double StGraphData::path_data_length() const { return path_data_length_; }
 
 }  // namespace planning
 }  // namespace apollo
