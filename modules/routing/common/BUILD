@@ -33,7 +33,7 @@ cc_library(
         "utils.h",
     ],
     deps = [
-                    "//modules/common:common",
+        "//modules/common:common",
     ],
 )
 
@@ -43,5 +43,19 @@ cc_library(
         "routing_macros.h",
     ],
 )
+
+cc_test(
+    name = "utils_test",
+    size = "small",
+    srcs = [
+        "utils_test.cc",
+    ],
+    deps = [
+        ":common",
+        "//modules/routing/proto:routing_proto",
+        "@gtest//:main",
+    ],
+)
+
 
 cpplint()
