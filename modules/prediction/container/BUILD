@@ -16,6 +16,21 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "container_manager_test",
+    size = "small",
+    srcs = ["container_manager_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/container:container_manager",
+        "//modules/common/util:util",
+        "@gtest//:main",
+    ]
+)
+
 cc_library(
     name = "container",
     hdrs = ["container.h"],
