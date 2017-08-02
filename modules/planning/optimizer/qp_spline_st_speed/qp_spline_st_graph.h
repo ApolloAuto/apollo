@@ -26,10 +26,12 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/status/status.h"
 #include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
 
+#include "modules/common/status/status.h"
+#include "modules/common/util/string_util.h"
 #include "modules/planning/common/path/path_data.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 #include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
@@ -47,6 +49,8 @@ class QpSplineStGraph {
                         const PathData& path_data, SpeedData* const speed_data);
 
  private:
+  void Init();
+
   // apply st graph constraint
   common::Status apply_constraint(
       const std::vector<StGraphBoundary>& boundaries);
@@ -66,6 +70,9 @@ class QpSplineStGraph {
   // generate reference speed profile
   common::Status apply_reference_speed_profile();
 
+  common::Status AddFollowReferenceLineKernel(
+      const StGraphBoundary& follow_boundary);
+
  private:
   // qp st configuration
   QpSplineStSpeedConfig _qp_spline_st_speed_config;
@@ -78,6 +85,9 @@ class QpSplineStGraph {
 
   // time resolution
   double time_resolution_ = 0.0;
+
+  // t_knots
+  std::vector<double> t_knots_;
 };
 
 }  // namespace planning
