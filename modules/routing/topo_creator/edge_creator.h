@@ -17,7 +17,7 @@
 #ifndef MODULES_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
 #define MODULES_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
 
-#include "modules/routing/topo_creator/topo_graph.pb.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
