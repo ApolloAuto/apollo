@@ -27,23 +27,6 @@ using ::google::protobuf::io::FileInputStream;
 using ::google::protobuf::io::ZeroCopyInputStream;
 using ::google::protobuf::io::CodedInputStream;
 
-bool FileUtils::load_protobuf_data_from_file(
-    const std::string& file_path,
-    ::google::protobuf::Message* const proto_data) {
-  int fd = open(file_path.c_str(), O_RDONLY);
-  if (fd == -1) {
-    AERROR << "File %s not found" << file_path.c_str();
-    return false;
-  }
-  std::unique_ptr<ZeroCopyInputStream> raw_input(new FileInputStream(fd));
-  std::unique_ptr<CodedInputStream> coded_input(
-      new CodedInputStream(raw_input.get()));
-  coded_input->SetTotalBytesLimit(INT_MAX, 536870912);  //  0..512M..2G
-  bool ret = proto_data->ParseFromCodedStream(coded_input.get());
-  close(fd);
-  return ret;
-}
-
 bool FileUtils::dump_protobuf_data_to_file(
     const std::string& file_path,
     const ::google::protobuf::Message* const proto_data) {

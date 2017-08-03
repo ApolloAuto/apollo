@@ -27,6 +27,8 @@ DECLARE_bool(enable_old_routing);
 DECLARE_string(route_topic_for_broadcast);
 DECLARE_bool(use_road_id);
 
+DECLARE_string(map_dir);
+DECLARE_string(map_file_name);
 DECLARE_string(graph_dir);
 DECLARE_string(graph_file_name);
 

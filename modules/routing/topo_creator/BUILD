@@ -34,6 +34,7 @@ cc_library(
         "//modules/routing/proto:routing_proto",
         "//modules/map/proto:map_proto",
         "//modules/common:common",
+        "//modules/common/util",
         "//modules/routing/common"
     ],
 )
