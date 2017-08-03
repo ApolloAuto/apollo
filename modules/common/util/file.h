@@ -55,7 +55,8 @@ bool SetProtoToASCIIFile(const MessageType &message,
   using google::protobuf::io::ZeroCopyOutputStream;
   using google::protobuf::io::FileOutputStream;
   using google::protobuf::TextFormat;
-  int file_descriptor = open(file_name.c_str(), O_WRONLY | O_CREAT, S_IRWXU);
+  int file_descriptor = open(file_name.c_str(),
+                             O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
   if (file_descriptor < 0) {
     // Failed to open;
     return false;
