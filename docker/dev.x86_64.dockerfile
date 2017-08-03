@@ -146,3 +146,14 @@ RUN rm -rf /tmp/gflags-2.2.0
 
 ENV CAFFE_ROOT=/apollo/bazel-genfiles/external/caffe
 RUN echo "$CAFFE_ROOT/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
+
+# install Opengl
+RUN echo "deb http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
+RUN echo "deb-src http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
+RUN apt-get update && apt-get install -y --force-yes libglfw3 libglfw3-dev
+
+WORKDIR /tmp
+RUN wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.0.0.zip
+RUN unzip glew-2.0.0.zip
+WORKDIR /tmp/glew-2.0.0
+RUN make && make install 
