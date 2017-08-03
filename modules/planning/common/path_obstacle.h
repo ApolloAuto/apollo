@@ -54,9 +54,17 @@ class PathObstacle {
 
   const planning::Obstacle* Obstacle() const;
 
-  void AddDecision(const ObjectDecisionType& decision);
+  /**
+   * @class add decision to this obstacle.
+   * @param decider_tag identifies which component added this decision
+   * @param the decision to be added to this path obstacle.
+   */
+  void AddDecision(const std::string& decider_tag,
+                   const ObjectDecisionType& decision);
 
   const std::vector<ObjectDecisionType>& Decisions() const;
+
+  const std::string DebugString() const;
 
  private:
   bool Init(const ReferenceLine* reference_line);
@@ -64,6 +72,7 @@ class PathObstacle {
   std::string id_;
   const planning::Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
+  std::vector<std::string> decider_tags_;
 };
 
 }  // namespace planning
