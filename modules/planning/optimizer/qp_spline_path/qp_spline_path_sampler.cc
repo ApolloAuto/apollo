@@ -58,14 +58,14 @@ bool QpSplinePathSampler::Sample(const common::FrenetFramePoint& init_point,
   sampling_point->emplace_back(start_s);
 
   // map sampling point
-  if (config_.number_of_spline() == 0) {
+  if (config_.number_of_knots() == 0) {
     AERROR << "sampling point shall greater than 0";
     return false;
   }
-  const double delta_s = sampling_distance / config_.number_of_spline();
+  const double delta_s = sampling_distance / config_.number_of_knots();
 
   double s = start_s + delta_s;
-  for (uint32_t i = 1; i <= config_.number_of_spline(); ++i) {
+  for (uint32_t i = 1; i <= config_.number_of_knots(); ++i) {
     sampling_point->emplace_back(s);
     s += delta_s;
   }
