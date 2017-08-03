@@ -7,11 +7,13 @@ cc_library(
     srcs = [
         "file_util.cc",
         "registerer.cc",
+        "timer.cc",
     ],
     hdrs = [
         "file_util.h",
         "registerer.h",
         "singleton.h",
+        "timer.h",
     ],
     linkopts = [
         "-lboost_filesystem",

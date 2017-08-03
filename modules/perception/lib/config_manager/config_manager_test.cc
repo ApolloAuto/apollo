@@ -40,7 +40,7 @@ class ConfigManagerTest : public testing::Test {
 
 TEST_F(ConfigManagerTest, test_Init) {
   EXPECT_TRUE(config_manager_->Init());
-  EXPECT_EQ(config_manager_->NumModels(), 2u);
+  EXPECT_EQ(config_manager_->NumModels(), 3u);
 }
 
 TEST_F(ConfigManagerTest, test_GetModelConfig) {
@@ -59,7 +59,7 @@ TEST_F(ConfigManagerTest, test_GetModelConfig) {
 TEST_F(ConfigManagerTest, test_ModelConfig) {
   std::string model_name = "ROIFilterTest";
   ASSERT_TRUE(config_manager_->Init());
-  ASSERT_EQ(config_manager_->NumModels(), 2u);
+  ASSERT_EQ(config_manager_->NumModels(), 3u);
   const ModelConfig* model_config = NULL;
   ASSERT_TRUE(config_manager_->GetModelConfig(model_name, &model_config));
   ASSERT_EQ(model_config->name(), model_name);
