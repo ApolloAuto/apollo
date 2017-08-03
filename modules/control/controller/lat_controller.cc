@@ -274,7 +274,7 @@ Status LatController::ComputeControlCommand(
                 (VehicleState::instance()->linear_velocity() *
                  VehicleState::instance()->linear_velocity())) *
       steer_transmission_ratio_ * 180 / M_PI /
-      steer_single_direction_max_degree_;
+      steer_single_direction_max_degree_ * 100;
 
   // Clamp the steer angle
   double steer_angle_limited =
