@@ -79,14 +79,14 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
   unassigned_tracks->clear();
   unassigned_objects->clear();
 
-  for (int i = 0; i < track_components.size(); i++) {
+  for (size_t i = 0; i < track_components.size(); i++) {
     if (track_components[i].empty() || obj_components[i].empty()) {
       if (track_components[i].empty()) {
-        for (int j = 0; j < obj_components[i].size(); j++) {
+        for (size_t j = 0; j < obj_components[i].size(); j++) {
           unassigned_objects->push_back(obj_components[i][j]);
         }
       } else {
-        for (int j = 0; j < track_components[i].size(); j++) {
+        for (size_t j = 0; j < track_components[i].size(); j++) {
           unassigned_tracks->push_back(track_components[i][j]);
         }
       }
@@ -112,9 +112,9 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
       obj_components[i].size());
     track_l2g.resize(track_components[i].size());
     obj_l2g.resize(obj_components[i].size());
-    for (int j = 0; j < track_components[i].size(); j++) {
+    for (size_t j = 0; j < track_components[i].size(); j++) {
       track_l2g[j] = track_components[i][j];
-      for (int k = 0; k < obj_components[i].size(); k++) {
+      for (size_t k = 0; k < obj_components[i].size(); k++) {
         if (j == 0) {
           obj_l2g[k] = obj_components[i][k];
         }
@@ -128,7 +128,7 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
 
     AssignObjectsToTracksUsingNullTracks(mat_loc, max_dist, &assignments_loc,
       &unassigned_tracks_loc, &unassigned_objects_loc);
-    for (int j = 0; j < assignments_loc.size(); j++) {
+    for (size_t j = 0; j < assignments_loc.size(); j++) {
       int track_gid = track_l2g[assignments_loc[j].first];
       int obj_gid = obj_l2g[assignments_loc[j].second];
       assignments->push_back(std::make_pair(track_gid, obj_gid));
@@ -136,11 +136,11 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
       float association_score = association_mat(track_gid, obj_gid);
       (*objects)[obj_gid]->association_score = association_score;
     }
-    for (int j = 0; j < unassigned_tracks_loc.size(); j++) {
+    for (size_t j = 0; j < unassigned_tracks_loc.size(); j++) {
       int track_gid = track_l2g[unassigned_tracks_loc[j]];
       unassigned_tracks->push_back(track_gid);
     }
-    for (int j = 0; j < unassigned_objects_loc.size(); j++) {
+    for (size_t j = 0; j < unassigned_objects_loc.size(); j++) {
       int obj_gid = obj_l2g[unassigned_objects_loc[j]];
       unassigned_objects->push_back(obj_gid);
     }

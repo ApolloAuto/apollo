@@ -1,7 +1,3 @@
-// Copyright 2016 Baidu Inc. All Rights Reserved.
-// @author: wang jun (wangjun21@baidu.com)
-// @file: file_system_util.h
-// @brief:
 #ifndef ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
 #define ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
 #include <vector>

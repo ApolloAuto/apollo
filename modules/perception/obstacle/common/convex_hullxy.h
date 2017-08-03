@@ -20,6 +20,10 @@
 #include <pcl/common/centroid.h>
 #include <pcl/surface/convex_hull.h>
 #include <pcl/surface/qhull.h>
+#include <algorithm>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace apollo {
 namespace perception {
@@ -39,7 +43,7 @@ class ConvexHull2DXY : public pcl::ConvexHull<PointInT> {
   using pcl::ConvexHull<PointInT>::total_volume_;
   using pcl::ConvexHull<PointInT>::qhull_flags;
 
-  ConvexHull2DXY(){};
+  ConvexHull2DXY() {}
   virtual ~ConvexHull2DXY() {}
 
   void Reconstruct2dxy(PointCloud &hull, std::vector<pcl::Vertices> &polygons) {

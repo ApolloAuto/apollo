@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 
+#include <float.h>
 #include <Eigen/Core>
 #include <algorithm>
-#include <float.h>
-
+#include <vector>
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 
 namespace apollo {
@@ -141,7 +142,6 @@ void transform_point_cloud(
     point_out.z = v.z();
 }
 
-
 template <typename PointType>                                                                       
 void transform_point_cloud(pcl::PointCloud<PointType>& cloud_in_out,
     const Eigen::Matrix4d& trans_mat) {                                                             
@@ -209,7 +209,6 @@ MatrixOut vector_rot_mat_2d_xy(VectorIn& v1, VectorIn& v2) {
   // std::cout << "drew theta : " << acos(cos_theta) << std::endl;
   return rot_mat;
 }
-
 
 }  // namespace perception
 }  // namespace apollo

@@ -15,7 +15,6 @@ cc_library(
         "convex_hullxy.h",
         "geometry_util.h",
         "disjoint_set.h",
-        "circular_array.h",
         "file_system_util.h",
         "graph_util.h",
         "hungarian_bigraph_matcher.h",
