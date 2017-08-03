@@ -21,15 +21,15 @@ class Renderer {
         this.scene.background = new THREE.Color(0x031C31);
 
         // Camera
-        this.viewAngle = PARAMETERS.camera.defaults.viewAngle;
+        this.viewAngle = PARAMETERS.camera.Default.viewAngle;
         this.viewDistance = (
             PARAMETERS.camera.laneWidth *
             PARAMETERS.camera.laneWidthToViewDistanceRatio);
         this.camera = new THREE.PerspectiveCamera(
-            PARAMETERS.camera.defaults.fov,
+            PARAMETERS.camera.Default.fov,
             window.innerWidth / window.innerHeight,
-            PARAMETERS.camera.defaults.near,
-            PARAMETERS.camera.defaults.far
+            PARAMETERS.camera.Default.near,
+            PARAMETERS.camera.Default.far
         );
         this.scene.add(this.camera);
 
