@@ -55,7 +55,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "topo_creator",
     srcs = ["topo_creator.cc"],
     deps = [
