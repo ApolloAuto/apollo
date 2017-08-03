@@ -54,8 +54,6 @@ TEST_F(MLPEvaluatorTest, OnLaneCase) {
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
-  const std::vector<double> feature_values = mlp_evaluator.feature_values();
-  EXPECT_EQ(feature_values.size(), 38);
 }
 
 }  // namespace prediction
