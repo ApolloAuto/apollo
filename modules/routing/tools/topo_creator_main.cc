@@ -22,7 +22,7 @@
 #include "modules/common/log.h"
 
 DEFINE_string(base_map_dir, "/apollo/modules/map/data", "directory of base map");
-DEFINE_string(base_map_name, "base_map.bin", "file name of base map");
+DEFINE_string(base_map_name, "base_map.txt", "file name of base map");
 DEFINE_string(dump_topo_path, "/apollo/modules/map/data/routing_map.bin", "dump path of routing topology file");
 
 int main(int argc, char **argv) {
