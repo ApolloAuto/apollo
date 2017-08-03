@@ -54,14 +54,14 @@ class QpFrenetFrame {
 
   double feasible_longitudinal_upper_bound() const;
 
-  bool get_overall_bound(const double s,
-                         std::pair<double, double>* const bound) const;
+  bool GetOverallBound(const double s,
+                       std::pair<double, double>* const bound) const;
 
-  bool get_map_bound(const double s,
-                     std::pair<double, double>* const bound) const;
+  bool GetMapBound(const double s,
+                   std::pair<double, double>* const bound) const;
 
-  bool get_static_obstacle_bound(const double s,
-                                 std::pair<double, double>* const bound) const;
+  bool GetStaticObstacleBound(const double s,
+                              std::pair<double, double>* const bound) const;
 
   bool get_dynamic_obstacle_bound(const double s,
                                   std::pair<double, double>* const bound) const;

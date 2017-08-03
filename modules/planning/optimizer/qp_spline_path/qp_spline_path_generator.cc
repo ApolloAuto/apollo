@@ -266,7 +266,7 @@ bool QpSplinePathGenerator::setup_constraint(
     for (std::uint32_t i = 0; i < num_fx_bound + 1; ++i) {
       fx_knots.push_back(s);
       std::pair<double, double> boundary = std::make_pair(0.0, 0.0);
-      qp_frenet_frame.get_map_bound(s, &boundary);
+      qp_frenet_frame.GetMapBound(s, &boundary);
       boundary_low.push_back(boundary.first);
       boundary_high.push_back(boundary.second);
       s += ds;
