@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
     AERROR << "Create routing topo failed!";
     return -1;
   }
-  LOG(INFO) << "Create routing topo succesful!";
-  LOG(INFO) << FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
+  AERROR << "Create routing topo succesful!";
+  AINFO << FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
   return 0;
 }
 

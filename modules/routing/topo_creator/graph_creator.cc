@@ -52,7 +52,7 @@ bool GraphCreator::create() {
     LOG(ERROR) << "Failed to load base map file from " << _base_map_file_path;
     return false;
   }
-  LOG(INFO) << "Number of lanes: " << _pbmap.lane_size();
+  LOG(ERROR) << "Number of lanes: " << _pbmap.lane_size();
 
   _graph.set_hdmap_version(_pbmap.header().version());
   _graph.set_hdmap_district(_pbmap.header().district());
@@ -89,8 +89,8 @@ bool GraphCreator::create() {
     add_edge(from_node, lane.successor_id(), Edge::FORWARD);
   }
 
-  if (!::apollo::routing::FileUtils::dump_protobuf_data_to_file(
-          _dump_topo_file_path, _graph)) {
+  if (!::apollo::common::util::SetProtoToASCIIFile(
+          _graph, _dump_topo_file_path)) {
     LOG(ERROR) << "Failed to dump topo data into file " << _dump_topo_file_path;
     return false;
   }
