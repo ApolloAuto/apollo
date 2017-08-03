@@ -210,7 +210,7 @@ const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {
   return reference_points_;
 }
 
-const MapPath& ReferenceLine::reference_map_line() const { return map_path_; }
+const MapPath& ReferenceLine::map_path() const { return map_path_; }
 
 double ReferenceLine::get_lane_width(const double s) const {
   // TODO(startcode) : need implement;
