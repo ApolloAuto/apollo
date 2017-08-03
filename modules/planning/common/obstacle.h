@@ -74,7 +74,7 @@ class Obstacle {
       std::list<std::unique_ptr<Obstacle>> *obstacles);
 
  private:
-  std::string id_ = 0;
+  std::string id_;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
   // FIXME move out later
