@@ -52,9 +52,7 @@ TEST_F(HDMapInputTest, test_GetROI) {
   HdmapStructPtr hdmap;
   pcl_util::PointD velodyne_pose_world = {435730.0, 4436777.0, 0.0};
   EXPECT_FALSE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
-  FLAGS_map_file =
-      "modules/perception/data/hdmap_input_test/"
-      "base_map_with_boundary.txt";
+  FLAGS_map_file = "modules/map/data/base_map_with_boundary.txt";
   EXPECT_TRUE(hdmap_input_->Init());
   EXPECT_TRUE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
   EXPECT_TRUE(hdmap != nullptr);
