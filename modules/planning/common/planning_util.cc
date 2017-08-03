@@ -113,6 +113,11 @@ PathPoint interpolate_linear_approximation(const PathPoint &p0,
 
 TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
                             const TrajectoryPoint &tp1, const double t) {
+
+  if (std::abs(tp0.path_point().s() - tp0.path_point().s()) < 1.0e-4) {
+      return tp1;
+  }
+
   const PathPoint &pp0 = tp0.path_point();
   const PathPoint &pp1 = tp1.path_point();
   double t0 = tp0.relative_time();
@@ -128,6 +133,10 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   };
   double s1 = common::math::IntegrateByGaussLegendre(func_v, t0, t1);
   double s = common::math::IntegrateByGaussLegendre(func_v, t0, t);
+
+  if (std::abs(tp0.path_point().s() - s1) < 1.0e-4) {
+      return tp1;
+  }
 
   double v = dynamic_spline.evaluate(0, t);
   double a = dynamic_spline.evaluate(1, t);
