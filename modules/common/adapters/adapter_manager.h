@@ -77,15 +77,15 @@ namespace adapter {
                   "Data type must be the same with adapter's type!");          \
     instance()->name##_->FillHeader(module_name, data);                        \
   }                                                                            \
-  static void Set##name##Callback(name##Adapter::Callback callback) {          \
+  static void Add##name##Callback(name##Adapter::Callback callback) {          \
     CHECK(instance()->name##_)                                                 \
         << "Initialize adapter before setting callback";                       \
-    instance()->name##_->SetCallback(callback);                                \
+    instance()->name##_->AddCallback(callback);                                \
   }                                                                            \
   template <class T>                                                           \
-  static void Set##name##Callback(                                             \
+  static void Add##name##Callback(                                             \
       void (T::*fp)(const name##Adapter::DataType &data), T *obj) {            \
-    Set##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
+    Add##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
   }                                                                            \
                                                                                \
  private:                                                                      \

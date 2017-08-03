@@ -73,7 +73,7 @@ Status Prediction::Init() {
   CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not ready.";
 
   // Set perception obstacle callback function
-  AdapterManager::SetPerceptionObstaclesCallback(&Prediction::OnPerception,
+  AdapterManager::AddPerceptionObstaclesCallback(&Prediction::OnPerception,
                                                  this);
   return Status::OK();
 }

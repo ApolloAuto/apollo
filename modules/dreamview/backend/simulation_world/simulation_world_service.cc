@@ -601,7 +601,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
 void SimulationWorldService::RegisterMonitorCallback() {
   if (CheckAdapterInitialized("Monitor", AdapterManager::GetMonitor())) {
-    AdapterManager::SetMonitorCallback(
+    AdapterManager::AddMonitorCallback(
         &SimulationWorldService::UpdateSimulationWorld, this);
   }
 }
