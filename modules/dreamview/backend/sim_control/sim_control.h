@@ -59,7 +59,7 @@ class SimControl {
 
   // Reset the start point according to the RoutingResponse, which can be read
   // from file or received from a publisher.
-  void SetStartPoint(const apollo::hdmap::RoutingResponse &routing);
+  void SetStartPoint(const apollo::routing::RoutingResponse &routing);
 
   void Freeze();
 

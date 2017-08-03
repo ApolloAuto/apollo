@@ -37,6 +37,9 @@ enum ErrorCode {
 
   // HDMap module error codes start from here
   HDMAP_DATA_ERROR = 7000;
+
+  // Routing module error codes
+  ROUTING_ERROR = 8000;
 }
 
 message StatusPb {
