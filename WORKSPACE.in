@@ -202,11 +202,18 @@ new_local_repository(
 # Caffe
 # =====
 # This requires Caffe being installed in docker image.
-new_local_repository(
+#new_local_repository(
+#    name = "caffe",
+#    build_file = "third_party/caffe.BUILD",
+#    path = "/third_party/caffe",
+#)
+new_http_archive(
     name = "caffe",
     build_file = "third_party/caffe.BUILD",
-    path = "/third_party/caffe",
+    strip_prefix = "caffe-1.0",
+    url = "https://github.com/BVLC/caffe/archive/1.0.zip",
 )
+
 
 # YAML-CPP
 new_http_archive(

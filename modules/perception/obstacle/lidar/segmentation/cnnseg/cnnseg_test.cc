@@ -21,6 +21,7 @@
 #include <pcl/io/pcd_io.h>
 
 #include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 
@@ -68,6 +69,9 @@ bool GetPointCloudFromFile(const std::string& pcd_file,
 }
 
 TEST_F(CNNSegmentationTest, test_cnnseg_det) {
+  FLAGS_work_root = "modules/perception";
+  FLAGS_config_manager_path = "./conf/config_manager.config";
+
   // generate input point cloud data
   std::string in_pcd_file(POINT_CLOUD_FILE);
   pcl_util::PointCloudPtr in_pc;

@@ -115,8 +115,10 @@ RUN tar xzf boost_1_56_0.tar.gz
 WORKDIR /tmp/boost_1_56_0
 RUN bash bootstrap.sh --with-toolset=gcc --with-libraries=filesystem,system,thread
 RUN ./b2 install
+RUN rm -rf /tmp/boost_1_56_0.tar.gz
+RUN rm -rf /tmp/boost_1_56_0
 
-# install Caffe (CPU_ONLY mode)
+# install prerequisites for Caffe (CPU_ONLY mode)
 RUN apt-get install -y \
    libleveldb-dev \
    libsnappy-dev \
@@ -129,6 +131,8 @@ RUN wget https://github.com/google/glog/archive/v0.3.5.tar.gz
 RUN tar xzf v0.3.5.tar.gz
 WORKDIR /tmp/glog-0.3.5
 RUN ./configure && make && make install
+RUN rm -rf /tmp/v0.3.5.tar.gz
+RUN rm -rf /tmp/glog-0.3.5
 
 WORKDIR /tmp
 RUN wget https://github.com/gflags/gflags/archive/v2.2.0.tar.gz
@@ -137,17 +141,8 @@ WORKDIR /tmp/gflags-2.2.0
 RUN mkdir build
 WORKDIR /tmp/gflags-2.2.0/build
 RUN CXXFLAGS="-fPIC" cmake .. && make && make install
+RUN rm -rf /tmp/v2.2.0.tar.gz
+RUN rm -rf /tmp/gflags-2.2.0
 
-RUN mkdir /third_party
-WORKDIR /third_party
-# FIXME: use ARG instead of ENV once DockerHub supports this
-# (https://github.com/docker/hub-feedback/issues/460)
-ENV CLONE_TAG=1.0
-RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/BVLC/caffe.git && \
-    cd caffe && mkdir build && cd build && \
-    cmake -DCPU_ONLY=ON -DBUILD_python=OFF .. && \
-    make -j"$(nproc)"
-
-ENV CAFFE_ROOT=/third_party/caffe
-ENV PATH $CAFFE_ROOT/build/tools:$PATH
-RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
+ENV CAFFE_ROOT=/apollo/bazel-genfiles/external/caffe
+RUN echo "$CAFFE_ROOT/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig

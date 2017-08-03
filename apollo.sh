@@ -282,6 +282,8 @@ function run_test() {
   fi
 
   generate_test_targets_opt
+  build_caffe_opt
+  run_ldconfig
   echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --test_verbose_timeout_warnings
   RES2=$?
   if [ $RES2 -eq 0 ]; then
@@ -444,6 +446,20 @@ function build_velodyne() {
   rm -rf modules/.catkin_workspace
   rm -rf modules/build_isolated/
   rm -rf modules/devel_isolated/
+}
+
+function run_ldconfig() {
+  sudo ldconfig
+}
+
+function build_caffe_opt() {
+  echo "Build Caffe (opt model) ..."
+  bazel build --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt @caffe//:lib
+}
+
+function build_caffe_dbg() {
+  echo "Build Caffe (dbg model) ..."
+  bazel build --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg @caffe//:lib
 }
 
 function config() {

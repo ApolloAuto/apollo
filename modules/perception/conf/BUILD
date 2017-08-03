@@ -9,5 +9,9 @@ filegroup(
 
 filegroup(
     name = "perception_config",
-    srcs = [ "config_manager.config"],
+    srcs = [
+        "config_manager.config",
+        "perception.conf",
+        "hdmap_roi_filter.conf",
+    ],
 )
