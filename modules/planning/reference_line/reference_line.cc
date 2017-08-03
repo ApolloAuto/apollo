@@ -179,10 +179,11 @@ bool ReferenceLine::get_point_in_frenet_frame(
     return false;
   }
 
-  if (s > map_path_.accumulated_s().back()) {
-    AERROR << "The s of point is bigger than the length of current path. s: "
-           << s << ", curr path length: " << map_path_.accumulated_s().back()
-           << ".";
+  if (s > length()) {
+    AERROR
+        << "The s of point is bigger than the length of current map_path. s: "
+        << s << ", curr path length: " << map_path_.accumulated_s().back()
+        << ".";
     return false;
   }
   sl_point->set_s(s);

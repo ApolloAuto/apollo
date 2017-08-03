@@ -112,9 +112,9 @@ double QpFrenetFrame::feasible_longitudinal_upper_bound() const {
   return feasible_longitudinal_upper_bound_;
 }
 
-bool QpFrenetFrame::get_overall_bound(
+bool QpFrenetFrame::GetOverallBound(
     const double s, std::pair<double, double>* const bound) const {
-  if (!get_map_bound(s, bound)) {
+  if (!GetMapBound(s, bound)) {
     return false;
   }
 
@@ -122,7 +122,7 @@ bool QpFrenetFrame::get_overall_bound(
       std::make_pair(-std::numeric_limits<double>::infinity(),
                      std::numeric_limits<double>::infinity());
 
-  if (!get_static_obstacle_bound(s, &obs_bound)) {
+  if (!GetStaticObstacleBound(s, &obs_bound)) {
     return false;
   }
 
@@ -138,12 +138,12 @@ bool QpFrenetFrame::get_overall_bound(
   return true;
 }
 
-bool QpFrenetFrame::get_map_bound(
-    const double s, std::pair<double, double>* const bound) const {
+bool QpFrenetFrame::GetMapBound(const double s,
+                                std::pair<double, double>* const bound) const {
   return GetBound(s, hdmap_bound_, bound);
 }
 
-bool QpFrenetFrame::get_static_obstacle_bound(
+bool QpFrenetFrame::GetStaticObstacleBound(
     const double s, std::pair<double, double>* const bound) const {
   return GetBound(s, static_obstacle_bound_, bound);
 }
