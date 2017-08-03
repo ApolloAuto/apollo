@@ -14,19 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <pcl/io/pcd_io.h>
 #include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <vector>
 #include <string>
+
+#include <pcl/io/pcd_io.h>
+
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/common/file_system_util.h"
-#include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/onboard/lidar_process.h"
-#include "modules/perception/obstacle/lidar/visualizer/pcl_obstacle_visualizer.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 
 DECLARE_string(flagfile);
 DECLARE_string(config_manager_path);
@@ -38,7 +40,76 @@ namespace apollo {
 namespace perception {
 
 DEFINE_string(output_path, "./output/", "output path");
-DEFINE_int32(start_frame, 0, "start frame");
+DEFINE_int32(start_frame, 1000, "start frame");
+
+template <typename T>
+void quaternion_to_rotation_matrix(const T * quat, T * R) {
+    T x2 = quat[0] * quat[0];
+    T xy = quat[0] * quat[1];
+    T rx = quat[3] * quat[0];
+    T y2 = quat[1] * quat[1];
+    T yz = quat[1] * quat[2];
+    T ry = quat[3] * quat[1];
+    T z2 = quat[2] * quat[2];
+    T zx = quat[2] * quat[0];
+    T rz = quat[3] * quat[2];
+    T r2 = quat[3] * quat[3];
+    R[0] = r2 + x2 - y2 - z2;         // fill diagonal terms
+    R[4] = r2 - x2 + y2 - z2;
+    R[8] = r2 - x2 - y2 + z2;
+    R[3] = 2 * (xy + rz);             // fill off diagonal terms
+    R[6] = 2 * (zx - ry);
+    R[7] = 2 * (yz + rx);
+    R[1] = 2 * (xy - rz);
+    R[2] = 2 * (zx + ry);
+    R[5] = 2 * (yz - rx);
+}
+
+bool read_pose_file(const std::string& filename, Eigen::Matrix4d& pose,
+    int& frame_id, double& time_stamp) {
+    std::ifstream ifs(filename.c_str());
+    if (!ifs.is_open()) {
+        std::cerr << "Failed to open file " << filename << std::endl;
+        return false;
+    }
+    char buffer[1024];
+    ifs.getline(buffer, 1024);
+    int id = 0;
+    double time_samp = 0;
+    double quat[4];
+    double matrix3x3[9];
+    sscanf(buffer, "%d %lf %lf %lf %lf %lf %lf %lf %lf", &id, &(time_samp),
+            &(pose(0, 3)), &(pose(1, 3)), &(pose(2, 3)),
+            &(quat[0]), &(quat[1]), &(quat[2]), &(quat[3]));
+    quaternion_to_rotation_matrix<double>(quat, matrix3x3);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            pose(i, j) = matrix3x3[i * 3 + j];
+        }
+    }
+
+    frame_id = id;
+    time_stamp = time_samp;
+    return true;
+}
+
+bool read_pose_file_mat12(const std::string& filename, Eigen::Matrix4d& pose,
+    int& frame_id, double& time_stamp) {
+    std::ifstream ifs(filename.c_str());
+    if (!ifs.is_open()) {
+        std::cerr << "Failed to open file " << filename << std::endl;
+        return false;
+    }
+    pose = Eigen::Matrix4d::Identity();
+    ifs >> frame_id >> time_stamp;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 4; j++) {
+            ifs >> pose(i, j);
+        }
+    }
+    return true;
+}
 
 class OfflineLidarPerceptionTool {
 public:
@@ -49,7 +120,7 @@ public:
     ~OfflineLidarPerceptionTool() = default;
 
     bool Init(bool use_visualization = false) {
-        FLAGS_config_manager_path = "./conf/config_manager.config";
+        FLAGS_config_manager_path = "tool/conf/config_manager.config";
         config_manager_ = Singleton<ConfigManager>::Get();
        
         if (config_manager_ == NULL || !config_manager_->Init()) {
@@ -67,8 +138,12 @@ public:
         output_dir_ = FLAGS_output_path;
 
         if (use_visualization) {
-            visualizer_.reset(new PCLObstacleVisualizer("obstaclevisualizer_",
-                OBJECT_COLOR_TRACK, false, output_dir_));
+            //visualizer_.reset(new PCLObstacleVisualizer("obstaclevisualizer_",
+            //    OBJECT_COLOR_TRACK, false, output_dir_));
+            visualizer_.reset(new OpenglVisualizer());
+            if(!visualizer_->init()) {
+                AERROR<<"init visialuzer failed"<<std::endl;
+            }; 
         }
         return true;
     }
@@ -79,46 +154,62 @@ public:
         std::string pose_folder = pose_path;
         std::vector<std::string> pcd_file_names;
         std::vector<std::string> pose_file_names;
+        AERROR << "starting to run"; 
         get_file_names_in_folder(pose_folder, ".pose", pose_file_names);
         get_file_names_in_folder(pcd_folder, ".pcd", pcd_file_names);
+        AERROR<<" pose size " << pose_file_names.size();
+        AERROR<<" pcd size " << pcd_file_names.size(); 
         if (pose_file_names.size() != pcd_file_names.size()) {
             AERROR << "pcd file number does not match pose file number";
             return;
         }
         double time_stamp = 0.0;
         int start_frame = FLAGS_start_frame;
+        AERROR << "starting frame is "<<start_frame;
+        sleep(1);
         for (size_t i = start_frame; i < pcd_file_names.size(); i++) {
-            AINFO << "***************** Frame " << i << " ******************";
+            AERROR << "***************** Frame " << i << " ******************";
             std::ostringstream oss;
             pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
+            AERROR << "load pcd file from file path" << pcd_folder + pcd_file_names[i];
             pcl::io::loadPCDFile<pcl_util::Point>(pcd_folder + pcd_file_names[i], *cloud);
-            AINFO << "read point cloud from " << pcd_file_names[i]
+            AERROR << "read point cloud from " << pcd_file_names[i]
                 << " with cloud size: " << cloud->points.size();
 
             //read pose
             Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
             int frame_id = -1;
-            if (!ReadPoseFile(pose_folder + pose_file_names[i],
-                &pose, &frame_id, &time_stamp)) {
+            if (!read_pose_file(pose_folder + pose_file_names[i],
+                pose, frame_id, time_stamp)) {
                 std::cout << "Failed to read file " << pose_file_names[i] << "\n";
                 return ;
             }
-            AINFO << "read pose file " << pose_file_names[i] << "  " << pose ;
+            AERROR << "read pose file " << pose_file_names[i] << "  " << pose ;
             
             std::shared_ptr<Eigen::Matrix4d> velodyne_trans = std::make_shared<Eigen::Matrix4d>(pose);
             lidar_process_->Process(time_stamp, cloud, velodyne_trans);
 
             std::vector<ObjectPtr> result_objects = lidar_process_->GetObjects();
             const pcl_util::PointIndicesPtr roi_indices = lidar_process_->GetROIIndices();
+
+            AERROR << "finish processing point cloud with num objects" << result_objects.size(); 
+            
             if (visualizer_) {
                 pcl_util::PointDCloudPtr transformed_cloud(new pcl_util::PointDCloud);
                 transform_perception_cloud(cloud, pose, transformed_cloud);
-                visualizer_->visualize_tracking(transformed_cloud,
-                    result_objects, pose, i, *roi_indices);
+                AERROR<<"transformed cloud size is "<<transformed_cloud->size();
+
+                pcl_util::PointIndices roi_indices_1;
+                FrameContent content;
+                content.set_lidar_cloud(cloud);
+                content.set_lidar_pose(pose);
+                visualizer_->update_camera_system(&content);
+                visualizer_->render(content);
             }
-            oss << std::setfill('0') << std::setw(6) << i;
-            std::string filename = FLAGS_output_path + oss.str() + ".txt";
-            save_obstacle_informaton(result_objects, filename);
+            AERROR << "finish pc";
+            //oss << std::setfill('0') << std::setw(6) << i;
+            //std::string filename = FLAGS_output_path + oss.str() + ".txt";
+            //save_obstacle_informaton(result_objects, filename);
         }
     }
 
@@ -267,7 +358,8 @@ public:
 protected:
     ConfigManager* config_manager_;
     std::unique_ptr<LidarProcess> lidar_process_;
-    std::unique_ptr<PCLObstacleVisualizer> visualizer_;
+    //std::unique_ptr<PCLObstacleVisualizer> visualizer_;
+    std::unique_ptr<OpenglVisualizer> visualizer_;
     std::string output_dir_;
     std::string pose_dir_;
     std::string label_file_;
@@ -278,9 +370,8 @@ protected:
 
 
 int main(int argc, char* argv[]) {
-    FLAGS_flagfile = "./conf/offlinelidar_process__test.flag";
+    FLAGS_flagfile = "./modules/perception/tool/conf/offline_lidar_perception_test.flag";
     gflags::ParseCommandLineFlags(&argc, &argv, true);
-
     apollo::perception::OfflineLidarPerceptionTool tool;
     tool.Init(FLAGS_enable_visualization);
     tool.Run(FLAGS_pcd_path, FLAGS_pose_path);

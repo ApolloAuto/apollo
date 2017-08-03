@@ -107,14 +107,14 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
   PERF_BLOCK_START();
   /// call hdmap to get ROI
   HdmapStructPtr hdmap = nullptr;
-  if (hdmap_input_) {
+  /*if (hdmap_input_) {
     PointD velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
     Affine3d temp_trans(*velodyne_trans);
     PointD velodyne_pose_world = pcl::transformPoint(velodyne_pose, temp_trans);
     hdmap.reset(new HdmapStruct);
     hdmap_input_->GetROI(velodyne_pose_world, &hdmap);
     PERF_BLOCK_END("lidar_get_roi_from_hdmap");
-  }
+  }*/
 
   /// call roi_filter
   PointCloudPtr roi_cloud(new PointCloud);
