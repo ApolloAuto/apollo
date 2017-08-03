@@ -180,6 +180,8 @@ void SimControl::PublishChassis(double lambda) {
 
   double cur_speed = Interpolate(prev_point_.v(), next_point_.v(), lambda);
   chassis.set_speed_mps(cur_speed);
+  chassis.set_throttle_percentage(0.0);
+  chassis.set_brake_percentage(0.0);
 
   AdapterManager::PublishChassis(chassis);
 }
