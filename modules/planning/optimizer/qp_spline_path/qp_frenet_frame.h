@@ -30,6 +30,7 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -65,47 +66,47 @@ class QpFrenetFrame {
                                   std::pair<double, double>* const bound) const;
 
  private:
-  bool find_longitudinal_distance(const double time,
-                                  common::SpeedPoint* const speed_point);
+  bool FindLongitudinalDistance(const double time,
+                                common::SpeedPoint* const speed_point);
 
-  bool calcualate_discretized_veh_loc();
+  bool CalculateDiscretizedVehicleLocation();
 
-  bool mapping_dynamic_obstacle_with_decision(const Obstacle& obstacle);
+  bool MapDynamicObstacleWithDecision(const Obstacle& obstacle);
 
-  bool mapping_static_obstacle_with_decision(const Obstacle& obstacle);
+  bool MapStaticObstacleWithDecision(const Obstacle& obstacle);
 
-  bool mapping_polygon(const std::vector<common::math::Vec2d>& corners,
-                       const double buffer, const bool nudge_side,
-                       std::vector<std::pair<double, double>>* const bound_map);
+  bool MapPolygon(const std::vector<common::math::Vec2d>& corners,
+                  const double buffer, const bool nudge_side,
+                  std::vector<std::pair<double, double>>* const bound_map);
 
   // nudge_side > 0 update upper bound, nudge_side < 0 update lower_bound
   // nudge_side == 0 out of bound
-  bool map_line(const common::SLPoint& start, const common::SLPoint& end,
-                const int nudge_side,
-                std::vector<std::pair<double, double>>* const constraint);
+  bool MapLine(const common::SLPoint& start, const common::SLPoint& end,
+               const int nudge_side,
+               std::vector<std::pair<double, double>>* const constraint);
 
-  std::pair<double, double> map_lateral_constraint(const common::SLPoint& start,
-                                                   const common::SLPoint& end,
-                                                   const int nudge_side,
-                                                   const double s_start,
-                                                   const double s_end);
+  std::pair<double, double> MapLateralConstraint(const common::SLPoint& start,
+                                                 const common::SLPoint& end,
+                                                 const int nudge_side,
+                                                 const double s_start,
+                                                 const double s_end);
 
-  std::pair<uint32_t, uint32_t> find_interval(const double start,
-                                              const double end) const;
+  std::pair<uint32_t, uint32_t> FindInterval(const double start,
+                                             const double end) const;
 
-  bool calculate_hd_map_bound();
+  bool CalculateHDMapBound();
 
-  bool calculate_static_obstacle_bound();
+  bool CalculateStaticObstacleBound();
 
-  bool calculate_dynamic_obstacle_bound();
+  bool CalculateDynamicObstacleBound();
 
-  bool get_bound(const double s,
-                 const std::vector<std::pair<double, double>>& bound_map,
-                 std::pair<double, double>* const bound) const;
+  bool GetBound(const double s,
+                const std::vector<std::pair<double, double>>& bound_map,
+                std::pair<double, double>* const bound) const;
 
-  uint32_t find_index(const double s) const;
+  uint32_t FindIndex(const double s) const;
 
-  void clear_data();
+  void Clear();
 
  private:
   const ReferenceLine* _reference_line = nullptr;
