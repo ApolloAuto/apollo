@@ -35,6 +35,7 @@
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 /**
  * @file message_adapters.h
@@ -63,8 +64,8 @@ using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using PredictionAdapter = Adapter<::apollo::prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter =
     Adapter<::apollo::perception::TrafficLightDetection>;
-using RoutingRequestAdapter = Adapter<::apollo::hdmap::RoutingRequest>;
-using RoutingResponseAdapter = Adapter<::apollo::hdmap::RoutingResponse>;
+using RoutingRequestAdapter = Adapter<::apollo::routing::RoutingRequest>;
+using RoutingResponseAdapter = Adapter<::apollo::routing::RoutingResponse>;
 
 }  // namespace adapter
 }  // namespace common

@@ -15,53 +15,72 @@
   *****************************************************************************/
 
 #include "modules/routing/routing.h"
-
 #include "modules/routing/core/navigator.h"
-#include "ros/include/std_msgs/String.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/adapters/adapter_manager.h"
 
 namespace apollo {
 namespace routing {
 
+using ::apollo::common::adapter::AdapterManager;
+using ::apollo::common::monitor::MonitorMessageItem;
+using apollo::common::ErrorCode;
+
 std::string Routing::Name() const { return FLAGS_node_name; }
 
-Status Routing::Init() {
+Routing::Routing() : 
+  monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {
+  
   std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
+  AINFO << "Use routing topology graph path: " <<  graph_path.c_str();
   _navigator_ptr.reset(new Navigator(graph_path));
-  return Status::OK();
 }
 
-Status Control::Start() {
+apollo::common::Status Routing::Init() {
+  std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
+
+  AdapterManager::Init(FLAGS_adapter_config_path);
+  AdapterManager::SetMonitorCallback(&Routing::OnMonitor, this);
+  AdapterManager::SetRoutingRequestCallback(&Routing::OnRouting_Request, this);
+
+  return apollo::common::Status::OK();
+}
+
+apollo::common::Status Routing::Start() {
   if (!_navigator_ptr->is_ready()) {
     AERROR << "Navigator is not ready!";
-    return Status::ERROR();
+    return apollo::common::Status(ErrorCode::ROUTING_ERROR, "Navigator not ready");
   }
-  ROS_INFO("Routing service is ready.");
+  AINFO << "Routing service is ready.";
 
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
   buffer.INFO("Routing started");
-  return Status::OK();
+  return apollo::common::Status::OK();
 }
 
-void OnRouting_Request(const apollo::routing::RoutingRequest &routing_req) {
+void Routing::OnRouting_Request(const apollo::routing::RoutingRequest &routing_request) {
   AINFO << "Get new routing request!!!";
-  ::apollo::routing::RoutingRequest request_proto;
-  ::apollo::routing::RoutingResponse response_proto;
-  if (!request_proto.ParseFromString(req.routing_request.data)) {
-    AERROR << "The request proto is invalid.";
-    return false;
-  }
-  if (!_navigator_ptr->search_route(request_proto, &response_proto)) {
-    AERROR<< "Failed to search route with navigator.";
-    return false;
+  ::apollo::routing::RoutingResponse routing_response;
+  if (!_navigator_ptr->search_route(routing_request, &routing_response)) {
+    AERROR << "Failed to search route with navigator.";
+    return;
   }
 
-  if (request_proto.broadcast()) {
-    AdapterManager::PublishControlCommand(*control_command);
-  }
-  return true;
+  //AdapterManager::FillRoutingResponseHeader(Name(), routing_response);
+  AdapterManager::PublishRoutingResponse(routing_response);
+  return;
 }
 
 void Routing::Stop() {}
+
+void Routing::OnMonitor(
+    const apollo::common::monitor::MonitorMessage &monitor_message) {
+  for (const auto &item : monitor_message.item()) {
+    if (item.log_level() == MonitorMessageItem::FATAL) {
+      return;
+    }
+  }
+}
 
 }  // namespace routing
 }  // namespace apollo

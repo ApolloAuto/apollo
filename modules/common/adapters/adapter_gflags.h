@@ -36,6 +36,7 @@ DECLARE_string(prediction_topic);
 DECLARE_string(perception_obstacle_topic);
 DECLARE_string(traffic_light_detection_topic);
 DECLARE_string(decision_topic);
-DECLARE_string(routing_result_topic);
+DECLARE_string(routing_request_topic);
+DECLARE_string(routing_response_topic);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_

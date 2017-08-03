@@ -90,6 +90,14 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableControlCommand(FLAGS_control_command_topic, config.mode(),
                              config.message_history_limit());
         break;
+      case AdapterConfig::ROUTING_REQUEST:
+        EnableRoutingRequest(FLAGS_routing_request_topic, config.mode(),
+                             config.message_history_limit());
+        break;
+      case AdapterConfig::ROUTING_RESPONSE:
+        EnableRoutingResponse(FLAGS_routing_response_topic, config.mode(),
+                             config.message_history_limit());
+        break;
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning(FLAGS_planning_trajectory_topic, config.mode(),
                        config.message_history_limit());
@@ -109,10 +117,6 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::DECISION:
         EnableDecision(FLAGS_decision_topic, config.mode(),
                        config.message_history_limit());
-        break;
-      case AdapterConfig::ROUTING_RESPONSE:
-        EnableRoutingResponse(FLAGS_routing_result_topic, config.mode(),
-                            config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";

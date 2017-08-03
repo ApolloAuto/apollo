@@ -14,10 +14,9 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include "core/node_range_manager.h"
+#include "modules/routing/core/node_range_manager.h"
 
-#include "graph/topo_edge.h"
-#include "graph/topo_node.h"
+#include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
 namespace routing {

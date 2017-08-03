@@ -19,22 +19,21 @@
 
 #include <memory>
 
-#include "common/routing_gflags.h"
-#include "common/routing_macros.h"
-
+#include "modules/routing/common/routing_gflags.h"
+#include "modules/routing/proto/routing.pb.h"
+#include "modules/routing/core/navigator.h"
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/monitor/monitor.h"
+#include "modules/common/status/status.h"
 
 namespace apollo {
 namespace routing {
 
-class Navigator;
-
 class Routing : public apollo::common::ApolloApp {
  // friend class RoutingTestBase;
  public:
-  Routing() : monitor_(apollo::common::monitor::MonitorMessageItem::Routing) {}
+  Routing();
 
   /**
    * @brief module name
@@ -64,10 +63,13 @@ class Routing : public apollo::common::ApolloApp {
   virtual ~Routing() = default;
 
  private:
-  void OnRouting_Request(const apollo::routing::RoutingRequest &routing_req);
+  void OnRouting_Request(const apollo::routing::RoutingRequest &routing_request);
+  void OnMonitor(
+      const apollo::common::monitor::MonitorMessage &monitor_message);
 
  private:
-  std::unique_ptr<Navigator> _navigator_ptr;
+  std::unique_ptr<::apollo::routing::Navigator> _navigator_ptr;
+  apollo::common::monitor::Monitor monitor_;
 };
 
 }  // namespace routing
