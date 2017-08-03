@@ -57,6 +57,8 @@ class Frame {
   static const hdmap::PncMap *PncMap();
   static void SetMap(hdmap::PncMap *pnc_map);
 
+  const ReferenceLine &reference_line() const;
+
   uint32_t sequence_num() const;
   const PlanningData &planning_data() const;
 
@@ -85,6 +87,7 @@ class Frame {
   hdmap::Path hdmap_path_;
   localization::Pose init_pose_;
   PublishableTrajectory _computed_trajectory;
+  std::unique_ptr<ReferenceLine> reference_line_ = nullptr;
   PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;
 };

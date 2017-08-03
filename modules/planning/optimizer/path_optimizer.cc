@@ -28,7 +28,7 @@ PathOptimizer::PathOptimizer(const std::string& name) : Optimizer(name) {}
 apollo::common::Status PathOptimizer::Optimize(Frame* frame) {
   frame_ = frame;
   auto* planning_data = frame->mutable_planning_data();
-  return Process(planning_data->speed_data(), planning_data->reference_line(),
+  return Process(planning_data->speed_data(), frame->reference_line(),
                  frame->PlanningStartPoint(),
                  planning_data->mutable_decision_data(),
                  planning_data->mutable_path_data());

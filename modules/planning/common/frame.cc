@@ -88,10 +88,6 @@ bool Frame::Init() {
            << init_pose_.DebugString();
     return false;
   }
-  if (!SmoothReferenceLine()) {
-    AERROR << "Failed to smooth reference line";
-    return false;
-  }
   if (FLAGS_enable_prediction) {
     CreateObstacles(prediction_);
   }
@@ -112,15 +108,24 @@ const PublishableTrajectory &Frame::computed_trajectory() const {
   return _computed_trajectory;
 }
 
+const ReferenceLine &Frame::reference_line() const { return *reference_line_; }
+
 bool Frame::CreateReferenceLineFromRouting() {
   common::PointENU vehicle_position;
   vehicle_position.set_x(init_pose_.position().x());
   vehicle_position.set_y(init_pose_.position().y());
   vehicle_position.set_z(init_pose_.position().z());
 
-  return pnc_map_->CreatePathFromRouting(
-      routing_result_, vehicle_position, FLAGS_look_backward_distance,
-      FLAGS_look_forward_distance, &hdmap_path_);
+  if (!pnc_map_->CreatePathFromRouting(
+          routing_result_, vehicle_position, FLAGS_look_backward_distance,
+          FLAGS_look_forward_distance, &hdmap_path_)) {
+    AERROR << "Failed to get path from routing";
+    return false;
+  }
+  if (!SmoothReferenceLine()) {
+    AERROR << "Failed to smooth reference line";
+    return false;
+  }
 }
 
 bool Frame::SmoothReferenceLine() {
@@ -152,7 +157,7 @@ bool Frame::SmoothReferenceLine() {
     return false;
   }
   ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
-  _planning_data.set_reference_line(smoothed_ref_points);
+  reference_line_.reset(new ReferenceLine(smoothed_ref_points));
   return true;
 }
 

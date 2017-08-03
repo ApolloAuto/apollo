@@ -29,9 +29,9 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
 #include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
-#include "modules/planning/integration_tests/planning_test_base.h"
 
 namespace apollo {
 namespace planning {
@@ -73,7 +73,7 @@ class DpRoadGraphTest : public PlanningTestBase {
     SetSpeedDataWithConstVeolocity(10.0);
     const auto* frame = planning_.GetFrame();
     ASSERT_TRUE(frame != nullptr);
-    reference_line_ = &(frame->planning_data().reference_line());
+    reference_line_ = &(frame->reference_line());
   }
 
  protected:
