@@ -40,12 +40,23 @@ bool PathObstacle::Init(const ReferenceLine* reference_line) { return true; }
 
 const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
 
-void PathObstacle::AddDecision(const ObjectDecisionType& decision) {
+void PathObstacle::AddDecision(const std::string& decider_tag,
+                               const ObjectDecisionType& decision) {
   decisions_.push_back(decision);
+  decider_tags_.push_back(decider_tag);
 }
 
 const std::vector<ObjectDecisionType>& PathObstacle::Decisions() const {
   return decisions_;
+}
+
+const std::string PathObstacle::DebugString() const {
+  std::stringstream ss;
+  for (std::size_t i = 0; i < decisions_.size(); ++i) {
+    ss << "id: " << id_ << " decision: " << decisions_[i].DebugString()
+       << ", made by " << decider_tags_[i];
+  }
+  return ss.str();
 }
 
 }  // namespace planning
