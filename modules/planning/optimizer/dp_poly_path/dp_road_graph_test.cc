@@ -30,7 +30,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/optimizer/dp_poly_path/dp_road_graph.h"
-#include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
 
 namespace apollo {
 namespace planning {

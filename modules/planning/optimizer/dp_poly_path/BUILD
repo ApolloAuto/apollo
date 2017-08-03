@@ -6,12 +6,10 @@ cc_library(
     name = "dp_poly_path",
     srcs = [
         "dp_road_graph.cc",
-        "path_sampler.cc",
         "trajectory_cost.cc",
     ],
     hdrs = [
         "dp_road_graph.h",
-        "path_sampler.h",
         "trajectory_cost.h",
     ],
     deps = [
@@ -45,23 +43,6 @@ cc_library(
     deps = [
         ":dp_poly_path",
         "//modules/planning/optimizer:path_optimizer",
-    ],
-)
-
-cc_test(
-    name = "path_sampler_test",
-    size = "small",
-    srcs = [
-        "path_sampler_test.cc",
-    ],
-    data = [
-        "//modules/map:map_data",
-        "//modules/planning:planning_testdata",
-    ],
-    deps = [
-        ":dp_poly_path",
-        "//modules/planning/integration_tests:planning_test_base",
-        "@gtest//:main",
     ],
 )
 
