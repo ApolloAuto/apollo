@@ -25,7 +25,6 @@
 #include <vector>
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/obstacle/common/circular_array.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/base_filter.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
 

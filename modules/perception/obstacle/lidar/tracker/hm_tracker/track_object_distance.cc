@@ -245,7 +245,7 @@ float TrackObjectDistance::ComputeHistogramDistance(const ObjectTrackPtr& track,
   }
 
   float histogram_dist = 0.0;
-  for (int i = 0; i < old_object_shape_features.size(); ++i) {
+  for (size_t i = 0; i < old_object_shape_features.size(); ++i) {
     histogram_dist += std::fabs(old_object_shape_features[i] -
       new_object_shape_features[i]);
   }
