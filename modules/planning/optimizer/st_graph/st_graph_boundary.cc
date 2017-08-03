@@ -61,31 +61,31 @@ Vec2d StGraphBoundary::point(const uint32_t index) const {
 const std::vector<Vec2d>& StGraphBoundary::points() const { return points_; }
 
 StGraphBoundary::BoundaryType StGraphBoundary::boundary_type() const {
-  return _boundary_type;
+  return boundary_type_;
 }
 
 void StGraphBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
-  _boundary_type = boundary_type;
+  boundary_type_ = boundary_type;
 }
 
-const std::string& StGraphBoundary::id() const { return _id; }
+const std::string& StGraphBoundary::id() const { return id_; }
 
-void StGraphBoundary::set_id(const std::string& id) { _id = id; }
+void StGraphBoundary::set_id(const std::string& id) { id_ = id; }
 
 double StGraphBoundary::characteristic_length() const {
-  return _characteristic_length;
+  return characteristic_length_;
 }
 
 void StGraphBoundary::SetCharacteristicLength(
     const double characteristic_length) {
-  _characteristic_length = characteristic_length;
+  characteristic_length_ = characteristic_length;
 }
 
 bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
                                        double* s_lower) const {
   const common::math::LineSegment2d segment = {Vec2d(curr_time, 0.0),
-                                               Vec2d(curr_time, _s_high_limit)};
-  *s_upper = _s_high_limit;
+                                               Vec2d(curr_time, s_high_limit_)};
+  *s_upper = s_high_limit_;
   *s_lower = 0.0;
   Vec2d p_s_first;
   Vec2d p_s_second;
@@ -95,17 +95,17 @@ bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
            << "] is out of the coverage scope of the boundary.";
     return false;
   }
-  if (_boundary_type == BoundaryType::STOP ||
-      _boundary_type == BoundaryType::YIELD ||
-      _boundary_type == BoundaryType::FOLLOW ||
-      _boundary_type == BoundaryType::UNKNOWN) {
+  if (boundary_type_ == BoundaryType::STOP ||
+      boundary_type_ == BoundaryType::YIELD ||
+      boundary_type_ == BoundaryType::FOLLOW ||
+      boundary_type_ == BoundaryType::UNKNOWN) {
     *s_upper = std::fmin(*s_upper, std::fmin(p_s_first.y(), p_s_second.y()));
-  } else if (_boundary_type == BoundaryType::OVERTAKE) {
+  } else if (boundary_type_ == BoundaryType::OVERTAKE) {
     // overtake
     *s_lower = std::fmax(*s_lower, std::fmax(p_s_first.y(), p_s_second.y()));
   } else {
     AERROR << "boundary_type is not supported. boundary_type: "
-           << static_cast<int>(_boundary_type);
+           << static_cast<int>(boundary_type_);
     return false;
   }
   return true;
@@ -114,8 +114,8 @@ bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
 bool StGraphBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
                                         double* s_lower) const {
   const common::math::LineSegment2d segment = {Vec2d(curr_time, 0.0),
-                                               Vec2d(curr_time, _s_high_limit)};
-  *s_upper = _s_high_limit;
+                                               Vec2d(curr_time, s_high_limit_)};
+  *s_upper = s_high_limit_;
   *s_lower = 0.0;
 
   Vec2d p_s_first;

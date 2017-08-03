@@ -94,4 +94,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "st_graph_boundary_test",
+    size = "small",
+    srcs = [
+        "st_graph_boundary_test.cc",
+    ],
+    deps = [
+        ":st_graph_boundary",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

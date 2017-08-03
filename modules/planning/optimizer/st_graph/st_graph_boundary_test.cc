@@ -14,39 +14,42 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
 
-#include "modules/planning/common/path_obstacle.h"
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "ros/include/ros/ros.h"
 
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
 
-const std::string& PathObstacle::Id() const { return id_; }
+TEST(StGraphBoundaryTest, basic_test) {
+  std::vector<STPoint> st_points;
+  st_points.emplace_back(0.0, 0.0);
+  st_points.emplace_back(0.0, 10.0);
+  st_points.emplace_back(5.0, 10.0);
+  st_points.emplace_back(5.0, 0.0);
 
-PathObstacle::PathObstacle(const planning::Obstacle* obstacle,
-                           const ReferenceLine* reference_line)
-    : obstacle_(obstacle) {
-  CHECK_NOTNULL(obstacle);
-  id_ = obstacle_->Id();
-  CHECK(reference_line != nullptr) << "reference line is null";
-  Init(reference_line);
-}
-
-bool PathObstacle::Init(const ReferenceLine* reference_line) { return true; }
-
-const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
-
-void PathObstacle::AddDecision(const ObjectDecisionType& decision) {
-  decisions_.push_back(decision);
-}
-
-const std::vector<ObjectDecisionType>& PathObstacle::Decisions() const {
-  return decisions_;
+  StGraphBoundary boundary(st_points);
+  EXPECT_EQ(boundary.id(), "");
+  EXPECT_EQ(boundary.boundary_type(), StGraphBoundary::BoundaryType::UNKNOWN);
+  double left_t = 0.0;
+  double right_t = 0.0;
+  boundary.GetBoundaryTimeScope(&left_t, &right_t);
+  EXPECT_DOUBLE_EQ(left_t, 0.0);
+  EXPECT_DOUBLE_EQ(right_t, 10.0);
 }
 
 }  // namespace planning
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

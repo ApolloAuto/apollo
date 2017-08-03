@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file qp_spline_path_optimizer.cpp
+ * @file qp_spline_path_optimizer.cc
  **/
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
 
