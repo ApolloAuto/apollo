@@ -820,13 +820,16 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   CHECK_NOTNULL(map);
 
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
+  double theta = point.theta();
   if (FLAGS_enable_kf_tracking) {
     point[0] = feature->t_position().x();
     point[1] = feature->t_position().y();
+    theta = feature->t_velocity_heading();
   }
 
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
-  map->NearbyLanesByCurrentLanes(point, current_lanes_, &nearby_lanes);
+  map->NearbyLanesByCurrentLanes(
+      point, theta, FLAGS_search_radius * 2.0, current_lanes_, &nearby_lanes);
   if (nearby_lanes.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no nearby lanes.";
     return;

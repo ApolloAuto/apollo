@@ -74,7 +74,8 @@ class PredictionMap {
           prev_lanes,
       const Eigen::Vector2d& point, const double heading,
       const double radius,
-      std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>* lanes);
+      std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>* lanes,
+      bool on_lane = true);
 
   double PathHeading(
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
@@ -87,6 +88,8 @@ class PredictionMap {
 
   void NearbyLanesByCurrentLanes(
       const Eigen::Vector2d& point,
+      double heading,
+      double radius,
       const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes,
       std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>*
           nearby_lanes);

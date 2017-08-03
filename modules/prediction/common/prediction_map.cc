@@ -20,6 +20,7 @@
 #include <unordered_set>
 #include <vector>
 #include <iomanip>
+#include <iostream>
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
@@ -75,9 +76,9 @@ double PredictionMap::HeadingOnLane(std::shared_ptr<const LaneInfo> lane_info,
   }
   const auto low_itr =
       std::lower_bound(accumulated_s.begin(), accumulated_s.end(), s);
-  CHECK(low_itr != accumulated_s.end());
+  // CHECK(low_itr != accumulated_s.end());
   size_t index = low_itr - accumulated_s.begin();
-  if (index == size - 1) {
+  if (index >= size - 1) {
     return headings.back();
   }
   return apollo::common::math::slerp(headings[index], accumulated_s[index],
@@ -134,40 +135,44 @@ void PredictionMap::OnLane(
     const std::vector<std::shared_ptr<const LaneInfo>>& prev_lanes,
     const Eigen::Vector2d& point, const double heading,
     const double radius,
-    std::vector<std::shared_ptr<const LaneInfo>>* lanes) {
+    std::vector<std::shared_ptr<const LaneInfo>>* lanes,
+    bool on_lane) {
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
+
   // TODO(kechxu) clean the messy code of this function
   apollo::common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
+  if (hdmap_->get_lanes_with_heading(
+        hdmap_point, radius, heading, M_PI, &candidate_lanes) != 0) {
+    return;
+  }
+
   apollo::common::math::Vec2d vec_point;
   vec_point.set_x(point[0]);
   vec_point.set_y(point[1]);
-  if (hdmap_->get_lanes_with_heading(hdmap_point, radius, heading, M_PI,
-                                     &candidate_lanes) != 0) {
-    return;
-  }
-  for (auto candidate_lane : candidate_lanes) {
+  for (const auto &candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
       continue;
-    } else if (!candidate_lane->is_on_lane(vec_point)) {
+    }
+    if (on_lane && !candidate_lane->is_on_lane(vec_point)) {
       continue;
-    } else if (!IsIdenticalLane(candidate_lane, prev_lanes) &&
-               !IsSuccessorLane(candidate_lane, prev_lanes) &&
-               !IsLeftNeighborLane(candidate_lane, prev_lanes) &&
-               !IsRightNeighborLane(candidate_lane, prev_lanes)) {
+    }
+    if (!IsIdenticalLane(candidate_lane, prev_lanes) &&
+        !IsSuccessorLane(candidate_lane, prev_lanes) &&
+        !IsLeftNeighborLane(candidate_lane, prev_lanes) &&
+        !IsRightNeighborLane(candidate_lane, prev_lanes)) {
       continue;
-    } else {
-      double distance = 0.0;
-      apollo::common::PointENU nearest_point =
-          candidate_lane->get_nearest_point(vec_point, &distance);
-      double nearest_point_heading =
-          PathHeading(candidate_lane, nearest_point);
-      double diff = std::fabs(
-          apollo::common::math::AngleDiff(heading, nearest_point_heading));
-      if (diff <= FLAGS_max_lane_angle_diff) {
-        lanes->push_back(candidate_lane);
-      }
+    }
+    double distance = 0.0;
+    apollo::common::PointENU nearest_point =
+        candidate_lane->get_nearest_point(vec_point, &distance);
+    double nearest_point_heading =
+        PathHeading(candidate_lane, nearest_point);
+    double diff = std::fabs(
+        apollo::common::math::AngleDiff(heading, nearest_point_heading));
+    if (diff <= FLAGS_max_lane_angle_diff) {
+      lanes->push_back(candidate_lane);
     }
   }
 }
@@ -201,28 +206,49 @@ int PredictionMap::SmoothPointFromLane(const apollo::hdmap::Id& id,
 
 void PredictionMap::NearbyLanesByCurrentLanes(
     const Eigen::Vector2d& point,
+    double heading,
+    double radius,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes,
     std::vector<std::shared_ptr<const LaneInfo>>* nearby_lanes) {
-  std::unordered_set<std::string> lane_ids;
-  for (auto& lane_ptr : lanes) {
-    if (lane_ptr == nullptr) {
-      continue;
-    }
-    for (auto& lane_id : lane_ptr->lane().left_neighbor_forward_lane_id()) {
-      if (lane_ids.find(lane_id.id()) != lane_ids.end()) {
+  if (lanes.size() == 0) {
+    std::vector<std::shared_ptr<const LaneInfo>> prev_lanes(0);
+    OnLane(prev_lanes, point, heading, radius, nearby_lanes, false);
+  } else {
+    std::unordered_set<std::string> lane_ids;
+    for (auto& lane_ptr : lanes) {
+      if (lane_ptr == nullptr) {
         continue;
       }
-      lane_ids.insert(lane_id.id());
-      std::shared_ptr<const LaneInfo> nearby_lane = LaneById(lane_id);
-      nearby_lanes->push_back(nearby_lane);
-    }
-    for (auto& lane_id : lane_ptr->lane().right_neighbor_forward_lane_id()) {
-      if (lane_ids.find(lane_id.id()) != lane_ids.end()) {
-        continue;
+      for (auto& lane_id : lane_ptr->lane().left_neighbor_forward_lane_id()) {
+        if (lane_ids.find(lane_id.id()) != lane_ids.end()) {
+          continue;
+        }
+        std::shared_ptr<const LaneInfo> nearby_lane = LaneById(lane_id);
+        double s = -1.0;
+        double l = 0.0;
+        GetProjection(point, nearby_lane, &s, &l);
+        if (::apollo::common::math::DoubleCompare(s, 0.0) >= 0 &&
+            ::apollo::common::math::DoubleCompare(std::fabs(l), radius) > 0) {
+          continue;
+        }
+        lane_ids.insert(lane_id.id());  
+        nearby_lanes->push_back(nearby_lane);
       }
-      lane_ids.insert(lane_id.id());
-      std::shared_ptr<const LaneInfo> nearby_lane = LaneById(lane_id);
-      nearby_lanes->push_back(nearby_lane);
+      for (auto& lane_id : lane_ptr->lane().right_neighbor_forward_lane_id()) {
+        if (lane_ids.find(lane_id.id()) != lane_ids.end()) {
+          continue;
+        }
+        std::shared_ptr<const LaneInfo> nearby_lane = LaneById(lane_id);
+        double s = -1.0;
+        double l = 0.0;
+        GetProjection(point, nearby_lane, &s, &l);
+        if (::apollo::common::math::DoubleCompare(s, 0.0) >= 0 &&
+            ::apollo::common::math::DoubleCompare(std::fabs(l), radius) > 0) {
+          continue;
+        }
+        lane_ids.insert(lane_id.id());
+        nearby_lanes->push_back(nearby_lane);
+      }
     }
   }
 }
@@ -356,7 +382,7 @@ bool PredictionMap::IsIdenticalLane(
     std::shared_ptr<const LaneInfo> other_lane,
     std::shared_ptr<const LaneInfo> curr_lane) {
   if (curr_lane == nullptr || other_lane == nullptr) {
-    return false;
+    return true;
   }
   return id_string(other_lane) == id_string(curr_lane);
 }
