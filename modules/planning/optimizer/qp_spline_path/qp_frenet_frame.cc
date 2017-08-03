@@ -129,7 +129,7 @@ bool QpFrenetFrame::GetOverallBound(
   bound->first = std::max(obs_bound.first, bound->first);
   bound->second = std::min(obs_bound.second, bound->second);
 
-  if (!get_dynamic_obstacle_bound(s, &obs_bound)) {
+  if (!GetDynamicObstacleBound(s, &obs_bound)) {
     return false;
   }
 
@@ -148,7 +148,7 @@ bool QpFrenetFrame::GetStaticObstacleBound(
   return GetBound(s, static_obstacle_bound_, bound);
 }
 
-bool QpFrenetFrame::get_dynamic_obstacle_bound(
+bool QpFrenetFrame::GetDynamicObstacleBound(
     const double s, std::pair<double, double>* const bound) const {
   return GetBound(s, dynamic_obstacle_bound_, bound);
 }
