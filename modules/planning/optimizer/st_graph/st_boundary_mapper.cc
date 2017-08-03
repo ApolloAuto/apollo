@@ -102,7 +102,7 @@ Status StBoundaryMapper::GetSpeedLimits(
         std::fmax(path_point.kappa(), st_boundary_config_.minimal_kappa()));
 
     const double curr_speed_limit = std::fmax(
-        st_boundary_config_.speed_limit_on_u_turn(),
+        st_boundary_config_.lowest_speed(),
         std::fmin(speed_limit_on_path, speed_limit_on_reference_line));
 
     SpeedPoint speed_point;
