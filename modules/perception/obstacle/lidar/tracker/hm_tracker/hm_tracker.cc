@@ -28,13 +28,13 @@
 namespace apollo {
 namespace perception {
 
-HmObjectTracker::HmObjectTracker(): matcher_(NULL),
-  time_stamp_(0.0),
-  valid_(false),
-  matcher_method_("hungarian_matcher"),
+HmObjectTracker::HmObjectTracker(): matcher_method_("hungarian_matcher"),
   filter_method_("kalman_filter"),
   use_histogram_for_match_(false),
-  histogram_bin_size_(10) {
+  histogram_bin_size_(10),
+  matcher_(NULL),
+  time_stamp_(0.0),
+  valid_(false) {
 }
 
 HmObjectTracker::~HmObjectTracker() {
@@ -209,7 +209,6 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   const TrackerOptions& options,
   std::vector<ObjectPtr>* tracked_objects) {
   // Track detected objects over consecutive frames
-  std::cout << "Tracking " << objects.size() << std::endl;
 
   /* 0. setup tracker */
   if (tracked_objects == NULL) {
@@ -249,7 +248,6 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   ref_location_ = cur_location;
   ref_orientation_ = (velo2world_pose *
     Eigen::Vector4d(1, 0, 0, 0)).head(3).cast<float>();
-  Eigen::Vector3f ref_velocity = ref_translation_ / time_diff;
   velodyne_to_local_pose_ = velo2world_pose;
 
   AINFO << "object_track_number = " << object_tracks_.size() << " "
@@ -304,8 +302,6 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
 
   // update frame
   valid_ = true;
-
-  std::cout << "Tracked " << tracked_objects->size() << std::endl;
 
   return true;
 }
@@ -475,7 +471,7 @@ void HmObjectTracker::UpdateAssignedTracks(
   // Update assigned tracks
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.get_tracks();
 
-  for (int i = 0; i < assignments.size(); i++) {
+  for (size_t i = 0; i < assignments.size(); i++) {
     int track_id = assignments[i].first;
     int obj_id = assignments[i].second;
     tracks[track_id]->UpdateWithObject(&(*new_objects)[obj_id], time_diff);
@@ -489,7 +485,7 @@ void HmObjectTracker::UpdateUnassignedTracks(
   // Update tracks without matched objects
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.get_tracks();
 
-  for (int i = 0; i < unassigned_tracks.size(); i++) {
+  for (size_t i = 0; i < unassigned_tracks.size(); i++) {
     int track_id = unassigned_tracks[i];
     tracks[track_id]->UpdateWithoutObject(
       tracks_predict[track_id], time_diff);
@@ -501,7 +497,7 @@ void HmObjectTracker::CreateNewTracks(
   const std::vector<int>& unassigned_objects,
   const double time_diff) {
   // Create new tracks for objects without matched tracks
-  for (int i = 0; i < unassigned_objects.size(); i++) {
+  for (size_t i = 0; i < unassigned_objects.size(); i++) {
     int obj_id = unassigned_objects[i];
     ObjectTrackPtr track(new ObjectTrack(new_objects[obj_id]));
     object_tracks_.add_track(track);
@@ -565,7 +561,7 @@ void HmObjectTracker::CollectTrackedResults(
     track_number++;
   }
 
-  for (int i = 0; i < background_objects_.size(); i++) {
+  for (size_t i = 0; i < background_objects_.size(); i++) {
     ObjectPtr obj(new Object);
     obj->clone(*(background_objects_[i]->object_ptr));
 

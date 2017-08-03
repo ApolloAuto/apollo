@@ -1,12 +1,22 @@
-// Copyright 2016 Baidu Inc. All Rights Reserved.
-// @author: yanhe (yanhe@baidu.com)
-// @file: graph_util.cpp
-// @brief:
-
-#include "modules/perception/obstacle/common/graph_util.h"
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include <queue>
 #include <iostream>
+#include "modules/perception/obstacle/common/graph_util.h"
 
 namespace apollo {
 namespace perception {
@@ -42,14 +52,7 @@ void connected_component_analysis(const std::vector<std::vector<int> >& graph,
         components.push_back(component);
         component.clear();
     }
-    // std::cout << "Find components \n";
-    // for (int i = 0; i < components.size(); i++) {
-    //     for (int j = 0; j < components[i].size(); j++) {
-    //         std::cout << components[i][j] << "  ";
-    //     }
-    //     std::cout << std::endl;
-    // }
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

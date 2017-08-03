@@ -28,7 +28,7 @@ namespace perception {
 
 struct TrackedObject {
   /* NEED TO NOTICE: All the states of track would be collected mainly based on states of tracked  
-   * * object. Thus, update tracked object's state when you update the state of track !!! */
+   * object. Thus, update tracked object's state when you update the state of track !!! */
 
   TrackedObject();
   explicit TrackedObject(ObjectPtr obj_ptr);

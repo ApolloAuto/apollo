@@ -343,7 +343,6 @@ void ObjectTrack::SmoothTrackOrientation() {
   cur_motion_dir.normalize();
 
   TrackedObjectPtr previous_obj = history_objects_.back();
-  float previous_speed = previous_obj->velocity.norm();
   Eigen::Vector3f previous_motion_dir = previous_obj->velocity;
   previous_motion_dir.normalize();
   Eigen::Vector3f previous_dir = previous_obj->direction;
@@ -352,7 +351,6 @@ void ObjectTrack::SmoothTrackOrientation() {
           previous_obj->velocity).head(2).norm();
   double w_vel = pow(10, std::min(12.0f, cur_speed - 1));
 
-  double cos_val = previous_motion_dir.dot(cur_motion_dir);
   double motion_confidence = 1;
 
   if (age_ > 1 && acceleration > 50) {
@@ -421,8 +419,6 @@ void ObjectTrack::SmoothTrackOrientation() {
   result_dir.normalize();
 
   Eigen::Vector3d bk_size = current_object_->size.cast<double>();
-  Eigen::Vector3d bk_dir = current_object_->direction.cast<double>();
-  Eigen::Vector3d bk_center = current_object_->center.cast<double>();
 
   Eigen::Vector3d new_size;
   Eigen::Vector3d new_center;

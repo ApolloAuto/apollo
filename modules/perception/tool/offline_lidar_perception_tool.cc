@@ -14,21 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <pcl/io/pcd_io.h>
 #include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <vector>
 #include <string>
-
-#include <pcl/io/pcd_io.h>
-
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/common/file_system_util.h"
+#include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/onboard/lidar_process.h"
 #include "modules/perception/obstacle/lidar/visualizer/pcl_obstacle_visualizer.h"
-
 
 DECLARE_string(flagfile);
 DECLARE_string(config_manager_path);
@@ -41,75 +39,6 @@ namespace perception {
 
 DEFINE_string(output_path, "./output/", "output path");
 DEFINE_int32(start_frame, 0, "start frame");
-
-template <typename T>
-void quaternion_to_rotation_matrix(const T * quat, T * R) {
-    T x2 = quat[0] * quat[0];
-    T xy = quat[0] * quat[1];
-    T rx = quat[3] * quat[0];
-    T y2 = quat[1] * quat[1];
-    T yz = quat[1] * quat[2];
-    T ry = quat[3] * quat[1];
-    T z2 = quat[2] * quat[2];
-    T zx = quat[2] * quat[0];
-    T rz = quat[3] * quat[2];
-    T r2 = quat[3] * quat[3];
-    R[0] = r2 + x2 - y2 - z2;         // fill diagonal terms
-    R[4] = r2 - x2 + y2 - z2;
-    R[8] = r2 - x2 - y2 + z2;
-    R[3] = 2 * (xy + rz);             // fill off diagonal terms
-    R[6] = 2 * (zx - ry);
-    R[7] = 2 * (yz + rx);
-    R[1] = 2 * (xy - rz);
-    R[2] = 2 * (zx + ry);
-    R[5] = 2 * (yz - rx);
-}
-
-bool read_pose_file(const std::string& filename, Eigen::Matrix4d& pose,
-    int& frame_id, double& time_stamp) {
-    std::ifstream ifs(filename.c_str());
-    if (!ifs.is_open()) {
-        std::cerr << "Failed to open file " << filename << std::endl;
-        return false;
-    }
-    char buffer[1024];
-    ifs.getline(buffer, 1024);
-    int id = 0;
-    double time_samp = 0;
-    double quat[4];
-    double matrix3x3[9];
-    sscanf(buffer, "%d %lf %lf %lf %lf %lf %lf %lf %lf", &id, &(time_samp),
-            &(pose(0, 3)), &(pose(1, 3)), &(pose(2, 3)),
-            &(quat[0]), &(quat[1]), &(quat[2]), &(quat[3]));
-    quaternion_to_rotation_matrix<double>(quat, matrix3x3);
-
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            pose(i, j) = matrix3x3[i * 3 + j];
-        }
-    }
-
-    frame_id = id;
-    time_stamp = time_samp;
-    return true;
-}
-
-bool read_pose_file_mat12(const std::string& filename, Eigen::Matrix4d& pose,
-    int& frame_id, double& time_stamp) {
-    std::ifstream ifs(filename.c_str());
-    if (!ifs.is_open()) {
-        std::cerr << "Failed to open file " << filename << std::endl;
-        return false;
-    }
-    pose = Eigen::Matrix4d::Identity();
-    ifs >> frame_id >> time_stamp;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
-            ifs >> pose(i, j);
-        }
-    }
-    return true;
-}
 
 class OfflineLidarPerceptionTool {
 public:
@@ -169,8 +98,8 @@ public:
             //read pose
             Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
             int frame_id = -1;
-            if (!read_pose_file(pose_folder + pose_file_names[i],
-                pose, frame_id, time_stamp)) {
+            if (!ReadPoseFile(pose_folder + pose_file_names[i],
+                &pose, &frame_id, &time_stamp)) {
                 std::cout << "Failed to read file " << pose_file_names[i] << "\n";
                 return ;
             }
