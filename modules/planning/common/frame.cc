@@ -126,6 +126,7 @@ bool Frame::CreateReferenceLineFromRouting() {
     AERROR << "Failed to smooth reference line";
     return false;
   }
+  return true;
 }
 
 bool Frame::SmoothReferenceLine() {

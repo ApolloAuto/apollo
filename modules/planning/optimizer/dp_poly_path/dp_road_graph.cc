@@ -26,16 +26,17 @@
 #include <unordered_map>
 #include <utility>
 
-#include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/log.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/math/double.h"
 #include "modules/planning/math/sl_analytic_transformation.h"
-#include "modules/planning/optimizer/dp_poly_path/path_sampler.h"
 #include "modules/planning/optimizer/dp_poly_path/trajectory_cost.h"
 
 namespace apollo {
@@ -177,8 +178,7 @@ bool DpRoadGraph::generate_graph(const ReferenceLine &reference_line,
     return false;
   }
   std::vector<std::vector<common::SLPoint>> points;
-  PathSampler path_sampler(config_);
-  if (!path_sampler.sample(reference_line, init_point_, &points)) {
+  if (!SamplePath(reference_line, init_point_, &points)) {
     AERROR << "Fail to sampling point with path sampler!";
     return false;
   }
@@ -417,6 +417,53 @@ bool DpRoadGraph::fill_ego_by_time(
         ego_width};
 
     ego_by_time->emplace_back(std::move(ego_bounding_box));
+  }
+  return true;
+}
+
+bool DpRoadGraph::SamplePath(
+    const ReferenceLine &reference_line,
+    const common::TrajectoryPoint &init_point,
+    std::vector<std::vector<common::SLPoint>> *const points) {
+  if (!points) {
+    AERROR << "The provided points are null";
+    return false;
+  }
+  ::apollo::common::SLPoint init_sl_point;
+  common::math::Vec2d init_point_vec2d{init_point.path_point().x(),
+                                       init_point.path_point().y()};
+  if (!reference_line.get_point_in_frenet_frame(init_point_vec2d,
+                                                &init_sl_point)) {
+    AERROR << "Failed to get sl point from point "
+           << init_point_vec2d.DebugString();
+    return false;
+  }
+  const double reference_line_length =
+      reference_line.map_path().accumulated_s().back();
+  double level_distance =
+      std::fmax(config_.step_length_min(),
+                std::fmin(init_point.v(), config_.step_length_max()));
+
+  double accumulated_s = init_sl_point.s();
+  for (size_t i = 0;
+       i < config_.sample_level() && accumulated_s < reference_line_length;
+       ++i) {
+    std::vector<common::SLPoint> level_points;
+    accumulated_s += level_distance;
+    double s = std::fmin(accumulated_s, reference_line_length);
+
+    int32_t num =
+        static_cast<int32_t>(config_.sample_points_num_each_level() / 2);
+    for (int32_t j = -num; j < num + 1; ++j) {
+      double l = config_.lateral_sample_offset() * j;
+      auto sl = common::util::MakeSLPoint(s, l);
+      if (reference_line.is_on_road(sl)) {
+        level_points.push_back(sl);
+      }
+    }
+    if (!level_points.empty()) {
+      points->push_back(level_points);
+    }
   }
   return true;
 }
