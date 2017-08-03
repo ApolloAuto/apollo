@@ -54,7 +54,7 @@ bool PathSampler::sample(
     return false;
   }
   const double reference_line_length =
-      reference_line.reference_map_line().accumulated_s().back();
+      reference_line.map_path().accumulated_s().back();
   double level_distance =
       std::fmax(config_.step_length_min(),
                 std::fmin(init_point.v(), config_.step_length_max()));
