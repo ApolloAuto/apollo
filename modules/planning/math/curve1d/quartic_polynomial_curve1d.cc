@@ -23,6 +23,7 @@
 #include <string>
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace planning {
@@ -102,13 +103,8 @@ void QuarticPolynomialCurve1d::compute_coefficients(
 }
 
 std::string QuarticPolynomialCurve1d::to_string() const {
-  std::string s = "";
-  for (uint32_t i = 0; i < coef_.size(); ++i) {
-    s += std::to_string(coef_[i]) + "\t";
-  }
-  s += std::to_string(param_);
-  s += "\n";
-  return s;
+  return apollo::common::util::StrCat(
+      apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
 }
 
 }  // namespace planning
