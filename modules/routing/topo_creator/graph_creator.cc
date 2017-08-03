@@ -49,10 +49,10 @@ GraphCreator::GraphCreator(const std::string& base_map_file_path,
 bool GraphCreator::create() {
   if (!::apollo::common::util::GetProtoFromFile(
           _base_map_file_path, &_pbmap)) {
-    LOG(ERROR) << "Failed to load base map file from " << _base_map_file_path;
+    AERROR << "Failed to load base map file from " << _base_map_file_path;
     return false;
   }
-  LOG(ERROR) << "Number of lanes: " << _pbmap.lane_size();
+  AINFO << "Number of lanes: " << _pbmap.lane_size();
 
   _graph.set_hdmap_version(_pbmap.header().version());
   _graph.set_hdmap_district(_pbmap.header().district());
@@ -70,7 +70,7 @@ bool GraphCreator::create() {
   }
 
   for (const auto& lane : _pbmap.lane()) {
-    LOG(INFO) << "Current lane id: " << lane.id().id();
+    AINFO << "Current lane id: " << lane.id().id();
     _node_index_map[lane.id().id()] = _graph.node_size();
     const auto iter = _road_id_map.find(lane.id().id());
     if (iter != _road_id_map.end()) {
@@ -91,10 +91,10 @@ bool GraphCreator::create() {
 
   if (!::apollo::common::util::SetProtoToASCIIFile(
           _graph, _dump_topo_file_path)) {
-    LOG(ERROR) << "Failed to dump topo data into file " << _dump_topo_file_path;
+    AERROR << "Failed to dump topo data into file " << _dump_topo_file_path;
     return false;
   }
-  LOG(INFO) << "File is dumped successfully. Path: " << _dump_topo_file_path;
+  AINFO << "File is dumped successfully. Path: " << _dump_topo_file_path;
   return true;
 }
 

@@ -19,7 +19,6 @@
 
 #include <memory>
 
-#include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/proto/routing.pb.h"
 #include "modules/routing/core/navigator.h"
 
