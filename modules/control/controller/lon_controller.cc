@@ -21,6 +21,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -181,9 +182,10 @@ Status LonController::ComputeControlCommand(
   double preview_time = lon_controller_conf.preview_window() * ts;
 
   if (preview_time < 0.0) {
-    AERROR << "Preview time set as: " << preview_time << " less than 0";
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
-                  "Invalid preview time:" + std::to_string(preview_time));
+    const auto error_msg = apollo::common::util::StrCat(
+        "Preview time set as: ", preview_time, " less than 0");
+    AERROR << error_msg;
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
   ComputeLongitudinalErrors(trajectory_analyzer_.get(), preview_time, debug);
 

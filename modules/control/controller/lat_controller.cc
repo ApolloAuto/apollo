@@ -201,13 +201,11 @@ Status LatController::Init(const ControlConf *control_conf) {
 
   int q_param_size = control_conf->lat_controller_conf().matrix_q_size();
   if (matrix_size != q_param_size) {
-    AERROR << "matrix_q size: " << q_param_size
-           << " in parameter file not equal to matrix_size: " << matrix_size;
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
-                  "lateral controller error: matrix_q size: " +
-                      std::to_string(q_param_size) +
-                      " in parameter file not equal to matrix_size: " +
-                      std::to_string(matrix_size));
+    const auto error_msg = apollo::common::util::StrCat(
+        "lateral controller error: matrix_q size: ", q_param_size,
+        " in parameter file not equal to matrix_size: ", matrix_size);
+    AERROR << error_msg;
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
   for (int i = 0; i < q_param_size; ++i) {
     matrix_q_(i, i) = control_conf->lat_controller_conf().matrix_q(i);

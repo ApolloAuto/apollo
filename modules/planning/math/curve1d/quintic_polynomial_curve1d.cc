@@ -21,6 +21,7 @@
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace planning {
@@ -112,13 +113,8 @@ void QuinticPolynomialCurve1d::compute_coefficients(
 double QuinticPolynomialCurve1d::param_length() const { return param_; }
 
 std::string QuinticPolynomialCurve1d::to_string() const {
-  std::string s = "";
-  for (uint32_t i = 0; i < coef_.size(); ++i) {
-    s += std::to_string(coef_[i]) + "\t";
-  }
-  s += std::to_string(param_);
-  s += "\n";
-  return s;
+  return apollo::common::util::StrCat(
+      apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
 }
 
 }  // namespace planning
