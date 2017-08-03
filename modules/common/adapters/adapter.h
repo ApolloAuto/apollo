@@ -252,6 +252,14 @@ class Adapter {
     return seq_num_;
   }
 
+  void SetLatestPublished(const D &data) {
+    latest_published_data_.reset(new D(data));
+  }
+
+  D *GetLatestPublished() {
+    return latest_published_data_.get();
+  }
+
  private:
   template <typename T>
   struct IdentifierType {};
@@ -407,6 +415,9 @@ class Adapter {
   /// The monotonically increasing sequence number of the message to
   /// be published.
   uint32_t seq_num_ = 0;
+
+  /// The most recenct published data.
+  std::unique_ptr<D> latest_published_data_;
 };
 
 }  // namespace adapter
