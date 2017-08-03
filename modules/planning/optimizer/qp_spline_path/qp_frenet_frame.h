@@ -63,8 +63,8 @@ class QpFrenetFrame {
   bool GetStaticObstacleBound(const double s,
                               std::pair<double, double>* const bound) const;
 
-  bool get_dynamic_obstacle_bound(const double s,
-                                  std::pair<double, double>* const bound) const;
+  bool GetDynamicObstacleBound(const double s,
+                               std::pair<double, double>* const bound) const;
 
  private:
   bool FindLongitudinalDistance(const double time,
