@@ -1,7 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
 
-load("//tools:cpplint.bzl", "cpplint")
-
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -9,9 +7,8 @@ cc_library(
     srcs = ["cnn_segmentation.cc"],
     hdrs = ["cnn_segmentation.h"],
     deps = [
-        "@caffe//:caffe",
+        "@caffe//:lib",
         "//modules/common:log",
-        "//modules/perception/common:perception_common",
         "//modules/common/util:util",
         "//modules/perception/lib/pcl_util:pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
@@ -36,7 +33,7 @@ cc_library(
     srcs = ["feature_generator.cc"],
     hdrs = ["feature_generator.h"],
     deps = [
-         "@caffe//:caffe",
+         "@caffe//:lib",
          "//modules/common:log",
          "//modules/perception/lib/pcl_util:pcl_util",
          "@eigen//:eigen",
@@ -49,7 +46,7 @@ cc_library(
     name = "cnnseg_cluster2d",
     hdrs = ["cluster2d.h"],
     deps = [
-         "@caffe//:caffe",
+         "@caffe//:lib",
          "//modules/common:log",
          "//modules/perception/lib/pcl_util:pcl_util",
          "//modules/perception/obstacle/base:perception_obstacle_base",
@@ -74,6 +71,7 @@ cc_test(
         "@pcl//:pcl",
         "@opencv2//:core",
         "//modules/common:log",
+        "//modules/perception/common:perception_common",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "perception_obstacle_lidar_segmention_cnnseg",

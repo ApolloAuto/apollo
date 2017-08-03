@@ -40,7 +40,7 @@ protected:
 };
 
 bool ConstructPointCloud(std::vector<ObjectPtr>* objects) {
-    std::string pcd_data("modules/perception/testdata/min_box_object_builder_test/QB9178_3_1461381834_1461382134_30651.pcd");
+    std::string pcd_data("modules/perception/data/min_box_object_builder_test/QB9178_3_1461381834_1461382134_30651.pcd");
     std::ifstream cluster_ifs(pcd_data.c_str(), std::ifstream::in);
     std::string point_buf;
     while (cluster_ifs.good()) {

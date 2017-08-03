@@ -29,6 +29,7 @@ cc_binary(
         "//modules/perception/proto:perception_proto",
         "@ros//:ros_common",
     ],
+    linkstatic = 0,
 )
 
 filegroup(
