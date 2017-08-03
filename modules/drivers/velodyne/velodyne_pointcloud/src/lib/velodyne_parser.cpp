@@ -95,12 +95,14 @@ void VelodyneParser::init_angle_params(double view_direction,
 
 /** Set up for on-line operation. */
 void VelodyneParser::setup() {
-  _calibration.read(_config.calibration_file);
+  if (!_config.calibration_online) {
+    _calibration.read(_config.calibration_file);
 
-  if (!_calibration._initialized) {
-    ROS_FATAL_STREAM(
-        "Unable to open calibration file: " << _config.calibration_file);
-    ROS_BREAK();
+    if (!_calibration._initialized) {
+      ROS_FATAL_STREAM(
+          "Unable to open calibration file: " << _config.calibration_file);
+      ROS_BREAK();
+    }
   }
 
   // setup angle parameters.

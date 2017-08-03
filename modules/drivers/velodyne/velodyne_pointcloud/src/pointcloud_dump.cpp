@@ -20,8 +20,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "velodyne_pointcloud/util.h"
 #include "velodyne_pointcloud/pointcloud_dump.h"
+#include "velodyne_pointcloud/util.h"
 
 namespace apollo {
 namespace drivers {

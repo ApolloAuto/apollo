@@ -32,6 +32,7 @@
 #include "velodyne_msgs/VelodyneScanUnified.h"
 #include "velodyne_pointcloud/calibration.h"
 #include "velodyne_pointcloud/const_variables.h"
+#include "velodyne_pointcloud/online_calibration.h"
 #include "velodyne_pointcloud/point_types.h"
 
 namespace apollo {
@@ -141,6 +142,7 @@ struct Config {
   double min_angle;
   double view_direction;
   double view_width;
+  bool calibration_online;
   std::string calibration_file;
   std::string model;  // VLP16,32E, 64E_32
   bool organized;     // is point cloud order
@@ -176,12 +178,8 @@ class VelodyneParser {
   // order point cloud fod IDL by velodyne model
   virtual void order(VPointCloud::Ptr &cloud) = 0;
 
-  const Calibration &get_calibration() {
-    return _calibration;
-  }
-  const double get_last_timestamp() {
-    return _last_time_stamp;
-  }
+  const Calibration &get_calibration() { return _calibration; }
+  const double get_last_timestamp() { return _last_time_stamp; }
 
  protected:
   const float (*_inner_time)[12][32];
@@ -249,6 +247,8 @@ class Velodyne64Parser : public VelodyneParser {
   uint64_t _gps_base_usec[4];  // full time
   bool _is_s2;
   int _offsets[64];
+
+  OnlineCalibration _online_calibration;
 
 };  // class Velodyne64Parser
 

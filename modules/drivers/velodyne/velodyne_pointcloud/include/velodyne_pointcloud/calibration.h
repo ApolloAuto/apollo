@@ -1,5 +1,5 @@
 /**
- * \file  calibration.h 
+ * \file  calibration.h
  *
  * \author  Piyush Khandelwal (piyushk@cs.utexas.edu)
  * Copyright (C) 2012, Austin Robot Technology, University of Texas at Austin
@@ -74,9 +74,7 @@ class Calibration {
 
  public:
   Calibration() : _initialized(false) {}
-  Calibration(const std::string& calibration_file) {
-    read(calibration_file);
-  }
+  Calibration(const std::string& calibration_file) { read(calibration_file); }
 
   void read(const std::string& calibration_file);
   void write(const std::string& calibration_file);

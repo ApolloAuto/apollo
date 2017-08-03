@@ -148,6 +148,13 @@ void Velodyne64Parser::init_offsets() {
 void Velodyne64Parser::generate_pointcloud(
     const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg,
     VPointCloud::Ptr& pointcloud) {
+  if (_config.calibration_online) {
+    if (_online_calibration.decode(scan_msg) == -1 ||
+        !_online_calibration.inited()) {
+      return;
+    }
+    _calibration = _online_calibration.calibration();
+  }
   // allocate a point cloud with same time and frame ID as raw data
   pointcloud->header.frame_id = scan_msg->header.frame_id;
   pointcloud->height = 1;
