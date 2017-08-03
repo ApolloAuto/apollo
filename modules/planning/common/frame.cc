@@ -66,7 +66,7 @@ void Frame::SetDecisionDataFromPrediction(
        prediction_obstacles.prediction_obstacle()) {
     Obstacle obstacle;
     auto &perception_obstacle = prediction_obstacle.perception_obstacle();
-    obstacle.SetId(perception_obstacle.id());
+    obstacle.SetId(std::to_string(perception_obstacle.id()));
     obstacle.SetType(perception_obstacle.type());
     obstacle.SetHeight(perception_obstacle.height());
     obstacle.SetWidth(perception_obstacle.width());
