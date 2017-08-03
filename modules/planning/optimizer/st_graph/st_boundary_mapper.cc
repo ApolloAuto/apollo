@@ -104,8 +104,7 @@ Status StBoundaryMapper::GetSpeedLimits(
     // speed limit from reference line
     double speed_limit_on_reference_line =
         std::fmin(st_boundary_config_.maximal_speed(),
-                  reference_line.GetSpeedLimitFromPoint(
-                      Vec2d(path_point.x(), path_point.y())));
+                  reference_line.GetSpeedLimitFromS(path_point.s()));
 
     // speed limit from path curvature
     double speed_limit_on_path = std::sqrt(
