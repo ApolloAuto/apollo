@@ -22,7 +22,6 @@ cc_proto_library(
         "map_speed_bump.proto",
         "map_stop_sign.proto",
         "map_yield_sign.proto",
-        "routing.proto",
     ],
     deps = [
         "//modules/common/proto:common_proto",
@@ -46,7 +45,6 @@ py_proto_compile(
         "map_speed_bump.proto",
         "map_stop_sign.proto",
         "map_yield_sign.proto",
-        "routing.proto",
     ],
     deps = [
         "//modules/common/proto:common_proto_pylib",
