@@ -272,22 +272,29 @@ void ReferenceLine::get_s_range_from_box2d(
 double ReferenceLine::GetSpeedLimitFromS(const double s) const {
   const auto& map_path_point = get_reference_point(s);
   double speed_limit = std::numeric_limits<double>::max();
+  bool found = false;
   for (const auto& lane_waypoint : map_path_point.lane_waypoints()) {
     if (lane_waypoint.lane == nullptr) {
       AWARN << "lane_waypoint.lane is nullptr";
       continue;
     }
+    found = true;
     speed_limit =
         std::fmin(lane_waypoint.lane->lane().speed_limit(), speed_limit);
   }
-  return speed_limit;
+  if (found) {
+    return speed_limit;
+  } else {
+    return FLAGS_default_speed_limit;
+  }
 }
 
 double ReferenceLine::GetSpeedLimitFromPoint(
     const common::math::Vec2d& point) const {
   SLPoint sl;
   if (!get_point_in_frenet_frame(point, &sl)) {
-    return false;
+    AWARN << "Failed to get projection for point: " << point.DebugString();
+    return FLAGS_default_speed_limit;
   }
   return GetSpeedLimitFromS(sl.s());
 }
