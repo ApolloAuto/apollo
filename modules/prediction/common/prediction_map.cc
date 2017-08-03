@@ -20,7 +20,6 @@
 #include <unordered_set>
 #include <vector>
 #include <iomanip>
-#include <iostream>
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
