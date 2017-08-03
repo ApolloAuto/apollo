@@ -20,11 +20,11 @@
 #include <sstream>
 
 #include "google/protobuf/text_format.h"
-#include "google/protobuf/util/message_differencer.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/monitor/proto/monitor.pb.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 #include "modules/control/integration_tests/control_test_base.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "ros/include/ros/ros.h"
@@ -150,8 +150,8 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
       AINFO << "Current result is written to " << tmp_golden_path;
       return false;
     }
-    bool same_result = google::protobuf::util::MessageDifferencer::Equals(
-        golden_result, control_command_);
+    bool same_result =
+        ::apollo::common::util::IsProtoEqual(golden_result, control_command_);
     if (!same_result) {
       std::string tmp_planning_file = tmp_golden_path + ".tmp";
       ::apollo::common::util::SetProtoToASCIIFile(control_command_,

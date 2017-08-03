@@ -26,6 +26,8 @@
 #include <string>
 #include <utility>
 
+#include "google/protobuf/util/message_differencer.h"
+
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/proto/map_id.pb.h"
 
@@ -36,6 +38,11 @@
 namespace apollo {
 namespace common {
 namespace util {
+
+template <typename ProtoA, typename ProtoB>
+bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
+  return google::protobuf::util::MessageDifferencer::Equals(a, b);
+}
 
 /**
  * @brief create a SL point
