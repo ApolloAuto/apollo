@@ -18,23 +18,21 @@
 """
 Real Time Plotting of planning and control
 """
-import argparse
 import json
-import matplotlib.pyplot as plt
 import math
+import sys
+import threading
+
+import gflags
+import matplotlib.pyplot as plt
 import numpy
 import rospy
-import sys
 import tf
-import threading
-from std_msgs.msg import String
-import gflags
-from gflags import FLAGS
 
 from item import Item
-from modules.localization.proto import localization_pb2
-from modules.canbus.proto import chassis_pb2
-from modules.planning.proto import planning_pb2
+from modules.localization.proto.localization_pb2 import LocalizationEstimate
+from modules.canbus.proto.chassis_pb2 import Chassis
+from modules.planning.proto.planning_pb2 import ADCTrajectory
 from stitem import Stitem
 from xyitem import Xyitem
 
@@ -77,10 +75,10 @@ class Plotter(object):
         """
         New Planning Trajectory
         """
-        entity = planning_pb2.ADCTrajectory()
+        entity = ADCTrajectory()
         entity.CopyFrom(data)
         basetime = entity.header.timestamp_sec
-        numpoints = len(entity.adc_trajectory_point)
+        numpoints = len(entity.trajectory_point)
         if numpoints == 0:
             print entity
             return
@@ -93,14 +91,14 @@ class Plotter(object):
         pointcur = numpy.zeros(numpoints)
         pointacc = numpy.zeros(numpoints)
         for idx in range(numpoints):
-            pointx[idx] = entity.adc_trajectory_point[idx].x
-            pointy[idx] = entity.adc_trajectory_point[idx].y
-            pointspeed[idx] = entity.adc_trajectory_point[idx].speed
-            pointtheta[idx] = entity.adc_trajectory_point[idx].theta
-            pointcur[idx] = entity.adc_trajectory_point[idx].curvature
-            pointacc[idx] = entity.adc_trajectory_point[idx].acceleration_s
-            pointtime[
-                idx] = entity.adc_trajectory_point[idx].relative_time + basetime
+            trajectory_point = entity.trajectory_point[idx]
+            pointx[idx] = trajectory_point.path_point.x
+            pointy[idx] = trajectory_point.path_point.y
+            pointspeed[idx] = trajectory_point.v
+            pointtheta[idx] = trajectory_point.path_point.theta
+            pointcur[idx] = trajectory_point.path_point.kappa
+            pointacc[idx] = trajectory_point.a
+            pointtime[idx] = trajectory_point.relative_time + basetime
 
         st_available = False
         debug = entity.debug.debug_message
@@ -136,13 +134,13 @@ class Plotter(object):
         """
         New localization pose
         """
-        entity = chassis_pb2.Chassis()
+        entity = Chassis()
         entity.CopyFrom(data)
         self.carspeed = entity.speed_mps
-        self.steer_angle = entity.steering_percentage / 100 * MaxSteerAngle / SteerRatio
+        self.steer_angle = \
+            entity.steering_percentage / 100 * MaxSteerAngle / SteerRatio
 
-        self.autodrive = (
-            entity.driving_mode == chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE)
+        self.autodrive = (entity.driving_mode == Chassis.COMPLETE_AUTO_DRIVE)
         self.carcurvature = math.tan(
             math.radians(self.steer_angle)) / VehicleLength
 
@@ -150,7 +148,7 @@ class Plotter(object):
         """
         New localization pose
         """
-        entity = localization_pb2.LocalizationEstimate()
+        entity = LocalizationEstimate()
         entity.CopyFrom(data)
         quat = (entity.pose.orientation.qx, entity.pose.orientation.qy,
                 entity.pose.orientation.qz, entity.pose.orientation.qw)
@@ -262,30 +260,21 @@ def main(argv):
 
     plt.tight_layout(pad=0.20)
     plt.ion()
-
     plt.show()
-    prevtime = 0
 
     plotter = Plotter(item1, item2, item3, item4)
     fig.canvas.mpl_connect('key_press_event', plotter.press)
-    planning_sub = rospy.Subscriber(
-        '/apollo/planning',
-        planning_pb2.ADCTrajectory,
-        plotter.callback_planning,
-        queue_size=3)
-    localization_sub = rospy.Subscriber(
-        '/apollo/localization/pose',
-        localization_pb2.LocalizationEstimate,
-        plotter.callback_localization,
-        queue_size=3)
-    chassis_sub = rospy.Subscriber(
-        '/apollo/canbus/chassis',
-        chassis_pb2.Chassis,
-        plotter.callback_chassis,
-        queue_size=3)
+    planning_sub = rospy.Subscriber('/apollo/planning', ADCTrajectory,
+                                    plotter.callback_planning, queue_size=3)
+    localization_sub = rospy.Subscriber('/apollo/localization/pose',
+                                        LocalizationEstimate,
+                                        plotter.callback_localization,
+                                        queue_size=3)
+    chassis_sub = rospy.Subscriber('/apollo/canbus/chassis', Chassis,
+                                   plotter.callback_chassis, queue_size=3)
     plotter.updatesub(planning_sub, localization_sub, chassis_sub)
 
-    r = rospy.Rate(5)
+    rate = rospy.Rate(5)
     while not rospy.is_shutdown():
         ax1.draw_artist(ax1.patch)
         ax2.draw_artist(ax2.patch)
@@ -303,7 +292,7 @@ def main(argv):
         fig.canvas.blit(ax3.bbox)
         fig.canvas.blit(ax4.bbox)
         fig.canvas.flush_events()
-        r.sleep()
+        rate.sleep()
 
 
 if __name__ == '__main__':
