@@ -48,6 +48,20 @@ cc_library(
 )
 
 cc_library(
+    name = "path_obstacle",
+    srcs = [
+        "path_obstacle.cc",
+    ],
+    hdrs = [
+        "path_obstacle.h",
+    ],
+    deps = [
+        ":obstacle",
+        "//modules/planning/reference_line",
+    ],
+)
+
+cc_library(
     name = "planning_gflags",
     srcs = [
         "planning_gflags.cc",
@@ -92,6 +106,8 @@ cc_library(
     deps = [
         ":indexed_list",
         ":indexed_queue",
+        ":obstacle",
+        ":path_obstacle",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/vehicle_state",

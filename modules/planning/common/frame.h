@@ -29,17 +29,19 @@
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/routing/proto/routing.pb.h"
 #include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
 
 using Obstacles = IndexedList<std::string, Obstacle>;
+using PathObstacles = IndexedList<std::string, PathObstacle>;
 
 class Frame {
  public:
@@ -78,6 +80,7 @@ class Frame {
   routing::RoutingResponse routing_result_;
   prediction::PredictionObstacles prediction_;
   Obstacles obstacles_;
+  PathObstacles path_obstacles_;
   uint32_t sequence_num_ = 0;
   hdmap::Path hdmap_path_;
   localization::Pose init_pose_;
