@@ -34,6 +34,8 @@ namespace planning {
 
 class StGraphBoundary : public common::math::Polygon2d {
  public:
+  // if you need to add boundary type, make sure you modify
+  // GetUnblockSRange accordingly.
   enum class BoundaryType {
     UNKNOWN,
     STOP,
@@ -58,8 +60,8 @@ class StGraphBoundary : public common::math::Polygon2d {
   double characteristic_length() const;
 
   void set_id(const std::string& id);
-  void set_boundary_type(const BoundaryType& boundary_type);
-  void set_characteristic_length(const double characteristic_length);
+  void SetBoundaryType(const BoundaryType& boundary_type);
+  void SetCharacteristicLength(const double characteristic_length);
 
   bool GetUnblockSRange(const double curr_time, double* s_upper,
                         double* s_lower) const;
@@ -67,7 +69,7 @@ class StGraphBoundary : public common::math::Polygon2d {
   bool GetBoundarySRange(const double curr_time, double* s_upper,
                          double* s_lower) const;
 
-  void get_boundary_time_scope(double* start_t, double* end_t) const;
+  void GetBoundaryTimeScope(double* start_t, double* end_t) const;
 
  private:
   BoundaryType _boundary_type = BoundaryType::UNKNOWN;
@@ -76,7 +78,7 @@ class StGraphBoundary : public common::math::Polygon2d {
   double _s_high_limit = 200.0;
 };
 
-}  // end namespace planning
-}  // end namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_BOUNDARY_H_

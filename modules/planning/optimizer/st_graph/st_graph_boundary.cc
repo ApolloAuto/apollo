@@ -64,7 +64,7 @@ StGraphBoundary::BoundaryType StGraphBoundary::boundary_type() const {
   return _boundary_type;
 }
 
-void StGraphBoundary::set_boundary_type(const BoundaryType& boundary_type) {
+void StGraphBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
   _boundary_type = boundary_type;
 }
 
@@ -76,7 +76,7 @@ double StGraphBoundary::characteristic_length() const {
   return _characteristic_length;
 }
 
-void StGraphBoundary::set_characteristic_length(
+void StGraphBoundary::SetCharacteristicLength(
     const double characteristic_length) {
   _characteristic_length = characteristic_length;
 }
@@ -130,10 +130,13 @@ bool StGraphBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
   return true;
 }
 
-void StGraphBoundary::get_boundary_time_scope(double* start_t,
-                                              double* end_t) const {
-  *start_t = std::fmin(points_.front().y(), points_.back().y());
-  *end_t = std::fmax(points_.at(1).y(), points_.at(2).y());
+void StGraphBoundary::GetBoundaryTimeScope(double* start_t,
+                                           double* end_t) const {
+  STPoint left;
+  STPoint right;
+  ExtremePoints(0.0, &left, &right);
+  *start_t = left.t();
+  *end_t = right.t();
 }
 
 }  // namespace planning
