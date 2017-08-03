@@ -30,6 +30,7 @@
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/double.h"
 #include "modules/planning/math/sl_analytic_transformation.h"
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_sampler.h"
 
@@ -95,8 +96,6 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
 
   // extract data
   const Spline1d& spline = _spline_generator->spline();
-  double s_resolution =
-      (end_s - _init_point.s()) / _qp_spline_path_config.num_output();
   std::vector<common::PathPoint> path_points;
 
   double start_l = spline(_init_point.s());
@@ -110,8 +109,9 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
   double y_diff = xy_point.y() - init_point.path_point().y();
 
   double s = _init_point.s();
-  for (std::uint32_t i = 0;
-       i <= _qp_spline_path_config.num_output() && s <= end_s; ++i) {
+  double s_resolution =
+      (end_s - _init_point.s()) / _qp_spline_path_config.num_output();
+  while (Double::compare(s, end_s) < 0) {
     double l = spline(s);
     double dl = spline.derivative(s);
     double ddl = spline.second_order_derivative(s);
@@ -132,8 +132,11 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
           common::util::Distance2D(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
     }
-    path_points.push_back(std::move(path_point));
-    s = _init_point.s() + (i + 1) * s_resolution;
+    if (Double::compare(path_point.s(), end_s) >= 0) {
+      break;
+    }
+    path_points.push_back(path_point);
+    s += s_resolution;
   }
   path_data->set_discretized_path(path_points);
   return true;
