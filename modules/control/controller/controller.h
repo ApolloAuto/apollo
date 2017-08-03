@@ -38,9 +38,6 @@
 namespace apollo {
 namespace control {
 
-using ErrorCode = ::apollo::common::ErrorCode;
-using Status = ::apollo::common::Status;
-
 /**
  * @class Controller
  *
@@ -63,7 +60,7 @@ class Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  virtual Status Init(const ControlConf *control_conf) = 0;
+  virtual common::Status Init(const ControlConf *control_conf) = 0;
 
   /**
    * @brief compute control command based on current vehicle status
@@ -74,7 +71,7 @@ class Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  virtual Status ComputeControlCommand(
+  virtual common::Status ComputeControlCommand(
       const ::apollo::localization::LocalizationEstimate *localization,
       const ::apollo::canbus::Chassis *chassis,
       const ::apollo::planning::ADCTrajectory *trajectory,
@@ -84,7 +81,7 @@ class Controller {
    * @brief reset Controller
    * @return Status reset status
    */
-  virtual Status Reset() = 0;
+  virtual common::Status Reset() = 0;
 
   /**
    * @brief controller name
