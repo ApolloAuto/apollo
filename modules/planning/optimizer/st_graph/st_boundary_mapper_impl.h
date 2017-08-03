@@ -43,24 +43,24 @@ class StBoundaryMapperImpl : public StBoundaryMapper {
       std::vector<StGraphBoundary>* const boundary) const override;
 
  private:
-  apollo::common::Status map_main_decision_stop(
+  apollo::common::Status MapMainDecisionStop(
       const MainStop& main_stop, const ReferenceLine& reference_line,
       const double planning_distance, const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const;
 
-  apollo::common::Status map_mission_complete(
+  apollo::common::Status MapMissionComplete(
       const ReferenceLine& reference_line, const double planning_distance,
       const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const;
 
-  apollo::common::Status map_obstacle_with_prediction_trajectory(
+  apollo::common::Status MapObstacleWithPredictionTrajectory(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const ObjectDecisionType obj_decision,
       const PathData& path_data, const double planning_distance,
       const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const;
 
-  apollo::common::Status map_obstacle_without_prediction_trajectory(
+  apollo::common::Status MapObstacleWithoutPredictionTrajectory(
       const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const ObjectDecisionType obj_decision,
       const PathData& path_data, const ReferenceLine& reference_line,
