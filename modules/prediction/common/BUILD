@@ -46,6 +46,21 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "prediction_map_test",
+    size = "small",
+    srcs = ["prediction_map_test.cc"],
+     data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/common:prediction_map",
+        "//modules/prediction/common:prediction_gflags",
+        "@gtest//:main",
+    ]
+)
+
 cc_library(
     name = "road_graph",
     srcs = ["road_graph.cc"],
