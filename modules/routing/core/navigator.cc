@@ -37,11 +37,11 @@ namespace routing {
 
 namespace {
 
-using ::apollo::routing::RoutingResult_Road;
-using ::apollo::routing::RoutingResult_Junction;
-using ::apollo::routing::RoutingResult_PassageRegion;
-using ::apollo::routing::RoutingResult_LaneSegment;
-using ::apollo::routing::RoutingResult_LaneChangeInfo;
+using ::apollo::routing::RoutingResponse_Road;
+using ::apollo::routing::RoutingResponse_Junction;
+using ::apollo::routing::RoutingResponse_PassageRegion;
+using ::apollo::routing::RoutingResponse_LaneSegment;
+using ::apollo::routing::RoutingResponse_LaneChangeInfo;
 
 void get_nodes_of_ways_based_on_virtual(
     const std::vector<const TopoNode*>& nodes,
@@ -86,7 +86,7 @@ void get_nodes_of_ways(
 void extract_basic_passages(
     const std::vector<const TopoNode*>& nodes,
     std::vector<std::vector<const TopoNode*> >* const nodes_of_passages,
-    std::vector<RoutingResult_LaneChangeInfo::Type>* const lane_change_types) {
+    std::vector<RoutingResponse_LaneChangeInfo::Type>* const lane_change_types) {
   assert(!nodes.empty());
   nodes_of_passages->clear();
   lane_change_types->clear();
@@ -104,10 +104,10 @@ void extract_basic_passages(
       nodes_of_passage.clear();
       if (edge->type() == TET_LEFT) {
         lane_change_types->push_back(
-            RoutingResult_LaneChangeInfo::LEFT_FORWARD);
+            RoutingResponse_LaneChangeInfo::LEFT_FORWARD);
       } else {
         lane_change_types->push_back(
-            RoutingResult_LaneChangeInfo::RIGHT_FORWARD);
+            RoutingResponse_LaneChangeInfo::RIGHT_FORWARD);
       }
     }
     nodes_of_passage.push_back(*iter);
@@ -118,9 +118,9 @@ void extract_basic_passages(
 void passage_lane_ids_to_passage_region(
     const std::vector<const TopoNode*>& nodes,
     const NodeRangeManager& range_manager,
-    RoutingResult_PassageRegion* const region) {
+    RoutingResponse_PassageRegion* const region) {
   for (const auto& node : nodes) {
-    RoutingResult_LaneSegment* seg = region->add_segment();
+    RoutingResponse_LaneSegment* seg = region->add_segment();
     seg->set_id(node->lane_id());
     NodeRange range = range_manager.get_node_range(node);
     seg->set_start_s(range.start_s);
@@ -269,7 +269,7 @@ bool Navigator::is_ready() const { return _is_ready; }
 // search new request to new response
 bool Navigator::search_route(
     const ::apollo::routing::RoutingRequest& request,
-    ::apollo::routing::RoutingResult* response) const {
+    ::apollo::routing::RoutingResponse* response) const {
   if (!is_ready()) {
     ROS_ERROR("Topo graph is not ready!");
     return false;
@@ -315,7 +315,7 @@ bool Navigator::generate_passage_region(
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     const NodeRangeManager& range_manager,
-    ::apollo::routing::RoutingResult* result) const {
+    ::apollo::routing::RoutingResponse* result) const {
   result->mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   result->mutable_header()->set_module_name(FLAGS_node_name);
   result->mutable_header()->set_sequence_num(1);
@@ -334,7 +334,7 @@ void Navigator::generate_passage_region(
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     const NodeRangeManager& range_manager,
-    ::apollo::routing::RoutingResult* result) const {
+    ::apollo::routing::RoutingResponse* result) const {
   std::vector<std::vector<const TopoNode*> > nodes_of_ways;
   if (FLAGS_use_road_id) {
     get_nodes_of_ways(nodes, &nodes_of_ways);
@@ -348,11 +348,11 @@ void Navigator::generate_passage_region(
     const std::vector<const TopoNode*>& nodes_of_way = nodes_of_ways.at(i);
     if (!nodes_of_way.at(0)->is_virtual()) {
       std::vector<std::vector<const TopoNode*> > nodes_of_basic_passages;
-      std::vector<RoutingResult_LaneChangeInfo::Type> lane_change_types;
+      std::vector<RoutingResponse_LaneChangeInfo::Type> lane_change_types;
       extract_basic_passages(nodes_of_way, &nodes_of_basic_passages,
                              &lane_change_types);
 
-      RoutingResult_Road road;
+      RoutingResponse_Road road;
       road.set_id("r" + boost::lexical_cast<std::string>(num_of_roads));
       auto node = nodes_of_basic_passages.front().front();
       road.mutable_in_lane()->set_id(node->lane_id());
@@ -365,7 +365,7 @@ void Navigator::generate_passage_region(
                                            road.add_passage_region());
       }
       for (size_t i = 0; i < lane_change_types.size(); ++i) {
-        RoutingResult_LaneChangeInfo* lc_info = road.add_lane_change_info();
+        RoutingResponse_LaneChangeInfo* lc_info = road.add_lane_change_info();
         lc_info->set_type(lane_change_types.at(i));
         lc_info->set_start_passage_region_index(i);
         lc_info->set_end_passage_region_index(i + 1);
@@ -373,15 +373,15 @@ void Navigator::generate_passage_region(
       result->add_route()->mutable_road_info()->CopyFrom(road);
       num_of_roads++;
     } else {
-      RoutingResult_Junction junction;
+      RoutingResponse_Junction junction;
       junction.set_id("j" + boost::lexical_cast<std::string>(num_of_junctions));
       junction.set_in_road_id(
           "r" + boost::lexical_cast<std::string>(num_of_roads - 1));
       junction.set_out_road_id("r" +
                                boost::lexical_cast<std::string>(num_of_roads));
-      RoutingResult_PassageRegion region;
+      RoutingResponse_PassageRegion region;
       for (const auto& node : nodes_of_way) {
-        RoutingResult_LaneSegment* seg = region.add_segment();
+        RoutingResponse_LaneSegment* seg = region.add_segment();
         seg->set_id(node->lane_id());
         NodeRange range = range_manager.get_node_range(node);
         seg->set_start_s(range.start_s);
@@ -401,7 +401,7 @@ void Navigator::generate_passage_region(
 void Navigator::dump_debug_data(
     const std::vector<const TopoNode*>& nodes,
     const NodeRangeManager& range_manager,
-    const ::apollo::routing::RoutingResult& response) const {
+    const ::apollo::routing::RoutingResponse& response) const {
   std::string debug_string;
   ROS_INFO("Route lane id\tis virtual\tstart s\tend s");
   for (const auto& node : nodes) {

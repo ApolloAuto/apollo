@@ -57,9 +57,9 @@ class SimControl {
  private:
   void OnPlanning(const apollo::planning::ADCTrajectory &trajectory);
 
-  // Reset the start point according to the RoutingResult, which can be read
+  // Reset the start point according to the RoutingResponse, which can be read
   // from file or received from a publisher.
-  void SetStartPoint(const apollo::hdmap::RoutingResult &routing);
+  void SetStartPoint(const apollo::hdmap::RoutingResponse &routing);
 
   void Freeze();
 

@@ -45,7 +45,7 @@ class Frame {
  public:
   Frame(const uint32_t sequence_num);
 
-  void SetRoutingResult(const hdmap::RoutingResult &routing);
+  void SetRoutingResponse(const hdmap::RoutingResponse &routing);
   void SetPrediction(const prediction::PredictionObstacles &prediction);
   void SetPlanningStartPoint(const common::TrajectoryPoint &start_point);
   void SetVehicleInitPose(const localization::Pose &pose);
@@ -76,7 +76,7 @@ class Frame {
  private:
   common::TrajectoryPoint planning_start_point_;
 
-  hdmap::RoutingResult routing_result_;
+  hdmap::RoutingResponse routing_result_;
   prediction::PredictionObstacles prediction_;
   ObstacleTable obstacle_table_;
   uint32_t sequence_num_ = 0;

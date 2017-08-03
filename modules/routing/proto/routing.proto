@@ -35,7 +35,7 @@ message RoutingRequest {
   optional bool broadcast = 7 [default = true];
 }
 
-message RoutingResult {
+message RoutingResponse {
   message Measurement {
     optional double distance = 1;
   }

@@ -64,7 +64,7 @@ using PredictionAdapter = Adapter<::apollo::prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter =
     Adapter<::apollo::perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<::apollo::hdmap::RoutingRequest>;
-using RoutingResultAdapter = Adapter<::apollo::hdmap::RoutingResult>;
+using RoutingResponseAdapter = Adapter<::apollo::hdmap::RoutingResponse>;
 
 }  // namespace adapter
 }  // namespace common

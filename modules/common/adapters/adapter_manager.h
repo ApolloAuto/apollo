@@ -205,7 +205,7 @@ class AdapterManager {
   REGISTER_ADAPTER(PointCloud);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
-  REGISTER_ADAPTER(RoutingResult);
+  REGISTER_ADAPTER(RoutingResponse);
 
   DECLARE_SINGLETON(AdapterManager);
 };

@@ -110,8 +110,8 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableDecision(FLAGS_decision_topic, config.mode(),
                        config.message_history_limit());
         break;
-      case AdapterConfig::ROUTING_RESULT:
-        EnableRoutingResult(FLAGS_routing_result_topic, config.mode(),
+      case AdapterConfig::ROUTING_RESPONSE:
+        EnableRoutingResponse(FLAGS_routing_result_topic, config.mode(),
                             config.message_history_limit());
         break;
       default:

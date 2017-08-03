@@ -33,7 +33,7 @@ using apollo::common::math::NormalizeAngle;
 using apollo::common::time::Clock;
 using apollo::common::TrajectoryPoint;
 using apollo::common::util::GetProtoFromFile;
-using apollo::hdmap::RoutingResult;
+using apollo::hdmap::RoutingResponse;
 using apollo::localization::LocalizationEstimate;
 using apollo::canbus::Chassis;
 
@@ -44,7 +44,7 @@ SimControl::SimControl()
       initial_start_(true),
       enabled_(FLAGS_enable_sim_control) {
   if (enabled_) {
-    RoutingResult routing;
+    RoutingResponse routing;
     if (!GetProtoFromFile(FLAGS_routing_result_file, &routing)) {
       AWARN << "Unable to read start point from file: "
             << FLAGS_routing_result_file;
@@ -54,7 +54,7 @@ SimControl::SimControl()
   }
 }
 
-void SimControl::SetStartPoint(const RoutingResult& routing) {
+void SimControl::SetStartPoint(const RoutingResponse& routing) {
   next_point_.set_v(0.0);
   next_point_.set_a(0.0);
 
@@ -81,7 +81,7 @@ void SimControl::Start() {
   if (initial_start_) {
     // Setup planning and routing result data callback.
     AdapterManager::SetPlanningCallback(&SimControl::OnPlanning, this);
-    AdapterManager::SetRoutingResultCallback(&SimControl::SetStartPoint, this);
+    AdapterManager::SetRoutingResponseCallback(&SimControl::SetStartPoint, this);
 
     // Start timer to publish localiztion and chassis messages.
     sim_control_timer_ = AdapterManager::CreateTimer(
