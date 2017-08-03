@@ -39,7 +39,7 @@
 namespace apollo {
 namespace planning {
 
-using ObstacleTable = IndexedList<uint32_t, Obstacle>;
+using ObstacleTable = IndexedList<std::string, Obstacle>;
 
 class Frame {
  public:

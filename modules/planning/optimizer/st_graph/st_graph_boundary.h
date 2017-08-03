@@ -54,10 +54,10 @@ class StGraphBoundary : public common::math::Polygon2d {
   const std::vector<common::math::Vec2d>& points() const;
 
   BoundaryType boundary_type() const;
-  uint32_t id() const;
+  const std::string& id() const;
   double characteristic_length() const;
 
-  void set_id(const uint32_t id);
+  void set_id(const std::string& id);
   void set_boundary_type(const BoundaryType& boundary_type);
   void set_characteristic_length(const double characteristic_length);
 
@@ -71,7 +71,7 @@ class StGraphBoundary : public common::math::Polygon2d {
 
  private:
   BoundaryType _boundary_type = BoundaryType::UNKNOWN;
-  uint32_t _id = 0;
+  std::string _id;
   double _characteristic_length = 1.0;
   double _s_high_limit = 200.0;
 };

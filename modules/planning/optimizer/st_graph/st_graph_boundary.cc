@@ -68,9 +68,9 @@ void StGraphBoundary::set_boundary_type(const BoundaryType& boundary_type) {
   _boundary_type = boundary_type;
 }
 
-uint32_t StGraphBoundary::id() const { return _id; }
+const std::string& StGraphBoundary::id() const { return _id; }
 
-void StGraphBoundary::set_id(const uint32_t id) { _id = id; }
+void StGraphBoundary::set_id(const std::string& id) { _id = id; }
 
 double StGraphBoundary::characteristic_length() const {
   return _characteristic_length;
