@@ -193,9 +193,9 @@ Status StBoundaryMapperImpl::MapMainDecisionStop(
     return Status(ErrorCode::PLANNING_SKIP);
   }
   boundary->emplace_back(boundary_points);
-  boundary->back().set_characteristic_length(
+  boundary->back().SetCharacteristicLength(
       st_boundary_config().boundary_buffer());
-  boundary->back().set_boundary_type(StGraphBoundary::BoundaryType::STOP);
+  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::STOP);
   return Status::OK();
 }
 
@@ -220,9 +220,9 @@ Status StBoundaryMapperImpl::MapMissionComplete(
     return Status(ErrorCode::PLANNING_SKIP);
   }
   boundary->emplace_back(boundary_points);
-  boundary->back().set_characteristic_length(
+  boundary->back().SetCharacteristicLength(
       st_boundary_config().boundary_buffer());
-  boundary->back().set_boundary_type(StGraphBoundary::BoundaryType::STOP);
+  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::STOP);
   return Status::OK();
 }
 
@@ -351,7 +351,7 @@ Status StBoundaryMapperImpl::MapObstacleWithPredictionTrajectory(
       const double area = GetArea(boundary_points);
       if (Double::compare(area, 0.0) > 0) {
         boundary->emplace_back(boundary_points);
-        boundary->back().set_boundary_type(b_type);
+        boundary->back().SetBoundaryType(b_type);
         skip = false;
       }
     }
@@ -439,9 +439,9 @@ Status StBoundaryMapperImpl::MapObstacleWithoutPredictionTrajectory(
       VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center() +
       st_boundary_config().follow_buffer();
 
-  boundary->back().set_characteristic_length(
-      characteristic_length * st_boundary_config().follow_coeff());
-  boundary->back().set_boundary_type(StGraphBoundary::BoundaryType::FOLLOW);
+  boundary->back().SetCharacteristicLength(characteristic_length *
+                                           st_boundary_config().follow_coeff());
+  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
   return Status::OK();
 }
 
