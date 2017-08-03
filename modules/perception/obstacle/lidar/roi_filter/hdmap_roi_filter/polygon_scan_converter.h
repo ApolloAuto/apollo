@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
 #include <vector>
 #include <limits>
 #include <Eigen/Core>
@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 
 class PolygonScanConverter {
-public:
+ public:
   typedef Eigen::Matrix<double, 2, 1> Point;
   typedef std::vector<Point, Eigen::aligned_allocator<Point>> Polygon;
   typedef std::pair<double, double> Interval;
@@ -52,7 +52,6 @@ public:
     op_major_dir_ = opposite_direction(major_dir);
   }
 
-
   static inline DirectionMajor opposite_direction(DirectionMajor dir_major) {
       return static_cast<DirectionMajor>(dir_major ^ 1);
   }
@@ -63,36 +62,35 @@ public:
                     const double step,
                     std::vector<std::vector<Interval>>* scans_intervals);
 
-private:
-    Polygon polygon_;
-    std::vector<bool> is_singular_;
-    std::vector<Segment> segments_;
+ private:
+  Polygon polygon_;
+  std::vector<Segment> segments_;
 
-    // ensure the k = s_inf_ edge to be filled
-    // std::vector<std::vector<Segment> > _specialsegments_; // 0 for x 1 for y
-    std::vector<double> ks_; // 0 for x 1 for y
+  // ensure the k = s_inf_ edge to be filled
+  // std::vector<std::vector<Segment> > _specialsegments_; // 0 for x 1 for y
+  std::vector<double> ks_; // 0 for x 1 for y
 
-    // edge table
-    std::vector<std::vector<Edge>> edge_table_;
+  // edge table
+  std::vector<std::vector<Edge>> edge_table_;
 
-    // std::vector<std::vector<Edge> > _specialedge_table_;
-    // active edge table
-    std::vector<Edge> active_edge_table_;
+  // std::vector<std::vector<Edge> > _specialedge_table_;
+  // active edge table
+  std::vector<Edge> active_edge_table_;
 
-    double bottom_x_;
-    double step_;
-    size_t scans_size_;
-    DirectionMajor major_dir_;
-    DirectionMajor op_major_dir_;
+  double bottom_x_;
+  double step_;
+  size_t scans_size_;
+  DirectionMajor major_dir_;
+  DirectionMajor op_major_dir_;
 
-    void DisturbPolygon();
-    void ParsePolygon();
-    void BuildEdgeTable();
-    void UpdateActiveEdgeTable(const size_t x_id, std::vector<Interval>* scan_intervals);
-    // convert segment, x  from continuous domain to discrete domain
-    bool ConvertSegment(size_t seg_id, std::pair<int, Edge> &out_edge);
+  void DisturbPolygon();
+  void ConvertPolygonToSegments();
+  void BuildEdgeTable();
+  void UpdateActiveEdgeTable(const size_t x_id, std::vector<Interval>* scan_intervals);
+  // convert segment, x  from continuous domain to discrete domain
+  bool ConvertSegment(size_t seg_id, std::pair<int, Edge> &out_edge);
 };
 
 } // perception
 } // apollo
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
