@@ -23,16 +23,28 @@
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
-#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_scan_cvter.h"
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_scan_converter.h"
 
 namespace apollo {
 namespace perception {
 
-void DrawPolygonMask(const typename PolygonScanConverter::Polygon &polygon,
-                       Bitmap2D &bitmap, const double extend_dist);
+typedef typename PolygonScanConverter::Interval Interval;
 
-void DrawPolygonMask(const std::vector<typename PolygonScanConverter::Polygon> &polygons,
-                       Bitmap2D &bitmap, const double extend_dist);
+void DrawPolygonInBitmap(const PolygonScanConverter::Polygon &polygon,
+                         Bitmap2D &bitmap, const double extend_dist);
+
+void DrawPolygonInBitmap(
+    const std::vector<PolygonScanConverter::Polygon> &polygons,
+    Bitmap2D &bitmap, const double extend_dist);
+
+/*
+ * @brief: Get valid x range(Major direction range)
+ */
+void GetValidXRange(const PolygonScanConverter::Polygon &polygon,
+                    const Bitmap2D &bitmap,
+                    const PolygonScanConverter::DirectionMajor major_dir,
+                    const double major_dir_grid_size,
+                    Interval* valid_x_range);
 
 } // perception
 } // apollo
