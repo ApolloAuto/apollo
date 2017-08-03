@@ -820,7 +820,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   CHECK_NOTNULL(map);
 
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
-  double theta = point.theta();
+  double theta = feature->theta();
   if (FLAGS_enable_kf_tracking) {
     point[0] = feature->t_position().x();
     point[1] = feature->t_position().y();
