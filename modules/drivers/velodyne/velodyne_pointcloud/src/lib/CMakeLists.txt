@@ -5,6 +5,7 @@ add_library(velodyne_parser
     # velodyne32_parser.cpp  
     # velodyne16_parser.cpp
     calibration.cpp
+    online_calibration.cpp
     util.cpp
 )
 target_link_libraries(velodyne_parser

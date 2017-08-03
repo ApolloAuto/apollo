@@ -33,6 +33,7 @@ void Convert::init(ros::NodeHandle& node, ros::NodeHandle& private_nh) {
   private_nh.param("view_direction", _config.view_direction, 0.0);
   private_nh.param("view_width", _config.view_width, 2.0 * M_PI);
   private_nh.param("model", _config.model, std::string("64E_S2"));
+  private_nh.param("calibration_online", _config.calibration_online, true);
   private_nh.param("calibration", _config.calibration_file, std::string(""));
   private_nh.param("organized", _config.organized, false);
   private_nh.param("topic_packets", _topic_packets, TOPIC_PACKTES);

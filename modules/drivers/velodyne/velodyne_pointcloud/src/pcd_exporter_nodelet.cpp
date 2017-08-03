@@ -27,7 +27,7 @@ namespace velodyne {
 class PCDExporterNodelet : public nodelet::Nodelet {
  public:
   PCDExporterNodelet() {}
-  ~PCDExporterNodelet() { }
+  ~PCDExporterNodelet() {}
 
  private:
   virtual void onInit();
@@ -37,7 +37,7 @@ class PCDExporterNodelet : public nodelet::Nodelet {
 /** @brief Nodelet initialization. */
 void PCDExporterNodelet::onInit() {
   ROS_INFO("Pcd exporter nodelet init");
-  _instance.reset(new PCDExporter(getNodeHandle(),getPrivateNodeHandle()));
+  _instance.reset(new PCDExporter(getNodeHandle(), getPrivateNodeHandle()));
   _instance->init();
 }
 

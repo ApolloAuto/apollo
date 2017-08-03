@@ -1,4 +1,6 @@
 <launch>
+    <arg name="velodyne64_calibration_online" default="true" />
+    <!--If 'velodyne64_calibration_online' is true, 'velodyne64_calibration_file' will not use  -->
     <arg name="param_folder" default="$(find velodyne_pointcloud)/params"/>
     <arg name="velodyne64_calibration_file" default="$(arg param_folder)/64E_S3_calibration_example.yaml"/> 
     <arg name="extrinsics_velodyne64" default="$(arg param_folder)/velodyne64_novatel_extrinsics_example.yaml"/>
@@ -14,7 +16,7 @@
   <include file="$(find velodyne_pointcloud)/launch/rosbag_replay.launch">
     <arg name="rate" default="1" />
     <arg name="start" default="0" />
-    <arg name="bag" value=""/>
+    <arg name="bag" value="" />
   </include> 
 
   <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
@@ -23,6 +25,7 @@
   <!-- start cloud nodelet using test calibration file -->
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
     <arg name="model" default="64E_S3D_STRONGEST" />
+    <arg name="calibration_online" value="$(arg velodyne64_calibration_online)" />
     <arg name="calibration" default="$(arg velodyne64_calibration_file)" />
     <arg name="organized" default="$(arg organized)"/>
     <arg name="min_range" default="$(arg min_range)" />

@@ -37,8 +37,7 @@ class CompensatorNodelet : public nodelet::Nodelet {
 /** @brief Nodelet initialization. */
 void CompensatorNodelet::onInit() {
   ROS_INFO("Compensator nodelet init");
-  _compensator.reset(new Compensator(
-      getNodeHandle(), getPrivateNodeHandle()));
+  _compensator.reset(new Compensator(getNodeHandle(), getPrivateNodeHandle()));
 }
 
 }  // namespace velodyne
