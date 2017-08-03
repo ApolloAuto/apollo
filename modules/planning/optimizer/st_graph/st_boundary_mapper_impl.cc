@@ -80,15 +80,15 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
 
   const auto& main_decision = decision_data.Decision().main_decision();
   if (main_decision.has_stop()) {
-    ret = map_main_decision_stop(main_decision.stop(), reference_line,
-                                 planning_distance, planning_time,
-                                 st_graph_boundaries);
+    ret = MapMainDecisionStop(main_decision.stop(), reference_line,
+                              planning_distance, planning_time,
+                              st_graph_boundaries);
     if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
       return Status(ErrorCode::PLANNING_ERROR);
     }
   } else if (main_decision.has_mission_complete()) {
-    ret = map_mission_complete(reference_line, planning_distance, planning_time,
-                               st_graph_boundaries);
+    ret = MapMissionComplete(reference_line, planning_distance, planning_time,
+                             st_graph_boundaries);
     if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
       return Status(ErrorCode::PLANNING_ERROR);
     }
@@ -101,7 +101,7 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
     if (obs == nullptr) {
       continue;
     }
-    ret = map_obstacle_without_prediction_trajectory(
+    ret = MapObstacleWithoutPredictionTrajectory(
         initial_planning_point, *obs, path_data, planning_distance,
         planning_time, st_graph_boundaries);
     if (!ret.ok()) {
@@ -118,7 +118,7 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
     }
     for (auto& obj_decision : obs->Decisions()) {
       if (obj_decision.has_follow()) {
-        ret = map_obstacle_without_prediction_trajectory(
+        ret = MapObstacleWithoutPredictionTrajectory(
             initial_planning_point, *obs, obj_decision, path_data,
             reference_line, planning_distance, planning_time,
             st_graph_boundaries);
@@ -129,7 +129,7 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
                         "Fail to map follow dynamic obstacle");
         }
       } else if (obj_decision.has_overtake() || obj_decision.has_yield()) {
-        ret = map_obstacle_with_prediction_trajectory(
+        ret = MapObstacleWithPredictionTrajectory(
             initial_planning_point, *obs, obj_decision, path_data,
             planning_distance, planning_time, st_graph_boundaries);
         if (!ret.ok()) {
@@ -143,7 +143,7 @@ Status StBoundaryMapperImpl::GetGraphBoundary(
   return Status::OK();
 }
 
-Status StBoundaryMapperImpl::map_main_decision_stop(
+Status StBoundaryMapperImpl::MapMainDecisionStop(
     const MainStop& main_stop, const ReferenceLine& reference_line,
     const double planning_distance, const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
@@ -155,7 +155,7 @@ Status StBoundaryMapperImpl::map_main_decision_stop(
   SLPoint sl_point;
   if (!reference_line.get_point_in_frenet_frame(
           Vec2d(map_point.x(), map_point.y()), &sl_point)) {
-    AERROR << "Fail to map_main_decision_stop since get_point_in_frenet_frame "
+    AERROR << "Fail to MapMainDecisionStop since get_point_in_frenet_frame "
               "failed.";
     return Status(ErrorCode::PLANNING_ERROR);
   }
@@ -171,7 +171,7 @@ Status StBoundaryMapperImpl::map_main_decision_stop(
     if (stop_rear_center_s >=
         reference_line.length() - FLAGS_backward_routing_distance) {
       AWARN << common::util::StrCat(
-          "Skip to map_main_decision_stop since stop_rear_center_s[",
+          "Skip to MapMainDecisionStop since stop_rear_center_s[",
           stop_rear_center_s, "] > path length[", reference_line.length(),
           "].");
       return Status(ErrorCode::PLANNING_SKIP);
@@ -199,7 +199,7 @@ Status StBoundaryMapperImpl::map_main_decision_stop(
   return Status::OK();
 }
 
-Status StBoundaryMapperImpl::map_mission_complete(
+Status StBoundaryMapperImpl::MapMissionComplete(
     const ReferenceLine& reference_line, const double planning_distance,
     const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
@@ -226,7 +226,7 @@ Status StBoundaryMapperImpl::map_mission_complete(
   return Status::OK();
 }
 
-Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
+Status StBoundaryMapperImpl::MapObstacleWithPredictionTrajectory(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const ObjectDecisionType obj_decision,
     const PathData& path_data, const double planning_distance,
@@ -366,7 +366,7 @@ Status StBoundaryMapperImpl::map_obstacle_with_prediction_trajectory(
               : Status::OK();
 }
 
-Status StBoundaryMapperImpl::map_obstacle_without_prediction_trajectory(
+Status StBoundaryMapperImpl::MapObstacleWithoutPredictionTrajectory(
     const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const ObjectDecisionType obj_decision,
     const PathData& path_data, const ReferenceLine& reference_line,
