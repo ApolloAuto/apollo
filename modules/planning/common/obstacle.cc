@@ -28,7 +28,7 @@ namespace apollo {
 namespace planning {
 
 const std::string& Obstacle::Id() const { return id_; }
-void Obstacle::SetId(int id) { id_ = std::to_string(id); }
+
 void Obstacle::SetId(const std::string& id) { id_ = id; }
 
 double Obstacle::Height() const { return height_; }
