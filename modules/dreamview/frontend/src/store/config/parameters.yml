@@ -1,5 +1,5 @@
 camera:
-  defaults:
+  Default:
     fov: 60
     near: 1
     far: 300
@@ -21,13 +21,21 @@ planning:
     width: 1.4
 options:
   defaults:
+    showMenu: false
     showConsole: false
     showPlanning: true
-    showObstacles: true
-    showDecision: true
+    showDecisionMain: true
+    showDecisionObstacle: true
+    showRouting: true
     showPredictionMajor: true
     showPredictionMinor: true
-    showRouting: true
+    showObstaclesVehicle: true
+    showObstaclesPedestrian: true
+    showObstaclesBicycle: true
+    showObstaclesUnknownMovable: true
+    showObstaclesUnknownUnmovable: true
+    showObstaclesVirtual: true
+    cameraAngle: Default
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
