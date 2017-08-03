@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
-#include "modules/perception/common/perception_gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/base/file_util.h"
