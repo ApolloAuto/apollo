@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
@@ -89,8 +90,8 @@ void Obstacle::CreateObstacles(
     const auto perception_id = prediction_obstacle.perception_obstacle().id();
     int trajectory_index = 0;
     for (const auto& trajectory : prediction_obstacle.trajectory()) {
-      std::string obstacle_id = std::to_string(perception_id) + "_" +
-                                std::to_string(trajectory_index++);
+      const std::string obstacle_id =
+          apollo::common::util::StrCat(perception_id, "_", trajectory_index++);
       obstacles->emplace_back(std::unique_ptr<Obstacle>(new Obstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory)));
     }

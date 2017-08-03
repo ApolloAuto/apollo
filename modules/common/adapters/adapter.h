@@ -36,6 +36,7 @@
 #include "modules/common/proto/header.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 
 #include "sensor_msgs/PointCloud2.h"
@@ -341,8 +342,8 @@ class Adapter {
     }
     uint32_t sequence_num =
         header.GetReflection()->GetUInt32(header, seq_num_descriptor);
-    return apollo::common::util::SetProtoToASCIIFile(
-        message, dump_path_ + "/" + std::to_string(sequence_num) + ".pb.txt");
+    return util::SetProtoToASCIIFile(
+        message, util::StrCat(dump_path_, "/", sequence_num, ".pb.txt"));
   }
 
   /**

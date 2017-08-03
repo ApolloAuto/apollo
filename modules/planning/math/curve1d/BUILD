@@ -30,6 +30,7 @@ cc_library(
     deps = [
         ":polynomial_curve1d",
         "//modules/common:log",
+        "//modules/common/util:string_util",
     ],
 )
 
@@ -44,6 +45,7 @@ cc_library(
     deps = [
         ":polynomial_curve1d",
         "//modules/common:log",
+        "//modules/common/util:string_util",
     ],
 )
 
