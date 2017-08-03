@@ -43,7 +43,7 @@ void Frame::SetVehicleInitPose(const localization::Pose &pose) {
   init_pose_ = pose;
 }
 
-void Frame::SetRoutingResponse(const hdmap::RoutingResponse &routing) {
+void Frame::SetRoutingResponse(const routing::RoutingResponse &routing) {
   routing_result_ = routing;
 }
 

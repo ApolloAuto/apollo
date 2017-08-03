@@ -14,6 +14,7 @@ cc_library(
         "//modules/common/math",
         "//modules/map/hdmap",
         "//modules/map/proto:map_proto",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 

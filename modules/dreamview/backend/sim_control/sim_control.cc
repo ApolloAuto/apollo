@@ -33,7 +33,7 @@ using apollo::common::math::NormalizeAngle;
 using apollo::common::time::Clock;
 using apollo::common::TrajectoryPoint;
 using apollo::common::util::GetProtoFromFile;
-using apollo::hdmap::RoutingResponse;
+using apollo::routing::RoutingResponse;
 using apollo::localization::LocalizationEstimate;
 using apollo::canbus::Chassis;
 
