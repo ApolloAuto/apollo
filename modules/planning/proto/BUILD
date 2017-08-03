@@ -24,6 +24,7 @@ cc_proto_library(
         "//modules/map/proto:map_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 

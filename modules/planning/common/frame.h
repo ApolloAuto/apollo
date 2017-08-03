@@ -29,7 +29,7 @@
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/map/proto/routing.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 #include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"

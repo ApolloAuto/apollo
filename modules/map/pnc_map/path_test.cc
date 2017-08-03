@@ -22,7 +22,7 @@
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
-#include "modules/map/proto/routing.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
@@ -31,8 +31,8 @@ using Id = apollo::hdmap::Id;
 using Lane = apollo::hdmap::Lane;
 using LaneSampleAssociation = apollo::hdmap::LaneSampleAssociation;
 using Point = apollo::common::PointENU;
-using RoutingRequest = apollo::hdmap::RoutingRequest;
-using RoutingResponse = apollo::hdmap::RoutingResponse;
+using RoutingRequest = apollo::routing::RoutingRequest;
+using RoutingResponse = apollo::routing::RoutingResponse;
 using MapPathPoint = apollo::hdmap::MapPathPoint;
 using AABox2d = apollo::common::math::AABox2d;
 using Box2d = apollo::common::math::Box2d;
