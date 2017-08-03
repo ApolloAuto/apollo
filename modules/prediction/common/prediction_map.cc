@@ -230,7 +230,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
             ::apollo::common::math::DoubleCompare(std::fabs(l), radius) > 0) {
           continue;
         }
-        lane_ids.insert(lane_id.id());  
+        lane_ids.insert(lane_id.id());
         nearby_lanes->push_back(nearby_lane);
       }
       for (auto& lane_id : lane_ptr->lane().right_neighbor_forward_lane_id()) {
