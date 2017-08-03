@@ -84,6 +84,7 @@ cc_library(
     ],
     deps = [
         ":decision_data",
+        "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/map/proto:map_proto",
         "//modules/planning/common/path:path_data",

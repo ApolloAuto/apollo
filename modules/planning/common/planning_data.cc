@@ -22,6 +22,7 @@
 
 #include <utility>
 
+#include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -29,21 +30,12 @@
 namespace apollo {
 namespace planning {
 
-const ReferenceLine& PlanningData::reference_line() const {
-  return *reference_line_;
-}
-
 const DecisionData& PlanningData::decision_data() const {
   return *decision_data_.get();
 }
 
 DecisionData* PlanningData::mutable_decision_data() const {
   return decision_data_.get();
-}
-
-void PlanningData::set_reference_line(
-    const std::vector<ReferencePoint>& ref_points) {
-  reference_line_.reset(new ReferenceLine(ref_points));
 }
 
 void PlanningData::set_decision_data(

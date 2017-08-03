@@ -29,8 +29,8 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
+#include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 
 namespace apollo {
 namespace planning {
@@ -71,7 +71,7 @@ class DpStSpeedTest : public PlanningTestBase {
     SetInitPoint();
     SetPathDataWithStraightLine();
     const auto* frame = planning_.GetFrame();
-    reference_line_ = &(frame->planning_data().reference_line());
+    reference_line_ = &(frame->reference_line());
   }
 
  protected:

@@ -93,19 +93,17 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
   if (type == DP_POLY_PATH_OPTIMIZER || type == QP_SPLINE_PATH_OPTIMIZER) {
     const auto& path_points =
         planning_data->path_data().discretized_path().points();
-    auto ptr_optimized_path =
-        ptr_debug->mutable_planning_data()->add_path();
+    auto ptr_optimized_path = ptr_debug->mutable_planning_data()->add_path();
     ptr_optimized_path->set_name(name);
-    ptr_optimized_path->mutable_path_point()->CopyFrom( { path_points.begin(),
-        path_points.end() });
-  } else if (type == DP_ST_SPEED_OPTIMIZER
-      || type == QP_SPLINE_ST_SPEED_OPTIMIZER) {
+    ptr_optimized_path->mutable_path_point()->CopyFrom(
+        {path_points.begin(), path_points.end()});
+  } else if (type == DP_ST_SPEED_OPTIMIZER ||
+             type == QP_SPLINE_ST_SPEED_OPTIMIZER) {
     const auto& speed_points = planning_data->speed_data().speed_vector();
-    auto ptr_speed_plan =
-        ptr_debug->mutable_planning_data()->add_speed_plan();
+    auto ptr_speed_plan = ptr_debug->mutable_planning_data()->add_speed_plan();
     ptr_speed_plan->set_name(name);
-    ptr_speed_plan->mutable_speed_point()->CopyFrom( { speed_points.begin(),
-        speed_points.end() });
+    ptr_speed_plan->mutable_speed_point()->CopyFrom(
+        {speed_points.begin(), speed_points.end()});
   }
 
   auto ptr_stats = ptr_latency_stats->add_processor_stats();
@@ -138,8 +136,10 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     ADEBUG << "after optimizer " << optimizer->name() << ":"
            << planning_data->DebugString();
 
-    if (FLAGS_enable_record_debug && ptr_debug != nullptr && ptr_latency_stats != nullptr) {
-      RecordDebugInfo(optimizer->name(), planning_data, time_diff_ms, ptr_debug, ptr_latency_stats);
+    if (FLAGS_enable_record_debug && ptr_debug != nullptr &&
+        ptr_latency_stats != nullptr) {
+      RecordDebugInfo(optimizer->name(), planning_data, time_diff_ms, ptr_debug,
+                      ptr_latency_stats);
     }
   }
   PublishableTrajectory computed_trajectory;
@@ -155,15 +155,12 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   *ptr_publishable_trajectory = std::move(computed_trajectory);
 
   // Add debug information.
-  if (FLAGS_enable_record_debug && ptr_debug != nullptr
-      ) {
-    auto* reference_line =
-    ptr_debug->mutable_planning_data()->add_path();
+  if (FLAGS_enable_record_debug && ptr_debug != nullptr) {
+    auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
     reference_line->set_name("planning_reference_line");
-    const auto& reference_points =
-    planning_data->reference_line().reference_points();
+    const auto& reference_points = frame->reference_line().reference_points();
     reference_line->mutable_path_point()->CopyFrom(
-        { reference_points.begin(), reference_points.end()});
+        {reference_points.begin(), reference_points.end()});
   }
   return Status::OK();
 }
@@ -215,7 +212,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     speed_point.set_da(da);
     speed_profile.push_back(speed_point);
   }
-  return std::move(speed_profile);
+  return speed_profile;
 }
 
 }  // namespace planning
