@@ -69,10 +69,11 @@ class QpSplinePathGenerator {
                                double* const y_diff) const;
 
  private:
-  QpSplinePathConfig _qp_spline_path_config;
+  QpSplinePathConfig qp_spline_path_config_;
   common::FrenetFramePoint _init_point;
   std::unique_ptr<Spline1dGenerator> _spline_generator;
 };
+
 }  // namespace planning
 }  // namespace apollo
 

@@ -91,7 +91,8 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!ApplyKernel(st_graph_data.st_graph_boundaries(), st_graph_data.speed_limit())
+  if (!ApplyKernel(st_graph_data.st_graph_boundaries(),
+                   st_graph_data.speed_limit())
            .ok()) {
     const std::string msg = "Apply kernel failed!";
     AERROR << msg;

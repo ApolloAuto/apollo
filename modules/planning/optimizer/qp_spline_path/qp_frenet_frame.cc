@@ -53,22 +53,22 @@ QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
       vehicle_param_(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
       init_frenet_point_(init_frenet_point),
-      feasible_longitudinal_upper_bound_(
-          reference_line_.map_path().length()),
+      feasible_longitudinal_upper_bound_(reference_line_.map_path().length()),
       start_s_(start_s),
       end_s_(end_s),
       time_resolution_(time_resolution) {}
 
 bool QpFrenetFrame::Init(const uint32_t num_points) {
   if (num_points <= 1) {
-    AERROR << "Number of s points is too small to evaluate " << num_points;
+    AERROR << "Number of s points [" << num_points
+           << "] is too small to evaluate.";
     return false;
   }
 
   const double resolution = (end_s_ - start_s_) / num_points;
   if (Double::compare(start_s_, end_s_, 1e-8) > 0) {
-    AERROR << "Not enough sl distance with start " << start_s_ << ", end "
-           << end_s_;
+    AERROR << "Not enough s distance. start_s: " << start_s_
+           << ", end_s: " << end_s_;
     return false;
   }
 
@@ -77,14 +77,14 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
     return false;
   }
 
-  const double inf = std::numeric_limits<double>::infinity();
+  const auto inf = std::numeric_limits<double>::infinity();
   double s = start_s_;
-  for (uint32_t i = 0; i <= num_points && s <= end_s_; ++i) {
+  while (s <= end_s_) {
     evaluated_knots_.push_back(std::move(s));
     hdmap_bound_.push_back(std::make_pair(-inf, inf));
     static_obstacle_bound_.push_back(std::make_pair(-inf, inf));
     dynamic_obstacle_bound_.push_back(std::make_pair(-inf, inf));
-    s = start_s_ + (i + 1) * resolution;
+    s += resolution;
   }
 
   // initialize calculation here
@@ -497,8 +497,7 @@ bool QpFrenetFrame::GetBound(
   double high_first = bound_map[lower_index + 1].first;
   double high_second = bound_map[lower_index + 1].second;
 
-  // If there is only one infinity in low and high point, then make it equal
-  // to
+  // If there is only one infinity in low and high point, then make it equal to
   // the not inf one.
   if (std::isinf(low_first) && !std::isinf(high_first)) {
     low_first = high_first;
@@ -525,14 +524,6 @@ uint32_t QpFrenetFrame::FindIndex(const double s) const {
              static_cast<uint32_t>(evaluated_knots_.size() - 1),
              static_cast<uint32_t>(upper_bound - evaluated_knots_.begin())) -
          1;
-}
-
-void QpFrenetFrame::Clear() {
-  evaluated_knots_.clear();
-  discretized_vehicle_location_.clear();
-  hdmap_bound_.clear();
-  static_obstacle_bound_.clear();
-  dynamic_obstacle_bound_.clear();
 }
 
 }  // namespace planning

@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file frenet_frame.h
+ * @file qp_frenet_frame.h
  * @brief: natural coordinate system
  **/
 
@@ -106,8 +106,6 @@ class QpFrenetFrame {
                 std::pair<double, double>* const bound) const;
 
   uint32_t FindIndex(const double s) const;
-
-  void Clear();
 
  private:
   const ReferenceLine& reference_line_;
