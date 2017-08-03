@@ -82,7 +82,7 @@ PncMap::PncMap(const std::string &map_file) {
   AINFO << "map loaded, Map file: " << map_file;
 }
 
-bool PncMap::validate_routing(const hdmap::RoutingResult &routing) const {
+bool PncMap::validate_routing(const hdmap::RoutingResponse &routing) const {
   const int num_routes = routing.route_size();
   if (num_routes == 0) {
     AERROR << "Route is empty.";
@@ -160,7 +160,7 @@ bool PncMap::validate_routing(const hdmap::RoutingResult &routing) const {
   return true;
 }
 
-bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
+bool PncMap::CreatePathFromRouting(const hdmap::RoutingResponse &routing,
                                    const common::PointENU &point,
                                    const double backward_length,
                                    const double forward_length,
@@ -245,7 +245,7 @@ bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
   }
 }
 
-bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
+bool PncMap::CreatePathFromRouting(const hdmap::RoutingResponse &routing,
                                    hdmap::Path *path) const {
   if (!validate_routing(routing)) {
     AERROR << "routing is invalid";
@@ -266,7 +266,7 @@ bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
   return CreatePathFromRouting(routing, 0.0, length, path);
 }
 
-bool PncMap::CreatePathFromRouting(const hdmap::RoutingResult &routing,
+bool PncMap::CreatePathFromRouting(const hdmap::RoutingResponse &routing,
                                    double start_s, double end_s,
                                    hdmap::Path *path) const {
   if (path == nullptr) {

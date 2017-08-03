@@ -94,7 +94,7 @@ message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
   optional apollo.canbus.Chassis chassis = 8;
-  optional apollo.hdmap.RoutingResult routing = 9;
+  optional apollo.hdmap.RoutingResponse routing = 9;
   optional apollo.common.TrajectoryPoint init_point = 10;
 
   repeated apollo.common.Path path = 6;

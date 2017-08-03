@@ -40,7 +40,7 @@ class Navigator {
 
   // search new request to new response
   bool search_route(const ::apollo::routing::RoutingRequest& request,
-                    ::apollo::routing::RoutingResult* response) const;
+                    ::apollo::routing::RoutingResponse* response) const;
 
  private:
   // new request to new response
@@ -49,19 +49,19 @@ class Navigator {
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
       const NodeRangeManager& range_manager,
-      ::apollo::routing::RoutingResult* result) const;
+      ::apollo::routing::RoutingResponse* result) const;
 
   // use internal generate result
   void generate_passage_region(
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
       const NodeRangeManager& range_manager,
-      ::apollo::routing::RoutingResult* result) const;
+      ::apollo::routing::RoutingResponse* result) const;
 
   void dump_debug_data(
       const std::vector<const TopoNode*>& nodes,
       const NodeRangeManager& range_manager,
-      const ::apollo::routing::RoutingResult& response) const;
+      const ::apollo::routing::RoutingResponse& response) const;
 
  private:
   bool _is_ready;

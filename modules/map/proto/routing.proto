@@ -35,7 +35,7 @@ message RoutingRequest {
   // Next tag: 8
 }
 
-message RoutingResult {
+message RoutingResponse {
     message LaneSegment {
         optional string id = 1;
         optional double start_s = 2;

@@ -62,13 +62,13 @@ bool PlanningTestBase::SetUpAdapters() {
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_adapter_config_path);
   }
-  if (!AdapterManager::GetRoutingResult()) {
+  if (!AdapterManager::GetRoutingResponse()) {
     AERROR << "routing is not registered in adapter manager, check adapter "
               "config file."
            << FLAGS_adapter_config_path;
     return false;
   }
-  if (!AdapterManager::FeedRoutingResultFile(FLAGS_test_routing_result_file)) {
+  if (!AdapterManager::FeedRoutingResponseFile(FLAGS_test_routing_result_file)) {
     AERROR << "failed to routing file: " << FLAGS_test_routing_result_file;
     return false;
   }
