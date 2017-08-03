@@ -23,7 +23,7 @@ DEFINE_string(node_name, "perception", "The perception module name in proto");
 /// lib/config_manager/config_manager.cc 
 DEFINE_string(config_manager_path, "./conf/config_manager.config",
               "The ModelConfig config paths file.");
-DEFINE_string(work_root, "", "Project work root direcotry.");
+DEFINE_string(work_root, "modules/perception", "Project work root direcotry.");
 
 /// obstacle/onboard/hdmap_input.cc
 DEFINE_double(map_radius, 60.0, "get map radius of car center");
