@@ -21,6 +21,7 @@
 #include "modules/routing/common/utils.h"
 #include "modules/routing/topo_creator/edge_creator.h"
 #include "modules/routing/topo_creator/node_creator.h"
+#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace routing {
@@ -46,7 +47,7 @@ GraphCreator::GraphCreator(const std::string& base_map_file_path,
       _dump_topo_file_path(dump_topo_file_path) {}
 
 bool GraphCreator::create() {
-  if (!::apollo::routing::FileUtils::load_protobuf_data_from_file(
+  if (!::apollo::common::util::GetProtoFromFile(
           _base_map_file_path, &_pbmap)) {
     LOG(ERROR) << "Failed to load base map file from " << _base_map_file_path;
     return false;

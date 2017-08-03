@@ -26,8 +26,10 @@ DEFINE_string(route_topic_for_broadcast, "/routing/routing",
               "the default routing topic");
 DEFINE_bool(use_road_id, true, "enable use road id to cut routing result");
 
-DEFINE_string(graph_dir, "", "the default directory of topology graph data");
-DEFINE_string(graph_file_name, "routing_map.bin",
+DEFINE_string(map_dir, "/apollo/modules/map/data", "the default directory of hdmap");
+DEFINE_string(map_file_name, "base_map.txt", "the default file name of hdmap.");
+DEFINE_string(graph_dir, "/apollo/modules/map/data", "the default directory of topology graph data");
+DEFINE_string(graph_file_name, "routing_map.txt",
               "the default file name of topology graph data");
 
 DEFINE_string(rosparam_name_routing_init_status, "/pnc/routing_initialized",

@@ -21,21 +21,19 @@
 #include "modules/routing/topo_creator/graph_creator.h"
 #include "modules/common/log.h"
 
-DEFINE_string(base_map_dir, "/apollo/modules/map/data", "directory of base map");
-DEFINE_string(base_map_name, "base_map.txt", "file name of base map");
-DEFINE_string(dump_topo_path, "/apollo/modules/map/data/routing_map.bin", "dump path of routing topology file");
-
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   std::unique_ptr<::apollo::routing::GraphCreator> creator_ptr;
   creator_ptr.reset(new ::apollo::routing::GraphCreator(
-                                FLAGS_base_map_dir + "/" + FLAGS_base_map_name,
-                                FLAGS_dump_topo_path));
+                                FLAGS_map_dir + "/" + FLAGS_map_file_name,
+                                FLAGS_graph_dir + "/" + FLAGS_graph_file_name));
   if (!creator_ptr->create()) {
-    AERROR << "Create router topo failed!";
+    AERROR << "Create routing topo failed!";
     return -1;
   }
+  LOG(INFO) << "Create routing topo succesful!";
+  LOG(INFO) << FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
   return 0;
 }
 

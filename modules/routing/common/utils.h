@@ -25,9 +25,6 @@ namespace routing {
 
 class FileUtils {
  public:
-  static bool load_protobuf_data_from_file(
-      const std::string& file_path,
-      ::google::protobuf::Message* const proto_data);
   static bool dump_protobuf_data_to_file(
       const std::string& file_path,
       const ::google::protobuf::Message& proto_data);
