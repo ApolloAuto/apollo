@@ -32,7 +32,6 @@
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
@@ -41,11 +40,8 @@ class PlanningData {
  public:
   PlanningData() = default;
 
-  // copy reference line to planning data
-  void set_reference_line(const std::vector<ReferencePoint>& ref_points);
   void set_decision_data(std::shared_ptr<DecisionData>& decision_data);
 
-  const ReferenceLine& reference_line() const;
   const DecisionData& decision_data() const;
 
   DecisionData* mutable_decision_data() const;
@@ -65,7 +61,6 @@ class PlanningData {
   std::string DebugString() const;
 
  protected:
-  std::unique_ptr<ReferenceLine> reference_line_ = nullptr;
   std::shared_ptr<DecisionData> decision_data_ = nullptr;
   PathData path_data_;
   SpeedData speed_data_;
