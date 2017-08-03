@@ -130,7 +130,7 @@ Status Canbus::Start() {
   const double duration = 1.0 / FLAGS_chassis_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &Canbus::OnTimer, this);
-  AdapterManager::SetControlCommandCallback(&Canbus::OnControlCommand, this);
+  AdapterManager::AddControlCommandCallback(&Canbus::OnControlCommand, this);
 
   // last step: publish monitor messages
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);

@@ -145,7 +145,7 @@ class Adapter {
    */
   void OnReceive(const D& message) {
     EnqueueData(message);
-    FireCallback(message);
+    FireCallbacks(message);
   }
 
   /**
@@ -228,8 +228,8 @@ class Adapter {
    * message hits the adapter.
    * @param callback the callback with signature void(const D &).
    */
-  void SetCallback(Callback callback) {
-    receive_callback_ = callback;
+  void AddCallback(Callback callback) {
+    receive_callbacks_.push_back(callback);
   }
 
   /**
@@ -346,12 +346,13 @@ class Adapter {
   }
 
   /**
-   * @brief proactively invokes the callback with the specified data.
+   * @brief proactively invokes the callbacks one by one registered with the
+   * specified data.
    * @param data the specified data.
    */
-  void FireCallback(const D& data) {
-    if (receive_callback_ != nullptr) {
-      receive_callback_(data);
+  void FireCallbacks(const D& data) {
+    for (const auto& callback : receive_callbacks_) {
+      callback(data);
     }
   }
 
@@ -391,7 +392,7 @@ class Adapter {
   std::list<std::shared_ptr<D>> observed_queue_;
 
   /// User defined function when receiving a message
-  Callback receive_callback_ = nullptr;
+  std::vector<Callback> receive_callbacks_;
 
   /// The mutex guarding data_queue_ and observed_queue_
   mutable std::mutex mutex_;

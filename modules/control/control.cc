@@ -86,8 +86,8 @@ Status Control::Init() {
   CHECK(AdapterManager::GetControlCommand())
       << "ControlCommand publisher is not initialized.";
 
-  AdapterManager::SetPadCallback(&Control::OnPad, this);
-  AdapterManager::SetMonitorCallback(&Control::OnMonitor, this);
+  AdapterManager::AddPadCallback(&Control::OnPad, this);
+  AdapterManager::AddMonitorCallback(&Control::OnMonitor, this);
 
   return Status::OK();
 }

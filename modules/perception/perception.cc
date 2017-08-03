@@ -44,7 +44,7 @@ Status Perception::Init() {
   }
 
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::SetPointCloudCallback(&Perception::OnPointCloud, this);
+  AdapterManager::AddPointCloudCallback(&Perception::OnPointCloud, this);
   return Status::OK();
 }
 
