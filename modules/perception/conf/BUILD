@@ -12,6 +12,5 @@ filegroup(
     srcs = [
         "config_manager.config",
         "perception.conf",
-        "hdmap_roi_filter.conf",
     ],
 )
