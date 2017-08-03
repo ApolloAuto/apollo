@@ -61,14 +61,28 @@ export default class Decision {
         });
         this.nudges = [];
 
-        if (!STORE.options.showDecision) {
-            hideArrayObjects(this.markers);
+        const mainStop = world.mainStop;
+        if (!STORE.options.showDecisionMain || _.isEmpty(mainStop)) {
             this.mainDecision.visible = false;
-            return;
+        } else {
+            // Update main decision marker.
+            this.mainDecision.visible = true;
+            copyProperty(this.mainDecision.position, coordinates.applyOffset(
+                    new THREE.Vector3(mainStop.positionX, mainStop.positionY, 0.2)));
+            this.mainDecision.rotation.set(Math.PI / 2, mainStop.heading - Math.PI / 2, 0);
+            const mainStopReason = _.attempt(() => mainStop.decision[0].stopReason);
+            if (!_.isError(mainStopReason)) {
+                let reason = null;
+                for (reason in StopReasonMarkerMapping) {
+                    this.mainDecision[reason].visible = false;
+                }
+                this.mainDecision[mainStopReason].visible = true;
+            }
         }
 
         const objects = world.object;
-        if (_.isEmpty(objects)) {
+        if (!STORE.options.showDecisionObstacle || _.isEmpty(objects)) {
+            hideArrayObjects(this.markers);
             return;
         }
 
@@ -91,7 +105,7 @@ export default class Decision {
                     let marker = null;
                     const color = MarkerColorMapping[decisionType];
                     if (markerIdx >= this.markers.length) {
-                        marker = this.getMarker(color);
+                        marker = this.getObstacleDecision(color);
                         this.markers.push(marker);
                         scene.add(marker);
                     } else {
@@ -136,26 +150,6 @@ export default class Decision {
             }
         }
         hideArrayObjects(this.markers, markerIdx);
-
-        // Update main decision marker.
-        const mainStop = world.mainStop;
-        if (_.isEmpty(mainStop)) {
-            this.mainDecision.visible = false;
-            return;
-        }
-
-        this.mainDecision.visible = true;
-        copyProperty(this.mainDecision.position, coordinates.applyOffset(
-                new THREE.Vector3(mainStop.positionX, mainStop.positionY, 0.2)));
-        this.mainDecision.rotation.set(Math.PI / 2, mainStop.heading - Math.PI / 2, 0);
-        const mainStopReason = _.attempt(() => mainStop.decision[0].stopReason);
-        if (!_.isError(mainStopReason)) {
-            let reason = null;
-            for (reason in StopReasonMarkerMapping) {
-                this.mainDecision[reason].visible = false;
-            }
-            this.mainDecision[mainStopReason].visible = true;
-        }
     }
 
     getMainDecision() {
@@ -175,7 +169,7 @@ export default class Decision {
         return marker;
     }
 
-    getMarker(color) {
+    getObstacleDecision(color) {
         const marker = new THREE.Object3D();
 
         const objStop = drawImage(objectStopMarker, 2, 2.5, 0, 1, 0);

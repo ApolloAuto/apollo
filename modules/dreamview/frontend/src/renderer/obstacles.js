@@ -23,15 +23,11 @@ export default class PerceptionObstacles {
     }
 
     update(world, coordinates, scene) {
-        if (!STORE.options.showObstacles) {
+        const objects = world.object;
+        if (_.isEmpty(objects)) {
             hideArrayObjects(this.arrows);
             hideArrayObjects(this.cubes);
             hideArrayObjects(this.extrusionFaces);
-            return;
-        }
-
-        const objects = world.object;
-        if (_.isEmpty(objects)) {
             return;
         }
 
@@ -40,7 +36,8 @@ export default class PerceptionObstacles {
         let extrusionFaceIdx = 0;
         for (let i = 0; i < objects.length; i++) {
             const obstacle = objects[i];
-            if (!obstacle.positionX || !obstacle.positionY) {
+            if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(obstacle.type))]
+                || !obstacle.positionX || !obstacle.positionY) {
                 continue;
             }
             const position = coordinates.applyOffset(

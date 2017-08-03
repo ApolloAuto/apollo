@@ -65,11 +65,13 @@ body {
 
     .button {
         height: 50px;
-        width: 130px;
+        width: 250px;
         border: none;
-        padding: 0px;
+        padding: 20px;
+        display: block;
         font-size: 15px;
-        color: #ffffff;
+        text-align: left;
+        color: #FFFFFF;
         background-color: rgba(0, 0, 0, 0.6);
     }
 
@@ -90,10 +92,11 @@ body {
     }
 
     .separator {
-        display: inline-block;
-        vertical-align: middle;
-        border-left:1px solid #38546d; 
-        height: 30px;
+        display: block;
+        height: 2px;
+        border: 0;
+        border-top:1px solid #38546d;
+        padding: 0;
     }
 
     .console {
@@ -101,31 +104,193 @@ body {
         border: none;
         margin: 0px;
         padding: 0px;
-        width: 260px;
+        width: 250px;
         height: 300px;
         overflow: scroll;
         overflow-x: hidden;
 
-        // Adjust the scrollbar style.
-        
-        &::-webkit-scrollbar-track {
-	    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-	    background-color: #555555;
-        }
-
-        &::-webkit-scrollbar {
-	    width: 5px;
-	    background-color: #F5F5F5;
-        }
-
-        &::-webkit-scrollbar-thumb {
-	    background-color: #30A5FF;
-        }
-        
         .monitor-item {
             @include monitor-item-common-properties();
         }
     }
+
+    .nav-side-menu {
+        overflow: auto;
+        background-color: rgba(74, 5, 24, 0.3);
+        opacity: 0.7;
+        width: 250px;
+        height: 250px;
+        font-size: 14px;
+        color: #ffffff;
+        text-align: left;
+        z-index: 10 !important;
+
+        details {
+            summary {
+                line-height: 40px;
+                border-bottom: 1px solid #23282E;
+            
+                img {
+                    position: relative;
+                    transform: translate(30%, 30%);
+                }
+                    
+                span {
+                    padding-left: 10px;
+                }
+            }
+            
+            summary::-webkit-details-marker {
+                float: right;
+                padding-top: 15px;
+                padding-right: 10px;
+            }
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0px;
+            margin: 0;
+            cursor: pointer;
+            
+            li {
+                line-height: 30px;
+                border-bottom: 1px solid #23282E;
+                padding-left: 6px;
+                margin-left: 0;
+                    
+                span {
+                    padding-left: 2px;
+                }
+            }
+                
+            li:hover {
+                background-color: #4F5B69;
+            }
+        }
+
+        // Toggle switch
+        .switch {
+            position: relative;
+            width: 30px;
+            display: inline-block;
+        }
+        
+        .toggle-switch {
+            display: none;
+        }
+        
+        .toggle-switch-label {
+            display: block;
+            overflow: hidden;
+            cursor: pointer;
+            height: 12px;
+            padding: 0;
+            line-height: 12px;
+            border: 2px solid #E3E3E3;
+            border-radius: 12px;
+            transition: background-color 0.2s ease-in;
+        }
+        
+        .toggle-switch-label:before {
+            content: "";
+            display: block;
+            width: 12px;
+            margin: 0px;
+            background: #FFFFFF;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 16px;
+            border: 2px solid #E3E3E3;
+            border-radius: 12px;
+            transition: all 0.2s ease-in;
+        }
+        
+        .toggle-switch:checked + .toggle-switch-label {
+            background-color: #3E8DC8;
+        }
+        
+        .toggle-switch:checked + .toggle-switch-label,
+        .toggle-switch:checked + .toggle-switch-label:before {
+            border-color: #3E8DC8;
+        }
+        
+        .toggle-switch:checked + .toggle-switch-label:before {
+            right: 0px;
+        }
+        
+        // Radio button (not in use)
+        .radio-selector {
+            display: none;
+        }
+
+        .radio-selector-label {
+            display: inline;
+        }
+        
+        .radio-selector + .radio-selector-label {
+            background-color: #FFFFFF;
+            border: 2px solid #E3E3E3;
+            border-radius: 50px;
+            display: inline-block;
+            padding: 11px;
+            position: relative;
+        }
+        
+        .radio-selector + .radio-selector-label:before {
+            background: none repeat scroll 0 0 #E3E3E3;
+            content: "";
+            border-radius: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
+            font-size: 36px;
+            height: 8px;
+            left: 7px;
+            position: absolute;
+            top: 7px;
+            width: 8px;
+        }
+        
+        .radio-selector:checked + .radio-selector-label:after {
+            background: none repeat scroll 0 0 #3E8DC8;
+            content: "";
+            border-radius: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
+            font-size: 36px;
+            height: 8px;
+            left: 7px;
+            position: absolute;
+            top: 7px;
+            width: 8px;
+        }
+        
+        .radio-selector:checked + radio-selector-label {
+            background-color: #E9ECEE;
+            border: 2ps solid #ADB8C0;
+            color: #3E8DC8;
+            padding: 11px;
+        }
+        
+    }
+}
+
+// Adjust the scrollbar style.
+::-webkit-scrollbar {
+    width: 5px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #555555;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #30A5FF;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background-color: #30A5FF;
 }
 
 .notification-warn {
