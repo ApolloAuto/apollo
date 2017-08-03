@@ -33,7 +33,7 @@ def get_center_of_passage_region(region):
 def read_routing_result(file_name):
     """Read routing result"""
     fin = open(file_name)
-    result = router_pb2.RoutingResult()
+    result = router_pb2.RoutingResponse()
     result.ParseFromString(fin.read())
     return result
 

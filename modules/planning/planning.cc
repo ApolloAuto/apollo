@@ -52,14 +52,14 @@ const hdmap::PncMap* Planning::GetPncMap() const { return pnc_map_.get(); }
 
 bool Planning::InitFrame(const uint32_t sequence_num) {
   frame_.reset(new Frame(sequence_num));
-  if (AdapterManager::GetRoutingResult()->Empty()) {
+  if (AdapterManager::GetRoutingResponse()->Empty()) {
     AERROR << "Routing is empty";
     return false;
   }
   common::TrajectoryPoint point;
   frame_->SetVehicleInitPose(VehicleState::instance()->pose());
-  frame_->SetRoutingResult(
-      AdapterManager::GetRoutingResult()->GetLatestObserved());
+  frame_->SetRoutingResponse(
+      AdapterManager::GetRoutingResponse()->GetLatestObserved());
   if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
     const auto& prediction =
         AdapterManager::GetPrediction()->GetLatestObserved();
@@ -98,14 +98,14 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  if (AdapterManager::GetRoutingResult() == nullptr) {
-    std::string error_msg("RoutingResult is not registered");
+  if (AdapterManager::GetRoutingResponse() == nullptr) {
+    std::string error_msg("RoutingResponse is not registered");
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
   // TODO(all) temporarily use the offline routing data.
-  if (!AdapterManager::GetRoutingResult()->HasReceived()) {
-    if (!AdapterManager::GetRoutingResult()->FeedFile(
+  if (!AdapterManager::GetRoutingResponse()->HasReceived()) {
+    if (!AdapterManager::GetRoutingResponse()->FeedFile(
             FLAGS_offline_routing_file)) {
       auto error_msg = common::util::StrCat(
           "Failed to load offline routing file ", FLAGS_offline_routing_file);
@@ -158,7 +158,7 @@ void Planning::RecordInput(ADCTrajectory* trajectory_pb) {
   debug_chassis->CopyFrom(chassis);
 
   const auto& routing_result =
-      AdapterManager::GetRoutingResult()->GetLatestObserved();
+      AdapterManager::GetRoutingResponse()->GetLatestObserved();
 
   auto debug_routing = planning_data->mutable_routing();
   debug_routing->CopyFrom(routing_result);
@@ -175,8 +175,8 @@ void Planning::RunOnce() {
     AERROR << "Chassis is not available; skip the planning cycle";
     return;
   }
-  if (AdapterManager::GetRoutingResult()->Empty()) {
-    AERROR << "RoutingResult is not available; skip the planning cycle";
+  if (AdapterManager::GetRoutingResponse()->Empty()) {
+    AERROR << "RoutingResponse is not available; skip the planning cycle";
     return;
   }
 

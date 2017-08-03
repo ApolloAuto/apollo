@@ -43,20 +43,20 @@ class PncMap {
 
   const hdmap::HDMap *HDMap() const;
 
-  bool CreatePathFromRouting(const hdmap::RoutingResult &routing,
+  bool CreatePathFromRouting(const hdmap::RoutingResponse &routing,
                              const common::PointENU &point,
                              const double backward_length,
                              const double forward_length,
                              hdmap::Path *path) const;
 
-  bool CreatePathFromRouting(const hdmap::RoutingResult &routing,
+  bool CreatePathFromRouting(const hdmap::RoutingResponse &routing,
                              hdmap::Path *path) const;
 
-  bool CreatePathFromRouting(const hdmap::RoutingResult &routing,
+  bool CreatePathFromRouting(const hdmap::RoutingResponse &routing,
                              double start_s, double end_s,
                              hdmap::Path *path) const;
 
-  bool validate_routing(const hdmap::RoutingResult &routing) const;
+  bool validate_routing(const hdmap::RoutingResponse &routing) const;
 
  private:
   void append_lane_to_points(

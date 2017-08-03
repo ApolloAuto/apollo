@@ -45,7 +45,7 @@ Status Control::Start() {
 void OnRouting_Request(const apollo::routing::RoutingRequest &routing_req) {
   AINFO << "Get new routing request!!!";
   ::apollo::routing::RoutingRequest request_proto;
-  ::apollo::routing::RoutingResult response_proto;
+  ::apollo::routing::RoutingResponse response_proto;
   if (!request_proto.ParseFromString(req.routing_request.data)) {
     AERROR << "The request proto is invalid.";
     return false;
