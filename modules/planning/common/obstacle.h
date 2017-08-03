@@ -36,7 +36,7 @@ class Obstacle : public PlanningObject {
   Obstacle() = default;
 
   const std::string &Id() const;
-  void SetId(int id);
+
   void SetId(const std::string &id);
 
   const perception::PerceptionObstacle::Type &Type() const;
