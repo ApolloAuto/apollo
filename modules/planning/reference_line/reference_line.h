@@ -42,7 +42,7 @@ class ReferenceLine {
                 const std::vector<hdmap::LaneSegment>& lane_segments,
                 const double max_approximation_error);
 
-  const hdmap::Path& reference_map_line() const;
+  const hdmap::Path& map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;
 
   ReferencePoint get_reference_point(const double s) const;

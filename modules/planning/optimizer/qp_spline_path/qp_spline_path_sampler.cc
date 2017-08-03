@@ -37,14 +37,14 @@ bool QpSplinePathSampler::Sample(const common::FrenetFramePoint& init_point,
                                  const double s_upper_bound,
                                  std::vector<double>* const sampling_point) {
   double sampling_distance =
-      std::min(reference_line.reference_map_line().length(), s_upper_bound) -
+      std::min(reference_line.map_path().length(), s_upper_bound) -
       init_point.s();
   sampling_distance = std::min(sampling_distance, FLAGS_planning_distance);
 
   if (Double::compare(sampling_distance, 0.0) <= 0) {
     AERROR << "Failed to allocate init trajectory point SL("
            << init_point.ShortDebugString() << ") on target lane with length "
-           << reference_line.reference_map_line().length();
+           << reference_line.map_path().length();
     return false;
   }
 
