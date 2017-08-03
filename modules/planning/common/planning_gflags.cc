@@ -79,6 +79,10 @@ DEFINE_double(output_trajectory_time_resolution, 0.05,
 DEFINE_double(speed_lower_bound, 0.0, "The lowest speed allowed.");
 DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
 
+DEFINE_double(
+    default_speed_limit, 10.0,
+    "The default speed limit, if speed limit is not marked on map lane");
+
 DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
               "The lowest longitudinal acceleration allowed.");
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,

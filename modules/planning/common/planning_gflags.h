@@ -58,6 +58,7 @@ DECLARE_double(output_trajectory_time_resolution);
 // parameters for trajectory sanity check
 DECLARE_double(speed_lower_bound);
 DECLARE_double(speed_upper_bound);
+DECLARE_double(default_speed_limit);
 
 DECLARE_double(longitudinal_acceleration_lower_bound);
 DECLARE_double(longitudinal_acceleration_upper_bound);
