@@ -53,4 +53,23 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "obstacle_test",
+    size = "small",
+    srcs = [
+        "obstacle_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "@gtest//:main",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/perception/proto:perception_proto",
+        "//modules/common/util:util",
+    ],
+)
+
 cpplint()
