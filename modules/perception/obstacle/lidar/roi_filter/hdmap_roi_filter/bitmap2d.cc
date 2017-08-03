@@ -68,20 +68,20 @@ bool Bitmap2D::IsExist(const Eigen::Vector2d& p) const {
 }
 
 bool Bitmap2D::Check(const Eigen::Vector2d &p) const {
-    //convert read_point to grid_point
+  //convert read_point to grid_point
 
-    Vec2ui grid_pt = ((p - min_p_).array() / grid_size_.array()).cast<size_t>();
+  Vec2ui grid_pt = ((p - min_p_).array() / grid_size_.array()).cast<size_t>();
 
-    Vec2ui major_grid_pt(grid_pt[dir_major_], grid_pt[op_dir_major_]);
+  Vec2ui major_grid_pt(grid_pt[dir_major_], grid_pt[op_dir_major_]);
 
-    size_t x_id = major_grid_pt.x();
-    size_t bits_id = major_grid_pt.y() >> 6;
-    size_t bit_id = major_grid_pt.y() & 63;
+  size_t x_id = major_grid_pt.x();
+  size_t bits_id = major_grid_pt.y() >> 6;
+  size_t bit_id = major_grid_pt.y() & 63;
 
-    const uint64_t &block = bitmap_[x_id][bits_id];
+  const uint64_t &block = bitmap_[x_id][bits_id];
 
-    const uint64_t first_one = static_cast<uint64_t> (1) << 63;
-    return block & (first_one >> bit_id);
+  const uint64_t first_one = static_cast<uint64_t> (1) << 63;
+  return block & (first_one >> bit_id);
 }
 
 Bitmap2D::Bitmap2D(const Eigen::Vector2d &min_p, const Eigen::Vector2d &max_p,

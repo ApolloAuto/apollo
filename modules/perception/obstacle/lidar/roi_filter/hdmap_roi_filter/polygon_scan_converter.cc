@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_scan_cvter.h"
-
-#include <iostream>
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_scan_converter.h"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +32,7 @@ void PolygonScanConverter::ConvertScans(
 
   scans_intervals->resize(scans_size_);
 
-  ParsePolygon();
+  ConvertPolygonToSegments();
   BuildEdgeTable();
 
   for (const auto &edge : edge_table_[0]) {
@@ -44,7 +42,6 @@ void PolygonScanConverter::ConvertScans(
       (*scans_intervals)[0].push_back(Interval(edge.y, edge.max_y));
     }
   }
-
 
 
   CHECK((active_edge_table_.size() & 1) == 0);
@@ -119,7 +116,6 @@ void PolygonScanConverter::BuildEdgeTable() {
     }
   }
 
-
   active_edge_table_.reserve(edges.size());
   //active_edge_table_.reserve(segments.size());
   for (size_t i = 0; i < edges.size(); ++i) {
@@ -141,8 +137,8 @@ void PolygonScanConverter::BuildEdgeTable() {
   }
 }
 
-
-bool PolygonScanConverter::ConvertSegment(size_t seg_id, std::pair<int, Edge> &out_edge) {
+bool PolygonScanConverter::ConvertSegment(size_t seg_id,
+                                          std::pair<int, Edge> &out_edge) {
   const Segment &segment = segments_[seg_id];
 
   Edge &edge = out_edge.second;
@@ -173,20 +169,17 @@ bool PolygonScanConverter::ConvertSegment(size_t seg_id, std::pair<int, Edge> &o
   return true;
 }
 
-void PolygonScanConverter::ParsePolygon() {
+void PolygonScanConverter::ConvertPolygonToSegments() {
   DisturbPolygon();
 
   size_t vertices_size = polygon_.size();
 
-  is_singular_.reserve(vertices_size);
   segments_.reserve(vertices_size);
   ks_.reserve(vertices_size);
 
   for (size_t i = 0; i < vertices_size; ++i) {
-    const Point &pre_vertex = polygon_[(i + vertices_size - 1) % vertices_size];
     const Point &cur_vertex = polygon_[i];
     const Point &next_vertex = polygon_[(i + 1) % vertices_size];
-
     if (cur_vertex[major_dir_] < next_vertex[major_dir_]) {
       segments_.emplace_back(cur_vertex, next_vertex);
     } else {
@@ -195,17 +188,8 @@ void PolygonScanConverter::ParsePolygon() {
 
     double x_diff = next_vertex[major_dir_] - cur_vertex[major_dir_];
     double y_diff = next_vertex[op_major_dir_] - cur_vertex[op_major_dir_];
-
     std::abs(cur_vertex[major_dir_] - next_vertex[major_dir_]) < s_epsilon_ ?
       ks_.push_back(s_inf_) : ks_.push_back(y_diff / x_diff);
-
-    double pre_x_diff = pre_vertex[major_dir_] - cur_vertex[major_dir_];
-
-    if (std::abs(x_diff) < s_epsilon_ || std::abs(pre_x_diff) < s_epsilon_) {
-      is_singular_.push_back(true);
-    } else {
-      pre_x_diff * x_diff > 0 ? is_singular_.push_back(true) : is_singular_.push_back(false);
-    }
   }
 }
 

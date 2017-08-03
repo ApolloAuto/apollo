@@ -8,13 +8,13 @@ cc_library(
         "bitmap2d.cc",
         "hdmap_roi_filter.cc",
         "polygon_mask.cc",
-        "polygon_scan_cvter.cc",
+        "polygon_scan_converter.cc",
     ],
     hdrs = [
         "bitmap2d.h",
         "hdmap_roi_filter.h",
         "polygon_mask.h",
-        "polygon_scan_cvter.h",
+        "polygon_scan_converter.h",
     ],
     deps = [
         "//modules/common:common",
