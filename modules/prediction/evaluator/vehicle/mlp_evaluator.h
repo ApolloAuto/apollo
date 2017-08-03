@@ -54,9 +54,8 @@ class MLPEvaluator : public Evaluator {
    *        Lane Sequence pointer
    */
   void ExtractFeatureValues(Obstacle* obstacle_ptr,
-                            LaneSequence* lane_sequence_ptr);
-
-  const std::vector<double>& feature_values() const;
+                            LaneSequence* lane_sequence_ptr,
+                            std::vector<double>* feature_values);
 
   /**
    * @brief Clear obstacle feature map
@@ -91,7 +90,7 @@ class MLPEvaluator : public Evaluator {
   /**
    * @brief Compute probability
    */
-  double ComputeProbability();
+  double ComputeProbability(const std::vector<double>& feature_values);
 
  private:
   std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;

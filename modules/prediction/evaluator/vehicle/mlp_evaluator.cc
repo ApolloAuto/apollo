@@ -67,8 +67,9 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK(lane_sequence_ptr != nullptr);
-    ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr);
-    double probability = ComputeProbability();
+    std::vector<double> feature_values;
+    ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
+    double probability = ComputeProbability(feature_values);
     lane_sequence_ptr->set_probability(probability);
     ADEBUG << "Obstacle [" << id << "] has lane sequence ["
            << lane_sequence_ptr->ShortDebugString()
@@ -77,8 +78,8 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 }
 
 void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
-                                        LaneSequence* lane_sequence_ptr) {
-  feature_values_.clear();
+                                        LaneSequence* lane_sequence_ptr,
+                                        std::vector<double>* feature_values) {
   int id = obstacle_ptr->id();
   std::vector<double> obstacle_feature_values;
 
@@ -105,9 +106,9 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
     return;
   }
 
-  feature_values_.insert(feature_values_.end(),
+  feature_values->insert(feature_values->end(),
       obstacle_feature_values.begin(), obstacle_feature_values.end());
-  feature_values_.insert(feature_values_.end(),
+  feature_values->insert(feature_values->end(),
       lane_feature_values.begin(), lane_feature_values.end());
 }
 
@@ -264,14 +265,15 @@ void MLPEvaluator::LoadModel(const std::string& model_file) {
   AINFO << "Succeeded in loading the model file: " << model_file << ".";
 }
 
-double MLPEvaluator::ComputeProbability() {
+double MLPEvaluator::ComputeProbability(
+    const std::vector<double>& feature_values) {
   CHECK_NOTNULL(model_ptr_.get());
   double probability = 0.0;
 
-  if (model_ptr_->dim_input() != static_cast<int>(feature_values_.size())) {
+  if (model_ptr_->dim_input() != static_cast<int>(feature_values.size())) {
     AERROR << "Model feature size not consistent with model proto definition. "
            << "model input dim = " << model_ptr_->dim_input()
-           << "; feature value size = " << feature_values_.size();
+           << "; feature value size = " << feature_values.size();
     return probability;
   }
   std::vector<double> layer_input;
@@ -283,7 +285,7 @@ double MLPEvaluator::ComputeProbability() {
     double mean = model_ptr_->samples_mean().columns(i);
     double std = model_ptr_->samples_std().columns(i);
     layer_input.push_back(
-        apollo::prediction::util::Normalize(feature_values_[i], mean, std));
+        apollo::prediction::util::Normalize(feature_values[i], mean, std));
   }
 
   for (int i = 0; i < model_ptr_->num_layer(); ++i) {
@@ -322,10 +324,6 @@ double MLPEvaluator::ComputeProbability() {
   }
 
   return probability;
-}
-
-const std::vector<double>& MLPEvaluator::feature_values() const {
-  return feature_values_;
 }
 
 }  // namespace prediction

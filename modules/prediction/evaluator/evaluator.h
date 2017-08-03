@@ -51,9 +51,6 @@ class Evaluator {
    * @param Obstacle pointer
    */
   virtual void Evaluate(Obstacle* obstacle) = 0;
-
- protected:
-  std::vector<double> feature_values_;
 };
 
 }  // namespace prediction
