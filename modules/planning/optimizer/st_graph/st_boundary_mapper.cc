@@ -88,6 +88,18 @@ bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
 Status StBoundaryMapper::GetSpeedLimits(
     const ReferenceLine& reference_line, const PathData& path_data,
     SpeedLimit* const speed_limit_data) const {
+  DCHECK_NOTNULL(speed_limit_data);
+
+  if (Double::compare(path_data.discretized_path().length(),
+                      reference_line.length()) > 0) {
+    std::string msg = common::util::StrCat(
+        "path length [", path_data.discretized_path().length(),
+        "] should be LESS than reference_line length [",
+        reference_line.length(), "].");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   std::vector<double> speed_limits;
   for (const auto& path_point : path_data.discretized_path().points()) {
     // speed limit from reference line

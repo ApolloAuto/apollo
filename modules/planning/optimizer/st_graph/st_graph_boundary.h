@@ -44,7 +44,10 @@ class StGraphBoundary : public common::math::Polygon2d {
     OVERTAKE,
   };
 
+  // boundary points go counter clockwise.
   explicit StGraphBoundary(const std::vector<STPoint>& points);
+
+  // boundary points go counter clockwise.
   explicit StGraphBoundary(const std::vector<common::math::Vec2d>& points);
 
   ~StGraphBoundary() = default;
@@ -72,10 +75,10 @@ class StGraphBoundary : public common::math::Polygon2d {
   void GetBoundaryTimeScope(double* start_t, double* end_t) const;
 
  private:
-  BoundaryType _boundary_type = BoundaryType::UNKNOWN;
-  std::string _id;
-  double _characteristic_length = 1.0;
-  double _s_high_limit = 200.0;
+  BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
+  std::string id_;
+  double characteristic_length_ = 1.0;
+  double s_high_limit_ = 200.0;
 };
 
 }  // namespace planning
