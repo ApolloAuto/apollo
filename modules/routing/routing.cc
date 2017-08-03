@@ -28,9 +28,9 @@ using apollo::common::ErrorCode;
 
 std::string Routing::Name() const { return FLAGS_node_name; }
 
-Routing::Routing() : 
+Routing::Routing() :
   monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {
-  
+
   std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
   AINFO << "Use routing topology graph path: " <<  graph_path.c_str();
   _navigator_ptr.reset(new Navigator(graph_path));
@@ -40,8 +40,8 @@ apollo::common::Status Routing::Init() {
   std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
 
   AdapterManager::Init(FLAGS_adapter_config_path);
-  AdapterManager::SetMonitorCallback(&Routing::OnMonitor, this);
-  AdapterManager::SetRoutingRequestCallback(&Routing::OnRouting_Request, this);
+  AdapterManager::AddMonitorCallback(&Routing::OnMonitor, this);
+  AdapterManager::AddRoutingRequestCallback(&Routing::OnRouting_Request, this);
 
   return apollo::common::Status::OK();
 }

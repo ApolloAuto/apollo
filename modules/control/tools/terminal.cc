@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
   }
 
   AdapterManager::Init(config);
-  AdapterManager::SetChassisCallback(on_chassis);
+  AdapterManager::AddChassisCallback(on_chassis);
 
   help();
   std::thread terminal_thread(terminal_thread_func);

@@ -335,7 +335,7 @@ class Teleop {
       return -1;
     }
     is_running_ = true;
-    AdapterManager::SetChassisCallback(&Teleop::OnChassis, this);
+    AdapterManager::AddChassisCallback(&Teleop::OnChassis, this);
     keyboard_thread_.reset(
         new std::thread([this] { KeyboardLoopThreadFunc(); }));
     if (keyboard_thread_ == nullptr) {
