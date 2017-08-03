@@ -434,7 +434,7 @@ void Obstacle::UpdateKFMotionTracker(Feature* feature) {
   if (feature_history_.size() > 0) {
     delta_ts = feature->timestamp() - feature_history_.front().timestamp();
   }
-  if (delta_ts <= FLAGS_double_precision) {
+  if (delta_ts > FLAGS_double_precision) {
     // Set tansition matrix and predict
     auto F = kf_motion_tracker_.GetTransitionMatrix();
     F(0, 2) = delta_ts;
