@@ -9,6 +9,7 @@ import PlanningTrajectory from "renderer/trajectory.js";
 import PerceptionObstacles from "renderer/obstacles.js";
 import Decision from "renderer/decision.js";
 import Prediction from "renderer/prediction.js";
+import Routing from "renderer/routing.js";
 
 class Renderer {
     constructor() {
@@ -55,6 +56,9 @@ class Renderer {
 
         // The prediction.
         this.prediction = new Prediction();
+
+        // The routing.
+        this.routing = new Routing();
     }
 
     initialize(canvasId, width, height) {
@@ -156,6 +160,7 @@ class Renderer {
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
+        this.routing.update(world, this.coordinates, this.scene);
     }
 
     updateMap(newData) {

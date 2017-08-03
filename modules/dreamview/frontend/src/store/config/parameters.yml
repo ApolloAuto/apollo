@@ -27,6 +27,7 @@ options:
     showDecision: true
     showPredictionMajor: true
     showPredictionMinor: true
+    showRouting: true
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
