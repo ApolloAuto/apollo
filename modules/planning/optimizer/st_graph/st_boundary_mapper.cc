@@ -90,18 +90,17 @@ Status StBoundaryMapper::GetSpeedLimits(
     SpeedLimit* const speed_limit_data) const {
   DCHECK_NOTNULL(speed_limit_data);
 
-  if (Double::compare(path_data.discretized_path().length(),
-                      reference_line.length()) > 0) {
-    std::string msg = common::util::StrCat(
-        "path length [", path_data.discretized_path().length(),
-        "] should be LESS than reference_line length [",
-        reference_line.length(), "].");
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
   std::vector<double> speed_limits;
   for (const auto& path_point : path_data.discretized_path().points()) {
+    if (Double::compare(path_point.s(), reference_line.length()) > 0) {
+      std::string msg = common::util::StrCat(
+          "path length [", path_data.discretized_path().length(),
+          "] is LARGER than reference_line length [", reference_line.length(),
+          "]. Please debug before proceeding.");
+      AWARN << msg;
+      break;
+    }
+
     // speed limit from reference line
     double speed_limit_on_reference_line =
         std::fmin(st_boundary_config_.maximal_speed(),
