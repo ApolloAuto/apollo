@@ -41,15 +41,16 @@ namespace planning {
 
 class QpFrenetFrame {
  public:
-  QpFrenetFrame() = default;
+  QpFrenetFrame(const ReferenceLine& reference_line,
+                const DecisionData& decision_data, const SpeedData& speed_data,
+                const common::FrenetFramePoint& init_frenet_point,
+                const double start_s, const double end_s,
+                const double time_resolution);
+  virtual ~QpFrenetFrame() = default;
 
-  bool Init(const ReferenceLine& reference_line,
-            const DecisionData& decision_data, const SpeedData& speed_data,
-            const common::FrenetFramePoint& init_frenet_point,
-            const double start_s, const double end_s,
-            const double time_resolution, const uint32_t num_points);
+  bool Init(const uint32_t num_points);
 
-  const ReferenceLine* reference_line() const;
+  const ReferenceLine& GetReferenceLine() const;
 
   double feasible_longitudinal_upper_bound() const;
 
@@ -109,25 +110,23 @@ class QpFrenetFrame {
   void Clear();
 
  private:
-  const ReferenceLine* _reference_line = nullptr;
+  const ReferenceLine& reference_line_;
+  const DecisionData& decision_data_;
+  const SpeedData& speed_data_;
 
-  const SpeedData* _speed_profile = nullptr;
+  common::VehicleParam vehicle_param_;
+  common::FrenetFramePoint init_frenet_point_;
 
-  const DecisionData* _decision_data = nullptr;
+  double feasible_longitudinal_upper_bound_ = 0.0;
+  double start_s_ = 0.0;
+  double end_s_ = 0.0;
+  double time_resolution_ = 0.1;
 
-  common::VehicleParam _vehicle_param;
-  common::FrenetFramePoint _init_frenet_point;
-
-  double _feasible_longitudinal_upper_bound = 0.0;
-  double _start_s = 0.0;
-  double _end_s = 0.0;
-  double _time_resolution = 0.1;
-
-  std::vector<double> _evaluated_knots;
-  std::vector<common::SpeedPoint> _discretized_veh_loc;
-  std::vector<std::pair<double, double>> _hdmap_bound;
-  std::vector<std::pair<double, double>> _static_obstacle_bound;
-  std::vector<std::pair<double, double>> _dynamic_obstacle_bound;
+  std::vector<double> evaluated_knots_;
+  std::vector<common::SpeedPoint> discretized_vehicle_location_;
+  std::vector<std::pair<double, double>> hdmap_bound_;
+  std::vector<std::pair<double, double>> static_obstacle_bound_;
+  std::vector<std::pair<double, double>> dynamic_obstacle_bound_;
 };
 
 }  // namespace planning
