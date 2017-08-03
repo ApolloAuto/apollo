@@ -172,27 +172,26 @@ message SimulationWorld {
 
   // Routing path
   repeated PolygonPoint route = 7;
+  // Timestamp of latest routing
+  optional double routing_time = 8;
 
   // Planned trajectory
-  repeated Object planning_trajectory = 8;
+  repeated Object planning_trajectory = 9;
 
   // Main stop
-  optional Object main_stop = 9;
+  optional Object main_stop = 10;
 
   // Speed limit
-  optional double speed_limit = 10;
+  optional double speed_limit = 11;
 
-  // Map Hashcode
-  optional string map_md5 = 11;
-
-  optional Delay delay = 17;
+  optional Delay delay = 12;
 
   // Relative time w.r.t. the begin time of rosbag
-  optional double relative_time_sec = 18;
+  optional double relative_time_sec = 13;
 
-  optional string decision_task_name = 19;
+  optional string decision_task_name = 14;
 
-  optional Debug debug_log = 26;
+  optional Debug debug_log = 15;
 
-  optional .apollo.common.monitor.MonitorMessage monitor = 29;
+  optional .apollo.common.monitor.MonitorMessage monitor = 16;
 }
