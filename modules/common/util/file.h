@@ -94,6 +94,21 @@ bool GetProtoFromASCIIFile(const std::string &file_name, MessageType *message) {
 }
 
 /**
+ * @brief Sets the content of the file specified by the file_name to be the
+ *        binary representation of the input protobuf.
+ * @param message The proto to output to the specified file.
+ * @param file_name The name of the target file to set the content.
+ * @return If the action is successful.
+ */
+template <typename MessageType>
+bool SetProtoToBinaryFile(const MessageType &message,
+                          const std::string &file_name) {
+  std::fstream output(file_name,
+                      std::ios::out | std::ios::trunc | std::ios::binary);
+  return message.SerializeToOstream(&output);
+}
+
+/**
  * @brief Parses the content of the file specified by the file_name as binary
  *        representation of protobufs, and merges the parsed content to the
  *        proto.
