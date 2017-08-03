@@ -1,4 +1,6 @@
 <launch>
+    <arg name="velodyne64_calibration_online" default="true" />
+    <!--If 'velodyne64_calibration_online' is true, 'velodyne64_calibration_file' will not use  -->
     <arg name="velodyne64_calibration_file" default="$(find velodyne_pointcloud)/params/64E_S3_calibration_example.yaml"/>
     <arg name="extrinsics_velodyne64" default="$(find velodyne_pointcloud)/params/velodyne64_novatel_extrinsics_example.yaml"/>
     <arg name="velodyne64_frame_id" default="velodyne64"/>
@@ -31,6 +33,7 @@
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_convert"/>
     <arg name="model" value="$(arg model)"/>
+    <arg name="calibration_online" value="$(arg velodyne64_calibration_online)" />
     <arg name="calibration" value="$(arg velodyne64_calibration_file)" />
     <arg name="organized" value="$(arg organized)"/>
     <arg name="min_range" value="$(arg min_range)" />

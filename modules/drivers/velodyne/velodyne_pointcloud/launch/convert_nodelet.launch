@@ -1,6 +1,8 @@
 <launch>
   <arg name="model" default="64E_S3D_STRONGEST" />
-  <arg name="calibration" default="$(find velodyne_pointcloud)/params/64E_S3_calibration_example.yaml" />
+  <arg name="calibration_online" default="true" />
+  <!--If 'calibration_online' is true, 'calibration' will not use -->
+  <arg name="calibration" default="" />
   <arg name="min_range" default="0.9" />
   <arg name="max_range" default="70.0" />
   <arg name="organized" default="false"/>
@@ -11,6 +13,7 @@
 
   <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
         args="load velodyne_pointcloud/ConvertNodelet velodyne_nodelet_manager" output="screen">
+    <param name="calibration_online" value="$(arg calibration_online)"/>
     <param name="calibration" value="$(arg calibration)"/>
     <param name="min_range" value="$(arg min_range)"/>
     <param name="max_range" value="$(arg max_range)"/>
