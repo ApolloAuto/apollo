@@ -90,7 +90,7 @@ void Obstacle::CreateObstacles(
     int trajectory_index = 0;
     for (const auto& trajectory : prediction_obstacle.trajectory()) {
       std::string obstacle_id = std::to_string(perception_id) + "_" +
-                                std::to_string(trajectory_index);
+                                std::to_string(trajectory_index++);
       obstacles->emplace_back(std::unique_ptr<Obstacle>(new Obstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory)));
     }
