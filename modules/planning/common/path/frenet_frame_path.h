@@ -18,8 +18,8 @@
  * @file frenet_frame_path.h
  **/
 
-#ifndef BAIDU_ADU_HOUSTON_COMMON_PATH_FRENET_FRAME_PATH_H_
-#define BAIDU_ADU_HOUSTON_COMMON_PATH_FRENET_FRAME_PATH_H_
+#ifndef MODULES_PLANNING_COMMON_PATH_FRENET_FRAME_PATH_H_
+#define MODULES_PLANNING_COMMON_PATH_FRENET_FRAME_PATH_H_
 
 #include <vector>
 
@@ -40,7 +40,7 @@ class FrenetFramePath {
   double length() const;
   const common::FrenetFramePoint &point_at(const std::uint32_t index) const;
   common::FrenetFramePoint &point_at(const std::uint32_t index);
-  const common::FrenetFramePoint& interpolate(double s) const;
+  const common::FrenetFramePoint &interpolate(double s) const;
 
  private:
   std::vector<common::FrenetFramePoint> points_;
@@ -49,4 +49,4 @@ class FrenetFramePath {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* BAIDU_ADU_HOUSTON_COMMON_PATH_FRENET_FRAME_PATH_H_ */
+#endif  // MODULES_PLANNING_COMMON_PATH_FRENET_FRAME_PATH_H_

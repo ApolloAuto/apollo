@@ -39,6 +39,8 @@ using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::Point3D;
 using ::apollo::common::VehicleState;
 using Matrix = Eigen::MatrixXd;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 namespace {
 

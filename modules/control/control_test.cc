@@ -42,15 +42,15 @@ TEST_F(ControlTest, Name) { EXPECT_EQ("control", control_.Name()); }
 TEST_F(ControlTest, Init) {
   FLAGS_control_conf_file = "";
   FLAGS_adapter_config_path = "";
-  auto result =
-      Status(ErrorCode::CONTROL_INIT_ERROR,
-             "Unable to load control conf file: " + FLAGS_control_conf_file);
+  auto result = common::Status(
+      common::ErrorCode::CONTROL_INIT_ERROR,
+      "Unable to load control conf file: " + FLAGS_control_conf_file);
   EXPECT_EQ(result, control_.Init());
   FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
   EXPECT_DEATH(control_.Init(), "Unable to parse adapter config file " +
                                     FLAGS_adapter_config_path);
   FLAGS_adapter_config_path = "modules/control/testdata/conf/adapter.conf";
-  EXPECT_EQ(Status::OK(), control_.Init());
+  EXPECT_EQ(common::Status::OK(), control_.Init());
 }
 
 }  // namespace control
