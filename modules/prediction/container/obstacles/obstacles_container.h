@@ -67,6 +67,11 @@ class ObstaclesContainer : public Container {
   Obstacle* GetObstacle(int id);
 
  private:
+  /**
+   * @brief Check if an obstacle is predictable
+   * @param An obstacle
+   * @return True if the obstacle is predictable; otherwise false;
+   */
   bool IsPredictable(
       const apollo::perception::PerceptionObstacle& perception_obstacle);
 
