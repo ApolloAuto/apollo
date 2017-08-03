@@ -1,12 +1,23 @@
 load("//tools:cpplint.bzl", "cpplint")
 
-load("//tools:cpplint.bzl", "cpplint")
-
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "perception_tool_offline_lidar_perception_tool",
+    name = "offline_lidar_perception_tool",
     srcs = ["offline_lidar_perception_tool.cc"],
+    data = [      
+        "//modules/perception/tool/conf:perception_tool_config",
+        "//modules/perception:perception_model",
+    ],
+    #copts = ["-L/usr/lib64", "-L/usr/lib/x86_64-linux-gnu"],
+    #linkopts = [
+    #  "-lglfw",
+    #  "-lglapi",
+    #  "-lglib-2.0",
+    #  "-lglut",
+    #  "-lglade-2.0",
+    #],
+
     deps = [
         "//modules/common",
         "//modules/common:log",
@@ -15,9 +26,12 @@ cc_binary(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/lidar/visualizer:perception_obstacle_lidar_visualizer",
+        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
         "@eigen//:eigen",
+        "@glew//:glew",
+        "@glfw//:glfw",
+        "@opengl//:opengl",
     ],
 )
 

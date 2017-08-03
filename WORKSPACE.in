@@ -194,6 +194,23 @@ new_local_repository(
 )
 
 new_local_repository(
+    name = "glew",
+    build_file = "third_party/glew.BUILD",
+    path = "/usr/include",
+)
+
+new_local_repository(
+    name = "opengl",
+    build_file = "third_party/opengl.BUILD",
+    path = "/usr/include",
+)
+new_local_repository(
+    name = "glfw",
+    build_file = "third_party/glfw.BUILD",
+    path = "/usr/include",
+)
+
+new_local_repository(
     name = "vtk",
     build_file = "third_party/vtk.BUILD",
     path = "/usr/include/vtk-5.8",
