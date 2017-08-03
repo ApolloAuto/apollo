@@ -18,7 +18,6 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "ros/include/ros/ros.h"
 
 #include "modules/planning/proto/planning.pb.h"
 

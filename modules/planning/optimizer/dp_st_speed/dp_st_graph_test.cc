@@ -20,7 +20,6 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "ros/include/ros/ros.h"
 
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 
