@@ -27,9 +27,11 @@
 namespace apollo {
 namespace control {
 
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::time::Clock;
-using ::apollo::common::VehicleState;
+using apollo::common::TrajectoryPoint;
+using apollo::common::time::Clock;
+using apollo::common::VehicleState;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 LonController::LonController()
     : name_(ControlConf_ControllerType_Name(ControlConf::LON_CONTROLLER)) {

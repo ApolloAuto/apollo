@@ -54,7 +54,7 @@ class ControllerAgent {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Status Init(const ControlConf *control_conf);
+  common::Status Init(const ControlConf *control_conf);
 
   /**
    * @brief compute control command based on current vehicle status
@@ -65,7 +65,7 @@ class ControllerAgent {
    * @param cmd control command
    * @return Status computation status
    */
-  Status ComputeControlCommand(
+  common::Status ComputeControlCommand(
       const ::apollo::localization::LocalizationEstimate *localization,
       const ::apollo::canbus::Chassis *chassis,
       const ::apollo::planning::ADCTrajectory *trajectory,
@@ -75,7 +75,7 @@ class ControllerAgent {
    * @brief reset ControllerAgent
    * @return Status reset status
    */
-  Status Reset();
+  common::Status Reset();
 
  private:
   /**
@@ -85,7 +85,7 @@ class ControllerAgent {
    */
   void RegisterControllers();
 
-  Status InitializeConf(const ControlConf *control_conf);
+  common::Status InitializeConf(const ControlConf *control_conf);
 
   const ControlConf *control_conf_ = nullptr;
   apollo::common::util::Factory<ControlConf::ControllerType, Controller>

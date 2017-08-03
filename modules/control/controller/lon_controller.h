@@ -64,7 +64,7 @@ class LonController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Status Init(const ControlConf *control_conf) override;
+  common::Status Init(const ControlConf *control_conf) override;
 
   /**
    * @brief compute brake / throttle values based on current vehicle status
@@ -75,7 +75,7 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Status ComputeControlCommand(
+  common::Status ComputeControlCommand(
       const ::apollo::localization::LocalizationEstimate *localization,
       const ::apollo::canbus::Chassis *chassis,
       const ::apollo::planning::ADCTrajectory *trajectory,
@@ -85,7 +85,7 @@ class LonController : public Controller {
    * @brief reset longitudinal controller
    * @return Status reset status
    */
-  Status Reset() override;
+  common::Status Reset() override;
 
   /**
    * @brief stop longitudinal controller

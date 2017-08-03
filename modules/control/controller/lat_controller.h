@@ -64,7 +64,7 @@ class LatController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Status Init(const ControlConf *control_conf) override;
+  common::Status Init(const ControlConf *control_conf) override;
 
   /**
    * @brief compute steering target based on current vehicle status
@@ -75,7 +75,7 @@ class LatController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Status ComputeControlCommand(
+  common::Status ComputeControlCommand(
       const localization::LocalizationEstimate *localization,
       const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
       ControlCommand *cmd) override;
@@ -84,7 +84,7 @@ class LatController : public Controller {
    * @brief reset Lateral Controller
    * @return Status reset status
    */
-  Status Reset() override;
+  common::Status Reset() override;
 
   /**
    * @brief stop Lateral controller

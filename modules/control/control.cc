@@ -32,12 +32,14 @@
 namespace apollo {
 namespace control {
 
-using ::apollo::canbus::Chassis;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::monitor::MonitorMessageItem;
-using ::apollo::common::time::Clock;
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::planning::ADCTrajectory;
+using apollo::canbus::Chassis;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::time::Clock;
+using apollo::localization::LocalizationEstimate;
+using apollo::planning::ADCTrajectory;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 #define CHECK_PROTO(a, b)                                          \
   if (!a.has_##b()) {                                              \

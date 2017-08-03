@@ -91,10 +91,10 @@ class Control : public apollo::common::ApolloApp {
   // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
-  Status ProduceControlCommand(ControlCommand *control_command);
-  Status CheckInput();
-  Status CheckTimestamp();
-  Status CheckPad();
+  common::Status ProduceControlCommand(ControlCommand *control_command);
+  common::Status CheckInput();
+  common::Status CheckTimestamp();
+  common::Status CheckPad();
 
   void Alert();
   void SendCmd(ControlCommand *control_command);

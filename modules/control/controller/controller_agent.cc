@@ -27,6 +27,8 @@ namespace apollo {
 namespace control {
 
 using apollo::common::time::Clock;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 void ControllerAgent::RegisterControllers() {
   controller_factory_.Register(

@@ -70,7 +70,7 @@ class LonControllerTest : public ::testing::Test, LonController {
     LonController::ComputeLongitudinalErrors(trajectory, preview_time, debug);
   }
 
-  Status Init(const ControlConf *control_conf) {
+  common::Status Init(const ControlConf *control_conf) {
     return LonController::Init(control_conf);
   }
 
@@ -152,8 +152,8 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
 }
 
 TEST_F(LonControllerTest, Init) {
-  Status status = Init(nullptr);
-  EXPECT_EQ(status.code() == ErrorCode::CONTROL_INIT_ERROR, true);
+  common::Status status = Init(nullptr);
+  EXPECT_EQ(status.code() == common::ErrorCode::CONTROL_INIT_ERROR, true);
 }
 
 }  // namespace control
