@@ -114,7 +114,11 @@ namespace adapter {
     return name##_.get();                                                      \
   }                                                                            \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
-    name##publisher_.publish(data);                                            \
+    /* Only publish ROS msg if node handle is initialized. */                  \
+    if (node_handle_) {                                                        \
+      name##publisher_.publish(data);                                          \
+    }                                                                          \
+    name##_->SetLatestPublished(data);                                         \
   }
 
 /**
