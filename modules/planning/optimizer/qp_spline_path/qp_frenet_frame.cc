@@ -478,7 +478,7 @@ bool QpFrenetFrame::GetBound(
     std::pair<double, double>* const bound) const {
   if (Double::compare(s, start_s_, 1e-8) < 0 ||
       Double::compare(s, end_s_, 1e-8) > 0) {
-    AERROR << "Evalutuat s location " << s
+    AERROR << "Evaluate s location " << s
            << ", is out of trajectory frenet frame range (" << start_s_ << ", "
            << end_s_ << ")";
     return false;

@@ -50,16 +50,16 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
                                      const SpeedData& speed_data,
                                      const common::TrajectoryPoint& init_point,
                                      PathData* const path_data) {
-  if (!calculate_sl_point(reference_line, init_point, &_init_point)) {
+  if (!calculate_sl_point(reference_line, init_point, &init_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
   }
-  double start_s = _init_point.s();
+  double start_s = init_point_.s();
   double end_s = std::min(reference_line.length(),
-                          _init_point.s() + FLAGS_planning_distance);
+                          init_point_.s() + FLAGS_planning_distance);
 
   QpFrenetFrame qp_frenet_frame(reference_line, decision_data, speed_data,
-                                _init_point, start_s, end_s,
+                                init_point_, start_s, end_s,
                                 qp_spline_path_config_.time_resolution());
   if (!qp_frenet_frame.Init(qp_spline_path_config_.num_output())) {
     AERROR << "Fail to initialize qp frenet frame";
@@ -72,7 +72,8 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
   }
 
   AINFO << "pss path start with " << start_s << ", end with " << end_s;
-  if (!init_smoothing_spline(reference_line, start_s, end_s)) {
+  if (!init_smoothing_spline(reference_line, init_point_, start_s,
+                             end_s - 0.1)) {
     AERROR << "Init smoothing spline failed with (" << start_s << ",  end_s "
            << end_s;
     return false;
@@ -91,16 +92,16 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
     return false;
   }
 
-  AINFO << common::util::StrCat("Spline dl:", _init_point.dl(), ", ddl:",
-                                _init_point.ddl());
+  AINFO << common::util::StrCat("Spline dl:", init_point_.dl(), ", ddl:",
+                                init_point_.ddl());
 
   // extract data
-  const Spline1d& spline = _spline_generator->spline();
+  const Spline1d& spline = spline_generator_->spline();
   std::vector<common::PathPoint> path_points;
 
-  double start_l = spline(_init_point.s());
+  double start_l = spline(init_point_.s());
   ReferencePoint ref_point =
-      reference_line.get_reference_point(_init_point.s());
+      reference_line.get_reference_point(init_point_.s());
   common::math::Vec2d xy_point = SLAnalyticTransformation::calculate_xypoint(
       ref_point.heading(), common::math::Vec2d(ref_point.x(), ref_point.y()),
       start_l);
@@ -108,9 +109,9 @@ bool QpSplinePathGenerator::generate(const ReferenceLine& reference_line,
   double x_diff = xy_point.x() - init_point.path_point().x();
   double y_diff = xy_point.y() - init_point.path_point().y();
 
-  double s = _init_point.s();
+  double s = init_point_.s();
   double s_resolution =
-      (end_s - _init_point.s()) / qp_spline_path_config_.num_output();
+      (end_s - init_point_.s()) / qp_spline_path_config_.num_output();
   while (Double::compare(s, end_s) < 0) {
     double l = spline(s);
     double dl = spline.derivative(s);
@@ -179,7 +180,7 @@ bool QpSplinePathGenerator::init_coord_range(
     const QpFrenetFrame& qp_frenet_frame, double* const start_s,
     double* const end_s) {
   // TODO(all): step 1 get current sl coordinate - with init coordinate point
-  double start_point = std::max(_init_point.s() - 5.0, 0.0);
+  double start_point = std::max(init_point_.s() - 5.0, 0.0);
 
   const ReferenceLine& reference_line = qp_frenet_frame.GetReferenceLine();
 
@@ -194,39 +195,50 @@ bool QpSplinePathGenerator::init_coord_range(
 }
 
 bool QpSplinePathGenerator::init_smoothing_spline(
-    const ReferenceLine& reference_line, const double start_s,
+    const ReferenceLine& reference_line,
+    const common::FrenetFramePoint& init_frenet_point, const double start_s,
     const double end_s) {
-  QpSplinePathSampler sampler(qp_spline_path_config_);
-
-  // TODO(all): refine here, add end_s tolorence here
-  std::vector<double> sampling_point;
-  if (!sampler.Sample(_init_point, reference_line, start_s, end_s - 0.1,
-                      &sampling_point)) {
-    AERROR << "Qp spline sampler failed!";
+  if (qp_spline_path_config_.number_of_knots() <= 1) {
+    AERROR << "Two few number of knots: "
+           << qp_spline_path_config_.number_of_knots();
     return false;
   }
+  double distance = std::fmin(reference_line.map_path().length(), end_s) -
+                    init_frenet_point.s();
+  if (distance > FLAGS_planning_distance) {
+    distance = FLAGS_planning_distance;
+  }
+  const double delta_s = distance / qp_spline_path_config_.number_of_knots();
 
-  _spline_generator.reset(new Spline1dGenerator(
-      sampling_point, qp_spline_path_config_.spline_order()));
+  double curr_knot_s = init_frenet_point.s();
+
+  knots_.clear();
+  for (uint32_t i = 0; i <= qp_spline_path_config_.number_of_knots(); ++i) {
+    knots_.push_back(curr_knot_s);
+    curr_knot_s += delta_s;
+  }
+  spline_generator_.reset(
+      new Spline1dGenerator(knots_, qp_spline_path_config_.spline_order()));
+
   return true;
 }
 
 bool QpSplinePathGenerator::setup_constraint(
     const QpFrenetFrame& qp_frenet_frame) {
   Spline1dConstraint* spline_constraint =
-      _spline_generator->mutable_spline_constraint();
+      spline_generator_->mutable_spline_constraint();
 
   // add init status constraint
-  spline_constraint->add_point_fx_constraint(_init_point.s(), _init_point.l());
-  spline_constraint->add_point_derivative_constraint(_init_point.s(),
-                                                     _init_point.dl());
-  spline_constraint->add_point_second_derivative_constraint(_init_point.s(),
-                                                            _init_point.ddl());
-  AINFO << "init frenet point: " << _init_point.ShortDebugString();
+  spline_constraint->add_point_fx_constraint(init_point_.s(), init_point_.l());
+  spline_constraint->add_point_derivative_constraint(init_point_.s(),
+                                                     init_point_.dl());
+  spline_constraint->add_point_second_derivative_constraint(init_point_.s(),
+                                                            init_point_.ddl());
+  AINFO << "init frenet point: " << init_point_.ShortDebugString();
 
   // add end point constraint
   const std::vector<double> spline_knots =
-      _spline_generator->spline().x_knots();
+      spline_generator_->spline().x_knots();
   if (spline_knots.size() < 2) {
     AERROR << common::util::StrCat("Smoothing spline knot size(",
                                    spline_knots.size(), ") < 2");
@@ -279,6 +291,7 @@ bool QpSplinePathGenerator::setup_constraint(
       return false;
     }
   }
+
   // add smooth jointness constraint
   if (!spline_constraint->add_third_derivative_smooth_constraint()) {
     AERROR << "Add spline jointness constraint failed!";
@@ -289,7 +302,7 @@ bool QpSplinePathGenerator::setup_constraint(
 }
 
 bool QpSplinePathGenerator::setup_kernel() {
-  Spline1dKernel* spline_kernel = _spline_generator->mutable_spline_kernel();
+  Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   if (qp_spline_path_config_.regularization_weight() > 0) {
     spline_kernel->add_regularization(
@@ -312,30 +325,16 @@ bool QpSplinePathGenerator::setup_kernel() {
   }
 
   // reference line kernel
-  if (qp_spline_path_config_.number_of_fx_constraint_knots() > 1) {
-    std::vector<double> fx_knots;
-    std::vector<double> l_vec;
-
-    const std::vector<double> spline_knots =
-        _spline_generator->spline().x_knots();
-    double ds = (spline_knots.back() - spline_knots.front()) /
-                qp_spline_path_config_.number_of_fx_constraint_knots();
-    double s = spline_knots.front();
-
-    for (std::uint32_t i = 0;
-         i < qp_spline_path_config_.number_of_fx_constraint_knots() + 1; ++i) {
-      fx_knots.push_back(s);
-      l_vec.push_back(0.0);
-      s += ds;
-    }
+  if (qp_spline_path_config_.number_of_knots() > 1) {
+    std::vector<double> l_vec(knots_.size(), 0.0);
     spline_kernel->add_reference_line_kernel_matrix(
-        fx_knots, l_vec, qp_spline_path_config_.reference_line_weight());
+        knots_, l_vec, qp_spline_path_config_.reference_line_weight());
   }
   return true;
 }
 
 bool QpSplinePathGenerator::solve() {
-  if (!_spline_generator->solve()) {
+  if (!spline_generator_->solve()) {
     AERROR << "Could not solve the qp problem in spline path generator.";
     return false;
   }
