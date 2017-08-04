@@ -1,75 +1,92 @@
-#include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include <iostream>
+#include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
 
 namespace apollo {
 namespace perception {
 
-HungarianOptimizer::HungarianOptimizer(const std::vector<std::vector<double> >& costs)
-    : _matrix_size(0),
-      _costs(),
-      _max_cost(0),
-      _rows_covered(),
-      _cols_covered(),
-      _marks(),
-      _stars_in_col(),
-      _preimage(),
-      _image(),
-      _zero_col(0),
-      _zero_row(0),
-      _width(0),
-      _height(0),
-      _state(NULL) {
+HungarianOptimizer::HungarianOptimizer(
+  const std::vector<std::vector<double> >& costs) :
+  _matrix_size(0),
+  _costs(),
+  _max_cost(0),
+  _rows_covered(),
+  _cols_covered(),
+  _marks(),
+  _stars_in_col(),
+  _preimage(),
+  _image(),
+  _zero_col(0),
+  _zero_row(0),
+  _width(0),
+  _height(0),
+  _state(NULL) {
   
-    _width = costs.size();
+  _width = costs.size();
 
-    if (_width > 0) {
-        _height = costs[0].size();
-    } else {
-        _height = 0;
+  if (_width > 0) {
+      _height = costs[0].size();
+  } else {
+      _height = 0;
+  }
+
+  _matrix_size = std::max(_width, _height);
+  _max_cost = 0;
+
+  // Generate the expanded cost matrix by adding extra 0-valued elements in
+  // order to make a square matrix.  At the same time, find the greatest cost
+  // in the matrix (used later if we want to maximize rather than minimize the
+  // overall cost.)
+  _costs.resize(_matrix_size);
+  for (int row = 0; row < _matrix_size; ++row) {
+    _costs[row].resize(_matrix_size);
+  }
+
+  for (int row = 0; row < _matrix_size; ++row) {
+    for (int col = 0; col < _matrix_size; ++col) {
+      if ((row >= _width) || (col >= _height)) {
+        _costs[row][col] = 0;
+      } else {
+        _costs[row][col] = costs[row][col];
+        _max_cost = std::max(_max_cost, _costs[row][col]);
+      }
     }
+  }
 
-    _matrix_size = std::max(_width, _height);
-    _max_cost = 0;
-
-    // Generate the expanded cost matrix by adding extra 0-valued elements in
-    // order to make a square matrix.  At the same time, find the greatest cost
-    // in the matrix (used later if we want to maximize rather than minimize the
-    // overall cost.)
-    _costs.resize(_matrix_size);
-    for (int row = 0; row < _matrix_size; ++row) {
-        _costs[row].resize(_matrix_size);
+  // Initially, none of the cells of the matrix are marked.
+  _marks.resize(_matrix_size);
+  for (int row = 0; row < _matrix_size; ++row) {
+    _marks[row].resize(_matrix_size);
+    for (int col = 0; col < _matrix_size; ++col) {
+      _marks[row][col] = NONE;
     }
+  }
 
-    for (int row = 0; row < _matrix_size; ++row) {
-        for (int col = 0; col < _matrix_size; ++col) {
-            if ((row >= _width) || (col >= _height)) {
-                _costs[row][col] = 0;
-            } else {
-                _costs[row][col] = costs[row][col];
-                _max_cost = std::max(_max_cost, _costs[row][col]);
-            }
-        }
-    }
+  _stars_in_col.resize(_matrix_size);
 
-    // Initially, none of the cells of the matrix are marked.
-    _marks.resize(_matrix_size);
-    for (int row = 0; row < _matrix_size; ++row) {
-        _marks[row].resize(_matrix_size);
-        for (int col = 0; col < _matrix_size; ++col) {
-            _marks[row][col] = NONE;
-        }
-    }
+  _rows_covered.resize(_matrix_size);
+  _cols_covered.resize(_matrix_size);
 
-    _stars_in_col.resize(_matrix_size);
-
-    _rows_covered.resize(_matrix_size);
-    _cols_covered.resize(_matrix_size);
-
-    _preimage.resize(_matrix_size * 2);
-    _image.resize(_matrix_size * 2);
-    
-    _uncov_col.resize(_matrix_size);
-    _uncov_row.resize(_matrix_size);
+  _preimage.resize(_matrix_size * 2);
+  _image.resize(_matrix_size * 2);
+  
+  _uncov_col.resize(_matrix_size);
+  _uncov_row.resize(_matrix_size);
 }
 
 // Find an assignment which maximizes the total cost.
@@ -78,227 +95,227 @@ HungarianOptimizer::HungarianOptimizer(const std::vector<std::vector<double> >& 
 void HungarianOptimizer::maximize(std::vector<int>* preimage, std::vector<int>* image) {
   // Find a maximal assignment by subtracting each of the
   // original costs from _max_cost  and then minimizing.
-    for (int row = 0; row < _width; ++row) {
-        for (int col = 0; col < _height; ++col) {
-            _costs[row][col] = _max_cost - _costs[row][col];
-        }
+  for (int row = 0; row < _width; ++row) {
+    for (int col = 0; col < _height; ++col) {
+      _costs[row][col] = _max_cost - _costs[row][col];
     }
-    minimize(preimage, image);
+  }
+  minimize(preimage, image);
 }
 
 // Find an assignment which minimizes the total cost.
 // Return an array of pairs of integers.  Each pair (i, j) corresponds to
 // assigning agent i to task j.
 void HungarianOptimizer::minimize(std::vector<int>* preimage, std::vector<int>* image) {
-    do_munkres();
-    find_assignments(preimage, image);
+  do_munkres();
+  find_assignments(preimage, image);
 }
 
 // Convert the final cost matrix into a set of assignments of agents -> tasks.
 // Return an array of pairs of integers, the same as the return values of
 // Minimize() and Maximize()
 void HungarianOptimizer::find_assignments(std::vector<int>* preimage,
-                                         std::vector<int>* image) {
-    preimage->clear();
-    image->clear();
-    for (int row = 0; row < _width; ++row) {
-        for (int col = 0; col < _height; ++col) {
-            if (is_starred(row, col)) {
-                preimage->push_back(row);
-                image->push_back(col);
-                break;
-            }
-        }
+  std::vector<int>* image) {
+  preimage->clear();
+  image->clear();
+  for (int row = 0; row < _width; ++row) {
+    for (int col = 0; col < _height; ++col) {
+      if (is_starred(row, col)) {
+        preimage->push_back(row);
+        image->push_back(col);
+        break;
+      }
     }
-    // TODO(user)
-    // result_size = std::min(_width, _height);
-    // CHECK image.size() == result_size
-    // CHECK preimage.size() == result_size
+  }
+  // TODO(user)
+  // result_size = std::min(_width, _height);
+  // CHECK image.size() == result_size
+  // CHECK preimage.size() == result_size
 }
 
 // Find a column in row 'row' containing a star, or return
 // kHungarianOptimizerColNotFound if no such column exists.
 int HungarianOptimizer::find_star_in_row(int row) const {
-    for (int col = 0; col < _matrix_size; ++col) {
-        if (is_starred(row, col)) {
-            return col;
-        }
+  for (int col = 0; col < _matrix_size; ++col) {
+    if (is_starred(row, col)) {
+      return col;
     }
+  }
 
-    return kHungarianOptimizerColNotFound;
+  return kHungarianOptimizerColNotFound;
 }
 
 // Find a row in column 'col' containing a star, or return
 // kHungarianOptimizerRowNotFound if no such row exists.
 int HungarianOptimizer::find_star_in_col(int col) const {
-    if (!col_contains_star(col)) {
-        return kHungarianOptimizerRowNotFound;
-    }
-
-    for (int row = 0; row < _matrix_size; ++row) {
-        if (is_starred(row, col)) {
-            return row;
-        }
-    }
-
-    // NOTREACHED
+  if (!col_contains_star(col)) {
     return kHungarianOptimizerRowNotFound;
+  }
+
+  for (int row = 0; row < _matrix_size; ++row) {
+    if (is_starred(row, col)) {
+      return row;
+    }
+  }
+
+  // NOTREACHED
+  return kHungarianOptimizerRowNotFound;
 }
 
 // Find a column in row containing a prime, or return
 // kHungarianOptimizerColNotFound if no such column exists.
 int HungarianOptimizer::find_prime_in_row(int row) const {
-    for (int col = 0; col < _matrix_size; ++col) {
-        if (is_primed(row, col)) {
-            return col;
-        }
+  for (int col = 0; col < _matrix_size; ++col) {
+    if (is_primed(row, col)) {
+      return col;
     }
+  }
 
-    return kHungarianOptimizerColNotFound;
+  return kHungarianOptimizerColNotFound;
 }
 
 // Remove the prime marks from every cell in the matrix.
 void HungarianOptimizer::clear_primes() {
-    for (int row = 0; row < _matrix_size; ++row) {
-        for (int col = 0; col < _matrix_size; ++col) {
-            if (is_primed(row, col)) {
-                _marks[row][col] = NONE;
-            }
-        }
+  for (int row = 0; row < _matrix_size; ++row) {
+    for (int col = 0; col < _matrix_size; ++col) {
+      if (is_primed(row, col)) {
+        _marks[row][col] = NONE;
+      }
     }
+  }
 }
 
 // Uncovery ever row and column in the matrix.
 void HungarianOptimizer::clear_covers() {
-    for (int x = 0; x < _matrix_size; x++) {
-        uncover_row(x);
-        uncover_col(x);
-    }
+  for (int x = 0; x < _matrix_size; x++) {
+    uncover_row(x);
+    uncover_col(x);
+  }
 }
 
 // Find the smallest uncovered cell in the matrix.
 double HungarianOptimizer::find_smallest_uncovered() {
-    double minval = std::numeric_limits<double>::max();
-    _uncov_col.clear();
-    _uncov_row.clear();
+  double minval = std::numeric_limits<double>::max();
+  _uncov_col.clear();
+  _uncov_row.clear();
 
-    for (int i = 0; i < _matrix_size; ++i) {
-        if (!row_covered(i)) {
-            _uncov_row.push_back(i);
-        }
-        if (!col_covered(i)) {
-            _uncov_col.push_back(i);
-        }
+  for (int i = 0; i < _matrix_size; ++i) {
+    if (!row_covered(i)) {
+      _uncov_row.push_back(i);
     }
-
-    for (int row = 0; row < _uncov_row.size(); ++row) {
-        for (int col = 0; col < _uncov_col.size(); ++col) {
-            minval = std::min(minval, _costs[_uncov_row[row]][_uncov_col[col]]);
-        }
+    if (!col_covered(i)) {
+      _uncov_col.push_back(i);
     }
+  }
 
-    return minval;
+  for (size_t row = 0; row < _uncov_row.size(); ++row) {
+    for (size_t col = 0; col < _uncov_col.size(); ++col) {
+      minval = std::min(minval, _costs[_uncov_row[row]][_uncov_col[col]]);
+    }
+  }
+
+  return minval;
 }
 
 // Find an uncovered zero and store its co-ordinates in (zeroRow, zeroCol)
 // and return true, or return false if no such cell exists.
 bool HungarianOptimizer::find_zero(int* zero_row, int* zero_col) {
-    _uncov_col.clear();
-    _uncov_row.clear();
+  _uncov_col.clear();
+  _uncov_row.clear();
 
-    for (int i = 0; i < _matrix_size; ++i) {
-        if (!row_covered(i)) {
-            _uncov_row.push_back(i);
-        }
-        if (!col_covered(i)) {
-            _uncov_col.push_back(i);
-        }
+  for (int i = 0; i < _matrix_size; ++i) {
+    if (!row_covered(i)) {
+      _uncov_row.push_back(i);
     }
-    if (_uncov_row.empty() || _uncov_col.empty()) {
-        return false;
+    if (!col_covered(i)) {
+      _uncov_col.push_back(i);
     }
-
-    for (int i = 0; i < _uncov_row.size(); ++i) {
-        for (int j = 0; j < _uncov_col.size(); ++j) {
-            if (_costs[_uncov_row[i]][_uncov_col[j]] == 0) {
-                *zero_row = _uncov_row[i];
-                *zero_col = _uncov_col[j];
-                return true;
-            }
-        }
-    }
+  }
+  if (_uncov_row.empty() || _uncov_col.empty()) {
     return false;
+  }
+
+  for (size_t i = 0; i < _uncov_row.size(); ++i) {
+    for (size_t j = 0; j < _uncov_col.size(); ++j) {
+      if (_costs[_uncov_row[i]][_uncov_col[j]] == 0) {
+        *zero_row = _uncov_row[i];
+        *zero_col = _uncov_col[j];
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 // Print the matrix to stdout (for debugging.)
 void HungarianOptimizer::print_matrix() {
-    for (int row = 0; row < _matrix_size; ++row) {
-        for (int col = 0; col < _matrix_size; ++col) {
-            printf("%g ", _costs[row][col]);
+  for (int row = 0; row < _matrix_size; ++row) {
+    for (int col = 0; col < _matrix_size; ++col) {
+      printf("%g ", _costs[row][col]);
 
-            if (is_starred(row, col)) {
-                printf("*");
-            }
+      if (is_starred(row, col)) {
+        printf("*");
+      }
 
-            if (is_primed(row, col)) {
-                printf("'");
-            }
-        }
-        printf("\n");
+      if (is_primed(row, col)) {
+        printf("'");
+      }
     }
+    printf("\n");
+  }
 }
 
 //  Run the Munkres algorithm!
 void HungarianOptimizer::do_munkres() {
-    int max_iter = 1000;
-    int iter_num = 0;
-    _state = &HungarianOptimizer::reduce_rows;
-    while (_state != NULL && iter_num < max_iter) {
-    // while (_state != NULL) {
-        (this->*_state)();
-        ++iter_num;
-    }
-    // std::cout << "do_munkres iterations: " << iter_num << std::endl;
-    if (iter_num >= max_iter) {
-        check_star();
-    }
+  int max_iter = 1000;
+  int iter_num = 0;
+  _state = &HungarianOptimizer::reduce_rows;
+  while (_state != NULL && iter_num < max_iter) {
+  // while (_state != NULL) {
+      (this->*_state)();
+      ++iter_num;
+  }
+  // std::cout << "do_munkres iterations: " << iter_num << std::endl;
+  if (iter_num >= max_iter) {
+      check_star();
+  }
 }
 
 void HungarianOptimizer::check_star() {
-    for (int row = 0; row < _width; ++row) {
-        int star_col = -1;
-        bool is_single = true;
-        for (int col = 0; col < _height; ++col) {
-            if (is_starred(row, col)) {
-                if (star_col == -1) {
-                    star_col = col;
-                } else {
-                    is_single = false;
-                    break;
-                }
-            }
+  for (int row = 0; row < _width; ++row) {
+    int star_col = -1;
+    bool is_single = true;
+    for (int col = 0; col < _height; ++col) {
+      if (is_starred(row, col)) {
+        if (star_col == -1) {
+          star_col = col;
+        } else {
+          is_single = false;
+          break;
         }
-        if (!is_single) {
-            for (int col = 0; col < _height; ++col) {
-                unstar(row, col);
-            }
-        }
+      }
     }
+    if (!is_single) {
+      for (int col = 0; col < _height; ++col) {
+        unstar(row, col);
+      }
+    }
+  }
 }
 // Step 1.
 // For each row of the matrix, find the smallest element and subtract it
 // from every element in its row.  Go to Step 2.
 void HungarianOptimizer::reduce_rows() {
-    for (int row = 0; row < _matrix_size; ++row) {
-        double min_cost = _costs[row][0];
-        for (int col = 1; col < _matrix_size; ++col) {
-            min_cost = std::min(min_cost, _costs[row][col]);
-        }
-        for (int col = 0; col < _matrix_size; ++col) {
-            _costs[row][col] -= min_cost;
-        }
+  for (int row = 0; row < _matrix_size; ++row) {
+    double min_cost = _costs[row][0];
+    for (int col = 1; col < _matrix_size; ++col) {
+      min_cost = std::min(min_cost, _costs[row][col]);
     }
-    _state = &HungarianOptimizer::star_zeroes;
+    for (int col = 0; col < _matrix_size; ++col) {
+      _costs[row][col] -= min_cost;
+    }
+  }
+  _state = &HungarianOptimizer::star_zeroes;
 }
 
 // Step 2.
@@ -486,5 +503,5 @@ void HungarianOptimizer::augment_path() {
     _state = &HungarianOptimizer::prime_zeroes;
 }
 
-}//namepsace perception
-}//namepsace apollo
+} // namepsace perception
+} // namepsace apollo
