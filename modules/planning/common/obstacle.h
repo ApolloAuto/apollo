@@ -44,6 +44,8 @@ class Obstacle {
 
   const std::string &Id() const;
 
+  bool IsStatic() const;
+
   common::TrajectoryPoint GetPointAtTime(const double time) const;
   common::math::Box2d GetBoundingBox(
       const common::TrajectoryPoint &point) const;
@@ -74,7 +76,10 @@ class Obstacle {
       std::list<std::unique_ptr<Obstacle>> *obstacles);
 
  private:
+  static bool IsStaticObstacle(
+      const perception::PerceptionObstacle &perception_obstacle);
   std::string id_;
+  bool is_static_;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
   // FIXME move out later
