@@ -8,13 +8,11 @@ cc_library(
         "qp_frenet_frame.cc",
         "qp_spline_path_generator.cc",
         "qp_spline_path_optimizer.cc",
-        "qp_spline_path_sampler.cc",
     ],
     hdrs = [
         "qp_frenet_frame.h",
         "qp_spline_path_generator.h",
         "qp_spline_path_optimizer.h",
-        "qp_spline_path_sampler.h",
     ],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -26,7 +24,7 @@ cc_library(
         "//modules/planning/common:decision_data",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_data",
-        "//modules/planning/common:planning_gflags",        
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/path:frenet_frame_path",
         "//modules/planning/common/path:path_data",
