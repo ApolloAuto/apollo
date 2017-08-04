@@ -66,8 +66,9 @@ StBoundaryMapper::StBoundaryMapper(
       planning_time_(planning_time) {}
 
 Status StBoundaryMapper::GetGraphBoundary(
-    const DecisionData& decision_data,
+    const PathDecision& path_decision,
     std::vector<StGraphBoundary>* const st_graph_boundaries) const {
+  const auto& path_obstacles = path_decision.path_obstacles();
   if (st_graph_boundaries == nullptr) {
     const std::string msg = "st_graph_boundaries is NULL.";
     AERROR << msg;
@@ -91,42 +92,33 @@ Status StBoundaryMapper::GetGraphBoundary(
   st_graph_boundaries->clear();
   Status ret = Status::OK();
 
-  // TODO: enable mapping for static obstacles.
-  /*
-  const auto& static_obs_vec = decision_data.StaticObstacles();
-  for (const auto* obs : static_obs_vec) {
-    ret = MapStopDecision(*obs, path_data_, planning_distance_,
-        planning_time_, st_graph_boundaries);
-    if (!ret.ok()) {
-      AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
-      return Status(ErrorCode::PLANNING_ERROR, "Fail to map static obstacle");
-    }
-  }
-  */
-
-  const auto& dynamic_obs_vec = decision_data.DynamicObstacles();
-  for (const auto* obs : dynamic_obs_vec) {
-    if (obs == nullptr) {
-      continue;
-    }
-    for (auto& obj_decision : obs->Decisions()) {
-      if (obj_decision.has_follow()) {
-        ret = MapObstacleWithoutPredictionTrajectory(*obs, obj_decision,
-                                                     st_graph_boundaries);
-        if (!ret.ok()) {
-          AERROR << "Fail to map follow dynamic obstacle with id " << obs->Id()
-                 << ".";
+  for (const auto path_obstacle : path_obstacles.Items()) {
+    const auto& obstacle = *path_obstacle->Obstacle();
+    for (const auto& decision : path_obstacle->Decisions()) {
+      StGraphBoundary boundary;
+      if (decision.has_follow()) {
+        const auto ret = MapFollowDecision(obstacle, decision, &boundary);
+        if (ret.ok()) {
+          AERROR << "Fail to map obstacle " << path_obstacle->Id()
+                 << " with follow decision: " << decision.DebugString();
           return Status(ErrorCode::PLANNING_ERROR,
-                        "Fail to map follow dynamic obstacle");
+                        "Fail to map follow decision");
         }
-      } else if (obj_decision.has_overtake() || obj_decision.has_yield()) {
-        ret = MapObstacleWithPredictionTrajectory(*obs, obj_decision,
-                                                  st_graph_boundaries);
+      } else if (decision.has_stop()) {
+        // TODO implement this function
+      } else if (decision.has_overtake() || decision.has_yield()) {
+        const auto ret = MapObstacleWithPredictionTrajectory(
+            obstacle, decision, st_graph_boundaries);
         if (!ret.ok()) {
-          AERROR << "Fail to map dynamic obstacle with id " << obs->Id() << ".";
-          // Return OK by intention.
-          return Status::OK();
+          AERROR << "Fail to map obstacle " << path_obstacle->Id()
+                 << " with decision: " << decision.DebugString();
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "Fail to map overtake/yield decision");
         }
+      } else {
+        AERROR << "could not map unkown decision type "
+               << decision.DebugString();
+        return Status(ErrorCode::PLANNING_ERROR, "unkown decision: ");
       }
     }
   }
@@ -134,7 +126,7 @@ Status StBoundaryMapper::GetGraphBoundary(
 }
 
 Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
-    const Obstacle& obstacle, const ObjectDecisionType obj_decision,
+    const Obstacle& obstacle, const ObjectDecisionType& obj_decision,
     std::vector<StGraphBoundary>* const boundary) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
@@ -264,12 +256,13 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
               : Status::OK();
 }
 
-Status StBoundaryMapper::MapObstacleWithoutPredictionTrajectory(
-    const Obstacle& obstacle, const ObjectDecisionType obj_decision,
-    std::vector<StGraphBoundary>* const boundary) const {
+Status StBoundaryMapper::MapFollowDecision(
+    const Obstacle& obstacle, const ObjectDecisionType& obj_decision,
+    StGraphBoundary* const boundary) const {
   if (!obj_decision.has_follow()) {
     std::string msg = common::util::StrCat(
-        "Map obstacle without prediction trajectory is ONLY supported when the "
+        "Map obstacle without prediction trajectory is ONLY supported when "
+        "the "
         "object decision is follow. The current object decision is: \n",
         obj_decision.DebugString());
     AERROR << msg;
@@ -330,7 +323,7 @@ Status StBoundaryMapper::MapObstacleWithoutPredictionTrajectory(
     AINFO << msg;
     return Status(ErrorCode::PLANNING_SKIP, msg);
   }
-  boundary->emplace_back(boundary_points);
+  *boundary = StGraphBoundary(boundary_points);
 
   const double characteristic_length =
       std::fmax(scalar_speed * speed_coeff *
@@ -339,9 +332,9 @@ Status StBoundaryMapper::MapObstacleWithoutPredictionTrajectory(
       vehicle_param_.front_edge_to_center() +
       st_boundary_config_.follow_buffer();
 
-  boundary->back().SetCharacteristicLength(characteristic_length *
-                                           st_boundary_config_.follow_coeff());
-  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
+  boundary->SetCharacteristicLength(characteristic_length *
+                                    st_boundary_config_.follow_coeff());
+  boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
   return Status::OK();
 }
 

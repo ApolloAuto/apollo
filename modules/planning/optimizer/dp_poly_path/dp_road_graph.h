@@ -26,8 +26,8 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/status/status.h"
-#include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
+#include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
@@ -49,10 +49,11 @@ class DPRoadGraph {
   bool FindPathTunnel(const ReferenceLine &reference_line,
                       PathData *const path_data);
 
-  bool ComputeObjectdecision(const PathData &path_data,
+  bool ComputeObjectDecision(const PathData &path_data,
                              const SpeedData &heuristic_speed_data,
                              const ReferenceLine &reference_line,
-                             DecisionData *const decision_data);
+                             const ConstObstacleList &obstacles,
+                             DecisionList *const decisions);
 
  private:
   /**
@@ -90,16 +91,10 @@ class DPRoadGraph {
   bool Generate(const ReferenceLine &reference_line,
                 std::vector<DPRoadGraphNode> *min_cost_path);
 
-  bool ComputeObjectDecisions(const PathData &path_data,
-                                         const SpeedData &heuristic_speed_data,
-                                         const ReferenceLine &reference_line,
-                                         DecisionData *const decision_data);
-
   bool ComputeBoundingBoxesForEgoVehicle(
       const FrenetFramePath &frenet_frame_path,
       const ReferenceLine &reference_line,
-      const SpeedData &heuristic_speed_data,
-      const std::size_t evaluate_times,
+      const SpeedData &heuristic_speed_data, const std::size_t evaluate_times,
       std::vector<common::math::Box2d> *ego_by_time);
 
   bool SamplePathWaypoints(
@@ -117,4 +112,4 @@ class DPRoadGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif //MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_
+#endif  // MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_

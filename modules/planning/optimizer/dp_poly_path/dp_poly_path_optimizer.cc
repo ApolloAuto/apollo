@@ -48,23 +48,33 @@ bool DpPolyPathOptimizer::Init() {
 Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
                                     const ReferenceLine &reference_line,
                                     const common::TrajectoryPoint &init_point,
-                                    DecisionData *const decision_data,
+                                    PathDecision *const path_decision,
                                     PathData *const path_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process().";
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
-  CHECK_NOTNULL(decision_data);
+  CHECK_NOTNULL(path_decision);
   CHECK_NOTNULL(path_data);
   DPRoadGraph dp_road_graph(config_, init_point, speed_data);
   if (!dp_road_graph.FindPathTunnel(reference_line, path_data)) {
     AERROR << "Failed to find tunnel in road graph";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph path generation");
   }
-  if (!dp_road_graph.ComputeObjectdecision(*path_data, speed_data,
-                                           reference_line, decision_data)) {
+  const auto &obstacles = frame_->GetObstacles().Items();
+  DecisionList decision_list;
+  if (!dp_road_graph.ComputeObjectDecision(
+          *path_data, speed_data, reference_line, obstacles, &decision_list)) {
     AERROR << "Failed to make decision based on tunnel";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
+  }
+  for (const auto &decision : decision_list) {
+    if (!path_decision->AddDecision("dp_poly_path", decision.first,
+                                    decision.second)) {
+      AERROR << "Failed to add decision for object: " << decision.first;
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "obstacles and PathDecision does not match");
+    }
   }
   return Status::OK();
 }

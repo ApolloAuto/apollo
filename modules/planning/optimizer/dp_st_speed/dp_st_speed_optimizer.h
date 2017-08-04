@@ -42,7 +42,7 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
   apollo::common::Status Process(const PathData& path_data,
                                  const common::TrajectoryPoint& init_point,
                                  const ReferenceLine& reference_line,
-                                 DecisionData* const decision_data,
+                                 PathDecision* const path_decision,
                                  SpeedData* const speed_data) override;
   DpStSpeedConfig dp_st_speed_config_;
   StBoundaryConfig st_boundary_config_;

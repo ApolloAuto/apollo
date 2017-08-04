@@ -43,7 +43,7 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
   common::Status Process(const PathData& path_data,
                          const apollo::common::TrajectoryPoint& init_point,
                          const ReferenceLine& reference_line,
-                         DecisionData* const decision_data,
+                         PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
 
   void RecordSTGraphDebug(const std::vector<StGraphBoundary>& boundaries,

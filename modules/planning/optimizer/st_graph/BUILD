@@ -63,7 +63,7 @@ cc_library(
         "//modules/common/status",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
-        "//modules/planning/common:decision_data",
+        "//modules/planning/common:path_decision",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",

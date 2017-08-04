@@ -29,7 +29,7 @@ cc_library(
     deps = [
         ":optimizer",
         "//modules/common/status",
-        "//modules/planning/common:decision_data",
+        "//modules/planning/common:path_decision",
         "//modules/planning/common:planning_data",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
@@ -48,7 +48,7 @@ cc_library(
     deps = [
         ":optimizer",
         "//modules/common/status",
-        "//modules/planning/common:decision_data",
+        "//modules/planning/common:path_decision",
         "//modules/planning/common:planning_data",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
