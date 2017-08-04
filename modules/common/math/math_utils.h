@@ -166,6 +166,12 @@ int DoubleCompare(
     const double d1, const double d2,
     const double epsilon = std::numeric_limits<double>::epsilon());
 
+// Gaussian
+double Gaussian(const double u, const double std, const double x);
+
+// Sigmoid
+double Sigmoid(const double x);
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

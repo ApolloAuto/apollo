@@ -87,6 +87,16 @@ int DoubleCompare(const double d1, const double d2, const double epsilon) {
     return 0;
   }
 }
+// Gaussian
+double Gaussian(const double u, const double std, const double x) {
+  return (1.0 / std::sqrt(2 * M_PI * std * std))
+      * std::exp(-(x - u) * (x - u) / (2 * std * std));
+}
+
+// Sigmoid
+double Sigmoid(const double x) {
+  return 1.0 / (1.0 + std::exp(-x));
+}
 
 }  // namespace math
 }  // namespace common
