@@ -54,6 +54,11 @@ TEST_F(MLPEvaluatorTest, OnLaneCase) {
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
+  const Feature& feature = obstacle_ptr->latest_feature();
+  const LaneGraph& lane_graph = feature.lane().lane_graph();
+  for (const auto& lane_sequence : lane_graph.lane_sequence()) {
+    EXPECT_TRUE(lane_sequence.has_probability());
+  }
 }
 
 }  // namespace prediction
