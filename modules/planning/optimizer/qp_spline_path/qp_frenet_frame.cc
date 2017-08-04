@@ -42,7 +42,7 @@ constexpr double kEpsilontol = 1e-6;
 }
 
 QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
-                             const std::vector<const Obstacle*>& obstacles,
+                             const ConstObstacleList& obstacles,
                              const SpeedData& speed_data,
                              const common::FrenetFramePoint& init_frenet_point,
                              const double start_s, const double end_s,
