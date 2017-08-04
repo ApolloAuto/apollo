@@ -18,12 +18,14 @@
 
 #include <algorithm>
 
+#include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace dreamview {
 
 using ::apollo::common::PointENU;
+using ::apollo::common::util::DownSampleByAngle;
 using ::apollo::hdmap::Map;
 using ::apollo::hdmap::Id;
 using ::apollo::hdmap::LaneInfoConstPtr;
@@ -228,10 +230,13 @@ bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
     AERROR << "Unable to get points from routing!";
     return false;
   }
-  for (const auto &point : path.path_points()) {
-    points->push_back(point);
+
+  std::vector<int> sampled_indices;
+  constexpr double angle_threshold = 0.1; // threshold is about 5.72 degree.
+  DownSampleByAngle(path.path_points(), angle_threshold, &sampled_indices);
+  for (int index : sampled_indices) {
+    points->push_back(path.path_points()[index]);
   }
-  // TODO(siyangy): Add downsampling points
 
   return true;
 }

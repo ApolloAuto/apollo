@@ -112,9 +112,9 @@ cc_test(
 )
 
 cc_library(
-    name = "down_sampler",
+    name = "points_downsampler",
     hdrs = [
-        "down_sampler.h",
+        "points_downsampler.h",
     ],
     deps = [
         "//modules/common:log",
@@ -122,13 +122,13 @@ cc_library(
 )
 
 cc_test(
-    name = "down_sampler_test",
+    name = "points_downsampler_test",
     size = "small",
     srcs = [
-        "down_sampler_test.cc",
+        "points_downsampler_test.cc",
     ],
     deps = [
-        "//modules/common/util:down_sampler",
+        ":points_downsampler",
         "//modules/common/math:vec2d",
         "@gtest//:main",
     ],
