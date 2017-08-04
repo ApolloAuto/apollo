@@ -32,7 +32,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 #include "modules/planning/math/sl_analytic_transformation.h"
-#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_sampler.h"
 
 namespace apollo {
 namespace planning {
