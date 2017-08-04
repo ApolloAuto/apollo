@@ -39,7 +39,7 @@ DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config)
     : dp_st_speed_config_(dp_config), dp_st_cost_(dp_config) {}
 
 Status DpStGraph::Search(const StGraphData& st_graph_data,
-                         DecisionData* const decision_data,
+                         PathDecision* const path_decision,
                          SpeedData* const speed_data, Obstacles* table) {
   init_point_ = st_graph_data.init_point();
 

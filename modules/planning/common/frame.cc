@@ -72,25 +72,15 @@ void Frame::CreatePredictionObstacles(
   std::list<std::unique_ptr<Obstacle> > obstacles;
   Obstacle::CreateObstacles(prediction, &obstacles);
   for (auto &ptr : obstacles) {
-    mutable_planning_data()->mutable_decision_data()->AddObstacle(ptr.get());
     obstacles_.Add(ptr->Id(), std::move(ptr));
   }
-}
-
-bool Frame::AddDecision(const std::string &tag, const std::string &object_id,
-                        const ObjectDecisionType &decision) {
-  auto *path_obstacle = path_obstacles_.Find(object_id);
-  if (!path_obstacle) {
-    AERROR << "failed to find obstacle";
-    return false;
-  }
-  path_obstacle->AddDecision(tag, decision);
-  return true;
 }
 
 const ADCTrajectory &Frame::GetADCTrajectory() const { return trajectory_pb_; }
 
 ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
+
+PathDecision *Frame::path_decision() { return path_decision_.get(); }
 
 bool Frame::Init() {
   if (!pnc_map_) {
@@ -115,6 +105,9 @@ bool Frame::Init() {
   if (FLAGS_enable_prediction) {
     CreatePredictionObstacles(prediction_);
   }
+
+  path_decision_ = common::util::make_unique<PathDecision>(obstacles_.Items(),
+                                                           reference_line_);
 
   if (FLAGS_enable_traffic_decision) {
     MakeTrafficDecision(routing_result_, reference_line_);

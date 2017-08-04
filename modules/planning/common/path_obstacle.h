@@ -37,6 +37,9 @@
 namespace apollo {
 namespace planning {
 
+// a commonly used type to store Object Id and Object Decisions
+using DecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
+
 /**
  * @class PathObstacle
  * @brief This is the class that associates an Obstacle with its path
@@ -46,8 +49,6 @@ namespace planning {
  */
 class PathObstacle {
  public:
-  PathObstacle() = default;
-
   PathObstacle(const planning::Obstacle* obstacle,
                const ReferenceLine* reference_line);
 

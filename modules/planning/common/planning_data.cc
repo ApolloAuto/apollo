@@ -29,19 +29,6 @@
 namespace apollo {
 namespace planning {
 
-const DecisionData& PlanningData::decision_data() const {
-  return *decision_data_.get();
-}
-
-DecisionData* PlanningData::mutable_decision_data() const {
-  return decision_data_.get();
-}
-
-void PlanningData::set_decision_data(
-    std::shared_ptr<DecisionData>& decision_data) {
-  decision_data_ = decision_data;
-}
-
 const PathData& PlanningData::path_data() const { return path_data_; }
 
 const SpeedData& PlanningData::speed_data() const { return speed_data_; }

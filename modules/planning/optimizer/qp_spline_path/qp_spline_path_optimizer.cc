@@ -47,7 +47,7 @@ bool QpSplinePathOptimizer::Init() {
 Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
                                       const ReferenceLine& reference_line,
                                       const common::TrajectoryPoint& init_point,
-                                      DecisionData* const decision_data,
+                                      PathDecision* const path_decision,
                                       PathData* const path_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process.";

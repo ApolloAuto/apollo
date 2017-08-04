@@ -27,12 +27,13 @@
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/localization/proto/pose.pb.h"
+
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -42,7 +43,6 @@ namespace apollo {
 namespace planning {
 
 using Obstacles = IndexedList<std::string, Obstacle>;
-using PathObstacles = IndexedList<std::string, PathObstacle>;
 
 class Frame {
  public:
@@ -54,9 +54,6 @@ class Frame {
   void SetVehicleInitPose(const localization::Pose &pose);
   const common::TrajectoryPoint &PlanningStartPoint() const;
   bool Init();
-
-  bool AddDecision(const std::string &tag, const std::string &object_id,
-                   const ObjectDecisionType &decision);
 
   static const hdmap::PncMap *PncMap();
   static void SetMap(hdmap::PncMap *pnc_map);
@@ -77,6 +74,8 @@ class Frame {
 
   void set_computed_trajectory(const PublishableTrajectory &trajectory);
   const PublishableTrajectory &computed_trajectory() const;
+
+  PathDecision *path_decision();
 
   void RecordInputDebug();
 
@@ -131,7 +130,7 @@ class Frame {
   routing::RoutingResponse routing_result_;
   prediction::PredictionObstacles prediction_;
   Obstacles obstacles_;
-  PathObstacles path_obstacles_;
+  std::unique_ptr<PathDecision> path_decision_;
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
   PublishableTrajectory _computed_trajectory;

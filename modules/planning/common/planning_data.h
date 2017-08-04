@@ -27,7 +27,6 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -39,12 +38,6 @@ namespace planning {
 class PlanningData {
  public:
   PlanningData() = default;
-
-  void set_decision_data(std::shared_ptr<DecisionData>& decision_data);
-
-  const DecisionData& decision_data() const;
-
-  DecisionData* mutable_decision_data() const;
 
   const PathData& path_data() const;
   const SpeedData& speed_data() const;
@@ -61,7 +54,6 @@ class PlanningData {
   std::string DebugString() const;
 
  protected:
-  std::shared_ptr<DecisionData> decision_data_ = nullptr;
   PathData path_data_;
   SpeedData speed_data_;
   double timestamp_ = 0.0;

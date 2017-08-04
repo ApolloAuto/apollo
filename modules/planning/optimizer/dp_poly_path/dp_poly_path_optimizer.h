@@ -40,7 +40,7 @@ class DpPolyPathOptimizer : public PathOptimizer {
   apollo::common::Status Process(
       const SpeedData &speed_data, const ReferenceLine &reference_line,
       const common::TrajectoryPoint &init_point,
-      DecisionData *const decision_data, PathData *const path_data) override;
+      PathDecision *const path_decision, PathData *const path_data) override;
 
  private:
   DpPolyPathConfig config_;

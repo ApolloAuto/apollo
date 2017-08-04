@@ -15,42 +15,45 @@
  *****************************************************************************/
 
 /**
- * @file decision_data.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_DECISION_DATA_H_
-#define MODULES_PLANNING_COMMON_DECISION_DATA_H_
+#ifndef MODULES_PLANNING_COMMON_PATH_DECISION_H_
+#define MODULES_PLANNING_COMMON_PATH_DECISION_H_
 
 #include <list>
 #include <vector>
 
+#include "modules/planning/proto/decision.pb.h"
+
+#include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 
 namespace apollo {
 namespace planning {
 
-class DecisionData {
+using PathObstacles = IndexedList<std::string, PathObstacle>;
+
+class PathDecision {
  public:
-  DecisionData() = default;
+  PathDecision(const std::vector<const Obstacle *> &obstacles,
+               const ReferenceLine &reference_line);
 
-  const DecisionResult &Decision() const;
-  DecisionResult *MutableDecision();
+  const PathObstacles &path_obstacles() const;
 
-  const std::vector<Obstacle *> &Obstacles() const;
-  const std::vector<Obstacle *> &StaticObstacles() const;
-  const std::vector<Obstacle *> &DynamicObstacles() const;
-  std::vector<Obstacle *> *MutableStaticObstacles();
-  std::vector<Obstacle *> *MutableDynamicObstacles();
-  void AddObstacle(Obstacle *obstacle);
+  bool AddDecision(const std::string &tag, const std::string &object_id,
+                   const ObjectDecisionType &decision);
 
  private:
-  DecisionResult decision_;
-  std::vector<Obstacle *> obstacles_;
-  std::vector<Obstacle *> static_obstacles_;
-  std::vector<Obstacle *> dynamic_obstacles_;
+  void Init(const std::vector<const Obstacle *> &obstacles);
+
+ private:
+  const ReferenceLine &reference_line_;
+  PathObstacles path_obstacles_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_DECISION_DATA_H_
+#endif  // MODULES_PLANNING_COMMON_PATH_DECISION_H_

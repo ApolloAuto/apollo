@@ -3,19 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "decision_data",
-    srcs = [
-        "decision_data.cc",
-    ],
-    hdrs = [
-        "decision_data.h",
-    ],
-    deps = [
-        "//modules/planning/common:obstacle",
-    ],
-)
-
-cc_library(
     name = "indexed_list",
     hdrs = [
         "indexed_list.h",
@@ -62,6 +49,38 @@ cc_library(
 )
 
 cc_library(
+    name = "planning_util",
+    srcs = [
+        "planning_util.cc",
+    ],
+    hdrs = [
+        "planning_util.h",
+    ],
+    deps = [
+        "//modules/common/math",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/planning/math:hermite_spline",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
+cc_library(
+    name = "path_decision",
+    srcs = [
+        "path_decision.cc",
+    ],
+    hdrs = [
+        "path_decision.h",
+    ],
+    deps = [
+        ":indexed_list",
+        ":obstacle",
+        ":path_obstacle",
+        "//modules/planning/reference_line",
+    ],
+)
+
+cc_library(
     name = "planning_gflags",
     srcs = [
         "planning_gflags.cc",
@@ -83,7 +102,6 @@ cc_library(
         "planning_data.h",
     ],
     deps = [
-        ":decision_data",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/map/proto:map_proto",
@@ -108,12 +126,13 @@ cc_library(
         ":indexed_list",
         ":indexed_queue",
         ":obstacle",
+        ":path_decision",
         ":path_obstacle",
+        ":planning_data",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/vehicle_state",
         "//modules/map/pnc_map",
-        "//modules/planning/common:planning_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:planning_proto",
@@ -160,22 +179,6 @@ cc_library(
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
         "@eigen//:eigen",
-    ],
-)
-
-cc_library(
-    name = "planning_util",
-    srcs = [
-        "planning_util.cc",
-    ],
-    hdrs = [
-        "planning_util.h",
-    ],
-    deps = [
-        "//modules/common/math",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/math:hermite_spline",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 

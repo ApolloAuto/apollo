@@ -28,7 +28,7 @@
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
-#include "modules/planning/common/decision_data.h"
+#include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
@@ -43,7 +43,7 @@ class DpStGraph {
   explicit DpStGraph(const DpStSpeedConfig& dp_config);
 
   apollo::common::Status Search(const StGraphData& st_graph_data,
-                                DecisionData* const decision_data,
+                                PathDecision* const path_decision,
                                 SpeedData* const speed_data,
                                 Obstacles* table);
 

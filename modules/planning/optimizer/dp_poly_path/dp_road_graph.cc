@@ -164,7 +164,7 @@ bool DPRoadGraph::Init(const ReferenceLine &reference_line) {
 }
 
 bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
-                                 std::vector<DPRoadGraphNode> *min_cost_path) {
+                           std::vector<DPRoadGraphNode> *min_cost_path) {
   CHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
@@ -173,7 +173,7 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
     return false;
   }
   path_waypoints.insert(path_waypoints.begin(),
-      std::vector<common::SLPoint>{init_sl_point_});
+                        std::vector<common::SLPoint>{init_sl_point_});
 
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
@@ -188,18 +188,18 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
     const auto &prev_dp_nodes = graph_nodes[level - 1];
     const auto &level_points = path_waypoints[level];
     for (std::size_t i = 0; i < level_points.size(); ++i) {
-      const auto& cur_point = level_points[i];
+      const auto &cur_point = level_points[i];
       graph_nodes[level].push_back(DPRoadGraphNode(cur_point, nullptr));
-      auto& cur_node = graph_nodes[level].back();
+      auto &cur_node = graph_nodes[level].back();
       for (std::size_t j = 0; j < prev_dp_nodes.size(); ++j) {
-        const auto& prev_dp_node = prev_dp_nodes[j];
-        const auto& prev_sl_point = prev_dp_node.sl_point;
+        const auto &prev_dp_node = prev_dp_nodes[j];
+        const auto &prev_sl_point = prev_dp_node.sl_point;
         QuinticPolynomialCurve1d curve(prev_sl_point.l(), 0.0, 0.0,
                                        cur_point.l(), 0.0, 0.0,
                                        cur_point.s() - prev_sl_point.s());
-        const double cost = trajectory_cost.calculate(curve, prev_sl_point.s(),
-                                                      cur_point.s()) +
-                            prev_dp_node.min_cost;
+        const double cost =
+            trajectory_cost.calculate(curve, prev_sl_point.s(), cur_point.s()) +
+            prev_dp_node.min_cost;
         cur_node.UpdateCost(&prev_dp_node, curve, cost);
       }
     }
@@ -223,14 +223,12 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
   return true;
 }
 
-bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
+bool DPRoadGraph::ComputeObjectDecision(const PathData &path_data,
                                         const SpeedData &heuristic_speed_data,
                                         const ReferenceLine &reference_line,
-                                        DecisionData *const decision_data) {
-  CHECK_NOTNULL(decision_data);
-
-  // Compute static obstacle decision
-  auto ptr_static_obstacles = decision_data->MutableStaticObstacles();
+                                        const ConstObstacleList &obstacles,
+                                        DecisionList *const decisions) {
+  CHECK_NOTNULL(decisions);
 
   std::vector<common::SLPoint> ego_sl_points;
   std::vector<common::math::Box2d> ego_bounding_box;
@@ -243,8 +241,8 @@ bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
   for (const common::PathPoint &path_point :
        path_data.discretized_path().points()) {
     ego_bounding_box.emplace_back(
-        common::math::Vec2d{path_point.x(), path_point.y()},
-        path_point.theta(), ego_length, ego_width);
+        common::math::Vec2d{path_point.x(), path_point.y()}, path_point.theta(),
+        ego_length, ego_width);
     common::SLPoint ego_sl;
     if (!reference_line.get_point_in_frenet_frame(
             {path_point.x(), path_point.y()}, &ego_sl)) {
@@ -255,12 +253,14 @@ bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
     }
   }
 
-  for (std::size_t i = 0; i < ptr_static_obstacles->size(); ++i) {
+  for (const auto obstacle : obstacles) {
+    if (!obstacle->IsStatic()) {
+      continue;
+    }
     bool ignore = true;
-    const auto &static_obstacle_box =
-        (*ptr_static_obstacles)[i]->PerceptionBoundingBox();
-
+    const auto &static_obstacle_box = obstacle->PerceptionBoundingBox();
     common::SLPoint obs_sl;
+
     if (!reference_line.get_point_in_frenet_frame(
             {static_obstacle_box.center_x(), static_obstacle_box.center_y()},
             &obs_sl)) {
@@ -280,7 +280,7 @@ bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
           object_stop_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
           object_stop_ptr->set_reason_code(
               StopReasonCode::STOP_REASON_OBSTACLE);
-          (*ptr_static_obstacles)[i]->MutableDecisions()->push_back(object_stop);
+          decisions->push_back(std::make_pair(obstacle->Id(), object_stop));
           ignore = false;
           break;
         } else {
@@ -291,7 +291,7 @@ bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
             object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
             object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
-            (*ptr_static_obstacles)[i]->MutableDecisions()->push_back(object_nudge);
+            decisions->push_back(std::make_pair(obstacle->Id(), object_nudge));
             ignore = false;
             break;
           } else if (diff_l < 0 &&
@@ -301,7 +301,7 @@ bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
             object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
             object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
-            (*ptr_static_obstacles)[i]->MutableDecisions()->push_back(object_nudge);
+            decisions->push_back(std::make_pair(obstacle->Id(), object_nudge));
             ignore = false;
             break;
           }
@@ -311,33 +311,34 @@ bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
     if (ignore) {
       // IGNORE
       ObjectDecisionType object_ignore;
-      ObjectIgnore *object_ignore_ptr = object_ignore.mutable_ignore();
-      CHECK_NOTNULL(object_ignore_ptr);
-      (*ptr_static_obstacles)[i]->MutableDecisions()->push_back(object_ignore);
+      object_ignore.mutable_ignore();
+      decisions->push_back(std::make_pair(obstacle->Id(), object_ignore));
     }
   }
 
   // Compute dynamic obstacle decision
-  auto ptr_dynamic_obstacles = decision_data->MutableDynamicObstacles();
   const double total_time =
       std::min(heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
   std::size_t evaluate_times = static_cast<std::size_t>(
       std::floor(total_time / config_.eval_time_interval()));
-  for (std::size_t i = 0; i < ptr_dynamic_obstacles->size(); ++i) {
-    auto ptr_dynamic_obstacle = (*ptr_dynamic_obstacles)[i];
+  for (const auto obstacle : obstacles) {
+    if (obstacle->IsStatic()) {
+      continue;
+    }
 
     // list of Box2d for ego car given heuristic speed profile
     std::vector<common::math::Box2d> ego_by_time;
-    if (!ComputeBoundingBoxesForEgoVehicle(path_data.frenet_frame_path(), reference_line,
-                          heuristic_speed_data, evaluate_times, &ego_by_time)) {
+    if (!ComputeBoundingBoxesForEgoVehicle(path_data.frenet_frame_path(),
+                                           reference_line, heuristic_speed_data,
+                                           evaluate_times, &ego_by_time)) {
       AERROR << "fill_ego_by_time error";
     }
 
     std::vector<common::math::Box2d> obstacle_by_time;
     for (std::size_t time = 0; time <= evaluate_times; ++time) {
       auto traj_point =
-          ptr_dynamic_obstacle->GetPointAtTime(time * config_.eval_time_interval());
-      obstacle_by_time.push_back(ptr_dynamic_obstacle->GetBoundingBox(traj_point));
+          obstacle->GetPointAtTime(time * config_.eval_time_interval());
+      obstacle_by_time.push_back(obstacle->GetBoundingBox(traj_point));
     }
 
     // if two lists of boxes collide
@@ -354,9 +355,9 @@ bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
           FLAGS_dynamic_decision_follow_range) {
         // Follow
         ObjectDecisionType object_follow;
-        auto ptr_object_follow = object_follow.mutable_follow();
-        ptr_object_follow->set_distance_s(FLAGS_dp_path_decision_buffer);
-        (*ptr_dynamic_obstacles)[i]->MutableDecisions()->push_back(object_follow);
+        ObjectFollow *object_follow_ptr = object_follow.mutable_follow();
+        object_follow_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
+        decisions->push_back(std::make_pair(obstacle->Id(), object_follow));
         break;
       }
     }
@@ -366,11 +367,9 @@ bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
 
 bool DPRoadGraph::ComputeBoundingBoxesForEgoVehicle(
     const FrenetFramePath &frenet_frame_path,
-    const ReferenceLine &reference_line,
-    const SpeedData &heuristic_speed_data,
+    const ReferenceLine &reference_line, const SpeedData &heuristic_speed_data,
     const std::size_t evaluate_times,
     std::vector<common::math::Box2d> *ego_boxes) {
-
   CHECK(ego_boxes != nullptr);
 
   const auto &vehicle_config =
@@ -407,7 +406,8 @@ bool DPRoadGraph::ComputeBoundingBoxesForEgoVehicle(
     double theta = ::apollo::common::math::NormalizeAngle(
         delta_theta + reference_point.heading());
 
-    ego_boxes->emplace_back(ego_position_cartesian, theta, ego_length, ego_width);
+    ego_boxes->emplace_back(ego_position_cartesian, theta, ego_length,
+                            ego_width);
   }
   return true;
 }
