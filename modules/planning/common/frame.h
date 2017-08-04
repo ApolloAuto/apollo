@@ -54,6 +54,9 @@ class Frame {
   const common::TrajectoryPoint &PlanningStartPoint() const;
   bool Init();
 
+  void AddDecision(const std::string &tag, const std::string &object_id,
+                   const ObjectDecisionType &decision);
+
   static const hdmap::PncMap *PncMap();
   static void SetMap(hdmap::PncMap *pnc_map);
 
