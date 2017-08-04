@@ -55,7 +55,7 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
   }
   QpSplinePathGenerator path_generator(reference_line, qp_spline_path_config_);
 
-  if (!path_generator.generate(*decision_data, speed_data, init_point,
+  if (!path_generator.Generate(*decision_data, speed_data, init_point,
                                path_data)) {
     const std::string msg = "failed to generate spline path!";
     AERROR << msg;
