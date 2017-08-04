@@ -115,7 +115,7 @@ function apollo_build() {
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
   echo "$BUILD_TARGETS"
-  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg
+  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
@@ -123,7 +123,8 @@ function apollo_build() {
   fi
   #build python proto
   chmod -R +w bazel-genfiles/modules
-  find modules/ -name "*.proto" | grep -v gnss | xargs protoc --python_out=bazel-genfiles
+  PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
+  find modules/ -name "*.proto" | grep -v gnss | xargs ${PROTOC} --python_out=bazel-genfiles
   find bazel-genfiles/* -type d -exec touch "{}/__init__.py" \;
   if [ -d "/root/conf" ];then
     sudo cp -r /root/conf bazel-apollo/external/ros/share/gnss_driver/
@@ -285,7 +286,7 @@ function run_test() {
   # FIXME(all): when all unit test passed, switch back.
   # bazel test --config=unit_test -c dbg //...
   generate_test_targets_dbg
-  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings
+  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
   RES1=$?
   if [ $RES1 -ne 0 ]; then
       fail "Test failed!"
@@ -295,7 +296,7 @@ function run_test() {
   generate_test_targets_opt
   build_caffe_opt
   run_ldconfig
-  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --test_verbose_timeout_warnings
+  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --test_verbose_timeout_warnings --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
   RES2=$?
   if [ $RES2 -eq 0 ]; then
     success 'Test passed!'

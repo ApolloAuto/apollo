@@ -19,7 +19,7 @@ cc_library(
     hdrs = ["restful_client.h"],
     deps = [
         "//modules/common:log",
-        "@com_google_protobuf_cc//:protobuf",
+        "@com_google_protobuf//:protobuf",
         "@curlpp//:curlpp",
         "@glog//:glog",
     ],
