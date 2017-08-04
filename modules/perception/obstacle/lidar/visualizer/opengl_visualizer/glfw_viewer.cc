@@ -116,8 +116,6 @@ bool GLFWViewer::initialize(){
     show_velocity = 1;
     show_polygon = 0;
     show_text = 1;
-
-
     return true;
 }
 
@@ -438,12 +436,15 @@ bool GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_
 
    	tracked_objects = content->get_tracked_objects();
 
+    std::cout<<"tracked objects size "<<tracked_objects.size()<<std::endl;
+
     for (size_t i = 0; i < tracked_objects.size(); ++i) {
         objects.push_back(tracked_objects[i]);
     }
 
 	float rgb[3];
 	if (draw_cube){
+        std::cout<<"draw cube enabled with objects size"<< objects.size()<<std::endl;
 		float verts[8][3];
 		int i = 0;
 		vec3 center;//x,y,z
@@ -461,6 +462,8 @@ bool GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_
 			size.x = objects[i]->length;             
             size.y = objects[i]->width;              
             size.z = objects[i]->height;
+
+            std::cout<<"objects info "<<objects[i]->ToString()<<std::endl;
 
 			float x1 = size.x/2;
             float x2 = 0 - x1;
