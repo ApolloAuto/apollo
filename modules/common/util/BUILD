@@ -111,4 +111,27 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "down_sampler",
+    hdrs = [
+        "down_sampler.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
+cc_test(
+    name = "down_sampler_test",
+    size = "small",
+    srcs = [
+        "down_sampler_test.cc",
+    ],
+    deps = [
+        "//modules/common/util:down_sampler",
+        "//modules/common/math:vec2d",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
