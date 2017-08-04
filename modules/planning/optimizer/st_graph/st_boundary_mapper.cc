@@ -86,30 +86,11 @@ Status StBoundaryMapper::GetGraphBoundary(
   st_graph_boundaries->clear();
   Status ret = Status::OK();
 
-  const auto& main_decision = decision_data.Decision().main_decision();
-  if (main_decision.has_stop()) {
-    ret = MapMainDecisionStop(main_decision.stop(), planning_distance,
-                              planning_time, st_graph_boundaries);
-    if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
-      return Status(ErrorCode::PLANNING_ERROR);
-    }
-  } else if (main_decision.has_mission_complete()) {
-    ret = MapMissionComplete(planning_distance, planning_time,
-                             st_graph_boundaries);
-    if (!ret.ok() && ret.code() != ErrorCode::PLANNING_SKIP) {
-      return Status(ErrorCode::PLANNING_ERROR);
-    }
-  }
-
   // TODO: enable mapping for static obstacles.
   /*
   const auto& static_obs_vec = decision_data.StaticObstacles();
   for (const auto* obs : static_obs_vec) {
-    if (obs == nullptr) {
-      continue;
-    }
-    ret = MapObstacleWithoutPredictionTrajectory(
-         *obs, path_data, planning_distance,
+    ret = MapStopDecision(*obs, path_data, planning_distance,
         planning_time, st_graph_boundaries);
     if (!ret.ok()) {
       AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
@@ -146,88 +127,6 @@ Status StBoundaryMapper::GetGraphBoundary(
       }
     }
   }
-  return Status::OK();
-}
-
-Status StBoundaryMapper::MapMainDecisionStop(
-    const MainStop& main_stop, const double planning_distance,
-    const double planning_time,
-    std::vector<StGraphBoundary>* const boundary) const {
-  const auto lane_id =
-      common::util::MakeMapId(main_stop.enforced_line().lane_id());
-  const auto lane_info = Frame::PncMap()->HDMap()->get_lane_by_id(lane_id);
-  const auto& map_point =
-      lane_info->get_smooth_point(main_stop.enforced_line().distance_s());
-  SLPoint sl_point;
-  if (!reference_line_.get_point_in_frenet_frame(
-          Vec2d(map_point.x(), map_point.y()), &sl_point)) {
-    AERROR << "Fail to MapMainDecisionStop since get_point_in_frenet_frame "
-              "failed.";
-    return Status(ErrorCode::PLANNING_ERROR);
-  }
-  sl_point.set_s(sl_point.s() - FLAGS_backward_routing_distance);
-  const double stop_rear_center_s = sl_point.s() -
-                                    FLAGS_decision_valid_stop_range -
-                                    vehicle_param_.front_edge_to_center();
-  if (Double::compare(stop_rear_center_s, 0.0) < 0) {
-    AERROR << common::util::StrCat(
-        "Fail to map main_decision_stop since stop_rear_center_s[",
-        stop_rear_center_s, "] behind adc.");
-  } else {
-    if (stop_rear_center_s >=
-        reference_line_.length() - FLAGS_backward_routing_distance) {
-      AWARN << common::util::StrCat(
-          "Skip to MapMainDecisionStop since stop_rear_center_s[",
-          stop_rear_center_s, "] > path length[", reference_line_.length(),
-          "].");
-      return Status(ErrorCode::PLANNING_SKIP);
-    }
-  }
-  const double s_min = (stop_rear_center_s > 0.0 ? stop_rear_center_s : 0.0);
-  const double s_max = std::fmax(
-      s_min + 1.0, std::fmax(planning_distance, reference_line_.length()));
-
-  std::vector<STPoint> boundary_points;
-  boundary_points.emplace_back(s_min, 0.0);
-  boundary_points.emplace_back(s_min, planning_time);
-  boundary_points.emplace_back(s_max + st_boundary_config_.boundary_buffer(),
-                               planning_time);
-  boundary_points.emplace_back(s_max, 0.0);
-
-  const double area = GetArea(boundary_points);
-  if (Double::compare(area, 0.0) <= 0) {
-    return Status(ErrorCode::PLANNING_SKIP);
-  }
-  boundary->emplace_back(boundary_points);
-  boundary->back().SetCharacteristicLength(
-      st_boundary_config_.boundary_buffer());
-  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::STOP);
-  return Status::OK();
-}
-
-Status StBoundaryMapper::MapMissionComplete(
-    const double planning_distance, const double planning_time,
-    std::vector<StGraphBoundary>* const boundary) const {
-  const double s_min = st_boundary_config_.success_tunnel();
-  const double s_max =
-      std::fmin(planning_distance,
-                reference_line_.length() - FLAGS_backward_routing_distance);
-
-  std::vector<STPoint> boundary_points;
-  boundary_points.emplace_back(s_min, 0.0);
-  boundary_points.emplace_back(s_max, 0.0);
-  boundary_points.emplace_back(s_max + st_boundary_config_.boundary_buffer(),
-                               planning_time);
-  boundary_points.emplace_back(s_min, planning_time);
-
-  const double area = GetArea(boundary_points);
-  if (Double::compare(area, 0.0) <= 0) {
-    return Status(ErrorCode::PLANNING_SKIP);
-  }
-  boundary->emplace_back(boundary_points);
-  boundary->back().SetCharacteristicLength(
-      st_boundary_config_.boundary_buffer());
-  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::STOP);
   return Status::OK();
 }
 
