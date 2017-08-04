@@ -18,8 +18,8 @@
  * @file dp_road_graph.h
  **/
 
-#ifndef MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H
-#define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H
+#ifndef MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_
+#define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_
 
 #include <vector>
 
@@ -90,11 +90,17 @@ class DPRoadGraph {
   bool Generate(const ReferenceLine &reference_line,
                 std::vector<DPRoadGraphNode> *min_cost_path);
 
-  bool fill_ego_by_time(
+  bool ComputeObjectDecisions(const PathData &path_data,
+                                         const SpeedData &heuristic_speed_data,
+                                         const ReferenceLine &reference_line,
+                                         DecisionData *const decision_data);
+
+  bool ComputeBoundingBoxesForEgoVehicle(
       const FrenetFramePath &frenet_frame_path,
       const ReferenceLine &reference_line,
-      const SpeedData &heuristic_speed_data, int evaluate_times,
-      std::vector<::apollo::common::math::Box2d> *ego_by_time);
+      const SpeedData &heuristic_speed_data,
+      const std::size_t evaluate_times,
+      std::vector<common::math::Box2d> *ego_by_time);
 
   bool SamplePathWaypoints(
       const ReferenceLine &reference_line,
@@ -111,4 +117,4 @@ class DPRoadGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H
+#endif //MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_
