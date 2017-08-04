@@ -192,7 +192,7 @@ void HungarianMatcher::ComputeConnectedComponents(
   }
 
   std::vector<std::vector<int> > components;
-  connected_component_analysis(nb_graph, components);
+  ConnectedComponentAnalysis(nb_graph, &components);
   track_components->clear();
   track_components->resize(components.size());
   obj_components->clear();

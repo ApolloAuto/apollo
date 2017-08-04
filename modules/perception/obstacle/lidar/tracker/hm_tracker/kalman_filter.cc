@@ -189,7 +189,6 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
   Eigen::Vector3d old_dir = old_object->direction.cast<double>();
   Eigen::Vector3d old_size = old_object->size.cast<double>();
   Eigen::Vector3d old_center = old_object->center.cast<double>();
-  Eigen::Vector3d new_dir = old_dir;
   Eigen::Vector3d new_size = old_size;
   Eigen::Vector3d new_center = old_center;
   compute_bbox_size_center_xy<pcl_util::Point>(new_object->object_ptr->cloud,
@@ -214,7 +213,6 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
   Eigen::Vector3d old_dir = old_object->direction.cast<double>();
   Eigen::Vector3d old_size = old_object->size.cast<double>();
   Eigen::Vector3d old_center = old_object->center.cast<double>();
-  Eigen::Vector3d new_dir = old_dir;
   Eigen::Vector3d new_size = old_size;
   Eigen::Vector3d new_center = old_center;
   compute_bbox_size_center_xy<pcl_util::Point>(new_object->object_ptr->cloud,
