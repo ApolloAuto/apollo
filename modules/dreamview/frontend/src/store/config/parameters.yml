@@ -1,9 +1,21 @@
 camera:
+  viewAngle: 0.5
   Default:
     fov: 60
     near: 1
     far: 300
-    viewAngle: 0.5
+  Near:
+    fov: 60
+    near: 1
+    far: 200
+  Overhead:
+    fov: 60
+    near: 1
+    far: 100
+  Map:
+    fov: 100
+    near: 1
+    far: 3000
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:

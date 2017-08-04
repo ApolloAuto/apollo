@@ -20,19 +20,6 @@ class Renderer {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x031C31);
 
-        // Camera
-        this.viewAngle = PARAMETERS.camera.Default.viewAngle;
-        this.viewDistance = (
-            PARAMETERS.camera.laneWidth *
-            PARAMETERS.camera.laneWidthToViewDistanceRatio);
-        this.camera = new THREE.PerspectiveCamera(
-            PARAMETERS.camera.Default.fov,
-            window.innerWidth / window.innerHeight,
-            PARAMETERS.camera.Default.near,
-            PARAMETERS.camera.Default.far
-        );
-        this.scene.add(this.camera);
-
         // The ground. (grid for now)
         this.ground = new Ground();
 
@@ -61,7 +48,22 @@ class Renderer {
         this.routing = new Routing();
     }
 
-    initialize(canvasId, width, height) {
+    initialize(canvasId, width, height, options) {
+        this.options = options;
+
+        // Camera
+        this.viewAngle = PARAMETERS.camera.viewAngle;
+        this.viewDistance = (
+            PARAMETERS.camera.laneWidth *
+            PARAMETERS.camera.laneWidthToViewDistanceRatio);
+        this.camera = new THREE.PerspectiveCamera(
+            PARAMETERS.camera[this.options.cameraAngle].fov,
+            window.innerWidth / window.innerHeight,
+            PARAMETERS.camera[this.options.cameraAngle].near,
+            PARAMETERS.camera[this.options.cameraAngle].far
+        );
+        this.scene.add(this.camera);
+
         this.updateDimension(width, height);
         this.renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -97,23 +99,70 @@ class Renderer {
         this.renderer.setSize(width, height);
     }
 
-    adjustCameraWithTarget(target) {
-        // TODO Add more views.
-        const deltaX = (this.viewDistance * Math.cos(target.rotation.y)
-            * Math.cos(this.viewAngle));
-        const deltaY = (this.viewDistance * Math.sin(target.rotation.y)
-            * Math.cos(this.viewAngle));
-        const deltaZ = this.viewDistance * Math.sin(this.viewAngle);
+    adjustCamera(target, pov) {
+        this.camera.fov = PARAMETERS.camera[pov].fov;
+        this.camera.near = PARAMETERS.camera[pov].near;
+        this.camera.far = PARAMETERS.camera[pov].far;
 
-        this.camera.position.x = target.position.x - deltaX;
-        this.camera.position.y = target.position.y - deltaY;
-        this.camera.position.z = target.position.z + deltaZ;
-        this.camera.up.set(0, 0, 1);
-        this.camera.lookAt({
-            x: target.position.x + 2 * deltaX,
-            y: target.position.y + 2 * deltaY,
-            z: 0
-        });
+        switch(pov) {
+        case "Default":
+            let deltaX = (this.viewDistance * Math.cos(target.rotation.y)
+                * Math.cos(this.viewAngle));
+            let deltaY = (this.viewDistance * Math.sin(target.rotation.y)
+                * Math.cos(this.viewAngle));
+            let deltaZ = this.viewDistance * Math.sin(this.viewAngle);
+
+            this.camera.position.x = target.position.x - deltaX;
+            this.camera.position.y = target.position.y - deltaY;
+            this.camera.position.z = target.position.z + deltaZ;
+            this.camera.up.set(0, 0, 1);
+            this.camera.lookAt({
+                x: target.position.x + 2 * deltaX,
+                y: target.position.y + 2 * deltaY,
+                z: 0
+            });
+            break;
+        case "Near":
+            deltaX = (this.viewDistance * 0.5 * Math.cos(target.rotation.y)
+                    * Math.cos(this.viewAngle));
+            deltaY = (this.viewDistance * 0.5 * Math.sin(target.rotation.y)
+                    * Math.cos(this.viewAngle));
+            deltaZ = this.viewDistance * 0.5 * Math.sin(this.viewAngle);
+
+            this.camera.position.x = target.position.x - deltaX;
+            this.camera.position.y = target.position.y - deltaY;
+            this.camera.position.z = target.position.z + deltaZ;
+            this.camera.up.set(0, 0, 1);
+            this.camera.lookAt({
+                x: target.position.x + 2 * deltaX,
+                y: target.position.y + 2 * deltaY,
+                z: 0
+            });
+            break;
+        case "Overhead":
+            deltaY = (this.viewDistance * 0.5 * Math.sin(target.rotation.y)
+                    * Math.cos(this.viewAngle));
+            deltaZ = this.viewDistance * 2 * Math.sin(this.viewAngle);
+
+            this.camera.position.x = target.position.x;
+            this.camera.position.y = target.position.y + deltaY;
+            this.camera.position.z = (target.position.z + deltaZ) * 2;
+            this.camera.up.set(0, 1, 0);
+            this.camera.lookAt({
+                x: target.position.x,
+                y: target.position.y + deltaY,
+                z: 0
+            });
+            break;
+        case "Map":
+            deltaY = (this.viewDistance * 3 * Math.sin(target.rotation.y)
+                    * Math.cos(this.viewAngle));
+            this.camera.position.set(target.position.x, target.position.y + deltaY, 60);
+            this.camera.up.set(0, 1, 0);
+            this.camera.lookAt(target.position.x, target.position.y + deltaY, 0);
+            break;
+        }
+        this.camera.updateProjectionMatrix();
     }
 
     // Render one frame. This supports the main draw/render loop.
@@ -143,7 +192,7 @@ class Renderer {
             this.scene.add(this.ground.mesh);
         }
 
-        this.adjustCameraWithTarget(this.adc.mesh);
+        this.adjustCamera(this.adc.mesh, this.options.cameraAngle);
         this.renderer.render(this.scene, this.camera);
     }
 
