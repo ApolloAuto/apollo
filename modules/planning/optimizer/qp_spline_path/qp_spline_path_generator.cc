@@ -139,7 +139,6 @@ bool QpSplinePathGenerator::Generate(const DecisionData& decision_data,
 }
 
 bool QpSplinePathGenerator::CalculateInitFrenetPoint(
-
     const common::TrajectoryPoint& traj_point,
     common::FrenetFramePoint* const frenet_frame_point) {
   common::SLPoint sl_point;
@@ -190,7 +189,6 @@ bool QpSplinePathGenerator::InitCoordRange(const QpFrenetFrame& qp_frenet_frame,
 }
 
 bool QpSplinePathGenerator::InitSpline(
-
     const common::FrenetFramePoint& init_frenet_point, const double start_s,
     const double end_s) {
   // set knots
@@ -265,7 +263,7 @@ bool QpSplinePathGenerator::AddConstraint(
     boundary_low.push_back(boundary.first);
     boundary_high.push_back(boundary.second);
   }
-  if (!spline_constraint->add_fx_boundary(knots_, boundary_low,
+  if (!spline_constraint->add_fx_boundary(evaluated_s_, boundary_low,
                                           boundary_high)) {
     AERROR << "Add boundary constraint failed";
     return false;
