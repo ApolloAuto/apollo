@@ -77,8 +77,8 @@ bool Frame::AddDecision(const std::string &tag, const std::string &object_id,
                         const ObjectDecisionType &decision) {
   auto *path_obstacle = path_obstacles_.Find(object_id);
   if (!path_obstacle) {
-    AERROR << "failed to find obstacle;
-        return false;
+    AERROR << "failed to find obstacle";
+    return false;
   }
   path_obstacle->AddDecision(tag, decision);
   return true;
