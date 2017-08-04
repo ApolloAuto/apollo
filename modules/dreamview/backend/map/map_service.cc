@@ -18,6 +18,8 @@
 
 #include <algorithm>
 
+#include "modules/common/util/string_util.h"
+
 namespace apollo {
 namespace dreamview {
 
@@ -94,14 +96,14 @@ MapElementIds::MapElementIds(const nlohmann::json &json_object)
 
 size_t MapElementIds::Hash() const {
   static std::hash<std::string> hash_function;
-  std::string text;
-  text = std::accumulate(lane.begin(), lane.end(), text);
-  text = std::accumulate(crosswalk.begin(), crosswalk.end(), text);
-  text = std::accumulate(junction.begin(), junction.end(), text);
-  text = std::accumulate(signal.begin(), signal.end(), text);
-  text = std::accumulate(stop_sign.begin(), stop_sign.end(), text);
-  text = std::accumulate(yield.begin(), yield.end(), text);
-  text = std::accumulate(overlap.begin(), overlap.end(), text);
+  const std::string text = apollo::common::util::StrCat(
+      apollo::common::util::PrintIter(lane, ""),
+      apollo::common::util::PrintIter(crosswalk, ""),
+      apollo::common::util::PrintIter(junction, ""),
+      apollo::common::util::PrintIter(signal, ""),
+      apollo::common::util::PrintIter(stop_sign, ""),
+      apollo::common::util::PrintIter(yield, ""),
+      apollo::common::util::PrintIter(overlap, ""));
   return hash_function(text);
 }
 
