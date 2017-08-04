@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_COMMON_PATH_OBSTACLE_H_
 
 #include <list>
+#include <string>
 #include <vector>
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
