@@ -39,7 +39,7 @@ class HDMapInputTest : public testing::Test {
   HDMapInput* hdmap_input_;
 };
 
-TEST_F(HDMapInputTest, test_InitFrameDependence) {
+TEST_F(HDMapInputTest, test_Init) {
   hdmap_input_->inited_ = true;
   EXPECT_TRUE(hdmap_input_->Init());
 

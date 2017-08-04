@@ -32,7 +32,9 @@ cc_test(
         "file_util_test.cc",
         "registerer_test.cc",
         "singleton_test.cc",
+        "timer_test.cc",
     ],
+    data = ["//modules/perception:perception_data"],
     deps = [
         ":base",
         "@gtest//:main",

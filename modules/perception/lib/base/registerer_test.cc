@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lib/base/registerer.h"
 #include <gtest/gtest.h>
+#define private public
+#include "modules/perception/lib/base/registerer.h"
 
 namespace apollo {
 namespace perception {
@@ -67,11 +68,18 @@ TEST(RegistererTest, test) {
 
   std::vector<std::string> derived_classes;
   EXPECT_TRUE(GetRegisteredClasses("BaseClass", &derived_classes));
+  EXPECT_FALSE(GetRegisteredClasses("NotExitstClass", &derived_classes));
   EXPECT_EQ(derived_classes.size(), 2u);
   EXPECT_TRUE(derived_classes[0] == "DerivedClass1" ||
               derived_classes[0] == "DerivedClass2");
   EXPECT_TRUE(derived_classes[1] == "DerivedClass1" ||
               derived_classes[1] == "DerivedClass2");
+}
+
+TEST(ObjectFactoryTest, test_ObjectFactory) {
+  ObjectFactory obj_fac;
+  Any any = obj_fac.NewInstance();
+  EXPECT_TRUE(any.content_ == NULL);
 }
 
 }  // namespace perception
