@@ -45,23 +45,28 @@ namespace planning {
 using ErrorCode = apollo::common::ErrorCode;
 using Status = apollo::common::Status;
 using PathPoint = apollo::common::PathPoint;
+using TrajectoryPoint = apollo::common::TrajectoryPoint;
 using SLPoint = apollo::common::SLPoint;
 using VehicleParam = apollo::common::VehicleParam;
 using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
 
-StBoundaryMapper::StBoundaryMapper(const StBoundaryConfig& config,
-                                   const ReferenceLine& reference_line)
+StBoundaryMapper::StBoundaryMapper(
+    const StBoundaryConfig& config, const ReferenceLine& reference_line,
+    const PathData& path_data,
+    const common::TrajectoryPoint& initial_planning_point,
+    const double planning_distance, const double planning_time)
     : st_boundary_config_(config),
       reference_line_(reference_line),
-      vehicle_param_(common::VehicleConfigHelper::instance()
-                         ->GetConfig()
-                         .vehicle_param()) {}
+      path_data_(path_data),
+      vehicle_param_(
+          common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
+      initial_planning_point_(initial_planning_point),
+      planning_distance_(planning_distance),
+      planning_time_(planning_time) {}
 
 Status StBoundaryMapper::GetGraphBoundary(
-    const common::TrajectoryPoint& initial_planning_point,
-    const DecisionData& decision_data, const PathData& path_data,
-    const double planning_distance, const double planning_time,
+    const DecisionData& decision_data,
     std::vector<StGraphBoundary>* const st_graph_boundaries) const {
   if (st_graph_boundaries == nullptr) {
     const std::string msg = "st_graph_boundaries is NULL.";
@@ -69,16 +74,16 @@ Status StBoundaryMapper::GetGraphBoundary(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (planning_time < 0.0) {
-    const std::string msg = "Fail to get params since planning_time < 0.";
+  if (planning_time_ < 0.0) {
+    const std::string msg = "Fail to get params since planning_time_ < 0.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (path_data.discretized_path().num_of_points() < 2) {
+  if (path_data_.discretized_path().num_of_points() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
-           << path_data.discretized_path().num_of_points() << ".";
+           << path_data_.discretized_path().num_of_points() << ".";
     return Status(ErrorCode::PLANNING_ERROR,
                   "Fail to get params because of too few path points");
   }
@@ -90,8 +95,8 @@ Status StBoundaryMapper::GetGraphBoundary(
   /*
   const auto& static_obs_vec = decision_data.StaticObstacles();
   for (const auto* obs : static_obs_vec) {
-    ret = MapStopDecision(*obs, path_data, planning_distance,
-        planning_time, st_graph_boundaries);
+    ret = MapStopDecision(*obs, path_data_, planning_distance_,
+        planning_time_, st_graph_boundaries);
     if (!ret.ok()) {
       AERROR << "Fail to map static obstacle with id[" << obs->Id() << "].";
       return Status(ErrorCode::PLANNING_ERROR, "Fail to map static obstacle");
@@ -106,9 +111,8 @@ Status StBoundaryMapper::GetGraphBoundary(
     }
     for (auto& obj_decision : obs->Decisions()) {
       if (obj_decision.has_follow()) {
-        ret = MapObstacleWithoutPredictionTrajectory(
-            *obs, obj_decision, path_data, planning_distance, planning_time,
-            st_graph_boundaries);
+        ret = MapObstacleWithoutPredictionTrajectory(*obs, obj_decision,
+                                                     st_graph_boundaries);
         if (!ret.ok()) {
           AERROR << "Fail to map follow dynamic obstacle with id " << obs->Id()
                  << ".";
@@ -116,9 +120,8 @@ Status StBoundaryMapper::GetGraphBoundary(
                         "Fail to map follow dynamic obstacle");
         }
       } else if (obj_decision.has_overtake() || obj_decision.has_yield()) {
-        ret = MapObstacleWithPredictionTrajectory(
-            initial_planning_point, *obs, obj_decision, path_data,
-            planning_distance, planning_time, st_graph_boundaries);
+        ret = MapObstacleWithPredictionTrajectory(*obs, obj_decision,
+                                                  st_graph_boundaries);
         if (!ret.ok()) {
           AERROR << "Fail to map dynamic obstacle with id " << obs->Id() << ".";
           // Return OK by intention.
@@ -131,10 +134,7 @@ Status StBoundaryMapper::GetGraphBoundary(
 }
 
 Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
-    const common::TrajectoryPoint& initial_planning_point,
     const Obstacle& obstacle, const ObjectDecisionType obj_decision,
-    const PathData& path_data, const double planning_distance,
-    const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
@@ -151,7 +151,7 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
 
   bool skip = true;
   std::vector<STPoint> boundary_points;
-  const auto& adc_path_points = path_data.discretized_path().points();
+  const auto& adc_path_points = path_data_.discretized_path().points();
   const auto& trajectory = obstacle.Trajectory();
   if (trajectory.trajectory_point_size() == 0) {
     AWARN << "Obstacle (id = " << obstacle.Id()
@@ -266,8 +266,6 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
 
 Status StBoundaryMapper::MapObstacleWithoutPredictionTrajectory(
     const Obstacle& obstacle, const ObjectDecisionType obj_decision,
-    const PathData& path_data, const double planning_distance,
-    const double planning_time,
     std::vector<StGraphBoundary>* const boundary) const {
   if (!obj_decision.has_follow()) {
     std::string msg = common::util::StrCat(
@@ -292,14 +290,14 @@ Status StBoundaryMapper::MapObstacleWithoutPredictionTrajectory(
                           "obstacle is moving opposite the reference line");
   }
 
-  const auto& point = path_data.discretized_path().points()[0];
+  const auto& point = path_data_.discretized_path().points()[0];
   const PathPoint curr_point =
       reference_line_.get_reference_point(point.x(), point.y());
   const double distance_to_obstacle = ref_point.s() - curr_point.s() -
                                       vehicle_param_.front_edge_to_center() -
                                       st_boundary_config_.follow_buffer();
 
-  if (distance_to_obstacle > planning_distance) {
+  if (distance_to_obstacle > planning_distance_) {
     std::string msg = "obstacle is out of range.";
     AINFO << msg;
     return Status(ErrorCode::PLANNING_SKIP, msg);
@@ -315,15 +313,15 @@ Status StBoundaryMapper::MapObstacleWithoutPredictionTrajectory(
 
   const double s_min_lower = distance_to_obstacle;
   const double s_min_upper =
-      std::max(distance_to_obstacle + 1.0, planning_distance);
+      std::max(distance_to_obstacle + 1.0, planning_distance_);
   const double s_max_upper =
-      std::max(s_min_upper + planning_time * follow_speed, planning_distance);
-  const double s_max_lower = s_min_lower + planning_time * follow_speed;
+      std::max(s_min_upper + planning_time_ * follow_speed, planning_distance_);
+  const double s_max_lower = s_min_lower + planning_time_ * follow_speed;
 
   std::vector<STPoint> boundary_points;
   boundary_points.emplace_back(s_min_lower, 0.0);
-  boundary_points.emplace_back(s_max_lower, planning_time);
-  boundary_points.emplace_back(s_max_upper, planning_time);
+  boundary_points.emplace_back(s_max_lower, planning_time_);
+  boundary_points.emplace_back(s_max_upper, planning_time_);
   boundary_points.emplace_back(s_min_upper, 0.0);
 
   const double area = GetArea(boundary_points);
@@ -381,14 +379,14 @@ bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
 }
 
 Status StBoundaryMapper::GetSpeedLimits(
-    const PathData& path_data, SpeedLimit* const speed_limit_data) const {
+    SpeedLimit* const speed_limit_data) const {
   CHECK_NOTNULL(speed_limit_data);
 
   std::vector<double> speed_limits;
-  for (const auto& path_point : path_data.discretized_path().points()) {
+  for (const auto& path_point : path_data_.discretized_path().points()) {
     if (Double::compare(path_point.s(), reference_line_.length()) > 0) {
       std::string msg = common::util::StrCat(
-          "path length [", path_data.discretized_path().length(),
+          "path length [", path_data_.discretized_path().length(),
           "] is LARGER than reference_line_ length [", reference_line_.length(),
           "]. Please debug before proceeding.");
       AWARN << msg;
