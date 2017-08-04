@@ -13,6 +13,26 @@ cc_library(
     deps = [
         "//modules/common/adapters:adapter_manager",
         "//modules/dreamview/backend/common:dreamview_gflags",
+        "@gtest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "sim_control_test",
+    size = "small",
+    srcs = [
+        "sim_control_test.cc",
+    ],
+    data = [
+        "//modules/dreamview/backend/testdata",
+    ],
+    deps = [
+        ":sim_control",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/adapters/proto:adapter_config_proto",
+        "//modules/common/time",
+        "@gtest//:main",
+        "@ros//:ros_common",
     ],
 )
 
