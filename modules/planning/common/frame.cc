@@ -194,6 +194,7 @@ bool Frame::SmoothReferenceLine(const hdmap::Path &hdmap_path,
     AERROR << "Fail to smooth a reference line from map";
     return false;
   }
+  *reference_line = ReferenceLine(smoothed_ref_points);
   ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
   return true;
 }
