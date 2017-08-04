@@ -59,15 +59,12 @@ pcl_util::PointCloudPtr FrameContent::get_cloud() {
     return _cloud;
 }
 
-
 bool FrameContent::has_cloud() {
     if ((_cloud == nullptr || _cloud->size() == 0)) {
         return false;
     }
     return true;
 }
-
-
 
 void FrameContent::offset_pointcloud(pcl_util::PointCloud& cloud,
     const Eigen::Vector3d& offset) {
@@ -86,7 +83,7 @@ void FrameContent::offset_pointcloud(pcl_util::PointDCloud& cloud,
         cloud.points[i].z += offset[2];
     }
 }
-/*
+
 void FrameContent::offset_object(ObjectPtr object, const Eigen::Vector3d& offset) {
     offset_pointcloud(*(object->cloud), offset);
     offset_pointcloud(object->polygon, offset);
@@ -94,8 +91,20 @@ void FrameContent::offset_object(ObjectPtr object, const Eigen::Vector3d& offset
     object->center[0] += offset[0];
     object->center[1] += offset[1];
     object->center[2] += offset[2];
-}*/
+}
 
+void FrameContent::set_tracked_objects(const std::vector<ObjectPtr>& objects) {
+    _tracked_objects_lidar.resize(objects.size());
+    for (size_t i = 0; i < objects.size(); ++i) {
+        _tracked_objects_lidar[i].reset(new Object);
+        _tracked_objects_lidar[i]->clone(*objects[i]);
+        offset_object(_tracked_objects_lidar[i], _global_offset);
+    }
+}
+
+std::vector<ObjectPtr> FrameContent::get_tracked_objects() {
+    return _tracked_objects_lidar;
+}
 
 } // namespace perception
-} // namespace adu
+} // namespace apollo

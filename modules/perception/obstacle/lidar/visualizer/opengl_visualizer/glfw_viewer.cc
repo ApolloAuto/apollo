@@ -25,6 +25,7 @@
 #include <pcl/io/pcd_io.h>
 
 #include "frame_content.h"
+#include "modules/perception/obstacle/base/object.h"
 //#include "obstacle/visualizer/pcl_render_util.h"
 
 namespace apollo {
@@ -358,17 +359,9 @@ bool GLFWViewer::draw_cloud(FrameContent* content)
 	pcl_util::PointCloudPtr cloud;
     pcl_util::PointCloudPtr roi_cloud;
 
-	/*if (_show_cloud_state==0){ //only show original point cloud
-        cloud = content->get_cloud();
-    }
-    else if (_show_cloud_state ==1) { //show roi
-        roi_cloud = content->get_roi_cloud();
-    }
-    else { //show both
-        cloud = content->get_cloud();
-        roi_cloud = content->get_roi_cloud();
-    }*/
     cloud = content->get_cloud();
+    //roi_cloud = content->get_roi_cloud();
+
 	//draw original point cloud
     if (cloud && !cloud->points.empty()) {
         glPointSize(1);
@@ -437,29 +430,16 @@ bool GLFWViewer::draw_car_forward_dir() {
     glEnd();
     glLineWidth(1);
 }
-/*
+
 bool GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_polygon, bool draw_velocity)
 {
 	std::vector<ObjectPtr> objects;
-    std::vector<ObjectPtr> segmented_objects;
     std::vector<ObjectPtr> tracked_objects;
-    std::vector<ObjectPtr> radar_objects;
-	std::vector<ObjectPtr> fusion_objects;
-	if (FLAGS_show_segment_objects) segmented_objects = content->get_segmented_objects();
-   	if (FLAGS_show_tracked_objects) tracked_objects = content->get_tracked_objects();
-   	if (FLAGS_show_radar_objects)   radar_objects = content->get_radar_objects();
-	if (FLAGS_show_fused_objects)   fusion_objects = content->get_fused_objects();
-	for (size_t i = 0; i < segmented_objects.size(); ++i) {
-        objects.push_back(segmented_objects[i]);
-    }
+
+   	tracked_objects = content->get_tracked_objects();
+
     for (size_t i = 0; i < tracked_objects.size(); ++i) {
         objects.push_back(tracked_objects[i]);
-    }
-    for (size_t i = 0; i < radar_objects.size(); ++i) {
-        objects.push_back(radar_objects[i]);
-    }
-    for (size_t i = 0; i < fusion_objects.size(); ++i) {
-        objects.push_back(fusion_objects[i]);
     }
 
 	float rgb[3];
@@ -472,18 +452,23 @@ bool GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_
 		int indices[16] = {0,1,2,3,4,5,6,7,4,3,0,5,6,1,2,7};
 		for (i = 0; i < objects.size(); i++)
 		{
-			center.x = objects[i]->center[0];        center.y = objects[i]->center[1];        center.z = objects[i]->center[2];
-			direction.x = objects[i]->direction[0];  direction.y = objects[i]->direction[1];  direction.z = objects[i]->direction[2];
-			size.x = objects[i]->length;             size.y = objects[i]->width;              size.z = objects[i]->height;
+			center.x = objects[i]->center[0];        
+            center.y = objects[i]->center[1];        
+            center.z = objects[i]->center[2];
+			direction.x = objects[i]->direction[0];  
+            direction.y = objects[i]->direction[1];  
+            direction.z = objects[i]->direction[2];
+			size.x = objects[i]->length;             
+            size.y = objects[i]->width;              
+            size.z = objects[i]->height;
 
 			float x1 = size.x/2;
-                        float x2 = 0 - x1;
+            float x2 = 0 - x1;
 			float y1 = size.y/2;
-                        float y2 = 0 - y1;
-		        float cos_theta = direction.x / sqrt(direction.x * direction.x  + direction.y * direction.y);
+            float y2 = 0 - y1;
+		    float cos_theta = direction.x / sqrt(direction.x * direction.x  + direction.y * direction.y);
 			float sin_theta = -1 * direction.y / sqrt(direction.x * direction.x  + direction.y * direction.y);
 			//set x y
-
 
 			verts[0][0] = verts[5][0] = x1 * cos_theta + y1 * sin_theta + center.x;
 			verts[0][1] = verts[5][1] = y1 * cos_theta - x1 * sin_theta + center.y;
@@ -557,31 +542,26 @@ vec3 GLFWViewer::get_velocity_src_position(FrameContent* content, int i)
 	vec3 size;
 	vec3 velocity;
 	std::vector<ObjectPtr> objects;
-    std::vector<ObjectPtr> segmented_objects;
     std::vector<ObjectPtr> tracked_objects;
-    std::vector<ObjectPtr> radar_objects;
-	std::vector<ObjectPtr> fusion_objects;
-	if (FLAGS_show_segment_objects) segmented_objects = content->get_segmented_objects();
-   	if (FLAGS_show_tracked_objects) tracked_objects = content->get_tracked_objects();
-   	if (FLAGS_show_radar_objects)   radar_objects = content->get_radar_objects();
-	if (FLAGS_show_fused_objects)   fusion_objects = content->get_fused_objects();
-	for (size_t i = 0; i < segmented_objects.size(); ++i) {
-        objects.push_back(segmented_objects[i]);
-    }
+	
+   	tracked_objects = content->get_tracked_objects();
+   	
     for (size_t i = 0; i < tracked_objects.size(); ++i) {
         objects.push_back(tracked_objects[i]);
     }
-    for (size_t i = 0; i < radar_objects.size(); ++i) {
-        objects.push_back(radar_objects[i]);
-    }
-    for (size_t i = 0; i < fusion_objects.size(); ++i) {
-        objects.push_back(fusion_objects[i]);
-    }
 
-	center.x = objects[i]->center[0];        center.y = objects[i]->center[1];        center.z = objects[i]->center[2];
-	direction.x = objects[i]->direction[0];  direction.y = objects[i]->direction[1];  direction.z = objects[i]->direction[2];
-	size.x = objects[i]->length;             size.y = objects[i]->width;              size.z = objects[i]->height;
-	velocity.x = objects[i]->velocity[0];    velocity.y = objects[i]->velocity[1];    velocity.z = objects[i]->velocity[2];
+	center.x = objects[i]->center[0];        
+    center.y = objects[i]->center[1];        
+    center.z = objects[i]->center[2];
+	direction.x = objects[i]->direction[0];  
+    direction.y = objects[i]->direction[1];  
+    direction.z = objects[i]->direction[2];
+	size.x = objects[i]->length;             
+    size.y = objects[i]->width;              
+    size.z = objects[i]->height;
+	velocity.x = objects[i]->velocity[0];    
+    velocity.y = objects[i]->velocity[1];    
+    velocity.z = objects[i]->velocity[2];
 	float cos_direction_velocity = (direction.x * direction.y + velocity.x * velocity.y)
 				     / sqrt(direction.x * direction.x  + direction.y * direction.y)
 				     / sqrt(velocity.x * velocity.x  + velocity.y * velocity.y);
@@ -628,7 +608,7 @@ vec3 GLFWViewer::get_velocity_src_position(FrameContent* content, int i)
 }
 
 
-bool GLFWViewer::show_map(FrameContent* content, bool show_map_roi, bool show_map_boundary)
+/*bool GLFWViewer::show_map(FrameContent* content, bool show_map_roi, bool show_map_boundary)
 {
 	int i = 0;
 	int j = 0;
@@ -683,9 +663,9 @@ void GLFWViewer::render(){
 
 	/*if (FLAGS_enable_hdmap_input) show_map(_frame_content, FLAGS_show_map_roi, FLAGS_show_map_boundary); */
 	if (show_cloud) draw_cloud(_frame_content);
-	/*draw_objects(_frame_content, show_box, show_polygon, show_velocity);
+	draw_objects(_frame_content, show_box, show_polygon, show_velocity);
 	draw_circle();
-    draw_car_forward_dir();*/
+    draw_car_forward_dir();
 }
 
 /************************callback functions************************/

@@ -120,8 +120,8 @@ private:
     bool draw_circle();
     bool draw_car_forward_dir();
     //objects
-    //bool draw_objects(FrameContent* content , bool draw_cube, bool draw_polygon, bool draw_velocity);
-    //vec3 get_velocity_src_position(FrameContent* content, int id);
+    bool draw_objects(FrameContent* content , bool draw_cube, bool draw_polygon, bool draw_velocity);
+    vec3 get_velocity_src_position(FrameContent* content, int id);
     //map_roi 
     //bool show_map(FrameContent* content, bool show_map_roi, bool show_map_boundary);
  
