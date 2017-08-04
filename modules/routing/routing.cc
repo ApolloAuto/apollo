@@ -40,13 +40,9 @@ Routing::Routing() :
 apollo::common::Status Routing::Init() {
   std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
 
-  AERROR << "debug 1";
   AdapterManager::Init(FLAGS_adapter_config_path);
-  AERROR << "debug 2";
   AdapterManager::AddMonitorCallback(&Routing::OnMonitor, this);
-  AERROR << "debug 3";
   AdapterManager::AddRoutingRequestCallback(&Routing::OnRouting_Request, this);
-  AERROR << "debug 4";
 
   return apollo::common::Status::OK();
 }
@@ -56,7 +52,7 @@ apollo::common::Status Routing::Start() {
     AERROR << "Navigator is not ready!";
     return apollo::common::Status(ErrorCode::ROUTING_ERROR, "Navigator not ready");
   }
-  AERROR << "Routing service is ready.";
+  AINFO << "Routing service is ready.";
 
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
   buffer.INFO("Routing started");

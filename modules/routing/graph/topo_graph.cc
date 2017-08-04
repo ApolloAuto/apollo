@@ -74,6 +74,7 @@ bool TopoGraph::load_graph(const std::string& file_path) {
   if (!::apollo::common::util::GetProtoFromFile(
           file_path, &graph)) {
     AERROR << "Failed to read topology graph from data.";
+    AERROR << "File Path: " << file_path;
     return false;
   }
 
