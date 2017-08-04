@@ -17,49 +17,7 @@
 namespace apollo {
 namespace perception {
 
-bool Bitmap2dFilter(const pcl::PointCloud<pcl_util::Point>::ConstPtr in_cloud_ptr,
-                    const Bitmap2D &bitmap,
-                    pcl_util::PointIndices* roi_indices_ptr) {
-  roi_indices_ptr->indices.reserve(in_cloud_ptr->size());
-  for (size_t i = 0; i < in_cloud_ptr->size(); ++i) {
-    const auto &pt = in_cloud_ptr->points[i];
-    Eigen::Vector2d p(pt.x, pt.y);
-    if (bitmap.IsExist(p) && bitmap.Check(p)) {
-      roi_indices_ptr->indices.push_back(i);
-    }
-  }
-  return true;
-}
 
-void MergeRoadBoundariesToPolygons(const std::vector<RoadBoundary>& road_boundaries,
-                                   std::vector<PolygonDType>* polygons) {
-  polygons->resize(road_boundaries.size());
-  for (size_t i = 0; i < road_boundaries.size(); ++i) {
-    const PolygonDType& left_boundary = road_boundaries[i].left_boundary;
-    const PolygonDType& right_boundary = road_boundaries[i].right_boundary;
-
-    auto& polygon = (*polygons)[i];
-    polygon.reserve(left_boundary.size() + right_boundary.size());
-    polygon.insert(polygon.end(), left_boundary.begin(), left_boundary.end());
-
-    CHECK(right_boundary.size() > 0);
-    for (size_t j = right_boundary.size() - 1; j != 0; --j) {
-      polygon.push_back(right_boundary[j]);
-    }
-  }
-}
-
-void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
-                                std::vector<PolygonDType>* polygons) {
-  std::vector<PolygonDType> road_polygons;
-  MergeRoadBoundariesToPolygons(hdmap_struct_ptr->road_boundary, &road_polygons);
-
-  const std::vector<PolygonDType>& junction_polygons = hdmap_struct_ptr->junction;
-
-  polygons->reserve(road_polygons.size() + junction_polygons.size());
-  polygons->insert(polygons->end(), road_polygons.begin(), road_polygons.end());
-  polygons->insert(polygons->end(), junction_polygons.begin(), junction_polygons.end());
-}
 
 bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
                           const ROIFilterOptions &roi_filter_options,
@@ -134,6 +92,55 @@ MajorDirection HdmapROIFilter::GetMajorDirection(
       MajorDirection::XMAJOR : MajorDirection::YMAJOR;
 }
 
+bool HdmapROIFilter::Bitmap2dFilter(
+    const pcl::PointCloud<pcl_util::Point>::ConstPtr in_cloud_ptr,
+    const Bitmap2D &bitmap,
+    pcl_util::PointIndices* roi_indices_ptr) {
+
+  roi_indices_ptr->indices.reserve(in_cloud_ptr->size());
+  for (size_t i = 0; i < in_cloud_ptr->size(); ++i) {
+    const auto &pt = in_cloud_ptr->points[i];
+    Eigen::Vector2d p(pt.x, pt.y);
+    if (bitmap.IsExist(p) && bitmap.Check(p)) {
+      roi_indices_ptr->indices.push_back(i);
+    }
+  }
+  return true;
+}
+
+void HdmapROIFilter::MergeRoadBoundariesToPolygons(
+    const std::vector<RoadBoundary>& road_boundaries,
+    std::vector<PolygonDType>* polygons) {
+
+  polygons->resize(road_boundaries.size());
+  for (size_t i = 0; i < road_boundaries.size(); ++i) {
+    const PolygonDType& left_boundary = road_boundaries[i].left_boundary;
+    const PolygonDType& right_boundary = road_boundaries[i].right_boundary;
+
+    auto& polygon = (*polygons)[i];
+    polygon.reserve(left_boundary.size() + right_boundary.size());
+    polygon.insert(polygon.end(), left_boundary.begin(), left_boundary.end());
+
+    CHECK(right_boundary.size() > 0);
+    for (size_t j = right_boundary.size() - 1; j != 0; --j) {
+      polygon.push_back(right_boundary[j]);
+    }
+  }
+}
+
+void HdmapROIFilter::MergeHdmapStructToPolygons(
+    const HdmapStructConstPtr& hdmap_struct_ptr,
+    std::vector<PolygonDType>* polygons) {
+
+  std::vector<PolygonDType> road_polygons;
+  MergeRoadBoundariesToPolygons(hdmap_struct_ptr->road_boundary, &road_polygons);
+
+  const std::vector<PolygonDType>& junction_polygons = hdmap_struct_ptr->junction;
+
+  polygons->reserve(road_polygons.size() + junction_polygons.size());
+  polygons->insert(polygons->end(), road_polygons.begin(), road_polygons.end());
+  polygons->insert(polygons->end(), junction_polygons.begin(), junction_polygons.end());
+}
 
 bool HdmapROIFilter::Init() {
   //FLAGS_work_root = "modules/perception";
@@ -199,6 +206,6 @@ void HdmapROIFilter::TransformFrame(
   }
 }
 
-} // perception
-} // apollo
+} // namespace perception
+} // namespace apollo
 

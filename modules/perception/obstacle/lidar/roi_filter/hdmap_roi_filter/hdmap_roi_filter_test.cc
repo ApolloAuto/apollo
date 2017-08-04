@@ -62,20 +62,16 @@ bool LoadPolygonFile(const std::string& absolute_file_name,
   return true;
 }
 
-class HdmapROIFilterTest : public testing::Test {
+class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
  public:
-  HdmapROIFilterTest() : _hdmap_roi_filter_ptr(new HdmapROIFilter),
-  _pts_cloud_ptr(new pcl_util::PointCloud){};
+  HdmapROIFilterTest() : _pts_cloud_ptr(new pcl_util::PointCloud){};
  protected:
   void SetUp() {
     LoadPolygonFile(polygon_file_name, &_polygons);
     pcl::io::loadPCDFile(pcd_file_name, *_pts_cloud_ptr);
-    //_hdmap_roi_filter_ptr = std::std::unique_ptr<HdmapROIFilter>(new HdmapROIFilter);
   }
 
   void TearDown() {
-    //delete _hdmap_roi_filter_ptr;
-    //_hdmap_roi_filter_ptr = nullptr;
   }
 
  protected:
@@ -90,14 +86,14 @@ class HdmapROIFilterTest : public testing::Test {
 
 void HdmapROIFilterTest::init() {
   FLAGS_work_root = "modules/perception/data";
-  FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
-  ASSERT_TRUE(_hdmap_roi_filter_ptr->Init());
+  FLAGS_config_manager_path = "config_manager_test/config_manager.config";
+  ASSERT_TRUE(Init());
 }
 
 void HdmapROIFilterTest::filter() {
   pcl_util::PointIndices indices;
 
-  _hdmap_roi_filter_ptr->FilterWithPolygonMask(_pts_cloud_ptr, _polygons, &indices);
+  ASSERT_TRUE(FilterWithPolygonMask(_pts_cloud_ptr, _polygons, &indices));
 
   size_t points_num = _pts_cloud_ptr->size();
   std::vector<bool> is_in_roi(points_num, false);
@@ -129,16 +125,16 @@ void HdmapROIFilterTest::filter() {
     }
   }
 
-  /*
+
   AERROR << "True positive: " << true_positive
-      << ", False positive: " << false_positive
-      << ", True negitive: " << true_negitive
-      << ", False negative: " << false_negitive;
-      */
+        << ", False positive: " << false_positive
+        << ", True negitive: " << true_negitive
+        << ", False negative: " << false_negitive;
 }
 
 TEST_F(HdmapROIFilterTest, test_filter) {
   init();
+  std::cout << "Successfully init." << std::endl;
   filter();
 }
 
