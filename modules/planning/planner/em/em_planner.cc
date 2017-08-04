@@ -88,6 +88,10 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
                                 const double time_diff_ms,
                                 planning_internal::Debug* ptr_debug,
                                 planning::LatencyStats* ptr_latency_stats) {
+  if (!FLAGS_enable_record_debug) {
+    ADEBUG << "Skip record debug info";
+    return;
+  }
   OptimizerType type;
   DCHECK(OptimizerType_Parse(name, &type));
   if (type == DP_POLY_PATH_OPTIMIZER || type == QP_SPLINE_PATH_OPTIMIZER) {

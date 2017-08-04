@@ -92,14 +92,10 @@ message StGraphBoundaryDebug {
   repeated apollo.common.SpeedPoint point = 2;
 }
 
-message SpeedLimitDebug {
-  repeated apollo.common.SpeedPoint point = 1;
-}
-
 message STGraphDebug {
   optional string name = 1;
   repeated StGraphBoundaryDebug boundary = 2;
-  optional SpeedLimitDebug speed_limit = 3;
+  repeated apollo.common.SpeedPoint speed_limit = 3;
 }
 
 // next id: 15

@@ -59,6 +59,32 @@ bool QpSplineStSpeedOptimizer::Init() {
   return true;
 }
 
+void QpSplineStSpeedOptimizer::RecordSTGraphDebug(
+    const std::vector<StGraphBoundary>& boundaries,
+    const SpeedLimit& speed_limits) {
+  if (!FLAGS_enable_record_debug) {
+    ADEBUG << "Skip record debug info";
+    return;
+  }
+
+  auto debug = frame_->MutableADCTrajectory()->mutable_debug();
+  auto st_graph_debug = debug->mutable_planning_data()->add_st_graph();
+  st_graph_debug->set_name(name());
+  for (const auto& boundary : boundaries) {
+    auto boundary_debug = st_graph_debug->add_boundary();
+    boundary_debug->set_name(boundary.id());
+    for (const auto& point : boundary.points()) {
+      auto point_debug = boundary_debug->add_point();
+      point_debug->set_t(point.x());
+      point_debug->set_s(point.y());
+    }
+  }
+
+  st_graph_debug->mutable_speed_limit()->CopyFrom(
+      {speed_limits.speed_points().begin(),
+       speed_limits.speed_points().end()});
+}
+
 Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          const ReferenceLine& reference_line,
@@ -88,6 +114,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
+  RecordSTGraphDebug(boundaries, speed_limits);
 
   // step 2 perform graph search
   const auto& veh_param =
