@@ -25,7 +25,6 @@
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/planning/common/path/path_data.h"
-#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -54,28 +53,21 @@ SpeedData* PlanningData::mutable_speed_data() { return &speed_data_; }
 bool PlanningData::aggregate(const double time_resolution,
                              const double relative_time,
                              PublishableTrajectory* trajectory) {
-  if (time_resolution < 0.0) {
-    AERROR << "time_resolution: " << time_resolution << " < 0.0";
-    return false;
-  }
-  if (!trajectory) {
-    AERROR << "The input trajectory is empty";
-    return false;
-  }
+  CHECK(time_resolution > 0.0);
+  CHECK(trajectory != nullptr);
 
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.total_time();
        cur_rel_time += time_resolution) {
     common::SpeedPoint speed_point;
-    QUIT_IF(!speed_data_.get_speed_point_with_time(cur_rel_time, &speed_point),
-            false, ERROR, "Fail to get speed point with relative time %f",
-            cur_rel_time);
+    if (!speed_data_.get_speed_point_with_time(cur_rel_time, &speed_point)) {
+      AERROR << "Fail to get speed point with relative time " << cur_rel_time;
+      return false;
+    }
 
-    common::PathPoint path_point;
-    // TODO(all): temp fix speed point s out of path point bound, need further
-    // refine later
     if (speed_point.s() > path_data_.discretized_path().length()) {
       break;
     }
+    common::PathPoint path_point;
     if (!path_data_.get_path_point_with_path_s(speed_point.s(), &path_point)) {
       AERROR << "Fail to get path data with s " << speed_point.s()
              << "path total length " << path_data_.discretized_path().length();
@@ -87,7 +79,7 @@ bool PlanningData::aggregate(const double time_resolution,
     trajectory_point.set_v(speed_point.v());
     trajectory_point.set_a(speed_point.a());
     trajectory_point.set_relative_time(speed_point.t() + relative_time);
-    trajectory->add_trajectory_point(trajectory_point);
+    trajectory->append_trajectory_point(trajectory_point);
   }
   return true;
 }

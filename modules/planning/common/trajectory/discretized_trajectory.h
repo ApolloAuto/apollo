@@ -55,7 +55,7 @@ class DiscretizedTrajectory : public Trajectory {
   virtual uint32_t query_nearest_point(
       const common::math::Vec2d& position) const;
 
-  virtual void add_trajectory_point(
+  virtual void append_trajectory_point(
       const apollo::common::TrajectoryPoint& trajectory_point);
 
   const apollo::common::TrajectoryPoint& trajectory_point_at(
