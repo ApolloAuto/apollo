@@ -43,10 +43,26 @@ cc_library(
 )
 
 cc_test(
-    name = "perception_obstacle_onboard_test",
+    name = "perception_obstacle_hdmap_input_test",
+    srcs = [
+        "hdmap_input_test.cc",
+        ],
+    size = "small",
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/map:map_data"
+    ],
+    deps = [
+        ":perception_obstacle_hdmapinput",
+        "//modules/perception/common:perception_common",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "perception_obstacle_lidar_process_test",
     srcs = [
         "lidar_process_test.cc",
-        "hdmap_input_test.cc",
         ],
     size = "small",
     data = [

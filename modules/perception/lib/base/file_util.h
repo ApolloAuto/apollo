@@ -55,9 +55,6 @@ class FileUtil {
   // delete file or directory
   static bool DeleteFile(const std::string& filename);
 
-  static bool RenameFile(const std::string& old_file,
-                         const std::string& new_file);
-
   static bool CreateDir(const std::string& dir);
 
   static bool GetFileContent(const std::string& path, std::string* content);
@@ -65,10 +62,6 @@ class FileUtil {
                         std::vector<std::string>* lines);
 
   static std::string RemoveFileSuffix(std::string filename);
-
-  static void GetFileList(std::vector<std::string>& files,
-                          const std::string path,
-                          const std::string suffix = "");
 
   static void GetFileList(const std::string& path, const std::string& suffix,
                           std::vector<std::string>* files);

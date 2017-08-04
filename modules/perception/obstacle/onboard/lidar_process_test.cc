@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
+#include <pcl/io/pcd_io.h>
 #include <vector>
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 
 #define private public
@@ -26,6 +28,10 @@ namespace apollo {
 namespace perception {
 
 using std::vector;
+using pcl_util::Point;
+using pcl_util::PointCloud;
+using pcl_util::PointCloudPtr;
+using Eigen::Matrix4d;
 
 class LidarProcessTest : public testing::Test {
  protected:
@@ -39,15 +45,21 @@ class LidarProcessTest : public testing::Test {
   LidarProcess lidar_process_;
 };
 
-TEST_F(LidarProcessTest, test_InitFrameDependence) {
+TEST_F(LidarProcessTest, test_Init) {
+  lidar_process_.inited_ = true;
+  EXPECT_TRUE(lidar_process_.Init());
+  lidar_process_.inited_ = false;
+
   FLAGS_work_root = "modules/perception/data";
   FLAGS_enable_hdmap_input = false;
   EXPECT_FALSE(lidar_process_.InitFrameDependence());
+  EXPECT_FALSE(lidar_process_.Init());
   FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
+  FLAGS_enable_hdmap_input = true;
+  EXPECT_FALSE(lidar_process_.InitFrameDependence());
+  FLAGS_enable_hdmap_input = false;
   EXPECT_TRUE(lidar_process_.InitFrameDependence());
-}
 
-TEST_F(LidarProcessTest, test_InitAlgorithmPlugin) {
   FLAGS_onboard_roi_filter = "not_exit_algo";
   FLAGS_onboard_segmentor = "not_exit_algo";
   FLAGS_onboard_object_builder = "not_exit_algo";
@@ -61,18 +73,37 @@ TEST_F(LidarProcessTest, test_InitAlgorithmPlugin) {
 
   FLAGS_onboard_object_builder = "DummyObjectBuilder";
   EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
+  EXPECT_FALSE(lidar_process_.Init());
 
   FLAGS_onboard_tracker = "DummyTracker";
   EXPECT_TRUE(lidar_process_.InitAlgorithmPlugin());
-}
 
-TEST_F(LidarProcessTest, test_Init) {
-  lidar_process_.inited_ = true;
-  EXPECT_TRUE(lidar_process_.Init());
-
-  lidar_process_.inited_ = false;
   EXPECT_TRUE(lidar_process_.Init());
   EXPECT_TRUE(lidar_process_.inited_);
+}
+
+TEST_F(LidarProcessTest, test_Process) {
+  std::string pcd_file =
+      "modules/perception/data/hm_tracker_test/"
+      "QN68P2_12_1476265365_1476265665_2.pcd";
+  PointCloudPtr point_cloud(new PointCloud);
+  pcl::PointCloud<pcl_util::PointXYZIT>::Ptr org_cloud(
+      new pcl::PointCloud<pcl_util::PointXYZIT>);
+  pcl::io::loadPCDFile(pcd_file, *org_cloud);
+  point_cloud->points.reserve(org_cloud->points.size());
+  for (size_t i = 0; i < org_cloud->points.size(); ++i) {
+    Point pt;
+    pt.x = org_cloud->points[i].x;
+    pt.y = org_cloud->points[i].y;
+    pt.z = org_cloud->points[i].z;
+    pt.intensity = org_cloud->points[i].intensity;
+    if (isnan(org_cloud->points[i].x)) continue;
+    point_cloud->push_back(pt);
+  }
+  std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
+  (*velodyne_trans) << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
+  lidar_process_.hdmap_input_ = Singleton<HDMapInput>::Get();
+  EXPECT_TRUE(lidar_process_.Process(123.0, point_cloud, velodyne_trans));
 }
 
 TEST_F(LidarProcessTest, test_GeneratePbMsg) {

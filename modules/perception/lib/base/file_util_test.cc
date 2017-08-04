@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace apollo {
 namespace perception {
@@ -70,6 +71,13 @@ TEST(FileUtilTest, test_exists) {
   EXPECT_FALSE(FileUtil::Exists("./tmp", ".txt"));
   ASSERT_EQ(std::system("touch ./tmp/a.txt"), 0);
   EXPECT_TRUE(FileUtil::Exists("./tmp", ".txt"));
+
+  FileType type;
+  ASSERT_TRUE(FileUtil::GetType("./tmp", &type));
+  ASSERT_TRUE(FileUtil::GetType("./tmp/a.txt", &type));
+  std::system("ln -s ./tmp/a.txt ./ln_a.txt");
+  ASSERT_FALSE(FileUtil::GetType("./ln_a.txt", &type));
+
   ASSERT_TRUE(FileUtil::DeleteFile("/not_exist_path"));
   ASSERT_TRUE(FileUtil::DeleteFile("./tmp"));
 }
@@ -85,6 +93,43 @@ TEST(FileUtilTest, test_ReadLines) {
   EXPECT_TRUE(FileUtil::ReadLines(data_file, &lines));
   EXPECT_EQ(lines.size(), 2u);
   std::system("rm ./1.txt");
+}
+
+TEST(FileUtilTest, test_GetFileContent) {
+  std::string proto_file =
+      "modules/perception/data/config_manager_test/config_manager.config";
+  std::string content;
+  EXPECT_FALSE(FileUtil::GetFileContent(proto_file, NULL));
+  EXPECT_FALSE(FileUtil::GetFileContent("/not_exist_path", &content));
+  EXPECT_TRUE(FileUtil::GetFileContent(proto_file, &content));
+}
+
+TEST(FileUtilTest, test_RemoveFileSuffix) {
+  std::string proto_file =
+      "modules/perception/data/config_manager_test/config_manager.config";
+  EXPECT_EQ("config_manager", FileUtil::RemoveFileSuffix(proto_file));
+
+  proto_file = "config_manager";
+  EXPECT_EQ("config_manager", FileUtil::RemoveFileSuffix(proto_file));
+}
+
+TEST(FileUtilTest, test_GetFileList) {
+  std::vector<std::string> files;
+  FileUtil::GetFileList("/not_exist_path", "config", &files);
+  EXPECT_EQ(0, files.size());
+  std::string path = "modules/perception/data/config_manager_test";
+  FileUtil::GetFileList(path, "config", &files);
+  EXPECT_TRUE(files.size() > 0);
+
+  files.clear();
+  FileUtil::GetFileList(path, &files);
+  EXPECT_TRUE(files.size() > 0);
+}
+
+TEST(FileUtilTest, test_NumLines) {
+  std::string proto_file =
+      "modules/perception/data/config_manager_test/config_manager.config";
+  EXPECT_TRUE(FileUtil::NumLines(proto_file) > 0);
 }
 
 }  // namespace perception
