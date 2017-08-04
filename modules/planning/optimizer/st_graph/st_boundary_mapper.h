@@ -55,14 +55,6 @@ class StBoundaryMapper {
                     const double buffer) const;
 
   double GetArea(const std::vector<STPoint>& boundary_points) const;
-  apollo::common::Status MapMainDecisionStop(
-      const MainStop& main_stop, const double planning_distance,
-      const double planning_time,
-      std::vector<StGraphBoundary>* const boundary) const;
-
-  apollo::common::Status MapMissionComplete(
-      const double planning_distance, const double planning_time,
-      std::vector<StGraphBoundary>* const boundary) const;
 
   apollo::common::Status MapObstacleWithPredictionTrajectory(
       const common::TrajectoryPoint& initial_planning_point,
