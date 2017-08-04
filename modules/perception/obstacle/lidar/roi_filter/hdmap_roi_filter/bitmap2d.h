@@ -25,6 +25,10 @@
 namespace apollo {
 namespace perception {
 
+/**
+ * @class Bitmap2D
+ *
+ */
 class Bitmap2D {
 public:
   enum DirectionMajor{XMAJOR = 0, YMAJOR =1};
@@ -46,7 +50,6 @@ public:
   bool IsExist(const Eigen::Vector2d& p) const;
   bool Check(const Eigen::Vector2d& p) const;
 
-  void Set(const Eigen::Vector2d& p);
   void Set(double x, double min_y, double max_y);
   void Set(uint64_t x_id, uint64_t min_y_id, uint64_t max_y_id);
 
