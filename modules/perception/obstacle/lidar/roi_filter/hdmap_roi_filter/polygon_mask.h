@@ -30,12 +30,12 @@ namespace perception {
 
 typedef typename PolygonScanConverter::Interval Interval;
 
-void DrawPolygonInBitmap(const PolygonScanConverter::Polygon &polygon,
-                         Bitmap2D &bitmap, const double extend_dist);
+void DrawPolygonInBitmap(const PolygonScanConverter::Polygon& polygon,
+                         const double extend_dist, Bitmap2D* bitmap);
 
 void DrawPolygonInBitmap(
-    const std::vector<PolygonScanConverter::Polygon> &polygons,
-    Bitmap2D &bitmap, const double extend_dist);
+    const std::vector<PolygonScanConverter::Polygon>& polygons,
+    const double extend_dist, Bitmap2D* bitmap);
 
 /*
  * @brief: Get valid x range(Major direction range)
