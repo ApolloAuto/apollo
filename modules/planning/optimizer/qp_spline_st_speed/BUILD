@@ -19,7 +19,7 @@ cc_library(
         "//modules/common/util",
         "//modules/planning/common:planning_util",
         "//modules/planning/math/smoothing_spline:spline_1d_generator",
-        "//modules/planning/optimizer/st_graph:st_boundary_mapper_impl",
+        "//modules/planning/optimizer/st_graph:st_boundary_mapper",
         "//modules/planning/optimizer/st_graph:st_graph_data",
     ],
 )
@@ -41,7 +41,7 @@ cc_library(
         "//modules/localization/proto:pose_proto",
         "//modules/map/hdmap",
         "//modules/planning/optimizer:speed_optimizer",
-        "//modules/planning/optimizer/st_graph:st_boundary_mapper_impl",
+        "//modules/planning/optimizer/st_graph:st_boundary_mapper",
         "//modules/planning/proto:planning_proto",
     ],
 )

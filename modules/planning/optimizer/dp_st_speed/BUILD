@@ -56,7 +56,7 @@ cc_library(
         "//modules/common/vehicle_state",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/optimizer:speed_optimizer",
-        "//modules/planning/optimizer/st_graph:st_boundary_mapper_impl",
+        "//modules/planning/optimizer/st_graph:st_boundary_mapper",
         "//modules/planning/optimizer/st_graph:st_graph_data",
         "//modules/planning/proto:dp_st_speed_config_proto",
         "//modules/planning/proto:planning_proto",

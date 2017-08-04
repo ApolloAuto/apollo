@@ -43,8 +43,9 @@ DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
 bool DpStSpeedOptimizer::Init() {
-  if (!boundary_mapper_.Init(FLAGS_st_boundary_config_file)) {
-    AERROR << "failed to load config file " << FLAGS_dp_st_speed_config_file;
+  if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
+                                      &st_boundary_config_)) {
+    AERROR << "failed to load config file " << FLAGS_st_boundary_config_file;
     return false;
   }
   if (!common::util::GetProtoFromFile(FLAGS_dp_st_speed_config_file,
@@ -66,12 +67,13 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
 
+  StBoundaryMapper boundary_mapper(st_boundary_config_, reference_line);
+
   const double path_length = path_data.discretized_path().length();
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
-  if (!boundary_mapper_
+  if (!boundary_mapper
            .GetGraphBoundary(init_point, *decision_data, path_data,
-                             reference_line,
                              dp_st_speed_config_.total_path_length(),
                              dp_st_speed_config_.total_time(), &boundaries)
            .ok()) {
@@ -83,8 +85,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 2 perform graph search
   SpeedLimit speed_limit;
-  if (!boundary_mapper_.GetSpeedLimits(reference_line, path_data, &speed_limit)
-           .ok()) {
+  if (!boundary_mapper.GetSpeedLimits(path_data, &speed_limit).ok()) {
     const std::string msg =
         "Getting speed limits for dp st speed optimizer failed!";
     AERROR << msg;
