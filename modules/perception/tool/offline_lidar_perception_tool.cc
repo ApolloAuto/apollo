@@ -203,6 +203,7 @@ public:
                 FrameContent content;
                 content.set_lidar_cloud(cloud);
                 content.set_lidar_pose(pose);
+                content.set_tracked_objects(result_objects);
                 visualizer_->update_camera_system(&content);
                 visualizer_->render(content);
             }
