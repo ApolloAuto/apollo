@@ -15,6 +15,7 @@ cc_library(
         "qp_spline_path_optimizer.h",
     ],
     deps = [
+        "@eigen//:eigen",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/math/qp_solver",
@@ -40,7 +41,18 @@ cc_library(
         "//modules/planning/optimizer:path_optimizer",
         "//modules/planning/proto:qp_spline_path_config_proto",
         "//modules/planning/reference_line",
-        "@eigen//:eigen",
+    ],
+)
+
+cc_test(
+    name = "qp_spline_path_optimizer_test",
+    size = "small",
+    srcs = [
+        "qp_spline_path_optimizer_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":qp_spline_path",
     ],
 )
 
