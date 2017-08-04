@@ -111,6 +111,14 @@ TrajectoryStitcher::compute_stitching_trajectory(
                   tp.set_relative_time(tp.relative_time() - zero_time);
                 });
 
+  double zero_s =
+      prev_trajectory.trajectory_point_at(forward_index).path_point().s();
+  std::for_each(stitching_trajectory.begin(), stitching_trajectory.end(),
+                [&zero_s](common::TrajectoryPoint& tp) {
+                  double s = tp.path_point().s();
+                  tp.mutable_path_point()->set_s(s - zero_s);
+                });
+
   return stitching_trajectory;
 }
 
