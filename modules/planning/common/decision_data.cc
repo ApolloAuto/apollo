@@ -49,8 +49,7 @@ std::vector<Obstacle *> *DecisionData::MutableDynamicObstacles() {
 
 void DecisionData::AddObstacle(Obstacle *obstacle) {
   obstacles_.push_back(obstacle);
-  if (obstacle->Perception().type() ==
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE) {
+  if (obstacle->IsStatic()) {
     static_obstacles_.push_back(obstacle);
   } else {
     dynamic_obstacles_.push_back(obstacle);
