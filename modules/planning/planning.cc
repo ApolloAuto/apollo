@@ -264,6 +264,7 @@ bool Planning::Plan(const bool is_on_auto_mode,
   publishable_trajectory.set_header_time(current_time_stamp);
 
   publishable_trajectory.populate_trajectory_protobuf(trajectory_pb);
+  trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
 
   // update last publishable trajectory;
   last_publishable_trajectory_ = std::move(publishable_trajectory);
