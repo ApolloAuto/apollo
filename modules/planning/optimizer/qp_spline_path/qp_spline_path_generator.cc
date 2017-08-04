@@ -68,7 +68,7 @@ bool QpSplinePathGenerator::Generate(const DecisionData& decision_data,
   }
 
   AINFO << "pss path start with " << start_s << ", end with " << end_s;
-  if (!InitSmoothingSpline(init_frenet_point_, start_s, end_s - 0.1)) {
+  if (!InitSpline(init_frenet_point_, start_s, end_s - 0.1)) {
     AERROR << "Init smoothing spline failed with (" << start_s << ",  end_s "
            << end_s;
     return false;
@@ -189,10 +189,11 @@ bool QpSplinePathGenerator::InitCoordRange(const QpFrenetFrame& qp_frenet_frame,
   return true;
 }
 
-bool QpSplinePathGenerator::InitSmoothingSpline(
+bool QpSplinePathGenerator::InitSpline(
 
     const common::FrenetFramePoint& init_frenet_point, const double start_s,
     const double end_s) {
+  // set knots
   if (qp_spline_path_config_.number_of_knots() <= 1) {
     AERROR << "Two few number of knots: "
            << qp_spline_path_config_.number_of_knots();
@@ -210,8 +211,28 @@ bool QpSplinePathGenerator::InitSmoothingSpline(
     knots_.push_back(curr_knot_s);
     curr_knot_s += delta_s;
   }
+
+  // spawn a new spline generator
   spline_generator_.reset(
       new Spline1dGenerator(knots_, qp_spline_path_config_.spline_order()));
+
+  // set evaluated_s_
+  std::uint32_t num_evaluated_s =
+      qp_spline_path_config_.number_of_fx_constraint_knots();
+  if (num_evaluated_s <= 2) {
+    AERROR << "Too few evaluated positions. Suggest: > 2, current number: "
+           << num_evaluated_s;
+    return false;
+  }
+  const double ds = (spline_generator_->spline().x_knots().back() -
+                     spline_generator_->spline().x_knots().front()) /
+                    num_evaluated_s;
+  double curr_evaluated_s = spline_generator_->spline().x_knots().front();
+
+  for (uint32_t i = 0; i < num_evaluated_s; ++i) {
+    evaluated_s_.push_back(curr_evaluated_s);
+    curr_evaluated_s += ds;
+  }
 
   return true;
 }
@@ -231,64 +252,28 @@ bool QpSplinePathGenerator::AddConstraint(
   AINFO << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint
-  const std::vector<double> spline_knots =
-      spline_generator_->spline().x_knots();
-  if (spline_knots.size() < 2) {
-    AERROR << common::util::StrCat("Smoothing spline knot size(",
-                                   spline_knots.size(), ") < 2");
-    return false;
-  }
-  double s_length = spline_knots.back() - spline_knots.front();
-  if (s_length <= 0) {
-    AERROR << common::util::StrCat("Smoothing spline knot length(", s_length,
-                                   ") <= 0");
-    return false;
-  }
+  spline_constraint->add_point_fx_constraint(knots_.back(), 0.0);
+  spline_constraint->add_point_derivative_constraint(knots_.back(), 0.0);
+  spline_constraint->add_point_second_derivative_constraint(knots_.back(), 0.0);
 
-  std::pair<double, double> boundary = std::make_pair(0.0, 0.0);
-  double end_ref_l = (boundary.first + boundary.second) / 2.0;
-  spline_constraint->add_point_fx_constraint(spline_knots.back(), end_ref_l);
-  spline_constraint->add_point_derivative_constraint(spline_knots.back(), 0.0);
-  spline_constraint->add_point_second_derivative_constraint(spline_knots.back(),
-                                                            0.0);
-  AINFO << "end frenet point:" << s_length << ", " << end_ref_l
-        << ", 0.0, 0.0.";
-  const std::vector<double> sampling_knots = spline_knots;
-
-  if (sampling_knots.size() <= 2) {
-    return false;
-  }
-
-  std::uint32_t num_fx_bound =
-      qp_spline_path_config_.number_of_fx_constraint_knots();
+  // add map bound constraint
   std::vector<double> boundary_low;
   std::vector<double> boundary_high;
-  std::vector<double> fx_knots;
-
-  if (num_fx_bound > 1) {
-    double ds = (sampling_knots.back() - sampling_knots.front()) / num_fx_bound;
-    double s = sampling_knots.front();
-
-    for (std::uint32_t i = 0; i < num_fx_bound + 1; ++i) {
-      fx_knots.push_back(s);
-      std::pair<double, double> boundary = std::make_pair(0.0, 0.0);
-      qp_frenet_frame.GetMapBound(s, &boundary);
-      boundary_low.push_back(boundary.first);
-      boundary_high.push_back(boundary.second);
-      s += ds;
-      // calculate boundary here
-    }
-
-    if (!spline_constraint->add_fx_boundary(fx_knots, boundary_low,
-                                            boundary_high)) {
-      AERROR << "Add boundary constraint failed";
-      return false;
-    }
+  for (const double s : evaluated_s_) {
+    std::pair<double, double> boundary = std::make_pair(0.0, 0.0);
+    qp_frenet_frame.GetMapBound(s, &boundary);
+    boundary_low.push_back(boundary.first);
+    boundary_high.push_back(boundary.second);
+  }
+  if (!spline_constraint->add_fx_boundary(knots_, boundary_low,
+                                          boundary_high)) {
+    AERROR << "Add boundary constraint failed";
+    return false;
   }
 
-  // add smooth jointness constraint
+  // add spline joint third derivative constraint
   if (!spline_constraint->add_third_derivative_smooth_constraint()) {
-    AERROR << "Add spline jointness constraint failed!";
+    AERROR << "Add spline joint third derivative constraint failed!";
     return false;
   }
 
