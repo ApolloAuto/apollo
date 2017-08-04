@@ -33,3 +33,4 @@ from modules.perception.proto import traffic_light_detection_pb2
 from modules.planning.proto import planning_internal_pb2
 from modules.planning.proto import planning_pb2
 from modules.prediction.proto import prediction_obstacle_pb2
+from modules.routing.proto import routing_pb2
