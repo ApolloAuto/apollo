@@ -47,8 +47,13 @@ class DPRoadGraph {
   ~DPRoadGraph() = default;
 
   bool FindPathTunnel(const ReferenceLine &reference_line,
-                   DecisionData *const decision_data,
-                   PathData *const path_data);
+                      PathData *const path_data);
+
+  bool ComputeObjectdecision(const PathData &path_data,
+                             const SpeedData &heuristic_speed_data,
+                             const ReferenceLine &reference_line,
+                             DecisionData *const decision_data);
+
  private:
   /**
    * an private inner struct for the dp algorithm
@@ -57,11 +62,12 @@ class DPRoadGraph {
    public:
     DPRoadGraphNode() = default;
 
-    DPRoadGraphNode(const common::SLPoint point_sl, const DPRoadGraphNode *node_prev)
+    DPRoadGraphNode(const common::SLPoint point_sl,
+                    const DPRoadGraphNode *node_prev)
         : sl_point(point_sl), min_cost_prev_node(node_prev) {}
 
-    DPRoadGraphNode(const common::SLPoint point_sl, const DPRoadGraphNode *node_prev,
-           const double cost)
+    DPRoadGraphNode(const common::SLPoint point_sl,
+                    const DPRoadGraphNode *node_prev, const double cost)
         : sl_point(point_sl), min_cost_prev_node(node_prev), min_cost(cost) {}
 
     void UpdateCost(const DPRoadGraphNode *node_prev,
@@ -82,13 +88,7 @@ class DPRoadGraph {
   bool Init(const ReferenceLine &reference_line);
 
   bool Generate(const ReferenceLine &reference_line,
-                      DecisionData *const decision_data,
-                      std::vector<DPRoadGraphNode> *min_cost_path);
-
-  bool compute_object_decision_from_path(const PathData &path_data,
-                                         const SpeedData &heuristic_speed_data,
-                                         const ReferenceLine &reference_line,
-                                         DecisionData *const decision_data);
+                std::vector<DPRoadGraphNode> *min_cost_path);
 
   bool fill_ego_by_time(
       const FrenetFramePath &frenet_frame_path,
@@ -96,9 +96,10 @@ class DPRoadGraph {
       const SpeedData &heuristic_speed_data, int evaluate_times,
       std::vector<::apollo::common::math::Box2d> *ego_by_time);
 
-  bool SamplePathWaypoints(const ReferenceLine &reference_line,
-                  const common::TrajectoryPoint &init_point,
-                  std::vector<std::vector<common::SLPoint>> *const points);
+  bool SamplePathWaypoints(
+      const ReferenceLine &reference_line,
+      const common::TrajectoryPoint &init_point,
+      std::vector<std::vector<common::SLPoint>> *const points);
 
  private:
   DpPolyPathConfig config_;

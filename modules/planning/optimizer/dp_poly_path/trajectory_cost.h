@@ -41,8 +41,7 @@ class TrajectoryCost {
   explicit TrajectoryCost(const DpPolyPathConfig &config,
                           const ReferenceLine &reference_line,
                           const common::VehicleParam &vehicle_param,
-                          const SpeedData &heuristic_speed_data,
-                          const DecisionData &decision_data);
+                          const SpeedData &heuristic_speed_data);
   double calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
                    const double end_s) const;
 
@@ -51,9 +50,6 @@ class TrajectoryCost {
   const ReferenceLine *reference_line_ = nullptr;
   const common::VehicleParam vehicle_param_;
   SpeedData heuristic_speed_data_;
-  std::vector<::apollo::common::math::Box2d> static_obstacle_boxes_;
-  std::vector<std::vector<::apollo::common::math::Box2d>> dynamic_obstacle_trajectory_;
-  std::vector<double> dynamic_obstacle_probability_;
   uint32_t evaluate_times_;
 };
 
