@@ -39,15 +39,17 @@ namespace planning {
 class StBoundaryMapper {
  public:
   StBoundaryMapper(const StBoundaryConfig& config,
-                   const ReferenceLine& reference_line);
+                   const ReferenceLine& reference_line,
+                   const PathData& path_data,
+                   const common::TrajectoryPoint& initial_planning_point,
+                   const double planning_distance, const double planning_time);
+
   apollo::common::Status GetGraphBoundary(
-      const common::TrajectoryPoint& initial_planning_point,
-      const DecisionData& decision_data, const PathData& path_data,
-      const double planning_distance, const double planning_time,
+      const DecisionData& decision_data,
       std::vector<StGraphBoundary>* const boundary) const;
 
   virtual apollo::common::Status GetSpeedLimits(
-      const PathData& path_data, SpeedLimit* const speed_limit_data) const;
+      SpeedLimit* const speed_limit_data) const;
 
  private:
   bool CheckOverlap(const apollo::common::PathPoint& path_point,
@@ -57,22 +59,21 @@ class StBoundaryMapper {
   double GetArea(const std::vector<STPoint>& boundary_points) const;
 
   apollo::common::Status MapObstacleWithPredictionTrajectory(
-      const common::TrajectoryPoint& initial_planning_point,
       const Obstacle& obstacle, const ObjectDecisionType obj_decision,
-      const PathData& path_data, const double planning_distance,
-      const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const;
 
   apollo::common::Status MapObstacleWithoutPredictionTrajectory(
       const Obstacle& obstacle, const ObjectDecisionType obj_decision,
-      const PathData& path_data, const double planning_distance,
-      const double planning_time,
       std::vector<StGraphBoundary>* const boundary) const;
 
  private:
   StBoundaryConfig st_boundary_config_;
   const ReferenceLine& reference_line_;
+  const PathData& path_data_;
   const apollo::common::VehicleParam vehicle_param_;
+  const common::TrajectoryPoint& initial_planning_point_;
+  const double planning_distance_;
+  const double planning_time_;
 };
 
 }  // namespace planning
