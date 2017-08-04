@@ -42,13 +42,13 @@ constexpr double kEpsilontol = 1e-6;
 }
 
 QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
-                             const DecisionData& decision_data,
+                             const std::vector<const Obstacle*>& obstacles,
                              const SpeedData& speed_data,
                              const common::FrenetFramePoint& init_frenet_point,
                              const double start_s, const double end_s,
                              const double time_resolution)
     : reference_line_(reference_line),
-      decision_data_(decision_data),
+      obstacles_(obstacles),
       speed_data_(speed_data),
       vehicle_param_(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
@@ -92,15 +92,10 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
     AERROR << "Calculate hd map bound failed!";
     return false;
   }
-  if (!CalculateStaticObstacleBound()) {
-    AERROR << "Calculate static obstacle bound failed!";
+  if (!CalculateObstacleBound()) {
+    AERROR << "Calculate obstacle bound failed!";
     return false;
   }
-  if (!CalculateDynamicObstacleBound()) {
-    AERROR << "Calculate dynamic obstacle bound failed!";
-    return false;
-  }
-
   return true;
 }
 
@@ -443,31 +438,20 @@ bool QpFrenetFrame::CalculateHDMapBound() {
   return true;
 }
 
-bool QpFrenetFrame::CalculateStaticObstacleBound() {
-  const std::vector<Obstacle*> static_obs_list =
-      decision_data_.StaticObstacles();
-
-  for (uint32_t i = 0; i < static_obs_list.size(); ++i) {
-    const Obstacle* cur_obstacle = static_obs_list[i];
-    if (!MapStaticObstacleWithDecision(*cur_obstacle)) {
-      AERROR << "mapping obstacle with id [" << cur_obstacle->Id()
-             << "] failed in qp frenet frame.";
-      return false;
-    }
-  }
-  return true;
-}
-
-bool QpFrenetFrame::CalculateDynamicObstacleBound() {
-  const std::vector<Obstacle*> dynamic_obs_list =
-      decision_data_.DynamicObstacles();
-
-  for (uint32_t i = 0; i < dynamic_obs_list.size(); ++i) {
-    const Obstacle* cur_obstacle = dynamic_obs_list[i];
-    if (!MapDynamicObstacleWithDecision(*cur_obstacle)) {
-      AERROR << "mapping obstacle with id [" << cur_obstacle->Id()
-             << "] failed in qp frenet frame.";
-      return false;
+bool QpFrenetFrame::CalculateObstacleBound() {
+  for (const auto obstacle : obstacles_) {
+    if (obstacle->IsStatic()) {
+      if (!MapStaticObstacleWithDecision(*obstacle)) {
+        AERROR << "mapping obstacle with id [" << obstacle->Id()
+               << "] failed in qp frenet frame.";
+        return false;
+      }
+    } else {
+      if (!MapDynamicObstacleWithDecision(*obstacle)) {
+        AERROR << "mapping obstacle with id [" << obstacle->Id()
+               << "] failed in qp frenet frame.";
+        return false;
+      }
     }
   }
   return true;
@@ -497,7 +481,8 @@ bool QpFrenetFrame::GetBound(
   double high_first = bound_map[lower_index + 1].first;
   double high_second = bound_map[lower_index + 1].second;
 
-  // If there is only one infinity in low and high point, then make it equal to
+  // If there is only one infinity in low and high point, then make it equal
+  // to
   // the not inf one.
   if (std::isinf(low_first) && !std::isinf(high_first)) {
     low_first = high_first;
