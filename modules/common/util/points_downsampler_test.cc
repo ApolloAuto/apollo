@@ -30,19 +30,19 @@ TEST(DownSamplerTest, DownSampleByAngle) {
     using ::apollo::common::math::Vec2d;
 
     std::vector<Vec2d> points;
-    points.push_back(Vec2d(-405.778, -134.969));
-    points.push_back(Vec2d(-403.919, -127.696));
-    points.push_back(Vec2d(-400.635, -115.407));
-    points.push_back(Vec2d(-397.997, -105.291));
-    points.push_back(Vec2d(-395.801, -96.8637));
-    points.push_back(Vec2d(-392.889, -86.1015));
-    points.push_back(Vec2d(-388.054, -67.9935));
-    points.push_back(Vec2d(-385.994, -60.1831));
-    points.push_back(Vec2d(-378.213, -30.2776));
-    points.push_back(Vec2d(-376.702, -24.5804));
-    points.push_back(Vec2d(-373.825, -13.3855));
-    points.push_back(Vec2d(-367.583, 10.4028));
-    points.push_back(Vec2d(-363.025, 27.4212));
+    points.emplace_back(-405.778, -134.969);
+    points.emplace_back(-403.919, -127.696);
+    points.emplace_back(-400.635, -115.407);
+    points.emplace_back(-397.997, -105.291);
+    points.emplace_back(-395.801, -96.8637);
+    points.emplace_back(-392.889, -86.1015);
+    points.emplace_back(-388.054, -67.9935);
+    points.emplace_back(-385.994, -60.1831);
+    points.emplace_back(-378.213, -30.2776);
+    points.emplace_back(-376.702, -24.5804);
+    points.emplace_back(-373.825, -13.3855);
+    points.emplace_back(-367.583, 10.4028);
+    points.emplace_back(-363.025, 27.4212);
 
     std::vector<int> sampled_indices;
 

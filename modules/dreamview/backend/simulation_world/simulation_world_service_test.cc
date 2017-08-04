@@ -39,7 +39,7 @@ using apollo::prediction::PredictionObstacles;
 namespace apollo {
 namespace dreamview {
 
-const float kEpsilon = 0.0001;
+const float kEpsilon = 0.01;
 
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
@@ -441,8 +441,22 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);
-  EXPECT_EQ(68, world.route_size());
-  // TODO(siyangy): Verify route points
+  EXPECT_EQ(23, world.route_size());
+
+  double points[23][2] = {
+      {-1826.41, -3027.52}, {-1839.88, -3023.9},  {-1851.95, -3020.71},
+      {-1857.06, -3018.62}, {-1858.04, -3017.94}, {-1859.56, -3016.51},
+      {-1860.48, -3014.95}, {-1861.12, -3013.2},  {-1861.62, -3010.06},
+      {-1861.29, -3005.88}, {-1859.8, -2999.36},  {-1855.8, -2984.56},
+      {-1851.39, -2968.23}, {-1844.32, -2943.14}, {-1842.9, -2939.22},
+      {-1841.74, -2937.09}, {-1839.35, -2934.03}, {-1837.76, -2932.88},
+      {-1835.53, -2931.86}, {-1833.36, -2931.52}, {-1831.33, -2931.67},
+      {-1827.05, -2932.6},  {-1809.64, -2937.85}};
+
+  for (size_t i = 0; i < world.route_size(); ++i) {
+    EXPECT_NEAR(world.route(i).x(), points[i][0], kEpsilon);
+    EXPECT_NEAR(world.route(i).y(), points[i][1], kEpsilon);
+  }
 }
 
 }  // namespace dreamview
