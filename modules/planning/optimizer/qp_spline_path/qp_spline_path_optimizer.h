@@ -23,9 +23,9 @@
 
 #include <string>
 
-#include "modules/planning/optimizer/path_optimizer.h"
+#include "modules/planning/proto/qp_spline_path_config.pb.h"
 
-#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
+#include "modules/planning/optimizer/path_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -43,7 +43,7 @@ class QpSplinePathOptimizer : public PathOptimizer {
                                  PathData* const path_data) override;
 
  private:
-  QpSplinePathGenerator _path_generator;
+  QpSplinePathConfig qp_spline_path_config_;
 };
 
 }  // namespace planning

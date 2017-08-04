@@ -38,23 +38,20 @@ namespace planning {
 
 class QpSplinePathGenerator {
  public:
-  QpSplinePathGenerator() = default;
-  bool Init(const std::string& config_file);
-  bool generate(const ReferenceLine& reference_line,
-                const DecisionData& decision_data, const SpeedData& speed_data,
+  QpSplinePathGenerator(const ReferenceLine& reference_line,
+                        const QpSplinePathConfig& qp_spline_path_config_);
+  bool generate(const DecisionData& decision_data, const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,
                 PathData* const path_data);
 
  private:
-  bool calculate_sl_point(const ReferenceLine& reference_line,
-                          const common::TrajectoryPoint& traj_point,
+  bool calculate_sl_point(const common::TrajectoryPoint& traj_point,
                           common::FrenetFramePoint* const sl_point);
 
   bool init_coord_range(const QpFrenetFrame& qp_frenet_frame,
                         double* const start_s, double* const end_s);
 
-  bool init_smoothing_spline(const ReferenceLine& reference_line,
-                             const common::FrenetFramePoint& init_frenet_point,
+  bool init_smoothing_spline(const common::FrenetFramePoint& init_frenet_point,
                              const double start_s, const double end_s);
 
   bool setup_constraint(const QpFrenetFrame& qp_frenet_frame);
@@ -70,8 +67,9 @@ class QpSplinePathGenerator {
                                double* const y_diff) const;
 
  private:
-  QpSplinePathConfig qp_spline_path_config_;
-  common::FrenetFramePoint init_point_;
+  const ReferenceLine& reference_line_;
+  const QpSplinePathConfig& qp_spline_path_config_;
+  common::FrenetFramePoint init_frenet_point_;
   std::unique_ptr<Spline1dGenerator> spline_generator_;
 
   std::vector<double> knots_;
