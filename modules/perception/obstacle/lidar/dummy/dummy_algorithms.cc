@@ -28,7 +28,7 @@ using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
 
 static void extract_pointcloud_indices(const PointCloudPtr &cloud,
-                                       PointIndicesPtr out_indices) {
+                                       PointIndices* out_indices) {
   const size_t vec_size = cloud->size();
   auto &indices = out_indices->indices;
   indices.resize(vec_size);
@@ -39,13 +39,14 @@ static void extract_pointcloud_indices(const PointCloudPtr &cloud,
 bool DummyROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
                             const ROIFilterOptions &roi_filter_options,
                             pcl_util::PointIndices* roi_indices) {
+  extract_pointcloud_indices(cloud, roi_indices);
   return true;
 }
 
 bool DummyGroundDetector::Detect(const GroundDetectorOptions &options,
                                  PointCloudPtr cloud,
                                  PointIndicesPtr non_ground_indices) {
-  extract_pointcloud_indices(cloud, non_ground_indices);
+  extract_pointcloud_indices(cloud, non_ground_indices.get());
   return result_detect_;
 }
 
