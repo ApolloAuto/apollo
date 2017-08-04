@@ -9,15 +9,7 @@ cc_binary(
         "//modules/perception/tool/conf:perception_tool_config",
         "//modules/perception:perception_model",
     ],
-    #copts = ["-L/usr/lib64", "-L/usr/lib/x86_64-linux-gnu"],
-    #linkopts = [
-    #  "-lglfw",
-    #  "-lglapi",
-    #  "-lglib-2.0",
-    #  "-lglut",
-    #  "-lglade-2.0",
-    #],
-
+    linkstatic = 0,
     deps = [
         "//modules/common",
         "//modules/common:log",

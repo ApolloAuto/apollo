@@ -50,17 +50,17 @@
 # the segmentation algorithm for onboard
 # type: string
 # candidate: DummySegmentation, CNNSegmentation
---onboard_segmentor=DummySegmentation
+--onboard_segmentor=CNNSegmentation
 
 # the object build algorithm for onboard
 # type: string
 # candidate: DummyObjectBuilder, MinBoxObjectBuilder
---onboard_object_builder=DummyObjectBuilder
+--onboard_object_builder=MinBoxObjectBuilder
 
 # the tracking algorithm for onboard
 # type: string
 # candidate: DummyTracker, HmObjectTracker
---onboard_tracker=DummyTracker
+--onboard_tracker=HmObjectTracker
 
 # the perception module's output topic name.
 # type: string

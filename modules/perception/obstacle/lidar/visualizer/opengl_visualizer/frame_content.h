@@ -24,12 +24,11 @@
 #include <thread>
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-
+#include "modules/perception/obstacle/base/object.h"
 
 namespace apollo {
 namespace perception {
  
-
 class FrameContent {
 public:
     FrameContent();
@@ -44,11 +43,15 @@ public:
 
     bool has_cloud();
 
+    void set_tracked_objects(const std::vector<ObjectPtr>& objects);                                  
+
+    std::vector<ObjectPtr> get_tracked_objects();                         
+
 protected:
     //coordinate transform utilities
     void offset_pointcloud(pcl_util::PointCloud& cloud, const Eigen::Vector3d& offset);
     void offset_pointcloud(pcl_util::PointDCloud& cloud, const Eigen::Vector3d& offset);
-    //void offset_object(ObjectPtr object, const Eigen::Vector3d& offset);
+    void offset_object(ObjectPtr object, const Eigen::Vector3d& offset);
 private:
     //input
     //1.lidar
@@ -58,9 +61,10 @@ private:
 
     Eigen::Vector3d _global_offset;  
     bool _global_offset_initialized;
+    std::vector<ObjectPtr> _tracked_objects_lidar;    //after tracking
 };
 
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif //  ADU_PERCEPTION_OBSTACLE_FRAME_CONTENT_H
