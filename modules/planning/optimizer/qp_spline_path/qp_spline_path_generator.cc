@@ -42,9 +42,10 @@ QpSplinePathGenerator::QpSplinePathGenerator(
     : reference_line_(reference_line),
       qp_spline_path_config_(qp_spline_path_config) {}
 
-bool QpSplinePathGenerator::Generate(
-    const std::vector<const Obstacle*>& obstacles, const SpeedData& speed_data,
-    const common::TrajectoryPoint& init_point, PathData* const path_data) {
+bool QpSplinePathGenerator::Generate(const ConstObstacleList& obstacles,
+                                     const SpeedData& speed_data,
+                                     const common::TrajectoryPoint& init_point,
+                                     PathData* const path_data) {
   if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
