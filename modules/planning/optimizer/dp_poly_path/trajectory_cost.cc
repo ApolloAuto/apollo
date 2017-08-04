@@ -37,8 +37,7 @@ using TrajectoryPoint = ::apollo::common::TrajectoryPoint;
 TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
                                const ReferenceLine &reference_line,
                                const common::VehicleParam &vehicle_param,
-                               const SpeedData &heuristic_speed_data,
-                               const DecisionData &decision_data)
+                               const SpeedData &heuristic_speed_data)
     : config_(config),
       reference_line_(&reference_line),
       vehicle_param_(vehicle_param),
@@ -47,28 +46,6 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
       std::min(heuristic_speed_data_.total_time(), FLAGS_prediction_total_time);
   evaluate_times_ = static_cast<uint32_t>(
       std::floor(total_time / config.eval_time_interval()));
-
-  // Mapping Static obstacle
-  for (const auto ptr_static_obstacle : decision_data.StaticObstacles()) {
-    static_obstacle_boxes_.push_back(
-        ptr_static_obstacle->PerceptionBoundingBox());
-  }
-
-  // Mapping dynamic obstacle
-  for (const auto ptr_dynamic_obstacle : decision_data.DynamicObstacles()) {
-    const auto &trajectory = ptr_dynamic_obstacle->Trajectory();
-    std::vector<Box2d> obstacle_by_time;
-    for (std::size_t time = 0; time < evaluate_times_ + 1; ++time) {
-      TrajectoryPoint traj_point = ptr_dynamic_obstacle->GetPointAtTime(
-          time * config.eval_time_interval());
-      obstacle_by_time.push_back(
-          ptr_dynamic_obstacle->GetBoundingBox(traj_point));
-    }
-    dynamic_obstacle_trajectory_.push_back(std::move(obstacle_by_time));
-    dynamic_obstacle_probability_.push_back(trajectory.probability());
-  }
-  CHECK(dynamic_obstacle_trajectory_.size() ==
-        dynamic_obstacle_probability_.size());
 }
 
 double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
