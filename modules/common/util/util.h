@@ -39,6 +39,11 @@ namespace apollo {
 namespace common {
 namespace util {
 
+template <typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 template <typename ProtoA, typename ProtoB>
 bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
   return google::protobuf::util::MessageDifferencer::Equals(a, b);
