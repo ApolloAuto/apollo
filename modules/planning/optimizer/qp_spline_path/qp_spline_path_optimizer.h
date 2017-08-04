@@ -22,7 +22,8 @@
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_SPLINE_PATH_OPTIMIZER_H_
 
 #include <string>
-
+#include <vector>
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
 
 #include "modules/planning/optimizer/path_optimizer.h"

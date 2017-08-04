@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
