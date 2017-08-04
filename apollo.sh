@@ -255,6 +255,14 @@ function gen_coverage() {
     mkdir -p "$(dirname "$target")"
     cp "$f" "$target"
   done
+
+  files=$(find bazel-out/local-opt/bin/modules/ -iname "*.gcda" -o -iname "*.gcno" | grep -v external)
+  for f in $files; do
+    target="$COV_DIR/objs/modules/${f##*modules}"
+    mkdir -p "$(dirname "$target")"
+    cp "$f" "$target"
+  done
+
   lcov --capture --directory "$COV_DIR/objs" --output-file "$COV_DIR/conv.info"
   if [ $? -ne 0 ]; then
     fail 'lcov failed!'

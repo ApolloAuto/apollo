@@ -99,6 +99,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
     AERROR << "faile to process msg at timestamp: " << kTimeStamp;
     return false;
   }
+  error_code_ = apollo::common::OK;
   return true;
 }
 
