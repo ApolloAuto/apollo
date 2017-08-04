@@ -87,7 +87,7 @@ void QpSplineStSpeedOptimizer::RecordSTGraphDebug(
 Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          const ReferenceLine& reference_line,
-                                         DecisionData* const decision_data,
+                                         PathDecision* const path_decision,
                                          SpeedData* const speed_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process.";
@@ -100,7 +100,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
-  if (!boundary_mapper.GetGraphBoundary(*decision_data, &boundaries).ok()) {
+  if (!boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).ok()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }

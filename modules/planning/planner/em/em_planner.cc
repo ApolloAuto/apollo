@@ -126,11 +126,9 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   auto* planning_data = frame->mutable_planning_data();
 
-  std::shared_ptr<DecisionData> decision_data(new DecisionData());
-
-  planning_data->set_decision_data(decision_data);
   auto ptr_debug = frame->MutableADCTrajectory()->mutable_debug();
-  auto ptr_latency_stats = frame->MutableADCTrajectory()->mutable_latency_stats();
+  auto ptr_latency_stats =
+      frame->MutableADCTrajectory()->mutable_latency_stats();
   for (auto& optimizer : optimizers_) {
     const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
     optimizer->Optimize(frame);

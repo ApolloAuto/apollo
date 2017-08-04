@@ -27,6 +27,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
@@ -75,7 +76,6 @@ class DpStSpeedTest : public PlanningTestBase {
 
  protected:
   const ReferenceLine* reference_line_ = nullptr;
-  DecisionData decision_data_;
   common::TrajectoryPoint init_point_;
   SpeedData speed_data_;  // output
   PathData path_data_;    // input

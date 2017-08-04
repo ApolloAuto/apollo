@@ -60,7 +60,7 @@ bool DpStSpeedOptimizer::Init() {
 Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    const common::TrajectoryPoint& init_point,
                                    const ReferenceLine& reference_line,
-                                   DecisionData* const decision_data,
+                                   PathDecision* const path_decision,
                                    SpeedData* const speed_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before process DpStSpeedOptimizer.";
@@ -75,7 +75,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   const double path_length = path_data.discretized_path().length();
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
-  if (!boundary_mapper.GetGraphBoundary(*decision_data, &boundaries).ok()) {
+  if (!boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).ok()) {
     const std::string msg =
         "Mapping obstacle for dp st speed optimizer failed.";
     AERROR << msg;
@@ -95,7 +95,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
 
   DpStGraph st_graph(dp_st_speed_config_);
   if (!st_graph
-           .Search(st_graph_data, decision_data, speed_data,
+           .Search(st_graph_data, path_decision, speed_data,
                    frame_->MutableObstacles())
            .ok()) {
     const std::string msg = "Failed to search graph with dynamic programming.";

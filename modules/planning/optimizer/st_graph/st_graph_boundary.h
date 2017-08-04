@@ -34,6 +34,7 @@ namespace planning {
 
 class StGraphBoundary : public common::math::Polygon2d {
  public:
+  StGraphBoundary() = default;
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
   enum class BoundaryType {
