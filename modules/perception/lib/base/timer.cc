@@ -15,8 +15,6 @@
  *****************************************************************************/
 
 #include "modules/perception/lib/base/timer.h"
-#include <sys/time.h>
-
 #include "modules/common/log.h"
 
 namespace apollo {

@@ -120,20 +120,6 @@ bool FileUtil::Exists(const string& path, const string& suffix) {
   return false;
 }
 
-bool FileUtil::RenameFile(const string& old_file, const string& new_file) {
-  if (!DeleteFile(new_file)) {
-    return false;
-  }
-  int ret = rename(old_file.c_str(), new_file.c_str());
-  if (ret != 0) {
-    AWARN << "failed to rename [old file: " << old_file
-          << "] to [newfile: " << new_file << "] [err: " << strerror(errno)
-          << "]";
-    return false;
-  }
-  return true;
-}
-
 bool FileUtil::CreateDir(const string& dir) {
   int ret = mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
   if (ret != 0) {
@@ -202,11 +188,6 @@ std::string FileUtil::RemoveFileSuffix(std::string filename) {
   std::string raw_name =
       filename.substr(first_index + 1, last_index - first_index - 1);
   return raw_name;
-}
-
-void FileUtil::GetFileList(vector<string>& files, const string path,
-                           const string suffix) {
-  GetFileList(path, suffix, &files);
 }
 
 void FileUtil::GetFileList(const std::string& path, const std::string& suffix,
