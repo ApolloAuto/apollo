@@ -51,14 +51,14 @@ void GetValidXRange(const typename PolygonScanConverter::Polygon &polygon,
       * major_dir_grid_size + bitmap_bottom_left_p[major_dir];
 }
 
-void DrawPolygonInBitmap(const typename PolygonScanConverter::Polygon &polygon,
-    Bitmap2D &bitmap, const double extend_dist) {
-  PolygonScanConverter::DirectionMajor major_dir = bitmap.get_dir_major();
-  PolygonScanConverter::DirectionMajor op_major_dir = bitmap.get_op_dir_major();
-  double major_dir_grid_size = bitmap.get_grid_size()[major_dir];
+void DrawPolygonInBitmap(const typename PolygonScanConverter::Polygon& polygon,
+    const double extend_dist, Bitmap2D* bitmap) {
+  PolygonScanConverter::DirectionMajor major_dir = bitmap->get_dir_major();
+  PolygonScanConverter::DirectionMajor op_major_dir = bitmap->get_op_dir_major();
+  double major_dir_grid_size = bitmap->get_grid_size()[major_dir];
 
   Interval valid_x_range;
-  GetValidXRange(polygon, bitmap, major_dir, major_dir_grid_size, &valid_x_range);
+  GetValidXRange(polygon, *bitmap, major_dir, major_dir_grid_size, &valid_x_range);
 
   std::vector<std::vector<Interval>> scans_intervals;
   PolygonScanConverter polygon_scan_converter(major_dir);
@@ -66,8 +66,8 @@ void DrawPolygonInBitmap(const typename PolygonScanConverter::Polygon &polygon,
                                   major_dir_grid_size, &scans_intervals);
 
 
-  const Eigen::Vector2d& bitmap_bottom_left_p = bitmap.get_min_p();
-  const Eigen::Vector2d& bitmap_top_right_p = bitmap.get_max_p();
+  const Eigen::Vector2d& bitmap_bottom_left_p = bitmap->get_min_p();
+  const Eigen::Vector2d& bitmap_top_right_p = bitmap->get_max_p();
   double x = valid_x_range.first;
   for (size_t i = 0; i < scans_intervals.size(); x += major_dir_grid_size, ++i) {
     for (const auto &scan_interval : scans_intervals[i]) {
@@ -81,16 +81,16 @@ void DrawPolygonInBitmap(const typename PolygonScanConverter::Polygon &polygon,
       if (valid_y_range.first > valid_y_range.second) {
         continue;
       }
-      bitmap.Set(x, valid_y_range.first, valid_y_range.second);
+      bitmap->Set(x, valid_y_range.first, valid_y_range.second);
     }
   }
 }
 
 void DrawPolygonInBitmap(
     const std::vector<typename PolygonScanConverter::Polygon>& polygons,
-    Bitmap2D& bitmap, const double extend_dist) {
+    const double extend_dist, Bitmap2D* bitmap) {
     for (const auto &polygon : polygons) {
-        DrawPolygonInBitmap(polygon, bitmap, extend_dist);
+        DrawPolygonInBitmap(polygon, extend_dist, bitmap);
     }
 }
 
