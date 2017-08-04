@@ -41,7 +41,17 @@ Obstacle::Obstacle(const std::string& id,
                                 perception_obstacle_.position().y()},
                                perception_obstacle_.theta(),
                                perception_obstacle_.length(),
-                               perception_obstacle_.width()) {}
+                               perception_obstacle_.width()) {
+  is_static_ = IsStaticObstacle(perception_obstacle);
+}
+
+bool Obstacle::IsStatic() const { return is_static_; }
+
+bool Obstacle::IsStaticObstacle(
+    const perception::PerceptionObstacle& perception_obstacle) {
+  return perception_obstacle.type() ==
+         perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
+}
 
 common::TrajectoryPoint Obstacle::GetPointAtTime(
     const double relative_time) const {
