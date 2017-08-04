@@ -81,9 +81,49 @@ class Frame {
   void RecordInputDebug();
 
  private:
-  bool CreateReferenceLineFromRouting();
-  bool SmoothReferenceLine();
-  void CreateObstacles(const prediction::PredictionObstacles &prediction);
+  /**
+   * @brief This is the function that can create one reference lines
+   * from routing result.
+   * In current implementation, only one reference line will be returned.
+   * But this is in sufficient when multiple driving options exist.
+   *
+   * TODO create multiple reference_lines from this function.
+   */
+  bool CreateReferenceLineFromRouting(
+      const common::PointENU &position, const routing::RoutingResponse &routing,
+      std::vector<ReferenceLine> *reference_lines);
+
+  /**
+   * @brief This is the function can smooth an hdmap::Path to a ReferenceLine
+   * @param hdmap_path an hdmap::Path instance
+   * @param reference_line the smoothed reference_line
+   *
+   * TODO move this function to a helper class in
+   * modules/planning/reference_line folder
+   */
+  bool SmoothReferenceLine(const hdmap::Path &hdmap_path,
+                           ReferenceLine *const reference_line);
+
+  /**
+   * @brief create obstacles from prediction input.
+   * @param prediction the received prediction result.
+   */
+  void CreatePredictionObstacles(
+      const prediction::PredictionObstacles &prediction);
+
+  /**
+   * @brief Create traffic obstacles in  this function.
+   * The created obstacles is added to obstacles_, and the decision is added to
+   * path_obstacles_
+   * Traffic obstacle examples include:
+   *  * Traffic Light
+   *  * End of routing
+   *  * Select the drivable reference line.
+   *  TODO impolement this function
+   *  TODO move this function to folder `planning/traffic_decision`
+   */
+  bool MakeTrafficDecision(const routing::RoutingResponse &routing,
+                           const ReferenceLine &reference_line);
 
  private:
   common::TrajectoryPoint planning_start_point_;
@@ -93,10 +133,9 @@ class Frame {
   Obstacles obstacles_;
   PathObstacles path_obstacles_;
   uint32_t sequence_num_ = 0;
-  hdmap::Path hdmap_path_;
   localization::Pose init_pose_;
   PublishableTrajectory _computed_trajectory;
-  std::unique_ptr<ReferenceLine> reference_line_ = nullptr;
+  ReferenceLine reference_line_;
   PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;
 

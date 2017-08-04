@@ -197,13 +197,12 @@ DECLARE_bool(enable_p_speed_override);
 DECLARE_double(threshold_timestamp_diff);
 DECLARE_double(pc_pob_tolerance);
 
-// Traffic law
-DECLARE_bool(enable_traffic_light_law);
-DECLARE_bool(enable_crosswalk_law);
-DECLARE_bool(enable_clear_zone_law);
+// Traffic decision
+DECLARE_bool(enable_traffic_decision);
+
 DECLARE_double(polygon_length_box_length_max_diff);
 
-// Traffic light law
+// Traffic light decision
 DECLARE_double(length_of_passing_stop_line_buffer);
 DECLARE_double(master_min_speed);
 DECLARE_double(max_deacceleration_for_red_light_stop);

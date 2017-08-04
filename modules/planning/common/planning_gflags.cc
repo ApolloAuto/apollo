@@ -282,15 +282,14 @@ DEFINE_double(threshold_timestamp_diff, 0.50,
               "Maximum timestamp gap between perception and prediction.");
 DEFINE_double(pc_pob_tolerance, 0.15, "Time diff tolerance for pcd and pobs");
 
-// Traffic law
-DEFINE_bool(enable_traffic_light_law, true, "enable traffic light law.");
-DEFINE_bool(enable_crosswalk_law, true, "enable crosswalk law.");
-DEFINE_bool(enable_clear_zone_law, true, "enable clear zone law.");
+// Traffic decision
+DEFINE_bool(enable_traffic_decision, false, "enable traffic decision.");
+
 DEFINE_double(polygon_length_box_length_max_diff, 2.0,
               "max length diff of polygon and box for checking sl point is "
               "right in uturn");
 
-// Traffic light law
+// Traffic light decision
 DEFINE_double(length_of_passing_stop_line_buffer, 4,
               "passing stop line buffer length");
 DEFINE_double(master_min_speed, 0.1, "min speed when compute deacceleration");
