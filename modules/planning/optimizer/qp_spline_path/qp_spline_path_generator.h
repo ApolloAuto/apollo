@@ -40,31 +40,25 @@ class QpSplinePathGenerator {
  public:
   QpSplinePathGenerator(const ReferenceLine& reference_line,
                         const QpSplinePathConfig& qp_spline_path_config_);
-  bool generate(const DecisionData& decision_data, const SpeedData& speed_data,
+  bool Generate(const DecisionData& decision_data, const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,
                 PathData* const path_data);
 
  private:
-  bool calculate_sl_point(const common::TrajectoryPoint& traj_point,
-                          common::FrenetFramePoint* const sl_point);
+  bool CalculateInitFrenetPoint(const common::TrajectoryPoint& traj_point,
+                                common::FrenetFramePoint* const sl_point);
 
-  bool init_coord_range(const QpFrenetFrame& qp_frenet_frame,
-                        double* const start_s, double* const end_s);
+  bool InitCoordRange(const QpFrenetFrame& qp_frenet_frame,
+                      double* const start_s, double* const end_s);
 
-  bool init_smoothing_spline(const common::FrenetFramePoint& init_frenet_point,
-                             const double start_s, const double end_s);
+  bool InitSmoothingSpline(const common::FrenetFramePoint& init_frenet_point,
+                           const double start_s, const double end_s);
 
-  bool setup_constraint(const QpFrenetFrame& qp_frenet_frame);
+  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame);
 
-  bool setup_kernel();
+  bool AddKernel();
 
-  bool solve();
-
-  bool extract(PathData* const path_data);
-
-  // slightly shift generated trajectory due to sl - xy transformation error
-  bool extract_init_coord_diff(double* const x_diff,
-                               double* const y_diff) const;
+  bool Solve();
 
  private:
   const ReferenceLine& reference_line_;
