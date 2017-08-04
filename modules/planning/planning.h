@@ -74,12 +74,10 @@ class Planning : public apollo::common::ApolloApp {
   /**
    * @brief Plan the trajectory given current vehicle state
    * @param is_on_auto_mode whether the current system is on auto-driving mode
-   * @param trajectory_pb the computed planning trajectory
    */
   bool Plan(const bool is_on_auto_mode,
             const double current_time_stamp,
-            const double planning_cycle_time,
-            ADCTrajectory* trajectory_pb);
+            const double planning_cycle_time);
 
   const Frame* GetFrame() const;
   const hdmap::PncMap* GetPncMap() const;
@@ -88,8 +86,6 @@ class Planning : public apollo::common::ApolloApp {
  private:
   void RegisterPlanners();
   void RunOnce();
-
-  void RecordInput(ADCTrajectory* trajectory_pb);
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;

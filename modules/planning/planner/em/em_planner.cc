@@ -113,9 +113,7 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame,
-                       PublishableTrajectory* ptr_publishable_trajectory,
-                       planning_internal::Debug* ptr_debug,
-                       planning::LatencyStats* ptr_latency_stats) {
+                       PublishableTrajectory* ptr_publishable_trajectory) {
   if (!frame) {
     AERROR << "Frame is empty in EMPlanner";
     return Status(ErrorCode::PLANNING_ERROR, "Frame is null");
@@ -127,6 +125,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   std::shared_ptr<DecisionData> decision_data(new DecisionData());
 
   planning_data->set_decision_data(decision_data);
+  auto ptr_debug = frame->MutableADCTrajectory()->mutable_debug();
+  auto ptr_latency_stats = frame->MutableADCTrajectory()->mutable_latency_stats();
   for (auto& optimizer : optimizers_) {
     const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
     optimizer->Optimize(frame);

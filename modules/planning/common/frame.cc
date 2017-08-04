@@ -22,6 +22,7 @@
 #include <cmath>
 #include <string>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -29,6 +30,8 @@
 
 namespace apollo {
 namespace planning {
+
+using apollo::common::adapter::AdapterManager;
 
 const hdmap::PncMap *Frame::pnc_map_ = nullptr;
 
@@ -82,6 +85,14 @@ bool Frame::AddDecision(const std::string &tag, const std::string &object_id,
   }
   path_obstacle->AddDecision(tag, decision);
   return true;
+}
+
+const ADCTrajectory& Frame::GetADCTrajectory() const {
+  return trajectory_pb_;
+}
+
+ADCTrajectory* Frame::MutableADCTrajectory() {
+  return &trajectory_pb_;
 }
 
 bool Frame::Init() {
@@ -179,6 +190,29 @@ Obstacles *Frame::MutableObstacles() { return &obstacles_; }
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);
 }
+
+void Frame::RecordInputDebug() {
+  if (!FLAGS_enable_record_debug) {
+    ADEBUG << "Skip record input into debug";
+    return;
+  }
+  auto planning_data = trajectory_pb_.mutable_debug()->mutable_planning_data();
+  auto adc_position = planning_data->mutable_adc_position();
+  const auto& localization =
+      AdapterManager::GetLocalization()->GetLatestObserved();
+  adc_position->CopyFrom(localization);
+
+  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
+  auto debug_chassis = planning_data->mutable_chassis();
+  debug_chassis->CopyFrom(chassis);
+
+  const auto& routing_result =
+      AdapterManager::GetRoutingResponse()->GetLatestObserved();
+
+  auto debug_routing = planning_data->mutable_routing();
+  debug_routing->CopyFrom(routing_result);
+}
+
 
 }  // namespace planning
 }  // namespace apollo
