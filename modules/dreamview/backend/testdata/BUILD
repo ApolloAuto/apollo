@@ -4,5 +4,6 @@ filegroup(
     name = "testdata",
     srcs = [
         "garage.bin",
+        "routing.pb.txt",
     ],
 )

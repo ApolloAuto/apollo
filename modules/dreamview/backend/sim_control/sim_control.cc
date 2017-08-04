@@ -45,9 +45,9 @@ SimControl::SimControl()
       enabled_(FLAGS_enable_sim_control) {
   if (enabled_) {
     RoutingResponse routing;
-    if (!GetProtoFromFile(FLAGS_routing_result_file, &routing)) {
+    if (!GetProtoFromFile(FLAGS_routing_response_file, &routing)) {
       AWARN << "Unable to read start point from file: "
-            << FLAGS_routing_result_file;
+            << FLAGS_routing_response_file;
       return;
     }
     SetStartPoint(routing);

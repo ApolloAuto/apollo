@@ -29,8 +29,9 @@ using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
-                                               MapService *map_service)
-    : sim_world_service_(map_service),
+                                               MapService *map_service,
+                                               bool routing_from_file)
+    : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket) {
   websocket_->RegisterMessageHandler(
