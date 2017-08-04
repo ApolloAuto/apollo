@@ -51,16 +51,14 @@ DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
     : config_(config), init_point_(init_point), speed_data_(speed_data) {}
 
 bool DPRoadGraph::FindPathTunnel(const ReferenceLine &reference_line,
-                              DecisionData *const decision_data,
-                              PathData *const path_data) {
-  CHECK_NOTNULL(decision_data);
+                                 PathData *const path_data) {
   CHECK_NOTNULL(path_data);
   if (!Init(reference_line)) {
     AERROR << "Fail to init dp road graph!";
     return false;
   }
   std::vector<DPRoadGraphNode> min_cost_path;
-  if (!Generate(reference_line, decision_data, &min_cost_path)) {
+  if (!Generate(reference_line, &min_cost_path)) {
     AERROR << "Fail to generate graph!";
     return false;
   }
@@ -130,20 +128,13 @@ bool DPRoadGraph::FindPathTunnel(const ReferenceLine &reference_line,
   }
   path_data->set_discretized_path(path_points);
 
-  // compute decision data
-  if (compute_object_decision_from_path(*path_data, speed_data_, reference_line,
-                                        decision_data)) {
-    AINFO << "Computing decision_data in dp path success";
-  } else {
-    AINFO << "Computing decision_data in dp path fail";
-  }
-
   return true;
 }
 
 bool DPRoadGraph::Init(const ReferenceLine &reference_line) {
-  if (!reference_line.get_point_in_frenet_frame({init_point_.path_point().x(),
-      init_point_.path_point().y()}, &init_sl_point_)) {
+  if (!reference_line.get_point_in_frenet_frame(
+          {init_point_.path_point().x(), init_point_.path_point().y()},
+          &init_sl_point_)) {
     AERROR << "Fail to map init point from cartesian to sl coordinate!";
     return false;
   }
@@ -171,8 +162,7 @@ bool DPRoadGraph::Init(const ReferenceLine &reference_line) {
 }
 
 bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
-                                 DecisionData *const decision_data,
-                                 std::vector<DPRoadGraphNode> *min_cost_path) {
+                           std::vector<DPRoadGraphNode> *min_cost_path) {
   if (!min_cost_path) {
     AERROR << "the provided min_cost_path is null";
     return false;
@@ -182,13 +172,13 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
     AERROR << "Fail to sampling point with path sampler!";
     return false;
   }
-  path_waypoints.insert(path_waypoints.begin(), std::vector<common::SLPoint>{init_sl_point_});
+  path_waypoints.insert(path_waypoints.begin(),
+                        std::vector<common::SLPoint>{init_sl_point_});
 
   const auto &vehicle_config_ =
       common::VehicleConfigHelper::instance()->GetConfig();
   TrajectoryCost trajectory_cost(config_, reference_line,
-                                 vehicle_config_.vehicle_param(), speed_data_,
-                                 *decision_data);
+                                 vehicle_config_.vehicle_param(), speed_data_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
   graph_nodes[0].push_back(DPRoadGraphNode(init_sl_point_, nullptr, 0.0));
@@ -201,7 +191,7 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
     for (std::size_t i = 0; i < level_points.size(); ++i) {
       const auto cur_sl_point = level_points[i];
       graph_nodes[level].push_back(DPRoadGraphNode(cur_sl_point, nullptr));
-      auto& cur_node = graph_nodes[level].back();
+      auto &cur_node = graph_nodes[level].back();
       for (std::size_t j = 0; j < prev_dp_nodes.size(); ++j) {
         const auto *prev_dp_node = &prev_dp_nodes[j];
         const auto prev_sl_point = prev_dp_node->sl_point;
@@ -222,7 +212,7 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
   for (std::size_t i = 0; i < last_dp_nodes.size(); ++i) {
     const auto &cur_dp_node = last_dp_nodes[i];
     fake_head.UpdateCost(&cur_dp_node, cur_dp_node.min_cost_curve,
-                          cur_dp_node.min_cost);
+                         cur_dp_node.min_cost);
   }
   const auto *min_cost_node = &fake_head;
   while (min_cost_node->min_cost_prev_node) {
@@ -233,9 +223,10 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
   return true;
 }
 
-bool DPRoadGraph::compute_object_decision_from_path(
-    const PathData &path_data, const SpeedData &heuristic_speed_data,
-    const ReferenceLine &reference_line, DecisionData *const decision_data) {
+bool DPRoadGraph::ComputeObjectdecision(const PathData &path_data,
+                                        const SpeedData &heuristic_speed_data,
+                                        const ReferenceLine &reference_line,
+                                        DecisionData *const decision_data) {
   CHECK_NOTNULL(decision_data);
 
   // Compute static obstacle decision
@@ -428,11 +419,10 @@ bool DPRoadGraph::SamplePathWaypoints(
     const ReferenceLine &reference_line,
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
-
   CHECK(points != nullptr);
 
   common::math::Vec2d init_cartesian_point(init_point.path_point().x(),
-                                       init_point.path_point().y());
+                                           init_point.path_point().y());
   common::SLPoint init_sl_point;
   if (!reference_line.get_point_in_frenet_frame(init_cartesian_point,
                                                 &init_sl_point)) {
