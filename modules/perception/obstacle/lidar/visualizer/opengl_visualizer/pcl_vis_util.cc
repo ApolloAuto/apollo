@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/lidar/visualizer/pcl_vis_util.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/pcl_vis_util.h"
 
 namespace apollo {
 namespace perception {

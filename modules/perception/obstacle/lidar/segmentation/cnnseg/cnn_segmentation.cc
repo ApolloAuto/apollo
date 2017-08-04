@@ -126,7 +126,8 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   // network forward process
   caffe_net_->Forward();
   network_time_ = timer_.Toc(true);
-
+  AERROR<< "objectness threshold is "<<cnnseg_param_.objectness_thresh();
+  AERROR<< "confidence threshold is "<<cnnseg_param_.confidence_thresh();
   // clutser points and construct segments/objects
   cluster2d_->Cluster(*category_pt_blob_, *instance_pt_blob_,
                       pc_ptr, valid_indices,
