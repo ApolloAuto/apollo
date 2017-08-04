@@ -17,8 +17,6 @@
 namespace apollo {
 namespace perception {
 
-
-
 bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
                           const ROIFilterOptions &roi_filter_options,
                           pcl_util::PointIndices* roi_indices) {
@@ -56,7 +54,7 @@ bool HdmapROIFilter::FilterWithPolygonMask(
   Bitmap2D bitmap(min_p, max_p, grid_size, major_dir);
   bitmap.BuildMap();
 
-  DrawPolygonInBitmap(raw_polygons, bitmap, extend_dist_);
+  DrawPolygonInBitmap(raw_polygons, extend_dist_, &bitmap);
 
   // 4. Check each point whether is in roi grids in bitmap
   return Bitmap2dFilter(cloud, bitmap, roi_indices);
@@ -143,12 +141,9 @@ void HdmapROIFilter::MergeHdmapStructToPolygons(
 }
 
 bool HdmapROIFilter::Init() {
-  //FLAGS_work_root = "modules/perception";
-  //FLAGS_config_manager_path = "data/config_manager.conf";
-
   // load model config
   ConfigManager* config_manager = Singleton<ConfigManager>::Get();
-  std::string model_name = "HdmapROIFilter";
+  std::string model_name = name();
   const ModelConfig* model_config = nullptr;
   if (config_manager == nullptr) {
     AERROR << "Failed to get config manager";
