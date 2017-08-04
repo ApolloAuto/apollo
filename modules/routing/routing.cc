@@ -60,7 +60,7 @@ apollo::common::Status Routing::Start() {
 }
 
 void Routing::OnRouting_Request(const apollo::routing::RoutingRequest &routing_request) {
-  AERROR << "Get new routing request!!!";
+  AINFO << "Get new routing request!!!";
   ::apollo::routing::RoutingResponse routing_response;
   if (!_navigator_ptr->search_route(routing_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";

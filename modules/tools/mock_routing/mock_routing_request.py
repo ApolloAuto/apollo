@@ -26,6 +26,7 @@ import sys
 from numpy import genfromtxt
 import scipy.signal as signal
 import atexit
+import time
 
 from modules.routing.proto import routing_pb2
 
@@ -45,13 +46,20 @@ def main():
     start_point = routing_request.start
     end_point = routing_request.end
 
+    """
+    start_point.id = '144_1_1'
+    start_point.s = 1
+    end_point.id = '94_1_1'
+    end_point.s = 2
+    """
     start_point.id = '1_-1'
-    start_point.s = 10
+    start_point.s = 1
     end_point.id = '1_-1'
-    end_point.s = 50
+    end_point.s = 5
 
     request_publisher = rospy.Publisher(
             '/apollo/routing_request', routing_pb2.RoutingRequest, queue_size=1)
+    time.sleep(1.0)
     request_publisher.publish(routing_request)
 
 

@@ -25,11 +25,24 @@ void NodeRangeManager::init_node_range(double start_node_s, double end_node_s,
                                        const TopoNode* start_node,
                                        const TopoNode* end_node) {
   _range_map.clear();
-  init_in_neighbor(start_node, start_node_s, start_node->length());
-  init_out_neighbor(start_node, start_node_s, start_node->length());
+  if (start_node == end_node) {
+    auto& range = _range_map[start_node];
+    if (start_node_s < end_node_s) {
+      // return current
+      range.start_s = start_node_s;
+      range.end_s = end_node_s;
+    } else {
+      // return nothing 
+      range.start_s = start_node_s;
+      range.end_s = start_node_s;
+    }
+  } else {
+    init_in_neighbor(start_node, start_node_s, start_node->length());
+    init_out_neighbor(start_node, start_node_s, start_node->length());
 
-  init_in_neighbor(end_node, 0.0, end_node_s);
-  init_out_neighbor(end_node, 0.0, end_node_s);
+    init_in_neighbor(end_node, 0.0, end_node_s);
+    init_out_neighbor(end_node, 0.0, end_node_s);
+  }
 }
 
 NodeRange NodeRangeManager::get_node_range(const TopoNode* topo_node) const {

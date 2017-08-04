@@ -34,4 +34,12 @@ cc_binary(
     ],
 )
 
+filegroup(
+    name = "routing_testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
+)
+
+
 cpplint()
