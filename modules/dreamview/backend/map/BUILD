@@ -11,7 +11,7 @@ cc_library(
         "map_service.h",
     ],
     deps = [
-        "//modules/map/hdmap",
+        "//modules/map/pnc_map",
         "//third_party/json",
         "@glog//:glog",
     ],

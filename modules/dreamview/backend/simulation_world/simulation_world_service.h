@@ -62,8 +62,10 @@ class SimulationWorldService {
   /**
    * @brief Constructor of SimulationWorldService.
    * @param map_service the pointer of MapService.
+   * @param routing_from_file whether to read intial routing from file.
    */
-  explicit SimulationWorldService(MapService *map_service);
+  SimulationWorldService(MapService *map_service,
+                         bool routing_from_file = false);
 
   /**
    * @brief Get a read-only view of the SimulationWorld.
@@ -108,10 +110,10 @@ class SimulationWorldService {
       const apollo::perception::PerceptionObstacle &obstacle);
   void UpdatePlanningTrajectory(
       const apollo::planning::ADCTrajectory &trajectory);
-  void UpdateDecision(
-      const apollo::planning::DecisionResult &decision_res, double header_time);
+  void UpdateDecision(const apollo::planning::DecisionResult &decision_res,
+                      double header_time);
   void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
-          double update_timestamp_sec, Object *world_main_stop);
+                          double update_timestamp_sec, Object *world_main_stop);
 
   /**
    * @brief Check whether a particular adapter has been initialized correctly.
@@ -147,10 +149,9 @@ class SimulationWorldService {
     UpdateSimulationWorld(adapter->GetLatestObserved());
   }
 
-  /**
-   * @brief Register monitor message data callback.
-   */
-  void RegisterMonitorCallback();
+  void RegisterMessageCallbacks();
+
+  void ReadRoutingFromFile(const std::string &routing_response_file);
 
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
@@ -171,6 +172,7 @@ class SimulationWorldService {
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePlanningTrajectory);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateDecision);
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePrediction);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateRouting);
 };
 
 }  // namespace dreamview

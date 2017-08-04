@@ -32,6 +32,9 @@ using ::apollo::hdmap::JunctionInfoConstPtr;
 using ::apollo::hdmap::SignalInfoConstPtr;
 using ::apollo::hdmap::StopSignInfoConstPtr;
 using ::apollo::hdmap::YieldSignInfoConstPtr;
+using ::apollo::hdmap::Path;
+using ::apollo::hdmap::MapPathPoint;
+using ::apollo::routing::RoutingResponse;
 
 namespace {
 
@@ -119,41 +122,37 @@ nlohmann::json MapElementIds::Json() const {
   return result;
 }
 
-MapService::MapService(const std::string &map_filename) {
-  if (hdmap_.load_map_from_file(map_filename)) {
-    AFATAL << "Failed to load map: " << map_filename;
-  }
-  AINFO << "HDMap loaded, Map: " << map_filename;
-}
+MapService::MapService(const std::string &map_filename)
+    : pnc_map_(map_filename) {}
 
 MapElementIds MapService::CollectMapElements(const PointENU &point,
                                              double radius) const {
   MapElementIds result;
 
   std::vector<LaneInfoConstPtr> lanes;
-  hdmap_.get_lanes(point, radius, &lanes);
+  hdmap()->get_lanes(point, radius, &lanes);
 
   ExtractIds(lanes, &result.lane);
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;
-  hdmap_.get_crosswalks(point, radius, &crosswalks);
+  hdmap()->get_crosswalks(point, radius, &crosswalks);
   ExtractIds(crosswalks, &result.crosswalk);
 
   std::vector<JunctionInfoConstPtr> junctions;
-  hdmap_.get_junctions(point, radius, &junctions);
+  hdmap()->get_junctions(point, radius, &junctions);
   ExtractIds(junctions, &result.junction);
 
   std::vector<SignalInfoConstPtr> signals;
-  hdmap_.get_signals(point, radius, &signals);
+  hdmap()->get_signals(point, radius, &signals);
   ExtractIds(signals, &result.signal);
   ExtractOverlapIds(signals, &result.overlap);
 
   std::vector<StopSignInfoConstPtr> stop_signs;
-  hdmap_.get_stop_signs(point, radius, &stop_signs);
+  hdmap()->get_stop_signs(point, radius, &stop_signs);
   ExtractIds(stop_signs, &result.stop_sign);
 
   std::vector<YieldSignInfoConstPtr> yield_signs;
-  hdmap_.get_yield_signs(point, radius, &yield_signs);
+  hdmap()->get_yield_signs(point, radius, &yield_signs);
   ExtractIds(yield_signs, &result.yield);
 
   return result;
@@ -165,7 +164,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.lane) {
     map_id.set_id(id);
-    auto element = hdmap_.get_lane_by_id(map_id);
+    auto element = hdmap()->get_lane_by_id(map_id);
     if (element) {
       *result.add_lane() = element->lane();
     }
@@ -173,7 +172,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.crosswalk) {
     map_id.set_id(id);
-    auto element = hdmap_.get_crosswalk_by_id(map_id);
+    auto element = hdmap()->get_crosswalk_by_id(map_id);
     if (element) {
       *result.add_crosswalk() = element->crosswalk();
     }
@@ -181,7 +180,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.junction) {
     map_id.set_id(id);
-    auto element = hdmap_.get_junction_by_id(map_id);
+    auto element = hdmap()->get_junction_by_id(map_id);
     if (element) {
       *result.add_junction() = element->junction();
     }
@@ -189,7 +188,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.signal) {
     map_id.set_id(id);
-    auto element = hdmap_.get_signal_by_id(map_id);
+    auto element = hdmap()->get_signal_by_id(map_id);
     if (element) {
       *result.add_signal() = element->signal();
     }
@@ -197,7 +196,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.stop_sign) {
     map_id.set_id(id);
-    auto element = hdmap_.get_stop_sign_by_id(map_id);
+    auto element = hdmap()->get_stop_sign_by_id(map_id);
     if (element) {
       *result.add_stop_sign() = element->stop_sign();
     }
@@ -205,7 +204,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.yield) {
     map_id.set_id(id);
-    auto element = hdmap_.get_yield_sign_by_id(map_id);
+    auto element = hdmap()->get_yield_sign_by_id(map_id);
     if (element) {
       *result.add_yield() = element->yield_sign();
     }
@@ -213,13 +212,28 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.overlap) {
     map_id.set_id(id);
-    auto element = hdmap_.get_overlap_by_id(map_id);
+    auto element = hdmap()->get_overlap_by_id(map_id);
     if (element) {
       *result.add_overlap() = element->overlap();
     }
   }
 
   return result;
+}
+
+bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
+                                      std::vector<MapPathPoint> *points) const {
+  Path path;
+  if (!pnc_map_.CreatePathFromRouting(routing, &path)) {
+    AERROR << "Unable to get points from routing!";
+    return false;
+  }
+  for (const auto &point : path.path_points()) {
+    points->push_back(point);
+  }
+  // TODO(siyangy): Add downsampling points
+
+  return true;
 }
 
 }  // namespace dreamview

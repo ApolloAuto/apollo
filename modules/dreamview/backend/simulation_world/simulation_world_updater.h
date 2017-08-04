@@ -46,9 +46,11 @@ class SimulationWorldUpdater {
    * @param websocket Pointer of the websocket handler that has been attached to
    * the server.
    * @param map_service Pointer of the map service to provide a high-level API
-   * of hdmap
+   * of hdmap.
+   * @param routing_from_file whether to read intial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket, MapService *map_service);
+  SimulationWorldUpdater(WebSocketHandler *websocket, MapService *map_service,
+                         bool routing_from_file = false);
 
   /**
    * @brief Starts to push simulation_world to frontend.

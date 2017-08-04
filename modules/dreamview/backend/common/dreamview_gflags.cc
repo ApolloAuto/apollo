@@ -33,8 +33,11 @@ DEFINE_bool(
     enable_sim_control, false,
     "Whether to enable SimControl to publish localiztion and chassis message.");
 
-DEFINE_string(routing_result_file, "modules/map/data/garage_routing.pb.txt",
-              "File path of the routing result that SimControl will read the "
+DEFINE_bool(routing_from_file, false,
+            "Whether Dreamview reads initial routing response from file.");
+
+DEFINE_string(routing_response_file, "modules/map/data/garage_routing.pb.txt",
+              "File path of the routing response that SimControl will read the "
               "start point from. If this is absent, SimControl will directly "
               "take the RoutingResponse from ROS to determine the start "
               "point.");

@@ -23,7 +23,7 @@
 
 #include <string>
 #include <vector>
-#include "modules/map/hdmap/hdmap.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "third_party/json/json.hpp"
 
 /**
@@ -65,17 +65,21 @@ class MapService {
   MapElementIds CollectMapElements(const apollo::common::PointENU &point,
                                    double raidus) const;
 
+  bool GetPointsFromRouting(
+      const apollo::routing::RoutingResponse &routing,
+      std::vector<apollo::hdmap::MapPathPoint> *points) const;
+
   // The returned value is of a ::apollo::hdmap::Map proto. This
   // makes it easy to convert to a JSON object and to send to the
   // javascript clients.
   ::apollo::hdmap::Map RetrieveMapElements(const MapElementIds &ids) const;
 
-  const ::apollo::hdmap::HDMap &hdmap() {
-    return hdmap_;
+  const ::apollo::hdmap::HDMap *hdmap() const {
+    return pnc_map_.HDMap();
   }
 
  private:
-  ::apollo::hdmap::HDMap hdmap_;
+  ::apollo::hdmap::PncMap pnc_map_;
 };
 
 }  // namespace dreamview

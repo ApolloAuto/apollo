@@ -23,6 +23,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
+
 using apollo::canbus::Chassis;
 using apollo::common::monitor::MonitorMessage;
 using apollo::localization::LocalizationEstimate;
@@ -42,6 +44,8 @@ const float kEpsilon = 0.0001;
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    FLAGS_routing_response_file =
+        "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
     sim_world_service_.reset(new SimulationWorldService(&map_service_));
   }
@@ -429,6 +433,16 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
   }
+}
+
+TEST_F(SimulationWorldServiceTest, UpdateRouting) {
+  // Load routing from file
+  sim_world_service_.reset(new SimulationWorldService(&map_service_, true));
+
+  auto& world = sim_world_service_->world_;
+  EXPECT_EQ(world.routing_time(), 1234.5);
+  EXPECT_EQ(68, world.route_size());
+  // TODO(siyangy): Verify route points
 }
 
 }  // namespace dreamview
