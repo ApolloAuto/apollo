@@ -42,7 +42,8 @@ QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const std::string& name)
 
 bool QpSplineStSpeedOptimizer::Init() {
   // load boundary mapper
-  if (!boundary_mapper_.Init(FLAGS_st_boundary_config_file)) {
+  if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
+                                      &st_boundary_config_)) {
     AERROR << "Failed to load config file: " << FLAGS_st_boundary_config_file;
     return false;
   }
@@ -67,22 +68,23 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
+  StBoundaryMapper boundary_mapper(st_boundary_config_, reference_line);
 
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
-  if (!boundary_mapper_
-           .GetGraphBoundary(
-               init_point, *decision_data, path_data, reference_line,
-               qp_spline_st_speed_config_.total_path_length(),
-               qp_spline_st_speed_config_.total_time(), &boundaries)
+  if (!boundary_mapper
+           .GetGraphBoundary(init_point, *decision_data, path_data,
+                             qp_spline_st_speed_config_.total_path_length(),
+                             qp_spline_st_speed_config_.total_time(),
+                             &boundaries)
            .ok()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
 
   SpeedLimit speed_limits;
-  if (boundary_mapper_.GetSpeedLimits(reference_line, path_data,
-                                      &speed_limits) != Status::OK()) {
+  if (boundary_mapper.GetSpeedLimits(path_data, &speed_limits) !=
+      Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
