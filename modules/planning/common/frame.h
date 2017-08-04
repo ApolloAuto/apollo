@@ -34,6 +34,7 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_data.h"
+#include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -71,8 +72,13 @@ class Frame {
   const Obstacles &GetObstacles() const;
   Obstacles *MutableObstacles();
 
+  const ADCTrajectory &GetADCTrajectory() const;
+  ADCTrajectory *MutableADCTrajectory();
+
   void set_computed_trajectory(const PublishableTrajectory &trajectory);
   const PublishableTrajectory &computed_trajectory() const;
+
+  void RecordInputDebug();
 
  private:
   bool CreateReferenceLineFromRouting();
@@ -93,6 +99,8 @@ class Frame {
   std::unique_ptr<ReferenceLine> reference_line_ = nullptr;
   PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;
+
+  ADCTrajectory trajectory_pb_;  // planning output pb
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
