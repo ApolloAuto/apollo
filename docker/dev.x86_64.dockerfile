@@ -156,4 +156,4 @@ WORKDIR /tmp
 RUN wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.0.0.zip
 RUN unzip glew-2.0.0.zip
 WORKDIR /tmp/glew-2.0.0
-RUN make && make install 
+RUN make && make install
