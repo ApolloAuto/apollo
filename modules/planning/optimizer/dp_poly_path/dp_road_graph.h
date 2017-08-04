@@ -38,50 +38,52 @@
 namespace apollo {
 namespace planning {
 
-class DpRoadGraph {
+class DPRoadGraph {
  public:
-  explicit DpRoadGraph(const DpPolyPathConfig &config,
-                       const ::apollo::common::TrajectoryPoint &init_point,
+  explicit DPRoadGraph(const DpPolyPathConfig &config,
+                       const common::TrajectoryPoint &init_point,
                        const SpeedData &speed_data);
-  ~DpRoadGraph() = default;
-  bool find_tunnel(const ReferenceLine &reference_line,
+
+  ~DPRoadGraph() = default;
+
+  bool FindPathTunnel(const ReferenceLine &reference_line,
                    DecisionData *const decision_data,
                    PathData *const path_data);
-
  private:
   /**
-   * an private inner stuct for the dp algorithm
+   * an private inner struct for the dp algorithm
    */
-  struct DpNode {
+  struct DPRoadGraphNode {
    public:
-    DpNode() = default;
-    DpNode(const common::SLPoint point_sl, const DpNode *node_prev)
+    DPRoadGraphNode() = default;
+
+    DPRoadGraphNode(const common::SLPoint point_sl, const DPRoadGraphNode *node_prev)
         : sl_point(point_sl), min_cost_prev_node(node_prev) {}
-    DpNode(const common::SLPoint point_sl, const DpNode *node_prev,
+
+    DPRoadGraphNode(const common::SLPoint point_sl, const DPRoadGraphNode *node_prev,
            const double cost)
         : sl_point(point_sl), min_cost_prev_node(node_prev), min_cost(cost) {}
-    bool update_cost(const DpNode *node_prev,
-                     const QuinticPolynomialCurve1d &curve, double cost) {
-      if (cost > min_cost) {
-        return false;
-      } else {
+
+    void UpdateCost(const DPRoadGraphNode *node_prev,
+                    const QuinticPolynomialCurve1d &curve, const double cost) {
+      if (cost < min_cost) {
         min_cost = cost;
         min_cost_prev_node = node_prev;
         min_cost_curve = curve;
-        return true;
       }
     }
 
     common::SLPoint sl_point;
-    const DpNode *min_cost_prev_node = nullptr;
+    const DPRoadGraphNode *min_cost_prev_node = nullptr;
     double min_cost = std::numeric_limits<double>::infinity();
     QuinticPolynomialCurve1d min_cost_curve;
   };
 
-  bool init(const ReferenceLine &reference_line);
-  bool generate_graph(const ReferenceLine &reference_line,
+  bool Init(const ReferenceLine &reference_line);
+
+  bool Generate(const ReferenceLine &reference_line,
                       DecisionData *const decision_data,
-                      std::vector<DpNode> *min_cost_path);
+                      std::vector<DPRoadGraphNode> *min_cost_path);
 
   bool compute_object_decision_from_path(const PathData &path_data,
                                          const SpeedData &heuristic_speed_data,
@@ -94,13 +96,13 @@ class DpRoadGraph {
       const SpeedData &heuristic_speed_data, int evaluate_times,
       std::vector<::apollo::common::math::Box2d> *ego_by_time);
 
-  bool SamplePath(const ReferenceLine &reference_line,
+  bool SamplePathWaypoints(const ReferenceLine &reference_line,
                   const common::TrajectoryPoint &init_point,
                   std::vector<std::vector<common::SLPoint>> *const points);
 
  private:
   DpPolyPathConfig config_;
-  ::apollo::common::TrajectoryPoint init_point_;
+  common::TrajectoryPoint init_point_;
   SpeedData speed_data_;
   common::SLPoint init_sl_point_;
 };
