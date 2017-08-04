@@ -46,8 +46,8 @@ bool TopoGraph::load_nodes(const ::apollo::routing::Graph& graph) {
 // Need to execute load_nodes() firstly
 bool TopoGraph::load_edges(const ::apollo::routing::Graph& graph) {
   if (graph.edge_size() == 0) {
-    AERROR << "No edges found in topology graph.";
-    return false;
+    AINFO << "0 edges found in topology graph, but it's fine";
+    return true;
   }
   for (const auto& edge : graph.edge()) {
     const std::string& from_lane_id = edge.from_lane_id();
@@ -89,6 +89,7 @@ bool TopoGraph::load_graph(const std::string& file_path) {
     AERROR << "Failed to load edges from topology graph.";
     return false;
   }
+  AERROR << "Load Topo data succesful.";
   return true;
 }
 

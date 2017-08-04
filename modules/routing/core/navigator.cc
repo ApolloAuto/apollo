@@ -144,7 +144,7 @@ template <typename T>
 void show_request_info(const T& request) {
   const auto& start = request.start();
   const auto& end = request.end();
-  AINFO << "Start point - lane id: " << start.id().c_str()
+  AERROR << "Start point - lane id: " << start.id().c_str()
         << " s " << start.s() << " x " << start.pose().x()
         << " y " << start.pose().y();
 
@@ -160,7 +160,7 @@ void show_request_info(const T& request) {
           << " end_s " << bl.end_s();
   }
 
-  AINFO << "End point - lane id: " << end.id().c_str()
+  AERROR << "End point - lane id: " << end.id().c_str()
         << " s " << end.s() << " x " << end.pose().x()
         << " y " << end.pose().y();
 }
@@ -268,7 +268,6 @@ Navigator::~Navigator() {}
 
 bool Navigator::is_ready() const { return _is_ready; }
 
-// search new request to new response
 bool Navigator::search_route(
     const ::apollo::routing::RoutingRequest& request,
     ::apollo::routing::RoutingResponse* response) const {
