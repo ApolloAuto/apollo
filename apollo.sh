@@ -122,6 +122,7 @@ function apollo_build() {
     fail 'Build failed!'
   fi
   #build python proto
+  chmod -R +w bazel-genfiles/modules
   find modules/ -name "*.proto" | grep -v gnss | xargs protoc --python_out=bazel-genfiles
   find bazel-genfiles/* -type d -exec touch "{}/__init__.py" \;
   if [ -d "/root/conf" ];then
