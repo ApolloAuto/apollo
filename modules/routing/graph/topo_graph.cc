@@ -89,7 +89,7 @@ bool TopoGraph::load_graph(const std::string& file_path) {
     AERROR << "Failed to load edges from topology graph.";
     return false;
   }
-  AERROR << "Load Topo data succesful.";
+  AINFO << "Load Topo data succesful.";
   return true;
 }
 
