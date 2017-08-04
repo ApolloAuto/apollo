@@ -67,7 +67,8 @@ void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
   prediction_ = prediction;
 }
 
-void Frame::CreateObstacles(const prediction::PredictionObstacles &prediction) {
+void Frame::CreatePredictionObstacles(
+    const prediction::PredictionObstacles &prediction) {
   std::list<std::unique_ptr<Obstacle> > obstacles;
   Obstacle::CreateObstacles(prediction, &obstacles);
   for (auto &ptr : obstacles) {
@@ -87,13 +88,9 @@ bool Frame::AddDecision(const std::string &tag, const std::string &object_id,
   return true;
 }
 
-const ADCTrajectory& Frame::GetADCTrajectory() const {
-  return trajectory_pb_;
-}
+const ADCTrajectory &Frame::GetADCTrajectory() const { return trajectory_pb_; }
 
-ADCTrajectory* Frame::MutableADCTrajectory() {
-  return &trajectory_pb_;
-}
+ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
 
 bool Frame::Init() {
   if (!pnc_map_) {
@@ -105,14 +102,24 @@ bool Frame::Init() {
     AERROR << "init point is not set";
     return false;
   }
-  if (!CreateReferenceLineFromRouting()) {
+  std::vector<ReferenceLine> reference_lines;
+  if (!CreateReferenceLineFromRouting(init_pose_.position(), routing_result_,
+                                      &reference_lines)) {
     AERROR << "Failed to create reference line from position: "
            << init_pose_.DebugString();
     return false;
   }
+  // TODO add fuctions to help select the best reference_line(s)
+  reference_line_ = reference_lines.front();
+
   if (FLAGS_enable_prediction) {
-    CreateObstacles(prediction_);
+    CreatePredictionObstacles(prediction_);
   }
+
+  if (FLAGS_enable_traffic_decision) {
+    MakeTrafficDecision(routing_result_, reference_line_);
+  }
+
   return true;
 }
 
@@ -130,31 +137,39 @@ const PublishableTrajectory &Frame::computed_trajectory() const {
   return _computed_trajectory;
 }
 
-const ReferenceLine &Frame::reference_line() const { return *reference_line_; }
+const ReferenceLine &Frame::reference_line() const { return reference_line_; }
 
-bool Frame::CreateReferenceLineFromRouting() {
-  common::PointENU vehicle_position;
-  vehicle_position.set_x(init_pose_.position().x());
-  vehicle_position.set_y(init_pose_.position().y());
-  vehicle_position.set_z(init_pose_.position().z());
+bool Frame::MakeTrafficDecision(const routing::RoutingResponse &,
+                                const ReferenceLine &) {
+  return true;
+}
 
+bool Frame::CreateReferenceLineFromRouting(
+    const common::PointENU &position, const routing::RoutingResponse &routing,
+    std::vector<ReferenceLine> *reference_lines) {
+  CHECK_NOTNULL(reference_lines);
+
+  hdmap::Path hdmap_path;
   if (!pnc_map_->CreatePathFromRouting(
-          routing_result_, vehicle_position, FLAGS_look_backward_distance,
-          FLAGS_look_forward_distance, &hdmap_path_)) {
+          routing, position, FLAGS_look_backward_distance,
+          FLAGS_look_forward_distance, &hdmap_path)) {
     AERROR << "Failed to get path from routing";
     return false;
   }
-  if (!SmoothReferenceLine()) {
+  reference_lines->emplace_back(ReferenceLine());
+  if (!SmoothReferenceLine(hdmap_path, &reference_lines->back())) {
     AERROR << "Failed to smooth reference line";
     return false;
   }
   return true;
 }
 
-bool Frame::SmoothReferenceLine() {
+bool Frame::SmoothReferenceLine(const hdmap::Path &hdmap_path,
+                                ReferenceLine *const reference_line) {
+  CHECK_NOTNULL(reference_line);
   std::vector<ReferencePoint> ref_points;
 
-  for (const auto &point : hdmap_path_.path_points()) {
+  for (const auto &point : hdmap_path.path_points()) {
     if (point.lane_waypoints().empty()) {
       AERROR << "path point has no lane_waypoint";
       return false;
@@ -167,7 +182,7 @@ bool Frame::SmoothReferenceLine() {
     return false;
   }
 
-  std::unique_ptr<ReferenceLine> reference_line(new ReferenceLine(ref_points));
+  *reference_line = ReferenceLine(ref_points);
   std::vector<ReferencePoint> smoothed_ref_points;
   ReferenceLineSmoother smoother;
   if (!smoother.Init(FLAGS_reference_line_smoother_config_file)) {
@@ -180,7 +195,6 @@ bool Frame::SmoothReferenceLine() {
     return false;
   }
   ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
-  reference_line_.reset(new ReferenceLine(smoothed_ref_points));
   return true;
 }
 
@@ -198,21 +212,20 @@ void Frame::RecordInputDebug() {
   }
   auto planning_data = trajectory_pb_.mutable_debug()->mutable_planning_data();
   auto adc_position = planning_data->mutable_adc_position();
-  const auto& localization =
+  const auto &localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
   adc_position->CopyFrom(localization);
 
-  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
+  const auto &chassis = AdapterManager::GetChassis()->GetLatestObserved();
   auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  const auto& routing_result =
+  const auto &routing_result =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
 
   auto debug_routing = planning_data->mutable_routing();
   debug_routing->CopyFrom(routing_result);
 }
-
 
 }  // namespace planning
 }  // namespace apollo
