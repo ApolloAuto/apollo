@@ -42,7 +42,8 @@ namespace planning {
 class QpFrenetFrame {
  public:
   QpFrenetFrame(const ReferenceLine& reference_line,
-                const DecisionData& decision_data, const SpeedData& speed_data,
+                const std::vector<const Obstacle*>& obstacles,
+                const SpeedData& speed_data,
                 const common::FrenetFramePoint& init_frenet_point,
                 const double start_s, const double end_s,
                 const double time_resolution);
@@ -97,9 +98,7 @@ class QpFrenetFrame {
 
   bool CalculateHDMapBound();
 
-  bool CalculateStaticObstacleBound();
-
-  bool CalculateDynamicObstacleBound();
+  bool CalculateObstacleBound();
 
   bool GetBound(const double s,
                 const std::vector<std::pair<double, double>>& bound_map,
@@ -109,7 +108,7 @@ class QpFrenetFrame {
 
  private:
   const ReferenceLine& reference_line_;
-  const DecisionData& decision_data_;
+  const std::vector<const Obstacle*>& obstacles_;
   const SpeedData& speed_data_;
 
   common::VehicleParam vehicle_param_;
