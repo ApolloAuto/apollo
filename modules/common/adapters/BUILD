@@ -45,7 +45,7 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/common/time",
         "//modules/common/util",
-        "@com_google_protobuf_cc//:protobuf",
+        "@com_google_protobuf//:protobuf",
         "@glog//:glog",
         "@ros//:ros_common",
     ],

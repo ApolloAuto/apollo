@@ -9,7 +9,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/proto:error_code_proto",
-        "@com_google_protobuf_cc//:protobuf",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 
