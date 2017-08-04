@@ -115,7 +115,7 @@ function apollo_build() {
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
   echo "$BUILD_TARGETS"
-  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
+  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
@@ -286,7 +286,7 @@ function run_test() {
   # FIXME(all): when all unit test passed, switch back.
   # bazel test --config=unit_test -c dbg //...
   generate_test_targets_dbg
-  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
+  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings
   RES1=$?
   if [ $RES1 -ne 0 ]; then
       fail "Test failed!"
@@ -296,7 +296,7 @@ function run_test() {
   generate_test_targets_opt
   build_caffe_opt
   run_ldconfig
-  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --test_verbose_timeout_warnings --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
+  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --test_verbose_timeout_warnings
   RES2=$?
   if [ $RES2 -eq 0 ]; then
     success 'Test passed!'

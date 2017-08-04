@@ -8,6 +8,9 @@ test --test_output=all
 # Work around the sandbox issue.
 test --spawn_strategy=standalone
 
+# Specify protobuf cc toolchain
+test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
+
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
 # +------------------------------------------------------------+
@@ -45,6 +48,9 @@ build --output_filter="^//"
 
 # Work around the sandbox issue.
 build --spawn_strategy=standalone
+
+# Specify protobuf cc toolchain
+build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 
 # Enable C++14
 # build --cxxopt="-std=c++14"
