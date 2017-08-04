@@ -169,6 +169,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
   }
   AERROR << "call object_builder succ.";
   PERF_BLOCK_END("lidar_object_builder");
+  //objects_ = objects; 
 
   /// call tracker
   if (tracker_ != nullptr) {

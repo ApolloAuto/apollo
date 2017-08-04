@@ -10,6 +10,7 @@ cc_library(
         "glfw_viewer.cc",
         "opengl_visualizer.cc",
         "frame_content.cc",
+        "pcl_vis_util.cc",
         ],
     hdrs = [
         "frame.h",
@@ -17,6 +18,7 @@ cc_library(
         "glfw_viewer.h",
         "opengl_visualizer.h",
         "frame_content.h",
+        "pcl_vis_util.h",
         ],
     deps = [
         "//modules/perception/lib/pcl_util:pcl_util",

@@ -157,3 +157,5 @@ RUN wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.
 RUN unzip glew-2.0.0.zip
 WORKDIR /tmp/glew-2.0.0
 RUN make && make install
+RUN ln -s /usr/lib64/libGLEW.so /usr/lib/libGLEW.so
+RUN ln -s /usr/lib64/libGLEW.so.2.0 /usr/lib/libGLEW.so.2.0

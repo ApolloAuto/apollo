@@ -120,7 +120,7 @@ public:
     ~OfflineLidarPerceptionTool() = default;
 
     bool Init(bool use_visualization = false) {
-        FLAGS_config_manager_path = "tool/conf/config_manager.config";
+        FLAGS_config_manager_path = "tool/offline_visualizer_tool/conf/config_manager.config";
         config_manager_ = Singleton<ConfigManager>::Get();
        
         if (config_manager_ == NULL || !config_manager_->Init()) {
@@ -371,7 +371,7 @@ protected:
 
 
 int main(int argc, char* argv[]) {
-    FLAGS_flagfile = "./modules/perception/tool/conf/offline_lidar_perception_test.flag";
+    FLAGS_flagfile = "./modules/perception/tool/offline_visualizer_tool/conf/offline_lidar_perception_test.flag";
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     apollo::perception::OfflineLidarPerceptionTool tool;
     tool.Init(FLAGS_enable_visualization);
