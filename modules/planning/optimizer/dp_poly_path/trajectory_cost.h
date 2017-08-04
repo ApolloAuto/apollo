@@ -50,7 +50,7 @@ class TrajectoryCost {
   const ReferenceLine *reference_line_ = nullptr;
   const common::VehicleParam vehicle_param_;
   SpeedData heuristic_speed_data_;
-  uint32_t evaluate_times_;
+  uint32_t num_of_time_stamps_;
 };
 
 }  // namespace planning
