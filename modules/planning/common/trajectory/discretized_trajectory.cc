@@ -112,7 +112,7 @@ std::uint32_t DiscretizedTrajectory::query_nearest_point(
   return index_min;
 }
 
-void DiscretizedTrajectory::add_trajectory_point(
+void DiscretizedTrajectory::append_trajectory_point(
     const TrajectoryPoint& trajectory_point) {
   if (!_trajectory_points.empty()) {
     CHECK_GT(trajectory_point.relative_time(),
