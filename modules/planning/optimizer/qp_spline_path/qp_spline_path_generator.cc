@@ -42,11 +42,11 @@ QpSplinePathGenerator::QpSplinePathGenerator(
     : reference_line_(reference_line),
       qp_spline_path_config_(qp_spline_path_config) {}
 
-bool QpSplinePathGenerator::generate(const DecisionData& decision_data,
+bool QpSplinePathGenerator::Generate(const DecisionData& decision_data,
                                      const SpeedData& speed_data,
                                      const common::TrajectoryPoint& init_point,
                                      PathData* const path_data) {
-  if (!calculate_sl_point(init_point, &init_frenet_point_)) {
+  if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
   }
@@ -62,27 +62,27 @@ bool QpSplinePathGenerator::generate(const DecisionData& decision_data,
     return false;
   }
 
-  if (!init_coord_range(qp_frenet_frame, &start_s, &end_s)) {
+  if (!InitCoordRange(qp_frenet_frame, &start_s, &end_s)) {
     AERROR << "Measure natural coord system with s range failed!";
     return false;
   }
 
   AINFO << "pss path start with " << start_s << ", end with " << end_s;
-  if (!init_smoothing_spline(init_frenet_point_, start_s, end_s - 0.1)) {
+  if (!InitSmoothingSpline(init_frenet_point_, start_s, end_s - 0.1)) {
     AERROR << "Init smoothing spline failed with (" << start_s << ",  end_s "
            << end_s;
     return false;
   }
 
-  if (!setup_constraint(qp_frenet_frame)) {
+  if (!AddConstraint(qp_frenet_frame)) {
     AERROR << "Fail to setup pss path constraint.";
     return false;
   }
-  if (!setup_kernel()) {
+  if (!AddKernel()) {
     AERROR << "Fail to setup pss path kernel.";
     return false;
   }
-  if (!solve()) {
+  if (!Solve()) {
     AERROR << "Fail to solve the qp problem.";
     return false;
   }
@@ -138,7 +138,7 @@ bool QpSplinePathGenerator::generate(const DecisionData& decision_data,
   return true;
 }
 
-bool QpSplinePathGenerator::calculate_sl_point(
+bool QpSplinePathGenerator::CalculateInitFrenetPoint(
 
     const common::TrajectoryPoint& traj_point,
     common::FrenetFramePoint* const frenet_frame_point) {
@@ -171,9 +171,9 @@ bool QpSplinePathGenerator::calculate_sl_point(
   return true;
 }
 
-bool QpSplinePathGenerator::init_coord_range(
-    const QpFrenetFrame& qp_frenet_frame, double* const start_s,
-    double* const end_s) {
+bool QpSplinePathGenerator::InitCoordRange(const QpFrenetFrame& qp_frenet_frame,
+                                           double* const start_s,
+                                           double* const end_s) {
   // TODO(all): step 1 get current sl coordinate - with init coordinate point
   double start_point = std::max(init_frenet_point_.s() - 5.0, 0.0);
 
@@ -189,7 +189,7 @@ bool QpSplinePathGenerator::init_coord_range(
   return true;
 }
 
-bool QpSplinePathGenerator::init_smoothing_spline(
+bool QpSplinePathGenerator::InitSmoothingSpline(
 
     const common::FrenetFramePoint& init_frenet_point, const double start_s,
     const double end_s) {
@@ -204,10 +204,8 @@ bool QpSplinePathGenerator::init_smoothing_spline(
     distance = FLAGS_planning_distance;
   }
   const double delta_s = distance / qp_spline_path_config_.number_of_knots();
-
   double curr_knot_s = init_frenet_point.s();
 
-  knots_.clear();
   for (uint32_t i = 0; i <= qp_spline_path_config_.number_of_knots(); ++i) {
     knots_.push_back(curr_knot_s);
     curr_knot_s += delta_s;
@@ -218,7 +216,7 @@ bool QpSplinePathGenerator::init_smoothing_spline(
   return true;
 }
 
-bool QpSplinePathGenerator::setup_constraint(
+bool QpSplinePathGenerator::AddConstraint(
     const QpFrenetFrame& qp_frenet_frame) {
   Spline1dConstraint* spline_constraint =
       spline_generator_->mutable_spline_constraint();
@@ -297,7 +295,7 @@ bool QpSplinePathGenerator::setup_constraint(
   return true;
 }
 
-bool QpSplinePathGenerator::setup_kernel() {
+bool QpSplinePathGenerator::AddKernel() {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   if (qp_spline_path_config_.regularization_weight() > 0) {
@@ -329,7 +327,7 @@ bool QpSplinePathGenerator::setup_kernel() {
   return true;
 }
 
-bool QpSplinePathGenerator::solve() {
+bool QpSplinePathGenerator::Solve() {
   if (!spline_generator_->solve()) {
     AERROR << "Could not solve the qp problem in spline path generator.";
     return false;
