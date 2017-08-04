@@ -87,7 +87,22 @@ message SpeedPlan {
   repeated apollo.common.SpeedPoint speed_point = 2;
 }
 
-// next id: 14
+message StGraphBoundaryDebug {
+  optional string name = 1;
+  repeated apollo.common.SpeedPoint point = 2;
+}
+
+message SpeedLimitDebug {
+  repeated apollo.common.SpeedPoint point = 1;
+}
+
+message STGraphDebug {
+  optional string name = 1;
+  repeated StGraphBoundaryDebug boundary = 2;
+  optional SpeedLimitDebug speed_limit = 3;
+}
+
+// next id: 15
 message PlanningData {
   optional apollo.common.Header header = 1;
 
@@ -99,6 +114,7 @@ message PlanningData {
 
   repeated apollo.common.Path path = 6;
   repeated SpeedPlan speed_plan = 13;
+  repeated STGraphDebug st_graph = 14;
 
   optional apollo.localization.Pose init_status = 2 [deprecated = true];  // initial status of adc
   optional apollo.planning.MainDecision main_decision = 3 [deprecated = true];
