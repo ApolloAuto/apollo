@@ -256,7 +256,7 @@ bool search_route_by_strategy(
 Navigator::Navigator(const std::string& topo_file_path) : _is_ready(false) {
   _graph.reset(new TopoGraph());
   if (!_graph->load_graph(topo_file_path)) {
-    AINFO << "Navigator init graph failed! File path: "
+    AERROR << "Navigator init graph failed! File path: "
           << topo_file_path.c_str();
     return;
   }
