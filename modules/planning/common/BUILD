@@ -116,6 +116,7 @@ cc_library(
         "//modules/planning/common:planning_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:reference_line_smoother_config_proto",
         "//modules/planning/reference_line:reference_line_smoother",
     ],

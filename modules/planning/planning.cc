@@ -71,6 +71,7 @@ bool Planning::InitFrame(const uint32_t sequence_num) {
     AERROR << "failed to init frame";
     return false;
   }
+  frame_->RecordInputDebug();
   return true;
 }
 
@@ -142,28 +143,6 @@ Status Planning::Start() {
   return Status::OK();
 }
 
-void Planning::RecordInput(ADCTrajectory* trajectory_pb) {
-  if (!FLAGS_enable_record_debug) {
-    ADEBUG << "Skip record input into debug";
-    return;
-  }
-  auto planning_data = trajectory_pb->mutable_debug()->mutable_planning_data();
-  auto adc_position = planning_data->mutable_adc_position();
-  const auto& localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
-  adc_position->CopyFrom(localization);
-
-  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
-  auto debug_chassis = planning_data->mutable_chassis();
-  debug_chassis->CopyFrom(chassis);
-
-  const auto& routing_result =
-      AdapterManager::GetRoutingResponse()->GetLatestObserved();
-
-  auto debug_routing = planning_data->mutable_routing();
-  debug_routing->CopyFrom(routing_result);
-}
-
 void Planning::RunOnce() {
   AdapterManager::Observe();
   if (AdapterManager::GetLocalization()->Empty()) {
@@ -203,9 +182,6 @@ void Planning::RunOnce() {
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
-  ADCTrajectory trajectory_pb;
-  RecordInput(&trajectory_pb);
-
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   if (!InitFrame(frame_num)) {
     AERROR << "Init frame failed";
@@ -213,21 +189,21 @@ void Planning::RunOnce() {
   }
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
-  bool res_planning = Plan(is_auto_mode, start_timestamp, planning_cycle_time,
-      &trajectory_pb);
+  bool res_planning = Plan(is_auto_mode, start_timestamp, planning_cycle_time);
 
   const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
-  trajectory_pb.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
+  auto trajectory_pb = frame_->MutableADCTrajectory();
+  trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  ADEBUG << "Planning latency: " << trajectory_pb->latency_stats().DebugString();
 
   if (res_planning) {
-    AdapterManager::FillPlanningHeader("planning", &trajectory_pb);
-    trajectory_pb.mutable_header()->set_timestamp_sec(start_timestamp);
+    AdapterManager::FillPlanningHeader("planning", trajectory_pb);
+    trajectory_pb->mutable_header()->set_timestamp_sec(start_timestamp);
     // TODO(all): integrate reverse gear
-    trajectory_pb.set_gear(canbus::Chassis::GEAR_DRIVE);
-    AdapterManager::PublishPlanning(trajectory_pb);
-    ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+    AdapterManager::PublishPlanning(*trajectory_pb);
+    ADEBUG << "Planning succeeded:" << trajectory_pb->header().DebugString();
   } else {
     AERROR << "Planning failed";
   }
@@ -237,8 +213,7 @@ void Planning::Stop() {}
 
 bool Planning::Plan(const bool is_on_auto_mode,
                     const double current_time_stamp,
-                    const double planning_cycle_time,
-                    ADCTrajectory* trajectory_pb) {
+                    const double planning_cycle_time) {
 
   const auto& stitching_trajectory =
       TrajectoryStitcher::compute_stitching_trajectory(
@@ -249,8 +224,7 @@ bool Planning::Plan(const bool is_on_auto_mode,
 
   PublishableTrajectory publishable_trajectory;
   auto status = planner_->Plan(stitching_trajectory.back(),
-      frame_.get(), &publishable_trajectory, trajectory_pb->mutable_debug(),
-      trajectory_pb->mutable_latency_stats());
+      frame_.get(), &publishable_trajectory);
 
   if (status != Status::OK()) {
     AERROR << "planner failed to make a driving plan";
@@ -263,6 +237,7 @@ bool Planning::Plan(const bool is_on_auto_mode,
 
   publishable_trajectory.set_header_time(current_time_stamp);
 
+  auto trajectory_pb = frame_->MutableADCTrajectory();
   publishable_trajectory.populate_trajectory_protobuf(trajectory_pb);
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
 
