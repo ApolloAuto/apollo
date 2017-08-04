@@ -34,6 +34,9 @@
 namespace apollo {
 namespace planning {
 
+class Obstacle;
+using ConstObstacleList = std::vector<const Obstacle *>;
+
 class Obstacle {
  public:
   Obstacle() = default;

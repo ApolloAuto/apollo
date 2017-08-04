@@ -42,8 +42,7 @@ namespace planning {
 class QpFrenetFrame {
  public:
   QpFrenetFrame(const ReferenceLine& reference_line,
-                const std::vector<const Obstacle*>& obstacles,
-                const SpeedData& speed_data,
+                const ConstObstacleList& obstacles, const SpeedData& speed_data,
                 const common::FrenetFramePoint& init_frenet_point,
                 const double start_s, const double end_s,
                 const double time_resolution);
@@ -108,7 +107,7 @@ class QpFrenetFrame {
 
  private:
   const ReferenceLine& reference_line_;
-  const std::vector<const Obstacle*>& obstacles_;
+  const ConstObstacleList& obstacles_;
   const SpeedData& speed_data_;
 
   common::VehicleParam vehicle_param_;
