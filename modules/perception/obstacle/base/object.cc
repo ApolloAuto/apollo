@@ -31,6 +31,7 @@ Object::Object() {
   center = Vector3d::Zero();
   velocity = Vector3d::Zero();
   cloud.reset(new pcl_util::PointCloud);
+  type = UNKNOWN;
   type_probs.resize(MAX_OBJECT_TYPE, 0);
 }
 
