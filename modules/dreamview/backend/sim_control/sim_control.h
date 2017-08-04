@@ -23,6 +23,7 @@
 
 #include <string>
 
+#include "gtest/gtest_prod.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
@@ -101,6 +102,8 @@ class SimControl {
 
   apollo::common::TrajectoryPoint prev_point_;
   apollo::common::TrajectoryPoint next_point_;
+
+  FRIEND_TEST(SimControlTest, Test);
 };
 
 }  // namespace dreamview
