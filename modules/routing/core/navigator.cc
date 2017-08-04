@@ -346,7 +346,7 @@ void Navigator::generate_passage_region(
   for (size_t i = 0; i < nodes_of_ways.size(); ++i) {
     AINFO << "Way " << std::to_string(i);
     const std::vector<const TopoNode*>& nodes_of_way = nodes_of_ways.at(i);
-    if (!nodes_of_way.at(0)->is_virtual()) {
+    if (FLAGS_use_road_id || !nodes_of_way.at(0)->is_virtual()) {
       std::vector<std::vector<const TopoNode*> > nodes_of_basic_passages;
       std::vector<RoutingResponse_LaneChangeInfo::Type> lane_change_types;
       extract_basic_passages(nodes_of_way, &nodes_of_basic_passages,
