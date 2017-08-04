@@ -81,7 +81,8 @@ void SimControl::Start() {
   if (initial_start_) {
     // Setup planning and routing result data callback.
     AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
-    AdapterManager::AddRoutingResponseCallback(&SimControl::SetStartPoint, this);
+    AdapterManager::AddRoutingResponseCallback(&SimControl::SetStartPoint,
+                                               this);
 
     // Start timer to publish localiztion and chassis messages.
     sim_control_timer_ = AdapterManager::CreateTimer(

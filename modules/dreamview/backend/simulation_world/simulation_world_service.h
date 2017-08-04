@@ -51,8 +51,6 @@ namespace dreamview {
  */
 class SimulationWorldService {
  public:
-  using Json = nlohmann::json;
-
   // The maximum number of monitor message items to be kept in
   // SimulationWorld.
   static constexpr int kMaxMonitorItems = 30;
@@ -79,7 +77,7 @@ class SimulationWorldService {
    * @brief Returns the json representation of the SimulationWorld object.
    * @return Json object equivalence of the SimulationWorld object.
    */
-  Json GetUpdateAsJson() const;
+  nlohmann::json GetUpdateAsJson() const;
 
   /**
    * @brief The function Update() is periodically called to check for updates
