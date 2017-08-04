@@ -78,22 +78,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "st_boundary_mapper_impl",
-    srcs = [
-        "st_boundary_mapper_impl.cc",
-    ],
-    hdrs = [
-        "st_boundary_mapper_impl.h",
-    ],
-    deps = [
-        "//modules/common:log",
-        "//modules/common/util",
-        "//modules/common/vehicle_state",
-        "//modules/planning/optimizer/st_graph:st_boundary_mapper",
-    ],
-)
-
 cc_test(
     name = "st_graph_boundary_test",
     size = "small",

@@ -15,27 +15,22 @@
  *****************************************************************************/
 
 /**
- *   @file: st_boundary_mapper.h
- **/
+*   @file
+**/
 
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 
-#include <string>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/status/status.h"
-#include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/decision_data.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed_limit.h"
 #include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
-#include "modules/planning/optimizer/st_graph/st_graph_point.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -43,35 +38,49 @@ namespace planning {
 
 class StBoundaryMapper {
  public:
-  StBoundaryMapper() = default;
-  virtual ~StBoundaryMapper() = default;
-
-  bool Init(const std::string& config_file);
-  virtual apollo::common::Status GetGraphBoundary(
+  StBoundaryMapper(const StBoundaryConfig& config,
+                   const ReferenceLine& reference_line);
+  apollo::common::Status GetGraphBoundary(
       const common::TrajectoryPoint& initial_planning_point,
       const DecisionData& decision_data, const PathData& path_data,
-      const ReferenceLine& reference_line, const double planning_distance,
-      const double planning_time,
-      std::vector<StGraphBoundary>* const boundary) const = 0;
+      const double planning_distance, const double planning_time,
+      std::vector<StGraphBoundary>* const boundary) const;
 
   virtual apollo::common::Status GetSpeedLimits(
-      const ReferenceLine& reference_line, const PathData& path_data,
-      SpeedLimit* const speed_limit_data) const;
+      const PathData& path_data, SpeedLimit* const speed_limit_data) const;
 
- protected:
-  const StBoundaryConfig& st_boundary_config() const;
-  const apollo::common::VehicleParam& vehicle_param() const {
-    return common::VehicleConfigHelper::GetConfig().vehicle_param();
-  }
-
-  double GetArea(const std::vector<STPoint>& boundary_points) const;
+ private:
   bool CheckOverlap(const apollo::common::PathPoint& path_point,
-                    const apollo::common::VehicleParam& params,
                     const apollo::common::math::Box2d& obs_box,
                     const double buffer) const;
 
+  double GetArea(const std::vector<STPoint>& boundary_points) const;
+  apollo::common::Status MapMainDecisionStop(
+      const MainStop& main_stop, const double planning_distance,
+      const double planning_time,
+      std::vector<StGraphBoundary>* const boundary) const;
+
+  apollo::common::Status MapMissionComplete(
+      const double planning_distance, const double planning_time,
+      std::vector<StGraphBoundary>* const boundary) const;
+
+  apollo::common::Status MapObstacleWithPredictionTrajectory(
+      const common::TrajectoryPoint& initial_planning_point,
+      const Obstacle& obstacle, const ObjectDecisionType obj_decision,
+      const PathData& path_data, const double planning_distance,
+      const double planning_time,
+      std::vector<StGraphBoundary>* const boundary) const;
+
+  apollo::common::Status MapObstacleWithoutPredictionTrajectory(
+      const Obstacle& obstacle, const ObjectDecisionType obj_decision,
+      const PathData& path_data, const double planning_distance,
+      const double planning_time,
+      std::vector<StGraphBoundary>* const boundary) const;
+
  private:
   StBoundaryConfig st_boundary_config_;
+  const ReferenceLine& reference_line_;
+  const apollo::common::VehicleParam vehicle_param_;
 };
 
 }  // namespace planning
