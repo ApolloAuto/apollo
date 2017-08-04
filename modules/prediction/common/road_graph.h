@@ -20,26 +20,19 @@
 #include <vector>
 #include <memory>
 
+#include "modules/common/status/status.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
-#include "modules/common/proto/error_code.pb.h"
 
 namespace apollo {
 namespace prediction {
 
 class RoadGraph {
  public:
-  RoadGraph();
-
   RoadGraph(double start_s, double length,
             std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
-  virtual ~RoadGraph();
-
-  void Set(double start_s, double length,
-           std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
-
-  apollo::common::ErrorCode BuildLaneGraph(LaneGraph* lane_graph);
+  apollo::common::Status BuildLaneGraph(LaneGraph* lane_graph);
 
  private:
   void ComputeLaneSequence(
@@ -50,9 +43,9 @@ class RoadGraph {
       LaneGraph* lane_graph_ptr) const;
 
  private:
-  double start_s_;
-  double length_;
-  std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr_;
+  double start_s_ = 0;
+  double length_ = -1.0;
+  std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr_ = nullptr;
 };
 
 }  // namespace prediction

@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/common/road_graph.h"
+
+#include <algorithm>
 #include <utility>
 
-#include "modules/prediction/common/road_graph.h"
+#include "modules/common/util/string_util.h"
 #include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
@@ -25,46 +28,33 @@ namespace prediction {
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::common::ErrorCode;
-
-RoadGraph::RoadGraph()
-    : start_s_(0.0), length_(-1.0), lane_info_ptr_(nullptr) {
-}
+using apollo::common::Status;
 
 RoadGraph::RoadGraph(double start_s, double length,
                      std::shared_ptr<const LaneInfo> lane_info_ptr)
     : start_s_(start_s), length_(length), lane_info_ptr_(lane_info_ptr) {
 }
 
-RoadGraph::~RoadGraph() {
-  start_s_ = 0.0;
-  length_ = -1.0;
-  lane_info_ptr_ = nullptr;
-}
-
-void RoadGraph::Set(double start_s, double length,
-                    std::shared_ptr< const LaneInfo> lane_info_ptr) {
-  start_s_ = start_s;
-  length_ = length;
-  lane_info_ptr_ = lane_info_ptr;
-}
-
-ErrorCode RoadGraph::BuildLaneGraph(LaneGraph* lane_graph_ptr) {
+Status RoadGraph::BuildLaneGraph(LaneGraph* lane_graph_ptr) {
   if (length_ < 0.0 || lane_info_ptr_ == nullptr) {
-    AERROR << "Invalid road graph settings. Road graph length = " << length_;
-    return ErrorCode::PREDICTION_ERROR;
+    const auto error_msg = apollo::common::util::StrCat(
+        "Invalid road graph settings. Road graph length = ", length_);
+    AERROR << error_msg;
+    return Status(ErrorCode::PREDICTION_ERROR, error_msg);
   }
 
   if (lane_graph_ptr == nullptr) {
-    AERROR << "Invalid input lane graph.";
-    return ErrorCode::PREDICTION_ERROR;
+    const auto error_msg = "Invalid input lane graph.";
+    AERROR << error_msg;
+    return Status(ErrorCode::PREDICTION_ERROR, error_msg);
   }
 
   std::vector<LaneSegment> lane_segments;
   double accumulated_s = 0.0;
   ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_,
-      &lane_segments, lane_graph_ptr);
+                      &lane_segments, lane_graph_ptr);
 
-  return ErrorCode::OK;
+  return Status::OK();
 }
 
 void RoadGraph::ComputeLaneSequence(
@@ -94,18 +84,17 @@ void RoadGraph::ComputeLaneSequence(
   if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_ ||
     lane_info_ptr->lane().successor_id_size() == 0) {
     LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
-    for (auto& lane_segment : *lane_segments) {
-      sequence->add_lane_segment()->CopyFrom(lane_segment);
-    }
+    *sequence->mutable_lane_segment() = {lane_segments->begin(),
+                                         lane_segments->end()};
     sequence->set_label(0);
   } else {
+    const double successor_accumulated_s =
+        accumulated_s + lane_info_ptr->total_length() - start_s;
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
-      double successor_accumulated_s =
-          accumulated_s + lane_info_ptr->total_length() - start_s;
       std::shared_ptr<const LaneInfo> successor_lane =
           map->LaneById(successor_lane_id);
       ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
-          lane_segments, lane_graph_ptr);
+                          lane_segments, lane_graph_ptr);
     }
   }
   lane_segments->pop_back();

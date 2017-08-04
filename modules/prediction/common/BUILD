@@ -66,7 +66,7 @@ cc_library(
     srcs = ["road_graph.cc"],
     hdrs = ["road_graph.h"],
     deps = [
-        "//modules/common/proto:error_code_proto",
+        "//modules/common/status",
         "//modules/map/hdmap",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/proto:lane_graph_proto",

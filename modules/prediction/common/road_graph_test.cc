@@ -27,7 +27,7 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::ErrorCode;
+using ::apollo::common::Status;
 
 class RoadGraphTest : public ::testing::Test {
  public:
@@ -49,7 +49,7 @@ TEST_F(RoadGraphTest, General) {
   RoadGraph road_graph(start_s, length, lane);
 
   LaneGraph lane_graph;
-  EXPECT_EQ(road_graph.BuildLaneGraph(&lane_graph), ErrorCode::OK);
+  EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
   EXPECT_EQ(1, lane_graph.lane_sequence_size());
   EXPECT_EQ(3, lane_graph.lane_sequence(0).lane_segment_size());
   EXPECT_EQ("l9", lane_graph.lane_sequence(0).lane_segment(0).lane_id());
@@ -74,7 +74,7 @@ TEST_F(RoadGraphTest, NegativeStartS) {
   RoadGraph road_graph(start_s, length, lane);
 
   LaneGraph lane_graph;
-  EXPECT_EQ(road_graph.BuildLaneGraph(&lane_graph), ErrorCode::OK);
+  EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
   EXPECT_EQ(1, lane_graph.lane_sequence_size());
   EXPECT_EQ(1, lane_graph.lane_sequence(0).lane_segment_size());
   EXPECT_EQ("l9", lane_graph.lane_sequence(0).lane_segment(0).lane_id());
@@ -97,7 +97,7 @@ TEST_F(RoadGraphTest, LengthLongerThanEnd) {
   RoadGraph road_graph(start_s, length, lane);
 
   LaneGraph lane_graph;
-  EXPECT_EQ(road_graph.BuildLaneGraph(&lane_graph), ErrorCode::OK);
+  EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
   EXPECT_EQ(1, lane_graph.lane_sequence_size());
   EXPECT_EQ(3, lane_graph.lane_sequence(0).lane_segment_size());
   EXPECT_EQ("l22", lane_graph.lane_sequence(0).lane_segment(0).lane_id());
@@ -122,7 +122,7 @@ TEST_F(RoadGraphTest, MultipleLaneSequence) {
   RoadGraph road_graph(start_s, length, lane);
 
   LaneGraph lane_graph;
-  EXPECT_EQ(road_graph.BuildLaneGraph(&lane_graph), ErrorCode::OK);
+  EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
   EXPECT_EQ(2, lane_graph.lane_sequence_size());
   EXPECT_EQ(3, lane_graph.lane_sequence(0).lane_segment_size());
   EXPECT_EQ(3, lane_graph.lane_sequence(1).lane_segment_size());
