@@ -36,6 +36,14 @@ namespace apollo {
 namespace perception {
 
 typedef typename Bitmap2D::DirectionMajor MajorDirection;
+
+/**
+ * @class HdmapROIFilter
+ * @brief This is ROI(Region of Interest) Filter based on HD map, which can
+ * figure out which point is in the regions what we focus on(Almost in the road).
+ * This is an optional process, the most advantage of ROI filter is to filter
+ * out some points to reduce calculation in the following process.
+ */
 class HdmapROIFilter: public BaseROIFilter {
 public:
   HdmapROIFilter() : BaseROIFilter() {}
@@ -48,8 +56,9 @@ public:
               const ROIFilterOptions &roi_filter_options,
               pcl_util::PointIndices* roi_indices) override;
 
-  /*
-   * @brief: Draw polygons bitmap and check each whether is in polygons
+protected:
+  /**
+   * @brief: Draw polygons bitmap and check each point whether is in polygons
    * @params[In] cloud: point cloud with local coordinates
    * @params[In] map_polygons: polygons after transformed to scan polygon type
    * @params[Out] roi_indices: Indices of point in roi
@@ -59,8 +68,7 @@ public:
                              const std::vector<PolygonType>& map_polygons,
                              pcl_util::PointIndices* roi_indices);
 
-protected:
-  /*
+  /**
    * @brief: transform polygon and cloud to local corrdinates
    * @params[In] cloud: point cloud with world coordinates
    * @params[In] vel_pose: TODO
@@ -75,7 +83,7 @@ protected:
           std::vector<PolygonType>& polygons_local,
           pcl_util::PointCloudPtr& cloud_local);
 
-  /*
+  /**
    * @brief: Get major direction. Transform polygons type to what we want.
    * @params[In] map_polygons: polygons with local coordinates
    * @params[In] polygons: polygons with type of vector<Matrix<double, 2, 1>>
@@ -84,6 +92,16 @@ protected:
   MajorDirection GetMajorDirection(
       const std::vector<PolygonType>& map_polygons,
       std::vector<PolygonScanConverter::Polygon>* polygons);
+
+  void MergeRoadBoundariesToPolygons(const std::vector<RoadBoundary>& road_boundaries,
+                                     std::vector<PolygonDType>* polygons);
+
+  void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
+                                std::vector<PolygonDType>* polygons);
+
+  bool Bitmap2dFilter(const pcl::PointCloud<pcl_util::Point>::ConstPtr in_cloud_ptr,
+                      const Bitmap2D &bitmap,
+                      pcl_util::PointIndices* roi_indices_ptr);
 
   // We only filter point with local coordinates x, y in [-range, range] in meters
   double range_;
