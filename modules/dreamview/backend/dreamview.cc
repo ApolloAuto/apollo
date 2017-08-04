@@ -53,8 +53,8 @@ Status Dreamview::Init() {
   server_->addWebSocketHandler("/websocket", *websocket_);
 
   map_service_.reset(new MapService(FLAGS_dreamview_map));
-  sim_world_updater_.reset(
-      new SimulationWorldUpdater(websocket_.get(), map_service_.get()));
+  sim_world_updater_.reset(new SimulationWorldUpdater(
+      websocket_.get(), map_service_.get(), FLAGS_routing_from_file));
   sim_control_.reset(new SimControl());
 
   return Status::OK();

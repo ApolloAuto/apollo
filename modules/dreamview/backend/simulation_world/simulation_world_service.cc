@@ -26,6 +26,8 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/util/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -52,9 +54,12 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
+using apollo::routing::RoutingResponse;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
+using apollo::common::util::GetProtoFromFile;
+using apollo::hdmap::MapPathPoint;
 
 using Json = nlohmann::json;
 
@@ -263,9 +268,13 @@ void CreatePredictionTrajectory(Object *world_object,
 constexpr int SimulationWorldService::kMaxMonitorItems;
 constexpr double SimulationWorldService::kMapRadius;
 
-SimulationWorldService::SimulationWorldService(MapService *map_service)
+SimulationWorldService::SimulationWorldService(MapService *map_service,
+                                               bool routing_from_file)
     : map_service_(map_service) {
-  RegisterMonitorCallback();
+  RegisterMessageCallbacks();
+  if (routing_from_file) {
+    ReadRoutingFromFile(FLAGS_routing_response_file);
+  }
 }
 
 const SimulationWorld &SimulationWorldService::Update() {
@@ -599,9 +608,47 @@ void SimulationWorldService::UpdateSimulationWorld(
       std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
 }
 
-void SimulationWorldService::RegisterMonitorCallback() {
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const RoutingResponse &routing_response) {
+  auto header_time = routing_response.header().timestamp_sec();
+
+  std::vector<MapPathPoint> points;
+  if (!map_service_->GetPointsFromRouting(routing_response, &points)) {
+    return;
+  }
+
+  world_.clear_route();
+  world_.set_routing_time(header_time);
+  for (const auto &point : points) {
+    PolygonPoint *route_point = world_.add_route();
+    route_point->set_x(point.x());
+    route_point->set_y(point.y());
+  }
+
+  world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
+}
+
+void SimulationWorldService::ReadRoutingFromFile(
+    const std::string &routing_response_file) {
+  RoutingResponse routing;
+  if (!GetProtoFromFile(routing_response_file, &routing)) {
+    AWARN << "Unable to read routing response from file: "
+          << routing_response_file;
+    return;
+  }
+  AINFO << "Loaded routing from " << routing_response_file;
+  UpdateSimulationWorld(routing);
+}
+
+void SimulationWorldService::RegisterMessageCallbacks() {
   if (CheckAdapterInitialized("Monitor", AdapterManager::GetMonitor())) {
     AdapterManager::AddMonitorCallback(
+        &SimulationWorldService::UpdateSimulationWorld, this);
+  }
+  if (CheckAdapterInitialized("RoutingResponse",
+                              AdapterManager::GetRoutingResponse())) {
+    AdapterManager::AddRoutingResponseCallback(
         &SimulationWorldService::UpdateSimulationWorld, this);
   }
 }

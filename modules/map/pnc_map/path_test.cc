@@ -943,8 +943,3 @@ TEST(TestSuite, lane_info) {
 
 }  // hdmap
 }  // apollo
-
-int main(int argc, char** argv) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
