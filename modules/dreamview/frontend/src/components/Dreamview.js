@@ -16,13 +16,13 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { dimension, meters } = this.props.store;
+        const { dimension, meters, options } = this.props.store;
 
         return (
             <div>
                 <SideBar />
                 <StatusBar meters={meters} />
-                <Scene width={dimension.width} height={dimension.height} />
+                <Scene width={dimension.width} height={dimension.height} options={options}/>
             </div>
         );
     }

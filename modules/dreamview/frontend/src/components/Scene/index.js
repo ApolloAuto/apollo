@@ -5,7 +5,8 @@ import RENDERER from "renderer";
 
 export default class Scene extends React.Component {
     componentDidMount() {
-        RENDERER.initialize("canvas", this.props.width, this.props.height);
+        RENDERER.initialize("canvas", this.props.width, this.props.height,
+                this.props.options);
     }
 
     componentWillUpdate() {
