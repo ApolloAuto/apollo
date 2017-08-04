@@ -45,6 +45,10 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
                          const ReferenceLine& reference_line,
                          DecisionData* const decision_data,
                          SpeedData* const speed_data) override;
+
+  void RecordSTGraphDebug(const std::vector<StGraphBoundary>& boundaries,
+                          const SpeedLimit& speed_limits);
+
   QpSplineStSpeedConfig qp_spline_st_speed_config_;
   StBoundaryConfig st_boundary_config_;
 };
