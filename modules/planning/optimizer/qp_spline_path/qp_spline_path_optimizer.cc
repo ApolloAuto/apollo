@@ -19,7 +19,10 @@
  **/
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
 
+#include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
 
 namespace apollo {
 namespace planning {
@@ -31,8 +34,10 @@ QpSplinePathOptimizer::QpSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
 bool QpSplinePathOptimizer::Init() {
-  if (!_path_generator.Init(FLAGS_qp_spline_path_config_file)) {
-    AERROR << "Fail to set config file for path generator.";
+  if (!common::util::GetProtoFromFile(FLAGS_qp_spline_path_config_file,
+                                      &qp_spline_path_config_)) {
+    AERROR << "Failed to load config file for path generator. config file: "
+           << FLAGS_qp_spline_path_config_file;
     return false;
   }
   is_init_ = true;
@@ -48,9 +53,10 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
+  QpSplinePathGenerator path_generator(reference_line, qp_spline_path_config_);
 
-  if (!_path_generator.generate(reference_line, *decision_data, speed_data,
-                                init_point, path_data)) {
+  if (!path_generator.generate(*decision_data, speed_data, init_point,
+                               path_data)) {
     const std::string msg = "failed to generate spline path!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
