@@ -47,7 +47,7 @@ class IndexedList {
       return iter->second.get();
     }
   }
-  const std::vector<T*>& Items() const { return _object_list; }
+  const std::vector<const T*>& Items() const { return _object_list; }
 
  private:
   std::vector<const T*> _object_list;
