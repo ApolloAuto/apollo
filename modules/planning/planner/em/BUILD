@@ -37,4 +37,22 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "decider",
+    srcs = [
+        "decider.cc",
+    ],
+    hdrs = [
+        "decider.h",
+    ],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/common/status",
+        "//modules/planning/common:planning_common",
+        "//modules/planning/proto:planning_proto",
+        "//modules/planning/reference_line",
+        "@eigen//:eigen",
+    ],
+)
 cpplint()
