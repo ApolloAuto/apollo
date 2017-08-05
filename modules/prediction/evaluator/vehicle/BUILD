@@ -12,14 +12,14 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:math_utils",
-        "//modules/common/util:util",
+        "//modules/common/util",
+        "//modules/map/proto:map_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
         "//modules/prediction/proto:lane_graph_proto",
-        "//modules/map/proto:map_proto",
         "@gtest//:main",
     ],
 )
@@ -35,12 +35,12 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        "//modules/common/util",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "@gtest//:main",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/perception/proto:perception_proto",
-        "//modules/common/util:util",
-        "//modules/prediction/container/obstacles:obstacles_container",
     ],
 )
 

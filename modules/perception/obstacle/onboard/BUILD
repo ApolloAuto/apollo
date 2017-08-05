@@ -7,7 +7,7 @@ cc_library(
     srcs = ["hdmap_input.cc"],
     hdrs = ["hdmap_input.h"],
     deps = [
-        "//modules/common:common",
+        "//modules/common",
         "//modules/common:log",
         "//modules/map/hdmap",
         "//modules/perception/common:perception_common",
@@ -24,7 +24,7 @@ cc_library(
     hdrs = ["lidar_process.h"],
     deps = [
         ":perception_obstacle_hdmapinput",
-        "//modules/common:common",
+        "//modules/common",
         "//modules/common:log",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/base",
@@ -33,9 +33,9 @@ cc_library(
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/lidar/dummy:perception_obstacle_lidar_dummy",
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter:hdmap_roi_filter",
-        "//modules/perception/obstacle/lidar/segmentation/cnnseg:perception_obstacle_lidar_segmention_cnnseg",
         "//modules/perception/obstacle/lidar/object_builder/min_box:perception_obstacle_lidar_object_builder_min_box",
+        "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
+        "//modules/perception/obstacle/lidar/segmentation/cnnseg:perception_obstacle_lidar_segmention_cnnseg",
         "//modules/perception/obstacle/lidar/tracker/hm_tracker:perception_obstacle_lidar_tracker_hm_tracker",
         "@eigen//:eigen",
         "@ros//:ros_common",
@@ -44,13 +44,13 @@ cc_library(
 
 cc_test(
     name = "perception_obstacle_hdmap_input_test",
+    size = "small",
     srcs = [
         "hdmap_input_test.cc",
-        ],
-    size = "small",
+    ],
     data = [
+        "//modules/map:map_data",
         "//modules/perception:perception_data",
-        "//modules/map:map_data"
     ],
     deps = [
         ":perception_obstacle_hdmapinput",
@@ -61,13 +61,13 @@ cc_test(
 
 cc_test(
     name = "perception_obstacle_lidar_process_test",
+    size = "small",
     srcs = [
         "lidar_process_test.cc",
-        ],
-    size = "small",
+    ],
     data = [
+        "//modules/map:map_data",
         "//modules/perception:perception_data",
-        "//modules/map:map_data"
     ],
     deps = [
         ":perception_obstacle_hdmapinput",

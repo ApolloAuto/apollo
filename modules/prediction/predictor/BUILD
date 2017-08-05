@@ -23,11 +23,11 @@ cc_library(
     deps = [
         "//modules/common:macro",
         "//modules/perception/proto:perception_proto",
-        "//modules/prediction/predictor/vehicle:lane_sequence_predictor",
-        "//modules/prediction/predictor/vehicle:free_move_predictor",
-        "//modules/prediction/predictor/pedestrian:regional_predictor",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/predictor/pedestrian:regional_predictor",
+        "//modules/prediction/predictor/vehicle:free_move_predictor",
+        "//modules/prediction/predictor/vehicle:lane_sequence_predictor",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
         "@glog//:glog",
@@ -43,11 +43,11 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        "//modules/common/util",
         "//modules/prediction/predictor:predictor_manager",
         "//modules/prediction/proto:prediction_conf_proto",
-        "//modules/common/util:util",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_library(

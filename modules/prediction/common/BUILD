@@ -28,7 +28,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:prediction_util",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_library(
@@ -50,15 +50,15 @@ cc_test(
     name = "prediction_map_test",
     size = "small",
     srcs = ["prediction_map_test.cc"],
-     data = [
+    data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_map",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_library(
@@ -82,11 +82,11 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/prediction/common:road_graph",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
+        "//modules/prediction/common:road_graph",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cpplint()

@@ -4,8 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "config_manager",
-    srcs = ["config_manager.cc",],
-    hdrs = ["config_manager.h",],
+    srcs = ["config_manager.cc"],
+    hdrs = ["config_manager.h"],
     deps = [
         "//modules/common:log",
         "//modules/perception/common:perception_common",

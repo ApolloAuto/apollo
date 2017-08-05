@@ -15,15 +15,14 @@ cc_library(
         "qp_spline_path_optimizer.h",
     ],
     deps = [
-        "@eigen//:eigen",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/math/qp_solver",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
-        "//modules/planning/common:path_decision",
         "//modules/planning/common:obstacle",
+        "//modules/planning/common:path_decision",
         "//modules/planning/common:planning_data",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/path:discretized_path",
@@ -41,6 +40,7 @@ cc_library(
         "//modules/planning/optimizer:path_optimizer",
         "//modules/planning/proto:qp_spline_path_config_proto",
         "//modules/planning/reference_line",
+        "@eigen//:eigen",
     ],
 )
 
@@ -51,8 +51,8 @@ cc_test(
         "qp_spline_path_optimizer_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":qp_spline_path",
+        "@gtest//:main",
     ],
 )
 
