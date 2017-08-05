@@ -46,16 +46,16 @@ def main():
     start_point = routing_request.start
     end_point = routing_request.end
 
-    """
-    start_point.id = '144_1_1'
-    start_point.s = 1
-    end_point.id = '94_1_1'
-    end_point.s = 2
+    start_point.id = '94_1_0'
+    start_point.s = 3
+    end_point.id = '94_1_0'
+    end_point.s = 50
     """
     start_point.id = '1_-1'
-    start_point.s = 1
+    start_point.s = 6
     end_point.id = '1_-1'
     end_point.s = 5
+    """
 
     request_publisher = rospy.Publisher(
             '/apollo/routing_request', routing_pb2.RoutingRequest, queue_size=1)
