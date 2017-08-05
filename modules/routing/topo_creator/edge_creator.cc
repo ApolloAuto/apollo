@@ -16,21 +16,15 @@
 
 #include "modules/routing/topo_creator/edge_creator.h"
 
+#include "modules/routing/common/routing_gflags.h"
 #include <math.h>
 
 namespace apollo {
 namespace routing {
 
-namespace {
-
 using ::apollo::routing::Node;
 using ::apollo::routing::Edge;
 using ::apollo::routing::CurveRange;
-
-const double CHANGE_PENALTY = 50;  // equal to 50 meter length
-const double BASE_CHANGING_LENGTH = 50;
-
-}  // namespace
 
 void EdgeCreator::get_pb_edge(const Node& node_from, const Node& node_to,
                               const Edge::DirectionType& type, Edge* pb_edge) {
@@ -57,10 +51,10 @@ void EdgeCreator::init_edge_cost(const Node& node_from, const Node& node_to,
     for (const auto& range : target_range) {
       changing_area_length += range.end().s() - range.start().s();
     }
-    double ratio = (changing_area_length >= BASE_CHANGING_LENGTH)
-                       ? pow(changing_area_length / BASE_CHANGING_LENGTH, -1.5)
+    double ratio = (changing_area_length >= FLAGS_base_changing_length)
+                       ? pow(changing_area_length / FLAGS_base_changing_length, -1.5)
                        : 1.0;
-    edge->set_cost(CHANGE_PENALTY * ratio);
+    edge->set_cost(FLAGS_change_penalty * ratio);
   }
 }
 
