@@ -32,7 +32,7 @@ class PredictionMapTest : public ::testing::Test {
   void SetUp() override {
     FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
     map_ = PredictionMap::instance();
-    CHECK_NOTNULL(map_);
+    CHECK(map_->EnsureMapLoaded());
   }
 
  protected:

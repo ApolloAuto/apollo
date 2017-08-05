@@ -20,10 +20,10 @@
 #include <utility>
 #include "Eigen/Dense"
 
+#include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/common/math/math_utils.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
@@ -140,7 +140,7 @@ int LaneSequencePredictor::GetLaneChangeType(
     const std::string& lane_id,
     const LaneSequence& lane_sequence) {
   PredictionMap *map = PredictionMap::instance();
-  CHECK_NOTNULL(map);
+  CHECK(map->EnsureMapLoaded());
 
   std::string lane_change_id = lane_sequence.lane_segment(0).lane_id();
   if (lane_id == lane_change_id) {
@@ -164,7 +164,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     double freq,
     std::vector<TrajectoryPoint> *points) {
   PredictionMap *map = PredictionMap::instance();
-  CHECK_NOTNULL(map);
+  CHECK(map->EnsureMapLoaded());
 
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
   double lane_s = state(0, 0);
