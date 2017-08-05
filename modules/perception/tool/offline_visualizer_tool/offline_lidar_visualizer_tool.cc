@@ -40,7 +40,7 @@ namespace apollo {
 namespace perception {
 
 DEFINE_string(output_path, "./output/", "output path");
-DEFINE_int32(start_frame, 1000, "start frame");
+DEFINE_int32(start_frame, 1, "start frame");
 
 template <typename T>
 void quaternion_to_rotation_matrix(const T * quat, T * R) {
