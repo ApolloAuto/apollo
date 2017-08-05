@@ -42,6 +42,10 @@ const PathObstacles &PathDecision::path_obstacles() const {
   return path_obstacles_;
 }
 
+PathObstacle *PathDecision::Find(const std::string &object_id) {
+  return path_obstacles_.Find(object_id);
+}
+
 bool PathDecision::AddDecision(const std::string &tag,
                                const std::string &object_id,
                                const ObjectDecisionType &decision) {
