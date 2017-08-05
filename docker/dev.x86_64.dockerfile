@@ -41,17 +41,12 @@ COPY ./modules/tools/py27_requirements.txt /tmp/
 
 WORKDIR /tmp
 # install protobuf 3.1.0
-RUN wget https://github.com/google/protobuf/releases/download/v3.1.0/protobuf-cpp-3.1.0.tar.gz
-RUN tar xzf protobuf-cpp-3.1.0.tar.gz
-WORKDIR /tmp/protobuf-3.1.0
+RUN wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz
+RUN tar xzf protobuf-cpp-3.3.0.tar.gz
+WORKDIR /tmp/protobuf-3.3.0
 RUN ./configure --prefix=/usr
 RUN make
 RUN make install
-
-WORKDIR /tmp
-RUN wget https://github.com/google/protobuf/releases/download/v3.1.0/protoc-3.1.0-linux-x86_64.zip
-RUN unzip protoc-3.1.0-linux-x86_64.zip -d protoc3
-RUN mv protoc3/bin/protoc /usr/bin/
 RUN chmod 755 /usr/bin/protoc
 
 # set up node v8.0.0
