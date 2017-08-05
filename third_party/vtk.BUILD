@@ -33,4 +33,7 @@ cc_library(
 	"-lvtksys",
 	"-lvtkverdict",
     ],
+    copts = [
+        "-Wno-deprecated",
+    ],
 )

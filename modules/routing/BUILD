@@ -13,13 +13,13 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:apollo_app",
-        "//modules/common/monitor",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/monitor",
+        "//modules/common/status",
         "//modules/common/util",
         "//modules/routing/common",
         "//modules/routing/core",
         "//modules/routing/proto:routing_proto",
-        "//modules/common/status",
         "@ros//:ros_common",
     ],
 )
@@ -40,6 +40,5 @@ filegroup(
         "testdata/**",
     ]),
 )
-
 
 cpplint()

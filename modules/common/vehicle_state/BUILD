@@ -13,8 +13,8 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
-        "//modules/common/math:quaternion",
         "//modules/common:macro",
+        "//modules/common/math:quaternion",
         "//modules/localization/common:localization_common",
         "@eigen//:eigen",
     ],

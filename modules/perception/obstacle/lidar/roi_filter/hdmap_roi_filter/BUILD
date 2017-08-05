@@ -17,36 +17,35 @@ cc_library(
         "polygon_scan_converter.h",
     ],
     deps = [
-        "//modules/common:common",
-        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/lib/pcl_util:pcl_util",
-        "//modules/perception/obstacle/onboard:perception_obstacle_hdmapinput",
         "//external:gflags",
+        "//modules/common",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
+        "//modules/perception/obstacle/onboard:perception_obstacle_hdmapinput",
         "@eigen//:eigen",
         "@pcl//:pcl",
-    ]
+    ],
 )
+
 cc_test(
     name = "hdmap_roi_filter_test",
     size = "small",
     srcs = [
-        "hdmap_roi_filter_test.cc"
-    ],
-    deps = [
-        "//modules/common:log",
-        "//modules/perception/lib/pcl_util:pcl_util",
-        "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter:hdmap_roi_filter",
-        "//external:gflags",
-        "@gtest//:gtest",
-        "@gtest//:main",
+        "hdmap_roi_filter_test.cc",
     ],
     data = [
         "//modules/perception:perception_data",
-    ]
+    ],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
+        "@gtest//:gtest",
+        "@gtest//:main",
+    ],
 )
-
-
 
 cpplint()

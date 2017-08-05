@@ -6,8 +6,8 @@ cc_library(
     name = "common",
     deps = [
         ":routing_gflags",
-        ":routing_util",
         ":routing_macros",
+        ":routing_util",
     ],
 )
 
@@ -33,7 +33,7 @@ cc_library(
         "utils.h",
     ],
     deps = [
-        "//modules/common:common",
+        "//modules/common",
     ],
 )
 

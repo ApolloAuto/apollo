@@ -31,7 +31,7 @@ cc_library(
     name = "string_util",
     hdrs = [
         "string_util.h",
-        "string_util_internal.h"
+        "string_util_internal.h",
     ],
 )
 

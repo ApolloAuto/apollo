@@ -7,10 +7,10 @@ cc_library(
     srcs = ["pose_container.cc"],
     hdrs = ["pose_container.h"],
     deps = [
-        "//modules/prediction/container",
+        "//modules/common:log",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
-        "//modules/common:log",
+        "//modules/prediction/container",
     ],
 )
 
@@ -21,7 +21,7 @@ cc_test(
     deps = [
         "//modules/prediction/container/pose:pose_container",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cpplint()

@@ -45,13 +45,13 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/prediction/predictor/vehicle:free_move_predictor",
-        "@gtest//:main",
-        "//modules/prediction/common:prediction_gflags",
+        "//modules/common/util",
         "//modules/perception/proto:perception_proto",
-        "//modules/prediction/proto:prediction_proto",
-        "//modules/common/util:util",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/predictor/vehicle:free_move_predictor",
+        "//modules/prediction/proto:prediction_proto",
+        "@gtest//:main",
     ],
 )
 
@@ -66,14 +66,14 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        "//modules/common/util",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/predictor/vehicle:lane_sequence_predictor",
-        "@gtest//:main",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/perception/proto:perception_proto",
         "//modules/prediction/proto:prediction_proto",
-        "//modules/common/util:util",
-        "//modules/prediction/container/obstacles:obstacles_container",
+        "@gtest//:main",
     ],
 )
 

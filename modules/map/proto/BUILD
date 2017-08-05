@@ -31,4 +31,5 @@ proto_library(
         "//modules/common/proto:common_proto_lib",
     ],
 )
+
 cpplint()
