@@ -66,7 +66,7 @@ StBoundaryMapper::StBoundaryMapper(
       planning_time_(planning_time) {
   const auto& path_start_point = path_data_.discretized_path().start_point();
   common::SLPoint sl_point;
-  CHECK(!reference_line_.get_point_in_frenet_frame(
+  DCHECK(reference_line_.get_point_in_frenet_frame(
       {path_start_point.x(), path_start_point.y()}, &sl_point))
       << "Failed to get adc reference line s";
   adc_front_s_ = sl_point.s() + vehicle_param_.front_edge_to_center();
