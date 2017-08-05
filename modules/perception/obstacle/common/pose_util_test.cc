@@ -14,21 +14,35 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
-#define ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
-
-#include <vector>
-#include <string>
+#include <gtest/gtest.h>
+#include "modules/common/log.h"
+#include "modules/perception/obstacle/common/pose_util.h"
 
 namespace apollo {
 namespace perception {
 
-void GetFileNamesInFolderById(
-  const std::string& folder,
-  const std::string& ext,
-  std::vector<std::string>* ret);
+class PoseUtilTest : public testing::Test {
+ protected:
+  PoseUtilTest() {}
+  virtual ~PoseUtilTest() {}
+  void SetUp() {}
+  void TearDown() {}
+};
+
+TEST_F(PoseUtilTest, test_ReadPoseFile) {
+    std::string data_path = "modules/perception/data/hm_tracker_test/";
+    std::string file_name = "QN68P2_12_1476265365_1476265665_2.pose";
+    std::string test_file = data_path + file_name;
+    Eigen::Matrix4d pose;
+    int frame_id;
+    double time_stamp;
+    EXPECT_TRUE(ReadPoseFile(test_file, &pose, &frame_id, &time_stamp));
+    EXPECT_EQ(frame_id, 11989);
+    EXPECT_EQ(time_stamp, 1160300588.419051);
+    EXPECT_EQ(pose(0, 3), 428033.330463);
+    EXPECT_EQ(pose(1, 3), 4435145.010161);
+    EXPECT_EQ(pose(2, 3), 40.746964);
+}
 
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // namespace ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
