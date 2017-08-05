@@ -31,7 +31,7 @@
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -42,7 +42,8 @@ namespace planning {
 class QpFrenetFrame {
  public:
   QpFrenetFrame(const ReferenceLine& reference_line,
-                const ConstObstacleList& obstacles, const SpeedData& speed_data,
+                const ConstPathObstacleList& path_obstacles,
+                const SpeedData& speed_data,
                 const common::FrenetFramePoint& init_frenet_point,
                 const double start_s, const double end_s,
                 const double time_resolution);
@@ -72,9 +73,9 @@ class QpFrenetFrame {
 
   bool CalculateDiscretizedVehicleLocation();
 
-  bool MapDynamicObstacleWithDecision(const Obstacle& obstacle);
+  bool MapDynamicObstacleWithDecision(const PathObstacle& path_obstacle);
 
-  bool MapStaticObstacleWithDecision(const Obstacle& obstacle);
+  bool MapStaticObstacleWithDecision(const PathObstacle& path_obstacle);
 
   bool MapPolygon(const std::vector<common::math::Vec2d>& corners,
                   const double buffer, const bool nudge_side,
@@ -107,7 +108,7 @@ class QpFrenetFrame {
 
  private:
   const ReferenceLine& reference_line_;
-  const ConstObstacleList& obstacles_;
+  const ConstPathObstacleList& path_obstacles_;
   const SpeedData& speed_data_;
 
   common::VehicleParam vehicle_param_;

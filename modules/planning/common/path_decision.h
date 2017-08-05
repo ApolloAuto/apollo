@@ -45,6 +45,8 @@ class PathDecision {
   bool AddDecision(const std::string &tag, const std::string &object_id,
                    const ObjectDecisionType &decision);
 
+  PathObstacle *Find(const std::string &object_id);
+
  private:
   void Init(const std::vector<const Obstacle *> &obstacles);
 
