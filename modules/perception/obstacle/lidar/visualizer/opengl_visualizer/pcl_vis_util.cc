@@ -14,7 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <pcl/io/pcd_io.h>
+
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/pcl_vis_util.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -114,6 +117,32 @@ Eigen::Vector3f get_track_color(int track_id){
     
     return Eigen::Vector3f(id2intesity[r], id2intesity[g], id2intesity[b]);
 }
+
+bool GetPointCloudFromFile(const std::string& pcd_file,
+                           pcl_util::PointCloudPtr cloud)
+                            {
+  pcl::PointCloud<pcl_util::PointXYZIT> ori_cloud;
+  if (pcl::io::loadPCDFile(pcd_file, ori_cloud) < 0) {
+    AERROR << "Failed to load pcd file: " << pcd_file;
+    return false;
+  }
+
+  cloud->points.reserve(ori_cloud.points.size());
+  for (size_t i = 0; i < ori_cloud.points.size(); ++i) {
+    apollo::perception::pcl_util::Point point;
+    point.x = ori_cloud.points[i].x;
+    point.y = ori_cloud.points[i].y;
+    point.z = ori_cloud.points[i].z;
+    point.intensity = ori_cloud.points[i].intensity;
+    if (isnan(ori_cloud.points[i].x)) {
+      continue;
+    }
+    cloud->push_back(point);
+  }
+
+  return true;
+}
+
 
 }// namespace perception
 }// namespace apollo
