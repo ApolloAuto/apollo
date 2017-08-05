@@ -22,10 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/util/util.h"
 #include "modules/planning/common/indexed_list.h"

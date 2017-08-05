@@ -53,11 +53,11 @@ class IndexedQueue {
       return false;
     }
     if (!queue_.empty() && queue_.size() == max_queue_size_) {
-      const auto &front = queue_.top();
+      const auto &front = queue_.front();
       map_.erase(front.first);
-      queue_.pop_front();
+      queue_.pop();
     }
-    queue_.push_back(std::make_pair<I, ptr>(id, ptr.get()));
+    queue_.push(std::make_pair(id, ptr.get()));
     map_[id] = std::move(ptr);
     return true;
   }
