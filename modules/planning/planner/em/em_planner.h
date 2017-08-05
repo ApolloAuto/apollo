@@ -86,4 +86,4 @@ class EMPlanner : public Planner {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  //* MODULES_PLANNING_PLANNER_EM_PLANNER_H_
+#endif  // MODULES_PLANNING_PLANNER_EM_PLANNER_H_
