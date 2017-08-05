@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+//     end_s
+//       ^
+//       |
+// S path direction
+//       |
+//   start_s
+//
+//  end_l  <-----L direction---- start_l
+//////////////////////////////////
+
+message SLBoundary {
+  optional double start_s = 1;
+  optional double end_s = 2;
+  optional double start_l = 3;
+  optional double end_l = 4;
+}

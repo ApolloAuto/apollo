@@ -17,6 +17,7 @@ proto_library(
         "planning_config.proto",
         "planning_internal.proto",
         "qp_spline_st_speed_config.proto",
+        "sl_boundary.proto",
         "st_boundary_config.proto",
     ],
     deps = [
