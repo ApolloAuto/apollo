@@ -46,14 +46,14 @@ class Navigator {
       const ::apollo::routing::RoutingRequest& request,
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
-      const NodeRangeManager& range_manager,
+      NodeRangeManager* const range_manager,
       ::apollo::routing::RoutingResponse* result) const;
 
   // use internal generate result
   void generate_passage_region(
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
-      const NodeRangeManager& range_manager,
+      NodeRangeManager* const range_manager,
       ::apollo::routing::RoutingResponse* result) const;
 
   void dump_debug_data(
