@@ -35,15 +35,15 @@ class PredictionMap {
  public:
   apollo::hdmap::Id id(const std::string& str_id);
 
-  Eigen::Vector2d PositionOnLane(
+  static Eigen::Vector2d PositionOnLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
       const double s);
 
-  double HeadingOnLane(
+  static double HeadingOnLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
       const double s);
 
-  double LaneTotalWidth(
+  static double LaneTotalWidth(
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
       const double s);
 
@@ -53,13 +53,13 @@ class PredictionMap {
   std::shared_ptr<const apollo::hdmap::LaneInfo> LaneById(
       const std::string& str_id);
 
-  void GetProjection(
+  static void GetProjection(
       const Eigen::Vector2d& position,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
       double* s,
       double* l);
 
-  bool ProjectionFromLane(
+  static bool ProjectionFromLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
       double s, apollo::hdmap::MapPathPoint* path_point);
 
@@ -71,7 +71,7 @@ class PredictionMap {
       std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>* lanes,
       bool on_lane = true);
 
-  double PathHeading(
+  static double PathHeading(
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
       const apollo::common::PointENU& point);
 
@@ -88,43 +88,43 @@ class PredictionMap {
       std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>*
           nearby_lanes);
 
-  bool IsLeftNeighborLane(
+  static bool IsLeftNeighborLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> left_lane,
       std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
 
-  bool IsLeftNeighborLane(
+  static bool IsLeftNeighborLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> left_lane,
       const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
 
-  bool IsRightNeighborLane(
+  static bool IsRightNeighborLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> right_lane,
       std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
 
-  bool IsRightNeighborLane(
+  static bool IsRightNeighborLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> right_lane,
       const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
 
-  bool IsSuccessorLane(
+  static bool IsSuccessorLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> succ_lane,
       std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
 
-  bool IsSuccessorLane(
+  static bool IsSuccessorLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> succ_lane,
       const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
 
-  bool IsPredecessorLane(
+  static bool IsPredecessorLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> pred_lane,
       std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
 
-  bool IsPredecessorLane(
+  static bool IsPredecessorLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> pred_lane,
       const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
 
-  bool IsIdenticalLane(
+  static bool IsIdenticalLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> other_lane,
       std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
 
-  bool IsIdenticalLane(
+  static bool IsIdenticalLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> other_lane,
       const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
 
@@ -133,7 +133,7 @@ class PredictionMap {
   int LaneTurnType(const std::string& lane_id);
 
   template <class MapInfo>
-  std::string id_string(std::shared_ptr<const MapInfo> info) {
+  static std::string id_string(std::shared_ptr<const MapInfo> info) {
     return info->id().id();
   }
 
