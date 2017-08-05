@@ -69,6 +69,8 @@ class PathObstacle {
 
   const std::string DebugString() const;
 
+  const SLBoundary& sl_boundary() const;
+
  private:
   bool Init(const ReferenceLine* reference_line);
 
@@ -76,9 +78,7 @@ class PathObstacle {
   const planning::Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
-
-  // TODO: set sl_boundary
-  SLBoundary sl_boundary;
+  SLBoundary sl_boundary_;
 };
 
 }  // namespace planning

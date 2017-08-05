@@ -58,9 +58,9 @@ class StBoundaryMapper {
 
   double GetArea(const std::vector<STPoint>& boundary_points) const;
 
-  bool MapObstacleWithStopDecision(
-      const ObjectDecisionType& obj_decision,
-      std::vector<StGraphBoundary>* const boundary) const;
+  bool MapObstacleWithStopDecision(const PathObstacle& stop_obstacle,
+                                   const ObjectDecisionType& stop_decision,
+                                   StGraphBoundary* const boundary) const;
 
   apollo::common::Status MapObstacleWithPredictionTrajectory(
       const Obstacle& obstacle, const ObjectDecisionType& obj_decision,
@@ -78,6 +78,7 @@ class StBoundaryMapper {
   const common::TrajectoryPoint& initial_planning_point_;
   const double planning_distance_;
   const double planning_time_;
+  double adc_front_s_ = 0.0;
 };
 
 }  // namespace planning

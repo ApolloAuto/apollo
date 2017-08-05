@@ -36,7 +36,31 @@ PathObstacle::PathObstacle(const planning::Obstacle* obstacle,
   Init(reference_line);
 }
 
-bool PathObstacle::Init(const ReferenceLine* reference_line) { return true; }
+bool PathObstacle::Init(const ReferenceLine* reference_line) {
+  double start_s(std::numeric_limits<double>::max());
+  double end_s(std::numeric_limits<double>::lowest());
+  double start_l(std::numeric_limits<double>::max());
+  double end_l(std::numeric_limits<double>::lowest());
+  std::vector<common::math::Vec2d> corners;
+  obstacle_->PerceptionBoundingBox().GetAllCorners(&corners);
+  for (const auto& point : corners) {
+    common::SLPoint sl_point;
+    if (!reference_line->get_point_in_frenet_frame(point, &sl_point)) {
+      AERROR << "failed to get projection for point: " << point.DebugString()
+             << " on reference line.";
+      return false;
+    }
+    start_s = std::fmin(start_s, sl_point.s());
+    end_s = std::fmax(end_s, sl_point.s());
+    start_l = std::fmin(start_l, sl_point.l());
+    end_l = std::fmax(end_l, sl_point.l());
+  }
+  sl_boundary_.set_start_s(start_s);
+  sl_boundary_.set_end_s(end_s);
+  sl_boundary_.set_start_l(start_l);
+  sl_boundary_.set_end_l(end_l);
+  return true;
+}
 
 const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
 
@@ -58,6 +82,8 @@ const std::string PathObstacle::DebugString() const {
   }
   return ss.str();
 }
+
+const SLBoundary& PathObstacle::sl_boundary() const { return sl_boundary_; }
 
 }  // namespace planning
 }  // namespace apollo

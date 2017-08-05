@@ -5,7 +5,6 @@ package apollo.planning;
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/vehicle_signal.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
-import "modules/planning/proto/sl_boundary.proto";
 
 message TargetLane {
   // lane id
@@ -38,7 +37,6 @@ message ObjectStop {
   optional apollo.common.PointENU stop_point =3;
   // When stopped, the heading of the vehicle should be stop_heading.
   optional double stop_heading = 4;
-  optional SLBoundary sl_boundary = 5; // sl boundary
 }
 
 message ObjectNudge {
