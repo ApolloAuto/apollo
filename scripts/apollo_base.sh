@@ -202,23 +202,24 @@ function help() {
 
 # run command_name module_name
 function run() {
-    local cmd=$1
-    shift
+    local module=$1
+    local cmd=$2
+    shift 2
     case $cmd in
         start)
-            start "$@"
+            start $module "$@"
             ;;
         start_fe)
-            start_fe "$@"
+            start_fe $module "$@"
             ;;
         stop)
-            stop "$1"
+            stop $module
             ;;
         help)
             help
             ;;
         *)
-            start "$@"
+            start $module "$@"
             ;;
     esac
 }
