@@ -749,7 +749,6 @@ void Obstacle::UpdateKFPedestrianTracker(Feature* feature) {
 
 void Obstacle::SetCurrentLanes(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
-  CHECK(map->EnsureMapLoaded());
 
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
   double heading = feature->theta();
@@ -817,7 +816,6 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
 
 void Obstacle::SetNearbyLanes(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
-  CHECK(map->EnsureMapLoaded());
 
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
   double theta = feature->theta();
@@ -878,7 +876,6 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
-  CHECK(map->EnsureMapLoaded());
 
   for (auto& lane : feature->lane().current_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane.lane_id());
@@ -918,7 +915,6 @@ void Obstacle::SetLanePoints(Feature* feature) {
     return;
   }
   PredictionMap* map = PredictionMap::instance();
-  CHECK(map->EnsureMapLoaded());
 
   LaneGraph* lane_graph = feature->mutable_lane()->mutable_lane_graph();
   double heading = feature->theta();
