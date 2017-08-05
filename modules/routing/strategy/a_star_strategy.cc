@@ -53,7 +53,7 @@ double get_cost_to_neighbor(const TopoEdge* edge) {
   return (edge->cost() + edge->to_node()->cost());
 }
 
-bool reconstruct(
+bool ReConstruct(
     const std::unordered_map<const TopoNode*, const TopoNode*>& came_from,
     const TopoNode* dest_node, std::vector<const TopoNode*>* result_nodes) {
   result_nodes->clear();
@@ -71,15 +71,15 @@ bool reconstruct(
 
 }  // namespace
 
-void AStarStrategy::clear() {
-  _closed_set.clear();
-  _open_set.clear();
-  _came_from.clear();
-  _g_score.clear();
+void AStarStrategy::Clear() {
+  closed_set_.clear();
+  open_set_.clear();
+  came_from_.clear();
+  g_score_.clear();
 }
 
-double AStarStrategy::heuristic_cost(const TopoNode* src_node,
-                                     const TopoNode* dest_node) {
+double AStarStrategy::HeuristicCost(const TopoNode* src_node,
+                                    const TopoNode* dest_node) {
   const ::apollo::common::PointENU& src_point = src_node->anchor_point();
   const ::apollo::common::PointENU& dest_point = dest_node->anchor_point();
   double distance = sqrt(pow(src_point.x() - dest_point.x(), 2) +
@@ -88,64 +88,64 @@ double AStarStrategy::heuristic_cost(const TopoNode* src_node,
   return distance;
 }
 
-bool AStarStrategy::search(
+bool AStarStrategy::Search(
     const TopoGraph* graph, const TopoNode* src_node, const TopoNode* dest_node,
     const std::unordered_set<const TopoNode*>& black_list,
     std::vector<const TopoNode*>* const result_nodes) {
-  clear();
+  Clear();
   AINFO << "Start A* search algorithm.";
 
-  _closed_set.insert(black_list.begin(), black_list.end());
+  closed_set_.insert(black_list.begin(), black_list.end());
 
   std::priority_queue<SearchNode> open_set_detail;
 
   SearchNode src_search_node(src_node);
-  src_search_node.f = heuristic_cost(src_node, dest_node);
+  src_search_node.f = HeuristicCost(src_node, dest_node);
   open_set_detail.push(src_search_node);
 
-  _open_set.insert(src_node);
-  _g_score[src_node] = 0.0;
+  open_set_.insert(src_node);
+  g_score_[src_node] = 0.0;
 
   SearchNode current_node;
   while (!open_set_detail.empty()) {
     current_node = open_set_detail.top();
     if (current_node == dest_node) {
-      if (!reconstruct(_came_from, current_node.topo_node, result_nodes)) {
-        AERROR << "Failed to reconstruct route.";
+      if (!ReConstruct(came_from_, current_node.topo_node, result_nodes)) {
+        AERROR << "Failed to ReConstruct route.";
         return false;
       }
       return true;
     }
-    _open_set.erase(current_node.topo_node);
+    open_set_.erase(current_node.topo_node);
     open_set_detail.pop();
 
-    if (_closed_set.count(current_node.topo_node) != 0) {
+    if (closed_set_.count(current_node.topo_node) != 0) {
       // if showed before, just skip...
       continue;
     }
-    _closed_set.emplace(current_node.topo_node);
+    closed_set_.emplace(current_node.topo_node);
 
-    double tentative_g_score = 0.0;
+    double tentativeg_score_ = 0.0;
     for (const auto* edge : current_node.topo_node->out_to_all_edge()) {
       const auto* to_node = edge->to_node();
-      if (_closed_set.count(to_node) == 1) {
+      if (closed_set_.count(to_node) == 1) {
         continue;
       }
-      tentative_g_score =
-          _g_score[current_node.topo_node] + get_cost_to_neighbor(edge);
-      if (_open_set.count(to_node) != 0 &&
-          tentative_g_score >= _g_score[to_node]) {
+      tentativeg_score_ =
+          g_score_[current_node.topo_node] + get_cost_to_neighbor(edge);
+      if (open_set_.count(to_node) != 0 &&
+          tentativeg_score_ >= g_score_[to_node]) {
         continue;
       }
-      _g_score[to_node] = tentative_g_score;
+      g_score_[to_node] = tentativeg_score_;
       SearchNode next_node(to_node);
       next_node.f =
-          tentative_g_score + heuristic_cost(current_node.topo_node, to_node);
+          tentativeg_score_ + HeuristicCost(current_node.topo_node, to_node);
       open_set_detail.push(next_node);
-      _came_from[to_node] = current_node.topo_node;
+      came_from_[to_node] = current_node.topo_node;
 
-      if (_open_set.count(to_node) == 0) {
-        _open_set.insert(to_node);
+      if (open_set_.count(to_node) == 0) {
+        open_set_.insert(to_node);
       }
     }
   }
