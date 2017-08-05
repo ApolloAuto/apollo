@@ -72,7 +72,8 @@ void Frame::CreatePredictionObstacles(
   std::list<std::unique_ptr<Obstacle> > obstacles;
   Obstacle::CreateObstacles(prediction, &obstacles);
   for (auto &ptr : obstacles) {
-    obstacles_.Add(ptr->Id(), std::move(ptr));
+    auto id(ptr->Id());
+    obstacles_.Add(id, std::move(ptr));
   }
 }
 
