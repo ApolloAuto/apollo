@@ -181,6 +181,10 @@ void add_bbox_3d(Eigen::Vector3f& center, Eigen::Vector3f& size,
              2, oss_bbox_up.str(), viewport); 
 }
 
+bool GetPointCloudFromFile(const std::string& pcd_file,
+                           pcl_util::PointCloudPtr cloud);
+
+
 } //namespace perception
 } //namespace apollo
 #endif //namespace MODULES_PERCEPTION_OBSTACLE_VISUALIZATION_PCL_VIS_UTIL_H
