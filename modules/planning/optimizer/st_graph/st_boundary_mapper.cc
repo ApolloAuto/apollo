@@ -109,7 +109,6 @@ Status StBoundaryMapper::GetGraphBoundary(
       StGraphBoundary boundary;
       if (decision.has_follow()) {
         const auto ret = MapFollowDecision(obstacle, decision, &boundary);
-        boundary.set_id(path_obstacle->Id());
         if (ret.ok()) {
           AERROR << "Fail to map obstacle " << path_obstacle->Id()
                  << " with follow decision: " << decision.DebugString();
@@ -190,9 +189,9 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
                                planning_time_);
   boundary_points.emplace_back(s_max, 0.0);
 
+  *boundary = StGraphBoundary(boundary_points);
   boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
   boundary->SetCharacteristicLength(st_boundary_config_.boundary_buffer());
-  *boundary = StGraphBoundary(boundary_points);
   boundary->set_id(stop_obstacle.Id());
   return true;
 }
@@ -407,6 +406,7 @@ Status StBoundaryMapper::MapFollowDecision(
   boundary->SetCharacteristicLength(characteristic_length *
                                     st_boundary_config_.follow_coeff());
   boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
+  boundary->set_id(obstacle.Id());
   return Status::OK();
 }
 
