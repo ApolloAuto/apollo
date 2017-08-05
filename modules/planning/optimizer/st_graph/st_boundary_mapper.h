@@ -58,6 +58,10 @@ class StBoundaryMapper {
 
   double GetArea(const std::vector<STPoint>& boundary_points) const;
 
+  bool MapObstacleWithStopDecision(
+      const ObjectDecisionType& obj_decision,
+      std::vector<StGraphBoundary>* const boundary) const;
+
   apollo::common::Status MapObstacleWithPredictionTrajectory(
       const Obstacle& obstacle, const ObjectDecisionType& obj_decision,
       std::vector<StGraphBoundary>* const boundary) const;

@@ -27,6 +27,7 @@
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 #include "modules/common/math/box2d.h"
@@ -75,6 +76,9 @@ class PathObstacle {
   const planning::Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
+
+  // TODO: set sl_boundary
+  SLBoundary sl_boundary;
 };
 
 }  // namespace planning

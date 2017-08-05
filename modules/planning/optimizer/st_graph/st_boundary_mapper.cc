@@ -51,6 +51,25 @@ using VehicleParam = apollo::common::VehicleParam;
 using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
 
+namespace {
+
+double GetMinStopDistance(const PathObstacle& stop_obs) {
+  double d = std::numeric_limits<double>::max();
+  for (const auto& obj_decision : stop_obs.Decisions()) {
+    if (obj_decision.has_stop()) {
+      return d = std::fmin(d, obj_decision.stop().sl_boundary().start_s() +
+                                  obj_decision.stop().distance_s());
+    }
+  }
+  return d;
+}
+
+bool CompareObstaclesWithStopDecision(const PathObstacle* obs1,
+                                      const PathObstacle* obs2) {
+  return GetMinStopDistance(*obs1) < GetMinStopDistance(*obs2);
+}
+}
+
 StBoundaryMapper::StBoundaryMapper(
     const StBoundaryConfig& config, const ReferenceLine& reference_line,
     const PathData& path_data,
@@ -92,6 +111,8 @@ Status StBoundaryMapper::GetGraphBoundary(
   st_graph_boundaries->clear();
   Status ret = Status::OK();
 
+  std::vector<const PathObstacle*> obs_with_stop_decision;
+
   for (const auto path_obstacle : path_obstacles.Items()) {
     const auto& obstacle = *path_obstacle->Obstacle();
     for (const auto& decision : path_obstacle->Decisions()) {
@@ -105,7 +126,7 @@ Status StBoundaryMapper::GetGraphBoundary(
                         "Fail to map follow decision");
         }
       } else if (decision.has_stop()) {
-        // TODO implement this function
+        obs_with_stop_decision.push_back(path_obstacle);
       } else if (decision.has_overtake() || decision.has_yield()) {
         const auto ret = MapObstacleWithPredictionTrajectory(
             obstacle, decision, st_graph_boundaries);
@@ -122,7 +143,75 @@ Status StBoundaryMapper::GetGraphBoundary(
       }
     }
   }
+
+  if (obs_with_stop_decision.size() > 0) {
+    std::sort(obs_with_stop_decision.begin(), obs_with_stop_decision.end(),
+              CompareObstaclesWithStopDecision);
+    for (const auto& obj_decision : obs_with_stop_decision[0]->Decisions()) {
+      if (obj_decision.has_stop()) {
+        bool success =
+            MapObstacleWithStopDecision(obj_decision, st_graph_boundaries);
+        if (!success) {
+          std::string msg = "Fail to MapObstacleWithStopDecision.";
+          AERROR << msg;
+          return Status(ErrorCode::PLANNING_ERROR, msg);
+        }
+        break;
+      }
+    }
+  }
+
   return Status::OK();
+}
+
+bool StBoundaryMapper::MapObstacleWithStopDecision(
+    const ObjectDecisionType& obj_decision,
+    std::vector<StGraphBoundary>* const boundary) const {
+  if (!obj_decision.has_stop()) {
+    AERROR << "Fail to MapObstacleWithStopDecision because obj_decision has no "
+              "stop. obj_decision: "
+           << obj_decision.DebugString();
+    return false;
+  }
+  const double stop_rear_center_s =
+      obj_decision.stop().sl_boundary().start_s() +
+      obj_decision.stop().distance_s() - FLAGS_decision_valid_stop_range -
+      vehicle_param_.front_edge_to_center();
+
+  if (stop_rear_center_s < 0.0) {
+    AERROR << common::util::StrCat(
+        "Fail to map main_decision_stop since stop_rear_center_s[",
+        stop_rear_center_s, "] behind adc.");
+  } else {
+    if (stop_rear_center_s >= reference_line_.length()) {
+      AWARN << common::util::StrCat(
+          "Skip to MapMainDecisionStop since stop_rear_center_s[",
+          stop_rear_center_s, "] > path length[", reference_line_.length(),
+          "].");
+      return true;
+    }
+  }
+
+  const double s_min = (stop_rear_center_s > 0.0 ? stop_rear_center_s : 0.0);
+  const double s_max = std::fmax(
+      s_min + 1.0, std::fmax(planning_distance_, reference_line_.length()));
+  std::vector<STPoint> boundary_points;
+  boundary_points.emplace_back(s_min, 0.0);
+  boundary_points.emplace_back(s_min, planning_time_);
+  boundary_points.emplace_back(s_max + st_boundary_config_.boundary_buffer(),
+                               planning_time_);
+  boundary_points.emplace_back(s_max, 0.0);
+
+  const double area = GetArea(boundary_points);
+  if (Double::compare(area, 0.0) <= 0) {
+    return true;
+  }
+  boundary->emplace_back(boundary_points);
+  boundary->back().SetCharacteristicLength(
+      st_boundary_config_.boundary_buffer());
+  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::STOP);
+
+  return true;
 }
 
 Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(

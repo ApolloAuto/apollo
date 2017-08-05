@@ -44,6 +44,7 @@ cc_library(
     ],
     deps = [
         ":obstacle",
+        "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
     ],
 )
