@@ -95,7 +95,7 @@ class DPRoadGraph {
       const FrenetFramePath &frenet_frame_path,
       const ReferenceLine &reference_line,
       const SpeedData &heuristic_speed_data, const std::size_t evaluate_times,
-      std::vector<common::math::Box2d> *ego_by_time);
+      std::vector<common::math::Box2d> *adc_by_time);
 
   bool SamplePathWaypoints(
       const ReferenceLine &reference_line,
