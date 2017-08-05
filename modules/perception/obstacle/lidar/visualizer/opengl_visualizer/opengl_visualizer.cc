@@ -149,6 +149,5 @@ void OpenglVisualizer::update_camera_system(FrameContent* content) {
     _forward_world.z = fd_w[2];
 }
 
-
 } // namespace perception
 } // namespace apollo
