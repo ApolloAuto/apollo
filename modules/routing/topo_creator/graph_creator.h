@@ -33,23 +33,25 @@ class GraphCreator {
 
   ~GraphCreator() = default;
 
-  bool create();
+  bool Create();
 
  private:
-  void add_edge(
-      const ::apollo::routing::Node& from_node,
-      const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Id>&
-          to_node_vec,
-      const ::apollo::routing::Edge::DirectionType& type);
+  std::string GetEdgeID(const std::string& from_id,
+                                      const std::string& to_id);
+
+  void AddEdge(const ::apollo::routing::Node& from_node,
+               const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Id>&
+                   to_node_vec,
+               const ::apollo::routing::Edge::DirectionType& type);
 
  private:
-  std::string _base_map_file_path;
-  std::string _dump_topo_file_path;
-  ::apollo::hdmap::Map _pbmap;
+  std::string base_map_file_path_;
+  std::string dump_topo_file_path_;
+  ::apollo::hdmap::Map pbmap_;
   ::apollo::routing::Graph _graph;
-  std::unordered_map<std::string, int> _node_index_map;
-  std::unordered_map<std::string, std::string> _road_id_map;
-  std::unordered_set<std::string> _showed_edge_id_set;
+  std::unordered_map<std::string, int> node_index_map_;
+  std::unordered_map<std::string, std::string> road_id_map_;
+  std::unordered_set<std::string> showed_edge_id_set_;
 };
 
 }  // namespace routing

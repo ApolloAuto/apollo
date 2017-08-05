@@ -25,7 +25,7 @@ namespace routing {
 void TopoGraph::clear() {
   _topo_nodes.clear();
   _topo_edges.clear();
-  _node_index_map.clear();
+  node_index_map_.clear();
 }
 
 bool TopoGraph::load_nodes(const ::apollo::routing::Graph& graph) {
@@ -34,7 +34,7 @@ bool TopoGraph::load_nodes(const ::apollo::routing::Graph& graph) {
     return false;
   }
   for (const auto& node : graph.node()) {
-    _node_index_map[node.lane_id()] = _topo_nodes.size();
+    node_index_map_[node.lane_id()] = _topo_nodes.size();
     std::shared_ptr<TopoNode> topo_node;
     topo_node.reset(new TopoNode(node));
     _road_node_map[node.road_id()].insert(topo_node.get());
@@ -52,13 +52,13 @@ bool TopoGraph::load_edges(const ::apollo::routing::Graph& graph) {
   for (const auto& edge : graph.edge()) {
     const std::string& from_lane_id = edge.from_lane_id();
     const std::string& to_lane_id = edge.to_lane_id();
-    if (_node_index_map.count(from_lane_id) != 1 ||
-        _node_index_map.count(to_lane_id) != 1) {
+    if (node_index_map_.count(from_lane_id) != 1 ||
+        node_index_map_.count(to_lane_id) != 1) {
       return false;
     }
     std::shared_ptr<TopoEdge> topo_edge;
-    TopoNode* from_node = _topo_nodes[_node_index_map[from_lane_id]].get();
-    TopoNode* to_node = _topo_nodes[_node_index_map[to_lane_id]].get();
+    TopoNode* from_node = _topo_nodes[node_index_map_[from_lane_id]].get();
+    TopoNode* to_node = _topo_nodes[node_index_map_[to_lane_id]].get();
     topo_edge.reset(new TopoEdge(edge, from_node, to_node));
     from_node->add_out_edge(topo_edge.get());
     to_node->add_in_edge(topo_edge.get());
@@ -98,8 +98,8 @@ const std::string& TopoGraph::map_version() const { return _map_version; }
 const std::string& TopoGraph::map_district() const { return _map_district; }
 
 const TopoNode* TopoGraph::get_node(const std::string& id) const {
-  const auto& iter = _node_index_map.find(id);
-  if (iter == _node_index_map.end()) {
+  const auto& iter = node_index_map_.find(id);
+  if (iter == node_index_map_.end()) {
     return nullptr;
   }
   return _topo_nodes[iter->second].get();

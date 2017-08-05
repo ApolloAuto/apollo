@@ -30,20 +30,20 @@ class AStarStrategy : public Strategy {
   AStarStrategy() = default;
   ~AStarStrategy() = default;
 
-  virtual bool search(const TopoGraph* graph, const TopoNode* src_node,
+  virtual bool Search(const TopoGraph* graph, const TopoNode* src_node,
                       const TopoNode* dest_node,
                       const std::unordered_set<const TopoNode*>& black_list,
                       std::vector<const TopoNode*>* const result_nodes);
 
  private:
-  void clear();
-  double heuristic_cost(const TopoNode* src_node, const TopoNode* dest_node);
+  void Clear();
+  double HeuristicCost(const TopoNode* src_node, const TopoNode* dest_node);
 
  private:
-  std::unordered_set<const TopoNode*> _open_set;
-  std::unordered_set<const TopoNode*> _closed_set;
-  std::unordered_map<const TopoNode*, const TopoNode*> _came_from;
-  std::unordered_map<const TopoNode*, double> _g_score;
+  std::unordered_set<const TopoNode*> open_set_;
+  std::unordered_set<const TopoNode*> closed_set_;
+  std::unordered_map<const TopoNode*, const TopoNode*> came_from_;
+  std::unordered_map<const TopoNode*, double> g_score_;
 };
 
 }  // namespace routing

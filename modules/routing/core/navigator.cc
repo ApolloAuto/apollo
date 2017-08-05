@@ -222,8 +222,8 @@ bool get_way_nodes(const T& request, const TopoGraph* graph,
     way_nodes->push_back(cur_node);
   }
 
-  if (way_nodes->size() == 1 
-        && start_node == end_node 
+  if (way_nodes->size() == 1
+        && start_node == end_node
         && request.start().s() > request.end().s()) {
 
     if (start_node->out_to_suc_edge().size() == 1) {
@@ -272,7 +272,7 @@ bool search_route_by_strategy(
     std::vector<const TopoNode*> cur_result_nodes;
     const auto* cur_start = way_nodes[i - 1];
     const auto* cur_end = way_nodes[i];
-    if (!strategy_ptr->search(graph, cur_start, cur_end, black_list,
+    if (!strategy_ptr->Search(graph, cur_start, cur_end, black_list,
                               &cur_result_nodes)) {
       AERROR << "Failed to search route with waypoint from "
              << cur_start->lane_id().c_str()

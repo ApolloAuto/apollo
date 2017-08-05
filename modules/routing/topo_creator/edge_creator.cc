@@ -16,8 +16,8 @@
 
 #include "modules/routing/topo_creator/edge_creator.h"
 
-#include "modules/routing/common/routing_gflags.h"
 #include <math.h>
+#include "modules/routing/common/routing_gflags.h"
 
 namespace apollo {
 namespace routing {
@@ -26,23 +26,23 @@ using ::apollo::routing::Node;
 using ::apollo::routing::Edge;
 using ::apollo::routing::CurveRange;
 
-void EdgeCreator::get_pb_edge(const Node& node_from, const Node& node_to,
-                              const Edge::DirectionType& type, Edge* pb_edge) {
-  init_edge_info(node_from, node_to, type, pb_edge);
-  init_edge_cost(node_from, node_to, type, pb_edge);
+void EdgeCreator::GetPbEdge(const Node& node_from, const Node& node_to,
+                            const Edge::DirectionType& type, Edge* pb_edge) {
+  InitEdgeInfo(node_from, node_to, type, pb_edge);
+  InitEdgeCost(node_from, node_to, type, pb_edge);
 }
 
-void EdgeCreator::init_edge_info(const Node& node_from, const Node& node_to,
-                                 const Edge::DirectionType& type,
-                                 Edge* const edge) {
+void EdgeCreator::InitEdgeInfo(const Node& node_from, const Node& node_to,
+                               const Edge::DirectionType& type,
+                               Edge* const edge) {
   edge->set_from_lane_id(node_from.lane_id());
   edge->set_to_lane_id(node_to.lane_id());
   edge->set_direction_type(type);
 }
 
-void EdgeCreator::init_edge_cost(const Node& node_from, const Node& node_to,
-                                 const Edge::DirectionType& type,
-                                 Edge* const edge) {
+void EdgeCreator::InitEdgeCost(const Node& node_from, const Node& node_to,
+                               const Edge::DirectionType& type,
+                               Edge* const edge) {
   edge->set_cost(0.0);
   if (type == Edge::LEFT || type == Edge::RIGHT) {
     const auto& target_range =
@@ -51,9 +51,10 @@ void EdgeCreator::init_edge_cost(const Node& node_from, const Node& node_to,
     for (const auto& range : target_range) {
       changing_area_length += range.end().s() - range.start().s();
     }
-    double ratio = (changing_area_length >= FLAGS_base_changing_length)
-                       ? pow(changing_area_length / FLAGS_base_changing_length, -1.5)
-                       : 1.0;
+    double ratio =
+        (changing_area_length >= FLAGS_base_changing_length)
+            ? pow(changing_area_length / FLAGS_base_changing_length, -1.5)
+            : 1.0;
     edge->set_cost(FLAGS_change_penalty * ratio);
   }
 }
