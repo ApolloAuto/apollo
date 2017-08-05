@@ -143,9 +143,9 @@ Status StBoundaryMapper::GetGraphBoundary(
                         "Fail to map overtake/yield decision");
         }
       } else {
-        AERROR << "could not map unkown decision type "
-               << decision.DebugString();
-        return Status(ErrorCode::PLANNING_ERROR, "unkown decision: ");
+        std::string msg = common::util::StrCat("No mapping for decision: ",
+                                               decision.DebugString());
+        return Status(ErrorCode::PLANNING_SKIP, msg);
       }
     }
   }
