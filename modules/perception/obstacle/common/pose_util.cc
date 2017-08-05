@@ -50,24 +50,5 @@ bool ReadPoseFile(const std::string& filename,
   return true;
 }
 
-bool ReadPoseFileMat12(const std::string& filename,
-  Eigen::Matrix4d* pose,
-  int* frame_id,
-  double* time_stamp) {
-  std::ifstream ifs(filename.c_str());
-  if (!ifs.is_open()) {
-    std::cerr << "Failed to open file " << filename << std::endl;
-    return false;
-  }
-  (*pose) = Eigen::Matrix4d::Identity();
-  ifs >> (*frame_id) >> (*time_stamp);
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 4; j++) {
-      ifs >> (*pose)(i, j);
-    }
-  }
-  return true;
-}
-
 }  // namespace perception
 }  // namespace apollo

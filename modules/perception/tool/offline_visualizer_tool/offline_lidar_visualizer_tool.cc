@@ -155,8 +155,8 @@ public:
         std::vector<std::string> pcd_file_names;
         std::vector<std::string> pose_file_names;
         AERROR << "starting to run"; 
-        get_file_names_in_folder(pose_folder, ".pose", pose_file_names);
-        get_file_names_in_folder(pcd_folder, ".pcd", pcd_file_names);
+        GetFileNamesInFolderById(pose_folder, ".pose", &pose_file_names);
+        GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
         AERROR<<" pose size " << pose_file_names.size();
         AERROR<<" pcd size " << pcd_file_names.size(); 
         if (pose_file_names.size() != pcd_file_names.size()) {

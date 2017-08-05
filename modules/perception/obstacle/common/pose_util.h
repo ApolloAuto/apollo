@@ -55,11 +55,6 @@ bool ReadPoseFile(const std::string& filename,
   int* frame_id,
   double* time_stamp);
 
-bool ReadPoseFileMat12(const std::string& filename,
-  Eigen::Matrix4d* pose,
-  int* frame_id,
-  double* time_stamp);
-
 }  // namespace perception
 }  // namespace apollo
 

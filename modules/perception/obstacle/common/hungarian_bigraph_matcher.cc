@@ -36,7 +36,6 @@ HungarianOptimizer::HungarianOptimizer(
   _width(0),
   _height(0),
   _state(NULL) {
-  
   _width = costs.size();
 
   if (_width > 0) {
@@ -84,7 +83,7 @@ HungarianOptimizer::HungarianOptimizer(
 
   _preimage.resize(_matrix_size * 2);
   _image.resize(_matrix_size * 2);
-  
+
   _uncov_col.resize(_matrix_size);
   _uncov_row.resize(_matrix_size);
 }
@@ -92,7 +91,8 @@ HungarianOptimizer::HungarianOptimizer(
 // Find an assignment which maximizes the total cost.
 // Return an array of pairs of integers.  Each pair (i, j) corresponds to
 // assigning agent i to task j.
-void HungarianOptimizer::maximize(std::vector<int>* preimage, std::vector<int>* image) {
+void HungarianOptimizer::maximize(
+  std::vector<int>* preimage, std::vector<int>* image) {
   // Find a maximal assignment by subtracting each of the
   // original costs from _max_cost  and then minimizing.
   for (int row = 0; row < _width; ++row) {
@@ -106,7 +106,8 @@ void HungarianOptimizer::maximize(std::vector<int>* preimage, std::vector<int>* 
 // Find an assignment which minimizes the total cost.
 // Return an array of pairs of integers.  Each pair (i, j) corresponds to
 // assigning agent i to task j.
-void HungarianOptimizer::minimize(std::vector<int>* preimage, std::vector<int>* image) {
+void HungarianOptimizer::minimize(
+  std::vector<int>* preimage, std::vector<int>* image) {
   do_munkres();
   find_assignments(preimage, image);
 }
@@ -272,12 +273,12 @@ void HungarianOptimizer::do_munkres() {
   _state = &HungarianOptimizer::reduce_rows;
   while (_state != NULL && iter_num < max_iter) {
   // while (_state != NULL) {
-      (this->*_state)();
-      ++iter_num;
+    (this->*_state)();
+    ++iter_num;
   }
   // std::cout << "do_munkres iterations: " << iter_num << std::endl;
   if (iter_num >= max_iter) {
-      check_star();
+    check_star();
   }
 }
 
@@ -324,29 +325,29 @@ void HungarianOptimizer::reduce_rows() {
 // of the CPU - the next slowest step takes 0.6%.  I can't think of a way
 // of speeding it up though.
 void HungarianOptimizer::star_zeroes() {
-    // Since no rows or columns are covered on entry to this step, we use the
-    // covers as a quick way of marking which rows & columns have stars in them.
-    for (int row = 0; row < _matrix_size; ++row) {
-        if (row_covered(row)) {
-            continue;
-        }
-
-        for (int col = 0; col < _matrix_size; ++col) {
-            if (col_covered(col)) {
-                continue;
-            }
-
-            if (_costs[row][col] == 0) {
-                star(row, col);
-                cover_row(row);
-                cover_col(col);
-                break;
-            }
-        }
+  // Since no rows or columns are covered on entry to this step, we use the
+  // covers as a quick way of marking which rows & columns have stars in them.
+  for (int row = 0; row < _matrix_size; ++row) {
+    if (row_covered(row)) {
+      continue;
     }
 
-    clear_covers();
-    _state = &HungarianOptimizer::cover_starred_zeroes;
+    for (int col = 0; col < _matrix_size; ++col) {
+      if (col_covered(col)) {
+        continue;
+      }
+
+      if (_costs[row][col] == 0) {
+        star(row, col);
+        cover_row(row);
+        cover_col(col);
+        break;
+      }
+    }
+  }
+
+  clear_covers();
+  _state = &HungarianOptimizer::cover_starred_zeroes;
 }
 
 // Step 3.
@@ -354,20 +355,20 @@ void HungarianOptimizer::star_zeroes() {
 // covered, the starred zeros describe a complete set of unique assignments.
 // In this case, terminate the algorithm.  Otherwise, go to step 4.
 void HungarianOptimizer::cover_starred_zeroes() {
-    int num_covered = 0;
+  int num_covered = 0;
 
-    for (int col = 0; col < _matrix_size; ++col) {
-        if (col_contains_star(col)) {
-            cover_col(col);
-            num_covered++;
-        }
+  for (int col = 0; col < _matrix_size; ++col) {
+    if (col_contains_star(col)) {
+      cover_col(col);
+      num_covered++;
     }
+  }
 
-    if (num_covered >= _matrix_size) {
-        _state = NULL;
-        return;
-    }
-    _state = &HungarianOptimizer::prime_zeroes;
+  if (num_covered >= _matrix_size) {
+    _state = NULL;
+    return;
+  }
+  _state = &HungarianOptimizer::prime_zeroes;
 }
 
 // Step 4.
@@ -383,28 +384,28 @@ void HungarianOptimizer::prime_zeroes() {
   // loop terminates.  Since there are _matrix_size rows, after that many
   // iterations there are no uncovered cells and hence no uncovered zeroes,
   // so the loop terminates.
-    for (;;) {
-        int zero_row = 0;
-        int zero_col = 0;
-        if (!find_zero(&zero_row, &zero_col)) {
-            // No uncovered zeroes.
-            _state = &HungarianOptimizer::augment_path;
-            return;
-        }
-
-        prime(zero_row, zero_col);
-        int star_col = find_star_in_row(zero_row);
-
-        if (star_col != kHungarianOptimizerColNotFound) {
-            cover_row(zero_row);
-            uncover_col(star_col);
-        } else {
-            _preimage[0] = zero_row;
-            _image[0] = zero_col;
-            _state = &HungarianOptimizer::make_augmenting_path;
-            return;
-        }
+  for (;;) {
+    int zero_row = 0;
+    int zero_col = 0;
+    if (!find_zero(&zero_row, &zero_col)) {
+      // No uncovered zeroes.
+      _state = &HungarianOptimizer::augment_path;
+      return;
     }
+
+    prime(zero_row, zero_col);
+    int star_col = find_star_in_row(zero_row);
+
+    if (star_col != kHungarianOptimizerColNotFound) {
+      cover_row(zero_row);
+      uncover_col(star_col);
+    } else {
+      _preimage[0] = zero_row;
+      _image[0] = zero_col;
+      _state = &HungarianOptimizer::make_augmenting_path;
+      return;
+    }
+  }
 }
 
 // Step 5.
@@ -417,66 +418,67 @@ void HungarianOptimizer::prime_zeroes() {
 // series, erase all primes and uncover every line in the matrix.  Return to
 // Step 3.
 void HungarianOptimizer::make_augmenting_path() {
-    bool done = false;
-    int count = 0;
+  bool done = false;
+  int count = 0;
 
-    // Note: this loop is guaranteed to terminate within _matrix_size iterations
-    // because:
-    // 1) on entry to this step, there is at least 1 column with no starred zero
-    //    (otherwise we would have terminated the algorithm already.)
-    // 2) each row containing a star also contains exactly one primed zero.
-    // 4) each column contains at most one starred zero.
-    //
-    // Since the path_ we construct visits primed and starred zeroes alternately,
-    // and terminates if we reach a primed zero in a column with no star, our
-    // path_ must either contain _matrix_size or fewer stars (in which case the
-    // loop iterates fewer than _matrix_size times), or it contains more.  In
-    // that case, because (1) implies that there are fewer than
-    // _matrix_size stars, we must have visited at least one star more than once.
-    // Consider the first such star that we visit more than once; it must have
-    // been reached immediately after visiting a prime in the same row.  By (2),
-    // this prime is unique and so must have also been visited more than once.
-    // Therefore, that prime must be in the same column as a star that has been
-    // visited more than once, contradicting the assumption that we chose the
-    // first multiply visited star, or it must be in the same column as more
-    // than one star, contradicting (3).  Therefore, we never visit any star
-    // more than once and the loop terminates within _matrix_size iterations.
+  /* Note: this loop is guaranteed to terminate within _matrix_size iterations
+  // because:
+  // 1) on entry to this step, there is at least 1 column with no starred zero
+  //    (otherwise we would have terminated the algorithm already.)
+  // 2) each row containing a star also contains exactly one primed zero.
+  // 4) each column contains at most one starred zero.
+  //
+  // Since the path_ we construct visits primed and starred zeroes alternately,
+  // and terminates if we reach a primed zero in a column with no star, our
+  // path_ must either contain _matrix_size or fewer stars (in which case the
+  // loop iterates fewer than _matrix_size times), or it contains more.  In
+  // that case, because (1) implies that there are fewer than
+  // _matrix_size stars, we must have visited at least one star more than once.
+  // Consider the first such star that we visit more than once; it must have
+  // been reached immediately after visiting a prime in the same row.  By (2),
+  // this prime is unique and so must have also been visited more than once.
+  // Therefore, that prime must be in the same column as a star that has been
+  // visited more than once, contradicting the assumption that we chose the
+  // first multiply visited star, or it must be in the same column as more
+  // than one star, contradicting (3).  Therefore, we never visit any star
+  // more than once and the loop terminates within _matrix_size iterations.
+  */
 
-    while (!done) {
-      // First construct the alternating path...
-        int row = find_star_in_col(_image[count]);
+  while (!done) {
+    // First construct the alternating path...
+    int row = find_star_in_col(_image[count]);
 
-        if (row != kHungarianOptimizerRowNotFound) {
-            count++;
-            _preimage[count] = row;
-            _image[count] = _image[count - 1];
-        } else {
-            done = true;
-        }
-
-        if (!done) {
-            int col = find_prime_in_row(_preimage[count]);
-            count++;
-            _preimage[count] = _preimage[count - 1];
-            _image[count] = col;
-        }
+    if (row != kHungarianOptimizerRowNotFound) {
+      count++;
+      _preimage[count] = row;
+      _image[count] = _image[count - 1];
+    } else {
+      done = true;
     }
 
-    // Then modify it.
-    for (int i = 0; i <= count; ++i) {
-        int row = _preimage[i];
-        int col = _image[i];
-
-        if (is_starred(row, col)) {
-            unstar(row, col);
-        } else {
-            star(row, col);
-        }
+    if (!done) {
+      int col = find_prime_in_row(_preimage[count]);
+      count++;
+      _preimage[count] = _preimage[count - 1];
+      _image[count] = col;
     }
+  }
 
-    clear_covers();
-    clear_primes();
-    _state = &HungarianOptimizer::cover_starred_zeroes;
+  // Then modify it.
+  for (int i = 0; i <= count; ++i) {
+    int row = _preimage[i];
+    int col = _image[i];
+
+    if (is_starred(row, col)) {
+      unstar(row, col);
+    } else {
+      star(row, col);
+    }
+  }
+
+  clear_covers();
+  clear_primes();
+  _state = &HungarianOptimizer::cover_starred_zeroes;
 }
 
 // Step 6
@@ -484,24 +486,24 @@ void HungarianOptimizer::make_augmenting_path() {
 // covered row, and subtract it from every element of each uncovered column.
 // Return to Step 4 without altering any stars, primes, or covered lines.
 void HungarianOptimizer::augment_path() {
-    double minval = find_smallest_uncovered();
+  double minval = find_smallest_uncovered();
 
-    for (int row = 0; row < _matrix_size; ++row) {
-        if (row_covered(row)) {
-            for (int c = 0; c < _matrix_size; ++c) {
-                _costs[row][c] += minval;
-            }
-        }
+  for (int row = 0; row < _matrix_size; ++row) {
+    if (row_covered(row)) {
+      for (int c = 0; c < _matrix_size; ++c) {
+        _costs[row][c] += minval;
+      }
     }
-    for (int col = 0; col < _matrix_size; ++col) {
-        if (!col_covered(col)) {
-            for (int r = 0; r < _matrix_size; ++r) {
-                _costs[r][col] -= minval;
-            }
-        }
+  }
+  for (int col = 0; col < _matrix_size; ++col) {
+    if (!col_covered(col)) {
+      for (int r = 0; r < _matrix_size; ++r) {
+        _costs[r][col] -= minval;
+      }
     }
-    _state = &HungarianOptimizer::prime_zeroes;
+  }
+  _state = &HungarianOptimizer::prime_zeroes;
 }
 
-} // namepsace perception
-} // namepsace apollo
+}  // namespace perception
+}  // namespace apollo
