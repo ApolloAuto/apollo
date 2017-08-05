@@ -2,16 +2,22 @@ syntax = "proto2";
 
 package apollo.planning;
 
-//////////////////////////////////
-//     end_s
-//       ^
-//       |
-// S path direction
-//       |
-//   start_s
+/////////////////////////////////////////////////////////////////
+// The start_s and end_s are longitutional values.
+// start_s <= end_s.
 //
+//              end_s
+//                ^
+//                |
+//          S  direction
+//                |
+//            start_s
+//
+// The start_l and end_l are lateral values.
+// start_l <= end_l. Left side of the reference line is is positive,
+// and right side of the reference line is negative.
 //  end_l  <-----L direction---- start_l
-//////////////////////////////////
+/////////////////////////////////////////////////////////////////
 
 message SLBoundary {
   optional double start_s = 1;

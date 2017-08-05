@@ -51,25 +51,6 @@ using VehicleParam = apollo::common::VehicleParam;
 using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
 
-namespace {
-
-double GetMinStopDistance(const PathObstacle& stop_obs) {
-  double d = std::numeric_limits<double>::max();
-  for (const auto& obj_decision : stop_obs.Decisions()) {
-    if (obj_decision.has_stop()) {
-      return d = std::fmin(d, obj_decision.stop().sl_boundary().start_s() +
-                                  obj_decision.stop().distance_s());
-    }
-  }
-  return d;
-}
-
-bool CompareObstaclesWithStopDecision(const PathObstacle* obs1,
-                                      const PathObstacle* obs2) {
-  return GetMinStopDistance(*obs1) < GetMinStopDistance(*obs2);
-}
-}
-
 StBoundaryMapper::StBoundaryMapper(
     const StBoundaryConfig& config, const ReferenceLine& reference_line,
     const PathData& path_data,
@@ -82,7 +63,14 @@ StBoundaryMapper::StBoundaryMapper(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
       initial_planning_point_(initial_planning_point),
       planning_distance_(planning_distance),
-      planning_time_(planning_time) {}
+      planning_time_(planning_time) {
+  const auto& path_start_point = path_data_.discretized_path().start_point();
+  common::SLPoint sl_point;
+  CHECK(!reference_line_.get_point_in_frenet_frame(
+      {path_start_point.x(), path_start_point.y()}, &sl_point))
+      << "Failed to get adc reference line s";
+  adc_front_s_ = sl_point.s() + vehicle_param_.front_edge_to_center();
+}
 
 Status StBoundaryMapper::GetGraphBoundary(
     const PathDecision& path_decision,
@@ -111,7 +99,9 @@ Status StBoundaryMapper::GetGraphBoundary(
   st_graph_boundaries->clear();
   Status ret = Status::OK();
 
-  std::vector<const PathObstacle*> obs_with_stop_decision;
+  const PathObstacle* stop_obstacle = nullptr;
+  ObjectDecisionType stop_decision;
+  double min_stop_s = std::numeric_limits<double>::max();
 
   for (const auto path_obstacle : path_obstacles.Items()) {
     const auto& obstacle = *path_obstacle->Obstacle();
@@ -126,7 +116,23 @@ Status StBoundaryMapper::GetGraphBoundary(
                         "Fail to map follow decision");
         }
       } else if (decision.has_stop()) {
-        obs_with_stop_decision.push_back(path_obstacle);
+        const double stop_s = path_obstacle->sl_boundary().start_s() +
+                              decision.stop().distance_s();
+        if (stop_s < adc_front_s_) {
+          AERROR << "Invalid stop decision. not stop at ahead of current "
+                    "postion. stop_s : "
+                 << stop_s << ", and current adc_s is; " << adc_front_s_;
+          return Status(ErrorCode::PLANNING_ERROR, "invalid decision");
+        }
+        if (!stop_obstacle) {
+          stop_obstacle = path_obstacle;
+          stop_decision = decision;
+          min_stop_s = stop_s;
+        } else if (stop_s < min_stop_s) {
+          stop_obstacle = path_obstacle;
+          min_stop_s = stop_s;
+          stop_decision = decision;
+        }
       } else if (decision.has_overtake() || decision.has_yield()) {
         const auto ret = MapObstacleWithPredictionTrajectory(
             obstacle, decision, st_graph_boundaries);
@@ -144,55 +150,36 @@ Status StBoundaryMapper::GetGraphBoundary(
     }
   }
 
-  if (obs_with_stop_decision.size() > 0) {
-    std::sort(obs_with_stop_decision.begin(), obs_with_stop_decision.end(),
-              CompareObstaclesWithStopDecision);
-    for (const auto& obj_decision : obs_with_stop_decision[0]->Decisions()) {
-      if (obj_decision.has_stop()) {
-        bool success =
-            MapObstacleWithStopDecision(obj_decision, st_graph_boundaries);
-        if (!success) {
-          std::string msg = "Fail to MapObstacleWithStopDecision.";
-          AERROR << msg;
-          return Status(ErrorCode::PLANNING_ERROR, msg);
-        }
-        break;
-      }
+  if (stop_obstacle) {
+    StGraphBoundary stop_boundary;
+    bool success = MapObstacleWithStopDecision(*stop_obstacle, stop_decision,
+                                               &stop_boundary);
+    if (!success) {
+      std::string msg = "Fail to MapObstacleWithStopDecision.";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    st_graph_boundaries->push_back(stop_boundary);
   }
 
   return Status::OK();
 }
 
 bool StBoundaryMapper::MapObstacleWithStopDecision(
-    const ObjectDecisionType& obj_decision,
-    std::vector<StGraphBoundary>* const boundary) const {
-  if (!obj_decision.has_stop()) {
-    AERROR << "Fail to MapObstacleWithStopDecision because obj_decision has no "
-              "stop. obj_decision: "
-           << obj_decision.DebugString();
+    const PathObstacle& stop_obstacle, const ObjectDecisionType& stop_decision,
+    StGraphBoundary* const boundary) const {
+  CHECK_NOTNULL(boundary);
+  DCHECK(!stop_decision.has_stop()) << "Must have stop decision";
+  const double st_stop_s = stop_decision.stop().distance_s() +
+                           stop_obstacle.sl_boundary().start_s() -
+                           FLAGS_decision_valid_stop_range - adc_front_s_;
+  if (st_stop_s < 0.0) {
+    AERROR << "obstacle st stop_s " << st_stop_s
+           << " is less than adc_front_s: " << adc_front_s_;
     return false;
   }
-  const double stop_rear_center_s =
-      obj_decision.stop().sl_boundary().start_s() +
-      obj_decision.stop().distance_s() - FLAGS_decision_valid_stop_range -
-      vehicle_param_.front_edge_to_center();
 
-  if (stop_rear_center_s < 0.0) {
-    AERROR << common::util::StrCat(
-        "Fail to map main_decision_stop since stop_rear_center_s[",
-        stop_rear_center_s, "] behind adc.");
-  } else {
-    if (stop_rear_center_s >= reference_line_.length()) {
-      AWARN << common::util::StrCat(
-          "Skip to MapMainDecisionStop since stop_rear_center_s[",
-          stop_rear_center_s, "] > path length[", reference_line_.length(),
-          "].");
-      return true;
-    }
-  }
-
-  const double s_min = (stop_rear_center_s > 0.0 ? stop_rear_center_s : 0.0);
+  const double s_min = st_stop_s;
   const double s_max = std::fmax(
       s_min + 1.0, std::fmax(planning_distance_, reference_line_.length()));
   std::vector<STPoint> boundary_points;
@@ -202,15 +189,9 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
                                planning_time_);
   boundary_points.emplace_back(s_max, 0.0);
 
-  const double area = GetArea(boundary_points);
-  if (Double::compare(area, 0.0) <= 0) {
-    return true;
-  }
-  boundary->emplace_back(boundary_points);
-  boundary->back().SetCharacteristicLength(
-      st_boundary_config_.boundary_buffer());
-  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::STOP);
-
+  boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
+  boundary->SetCharacteristicLength(st_boundary_config_.boundary_buffer());
+  *boundary = StGraphBoundary(boundary_points);
   return true;
 }
 
@@ -372,7 +353,7 @@ Status StBoundaryMapper::MapFollowDecision(
                           "obstacle is moving opposite the reference line");
   }
 
-  const auto& point = path_data_.discretized_path().points()[0];
+  const auto& point = path_data_.discretized_path().start_point();
   const PathPoint curr_point =
       reference_line_.get_reference_point(point.x(), point.y());
   const double distance_to_obstacle = ref_point.s() - curr_point.s() -
