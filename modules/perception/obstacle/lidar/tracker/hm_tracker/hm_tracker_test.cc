@@ -189,11 +189,11 @@ TEST_F(HmObjectTrackerTest, demo_tracking) {
   // test tracking via hm tracker
   std::string data_path = "modules/perception/data/hm_tracker_test/";
   std::vector<std::string> pcd_filenames;
-  get_file_names_in_folder_by_id(data_path, ".pcd", pcd_filenames);
+  GetFileNamesInFolderById(data_path, ".pcd", &pcd_filenames);
   std::vector<std::string> seg_filenames;
-  get_file_names_in_folder_by_id(data_path, ".seg", seg_filenames);
+  GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
   std::vector<std::string> pose_filenames;
-  get_file_names_in_folder_by_id(data_path, ".pose", pose_filenames);
+  GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
   int frame_id = -1;
   double time_stamp = 0.0;
   EXPECT_GT(pcd_filenames.size(), 0);

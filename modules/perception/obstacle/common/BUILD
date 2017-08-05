@@ -36,6 +36,10 @@ cc_test(
     size = "small",
     srcs = [
         "geometry_util_test.cc",
+        "pose_util_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
     ],
     deps = [
         ":perception_obstacle_common",
