@@ -31,11 +31,6 @@ using ::apollo::hdmap::Id;
 using ::apollo::routing::Node;
 using ::apollo::routing::Edge;
 
-std::string GraphCreator::GetEdgeID(const std::string& from_id,
-                                    const std::string& to_id) {
-  return from_id + "->" + to_id;
-}
-
 GraphCreator::GraphCreator(const std::string& base_map_file_path,
                            const std::string& dump_topo_file_path)
     : base_map_file_path_(base_map_file_path),
@@ -57,8 +52,8 @@ bool GraphCreator::Create() {
 
   for (const auto& road : pbmap_.road()) {
     for (const auto& section : road.section()) {
-      for (const auto& lane : section.lane_id()) {
-        road_id_map_[lane.id()] = road.id().id();
+      for (const auto& lane_id : section.lane_id()) {
+        road_id_map_[lane_id.id()] = road.id().id();
       }
     }
   }
@@ -90,6 +85,11 @@ bool GraphCreator::Create() {
   }
   AINFO << "File is dumped successfully. Path: " << dump_topo_file_path_;
   return true;
+}
+
+std::string GraphCreator::GetEdgeID(const std::string& from_id,
+                                    const std::string& to_id) {
+  return from_id + "->" + to_id;
 }
 
 void GraphCreator::AddEdge(const Node& from_node,
