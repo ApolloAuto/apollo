@@ -33,11 +33,8 @@ namespace prediction {
 
 class PredictionMap {
  public:
-  ~PredictionMap();
-
-  void LoadMap();
-
-  void Clear();
+  // Should be called at least once before using hdmap.
+  bool EnsureMapLoaded();
 
   apollo::hdmap::Id id(const std::string& str_id);
 
@@ -144,7 +141,9 @@ class PredictionMap {
   }
 
  private:
-  std::unique_ptr<apollo::hdmap::HDMap> hdmap_;
+  bool LoadMap();
+
+  std::unique_ptr<apollo::hdmap::HDMap> hdmap_ = nullptr;
   DECLARE_SINGLETON(PredictionMap);
 };
 

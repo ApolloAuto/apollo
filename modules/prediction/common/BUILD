@@ -26,7 +26,7 @@ cc_test(
     size = "small",
     srcs = ["prediction_util_test.cc"],
     deps = [
-        "//modules/prediction/common:prediction_util",
+        ":prediction_util",
         "@gtest//:main",
     ],
 )
@@ -36,12 +36,12 @@ cc_library(
     srcs = ["prediction_map.cc"],
     hdrs = ["prediction_map.h"],
     deps = [
+        ":prediction_gflags",
         "//modules/common:macro",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:vec2d",
         "//modules/map/hdmap",
         "//modules/map/pnc_map",
-        "//modules/prediction/common:prediction_gflags",
         "@eigen//:eigen",
     ],
 )
@@ -55,8 +55,8 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:prediction_map",
+        ":prediction_gflags",
+        ":prediction_map",
         "@gtest//:main",
     ],
 )
@@ -66,9 +66,9 @@ cc_library(
     srcs = ["road_graph.cc"],
     hdrs = ["road_graph.h"],
     deps = [
+        ":prediction_map",
         "//modules/common/status",
         "//modules/map/hdmap",
-        "//modules/prediction/common:prediction_map",
         "//modules/prediction/proto:lane_graph_proto",
     ],
 )
@@ -82,9 +82,9 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:prediction_map",
-        "//modules/prediction/common:road_graph",
+        ":prediction_gflags",
+        ":prediction_map",
+        ":road_graph",
         "@gtest//:main",
     ],
 )

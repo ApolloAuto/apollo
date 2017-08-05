@@ -14,19 +14,20 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/common/prediction_map.h"
+
 #include <cmath>
+#include <iomanip>
 #include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <iomanip>
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -35,18 +36,23 @@ using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::hdmap::MapPathPoint;
 
-PredictionMap::PredictionMap() : hdmap_(nullptr) { LoadMap(); }
+PredictionMap::PredictionMap() {}
 
-PredictionMap::~PredictionMap() { Clear(); }
-
-void PredictionMap::LoadMap() {
+bool PredictionMap::LoadMap() {
   hdmap_.reset(new apollo::hdmap::HDMap());
-  CHECK(hdmap_ != nullptr);
-  hdmap_->load_map_from_file(FLAGS_map_file);
+  if (hdmap_->load_map_from_file(FLAGS_map_file) != 0) {
+    hdmap_.reset(nullptr);
+    AERROR << "Failed to load map file: " << FLAGS_map_file << ".";
+    return false;
+  }
   AINFO << "Succeeded in loading map file: " << FLAGS_map_file << ".";
+  return true;
 }
 
-void PredictionMap::Clear() { hdmap_.reset(); }
+bool PredictionMap::EnsureMapLoaded() {
+  static bool loaded = LoadMap();  // Guaranteed to load only once.
+  return loaded;
+}
 
 Id PredictionMap::id(const std::string& str_id) {
   Id id;
@@ -95,6 +101,7 @@ double PredictionMap::LaneTotalWidth(
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(const Id& id) {
+  CHECK(EnsureMapLoaded());
   return hdmap_->get_lane_by_id(id);
 }
 
@@ -136,6 +143,7 @@ void PredictionMap::OnLane(
     const double radius,
     std::vector<std::shared_ptr<const LaneInfo>>* lanes,
     bool on_lane) {
+  CHECK(EnsureMapLoaded());
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
 
   // TODO(kechxu) clean the messy code of this function

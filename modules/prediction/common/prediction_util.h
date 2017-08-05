@@ -17,8 +17,8 @@
 #ifndef MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 #define MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
