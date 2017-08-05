@@ -12,10 +12,10 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//modules/routing/proto:routing_proto",
+        "//modules/common",
         "//modules/map/proto:map_proto",
-        "//modules/common:common",
-        "//modules/routing/common"
+        "//modules/routing/common",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 
@@ -28,14 +28,14 @@ cc_library(
         "graph_creator.h",
     ],
     deps = [
-        "//external:gflags",
         ":edge_creator",
         ":node_creator",
-        "//modules/routing/proto:routing_proto",
-        "//modules/map/proto:map_proto",
-        "//modules/common:common",
+        "//external:gflags",
+        "//modules/common",
         "//modules/common/util",
-        "//modules/routing/common"
+        "//modules/map/proto:map_proto",
+        "//modules/routing/common",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 
@@ -49,10 +49,10 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//modules/routing/proto:routing_proto",
+        "//modules/common",
         "//modules/map/proto:map_proto",
-        "//modules/common:common",
-        "//modules/routing/common"
+        "//modules/routing/common",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 
@@ -60,13 +60,13 @@ cc_binary(
     name = "topo_creator",
     srcs = ["topo_creator.cc"],
     deps = [
-        "//external:gflags",
         ":graph_creator",
+        "//external:gflags",
+        "//modules/common",
         "//modules/common:log",
-        "//modules/routing/proto:routing_proto",
         "//modules/map/proto:map_proto",
-        "//modules/common:common",
-        "//modules/routing/common"
+        "//modules/routing/common",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 

@@ -27,13 +27,13 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/prediction/predictor/pedestrian:regional_predictor",
-        "@gtest//:main",
-        "//modules/prediction/common:prediction_gflags",
+        "//modules/common/util",
         "//modules/perception/proto:perception_proto",
-        "//modules/prediction/proto:prediction_proto",
-        "//modules/common/util:util",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/predictor/pedestrian:regional_predictor",
+        "//modules/prediction/proto:prediction_proto",
+        "@gtest//:main",
     ],
 )
 

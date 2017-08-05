@@ -84,11 +84,11 @@ cc_library(
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "//modules/localization/proto:localization_proto",
-        "//modules/routing/proto:routing_proto",
         "//modules/map/proto:map_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/routing/proto:routing_proto",
         "@glog//:glog",
     ],
 )

@@ -5,9 +5,9 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "offline_lidar_visualizer_tool",
     srcs = ["offline_lidar_visualizer_tool.cc"],
-    data = [      
-        "//modules/perception/tool/offline_visualizer_tool/conf:perception_tool_config",
+    data = [
         "//modules/perception:perception_model",
+        "//modules/perception/tool/offline_visualizer_tool/conf:perception_tool_config",
     ],
     linkstatic = 0,
     deps = [

@@ -20,14 +20,14 @@ cc_library(
     ],
     deps = [
         ":routing_node_range_manager",
+        "//modules/common",
         "//modules/common/proto:common_proto",
+        "//modules/common/time",
         "//modules/map/proto:map_proto",
-        "//modules/routing/proto:routing_proto",
         "//modules/routing/common",
         "//modules/routing/graph",
+        "//modules/routing/proto:routing_proto",
         "//modules/routing/strategy",
-        "//modules/common",
-        "//modules/common/time",
     ],
 )
 
@@ -42,7 +42,7 @@ cc_library(
     deps = [
         "//modules/common/proto:common_proto",
         "//modules/routing/common",
-        "//modules/routing/graph"
+        "//modules/routing/graph",
     ],
 )
 

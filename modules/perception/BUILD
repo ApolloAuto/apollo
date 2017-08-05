@@ -21,6 +21,7 @@ cc_binary(
     data = [
         "//modules/perception/conf:perception_adapter_manager_config",
     ],
+    linkstatic = 0,
     deps = [
         ":perception_lib",
         "//external:gflags",
@@ -29,7 +30,6 @@ cc_binary(
         "//modules/perception/proto:perception_proto",
         "@ros//:ros_common",
     ],
-    linkstatic = 0,
 )
 
 filegroup(
@@ -42,7 +42,7 @@ filegroup(
 filegroup(
     name = "perception_model",
     srcs = glob([
-        "model/**"
+        "model/**",
     ]),
 )
 

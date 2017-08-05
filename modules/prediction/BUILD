@@ -10,8 +10,8 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
@@ -29,14 +29,14 @@ cc_test(
     size = "small",
     srcs = ["prediction_test.cc"],
     data = [
+        "//modules/prediction:prediction_conf",
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
-        "//modules/prediction:prediction_conf",
     ],
     deps = [
         "//modules/prediction:prediction_lib",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_binary(

@@ -5,8 +5,8 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "graph",
     deps = [
-        ":routing_topo_node",
         ":routing_topo_graph",
+        ":routing_topo_node",
     ],
 )
 
@@ -35,12 +35,12 @@ cc_library(
     ],
     deps = [
         ":routing_topo_node",
+        "//modules/common",
         "//modules/common/proto:common_proto",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/proto:routing_proto",
-        "//modules/common:common",
         "//modules/common/util",
-        "//modules/routing/common"
+        "//modules/map/proto:map_proto",
+        "//modules/routing/common",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 

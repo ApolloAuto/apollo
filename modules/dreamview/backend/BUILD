@@ -14,8 +14,8 @@ cc_library(
     deps = [
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
-        "//modules/dreamview/backend/simulation_world:simulation_world_updater",
         "//modules/dreamview/backend/sim_control",
+        "//modules/dreamview/backend/simulation_world:simulation_world_updater",
         "//modules/dreamview/backend/websocket",
         "@civetweb//:civetweb++",
     ],
