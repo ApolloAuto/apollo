@@ -30,7 +30,7 @@ cc_library(
     deps = [
         "//external:gflags",
         ":edge_creator",
-       ":node_creator",
+        ":node_creator",
         "//modules/routing/proto:routing_proto",
         "//modules/map/proto:map_proto",
         "//modules/common:common",
