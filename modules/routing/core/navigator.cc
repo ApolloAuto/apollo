@@ -114,27 +114,34 @@ void extract_basic_passages(
 
 void passage_lane_ids_to_passage_region(
     const std::vector<const TopoNode*>& nodes,
-    const NodeRangeManager& range_manager,
+    NodeRangeManager* const range_manager,
     RoutingResponse_PassageRegion* const region) {
   for (const auto& node : nodes) {
     RoutingResponse_LaneSegment* seg = region->add_segment();
     seg->set_id(node->lane_id());
-    NodeRange range = range_manager.get_node_range(node);
-    seg->set_start_s(range.start_s);
-    seg->set_end_s(range.end_s);
+    NodeRange range = range_manager->get_node_range(node);
+    // handle start and end on the same node, but start is later than end
+    if (range.start_s > range.end_s) {
+      seg->set_start_s(range.start_s);
+      seg->set_end_s(node->length());
+      range_manager->set_node_s(node, 0.0, range.end_s);
+    } else {
+      seg->set_start_s(range.start_s);
+      seg->set_end_s(range.end_s);
+    }
   }
 }
 
 double calculate_distance(const std::vector<const TopoNode*>& nodes,
-                          const NodeRangeManager& range_manager) {
-  NodeRange range = range_manager.get_node_range(nodes.at(0));
+                          NodeRangeManager* const range_manager) {
+  NodeRange range = range_manager->get_node_range(nodes.at(0));
   double distance = range.end_s - range.start_s;
   for (auto iter = nodes.begin() + 1; iter != nodes.end(); ++iter) {
     auto edge = (*(iter - 1))->get_out_edge_to(*iter);
     if (edge->type() != TET_FORWARD) {
       continue;
     }
-    range = range_manager.get_node_range(*iter);
+    range = range_manager->get_node_range(*iter);
     distance += range.end_s - range.start_s;
   }
   return distance;
@@ -192,11 +199,18 @@ bool get_way_nodes(const T& request, const TopoGraph* graph,
                    std::vector<const TopoNode*>* const way_nodes,
                    NodeRangeManager* const range_manager) {
   const auto* start_node = graph->get_node(request.start().id());
+  const auto* end_node = graph->get_node(request.end().id());
   if (start_node == nullptr) {
     AERROR << "Can't find start point in graph! Id: "
            << request.start().id().c_str();
     return false;
   }
+  if (end_node == nullptr) {
+    AERROR << "Can't find end point in graph! Id: "
+           << request.start().id().c_str();
+    return false;
+  }
+
   way_nodes->push_back(start_node);
 
   for (const auto& point : request.waypoint()) {
@@ -208,12 +222,36 @@ bool get_way_nodes(const T& request, const TopoGraph* graph,
     way_nodes->push_back(cur_node);
   }
 
-  const auto* end_node = graph->get_node(request.end().id());
-  if (end_node == nullptr) {
-    AERROR << "Can't find end point in graph! Id: "
-           << request.start().id().c_str();
-    return false;
+  if (way_nodes->size() == 1 
+        && start_node == end_node 
+        && request.start().s() > request.end().s()) {
+
+    if (start_node->out_to_suc_edge().size() == 1) {
+      for (const auto& inter_edge : start_node->out_to_suc_edge()) {
+        way_nodes->push_back(inter_edge->to_node());
+        break;
+      }
+    } else if (end_node->in_from_pre_edge().size() == 1) {
+      for (const auto& inter_edge : end_node->in_from_pre_edge()) {
+        way_nodes->push_back(inter_edge->from_node());
+        break;
+      }
+    } else if (start_node->out_to_suc_edge().size() > 1) {
+      for (const auto& inter_edge : start_node->out_to_suc_edge()) {
+        way_nodes->push_back(inter_edge->to_node());
+        break;
+      }
+    } else if (end_node->in_from_pre_edge().size() > 1) {
+      for (const auto& inter_edge : end_node->in_from_pre_edge()) {
+        way_nodes->push_back(inter_edge->from_node());
+        break;
+      }
+    } else {
+      // on the same not but able to expand
+      return false;
+    }
   }
+
   way_nodes->push_back(end_node);
 
   range_manager->init_node_range(request.start().s(), request.end().s(),
@@ -296,7 +334,7 @@ bool Navigator::search_route(
     return false;
   }
 
-  if (!generate_passage_region(request, result_nodes, black_list, range_manager,
+  if (!generate_passage_region(request, result_nodes, black_list, &range_manager,
                                response)) {
     AERROR <<
         "Failed to generate new passage regions based on route result lane";
@@ -314,7 +352,7 @@ bool Navigator::generate_passage_region(
     const ::apollo::routing::RoutingRequest& request,
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
-    const NodeRangeManager& range_manager,
+    NodeRangeManager* const range_manager,
     ::apollo::routing::RoutingResponse* result) const {
   result->mutable_header()->set_timestamp_sec(apollo::common::time::ToSecond(Clock::Now()));
   result->mutable_header()->set_module_name(FLAGS_node_name);
@@ -333,7 +371,7 @@ bool Navigator::generate_passage_region(
 void Navigator::generate_passage_region(
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
-    const NodeRangeManager& range_manager,
+    NodeRangeManager* const range_manager,
     ::apollo::routing::RoutingResponse* result) const {
   std::vector<std::vector<const TopoNode*> > nodes_of_ways;
   if (FLAGS_use_road_id) {
@@ -356,10 +394,10 @@ void Navigator::generate_passage_region(
       road.set_id("r" + std::to_string(num_of_roads));
       auto node = nodes_of_basic_passages.front().front();
       road.mutable_in_lane()->set_id(node->lane_id());
-      road.mutable_in_lane()->set_s(range_manager.get_node_start_s(node));
+      road.mutable_in_lane()->set_s(range_manager->get_node_start_s(node));
       node = nodes_of_basic_passages.back().back();
       road.mutable_out_lane()->set_id(node->lane_id());
-      road.mutable_out_lane()->set_s(range_manager.get_node_end_s(node));
+      road.mutable_out_lane()->set_s(range_manager->get_node_end_s(node));
       for (const auto& nodes_of_passage : nodes_of_basic_passages) {
         passage_lane_ids_to_passage_region(nodes_of_passage, range_manager,
                                            road.add_passage_region());
@@ -383,7 +421,7 @@ void Navigator::generate_passage_region(
       for (const auto& node : nodes_of_way) {
         RoutingResponse_LaneSegment* seg = region.add_segment();
         seg->set_id(node->lane_id());
-        NodeRange range = range_manager.get_node_range(node);
+        NodeRange range = range_manager->get_node_range(node);
         seg->set_start_s(range.start_s);
         seg->set_end_s(range.end_s);
       }
