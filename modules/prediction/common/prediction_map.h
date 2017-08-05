@@ -33,9 +33,6 @@ namespace prediction {
 
 class PredictionMap {
  public:
-  // Should be called at least once before using hdmap.
-  bool EnsureMapLoaded();
-
   apollo::hdmap::Id id(const std::string& str_id);
 
   Eigen::Vector2d PositionOnLane(

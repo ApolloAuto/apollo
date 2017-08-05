@@ -36,7 +36,9 @@ using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::hdmap::MapPathPoint;
 
-PredictionMap::PredictionMap() {}
+PredictionMap::PredictionMap() {
+  CHECK(LoadMap());
+}
 
 bool PredictionMap::LoadMap() {
   hdmap_.reset(new apollo::hdmap::HDMap());
@@ -47,11 +49,6 @@ bool PredictionMap::LoadMap() {
   }
   AINFO << "Succeeded in loading map file: " << FLAGS_map_file << ".";
   return true;
-}
-
-bool PredictionMap::EnsureMapLoaded() {
-  static bool loaded = LoadMap();  // Guaranteed to load only once.
-  return loaded;
 }
 
 Id PredictionMap::id(const std::string& str_id) {
@@ -101,7 +98,6 @@ double PredictionMap::LaneTotalWidth(
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(const Id& id) {
-  CHECK(EnsureMapLoaded());
   return hdmap_->get_lane_by_id(id);
 }
 
@@ -143,7 +139,6 @@ void PredictionMap::OnLane(
     const double radius,
     std::vector<std::shared_ptr<const LaneInfo>>* lanes,
     bool on_lane) {
-  CHECK(EnsureMapLoaded());
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
 
   // TODO(kechxu) clean the messy code of this function

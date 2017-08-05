@@ -67,7 +67,6 @@ void RoadGraph::ComputeLaneSequence(
     return;
   }
   PredictionMap* map = PredictionMap::instance();
-  CHECK(map->EnsureMapLoaded());
 
   LaneSegment lane_segment;
   lane_segment.set_lane_id(lane_info_ptr->id().id());
