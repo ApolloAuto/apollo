@@ -11,14 +11,14 @@ message BoundaryEdge {
         UNKNOWN = 0;
         NORMAL = 1;
         LEFT_BOUNDARY = 2;
-	RIGHT_BOUNDARY = 3;
+        RIGHT_BOUNDARY = 3;
     };
     optional Type type = 2;
 };
 
 message BoundaryPolygon {
     repeated BoundaryEdge edge = 1;
-}; 
+};
 
 // boundary with holes
 message RoadBoundary {
@@ -27,7 +27,7 @@ message RoadBoundary {
   repeated BoundaryPolygon hole = 2;
 };
 
-// road section defines a road cross-section, At least one record must be defined in order to
+// road section defines a road cross-section, At least one section must be defined in order to
 // use a road, If multiple road sections are defined, they must be listed in order along the road
 message RoadSection {
     optional Id id = 1;
@@ -37,7 +37,7 @@ message RoadSection {
     optional RoadBoundary boundary = 3;
 };
 
-// The road is a collection of traffic elements, such as lanes, road boundary etc. 
+// The road is a collection of traffic elements, such as lanes, road boundary etc.
 // It provides general information about the road.
 message Road {
     optional Id id = 1;
