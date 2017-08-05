@@ -15,6 +15,7 @@
   *****************************************************************************/
 
 #include "modules/routing/topo_creator/node_creator.h"
+#include "modules/routing/common/routing_gflags.h"
 
 #include <math.h>
 
@@ -32,11 +33,6 @@ using ::apollo::hdmap::LaneBoundaryType;
 using ::apollo::routing::Node;
 using ::apollo::routing::Edge;
 using ::apollo::routing::CurveRange;
-
-const double BASE_SPEED = 4.167;       // 15kmh
-const double LEFT_TURN_PENALTY = 50;   // meter
-const double RIGHT_TURN_PENALTY = 20;  // meter
-const double UTURN_PENALTY = 100;      // meter
 
 bool is_allowed_out(const LaneBoundaryType& type) {
   if (type.types(0) == LaneBoundaryType::DOTTED_YELLOW ||
@@ -108,17 +104,17 @@ void NodeCreator::init_node_info(const Lane& lane, const std::string& road_id,
 void NodeCreator::init_node_cost(const Lane& lane, Node* const node) {
   double lane_length = get_lane_length(lane);
   double speed_limit =
-      (lane.has_speed_limit()) ? lane.speed_limit() : BASE_SPEED;
+      (lane.has_speed_limit()) ? lane.speed_limit() : FLAGS_base_speed;
   double ratio =
-      (speed_limit >= BASE_SPEED) ? (1 / sqrt(speed_limit / BASE_SPEED)) : 1.0;
+      (speed_limit >= FLAGS_base_speed) ? (1 / sqrt(speed_limit / FLAGS_base_speed)) : 1.0;
   double cost = lane_length * ratio;
   if (lane.has_turn()) {
     if (lane.turn() == ::apollo::hdmap::Lane::LEFT_TURN) {
-      cost += LEFT_TURN_PENALTY;
+      cost += FLAGS_left_turn_penalty;
     } else if (lane.turn() == ::apollo::hdmap::Lane::RIGHT_TURN) {
-      cost += RIGHT_TURN_PENALTY;
+      cost += FLAGS_right_turn_penalty;
     } else if (lane.turn() == ::apollo::hdmap::Lane::U_TURN) {
-      cost += UTURN_PENALTY;
+      cost += UFLAGS_u_turn_penalty;
     }
   }
   node->set_cost(cost);
