@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/proto/decision.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 #include "modules/common/math/box2d.h"
@@ -61,12 +60,6 @@ class Obstacle {
 
   const perception::PerceptionObstacle &Perception() const;
 
-  // FIXME fake functions, will be migrate out soon.
-  const std::vector<ObjectDecisionType> &Decisions() const {
-    return decisions_;
-  }
-  std::vector<ObjectDecisionType> *MutableDecisions() { return &decisions_; }
-
   /**
    * @brief This is a helper function that can create obstacles from prediction
    * data.  The original prediction may have multiple trajectories for each
@@ -85,8 +78,6 @@ class Obstacle {
   bool is_static_;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
-  // FIXME move out later
-  std::vector<ObjectDecisionType> decisions_;
   common::math::Box2d perception_bounding_box_;
 };
 

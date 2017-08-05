@@ -40,7 +40,7 @@ DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config)
 
 Status DpStGraph::Search(const StGraphData& st_graph_data,
                          PathDecision* const path_decision,
-                         SpeedData* const speed_data, Obstacles* table) {
+                         SpeedData* const speed_data) {
   init_point_ = st_graph_data.init_point();
 
   if (st_graph_data.path_data_length() <
@@ -68,7 +68,7 @@ Status DpStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!get_object_decision(st_graph_data, *speed_data, table).ok()) {
+  if (!get_object_decision(st_graph_data, *speed_data, path_decision).ok()) {
     const std::string msg = "Get object decision by speed profile failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -283,7 +283,7 @@ Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
 
 Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
                                       const SpeedData& speed_profile,
-                                      Obstacles* obstacles) const {
+                                      PathDecision* const path_decision) const {
   if (speed_profile.speed_vector().size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
@@ -299,16 +299,14 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
        boundary_it != obs_boundaries.end(); ++boundary_it) {
     CHECK_EQ(boundary_it->points().size(), 4);
 
-    Obstacle* object_ptr = obstacles->Find(boundary_it->id());
-    if (!object_ptr) {
-      AERROR << "Failed to find object " << boundary_it->id();
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "failed to find object from object_table");
-    }
     if (boundary_it->points().front().x() <= 0) {
-      ObjectDecisionType dec;
-      dec.mutable_yield();
-      object_ptr->MutableDecisions()->push_back(dec);
+      ObjectDecisionType yield_decision;
+      yield_decision.mutable_yield();
+      if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
+                                      yield_decision)) {
+        AERROR << "Failed to add decision to object " << boundary_it->id();
+        return Status(ErrorCode::PLANNING_ERROR, "failed to find object");
+      }
       continue;
     }
     double start_t = 0.0;
@@ -344,13 +342,24 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
       }
     }
     if (go_down) {
-      ObjectDecisionType dec;
-      dec.mutable_yield();
-      object_ptr->MutableDecisions()->push_back(dec);
+      ObjectDecisionType yield_decision;
+      yield_decision.mutable_yield();
+      if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
+                                      yield_decision)) {
+        AERROR << "Failed to add yield decision to object "
+               << boundary_it->id();
+        return Status(ErrorCode::PLANNING_ERROR, "faind to add yield decision");
+      }
     } else {
-      ObjectDecisionType dec;
-      dec.mutable_overtake();
-      object_ptr->MutableDecisions()->push_back(dec);
+      ObjectDecisionType overtake_decision;
+      overtake_decision.mutable_overtake();
+      if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
+                                      overtake_decision)) {
+        AERROR << "Failed to add overtake decision to object "
+               << boundary_it->id();
+        return Status(ErrorCode::PLANNING_ERROR,
+                      "faind to add overtake decision");
+      }
     }
   }
   return Status::OK();

@@ -30,6 +30,7 @@
 
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 #include "modules/planning/optimizer/qp_spline_path/qp_frenet_frame.h"
@@ -42,7 +43,8 @@ class QpSplinePathGenerator {
   QpSplinePathGenerator(const ReferenceLine& reference_line,
                         const QpSplinePathConfig& qp_spline_path_config_);
 
-  bool Generate(const ConstObstacleList& obstacles, const SpeedData& speed_data,
+  bool Generate(const ConstPathObstacleList& obstacles,
+                const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,
                 PathData* const path_data);
 

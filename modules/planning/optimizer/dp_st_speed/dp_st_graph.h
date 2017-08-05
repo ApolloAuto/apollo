@@ -28,8 +28,8 @@
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
-#include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/optimizer/dp_st_speed/dp_st_cost.h"
@@ -44,8 +44,7 @@ class DpStGraph {
 
   apollo::common::Status Search(const StGraphData& st_graph_data,
                                 PathDecision* const path_decision,
-                                SpeedData* const speed_data,
-                                Obstacles* table);
+                                SpeedData* const speed_data);
 
  private:
   apollo::common::Status InitCostTable();
@@ -55,9 +54,9 @@ class DpStGraph {
   apollo::common::Status retrieve_speed_profile(
       SpeedData* const speed_data) const;
 
-  apollo::common::Status get_object_decision(const StGraphData& st_graph_data,
-                                             const SpeedData& speed_profile,
-                                             Obstacles* obstacles) const;
+  apollo::common::Status get_object_decision(
+      const StGraphData& st_graph_data, const SpeedData& speed_profile,
+      PathDecision* const path_decision) const;
 
   apollo::common::Status CalculateTotalCost(const StGraphData& st_graph_data);
   void CalculateCostAt(const StGraphData& st_graph_data, const uint32_t r,
