@@ -169,7 +169,7 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
     const PathObstacle& stop_obstacle, const ObjectDecisionType& stop_decision,
     StGraphBoundary* const boundary) const {
   CHECK_NOTNULL(boundary);
-  DCHECK(!stop_decision.has_stop()) << "Must have stop decision";
+  DCHECK(stop_decision.has_stop()) << "Must have stop decision";
   const double st_stop_s = stop_decision.stop().distance_s() +
                            stop_obstacle.sl_boundary().start_s() -
                            FLAGS_decision_valid_stop_range - adc_front_s_;
