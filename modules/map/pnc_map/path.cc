@@ -178,13 +178,7 @@ void Path::init_points() {
       // TODO(lianglia_apollo):
       // use heading.length when all adjacent lanes are guarantee to be
       // connected.
-      LaneSegment lane_segment;
-      if (find_lane_segment(_path_points[i], _path_points[i + 1],
-                            &lane_segment)) {
-        s += lane_segment.end_s - lane_segment.start_s;
-      } else {
-        s += heading.Length();
-      }
+      s += heading.Length();
     }
     heading.Normalize();
     _unit_directions.push_back(heading);
