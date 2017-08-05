@@ -114,7 +114,7 @@ void NodeCreator::init_node_cost(const Lane& lane, Node* const node) {
     } else if (lane.turn() == ::apollo::hdmap::Lane::RIGHT_TURN) {
       cost += FLAGS_right_turn_penalty;
     } else if (lane.turn() == ::apollo::hdmap::Lane::U_TURN) {
-      cost += UFLAGS_u_turn_penalty;
+      cost += FLAGS_uturn_penalty;
     }
   }
   node->set_cost(cost);
