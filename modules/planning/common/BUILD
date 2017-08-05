@@ -9,6 +9,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "indexed_list_test",
+    srcs = [
+        "indexed_list_test.cc",
+    ],
+    deps = [
+        ":indexed_list",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "indexed_queue",
     hdrs = [
