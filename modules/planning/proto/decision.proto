@@ -34,8 +34,11 @@ enum StopReasonCode {
 message ObjectStop {
   optional StopReasonCode reason_code = 1;
   optional double distance_s = 2;  // in meters
-  optional apollo.common.PointENU stop_point = 3;  // stop point
-  optional SLBoundary sl_boundary = 4; // sl boundary
+  // When stopped, the front center of vehicle should be at this point.
+  optional apollo.common.PointENU stop_point =3;
+  // When stopped, the heading of the vehicle should be stop_heading.
+  optional double stop_heading = 4;
+  optional SLBoundary sl_boundary = 5; // sl boundary
 }
 
 message ObjectNudge {
@@ -82,6 +85,7 @@ message ObjectDecisionType {
   }
 }
 
+
 message ObjectDecision {
   enum ObjectType {
     PREDICTION = 1;
@@ -98,20 +102,13 @@ message ObjectDecisions {
   repeated ObjectDecision decision = 1;
 }
 
-// stop at distance_s on lane
-message StopLine {
-  optional string lane_id = 1;
-  optional double distance_s = 2;
-}
-
 message MainStop {
   optional StopReasonCode reason_code = 1;
   optional string reason = 2;
-  optional StopLine enforced_line = 3;
   // When stopped, the front center of vehicle should be at this point.
-  optional apollo.common.PointENU stop_point = 4;
+  optional apollo.common.PointENU stop_point = 3;
   // When stopped, the heading of the vehicle should be stop_heading.
-  optional double stop_heading = 5;
+  optional double stop_heading = 4;
 }
 
 message EmergencyStopHardBrake {
