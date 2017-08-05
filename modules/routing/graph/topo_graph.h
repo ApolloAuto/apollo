@@ -55,7 +55,7 @@ class TopoGraph {
   std::string _map_district;
   std::vector<std::shared_ptr<TopoNode> > _topo_nodes;
   std::vector<std::shared_ptr<TopoEdge> > _topo_edges;
-  std::unordered_map<std::string, int> _node_index_map;
+  std::unordered_map<std::string, int> node_index_map_;
   std::unordered_map<std::string, std::unordered_set<const TopoNode*> >
       _road_node_map;
 };

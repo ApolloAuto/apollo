@@ -28,7 +28,7 @@ class Strategy {
  public:
   virtual ~Strategy(){};
 
-  virtual bool search(const TopoGraph* graph, const TopoNode* src_node,
+  virtual bool Search(const TopoGraph* graph, const TopoNode* src_node,
                       const TopoNode* dest_node,
                       const std::unordered_set<const TopoNode*>& black_list,
                       std::vector<const TopoNode*>* const result_nodes) = 0;

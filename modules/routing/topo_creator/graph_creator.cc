@@ -18,102 +18,96 @@
 
 #include "glog/logging.h"
 
+#include "modules/common/util/file.h"
 #include "modules/routing/common/utils.h"
 #include "modules/routing/topo_creator/edge_creator.h"
 #include "modules/routing/topo_creator/node_creator.h"
-#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace routing {
 
-namespace {
-
 using ::google::protobuf::RepeatedPtrField;
-
 using ::apollo::hdmap::Id;
-
 using ::apollo::routing::Node;
 using ::apollo::routing::Edge;
 
-std::string get_edge_id(const std::string& from_id, const std::string& to_id) {
+std::string GraphCreator::GetEdgeID(const std::string& from_id,
+                                    const std::string& to_id) {
   return from_id + "->" + to_id;
 }
 
-}  // namespace
-
 GraphCreator::GraphCreator(const std::string& base_map_file_path,
                            const std::string& dump_topo_file_path)
-    : _base_map_file_path(base_map_file_path),
-      _dump_topo_file_path(dump_topo_file_path) {}
+    : base_map_file_path_(base_map_file_path),
+      dump_topo_file_path_(dump_topo_file_path) {}
 
-bool GraphCreator::create() {
-  if (!::apollo::common::util::GetProtoFromFile(
-          _base_map_file_path, &_pbmap)) {
-    AERROR << "Failed to load base map file from " << _base_map_file_path;
+bool GraphCreator::Create() {
+  if (!::apollo::common::util::GetProtoFromFile(base_map_file_path_, &pbmap_)) {
+    AERROR << "Failed to load base map file from " << base_map_file_path_;
     return false;
   }
-  AINFO << "Number of lanes: " << _pbmap.lane_size();
+  AINFO << "Number of lanes: " << pbmap_.lane_size();
 
-  _graph.set_hdmap_version(_pbmap.header().version());
-  _graph.set_hdmap_district(_pbmap.header().district());
+  _graph.set_hdmap_version(pbmap_.header().version());
+  _graph.set_hdmap_district(pbmap_.header().district());
 
-  _node_index_map.clear();
-  _road_id_map.clear();
-  _showed_edge_id_set.clear();
+  node_index_map_.clear();
+  road_id_map_.clear();
+  showed_edge_id_set_.clear();
 
-  for (const auto& road : _pbmap.road()) {
+  for (const auto& road : pbmap_.road()) {
     for (const auto& section : road.section()) {
       for (const auto& lane : section.lane_id()) {
-        _road_id_map[lane.id()] = road.id().id();
+        road_id_map_[lane.id()] = road.id().id();
       }
     }
   }
 
-  for (const auto& lane : _pbmap.lane()) {
+  for (const auto& lane : pbmap_.lane()) {
     AINFO << "Current lane id: " << lane.id().id();
-    _node_index_map[lane.id().id()] = _graph.node_size();
-    const auto iter = _road_id_map.find(lane.id().id());
-    if (iter != _road_id_map.end()) {
-      NodeCreator::get_pb_node(lane, iter->second, _graph.add_node());
+    node_index_map_[lane.id().id()] = _graph.node_size();
+    const auto iter = road_id_map_.find(lane.id().id());
+    if (iter != road_id_map_.end()) {
+      NodeCreator::GetPbNode(lane, iter->second, _graph.add_node());
     } else {
       LOG(WARNING) << "Failed to find road id of lane " << lane.id().id();
-      NodeCreator::get_pb_node(lane, "", _graph.add_node());
+      NodeCreator::GetPbNode(lane, "", _graph.add_node());
     }
   }
 
   std::string edge_id = "";
-  for (const auto& lane : _pbmap.lane()) {
-    const auto& from_node = _graph.node(_node_index_map[lane.id().id()]);
-    add_edge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
-    add_edge(from_node, lane.right_neighbor_forward_lane_id(), Edge::RIGHT);
-    add_edge(from_node, lane.successor_id(), Edge::FORWARD);
+  for (const auto& lane : pbmap_.lane()) {
+    const auto& from_node = _graph.node(node_index_map_[lane.id().id()]);
+    AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
+    AddEdge(from_node, lane.right_neighbor_forward_lane_id(), Edge::RIGHT);
+    AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
   }
 
-  if (!::apollo::common::util::SetProtoToASCIIFile(
-          _graph, _dump_topo_file_path)) {
-    AERROR << "Failed to dump topo data into file " << _dump_topo_file_path;
+  if (!::apollo::common::util::SetProtoToASCIIFile(_graph,
+                                                   dump_topo_file_path_)) {
+    AERROR << "Failed to dump topo data into file " << dump_topo_file_path_;
     return false;
   }
-  AINFO << "File is dumped successfully. Path: " << _dump_topo_file_path;
+  AINFO << "File is dumped successfully. Path: " << dump_topo_file_path_;
   return true;
 }
 
-void GraphCreator::add_edge(const Node& from_node,
-                            const RepeatedPtrField<Id>& to_node_vec,
-                            const Edge::DirectionType& type) {
+void GraphCreator::AddEdge(const Node& from_node,
+                           const RepeatedPtrField<Id>& to_node_vec,
+                           const Edge::DirectionType& type) {
   std::string edge_id = "";
   for (const auto& to_id : to_node_vec) {
-    edge_id = get_edge_id(from_node.lane_id(), to_id.id());
-    if (_showed_edge_id_set.count(edge_id) != 0) {
+    edge_id = GetEdgeID(from_node.lane_id(), to_id.id());
+    if (showed_edge_id_set_.count(edge_id) != 0) {
       continue;
     }
-    _showed_edge_id_set.insert(edge_id);
-    const auto& iter = _node_index_map.find(to_id.id());
-    if (iter == _node_index_map.end()) {
+    showed_edge_id_set_.insert(edge_id);
+    const auto& iter = node_index_map_.find(to_id.id());
+    if (iter == node_index_map_.end()) {
       continue;
     }
     const auto& to_node = _graph.node(iter->second);
-    EdgeCreator::get_pb_edge(from_node, to_node, type, _graph.add_edge());
+    EdgeCreator::GetPbEdge(from_node, to_node, type, _graph.add_edge());
   }
 }
 
