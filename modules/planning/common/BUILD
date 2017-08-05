@@ -11,6 +11,7 @@ cc_library(
 
 cc_test(
     name = "indexed_list_test",
+    size = "small",
     srcs = [
         "indexed_list_test.cc",
     ],
@@ -25,6 +26,19 @@ cc_library(
     name = "indexed_queue",
     hdrs = [
         "indexed_queue.h",
+    ],
+)
+
+cc_test(
+    name = "indexed_queue_test",
+    size = "small",
+    srcs = [
+        "indexed_queue_test.cc",
+    ],
+    deps = [
+        ":indexed_queue",
+        "//modules/common/util",
+        "@gtest//:main",
     ],
 )
 
