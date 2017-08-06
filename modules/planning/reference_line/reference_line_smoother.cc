@@ -54,8 +54,9 @@ void ReferenceLineSmoother::Reset() {
 
 bool ReferenceLineSmoother::smooth(
     const ReferenceLine& raw_reference_line,
-    std::vector<ReferencePoint>* const smoothed_ref_line) {
+    ReferenceLine* const smoothed_reference_line) {
   Reset();
+  std::vector<ReferencePoint> ref_points;
   if (!sampling(raw_reference_line)) {
     AERROR << "Fail to sample reference line smoother points!";
     return false;
@@ -85,8 +86,8 @@ bool ReferenceLineSmoother::smooth(
   const double resolution =
       (end_t - start_t) / (smoother_config_.num_of_total_points() - 1);
   double t = start_t;
-  for (std::uint32_t i = 0; i < smoother_config_.num_of_total_points() &&
-       t < end_t; ++i) {
+  for (std::uint32_t i = 0;
+       i < smoother_config_.num_of_total_points() && t < end_t; ++i) {
     std::pair<double, double> xy = spline_solver_->spline()(t);
     const double heading = std::atan2(spline_solver_->spline().derivative_y(t),
                                       spline_solver_->spline().derivative_x(t));
@@ -108,19 +109,20 @@ bool ReferenceLineSmoother::smooth(
       return false;
     }
     ReferencePoint rlp = raw_reference_line.get_reference_point(s);
-    ReferencePoint new_rlp(common::math::Vec2d(xy.first, xy.second), heading,
-                           kappa, dkappa, rlp.lane_waypoints());
-    smoothed_ref_line->push_back(std::move(new_rlp));
+    ref_points.emplace_back(
+        ReferencePoint(common::math::Vec2d(xy.first, xy.second), heading, kappa,
+                       dkappa, rlp.lane_waypoints()));
     t = start_t + (i + 1) * resolution;
   }
+  *smoothed_reference_line = ReferenceLine(ref_points);
   return true;
 }
 
 bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.length();
   const double resolution = length / smoother_config_.num_spline();
-  for (std::uint32_t i = 0; i <= smoother_config_.num_spline() &&
-       i * resolution <= length; ++i) {
+  for (std::uint32_t i = 0;
+       i <= smoother_config_.num_spline() && i * resolution <= length; ++i) {
     ReferencePoint rlp = raw_reference_line.get_reference_point(resolution * i);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
