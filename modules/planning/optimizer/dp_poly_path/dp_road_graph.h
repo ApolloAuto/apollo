@@ -28,6 +28,7 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
@@ -52,7 +53,7 @@ class DPRoadGraph {
   bool ComputeObjectDecision(const PathData &path_data,
                              const SpeedData &heuristic_speed_data,
                              const ReferenceLine &reference_line,
-                             const ConstObstacleList &obstacles,
+                             const ConstPathObstacleList &obstacles,
                              IdDecisionList *const decisions);
 
  private:
@@ -91,7 +92,7 @@ class DPRoadGraph {
   bool Generate(const ReferenceLine &reference_line,
                 std::vector<DPRoadGraphNode> *min_cost_path);
 
-  bool ComputeBoundingBoxesForEgoVehicle(
+  bool ComputeBoundingBoxesForAdc(
       const FrenetFramePath &frenet_frame_path,
       const ReferenceLine &reference_line,
       const SpeedData &heuristic_speed_data, const std::size_t evaluate_times,
