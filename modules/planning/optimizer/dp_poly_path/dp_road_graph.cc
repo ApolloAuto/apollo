@@ -223,20 +223,25 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
   return true;
 }
 
-bool DPRoadGraph::ComputeObjectDecision(const PathData &path_data,
-                                        const SpeedData &heuristic_speed_data,
-                                        const ReferenceLine &reference_line,
-                                        const ConstObstacleList &obstacles,
-                                        IdDecisionList *const decisions) {
+bool DPRoadGraph::ComputeObjectDecision(
+    const PathData &path_data, const SpeedData &heuristic_speed_data,
+    const ReferenceLine &reference_line,
+    const ConstPathObstacleList &path_obstacles,
+    IdDecisionList *const decisions) {
   CHECK_NOTNULL(decisions);
 
   std::vector<common::SLPoint> adc_sl_points;
   std::vector<common::math::Box2d> adc_bounding_box;
 
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
-  double adc_length = vehicle_config.vehicle_param().length();
-  double adc_width = vehicle_config.vehicle_param().length();
+  const auto &vehicle_param =
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  const double adc_length = vehicle_param.length();
+  const double adc_width = vehicle_param.length();
+  const double adc_max_edge_to_center_dist =
+      std::hypot(std::max(vehicle_param.front_edge_to_center(),
+                          vehicle_param.back_edge_to_center()),
+                 std::max(vehicle_param.left_edge_to_center(),
+                          vehicle_param.right_edge_to_center()));
 
   for (const common::PathPoint &path_point :
        path_data.discretized_path().points()) {
@@ -253,28 +258,32 @@ bool DPRoadGraph::ComputeObjectDecision(const PathData &path_data,
     }
   }
 
-  for (const auto obstacle : obstacles) {
+  for (const auto *path_obstacle : path_obstacles) {
+    const auto *obstacle = path_obstacle->Obstacle();
     if (!obstacle->IsStatic()) {
       continue;
     }
     bool ignore = true;
     const auto &static_obstacle_box = obstacle->PerceptionBoundingBox();
-    common::SLPoint obs_sl;
 
-    if (!reference_line.get_point_in_frenet_frame(
-            {static_obstacle_box.center_x(), static_obstacle_box.center_y()},
-            &obs_sl)) {
-      AERROR << "Fail to map obs in frenet frame";
-    }
-
+    const auto &sl_boundary = path_obstacle->sl_boundary();
     for (std::size_t j = 0; j < adc_sl_points.size(); ++j) {
       const auto &adc_sl = adc_sl_points[j];
-      if (adc_sl.s() < obs_sl.s() - static_obstacle_box.half_length() ||
-          adc_sl.s() > obs_sl.s() + static_obstacle_box.half_length()) {
+      if (adc_sl.s() + adc_max_edge_to_center_dist < sl_boundary.start_s() ||
+          adc_sl.s() - adc_max_edge_to_center_dist > sl_boundary.end_s()) {
+        // no overlap in s direction
+        continue;
+      } else if (adc_sl.l() + adc_max_edge_to_center_dist <
+                     sl_boundary.start_l() ||
+                 adc_sl.l() - adc_max_edge_to_center_dist <
+                     sl_boundary.end_l()) {
+        // no overlap in l direction
         continue;
       } else {
         if (static_obstacle_box.HasOverlap(adc_bounding_box[j]) &&
-            std::fabs(obs_sl.l()) < FLAGS_static_decision_stop_buffer) {
+            (sl_boundary.start_l() * sl_boundary.end_l() < 0.0 ||
+             std::fabs(std::min(sl_boundary.start_l(), sl_boundary.end_l())) <
+                 FLAGS_static_decision_stop_buffer)) {
           ObjectDecisionType object_stop;
           ObjectStop *object_stop_ptr = object_stop.mutable_stop();
           object_stop_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
@@ -284,8 +293,9 @@ bool DPRoadGraph::ComputeObjectDecision(const PathData &path_data,
           ignore = false;
           break;
         } else {
-          double diff_l = obs_sl.l() - adc_sl.l();
-          if (diff_l > 0 && fabs(diff_l) < FLAGS_static_decision_ignore_range) {
+          if (sl_boundary.start_l() > adc_sl.l() &&
+              sl_boundary.start_l() - adc_sl.l() <
+                  FLAGS_static_decision_ignore_range) {
             // GO_RIGHT
             ObjectDecisionType object_nudge;
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
@@ -294,8 +304,9 @@ bool DPRoadGraph::ComputeObjectDecision(const PathData &path_data,
             decisions->push_back(std::make_pair(obstacle->Id(), object_nudge));
             ignore = false;
             break;
-          } else if (diff_l < 0 &&
-                     fabs(diff_l) < FLAGS_static_decision_ignore_range) {
+          } else if (sl_boundary.end_l() < adc_sl.l() &&
+                     adc_sl.l() - sl_boundary.end_l() <
+                         FLAGS_static_decision_ignore_range) {
             // GO_LEFT
             ObjectDecisionType object_nudge;
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
@@ -321,16 +332,17 @@ bool DPRoadGraph::ComputeObjectDecision(const PathData &path_data,
       std::min(heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
   std::size_t evaluate_times = static_cast<std::size_t>(
       std::floor(total_time / config_.eval_time_interval()));
-  for (const auto obstacle : obstacles) {
+  for (const auto *path_obstacle : path_obstacles) {
+    const auto *obstacle = path_obstacle->Obstacle();
     if (obstacle->IsStatic()) {
       continue;
     }
 
     // list of Box2d for ego car given heuristic speed profile
     std::vector<common::math::Box2d> adc_by_time;
-    if (!ComputeBoundingBoxesForEgoVehicle(path_data.frenet_frame_path(),
-                                           reference_line, heuristic_speed_data,
-                                           evaluate_times, &adc_by_time)) {
+    if (!ComputeBoundingBoxesForAdc(path_data.frenet_frame_path(),
+                                    reference_line, heuristic_speed_data,
+                                    evaluate_times, &adc_by_time)) {
       AERROR << "fill_adc_by_time error";
     }
 
@@ -365,7 +377,7 @@ bool DPRoadGraph::ComputeObjectDecision(const PathData &path_data,
   return true;
 }
 
-bool DPRoadGraph::ComputeBoundingBoxesForEgoVehicle(
+bool DPRoadGraph::ComputeBoundingBoxesForAdc(
     const FrenetFramePath &frenet_frame_path,
     const ReferenceLine &reference_line, const SpeedData &heuristic_speed_data,
     const std::size_t evaluate_times,
