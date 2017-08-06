@@ -21,15 +21,11 @@
 namespace apollo {
 namespace routing {
 
-namespace {
-
 using ::apollo::routing::Node;
 using ::apollo::routing::Edge;
 
-}  // namespace
-
 TopoNode::TopoNode(const Node& node)
-    : _pb_node(node), _start_s(0.0), _end_s(_pb_node.length()) {
+    : pb_node_(node), start_s_(0.0), _end_s(pb_node_.length()) {
   int total_size = 0;
   for (const auto& seg : central_curve().segment()) {
     total_size += seg.line_segment().point_size();
@@ -37,7 +33,7 @@ TopoNode::TopoNode(const Node& node)
   int half_size = total_size / 2;
   for (const auto& seg : central_curve().segment()) {
     if (half_size < seg.line_segment().point_size()) {
-      _anchor_point = seg.line_segment().point(half_size);
+      anchor_point_ = seg.line_segment().point(half_size);
       break;
     }
     half_size -= seg.line_segment().point_size();
@@ -49,67 +45,67 @@ TopoNode::TopoNode(const TopoNode* topo_node) : TopoNode(topo_node->node()) {}
 
 TopoNode::~TopoNode() {}
 
-const Node& TopoNode::node() const { return _pb_node; }
+const Node& TopoNode::node() const { return pb_node_; }
 
-double TopoNode::length() const { return _pb_node.length(); }
+double TopoNode::length() const { return pb_node_.length(); }
 
-double TopoNode::cost() const { return _pb_node.cost(); }
+double TopoNode::cost() const { return pb_node_.cost(); }
 
-bool TopoNode::is_virtual() const { return _pb_node.is_virtual(); }
+bool TopoNode::is_virtual() const { return pb_node_.is_virtual(); }
 
-const std::string& TopoNode::lane_id() const { return _pb_node.lane_id(); }
+const std::string& TopoNode::lane_id() const { return pb_node_.lane_id(); }
 
-const std::string& TopoNode::road_id() const { return _pb_node.road_id(); }
+const std::string& TopoNode::road_id() const { return pb_node_.road_id(); }
 
 const ::apollo::hdmap::Curve& TopoNode::central_curve() const {
-  return _pb_node.central_curve();
+  return pb_node_.central_curve();
 }
 
 const ::apollo::common::PointENU& TopoNode::anchor_point() const {
-  return _anchor_point;
+  return anchor_point_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::in_from_all_edge() const {
-  return _in_from_all_edge_set;
+  return in_from_all_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::in_from_left_edge() const {
-  return _in_from_left_edge_set;
+  return in_from_left_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::in_from_right_edge()
     const {
-  return _in_from_right_edge_set;
+  return in_from_right_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>&
 TopoNode::in_from_left_or_right_edge() const {
-  return _in_from_left_or_right_edge_set;
+  return in_from_left_or_right_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::in_from_pre_edge() const {
-  return _in_from_pre_edge_set;
+  return in_from_pre_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::out_to_all_edge() const {
-  return _out_to_all_edge_set;
+  return out_to_all_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::out_to_left_edge() const {
-  return _out_to_left_edge_set;
+  return out_to_left_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::out_to_right_edge() const {
-  return _out_to_right_edge_set;
+  return out_to_right_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::out_to_left_or_right_edge()
     const {
-  return _out_to_left_or_right_edge_set;
+  return out_to_left_or_right_edge_set_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::out_to_suc_edge() const {
-  return _out_to_suc_edge_set;
+  return out_to_suc_edge_set_;
 }
 
 const TopoEdge* TopoNode::get_in_edge_from(const TopoNode* from_node) const {
@@ -130,7 +126,7 @@ const TopoEdge* TopoNode::get_out_edge_to(const TopoNode* to_node) const {
 
 const TopoNode* TopoNode::origin_node() const { return _origin_node; }
 
-double TopoNode::start_s() const { return _start_s; }
+double TopoNode::start_s() const { return start_s_; }
 
 double TopoNode::end_s() const { return _end_s; }
 
@@ -145,18 +141,18 @@ void TopoNode::add_in_edge(const TopoEdge* edge) {
   }
   switch (edge->type()) {
     case TET_LEFT:
-      _in_from_right_edge_set.insert(edge);
-      _in_from_left_or_right_edge_set.insert(edge);
+      in_from_right_edge_set_.insert(edge);
+      in_from_left_or_right_edge_set_.insert(edge);
       break;
     case TET_RIGHT:
-      _in_from_left_edge_set.insert(edge);
-      _in_from_left_or_right_edge_set.insert(edge);
+      in_from_left_edge_set_.insert(edge);
+      in_from_left_or_right_edge_set_.insert(edge);
       break;
     default:
-      _in_from_pre_edge_set.insert(edge);
+      in_from_pre_edge_set_.insert(edge);
       break;
   }
-  _in_from_all_edge_set.insert(edge);
+  in_from_all_edge_set_.insert(edge);
   _in_edge_map[edge->from_node()] = edge;
 }
 
@@ -169,18 +165,18 @@ void TopoNode::add_out_edge(const TopoEdge* edge) {
   }
   switch (edge->type()) {
     case TET_LEFT:
-      _out_to_left_edge_set.insert(edge);
-      _out_to_left_or_right_edge_set.insert(edge);
+      out_to_left_edge_set_.insert(edge);
+      out_to_left_or_right_edge_set_.insert(edge);
       break;
     case TET_RIGHT:
-      _out_to_right_edge_set.insert(edge);
-      _out_to_left_or_right_edge_set.insert(edge);
+      out_to_right_edge_set_.insert(edge);
+      out_to_left_or_right_edge_set_.insert(edge);
       break;
     default:
-      _out_to_suc_edge_set.insert(edge);
+      out_to_suc_edge_set_.insert(edge);
       break;
   }
-  _out_to_all_edge_set.insert(edge);
+  out_to_all_edge_set_.insert(edge);
   _out_edge_map[edge->to_node()] = edge;
 }
 
@@ -188,37 +184,37 @@ void TopoNode::set_origin_node(const TopoNode* origin_node) {
   _origin_node = origin_node;
 }
 
-void TopoNode::set_start_s(double start_s) { _start_s = start_s; }
+void TopoNode::set_start_s(double start_s) { start_s_ = start_s; }
 
 void TopoNode::set_end_s(double end_s) { _end_s = end_s; }
 
 TopoEdge::TopoEdge(const ::apollo::routing::Edge& edge,
                    const TopoNode* from_node, const TopoNode* to_node)
-    : _pb_edge(edge), _from_node(from_node), _to_node(to_node) {}
+    : pb_edge_(edge), from_node_(from_node), to_node_(to_node) {}
 
 TopoEdge::~TopoEdge() {}
 
-const Edge& TopoEdge::edge() const { return _pb_edge; }
+const Edge& TopoEdge::edge() const { return pb_edge_; }
 
-double TopoEdge::cost() const { return _pb_edge.cost(); }
+double TopoEdge::cost() const { return pb_edge_.cost(); }
 
-const TopoNode* TopoEdge::from_node() const { return _from_node; }
+const TopoNode* TopoEdge::from_node() const { return from_node_; }
 
-const TopoNode* TopoEdge::to_node() const { return _to_node; }
+const TopoNode* TopoEdge::to_node() const { return to_node_; }
 
 const std::string& TopoEdge::from_lane_id() const {
-  return _pb_edge.from_lane_id();
+  return pb_edge_.from_lane_id();
 }
 
 const std::string& TopoEdge::to_lane_id() const {
-  return _pb_edge.to_lane_id();
+  return pb_edge_.to_lane_id();
 }
 
 TopoEdgeType TopoEdge::type() const {
-  if (_pb_edge.direction_type() == ::apollo::routing::Edge::LEFT) {
+  if (pb_edge_.direction_type() == ::apollo::routing::Edge::LEFT) {
     return TET_LEFT;
   }
-  if (_pb_edge.direction_type() == ::apollo::routing::Edge::RIGHT) {
+  if (pb_edge_.direction_type() == ::apollo::routing::Edge::RIGHT) {
     return TET_RIGHT;
   }
   return TET_FORWARD;
