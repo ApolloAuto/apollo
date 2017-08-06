@@ -17,39 +17,39 @@ modules {
   }
 }
 modules {
-  name: "control"
-  display_name: "Control"
+  name: "localization"
+  display_name: "Localization"
   supported_commands {
     name: "start"
-    command: "scripts/control.sh"
+    command: "scripts/localization.sh"
     command: "start"
-    stdout_file: "data/log/control.stdout"
-    stderr_file: "data/log/control.stderr"
+    stdout_file: "data/log/localization.stdout"
+    stderr_file: "data/log/localization.stderr"
   }
   supported_commands {
     name: "stop"
-    command: "scripts/control.sh"
+    command: "scripts/localization.sh"
     command: "stop"
-    stdout_file: "data/log/control.stdout"
-    stderr_file: "data/log/control.stderr"
+    stdout_file: "data/log/localization.stdout"
+    stderr_file: "data/log/localization.stderr"
   }
 }
 modules {
-  name: "canbus"
-  display_name: "CAN Bus"
+  name: "perception"
+  display_name: "Perception"
   supported_commands {
     name: "start"
-    command: "scripts/canbus.sh"
+    command: "scripts/perception.sh"
     command: "start"
-    stdout_file: "data/log/canbus.stdout"
-    stderr_file: "data/log/canbus.stderr"
+    stdout_file: "data/log/perception.stdout"
+    stderr_file: "data/log/perception.stderr"
   }
   supported_commands {
     name: "stop"
-    command: "scripts/canbus.sh"
+    command: "scripts/perception.sh"
     command: "stop"
-    stdout_file: "data/log/canbus.stdout"
-    stderr_file: "data/log/canbus.stderr"
+    stdout_file: "data/log/perception.stdout"
+    stderr_file: "data/log/perception.stderr"
   }
 }
 modules {
@@ -89,21 +89,39 @@ modules {
   }
 }
 modules {
-  name: "localization"
-  display_name: "Localization"
+  name: "control"
+  display_name: "Control"
   supported_commands {
     name: "start"
-    command: "scripts/localization.sh"
+    command: "scripts/control.sh"
     command: "start"
-    stdout_file: "data/log/localization.stdout"
-    stderr_file: "data/log/localization.stderr"
+    stdout_file: "data/log/control.stdout"
+    stderr_file: "data/log/control.stderr"
   }
   supported_commands {
     name: "stop"
-    command: "scripts/localization.sh"
+    command: "scripts/control.sh"
     command: "stop"
-    stdout_file: "data/log/localization.stdout"
-    stderr_file: "data/log/localization.stderr"
+    stdout_file: "data/log/control.stdout"
+    stderr_file: "data/log/control.stderr"
+  }
+}
+modules {
+  name: "canbus"
+  display_name: "CAN Bus"
+  supported_commands {
+    name: "start"
+    command: "scripts/canbus.sh"
+    command: "start"
+    stdout_file: "data/log/canbus.stdout"
+    stderr_file: "data/log/canbus.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/canbus.sh"
+    command: "stop"
+    stdout_file: "data/log/canbus.stdout"
+    stderr_file: "data/log/canbus.stderr"
   }
 }
 modules {
