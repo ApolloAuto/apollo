@@ -25,7 +25,7 @@ using ::apollo::routing::Node;
 using ::apollo::routing::Edge;
 
 TopoNode::TopoNode(const Node& node)
-    : pb_node_(node), start_s_(0.0), _end_s(pb_node_.length()) {
+    : pb_node_(node), start_s_(0.0), end_s_(pb_node_.length()) {
   int total_size = 0;
   for (const auto& seg : central_curve().segment()) {
     total_size += seg.line_segment().point_size();
@@ -38,7 +38,7 @@ TopoNode::TopoNode(const Node& node)
     }
     half_size -= seg.line_segment().point_size();
   }
-  _origin_node = this;
+  origin_node_ = this;
 }
 
 TopoNode::TopoNode(const TopoNode* topo_node) : TopoNode(topo_node->node()) {}
@@ -117,18 +117,18 @@ const TopoEdge* TopoNode::get_in_edge_from(const TopoNode* from_node) const {
 }
 
 const TopoEdge* TopoNode::get_out_edge_to(const TopoNode* to_node) const {
-  const auto& iter = _out_edge_map.find(to_node);
-  if (iter == _out_edge_map.end()) {
+  const auto& iter = out_edge_map_.find(to_node);
+  if (iter == out_edge_map_.end()) {
     return nullptr;
   }
   return iter->second;
 }
 
-const TopoNode* TopoNode::origin_node() const { return _origin_node; }
+const TopoNode* TopoNode::origin_node() const { return origin_node_; }
 
 double TopoNode::start_s() const { return start_s_; }
 
-double TopoNode::end_s() const { return _end_s; }
+double TopoNode::end_s() const { return end_s_; }
 
 bool TopoNode::is_sub_node() const { return origin_node() != this; }
 
@@ -160,7 +160,7 @@ void TopoNode::add_out_edge(const TopoEdge* edge) {
   if (edge->from_node() != this) {
     return;
   }
-  if (_out_edge_map.count(edge->to_node()) != 0) {
+  if (out_edge_map_.count(edge->to_node()) != 0) {
     return;
   }
   switch (edge->type()) {
@@ -177,16 +177,16 @@ void TopoNode::add_out_edge(const TopoEdge* edge) {
       break;
   }
   out_to_all_edge_set_.insert(edge);
-  _out_edge_map[edge->to_node()] = edge;
+  out_edge_map_[edge->to_node()] = edge;
 }
 
-void TopoNode::set_origin_node(const TopoNode* origin_node) {
-  _origin_node = origin_node;
+void TopoNode::setorigin_node_(const TopoNode* origin_node) {
+  origin_node_ = origin_node;
 }
 
 void TopoNode::set_start_s(double start_s) { start_s_ = start_s; }
 
-void TopoNode::set_end_s(double end_s) { _end_s = end_s; }
+void TopoNode::set_end_s(double end_s) { end_s_ = end_s; }
 
 TopoEdge::TopoEdge(const ::apollo::routing::Edge& edge,
                    const TopoNode* from_node, const TopoNode* to_node)
