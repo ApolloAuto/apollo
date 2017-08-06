@@ -43,7 +43,8 @@ class ReferenceLineSmootherTest : public ::testing::Test {
              << map_file;
       return;
     }
-    smoother_.Init(config_);  // use the default value in config.
+    ReferenceLineSmootherConfig config;
+    smoother_.Init(config);  // use the default value in config.
 
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
@@ -56,7 +57,6 @@ class ReferenceLineSmootherTest : public ::testing::Test {
   }
 
   const std::string map_file = "modules/planning/testdata/base_map.txt";
-  ReferenceLineSmootherConfig config_;
 
   hdmap::HDMap hdmap_;
   ReferenceLineSmoother smoother_;
@@ -66,9 +66,10 @@ class ReferenceLineSmootherTest : public ::testing::Test {
 };
 
 TEST_F(ReferenceLineSmootherTest, smooth) {
-  std::vector<ReferencePoint> smoothed_ref_points;
-  EXPECT_TRUE(smoother_.smooth(*reference_line_, &smoothed_ref_points));
-  EXPECT_FALSE(smoothed_ref_points.empty());
+  ReferenceLine smoothed_reference_line;
+  EXPECT_FLOAT_EQ(153.87421, reference_line_->length());
+  EXPECT_TRUE(smoother_.smooth(*reference_line_, &smoothed_reference_line));
+  EXPECT_FLOAT_EQ(153.84697, smoothed_reference_line.length());
 }
 
 }  // namespace planning

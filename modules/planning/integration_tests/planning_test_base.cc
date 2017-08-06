@@ -68,7 +68,8 @@ bool PlanningTestBase::SetUpAdapters() {
            << FLAGS_adapter_config_path;
     return false;
   }
-  if (!AdapterManager::FeedRoutingResponseFile(FLAGS_test_routing_result_file)) {
+  if (!AdapterManager::FeedRoutingResponseFile(
+          FLAGS_test_routing_result_file)) {
     AERROR << "failed to routing file: " << FLAGS_test_routing_result_file;
     return false;
   }

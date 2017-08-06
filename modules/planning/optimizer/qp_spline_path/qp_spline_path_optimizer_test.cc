@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "gtest/gtest.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
 
 namespace apollo {
@@ -26,6 +27,8 @@ namespace planning {
 class QpSplinePathOptimizerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    FLAGS_reference_line_smoother_config_file =
+        "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
     qp_spline_path_optimizer_.reset(new QpSplinePathOptimizer("QP_PATH"));
   }
 

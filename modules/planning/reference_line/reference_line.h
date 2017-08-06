@@ -38,6 +38,7 @@ class ReferenceLine {
  public:
   ReferenceLine() = default;
   ReferenceLine(const std::vector<ReferencePoint>& reference_points);
+  ReferenceLine(const hdmap::Path& hdmap_path);
   ReferenceLine(const std::vector<ReferencePoint>& reference_points,
                 const std::vector<hdmap::LaneSegment>& lane_segments,
                 const double max_approximation_error);
@@ -80,6 +81,7 @@ class ReferenceLine {
                                         const double s1, const double x,
                                         const double y);
 
+ private:
   std::vector<ReferencePoint> reference_points_;
   hdmap::Path map_path_;
 };
