@@ -28,8 +28,10 @@
 
 #include "google/protobuf/util/message_differencer.h"
 
+#include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/proto/map_id.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 /**
  * @namespace apollo::common::util
@@ -56,6 +58,12 @@ bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
  * @return a SLPoint instance
  */
 apollo::common::SLPoint MakeSLPoint(const double s, const double l);
+
+apollo::common::Point3D MakePoint3D(const double x, const double y,
+                                    const double z);
+
+apollo::perception::Point MakePerceptionPoint(const double x, const double y,
+                                              const double z);
 
 apollo::common::SpeedPoint MakeSpeedPoint(const double s, const double t,
                                           const double v, const double a,

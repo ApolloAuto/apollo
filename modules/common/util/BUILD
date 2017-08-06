@@ -19,6 +19,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
         "//modules/map/proto:map_proto",
+        "//modules/perception/proto:perception_proto",
     ],
 )
 

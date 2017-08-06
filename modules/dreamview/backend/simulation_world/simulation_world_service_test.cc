@@ -453,7 +453,7 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
       {-1835.53, -2931.86}, {-1833.36, -2931.52}, {-1831.33, -2931.67},
       {-1827.05, -2932.6},  {-1809.64, -2937.85}};
 
-  for (size_t i = 0; i < world.route_size(); ++i) {
+  for (int i = 0; i < world.route_size(); ++i) {
     EXPECT_NEAR(world.route(i).x(), points[i][0], kEpsilon);
     EXPECT_NEAR(world.route(i).y(), points[i][1], kEpsilon);
   }
