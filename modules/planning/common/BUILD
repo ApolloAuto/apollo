@@ -54,10 +54,35 @@ cc_library(
         ":indexed_list",
         "//modules/common/math:box2d",
         "//modules/common/math:polygon2d",
+        "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_util",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+    ],
+)
+
+filegroup(
+    name = "common_testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
+)
+
+cc_test(
+    name = "obstacle_test",
+    size = "small",
+    srcs = [
+        "obstacle_test.cc",
+    ],
+    data = [
+        "//modules/planning/common:common_testdata",
+    ],
+    deps = [
+        ":obstacle",
+        "//modules/common/util",
+        "//modules/perception/proto:perception_proto",
+        "@gtest//:main",
     ],
 )
 

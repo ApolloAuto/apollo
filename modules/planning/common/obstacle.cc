@@ -21,9 +21,11 @@
 #include "modules/planning/common/obstacle.h"
 
 #include <algorithm>
+#include <string>
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
@@ -32,10 +34,8 @@ namespace planning {
 const std::string& Obstacle::Id() const { return id_; }
 
 Obstacle::Obstacle(const std::string& id,
-                   const perception::PerceptionObstacle& perception_obstacle,
-                   const prediction::Trajectory& trajectory)
+                   const perception::PerceptionObstacle& perception_obstacle)
     : id_(id),
-      trajectory_(trajectory),
       perception_obstacle_(perception_obstacle),
       perception_bounding_box_({perception_obstacle_.position().x(),
                                 perception_obstacle_.position().y()},
@@ -45,18 +45,42 @@ Obstacle::Obstacle(const std::string& id,
   is_static_ = IsStaticObstacle(perception_obstacle);
 }
 
+Obstacle::Obstacle(const std::string& id,
+                   const perception::PerceptionObstacle& perception_obstacle,
+                   const prediction::Trajectory& trajectory)
+    : Obstacle(id, perception_obstacle) {
+  has_trajectory_ = true;
+  trajectory_ = trajectory;
+  auto& trajectory_points = *trajectory_.mutable_trajectory_point();
+  double cumulative_s = 0.0;
+  if (trajectory_points.size() > 0) {
+    trajectory_points[0].mutable_path_point()->set_s(0.0);
+  }
+  for (int i = 1; i < trajectory_points.size(); ++i) {
+    cumulative_s +=
+        common::util::Distance2D(trajectory_points[i - 1].path_point(),
+                                 trajectory_points[i].path_point());
+
+    trajectory_points[i].mutable_path_point()->set_s(cumulative_s);
+  }
+}
+
 bool Obstacle::IsStatic() const { return is_static_; }
 
 bool Obstacle::IsStaticObstacle(
     const perception::PerceptionObstacle& perception_obstacle) {
+  if (!perception_obstacle.has_type()) {
+    AWARN << "perception obstacle does not have type, treat as static";
+    return true;
+  }
   return perception_obstacle.type() ==
          perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
 }
 
 common::TrajectoryPoint Obstacle::GetPointAtTime(
     const double relative_time) const {
-  auto comp = [](const common::TrajectoryPoint p, const double relative_time) {
-    return p.relative_time() < relative_time;
+  auto comp = [](const common::TrajectoryPoint p, const double time) {
+    return p.relative_time() < time;
   };
 
   const auto& points = trajectory_.trajectory_point();
@@ -65,6 +89,8 @@ common::TrajectoryPoint Obstacle::GetPointAtTime(
 
   if (it_lower == points.begin()) {
     return *points.begin();
+  } else if (it_lower == points.end()) {
+    return *points.rbegin();
   }
   return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
 }
@@ -97,13 +123,21 @@ void Obstacle::CreateObstacles(
     return;
   }
   for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
-    const auto perception_id = prediction_obstacle.perception_obstacle().id();
+    const auto perception_id =
+        std::to_string(prediction_obstacle.perception_obstacle().id());
     int trajectory_index = 0;
-    for (const auto& trajectory : prediction_obstacle.trajectory()) {
-      const std::string obstacle_id =
-          apollo::common::util::StrCat(perception_id, "_", trajectory_index++);
+    if (prediction_obstacle.trajectory_size() > 0) {
+      for (const auto& trajectory : prediction_obstacle.trajectory()) {
+        const std::string obstacle_id =
+            apollo::common::util::StrCat(perception_id, "_", trajectory_index);
+        obstacles->emplace_back(std::unique_ptr<Obstacle>(
+            new Obstacle(obstacle_id, prediction_obstacle.perception_obstacle(),
+                         trajectory)));
+        ++trajectory_index;
+      }
+    } else {
       obstacles->emplace_back(std::unique_ptr<Obstacle>(new Obstacle(
-          obstacle_id, prediction_obstacle.perception_obstacle(), trajectory)));
+          perception_id, prediction_obstacle.perception_obstacle())));
     }
   }
 }
