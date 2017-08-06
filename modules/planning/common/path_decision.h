@@ -33,14 +33,12 @@
 namespace apollo {
 namespace planning {
 
-using PathObstacles = IndexedList<std::string, PathObstacle>;
-
 class PathDecision {
  public:
   PathDecision(const std::vector<const Obstacle *> &obstacles,
                const ReferenceLine &reference_line);
 
-  const PathObstacles &path_obstacles() const;
+  const IndexedPathObstacles &path_obstacles() const;
 
   bool AddDecision(const std::string &tag, const std::string &object_id,
                    const ObjectDecisionType &decision);
@@ -52,7 +50,7 @@ class PathDecision {
 
  private:
   const ReferenceLine &reference_line_;
-  PathObstacles path_obstacles_;
+  IndexedPathObstacles path_obstacles_;
 };
 
 }  // namespace planning
