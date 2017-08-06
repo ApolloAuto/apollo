@@ -46,6 +46,16 @@ ReferenceLine::ReferenceLine(
       map_path_(MapPath(std::vector<hdmap::MapPathPoint>(
           reference_points.begin(), reference_points.end()))) {}
 
+ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
+    : map_path_(hdmap_path) {
+  for (const auto& point : hdmap_path.path_points()) {
+    DCHECK(!point.lane_waypoints().empty());
+    const auto& lane_waypoint = point.lane_waypoints()[0];
+    reference_points_.emplace_back(point, point.heading(), 0.0, 0.0,
+                                   lane_waypoint);
+  }
+}
+
 ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points,
     const std::vector<hdmap::LaneSegment>& lane_segments,

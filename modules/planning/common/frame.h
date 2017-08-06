@@ -27,6 +27,9 @@
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/localization/proto/pose.pb.h"
+#include "modules/planning/proto/reference_line_smoother_config.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/pnc_map.h"
@@ -35,8 +38,6 @@
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -96,8 +97,6 @@ class Frame {
    * TODO move this function to a helper class in
    * modules/planning/reference_line folder
    */
-  bool SmoothReferenceLine(const hdmap::Path &hdmap_path,
-                           ReferenceLine *const reference_line);
 
   /**
    * @brief create obstacles from prediction input.
@@ -133,6 +132,7 @@ class Frame {
   ReferenceLine reference_line_;
   PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;
+  ReferenceLineSmootherConfig smoother_config_;
 
   ADCTrajectory trajectory_pb_;  // planning output pb
 };

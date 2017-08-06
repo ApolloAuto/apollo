@@ -50,6 +50,9 @@ cc_test(
     srcs = [
         "qp_spline_path_optimizer_test.cc",
     ],
+    data = [
+        "//modules/planning:planning_testdata",
+    ],
     deps = [
         ":qp_spline_path",
         "@gtest//:main",

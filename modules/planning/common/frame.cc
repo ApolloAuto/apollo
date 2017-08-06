@@ -40,7 +40,12 @@ void Frame::SetMap(hdmap::PncMap *pnc_map) { pnc_map_ = pnc_map; }
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
 
-Frame::Frame(const uint32_t sequence_num) : sequence_num_(sequence_num) {}
+Frame::Frame(const uint32_t sequence_num) : sequence_num_(sequence_num) {
+  DCHECK(common::util::GetProtoFromFile(
+      FLAGS_reference_line_smoother_config_file, &smoother_config_))
+      << "Failed to init reference line smoother config with file "
+      << FLAGS_reference_line_smoother_config_file;
+}
 
 void Frame::SetVehicleInitPose(const localization::Pose &pose) {
   init_pose_ = pose;
@@ -151,45 +156,12 @@ bool Frame::CreateReferenceLineFromRouting(
     return false;
   }
   reference_lines->emplace_back(ReferenceLine());
-  if (!SmoothReferenceLine(hdmap_path, &reference_lines->back())) {
+  ReferenceLineSmoother smoother;
+  smoother.Init(smoother_config_);
+  if (!smoother.smooth(ReferenceLine(hdmap_path), &reference_lines->back())) {
     AERROR << "Failed to smooth reference line";
     return false;
   }
-  return true;
-}
-
-bool Frame::SmoothReferenceLine(const hdmap::Path &hdmap_path,
-                                ReferenceLine *const reference_line) {
-  CHECK_NOTNULL(reference_line);
-  std::vector<ReferencePoint> ref_points;
-
-  for (const auto &point : hdmap_path.path_points()) {
-    if (point.lane_waypoints().empty()) {
-      AERROR << "path point has no lane_waypoint";
-      return false;
-    }
-    const auto &lane_waypoint = point.lane_waypoints()[0];
-    ref_points.emplace_back(point, point.heading(), 0.0, 0.0, lane_waypoint);
-  }
-  if (ref_points.empty()) {
-    AERROR << "Found no reference points from map";
-    return false;
-  }
-
-  *reference_line = ReferenceLine(ref_points);
-  std::vector<ReferencePoint> smoothed_ref_points;
-  ReferenceLineSmoother smoother;
-  if (!smoother.Init(FLAGS_reference_line_smoother_config_file)) {
-    AERROR << "Failed to load file "
-           << FLAGS_reference_line_smoother_config_file;
-    return false;
-  }
-  if (!smoother.smooth(*reference_line, &smoothed_ref_points)) {
-    AERROR << "Fail to smooth a reference line from map";
-    return false;
-  }
-  *reference_line = ReferenceLine(smoothed_ref_points);
-  ADEBUG << "smooth reference points num:" << smoothed_ref_points.size();
   return true;
 }
 

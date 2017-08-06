@@ -40,7 +40,7 @@ class ReferenceLineSmoother {
   bool Init(const std::string& config_file);
   void Init(const ReferenceLineSmootherConfig& refline_smooth_config);
   bool smooth(const ReferenceLine& raw_reference_line,
-              std::vector<ReferencePoint>* const smoothed_ref_line);
+              ReferenceLine* const smoothed_reference_line);
 
  private:
   void Reset();
