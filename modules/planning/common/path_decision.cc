@@ -38,7 +38,7 @@ void PathDecision::Init(const std::vector<const Obstacle *> &obstacles) {
   }
 }
 
-const PathObstacles &PathDecision::path_obstacles() const {
+const IndexedPathObstacles &PathDecision::path_obstacles() const {
   return path_obstacles_;
 }
 
