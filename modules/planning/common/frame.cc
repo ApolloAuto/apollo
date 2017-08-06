@@ -193,8 +193,7 @@ bool Frame::SmoothReferenceLine(const hdmap::Path &hdmap_path,
   return true;
 }
 
-const Obstacles &Frame::GetObstacles() const { return obstacles_; }
-Obstacles *Frame::MutableObstacles() { return &obstacles_; }
+const IndexedObstacles &Frame::GetObstacles() const { return obstacles_; }
 
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);

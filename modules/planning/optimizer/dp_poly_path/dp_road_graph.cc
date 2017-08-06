@@ -227,7 +227,7 @@ bool DPRoadGraph::ComputeObjectDecision(const PathData &path_data,
                                         const SpeedData &heuristic_speed_data,
                                         const ReferenceLine &reference_line,
                                         const ConstObstacleList &obstacles,
-                                        DecisionList *const decisions) {
+                                        IdDecisionList *const decisions) {
   CHECK_NOTNULL(decisions);
 
   std::vector<common::SLPoint> adc_sl_points;

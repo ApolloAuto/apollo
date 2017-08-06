@@ -53,7 +53,7 @@ class DPRoadGraph {
                              const SpeedData &heuristic_speed_data,
                              const ReferenceLine &reference_line,
                              const ConstObstacleList &obstacles,
-                             DecisionList *const decisions);
+                             IdDecisionList *const decisions);
 
  private:
   /**

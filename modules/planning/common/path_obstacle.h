@@ -32,6 +32,7 @@
 
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -39,9 +40,10 @@ namespace apollo {
 namespace planning {
 
 // a commonly used type to store Object Id and Object Decisions
-using DecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
+using IdDecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
 
 class PathObstacle;
+using IndexedPathObstacles = IndexedList<std::string, PathObstacle>;
 using ConstPathObstacleList = std::vector<const PathObstacle*>;
 
 /**

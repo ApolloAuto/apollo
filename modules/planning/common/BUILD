@@ -51,6 +51,7 @@ cc_library(
         "obstacle.h",
     ],
     deps = [
+        ":indexed_list",
         "//modules/common/math:box2d",
         "//modules/common/math:polygon2d",
         "//modules/perception/proto:perception_proto",
@@ -69,6 +70,7 @@ cc_library(
         "path_obstacle.h",
     ],
     deps = [
+        ":indexed_list",
         ":obstacle",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
@@ -100,7 +102,6 @@ cc_library(
         "path_decision.h",
     ],
     deps = [
-        ":indexed_list",
         ":obstacle",
         ":path_obstacle",
         "//modules/planning/reference_line",
@@ -150,7 +151,6 @@ cc_library(
         "frame.h",
     ],
     deps = [
-        ":indexed_list",
         ":indexed_queue",
         ":obstacle",
         ":path_decision",

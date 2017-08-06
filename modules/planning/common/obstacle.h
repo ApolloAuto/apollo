@@ -29,12 +29,14 @@
 
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/planning/common/indexed_list.h"
 
 namespace apollo {
 namespace planning {
 
 class Obstacle;
 using ConstObstacleList = std::vector<const Obstacle *>;
+using IndexedObstacles = IndexedList<std::string, Obstacle>;
 
 class Obstacle {
  public:
