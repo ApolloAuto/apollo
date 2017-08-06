@@ -66,7 +66,7 @@ class TopoNode {
 
   void add_in_edge(const TopoEdge* edge);
   void add_out_edge(const TopoEdge* edge);
-  void set_origin_node(const TopoNode* origin_node);
+  void setorigin_node_(const TopoNode* origin_node);
   void set_start_s(double start_s);
   void set_end_s(double end_s);
 
@@ -75,7 +75,7 @@ class TopoNode {
   ::apollo::common::PointENU anchor_point_;
 
   double start_s_;
-  double _end_s;
+  double end_s_;
 
   std::unordered_set<const TopoEdge*> in_from_all_edge_set_;
   std::unordered_set<const TopoEdge*> in_from_left_edge_set_;
@@ -88,10 +88,10 @@ class TopoNode {
   std::unordered_set<const TopoEdge*> out_to_left_or_right_edge_set_;
   std::unordered_set<const TopoEdge*> out_to_suc_edge_set_;
 
-  std::unordered_map<const TopoNode*, const TopoEdge*> _out_edge_map;
+  std::unordered_map<const TopoNode*, const TopoEdge*> out_edge_map_;
   std::unordered_map<const TopoNode*, const TopoEdge*> _in_edge_map;
 
-  const TopoNode* _origin_node;
+  const TopoNode* origin_node_;
 };
 
 enum TopoEdgeType {
