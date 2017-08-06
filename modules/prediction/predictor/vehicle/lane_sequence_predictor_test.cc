@@ -58,7 +58,7 @@ TEST_F(LaneSequencePredictorTest, OnLaneCase) {
   LaneSequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
   PredictionObstacle prediction_obstacle = predictor.prediction_obstacle();
-  EXPECT_EQ(prediction_obstacle.trajectory_size(), 1);
+  EXPECT_EQ(prediction_obstacle.trajectory_size(), 2);
 }
 
 }  // namespace prediction

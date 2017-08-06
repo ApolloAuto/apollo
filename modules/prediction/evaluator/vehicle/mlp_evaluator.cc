@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <numeric>
+#include <limits>
 
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
@@ -29,6 +30,20 @@ namespace apollo {
 namespace prediction {
 
 using HDMapLane = apollo::hdmap::Lane;
+
+namespace {
+
+double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
+  int count = 0;
+  double sum = 0.0;
+  for (size_t i = start; i <= end && i < nums.size(); i++) {
+    sum += nums[i];
+    ++count;
+  }
+  return (count == 0) ? 0.0 : sum / count;
+}
+
+}  // namespace
 
 MLPEvaluator::MLPEvaluator() {
   LoadModel(FLAGS_vehicle_model_file);
@@ -155,47 +170,92 @@ void MLPEvaluator::SetObstacleFeatureValues(
   if (count <= 0) {
     return;
   }
-  double theta_mean =
-      std::accumulate(thetas.begin(), thetas.end(), 0.0) / thetas.size();
-  double theta_filtered =
-      (thetas.size() > 1) ? (thetas[0] + thetas[1]) / 2.0 : thetas[0];
-  double lane_l_mean =
-      std::accumulate(lane_ls.begin(), lane_ls.end(), 0.0) / lane_ls.size();
-  double lane_l_filtered =
-      (lane_ls.size() > 1) ? (lane_ls[0] + lane_ls[1]) / 2.0 : lane_ls[0];
-  double speed_mean =
-      std::accumulate(speeds.begin(), speeds.end(), 0.0) / speeds.size();
-  double speed_lateral = sin(theta_filtered) * speed_mean;
-  double speed_sign = (speed_lateral > 0) ? 1.0 : -1.0;
-  double time_to_lb = (abs(speed_lateral) > 0.05)
-                          ? dist_lbs[0] / speed_lateral
-                          : 20 * dist_lbs[0] * speed_sign;
-  double time_to_rb = (abs(speed_lateral) > 0.05)
-                          ? -1 * dist_rbs[0] / speed_lateral
-                          : -20 * dist_rbs[0] * speed_sign;
+  int curr_size = 5;
+  int hist_size = obstacle_ptr->history_size();
+  double theta_mean = ComputeMean(thetas, 0, hist_size - 1);
+  double theta_filtered = ComputeMean(thetas, 0, curr_size - 1);
+  double lane_l_mean = ComputeMean(lane_ls, 0, hist_size - 1);
+  double lane_l_filtered = ComputeMean(lane_ls, 0, curr_size - 1);
+  double speed_mean = ComputeMean(speeds, 0, hist_size - 1);
+
   double time_diff = timestamps.front() - timestamps.back();
-  double dist_lb_rate = (timestamps.size() > 1)
-                            ? (dist_lbs.front() - dist_lbs.back()) / time_diff
-                            : 0.0;
-  double dist_rb_rate = (timestamps.size() > 1)
-                            ? (dist_rbs.front() - dist_rbs.back()) / time_diff
-                            : 0.0;
+  double dist_lb_rate = (timestamps.size() > 1) ?
+                (dist_lbs.front() - dist_lbs.back()) / time_diff : 0.0;
+  double dist_rb_rate = (timestamps.size() > 1) ?
+                (dist_rbs.front() - dist_rbs.back()) / time_diff : 0.0;
+
+  double delta_t = 0.0;
+  if (timestamps.size() > 1) {
+    delta_t =
+        (timestamps.front() - timestamps.back()) / (timestamps.size() - 1);
+  }
+  double angle_curr = ComputeMean(thetas, 0, curr_size - 1);
+  double angle_prev = ComputeMean(thetas, curr_size, 2 * curr_size - 1);
+  double angle_diff =
+      (hist_size >= 2 * curr_size) ? angle_curr - angle_prev : 0.0;
+
+  double lane_l_curr = ComputeMean(lane_ls, 0, curr_size - 1);
+  double lane_l_prev = ComputeMean(lane_ls, curr_size, 2 * curr_size - 1);
+  double lane_l_diff =
+      (hist_size >= 2 * curr_size) ? lane_l_curr - lane_l_prev : 0.0;
+
+  double angle_diff_rate = 0.0;
+  double lane_l_diff_rate = 0.0;
+  if (delta_t > std::numeric_limits<double>::epsilon()) {
+    angle_diff_rate = angle_diff / (delta_t * curr_size);
+    lane_l_diff_rate = lane_l_diff / (delta_t * curr_size);
+  }
+
+  double acc = 0.0;
+  if (static_cast<int>(speeds.size()) >= 3 * curr_size &&
+          delta_t > std::numeric_limits<double>::epsilon()) {
+    double speed_1 = ComputeMean(speeds, 0, curr_size - 1);
+    double speed_2 = ComputeMean(speeds, curr_size, 2 * curr_size - 1);
+    double speed_3 = ComputeMean(speeds, 2 * curr_size, 3 * curr_size - 1);
+    acc = (speed_1 - 2 * speed_2 + speed_3) /
+        (curr_size * curr_size * delta_t * delta_t);
+  }
+
+  double dist_lb_rate_curr = 0.0;
+  if (hist_size >= 2 * curr_size && delta_t >
+      std::numeric_limits<double>::epsilon()) {
+    double dist_lb_curr = ComputeMean(dist_lbs, 0, curr_size - 1);
+    double dist_lb_prev = ComputeMean(dist_lbs, curr_size, 2 * curr_size - 1);
+    dist_lb_rate_curr = (dist_lb_curr - dist_lb_prev) / (curr_size * delta_t);
+  }
+
+  double dist_rb_rate_curr = 0.0;
+  if (hist_size >= 2 * curr_size && delta_t >
+      std::numeric_limits<double>::epsilon()) {
+    double dist_rb_curr = ComputeMean(dist_rbs, 0, curr_size - 1);
+    double dist_rb_prev = ComputeMean(dist_rbs, curr_size, 2 * curr_size - 1);
+    dist_rb_rate_curr = (dist_rb_curr - dist_rb_prev) / (curr_size * delta_t);
+  }
+
   // setup obstacle feature values
   feature_values->push_back(theta_filtered);
   feature_values->push_back(theta_mean);
   feature_values->push_back(theta_filtered - theta_mean);
-  feature_values->push_back((thetas.size() > 1) ? thetas[0] - thetas[1]
-                                            : thetas[0]);
+  feature_values->push_back(angle_diff);
+  feature_values->push_back(angle_diff_rate);
+
   feature_values->push_back(lane_l_filtered);
   feature_values->push_back(lane_l_mean);
   feature_values->push_back(lane_l_filtered - lane_l_mean);
+  feature_values->push_back(lane_l_diff);
+  feature_values->push_back(lane_l_diff_rate);
+
   feature_values->push_back(speed_mean);
+  feature_values->push_back(acc);
+
   feature_values->push_back(dist_lbs.front());
   feature_values->push_back(dist_lb_rate);
-  feature_values->push_back(time_to_lb);
+  feature_values->push_back(dist_lb_rate_curr);
+
   feature_values->push_back(dist_rbs.front());
   feature_values->push_back(dist_rb_rate);
-  feature_values->push_back(time_to_rb);
+  feature_values->push_back(dist_rb_rate_curr);
+
   feature_values->push_back(lane_types.front() == 0 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 1 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 2 ? 1.0 : 0.0);
