@@ -71,22 +71,22 @@ class TopoNode {
   void set_end_s(double end_s);
 
  private:
-  ::apollo::routing::Node _pb_node;
-  ::apollo::common::PointENU _anchor_point;
+  ::apollo::routing::Node pb_node_;
+  ::apollo::common::PointENU anchor_point_;
 
-  double _start_s;
+  double start_s_;
   double _end_s;
 
-  std::unordered_set<const TopoEdge*> _in_from_all_edge_set;
-  std::unordered_set<const TopoEdge*> _in_from_left_edge_set;
-  std::unordered_set<const TopoEdge*> _in_from_right_edge_set;
-  std::unordered_set<const TopoEdge*> _in_from_left_or_right_edge_set;
-  std::unordered_set<const TopoEdge*> _in_from_pre_edge_set;
-  std::unordered_set<const TopoEdge*> _out_to_all_edge_set;
-  std::unordered_set<const TopoEdge*> _out_to_left_edge_set;
-  std::unordered_set<const TopoEdge*> _out_to_right_edge_set;
-  std::unordered_set<const TopoEdge*> _out_to_left_or_right_edge_set;
-  std::unordered_set<const TopoEdge*> _out_to_suc_edge_set;
+  std::unordered_set<const TopoEdge*> in_from_all_edge_set_;
+  std::unordered_set<const TopoEdge*> in_from_left_edge_set_;
+  std::unordered_set<const TopoEdge*> in_from_right_edge_set_;
+  std::unordered_set<const TopoEdge*> in_from_left_or_right_edge_set_;
+  std::unordered_set<const TopoEdge*> in_from_pre_edge_set_;
+  std::unordered_set<const TopoEdge*> out_to_all_edge_set_;
+  std::unordered_set<const TopoEdge*> out_to_left_edge_set_;
+  std::unordered_set<const TopoEdge*> out_to_right_edge_set_;
+  std::unordered_set<const TopoEdge*> out_to_left_or_right_edge_set_;
+  std::unordered_set<const TopoEdge*> out_to_suc_edge_set_;
 
   std::unordered_map<const TopoNode*, const TopoEdge*> _out_edge_map;
   std::unordered_map<const TopoNode*, const TopoEdge*> _in_edge_map;
@@ -117,9 +117,9 @@ class TopoEdge {
   const TopoNode* to_node() const;
 
  private:
-  ::apollo::routing::Edge _pb_edge;
-  const TopoNode* _from_node;
-  const TopoNode* _to_node;
+  ::apollo::routing::Edge pb_edge_;
+  const TopoNode* from_node_;
+  const TopoNode* to_node_;
 };
 
 }  // namespace routing
