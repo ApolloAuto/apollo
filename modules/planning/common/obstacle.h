@@ -35,12 +35,18 @@ namespace apollo {
 namespace planning {
 
 class Obstacle;
+using Obstacles = IndexedList<std::string, Obstacle>;
+
+class Obstacle;
 using ConstObstacleList = std::vector<const Obstacle *>;
 using IndexedObstacles = IndexedList<std::string, Obstacle>;
 
 class Obstacle {
  public:
   Obstacle() = default;
+
+  Obstacle(const std::string &id,
+           const perception::PerceptionObstacle &perception_obstacle);
 
   Obstacle(const std::string &id,
            const perception::PerceptionObstacle &perception,
@@ -73,11 +79,13 @@ class Obstacle {
       const prediction::PredictionObstacles &predictions,
       std::list<std::unique_ptr<Obstacle>> *obstacles);
 
- private:
   static bool IsStaticObstacle(
       const perception::PerceptionObstacle &perception_obstacle);
+
+ private:
   std::string id_;
   bool is_static_;
+  bool has_trajectory_ = false;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
   common::math::Box2d perception_bounding_box_;

@@ -34,6 +34,24 @@ SLPoint MakeSLPoint(const double s, const double l) {
   return sl;
 }
 
+apollo::common::Point3D MakePoint3D(const double x, const double y,
+                                    const double z) {
+  common::Point3D point3d;
+  point3d.set_x(x);
+  point3d.set_y(y);
+  point3d.set_z(z);
+  return point3d;
+}
+
+apollo::perception::Point MakePerceptionPoint(const double x, const double y,
+                                              const double z) {
+  perception::Point point3d;
+  point3d.set_x(x);
+  point3d.set_y(y);
+  point3d.set_z(z);
+  return point3d;
+}
+
 SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
                           const double a, const double da) {
   SpeedPoint speed_point;
