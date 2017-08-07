@@ -46,20 +46,20 @@ def main():
     start_point = routing_request.start
     end_point = routing_request.end
 
+    """
     start_point.id = '94_1_0'
-    start_point.s = 3
+    start_point.s = 53
     end_point.id = '94_1_0'
     end_point.s = 50
     """
     start_point.id = '1_-1'
-    start_point.s = 6
+    start_point.s = 1
     end_point.id = '1_-1'
-    end_point.s = 5
-    """
+    end_point.s = 80
 
     request_publisher = rospy.Publisher(
             '/apollo/routing_request', routing_pb2.RoutingRequest, queue_size=1)
-    time.sleep(1.0)
+    time.sleep(2.0)
     request_publisher.publish(routing_request)
 
 
