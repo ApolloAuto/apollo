@@ -87,7 +87,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
       frenet_frame_point.set_l(l);
       frenet_frame_point.set_dl(dl);
       frenet_frame_point.set_ddl(ddl);
-      frenet_path.push_back(frenet_frame_point);
+      frenet_path.push_back(std::move(frenet_frame_point));
       current_s += path_resolution;
     }
     accumulated_s += path_length;
@@ -169,14 +169,14 @@ bool DPRoadGraph::GenerateMinCostPath(
                                  vehicle_config.vehicle_param(), speed_data_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
-  graph_nodes[0].push_back(DPRoadGraphNode(init_sl_point_, nullptr, 0.0));
+  graph_nodes[0].emplace_back(init_sl_point_, nullptr, 0.0);
 
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
     const auto &prev_dp_nodes = graph_nodes[level - 1];
     const auto &level_points = path_waypoints[level];
     for (std::size_t i = 0; i < level_points.size(); ++i) {
       const auto &cur_point = level_points[i];
-      graph_nodes[level].push_back(DPRoadGraphNode(cur_point, nullptr));
+      graph_nodes[level].emplace_back(cur_point, nullptr);
       auto &cur_node = graph_nodes[level].back();
       for (std::size_t j = 0; j < prev_dp_nodes.size(); ++j) {
         const auto &prev_dp_node = prev_dp_nodes[j];
@@ -251,6 +251,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
             {path_point.x(), path_point.y()}, &adc_sl)) {
       AERROR << "get_point_in_Frenet_frame error for ego vehicle "
              << path_point.x() << " " << path_point.y();
+      return false;
     } else {
       adc_sl_points.push_back(std::move(adc_sl));
     }
@@ -289,7 +290,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
           object_stop_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
           object_stop_ptr->set_reason_code(
               StopReasonCode::STOP_REASON_OBSTACLE);
-          decisions->push_back(std::make_pair(obstacle->Id(), object_stop));
+          decisions->emplace_back(obstacle->Id(), object_stop);
           ignore = false;
           break;
         } else {
@@ -301,7 +302,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
             object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
             object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
-            decisions->push_back(std::make_pair(obstacle->Id(), object_nudge));
+            decisions->emplace_back(obstacle->Id(), object_nudge);
             ignore = false;
             break;
           } else if (sl_boundary.end_l() < adc_sl.l() &&
@@ -312,7 +313,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
             object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
             object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
-            decisions->push_back(std::make_pair(obstacle->Id(), object_nudge));
+            decisions->emplace_back(obstacle->Id(), object_nudge);
             ignore = false;
             break;
           }
@@ -323,7 +324,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
       // IGNORE
       ObjectDecisionType object_ignore;
       object_ignore.mutable_ignore();
-      decisions->push_back(std::make_pair(obstacle->Id(), object_ignore));
+      decisions->emplace_back(obstacle->Id(), object_ignore);
     }
   }
   return true;
@@ -343,6 +344,7 @@ bool DPRoadGraph::MakeDynamicObstcleDecision(
   if (!ComputeBoundingBoxesForAdc(path_data.frenet_frame_path(),
                                   evaluate_time_slots, &adc_by_time)) {
     AERROR << "fill_adc_by_time error";
+    return false;
   }
 
   for (const auto *path_obstacle : path_obstacles) {
@@ -363,7 +365,7 @@ bool DPRoadGraph::MakeDynamicObstcleDecision(
         ObjectDecisionType object_follow;
         ObjectFollow *object_follow_ptr = object_follow.mutable_follow();
         object_follow_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
-        decisions->push_back(std::make_pair(obstacle->Id(), object_follow));
+        decisions->emplace_back(obstacle->Id(), object_follow);
         break;
       }
     }
