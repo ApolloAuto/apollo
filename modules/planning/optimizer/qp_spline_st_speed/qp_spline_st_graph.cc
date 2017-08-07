@@ -187,18 +187,28 @@ Status QpSplineStGraph::ApplyConstraint(
   }
   if (!constraint->add_fx_boundary(t_evaluated_, s_lower_bound,
                                    s_upper_bound)) {
-    const std::string msg = "Fail to apply obstacle constraint";
+    const std::string msg = "Fail to apply distance constraints.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  std::vector<double> speed_constraint;
-  if (!EstimateSpeedConstraint(init_point, speed_limit, &speed_constraint)
+  std::vector<double> speed_upper_bound;
+  if (!EstimateSpeedUpperBound(init_point, speed_limit, &speed_upper_bound)
            .ok()) {
-    std::string msg = "Fail to estimate speed constraint.";
+    std::string msg = "Fail to estimate speed upper constraints.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  std::vector<double> speed_lower_bound(t_evaluated_.size(), 0.0);
+  if (!constraint->add_derivative_boundary(t_evaluated_, speed_lower_bound,
+                                   speed_upper_bound)) {
+    const std::string msg = "Fail to apply speed constraints.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+
   return Status::OK();
 }
 
@@ -309,11 +319,11 @@ Status QpSplineStGraph::GetSConstraintByTime(
   return Status::OK();
 }
 
-Status QpSplineStGraph::EstimateSpeedConstraint(
+Status QpSplineStGraph::EstimateSpeedUpperBound(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-    std::vector<double>* speed_constraint) const {
-  DCHECK_NOTNULL(speed_constraint);
-  speed_constraint->clear();
+    std::vector<double>* speed_upper_bound) const {
+  DCHECK_NOTNULL(speed_upper_bound);
+  speed_upper_bound->clear();
 
   // use v to estimate position: not accurate, but feasible in cyclic
   // processing. We can do the following process multiple times and use
@@ -327,19 +337,19 @@ Status QpSplineStGraph::EstimateSpeedConstraint(
   while (i < t_evaluated_.size() && j + 1 < speed_limit.speed_points().size()) {
     distance = v * t_evaluated_[i];
     if (fabs(distance - speed_limit.speed_points()[j].s()) < kDistanceEpsilon) {
-      speed_constraint->push_back(speed_limit.speed_points()[j].v());
+      speed_upper_bound->push_back(speed_limit.speed_points()[j].v());
       ++i;
     } else if (speed_limit.speed_points()[j + 1].s() < distance) {
       ++j;
     } else {
-      speed_constraint->push_back(speed_limit.get_speed_limit_by_s(distance));
+      speed_upper_bound->push_back(speed_limit.get_speed_limit_by_s(distance));
       ++i;
     }
   }
 
-  for (uint32_t k = speed_constraint->size() - 1; k < t_evaluated_.size();
+  for (uint32_t k = speed_upper_bound->size() - 1; k < t_evaluated_.size();
        ++k) {
-    speed_constraint->push_back(qp_spline_st_speed_config_.max_speed());
+    speed_upper_bound->push_back(qp_spline_st_speed_config_.max_speed());
   }
   return Status::OK();
 }
