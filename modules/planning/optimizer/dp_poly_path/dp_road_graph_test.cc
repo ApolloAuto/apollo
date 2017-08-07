@@ -82,9 +82,9 @@ class DpRoadGraphTest : public PlanningTestBase {
 };
 
 TEST_F(DpRoadGraphTest, speed_road_graph) {
-  DPRoadGraph road_graph(dp_poly_path_config_, init_point_, speed_data_);
+  DPRoadGraph road_graph(dp_poly_path_config_, *reference_line_, speed_data_);
   ASSERT_TRUE(reference_line_ != nullptr);
-  bool result = road_graph.FindPathTunnel(*reference_line_, &path_data_);
+  bool result = road_graph.FindPathTunnel(init_point_, &path_data_);
   EXPECT_TRUE(result);
   EXPECT_EQ(648, path_data_.discretized_path().num_of_points());
   EXPECT_EQ(648, path_data_.frenet_frame_path().number_of_points());

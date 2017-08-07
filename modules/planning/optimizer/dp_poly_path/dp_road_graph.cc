@@ -46,19 +46,24 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 
 DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
-                         const common::TrajectoryPoint &init_point,
+                         const ReferenceLine &reference_line,
                          const SpeedData &speed_data)
-    : config_(config), init_point_(init_point), speed_data_(speed_data) {}
+    : config_(config),
+      reference_line_(reference_line),
+      speed_data_(speed_data) {}
 
-bool DPRoadGraph::FindPathTunnel(const ReferenceLine &reference_line,
+bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
                                  PathData *const path_data) {
   CHECK_NOTNULL(path_data);
-  if (!Init(reference_line)) {
-    AERROR << "Fail to init dp road graph!";
+  init_point_ = init_point;
+  if (!reference_line_.get_point_in_frenet_frame(
+          {init_point_.path_point().x(), init_point_.path_point().y()},
+          &init_sl_point_)) {
+    AERROR << "Fail to creat init_sl_point from : " << init_point.DebugString();
     return false;
   }
   std::vector<DPRoadGraphNode> min_cost_path;
-  if (!Generate(reference_line, &min_cost_path)) {
+  if (!Generate(&min_cost_path)) {
     AERROR << "Fail to generate graph!";
     return false;
   }
@@ -97,13 +102,13 @@ bool DPRoadGraph::FindPathTunnel(const ReferenceLine &reference_line,
     common::math::Vec2d cartesian_point;
     sl_point.set_s(frenet_point.s());
     sl_point.set_l(frenet_point.l());
-    if (!reference_line.get_point_in_Cartesian_frame(sl_point,
-                                                     &cartesian_point)) {
+    if (!reference_line_.get_point_in_Cartesian_frame(sl_point,
+                                                      &cartesian_point)) {
       AERROR << "Fail to convert sl point to xy point";
       return false;
     }
     ReferencePoint ref_point =
-        reference_line.get_reference_point(frenet_point.s());
+        reference_line_.get_reference_point(frenet_point.s());
     double theta = SLAnalyticTransformation::calculate_theta(
         ref_point.heading(), ref_point.kappa(), frenet_point.l(),
         frenet_point.dl());
@@ -133,42 +138,11 @@ bool DPRoadGraph::FindPathTunnel(const ReferenceLine &reference_line,
   return true;
 }
 
-bool DPRoadGraph::Init(const ReferenceLine &reference_line) {
-  if (!reference_line.get_point_in_frenet_frame(
-          {init_point_.path_point().x(), init_point_.path_point().y()},
-          &init_sl_point_)) {
-    AERROR << "Fail to map init point from cartesian to sl coordinate!";
-    return false;
-  }
-
-  ReferencePoint reference_point =
-      reference_line.get_reference_point(init_sl_point_.s());
-
-  double init_dl = SLAnalyticTransformation::calculate_lateral_derivative(
-      reference_point.heading(), init_point_.path_point().theta(),
-      init_sl_point_.l(), reference_point.kappa());
-
-  double init_ddl =
-      SLAnalyticTransformation::calculate_second_order_lateral_derivative(
-          reference_point.heading(), init_point_.path_point().theta(),
-          reference_point.kappa(), init_point_.path_point().kappa(),
-          reference_point.dkappa(), init_sl_point_.l());
-
-  common::FrenetFramePoint init_frenet_frame_point;
-  init_frenet_frame_point.set_s(init_sl_point_.s());
-  init_frenet_frame_point.set_l(init_sl_point_.l());
-  init_frenet_frame_point.set_dl(init_dl);
-  init_frenet_frame_point.set_ddl(init_ddl);
-
-  return true;
-}
-
-bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
-                           std::vector<DPRoadGraphNode> *min_cost_path) {
+bool DPRoadGraph::Generate(std::vector<DPRoadGraphNode> *min_cost_path) {
   CHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
-  if (!SamplePathWaypoints(reference_line, init_point_, &path_waypoints)) {
+  if (!SamplePathWaypoints(init_point_, &path_waypoints)) {
     AERROR << "Fail to sample path waypoints!";
     return false;
   }
@@ -178,7 +152,7 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
 
-  TrajectoryCost trajectory_cost(config_, reference_line,
+  TrajectoryCost trajectory_cost(config_, reference_line_,
                                  vehicle_config.vehicle_param(), speed_data_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
@@ -224,8 +198,7 @@ bool DPRoadGraph::Generate(const ReferenceLine &reference_line,
 }
 
 bool DPRoadGraph::ComputeObjectDecision(
-    const PathData &path_data, const SpeedData &heuristic_speed_data,
-    const ReferenceLine &reference_line,
+    const PathData &path_data, const SpeedData &speed_data,
     const ConstPathObstacleList &path_obstacles,
     IdDecisionList *const decisions) {
   CHECK_NOTNULL(decisions);
@@ -249,7 +222,7 @@ bool DPRoadGraph::ComputeObjectDecision(
         common::math::Vec2d{path_point.x(), path_point.y()}, path_point.theta(),
         adc_length, adc_width);
     common::SLPoint adc_sl;
-    if (!reference_line.get_point_in_frenet_frame(
+    if (!reference_line_.get_point_in_frenet_frame(
             {path_point.x(), path_point.y()}, &adc_sl)) {
       AERROR << "get_point_in_Frenet_frame error for ego vehicle "
              << path_point.x() << " " << path_point.y();
@@ -329,7 +302,7 @@ bool DPRoadGraph::ComputeObjectDecision(
 
   // Compute dynamic obstacle decision
   const double total_time =
-      std::min(heuristic_speed_data.total_time(), FLAGS_prediction_total_time);
+      std::min(speed_data.total_time(), FLAGS_prediction_total_time);
   std::size_t evaluate_times = static_cast<std::size_t>(
       std::floor(total_time / config_.eval_time_interval()));
   for (const auto *path_obstacle : path_obstacles) {
@@ -340,8 +313,7 @@ bool DPRoadGraph::ComputeObjectDecision(
 
     // list of Box2d for ego car given heuristic speed profile
     std::vector<common::math::Box2d> adc_by_time;
-    if (!ComputeBoundingBoxesForAdc(path_data.frenet_frame_path(),
-                                    reference_line, heuristic_speed_data,
+    if (!ComputeBoundingBoxesForAdc(path_data.frenet_frame_path(), speed_data,
                                     evaluate_times, &adc_by_time)) {
       AERROR << "fill_adc_by_time error";
     }
@@ -356,8 +328,7 @@ bool DPRoadGraph::ComputeObjectDecision(
     // if two lists of boxes collide
     if (obstacle_by_time.size() != adc_by_time.size()) {
       AINFO << "dynamic_obstacle_by_time size[" << obstacle_by_time.size()
-            << "] != adc_by_time[" << adc_by_time.size()
-            << "] from heuristic_speed_data";
+            << "] != adc_by_time[" << adc_by_time.size() << "] from speed_data";
       continue;
     }
 
@@ -378,8 +349,7 @@ bool DPRoadGraph::ComputeObjectDecision(
 }
 
 bool DPRoadGraph::ComputeBoundingBoxesForAdc(
-    const FrenetFramePath &frenet_frame_path,
-    const ReferenceLine &reference_line, const SpeedData &heuristic_speed_data,
+    const FrenetFramePath &frenet_frame_path, const SpeedData &speed_data,
     const std::size_t evaluate_times,
     std::vector<common::math::Box2d> *adc_boxes) {
   CHECK(adc_boxes != nullptr);
@@ -392,8 +362,7 @@ bool DPRoadGraph::ComputeBoundingBoxesForAdc(
   for (std::size_t i = 0; i < evaluate_times; ++i) {
     double time_stamp = i * config_.eval_time_interval();
     common::SpeedPoint speed_point;
-    if (!heuristic_speed_data.get_speed_point_with_time(time_stamp,
-                                                        &speed_point)) {
+    if (!speed_data.get_speed_point_with_time(time_stamp, &speed_point)) {
       AINFO << "get_speed_point_with_time for time_stamp[" << time_stamp << "]";
       return false;
     }
@@ -408,10 +377,10 @@ bool DPRoadGraph::ComputeBoundingBoxesForAdc(
     common::SLPoint sl_point;
     sl_point.set_s(s);
     sl_point.set_l(l);
-    reference_line.get_point_in_Cartesian_frame(sl_point,
-                                                &adc_position_cartesian);
+    reference_line_.get_point_in_Cartesian_frame(sl_point,
+                                                 &adc_position_cartesian);
 
-    ReferencePoint reference_point = reference_line.get_reference_point(s);
+    ReferencePoint reference_point = reference_line_.get_reference_point(s);
 
     double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
     double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
@@ -425,7 +394,6 @@ bool DPRoadGraph::ComputeBoundingBoxesForAdc(
 }
 
 bool DPRoadGraph::SamplePathWaypoints(
-    const ReferenceLine &reference_line,
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
   CHECK(points != nullptr);
@@ -433,15 +401,15 @@ bool DPRoadGraph::SamplePathWaypoints(
   common::math::Vec2d init_cartesian_point(init_point.path_point().x(),
                                            init_point.path_point().y());
   common::SLPoint init_sl_point;
-  if (!reference_line.get_point_in_frenet_frame(init_cartesian_point,
-                                                &init_sl_point)) {
+  if (!reference_line_.get_point_in_frenet_frame(init_cartesian_point,
+                                                 &init_sl_point)) {
     AERROR << "Failed to get sl point from point "
            << init_cartesian_point.DebugString();
     return false;
   }
 
   const double reference_line_length =
-      reference_line.map_path().accumulated_s().back();
+      reference_line_.map_path().accumulated_s().back();
 
   double level_distance =
       std::fmax(config_.step_length_min(),
@@ -461,7 +429,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     for (int32_t j = -num; j < num + 1; ++j) {
       double l = config_.lateral_sample_offset() * j;
       auto sl = common::util::MakeSLPoint(s, l);
-      if (reference_line.is_on_road(sl)) {
+      if (reference_line_.is_on_road(sl)) {
         level_points.push_back(sl);
       }
     }
