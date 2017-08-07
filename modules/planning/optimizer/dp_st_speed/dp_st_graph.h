@@ -40,7 +40,7 @@ namespace planning {
 
 class DpStGraph {
  public:
-  explicit DpStGraph(const DpStSpeedConfig& dp_config);
+  DpStGraph(const DpStSpeedConfig& dp_config, const PathData& path_data);
 
   apollo::common::Status Search(const StGraphData& st_graph_data,
                                 PathDecision* const path_decision,
@@ -75,9 +75,28 @@ class DpStGraph {
                                    uint32_t* const lower_bound,
                                    uint32_t* const upper_bound) const;
 
+  /**
+   * @brief check if the ADC should follow an obstacle by examing the
+   *StGraphBoundary of the obstacle.
+   * @param boundary The boundary of the obstacle.
+   * @return true if the ADC believe it should follow the obstacle, and
+   *         false otherwise.
+   **/
+  bool CheckIsFollowByT(const StGraphBoundary& boundary) const;
+
+  /**
+   * @brief create follow decision based on the boundary
+   * @return true if the follow decision is created successfully, and
+   *         false otherwise.
+   **/
+  bool CreateFollowDecision(const StGraphBoundary& boundary,
+                            ObjectDecisionType* const follow_decision) const;
+
  private:
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
+
+  const PathData& path_data_;
 
   // cost utility with configuration;
   DpStCost dp_st_cost_;

@@ -26,6 +26,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
@@ -35,8 +36,11 @@ using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
 
-DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config)
-    : dp_st_speed_config_(dp_config), dp_st_cost_(dp_config) {}
+DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config,
+                     const PathData& path_data)
+    : dp_st_speed_config_(dp_config),
+      path_data_(path_data),
+      dp_st_cost_(dp_config) {}
 
 Status DpStGraph::Search(const StGraphData& st_graph_data,
                          PathDecision* const path_decision,
@@ -314,8 +318,12 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
     boundary_it->GetBoundaryTimeScope(&start_t, &end_t);
 
     bool go_down = true;
+    double min_t = speed_points.front().t();
+    double max_t = speed_points.front().t();
     for (std::vector<SpeedPoint>::const_iterator st_it = speed_points.begin();
          st_it != speed_points.end(); ++st_it) {
+      min_t = std::min(min_t, st_it->t());
+      max_t = std::max(max_t, st_it->t());
       if (st_it->t() < start_t) {
         continue;
       }
@@ -342,13 +350,32 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
       }
     }
     if (go_down) {
-      ObjectDecisionType yield_decision;
-      yield_decision.mutable_yield();
-      if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
-                                      yield_decision)) {
-        AERROR << "Failed to add yield decision to object "
-               << boundary_it->id();
-        return Status(ErrorCode::PLANNING_ERROR, "faind to add yield decision");
+      if (CheckIsFollowByT(*boundary_it)) {
+        ObjectDecisionType follow_decision;
+        if (!CreateFollowDecision(*boundary_it, &follow_decision)) {
+          AERROR << "Failed to create follow decision for boundary with id "
+                 << boundary_it->id();
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "faind to create follow decision");
+        }
+        if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
+                                        follow_decision)) {
+          AERROR << "Failed to add follow decision to object "
+                 << boundary_it->id();
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "faind to add follow decision");
+        }
+      } else {
+        ObjectDecisionType yield_decision;
+        yield_decision.mutable_yield();
+        // TODO(all) set yield point here.
+        if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
+                                        yield_decision)) {
+          AERROR << "Failed to add yield decision to object "
+                 << boundary_it->id();
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "faind to add yield decision");
+        }
       }
     } else {
       ObjectDecisionType overtake_decision;
@@ -363,6 +390,29 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
     }
   }
   return Status::OK();
+}
+
+bool DpStGraph::CreateFollowDecision(
+    const StGraphBoundary& boundary,
+    ObjectDecisionType* const follow_decision) const {
+  DCHECK_NOTNULL(follow_decision);
+  auto* follow = follow_decision->mutable_follow();
+  const double follow_distance_s = -1.0 * boundary.characteristic_length();
+  follow->set_distance_s(follow_distance_s);
+  const double reference_line_fence_s =
+      boundary.path_obstacle()->sl_boundary().start_s() + follow_distance_s;
+  common::PathPoint path_point;
+  if (!path_data_.get_path_point_with_ref_s(reference_line_fence_s,
+                                            &path_point)) {
+    AERROR << "Failed to get path point from reference line s "
+           << reference_line_fence_s;
+    return false;
+  }
+  auto* follow_point = follow->mutable_follow_point();
+  follow_point->set_x(path_point.x());
+  follow_point->set_y(path_point.y());
+  follow_point->set_z(0.0);
+  return true;
 }
 
 double DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
@@ -396,6 +446,11 @@ double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
   return dp_st_cost_.GetSpeedCost(second, third, speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(first, second, third) +
          dp_st_cost_.GetJerkCostByThreePoints(init_speed, first, second, third);
+}
+
+bool DpStGraph::CheckIsFollowByT(const StGraphBoundary& boundary) const {
+  return boundary.min_t() < FLAGS_st_follow_max_start_t &&
+         boundary.max_t() > FLAGS_st_follow_min_end_t;
 }
 
 }  // namespace planning

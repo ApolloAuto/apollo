@@ -84,6 +84,8 @@ DECLARE_double(nudge_distance_vehicle);
 DECLARE_double(nudge_distance_bicycle);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
+DECLARE_double(st_follow_max_start_t);
+DECLARE_double(st_follow_min_end_t);
 
 // Predeciton Part
 DECLARE_int32(adc_id);
