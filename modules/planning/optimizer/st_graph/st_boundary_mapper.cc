@@ -180,7 +180,7 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
   }
 
   const double st_stop_s = path_point.s() + stop_decision.stop().distance_s() -
-                           FLAGS_decision_valid_stop_range - adc_front_s_;
+                           FLAGS_decision_valid_stop_range;
   if (st_stop_s < 0.0) {
     AERROR << "obstacle st stop_s " << st_stop_s
            << " is less than adc_front_s: " << adc_front_s_;
