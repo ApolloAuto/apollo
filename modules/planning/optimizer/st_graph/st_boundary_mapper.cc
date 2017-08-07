@@ -459,18 +459,15 @@ Status StBoundaryMapper::GetSpeedLimits(
       break;
     }
 
-    // speed limit from reference line
     double speed_limit_on_reference_line =
-        std::fmin(st_boundary_config_.maximal_speed(),
-                  reference_line_.GetSpeedLimitFromS(path_point.s()));
+        reference_line_.GetSpeedLimitFromS(path_point.s());
 
     // speed limit from path curvature
     double speed_limit_on_path = std::sqrt(
         st_boundary_config_.centric_acceleration_limit() /
-        std::fmax(path_point.kappa(), st_boundary_config_.minimal_kappa()));
+        std::fmax(std::fabs(path_point.kappa()), st_boundary_config_.minimal_kappa()));
 
-    const double curr_speed_limit = std::fmax(
-        st_boundary_config_.lowest_speed(),
+    const double curr_speed_limit = std::fmax(st_boundary_config_.lowest_speed(),
         std::fmin(speed_limit_on_path, speed_limit_on_reference_line));
 
     common::SpeedPoint speed_point;

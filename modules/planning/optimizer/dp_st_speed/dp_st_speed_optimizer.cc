@@ -67,12 +67,12 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
 
-  StBoundaryMapper boundary_mapper(st_boundary_config_, reference_line,
+  StBoundaryMapper boundary_mapper(st_boundary_config_,
+                                   reference_line,
                                    path_data,
                                    dp_st_speed_config_.total_path_length(),
                                    dp_st_speed_config_.total_time());
 
-  const double path_length = path_data.discretized_path().length();
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
   if (!boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).ok()) {
@@ -91,6 +91,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  const double path_length = path_data.discretized_path().length();
   StGraphData st_graph_data(boundaries, init_point, speed_limit, path_length);
 
   DpStGraph st_graph(dp_st_speed_config_);
