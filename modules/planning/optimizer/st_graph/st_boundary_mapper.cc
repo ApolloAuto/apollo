@@ -103,7 +103,7 @@ Status StBoundaryMapper::GetGraphBoundary(
   ObjectDecisionType stop_decision;
   double min_stop_s = std::numeric_limits<double>::max();
 
-  for (const auto path_obstacle : path_obstacles.Items()) {
+  for (const auto& path_obstacle : path_obstacles.Items()) {
     const auto& obstacle = *path_obstacle->Obstacle();
     for (const auto& decision : path_obstacle->Decisions()) {
       StGraphBoundary boundary;
@@ -120,7 +120,7 @@ Status StBoundaryMapper::GetGraphBoundary(
                               decision.stop().distance_s();
         if (stop_s < adc_front_s_) {
           AERROR << "Invalid stop decision. not stop at ahead of current "
-                    "postion. stop_s : "
+                    "position. stop_s : "
                  << stop_s << ", and current adc_s is; " << adc_front_s_;
           return Status(ErrorCode::PLANNING_ERROR, "invalid decision");
         }
@@ -181,6 +181,7 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
   }
 
   const double s_min = st_stop_s;
+  //TODO: what is 1.0 here?
   const double s_max = std::fmax(
       s_min + 1.0, std::fmax(planning_distance_, reference_line_.length()));
   std::vector<STPoint> boundary_points;
@@ -418,15 +419,16 @@ double StBoundaryMapper::GetArea(
   }
 
   double area = 0.0;
-  for (uint32_t i = 1; i < boundary_points.size(); ++i) {
+  for (uint32_t i = 2; i < boundary_points.size(); ++i) {
     const double ds1 = boundary_points[i - 1].s() - boundary_points[0].s();
-    const double dt1 = boundary_points[i].t() - boundary_points[0].t();
+    const double dt1 = boundary_points[i - 1].t() - boundary_points[0].t();
+
     const double ds2 = boundary_points[i].s() - boundary_points[0].s();
-    const double dt2 = boundary_points[i - 1].t() - boundary_points[0].t();
+    const double dt2 = boundary_points[i].t() - boundary_points[0].t();
     // cross product
-    area += (ds1 * dt1 - ds2 * dt2);
+    area += (ds1 * dt2 - ds2 * dt1);
   }
-  return fabs(area);
+  return fabs(area * 0.5);
 }
 
 bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
@@ -438,7 +440,7 @@ bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
       path_point.x() - mid_to_rear_center * std::cos(path_point.theta());
   const double y =
       path_point.y() - mid_to_rear_center * std::sin(path_point.theta());
-  const apollo::common::math::Box2d adc_box = apollo::common::math::Box2d(
+  const Box2d adc_box = Box2d(
       {x, y}, path_point.theta(), vehicle_param_.length() + 2 * buffer,
       vehicle_param_.width() + 2 * buffer);
   return obs_box.HasOverlap(adc_box);
