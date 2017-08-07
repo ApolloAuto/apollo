@@ -200,6 +200,7 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
   *boundary = StGraphBoundary(&stop_obstacle, boundary_points);
   boundary->SetBoundaryType(StGraphBoundary::BoundaryType::STOP);
   boundary->SetCharacteristicLength(st_boundary_config_.boundary_buffer());
+  boundary->set_id(stop_obstacle.Id());
   return true;
 }
 
