@@ -18,8 +18,8 @@
  * @points_downsampler
  */
 
-#ifndef MODULES_COMMON_UTIL_DOWN_SAMPLER_H_
-#define MODULES_COMMON_UTIL_DOWN_SAMPLER_H_
+#ifndef MODULES_COMMON_UTIL_POINTS_DOWNSAMPLER_H_
+#define MODULES_COMMON_UTIL_POINTS_DOWNSAMPLER_H_
 
 #include <cmath>
 #include <vector>
@@ -113,4 +113,4 @@ bool DownSampleByAngle(const std::vector<PointType> &points,
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_DOWN_SAMPLER_H_
+#endif  // MODULES_COMMON_UTIL_POINTS_DOWNSAMPLER_H_
