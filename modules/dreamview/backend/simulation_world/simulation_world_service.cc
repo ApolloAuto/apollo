@@ -480,22 +480,22 @@ void SimulationWorldService::UpdateMainDecision(
     double update_timestamp_sec, Object *world_main_stop) {
   apollo::common::math::Vec2d stop_pt;
   double stop_heading = 0.0;
+  auto decision = world_main_stop->add_decision();
+  decision->set_type(Decision::STOP);
   if (main_decision.has_not_ready()) {
     // The car is not ready!
     // Use the current ADC pose since it is better not to self-drive.
     stop_pt.set_x(world_.auto_driving_car().position_x());
     stop_pt.set_y(world_.auto_driving_car().position_y());
     stop_heading = world_.auto_driving_car().heading();
-    world_main_stop->add_decision()->set_stopreason(
-        Decision::STOP_REASON_NOT_READY);
+    decision->set_stopreason(Decision::STOP_REASON_NOT_READY);
   } else if (main_decision.has_estop()) {
     // Emergency stop.
     // Use the current ADC pose since it is better to stop immediately.
     stop_pt.set_x(world_.auto_driving_car().position_x());
     stop_pt.set_y(world_.auto_driving_car().position_y());
     stop_heading = world_.auto_driving_car().heading();
-    world_main_stop->add_decision()->set_stopreason(
-        Decision::STOP_REASON_EMERGENCY);
+    decision->set_stopreason(Decision::STOP_REASON_EMERGENCY);
     world_.mutable_auto_driving_car()->set_current_signal("EMERGENCY");
   } else {
     // Normal stop.
@@ -504,7 +504,7 @@ void SimulationWorldService::UpdateMainDecision(
     stop_pt.set_y(stop.stop_point().y());
     stop_heading = stop.stop_heading();
     if (stop.has_reason_code()) {
-      SetStopReason(stop.reason_code(), world_main_stop->add_decision());
+      SetStopReason(stop.reason_code(), decision);
     }
   }
   world_main_stop->set_position_x(stop_pt.x());
