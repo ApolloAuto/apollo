@@ -34,7 +34,7 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-DECLARE_string(test_routing_result_file);
+DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
 DECLARE_string(test_chassis_file);
 
@@ -44,12 +44,12 @@ class PlanningTestBase : public ::testing::Test {
    * @brief set common data settings, such as gflags path configurations.
    * If in your local test, you want to use a different file,
    * call this function first, and add the new settings.
-   * For example, if you want to let FLAGS_test_routing_result_file =
+   * For example, if you want to let FLAGS_test_routing_response_file =
    * "new_routing.pb.txt", You can implement your own SetDataConfigs by
    * ```
    * virtual void SetDataConfigs() {
    *   PlanningTestBase::SetDataConfigs();
-   *   FLAGS_test_routing_result_file = "new_routing.pb.txt"
+   *   FLAGS_test_routing_response_file = "new_routing.pb.txt"
    * }
    * ```
    */

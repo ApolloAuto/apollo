@@ -122,7 +122,7 @@ class Frame {
  private:
   common::TrajectoryPoint planning_start_point_;
 
-  routing::RoutingResponse routing_result_;
+  routing::RoutingResponse routing_response_;
   prediction::PredictionObstacles prediction_;
   IndexedObstacles obstacles_;
   std::unique_ptr<PathDecision> path_decision_;
