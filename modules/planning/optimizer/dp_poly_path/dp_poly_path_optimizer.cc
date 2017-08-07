@@ -64,8 +64,8 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
   const auto &path_obstacles =
       frame_->path_decision()->path_obstacles().Items();
   IdDecisionList decision_list;
-  if (!dp_road_graph.ComputeObjectDecision(*path_data, speed_data,
-                                           path_obstacles, &decision_list)) {
+  if (!dp_road_graph.ComputeObjectDecision(*path_data, path_obstacles,
+                                           &decision_list)) {
     AERROR << "Failed to make decision based on tunnel";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
   }

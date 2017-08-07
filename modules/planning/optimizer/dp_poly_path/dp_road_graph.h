@@ -51,8 +51,7 @@ class DPRoadGraph {
                       PathData *const path_data);
 
   bool ComputeObjectDecision(const PathData &path_data,
-                             const SpeedData &speed_data,
-                             const ConstPathObstacleList &obstacles,
+                             const ConstPathObstacleList &path_obstacles,
                              IdDecisionList *const decisions);
 
  private:
@@ -86,16 +85,27 @@ class DPRoadGraph {
     QuinticPolynomialCurve1d min_cost_curve;
   };
 
-  bool Generate(std::vector<DPRoadGraphNode> *min_cost_path);
+  bool GenerateMinCostPath(std::vector<DPRoadGraphNode> *min_cost_path);
 
   bool ComputeBoundingBoxesForAdc(
-      const FrenetFramePath &frenet_frame_path, const SpeedData &speed_data,
+      const FrenetFramePath &frenet_frame_path,
       const std::size_t evaluate_times,
       std::vector<common::math::Box2d> *adc_by_time);
 
   bool SamplePathWaypoints(
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
+
+  bool MakeDynamicObstcleDecision(const PathData &path_data,
+                                  const ConstPathObstacleList &path_obstacles,
+                                  IdDecisionList *decisions);
+
+  bool MakeStaticObstacleDecision(const PathData &path_data,
+                                  const ConstPathObstacleList &path_obstacles,
+                                  IdDecisionList *const decisions);
+
+  bool FrenetToCartesian(const FrenetFramePath &frenet_path,
+                         DiscretizedPath *const discretized_path);
 
  private:
   DpPolyPathConfig config_;
