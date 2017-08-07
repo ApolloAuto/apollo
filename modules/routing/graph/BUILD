@@ -60,5 +60,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "topo_node_test",
+    size = "small",
+    srcs = [
+        "topo_node_test.cc",
+    ],
+    deps = [
+        ":routing_graph_test_utils",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
