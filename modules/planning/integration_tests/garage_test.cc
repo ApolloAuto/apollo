@@ -45,17 +45,18 @@ class GarageTest : public PlanningTestBase {
 
 TEST_F(GarageTest, Stop) {
   FLAGS_test_prediction_file =
-      "modules/planning/integration_tests/garage_test/"
+      "modules/planning/testdata/garage_test/"
       "stop_obstacle_prediction.pb.txt";
   FLAGS_test_localization_file =
-      "modules/planning/integration_tests/garage_test/"
+      "modules/planning/testdata/garage_test/"
       "stop_obstacle_localization.pb.txt";
   FLAGS_test_chassis_file =
-      "modules/planning/integration_tests/garage_test/"
+      "modules/planning/testdata/garage_test/"
       "stop_obstacle_chassis.pb.txt";
-  EXPECT_DEATH(PlanningTestBase::SetUp(), ".*SetUpAdapters.*");
-  // RunPlanning();
-  // ASSERT_TRUE(adc_trajectory_ != nullptr);
+  // EXPECT_DEATH(PlanningTestBase::SetUp(), ".*SetUpAdapters.*");
+  PlanningTestBase::SetUp();
+  RunPlanning();
+  ASSERT_TRUE(adc_trajectory_ != nullptr);
 }
 
 }  // namespace planning

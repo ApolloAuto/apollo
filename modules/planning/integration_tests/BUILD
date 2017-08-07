@@ -26,20 +26,13 @@ cc_library(
     ],
 )
 
-filegroup(
-    name = "garage_testdata",
-    srcs = glob([
-        "garage/**",
-    ]),
-)
-
 cc_test(
     name = "garage_test",
     srcs = [
         "garage_test.cc",
     ],
     data = [
-        "garage_testdata",
+        "//modules/planning:planning_testdata",
     ],
     deps = [
         ":planning_test_base",
