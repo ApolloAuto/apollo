@@ -261,8 +261,6 @@ class Path {
   bool get_width(const double s, double* left_width, double* right_width) const;
 
   bool is_on_path(const common::math::Vec2d& point) const;
-  // requires all corners of the box on path.
-  bool is_on_path(const common::math::Box2d& box) const;
   bool overlap_with(const common::math::Box2d& box, double width) const;
 
   std::string debug_string() const;
