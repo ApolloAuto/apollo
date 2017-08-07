@@ -10,11 +10,11 @@ Path is defined in station-lateral corrdination system. The **s** range from vei
 
 ### 1.2  Get spline segments
 
-Split the path into n segments. each segment trajectory is defined b a polynomial. 
+Split the path into n segments. each segment trajectory is defined by a polynomial.
 
-### 1.3 define function for each spline segment
+### 1.3 Define function for each spline segment
 
-Each segment *i* has accumulated distance $d_i$ along reference line. And the trajactory for the segment is defined as a  polynomial of degree five by default
+Each segment *i* has accumulated distance $d_i$ along reference line. And the trajactory for the segment is defined as a polynomial of degree five by default
 
 $$
 l = f_i(s) 
