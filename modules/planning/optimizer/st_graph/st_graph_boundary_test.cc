@@ -24,6 +24,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/log.h"
+#include "modules/planning/common/path_obstacle.h"
 
 namespace apollo {
 namespace planning {
@@ -35,7 +36,8 @@ TEST(StGraphBoundaryTest, basic_test) {
   st_points.emplace_back(5.0, 10.0);
   st_points.emplace_back(5.0, 0.0);
 
-  StGraphBoundary boundary(st_points);
+  PathObstacle path_obstacle;
+  StGraphBoundary boundary(&path_obstacle, st_points);
   EXPECT_EQ(boundary.id(), "");
   EXPECT_EQ(boundary.boundary_type(), StGraphBoundary::BoundaryType::UNKNOWN);
   double left_t = 0.0;
