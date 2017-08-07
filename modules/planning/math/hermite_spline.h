@@ -36,9 +36,9 @@ class HermiteSpline {
 
   virtual ~HermiteSpline() = default;
 
-  virtual T evaluate(const std::uint32_t order, const double z) const;
+  virtual T Evaluate(const std::uint32_t order, const double z) const;
 
-  // virtual std::array<T, N> evaluate(const double z) const;
+  // virtual std::array<T, N> Evaluate(const double z) const;
  private:
   std::array<T, (N + 1) / 2> _x0;
 
@@ -59,7 +59,7 @@ inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
 }
 
 template <typename T, std::uint32_t N>
-inline T HermiteSpline<T, N>::evaluate(const std::uint32_t order,
+inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
                                        const double z) const {
   CHECK_LE(_z0, z);
   CHECK_LE(z, _z0 + delta_z_);

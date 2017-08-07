@@ -24,8 +24,8 @@
 namespace apollo {
 namespace planning {
 
-double CurveMath::compute_curvature(const double dx, const double d2x,
-                                    const double dy, const double d2y) {
+double CurveMath::ComputeCurvature(const double dx, const double d2x,
+                                   const double dy, const double d2y) {
   double a = dx * d2y - dy * d2x;
   double dx_dy_norm_square = dx * dx + dy * dy;
   double dx_dy_norm = std::sqrt(dx_dy_norm_square);
@@ -33,9 +33,10 @@ double CurveMath::compute_curvature(const double dx, const double d2x,
   return a / b;
 }
 
-double CurveMath::compute_curvature_derivative(
-    const double dx, const double d2x, const double d3x, const double dy,
-    const double d2y, const double d3y) {
+double CurveMath::ComputeCurvatureDerivative(const double dx, const double d2x,
+                                             const double d3x, const double dy,
+                                             const double d2y,
+                                             const double d3y) {
   double a = dx * d2y - dy * d2x;
   double dx_dy_norm_square = dx * dx + dy * dy;
   double dx_dy_norm = std::sqrt(dx_dy_norm_square);

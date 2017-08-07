@@ -64,14 +64,14 @@ bool SpeedData::get_speed_point_with_time(
     return false;
   }
   std::uint32_t index = find_index(t);
-  if (Double::compare(t, speed_vector_[index].t()) < 0 ||
+  if (Double::Compare(t, speed_vector_[index].t()) < 0 ||
       index + 1 >= speed_vector_.size()) {
     return false;
   }
 
   // index index + 1
   double weight = 0.0;
-  if (Double::compare(speed_vector_[index + 1].t(), speed_vector_[index].t()) >
+  if (Double::Compare(speed_vector_[index + 1].t(), speed_vector_[index].t()) >
       0) {
     weight = (t - speed_vector_[index].t()) /
              (speed_vector_[index + 1].t() - speed_vector_[index].t());

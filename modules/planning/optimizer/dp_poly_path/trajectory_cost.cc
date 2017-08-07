@@ -42,7 +42,6 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
       reference_line_(&reference_line),
       vehicle_param_(vehicle_param),
       heuristic_speed_data_(heuristic_speed_data) {
-
   const double total_time =
       std::min(heuristic_speed_data_.total_time(), FLAGS_prediction_total_time);
 
@@ -57,10 +56,10 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
   // path_cost
   double path_s = 0.0;
   while (path_s < (end_s - start_s)) {
-    double l = std::fabs(curve.evaluate(0, path_s));
+    double l = std::fabs(curve.Evaluate(0, path_s));
     total_cost += l;
 
-    double dl = std::fabs(curve.evaluate(1, path_s));
+    double dl = std::fabs(curve.Evaluate(1, path_s));
     total_cost += dl;
     // TODO(all): add the 5.0 as a parameter into config
     path_s += config_.path_resolution() / 5.0;

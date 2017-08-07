@@ -36,8 +36,8 @@ class CurveMath {
    * @param d2y d(dy) / dt
    * @return the curvature
    */
-  static double compute_curvature(const double dx, const double d2x,
-                                  const double dy, const double d2y);
+  static double ComputeCurvature(const double dx, const double d2x,
+                                 const double dy, const double d2y);
 
   /**
    * @brief Compute the curvature change rate w.r.t. curve length (dkappa) given
@@ -51,10 +51,9 @@ class CurveMath {
    * @param d3y d(d2y) / dt
    * @return the curvature change rate
    */
-  static double compute_curvature_derivative(const double dx, const double d2x,
-                                             const double d3x, const double dy,
-                                             const double d2y,
-                                             const double d3y);
+  static double ComputeCurvatureDerivative(const double dx, const double d2x,
+                                           const double d3x, const double dy,
+                                           const double d2y, const double d3y);
 };
 
 }  // namespace planning

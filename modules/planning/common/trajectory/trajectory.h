@@ -34,7 +34,7 @@ class Trajectory {
 
   virtual double time_length() const = 0;
 
-  virtual apollo::common::TrajectoryPoint evaluate(
+  virtual apollo::common::TrajectoryPoint Evaluate(
       const double relative_time) const = 0;
 
   virtual apollo::common::TrajectoryPoint start_point() const = 0;

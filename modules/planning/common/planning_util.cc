@@ -43,11 +43,11 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   std::array<double, 2> gx1{{p1.theta(), p1.kappa()}};
   HermiteSpline<double, 3> geometry_spline(gx0, gx1, s0, s1);
   auto func_cos_theta = [&geometry_spline](const double s) {
-    auto theta = geometry_spline.evaluate(0, s);
+    auto theta = geometry_spline.Evaluate(0, s);
     return std::cos(theta);
   };
   auto func_sin_theta = [&geometry_spline](const double s) {
-    auto theta = geometry_spline.evaluate(0, s);
+    auto theta = geometry_spline.Evaluate(0, s);
     return std::sin(theta);
   };
 
@@ -55,10 +55,10 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
       p0.x() + common::math::IntegrateByGaussLegendre(func_cos_theta, s0, s);
   double y =
       p0.y() + common::math::IntegrateByGaussLegendre(func_sin_theta, s0, s);
-  double theta = geometry_spline.evaluate(0, s);
-  double kappa = geometry_spline.evaluate(1, s);
-  double dkappa = geometry_spline.evaluate(2, s);
-  double d2kappa = geometry_spline.evaluate(3, s);
+  double theta = geometry_spline.Evaluate(0, s);
+  double kappa = geometry_spline.Evaluate(1, s);
+  double dkappa = geometry_spline.Evaluate(2, s);
+  double d2kappa = geometry_spline.Evaluate(3, s);
 
   PathPoint p;
   p.set_x(x);
@@ -113,9 +113,8 @@ PathPoint interpolate_linear_approximation(const PathPoint &p0,
 
 TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
                             const TrajectoryPoint &tp1, const double t) {
-
   if (std::abs(tp0.path_point().s() - tp0.path_point().s()) < 1.0e-4) {
-      return tp1;
+    return tp1;
   }
 
   const PathPoint &pp0 = tp0.path_point();
@@ -129,27 +128,27 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
 
   double s0 = 0.0;
   auto func_v = [&dynamic_spline](const double t) {
-    return dynamic_spline.evaluate(0, t);
+    return dynamic_spline.Evaluate(0, t);
   };
   double s1 = common::math::IntegrateByGaussLegendre(func_v, t0, t1);
   double s = common::math::IntegrateByGaussLegendre(func_v, t0, t);
 
   if (std::abs(tp0.path_point().s() - s1) < 1.0e-4) {
-      return tp1;
+    return tp1;
   }
 
-  double v = dynamic_spline.evaluate(0, t);
-  double a = dynamic_spline.evaluate(1, t);
+  double v = dynamic_spline.Evaluate(0, t);
+  double a = dynamic_spline.Evaluate(1, t);
 
   std::array<double, 2> gx0{{pp0.theta(), pp0.kappa()}};
   std::array<double, 2> gx1{{pp1.theta(), pp1.kappa()}};
   HermiteSpline<double, 3> geometry_spline(gx0, gx1, s0, s1);
   auto func_cos_theta = [&geometry_spline](const double s) {
-    auto theta = geometry_spline.evaluate(0, s);
+    auto theta = geometry_spline.Evaluate(0, s);
     return std::cos(theta);
   };
   auto func_sin_theta = [&geometry_spline](const double s) {
-    auto theta = geometry_spline.evaluate(0, s);
+    auto theta = geometry_spline.Evaluate(0, s);
     return std::sin(theta);
   };
 
@@ -157,10 +156,10 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
       pp0.x() + common::math::IntegrateByGaussLegendre(func_cos_theta, s0, s);
   double y =
       pp0.y() + common::math::IntegrateByGaussLegendre(func_sin_theta, s0, s);
-  double theta = geometry_spline.evaluate(0, s);
-  double kappa = geometry_spline.evaluate(1, s);
-  double dkappa = geometry_spline.evaluate(2, s);
-  double d2kappa = geometry_spline.evaluate(3, s);
+  double theta = geometry_spline.Evaluate(0, s);
+  double kappa = geometry_spline.Evaluate(1, s);
+  double dkappa = geometry_spline.Evaluate(2, s);
+  double d2kappa = geometry_spline.Evaluate(3, s);
 
   TrajectoryPoint tp;
   tp.set_v(v);

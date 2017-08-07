@@ -45,7 +45,7 @@ double DiscretizedTrajectory::time_length() const {
          _trajectory_points.front().relative_time();
 }
 
-TrajectoryPoint DiscretizedTrajectory::evaluate(
+TrajectoryPoint DiscretizedTrajectory::Evaluate(
     const double relative_time) const {
   CHECK(!_trajectory_points.empty());
   CHECK(_trajectory_points.front().relative_time() <= relative_time &&
