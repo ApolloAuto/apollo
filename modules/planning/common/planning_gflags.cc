@@ -68,6 +68,8 @@ DEFINE_double(replan_l_threshold, 2.5,
 DEFINE_double(default_reference_line_width, 4.0,
               "Default reference line width");
 
+DEFINE_double(planning_speed_upper_limit, 10.0, "Maximum speed in planning.");
+
 DEFINE_double(planning_distance, 100, "Planning distance");
 
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
@@ -78,10 +80,6 @@ DEFINE_double(output_trajectory_time_resolution, 0.05,
 
 DEFINE_double(speed_lower_bound, 0.0, "The lowest speed allowed.");
 DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
-
-DEFINE_double(
-    default_speed_limit, 10.0,
-    "The default speed limit, if speed limit is not marked on map lane");
 
 DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
               "The lowest longitudinal acceleration allowed.");

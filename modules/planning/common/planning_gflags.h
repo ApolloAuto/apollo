@@ -43,6 +43,7 @@ DECLARE_double(replan_l_threshold);
 
 // parameter for reference line
 DECLARE_double(default_reference_line_width);
+DECLARE_double(planning_speed_upper_limit);
 
 // parameters for task manager
 DECLARE_string(reference_line_decider);
@@ -55,7 +56,6 @@ DECLARE_double(output_trajectory_time_resolution);
 // parameters for trajectory sanity check
 DECLARE_double(speed_lower_bound);
 DECLARE_double(speed_upper_bound);
-DECLARE_double(default_speed_limit);
 
 DECLARE_double(longitudinal_acceleration_lower_bound);
 DECLARE_double(longitudinal_acceleration_upper_bound);
