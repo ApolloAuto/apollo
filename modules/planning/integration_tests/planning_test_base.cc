@@ -24,7 +24,7 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-DEFINE_string(test_routing_result_file,
+DEFINE_string(test_routing_response_file,
               "modules/planning/testdata/garage_routing.pb.txt",
               "The routing file used in test");
 DEFINE_string(test_localization_file,
@@ -69,8 +69,8 @@ bool PlanningTestBase::SetUpAdapters() {
     return false;
   }
   if (!AdapterManager::FeedRoutingResponseFile(
-          FLAGS_test_routing_result_file)) {
-    AERROR << "failed to routing file: " << FLAGS_test_routing_result_file;
+          FLAGS_test_routing_response_file)) {
+    AERROR << "failed to routing file: " << FLAGS_test_routing_response_file;
     return false;
   }
   if (!AdapterManager::FeedLocalizationFile(FLAGS_test_localization_file)) {

@@ -41,7 +41,7 @@ using Vec2d = apollo::common::math::Vec2d;
 using LaneWaypoint = apollo::hdmap::LaneWaypoint;
 using LaneInfoConstPtr = apollo::hdmap::LaneInfoConstPtr;
 
-DECLARE_bool(validate_routing_result_for_trajectories);
+DECLARE_bool(validate_routing_response_for_trajectories);
 
 namespace apollo {
 namespace hdmap {
