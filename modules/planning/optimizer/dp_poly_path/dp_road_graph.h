@@ -42,17 +42,16 @@ namespace planning {
 class DPRoadGraph {
  public:
   explicit DPRoadGraph(const DpPolyPathConfig &config,
-                       const common::TrajectoryPoint &init_point,
+                       const ReferenceLine &reference_line,
                        const SpeedData &speed_data);
 
   ~DPRoadGraph() = default;
 
-  bool FindPathTunnel(const ReferenceLine &reference_line,
+  bool FindPathTunnel(const common::TrajectoryPoint &init_point,
                       PathData *const path_data);
 
   bool ComputeObjectDecision(const PathData &path_data,
-                             const SpeedData &heuristic_speed_data,
-                             const ReferenceLine &reference_line,
+                             const SpeedData &speed_data,
                              const ConstPathObstacleList &obstacles,
                              IdDecisionList *const decisions);
 
@@ -87,25 +86,21 @@ class DPRoadGraph {
     QuinticPolynomialCurve1d min_cost_curve;
   };
 
-  bool Init(const ReferenceLine &reference_line);
-
-  bool Generate(const ReferenceLine &reference_line,
-                std::vector<DPRoadGraphNode> *min_cost_path);
+  bool Generate(std::vector<DPRoadGraphNode> *min_cost_path);
 
   bool ComputeBoundingBoxesForAdc(
-      const FrenetFramePath &frenet_frame_path,
-      const ReferenceLine &reference_line,
-      const SpeedData &heuristic_speed_data, const std::size_t evaluate_times,
+      const FrenetFramePath &frenet_frame_path, const SpeedData &speed_data,
+      const std::size_t evaluate_times,
       std::vector<common::math::Box2d> *adc_by_time);
 
   bool SamplePathWaypoints(
-      const ReferenceLine &reference_line,
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
 
  private:
   DpPolyPathConfig config_;
   common::TrajectoryPoint init_point_;
+  const ReferenceLine &reference_line_;
   SpeedData speed_data_;
   common::SLPoint init_sl_point_;
 };
