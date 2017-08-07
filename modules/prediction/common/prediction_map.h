@@ -33,8 +33,6 @@ namespace prediction {
 
 class PredictionMap {
  public:
-  apollo::hdmap::Id id(const std::string& str_id);
-
   static Eigen::Vector2d PositionOnLane(
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
       const double s);

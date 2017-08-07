@@ -38,11 +38,6 @@ class PredictionMapTest : public ::testing::Test {
   PredictionMap *map_;
 };
 
-TEST_F(PredictionMapTest, set_id) {
-  Id id = map_->id("l20");
-  EXPECT_EQ("l20", id.id());
-}
-
 TEST_F(PredictionMapTest, get_lane_info) {
   std::shared_ptr<const LaneInfo> lane_info = map_->LaneById("l20");
   EXPECT_TRUE(lane_info != nullptr);

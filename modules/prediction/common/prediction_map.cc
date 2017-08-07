@@ -25,6 +25,7 @@
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -49,12 +50,6 @@ bool PredictionMap::LoadMap() {
   }
   AINFO << "Succeeded in loading map file: " << FLAGS_map_file << ".";
   return true;
-}
-
-Id PredictionMap::id(const std::string& str_id) {
-  Id id;
-  id.set_id(str_id);
-  return id;
 }
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
@@ -103,9 +98,7 @@ std::shared_ptr<const LaneInfo> PredictionMap::LaneById(const Id& id) {
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
     const std::string& str_id) {
-  Id id;
-  id.set_id(str_id);
-  return LaneById(id);
+  return LaneById(apollo::common::util::MakeMapId(str_id));
 }
 
 void PredictionMap::GetProjection(const Eigen::Vector2d& position,
@@ -412,7 +405,7 @@ int PredictionMap::LaneTurnType(const Id& id) {
 }
 
 int PredictionMap::LaneTurnType(const std::string& lane_id) {
-  return LaneTurnType(id(lane_id));
+  return LaneTurnType(apollo::common::util::MakeMapId(lane_id));
 }
 
 }  // namespace prediction
