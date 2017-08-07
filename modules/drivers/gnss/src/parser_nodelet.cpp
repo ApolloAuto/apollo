@@ -41,7 +41,7 @@ void ParserNodelet::onInit() {
   ros::NodeHandle& nh = getPrivateNodeHandle();
   std::string gnss_conf;
   std::string raw_data_topic;
-  std::string gpgga_topic;
+  std::string ins_stat_topic;
   std::string corr_imu_topic;
   std::string odometry_topic;
   std::string gnss_status_topic;
@@ -50,8 +50,8 @@ void ParserNodelet::onInit() {
   nh.param("gnss_conf", gnss_conf, std::string("./conf/gnss_conf.txt"));
   nh.param("raw_data_topic", raw_data_topic,
            std::string("/apollo/sensor/gnss/raw_data"));
-  nh.param("gpgga_topic", gpgga_topic,
-           std::string("/apollo/sensor/gnss/gpgga"));
+  nh.param("ins_stat_topic", ins_stat_topic,
+           std::string("/apollo/sensor/gnss/ins_stat"));
   nh.param("corr_imu_topic", corr_imu_topic,
            std::string("/apollo/sensor/gnss/corrected_imu"));
   nh.param("odometry_topic", odometry_topic,
@@ -61,7 +61,7 @@ void ParserNodelet::onInit() {
   nh.param("ins_status_topic", ins_status_topic,
            std::string("/apollo/sensor/gnss/ins_status"));
 
-  _data_parser.reset(new DataParser(nh, raw_data_topic, gpgga_topic,
+  _data_parser.reset(new DataParser(nh, raw_data_topic, ins_stat_topic,
                                     corr_imu_topic, odometry_topic,
                                     gnss_status_topic, ins_status_topic));
   if (!_data_parser->init(gnss_conf)) {
