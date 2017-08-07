@@ -15,9 +15,9 @@
   *****************************************************************************/
 
 #include "modules/routing/graph/topo_graph.h"
+#include "modules/common/util/file.h"
 #include "modules/routing/common/utils.h"
 #include "modules/routing/graph/topo_node.h"
-#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace routing {
@@ -71,8 +71,7 @@ bool TopoGraph::load_graph(const std::string& file_path) {
   clear();
 
   ::apollo::routing::Graph graph;
-  if (!::apollo::common::util::GetProtoFromFile(
-          file_path, &graph)) {
+  if (!::apollo::common::util::GetProtoFromFile(file_path, &graph)) {
     AERROR << "Failed to read topology graph from data.";
     AERROR << "File Path: " << file_path;
     return false;
