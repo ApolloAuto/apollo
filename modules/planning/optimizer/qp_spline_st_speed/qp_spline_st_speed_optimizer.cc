@@ -94,7 +94,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
   StBoundaryMapper boundary_mapper(
-      st_boundary_config_, reference_line, path_data, init_point,
+      st_boundary_config_, reference_line, path_data,
       qp_spline_st_speed_config_.total_path_length(),
       qp_spline_st_speed_config_.total_time());
 
