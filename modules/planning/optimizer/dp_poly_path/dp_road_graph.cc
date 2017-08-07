@@ -291,21 +291,12 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
           object_stop_ptr->set_reason_code(
               StopReasonCode::STOP_REASON_OBSTACLE);
 
-          common::SLPoint stop_line_sl;
-          stop_line_sl.set_s(sl_boundary.start_s() -
-                             FLAGS_dp_path_decision_buffer);
-          stop_line_sl.set_l(0);
-          common::math::Vec2d stop_point;
-          if (!reference_line_.get_point_in_Cartesian_frame(
-              stop_line_sl, &stop_point)) {
-            AERROR << "Fail to get_point_in_Cartesian_frame: {"
-                << stop_line_sl.s() << ", " << stop_line_sl.l() << "}";
-            return false;
-          }
-          object_stop_ptr->mutable_stop_point()->set_x(stop_point.x());
-          object_stop_ptr->mutable_stop_point()->set_y(stop_point.y());
-          // TODO(all): to be added
-          // object_stop_ptr->set_stop_heading();
+          auto stop_ref_s = sl_boundary.start_s()
+              - FLAGS_dp_path_decision_buffer;
+          auto stop_ref_point = reference_line_.get_reference_point(stop_ref_s);
+          object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
+          object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
+          object_stop_ptr->set_stop_heading(stop_ref_point.heading());
 
           decisions->emplace_back(obstacle->Id(), object_stop);
           ignore = false;
