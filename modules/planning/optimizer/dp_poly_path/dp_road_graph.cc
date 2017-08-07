@@ -63,7 +63,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
     return false;
   }
   std::vector<DPRoadGraphNode> min_cost_path;
-  if (!Generate(&min_cost_path)) {
+  if (!GenerateMinCostPath(&min_cost_path)) {
     AERROR << "Fail to generate graph!";
     return false;
   }
@@ -94,10 +94,22 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   }
   FrenetFramePath tunnel(frenet_path);
 
+  DiscretizedPath discretized_path;
+  if (!FrenetToCartesian(tunnel, &discretized_path)) {
+    AERROR << "Failed to convert dp graph tunnel to PathData";
+    return false;
+  }
   path_data->set_frenet_path(tunnel);
+  path_data->set_discretized_path(discretized_path);
+  return true;
+}
+
+bool DPRoadGraph::FrenetToCartesian(const FrenetFramePath &frenet_path,
+                                    DiscretizedPath *const discretized_path) {
+  DCHECK_NOTNULL(discretized_path);
   // convert frenet path to cartesian path by reference line
   std::vector<common::PathPoint> path_points;
-  for (const common::FrenetFramePoint &frenet_point : frenet_path) {
+  for (const common::FrenetFramePoint &frenet_point : frenet_path.points()) {
     common::SLPoint sl_point;
     common::math::Vec2d cartesian_point;
     sl_point.set_s(frenet_point.s());
@@ -126,7 +138,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
     path_point.set_ddkappa(0.0);
     path_point.set_s(0.0);
 
-    if (path_points.size() != 0) {
+    if (!path_points.empty()) {
       common::math::Vec2d last(path_points.back().x(), path_points.back().y());
       common::math::Vec2d current(path_point.x(), path_point.y());
       double distance = (last - current).Length();
@@ -134,11 +146,12 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
     }
     path_points.push_back(std::move(path_point));
   }
-  path_data->set_discretized_path(path_points);
+  *discretized_path = DiscretizedPath(path_points);
   return true;
 }
 
-bool DPRoadGraph::Generate(std::vector<DPRoadGraphNode> *min_cost_path) {
+bool DPRoadGraph::GenerateMinCostPath(
+    std::vector<DPRoadGraphNode> *min_cost_path) {
   CHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
@@ -198,14 +211,26 @@ bool DPRoadGraph::Generate(std::vector<DPRoadGraphNode> *min_cost_path) {
 }
 
 bool DPRoadGraph::ComputeObjectDecision(
-    const PathData &path_data, const SpeedData &speed_data,
-    const ConstPathObstacleList &path_obstacles,
+    const PathData &path_data, const ConstPathObstacleList &path_obstacles,
     IdDecisionList *const decisions) {
-  CHECK_NOTNULL(decisions);
+  DCHECK_NOTNULL(decisions);
+  if (!MakeStaticObstacleDecision(path_data, path_obstacles, decisions)) {
+    AERROR << "Failed to make decisions for static obstacles";
+    return false;
+  }
+  if (!MakeDynamicObstcleDecision(path_data, path_obstacles, decisions)) {
+    AERROR << "Failed to make decisions for dynamic obstacles";
+    return false;
+  }
+  return true;
+}
 
+bool DPRoadGraph::MakeStaticObstacleDecision(
+    const PathData &path_data, const ConstPathObstacleList &path_obstacles,
+    IdDecisionList *const decisions) {
+  DCHECK_NOTNULL(decisions);
   std::vector<common::SLPoint> adc_sl_points;
   std::vector<common::math::Box2d> adc_bounding_box;
-
   const auto &vehicle_param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   const double adc_length = vehicle_param.length();
@@ -246,9 +271,11 @@ bool DPRoadGraph::ComputeObjectDecision(
           adc_sl.s() - adc_max_edge_to_center_dist > sl_boundary.end_s()) {
         // no overlap in s direction
         continue;
-      } else if (adc_sl.l() + adc_max_edge_to_center_dist <
+      } else if (adc_sl.l() + adc_max_edge_to_center_dist +
+                         FLAGS_static_decision_ignore_range <
                      sl_boundary.start_l() ||
-                 adc_sl.l() - adc_max_edge_to_center_dist <
+                 adc_sl.l() - adc_max_edge_to_center_dist -
+                         FLAGS_static_decision_ignore_range >
                      sl_boundary.end_l()) {
         // no overlap in l direction
         continue;
@@ -299,42 +326,38 @@ bool DPRoadGraph::ComputeObjectDecision(
       decisions->push_back(std::make_pair(obstacle->Id(), object_ignore));
     }
   }
+  return true;
+}
 
+bool DPRoadGraph::MakeDynamicObstcleDecision(
+    const PathData &path_data, const ConstPathObstacleList &path_obstacles,
+    IdDecisionList *decisions) {
   // Compute dynamic obstacle decision
+  const double interval = config_.eval_time_interval();
   const double total_time =
-      std::min(speed_data.total_time(), FLAGS_prediction_total_time);
-  std::size_t evaluate_times = static_cast<std::size_t>(
-      std::floor(total_time / config_.eval_time_interval()));
+      std::min(speed_data_.total_time(), FLAGS_prediction_total_time);
+  std::size_t evaluate_time_slots =
+      static_cast<std::size_t>(std::floor(total_time / interval));
+  // list of Box2d for adc given speed profile
+  std::vector<common::math::Box2d> adc_by_time;
+  if (!ComputeBoundingBoxesForAdc(path_data.frenet_frame_path(),
+                                  evaluate_time_slots, &adc_by_time)) {
+    AERROR << "fill_adc_by_time error";
+  }
+
   for (const auto *path_obstacle : path_obstacles) {
     const auto *obstacle = path_obstacle->Obstacle();
     if (obstacle->IsStatic()) {
       continue;
     }
-
-    // list of Box2d for ego car given heuristic speed profile
-    std::vector<common::math::Box2d> adc_by_time;
-    if (!ComputeBoundingBoxesForAdc(path_data.frenet_frame_path(), speed_data,
-                                    evaluate_times, &adc_by_time)) {
-      AERROR << "fill_adc_by_time error";
-    }
-
-    std::vector<common::math::Box2d> obstacle_by_time;
-    for (std::size_t time = 0; time <= evaluate_times; ++time) {
-      auto traj_point =
-          obstacle->GetPointAtTime(time * config_.eval_time_interval());
-      obstacle_by_time.push_back(obstacle->GetBoundingBox(traj_point));
-    }
-
-    // if two lists of boxes collide
-    if (obstacle_by_time.size() != adc_by_time.size()) {
-      AINFO << "dynamic_obstacle_by_time size[" << obstacle_by_time.size()
-            << "] != adc_by_time[" << adc_by_time.size() << "] from speed_data";
-      continue;
-    }
-
-    // judge for collision
-    for (std::size_t k = 0; k < obstacle_by_time.size(); ++k) {
-      if (adc_by_time[k].DistanceTo(obstacle_by_time[k]) <
+    double timestamp = 0.0;
+    for (std::size_t k = 0; k < evaluate_time_slots;
+         ++k, timestamp += interval) {
+      const auto obstacle_by_time =
+          obstacle->GetBoundingBox(obstacle->GetPointAtTime(timestamp));
+      // FIXME(startcode) Strongly believe that the follow condition has
+      // problem.
+      if (adc_by_time[k].DistanceTo(obstacle_by_time) <
           FLAGS_dynamic_decision_follow_range) {
         // Follow
         ObjectDecisionType object_follow;
@@ -349,8 +372,8 @@ bool DPRoadGraph::ComputeObjectDecision(
 }
 
 bool DPRoadGraph::ComputeBoundingBoxesForAdc(
-    const FrenetFramePath &frenet_frame_path, const SpeedData &speed_data,
-    const std::size_t evaluate_times,
+    const FrenetFramePath &frenet_frame_path,
+    const std::size_t evaluate_time_slots,
     std::vector<common::math::Box2d> *adc_boxes) {
   CHECK(adc_boxes != nullptr);
 
@@ -359,10 +382,12 @@ bool DPRoadGraph::ComputeBoundingBoxesForAdc(
   double adc_length = vehicle_config.vehicle_param().length();
   double adc_width = vehicle_config.vehicle_param().length();
 
-  for (std::size_t i = 0; i < evaluate_times; ++i) {
-    double time_stamp = i * config_.eval_time_interval();
+  double time_stamp = 0.0;
+  const double interval = config_.eval_time_interval();
+  for (std::size_t i = 0; i < evaluate_time_slots;
+       ++i, time_stamp += interval) {
     common::SpeedPoint speed_point;
-    if (!speed_data.get_speed_point_with_time(time_stamp, &speed_point)) {
+    if (!speed_data_.get_speed_point_with_time(time_stamp, &speed_point)) {
       AINFO << "get_speed_point_with_time for time_stamp[" << time_stamp << "]";
       return false;
     }
