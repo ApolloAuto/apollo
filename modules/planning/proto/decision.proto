@@ -90,10 +90,11 @@ message ObjectDecision {
     PERCEPTION = 2;
     VIRTUAL = 3;
   }
-  optional apollo.prediction.PredictionObstacle prediction = 1;
   optional string id = 2;
+  optional int32 perception_id = 5;
   optional ObjectType type = 3;
   repeated ObjectDecisionType object_decision = 4;
+  optional apollo.prediction.PredictionObstacle prediction = 1 [deprecated=true];
 }
 
 message ObjectDecisions {
