@@ -24,30 +24,40 @@
 namespace apollo {
 namespace planning {
 
+using common::Status;
+using common::ErrorCode;
+
 Decider::Decider(DecisionResult* decision_result)
 : decision_(decision_result) {
 }
 
 const DecisionResult& Decider::Decision() const { return *decision_; }
 
-int Decider::MakeDecision(Frame* frame) {
+Status Decider::MakeDecision(Frame* frame) {
   decision_->Clear();
 
   auto path_decision = frame->path_decision();
+
   bool estop = 0;
   if (estop) {
     MakeEStopDecision(path_decision);
-    return 0;
+    return Status(ErrorCode::OK, "estop");
   }
 
-  MainDecision main_decision;
-  main_decision.mutable_cruise();  // cruise by default
+  // cruise by default
+  decision_->mutable_main_decision()->mutable_cruise();
 
+  // check stop decision
   int error_code = MakeMainStopDecision(frame, path_decision);
+  if (error_code < 0) {
+    MakeEStopDecision(path_decision);
+    return Status(ErrorCode::OK, "MakeDecision failed. estop.");
+  } else if (error_code == 0) {
+    // TODO: check other main decisions
+  }
 
-  error_code = SetObjectDecisions(path_decision);
-
-  return error_code;
+  SetObjectDecisions(path_decision);
+  return Status(ErrorCode::OK, "MakeDecision completed");
 }
 
 int Decider::MakeMainStopDecision(Frame* frame,
@@ -101,8 +111,7 @@ int Decider::MakeMainStopDecision(Frame* frame,
     main_stop->set_reason("stop by " + stop_obstacle->Id());
     main_stop->mutable_stop_point()->set_x(stop_decision->stop_point().x());
     main_stop->mutable_stop_point()->set_y(stop_decision->stop_point().y());
-    // TODO: to be added
-    // main_stop->set_stop_heading(stop_decision->stop_heading());
+    main_stop->set_stop_heading(stop_decision->stop_heading());
 
     ADEBUG << " main stop obstacle id:" << stop_obstacle->Id()
            << " stop_line_s:" << min_stop_line_s << " stop_point: ("
