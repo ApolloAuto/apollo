@@ -62,8 +62,8 @@ double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
 
     double dl = std::fabs(curve.evaluate(1, path_s));
     total_cost += dl;
-
-    path_s += config_.path_resolution();
+    // TODO(all): add the 5.0 as a parameter into config
+    path_s += config_.path_resolution() / 5.0;
   }
   // obstacle cost
   return total_cost;
