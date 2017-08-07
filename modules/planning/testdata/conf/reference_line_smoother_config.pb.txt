@@ -9,3 +9,4 @@ ref_line_weight: 0.0
 derivative_weight: 0.0
 second_derivative_weight: 0.0
 third_derivative_weight: 100
+num_of_total_points: 500
