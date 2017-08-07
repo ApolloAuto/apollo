@@ -41,7 +41,6 @@ class StBoundaryMapper {
   StBoundaryMapper(const StBoundaryConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data,
-                   const common::TrajectoryPoint& initial_planning_point,
                    const double planning_distance, const double planning_time);
 
   apollo::common::Status GetGraphBoundary(
@@ -75,7 +74,6 @@ class StBoundaryMapper {
   const ReferenceLine& reference_line_;
   const PathData& path_data_;
   const apollo::common::VehicleParam vehicle_param_;
-  const common::TrajectoryPoint& initial_planning_point_;
   const double planning_distance_;
   const double planning_time_;
   double adc_front_s_ = 0.0;

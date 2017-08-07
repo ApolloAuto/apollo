@@ -68,7 +68,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   }
 
   StBoundaryMapper boundary_mapper(st_boundary_config_, reference_line,
-                                   path_data, init_point,
+                                   path_data,
                                    dp_st_speed_config_.total_path_length(),
                                    dp_st_speed_config_.total_time());
 

@@ -54,14 +54,12 @@ using Vec2d = apollo::common::math::Vec2d;
 StBoundaryMapper::StBoundaryMapper(
     const StBoundaryConfig& config, const ReferenceLine& reference_line,
     const PathData& path_data,
-    const common::TrajectoryPoint& initial_planning_point,
     const double planning_distance, const double planning_time)
     : st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
-      initial_planning_point_(initial_planning_point),
       planning_distance_(planning_distance),
       planning_time_(planning_time) {
   const auto& path_start_point = path_data_.discretized_path().start_point();
