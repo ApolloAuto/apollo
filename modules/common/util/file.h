@@ -22,13 +22,13 @@
 #define MODULES_COMMON_UTIL_FILE_H_
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstdio>
 #include <fstream>
 #include <string>
-#include <stdio.h>
 
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
@@ -56,8 +56,8 @@ bool SetProtoToASCIIFile(const MessageType &message,
   using google::protobuf::io::ZeroCopyOutputStream;
   using google::protobuf::io::FileOutputStream;
   using google::protobuf::TextFormat;
-  int file_descriptor = open(file_name.c_str(),
-                             O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+  int file_descriptor =
+      open(file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
   if (file_descriptor < 0) {
     // Failed to open;
     return false;
@@ -84,6 +84,7 @@ bool GetProtoFromASCIIFile(const std::string &file_name, MessageType *message) {
   using google::protobuf::TextFormat;
   int file_descriptor = open(file_name.c_str(), O_RDONLY);
   if (file_descriptor < 0) {
+    AERROR << "Failed to open file " << file_name;
     // Failed to open;
     return false;
   }
