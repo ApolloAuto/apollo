@@ -27,6 +27,7 @@
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/math/polygon2d.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/optimizer/st_graph/st_graph_point.h"
 
 namespace apollo {
@@ -34,7 +35,14 @@ namespace planning {
 
 class StGraphBoundary : public common::math::Polygon2d {
  public:
-  StGraphBoundary() = default;
+  explicit StGraphBoundary(const PathObstacle* path_obstacle);
+  // boundary points go counter clockwise.
+  explicit StGraphBoundary(const PathObstacle* path_obstacle,
+                           const std::vector<STPoint>& points);
+
+  // boundary points go counter clockwise.
+  explicit StGraphBoundary(const PathObstacle* path_obstacle,
+                           const std::vector<common::math::Vec2d>& points);
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
   enum class BoundaryType {
@@ -44,12 +52,6 @@ class StGraphBoundary : public common::math::Polygon2d {
     YIELD,
     OVERTAKE,
   };
-
-  // boundary points go counter clockwise.
-  explicit StGraphBoundary(const std::vector<STPoint>& points);
-
-  // boundary points go counter clockwise.
-  explicit StGraphBoundary(const std::vector<common::math::Vec2d>& points);
 
   ~StGraphBoundary() = default;
 
@@ -75,7 +77,10 @@ class StGraphBoundary : public common::math::Polygon2d {
 
   void GetBoundaryTimeScope(double* start_t, double* end_t) const;
 
+  const PathObstacle* path_obstacle() const;
+
  private:
+  const PathObstacle* path_obstacle_ = nullptr;
   BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
   std::string id_;
   double characteristic_length_ = 1.0;

@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/optimizer/st_graph/st_graph_data.h"
 
 #include <algorithm>
@@ -43,8 +44,9 @@ TEST(StGraphDataTest, basic_test) {
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().relative_time(), 0.0);
   EXPECT_DOUBLE_EQ(st_graph_data.path_data_length(), 0.0);
 
+  PathObstacle path_obstacle;
   std::vector<StGraphBoundary> boundary_vec;
-  boundary_vec.push_back(StGraphBoundary());
+  boundary_vec.push_back(StGraphBoundary(&path_obstacle));
   apollo::common::TrajectoryPoint traj_point;
   traj_point.mutable_path_point()->set_x(1.1);
   traj_point.mutable_path_point()->set_y(2.1);

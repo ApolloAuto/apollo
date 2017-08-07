@@ -55,6 +55,8 @@ using ConstPathObstacleList = std::vector<const PathObstacle*>;
  */
 class PathObstacle {
  public:
+  PathObstacle() = default;
+
   PathObstacle(const planning::Obstacle* obstacle);
 
   bool Init(const ReferenceLine* reference_line);

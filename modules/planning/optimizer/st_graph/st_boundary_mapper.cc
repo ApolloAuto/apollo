@@ -102,12 +102,11 @@ Status StBoundaryMapper::GetGraphBoundary(
   ObjectDecisionType stop_decision;
   double min_stop_s = std::numeric_limits<double>::max();
 
-  for (const auto& path_obstacle : path_obstacles.Items()) {
-    const auto& obstacle = *path_obstacle->Obstacle();
+  for (const auto* path_obstacle : path_obstacles.Items()) {
     for (const auto& decision : path_obstacle->Decisions()) {
-      StGraphBoundary boundary;
+      StGraphBoundary boundary(path_obstacle);
       if (decision.has_follow()) {
-        const auto ret = MapFollowDecision(obstacle, decision, &boundary);
+        const auto ret = MapFollowDecision(*path_obstacle, decision, &boundary);
         if (!ret.ok()) {
           AERROR << "Fail to map obstacle " << path_obstacle->Id()
                  << " with follow decision: " << decision.DebugString();
@@ -134,7 +133,7 @@ Status StBoundaryMapper::GetGraphBoundary(
         }
       } else if (decision.has_overtake() || decision.has_yield()) {
         const auto ret = MapObstacleWithPredictionTrajectory(
-            obstacle, decision, st_graph_boundaries);
+            *path_obstacle, decision, st_graph_boundaries);
         if (!ret.ok()) {
           AERROR << "Fail to map obstacle " << path_obstacle->Id()
                  << " with decision: " << decision.DebugString();
@@ -151,7 +150,7 @@ Status StBoundaryMapper::GetGraphBoundary(
   }
 
   if (stop_obstacle) {
-    StGraphBoundary stop_boundary;
+    StGraphBoundary stop_boundary(stop_obstacle);
     bool success = MapObstacleWithStopDecision(*stop_obstacle, stop_decision,
                                                &stop_boundary);
     if (!success) {
@@ -198,19 +197,20 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
                                planning_time_);
   boundary_points.emplace_back(s_max, 0.0);
 
-  *boundary = StGraphBoundary(boundary_points);
+  *boundary = StGraphBoundary(&stop_obstacle, boundary_points);
   boundary->SetBoundaryType(StGraphBoundary::BoundaryType::STOP);
   boundary->SetCharacteristicLength(st_boundary_config_.boundary_buffer());
   return true;
 }
 
 Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
-    const Obstacle& obstacle, const ObjectDecisionType& obj_decision,
+    const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
     std::vector<StGraphBoundary>* const boundary) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  const auto& speed = obstacle.Perception().velocity();
+  const auto* obstacle = path_obstacle.Obstacle();
+  const auto& speed = obstacle->Perception().velocity();
   const double scalar_speed = std::hypot(speed.x(), speed.y());
   const double minimal_follow_time = st_boundary_config_.minimal_follow_time();
   double follow_distance = -1.0;
@@ -223,9 +223,9 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
   bool skip = true;
   std::vector<STPoint> boundary_points;
   const auto& adc_path_points = path_data_.discretized_path().points();
-  const auto& trajectory = obstacle.Trajectory();
+  const auto& trajectory = obstacle->Trajectory();
   if (trajectory.trajectory_point_size() == 0) {
-    AWARN << "Obstacle (id = " << obstacle.Id()
+    AWARN << "Obstacle (id = " << obstacle->Id()
           << ") has NO prediction trajectory.";
   }
 
@@ -233,7 +233,7 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
     const auto& trajectory_point = trajectory.trajectory_point(j);
     // TODO(all): fix trajectory point relative time issue.
     double trajectory_point_time = trajectory_point.relative_time();
-    const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
+    const Box2d obs_box = obstacle->GetBoundingBox(trajectory_point);
     int64_t low = 0;
     int64_t high = adc_path_points.size() - 1;
     bool find_low = false;
@@ -325,9 +325,9 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
 
       const double area = GetArea(boundary_points);
       if (Double::Compare(area, 0.0) > 0) {
-        boundary->emplace_back(boundary_points);
+        boundary->emplace_back(&path_obstacle, boundary_points);
         boundary->back().SetBoundaryType(b_type);
-        boundary->back().set_id(obstacle.Id());
+        boundary->back().set_id(obstacle->Id());
         skip = false;
       }
     }
@@ -337,7 +337,7 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
 }
 
 Status StBoundaryMapper::MapFollowDecision(
-    const Obstacle& obstacle, const ObjectDecisionType& obj_decision,
+    const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
     StGraphBoundary* const boundary) const {
   if (!obj_decision.has_follow()) {
     std::string msg = common::util::StrCat(
@@ -349,10 +349,12 @@ Status StBoundaryMapper::MapFollowDecision(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  const auto& speed = obstacle.Perception().velocity();
+  const auto* obstacle = path_obstacle.Obstacle();
+
+  const auto& speed = obstacle->Perception().velocity();
   const double scalar_speed = std::hypot(speed.x(), speed.y());
 
-  const auto& perception = obstacle.Perception();
+  const auto& perception = obstacle->Perception();
   const PathPoint ref_point = reference_line_.get_reference_point(
       perception.position().x(), perception.position().y());
   const double speed_coeff = std::cos(perception.theta() - ref_point.theta());
@@ -403,7 +405,7 @@ Status StBoundaryMapper::MapFollowDecision(
     AINFO << msg;
     return Status(ErrorCode::PLANNING_SKIP, msg);
   }
-  *boundary = StGraphBoundary(boundary_points);
+  *boundary = StGraphBoundary(&path_obstacle, boundary_points);
 
   const double characteristic_length =
       std::fmax(scalar_speed * speed_coeff *
@@ -415,7 +417,7 @@ Status StBoundaryMapper::MapFollowDecision(
   boundary->SetCharacteristicLength(characteristic_length *
                                     st_boundary_config_.follow_coeff());
   boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
-  boundary->set_id(obstacle.Id());
+  boundary->set_id(obstacle->Id());
   return Status::OK();
 }
 
@@ -472,11 +474,13 @@ Status StBoundaryMapper::GetSpeedLimits(
         reference_line_.GetSpeedLimitFromS(path_point.s());
 
     // speed limit from path curvature
-    double speed_limit_on_path = std::sqrt(
-        st_boundary_config_.centric_acceleration_limit() /
-        std::fmax(std::fabs(path_point.kappa()), st_boundary_config_.minimal_kappa()));
+    double speed_limit_on_path =
+        std::sqrt(st_boundary_config_.centric_acceleration_limit() /
+                  std::fmax(std::fabs(path_point.kappa()),
+                            st_boundary_config_.minimal_kappa()));
 
-    const double curr_speed_limit = std::fmax(st_boundary_config_.lowest_speed(),
+    const double curr_speed_limit = std::fmax(
+        st_boundary_config_.lowest_speed(),
         std::fmin(speed_limit_on_path, speed_limit_on_reference_line));
 
     common::SpeedPoint speed_point;

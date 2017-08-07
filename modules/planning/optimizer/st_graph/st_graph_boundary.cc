@@ -29,16 +29,30 @@ namespace planning {
 
 using Vec2d = common::math::Vec2d;
 
-StGraphBoundary::StGraphBoundary(const std::vector<STPoint>& points)
-    : Polygon2d(std::vector<Vec2d>(points.begin(), points.end())) {
+StGraphBoundary::StGraphBoundary(const PathObstacle* path_obstacle)
+    : path_obstacle_(path_obstacle) {
+  CHECK_NOTNULL(path_obstacle);
+}
+
+const PathObstacle* StGraphBoundary::path_obstacle() const {
+  return path_obstacle_;
+}
+
+StGraphBoundary::StGraphBoundary(const PathObstacle* path_obstacle,
+                                 const std::vector<STPoint>& points)
+    : Polygon2d(std::vector<Vec2d>(points.begin(), points.end())),
+      path_obstacle_(path_obstacle) {
+  CHECK_NOTNULL(path_obstacle);
   CHECK_EQ(points.size(), 4)
       << "StGraphBoundary must have exactly four points. Input points size: "
       << points.size();
 }
 
 StGraphBoundary::StGraphBoundary(
+    const PathObstacle* path_obstacle,
     const std::vector<::apollo::common::math::Vec2d>& points)
-    : Polygon2d(points) {
+    : Polygon2d(points), path_obstacle_(path_obstacle) {
+  CHECK_NOTNULL(path_obstacle);
   CHECK_EQ(points.size(), 4)
       << "StGraphBoundary must have exactly four points. Input points size: "
       << points.size();
