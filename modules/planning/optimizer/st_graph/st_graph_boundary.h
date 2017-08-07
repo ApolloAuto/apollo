@@ -79,12 +79,21 @@ class StGraphBoundary : public common::math::Polygon2d {
 
   const PathObstacle* path_obstacle() const;
 
+  double min_s() const;
+  double min_t() const;
+  double max_s() const;
+  double max_t() const;
+
  private:
   const PathObstacle* path_obstacle_ = nullptr;
   BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
   std::string id_;
   double characteristic_length_ = 1.0;
   double s_high_limit_ = 200.0;
+  double min_s_ = std::numeric_limits<double>::max();
+  double max_s_ = std::numeric_limits<double>::lowest();
+  double min_t_ = std::numeric_limits<double>::max();
+  double max_t_ = std::numeric_limits<double>::lowest();
 };
 
 }  // namespace planning

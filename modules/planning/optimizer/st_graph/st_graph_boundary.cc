@@ -46,6 +46,12 @@ StGraphBoundary::StGraphBoundary(const PathObstacle* path_obstacle,
   CHECK_EQ(points.size(), 4)
       << "StGraphBoundary must have exactly four points. Input points size: "
       << points.size();
+  for (const auto& point : points) {
+    min_s_ = std::fmin(min_s_, point.s());
+    min_t_ = std::fmin(min_t_, point.t());
+    max_s_ = std::fmax(max_s_, point.s());
+    max_t_ = std::fmax(max_t_, point.t());
+  }
 }
 
 StGraphBoundary::StGraphBoundary(
@@ -56,6 +62,12 @@ StGraphBoundary::StGraphBoundary(
   CHECK_EQ(points.size(), 4)
       << "StGraphBoundary must have exactly four points. Input points size: "
       << points.size();
+  for (const auto& point : points) {
+    min_s_ = std::fmin(min_s_, point.y());
+    min_t_ = std::fmin(min_t_, point.x());
+    max_s_ = std::fmax(max_s_, point.y());
+    max_t_ = std::fmax(max_t_, point.x());
+  }
 }
 
 bool StGraphBoundary::IsPointInBoundary(
@@ -152,6 +164,11 @@ void StGraphBoundary::GetBoundaryTimeScope(double* start_t,
   *start_t = left.t();
   *end_t = right.t();
 }
+
+double StGraphBoundary::min_s() const { return min_s_; }
+double StGraphBoundary::min_t() const { return min_t_; }
+double StGraphBoundary::max_s() const { return max_s_; }
+double StGraphBoundary::max_t() const { return max_t_; }
 
 }  // namespace planning
 }  // namespace apollo
