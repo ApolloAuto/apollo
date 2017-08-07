@@ -36,8 +36,8 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::localization::LocalizationEstimate;
+using apollo::common::adapter::AdapterManager;
+using apollo::localization::LocalizationEstimate;
 
 DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
