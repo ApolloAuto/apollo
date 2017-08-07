@@ -75,17 +75,17 @@ class Planning : public apollo::common::ApolloApp {
    * @brief Plan the trajectory given current vehicle state
    * @param is_on_auto_mode whether the current system is on auto-driving mode
    */
-  bool Plan(const bool is_on_auto_mode,
-            const double current_time_stamp,
+  bool Plan(const bool is_on_auto_mode, const double current_time_stamp,
             const double planning_cycle_time);
 
   const Frame* GetFrame() const;
   const hdmap::PncMap* GetPncMap() const;
   bool InitFrame(const uint32_t sequence_num);
 
+  void RunOnce();
+
  private:
   void RegisterPlanners();
-  void RunOnce();
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;

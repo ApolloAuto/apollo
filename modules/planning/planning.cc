@@ -88,7 +88,9 @@ Status Planning::Init() {
         "failed to load planning config file: " + FLAGS_planning_config_file);
   }
 
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  if (!AdapterManager::Initialized()) {
+    AdapterManager::Init(FLAGS_adapter_config_path);
+  }
   if (AdapterManager::GetLocalization() == nullptr) {
     std::string error_msg("Localization is not registered");
     AERROR << error_msg;
@@ -195,7 +197,8 @@ void Planning::RunOnce() {
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   auto trajectory_pb = frame_->MutableADCTrajectory();
   trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  ADEBUG << "Planning latency: " << trajectory_pb->latency_stats().DebugString();
+  ADEBUG << "Planning latency: "
+         << trajectory_pb->latency_stats().DebugString();
 
   if (res_planning) {
     AdapterManager::FillPlanningHeader("planning", trajectory_pb);
@@ -211,10 +214,8 @@ void Planning::RunOnce() {
 
 void Planning::Stop() {}
 
-bool Planning::Plan(const bool is_on_auto_mode,
-                    const double current_time_stamp,
+bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
                     const double planning_cycle_time) {
-
   const auto& stitching_trajectory =
       TrajectoryStitcher::compute_stitching_trajectory(
           is_on_auto_mode, current_time_stamp, planning_cycle_time,
@@ -223,8 +224,8 @@ bool Planning::Plan(const bool is_on_auto_mode,
   frame_->SetPlanningStartPoint(stitching_trajectory.back());
 
   PublishableTrajectory publishable_trajectory;
-  auto status = planner_->Plan(stitching_trajectory.back(),
-      frame_.get(), &publishable_trajectory);
+  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
+                               &publishable_trajectory);
 
   if (status != Status::OK()) {
     AERROR << "planner failed to make a driving plan";

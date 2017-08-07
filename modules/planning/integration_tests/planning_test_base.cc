@@ -33,6 +33,7 @@ DEFINE_string(test_localization_file,
 DEFINE_string(test_chassis_file,
               "modules/planning/testdata/garage_chassis.pb.txt",
               "The chassis test file");
+DEFINE_string(test_prediction_file, "", "The prediction module test file");
 
 void PlanningTestBase::SetDataConfigs() {
   FLAGS_qp_spline_path_config_file =
@@ -82,35 +83,24 @@ bool PlanningTestBase::SetUpAdapters() {
     AERROR << "Failed to load chassis file: " << FLAGS_test_chassis_file;
     return false;
   }
-  AdapterManager::Observe();
+  if (!FLAGS_test_prediction_file.empty() &&
+      AdapterManager::FeedPredictionFile(FLAGS_test_prediction_file)) {
+    AERROR << "Failed to load prediction file: " << FLAGS_test_prediction_file;
+    return false;
+  }
   return true;
 }
 
 void PlanningTestBase::SetUp() {
   SetDataConfigs();
+  adc_trajectory_ = nullptr;
+  SetUpAdapters();
   planning_.Init();
-  if (!SetUpAdapters()) {
-    AERROR << "Failed to setup adapters";
-    return;
-  }
-  common::VehicleState::instance()->Update(
-      AdapterManager::GetLocalization()->GetLatestObserved(),
-      AdapterManager::GetChassis()->GetLatestObserved());
-  pose_ = common::VehicleState::instance()->pose();
-  if (!common::util::GetProtoFromFile(FLAGS_dp_poly_path_config_file,
-                                      &dp_poly_path_config_)) {
-    AERROR << "Failed to load file " << FLAGS_dp_poly_path_config_file;
-    return;
-  }
-  if (!common::util::GetProtoFromFile(FLAGS_dp_st_speed_config_file,
-                                      &dp_st_speed_config_)) {
-    AERROR << "Failed to load file " << FLAGS_dp_st_speed_config_file;
-    return;
-  }
-  if (!planning_.InitFrame(1)) {
-    AERROR << "planning init frame failed";
-    return;
-  }
+}
+
+void PlanningTestBase::RunPlanning() {
+  planning_.RunOnce();
+  adc_trajectory_ = AdapterManager::GetPlanning()->GetLatestPublished();
 }
 
 void PlanningTestBase::export_sl_points(
