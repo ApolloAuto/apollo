@@ -3,6 +3,25 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "decider",
+    srcs = [
+        "decider.cc",
+    ],
+    hdrs = [
+        "decider.h",
+    ],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/common/status",
+        "//modules/planning/common:planning_common",
+        "//modules/planning/proto:planning_proto",
+        "//modules/planning/reference_line",
+        "@eigen//:eigen",
+    ],
+)
+
+cc_library(
     name = "em_planner",
     srcs = [
         "em_planner.cc",
@@ -11,6 +30,7 @@ cc_library(
         "em_planner.h",
     ],
     deps = [
+        ":decider",
         "//external:gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
@@ -33,25 +53,6 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:reference_line_smoother",
-        "@eigen//:eigen",
-    ],
-)
-
-cc_library(
-    name = "decider",
-    srcs = [
-        "decider.cc",
-    ],
-    hdrs = [
-        "decider.h",
-    ],
-    deps = [
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/common/status",
-        "//modules/planning/common:planning_common",
-        "//modules/planning/proto:planning_proto",
-        "//modules/planning/reference_line",
         "@eigen//:eigen",
     ],
 )
