@@ -88,6 +88,13 @@ TEST_F(ObstacleTest, CreateObstacles) {
   ASSERT_TRUE(indexed_obstacles_.Find("2161"));
 }
 
+TEST_F(ObstacleTest, Id) {
+  ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
+  const auto* obstacle = indexed_obstacles_.Find("2156_0");
+  EXPECT_EQ("2156_0", obstacle->Id());
+  EXPECT_EQ(2156, obstacle->PerceptionId());
+}
+
 TEST_F(ObstacleTest, GetPointAtTime) {
   ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
