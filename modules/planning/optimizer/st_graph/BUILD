@@ -93,4 +93,19 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "st_graph_data_test",
+    size = "small",
+    srcs = [
+        "st_graph_data_test.cc",
+    ],
+    deps = [
+        ":st_graph_data",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

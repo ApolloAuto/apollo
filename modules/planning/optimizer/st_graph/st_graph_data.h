@@ -36,10 +36,9 @@ class StGraphData {
  public:
   StGraphData() = default;
 
-  explicit StGraphData(const std::vector<StGraphBoundary>& st_graph_boundaries,
-                       const apollo::common::TrajectoryPoint& init_point,
-                       const SpeedLimit& speed_limit,
-                       const double path_data_length);
+  StGraphData(const std::vector<StGraphBoundary>& st_graph_boundaries,
+              const apollo::common::TrajectoryPoint& init_point,
+              const SpeedLimit& speed_limit, const double path_data_length);
 
   const std::vector<StGraphBoundary>& st_graph_boundaries() const;
 
