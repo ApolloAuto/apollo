@@ -40,8 +40,7 @@ class Decider {
   ~Decider() = default;
 
   const DecisionResult &Decision() const;
-  // TODO(all): fix the return code to use Status object.
-  int MakeDecision(Frame* frame);
+  apollo::common::Status MakeDecision(Frame* frame);
 
  private:
   int MakeMainStopDecision(Frame* frame,
