@@ -78,7 +78,7 @@ class QpFrenetFrame {
   bool MapStaticObstacleWithDecision(const PathObstacle& path_obstacle);
 
   bool MapPolygon(const std::vector<common::math::Vec2d>& corners,
-                  const double buffer, const bool nudge_side,
+                  const double buffer, const int nudge_side,
                   std::vector<std::pair<double, double>>* const bound_map);
 
   // nudge_side > 0 update upper bound, nudge_side < 0 update lower_bound

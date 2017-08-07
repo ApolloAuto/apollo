@@ -41,7 +41,7 @@ namespace planning {
 class QpSplinePathGenerator {
  public:
   QpSplinePathGenerator(const ReferenceLine& reference_line,
-                        const QpSplinePathConfig& qp_spline_path_config_);
+                        const QpSplinePathConfig& qp_spline_path_config);
 
   bool Generate(const ConstPathObstacleList& obstacles,
                 const SpeedData& speed_data,

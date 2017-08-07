@@ -154,9 +154,7 @@ bool QpFrenetFrame::FindLongitudinalDistance(const double time,
 }
 
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
-  double relative_time = 0.0;
-
-  for (; relative_time < speed_data_.total_time();
+  for (double relative_time = 0.0; relative_time < speed_data_.total_time();
        relative_time += time_resolution_) {
     SpeedPoint veh_point;
     if (!speed_data_.get_speed_point_with_time(relative_time, &veh_point)) {
@@ -166,7 +164,6 @@ bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
     veh_point.set_t(relative_time);
     discretized_vehicle_location_.push_back(std::move(veh_point));
   }
-
   return true;
 }
 
@@ -197,8 +194,7 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
 
       for (uint32_t i = 0; i < corners.size(); ++i) {
         common::SLPoint cur_point;
-        common::math::Vec2d xy_point(corners[i].x(), corners[i].y());
-        if (!reference_line_.get_point_in_frenet_frame(xy_point, &cur_point)) {
+        if (!reference_line_.get_point_in_frenet_frame({corners[i].x(), corners[i].y()}, &cur_point)) {
           AERROR << "Fail to map xy point " << corners[i].DebugString()
                  << " to " << cur_point.ShortDebugString();
 
@@ -252,7 +248,7 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
     const PathObstacle& path_obstacle) {
   const std::vector<ObjectDecisionType>& object_decisions =
       path_obstacle.Decisions();
-  const auto* obstacle = path_obstacle.Obstacle();
+  const auto ptr_obstacle = path_obstacle.Obstacle();
 
   for (const auto& decision : object_decisions) {
     if (!decision.has_nudge()) {
@@ -261,7 +257,7 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
     const auto& nudge = decision.nudge();
     const double buffer = std::fabs(nudge.distance_l());
     if (nudge.type() == ObjectNudge::RIGHT_NUDGE) {
-      const auto& box = obstacle->PerceptionBoundingBox();
+      const auto& box = ptr_obstacle->PerceptionBoundingBox();
       std::vector<common::math::Vec2d> corners;
       box.GetAllCorners(&corners);
       if (!MapPolygon(corners, buffer, -1, &static_obstacle_bound_)) {
@@ -270,7 +266,7 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
         return false;
       }
     } else {
-      const auto& box = obstacle->PerceptionBoundingBox();
+      const auto& box = ptr_obstacle->PerceptionBoundingBox();
       std::vector<common::math::Vec2d> corners;
       box.GetAllCorners(&corners);
       if (!MapPolygon(corners, buffer, 1, &static_obstacle_bound_)) {
@@ -285,8 +281,9 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
 }
 
 bool QpFrenetFrame::MapPolygon(
-    const std::vector<common::math::Vec2d>& corners, const double buffer,
-    const bool nudge_side,
+    const std::vector<common::math::Vec2d>& corners,
+    const double buffer,
+    const int nudge_side,
     std::vector<std::pair<double, double>>* const bound_map) {
   std::vector<common::SLPoint> sl_corners;
 
@@ -443,16 +440,16 @@ bool QpFrenetFrame::CalculateHDMapBound() {
 }
 
 bool QpFrenetFrame::CalculateObstacleBound() {
-  for (const auto path_obstacle : path_obstacles_) {
-    if (path_obstacle->Obstacle()->IsStatic()) {
-      if (!MapStaticObstacleWithDecision(*path_obstacle)) {
-        AERROR << "mapping obstacle with id [" << path_obstacle->Id()
+  for (const auto ptr_path_obstacle : path_obstacles_) {
+    if (ptr_path_obstacle->Obstacle()->IsStatic()) {
+      if (!MapStaticObstacleWithDecision(*ptr_path_obstacle)) {
+        AERROR << "mapping obstacle with id [" << ptr_path_obstacle->Id()
                << "] failed in qp frenet frame.";
         return false;
       }
     } else {
-      if (!MapDynamicObstacleWithDecision(*path_obstacle)) {
-        AERROR << "mapping obstacle with id [" << path_obstacle->Id()
+      if (!MapDynamicObstacleWithDecision(*ptr_path_obstacle)) {
+        AERROR << "mapping obstacle with id [" << ptr_path_obstacle->Id()
                << "] failed in qp frenet frame.";
         return false;
       }
