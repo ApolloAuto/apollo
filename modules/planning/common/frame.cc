@@ -52,7 +52,7 @@ void Frame::SetVehicleInitPose(const localization::Pose &pose) {
 }
 
 void Frame::SetRoutingResponse(const routing::RoutingResponse &routing) {
-  routing_result_ = routing;
+  routing_response_ = routing;
 }
 
 void Frame::SetPlanningStartPoint(const common::TrajectoryPoint &start_point) {
@@ -99,7 +99,7 @@ bool Frame::Init() {
     return false;
   }
   std::vector<ReferenceLine> reference_lines;
-  if (!CreateReferenceLineFromRouting(init_pose_.position(), routing_result_,
+  if (!CreateReferenceLineFromRouting(init_pose_.position(), routing_response_,
                                       &reference_lines)) {
     AERROR << "Failed to create reference line from position: "
            << init_pose_.DebugString();
@@ -116,7 +116,7 @@ bool Frame::Init() {
                                                            reference_line_);
 
   if (FLAGS_enable_traffic_decision) {
-    MakeTrafficDecision(routing_result_, reference_line_);
+    MakeTrafficDecision(routing_response_, reference_line_);
   }
 
   return true;
@@ -186,11 +186,11 @@ void Frame::RecordInputDebug() {
   auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  const auto &routing_result =
+  const auto &routing_response =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
 
   auto debug_routing = planning_data->mutable_routing();
-  debug_routing->CopyFrom(routing_result);
+  debug_routing->CopyFrom(routing_response);
 }
 
 }  // namespace planning
