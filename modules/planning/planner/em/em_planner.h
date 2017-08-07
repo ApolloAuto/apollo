@@ -72,6 +72,8 @@ class EMPlanner : public Planner {
 
   std::vector<common::SpeedPoint> GenerateInitSpeedProfile(const double init_v,
                                                            const double init_a);
+  // TODO(all): change to return Status.
+  void PopulateDecision(Frame* frame);
 
   void RecordDebugInfo(const std::string& name,
                        const PlanningData* planning_data,
