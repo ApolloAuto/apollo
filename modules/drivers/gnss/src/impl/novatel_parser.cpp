@@ -122,6 +122,8 @@ class NovatelParser : public Parser {
 
   bool handle_ins_pva(const novatel::InsPva* pva);
 
+  bool handle_ins_pvax(const novatel::InsPvaX* pvax);
+    
   bool handle_raw_imu_x(const novatel::RawImuX* imu);
 
   double _gyro_scale = 0.0;
@@ -152,6 +154,7 @@ class NovatelParser : public Parser {
   ::apollo::drivers::gnss::Gnss _gnss;
   ::apollo::drivers::gnss::Imu _imu;
   ::apollo::drivers::gnss::Ins _ins;
+  ::apollo::drivers::gnss::InsStat _ins_stat;
 };
 
 Parser* Parser::create_novatel() { return new NovatelParser(); }
@@ -354,6 +357,17 @@ Parser::MessageType NovatelParser::prepare_message(MessagePtr& message_ptr) {
       }
       break;
 
+    case novatel::INSPVAX:
+        if (message_length != sizeof(novatel::InsPvaX)) {
+          ROS_ERROR("Incorrect message_length");
+          break;
+        }
+
+        if (handle_ins_pvax(reinterpret_cast<novatel::InsPvaX*>(message))) {
+          message_ptr = &_ins_stat;
+          return MessageType::INS_STAT;
+        }
+        break;
     default:
       break;
   }
@@ -530,6 +544,12 @@ bool NovatelParser::handle_ins_pva(const novatel::InsPva* pva) {
   }
 
   _ins.mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
+  return true;
+}
+
+bool NovatelParser::handle_ins_pvax(const novatel::InsPvaX* pvax) {
+  _ins_stat.set_ins_status(pvax->ins_status); 
+  _ins_stat.set_pos_type(pvax->pos_type); 
   return true;
 }
 
