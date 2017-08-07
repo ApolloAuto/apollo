@@ -55,8 +55,9 @@ using ConstPathObstacleList = std::vector<const PathObstacle*>;
  */
 class PathObstacle {
  public:
-  PathObstacle(const planning::Obstacle* obstacle,
-               const ReferenceLine* reference_line);
+  PathObstacle(const planning::Obstacle* obstacle);
+
+  bool Init(const ReferenceLine* reference_line);
 
   const std::string& Id() const;
 
@@ -77,8 +78,6 @@ class PathObstacle {
   const SLBoundary& sl_boundary() const;
 
  private:
-  bool Init(const ReferenceLine* reference_line);
-
   std::string id_;
   const planning::Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
