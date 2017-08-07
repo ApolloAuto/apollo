@@ -33,8 +33,9 @@ PathDecision::PathDecision(const std::vector<const Obstacle *> &obstacles,
 
 void PathDecision::Init(const std::vector<const Obstacle *> &obstacles) {
   for (const auto obstacle : obstacles) {
-    path_obstacles_.Add(obstacle->Id(), common::util::make_unique<PathObstacle>(
-                                            obstacle, &reference_line_));
+    auto path_obstacle = common::util::make_unique<PathObstacle>(obstacle);
+    path_obstacle->Init(&reference_line_);
+    path_obstacles_.Add(obstacle->Id(), std::move(path_obstacle));
   }
 }
 

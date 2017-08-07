@@ -27,13 +27,10 @@ namespace planning {
 
 const std::string& PathObstacle::Id() const { return id_; }
 
-PathObstacle::PathObstacle(const planning::Obstacle* obstacle,
-                           const ReferenceLine* reference_line)
+PathObstacle::PathObstacle(const planning::Obstacle* obstacle)
     : obstacle_(obstacle) {
   CHECK_NOTNULL(obstacle);
   id_ = obstacle_->Id();
-  CHECK(reference_line != nullptr) << "reference line is null";
-  Init(reference_line);
 }
 
 bool PathObstacle::Init(const ReferenceLine* reference_line) {
