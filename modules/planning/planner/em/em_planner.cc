@@ -211,10 +211,10 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
 
   for (std::uint32_t i = 0; i < num_time_steps; ++i) {
     double t = i * FLAGS_trajectory_time_resolution;
-    double s = speed_curve.evaluate(0, t);
-    double v = speed_curve.evaluate(1, t);
-    double a = speed_curve.evaluate(2, t);
-    double da = speed_curve.evaluate(3, t);
+    double s = speed_curve.Evaluate(0, t);
+    double v = speed_curve.Evaluate(1, t);
+    double a = speed_curve.Evaluate(2, t);
+    double da = speed_curve.Evaluate(3, t);
     SpeedPoint speed_point;
     speed_point.set_s(s);
     speed_point.set_t(t);

@@ -66,7 +66,7 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
   }
 
   const double resolution = (end_s_ - start_s_) / num_points;
-  if (Double::compare(start_s_, end_s_, 1e-8) > 0) {
+  if (Double::Compare(start_s_, end_s_, 1e-8) > 0) {
     AERROR << "Not enough s distance. start_s: " << start_s_
            << ", end_s: " << end_s_;
     return false;
@@ -386,7 +386,7 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(
   double weight_back = 0.0;
   double weight_front = 0.0;
 
-  if (Double::compare((end.s() - start.s()), 0.0) > 0) {
+  if (Double::Compare((end.s() - start.s()), 0.0) > 0) {
     weight_back = (s_back - end.s()) / (end.s() - start.s());
     weight_front = (s_front - start.s()) / (end.s() - start.s());
   }
@@ -464,8 +464,8 @@ bool QpFrenetFrame::CalculateObstacleBound() {
 bool QpFrenetFrame::GetBound(
     const double s, const std::vector<std::pair<double, double>>& bound_map,
     std::pair<double, double>* const bound) const {
-  if (Double::compare(s, start_s_, 1e-8) < 0 ||
-      Double::compare(s, end_s_, 1e-8) > 0) {
+  if (Double::Compare(s, start_s_, 1e-8) < 0 ||
+      Double::Compare(s, end_s_, 1e-8) > 0) {
     AERROR << "Evaluate s location " << s
            << ", is out of trajectory frenet frame range (" << start_s_ << ", "
            << end_s_ << ")";
@@ -476,7 +476,7 @@ bool QpFrenetFrame::GetBound(
   uint32_t lower_index = FindIndex(s);
   const double s_low = evaluated_knots_[lower_index];
   const double s_high = evaluated_knots_[lower_index + 1];
-  double weight = (Double::compare(s_high, s_low, 1e-8) <= 0
+  double weight = (Double::Compare(s_high, s_low, 1e-8) <= 0
                        ? 0
                        : (s - s_low) / (s_high - s_low));
 

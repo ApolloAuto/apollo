@@ -40,7 +40,7 @@ double SLAnalyticTransformation::calculate_kappa(const double kappa_ref,
                                                  const double dl,
                                                  const double ddl) {
   double denominator = (dl * dl + (1 - l * kappa_ref) * (1 - l * kappa_ref));
-  if (Double::compare(denominator, 0.0, 1e-8) == 0) {
+  if (Double::Compare(denominator, 0.0, 1e-8) == 0) {
     return 0.0;
   }
   denominator = std::pow(denominator, 1.5);
@@ -59,7 +59,7 @@ common::math::Vec2d SLAnalyticTransformation::calculate_xypoint(
   return result;
 }
 
-double SLAnalyticTransformation::calculate_lateral_derivative(
+double SLAnalyticTransformation::CalculateLateralDerivative(
     const double theta_ref, const double theta, const double l,
     const double kappa_ref) {
   return (1 - kappa_ref * l) * std::tan(theta - theta_ref);
@@ -69,7 +69,7 @@ double SLAnalyticTransformation::calculate_second_order_lateral_derivative(
     const double theta_ref, const double theta, const double kappa_ref,
     const double kappa, const double dkappa_ref, const double l) {
   const double dl =
-      calculate_lateral_derivative(theta_ref, theta, l, kappa_ref);
+      CalculateLateralDerivative(theta_ref, theta, l, kappa_ref);
   const double theta_diff = theta - theta_ref;
   const double cos_theta_diff = std::cos(theta_diff);
   // TODO(fanhaoyang): add sanity check for invalid input

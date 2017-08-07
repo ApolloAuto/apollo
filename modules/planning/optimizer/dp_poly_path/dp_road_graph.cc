@@ -78,10 +78,10 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
     const double path_length = cur_node.sl_point.s() - prev_node.sl_point.s();
     double current_s = 0.0;
     const auto &curve = cur_node.min_cost_curve;
-    while (Double::compare(current_s, path_length) < 0.0) {
-      const double l = curve.evaluate(0, current_s);
-      const double dl = curve.evaluate(1, current_s);
-      const double ddl = curve.evaluate(2, current_s);
+    while (Double::Compare(current_s, path_length) < 0.0) {
+      const double l = curve.Evaluate(0, current_s);
+      const double dl = curve.Evaluate(1, current_s);
+      const double ddl = curve.Evaluate(2, current_s);
       common::FrenetFramePoint frenet_frame_point;
       frenet_frame_point.set_s(accumulated_s + current_s);
       frenet_frame_point.set_l(l);

@@ -315,7 +315,7 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
       }
 
       const double area = GetArea(boundary_points);
-      if (Double::compare(area, 0.0) > 0) {
+      if (Double::Compare(area, 0.0) > 0) {
         boundary->emplace_back(boundary_points);
         boundary->back().SetBoundaryType(b_type);
         boundary->back().set_id(obstacle.Id());
@@ -389,7 +389,7 @@ Status StBoundaryMapper::MapFollowDecision(
   boundary_points.emplace_back(s_min_upper, 0.0);
 
   const double area = GetArea(boundary_points);
-  if (Double::compare(area, 0.0) <= 0) {
+  if (Double::Compare(area, 0.0) <= 0) {
     std::string msg = "Do not need to map because area is zero.";
     AINFO << msg;
     return Status(ErrorCode::PLANNING_SKIP, msg);
@@ -450,7 +450,7 @@ Status StBoundaryMapper::GetSpeedLimits(
 
   std::vector<double> speed_limits;
   for (const auto& path_point : path_data_.discretized_path().points()) {
-    if (Double::compare(path_point.s(), reference_line_.length()) > 0) {
+    if (Double::Compare(path_point.s(), reference_line_.length()) > 0) {
       std::string msg = common::util::StrCat(
           "path length [", path_data_.discretized_path().length(),
           "] is LARGER than reference_line_ length [", reference_line_.length(),

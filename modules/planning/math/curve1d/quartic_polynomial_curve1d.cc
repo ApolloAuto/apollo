@@ -51,7 +51,7 @@ QuarticPolynomialCurve1d::QuarticPolynomialCurve1d(
   coef_ = other.coef_;
 }
 
-double QuarticPolynomialCurve1d::evaluate(const std::uint32_t order,
+double QuarticPolynomialCurve1d::Evaluate(const std::uint32_t order,
                                           const double p) const {
   switch (order) {
     case 0: {

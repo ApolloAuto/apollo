@@ -32,19 +32,19 @@ class Double {
   explicit Double(const double value);
   ~Double() = default;
 
-  double value() const;
+  double Value() const;
 
-  static int compare(const double d1, const double d2, const double epsilon);
-  static int compare(const double d1, const double d2);
-  static int compare(const Double& d1, const Double& d2, const double epsilon);
-  static int compare(const Double& d1, const Double& d2);
+  static int Compare(const double d1, const double d2, const double epsilon);
+  static int Compare(const double d1, const double d2);
+  static int Compare(const Double& d1, const Double& d2, const double epsilon);
+  static int Compare(const Double& d1, const Double& d2);
 
   static Double sqrt(const Double& d1);
 
-  int compare_to(const double d1, const double epsilon) const;
-  int compare_to(const double d1) const;
-  int compare_to(const Double& d1, const double epsilon) const;
-  int compare_to(const Double& d1) const;
+  int CompareTo(const double d1, const double epsilon) const;
+  int CompareTo(const double d1) const;
+  int CompareTo(const Double& d1, const double epsilon) const;
+  int CompareTo(const Double& d1) const;
 
   Double operator+(const Double& other) const;
   Double operator-(const Double& other) const;

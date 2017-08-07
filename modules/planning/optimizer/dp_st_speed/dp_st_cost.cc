@@ -65,15 +65,15 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
                               const double speed_limit) const {
   double cost = 0.0;
   double speed = (second.s() - first.s()) / _unit_t;
-  if (Double::compare(speed, 0.0) < 0) {
+  if (Double::Compare(speed, 0.0) < 0) {
     cost = _dp_st_speed_config.st_graph_default_point_cost();
   }
   double det_speed = (speed - speed_limit) / speed_limit;
-  if (Double::compare(det_speed, 0.0) > 0) {
+  if (Double::Compare(det_speed, 0.0) > 0) {
     cost = _dp_st_speed_config.exceed_speed_penalty() *
            _dp_st_speed_config.default_speed_cost() * fabs(speed * speed) *
            _unit_t;
-  } else if (Double::compare(det_speed, 0.0) < 0) {
+  } else if (Double::Compare(det_speed, 0.0) < 0) {
     cost = _dp_st_speed_config.low_speed_penalty() *
            _dp_st_speed_config.default_speed_cost() * -det_speed * _unit_t;
   } else {
@@ -119,9 +119,9 @@ double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
 double DpStCost::JerkCost(const double jerk) const {
   double jerk_sq = jerk * jerk;
   double cost = 0.0;
-  if (Double::compare(jerk, 0.0) > 0) {
+  if (Double::Compare(jerk, 0.0) > 0) {
     cost = _dp_st_speed_config.positive_jerk_coeff() * jerk_sq * _unit_t;
-  } else if (Double::compare(jerk, 0.0) < 0) {
+  } else if (Double::Compare(jerk, 0.0) < 0) {
     cost = _dp_st_speed_config.negative_jerk_coeff() * jerk_sq * _unit_t;
   } else {
     cost = 0.0;

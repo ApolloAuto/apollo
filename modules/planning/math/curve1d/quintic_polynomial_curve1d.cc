@@ -52,7 +52,7 @@ QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
   return;
 }
 
-double QuinticPolynomialCurve1d::evaluate(const uint32_t order,
+double QuinticPolynomialCurve1d::Evaluate(const uint32_t order,
                                           const double p) const {
   switch (order) {
     case 0: {

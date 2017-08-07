@@ -27,7 +27,7 @@ using apollo::common::TrajectoryPoint;
 
 TrajectoryPoint PublishableTrajectory::evaluate_absolute_time(
     const double abs_time) const {
-  return evaluate(abs_time - _header_time);
+  return Evaluate(abs_time - _header_time);
 }
 
 TrajectoryPoint

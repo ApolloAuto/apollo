@@ -81,7 +81,7 @@ Status DpStGraph::InitCostTable() {
   uint32_t dim_s = dp_st_speed_config_.matrix_dimension_s();
   uint32_t dim_t = dp_st_speed_config_.matrix_dimension_t();
 
-  if (Double::compare(dp_st_speed_config_.total_path_length(), 0.0) == 0) {
+  if (Double::Compare(dp_st_speed_config_.total_path_length(), 0.0) == 0) {
     unit_s_ = 1e-8;
     uint32_t dim_s =
         std::min(dim_s, static_cast<uint32_t>(
@@ -271,8 +271,8 @@ Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
   }
   std::reverse(speed_profile.begin(), speed_profile.end());
 
-  if (Double::compare(speed_profile.front().t(), 0.0) != 0 ||
-      Double::compare(speed_profile.front().s(), 0.0) != 0) {
+  if (Double::Compare(speed_profile.front().t(), 0.0) != 0 ||
+      Double::Compare(speed_profile.front().s(), 0.0) != 0) {
     const std::string msg = "Fail to retrieve speed profile.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

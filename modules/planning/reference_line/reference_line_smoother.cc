@@ -91,12 +91,12 @@ bool ReferenceLineSmoother::smooth(
     std::pair<double, double> xy = spline_solver_->spline()(t);
     const double heading = std::atan2(spline_solver_->spline().derivative_y(t),
                                       spline_solver_->spline().derivative_x(t));
-    const double kappa = CurveMath::compute_curvature(
+    const double kappa = CurveMath::ComputeCurvature(
         spline_solver_->spline().derivative_x(t),
         spline_solver_->spline().second_derivative_x(t),
         spline_solver_->spline().derivative_y(t),
         spline_solver_->spline().second_derivative_y(t));
-    const double dkappa = CurveMath::compute_curvature_derivative(
+    const double dkappa = CurveMath::ComputeCurvatureDerivative(
         spline_solver_->spline().derivative_x(t),
         spline_solver_->spline().second_derivative_x(t),
         spline_solver_->spline().third_derivative_x(t),
@@ -224,13 +224,13 @@ bool ReferenceLineSmoother::extract_evaluated_points(
 
 bool ReferenceLineSmoother::get_s_from_param_t(const double t,
                                                double* const s) const {
-  if (t_knots_.size() < 2 || Double::compare(t, t_knots_.back(), 1e-8) > 0) {
+  if (t_knots_.size() < 2 || Double::Compare(t, t_knots_.back(), 1e-8) > 0) {
     return false;
   }
   std::uint32_t lower = find_index(t);
   std::uint32_t upper = lower + 1;
   double weight = 0.0;
-  if (Double::compare(t_knots_[upper], t_knots_[lower], 1e-8) > 0) {
+  if (Double::Compare(t_knots_[upper], t_knots_[lower], 1e-8) > 0) {
     weight = (t - t_knots_[lower]) / (t_knots_[upper] - t_knots_[lower]);
   }
   *s =
