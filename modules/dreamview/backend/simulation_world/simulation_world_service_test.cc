@@ -295,7 +295,6 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   // The 1st obstacle has two decisions: nudge or sidepass.
   apollo::planning::ObjectDecision* obj_decision1 =
       obj_decisions->add_decision();
-  obj_decision1->set_type(apollo::planning::ObjectDecision_ObjectType_VIRTUAL);
   PerceptionObstacle* perception1 =
       obj_decision1->mutable_prediction()->mutable_perception_obstacle();
   perception1->set_id(1);
@@ -356,7 +355,7 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   for (int i = 0; i < 2; ++i) {
     const Object& obj_dec = world.object(i);
     if (obj_dec.id() == "1") {
-      EXPECT_EQ(Object_Type_VIRTUAL, obj_dec.type());
+      EXPECT_EQ(Object_Type_UNKNOWN, obj_dec.type());
       EXPECT_DOUBLE_EQ(1.0, obj_dec.position_x());
       EXPECT_DOUBLE_EQ(2.0, obj_dec.position_y());
       EXPECT_DOUBLE_EQ(3.0, obj_dec.heading());
