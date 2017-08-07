@@ -27,9 +27,9 @@ Double::Double(const double value) : value_(value) {
   CHECK(!std::isnan(value));
 }
 
-double Double::value() const { return value_; }
+double Double::Value() const { return value_; }
 
-int Double::compare(const double d1, const double d2, const double epsilon) {
+int Double::Compare(const double d1, const double d2, const double epsilon) {
   CHECK(!std::isnan(d1));
   CHECK(!std::isnan(d2));
 
@@ -42,21 +42,21 @@ int Double::compare(const double d1, const double d2, const double epsilon) {
   }
 }
 
-int Double::compare(const double d1, const double d2) {
-  return compare(d1, d2, kEpsilon_);
+int Double::Compare(const double d1, const double d2) {
+  return Compare(d1, d2, kEpsilon_);
 }
 
-int Double::compare(const Double& d1, const Double& d2, const double epsilon) {
-  return compare(d1.value(), d2.value(), epsilon);
+int Double::Compare(const Double& d1, const Double& d2, const double epsilon) {
+  return Compare(d1.Value(), d2.Value(), epsilon);
 }
 
-int Double::compare(const Double& d1, const Double& d2) {
-  return compare(d1.value(), d2.value());
+int Double::Compare(const Double& d1, const Double& d2) {
+  return Compare(d1.Value(), d2.Value());
 }
 
-Double Double::sqrt(const Double& d1) { return Double(std::sqrt(d1.value())); }
+Double Double::sqrt(const Double& d1) { return Double(std::sqrt(d1.Value())); }
 
-int Double::compare_to(const double d1, const double epsilon) const {
+int Double::CompareTo(const double d1, const double epsilon) const {
   CHECK(!std::isnan(d1));
   if (definitely_greater_than(value_, d1, epsilon)) {
     return 1;
@@ -67,61 +67,61 @@ int Double::compare_to(const double d1, const double epsilon) const {
   }
 }
 
-int Double::compare_to(const double d1) const {
-  return compare_to(d1, kEpsilon_);
+int Double::CompareTo(const double d1) const {
+  return CompareTo(d1, kEpsilon_);
 }
 
-int Double::compare_to(const Double& d1, const double epsilon) const {
-  return compare_to(d1.value(), epsilon);
+int Double::CompareTo(const Double& d1, const double epsilon) const {
+  return CompareTo(d1.Value(), epsilon);
 }
 
-int Double::compare_to(const Double& d1) const {
-  return compare_to(d1.value(), kEpsilon_);
+int Double::CompareTo(const Double& d1) const {
+  return CompareTo(d1.Value(), kEpsilon_);
 }
 
 Double& Double::operator=(const Double& other) {
-  value_ = other.value();
+  value_ = other.Value();
   return *this;
 }
 
 Double Double::operator+(const Double& other) const {
-  return Double(value_ + other.value());
+  return Double(value_ + other.Value());
 }
 
 Double Double::operator-(const Double& other) const {
-  return Double(value_ - other.value());
+  return Double(value_ - other.Value());
 }
 
 Double Double::operator*(const Double& other) const {
-  return Double(value_ * other.value());
+  return Double(value_ * other.Value());
 }
 
 Double Double::operator/(const Double& other) const {
-  return Double(value_ / other.value());
+  return Double(value_ / other.Value());
 }
 
 Double& Double::operator+=(const Double& other) {
-  value_ += other.value();
+  value_ += other.Value();
   return *this;
 }
 
 Double& Double::operator-=(const Double& other) {
-  value_ -= other.value();
+  value_ -= other.Value();
   return *this;
 }
 
 Double& Double::operator*=(const Double& other) {
-  value_ *= other.value();
+  value_ *= other.Value();
   return *this;
 }
 
 Double& Double::operator/=(const Double& other) {
-  value_ /= other.value();
+  value_ /= other.Value();
   return *this;
 }
 
 bool Double::operator>(const Double& other) const {
-  return definitely_greater_than(value_, other.value(), kEpsilon_);
+  return definitely_greater_than(value_, other.Value(), kEpsilon_);
 }
 
 bool Double::operator>=(const Double& other) const {
@@ -129,7 +129,7 @@ bool Double::operator>=(const Double& other) const {
 }
 
 bool Double::operator<(const Double& other) const {
-  return definitely_less_than(value_, other.value(), kEpsilon_);
+  return definitely_less_than(value_, other.Value(), kEpsilon_);
 }
 
 bool Double::operator<=(const Double& other) const {
@@ -137,7 +137,7 @@ bool Double::operator<=(const Double& other) const {
 }
 
 bool Double::operator==(const Double& other) const {
-  return essentially_equal(value_, other.value(), kEpsilon_);
+  return essentially_equal(value_, other.Value(), kEpsilon_);
 }
 
 bool Double::approximately_equal(double a, double b, double epsilon) {

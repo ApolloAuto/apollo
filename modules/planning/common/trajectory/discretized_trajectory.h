@@ -40,7 +40,7 @@ class DiscretizedTrajectory : public Trajectory {
 
   double time_length() const override;
 
-  apollo::common::TrajectoryPoint evaluate(
+  apollo::common::TrajectoryPoint Evaluate(
       const double relative_time) const override;
 
   apollo::common::TrajectoryPoint start_point() const override;

@@ -51,7 +51,7 @@ bool QpSplinePathGenerator::Generate(
   }
   double start_s = init_frenet_point_.s();
   double end_s = std::min(reference_line_.length(),
-                          init_frenet_point_.s() + FLAGS_planning_distance);
+                          init_frenet_point_.s() + FLAGS_look_forward_distance);
 
   QpFrenetFrame qp_frenet_frame(reference_line_, path_obstacles, speed_data,
                                 init_frenet_point_, start_s, end_s,
@@ -106,7 +106,7 @@ bool QpSplinePathGenerator::Generate(
   double s = init_frenet_point_.s();
   double s_resolution =
       (end_s - init_frenet_point_.s()) / qp_spline_path_config_.num_output();
-  while (Double::compare(s, end_s) < 0) {
+  while (Double::Compare(s, end_s) < 0) {
     double l = spline(s);
     double dl = spline.derivative(s);
     double ddl = spline.second_order_derivative(s);
@@ -127,7 +127,7 @@ bool QpSplinePathGenerator::Generate(
           common::util::Distance2D(path_points.back(), path_point);
       path_point.set_s(path_points.back().s() + distance);
     }
-    if (Double::compare(path_point.s(), end_s) >= 0) {
+    if (Double::Compare(path_point.s(), end_s) >= 0) {
       break;
     }
     path_points.push_back(path_point);
@@ -159,7 +159,7 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
   const double kappa_ref = ref_point.kappa();
   const double dkappa_ref = ref_point.dkappa();
 
-  const double dl = SLAnalyticTransformation::calculate_lateral_derivative(
+  const double dl = SLAnalyticTransformation::CalculateLateralDerivative(
       theta_ref, theta, l, kappa_ref);
   const double ddl =
       SLAnalyticTransformation::calculate_second_order_lateral_derivative(
@@ -177,8 +177,8 @@ bool QpSplinePathGenerator::InitCoordRange(const QpFrenetFrame& qp_frenet_frame,
 
   const ReferenceLine& reference_line_ = qp_frenet_frame.GetReferenceLine();
 
-  double end_point =
-      std::min(reference_line_.length(), *start_s + FLAGS_planning_distance);
+  double end_point = std::min(reference_line_.length(),
+                              *start_s + FLAGS_look_forward_distance);
 
   end_point =
       std::min(qp_frenet_frame.feasible_longitudinal_upper_bound(), end_point);
@@ -198,9 +198,7 @@ bool QpSplinePathGenerator::InitSpline(
   }
   double distance = std::fmin(reference_line_.map_path().length(), end_s) -
                     init_frenet_point.s();
-  if (distance > FLAGS_planning_distance) {
-    distance = FLAGS_planning_distance;
-  }
+  distance = std::fmin(distance, FLAGS_look_forward_distance);
   const double delta_s = distance / qp_spline_path_config_.number_of_knots();
   double curr_knot_s = init_frenet_point.s();
 

@@ -56,7 +56,7 @@ class SLAnalyticTransformation {
    * @reference:  in paper: optimal trajectory generation for dynamic street
    * scenarios in a frenet frame
    **/
-  static double calculate_lateral_derivative(const double theta_ref,
+  static double CalculateLateralDerivative(const double theta_ref,
                                              const double theta, const double l,
                                              const double kappa_ref);
 

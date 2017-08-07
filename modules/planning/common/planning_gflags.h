@@ -47,9 +47,6 @@ DECLARE_double(default_reference_line_width);
 // parameters for task manager
 DECLARE_string(reference_line_decider);
 
-// parameters for path planning
-DECLARE_double(planning_distance);
-
 // parameters for trajectory planning
 DECLARE_double(trajectory_time_length);
 DECLARE_double(trajectory_time_resolution);

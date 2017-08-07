@@ -38,7 +38,7 @@ class DiscretizedPath {
 
   virtual ~DiscretizedPath() = default;
 
-  common::PathPoint evaluate(const double param) const;
+  common::PathPoint Evaluate(const double param) const;
 
   double length() const;
 
