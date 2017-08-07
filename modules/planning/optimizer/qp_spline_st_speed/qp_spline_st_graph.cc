@@ -232,31 +232,13 @@ Status QpSplineStGraph::ApplyKernel(
         qp_spline_st_speed_config_.jerk_kernel_weight());
   }
 
-  // add reference line for follow
-  for (const auto& boundary : boundaries) {
-    if (boundary.boundary_type() == StGraphBoundary::BoundaryType::FOLLOW) {
-      AddFollowReferenceLineKernel(boundary);
-    }
+  if (AddCruiseReferenceLineKernel(t_evaluated_, speed_limit) != Status::OK()) {
+    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
 
-  // TODO(all): add reference speed profile for different main decision
-  std::vector<double> s_vec;
-  if (speed_limit.speed_points().size() == 0) {
-    std::string msg = "Fail to apply_kernel due to empty speed limits.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+  if (AddFollowReferenceLineKernel(t_evaluated_, boundaries, 1.0) != Status::OK()) {
+    return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
-  double dist_ref = 0.0;
-  for (uint32_t i = 0;
-       i <= qp_spline_st_speed_config_.number_of_discrete_graph_t(); ++i) {
-    s_vec.push_back(dist_ref);
-    dist_ref +=
-        t_knots_resolution_ * speed_limit.get_speed_limit_by_s(dist_ref);
-  }
-  spline_kernel->add_reference_line_kernel_matrix(
-      t_knots_, s_vec,
-      qp_spline_st_speed_config_.reference_line_kernel_weight());
-
   return Status::OK();
 }
 
@@ -266,29 +248,56 @@ Status QpSplineStGraph::Solve() {
              : Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::solve");
 }
 
-Status QpSplineStGraph::AddFollowReferenceLineKernel(
-    const StGraphBoundary& follow_boundary) {
-  if (follow_boundary.boundary_type() !=
-      StGraphBoundary::BoundaryType::FOLLOW) {
-    std::string msg = common::util::StrCat(
-        "Fail to add follow reference line kernel because boundary type is ",
-        "incorrect. type: ", static_cast<int>(follow_boundary.boundary_type()),
-        ".");
+Status QpSplineStGraph::AddCruiseReferenceLineKernel(
+      const std::vector<double>& evaluate_t,
+      const SpeedLimit& speed_limit) {
+  auto* spline_kernel = spline_generator_->mutable_spline_kernel();  
+  std::vector<double> s_vec;
+  if (speed_limit.speed_points().size() == 0) {
+    std::string msg = "Fail to apply_kernel due to empty speed limits.";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  double dist_ref = 0.0;
+  for (uint32_t i = 1; i < evaluate_t.size(); ++i) {
+    s_vec.push_back(dist_ref);
+    dist_ref += (evaluate_t[i] - evaluate_t[i - 1]) *
+      speed_limit.get_speed_limit_by_s(dist_ref);
+  }
+  spline_kernel->add_reference_line_kernel_matrix(
+    t_knots_, s_vec,
+    qp_spline_st_speed_config_.reference_line_kernel_weight());
 
+  return Status::OK();  
+}
+
+Status QpSplineStGraph::AddFollowReferenceLineKernel(
+    const std::vector<double>& evaluate_t,
+    const std::vector<StGraphBoundary>& boundaries,
+    const double weight) {
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
   std::vector<double> ref_s;
-  for (const double curr_t : t_knots_) {
+  std::vector<double> filtered_evaluate_t;
+  for (const double curr_t : evaluate_t) {
     double s_upper = 0.0;
     double s_lower = 0.0;
-    if (follow_boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
-      ref_s.push_back(s_upper - follow_boundary.characteristic_length());
+    double s_ref_min = std::numeric_limits<double>::infinity();
+    bool success = false;
+    for (const auto& boundary : boundaries) {
+      if (boundary.boundary_type() == StGraphBoundary::BoundaryType::FOLLOW &&
+        boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
+        success = true;
+        s_ref_min = std::min(s_ref_min,
+          s_upper - boundary.characteristic_length());
+      }
     }
-    ref_s.push_back(s_upper);
+    if (success) {
+      filtered_evaluate_t.push_back(curr_t);
+      ref_s.push_back(s_ref_min);
+    }
   }
-
-  spline_kernel->add_reference_line_kernel_matrix(t_knots_, ref_s, 1.0);
+  spline_kernel->add_reference_line_kernel_matrix(
+    filtered_evaluate_t, ref_s, weight);
   return Status::OK();
 }
 

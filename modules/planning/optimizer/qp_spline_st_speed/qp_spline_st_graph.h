@@ -71,9 +71,14 @@ class QpSplineStGraph {
 
   // generate reference speed profile
   // common::Status ApplyReferenceSpeedProfile();
+  common::Status AddCruiseReferenceLineKernel(
+    const std::vector<double>& evaluate_t,
+      const SpeedLimit& speed_limit);
 
   common::Status AddFollowReferenceLineKernel(
-      const StGraphBoundary& follow_boundary);
+      const std::vector<double>& evaluate_t,
+      const std::vector<StGraphBoundary>& boundaries,
+      const double weight);
 
   common::Status EstimateSpeedUpperBound(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
