@@ -46,5 +46,6 @@ DECLARE_double(max_acceleration_when_stopped);
 DECLARE_double(max_abs_speed_when_stopped);
 
 DECLARE_double(steer_angle_rate);
+DECLARE_bool(enable_gain_scheduler);
 
 #endif  // MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_
