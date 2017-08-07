@@ -24,13 +24,16 @@
 namespace apollo {
 namespace planning {
 
-Decider::Decider() { decision_.Clear(); }
+Decider::Decider(DecisionResult* decision_result)
+: decision_(decision_result) {
+}
 
-const DecisionResult& Decider::Decision() const { return decision_; }
+const DecisionResult& Decider::Decision() const { return *decision_; }
 
-int Decider::MakeDecision(Frame* frame, PathDecision* const path_decision) {
-  decision_.Clear();
+int Decider::MakeDecision(Frame* frame) {
+  decision_->Clear();
 
+  auto path_decision = frame->path_decision();
   bool estop = 0;
   if (estop) {
     MakeEStopDecision(path_decision);
@@ -93,7 +96,7 @@ int Decider::MakeMainStopDecision(Frame* frame,
   }
 
   if (stop_obstacle != nullptr) {
-    MainStop* main_stop = decision_.mutable_main_decision()->mutable_stop();
+    MainStop* main_stop = decision_->mutable_main_decision()->mutable_stop();
     main_stop->set_reason_code(stop_decision->reason_code());
     main_stop->set_reason("stop by " + stop_obstacle->Id());
     main_stop->mutable_stop_point()->set_x(stop_decision->stop_point().x());
@@ -113,7 +116,7 @@ int Decider::MakeMainStopDecision(Frame* frame,
 }
 
 int Decider::SetObjectDecisions(PathDecision* const path_decision) {
-  ObjectDecisions* object_decisions = decision_.mutable_object_decision();
+  ObjectDecisions* object_decisions = decision_->mutable_object_decision();
 
   const auto& path_obstacles = path_decision->path_obstacles();
   for (const auto path_obstacle : path_obstacles.Items()) {
@@ -135,15 +138,15 @@ int Decider::SetObjectDecisions(PathDecision* const path_decision) {
 
 int Decider::MakeEStopDecision(PathDecision* const path_decision) {
   CHECK_NOTNULL(path_decision);
-  decision_.Clear();
+  decision_->Clear();
 
   // TODO: to be added
   // MainEmergencyStop* main_estop =
-  // decision_.mutable_main_decision()->mutable_estop();
+  // decision_->mutable_main_decision()->mutable_estop();
   // main_estop->set_reason_code();
   // main_estop->set_reason();
 
-  ObjectDecisions* object_decisions = decision_.mutable_object_decision();
+  ObjectDecisions* object_decisions = decision_->mutable_object_decision();
 
   const auto& path_obstacles = path_decision->path_obstacles();
   for (const auto path_obstacle : path_obstacles.Items()) {
@@ -152,9 +155,6 @@ int Decider::MakeEStopDecision(PathDecision* const path_decision) {
     const auto& obstacle = path_obstacle->Obstacle();
     object_decision->set_id(obstacle->Id());
     object_decision->add_object_decision()->mutable_avoid();
-    ;
-    // TODO: add prediction
-    // object_decision->mutable_prediction()->CopyFrom(*(obstacle->prediction()));
   }
   return 0;
 }

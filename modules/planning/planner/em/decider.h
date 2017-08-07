@@ -36,12 +36,12 @@ namespace planning {
 
 class Decider {
  public:
-  Decider();
+  explicit Decider(DecisionResult* decision_result);
   ~Decider() = default;
 
   const DecisionResult &Decision() const;
-  int MakeDecision(Frame* frame,
-                   PathDecision *const path_decision);
+  // TODO(all): fix the return code to use Status object.
+  int MakeDecision(Frame* frame);
 
  private:
   int MakeMainStopDecision(Frame* frame,
@@ -50,7 +50,7 @@ class Decider {
   int SetObjectDecisions(PathDecision *const path_decision);
 
  private:
-  DecisionResult decision_;
+  DecisionResult* decision_ = nullptr;  // not owned
 };
 
 }  // namespace planning

@@ -35,6 +35,7 @@
 #include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
+#include "modules/planning/planner/em/decider.h"
 
 namespace apollo {
 namespace planning {
@@ -115,6 +116,12 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
   ptr_stats->set_time_ms(time_diff_ms);
 }
 
+void EMPlanner::PopulateDecision(Frame* frame) {
+  auto planning_pb = frame->MutableADCTrajectory();
+  Decider decider(planning_pb->mutable_decision());
+  decider.MakeDecision(frame);
+}
+
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame,
                        PublishableTrajectory* ptr_publishable_trajectory) {
@@ -155,6 +162,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   computed_trajectory.set_header_time(VehicleState::instance()->timestamp());
 
   *ptr_publishable_trajectory = std::move(computed_trajectory);
+
+  PopulateDecision(frame);
 
   // Add debug information.
   if (FLAGS_enable_record_debug && ptr_debug != nullptr) {
