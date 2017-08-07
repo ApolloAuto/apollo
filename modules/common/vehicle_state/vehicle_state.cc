@@ -20,6 +20,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -59,20 +60,21 @@ void VehicleState::ConstructExceptLinearVelocity(
     z_ = localization.pose().position().z();
   }
 
+  const auto &orientation = localization.pose().orientation();
+
   if (localization.pose().has_heading()) {
     heading_ = localization.pose().heading();
   } else {
-    const auto &orientation = localization.pose().orientation();
     heading_ = ::apollo::common::math::QuaternionToHeading(
         orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
   }
 
   if (FLAGS_enable_map_reference_unify) {
     angular_v_ = localization.pose().angular_velocity_vrf().z();
-    linear_a_ = localization.pose().linear_acceleration_vrf().y();
+    linear_a_y_ = localization.pose().linear_acceleration_vrf().y();
   } else {
     angular_v_ = localization.pose().angular_velocity().z();
-    linear_a_ = localization.pose().linear_acceleration().y();
+    linear_a_y_ = localization.pose().linear_acceleration().y();
   }
 
   if (!(linear_v_ > 0.0)) {
@@ -80,6 +82,11 @@ void VehicleState::ConstructExceptLinearVelocity(
   } else {
       kappa_ = angular_v_ / linear_v_;
   }
+
+  ::apollo::common::math::EulerAnglesZXYd euler_angle(orientation.qw(), \
+          orientation.qx(), orientation.qy(), orientation.qz());
+
+  pitch_ = euler_angle.pitch();
 }
 
 double VehicleState::x() const { return x_; }
@@ -87,6 +94,8 @@ double VehicleState::x() const { return x_; }
 double VehicleState::y() const { return y_; }
 
 double VehicleState::z() const { return z_; }
+
+double VehicleState::pitch() const { return pitch_; }
 
 double VehicleState::heading() const { return heading_; }
 
@@ -96,7 +105,7 @@ double VehicleState::linear_velocity() const { return linear_v_; }
 
 double VehicleState::angular_velocity() const { return angular_v_; }
 
-double VehicleState::linear_acceleration() const { return linear_a_; }
+double VehicleState::linear_acceleration() const { return linear_a_y_; }
 
 double VehicleState::gear() const { return gear_; }
 
@@ -105,6 +114,8 @@ void VehicleState::set_x(const double x) { x_ = x; }
 void VehicleState::set_y(const double y) { y_ = y; }
 
 void VehicleState::set_z(const double z) { z_ = z; }
+
+void VehicleState::set_pitch(const double pitch) { pitch_ = pitch; }
 
 void VehicleState::set_heading(const double heading) { heading_ = heading; }
 

@@ -34,6 +34,8 @@ using apollo::common::VehicleState;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 
+const double GRA_ACC = 9.8;
+
 LonController::LonController()
     : name_(ControlConf_ControllerType_Name(ControlConf::LON_CONTROLLER)) {
   if (FLAGS_enable_csv_debug) {
@@ -228,8 +230,10 @@ Status LonController::ComputeControlCommand(
   }
 
   double acceleration_cmd =
-      acceleration_cmd_closeloop + debug->preview_acceleration_reference();
-  debug->set_is_full_stop(false);
+      acceleration_cmd_closeloop + debug->preview_acceleration_reference() + \
+      digital_filter_acceleration_.Filter(GRA_ACC \
+              * std::sin(VehicleState::instance()->pitch()));
+      debug->set_is_full_stop(false);
   if (std::abs(debug->preview_acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
       std::abs(debug->preview_speed_reference()) <=

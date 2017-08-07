@@ -87,6 +87,12 @@ class VehicleState {
   double kappa() const;
 
   /**
+   * @brief Get the vehicle pitch angle.
+   * @return The euler pitch angle.
+   */
+  double pitch() const;
+
+  /**
    * @brief Get the heading of vehicle position, which is the angle
    *        between the vehicle's heading direction and the x-axis.
    * @return The angle between the vehicle's heading direction
@@ -135,6 +141,12 @@ class VehicleState {
    * @param z The z coordinate of vehicle position.
    */
   void set_z(const double z);
+
+  /**
+   * @brief Set the vehicle pitch angle.
+   * @param pitch The vehicle pitch angle.
+   */
+  void set_pitch(const double pitch);
 
   /**
    * @brief Set the heading of vehicle position, which is the angle
@@ -192,13 +204,14 @@ class VehicleState {
   double x_ = 0.0;
   double y_ = 0.0;
   double z_ = 0.0;
+  double pitch_ = 0.0;
   double heading_ = 0.0;
   // TODO: check the setting of kappa_
   double kappa_ = 0.0;
   double linear_v_ = 0.0;
   double angular_v_ = 0.0;
-  double linear_a_ = 0.0;
   double timestamp_ = 0.0;
+  double linear_a_y_ = 0.0;
   canbus::Chassis::GearPosition gear_;
   localization::Pose pose_;
 };
