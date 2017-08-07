@@ -51,6 +51,8 @@ void Frame::SetVehicleInitPose(const localization::Pose &pose) {
   init_pose_ = pose;
 }
 
+const localization::Pose &Frame::VehicleInitPose() const { return init_pose_; }
+
 void Frame::SetRoutingResponse(const routing::RoutingResponse &routing) {
   routing_response_ = routing;
 }

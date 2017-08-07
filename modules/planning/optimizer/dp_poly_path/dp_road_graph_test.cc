@@ -39,11 +39,13 @@ using common::adapter::AdapterManager;
 class DpRoadGraphTest : public PlanningTestBase {
  public:
   void SetInitPoint() {
-    init_point_.mutable_path_point()->set_x(pose_.position().x());
-    init_point_.mutable_path_point()->set_y(pose_.position().y());
-    const auto& velocity = pose_.linear_velocity();
+    const auto* frame = planning_.GetFrame();
+    const auto& pose = frame->VehicleInitPose();
+    init_point_.mutable_path_point()->set_x(pose.position().x());
+    init_point_.mutable_path_point()->set_y(pose.position().y());
+    const auto& velocity = pose.linear_velocity();
     init_point_.set_v(std::hypot(velocity.x(), velocity.y()));
-    const auto& acc = pose_.linear_acceleration();
+    const auto& acc = pose.linear_acceleration();
     init_point_.set_a(std::hypot(acc.x(), acc.y()));
     init_point_.set_relative_time(0.0);
   }
@@ -83,13 +85,14 @@ class DpRoadGraphTest : public PlanningTestBase {
 };
 
 TEST_F(DpRoadGraphTest, speed_road_graph) {
-  DPRoadGraph road_graph(dp_poly_path_config_, *reference_line_, speed_data_);
+  DpPolyPathConfig dp_poly_path_config;  // default values
+  DPRoadGraph road_graph(dp_poly_path_config, *reference_line_, speed_data_);
   ASSERT_TRUE(reference_line_ != nullptr);
   bool result = road_graph.FindPathTunnel(init_point_, &path_data_);
   EXPECT_TRUE(result);
-  EXPECT_EQ(765, path_data_.discretized_path().num_of_points());
-  EXPECT_EQ(765, path_data_.frenet_frame_path().number_of_points());
-  EXPECT_FLOAT_EQ(75.900002,
+  EXPECT_EQ(648, path_data_.discretized_path().num_of_points());
+  EXPECT_EQ(648, path_data_.frenet_frame_path().number_of_points());
+  EXPECT_FLOAT_EQ(70.450378,
                   path_data_.frenet_frame_path().points().back().s());
   EXPECT_FLOAT_EQ(0.0, path_data_.frenet_frame_path().points().back().l());
   // export_path_data(path_data_, "/tmp/path.txt");

@@ -71,6 +71,7 @@ class Frame {
 
   void set_computed_trajectory(const PublishableTrajectory &trajectory);
   const PublishableTrajectory &computed_trajectory() const;
+  const localization::Pose &VehicleInitPose() const;
 
   PathDecision *path_decision();
 
