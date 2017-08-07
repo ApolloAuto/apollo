@@ -40,8 +40,8 @@ class StBoundaryMapper {
  public:
   StBoundaryMapper(const StBoundaryConfig& config,
                    const ReferenceLine& reference_line,
-                   const PathData& path_data,
-                   const double planning_distance, const double planning_time);
+                   const PathData& path_data, const double planning_distance,
+                   const double planning_time);
 
   apollo::common::Status GetGraphBoundary(
       const PathDecision& path_decision,
