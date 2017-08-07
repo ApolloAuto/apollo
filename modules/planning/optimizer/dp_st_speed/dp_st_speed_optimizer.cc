@@ -67,8 +67,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
 
-  StBoundaryMapper boundary_mapper(st_boundary_config_,
-                                   reference_line,
+  StBoundaryMapper boundary_mapper(st_boundary_config_, reference_line,
                                    path_data,
                                    dp_st_speed_config_.total_path_length(),
                                    dp_st_speed_config_.total_time());
@@ -94,7 +93,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   const double path_length = path_data.discretized_path().length();
   StGraphData st_graph_data(boundaries, init_point, speed_limit, path_length);
 
-  DpStGraph st_graph(dp_st_speed_config_);
+  DpStGraph st_graph(dp_st_speed_config_, path_data);
   if (!st_graph.Search(st_graph_data, path_decision, speed_data).ok()) {
     const std::string msg = "Failed to search graph with dynamic programming.";
     AERROR << msg;

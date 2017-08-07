@@ -53,14 +53,15 @@ class DpStSpeedTest : public PlanningTestBase {
 
     FrenetFramePath path(points);
     path_data_.set_frenet_path(path);
+    path_data_.set_reference_line(reference_line_);
   }
 
   virtual void SetUp() {
     google::InitGoogleLogging("DpStSpeedTest");
     PlanningTestBase::SetUp();
-    SetPathDataWithStraightLine();
     const auto* frame = planning_.GetFrame();
     reference_line_ = &(frame->reference_line());
+    SetPathDataWithStraightLine();
   }
 
  protected:
@@ -72,7 +73,7 @@ class DpStSpeedTest : public PlanningTestBase {
 
 TEST_F(DpStSpeedTest, dp_st_graph_test) {
   DpStSpeedConfig dp_st_speed_config;
-  DpStGraph dp_st_graph(dp_st_speed_config);
+  DpStGraph dp_st_graph(dp_st_speed_config, path_data_);
 }
 
 }  // namespace planning
