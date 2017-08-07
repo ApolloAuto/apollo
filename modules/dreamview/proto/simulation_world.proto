@@ -30,7 +30,7 @@ message Decision {
     FOLLOW = 5; // Follow the object in the same lane
     SIDEPASS = 6; // Pass the object in neighbouring lane
   }
-  required Type type = 1 [default = IGNORE];
+  optional Type type = 1 [default = IGNORE];
 
   // Shape Info
   // Can be used for corners of nudge region

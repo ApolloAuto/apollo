@@ -8,6 +8,8 @@ import objectFollowMarker from "assets/images/decision/object-follow.png";
 import objectYieldMarker from "assets/images/decision/object-yield.png";
 import objectOvertakeMarker from "assets/images/decision/object-overtake.png";
 
+import fenceStop from "assets/images/decision/stop-fence.png";
+
 import reasonHeadVehicle from "assets/images/decision/head-vehicle.png";
 import reasonDestination from "assets/images/decision/destination.png";
 import reasonPedestrian from "assets/images/decision/pedestrian.png";
@@ -21,7 +23,7 @@ import reasonEmergency from "assets/images/decision/emergency.png";
 import reasonNotReady from "assets/images/decision/not-ready.png";
 
 import { copyProperty, hideArrayObjects } from "utils/misc";
-import { drawImage, drawShapeFromPoints } from "utils/draw";
+import { drawImage, drawDashedLineFromPoints, drawShapeFromPoints } from "utils/draw";
 
 const _ = require('lodash');
 const MarkerColorMapping = {
@@ -50,6 +52,7 @@ export default class Decision {
         this.markers = []; // for FOLLOW/STOP/YIELD/OVERTAKE decisions
         this.nudges = []; // for NUDGE decision
         this.mainDecision = this.getMainDecision(); // for main decision with reason
+        this.mainDecisionAddedToScene = false;
     }
 
     update(world, coordinates, scene) {
@@ -67,9 +70,14 @@ export default class Decision {
         } else {
             // Update main decision marker.
             this.mainDecision.visible = true;
+            if (!this.mainDecisionAddedToScene) {
+                scene.add(this.mainDecision);
+                this.mainDecisionAddedToScene = true;
+            }
             copyProperty(this.mainDecision.position, coordinates.applyOffset(
                     new THREE.Vector3(mainStop.positionX, mainStop.positionY, 0.2)));
-            this.mainDecision.rotation.set(Math.PI / 2, mainStop.heading - Math.PI / 2, 0);
+            this.mainDecision.rotation.set(Math.PI / 2,
+                    mainStop.heading - Math.PI / 2, 0);
             const mainStopReason = _.attempt(() => mainStop.decision[0].stopReason);
             if (!_.isError(mainStopReason)) {
                 let reason = null;
@@ -155,12 +163,15 @@ export default class Decision {
     getMainDecision() {
         const marker = new THREE.Object3D();
 
-        const mainStop = drawImage(mainStopMarker, 2, 2.5, 0, 1, 0);
+        const stopFence = drawImage(fenceStop, 11.625, 3, 0, 1.5, 0);
+        marker.add(stopFence);
+
+        const mainStop = drawImage(mainStopMarker, 1, 1, 3, 3.6, 0);
         marker.add(mainStop);
 
         let reason = null;
         for (reason in StopReasonMarkerMapping) {
-            const reasonMarker = drawImage(StopReasonMarkerMapping[reason], 2, 2, 2, 2, 0);
+            const reasonMarker = drawImage(StopReasonMarkerMapping[reason], 1, 1, 4.1, 3.5, 0);
             marker.add(reasonMarker);
             marker[reason] = reasonMarker;
         }
@@ -172,16 +183,20 @@ export default class Decision {
     getObstacleDecision(color) {
         const marker = new THREE.Object3D();
 
-        const objStop = drawImage(objectStopMarker, 2, 2.5, 0, 1, 0);
+        // TODO: optimize with different fence types
+        const stopFence = drawImage(fenceStop, 11.625, 3, 0, 1.5, 0);
+        marker.add(stopFence);
+
+        const objStop = drawImage(objectStopMarker, 1, 1, 3, 3.6, 0);
         marker.add(objStop);
         marker.objStop = objStop;
-        const objFollow = drawImage(objectFollowMarker, 2, 2.5, 0, 1, 0);
+        const objFollow = drawImage(objectFollowMarker, 1, 1, 3, 3.6, 0);
         marker.add(objFollow);
         marker.objFollow = objFollow;
-        const objYield = drawImage(objectYieldMarker, 2, 2.5, 0, 1, 0);
+        const objYield = drawImage(objectYieldMarker, 1, 1, 3, 3.6, 0);
         marker.add(objYield);
         marker.objYield = objYield;
-        const objOvertake = drawImage(objectStopMarker, 2, 2.5, 0, 1, 0);
+        const objOvertake = drawImage(objectStopMarker, 1, 1, 3, 3.6, 0);
         marker.add(objOvertake);
         marker.objOvertake = objOvertake;
 

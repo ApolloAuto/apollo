@@ -16,7 +16,8 @@ export function addOffsetZ(mesh, value) {
 }
 
 export function drawImage(img, width, height, x = 0, y = 0, z = 0) {
-    const material = new THREE.MeshBasicMaterial({map: textureLoader.load(img)});
+    const material = new THREE.MeshBasicMaterial(
+            {map: textureLoader.load(img), transparent: true});
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
     mesh.position.set(x, y, z);
     mesh.overdraw = true;

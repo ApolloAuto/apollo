@@ -152,7 +152,7 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
       world_object->set_type(Object_Type_VEHICLE);
       break;
     default:
-      world_object->set_type(Object_Type_UNKNOWN);
+      world_object->set_type(Object_Type_VIRTUAL);
   }
 }
 
@@ -538,15 +538,7 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   for (const auto &obj_decision : decision_res.object_decision().decision()) {
     if (obj_decision.has_prediction()) {
       const auto &p_obj = obj_decision.prediction().perception_obstacle();
-      const std::string id = std::to_string(p_obj.id());
       Object &world_obj = CreateWorldObjectIfAbsent(p_obj);
-
-      // If the object does not exist in the map yet, it could be extra virtual
-      // objects created by decision modules.
-      if (obj_decision.type() ==
-          apollo::planning::ObjectDecision_ObjectType_VIRTUAL) {
-        world_obj.set_type(Object_Type_VIRTUAL);
-      }
 
       for (const auto &decision : obj_decision.object_decision()) {
         Decision *world_decision = world_obj.add_decision();
