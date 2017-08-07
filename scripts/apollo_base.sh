@@ -16,11 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-
-START_TIME=$(($(date +%s%N)/1000000))
-TIME=$(date  +%Y%m%d_%H%M)
 
 RED='\033[0;31m'
 YELLOW='\e[33m'
@@ -35,7 +31,7 @@ function error() {
 }
 
 function warning() {
-  (>&2 echo -e "[${YELLOW}WARNING${NO_COLOR}] $*")
+  (>&2 echo -e "${YELLOW}[WARNING] $*${NO_COLOR}")
 }
 
 function ok() {
@@ -46,9 +42,13 @@ function print_delim() {
   echo '============================'
 }
 
-print_time() {
-  END_TIME=$(($(date +%s%N)/1000000))
-  ELAPSED_TIME=$(echo "scale=3; ($END_TIME - $START_TIME) / 1000" | bc -l)
+function get_now() {
+  echo $(date +%s)
+}
+
+function print_time() {
+  END_TIME=$(get_now)
+  ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc -l)
   MESSAGE="Took ${ELAPSED_TIME} seconds"
   info "${MESSAGE}"
 }
@@ -68,63 +68,73 @@ function fail() {
   exit -1
 }
 
+# Check whether user has agreed license agreement
+function check_agreement() {
+  agreement_record="$HOME/.cache/.apollo_agreement.txt"
+  if [ ! -e "$agreement_record" ]; then
+     AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
+     if [ ! -e "$AGREEMENT_FILE" ]; then
+          error "AGREEMENT $AGREEMENT_FILE does not exist."
+          exit 0
+     fi
+     cat $AGREEMENT_FILE
+     tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
+     echo $tip
+     read -n 1 user_agreed
+     if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+         rm -rf $agreement_record
+         cat $AGREEMENT_FILE >> $agreement_record
+         echo "$tip" >> $agreement_record
+         echo "$user_agreed" >> $agreement_record
+     else
+         exit 0
+     fi
+  fi
+}
 
-agreement_record="$HOME/.apollo_agreement.txt"
-if [ ! -e "$agreement_record" ]; then
-   AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
-   if [ ! -e "$AGREEMENT_FILE" ]; then
-        error "AGREEMENT $AGREEMENT_FILE does not exist."
-        exit 0
-   fi
-   cat $AGREEMENT_FILE
-   tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-   echo $tip 
-   read -n 1 user_agreed
-   if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
-       rm -rf $agreement_record
-       cat $AGREEMENT_FILE >> $agreement_record
-       echo "$tip" >> $agreement_record
-       echo "$user_agreed" >> $agreement_record
-   else
-       exit 0
-   fi
-fi
+function check_in_docker() {
+  if [ -f /.dockerenv ]; then
+      APOLLO_IN_DOCKER=true
+  else
+      APOLLO_IN_DOCKER=false
+  fi
+  export APOLLO_IN_DOCKER
+}
 
+function set_lib_path() {
+  if [ "$RELEASE_DOCKER" == 1 ];then
+      source /apollo/ros/setup.bash
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib
+      export PYTHONPATH=/apollo/lib:${PYTHONPATH}
+  else
+      if [ -e "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash" ]; then
+         source "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash"
+      fi
+      export PYTHONPATH=${APOLLO_ROOT_DIR}/bazel-genfiles:${PYTHONPATH}
+  fi
+}
 
-if [ -f /.dockerenv ]; then
-    APOLLO_IN_DOCKER=true
-else
-    APOLLO_IN_DOCKER=false
-fi
+function create_data_dir() {
+  if [ ! -e "${APOLLO_ROOT_DIR}/data/log" ]; then
+      mkdir -p "${APOLLO_ROOT_DIR}/data/log"
+  fi
 
-if [ "$RELEASE_DOCKER" == 1 ];then
-    source /apollo/ros/setup.bash
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib
-    export PYTHONPATH=/apollo/lib:${PYTHONPATH}
-else
-    source "${APOLLO_ROOT_DIR}/third_party/ros/setup.bash"
-    export PYTHONPATH=${APOLLO_ROOT_DIR}/bazel-genfiles:${PYTHONPATH}
-fi
+  if [ ! -e "${APOLLO_ROOT_DIR}/data/bag" ]; then
+      mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
+  fi
 
-if [ ! -e "${APOLLO_ROOT_DIR}/data/log" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/log"
-fi
+  if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
+      mkdir -p "${APOLLO_ROOT_DIR}/data/core"
+  fi
+}
 
-if [ ! -e "${APOLLO_ROOT_DIR}/data/bag" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
-fi
-
-if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/core"
-fi
-
-
-APOLLO_BIN_PREFIX=$APOLLO_ROOT_DIR
-if [ -e "${APOLLO_ROOT_DIR}/bazel-bin" ]; then
-    APOLLO_BIN_PREFIX="${APOLLO_ROOT_DIR}/bazel-bin"
-fi
-export APOLLO_BIN_PREFIX
-export APOLLO_IN_DOCKER
+function determine_bin_prefix() {
+  APOLLO_BIN_PREFIX=$APOLLO_ROOT_DIR
+  if [ -e "${APOLLO_ROOT_DIR}/bazel-bin" ]; then
+      APOLLO_BIN_PREFIX="${APOLLO_ROOT_DIR}/bazel-bin"
+  fi
+  export APOLLO_BIN_PREFIX
+}
 
 function is_stopped() {
     MODULE=${1}
@@ -175,7 +185,7 @@ function stop() {
     fi
 }
 
-function print_usage() {
+function help() {
   echo "Usage:
   ./$0 [COMMAND]"
   echo "COMMAND:
@@ -199,10 +209,16 @@ function run() {
             stop "$2"
             ;;
         help)
-            print_usage
+            help
             ;;
         *)
             start "$2"
             ;;
     esac
 }
+
+check_agreement
+check_in_docker
+create_data_dir
+set_lib_path
+determine_bin_prefix

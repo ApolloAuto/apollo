@@ -16,6 +16,8 @@
 
 #include "modules/planning/planning_node.h"
 
+#include <utility>
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -24,6 +26,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
@@ -70,11 +73,11 @@ void PlanningNode::RunOnce() {
 
   AINFO << "Start planning ...";
 
-  const auto& localization =
+  const auto &localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
   VehicleState vehicle_state(localization);
 
-  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
+  const auto &chassis = AdapterManager::GetChassis()->GetLatestObserved();
   bool is_on_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
 
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
@@ -85,10 +88,12 @@ void PlanningNode::RunOnce() {
       planning_cycle_time;
 
   std::vector<TrajectoryPoint> planning_trajectory;
-  bool res_planning = planning_.Plan(vehicle_state, is_on_auto_mode,
-      execution_start_time, &planning_trajectory);
+  bool res_planning =
+      planning_.Plan(vehicle_state, is_on_auto_mode, execution_start_time,
+                     &planning_trajectory);
   if (res_planning) {
-    TrajectoryPb trajectory_pb = ToTrajectoryPb(execution_start_time, planning_trajectory);
+    TrajectoryPb trajectory_pb =
+        ToTrajectoryPb(execution_start_time, planning_trajectory);
     AdapterManager::PublishPlanningTrajectory(trajectory_pb);
     AINFO << "Planning succeeded";
   } else {
@@ -96,29 +101,28 @@ void PlanningNode::RunOnce() {
   }
 }
 
-void PlanningNode::Reset() {
-  planning_.Reset();
-}
+void PlanningNode::Reset() { planning_.Reset(); }
 
 TrajectoryPb PlanningNode::ToTrajectoryPb(
     const double header_time,
-    const std::vector<TrajectoryPoint>& discretized_trajectory) {
+    const std::vector<TrajectoryPoint> &discretized_trajectory) {
   TrajectoryPb trajectory_pb;
   AdapterManager::FillPlanningTrajectoryHeader("planning",
                                                trajectory_pb.mutable_header());
 
   trajectory_pb.mutable_header()->set_timestamp_sec(header_time);
 
-  for (const auto& trajectory_point : discretized_trajectory) {
+  for (const auto &trajectory_point : discretized_trajectory) {
     auto ptr_trajectory_point_pb = trajectory_pb.add_adc_trajectory_point();
-    ptr_trajectory_point_pb->set_x(trajectory_point.x);
-    ptr_trajectory_point_pb->set_y(trajectory_point.y);
-    ptr_trajectory_point_pb->set_theta(trajectory_point.theta);
-    ptr_trajectory_point_pb->set_curvature(trajectory_point.kappa);
-    ptr_trajectory_point_pb->set_relative_time(trajectory_point.relative_time);
-    ptr_trajectory_point_pb->set_speed(trajectory_point.v);
-    ptr_trajectory_point_pb->set_acceleration_s(trajectory_point.a);
-    ptr_trajectory_point_pb->set_accumulated_s(trajectory_point.s);
+    ptr_trajectory_point_pb->set_x(trajectory_point.x());
+    ptr_trajectory_point_pb->set_y(trajectory_point.y());
+    ptr_trajectory_point_pb->set_theta(trajectory_point.theta());
+    ptr_trajectory_point_pb->set_curvature(trajectory_point.kappa());
+    ptr_trajectory_point_pb->set_relative_time(
+        trajectory_point.relative_time());
+    ptr_trajectory_point_pb->set_speed(trajectory_point.v());
+    ptr_trajectory_point_pb->set_acceleration_s(trajectory_point.a());
+    ptr_trajectory_point_pb->set_accumulated_s(trajectory_point.s());
   }
   return std::move(trajectory_pb);
 }

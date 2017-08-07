@@ -19,6 +19,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include "modules/canbus/common/canbus_consts.h"
 #include "modules/common/log.h"
@@ -28,7 +29,7 @@ namespace canbus {
 
 using ::apollo::common::ErrorCode;
 
-ErrorCode CanReceiver::Init(CanClient* can_client, MessageManager* pt_manager,
+ErrorCode CanReceiver::Init(CanClient *can_client, MessageManager *pt_manager,
                             bool enable_log) {
   can_client_ = can_client;
   pt_manager_ = pt_manager;
@@ -57,8 +58,8 @@ void CanReceiver::RecvThreadFunc() {
 
   while (IsRunning()) {
     std::vector<CanFrame> buf;
-    int32_t length = MAX_CAN_RECV_FRAME_LEN;
-    if (can_client_->Receive(&buf, &length) != ErrorCode::OK) {
+    int32_t frame_num = MAX_CAN_RECV_FRAME_LEN;
+    if (can_client_->Receive(&buf, &frame_num) != ErrorCode::OK) {
       LOG_IF_EVERY_N(ERROR, receive_error_count++ > ERROR_COUNT_MAX,
                      ERROR_COUNT_MAX)
           << "Received " << receive_error_count << " error messages.";
@@ -67,13 +68,13 @@ void CanReceiver::RecvThreadFunc() {
     }
     receive_error_count = 0;
 
-    if (buf.size() != static_cast<size_t>(length)) {
+    if (buf.size() != static_cast<size_t>(frame_num)) {
       AERROR << "Receiver buf size[" << buf.size()
-             << "] does not match can_client returned length[" << length
+             << "] does not match can_client returned length[" << frame_num
              << "].";
     }
 
-    if (length == 0) {
+    if (frame_num == 0) {
       LOG_IF_EVERY_N(ERROR, receive_none_count++ > ERROR_COUNT_MAX,
                      ERROR_COUNT_MAX)
           << "Received " << receive_none_count << " empty messages.";
@@ -82,16 +83,16 @@ void CanReceiver::RecvThreadFunc() {
     }
     receive_none_count = 0;
 
-    for (int32_t i = 0; i < length; ++i) {
-      uint8_t len = buf.at(i).len;
-      uint32_t uid = buf.at(i).id;
-      uint8_t* data = buf.at(i).data;
+    for (const auto &frame : buf) {
+      uint8_t len = frame.len;
+      uint32_t uid = frame.id;
+      const uint8_t *data = frame.data;
       struct timeval timestamp;
-      timestamp.tv_sec = buf.at(i).timestamp.tv_sec;
-      timestamp.tv_usec = buf.at(i).timestamp.tv_usec;
+      timestamp.tv_sec = frame.timestamp.tv_sec;
+      timestamp.tv_usec = frame.timestamp.tv_usec;
       pt_manager_->Parse(uid, data, len, timestamp);
       if (enable_log_) {
-        ADEBUG << "recv_can_frame#" << buf.at(i).CanFrameString();
+        ADEBUG << "recv_can_frame#" << frame.CanFrameString();
       }
     }
     std::this_thread::yield();

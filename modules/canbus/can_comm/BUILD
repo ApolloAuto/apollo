@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -21,6 +23,7 @@ cc_library(
         "//modules/canbus/vehicle:message_manager_base",
         "//modules/common",
         "//modules/common/proto:error_code_proto",
+        "@gtest//:gtest",
     ],
 )
 
@@ -53,3 +56,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cpplint()

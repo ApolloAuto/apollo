@@ -42,17 +42,17 @@ Status RTKLocalization::Start() {
   const double duration = 1.0 / FLAGS_localization_publish_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &RTKLocalization::OnTimer, this);
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorBuffer buffer(&monitor_);
   if (!AdapterManager::GetGps()) {
     buffer.ERROR() << "GPS input not initialized. Check file "
                    << FLAGS_rtk_adapter_config_file;
     buffer.PrintLog();
-    return Status(apollo::common::LOCALIZATION_ERROR, "no GPS adapter");
+    return Status(common::LOCALIZATION_ERROR, "no GPS adapter");
   }
   if (!AdapterManager::GetImu()) {
     buffer.ERROR("IMU input not initialized. Check your adapter.conf file!");
     buffer.PrintLog();
-    return Status(apollo::common::LOCALIZATION_ERROR, "no IMU adapter");
+    return Status(common::LOCALIZATION_ERROR, "no IMU adapter");
   }
   return Status::OK();
 }
@@ -63,9 +63,9 @@ Status RTKLocalization::Stop() {
 }
 
 void RTKLocalization::OnTimer(const ros::TimerEvent &event) {
-  double time_delay = apollo::common::time::ToSecond(Clock::Now()) -
-                      last_received_timestamp_sec_;
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  double time_delay =
+      common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
+  common::monitor::MonitorBuffer buffer(&monitor_);
   if (FLAGS_enable_gps_timestamp &&
       time_delay > FLAGS_gps_time_delay_tolerance) {
     buffer.ERROR() << "GPS message time delay: " << time_delay;
@@ -97,7 +97,7 @@ void RTKLocalization::OnTimer(const ros::TimerEvent &event) {
   // watch dog
   RunWatchDog();
 
-  last_received_timestamp_sec_ = apollo::common::time::ToSecond(Clock::Now());
+  last_received_timestamp_sec_ = common::time::ToSecond(Clock::Now());
 }
 
 template <class T>
@@ -119,14 +119,16 @@ T RTKLocalization::InterpolateXYZ(const T &p1, const T &p2,
 
 bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
                                       Imu *imu_msg) {
-  bool success = false;
-
+  if (imu_msg == nullptr) {
+    AERROR << "imu_msg should NOT be nullptr.";
+    return false;
+  }
   auto *imu_adapter = AdapterManager::GetImu();
   if (imu_adapter->Empty()) {
     AERROR << "[FindMatchingIMU]: Cannot find Matching IMU. "
            << "IMU message Queue is empty! GPS timestamp[" << gps_timestamp_sec
            << "]";
-    return success;
+    return false;
   }
 
   // scan imu buffer, find first imu message that is newer than the given
@@ -138,8 +140,6 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
       break;
     }
   }
-
-  success = true;
 
   if (imu_it != imu_adapter->end()) {  // found one
     if (imu_it == imu_adapter->begin()) {
@@ -170,12 +170,12 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
              << "], GPS timestamp[" << gps_timestamp_sec << "]";
     }
   }
-
-  return success;
+  return true;
 }
 
 void RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
                                      const double timestamp_sec, Imu *imu_msg) {
+  DCHECK_NOTNULL(imu_msg);
   if (timestamp_sec - imu1.header().timestamp_sec() <
       FLAGS_timestamp_sec_tolerance) {
     AERROR << "[InterpolateIMU]: the given time stamp[" << timestamp_sec
@@ -281,7 +281,7 @@ void RTKLocalization::ComposeLocalizationMsg(
     // orientation
     if (pose.has_orientation()) {
       mutable_pose->mutable_orientation()->CopyFrom(pose.orientation());
-      double heading = ::apollo::common::math::QuaternionToHeading(
+      double heading = common::math::QuaternionToHeading(
           pose.orientation().qw(), pose.orientation().qx(),
           pose.orientation().qy(), pose.orientation().qz());
       mutable_pose->set_heading(heading);
@@ -303,7 +303,7 @@ void RTKLocalization::ComposeLocalizationMsg(
           Vector3d orig(imu.linear_acceleration().x(),
                         imu.linear_acceleration().y(),
                         imu.linear_acceleration().z());
-          Vector3d vec = ::apollo::common::math::QuaternionRotate(
+          Vector3d vec = common::math::QuaternionRotate(
               localization->pose().orientation(), orig);
           mutable_pose->mutable_linear_acceleration()->set_x(vec[0]);
           mutable_pose->mutable_linear_acceleration()->set_y(vec[1]);
@@ -331,7 +331,7 @@ void RTKLocalization::ComposeLocalizationMsg(
           // convert from vehicle reference to map reference
           Vector3d orig(imu.angular_velocity().x(), imu.angular_velocity().y(),
                         imu.angular_velocity().z());
-          Vector3d vec = ::apollo::common::math::QuaternionRotate(
+          Vector3d vec = common::math::QuaternionRotate(
               localization->pose().orientation(), orig);
           mutable_pose->mutable_angular_velocity()->set_x(vec[0]);
           mutable_pose->mutable_angular_velocity()->set_y(vec[1]);
@@ -366,16 +366,16 @@ void RTKLocalization::RunWatchDog() {
     return;
   }
 
-  bool msg_lost = false;
-
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorBuffer buffer(&monitor_);
 
   // check GPS time stamp against ROS timer
   double gps_delay_sec =
-      apollo::common::time::ToSecond(Clock::Now()) -
+      common::time::ToSecond(Clock::Now()) -
       AdapterManager::GetGps()->GetLatestObserved().header().timestamp_sec();
   int64_t gps_delay_cycle_cnt =
       static_cast<int64_t>(gps_delay_sec * FLAGS_localization_publish_freq);
+
+  bool msg_lost = false;
   if (FLAGS_enable_gps_timestamp &&
       (gps_delay_cycle_cnt > FLAGS_report_threshold_err_num)) {
     msg_lost = true;
@@ -388,7 +388,7 @@ void RTKLocalization::RunWatchDog() {
 
   // check IMU time stamp against ROS timer
   double imu_delay_sec =
-      apollo::common::time::ToSecond(Clock::Now()) -
+      common::time::ToSecond(Clock::Now()) -
       AdapterManager::GetImu()->GetLatestObserved().header().timestamp_sec();
   int64_t imu_delay_cycle_cnt =
       static_cast<int64_t>(imu_delay_sec * FLAGS_localization_publish_freq);
@@ -404,10 +404,10 @@ void RTKLocalization::RunWatchDog() {
 
   // to prevent it from beeping continuously
   if (msg_lost && (last_reported_timestamp_sec_ < 1. ||
-                   apollo::common::time::ToSecond(Clock::Now()) >
+                   common::time::ToSecond(Clock::Now()) >
                        last_reported_timestamp_sec_ + 1.)) {
     AERROR << "gps/imu frame lost!";
-    last_reported_timestamp_sec_ = apollo::common::time::ToSecond(Clock::Now());
+    last_reported_timestamp_sec_ = common::time::ToSecond(Clock::Now());
   }
 }
 

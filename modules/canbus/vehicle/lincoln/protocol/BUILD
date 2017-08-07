@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -23,7 +25,7 @@ cc_library(
         "tirepressure_71.cc",
         "turnsignal_68.cc",
         "version_7f.cc",
-        "wheelspeed_6a.cc"
+        "wheelspeed_6a.cc",
     ],
     hdrs = [
         "accel_6b.h",
@@ -46,7 +48,7 @@ cc_library(
         "tirepressure_71.h",
         "turnsignal_68.h",
         "version_7f.h",
-        "wheelspeed_6a.h"
+        "wheelspeed_6a.h",
     ],
     deps = [
         "//modules/canbus/common:canbus_common",
@@ -200,10 +202,34 @@ cc_test(
 )
 
 cc_test(
+    name = "steering_64_test",
+    size = "small",
+    srcs = [
+        "steering_64_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "steering_65_test",
     size = "small",
     srcs = [
         "steering_65_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "throttle_62_test",
+    size = "small",
+    srcs = [
+        "throttle_62_test.cc",
     ],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
@@ -282,3 +308,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cpplint()

@@ -50,7 +50,7 @@ double PtSegDistance(double query_x, double query_y, double start_x,
 
 }  // namespace
 
-Box2d::Box2d(const Vec2d& center, const double heading, const double length,
+Box2d::Box2d(const Vec2d &center, const double heading, const double length,
              const double width)
     : center_(center),
       length_(length),
@@ -64,7 +64,7 @@ Box2d::Box2d(const Vec2d& center, const double heading, const double length,
   CHECK_GT(width_, -kMathEpsilon);
 }
 
-Box2d::Box2d(const LineSegment2d& axis, const double width)
+Box2d::Box2d(const LineSegment2d &axis, const double width)
     : center_(axis.center()),
       length_(axis.length()),
       width_(width),
@@ -77,7 +77,7 @@ Box2d::Box2d(const LineSegment2d& axis, const double width)
   CHECK_GT(width_, -kMathEpsilon);
 }
 
-Box2d::Box2d(const AABox2d& aabox)
+Box2d::Box2d(const AABox2d &aabox)
     : center_(aabox.center()),
       length_(aabox.length()),
       width_(aabox.width()),
@@ -90,8 +90,8 @@ Box2d::Box2d(const AABox2d& aabox)
   CHECK_GT(width_, -kMathEpsilon);
 }
 
-Box2d Box2d::CreateAABox(const Vec2d& one_corner,
-                         const Vec2d& opposite_corner) {
+Box2d Box2d::CreateAABox(const Vec2d &one_corner,
+                         const Vec2d &opposite_corner) {
   const double x1 = std::min(one_corner.x(), opposite_corner.x());
   const double x2 = std::max(one_corner.x(), opposite_corner.x());
   const double y1 = std::min(one_corner.y(), opposite_corner.y());
@@ -99,7 +99,7 @@ Box2d Box2d::CreateAABox(const Vec2d& one_corner,
   return Box2d({(x1 + x2) / 2.0, (y1 + y2) / 2.0}, 0.0, x2 - x1, y2 - y1);
 }
 
-void Box2d::GetAllCorners(std::vector<Vec2d>* const corners) const {
+void Box2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   if (corners == nullptr) {
     return;
   }
@@ -115,7 +115,7 @@ void Box2d::GetAllCorners(std::vector<Vec2d>* const corners) const {
   corners->emplace_back(center_.x() - dx1 + dx2, center_.y() - dy1 + dy2);
 }
 
-bool Box2d::IsPointIn(const Vec2d& point) const {
+bool Box2d::IsPointIn(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
   const double y0 = point.y() - center_.y();
   const double dx = std::abs(x0 * cos_heading_ + y0 * sin_heading_);
@@ -123,7 +123,7 @@ bool Box2d::IsPointIn(const Vec2d& point) const {
   return dx <= half_length_ + kMathEpsilon && dy <= half_width_ + kMathEpsilon;
 }
 
-bool Box2d::IsPointOnBoundary(const Vec2d& point) const {
+bool Box2d::IsPointOnBoundary(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
   const double y0 = point.y() - center_.y();
   const double dx = std::abs(x0 * cos_heading_ + y0 * sin_heading_);
@@ -134,7 +134,7 @@ bool Box2d::IsPointOnBoundary(const Vec2d& point) const {
           dx <= half_length_ + kMathEpsilon);
 }
 
-double Box2d::DistanceTo(const Vec2d& point) const {
+double Box2d::DistanceTo(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
   const double y0 = point.y() - center_.y();
   const double dx =
@@ -150,14 +150,14 @@ double Box2d::DistanceTo(const Vec2d& point) const {
   return hypot(dx, dy);
 }
 
-bool Box2d::HasOverlap(const LineSegment2d& line_segment) const {
+bool Box2d::HasOverlap(const LineSegment2d &line_segment) const {
   if (line_segment.length() <= kMathEpsilon) {
     return IsPointIn(line_segment.start());
   }
   return DistanceTo(line_segment) <= kMathEpsilon;
 }
 
-double Box2d::DistanceTo(const LineSegment2d& line_segment) const {
+double Box2d::DistanceTo(const LineSegment2d &line_segment) const {
   if (line_segment.length() <= kMathEpsilon) {
     return DistanceTo(line_segment.start());
   }
@@ -251,11 +251,11 @@ double Box2d::DistanceTo(const LineSegment2d& line_segment) const {
   return 0.0;
 }
 
-double Box2d::DistanceTo(const Box2d& box) const {
+double Box2d::DistanceTo(const Box2d &box) const {
   return Polygon2d(box).DistanceTo(*this);
 }
 
-bool Box2d::HasOverlap(const Box2d& box) const {
+bool Box2d::HasOverlap(const Box2d &box) const {
   const double shift_x = box.center_x() - center_.x();
   const double shift_y = box.center_y() - center_.y();
 
@@ -300,7 +300,7 @@ void Box2d::RotateFromCenter(const double rotate_angle) {
   sin_heading_ = std::sin(heading_);
 }
 
-void Box2d::Shift(const Vec2d& shift_vec) { center_ += shift_vec; }
+void Box2d::Shift(const Vec2d &shift_vec) { center_ += shift_vec; }
 
 std::string Box2d::DebugString() const {
   std::ostringstream sout;

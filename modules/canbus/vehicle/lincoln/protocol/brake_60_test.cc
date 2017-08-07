@@ -30,10 +30,18 @@ class Brake60Test : public ::testing::Test {
 TEST_F(Brake60Test, simple) {
   Brake60 brake;
   EXPECT_EQ(brake.GetPeriod(), 20 * 1000);
-  uint8_t data = 0x64;
-  brake.UpdateData(&data);
+  uint8_t data[8] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68};
+  brake.UpdateData(data);
+  EXPECT_EQ(data[0], 0b00000000);
+  EXPECT_EQ(data[1], 0b00000000);
+  EXPECT_EQ(data[2], 0b01100010);
+  EXPECT_EQ(data[3], 0b01100100);
+  EXPECT_EQ(data[4], 0b01100101);
+  EXPECT_EQ(data[5], 0b01100110);
+  EXPECT_EQ(data[6], 0b01100111);
+  EXPECT_EQ(data[7], 0b00000000);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

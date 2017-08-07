@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef DRIVERS_GNSS_RAW_STREAM_H
-#define DRIVERS_GNSS_RAW_STREAM_H
+#ifndef MODULES_DRIVERS_GNSS_RAW_STREAM_H_
+#define MODULES_DRIVERS_GNSS_RAW_STREAM_H_
 
 #include <memory>
 #include <thread>
@@ -28,61 +28,62 @@
 #include "proto/gnss_status.pb.h"
 
 namespace apollo {
-namespace drivers{
+namespace drivers {
 namespace gnss {
 
 class RawStream {
-public:
-    RawStream(ros::NodeHandle& nh, const std::string &name,
-              const std::string &raw_topic, const std::string &rtcm_topic,
-              const std::string &stream_status_topic);
-    ~RawStream();
-    bool init(const std::string &cfg_file);
+ public:
+  RawStream(ros::NodeHandle &nh, const std::string &name,
+            const std::string &raw_topic, const std::string &rtcm_topic,
+            const std::string &stream_status_topic);
+  ~RawStream();
+  bool init(const std::string &cfg_file);
 
-    struct Status {
-        bool filter[Stream::NUM_STATUS] = {false};
-        Stream::Status status;
-    };
-private:
-    void data_spin();
-    void ntrip_spin();
-    bool connect();
-    bool disconnect();
-    bool login();
-    bool logout();
-    void stream_status_check();
-    std::string status_string(Stream::Status status);
+  struct Status {
+    bool filter[Stream::NUM_STATUS] = {false};
+    Stream::Status status;
+  };
 
-    static constexpr size_t BUFFER_SIZE = 2048;
-    uint8_t _buffer[BUFFER_SIZE];
-    uint8_t _buffer_ntrip[BUFFER_SIZE];
+ private:
+  void data_spin();
+  void ntrip_spin();
+  bool connect();
+  bool disconnect();
+  bool login();
+  bool logout();
+  void stream_status_check();
 
-    std::shared_ptr<Stream> _data_stream;
-    std::shared_ptr<Stream> _command_stream;
-    std::shared_ptr<Stream> _in_rtk_stream;
-    std::shared_ptr<Stream> _out_rtk_stream;
+  static constexpr size_t BUFFER_SIZE = 2048;
+  uint8_t _buffer[BUFFER_SIZE];
+  uint8_t _buffer_ntrip[BUFFER_SIZE];
 
-    std::shared_ptr<Status> _data_stream_status;
-    std::shared_ptr<Status> _command_stream_status;
-    std::shared_ptr<Status> _in_rtk_stream_status;
-    std::shared_ptr<Status> _out_rtk_stream_status;
+  std::shared_ptr<Stream> _data_stream;
+  std::shared_ptr<Stream> _command_stream;
+  std::shared_ptr<Stream> _in_rtk_stream;
+  std::shared_ptr<Stream> _out_rtk_stream;
 
-    bool _rtk_software_solution = false;
-    bool _is_healthy = true;
-    config::Config _config;
+  std::shared_ptr<Status> _data_stream_status;
+  std::shared_ptr<Status> _command_stream_status;
+  std::shared_ptr<Status> _in_rtk_stream_status;
+  std::shared_ptr<Status> _out_rtk_stream_status;
 
-    const std::string _raw_data_topic;
-    const std::string _rtcm_data_topic;
-    const ros::Publisher _raw_data_publisher;
-    const ros::Publisher _rtcm_data_publisher;
-    const ros::Publisher _stream_status_publisher;
+  bool _rtk_software_solution = false;
+  bool _is_healthy = true;
+  config::Config _config;
 
-    boost::shared_ptr<apollo::common::gnss_status::StreamStatus> _stream_status;
-    std::unique_ptr<std::thread> _data_thread_ptr;
-    std::unique_ptr<std::thread> _ntrip_thread_ptr;
+  const std::string _raw_data_topic;
+  const std::string _rtcm_data_topic;
+  const ros::Publisher _raw_data_publisher;
+  const ros::Publisher _rtcm_data_publisher;
+  const ros::Publisher _stream_status_publisher;
+
+  boost::shared_ptr<apollo::common::gnss_status::StreamStatus> _stream_status;
+  std::unique_ptr<std::thread> _data_thread_ptr;
+  std::unique_ptr<std::thread> _ntrip_thread_ptr;
 };
 
-}
-}
-}
-#endif
+}  // namespace apollo
+}  // namespace drivers
+}  // namespace gnss
+
+#endif  // MODULES_DRIVERS_GNSS_RAW_STREAM_H_

@@ -55,7 +55,7 @@ struct TestCanParam {
   int32_t send_lost_cnt = 0;
   int32_t send_time = 0;
   int32_t recv_time = 0;
-  CanClient* can_client = nullptr;
+  CanClient *can_client = nullptr;
 
   TestCanParam() = default;
 
@@ -72,11 +72,11 @@ struct TestCanParam {
 
 class CanAgent {
  public:
-  explicit CanAgent(TestCanParam* param_ptr) : param_ptr_(param_ptr) {}
+  explicit CanAgent(TestCanParam *param_ptr) : param_ptr_(param_ptr) {}
 
-  TestCanParam* param_ptr() { return param_ptr_; }
+  TestCanParam *param_ptr() { return param_ptr_; }
 
-  CanAgent* other_agent() { return other_agent_; }
+  CanAgent *other_agent() { return other_agent_; }
 
   bool Start() {
     thread_recv_.reset(new std::thread([this] { RecvThreadFunc(); }));
@@ -98,8 +98,8 @@ class CanAgent {
     using ::apollo::common::time::micros;
     using ::apollo::common::ErrorCode;
     AINFO << "Send thread starting...";
-    TestCanParam* param = param_ptr();
-    CanClient* client = param->can_client;
+    TestCanParam *param = param_ptr();
+    CanClient *client = param->can_client;
     std::vector<CanFrame> frames;
     frames.resize(MAX_CAN_SEND_FRAME_LEN);
 
@@ -167,7 +167,7 @@ class CanAgent {
     return;
   }
 
-  void AddOtherAgent(CanAgent* agent) { other_agent_ = agent; }
+  void AddOtherAgent(CanAgent *agent) { other_agent_ = agent; }
 
   bool is_receiving() { return is_receiving_; }
 
@@ -183,9 +183,8 @@ class CanAgent {
     using ::apollo::common::time::micros;
     using ::apollo::common::ErrorCode;
     AINFO << "Receive thread starting...";
-    TestCanParam* param = param_ptr();
-    CanClient* client = param->can_client;
-    std::stringstream ss("");
+    TestCanParam *param = param_ptr();
+    CanClient *client = param->can_client;
     int64_t start = 0;
     std::vector<CanFrame> buf;
 
@@ -239,8 +238,8 @@ class CanAgent {
  private:
   bool is_receiving_ = false;
   bool is_sending_finish_ = false;
-  CanAgent* other_agent_ = nullptr;
-  TestCanParam* param_ptr_ = nullptr;
+  CanAgent *other_agent_ = nullptr;
+  TestCanParam *param_ptr_ = nullptr;
   std::unique_ptr<std::thread> thread_recv_;
   std::unique_ptr<std::thread> thread_send_;
 };
@@ -248,7 +247,7 @@ class CanAgent {
 }  // namespace canbus
 }  // namespace apollo
 
-int main(int32_t argc, char** argv) {
+int main(int32_t argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
@@ -262,7 +261,7 @@ int main(int32_t argc, char** argv) {
   std::shared_ptr<TestCanParam> param_ptr_a(new TestCanParam());
   std::shared_ptr<TestCanParam> param_ptr_b(new TestCanParam());
 
-  auto* can_client_factory = CanClientFactory::instance();
+  auto *can_client_factory = CanClientFactory::instance();
   can_client_factory->RegisterCanClients();
 
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_can_client_conf_file_a,

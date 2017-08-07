@@ -17,17 +17,20 @@
 #include "modules/hmi/ros_node/ros_node_service.h"
 
 #include <chrono>
+#include <memory>
 #include <thread>
 
 #include "gflags/gflags.h"
 #include "grpc++/security/server_credentials.h"
 #include "grpc++/server.h"
 #include "grpc++/server_builder.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/proto/pad_msg.pb.h"
 
 DEFINE_string(hmi_ros_node_service_address, "127.0.0.1:8897",
               "HMI Ros node service address.");
@@ -45,7 +48,7 @@ namespace {
 static constexpr char kHMIRosNodeName[] = "hmi_ros_node_service";
 
 void SendPadMessage(DrivingAction action) {
-  apollo::control::PadMessage pb;
+  control::PadMessage pb;
   pb.set_action(action);
   AINFO << "Sending PadMessage:\n" << pb.DebugString();
   AdapterManager::FillPadHeader(kHMIRosNodeName, pb.mutable_header());
@@ -76,13 +79,13 @@ void HMIRosNodeImpl::Init() {
   AdapterManagerConfig config;
   config.set_is_ros(true);
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
     sub_config->set_type(AdapterConfig::PAD);
   }
 
   {
-    auto* sub_config = config.add_config();
+    auto *sub_config = config.add_config();
     sub_config->set_mode(AdapterConfig::RECEIVE_ONLY);
     sub_config->set_type(AdapterConfig::CHASSIS);
   }
@@ -91,8 +94,8 @@ void HMIRosNodeImpl::Init() {
 }
 
 grpc::Status HMIRosNodeImpl::ChangeDrivingMode(
-    grpc::ServerContext* context, const ChangeDrivingModeRequest* request,
-    ChangeDrivingModeResponse* response) {
+    grpc::ServerContext *context, const ChangeDrivingModeRequest *request,
+    ChangeDrivingModeResponse *response) {
   AINFO << "received ChangeDrivingModeRequest: " << request->DebugString();
   auto driving_action_to_send = DrivingAction::RESET;
   auto driving_mode_to_wait = Chassis::COMPLETE_MANUAL;
@@ -132,7 +135,7 @@ grpc::Status HMIRosNodeImpl::ChangeDrivingMode(
   return grpc::Status::OK;
 }
 
-void HMIRosNodeImpl::MonitorDrivingMode(const apollo::canbus::Chassis& status) {
+void HMIRosNodeImpl::MonitorDrivingMode(const canbus::Chassis &status) {
   auto driving_mode = status.driving_mode();
   std::lock_guard<std::mutex> guard(current_driving_mode_mutex_);
   // Update current_driving_mode_ when it is changed.
@@ -147,16 +150,16 @@ void HMIRosNodeImpl::MonitorDrivingMode(const apollo::canbus::Chassis& status) {
 }  // namespace hmi
 }  // namespace apollo
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   // Setup ros node.
-  ros::init(argc, argv, apollo::hmi::kHMIRosNodeName);
-  apollo::hmi::HMIRosNodeImpl::Init();
+  ros::init(argc, argv, ::apollo::hmi::kHMIRosNodeName);
+  ::apollo::hmi::HMIRosNodeImpl::Init();
 
   // Run GRPC server in background thread.
-  std::thread grpc_server_thread(apollo::hmi::RunGRPCServer);
+  std::thread grpc_server_thread(::apollo::hmi::RunGRPCServer);
 
   ros::spin();
   grpc_server_thread.join();

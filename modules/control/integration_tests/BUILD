@@ -17,7 +17,6 @@ cc_library(
         "//modules/common/time",
         "//modules/control:lib_control",
         "//modules/control/common:control_gflags",
-        "//modules/control/common:definitions",
         "//modules/control/proto:control_proto",
         "@gtest//:main",
     ],

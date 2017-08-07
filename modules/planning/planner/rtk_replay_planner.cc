@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "rtk_replay_planner.h"
+#include "modules/planning/planner/rtk_replay_planner.h"
 
 #include <fstream>
 
@@ -25,6 +25,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::TrajectoryPoint;
 using apollo::common::vehicle_state::VehicleState;
 
 RTKReplayPlanner::RTKReplayPlanner() {
@@ -32,9 +33,8 @@ RTKReplayPlanner::RTKReplayPlanner() {
 }
 
 bool RTKReplayPlanner::Plan(
-    const TrajectoryPoint& start_point,
-    std::vector<TrajectoryPoint>* ptr_discretized_trajectory) {
-
+    const TrajectoryPoint &start_point,
+    std::vector<TrajectoryPoint> *ptr_discretized_trajectory) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     AERROR << "RTKReplayPlanner doesn't have a recorded trajectory or "
               "the recorded trajectory doesn't have enough valid trajectory "
@@ -51,33 +51,29 @@ bool RTKReplayPlanner::Plan(
           ? complete_rtk_trajectory_.size() - 1
           : matched_index + forward_buffer - 1;
 
-  if (ptr_discretized_trajectory->size() > 0) {
-    ptr_discretized_trajectory->clear();
-  }
-
-  ptr_discretized_trajectory->insert(
-      ptr_discretized_trajectory->begin(),
+  ptr_discretized_trajectory->assign(
       complete_rtk_trajectory_.begin() + matched_index,
       complete_rtk_trajectory_.begin() + end_index + 1);
 
   // reset relative time
-  double zero_time = complete_rtk_trajectory_[matched_index].relative_time;;
-  for (std::size_t i = 0; i < ptr_discretized_trajectory->size(); ++i) {
-    (*ptr_discretized_trajectory)[i].relative_time -= zero_time;
+  double zero_time = complete_rtk_trajectory_[matched_index].relative_time();
+  for (auto &trajectory : *ptr_discretized_trajectory) {
+    trajectory.set_relative_time(trajectory.relative_time() - zero_time);
   }
 
   // check if the trajectory has enough points;
   // if not, append the last points multiple times and
   // adjust their corresponding time stamps.
   while (ptr_discretized_trajectory->size() < FLAGS_rtk_trajectory_forward) {
-    const auto& last_point = ptr_discretized_trajectory->back();
-    ptr_discretized_trajectory->push_back(last_point);
-    ptr_discretized_trajectory->back().relative_time += FLAGS_trajectory_resolution;
+    ptr_discretized_trajectory->push_back(ptr_discretized_trajectory->back());
+    auto &last_point = ptr_discretized_trajectory->back();
+    last_point.set_relative_time(last_point.relative_time() +
+                                 FLAGS_trajectory_resolution);
   }
   return true;
 }
 
-void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
+void RTKReplayPlanner::ReadTrajectoryFile(const std::string &filename) {
   if (!complete_rtk_trajectory_.empty()) {
     complete_rtk_trajectory_.clear();
   }
@@ -100,27 +96,28 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
 
     auto tokens = apollo::common::util::StringTokenizer::Split(line, "\t ");
     if (tokens.size() < 11) {
-      AERROR << "RTKReplayPlanner parse line failed; the data dimension does not match.";
+      AERROR << "RTKReplayPlanner parse line failed; the data dimension does "
+                "not match.";
       AERROR << line;
       continue;
     }
 
     TrajectoryPoint point;
-    point.x = std::stod(tokens[0]);
-    point.y = std::stod(tokens[1]);
-    point.z = std::stod(tokens[2]);
+    point.set_x(std::stod(tokens[0]));
+    point.set_y(std::stod(tokens[1]));
+    point.set_z(std::stod(tokens[2]));
 
-    point.v = std::stod(tokens[3]);
-    point.a = std::stod(tokens[4]);
+    point.set_v(std::stod(tokens[3]));
+    point.set_a(std::stod(tokens[4]));
 
-    point.kappa = std::stod(tokens[5]);
-    point.dkappa = std::stod(tokens[6]);
+    point.set_kappa(std::stod(tokens[5]));
+    point.set_dkappa(std::stod(tokens[6]));
 
-    point.relative_time = std::stod(tokens[7]);
+    point.set_relative_time(std::stod(tokens[7]));
 
-    point.theta = std::stod(tokens[8]);
+    point.set_theta(std::stod(tokens[8]));
 
-    point.s = std::stod(tokens[10]);
+    point.set_s(std::stod(tokens[10]));
     complete_rtk_trajectory_.push_back(point);
   }
 
@@ -128,20 +125,20 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
 }
 
 std::size_t RTKReplayPlanner::QueryPositionMatchedPoint(
-    const TrajectoryPoint& start_point,
-    const std::vector<TrajectoryPoint>& trajectory) const {
-  auto func_distance_square = [](const PathPoint& point, const double x,
+    const TrajectoryPoint &start_point,
+    const std::vector<TrajectoryPoint> &trajectory) const {
+  auto func_distance_square = [](const TrajectoryPoint &point, const double x,
                                  const double y) {
-    double dx = point.x - x;
-    double dy = point.y - y;
+    double dx = point.x() - x;
+    double dy = point.y() - y;
     return dx * dx + dy * dy;
   };
-  double d_min = func_distance_square(trajectory.front(), start_point.x,
-                                      start_point.y);
+  double d_min = func_distance_square(trajectory.front(), start_point.x(),
+                                      start_point.y());
   std::size_t index_min = 0;
   for (std::size_t i = 1; i < trajectory.size(); ++i) {
-    double d_temp = func_distance_square(trajectory[i], start_point.x,
-                                         start_point.y);
+    double d_temp =
+        func_distance_square(trajectory[i], start_point.x(), start_point.y());
     if (d_temp < d_min) {
       d_min = d_temp;
       index_min = i;
@@ -151,4 +148,4 @@ std::size_t RTKReplayPlanner::QueryPositionMatchedPoint(
 }
 
 }  // namespace planning
-}  // nameapace apollo
+}  // namespace apollo

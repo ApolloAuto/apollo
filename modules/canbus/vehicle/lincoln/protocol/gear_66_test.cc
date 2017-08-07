@@ -18,8 +18,6 @@
 
 #include "gtest/gtest.h"
 
-#include <iostream>
-
 namespace apollo {
 namespace canbus {
 namespace lincoln {
@@ -31,11 +29,20 @@ class Accel6bTest : public ::testing::Test {
 
 TEST_F(Accel6bTest, Parse) {
   Gear66 gear;
-  uint8_t data = 0x12U;
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   EXPECT_EQ(gear.GetPeriod(), 20 * 1000);
-  gear.UpdateData(&data);
+  gear.UpdateData(data);
+
+  EXPECT_EQ(data[0], 0b01100000);
+  EXPECT_EQ(data[1], 0b01100010);
+  EXPECT_EQ(data[2], 0b01100011);
+  EXPECT_EQ(data[3], 0b01100100);
+  EXPECT_EQ(data[4], 0b01010001);
+  EXPECT_EQ(data[5], 0b01010010);
+  EXPECT_EQ(data[6], 0b01010011);
+  EXPECT_EQ(data[7], 0b01010100);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

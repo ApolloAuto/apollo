@@ -28,7 +28,7 @@ cc_binary(
         "//modules/hmi/utils:hmi_status_helper",
         "//modules/monitor/hwmonitor/hw:platform_hw_log_module_lib",
         "//modules/monitor/hwmonitor/hw/esdcan:esdcan_checker_lib",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 

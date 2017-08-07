@@ -26,12 +26,14 @@
 #include <memory>
 #include <vector>
 
-#include "modules/common/util/factory.h"
-#include "modules/control/controller/controller.h"
+#include "ros/include/ros/ros.h"
+
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "third_party/ros/include/ros/ros.h"
+
+#include "modules/common/util/factory.h"
+#include "modules/control/controller/controller.h"
 
 /**
  * @namespace apollo::control

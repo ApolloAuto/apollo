@@ -27,17 +27,19 @@
 #include <utility>
 #include <vector>
 
-#include "glog/logging.h"
-#include "gtest/gtest_prod.h"
-#include "modules/common/monitor/monitor.h"
-#include "modules/common/status/status.h"
-#include "modules/localization/localization_base.h"
+#include "ros/include/ros/ros.h"
+
 #include "modules/localization/proto/camera.pb.h"
 #include "modules/localization/proto/camera_parameter.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "third_party/ros/include/ros/ros.h"
+
+#include "glog/logging.h"
+#include "gtest/gtest_prod.h"
+#include "modules/common/monitor/monitor.h"
+#include "modules/common/status/status.h"
+#include "modules/localization/localization_base.h"
 
 /**
  * @namespace apollo::localization
@@ -77,8 +79,6 @@ class CameraLocalization : public LocalizationBase {
   bool CreateLocalizationMsg(const ::apollo::localization::Gps &gps_msg,
                              const ::apollo::localization::Camera &camera_msg,
                              LocalizationEstimate *localization);
-  template <class T>
-  T InterpolateXYZ(const T &p1, const T &p2, const double &frac1);
 
  private:
   ros::Timer timer_;

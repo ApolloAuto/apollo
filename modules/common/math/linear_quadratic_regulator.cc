@@ -24,16 +24,11 @@ namespace math {
 
 using Matrix = Eigen::MatrixXd;
 
-void SolveLQRProblem(const Matrix &A, const Matrix &B,
-               const Matrix &Q, const Matrix &R,
-               const double tolerance, const uint max_num_iteration,
-               Matrix *ptr_K) {
-  if (A.rows() != A.cols() ||
-      B.rows() != A.rows() ||
-      Q.rows() != Q.cols() ||
-      Q.rows() != A.rows() ||
-      R.rows() != R.cols() ||
-      R.rows() != B.cols()) {
+void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
+                     const Matrix &R, const double tolerance,
+                     const uint max_num_iteration, Matrix *ptr_K) {
+  if (A.rows() != A.cols() || B.rows() != A.rows() || Q.rows() != Q.cols() ||
+      Q.rows() != A.rows() || R.rows() != R.cols() || R.rows() != B.cols()) {
     AERROR << "One or more matrices have incompatible dimensions.";
     return;
   }
@@ -47,9 +42,8 @@ void SolveLQRProblem(const Matrix &A, const Matrix &B,
   uint num_iteration = 0;
   double diff = 0.0;
   while (num_iteration++ < max_num_iteration) {
-    Matrix P_next = AT * P * A -
-        AT * P * B * (R + BT * P * B).inverse() * BT * P * A +
-        Q;
+    Matrix P_next =
+        AT * P * A - AT * P * B * (R + BT * P * B).inverse() * BT * P * A + Q;
     // check the difference between P and P_next
     diff = fabs((P_next - P).maxCoeff());
     P = P_next;

@@ -69,8 +69,8 @@ class KalmanFilter {
    * @param x Mean of the state belief distribution
    * @param P Covariance of the state belief distribution
    */
-  void SetStateEstimate(const Eigen::Matrix<T, XN, 1>& x,
-                        const Eigen::Matrix<T, XN, XN>& P) {
+  void SetStateEstimate(const Eigen::Matrix<T, XN, 1> &x,
+                        const Eigen::Matrix<T, XN, XN> &P) {
     x_ = x;
     P_ = P;
     is_initialized_ = true;
@@ -81,8 +81,8 @@ class KalmanFilter {
    * @param x Mean of the state belief distribution
    * @param P Covariance of the state belief distribution
    */
-  KalmanFilter(const Eigen::Matrix<T, XN, 1>& x,
-               const Eigen::Matrix<T, XN, XN>& P)
+  KalmanFilter(const Eigen::Matrix<T, XN, 1> &x,
+               const Eigen::Matrix<T, XN, XN> &P)
       : KalmanFilter() {
     SetStateEstimate(x, P);
   }
@@ -97,35 +97,84 @@ class KalmanFilter {
    *
    * @param F New transition matrix
    */
-  void SetTransitionMatrix(const Eigen::Matrix<T, XN, XN>& F) { F_ = F; }
+  void SetTransitionMatrix(const Eigen::Matrix<T, XN, XN> &F) { F_ = F; }
 
   /**
    * @brief Changes the covariance matrix of the transition noise.
    *
    * @param Q New covariance matrix
    */
-  void SetTransitionNoise(const Eigen::Matrix<T, XN, XN>& Q) { Q_ = Q; }
+  void SetTransitionNoise(const Eigen::Matrix<T, XN, XN> &Q) { Q_ = Q; }
 
   /**
    * @brief Changes the observation matrix, which maps states to observations.
    *
    * @param H New observation matrix
    */
-  void SetObservationMatrix(const Eigen::Matrix<T, ZN, XN>& H) { H_ = H; }
+  void SetObservationMatrix(const Eigen::Matrix<T, ZN, XN> &H) { H_ = H; }
 
   /**
    * @brief Changes the covariance matrix of the observation noise.
    *
    * @param R New covariance matrix
    */
-  void SetObservationNoise(const Eigen::Matrix<T, ZN, ZN>& R) { R_ = R; }
+  void SetObservationNoise(const Eigen::Matrix<T, ZN, ZN> &R) { R_ = R; }
+
+  /**
+   * @brief Changes the covariance matrix of current state belief distribution.
+   *
+   * @param P New state covariance matrix
+   */
+  void SetStateCovariance(const Eigen::Matrix<T, XN, XN> &P) { P_ = P; }
 
   /**
    * @brief Changes the control matrix in the state transition rule.
    *
    * @param B New control matrix
    */
-  void SetControlMatrix(const Eigen::Matrix<T, XN, UN>& B) { B_ = B; }
+  void SetControlMatrix(const Eigen::Matrix<T, XN, UN> &B) { B_ = B; }
+
+  /**
+   * @brief Get the system transition function under zero control.
+   *
+   * @return Transition matrix.
+   */
+  const Eigen::Matrix<T, XN, XN> &GetTransitionMatrix() { return F_; }
+
+  /**
+   * @brief Get the covariance matrix of the transition noise.
+   *
+   * @return Covariance matrix
+   */
+  const Eigen::Matrix<T, XN, XN> &GetTransitionNoise() { return Q_; }
+
+  /**
+   * @brief Get the observation matrix, which maps states to observations.
+   *
+   * @return Observation matrix
+   */
+  const Eigen::Matrix<T, ZN, XN> &GetObservationMatrix() { return H_; }
+
+  /**
+   * @brief Get the covariance matrix of the observation noise.
+   *
+   * @return Covariance matrix
+   */
+  const Eigen::Matrix<T, ZN, ZN> &GetObservationNoise() { return R_; }
+
+  /**
+   * @brief Get the covariance matrix of current state belief distribution.
+   *
+   * @return State covariance matrix
+   */
+  const Eigen::Matrix<T, XN, XN> &GetStateCovariance() { return P_; }
+
+  /**
+   * @brief Get the control matrix in the state transition rule.
+   *
+   * @return Control matrix
+   */
+  const Eigen::Matrix<T, XN, UN> &GetControlMatrix() { return B_; }
 
   /**
    * @brief Updates the state belief distribution given the control input u.
@@ -133,14 +182,14 @@ class KalmanFilter {
    * @param u Control input (by default, zero)
    */
   void Predict(
-      const Eigen::Matrix<T, UN, 1>& u = Eigen::Matrix<T, UN, 1>::Zero());
+      const Eigen::Matrix<T, UN, 1> &u = Eigen::Matrix<T, UN, 1>::Zero());
 
   /**
    * @brief Updates the state belief distribution given an observation z.
    *
    * @param z Observation
    */
-  void Correct(const Eigen::Matrix<T, ZN, 1>& z);
+  void Correct(const Eigen::Matrix<T, ZN, 1> &z);
 
   /**
    * @brief Gets mean of our current state belief distribution
@@ -200,7 +249,7 @@ class KalmanFilter {
 
 template <typename T, unsigned int XN, unsigned int ZN, unsigned int UN>
 inline void KalmanFilter<T, XN, ZN, UN>::Predict(
-    const Eigen::Matrix<T, UN, 1>& u) {
+    const Eigen::Matrix<T, UN, 1> &u) {
   CHECK(is_initialized_);
   x_ = F_ * x_ + B_ * u;
   P_ = F_ * P_ * F_.transpose() + Q_;
@@ -208,7 +257,7 @@ inline void KalmanFilter<T, XN, ZN, UN>::Predict(
 
 template <typename T, unsigned int XN, unsigned int ZN, unsigned int UN>
 inline void KalmanFilter<T, XN, ZN, UN>::Correct(
-    const Eigen::Matrix<T, ZN, 1>& z) {
+    const Eigen::Matrix<T, ZN, 1> &z) {
   CHECK(is_initialized_);
   y_ = z - H_ * x_;
 

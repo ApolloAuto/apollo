@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [ -e "$DIR/../../scripts/apollo_base.sh" ]; then
@@ -42,7 +43,7 @@ fi
 
 echo "APOLLO_ROOT_DIR=$APOLLO_ROOT_DIR"
 
-VERSION=release-latest
+VERSION=release-20170712_1820
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
@@ -70,11 +71,16 @@ function find_device() {
 function main() {
     docker pull "$IMG"
 
-    docker stop apollo_release
-    docker rm -f apollo_release
+    docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
+    if [ $? == 0 ]; then
+        docker stop apollo_release 1>/dev/null
+        docker rm -f apollo_release 1>/dev/null
+    fi
 
     # setup CAN device
-    sudo mknod --mode=a+rw /dev/can0 c 52 0
+    if [ ! -e /dev/can0 ]; then
+        sudo mknod --mode=a+rw /dev/can0 c 52 0
+    fi
 
     # enable coredump
     echo "${APOLLO_ROOT_DIR}/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
@@ -92,22 +98,33 @@ function main() {
         display="${DISPLAY}"
     fi
     USER_ID=$(id -u)
+    GRP=$(id -g -n)
+    GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
+    DOCKER_HOME="/home/$USER"
+    if [ "$USER" == "root" ];then
+        DOCKER_HOME="/root"
+    fi
+    if [ ! -d "$HOME/.cache" ];then
+        mkdir "$HOME/.cache"
+    fi
     docker run -it \
         -d --privileged \
         --name apollo_release \
         --net host \
         -v /media:/media \
         -v ${APOLLO_ROOT_DIR}/data:/apollo/data \
-        -v $HOME:/home/$USER \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /etc/localtime:/etc/localtime:ro \
+        -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -w /apollo \
         -e DISPLAY=${display} \
         -e RELEASE_DOCKER=1 \
         -e DOCKER_USER=$USER \
         -e USER=$USER \
         -e DOCKER_USER_ID=$USER_ID \
+        -e DOCKER_GRP=$GRP \
+        -e DOCKER_GRP_ID=$GRP_ID \
         -e PYTHONPATH=/apollo/lib:/apollo/ros/lib/python2.7/dist-packages \
         ${devices} \
         --add-host in_release_docker:127.0.0.1 \
@@ -115,9 +132,11 @@ function main() {
         --hostname in_release_docker \
         --shm-size 512M \
         $IMG
-    docker exec apollo_release /apollo/scripts/docker_adduser.sh
-    docker exec apollo_release bash -c "chown -R ${USER}:${USER} /apollo"
-    docker exec -u ${USER} apollo_release "/apollo/scripts/hmi.sh"
+    if [ "${USER}" != "root" ]; then
+        docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
+        docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo"
+    fi
+    docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
 }
 
 main

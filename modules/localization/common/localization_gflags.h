@@ -19,8 +19,8 @@
  * @brief The gflags used by localization module
  */
 
-#ifndef MODEULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
-#define MODEULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
+#ifndef MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
+#define MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
 
 #include "gflags/gflags.h"
 
@@ -55,4 +55,4 @@ DECLARE_double(report_gps_imu_time_diff_threshold);
 DECLARE_bool(enable_gps_timestamp);
 DECLARE_bool(enable_camera_timestamp);
 
-#endif  // MODEULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
+#endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

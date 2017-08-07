@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-
 #include "modules/common/math/kalman_filter.h"
 
 #include "gtest/gtest.h"
@@ -102,4 +101,3 @@ TEST(KalmanFilterTest, SyntheticTracking) {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-

@@ -18,11 +18,12 @@
 #define MODULES_PLATFORM_HW_ESDCAN_CHECKER_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/monitor/common/annotations.h"
 #include "modules/monitor/common/interface/hw_checker.h"
 
-#include "esdcan_test.h"
+#include "modules/monitor/hwmonitor/hw/esdcan/esdcan_test.h"
 
 /**
  * @namespace apollo::platform::hw
@@ -32,9 +33,9 @@ namespace apollo {
 namespace platform {
 namespace hw {
 
-class EsdCanChecker : public HwCheckerIntf {
+class EsdCanChecker : public HwCheckerInterface {
  public:
-  static const std::string ESD_CAN_NAME;
+  static const char ESD_CAN_NAME[];
 
   /// Returns a HW status code from ntstatus.
   static hw::Status esdcan_result_to_hw_status(NTCAN_RESULT ntstatus);
@@ -50,7 +51,7 @@ class EsdCanChecker : public HwCheckerIntf {
   const std::string &get_name() const override { return name_; };
 
   /// Runs HW status check, stores results in results.
-  void run_check(std::vector<HwCheckResult> &results) override;
+  void run_check(std::vector<HwCheckResult> *results) override;
 
  private:
   int can_id_ = 0;

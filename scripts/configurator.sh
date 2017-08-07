@@ -16,9 +16,13 @@
 # limitations under the License.
 ###############################################################################
 
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd "${DIR}/.."
+
+source "${DIR}/apollo_base.sh"
+
 set -x
 
-# get script directory
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-export LD_LIBRARY_PATH=$ROOT/lib:$LD_LIBRARY_PATH
+python modules/tools/configurator/configurator.py

@@ -46,10 +46,10 @@ class Gyro6c : public ProtocolData {
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
    * @param timestamp the timestamp of input data
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
   /**
    * @brief calculate the roll rate based on byte array.
@@ -60,7 +60,7 @@ class Gyro6c : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of roll rate
    */
-  double roll_rate(const std::uint8_t* bytes, int32_t length) const;
+  double roll_rate(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief calculate longitudinal_acceleration based on byte array.
@@ -71,7 +71,7 @@ class Gyro6c : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of yaw rate
    */
-  double yaw_rate(const std::uint8_t* bytes, int32_t length) const;
+  double yaw_rate(const std::uint8_t *bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

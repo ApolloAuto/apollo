@@ -1,5 +1,4 @@
 load("//tools:cpplint.bzl", "cpplint")
-
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -16,36 +15,26 @@ cc_library(
 )
 
 cc_library(
-    name = "base_types",
-    hdrs = [
-        "base_types.h",
-    ],
-    deps = [
-        ":definitions",
-        "//modules/common:log",
-        "@eigen//:eigen",
-    ],
-)
-
-cc_library(
-    name = "definitions",
-    srcs = [],
-    hdrs = [
-        "definitions.h",
-    ],
-    deps = [
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/status",
-    ],
-)
-
-cc_library(
     name = "hysteresis_filter",
     srcs = [
         "hysteresis_filter.cc",
     ],
     hdrs = [
         "hysteresis_filter.h",
+    ],
+)
+
+cc_library(
+    name = "interpolation_1d",
+    srcs = [
+        "interpolation_1d.cc",
+    ],
+    hdrs = [
+        "interpolation_1d.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "@eigen//:eigen",
     ],
 )
 
@@ -86,10 +75,10 @@ cc_library(
         "trajectory_analyzer.h",
     ],
     deps = [
-        ":base_types",
         "//modules/common:log",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:search",
+        "//modules/common/proto:path_point_proto",
         "//modules/common/vehicle_state",
         "//modules/planning/proto:planning_proto",
     ],
@@ -98,10 +87,9 @@ cc_library(
 cc_library(
     name = "common",
     deps = [
-        ":base_types",
         ":control_gflags",
-        ":definitions",
         ":hysteresis_filter",
+        ":interpolation_1d",
         ":interpolation_2d",
         ":pid_controller",
         ":trajectory_analyzer",
@@ -116,6 +104,22 @@ cc_test(
     ],
     deps = [
         ":hysteresis_filter",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "interpolation_1d_test",
+    size = "small",
+    srcs = [
+        "interpolation_1d_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":interpolation_1d",
+        "//modules/common:log",
+        "//modules/common/util",
+        "//modules/control/proto:control_proto",
         "@gtest//:main",
     ],
 )

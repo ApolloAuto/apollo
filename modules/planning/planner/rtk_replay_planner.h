@@ -17,10 +17,10 @@
 #ifndef MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
 
-#include "planner.h"
-
 #include <string>
 #include <vector>
+
+#include "modules/planning/planner/planner.h"
 
 /**
  * @namespace apollo::planning
@@ -54,24 +54,25 @@ class RTKReplayPlanner : public Planner {
    * @param discretized_trajectory The computed trajectory
    * @return true if planning succeeds; false otherwise.
    */
-  bool Plan(const TrajectoryPoint& start_point,
-            std::vector<TrajectoryPoint>* ptr_trajectory) override;
+  bool Plan(
+      const apollo::common::TrajectoryPoint &start_point,
+      std::vector<apollo::common::TrajectoryPoint> *ptr_trajectory) override;
 
   /**
    * @brief Read the recorded trajectory file.
    * @param filename The name of the trajectory file.
    */
-  void ReadTrajectoryFile(const std::string& filename);
+  void ReadTrajectoryFile(const std::string &filename);
 
  private:
   std::size_t QueryPositionMatchedPoint(
-      const TrajectoryPoint& start_point,
-      const std::vector<TrajectoryPoint>& trajectory) const;
+      const apollo::common::TrajectoryPoint &start_point,
+      const std::vector<apollo::common::TrajectoryPoint> &trajectory) const;
 
-  std::vector<TrajectoryPoint> complete_rtk_trajectory_;
+  std::vector<apollo::common::TrajectoryPoint> complete_rtk_trajectory_;
 };
 
 }  // namespace planning
-}  // nameapace apollo
+}  // namespace apollo
 
 #endif /* MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_ */

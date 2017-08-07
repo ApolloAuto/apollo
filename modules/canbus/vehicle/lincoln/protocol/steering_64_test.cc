@@ -14,23 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CONTROL_COMMON_DEFINITIONS_H_
-#define MODULES_CONTROL_COMMON_DEFINITIONS_H_
+#include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
 
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/common/status/status.h"
+#include "gtest/gtest.h"
 
-/**
- * @namespace apollo::control
- * @brief apollo::control
- */
 namespace apollo {
-namespace control {
+namespace canbus {
+namespace lincoln {
 
-using apollo::common::Status;
-using apollo::common::ErrorCode;
+TEST(Steering64Test, General) {
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  Steering64 steering;
+  EXPECT_EQ(steering.GetPeriod(), 20 * 1000);
+  steering.UpdateData(data);
+  EXPECT_EQ(data[0], 0b00000000);
+  EXPECT_EQ(data[1], 0b00000000);
+  EXPECT_EQ(data[2], 0b01100000);
+  EXPECT_EQ(data[3], 0b00000000);
+  EXPECT_EQ(data[4], 0b01010001);
+  EXPECT_EQ(data[5], 0b01010010);
+  EXPECT_EQ(data[6], 0b01010011);
+  EXPECT_EQ(data[7], 0b00000000);
+}
 
-}  // namespace control
+}  // namespace lincoln
+}  // namespace canbus
 }  // namespace apollo
-
-#endif  // MODULES_CONTROL_COMMON_DEFINITIONS_H_

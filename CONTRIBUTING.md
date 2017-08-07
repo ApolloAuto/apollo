@@ -18,7 +18,7 @@ make sure your changes follow the coding style, license and testing guidelines.
 
 #### License
 
-For each new file, please include a license at the top of the file. 
+For each new file, please include a license at the top of the file.
 
 * C++ code License example [adapter.h](https://github.com/ApolloAuto/apollo/blob/master/modules/common/adapters/adapter.h);
 
@@ -36,7 +36,7 @@ You can use command `bash apollo.sh test` to run all unit tests.
 
 #### Coding style
 
-* C/C++ coding style: Apollo adopted the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html). Make sure your code conforms to this style guide. You can use command `bash apollo.sh check` to check if your code has any style problem.
+* C/C++ coding style: Apollo adopted the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html). Make sure your code conforms to this style guide. You can use command `bash apollo.sh lint` to check if your code has any style problem.
 
 * Python coding style:  Apollo adopted the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html). You can use the  [yapf](https://github.com/google/yapf) command `yapf -i --style='{based_on_style: google}' foo.py` to format a file foo.py.
 
@@ -61,4 +61,8 @@ The following is a commit message example:
 >
 > Fixes #1234
 
-
+#### Before Creating Pull Request
+After you finish your code and ready to create a Pull Request, please make sure your
+change doesn't break build/test/lint by running `bash apollo.sh check`, which is
+equivalent to a combination of `bash apollo.sh build`, `bash apollo.sh test` and
+`bash apollo.sh lint`.

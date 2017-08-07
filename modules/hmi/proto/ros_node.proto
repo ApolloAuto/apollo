@@ -2,11 +2,9 @@ syntax = "proto2";
 
 package apollo.hmi;
 
-
 service HMIRosNode {
   rpc ChangeDrivingMode(ChangeDrivingModeRequest) returns (ChangeDrivingModeResponse) {}
 }
-
 
 message ChangeDrivingModeRequest {
   enum Action {

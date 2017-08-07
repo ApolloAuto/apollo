@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -5,8 +7,8 @@ cc_library(
     deps = [
         ":log",
         ":macro",
-        "//third_party/ros:ros_common",
         "@glog//:glog",
+        "@ros//:ros_common",
     ],
 )
 
@@ -38,7 +40,9 @@ cc_library(
     deps = [
         "//modules/common/status",
         "//modules/hmi/utils:hmi_status_helper",
-        "//third_party/ros:ros_common",
         "@glog//:glog",
+        "@ros//:ros_common",
     ],
 )
+
+cpplint()

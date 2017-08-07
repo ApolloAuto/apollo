@@ -24,16 +24,20 @@ namespace lincoln {
 
 TEST(Wheelspeed6aTest, General) {
   Wheelspeed6a wheelspeed;
-  uint8_t data = 0x64U;
+  uint8_t data[8] = {0x61, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   int32_t length = 8;
   ChassisDetail cd;
   struct timeval timestamp;
-  wheelspeed.Parse(&data, length, timestamp, &cd);
+  wheelspeed.Parse(data, length, timestamp, &cd);
 
   EXPECT_TRUE(cd.vehicle_spd().is_wheel_spd_fl_valid());
+  EXPECT_DOUBLE_EQ(cd.vehicle_spd().wheel_spd_rr(), 215.87);
   EXPECT_TRUE(cd.vehicle_spd().is_wheel_spd_fr_valid());
+  EXPECT_DOUBLE_EQ(cd.vehicle_spd().wheel_spd_rl(), 210.73);
   EXPECT_TRUE(cd.vehicle_spd().is_wheel_spd_rl_valid());
+  EXPECT_DOUBLE_EQ(cd.vehicle_spd().wheel_spd_fr(), 256.99);
   EXPECT_TRUE(cd.vehicle_spd().is_wheel_spd_rr_valid());
+  EXPECT_DOUBLE_EQ(cd.vehicle_spd().wheel_spd_fl(), 251.85);
 }
 
 }  // namespace lincoln

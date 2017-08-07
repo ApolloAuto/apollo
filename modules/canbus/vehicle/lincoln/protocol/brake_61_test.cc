@@ -23,15 +23,42 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Brake61Test, General) {
-  uint8_t data = 0x01;
+  uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   int32_t length = 8;
   ChassisDetail cd;
   Brake61 brake;
-  brake.Parse(&data, length, &cd);
+  brake.Parse(data, length, &cd);
 
-  EXPECT_FALSE(cd.brake().brake_enabled());
+  EXPECT_EQ(data[0], 0b00000001);
+  EXPECT_EQ(data[1], 0b00000010);
+  EXPECT_EQ(data[2], 0b00000011);
+  EXPECT_EQ(data[3], 0b00000100);
+  EXPECT_EQ(data[4], 0b00010001);
+  EXPECT_EQ(data[5], 0b00010010);
+  EXPECT_EQ(data[6], 0b00010011);
+  EXPECT_EQ(data[7], 0b00010100);
+
+  auto &brakeinfo = cd.brake();
+  EXPECT_DOUBLE_EQ(brakeinfo.brake_input(), 0.78278782330052543);
+  EXPECT_DOUBLE_EQ(brakeinfo.brake_cmd(), 1.5671015487907205);
+  EXPECT_DOUBLE_EQ(brakeinfo.brake_output(), 7.057297627222086);
+  EXPECT_TRUE(brakeinfo.boo_input());
+  EXPECT_TRUE(brakeinfo.boo_cmd());
+  EXPECT_FALSE(brakeinfo.boo_output());
+  EXPECT_FALSE(brakeinfo.watchdog_applying_brakes());
+  EXPECT_EQ(brakeinfo.watchdog_source(), 1);
+  EXPECT_FALSE(brakeinfo.brake_enabled());
+  EXPECT_FALSE(brakeinfo.driver_override());
+  EXPECT_TRUE(brakeinfo.driver_activity());
+  EXPECT_FALSE(brakeinfo.watchdog_fault());
+  EXPECT_TRUE(brakeinfo.channel_1_fault());
+  EXPECT_FALSE(brakeinfo.channel_2_fault());
+  EXPECT_FALSE(brakeinfo.boo_fault());
+  EXPECT_FALSE(brakeinfo.connector_fault());
+
+  EXPECT_TRUE(cd.check_response().is_esp_online());
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

@@ -25,9 +25,6 @@ DECLARE_string(control_conf_file);
 DECLARE_double(min_alert_interval);
 DECLARE_bool(enable_csv_debug);
 
-// gflags for test purpose
-DECLARE_bool(use_state_exact_match);
-
 // temporary gflag for test purpose
 DECLARE_bool(enable_speed_station_preview);
 
@@ -46,5 +43,6 @@ DECLARE_double(max_acceleration_when_stopped);
 DECLARE_double(max_abs_speed_when_stopped);
 
 DECLARE_double(steer_angle_rate);
+DECLARE_bool(enable_gain_scheduler);
 
 #endif  // MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_
