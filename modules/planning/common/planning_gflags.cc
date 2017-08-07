@@ -110,8 +110,9 @@ DEFINE_double(stgraph_max_deceleration_divide_factor_level_2, 2.0,
 // Decision Part
 DEFINE_double(static_decision_ignore_range, 3.0,
               "threshold for judging nudge in dp path computing decision");
-DEFINE_double(static_decision_stop_buffer, 0.5,
-              "added distance to vehicle width for static decision collision judgement");
+DEFINE_double(
+    static_decision_stop_buffer, 0.5,
+    "added distance to vehicle width for static decision collision judgement");
 DEFINE_double(dynamic_decision_follow_range, 1.0,
               "threshold for judging follow in dp path computing decision for "
               "static obstacles");
@@ -127,6 +128,16 @@ DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3,
               "min follow distance for vehicles/bicycles/moving objects");
+DEFINE_double(st_follow_max_start_t, 1.0,
+              "A threshold to judge whether we should issue a follow decision "
+              "instead of yield decision. To issue a follow decision, "
+              "the obstacle's t in S-T boundary must be smaller or equal to "
+              "this value. Unit: seconds");
+DEFINE_double(st_follow_min_end_t, 3.0,
+              "A threshold to judge whether we should issue a follow decision "
+              "instead of yield decision. To issue a follow decision, "
+              "the obstacle's t in S-T boundary must be larger or equal to "
+              "this value. Unit: seconds");
 
 // Prediction Part
 
