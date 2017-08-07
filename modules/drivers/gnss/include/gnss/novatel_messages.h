@@ -270,6 +270,36 @@ struct InsPva {
 };
 static_assert(sizeof(InsPva) == 88, "Incorrect size of InsPva");
 
+struct InsPvaX {
+  uint32_t ins_status;
+  uint32_t pos_type;
+  double latitude;  // in degrees
+  double longitude;  // in degrees
+  double height;  // Ellipsoidal height - WGS84 (m)
+  float undulation;
+
+  double north_velocity;  // velocity in a northerly direction (m/s)
+  double east_velocity;  // velocity in an easterly direction (m/s)
+  double up_velocity;  // velocity in an up direction
+  double roll;  // right handed rotation around y-axis (degrees)
+  double pitch;  // right handed rotation around x-axis (degrees)
+  double azimuth;  // left handed rotation around z-axis (degrees)
+
+  float latitude_std;
+  float longitude_std;
+  float height_std;
+  float north_velocity_std;
+  float east_velocity_std;
+  float up_velocity_std;
+
+  float roll_std;
+  float pitch_std;
+  float azimuth_std;
+  uint32_t ext_slo_stat;
+  uint16_t elapsed_time;
+};
+static_assert(sizeof(InsPvaX) == 126, "Incorrect size of InsPvaX");
+
 enum class ImuType : uint8_t {
   // We currently use the following IMUs. We'll extend this list when a new IMU
   // is introduced.

@@ -75,14 +75,15 @@ Parser *create_parser(config::Stream::Format format,
 }  // namespace
 
 DataParser::DataParser(ros::NodeHandle &nh, const std::string &raw_data_topic,
-                       const std::string &gpgga_topic,
+                       const std::string &ins_stat_topic,
                        const std::string &corr_imu_topic,
                        const std::string &odometry_topic,
                        const std::string &gnss_status_topic,
                        const std::string &ins_status_topic)
     : _raw_data_sub(nh.subscribe(raw_data_topic, 256,
                                  &DataParser::raw_data_callback, this)),
-      _gpgga_publisher(nh.advertise<std_msgs::String>(gpgga_topic, 64)),
+      _ins_stat_publisher(
+          nh.advertise<::apollo::drivers::gnss::InsStat>(ins_stat_topic, 64)),
       _imu_publisher(
           nh.advertise<apollo::localization::Imu>(corr_imu_topic, 64)),
       _nav_odometry_publisher(
@@ -208,12 +209,19 @@ void DataParser::dispatch_message(Parser::MessageType type,
       publish_odometry_pb_message(message);
       break;
 
-    case Parser::MessageType::GPGGA:
-      publish_message_raw(_gpgga_publisher,
-                          As<::apollo::drivers::gnss::gpgga::GPGGA>(message));
+    case Parser::MessageType::INS_STAT:
+      publish_ins_stat(message);
+      break;
+
     default:
       break;
   }
+}
+
+void DataParser::publish_ins_stat(const MessagePtr message) {
+    boost::shared_ptr<::apollo::drivers::gnss::InsStat> ins_stat(
+        new ::apollo::drivers::gnss::InsStat(*As<::apollo::drivers::gnss::InsStat>(message)));
+    _ins_stat_publisher.publish(ins_stat);
 }
 
 void DataParser::publish_odometry_pb_message(const MessagePtr message) {
