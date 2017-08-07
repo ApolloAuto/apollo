@@ -290,6 +290,14 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
           object_stop_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
           object_stop_ptr->set_reason_code(
               StopReasonCode::STOP_REASON_OBSTACLE);
+          auto s = sl_boundary.start_s() - FLAGS_dp_path_decision_buffer;
+          common::PathPoint stop_point;
+          if (!path_data.get_path_point_with_path_s(s, &stop_point)) {
+            AERROR << "Fail to get_path_point_with_path_s:" << s;
+            return false;
+          }
+          object_stop_ptr->mutable_stop_point()->set_x(stop_point.x());
+          object_stop_ptr->mutable_stop_point()->set_y(stop_point.y());
           decisions->emplace_back(obstacle->Id(), object_stop);
           ignore = false;
           break;
