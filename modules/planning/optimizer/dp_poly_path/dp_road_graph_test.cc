@@ -67,6 +67,7 @@ class DpRoadGraphTest : public PlanningTestBase {
   virtual void SetUp() {
     google::InitGoogleLogging("DpRoadGraphTest");
     PlanningTestBase::SetUp();
+    RunPlanning();
     SetInitPoint();
     SetSpeedDataWithConstVeolocity(10.0);
     const auto* frame = planning_.GetFrame();
@@ -86,9 +87,9 @@ TEST_F(DpRoadGraphTest, speed_road_graph) {
   ASSERT_TRUE(reference_line_ != nullptr);
   bool result = road_graph.FindPathTunnel(init_point_, &path_data_);
   EXPECT_TRUE(result);
-  EXPECT_EQ(648, path_data_.discretized_path().num_of_points());
-  EXPECT_EQ(648, path_data_.frenet_frame_path().number_of_points());
-  EXPECT_FLOAT_EQ(70.450378,
+  EXPECT_EQ(765, path_data_.discretized_path().num_of_points());
+  EXPECT_EQ(765, path_data_.frenet_frame_path().number_of_points());
+  EXPECT_FLOAT_EQ(75.900002,
                   path_data_.frenet_frame_path().points().back().s());
   EXPECT_FLOAT_EQ(0.0, path_data_.frenet_frame_path().points().back().l());
   // export_path_data(path_data_, "/tmp/path.txt");

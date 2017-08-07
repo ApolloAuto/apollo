@@ -37,6 +37,7 @@ using common::adapter::AdapterManager;
 DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
 DECLARE_string(test_chassis_file);
+DECLARE_string(test_prediction_file);
 
 class PlanningTestBase : public ::testing::Test {
  public:
@@ -57,6 +58,13 @@ class PlanningTestBase : public ::testing::Test {
   virtual void SetUp();
 
   /**
+   * Execute the planning code.
+   * @return true if planning is success. The ADCTrajectory will be used to
+   * store the planing results.  Otherwise false.
+   */
+  void RunPlanning();
+
+  /**
    * @brief Print out the points to a file for debug and visualization purpose.
    * User can see the file, or feed it
    * into a graphic visualizer.
@@ -74,6 +82,7 @@ class PlanningTestBase : public ::testing::Test {
   DpStSpeedConfig dp_st_speed_config_;
   localization::Pose pose_;
   Planning planning_;
+  ADCTrajectory* adc_trajectory_ = nullptr;
 };
 
 }  // namespace planning
