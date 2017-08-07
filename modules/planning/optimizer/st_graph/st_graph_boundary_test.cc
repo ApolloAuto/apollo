@@ -45,6 +45,10 @@ TEST(StGraphBoundaryTest, basic_test) {
   boundary.GetBoundaryTimeScope(&left_t, &right_t);
   EXPECT_DOUBLE_EQ(left_t, 0.0);
   EXPECT_DOUBLE_EQ(right_t, 10.0);
+  EXPECT_FLOAT_EQ(0.0, boundary.min_s());
+  EXPECT_FLOAT_EQ(5.0, boundary.max_s());
+  EXPECT_FLOAT_EQ(0.0, boundary.min_t());
+  EXPECT_FLOAT_EQ(10.0, boundary.max_t());
 }
 
 }  // namespace planning
