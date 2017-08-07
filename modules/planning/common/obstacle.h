@@ -54,6 +54,8 @@ class Obstacle {
 
   const std::string &Id() const;
 
+  std::int32_t PerceptionId() const;
+
   bool IsStatic() const;
 
   common::TrajectoryPoint GetPointAtTime(const double time) const;
@@ -84,6 +86,7 @@ class Obstacle {
 
  private:
   std::string id_;
+  std::int32_t perception_id_;
   bool is_static_;
   bool has_trajectory_ = false;
   prediction::Trajectory trajectory_;

@@ -33,9 +33,12 @@ namespace planning {
 
 const std::string& Obstacle::Id() const { return id_; }
 
+std::int32_t Obstacle::PerceptionId() const { return perception_id_; }
+
 Obstacle::Obstacle(const std::string& id,
                    const perception::PerceptionObstacle& perception_obstacle)
     : id_(id),
+      perception_id_(perception_obstacle.id()),
       perception_obstacle_(perception_obstacle),
       perception_bounding_box_({perception_obstacle_.position().x(),
                                 perception_obstacle_.position().y()},
