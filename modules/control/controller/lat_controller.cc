@@ -116,6 +116,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
   lqr_eps_ = control_conf->lat_controller_conf().eps();
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
+  //LoadLatGainScheduler(control_conf->lat_controller_conf());
+
   return true;
 }
 
@@ -211,7 +213,10 @@ Status LatController::Init(const ControlConf *control_conf) {
     matrix_q_(i, i) = control_conf->lat_controller_conf().matrix_q(i);
   }
 
+  matrix_q_updated_ = matrix_q_;
   InitializeFilters(control_conf);
+  auto &lat_controller_conf = control_conf->lat_controller_conf();
+  LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
   return Status::OK();
 }
@@ -220,6 +225,32 @@ void LatController::CloseLogFile() {
   if (FLAGS_enable_csv_debug && steer_log_file_.is_open()) {
     steer_log_file_.close();
   }
+}
+
+void LatController::LoadLatGainScheduler( const LatControllerConf &lat_controller_conf)
+{ const auto &lat_err_gain_scheduler = lat_controller_conf.lat_err_gain_scheduler();
+  const auto &heading_err_gain_scheduler = lat_controller_conf.heading_err_gain_scheduler();
+  AINFO << "Lateral control gain scheduler loaded";
+  Interpolation1D::DataType xy1, xy2;
+  for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
+    xy1.push_back(std::make_pair(scheduler.speed(),
+                                  scheduler.ratio()
+                ));
+  }
+  for (const auto &scheduler : heading_err_gain_scheduler.scheduler()) {
+    xy2.push_back(std::make_pair(scheduler.speed(),
+                                  scheduler.ratio()
+                ));
+  }
+
+  lat_err_interpolation_.reset(new Interpolation1D);
+  CHECK(lat_err_interpolation_->Init(xy1))
+      << "Fail to load lateral error gain scheduler";
+
+  heading_err_interpolation_.reset(new Interpolation1D);
+  CHECK(heading_err_interpolation_->Init(xy2))
+      << "Fail to load heading error gain scheduler";
+
 }
 
 void LatController::Stop() { CloseLogFile(); }
@@ -252,6 +283,18 @@ Status LatController::ComputeControlCommand(
 
   // Compound discrete matrix with road preview model
   UpdateMatrixCompound();
+
+  // Add gain sheduler for higher speed steering
+  if (FLAGS_enable_gain_scheduler) {
+
+      matrix_q_updated_(0, 0) = matrix_q_(0, 0)
+ *
+          lat_err_interpolation_->Interpolate(VehicleState::instance()->linear_velocity());
+      matrix_q_updated_(2, 2) = matrix_q_(2, 2)
+*
+          heading_err_interpolation_->Interpolate(VehicleState::instance()->linear_velocity());
+}
+
 
   common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_, matrix_r_,
                                 lqr_eps_, lqr_max_iteration_, &matrix_k_);
@@ -300,8 +343,6 @@ Status LatController::ComputeControlCommand(
   double steer_angle_heading_rate_contribution =
       -matrix_k_(0, 3) * matrix_state_(3, 0) * 180 / M_PI *
       steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
-
-  // TODO(yifei): move up temporary values to use debug fields.
 
   debug->set_heading(VehicleState::instance()->heading());
   debug->set_steer_angle(steer_angle);
