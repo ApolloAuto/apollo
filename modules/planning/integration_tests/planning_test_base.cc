@@ -35,7 +35,7 @@ DEFINE_string(test_chassis_file,
               "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 
-void PlanningTestBase::SetDataConfigs() {
+void PlanningTestBase::SetUpTestCase() {
   FLAGS_qp_spline_path_config_file =
       "modules/planning/testdata/conf/qp_spline_path_config.pb.txt";
   FLAGS_qp_spline_st_speed_config_file =
@@ -74,27 +74,30 @@ bool PlanningTestBase::SetUpAdapters() {
     AERROR << "failed to routing file: " << FLAGS_test_routing_response_file;
     return false;
   }
+  AINFO << "Using Routing " << FLAGS_test_routing_response_file;
   if (!AdapterManager::FeedLocalizationFile(FLAGS_test_localization_file)) {
     AERROR << "Failed to load localization file: "
            << FLAGS_test_localization_file;
     return false;
   }
+  AINFO << "Using Localization file: " << FLAGS_test_localization_file;
   if (!AdapterManager::FeedChassisFile(FLAGS_test_chassis_file)) {
     AERROR << "Failed to load chassis file: " << FLAGS_test_chassis_file;
     return false;
   }
+  AINFO << "Using Chassis file: " << FLAGS_test_chassis_file;
   if (!FLAGS_test_prediction_file.empty() &&
-      AdapterManager::FeedPredictionFile(FLAGS_test_prediction_file)) {
+      !AdapterManager::FeedPredictionFile(FLAGS_test_prediction_file)) {
     AERROR << "Failed to load prediction file: " << FLAGS_test_prediction_file;
     return false;
   }
+  AINFO << "Using Prediction file: " << FLAGS_test_chassis_file;
   return true;
 }
 
 void PlanningTestBase::SetUp() {
-  SetDataConfigs();
   adc_trajectory_ = nullptr;
-  SetUpAdapters();
+  CHECK(SetUpAdapters()) << "Failed to setup adapters";
   planning_.Init();
 }
 

@@ -39,16 +39,6 @@ using common::adapter::AdapterManager;
 
 class DpStSpeedTest : public PlanningTestBase {
  public:
-  void SetInitPoint() {
-    init_point_.mutable_path_point()->set_x(pose_.position().x());
-    init_point_.mutable_path_point()->set_y(pose_.position().y());
-    const auto& velocity = pose_.linear_velocity();
-    init_point_.set_v(std::hypot(velocity.x(), velocity.y()));
-    const auto& acc = pose_.linear_acceleration();
-    init_point_.set_a(std::hypot(acc.x(), acc.y()));
-    init_point_.set_relative_time(0.0);
-  }
-
   void SetPathDataWithStraightLine() {
     double l = 0.0;
     const double ds = 1.0;
@@ -68,7 +58,6 @@ class DpStSpeedTest : public PlanningTestBase {
   virtual void SetUp() {
     google::InitGoogleLogging("DpStSpeedTest");
     PlanningTestBase::SetUp();
-    SetInitPoint();
     SetPathDataWithStraightLine();
     const auto* frame = planning_.GetFrame();
     reference_line_ = &(frame->reference_line());
@@ -82,7 +71,8 @@ class DpStSpeedTest : public PlanningTestBase {
 };
 
 TEST_F(DpStSpeedTest, dp_st_graph_test) {
-  DpStGraph dp_st_graph(dp_st_speed_config_);
+  DpStSpeedConfig dp_st_speed_config;
+  DpStGraph dp_st_graph(dp_st_speed_config);
 }
 
 }  // namespace planning

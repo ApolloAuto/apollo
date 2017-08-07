@@ -15,18 +15,11 @@
  *****************************************************************************/
 
 #include <string>
-#include <vector>
 
 #include "gtest/gtest.h"
 
-#include "modules/planning/proto/dp_poly_path_config.pb.h"
-#include "modules/planning/proto/dp_st_speed_config.pb.h"
-
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/planning.h"
 
 namespace apollo {
@@ -37,38 +30,33 @@ using common::adapter::AdapterManager;
 DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
 DECLARE_string(test_chassis_file);
-DECLARE_string(test_prediction_file);
 
-class PlanningTestBase : public ::testing::Test {
+/**
+ * @class GarageTest
+ * @brief This is an integration test that uses the garage map.
+ */
+
+class GarageTest : public PlanningTestBase {
  public:
-  static void SetUpTestCase();
-
-  virtual void SetUp();
-
-  /**
-   * Execute the planning code.
-   * @return true if planning is success. The ADCTrajectory will be used to
-   * store the planing results.  Otherwise false.
-   */
-  void RunPlanning();
-
-  /**
-   * @brief Print out the points to a file for debug and visualization purpose.
-   * User can see the file, or feed it
-   * into a graphic visualizer.
-   */
-  static void export_sl_points(
-      const std::vector<std::vector<common::SLPoint>>& points,
-      const std::string& filename);
-
-  static void export_path_data(const PathData& path_data,
-                               const std::string& filename);
-
- protected:
-  bool SetUpAdapters();
-  Planning planning_;
-  ADCTrajectory* adc_trajectory_ = nullptr;
+  virtual void SetUp() {
+    FLAGS_map_filename = "modules/planning/testdata/base_map.txt";
+  }
 };
+
+TEST_F(GarageTest, Stop) {
+  FLAGS_test_prediction_file =
+      "modules/planning/integration_tests/garage_test/"
+      "stop_obstacle_prediction.pb.txt";
+  FLAGS_test_localization_file =
+      "modules/planning/integration_tests/garage_test/"
+      "stop_obstacle_localization.pb.txt";
+  FLAGS_test_chassis_file =
+      "modules/planning/integration_tests/garage_test/"
+      "stop_obstacle_chassis.pb.txt";
+  EXPECT_DEATH(PlanningTestBase::SetUp(), ".*SetUpAdapters.*");
+  // RunPlanning();
+  // ASSERT_TRUE(adc_trajectory_ != nullptr);
+}
 
 }  // namespace planning
 }  // namespace apollo
