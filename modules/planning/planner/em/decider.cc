@@ -19,13 +19,15 @@
  **/
 
 #include "modules/common/log.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/planner/em/decider.h"
 
 namespace apollo {
 namespace planning {
 
-using common::Status;
 using common::ErrorCode;
+using common::Status;
+using common::VehicleState;
 
 Decider::Decider(DecisionResult* decision_result)
 : decision_(decision_result) {
@@ -53,7 +55,7 @@ Status Decider::MakeDecision(Frame* frame) {
     MakeEStopDecision(path_decision);
     return Status(ErrorCode::OK, "MakeDecision failed. estop.");
   } else if (error_code == 0) {
-    // TODO: check other main decisions
+    // TODO(all): check other main decisions
   }
 
   SetObjectDecisions(path_decision);
@@ -95,7 +97,18 @@ int Decider::MakeMainStopDecision(Frame* frame,
         continue;
       }
 
-      // TODO: check stop_line_s vs adc_s
+      // check stop_line_s vs adc_s
+      common::SLPoint adc_sl;
+      auto& adc_position = VehicleState::instance()->pose().position();
+      reference_line.get_point_in_frenet_frame(
+          {adc_position.x(), adc_position.y()},
+          &adc_sl);
+      if (stop_line_s <= adc_sl.s()) {
+        AERROR << "object:" << obstacle->Id() << " fence route_s["
+               << stop_line_s << "] behind adc route_s[" << adc_sl.s()
+               << "]";
+        continue;
+      }
 
       if (stop_line_s < min_stop_line_s) {
         min_stop_line_s = stop_line_s;
@@ -133,10 +146,8 @@ int Decider::SetObjectDecisions(PathDecision* const path_decision) {
 
     const auto& obstacle = path_obstacle->Obstacle();
     object_decision->set_id(obstacle->Id());
-    // TODO: to be added
-    // object_decision->set_type();
-    // object_decision->mutable_prediction()->CopyFrom(
-    //      *(path_obstacle->prediction()));
+    object_decision->set_type(ObjectDecision::PREDICTION);
+    object_decision->set_perception_id(obstacle->PerceptionId());
 
     for (const auto& decision : path_obstacle->Decisions()) {
       object_decision->add_object_decision()->CopyFrom(decision);
@@ -149,20 +160,21 @@ int Decider::MakeEStopDecision(PathDecision* const path_decision) {
   CHECK_NOTNULL(path_decision);
   decision_->Clear();
 
-  // TODO: to be added
-  // MainEmergencyStop* main_estop =
-  // decision_->mutable_main_decision()->mutable_estop();
-  // main_estop->set_reason_code();
-  // main_estop->set_reason();
+  // TODO(all): to be added
+  MainEmergencyStop* main_estop =
+      decision_->mutable_main_decision()->mutable_estop();
+  main_estop->set_reason_code(MainEmergencyStop::ESTOP_REASON_INTERNAL_ERR);
+  main_estop->set_reason("estop reason to be added");
+  main_estop->mutable_cruise_to_stop();
 
   ObjectDecisions* object_decisions = decision_->mutable_object_decision();
-
   const auto& path_obstacles = path_decision->path_obstacles();
   for (const auto path_obstacle : path_obstacles.Items()) {
     auto* object_decision = object_decisions->add_decision();
-
     const auto& obstacle = path_obstacle->Obstacle();
     object_decision->set_id(obstacle->Id());
+    object_decision->set_type(ObjectDecision::PREDICTION);
+    object_decision->set_perception_id(obstacle->PerceptionId());
     object_decision->add_object_decision()->mutable_avoid();
   }
   return 0;

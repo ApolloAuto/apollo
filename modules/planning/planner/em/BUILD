@@ -14,6 +14,7 @@ cc_library(
         "//external:gflags",
         "//modules/common:log",
         "//modules/common/status",
+        "//modules/common/vehicle_state",
         "//modules/planning/common:planning_common",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
