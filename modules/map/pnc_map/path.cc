@@ -546,17 +546,6 @@ bool Path::is_on_path(const Vec2d& point) const {
   return false;
 }
 
-bool Path::is_on_path(const Box2d& box) const {
-  std::vector<Vec2d> corners;
-  box.GetAllCorners(&corners);
-  for (const auto& corner : corners) {
-    if (!is_on_path(corner)) {
-      return false;
-    }
-  }
-  return true;
-}
-
 bool Path::overlap_with(const common::math::Box2d& box, double width) const {
   if (_use_path_approximation) {
     return _approximation.overlap_with(*this, box, width);
