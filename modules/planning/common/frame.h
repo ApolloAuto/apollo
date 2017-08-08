@@ -69,7 +69,7 @@ class Frame {
   const ADCTrajectory &GetADCTrajectory() const;
   ADCTrajectory *MutableADCTrajectory();
 
-  void set_computed_trajectory(const PublishableTrajectory &trajectory);
+  void SetComputedTrajectory(const PublishableTrajectory &trajectory);
   const PublishableTrajectory &computed_trajectory() const;
   const localization::Pose &VehicleInitPose() const;
 
@@ -131,7 +131,7 @@ class Frame {
   std::unique_ptr<PathDecision> path_decision_;
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
-  PublishableTrajectory _computed_trajectory;
+  PublishableTrajectory computed_trajectory_;
   ReferenceLine reference_line_;
   PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;

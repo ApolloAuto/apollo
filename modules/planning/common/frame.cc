@@ -130,12 +130,12 @@ const PlanningData &Frame::planning_data() const { return _planning_data; }
 
 PlanningData *Frame::mutable_planning_data() { return &_planning_data; }
 
-void Frame::set_computed_trajectory(const PublishableTrajectory &trajectory) {
-  _computed_trajectory = trajectory;
+void Frame::SetComputedTrajectory(const PublishableTrajectory &trajectory) {
+  computed_trajectory_ = trajectory;
 }
 
 const PublishableTrajectory &Frame::computed_trajectory() const {
-  return _computed_trajectory;
+  return computed_trajectory_;
 }
 
 const ReferenceLine &Frame::reference_line() const { return reference_line_; }
@@ -199,17 +199,16 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
   double prediction_header_time = prediction_.header().timestamp_sec();
 
   for (int i = 0; i < prediction_.prediction_obstacle_size(); i++) {
-    prediction::PredictionObstacle* obstacle =
+    prediction::PredictionObstacle *obstacle =
         prediction_.mutable_prediction_obstacle(i);
     for (int j = 0; j < obstacle->trajectory_size(); j++) {
-      prediction::Trajectory* trajectory = obstacle->mutable_trajectory(j);
+      prediction::Trajectory *trajectory = obstacle->mutable_trajectory(j);
       for (int k = 0; k < trajectory->trajectory_point_size(); k++) {
-        common::TrajectoryPoint* point
-            = trajectory->mutable_trajectory_point(k);
+        common::TrajectoryPoint *point =
+            trajectory->mutable_trajectory_point(k);
         double abs_relative_time = point->relative_time();
-        point->set_relative_time(prediction_header_time
-                                     + abs_relative_time
-                                     - trajectory_header_time);
+        point->set_relative_time(prediction_header_time + abs_relative_time -
+                                 trajectory_header_time);
       }
     }
   }
