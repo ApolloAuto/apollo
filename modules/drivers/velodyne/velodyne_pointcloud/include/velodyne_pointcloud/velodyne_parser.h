@@ -231,7 +231,7 @@ class Velodyne64Parser : public VelodyneParser {
       const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
-  void setup();
+  void setup() override;
 
  private:
   void set_base_time_from_packets(const velodyne_msgs::VelodynePacket &pkt);
