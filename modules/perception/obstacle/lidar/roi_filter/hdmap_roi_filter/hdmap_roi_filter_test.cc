@@ -19,7 +19,6 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <memory>
-#include <gflags/gflags.h>
 #include <pcl/io/pcd_io.h>
 
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"

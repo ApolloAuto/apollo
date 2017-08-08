@@ -19,7 +19,6 @@
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 
 #include <vector>
-#include <gflags/gflags.h>
 #include <Eigen/Core>
 
 #include "modules/common/log.h"
