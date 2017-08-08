@@ -346,7 +346,7 @@ bool DPRoadGraph::ComputeBoundingBoxesForAdc(
     }
 
     const common::FrenetFramePoint &interpolated_frenet_point =
-        frenet_frame_path.Interpolate(speed_point.s());
+        frenet_frame_path.EvaluateByS(speed_point.s());
     double s = interpolated_frenet_point.s();
     double l = interpolated_frenet_point.l();
     double dl = interpolated_frenet_point.dl();
