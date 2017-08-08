@@ -50,7 +50,7 @@ std::vector<common::TrajectoryPoint> compute_reinit_stitching_trajectory() {
 //    2. we don't have the trajectory from last planning cycle or
 //    3. the position deviation from actual and target is too high
 std::vector<common::TrajectoryPoint>
-TrajectoryStitcher::compute_stitching_trajectory(
+TrajectoryStitcher::ComputeStitchingTrajectory(
     const bool is_on_auto_mode, const double current_timestamp,
     const double planning_cycle_time,
     const PublishableTrajectory& prev_trajectory) {

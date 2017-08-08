@@ -31,22 +31,22 @@ class PublishableTrajectory : public DiscretizedTrajectory {
  public:
   virtual ~PublishableTrajectory() = default;
 
-  apollo::common::TrajectoryPoint evaluate_absolute_time(
+  common::TrajectoryPoint EvaluateAbsoluteTime(
       const double abs_time) const;
 
-  apollo::common::TrajectoryPoint evaluate_linear_approximation_absolute_time(
+  common::TrajectoryPoint EvaluateAbsoluteTimeUsingLinearApproximation(
       const double abs_time) const;
 
-  std::uint32_t query_nearest_point_absolute_time(const double abs_time) const;
+  std::uint32_t QueryNearestPointAbsoluteTime(const double abs_time) const;
 
   double header_time() const;
 
   void set_header_time(const double header_time);
 
-  void populate_trajectory_protobuf(ADCTrajectory* trajectory_pb) const;
+  void PopulateTrajectoryProtobuf(ADCTrajectory* trajectory_pb) const;
 
  private:
-  double _header_time;
+  double header_time_;
 };
 
 }  // namespace planning

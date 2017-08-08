@@ -80,7 +80,7 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
                                  FLAGS_trajectory_resolution);
     trajectory_points.push_back(*new_point);
   }
-  ptr_publishable_trajectory->SetTrajectoryPoints(trajectory_points);
+  ptr_publishable_trajectory->set_trajectory_points(std::move(trajectory_points));
   return Status::OK();
 }
 

@@ -34,22 +34,22 @@ using apollo::common::TrajectoryPoint;
 
 DiscretizedTrajectory::DiscretizedTrajectory(
     std::vector<TrajectoryPoint> trajectory_points) {
-  _trajectory_points = std::move(trajectory_points);
+  trajectory_points_ = std::move(trajectory_points);
 }
 
 double DiscretizedTrajectory::TimeLength() const {
-  if (_trajectory_points.empty()) {
+  if (trajectory_points_.empty()) {
     return 0.0;
   }
-  return _trajectory_points.back().relative_time() -
-         _trajectory_points.front().relative_time();
+  return trajectory_points_.back().relative_time() -
+         trajectory_points_.front().relative_time();
 }
 
 TrajectoryPoint DiscretizedTrajectory::Evaluate(
     const double relative_time) const {
-  CHECK(!_trajectory_points.empty());
-  CHECK(_trajectory_points.front().relative_time() <= relative_time &&
-        _trajectory_points.back().relative_time() <= relative_time)
+  CHECK(!trajectory_points_.empty());
+  CHECK(trajectory_points_.front().relative_time() <= relative_time &&
+        trajectory_points_.back().relative_time() <= relative_time)
       << "Invalid relative time input!";
 
   auto comp = [](const TrajectoryPoint& p, const double relative_time) {
@@ -57,11 +57,11 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
   };
 
   auto it_lower =
-      std::lower_bound(_trajectory_points.begin(), _trajectory_points.end(),
+      std::lower_bound(trajectory_points_.begin(), trajectory_points_.end(),
                        relative_time, comp);
 
-  if (it_lower == _trajectory_points.begin()) {
-    return _trajectory_points.front();
+  if (it_lower == trajectory_points_.begin()) {
+    return trajectory_points_.front();
   }
   return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
 }
@@ -73,11 +73,11 @@ TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
   };
 
   auto it_lower =
-      std::lower_bound(_trajectory_points.begin(), _trajectory_points.end(),
+      std::lower_bound(trajectory_points_.begin(), trajectory_points_.end(),
                        relative_time, comp);
 
-  if (it_lower == _trajectory_points.begin()) {
-    return _trajectory_points.front();
+  if (it_lower == trajectory_points_.begin()) {
+    return trajectory_points_.front();
   }
   return util::interpolate_linear_approximation(*(it_lower - 1), *it_lower,
                                                 relative_time);
@@ -89,19 +89,19 @@ std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
     return tp.relative_time() < relative_time;
   };
   auto it_lower =
-      std::lower_bound(_trajectory_points.begin(), _trajectory_points.end(),
+      std::lower_bound(trajectory_points_.begin(), trajectory_points_.end(),
                        relative_time, func);
-  return (std::uint32_t)(it_lower - _trajectory_points.begin());
+  return (std::uint32_t)(it_lower - trajectory_points_.begin());
 }
 
 std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
     const common::math::Vec2d& position) const {
   double dist_min = std::numeric_limits<double>::max();
   std::uint32_t index_min = 0;
-  for (std::uint32_t i = 0; i < _trajectory_points.size(); ++i) {
+  for (std::uint32_t i = 0; i < trajectory_points_.size(); ++i) {
     const common::math::Vec2d coordinate(
-        _trajectory_points[i].path_point().x(),
-        _trajectory_points[i].path_point().y());
+        trajectory_points_[i].path_point().x(),
+        trajectory_points_[i].path_point().y());
     common::math::Vec2d dist_vec = coordinate - position;
     double dist = dist_vec.InnerProd(dist_vec);
     if (dist < dist_min) {
@@ -114,44 +114,60 @@ std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
 
 void DiscretizedTrajectory::AppendTrajectoryPoint(
     const TrajectoryPoint& trajectory_point) {
-  if (!_trajectory_points.empty()) {
+  if (!trajectory_points_.empty()) {
     CHECK_GT(trajectory_point.relative_time(),
-             _trajectory_points.back().relative_time());
+             trajectory_points_.back().relative_time());
   }
-  _trajectory_points.push_back(trajectory_point);
+  trajectory_points_.push_back(trajectory_point);
 }
 
 const TrajectoryPoint& DiscretizedTrajectory::TrajectoryPointAt(
     const std::uint32_t index) const {
   CHECK_LT(index, NumOfPoints());
-  return _trajectory_points[index];
+  return trajectory_points_[index];
 }
 
 TrajectoryPoint DiscretizedTrajectory::StartPoint() const {
-  CHECK(!_trajectory_points.empty());
-  return _trajectory_points.front();
+  CHECK(!trajectory_points_.empty());
+  return trajectory_points_.front();
 }
 
 TrajectoryPoint DiscretizedTrajectory::EndPoint() const {
-  CHECK(!_trajectory_points.empty());
-  return _trajectory_points.back();
+  CHECK(!trajectory_points_.empty());
+  return trajectory_points_.back();
 }
 
 std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
-  return _trajectory_points.size();
+  return trajectory_points_.size();
 }
 
-const std::vector<apollo::common::TrajectoryPoint>&
+const std::vector<TrajectoryPoint>&
 DiscretizedTrajectory::trajectory_points() const {
-  return _trajectory_points;
+  return trajectory_points_;
 }
 
-void DiscretizedTrajectory::SetTrajectoryPoints(
-    const std::vector<apollo::common::TrajectoryPoint>& points) {
-  *this = DiscretizedTrajectory(points);
+void DiscretizedTrajectory::set_trajectory_points(
+    std::vector<TrajectoryPoint> points) {
+  trajectory_points_ = std::move(points);
+  CHECK(Valid() && "The input trajectory points have wrong relative time!");
 }
 
-void DiscretizedTrajectory::Clear() { _trajectory_points.clear(); }
+bool DiscretizedTrajectory::Valid() const {
+  std::size_t size = trajectory_points_.size();
+  if (size == 0 || size == 1) {
+    return true;
+  }
+
+  for (std::size_t i = 1; i < size; ++i) {
+    if (!(trajectory_points_[i - 1].relative_time()
+        < trajectory_points_[i].relative_time())) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }
 
 }  // namespace planning
 }  // namespace apollo

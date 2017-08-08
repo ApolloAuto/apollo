@@ -25,33 +25,33 @@ namespace planning {
 
 using apollo::common::TrajectoryPoint;
 
-TrajectoryPoint PublishableTrajectory::evaluate_absolute_time(
+TrajectoryPoint PublishableTrajectory::EvaluateAbsoluteTime(
     const double abs_time) const {
-  return Evaluate(abs_time - _header_time);
+  return Evaluate(abs_time - header_time_);
 }
 
 TrajectoryPoint
-PublishableTrajectory::evaluate_linear_approximation_absolute_time(
+PublishableTrajectory::EvaluateAbsoluteTimeUsingLinearApproximation(
     const double abs_time) const {
-  return EvaluateUsingLinearApproximation(abs_time - _header_time);
+  return EvaluateUsingLinearApproximation(abs_time - header_time_);
 }
 
-std::uint32_t PublishableTrajectory::query_nearest_point_absolute_time(
+std::uint32_t PublishableTrajectory::QueryNearestPointAbsoluteTime(
     const double abs_time) const {
-  return QueryNearestPoint(abs_time - _header_time);
+  return QueryNearestPoint(abs_time - header_time_);
 }
 
-double PublishableTrajectory::header_time() const { return _header_time; }
+double PublishableTrajectory::header_time() const { return header_time_; }
 
 void PublishableTrajectory::set_header_time(const double header_time) {
-  _header_time = header_time;
+  header_time_ = header_time;
 }
 
-void PublishableTrajectory::populate_trajectory_protobuf(
+void PublishableTrajectory::PopulateTrajectoryProtobuf(
     ADCTrajectory* trajectory_pb) const {
-  trajectory_pb->mutable_header()->set_timestamp_sec(_header_time);
+  trajectory_pb->mutable_header()->set_timestamp_sec(header_time_);
   trajectory_pb->mutable_trajectory_point()->CopyFrom(
-      {_trajectory_points.begin(), _trajectory_points.end()});
+      {trajectory_points_.begin(), trajectory_points_.end()});
 }
 
 }  // namespace planning

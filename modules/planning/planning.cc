@@ -217,7 +217,7 @@ void Planning::Stop() {}
 bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
                     const double planning_cycle_time) {
   const auto& stitching_trajectory =
-      TrajectoryStitcher::compute_stitching_trajectory(
+      TrajectoryStitcher::ComputeStitchingTrajectory(
           is_on_auto_mode, current_time_stamp, planning_cycle_time,
           last_publishable_trajectory_);
 
@@ -239,7 +239,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
   publishable_trajectory.set_header_time(current_time_stamp);
 
   auto trajectory_pb = frame_->MutableADCTrajectory();
-  publishable_trajectory.populate_trajectory_protobuf(trajectory_pb);
+  publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
 
   // update last publishable trajectory;
