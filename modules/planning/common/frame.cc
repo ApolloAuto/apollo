@@ -195,8 +195,7 @@ void Frame::RecordInputDebug() {
   debug_routing->CopyFrom(routing_response);
 }
 
-void Frame::AlignPredictionTime(const double trajectory_header_time,
-                                const double initpoint_relative_time) {
+void Frame::AlignPredictionTime(const double trajectory_header_time) {
   double prediction_header_time = prediction_.header().timestamp_sec();
 
   for (int i = 0; i < prediction_.prediction_obstacle_size(); i++) {
@@ -210,8 +209,7 @@ void Frame::AlignPredictionTime(const double trajectory_header_time,
         double abs_relative_time = point->relative_time();
         point->set_relative_time(prediction_header_time
                                      + abs_relative_time
-                                     - trajectory_header_time
-                                     - initpoint_relative_time);
+                                     - trajectory_header_time);
       }
     }
   }

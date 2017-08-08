@@ -77,8 +77,7 @@ class Frame {
 
   void RecordInputDebug();
 
-  void AlignPredictionTime(const double trajectory_header_time,
-                           const double initpoint_relative_time);
+  void AlignPredictionTime(const double trajectory_header_time);
 
  private:
   /**
