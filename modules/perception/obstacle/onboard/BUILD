@@ -15,6 +15,7 @@ cc_library(
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "@eigen//:eigen",
+        "@gtest//:gtest",
     ],
 )
 
@@ -38,6 +39,7 @@ cc_library(
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:perception_obstacle_lidar_segmention_cnnseg",
         "//modules/perception/obstacle/lidar/tracker/hm_tracker:perception_obstacle_lidar_tracker_hm_tracker",
         "@eigen//:eigen",
+        "@gtest//:gtest",
         "@ros//:ros_common",
     ],
 )
