@@ -107,9 +107,6 @@ class DPRoadGraph {
       const std::vector<const PathObstacle *> &path_obstacles,
       std::vector<std::pair<std::string, ObjectDecisionType>> *const decisions);
 
-  bool FrenetToCartesian(const FrenetFramePath &frenet_path,
-                         DiscretizedPath *const discretized_path);
-
  private:
   DpPolyPathConfig config_;
   common::TrajectoryPoint init_point_;

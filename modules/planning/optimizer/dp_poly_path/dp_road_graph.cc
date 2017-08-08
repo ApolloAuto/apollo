@@ -36,7 +36,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/math/double.h"
-#include "modules/planning/math/sl_analytic_transformation.h"
 #include "modules/planning/optimizer/dp_poly_path/trajectory_cost.h"
 
 namespace apollo {
@@ -97,60 +96,8 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   }
   FrenetFramePath tunnel(frenet_path);
 
-  DiscretizedPath discretized_path;
-  if (!FrenetToCartesian(tunnel, &discretized_path)) {
-    AERROR << "Failed to convert dp graph tunnel to PathData";
-    return false;
-  }
   path_data->set_reference_line(&reference_line_);
   path_data->set_frenet_path(tunnel);
-  path_data->set_discretized_path(discretized_path);
-  return true;
-}
-
-bool DPRoadGraph::FrenetToCartesian(const FrenetFramePath &frenet_path,
-                                    DiscretizedPath *const discretized_path) {
-  DCHECK_NOTNULL(discretized_path);
-  // convert frenet path to cartesian path by reference line
-  std::vector<common::PathPoint> path_points;
-  for (const common::FrenetFramePoint &frenet_point : frenet_path.points()) {
-    common::SLPoint sl_point;
-    common::math::Vec2d cartesian_point;
-    sl_point.set_s(frenet_point.s());
-    sl_point.set_l(frenet_point.l());
-    if (!reference_line_.get_point_in_cartesian_frame(sl_point,
-                                                      &cartesian_point)) {
-      AERROR << "Fail to convert sl point to xy point";
-      return false;
-    }
-    ReferencePoint ref_point =
-        reference_line_.get_reference_point(frenet_point.s());
-    double theta = SLAnalyticTransformation::calculate_theta(
-        ref_point.heading(), ref_point.kappa(), frenet_point.l(),
-        frenet_point.dl());
-    double kappa = SLAnalyticTransformation::calculate_kappa(
-        ref_point.kappa(), ref_point.dkappa(), frenet_point.l(),
-        frenet_point.dl(), frenet_point.ddl());
-
-    common::PathPoint path_point;
-    path_point.set_x(cartesian_point.x());
-    path_point.set_y(cartesian_point.y());
-    path_point.set_z(0.0);
-    path_point.set_theta(theta);
-    path_point.set_kappa(kappa);
-    path_point.set_dkappa(0.0);
-    path_point.set_ddkappa(0.0);
-    path_point.set_s(0.0);
-
-    if (!path_points.empty()) {
-      common::math::Vec2d last(path_points.back().x(), path_points.back().y());
-      common::math::Vec2d current(path_point.x(), path_point.y());
-      double distance = (last - current).Length();
-      path_point.set_s(path_points.back().s() + distance);
-    }
-    path_points.push_back(std::move(path_point));
-  }
-  *discretized_path = DiscretizedPath(path_points);
   return true;
 }
 
