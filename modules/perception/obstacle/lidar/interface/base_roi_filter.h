@@ -52,9 +52,10 @@
 // using roi_filter to do somethings.
 // ////////////////////////////////////////////////////
 
-#include <Eigen/Core>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
@@ -85,7 +86,7 @@ class BaseROIFilter {
 
   virtual bool Filter(const pcl_util::PointCloudPtr &cloud,
                       const ROIFilterOptions &roi_filter_options,
-                      pcl_util::PointIndices* roi_indices) = 0;
+                      pcl_util::PointIndices *roi_indices) = 0;
 
   virtual std::string name() const = 0;
 

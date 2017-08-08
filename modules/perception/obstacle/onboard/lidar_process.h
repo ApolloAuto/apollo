@@ -17,8 +17,7 @@
 #ifndef MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
 #define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
 
-#include <Eigen/Core>
-#include <sensor_msgs/PointCloud2.h>
+#include "Eigen/Core"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
@@ -27,6 +26,7 @@
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "sensor_msgs/PointCloud2.h"
 
 namespace apollo {
 namespace perception {
@@ -42,7 +42,8 @@ class LidarProcess {
   }
   bool Process(const sensor_msgs::PointCloud2& message);
 
-  bool Process(double timestamp, pcl_util::PointCloudPtr cloud, std::shared_ptr<Eigen::Matrix4d> velodyne_trans);
+  bool Process(double timestamp, pcl_util::PointCloudPtr cloud,
+               std::shared_ptr<Eigen::Matrix4d> velodyne_trans);
 
   bool GeneratePbMsg(PerceptionObstacles* obstacles);
 

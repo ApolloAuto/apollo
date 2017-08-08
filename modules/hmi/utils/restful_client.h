@@ -22,8 +22,8 @@
 #ifndef MODULES_HMI_UTILS_RESTFUL_CLIENT_H_
 #define MODULES_HMI_UTILS_RESTFUL_CLIENT_H_
 
-#include <google/protobuf/message.h>
 #include <string>
+#include "google/protobuf/message.h"
 
 /**
  * @namespace apollo::hmi

@@ -21,13 +21,13 @@
 #ifndef MODEULES_PERCEPTION_PERCEPTION_H_
 #define MODEULES_PERCEPTION_PERCEPTION_H_
 
-#include <sensor_msgs/PointCloud2.h>
 #include <string>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "ros/include/ros/ros.h"
 #include "modules/perception/obstacle/onboard/lidar_process.h"
+#include "ros/include/ros/ros.h"
+#include "sensor_msgs/PointCloud2.h"
 
 /**
  * @namespace apollo::perception

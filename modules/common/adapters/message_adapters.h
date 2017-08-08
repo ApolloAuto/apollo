@@ -17,8 +17,7 @@
 #ifndef MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 #define MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 
-#include <sensor_msgs/PointCloud2.h>
-
+#include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/adapters/adapter.h"
@@ -26,6 +25,7 @@
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/decision/proto/decision.pb.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/localization/proto/camera.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -35,8 +35,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
-#include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
+#include "sensor_msgs/PointCloud2.h"
 
 /**
  * @file message_adapters.h
@@ -67,7 +66,8 @@ using TrafficLightDetectionAdapter =
     Adapter<::apollo::perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<::apollo::routing::RoutingRequest>;
 using RoutingResponseAdapter = Adapter<::apollo::routing::RoutingResponse>;
-using RelativeOdometryAdapter = Adapter<::apollo::calibration::republish_msg::RelativeOdometry>;
+using RelativeOdometryAdapter =
+    Adapter<::apollo::calibration::republish_msg::RelativeOdometry>;
 using InsStatAdapter = Adapter<::apollo::drivers::gnss::InsStat>;
 
 }  // namespace adapter

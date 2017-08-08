@@ -14,10 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <unistd.h>
-#include <gtest/gtest.h>
-#include "modules/common/log.h"
 #include "modules/perception/lib/base/timer.h"
+
+#include <unistd.h>
+
+#include "gtest/gtest.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -41,13 +43,13 @@ TEST(PerfFunctionTest, test) {
 }
 
 TEST(PerfBlockTest, test) {
-    PERF_BLOCK_START();
-    // do somethings.
-    usleep(100000);
-    PERF_BLOCK_END("BLOCK1");
+  PERF_BLOCK_START();
+  // do somethings.
+  usleep(100000);
+  PERF_BLOCK_END("BLOCK1");
 
-    usleep(200000);
-    PERF_BLOCK_END("BLOCK2");
+  usleep(200000);
+  PERF_BLOCK_END("BLOCK2");
 }
 
 }  // namespace perception

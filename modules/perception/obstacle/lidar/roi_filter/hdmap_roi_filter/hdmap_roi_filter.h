@@ -19,18 +19,19 @@
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 
 #include <vector>
-#include <gflags/gflags.h>
-#include <Eigen/Core>
+
+#include "Eigen/Core"
+#include "gflags/gflags.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/base/singleton.h"
-#include "modules/perception/obstacle/base/hdmap_struct.h"
-#include "modules/perception/obstacle/onboard/hdmap_input.h"
-#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_scan_converter.h"
-#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_mask.h"
-#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lib/base/singleton.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/base/hdmap_struct.h"
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_mask.h"
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_scan_converter.h"
+#include "modules/perception/obstacle/onboard/hdmap_input.h"
 
 namespace apollo {
 namespace perception {
@@ -40,17 +41,20 @@ typedef typename Bitmap2D::DirectionMajor MajorDirection;
 /**
  * @class HdmapROIFilter
  * @brief This is ROI(Region of Interest) Filter based on HD map, which can
- * figure out which point is in the regions what we focus on(Almost in the road).
+ * figure out which point is in the regions what we focus on(Almost in the
+ * road).
  * This is an optional process, the most advantage of ROI filter is to filter
  * out some points to reduce calculation in the following process.
  */
-class HdmapROIFilter: public BaseROIFilter {
-public:
+class HdmapROIFilter : public BaseROIFilter {
+ public:
   HdmapROIFilter() : BaseROIFilter() {}
   ~HdmapROIFilter() {}
 
   bool Init() override;
-  std::string name() const {return "HdmapROIFilter";}
+  std::string name() const {
+    return "HdmapROIFilter";
+  }
 
   /**
    * @params[In] cloud: All the cloud points with local coordinates
@@ -61,10 +65,10 @@ public:
    * @return true if filter points successfully, otherwise return false
    */
   bool Filter(const pcl_util::PointCloudPtr& cloud,
-              const ROIFilterOptions &roi_filter_options,
+              const ROIFilterOptions& roi_filter_options,
               pcl_util::PointIndices* roi_indices) override;
 
-protected:
+ protected:
   /**
    * @brief: Draw polygons into grids in bitmap and check each point whether
    * is in the grids within ROI.
@@ -77,12 +81,11 @@ protected:
    * @brief: Transform polygon points and cloud points from world coordinates
    * system to local.
    */
-  void TransformFrame(
-          const pcl_util::PointCloudConstPtr& cloud,
-          const Eigen::Affine3d& vel_pose,
-          const std::vector<PolygonDType>& polygons_world,
-          std::vector<PolygonType>& polygons_local,
-          pcl_util::PointCloudPtr& cloud_local);
+  void TransformFrame(const pcl_util::PointCloudConstPtr& cloud,
+                      const Eigen::Affine3d& vel_pose,
+                      const std::vector<PolygonDType>& polygons_world,
+                      std::vector<PolygonType>& polygons_local,
+                      pcl_util::PointCloudPtr& cloud_local);
 
   /**
    * @brief: Get major direction. Transform polygons type to what we want.
@@ -102,9 +105,8 @@ protected:
   /**
    * @brief: Merge junction polygons and road boundaries in a vector.
    */
-  void MergeHdmapStructToPolygons(
-      const HdmapStructConstPtr& hdmap_struct_ptr,
-      std::vector<PolygonDType>* polygons);
+  void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
+                                  std::vector<PolygonDType>* polygons);
 
   /**
    * @brief: After drawing polygons into grids in bitmap. We check each point
@@ -112,9 +114,10 @@ protected:
    */
   bool Bitmap2dFilter(
       const pcl::PointCloud<pcl_util::Point>::ConstPtr in_cloud_ptr,
-      const Bitmap2D &bitmap, pcl_util::PointIndices* roi_indices_ptr);
+      const Bitmap2D& bitmap, pcl_util::PointIndices* roi_indices_ptr);
 
-  // We only filter point with local coordinates x, y in [-range, range] in meters
+  // We only filter point with local coordinates x, y in [-range, range] in
+  // meters
   double range_;
 
   // Hight and width of grid in bitmap
@@ -126,7 +129,7 @@ protected:
 
 REGISTER_ROIFILTER(HdmapROIFilter);
 
-} // perception
-} // apollo
+}  // perception
+}  // apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_HDMAP_ROI_FILTER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_HDMAP_ROI_FILTER_H_

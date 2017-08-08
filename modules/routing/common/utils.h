@@ -17,8 +17,8 @@
 #ifndef MODULES_ROUTING_COMMON_UTILS_H_
 #define MODULES_ROUTING_COMMON_UTILS_H_
 
-#include <google/protobuf/message.h>
 #include <string>
+#include "google/protobuf/message.h"
 
 namespace apollo {
 namespace routing {

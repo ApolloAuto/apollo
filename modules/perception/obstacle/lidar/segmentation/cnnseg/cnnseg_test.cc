@@ -14,16 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <memory>
-#include <vector>
-#include <string>
-#include <unordered_set>
-#include <stdio.h>
-#include <gtest/gtest.h>
+#include <pcl/io/pcd_io.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include <pcl/io/pcd_io.h>
+#include <stdio.h>
+#include <memory>
+#include <string>
+#include <unordered_set>
+#include <vector>
 
+#include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
@@ -46,8 +46,10 @@ namespace apollo {
 namespace perception {
 namespace test {
 
-DEFINE_string(test_dir, "/apollo/modules/perception/data/cnnseg_test/", "test data directory");
-DEFINE_string(pcd_name, "uscar_12_1470770225_1470770492_1349", "poind cloud data name");
+DEFINE_string(test_dir, "/apollo/modules/perception/data/cnnseg_test/",
+              "test data directory");
+DEFINE_string(pcd_name, "uscar_12_1470770225_1470770492_1349",
+              "poind cloud data name");
 
 struct CellStat {
   CellStat() : point_num(0), valid_point_num(0) {}
@@ -67,6 +69,7 @@ class CNNSegmentationTest : public testing::Test {
     cnn_segmentor_.reset(new CNNSegmentation());
   }
   void TearDown() {}
+
  protected:
   shared_ptr<CNNSegmentation> cnn_segmentor_;
 };
@@ -79,8 +82,7 @@ int RowCol2Grid(int row, int col, int cols) {
   return row * cols + col;
 }
 
-bool GetPointCloudFromFile(const string& pcd_file,
-                           PointCloudPtr cloud) {
+bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
   pcl::PointCloud<PointXYZIT> ori_cloud;
   if (pcl::io::loadPCDFile(pcd_file, ori_cloud) < 0) {
     AERROR << "Failed to load pcd file: " << pcd_file;
@@ -103,11 +105,8 @@ bool GetPointCloudFromFile(const string& pcd_file,
   return true;
 }
 
-void DrawDetection(const PointCloudPtr &pc_ptr,
-                   const PointIndices &valid_idx,
-                   int rows,
-                   int cols,
-                   float range,
+void DrawDetection(const PointCloudPtr &pc_ptr, const PointIndices &valid_idx,
+                   int rows, int cols, float range,
                    const vector<ObjectPtr> &objects,
                    const string &result_file) {
   // create a new image for visualization
@@ -119,7 +118,7 @@ void DrawDetection(const PointCloudPtr &pc_ptr,
   int grids = rows * cols;
   vector<CellStat> view(grids);
 
-  const std::vector<int>* valid_indices_in_pc = &(valid_idx.indices);
+  const std::vector<int> *valid_indices_in_pc = &(valid_idx.indices);
   CHECK_LE(valid_indices_in_pc->size(), pc_ptr->size());
   unordered_set<int> unique_indices;
   for (size_t i = 0; i < valid_indices_in_pc->size(); ++i) {
@@ -129,8 +128,9 @@ void DrawDetection(const PointCloudPtr &pc_ptr,
   }
 
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
-    const auto& point = pc_ptr->points[i];
-    // * the coordinates of x and y have been exchanged in feature generation step,
+    const auto &point = pc_ptr->points[i];
+    // * the coordinates of x and y have been exchanged in feature generation
+    // step,
     // so they should be swapped back here.
     int col = F2I(point.y, range, inv_res_x);  // col
     int row = F2I(point.x, range, inv_res_y);  // row
@@ -157,8 +157,8 @@ void DrawDetection(const PointCloudPtr &pc_ptr,
   }
 
   // show segment grids with tight bounding box
-  const cv::Vec3b segm_color(0, 0, 255);     // red
-  const cv::Vec3b bbox_color(0, 255, 255);   // yellow
+  const cv::Vec3b segm_color(0, 0, 255);    // red
+  const cv::Vec3b bbox_color(0, 255, 255);  // yellow
 
   for (size_t i = 0; i < objects.size(); ++i) {
     const ObjectPtr &obj = objects[i];
@@ -183,8 +183,10 @@ void DrawDetection(const PointCloudPtr &pc_ptr,
       y_max = std::max(row, y_max);
     }
 
-    //fillConvexPoly(img, list.data(), list.size(), cv::Scalar(positive_prob * segm_color));
-    rectangle(img, cv::Point(x_min, y_min), cv::Point(x_max, y_max), cv::Scalar(bbox_color));
+    // fillConvexPoly(img, list.data(), list.size(), cv::Scalar(positive_prob *
+    // segm_color));
+    rectangle(img, cv::Point(x_min, y_min), cv::Point(x_max, y_max),
+              cv::Scalar(bbox_color));
   }
 
   // write image intensity values into file
@@ -193,10 +195,8 @@ void DrawDetection(const PointCloudPtr &pc_ptr,
   fprintf(f_res, "%d %d\n", rows, cols);
   for (int row = 0; row < rows; ++row) {
     for (int col = 0; col < cols; ++col) {
-      fprintf(f_res, "%u %u %u\n",
-              img.at<cv::Vec3b>(row, col)[0],
-              img.at<cv::Vec3b>(row, col)[1],
-              img.at<cv::Vec3b>(row, col)[2]);
+      fprintf(f_res, "%u %u %u\n", img.at<cv::Vec3b>(row, col)[0],
+              img.at<cv::Vec3b>(row, col)[1], img.at<cv::Vec3b>(row, col)[2]);
     }
   }
   fclose(f_res);
@@ -236,12 +236,8 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
   // do visualization of segmentation results (output object detections)
   string result_file(FLAGS_test_dir);
   result_file = result_file + FLAGS_pcd_name + "-detection.txt";
-  DrawDetection(in_pc,
-                valid_idx,
-                cnn_segmentor_->height(),
-                cnn_segmentor_->width(),
-                cnn_segmentor_->range(),
-                out_objects,
+  DrawDetection(in_pc, valid_idx, cnn_segmentor_->height(),
+                cnn_segmentor_->width(), cnn_segmentor_->range(), out_objects,
                 result_file);
 #endif
 }

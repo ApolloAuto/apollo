@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/base/object.h"
-#include <gtest/gtest.h>
+
 #include <vector>
+
+#include "gtest/gtest.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -24,70 +26,70 @@ namespace perception {
 using std::vector;
 
 TEST(ObjectTest, test_ToString) {
-    Object object;
-    AINFO << object.ToString();
+  Object object;
+  AINFO << object.ToString();
 }
 
 TEST(ObjectTest, test_Serialize) {
-    Object obj;
-    obj.id = 1;
-    obj.track_id = 2;
-    obj.direction << 1.0, 2.0, 3.0;
-    obj.center << 4.0, 5.0, 6.0;
-    obj.velocity << 7.0, 8.0, 9.0;
-    obj.theta = 0.0;
-    obj.length = 0.1;
-    obj.width = 0.2;
-    obj.height = 0.3;
-    obj.type = BICYCLE;
-    obj.tracking_time = 10.0;
-    obj.latest_tracked_time = 123456.7;
-    PolygonDType polygon;
-    for (int i = 1; i < 5; ++i) {
-        pcl_util::PointD p;
-        p.x = i;
-        p.y = i;
-        p.z = i;
-        polygon.push_back(p);
-    }
-    obj.polygon = polygon;
+  Object obj;
+  obj.id = 1;
+  obj.track_id = 2;
+  obj.direction << 1.0, 2.0, 3.0;
+  obj.center << 4.0, 5.0, 6.0;
+  obj.velocity << 7.0, 8.0, 9.0;
+  obj.theta = 0.0;
+  obj.length = 0.1;
+  obj.width = 0.2;
+  obj.height = 0.3;
+  obj.type = BICYCLE;
+  obj.tracking_time = 10.0;
+  obj.latest_tracked_time = 123456.7;
+  PolygonDType polygon;
+  for (int i = 1; i < 5; ++i) {
+    pcl_util::PointD p;
+    p.x = i;
+    p.y = i;
+    p.z = i;
+    polygon.push_back(p);
+  }
+  obj.polygon = polygon;
 
-    PerceptionObstacle pb_obj;
-    EXPECT_TRUE(obj.Serialize(&pb_obj));
-    EXPECT_EQ(pb_obj.id(), 2);
-    EXPECT_EQ(pb_obj.position().x(), 4.0);
-    AINFO << "org obj:" << obj.ToString();
-    AINFO << "pb obj:" << pb_obj.ShortDebugString();
+  PerceptionObstacle pb_obj;
+  EXPECT_TRUE(obj.Serialize(&pb_obj));
+  EXPECT_EQ(pb_obj.id(), 2);
+  EXPECT_EQ(pb_obj.position().x(), 4.0);
+  AINFO << "org obj:" << obj.ToString();
+  AINFO << "pb obj:" << pb_obj.ShortDebugString();
 }
 
 TEST(ObjectTest, test_Deserialize) {
-    Object obj;
-    PerceptionObstacle pb_obj;
-    pb_obj.set_id(1);
-    pb_obj.set_theta(0.1);
-    Point* pos = pb_obj.mutable_position();
-    pos->set_x(10.1);
-    pos->set_y(20.1);
-    pos->set_z(1.1);
-    pb_obj.set_length(2.0);
-    pb_obj.set_width(1.0);
-    pb_obj.set_height(1.5);
-    pb_obj.set_tracking_time(20.1);
-    pb_obj.set_type(PerceptionObstacle::BICYCLE);
-    pb_obj.set_timestamp(1147012345.678);
+  Object obj;
+  PerceptionObstacle pb_obj;
+  pb_obj.set_id(1);
+  pb_obj.set_theta(0.1);
+  Point* pos = pb_obj.mutable_position();
+  pos->set_x(10.1);
+  pos->set_y(20.1);
+  pos->set_z(1.1);
+  pb_obj.set_length(2.0);
+  pb_obj.set_width(1.0);
+  pb_obj.set_height(1.5);
+  pb_obj.set_tracking_time(20.1);
+  pb_obj.set_type(PerceptionObstacle::BICYCLE);
+  pb_obj.set_timestamp(1147012345.678);
 
-    EXPECT_TRUE(obj.Deserialize(pb_obj));
-    EXPECT_EQ(obj.track_id, 1);
-    EXPECT_EQ(obj.theta, 0.1);
-    EXPECT_EQ(obj.center(0), 10.1);
-    EXPECT_EQ(obj.center(1), 20.1);
-    EXPECT_EQ(obj.center(2), 1.1);
-    EXPECT_EQ(obj.length, 2.0);
-    EXPECT_EQ(obj.width, 1.0);
-    EXPECT_EQ(obj.height, 1.5);
-    EXPECT_EQ(obj.type, BICYCLE);
-    EXPECT_EQ(obj.tracking_time, 20.1);
-    EXPECT_EQ(obj.latest_tracked_time, 1147012345.678);
+  EXPECT_TRUE(obj.Deserialize(pb_obj));
+  EXPECT_EQ(obj.track_id, 1);
+  EXPECT_EQ(obj.theta, 0.1);
+  EXPECT_EQ(obj.center(0), 10.1);
+  EXPECT_EQ(obj.center(1), 20.1);
+  EXPECT_EQ(obj.center(2), 1.1);
+  EXPECT_EQ(obj.length, 2.0);
+  EXPECT_EQ(obj.width, 1.0);
+  EXPECT_EQ(obj.height, 1.5);
+  EXPECT_EQ(obj.type, BICYCLE);
+  EXPECT_EQ(obj.tracking_time, 20.1);
+  EXPECT_EQ(obj.latest_tracked_time, 1147012345.678);
 }
 
 }  // namespace perception
