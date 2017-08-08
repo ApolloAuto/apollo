@@ -4,7 +4,6 @@ package apollo.planning;
 
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/vehicle_signal.proto";
-import "modules/prediction/proto/prediction_obstacle.proto";
 
 message TargetLane {
   // lane id
