@@ -14,6 +14,7 @@ genrule(
     srcs = [
         ":protobuf-root",
         ":CMakeLists.txt",
+        ":cmake/Dependencies.cmake",
         "@com_google_protobuf//:protoc",
         "@com_google_protobuf//:protobuf",
     ],
@@ -24,6 +25,7 @@ genrule(
     ],
     cmd =
         '''
+        sed -i -e "s/Boost 1.55/Boost 1.54/g" $(location :cmake/Dependencies.cmake);
         srcdir=$$(pwd);
         workdir=$$(mktemp -d -t tmp.XXXXXXXXXX);
         outdir=$$srcdir/$(@D);

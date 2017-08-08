@@ -126,8 +126,8 @@ function apollo_build() {
   PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
   find modules/ -name "*.proto" | grep -v gnss | xargs ${PROTOC} --python_out=bazel-genfiles
   find bazel-genfiles/* -type d -exec touch "{}/__init__.py" \;
-  if [ -d "/root/conf" ];then
-    sudo cp -r /root/conf bazel-apollo/external/ros/share/gnss_driver/
+  if [ -d "/home/tmp/conf" ];then
+    sudo cp -r /home/tmp/conf bazel-apollo/external/ros/share/gnss_driver/
     sudo chown -R ${DOCKER_USER}:${DOCKER_GRP} "bazel-apollo/external/ros/share/gnss_driver/conf"
   fi
 }
