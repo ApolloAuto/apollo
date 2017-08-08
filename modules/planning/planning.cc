@@ -225,8 +225,10 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
 
   auto trajectory_pb = frame_->MutableADCTrajectory();
   if (FLAGS_enable_record_debug) {
-    trajectory_pb->mutable_debug()->mutable_planning_data()
-        ->mutable_init_point()->CopyFrom(stitching_trajectory.back());
+    trajectory_pb->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_init_point()
+        ->CopyFrom(stitching_trajectory.back());
   }
 
   frame_->AlignPredictionTime(current_time_stamp);

@@ -402,8 +402,7 @@ bool DpStGraph::CreateFollowDecision(
   const double reference_line_fence_s =
       boundary.path_obstacle()->sl_boundary().start_s() + follow_distance_s;
   common::PathPoint path_point;
-  if (!path_data_.get_path_point_with_ref_s(reference_line_fence_s,
-                                            &path_point)) {
+  if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "
            << reference_line_fence_s;
     return false;

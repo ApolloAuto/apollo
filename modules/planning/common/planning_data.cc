@@ -55,7 +55,7 @@ bool PlanningData::aggregate(const double time_resolution,
       break;
     }
     common::PathPoint path_point;
-    if (!path_data_.get_path_point_with_path_s(speed_point.s(), &path_point)) {
+    if (!path_data_.GetPathPointWithPathS(speed_point.s(), &path_point)) {
       AERROR << "Fail to get path data with s " << speed_point.s()
              << "path total length " << path_data_.discretized_path().Length();
       return false;

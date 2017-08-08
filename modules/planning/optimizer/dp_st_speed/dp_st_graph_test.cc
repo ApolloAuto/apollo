@@ -52,8 +52,8 @@ class DpStSpeedTest : public PlanningTestBase {
     }
 
     FrenetFramePath path(points);
-    path_data_.set_frenet_path(path);
-    path_data_.set_reference_line(reference_line_);
+    path_data_.SetReferenceLine(reference_line_);
+    path_data_.SetFrenetPath(path);
   }
 
   virtual void SetUp() {
