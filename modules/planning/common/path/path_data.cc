@@ -36,13 +36,23 @@ namespace planning {
 using SLPoint = apollo::common::SLPoint;
 using Vec2d = apollo::common::math::Vec2d;
 
-void PathData::set_discretized_path(const DiscretizedPath &path) {
+bool PathData::set_discretized_path(const DiscretizedPath &path) {
+  if (reference_line_ == nullptr) {
+    AERROR << "Should NOT set discretized path when reference line is nullptr. "
+              "Please set reference line first.";
+    return false;
+  }
   discretized_path_ = path;
+  if (!CartesianToFrenet(discretized_path_, &frenet_path_)) {
+    AERROR << "Fail to transfer discretized path to frenet path.";
+    return false;
+  }
+  return true;
 }
 
 bool PathData::set_frenet_path(const FrenetFramePath &frenet_path) {
   if (reference_line_ == nullptr) {
-    AERROR << "Should NOT set frenet path with reference line is nullptr. "
+    AERROR << "Should NOT set frenet path when reference line is nullptr. "
               "Please set reference line first.";
     return false;
   }
@@ -54,11 +64,6 @@ bool PathData::set_frenet_path(const FrenetFramePath &frenet_path) {
   return true;
 }
 
-void PathData::set_discretized_path(
-    const std::vector<common::PathPoint> &path_points) {
-  discretized_path_.set_points(path_points);
-}
-
 const DiscretizedPath &PathData::discretized_path() const {
   return discretized_path_;
 }
@@ -68,7 +73,7 @@ const FrenetFramePath &PathData::frenet_frame_path() const {
 }
 
 void PathData::set_reference_line(const ReferenceLine *reference_line) {
-  // Clear();
+  Clear();
   reference_line_ = reference_line;
 }
 
@@ -166,6 +171,28 @@ bool PathData::FrenetToCartesian(const FrenetFramePath &frenet_path,
     path_points.push_back(std::move(path_point));
   }
   *discretized_path = DiscretizedPath(path_points);
+  return true;
+}
+
+bool PathData::CartesianToFrenet(const DiscretizedPath &discretized_path,
+                                 FrenetFramePath *const frenet_path) {
+  DCHECK_NOTNULL(frenet_path);
+  std::vector<common::FrenetFramePoint> frenet_frame_points;
+
+  for (const auto &path_point : discretized_path.points()) {
+    SLPoint sl_point;
+    if (!reference_line_->get_point_in_frenet_frame(
+            Vec2d(path_point.x(), path_point.y()), &sl_point)) {
+      AERROR << "Fail to transfer cartesian point to frenet point.";
+      return false;
+    }
+    common::FrenetFramePoint frenet_point;
+    // NOTICE: does not set dl and ddl here. Add if needed.
+    frenet_point.set_s(sl_point.s());
+    frenet_point.set_l(sl_point.l());
+    frenet_frame_points.push_back(std::move(frenet_point));
+  }
+  *frenet_path = FrenetFramePath(frenet_frame_points);
   return true;
 }
 
