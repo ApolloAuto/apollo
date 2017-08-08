@@ -182,8 +182,7 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
   const double st_stop_s = path_point.s() + stop_decision.stop().distance_s() -
                            FLAGS_decision_valid_stop_range;
   if (st_stop_s < 0.0) {
-    AERROR << "obstacle st stop_s " << st_stop_s
-           << " is less than adc_front_s: " << adc_front_s_;
+    AERROR << "obstacle st stop_s " << st_stop_s << " is less than 0.";
     return false;
   }
 
@@ -224,6 +223,13 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
   bool skip = true;
   std::vector<STPoint> boundary_points;
   const auto& adc_path_points = path_data_.discretized_path().points();
+  if (adc_path_points.size() == 0) {
+    std::string msg = common::util::StrCat(
+        "Too few points in path_data_.discretized_path(); size = ",
+        adc_path_points.size());
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
   const auto& trajectory = obstacle->Trajectory();
   if (trajectory.trajectory_point_size() == 0) {
     AWARN << "Obstacle (id = " << obstacle->Id()
