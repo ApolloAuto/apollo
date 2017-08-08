@@ -21,6 +21,7 @@
 #include "modules/planning/common/path/path_data.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
@@ -65,15 +66,24 @@ bool PathData::get_path_point_with_ref_s(
     const ReferenceLine &reference_line, const double ref_s,
     common::PathPoint *const path_point) const {
   *path_point = discretized_path_.start_point();
-  for (common::PathPoint point : discretized_path_.points()) {
+  double shortest_distance = std::numeric_limits<double>::max();
+  const double kDistanceEpsilon = 1e-3;
+  for (const auto &curr_path_point : discretized_path_.points()) {
     SLPoint sl;
-    reference_line.get_point_in_frenet_frame(Vec2d(point.x(), point.y()), &sl);
-    if (Double::Compare(sl.s(), ref_s) == 0) {
-      path_point->CopyFrom(point);
+    if (!reference_line.get_point_in_frenet_frame(
+            Vec2d(curr_path_point.x(), curr_path_point.y()), &sl)) {
+      AERROR << "Fail to get point in frenet from.";
+      return false;
+    }
+    const double curr_distance = std::fabs(sl.s() - ref_s);
+
+    if (curr_distance < kDistanceEpsilon) {
+      path_point->CopyFrom(curr_path_point);
       return true;
     }
-    if (std::fabs(sl.s() - ref_s) < std::fabs(path_point->s() - ref_s)) {
-      path_point->CopyFrom(point);
+    if (curr_distance < shortest_distance) {
+      path_point->CopyFrom(curr_path_point);
+      shortest_distance = curr_distance;
     }
   }
   return true;
