@@ -47,6 +47,10 @@ class PathData {
   bool get_path_point_with_path_s(const double s,
                                   common::PathPoint *const path_point) const;
 
+  /*
+   * brief: this function will find the path_point in discretized_path whose
+   * projection to reference line has s value closest to ref_s.
+   */
   bool get_path_point_with_ref_s(const ReferenceLine &reference_line,
                                  const double ref_s,
                                  common::PathPoint *const path_point) const;
