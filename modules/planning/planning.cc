@@ -222,11 +222,15 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
           last_publishable_trajectory_);
 
   frame_->SetPlanningStartPoint(stitching_trajectory.back());
+
   auto trajectory_pb = frame_->MutableADCTrajectory();
   if (FLAGS_enable_record_debug) {
     trajectory_pb->mutable_debug()->mutable_planning_data()
         ->mutable_init_point()->CopyFrom(stitching_trajectory.back());
   }
+
+  frame_->AlignPredictionTime(current_time_stamp,
+                              stitching_trajectory.back().relative_time());
 
   PublishableTrajectory publishable_trajectory;
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
