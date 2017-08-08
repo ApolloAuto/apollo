@@ -270,11 +270,7 @@ Status LatController::ComputeControlCommand(
 
   // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
   // Error Rate, preview lateral error1 , preview lateral error2, ...]
-  if (FLAGS_use_state_exact_match) {
-    UpdateStateAnalyticalMatching(debug);
-  } else {
-    UpdateState(debug);
-  }
+  UpdateStateAnalyticalMatching(debug);
 
   UpdateMatrix();
 
@@ -426,6 +422,11 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
                        VehicleState::instance()->linear_velocity(),
                        VehicleState::instance()->angular_velocity(),
                        trajectory_analyzer_, debug);
+
+  // Reverse heading error if vehicle is going in reverse
+  if (VehicleState::instance()->gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+    debug->set_heading_error(-debug->heading_error());
+  }
 
   // State matrix update;
   // First four elements are fixed;
