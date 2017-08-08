@@ -222,6 +222,11 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
           last_publishable_trajectory_);
 
   frame_->SetPlanningStartPoint(stitching_trajectory.back());
+  auto trajectory_pb = frame_->MutableADCTrajectory();
+  if (FLAGS_enable_record_debug) {
+    trajectory_pb->mutable_debug()->mutable_planning_data()
+        ->mutable_init_point()->CopyFrom(stitching_trajectory.back());
+  }
 
   PublishableTrajectory publishable_trajectory;
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
@@ -238,7 +243,6 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
 
   publishable_trajectory.set_header_time(current_time_stamp);
 
-  auto trajectory_pb = frame_->MutableADCTrajectory();
   publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
 
