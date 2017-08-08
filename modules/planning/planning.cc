@@ -229,8 +229,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
         ->mutable_init_point()->CopyFrom(stitching_trajectory.back());
   }
 
-  frame_->AlignPredictionTime(current_time_stamp,
-                              stitching_trajectory.back().relative_time());
+  frame_->AlignPredictionTime(current_time_stamp);
 
   PublishableTrajectory publishable_trajectory;
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
