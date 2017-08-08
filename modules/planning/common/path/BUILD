@@ -43,6 +43,7 @@ cc_library(
         ":frenet_frame_path",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:double",
+        "//modules/planning/reference_line",
     ],
 )
 
