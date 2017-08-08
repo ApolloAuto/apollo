@@ -58,14 +58,14 @@ class StGraphPoint {
   STPoint* mutable_point();
 
  private:
-  STPoint _point;
-  const StGraphPoint* _pre_point = nullptr;
-  std::uint32_t _index_s = 0;
-  std::uint32_t _index_t = 0;
+  STPoint point_;
+  const StGraphPoint* pre_point_ = nullptr;
+  std::uint32_t index_s_ = 0;
+  std::uint32_t index_t_ = 0;
 
-  double _reference_cost = 0.0;
-  double _obstacle_cost = 0.0;
-  double _total_cost = 0.0;
+  double reference_cost_ = 0.0;
+  double obstacle_cost_ = 0.0;
+  double total_cost_ = 0.0;
 };
 
 }  // namespace planning

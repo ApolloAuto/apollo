@@ -25,44 +25,44 @@
 namespace apollo {
 namespace planning {
 
-std::uint32_t StGraphPoint::index_s() const { return _index_s; }
+std::uint32_t StGraphPoint::index_s() const { return index_s_; }
 
-std::uint32_t StGraphPoint::index_t() const { return _index_t; }
+std::uint32_t StGraphPoint::index_t() const { return index_t_; }
 
-const STPoint& StGraphPoint::point() const { return _point; }
+const STPoint& StGraphPoint::point() const { return point_; }
 
-const StGraphPoint* StGraphPoint::pre_point() const { return _pre_point; }
+const StGraphPoint* StGraphPoint::pre_point() const { return pre_point_; }
 
-double StGraphPoint::reference_cost() const { return _reference_cost; }
+double StGraphPoint::reference_cost() const { return reference_cost_; }
 
-double StGraphPoint::obstacle_cost() const { return _obstacle_cost; }
+double StGraphPoint::obstacle_cost() const { return obstacle_cost_; }
 
-double StGraphPoint::total_cost() const { return _total_cost; }
+double StGraphPoint::total_cost() const { return total_cost_; }
 
 void StGraphPoint::init(const std::uint32_t index_t,
                         const std::uint32_t index_s, const STPoint& st_point) {
-  _index_t = index_t;
-  _index_s = index_s;
-  _point = st_point;
+  index_t_ = index_t;
+  index_s_ = index_s;
+  point_ = st_point;
 }
 
 void StGraphPoint::set_reference_cost(const double reference_cost) {
-  _reference_cost = reference_cost;
+  reference_cost_ = reference_cost;
 }
 
 void StGraphPoint::set_obstacle_cost(const double obs_cost) {
-  _obstacle_cost = obs_cost;
+  obstacle_cost_ = obs_cost;
 }
 
 void StGraphPoint::set_total_cost(const double total_cost) {
-  _total_cost = total_cost;
+  total_cost_ = total_cost;
 }
 
 void StGraphPoint::set_pre_point(const StGraphPoint& pre_point) {
-  _pre_point = &pre_point;
+  pre_point_ = &pre_point;
 }
 
-STPoint* StGraphPoint::mutable_point() { return &_point; }
+STPoint* StGraphPoint::mutable_point() { return &point_; }
 
 }  // namespace planning
 }  // namespace apollo
