@@ -18,7 +18,6 @@
 """
 Real Time Plotting of planning and control
 """
-import json
 import math
 import sys
 import threading
@@ -27,7 +26,7 @@ import gflags
 import matplotlib.pyplot as plt
 import numpy
 import rospy
-import tf
+import time
 
 from item import Item
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -45,8 +44,7 @@ WindowSize = 80
 FLAGS = gflags.FLAGS
 gflags.DEFINE_boolean('show_heading', False,
                       'Show heading instead of acceleration')
-gflags.DEFINE_boolean('show_st_graph', False,
-                      'Show st graph instead of curvature.')
+gflags.DEFINE_boolean('show_st_graph', False, 'Show st graph')
 
 
 class Plotter(object):
@@ -54,11 +52,8 @@ class Plotter(object):
     Plotter Class
     """
 
-    def __init__(self, ax1, ax2, ax3, ax4):
-        self.ax1 = ax1
-        self.ax2 = ax2
-        self.ax3 = ax3
-        self.ax4 = ax4
+    def __init__(self, ax1, ax2, ax3, ax4, stgraph):
+        self.ax = [ax1, ax2, ax3, ax4]
 
         self.updategraph = False
         self.planningavailable = False
@@ -69,78 +64,85 @@ class Plotter(object):
         self.autodrive = False
         self.carcurvature = 0.0
 
+        self.stgraph = stgraph
+
         self.lock = threading.Lock()
 
     def callback_planning(self, data):
         """
         New Planning Trajectory
         """
-        entity = ADCTrajectory()
-        entity.CopyFrom(data)
-        basetime = entity.header.timestamp_sec
-        numpoints = len(entity.trajectory_point)
-        if numpoints == 0:
-            print entity
-            return
+        if self.stgraph:
+            stlist = []
+            for st in data.debug.planning_data.st_graph:
+                stdata = {}
+                stdata['st_s'] = [point.s for point in st.speed_profile]
+                stdata['st_t'] = [point.t for point in st.speed_profile]
+                polygons_s = []
+                polygons_t = []
+                for bound in st.boundary:
+                    boundary_s = [point.s for point in bound.point]
+                    boundary_t = [point.t for point in bound.point]
+                    polygons_t.append(boundary_t)
+                    polygons_s.append(boundary_s)
+                stdata['polygons_s'] = polygons_s
+                stdata['polygons_t'] = polygons_t
+                #print stdata['st_s']
+                stlist.append(stdata)
 
-        pointx = numpy.zeros(numpoints)
-        pointy = numpy.zeros(numpoints)
-        pointspeed = numpy.zeros(numpoints)
-        pointtime = numpy.zeros(numpoints)
-        pointtheta = numpy.zeros(numpoints)
-        pointcur = numpy.zeros(numpoints)
-        pointacc = numpy.zeros(numpoints)
-        for idx in range(numpoints):
-            trajectory_point = entity.trajectory_point[idx]
-            pointx[idx] = trajectory_point.path_point.x
-            pointy[idx] = trajectory_point.path_point.y
-            pointspeed[idx] = trajectory_point.v
-            pointtheta[idx] = trajectory_point.path_point.theta
-            pointcur[idx] = trajectory_point.path_point.kappa
-            pointacc[idx] = trajectory_point.a
-            pointtime[idx] = trajectory_point.relative_time + basetime
+            with self.lock:
+                for i in range(len(stlist)):
+                    self.ax[i].new_planning(
+                        stlist[i]['st_t'], stlist[i]['st_s'],
+                        stlist[i]['polygons_t'], stlist[i]['polygons_s'])
 
-        st_available = False
-        debug = entity.debug.debug_message
-        for item in debug:
-            if item.id == 0:
-                stgraph = json.loads(item.info)["st_graph_info"]
-                boundaries = stgraph["boundaries"]
-                unit_t = stgraph["unit_t"]
-                graph_total_t = stgraph["graph_total_t"]
-                graph_total_s = stgraph["graph_total_s"]
-                st_points = stgraph["st_points"]
-                st_a = [point["a"] for point in st_points]
-                st_v = [point["v"] for point in st_points]
-                st_s = [point["point"]["s"] for point in st_points]
-                st_t = [point["point"]["t"] for point in st_points]
-                st_available = True
+        else:
+            basetime = data.header.timestamp_sec
+            numpoints = len(data.trajectory_point)
+            if numpoints == 0:
+                print data
+                return
 
-        with self.lock:
-            self.ax1.new_planning(pointtime, pointx, pointy)
-            self.ax2.new_planning(pointtime, pointspeed)
+            pointx = numpy.zeros(numpoints)
+            pointy = numpy.zeros(numpoints)
+            pointspeed = numpy.zeros(numpoints)
+            pointtime = numpy.zeros(numpoints)
+            pointtheta = numpy.zeros(numpoints)
+            pointcur = numpy.zeros(numpoints)
+            pointacc = numpy.zeros(numpoints)
+            for idx in range(numpoints):
+                trajectory_point = data.trajectory_point[idx]
+                pointx[idx] = trajectory_point.path_point.x
+                pointy[idx] = trajectory_point.path_point.y
+                pointspeed[idx] = trajectory_point.v
+                pointtheta[idx] = trajectory_point.path_point.theta
+                pointcur[idx] = trajectory_point.path_point.kappa
+                pointacc[idx] = trajectory_point.a
+                pointtime[idx] = trajectory_point.relative_time + basetime
 
-            if self.ax3.title == "Curvature":
-                self.ax3.new_planning(pointtime, pointcur)
-            elif st_available:
-                self.ax3.new_planning(st_t, st_s, graph_total_t, graph_total_s)
+            with self.lock:
+                self.ax[0].new_planning(pointtime, pointx, pointy)
+                self.ax[1].new_planning(pointtime, pointspeed)
 
-            if self.ax4.title == "Heading":
-                self.ax4.new_planning(pointtime, pointtheta)
-            else:
-                self.ax4.new_planning(pointtime, pointacc)
+                if self.ax[2].title == "Curvature":
+                    self.ax[2].new_planning(pointtime, pointcur)
+
+                if self.ax[3].title == "Heading":
+                    self.ax[3].new_planning(pointtime, pointtheta)
+                else:
+                    self.ax[3].new_planning(pointtime, pointacc)
 
     def callback_chassis(self, data):
         """
         New localization pose
         """
-        entity = Chassis()
-        entity.CopyFrom(data)
-        self.carspeed = entity.speed_mps
+        if self.stgraph:
+            return
+        self.carspeed = data.speed_mps
         self.steer_angle = \
-            entity.steering_percentage / 100 * MaxSteerAngle / SteerRatio
+            data.steering_percentage / 100 * MaxSteerAngle / SteerRatio
 
-        self.autodrive = (entity.driving_mode == Chassis.COMPLETE_AUTO_DRIVE)
+        self.autodrive = (data.driving_mode == Chassis.COMPLETE_AUTO_DRIVE)
         self.carcurvature = math.tan(
             math.radians(self.steer_angle)) / VehicleLength
 
@@ -148,37 +150,23 @@ class Plotter(object):
         """
         New localization pose
         """
-        entity = LocalizationEstimate()
-        entity.CopyFrom(data)
-        quat = (entity.pose.orientation.qx, entity.pose.orientation.qy,
-                entity.pose.orientation.qz, entity.pose.orientation.qw)
-        heading = tf.transformations.euler_from_quaternion(quat)
-        carheading = (heading[2] + math.pi / 2 + math.pi) % (
-            2 * math.pi) - math.pi
-        carx = entity.pose.position.x
-        cary = entity.pose.position.y
-        cartime = entity.header.timestamp_sec
+        if self.stgraph:
+            return
+        carheading = data.pose.heading
+        carx = data.pose.position.x
+        cary = data.pose.position.y
+        cartime = data.header.timestamp_sec
         with self.lock:
-            self.ax1.new_carstatus(cartime, carx, cary, carheading,
-                                   self.steer_angle, self.autodrive)
-            self.ax2.new_carstatus(cartime, self.carspeed, self.autodrive)
-            if self.ax3.title == "Curvature":
-                self.ax3.new_carstatus(cartime, self.carcurvature,
-                                       self.autodrive)
+            self.ax[0].new_carstatus(cartime, carx, cary, carheading,
+                                     self.steer_angle, self.autodrive)
+            self.ax[1].new_carstatus(cartime, self.carspeed, self.autodrive)
+            self.ax[2].new_carstatus(cartime, self.carcurvature, self.autodrive)
 
-            if self.ax4.title == "Heading":
-                self.ax4.new_carstatus(cartime, carheading, self.autodrive)
+            if self.ax[3].title == "Heading":
+                self.ax[3].new_carstatus(cartime, carheading, self.autodrive)
             else:
-                acc = entity.pose.linear_acceleration_vrf.y
-                self.ax4.new_carstatus(cartime, acc, self.autodrive)
-
-    def updatesub(self, planning_sub, localization_sub, chassis_sub):
-        """
-        update subscriber
-        """
-        self.planning_sub = planning_sub
-        self.localization_sub = localization_sub
-        self.chassis_sub = chassis_sub
+                acc = data.pose.linear_acceleration_vrf.y
+                self.ax[3].new_carstatus(cartime, acc, self.autodrive)
 
     def press(self, event):
         """
@@ -198,16 +186,9 @@ class Plotter(object):
 
         if event.key == 'n' or event.key == 'N':
             with self.lock:
-                self.ax1.reset()
-                self.ax2.reset()
-                self.ax3.reset()
-                self.ax4.reset()
+                for ax in self.ax:
+                    ax.reset()
             self.updategraph = True
-
-        if event.key == 'b' or event.key == 'B':
-            self.planning_sub.unregister()
-            self.localization_sub.unregister()
-            self.chassis_sub.unregister()
 
 
 def main(argv):
@@ -236,45 +217,64 @@ def main(argv):
     rospy.init_node('realtime_plot', anonymous=True)
 
     fig = plt.figure()
-    ax1 = plt.subplot(2, 2, 1)
-    item1 = Xyitem(ax1, WindowSize, VehicleLength, "Trajectory", "X [m]",
-                   "Y [m]")
-
-    ax2 = plt.subplot(2, 2, 2)
-    item2 = Item(ax2, "Speed", "Time [sec]", "Speed [m/s]", 0, 30)
 
     if not FLAGS.show_st_graph:
+        ax1 = plt.subplot(2, 2, 1)
+        item1 = Xyitem(ax1, WindowSize, VehicleLength, "Trajectory", "X [m]",
+                       "Y [m]")
+
+        ax2 = plt.subplot(2, 2, 2)
+        item2 = Item(ax2, "Speed", "Time [sec]", "Speed [m/s]", 0, 30)
+
         ax3 = plt.subplot(2, 2, 3, sharex=ax2)
         item3 = Item(ax3, "Curvature", "Time [sec]", "Curvature [m-1]", -0.2,
                      0.2)
+
+        ax4 = plt.subplot(2, 2, 4, sharex=ax2)
+        if not FLAGS.show_heading:
+            item4 = Item(ax4, "Acceleration", "Time [sec]",
+                         "Acceleration [m/sec^2]", -5, 5)
+        else:
+            item4 = Item(ax4, "Heading", "Time [sec]", "Heading [radian]", -4,
+                         4)
     else:
+        ax1 = plt.subplot(2, 2, 1)
+        item1 = Stitem(ax1, "ST Graph", "Time [sec]", "S [m]")
+
+        ax2 = plt.subplot(2, 2, 2)
+        item2 = Stitem(ax2, "ST Graph", "Time [sec]", "S [m]")
+
         ax3 = plt.subplot(2, 2, 3)
         item3 = Stitem(ax3, "ST Graph", "Time [sec]", "S [m]")
 
-    ax4 = plt.subplot(2, 2, 4, sharex=ax2)
-    if not FLAGS.show_heading:
-        item4 = Item(ax4, "Acceleration", "Time [sec]",
-                     "Acceleration [m/sec^2]", -5, 5)
-    else:
-        item4 = Item(ax4, "Heading", "Time [sec]", "Heading [radian]", -4, 4)
+        ax4 = plt.subplot(2, 2, 4)
+        item4 = Stitem(ax4, "ST Graph", "Time [sec]", "S [m]")
 
     plt.tight_layout(pad=0.20)
     plt.ion()
     plt.show()
 
-    plotter = Plotter(item1, item2, item3, item4)
+    plotter = Plotter(item1, item2, item3, item4, FLAGS.show_st_graph)
     fig.canvas.mpl_connect('key_press_event', plotter.press)
-    planning_sub = rospy.Subscriber('/apollo/planning', ADCTrajectory,
-                                    plotter.callback_planning, queue_size=3)
-    localization_sub = rospy.Subscriber('/apollo/localization/pose',
-                                        LocalizationEstimate,
-                                        plotter.callback_localization,
-                                        queue_size=3)
-    chassis_sub = rospy.Subscriber('/apollo/canbus/chassis', Chassis,
-                                   plotter.callback_chassis, queue_size=3)
-    plotter.updatesub(planning_sub, localization_sub, chassis_sub)
+    planning_sub = rospy.Subscriber(
+        '/apollo/planning',
+        ADCTrajectory,
+        plotter.callback_planning,
+        queue_size=3)
 
-    rate = rospy.Rate(5)
+    if not FLAGS.show_st_graph:
+        localization_sub = rospy.Subscriber(
+            '/apollo/localization/pose',
+            LocalizationEstimate,
+            plotter.callback_localization,
+            queue_size=3)
+        chassis_sub = rospy.Subscriber(
+            '/apollo/canbus/chassis',
+            Chassis,
+            plotter.callback_chassis,
+            queue_size=3)
+
+    rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         ax1.draw_artist(ax1.patch)
         ax2.draw_artist(ax2.patch)

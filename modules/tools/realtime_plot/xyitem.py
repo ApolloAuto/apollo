@@ -219,14 +219,8 @@ class Xyitem(object):
         """
         plot lines
         """
-        if self.planningavailable:
-            self.ax.draw_artist(self.ax.lines[self.pathstartidx])
-            self.ax.draw_artist(self.current_line)
+        for polygon in self.ax.patches:
+            self.ax.draw_artist(polygon)
 
-        if self.targethistidx != -1:
-            self.ax.draw_artist(self.ax.lines[self.targethistidx])
-
-        if self.carposidx != -1:
-            self.ax.draw_artist(self.ax.patches[0])
-            self.ax.draw_artist(self.ax.lines[self.carxyhistidx])
-            self.ax.draw_artist(self.ax.lines[self.carposidx])
+        for line in self.ax.lines:
+            self.ax.draw_artist(line)
