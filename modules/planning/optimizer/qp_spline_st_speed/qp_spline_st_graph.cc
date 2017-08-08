@@ -136,7 +136,7 @@ Status QpSplineStGraph::ApplyConstraint(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
+  ADEBUG << "init point constraint:" << init_point.DebugString();
   if (!constraint->add_point_derivative_constraint(0.0, init_point_.v())) {
     const std::string msg = "add st start point velocity constraint failed!";
     AERROR << msg;
@@ -184,6 +184,8 @@ Status QpSplineStGraph::ApplyConstraint(
                          &upper_s, &lower_s);
     s_upper_bound.push_back(upper_s);
     s_lower_bound.push_back(lower_s);
+    ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
+        << " lower_s: " << lower_s;
   }
   if (!constraint->add_fx_boundary(t_evaluated_, s_lower_bound,
                                    s_upper_bound)) {
