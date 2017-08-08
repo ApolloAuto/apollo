@@ -16,10 +16,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PLYGON_MASK_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PLYGON_MASK_H_
 
+#include <algorithm>
 #include <limits>
 #include <vector>
-#include <algorithm>
-#include <Eigen/StdVector>
+
+#include "Eigen/StdVector"
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
@@ -40,14 +41,12 @@ void DrawPolygonInBitmap(
 /*
  * @brief: Get valid x range(Major direction range)
  */
-void GetValidXRange(const PolygonScanConverter::Polygon &polygon,
-                    const Bitmap2D &bitmap,
+void GetValidXRange(const PolygonScanConverter::Polygon& polygon,
+                    const Bitmap2D& bitmap,
                     const PolygonScanConverter::DirectionMajor major_dir,
-                    const double major_dir_grid_size,
-                    Interval* valid_x_range);
+                    const double major_dir_grid_size, Interval* valid_x_range);
 
-} // perception
-} // apollo
+}  // perception
+}  // apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PLYGON_MASK_H_
-
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PLYGON_MASK_H_

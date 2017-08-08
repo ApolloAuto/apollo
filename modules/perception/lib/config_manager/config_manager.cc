@@ -15,11 +15,13 @@
  *****************************************************************************/
 
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include <google/protobuf/text_format.h>
+
 #include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
+
+#include "google/protobuf/text_format.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/file_util.h"

@@ -15,24 +15,26 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/onboard/lidar_process.h"
-#include <eigen_conversions/eigen_msg.h>
-#include <pcl_conversions/pcl_conversions.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <tf/transform_broadcaster.h>
-#include <tf/transform_listener.h>
-#include <tf_conversions/tf_eigen.h>
-#include <Eigen/Core>
+
 #include <string>
+
+#include "Eigen/Core"
+#include "eigen_conversions/eigen_msg.h"
+#include "pcl_conversions/pcl_conversions.h"
 #include "ros/include/ros/ros.h"
+#include "sensor_msgs/PointCloud2.h"
+#include "tf/transform_broadcaster.h"
+#include "tf/transform_listener.h"
+#include "tf_conversions/tf_eigen.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
+#include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
-#include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 
 namespace apollo {
@@ -124,7 +126,8 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
     ROIFilterOptions roi_filter_options;
     roi_filter_options.velodyne_trans = velodyne_trans;
     roi_filter_options.hdmap = hdmap;
-    if (roi_filter_->Filter(point_cloud, roi_filter_options, roi_indices.get())) {
+    if (roi_filter_->Filter(point_cloud, roi_filter_options,
+                            roi_indices.get())) {
       pcl::copyPointCloud(*point_cloud, *roi_indices, *roi_cloud);
       roi_indices_ = roi_indices;
     } else {
@@ -143,7 +146,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
     SegmentationOptions segmentation_options;
     segmentation_options.origin_cloud = point_cloud;
     PointIndices non_ground_indices;
-    //non_ground_indices.indices.resize(roi_cloud->points.size());
+    // non_ground_indices.indices.resize(roi_cloud->points.size());
     non_ground_indices.indices.resize(point_cloud->points.size());
 
     std::iota(non_ground_indices.indices.begin(),
@@ -183,7 +186,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
   }
   PERF_BLOCK_END("lidar_tracker");
   AINFO << "lidar process succ, there are " << objects_.size()
-         << " tracked objects.";
+        << " tracked objects.";
   return true;
 }
 

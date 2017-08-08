@@ -14,18 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/base/types.h"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
 
 TEST(TypesTest, test_GetSensorType) {
-    EXPECT_EQ(GetSensorType(VELODYNE_64), "velodyne_64");
-    EXPECT_EQ(GetSensorType(VELODYNE_16), "velodyne_16");
-    EXPECT_EQ(GetSensorType(RADAR), "radar");
-    EXPECT_EQ(GetSensorType(CAMERA), "camera");
-    EXPECT_EQ(GetSensorType(UNKNOWN_SENSOR_TYPE), "unknown_sensor_type");
+  EXPECT_EQ(GetSensorType(VELODYNE_64), "velodyne_64");
+  EXPECT_EQ(GetSensorType(VELODYNE_16), "velodyne_16");
+  EXPECT_EQ(GetSensorType(RADAR), "radar");
+  EXPECT_EQ(GetSensorType(CAMERA), "camera");
+  EXPECT_EQ(GetSensorType(UNKNOWN_SENSOR_TYPE), "unknown_sensor_type");
 }
 
 }  // namespace perception

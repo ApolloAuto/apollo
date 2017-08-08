@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_FILTER_H_
 
-#include <Eigen/Core>
 #include <string>
+#include "Eigen/Core"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
 
@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 
 class BaseFilter {
- public :
+ public:
   typedef Object ObjectType;
 
   BaseFilter() {
@@ -39,7 +39,7 @@ class BaseFilter {
   // @params[IN] velocity: initial velocity for filtering
   // @return nothing
   virtual void Initialize(const Eigen::Vector3f& anchor_point,
-    const Eigen::Vector3f& velocity) = 0;
+                          const Eigen::Vector3f& velocity) = 0;
 
   // @brief predict the state of filter
   // @params[IN] time_diff: time interval for predicting
@@ -52,8 +52,8 @@ class BaseFilter {
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
   virtual void UpdateWithObject(const TrackedObjectPtr& new_object,
-    const TrackedObjectPtr& old_object,
-    const double time_diff) = 0;
+                                const TrackedObjectPtr& old_object,
+                                const double time_diff) = 0;
 
   // @brief update filter without object
   // @params[IN] time_diff: time interval from last updating
@@ -65,7 +65,7 @@ class BaseFilter {
   // @params[OUT] velocity: velocity of current state
   // @return nothing
   virtual void GetState(Eigen::Vector3f* anchor_point,
-    Eigen::Vector3f* velocity) = 0;
+                        Eigen::Vector3f* velocity) = 0;
 
   // @brief get state of filter with accelaration
   // @params[OUT] anchor_point: anchor point of current state
@@ -73,8 +73,8 @@ class BaseFilter {
   // @params[OUT] velocity_accelaration: accelaration of curret state
   // @return nothing
   virtual void GetState(Eigen::Vector3f* anchor_point,
-    Eigen::Vector3f* velocity,
-    Eigen::Vector3f* velocity_accelaration) = 0;
+                        Eigen::Vector3f* velocity,
+                        Eigen::Vector3f* velocity_accelaration) = 0;
 
   // @brief get name of filter
   // @return name of filter

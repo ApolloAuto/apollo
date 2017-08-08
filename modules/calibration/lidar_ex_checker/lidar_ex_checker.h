@@ -21,23 +21,23 @@
 #ifndef MODEULES_CALIBRATION_LIDAR_EX_CHECKER_H_
 #define MODEULES_CALIBRATION_LIDAR_EX_CHECKER_H_
 
-#include <string>
 #include <map>
+#include <string>
 #include <vector>
 
-#include <Eigen/Eigen>
-#include <sensor_msgs/PointCloud2.h>
+#include "Eigen/Eigen"
+#include "sensor_msgs/PointCloud2.h"
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/localization/proto/gps.pb.h"
+#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::calibration
  * @brief apollo::calibration
- */ 
+ */
 namespace apollo {
 namespace calibration {
 
@@ -68,13 +68,13 @@ class LidarExChecker : public apollo::common::ApolloApp {
   Eigen::Vector3d last_position_;
   Eigen::Affine3d offset_;
   Eigen::Affine3d extrinsics_;
-  
+
   // the complete pose data;
   std::map<double, Eigen::Affine3d> gps_poses_;
   // the complete cloud data;
-  std::vector<pcl::PointCloud<PointXYZIT> > clouds_;
+  std::vector<pcl::PointCloud<PointXYZIT>> clouds_;
 
-  // to ensure the pose of given timestamp can be found, 
+  // to ensure the pose of given timestamp can be found,
   // we pad some redundant clouds
   uint32_t top_redundant_cloud_count_;
   uint32_t bottom_redundant_cloud_count_;
@@ -85,8 +85,8 @@ class LidarExChecker : public apollo::common::ApolloApp {
   uint32_t cloud_count_;
   // the distance between two clouds
   double capture_distance_;
-  
-  // latest INS status                                                                                                                                                                                                        
+
+  // latest INS status
   uint32_t position_type_;
 };
 

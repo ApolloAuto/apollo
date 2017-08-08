@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <pcl_conversions/pcl_conversions.h>
 #include <pcl/visualization/cloud_viewer.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <yaml-cpp/yaml.h>
 
-#include "modules/perception/conf/calib_vis/calib_vis.h"
-#include "ros/include/ros/ros.h"
+#include "pcl_conversions/pcl_conversions.h"
+#include "sensor_msgs/PointCloud2.h"
+#include "yaml-cpp/yaml.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/perception/conf/calib_vis/calib_vis.h"
+#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace perception {
@@ -64,13 +65,14 @@ void CalibVis::LoadExtrinsics() {
   std::string extrin_file = "";
   YAML::Node node = YAML::LoadFile(extrin_file);
 
-  Eigen::Quaterniond rotation(node["transform"]["rotation"]["w"].as<double>(), 
-                              node["transform"]["rotation"]["x"].as<double>(), 
-                              node["transform"]["rotation"]["y"].as<double>(), 
+  Eigen::Quaterniond rotation(node["transform"]["rotation"]["w"].as<double>(),
+                              node["transform"]["rotation"]["x"].as<double>(),
+                              node["transform"]["rotation"]["y"].as<double>(),
                               node["transform"]["rotation"]["z"].as<double>());
-  Eigen::Translation3d translation(node["transform"]["translation"]["x"].as<double>(), 
-                                   node["transform"]["translation"]["y"].as<double>(), 
-                                   node["transform"]["translation"]["z"].as<double>());
+  Eigen::Translation3d translation(
+      node["transform"]["translation"]["x"].as<double>(),
+      node["transform"]["translation"]["y"].as<double>(),
+      node["transform"]["translation"]["z"].as<double>());
   extrinsics_ = translation * rotation;
 }
 
@@ -81,7 +83,7 @@ void CalibVis::VisualizeClouds() {
   for (uint32_t i = 0; i < clouds_.size(); ++i) {
     pcl::PointCloud<pcl_util::PointXYZIT> cld = clouds_[i];
     pcl::PointCloud<pcl_util::PointXYZIT>::Ptr tf_cld_ptr(
-            new pcl::PointCloud<pcl_util::PointXYZIT>);
+        new pcl::PointCloud<pcl_util::PointXYZIT>);
     double timestamp = cld.points.back().timestamp;
     timestamp = round(timestamp * 100) / 100.0;
     for (uint32_t j = 0; j < cld.points.size(); ++j) {
@@ -90,19 +92,19 @@ void CalibVis::VisualizeClouds() {
       Eigen::Affine3d pose = gps_poses_[timestamp];
 
       Eigen::Vector3d tf_pt_vec = pose * extrinsics_ * pt_vec;
-      
+
       pcl_util::PointXYZIT tf_pt;
       tf_pt.x = tf_pt_vec[0];
       tf_pt.y = tf_pt_vec[1];
       tf_pt.z = tf_pt_vec[2];
-      tf_cld_ptr->points.push_back(tf_pt);  
+      tf_cld_ptr->points.push_back(tf_pt);
     }
     int r = rand() % 255;
     int g = rand() % 255;
     int b = rand() % 255;
-    pcl::visualization::PointCloudColorHandlerCustom<pcl_util::PointXYZIT> handler(tf_cld_ptr, 
-            r, g, b);
-    pcl_vis->addPointCloud(tf_cld_ptr, handler, "clouds" + i); 
+    pcl::visualization::PointCloudColorHandlerCustom<pcl_util::PointXYZIT>
+        handler(tf_cld_ptr, r, g, b);
+    pcl_vis->addPointCloud(tf_cld_ptr, handler, "clouds" + i);
   }
   pcl_vis->spin();
 }
@@ -114,19 +116,19 @@ void CalibVis::OnPointCloud(const sensor_msgs::PointCloud2& message) {
     top_redundant_cloud_count_++;
     return;
   }
-  
+
   if (enough_data_) {
     bottom_redundant_cloud_count_++;
     if (bottom_redundant_cloud_count_ == 50) {
-        VisualizeClouds();
+      VisualizeClouds();
     }
     return;
   }
-  
+
   if (position_type_ != 56) {
     return;
-  } 
-  
+  }
+
   Eigen::Vector3d position;
   Eigen::Affine3d pose = gps_poses_.rbegin()->second;
   position[0] = pose.translation().x();
@@ -147,7 +149,7 @@ void CalibVis::OnPointCloud(const sensor_msgs::PointCloud2& message) {
     }
   }
   cld = tmp_cld;
-  
+
   if (clouds_.size() < cloud_count_) {
     clouds_.push_back(cld);
   }
@@ -156,10 +158,9 @@ void CalibVis::OnPointCloud(const sensor_msgs::PointCloud2& message) {
 void CalibVis::OnGps(const ::apollo::localization::Gps& message) {
   if (message.has_localization()) {
     const auto pose_msg = message.localization();
-    Eigen::Quaterniond rotation(pose_msg.orientation().qw(),
-                                pose_msg.orientation().qx(),
-                                pose_msg.orientation().qy(),
-                                pose_msg.orientation().qz());
+    Eigen::Quaterniond rotation(
+        pose_msg.orientation().qw(), pose_msg.orientation().qx(),
+        pose_msg.orientation().qy(), pose_msg.orientation().qz());
     Eigen::Translation3d translation(pose_msg.position().x(),
                                      pose_msg.position().y(),
                                      pose_msg.position().z());

@@ -15,10 +15,11 @@
  *****************************************************************************/
 
 #include "modules/perception/lib/base/file_util.h"
-#include <gtest/gtest.h>
+
 #include <fstream>
 #include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {

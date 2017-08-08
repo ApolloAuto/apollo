@@ -17,10 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_MATCHER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_MATCHER_H_
 
-#include <Eigen/Core>
-#include <vector>
-#include <utility>
 #include <string>
+#include <utility>
+#include <vector>
+
+#include "Eigen/Core"
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/object_track.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
@@ -30,7 +31,7 @@ namespace perception {
 
 class BaseMatcher {
  public:
-  typedef std::pair<int, int>     TrackObjectPair;
+  typedef std::pair<int, int> TrackObjectPair;
 
   BaseMatcher() {}
   virtual ~BaseMatcher() {}
@@ -45,12 +46,12 @@ class BaseMatcher {
   // @params[OUT] unassigned_objects: unmatched objects
   // @return nothing
   virtual void Match(std::vector<TrackedObjectPtr>* objects,
-    const std::vector<ObjectTrackPtr>& tracks,
-    const std::vector<Eigen::VectorXf>& tracks_predict,
-    const double time_diff,
-    std::vector<TrackObjectPair>* assignments,
-    std::vector<int>* unassigned_tracks,
-    std::vector<int>* unassigned_objects) = 0;
+                     const std::vector<ObjectTrackPtr>& tracks,
+                     const std::vector<Eigen::VectorXf>& tracks_predict,
+                     const double time_diff,
+                     std::vector<TrackObjectPair>* assignments,
+                     std::vector<int>* unassigned_tracks,
+                     std::vector<int>* unassigned_objects) = 0;
 
   // @brief get name of matcher
   // @return name of matcher

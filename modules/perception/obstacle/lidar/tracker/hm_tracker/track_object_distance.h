@@ -17,8 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_TRACK_OBJECT_DISTANCE_H_
 #define MODULES_PERCEPTION_OBSTACLE_TRACK_OBJECT_DISTANCE_H_
 
-#include <Eigen/Core>
 #include <string>
+
+#include "Eigen/Core"
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/object_track.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
@@ -26,7 +27,7 @@
 namespace apollo {
 namespace perception {
 
-class TrackObjectDistance{
+class TrackObjectDistance {
  public:
   // @brief set weight of location dist for all the track object distance
   // objects
@@ -65,9 +66,9 @@ class TrackObjectDistance{
   // @params[IN] time_diff: time interval from last matching
   // @return nothing
   static float ComputeDistance(const ObjectTrackPtr& track,
-    const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object,
-    const double time_diff);
+                               const Eigen::VectorXf& track_predict,
+                               const TrackedObjectPtr& new_object,
+                               const double time_diff);
 
   std::string Name() const {
     return "TrackObjectDistance";
@@ -81,9 +82,9 @@ class TrackObjectDistance{
   // @params[IN] time_diff: time interval from last matching
   // @return nothing
   static float ComputeLocationDistance(const ObjectTrackPtr& track,
-    const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object,
-    const double time_diff);
+                                       const Eigen::VectorXf& track_predict,
+                                       const TrackedObjectPtr& new_object,
+                                       const double time_diff);
 
   // @brief compute direction distance for given track & object
   // @params[IN] track: track for computing distance
@@ -92,9 +93,9 @@ class TrackObjectDistance{
   // @params[IN] time_diff: time interval from last matching
   // @return nothing
   static float ComputeDirectionDistance(const ObjectTrackPtr& track,
-    const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object,
-    const double time_diff);
+                                        const Eigen::VectorXf& track_predict,
+                                        const TrackedObjectPtr& new_object,
+                                        const double time_diff);
 
   // @brief compute bbox size distance for given track & object
   // @params[IN] track: track for computing distance
@@ -103,9 +104,9 @@ class TrackObjectDistance{
   // @params[IN] time_diff: time interval from last matching
   // @return nothing
   static float ComputeBboxSizeDistance(const ObjectTrackPtr& track,
-    const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object,
-    const double time_diff);
+                                       const Eigen::VectorXf& track_predict,
+                                       const TrackedObjectPtr& new_object,
+                                       const double time_diff);
 
   // @brief compute point num distance for given track & object
   // @params[IN] track: track for computing distance
@@ -114,9 +115,9 @@ class TrackObjectDistance{
   // @params[IN] time_diff: time interval from last matching
   // @return nothing
   static float ComputePointNumDistance(const ObjectTrackPtr& track,
-    const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object,
-    const double time_diff);
+                                       const Eigen::VectorXf& track_predict,
+                                       const TrackedObjectPtr& new_object,
+                                       const double time_diff);
 
   // @brief compute histogram distance for given track & object
   // @params[IN] track: track for computing distance
@@ -125,17 +126,17 @@ class TrackObjectDistance{
   // @params[IN] time_diff: time interval from last matching
   // @return nothing
   static float ComputeHistogramDistance(const ObjectTrackPtr& track,
-    const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object,
-    const double time_diff);
+                                        const Eigen::VectorXf& track_predict,
+                                        const TrackedObjectPtr& new_object,
+                                        const double time_diff);
 
  protected:
   // distance weights
-  static double   s_weight_location_dist_;
-  static double   s_weight_direction_dist_;
-  static double   s_weight_bbox_size_dist_;
-  static double   s_weight_point_num_dist_;
-  static double   s_weight_histogram_dist_;
+  static double s_weight_location_dist_;
+  static double s_weight_direction_dist_;
+  static double s_weight_bbox_size_dist_;
+  static double s_weight_point_num_dist_;
+  static double s_weight_histogram_dist_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(TrackObjectDistance);

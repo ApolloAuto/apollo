@@ -16,10 +16,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_H_
 #define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_H_
 
-#include <Eigen/Core>
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
+#include "Eigen/Core"
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -32,7 +32,7 @@ struct alignas(16) Object {
   Object();
   // shallow copy for copy constructor and assignment
   Object(const Object& rhs);
-  Object& operator = (const Object& rhs);
+  Object& operator=(const Object& rhs);
   // deep copy
   void clone(const Object& rhs);
   std::string ToString() const;
@@ -90,4 +90,3 @@ typedef std::shared_ptr<const Object> ObjectConstPtr;
 }  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_H_
-

@@ -16,9 +16,9 @@
 #ifndef apollo_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP_2D_H_
 #define apollo_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP_2D_H_
 
-#include <vector>
-#include <Eigen/Core>
 #include <limits>
+#include <vector>
+#include "Eigen/Core"
 
 #include "modules/common/log.h"
 
@@ -30,8 +30,8 @@ namespace perception {
  *
  */
 class Bitmap2D {
-public:
-  enum DirectionMajor{XMAJOR = 0, YMAJOR =1};
+ public:
+  enum DirectionMajor { XMAJOR = 0, YMAJOR = 1 };
   Bitmap2D(const Eigen::Vector2d& min_p, const Eigen::Vector2d& max_p,
            const Eigen::Vector2d& grid_size, DirectionMajor dir_major);
 
@@ -41,11 +41,21 @@ public:
     return static_cast<DirectionMajor>(dir_major ^ 1);
   }
   // getter and setter
-  const Eigen::Vector2d& get_min_p() const { return min_p_; }
-  const Eigen::Vector2d& get_max_p() const { return max_p_; }
-  const Eigen::Vector2d& get_grid_size() const { return grid_size_; }
-  const DirectionMajor get_dir_major() const { return dir_major_; }
-  const DirectionMajor get_op_dir_major() const { return op_dir_major_; }
+  const Eigen::Vector2d& get_min_p() const {
+    return min_p_;
+  }
+  const Eigen::Vector2d& get_max_p() const {
+    return max_p_;
+  }
+  const Eigen::Vector2d& get_grid_size() const {
+    return grid_size_;
+  }
+  const DirectionMajor get_dir_major() const {
+    return dir_major_;
+  }
+  const DirectionMajor get_op_dir_major() const {
+    return op_dir_major_;
+  }
 
   bool IsExist(const Eigen::Vector2d& p) const;
   bool Check(const Eigen::Vector2d& p) const;
@@ -55,7 +65,7 @@ public:
 
   void BuildMap();
 
-private:
+ private:
   Eigen::Vector2d min_p_;
   Eigen::Vector2d max_p_;
   Eigen::Vector2d grid_size_;
@@ -64,12 +74,12 @@ private:
 
   std::vector<std::vector<uint64_t>> bitmap_;
 
-  inline void SetUint64RangeBits(uint64_t &block, size_t head, size_t tail);
-  inline void SetUint64HeadBits(uint64_t &block, size_t head);
-  inline void SetUint64TailBits(uint64_t &block, size_t tail);
+  inline void SetUint64RangeBits(uint64_t& block, size_t head, size_t tail);
+  inline void SetUint64HeadBits(uint64_t& block, size_t head);
+  inline void SetUint64TailBits(uint64_t& block, size_t tail);
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // apollo_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP_2D_H_
+#endif  // apollo_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP_2D_H_

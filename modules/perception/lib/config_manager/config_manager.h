@@ -117,13 +117,14 @@
 #ifndef MODULES_PERCEPTION_LIB_CONFIG_MANAGER_H_
 #define MODULES_PERCEPTION_LIB_CONFIG_MANAGER_H_
 
-#include <google/protobuf/message.h>
 #include <map>
 #include <mutex>
 #include <sstream>
 #include <string>
 #include <typeinfo>
 #include <vector>
+
+#include "google/protobuf/message.h"
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/singleton.h"

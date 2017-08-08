@@ -17,7 +17,7 @@
 #ifndef ADU_PERCEPTION_OBSTACLE_VISUALIZER_FRAME_H
 #define ADU_PERCEPTION_OBSTACLE_VISUALIZER_FRAME_H
 
-#include <Eigen/Geometry> 
+#include "Eigen/Geometry"
 
 namespace apollo {
 namespace perception {
@@ -35,38 +35,38 @@ public:
     void set_position(double x, double y, double z);
     void set_orientation(const Eigen::Quaterniond& orientation);
     void set_orientation(double q0, double q1, double q2, double q3);
-    void set_position_and_orientation(const Eigen::Vector3d& position, 
+    void set_position_and_orientation(const Eigen::Vector3d& position,
                                       const Eigen::Quaterniond& orientation);
 
-    Eigen::Vector3d position() const { 
-        return inverse_coordinates_of(Eigen::Vector3d(0.0, 0.0, 0.0)); 
+    Eigen::Vector3d position() const {
+        return inverse_coordinates_of(Eigen::Vector3d(0.0, 0.0, 0.0));
     };
     Eigen::Quaterniond orientation() const;
     void get_position(double& x, double& y, double& z) const;
     void get_orientation(double& q0, double& q1, double& q2, double& q3) const;
 
-    void set_translation(const Eigen::Vector3d& translation) { 
-        _t = translation; 
+    void set_translation(const Eigen::Vector3d& translation) {
+        _t = translation;
     };
     void set_translation(double x, double y, double z);
     void set_rotation(const Eigen::Quaterniond& rotation) {
-    _q = rotation; 
+    _q = rotation;
     };
     void set_rotation(double q0, double q1, double q2, double q3);
-    void set_translation_and_rotation(const Eigen::Vector3d& translation, 
+    void set_translation_and_rotation(const Eigen::Vector3d& translation,
                                       const Eigen::Quaterniond& rotation);
 
-    Eigen::Vector3d translation() const { 
-        return _t; 
+    Eigen::Vector3d translation() const {
+        return _t;
     };
-    Eigen::Quaterniond rotation() const { 
-        return _q; 
+    Eigen::Quaterniond rotation() const {
+        return _q;
     };
     void get_translation(double& x, double& y, double& z) const;
     void get_rotation(double& q0, double& q1, double& q2, double& q3) const;
 
-    const Frame* reference_frame() const { 
-    return _reference_frame; 
+    const Frame* reference_frame() const {
+    return _reference_frame;
     };
     void set_reference_frame(const Frame* const refFrame);
     bool setting_asreference_frame_will_create_a_loop(const Frame* const frame);
@@ -100,9 +100,9 @@ public:
     void get_coordinates_of_in(const double src[3], double res[3], const Frame* const in) const;
     void get_coordinates_of_from(const double src[3], double res[3], const Frame* const from) const;
 
-    Eigen::Vector3d transform_of(const Eigen::Vector3d& src) const;  //world coordinate 
+    Eigen::Vector3d transform_of(const Eigen::Vector3d& src) const;  //world coordinate
     Eigen::Vector3d inverse_transform_of(const Eigen::Vector3d& src) const;
-    Eigen::Vector3d local_transform_of(const Eigen::Vector3d& src) const;  
+    Eigen::Vector3d local_transform_of(const Eigen::Vector3d& src) const;
     Eigen::Vector3d local_inverse_transform_of(const Eigen::Vector3d& src) const;
     Eigen::Vector3d transform_of_in(const Eigen::Vector3d& src, const Frame* const in) const;
     Eigen::Vector3d transform_of_from(const Eigen::Vector3d& src, const Frame* const from) const;
@@ -123,9 +123,9 @@ public:
     void set_from_matrix(const double m[16]);
 
     Frame inverse() const;
-    Frame world_inverse() const { 
+    Frame world_inverse() const {
         return Frame(-(orientation().inverse()._transformVector(position())),
-        orientation().inverse()); 
+        orientation().inverse());
     }
 
 private:
@@ -133,9 +133,9 @@ private:
     Eigen::Vector3d _t;
     Eigen::Quaterniond _q;
 
-    //Frame composition  
+    //Frame composition
     const Frame* _reference_frame;
-}; 
+};
 
 void get_quaternion_axis_angle(const Eigen::Quaterniond& quat, Eigen::Vector3d& axis, float& angle);
 Eigen::Vector3d get_quaternion_axis(const Eigen::Quaterniond& quat);

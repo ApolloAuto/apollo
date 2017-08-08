@@ -23,14 +23,14 @@
 
 #include <string>
 
-#include <Eigen/Eigen>
+#include "Eigen/Eigen"
 
+#include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "ros/include/ros/ros.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/localization/proto/gps.pb.h"
-#include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
+#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::calibration
@@ -51,7 +51,7 @@ class RepublishMsg : public apollo::common::ApolloApp {
   void OnInsStat(const ::apollo::drivers::gnss::InsStat& msg);
   // Upon receiving GPS data
   void OnGps(const ::apollo::localization::Gps& msg);
-  
+
   // Gps offset pose
   Eigen::Affine3d offset_;
   // first Gps message flag

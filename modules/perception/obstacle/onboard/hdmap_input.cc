@@ -15,11 +15,12 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
+
 #include <stdlib.h>
-#include <Eigen/Core>
 #include <algorithm>
 #include <vector>
 
+#include "Eigen/Core"
 #include "modules/common/log.h"
 #include "modules/perception/common/define.h"
 #include "modules/perception/common/perception_gflags.h"

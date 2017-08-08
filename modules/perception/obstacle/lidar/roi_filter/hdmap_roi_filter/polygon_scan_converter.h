@@ -15,11 +15,12 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
-#include <vector>
+
 #include <limits>
-#include <Eigen/Core>
-#include <Eigen/StdVector>
-#include <gflags/gflags.h>
+#include <vector>
+#include "Eigen/Core"
+#include "Eigen/StdVector"
+#include "gflags/gflags.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
@@ -34,16 +35,18 @@ class PolygonScanConverter {
   typedef std::pair<double, double> Interval;
   typedef std::pair<Point, Point> Segment;
   struct Edge {
-      bool operator<(const Edge& other) const { return y < other.y; }
-      bool MoveUp(const double delta_x);
+    bool operator<(const Edge& other) const {
+      return y < other.y;
+    }
+    bool MoveUp(const double delta_x);
 
-      // high x end point constant vars
-      double max_x;
-      double max_y;
-      // initial to low x y and move
-      double x;
-      double y;
-      double k;
+    // high x end point constant vars
+    double max_x;
+    double max_y;
+    // initial to low x y and move
+    double x;
+    double y;
+    double k;
   };
 
   typedef Bitmap2D::DirectionMajor DirectionMajor;
@@ -53,7 +56,7 @@ class PolygonScanConverter {
   }
 
   static inline DirectionMajor opposite_direction(DirectionMajor dir_major) {
-      return static_cast<DirectionMajor>(dir_major ^ 1);
+    return static_cast<DirectionMajor>(dir_major ^ 1);
   }
 
   // get scan intervals
@@ -68,7 +71,7 @@ class PolygonScanConverter {
 
   // ensure the k = s_inf_ edge to be filled
   // std::vector<std::vector<Segment> > _specialsegments_; // 0 for x 1 for y
-  std::vector<double> ks_; // 0 for x 1 for y
+  std::vector<double> ks_;  // 0 for x 1 for y
 
   // edge table
   std::vector<std::vector<Edge>> edge_table_;
@@ -86,11 +89,12 @@ class PolygonScanConverter {
   void DisturbPolygon();
   void ConvertPolygonToSegments();
   void BuildEdgeTable();
-  void UpdateActiveEdgeTable(const size_t x_id, std::vector<Interval>* scan_intervals);
+  void UpdateActiveEdgeTable(const size_t x_id,
+                             std::vector<Interval>* scan_intervals);
   // convert segment, x  from continuous domain to discrete domain
-  bool ConvertSegment(size_t seg_id, std::pair<int, Edge> &out_edge);
+  bool ConvertSegment(size_t seg_id, std::pair<int, Edge>& out_edge);
 };
 
-} // perception
-} // apollo
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
+}  // perception
+}  // apollo
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
