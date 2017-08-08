@@ -34,25 +34,25 @@ class PathData {
  public:
   PathData() = default;
 
-  bool set_discretized_path(const DiscretizedPath &path);
+  bool SetDiscretizedPath(const DiscretizedPath &path);
 
-  bool set_frenet_path(const FrenetFramePath &frenet_path);
+  bool SetFrenetPath(const FrenetFramePath &frenet_path);
 
-  void set_reference_line(const ReferenceLine *reference_line);
+  void SetReferenceLine(const ReferenceLine *reference_line);
 
   const DiscretizedPath &discretized_path() const;
 
   const FrenetFramePath &frenet_frame_path() const;
 
-  bool get_path_point_with_path_s(const double s,
-                                  common::PathPoint *const path_point) const;
+  bool GetPathPointWithPathS(const double s,
+                             common::PathPoint *const path_point) const;
 
   /*
    * brief: this function will find the path_point in discretized_path whose
    * projection to reference line has s value closest to ref_s.
    */
-  bool get_path_point_with_ref_s(const double ref_s,
-                                 common::PathPoint *const path_point) const;
+  bool GetPathPointWithRefS(const double ref_s,
+                            common::PathPoint *const path_point) const;
 
   void Clear();
 

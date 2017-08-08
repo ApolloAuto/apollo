@@ -37,7 +37,7 @@ namespace planning {
 using SLPoint = apollo::common::SLPoint;
 using Vec2d = apollo::common::math::Vec2d;
 
-bool PathData::set_discretized_path(const DiscretizedPath &path) {
+bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
   if (reference_line_ == nullptr) {
     AERROR << "Should NOT set discretized path when reference line is nullptr. "
               "Please set reference line first.";
@@ -52,7 +52,7 @@ bool PathData::set_discretized_path(const DiscretizedPath &path) {
   return true;
 }
 
-bool PathData::set_frenet_path(const FrenetFramePath &frenet_path) {
+bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
   if (reference_line_ == nullptr) {
     AERROR << "Should NOT set frenet path when reference line is nullptr. "
               "Please set reference line first.";
@@ -75,19 +75,19 @@ const FrenetFramePath &PathData::frenet_frame_path() const {
   return frenet_path_;
 }
 
-void PathData::set_reference_line(const ReferenceLine *reference_line) {
+void PathData::SetReferenceLine(const ReferenceLine *reference_line) {
   Clear();
   reference_line_ = reference_line;
 }
 
-bool PathData::get_path_point_with_path_s(
+bool PathData::GetPathPointWithPathS(
     const double s, common::PathPoint *const path_point) const {
   *path_point = discretized_path_.EvaluateUsingLinearApproximation(s);
   return true;
 }
 
-bool PathData::get_path_point_with_ref_s(
-    const double ref_s, common::PathPoint *const path_point) const {
+bool PathData::GetPathPointWithRefS(const double ref_s,
+                                    common::PathPoint *const path_point) const {
   DCHECK_NOTNULL(reference_line_);
   DCHECK_NOTNULL(path_point);
   DCHECK_EQ(discretized_path_.path_points().size(),
