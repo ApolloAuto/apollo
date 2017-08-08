@@ -114,7 +114,7 @@ TEST_F(QpSplinePathOptimizerTest, Process) {
   EXPECT_EQ(qp_path_ground_truth.path_point().size(), 101);
   EXPECT_EQ(planning_data->path_data().discretized_path().points().size(), 101);
 
-  for (std::uint32_t i = 0; i < qp_path_ground_truth.path_point().size(); i++) {
+  for (std::int32_t i = 0; i < qp_path_ground_truth.path_point().size(); i++) {
     common::PathPoint ground_truth_point =
         qp_path_ground_truth.path_point().Get(i);
     common::PathPoint computed_point = planning_data
