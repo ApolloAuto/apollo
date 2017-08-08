@@ -2,13 +2,17 @@ import * as THREE from "three";
 
 import STORE from "store";
 
-import mainStopMarker from "assets/images/decision/main-stop.png";
-import objectStopMarker from "assets/images/decision/object-stop.png";
-import objectFollowMarker from "assets/images/decision/object-follow.png";
-import objectYieldMarker from "assets/images/decision/object-yield.png";
-import objectOvertakeMarker from "assets/images/decision/object-overtake.png";
+import iconMainStop from "assets/images/decision/main-stop.png";
+import iconObjectStop from "assets/images/decision/object-stop.png";
+import iconObjectFollow from "assets/images/decision/object-follow.png";
+import iconObjectYield from "assets/images/decision/object-yield.png";
+import iconObjectOvertake from "assets/images/decision/object-overtake.png";
 
-import fenceStop from "assets/images/decision/stop-fence.png";
+import fenceMainStop from "assets/images/decision/fence-main-stop.png";
+import fenceObjectStop from "assets/images/decision/fence-object-stop.png";
+import fenceObjectFollow from "assets/images/decision/fence-object-follow.png";
+import fenceObjectYield from "assets/images/decision/fence-object-yield.png";
+import fenceObjectOvertake from "assets/images/decision/fence-object-overtake.png";
 
 import reasonHeadVehicle from "assets/images/decision/head-vehicle.png";
 import reasonDestination from "assets/images/decision/destination.png";
@@ -49,7 +53,13 @@ const StopReasonMarkerMapping = {
 
 export default class Decision {
     constructor() {
-        this.markers = []; // for FOLLOW/STOP/YIELD/OVERTAKE decisions
+        // for STOP/FOLLOW/YIELD/OVERTAKE decisions
+        this.markers = {
+                STOP: [],
+                FOLLOW: [],
+                YIELD: [],
+                OVERTAKE: []
+        };
         this.nudges = []; // for NUDGE decision
         this.mainDecision = this.getMainDecision(); // for main decision with reason
         this.mainDecisionAddedToScene = false;
@@ -90,11 +100,14 @@ export default class Decision {
 
         const objects = world.object;
         if (!STORE.options.showDecisionObstacle || _.isEmpty(objects)) {
-            hideArrayObjects(this.markers);
+            let decision = null;
+            for (decision in MarkerColorMapping) {
+                hideArrayObjects(this.markers[decision]);
+            }
             return;
         }
 
-        let markerIdx = 0;
+        const markerIdx = {STOP: 0, FOLLOW: 0, YIELD: 0, OVERTAKE: 0};
         for (let i = 0; i < objects.length; i++) {
             const decisions = objects[i].decision;
             if (_.isEmpty(decisions)) {
@@ -111,13 +124,12 @@ export default class Decision {
                         decisionType === 'YIELD' || decisionType === 'OVERTAKE') {
                     // Show the specific marker.
                     let marker = null;
-                    const color = MarkerColorMapping[decisionType];
-                    if (markerIdx >= this.markers.length) {
-                        marker = this.getObstacleDecision(color);
-                        this.markers.push(marker);
+                    if (markerIdx[decisionType] >= this.markers[decisionType].length) {
+                        marker = this.getObstacleDecision(decisionType);
+                        this.markers[decisionType].push(marker);
                         scene.add(marker);
                     } else {
-                        marker = this.markers[markerIdx];
+                        marker = this.markers[decisionType][markerIdx[decisionType]];
                     }
 
                     const pos = coordinates.applyOffset(new THREE.Vector3(
@@ -128,12 +140,8 @@ export default class Decision {
                     marker.position.set(pos.x, pos.y, 0.2);
                     marker.rotation.set(Math.PI / 2, decision.heading - Math.PI / 2, 0);
                     marker.visible = true;
-                    marker.objStop.visible = (decisionType === 'STOP');
-                    marker.objFollow.visible = (decisionType === 'FOLLOW');
-                    marker.objYield.visible = (decisionType === 'YIELD');
-                    marker.objOvertake.visible = (decisionType === 'OVERTAKE');
-                    marker.connect.visible = false;
-                    markerIdx++;
+                    //marker.connect.visible = false;
+                    markerIdx[decisionType]++;
 
                     if (decisionType === 'YIELD' || decisionType === 'OVERTAKE') {
                         // Draw a dotted line to connect the marker and the obstacle.
@@ -146,28 +154,25 @@ export default class Decision {
                         connect.geometry.lineDistancesNeedUpdate = true;
                         connect.rotation.set(Math.PI / (-2), 0,
                                 Math.PI / 2 - decision.heading);
-                        connect.visible = true;
+                        //connect.visible = true;
                     }
                 } else if (decisionType === 'NUDGE') {
                     const nudge = drawShapeFromPoints(
-                            coordinates.applyOffset(decision.polygonPoint),
+                            coordinates.applyOffsetToArray(decision.polygonPoint),
                             new THREE.MeshBasicMaterial({color: 0xff7f00}), false, 2);
                     this.nudges.push(nudge);
                     scene.add(nudge);
                 }
             }
         }
-        hideArrayObjects(this.markers, markerIdx);
+        let decision = null;
+        for (decision in MarkerColorMapping) {
+            hideArrayObjects(this.markers[decision], markerIdx[decision]);
+        }
     }
 
     getMainDecision() {
-        const marker = new THREE.Object3D();
-
-        const stopFence = drawImage(fenceStop, 11.625, 3, 0, 1.5, 0);
-        marker.add(stopFence);
-
-        const mainStop = drawImage(mainStopMarker, 1, 1, 3, 3.6, 0);
-        marker.add(mainStop);
+        const marker = this.getFence("MAIN_STOP");
 
         let reason = null;
         for (reason in StopReasonMarkerMapping) {
@@ -180,33 +185,56 @@ export default class Decision {
         return marker;
     }
 
-    getObstacleDecision(color) {
-        const marker = new THREE.Object3D();
+    getObstacleDecision(type) {
+        const marker = this.getFence(type);
 
-        // TODO: optimize with different fence types
-        const stopFence = drawImage(fenceStop, 11.625, 3, 0, 1.5, 0);
-        marker.add(stopFence);
-
-        const objStop = drawImage(objectStopMarker, 1, 1, 3, 3.6, 0);
-        marker.add(objStop);
-        marker.objStop = objStop;
-        const objFollow = drawImage(objectFollowMarker, 1, 1, 3, 3.6, 0);
-        marker.add(objFollow);
-        marker.objFollow = objFollow;
-        const objYield = drawImage(objectYieldMarker, 1, 1, 3, 3.6, 0);
-        marker.add(objYield);
-        marker.objYield = objYield;
-        const objOvertake = drawImage(objectStopMarker, 1, 1, 3, 3.6, 0);
-        marker.add(objOvertake);
-        marker.objOvertake = objOvertake;
-
-        const connect = drawDashedLineFromPoints(
-                [new THREE.Vector3(1, 1, 0), new THREE.Vector3(0, 0, 0)],
-                color, 2, 2, 1, 30);
-        marker.add(connect);
-        marker.connect = connect;
+        if (type === 'YIELD' || type === 'OVERTAKE') {
+            const color = MarkerColorMapping[type];
+            const connect = drawDashedLineFromPoints(
+                    [new THREE.Vector3(1, 1, 0), new THREE.Vector3(0, 0, 0)],
+                    color, 2, 2, 1, 30);
+            marker.add(connect);
+            marker.connect = connect;
+        }
 
         marker.visible = false;
+        return marker;
+    }
+
+    getFence(type) {
+        const marker = new THREE.Object3D();
+        switch(type) {
+        case 'STOP':
+            let fence = drawImage(fenceObjectStop, 11.625, 3, 0, 1.5, 0);
+            marker.add(fence);
+            let icon = drawImage(iconObjectStop, 1, 1, 3, 3.6, 0);
+            marker.add(icon);
+            break;
+        case 'FOLLOW':
+            fence = drawImage(fenceObjectFollow, 11.625, 3, 0, 1.5, 0);
+            marker.add(fence);
+            icon = drawImage(iconObjectFollow, 1, 1, 3, 3.6, 0);
+            marker.add(icon);
+            break;
+        case 'YIELD':
+            fence = drawImage(fenceObjectYield, 11.625, 3, 0, 1.5, 0);
+            marker.add(fence);
+            icon = drawImage(iconObjectYield, 1, 1, 3, 3.6, 0);
+            marker.add(icon);
+            break;
+        case 'OVERTAKE':
+            fence = drawImage(fenceObjectOvertake, 11.625, 3, 0, 1.5, 0);
+            marker.add(fence);
+            icon = drawImage(iconObjectOvertake, 1, 1, 3, 3.6, 0);
+            marker.add(icon);
+            break;
+        case 'MAIN_STOP':
+            fence = drawImage(fenceMainStop, 11.625, 3, 0, 1.5, 0);
+            marker.add(fence);
+            icon = drawImage(iconMainStop, 1, 1, 3, 3.6, 0);
+            marker.add(icon);
+            break;
+        }
         return marker;
     }
 }
