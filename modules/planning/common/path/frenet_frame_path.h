@@ -42,6 +42,7 @@ class FrenetFramePath {
   common::FrenetFramePoint &PointAt(const std::uint32_t index);
   const common::FrenetFramePoint &Interpolate(double s) const;
 
+  virtual void Clear();
  private:
   std::vector<common::FrenetFramePoint> points_;
 };

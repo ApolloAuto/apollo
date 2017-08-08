@@ -113,8 +113,8 @@ bool PathData::get_path_point_with_ref_s(
 }
 
 void PathData::Clear() {
-  discretized_path_ = DiscretizedPath();
-  frenet_path_ = FrenetFramePath();
+  discretized_path_.Clear();
+  frenet_path_.Clear();
   reference_line_ = nullptr;
 }
 
@@ -166,7 +166,7 @@ bool PathData::FrenetToCartesian(const FrenetFramePath &frenet_path,
     }
     path_points.push_back(std::move(path_point));
   }
-  *discretized_path = DiscretizedPath(path_points);
+  *discretized_path = DiscretizedPath(std::move(path_points));
 
   return true;
 }
@@ -189,7 +189,7 @@ bool PathData::CartesianToFrenet(const DiscretizedPath &discretized_path,
     frenet_point.set_l(sl_point.l());
     frenet_frame_points.push_back(std::move(frenet_point));
   }
-  *frenet_path = FrenetFramePath(frenet_frame_points);
+  *frenet_path = FrenetFramePath(std::move(frenet_frame_points));
   return true;
 }
 

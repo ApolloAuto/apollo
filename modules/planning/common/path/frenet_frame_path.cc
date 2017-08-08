@@ -67,5 +67,9 @@ const common::FrenetFramePoint &FrenetFramePath::Interpolate(double s) const {
   return points_.front();
 }
 
+void FrenetFramePath::Clear() {
+  points_.clear();
+}
+
 }  // namespace planning
 }  // namespace apollo
