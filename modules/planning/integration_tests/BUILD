@@ -28,6 +28,7 @@ cc_library(
 
 cc_test(
     name = "garage_test",
+    size = "small",
     srcs = [
         "garage_test.cc",
     ],
