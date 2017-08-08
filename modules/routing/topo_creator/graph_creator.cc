@@ -19,7 +19,6 @@
 #include "glog/logging.h"
 
 #include "modules/common/util/file.h"
-#include "modules/routing/common/utils.h"
 #include "modules/routing/topo_creator/edge_creator.h"
 #include "modules/routing/topo_creator/node_creator.h"
 
