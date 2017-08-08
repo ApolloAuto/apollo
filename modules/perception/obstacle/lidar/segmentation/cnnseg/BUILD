@@ -6,7 +6,6 @@ cc_library(
     name = "perception_obstacle_lidar_segmention_cnnseg",
     srcs = ["cnn_segmentation.cc"],
     hdrs = ["cnn_segmentation.h"],
-#    copts = ["-isystem $(GENDIR)/external/com_github_gflags_gflags/",],
     deps = [
         "//modules/common:log",
         "//modules/common/util",
@@ -21,21 +20,18 @@ cc_library(
         "//modules/perception/obstacle/lidar/segmentation/cnnseg/proto:cnnseg_proto",
         "@caffe//:lib",
     ],
-    linkopts = [
-        "-lopencv_core",
-    ],
 )
 
 cc_library(
     name = "cnnseg_util",
     hdrs = ["util.h"],
+    deps = ["@opencv2//:core"],
 )
 
 cc_library(
     name = "cnnseg_feature_generator",
     srcs = ["feature_generator.cc"],
     hdrs = ["feature_generator.h"],
-#    copts = ["-isystem $(GENDIR)/external/com_github_gflags_gflags/",],
     deps = [
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
@@ -77,10 +73,8 @@ cc_test(
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "@gtest//:main",
+        "@opencv2//:core",
         "@pcl//:pcl",
-    ],
-    linkopts = [
-        "-lopencv_core",
     ],
 )
 

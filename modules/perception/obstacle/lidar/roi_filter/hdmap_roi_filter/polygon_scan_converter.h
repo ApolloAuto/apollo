@@ -19,6 +19,7 @@
 #include <limits>
 #include <Eigen/Core>
 #include <Eigen/StdVector>
+#include <gflags/gflags.h>
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"

@@ -25,7 +25,6 @@ cc_library(
         ":stl_logging_h",
         ":config_h",
         ":logging_h",
-        ":log_severity",
         ":vlog_is_on_h",
         "raw_logging_h"
     ],
@@ -114,18 +113,6 @@ genrule(
     ],
     outs = [
         "glog/logging.h",
-    ],
-    cmd = "$(location :gen_sh) < $(<) > $(@)",
-    tools = [":gen_sh"],
-)
-
-genrule(
-    name = "log_severity",
-    srcs = [
-        "src/glog/log_severity.h",
-    ],
-    outs = [
-        "glog/log_severity.h",
     ],
     cmd = "$(location :gen_sh) < $(<) > $(@)",
     tools = [":gen_sh"],

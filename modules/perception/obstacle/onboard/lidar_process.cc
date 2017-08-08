@@ -23,7 +23,6 @@
 #include <tf_conversions/tf_eigen.h>
 #include <Eigen/Core>
 #include <string>
-#include <math.h>
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/log.h"
@@ -168,7 +167,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
       return false;
     }
   }
-  ADEBUG << "call object_builder succ.";
+  AERROR << "call object_builder succ.";
   PERF_BLOCK_END("lidar_object_builder");
 
   /// call tracker
@@ -304,18 +303,12 @@ void LidarProcess::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
   cloud->sensor_origin_ = in_cloud.sensor_origin_;
   cloud->sensor_orientation_ = in_cloud.sensor_orientation_;
   cloud->points.resize(in_cloud.points.size());
-  int pt_num = 0;
   for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
-    Point pt;
-    pt.x = in_cloud.points[idx].x;
-    pt.y = in_cloud.points[idx].y;
-    pt.z = in_cloud.points[idx].z;
-    pt.intensity = in_cloud.points[idx].intensity;
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z)) {
-      cloud->points[pt_num++] = pt;
-    }
+    cloud->points[idx].x = in_cloud.points[idx].x;
+    cloud->points[idx].y = in_cloud.points[idx].y;
+    cloud->points[idx].z = in_cloud.points[idx].z;
+    cloud->points[idx].intensity = in_cloud.points[idx].intensity;
   }
-  cloud->points.resize(pt_num);
 }
 
 bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
