@@ -36,6 +36,8 @@
 namespace apollo {
 namespace planning {
 
+using ConstPathObstacleList = std::vector<const PathObstacle*>;
+
 QpSplinePathGenerator::QpSplinePathGenerator(
     const ReferenceLine& reference_line,
     const QpSplinePathConfig& qp_spline_path_config)

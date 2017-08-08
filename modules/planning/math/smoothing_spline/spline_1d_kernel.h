@@ -60,7 +60,7 @@ class Spline1dKernel {
                                         const std::vector<double>& ref_fx,
                                         const double weight);
 
-  // distance offset (for speed optimzer, given time optimize the distance can
+  // distance offset (for speed optimizer, given time optimize the distance can
   // go);
   void add_distance_offset(const double weight);
 

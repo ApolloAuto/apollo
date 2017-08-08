@@ -36,6 +36,7 @@ namespace apollo {
 namespace planning {
 
 using common::SpeedPoint;
+using ConstPathObstacleList = std::vector<const PathObstacle*>;
 
 namespace {
 constexpr double kEpsilontol = 1e-6;

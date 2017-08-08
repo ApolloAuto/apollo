@@ -44,6 +44,8 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using IdDecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
+using ConstPathObstacleList = std::vector<const PathObstacle*>;
 
 DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
                          const ReferenceLine &reference_line,
@@ -59,7 +61,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   if (!reference_line_.get_point_in_frenet_frame(
           {init_point_.path_point().x(), init_point_.path_point().y()},
           &init_sl_point_)) {
-    AERROR << "Fail to creat init_sl_point from : " << init_point.DebugString();
+    AERROR << "Fail to create init_sl_point from : " << init_point.DebugString();
     return false;
   }
   std::vector<DPRoadGraphNode> min_cost_path;
