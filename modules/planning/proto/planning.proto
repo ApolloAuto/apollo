@@ -57,6 +57,7 @@ message ADCSignals {
 message EStop {
   // is_estop == true when emergency stop is required
   optional bool is_estop = 1;
+  optional string reason = 2;
 }
 
 message ProcessorStats {

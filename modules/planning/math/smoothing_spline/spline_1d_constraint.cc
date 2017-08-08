@@ -29,34 +29,34 @@ namespace planning {
 
 Spline1dConstraint::Spline1dConstraint(const Spline1d& pss)
     : x_knots_(pss.x_knots()), spline_order_(pss.spline_order()) {
-  inequality_constraint_.set_is_equality(false);
-  equality_constraint_.set_is_equality(true);
+  inequality_constraint_.SetIsEquality(false);
+  equality_constraint_.SetIsEquality(true);
 }
 
 Spline1dConstraint::Spline1dConstraint(const std::vector<double>& x_knots,
                                        const std::uint32_t spline_order)
     : x_knots_(x_knots), spline_order_(spline_order) {
-  inequality_constraint_.set_is_equality(false);
-  equality_constraint_.set_is_equality(true);
+  inequality_constraint_.SetIsEquality(false);
+  equality_constraint_.SetIsEquality(true);
 }
 
-bool Spline1dConstraint::add_inequality_constraint(
+bool Spline1dConstraint::AddInequalityConstraint(
     const Eigen::MatrixXd& constraint_matrix,
     const Eigen::MatrixXd& constraint_boundary) {
-  return inequality_constraint_.add_constraint(constraint_matrix,
-                                               constraint_boundary);
+  return inequality_constraint_.AddConstraint(constraint_matrix,
+                                              constraint_boundary);
 }
 
-bool Spline1dConstraint::add_equality_constraint(
+bool Spline1dConstraint::AddEqualityConstraint(
     const Eigen::MatrixXd& constraint_matrix,
     const Eigen::MatrixXd& constraint_boundary) {
-  return equality_constraint_.add_constraint(constraint_matrix,
-                                             constraint_boundary);
+  return equality_constraint_.AddConstraint(constraint_matrix,
+                                            constraint_boundary);
 }
 
-bool Spline1dConstraint::add_fx_boundary(
-    const std::vector<double>& x_coord, const std::vector<double>& lower_bound,
-    const std::vector<double>& upper_bound) {
+bool Spline1dConstraint::AddBoundary(const std::vector<double>& x_coord,
+                                     const std::vector<double>& lower_bound,
+                                     const std::vector<double>& upper_bound) {
   std::vector<double> filtered_lower_bound;
   std::vector<double> filtered_upper_bound;
   std::vector<double> filtered_lower_bound_x;
@@ -66,9 +66,9 @@ bool Spline1dConstraint::add_fx_boundary(
     return false;
   }
 
-  if (!filter_constraints(x_coord, lower_bound, upper_bound,
-                          &filtered_lower_bound_x, &filtered_lower_bound,
-                          &filtered_upper_bound_x, &filtered_upper_bound)) {
+  if (!FilterConstraints(x_coord, lower_bound, upper_bound,
+                         &filtered_lower_bound_x, &filtered_lower_bound,
+                         &filtered_upper_bound_x, &filtered_upper_bound)) {
     return false;
   }
   // emplace affine constraints
@@ -79,7 +79,7 @@ bool Spline1dConstraint::add_fx_boundary(
       filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
   for (std::uint32_t i = 0; i < filtered_lower_bound.size(); ++i) {
-    std::uint32_t index = find_index(filtered_lower_bound_x[i]);
+    std::uint32_t index = FindIndex(filtered_lower_bound_x[i]);
 
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double coef = 1.0;
@@ -91,7 +91,7 @@ bool Spline1dConstraint::add_fx_boundary(
   }
 
   for (std::uint32_t i = 0; i < filtered_upper_bound.size(); ++i) {
-    std::uint32_t index = find_index(filtered_upper_bound_x[i]);
+    std::uint32_t index = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
@@ -103,11 +103,11 @@ bool Spline1dConstraint::add_fx_boundary(
         -filtered_upper_bound[i];
   }
 
-  return inequality_constraint_.add_constraint(inequality_constraint,
-                                               inequality_boundary);
+  return inequality_constraint_.AddConstraint(inequality_constraint,
+                                              inequality_boundary);
 }
 
-bool Spline1dConstraint::add_derivative_boundary(
+bool Spline1dConstraint::AddDerivativeBoundary(
     const std::vector<double>& x_coord, const std::vector<double>& lower_bound,
     const std::vector<double>& upper_bound) {
   std::vector<double> filtered_lower_bound;
@@ -119,9 +119,9 @@ bool Spline1dConstraint::add_derivative_boundary(
     return false;
   }
 
-  if (!filter_constraints(x_coord, lower_bound, upper_bound,
-                          &filtered_lower_bound_x, &filtered_lower_bound,
-                          &filtered_upper_bound_x, &filtered_upper_bound)) {
+  if (!FilterConstraints(x_coord, lower_bound, upper_bound,
+                         &filtered_lower_bound_x, &filtered_lower_bound,
+                         &filtered_upper_bound_x, &filtered_upper_bound)) {
     return false;
   }
 
@@ -133,7 +133,7 @@ bool Spline1dConstraint::add_derivative_boundary(
       filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
   for (std::uint32_t i = 0; i < filtered_lower_bound.size(); ++i) {
-    std::uint32_t index = find_index(filtered_lower_bound_x[i]);
+    std::uint32_t index = FindIndex(filtered_lower_bound_x[i]);
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double coef = 1.0;
     for (std::uint32_t j = 1; j < spline_order_; ++j) {
@@ -144,7 +144,7 @@ bool Spline1dConstraint::add_derivative_boundary(
   }
 
   for (std::uint32_t i = 0; i < filtered_upper_bound.size(); ++i) {
-    std::uint32_t index = find_index(filtered_upper_bound_x[i]);
+    std::uint32_t index = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
     for (std::uint32_t j = 1; j < spline_order_; ++j) {
@@ -155,11 +155,11 @@ bool Spline1dConstraint::add_derivative_boundary(
     inequality_boundary(i + filtered_upper_bound.size(), 0) =
         -filtered_upper_bound[i];
   }
-  return inequality_constraint_.add_constraint(inequality_constraint,
-                                               inequality_boundary);
+  return inequality_constraint_.AddConstraint(inequality_constraint,
+                                              inequality_boundary);
 }
 
-bool Spline1dConstraint::add_second_derivative_boundary(
+bool Spline1dConstraint::AddSecondDerivativeBoundary(
     const std::vector<double>& x_coord, const std::vector<double>& lower_bound,
     const std::vector<double>& upper_bound) {
   std::vector<double> filtered_lower_bound;
@@ -171,9 +171,9 @@ bool Spline1dConstraint::add_second_derivative_boundary(
     return false;
   }
 
-  if (!filter_constraints(x_coord, lower_bound, upper_bound,
-                          &filtered_lower_bound_x, &filtered_lower_bound,
-                          &filtered_upper_bound_x, &filtered_upper_bound)) {
+  if (!FilterConstraints(x_coord, lower_bound, upper_bound,
+                         &filtered_lower_bound_x, &filtered_lower_bound,
+                         &filtered_upper_bound_x, &filtered_upper_bound)) {
     return false;
   }
 
@@ -185,7 +185,7 @@ bool Spline1dConstraint::add_second_derivative_boundary(
       filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
   for (std::uint32_t i = 0; i < filtered_lower_bound.size(); ++i) {
-    std::uint32_t index = find_index(filtered_lower_bound_x[i]);
+    std::uint32_t index = FindIndex(filtered_lower_bound_x[i]);
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double coef = 1.0;
     for (std::uint32_t j = 2; j < spline_order_; ++j) {
@@ -196,7 +196,7 @@ bool Spline1dConstraint::add_second_derivative_boundary(
   }
 
   for (std::uint32_t i = 0; i < filtered_upper_bound.size(); ++i) {
-    std::uint32_t index = find_index(filtered_upper_bound_x[i]);
+    std::uint32_t index = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
     for (std::uint32_t j = 2; j < spline_order_; ++j) {
@@ -207,11 +207,11 @@ bool Spline1dConstraint::add_second_derivative_boundary(
     inequality_boundary(i + filtered_upper_bound.size(), 0) =
         -filtered_upper_bound[i];
   }
-  return inequality_constraint_.add_constraint(inequality_constraint,
-                                               inequality_boundary);
+  return inequality_constraint_.AddConstraint(inequality_constraint,
+                                              inequality_boundary);
 }
 
-bool Spline1dConstraint::add_third_derivative_boundary(
+bool Spline1dConstraint::AddThirdDerivativeBoundary(
     const std::vector<double>& x_coord, const std::vector<double>& lower_bound,
     const std::vector<double>& upper_bound) {
   std::vector<double> filtered_lower_bound;
@@ -219,9 +219,9 @@ bool Spline1dConstraint::add_third_derivative_boundary(
   std::vector<double> filtered_lower_bound_x;
   std::vector<double> filtered_upper_bound_x;
 
-  if (!filter_constraints(x_coord, lower_bound, upper_bound,
-                          &filtered_lower_bound_x, &filtered_lower_bound,
-                          &filtered_upper_bound_x, &filtered_upper_bound)) {
+  if (!FilterConstraints(x_coord, lower_bound, upper_bound,
+                         &filtered_lower_bound_x, &filtered_lower_bound,
+                         &filtered_upper_bound_x, &filtered_upper_bound)) {
     return false;
   }
 
@@ -237,7 +237,7 @@ bool Spline1dConstraint::add_third_derivative_boundary(
       filtered_upper_bound.size() + filtered_lower_bound.size(), 1);
 
   for (std::uint32_t i = 0; i < filtered_lower_bound.size(); ++i) {
-    std::uint32_t index = find_index(filtered_lower_bound_x[i]);
+    std::uint32_t index = FindIndex(filtered_lower_bound_x[i]);
     const double corrected_x = filtered_lower_bound_x[i] - x_knots_[index];
     double coef = 1.0;
     for (std::uint32_t j = 3; j < spline_order_; ++j) {
@@ -249,7 +249,7 @@ bool Spline1dConstraint::add_third_derivative_boundary(
   }
 
   for (std::uint32_t i = 0; i < filtered_upper_bound.size(); ++i) {
-    std::uint32_t index = find_index(filtered_upper_bound_x[i]);
+    std::uint32_t index = FindIndex(filtered_upper_bound_x[i]);
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
     for (std::uint32_t j = 3; j < spline_order_; ++j) {
@@ -261,15 +261,14 @@ bool Spline1dConstraint::add_third_derivative_boundary(
     inequality_boundary(i + filtered_upper_bound.size(), 0) =
         -filtered_upper_bound[i];
   }
-  return inequality_constraint_.add_constraint(inequality_constraint,
-                                               inequality_boundary);
+  return inequality_constraint_.AddConstraint(inequality_constraint,
+                                              inequality_boundary);
 }
 
-bool Spline1dConstraint::add_point_fx_constraint(const double x,
-                                                 const double fx) {
-  std::uint32_t index = find_index(x);
+bool Spline1dConstraint::AddPointConstraint(const double x, const double fx) {
+  std::uint32_t index = FindIndex(x);
   std::vector<double> power_x;
-  generate_power_x(x - x_knots_[index], spline_order_, &power_x);
+  GeneratePowerX(x - x_knots_[index], spline_order_, &power_x);
   Eigen::MatrixXd equality_constraint =
       Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * spline_order_);
   std::uint32_t index_offset = index * spline_order_;
@@ -278,14 +277,14 @@ bool Spline1dConstraint::add_point_fx_constraint(const double x,
   }
   Eigen::MatrixXd equality_boundary(1, 1);
   equality_boundary(0, 0) = fx;
-  return add_equality_constraint(equality_constraint, equality_boundary);
+  return AddEqualityConstraint(equality_constraint, equality_boundary);
 }
 
-bool Spline1dConstraint::add_point_derivative_constraint(const double x,
-                                                         const double dfx) {
-  std::uint32_t index = find_index(x);
+bool Spline1dConstraint::AddPointDerivativeConstraint(const double x,
+                                                      const double dfx) {
+  std::uint32_t index = FindIndex(x);
   std::vector<double> power_x;
-  generate_power_x(x - x_knots_[index], spline_order_, &power_x);
+  GeneratePowerX(x - x_knots_[index], spline_order_, &power_x);
   Eigen::MatrixXd equality_constraint =
       Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * spline_order_);
   std::uint32_t index_offset = index * spline_order_;
@@ -294,14 +293,14 @@ bool Spline1dConstraint::add_point_derivative_constraint(const double x,
   }
   Eigen::MatrixXd equality_boundary(1, 1);
   equality_boundary(0, 0) = dfx;
-  return add_equality_constraint(equality_constraint, equality_boundary);
+  return AddEqualityConstraint(equality_constraint, equality_boundary);
 }
 
-bool Spline1dConstraint::add_point_second_derivative_constraint(
-    const double x, const double ddfx) {
-  std::uint32_t index = find_index(x);
+bool Spline1dConstraint::AddPointSecondDerivativeConstraint(const double x,
+                                                            const double ddfx) {
+  std::uint32_t index = FindIndex(x);
   std::vector<double> power_x;
-  generate_power_x(x - x_knots_[index], spline_order_, &power_x);
+  GeneratePowerX(x - x_knots_[index], spline_order_, &power_x);
   Eigen::MatrixXd equality_constraint =
       Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * spline_order_);
   std::uint32_t index_offset = index * spline_order_;
@@ -310,14 +309,14 @@ bool Spline1dConstraint::add_point_second_derivative_constraint(
   }
   Eigen::MatrixXd equality_boundary(1, 1);
   equality_boundary(0, 0) = ddfx;
-  return add_equality_constraint(equality_constraint, equality_boundary);
+  return AddEqualityConstraint(equality_constraint, equality_boundary);
 }
 
-bool Spline1dConstraint::add_point_third_derivative_constraint(
-    const double x, const double dddfx) {
-  std::uint32_t index = find_index(x);
+bool Spline1dConstraint::AddPointThirdDerivativeConstraint(const double x,
+                                                           const double dddfx) {
+  std::uint32_t index = FindIndex(x);
   std::vector<double> power_x;
-  generate_power_x(x - x_knots_[index], spline_order_, &power_x);
+  GeneratePowerX(x - x_knots_[index], spline_order_, &power_x);
   Eigen::MatrixXd equality_constraint =
       Eigen::MatrixXd::Zero(1, (x_knots_.size() - 1) * spline_order_);
   std::uint32_t index_offset = index * spline_order_;
@@ -327,10 +326,10 @@ bool Spline1dConstraint::add_point_third_derivative_constraint(
   }
   Eigen::MatrixXd equality_boundary(1, 1);
   equality_boundary(0, 0) = dddfx;
-  return add_equality_constraint(equality_constraint, equality_boundary);
+  return AddEqualityConstraint(equality_constraint, equality_boundary);
 }
 
-bool Spline1dConstraint::add_fx_smooth_constraint() {
+bool Spline1dConstraint::AddSmoothConstraint() {
   if (x_knots_.size() < 3) {
     return false;
   }
@@ -351,11 +350,11 @@ bool Spline1dConstraint::add_fx_smooth_constraint() {
       right_coef *= x_right;
     }
   }
-  return equality_constraint_.add_constraint(equality_constraint,
-                                             equality_boundary);
+  return equality_constraint_.AddConstraint(equality_constraint,
+                                            equality_boundary);
 }
 
-bool Spline1dConstraint::add_derivative_smooth_constraint() {
+bool Spline1dConstraint::AddDerivativeSmoothConstraint() {
   if (x_knots_.size() < 3) {
     return false;
   }
@@ -387,11 +386,11 @@ bool Spline1dConstraint::add_derivative_smooth_constraint() {
       right_coef *= x_right;
     }
   }
-  return equality_constraint_.add_constraint(equality_constraint,
-                                             equality_boundary);
+  return equality_constraint_.AddConstraint(equality_constraint,
+                                            equality_boundary);
 }
 
-bool Spline1dConstraint::add_second_derivative_smooth_constraint() {
+bool Spline1dConstraint::AddSecondDerivativeSmoothConstraint() {
   if (x_knots_.size() < 3) {
     return false;
   }
@@ -436,11 +435,11 @@ bool Spline1dConstraint::add_second_derivative_smooth_constraint() {
       right_coef *= x_right;
     }
   }
-  return equality_constraint_.add_constraint(equality_constraint,
-                                             equality_boundary);
+  return equality_constraint_.AddConstraint(equality_constraint,
+                                            equality_boundary);
 }
 
-bool Spline1dConstraint::add_third_derivative_smooth_constraint() {
+bool Spline1dConstraint::AddThirdDerivativeSmoothConstraint() {
   if (x_knots_.size() < 3) {
     return false;
   }
@@ -496,11 +495,11 @@ bool Spline1dConstraint::add_third_derivative_smooth_constraint() {
       right_coef *= x_right;
     }
   }
-  return equality_constraint_.add_constraint(equality_constraint,
-                                             equality_boundary);
+  return equality_constraint_.AddConstraint(equality_constraint,
+                                            equality_boundary);
 }
 
-bool Spline1dConstraint::add_monotone_fx_inequality_constraint(
+bool Spline1dConstraint::AddMonotoneInequalityConstraint(
     const std::vector<double>& x_coord) {
   if (x_coord.size() < 2) {
     // no inequality constraint needed
@@ -512,15 +511,15 @@ bool Spline1dConstraint::add_monotone_fx_inequality_constraint(
   Eigen::MatrixXd inequality_boundary =
       Eigen::MatrixXd::Zero(x_coord.size() - 1, 1);
 
-  std::uint32_t prev_spline_index = find_index(x_coord[0]);
+  std::uint32_t prev_spline_index = FindIndex(x_coord[0]);
   double prev_rel_x = x_coord[0] - x_knots_[prev_spline_index];
   std::vector<double> prev_coef;
-  generate_power_x(prev_rel_x, spline_order_, &prev_coef);
+  GeneratePowerX(prev_rel_x, spline_order_, &prev_coef);
   for (std::uint32_t i = 1; i < x_coord.size(); ++i) {
-    std::uint32_t cur_spline_index = find_index(x_coord[i]);
+    std::uint32_t cur_spline_index = FindIndex(x_coord[i]);
     double cur_rel_x = x_coord[i] - x_knots_[cur_spline_index];
     std::vector<double> cur_coef;
-    generate_power_x(cur_rel_x, spline_order_, &cur_coef);
+    GeneratePowerX(cur_rel_x, spline_order_, &cur_coef);
     // if constraint on the same spline
     if (cur_spline_index == prev_spline_index) {
       for (std::uint32_t j = 0; j < cur_coef.size(); ++j) {
@@ -539,12 +538,12 @@ bool Spline1dConstraint::add_monotone_fx_inequality_constraint(
     prev_coef = cur_coef;
   }
 
-  return inequality_constraint_.add_constraint(inequality_constraint,
-                                               inequality_boundary);
+  return inequality_constraint_.AddConstraint(inequality_constraint,
+                                              inequality_boundary);
 }
 
-bool Spline1dConstraint::add_monotone_fx_inequality_constraint_at_knots() {
-  return add_monotone_fx_inequality_constraint(x_knots_);
+bool Spline1dConstraint::AddMonotoneInequalityConstraintAtKnots() {
+  return AddMonotoneInequalityConstraint(x_knots_);
 }
 
 const AffineConstraint& Spline1dConstraint::inequality_constraint() const {
@@ -555,14 +554,14 @@ const AffineConstraint& Spline1dConstraint::equality_constraint() const {
   return equality_constraint_;
 }
 
-std::uint32_t Spline1dConstraint::find_index(const double x) const {
+std::uint32_t Spline1dConstraint::FindIndex(const double x) const {
   auto upper_bound = std::upper_bound(x_knots_.begin() + 1, x_knots_.end(), x);
   return std::min(static_cast<std::uint32_t>(x_knots_.size() - 1),
                   static_cast<std::uint32_t>(upper_bound - x_knots_.begin())) -
          1;
 }
 
-bool Spline1dConstraint::filter_constraints(
+bool Spline1dConstraint::FilterConstraints(
     const std::vector<double>& x_coord, const std::vector<double>& lower_bound,
     const std::vector<double>& upper_bound,
     std::vector<double>* const filtered_lower_bound_x,
@@ -604,7 +603,7 @@ bool Spline1dConstraint::filter_constraints(
   return true;
 }
 
-void Spline1dConstraint::generate_power_x(
+void Spline1dConstraint::GeneratePowerX(
     const double x, const std::uint32_t order,
     std::vector<double>* const power_x) const {
   double cur_x = 1;

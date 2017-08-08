@@ -35,12 +35,11 @@ class AffineConstraint {
                             const Eigen::MatrixXd& constraint_boundary,
                             const bool is_equality);
 
-  void set_is_equality(const double is_equality);
+  void SetIsEquality(const double is_equality);
 
   const Eigen::MatrixXd& constraint_matrix() const;
   const Eigen::MatrixXd& constraint_boundary() const;
-  bool is_equality() const;
-  bool add_constraint(const Eigen::MatrixXd& constraint_matrix,
+  bool AddConstraint(const Eigen::MatrixXd& constraint_matrix,
                       const Eigen::MatrixXd& constraint_boundary);
 
  private:

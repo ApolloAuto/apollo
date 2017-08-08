@@ -38,13 +38,13 @@ namespace planning {
 class SplineSegKernel {
  public:
   // generating kernel matrix
-  Eigen::MatrixXd kernel_fx(const std::uint32_t order,
+  Eigen::MatrixXd Kernel(const std::uint32_t order,
                             const double accumalated_x);
-  Eigen::MatrixXd kernel_derivative(const std::uint32_t order,
+  Eigen::MatrixXd DerivativeKernel(const std::uint32_t order,
                                     const double accumalated_x);
-  Eigen::MatrixXd kernel_second_order_derivative(const std::uint32_t order,
+  Eigen::MatrixXd SecondOrderDerivativeKernel(const std::uint32_t order,
                                                  const double accumalated_x);
-  Eigen::MatrixXd kernel_third_order_derivative(const std::uint32_t order,
+  Eigen::MatrixXd ThirdOrderDerivativeKernel(const std::uint32_t order,
                                                 const double accumalated_x);
 
  private:
@@ -52,9 +52,9 @@ class SplineSegKernel {
                               const std::string& type,
                               Eigen::MatrixXd* term_matrix) const;
   void calculate_fx(const std::uint32_t order);
-  void calculate_derivative(const std::uint32_t order);
-  void calculate_second_order_derivative(const std::uint32_t order);
-  void calculate_third_order_derivative(const std::uint32_t order);
+  void CalculateDerivative(const std::uint32_t order);
+  void CalculateSecondOrderDerivative(const std::uint32_t order);
+  void CalculateThirdOrderDerivative(const std::uint32_t order);
 
   std::uint32_t reserved_order_;
   Eigen::MatrixXd kernel_fx_;

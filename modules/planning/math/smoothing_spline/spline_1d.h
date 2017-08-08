@@ -46,20 +46,19 @@ class Spline1d {
   // @brief: given x return f(x) value, derivative, second order derivative and
   // the third order;
   double operator()(const double x) const;
-  double derivative(const double x) const;
-  double second_order_derivative(const double x) const;
-  double third_order_derivative(const double x) const;
+  double Derivative(const double x) const;
+  double SecondOrderDerivative(const double x) const;
+  double ThirdOrderDerivative(const double x) const;
 
   // @brief: set spline segments
-  bool set_spline_segs(const Eigen::MatrixXd& params,
-                       const std::uint32_t order);
+  bool SetSplineSegs(const Eigen::MatrixXd& params, const std::uint32_t order);
   Spline1dSeg* mutable_smoothing_spline(const std::uint32_t index);
 
   const std::vector<double>& x_knots() const;
   std::uint32_t spline_order() const;
 
  private:
-  std::uint32_t find_index(const double x) const;
+  std::uint32_t FindIndex(const double x) const;
 
  private:
   std::vector<Spline1dSeg> splines_;

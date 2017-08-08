@@ -33,9 +33,9 @@ int Double::Compare(const double d1, const double d2, const double epsilon) {
   CHECK(!std::isnan(d1));
   CHECK(!std::isnan(d2));
 
-  if (definitely_greater_than(d1, d2, epsilon)) {
+  if (DefinitelyGreaterThan(d1, d2, epsilon)) {
     return 1;
-  } else if (definitely_less_than(d1, d2, epsilon)) {
+  } else if (DefinitelyLessThan(d1, d2, epsilon)) {
     return -1;
   } else {
     return 0;
@@ -54,13 +54,13 @@ int Double::Compare(const Double& d1, const Double& d2) {
   return Compare(d1.Value(), d2.Value());
 }
 
-Double Double::sqrt(const Double& d1) { return Double(std::sqrt(d1.Value())); }
+Double Double::Sqrt(const Double& d1) { return Double(std::sqrt(d1.Value())); }
 
 int Double::CompareTo(const double d1, const double epsilon) const {
   CHECK(!std::isnan(d1));
-  if (definitely_greater_than(value_, d1, epsilon)) {
+  if (DefinitelyGreaterThan(value_, d1, epsilon)) {
     return 1;
-  } else if (definitely_less_than(value_, d1, epsilon)) {
+  } else if (DefinitelyLessThan(value_, d1, epsilon)) {
     return -1;
   } else {
     return 0;
@@ -121,7 +121,7 @@ Double& Double::operator/=(const Double& other) {
 }
 
 bool Double::operator>(const Double& other) const {
-  return definitely_greater_than(value_, other.Value(), kEpsilon_);
+  return DefinitelyGreaterThan(value_, other.Value(), kEpsilon_);
 }
 
 bool Double::operator>=(const Double& other) const {
@@ -129,7 +129,7 @@ bool Double::operator>=(const Double& other) const {
 }
 
 bool Double::operator<(const Double& other) const {
-  return definitely_less_than(value_, other.Value(), kEpsilon_);
+  return DefinitelyLessThan(value_, other.Value(), kEpsilon_);
 }
 
 bool Double::operator<=(const Double& other) const {
@@ -137,22 +137,22 @@ bool Double::operator<=(const Double& other) const {
 }
 
 bool Double::operator==(const Double& other) const {
-  return essentially_equal(value_, other.Value(), kEpsilon_);
+  return EssentiallyEqual(value_, other.Value(), kEpsilon_);
 }
 
-bool Double::approximately_equal(double a, double b, double epsilon) {
+bool Double::ApproximatelyEqual(double a, double b, double epsilon) {
   return std::fabs(a - b) <= std::fmax(std::fabs(a), std::fabs(b)) * epsilon;
 }
 
-bool Double::essentially_equal(double a, double b, double epsilon) {
+bool Double::EssentiallyEqual(double a, double b, double epsilon) {
   return std::fabs(a - b) <= std::fmin(std::fabs(a), std::fabs(b)) * epsilon;
 }
 
-bool Double::definitely_greater_than(double a, double b, double epsilon) {
+bool Double::DefinitelyGreaterThan(double a, double b, double epsilon) {
   return (a - b) > std::fmax(std::fabs(a), std::fabs(b)) * epsilon;
 }
 
-bool Double::definitely_less_than(double a, double b, double epsilon) {
+bool Double::DefinitelyLessThan(double a, double b, double epsilon) {
   return (b - a) > std::fmax(std::fabs(a), std::fabs(b)) * epsilon;
 }
 

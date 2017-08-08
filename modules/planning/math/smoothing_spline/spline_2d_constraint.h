@@ -37,9 +37,9 @@ class Spline2dConstraint {
                      const std::uint32_t order);
 
   // direct method
-  bool add_inequality_constraint(const Eigen::MatrixXd& constraint_matrix,
+  bool AddInequalityConstraint(const Eigen::MatrixXd& constraint_matrix,
                                  const Eigen::MatrixXd& constraint_boundary);
-  bool add_equality_constraint(const Eigen::MatrixXd& constraint_matrix,
+  bool AddEqualityConstraint(const Eigen::MatrixXd& constraint_matrix,
                                const Eigen::MatrixXd& constraint_boundary);
 
   // preset method
@@ -79,16 +79,16 @@ class Spline2dConstraint {
   bool add_point_angle_constraint(const double t, const double angle);
 
   // guarantee upto values are joint
-  bool add_fx_smooth_constraint();
+  bool AddSmoothConstraint();
 
   // guarantee upto derivative are joint
-  bool add_derivative_smooth_constraint();
+  bool AddDerivativeSmoothConstraint();
 
   // guarantee upto second order derivative are joint
-  bool add_second_derivative_smooth_constraint();
+  bool AddSecondDerivativeSmoothConstraint();
 
   // guarantee upto third order derivative are joint
-  bool add_third_derivative_smooth_constraint();
+  bool AddThirdDerivativeSmoothConstraint();
 
   /**
   *   @brief: output interface inequality constraint

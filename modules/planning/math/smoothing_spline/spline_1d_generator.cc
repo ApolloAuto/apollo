@@ -75,7 +75,7 @@ bool Spline1dGenerator::solve() {
 
   const std::uint32_t spline_order = spline_.spline_order();
   const Eigen::MatrixXd solved_params = qp_solver_->params();
-  return spline_.set_spline_segs(solved_params, spline_order);
+  return spline_.SetSplineSegs(solved_params, spline_order);
 }
 
 const Spline1d& Spline1dGenerator::spline() const { return spline_; }

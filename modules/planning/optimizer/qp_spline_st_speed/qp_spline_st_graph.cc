@@ -114,9 +114,9 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   double time = 0.0;
   while (time < qp_spline_st_speed_config_.total_time() + t_output_resolution) {
     double s = spline(time);
-    double v = spline.derivative(time);
-    double a = spline.second_order_derivative(time);
-    double da = spline.third_order_derivative(time);
+    double v = spline.Derivative(time);
+    double a = spline.SecondOrderDerivative(time);
+    double da = spline.ThirdOrderDerivative(time);
     speed_data->add_speed_point(s, time, v, a, da);
     time += t_output_resolution;
   }
@@ -131,19 +131,19 @@ Status QpSplineStGraph::ApplyConstraint(
       spline_generator_->mutable_spline_constraint();
   // position, velocity, acceleration
 
-  if (!constraint->add_point_fx_constraint(0.0, 0.0)) {
+  if (!constraint->AddPointConstraint(0.0, 0.0)) {
     const std::string msg = "add st start point constraint failed";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   ADEBUG << "init point constraint:" << init_point.DebugString();
-  if (!constraint->add_point_derivative_constraint(0.0, init_point_.v())) {
+  if (!constraint->AddPointDerivativeConstraint(0.0, init_point_.v())) {
     const std::string msg = "add st start point velocity constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!constraint->add_point_second_derivative_constraint(0.0,
+  if (!constraint->AddPointSecondDerivativeConstraint(0.0,
                                                           init_point_.a())) {
     const std::string msg =
         "add st start point acceleration constraint failed!";
@@ -151,7 +151,7 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!constraint->add_point_second_derivative_constraint(
+  if (!constraint->AddPointSecondDerivativeConstraint(
           spline_generator_->spline().x_knots().back(), 0.0)) {
     const std::string msg = "add st end point acceleration constraint failed!";
     AERROR << msg;
@@ -159,14 +159,14 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   // monotone constraint
-  if (!constraint->add_monotone_fx_inequality_constraint_at_knots()) {
+  if (!constraint->AddMonotoneInequalityConstraintAtKnots()) {
     const std::string msg = "add monotonicity constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // smoothness constraint
-  if (!constraint->add_third_derivative_smooth_constraint()) {
+  if (!constraint->AddThirdDerivativeSmoothConstraint()) {
     const std::string msg = "add smoothness joint constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -187,7 +187,7 @@ Status QpSplineStGraph::ApplyConstraint(
     ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
         << " lower_s: " << lower_s;
   }
-  if (!constraint->add_fx_boundary(t_evaluated_, s_lower_bound,
+  if (!constraint->AddBoundary(t_evaluated_, s_lower_bound,
                                    s_upper_bound)) {
     const std::string msg = "Fail to apply distance constraints.";
     AERROR << msg;
@@ -203,7 +203,7 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   std::vector<double> speed_lower_bound(t_evaluated_.size(), 0.0);
-  if (!constraint->add_derivative_boundary(t_evaluated_, speed_lower_bound,
+  if (!constraint->AddDerivativeBoundary(t_evaluated_, speed_lower_bound,
                                            speed_upper_bound)) {
     const std::string msg = "Fail to apply speed constraints.";
     AERROR << msg;
