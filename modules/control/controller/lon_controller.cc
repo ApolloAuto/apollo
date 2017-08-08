@@ -230,10 +230,10 @@ Status LonController::ComputeControlCommand(
   }
 
   double acceleration_cmd =
-      acceleration_cmd_closeloop + debug->preview_acceleration_reference() + \
-      digital_filter_acceleration_.Filter(GRA_ACC \
-              * std::sin(VehicleState::instance()->pitch()));
-      debug->set_is_full_stop(false);
+      acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
+      digital_filter_acceleration_.Filter(
+          GRA_ACC * std::sin(VehicleState::instance()->pitch()));
+  debug->set_is_full_stop(false);
   if (std::abs(debug->preview_acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
       std::abs(debug->preview_speed_reference()) <=
