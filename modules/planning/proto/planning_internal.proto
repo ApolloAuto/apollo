@@ -44,7 +44,6 @@ message PlanningObstacle {
   // from prediction
   repeated apollo.prediction.Trajectory prediction_trajectory = 15;
 
-  optional apollo.planning.ObjectDecision.ObjectType decision_object_type = 16;
   optional apollo.planning.ObjectDecisionType object_decision =
       17 [deprecated = true];
   repeated apollo.planning.ObjectDecisionType planning_object_decision = 18;
