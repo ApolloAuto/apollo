@@ -536,9 +536,11 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
 
   // Update obstacle decision.
   for (const auto &obj_decision : decision_res.object_decision().decision()) {
-    if (obj_decision.has_prediction()) {
-      const auto &p_obj = obj_decision.prediction().perception_obstacle();
-      Object &world_obj = CreateWorldObjectIfAbsent(p_obj);
+    if (obj_decision.has_perception_id()) {
+      Object &world_obj = obj_map_[std::to_string(obj_decision.perception_id())];
+      if (!world_obj.has_type()) {
+        world_obj.set_type(Object_Type_VIRTUAL);
+      }
 
       for (const auto &decision : obj_decision.object_decision()) {
         Decision *world_decision = world_obj.add_decision();
