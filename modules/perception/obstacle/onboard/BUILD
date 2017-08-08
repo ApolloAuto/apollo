@@ -22,7 +22,6 @@ cc_library(
     name = "perception_obstacle_lidar_process",
     srcs = ["lidar_process.cc"],
     hdrs = ["lidar_process.h"],
-#    copts = ["-isystem $(GENDIR)/external/com_github_gflags_gflags/",],
     deps = [
         ":perception_obstacle_hdmapinput",
         "//modules/common",
