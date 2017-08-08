@@ -20,6 +20,7 @@
 #ifndef MODULES_PLANNING_COMMON_PATH_PATH_DATA_H_
 #define MODULES_PLANNING_COMMON_PATH_PATH_DATA_H_
 
+#include <list>
 #include <string>
 #include <vector>
 
@@ -69,6 +70,7 @@ class PathData {
   const ReferenceLine *reference_line_ = nullptr;
   DiscretizedPath discretized_path_;
   FrenetFramePath frenet_path_;
+  std::list<std::pair<DiscretizedPath, FrenetFramePath>> path_data_history_;
 };
 
 }  // namespace planning
