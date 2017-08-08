@@ -26,6 +26,7 @@ cc_library(
         "//modules/common/math:lqr",
         "//modules/common/math:math_utils",
         "//modules/common/proto:common_proto",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/status",
         "//modules/common/time",
         "//modules/control/common:control_gflags",
