@@ -57,6 +57,8 @@
 #include <string>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 
@@ -105,6 +107,8 @@ class Any {
   };
 
   PlaceHolder *content_;
+
+  FRIEND_TEST(ObjectFactoryTest, test_ObjectFactory);
 };
 
 class ObjectFactory {

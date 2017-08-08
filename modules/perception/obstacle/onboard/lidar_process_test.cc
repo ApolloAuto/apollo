@@ -21,8 +21,6 @@
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
-
-#define private public
 #include "modules/perception/obstacle/onboard/lidar_process.h"
 
 namespace apollo {
@@ -38,11 +36,7 @@ class LidarProcessTest : public testing::Test {
  protected:
   LidarProcessTest() {}
   virtual ~LidarProcessTest() {}
-  virtual void SetUp() {
-    lidar_process_.RegistAllAlgorithm();
-  }
 
- private:
   LidarProcess lidar_process_;
 };
 

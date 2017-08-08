@@ -16,7 +16,6 @@
 
 #include "gtest/gtest.h"
 
-#define private public
 #include "modules/perception/lib/base/registerer.h"
 
 namespace apollo {

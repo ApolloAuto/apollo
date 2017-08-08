@@ -19,7 +19,6 @@
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 
-#define private public
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
 
 namespace apollo {
@@ -36,7 +35,6 @@ class HDMapInputTest : public testing::Test {
     ASSERT_TRUE(hdmap_input_ != NULL);
   }
 
- private:
   HDMapInput* hdmap_input_;
 };
 

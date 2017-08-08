@@ -19,7 +19,6 @@
 #include <fstream>
 #include "gflags/gflags.h"
 
-#define private public
 #include "modules/map/proto/map_geometry.pb.h"
 #include "modules/common/log.h"
 #include "modules/map/hdmap/hdmap_common.h"
