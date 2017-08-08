@@ -287,12 +287,12 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
                  FLAGS_static_decision_stop_buffer)) {
           ObjectDecisionType object_stop;
           ObjectStop *object_stop_ptr = object_stop.mutable_stop();
-          object_stop_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
+          object_stop_ptr->set_distance_s(FLAGS_stop_distance_obstacle);
           object_stop_ptr->set_reason_code(
               StopReasonCode::STOP_REASON_OBSTACLE);
 
           auto stop_ref_s = sl_boundary.start_s()
-              - FLAGS_dp_path_decision_buffer;
+              - FLAGS_stop_distance_obstacle;
           auto stop_ref_point = reference_line_.get_reference_point(stop_ref_s);
           object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
           object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
@@ -308,7 +308,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
             // GO_RIGHT
             ObjectDecisionType object_nudge;
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
-            object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
+            object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
             object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
             decisions->emplace_back(obstacle->Id(), object_nudge);
             ignore = false;
@@ -319,7 +319,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
             // GO_LEFT
             ObjectDecisionType object_nudge;
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
-            object_nudge_ptr->set_distance_l(FLAGS_dp_path_decision_buffer);
+            object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
             object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
             decisions->emplace_back(obstacle->Id(), object_nudge);
             ignore = false;
@@ -372,7 +372,7 @@ bool DPRoadGraph::MakeDynamicObstcleDecision(
         // Follow
         ObjectDecisionType object_follow;
         ObjectFollow *object_follow_ptr = object_follow.mutable_follow();
-        object_follow_ptr->set_distance_s(FLAGS_dp_path_decision_buffer);
+        object_follow_ptr->set_distance_s(FLAGS_follow_min_distance);
         decisions->emplace_back(obstacle->Id(), object_follow);
         break;
       }
