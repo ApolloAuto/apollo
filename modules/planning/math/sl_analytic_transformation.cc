@@ -27,14 +27,14 @@
 namespace apollo {
 namespace planning {
 
-double SLAnalyticTransformation::calculate_theta(const double theta,
-                                                 const double kappa_ref,
-                                                 const double l,
-                                                 const double dl) {
+double SLAnalyticTransformation::CalculateTheta(const double theta,
+                                                const double kappa_ref,
+                                                const double l,
+                                                const double dl) {
   return theta + std::atan2(dl, 1 - l * kappa_ref);
 }
 
-double SLAnalyticTransformation::calculate_kappa(const double kappa_ref,
+double SLAnalyticTransformation::CalculateKappa(const double kappa_ref,
                                                  const double dkappa_ref,
                                                  const double l,
                                                  const double dl,
@@ -51,7 +51,7 @@ double SLAnalyticTransformation::calculate_kappa(const double kappa_ref,
   return numerator / denominator;
 }
 
-common::math::Vec2d SLAnalyticTransformation::calculate_xypoint(
+common::math::Vec2d SLAnalyticTransformation::CalculateXYPoint(
     const double theta, const common::math::Vec2d& point_ref, const double l) {
   double x = point_ref.x() - l * std::sin(theta);
   double y = point_ref.y() + l * std::cos(theta);
@@ -65,11 +65,10 @@ double SLAnalyticTransformation::CalculateLateralDerivative(
   return (1 - kappa_ref * l) * std::tan(theta - theta_ref);
 }
 
-double SLAnalyticTransformation::calculate_second_order_lateral_derivative(
+double SLAnalyticTransformation::CalculateSecondOrderLateralDerivative(
     const double theta_ref, const double theta, const double kappa_ref,
     const double kappa, const double dkappa_ref, const double l) {
-  const double dl =
-      CalculateLateralDerivative(theta_ref, theta, l, kappa_ref);
+  const double dl = CalculateLateralDerivative(theta_ref, theta, l, kappa_ref);
   const double theta_diff = theta - theta_ref;
   const double cos_theta_diff = std::cos(theta_diff);
   // TODO(fanhaoyang): add sanity check for invalid input

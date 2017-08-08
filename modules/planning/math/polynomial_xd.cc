@@ -33,13 +33,13 @@ PolynomialXd::PolynomialXd(const std::vector<double>& params)
 
 std::uint32_t PolynomialXd::order() const { return params_.size(); }
 
-void PolynomialXd::set_params(const std::vector<double>& params) {
+void PolynomialXd::SetParams(const std::vector<double>& params) {
   params_ = params;
 }
 
 const std::vector<double>& PolynomialXd::params() const { return params_; }
 
-void PolynomialXd::derived_from(const PolynomialXd& base) {
+void PolynomialXd::DerivedFrom(const PolynomialXd& base) {
   if (base.order() <= 1) {
     params_.clear();
   } else {
@@ -50,7 +50,7 @@ void PolynomialXd::derived_from(const PolynomialXd& base) {
   }
 }
 
-void PolynomialXd::integrated_from(const PolynomialXd& base) {
+void PolynomialXd::IntegratedFrom(const PolynomialXd& base) {
   params_.resize(base.order() + 1);
   params_[0] = 0.0;
   for (std::uint32_t i = 0; i < base.order(); ++i) {
@@ -58,7 +58,7 @@ void PolynomialXd::integrated_from(const PolynomialXd& base) {
   }
 }
 
-void PolynomialXd::integrated_from(const PolynomialXd& base,
+void PolynomialXd::IntegratedFrom(const PolynomialXd& base,
                                    const double intercept) {
   params_.resize(base.order() + 1);
   params_[0] = intercept;

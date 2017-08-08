@@ -37,7 +37,7 @@ AffineConstraint::AffineConstraint(const Eigen::MatrixXd& constraint_matrix,
   CHECK_EQ(constraint_boundary.rows(), constraint_matrix.rows());
 }
 
-void AffineConstraint::set_is_equality(const double is_equality) {
+void AffineConstraint::SetIsEquality(const double is_equality) {
   is_equality_ = is_equality;
 }
 
@@ -49,9 +49,7 @@ const Eigen::MatrixXd& AffineConstraint::constraint_boundary() const {
   return constraint_boundary_;
 }
 
-bool AffineConstraint::is_equality() const { return is_equality_; }
-
-bool AffineConstraint::add_constraint(
+bool AffineConstraint::AddConstraint(
     const Eigen::MatrixXd& constraint_matrix,
     const Eigen::MatrixXd& constraint_boundary) {
   if (constraint_matrix.rows() != constraint_boundary.rows()) {

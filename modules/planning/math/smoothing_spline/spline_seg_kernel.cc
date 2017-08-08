@@ -29,12 +29,12 @@ namespace planning {
 SplineSegKernel::SplineSegKernel() {
   reserved_order_ = 6;
   calculate_fx(reserved_order_);
-  calculate_derivative(reserved_order_);
-  calculate_second_order_derivative(reserved_order_);
-  calculate_third_order_derivative(reserved_order_);
+  CalculateDerivative(reserved_order_);
+  CalculateSecondOrderDerivative(reserved_order_);
+  CalculateThirdOrderDerivative(reserved_order_);
 }
 
-Eigen::MatrixXd SplineSegKernel::kernel_fx(const std::uint32_t order,
+Eigen::MatrixXd SplineSegKernel::Kernel(const std::uint32_t order,
                                            const double accumulated_x) {
   if (order > reserved_order_) {
     calculate_fx(order);
@@ -44,20 +44,20 @@ Eigen::MatrixXd SplineSegKernel::kernel_fx(const std::uint32_t order,
   return kernel_fx_.block(0, 0, order, order).cwiseProduct(term_matrix);
 }
 
-Eigen::MatrixXd SplineSegKernel::kernel_derivative(const std::uint32_t order,
+Eigen::MatrixXd SplineSegKernel::DerivativeKernel(const std::uint32_t order,
                                                    const double accumulated_x) {
   if (order > reserved_order_) {
-    calculate_derivative(order);
+    CalculateDerivative(order);
   }
   Eigen::MatrixXd term_matrix;
   integrated_term_matrix(order, accumulated_x, "derivative", &term_matrix);
   return kernel_derivative_.block(0, 0, order, order).cwiseProduct(term_matrix);
 }
 
-Eigen::MatrixXd SplineSegKernel::kernel_second_order_derivative(
+Eigen::MatrixXd SplineSegKernel::SecondOrderDerivativeKernel(
     const std::uint32_t order, const double accumulated_x) {
   if (order > reserved_order_) {
-    calculate_second_order_derivative(order);
+    CalculateSecondOrderDerivative(order);
   }
   Eigen::MatrixXd term_matrix;
   integrated_term_matrix(order, accumulated_x, "second_order", &term_matrix);
@@ -65,10 +65,10 @@ Eigen::MatrixXd SplineSegKernel::kernel_second_order_derivative(
       .cwiseProduct(term_matrix);
 }
 
-Eigen::MatrixXd SplineSegKernel::kernel_third_order_derivative(
+Eigen::MatrixXd SplineSegKernel::ThirdOrderDerivativeKernel(
     const std::uint32_t order, const double accumulated_x) {
   if (order > reserved_order_) {
-    calculate_third_order_derivative(order);
+    CalculateThirdOrderDerivative(order);
   }
   Eigen::MatrixXd term_matrix;
   integrated_term_matrix(order, accumulated_x, "third_order", &term_matrix);
@@ -134,7 +134,7 @@ void SplineSegKernel::calculate_fx(const std::uint32_t order) {
   }
 }
 
-void SplineSegKernel::calculate_derivative(const std::uint32_t order) {
+void SplineSegKernel::CalculateDerivative(const std::uint32_t order) {
   kernel_derivative_ = Eigen::MatrixXd::Zero(order, order);
   for (int r = 1; r < kernel_derivative_.rows(); ++r) {
     for (int c = 1; c < kernel_derivative_.cols(); ++c) {
@@ -143,7 +143,7 @@ void SplineSegKernel::calculate_derivative(const std::uint32_t order) {
   }
 }
 
-void SplineSegKernel::calculate_second_order_derivative(
+void SplineSegKernel::CalculateSecondOrderDerivative(
     const std::uint32_t order) {
   kernel_second_order_derivative_ = Eigen::MatrixXd::Zero(order, order);
   for (int r = 2; r < kernel_second_order_derivative_.rows(); ++r) {
@@ -154,7 +154,7 @@ void SplineSegKernel::calculate_second_order_derivative(
   }
 }
 
-void SplineSegKernel::calculate_third_order_derivative(
+void SplineSegKernel::CalculateThirdOrderDerivative(
     const std::uint32_t order) {
   kernel_third_order_derivative_ = Eigen::MatrixXd::Zero(order, order);
   for (int r = 3; r < kernel_third_order_derivative_.rows(); ++r) {

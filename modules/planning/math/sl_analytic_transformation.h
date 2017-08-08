@@ -42,12 +42,12 @@ namespace planning {
 class SLAnalyticTransformation {
  public:
   // given sl point extract x, y, theta, kappa
-  static double calculate_theta(const double theta_ref, const double kappa_ref,
-                                const double l, const double dl);
-  static double calculate_kappa(const double kappa_ref, const double dkappa_ref,
+  static double CalculateTheta(const double theta_ref, const double kappa_ref,
+                               const double l, const double dl);
+  static double CalculateKappa(const double kappa_ref, const double dkappa_ref,
                                 const double l, const double dl,
                                 const double ddl);
-  static common::math::Vec2d calculate_xypoint(
+  static common::math::Vec2d CalculateXYPoint(
       const double theta_ref, const common::math::Vec2d& point_ref,
       const double l);
   /**
@@ -57,11 +57,11 @@ class SLAnalyticTransformation {
    * scenarios in a frenet frame
    **/
   static double CalculateLateralDerivative(const double theta_ref,
-                                             const double theta, const double l,
-                                             const double kappa_ref);
+                                           const double theta, const double l,
+                                           const double kappa_ref);
 
   // given sl, theta, and road's theta, kappa, extract second order derivative
-  static double calculate_second_order_lateral_derivative(
+  static double CalculateSecondOrderLateralDerivative(
       const double theta_ref, const double theta, const double kappa_ref,
       const double kappa, const double dkappa_ref, const double l);
 };

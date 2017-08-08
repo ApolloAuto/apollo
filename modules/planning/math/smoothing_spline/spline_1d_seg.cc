@@ -28,46 +28,46 @@ namespace planning {
 
 Spline1dSeg::Spline1dSeg(const std::uint32_t order) {
   spline_func_ = PolynomialXd(order);
-  derivative_.derived_from(spline_func_);
-  second_order_derivative_.derived_from(derivative_);
-  third_order_derivative_.derived_from(second_order_derivative_);
+  derivative_.DerivedFrom(spline_func_);
+  second_order_derivative_.DerivedFrom(derivative_);
+  third_order_derivative_.DerivedFrom(second_order_derivative_);
 }
 
 Spline1dSeg::Spline1dSeg(const std::vector<double>& params) {
   spline_func_ = PolynomialXd(params);
-  derivative_.derived_from(spline_func_);
-  second_order_derivative_.derived_from(derivative_);
-  third_order_derivative_.derived_from(second_order_derivative_);
+  derivative_.DerivedFrom(spline_func_);
+  second_order_derivative_.DerivedFrom(derivative_);
+  third_order_derivative_.DerivedFrom(second_order_derivative_);
 }
 
-void Spline1dSeg::set_params(const std::vector<double>& params) {
+void Spline1dSeg::SetParams(const std::vector<double>& params) {
   spline_func_ = PolynomialXd(params);
-  derivative_.derived_from(spline_func_);
-  second_order_derivative_.derived_from(derivative_);
-  third_order_derivative_.derived_from(second_order_derivative_);
+  derivative_.DerivedFrom(spline_func_);
+  second_order_derivative_.DerivedFrom(derivative_);
+  third_order_derivative_.DerivedFrom(second_order_derivative_);
 }
 
 double Spline1dSeg::operator()(const double x) const { return spline_func_(x); }
 
-double Spline1dSeg::derivative(const double x) const { return derivative_(x); }
+double Spline1dSeg::Derivative(const double x) const { return derivative_(x); }
 
-double Spline1dSeg::second_order_derivative(const double x) const {
+double Spline1dSeg::SecondOrderDerivative(const double x) const {
   return second_order_derivative_(x);
 }
 
-double Spline1dSeg::third_order_derivative(const double x) const {
+double Spline1dSeg::ThirdOrderDerivative(const double x) const {
   return third_order_derivative_(x);
 }
 
 const PolynomialXd& Spline1dSeg::spline_func() const { return spline_func_; }
 
-const PolynomialXd& Spline1dSeg::derivative() const { return derivative_; }
+const PolynomialXd& Spline1dSeg::Derivative() const { return derivative_; }
 
-const PolynomialXd& Spline1dSeg::second_order_derivative() const {
+const PolynomialXd& Spline1dSeg::SecondOrderDerivative() const {
   return second_order_derivative_;
 }
 
-const PolynomialXd& Spline1dSeg::third_order_derivative() const {
+const PolynomialXd& Spline1dSeg::ThirdOrderDerivative() const {
   return third_order_derivative_;
 }
 

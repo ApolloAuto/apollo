@@ -39,7 +39,7 @@ class Double {
   static int Compare(const Double& d1, const Double& d2, const double epsilon);
   static int Compare(const Double& d1, const Double& d2);
 
-  static Double sqrt(const Double& d1);
+  static Double Sqrt(const Double& d1);
 
   int CompareTo(const double d1, const double epsilon) const;
   int CompareTo(const double d1) const;
@@ -66,10 +66,10 @@ class Double {
  private:
   double value_ = 0.0;
   static constexpr double kEpsilon_ = std::numeric_limits<double>::epsilon();
-  static bool approximately_equal(double a, double b, double epsilon);
-  static bool essentially_equal(double a, double b, double epsilon);
-  static bool definitely_greater_than(double a, double b, double epsilon);
-  static bool definitely_less_than(double a, double b, double epsilon);
+  static bool ApproximatelyEqual(double a, double b, double epsilon);
+  static bool EssentiallyEqual(double a, double b, double epsilon);
+  static bool DefinitelyGreaterThan(double a, double b, double epsilon);
+  static bool DefinitelyLessThan(double a, double b, double epsilon);
 };
 
 }  // namespace planning
