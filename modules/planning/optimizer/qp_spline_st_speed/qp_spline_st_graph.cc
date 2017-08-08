@@ -303,8 +303,7 @@ Status QpSplineStGraph::GetSConstraintByTime(
     const std::vector<StGraphBoundary>& boundaries, const double time,
     const double total_path_s, double* const s_upper_bound,
     double* const s_lower_bound) const {
-  *s_upper_bound =
-      std::min(total_path_s, time * qp_spline_st_speed_config_.max_speed());
+  *s_upper_bound = total_path_s;
 
   for (const StGraphBoundary& boundary : boundaries) {
     double s_upper = 0.0;
