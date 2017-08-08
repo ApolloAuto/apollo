@@ -197,7 +197,7 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
       } else {
         const STPoint& triple_pre_point =
             prepre_graph_point.pre_point()->point();
-        const STPoint& prepre_point = cost_table_[c - 3][r_prepre].point();
+        const STPoint& prepre_point = prepre_graph_point.point();
         const STPoint& pre_point = cost_table_[c - 1][r_pre].point();
         const STPoint& curr_point = cost_table_[c][r].point();
         double cost = cost_table_[c][r].obstacle_cost() +
