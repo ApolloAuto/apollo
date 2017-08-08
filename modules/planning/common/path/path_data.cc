@@ -49,6 +49,7 @@ bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
     return false;
   }
   DCHECK_EQ(discretized_path_.NumOfPoints(), frenet_path_.points().size());
+  path_data_history_.push_back(std::make_pair(discretized_path_, frenet_path_));
   return true;
 }
 
@@ -64,6 +65,7 @@ bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
     return false;
   }
   DCHECK_EQ(discretized_path_.NumOfPoints(), frenet_path_.points().size());
+  path_data_history_.push_back(std::make_pair(discretized_path_, frenet_path_));
   return true;
 }
 
