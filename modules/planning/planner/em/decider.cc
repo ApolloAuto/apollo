@@ -19,6 +19,7 @@
  **/
 
 #include "modules/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/planner/em/decider.h"
 
@@ -103,7 +104,9 @@ int Decider::MakeMainStopDecision(Frame* frame,
       reference_line.get_point_in_frenet_frame(
           {adc_position.x(), adc_position.y()},
           &adc_sl);
-      if (stop_line_s <= adc_sl.s()) {
+      const auto &vehicle_param =
+          common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      if (stop_line_s <= adc_sl.s() + vehicle_param.front_edge_to_center()) {
         AERROR << "object:" << obstacle->Id() << " fence route_s["
                << stop_line_s << "] behind adc route_s[" << adc_sl.s()
                << "]";
@@ -146,9 +149,7 @@ int Decider::SetObjectDecisions(PathDecision* const path_decision) {
 
     const auto& obstacle = path_obstacle->Obstacle();
     object_decision->set_id(obstacle->Id());
-    object_decision->set_type(ObjectDecision::PREDICTION);
     object_decision->set_perception_id(obstacle->PerceptionId());
-
     for (const auto& decision : path_obstacle->Decisions()) {
       object_decision->add_object_decision()->CopyFrom(decision);
     }
@@ -160,6 +161,7 @@ int Decider::MakeEStopDecision(PathDecision* const path_decision) {
   CHECK_NOTNULL(path_decision);
   decision_->Clear();
 
+  // main decision
   // TODO(all): to be added
   MainEmergencyStop* main_estop =
       decision_->mutable_main_decision()->mutable_estop();
@@ -167,13 +169,13 @@ int Decider::MakeEStopDecision(PathDecision* const path_decision) {
   main_estop->set_reason("estop reason to be added");
   main_estop->mutable_cruise_to_stop();
 
+  // set object decisions
   ObjectDecisions* object_decisions = decision_->mutable_object_decision();
   const auto& path_obstacles = path_decision->path_obstacles();
   for (const auto path_obstacle : path_obstacles.Items()) {
     auto* object_decision = object_decisions->add_decision();
     const auto& obstacle = path_obstacle->Obstacle();
     object_decision->set_id(obstacle->Id());
-    object_decision->set_type(ObjectDecision::PREDICTION);
     object_decision->set_perception_id(obstacle->PerceptionId());
     object_decision->add_object_decision()->mutable_avoid();
   }

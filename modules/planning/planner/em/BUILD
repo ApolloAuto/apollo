@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common:log",
         "//modules/common/status",
         "//modules/common/vehicle_state",
