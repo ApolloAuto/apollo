@@ -18,6 +18,8 @@
 #define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
 
 #include "Eigen/Core"
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
@@ -75,6 +77,10 @@ class LidarProcess {
   std::unique_ptr<BaseObjectBuilder> object_builder_;
   std::unique_ptr<BaseTracker> tracker_;
   pcl_util::PointIndicesPtr roi_indices_;
+
+  FRIEND_TEST(LidarProcessTest, test_Init);
+  FRIEND_TEST(LidarProcessTest, test_Process);
+  FRIEND_TEST(LidarProcessTest, test_GeneratePbMsg);
 };
 
 }  // namespace perception

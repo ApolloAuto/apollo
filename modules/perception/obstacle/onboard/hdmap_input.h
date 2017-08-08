@@ -18,6 +18,9 @@
 #define MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
 
 #include <mutex>
+
+#include "gtest/gtest_prod.h"
+
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/lib/base/singleton.h"
@@ -56,6 +59,9 @@ class HDMapInput {
   std::unique_ptr<apollo::hdmap::HDMap> hdmap_;
 
   DISALLOW_COPY_AND_ASSIGN(HDMapInput);
+
+  FRIEND_TEST(HDMapInputTest, test_Init);
+  FRIEND_TEST(HDMapInputTest, test_GetROI);
 };
 
 typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;

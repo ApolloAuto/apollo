@@ -22,6 +22,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
+        "@gtest//:gtest",
     ],
 )
 
