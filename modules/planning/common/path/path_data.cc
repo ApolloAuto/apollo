@@ -56,6 +56,10 @@ const FrenetFramePath &PathData::frenet_frame_path() const {
   return frenet_path_;
 }
 
+void PathData::set_reference_line(const ReferenceLine *reference_line) {
+  reference_line_ = reference_line;
+}
+
 bool PathData::get_path_point_with_path_s(
     const double s, common::PathPoint *const path_point) const {
   *path_point = discretized_path_.evaluate_linear_approximation(s);
@@ -63,14 +67,15 @@ bool PathData::get_path_point_with_path_s(
 }
 
 bool PathData::get_path_point_with_ref_s(
-    const ReferenceLine &reference_line, const double ref_s,
-    common::PathPoint *const path_point) const {
+    const double ref_s, common::PathPoint *const path_point) const {
+  DCHECK_NOTNULL(reference_line_);
+  DCHECK_NOTNULL(path_point);
   *path_point = discretized_path_.start_point();
   double shortest_distance = std::numeric_limits<double>::max();
   const double kDistanceEpsilon = 1e-3;
   for (const auto &curr_path_point : discretized_path_.points()) {
     SLPoint sl;
-    if (!reference_line.get_point_in_frenet_frame(
+    if (!reference_line_->get_point_in_frenet_frame(
             Vec2d(curr_path_point.x(), curr_path_point.y()), &sl)) {
       AERROR << "Fail to get point in frenet from.";
       return false;
@@ -92,6 +97,7 @@ bool PathData::get_path_point_with_ref_s(
 void PathData::Clear() {
   discretized_path_ = DiscretizedPath();
   frenet_path_ = FrenetFramePath();
+  reference_line_ = nullptr;
 }
 
 std::string PathData::DebugString() const {

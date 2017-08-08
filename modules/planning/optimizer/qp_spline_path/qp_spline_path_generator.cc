@@ -135,6 +135,7 @@ bool QpSplinePathGenerator::Generate(
     path_points.push_back(path_point);
     s += s_resolution;
   }
+  path_data->set_reference_line(&reference_line_);
   path_data->set_discretized_path(path_points);
   return true;
 }

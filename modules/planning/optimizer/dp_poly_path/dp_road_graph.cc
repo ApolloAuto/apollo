@@ -45,7 +45,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using IdDecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
-using ConstPathObstacleList = std::vector<const PathObstacle*>;
+using ConstPathObstacleList = std::vector<const PathObstacle *>;
 
 DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
                          const ReferenceLine &reference_line,
@@ -61,7 +61,8 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   if (!reference_line_.get_point_in_frenet_frame(
           {init_point_.path_point().x(), init_point_.path_point().y()},
           &init_sl_point_)) {
-    AERROR << "Fail to create init_sl_point from : " << init_point.DebugString();
+    AERROR << "Fail to create init_sl_point from : "
+           << init_point.DebugString();
     return false;
   }
   std::vector<DPRoadGraphNode> min_cost_path;
@@ -101,6 +102,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
     AERROR << "Failed to convert dp graph tunnel to PathData";
     return false;
   }
+  path_data->set_reference_line(&reference_line_);
   path_data->set_frenet_path(tunnel);
   path_data->set_discretized_path(discretized_path);
   return true;
@@ -293,8 +295,8 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
           object_stop_ptr->set_reason_code(
               StopReasonCode::STOP_REASON_OBSTACLE);
 
-          auto stop_ref_s = sl_boundary.start_s()
-              - FLAGS_stop_distance_obstacle;
+          auto stop_ref_s =
+              sl_boundary.start_s() - FLAGS_stop_distance_obstacle;
           auto stop_ref_point = reference_line_.get_reference_point(stop_ref_s);
           object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
           object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
