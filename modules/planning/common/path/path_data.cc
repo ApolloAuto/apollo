@@ -90,7 +90,8 @@ bool PathData::get_path_point_with_ref_s(
     const double ref_s, common::PathPoint *const path_point) const {
   DCHECK_NOTNULL(reference_line_);
   DCHECK_NOTNULL(path_point);
-  DCHECK_EQ(discretized_path_.points().size(), frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.path_points().size(),
+            frenet_path_.points().size());
   if (ref_s < 0) {
     AERROR << "ref_s[" << ref_s << "] should be > 0";
     return false;
@@ -105,7 +106,7 @@ bool PathData::get_path_point_with_ref_s(
   const double kDistanceEpsilon = 1e-3;
   for (uint32_t i = 0; i + 1 < frenet_path_.points().size(); ++i) {
     if (fabs(ref_s - frenet_path_.points().at(i).s()) < kDistanceEpsilon) {
-      path_point->CopyFrom(discretized_path_.points().at(i));
+      path_point->CopyFrom(discretized_path_.path_points().at(i));
       return true;
     }
     if (frenet_path_.points().at(i).s() < ref_s &&
@@ -119,11 +120,11 @@ bool PathData::get_path_point_with_ref_s(
               frenet_path_.points().at(index).s());
 
   const double discretized_path_s =
-      discretized_path_.path_point_at(index).s() +
-      r * (discretized_path_.path_point_at(index + 1).s() -
-           discretized_path_.path_point_at(index).s());
+      discretized_path_.path_points().at(index).s() +
+      r * (discretized_path_.path_points().at(index + 1).s() -
+           discretized_path_.path_points().at(index).s());
   path_point->CopyFrom(
-      discretized_path_.evaluate_linear_approximation(discretized_path_s));
+      discretized_path_.EvaluateUsingLinearApproximation(discretized_path_s));
 
   return true;
 }

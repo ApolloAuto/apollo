@@ -130,7 +130,7 @@ bool Spline1dKernel::add_reference_line_kernel_matrix(
     // update offset
     double offset_coef = -ref_x[i] * weight;
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
-      offset_(j + cur_index * spline_order_, 0) = offset_coef;
+      offset_(j + cur_index * spline_order_, 0) += offset_coef;
       offset_coef *= cur_rel_x;
     }
     // update kernel matrix
