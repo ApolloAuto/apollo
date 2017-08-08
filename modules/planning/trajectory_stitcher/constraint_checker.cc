@@ -79,9 +79,9 @@ bool ConstraintChecker::valid_trajectory(
     }
   }
 
-  for (std::size_t i = 1; i < trajectory.num_of_points(); ++i) {
-    const auto& p0 = trajectory.trajectory_point_at(i - 1);
-    const auto& p1 = trajectory.trajectory_point_at(i);
+  for (std::size_t i = 1; i < trajectory.NumOfPoints(); ++i) {
+    const auto& p0 = trajectory.TrajectoryPointAt(i - 1);
+    const auto& p1 = trajectory.TrajectoryPointAt(i);
     double t = p0.relative_time();
 
     double dt = p1.relative_time() - p0.relative_time();

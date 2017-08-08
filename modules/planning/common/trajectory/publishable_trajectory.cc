@@ -33,12 +33,12 @@ TrajectoryPoint PublishableTrajectory::evaluate_absolute_time(
 TrajectoryPoint
 PublishableTrajectory::evaluate_linear_approximation_absolute_time(
     const double abs_time) const {
-  return evaluate_linear_approximation(abs_time - _header_time);
+  return EvaluateUsingLinearApproximation(abs_time - _header_time);
 }
 
 std::uint32_t PublishableTrajectory::query_nearest_point_absolute_time(
     const double abs_time) const {
-  return query_nearest_point(abs_time - _header_time);
+  return QueryNearestPoint(abs_time - _header_time);
 }
 
 double PublishableTrajectory::header_time() const { return _header_time; }
