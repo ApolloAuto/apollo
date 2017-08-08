@@ -38,7 +38,7 @@ class PathDecision {
   PathDecision(const std::vector<const Obstacle *> &obstacles,
                const ReferenceLine &reference_line);
 
-  const IndexedPathObstacles &path_obstacles() const;
+  const IndexedList<std::string, PathObstacle> &path_obstacles() const;
 
   bool AddDecision(const std::string &tag, const std::string &object_id,
                    const ObjectDecisionType &decision);
@@ -50,7 +50,7 @@ class PathDecision {
 
  private:
   const ReferenceLine &reference_line_;
-  IndexedPathObstacles path_obstacles_;
+  IndexedList<std::string, PathObstacle> path_obstacles_;
 };
 
 }  // namespace planning

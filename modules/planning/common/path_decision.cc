@@ -25,6 +25,8 @@
 namespace apollo {
 namespace planning {
 
+using IndexedPathObstacles = IndexedList<std::string, PathObstacle>;
+
 PathDecision::PathDecision(const std::vector<const Obstacle *> &obstacles,
                            const ReferenceLine &reference_line)
     : reference_line_(reference_line) {
