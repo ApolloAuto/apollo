@@ -43,7 +43,7 @@ class QpSplinePathGenerator {
   QpSplinePathGenerator(const ReferenceLine& reference_line,
                         const QpSplinePathConfig& qp_spline_path_config);
 
-  bool Generate(const ConstPathObstacleList& obstacles,
+  bool Generate(const std::vector<const PathObstacle*>& obstacles,
                 const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,
                 PathData* const path_data);

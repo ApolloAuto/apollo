@@ -31,6 +31,7 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using IdDecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
 
 DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
     : PathOptimizer(name) {}
