@@ -126,7 +126,7 @@ bool Spline2d::set_splines(const Eigen::MatrixXd& params,
       spline_piece_x[j] = params(2 * i * order + j, 0);
       spline_piece_y[j] = params((2 * i + 1) * order + j, 0);
     }
-    splines_[i].set_params(spline_piece_x, spline_piece_y);
+    splines_[i].SetParams(spline_piece_x, spline_piece_y);
   }
   spline_order_ = order;
   return true;

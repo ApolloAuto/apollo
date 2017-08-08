@@ -98,7 +98,7 @@ bool QpSplinePathGenerator::Generate(
   double start_l = spline(init_frenet_point_.s());
   ReferencePoint ref_point =
       reference_line_.get_reference_point(init_frenet_point_.s());
-  common::math::Vec2d xy_point = SLAnalyticTransformation::calculate_xypoint(
+  common::math::Vec2d xy_point = SLAnalyticTransformation::CalculateXYPoint(
       ref_point.heading(), common::math::Vec2d(ref_point.x(), ref_point.y()),
       start_l);
 
@@ -110,17 +110,17 @@ bool QpSplinePathGenerator::Generate(
       (end_s - init_frenet_point_.s()) / qp_spline_path_config_.num_output();
   while (Double::Compare(s, end_s) < 0) {
     double l = spline(s);
-    double dl = spline.derivative(s);
-    double ddl = spline.second_order_derivative(s);
+    double dl = spline.Derivative(s);
+    double ddl = spline.SecondOrderDerivative(s);
     ReferencePoint ref_point = reference_line_.get_reference_point(s);
-    common::math::Vec2d xy_point = SLAnalyticTransformation::calculate_xypoint(
+    common::math::Vec2d xy_point = SLAnalyticTransformation::CalculateXYPoint(
         ref_point.heading(), common::math::Vec2d(ref_point.x(), ref_point.y()),
         l);
     xy_point.set_x(xy_point.x() - x_diff);
     xy_point.set_y(xy_point.y() - y_diff);
-    double theta = SLAnalyticTransformation::calculate_theta(
+    double theta = SLAnalyticTransformation::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), l, dl);
-    double kappa = SLAnalyticTransformation::calculate_kappa(
+    double kappa = SLAnalyticTransformation::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), l, dl, ddl);
     common::PathPoint path_point = common::util::MakePathPoint(
         xy_point.x(), xy_point.y(), 0.0, theta, kappa, 0.0, 0.0);
@@ -165,7 +165,7 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
   const double dl = SLAnalyticTransformation::CalculateLateralDerivative(
       theta_ref, theta, l, kappa_ref);
   const double ddl =
-      SLAnalyticTransformation::calculate_second_order_lateral_derivative(
+      SLAnalyticTransformation::CalculateSecondOrderLateralDerivative(
           theta_ref, theta, kappa_ref, kappa, dkappa_ref, l);
   frenet_frame_point->set_dl(dl);
   frenet_frame_point->set_ddl(ddl);
@@ -241,18 +241,18 @@ bool QpSplinePathGenerator::AddConstraint(
       spline_generator_->mutable_spline_constraint();
 
   // add init status constraint
-  spline_constraint->add_point_fx_constraint(init_frenet_point_.s(),
+  spline_constraint->AddPointConstraint(init_frenet_point_.s(),
                                              init_frenet_point_.l());
-  spline_constraint->add_point_derivative_constraint(init_frenet_point_.s(),
+  spline_constraint->AddPointDerivativeConstraint(init_frenet_point_.s(),
                                                      init_frenet_point_.dl());
-  spline_constraint->add_point_second_derivative_constraint(
+  spline_constraint->AddPointSecondDerivativeConstraint(
       init_frenet_point_.s(), init_frenet_point_.ddl());
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint
-  spline_constraint->add_point_fx_constraint(knots_.back(), 0.0);
-  spline_constraint->add_point_derivative_constraint(knots_.back(), 0.0);
-  spline_constraint->add_point_second_derivative_constraint(knots_.back(), 0.0);
+  spline_constraint->AddPointConstraint(knots_.back(), 0.0);
+  spline_constraint->AddPointDerivativeConstraint(knots_.back(), 0.0);
+  spline_constraint->AddPointSecondDerivativeConstraint(knots_.back(), 0.0);
 
   // add map bound constraint
   std::vector<double> boundary_low;
@@ -263,14 +263,14 @@ bool QpSplinePathGenerator::AddConstraint(
     boundary_low.push_back(boundary.first);
     boundary_high.push_back(boundary.second);
   }
-  if (!spline_constraint->add_fx_boundary(evaluated_s_, boundary_low,
+  if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low,
                                           boundary_high)) {
     AERROR << "Add boundary constraint failed";
     return false;
   }
 
   // add spline joint third derivative constraint
-  if (!spline_constraint->add_third_derivative_smooth_constraint()) {
+  if (!spline_constraint->AddThirdDerivativeSmoothConstraint()) {
     AERROR << "Add spline joint third derivative constraint failed!";
     return false;
   }

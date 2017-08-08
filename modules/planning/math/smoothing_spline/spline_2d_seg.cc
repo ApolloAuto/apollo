@@ -26,26 +26,26 @@ namespace apollo {
 namespace planning {
 Spline2dSeg::Spline2dSeg(const std::uint32_t order)
     : spline_func_x_(order), spline_func_y_(order) {
-  derivative_x_.derived_from(spline_func_x_);
-  derivative_y_.derived_from(spline_func_y_);
-  second_derivative_x_.derived_from(derivative_x_);
-  second_derivative_y_.derived_from(derivative_y_);
-  third_derivative_x_.derived_from(second_derivative_x_);
-  third_derivative_y_.derived_from(second_derivative_y_);
+  derivative_x_.DerivedFrom(spline_func_x_);
+  derivative_y_.DerivedFrom(spline_func_y_);
+  second_derivative_x_.DerivedFrom(derivative_x_);
+  second_derivative_y_.DerivedFrom(derivative_y_);
+  third_derivative_x_.DerivedFrom(second_derivative_x_);
+  third_derivative_y_.DerivedFrom(second_derivative_y_);
 }
 
 Spline2dSeg::Spline2dSeg(const std::vector<double>& x_param,
                          const std::vector<double>& y_param)
     : spline_func_x_(x_param), spline_func_y_(y_param) {
-  derivative_x_.derived_from(spline_func_x_);
-  derivative_y_.derived_from(spline_func_y_);
-  second_derivative_x_.derived_from(derivative_x_);
-  second_derivative_y_.derived_from(derivative_y_);
-  third_derivative_x_.derived_from(second_derivative_x_);
-  third_derivative_y_.derived_from(second_derivative_y_);
+  derivative_x_.DerivedFrom(spline_func_x_);
+  derivative_y_.DerivedFrom(spline_func_y_);
+  second_derivative_x_.DerivedFrom(derivative_x_);
+  second_derivative_y_.DerivedFrom(derivative_y_);
+  third_derivative_x_.DerivedFrom(second_derivative_x_);
+  third_derivative_y_.DerivedFrom(second_derivative_y_);
 }
 
-bool Spline2dSeg::set_params(const std::vector<double>& x_param,
+bool Spline2dSeg::SetParams(const std::vector<double>& x_param,
                              const std::vector<double>& y_param) {
   if (x_param.size() != y_param.size()) {
     return false;
@@ -53,12 +53,12 @@ bool Spline2dSeg::set_params(const std::vector<double>& x_param,
 
   spline_func_x_ = PolynomialXd(x_param);
   spline_func_y_ = PolynomialXd(y_param);
-  derivative_x_.derived_from(spline_func_x_);
-  derivative_y_.derived_from(spline_func_y_);
-  second_derivative_x_.derived_from(derivative_x_);
-  second_derivative_y_.derived_from(derivative_y_);
-  third_derivative_x_.derived_from(second_derivative_x_);
-  third_derivative_y_.derived_from(second_derivative_y_);
+  derivative_x_.DerivedFrom(spline_func_x_);
+  derivative_y_.DerivedFrom(spline_func_y_);
+  second_derivative_x_.DerivedFrom(derivative_x_);
+  second_derivative_y_.DerivedFrom(derivative_y_);
+  third_derivative_x_.DerivedFrom(second_derivative_x_);
+  third_derivative_y_.DerivedFrom(second_derivative_y_);
   return true;
 }
 

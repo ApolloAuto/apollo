@@ -37,16 +37,16 @@ class Spline1dSeg {
   explicit Spline1dSeg(const std::vector<double>& params);
   ~Spline1dSeg() = default;
 
-  void set_params(const std::vector<double>& params);
+  void SetParams(const std::vector<double>& params);
   double operator()(const double x) const;
-  double derivative(const double x) const;
-  double second_order_derivative(const double x) const;
-  double third_order_derivative(const double x) const;
+  double Derivative(const double x) const;
+  double SecondOrderDerivative(const double x) const;
+  double ThirdOrderDerivative(const double x) const;
 
   const PolynomialXd& spline_func() const;
-  const PolynomialXd& derivative() const;
-  const PolynomialXd& second_order_derivative() const;
-  const PolynomialXd& third_order_derivative() const;
+  const PolynomialXd& Derivative() const;
+  const PolynomialXd& SecondOrderDerivative() const;
+  const PolynomialXd& ThirdOrderDerivative() const;
 
  private:
   PolynomialXd spline_func_;

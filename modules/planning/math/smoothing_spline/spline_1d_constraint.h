@@ -40,10 +40,10 @@ class Spline1dConstraint {
                      const std::uint32_t order);
 
   // direct methods
-  bool add_inequality_constraint(const Eigen::MatrixXd& constraint_matrix,
-                                 const Eigen::MatrixXd& constraint_boundary);
-  bool add_equality_constraint(const Eigen::MatrixXd& constraint_matrix,
+  bool AddInequalityConstraint(const Eigen::MatrixXd& constraint_matrix,
                                const Eigen::MatrixXd& constraint_boundary);
+  bool AddEqualityConstraint(const Eigen::MatrixXd& constraint_matrix,
+                             const Eigen::MatrixXd& constraint_boundary);
 
   // preset method
   /**
@@ -51,45 +51,43 @@ class Spline1dConstraint {
   *   if no boundary, do specify either by std::infinity or let vector.size() =
   *0
   **/
-  bool add_fx_boundary(const std::vector<double>& x_coord,
-                       const std::vector<double>& lower_bound,
-                       const std::vector<double>& upper_bound);
+  bool AddBoundary(const std::vector<double>& x_coord,
+                   const std::vector<double>& lower_bound,
+                   const std::vector<double>& upper_bound);
 
-  bool add_derivative_boundary(const std::vector<double>& x_coord,
-                               const std::vector<double>& lower_bound,
-                               const std::vector<double>& upper_bound);
+  bool AddDerivativeBoundary(const std::vector<double>& x_coord,
+                             const std::vector<double>& lower_bound,
+                             const std::vector<double>& upper_bound);
 
-  bool add_second_derivative_boundary(const std::vector<double>& x_coord,
-                                      const std::vector<double>& lower_bound,
-                                      const std::vector<double>& upper_bound);
+  bool AddSecondDerivativeBoundary(const std::vector<double>& x_coord,
+                                   const std::vector<double>& lower_bound,
+                                   const std::vector<double>& upper_bound);
 
-  bool add_third_derivative_boundary(const std::vector<double>& x_coord,
-                                     const std::vector<double>& lower_bound,
-                                     const std::vector<double>& upper_bound);
+  bool AddThirdDerivativeBoundary(const std::vector<double>& x_coord,
+                                  const std::vector<double>& lower_bound,
+                                  const std::vector<double>& upper_bound);
 
   /**
   *   @brief: equality constraint to guarantee joint smoothness
   **/
   // boundary equality constriant
   // constraint on fx, dfx, ddfx ... in vector form; upto third order
-  bool add_point_fx_constraint(const double x, const double fx);
-  bool add_point_derivative_constraint(const double x, const double dfx);
-  bool add_point_second_derivative_constraint(const double x,
-                                              const double ddfx);
-  bool add_point_third_derivative_constraint(const double x,
-                                             const double dddfx);
+  bool AddPointConstraint(const double x, const double fx);
+  bool AddPointDerivativeConstraint(const double x, const double dfx);
+  bool AddPointSecondDerivativeConstraint(const double x, const double ddfx);
+  bool AddPointThirdDerivativeConstraint(const double x, const double dddfx);
 
   // guarantee upto values are joint
-  bool add_fx_smooth_constraint();
+  bool AddSmoothConstraint();
 
   // guarantee upto derivative are joint
-  bool add_derivative_smooth_constraint();
+  bool AddDerivativeSmoothConstraint();
 
   // guarantee upto second order derivative are joint
-  bool add_second_derivative_smooth_constraint();
+  bool AddSecondDerivativeSmoothConstraint();
 
   // guarantee upto third order derivative are joint
-  bool add_third_derivative_smooth_constraint();
+  bool AddThirdDerivativeSmoothConstraint();
 
   /**
   *   @brief: Add monotone constraint inequality, guarantee the monotone city at
@@ -97,11 +95,10 @@ class Spline1dConstraint {
   **/
 
   // customized monotone inequality constraint at x_coord
-  bool add_monotone_fx_inequality_constraint(
-      const std::vector<double>& x_coord);
+  bool AddMonotoneInequalityConstraint(const std::vector<double>& x_coord);
 
   // default inequality constraint at knots
-  bool add_monotone_fx_inequality_constraint_at_knots();
+  bool AddMonotoneInequalityConstraintAtKnots();
 
   /**
   *   @brief: output interface inequality constraint
@@ -110,17 +107,17 @@ class Spline1dConstraint {
   const AffineConstraint& equality_constraint() const;
 
  private:
-  std::uint32_t find_index(const double x) const;
+  std::uint32_t FindIndex(const double x) const;
 
-  bool filter_constraints(const std::vector<double>& x_coord,
-                          const std::vector<double>& lower_bound,
-                          const std::vector<double>& upper_bound,
-                          std::vector<double>* const filtered_lower_bound_x,
-                          std::vector<double>* const filtered_lower_bound,
-                          std::vector<double>* const filtered_upper_bound_x,
-                          std::vector<double>* const filtered_upper_bound);
-  void generate_power_x(const double x, const std::uint32_t order,
-                        std::vector<double>* const power_x) const;
+  bool FilterConstraints(const std::vector<double>& x_coord,
+                         const std::vector<double>& lower_bound,
+                         const std::vector<double>& upper_bound,
+                         std::vector<double>* const filtered_lower_bound_x,
+                         std::vector<double>* const filtered_lower_bound,
+                         std::vector<double>* const filtered_upper_bound_x,
+                         std::vector<double>* const filtered_upper_bound);
+  void GeneratePowerX(const double x, const std::uint32_t order,
+                      std::vector<double>* const power_x) const;
 
  private:
   AffineConstraint inequality_constraint_;

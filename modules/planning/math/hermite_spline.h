@@ -38,7 +38,6 @@ class HermiteSpline {
 
   virtual T Evaluate(const std::uint32_t order, const double z) const;
 
-  // virtual std::array<T, N> Evaluate(const double z) const;
  private:
   std::array<T, (N + 1) / 2> _x0;
 

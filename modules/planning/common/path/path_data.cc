@@ -163,10 +163,10 @@ bool PathData::FrenetToCartesian(const FrenetFramePath &frenet_path,
     }
     ReferencePoint ref_point =
         reference_line_->get_reference_point(frenet_point.s());
-    double theta = SLAnalyticTransformation::calculate_theta(
+    double theta = SLAnalyticTransformation::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), frenet_point.l(),
         frenet_point.dl());
-    double kappa = SLAnalyticTransformation::calculate_kappa(
+    double kappa = SLAnalyticTransformation::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), frenet_point.l(),
         frenet_point.dl(), frenet_point.ddl());
 

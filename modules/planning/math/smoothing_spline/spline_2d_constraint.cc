@@ -31,23 +31,23 @@ using apollo::common::math::Vec2d;
 Spline2dConstraint::Spline2dConstraint(const std::vector<double>& t_knots,
                                        const std::uint32_t order)
     : t_knots_(t_knots), spline_order_(order) {
-  inequality_constraint_.set_is_equality(false);
-  equality_constraint_.set_is_equality(true);
+  inequality_constraint_.SetIsEquality(false);
+  equality_constraint_.SetIsEquality(true);
   total_param_ = 2 * spline_order_ * (t_knots.size() - 1);
 }
 
 // direct method
-bool Spline2dConstraint::add_inequality_constraint(
+bool Spline2dConstraint::AddInequalityConstraint(
     const Eigen::MatrixXd& constraint_matrix,
     const Eigen::MatrixXd& constraint_boundary) {
-  return inequality_constraint_.add_constraint(constraint_matrix,
+  return inequality_constraint_.AddConstraint(constraint_matrix,
                                                constraint_boundary);
 }
 
-bool Spline2dConstraint::add_equality_constraint(
+bool Spline2dConstraint::AddEqualityConstraint(
     const Eigen::MatrixXd& constraint_matrix,
     const Eigen::MatrixXd& constraint_boundary) {
-  return equality_constraint_.add_constraint(constraint_matrix,
+  return equality_constraint_.AddConstraint(constraint_matrix,
                                              constraint_boundary);
 }
 
@@ -94,7 +94,7 @@ bool Spline2dConstraint::add_2d_boundary(
     affine_boundary(4 * i + 2, 0) = d_lateral - lateral_bound[i];
     affine_boundary(4 * i + 3, 0) = -d_lateral - lateral_bound[i];
   }
-  return add_inequality_constraint(affine_inequality, affine_boundary);
+  return AddInequalityConstraint(affine_inequality, affine_boundary);
 }
 
 bool Spline2dConstraint::add_2d_derivative_boundary(
@@ -136,7 +136,7 @@ bool Spline2dConstraint::add_2d_derivative_boundary(
     affine_boundary(4 * i + 2, 0) = d_lateral - lateral_bound[i];
     affine_boundary(4 * i + 3, 0) = -d_lateral - lateral_bound[i];
   }
-  return add_inequality_constraint(affine_inequality, affine_boundary);
+  return AddInequalityConstraint(affine_inequality, affine_boundary);
 }
 
 bool Spline2dConstraint::add_2d_second_derivative_boundary(
@@ -179,7 +179,7 @@ bool Spline2dConstraint::add_2d_second_derivative_boundary(
     affine_boundary(4 * i + 2, 0) = d_lateral - lateral_bound[i];
     affine_boundary(4 * i + 3, 0) = -d_lateral - lateral_bound[i];
   }
-  return add_inequality_constraint(affine_inequality, affine_boundary);
+  return AddInequalityConstraint(affine_inequality, affine_boundary);
 }
 
 bool Spline2dConstraint::add_2d_third_derivative_boundary(
@@ -222,7 +222,7 @@ bool Spline2dConstraint::add_2d_third_derivative_boundary(
     affine_boundary(4 * i + 2, 0) = d_lateral - lateral_bound[i];
     affine_boundary(4 * i + 3, 0) = -d_lateral - lateral_bound[i];
   }
-  return add_inequality_constraint(affine_inequality, affine_boundary);
+  return AddInequalityConstraint(affine_inequality, affine_boundary);
 }
 
 bool Spline2dConstraint::add_point_constraint(const double t, const double x,
@@ -239,7 +239,7 @@ bool Spline2dConstraint::add_point_constraint(const double t, const double x,
     affine_equality(0, i + index_offset) = power_t[i];
     affine_equality(1, i + spline_order_ + index_offset) = power_t[i];
   }
-  return add_equality_constraint(affine_equality, affine_boundary);
+  return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
 bool Spline2dConstraint::add_point_angle_constraint(const double t,
@@ -281,15 +281,15 @@ bool Spline2dConstraint::add_point_angle_constraint(const double t,
     affine_inequality(0, i + index_offset) = t_coef[i] * x_sign;
     affine_inequality(1, i + index_offset + spline_order_) = t_coef[i] * y_sign;
   }
-  if (!add_equality_constraint(affine_equality, affine_boundary)) {
+  if (!AddEqualityConstraint(affine_equality, affine_boundary)) {
     return false;
   }
-  return add_inequality_constraint(affine_inequality,
+  return AddInequalityConstraint(affine_inequality,
                                    affine_inequality_boundary);
 }
 
 // guarantee upto values are joint
-bool Spline2dConstraint::add_fx_smooth_constraint() {
+bool Spline2dConstraint::AddSmoothConstraint() {
   if (t_knots_.size() < 3) {
     return false;
   }
@@ -309,11 +309,11 @@ bool Spline2dConstraint::add_fx_smooth_constraint() {
     affine_equality(2 * i, index_offset + 2 * spline_order_) = -1.0;
     affine_equality(2 * i + 1, index_offset + 3 * spline_order_) = -1.0;
   }
-  return add_equality_constraint(affine_equality, affine_boundary);
+  return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
 // guarantee upto derivative are joint
-bool Spline2dConstraint::add_derivative_smooth_constraint() {
+bool Spline2dConstraint::AddDerivativeSmoothConstraint() {
   if (t_knots_.size() < 3) {
     return false;
   }
@@ -339,11 +339,11 @@ bool Spline2dConstraint::add_derivative_smooth_constraint() {
     affine_equality(4 * i + 2, index_offset + 3 * spline_order_) = -1.0;
     affine_equality(4 * i + 3, index_offset + 3 * spline_order_ + 1) = -1.0;
   }
-  return add_equality_constraint(affine_equality, affine_boundary);
+  return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
 // guarantee upto second order derivative are joint
-bool Spline2dConstraint::add_second_derivative_smooth_constraint() {
+bool Spline2dConstraint::AddSecondDerivativeSmoothConstraint() {
   if (t_knots_.size() < 3) {
     return false;
   }
@@ -375,11 +375,11 @@ bool Spline2dConstraint::add_second_derivative_smooth_constraint() {
     affine_equality(6 * i + 4, index_offset + 3 * spline_order_ + 1) = -1.0;
     affine_equality(6 * i + 5, index_offset + 3 * spline_order_ + 2) = -2.0;
   }
-  return add_equality_constraint(affine_equality, affine_boundary);
+  return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
 // guarantee upto third order derivative are joint
-bool Spline2dConstraint::add_third_derivative_smooth_constraint() {
+bool Spline2dConstraint::AddThirdDerivativeSmoothConstraint() {
   if (t_knots_.size() < 3) {
     return false;
   }
@@ -417,7 +417,7 @@ bool Spline2dConstraint::add_third_derivative_smooth_constraint() {
     affine_equality(8 * i + 6, index_offset + 3 * spline_order_ + 2) = -2.0;
     affine_equality(8 * i + 7, index_offset + 3 * spline_order_ + 3) = -6.0;
   }
-  return add_equality_constraint(affine_equality, affine_boundary);
+  return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
 /**
