@@ -43,9 +43,9 @@ if [ -e /dev/can0 ]; then
 fi
 
 #setup big data
-cp -r /root/modules_data/* /apollo/modules/
+cp -r /home/tmp/modules_data/* /apollo/modules/
 chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
 #setup internal configuration
-cp -r /root/esd_can/include /apollo/third_party/can_card_library/esd_can
-cp -r /root/esd_can/lib /apollo/third_party/can_card_library/esd_can
+cp -r /home/tmp/esd_can/include /apollo/third_party/can_card_library/esd_can
+cp -r /home/tmp/esd_can/lib /apollo/third_party/can_card_library/esd_can
 chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/third_party/can_card_library/esd_can"
