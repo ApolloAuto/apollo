@@ -23,7 +23,7 @@
 namespace apollo {
 namespace planning {
 
-using TrajectoryPoint = apollo::common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 StGraphData::StGraphData(
     const std::vector<StGraphBoundary>& st_graph_boundaries,

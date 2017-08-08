@@ -89,7 +89,7 @@ TEST_F(QpSplinePathOptimizerTest, Process) {
   frame->SetPlanningStartPoint(init_point);
 
   PlanningData* planning_data = frame->mutable_planning_data();
-  EXPECT_EQ(planning_data->path_data().discretized_path().points().size(), 0);
+  EXPECT_EQ(planning_data->path_data().discretized_path().path_points().size(), 0);
 
   QpSplinePathConfig qp_spline_path_config;
   EXPECT_TRUE(common::util::GetProtoFromFile(
@@ -112,13 +112,13 @@ TEST_F(QpSplinePathOptimizerTest, Process) {
   }
 
   EXPECT_EQ(qp_path_ground_truth.path_point().size(), 101);
-  EXPECT_EQ(planning_data->path_data().discretized_path().points().size(), 101);
+  EXPECT_EQ(planning_data->path_data().discretized_path().path_points().size(), 101);
 
   for (std::int32_t i = 0; i < qp_path_ground_truth.path_point().size(); i++) {
     common::PathPoint ground_truth_point =
         qp_path_ground_truth.path_point().Get(i);
     common::PathPoint computed_point = planning_data
-        ->path_data().discretized_path().points()[i];
+        ->path_data().discretized_path().path_points()[i];
     EXPECT_NEAR(ground_truth_point.x(), computed_point.x(), 1.0e-3);
     EXPECT_NEAR(ground_truth_point.y(), computed_point.y(), 1.0e-3);
     EXPECT_NEAR(ground_truth_point.kappa(), computed_point.kappa(), 1.0e-3);

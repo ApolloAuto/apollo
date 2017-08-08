@@ -97,7 +97,7 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
   DCHECK(OptimizerType_Parse(name, &type));
   if (type == DP_POLY_PATH_OPTIMIZER || type == QP_SPLINE_PATH_OPTIMIZER) {
     const auto& path_points =
-        planning_data->path_data().discretized_path().points();
+        planning_data->path_data().discretized_path().path_points();
     auto ptr_optimized_path = ptr_debug->mutable_planning_data()->add_path();
     ptr_optimized_path->set_name(name);
     ptr_optimized_path->mutable_path_point()->CopyFrom(
