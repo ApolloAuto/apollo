@@ -238,7 +238,6 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
 
   for (int j = 0; j < trajectory.trajectory_point_size(); ++j) {
     const auto& trajectory_point = trajectory.trajectory_point(j);
-    // TODO(all): fix trajectory point relative time issue.
     double trajectory_point_time = trajectory_point.relative_time();
     const Box2d obs_box = obstacle->GetBoundingBox(trajectory_point);
     int64_t low = 0;
