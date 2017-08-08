@@ -19,10 +19,12 @@
  **/
 #include "modules/planning/common/path/frenet_frame_path.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "modules/common/log.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/math/linear_interpolation.h"
 
 namespace apollo {
 namespace planning {
@@ -62,9 +64,31 @@ common::FrenetFramePoint &FrenetFramePath::PointAt(const std::uint32_t index) {
   return points_[index];
 }
 
-// TODO: implement interpolate
-const common::FrenetFramePoint &FrenetFramePath::Interpolate(double s) const {
-  return points_.front();
+common::FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
+  CHECK(points_.size() > 1);
+  CHECK( s < points_.back().s() + 1.0e-6 && s > points_.front().s() - 1.0e-6);
+  auto func = [](const common::FrenetFramePoint& p, const double s) {
+    return p.s() < s;
+  };
+
+  auto it_lower = std::lower_bound(points_.begin(), points_.end(), s, func);
+  if (it_lower == points_.begin()) {
+    return points_.front();
+  } else if (it_lower == points_.end()) {
+    return points_.back();
+  }
+  const auto& p0 = *(it_lower - 1);
+  const auto s0 = p0.s();
+  const auto& p1 = *it_lower;
+  const auto s1 = p1.s();
+
+  common::FrenetFramePoint p;
+  p.set_s(s);
+  p.set_l(common::math::lerp(p0.l(), s0, p1.l(), s1, s));
+  p.set_dl(common::math::lerp(p0.dl(), s0, p1.dl(), s1, s));
+  p.set_ddl(common::math::lerp(p0.ddl(), s0, p1.ddl(), s1, s));
+  return p;
+
 }
 
 void FrenetFramePath::Clear() {
