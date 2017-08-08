@@ -38,7 +38,7 @@ class PathData {
 
   void set_discretized_path(const std::vector<common::PathPoint> &path_points);
 
-  void set_frenet_path(const FrenetFramePath &frenet_path);
+  bool set_frenet_path(const FrenetFramePath &frenet_path);
 
   void set_reference_line(const ReferenceLine *reference_line);
 
@@ -61,6 +61,13 @@ class PathData {
   std::string DebugString() const;
 
  private:
+  /*
+   * convert frenet path to cartesian path by reference line
+   */
+  bool FrenetToCartesian(const FrenetFramePath &frenet_path,
+                         DiscretizedPath *const discretized_path);
+  bool CartesianToFrenet(const DiscretizedPath &discretized_path,
+                         FrenetFramePath *const frenet_path);
   const ReferenceLine *reference_line_ = nullptr;
   DiscretizedPath discretized_path_;
   FrenetFramePath frenet_path_;

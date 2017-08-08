@@ -68,4 +68,4 @@ class DiscretizedPath {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_COMMON_PATH_PATH_H_ */
+#endif  // MODULES_PLANNING_COMMON_PATH_PATH_H_
