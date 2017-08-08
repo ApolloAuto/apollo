@@ -101,8 +101,9 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   preview_window_ = control_conf->lat_controller_conf().preview_window();
   wheelbase_ = vehicle_param_.wheel_base();
   steer_transmission_ratio_ = vehicle_param_.steer_ratio();
-  steer_single_direction_max_degree_ = vehicle_param_.max_steer_angle() / M_PI * 180;
-        max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
+  steer_single_direction_max_degree_ =
+      vehicle_param_.max_steer_angle() / M_PI * 180;
+  max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
 
   double mass_fl = control_conf->lat_controller_conf().mass_fl();
   double mass_fr = control_conf->lat_controller_conf().mass_fr();
@@ -281,14 +282,13 @@ Status LatController::ComputeControlCommand(
 
   // Add gain sheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
-
-      matrix_q_updated_(0, 0) = matrix_q_(0, 0)
- *
-          lat_err_interpolation_->Interpolate(VehicleState::instance()->linear_velocity());
-      matrix_q_updated_(2, 2) = matrix_q_(2, 2)
-*
-          heading_err_interpolation_->Interpolate(VehicleState::instance()->linear_velocity());
-}
+    matrix_q_updated_(0, 0) = matrix_q_(0, 0) *
+                              lat_err_interpolation_->Interpolate(
+                                  VehicleState::instance()->linear_velocity());
+    matrix_q_updated_(2, 2) = matrix_q_(2, 2) *
+                              heading_err_interpolation_->Interpolate(
+                                  VehicleState::instance()->linear_velocity());
+  }
 
   common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_, matrix_r_,
                                 lqr_eps_, lqr_max_iteration_, &matrix_k_);
@@ -426,12 +426,14 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
                        trajectory_analyzer_, debug);
 
   // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+  if (VehicleState::instance()->gear() ==
+      ::apollo::canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 
   // Reverse heading error if vehicle is going in reverse
-  if (VehicleState::instance()->gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+  if (VehicleState::instance()->gear() ==
+      ::apollo::canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 
