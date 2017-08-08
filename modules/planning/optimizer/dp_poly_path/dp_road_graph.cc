@@ -116,7 +116,7 @@ bool DPRoadGraph::FrenetToCartesian(const FrenetFramePath &frenet_path,
     common::math::Vec2d cartesian_point;
     sl_point.set_s(frenet_point.s());
     sl_point.set_l(frenet_point.l());
-    if (!reference_line_.get_point_in_Cartesian_frame(sl_point,
+    if (!reference_line_.get_point_in_cartesian_frame(sl_point,
                                                       &cartesian_point)) {
       AERROR << "Fail to convert sl point to xy point";
       return false;
@@ -414,7 +414,7 @@ bool DPRoadGraph::ComputeBoundingBoxesForAdc(
     common::SLPoint sl_point;
     sl_point.set_s(s);
     sl_point.set_l(l);
-    reference_line_.get_point_in_Cartesian_frame(sl_point,
+    reference_line_.get_point_in_cartesian_frame(sl_point,
                                                  &adc_position_cartesian);
 
     ReferencePoint reference_point = reference_line_.get_reference_point(s);
