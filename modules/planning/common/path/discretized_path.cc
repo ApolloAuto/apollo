@@ -122,6 +122,10 @@ common::PathPoint &DiscretizedPath::PathPointAt(const std::uint32_t index) {
   return path_points_[index];
 }
 
+void DiscretizedPath::Clear() {
+  path_points_.clear();
+}
+
 std::vector<common::PathPoint>::const_iterator
 DiscretizedPath::QueryLowerBound(const double param) const {
   auto func = [](const common::PathPoint &tp, const double param) {
