@@ -80,7 +80,7 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
   const auto inf = std::numeric_limits<double>::infinity();
   double s = start_s_;
   while (s <= end_s_) {
-    evaluated_knots_.push_back(std::move(s));
+    evaluated_knots_.push_back(s);
     hdmap_bound_.push_back(std::make_pair(-inf, inf));
     static_obstacle_bound_.push_back(std::make_pair(-inf, inf));
     dynamic_obstacle_bound_.push_back(std::make_pair(-inf, inf));
@@ -88,10 +88,8 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
   }
 
   // initialize calculation here
-  if (!CalculateHDMapBound()) {
-    AERROR << "Calculate hd map bound failed!";
-    return false;
-  }
+  CalculateHDMapBound();
+
   if (!CalculateObstacleBound()) {
     AERROR << "Calculate obstacle bound failed!";
     return false;
@@ -170,7 +168,7 @@ bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
 bool QpFrenetFrame::MapDynamicObstacleWithDecision(
     const PathObstacle& path_obstacle) {
   const std::vector<ObjectDecisionType>& decisions = path_obstacle.Decisions();
-  const Obstacle* obstacle = path_obstacle.Obstacle();
+  const Obstacle* ptr_obstacle = path_obstacle.Obstacle();
 
   for (const auto& decision : decisions) {
     if (!decision.has_nudge()) {
@@ -179,14 +177,12 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
     const auto& nudge = decision.nudge();
     double buffer = std::fabs(nudge.distance_l());
 
-    int nudge_side = nudge.type() == ObjectNudge::RIGHT_NUDGE ? 1 : -1;
+    int nudge_side = (nudge.type() == ObjectNudge::RIGHT_NUDGE) ? 1 : -1;
 
     for (const SpeedPoint& veh_point : discretized_vehicle_location_) {
       double time = veh_point.t();
-      common::TrajectoryPoint trajectory_point = obstacle->GetPointAtTime(time);
-      common::math::Vec2d xy_point(trajectory_point.path_point().x(),
-                                   trajectory_point.path_point().y());
-      common::math::Box2d obs_box = obstacle->GetBoundingBox(trajectory_point);
+      common::TrajectoryPoint trajectory_point = ptr_obstacle->GetPointAtTime(time);
+      common::math::Box2d obs_box = ptr_obstacle->GetBoundingBox(trajectory_point);
       // project obs_box on reference line
       std::vector<common::math::Vec2d> corners;
       obs_box.GetAllCorners(&corners);
@@ -219,16 +215,16 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
 
         // update bound map
         double s_resolution = std::fabs(veh_point.v() * time_resolution_);
-        double updatestart_s_ =
+        double updated_start_s =
             init_frenet_point_.s() + veh_point.s() - s_resolution;
-        double updateend_s_ =
+        double updated_end_s =
             init_frenet_point_.s() + veh_point.s() + s_resolution;
-        if (updateend_s_ > evaluated_knots_.back() ||
-            updatestart_s_ < evaluated_knots_.front()) {
+        if (updated_end_s > evaluated_knots_.back() ||
+            updated_start_s < evaluated_knots_.front()) {
           continue;
         }
         std::pair<uint32_t, uint32_t> update_index_range =
-            FindInterval(updatestart_s_, updateend_s_);
+            FindInterval(updated_start_s, updated_end_s);
 
         for (uint32_t j = update_index_range.first;
              j < update_index_range.second; ++j) {
@@ -240,7 +236,6 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
       }
     }
   }
-
   return true;
 }
 
@@ -276,7 +271,6 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
       }
     }
   }
-
   return true;
 }
 
@@ -418,7 +412,7 @@ std::pair<uint32_t, uint32_t> QpFrenetFrame::FindInterval(
   return std::make_pair(start_index, end_index);
 }
 
-bool QpFrenetFrame::CalculateHDMapBound() {
+void QpFrenetFrame::CalculateHDMapBound() {
   for (uint32_t i = 0; i < hdmap_bound_.size(); ++i) {
     double left_bound = 0.0;
     double right_bound = 0.0;
@@ -432,11 +426,6 @@ bool QpFrenetFrame::CalculateHDMapBound() {
     hdmap_bound_[i].first = -right_bound;
     hdmap_bound_[i].second = left_bound;
   }
-  for (uint32_t i = 0; i < hdmap_bound_.size(); ++i) {
-    hdmap_bound_[i].first = -4.0;
-    hdmap_bound_[i].second = 4.0;
-  }
-  return true;
 }
 
 bool QpFrenetFrame::CalculateObstacleBound() {
