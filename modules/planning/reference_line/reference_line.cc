@@ -162,7 +162,7 @@ ReferencePoint ReferenceLine::get_reference_point(const double x,
                                     reference_points_[index_end], s1, s);
 }
 
-bool ReferenceLine::get_point_in_Cartesian_frame(
+bool ReferenceLine::get_point_in_cartesian_frame(
     const common::SLPoint& sl_point,
     common::math::Vec2d* const xy_point) const {
   CHECK_NOTNULL(xy_point);
