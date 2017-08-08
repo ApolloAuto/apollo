@@ -19,46 +19,36 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+cd "${DIR}/.."
+
 source "${DIR}/apollo_base.sh"
 
-if [ ! -d "${APOLLO_ROOT_DIR}/data/bag" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
-fi
-
-cd "${APOLLO_ROOT_DIR}/data/bag"
-
 function start() {
-    LOG="/tmp/apollo_record.out"
-    NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
+    LOG="${APOLLO_ROOT_DIR}/data/log/velodyne.out"
+    CMD="roslaunch velodyne start_velodyne.launch"
+    NUM_PROCESSES="$(pgrep -c -f "velodyne_nodelet_manager")"
     if [ "${NUM_PROCESSES}" -eq 0 ]; then
-        nohup rosbag record -b 2048  \
-            /apollo/sensor/gnss/gnss_status \
-            /apollo/sensor/gnss/odometry \
-            /apollo/sensor/gnss/ins_stat \
-            /apollo/sensor/gnss/corrected_imu \
-            /apollo/canbus/chassis \
-            /apollo/canbus/chassis_detail \
-            /apollo/control \
-            /apollo/control/pad \
-            /apollo/planning \
-            /apollo/prediction \
-            /apollo/localization/pose \
-            /apollo/monitor </dev/null >"${LOG}" 2>&1 &
+       eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
     fi
 }
 
 function stop() {
-    pkill -SIGINT -f rosbag
+    pkill -f start_velodyne
 }
 
-case $1 in
-  start)
-    start
-    ;;
-  stop)
-    stop
-    ;;
-  *)
-    start
-    ;;
-esac
+# run command_name module_name
+function run() {
+    case $1 in
+        start)
+            start
+            ;;
+        stop)
+            stop
+            ;;
+        *)
+            start
+            ;;
+    esac
+}
+
+run "$1"

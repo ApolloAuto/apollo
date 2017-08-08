@@ -31,7 +31,7 @@ int OnlineCalibration::decode(
   }
   // read calibration when get 2s packet
   if (_status_types.size() < 5789 * 2) {
-    ROS_INFO("Need more scan msgs");
+    ROS_INFO("Wait for more scan msgs");
     return -1;
   }
   get_unit_index();
@@ -89,11 +89,22 @@ int OnlineCalibration::decode(
     laser_correction.max_intensity = _status_values[index_48 + 6];
     laser_correction.min_intensity = _status_values[index_48 + 5];
 
-    _calibration._laser_corrections[i] = laser_correction;
-    _calibration._num_lasers = 64;
-    _calibration._initialized = true;
+    laser_correction.cos_rot_correction = cosf(laser_correction.rot_correction);
+    laser_correction.sin_rot_correction = sinf(laser_correction.rot_correction);
+    laser_correction.cos_vert_correction =
+        cosf(laser_correction.vert_correction);
+    laser_correction.sin_vert_correction =
+        sinf(laser_correction.vert_correction);
+    laser_correction.focal_offset =
+        256 * pow(1 - laser_correction.focal_distance / 13100, 2);
+
+    _calibration._laser_corrections[laser_correction.laser_ring] =
+        laser_correction;
   }
+  _calibration._num_lasers = 64;
+  _calibration._initialized = true;
   _inited = true;
+  return 0;
 }
 
 void OnlineCalibration::get_unit_index() {
@@ -113,6 +124,7 @@ void OnlineCalibration::get_unit_index() {
 void OnlineCalibration::dump(const std::string& file_path) {
   if (!_inited) {
     ROS_ERROR("Please decode calibraion info first");
+    return;
   }
   std::ofstream ofs(file_path.c_str(), std::ios::out);
   ofs << "lasers:" << std::endl;
