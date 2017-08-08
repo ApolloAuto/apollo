@@ -95,6 +95,7 @@ message STGraphDebug {
   optional string name = 1;
   repeated StGraphBoundaryDebug boundary = 2;
   repeated apollo.common.SpeedPoint speed_limit = 3;
+  repeated apollo.common.SpeedPoint speed_profile = 4;
 }
 
 // next id: 15
