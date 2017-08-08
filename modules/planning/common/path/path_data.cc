@@ -90,24 +90,40 @@ bool PathData::get_path_point_with_ref_s(
     const double ref_s, common::PathPoint *const path_point) const {
   DCHECK_NOTNULL(reference_line_);
   DCHECK_NOTNULL(path_point);
-  DCHECK_EQ(discretized_path_.path_points().size(), frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.points().size(), frenet_path_.points().size());
+  if (ref_s < 0) {
+    AERROR << "ref_s[" << ref_s << "] should be > 0";
+    return false;
+  }
+  if (ref_s > frenet_path_.points().back().s()) {
+    AERROR << "ref_s is larger than the length of frenet_path_ length ["
+           << frenet_path_.points().back().s() << "].";
+    return false;
+  }
 
   uint32_t index = 0;
   const double kDistanceEpsilon = 1e-3;
-  double shortest_distance = std::numeric_limits<double>::max();
-  for (uint32_t i = 0; i < frenet_path_.points().size(); ++i) {
-    const double curr_distance =
-        std::fabs(ref_s - frenet_path_.points().at(i).s());
-    if (curr_distance < kDistanceEpsilon) {
-      path_point->CopyFrom(discretized_path_.PathPointAt(i));
+  for (uint32_t i = 0; i + 1 < frenet_path_.points().size(); ++i) {
+    if (fabs(ref_s - frenet_path_.points().at(i).s()) < kDistanceEpsilon) {
+      path_point->CopyFrom(discretized_path_.points().at(i));
       return true;
     }
-    if (curr_distance < shortest_distance) {
+    if (frenet_path_.points().at(i).s() < ref_s &&
+        ref_s <= frenet_path_.points().at(i + 1).s()) {
       index = i;
-      shortest_distance = curr_distance;
+      break;
     }
   }
-  path_point->CopyFrom(discretized_path_.PathPointAt(index));
+  double r = (ref_s - frenet_path_.points().at(index).s()) /
+             (frenet_path_.points().at(index + 1).s() -
+              frenet_path_.points().at(index).s());
+
+  const double discretized_path_s =
+      discretized_path_.path_point_at(index).s() +
+      r * (discretized_path_.path_point_at(index + 1).s() -
+           discretized_path_.path_point_at(index).s());
+  path_point->CopyFrom(
+      discretized_path_.evaluate_linear_approximation(discretized_path_s));
 
   return true;
 }
