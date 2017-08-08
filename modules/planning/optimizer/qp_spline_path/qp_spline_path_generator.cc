@@ -247,7 +247,7 @@ bool QpSplinePathGenerator::AddConstraint(
                                                      init_frenet_point_.dl());
   spline_constraint->add_point_second_derivative_constraint(
       init_frenet_point_.s(), init_frenet_point_.ddl());
-  AINFO << "init frenet point: " << init_frenet_point_.ShortDebugString();
+  ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
 
   // add end point constraint
   spline_constraint->add_point_fx_constraint(knots_.back(), 0.0);
