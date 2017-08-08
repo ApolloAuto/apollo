@@ -1,3 +1,3 @@
 # calibration visualzer 
 This node is used to check lidar-to-gps calibration file
-$:./calib_vis --flagfile=/apollo/modules/perception/conf/calib_vis.conf
+$:./lidar_ex_checker --flagfile=/apollo/modules/calibration/lidar_ex_checker/conf/lidar_ex_checker.conf

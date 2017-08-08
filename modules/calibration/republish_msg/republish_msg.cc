@@ -28,7 +28,7 @@ using apollo::common::Status;
 using apollo::common::ErrorCode;
 
 std::string RepublishMsg::Name() const {
-  return "calibration";
+  return "republish_msg";
 }
 
 Status RepublishMsg::Init() {
