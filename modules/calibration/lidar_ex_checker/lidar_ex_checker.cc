@@ -16,6 +16,7 @@
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/visualization/cloud_viewer.h>
+#include <pcl/io/pcd_io.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <yaml-cpp/yaml.h>
 
@@ -23,6 +24,7 @@
 #include "ros/include/ros/ros.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
 
 namespace apollo {
 namespace calibration {
@@ -32,7 +34,7 @@ using apollo::common::Status;
 using apollo::common::ErrorCode;
 
 std::string LidarExChecker::Name() const {
-  return "lidar extrinsics checker";
+  return "lidar_extrinsics_checker";
 }
 
 Status LidarExChecker::Init() {
@@ -47,7 +49,9 @@ Status LidarExChecker::Init() {
 
   position_type_ = 0;
 
-  LoadExtrinsics();
+  if (!LoadExtrinsics()) {
+    return Status::OK();
+  }
 
   std::cout << FLAGS_adapter_config_path << std::endl;
   AdapterManager::Init(FLAGS_adapter_config_path);
@@ -60,8 +64,15 @@ Status LidarExChecker::Init() {
   return Status::OK();
 }
 
-void LidarExChecker::LoadExtrinsics() {
-  std::string extrin_file = "";
+bool LidarExChecker::LoadExtrinsics() {
+  std::string extrin_file = FLAGS_velodyne64_extrinsics_path;
+  std::cout << extrin_file << std::endl;
+  ifstream fi(extrin_file.c_str());
+  if (!fi.good()) {
+    std::cerr << "extrinsics file does not exist." << std::endl;
+    return false; 
+  }
+
   YAML::Node node = YAML::LoadFile(extrin_file);
 
   Eigen::Quaterniond rotation(node["transform"]["rotation"]["w"].as<double>(), 
@@ -72,22 +83,29 @@ void LidarExChecker::LoadExtrinsics() {
                                    node["transform"]["translation"]["y"].as<double>(), 
                                    node["transform"]["translation"]["z"].as<double>());
   extrinsics_ = translation * rotation;
+
+  return true;
 }
 
 void LidarExChecker::VisualizeClouds() {
   boost::shared_ptr<pcl::visualization::PCLVisualizer> pcl_vis;
   pcl_vis.reset(new pcl::visualization::PCLVisualizer("3D Viewer"));
 
+  //std::cout << "offset: " << std::endl << offset_.matrix() << std::endl;
+  //std::cout << "extrinsics: " << std::endl << extrinsics_.matrix() << std::endl;
+  //pcl::PointCloud<pcl::PointXYZ> save_cld;
   for (uint32_t i = 0; i < clouds_.size(); ++i) {
     pcl::PointCloud<PointXYZIT> cld = clouds_[i];
     pcl::PointCloud<pcl::PointXYZ>::Ptr tf_cld_ptr(
             new pcl::PointCloud<pcl::PointXYZ>);
     double timestamp = cld.points.back().timestamp;
     timestamp = round(timestamp * 100) / 100.0;
+    //std::cout << timestamp << std::endl;
+    Eigen::Affine3d pose = gps_poses_[timestamp];
+    //std::cout << "pose" << i << ": " << std::endl << pose.matrix() << std::endl;
     for (uint32_t j = 0; j < cld.points.size(); ++j) {
       PointXYZIT pt = cld.points[j];
       Eigen::Vector3d pt_vec(pt.x, pt.y, pt.z);
-      Eigen::Affine3d pose = gps_poses_[timestamp];
 
       Eigen::Vector3d tf_pt_vec = pose * extrinsics_ * pt_vec;
       
@@ -95,7 +113,9 @@ void LidarExChecker::VisualizeClouds() {
       tf_pt.x = tf_pt_vec[0];
       tf_pt.y = tf_pt_vec[1];
       tf_pt.z = tf_pt_vec[2];
-      tf_cld_ptr->points.push_back(tf_pt);  
+      tf_cld_ptr->points.push_back(tf_pt);
+
+      //save_cld.points.push_back(tf_pt);
     }
     int r = rand() % 255;
     int g = rand() % 255;
@@ -104,12 +124,11 @@ void LidarExChecker::VisualizeClouds() {
             r, g, b);
     pcl_vis->addPointCloud(tf_cld_ptr, handler, "clouds" + i); 
   }
+  //pcl::io::savePCDFileBinary("./result.pcd", save_cld);
   pcl_vis->spin();
 }
 
 void LidarExChecker::OnPointCloud(const sensor_msgs::PointCloud2& message) {
-  std::cout << "point cloud, haha" << std::endl;
-
   if (top_redundant_cloud_count_ < 50) {
     top_redundant_cloud_count_++;
     return;
@@ -123,9 +142,9 @@ void LidarExChecker::OnPointCloud(const sensor_msgs::PointCloud2& message) {
     return;
   }
   
-  if (position_type_ != 56) {
-    return;
-  } 
+  //if (position_type_ != 56) {
+  //  return;
+  //} 
   
   Eigen::Vector3d position;
   Eigen::Affine3d pose = gps_poses_.rbegin()->second;
@@ -149,7 +168,16 @@ void LidarExChecker::OnPointCloud(const sensor_msgs::PointCloud2& message) {
   cld = tmp_cld;
   
   if (clouds_.size() < cloud_count_) {
+    last_position_ = position;
     clouds_.push_back(cld);
+    std::cout << "take " << clouds_.size() << " cloud(s)." << std::endl;
+  }
+
+  if (clouds_.size() >= cloud_count_) {
+    enough_data_ = true;
+  }
+  else {
+    enough_data_ = false;
   }
 }
 
@@ -172,12 +200,12 @@ void LidarExChecker::OnGps(const ::apollo::localization::Gps& message) {
       last_position_[2] = translation.z();
       offset_ = pose.inverse();
     }
-    pose = offset_ * pose;
+    Eigen::Affine3d new_pose = offset_ * pose;
 
     double timestamp = message.header().timestamp_sec();
     timestamp = round(timestamp * 100) / 100.0;
 
-    gps_poses_.insert(std::make_pair(timestamp, pose));
+    gps_poses_.insert(std::make_pair(timestamp, new_pose));
   }
 }
 

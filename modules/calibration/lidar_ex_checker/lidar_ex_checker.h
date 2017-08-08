@@ -35,8 +35,8 @@
 #include "ros/include/ros/ros.h"
 
 /**
- * @namespace apollo::perception
- * @brief apollo::perception
+ * @namespace apollo::calibration
+ * @brief apollo::calibration
  */ 
 namespace apollo {
 namespace calibration {
@@ -51,7 +51,9 @@ class LidarExChecker : public apollo::common::ApolloApp {
   void Stop() override;
 
  private:
-  void LoadExtrinsics();
+  // load extrinsics which are calibrated before
+  bool LoadExtrinsics();
+  // visualize the checking result
   void VisualizeClouds();
 
   // Upon receiving point cloud data
@@ -67,14 +69,21 @@ class LidarExChecker : public apollo::common::ApolloApp {
   Eigen::Affine3d offset_;
   Eigen::Affine3d extrinsics_;
   
+  // the complete pose data;
   std::map<double, Eigen::Affine3d> gps_poses_;
+  // the complete cloud data;
   std::vector<pcl::PointCloud<PointXYZIT> > clouds_;
 
+  // to ensure the pose of given timestamp can be found, 
+  // we pad some redundant clouds
   uint32_t top_redundant_cloud_count_;
   uint32_t bottom_redundant_cloud_count_;
+  // if program has took enough clouds
   bool enough_data_;
 
+  // the number of cloud count to take
   uint32_t cloud_count_;
+  // the distance between two clouds
   double capture_distance_;
   
   // latest INS status                                                                                                                                                                                                        

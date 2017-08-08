@@ -19,6 +19,6 @@
 DEFINE_string(node_name, "lidar_ex_checker", 
         "The lidar extrinsics checker module name in proto");
 
-DEFINE_string(velodyne64_extrinsic_path, "",
+DEFINE_string(velodyne64_extrinsics_path, "/apollo/docs/demo_guide/velodyne64_novatel_extrinsics.yaml",
               "The Velodyne64 extrinsics file path");
 
