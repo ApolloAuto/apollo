@@ -17,7 +17,7 @@ cc_library(
         "//modules/common/monitor",
         "//modules/common/status",
         "//modules/common/util",
-        "//modules/routing/common",
+        "//modules/routing/common:routing_gflags",
         "//modules/routing/core",
         "//modules/routing/proto:routing_proto",
         "@ros//:ros_common",
@@ -30,7 +30,7 @@ cc_binary(
     deps = [
         ":lib_routing",
         "//external:gflags",
-        "//modules/routing/common",
+        "//modules/routing/common:routing_gflags",
     ],
 )
 

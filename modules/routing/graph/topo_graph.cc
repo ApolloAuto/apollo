@@ -16,7 +16,6 @@
 
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/common/util/file.h"
-#include "modules/routing/common/utils.h"
 #include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
