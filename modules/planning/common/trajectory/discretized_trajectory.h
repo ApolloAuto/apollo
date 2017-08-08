@@ -61,10 +61,10 @@ class DiscretizedTrajectory : public Trajectory {
 
   template <typename Iter>
   void PrependTrajectoryPoints(Iter begin, Iter end) {
-    if (!_trajectory_points.empty() && begin != end) {
-      CHECK((end - 1)->relative_time() < _trajectory_points.front().relative_time());
+    if (!trajectory_points_.empty() && begin != end) {
+      CHECK((end - 1)->relative_time() < trajectory_points_.front().relative_time());
     }
-    _trajectory_points.insert(_trajectory_points.begin(), begin, end);
+    trajectory_points_.insert(trajectory_points_.begin(), begin, end);
   }
 
   const common::TrajectoryPoint& TrajectoryPointAt(
@@ -72,15 +72,16 @@ class DiscretizedTrajectory : public Trajectory {
 
   uint32_t NumOfPoints() const;
 
-  void SetTrajectoryPoints(
-      const std::vector<common::TrajectoryPoint>& points);
+  void set_trajectory_points(std::vector<common::TrajectoryPoint> points);
 
   const std::vector<common::TrajectoryPoint>& trajectory_points() const;
+
+  virtual bool Valid() const;
 
   virtual void Clear();
 
  protected:
-  std::vector<common::TrajectoryPoint> _trajectory_points;
+  std::vector<common::TrajectoryPoint> trajectory_points_;
 };
 
 }  // namespace planning

@@ -36,7 +36,7 @@ class TrajectoryStitcher {
  public:
   TrajectoryStitcher() = delete;
 
-  static std::vector<common::TrajectoryPoint> compute_stitching_trajectory(
+  static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
       const bool is_on_auto_mode, const double current_timestamp,
       const double planning_cycle_time,
       const PublishableTrajectory& prev_trajectory);
