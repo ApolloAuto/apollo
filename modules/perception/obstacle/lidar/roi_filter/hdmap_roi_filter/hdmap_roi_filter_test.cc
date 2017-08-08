@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <iostream>
+#include <pcl/io/pcd_io.h>
 #include <fstream>
+#include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
-#include <gtest/gtest.h>
-#include <memory>
-#include <gflags/gflags.h>
-#include <pcl/io/pcd_io.h>
 
-#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
+#include "gflags/gflags.h"
+#include "gtest/gtest.h"
+
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -45,7 +46,7 @@ bool LoadPolygonFile(const std::string& absolute_file_name,
   polygon_data >> polygons_num;
 
   auto& polygons = *polygons_ptr;
-  polygons = std::vector<PolygonType> (polygons_num);
+  polygons = std::vector<PolygonType>(polygons_num);
 
   for (auto& polygon : polygons) {
     size_t points_num = 0;
@@ -65,14 +66,14 @@ bool LoadPolygonFile(const std::string& absolute_file_name,
 class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
  public:
   HdmapROIFilterTest() : _pts_cloud_ptr(new pcl_util::PointCloud){};
+
  protected:
   void SetUp() {
     LoadPolygonFile(polygon_file_name, &_polygons);
     pcl::io::loadPCDFile(pcd_file_name, *_pts_cloud_ptr);
   }
 
-  void TearDown() {
-  }
+  void TearDown() {}
 
  protected:
   void init();
@@ -82,7 +83,6 @@ class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
   std::vector<PolygonType> _polygons;
   pcl_util::PointCloudPtr _pts_cloud_ptr;
 };
-
 
 void HdmapROIFilterTest::init() {
   FLAGS_work_root = "modules/perception/data";
@@ -108,7 +108,7 @@ void HdmapROIFilterTest::filter() {
   size_t true_negitive = 0, false_negitive = 0;
 
   for (size_t i = 0; i < points_num; ++i) {
-    const auto &pt = _pts_cloud_ptr->points[i];
+    const auto& pt = _pts_cloud_ptr->points[i];
 
     if (pt.z > 0) {
       EXPECT_TRUE(is_in_roi[i]);
@@ -125,11 +125,10 @@ void HdmapROIFilterTest::filter() {
     }
   }
 
-
   AERROR << "True positive: " << true_positive
-        << ", False positive: " << false_positive
-        << ", True negitive: " << true_negitive
-        << ", False negative: " << false_negitive;
+         << ", False positive: " << false_positive
+         << ", True negitive: " << true_negitive
+         << ", False negative: " << false_negitive;
 }
 
 TEST_F(HdmapROIFilterTest, test_filter) {
@@ -138,10 +137,5 @@ TEST_F(HdmapROIFilterTest, test_filter) {
   filter();
 }
 
-
-
-
-
-
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

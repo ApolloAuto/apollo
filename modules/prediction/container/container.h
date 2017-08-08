@@ -22,7 +22,7 @@
 #ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_H_
 #define MODULES_PREDICTION_CONTAINER_CONTAINER_H_
 
-#include <google/protobuf/message.h>
+#include "google/protobuf/message.h"
 
 /**
  * @namespace apollo::prediction

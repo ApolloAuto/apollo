@@ -15,9 +15,11 @@
   *****************************************************************************/
 
 #include "modules/routing/common/utils.h"
+
 #include <fcntl.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
+
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "modules/common/log.h"
 
 namespace apollo {

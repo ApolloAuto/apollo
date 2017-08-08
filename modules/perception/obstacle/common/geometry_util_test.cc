@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/common/geometry_util.h"
-#include <gtest/gtest.h>
-#include <vector>
+
 #include <cfloat>
+#include <vector>
+
+#include "gtest/gtest.h"
 #include "modules/common/log.h"
 
 namespace apollo {

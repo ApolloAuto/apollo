@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
+
 #include <pcl/io/pcd_io.h>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/kdtree/kdtree_flann.h>
@@ -22,6 +23,8 @@
 #include <iomanip>
 #include <map>
 #include <sstream>
+
+#include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -29,7 +32,6 @@
 #include "modules/perception/obstacle/common/file_system_util.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
-#include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 
 namespace apollo {
 namespace perception {
@@ -55,7 +57,7 @@ class HmObjectTrackerTest : public testing::Test {
     object_builder_ = new MinBoxObjectBuilder();
     object_builder_->Init();
     object_builder_options_.ref_center =
-      Eigen::Vector3d(0, 0, -1.7);  // velodyne height
+        Eigen::Vector3d(0, 0, -1.7);  // velodyne height
     tracker_options_.velodyne_trans.reset(new Eigen::Matrix4d);
   }
   void TearDown() {
@@ -66,15 +68,15 @@ class HmObjectTrackerTest : public testing::Test {
   }
 
  protected:
-  ConfigManager*        config_manager_;
-  HmObjectTracker*      hm_tracker_;
-  MinBoxObjectBuilder*  object_builder_;
-  ObjectBuilderOptions  object_builder_options_;
-  TrackerOptions        tracker_options_;
+  ConfigManager* config_manager_;
+  HmObjectTracker* hm_tracker_;
+  MinBoxObjectBuilder* object_builder_;
+  ObjectBuilderOptions object_builder_options_;
+  TrackerOptions tracker_options_;
 };
 
 bool ConstructObjects(const std::string& filename,
-  std::vector<ObjectPtr>* objects) {
+                      std::vector<ObjectPtr>* objects) {
   std::ifstream ifs(filename);
   if (!ifs.is_open()) {
     AERROR << "failed to open file" << filename;
@@ -88,10 +90,8 @@ bool ConstructObjects(const std::string& filename,
     ObjectPtr obj(new Object());
     obj->cloud->resize(no_point);
     for (int j = 0; j < no_point; ++j) {
-      ifs >> obj->cloud->points[j].x
-        >> obj->cloud->points[j].y
-        >> obj->cloud->points[j].z
-        >> obj->cloud->points[j].intensity;
+      ifs >> obj->cloud->points[j].x >> obj->cloud->points[j].y >>
+          obj->cloud->points[j].z >> obj->cloud->points[j].intensity;
     }
     (*objects).push_back(obj);
   }
@@ -99,7 +99,7 @@ bool ConstructObjects(const std::string& filename,
 }
 
 bool LoadPclPcds(const std::string filename,
-  pcl_util::PointCloudPtr* cloud_out) {
+                 pcl_util::PointCloudPtr* cloud_out) {
   pcl::PointCloud<pcl_util::PointXYZIT> org_cloud;
   if (pcl::io::loadPCDFile(filename, org_cloud) < 0) {
     AERROR << "failed to load pcd file: " << filename;
@@ -112,26 +112,24 @@ bool LoadPclPcds(const std::string filename,
     pt.y = org_cloud.points[i].y;
     pt.z = org_cloud.points[i].z;
     pt.intensity = org_cloud.points[i].intensity;
-    if (isnan(org_cloud.points[i].x))
-        continue;
+    if (isnan(org_cloud.points[i].x)) continue;
     (*cloud_out)->push_back(pt);
   }
   return true;
 }
 
 bool SaveTrackingResults(const std::vector<ObjectPtr>& objects,
-  const Eigen::Matrix4d& pose_v2w,
-  const int frame_id,
-  pcl_util::PointCloudPtr* cloud,
-  const std::string& filename) {
+                         const Eigen::Matrix4d& pose_v2w, const int frame_id,
+                         pcl_util::PointCloudPtr* cloud,
+                         const std::string& filename) {
   std::ofstream fout(filename.c_str(), std::ios::out);
   if (!fout) {
     AERROR << filename << " is not exist!";
     return false;
   }
   fout << frame_id << " " << objects.size() << std::endl;
-  typename pcl::PointCloud<pcl_util::Point>::Ptr
-    trans_cloud(new pcl::PointCloud<pcl_util::Point>());
+  typename pcl::PointCloud<pcl_util::Point>::Ptr trans_cloud(
+      new pcl::PointCloud<pcl_util::Point>());
 
   Eigen::Matrix4d pose_velo2w = pose_v2w;
   pcl::copyPointCloud(*(*cloud), *trans_cloud);
@@ -144,29 +142,23 @@ bool SaveTrackingResults(const std::vector<ObjectPtr>& objects,
 
   for (size_t i = 0; i < objects.size(); ++i) {
     Eigen::Vector3f coord_dir(0, 1, 0);
-    Eigen::Vector4d dir_velo = pose_w2v * Eigen::Vector4d(
-      objects[i]->direction[0], objects[i]->direction[1],
-      objects[i]->direction[2], 0);
-    Eigen::Vector4d ct_velo = pose_w2v * Eigen::Vector4d(objects[i]->center[0],
-      objects[i]->center[1], objects[i]->center[2], 0);
+    Eigen::Vector4d dir_velo =
+        pose_w2v * Eigen::Vector4d(objects[i]->direction[0],
+                                   objects[i]->direction[1],
+                                   objects[i]->direction[2], 0);
+    Eigen::Vector4d ct_velo =
+        pose_w2v * Eigen::Vector4d(objects[i]->center[0], objects[i]->center[1],
+                                   objects[i]->center[2], 0);
     Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
     double theta = vector_theta_2d_xy(coord_dir, dir_velo3);
     std::string type = "unknown";
     fout << objects[i]->id << " " << objects[i]->track_id << " " << type << " "
-       << std::setprecision(10)
-       << ct_velo[0] << " "
-       << ct_velo[1] << " "
-       << ct_velo[2] << " "
-       << objects[i]->length << " "
-       << objects[i]->width << " "
-       << objects[i]->height << " "
-       << theta << " "
-       << 0 << " "
-       << 0 << " "
-       << objects[i]->velocity[0] << " "
-       << objects[i]->velocity[1] << " "
-       << objects[i]->velocity[2] << " "
-       << objects[i]->cloud->size() << " ";
+         << std::setprecision(10) << ct_velo[0] << " " << ct_velo[1] << " "
+         << ct_velo[2] << " " << objects[i]->length << " " << objects[i]->width
+         << " " << objects[i]->height << " " << theta << " " << 0 << " " << 0
+         << " " << objects[i]->velocity[0] << " " << objects[i]->velocity[1]
+         << " " << objects[i]->velocity[2] << " " << objects[i]->cloud->size()
+         << " ";
     for (size_t j = 0; j < objects[i]->cloud->size(); ++j) {
       const pcl_util::Point& pt = objects[i]->cloud->points[j];
       pcl_util::Point query_pt;
@@ -207,7 +199,7 @@ TEST_F(HmObjectTrackerTest, demo_tracking) {
     // read pose
     Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
     if (!ReadPoseFile(data_path + pose_filenames[i], &pose, &frame_id,
-      &time_stamp)) {
+                      &time_stamp)) {
       AERROR << "failed to read pose";
       return;
     }
@@ -232,7 +224,7 @@ TEST_F(HmObjectTrackerTest, demo_tracking) {
     std::vector<ObjectPtr> result_objects;
     // assert tracking succesfully
     EXPECT_TRUE(hm_tracker_->Track(objects, time_stamp, tracker_options_,
-      &result_objects));
+                                   &result_objects));
     // assert reports completly
     EXPECT_TRUE(result_objects.size() >= objects.size());
     std::map<int, int> id_pool;
@@ -246,8 +238,8 @@ TEST_F(HmObjectTrackerTest, demo_tracking) {
     std::ostringstream oss;
     oss << std::setfill('0') << std::setw(6) << i;
     std::string filename = data_path + oss.str() + ".txt";
-    EXPECT_TRUE(SaveTrackingResults(result_objects, pose, frame_id, &cloud,
-      filename));
+    EXPECT_TRUE(
+        SaveTrackingResults(result_objects, pose, frame_id, &cloud, filename));
   }
 }
 

@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
+
 #define private public
 #include "modules/perception/lib/base/registerer.h"
 

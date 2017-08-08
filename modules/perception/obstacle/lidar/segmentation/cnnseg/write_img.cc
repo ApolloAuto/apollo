@@ -14,16 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <iostream>
 #include <fstream>
-#include <string>
-#include <gflags/gflags.h>
+#include <iostream>
 #include <opencv2/opencv.hpp>
+#include <string>
+#include "gflags/gflags.h"
 
 using namespace std;
 
-DEFINE_string(test_dir, "/apollo/modules/perception/data/cnnseg_test/", "test data directory");
-DEFINE_string(pcd_name, "uscar_12_1470770225_1470770492_1349", "poind cloud data name");
+DEFINE_string(test_dir, "/apollo/modules/perception/data/cnnseg_test/",
+              "test data directory");
+DEFINE_string(pcd_name, "uscar_12_1470770225_1470770492_1349",
+              "poind cloud data name");
 
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
@@ -31,7 +33,7 @@ int main(int argc, char** argv) {
   string test_dir(FLAGS_test_dir);
   string det_res_file = test_dir + FLAGS_pcd_name + "-detection.txt";
   ifstream f_res(det_res_file.c_str(), std::ifstream::in);
-  
+
   string line;
 
   getline(f_res, line);

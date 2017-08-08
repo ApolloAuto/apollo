@@ -15,9 +15,11 @@
  *****************************************************************************/
 
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include <gtest/gtest.h>
+
 #include <string>
 #include <vector>
+
+#include "gtest/gtest.h"
 #include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {

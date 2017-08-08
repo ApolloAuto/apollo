@@ -21,23 +21,23 @@
 #ifndef MODEULES_PERCEPTION_PERCEPTION_CALIBVIS_H_
 #define MODEULES_PERCEPTION_PERCEPTION_CALIBVIS_H_
 
-#include <string>
 #include <map>
+#include <string>
 #include <vector>
 
-#include <Eigen/Eigen>
-#include <sensor_msgs/PointCloud2.h>
+#include "Eigen/Eigen"
+#include "sensor_msgs/PointCloud2.h"
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/localization/proto/gps.pb.h"
+#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::perception
  * @brief apollo::perception
- */ 
+ */
 namespace apollo {
 namespace perception {
 
@@ -64,9 +64,9 @@ class CalibVis : public apollo::common::ApolloApp {
   Eigen::Vector3d last_position_;
   Eigen::Affine3d offset_;
   Eigen::Affine3d extrinsics_;
-  
+
   std::map<double, Eigen::Affine3d> gps_poses_;
-  std::vector<pcl::PointCloud<pcl_util::PointXYZIT> > clouds_;
+  std::vector<pcl::PointCloud<pcl_util::PointXYZIT>> clouds_;
 
   uint32_t top_redundant_cloud_count_;
   uint32_t bottom_redundant_cloud_count_;
@@ -74,8 +74,8 @@ class CalibVis : public apollo::common::ApolloApp {
 
   uint32_t cloud_count_;
   double capture_distance_;
-  
-  // latest INS status                                                                                                                                                                                                        
+
+  // latest INS status
   uint32_t position_type_;
 };
 

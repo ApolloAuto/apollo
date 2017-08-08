@@ -17,18 +17,18 @@
 #ifndef ADU_PERCEPTION_OBSTACLE_COMMON_POSE_UTIL_H
 #define ADU_PERCEPTION_OBSTACLE_COMMON_POSE_UTIL_H
 
-#include <Eigen/Core>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {
 
 template <typename T>
-void QuaternionToRotationMatrix(const T * quat, T * R) {
+void QuaternionToRotationMatrix(const T* quat, T* R) {
   T x2 = quat[0] * quat[0];
   T xy = quat[0] * quat[1];
   T rx = quat[3] * quat[0];
@@ -50,10 +50,8 @@ void QuaternionToRotationMatrix(const T * quat, T * R) {
   R[5] = 2 * (yz - rx);
 }
 
-bool ReadPoseFile(const std::string& filename,
-  Eigen::Matrix4d* pose,
-  int* frame_id,
-  double* time_stamp);
+bool ReadPoseFile(const std::string& filename, Eigen::Matrix4d* pose,
+                  int* frame_id, double* time_stamp);
 
 }  // namespace perception
 }  // namespace apollo
