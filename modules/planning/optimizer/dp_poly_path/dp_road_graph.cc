@@ -96,8 +96,8 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   }
   FrenetFramePath tunnel(frenet_path);
 
-  path_data->set_reference_line(&reference_line_);
-  path_data->set_frenet_path(tunnel);
+  path_data->SetReferenceLine(&reference_line_);
+  path_data->SetFrenetPath(tunnel);
   return true;
 }
 
