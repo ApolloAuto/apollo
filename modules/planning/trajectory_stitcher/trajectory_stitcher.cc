@@ -58,7 +58,7 @@ TrajectoryStitcher::compute_stitching_trajectory(
     return compute_reinit_stitching_trajectory();
   }
 
-  std::size_t prev_trajectory_size = prev_trajectory.num_of_points();
+  std::size_t prev_trajectory_size = prev_trajectory.NumOfPoints();
 
   if (prev_trajectory_size == 0) {
     AWARN << "Projected trajectory at time [" << prev_trajectory.header_time()
@@ -69,7 +69,7 @@ TrajectoryStitcher::compute_stitching_trajectory(
 
   const double veh_rel_time = current_timestamp - prev_trajectory.header_time();
 
-  std::size_t matched_index = prev_trajectory.query_nearest_point(veh_rel_time);
+  std::size_t matched_index = prev_trajectory.QueryNearestPoint(veh_rel_time);
 
   if (matched_index == prev_trajectory_size) {
     AWARN << "The previous trajectory is not long enough, something is wrong";
@@ -77,12 +77,12 @@ TrajectoryStitcher::compute_stitching_trajectory(
   }
 
   if (matched_index == 0 &&
-      veh_rel_time < prev_trajectory.start_point().relative_time()) {
+      veh_rel_time < prev_trajectory.StartPoint().relative_time()) {
     AWARN << "the previous trajectory doesn't cover current time";
     return compute_reinit_stitching_trajectory();
   }
 
-  auto matched_point = prev_trajectory.trajectory_point_at(matched_index);
+  auto matched_point = prev_trajectory.TrajectoryPointAt(matched_index);
   double position_diff =
       common::math::Vec2d(
           matched_point.path_point().x() - VehicleState::instance()->x(),
@@ -97,14 +97,14 @@ TrajectoryStitcher::compute_stitching_trajectory(
 
   double forward_rel_time = veh_rel_time + planning_cycle_time;
   std::size_t forward_index =
-      prev_trajectory.query_nearest_point(forward_rel_time);
+      prev_trajectory.QueryNearestPoint(forward_rel_time);
 
   std::vector<common::TrajectoryPoint> stitching_trajectory(
       prev_trajectory.trajectory_points().begin() + matched_index,
       prev_trajectory.trajectory_points().begin() + forward_index + 1);
 
   double zero_time =
-      prev_trajectory.trajectory_point_at(matched_index).relative_time();
+      prev_trajectory.TrajectoryPointAt(matched_index).relative_time();
 
   std::for_each(stitching_trajectory.begin(), stitching_trajectory.end(),
                 [&zero_time](common::TrajectoryPoint& tp) {
@@ -112,7 +112,7 @@ TrajectoryStitcher::compute_stitching_trajectory(
                 });
 
   double zero_s =
-      prev_trajectory.trajectory_point_at(forward_index).path_point().s();
+      prev_trajectory.TrajectoryPointAt(forward_index).path_point().s();
   std::for_each(stitching_trajectory.begin(), stitching_trajectory.end(),
                 [&zero_s](common::TrajectoryPoint& tp) {
                   double s = tp.path_point().s();

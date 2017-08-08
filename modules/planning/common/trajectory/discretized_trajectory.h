@@ -25,6 +25,7 @@
 
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/trajectory/trajectory.h"
+#include "glog/logging.h"
 
 namespace apollo {
 namespace planning {
@@ -34,44 +35,52 @@ class DiscretizedTrajectory : public Trajectory {
   DiscretizedTrajectory() = default;
 
   DiscretizedTrajectory(
-      std::vector<apollo::common::TrajectoryPoint> trajectory_points);
+      std::vector<common::TrajectoryPoint> trajectory_points);
 
   virtual ~DiscretizedTrajectory() = default;
 
-  double time_length() const override;
+  double TimeLength() const override;
 
-  apollo::common::TrajectoryPoint Evaluate(
+  common::TrajectoryPoint Evaluate(
       const double relative_time) const override;
 
-  apollo::common::TrajectoryPoint start_point() const override;
+  common::TrajectoryPoint StartPoint() const override;
 
-  apollo::common::TrajectoryPoint end_point() const override;
+  common::TrajectoryPoint EndPoint() const override;
 
-  virtual apollo::common::TrajectoryPoint evaluate_linear_approximation(
+  virtual common::TrajectoryPoint EvaluateUsingLinearApproximation(
       const double relative_time) const;
 
-  virtual uint32_t query_nearest_point(const double relative_time) const;
+  virtual uint32_t QueryNearestPoint(const double relative_time) const;
 
-  virtual uint32_t query_nearest_point(
+  virtual uint32_t QueryNearestPoint(
       const common::math::Vec2d& position) const;
 
-  virtual void append_trajectory_point(
-      const apollo::common::TrajectoryPoint& trajectory_point);
+  virtual void AppendTrajectoryPoint(
+      const common::TrajectoryPoint& trajectory_point);
 
-  const apollo::common::TrajectoryPoint& trajectory_point_at(
+  template <typename Iter>
+  void PrependTrajectoryPoints(Iter begin, Iter end) {
+    if (!_trajectory_points.empty() && begin != end) {
+      CHECK((end - 1)->relative_time() < _trajectory_points.front().relative_time());
+    }
+    _trajectory_points.insert(_trajectory_points.begin(), begin, end);
+  }
+
+  const common::TrajectoryPoint& TrajectoryPointAt(
       const std::uint32_t index) const;
 
-  uint32_t num_of_points() const;
+  uint32_t NumOfPoints() const;
 
   void SetTrajectoryPoints(
-      const std::vector<apollo::common::TrajectoryPoint>& points);
+      const std::vector<common::TrajectoryPoint>& points);
 
-  const std::vector<apollo::common::TrajectoryPoint>& trajectory_points() const;
+  const std::vector<common::TrajectoryPoint>& trajectory_points() const;
 
   virtual void Clear();
 
  protected:
-  std::vector<apollo::common::TrajectoryPoint> _trajectory_points;
+  std::vector<common::TrajectoryPoint> _trajectory_points;
 };
 
 }  // namespace planning

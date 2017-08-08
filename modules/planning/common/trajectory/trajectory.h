@@ -32,14 +32,14 @@ class Trajectory {
 
   virtual ~Trajectory() = default;
 
-  virtual double time_length() const = 0;
+  virtual double TimeLength() const = 0;
 
-  virtual apollo::common::TrajectoryPoint Evaluate(
+  virtual common::TrajectoryPoint Evaluate(
       const double relative_time) const = 0;
 
-  virtual apollo::common::TrajectoryPoint start_point() const = 0;
+  virtual common::TrajectoryPoint StartPoint() const = 0;
 
-  virtual apollo::common::TrajectoryPoint end_point() const = 0;
+  virtual common::TrajectoryPoint EndPoint() const = 0;
 };
 
 }  // namespace planning

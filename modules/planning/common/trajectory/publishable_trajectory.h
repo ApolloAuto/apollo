@@ -23,7 +23,6 @@
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "glog/logging.h"
 
 namespace apollo {
 namespace planning {
@@ -43,14 +42,6 @@ class PublishableTrajectory : public DiscretizedTrajectory {
   double header_time() const;
 
   void set_header_time(const double header_time);
-
-  template <typename Iter>
-  void prepend_trajectory_points(Iter begin, Iter end) {
-    if (!_trajectory_points.empty() && begin != end) {
-      CHECK((end - 1)->relative_time() < _trajectory_points.front().relative_time());
-    }
-    _trajectory_points.insert(_trajectory_points.begin(), begin, end);
-  }
 
   void populate_trajectory_protobuf(ADCTrajectory* trajectory_pb) const;
 

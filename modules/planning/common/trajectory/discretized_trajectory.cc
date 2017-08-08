@@ -37,7 +37,7 @@ DiscretizedTrajectory::DiscretizedTrajectory(
   _trajectory_points = std::move(trajectory_points);
 }
 
-double DiscretizedTrajectory::time_length() const {
+double DiscretizedTrajectory::TimeLength() const {
   if (_trajectory_points.empty()) {
     return 0.0;
   }
@@ -66,7 +66,7 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
   return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
 }
 
-TrajectoryPoint DiscretizedTrajectory::evaluate_linear_approximation(
+TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
     const double relative_time) const {
   auto comp = [](const TrajectoryPoint& p, const double relative_time) {
     return p.relative_time() < relative_time;
@@ -83,7 +83,7 @@ TrajectoryPoint DiscretizedTrajectory::evaluate_linear_approximation(
                                                 relative_time);
 }
 
-std::uint32_t DiscretizedTrajectory::query_nearest_point(
+std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
     const double relative_time) const {
   auto func = [](const TrajectoryPoint& tp, const double relative_time) {
     return tp.relative_time() < relative_time;
@@ -94,7 +94,7 @@ std::uint32_t DiscretizedTrajectory::query_nearest_point(
   return (std::uint32_t)(it_lower - _trajectory_points.begin());
 }
 
-std::uint32_t DiscretizedTrajectory::query_nearest_point(
+std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
     const common::math::Vec2d& position) const {
   double dist_min = std::numeric_limits<double>::max();
   std::uint32_t index_min = 0;
@@ -112,7 +112,7 @@ std::uint32_t DiscretizedTrajectory::query_nearest_point(
   return index_min;
 }
 
-void DiscretizedTrajectory::append_trajectory_point(
+void DiscretizedTrajectory::AppendTrajectoryPoint(
     const TrajectoryPoint& trajectory_point) {
   if (!_trajectory_points.empty()) {
     CHECK_GT(trajectory_point.relative_time(),
@@ -121,23 +121,23 @@ void DiscretizedTrajectory::append_trajectory_point(
   _trajectory_points.push_back(trajectory_point);
 }
 
-const TrajectoryPoint& DiscretizedTrajectory::trajectory_point_at(
+const TrajectoryPoint& DiscretizedTrajectory::TrajectoryPointAt(
     const std::uint32_t index) const {
-  CHECK_LT(index, num_of_points());
+  CHECK_LT(index, NumOfPoints());
   return _trajectory_points[index];
 }
 
-TrajectoryPoint DiscretizedTrajectory::start_point() const {
+TrajectoryPoint DiscretizedTrajectory::StartPoint() const {
   CHECK(!_trajectory_points.empty());
   return _trajectory_points.front();
 }
 
-TrajectoryPoint DiscretizedTrajectory::end_point() const {
+TrajectoryPoint DiscretizedTrajectory::EndPoint() const {
   CHECK(!_trajectory_points.empty());
   return _trajectory_points.back();
 }
 
-std::uint32_t DiscretizedTrajectory::num_of_points() const {
+std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
   return _trajectory_points.size();
 }
 
