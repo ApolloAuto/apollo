@@ -21,13 +21,13 @@
 #include <fstream>
 
 #include <float.h>
+#include "modules/common/log.h"
+#include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
 #include "modules/routing/common/routing_gflags.h"
-#include "modules/routing/common/utils.h"
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_node.h"
 #include "modules/routing/strategy/a_star_strategy.h"
-#include "modules/common/log.h"
-#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace routing {
@@ -40,10 +40,11 @@ using ::apollo::routing::RoutingResponse_PassageRegion;
 using ::apollo::routing::RoutingResponse_LaneSegment;
 using ::apollo::routing::RoutingResponse_LaneChangeInfo;
 using ::apollo::common::time::Clock;
+using ::apollo::common::util::SetProtoToASCIIFile;
 
 void get_nodes_of_ways_based_on_virtual(
     const std::vector<const TopoNode*>& nodes,
-    std::vector<std::vector<const TopoNode*> >* const nodes_of_ways) {
+    std::vector<std::vector<const TopoNode*>>* const nodes_of_ways) {
   AINFO << "Cut routing ways based on is_virtual.";
   assert(!nodes.empty());
   nodes_of_ways->clear();
@@ -63,7 +64,7 @@ void get_nodes_of_ways_based_on_virtual(
 
 void get_nodes_of_ways(
     const std::vector<const TopoNode*>& nodes,
-    std::vector<std::vector<const TopoNode*> >* const nodes_of_ways) {
+    std::vector<std::vector<const TopoNode*>>* const nodes_of_ways) {
   AINFO << "Cut routing ways based on road id.";
   assert(!nodes.empty());
   nodes_of_ways->clear();
@@ -83,8 +84,9 @@ void get_nodes_of_ways(
 
 void extract_basic_passages(
     const std::vector<const TopoNode*>& nodes,
-    std::vector<std::vector<const TopoNode*> >* const nodes_of_passages,
-    std::vector<RoutingResponse_LaneChangeInfo::Type>* const lane_change_types) {
+    std::vector<std::vector<const TopoNode*>>* const nodes_of_passages,
+    std::vector<RoutingResponse_LaneChangeInfo::Type>* const
+        lane_change_types) {
   assert(!nodes.empty());
   nodes_of_passages->clear();
   lane_change_types->clear();
@@ -151,30 +153,25 @@ template <typename T>
 void show_request_info(const T& request) {
   const auto& start = request.start();
   const auto& end = request.end();
-  AERROR << "Start point - lane id: " << start.id().c_str()
-        << " s " << start.s() << " x " << start.pose().x()
-        << " y " << start.pose().y();
+  AERROR << "Start point - lane id: " << start.id() << " s " << start.s()
+         << " x " << start.pose().x() << " y " << start.pose().y();
 
   for (const auto& wp : request.waypoint()) {
-    AINFO << "Way Point - lane id: " << wp.id().c_str()
-          << " s " << wp.s() << " x " << wp.pose().x()
-          << " y " << wp.pose().y();
+    AINFO << "Way Point - lane id: " << wp.id() << " s " << wp.s() << " x "
+          << wp.pose().x() << " y " << wp.pose().y();
   }
 
   for (const auto& bl : request.blacklisted_lane()) {
-    AINFO << "Way Point - lane id: " << bl.id().c_str()
-          << " start_s " << bl.start_s()
+    AINFO << "Way Point - lane id: " << bl.id() << " start_s " << bl.start_s()
           << " end_s " << bl.end_s();
   }
 
-  AERROR << "End point - lane id: " << end.id().c_str()
-        << " s " << end.s() << " x " << end.pose().x()
-        << " y " << end.pose().y();
+  AERROR << "End point - lane id: " << end.id() << " s " << end.s() << " x "
+         << end.pose().x() << " y " << end.pose().y();
 }
 
 void generate_black_set_from_road(
-    const ::apollo::routing::RoutingRequest& request,
-    const TopoGraph* graph,
+    const ::apollo::routing::RoutingRequest& request, const TopoGraph* graph,
     std::unordered_set<const TopoNode*>* const black_list) {
   for (const auto& road_id : request.blacklisted_road()) {
     graph->get_nodes_by_road_id(road_id, black_list);
@@ -201,13 +198,11 @@ bool get_way_nodes(const T& request, const TopoGraph* graph,
   const auto* start_node = graph->get_node(request.start().id());
   const auto* end_node = graph->get_node(request.end().id());
   if (start_node == nullptr) {
-    AERROR << "Can't find start point in graph! Id: "
-           << request.start().id().c_str();
+    AERROR << "Can't find start point in graph! Id: " << request.start().id();
     return false;
   }
   if (end_node == nullptr) {
-    AERROR << "Can't find end point in graph! Id: "
-           << request.start().id().c_str();
+    AERROR << "Can't find end point in graph! Id: " << request.start().id();
     return false;
   }
 
@@ -216,16 +211,14 @@ bool get_way_nodes(const T& request, const TopoGraph* graph,
   for (const auto& point : request.waypoint()) {
     const auto* cur_node = graph->get_node(point.id());
     if (cur_node == nullptr) {
-      AERROR << "Can't find way point in graph! Id: " << point.id().c_str();
+      AERROR << "Can't find way point in graph! Id: " << point.id();
       return false;
     }
     way_nodes->push_back(cur_node);
   }
 
-  if (way_nodes->size() == 1
-        && start_node == end_node
-        && request.start().s() > request.end().s()) {
-
+  if (way_nodes->size() == 1 && start_node == end_node &&
+      request.start().s() > request.end().s()) {
     if (start_node->out_to_suc_edge().size() == 1) {
       for (const auto& inter_edge : start_node->out_to_suc_edge()) {
         way_nodes->push_back(inter_edge->to_node());
@@ -275,8 +268,7 @@ bool search_route_by_strategy(
     if (!strategy_ptr->Search(graph, cur_start, cur_end, black_list,
                               &cur_result_nodes)) {
       AERROR << "Failed to search route with waypoint from "
-             << cur_start->lane_id().c_str()
-             << " to " << cur_end->lane_id().c_str();
+             << cur_start->lane_id() << " to " << cur_end->lane_id();
       return false;
     }
     auto end_iter = cur_result_nodes.end();
@@ -294,8 +286,7 @@ bool search_route_by_strategy(
 Navigator::Navigator(const std::string& topo_file_path) : _is_ready(false) {
   _graph.reset(new TopoGraph());
   if (!_graph->load_graph(topo_file_path)) {
-    AERROR << "Navigator init graph failed! File path: "
-          << topo_file_path.c_str();
+    AERROR << "Navigator init graph failed! File path: " << topo_file_path;
     return;
   }
   _is_ready = true;
@@ -304,7 +295,9 @@ Navigator::Navigator(const std::string& topo_file_path) : _is_ready(false) {
 
 Navigator::~Navigator() {}
 
-bool Navigator::is_ready() const { return _is_ready; }
+bool Navigator::is_ready() const {
+  return _is_ready;
+}
 
 bool Navigator::search_route(
     const ::apollo::routing::RoutingRequest& request,
@@ -334,10 +327,10 @@ bool Navigator::search_route(
     return false;
   }
 
-  if (!generate_passage_region(request, result_nodes, black_list, &range_manager,
-                               response)) {
-    AERROR <<
-        "Failed to generate new passage regions based on route result lane";
+  if (!generate_passage_region(request, result_nodes, black_list,
+                               &range_manager, response)) {
+    AERROR
+        << "Failed to generate new passage regions based on route result lane";
     return false;
   }
 
@@ -354,7 +347,8 @@ bool Navigator::generate_passage_region(
     const std::unordered_set<const TopoNode*>& black_list,
     NodeRangeManager* const range_manager,
     ::apollo::routing::RoutingResponse* result) const {
-  result->mutable_header()->set_timestamp_sec(apollo::common::time::ToSecond(Clock::Now()));
+  result->mutable_header()->set_timestamp_sec(
+      apollo::common::time::ToSecond(Clock::Now()));
   result->mutable_header()->set_module_name(FLAGS_node_name);
   result->mutable_header()->set_sequence_num(1);
 
@@ -373,7 +367,7 @@ void Navigator::generate_passage_region(
     const std::unordered_set<const TopoNode*>& black_list,
     NodeRangeManager* const range_manager,
     ::apollo::routing::RoutingResponse* result) const {
-  std::vector<std::vector<const TopoNode*> > nodes_of_ways;
+  std::vector<std::vector<const TopoNode*>> nodes_of_ways;
   if (FLAGS_use_road_id) {
     get_nodes_of_ways(nodes, &nodes_of_ways);
   } else {
@@ -385,7 +379,7 @@ void Navigator::generate_passage_region(
     AINFO << "Way " << std::to_string(i);
     const std::vector<const TopoNode*>& nodes_of_way = nodes_of_ways.at(i);
     if (FLAGS_use_road_id || !nodes_of_way.at(0)->is_virtual()) {
-      std::vector<std::vector<const TopoNode*> > nodes_of_basic_passages;
+      std::vector<std::vector<const TopoNode*>> nodes_of_basic_passages;
       std::vector<RoutingResponse_LaneChangeInfo::Type> lane_change_types;
       extract_basic_passages(nodes_of_way, &nodes_of_basic_passages,
                              &lane_change_types);
@@ -414,10 +408,8 @@ void Navigator::generate_passage_region(
       RoutingResponse_Junction junction;
       RoutingResponse_PassageRegion region;
       junction.set_id("j" + std::to_string(num_of_junctions));
-      junction.set_in_road_id(
-          "r" + std::to_string(num_of_roads - 1));
-      junction.set_out_road_id("r" +
-                               std::to_string(num_of_roads));
+      junction.set_in_road_id("r" + std::to_string(num_of_roads - 1));
+      junction.set_out_road_id("r" + std::to_string(num_of_roads));
       for (const auto& node : nodes_of_way) {
         RoutingResponse_LaneSegment* seg = region.add_segment();
         seg->set_id(node->lane_id());
@@ -441,22 +433,20 @@ void Navigator::dump_debug_data(
   AINFO << "Route lane id\tis virtual\tstart s\tend s";
   for (const auto& node : nodes) {
     NodeRange range = range_manager.get_node_range(node);
-    fout << node->lane_id() << ", "
-         << node->is_virtual() << ","
-         << range.start_s << ","
-         << range.end_s << "\n";
-    AINFO << node->lane_id().c_str() << "\t" << node->is_virtual()
-          << range.start_s << "\t" << range.end_s;
+    fout << node->lane_id() << ", " << node->is_virtual() << ","
+         << range.start_s << "," << range.end_s << "\n";
+    AINFO << node->lane_id() << "\t" << node->is_virtual() << range.start_s
+          << "\t" << range.end_s;
   }
 
   fout.close();
 
   std::string dump_path = FLAGS_debug_passage_region_path;
-  if (!FileUtils::dump_protobuf_data_to_file(dump_path, response)) {
+  if (!SetProtoToASCIIFile(response, dump_path)) {
     AERROR << "Failed to dump passage region debug file.";
   }
   AINFO << "Passage region debug file is dumped successfully. Dump path: "
-        << dump_path.c_str();
+        << dump_path;
 }
 
 }  // namespace routing

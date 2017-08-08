@@ -23,8 +23,9 @@ cc_library(
         "//modules/common",
         "//modules/common/proto:common_proto",
         "//modules/common/time",
+        "//modules/common/util",
         "//modules/map/proto:map_proto",
-        "//modules/routing/common",
+        "//modules/routing/common:routing_gflags",
         "//modules/routing/graph",
         "//modules/routing/proto:routing_proto",
         "//modules/routing/strategy",
@@ -41,7 +42,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/proto:common_proto",
-        "//modules/routing/common",
+        "//modules/routing/common:routing_gflags",
         "//modules/routing/graph",
     ],
 )

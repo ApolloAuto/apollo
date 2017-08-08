@@ -39,7 +39,7 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
-        "//modules/routing/common",
+        "//modules/routing/common:routing_gflags",
         "//modules/routing/proto:routing_proto",
     ],
 )
