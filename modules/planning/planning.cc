@@ -139,6 +139,7 @@ Status Planning::Start() {
   static ros::Rate loop_rate(FLAGS_planning_loop_rate);
   while (ros::ok()) {
     RunOnce();
+    FrameHistory::instance()->Add(frame_->sequence_num(), std::move(frame_));
     ros::spinOnce();
     loop_rate.sleep();
   }
@@ -253,6 +254,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
 
   // update last publishable trajectory;
   last_publishable_trajectory_ = std::move(publishable_trajectory);
+
   return true;
 }
 

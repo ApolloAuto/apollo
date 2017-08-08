@@ -70,7 +70,7 @@ bool ReferenceLineSmoother::smooth(
     return false;
   }
 
-  if (!apply_kernel()) {
+  if (!ApplyKernel()) {
     AERROR << "Add kernel for spline smoother failed.";
     return false;
   }
@@ -177,7 +177,7 @@ bool ReferenceLineSmoother::apply_constraint(
   return true;
 }
 
-bool ReferenceLineSmoother::apply_kernel() {
+bool ReferenceLineSmoother::ApplyKernel() {
   Spline2dKernel* kernel = spline_solver_->mutable_kernel();
 
   // add spline kernel
