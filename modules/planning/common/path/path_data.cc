@@ -31,6 +31,9 @@
 namespace apollo {
 namespace planning {
 
+using SLPoint = apollo::common::SLPoint;
+using Vec2d = apollo::common::math::Vec2d;
+
 void PathData::set_discretized_path(const DiscretizedPath &path) {
   discretized_path_ = path;
 }
@@ -59,33 +62,19 @@ bool PathData::get_path_point_with_path_s(
 }
 
 bool PathData::get_path_point_with_ref_s(
-    const double ref_s, common::PathPoint *const path_point) const {
-  const auto &frenet_points = frenet_path_.points();
-  if (frenet_points.size() < 2 || ref_s < frenet_points.front().s() ||
-      frenet_points.back().s() < ref_s) {
-    return false;
-  }
-
-  auto comp = [](const common::FrenetFramePoint &frenet_point,
-                 const double ref_s) { return frenet_point.s() < ref_s; };
-
-  auto it_lower =
-      std::lower_bound(frenet_points.begin(), frenet_points.end(), ref_s, comp);
-  if (it_lower == frenet_points.begin()) {
-    *path_point = discretized_path_.points().front();
-  } else {
-    //        std::uint32_t index_lower = (std::uint32_t)(it_lower -
-    //        frenet_points.begin());
-    //
-    //        double ref_s0 = (it_lower - 1)->s();
-    //        double ref_s1 = it_lower->s();
-    //
-    //        CHECK_LT(ref_s0, ref_s1);
-    //        double weight = (ref_s - ref_s0) / (ref_s1 - ref_s0);
-    //        *path_point =
-    //        common::PathPoint::interpolate_linear_approximation(path_.path_point_at(index_lower
-    //        - 1),
-    //                path_.path_point_at(index_lower), weight);
+    const ReferenceLine &reference_line, const double ref_s,
+    common::PathPoint *const path_point) const {
+  *path_point = discretized_path_.start_point();
+  for (common::PathPoint point : discretized_path_.points()) {
+    SLPoint sl;
+    reference_line.get_point_in_frenet_frame(Vec2d(point.x(), point.y()), &sl);
+    if (Double::Compare(sl.s(), ref_s) == 0) {
+      path_point->CopyFrom(point);
+      return true;
+    }
+    if (std::fabs(sl.s() - ref_s) < std::fabs(path_point->s() - ref_s)) {
+      path_point->CopyFrom(point);
+    }
   }
   return true;
 }

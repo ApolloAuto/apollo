@@ -25,6 +25,7 @@
 
 #include "modules/planning/common/path/discretized_path.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
+#include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
@@ -46,7 +47,8 @@ class PathData {
   bool get_path_point_with_path_s(const double s,
                                   common::PathPoint *const path_point) const;
 
-  bool get_path_point_with_ref_s(const double ref_s,
+  bool get_path_point_with_ref_s(const ReferenceLine &reference_line,
+                                 const double ref_s,
                                  common::PathPoint *const path_point) const;
 
   void Clear();

@@ -113,6 +113,7 @@ bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
                                                Vec2d(curr_time, s_high_limit_)};
   *s_upper = s_high_limit_;
   *s_lower = 0.0;
+
   Vec2d p_s_first;
   Vec2d p_s_second;
 
@@ -123,8 +124,7 @@ bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
   }
   if (boundary_type_ == BoundaryType::STOP ||
       boundary_type_ == BoundaryType::YIELD ||
-      boundary_type_ == BoundaryType::FOLLOW ||
-      boundary_type_ == BoundaryType::UNKNOWN) {
+      boundary_type_ == BoundaryType::FOLLOW) {
     *s_upper = std::fmin(*s_upper, std::fmin(p_s_first.y(), p_s_second.y()));
   } else if (boundary_type_ == BoundaryType::OVERTAKE) {
     // overtake
