@@ -35,6 +35,8 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
 
 /**
  * @file message_adapters.h
@@ -65,6 +67,8 @@ using TrafficLightDetectionAdapter =
     Adapter<::apollo::perception::TrafficLightDetection>;
 using RoutingRequestAdapter = Adapter<::apollo::routing::RoutingRequest>;
 using RoutingResponseAdapter = Adapter<::apollo::routing::RoutingResponse>;
+using RelativeOdometryAdapter = Adapter<::apollo::calibration::republish_msg::RelativeOdometry>;
+using InsStatAdapter = Adapter<::apollo::drivers::gnss::InsStat>;
 
 }  // namespace adapter
 }  // namespace common

@@ -211,6 +211,8 @@ class AdapterManager {
   REGISTER_ADAPTER(TrafficLightDetection);
   REGISTER_ADAPTER(RoutingRequest);
   REGISTER_ADAPTER(RoutingResponse);
+  REGISTER_ADAPTER(RelativeOdometry);
+  REGISTER_ADAPTER(InsStat);
 
   DECLARE_SINGLETON(AdapterManager);
 };
