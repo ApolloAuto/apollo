@@ -49,7 +49,7 @@ class ReferenceLineSmoother {
 
   bool apply_constraint(const ReferenceLine& raw_reference_line);
 
-  bool apply_kernel();
+  bool ApplyKernel();
 
   bool solve();
 
