@@ -94,7 +94,7 @@ bool PathData::get_path_point_with_ref_s(
     SLPoint sl;
     if (!reference_line_->get_point_in_frenet_frame(
             Vec2d(curr_path_point.x(), curr_path_point.y()), &sl)) {
-      AERROR << "Fail to get point in frenet from.";
+      AERROR << "Fail to get point in frenet from:" << curr_path_point.DebugString();
       return false;
     }
     const double curr_distance = std::fabs(sl.s() - ref_s);
