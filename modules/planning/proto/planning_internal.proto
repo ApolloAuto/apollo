@@ -50,35 +50,7 @@ message PlanningObstacle {
 }
 
 message Debug {
-  /*
-      PLEASE add id here
-      id = 1: st_graph_info
-  */
-  message DebugMessage {
-    optional apollo.common.ErrorCode error_code = 1;
-    optional int32 id = 2;
-    oneof debug_string {
-      string trace = 3;
-      string info = 4;
-      string warn = 5;
-      string error = 6;
-      string fatal = 7;
-    }
-  }
-
-  optional apollo.common.ErrorCode error_code = 1;
   optional PlanningData planning_data = 2;
-  repeated DebugMessage debug_message = 3;
-}
-
-message LightSignal {
-  optional bool emergency = 1; // hazard signal
-  enum TurnSignal {
-    NO_TURN = 1;
-    LEFT_TURN = 2;
-    RIGHT_TURN = 3;
-  };
-  optional TurnSignal turn_signal = 2 [default = NO_TURN];
 }
 
 message SpeedPlan {
@@ -100,8 +72,6 @@ message STGraphDebug {
 
 // next id: 15
 message PlanningData {
-  optional apollo.common.Header header = 1;
-
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
   optional apollo.canbus.Chassis chassis = 8;
@@ -111,11 +81,4 @@ message PlanningData {
   repeated apollo.common.Path path = 6;
   repeated SpeedPlan speed_plan = 13;
   repeated STGraphDebug st_graph = 14;
-
-  optional apollo.localization.Pose init_status = 2 [deprecated = true];  // initial status of adc
-  optional apollo.planning.MainDecision main_decision = 3 [deprecated = true];
-  repeated PlanningObstacle planning_obstacle = 4 [deprecated = true];
-  optional LightSignal light_signal = 5 [deprecated = true];
-  optional bool is_replan = 11 [deprecated = true];
-
 }
