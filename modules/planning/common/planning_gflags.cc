@@ -110,14 +110,23 @@ DEFINE_double(stgraph_max_deceleration_divide_factor_level_2, 2.0,
 // Decision Part
 DEFINE_double(static_decision_ignore_range, 3.0,
               "threshold for judging nudge in dp path computing decision");
-DEFINE_double(
-    static_decision_stop_buffer, 0.5,
-    "added distance to vehicle width for static decision collision judgement");
-DEFINE_double(dp_path_decision_buffer, 0.65,
-              "buffer in decision while dp path computing decision");
+DEFINE_double(static_decision_stop_buffer, 0.5,
+              "added distance to vehicle width for static decision collision judgement");
 DEFINE_double(dynamic_decision_follow_range, 1.0,
               "threshold for judging follow in dp path computing decision for "
               "static obstacles");
+DEFINE_double(stop_distance_pedestrian, 3.0,
+              "stop distance from in-lane pedestrian (meters)");
+DEFINE_double(stop_distance_obstacle, 3.0,
+              "stop distance from in-lane obstacle (meters)");
+DEFINE_double(nudge_distance_vehicle, 0.3,
+              "minimum distance to nudge a vehicle");
+DEFINE_double(nudge_distance_bicycle, 0.9144,
+              "minimum distance to nudge a bicycle (3 feet = 0.9144 meter)");
+DEFINE_double(nudge_distance_obstacle, 0.3,
+              "minimum distance to nudge a obstacle (meters)");
+DEFINE_double(follow_min_distance, 3,
+              "min follow distance for vehicles/bicycles/moving objects");
 
 // Prediction Part
 

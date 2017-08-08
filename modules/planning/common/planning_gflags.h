@@ -77,8 +77,13 @@ DECLARE_double(stgraph_max_deceleration_divide_factor_level_2);
 // Decision Part
 DECLARE_double(static_decision_ignore_range);
 DECLARE_double(static_decision_stop_buffer);
-DECLARE_double(dp_path_decision_buffer);
 DECLARE_double(dynamic_decision_follow_range);
+DECLARE_double(stop_distance_pedestrian);
+DECLARE_double(stop_distance_obstacle);
+DECLARE_double(nudge_distance_vehicle);
+DECLARE_double(nudge_distance_bicycle);
+DECLARE_double(nudge_distance_obstacle);
+DECLARE_double(follow_min_distance);
 
 // Predeciton Part
 DECLARE_int32(adc_id);
