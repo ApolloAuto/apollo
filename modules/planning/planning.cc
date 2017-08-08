@@ -233,7 +233,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
     return false;
   }
 
-  publishable_trajectory.prepend_trajectory_points(
+  publishable_trajectory.PrependTrajectoryPoints(
       stitching_trajectory.begin(), stitching_trajectory.end() - 1);
 
   publishable_trajectory.set_header_time(current_time_stamp);

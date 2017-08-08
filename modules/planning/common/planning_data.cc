@@ -66,7 +66,7 @@ bool PlanningData::aggregate(const double time_resolution,
     trajectory_point.set_v(speed_point.v());
     trajectory_point.set_a(speed_point.a());
     trajectory_point.set_relative_time(speed_point.t() + relative_time);
-    trajectory->append_trajectory_point(trajectory_point);
+    trajectory->AppendTrajectoryPoint(trajectory_point);
   }
   return true;
 }
