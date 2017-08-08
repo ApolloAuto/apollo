@@ -118,6 +118,14 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableDecision(FLAGS_decision_topic, config.mode(),
                        config.message_history_limit());
         break;
+      case AdapterConfig::RELATIVE_ODOMETRY:
+        EnableRelativeOdometry(FLAGS_relative_odometry_topic, config.mode(), 
+                          config.message_history_limit());
+        break;
+      case AdapterConfig::INS_STAT:
+        EnableInsStat(FLAGS_ins_stat_topic, config.mode(), 
+                          config.message_history_limit());
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;

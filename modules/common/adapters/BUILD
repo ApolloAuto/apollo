@@ -89,6 +89,8 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
         "//modules/routing/proto:routing_proto",
+        "//modules/calibration/republish_msg/proto:relative_odometry_proto",
+        "//modules/drivers/gnss/proto:ins_proto",
         "@glog//:glog",
     ],
 )

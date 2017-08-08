@@ -22,6 +22,8 @@ message AdapterConfig {
     CANBUS = 15;
     ROUTING_REQUEST = 16;
     ROUTING_RESPONSE = 17;
+    RELATIVE_ODOMETRY = 18;
+    INS_STAT = 19;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
