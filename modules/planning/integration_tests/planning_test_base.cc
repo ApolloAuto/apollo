@@ -129,13 +129,13 @@ void PlanningTestBase::export_path_data(const PathData& path_data,
   ofs << "s, l, dl, ddl, x, y, z" << std::endl;
   const auto& frenet_path = path_data.frenet_frame_path();
   const auto& discrete_path = path_data.discretized_path();
-  if (frenet_path.number_of_points() != discrete_path.num_of_points()) {
+  if (frenet_path.NumOfPoints() != discrete_path.NumOfPoints()) {
     AERROR << "frenet_path and discrete path have different number of points";
     return;
   }
-  for (uint32_t i = 0; i < frenet_path.number_of_points(); ++i) {
-    const auto& frenet_point = frenet_path.point_at(i);
-    const auto& discrete_point = discrete_path.path_point_at(i);
+  for (uint32_t i = 0; i < frenet_path.NumOfPoints(); ++i) {
+    const auto& frenet_point = frenet_path.PointAt(i);
+    const auto& discrete_point = discrete_path.PathPointAt(i);
     ofs << frenet_point.s() << ", " << frenet_point.l() << ", "
         << frenet_point.dl() << ", " << frenet_point.ddl() << discrete_point.x()
         << ", " << discrete_point.y() << ", " << discrete_point.z()

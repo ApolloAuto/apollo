@@ -32,39 +32,38 @@ FrenetFramePath::FrenetFramePath(
   points_ = std::move(sl_points);
 }
 
-void FrenetFramePath::set_points(
-    const std::vector<common::FrenetFramePoint> &points) {
-  points_ = points;
+void FrenetFramePath::set_points(std::vector<common::FrenetFramePoint> points) {
+  points_ = std::move(points);
 }
 
 const std::vector<common::FrenetFramePoint> &FrenetFramePath::points() const {
   return points_;
 }
 
-double FrenetFramePath::length() const {
+double FrenetFramePath::Length() const {
   if (points_.empty()) {
     return 0.0;
   }
   return points_.back().s() - points_.front().s();
 }
 
-std::uint32_t FrenetFramePath::number_of_points() const {
+std::uint32_t FrenetFramePath::NumOfPoints() const {
   return points_.size();
 }
 
-const common::FrenetFramePoint &FrenetFramePath::point_at(
+const common::FrenetFramePoint &FrenetFramePath::PointAt(
     const std::uint32_t index) const {
   CHECK_LT(index, points_.size());
   return points_[index];
 }
 
-common::FrenetFramePoint &FrenetFramePath::point_at(const std::uint32_t index) {
+common::FrenetFramePoint &FrenetFramePath::PointAt(const std::uint32_t index) {
   CHECK_LT(index, points_.size());
   return points_[index];
 }
 
 // TODO: implement interpolate
-const common::FrenetFramePoint &FrenetFramePath::interpolate(double s) const {
+const common::FrenetFramePoint &FrenetFramePath::Interpolate(double s) const {
   return points_.front();
 }
 

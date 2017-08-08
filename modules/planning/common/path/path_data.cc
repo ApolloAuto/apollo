@@ -48,7 +48,7 @@ bool PathData::set_discretized_path(const DiscretizedPath &path) {
     AERROR << "Fail to transfer discretized path to frenet path.";
     return false;
   }
-  DCHECK_EQ(discretized_path_.points().size(), frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.NumOfPoints(), frenet_path_.points().size());
   return true;
 }
 
@@ -63,7 +63,7 @@ bool PathData::set_frenet_path(const FrenetFramePath &frenet_path) {
     AERROR << "Fail to transfer frenet path to discretized path.";
     return false;
   }
-  DCHECK_EQ(discretized_path_.points().size(), frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.NumOfPoints(), frenet_path_.points().size());
   return true;
 }
 
@@ -82,7 +82,7 @@ void PathData::set_reference_line(const ReferenceLine *reference_line) {
 
 bool PathData::get_path_point_with_path_s(
     const double s, common::PathPoint *const path_point) const {
-  *path_point = discretized_path_.evaluate_linear_approximation(s);
+  *path_point = discretized_path_.EvaluateUsingLinearApproximation(s);
   return true;
 }
 
@@ -90,7 +90,7 @@ bool PathData::get_path_point_with_ref_s(
     const double ref_s, common::PathPoint *const path_point) const {
   DCHECK_NOTNULL(reference_line_);
   DCHECK_NOTNULL(path_point);
-  DCHECK_EQ(discretized_path_.points().size(), frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.path_points().size(), frenet_path_.points().size());
 
   uint32_t index = 0;
   const double kDistanceEpsilon = 1e-3;
@@ -99,7 +99,7 @@ bool PathData::get_path_point_with_ref_s(
     const double curr_distance =
         std::fabs(ref_s - frenet_path_.points().at(i).s());
     if (curr_distance < kDistanceEpsilon) {
-      path_point->CopyFrom(discretized_path_.points().at(i));
+      path_point->CopyFrom(discretized_path_.PathPointAt(i));
       return true;
     }
     if (curr_distance < shortest_distance) {
@@ -107,7 +107,7 @@ bool PathData::get_path_point_with_ref_s(
       shortest_distance = curr_distance;
     }
   }
-  path_point->CopyFrom(discretized_path_.points().at(index));
+  path_point->CopyFrom(discretized_path_.PathPointAt(index));
 
   return true;
 }
@@ -119,7 +119,7 @@ void PathData::Clear() {
 }
 
 std::string PathData::DebugString() const {
-  const auto &path_points = discretized_path_.points();
+  const auto &path_points = discretized_path_.path_points();
   const auto limit =
       std::min(path_points.size(),
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
@@ -176,7 +176,7 @@ bool PathData::CartesianToFrenet(const DiscretizedPath &discretized_path,
   DCHECK_NOTNULL(frenet_path);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
 
-  for (const auto &path_point : discretized_path.points()) {
+  for (const auto &path_point : discretized_path.path_points()) {
     SLPoint sl_point;
     if (!reference_line_->get_point_in_frenet_frame(
             Vec2d(path_point.x(), path_point.y()), &sl_point)) {

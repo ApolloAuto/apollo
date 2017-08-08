@@ -90,8 +90,8 @@ TEST_F(DpRoadGraphTest, speed_road_graph) {
   ASSERT_TRUE(reference_line_ != nullptr);
   bool result = road_graph.FindPathTunnel(init_point_, &path_data_);
   EXPECT_TRUE(result);
-  EXPECT_EQ(648, path_data_.discretized_path().num_of_points());
-  EXPECT_EQ(648, path_data_.frenet_frame_path().number_of_points());
+  EXPECT_EQ(648, path_data_.discretized_path().NumOfPoints());
+  EXPECT_EQ(648, path_data_.frenet_frame_path().NumOfPoints());
   EXPECT_FLOAT_EQ(70.450378,
                   path_data_.frenet_frame_path().points().back().s());
   EXPECT_FLOAT_EQ(0.0, path_data_.frenet_frame_path().points().back().l());

@@ -34,32 +34,32 @@ class DiscretizedPath {
 
   explicit DiscretizedPath(std::vector<common::PathPoint> path_points);
 
-  void set_points(std::vector<common::PathPoint> path_points);
+  void set_path_points(std::vector<common::PathPoint> path_points);
 
   virtual ~DiscretizedPath() = default;
 
   common::PathPoint Evaluate(const double param) const;
 
-  double length() const;
+  double Length() const;
 
-  common::PathPoint start_point() const;
+  common::PathPoint StartPoint() const;
 
-  common::PathPoint end_point() const;
+  common::PathPoint EndPoint() const;
 
-  common::PathPoint evaluate_linear_approximation(const double param) const;
+  common::PathPoint EvaluateUsingLinearApproximation(const double param) const;
 
-  int query_closest_point(const double param) const;
+  int QueryClosestPoint(const double param) const;
 
-  const std::vector<common::PathPoint> &points() const;
+  const std::vector<common::PathPoint> &path_points() const;
 
-  std::uint32_t num_of_points() const;
+  std::uint32_t NumOfPoints() const;
 
-  const common::PathPoint &path_point_at(const std::uint32_t index) const;
+  const common::PathPoint &PathPointAt(const std::uint32_t index) const;
 
-  common::PathPoint &path_point_at(const std::uint32_t index);
+  common::PathPoint &PathPointAt(const std::uint32_t index);
 
  protected:
-  std::vector<common::PathPoint>::const_iterator query_lower_bound(
+  std::vector<common::PathPoint>::const_iterator QueryLowerBound(
       const double param) const;
 
   std::vector<common::PathPoint> path_points_;
