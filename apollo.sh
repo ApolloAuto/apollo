@@ -478,11 +478,20 @@ function config() {
   ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
 
+function link_cpu_caffe_build() {
+  echo "Link CPU version of caffe.BUILD ..."
+  cd third_party
+  rm -f caffe.BUILD
+  ln -sf caffe_cpu.BUILD caffe.BUILD
+  cd -
+}
+
 function main() {
   source_apollo_base
   apollo_check_system_config
   check_machine_arch
   check_esd_files
+  link_cpu_caffe_build
 
   case $1 in
     check)

@@ -19,10 +19,6 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/base/file_util.h"
 
-#ifndef CPU_ONLY
-#define CPU_ONLY
-#endif
-
 using std::string;
 using std::vector;
 
@@ -56,14 +52,23 @@ bool CNNSegmentation::Init() {
 #ifdef CPU_ONLY
   caffe::Caffe::set_mode(caffe::Caffe::CPU);
 #else
-  CHECK(cnnseg_param_.gpu_id() >= 0);
-  caffe::Caffe::SetDevice(cnnseg_param_.gpu_id);
+  int gpu_id = static_cast<int>(cnnseg_param_.gpu_id());
+  CHECK(gpu_id >= 0);
+  caffe::Caffe::SetDevice(gpu_id);
   caffe::Caffe::set_mode(caffe::Caffe::GPU);
   caffe::Caffe::DeviceQuery();
 #endif
 
   caffe_net_.reset(new caffe::Net<float>(proto_file, caffe::TEST));
   caffe_net_->CopyTrainedLayersFrom(weight_file);
+
+  AERROR << "confidence threshold = "<<cnnseg_param_.confidence_thresh();
+  
+#ifdef CPU_ONLY  
+  AERROR << "using Caffe CPU mode";
+#else
+  AERROR << "using Caffe GPU mode";
+#endif    
 
   /// set related Caffe blobs
   // center offset prediction
@@ -126,8 +131,7 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   // network forward process
   caffe_net_->Forward();
   network_time_ = timer_.Toc(true);
-  AERROR<< "objectness threshold is "<<cnnseg_param_.objectness_thresh();
-  AERROR<< "confidence threshold is "<<cnnseg_param_.confidence_thresh();
+  
   // clutser points and construct segments/objects
   cluster2d_->Cluster(*category_pt_blob_, *instance_pt_blob_,
                       pc_ptr, valid_indices,
@@ -144,9 +148,9 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
 
   tot_time_ = feat_time_ + network_time_ + clust_time_ + post_time_;
 
-  AINFO
+  AERROR
       << "Total runtime: " << tot_time_ << "ms\t"
-      << "  Raw feature extraction: " << feat_time_ << "ms\t"
+      << "  Feature generation: " << feat_time_ << "ms\t"
       << "  CNN forward: " << network_time_ << "ms\t"
       << "  Clustering: " << clust_time_ << "ms\t"
       << "  Post-processing: " << post_time_ << "ms";

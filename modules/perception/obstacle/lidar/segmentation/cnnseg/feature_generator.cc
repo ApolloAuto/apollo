@@ -61,14 +61,14 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
   }
 
   Dtype* out_blob_data = nullptr;
-#ifndef CPU_ONLY
-  log_table_blob_.reset(new caffe::Blob<Dtype>(1, 1, 1, log_table_.size()));
-  Dtype* log_table_blob_data = log_table_blob_->mutable_gpu_data();
-  caffe::caffe_copy(log_table_.size(), log_table_.data(), log_table_blob_data);
-  out_blob_data = out_blob_->mutable_gpu_data();
-#else
+//#ifndef CPU_ONLY
+//  log_table_blob_.reset(new caffe::Blob<Dtype>(1, 1, 1, log_table_.size()));
+//  Dtype* log_table_blob_data = log_table_blob_->mutable_gpu_data();
+//  caffe::caffe_copy(log_table_.size(), log_table_.data(), log_table_blob_data);
+//  out_blob_data = out_blob_->mutable_gpu_data();
+//#else
   out_blob_data = out_blob_->mutable_cpu_data();
-#endif
+//#endif
 
   int channel_index = 0;
   max_height_data_ = out_blob_data + out_blob_->offset(0, channel_index++);

@@ -17,10 +17,6 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H
 
-#ifndef CPU_ONLY
-#define CPU_ONLY
-#endif
-
 #include <string>
 #include <cmath>
 #include "caffe/caffe.hpp"
@@ -38,31 +34,28 @@ class FeatureGenerator {
   FeatureGenerator() {}
 
   ~FeatureGenerator() {
-#ifndef CPU_ONLY
-    release_gpu_mem();
-#endif
+//#ifndef CPU_ONLY
+//    release_gpu_mem();
+//#endif
   }
 
   bool Init(const FeatureParam& feature_param, caffe::Blob<Dtype>* out_blob);
 
-  inline void Generate(
-      const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr) {
-#ifdef CPU_ONLY
-    AINFO << "Generate raw features with CPU for CNNSegmentation.";
+  inline void Generate(const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr) {
+//#ifdef CPU_ONLY
+//    AINFO << "Generate raw features with CPU for CNNSegmentation.";
     GenerateByCpu(pc_ptr);
-#else
-    AINFO << "Generate raw features with GPU for CNNSegmentation.";
-    GenerateByGpu(pc_ptr);
-#endif
+//#else
+//    AINFO << "Generate raw features with GPU for CNNSegmentation.";
+//    GenerateByGpu(pc_ptr);
+//#endif
   }
 
-#ifdef CPU_ONLY
-  void GenerateByCpu(
-      const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
-#else
-  void GenerateByGpu(
-      const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
-#endif
+//#ifdef CPU_ONLY
+  void GenerateByCpu(const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
+//#else
+//  void GenerateByGpu(const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
+//#endif
 
   inline std::string name() const { return "FeatureGenerator"; }
 
@@ -100,11 +93,11 @@ class FeatureGenerator {
   // output Caffe blob
   caffe::Blob<Dtype>* out_blob_ = nullptr;
 
-#ifndef CPU_ONLY
-  apollo::perception::pcl_util::Point *pc_gpu_ = nullptr;
-  int pc_gpu_size_ = 0;
-  std::shared_ptr<caffe::Blob<Dtype>> log_table_blob_;
-#endif
+//#ifndef CPU_ONLY
+//  apollo::perception::pcl_util::Point *pc_gpu_ = nullptr;
+//  int pc_gpu_size_ = 0;
+//  std::shared_ptr<caffe::Blob<Dtype>> log_table_blob_;
+//#endif
 };
 
 typedef FeatureGenerator<float> FP32FeatureGenerator;
