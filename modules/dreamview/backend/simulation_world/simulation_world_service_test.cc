@@ -292,20 +292,21 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
 
   apollo::planning::ObjectDecisions* obj_decisions =
       decision_res.mutable_object_decision();
-  // The 1st obstacle has two decisions: nudge or sidepass.
+  // The 1st obstacle is from perception and has 2 decisions: nudge or sidepass.
   apollo::planning::ObjectDecision* obj_decision1 =
       obj_decisions->add_decision();
-  PerceptionObstacle* perception1 =
-      obj_decision1->mutable_prediction()->mutable_perception_obstacle();
-  perception1->set_id(1);
-  perception1->mutable_position()->set_x(1.0);
-  perception1->mutable_position()->set_y(2.0);
-  perception1->set_theta(3.0);
-  perception1->set_length(4.0);
-  perception1->set_width(5.0);
-  perception1->set_height(6.0);
+  obj_decision1->set_perception_id(1);
+  Object &perception1 = sim_world_service_->obj_map_["1"];
+  perception1.set_type(Object_Type_UNKNOWN_UNMOVABLE);
+  perception1.set_id("1");
+  perception1.set_position_x(1.0);
+  perception1.set_position_y(2.0);
+  perception1.set_heading(3.0);
+  perception1.set_length(4.0);
+  perception1.set_width(5.0);
+  perception1.set_height(6.0);
   for (int i = 0; i < 3; ++i) {
-    apollo::perception::Point* perception_pt = perception1->add_polygon_point();
+    PolygonPoint* perception_pt = perception1.add_polygon_point();
     if (i < 2) {
       perception_pt->set_x(10.0 * (i + 1));
       perception_pt->set_y(20.0 * (i + 1));
@@ -316,22 +317,16 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   }
   obj_decision1->add_object_decision()->mutable_nudge()->set_distance_l(1.8);
   obj_decision1->add_object_decision()->mutable_sidepass();
-  // The 2nd obstacle has one decision: follow.
+  // The 2nd obstacle is virtual and has only 1 decision: yield.
   apollo::planning::ObjectDecision* obj_decision2 =
       obj_decisions->add_decision();
-  obj_decision2->set_type(
-      apollo::planning::ObjectDecision_ObjectType_PERCEPTION);
-  PerceptionObstacle* perception2 =
-      obj_decision2->mutable_prediction()->mutable_perception_obstacle();
-  perception2->set_id(2);
-  perception2->mutable_position()->set_x(-1860.48981629632);
-  perception2->mutable_position()->set_y(-3001.9591838696506);
-  apollo::planning::ObjectFollow* follow =
-      obj_decision2->add_object_decision()->mutable_follow();
-  follow->set_distance_s(2.0);
-  apollo::common::PointENU* follow_point = follow->mutable_follow_point();
-  follow_point->set_x(-1859.98);
-  follow_point->set_y(-3000.03);
+  obj_decision2->set_perception_id(2);
+  apollo::planning::ObjectYield* yield =
+      obj_decision2->add_object_decision()->mutable_yield();
+  yield->set_distance_s(2.0);
+  apollo::common::PointENU* yield_point = yield->mutable_yield_point();
+  yield_point->set_x(-1859.98);
+  yield_point->set_y(-3000.03);
 
   sim_world_service_->UpdateDecision(decision_res, 1501095053);
 
@@ -355,7 +350,7 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   for (int i = 0; i < 2; ++i) {
     const Object& obj_dec = world.object(i);
     if (obj_dec.id() == "1") {
-      EXPECT_EQ(Object_Type_UNKNOWN, obj_dec.type());
+      EXPECT_EQ(Object_Type_UNKNOWN_UNMOVABLE, obj_dec.type());
       EXPECT_DOUBLE_EQ(1.0, obj_dec.position_x());
       EXPECT_DOUBLE_EQ(2.0, obj_dec.position_y());
       EXPECT_DOUBLE_EQ(3.0, obj_dec.heading());
@@ -373,10 +368,10 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
         }
       }
     } else {
-      EXPECT_NE(Object_Type_VIRTUAL, obj_dec.type());
+      EXPECT_EQ(Object_Type_VIRTUAL, obj_dec.type());
       EXPECT_EQ(1, obj_dec.decision_size());
       const Decision& decision = obj_dec.decision(0);
-      EXPECT_EQ(Decision_Type_FOLLOW, decision.type());
+      EXPECT_EQ(Decision_Type_YIELD, decision.type());
       EXPECT_DOUBLE_EQ(-1859.98, decision.position_x());
       EXPECT_DOUBLE_EQ(-3000.03, decision.position_y());
       EXPECT_DOUBLE_EQ(0.0, decision.heading());
