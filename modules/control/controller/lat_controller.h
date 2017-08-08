@@ -23,6 +23,7 @@
 #define MODULES_CONTROL_CONTROLLER_LAT_CONTROLLER_H_
 
 #include <fstream>
+#include <memory>
 #include <string>
 
 #include "Eigen/Core"
