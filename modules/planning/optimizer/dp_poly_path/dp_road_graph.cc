@@ -222,10 +222,12 @@ bool DPRoadGraph::ComputeObjectDecision(
     AERROR << "Failed to make decisions for static obstacles";
     return false;
   }
-  if (!MakeDynamicObstcleDecision(path_data, path_obstacles, decisions)) {
-    AERROR << "Failed to make decisions for dynamic obstacles";
-    return false;
-  }
+  // TODO(all) enable this function call when nudge dynamic obstacle is
+  // implemented.
+  // if (!MakeDynamicObstcleDecision(path_data, path_obstacles, decisions)) {
+  //   AERROR << "Failed to make decisions for dynamic obstacles";
+  //   return false;
+  // }
   return true;
 }
 
@@ -355,7 +357,7 @@ bool DPRoadGraph::MakeDynamicObstcleDecision(
   std::vector<common::math::Box2d> adc_by_time;
   if (!ComputeBoundingBoxesForAdc(path_data.frenet_frame_path(),
                                   evaluate_time_slots, &adc_by_time)) {
-    AERROR << "fill_adc_by_time error";
+    AERROR << "fill adc_by_time error";
     return false;
   }
 
@@ -367,19 +369,9 @@ bool DPRoadGraph::MakeDynamicObstcleDecision(
     double timestamp = 0.0;
     for (std::size_t k = 0; k < evaluate_time_slots;
          ++k, timestamp += interval) {
-      const auto obstacle_by_time =
-          obstacle->GetBoundingBox(obstacle->GetPointAtTime(timestamp));
-      // FIXME(startcode) Strongly believe that the follow condition has
-      // problem.
-      if (adc_by_time[k].DistanceTo(obstacle_by_time) <
-          FLAGS_dynamic_decision_follow_range) {
-        // Follow
-        ObjectDecisionType object_follow;
-        ObjectFollow *object_follow_ptr = object_follow.mutable_follow();
-        object_follow_ptr->set_distance_s(FLAGS_follow_min_distance);
-        decisions->emplace_back(obstacle->Id(), object_follow);
-        break;
-      }
+      // TODO(all) make nudge decision for dynamic obstacles.
+      // const auto obstacle_by_time =
+      //     obstacle->GetBoundingBox(obstacle->GetPointAtTime(timestamp));
     }
   }
   return true;

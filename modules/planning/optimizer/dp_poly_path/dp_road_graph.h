@@ -50,9 +50,10 @@ class DPRoadGraph {
   bool FindPathTunnel(const common::TrajectoryPoint &init_point,
                       PathData *const path_data);
 
-  bool ComputeObjectDecision(const PathData &path_data,
-                             const std::vector<const PathObstacle*> &path_obstacles,
-                             std::vector<std::pair<std::string, ObjectDecisionType>> *const decisions);
+  bool ComputeObjectDecision(
+      const PathData &path_data,
+      const std::vector<const PathObstacle *> &path_obstacles,
+      std::vector<std::pair<std::string, ObjectDecisionType>> *const decisions);
 
  private:
   /**
@@ -96,13 +97,15 @@ class DPRoadGraph {
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
 
-  bool MakeDynamicObstcleDecision(const PathData &path_data,
-                                  const std::vector<const PathObstacle*> &path_obstacles,
-                                  std::vector<std::pair<std::string, ObjectDecisionType>> *decisions);
+  bool MakeDynamicObstcleDecision(
+      const PathData &path_data,
+      const std::vector<const PathObstacle *> &path_obstacles,
+      std::vector<std::pair<std::string, ObjectDecisionType>> *decisions);
 
-  bool MakeStaticObstacleDecision(const PathData &path_data,
-                                  const std::vector<const PathObstacle*> &path_obstacles,
-                                  std::vector<std::pair<std::string, ObjectDecisionType>> *const decisions);
+  bool MakeStaticObstacleDecision(
+      const PathData &path_data,
+      const std::vector<const PathObstacle *> &path_obstacles,
+      std::vector<std::pair<std::string, ObjectDecisionType>> *const decisions);
 
   bool FrenetToCartesian(const FrenetFramePath &frenet_path,
                          DiscretizedPath *const discretized_path);
