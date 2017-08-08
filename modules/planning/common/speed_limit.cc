@@ -22,6 +22,7 @@
 
 #include <algorithm>
 
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_util.h"
 
@@ -78,7 +79,6 @@ double SpeedLimit::get_speed_limit_by_s(const double s) const {
 }
 
 double SpeedLimit::get_speed_limit_by_t(const double t) const {
-  double ref_t = t;
   if (speed_points_.size() == 0) {
     return 0.0;
   }
@@ -87,11 +87,11 @@ double SpeedLimit::get_speed_limit_by_t(const double t) const {
     return speed_points_.front().v();
   }
 
-  if (ref_t > speed_points_.back().t()) {
+  if (t > speed_points_.back().t()) {
     return speed_points_.back().v();
   }
 
-  if (ref_t < speed_points_.front().t()) {
+  if (t < speed_points_.front().t()) {
     return speed_points_.front().v();
   }
 
@@ -101,14 +101,17 @@ double SpeedLimit::get_speed_limit_by_t(const double t) const {
       std::lower_bound(speed_points_.begin(), speed_points_.end(), t, func);
   if (it_lower == speed_points_.begin()) {
     return speed_points_.front().v();
+  } else if (it_lower == speed_points_.end()) {
+    return speed_points_.back().v();
   }
 
-  double weight = 0.0;
-  double range = (*it_lower).t() - (*(it_lower - 1)).t();
-  if (range > 0) {
-    weight = (t - (*(it_lower - 1)).t()) / range;
-  }
-  return util::interpolate(*(it_lower - 1), *it_lower, weight).v();
+  double v0 = (it_lower - 1)->v();
+  double t0 = (it_lower - 1)->t();
+
+  double v1 = it_lower->v();
+  double t1 = it_lower->t();
+
+  return common::math::lerp(v0, t0, v1, t1, t);
 }
 
 }  // namespace planning
