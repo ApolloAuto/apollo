@@ -25,6 +25,7 @@
 
 #include "Eigen/LU"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/linear_quadratic_regulator.h"
 #include "modules/common/math/math_utils.h"
@@ -90,17 +91,18 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
     AERROR << "[LatController] control_conf == nullptr";
     return false;
   }
+  const auto &vehicle_param_ =
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+
   ts_ = control_conf->lat_controller_conf().ts();
   CHECK_GT(ts_, 0.0) << "[LatController] Invalid control update interval.";
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
-  wheelbase_ = control_conf->lat_controller_conf().wheelbase();
-  steer_transmission_ratio_ =
-      control_conf->lat_controller_conf().steer_transmission_ratio();
-  steer_single_direction_max_degree_ =
-      control_conf->lat_controller_conf().steer_single_direction_max_degree();
-  max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
+  wheelbase_ = vehicle_param_.wheel_base();
+  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
+  steer_single_direction_max_degree_ = vehicle_param_.max_steer_angle() / M_PI * 180;
+        max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
 
   double mass_fl = control_conf->lat_controller_conf().mass_fl();
   double mass_fr = control_conf->lat_controller_conf().mass_fr();
@@ -422,6 +424,11 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
                        VehicleState::instance()->linear_velocity(),
                        VehicleState::instance()->angular_velocity(),
                        trajectory_analyzer_, debug);
+
+  // Reverse heading error if vehicle is going in reverse
+  if (VehicleState::instance()->gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+    debug->set_heading_error(-debug->heading_error());
+  }
 
   // Reverse heading error if vehicle is going in reverse
   if (VehicleState::instance()->gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
