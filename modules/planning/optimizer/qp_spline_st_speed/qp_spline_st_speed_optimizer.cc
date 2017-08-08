@@ -61,7 +61,8 @@ bool QpSplineStSpeedOptimizer::Init() {
 
 void QpSplineStSpeedOptimizer::RecordSTGraphDebug(
     const std::vector<StGraphBoundary>& boundaries,
-    const SpeedLimit& speed_limits) {
+    const SpeedLimit& speed_limits,
+    const SpeedData& speed_data) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;
@@ -82,7 +83,10 @@ void QpSplineStSpeedOptimizer::RecordSTGraphDebug(
 
   st_graph_debug->mutable_speed_limit()->CopyFrom(
       {speed_limits.speed_points().begin(), speed_limits.speed_points().end()});
+  st_graph_debug->mutable_speed_profile()->CopyFrom(
+      {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
 }
+
 
 Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
@@ -110,7 +114,6 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for dp st speed optimizer failed!");
   }
-  RecordSTGraphDebug(boundaries, speed_limits);
 
   // step 2 perform graph search
   const auto& veh_param =
@@ -123,6 +126,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR,
                   "Failed to search graph with dynamic programming!");
   }
+  RecordSTGraphDebug(boundaries, speed_limits, *speed_data);
   return Status::OK();
 }
 
