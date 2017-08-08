@@ -33,7 +33,7 @@ DiscretizedPath::DiscretizedPath(std::vector<common::PathPoint> path_points) {
   path_points_ = std::move(path_points);
 }
 
-void DiscretizedPath::set_points(std::vector<common::PathPoint> path_points) {
+void DiscretizedPath::set_path_points(std::vector<common::PathPoint> path_points) {
   path_points_ = path_points;
 }
 
@@ -41,7 +41,7 @@ common::PathPoint DiscretizedPath::Evaluate(const double param) const {
   CHECK_GT(path_points_.size(), 1);
   CHECK(path_points_.front().s() <= param && path_points_.back().s() <= param);
 
-  auto it_lower = query_lower_bound(param);
+  auto it_lower = QueryLowerBound(param);
   if (it_lower == path_points_.begin()) {
     return path_points_.front();
   }
@@ -49,17 +49,17 @@ common::PathPoint DiscretizedPath::Evaluate(const double param) const {
   return util::interpolate(*(it_lower - 1), *it_lower, param);
 }
 
-double DiscretizedPath::length() const {
+double DiscretizedPath::Length() const {
   if (path_points_.empty()) {
     return 0.0;
   }
   return path_points_.back().s() - path_points_.front().s();
 }
 
-common::PathPoint DiscretizedPath::evaluate_linear_approximation(
+common::PathPoint DiscretizedPath::EvaluateUsingLinearApproximation(
     const double param) const {
   CHECK(!path_points_.empty());
-  auto it_lower = query_lower_bound(param);
+  auto it_lower = QueryLowerBound(param);
   if (it_lower == path_points_.begin()) {
     return path_points_.front();
   }
@@ -70,11 +70,11 @@ common::PathPoint DiscretizedPath::evaluate_linear_approximation(
                                                 param);
 }
 
-int DiscretizedPath::query_closest_point(const double param) const {
+int DiscretizedPath::QueryClosestPoint(const double param) const {
   if (path_points_.empty()) {
     return -1;
   }
-  auto it_lower = query_lower_bound(param);
+  auto it_lower = QueryLowerBound(param);
 
   if (it_lower == path_points_.begin()) {
     return 0;
@@ -93,37 +93,37 @@ int DiscretizedPath::query_closest_point(const double param) const {
   }
 }
 
-const std::vector<common::PathPoint> &DiscretizedPath::points() const {
+const std::vector<common::PathPoint> &DiscretizedPath::path_points() const {
   return path_points_;
 }
 
-std::uint32_t DiscretizedPath::num_of_points() const {
+std::uint32_t DiscretizedPath::NumOfPoints() const {
   return path_points_.size();
 }
 
-const common::PathPoint &DiscretizedPath::path_point_at(
+const common::PathPoint &DiscretizedPath::PathPointAt(
     const std::uint32_t index) const {
   CHECK_LT(index, path_points_.size());
   return path_points_[index];
 }
 
-common::PathPoint DiscretizedPath::start_point() const {
+common::PathPoint DiscretizedPath::StartPoint() const {
   CHECK(!path_points_.empty());
   return path_points_.front();
 }
 
-common::PathPoint DiscretizedPath::end_point() const {
+common::PathPoint DiscretizedPath::EndPoint() const {
   CHECK(!path_points_.empty());
   return path_points_.back();
 }
 
-common::PathPoint &DiscretizedPath::path_point_at(const std::uint32_t index) {
+common::PathPoint &DiscretizedPath::PathPointAt(const std::uint32_t index) {
   CHECK_LT(index, path_points_.size());
   return path_points_[index];
 }
 
 std::vector<common::PathPoint>::const_iterator
-DiscretizedPath::query_lower_bound(const double param) const {
+DiscretizedPath::QueryLowerBound(const double param) const {
   auto func = [](const common::PathPoint &tp, const double param) {
     return tp.s() < param;
   };

@@ -63,7 +63,7 @@ StBoundaryMapper::StBoundaryMapper(const StBoundaryConfig& config,
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
       planning_distance_(planning_distance),
       planning_time_(planning_time) {
-  const auto& path_start_point = path_data_.discretized_path().start_point();
+  const auto& path_start_point = path_data_.discretized_path().StartPoint();
   common::SLPoint sl_point;
   DCHECK(reference_line_.get_point_in_frenet_frame(
       {path_start_point.x(), path_start_point.y()}, &sl_point))
@@ -87,10 +87,10 @@ Status StBoundaryMapper::GetGraphBoundary(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (path_data_.discretized_path().num_of_points() < 2) {
+  if (path_data_.discretized_path().NumOfPoints() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
-           << path_data_.discretized_path().num_of_points() << ".";
+           << path_data_.discretized_path().NumOfPoints() << ".";
     return Status(ErrorCode::PLANNING_ERROR,
                   "Fail to get params because of too few path points");
   }
@@ -222,7 +222,7 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
 
   bool skip = true;
   std::vector<STPoint> boundary_points;
-  const auto& adc_path_points = path_data_.discretized_path().points();
+  const auto& adc_path_points = path_data_.discretized_path().path_points();
   if (adc_path_points.size() == 0) {
     std::string msg = common::util::StrCat(
         "Too few points in path_data_.discretized_path(); size = ",
@@ -371,7 +371,7 @@ Status StBoundaryMapper::MapFollowDecision(
                           "obstacle is moving opposite the reference line");
   }
 
-  const auto& point = path_data_.discretized_path().start_point();
+  const auto& point = path_data_.discretized_path().StartPoint();
   const PathPoint curr_point =
       reference_line_.get_reference_point(point.x(), point.y());
   const double distance_to_obstacle = ref_point.s() - curr_point.s() -
@@ -466,10 +466,10 @@ Status StBoundaryMapper::GetSpeedLimits(
   CHECK_NOTNULL(speed_limit_data);
 
   std::vector<double> speed_limits;
-  for (const auto& path_point : path_data_.discretized_path().points()) {
+  for (const auto& path_point : path_data_.discretized_path().path_points()) {
     if (Double::Compare(path_point.s(), reference_line_.length()) > 0) {
       std::string msg = common::util::StrCat(
-          "path length [", path_data_.discretized_path().length(),
+          "path length [", path_data_.discretized_path().Length(),
           "] is LARGER than reference_line_ length [", reference_line_.length(),
           "]. Please debug before proceeding.");
       AWARN << msg;

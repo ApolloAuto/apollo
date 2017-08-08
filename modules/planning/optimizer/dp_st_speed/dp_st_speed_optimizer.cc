@@ -90,7 +90,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  const double path_length = path_data.discretized_path().length();
+  const double path_length = path_data.discretized_path().Length();
   StGraphData st_graph_data(boundaries, init_point, speed_limit, path_length);
 
   DpStGraph st_graph(dp_st_speed_config_, path_data);
