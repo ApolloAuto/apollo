@@ -25,6 +25,9 @@ DECLARE_int32(perception_loop_rate);
 DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 
+/// obstacle/base/object.cc
+DECLARE_bool(is_serialize_point_cloud);
+
 /// obstacle/onboard/hdmap_input.cc
 DECLARE_double(map_radius);
 DECLARE_string(map_file);
