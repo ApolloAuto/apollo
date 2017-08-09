@@ -36,9 +36,9 @@ RTKReplayPlanner::RTKReplayPlanner() {
 
 Status RTKReplayPlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
-Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
-    Frame* frame, PublishableTrajectory* ptr_publishable_trajectory) {
-
+Status RTKReplayPlanner::Plan(
+    const TrajectoryPoint& planning_init_point, Frame* frame,
+    PublishableTrajectory* ptr_publishable_trajectory) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg(
         "RTKReplayPlanner doesn't have a recorded trajectory or "
@@ -78,9 +78,10 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_init_point,
     auto new_point = last_point;
     new_point->set_relative_time(new_point->relative_time() +
                                  FLAGS_trajectory_resolution);
-    trajectory_points.push_back(*new_point);
+    trajectory_points.push_back(std::move(*new_point));
   }
-  ptr_publishable_trajectory->set_trajectory_points(std::move(trajectory_points));
+  ptr_publishable_trajectory->set_trajectory_points(
+      std::move(trajectory_points));
   return Status::OK();
 }
 
@@ -129,7 +130,7 @@ void RTKReplayPlanner::ReadTrajectoryFile(const std::string& filename) {
     point.mutable_path_point()->set_theta(std::stod(tokens[8]));
 
     point.mutable_path_point()->set_s(std::stod(tokens[10]));
-    complete_rtk_trajectory_.push_back(point);
+    complete_rtk_trajectory_.push_back(std::move(point));
   }
 
   file_in.close();
