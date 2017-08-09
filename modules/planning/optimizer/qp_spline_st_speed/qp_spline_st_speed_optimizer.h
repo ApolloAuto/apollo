@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_ST_QP_SPLINE_ST_SPEED_OPTIMIZER_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
