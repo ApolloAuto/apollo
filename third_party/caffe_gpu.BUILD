@@ -5,7 +5,7 @@ genquery(
     name = "protobuf-root",
     expression = "@com_google_protobuf//:protobuf",
     scope = ["@com_google_protobuf//:protobuf"],
-    opts = ["--output=location"]
+    opts = ["--output=location"],
 )
 
 genrule(
@@ -14,8 +14,11 @@ genrule(
     srcs = [
         ":protobuf-root",
         ":CMakeLists.txt",
+        ":cmake/Dependencies.cmake",
         "@com_google_protobuf//:protoc",
         "@com_google_protobuf//:protobuf",
+        "//external:gflags",
+        "@glog//:glog",
     ],
     outs = [
         "lib/libcaffe.so",
@@ -24,29 +27,40 @@ genrule(
     ],
     cmd =
         '''
+        sed -i -e "s/Boost 1.55/Boost 1.54/g" $(location :cmake/Dependencies.cmake);
         srcdir=$$(pwd);
         workdir=$$(mktemp -d -t tmp.XXXXXXXXXX);
         outdir=$$srcdir/$(@D);
 
         protobuf_incl=$$(grep -oP "^/\\\S*(?=/)" $(location :protobuf-root))/src;
         protoc=$$srcdir/$(location @com_google_protobuf//:protoc);
-        protolib=$$srcdir/$$(echo "$(locations @com_google_protobuf//:protobuf)" | grep -o "\\\S*/libprotobuf.so"); ''' +
+        protolib=$$srcdir/$$(echo "$(locations @com_google_protobuf//:protobuf)" | grep -o "\\\S*/libprotobuf.so");
+        
+        gflags_lib=$$srcdir/$$(echo "$(locations //external:gflags)" | grep -o "\\\S*/libgflags.so"); 
+        gflags_incl=$$(echo $$gflags_lib | grep -o "\\\S*/local-opt")/genfiles/external/com_github_gflags_gflags;
+ 
+        glog_lib=$$srcdir/$$(echo "$(locations @glog//:glog)" | grep -o "\\\S*/libglog.so"); 
+        glog_incl=$$(echo $$glog_lib | grep -o "\\\S*/local-opt")/genfiles/external/glog; ''' +
 
         # configure cmake.
         '''
         pushd $$workdir;
         cmake $$srcdir/$$(dirname $(location :CMakeLists.txt)) \
-            -DCMAKE_INSTALL_PREFIX=$$srcdir/$(@D) \
-            -DCMAKE_BUILD_TYPE=Release            \
-            -DCPU_ONLY=OFF                        \
-            -DBUILD_python=OFF             \
-            -DBUILD_python_layer=OFF       \
-            -DUSE_OPENCV=ON                      \
-            -DBUILD_SHARED_LIBS=ON               \
-            -DUSE_LEVELDB=ON                     \
-            -DUSE_LMDB=ON                        \
-            -DPROTOBUF_INCLUDE_DIR=$$protobuf_incl\
-            -DPROTOBUF_PROTOC_EXECUTABLE=$$protoc \
+            -DCMAKE_INSTALL_PREFIX=$$srcdir/$(@D)  \
+            -DCMAKE_BUILD_TYPE=Release             \
+            -DCPU_ONLY=OFF                       \
+            -DBUILD_python=OFF                     \
+            -DBUILD_python_layer=OFF               \
+            -DUSE_OPENCV=ON                        \
+            -DBUILD_SHARED_LIBS=ON                 \
+            -DUSE_LEVELDB=ON                       \
+            -DUSE_LMDB=ON                          \
+            -DGFLAGS_INCLUDE_DIR=$$gflags_incl     \
+            -DGFLAGS_LIBRARY=$$gflags_lib          \
+            -DGLOG_INCLUDE_DIR=$$glog_incl         \
+            -DGLOG_LIBRARY=$$glog_lib              \
+            -DPROTOBUF_INCLUDE_DIR=$$protobuf_incl \
+            -DPROTOBUF_PROTOC_EXECUTABLE=$$protoc  \
             -DPROTOBUF_LIBRARY=$$protolib; ''' +
 
         '''
@@ -72,6 +86,8 @@ cc_library(
            + ["include/caffe/proto/caffe.pb.h"],
     deps = [
         "@com_google_protobuf//:protobuf",
+        "//external:gflags",
+        "@glog//:glog",
     ],
     linkopts = [
         "-L/usr/lib/x86_64-linux-gnu/hdf5/serial/lib",
@@ -87,6 +103,9 @@ cc_library(
         "-lz",
         "-ldl",
         "-lm",
+        "-lopencv_core",
+        "-lopencv_highgui",
+        "-lopencv_imgproc",
     ],
     visibility = ["//visibility:public"],
     linkstatic = 0,
