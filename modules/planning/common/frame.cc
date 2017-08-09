@@ -102,28 +102,14 @@ bool Frame::CreateDestinationObstacle() {
     return true;
   }
 
-  // create a "virtual" perception_obstacle
-  perception::PerceptionObstacle perception_obstacle;
-  perception_obstacle.mutable_position()->set_x(destination.x());
-  perception_obstacle.mutable_position()->set_y(destination.y());
-  auto dest_ref_point = reference_line_.get_reference_point(
-      destination.x(), destination.y());
-  perception_obstacle.set_theta(dest_ref_point.heading());
-  perception_obstacle.mutable_velocity()->set_x(0);
-  perception_obstacle.mutable_velocity()->set_y(0);
-  perception_obstacle.set_length(FLAGS_virtual_stop_wall_length);
-  perception_obstacle.set_width(FLAGS_virtual_stop_wall_width);
-  perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
-  perception_obstacle.set_type(
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
-  perception_obstacle.set_tracking_time(1.0);
-
-  std::unique_ptr<Obstacle> obstacle_ptr(new Obstacle(
+  std::unique_ptr<Obstacle> obstacle_ptr = CreateVirtualObstacle(
       FLAGS_destination_obstacle_id,
-      perception_obstacle));
+      destination,
+      FLAGS_virtual_stop_wall_length,
+      FLAGS_virtual_stop_wall_width,
+      FLAGS_virtual_stop_wall_height);
 
-  auto id(FLAGS_destination_obstacle_id);
-  obstacles_.Add(id, std::move(obstacle_ptr));
+  obstacles_.Add(FLAGS_destination_obstacle_id, std::move(obstacle_ptr));
 
   return true;
 }
@@ -186,6 +172,29 @@ const ReferenceLine &Frame::reference_line() const { return reference_line_; }
 
 bool Frame::MakeTrafficDecision(const routing::RoutingResponse &,
                                 const ReferenceLine &) {
+  const auto& path_obstacles = path_decision_->path_obstacles();
+  for (const auto path_obstacle : path_obstacles.Items()) {
+    const auto& obstacle = path_obstacle->Obstacle();
+
+    // destination stop
+    if (obstacle->Id() == FLAGS_destination_obstacle_id) {
+      ObjectDecisionType object_stop;
+      ObjectStop *object_stop_ptr = object_stop.mutable_stop();
+      object_stop_ptr->set_distance_s(FLAGS_stop_line_min_distance);
+      object_stop_ptr->set_reason_code(
+          StopReasonCode::STOP_REASON_DESTINATION);
+
+      auto stop_position = obstacle->Perception().position();
+      auto stop_ref_point = reference_line_.get_reference_point(
+          stop_position.x(), stop_position.y());
+      object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
+      object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
+      object_stop_ptr->set_stop_heading(stop_ref_point.heading());
+
+      path_decision_->AddDecision("TBD", obstacle->Id(), object_stop);
+    }
+  }
+
   return true;
 }
 
@@ -256,6 +265,34 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
       }
     }
   }
+}
+
+std::unique_ptr<Obstacle> Frame::CreateVirtualObstacle(
+    const std::string &obstacle_id,
+    const common::math::Vec2d &position,
+    const double length,
+    const double width,
+    const double height) {
+  std::unique_ptr<Obstacle> obstacle_ptr(nullptr);
+
+  // create a "virtual" perception_obstacle
+  perception::PerceptionObstacle perception_obstacle;
+  perception_obstacle.set_id(-1); // simulator needs a valid integer
+  perception_obstacle.mutable_position()->set_y(position.y());
+  auto dest_ref_point = reference_line_.get_reference_point(
+      position.x(), position.y());
+  perception_obstacle.set_theta(dest_ref_point.heading());
+  perception_obstacle.mutable_velocity()->set_x(0);
+  perception_obstacle.mutable_velocity()->set_y(0);
+  perception_obstacle.set_length(length);
+  perception_obstacle.set_width(length);
+  perception_obstacle.set_height(length);
+  perception_obstacle.set_type(
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_tracking_time(1.0);
+
+  obstacle_ptr.reset(new Obstacle(obstacle_id, perception_obstacle));
+  return obstacle_ptr;
 }
 
 }  // namespace planning

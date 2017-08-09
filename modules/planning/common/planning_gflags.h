@@ -86,8 +86,14 @@ DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
 DECLARE_double(st_follow_max_start_t);
 DECLARE_double(st_follow_min_end_t);
+DECLARE_double(stop_line_max_distance);
+DECLARE_double(stop_line_min_distance);
 
-// Predeciton Part
+DECLARE_string(destination_obstacle_id);
+DECLARE_double(virtual_stop_wall_length);
+DECLARE_double(virtual_stop_wall_width);
+DECLARE_double(virtual_stop_wall_height);
+
 DECLARE_int32(adc_id);
 DECLARE_bool(local_debug);
 DECLARE_string(new_pobs_dump_file);
@@ -228,11 +234,5 @@ DECLARE_double(decision_valid_stop_range);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
-
-DECLARE_string(destination_obstacle_id);
-
-DECLARE_double(virtual_stop_wall_length);
-DECLARE_double(virtual_stop_wall_width);
-DECLARE_double(virtual_stop_wall_height);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
