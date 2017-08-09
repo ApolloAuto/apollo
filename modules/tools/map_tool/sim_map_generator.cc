@@ -53,6 +53,7 @@ void DownsampleCurve(Curve* curve) {
   for (const auto& point : line_segment->point()) {
     points.push_back(point);
   }
+  int original_size = line_segment->point_size();
   line_segment->clear_point();
 
   // NOTE: this not the most efficient implementation, but since this map tool
@@ -71,11 +72,17 @@ void DownsampleCurve(Curve* curve) {
   for (int index : sampled_indices) {
     *line_segment->add_point() = downsampled_points[index];
   }
+  int new_size = line_segment->point_size();
+
+  AINFO << "Lane curve downsampled from " << original_size << " points to "
+        << new_size << " points.";
 }
 
 void DownsampleMap(Map* map_pb) {
   for (int i = 0; i < map_pb->lane_size(); ++i) {
     auto* lane = map_pb->mutable_lane(i);
+    AINFO << "Downsampling lane " << lane->id().id();
+
     DownsampleCurve(lane->mutable_central_curve());
     DownsampleCurve(lane->mutable_left_boundary()->mutable_curve());
     DownsampleCurve(lane->mutable_right_boundary()->mutable_curve());
