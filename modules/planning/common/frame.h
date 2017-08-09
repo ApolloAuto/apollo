@@ -115,6 +115,13 @@ class Frame {
    */
   bool CreateDestinationObstacle();
 
+  std::unique_ptr<Obstacle> CreateVirtualObstacle(
+      const std::string &obstacle_id,
+      const common::math::Vec2d &position,
+      const double length,
+      const double width,
+      const double height);
+
   /**
    * @brief Create traffic obstacles in  this function.
    * The created obstacles is added to obstacles_, and the decision is added to

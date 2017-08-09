@@ -138,6 +138,15 @@ DEFINE_double(st_follow_min_end_t, 3.0,
               "instead of yield decision. To issue a follow decision, "
               "the obstacle's t in S-T boundary must be larger or equal to "
               "this value. Unit: seconds");
+DEFINE_double(stop_line_max_distance, 3.0,
+              "max distance to the stop line to be considered as a valid stop");
+DEFINE_double(stop_line_min_distance, 0.0,
+              "min distance (meters) to stop line for a valid stop");
+DEFINE_string(destination_obstacle_id, "DEST",
+              "obstacle id for converting destination to an obstacle");
+DEFINE_double(virtual_stop_wall_length, 0.1, "virtual stop wall length (meters)");
+DEFINE_double(virtual_stop_wall_width, 3.7, "virtual stop wall width (meters)");
+DEFINE_double(virtual_stop_wall_height, 2.0, "virtual stop wall height (meters)");
 
 // Prediction Part
 
@@ -352,10 +361,3 @@ DEFINE_double(decision_valid_stop_range, 0.5,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
-
-DEFINE_string(destination_obstacle_id, "DEST",
-              "obstacle id for converting destination to an obstacle");
-
-DEFINE_double(virtual_stop_wall_length, 0.1, "virtual stop wall length (meters)");
-DEFINE_double(virtual_stop_wall_width, 3.7, "virtual stop wall width (meters)");
-DEFINE_double(virtual_stop_wall_height, 2.0, "virtual stop wall height (meters)");
