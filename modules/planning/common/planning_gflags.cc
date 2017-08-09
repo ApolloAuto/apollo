@@ -352,3 +352,10 @@ DEFINE_double(decision_valid_stop_range, 0.5,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
+
+DEFINE_string(destination_obstacle_id, "DEST",
+              "obstacle id for converting destination to an obstacle");
+
+DEFINE_double(virtual_stop_wall_length, 0.1, "virtual stop wall length (meters)");
+DEFINE_double(virtual_stop_wall_width, 3.7, "virtual stop wall width (meters)");
+DEFINE_double(virtual_stop_wall_height, 2.0, "virtual stop wall height (meters)");
