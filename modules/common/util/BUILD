@@ -119,6 +119,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/math:vec2d",
     ],
 )
 
@@ -130,7 +131,6 @@ cc_test(
     ],
     deps = [
         ":points_downsampler",
-        "//modules/common/math:vec2d",
         "@gtest//:main",
     ],
 )
