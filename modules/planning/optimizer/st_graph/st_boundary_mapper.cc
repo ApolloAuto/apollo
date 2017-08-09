@@ -170,17 +170,18 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
   CHECK_NOTNULL(boundary);
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
-  PathPoint path_point;
+  PathPoint obstacle_point;
   if (!path_data_.GetPathPointWithRefS(stop_obstacle.sl_boundary().start_s(),
-                                       &path_point)) {
+                                       &obstacle_point)) {
     AERROR << "Fail to get path point from reference s. The sl boundary of "
               "stop obstacle is: "
            << stop_obstacle.sl_boundary().DebugString();
     return false;
   }
 
-  const double st_stop_s = path_point.s() + stop_decision.stop().distance_s() -
-                           FLAGS_decision_valid_stop_range;
+  const double st_stop_s =
+      obstacle_point.s() + stop_decision.stop().distance_s() -
+      vehicle_param_.front_edge_to_center() - FLAGS_decision_valid_stop_range;
   if (st_stop_s < 0.0) {
     AERROR << "obstacle st stop_s " << st_stop_s << " is less than 0.";
     return false;
