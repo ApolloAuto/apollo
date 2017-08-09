@@ -129,6 +129,11 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   feat_time_ = timer_.Toc(true);
 
   // network forward process
+#ifdef CPU_ONLY
+  caffe::Caffe::set_mode(caffe::Caffe::CPU);
+#else    
+  caffe::Caffe::set_mode(caffe::Caffe::GPU);
+#endif  
   caffe_net_->Forward();
   network_time_ = timer_.Toc(true);
   
