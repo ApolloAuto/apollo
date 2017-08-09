@@ -19,7 +19,7 @@
 import google.protobuf.json_format as json_format
 
 from config import Config
-from modules.hmi.proto.socketio_api_pb2 import SocketIORequest
+from modules.hmi.proto.hmi_message_pb2 import SocketIORequest
 import hardware_api
 import module_api
 import ros_bridge_api
