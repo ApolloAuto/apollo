@@ -282,7 +282,7 @@ bool QpSplinePathGenerator::AddKernel() {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   if (qp_spline_path_config_.regularization_weight() > 0) {
-    spline_kernel->add_regularization(
+    spline_kernel->AddRegularization(
         qp_spline_path_config_.regularization_weight());
   }
 
@@ -311,7 +311,7 @@ bool QpSplinePathGenerator::AddKernel() {
 }
 
 bool QpSplinePathGenerator::Solve() {
-  if (!spline_generator_->solve()) {
+  if (!spline_generator_->Solve()) {
     AERROR << "Could not solve the qp problem in spline path generator.";
     return false;
   }

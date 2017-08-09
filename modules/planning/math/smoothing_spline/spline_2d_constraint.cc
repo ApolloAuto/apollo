@@ -56,7 +56,7 @@ bool Spline2dConstraint::AddEqualityConstraint(
 *   @brief: inequality boundary constraints
 *   if no boundary, do specify either by std::infinity or let vector.size() = 0
 **/
-bool Spline2dConstraint::add_2d_boundary(
+bool Spline2dConstraint::Add2dBoundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
     const std::vector<Vec2d>& ref_point,
     const std::vector<double>& longitidinal_bound,

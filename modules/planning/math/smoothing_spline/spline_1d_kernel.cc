@@ -46,13 +46,13 @@ Spline1dKernel::Spline1dKernel(const std::vector<double>& x_knots,
   offset_ = Eigen::MatrixXd::Zero(total_params_, 1);
 }
 
-void Spline1dKernel::add_regularization(const double regularized_param) {
+void Spline1dKernel::AddRegularization(const double regularized_param) {
   Eigen::MatrixXd id_matrix =
       Eigen::MatrixXd::Identity(kernel_matrix_.rows(), kernel_matrix_.cols());
   kernel_matrix_ += id_matrix * regularized_param;
 }
 
-bool Spline1dKernel::add_kernel(const Eigen::MatrixXd& kernel,
+bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel,
                                 const Eigen::MatrixXd& offset,
                                 const double weight) {
   if (kernel.rows() != kernel.cols() ||
@@ -65,10 +65,10 @@ bool Spline1dKernel::add_kernel(const Eigen::MatrixXd& kernel,
   return true;
 }
 
-bool Spline1dKernel::add_kernel(const Eigen::MatrixXd& kernel,
+bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel,
                                 const double weight) {
   Eigen::MatrixXd offset = Eigen::MatrixXd::Zero(kernel.rows(), 1);
-  return add_kernel(kernel, offset, weight);
+  return AddKernel(kernel, offset, weight);
 }
 
 Eigen::MatrixXd* Spline1dKernel::mutable_kernel_matrix() {

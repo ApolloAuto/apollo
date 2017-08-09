@@ -39,13 +39,13 @@ Spline2dKernel::Spline2dKernel(const std::vector<double>& t_knots,
 }
 
 // customized input output
-void Spline2dKernel::add_regularization(const double regularization_param) {
+void Spline2dKernel::AddRegularization(const double regularization_param) {
   Eigen::MatrixXd id_matrix =
       Eigen::MatrixXd::Identity(kernel_matrix_.rows(), kernel_matrix_.cols());
   kernel_matrix_ += id_matrix * regularization_param;
 }
 
-bool Spline2dKernel::add_kernel(const Eigen::MatrixXd& kernel,
+bool Spline2dKernel::AddKernel(const Eigen::MatrixXd& kernel,
                                 const Eigen::MatrixXd& offset,
                                 const double weight) {
   if (kernel.rows() != kernel.cols() ||
@@ -58,10 +58,10 @@ bool Spline2dKernel::add_kernel(const Eigen::MatrixXd& kernel,
   return true;
 }
 
-bool Spline2dKernel::add_kernel(const Eigen::MatrixXd& kernel,
+bool Spline2dKernel::AddKernel(const Eigen::MatrixXd& kernel,
                                 const double weight) {
   Eigen::MatrixXd offset = Eigen::MatrixXd::Zero(kernel.rows(), 1);
-  return add_kernel(kernel, offset, weight);
+  return AddKernel(kernel, offset, weight);
 }
 
 Eigen::MatrixXd* Spline2dKernel::mutable_kernel_matrix() {

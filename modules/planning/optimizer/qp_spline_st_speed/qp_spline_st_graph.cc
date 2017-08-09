@@ -245,7 +245,7 @@ Status QpSplineStGraph::ApplyKernel(
 }
 
 Status QpSplineStGraph::Solve() {
-  return spline_generator_->solve()
+  return spline_generator_->Solve()
              ? Status::OK()
              : Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::solve");
 }
