@@ -201,7 +201,8 @@ function release() {
   cp -r modules/common/data $MODULES_DIR/common
 
   # hmi
-  mkdir -p $MODULES_DIR/hmi/utils
+  mkdir -p $MODULES_DIR/hmi/ros_bridge $MODULES_DIR/hmi/utils
+  cp bazel-bin/modules/hmi/ros_bridge/ros_bridge $MODULES_DIR/hmi/ros_bridge/
   cp -r modules/hmi/conf $MODULES_DIR/hmi
   cp -r modules/hmi/web $MODULES_DIR/hmi
   cp -r modules/hmi/utils/*.py $MODULES_DIR/hmi/utils

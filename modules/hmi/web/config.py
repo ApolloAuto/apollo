@@ -16,14 +16,17 @@
 # limitations under the License.
 ###############################################################################
 """Global config access."""
-
+import logging
 import os
 
-import google.protobuf.text_format as text_format
 import gflags
-import glog
+import google.protobuf.text_format as text_format
 
 import modules.hmi.proto.config_pb2 as config_pb2
+
+gflags.DEFINE_string(
+    'conf', 'modules/hmi/conf/config.pb.txt',
+    'HMI config file, which should be text-formatted config proto.')
 
 
 class Config(object):
@@ -34,17 +37,35 @@ class Config(object):
     module_dict = None
     tool_dict = None
     apollo_root = os.path.join(os.path.dirname(__file__), '../../..')
+    log = logging.getLogger('HMI')
 
     @classmethod
     def get_pb(cls):
         """Get a pb instance from the config."""
         if cls.pb_singleton is None:
-            # Init the config by reading conf file.
-            with open(gflags.FLAGS.conf, 'r') as conf_file:
-                cls.pb_singleton = text_format.Merge(conf_file.read(),
-                                                     config_pb2.Config())
-                glog.info('Get config: {}'.format(cls.pb_singleton))
+            cls.__init_once(logging.DEBUG)
         return cls.pb_singleton
+
+    @classmethod
+    def __init_once(cls, log_level=logging.DEBUG):
+        """Init config once."""
+        # Init the config by reading conf file.
+        with open(gflags.FLAGS.conf, 'r') as conf_file:
+            cls.pb_singleton = text_format.Merge(conf_file.read(),
+                                                 config_pb2.Config())
+            cls.log.info('Get config: %s', str(cls.pb_singleton))
+
+        # Init logger
+        file_handler = logging.handlers.TimedRotatingFileHandler(
+            cls.get_realpath(cls.pb_singleton.server.log_file),
+            when='H', interval=1, backupCount=0)
+        file_handler.setLevel(log_level)
+        file_handler.setFormatter(logging.Formatter(
+            '[%(name)s][%(levelname)s] %(asctime)s '
+            '%(filename)s:%(lineno)s %(message)s'))
+        file_handler.suffix = "%Y%m%d%H%M.log"
+        cls.log.addHandler(file_handler)
+        cls.log.setLevel(log_level)
 
     @classmethod
     def get_hardware(cls, hardware_name):

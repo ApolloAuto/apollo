@@ -18,18 +18,25 @@
 """System command utils."""
 
 import subprocess
-import glog
 
-import config
+from config import Config
 
 
-def run_in_background(cmd, stdout_file, stderr_file):
+def async_run_command(cmd, stdout_file, stderr_file):
     """Run command in background."""
-    stdout_fd = open(config.Config.get_realpath(stdout_file), 'w')
+    stdout_fd = open(Config.get_realpath(stdout_file), 'w')
     # Reuse the fd if it's the same file, such as the default '/dev/null'.
     stderr_fd = stdout_fd if stderr_file == stdout_file else open(
-        config.Config.get_realpath(stderr_file), 'w')
+        Config.get_realpath(stderr_file), 'w')
 
-    glog.info('Run command in background: {}'.format(cmd))
+    Config.log.info('Run command in background: {}'.format(cmd))
     subprocess.Popen(
         cmd, shell=True, stdout=stdout_fd, stderr=stderr_fd, close_fds=True)
+
+
+def async_run_command_pb(cmd_pb):
+    """Run an apollo.hmi.Command in background."""
+    # Construct the command string by joining all components.
+    cmd_pb.command[0] = Config.get_realpath(cmd_pb.command[0])
+    cmd_str = ' '.join(cmd_pb.command)
+    async_run_command(cmd_str, cmd_pb.stdout_file, cmd_pb.stderr_file)

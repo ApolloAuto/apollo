@@ -80,6 +80,7 @@ cc_library(
         "//modules/common/monitor/proto:monitor_proto",
         "//modules/control/proto:control_proto",
         "//modules/decision/proto:decision_proto",
+        "//modules/hmi/proto:hmi_message_proto",
         "//modules/localization/proto:camera_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",

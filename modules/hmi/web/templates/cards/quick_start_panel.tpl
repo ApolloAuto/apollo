@@ -75,24 +75,25 @@
 
     <h4 class="quick_start_row">
       Quick Record
-      <button type="button" id="reset_recording_btn" class="btn pull-right hmi_small_btn"
-          onclick="exec_tool('reset_recording')" disabled>New</button>
+      <button type="button" id="reset_recording_btn"
+          class="btn pull-right hmi_small_btn" disabled
+          onclick="io_request('tool_api', 'reset_recording')">New</button>
     </h4>
 
     <div class="row quick_start_row recording">
       <div class="col-xs-4 quick_start_col1">
-        <button type="button" class="btn hmi_large_btn check_btn"
-            onclick="exec_tool('setup_recording')" disabled>Setup</button>
+        <button type="button" class="btn hmi_large_btn check_btn" disabled
+            onclick="io_request('tool_api', 'setup_recording')">Setup</button>
         <span class="glyphicon"></span>
       </div>
       <div class="col-xs-4 quick_start_col2">
-        <button type="button" class="btn hmi_large_btn start_btn"
-            onclick="exec_tool('start_recording')" disabled>Start</button>
+        <button type="button" class="btn hmi_large_btn start_btn" disabled
+            onclick="io_request('tool_api', 'start_recording')">Start</button>
         <span class="glyphicon"></span>
       </div>
       <div class="col-xs-4 quick_start_col3">
-        <button type="button" class="btn hmi_large_btn finish_btn"
-            onclick="exec_tool('stop_recording')" disabled>Stop</button>
+        <button type="button" class="btn hmi_large_btn finish_btn" disabled
+            onclick="io_request('tool_api', 'stop_recording')">Stop</button>
         <span class="glyphicon"></span>
       </div>
     </div>
@@ -101,18 +102,20 @@
 
     <div class="row quick_start_row playing">
       <div class="col-xs-4 quick_start_col1">
-        <button type="button" class="btn hmi_large_btn check_btn"
-            onclick="exec_tool('setup_playing')" disabled>Setup</button>
+        <button type="button" class="btn hmi_large_btn check_btn" disabled
+            onclick="io_request('tool_api', 'setup_playing')"
+            >Setup</button>
         <span class="glyphicon"></span>
       </div>
       <div class="col-xs-4 quick_start_col2">
-        <button type="button" class="btn hmi_large_btn start_btn"
-            onclick="exec_tool('start_playing'); goto_dreamview();" disabled>Start</button>
+        <button type="button" class="btn hmi_large_btn start_btn" disabled
+            onclick="io_request('tool_api', 'start_playing'); goto_dreamview();"
+            >Start</button>
         <span class="glyphicon"></span>
       </div>
       <div class="col-xs-4 quick_start_col3">
         <button type="button" class="btn hmi_large_btn finish_btn"
-            onclick="exec_tool('stop_playing')" disabled>Stop</button>
+            onclick="io_request('tool_api', 'stop_playing')" disabled>Stop</button>
         <span class="glyphicon"></span>
       </div>
     </div>
@@ -122,12 +125,14 @@
     <div class="row quick_start_row">
       <div class="col-xs-4 quick_start_col1">
         <button type="button" class="btn hmi_large_btn"
-            onclick="exec_module_command('all', 'start')">Setup</button>
+            onclick="io_request('module_api', 'start', ['all']);
+            io_request('hardware_api', 'health_check', ['all'])">Setup</button>
         <span class="glyphicon"></span>
       </div>
       <div class="col-xs-4 quick_start_col2">
-        <button type="button" class="btn hmi_large_btn"
-            onclick="ros_request('restart_auto_driving')">Start Auto</button>
+        <button type="button" class="btn hmi_large_btn" onclick="
+            io_request('ros_bridge_api', 'change_driving_mode', ['auto'])"
+            >Start Auto</button>
         <span class="glyphicon"></span>
       </div>
     </div>
@@ -135,14 +140,6 @@
 </div>
 
 <script>
-  // Execute the ros request at background.
-  function ros_request(cmd_name) {
-    // The pattern is generated at template compiling time.
-    url_pattern = '{{ url_for('rosserviceapi', cmd_name='CMD_NAME') }}';
-    url = url_pattern.replace('CMD_NAME', cmd_name);
-    $.get(url);
-  }
-
   last_clock_start_timestamp = undefined;
   duration = undefined;
   clock_id = undefined;

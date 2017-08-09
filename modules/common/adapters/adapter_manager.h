@@ -213,6 +213,7 @@ class AdapterManager {
   REGISTER_ADAPTER(RoutingResponse);
   REGISTER_ADAPTER(RelativeOdometry);
   REGISTER_ADAPTER(InsStat);
+  REGISTER_ADAPTER(HMICommand);
 
   DECLARE_SINGLETON(AdapterManager);
 };
