@@ -758,7 +758,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     heading = feature->t_velocity_heading();
   }
   std::vector<std::shared_ptr<const LaneInfo>> current_lanes;
-  map->OnLane(current_lanes_, point, heading, FLAGS_search_radius,
+  map->OnLane(current_lanes_, point, heading, FLAGS_search_radius, true,
               &current_lanes);
   current_lanes_ = current_lanes;
   if (current_lanes_.empty()) {

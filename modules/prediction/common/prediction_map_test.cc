@@ -132,14 +132,14 @@ TEST_F(PredictionMapTest, on_lane) {
 
   // on lane without previous lanes
   std::vector<std::shared_ptr<const LaneInfo>> curr_lanes(0);
-  map_->OnLane(prev_lanes, point, heading, radius, &curr_lanes);
+  map_->OnLane(prev_lanes, point, heading, radius, true, &curr_lanes);
   EXPECT_EQ(1, curr_lanes.size());
   EXPECT_EQ("l20", curr_lanes[0]->id().id());
 
   // on lane with previous lanes
   prev_lanes.emplace_back(map_->LaneById("l10"));
   curr_lanes.clear();
-  map_->OnLane(prev_lanes, point, heading, radius, &curr_lanes);
+  map_->OnLane(prev_lanes, point, heading, radius, true, &curr_lanes);
   EXPECT_EQ(0, curr_lanes.size());
 
   // off lane without previous lanes
@@ -147,7 +147,7 @@ TEST_F(PredictionMapTest, on_lane) {
   point(0) = 124.85931;
   point(1) = 357.52733;
   curr_lanes.clear();
-  map_->OnLane(prev_lanes, point, heading, radius, &curr_lanes);
+  map_->OnLane(prev_lanes, point, heading, radius, true, &curr_lanes);
   EXPECT_EQ(0, curr_lanes.size());
 }
 
