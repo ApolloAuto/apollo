@@ -263,7 +263,7 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
   for (uint32_t i = 1; i < evaluate_t.size(); ++i) {
     s_vec.push_back(dist_ref);
     dist_ref += (evaluate_t[i] - evaluate_t[i - 1]) *
-                speed_limit.GetSpeedLimitByT(evaluate_t[i]);
+                speed_limit.GetSpeedLimitByS(dist_ref);
   }
   DCHECK_EQ(evaluate_t.size(), s_vec.size());
   spline_kernel->add_reference_line_kernel_matrix(
