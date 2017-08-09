@@ -294,7 +294,7 @@ bool QpFrenetFrame::MapPolygon(
       return false;
     }
     // shift box base on buffer
-    cur_point.set_l(cur_point.l() - buffer * nudge_side);
+    cur_point.set_l(cur_point.l() + buffer * nudge_side);
     sl_corners.push_back(std::move(cur_point));
   }
 
