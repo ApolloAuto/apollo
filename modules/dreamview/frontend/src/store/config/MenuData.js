@@ -8,8 +8,7 @@ export default [
             perceptionPedestrian: 'Pedestrian',
             perceptionBicycle: 'Bicycle',
             perceptionUnknownMovable: 'Unknown Movable',
-            perceptionUnknownUnmovable: 'Unknown Stationary',
-            perceptionVirtual: 'Virtual'
+            perceptionUnknownUnmovable: 'Unknown Stationary'
         }
     }, {
         id: 'prediction',
@@ -24,7 +23,7 @@ export default [
         title: 'Routing',
         type: 'checkbox',
         data: {
-            routing: 'Routing Region'
+            routing: 'Routing Line'
         }
     }, {
         id: 'decision',
