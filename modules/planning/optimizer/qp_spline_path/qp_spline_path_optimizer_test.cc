@@ -33,7 +33,9 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
   virtual void SetUp() {
     FLAGS_reference_line_smoother_config_file =
         "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
-
+    FLAGS_qp_spline_path_config_file =
+        "modules/planning/testdata/qp_spline_path/qp_spline_path_config.pb.txt";
+    optimizer_.reset(new QpSplinePathOptimizer(""));
     frame.reset(new Frame(1));
     hdmap::PncMap* pnc_map;
     pnc_map = new hdmap::PncMap("modules/planning/testdata/base_map.txt");
@@ -42,7 +44,6 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
     planning_pb = LoadPlanningPb(
         "modules/planning/testdata"
             "/qp_spline_path/42_apollo_planning.pb.txt");
-
     frame->SetVehicleInitPose(
         planning_pb.debug().planning_data().adc_position().pose());
     frame->SetRoutingResponse(
@@ -80,29 +81,18 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
   double timestamp_ = 0.0;
   std::unique_ptr<Frame> frame;
   PlanningPb planning_pb;
+  std::unique_ptr<Optimizer> optimizer_;
 };
 
 TEST_F(QpSplinePathOptimizerTest, Process) {
   EXPECT_EQ(frame->Init(), true);
-
   common::TrajectoryPoint init_point = GetInitPoint();
   frame->SetPlanningStartPoint(init_point);
-
   PlanningData* planning_data = frame->mutable_planning_data();
-  EXPECT_EQ(planning_data->path_data().discretized_path().path_points().size(), 0);
-
-  QpSplinePathConfig qp_spline_path_config;
-  EXPECT_TRUE(common::util::GetProtoFromFile(
-      "modules/planning/testdata/qp_spline_path/qp_spline_path_config.pb.txt",
-      &qp_spline_path_config));
-
-  QpSplinePathGenerator path_generator(frame->reference_line(),
-                                       qp_spline_path_config);
-  EXPECT_TRUE(path_generator.Generate(
-      frame->path_decision()->path_obstacles().Items(),
-      planning_data->speed_data(),
-      frame->PlanningStartPoint(),
-      planning_data->mutable_path_data()));
+  EXPECT_EQ(planning_data->path_data().discretized_path().path_points().size()
+  , 0);
+  optimizer_->Init();
+  optimizer_->Optimize(frame.get());
 
   common::Path qp_path_ground_truth;
   for (common::Path path : planning_pb.debug().planning_data().path()) {
@@ -112,7 +102,8 @@ TEST_F(QpSplinePathOptimizerTest, Process) {
   }
 
   EXPECT_EQ(qp_path_ground_truth.path_point().size(), 101);
-  EXPECT_EQ(planning_data->path_data().discretized_path().path_points().size(), 101);
+  EXPECT_EQ(frame->planning_data().path_data()
+                .discretized_path().path_points().size(), 101);
 
   for (std::int32_t i = 0; i < qp_path_ground_truth.path_point().size(); i++) {
     common::PathPoint ground_truth_point =
