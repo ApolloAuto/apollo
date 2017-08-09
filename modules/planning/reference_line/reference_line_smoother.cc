@@ -109,9 +109,10 @@ bool ReferenceLineSmoother::smooth(
       return false;
     }
     ReferencePoint rlp = raw_reference_line.get_reference_point(s);
-    ref_points.emplace_back(
-        ReferencePoint(common::math::Vec2d(xy.first, xy.second), heading, kappa,
-                       dkappa, rlp.lane_waypoints()));
+    ref_points.emplace_back(ReferencePoint(
+        hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
+                            rlp.lane_waypoints()),
+        kappa, dkappa, 0.0, 0.0));
     t = start_t + (i + 1) * resolution;
   }
   *smoothed_reference_line = ReferenceLine(ref_points);

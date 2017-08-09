@@ -38,21 +38,6 @@ class ReferencePoint : public hdmap::MapPathPoint {
                  const double dkappa, const double lower_bound,
                  const double upper_bound);
 
-  ReferencePoint(const common::math::Vec2d& point, const double heading,
-                 const double kappa, const double dkappa,
-                 const double lower_bound, const double upper_bound);
-
-  ReferencePoint(const common::math::Vec2d& point, const double heading,
-                 const hdmap::LaneWaypoint lane_waypoint);
-
-  ReferencePoint(const common::math::Vec2d& point, const double heading,
-                 const double kappa, const double dkappa,
-                 const hdmap::LaneWaypoint lane_waypoint);
-
-  ReferencePoint(const common::math::Vec2d& point, const double heading,
-                 const double kappa, const double dkappa,
-                 const std::vector<hdmap::LaneWaypoint>& lane_waypoints);
-
   operator apollo::common::PathPoint() const;
 
   void set_kappa(const double kappa);

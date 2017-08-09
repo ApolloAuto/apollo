@@ -52,8 +52,9 @@ ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
   for (const auto& point : hdmap_path.path_points()) {
     DCHECK(!point.lane_waypoints().empty());
     const auto& lane_waypoint = point.lane_waypoints()[0];
-    reference_points_.emplace_back(point, point.heading(), 0.0, 0.0,
-                                   lane_waypoint);
+    reference_points_.emplace_back(
+        hdmap::MapPathPoint(point, point.heading(), lane_waypoint), 0.0, 0.0,
+        0.0, 0.0);
   }
 }
 
