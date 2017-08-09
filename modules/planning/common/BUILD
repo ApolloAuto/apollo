@@ -221,6 +221,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "speed_limit_test",
+    size = "small",
+    srcs = [
+        "speed_limit_test.cc",
+    ],
+    deps = [
+        ":speed_limit",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "planning_common",
     deps = [
