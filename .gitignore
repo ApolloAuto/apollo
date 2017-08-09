@@ -8,6 +8,8 @@ bazel-testlogs
 /Debug/
 *.pyc
 WORKSPACE
+# temporary files
+*.swp
 
 # javascript
 *bundle.js
@@ -61,3 +63,4 @@ docs/doxygen
 
 # Caffe
 third_party/caffe.BUILD
+
