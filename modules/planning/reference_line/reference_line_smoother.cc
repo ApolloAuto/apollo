@@ -108,7 +108,13 @@ bool ReferenceLineSmoother::smooth(
       AERROR << "Get corresponding s failed!";
       return false;
     }
-    ReferencePoint rlp = raw_reference_line.get_reference_point(s);
+
+    common::SLPoint ref_sl_point;
+    if (!raw_reference_line.get_point_in_frenet_frame({xy.first, xy.second}, &ref_sl_point)) {
+      AERROR << "get sl point failed!" << std::endl;
+      return false;
+    };
+    ReferencePoint rlp = raw_reference_line.get_reference_point(ref_sl_point.s());
     ref_points.emplace_back(ReferencePoint(
         hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
                             rlp.lane_waypoints()),
