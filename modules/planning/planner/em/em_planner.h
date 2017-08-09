@@ -70,8 +70,8 @@ class EMPlanner : public Planner {
  private:
   void RegisterOptimizers();
 
-  std::vector<common::SpeedPoint> GenerateInitSpeedProfile(const double init_v,
-                                                           const double init_a);
+  std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
+        const common::TrajectoryPoint& planning_init_point);
   // TODO(all): change to return Status.
   void PopulateDecision(Frame* frame);
 
