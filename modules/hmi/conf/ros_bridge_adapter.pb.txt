@@ -1,16 +1,17 @@
 config {
   type: LOCALIZATION
   mode: RECEIVE_ONLY
+  message_history_limit: 1
 }
 config {
   type: CHASSIS
   mode: RECEIVE_ONLY
-  message_history_limit: 10
+  message_history_limit: 1
 }
 config {
   type: HMI_COMMAND
   mode: RECEIVE_ONLY
-  message_history_limit: 10
+  message_history_limit: 1
 }
 config {
   type: PAD
