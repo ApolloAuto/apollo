@@ -492,11 +492,18 @@ Status StBoundaryMapper::GetSpeedLimits(
         std::fmin(speed_limit_on_path, speed_limit_on_reference_line));
 
     common::SpeedPoint speed_point;
+
+    double next_t = 0.0;
+    if (!speed_limit_data->speed_points().empty()) {
+      next_t = (path_point.s() - speed_limit_data->speed_points().back().s()) /
+               curr_speed_limit;
+    }
     speed_point.set_s(path_point.s());
     speed_point.set_v(curr_speed_limit);
     speed_point.set_t(curr_t);
     speed_limit_data->AddSpeedLimit(speed_point);
-    curr_t += speed_point.s() / speed_point.v();
+
+    curr_t = next_t;
   }
   return Status::OK();
 }
