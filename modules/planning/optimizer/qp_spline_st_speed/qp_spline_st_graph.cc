@@ -254,7 +254,7 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
     const std::vector<double>& evaluate_t, const SpeedLimit& speed_limit) {
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
   std::vector<double> s_vec;
-  if (speed_limit.speed_points().size() == 0) {
+  if (speed_limit.speed_limit_info().size() == 0) {
     std::string msg = "Fail to apply_kernel due to empty speed limits.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -342,12 +342,12 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
   uint32_t j = 0;
   double distance = 0.0;
   const double kDistanceEpsilon = 1e-6;
-  while (i < t_evaluated_.size() && j + 1 < speed_limit.speed_points().size()) {
+  while (i < t_evaluated_.size() && j + 1 < speed_limit.speed_limit_info().size()) {
     distance = v * t_evaluated_[i];
-    if (fabs(distance - speed_limit.speed_points()[j].s()) < kDistanceEpsilon) {
-      speed_upper_bound->push_back(speed_limit.speed_points()[j].v());
+    if (fabs(distance - speed_limit.speed_limit_info()[j].first) < kDistanceEpsilon) {
+      speed_upper_bound->push_back(speed_limit.speed_limit_info()[j].second);
       ++i;
-    } else if (speed_limit.speed_points()[j + 1].s() < distance) {
+    } else if (speed_limit.speed_limit_info()[j + 1].first < distance) {
       ++j;
     } else {
       speed_upper_bound->push_back(speed_limit.get_speed_limit_by_s(distance));

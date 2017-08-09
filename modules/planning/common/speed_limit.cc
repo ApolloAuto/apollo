@@ -29,89 +29,38 @@
 namespace apollo {
 namespace planning {
 
-using common::SpeedPoint;
-
-void SpeedLimit::add_speed_limit(const SpeedPoint& speed_point) {
-  speed_points_.push_back(speed_point);
+void SpeedLimit::AppendSpeedLimitInfo(std::pair<double, double> speed_limit_info) {
+  speed_points_.push_back(std::move(speed_limit_info));
 }
 
-void SpeedLimit::add_speed_limit(const double s, const double t, const double v,
-                                 const double a, const double da) {
-  speed_points_.push_back(common::util::MakeSpeedPoint(s, t, v, a, da));
-}
-
-const std::vector<SpeedPoint>& SpeedLimit::speed_points() const {
+const std::vector<std::pair<double, double>>& SpeedLimit::speed_limit_info() const {
   return speed_points_;
 }
 
 double SpeedLimit::get_speed_limit_by_s(const double s) const {
-  double ref_s = s;
   if (speed_points_.size() == 0) {
     return 0.0;
   }
 
   if (speed_points_.size() == 1) {
-    return speed_points_.front().v();
+    return speed_points_.front().second;
   }
 
-  if (ref_s > speed_points_.back().s()) {
-    return speed_points_.back().v();
-  }
-
-  if (ref_s < speed_points_.front().s()) {
-    return speed_points_.front().v();
-  }
-
-  auto func = [](const SpeedPoint& sp, const double s) { return sp.s() < s; };
+  auto func = [](const std::pair<double, double>& sp, const double s) { return sp.first < s; };
 
   auto it_lower =
       std::lower_bound(speed_points_.begin(), speed_points_.end(), s, func);
   if (it_lower == speed_points_.begin()) {
-    return speed_points_.front().v();
-  }
-
-  double weight = 0.0;
-  double range = (*it_lower).s() - (*(it_lower - 1)).s();
-  if (range > 0) {
-    weight = (s - (*(it_lower - 1)).s()) / range;
-  }
-  return util::interpolate(*(it_lower - 1), *it_lower, weight).v();
-}
-
-double SpeedLimit::get_speed_limit_by_t(const double t) const {
-  if (speed_points_.size() == 0) {
-    return 0.0;
-  }
-
-  if (speed_points_.size() == 1) {
-    return speed_points_.front().v();
-  }
-
-  if (t > speed_points_.back().t()) {
-    return speed_points_.back().v();
-  }
-
-  if (t < speed_points_.front().t()) {
-    return speed_points_.front().v();
-  }
-
-  auto func = [](const SpeedPoint& sp, const double t) { return sp.t() < t; };
-
-  auto it_lower =
-      std::lower_bound(speed_points_.begin(), speed_points_.end(), t, func);
-  if (it_lower == speed_points_.begin()) {
-    return speed_points_.front().v();
+    return speed_points_.front().second;
   } else if (it_lower == speed_points_.end()) {
-    return speed_points_.back().v();
+    return speed_points_.back().second;
   }
 
-  double v0 = (it_lower - 1)->v();
-  double t0 = (it_lower - 1)->t();
-
-  double v1 = it_lower->v();
-  double t1 = it_lower->t();
-
-  return common::math::lerp(v0, t0, v1, t1, t);
+  double s0 = (it_lower - 1)->first;
+  double v0 = (it_lower - 1)->second;
+  double s1 = it_lower->first;
+  double v1 = it_lower->second;
+  return common::math::lerp(v0, s0, v1, s1, s);
 }
 
 }  // namespace planning
