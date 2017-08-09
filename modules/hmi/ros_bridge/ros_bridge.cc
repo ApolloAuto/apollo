@@ -81,15 +81,16 @@ class RosBridge {
 
     constexpr int kMaxTries = 3;
     constexpr auto kTryInterval = std::chrono::milliseconds(500);
+    auto* chassis = AdapterManager::GetChassis();
     for (int i = 0; i < kMaxTries; ++i) {
       // Send driving action periodically until entering target driving mode.
       SendPadMessage(driving_action);
       std::this_thread::sleep_for(kTryInterval);
-      const auto* latest_chassis =
-          AdapterManager::GetChassis()->GetLatestPublished();
-      if (latest_chassis == nullptr) {
+
+      chassis->Observe();
+      if (chassis->Empty()) {
         AERROR << "No Chassis message received!";
-      } else if (latest_chassis->driving_mode() == target_mode) {
+      } else if (chassis->GetLatestObserved().driving_mode() == target_mode) {
         return true;
       }
     }
