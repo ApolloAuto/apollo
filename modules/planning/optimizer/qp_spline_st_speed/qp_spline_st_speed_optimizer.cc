@@ -81,8 +81,11 @@ void QpSplineStSpeedOptimizer::RecordSTGraphDebug(
     }
   }
 
-  st_graph_debug->mutable_speed_limit()->CopyFrom(
-      {speed_limits.speed_points().begin(), speed_limits.speed_points().end()});
+  for (const auto& p : speed_limits.speed_limit_info()) {
+    auto ptr_speed_point = st_graph_debug->add_speed_limit();
+    ptr_speed_point->set_s(p.first);
+    ptr_speed_point->set_v(p.second);
+  }
   st_graph_debug->mutable_speed_profile()->CopyFrom(
       {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
 }
