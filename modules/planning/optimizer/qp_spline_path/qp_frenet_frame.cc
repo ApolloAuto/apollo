@@ -182,8 +182,10 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
 
     for (const SpeedPoint& veh_point : discretized_vehicle_location_) {
       double time = veh_point.t();
-      common::TrajectoryPoint trajectory_point = ptr_obstacle->GetPointAtTime(time);
-      common::math::Box2d obs_box = ptr_obstacle->GetBoundingBox(trajectory_point);
+      common::TrajectoryPoint trajectory_point =
+          ptr_obstacle->GetPointAtTime(time);
+      common::math::Box2d obs_box =
+          ptr_obstacle->GetBoundingBox(trajectory_point);
       // project obs_box on reference line
       std::vector<common::math::Vec2d> corners;
       obs_box.GetAllCorners(&corners);
@@ -191,7 +193,8 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
 
       for (uint32_t i = 0; i < corners.size(); ++i) {
         common::SLPoint cur_point;
-        if (!reference_line_.get_point_in_frenet_frame({corners[i].x(), corners[i].y()}, &cur_point)) {
+        if (!reference_line_.get_point_in_frenet_frame(
+            {corners[i].x(), corners[i].y()}, &cur_point)) {
           AERROR << "Fail to map xy point " << corners[i].DebugString()
                  << " to " << cur_point.ShortDebugString();
 
