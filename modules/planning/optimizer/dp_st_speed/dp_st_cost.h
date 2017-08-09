@@ -61,7 +61,7 @@ class DpStCost {
 
   double GetJerkCostByFourPoints(const STPoint& first, const STPoint& second,
                                  const STPoint& third,
-                                 const STPoint& forth) const;
+                                 const STPoint& fourth) const;
 
  private:
   double GetAccelCost(const double accel) const;
