@@ -71,6 +71,22 @@ class ReferenceLine {
   double GetSpeedLimitFromPoint(const common::math::Vec2d& point) const;
 
  private:
+  /**
+   * @brief Linearly interpolate p0 and p1 by s0 and s1.
+   * The input has to satisfy condition: s0 <= s <= s1
+   * p0 and p1 must have lane_waypoint.
+   * Note: it requires p0 and p1 are on the same lane, adjacent lanes, or
+   * parallel neighboring lanes. Otherwise the interpolated result may not
+   * valid.
+   * @param p0 the first anchor point for interpolation.
+   * @param s0 the longitutial distance (s) of p0 on current reference line. s0
+   * <= s && s0 <= s1
+   * @param p1 the second anchor point for interpolation
+   * @param s1 the longitutial distance (s) of p1 on current reference line. s1
+   * @param s identifies the the middle point that is going to be interpolated.
+   * s >= s0 && s <= s1
+   * @return The interpolated ReferencePoint.
+   */
   static ReferencePoint interpolate(const ReferencePoint& p0, const double s0,
                                     const ReferencePoint& p1, const double s1,
                                     const double s);

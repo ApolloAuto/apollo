@@ -49,8 +49,12 @@ class ReferenceLineSmootherTest : public ::testing::Test {
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
     const auto& headings = lane_info_ptr->headings();
+    const auto& accumulate_s = lane_info_ptr->accumulate_s();
     for (std::size_t i = 0; i < points.size(); ++i) {
-      ref_points.emplace_back(points[i], headings[i], 0.0, 0.0, -2.0, 2.0);
+      std::vector<hdmap::LaneWaypoint> waypoint;
+      waypoint.emplace_back(lane_info_ptr, accumulate_s[i]);
+      hdmap::MapPathPoint map_path_point(points[i], headings[i], waypoint);
+      ref_points.emplace_back(map_path_point, 0.0, 0.0, -2.0, 2.0);
     }
     reference_line_.reset(new ReferenceLine(ref_points));
     vehicle_position_ = points[0];
