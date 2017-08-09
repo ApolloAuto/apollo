@@ -139,7 +139,10 @@ Status Planning::Start() {
   static ros::Rate loop_rate(FLAGS_planning_loop_rate);
   while (ros::ok()) {
     RunOnce();
-    FrameHistory::instance()->Add(frame_->sequence_num(), std::move(frame_));
+    if (frame_) {
+      auto seq_num = frame_->sequence_num();
+      FrameHistory::instance()->Add(seq_num, std::move(frame_));
+    }
     ros::spinOnce();
     loop_rate.sleep();
   }
