@@ -67,9 +67,9 @@ class DpStCost {
   double GetAccelCost(const double accel) const;
   double JerkCost(const double jerk) const;
 
-  const DpStSpeedConfig& _dp_st_speed_config;
-  double _unit_s = 0.0;
-  double _unit_t = 0.0;
+  const DpStSpeedConfig& dp_st_speed_config_;
+  double unit_s_ = 0.0;
+  double unit_t_ = 0.0;
 };
 
 }  // namespace planning
