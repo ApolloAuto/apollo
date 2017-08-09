@@ -92,6 +92,23 @@ class DpStGraph {
   bool CreateFollowDecision(const StGraphBoundary& boundary,
                             ObjectDecisionType* const follow_decision) const;
 
+  /**
+   * @brief create yield decision based on the boundary
+   * @return true if the yield decision is created successfully, and
+   *         false otherwise.
+   **/
+  bool CreateYieldDecision(const StGraphBoundary& boundary,
+                           ObjectDecisionType* const yield_decision) const;
+
+  /**
+   * @brief create overtake decision based on the boundary
+   * @return true if the overtake decision is created successfully, and
+   *         false otherwise.
+   **/
+  bool CreateOvertakeDecision(
+      const StGraphBoundary& boundary,
+      ObjectDecisionType* const overtake_decision) const;
+
  private:
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
