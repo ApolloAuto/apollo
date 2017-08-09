@@ -101,7 +101,7 @@ class QpFrenetFrame {
   bool CalculateObstacleBound();
 
   bool GetBound(const double s,
-                const std::vector<std::pair<double, double>>& bound_map,
+                const std::vector<std::pair<double, double>>& map_bound,
                 std::pair<double, double>* const bound) const;
 
   uint32_t FindIndex(const double s) const;
