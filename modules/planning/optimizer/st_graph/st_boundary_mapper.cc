@@ -493,17 +493,17 @@ Status StBoundaryMapper::GetSpeedLimits(
 
     common::SpeedPoint speed_point;
 
-    double next_t = 0.0;
+    double delta_t = 0.0;
     if (!speed_limit_data->speed_points().empty()) {
-      next_t = (path_point.s() - speed_limit_data->speed_points().back().s()) /
-               curr_speed_limit;
+      delta_t = (path_point.s() - speed_limit_data->speed_points().back().s()) /
+                curr_speed_limit;
     }
     speed_point.set_s(path_point.s());
     speed_point.set_v(curr_speed_limit);
     speed_point.set_t(curr_t);
     speed_limit_data->AddSpeedLimit(speed_point);
 
-    curr_t = next_t;
+    curr_t += delta_t;
   }
   return Status::OK();
 }
