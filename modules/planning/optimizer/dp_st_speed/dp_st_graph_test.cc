@@ -44,7 +44,7 @@ class DpStSpeedTest : public PlanningTestBase {
     const double ds = 1.0;
 
     std::vector<common::FrenetFramePoint> points;
-    for (double s = 0.0; s < 100.0; s += ds) {
+    for (double s = 0.0; s < 50.0; s += ds) {
       common::FrenetFramePoint ffp;
       ffp.set_s(s);
       ffp.set_l(l);
@@ -59,6 +59,7 @@ class DpStSpeedTest : public PlanningTestBase {
   virtual void SetUp() {
     google::InitGoogleLogging("DpStSpeedTest");
     PlanningTestBase::SetUp();
+    RunPlanning();
     const auto* frame = planning_.GetFrame();
     reference_line_ = &(frame->reference_line());
     SetPathDataWithStraightLine();
