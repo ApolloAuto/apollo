@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <limits>
 
 #include "modules/common/log.h"
 
