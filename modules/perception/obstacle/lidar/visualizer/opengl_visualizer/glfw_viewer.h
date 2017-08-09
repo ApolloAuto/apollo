@@ -131,10 +131,10 @@ class GLFWViewer {
   static const int VAO_circle_num = 6;
   static const int VBO_circle_num = 256;
   GLuint VAO_circle[VAO_circle_num];
-  bool draw_circle();
-  bool draw_car_forward_dir();
+  void draw_circle();
+  void draw_car_forward_dir();
   // objects
-  bool draw_objects(FrameContent* content, bool draw_cube, bool draw_polygon,
+  void draw_objects(FrameContent* content, bool draw_cube, bool draw_polygon,
                     bool draw_velocity);
   vec3 get_velocity_src_position(FrameContent* content, int id);
   // map_roi

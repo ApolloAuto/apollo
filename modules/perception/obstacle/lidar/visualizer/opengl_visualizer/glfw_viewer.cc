@@ -38,18 +38,18 @@ GLFWViewer::GLFWViewer() :
 _init(false),
 _window(NULL),
 _pers_camera(NULL),
+_bg_color(0.0,0.0,0.0),
 _win_width(800),
 _win_height(600),
 _mouse_prev_x(0),
 _mouse_prev_y(0),
+_frame_content(NULL),
 show_cloud(1),
 _show_cloud_state(0),
 show_box(1),
 show_velocity(1),
 show_polygon(0),
-show_text(0),
-_bg_color(0.0,0.0,0.0),
-_frame_content(NULL){
+show_text(0){
     _mode_mat = Eigen::Matrix4d::Identity();
 }
 
@@ -363,7 +363,7 @@ bool GLFWViewer::draw_cloud(FrameContent* content)
 	//draw original point cloud
     if (cloud && !cloud->points.empty()) {
         glPointSize(1);
-        int i = 0;
+        size_t i = 0;
         int vao = 0;
         int vbo = 0;
         int vao_num = (cloud->points.size() / VBO_cloud_num) + 1;
@@ -373,16 +373,16 @@ bool GLFWViewer::draw_cloud(FrameContent* content)
                 cloudVerts[vbo][1] = cloud->points[i].y;
                 cloudVerts[vbo][2] = cloud->points[i].z;
                 i++;
-                if (i>=cloud->points.size()) break;
+                if (i >= cloud->points.size()) break;
             }
             glBindVertexArray(VAO_cloud[vao]);
             glBindBuffer(GL_ARRAY_BUFFER, buffers_cloud[vao][vertices]);
             glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(cloudVerts), cloudVerts);
             glDrawElements(GL_POINTS, vbo, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
             glBindVertexArray(0);
-            if (i>=cloud->points.size()) break;
+            if (i >= cloud->points.size()) break;
         }
-        if (i<cloud->points.size()) AINFO <<"vao*vbo num < cloud->points.size()";
+        if (i < cloud->points.size()) AINFO <<"vao*vbo num < cloud->points.size()";
     }
 
     //draw roi point cloud
@@ -399,7 +399,7 @@ bool GLFWViewer::draw_cloud(FrameContent* content)
     return true;
 }
 
-bool GLFWViewer::draw_circle() {
+void GLFWViewer::draw_circle() {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     Eigen::Matrix4d v2w_pose ;//= _frame_content->get_pose_v2w();
@@ -417,7 +417,7 @@ bool GLFWViewer::draw_circle() {
     glPopMatrix();
 }
 
-bool GLFWViewer::draw_car_forward_dir() {
+void GLFWViewer::draw_car_forward_dir() {
     glColor3f(1.0,0.5,0.17);
     glLineWidth(5);
     glBegin(GL_LINES);
@@ -429,7 +429,7 @@ bool GLFWViewer::draw_car_forward_dir() {
     glLineWidth(1);
 }
 
-bool GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_polygon, bool draw_velocity)
+void GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_polygon, bool draw_velocity)
 {
 	std::vector<ObjectPtr> objects;
     std::vector<ObjectPtr> tracked_objects;
@@ -446,12 +446,11 @@ bool GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_
 	if (draw_cube){
         std::cout<<"draw cube enabled with objects size"<< objects.size()<<std::endl;
 		float verts[8][3];
-		int i = 0;
 		vec3 center;//x,y,z
 		vec3 direction;//x,y,z
 		vec3 size;//len wid hei
 		int indices[16] = {0,1,2,3,4,5,6,7,4,3,0,5,6,1,2,7};
-		for (i = 0; i < objects.size(); i++)
+		for (size_t i = 0; i < objects.size(); i++)
 		{
 			center.x = objects[i]->center[0];        
             center.y = objects[i]->center[1];        
@@ -500,15 +499,13 @@ bool GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_
 		}
 	}
 	if (draw_polygon){
-		int i = 0;
-		int j = 0;
-		for (i = 0; i < objects.size(); i++)
+		for (size_t i = 0; i < objects.size(); i++)
 		{
 			get_class_color(objects[i]->type, rgb);
 			glColor3f((GLfloat)rgb[0],(GLfloat)rgb[1],(GLfloat)rgb[2]);
 			glBegin(GL_LINE_LOOP);
 
-			for (j = 0; j<objects[i]->polygon.size(); j++) {
+			for (size_t j = 0; j< objects[i]->polygon.size(); j++) {
 				glVertex3f((GLfloat)objects[i]->polygon.points[j].x,(GLfloat)objects[i]->polygon.points[j].y,-1.0); }
 			glEnd();
 			glFlush();
@@ -516,11 +513,10 @@ bool GLFWViewer::draw_objects(FrameContent* content , bool draw_cube, bool draw_
 
 	}
 	if (draw_velocity){
-		int i = 0;
 		vec3 velocity_src;
 		vec3 velocity_dst;
 		float rgb[3]= {1,1,0};
-		for (i = 0; i < objects.size(); i++)
+		for (size_t i = 0; i < objects.size(); i++)
 		{
 			velocity_src = get_velocity_src_position(content, i);
 			velocity_dst.x = velocity_src.x + objects[i]->velocity[0];
