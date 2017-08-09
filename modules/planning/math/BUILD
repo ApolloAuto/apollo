@@ -25,6 +25,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "curve_math_test",
+    size = "small",
+    srcs = [
+        "curve_math_test.cc",
+    ],
+    deps = [
+        ":curve_math",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "polynomial_xd",
     srcs = [
