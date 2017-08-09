@@ -20,27 +20,49 @@
 
 #include "modules/planning/common/speed_limit.h"
 
-#include <memory>
-#include <unordered_map>
-#include <vector>
-
 #include "gtest/gtest.h"
-
-#include "modules/common/util/file.h"
-#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
 
-class ObstacleTest : public ::testing::Test {
+using SpeedPoint = apollo::common::SpeedPoint;
+
+class SpeedLimitTest : public ::testing::Test {
  public:
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    speed_limit_.Clear();
+    for (int i = 0; i < 100; ++i) {
+      SpeedPoint sp;
+      sp.set_s(i * 1.0);
+      sp.set_t(i * 0.5);
+      sp.set_v((i % 2 == 0) ? 5.0 : 10.0);
+      speed_limit_.AddSpeedLimit(std::move(sp));
+    }
+  }
 
  protected:
   SpeedLimit speed_limit_;
 };
 
-TEST_F(ObstacleTest, CreateObstacles) {}
+TEST_F(SpeedLimitTest, SimpleSpeedLimitCreation) {
+  SpeedLimit simple_speed_limit;
+  EXPECT_TRUE(simple_speed_limit.speed_points().empty());
+  EXPECT_EQ(speed_limit_.speed_points().size(), 100);
+}
+
+TEST_F(SpeedLimitTest, GetSpeedLimitByS) {
+  double s = 0.0;
+  const double ds = 1;
+  while (s < 99.0) {
+    double v_limit = speed_limit_.GetSpeedLimitByS(s);
+    if (static_cast<int>(s) % 2 == 0) {
+      EXPECT_DOUBLE_EQ(v_limit, 5.0);
+    } else {
+      EXPECT_DOUBLE_EQ(v_limit, 10.0);
+    }
+    s += ds;
+  }
+}
 
 }  // namespace planning
 }  // namespace apollo

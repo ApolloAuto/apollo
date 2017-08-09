@@ -44,16 +44,13 @@ double SpeedLimit::GetSpeedLimitByS(const double s) const {
     AWARN << "Speed points is empty.";
     return 0.0;
   }
-
   if (speed_points_.size() == 1) {
     return speed_points_.front().v();
   }
-
   if (s > speed_points_.back().s()) {
     AWARN << "s is larger than the last point of Speed points.";
     return speed_points_.back().v();
   }
-
   if (s < speed_points_.front().s()) {
     return speed_points_.front().v();
   }
