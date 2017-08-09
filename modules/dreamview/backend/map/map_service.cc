@@ -25,7 +25,7 @@ namespace apollo {
 namespace dreamview {
 
 using ::apollo::common::PointENU;
-using ::apollo::common::util::DownSampleByAngle;
+using ::apollo::common::util::DownsampleByAngle;
 using ::apollo::hdmap::Map;
 using ::apollo::hdmap::Id;
 using ::apollo::hdmap::LaneInfoConstPtr;
@@ -233,7 +233,7 @@ bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
 
   std::vector<int> sampled_indices;
   constexpr double angle_threshold = 0.1; // threshold is about 5.72 degree.
-  DownSampleByAngle(path.path_points(), angle_threshold, &sampled_indices);
+  DownsampleByAngle(path.path_points(), angle_threshold, &sampled_indices);
   for (int index : sampled_indices) {
     points->push_back(path.path_points()[index]);
   }

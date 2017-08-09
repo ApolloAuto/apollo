@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "modules/common/log.h"
+#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::common::util
@@ -69,15 +70,15 @@ double GetPathAngle(const std::vector<PointType> &points, const int start,
 }
 
 /**
- * @brief Down sample the points on the path according to the angle.
+ * @brief Downsample the points on the path according to the angle.
  * @param points Points on the path.
  * @param angle_threshold Points are sampled when the accumulated direction
  * change exceeds the threshold.
- * @param sampled_indexes Indexes of all sampled points.
- * @return true if down sampling is successful.
+ * @param sampled_indices Indecies of all sampled points.
+ * @return true if downsampling is successful.
  */
 template <typename PointType>
-bool DownSampleByAngle(const std::vector<PointType> &points,
+bool DownsampleByAngle(const std::vector<PointType> &points,
                        const double angle_threshold,
                        std::vector<int> *sampled_indices) {
   if (angle_threshold < 0.0) {
@@ -103,10 +104,55 @@ bool DownSampleByAngle(const std::vector<PointType> &points,
     sampled_indices->push_back(end);
   }
 
-  AINFO << "Point Vector is down sampled from " << points.size() << " to "
+  AINFO << "Point Vector is downsampled from " << points.size() << " to "
         << sampled_indices->size();
 
   return true;
+}
+
+static constexpr int kDownsampleDistance = 5;
+static constexpr int kSteepTurnDownsampleDistance = 1;
+
+/**
+ * @brief Downsample the points on the path based on distance.
+ * @param points Points on the path.
+ * @param sampled_indices Indecies of all sampled points.
+ * @return true if downsampling is successful.
+ */
+template <typename PointType>
+void DownsampleByDistance(const std::vector<PointType> &points,
+                          std::vector<int> *sampled_indices) {
+  if (points.size() <= 4) {
+    // No need to downsample if there are not too many points.
+    for (int i = 0; i < points.size(); ++i) {
+      sampled_indices->push_back(i);
+    }
+    return;
+  }
+
+  using apollo::common::math::Vec2d;
+  Vec2d v_start =
+      Vec2d(points[1].x() - points[0].x(), points[1].y() - points[0].y());
+  Vec2d v_end =
+      Vec2d(points[points.size() - 1].x() - points[points.size() - 2].x(),
+            points[points.size() - 1].y() - points[points.size() - 2].y());
+  bool is_steep_turn = v_start.InnerProd(v_end) <= 0;
+  int downsampleRate =
+      is_steep_turn ? kSteepTurnDownsampleDistance : kDownsampleDistance;
+
+  sampled_indices->push_back(0);
+
+  double accum_distance = 0.0;
+  for (size_t pos = 1; pos < points.size(); ++pos) {
+    Vec2d point_start = Vec2d(points[pos - 1].x(), points[pos - 1].y());
+    Vec2d point_end = Vec2d(points[pos].x(), points[pos].y());
+    accum_distance += point_start.DistanceTo(point_end);
+
+    if (accum_distance > downsampleRate) {
+      sampled_indices->push_back(pos);
+      accum_distance = 0.0;
+    }
+  }
 }
 
 }  // namespace util

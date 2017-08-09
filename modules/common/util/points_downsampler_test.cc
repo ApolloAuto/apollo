@@ -16,19 +16,18 @@
 
 #include "modules/common/util/points_downsampler.h"
 
-#include "modules/common/math/vec2d.h"
-
 #include <vector>
 
+#include "modules/common/math/vec2d.h"
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {
 namespace util {
 
-TEST(DownSamplerTest, DownSampleByAngle) {
-  using ::apollo::common::math::Vec2d;
+using ::apollo::common::math::Vec2d;
 
+TEST(DownSamplerTest, DownsampleByAngle) {
   std::vector<Vec2d> points;
   points.emplace_back(-405.778, -134.969);
   points.emplace_back(-403.919, -127.696);
@@ -46,10 +45,47 @@ TEST(DownSamplerTest, DownSampleByAngle) {
 
   std::vector<int> sampled_indices;
 
-  EXPECT_TRUE(DownSampleByAngle(points, 0.1, &sampled_indices));
+  EXPECT_TRUE(DownsampleByAngle(points, 0.1, &sampled_indices));
   EXPECT_EQ(2, sampled_indices.size());
   EXPECT_EQ(0, sampled_indices[0]);
   EXPECT_EQ(12, sampled_indices[1]);
+}
+
+TEST(DownSamplerTest, DownsampleByDistanceNormal) {
+  std::vector<Vec2d> points;
+  points.emplace_back(0, 0);
+  points.emplace_back(0, 4);
+  points.emplace_back(0, 8);
+  points.emplace_back(0, 12);
+  points.emplace_back(0, 16);
+  points.emplace_back(0, 20);
+
+  std::vector<int> sampled_indices;
+
+  DownsampleByDistance(points, &sampled_indices);
+  EXPECT_EQ(3, sampled_indices.size());
+  EXPECT_EQ(0, sampled_indices[0]);
+  EXPECT_EQ(2, sampled_indices[1]);
+  EXPECT_EQ(4, sampled_indices[2]);
+}
+
+TEST(DownSamplerTest, DownsampleByDistanceSteepTurn) {
+  std::vector<Vec2d> points;
+  points.emplace_back(-2, 0);
+  points.emplace_back(-1, 1);
+  points.emplace_back(0, 2);
+  points.emplace_back(1, 1);
+  points.emplace_back(2, 0);
+
+  std::vector<int> sampled_indices;
+
+  DownsampleByDistance(points, &sampled_indices);
+  EXPECT_EQ(5, sampled_indices.size());
+  EXPECT_EQ(0, sampled_indices[0]);
+  EXPECT_EQ(1, sampled_indices[1]);
+  EXPECT_EQ(2, sampled_indices[2]);
+  EXPECT_EQ(3, sampled_indices[3]);
+  EXPECT_EQ(4, sampled_indices[4]);
 }
 
 }  // namespace util
