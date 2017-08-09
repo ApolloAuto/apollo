@@ -42,9 +42,7 @@ QpSplineStGraph::QpSplineStGraph(
           qp_spline_st_speed_config_.number_of_discrete_graph_t()),
       t_evaluated_resolution_(
           qp_spline_st_speed_config_.total_time() /
-          qp_spline_st_speed_config_.number_of_evaluated_graph_t())
-
-{}
+          qp_spline_st_speed_config_.number_of_evaluated_graph_t()) {}
 
 void QpSplineStGraph::Init() {
   // init knots
@@ -143,8 +141,7 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!constraint->AddPointSecondDerivativeConstraint(0.0,
-                                                          init_point_.a())) {
+  if (!constraint->AddPointSecondDerivativeConstraint(0.0, init_point_.a())) {
     const std::string msg =
         "add st start point acceleration constraint failed!";
     AERROR << msg;
@@ -160,7 +157,7 @@ Status QpSplineStGraph::ApplyConstraint(
 
   // monotone constraint
   if (!constraint->AddMonotoneInequalityConstraintAtKnots()) {
-    const std::string msg = "add monotonicity constraint failed!";
+    const std::string msg = "add monotone inequality constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -185,10 +182,9 @@ Status QpSplineStGraph::ApplyConstraint(
     s_upper_bound.push_back(upper_s);
     s_lower_bound.push_back(lower_s);
     ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
-        << " lower_s: " << lower_s;
+           << " lower_s: " << lower_s;
   }
-  if (!constraint->AddBoundary(t_evaluated_, s_lower_bound,
-                                   s_upper_bound)) {
+  if (!constraint->AddBoundary(t_evaluated_, s_lower_bound, s_upper_bound)) {
     const std::string msg = "Fail to apply distance constraints.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -203,8 +199,11 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   std::vector<double> speed_lower_bound(t_evaluated_.size(), 0.0);
+
+  DCHECK_EQ(t_evaluated_.size(), speed_upper_bound.size());
+  DCHECK_EQ(t_evaluated_.size(), speed_lower_bound.size());
   if (!constraint->AddDerivativeBoundary(t_evaluated_, speed_lower_bound,
-                                           speed_upper_bound)) {
+                                         speed_upper_bound)) {
     const std::string msg = "Fail to apply speed constraints.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -254,17 +253,19 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
     const std::vector<double>& evaluate_t, const SpeedLimit& speed_limit) {
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
   std::vector<double> s_vec;
-  if (speed_limit.speed_limit_info().size() == 0) {
+  if (speed_limit.speed_points().size() == 0) {
     std::string msg = "Fail to apply_kernel due to empty speed limits.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   double dist_ref = 0.0;
+  s_vec.push_back(dist_ref);
   for (uint32_t i = 1; i < evaluate_t.size(); ++i) {
     s_vec.push_back(dist_ref);
     dist_ref += (evaluate_t[i] - evaluate_t[i - 1]) *
-                speed_limit.GetSpeedLimit(dist_ref);
+                speed_limit.GetSpeedLimitByT(evaluate_t[i]);
   }
+  DCHECK_EQ(evaluate_t.size(), s_vec.size());
   spline_kernel->add_reference_line_kernel_matrix(
       evaluate_t, s_vec,
       qp_spline_st_speed_config_.reference_line_kernel_weight());
@@ -342,21 +343,23 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
   uint32_t j = 0;
   double distance = 0.0;
   const double kDistanceEpsilon = 1e-6;
-  while (i < t_evaluated_.size() && j + 1 < speed_limit.speed_limit_info().size()) {
+  while (i < t_evaluated_.size() && j + 1 < speed_limit.speed_points().size()) {
     distance = v * t_evaluated_[i];
-    if (fabs(distance - speed_limit.speed_limit_info()[j].first) < kDistanceEpsilon) {
-      speed_upper_bound->push_back(speed_limit.speed_limit_info()[j].second);
+    if (fabs(distance - speed_limit.speed_points()[j].s()) < kDistanceEpsilon) {
+      speed_upper_bound->push_back(speed_limit.speed_points()[j].v());
       ++i;
-    } else if (speed_limit.speed_limit_info()[j + 1].first < distance) {
-      ++j;
+    } else if (distance < speed_limit.speed_points()[j].s()) {
+      ++i;
+    } else if (distance <= speed_limit.speed_points()[j + 1].s()) {
+      speed_upper_bound->push_back(
+          speed_limit.GetSpeedLimitByT(t_evaluated_[i]));
+      ++i;
     } else {
-      speed_upper_bound->push_back(speed_limit.GetSpeedLimit(distance));
-      ++i;
+      ++j;
     }
   }
 
-  for (uint32_t k = speed_upper_bound->size() - 1; k < t_evaluated_.size();
-       ++k) {
+  for (uint32_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
     speed_upper_bound->push_back(qp_spline_st_speed_config_.max_speed());
   }
   return Status::OK();

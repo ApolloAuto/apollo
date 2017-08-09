@@ -61,8 +61,7 @@ bool QpSplineStSpeedOptimizer::Init() {
 
 void QpSplineStSpeedOptimizer::RecordSTGraphDebug(
     const std::vector<StGraphBoundary>& boundaries,
-    const SpeedLimit& speed_limits,
-    const SpeedData& speed_data) {
+    const SpeedLimit& speed_limits, const SpeedData& speed_data) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;
@@ -81,15 +80,12 @@ void QpSplineStSpeedOptimizer::RecordSTGraphDebug(
     }
   }
 
-  for (const auto& p : speed_limits.speed_limit_info()) {
-    auto ptr_speed_point = st_graph_debug->add_speed_limit();
-    ptr_speed_point->set_s(p.first);
-    ptr_speed_point->set_v(p.second);
-  }
+  st_graph_debug->mutable_speed_limit()->CopyFrom(
+      {speed_limits.speed_points().begin(), speed_limits.speed_points().end()});
+
   st_graph_debug->mutable_speed_profile()->CopyFrom(
       {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
 }
-
 
 Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
                                          const TrajectoryPoint& init_point,
