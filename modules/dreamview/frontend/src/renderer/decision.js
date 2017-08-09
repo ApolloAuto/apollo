@@ -31,10 +31,10 @@ import { drawImage, drawDashedLineFromPoints, drawShapeFromPoints } from "utils/
 
 const _ = require('lodash');
 const MarkerColorMapping = {
-        STOP: 0xff7f00,
-        FOLLOW: 0x00ff00,
-        YIELD: 0xff00ff,
-        OVERTAKE: 0x0000ff
+        STOP: 0xFF3030,
+        FOLLOW: 0x1AD061,
+        YIELD: 0xFF30F7,
+        OVERTAKE: 0x30A5FF
 };
 const StopReasonMarkerMapping = {
         STOP_REASON_HEAD_VEHICLE: reasonHeadVehicle,
@@ -140,7 +140,6 @@ export default class Decision {
                     marker.position.set(pos.x, pos.y, 0.2);
                     marker.rotation.set(Math.PI / 2, decision.heading - Math.PI / 2, 0);
                     marker.visible = true;
-                    //marker.connect.visible = false;
                     markerIdx[decisionType]++;
 
                     if (decisionType === 'YIELD' || decisionType === 'OVERTAKE') {
@@ -154,7 +153,6 @@ export default class Decision {
                         connect.geometry.lineDistancesNeedUpdate = true;
                         connect.rotation.set(Math.PI / (-2), 0,
                                 Math.PI / 2 - decision.heading);
-                        //connect.visible = true;
                     }
                 } else if (decisionType === 'NUDGE') {
                     const nudge = drawShapeFromPoints(
