@@ -31,43 +31,14 @@ namespace planning {
 using apollo::common::PathPoint;
 
 ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
-                 const double kappa, const double dkappa,
-                 const double lower_bound, const double upper_bound)
+                               const double kappa, const double dkappa,
+                               const double lower_bound,
+                               const double upper_bound)
     : hdmap::MapPathPoint(map_path_point),
       kappa_(kappa),
       dkappa_(dkappa),
       lower_bound_(lower_bound),
       upper_bound_(upper_bound) {}
-
-ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
-                               const double heading, const double kappa,
-                               const double dkappa, const double lower_bound,
-                               const double upper_bound)
-    : hdmap::MapPathPoint(point, heading),
-      kappa_(kappa),
-      dkappa_(dkappa),
-      lower_bound_(lower_bound),
-      upper_bound_(upper_bound) {}
-
-ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
-                               const double heading,
-                               const hdmap::LaneWaypoint lane_waypoint)
-    : hdmap::MapPathPoint(point, heading, lane_waypoint) {}
-
-ReferencePoint::ReferencePoint(const common::math::Vec2d& point,
-                               const double heading, const double kappa,
-                               const double dkappa,
-                               const hdmap::LaneWaypoint lane_waypoint)
-    : hdmap::MapPathPoint(point, heading, lane_waypoint),
-      kappa_(kappa),
-      dkappa_(dkappa) {}
-
-ReferencePoint::ReferencePoint(
-    const common::math::Vec2d& point, const double heading, const double kappa,
-    const double dkappa, const std::vector<hdmap::LaneWaypoint>& lane_waypoints)
-    : hdmap::MapPathPoint(point, heading, lane_waypoints),
-      kappa_(kappa),
-      dkappa_(dkappa) {}
 
 ReferencePoint::operator PathPoint() const {
   PathPoint result;
@@ -100,14 +71,25 @@ double ReferencePoint::lower_bound() const { return lower_bound_; }
 double ReferencePoint::upper_bound() const { return upper_bound_; }
 
 const std::string ReferencePoint::DebugString() const {
-  return apollo::common::util::StrCat(
-      "{x: ", std::fixed, x(), ", "
-      "y: ", y(), ", "
-      "theta: ", heading(), ", "
-      "kappa: ", kappa(), ", "
-      "dkappa: ", dkappa(), ", "
-      "upper_bound: ", upper_bound(), ", "
-      "lower_bound: ", lower_bound(), "}");
+  return apollo::common::util::StrCat("{x: ", std::fixed, x(),
+                                      ", "
+                                      "y: ",
+                                      y(),
+                                      ", "
+                                      "theta: ",
+                                      heading(),
+                                      ", "
+                                      "kappa: ",
+                                      kappa(),
+                                      ", "
+                                      "dkappa: ",
+                                      dkappa(),
+                                      ", "
+                                      "upper_bound: ",
+                                      upper_bound(),
+                                      ", "
+                                      "lower_bound: ",
+                                      lower_bound(), "}");
 }
 
 }  // namespace planning
