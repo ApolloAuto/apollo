@@ -132,8 +132,8 @@ double DpStCost::JerkCost(const double jerk) const {
 double DpStCost::GetJerkCostByFourPoints(const STPoint& first,
                                          const STPoint& second,
                                          const STPoint& third,
-                                         const STPoint& forth) const {
-  double jerk = (first.s() - 3 * second.s() + 3 * third.s() - forth.s()) /
+                                         const STPoint& fourth) const {
+  double jerk = (fourth.s() - 3 * third.s() + 3 * second.s() - first.s()) /
                 (_unit_t * _unit_t * _unit_t);
   return JerkCost(jerk);
 }
