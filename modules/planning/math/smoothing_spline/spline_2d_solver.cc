@@ -40,7 +40,7 @@ Spline2dKernel* Spline2dSolver::mutable_kernel() { return &kernel_; }
 Spline2d* Spline2dSolver::mutable_spline() { return &spline_; }
 
 // solve
-bool Spline2dSolver::solve() {
+bool Spline2dSolver::Solve() {
   const Eigen::MatrixXd& kernel_matrix = kernel_.kernel_matrix();
   const Eigen::MatrixXd& offset = kernel_.offset();
   const Eigen::MatrixXd& inequality_constraint_matrix =
@@ -56,7 +56,7 @@ bool Spline2dSolver::solve() {
       kernel_matrix, offset, inequality_constraint_matrix,
       inequality_constraint_boundary, equality_constraint_matrix,
       equality_constraint_boundary));
-  if (!qp_solver_->solve()) {
+  if (!qp_solver_->Solve()) {
     return false;
   }
 

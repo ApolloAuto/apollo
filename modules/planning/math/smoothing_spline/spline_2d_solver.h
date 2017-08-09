@@ -42,7 +42,7 @@ class Spline2dSolver {
   Spline2d* mutable_spline();
 
   // solve
-  bool solve();
+  bool Solve();
 
   // extract
   const Spline2d& spline() const;

@@ -75,7 +75,7 @@ bool ReferenceLineSmoother::smooth(
     return false;
   }
 
-  if (!solve()) {
+  if (!Solve()) {
     AERROR << "Solve spline smoother problem failed";
   }
 
@@ -90,16 +90,16 @@ bool ReferenceLineSmoother::smooth(
        i < smoother_config_.num_of_total_points() && t < end_t; ++i) {
     std::pair<double, double> xy = spline_solver_->spline()(t);
     const double heading = std::atan2(spline_solver_->spline().derivative_y(t),
-                                      spline_solver_->spline().derivative_x(t));
+                                      spline_solver_->spline().DerivativeX(t));
     const double kappa = CurveMath::ComputeCurvature(
-        spline_solver_->spline().derivative_x(t),
-        spline_solver_->spline().second_derivative_x(t),
+        spline_solver_->spline().DerivativeX(t),
+        spline_solver_->spline().SecondDerivativeX(t),
         spline_solver_->spline().derivative_y(t),
         spline_solver_->spline().second_derivative_y(t));
     const double dkappa = CurveMath::ComputeCurvatureDerivative(
-        spline_solver_->spline().derivative_x(t),
-        spline_solver_->spline().second_derivative_x(t),
-        spline_solver_->spline().third_derivative_x(t),
+        spline_solver_->spline().DerivativeX(t),
+        spline_solver_->spline().SecondDerivativeX(t),
+        spline_solver_->spline().ThirdDerivativeX(t),
         spline_solver_->spline().derivative_y(t),
         spline_solver_->spline().second_derivative_y(t),
         spline_solver_->spline().third_derivative_y(t));
@@ -162,7 +162,7 @@ bool ReferenceLineSmoother::apply_constraint(
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
-  if (!spline_solver_->mutable_constraint()->add_2d_boundary(
+  if (!spline_solver_->mutable_constraint()->Add2dBoundary(
           evaluated_t, angles, xy_points, longitidinal_bound, lateral_bound)) {
     AERROR << "Add 2d boundary constraint failed";
     return false;
@@ -196,11 +196,11 @@ bool ReferenceLineSmoother::ApplyKernel() {
   }
 
   // TODO(fanhaoyang): change to a configurable param
-  kernel->add_regularization(0.01);
+  kernel->AddRegularization(0.01);
   return true;
 }
 
-bool ReferenceLineSmoother::solve() { return spline_solver_->solve(); }
+bool ReferenceLineSmoother::Solve() { return spline_solver_->Solve(); }
 
 bool ReferenceLineSmoother::extract_evaluated_points(
     const ReferenceLine& raw_reference_line, const std::vector<double>& vec_t,

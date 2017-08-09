@@ -51,7 +51,7 @@ class ReferenceLineSmoother {
 
   bool ApplyKernel();
 
-  bool solve();
+  bool Solve();
 
   bool extract_evaluated_points(
       const ReferenceLine& raw_reference_line, const std::vector<double>& vec_t,

@@ -42,17 +42,17 @@ Spline1dKernel* Spline1dGenerator::mutable_spline_kernel() {
   return &spline_kernel_;
 }
 
-void Spline1dGenerator::setup_init_qp_point(const Eigen::MatrixXd& x,
-                                            const Eigen::MatrixXd& y,
-                                            const Eigen::MatrixXd& z,
-                                            const Eigen::MatrixXd& s) {
+void Spline1dGenerator::SetupInitQpPoint(const Eigen::MatrixXd& x,
+                                         const Eigen::MatrixXd& y,
+                                         const Eigen::MatrixXd& z,
+                                         const Eigen::MatrixXd& s) {
   init_x_ = x;
   init_y_ = y;
   init_z_ = z;
   init_s_ = s;
 }
 
-bool Spline1dGenerator::solve() {
+bool Spline1dGenerator::Solve() {
   const Eigen::MatrixXd& kernel_matrix = spline_kernel_.kernel_matrix();
   const Eigen::MatrixXd& offset = spline_kernel_.offset();
   const Eigen::MatrixXd& inequality_constraint_matrix =
@@ -69,7 +69,7 @@ bool Spline1dGenerator::solve() {
       inequality_constraint_boundary, equality_constraint_matrix,
       equality_constraint_boundary));
 
-  if (!qp_solver_->solve()) {
+  if (!qp_solver_->Solve()) {
     return false;
   }
 

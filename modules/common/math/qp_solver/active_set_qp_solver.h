@@ -38,7 +38,7 @@ class ActiveSetQpSolver : public QpSolver {
                     const Eigen::MatrixXd& affine_equality_matrix,
                     const Eigen::MatrixXd& affine_equality_boundary);
 
-  bool solve() override;
+  bool Solve() override;
 
   void set_qp_eps_num(const double eps);
   void set_qp_eps_den(const double eps);
