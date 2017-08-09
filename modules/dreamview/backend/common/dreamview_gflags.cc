@@ -18,8 +18,7 @@
 
 DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 
-// TODO(siyangy): Use garage map temporarily
-DEFINE_string(dreamview_map, "modules/map/data/base_map.txt",
+DEFINE_string(dreamview_map, "modules/map/data/sim_map.txt",
               "File path for the map file to be rendered in frontend.");
 
 DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
