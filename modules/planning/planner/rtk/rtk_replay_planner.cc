@@ -78,7 +78,7 @@ Status RTKReplayPlanner::Plan(
     auto new_point = last_point;
     new_point->set_relative_time(new_point->relative_time() +
                                  FLAGS_trajectory_resolution);
-    trajectory_points.push_back(std::move(*new_point));
+    trajectory_points.push_back(*new_point);
   }
   ptr_publishable_trajectory->set_trajectory_points(
       std::move(trajectory_points));
