@@ -18,6 +18,7 @@
 #include "modules/common/macro.h"
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -140,10 +141,12 @@ bool Object::Serialize(PerceptionObstacle* pb_obj) const {
     p->set_z(point.z);
   }
 
-  for (auto point : cloud->points) {
-    pb_obj->add_point_cloud(point.x);
-    pb_obj->add_point_cloud(point.y);
-    pb_obj->add_point_cloud(point.z);
+  if (FLAGS_is_serialize_point_cloud) {
+    for (auto point : cloud->points) {
+      pb_obj->add_point_cloud(point.x);
+      pb_obj->add_point_cloud(point.y);
+      pb_obj->add_point_cloud(point.z);
+    }
   }
 
   pb_obj->set_tracking_time(tracking_time);
