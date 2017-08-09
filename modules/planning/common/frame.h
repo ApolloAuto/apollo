@@ -79,6 +79,7 @@ class Frame {
 
   void AlignPredictionTime(const double trajectory_header_time);
 
+
  private:
   /**
    * @brief This is the function that can create one reference lines
@@ -107,6 +108,12 @@ class Frame {
    */
   void CreatePredictionObstacles(
       const prediction::PredictionObstacles &prediction);
+
+  /**
+   * @brief create destination obstacle based on routing end point
+   * @param
+   */
+  bool CreateDestinationObstacle();
 
   /**
    * @brief Create traffic obstacles in  this function.

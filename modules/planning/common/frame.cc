@@ -24,6 +24,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
@@ -82,6 +83,49 @@ void Frame::CreatePredictionObstacles(
     auto id(ptr->Id());
     obstacles_.Add(id, std::move(ptr));
   }
+}
+
+bool Frame::CreateDestinationObstacle() {
+  // set destination point
+  common::math::Vec2d destination;
+  destination.set_x(routing_response_.routing_request().end().pose().x());
+  destination.set_y(routing_response_.routing_request().end().pose().y());
+
+  // check if destination point is in planning range
+  common::SLPoint destination_sl;
+  reference_line_.get_point_in_frenet_frame(destination,
+                                            &destination_sl);
+  double destination_s = destination_sl.s();
+  if (destination_s < 0 || destination_s > reference_line_.length()) {
+    AINFO << "destination(s[:" << destination_sl.s()
+          << "]) out of planning range. Skip";
+    return true;
+  }
+
+  // create a "virtual" perception_obstacle
+  perception::PerceptionObstacle perception_obstacle;
+  perception_obstacle.mutable_position()->set_x(destination.x());
+  perception_obstacle.mutable_position()->set_y(destination.y());
+  auto dest_ref_point = reference_line_.get_reference_point(
+      destination.x(), destination.y());
+  perception_obstacle.set_theta(dest_ref_point.heading());
+  perception_obstacle.mutable_velocity()->set_x(0);
+  perception_obstacle.mutable_velocity()->set_y(0);
+  perception_obstacle.set_length(FLAGS_virtual_stop_wall_length);
+  perception_obstacle.set_width(FLAGS_virtual_stop_wall_width);
+  perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
+  perception_obstacle.set_type(
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_tracking_time(1.0);
+
+  std::unique_ptr<Obstacle> obstacle_ptr(new Obstacle(
+      FLAGS_destination_obstacle_id,
+      perception_obstacle));
+
+  auto id(FLAGS_destination_obstacle_id);
+  obstacles_.Add(id, std::move(obstacle_ptr));
+
+  return true;
 }
 
 const ADCTrajectory &Frame::GetADCTrajectory() const { return trajectory_pb_; }
