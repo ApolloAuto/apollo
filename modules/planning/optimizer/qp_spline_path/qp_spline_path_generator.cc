@@ -262,6 +262,9 @@ bool QpSplinePathGenerator::AddConstraint(
     qp_frenet_frame.GetMapBound(s, &boundary);
     boundary_low.push_back(boundary.first);
     boundary_high.push_back(boundary.second);
+    ADEBUG << "s:" << s << " boundary_low:" << boundary.first
+        << " boundary_high:" << boundary.second;
+
   }
   if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low,
                                           boundary_high)) {
