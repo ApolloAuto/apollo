@@ -29,9 +29,20 @@ namespace prediction {
 
 class RoadGraph {
  public:
+  /**
+   * @brief Constructor
+   * @param start_s The starting longitudinal s value.
+   * @param length The length to build the road graph.
+   * @param lane_info_ptr The starting lane.
+   */
   RoadGraph(double start_s, double length,
             std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
+  /**
+   * @brief Build the lane graph.
+   * @param The built lane graph.
+   * @return The status of the road graph building.
+   */
   apollo::common::Status BuildLaneGraph(LaneGraph* lane_graph);
 
  private:

@@ -25,16 +25,44 @@
 namespace apollo {
 namespace prediction {
 namespace util {
-
+/**
+ * @brief Normalize the value by specified mean and standard deviation.
+ * @param value The value to be normalized.
+ * @param mean The mean used for normalization.
+ * @param std The standard deviation used for normalization.
+ * @return The normalized value.
+ */
 double Normalize(const double value, const double mean, const double std);
 
+/**
+ * @brief Sigmoid function used in neural networks as an activation function.
+ * @param value The input.
+ * @return The output of sigmoid function.
+ */
 double Sigmoid(const double value);
 
+/**
+ * @brief RELU function used in neural networks as an activation function.
+ * @param value The input.
+ * @return The output of RELU function.
+ */
 double Relu(const double value);
 
+/**
+ * @brief Solve quadratic equation.
+ * @param coefficients The coefficients of quadratic equation.
+ * @param roots Two roots of the equation if any.
+ * @return An integer indicating the success of solving equation.
+ */
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots);
 
+/**
+ * @brief Translate a point.
+ * @param translate_x The translation along x-axis.
+ * @param translate_y The translation along y-axis.
+ * @param point The point to be translated.
+ */
 void TranslatePoint(const double translate_x, const double translate_y,
                     apollo::common::TrajectoryPoint* point);
 
