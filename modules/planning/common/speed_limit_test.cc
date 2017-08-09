@@ -51,16 +51,38 @@ TEST_F(SpeedLimitTest, SimpleSpeedLimitCreation) {
 }
 
 TEST_F(SpeedLimitTest, GetSpeedLimitByS) {
+  EXPECT_EQ(speed_limit_.speed_points().size(), 100);
   double s = 0.0;
-  const double ds = 1;
+  const double ds = 0.01;
   while (s < 99.0) {
     double v_limit = speed_limit_.GetSpeedLimitByS(s);
-    if (static_cast<int>(s) % 2 == 0) {
-      EXPECT_DOUBLE_EQ(v_limit, 5.0);
-    } else {
-      EXPECT_DOUBLE_EQ(v_limit, 10.0);
-    }
+
+    auto it_lower = std::lower_bound(
+        speed_limit_.speed_points().begin(), speed_limit_.speed_points().end(),
+        s, [](const SpeedPoint& point, const double curr_s) {
+          return point.s() < curr_s;
+        });
+
+    EXPECT_DOUBLE_EQ(v_limit, it_lower->v());
     s += ds;
+  }
+}
+
+TEST_F(SpeedLimitTest, GetSpeedLimitByT) {
+  EXPECT_EQ(speed_limit_.speed_points().size(), 100);
+  double t = 0.0;
+  const double dt = 0.01;
+  while (t < 49.0) {
+    double v_limit = speed_limit_.GetSpeedLimitByT(t);
+
+    auto it_lower = std::lower_bound(
+        speed_limit_.speed_points().begin(), speed_limit_.speed_points().end(),
+        t, [](const SpeedPoint& point, const double curr_t) {
+          return point.t() < curr_t;
+        });
+
+    EXPECT_DOUBLE_EQ(v_limit, it_lower->v());
+    t += dt;
   }
 }
 
