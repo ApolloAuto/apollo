@@ -37,7 +37,7 @@ void SpeedLimit::AddSpeedLimit(const SpeedPoint& speed_point) {
     DCHECK_GE(speed_point.s(), speed_points_.back().s());
     DCHECK_GE(speed_point.t(), speed_points_.back().t());
   }
-  speed_points_.push_back(std::move(speed_point));
+  speed_points_.push_back(speed_point);
 }
 
 const std::vector<SpeedPoint>& SpeedLimit::speed_points() const {

@@ -110,11 +110,13 @@ bool ReferenceLineSmoother::smooth(
     }
 
     common::SLPoint ref_sl_point;
-    if (!raw_reference_line.get_point_in_frenet_frame({xy.first, xy.second}, &ref_sl_point)) {
+    if (!raw_reference_line.get_point_in_frenet_frame({xy.first, xy.second},
+                                                      &ref_sl_point)) {
       AERROR << "get sl point failed!" << std::endl;
       return false;
     };
-    ReferencePoint rlp = raw_reference_line.get_reference_point(ref_sl_point.s());
+    ReferencePoint rlp =
+        raw_reference_line.get_reference_point(ref_sl_point.s());
     ref_points.emplace_back(ReferencePoint(
         hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
                             rlp.lane_waypoints()),
@@ -164,8 +166,8 @@ bool ReferenceLineSmoother::apply_constraint(
   std::vector<common::math::Vec2d> xy_points;
   for (std::uint32_t i = 0; i < path_points.size(); ++i) {
     angles.push_back(path_points[i].theta());
-    longitidinal_bound.push_back(std::move(smoother_config_.boundary_bound()));
-    lateral_bound.push_back(std::move(smoother_config_.boundary_bound()));
+    longitidinal_bound.push_back(smoother_config_.boundary_bound());
+    lateral_bound.push_back(smoother_config_.boundary_bound());
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
