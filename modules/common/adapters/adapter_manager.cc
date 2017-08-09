@@ -126,6 +126,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableInsStat(FLAGS_ins_stat_topic, config.mode(), 
                           config.message_history_limit());
         break;
+      case AdapterConfig::HMI_COMMAND:
+        EnableHMICommand(FLAGS_hmi_command_topic, config.mode(),
+                         config.message_history_limit());
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;

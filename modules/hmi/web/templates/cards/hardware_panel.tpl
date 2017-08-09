@@ -13,7 +13,7 @@
 
   <div class="pull-right quick_link">
     <button type="button" class="btn hmi_small_btn"
-        onclick="exec_tool('reset_all');">Reset All</button>
+        onclick="io_request('tool_api', 'reset_all');">Reset All</button>
     <button type="button" class="btn hmi_small_btn"
         onclick="goto_dreamview()">Dreamview</button>
   </div>
@@ -27,7 +27,8 @@
           {{ hardware.display_name }}
           <span class="glyphicon"></span>
           <button type="button" class="btn hmi_small_btn pull-right"
-              onclick="exec_hardware_command('{{ hardware.name }}', 'health_check');"
+              onclick="io_request(
+                  'hardware_api', 'health_check', ['{{ hardware.name }}']);"
               >Check</button>
         </div>
       </li>
@@ -36,14 +37,6 @@
 </div>
 
 <script>
-  // Execute the hardware command at background.
-  function exec_hardware_command(hardware_name, cmd_name) {
-    // The pattern is generated at template compiling time.
-    url_pattern = '{{ url_for('hardwareapi', hardware_name='HARDWARE_NAME') }}';
-    url = url_pattern.replace('HARDWARE_NAME', hardware_name);
-    $.post(url, {'execute_command': cmd_name});
-  }
-
   // Change UI according to status.
   function on_hardware_status_change(global_status) {
     var hw_list = [{% for hw in conf_pb.hardware %} '{{ hw.name }}', {% endfor %}];

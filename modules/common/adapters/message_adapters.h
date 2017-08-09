@@ -26,6 +26,7 @@
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/decision/proto/decision.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/camera.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -69,6 +70,7 @@ using RoutingResponseAdapter = Adapter<::apollo::routing::RoutingResponse>;
 using RelativeOdometryAdapter =
     Adapter<::apollo::calibration::republish_msg::RelativeOdometry>;
 using InsStatAdapter = Adapter<::apollo::drivers::gnss::InsStat>;
+using HMICommandAdapter = Adapter<::apollo::hmi::HMICommand>;
 
 }  // namespace adapter
 }  // namespace common

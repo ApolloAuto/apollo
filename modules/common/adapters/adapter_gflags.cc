@@ -51,3 +51,5 @@ DEFINE_string(relative_odometry_topic, "/apollo/calibrtion/relative_odometry",
               "relative odometry topic name");
 DEFINE_string(ins_stat_topic, "/apollo/sensor/gnss/ins_stat",
               "ins stat topic name");
+DEFINE_string(hmi_command_topic, "/apollo/hmi_command",
+              "HMI command topic name");

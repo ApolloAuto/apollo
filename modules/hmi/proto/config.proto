@@ -11,8 +11,8 @@ message Command {
   repeated string command = 2;
 
   // Log file paths.
-  optional string stdout_file = 3 [default = '/dev/null'];
-  optional string stderr_file = 4 [default = '/dev/null'];
+  optional string stdout_file = 3 [default = "/dev/null"];
+  optional string stderr_file = 4 [default = "/dev/null"];
 }
 
 message Component {
@@ -22,7 +22,15 @@ message Component {
 }
 
 message Config {
-  repeated Component modules = 1;
-  repeated Component hardware = 2;
-  repeated Command tools = 3;
+  message Server {
+    optional string host = 1 [default = "0.0.0.0"];
+    optional string external_ip = 2 [default = "127.0.0.1"];
+    optional int32 port = 3 [default = 8887];
+    optional string log_file = 4 [default = "data/log/hmi.log"];
+  }
+  optional Server server = 1;
+
+  repeated Component modules = 2;
+  repeated Component hardware = 3;
+  repeated Command tools = 4;
 }
