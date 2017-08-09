@@ -9,6 +9,9 @@ cc_library(
     deps = [
         ":restful_client",
         "//external:gflags",
+        "//modules/common/util",
+        "//modules/common/util:string_util",
+        "//modules/hmi/proto:config_proto",
         "//modules/hmi/proto:runtime_status_proto",
     ],
 )

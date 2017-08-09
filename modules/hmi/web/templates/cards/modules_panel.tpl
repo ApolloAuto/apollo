@@ -50,14 +50,6 @@
 </div>
 
 <script>
-  // Execute the module command at background.
-  function exec_module_command(module_name, cmd_name) {
-    // The pattern is generated at template compiling time.
-    url_pattern = '{{ url_for('moduleapi', module_name='MODULE_NAME') }}';
-    url = url_pattern.replace('MODULE_NAME', module_name);
-    $.post(url, {'execute_command': cmd_name});
-  }
-
   function init_modules_panel() {
     var modules = [{% for module in conf_pb.modules %} '{{ module.name }}', {% endfor %}];
     modules.forEach(function(module_name) {
@@ -65,9 +57,9 @@
       $btn = $("#module_" + module_name + " .module_switch");
       $btn.click(function(e) {
         if ($(this).hasClass("module_switch_close")) {
-          exec_module_command(module_name, 'start');
+          io_request('module_api', 'start', [module_name]);
         } else {
-          exec_module_command(module_name, 'stop');
+          io_request('module_api', 'stop', [module_name]);
         }
         $(this).toggleClass("module_switch_close module_switch_open");
       });

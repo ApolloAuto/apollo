@@ -91,14 +91,6 @@
 </div>
 
 <script>
-  // Execute the tool command at background.
-  function exec_tool(tool_name) {
-    // The pattern is generated at template compiling time.
-    url_pattern = '{{ url_for('toolapi', tool_name='TOOL_NAME') }}';
-    url = url_pattern.replace('TOOL_NAME', tool_name);
-    $.get(url);
-  }
-
   function goto_dreamview() {
     javascript:window.location.port = 8888;
   }
@@ -110,18 +102,29 @@
     on_tools_status_change(global_status);
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  // Client-server communication via socketio.
+  //////////////////////////////////////////////////////////////////////////////
+  socketio = undefined;
+  // Parameters are mapped to apollo::hmi::SocketIORequest.
+  function io_request(api, cmd_name, cmd_args=[]) {
+    socketio.emit('socketio_api',
+                  {api_name: api, command_name: cmd_name, args: cmd_args});
+  }
+
   $(document).ready(function() {
     init_modules_panel();
 
     // Get current status once to init UI elements.
-    $.get('{{ url_for('runtimestatusapi') }}', function(json) {
-      on_status_change(json);
+    $.getJSON('{{ url_for('runtime_status') }}', function( status_json ) {
+      on_status_change(status_json);
     });
 
-    // Setup websocket to monitor runtime status change.
-    var socket = io.connect('http://' + document.domain + ':' + location.port + '/runtime_status');
-    socket.on('new_status', function(json) {
-      on_status_change(json);
+    // Setup socketio to communicate with HMI server.
+    socketio = io.connect(
+        'http://' + document.domain + ':' + location.port + '/io_frontend');
+    socketio.on('current_status', function(status_json) {
+      on_status_change(status_json);
     });
   });
 </script>
