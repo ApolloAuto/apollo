@@ -54,8 +54,6 @@ class ReferenceLine {
   bool get_point_in_frenet_frame(const common::math::Vec2d& xy_point,
                                  common::SLPoint* const sl_point) const;
 
-  double get_lane_width(const double s) const;
-
   bool get_lane_width(const double s, double* const left_width,
                       double* const right_width) const;
   bool is_on_road(const common::SLPoint& sl_point) const;
