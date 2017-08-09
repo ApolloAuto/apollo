@@ -153,6 +153,9 @@ void Velodyne64Parser::generate_pointcloud(
       return;
     }
     _calibration = _online_calibration.calibration();
+    if (_config.organized) {
+      init_offsets();
+    }
   }
 
   // allocate a point cloud with same time and frame ID as raw data
