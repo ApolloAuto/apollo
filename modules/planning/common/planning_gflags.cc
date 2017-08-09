@@ -116,9 +116,9 @@ DEFINE_double(
 DEFINE_double(dynamic_decision_follow_range, 1.0,
               "threshold for judging follow in dp path computing decision for "
               "static obstacles");
-DEFINE_double(stop_distance_pedestrian, 3.0,
+DEFINE_double(stop_distance_pedestrian, 5.0,
               "stop distance from in-lane pedestrian (meters)");
-DEFINE_double(stop_distance_obstacle, 3.0,
+DEFINE_double(stop_distance_obstacle, 5.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(nudge_distance_vehicle, 0.3,
               "minimum distance to nudge a vehicle");

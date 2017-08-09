@@ -348,11 +348,13 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     if (fabs(distance - speed_limit.speed_points()[j].s()) < kDistanceEpsilon) {
       speed_upper_bound->push_back(speed_limit.speed_points()[j].v());
       ++i;
-    } else if (distance < speed_limit.speed_points()[j].s()) {
+      ADEBUG << "speed upper bound:" << speed_upper_bound->back();
+  } else if (distance < speed_limit.speed_points()[j].s()) {
       ++i;
     } else if (distance <= speed_limit.speed_points()[j + 1].s()) {
       speed_upper_bound->push_back(
           speed_limit.GetSpeedLimitByT(t_evaluated_[i]));
+      ADEBUG << "speed upper bound:" << speed_upper_bound->back();
       ++i;
     } else {
       ++j;
@@ -361,6 +363,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
 
   for (uint32_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
     speed_upper_bound->push_back(qp_spline_st_speed_config_.max_speed());
+    ADEBUG << "speed upper bound:" << speed_upper_bound->back();
   }
   return Status::OK();
 }
