@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y \
    libcurl4-openssl-dev \
    libfreetype6-dev \
    lsof \
-   python-pip \
    python-matplotlib \
+   python-pip \
    python-scipy \
    python-software-properties \
    realpath \
@@ -71,16 +71,16 @@ ENV ROSCONSOLE_FORMAT '${file}:${line} ${function}() [${severity}] [${time}]: ${
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 RUN apt-get update && apt-get install -y \
-    ros-indigo-catkin \
     libbz2-dev \
     libconsole-bridge-dev \
-    liblog4cxx10-dev \
     libeigen3-dev \
+    liblog4cxx10-dev \
     liblz4-dev \
     libpoco-dev \
     libproj-dev \
     libtinyxml-dev \
     libyaml-cpp-dev \
+    ros-indigo-catkin \
     sip-dev \
     uuid-dev \
     zlib1g-dev
@@ -93,15 +93,15 @@ RUN ln -s -f /bin/true /usr/bin/chfn
 
 # install pcl and opencv, prerequisites for Caffe (CPU_ONLY mode)
 RUN apt-get update && apt-get install -y \
-    libpcl-1.7-all \
-    libopencv-dev \
-    mpi-default-dev \
+    libatlas-base-dev \
+    libhdf5-serial-dev \
     libicu-dev \
     libleveldb-dev \
+    liblmdb-dev \
+    libopencv-dev \
+    libpcl-1.7-all \
     libsnappy-dev \
-    libhdf5-serial-dev \
-    libatlas-base-dev \
-    liblmdb-dev
+    mpi-default-dev
 
 WORKDIR /tmp
 RUN wget https://github.com/google/glog/archive/v0.3.5.tar.gz
@@ -135,4 +135,3 @@ RUN ln -s /usr/lib64/libGLEW.so.2.0 /usr/lib/libGLEW.so.2.0
 
 # Remove all temporary files.
 RUN rm -fr /tmp/*
-
