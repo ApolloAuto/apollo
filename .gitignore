@@ -58,3 +58,6 @@ data/cov
 
 # Doxygen
 docs/doxygen
+
+# Caffe
+third_party/caffe.BUILD
