@@ -229,4 +229,10 @@ DECLARE_double(decision_valid_stop_range);
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
 
+DECLARE_string(destination_obstacle_id);
+
+DECLARE_double(virtual_stop_wall_length);
+DECLARE_double(virtual_stop_wall_width);
+DECLARE_double(virtual_stop_wall_height);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
