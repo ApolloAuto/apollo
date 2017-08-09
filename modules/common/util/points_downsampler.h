@@ -81,6 +81,9 @@ template <typename PointType>
 bool DownsampleByAngle(const std::vector<PointType> &points,
                        const double angle_threshold,
                        std::vector<int> *sampled_indices) {
+  CHECK(sampled_indices);
+  sampled_indices->clear();
+
   if (angle_threshold < 0.0) {
     AERROR << "Input angle threshold is negative.";
     return false;
@@ -110,18 +113,22 @@ bool DownsampleByAngle(const std::vector<PointType> &points,
   return true;
 }
 
-static constexpr int kDownsampleDistance = 5;
-static constexpr int kSteepTurnDownsampleDistance = 1;
-
 /**
  * @brief Downsample the points on the path based on distance.
  * @param points Points on the path.
+ * @param downsampleDistance downsample rate for a normal path
+ * @param steepTurnDownsampleDistance downsample rate for a steep turn path
  * @param sampled_indices Indecies of all sampled points.
  * @return true if downsampling is successful.
  */
 template <typename PointType>
 void DownsampleByDistance(const std::vector<PointType> &points,
+                          int downsampleDistance,
+                          int steepTurnDownsampleDistance,
                           std::vector<int> *sampled_indices) {
+  CHECK(sampled_indices);
+  sampled_indices->clear();
+
   if (points.size() <= 4) {
     // No need to downsample if there are not too many points.
     for (int i = 0; i < points.size(); ++i) {
@@ -138,7 +145,7 @@ void DownsampleByDistance(const std::vector<PointType> &points,
             points[points.size() - 1].y() - points[points.size() - 2].y());
   bool is_steep_turn = v_start.InnerProd(v_end) <= 0;
   int downsampleRate =
-      is_steep_turn ? kSteepTurnDownsampleDistance : kDownsampleDistance;
+      is_steep_turn ? steepTurnDownsampleDistance : downsampleDistance;
 
   sampled_indices->push_back(0);
 

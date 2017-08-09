@@ -26,4 +26,17 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "sim_map_generator",
+    srcs = ["sim_map_generator.cc"],
+    data = ["//modules/map:map_data"],
+    deps = [
+        "//external:gflags",
+        "//modules/common",
+        "//modules/common/util",
+        "//modules/common/util:points_downsampler",
+        "//modules/map/proto:map_proto",
+    ],
+)
+
 cpplint()
