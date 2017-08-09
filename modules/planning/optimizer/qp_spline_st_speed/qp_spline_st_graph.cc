@@ -263,7 +263,7 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
   for (uint32_t i = 1; i < evaluate_t.size(); ++i) {
     s_vec.push_back(dist_ref);
     dist_ref += (evaluate_t[i] - evaluate_t[i - 1]) *
-                speed_limit.get_speed_limit_by_s(dist_ref);
+                speed_limit.GetSpeedLimit(dist_ref);
   }
   spline_kernel->add_reference_line_kernel_matrix(
       evaluate_t, s_vec,
@@ -350,7 +350,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     } else if (speed_limit.speed_limit_info()[j + 1].first < distance) {
       ++j;
     } else {
-      speed_upper_bound->push_back(speed_limit.get_speed_limit_by_s(distance));
+      speed_upper_bound->push_back(speed_limit.GetSpeedLimit(distance));
       ++i;
     }
   }

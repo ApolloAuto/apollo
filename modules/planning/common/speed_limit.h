@@ -34,10 +34,12 @@ class SpeedLimit {
 
   const std::vector<std::pair<double, double>>& speed_limit_info() const;
 
-  double get_speed_limit_by_s(const double s) const;
+  double GetSpeedLimit(const double s) const;
 
  private:
-  std::vector<std::pair<double, double>> speed_points_;
+  // the first element is the s value and
+  // the second element is the corresponding velocity limit.
+  std::vector<std::pair<double, double>> speed_limit_info_;
 };
 
 }  // namespace planning

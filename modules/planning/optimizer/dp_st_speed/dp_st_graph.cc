@@ -154,7 +154,7 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
 
   // TODO(all): get speed limit from mapper
   double speed_limit =
-      st_graph_data.speed_limit().get_speed_limit_by_s(unit_s_ * r);
+      st_graph_data.speed_limit().GetSpeedLimit(unit_s_ * r);
   if (c == 1) {
     cost_table_[c][r].set_total_cost(
         cost_table_[c][r].obstacle_cost() + cost_table_[0][0].total_cost() +
