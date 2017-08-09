@@ -63,23 +63,13 @@ class MenuItemRadio extends React.Component {
                 <li id={title} onClick={() => {
                     options.selectCamera(title);
                 }}>
-                    <input type="radio" name={id} value={title}
+                    <input type="radio" name={id} id={title}
                     checked={options.cameraAngle === title} readOnly/>
+                    <label id="radio-selector-label" htmlFor={title} />
                     <span>  {title}</span>
                 </li>
             </ul>
         );
-        /*return (
-            <ul>
-                <li id={title} onClick={() => {
-                    options.selectCamera(title);
-                }}>
-                    <input type="radio" name={id} className="radio-selector" />
-                    <label className="radio-selector-label" htmlFor={id} />
-                    <span>  {title}</span>
-                </li>
-            </ul>
-        );*/
     }
 }
 

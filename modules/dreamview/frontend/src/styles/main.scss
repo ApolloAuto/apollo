@@ -101,13 +101,13 @@ body {
     }
 
     .console {
-        background-color: rgba(74, 5, 24, 0.3);
+        background-color: rgba(74, 5, 24, 0.4);
         border: none;
         margin: 0px;
         padding: 0px;
         width: 260px;
-        height: 300px;
-        overflow: scroll;
+        height: 250px;
+        overflow: auto;
         overflow-x: hidden;
 
         .monitor-item {
@@ -231,63 +231,31 @@ body {
             background-color: #30A5FF;
         }
 
+        // Radio button
         input[type="radio"] {
-            position: relative;
-            transform: scale(1.5) translate(75%, 20%);
-            display: inline-block;
-        }
-        
-        // Radio button (not in use)
-        .radio-selector {
             display: none;
         }
-
-        .radio-selector-label {
-            display: inline;
-        }
         
-        .radio-selector + .radio-selector-label {
-            background-color: #FFFFFF;
-            border: 2px solid #E3E3E3;
-            border-radius: 50px;
-            display: inline-block;
-            padding: 11px;
+        #radio-selector-label {
             position: relative;
+            transform: translate(65%, 30%);
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            margin-right: 6px;
+            border-radius: 50%;
+            -webkit-border-radius: 50%;
+            background-color: #A0A0A0;
+            box-shadow: inset 1px 0 #A0A0A0;
+            border: 7px solid #3F4548;
         }
         
-        .radio-selector + .radio-selector-label:before {
-            background: none repeat scroll 0 0 #E3E3E3;
-            content: "";
-            border-radius: 50px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
-            font-size: 36px;
-            height: 8px;
-            left: 7px;
-            position: absolute;
-            top: 7px;
-            width: 8px;
+        input[type="radio"]:checked + #radio-selector-label {
+            border: 7px solid #0E3D62;
+            background-color: #30A5FF;
         }
-        
-        .radio-selector:checked + .radio-selector-label:after {
-            background: none repeat scroll 0 0 #3E8DC8;
-            content: "";
-            border-radius: 50px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
-            font-size: 36px;
-            height: 8px;
-            left: 7px;
-            position: absolute;
-            top: 7px;
-            width: 8px;
-        }
-        
-        .radio-selector:checked + radio-selector-label {
-            background-color: #E9ECEE;
-            border: 2ps solid #ADB8C0;
-            color: #3E8DC8;
-            padding: 11px;
-        }
-        
     }
 }
 
