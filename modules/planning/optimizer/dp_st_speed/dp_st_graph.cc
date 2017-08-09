@@ -415,11 +415,11 @@ bool DpStGraph::CreateFollowDecision(
   DCHECK_NOTNULL(follow_decision);
 
   auto* follow = follow_decision->mutable_follow();
-  const double follow_distance_s = boundary.characteristic_length();
+  const double follow_distance_s = -1.0 * boundary.characteristic_length();
   follow->set_distance_s(follow_distance_s);
 
   const double reference_line_fence_s =
-      boundary.path_obstacle()->sl_boundary().start_s() - follow_distance_s;
+      boundary.path_obstacle()->sl_boundary().start_s() + follow_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "
@@ -440,11 +440,11 @@ bool DpStGraph::CreateYieldDecision(
   DCHECK_NOTNULL(yield_decision);
 
   auto* yield = yield_decision->mutable_yield();
-  const double yield_distance_s = boundary.characteristic_length();
+  const double yield_distance_s = -1.0 * boundary.characteristic_length();
   yield->set_distance_s(yield_distance_s);
 
   const double reference_line_fence_s =
-      boundary.path_obstacle()->sl_boundary().start_s() - yield_distance_s;
+      boundary.path_obstacle()->sl_boundary().start_s() + yield_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "
