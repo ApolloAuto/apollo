@@ -30,6 +30,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/common/util/string_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
@@ -101,7 +102,7 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
     auto s0 = accumulated_s[index - 1];
     auto s1 = accumulated_s[index];
 
-    return ReferenceLine::interpolate(p0, s0, p1, s1, s);
+    return interpolate(p0, s0, p1, s1, s);
   }
 }
 
@@ -111,7 +112,7 @@ double ReferenceLine::find_min_distance_point(const ReferencePoint& p0,
                                               const double s1, const double x,
                                               const double y) {
   auto func_dist_square = [&p0, &p1, &s0, &s1, &x, &y](const double s) {
-    auto p = ReferenceLine::interpolate(p0, s0, p1, s1, s);
+    auto p = interpolate(p0, s0, p1, s1, s);
     double dx = p.x() - x;
     double dy = p.y() - y;
     return dx * dx + dy * dy;
@@ -158,8 +159,8 @@ ReferencePoint ReferenceLine::get_reference_point(const double x,
       reference_points_[index_start], s0, reference_points_[index_end], s1, x,
       y);
 
-  return ReferenceLine::interpolate(reference_points_[index_start], s0,
-                                    reference_points_[index_end], s1, s);
+  return interpolate(reference_points_[index_start], s0,
+                     reference_points_[index_end], s1, s);
 }
 
 bool ReferenceLine::get_point_in_cartesian_frame(
@@ -198,15 +199,38 @@ ReferencePoint ReferenceLine::interpolate(const ReferencePoint& p0,
                                           const double s0,
                                           const ReferencePoint& p1,
                                           const double s1, const double s) {
+  if (std::fabs(s0 - s1) < common::math::kMathEpsilon) {
+    return p0;
+  }
+  DCHECK_LE(s0, s) << " s: " << s << " is less than s0 :" << s0;
+  DCHECK_LE(s, s1) << "s: " << s << "is larger than s1: " << s1;
+  CHECK(!p0.lane_waypoints().empty());
+  CHECK(!p1.lane_waypoints().empty());
   ReferencePoint p = p1;
-  p.set_x(common::math::lerp(p0.x(), s0, p1.x(), s1, s));
-  p.set_y(common::math::lerp(p0.y(), s0, p1.y(), s1, s));
-  p.set_heading(common::math::slerp(p0.heading(), s0, p1.heading(), s1, s));
-  p.set_kappa(common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s));
-  p.set_dkappa(common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s));
+  const double x = common::math::lerp(p0.x(), s0, p1.x(), s1, s);
+  const double y = common::math::lerp(p0.y(), s0, p1.y(), s1, s);
+  const double heading =
+      common::math::slerp(p0.heading(), s0, p1.heading(), s1, s);
+  const double kappa = common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s);
+  const double dkappa = common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s);
+  const auto& p0_waypoint = p0.lane_waypoints()[0];
+  std::vector<hdmap::LaneWaypoint> waypoints;
+  double upper_bound = 0.0;
+  double lower_bound = 0.0;
+  if ((s - s0) + p0_waypoint.s <= p0_waypoint.lane->total_length()) {
+    const double lane_s = p0_waypoint.s + s - s0;
+    waypoints.emplace_back(p0_waypoint.lane, lane_s);
+    p0_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
+  }
+  const auto& p1_waypoint = p1.lane_waypoints()[0];
+  if (p1_waypoint.s - (s1 - s) >= 0) {
+    const double lane_s = p1_waypoint.s - (s1 - s);
+    waypoints.emplace_back(p1_waypoint.lane, lane_s);
+    p1_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
+  }
 
-  // lane boundary info, lane info will be the same as the p1.
-  return p;
+  return ReferencePoint(hdmap::MapPathPoint({x, y}, heading, waypoints), kappa,
+                        dkappa, lower_bound, upper_bound);
 }
 
 const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {

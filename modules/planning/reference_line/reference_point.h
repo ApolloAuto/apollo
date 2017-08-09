@@ -34,9 +34,9 @@ class ReferencePoint : public hdmap::MapPathPoint {
  public:
   ReferencePoint() = default;
 
-  ReferencePoint(const MapPathPoint& map_path_point,
-                 const double kappa, const double dkappa,
-                 const double lower_bound, const double upper_bound);
+  ReferencePoint(const MapPathPoint& map_path_point, const double kappa,
+                 const double dkappa, const double lower_bound,
+                 const double upper_bound);
 
   ReferencePoint(const common::math::Vec2d& point, const double heading,
                  const double kappa, const double dkappa,
