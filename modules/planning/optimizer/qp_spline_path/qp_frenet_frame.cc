@@ -82,9 +82,9 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
   double s = start_s_;
   while (s <= end_s_) {
     evaluated_knots_.push_back(s);
-    hdmap_bound_.push_back(std::make_pair(-inf, inf));
-    static_obstacle_bound_.push_back(std::make_pair(-inf, inf));
-    dynamic_obstacle_bound_.push_back(std::make_pair(-inf, inf));
+    hdmap_bound_.emplace_back(-inf, inf);
+    static_obstacle_bound_.emplace_back(-inf, inf);
+    dynamic_obstacle_bound_.emplace_back(-inf, inf);
     s += resolution;
   }
 
@@ -112,9 +112,9 @@ bool QpFrenetFrame::GetOverallBound(
     return false;
   }
 
-  std::pair<double, double> obs_bound =
-      std::make_pair(-std::numeric_limits<double>::infinity(),
-                     std::numeric_limits<double>::infinity());
+  std::pair<double, double> obs_bound(
+    -std::numeric_limits<double>::infinity(),
+    std::numeric_limits<double>::infinity());
 
   if (!GetStaticObstacleBound(s, &obs_bound)) {
     return false;
@@ -449,7 +449,7 @@ bool QpFrenetFrame::CalculateObstacleBound() {
 }
 
 bool QpFrenetFrame::GetBound(
-    const double s, const std::vector<std::pair<double, double>>& bound_map,
+    const double s, const std::vector<std::pair<double, double>>& map_bound,
     std::pair<double, double>* const bound) const {
   if (Double::Compare(s, start_s_, 1e-8) < 0 ||
       Double::Compare(s, end_s_, 1e-8) > 0) {
@@ -463,14 +463,14 @@ bool QpFrenetFrame::GetBound(
   uint32_t lower_index = FindIndex(s);
   const double s_low = evaluated_knots_[lower_index];
   const double s_high = evaluated_knots_[lower_index + 1];
-  double weight = (Double::Compare(s_high, s_low, 1e-8) <= 0
-                       ? 0
-                       : (s - s_low) / (s_high - s_low));
+  double weight = Double::Compare(s_low, s_high, 1e-8) < 0
+                       ? (s - s_low) / (s_high - s_low)
+                       : 0.0;
 
-  double low_first = bound_map[lower_index].first;
-  double low_second = bound_map[lower_index].second;
-  double high_first = bound_map[lower_index + 1].first;
-  double high_second = bound_map[lower_index + 1].second;
+  double low_first = map_bound[lower_index].first;
+  double low_second = map_bound[lower_index].second;
+  double high_first = map_bound[lower_index + 1].first;
+  double high_second = map_bound[lower_index + 1].second;
 
   // If there is only one infinity in low and high point, then make it equal
   // to
@@ -494,12 +494,11 @@ bool QpFrenetFrame::GetBound(
 }
 
 uint32_t QpFrenetFrame::FindIndex(const double s) const {
-  auto upper_bound =
+  auto lower_bound =
       std::lower_bound(evaluated_knots_.begin() + 1, evaluated_knots_.end(), s);
   return std::min(
              static_cast<uint32_t>(evaluated_knots_.size() - 1),
-             static_cast<uint32_t>(upper_bound - evaluated_knots_.begin())) -
-         1;
+             static_cast<uint32_t>(lower_bound - evaluated_knots_.begin())) - 1;
 }
 
 }  // namespace planning
