@@ -25,6 +25,10 @@ DEFINE_string(config_manager_path, "./conf/config_manager.config",
               "The ModelConfig config paths file.");
 DEFINE_string(work_root, "modules/perception", "Project work root direcotry.");
 
+/// obstacle/base/object.cc
+DEFINE_bool(is_serialize_point_cloud, false,
+            "serialize and output object cloud");
+
 /// obstacle/onboard/hdmap_input.cc
 DEFINE_double(map_radius, 60.0, "get map radius of car center");
 DEFINE_string(map_file, "", "map file name.");
