@@ -206,7 +206,6 @@ ReferencePoint ReferenceLine::interpolate(const ReferencePoint& p0,
   DCHECK_LE(s, s1) << "s: " << s << "is larger than s1: " << s1;
   CHECK(!p0.lane_waypoints().empty());
   CHECK(!p1.lane_waypoints().empty());
-  ReferencePoint p = p1;
   const double x = common::math::lerp(p0.x(), s0, p1.x(), s1, s);
   const double y = common::math::lerp(p0.y(), s0, p1.y(), s1, s);
   const double heading =
@@ -223,7 +222,8 @@ ReferencePoint ReferenceLine::interpolate(const ReferencePoint& p0,
     p0_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
   }
   const auto& p1_waypoint = p1.lane_waypoints()[0];
-  if (p1_waypoint.s - (s1 - s) >= 0) {
+  if (p1_waypoint.lane->id().id() != p0_waypoint.lane->id().id() &&
+      p1_waypoint.s - (s1 - s) >= 0) {
     const double lane_s = p1_waypoint.s - (s1 - s);
     waypoints.emplace_back(p1_waypoint.lane, lane_s);
     p1_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
@@ -238,11 +238,6 @@ const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {
 }
 
 const MapPath& ReferenceLine::map_path() const { return map_path_; }
-
-double ReferenceLine::get_lane_width(const double s) const {
-  // TODO(startcode) : need implement;
-  return 4.0;
-}
 
 bool ReferenceLine::get_lane_width(const double s, double* const left_width,
                                    double* const right_width) const {
