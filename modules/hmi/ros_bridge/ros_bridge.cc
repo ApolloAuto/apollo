@@ -25,18 +25,22 @@
 #include "modules/common/util/file.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/pad_msg.pb.h"
-#include "modules/hmi/proto/config.pb.h"
+#include "modules/map/hdmap/hdmap.h"
 
 
 DEFINE_string(adapter_config_file,
               "modules/hmi/conf/ros_bridge_adapter.pb.txt",
               "Adapter config file for ros bridge.");
 
-using apollo::common::adapter::AdapterConfig;
+DEFINE_string(routing_request_template,
+              "modules/hmi/conf/routing_request_template.pb.txt",
+              "RoutingRequest template file.");
+
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterManagerConfig;
 using apollo::control::DrivingAction;
 using apollo::canbus::Chassis;
+using apollo::hdmap::HDMap;
 
 namespace apollo {
 namespace hmi {
@@ -46,12 +50,19 @@ static constexpr char kHMIRosBridgeName[] = "hmi_ros_bridge";
 
 class RosBridge {
  public:
-  static void Init() {
+  void Init() {
+    // Init AdapterManager.
     AdapterManagerConfig adapter_conf;
     CHECK(apollo::common::util::GetProtoFromASCIIFile(FLAGS_adapter_config_file,
                                                       &adapter_conf));
     AdapterManager::Init(adapter_conf);
     AdapterManager::AddHMICommandCallback(OnHMICommand);
+
+    // Init RoutingRequest template.
+    CHECK(apollo::common::util::GetProtoFromASCIIFile(
+        FLAGS_routing_request_template, &routing_request_template));
+    // Init HDMap.
+    hdmap_ = &HDMap::DefaultMap();
   }
 
  private:
@@ -62,6 +73,10 @@ class RosBridge {
         ChangeDrivingModeTo(Chassis::COMPLETE_MANUAL);
       }
       ChangeDrivingModeTo(cmd.target_mode());
+    }
+
+    if (command.new_routing_request()) {
+      instance()->SendRoutingRequest();
     }
   }
 
@@ -101,11 +116,52 @@ class RosBridge {
   static void SendPadMessage(const DrivingAction action) {
     control::PadMessage pad;
     pad.set_action(action);
-    AINFO << "Sending PadMessage:\n" << pad.DebugString();
     AdapterManager::FillPadHeader(kHMIRosBridgeName, &pad);
     AdapterManager::PublishPad(pad);
+    AINFO << "Sent PadMessage";
   }
+
+  void SendRoutingRequest() {
+    // Observe position from Localization.
+    auto* localization = AdapterManager::GetLocalization();
+    localization->Observe();
+    if (localization->Empty()) {
+      AERROR << "No Localization message received!";
+      return;
+    }
+    const auto& pos = localization->GetLatestObserved().pose().position();
+
+    // Look up lane info from map.
+    apollo::hdmap::LaneInfoConstPtr lane = nullptr;
+    double s, l;
+    hdmap_->get_nearest_lane(pos, &lane, &s, &l);
+    if (lane == nullptr) {
+      AERROR << "Cannot get nearest lane from current position.";
+      return;
+    }
+
+    // Populate message and send.
+    routing::RoutingRequest routing_request = routing_request_template;
+    auto* start_point = routing_request.mutable_start();
+    start_point->set_id(lane->id().id());
+    start_point->set_s(s);
+    auto* pose = start_point->mutable_pose();
+    pose->set_x(pos.x());
+    pose->set_y(pos.y());
+    pose->set_z(pos.z());
+    AdapterManager::FillRoutingRequestHeader(kHMIRosBridgeName,
+                                             &routing_request);
+    AdapterManager::PublishRoutingRequest(routing_request);
+  }
+
+ private:
+  const HDMap* hdmap_;
+  routing::RoutingRequest routing_request_template;
+
+  DECLARE_SINGLETON(RosBridge);
 };
+
+RosBridge::RosBridge() {}
 
 }  // namespace
 }  // namespace hmi
@@ -116,7 +172,7 @@ int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   ros::init(argc, argv, apollo::hmi::kHMIRosBridgeName);
-  apollo::hmi::RosBridge::Init();
+  apollo::hmi::RosBridge::instance()->Init();
   ros::spin();
   return 0;
 }

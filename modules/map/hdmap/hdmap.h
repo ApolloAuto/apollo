@@ -39,6 +39,9 @@ namespace hdmap {
 
 class HDMap {
  public:
+  static std::unique_ptr<HDMap> CreateMap(const std::string& map_filename);
+  static const HDMap& DefaultMap();
+
   int load_map_from_file(const std::string& map_filename);
 
   LaneInfoConstPtr get_lane_by_id(const apollo::hdmap::Id& id) const;

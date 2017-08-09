@@ -64,9 +64,3 @@ def runtime_status():
 def frontend_handler(socketio_request_json):
     """Handler of SocketIO request for frontend."""
     SocketIOApi.execute(socketio_request_json)
-
-
-@socketio.on('socketio_api', namespace='/io_ros_bridge')
-def ros_handler(socketio_request_json):
-    """Handler of SocketIO request for ros."""
-    SocketIOApi.execute(socketio_request_json)
