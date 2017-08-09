@@ -112,8 +112,6 @@ class MapPathPoint : public common::math::Vec2d {
 
  protected:
   double _heading = 0.0;
-  double _curvature = 0.0;
-  double _curvature_derivative = 0.0;
   std::vector<LaneWaypoint> _lane_waypoints;
 };
 
