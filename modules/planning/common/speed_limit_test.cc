@@ -15,33 +15,32 @@
  *****************************************************************************/
 
 /**
- * @file speed_limit.h
+ * @file
  **/
 
+#include "modules/planning/common/speed_limit.h"
+
+#include <memory>
+#include <unordered_map>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "gtest/gtest.h"
 
-#ifndef MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
-#define MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
+#include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
 
-class SpeedLimit {
+class ObstacleTest : public ::testing::Test {
  public:
-  SpeedLimit() = default;
-  void AddSpeedLimit(const common::SpeedPoint& speed_point);
+  virtual void SetUp() {}
 
-  const std::vector<common::SpeedPoint>& speed_points() const;
-  double GetSpeedLimitByS(const double s) const;
-  double GetSpeedLimitByT(const double t) const;
-
- private:
-  std::vector<common::SpeedPoint> speed_points_;
+ protected:
+  SpeedLimit speed_limit_;
 };
+
+TEST_F(ObstacleTest, CreateObstacles) {}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_COMMON_SPEED_LIMIT_H_

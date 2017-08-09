@@ -72,13 +72,11 @@ class QpSplineStGraph {
   // generate reference speed profile
   // common::Status ApplyReferenceSpeedProfile();
   common::Status AddCruiseReferenceLineKernel(
-    const std::vector<double>& evaluate_t,
-      const SpeedLimit& speed_limit);
+      const std::vector<double>& evaluate_t, const SpeedLimit& speed_limit);
 
   common::Status AddFollowReferenceLineKernel(
       const std::vector<double>& evaluate_t,
-      const std::vector<StGraphBoundary>& boundaries,
-      const double weight);
+      const std::vector<StGraphBoundary>& boundaries, const double weight);
 
   common::Status EstimateSpeedUpperBound(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
@@ -94,13 +92,15 @@ class QpSplineStGraph {
   // solver
   std::unique_ptr<Spline1dGenerator> spline_generator_ = nullptr;
 
-  // time resolution
+  // t knots resolution
   double t_knots_resolution_ = 0.0;
 
   // knots
   std::vector<double> t_knots_;
 
+  // evaluated t resolution
   double t_evaluated_resolution_ = 0.0;
+
   // evaluated points
   std::vector<double> t_evaluated_;
 };
