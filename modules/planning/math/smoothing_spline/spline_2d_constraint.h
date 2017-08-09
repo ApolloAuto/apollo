@@ -48,7 +48,7 @@ class Spline2dConstraint {
   *   if no boundary, do specify either by std::infinity or let vector.size() =
   *0
   **/
-  bool add_2d_boundary(
+  bool Add2dBoundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
       const std::vector<apollo::common::math::Vec2d>& ref_point,
       const std::vector<double>& longitidinal_bound,

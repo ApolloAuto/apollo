@@ -36,10 +36,10 @@ class Spline2dKernel {
                  const std::uint32_t spline_order);
 
   // customized input output
-  void add_regularization(const double regularization_param);
-  bool add_kernel(const Eigen::MatrixXd& kernel, const Eigen::MatrixXd& offset,
+  void AddRegularization(const double regularization_param);
+  bool AddKernel(const Eigen::MatrixXd& kernel, const Eigen::MatrixXd& offset,
                   const double weight);
-  bool add_kernel(const Eigen::MatrixXd& kernel, const double weight);
+  bool AddKernel(const Eigen::MatrixXd& kernel, const double weight);
 
   Eigen::MatrixXd* mutable_kernel_matrix();
   Eigen::MatrixXd* mutable_offset();

@@ -74,11 +74,11 @@ class Spline1dGenerator {
 
   // setup initialize point, if not,
   // will use the default primal-dual parameter
-  void setup_init_qp_point(const Eigen::MatrixXd& x, const Eigen::MatrixXd& y,
-                           const Eigen::MatrixXd& z, const Eigen::MatrixXd& s);
+  void SetupInitQpPoint(const Eigen::MatrixXd& x, const Eigen::MatrixXd& y,
+                        const Eigen::MatrixXd& z, const Eigen::MatrixXd& s);
 
   // solve
-  bool solve();
+  bool Solve();
 
   // output
   const Spline1d& spline() const;

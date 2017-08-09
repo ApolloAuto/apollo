@@ -39,11 +39,11 @@ class Spline2d {
   std::pair<double, double> operator()(const double t) const;
   double x(const double t) const;
   double y(const double t) const;
-  double derivative_x(const double t) const;
+  double DerivativeX(const double t) const;
   double derivative_y(const double t) const;
-  double second_derivative_x(const double t) const;
+  double SecondDerivativeX(const double t) const;
   double second_derivative_y(const double t) const;
-  double third_derivative_x(const double t) const;
+  double ThirdDerivativeX(const double t) const;
   double third_derivative_y(const double t) const;
   bool set_splines(const Eigen::MatrixXd& params, const std::uint32_t order);
   Spline2dSeg* mutable_smoothing_spline(const std::uint32_t index);
