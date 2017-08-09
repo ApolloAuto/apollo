@@ -305,7 +305,12 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
 
     if (boundary_it->points().front().x() <= 0) {
       ObjectDecisionType yield_decision;
-      yield_decision.mutable_yield();
+      if (!CreateYieldDecision(*boundary_it, &yield_decision)) {
+        AERROR << "Failed to create yield decision for boundary with id "
+               << boundary_it->id();
+        return Status(ErrorCode::PLANNING_ERROR,
+                      "faind to create yield decision");
+      }
       if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
                                       yield_decision)) {
         AERROR << "Failed to add decision to object " << boundary_it->id();
@@ -351,6 +356,7 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
     }
     if (go_down) {
       if (CheckIsFollowByT(*boundary_it)) {
+        // FOLLOW decision
         ObjectDecisionType follow_decision;
         if (!CreateFollowDecision(*boundary_it, &follow_decision)) {
           AERROR << "Failed to create follow decision for boundary with id "
@@ -366,9 +372,14 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
                         "faind to add follow decision");
         }
       } else {
+        // YIELD decision
         ObjectDecisionType yield_decision;
-        yield_decision.mutable_yield();
-        // TODO(all) set yield point here.
+        if (!CreateYieldDecision(*boundary_it, &yield_decision)) {
+          AERROR << "Failed to create yield decision for boundary with id "
+                 << boundary_it->id();
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "faind to create yield decision");
+        }
         if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
                                         yield_decision)) {
           AERROR << "Failed to add yield decision to object "
@@ -378,8 +389,14 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
         }
       }
     } else {
+      // OVERTAKE decision
       ObjectDecisionType overtake_decision;
-      overtake_decision.mutable_overtake();
+      if (!CreateOvertakeDecision(*boundary_it, &overtake_decision)) {
+        AERROR << "Failed to create overtake decision for boundary with id "
+               << boundary_it->id();
+        return Status(ErrorCode::PLANNING_ERROR,
+                      "faind to create overtake decision");
+      }
       if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
                                       overtake_decision)) {
         AERROR << "Failed to add overtake decision to object "
@@ -396,11 +413,13 @@ bool DpStGraph::CreateFollowDecision(
     const StGraphBoundary& boundary,
     ObjectDecisionType* const follow_decision) const {
   DCHECK_NOTNULL(follow_decision);
+
   auto* follow = follow_decision->mutable_follow();
-  const double follow_distance_s = -1.0 * boundary.characteristic_length();
+  const double follow_distance_s = boundary.characteristic_length();
   follow->set_distance_s(follow_distance_s);
+
   const double reference_line_fence_s =
-      boundary.path_obstacle()->sl_boundary().start_s() + follow_distance_s;
+      boundary.path_obstacle()->sl_boundary().start_s() - follow_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "
@@ -411,6 +430,59 @@ bool DpStGraph::CreateFollowDecision(
   follow_point->set_x(path_point.x());
   follow_point->set_y(path_point.y());
   follow_point->set_z(0.0);
+
+  return true;
+}
+
+bool DpStGraph::CreateYieldDecision(
+    const StGraphBoundary& boundary,
+    ObjectDecisionType* const yield_decision) const {
+  DCHECK_NOTNULL(yield_decision);
+
+  auto* yield = yield_decision->mutable_yield();
+  const double yield_distance_s = boundary.characteristic_length();
+  yield->set_distance_s(yield_distance_s);
+
+  const double reference_line_fence_s =
+      boundary.path_obstacle()->sl_boundary().start_s() - yield_distance_s;
+  common::PathPoint path_point;
+  if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
+    AERROR << "Failed to get path point from reference line s "
+           << reference_line_fence_s;
+    return false;
+  }
+
+  yield->mutable_yield_point()->set_x(path_point.x());
+  yield->mutable_yield_point()->set_y(path_point.y());
+  yield->mutable_yield_point()->set_z(0.0);
+  yield->set_yield_heading(path_point.theta());
+
+  return true;
+}
+
+bool DpStGraph::CreateOvertakeDecision(
+    const StGraphBoundary& boundary,
+    ObjectDecisionType* const overtake_decision) const {
+  DCHECK_NOTNULL(overtake_decision);
+
+  auto* overtake = overtake_decision->mutable_overtake();
+  const double overtake_distance_s = boundary.characteristic_length();
+  overtake->set_distance_s(overtake_distance_s);
+
+  const double reference_line_fence_s =
+      boundary.path_obstacle()->sl_boundary().end_s() + overtake_distance_s;
+  common::PathPoint path_point;
+  if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
+    AERROR << "Failed to get path point from reference line s "
+           << reference_line_fence_s;
+    return false;
+  }
+
+  overtake->mutable_overtake_point()->set_x(path_point.x());
+  overtake->mutable_overtake_point()->set_y(path_point.y());
+  overtake->mutable_overtake_point()->set_z(0.0);
+  overtake->set_overtake_heading(path_point.theta());
+
   return true;
 }
 
