@@ -221,7 +221,7 @@ bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
     fence_point = decision.yield().yield_point();
     heading = decision.yield().yield_heading();
   } else if (decision.has_overtake() &&
-             decision.overtake().has_overtake_point()) {
+             decision.overtake().has_fence_point()) {
     world_decision->set_type(Decision_Type_OVERTAKE);
     fence_point = decision.overtake().overtake_point();
     heading = decision.overtake().overtake_heading();
