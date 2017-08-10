@@ -426,11 +426,11 @@ bool DpStGraph::CreateFollowDecision(
            << reference_line_fence_s;
     return false;
   }
-  auto* follow_point = follow->mutable_follow_point();
-  follow_point->set_x(path_point.x());
-  follow_point->set_y(path_point.y());
-  follow_point->set_z(0.0);
-  follow->set_follow_heading(path_point.theta());
+  auto* fence_point = follow->mutable_fence_point();
+  fence_point->set_x(path_point.x());
+  fence_point->set_y(path_point.y());
+  fence_point->set_z(0.0);
+  follow->set_fence_heading(path_point.theta());
 
   return true;
 }
@@ -453,10 +453,10 @@ bool DpStGraph::CreateYieldDecision(
     return false;
   }
 
-  yield->mutable_yield_point()->set_x(path_point.x());
-  yield->mutable_yield_point()->set_y(path_point.y());
-  yield->mutable_yield_point()->set_z(0.0);
-  yield->set_yield_heading(path_point.theta());
+  yield->mutable_fence_point()->set_x(path_point.x());
+  yield->mutable_fence_point()->set_y(path_point.y());
+  yield->mutable_fence_point()->set_z(0.0);
+  yield->set_fence_heading(path_point.theta());
 
   return true;
 }
@@ -479,10 +479,10 @@ bool DpStGraph::CreateOvertakeDecision(
     return false;
   }
 
-  overtake->mutable_overtake_point()->set_x(path_point.x());
-  overtake->mutable_overtake_point()->set_y(path_point.y());
-  overtake->mutable_overtake_point()->set_z(0.0);
-  overtake->set_overtake_heading(path_point.theta());
+  overtake->mutable_fence_point()->set_x(path_point.x());
+  overtake->mutable_fence_point()->set_y(path_point.y());
+  overtake->mutable_fence_point()->set_z(0.0);
+  overtake->set_fence_heading(path_point.theta());
 
   return true;
 }
