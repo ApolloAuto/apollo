@@ -22,16 +22,11 @@
 DECLARE_string(node_name);
 DECLARE_string(node_namespace);
 
-DECLARE_bool(enable_old_routing);
-DECLARE_string(route_topic_for_broadcast);
 DECLARE_bool(use_road_id);
 
 DECLARE_string(map_dir);
 DECLARE_string(map_file_name);
-DECLARE_string(graph_dir);
 DECLARE_string(graph_file_name);
-
-DECLARE_string(rosparam_name_routing_init_status);
 
 DECLARE_bool(enable_debug_mode);
 DECLARE_string(debug_route_path);
