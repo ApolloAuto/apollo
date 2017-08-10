@@ -27,7 +27,13 @@ namespace perception {
 
 /**
  * @class Bitmap2D
+ * @brief This is Bitmap, which store the ROI information as grids. If the value
+ * of grid is true, means this grid is in ROI, otherwise means the grid is out
+ * of ROI.
  *
+ * @Note: In column direction, each bit denotes one grid. To speed up range set
+ * operation, we use uint64_t to represent 64 grids, which can set 64 gird at
+ * one time.
  */
 class Bitmap2D {
  public:
@@ -40,7 +46,7 @@ class Bitmap2D {
   static inline DirectionMajor opposite_direction(DirectionMajor dir_major) {
     return static_cast<DirectionMajor>(dir_major ^ 1);
   }
-  // getter and setter
+
   const Eigen::Vector2d& get_min_p() const {
     return min_p_;
   }
@@ -57,7 +63,15 @@ class Bitmap2D {
     return op_dir_major_;
   }
 
+  /**
+   * @brief: Roughly check whether the point is in bitmap.
+   */
   bool IsExist(const Eigen::Vector2d& p) const;
+
+  /**
+   * @brief: Cast point to a grid in bitmap, then check whether the value of
+   * gird is true(in ROI).
+   */
   bool Check(const Eigen::Vector2d& p) const;
 
   void Set(double x, double min_y, double max_y);

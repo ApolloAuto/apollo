@@ -32,6 +32,7 @@ void PolygonScanConverter::ConvertScans(
 
   scans_intervals->resize(scans_size_);
 
+  DisturbPolygon();
   ConvertPolygonToSegments();
   BuildEdgeTable();
 
@@ -111,13 +112,13 @@ void PolygonScanConverter::BuildEdgeTable() {
   edges.reserve(segments_.size());
   for (size_t i = 0; i < segments_.size(); ++i) {
     std::pair<int, Edge> out_edge;
-    if (ConvertSegment(i, out_edge)) {
+    if (ConvertSegmentToEdge(i, out_edge)) {
       edges.push_back(out_edge);
     }
   }
 
   active_edge_table_.reserve(edges.size());
-  //active_edge_table_.reserve(segments.size());
+
   for (size_t i = 0; i < edges.size(); ++i) {
     int x_id = edges[i].first;
     const Edge &edge = edges[i].second;
@@ -137,11 +138,9 @@ void PolygonScanConverter::BuildEdgeTable() {
   }
 }
 
-bool PolygonScanConverter::ConvertSegment(size_t seg_id,
+bool PolygonScanConverter::ConvertSegmentToEdge(size_t seg_id,
                                           std::pair<int, Edge> &out_edge) {
   const Segment &segment = segments_[seg_id];
-
-  Edge &edge = out_edge.second;
 
   double min_x = segment.first[major_dir_] - bottom_x_;
   double min_y = segment.first[op_major_dir_];
@@ -149,10 +148,11 @@ bool PolygonScanConverter::ConvertSegment(size_t seg_id,
   int x_id = std::ceil(min_x / step_);
   out_edge.first = x_id;
 
+  Edge &edge = out_edge.second;
   edge.x = x_id * step_;
   edge.max_x = segment.second[major_dir_] - bottom_x_;
   edge.max_y = segment.second[op_major_dir_];
-  edge.k = ks_[seg_id];
+  edge.k = slope_[seg_id];
 
   if (std::isfinite(edge.k)) {
     edge.y = min_y + (edge.x - min_x) * edge.k;
@@ -170,12 +170,11 @@ bool PolygonScanConverter::ConvertSegment(size_t seg_id,
 }
 
 void PolygonScanConverter::ConvertPolygonToSegments() {
-  DisturbPolygon();
 
   size_t vertices_size = polygon_.size();
 
   segments_.reserve(vertices_size);
-  ks_.reserve(vertices_size);
+  slope_.reserve(vertices_size);
 
   for (size_t i = 0; i < vertices_size; ++i) {
     const Point &cur_vertex = polygon_[i];
@@ -189,7 +188,7 @@ void PolygonScanConverter::ConvertPolygonToSegments() {
     double x_diff = next_vertex[major_dir_] - cur_vertex[major_dir_];
     double y_diff = next_vertex[op_major_dir_] - cur_vertex[op_major_dir_];
     std::abs(cur_vertex[major_dir_] - next_vertex[major_dir_]) < s_epsilon_ ?
-      ks_.push_back(s_inf_) : ks_.push_back(y_diff / x_diff);
+      slope_.push_back(s_inf_) : slope_.push_back(y_diff / x_diff);
   }
 }
 
@@ -221,8 +220,8 @@ bool PolygonScanConverter::Edge::MoveUp(const double delta_x) {
   return true;
 }
 
-} // perception
-} // apollo
+} // namespace perception
+} // namespace apollo
 
 
 
