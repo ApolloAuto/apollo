@@ -44,8 +44,9 @@ Status LidarExChecker::Init() {
   bottom_redundant_cloud_count_ = 0;
   enough_data_ = false;
 
-  cloud_count_ = 3;
-  capture_distance_ = 10.0;
+  cloud_count_ = FLAGS_capture_cloud_count;
+  capture_distance_ = FLAGS_capture_distance;
+  extrin_file_ = FLAGS_velodyne64_extrinsics_path;
 
   position_type_ = 0;
 
@@ -53,27 +54,25 @@ Status LidarExChecker::Init() {
     return Status::OK();
   }
 
-  std::cout << FLAGS_adapter_config_path << std::endl;
   AdapterManager::Init(FLAGS_adapter_config_path);
 
   CHECK(AdapterManager::GetGps()) << "gps is not initialized.";
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
   AdapterManager::AddPointCloudCallback(&LidarExChecker::OnPointCloud, this);
   AdapterManager::AddGpsCallback(&LidarExChecker::OnGps, this);
+  AdapterManager::AddInsStatCallback(&LidarExChecker::OnInsStat, this);
 
   return Status::OK();
 }
 
 bool LidarExChecker::LoadExtrinsics() {
-  std::string extrin_file = FLAGS_velodyne64_extrinsics_path;
-  std::cout << extrin_file << std::endl;
-  ifstream fi(extrin_file.c_str());
+  ifstream fi(extrin_file_.c_str());
   if (!fi.good()) {
-    std::cerr << "extrinsics file does not exist." << std::endl;
+    std::cerr << "Fail to open extrinsics file: " << extrin_file_ << std::endl;
     return false;
   }
 
-  YAML::Node node = YAML::LoadFile(extrin_file);
+  YAML::Node node = YAML::LoadFile(extrin_file_);
 
   Eigen::Quaterniond rotation(node["transform"]["rotation"]["w"].as<double>(),
                               node["transform"]["rotation"]["x"].as<double>(),
@@ -91,25 +90,17 @@ bool LidarExChecker::LoadExtrinsics() {
 void LidarExChecker::VisualizeClouds() {
   boost::shared_ptr<pcl::visualization::PCLVisualizer> pcl_vis;
   pcl_vis.reset(new pcl::visualization::PCLVisualizer("3D Viewer"));
-
-  // std::cout << "offset: " << std::endl << offset_.matrix() << std::endl;
-  // std::cout << "extrinsics: " << std::endl << extrinsics_.matrix() <<
-  // std::endl;
-  // pcl::PointCloud<pcl::PointXYZ> save_cld;
   for (uint32_t i = 0; i < clouds_.size(); ++i) {
     pcl::PointCloud<PointXYZIT> cld = clouds_[i];
     pcl::PointCloud<pcl::PointXYZ>::Ptr tf_cld_ptr(
         new pcl::PointCloud<pcl::PointXYZ>);
     double timestamp = cld.points.back().timestamp;
     timestamp = round(timestamp * 100) / 100.0;
-    // std::cout << timestamp << std::endl;
     Eigen::Affine3d pose = gps_poses_[timestamp];
-    // std::cout << "pose" << i << ": " << std::endl << pose.matrix() <<
-    // std::endl;
+
     for (uint32_t j = 0; j < cld.points.size(); ++j) {
       PointXYZIT pt = cld.points[j];
       Eigen::Vector3d pt_vec(pt.x, pt.y, pt.z);
-
       Eigen::Vector3d tf_pt_vec = pose * extrinsics_ * pt_vec;
 
       pcl::PointXYZ tf_pt;
@@ -117,17 +108,15 @@ void LidarExChecker::VisualizeClouds() {
       tf_pt.y = tf_pt_vec[1];
       tf_pt.z = tf_pt_vec[2];
       tf_cld_ptr->points.push_back(tf_pt);
-
-      // save_cld.points.push_back(tf_pt);
     }
-    int r = rand() % 255;
-    int g = rand() % 255;
-    int b = rand() % 255;
+    uint32_t seed = static_cast<uint32_t>(timestamp);
+    int r = rand_r(&seed) % 255;
+    int g = rand_r(&seed) % 255;
+    int b = rand_r(&seed) % 255;
     pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> handler(
         tf_cld_ptr, r, g, b);
     pcl_vis->addPointCloud(tf_cld_ptr, handler, "clouds" + i);
   }
-  // pcl::io::savePCDFileBinary("./result.pcd", save_cld);
   pcl_vis->spin();
 }
 
@@ -145,9 +134,9 @@ void LidarExChecker::OnPointCloud(const sensor_msgs::PointCloud2& message) {
     return;
   }
 
-  // if (position_type_ != 56) {
-  //  return;
-  //}
+  if (position_type_ != 56) {
+    return;
+  }
 
   Eigen::Vector3d position;
   Eigen::Affine3d pose = gps_poses_.rbegin()->second;
@@ -210,8 +199,9 @@ void LidarExChecker::OnGps(const ::apollo::localization::Gps& message) {
   }
 }
 
-void LidarExChecker::OnInsStat() {
-  position_type_ = 0;
+void LidarExChecker::OnInsStat(
+    const ::apollo::drivers::gnss::InsStat& message) {
+  position_type_ = message.pos_type();
 }
 
 Status LidarExChecker::Start() {

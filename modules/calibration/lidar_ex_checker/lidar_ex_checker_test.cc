@@ -14,10 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/conf/calib_vis/common/calib_vis_gflags.h"
+#include "modules/calibration/lidar_ex_checker/lidar_ex_checker.h"
 
-DEFINE_string(node_name, "calib_vis", "The calibraiton visualizer module name in proto");
+#include "gtest/gtest.h"
 
-DEFINE_string(velodyne64_extrinsic_path, "",
-              "The Velodyne64 extrinsics file path");
+namespace apollo {
+namespace calibration {
 
+using apollo::common::ErrorCode;
+
+TEST(LidarExCheckerTest, Simple) {
+  LidarExChecker checker;
+  EXPECT_EQ(checker.Name(), "lidar_extrinsics_checker");
+}
+
+}  // namespace calibration
+}  // namespace apollo

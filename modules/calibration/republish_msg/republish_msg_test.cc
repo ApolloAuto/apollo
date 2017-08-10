@@ -14,12 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_CALIBVIS_GFLAGS_H_
-#define MODULES_PERCEPTION_COMMON_CALIBVIS_GFLAGS_H_
+#include "modules/calibration/republish_msg/republish_msg.h"
 
-#include "gflags/gflags.h"
+#include "gtest/gtest.h"
 
-DECLARE_string(node_name);
-DECLARE_string(velodyne64_extrinsics_path);
+namespace apollo {
+namespace calibration {
 
-#endif /* MODULES_PERCEPTION_COMMON_CALIBVIS_GFLAGS_H_ */
+using apollo::common::ErrorCode;
+
+TEST(RepublishMsgTest, Simple) {
+  RepublishMsg repub_msg;
+  EXPECT_EQ(repub_msg.Name(), "republish_msg");
+}
+
+}  // namespace calibration
+}  // namespace apollo
