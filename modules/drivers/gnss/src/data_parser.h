@@ -52,6 +52,7 @@ class DataParser {
   void publish_ins_stat(const MessagePtr message);
   void publish_odometry_pb_message(const MessagePtr message);
   void publish_corrimu_pb_message(const MessagePtr message);
+  void publish_ins_message(const MessagePtr message);
   void check_ins_status(::apollo::drivers::gnss::Ins *ins);
   void check_gnss_status(::apollo::drivers::gnss::Gnss *gnss);
 
@@ -64,6 +65,7 @@ class DataParser {
   const ros::Publisher _nav_odometry_publisher;
   const ros::Publisher _gnss_status_publisher;
   const ros::Publisher _ins_status_publisher;
+  const ros::Publisher _ins_publisher;
 
   boost::shared_ptr<apollo::common::gnss_status::GnssStatus> _gnss_status;
   boost::shared_ptr<apollo::common::gnss_status::InsStatus> _ins_status;
