@@ -64,9 +64,10 @@ class EMPlanner : public Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                              Frame* frame,
-                              PublishableTrajectory* trajectory_pb) override;
+  apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point,
+      Frame* frame, PublishableTrajectory* trajectory_pb) override;
+
  private:
   void RegisterOptimizers();
 

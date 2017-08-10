@@ -65,8 +65,8 @@ common::FrenetFramePoint &FrenetFramePath::PointAt(const std::uint32_t index) {
 }
 
 common::FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
-  CHECK(points_.size() > 1);
-  CHECK( s < points_.back().s() + 1.0e-6 && s > points_.front().s() - 1.0e-6);
+  CHECK_GT(points_.size(), 1);
+  CHECK(s < points_.back().s() + 1.0e-6 && s > points_.front().s() - 1.0e-6);
   auto func = [](const common::FrenetFramePoint& p, const double s) {
     return p.s() < s;
   };
@@ -88,7 +88,6 @@ common::FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
   p.set_dl(common::math::lerp(p0.dl(), s0, p1.dl(), s1, s));
   p.set_ddl(common::math::lerp(p0.ddl(), s0, p1.ddl(), s1, s));
   return p;
-
 }
 
 void FrenetFramePath::Clear() {

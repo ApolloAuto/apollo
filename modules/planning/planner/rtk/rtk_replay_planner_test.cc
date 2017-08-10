@@ -63,7 +63,8 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
   PublishableTrajectory trajectory;
-  EXPECT_TRUE(!(planner_with_error_csv.Plan(start_point, nullptr, &trajectory)).ok());
+  EXPECT_TRUE(
+      !(planner_with_error_csv.Plan(start_point, nullptr, &trajectory)).ok());
 }
 
 }  // namespace planning

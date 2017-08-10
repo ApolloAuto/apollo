@@ -186,7 +186,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   std::vector<SpeedPoint> speed_profile;
   const auto* last_frame = FrameHistory::instance()->Latest();
   if (last_frame != nullptr) {
-    const auto& last_speed_vector = 
+    const auto& last_speed_vector =
           last_frame->planning_data().speed_data().speed_vector();
 
     if (!last_speed_vector.empty()) {
