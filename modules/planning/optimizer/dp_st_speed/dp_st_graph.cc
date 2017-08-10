@@ -430,6 +430,7 @@ bool DpStGraph::CreateFollowDecision(
   follow_point->set_x(path_point.x());
   follow_point->set_y(path_point.y());
   follow_point->set_z(0.0);
+  follow->set_follow_heading(path_point.theta());
 
   return true;
 }
