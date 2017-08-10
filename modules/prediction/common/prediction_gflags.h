@@ -29,7 +29,6 @@ DECLARE_double(double_precision);
 DECLARE_double(max_prediction_length);
 
 // Map
-DECLARE_string(map_file);
 DECLARE_double(search_radius);
 
 // Obstacle features

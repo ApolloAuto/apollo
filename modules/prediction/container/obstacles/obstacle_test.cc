@@ -22,10 +22,12 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/common/util/file.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/map/hdmap/hdmap.h"
 
 namespace apollo {
 namespace prediction {
@@ -33,18 +35,18 @@ namespace prediction {
 class ObstacleTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
+    apollo::hdmap::HDMap::SetDefaultMap(
+        "modules/prediction/testdata/kml_map.bin");
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.1;
     FLAGS_r_var = 0.001;
     FLAGS_enable_kf_tracking = true;
     int num_frame = 3;
     for (int i = 1; i <= num_frame; ++i) {
-      std::stringstream file;
-      file << "modules/prediction/testdata/frame_sequence/frame_"
-           << i << ".pb.txt";
+      const auto filename = apollo::common::util::StrCat(
+          "modules/prediction/testdata/frame_sequence/frame_", i, ".pb.txt");
       apollo::perception::PerceptionObstacles perception_obstacles;
-      apollo::common::util::GetProtoFromFile(file.str(), &perception_obstacles);
+      apollo::common::util::GetProtoFromFile(filename, &perception_obstacles);
       container_.Insert(perception_obstacles);
     }
   }

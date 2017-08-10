@@ -18,8 +18,6 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/prediction/common/prediction_gflags.h"
-
 namespace apollo {
 namespace prediction {
 
@@ -30,7 +28,8 @@ using ::apollo::hdmap::MapPathPoint;
 class PredictionMapTest : public ::testing::Test {
  public:
   void SetUp() override {
-    FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
+    apollo::hdmap::HDMap::SetDefaultMap(
+        "modules/prediction/testdata/kml_map.bin");
     map_ = PredictionMap::instance();
   }
 

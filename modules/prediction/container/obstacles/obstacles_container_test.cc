@@ -20,9 +20,10 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/common/util/file.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 namespace apollo {
@@ -35,7 +36,8 @@ class ObstaclesContainerTest : public ::testing::Test {
       "modules/prediction/testdata/perception_vehicles_pedestrians.pb.txt";
     apollo::perception::PerceptionObstacles perception_obstacles;
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles);
-    FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
+    apollo::hdmap::HDMap::SetDefaultMap(
+        "modules/prediction/testdata/kml_map.bin");
     container_.Insert(perception_obstacles);
   }
  protected:
