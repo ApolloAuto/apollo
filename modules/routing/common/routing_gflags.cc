@@ -18,8 +18,6 @@
 
 DEFINE_string(node_name, "routing", "the name for this node");
 DEFINE_string(node_namespace, "routing", "the namespace for this node");
-DEFINE_string(signal_probe_service, "/routing/routing_signal",
-              "the service name for signal probe");
 
 DEFINE_bool(enable_old_routing, true, "enable old routing");
 DEFINE_string(route_topic_for_broadcast, "/routing/routing",

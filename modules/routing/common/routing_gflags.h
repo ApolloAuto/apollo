@@ -21,7 +21,6 @@
 
 DECLARE_string(node_name);
 DECLARE_string(node_namespace);
-DECLARE_string(signal_probe_service);
 
 DECLARE_bool(enable_old_routing);
 DECLARE_string(route_topic_for_broadcast);

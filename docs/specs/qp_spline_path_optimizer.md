@@ -2,9 +2,9 @@
 
 Quadratic programming + Spline interpolation
 
-## 1. Objective function 
+## 1. Objective function
 
-### 1.1 Get path length 
+### 1.1 Get path length
 
 Path is defined in station-lateral corrdination system. The **s** range from veichle's current position to  default planing path length.
 
@@ -17,7 +17,7 @@ Split the path into n segments. each segment trajectory is defined by a polynomi
 Each segment *i* has accumulated distance $d_i$ along reference line. And the trajactory for the segment is defined as a polynomial of degree five by default
 
 $$
-l = f_i(s) 
+l = f_i(s)
   = a_i + b_i * s + c_i * s^2 + d_i * s^3 + e_i * s^4 + f_i * s^5   (0 \leq s \leq d_{i})
 $$
 
