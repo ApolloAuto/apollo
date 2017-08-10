@@ -19,19 +19,12 @@
 DEFINE_string(node_name, "routing", "the name for this node");
 DEFINE_string(node_namespace, "routing", "the namespace for this node");
 
-DEFINE_bool(enable_old_routing, true, "enable old routing");
-DEFINE_string(route_topic_for_broadcast, "/routing/routing",
-              "the default routing topic");
 DEFINE_bool(use_road_id, true, "enable use road id to cut routing result");
 
 DEFINE_string(map_dir, "/apollo/modules/map/data", "the default directory of hdmap");
 DEFINE_string(map_file_name, "base_map.txt", "the default file name of hdmap.");
-DEFINE_string(graph_dir, "/apollo/modules/map/data", "the default directory of topology graph data");
 DEFINE_string(graph_file_name, "routing_map.txt",
               "the default file name of topology graph data");
-
-DEFINE_string(rosparam_name_routing_init_status, "/pnc/routing_initialized",
-              "true if routing init ok, used by ADS test");
 
 DEFINE_bool(enable_debug_mode, true, "enable debug mode");
 DEFINE_string(debug_route_path, "",
