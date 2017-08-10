@@ -22,7 +22,6 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"

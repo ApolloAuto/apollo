@@ -50,7 +50,7 @@ void ReportRuntimeStatus(const RuntimeStatus& runtime_status) {
   }
 }
 
-}  // namesoace
+}  // namespace
 
 void HMIStatusHelper::ReportHardwareStatus(
     const std::vector<HardwareStatus> &hardware_status) {

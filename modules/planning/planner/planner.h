@@ -22,13 +22,11 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/common/status/status.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/common/frame.h"
 
 /**
  * @namespace apollo::planning
@@ -64,9 +62,9 @@ class Planner {
    * @return OK if planning succeeds; error otherwise.
    */
 
-  virtual apollo::common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                                      Frame* frame,
-                                      PublishableTrajectory* trajectory_pb) = 0;
+  virtual apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point,
+      Frame* frame, PublishableTrajectory* trajectory_pb) = 0;
 };
 
 }  // namespace planning

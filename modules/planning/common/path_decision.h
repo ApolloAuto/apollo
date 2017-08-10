@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_COMMON_PATH_DECISION_H_
 
 #include <list>
+#include <string>
 #include <vector>
 
 #include "modules/planning/proto/decision.pb.h"

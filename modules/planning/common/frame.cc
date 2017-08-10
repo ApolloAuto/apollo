@@ -20,7 +20,9 @@
 #include "modules/planning/common/frame.h"
 
 #include <cmath>
+#include <list>
 #include <string>
+#include <utility>
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
@@ -277,7 +279,7 @@ std::unique_ptr<Obstacle> Frame::CreateVirtualObstacle(
 
   // create a "virtual" perception_obstacle
   perception::PerceptionObstacle perception_obstacle;
-  perception_obstacle.set_id(-1); // simulator needs a valid integer
+  perception_obstacle.set_id(-1);  // simulator needs a valid integer
   perception_obstacle.mutable_position()->set_y(position.y());
   auto dest_ref_point = reference_line_.get_reference_point(
       position.x(), position.y());
