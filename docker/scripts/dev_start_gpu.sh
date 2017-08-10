@@ -22,7 +22,7 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20170804_1205-gpu"
+VERSION_X86_64="dev-x86_64-20170808_1518-gpu"
 VERSION_AARCH64="dev-aarch64-20170712_1533"
 if [[ $# == 1 ]];then
     VERSION=$1
@@ -121,6 +121,7 @@ function main(){
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v $LOCAL_DIR:/apollo \
         -v /media:/media \
+        -v /usr/src:/usr/src \
         -v /lib/modules:/lib/modules \
         -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
