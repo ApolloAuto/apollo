@@ -32,42 +32,29 @@ namespace planning {
 
 using common::SpeedPoint;
 
-void SpeedLimit::AddSpeedLimit(const SpeedPoint& speed_point) {
-  if (!speed_points_.empty()) {
-    DCHECK_GE(speed_point.s(), speed_points_.back().s());
-    DCHECK_GE(speed_point.t(), speed_points_.back().t());
+void SpeedLimit::AddSpeedLimit(const double s, const double v) {
+  if (!speed_limit_points_.empty()) {
+    DCHECK_GE(s, speed_limit_points_.back().first);
   }
-  speed_points_.push_back(speed_point);
+  speed_limit_points_.emplace_back(s, v);
 }
 
-const std::vector<SpeedPoint>& SpeedLimit::speed_points() const {
-  return speed_points_;
+const std::vector<std::pair<double, double>>& SpeedLimit::speed_limit_points()
+    const {
+  return speed_limit_points_;
 }
 
 double SpeedLimit::GetSpeedLimitByS(const double s) const {
-  DCHECK_GE(speed_points_.size(), 2);
-  DCHECK_GE(s, speed_points_.front().s());
+  DCHECK_GE(speed_limit_points_.size(), 2);
+  DCHECK_GE(s, speed_limit_points_.front().first);
 
-  auto compare_s = [](const SpeedPoint& sp, const double s) {
-    return sp.s() < s;
+  auto compare_s = [](const std::pair<double, double> point, const double s) {
+    return point.first < s;
   };
 
-  auto it_lower = std::lower_bound(speed_points_.begin(), speed_points_.end(),
-                                   s, compare_s);
-  return it_lower->v();
-}
-
-double SpeedLimit::GetSpeedLimitByT(const double t) const {
-  DCHECK_GE(speed_points_.size(), 2);
-  DCHECK_GE(t, speed_points_.front().t());
-
-  auto compare_t = [](const SpeedPoint& sp, const double t) {
-    return sp.t() < t;
-  };
-
-  auto it_lower = std::lower_bound(speed_points_.begin(), speed_points_.end(),
-                                   t, compare_t);
-  return it_lower->v();
+  auto it_lower = std::lower_bound(speed_limit_points_.begin(),
+                                   speed_limit_points_.end(), s, compare_s);
+  return it_lower->second;
 }
 
 }  // namespace planning

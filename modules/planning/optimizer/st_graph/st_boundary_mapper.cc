@@ -467,7 +467,6 @@ Status StBoundaryMapper::GetSpeedLimits(
   CHECK_NOTNULL(speed_limit_data);
 
   std::vector<double> speed_limits;
-  double curr_t = 0.0;
   for (const auto& path_point : path_data_.discretized_path().path_points()) {
     if (Double::Compare(path_point.s(), reference_line_.length()) > 0) {
       std::string msg = common::util::StrCat(
@@ -491,19 +490,7 @@ Status StBoundaryMapper::GetSpeedLimits(
         st_boundary_config_.lowest_speed(),
         std::fmin(speed_limit_on_path, speed_limit_on_reference_line));
 
-    common::SpeedPoint speed_point;
-
-    double delta_t = 0.0;
-    if (!speed_limit_data->speed_points().empty()) {
-      delta_t = (path_point.s() - speed_limit_data->speed_points().back().s()) /
-                curr_speed_limit;
-    }
-    speed_point.set_s(path_point.s());
-    speed_point.set_v(curr_speed_limit);
-    speed_point.set_t(curr_t);
-    speed_limit_data->AddSpeedLimit(speed_point);
-
-    curr_t += delta_t;
+    speed_limit_data->AddSpeedLimit(path_point.s(), curr_speed_limit);
   }
   return Status::OK();
 }
