@@ -208,26 +208,26 @@ bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
                   Decision *world_decision) {
   apollo::common::PointENU fence_point;
   double heading;
-  /*if (decision.has_stop() && decision.stop().has_stop_point()) {
+  if (decision.has_stop() && decision.stop().has_stop_point()) {
     world_decision->set_type(Decision_Type_STOP);
     fence_point = decision.stop().stop_point();
     heading = decision.stop().stop_heading();
-  } else if (decision.has_follow() && decision.follow().has_follow_point()) {
+  } else if (decision.has_follow() && decision.follow().has_fence_point()) {
     world_decision->set_type(Decision_Type_FOLLOW);
-    fence_point = decision.follow().follow_point();
-    heading = decision.follow().follow_heading();
-  } else if (decision.has_yield() && decision.yield().has_yield_point()) {
+    fence_point = decision.follow().fence_point();
+    heading = decision.follow().fence_heading();
+  } else if (decision.has_yield() && decision.yield().has_fence_point()) {
     world_decision->set_type(Decision_Type_YIELD);
-    fence_point = decision.yield().yield_point();
-    heading = decision.yield().yield_heading();
+    fence_point = decision.yield().fence_point();
+    heading = decision.yield().fence_heading();
   } else if (decision.has_overtake() &&
              decision.overtake().has_fence_point()) {
     world_decision->set_type(Decision_Type_OVERTAKE);
-    fence_point = decision.overtake().overtake_point();
-    heading = decision.overtake().overtake_heading();
+    fence_point = decision.overtake().fence_point();
+    heading = decision.overtake().fence_heading();
   } else {
     return false;
-  }*/
+  }
 
   world_decision->set_position_x(fence_point.x());
   world_decision->set_position_y(fence_point.y());
