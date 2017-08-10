@@ -196,6 +196,10 @@ function release() {
   cp -Lr bazel-bin/modules/dreamview/dreamview.runfiles/apollo/modules/dreamview $MODULES_DIR
   cp -r modules/dreamview/conf $MODULES_DIR/dreamview
 
+  # map
+  mkdir $MODULES_DIR/map
+  cp -r modules/map/data $MODULES_DIR/map
+
   # common data
   mkdir $MODULES_DIR/common
   cp -r modules/common/data $MODULES_DIR/common
