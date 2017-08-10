@@ -19,6 +19,8 @@
 
 #include "gflags/gflags.h"
 
+DECLARE_string(map_file_path);
+
 DECLARE_string(vehicle_config_path);
 
 #endif  // MODULES_COMMON_CONFIGS_GFLAGS_H_

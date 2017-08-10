@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -43,7 +44,7 @@ TEST_F(HDMapInputTest, test_Init) {
   EXPECT_TRUE(hdmap_input_->Init());
 
   hdmap_input_->inited_ = false;
-  FLAGS_map_file = "not_exit_dir";
+  FLAGS_map_file_path = "not_exit_dir";
   EXPECT_FALSE(hdmap_input_->Init());
 }
 
@@ -51,7 +52,7 @@ TEST_F(HDMapInputTest, test_GetROI) {
   HdmapStructPtr hdmap;
   pcl_util::PointD velodyne_pose_world = {435730.0, 4436777.0, 0.0};
   EXPECT_FALSE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
-  FLAGS_map_file = "modules/map/data/base_map_with_boundary.txt";
+  FLAGS_map_file_path = "modules/map/data/base_map_with_boundary.txt";
   EXPECT_TRUE(hdmap_input_->Init());
   EXPECT_TRUE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
   EXPECT_TRUE(hdmap != nullptr);

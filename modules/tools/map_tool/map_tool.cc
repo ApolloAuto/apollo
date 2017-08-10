@@ -18,11 +18,11 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/map/proto/map.pb.h"
 
-DEFINE_string(map_file, "modules/map/data/base_map.txt", "map file");
 DEFINE_double(x_offset, 587318.4866268333, "x offset");
 DEFINE_double(y_offset, 4141146.110116891, "y offset");
 DEFINE_string(output_dir, "/tmp/", "output map directory");
@@ -83,9 +83,9 @@ int main(int32_t argc, char** argv) {
 
   Map map_pb;
 
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_map_file,
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_map_file_path,
                                                 &map_pb)) {
-    AERROR << "Fail to open:" << FLAGS_map_file;
+    AERROR << "Fail to open:" << FLAGS_map_file_path;
     return 1;
   }
   ShiftMap(&map_pb);

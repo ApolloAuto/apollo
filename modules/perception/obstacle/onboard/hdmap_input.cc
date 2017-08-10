@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "Eigen/Core"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/define.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -51,14 +52,14 @@ bool HDMapInput::Init() {
   }
 
   hdmap_.reset(new apollo::hdmap::HDMap());
-  if (hdmap_->load_map_from_file(FLAGS_map_file) != SUCC) {
-    AERROR << "Failed to load map file: " << FLAGS_map_file;
+  if (hdmap_->load_map_from_file(FLAGS_map_file_path) != SUCC) {
+    AERROR << "Failed to load map file: " << FLAGS_map_file_path;
     inited_ = false;
     return false;
   }
 
   AINFO << "Init HDMap successfully, "
-        << "load map file: " << FLAGS_map_file;
+        << "load map file: " << FLAGS_map_file_path;
   inited_ = true;
   return true;
 }

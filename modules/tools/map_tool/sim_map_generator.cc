@@ -19,6 +19,7 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/points_downsampler.h"
@@ -29,7 +30,6 @@
  * frontend.
  */
 
-DEFINE_string(map_file, "", "map file name");
 DEFINE_string(output_dir, "/tmp/", "output map directory");
 DEFINE_double(angle_threshold, 1 / 180 * M_PI, /* 1 degree */
               "Points are sampled when the accumulated direction change "
@@ -110,8 +110,8 @@ int main(int32_t argc, char** argv) {
 
   Map map_pb;
 
-  if (!GetProtoFromFile(FLAGS_map_file, &map_pb)) {
-    AERROR << "Fail to open:" << FLAGS_map_file;
+  if (!GetProtoFromFile(FLAGS_map_file_path, &map_pb)) {
+    AERROR << "Fail to open:" << FLAGS_map_file_path;
     return -1;
   }
 

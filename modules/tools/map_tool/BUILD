@@ -9,6 +9,7 @@ cc_binary(
     deps = [
         "//external:gflags",
         "//modules/common",
+        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
     ],
@@ -21,6 +22,7 @@ cc_binary(
     deps = [
         "//external:gflags",
         "//modules/common",
+        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/map/hdmap",
     ],
@@ -33,6 +35,7 @@ cc_binary(
     deps = [
         "//external:gflags",
         "//modules/common",
+        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:points_downsampler",
         "//modules/map/proto:map_proto",
