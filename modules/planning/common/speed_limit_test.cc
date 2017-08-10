@@ -32,11 +32,10 @@ class SpeedLimitTest : public ::testing::Test {
   virtual void SetUp() {
     speed_limit_.Clear();
     for (int i = 0; i < 100; ++i) {
-      SpeedPoint sp;
-      sp.set_s(i * 1.0);
-      sp.set_t(i * 0.5);
-      sp.set_v((i % 2 == 0) ? 5.0 : 10.0);
-      speed_limit_.AddSpeedLimit(std::move(sp));
+      std::pair<double, double> sp;
+      sp.first = i * 1.0;
+      sp.second = (i % 2 == 0) ? 5.0 : 10.0;
+      speed_limit_.AddSpeedLimit(sp.first, sp.second);
     }
   }
 
@@ -46,43 +45,26 @@ class SpeedLimitTest : public ::testing::Test {
 
 TEST_F(SpeedLimitTest, SimpleSpeedLimitCreation) {
   SpeedLimit simple_speed_limit;
-  EXPECT_TRUE(simple_speed_limit.speed_points().empty());
-  EXPECT_EQ(speed_limit_.speed_points().size(), 100);
+  EXPECT_TRUE(simple_speed_limit.speed_limit_points().empty());
+  EXPECT_EQ(speed_limit_.speed_limit_points().size(), 100);
 }
 
 TEST_F(SpeedLimitTest, GetSpeedLimitByS) {
-  EXPECT_EQ(speed_limit_.speed_points().size(), 100);
+  EXPECT_EQ(speed_limit_.speed_limit_points().size(), 100);
   double s = 0.0;
   const double ds = 0.01;
   while (s < 99.0) {
     double v_limit = speed_limit_.GetSpeedLimitByS(s);
 
     auto it_lower = std::lower_bound(
-        speed_limit_.speed_points().begin(), speed_limit_.speed_points().end(),
-        s, [](const SpeedPoint& point, const double curr_s) {
-          return point.s() < curr_s;
+        speed_limit_.speed_limit_points().begin(),
+        speed_limit_.speed_limit_points().end(), s,
+        [](const std::pair<double, double>& point, const double curr_s) {
+          return point.first < curr_s;
         });
 
-    EXPECT_DOUBLE_EQ(v_limit, it_lower->v());
+    EXPECT_DOUBLE_EQ(v_limit, it_lower->second);
     s += ds;
-  }
-}
-
-TEST_F(SpeedLimitTest, GetSpeedLimitByT) {
-  EXPECT_EQ(speed_limit_.speed_points().size(), 100);
-  double t = 0.0;
-  const double dt = 0.01;
-  while (t < 49.0) {
-    double v_limit = speed_limit_.GetSpeedLimitByT(t);
-
-    auto it_lower = std::lower_bound(
-        speed_limit_.speed_points().begin(), speed_limit_.speed_points().end(),
-        t, [](const SpeedPoint& point, const double curr_t) {
-          return point.t() < curr_t;
-        });
-
-    EXPECT_DOUBLE_EQ(v_limit, it_lower->v());
-    t += dt;
   }
 }
 

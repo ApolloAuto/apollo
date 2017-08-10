@@ -31,16 +31,18 @@ namespace planning {
 class SpeedLimit {
  public:
   SpeedLimit() = default;
-  void AddSpeedLimit(const common::SpeedPoint& speed_point);
+  void AddSpeedLimit(const double s, const double v);
 
-  const std::vector<common::SpeedPoint>& speed_points() const;
+  const std::vector<std::pair<double, double>>& speed_limit_points() const;
   double GetSpeedLimitByS(const double s) const;
-  double GetSpeedLimitByT(const double t) const;
 
-  void Clear() { speed_points_.clear(); }
+  void Clear() { speed_limit_points_.clear(); }
 
  private:
-  std::vector<common::SpeedPoint> speed_points_;
+  // use a vector to represent speed limit
+  // the first number is s, the second number is v
+  // It means at distance s from the start point, the speed limit is v.
+  std::vector<std::pair<double, double>> speed_limit_points_;
 };
 
 }  // namespace planning

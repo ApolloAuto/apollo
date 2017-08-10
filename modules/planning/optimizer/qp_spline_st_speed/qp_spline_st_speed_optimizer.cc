@@ -23,6 +23,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
@@ -80,8 +82,12 @@ void QpSplineStSpeedOptimizer::RecordSTGraphDebug(
     }
   }
 
-  st_graph_debug->mutable_speed_limit()->CopyFrom(
-      {speed_limits.speed_points().begin(), speed_limits.speed_points().end()});
+  for (const auto& point : speed_limits.speed_limit_points()) {
+    common::SpeedPoint speed_point;
+    speed_point.set_s(point.first);
+    speed_point.set_v(point.second);
+    st_graph_debug->add_speed_limit()->CopyFrom(speed_point);
+  }
 
   st_graph_debug->mutable_speed_profile()->CopyFrom(
       {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
