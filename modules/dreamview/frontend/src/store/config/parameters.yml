@@ -41,11 +41,12 @@ options:
     showRouting: true
     showPredictionMajor: true
     showPredictionMinor: true
-    showObstaclesVehicle: true
-    showObstaclesPedestrian: true
-    showObstaclesBicycle: true
-    showObstaclesUnknownMovable: true
-    showObstaclesUnknownUnmovable: true
+    showObstaclesVehicle: false
+    showObstaclesPedestrian: false
+    showObstaclesBicycle: false
+    showObstaclesUnknownMovable: false
+    showObstaclesUnknownUnmovable: false
+    showObstaclesUnknown: true
     showObstaclesVirtual: false
     cameraAngle: Default
 debug:
