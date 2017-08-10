@@ -56,7 +56,7 @@ export default class PlanningTrajectory {
         let width = null;
         if (!world.autoDrivingCar.width) {
             console.warn("Unable to get the auto driving car's width, " +
-                         "planning line width has been set to default: "
+                         "planning line width has been set to default: " +
                          `${PARAMETERS.planning.defaults.width} m.`);
             width = PARAMETERS.planning.defaults.width;
         } else {
