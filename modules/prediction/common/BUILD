@@ -38,6 +38,7 @@ cc_library(
     deps = [
         ":prediction_gflags",
         "//modules/common:macro",
+        "//modules/common/configs:config_gflags",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:vec2d",
         "//modules/map/hdmap",
@@ -51,6 +52,7 @@ cc_test(
     size = "small",
     srcs = ["prediction_map_test.cc"],
     data = [
+        "//modules/common/configs:config_gflags",
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
@@ -78,6 +80,7 @@ cc_test(
     size = "small",
     srcs = ["road_graph_test.cc"],
     data = [
+        "//modules/common/configs:config_gflags",
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],

@@ -30,7 +30,6 @@ DECLARE_bool(is_serialize_point_cloud);
 
 /// obstacle/onboard/hdmap_input.cc
 DECLARE_double(map_radius);
-DECLARE_string(map_file);
 DECLARE_int32(map_sample_step);
 
 /// obstacle/onboard/lidar_process.cc

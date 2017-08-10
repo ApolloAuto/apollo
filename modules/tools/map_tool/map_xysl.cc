@@ -19,12 +19,12 @@
 #include <fstream>
 #include "gflags/gflags.h"
 
-#include "modules/map/proto/map_geometry.pb.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
+#include "modules/map/proto/map_geometry.pb.h"
 
-DEFINE_string(map_file, "modules/map/data/base_map.txt", "the map file");
 DEFINE_bool(xy_to_sl, false, "calculate xy to sl");
 DEFINE_bool(sl_to_xy, false, "calculate sl to xy");
 DEFINE_bool(xy_to_lane, false, "calculate xy to lane");
@@ -159,8 +159,8 @@ std::ostream &operator<<(
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::string map_file = FLAGS_map_file;
-  ::apollo::tools::MapUtil map_util(FLAGS_map_file);
+  std::string map_file = FLAGS_map_file_path;
+  ::apollo::tools::MapUtil map_util(FLAGS_map_file_path);
 
   if (FLAGS_xy_to_sl) {
     double x = FLAGS_x;

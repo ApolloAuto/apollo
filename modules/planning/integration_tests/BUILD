@@ -17,6 +17,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/vehicle_state",
         "//modules/planning:planning_impl",

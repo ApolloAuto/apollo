@@ -22,7 +22,6 @@
 DECLARE_string(planning_config_file);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
-DECLARE_string(map_filename);
 DECLARE_uint64(backward_trajectory_point_num);
 DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(replanning_threshold);

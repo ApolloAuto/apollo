@@ -20,6 +20,7 @@
 
 #include "google/protobuf/repeated_field.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -75,7 +76,7 @@ bool Planning::InitFrame(const uint32_t sequence_num) {
 }
 
 Status Planning::Init() {
-  pnc_map_.reset(new hdmap::PncMap(FLAGS_map_filename));
+  pnc_map_.reset(new hdmap::PncMap(FLAGS_map_file_path));
   Frame::SetMap(pnc_map_.get());
 
   if (!apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
