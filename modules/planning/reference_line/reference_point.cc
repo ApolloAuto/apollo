@@ -50,18 +50,6 @@ ReferencePoint::operator PathPoint() const {
   return result;
 }
 
-void ReferencePoint::set_kappa(const double kappa) { kappa_ = kappa; }
-
-void ReferencePoint::set_dkappa(const double dkappa) { dkappa_ = dkappa; }
-
-void ReferencePoint::set_lower_bound(const double lower_bound) {
-  lower_bound_ = lower_bound;
-}
-
-void ReferencePoint::set_upper_bound(const double upper_bound) {
-  upper_bound_ = upper_bound;
-}
-
 double ReferencePoint::kappa() const { return kappa_; }
 
 double ReferencePoint::dkappa() const { return dkappa_; }
