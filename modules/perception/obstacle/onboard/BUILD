@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
+        "//modules/common/configs:config_gflags",
         "//modules/map/hdmap",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/base",
@@ -56,6 +57,7 @@ cc_test(
     ],
     deps = [
         ":perception_obstacle_hdmapinput",
+        "//modules/common/configs:config_gflags",
         "//modules/perception/common:perception_common",
         "@gtest//:main",
     ],

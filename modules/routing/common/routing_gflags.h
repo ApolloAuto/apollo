@@ -26,6 +26,7 @@ DECLARE_bool(use_road_id);
 
 DECLARE_string(map_dir);
 DECLARE_string(map_file_name);
+
 DECLARE_string(graph_file_name);
 
 DECLARE_bool(enable_debug_mode);

@@ -31,7 +31,6 @@ DEFINE_bool(is_serialize_point_cloud, false,
 
 /// obstacle/onboard/hdmap_input.cc
 DEFINE_double(map_radius, 60.0, "get map radius of car center");
-DEFINE_string(map_file, "", "map file name.");
 DEFINE_int32(map_sample_step, 1, "step for sample road boundary points");
 
 /// obstacle/onboard/lidar_process.cc

@@ -45,6 +45,7 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
@@ -64,6 +65,7 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",

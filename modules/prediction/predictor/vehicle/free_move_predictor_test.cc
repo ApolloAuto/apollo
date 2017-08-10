@@ -40,7 +40,6 @@ class FreeMovePredictorTest : public ::testing::Test {
         &perception_obstacles_));
     apollo::hdmap::HDMap::SetDefaultMap(
         "modules/prediction/testdata/kml_map.bin");
-
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.01;
     FLAGS_r_var = 0.25;

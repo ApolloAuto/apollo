@@ -20,6 +20,7 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/proto/lane_graph.pb.h"

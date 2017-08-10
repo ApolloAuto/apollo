@@ -16,5 +16,8 @@
 
 #include "modules/common/configs/config_gflags.h"
 
+DEFINE_string(map_file_path, "modules/map/data/base_map.txt",
+              "the file path of map data file");
+
 DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
               "the file path of vehicle config file");

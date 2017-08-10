@@ -23,6 +23,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
@@ -36,7 +37,7 @@ namespace prediction {
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::hdmap::MapPathPoint;
-
+  
 PredictionMap::PredictionMap() : hdmap_(apollo::hdmap::HDMap::DefaultMap()) {}
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
