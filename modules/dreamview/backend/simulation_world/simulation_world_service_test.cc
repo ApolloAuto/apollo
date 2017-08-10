@@ -323,10 +323,10 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   obj_decision2->set_perception_id(2);
   apollo::planning::ObjectYield* yield =
       obj_decision2->add_object_decision()->mutable_yield();
-  /*apollo::common::PointENU* yield_point = yield->mutable_yield_point();
-  yield_point->set_x(-1859.98);
-  yield_point->set_y(-3000.03);
-  yield->set_yield_heading(1.3);*/
+  apollo::common::PointENU* fence_point = yield->mutable_fence_point();
+  fence_point->set_x(-1859.98);
+  fence_point->set_y(-3000.03);
+  yield->set_fence_heading(1.3);
 
   sim_world_service_->UpdateDecision(decision_res, 1501095053);
 
@@ -371,10 +371,10 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
       EXPECT_EQ(Object_Type_VIRTUAL, obj_dec.type());
       EXPECT_EQ(1, obj_dec.decision_size());
       const Decision& decision = obj_dec.decision(0);
-      /*EXPECT_EQ(Decision_Type_YIELD, decision.type());
+      EXPECT_EQ(Decision_Type_YIELD, decision.type());
       EXPECT_DOUBLE_EQ(-1859.98, decision.position_x());
       EXPECT_DOUBLE_EQ(-3000.03, decision.position_y());
-      EXPECT_DOUBLE_EQ(1.3, decision.heading());*/
+      EXPECT_DOUBLE_EQ(1.3, decision.heading());
     }
   }
 }
