@@ -37,7 +37,7 @@ class SpeedLimit {
   double GetSpeedLimitByS(const double s) const;
   double GetSpeedLimitByT(const double t) const;
 
-  void Clear() { speed_points_.clear(); };
+  void Clear() { speed_points_.clear(); }
 
  private:
   std::vector<common::SpeedPoint> speed_points_;

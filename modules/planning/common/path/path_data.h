@@ -22,6 +22,7 @@
 
 #include <list>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/planning/common/path/discretized_path.h"

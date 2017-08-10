@@ -144,9 +144,11 @@ DEFINE_double(stop_line_min_distance, 0.0,
               "min distance (meters) to stop line for a valid stop");
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
-DEFINE_double(virtual_stop_wall_length, 0.1, "virtual stop wall length (meters)");
+DEFINE_double(virtual_stop_wall_length, 0.1,
+              "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_width, 3.7, "virtual stop wall width (meters)");
-DEFINE_double(virtual_stop_wall_height, 2.0, "virtual stop wall height (meters)");
+DEFINE_double(virtual_stop_wall_height, 2.0,
+              "virtual stop wall height (meters)");
 
 // Prediction Part
 

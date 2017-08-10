@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/localization/proto/pose.pb.h"
@@ -44,7 +45,7 @@ namespace planning {
 
 class Frame {
  public:
-  Frame(const uint32_t sequence_num);
+  explicit Frame(const uint32_t sequence_num);
 
   void SetRoutingResponse(const routing::RoutingResponse &routing);
   void SetPrediction(const prediction::PredictionObstacles &prediction);

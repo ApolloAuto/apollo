@@ -20,6 +20,8 @@
 
 #include "modules/planning/common/path_obstacle.h"
 
+#include <limits>
+
 #include "modules/common/log.h"
 
 namespace apollo {
