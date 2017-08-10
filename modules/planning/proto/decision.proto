@@ -56,6 +56,7 @@ message ObjectYield {
 message ObjectFollow {
   optional double distance_s = 1;  // minimum longitutional distance in meters
   optional apollo.common.PointENU follow_point = 2;
+  optional double follow_heading = 3;
 }
 
 message ObjectOvertake {
