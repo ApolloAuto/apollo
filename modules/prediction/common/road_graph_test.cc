@@ -32,7 +32,8 @@ using ::apollo::common::Status;
 class RoadGraphTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    FLAGS_map_file = "modules/prediction/testdata/kml_map.bin";
+    apollo::hdmap::HDMap::SetDefaultMap(
+        "modules/prediction/testdata/kml_map.bin");
     map_ = PredictionMap::instance();
   }
 

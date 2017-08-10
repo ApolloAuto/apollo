@@ -4,7 +4,6 @@ package apollo.hmi;
 
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/header.proto";
-import "modules/routing/proto/routing.proto";
 
 // Message between HMI frontend and HMI server.
 message SocketIORequest {

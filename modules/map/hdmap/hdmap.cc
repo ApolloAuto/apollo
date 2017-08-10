@@ -30,6 +30,10 @@ std::unique_ptr<HDMap> HDMap::CreateMap(const std::string& map_filename) {
   return hdmap;
 }
 
+void HDMap::SetDefaultMap(const std::string& map_filename) {
+  FLAGS_default_map_file = map_filename;
+}
+
 const HDMap& HDMap::DefaultMap() {
   static const HDMap* hdmap = CreateMap(FLAGS_default_map_file).release();
   return *hdmap;
