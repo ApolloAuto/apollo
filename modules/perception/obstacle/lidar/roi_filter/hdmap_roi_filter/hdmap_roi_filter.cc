@@ -67,6 +67,8 @@ MajorDirection HdmapROIFilter::GetMajorDirection(
   double max_x = -range_, max_y = -range_;
   auto &raw_polygons = *polygons;
 
+  // Get available x_range and y_range, then set the direction with small range
+  // as major direction.
   for (size_t i = 0; i < map_polygons.size(); ++i) {
     raw_polygons[i].resize(map_polygons[i].size());
     for (size_t j = 0; j < map_polygons[i].size(); ++j) {
@@ -112,6 +114,9 @@ void HdmapROIFilter::MergeRoadBoundariesToPolygons(
 
   polygons->resize(road_boundaries.size());
   for (size_t i = 0; i < road_boundaries.size(); ++i) {
+    // Assume the points of left boundary are [L1, L2, L3, ..., Ln],
+    // points of right boundary are [R1, R2, R3, ..., Rn]. The polygon should be
+    // like [L1, L2, L3, ..., Ln, Rn, ..., R3, R2, R1].
     const PolygonDType& left_boundary = road_boundaries[i].left_boundary;
     const PolygonDType& right_boundary = road_boundaries[i].right_boundary;
 

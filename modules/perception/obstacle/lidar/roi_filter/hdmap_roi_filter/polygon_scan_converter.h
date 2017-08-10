@@ -28,6 +28,13 @@
 namespace apollo {
 namespace perception {
 
+/*
+ * @class PolygonScanConverter
+ * @brief: This is a converter from polygon to scan lines, by which we can build
+ * bitmap. Assume major direction as x direction, we scan polygons in x ascending
+ * order.
+ */
+
 class PolygonScanConverter {
  public:
   typedef Eigen::Matrix<double, 2, 1> Point;
@@ -35,18 +42,15 @@ class PolygonScanConverter {
   typedef std::pair<double, double> Interval;
   typedef std::pair<Point, Point> Segment;
   struct Edge {
-    bool operator<(const Edge& other) const {
-      return y < other.y;
-    }
-    bool MoveUp(const double delta_x);
+      bool operator<(const Edge& other) const { return y < other.y; }
+      bool MoveUp(const double delta_x);
 
-    // high x end point constant vars
-    double max_x;
-    double max_y;
-    // initial to low x y and move
-    double x;
-    double y;
-    double k;
+      double max_x;
+      double max_y;
+
+      double x;
+      double y;
+      double k;
   };
 
   typedef Bitmap2D::DirectionMajor DirectionMajor;
@@ -59,8 +63,6 @@ class PolygonScanConverter {
     return static_cast<DirectionMajor>(dir_major ^ 1);
   }
 
-  // get scan intervals
-  // HORIZONTAL = 0 for x, VERTICAL = 1 for y
   void ConvertScans(const Interval& valid_range, const Polygon& polygon,
                     const double step,
                     std::vector<std::vector<Interval>>* scans_intervals);
@@ -69,15 +71,10 @@ class PolygonScanConverter {
   Polygon polygon_;
   std::vector<Segment> segments_;
 
-  // ensure the k = s_inf_ edge to be filled
-  // std::vector<std::vector<Segment> > _specialsegments_; // 0 for x 1 for y
-  std::vector<double> ks_;  // 0 for x 1 for y
+  std::vector<double> slope_;
 
-  // edge table
   std::vector<std::vector<Edge>> edge_table_;
 
-  // std::vector<std::vector<Edge> > _specialedge_table_;
-  // active edge table
   std::vector<Edge> active_edge_table_;
 
   double bottom_x_;
@@ -86,13 +83,21 @@ class PolygonScanConverter {
   DirectionMajor major_dir_;
   DirectionMajor op_major_dir_;
 
+  /*
+   * @brief: If some point of polygon happens to be around the scan line we will
+   * use, lightly change the x coordinate to avoid situation of singular point.
+   */
   void DisturbPolygon();
-  void ConvertPolygonToSegments();
+
+
   void BuildEdgeTable();
+
   void UpdateActiveEdgeTable(const size_t x_id,
                              std::vector<Interval>* scan_intervals);
-  // convert segment, x  from continuous domain to discrete domain
-  bool ConvertSegment(size_t seg_id, std::pair<int, Edge>& out_edge);
+
+  void ConvertPolygonToSegments();
+
+  bool ConvertSegmentToEdge(size_t seg_id, std::pair<int, Edge>& out_edge);
 };
 
 }  // perception
