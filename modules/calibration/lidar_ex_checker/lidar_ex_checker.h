@@ -24,12 +24,14 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "Eigen/Eigen"
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "ros/include/ros/ros.h"
@@ -61,7 +63,7 @@ class LidarExChecker : public apollo::common::ApolloApp {
   // Upon receiving GPS data
   void OnGps(const ::apollo::localization::Gps& message);
   // Upon receiving INS status data
-  void OnInsStat();
+  void OnInsStat(const ::apollo::drivers::gnss::InsStat& msg);
 
   bool is_first_gps_msg_;
 
@@ -85,6 +87,8 @@ class LidarExChecker : public apollo::common::ApolloApp {
   uint32_t cloud_count_;
   // the distance between two clouds
   double capture_distance_;
+  // the extrinsics file path of lidar
+  std::string extrin_file_;
 
   // latest INS status
   uint32_t position_type_;
