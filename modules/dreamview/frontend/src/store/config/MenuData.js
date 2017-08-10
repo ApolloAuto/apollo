@@ -8,7 +8,8 @@ export default [
             perceptionPedestrian: 'Pedestrian',
             perceptionBicycle: 'Bicycle',
             perceptionUnknownMovable: 'Unknown Movable',
-            perceptionUnknownUnmovable: 'Unknown Stationary'
+            perceptionUnknownUnmovable: 'Unknown Stationary',
+            perceptionUnknown: 'Unknown'
         }
     }, {
         id: 'prediction',
