@@ -165,7 +165,7 @@ function release() {
   # modules
   MODULES_DIR=$ROOT_DIR/modules
   mkdir -p $MODULES_DIR
-  for m in control canbus localization decision perception prediction planning
+  for m in control canbus localization decision perception prediction planning routing
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
