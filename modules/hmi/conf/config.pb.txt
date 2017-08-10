@@ -89,6 +89,24 @@ modules {
   }
 }
 modules {
+  name: "routing"
+  display_name: "Routing"
+  supported_commands {
+    name: "start"
+    command: "scripts/routing.sh"
+    command: "start"
+    stdout_file: "data/log/routing.stdout"
+    stderr_file: "data/log/routing.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/routing.sh"
+    command: "stop"
+    stdout_file: "data/log/routing.stdout"
+    stderr_file: "data/log/routing.stderr"
+  }
+}
+modules {
   name: "control"
   display_name: "Control"
   supported_commands {
