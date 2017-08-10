@@ -103,6 +103,16 @@ Status StBoundaryMapper::GetGraphBoundary(
   double min_stop_s = std::numeric_limits<double>::max();
 
   for (const auto* path_obstacle : path_obstacles.Items()) {
+    if (path_obstacle->Decisions().empty()) {
+      const auto ret =
+          MapObstacleWithoutDecision(*path_obstacle, st_graph_boundaries);
+      if (!ret.ok()) {
+        std::string msg = common::util::StrCat(
+            "Fail to map obstacle ", path_obstacle->Id(), " without decision.");
+        AERROR << msg;
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
+    }
     for (const auto& decision : path_obstacle->Decisions()) {
       StGraphBoundary boundary(path_obstacle);
       if (decision.has_follow()) {
@@ -202,6 +212,96 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
   boundary->SetCharacteristicLength(st_boundary_config_.boundary_buffer());
   boundary->set_id(stop_obstacle.Id());
   return true;
+}
+
+Status StBoundaryMapper::MapObstacleWithoutDecision(
+    const PathObstacle& path_obstacle,
+    std::vector<StGraphBoundary>* const boundary) const {
+  std::vector<STPoint> lower_points;
+  std::vector<STPoint> upper_points;
+
+  const auto* obstacle = path_obstacle.Obstacle();
+
+  bool skip = true;
+  std::vector<STPoint> boundary_points;
+  const auto& adc_path_points = path_data_.discretized_path().path_points();
+  if (adc_path_points.size() == 0) {
+    std::string msg = common::util::StrCat(
+        "Too few points in path_data_.discretized_path(); size = ",
+        adc_path_points.size());
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  const auto& trajectory = obstacle->Trajectory();
+  if (trajectory.trajectory_point_size() == 0) {
+    AWARN << "Obstacle (id = " << obstacle->Id()
+          << ") has NO prediction trajectory.";
+  }
+
+  for (int j = 0; j < trajectory.trajectory_point_size(); ++j) {
+    const auto& trajectory_point = trajectory.trajectory_point(j);
+    double trajectory_point_time = trajectory_point.relative_time();
+    const Box2d obs_box = obstacle->GetBoundingBox(trajectory_point);
+    int64_t low = 0;
+    int64_t high = adc_path_points.size() - 1;
+    bool find_low = false;
+    bool find_high = false;
+    while (low < high) {
+      if (find_low && find_high) {
+        break;
+      }
+      if (!find_low) {
+        if (!CheckOverlap(adc_path_points[low], obs_box,
+                          st_boundary_config_.boundary_buffer())) {
+          ++low;
+        } else {
+          find_low = true;
+        }
+      }
+      if (!find_high) {
+        if (!CheckOverlap(adc_path_points[high], obs_box,
+                          st_boundary_config_.boundary_buffer())) {
+          --high;
+        } else {
+          find_high = true;
+        }
+      }
+    }
+    if (find_high && find_low) {
+      lower_points.emplace_back(
+          adc_path_points[low].s() - st_boundary_config_.point_extension(),
+          trajectory_point_time);
+      upper_points.emplace_back(
+          adc_path_points[high].s() + st_boundary_config_.point_extension(),
+          trajectory_point_time);
+    }
+    if (lower_points.size() > 0) {
+      boundary_points.clear();
+      const double buffer = st_boundary_config_.follow_buffer();
+      boundary_points.emplace_back(lower_points.at(0).s() - buffer,
+                                   lower_points.at(0).t());
+      boundary_points.emplace_back(lower_points.back().s() - buffer,
+                                   lower_points.back().t());
+      boundary_points.emplace_back(upper_points.back().s() + buffer +
+                                       st_boundary_config_.boundary_buffer(),
+                                   upper_points.back().t());
+      boundary_points.emplace_back(upper_points.at(0).s() + buffer,
+                                   upper_points.at(0).t());
+      if (lower_points.at(0).t() > lower_points.back().t() ||
+          upper_points.at(0).t() > upper_points.back().t()) {
+        AWARN << "lower/upper points are reversed.";
+      }
+
+      const double area = GetArea(boundary_points);
+      if (Double::Compare(area, 0.0) > 0) {
+        boundary->emplace_back(&path_obstacle, boundary_points);
+        boundary->back().set_id(obstacle->Id());
+        skip = false;
+      }
+    }
+  }
+  return skip ? Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP")
+              : Status::OK();
 }
 
 Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
