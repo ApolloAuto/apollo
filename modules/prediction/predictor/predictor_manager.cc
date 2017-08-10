@@ -111,7 +111,11 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         break;
       }
       default: {
-        predictor = GetPredictor(default_predictor_);
+        if (obstacle->IsOnLane()) {
+          predictor = GetPredictor(vehicle_on_lane_predictor_);
+        } else {
+          predictor = GetPredictor(vehicle_off_lane_predictor_);
+        }
         break;
       }
     }
