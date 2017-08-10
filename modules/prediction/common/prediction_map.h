@@ -284,9 +284,7 @@ class PredictionMap {
   }
 
  private:
-  bool LoadMap();
-
-  std::unique_ptr<apollo::hdmap::HDMap> hdmap_ = nullptr;
+  const apollo::hdmap::HDMap& hdmap_;
   DECLARE_SINGLETON(PredictionMap);
 };
 

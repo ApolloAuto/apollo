@@ -32,7 +32,6 @@ DEFINE_double(max_prediction_length, 100.0,
     "Max length of prediction trajectory");
 
 // Map
-DEFINE_string(map_file, "modules/map/data/base_map.txt", "Path to map file");
 DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
 
 // Obstacle features

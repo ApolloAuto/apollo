@@ -37,20 +37,7 @@ using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::hdmap::MapPathPoint;
 
-PredictionMap::PredictionMap() {
-  CHECK(LoadMap());
-}
-
-bool PredictionMap::LoadMap() {
-  hdmap_.reset(new apollo::hdmap::HDMap());
-  if (hdmap_->load_map_from_file(FLAGS_map_file) != 0) {
-    hdmap_.reset(nullptr);
-    AERROR << "Failed to load map file: " << FLAGS_map_file << ".";
-    return false;
-  }
-  AINFO << "Succeeded in loading map file: " << FLAGS_map_file << ".";
-  return true;
-}
+PredictionMap::PredictionMap() : hdmap_(apollo::hdmap::HDMap::DefaultMap()) {}
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
     std::shared_ptr<const LaneInfo> lane_info,
@@ -93,7 +80,7 @@ double PredictionMap::LaneTotalWidth(
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(const Id& id) {
-  return hdmap_->get_lane_by_id(id);
+  return hdmap_.get_lane_by_id(id);
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
@@ -138,7 +125,7 @@ void PredictionMap::OnLane(
   apollo::common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
-  if (hdmap_->get_lanes_with_heading(
+  if (hdmap_.get_lanes_with_heading(
         hdmap_point, radius, heading, M_PI, &candidate_lanes) != 0) {
     return;
   }
