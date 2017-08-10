@@ -205,24 +205,29 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
 }
 
 bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
-                  double heading, Decision *world_decision) {
+                  Decision *world_decision) {
   apollo::common::PointENU fence_point;
-  if (decision.has_stop() && decision.stop().has_stop_point()) {
+  double heading;
+  /*if (decision.has_stop() && decision.stop().has_stop_point()) {
     world_decision->set_type(Decision_Type_STOP);
     fence_point = decision.stop().stop_point();
+    heading = decision.stop().stop_heading();
   } else if (decision.has_follow() && decision.follow().has_follow_point()) {
     world_decision->set_type(Decision_Type_FOLLOW);
     fence_point = decision.follow().follow_point();
+    heading = decision.follow().follow_heading();
   } else if (decision.has_yield() && decision.yield().has_yield_point()) {
     world_decision->set_type(Decision_Type_YIELD);
     fence_point = decision.yield().yield_point();
+    heading = decision.yield().yield_heading();
   } else if (decision.has_overtake() &&
              decision.overtake().has_overtake_point()) {
     world_decision->set_type(Decision_Type_OVERTAKE);
     fence_point = decision.overtake().overtake_point();
+    heading = decision.overtake().overtake_heading();
   } else {
     return false;
-  }
+  }*/
 
   world_decision->set_position_x(fence_point.x());
   world_decision->set_position_y(fence_point.y());
@@ -238,7 +243,7 @@ void FindNudgeRegion(const apollo::planning::ObjectDecisionType &decision,
   }
   const apollo::common::math::Polygon2d obj_polygon(points);
   const apollo::common::math::Polygon2d &nudge_polygon =
-      obj_polygon.ExpandByDistance(fabs(decision.nudge().distance_l()));
+      obj_polygon.ExpandByDistance(std::fabs(decision.nudge().distance_l()));
   const std::vector<apollo::common::math::Vec2d> &nudge_points =
       nudge_polygon.points();
   for (auto &nudge_pt : nudge_points) {
@@ -547,8 +552,7 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
         world_decision->set_type(Decision_Type_IGNORE);
         if (decision.has_stop() || decision.has_follow() ||
             decision.has_yield() || decision.has_overtake()) {
-          if (!LocateMarker(decision, world_.auto_driving_car().heading(),
-                            world_decision)) {
+          if (!LocateMarker(decision, world_decision)) {
             AWARN << "No decision marker position found for object id="
                   << world_obj.id();
             continue;
