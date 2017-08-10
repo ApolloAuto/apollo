@@ -174,7 +174,7 @@ function release() {
         cp -r modules/$m/conf $TARGET_DIR
     fi
     if [ -d modules/$m/data ];then
-        cp -r modules/$m/conf $TARGET_DIR
+        cp -r modules/$m/data $TARGET_DIR
     fi
   done
 
