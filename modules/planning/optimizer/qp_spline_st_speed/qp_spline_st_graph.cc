@@ -281,25 +281,29 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
   for (const double curr_t : evaluate_t) {
-    double s_upper = 0.0;
-    double s_lower = 0.0;
-    double s_ref_min = std::numeric_limits<double>::infinity();
+    double s_min = std::numeric_limits<double>::infinity();
     bool success = false;
     for (const auto& boundary : boundaries) {
-      if (boundary.boundary_type() == StGraphBoundary::BoundaryType::FOLLOW &&
-          boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
+      if (boundary.boundary_type() != StGraphBoundary::BoundaryType::FOLLOW) {
+        continue;
+      }
+      double s_upper = 0.0;
+      double s_lower = 0.0;
+      if (boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
         success = true;
-        s_ref_min =
-            std::min(s_ref_min, s_upper - boundary.characteristic_length());
+        s_min = std::min(s_min, s_upper - boundary.characteristic_length());
       }
     }
     if (success) {
       filtered_evaluate_t.push_back(curr_t);
-      ref_s.push_back(s_ref_min);
+      ref_s.push_back(s_min);
     }
   }
-  spline_kernel->add_reference_line_kernel_matrix(filtered_evaluate_t, ref_s,
-                                                  weight);
+  DCHECK_EQ(filtered_evaluate_t.size(), ref_s.size());
+  if (!ref_s.empty()) {
+    spline_kernel->add_reference_line_kernel_matrix(filtered_evaluate_t, ref_s,
+                                                    weight);
+  }
   return Status::OK();
 }
 
