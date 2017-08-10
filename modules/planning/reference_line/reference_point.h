@@ -40,11 +40,6 @@ class ReferencePoint : public hdmap::MapPathPoint {
 
   operator apollo::common::PathPoint() const;
 
-  void set_kappa(const double kappa);
-  void set_dkappa(const double dkappa);
-  void set_lower_bound(const double lower_bound);
-  void set_upper_bound(const double upper_bound);
-
   double kappa() const;
   double dkappa() const;
 
