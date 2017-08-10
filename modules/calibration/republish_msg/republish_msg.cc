@@ -33,16 +33,17 @@ std::string RepublishMsg::Name() const {
 
 Status RepublishMsg::Init() {
   std::cout << FLAGS_adapter_config_path << std::endl;
-    
+
   AdapterManager::Init(FLAGS_adapter_config_path);
-  
+
   CHECK(AdapterManager::GetInsStat()) << "INS status is not initialized.";
   CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
-  CHECK(AdapterManager::GetRelativeOdometry()) << "Relative odometry is not initialized.";
+  CHECK(AdapterManager::GetRelativeOdometry())
+      << "Relative odometry is not initialized.";
 
   AdapterManager::AddGpsCallback(&RepublishMsg::OnGps, this);
   AdapterManager::AddInsStatCallback(&RepublishMsg::OnInsStat, this);
-  
+
   is_first_gps_msg_ = true;
   position_type_ = 0;
 
@@ -54,10 +55,9 @@ void RepublishMsg::OnInsStat(const ::apollo::drivers::gnss::InsStat& msg) {
 }
 
 void RepublishMsg::OnGps(const ::apollo::localization::Gps& msg) {
-  //std::cout << "get odometry callback" << std::endl;;
   if (msg.has_localization()) {
     const auto pose_msg = msg.localization();
-  
+
     Eigen::Quaterniond rotation(pose_msg.orientation().qw(),
                                 pose_msg.orientation().qx(),
                                 pose_msg.orientation().qy(),
@@ -66,7 +66,7 @@ void RepublishMsg::OnGps(const ::apollo::localization::Gps& msg) {
                                      pose_msg.position().y(),
                                      pose_msg.position().z());
     Eigen::Affine3d pose = translation * rotation;
-  
+
     if (is_first_gps_msg_) {
       is_first_gps_msg_ = false;
       offset_ = pose.inverse();
@@ -75,7 +75,7 @@ void RepublishMsg::OnGps(const ::apollo::localization::Gps& msg) {
     Eigen::Affine3d pub_pose = offset_ * pose;
     Eigen::Quaterniond pub_rot(pub_pose.rotation());
     Eigen::Translation3d pub_trans(pub_pose.translation());
-    
+
     ::apollo::calibration::republish_msg::RelativeOdometry pub_msg;
     pub_msg.mutable_header()->set_timestamp_sec(msg.header().timestamp_sec());
     pub_msg.mutable_orientation()->set_qw(pub_rot.w());
