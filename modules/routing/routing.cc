@@ -32,13 +32,13 @@ std::string Routing::Name() const { return FLAGS_node_name; }
 Routing::Routing() :
   monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {
 
-  std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
+  std::string graph_path = FLAGS_map_dir + "/" + FLAGS_graph_file_name;
   AINFO << "Use routing topology graph path: " <<  graph_path.c_str();
   _navigator_ptr.reset(new Navigator(graph_path));
 }
 
 apollo::common::Status Routing::Init() {
-  std::string graph_path = FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
+  std::string graph_path = FLAGS_map_dir + "/" + FLAGS_graph_file_name;
 
   AdapterManager::Init(FLAGS_adapter_config_path);
   AdapterManager::AddMonitorCallback(&Routing::OnMonitor, this);

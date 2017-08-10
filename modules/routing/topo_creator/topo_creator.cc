@@ -27,12 +27,12 @@ int main(int argc, char **argv) {
   std::unique_ptr<::apollo::routing::GraphCreator> creator_ptr;
   creator_ptr.reset(new ::apollo::routing::GraphCreator(
       FLAGS_map_dir + "/" + FLAGS_map_file_name,
-      FLAGS_graph_dir + "/" + FLAGS_graph_file_name));
+      FLAGS_map_dir + "/" + FLAGS_graph_file_name));
   if (!creator_ptr->Create()) {
     AERROR << "Create routing topo failed!";
     return -1;
   }
   AERROR << "Create routing topo succesful!";
-  AINFO << FLAGS_graph_dir + "/" + FLAGS_graph_file_name;
+  AINFO << FLAGS_map_dir + "/" + FLAGS_graph_file_name;
   return 0;
 }
