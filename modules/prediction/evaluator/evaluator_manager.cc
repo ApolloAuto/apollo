@@ -90,6 +90,10 @@ void EvaluatorManager::Run(
         break;
       }
       default: {
+        if (obstacle->IsOnLane()) {
+          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+          CHECK_NOTNULL(evaluator);
+        }
         break;
       }
     }
