@@ -55,7 +55,8 @@ class StGraphBoundary : public common::math::Polygon2d {
 
   ~StGraphBoundary() = default;
 
-  bool IsEmpty() const { return points.empty(); }
+  // TODO: add this function.
+  // bool IsEmpty() const { return points.empty(); }
   bool IsPointInBoundary(const StGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;
 
