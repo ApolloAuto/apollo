@@ -295,9 +295,7 @@ Navigator::Navigator(const std::string& topo_file_path) : _is_ready(false) {
 
 Navigator::~Navigator() {}
 
-bool Navigator::is_ready() const {
-  return _is_ready;
-}
+bool Navigator::is_ready() const { return _is_ready; }
 
 bool Navigator::search_route(
     const ::apollo::routing::RoutingRequest& request,

@@ -19,8 +19,8 @@
 
 #include <memory>
 
-#include "modules/routing/proto/routing.pb.h"
 #include "modules/routing/core/navigator.h"
+#include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/monitor/monitor.h"
@@ -30,7 +30,7 @@ namespace apollo {
 namespace routing {
 
 class Routing : public apollo::common::ApolloApp {
- // friend class RoutingTestBase;
+  // friend class RoutingTestBase;
  public:
   Routing();
 
@@ -62,7 +62,8 @@ class Routing : public apollo::common::ApolloApp {
   virtual ~Routing() = default;
 
  private:
-  void OnRouting_Request(const apollo::routing::RoutingRequest &routing_request);
+  void OnRouting_Request(
+      const apollo::routing::RoutingRequest &routing_request);
   void OnMonitor(
       const apollo::common::monitor::MonitorMessage &monitor_message);
 

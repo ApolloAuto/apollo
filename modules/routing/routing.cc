@@ -15,10 +15,10 @@
   *****************************************************************************/
 
 #include "modules/routing/routing.h"
-#include "modules/routing/core/navigator.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/routing/common/routing_gflags.h"
+#include "modules/routing/core/navigator.h"
 
 namespace apollo {
 namespace routing {
@@ -29,11 +29,10 @@ using apollo::common::ErrorCode;
 
 std::string Routing::Name() const { return FLAGS_node_name; }
 
-Routing::Routing() :
-  monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {
-
+Routing::Routing()
+    : monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {
   std::string graph_path = FLAGS_map_dir + "/" + FLAGS_graph_file_name;
-  AINFO << "Use routing topology graph path: " <<  graph_path.c_str();
+  AINFO << "Use routing topology graph path: " << graph_path.c_str();
   navigator_ptr_.reset(new Navigator(graph_path));
 }
 
@@ -50,7 +49,8 @@ apollo::common::Status Routing::Init() {
 apollo::common::Status Routing::Start() {
   if (!navigator_ptr_->is_ready()) {
     AERROR << "Navigator is not ready!";
-    return apollo::common::Status(ErrorCode::ROUTING_ERROR, "Navigator not ready");
+    return apollo::common::Status(ErrorCode::ROUTING_ERROR,
+                                  "Navigator not ready");
   }
   AINFO << "Routing service is ready.";
 
@@ -59,7 +59,8 @@ apollo::common::Status Routing::Start() {
   return apollo::common::Status::OK();
 }
 
-void Routing::OnRouting_Request(const apollo::routing::RoutingRequest &routing_request) {
+void Routing::OnRouting_Request(
+    const apollo::routing::RoutingRequest &routing_request) {
   AINFO << "Get new routing request!!!";
   ::apollo::routing::RoutingResponse routing_response;
   if (!navigator_ptr_->search_route(routing_request, &routing_response)) {
@@ -67,7 +68,7 @@ void Routing::OnRouting_Request(const apollo::routing::RoutingRequest &routing_r
     return;
   }
 
-  //AdapterManager::FillRoutingResponseHeader(Name(), routing_response);
+  // AdapterManager::FillRoutingResponseHeader(Name(), routing_response);
   AdapterManager::PublishRoutingResponse(routing_response);
   return;
 }

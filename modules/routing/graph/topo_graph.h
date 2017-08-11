@@ -22,8 +22,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "modules/routing/proto/topo_graph.pb.h"
 #include "modules/common/log.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
