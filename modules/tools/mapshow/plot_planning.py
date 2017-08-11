@@ -26,71 +26,38 @@ from map import Map
 from localization import Localization
 from modules.planning.proto import planning_pb2
 from modules.localization.proto import localization_pb2
+from planning import Planning
 
+planning = Planning()
+localization = Localization()
 
-PATH_DATA_X = {}
-PATH_DATA_Y = {}
 path_line_pool = []
 path_line_pool_size = 4
 
-SPEED_DATA_TIME = {}
-SPEED_DATA_VAL = {}
 speed_line_pool = []
 speed_line_pool_size = 4
 
 vehicle_position_line = None
 vehicle_polygon_line = None
-localization_pb_buff = None
 
-PATH_DATA_LOCK = threading.Lock()
-SPEED_DATA_LOCK = threading.Lock()
-LOCALIZATION_DATA_LOCK = threading.Lock()
+st_line_pool = []
+st_line_pool_size = 2
+
+obstacle_line_pool = []
+obstacle_annotation_pool = []
+obstacle_line_pool_size = 10
+
 
 def localization_callback(localization_pb):
-    global localization_pb_buff
-    LOCALIZATION_DATA_LOCK.acquire()
-    localization_pb_buff = localization_pb
-    LOCALIZATION_DATA_LOCK.release()
+    localization.update_localization_pb(localization_pb)
 
 
 def planning_callback(planning_pb):
-    global PATH_DATA_X, PATH_DATA_Y
-    global SPEED_DATA_TIME, SPEED_DATA_VAL
-    # path
-    path_data_x = {}
-    path_data_y = {}
-    for path_debug in planning_pb.debug.planning_data.path:
-        name = path_debug.name
-        path_data_x[name] = []
-        path_data_y[name] = []
-        for path_point in path_debug.path_point:
-            path_data_x[name].append(path_point.x)
-            path_data_y[name].append(path_point.y)
-    PATH_DATA_LOCK.acquire()
-    PATH_DATA_X = path_data_x
-    PATH_DATA_Y = path_data_y
-    PATH_DATA_LOCK.release()
+    planning.update_planning_pb(planning_pb)
+    planning.compute_path_data()
+    planning.compute_speed_data()
+    planning.compute_st_data()
 
-    # speed
-    speed_data_time = {}
-    speed_data_val = {}
-    for speed_plan in planning_pb.debug.planning_data.speed_plan:
-        name = speed_plan.name
-        speed_data_time[name] = []
-        speed_data_val[name] = []
-        for speed_point in speed_plan.speed_point:
-            speed_data_time[name].append(speed_point.t)
-            speed_data_val[name].append(speed_point.v)
-    name = "final_output"
-    speed_data_time[name] = []
-    speed_data_val[name] = []
-    for traj_point in planning_pb.trajectory_point:
-        speed_data_time[name].append(traj_point.relative_time)
-        speed_data_val[name].append(traj_point.v)
-    SPEED_DATA_LOCK.acquire()
-    SPEED_DATA_TIME = speed_data_time
-    SPEED_DATA_VAL = speed_data_val
-    SPEED_DATA_LOCK.release()
 
 def add_listener():
     rospy.init_node('plot_planning', anonymous=True)
@@ -103,72 +70,39 @@ def add_listener():
 
 
 def update(frame_number):
-    update_init()
-    update_path()
-    update_speed()
-    update_localization()
-    ax.relim()
-    ax.autoscale_view()
-    ax.legend(loc="upper left")
-    ax1.legend(loc="upper center", bbox_to_anchor=(0.5, 1.05))
-
-
-def update_init():
     for line in speed_line_pool:
         line.set_visible(False)
         line.set_label(None)
     for line in path_line_pool:
         line.set_visible(False)
         line.set_label(None)
+    for line in obstacle_line_pool:
+        line.set_visible(False)
+    for line in st_line_pool:
+        line.set_visible(False)
+        line.set_label(None)
+    for line in obstacle_annotation_pool:
+        line.set_visible(False)
+
     vehicle_position_line.set_visible(False)
     vehicle_polygon_line.set_visible(False)
 
+    planning.replot_path_data(path_line_pool)
+    planning.replot_speed_data(speed_line_pool)
 
-def update_speed():
-    cnt = 0
-    SPEED_DATA_LOCK.acquire()
-    for name in SPEED_DATA_TIME.keys():
-        if cnt >= len(speed_line_pool):
-            print "Number of lines is more than 4! "
-            continue
-        line = speed_line_pool[cnt]
-        line.set_visible(True)
-        if len(SPEED_DATA_TIME[name]) <= 1:
-            continue
-        line.set_xdata(SPEED_DATA_TIME[name])
-        line.set_ydata(SPEED_DATA_VAL[name])
-        line.set_label(name)
-        cnt += 1
-    SPEED_DATA_LOCK.release()
+    planning.replot_st_data(obstacle_line_pool, st_line_pool, obstacle_annotation_pool)
+    localization.replot_vehicle(vehicle_position_line, vehicle_polygon_line)
+    ax.relim()
+    ax.autoscale_view()
+    ax.legend(loc="upper left")
+    ax1.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1))
+    ax2.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1))
+    return obstacle_annotation_pool[0]
 
-def update_path():
-    cnt = 0
-    PATH_DATA_LOCK.acquire()
-    for name in PATH_DATA_X.keys():
-        if cnt >= len(path_line_pool):
-            print "Number of lines is more than 4! "
-            continue
-        line = path_line_pool[cnt]
-        line.set_visible(True)
-        if len(PATH_DATA_X[name]) <= 1:
-            continue
-        line.set_xdata(PATH_DATA_X[name])
-        line.set_ydata(PATH_DATA_Y[name])
-        line.set_label(name)
-        cnt += 1
-    PATH_DATA_LOCK.release()
-
-def update_localization():
-    LOCALIZATION_DATA_LOCK.acquire()
-    if localization_pb_buff is not None:
-        vehicle_position_line.set_visible(True)
-        vehicle_polygon_line.set_visible(True)
-        Localization(localization_pb_buff) \
-            .replot_vehicle(vehicle_position_line, vehicle_polygon_line)
-    LOCALIZATION_DATA_LOCK.release()
 
 def init_line_pool(central_x, central_y):
     global vehicle_position_line, vehicle_polygon_line, s_speed_line
+    global obstacle_line_pool, st_line_pool
     colors = ['b', 'g', 'r', 'k']
 
     for i in range(path_line_pool_size):
@@ -180,6 +114,21 @@ def init_line_pool(central_x, central_y):
         line, = ax1.plot([central_x], [central_y],
                         colors[i % len(colors)]+".", lw=3, alpha=0.5)
         speed_line_pool.append(line)
+
+    for i in range(st_line_pool_size):
+        line, = ax2.plot([0], [0],
+                         colors[i % len(colors)]+".", lw=3, alpha=0.5)
+        st_line_pool.append(line)
+
+    for i in range(obstacle_line_pool_size):
+        line, = ax2.plot([0], [0],
+                         'r-', lw=3, alpha=0.5)
+        anno = ax2.text(0, 0, "")
+        obstacle_line_pool.append(line)
+        obstacle_annotation_pool.append(anno)
+
+    ax2.set_xlim(-1, 9)
+    ax2.set_ylim(-1,90)
 
     vehicle_position_line, = ax.plot([central_x], [central_y], 'go', alpha=0.3)
     vehicle_polygon_line, = ax.plot([central_x], [central_y], 'g-')
@@ -203,6 +152,7 @@ if __name__ == '__main__':
     fig = plt.figure()
     ax = plt.subplot2grid((2, 3), (0, 0), rowspan=2, colspan=2)
     ax1 = plt.subplot2grid((2, 3), (0, 2))
+    ax2 = plt.subplot2grid((2, 3), (1, 2))
     ax1.set_xlabel("t (second)")
     ax1.set_xlim([-2, 10])
     ax1.set_ylim([-1, 10])
