@@ -21,16 +21,12 @@
 #include "modules/planning/common/speed_limit.h"
 
 #include <algorithm>
-#include <iostream>
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
-
-using common::SpeedPoint;
 
 void SpeedLimit::AddSpeedLimit(const double s, const double v) {
   if (!speed_limit_points_.empty()) {
