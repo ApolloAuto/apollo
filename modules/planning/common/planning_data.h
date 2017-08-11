@@ -30,7 +30,7 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {
@@ -40,23 +40,24 @@ class PlanningData {
   PlanningData() = default;
 
   const PathData& path_data() const;
+
   const SpeedData& speed_data() const;
 
   PathData* mutable_path_data();
+
   SpeedData* mutable_speed_data();
 
-  double timestamp() const;
-
   // aggregate final result together by some configuration
-  bool aggregate(const double time_resolution, const double relative_time,
-                 PublishableTrajectory* PublishableTrajectory);
+  bool CombinePathAndSpeedProfile(const double time_resolution,
+      const double relative_time,
+      DiscretizedTrajectory* discretized_trajectory);
 
   std::string DebugString() const;
 
- protected:
+ private:
   PathData path_data_;
+
   SpeedData speed_data_;
-  double timestamp_ = 0.0;
 };
 
 }  // namespace planning

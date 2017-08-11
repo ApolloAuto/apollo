@@ -36,7 +36,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
 
-  PublishableTrajectory trajectory;
+  DiscretizedTrajectory trajectory;
   auto status = planner.Plan(start_point, nullptr, &trajectory);
 
   EXPECT_TRUE(status.ok());
@@ -62,7 +62,7 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   TrajectoryPoint start_point;
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
-  PublishableTrajectory trajectory;
+  DiscretizedTrajectory trajectory;
   EXPECT_TRUE(
       !(planner_with_error_csv.Plan(start_point, nullptr, &trajectory)).ok());
 }
