@@ -53,11 +53,11 @@ class TopoGraph {
  private:
   std::string _map_version;
   std::string _map_district;
-  std::vector<std::shared_ptr<TopoNode> > _topo_nodes;
-  std::vector<std::shared_ptr<TopoEdge> > _topo_edges;
+  std::vector<std::shared_ptr<TopoNode> > topo_nodes_;
+  std::vector<std::shared_ptr<TopoEdge> > topo_edges_;
   std::unordered_map<std::string, int> node_index_map_;
   std::unordered_map<std::string, std::unordered_set<const TopoNode*> >
-      _road_node_map;
+      road_node_map_;
 };
 
 }  // namespace routing

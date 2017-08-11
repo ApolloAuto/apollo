@@ -284,8 +284,8 @@ bool search_route_by_strategy(
 }  // namespace
 
 Navigator::Navigator(const std::string& topo_file_path) : _is_ready(false) {
-  _graph.reset(new TopoGraph());
-  if (!_graph->load_graph(topo_file_path)) {
+  graph_.reset(new TopoGraph());
+  if (!graph_->load_graph(topo_file_path)) {
     AERROR << "Navigator init graph failed! File path: " << topo_file_path;
     return;
   }
@@ -311,17 +311,17 @@ bool Navigator::search_route(
   std::vector<const TopoNode*> way_nodes;
   NodeRangeManager range_manager;
 
-  if (!get_way_nodes(request, _graph.get(), &way_nodes, &range_manager)) {
+  if (!get_way_nodes(request, graph_.get(), &way_nodes, &range_manager)) {
     AERROR << "Can't find way point in graph!";
     return false;
   }
 
   std::vector<const TopoNode*> result_nodes;
   std::unordered_set<const TopoNode*> black_list;
-  generate_black_set_from_lane(request, _graph.get(), &black_list);
-  generate_black_set_from_road(request, _graph.get(), &black_list);
+  generate_black_set_from_lane(request, graph_.get(), &black_list);
+  generate_black_set_from_road(request, graph_.get(), &black_list);
 
-  if (!search_route_by_strategy(_graph.get(), way_nodes, black_list,
+  if (!search_route_by_strategy(graph_.get(), way_nodes, black_list,
                                 &result_nodes)) {
     AERROR << "Can't find route from request!";
     return false;
@@ -354,7 +354,7 @@ bool Navigator::generate_passage_region(
 
   generate_passage_region(nodes, black_list, range_manager, result);
 
-  result->set_map_version(_graph->map_version());
+  result->set_map_version(graph_->map_version());
   result->mutable_measurement()->set_distance(
       calculate_distance(nodes, range_manager));
   result->mutable_routing_request()->CopyFrom(request);

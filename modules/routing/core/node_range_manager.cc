@@ -24,9 +24,9 @@ namespace routing {
 void NodeRangeManager::init_node_range(double start_node_s, double end_node_s,
                                        const TopoNode* start_node,
                                        const TopoNode* end_node) {
-  _range_map.clear();
+  range_map_.clear();
   if (start_node == end_node) {
-    auto& range = _range_map[start_node];
+    auto& range = range_map_[start_node];
     range.start_s = start_node_s;
     range.end_s = end_node_s;
     init_in_neighbor(start_node, start_node_s, end_node_s);
@@ -41,15 +41,15 @@ void NodeRangeManager::init_node_range(double start_node_s, double end_node_s,
 }
 
 NodeRange NodeRangeManager::get_node_range(const TopoNode* topo_node) const {
-  const auto& iter = _range_map.find(topo_node);
-  if (iter != _range_map.end()) {
+  const auto& iter = range_map_.find(topo_node);
+  if (iter != range_map_.end()) {
     return iter->second;
   }
   return NodeRange(0.0, topo_node->length());
 }
 
 void NodeRangeManager::set_node_s(const TopoNode* topo_node, double node_start_s, double node_end_s) {
-  auto& range = _range_map[topo_node];
+  auto& range = range_map_[topo_node];
   range.start_s = node_start_s;
   range.end_s = node_end_s;
 }
@@ -66,13 +66,13 @@ void NodeRangeManager::init_in_neighbor(const TopoNode* cur_node,
                                         double start_s, double end_s) {
   for (const auto* edge : cur_node->in_from_left_or_right_edge()) {
     const auto* from_node = edge->from_node();
-    if (_range_map.count(from_node) != 0) {
+    if (range_map_.count(from_node) != 0) {
       // in case of start and end in the same lane
-      auto& range = _range_map[from_node];
+      auto& range = range_map_[from_node];
       range.start_s = std::max(range.start_s, start_s);
       range.end_s = std::min(range.end_s, end_s);
     } else {
-      auto& range = _range_map[from_node];
+      auto& range = range_map_[from_node];
       range.start_s = start_s;
       range.end_s = end_s;
       init_in_neighbor(from_node, start_s, end_s);
@@ -84,13 +84,13 @@ void NodeRangeManager::init_out_neighbor(const TopoNode* cur_node,
                                          double start_s, double end_s) {
   for (const auto* edge : cur_node->out_to_left_or_right_edge()) {
     const auto* to_node = edge->to_node();
-    if (_range_map.count(to_node) != 0) {
+    if (range_map_.count(to_node) != 0) {
       // in case of start and end in the same lane
-      auto& range = _range_map[to_node];
+      auto& range = range_map_[to_node];
       range.start_s = std::max(range.start_s, start_s);
       range.end_s = std::min(range.end_s, end_s);
     } else {
-      auto& range = _range_map[to_node];
+      auto& range = range_map_[to_node];
       range.start_s = start_s;
       range.end_s = end_s;
       init_out_neighbor(to_node, start_s, end_s);

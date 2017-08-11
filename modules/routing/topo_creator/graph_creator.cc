@@ -42,8 +42,8 @@ bool GraphCreator::Create() {
   }
   AINFO << "Number of lanes: " << pbmap_.lane_size();
 
-  _graph.set_hdmap_version(pbmap_.header().version());
-  _graph.set_hdmap_district(pbmap_.header().district());
+  graph_.set_hdmap_version(pbmap_.header().version());
+  graph_.set_hdmap_district(pbmap_.header().district());
 
   node_index_map_.clear();
   road_id_map_.clear();
@@ -59,25 +59,25 @@ bool GraphCreator::Create() {
 
   for (const auto& lane : pbmap_.lane()) {
     AINFO << "Current lane id: " << lane.id().id();
-    node_index_map_[lane.id().id()] = _graph.node_size();
+    node_index_map_[lane.id().id()] = graph_.node_size();
     const auto iter = road_id_map_.find(lane.id().id());
     if (iter != road_id_map_.end()) {
-      NodeCreator::GetPbNode(lane, iter->second, _graph.add_node());
+      NodeCreator::GetPbNode(lane, iter->second, graph_.add_node());
     } else {
       LOG(WARNING) << "Failed to find road id of lane " << lane.id().id();
-      NodeCreator::GetPbNode(lane, "", _graph.add_node());
+      NodeCreator::GetPbNode(lane, "", graph_.add_node());
     }
   }
 
   std::string edge_id = "";
   for (const auto& lane : pbmap_.lane()) {
-    const auto& from_node = _graph.node(node_index_map_[lane.id().id()]);
+    const auto& from_node = graph_.node(node_index_map_[lane.id().id()]);
     AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
     AddEdge(from_node, lane.right_neighbor_forward_lane_id(), Edge::RIGHT);
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
   }
 
-  if (!::apollo::common::util::SetProtoToASCIIFile(_graph,
+  if (!::apollo::common::util::SetProtoToASCIIFile(graph_,
                                                    dump_topo_file_path_)) {
     AERROR << "Failed to dump topo data into file " << dump_topo_file_path_;
     return false;
@@ -105,8 +105,8 @@ void GraphCreator::AddEdge(const Node& from_node,
     if (iter == node_index_map_.end()) {
       continue;
     }
-    const auto& to_node = _graph.node(iter->second);
-    EdgeCreator::GetPbEdge(from_node, to_node, type, _graph.add_edge());
+    const auto& to_node = graph_.node(iter->second);
+    EdgeCreator::GetPbEdge(from_node, to_node, type, graph_.add_edge());
   }
 }
 

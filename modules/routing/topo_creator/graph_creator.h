@@ -48,7 +48,7 @@ class GraphCreator {
   std::string base_map_file_path_;
   std::string dump_topo_file_path_;
   ::apollo::hdmap::Map pbmap_;
-  ::apollo::routing::Graph _graph;
+  ::apollo::routing::Graph graph_;
   std::unordered_map<std::string, int> node_index_map_;
   std::unordered_map<std::string, std::string> road_id_map_;
   std::unordered_set<std::string> showed_edge_id_set_;

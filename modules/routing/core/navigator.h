@@ -63,7 +63,7 @@ class Navigator {
 
  private:
   bool _is_ready;
-  std::unique_ptr<TopoGraph> _graph;
+  std::unique_ptr<TopoGraph> graph_;
 };
 
 }  // namespace routing

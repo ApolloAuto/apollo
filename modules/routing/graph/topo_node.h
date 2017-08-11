@@ -89,7 +89,7 @@ class TopoNode {
   std::unordered_set<const TopoEdge*> out_to_suc_edge_set_;
 
   std::unordered_map<const TopoNode*, const TopoEdge*> out_edge_map_;
-  std::unordered_map<const TopoNode*, const TopoEdge*> _in_edge_map;
+  std::unordered_map<const TopoNode*, const TopoEdge*> in_edge_map_;
 
   const TopoNode* origin_node_;
 };

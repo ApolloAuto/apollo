@@ -109,8 +109,8 @@ const std::unordered_set<const TopoEdge*>& TopoNode::out_to_suc_edge() const {
 }
 
 const TopoEdge* TopoNode::get_in_edge_from(const TopoNode* from_node) const {
-  const auto& iter = _in_edge_map.find(from_node);
-  if (iter == _in_edge_map.end()) {
+  const auto& iter = in_edge_map_.find(from_node);
+  if (iter == in_edge_map_.end()) {
     return nullptr;
   }
   return iter->second;
@@ -136,7 +136,7 @@ void TopoNode::add_in_edge(const TopoEdge* edge) {
   if (edge->to_node() != this) {
     return;
   }
-  if (_in_edge_map.count(edge->from_node()) != 0) {
+  if (in_edge_map_.count(edge->from_node()) != 0) {
     return;
   }
   switch (edge->type()) {
@@ -153,7 +153,7 @@ void TopoNode::add_in_edge(const TopoEdge* edge) {
       break;
   }
   in_from_all_edge_set_.insert(edge);
-  _in_edge_map[edge->from_node()] = edge;
+  in_edge_map_[edge->from_node()] = edge;
 }
 
 void TopoNode::add_out_edge(const TopoEdge* edge) {
