@@ -218,7 +218,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
     bool ignore = true;
     const auto &static_obstacle_box = obstacle->PerceptionBoundingBox();
 
-    const auto &sl_boundary = path_obstacle->sl_boundary();
+    const auto &sl_boundary = path_obstacle->perception_sl_boundary();
     for (std::size_t j = 0; j < adc_sl_points.size(); ++j) {
       const auto &adc_sl = adc_sl_points[j];
       if (adc_sl.s() + adc_max_edge_to_center_dist < sl_boundary.start_s() ||

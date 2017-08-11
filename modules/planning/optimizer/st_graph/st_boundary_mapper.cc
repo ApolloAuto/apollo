@@ -124,8 +124,10 @@ Status StBoundaryMapper::GetGraphBoundary(
                         "Fail to map follow decision");
         }
       } else if (decision.has_stop()) {
-        const double stop_s = path_obstacle->sl_boundary().start_s() +
-                              decision.stop().distance_s();
+        // TODO(all) change start_s() to st_boundary.min_s()
+        const double stop_s =
+            path_obstacle->perception_sl_boundary().start_s() +
+            decision.stop().distance_s();
         if (stop_s < adc_front_s_) {
           AERROR << "Invalid stop decision. not stop at ahead of current "
                     "position. stop_s : "
@@ -181,11 +183,11 @@ bool StBoundaryMapper::MapObstacleWithStopDecision(
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
   PathPoint obstacle_point;
-  if (!path_data_.GetPathPointWithRefS(stop_obstacle.sl_boundary().start_s(),
-                                       &obstacle_point)) {
+  if (!path_data_.GetPathPointWithRefS(
+          stop_obstacle.perception_sl_boundary().start_s(), &obstacle_point)) {
     AERROR << "Fail to get path point from reference s. The sl boundary of "
               "stop obstacle is: "
-           << stop_obstacle.sl_boundary().DebugString();
+           << stop_obstacle.perception_sl_boundary().DebugString();
     return false;
   }
 
