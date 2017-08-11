@@ -18,6 +18,7 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/planning.h"
@@ -39,7 +40,7 @@ DECLARE_string(test_chassis_file);
 class GarageTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
-    FLAGS_map_filename = "modules/planning/testdata/base_map.txt";
+    FLAGS_map_file_path = "modules/planning/testdata/base_map.txt";
   }
 };
 
