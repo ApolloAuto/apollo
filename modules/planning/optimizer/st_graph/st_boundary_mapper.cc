@@ -227,7 +227,7 @@ Status StBoundaryMapper::MapObstacleWithoutDecision(
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
                                 *(path_obstacle.Obstacle()), &upper_points,
                                 &lower_points)) {
-    return Status(ErrorCode::PLANNING_ERROR, "PLANNING_ERROR");
+    return Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP");
   }
 
   if (lower_points.size() > 0 && upper_points.size() > 0) {
