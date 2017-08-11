@@ -78,6 +78,7 @@ class PathObstacle {
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
   SLBoundary sl_boundary_;
+  StGraphBoundary st_boundary_;
 };
 
 }  // namespace planning
