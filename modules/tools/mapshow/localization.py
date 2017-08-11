@@ -1,10 +1,17 @@
 import math
 from google.protobuf import text_format
 from modules.localization.proto import localization_pb2
+import threading
 
 class Localization:
     def __init__(self, localization_pb=None):
         self.localization_pb = localization_pb
+        self.localization_data_lock = threading.Lock()
+
+    def update_localization_pb(self, localization_pb):
+        self.localization_data_lock.acquire()
+        self.localization_pb = localization_pb
+        self.localization_data_lock.release()
 
     def load(self, localization_file_name):
         self.localization_pb = localization_pb2.LocalizationEstimate()
@@ -18,21 +25,28 @@ class Localization:
         self.show_annotation(ax)
 
     def replot_vehicle(self, position_line, polygon_line):
-        self.replot_vehicle_position(position_line)
-        self.replot_vehicle_polygon(polygon_line)
+        self.localization_data_lock.acquire()
+        if self.localization_pb is None:
+            self.localization_data_lock.release()
+            return
+        position_line.set_visible(True)
+        polygon_line.set_visible(True)
+        self._replot_vehicle_position(position_line)
+        self._replot_vehicle_polygon(polygon_line)
+        self.localization_data_lock.release()
 
     def plot_vehicle_position(self, ax):
         loc_x = [self.localization_pb.pose.position.x]
         loc_y = [self.localization_pb.pose.position.y]
         ax.plot(loc_x, loc_y, "bo")
 
-    def replot_vehicle_position(self, line):
+    def _replot_vehicle_position(self, line):
         loc_x = [self.localization_pb.pose.position.x]
         loc_y = [self.localization_pb.pose.position.y]
         line.set_xdata(loc_x)
         line.set_ydata(loc_y)
 
-    def replot_vehicle_polygon(self, line):
+    def _replot_vehicle_polygon(self, line):
         position = []
         position.append(self.localization_pb.pose.position.x)
         position.append(self.localization_pb.pose.position.y)
