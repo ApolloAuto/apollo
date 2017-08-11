@@ -40,12 +40,6 @@ message Uncertainty {
   // second.
   optional apollo.common.Point3D angular_velocity_std_dev = 5;
 
-  // Roll/pitch/yaw that represents a rotation of the intrinsic sequence z-y-x.
-  // Note: our definition differs from what NovAtel and aviation use.
-
-  // Roll/pitch/yaw in radians.
-  optional apollo.common.Point3D euler_angles = 6;
-
   // TODO: Define covariance items when needed.
 }
 
