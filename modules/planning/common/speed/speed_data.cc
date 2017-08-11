@@ -59,7 +59,7 @@ bool SpeedData::EvaluateByTime(
   if (speed_vector_.size() < 2) {
     return false;
   }
-  if(!(speed_vector_.front().t() < t + 1.0e-6
+  if (!(speed_vector_.front().t() < t + 1.0e-6
       && t - 1.0e-6 < speed_vector_.back().t())) {
     return false;
   }
@@ -68,7 +68,8 @@ bool SpeedData::EvaluateByTime(
     return sp.t() < t;
   };
 
-  auto it_lower = std::lower_bound(speed_vector_.begin(), speed_vector_.end(), t, comp);
+  auto it_lower = std::lower_bound(speed_vector_.begin(),
+                                   speed_vector_.end(), t, comp);
   if (it_lower == speed_vector_.end()) {
     *speed_point = speed_vector_.back();
   } else if (it_lower == speed_vector_.begin()) {
