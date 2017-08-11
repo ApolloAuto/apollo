@@ -102,6 +102,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "path_obstacle_test",
+    size = "small",
+    srcs = [
+        "path_obstacle_test.cc",
+    ],
+    deps = [
+        ":path_obstacle",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "planning_util",
     srcs = [
