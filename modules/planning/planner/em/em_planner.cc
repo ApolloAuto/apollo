@@ -126,7 +126,7 @@ void EMPlanner::PopulateDecision(Frame* frame) {
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame,
-                       PublishableTrajectory* ptr_publishable_trajectory) {
+                       DiscretizedTrajectory* ptr_trajectory) {
   if (!frame) {
     AERROR << "Frame is empty in EMPlanner";
     return Status(ErrorCode::PLANNING_ERROR, "Frame is null");
@@ -156,17 +156,14 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                       ptr_latency_stats);
     }
   }
-  PublishableTrajectory computed_trajectory;
-  if (!planning_data->aggregate(FLAGS_output_trajectory_time_resolution,
-                                planning_start_point.relative_time(),
-                                &computed_trajectory)) {
+  if (!planning_data->CombinePathAndSpeedProfile(
+      FLAGS_output_trajectory_time_resolution,
+      planning_start_point.relative_time(),
+      ptr_trajectory)) {
     std::string msg("Fail to aggregate planning trajectory.");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  computed_trajectory.set_header_time(VehicleState::instance()->timestamp());
-
-  *ptr_publishable_trajectory = std::move(computed_trajectory);
 
   PopulateDecision(frame);
 

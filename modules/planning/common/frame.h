@@ -38,6 +38,7 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/planning_data.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
