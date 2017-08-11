@@ -190,8 +190,8 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
       content.set_lidar_pose(*velodyne_trans);
       content.set_lidar_cloud(point_cloud);
       content.set_tracked_objects(objects_);
-      visualizer_->update_camera_system(&content);
-      visualizer_->render(content);
+      visualizer_->UpdateCameraSystem(&content);
+      visualizer_->Render(content);
   }
 
   PERF_BLOCK_END("lidar_tracker");
@@ -243,7 +243,7 @@ bool LidarProcess::InitFrameDependence() {
 
   if (FLAGS_enable_visualization) {
     visualizer_.reset(new OpenglVisualizer());
-    if(!visualizer_->init()) {
+    if(!visualizer_->Init()) {
       AERROR<<"init visialuzer failed";
       return false;
     }; 
