@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
@@ -45,6 +47,16 @@ namespace planning {
  * properties. An obstacle's path properties relative to a path.
  * The `s` and `l` values are examples of path properties.
  * The decision of an obstacle is also associated with a path.
+ *
+ * The decisions have two categories: lateral decision and longitutional
+ * decision.
+ * Lateral decision includes: nudge, ignore.
+ * Lateral decision saftey priority: nudge > ignore.
+ * Longitutional decision includes: stop, yield, follow, overtake, ignore.
+ * Decision saftey priorities order: stop > yield >= follow > overtake > ignore
+ *
+ * Ignore decision belongs to both lateral decision and longitutional decision,
+ * and it has the lowest priority.
  */
 class PathObstacle {
  public:
@@ -58,15 +70,36 @@ class PathObstacle {
 
   const planning::Obstacle* Obstacle() const;
 
+  bool MergeObstacle() const;
+
   /**
-   * @class add decision to this obstacle.
+   * @class Add decision to this obstacle. This function will
+   * also calculate the merged decision. i.e., if there are multiple lateral
+   * decisions or longitutional decisions, this function will merge them into
+   * one. The rule of merging decisions are as follows
+   * * Priorities of different decisions: stop > yield > follow > overtake >
+   * ignore
+   * * Priorities of the same decisions: decision1.distance_s <
+   * decision2.distance_s
    * @param decider_tag identifies which component added this decision
    * @param the decision to be added to this path obstacle.
-   */
+   **/
   void AddDecision(const std::string& decider_tag,
                    const ObjectDecisionType& decision);
 
   const std::vector<ObjectDecisionType>& Decisions() const;
+
+  /**
+   * return the merged lateral decision
+   * Lateral decision is one of {Nudge, Ignore}
+   **/
+  const ObjectDecisionType& MergedLateralDecision() const;
+
+  /**
+   * @brief return the merged longitutional decision
+   * Longitutional decision is one of {Stop, Yield, Follow, Overtake, Ignore}
+   **/
+  const ObjectDecisionType& MergedLongitutionalDecision() const;
 
   const std::string DebugString() const;
 
@@ -75,14 +108,50 @@ class PathObstacle {
  private:
   bool InitPerceptionSLBoundary(const ReferenceLine* reference_line);
 
- private:
+  /**
+   * @brief check if a ObjectDecisionType is a lateral decision.
+   **/
+  FRIEND_TEST(IsLateralDecision, AllDecisions);
+  static bool IsLateralDecision(const ObjectDecisionType& decision);
+
+  /**
+   * @brief check if a ObjectDecisionType is longitutional decision.
+   **/
+  FRIEND_TEST(IsLongitutionalDecision, AllDecisions);
+  static bool IsLongitutionalDecision(const ObjectDecisionType& decision);
+
+  FRIEND_TEST(MergeLongitutionalDecision, AllDecisions);
+  static ObjectDecisionType MergeLongitutionalDecision(
+      const ObjectDecisionType& lhs, const ObjectDecisionType& rhs);
+  FRIEND_TEST(MergeLateralDecision, AllDecisions);
+  static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
+                                                 const ObjectDecisionType& rhs);
+
   std::string id_;
   const planning::Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
   SLBoundary perception_sl_boundary_;
-  // TODO: add st_boundary_ here.
+
+  // TODO(zhangliangliang): add st_boundary_ here.
   // StGraphBoundary st_boundary_;
+
+  ObjectDecisionType lateral_decision_;
+  ObjectDecisionType longitutional_decision_;
+
+  struct ObjectTagCaseHash {
+    std::size_t operator()(
+        const planning::ObjectDecisionType::ObjectTagCase tag) const {
+      return static_cast<std::size_t>(tag);
+    }
+  };
+
+  static const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
+                                  ObjectTagCaseHash>
+      s_lateral_decision_safety_sorter_;
+  static const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
+                                  ObjectTagCaseHash>
+      s_longitutional_decision_safety_sorter_;
 };
 
 }  // namespace planning
