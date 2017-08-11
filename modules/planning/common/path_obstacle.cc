@@ -23,9 +23,24 @@
 #include <limits>
 
 #include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
+
+const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
+                         PathObstacle::ObjectTagCaseHash>
+    PathObstacle::s_longitutional_decision_safety_sorter_ = {
+        {ObjectDecisionType::kIgnore, 0},
+        {ObjectDecisionType::kOvertake, 100},
+        {ObjectDecisionType::kFollow, 300},
+        {ObjectDecisionType::kYield, 400},
+        {ObjectDecisionType::kStop, 500}};
+
+const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
+                         PathObstacle::ObjectTagCaseHash>
+    PathObstacle::s_lateral_decision_safety_sorter_ = {
+        {ObjectDecisionType::kIgnore, 0}, {ObjectDecisionType::kNudge, 100}};
 
 const std::string& PathObstacle::Id() const { return id_; }
 
@@ -33,6 +48,8 @@ PathObstacle::PathObstacle(const planning::Obstacle* obstacle)
     : obstacle_(obstacle) {
   CHECK_NOTNULL(obstacle);
   id_ = obstacle_->Id();
+  lateral_decision_.mutable_ignore();
+  longitutional_decision_.mutable_ignore();
 }
 
 bool PathObstacle::Init(const ReferenceLine* reference_line) {
@@ -70,10 +87,105 @@ bool PathObstacle::InitPerceptionSLBoundary(
   return true;
 }
 
+bool PathObstacle::IsLateralDecision(const ObjectDecisionType& decision) {
+  return decision.has_ignore() || decision.has_nudge();
+}
+
+bool PathObstacle::IsLongitutionalDecision(const ObjectDecisionType& decision) {
+  return decision.has_ignore() || decision.has_stop() || decision.has_yield() ||
+         decision.has_follow() || decision.has_overtake();
+}
+
+ObjectDecisionType PathObstacle::MergeLongitutionalDecision(
+    const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
+  auto lhs_iter =
+      s_longitutional_decision_safety_sorter_.find(lhs.object_tag_case());
+  DCHECK(lhs_iter != s_longitutional_decision_safety_sorter_.end())
+      << "decision : " << lhs.ShortDebugString()
+      << " not found in safety sorter";
+  auto rhs_iter =
+      s_longitutional_decision_safety_sorter_.find(rhs.object_tag_case());
+  DCHECK(rhs_iter != s_longitutional_decision_safety_sorter_.end())
+      << "decision : " << rhs.ShortDebugString()
+      << " not found in safety sorter";
+  if (lhs_iter->second < rhs_iter->second) {
+    return rhs;
+  } else if (lhs_iter->second > rhs_iter->second) {
+    return lhs;
+  } else {
+    if (lhs.has_ignore()) {
+      return rhs;
+    } else if (lhs.has_stop()) {
+      return lhs.stop().distance_s() < rhs.stop().distance_s() ? lhs : rhs;
+    } else if (lhs.has_yield()) {
+      return lhs.yield().distance_s() < rhs.yield().distance_s() ? lhs : rhs;
+    } else if (lhs.has_follow()) {
+      return lhs.follow().distance_s() < rhs.follow().distance_s() ? lhs : rhs;
+    } else if (lhs.has_overtake()) {
+      return lhs.overtake().distance_s() > rhs.overtake().distance_s() ? lhs
+                                                                       : rhs;
+    }
+  }
+  DCHECK(false) << "Does not have rule to merge decision: "
+                << lhs.ShortDebugString()
+                << " and decision: " << rhs.ShortDebugString();
+}
+
+ObjectDecisionType PathObstacle::MergeLateralDecision(
+    const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
+  auto lhs_iter = s_lateral_decision_safety_sorter_.find(lhs.object_tag_case());
+  DCHECK(lhs_iter != s_lateral_decision_safety_sorter_.end())
+      << "decision : " << lhs.ShortDebugString()
+      << " not found in safety sorter";
+  auto rhs_iter = s_lateral_decision_safety_sorter_.find(rhs.object_tag_case());
+  DCHECK(rhs_iter != s_lateral_decision_safety_sorter_.end())
+      << "decision : " << rhs.ShortDebugString()
+      << " not found in safety sorter";
+  if (lhs_iter->second < rhs_iter->second) {
+    return rhs;
+  } else if (lhs_iter->second > rhs_iter->second) {
+    return lhs;
+  } else {
+    if (lhs.has_ignore()) {
+      return rhs;
+    } else if (lhs.has_nudge()) {
+      if (lhs.nudge().type() == rhs.nudge().type()) {
+        return std::fabs(lhs.nudge().distance_l()) >
+                       std::fabs(rhs.nudge().distance_l())
+                   ? lhs
+                   : rhs;
+      } else {
+        ObjectDecisionType stop_decision;
+        stop_decision.mutable_stop()->set_distance_s(
+            FLAGS_static_decision_stop_buffer);
+        return stop_decision;
+      }
+    }
+  }
+  DCHECK(false) << "Does not have rule to merge decision: "
+                << lhs.ShortDebugString()
+                << " and decision: " << rhs.ShortDebugString();
+}
+
 const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
 
 void PathObstacle::AddDecision(const std::string& decider_tag,
                                const ObjectDecisionType& decision) {
+  if (IsLateralDecision(decision)) {
+    const auto merged_decision =
+        MergeLateralDecision(lateral_decision_, decision);
+    if (IsLongitutionalDecision(merged_decision)) {
+      longitutional_decision_ =
+          MergeLongitutionalDecision(longitutional_decision_, merged_decision);
+    } else {
+      lateral_decision_ = merged_decision;
+    }
+  } else if (IsLongitutionalDecision(decision)) {
+    longitutional_decision_ =
+        MergeLongitutionalDecision(longitutional_decision_, decision);
+  } else {
+    DCHECK(false) << "Unkown decision type: " << decision.DebugString();
+  }
   decisions_.push_back(decision);
   decider_tags_.push_back(decider_tag);
 }
