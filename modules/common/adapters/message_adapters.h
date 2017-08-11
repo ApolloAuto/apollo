@@ -24,7 +24,6 @@
 #include "modules/common/monitor/proto/monitor.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
-#include "modules/decision/proto/decision.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/camera.pb.h"
@@ -51,7 +50,6 @@ namespace adapter {
 using ChassisAdapter = Adapter<::apollo::canbus::Chassis>;
 using ChassisDetailAdapter = Adapter<::apollo::canbus::ChassisDetail>;
 using ControlCommandAdapter = Adapter<::apollo::control::ControlCommand>;
-using DecisionAdapter = Adapter<::apollo::decision::DecisionResult>;
 using GpsAdapter = Adapter<apollo::localization::Gps>;
 using ImuAdapter = Adapter<::apollo::localization::Imu>;
 using CameraAdapter = Adapter<::apollo::localization::Camera>;

@@ -114,16 +114,12 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableChassisDetail(FLAGS_chassis_detail_topic, config.mode(),
                             config.message_history_limit());
         break;
-      case AdapterConfig::DECISION:
-        EnableDecision(FLAGS_decision_topic, config.mode(),
-                       config.message_history_limit());
-        break;
       case AdapterConfig::RELATIVE_ODOMETRY:
-        EnableRelativeOdometry(FLAGS_relative_odometry_topic, config.mode(), 
+        EnableRelativeOdometry(FLAGS_relative_odometry_topic, config.mode(),
                           config.message_history_limit());
         break;
       case AdapterConfig::INS_STAT:
-        EnableInsStat(FLAGS_ins_stat_topic, config.mode(), 
+        EnableInsStat(FLAGS_ins_stat_topic, config.mode(),
                           config.message_history_limit());
         break;
       case AdapterConfig::HMI_COMMAND:

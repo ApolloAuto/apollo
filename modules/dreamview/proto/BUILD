@@ -12,7 +12,6 @@ proto_library(
     srcs = ["simulation_world.proto"],
     deps = [
         "//modules/common/monitor/proto:monitor_proto_lib",
-        "//modules/decision/proto:decision_proto_lib",
         "//modules/planning/proto:planning_proto_lib",
     ],
 )
