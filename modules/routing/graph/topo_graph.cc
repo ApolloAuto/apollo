@@ -22,8 +22,8 @@ namespace apollo {
 namespace routing {
 
 void TopoGraph::clear() {
-  _topo_nodes.clear();
-  _topo_edges.clear();
+  topo_nodes_.clear();
+  topo_edges_.clear();
   node_index_map_.clear();
 }
 
@@ -33,11 +33,11 @@ bool TopoGraph::load_nodes(const ::apollo::routing::Graph& graph) {
     return false;
   }
   for (const auto& node : graph.node()) {
-    node_index_map_[node.lane_id()] = _topo_nodes.size();
+    node_index_map_[node.lane_id()] = topo_nodes_.size();
     std::shared_ptr<TopoNode> topo_node;
     topo_node.reset(new TopoNode(node));
-    _road_node_map[node.road_id()].insert(topo_node.get());
-    _topo_nodes.push_back(std::move(topo_node));
+    road_node_map_[node.road_id()].insert(topo_node.get());
+    topo_nodes_.push_back(std::move(topo_node));
   }
   return true;
 }
@@ -56,12 +56,12 @@ bool TopoGraph::load_edges(const ::apollo::routing::Graph& graph) {
       return false;
     }
     std::shared_ptr<TopoEdge> topo_edge;
-    TopoNode* from_node = _topo_nodes[node_index_map_[from_lane_id]].get();
-    TopoNode* to_node = _topo_nodes[node_index_map_[to_lane_id]].get();
+    TopoNode* from_node = topo_nodes_[node_index_map_[from_lane_id]].get();
+    TopoNode* to_node = topo_nodes_[node_index_map_[to_lane_id]].get();
     topo_edge.reset(new TopoEdge(edge, from_node, to_node));
     from_node->add_out_edge(topo_edge.get());
     to_node->add_in_edge(topo_edge.get());
-    _topo_edges.push_back(std::move(topo_edge));
+    topo_edges_.push_back(std::move(topo_edge));
   }
   return true;
 }
@@ -100,14 +100,14 @@ const TopoNode* TopoGraph::get_node(const std::string& id) const {
   if (iter == node_index_map_.end()) {
     return nullptr;
   }
-  return _topo_nodes[iter->second].get();
+  return topo_nodes_[iter->second].get();
 }
 
 void TopoGraph::get_nodes_by_road_id(
     const std::string& road_id,
     std::unordered_set<const TopoNode*>* const node_in_road) const {
-  const auto& iter = _road_node_map.find(road_id);
-  if (iter != _road_node_map.end()) {
+  const auto& iter = road_node_map_.find(road_id);
+  if (iter != road_node_map_.end()) {
     node_in_road->insert(iter->second.begin(), iter->second.end());
   }
 }
