@@ -10,7 +10,6 @@ cc_library(
         "frame_content.cc",
         "glfw_viewer.cc",
         "opengl_visualizer.cc",
-        "pcl_vis_util.cc",
     ],
     hdrs = [
         "camera.h",
@@ -18,7 +17,6 @@ cc_library(
         "frame_content.h",
         "glfw_viewer.h",
         "opengl_visualizer.h",
-        "pcl_vis_util.h",
     ],
     copts = [
         "-Wno-deprecated",

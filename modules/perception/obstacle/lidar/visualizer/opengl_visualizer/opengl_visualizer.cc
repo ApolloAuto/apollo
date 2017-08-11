@@ -21,132 +21,131 @@
 namespace apollo {
 namespace perception {
 
-OpenglVisualizer::OpenglVisualizer() : _name("OpenglVisualizer") {
+OpenglVisualizer::OpenglVisualizer() : name_("OpenglVisualizer") {
 }
 
-bool OpenglVisualizer::init() {
-    _opengl_vs = boost::shared_ptr<GLFWViewer>(new GLFWViewer());
+bool OpenglVisualizer::Init() {
+    opengl_vs_ = boost::shared_ptr<GLFWViewer>(new GLFWViewer());
  
-    if (_opengl_vs == nullptr) {
-        AERROR << "Failed to create opengl viewer";
+    if (opengl_vs_ == nullptr) {
+        AINFO << "Failed to create opengl viewer";
         return false;
     }
 
-    if (_opengl_vs->initialize() == false) {
-        AERROR << "Failed to initialize opengl viewer";
+    if (opengl_vs_->Initialize() == false) {
+        AINFO << "Failed to initialize opengl viewer";
         return false;
     }
 
-    set_size(2000, 1400);
-    set_background_color(0.05, 0.05, 0.05, 0.0f);
-    set_velodyne_height(2.5);
-    set_main_car_points();
-    set_camera_position();
+    SetSize(2000, 1400);
+    SetBackgroundColor(0.05, 0.05, 0.05, 0.0f);
+    SetVelodyneHeight(2.5);
+    SetMainCarPoints();
+    SetCameraPosition();
     AINFO << "Initialize OpenglVisualizer successfully";
     return true;
 }
 
-void OpenglVisualizer::render(FrameContent& content) {  
-    Eigen::Vector3d camera_world_pos(_camera_center_world.x, _camera_center_world.y, _camera_center_world.z);
-    Eigen::Vector3d camera_scene_center(_view_point_world.x,    _view_point_world.y,    _view_point_world.z);
-    Eigen::Vector3d camera_up_vector(_up_world.x, _up_world.y, _up_world.z);
-    _opengl_vs->set_camera_para(Eigen::Vector3d(_camera_center_world.x, _camera_center_world.y, _camera_center_world.z), 
-                                Eigen::Vector3d(_view_point_world.x, _view_point_world.y, _view_point_world.z), 
-                                Eigen::Vector3d(_up_world.x, _up_world.y, _up_world.z)
+void OpenglVisualizer::Render(FrameContent& content) {  
+    Eigen::Vector3d camera_world_pos(camera_center_world_.x, camera_center_world_.y, camera_center_world_.z);
+    Eigen::Vector3d camera_scene_center(view_point_world_.x,    view_point_world_.y,    view_point_world_.z);
+    Eigen::Vector3d camera_up_vector(up_world_.x, up_world_.y, up_world_.z);
+    opengl_vs_->SetCameraPara(Eigen::Vector3d(camera_center_world_.x, camera_center_world_.y, camera_center_world_.z), 
+                                Eigen::Vector3d(view_point_world_.x, view_point_world_.y, view_point_world_.z), 
+                                Eigen::Vector3d(up_world_.x, up_world_.y, up_world_.z)
                                );
-    _opengl_vs->set_forward_dir(Eigen::Vector3d(_forward_world.x, _forward_world.y, _forward_world.z));
-    _opengl_vs->set_frame_content(&content);
-    _opengl_vs->spin_once();
-
-   // AINFO << "OpenglVisualizer spin_once";
+    opengl_vs_->SetForwardDir(Eigen::Vector3d(forward_world_.x, forward_world_.y, forward_world_.z));
+    opengl_vs_->SetFrameContent(&content);
+    opengl_vs_->SpinOnce();
+    AINFO << "OpenglVisualizer spin_once";
 }
 
-void OpenglVisualizer::set_size(int w, int h) { 
-    _opengl_vs->set_size(w, h); 
+void OpenglVisualizer::SetSize(int w, int h) { 
+    opengl_vs_->SetSize(w, h); 
 }
 
-void OpenglVisualizer::set_background_color(float r, float g, float b, float a) { 
-    _opengl_vs->set_background_color(Eigen::Vector3d(r, g, b)); 
+void OpenglVisualizer::SetBackgroundColor(float r, float g, float b, float a) { 
+    opengl_vs_->SetBackgroundColor(Eigen::Vector3d(r, g, b)); 
 }
 
-void OpenglVisualizer::set_velodyne_height(float h) { 
-    _velodyne_height = h; 
+void OpenglVisualizer::SetVelodyneHeight(float h) { 
+    velodyne_height_ = h; 
 }
 
-void OpenglVisualizer::set_camera_position() { 
-    _up_velodyne.x = 0;
-    _up_velodyne.y = 1;
-    _up_velodyne.z = 0;
-    _forward_velodyne.x = 1;
-    _forward_velodyne.y = 0;
-    _forward_velodyne.z = 0;
-    _view_point_velodyne.x = 0;
-    _view_point_velodyne.y = 0;
-    _view_point_velodyne.z = 0;
-    _camera_center_velodyne.x = 0;
-    _camera_center_velodyne.y = 0;
-    _camera_center_velodyne.z = 100; 
+void OpenglVisualizer::SetCameraPosition() { 
+    up_velodyne_.x = 0;
+    up_velodyne_.y = 1;
+    up_velodyne_.z = 0;
+    forward_velodyne_.x = 1;
+    forward_velodyne_.y = 0;
+    forward_velodyne_.z = 0;
+    view_point_velodyne_.x = 0;
+    view_point_velodyne_.y = 0;
+    view_point_velodyne_.z = 0;
+    camera_center_velodyne_.x = 0;
+    camera_center_velodyne_.y = 0;
+    camera_center_velodyne_.z = 100; 
 }
 
-void OpenglVisualizer::set_main_car_points() { 
-    _main_car_points_velodyne.resize(9);
-    _main_car_points_velodyne.at(0).x = 0;
-    _main_car_points_velodyne.at(0).y = 0;
-    _main_car_points_velodyne.at(0).z = 0;
+void OpenglVisualizer::SetMainCarPoints() { 
+    main_car_points_velodyne_.resize(9);
+    main_car_points_velodyne_.at(0).x = 0;
+    main_car_points_velodyne_.at(0).y = 0;
+    main_car_points_velodyne_.at(0).z = 0;
 
-    _main_car_points_velodyne.at(1).x = 0;
-    _main_car_points_velodyne.at(1).y = 0;
-    _main_car_points_velodyne.at(1).z = -_velodyne_height;
-    _main_car_points_velodyne.at(2).x = 3;
-    _main_car_points_velodyne.at(2).y = 0;
-    _main_car_points_velodyne.at(2).z = -_velodyne_height;
+    main_car_points_velodyne_.at(1).x = 0;
+    main_car_points_velodyne_.at(1).y = 0;
+    main_car_points_velodyne_.at(1).z = -velodyne_height_;
+    main_car_points_velodyne_.at(2).x = 3;
+    main_car_points_velodyne_.at(2).y = 0;
+    main_car_points_velodyne_.at(2).z = -velodyne_height_;
 
-    _main_car_points_velodyne.at(3).x = 2.5;
-    _main_car_points_velodyne.at(3).y = 1.0;
-    _main_car_points_velodyne.at(3).z = -_velodyne_height;
-    _main_car_points_velodyne.at(4).x = 2.5;
-    _main_car_points_velodyne.at(4).y = -1.0;
-    _main_car_points_velodyne.at(4).z = -_velodyne_height;
-    _main_car_points_velodyne.at(5).x = -2.5;
-    _main_car_points_velodyne.at(5).y = -1.0;
-    _main_car_points_velodyne.at(5).z = -_velodyne_height;
-    _main_car_points_velodyne.at(6).x = -2.5;
-    _main_car_points_velodyne.at(6).y = 1.0;
-    _main_car_points_velodyne.at(6).z = -_velodyne_height;
+    main_car_points_velodyne_.at(3).x = 2.5;
+    main_car_points_velodyne_.at(3).y = 1.0;
+    main_car_points_velodyne_.at(3).z = -velodyne_height_;
+    main_car_points_velodyne_.at(4).x = 2.5;
+    main_car_points_velodyne_.at(4).y = -1.0;
+    main_car_points_velodyne_.at(4).z = -velodyne_height_;
+    main_car_points_velodyne_.at(5).x = -2.5;
+    main_car_points_velodyne_.at(5).y = -1.0;
+    main_car_points_velodyne_.at(5).z = -velodyne_height_;
+    main_car_points_velodyne_.at(6).x = -2.5;
+    main_car_points_velodyne_.at(6).y = 1.0;
+    main_car_points_velodyne_.at(6).z = -velodyne_height_;
 
-    _main_car_points_velodyne.at(7).x = 0;
-    _main_car_points_velodyne.at(7).y = 0;
-    _main_car_points_velodyne.at(7).z = 160;
-    _main_car_points_velodyne.at(8).x = -40;
-    _main_car_points_velodyne.at(8).y = 0;
-    _main_car_points_velodyne.at(8).z = 50; 
+    main_car_points_velodyne_.at(7).x = 0;
+    main_car_points_velodyne_.at(7).y = 0;
+    main_car_points_velodyne_.at(7).z = 160;
+    main_car_points_velodyne_.at(8).x = -40;
+    main_car_points_velodyne_.at(8).y = 0;
+    main_car_points_velodyne_.at(8).z = 50; 
 }
 
 
-void OpenglVisualizer::update_camera_system(FrameContent* content) { 
+void OpenglVisualizer::UpdateCameraSystem(FrameContent* content) { 
     Eigen::Matrix4d pose_v2w = content->get_pose_v2w(); 
 
-    transform_point_cloud<pcl_util::Point>(_camera_center_velodyne, 
-        _camera_center_world, pose_v2w); 
+    transform_point_cloud<pcl_util::Point>(camera_center_velodyne_, 
+        camera_center_world_, pose_v2w); 
 
-    transform_point_cloud<pcl_util::Point>(_view_point_velodyne, 
-        _view_point_world, pose_v2w); 
+    transform_point_cloud<pcl_util::Point>(view_point_velodyne_, 
+        view_point_world_, pose_v2w); 
 
-    transform_point_cloud<pcl_util::Point>(_main_car_points_velodyne, 
-        _main_car_points_world, pose_v2w); 
+    transform_point_cloud<pcl_util::Point>(main_car_points_velodyne_, 
+        main_car_points_world_, pose_v2w); 
 
-    Eigen::Vector4d up_w(_up_velodyne.x, _up_velodyne.y, _up_velodyne.z, 0); 
+    Eigen::Vector4d up_w(up_velodyne_.x, up_velodyne_.y, up_velodyne_.z, 0); 
 
     up_w = pose_v2w * up_w;
-    _up_world.x = up_w[0];
-    _up_world.y = up_w[1];
-    _up_world.z = up_w[2]; 
+    up_world_.x = up_w[0];
+    up_world_.y = up_w[1];
+    up_world_.z = up_w[2]; 
 
-    Eigen::Vector4d fd_w(_forward_velodyne.x, _forward_velodyne.y, _forward_velodyne.z, 0);
+    Eigen::Vector4d fd_w(forward_velodyne_.x, forward_velodyne_.y, forward_velodyne_.z, 0);
     fd_w = pose_v2w * fd_w;
-    _forward_world.x = fd_w[0];
-    _forward_world.y = fd_w[1];
-    _forward_world.z = fd_w[2];
+    forward_world_.x = fd_w[0];
+    forward_world_.y = fd_w[1];
+    forward_world_.z = fd_w[2];
 }
 
 } // namespace perception

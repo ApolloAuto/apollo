@@ -616,6 +616,5 @@ void Frame::project_on_line(const Eigen::Vector3d& origin, const Eigen::Vector3d
   translate(shift-proj);
 }
 
-
 } // namespace obstacle
 } // namespace perception

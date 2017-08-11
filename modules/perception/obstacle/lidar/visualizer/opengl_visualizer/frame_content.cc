@@ -54,9 +54,16 @@ void FrameContent::set_lidar_cloud(pcl_util::PointCloudPtr cloud) {
     pcl::transformPointCloud(*cloud, *(_cloud), _pose_v2w);
 }
 
+void FrameContent::set_lidar_roi_cloud(pcl_util::PointCloudPtr cloud) {
+    pcl::transformPointCloud(*cloud, *(_roi_cloud), _pose_v2w);
+}
 
 pcl_util::PointCloudPtr FrameContent::get_cloud() {
     return _cloud;
+}
+
+pcl_util::PointCloudPtr FrameContent::get_roi_cloud() {
+    return _roi_cloud;
 }
 
 bool FrameContent::has_cloud() {

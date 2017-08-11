@@ -38,8 +38,9 @@ public:
     Eigen::Matrix4d get_pose_v2w();
 
     void set_lidar_cloud(pcl_util::PointCloudPtr cloud);
-
+    void set_lidar_roi_cloud(pcl_util::PointCloudPtr cloud);
     pcl_util::PointCloudPtr get_cloud();
+    pcl_util::PointCloudPtr get_roi_cloud();
 
     bool has_cloud();
 
