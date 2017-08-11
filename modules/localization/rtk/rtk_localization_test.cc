@@ -181,6 +181,8 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
     EXPECT_STREQ(expected_result.pose().DebugString().c_str(),
                  localization.pose().DebugString().c_str());
   }
+
+  // TODO(Qi Luo) Update test once got new imu data for euler angle.
 }
 
 }  // namespace localization
