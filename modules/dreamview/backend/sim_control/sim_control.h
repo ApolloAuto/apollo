@@ -97,7 +97,6 @@ class SimControl {
   bool initial_start_;
 
   // Whether the sim control is enabled.
-  // TODO(siyangy): This could be toggled by frontend.
   bool enabled_;
 
   apollo::common::TrajectoryPoint prev_point_;

@@ -27,7 +27,6 @@ DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
 
 DEFINE_int32(server_port, 8888, "The port of backend webserver");
 
-// TODO(siyangy): Make this directly configurable by script/dreamview
 DEFINE_bool(
     enable_sim_control, false,
     "Whether to enable SimControl to publish localiztion and chassis message.");
