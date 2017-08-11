@@ -209,7 +209,7 @@ void DataParser::dispatch_message(Parser::MessageType type,
       check_ins_status(As<::apollo::drivers::gnss::Ins>(message));
       publish_corrimu_pb_message(message);
       publish_odometry_pb_message(message);
-      publish_ins_message(message);
+      //publish_ins_message(message);
       break;
 
     case Parser::MessageType::INS_STAT:
@@ -302,6 +302,10 @@ void DataParser::publish_corrimu_pb_message(const MessagePtr message) {
   imu_msg->mutable_angular_velocity()->set_x(-ins->angular_velocity().y());
   imu_msg->mutable_angular_velocity()->set_y(ins->angular_velocity().x());
   imu_msg->mutable_angular_velocity()->set_z(ins->angular_velocity().z());
+
+  imu_msg->mutable_euler_angles()->set_x(ins->euler_angles().x());
+  imu_msg->mutable_euler_angles()->set_y(ins->euler_angles().y());
+  imu_msg->mutable_euler_angles()->set_z(ins->euler_angles().z());
 
   _imu_publisher.publish(imu);
 }
