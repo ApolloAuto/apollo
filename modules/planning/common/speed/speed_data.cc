@@ -33,14 +33,17 @@
 namespace apollo {
 namespace planning {
 
+SpeedData::SpeedData(std::vector<common::SpeedPoint> speed_points)
+    : speed_vector_(std::move(speed_points)) {}
+
 void SpeedData::AppendSpeedPoint(const double s, const double time,
                                 const double v, const double a,
                                 const double da) {
+  if (!speed_vector_.empty()) {
+    CHECK(speed_vector_.back().t() < time);
+  }
   speed_vector_.push_back(common::util::MakeSpeedPoint(s, time, v, a, da));
 }
-
-SpeedData::SpeedData(std::vector<common::SpeedPoint> speed_points)
-    : speed_vector_(std::move(speed_points)) {}
 
 const std::vector<common::SpeedPoint>& SpeedData::speed_vector() const {
   return speed_vector_;
@@ -68,24 +71,21 @@ bool SpeedData::EvaluateByTime(
   auto it_lower = std::lower_bound(speed_vector_.begin(), speed_vector_.end(), t, comp);
   if (it_lower == speed_vector_.end()) {
     *speed_point = speed_vector_.back();
-    return true;
   } else if (it_lower == speed_vector_.begin()) {
     *speed_point = speed_vector_.front();
-    return true;
+  } else {
+    const auto& p0 = *(it_lower - 1);
+    const auto& p1 = *it_lower;
+    double t0 = p0.t();
+    double t1 = p1.t();
+
+    double s = common::math::lerp(p0.s(), t0, p1.s(), t1, t);
+    double v = common::math::lerp(p0.v(), t0, p1.v(), t1, t);
+    double a = common::math::lerp(p0.a(), t0, p1.a(), t1, t);
+    double j = common::math::lerp(p0.da(), t0, p1.da(), t1, t);
+
+    *speed_point = common::util::MakeSpeedPoint(s, t, v, a, j);
   }
-
-  const auto& p0 = *(it_lower - 1);
-  const auto& p1 = *it_lower;
-  double t0 = p0.t();
-  double t1 = p1.t();
-
-  double s = common::math::lerp(p0.s(), t0, p1.s(), t1, t);
-  double v = common::math::lerp(p0.v(), t0, p1.v(), t1, t);
-  double a = common::math::lerp(p0.a(), t0, p1.a(), t1, t);
-  double j = common::math::lerp(p0.da(), t0, p1.da(), t1, t);
-
-  *speed_point = common::util::MakeSpeedPoint(s, t, v, a, j);
-
   return true;
 }
 
