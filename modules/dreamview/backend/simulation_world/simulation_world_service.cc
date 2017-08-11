@@ -110,6 +110,8 @@ void SetObstacleInfo(const PerceptionObstacle &obstacle, Object *world_object) {
   world_object->set_length(obstacle.length());
   world_object->set_width(obstacle.width());
   world_object->set_height(obstacle.height());
+  world_object->set_speed(
+      std::hypot(obstacle.velocity().x(), obstacle.velocity().y()));
   world_object->set_timestamp_sec(obstacle.timestamp());
 }
 
@@ -542,7 +544,8 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   // Update obstacle decision.
   for (const auto &obj_decision : decision_res.object_decision().decision()) {
     if (obj_decision.has_perception_id()) {
-      Object &world_obj = obj_map_[std::to_string(obj_decision.perception_id())];
+      Object &world_obj = obj_map_[std::to_string(
+          obj_decision.perception_id())];
       if (!world_obj.has_type()) {
         world_obj.set_type(Object_Type_VIRTUAL);
       }

@@ -9,7 +9,8 @@ export default [
             perceptionBicycle: 'Bicycle',
             perceptionUnknownMovable: 'Unknown Movable',
             perceptionUnknownUnmovable: 'Unknown Stationary',
-            perceptionUnknown: 'Unknown'
+            perceptionUnknown: 'Unknown',
+            perceptionArrow: 'Heading & Speed'
         }
     }, {
         id: 'prediction',

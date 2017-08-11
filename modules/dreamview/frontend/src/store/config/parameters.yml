@@ -48,6 +48,7 @@ options:
     showObstaclesUnknownUnmovable: true
     showObstaclesUnknown: true
     showObstaclesVirtual: false
+    showObstaclesArrow: true
     cameraAngle: Default
 debug:
   # Turn this on for monitor related debugging
