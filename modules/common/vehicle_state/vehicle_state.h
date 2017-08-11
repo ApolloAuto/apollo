@@ -87,10 +87,24 @@ class VehicleState {
   double kappa() const;
 
   /**
+   * @brief Get the vehicle roll angle.
+   * @return The euler roll angle.
+   */
+  double roll() const;
+
+  /**
    * @brief Get the vehicle pitch angle.
    * @return The euler pitch angle.
    */
   double pitch() const;
+
+  /**
+   * @brief Get the vehicle yaw angle.
+   *  As of now, use the heading instead of yaw angle.
+   *  Heading angle with East as zero, yaw angle has North as zero
+   * @return The euler yaw angle.
+   */
+  double yaw() const;
 
   /**
    * @brief Get the heading of vehicle position, which is the angle
@@ -143,10 +157,22 @@ class VehicleState {
   void set_z(const double z);
 
   /**
+   * @brief Set the vehicle roll angle.
+   * @param pitch The vehicle roll angle.
+   */
+  void set_roll(const double roll);
+
+  /**
    * @brief Set the vehicle pitch angle.
    * @param pitch The vehicle pitch angle.
    */
   void set_pitch(const double pitch);
+
+  /**
+   * @brief Set the vehicle yaw angle.
+   * @param pitch The vehicle yaw angle.
+   */
+  void set_yaw(const double yaw);
 
   /**
    * @brief Set the heading of vehicle position, which is the angle
@@ -204,7 +230,9 @@ class VehicleState {
   double x_ = 0.0;
   double y_ = 0.0;
   double z_ = 0.0;
+  double roll_ = 0.0;
   double pitch_ = 0.0;
+  double yaw_ = 0.0;
   double heading_ = 0.0;
   // TODO: check the setting of kappa_
   double kappa_ = 0.0;
