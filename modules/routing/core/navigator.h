@@ -19,8 +19,8 @@
 
 #include <memory>
 
-#include "modules/routing/proto/routing.pb.h"
 #include "modules/routing/core/node_range_manager.h"
+#include "modules/routing/proto/routing.pb.h"
 
 #include <unordered_set>
 
