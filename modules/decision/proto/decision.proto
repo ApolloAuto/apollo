@@ -1,9 +1,0 @@
-syntax = "proto2";
-
-package apollo.decision;
-
-import "modules/common/proto/header.proto";
-
-message DecisionResult {
-  optional apollo.common.Header header = 1;
-}

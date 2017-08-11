@@ -197,7 +197,6 @@ class AdapterManager {
   REGISTER_ADAPTER(Chassis);
   REGISTER_ADAPTER(ChassisDetail);
   REGISTER_ADAPTER(ControlCommand);
-  REGISTER_ADAPTER(Decision);
   REGISTER_ADAPTER(Gps);
   REGISTER_ADAPTER(Imu);
   REGISTER_ADAPTER(Camera);
