@@ -16,19 +16,15 @@
 
 #ifndef ADU_PERCEPTION_OBSTACLE_VISUALIZER_OPENGL_VISUALIZER_H
 #define ADU_PERCEPTION_OBSTACLE_VISUALIZER_OPENGL_VISUALIZER_H
+
 #include <string>
 #include <sstream>
 #include <vector>
-
 #include <boost/shared_ptr.hpp>
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-/*#include "obstacle/lidar/visualizer/pcl_vis_util.h"
-#include "obstacle/visualizer/base_visualizer.h"
-*/
-#include "frame_content.h"
-
-#include "glfw_viewer.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
 
 namespace apollo {
 namespace perception { 
@@ -38,44 +34,43 @@ public:
     OpenglVisualizer();
     virtual ~OpenglVisualizer() = default;
 
-    virtual bool init();
+    virtual bool Init();
 
-    virtual std::string name() const {
-        return _name;
+    virtual std::string Name() const {
+        return name_;
 }
     
-    void update_camera_system(FrameContent* content);
+    void UpdateCameraSystem(FrameContent* content);
 
-    virtual void render(FrameContent& content);    
+    virtual void Render(FrameContent& content);    
 
 private:
-    void set_size(int w, int h);
-    void set_background_color(float r, float g, float b, float a);
-    void set_velodyne_height(float h);
-    void set_main_car_points();
-    void set_camera_position();
+    void SetSize(int w, int h);
+    void SetBackgroundColor(float r, float g, float b, float a);
+    void SetVelodyneHeight(float h);
+    void SetMainCarPoints();
+    void SetCameraPosition();
 
-    float _velodyne_height;
-    pcl_util::Point _camera_center_velodyne;
-    pcl_util::Point _view_point_velodyne;
-    pcl_util::Point _up_velodyne;
-    pcl_util::Point _forward_velodyne;
-    pcl_util::PointCloud _main_car_points_velodyne;
+    float velodyne_height_;
+    pcl_util::Point camera_center_velodyne_;
+    pcl_util::Point view_point_velodyne_;
+    pcl_util::Point up_velodyne_;
+    pcl_util::Point forward_velodyne_;
+    pcl_util::PointCloud main_car_points_velodyne_;
     
-    pcl_util::Point _camera_center_world;
-    pcl_util::Point _view_point_world;
-    pcl_util::Point _up_world;
-    pcl_util::Point _forward_world;
-    pcl_util::PointCloud _main_car_points_world;
+    pcl_util::Point camera_center_world_;
+    pcl_util::Point view_point_world_;
+    pcl_util::Point up_world_;
+    pcl_util::Point forward_world_;
+    pcl_util::PointCloud main_car_points_world_;
 
-    boost::shared_ptr<GLFWViewer> _opengl_vs;
-    std::string _name;
-    bool _init = false;
+    boost::shared_ptr<GLFWViewer> opengl_vs_;
+    std::string name_;
+    bool init_ = false;
 
 };
 
-
 } // namespace perception
-} // namespace adu
+} // namespace apollo
 
 #endif //  ADU_PERCEPTION_OBSTACLE_VISUALIZER_PCL_VISUALIZER_H
