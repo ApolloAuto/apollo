@@ -232,16 +232,18 @@ Status StBoundaryMapper::MapObstacleWithoutDecision(
 
   if (lower_points.size() > 0 && upper_points.size() > 0) {
     boundary_points.clear();
-    const double buffer = st_boundary_config_.follow_buffer();
-    boundary_points.emplace_back(lower_points.at(0).s() - buffer,
-                                 lower_points.at(0).t());
-    boundary_points.emplace_back(lower_points.back().s() - buffer,
-                                 lower_points.back().t());
-    boundary_points.emplace_back(upper_points.back().s() + buffer +
-                                     st_boundary_config_.boundary_buffer(),
-                                 upper_points.back().t());
-    boundary_points.emplace_back(upper_points.at(0).s() + buffer,
-                                 upper_points.at(0).t());
+    boundary_points.emplace_back(
+        lower_points.at(0).s() - st_boundary_config_.boundary_buffer(),
+        lower_points.at(0).t() - st_boundary_config_.boundary_buffer());
+    boundary_points.emplace_back(
+        lower_points.back().s() - st_boundary_config_.boundary_buffer(),
+        lower_points.back().t() + st_boundary_config_.boundary_buffer());
+    boundary_points.emplace_back(
+        upper_points.back().s() + st_boundary_config_.boundary_buffer(),
+        upper_points.back().t() + st_boundary_config_.boundary_buffer());
+    boundary_points.emplace_back(
+        upper_points.at(0).s() + st_boundary_config_.boundary_buffer(),
+        upper_points.at(0).t() - st_boundary_config_.boundary_buffer());
     if (lower_points.at(0).t() > lower_points.back().t() ||
         upper_points.at(0).t() > upper_points.back().t()) {
       AWARN << "lower/upper points are reversed.";
@@ -277,42 +279,60 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
   }
 
   const auto& trajectory = obstacle.Trajectory();
-  for (int j = 0; j < trajectory.trajectory_point_size(); ++j) {
-    const auto& trajectory_point = trajectory.trajectory_point(j);
-    double trajectory_point_time = trajectory_point.relative_time();
-    const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
-    int64_t low = 0;
-    int64_t high = path_points.size() - 1;
-    bool find_low = false;
-    bool find_high = false;
-    while (low < high) {
-      if (find_low && find_high) {
+  if (trajectory.trajectory_point_size() == 0) {
+    for (const auto& curr_point_on_path : path_points) {
+      if (curr_point_on_path.s() > planning_distance_) {
         break;
       }
-      if (!find_low) {
-        if (!CheckOverlap(path_points[low], obs_box,
-                          st_boundary_config_.boundary_buffer())) {
-          ++low;
-        } else {
-          find_low = true;
-        }
-      }
-      if (!find_high) {
-        if (!CheckOverlap(path_points[high], obs_box,
-                          st_boundary_config_.boundary_buffer())) {
-          --high;
-        } else {
-          find_high = true;
-        }
+      const Box2d obs_box = obstacle.PerceptionBoundingBox();
+
+      if (CheckOverlap(curr_point_on_path, obs_box,
+                       st_boundary_config_.boundary_buffer())) {
+        lower_points->emplace_back(curr_point_on_path.s(), 0.0);
+        lower_points->emplace_back(curr_point_on_path.s(), planning_time_);
+        upper_points->emplace_back(planning_distance_, 0.0);
+        upper_points->emplace_back(planning_distance_, planning_time_);
+        break;
       }
     }
-    if (find_high && find_low) {
-      lower_points->emplace_back(
-          path_points[low].s() - st_boundary_config_.point_extension(),
-          trajectory_point_time);
-      upper_points->emplace_back(
-          path_points[high].s() + st_boundary_config_.point_extension(),
-          trajectory_point_time);
+  } else {
+    for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
+      const auto& trajectory_point = trajectory.trajectory_point(i);
+      double trajectory_point_time = trajectory_point.relative_time();
+      const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
+      int64_t low = 0;
+      int64_t high = path_points.size() - 1;
+      bool find_low = false;
+      bool find_high = false;
+      while (low < high) {
+        if (find_low && find_high) {
+          break;
+        }
+        if (!find_low) {
+          if (!CheckOverlap(path_points[low], obs_box,
+                            st_boundary_config_.boundary_buffer())) {
+            ++low;
+          } else {
+            find_low = true;
+          }
+        }
+        if (!find_high) {
+          if (!CheckOverlap(path_points[high], obs_box,
+                            st_boundary_config_.boundary_buffer())) {
+            --high;
+          } else {
+            find_high = true;
+          }
+        }
+      }
+      if (find_high && find_low) {
+        lower_points->emplace_back(
+            path_points[low].s() - st_boundary_config_.point_extension(),
+            trajectory_point_time);
+        upper_points->emplace_back(
+            path_points[high].s() + st_boundary_config_.point_extension(),
+            trajectory_point_time);
+      }
     }
   }
   DCHECK_EQ(lower_points->size(), upper_points->size());
