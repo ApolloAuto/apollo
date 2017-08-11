@@ -21,7 +21,8 @@ DEFINE_string(node_namespace, "routing", "the namespace for this node");
 
 DEFINE_bool(use_road_id, true, "enable use road id to cut routing result");
 
-DEFINE_string(map_dir, "/apollo/modules/map/data", "the default directory of hdmap");
+DEFINE_string(map_dir, "/apollo/modules/map/data",
+              "the default directory of hdmap");
 DEFINE_string(map_file_name, "base_map.txt", "the default file name of hdmap.");
 
 DEFINE_string(graph_file_name, "routing_map.txt",
@@ -34,8 +35,12 @@ DEFINE_string(debug_passage_region_path, "",
               "the default path of passage region debug file");
 
 DEFINE_double(base_speed, 4.167, "base speed for node creator, in m/s");
-DEFINE_double(left_turn_penalty, 50, "left turn penalty for node creater, in meter");
-DEFINE_double(right_turn_penalty, 50, "right turn penalty for node creater, in meter");
-DEFINE_double(uturn_penalty, 50, "left turn penalty for node creater, in meter");
+DEFINE_double(left_turn_penalty, 50,
+              "left turn penalty for node creater, in meter");
+DEFINE_double(right_turn_penalty, 50,
+              "right turn penalty for node creater, in meter");
+DEFINE_double(uturn_penalty, 50,
+              "left turn penalty for node creater, in meter");
 DEFINE_double(change_penalty, 50, "change penalty for edge creater, in meter");
-DEFINE_double(base_changing_length, 50, "base change length penalty for edge creater, in meter");
+DEFINE_double(base_changing_length, 50,
+              "base change length penalty for edge creater, in meter");

@@ -48,7 +48,8 @@ NodeRange NodeRangeManager::get_node_range(const TopoNode* topo_node) const {
   return NodeRange(0.0, topo_node->length());
 }
 
-void NodeRangeManager::set_node_s(const TopoNode* topo_node, double node_start_s, double node_end_s) {
+void NodeRangeManager::set_node_s(const TopoNode* topo_node,
+                                  double node_start_s, double node_end_s) {
   auto& range = range_map_[topo_node];
   range.start_s = node_start_s;
   range.end_s = node_end_s;

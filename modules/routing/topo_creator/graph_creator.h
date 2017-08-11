@@ -36,8 +36,7 @@ class GraphCreator {
   bool Create();
 
  private:
-  std::string GetEdgeID(const std::string& from_id,
-                                      const std::string& to_id);
+  std::string GetEdgeID(const std::string& from_id, const std::string& to_id);
 
   void AddEdge(const ::apollo::routing::Node& from_node,
                const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Id>&

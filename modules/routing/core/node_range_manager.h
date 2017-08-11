@@ -42,7 +42,8 @@ class NodeRangeManager {
   NodeRange get_node_range(const TopoNode* topo_node) const;
   double get_node_start_s(const TopoNode* topo_node) const;
   double get_node_end_s(const TopoNode* topo_node) const;
-  void set_node_s(const TopoNode* topo_node, double node_start_s, double node_end_s);
+  void set_node_s(const TopoNode* topo_node, double node_start_s,
+                  double node_end_s);
 
  private:
   void init_in_neighbor(const TopoNode* cur_node, double start_s, double end_s);
