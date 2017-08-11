@@ -28,12 +28,12 @@ bool OpenglVisualizer::init() {
     _opengl_vs = boost::shared_ptr<GLFWViewer>(new GLFWViewer());
  
     if (_opengl_vs == nullptr) {
-        AINFO << "Failed to create opengl viewer";
+        AERROR << "Failed to create opengl viewer";
         return false;
     }
 
     if (_opengl_vs->initialize() == false) {
-        AINFO << "Failed to initialize opengl viewer";
+        AERROR << "Failed to initialize opengl viewer";
         return false;
     }
 
