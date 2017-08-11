@@ -185,15 +185,6 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
     }
   }
 
-  if (visualizer_ != nullptr) {
-      FrameContent content;
-      content.set_lidar_pose(*velodyne_trans);
-      content.set_lidar_cloud(point_cloud);
-      content.set_tracked_objects(objects_);
-      visualizer_->UpdateCameraSystem(&content);
-      visualizer_->Render(content);
-  }
-
   PERF_BLOCK_END("lidar_tracker");
   AINFO << "lidar process succ, there are " << objects_.size()
         << " tracked objects.";
@@ -241,13 +232,6 @@ bool LidarProcess::InitFrameDependence() {
     AINFO << "get and init hdmap_input succ.";
   }
 
-  if (FLAGS_enable_visualization) {
-    visualizer_.reset(new OpenglVisualizer());
-    if(!visualizer_->Init()) {
-      AERROR<<"init visialuzer failed";
-      return false;
-    }; 
-  }
   return true;
 }
 
@@ -324,12 +308,18 @@ void LidarProcess::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
   cloud->sensor_origin_ = in_cloud.sensor_origin_;
   cloud->sensor_orientation_ = in_cloud.sensor_orientation_;
   cloud->points.resize(in_cloud.points.size());
+  size_t points_num = 0;
   for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
-    cloud->points[idx].x = in_cloud.points[idx].x;
-    cloud->points[idx].y = in_cloud.points[idx].y;
-    cloud->points[idx].z = in_cloud.points[idx].z;
-    cloud->points[idx].intensity = in_cloud.points[idx].intensity;
+    pcl_util::PointXYZIT& pt = in_cloud.points[idx];
+    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z) && !isnan(pt.intensity)) {
+      cloud->points[points_num].x = pt.x;
+      cloud->points[points_num].y = pt.y;
+      cloud->points[points_num].z = pt.z;
+      cloud->points[points_num].intensity = pt.intensity;
+      points_num++;
+    }
   }
+  cloud->points.resize(points_num);
 }
 
 bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
