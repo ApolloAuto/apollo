@@ -36,6 +36,15 @@ PathObstacle::PathObstacle(const planning::Obstacle* obstacle)
 }
 
 bool PathObstacle::Init(const ReferenceLine* reference_line) {
+  if (!InitPerceptionSLBoundary(reference_line)) {
+    AERROR << "Failed to init perception sl boundary";
+    return false;
+  }
+  return true;
+}
+
+bool PathObstacle::InitPerceptionSLBoundary(
+    const ReferenceLine* reference_line) {
   double start_s(std::numeric_limits<double>::max());
   double end_s(std::numeric_limits<double>::lowest());
   double start_l(std::numeric_limits<double>::max());
@@ -54,10 +63,10 @@ bool PathObstacle::Init(const ReferenceLine* reference_line) {
     start_l = std::fmin(start_l, sl_point.l());
     end_l = std::fmax(end_l, sl_point.l());
   }
-  sl_boundary_.set_start_s(start_s);
-  sl_boundary_.set_end_s(end_s);
-  sl_boundary_.set_start_l(start_l);
-  sl_boundary_.set_end_l(end_l);
+  perception_sl_boundary_.set_start_s(start_s);
+  perception_sl_boundary_.set_end_s(end_s);
+  perception_sl_boundary_.set_start_l(start_l);
+  perception_sl_boundary_.set_end_l(end_l);
   return true;
 }
 
@@ -82,7 +91,9 @@ const std::string PathObstacle::DebugString() const {
   return ss.str();
 }
 
-const SLBoundary& PathObstacle::sl_boundary() const { return sl_boundary_; }
+const SLBoundary& PathObstacle::perception_sl_boundary() const {
+  return perception_sl_boundary_;
+}
 
 }  // namespace planning
 }  // namespace apollo

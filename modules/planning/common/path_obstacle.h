@@ -70,14 +70,17 @@ class PathObstacle {
 
   const std::string DebugString() const;
 
-  const SLBoundary& sl_boundary() const;
+  const SLBoundary& perception_sl_boundary() const;
+
+ private:
+  bool InitPerceptionSLBoundary(const ReferenceLine* reference_line);
 
  private:
   std::string id_;
   const planning::Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
-  SLBoundary sl_boundary_;
+  SLBoundary perception_sl_boundary_;
   // TODO: add st_boundary_ here.
   // StGraphBoundary st_boundary_;
 };
