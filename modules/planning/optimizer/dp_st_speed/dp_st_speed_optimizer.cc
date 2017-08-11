@@ -99,6 +99,9 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  RecordSTGraphDebug(boundaries, speed_limit, *speed_data);
+
   return Status::OK();
 }
 
