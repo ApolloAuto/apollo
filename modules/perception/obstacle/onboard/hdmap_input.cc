@@ -168,6 +168,9 @@ void HDMapInput::DownSampleBoundary(const apollo::hdmap::LineSegment& line,
   double acos_theta = 0.0;
   size_t raw_cloud_size = raw_cloud->points.size();
   if (raw_cloud_size <= 3) {
+    for (size_t i = 0; i < raw_cloud_size; ++i) {
+        out_boundary_line->push_back(raw_cloud->points[i]);
+    }
     AINFO << "Points num < 3, so no need to downsample.";
     return;
   }
