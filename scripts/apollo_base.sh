@@ -156,6 +156,7 @@ function start() {
         eval "nohup ${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE} \
             --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
             --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
+        sleep 0.5
         is_stopped "${MODULE}"
         if [ $? -eq 0 ]; then
             echo "Launched module ${MODULE}."
