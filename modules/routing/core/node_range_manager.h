@@ -50,7 +50,7 @@ class NodeRangeManager {
                          double end_s);
 
  private:
-  std::unordered_map<const TopoNode*, NodeRange> _range_map;
+  std::unordered_map<const TopoNode*, NodeRange> range_map_;
 };
 
 }  // namespace routing

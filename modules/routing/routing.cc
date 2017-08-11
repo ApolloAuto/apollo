@@ -34,7 +34,7 @@ Routing::Routing() :
 
   std::string graph_path = FLAGS_map_dir + "/" + FLAGS_graph_file_name;
   AINFO << "Use routing topology graph path: " <<  graph_path.c_str();
-  _navigator_ptr.reset(new Navigator(graph_path));
+  navigator_ptr_.reset(new Navigator(graph_path));
 }
 
 apollo::common::Status Routing::Init() {
@@ -48,7 +48,7 @@ apollo::common::Status Routing::Init() {
 }
 
 apollo::common::Status Routing::Start() {
-  if (!_navigator_ptr->is_ready()) {
+  if (!navigator_ptr_->is_ready()) {
     AERROR << "Navigator is not ready!";
     return apollo::common::Status(ErrorCode::ROUTING_ERROR, "Navigator not ready");
   }
@@ -62,7 +62,7 @@ apollo::common::Status Routing::Start() {
 void Routing::OnRouting_Request(const apollo::routing::RoutingRequest &routing_request) {
   AINFO << "Get new routing request!!!";
   ::apollo::routing::RoutingResponse routing_response;
-  if (!_navigator_ptr->search_route(routing_request, &routing_response)) {
+  if (!navigator_ptr_->search_route(routing_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";
     return;
   }
