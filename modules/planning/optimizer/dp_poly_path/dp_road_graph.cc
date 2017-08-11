@@ -297,7 +297,7 @@ bool DPRoadGraph::MakeDynamicObstcleDecision(
   // Compute dynamic obstacle decision
   const double interval = config_.eval_time_interval();
   const double total_time =
-      std::min(speed_data_.total_time(), FLAGS_prediction_total_time);
+      std::min(speed_data_.TotalTime(), FLAGS_prediction_total_time);
   std::size_t evaluate_time_slots =
       static_cast<std::size_t>(std::floor(total_time / interval));
   // list of Box2d for adc given speed profile
@@ -340,7 +340,7 @@ bool DPRoadGraph::ComputeBoundingBoxesForAdc(
   for (std::size_t i = 0; i < evaluate_time_slots;
        ++i, time_stamp += interval) {
     common::SpeedPoint speed_point;
-    if (!speed_data_.get_speed_point_with_time(time_stamp, &speed_point)) {
+    if (!speed_data_.EvaluateByTime(time_stamp, &speed_point)) {
       AINFO << "get_speed_point_with_time for time_stamp[" << time_stamp << "]";
       return false;
     }

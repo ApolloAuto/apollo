@@ -23,66 +23,73 @@
 #include <algorithm>
 #include <utility>
 
+#include "glog/logging.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
-//#include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
 
-namespace {
-
-bool speed_time_comp(const double t, const common::SpeedPoint& speed_point) {
-  return t < speed_point.t();
-}
-
-}  // namespace
-
-void SpeedData::add_speed_point(const double s, const double time,
+void SpeedData::AppendSpeedPoint(const double s, const double time,
                                 const double v, const double a,
                                 const double da) {
   speed_vector_.push_back(common::util::MakeSpeedPoint(s, time, v, a, da));
 }
 
-SpeedData::SpeedData(const std::vector<common::SpeedPoint>& speed_points)
-    : speed_vector_(speed_points) {}
+SpeedData::SpeedData(std::vector<common::SpeedPoint> speed_points)
+    : speed_vector_(std::move(speed_points)) {}
 
 const std::vector<common::SpeedPoint>& SpeedData::speed_vector() const {
   return speed_vector_;
 }
 
 void SpeedData::set_speed_vector(
-    const std::vector<common::SpeedPoint>& speed_points) {
+    std::vector<common::SpeedPoint> speed_points) {
   speed_vector_ = std::move(speed_points);
 }
 
-bool SpeedData::get_speed_point_with_time(
+bool SpeedData::EvaluateByTime(
     const double t, common::SpeedPoint* const speed_point) const {
   if (speed_vector_.size() < 2) {
     return false;
   }
-  std::uint32_t index = find_index(t);
-  if (Double::Compare(t, speed_vector_[index].t()) < 0 ||
-      index + 1 >= speed_vector_.size()) {
+  if(!(speed_vector_.front().t() < t + 1.0e-6
+      && t - 1.0e-6 < speed_vector_.back().t())) {
     return false;
   }
 
-  // index index + 1
-  double weight = 0.0;
-  if (Double::Compare(speed_vector_[index + 1].t(), speed_vector_[index].t()) >
-      0) {
-    weight = (t - speed_vector_[index].t()) /
-             (speed_vector_[index + 1].t() - speed_vector_[index].t());
+  auto comp = [](const common::SpeedPoint& sp, const double t) {
+    return sp.t() < t;
+  };
+
+  auto it_lower = std::lower_bound(speed_vector_.begin(), speed_vector_.end(), t, comp);
+  if (it_lower == speed_vector_.end()) {
+    *speed_point = speed_vector_.back();
+    return true;
+  } else if (it_lower == speed_vector_.begin()) {
+    *speed_point = speed_vector_.front();
+    return true;
   }
 
-  *speed_point =
-      interpolate(speed_vector_[index], speed_vector_[index + 1], weight);
+  const auto& p0 = *(it_lower - 1);
+  const auto& p1 = *it_lower;
+  double t0 = p0.t();
+  double t1 = p1.t();
+
+  double s = common::math::lerp(p0.s(), t0, p1.s(), t1, t);
+  double v = common::math::lerp(p0.v(), t0, p1.v(), t1, t);
+  double a = common::math::lerp(p0.a(), t0, p1.a(), t1, t);
+  double j = common::math::lerp(p0.da(), t0, p1.da(), t1, t);
+
+  *speed_point = common::util::MakeSpeedPoint(s, t, v, a, j);
+
   return true;
 }
 
-double SpeedData::total_time() const {
+double SpeedData::TotalTime() const {
   if (speed_vector_.empty()) {
     return 0.0;
   }
@@ -99,26 +106,6 @@ std::string SpeedData::DebugString() const {
       "[\n", apollo::common::util::PrintDebugStringIter(
                  speed_vector_.begin(), speed_vector_.begin() + limit, ",\n"),
       "]\n");
-}
-
-std::uint32_t SpeedData::find_index(const double t) const {
-  auto upper_bound = std::upper_bound(speed_vector_.begin() + 1,
-                                      speed_vector_.end(), t, speed_time_comp);
-  return std::min(
-             static_cast<std::uint32_t>(speed_vector_.size() - 1),
-             static_cast<std::uint32_t>(upper_bound - speed_vector_.begin())) -
-         1;
-}
-
-common::SpeedPoint SpeedData::interpolate(const common::SpeedPoint& left,
-                                          const common::SpeedPoint& right,
-                                          const double weight) const {
-  double s = (1 - weight) * left.s() + weight * right.s();
-  double t = (1 - weight) * left.t() + weight * right.t();
-  double v = (1 - weight) * left.v() + weight * right.v();
-  double a = (1 - weight) * left.a() + weight * right.a();
-  double da = (1 - weight) * left.da() + weight * right.da();
-  return common::util::MakeSpeedPoint(s, t, v, a, da);
 }
 
 }  // namespace planning
