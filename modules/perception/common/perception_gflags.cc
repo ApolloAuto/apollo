@@ -47,4 +47,4 @@ DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
               "the tf2 transform child frame id");
 DEFINE_string(obstacle_module_name, "perception_obstacle",
               "perception obstacle module name");
-
+DEFINE_bool(enable_visualization, false, "enable visualization for debug");

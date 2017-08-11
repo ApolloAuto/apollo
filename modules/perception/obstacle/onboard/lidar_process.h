@@ -29,6 +29,8 @@
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 
 namespace apollo {
 namespace perception {
@@ -77,6 +79,8 @@ class LidarProcess {
   std::unique_ptr<BaseObjectBuilder> object_builder_;
   std::unique_ptr<BaseTracker> tracker_;
   pcl_util::PointIndicesPtr roi_indices_;
+
+  std::unique_ptr<OpenglVisualizer> visualizer_ = nullptr;
 
   FRIEND_TEST(LidarProcessTest, test_Init);
   FRIEND_TEST(LidarProcessTest, test_Process);
