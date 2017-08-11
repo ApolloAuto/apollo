@@ -31,10 +31,10 @@
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 
 DECLARE_string(flagfile);
+DECLARE_bool(enable_visualization);
 DECLARE_string(config_manager_path);
 DEFINE_string(pcd_path, "./pcd/", "pcd path");
 DEFINE_string(pose_path, "./pose/", "pose path");
-DEFINE_bool(enable_visualization, true, "enable visualization");
 
 namespace apollo {
 namespace perception {

@@ -90,22 +90,22 @@ void GLFWViewer:: get_class_color(int cls, float rgb[3])
 bool GLFWViewer::initialize(){
 	AINFO << "GLFWViewer::initialize()"<<std::endl;
     if (_init) {
-        AINFO <<" GLFWViewer is already initialized !"<<std::endl;
+        AERROR <<" GLFWViewer is already initialized !"<<std::endl;
         return false;
     }
 
     if (!window_init()){
-        AINFO << " Failed to initialize the window !"<<std::endl;
+        AERROR << " Failed to initialize the window !"<<std::endl;
         return false;
     }
 
     if (!camera_init()){
-        AINFO << " Failed to initialize the camera !"<<std::endl;
+        AERROR << " Failed to initialize the camera !"<<std::endl;
         return false;
     }
 
     if (!opengl_init()){
-        AINFO << " Failed to initialize opengl !"<<std::endl;
+        AERROR << " Failed to initialize opengl !"<<std::endl;
         return false;
     }
 
