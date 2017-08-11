@@ -19,7 +19,6 @@
 #include <sstream>
 #include <vector>
 #include <string>
-
 #include <pcl/io/pcd_io.h>
 
 #include "modules/perception/common/perception_gflags.h"
@@ -35,6 +34,8 @@ DECLARE_bool(enable_visualization);
 DECLARE_string(config_manager_path);
 DEFINE_string(pcd_path, "./pcd/", "pcd path");
 DEFINE_string(pose_path, "./pose/", "pose path");
+DEFINE_bool(save_obstacles, false, "save obstacles to file");
+
 
 namespace apollo {
 namespace perception {
@@ -43,7 +44,7 @@ DEFINE_string(output_path, "./output/", "output path");
 DEFINE_int32(start_frame, 1, "start frame");
 
 template <typename T>
-void quaternion_to_rotation_matrix(const T * quat, T * R) {
+void QuaternionToRotationMatrix(const T * quat, T * R) {
     T x2 = quat[0] * quat[0];
     T xy = quat[0] * quat[1];
     T rx = quat[3] * quat[0];
@@ -65,7 +66,7 @@ void quaternion_to_rotation_matrix(const T * quat, T * R) {
     R[5] = 2 * (yz - rx);
 }
 
-bool read_pose_file(const std::string& filename, Eigen::Matrix4d& pose,
+bool ReadPoseFile(const std::string& filename, Eigen::Matrix4d& pose,
     int& frame_id, double& time_stamp) {
     std::ifstream ifs(filename.c_str());
     if (!ifs.is_open()) {
@@ -81,7 +82,7 @@ bool read_pose_file(const std::string& filename, Eigen::Matrix4d& pose,
     sscanf(buffer, "%d %lf %lf %lf %lf %lf %lf %lf %lf", &id, &(time_samp),
             &(pose(0, 3)), &(pose(1, 3)), &(pose(2, 3)),
             &(quat[0]), &(quat[1]), &(quat[2]), &(quat[3]));
-    quaternion_to_rotation_matrix<double>(quat, matrix3x3);
+    QuaternionToRotationMatrix<double>(quat, matrix3x3);
 
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
@@ -91,23 +92,6 @@ bool read_pose_file(const std::string& filename, Eigen::Matrix4d& pose,
 
     frame_id = id;
     time_stamp = time_samp;
-    return true;
-}
-
-bool read_pose_file_mat12(const std::string& filename, Eigen::Matrix4d& pose,
-    int& frame_id, double& time_stamp) {
-    std::ifstream ifs(filename.c_str());
-    if (!ifs.is_open()) {
-        std::cerr << "Failed to open file " << filename << std::endl;
-        return false;
-    }
-    pose = Eigen::Matrix4d::Identity();
-    ifs >> frame_id >> time_stamp;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
-            ifs >> pose(i, j);
-        }
-    }
     return true;
 }
 
@@ -138,10 +122,8 @@ public:
         output_dir_ = FLAGS_output_path;
 
         if (use_visualization) {
-            //visualizer_.reset(new PCLObstacleVisualizer("obstaclevisualizer_",
-            //    OBJECT_COLOR_TRACK, false, output_dir_));
             visualizer_.reset(new OpenglVisualizer());
-            if(!visualizer_->init()) {
+            if(!visualizer_->Init()) {
                 AERROR<<"init visialuzer failed"<<std::endl;
             }; 
         }
@@ -154,45 +136,40 @@ public:
         std::string pose_folder = pose_path;
         std::vector<std::string> pcd_file_names;
         std::vector<std::string> pose_file_names;
-        AERROR << "starting to run"; 
+        AINFO << "starting to run"; 
         GetFileNamesInFolderById(pose_folder, ".pose", &pose_file_names);
         GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
-        AERROR<<" pose size " << pose_file_names.size();
-        AERROR<<" pcd size " << pcd_file_names.size(); 
+        AINFO<<" pose size " << pose_file_names.size();
+        AINFO<<" pcd size " << pcd_file_names.size(); 
         if (pose_file_names.size() != pcd_file_names.size()) {
             AERROR << "pcd file number does not match pose file number";
             return;
         }
         double time_stamp = 0.0;
         int start_frame = FLAGS_start_frame;
-        AERROR << "starting frame is "<<start_frame;
+        AINFO << "starting frame is "<<start_frame;
         sleep(1);
         for (size_t i = start_frame; i < pcd_file_names.size(); i++) {
-            AERROR << "***************** Frame " << i << " ******************";
+            AINFO << "***************** Frame " << i << " ******************";
             std::ostringstream oss;
             pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
-            AERROR << "load pcd file from file path" << pcd_folder + pcd_file_names[i];
+            AINFO << "load pcd file from file path" << pcd_folder + pcd_file_names[i];
             pcl::io::loadPCDFile<pcl_util::Point>(pcd_folder + pcd_file_names[i], *cloud);
-            AERROR << "read point cloud from " << pcd_file_names[i]
-                << " with cloud size: " << cloud->points.size();
 
             //read pose
             Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
             int frame_id = -1;
-            if (!read_pose_file(pose_folder + pose_file_names[i],
+            if (!ReadPoseFile(pose_folder + pose_file_names[i],
                 pose, frame_id, time_stamp)) {
                 std::cout << "Failed to read file " << pose_file_names[i] << "\n";
                 return ;
             }
-            AERROR << "read pose file " << pose_file_names[i] << "  " << pose ;
             
             std::shared_ptr<Eigen::Matrix4d> velodyne_trans = std::make_shared<Eigen::Matrix4d>(pose);
             lidar_process_->Process(time_stamp, cloud, velodyne_trans);
 
             std::vector<ObjectPtr> result_objects = lidar_process_->GetObjects();
             const pcl_util::PointIndicesPtr roi_indices = lidar_process_->GetROIIndices();
-
-            AERROR << "finish processing point cloud with num objects" << result_objects.size(); 
             
             if (visualizer_) {
                 pcl_util::PointDCloudPtr transformed_cloud(new pcl_util::PointDCloud);
@@ -204,17 +181,20 @@ public:
                 content.set_lidar_pose(pose);
                 content.set_lidar_cloud(cloud);
                 content.set_tracked_objects(result_objects);
-                visualizer_->update_camera_system(&content);
-                visualizer_->render(content);
+                visualizer_->UpdateCameraSystem(&content);
+                visualizer_->Render(content);
             }
-            AERROR << "finish pc";
-            //oss << std::setfill('0') << std::setw(6) << i;
-            //std::string filename = FLAGS_output_path + oss.str() + ".txt";
-            //save_obstacle_informaton(result_objects, filename);
+            AINFO << "finish pc";
+            
+            if (FLAGS_save_obstacles) {
+                oss << std::setfill('0') << std::setw(6) << i;
+                std::string filename = FLAGS_output_path + oss.str() + ".txt";
+                SaveObstacleInformaton(result_objects, filename);
+            }
         }
     }
 
-    void save_obstacle_informaton(
+    void SaveObstacleInformaton(
         std::vector<ObjectPtr>& objects, std::string file_name) {
         std::cout << "save " << objects.size() << " objects to "
             << file_name << std::endl;
@@ -359,7 +339,6 @@ public:
 protected:
     ConfigManager* config_manager_;
     std::unique_ptr<LidarProcess> lidar_process_;
-    //std::unique_ptr<PCLObstacleVisualizer> visualizer_;
     std::unique_ptr<OpenglVisualizer> visualizer_;
     std::string output_dir_;
     std::string pose_dir_;
