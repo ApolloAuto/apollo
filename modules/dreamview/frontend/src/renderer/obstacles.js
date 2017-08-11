@@ -45,20 +45,25 @@ export default class PerceptionObstacles {
                                       obstacle.positionY,
                                       (obstacle.height || DEFAULT_HEIGHT) / 2));
             const color = ObstacleColorMapping[obstacle.type] || DEFAULT_COLOR;
-            const arrowMesh = this.updateArrow(position, obstacle.heading,
-                    color, arrowIdx++, scene);
+            if (STORE.options.showObstaclesArrow && obstacle.type &&
+                    obstacle.type !== 'UNKNOWN_UNMOVABLE' && obstacle.speed > 0.5) {
+                const arrowMesh = this.updateArrow(position, obstacle.heading,
+                        color, arrowIdx++, scene);
+                const scale = 1 + Math.log2(obstacle.speed);
+                arrowMesh.scale.set(scale, scale, scale);
+                arrowMesh.visible = true;
+            }
             const polygon = obstacle.polygonPoint;
             if (polygon.length > 0) {
                 const scale = this.updatePolygon(polygon, obstacle.height, color, coordinates,
                         extrusionFaceIdx, scene);
                 extrusionFaceIdx += polygon.length;
-                arrowMesh.scale.set(scale, scale, scale);
+                // arrowMesh.scale.set(scale, scale, scale);
             } else if (obstacle.length && obstacle.width && obstacle.height) {
                 this.updateCube(obstacle.length, obstacle.width, obstacle.height, position,
                         obstacle.heading, color, cubeIdx++, scene);
-                arrowMesh.scale.set(obstacle.width, obstacle.length, obstacle.height);
+                // arrowMesh.scale.set(obstacle.width, obstacle.length, obstacle.height);
             }
-            arrowMesh.visible = (obstacle.type && obstacle.type !== 'UNKNOWN_UNMOVABLE');
         }
         hideArrayObjects(this.arrows, arrowIdx);
         hideArrayObjects(this.cubes, cubeIdx);

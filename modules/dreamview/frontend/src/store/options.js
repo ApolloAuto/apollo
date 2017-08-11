@@ -22,6 +22,8 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesUnknown;
     @observable showObstaclesVirtual =
         PARAMETERS.options.defaults.showObstaclesVirtual;
+    @observable showObstaclesArrow =
+        PARAMETERS.options.defaults.showObstaclesArrow;
     @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
 
     @action toggleShowMenu() {

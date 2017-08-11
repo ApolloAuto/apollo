@@ -209,6 +209,8 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
   obstacle2->set_length(4.0);
   obstacle2->set_width(5.0);
   obstacle2->set_height(6.0);
+  obstacle2->mutable_velocity()->set_x(3.0);
+  obstacle2->mutable_velocity()->set_y(4.0);
   obstacle2->set_type(apollo::perception::PerceptionObstacle_Type_VEHICLE);
 
   sim_world_service_->UpdateSimulationWorld(obstacles);
@@ -230,6 +232,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
       EXPECT_DOUBLE_EQ(4.0, object.length());
       EXPECT_DOUBLE_EQ(5.0, object.width());
       EXPECT_DOUBLE_EQ(6.0, object.height());
+      EXPECT_DOUBLE_EQ(5.0, object.speed());
       EXPECT_EQ(0, object.polygon_point_size());
       EXPECT_EQ(Object_Type_VEHICLE, object.type());
     } else {
