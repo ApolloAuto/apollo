@@ -118,7 +118,7 @@ bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
   Vec2d p_s_second;
 
   if (!GetOverlap(segment, &p_s_first, &p_s_second)) {
-    AERROR << "curr_time[" << curr_time
+    ADEBUG << "curr_time[" << curr_time
            << "] is out of the coverage scope of the boundary.";
     return false;
   }
@@ -147,7 +147,7 @@ bool StGraphBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
   Vec2d p_s_first;
   Vec2d p_s_second;
   if (!GetOverlap(segment, &p_s_first, &p_s_second)) {
-    AERROR << "curr_time[" << curr_time
+    ADEBUG << "curr_time[" << curr_time
            << "] is out of the coverage scope of the boundary.";
     return false;
   }

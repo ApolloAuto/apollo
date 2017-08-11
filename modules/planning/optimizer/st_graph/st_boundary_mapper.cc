@@ -234,8 +234,10 @@ Status StBoundaryMapper::MapObstacleWithoutDecision(
   }
   const auto& trajectory = obstacle->Trajectory();
   if (trajectory.trajectory_point_size() == 0) {
-    AWARN << "Obstacle (id = " << obstacle->Id()
-          << ") has NO prediction trajectory.";
+    std::string msg = common::util::StrCat("Obstacle (id = ", obstacle->Id(),
+                                           ") has NO prediction trajectory.");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   for (int j = 0; j < trajectory.trajectory_point_size(); ++j) {
@@ -275,29 +277,29 @@ Status StBoundaryMapper::MapObstacleWithoutDecision(
           adc_path_points[high].s() + st_boundary_config_.point_extension(),
           trajectory_point_time);
     }
-    if (lower_points.size() > 0) {
-      boundary_points.clear();
-      const double buffer = st_boundary_config_.follow_buffer();
-      boundary_points.emplace_back(lower_points.at(0).s() - buffer,
-                                   lower_points.at(0).t());
-      boundary_points.emplace_back(lower_points.back().s() - buffer,
-                                   lower_points.back().t());
-      boundary_points.emplace_back(upper_points.back().s() + buffer +
-                                       st_boundary_config_.boundary_buffer(),
-                                   upper_points.back().t());
-      boundary_points.emplace_back(upper_points.at(0).s() + buffer,
-                                   upper_points.at(0).t());
-      if (lower_points.at(0).t() > lower_points.back().t() ||
-          upper_points.at(0).t() > upper_points.back().t()) {
-        AWARN << "lower/upper points are reversed.";
-      }
+  }
+  if (lower_points.size() > 0 && upper_points.size() > 0) {
+    boundary_points.clear();
+    const double buffer = st_boundary_config_.follow_buffer();
+    boundary_points.emplace_back(lower_points.at(0).s() - buffer,
+                                 lower_points.at(0).t());
+    boundary_points.emplace_back(lower_points.back().s() - buffer,
+                                 lower_points.back().t());
+    boundary_points.emplace_back(upper_points.back().s() + buffer +
+                                     st_boundary_config_.boundary_buffer(),
+                                 upper_points.back().t());
+    boundary_points.emplace_back(upper_points.at(0).s() + buffer,
+                                 upper_points.at(0).t());
+    if (lower_points.at(0).t() > lower_points.back().t() ||
+        upper_points.at(0).t() > upper_points.back().t()) {
+      AWARN << "lower/upper points are reversed.";
+    }
 
-      const double area = GetArea(boundary_points);
-      if (Double::Compare(area, 0.0) > 0) {
-        boundary->emplace_back(&path_obstacle, boundary_points);
-        boundary->back().set_id(obstacle->Id());
-        skip = false;
-      }
+    const double area = GetArea(boundary_points);
+    if (Double::Compare(area, 0.0) > 0) {
+      boundary->emplace_back(&path_obstacle, boundary_points);
+      boundary->back().set_id(obstacle->Id());
+      skip = false;
     }
   }
   return skip ? Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP")
