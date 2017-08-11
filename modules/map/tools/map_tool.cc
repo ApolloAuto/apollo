@@ -63,15 +63,10 @@ void ShiftMap(Map* map_pb) {
 }
 
 void OutputMap(const Map& map_pb) {
-  std::ofstream map_txt_file(FLAGS_output_dir + "/base_map.txt");
-  map_txt_file << map_pb.DebugString();
-  map_txt_file.close();
-
-  std::ofstream map_bin_file(FLAGS_output_dir + "/base_map.bin");
-  std::string map_str;
-  map_pb.SerializeToString(&map_str);
-  map_bin_file << map_str;
-  map_bin_file.close();
+  const std::string txt_file = FLAGS_output_dir + "/base_map.txt";
+  const std::string bin_file = FLAGS_output_dir + "/base_map.bin";
+  CHECK(apollo::common::util::SetProtoToASCIIFile(map_pb, txt_file));
+  CHECK(apollo::common::util::SetProtoToBinaryFile(map_pb, bin_file));
 }
 
 int main(int32_t argc, char** argv) {
@@ -82,9 +77,7 @@ int main(int32_t argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   Map map_pb;
-
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_map_file_path,
-                                                &map_pb)) {
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_map_file_path, &map_pb)) {
     AERROR << "Fail to open:" << FLAGS_map_file_path;
     return 1;
   }
