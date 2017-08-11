@@ -59,8 +59,8 @@ body {
     left: 40px;
 
     @include small-screen {
-        top: 120px;
-        left: 40px;
+        top: 100px;
+        left: 10px;
     }
 
     .button {
@@ -74,6 +74,12 @@ body {
         text-align: left;
         color: #FFFFFF;
         background-color: #000000;
+
+        @include small-screen {
+            padding-top: 5px;
+            height: 10px;
+            width: 200px;
+        }
     }
 
     .button:focus {
@@ -110,6 +116,11 @@ body {
         overflow: auto;
         overflow-x: hidden;
 
+        @include small-screen {
+            height: 130px;
+            width: 200px;
+        }
+
         .monitor-item {
             @include monitor-item-common-properties();
         }
@@ -126,20 +137,39 @@ body {
         text-align: left;
         z-index: 10 !important;
 
+        @include small-screen {
+            height: 180px;
+            width: 200px;
+        }
+
         details {
             summary {
                 line-height: 50px;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+                @include small-screen {
+                    line-height: 25px;
+                }
             
                 img {
                     position: relative;
                     transform: translate(70%, 30%);
                     width: 30px;
                     height: 30px;
+
+                    @include small-screen {
+                        transform: translate(120%, 20%);
+                        width: 15px;
+                        height: 15px;
+                    }
                 }
                     
                 span {
                     padding-left: 35px;
+
+                    @include small-screen {
+                        padding-left: 20px;
+                    }
                 }
             }
             
@@ -147,6 +177,10 @@ body {
                 float: right;
                 padding-top: 22px;
                 padding-right: 10px;
+
+                @include small-screen {
+                    padding-top: 8px;
+                }
             }
         }
 
