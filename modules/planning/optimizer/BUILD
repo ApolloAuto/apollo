@@ -50,8 +50,12 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:planning_data",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:speed_limit",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
+        "//modules/planning/optimizer/st_graph:st_graph_boundary",
+        "//modules/planning/optimizer/st_graph:st_graph_point",
         "@eigen//:eigen",
     ],
 )

@@ -26,9 +26,13 @@
 #include "modules/planning/optimizer/optimizer.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/optimizer/st_graph/st_graph_boundary.h"
 
 namespace apollo {
 namespace planning {
+
+class SpeedLimit;
+class SpeedData;
 
 class SpeedOptimizer : public Optimizer {
  public:
@@ -41,6 +45,10 @@ class SpeedOptimizer : public Optimizer {
       const PathData& path_data, const common::TrajectoryPoint& init_point,
       const ReferenceLine& reference_line, PathDecision* const path_decision,
       SpeedData* const speed_data) = 0;
+
+  void RecordSTGraphDebug(const std::vector<StGraphBoundary>& boundaries,
+    const SpeedLimit& speed_limits, const SpeedData& speed_data);
+
 };
 
 }  // namespace planning
