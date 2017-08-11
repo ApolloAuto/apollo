@@ -19,6 +19,8 @@
  **/
 
 #include "modules/planning/optimizer/speed_optimizer.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/speed_limit.h"
 
 #include <string>
 
@@ -34,6 +36,39 @@ apollo::common::Status SpeedOptimizer::Optimize(Frame* frame) {
                  frame->reference_line(), frame->path_decision(),
                  planning_data->mutable_speed_data());
 }
+
+void SpeedOptimizer::RecordSTGraphDebug(
+    const std::vector<StGraphBoundary>& boundaries,
+    const SpeedLimit& speed_limits, const SpeedData& speed_data) {
+  if (!FLAGS_enable_record_debug) {
+    ADEBUG << "Skip record debug info";
+    return;
+  }
+
+  auto debug = frame_->MutableADCTrajectory()->mutable_debug();
+  auto st_graph_debug = debug->mutable_planning_data()->add_st_graph();
+  st_graph_debug->set_name(name());
+  for (const auto& boundary : boundaries) {
+    auto boundary_debug = st_graph_debug->add_boundary();
+    boundary_debug->set_name(boundary.id());
+    for (const auto& point : boundary.points()) {
+      auto point_debug = boundary_debug->add_point();
+      point_debug->set_t(point.x());
+      point_debug->set_s(point.y());
+    }
+  }
+
+  for (const auto& point : speed_limits.speed_limit_points()) {
+    common::SpeedPoint speed_point;
+    speed_point.set_s(point.first);
+    speed_point.set_v(point.second);
+    st_graph_debug->add_speed_limit()->CopyFrom(speed_point);
+  }
+
+  st_graph_debug->mutable_speed_profile()->CopyFrom(
+      {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
+}
+
 
 }  // namespace planning
 }  // namespace apollo
