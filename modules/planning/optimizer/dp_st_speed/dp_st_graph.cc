@@ -66,13 +66,13 @@ Status DpStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!retrieve_speed_profile(speed_data).ok()) {
+  if (!RetrieveSpeedProfile(speed_data).ok()) {
     const std::string msg = "Retrieve best speed profile failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!get_object_decision(st_graph_data, *speed_data, path_decision).ok()) {
+  if (!GetObjectDecision(st_graph_data, *speed_data, path_decision).ok()) {
     const std::string msg = "Get object decision by speed profile failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -233,7 +233,7 @@ bool DpStGraph::CalculateFeasibleAccelRange(const double r_pre,
   return true;
 }
 
-Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
+Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
   double min_cost = std::numeric_limits<double>::infinity();
   uint32_t n = cost_table_.back().size();
   uint32_t m = cost_table_.size();
@@ -285,9 +285,9 @@ Status DpStGraph::retrieve_speed_profile(SpeedData* const speed_data) const {
   return Status::OK();
 }
 
-Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
-                                      const SpeedData& speed_profile,
-                                      PathDecision* const path_decision) const {
+Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
+                                    const SpeedData& speed_profile,
+                                    PathDecision* const path_decision) const {
   if (speed_profile.speed_vector().size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
@@ -323,12 +323,8 @@ Status DpStGraph::get_object_decision(const StGraphData& st_graph_data,
     boundary_it->GetBoundaryTimeScope(&start_t, &end_t);
 
     bool go_down = true;
-    double min_t = speed_points.front().t();
-    double max_t = speed_points.front().t();
     for (std::vector<SpeedPoint>::const_iterator st_it = speed_points.begin();
          st_it != speed_points.end(); ++st_it) {
-      min_t = std::min(min_t, st_it->t());
-      max_t = std::max(max_t, st_it->t());
       if (st_it->t() < start_t) {
         continue;
       }

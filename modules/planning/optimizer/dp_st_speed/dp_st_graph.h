@@ -51,10 +51,10 @@ class DpStGraph {
 
   void CalculatePointwiseCost(const std::vector<StGraphBoundary>& boundaries);
 
-  apollo::common::Status retrieve_speed_profile(
+  apollo::common::Status RetrieveSpeedProfile(
       SpeedData* const speed_data) const;
 
-  apollo::common::Status get_object_decision(
+  apollo::common::Status GetObjectDecision(
       const StGraphData& st_graph_data, const SpeedData& speed_profile,
       PathDecision* const path_decision) const;
 
