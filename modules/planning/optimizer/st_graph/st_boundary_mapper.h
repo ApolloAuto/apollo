@@ -57,6 +57,11 @@ class StBoundaryMapper {
 
   double GetArea(const std::vector<STPoint>& boundary_points) const;
 
+  bool GetOverlapBoundaryPoints(
+      const std::vector<apollo::common::PathPoint>& path_points,
+      const Obstacle& obstacle, std::vector<STPoint>* upper_points,
+      std::vector<STPoint>* lower_points) const;
+
   apollo::common::Status MapObstacleWithoutDecision(
       const PathObstacle& path_obstacle,
       std::vector<StGraphBoundary>* const boundary) const;

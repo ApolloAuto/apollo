@@ -69,6 +69,7 @@ class Obstacle {
   const common::math::Box2d &PerceptionBoundingBox() const;
 
   const prediction::Trajectory &Trajectory() const;
+  bool has_trajectory() const { return has_trajectory_; }
 
   const perception::PerceptionObstacle &Perception() const;
 
