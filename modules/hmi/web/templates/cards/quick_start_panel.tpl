@@ -138,7 +138,7 @@
       <div class="col-xs-4 quick_start_col3">
         <button type="button" class="btn hmi_large_btn"
             onclick="io_request('ros_bridge_api', 'new_routing_request')"
-            >Routing</button>
+            >RoutingReq</button>
         <span class="glyphicon"></span>
       </div>
     </div>
