@@ -504,7 +504,7 @@ void ObjectTrackSet::clear() {
 }
 
 int ObjectTrackSet::remove_lost_tracks() {
-  int track_num = 0;
+  size_t track_num = 0;
   for (size_t i = 0; i < tracks_.size(); i++) {
     if (tracks_[i]->age_ < age_threshold_ &&
       tracks_[i]->consecutive_invisible_count_ > 1) {

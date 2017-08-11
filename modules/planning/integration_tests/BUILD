@@ -27,19 +27,20 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "garage_test",
-#    size = "small",
-#    srcs = [
-#        "garage_test.cc",
-#    ],
-#    data = [
-#        "//modules/planning:planning_testdata",
-#    ],
-#    deps = [
-#        ":planning_test_base",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "garage_test",
+    size = "small",
+    srcs = [
+        "garage_test.cc",
+    ],
+    data = [
+        "//modules/common/configs:config_gflags",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":planning_test_base",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
