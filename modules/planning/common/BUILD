@@ -194,19 +194,6 @@ cc_library(
 )
 
 cc_library(
-    name = "planning_state",
-    srcs = [
-        "planning_state.cc",
-    ],
-    hdrs = [
-        "planning_state.h",
-    ],
-    deps = [
-        "//modules/common:macro",
-    ],
-)
-
-cc_library(
     name = "speed_limit",
     srcs = [
         "speed_limit.cc",
