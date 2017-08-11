@@ -56,7 +56,7 @@ class EMPlanner : public Planner {
    */
   virtual ~EMPlanner() = default;
 
-  apollo::common::Status Init(const PlanningConfig& config) override;
+  common::Status Init(const PlanningConfig& config) override;
 
   /**
    * @brief Overrode function Plan in parent class Planner.
@@ -64,9 +64,9 @@ class EMPlanner : public Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(
+  common::Status Plan(
       const common::TrajectoryPoint& planning_init_point,
-      Frame* frame, PublishableTrajectory* trajectory_pb) override;
+      Frame* frame, DiscretizedTrajectory* ptr_trajectory) override;
 
  private:
   void RegisterOptimizers();

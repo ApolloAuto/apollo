@@ -37,11 +37,11 @@ PathData* PlanningData::mutable_path_data() { return &path_data_; }
 
 SpeedData* PlanningData::mutable_speed_data() { return &speed_data_; }
 
-bool PlanningData::aggregate(const double time_resolution,
+bool PlanningData::CombinePathAndSpeedProfile(const double time_resolution,
                              const double relative_time,
-                             PublishableTrajectory* trajectory) {
+                             DiscretizedTrajectory* ptr_discretized_trajectory) {
   CHECK(time_resolution > 0.0);
-  CHECK(trajectory != nullptr);
+  CHECK(ptr_discretized_trajectory != nullptr);
 
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
        cur_rel_time += time_resolution) {
@@ -66,7 +66,7 @@ bool PlanningData::aggregate(const double time_resolution,
     trajectory_point.set_v(speed_point.v());
     trajectory_point.set_a(speed_point.a());
     trajectory_point.set_relative_time(speed_point.t() + relative_time);
-    trajectory->AppendTrajectoryPoint(trajectory_point);
+    ptr_discretized_trajectory->AppendTrajectoryPoint(trajectory_point);
   }
   return true;
 }

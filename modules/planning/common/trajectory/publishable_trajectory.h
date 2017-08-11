@@ -29,6 +29,11 @@ namespace planning {
 
 class PublishableTrajectory : public DiscretizedTrajectory {
  public:
+  PublishableTrajectory() = default;
+
+  PublishableTrajectory(const double header_time,
+      const std::vector<common::TrajectoryPoint> trajectory_points);
+
   virtual ~PublishableTrajectory() = default;
 
   common::TrajectoryPoint EvaluateAbsoluteTime(
@@ -46,7 +51,7 @@ class PublishableTrajectory : public DiscretizedTrajectory {
   void PopulateTrajectoryProtobuf(ADCTrajectory* trajectory_pb) const;
 
  private:
-  double header_time_;
+  double header_time_ = 0.0;
 };
 
 }  // namespace planning

@@ -23,7 +23,14 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::TrajectoryPoint;
+using common::TrajectoryPoint;
+
+PublishableTrajectory::PublishableTrajectory(
+    const double header_time,
+    const std::vector<common::TrajectoryPoint> trajectory_points) {
+  header_time_ = header_time;
+  trajectory_points_ = std::move(trajectory_points);
+}
 
 TrajectoryPoint PublishableTrajectory::EvaluateAbsoluteTime(
     const double abs_time) const {
