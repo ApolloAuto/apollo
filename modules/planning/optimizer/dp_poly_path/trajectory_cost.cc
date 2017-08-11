@@ -43,7 +43,7 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
       vehicle_param_(vehicle_param),
       heuristic_speed_data_(heuristic_speed_data) {
   const double total_time =
-      std::min(heuristic_speed_data_.total_time(), FLAGS_prediction_total_time);
+      std::min(heuristic_speed_data_.TotalTime(), FLAGS_prediction_total_time);
 
   num_of_time_stamps_ = static_cast<uint32_t>(
       std::floor(total_time / config.eval_time_interval()));

@@ -32,30 +32,27 @@ class SpeedData {
  public:
   SpeedData() = default;
 
-  explicit SpeedData(const std::vector<common::SpeedPoint>& speed_points);
+  explicit SpeedData(std::vector<common::SpeedPoint> speed_points);
+
+  virtual ~SpeedData() = default;
 
   const std::vector<common::SpeedPoint>& speed_vector() const;
 
-  void set_speed_vector(const std::vector<common::SpeedPoint>& speed_points);
+  void set_speed_vector(std::vector<common::SpeedPoint> speed_points);
 
-  virtual std::string DebugString() const;
+  void AppendSpeedPoint(const double s, const double time, const double v,
+                        const double a, const double da);
 
-  void add_speed_point(const double s, const double time, const double v,
-                       const double a, const double da);
+  bool EvaluateByTime(const double time,
+                      common::SpeedPoint* const speed_point) const;
 
-  bool get_speed_point_with_time(const double time,
-                                 common::SpeedPoint* const speed_point) const;
-
-  double total_time() const;
+  double TotalTime() const;
 
   void Clear();
 
- private:
-  common::SpeedPoint interpolate(const common::SpeedPoint& left,
-                                 const common::SpeedPoint& right,
-                                 const double weight) const;
-  std::uint32_t find_index(const double s) const;
+  virtual std::string DebugString() const;
 
+ private:
   std::vector<common::SpeedPoint> speed_vector_;
 };
 

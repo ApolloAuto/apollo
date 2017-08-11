@@ -116,7 +116,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
     double v = spline.Derivative(time);
     double a = spline.SecondOrderDerivative(time);
     double da = spline.ThirdOrderDerivative(time);
-    speed_data->add_speed_point(s, time, v, a, da);
+    speed_data->AppendSpeedPoint(s, time, v, a, da);
     time += t_output_resolution;
   }
 

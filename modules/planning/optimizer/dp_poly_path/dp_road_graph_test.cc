@@ -56,12 +56,12 @@ class DpRoadGraphTest : public PlanningTestBase {
     const double delta_s = 1.0;
     if (velocity > 0.0) {
       for (double s = 0.0; s < 100.0; s += delta_s) {
-        speed_data_.add_speed_point(s, t, velocity, 0.0, 0.0);
+        speed_data_.AppendSpeedPoint(s, t, velocity, 0.0, 0.0);
         t += delta_s / velocity;
       }
     } else {  // when velocity = 0, stand still
       for (double t = 0.0; t < 10.0; t += 0.1) {
-        speed_data_.add_speed_point(0.0, t, 0.0, 0.0, 0.0);
+        speed_data_.AppendSpeedPoint(0.0, t, 0.0, 0.0, 0.0);
       }
     }
   }

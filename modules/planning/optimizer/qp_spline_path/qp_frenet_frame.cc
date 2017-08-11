@@ -149,14 +149,14 @@ bool QpFrenetFrame::GetDynamicObstacleBound(
 
 bool QpFrenetFrame::FindLongitudinalDistance(const double time,
                                              SpeedPoint* const speed_point) {
-  return speed_data_.get_speed_point_with_time(time, speed_point);
+  return speed_data_.EvaluateByTime(time, speed_point);
 }
 
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
-  for (double relative_time = 0.0; relative_time < speed_data_.total_time();
+  for (double relative_time = 0.0; relative_time < speed_data_.TotalTime();
        relative_time += time_resolution_) {
     SpeedPoint veh_point;
-    if (!speed_data_.get_speed_point_with_time(relative_time, &veh_point)) {
+    if (!speed_data_.EvaluateByTime(relative_time, &veh_point)) {
       AERROR << "Fail to get speed point at relative time " << relative_time;
       return false;
     }

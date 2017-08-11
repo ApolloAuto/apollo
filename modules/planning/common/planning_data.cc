@@ -43,10 +43,10 @@ bool PlanningData::aggregate(const double time_resolution,
   CHECK(time_resolution > 0.0);
   CHECK(trajectory != nullptr);
 
-  for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.total_time();
+  for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
        cur_rel_time += time_resolution) {
     common::SpeedPoint speed_point;
-    if (!speed_data_.get_speed_point_with_time(cur_rel_time, &speed_point)) {
+    if (!speed_data_.EvaluateByTime(cur_rel_time, &speed_point)) {
       AERROR << "Fail to get speed point with relative time " << cur_rel_time;
       return false;
     }
