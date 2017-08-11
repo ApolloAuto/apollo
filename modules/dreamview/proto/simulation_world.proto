@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.dreamview;
 
 import "modules/common/monitor/proto/monitor.proto";
-import "modules/decision/proto/decision.proto";
+import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning.proto";
 
 // Next-id: 4
@@ -103,7 +103,7 @@ message Object {
   // Decision Info
   repeated Decision decision = 20;
   // ADC decision results
-  optional .apollo.decision.DecisionResult adc_decision_result = 29;
+  optional .apollo.planning.DecisionResult adc_decision_result = 29;
   // ADC planning trajectory
   optional .apollo.planning.ADCTrajectory adc_trajectory = 31;
 

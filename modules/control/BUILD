@@ -28,7 +28,6 @@ cc_library(
         "//modules/control/common",
         "//modules/control/controller",
         "//modules/control/proto:control_proto",
-        "//modules/decision/proto:decision_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
