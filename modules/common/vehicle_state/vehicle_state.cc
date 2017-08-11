@@ -19,8 +19,8 @@
 #include "Eigen/Core"
 
 #include "modules/common/log.h"
-#include "modules/common/math/quaternion.h"
 #include "modules/common/math/euler_angles_zxy.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -78,15 +78,22 @@ void VehicleState::ConstructExceptLinearVelocity(
   }
 
   if (!(linear_v_ > 0.0)) {
-      kappa_ = 0.0;
+    kappa_ = 0.0;
   } else {
-      kappa_ = angular_v_ / linear_v_;
+    kappa_ = angular_v_ / linear_v_;
   }
 
-  ::apollo::common::math::EulerAnglesZXYd euler_angle(orientation.qw(), \
-          orientation.qx(), orientation.qy(), orientation.qz());
-
-  pitch_ = euler_angle.pitch();
+  if (localization.pose().has_euler_angles()) {
+    roll_ = localization.pose().euler_angles().x();
+    pitch_ = localization.pose().euler_angles().y();
+    yaw_ = localization.pose().euler_angles().z();
+  } else {
+    ::apollo::common::math::EulerAnglesZXYd euler_angle(
+        orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
+    roll_ = euler_angle.roll();
+    pitch_ = euler_angle.pitch();
+    yaw_ = euler_angle.yaw();
+  }
 }
 
 double VehicleState::x() const { return x_; }
@@ -95,7 +102,11 @@ double VehicleState::y() const { return y_; }
 
 double VehicleState::z() const { return z_; }
 
+double VehicleState::roll() const { return roll_; }
+
 double VehicleState::pitch() const { return pitch_; }
+
+double VehicleState::yaw() const { return yaw_; }
 
 double VehicleState::heading() const { return heading_; }
 
@@ -115,7 +126,12 @@ void VehicleState::set_y(const double y) { y_ = y; }
 
 void VehicleState::set_z(const double z) { z_ = z; }
 
+void VehicleState::set_roll(const double roll) { roll_ = roll; }
+
 void VehicleState::set_pitch(const double pitch) { pitch_ = pitch; }
+
+// As of now, use heading instead of yaw angle
+void VehicleState::set_yaw(const double yaw) { yaw_ = yaw; }
 
 void VehicleState::set_heading(const double heading) { heading_ = heading; }
 
