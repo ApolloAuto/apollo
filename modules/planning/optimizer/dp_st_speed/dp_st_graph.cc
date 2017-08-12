@@ -303,21 +303,6 @@ Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
        boundary_it != obs_boundaries.end(); ++boundary_it) {
     CHECK_EQ(boundary_it->points().size(), 4);
 
-    if (boundary_it->points().front().x() <= 0) {
-      ObjectDecisionType yield_decision;
-      if (!CreateYieldDecision(*boundary_it, &yield_decision)) {
-        AERROR << "Failed to create yield decision for boundary with id "
-               << boundary_it->id();
-        return Status(ErrorCode::PLANNING_ERROR,
-                      "faind to create yield decision");
-      }
-      if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
-                                      yield_decision)) {
-        AERROR << "Failed to add decision to object " << boundary_it->id();
-        return Status(ErrorCode::PLANNING_ERROR, "failed to find object");
-      }
-      continue;
-    }
     double start_t = 0.0;
     double end_t = 0.0;
     boundary_it->GetBoundaryTimeScope(&start_t, &end_t);
