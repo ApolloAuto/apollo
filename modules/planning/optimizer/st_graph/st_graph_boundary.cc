@@ -79,9 +79,9 @@ bool StGraphBoundary::IsPointInBoundary(const STPoint& st_point) const {
   return IsPointIn(st_point);
 }
 
-Vec2d StGraphBoundary::point(const uint32_t index) const {
+STPoint StGraphBoundary::point(const uint32_t index) const {
   CHECK_LT(index, points_.size()) << "Index[" << index << "] is out of range.";
-  return points_[index];
+  return STPoint(points_[index].y(), points_[index].x());
 }
 
 const std::vector<Vec2d>& StGraphBoundary::points() const { return points_; }
