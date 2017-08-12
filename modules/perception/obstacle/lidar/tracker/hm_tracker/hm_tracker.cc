@@ -533,7 +533,7 @@ void HmObjectTracker::CollectTrackedResults(
         obj->theta = -M_PI / 2;
       }
     } else {
-      obj->theta = atan(obj->direction[1] / obj->direction[0]);
+      obj->theta = atan2(obj->direction[1], obj->direction[0]);
     }
 
     obj->length = result_obj->size[0];
@@ -572,7 +572,7 @@ void HmObjectTracker::CollectTrackedResults(
         obj->theta = -M_PI / 2;
       }
     } else {
-      obj->theta = atan(obj->direction[1] / obj->direction[0]);
+      obj->theta = atan2(obj->direction[1], obj->direction[0]);
     }
 
     obj->tracking_time = 0;
