@@ -387,6 +387,14 @@ Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
       }
     }
   }
+  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
+    if (path_obstacle->Decisions().empty()) {
+      ObjectDecisionType ignore_decision;
+      ignore_decision.mutable_ignore();
+      path_decision->AddDecision("dp_st_graph", path_obstacle->Id(),
+                                 ignore_decision);
+    }
+  }
   return Status::OK();
 }
 
