@@ -112,7 +112,7 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
-  // @return measured velocity
+  // @return measured anchor point elocity
   Eigen::VectorXf ComputeMeasuredAnchorPointVelocity(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
@@ -122,7 +122,7 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
-  // @return measured velocity
+  // @return measured bbox center velocity
   Eigen::VectorXf ComputeMeasuredBboxCenterVelocity(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
@@ -132,7 +132,7 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
-  // @return measured velocity
+  // @return measured bbox corner velocity
   Eigen::VectorXf ComputeMeasuredBboxCornerVelocity(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
