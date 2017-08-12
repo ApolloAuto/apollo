@@ -199,6 +199,11 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
   measured_bbox_center_velocity_with_old_dir(2) = 0.0;
   Eigen::Vector3f measured_bbox_center_velocity =
     measured_bbox_center_velocity_with_old_dir;
+  Eigen::Vector3f project_dir = new_object->anchor_point -
+      old_object->anchor_point;
+  if (measured_bbox_center_velocity.dot(project_dir) <= 0) {
+    measured_bbox_center_velocity = Eigen::Vector3f::Zero();
+  }
   return measured_bbox_center_velocity;
 }
 
