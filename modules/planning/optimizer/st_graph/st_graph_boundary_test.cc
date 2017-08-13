@@ -51,6 +51,36 @@ TEST(StGraphBoundaryTest, basic_test) {
   EXPECT_FLOAT_EQ(10.0, boundary.max_t());
 }
 
+TEST(StGraphBoundaryTest, boundary_range) {
+  std::vector<STPoint> st_points;
+  st_points.emplace_back(1.0, 0.0);
+  st_points.emplace_back(1.0, 10.0);
+  st_points.emplace_back(5.0, 10.0);
+  st_points.emplace_back(5.0, 0.0);
+  PathObstacle path_obstacle;
+  StGraphBoundary boundary(&path_obstacle, st_points);
+  boundary.SetBoundaryType(StGraphBoundary::BoundaryType::YIELD);
+  double t = -10.0;
+  const double dt = 0.01;
+  while (t < 10.0) {
+    double low = 0.0;
+    double high = 0.0;
+    if (t < -1e-6) {
+      EXPECT_FALSE(boundary.GetUnblockSRange(t, &high, &low));
+      EXPECT_FALSE(boundary.GetBoundarySRange(t, &high, &low));
+    } else {
+      EXPECT_TRUE(boundary.GetUnblockSRange(t, &high, &low));
+      EXPECT_DOUBLE_EQ(low, 0.0);
+      EXPECT_DOUBLE_EQ(high, 1.0);
+
+      EXPECT_TRUE(boundary.GetBoundarySRange(t, &high, &low));
+      EXPECT_DOUBLE_EQ(low, 1.0);
+      EXPECT_DOUBLE_EQ(high, 5.0);
+    }
+    t += dt;
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo
 
