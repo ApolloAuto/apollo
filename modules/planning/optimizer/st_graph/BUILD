@@ -80,6 +80,21 @@ cc_library(
 )
 
 cc_test(
+    name = "st_boundary_mapper_test",
+    size = "small",
+    srcs = [
+        "st_boundary_mapper_test.cc",
+    ],
+    deps = [
+        ":st_boundary_mapper",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "st_graph_boundary_test",
     size = "small",
     srcs = [
