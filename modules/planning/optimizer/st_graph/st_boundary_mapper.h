@@ -51,6 +51,7 @@ class StBoundaryMapper {
       SpeedLimit* const speed_limit_data) const;
 
  private:
+  FRIEND_TEST(StBoundaryMapperTest, check_overlap_test);
   bool CheckOverlap(const apollo::common::PathPoint& path_point,
                     const apollo::common::math::Box2d& obs_box,
                     const double buffer) const;
