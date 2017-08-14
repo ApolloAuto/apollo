@@ -111,7 +111,7 @@ class DpStGraph {
       const StGraphBoundary& boundary,
       ObjectDecisionType* const overtake_decision) const;
 
-  bool GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
+  void GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
                    uint32_t* highest_row, uint32_t* lowest_row);
 
  private:
