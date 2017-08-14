@@ -21,15 +21,15 @@
 #ifndef MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
 #define MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
 
-#include <cstring>
-#include <typeinfo>
-#include <utility>
+#include <array>
 
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
 
+//Hermite spline implementation that works for 1d and 2d space interpolation.
+//Valid input type T: double, Eigen::Vector2d
 template <typename T, std::uint32_t N>
 class HermiteSpline {
  public:
@@ -170,12 +170,31 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         return dddh0 * p0 + dddh1 * v0 + dddh2 * a0 + dddh3 * p1 + dddh4 * v1 +
                dddh5 * a1;
       }
+      case 4: {
+        double t = (z - z0_) / delta_z_;
+        double d4h0 = 360.0 - 720.0 * t;
+        double d4h1 = 192.0 - 360.0 * t;
+        double d4h2 = 36.0 - 60.0 * t;
+        double d4h3 = -360.0 + 720.0 * t;
+        double d4h4 = 168.0 - 360.0 * t;
+        double d4h5 = -24.0 + 60.0 * t;
+
+        return d4h0 * p0 + d4h1 * v0 + d4h2 * a0 + d4h3 * p1 + d4h4 * v1 +
+               d4h5 * a1;
+      }
+      case 5: {
+        double d5h0 = -720.0;
+        double d5h1 = -360.0;
+        double d5h2 = -60.0;
+        double d5h3 = 720.0;
+        double d5h4 = -360.0;
+        double d5h5 = -60.0;
+
+        return d5h0 * p0 + d5h1 * v0 + d5h2 * a0 + d5h3 * p1 + d5h4 * v1 +
+               d5h5 * a1;
+      }
       default: { break; }
     }
-  }
-  // Check the type is "double" or "float"
-  if (std::strcmp(typeid(x0_).name(), "d") == 0 || std::strcmp(typeid(x0_).name(), "f") == 0) {
-    return T(0.0);
   }
   return T();
 }
