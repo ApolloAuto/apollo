@@ -84,8 +84,6 @@ STPoint StGraphBoundary::point(const uint32_t index) const {
   return STPoint(points_[index].y(), points_[index].x());
 }
 
-const std::vector<Vec2d>& StGraphBoundary::points() const { return points_; }
-
 StGraphBoundary::BoundaryType StGraphBoundary::boundary_type() const {
   return boundary_type_;
 }
