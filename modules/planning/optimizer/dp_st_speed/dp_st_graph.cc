@@ -428,10 +428,8 @@ bool DpStGraph::CreateFollowDecision(
   const double follow_distance_s = -1.0 * boundary.characteristic_length();
   follow->set_distance_s(follow_distance_s);
 
-  // TODO(all) recommend to use st_boundary.min_s()
   const double reference_line_fence_s =
-      boundary.path_obstacle()->perception_sl_boundary().start_s() +
-      follow_distance_s;
+      boundary.min_s() + follow_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "
@@ -456,10 +454,7 @@ bool DpStGraph::CreateYieldDecision(
   const double yield_distance_s = -1.0 * boundary.characteristic_length();
   yield->set_distance_s(yield_distance_s);
 
-  // FIXME (all) change to st_boundary.min_s()
-  const double reference_line_fence_s =
-      boundary.path_obstacle()->perception_sl_boundary().start_s() +
-      yield_distance_s;
+  const double reference_line_fence_s = boundary.min_s() + yield_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "
@@ -484,10 +479,7 @@ bool DpStGraph::CreateOvertakeDecision(
   const double overtake_distance_s = boundary.characteristic_length();
   overtake->set_distance_s(overtake_distance_s);
 
-  // FIXME (all) change to st_boundary.min_s()
-  const double reference_line_fence_s =
-      boundary.path_obstacle()->perception_sl_boundary().end_s() +
-      overtake_distance_s;
+  const double reference_line_fence_s = boundary.max_s() + overtake_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "
