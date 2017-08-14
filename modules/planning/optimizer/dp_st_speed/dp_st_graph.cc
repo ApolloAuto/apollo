@@ -303,9 +303,8 @@ Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
        boundary_it != obs_boundaries.end(); ++boundary_it) {
     CHECK_EQ(boundary_it->points().size(), 4);
 
-    double start_t = 0.0;
-    double end_t = 0.0;
-    boundary_it->GetBoundaryTimeScope(&start_t, &end_t);
+    double start_t = boundary_it->min_t();
+    double end_t = boundary_it->max_t();
 
     bool go_down = true;
     for (std::vector<SpeedPoint>::const_iterator st_it = speed_points.begin();

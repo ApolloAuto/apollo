@@ -76,8 +76,6 @@ class StGraphBoundary : public common::math::Polygon2d {
   bool GetBoundarySRange(const double curr_time, double* s_upper,
                          double* s_lower) const;
 
-  void GetBoundaryTimeScope(double* start_t, double* end_t) const;
-
   const PathObstacle* path_obstacle() const;
 
   double min_s() const;

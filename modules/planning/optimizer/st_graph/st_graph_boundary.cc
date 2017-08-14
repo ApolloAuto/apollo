@@ -154,15 +154,6 @@ bool StGraphBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
   return true;
 }
 
-void StGraphBoundary::GetBoundaryTimeScope(double* start_t,
-                                           double* end_t) const {
-  STPoint left;
-  STPoint right;
-  ExtremePoints(0.0, &left, &right);
-  *start_t = left.t();
-  *end_t = right.t();
-}
-
 double StGraphBoundary::min_s() const { return min_s_; }
 double StGraphBoundary::min_t() const { return min_t_; }
 double StGraphBoundary::max_s() const { return max_s_; }
