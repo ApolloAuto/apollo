@@ -203,4 +203,3 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
 }  // namespace apollo
 
 #endif /* MODULES_PLANNING_MATH_HERMITE_SPLINE_H_ */
-
