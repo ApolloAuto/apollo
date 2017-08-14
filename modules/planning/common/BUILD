@@ -56,6 +56,7 @@ cc_library(
         "//modules/common/math:polygon2d",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/common:planning_util",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
