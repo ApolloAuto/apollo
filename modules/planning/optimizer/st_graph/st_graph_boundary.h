@@ -61,7 +61,6 @@ class StGraphBoundary : public common::math::Polygon2d {
   bool IsPointInBoundary(const STPoint& st_point) const;
 
   STPoint point(const uint32_t index) const;
-  const std::vector<common::math::Vec2d>& points() const;
 
   BoundaryType boundary_type() const;
   const std::string& id() const;
