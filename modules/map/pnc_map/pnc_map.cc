@@ -221,7 +221,7 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
   double min_overlap_distance = std::numeric_limits<double>::infinity();
   double proj_s = 0.0;
   double accumulate_s = 0.0;
-  for (int i = 0; i < routing.route(0).road_info().passage_region(0).segment_size(); ++i ){
+  for (int i = 0; i < routing.route(0).road_info().passage_region(0).segment_size(); ++i){
     const auto& lane_segment = routing.route(0).road_info().passage_region(0).segment(i);
     const double length = lane_segment.end_s() - lane_segment.start_s();
     if (lane_segment.id() == nearest_waypoint.lane->id().id()) {
@@ -256,7 +256,7 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
     return false;
   }
   double length = 0.0;
-  for (int i = 0; i < routing.route(0).road_info().passage_region(0).segment_size(); ++i ){
+  for (int i = 0; i < routing.route(0).road_info().passage_region(0).segment_size(); ++i){
     const auto& lane_segment = routing.route(0).road_info().passage_region(0).segment(i);
     CHECK_LE(lane_segment.start_s(),
              lane_segment.end_s() + common::math::kMathEpsilon);
