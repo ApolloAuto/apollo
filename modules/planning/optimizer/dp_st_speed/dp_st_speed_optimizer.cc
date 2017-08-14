@@ -80,6 +80,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
   // step 2 perform graph search
   SpeedLimit speed_limit;
   if (!boundary_mapper.GetSpeedLimits(&speed_limit).ok()) {

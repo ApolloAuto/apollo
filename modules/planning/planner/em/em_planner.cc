@@ -125,8 +125,7 @@ void EMPlanner::PopulateDecision(Frame* frame) {
 }
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
-                       Frame* frame,
-                       DiscretizedTrajectory* ptr_trajectory) {
+                       Frame* frame, DiscretizedTrajectory* ptr_trajectory) {
   if (!frame) {
     AERROR << "Frame is empty in EMPlanner";
     return Status(ErrorCode::PLANNING_ERROR, "Frame is null");
@@ -157,9 +156,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     }
   }
   if (!planning_data->CombinePathAndSpeedProfile(
-      FLAGS_output_trajectory_time_resolution,
-      planning_start_point.relative_time(),
-      ptr_trajectory)) {
+          FLAGS_output_trajectory_time_resolution,
+          planning_start_point.relative_time(), ptr_trajectory)) {
     std::string msg("Fail to aggregate planning trajectory.");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -172,8 +170,14 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
     reference_line->set_name("planning_reference_line");
     const auto& reference_points = frame->reference_line().reference_points();
-    reference_line->mutable_path_point()->CopyFrom(
-        {reference_points.begin(), reference_points.end()});
+    for (const auto& reference_point : reference_points) {
+      auto* path_point = reference_line->add_path_point();
+      path_point->set_x(reference_point.x());
+      path_point->set_y(reference_point.y());
+      path_point->set_theta(reference_point.heading());
+      path_point->set_kappa(reference_point.kappa());
+      path_point->set_dkappa(reference_point.dkappa());
+    }
   }
   return Status::OK();
 }
@@ -184,44 +188,44 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   const auto* last_frame = FrameHistory::instance()->Latest();
   if (last_frame != nullptr) {
     const auto& last_speed_vector =
-          last_frame->planning_data().speed_data().speed_vector();
+        last_frame->planning_data().speed_data().speed_vector();
 
     if (!last_speed_vector.empty()) {
       const auto& last_init_point =
           last_frame->PlanningStartPoint().path_point();
       Vec2d last_xy_point = {last_init_point.x(), last_init_point.y()};
       SLPoint last_sl_point;
-      if (!last_frame->reference_line().
-            get_point_in_frenet_frame(last_xy_point, &last_sl_point)) {
-          AERROR << "Fail to transfer xy to sl when init speed profile";
+      if (!last_frame->reference_line().get_point_in_frenet_frame(
+              last_xy_point, &last_sl_point)) {
+        AERROR << "Fail to transfer xy to sl when init speed profile";
       }
       Vec2d xy_point = {planning_init_point.path_point().x(),
-                                      planning_init_point.path_point().y()};
+                        planning_init_point.path_point().y()};
       SLPoint sl_point;
-      if (!last_frame->reference_line().
-            get_point_in_frenet_frame(xy_point, &last_sl_point)) {
-          AERROR << "Fail to transfer xy to sl when init speed profile";
+      if (!last_frame->reference_line().get_point_in_frenet_frame(
+              xy_point, &last_sl_point)) {
+        AERROR << "Fail to transfer xy to sl when init speed profile";
       }
       double s_diff = sl_point.s() - last_sl_point.s();
       double start_time = 0.0;
       double start_s = 0.0;
       bool is_updated_start = false;
       for (const auto& speed_point : last_speed_vector) {
-            if (speed_point.s() < s_diff) {
-                continue;
-            }
-            if (!is_updated_start) {
-                start_time = speed_point.t();
-                start_s = speed_point.s();
-                is_updated_start = true;
-            }
-            SpeedPoint refined_speed_point;
-            refined_speed_point.set_s(speed_point.s() - start_s);
-            refined_speed_point.set_t(speed_point.t() - start_time);
-            refined_speed_point.set_v(speed_point.v());
-            refined_speed_point.set_a(speed_point.a());
-            refined_speed_point.set_da(speed_point.da());
-            speed_profile.push_back(refined_speed_point);
+        if (speed_point.s() < s_diff) {
+          continue;
+        }
+        if (!is_updated_start) {
+          start_time = speed_point.t();
+          start_s = speed_point.s();
+          is_updated_start = true;
+        }
+        SpeedPoint refined_speed_point;
+        refined_speed_point.set_s(speed_point.s() - start_s);
+        refined_speed_point.set_t(speed_point.t() - start_time);
+        refined_speed_point.set_v(speed_point.v());
+        refined_speed_point.set_a(speed_point.a());
+        refined_speed_point.set_da(speed_point.da());
+        speed_profile.push_back(refined_speed_point);
       }
     }
   }
@@ -251,7 +255,8 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     // assume the time resolution is 0.1
     std::uint32_t num_time_steps =
         static_cast<std::uint32_t>(FLAGS_trajectory_time_length /
-                                   FLAGS_trajectory_time_resolution) + 1;
+                                   FLAGS_trajectory_time_resolution) +
+        1;
     speed_profile.reserve(num_time_steps);
 
     for (std::uint32_t i = 0; i < num_time_steps; ++i) {
