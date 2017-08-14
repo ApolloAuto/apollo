@@ -48,22 +48,25 @@ genrule(
         '''
         pushd $$workdir;
         cmake $$srcdir/$$(dirname $(location :CMakeLists.txt)) \
-            -DCMAKE_INSTALL_PREFIX=$$srcdir/$(@D) \
-            -DCMAKE_BUILD_TYPE=Release            \
-            -DCPU_ONLY=OFF                        \
-            -DBUILD_python=OFF                    \
-            -DBUILD_python_layer=OFF              \
-            -DUSE_OPENCV=ON                       \
-            -DBUILD_SHARED_LIBS=ON                \
-            -DUSE_LEVELDB=ON                      \
-            -DUSE_LMDB=ON                         \
-            -DGFLAGS_INCLUDE_DIR=$$gflags_incl    \
-            -DGFLAGS_LIBRARY=$$gflags_lib         \
-            -DGLOG_INCLUDE_DIR=$$glog_incl        \
-            -DGLOG_LIBRARY=$$glog_lib             \
-            -DPROTOBUF_INCLUDE_DIR=$$protobuf_incl\
-            -DPROTOBUF_PROTOC_EXECUTABLE=$$protoc \
-            -DPROTOBUF_LIBRARY=$$protolib; ''' +
+            -DCMAKE_INSTALL_PREFIX=$$srcdir/$(@D)   \
+            -DCMAKE_BUILD_TYPE=Release              \
+            -DCPU_ONLY=OFF                          \
+            -DUSE_CUDNN=ON                          \
+            -DBUILD_python=OFF                      \
+            -DBUILD_python_layer=OFF                \
+            -DUSE_OPENCV=ON                         \
+            -DBUILD_SHARED_LIBS=ON                  \
+            -DUSE_LEVELDB=ON                        \
+            -DUSE_LMDB=ON                           \
+            -DGFLAGS_INCLUDE_DIR=$$gflags_incl      \
+            -DGFLAGS_LIBRARY=$$gflags_lib           \
+            -DGLOG_INCLUDE_DIR=$$glog_incl          \
+            -DGLOG_LIBRARY=$$glog_lib               \
+            -DPROTOBUF_INCLUDE_DIR=$$protobuf_incl  \
+            -DPROTOBUF_PROTOC_EXECUTABLE=$$protoc   \
+            -DPROTOBUF_LIBRARY=$$protolib           \
+            -DCUDNN_INCLUDE:path=/usr/local/cuda-8.0/include \
+            -DCUDNN_LIBRARY:path=/usr/local/cuda-8.0/lib64/libcudnn.so.7 ; ''' +
 
         '''
         cmake --build . --target caffe -- -j 8
@@ -76,6 +79,13 @@ genrule(
         # rm -rf $$workdir;
         '''
 )
+
+#cc_library(
+#    name = "cudnn",
+#    hdrs = ["/usr/local/cuda-8.0/include/cudnn.h"],
+#    srcs = ["/usr/local/cuda-8.0/lib64/libcudnn.so"],
+#    data = ["/usr/local/cuda-8.0/lib64/libcudnn.so"],
+#)
 
 cc_library(
     name = "lib",
