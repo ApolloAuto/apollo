@@ -40,7 +40,9 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const DpStSpeedConfig& dp_config, const PathData& path_data);
+  DpStGraph(const DpStSpeedConfig& dp_config,
+            const common::VehicleParam& vehicle_param,
+            const PathData& path_data);
 
   apollo::common::Status Search(const StGraphData& st_graph_data,
                                 PathDecision* const path_decision,
@@ -109,9 +111,15 @@ class DpStGraph {
       const StGraphBoundary& boundary,
       ObjectDecisionType* const overtake_decision) const;
 
+  bool GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
+                   uint32_t* highest_row, uint32_t* lowest_row);
+
  private:
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
+
+  // vehicle configuration parameter
+  const common::VehicleParam& vehicle_param_;
 
   const PathData& path_data_;
 
@@ -128,8 +136,8 @@ class DpStGraph {
   double unit_t_ = 0.0;
 
   // cost_table_[t][s]
-  // row: s, col: t
-  std::vector<std::vector<StGraphPoint> > cost_table_;
+  // row: s, col: t --- NOTICE: Please do NOT change.
+  std::vector<std::vector<StGraphPoint>> cost_table_;
 };
 
 }  // namespace planning

@@ -35,10 +35,13 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
+using apollo::common::VehicleParam;
 
 DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config,
+                     const VehicleParam& vehicle_param,
                      const PathData& path_data)
     : dp_st_speed_config_(dp_config),
+      vehicle_param_(vehicle_param),
       path_data_(path_data),
       dp_st_cost_(dp_config) {}
 
@@ -132,13 +135,33 @@ void DpStGraph::CalculatePointwiseCost(
 }
 
 Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
-  // time corresponding to col, s corresponding to row
+  // s corresponding to row
+  // time corresponding to col
   for (uint32_t c = 0; c < cost_table_.size(); ++c) {
     for (uint32_t r = 0; r < cost_table_[c].size(); ++r) {
       CalculateCostAt(st_graph_data, c, r);
     }
   }
+
   return Status::OK();
+}
+
+bool DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
+                            uint32_t* next_highest_row,
+                            uint32_t* next_lowest_row) {
+  // TODO: finish the implementation of this function.
+  *next_highest_row = cost_table_[0].size() - 1;
+  *next_lowest_row = 0;
+  if (curr_col == 0) {
+    const double v0 = init_point_.v();
+    const double s =
+        v0 * unit_t_ +
+        0.5 * vehicle_param_.max_acceleration() * unit_t_ * unit_t_;
+    *next_highest_row =
+        std::min(*next_highest_row, static_cast<uint32_t>(s / unit_s_));
+    *next_lowest_row = 0;
+  }
+  return true;
 }
 
 void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
@@ -152,7 +175,6 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
     return;
   }
 
-  // TODO(all): get speed limit from mapper
   double speed_limit =
       st_graph_data.speed_limit().GetSpeedLimitByS(unit_s_ * r);
   if (c == 1) {
