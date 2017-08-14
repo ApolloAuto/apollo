@@ -398,10 +398,11 @@ void GLFWViewer::DrawCircle() {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     Eigen::Matrix4d v2w_pose ; //= frame_content_->get_pose_v2w();
-    GLdouble mat[16] = {v2w_pose(0, 0),v2w_pose(1, 0),v2w_pose(2, 0),v2w_pose(3,0),
-                        v2w_pose(0, 1),v2w_pose(1, 1),v2w_pose(2, 1),v2w_pose(3,1),
-                        v2w_pose(0, 2),v2w_pose(1, 2),v2w_pose(2, 2),v2w_pose(3,2),
-                        v2w_pose(0, 3),v2w_pose(1, 3),v2w_pose(2, 3),v2w_pose(3,3)};
+    GLdouble mat[16] = {
+        v2w_pose(0, 0), v2w_pose(1, 0), v2w_pose(2, 0), v2w_pose(3, 0),
+        v2w_pose(0, 1), v2w_pose(1, 1), v2w_pose(2, 1), v2w_pose(3, 1),
+        v2w_pose(0, 2), v2w_pose(1, 2), v2w_pose(2, 2), v2w_pose(3, 2),
+        v2w_pose(0, 3), v2w_pose(1, 3), v2w_pose(2, 3), v2w_pose(3, 3)};
     glMultMatrixd(mat);
     int vao = 0;
     for (vao = 0; vao < VAO_circle_num; vao++) {
