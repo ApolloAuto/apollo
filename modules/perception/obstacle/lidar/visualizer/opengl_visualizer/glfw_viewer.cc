@@ -360,12 +360,12 @@ bool GLFWViewer::DrawCloud(FrameContent* content) {
         int vbo = 0;
         int vao_num = (cloud->points.size() / VBO_cloud_num) + 1;
         for (vao = 0; vao< vao_num; vao++) {
-            for (vbo = 0; vbo < VBO_cloud_num; vbo++){
+            for (vbo = 0; vbo < VBO_cloud_num; vbo++) {
                 cloudVerts[vbo][0] = cloud->points[i].x;
                 cloudVerts[vbo][1] = cloud->points[i].y;
                 cloudVerts[vbo][2] = cloud->points[i].z;
                 i++;
-                if (i>= (int)cloud->points.size()) break;
+                if (i >= cloud->points.size()) break;
 
             }
             glBindVertexArray(VAO_cloud[vao]);
@@ -373,9 +373,11 @@ bool GLFWViewer::DrawCloud(FrameContent* content) {
             glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(cloudVerts), cloudVerts);
             glDrawElements(GL_POINTS, vbo, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
             glBindVertexArray(0);
-            if (i>=(int)cloud->points.size()) break;
+            if (i >= cloud->points.size()) break;
         }
-        if (i<(int)cloud->points.size()) AINFO <<"vao*vbo num < cloud->points.size()";
+        if (i < cloud->points.size()) {
+            AINFO << "vao*vbo num < cloud->points.size()";
+        }
     }
 
     //draw roi point cloud
@@ -395,7 +397,7 @@ bool GLFWViewer::DrawCloud(FrameContent* content) {
 void GLFWViewer::DrawCircle() {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    Eigen::Matrix4d v2w_pose ;//= frame_content_->get_pose_v2w();
+    Eigen::Matrix4d v2w_pose ; //= frame_content_->get_pose_v2w();
     GLdouble mat[16] = {v2w_pose(0, 0),v2w_pose(1, 0),v2w_pose(2, 0),v2w_pose(3,0),
                         v2w_pose(0, 1),v2w_pose(1, 1),v2w_pose(2, 1),v2w_pose(3,1),
                         v2w_pose(0, 2),v2w_pose(1, 2),v2w_pose(2, 2),v2w_pose(3,2),
