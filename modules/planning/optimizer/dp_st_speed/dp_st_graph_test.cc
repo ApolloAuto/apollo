@@ -26,6 +26,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/planning_gflags.h"
