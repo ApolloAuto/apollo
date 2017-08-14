@@ -164,8 +164,6 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
 
 void ControlTestBase::SetUpTestCase() {
   ros::Time::init();
-  FLAGS_v = 4;
-  FLAGS_alsologtostderr = true;
   FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
   FLAGS_adapter_config_path = "modules/control/testdata/conf/adapter.conf";
   FLAGS_is_control_test_mode = true;
