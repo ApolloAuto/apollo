@@ -221,17 +221,21 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
     for (std::size_t j = 0; j < adc_sl_points.size(); ++j) {
       const auto &adc_sl = adc_sl_points[j];
       if (adc_sl.s() + adc_max_edge_to_center_dist +
-          FLAGS_static_decision_ignore_s_range < sl_boundary.start_s() ||
+                  FLAGS_static_decision_ignore_s_range <
+              sl_boundary.start_s() ||
           adc_sl.s() - adc_max_edge_to_center_dist -
-          FLAGS_static_decision_ignore_s_range > sl_boundary.end_s()) {
+                  FLAGS_static_decision_ignore_s_range >
+              sl_boundary.end_s()) {
         // ignore: no overlap in s direction
         continue;
       }
 
       if (adc_sl.l() + adc_max_edge_to_center_dist +
-          FLAGS_static_decision_nudge_l_buffer < sl_boundary.start_l() ||
+                  FLAGS_static_decision_nudge_l_buffer <
+              sl_boundary.start_l() ||
           adc_sl.l() - adc_max_edge_to_center_dist -
-          FLAGS_static_decision_nudge_l_buffer > sl_boundary.end_l()) {
+                  FLAGS_static_decision_nudge_l_buffer >
+              sl_boundary.end_l()) {
         // ignore: no overlap in l direction
         continue;
       }
@@ -239,15 +243,14 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
       // check STOP/NUDGE
       double left_bound;
       double right_bound;
-      if (!reference_line_.get_lane_width(adc_sl.s(),
-                                          &left_bound,
+      if (!reference_line_.get_lane_width(adc_sl.s(), &left_bound,
                                           &right_bound)) {
         left_bound = right_bound = FLAGS_default_reference_line_width / 2;
       }
       bool left_nudgable = left_bound - sl_boundary.end_l() >=
-          FLAGS_static_decision_nudge_l_buffer;
+                           FLAGS_static_decision_nudge_l_buffer;
       bool right_nudgable = sl_boundary.start_l() - right_bound >=
-          FLAGS_static_decision_nudge_l_buffer;
+                            FLAGS_static_decision_nudge_l_buffer;
 
       if (!left_nudgable && !right_nudgable) {
         // stop
@@ -256,8 +259,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
         object_stop_ptr->set_distance_s(FLAGS_stop_distance_obstacle);
         object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
 
-        auto stop_ref_s =
-            sl_boundary.start_s() - FLAGS_stop_distance_obstacle;
+        auto stop_ref_s = sl_boundary.start_s() - FLAGS_stop_distance_obstacle;
         auto stop_ref_point = reference_line_.get_reference_point(stop_ref_s);
         object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
         object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
