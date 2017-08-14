@@ -127,7 +127,7 @@ DEFINE_double(nudge_distance_bicycle, 0.9144,
               "minimum distance to nudge a bicycle (3 feet = 0.9144 meter)");
 DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
-DEFINE_double(follow_min_distance, 3,
+DEFINE_double(follow_min_distance, 10,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(st_follow_max_start_t, 1.0,
               "A threshold to judge whether we should issue a follow decision "
