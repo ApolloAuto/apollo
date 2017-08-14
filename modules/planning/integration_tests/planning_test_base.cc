@@ -56,7 +56,6 @@ void PlanningTestBase::SetUpTestCase() {
       "modules/planning/testdata/garage_localization.pb.txt";
   FLAGS_test_chassis_file = "modules/planning/testdata/garage_chassis.pb.txt",
   FLAGS_v = 4;
-  FLAGS_alsologtostderr = true;
 }
 
 bool PlanningTestBase::SetUpAdapters() {
