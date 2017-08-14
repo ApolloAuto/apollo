@@ -67,10 +67,10 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
 
   // if N == 3, cubic hermite spline, N == 5, qunitic hermite spline
   if (N == 3) {
-    double p0 = x0_[0];
-    double v0 = x0_[1];
-    double p1 = x1_[0];
-    double v1 = x1_[1];
+    const T& p0 = x0_[0];
+    const T& v0 = x0_[1];
+    const T& p1 = x1_[0];
+    const T& v1 = x1_[1];
     switch (order) {
       case 0: {
         double t = (z - z0_) / delta_z_;
@@ -99,12 +99,12 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
     }
   } else {
     CHECK_EQ(5, N);
-    double p0 = x0_[0];
-    double v0 = x0_[1];
-    double a0 = x0_[2];
-    double p1 = x1_[0];
-    double v1 = x1_[1];
-    double a1 = x1_[2];
+    const T& p0 = x0_[0];
+    const T& v0 = x0_[1];
+    const T& a0 = x0_[2];
+    const T& p1 = x1_[0];
+    const T& v1 = x1_[1];
+    const T& a1 = x1_[2];
 
     switch (order) {
       case 0: {
@@ -175,10 +175,9 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
   }
   // Check the type is "double" or "float"
   if (std::strcmp(typeid(x0_).name(), "d") == 0 || std::strcmp(typeid(x0_).name(), "f") == 0) {
-    return 0.0;
+    return T(0.0);
   }
-  T t;
-  return t;
+  return T();
 }
 
 }  // namespace planning
