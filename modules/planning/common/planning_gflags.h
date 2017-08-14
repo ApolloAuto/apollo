@@ -74,7 +74,8 @@ DECLARE_double(stgraph_max_deceleration_divide_factor_level_1);
 DECLARE_double(stgraph_max_deceleration_divide_factor_level_2);
 
 // Decision Part
-DECLARE_double(static_decision_ignore_range);
+DECLARE_double(static_decision_ignore_s_range);
+DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(static_decision_stop_buffer);
 DECLARE_double(dynamic_decision_follow_range);
 DECLARE_double(stop_distance_pedestrian);
