@@ -188,7 +188,7 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         double d5h2 = -60.0;
         double d5h3 = 720.0;
         double d5h4 = -360.0;
-        double d5h5 = -60.0;
+        double d5h5 = 60.0;
 
         return d5h0 * p0 + d5h1 * v0 + d5h2 * a0 + d5h3 * p1 + d5h4 * v1 +
                d5h5 * a1;
