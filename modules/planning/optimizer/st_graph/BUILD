@@ -85,6 +85,10 @@ cc_test(
     srcs = [
         "st_boundary_mapper_test.cc",
     ],
+    data = [
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
     deps = [
         ":st_boundary_mapper",
         "//modules/common:log",
