@@ -30,6 +30,7 @@
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -38,6 +39,10 @@ using apollo::perception::PerceptionObstacle;
 TEST(Obstacle, IsStaticObstacle) {
   perception::PerceptionObstacle perception_obstacle;
   EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
+
+  perception_obstacle.mutable_velocity()->set_x(2.5);
+  perception_obstacle.mutable_velocity()->set_y(0.5);
+  EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
   perception_obstacle.set_type(perception::PerceptionObstacle::UNKNOWN);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
@@ -57,6 +62,10 @@ TEST(Obstacle, IsStaticObstacle) {
 
   perception_obstacle.set_type(perception::PerceptionObstacle::VEHICLE);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
+
+  perception_obstacle.mutable_velocity()->set_x(0.5);
+  perception_obstacle.mutable_velocity()->set_y(0.5);
+  EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
 }
 
 class ObstacleTest : public ::testing::Test {
