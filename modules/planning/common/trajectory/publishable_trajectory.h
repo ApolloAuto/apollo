@@ -32,7 +32,7 @@ class PublishableTrajectory : public DiscretizedTrajectory {
   PublishableTrajectory() = default;
 
   PublishableTrajectory(const double header_time,
-      const std::vector<common::TrajectoryPoint> trajectory_points);
+      std::vector<common::TrajectoryPoint> trajectory_points);
 
   virtual ~PublishableTrajectory() = default;
 

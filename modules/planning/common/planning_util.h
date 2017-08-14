@@ -39,11 +39,7 @@ common::SLPoint interpolate(const common::SLPoint &start,
 
 common::PathPoint interpolate(const common::PathPoint &p0,
                               const common::PathPoint &p1, const double s);
-common::SpeedPoint interpolate(const common::SpeedPoint &start,
-                               const common::SpeedPoint &end,
-                               const double weight);
 
-// @ weight shall between 1 and 0
 common::PathPoint interpolate_linear_approximation(const common::PathPoint &p0,
                                                    const common::PathPoint &p1,
                                                    const double s);
@@ -55,6 +51,7 @@ common::TrajectoryPoint interpolate(const common::TrajectoryPoint &tp0,
 common::TrajectoryPoint interpolate_linear_approximation(
     const common::TrajectoryPoint &tp0, const common::TrajectoryPoint &tp1,
     const double t);
+
 }  // namespace util
 }  // namespace planning
 }  // namespace apollo

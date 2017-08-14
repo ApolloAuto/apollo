@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-void SpeedLimit::AddSpeedLimit(const double s, const double v) {
+void SpeedLimit::AppendSpeedLimit(const double s, const double v) {
   if (!speed_limit_points_.empty()) {
     DCHECK_GE(s, speed_limit_points_.back().first);
   }

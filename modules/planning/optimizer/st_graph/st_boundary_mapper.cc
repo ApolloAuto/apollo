@@ -572,7 +572,7 @@ Status StBoundaryMapper::GetSpeedLimits(
         st_boundary_config_.lowest_speed(),
         std::fmin(speed_limit_on_path, speed_limit_on_reference_line));
 
-    speed_limit_data->AddSpeedLimit(path_point.s(), curr_speed_limit);
+    speed_limit_data->AppendSpeedLimit(path_point.s(), curr_speed_limit);
   }
   return Status::OK();
 }
