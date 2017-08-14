@@ -131,6 +131,14 @@ ObjectDecisionType PathObstacle::MergeLongitutionalDecision(
                 << " and decision: " << rhs.ShortDebugString();
 }
 
+const ObjectDecisionType& PathObstacle::LongitutionalDecision() const {
+  return longitutional_decision_;
+}
+
+const ObjectDecisionType& PathObstacle::LateralDecision() const {
+  return lateral_decision_;
+}
+
 ObjectDecisionType PathObstacle::MergeLateralDecision(
     const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
   auto lhs_iter = s_lateral_decision_safety_sorter_.find(lhs.object_tag_case());
@@ -167,6 +175,12 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
                 << " and decision: " << rhs.ShortDebugString();
 }
 
+bool PathObstacle::HasLateralDecision() const { return has_lateral_decision_; }
+
+bool PathObstacle::HasLongitutionalDecision() const {
+  return has_longitutional_decision_;
+}
+
 const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
 
 void PathObstacle::AddDecision(const std::string& decider_tag,
@@ -179,19 +193,17 @@ void PathObstacle::AddDecision(const std::string& decider_tag,
           MergeLongitutionalDecision(longitutional_decision_, merged_decision);
     } else {
       lateral_decision_ = merged_decision;
+      has_lateral_decision_ = true;
     }
   } else if (IsLongitutionalDecision(decision)) {
     longitutional_decision_ =
         MergeLongitutionalDecision(longitutional_decision_, decision);
+    has_longitutional_decision_ = true;
   } else {
     DCHECK(false) << "Unkown decision type: " << decision.DebugString();
   }
   decisions_.push_back(decision);
   decider_tags_.push_back(decider_tag);
-}
-
-const std::vector<ObjectDecisionType>& PathObstacle::Decisions() const {
-  return decisions_;
 }
 
 const std::string PathObstacle::DebugString() const {

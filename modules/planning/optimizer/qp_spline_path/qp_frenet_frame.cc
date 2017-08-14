@@ -112,9 +112,8 @@ bool QpFrenetFrame::GetOverallBound(
     return false;
   }
 
-  std::pair<double, double> obs_bound(
-    -std::numeric_limits<double>::infinity(),
-    std::numeric_limits<double>::infinity());
+  std::pair<double, double> obs_bound(-std::numeric_limits<double>::infinity(),
+                                      std::numeric_limits<double>::infinity());
 
   if (!GetStaticObstacleBound(s, &obs_bound)) {
     return false;
@@ -168,75 +167,77 @@ bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
 
 bool QpFrenetFrame::MapDynamicObstacleWithDecision(
     const PathObstacle& path_obstacle) {
-  const std::vector<ObjectDecisionType>& decisions = path_obstacle.Decisions();
   const Obstacle* ptr_obstacle = path_obstacle.Obstacle();
+  if (!path_obstacle.HasLateralDecision()) {
+    AERROR << "object has no lateral decision";
+    return false;
+  }
+  const auto& decision = path_obstacle.LateralDecision();
+  if (!decision.has_nudge()) {
+    AWARN << "only support nudge now";
+    return true;
+  }
+  const auto& nudge = decision.nudge();
+  double buffer = std::fabs(nudge.distance_l());
 
-  for (const auto& decision : decisions) {
-    if (!decision.has_nudge()) {
-      continue;
+  int nudge_side = (nudge.type() == ObjectNudge::RIGHT_NUDGE) ? 1 : -1;
+
+  for (const SpeedPoint& veh_point : discretized_vehicle_location_) {
+    double time = veh_point.t();
+    common::TrajectoryPoint trajectory_point =
+        ptr_obstacle->GetPointAtTime(time);
+    common::math::Box2d obs_box =
+        ptr_obstacle->GetBoundingBox(trajectory_point);
+    // project obs_box on reference line
+    std::vector<common::math::Vec2d> corners;
+    obs_box.GetAllCorners(&corners);
+    std::vector<common::SLPoint> sl_corners;
+
+    for (uint32_t i = 0; i < corners.size(); ++i) {
+      common::SLPoint cur_point;
+      if (!reference_line_.get_point_in_frenet_frame(
+              {corners[i].x(), corners[i].y()}, &cur_point)) {
+        AERROR << "Fail to map xy point " << corners[i].DebugString() << " to "
+               << cur_point.ShortDebugString();
+
+        return false;
+      }
+      // shift box base on buffer
+      cur_point.set_l(cur_point.l() - buffer * nudge_side);
+      sl_corners.push_back(std::move(cur_point));
     }
-    const auto& nudge = decision.nudge();
-    double buffer = std::fabs(nudge.distance_l());
 
-    int nudge_side = (nudge.type() == ObjectNudge::RIGHT_NUDGE) ? 1 : -1;
-
-    for (const SpeedPoint& veh_point : discretized_vehicle_location_) {
-      double time = veh_point.t();
-      common::TrajectoryPoint trajectory_point =
-          ptr_obstacle->GetPointAtTime(time);
-      common::math::Box2d obs_box =
-          ptr_obstacle->GetBoundingBox(trajectory_point);
-      // project obs_box on reference line
-      std::vector<common::math::Vec2d> corners;
-      obs_box.GetAllCorners(&corners);
-      std::vector<common::SLPoint> sl_corners;
-
-      for (uint32_t i = 0; i < corners.size(); ++i) {
-        common::SLPoint cur_point;
-        if (!reference_line_.get_point_in_frenet_frame(
-            {corners[i].x(), corners[i].y()}, &cur_point)) {
-          AERROR << "Fail to map xy point " << corners[i].DebugString()
-                 << " to " << cur_point.ShortDebugString();
-
-          return false;
-        }
-        // shift box base on buffer
-        cur_point.set_l(cur_point.l() - buffer * nudge_side);
-        sl_corners.push_back(std::move(cur_point));
+    for (uint32_t i = 0; i < sl_corners.size(); ++i) {
+      common::SLPoint sl_first = sl_corners[i % sl_corners.size()];
+      common::SLPoint sl_second = sl_corners[(i + 1) % sl_corners.size()];
+      if (sl_first.s() < sl_second.s()) {
+        std::swap(sl_first, sl_second);
       }
 
-      for (uint32_t i = 0; i < sl_corners.size(); ++i) {
-        common::SLPoint sl_first = sl_corners[i % sl_corners.size()];
-        common::SLPoint sl_second = sl_corners[(i + 1) % sl_corners.size()];
-        if (sl_first.s() < sl_second.s()) {
-          std::swap(sl_first, sl_second);
-        }
+      std::pair<double, double> bound = MapLateralConstraint(
+          sl_first, sl_second, nudge_side,
+          veh_point.s() - vehicle_param_.back_edge_to_center(),
+          veh_point.s() + vehicle_param_.front_edge_to_center());
 
-        std::pair<double, double> bound = MapLateralConstraint(
-            sl_first, sl_second, nudge_side,
-            veh_point.s() - vehicle_param_.back_edge_to_center(),
-            veh_point.s() + vehicle_param_.front_edge_to_center());
+      // update bound map
+      double s_resolution = std::fabs(veh_point.v() * time_resolution_);
+      double updated_start_s =
+          init_frenet_point_.s() + veh_point.s() - s_resolution;
+      double updated_end_s =
+          init_frenet_point_.s() + veh_point.s() + s_resolution;
+      if (updated_end_s > evaluated_knots_.back() ||
+          updated_start_s < evaluated_knots_.front()) {
+        continue;
+      }
+      std::pair<uint32_t, uint32_t> update_index_range =
+          FindInterval(updated_start_s, updated_end_s);
 
-        // update bound map
-        double s_resolution = std::fabs(veh_point.v() * time_resolution_);
-        double updated_start_s =
-            init_frenet_point_.s() + veh_point.s() - s_resolution;
-        double updated_end_s =
-            init_frenet_point_.s() + veh_point.s() + s_resolution;
-        if (updated_end_s > evaluated_knots_.back() ||
-            updated_start_s < evaluated_knots_.front()) {
-          continue;
-        }
-        std::pair<uint32_t, uint32_t> update_index_range =
-            FindInterval(updated_start_s, updated_end_s);
-
-        for (uint32_t j = update_index_range.first;
-             j < update_index_range.second; ++j) {
-          dynamic_obstacle_bound_[j].first =
-              std::max(bound.first, dynamic_obstacle_bound_[j].first);
-          dynamic_obstacle_bound_[j].second =
-              std::min(bound.second, dynamic_obstacle_bound_[j].second);
-        }
+      for (uint32_t j = update_index_range.first; j < update_index_range.second;
+           ++j) {
+        dynamic_obstacle_bound_[j].first =
+            std::max(bound.first, dynamic_obstacle_bound_[j].first);
+        dynamic_obstacle_bound_[j].second =
+            std::min(bound.second, dynamic_obstacle_bound_[j].second);
       }
     }
   }
@@ -245,42 +246,42 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
 
 bool QpFrenetFrame::MapStaticObstacleWithDecision(
     const PathObstacle& path_obstacle) {
-  const std::vector<ObjectDecisionType>& object_decisions =
-      path_obstacle.Decisions();
   const auto ptr_obstacle = path_obstacle.Obstacle();
-
-  for (const auto& decision : object_decisions) {
-    if (!decision.has_nudge()) {
-      continue;
+  if (!path_obstacle.HasLateralDecision()) {
+    AERROR << "obstacle has no lateral decision";
+    return false;
+  }
+  const auto& decision = path_obstacle.LateralDecision();
+  if (!decision.has_nudge()) {
+    AWARN << "only support nudge decision now";
+    return true;
+  }
+  const auto& nudge = decision.nudge();
+  const double buffer = std::fabs(nudge.distance_l());
+  if (nudge.type() == ObjectNudge::RIGHT_NUDGE) {
+    const auto& box = ptr_obstacle->PerceptionBoundingBox();
+    std::vector<common::math::Vec2d> corners;
+    box.GetAllCorners(&corners);
+    if (!MapPolygon(corners, buffer, -1, &static_obstacle_bound_)) {
+      AERROR << "fail to map polygon with id " << path_obstacle.Id()
+             << " in qp frenet frame";
+      return false;
     }
-    const auto& nudge = decision.nudge();
-    const double buffer = std::fabs(nudge.distance_l());
-    if (nudge.type() == ObjectNudge::RIGHT_NUDGE) {
-      const auto& box = ptr_obstacle->PerceptionBoundingBox();
-      std::vector<common::math::Vec2d> corners;
-      box.GetAllCorners(&corners);
-      if (!MapPolygon(corners, buffer, -1, &static_obstacle_bound_)) {
-        AERROR << "fail to map polygon with id " << path_obstacle.Id()
-               << " in qp frenet frame";
-        return false;
-      }
-    } else {
-      const auto& box = ptr_obstacle->PerceptionBoundingBox();
-      std::vector<common::math::Vec2d> corners;
-      box.GetAllCorners(&corners);
-      if (!MapPolygon(corners, buffer, 1, &static_obstacle_bound_)) {
-        AERROR << "fail to map polygon with id " << path_obstacle.Id()
-               << "in qp frenet frame";
-        return false;
-      }
+  } else {
+    const auto& box = ptr_obstacle->PerceptionBoundingBox();
+    std::vector<common::math::Vec2d> corners;
+    box.GetAllCorners(&corners);
+    if (!MapPolygon(corners, buffer, 1, &static_obstacle_bound_)) {
+      AERROR << "fail to map polygon with id " << path_obstacle.Id()
+             << "in qp frenet frame";
+      return false;
     }
   }
   return true;
 }
 
 bool QpFrenetFrame::MapPolygon(
-    const std::vector<common::math::Vec2d>& corners,
-    const double buffer,
+    const std::vector<common::math::Vec2d>& corners, const double buffer,
     const int nudge_side,
     std::vector<std::pair<double, double>>* const bound_map) {
   std::vector<common::SLPoint> sl_corners;
@@ -434,6 +435,9 @@ void QpFrenetFrame::CalculateHDMapBound() {
 
 bool QpFrenetFrame::CalculateObstacleBound() {
   for (const auto ptr_path_obstacle : path_obstacles_) {
+    if (!ptr_path_obstacle->HasLateralDecision()) {
+      continue;
+    }
     if (ptr_path_obstacle->Obstacle()->IsStatic()) {
       if (!MapStaticObstacleWithDecision(*ptr_path_obstacle)) {
         AERROR << "mapping obstacle with id [" << ptr_path_obstacle->Id()
@@ -467,8 +471,8 @@ bool QpFrenetFrame::GetBound(
   const double s_low = evaluated_knots_[lower_index];
   const double s_high = evaluated_knots_[lower_index + 1];
   double weight = Double::Compare(s_low, s_high, 1e-8) < 0
-                       ? (s - s_low) / (s_high - s_low)
-                       : 0.0;
+                      ? (s - s_low) / (s_high - s_low)
+                      : 0.0;
 
   double low_first = map_bound[lower_index].first;
   double low_second = map_bound[lower_index].second;
@@ -501,7 +505,8 @@ uint32_t QpFrenetFrame::FindIndex(const double s) const {
       std::lower_bound(evaluated_knots_.begin() + 1, evaluated_knots_.end(), s);
   return std::min(
              static_cast<uint32_t>(evaluated_knots_.size() - 1),
-             static_cast<uint32_t>(lower_bound - evaluated_knots_.begin())) - 1;
+             static_cast<uint32_t>(lower_bound - evaluated_knots_.begin())) -
+         1;
 }
 
 }  // namespace planning

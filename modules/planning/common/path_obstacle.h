@@ -70,8 +70,6 @@ class PathObstacle {
 
   const planning::Obstacle* Obstacle() const;
 
-  bool MergeObstacle() const;
-
   /**
    * @class Add decision to this obstacle. This function will
    * also calculate the merged decision. i.e., if there are multiple lateral
@@ -87,19 +85,19 @@ class PathObstacle {
   void AddDecision(const std::string& decider_tag,
                    const ObjectDecisionType& decision);
 
-  const std::vector<ObjectDecisionType>& Decisions() const;
-
+  bool HasLateralDecision() const;
+  bool HasLongitutionalDecision() const;
   /**
    * return the merged lateral decision
    * Lateral decision is one of {Nudge, Ignore}
    **/
-  const ObjectDecisionType& MergedLateralDecision() const;
+  const ObjectDecisionType& LateralDecision() const;
 
   /**
    * @brief return the merged longitutional decision
    * Longitutional decision is one of {Stop, Yield, Follow, Overtake, Ignore}
    **/
-  const ObjectDecisionType& MergedLongitutionalDecision() const;
+  const ObjectDecisionType& LongitutionalDecision() const;
 
   const std::string DebugString() const;
 
@@ -137,7 +135,9 @@ class PathObstacle {
   // StGraphBoundary st_boundary_;
 
   ObjectDecisionType lateral_decision_;
+  bool has_lateral_decision_ = false;
   ObjectDecisionType longitutional_decision_;
+  bool has_longitutional_decision_ = false;
 
   struct ObjectTagCaseHash {
     std::size_t operator()(
