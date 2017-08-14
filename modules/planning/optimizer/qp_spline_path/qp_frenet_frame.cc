@@ -60,7 +60,7 @@ QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
       time_resolution_(time_resolution) {}
 
 bool QpFrenetFrame::Init(const uint32_t num_points) {
-  if (num_points <= 1) {
+  if (num_points < 2) {
     AERROR << "Number of s points [" << num_points
            << "] is too small to evaluate.";
     return false;

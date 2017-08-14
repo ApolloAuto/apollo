@@ -31,7 +31,7 @@ namespace planning {
 class SpeedLimit {
  public:
   SpeedLimit() = default;
-  void AddSpeedLimit(const double s, const double v);
+  void AppendSpeedLimit(const double s, const double v);
 
   const std::vector<std::pair<double, double>>& speed_limit_points() const;
   double GetSpeedLimitByS(const double s) const;
