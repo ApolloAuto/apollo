@@ -18,12 +18,10 @@
  * @file speed_limit.h
  **/
 
-#include <vector>
-
-#include "modules/common/proto/pnc_point.pb.h"
-
 #ifndef MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
 #define MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
+
+#include <vector>
 
 namespace apollo {
 namespace planning {
@@ -31,13 +29,14 @@ namespace planning {
 class SpeedLimit {
  public:
   SpeedLimit() = default;
+
   void AppendSpeedLimit(const double s, const double v);
 
   const std::vector<std::pair<double, double>>& speed_limit_points() const;
+
   double GetSpeedLimitByS(const double s) const;
 
-  void Clear() { speed_limit_points_.clear(); }
-
+  void Clear();
  private:
   // use a vector to represent speed limit
   // the first number is s, the second number is v

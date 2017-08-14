@@ -22,8 +22,7 @@
 
 #include <algorithm>
 
-#include "modules/common/math/linear_interpolation.h"
-#include "modules/common/util/util.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -44,14 +43,20 @@ double SpeedLimit::GetSpeedLimitByS(const double s) const {
   DCHECK_GE(speed_limit_points_.size(), 2);
   DCHECK_GE(s, speed_limit_points_.front().first);
 
-  auto compare_s = [](const std::pair<double, double> point, const double s) {
+  auto compare_s = [](const std::pair<double, double>& point, const double s) {
     return point.first < s;
   };
 
   auto it_lower = std::lower_bound(speed_limit_points_.begin(),
                                    speed_limit_points_.end(), s, compare_s);
+
+  if (it_lower == speed_limit_points_.end()) {
+    return (it_lower - 1)->second;
+  }
   return it_lower->second;
 }
+
+void SpeedLimit::Clear() { speed_limit_points_.clear(); }
 
 }  // namespace planning
 }  // namespace apollo
