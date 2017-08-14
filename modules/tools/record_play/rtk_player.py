@@ -34,6 +34,7 @@ from modules.control.proto import pad_msg_pb2
 from modules.hmi.proto import runtime_status_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
+from modules.common.proto import pnc_point_pb2
 
 # Import hmi_status_helper
 APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')
@@ -213,15 +214,15 @@ class RtkPlayer(object):
             % (self.start, self.end))
 
         for i in range(self.start, self.end):
-            adc_point = planning_pb2.ADCTrajectoryPoint()
-            adc_point.x = self.data['x'][i]
-            adc_point.y = self.data['y'][i]
-            adc_point.z = self.data['z'][i]
-            adc_point.speed = self.data['speed'][i] * self.speedmultiplier
-            adc_point.acceleration_s = self.data['acceleration'][
+            adc_point = pnc_point_pb2.TrajectoryPoint()
+            adc_point.path_point.x = self.data['x'][i]
+            adc_point.path_point.y = self.data['y'][i]
+            adc_point.path_point.z = self.data['z'][i]
+            adc_point.v = self.data['speed'][i] * self.speedmultiplier
+            adc_point.a = self.data['acceleration'][
                 i] * self.speedmultiplier
-            adc_point.curvature = self.data['curvature'][i]
-            adc_point.curvature_change_rate = self.data[
+            adc_point.path_point.kappa = self.data['curvature'][i]
+            adc_point.path_point.dkappa = self.data[
                 'curvature_change_rate'][i]
 
             time_diff = self.data['time'][i] - \
@@ -230,10 +231,10 @@ class RtkPlayer(object):
             adc_point.relative_time = time_diff / self.speedmultiplier - (
                 now - self.starttime)
 
-            adc_point.theta = self.data['theta'][i]
-            adc_point.accumulated_s = self.data['s'][i]
+            adc_point.path_point.theta = self.data['theta'][i]
+            adc_point.path_point.s = self.data['s'][i]
 
-            planningdata.adc_trajectory_point.extend([adc_point])
+            planningdata.trajectory_point.extend([adc_point])
 
         planningdata.estop.is_estop = self.estop
 
