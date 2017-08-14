@@ -35,7 +35,7 @@ class SpeedLimitTest : public ::testing::Test {
       std::pair<double, double> sp;
       sp.first = i * 1.0;
       sp.second = (i % 2 == 0) ? 5.0 : 10.0;
-      speed_limit_.AddSpeedLimit(sp.first, sp.second);
+      speed_limit_.AppendSpeedLimit(sp.first, sp.second);
     }
   }
 
