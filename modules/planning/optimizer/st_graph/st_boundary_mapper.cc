@@ -103,7 +103,7 @@ Status StBoundaryMapper::GetGraphBoundary(
   double min_stop_s = std::numeric_limits<double>::max();
 
   for (const auto* path_obstacle : path_obstacles.Items()) {
-    if (path_obstacle->Decisions().empty()) {
+    if (!path_obstacle->HasLongitutionalDecision()) {
       const auto ret =
           MapObstacleWithoutDecision(*path_obstacle, st_graph_boundaries);
       if (ret.code() == ErrorCode::PLANNING_ERROR) {
@@ -113,52 +113,49 @@ Status StBoundaryMapper::GetGraphBoundary(
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
     }
-    for (const auto& decision : path_obstacle->Decisions()) {
-      StGraphBoundary boundary(path_obstacle);
-      if (decision.has_follow()) {
-        const auto ret = MapFollowDecision(*path_obstacle, decision, &boundary);
-        if (!ret.ok()) {
-          AERROR << "Fail to map obstacle " << path_obstacle->Id()
-                 << " with follow decision: " << decision.DebugString();
-          return Status(ErrorCode::PLANNING_ERROR,
-                        "Fail to map follow decision");
-        }
-      } else if (decision.has_stop()) {
-        // TODO(all) change start_s() to st_boundary.min_s()
-        const double stop_s =
-            path_obstacle->perception_sl_boundary().start_s() +
-            decision.stop().distance_s();
-        if (stop_s < adc_front_s_) {
-          AERROR << "Invalid stop decision. not stop at ahead of current "
-                    "position. stop_s : "
-                 << stop_s << ", and current adc_s is; " << adc_front_s_;
-          return Status(ErrorCode::PLANNING_ERROR, "invalid decision");
-        }
-        if (!stop_obstacle) {
-          stop_obstacle = path_obstacle;
-          stop_decision = decision;
-          min_stop_s = stop_s;
-        } else if (stop_s < min_stop_s) {
-          stop_obstacle = path_obstacle;
-          min_stop_s = stop_s;
-          stop_decision = decision;
-        }
-      } else if (decision.has_overtake() || decision.has_yield()) {
-        const auto ret = MapObstacleWithPredictionTrajectory(
-            *path_obstacle, decision, st_graph_boundaries);
-        if (!ret.ok()) {
-          AERROR << "Fail to map obstacle " << path_obstacle->Id()
-                 << " with decision: " << decision.DebugString();
-          return Status(ErrorCode::PLANNING_ERROR,
-                        "Fail to map overtake/yield decision");
-        }
-      } else {
-        std::string msg = common::util::StrCat("No mapping for decision: ",
-                                               decision.DebugString());
-        return Status(ErrorCode::PLANNING_SKIP, msg);
+    const auto& decision = path_obstacle->LongitutionalDecision();
+    StGraphBoundary boundary(path_obstacle);
+    if (decision.has_follow()) {
+      const auto ret = MapFollowDecision(*path_obstacle, decision, &boundary);
+      if (!ret.ok()) {
+        AERROR << "Fail to map obstacle " << path_obstacle->Id()
+               << " with follow decision: " << decision.DebugString();
+        return Status(ErrorCode::PLANNING_ERROR, "Fail to map follow decision");
       }
-      boundary.set_id(path_obstacle->Id());
+    } else if (decision.has_stop()) {
+      // TODO(all) change start_s() to st_boundary.min_s()
+      const double stop_s = path_obstacle->perception_sl_boundary().start_s() +
+                            decision.stop().distance_s();
+      if (stop_s < adc_front_s_) {
+        AERROR << "Invalid stop decision. not stop at ahead of current "
+                  "position. stop_s : "
+               << stop_s << ", and current adc_s is; " << adc_front_s_;
+        return Status(ErrorCode::PLANNING_ERROR, "invalid decision");
+      }
+      if (!stop_obstacle) {
+        stop_obstacle = path_obstacle;
+        stop_decision = decision;
+        min_stop_s = stop_s;
+      } else if (stop_s < min_stop_s) {
+        stop_obstacle = path_obstacle;
+        min_stop_s = stop_s;
+        stop_decision = decision;
+      }
+    } else if (decision.has_overtake() || decision.has_yield()) {
+      const auto ret = MapObstacleWithPredictionTrajectory(
+          *path_obstacle, decision, st_graph_boundaries);
+      if (!ret.ok()) {
+        AERROR << "Fail to map obstacle " << path_obstacle->Id()
+               << " with decision: " << decision.DebugString();
+        return Status(ErrorCode::PLANNING_ERROR,
+                      "Fail to map overtake/yield decision");
+      }
+    } else {
+      std::string msg = common::util::StrCat("No mapping for decision: ",
+                                             decision.DebugString());
+      return Status(ErrorCode::PLANNING_SKIP, msg);
     }
+    boundary.set_id(path_obstacle->Id());
   }
 
   if (stop_obstacle) {
