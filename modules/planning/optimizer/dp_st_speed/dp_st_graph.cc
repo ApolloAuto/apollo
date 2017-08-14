@@ -409,7 +409,7 @@ Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
     }
   }
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    if (path_obstacle->Decisions().empty()) {
+    if (!path_obstacle->HasLongitutionalDecision()) {
       ObjectDecisionType ignore_decision;
       ignore_decision.mutable_ignore();
       path_decision->AddDecision("dp_st_graph", path_obstacle->Id(),
@@ -428,8 +428,7 @@ bool DpStGraph::CreateFollowDecision(
   const double follow_distance_s = -FLAGS_follow_min_distance;
   follow->set_distance_s(follow_distance_s);
 
-  const double reference_line_fence_s =
-      boundary.min_s() + follow_distance_s;
+  const double reference_line_fence_s = boundary.min_s() + follow_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "

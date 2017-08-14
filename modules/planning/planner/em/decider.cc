@@ -18,8 +18,8 @@
  * @file decider.cpp
  **/
 
-#include "modules/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/planner/em/decider.h"
 
@@ -31,8 +31,7 @@ using common::Status;
 using common::VehicleState;
 
 Decider::Decider(DecisionResult* decision_result)
-: decision_(decision_result) {
-}
+    : decision_(decision_result) {}
 
 const DecisionResult& Decider::Decision() const { return *decision_; }
 
@@ -79,45 +78,42 @@ int Decider::MakeMainStopDecision(Frame* frame,
   const auto& path_obstacles = path_decision->path_obstacles();
   for (const auto path_obstacle : path_obstacles.Items()) {
     const auto& obstacle = path_obstacle->Obstacle();
-    for (const auto& object_decision : path_obstacle->Decisions()) {
-      if (not object_decision.has_stop()) {
-        continue;
-      }
+    const auto& object_decision = path_obstacle->LongitutionalDecision();
+    if (not object_decision.has_stop()) {
+      continue;
+    }
 
-      const auto& reference_line = frame->reference_line();
-      apollo::common::PointENU stop_point = object_decision.stop().stop_point();
-      common::SLPoint stop_line_sl;
-      reference_line.get_point_in_frenet_frame({stop_point.x(), stop_point.y()},
-                                               &stop_line_sl);
+    const auto& reference_line = frame->reference_line();
+    apollo::common::PointENU stop_point = object_decision.stop().stop_point();
+    common::SLPoint stop_line_sl;
+    reference_line.get_point_in_frenet_frame({stop_point.x(), stop_point.y()},
+                                             &stop_line_sl);
 
-      double stop_line_s = stop_line_sl.s();
-      if (stop_line_s < 0 || stop_line_s > reference_line.length()) {
-        AERROR << "Ignore object:" << obstacle->Id() << " fence route_s["
-               << stop_line_s << "] not in range[0, " << reference_line.length()
-               << "]";
-        continue;
-      }
+    double stop_line_s = stop_line_sl.s();
+    if (stop_line_s < 0 || stop_line_s > reference_line.length()) {
+      AERROR << "Ignore object:" << obstacle->Id() << " fence route_s["
+             << stop_line_s << "] not in range[0, " << reference_line.length()
+             << "]";
+      continue;
+    }
 
-      // check stop_line_s vs adc_s
-      common::SLPoint adc_sl;
-      auto& adc_position = VehicleState::instance()->pose().position();
-      reference_line.get_point_in_frenet_frame(
-          {adc_position.x(), adc_position.y()},
-          &adc_sl);
-      const auto &vehicle_param =
-          common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-      if (stop_line_s <= adc_sl.s() + vehicle_param.front_edge_to_center()) {
-        AERROR << "object:" << obstacle->Id() << " fence route_s["
-               << stop_line_s << "] behind adc route_s[" << adc_sl.s()
-               << "]";
-        continue;
-      }
+    // check stop_line_s vs adc_s
+    common::SLPoint adc_sl;
+    auto& adc_position = VehicleState::instance()->pose().position();
+    reference_line.get_point_in_frenet_frame(
+        {adc_position.x(), adc_position.y()}, &adc_sl);
+    const auto& vehicle_param =
+        common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+    if (stop_line_s <= adc_sl.s() + vehicle_param.front_edge_to_center()) {
+      AERROR << "object:" << obstacle->Id() << " fence route_s[" << stop_line_s
+             << "] behind adc route_s[" << adc_sl.s() << "]";
+      continue;
+    }
 
-      if (stop_line_s < min_stop_line_s) {
-        min_stop_line_s = stop_line_s;
-        stop_obstacle = obstacle;
-        stop_decision = &(object_decision.stop());
-      }
+    if (stop_line_s < min_stop_line_s) {
+      min_stop_line_s = stop_line_s;
+      stop_obstacle = obstacle;
+      stop_decision = &(object_decision.stop());
     }
   }
 
@@ -150,8 +146,13 @@ int Decider::SetObjectDecisions(PathDecision* const path_decision) {
     const auto& obstacle = path_obstacle->Obstacle();
     object_decision->set_id(obstacle->Id());
     object_decision->set_perception_id(obstacle->PerceptionId());
-    for (const auto& decision : path_obstacle->Decisions()) {
-      object_decision->add_object_decision()->CopyFrom(decision);
+    if (path_obstacle->HasLateralDecision()) {
+      object_decision->add_object_decision()->CopyFrom(
+          path_obstacle->LateralDecision());
+    }
+    if (path_obstacle->HasLongitutionalDecision()) {
+      object_decision->add_object_decision()->CopyFrom(
+          path_obstacle->LongitutionalDecision());
     }
   }
   return 0;
