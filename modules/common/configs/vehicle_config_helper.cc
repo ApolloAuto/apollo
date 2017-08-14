@@ -22,6 +22,7 @@ namespace apollo {
 namespace common {
 
 VehicleConfig VehicleConfigHelper::vehicle_config_;
+bool VehicleConfigHelper::is_init_ = false;
 
 VehicleConfigHelper::VehicleConfigHelper() {}
 
@@ -36,9 +37,13 @@ void VehicleConfigHelper::Init(const std::string &config_file) {
 
 void VehicleConfigHelper::Init(const VehicleConfig &vehicle_params) {
   vehicle_config_ = vehicle_params;
+  is_init_ = true;
 }
 
 const VehicleConfig &VehicleConfigHelper::GetConfig() {
+  if (!is_init_) {
+    Init();
+  }
   return vehicle_config_;
 }
 
