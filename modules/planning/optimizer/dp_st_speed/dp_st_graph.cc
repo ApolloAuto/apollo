@@ -137,10 +137,24 @@ void DpStGraph::CalculatePointwiseCost(
 Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
   // s corresponding to row
   // time corresponding to col
-  for (uint32_t c = 0; c < cost_table_.size(); ++c) {
-    for (uint32_t r = 0; r < cost_table_[c].size(); ++r) {
+  uint32_t c = 0;
+  uint32_t next_highest_row = 0;
+  uint32_t next_lowest_row = 0;
+
+  while (c < cost_table_.size()) {
+    uint32_t highest_row = 0;
+    uint32_t lowest_row = cost_table_.back().size() - 1;
+    for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       CalculateCostAt(st_graph_data, c, r);
+      uint32_t h_r = 0;
+      uint32_t l_r = 0;
+      GetRowRange(r, c, &h_r, &l_r);
+      highest_row = std::max(highest_row, h_r);
+      lowest_row = std::min(lowest_row, l_r);
     }
+    ++c;
+    next_highest_row = highest_row;
+    next_lowest_row = lowest_row;
   }
 
   return Status::OK();

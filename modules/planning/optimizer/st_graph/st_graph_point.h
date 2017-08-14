@@ -28,9 +28,6 @@ namespace planning {
 
 class StGraphPoint {
  public:
-  ~StGraphPoint() = default;
-
- public:
   std::uint32_t index_s() const;
   std::uint32_t index_t() const;
 
