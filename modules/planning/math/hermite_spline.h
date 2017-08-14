@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
 #define MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
 
+#include <cstring>
+#include <typeinfo>
 #include <utility>
 
 #include "modules/common/log.h"
@@ -39,11 +41,11 @@ class HermiteSpline {
   virtual T Evaluate(const std::uint32_t order, const double z) const;
 
  private:
-  std::array<T, (N + 1) / 2> _x0;
+  std::array<T, (N + 1) / 2> x0_;
 
-  std::array<T, (N + 1) / 2> _x1;
+  std::array<T, (N + 1) / 2> x1_;
 
-  double _z0 = 0.0;
+  double z0_ = 0.0;
 
   double delta_z_ = 0.0;
 };
@@ -52,7 +54,7 @@ template <typename T, std::uint32_t N>
 inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
                                           std::array<T, (N + 1) / 2> x1,
                                           const double z0, const double z1)
-    : _x0(std::move(x0)), _x1(std::move(x1)), _z0(z0), delta_z_(z1 - z0) {
+    : x0_(std::move(x0)), x1_(std::move(x1)), z0_(z0), delta_z_(z1 - z0) {
   CHECK(N == 3 || N == 5)
       << "Error: currently we only support cubic and quintic hermite splines!";
 }
@@ -60,18 +62,18 @@ inline HermiteSpline<T, N>::HermiteSpline(std::array<T, (N + 1) / 2> x0,
 template <typename T, std::uint32_t N>
 inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
                                        const double z) const {
-  CHECK_LE(_z0, z);
-  CHECK_LE(z, _z0 + delta_z_);
+  CHECK_LE(z0_, z);
+  CHECK_LE(z, z0_ + delta_z_);
 
   // if N == 3, cubic hermite spline, N == 5, qunitic hermite spline
   if (N == 3) {
-    double p0 = _x0[0];
-    double v0 = _x0[1];
-    double p1 = _x1[0];
-    double v1 = _x1[1];
+    double p0 = x0_[0];
+    double v0 = x0_[1];
+    double p1 = x1_[0];
+    double v1 = x1_[1];
     switch (order) {
       case 0: {
-        double t = (z - _z0) / delta_z_;
+        double t = (z - z0_) / delta_z_;
         double t2 = t * t;
         double t3 = t2 * t;
 
@@ -79,14 +81,14 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
                (-2.0 * t3 + 3.0 * t2) * p1 + (t3 - t2) * v1;
       }
       case 1: {
-        double t = (z - _z0) / delta_z_;
+        double t = (z - z0_) / delta_z_;
         double t2 = t * t;
 
         return (6.0 * t2 - 6.0 * t) * p0 + (3.0 * t2 - 4 * t + 1.0) * v0 +
                (-6.0 * t2 + 6.0 * t) * p1 + (3.0 * t2 - 2.0 * t) * v1;
       }
       case 2: {
-        double t = (z - _z0) / delta_z_;
+        double t = (z - z0_) / delta_z_;
         return (12.0 * t - 6.0) * p0 + (6.0 * t - 4.0) * v0 +
                (-12.0 * t + 6.0) * p1 + (6.0 * t - 2.0) * v1;
       }
@@ -97,16 +99,16 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
     }
   } else {
     CHECK_EQ(5, N);
-    double p0 = _x0[0];
-    double v0 = _x0[1];
-    double a0 = _x0[2];
-    double p1 = _x1[0];
-    double v1 = _x1[1];
-    double a1 = _x1[2];
+    double p0 = x0_[0];
+    double v0 = x0_[1];
+    double a0 = x0_[2];
+    double p1 = x1_[0];
+    double v1 = x1_[1];
+    double a1 = x1_[2];
 
     switch (order) {
       case 0: {
-        double t = (z - _z0) / delta_z_;
+        double t = (z - z0_) / delta_z_;
         double t2 = t * t;
         double t3 = t * t2;
         double t4 = t2 * t2;
@@ -123,7 +125,7 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         return h0 * p0 + h1 * v0 + h2 * a0 + h3 * p1 + h4 * v1 + h5 * a1;
       }
       case 1: {
-        double t = (z - _z0) / delta_z_;
+        double t = (z - z0_) / delta_z_;
         double t2 = t * t;
         double t3 = t * t2;
         double t4 = t2 * t2;
@@ -139,7 +141,7 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         return dh0 * p0 + dh1 * v0 + dh2 * a0 + dh3 * p1 + dh4 * v1 + dh5 * a1;
       }
       case 2: {
-        double t = (z - _z0) / delta_z_;
+        double t = (z - z0_) / delta_z_;
         double t2 = t * t;
         double t3 = t * t2;
         double det0 = t - t2;
@@ -155,7 +157,7 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
                ddh5 * a1;
       }
       case 3: {
-        double t = (z - _z0) / delta_z_;
+        double t = (z - z0_) / delta_z_;
         double t2 = t * t;
         double det = t - t2;
         double dddh0 = -60.0 + 360.0 * det;
@@ -168,12 +170,13 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
         return dddh0 * p0 + dddh1 * v0 + dddh2 * a0 + dddh3 * p1 + dddh4 * v1 +
                dddh5 * a1;
       }
-      // TODO(fanhaoyang): the derive higher order derivative for
-      // quintic hermite spline
       default: { break; }
     }
   }
-  AFATAL << "Error: unsupported order of spline or derivative!";
+  // Check the type is "double" or "float"
+  if (std::strcmp(typeid(x0_).name(), "d") == 0 || std::strcmp(typeid(x0_).name(), "f") == 0) {
+    return 0.0;
+  }
   T t;
   return t;
 }
