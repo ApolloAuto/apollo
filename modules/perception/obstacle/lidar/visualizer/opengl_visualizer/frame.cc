@@ -57,10 +57,10 @@ double get_quaternion_angle(const Eigen::Quaterniond& quat) {
 }
 
 
-Frame::Frame() :  
-_reference_frame(NULL),
+Frame::Frame() :
 _t(0, 0, 0),
-_q(Eigen::Quaterniond(1, 0, 0, 0)){
+_q(Eigen::Quaterniond(1, 0, 0, 0)),
+_reference_frame(NULL){
 }
 
 Frame::Frame(const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation)
