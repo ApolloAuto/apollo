@@ -216,7 +216,6 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
       continue;
     }
     bool ignore = true;
-    const auto &static_obstacle_box = obstacle->PerceptionBoundingBox();
 
     const auto &sl_boundary = path_obstacle->perception_sl_boundary();
     for (std::size_t j = 0; j < adc_sl_points.size(); ++j) {
@@ -225,71 +224,66 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
           FLAGS_static_decision_ignore_s_range < sl_boundary.start_s() ||
           adc_sl.s() - adc_max_edge_to_center_dist -
           FLAGS_static_decision_ignore_s_range > sl_boundary.end_s()) {
-        // no overlap in s direction
+        // ignore: no overlap in s direction
         continue;
-      } else if (adc_sl.l() + adc_max_edge_to_center_dist +
-                         FLAGS_static_decision_nudge_l_buffer <
-                     sl_boundary.start_l() ||
-                 adc_sl.l() - adc_max_edge_to_center_dist -
-                         FLAGS_static_decision_nudge_l_buffer >
-                     sl_boundary.end_l()) {
-        // no overlap in l direction
-        continue;
-      } else {
-        double left_bound;
-        double right_bound;
-        if (!reference_line_.get_lane_width(adc_sl.s(),
-                                            &left_bound,
-                                            &right_bound)) {
-          left_bound = right_bound = FLAGS_default_reference_line_width / 2;
-        }
-        if (static_obstacle_box.HasOverlap(adc_bounding_box[j]) &&
-            (sl_boundary.start_l() * sl_boundary.end_l() < 0.0 ||
-              (sl_boundary.start_l() > 0 &&
-                  left_bound - sl_boundary.end_l() <
-                      FLAGS_static_decision_nudge_l_buffer) ||
-              (sl_boundary.end_l() < 0 &&
-                  sl_boundary.start_l() - right_bound <
-                      FLAGS_static_decision_nudge_l_buffer))) {
-          ObjectDecisionType object_stop;
-          ObjectStop *object_stop_ptr = object_stop.mutable_stop();
-          object_stop_ptr->set_distance_s(FLAGS_stop_distance_obstacle);
-          object_stop_ptr->set_reason_code(
-              StopReasonCode::STOP_REASON_OBSTACLE);
-
-          auto stop_ref_s =
-              sl_boundary.start_s() - FLAGS_stop_distance_obstacle;
-          auto stop_ref_point = reference_line_.get_reference_point(stop_ref_s);
-          object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
-          object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
-          object_stop_ptr->set_stop_heading(stop_ref_point.heading());
-
-          decisions->emplace_back(obstacle->Id(), object_stop);
-          ignore = false;
-          break;
-        } else {
-          if (sl_boundary.start_l() > 0) {
-            // RIGHT_NUDGE
-            ObjectDecisionType object_nudge;
-            ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
-            object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
-            object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
-            decisions->emplace_back(obstacle->Id(), object_nudge);
-            ignore = false;
-            break;
-          } else {
-            // LEFT_NUDGE
-            ObjectDecisionType object_nudge;
-            ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
-            object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
-            object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
-            decisions->emplace_back(obstacle->Id(), object_nudge);
-            ignore = false;
-            break;
-          }
-        }
       }
+
+      if (adc_sl.l() + adc_max_edge_to_center_dist +
+          FLAGS_static_decision_nudge_l_buffer < sl_boundary.start_l() ||
+          adc_sl.l() - adc_max_edge_to_center_dist -
+          FLAGS_static_decision_nudge_l_buffer > sl_boundary.end_l()) {
+        // ignore: no overlap in l direction
+        continue;
+      }
+
+      // check STOP/NUDGE
+      double left_bound;
+      double right_bound;
+      if (!reference_line_.get_lane_width(adc_sl.s(),
+                                          &left_bound,
+                                          &right_bound)) {
+        left_bound = right_bound = FLAGS_default_reference_line_width / 2;
+      }
+      bool left_nudgable = left_bound - sl_boundary.end_l() >=
+          FLAGS_static_decision_nudge_l_buffer;
+      bool right_nudgable = sl_boundary.start_l() - right_bound >=
+          FLAGS_static_decision_nudge_l_buffer;
+
+      if (!left_nudgable && !right_nudgable) {
+        // stop
+        ObjectDecisionType object_stop;
+        ObjectStop *object_stop_ptr = object_stop.mutable_stop();
+        object_stop_ptr->set_distance_s(FLAGS_stop_distance_obstacle);
+        object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
+
+        auto stop_ref_s =
+            sl_boundary.start_s() - FLAGS_stop_distance_obstacle;
+        auto stop_ref_point = reference_line_.get_reference_point(stop_ref_s);
+        object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
+        object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
+        object_stop_ptr->set_stop_heading(stop_ref_point.heading());
+
+        decisions->emplace_back(obstacle->Id(), object_stop);
+      } else {
+        // nudge
+        ObjectDecisionType object_nudge;
+        ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
+        object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
+
+        if (left_nudgable) {
+          // LEFT_NUDGE
+          object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
+        } else {
+          // RIGHT_NUDGE
+          object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
+        }
+        decisions->emplace_back(obstacle->Id(), object_nudge);
+      }
+
+      ignore = false;
+      break;
     }
+
     if (ignore) {
       // IGNORE
       ObjectDecisionType object_ignore;
