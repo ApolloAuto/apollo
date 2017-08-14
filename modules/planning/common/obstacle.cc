@@ -21,19 +21,25 @@
 #include "modules/planning/common/obstacle.h"
 
 #include <algorithm>
+#include <cmath>
 #include <string>
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
 
-const std::string& Obstacle::Id() const { return id_; }
+const std::string& Obstacle::Id() const {
+  return id_;
+}
 
-std::int32_t Obstacle::PerceptionId() const { return perception_id_; }
+std::int32_t Obstacle::PerceptionId() const {
+  return perception_id_;
+}
 
 Obstacle::Obstacle(const std::string& id,
                    const perception::PerceptionObstacle& perception_obstacle)
@@ -68,16 +74,19 @@ Obstacle::Obstacle(const std::string& id,
   }
 }
 
-bool Obstacle::IsStatic() const { return is_static_; }
+bool Obstacle::IsStatic() const {
+  return is_static_;
+}
 
 bool Obstacle::IsStaticObstacle(
     const perception::PerceptionObstacle& perception_obstacle) {
-  if (!perception_obstacle.has_type()) {
-    AWARN << "perception obstacle does not have type, treat as static";
+  if (perception_obstacle.type() ==
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE) {
     return true;
   }
-  return perception_obstacle.type() ==
-         perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
+  auto moving_speed = std::hypot(perception_obstacle.velocity().x(),
+                                 perception_obstacle.velocity().y());
+  return moving_speed <= FLAGS_static_speed_threshold;
 }
 
 common::TrajectoryPoint Obstacle::GetPointAtTime(
