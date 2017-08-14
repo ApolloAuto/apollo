@@ -40,11 +40,6 @@ TEST(StGraphBoundaryTest, basic_test) {
   StGraphBoundary boundary(&path_obstacle, st_points);
   EXPECT_EQ(boundary.id(), "");
   EXPECT_EQ(boundary.boundary_type(), StGraphBoundary::BoundaryType::UNKNOWN);
-  double left_t = 0.0;
-  double right_t = 0.0;
-  boundary.GetBoundaryTimeScope(&left_t, &right_t);
-  EXPECT_DOUBLE_EQ(left_t, 0.0);
-  EXPECT_DOUBLE_EQ(right_t, 10.0);
   EXPECT_FLOAT_EQ(0.0, boundary.min_s());
   EXPECT_FLOAT_EQ(5.0, boundary.max_s());
   EXPECT_FLOAT_EQ(0.0, boundary.min_t());
