@@ -515,6 +515,15 @@ double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
 }
 
 bool DpStGraph::CheckIsFollowByT(const StGraphBoundary& boundary) const {
+  DCHECK_EQ(boundary.points().size(), 4);
+
+  if (boundary.point(0).s() >= boundary.point(1).s()) {
+    return false;
+  }
+  const double kFollowTimeEpsilon = 1e-3;
+  if (boundary.min_t() > kFollowTimeEpsilon) {
+    return false;
+  }
   return boundary.min_t() < FLAGS_st_follow_max_start_t &&
          boundary.max_t() > FLAGS_st_follow_min_end_t;
 }
