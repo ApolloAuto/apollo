@@ -18,15 +18,12 @@
  * @file
  **/
 
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/speed_limit.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::SpeedPoint;
 
 class SpeedLimitTest : public ::testing::Test {
  public:
