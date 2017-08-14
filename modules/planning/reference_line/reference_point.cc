@@ -40,16 +40,6 @@ ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
       lower_bound_(lower_bound),
       upper_bound_(upper_bound) {}
 
-ReferencePoint::operator PathPoint() const {
-  PathPoint result;
-  result.set_x(x());
-  result.set_y(y());
-  result.set_theta(heading());
-  result.set_kappa(kappa());
-  result.set_dkappa(dkappa());
-  return result;
-}
-
 double ReferencePoint::kappa() const { return kappa_; }
 
 double ReferencePoint::dkappa() const { return dkappa_; }

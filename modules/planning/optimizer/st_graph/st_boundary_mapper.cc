@@ -438,23 +438,35 @@ Status StBoundaryMapper::MapFollowDecision(
   const auto* obstacle = path_obstacle.Obstacle();
 
   const auto& speed = obstacle->Perception().velocity();
-  const double scalar_speed = std::hypot(speed.x(), speed.y());
 
-  const auto& perception = obstacle->Perception();
-  const PathPoint ref_point = reference_line_.get_reference_point(
-      perception.position().x(), perception.position().y());
-  const double speed_coeff = std::cos(perception.theta() - ref_point.theta());
+  SLPoint obstacle_sl_point;
+  reference_line_.get_point_in_frenet_frame(
+      Vec2d(obj_decision.follow().fence_point().x(),
+            obj_decision.follow().fence_point().y()),
+      &obstacle_sl_point);
+  const auto& ref_point = reference_line_.get_reference_point(
+      obj_decision.follow().fence_point().x(),
+      obj_decision.follow().fence_point().y());
+
+  const double speed_coeff =
+      std::cos(obj_decision.follow().fence_heading() - ref_point.heading());
   if (speed_coeff < 0.0) {
-    AERROR << "Obstacle is moving opposite to the reference line. Obstacle: "
-           << perception.DebugString();
+    AERROR << "Obstacle is moving opposite to the reference line.";
     return common::Status(ErrorCode::PLANNING_ERROR,
                           "obstacle is moving opposite the reference line");
   }
 
-  const auto& point = path_data_.discretized_path().StartPoint();
-  const PathPoint curr_point =
-      reference_line_.get_reference_point(point.x(), point.y());
-  const double distance_to_obstacle = ref_point.s() - curr_point.s() -
+  const auto& start_point = path_data_.discretized_path().StartPoint();
+  SLPoint start_sl_point;
+  if (!reference_line_.get_point_in_frenet_frame(
+          Vec2d(start_point.x(), start_point.y()), &start_sl_point)) {
+    std::string msg = "Fail to get s and l of start point.";
+    AERROR << msg;
+    return common::Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  const double distance_to_obstacle = obstacle_sl_point.s() -
+                                      start_sl_point.s() -
                                       vehicle_param_.front_edge_to_center() -
                                       st_boundary_config_.follow_buffer();
 
@@ -465,6 +477,7 @@ Status StBoundaryMapper::MapFollowDecision(
   }
 
   double follow_speed = 0.0;
+  const double scalar_speed = std::hypot(speed.x(), speed.y());
   if (scalar_speed > st_boundary_config_.follow_speed_threshold()) {
     follow_speed = st_boundary_config_.follow_speed_threshold() * speed_coeff;
   } else {
@@ -475,9 +488,8 @@ Status StBoundaryMapper::MapFollowDecision(
   const double s_min_lower = distance_to_obstacle;
   const double s_min_upper =
       std::max(distance_to_obstacle + 1.0, planning_distance_);
-  const double s_max_upper =
-      std::max(s_min_upper + planning_time_ * follow_speed, planning_distance_);
   const double s_max_lower = s_min_lower + planning_time_ * follow_speed;
+  const double s_max_upper = std::max(s_max_lower, planning_distance_);
 
   std::vector<STPoint> boundary_points;
   boundary_points.emplace_back(s_min_lower, 0.0);
@@ -504,6 +516,7 @@ Status StBoundaryMapper::MapFollowDecision(
                                     st_boundary_config_.follow_coeff());
   boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
   boundary->set_id(obstacle->Id());
+
   return Status::OK();
 }
 

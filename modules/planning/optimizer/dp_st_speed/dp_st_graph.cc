@@ -164,15 +164,15 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
   const double s_upper_bound =
       v0 * unit_t_ +
       0.5 * vehicle_param_.max_acceleration() * unit_t_ * unit_t_;
+  *next_highest_row = std::min(
+      static_cast<uint32_t>(cost_table_.back().size() - 1),
+      *next_lowest_row + static_cast<uint32_t>(s_upper_bound / unit_s_));
+
   const double s_lower_bound =
       v0 * unit_t_ +
       0.5 * vehicle_param_.max_deceleration() * unit_t_ * unit_t_;
-  *next_highest_row = std::min(
-      cost_table_.back().size() - 1,
-      *next_lowest_row + static_cast<uint32_t>(s_upper_bound / unit_s_));
-  *next_lowest_row =
-      *next_lowest_row +
-      std::max(0, static_cast<uint32_t>(s_lower_bound / unit_s_));
+  *next_lowest_row = *next_lowest_row +
+                     std::max(0, static_cast<int32_t>(s_lower_bound / unit_s_));
 }
 
 void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
