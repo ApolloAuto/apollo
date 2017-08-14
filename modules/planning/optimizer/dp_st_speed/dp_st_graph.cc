@@ -425,7 +425,7 @@ bool DpStGraph::CreateFollowDecision(
   DCHECK_NOTNULL(follow_decision);
 
   auto* follow = follow_decision->mutable_follow();
-  const double follow_distance_s = -1.0 * boundary.characteristic_length();
+  const double follow_distance_s = -FLAGS_follow_min_distance;
   follow->set_distance_s(follow_distance_s);
 
   const double reference_line_fence_s =
