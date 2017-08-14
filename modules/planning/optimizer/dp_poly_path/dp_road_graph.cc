@@ -221,23 +221,36 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
     const auto &sl_boundary = path_obstacle->perception_sl_boundary();
     for (std::size_t j = 0; j < adc_sl_points.size(); ++j) {
       const auto &adc_sl = adc_sl_points[j];
-      if (adc_sl.s() + adc_max_edge_to_center_dist < sl_boundary.start_s() ||
-          adc_sl.s() - adc_max_edge_to_center_dist > sl_boundary.end_s()) {
+      if (adc_sl.s() + adc_max_edge_to_center_dist +
+          FLAGS_static_decision_ignore_s_range < sl_boundary.start_s() ||
+          adc_sl.s() - adc_max_edge_to_center_dist -
+          FLAGS_static_decision_ignore_s_range > sl_boundary.end_s()) {
         // no overlap in s direction
         continue;
       } else if (adc_sl.l() + adc_max_edge_to_center_dist +
-                         FLAGS_static_decision_ignore_range <
+                         FLAGS_static_decision_nudge_l_buffer <
                      sl_boundary.start_l() ||
                  adc_sl.l() - adc_max_edge_to_center_dist -
-                         FLAGS_static_decision_ignore_range >
+                         FLAGS_static_decision_nudge_l_buffer >
                      sl_boundary.end_l()) {
         // no overlap in l direction
         continue;
       } else {
+        double left_bound;
+        double right_bound;
+        if (!reference_line_.get_lane_width(adc_sl.s(),
+                                            &left_bound,
+                                            &right_bound)) {
+          left_bound = right_bound = FLAGS_default_reference_line_width / 2;
+        }
         if (static_obstacle_box.HasOverlap(adc_bounding_box[j]) &&
             (sl_boundary.start_l() * sl_boundary.end_l() < 0.0 ||
-             std::fabs(std::min(sl_boundary.start_l(), sl_boundary.end_l())) <
-                 FLAGS_static_decision_stop_buffer)) {
+              (sl_boundary.start_l() > 0 &&
+                  left_bound - sl_boundary.end_l() <
+                      FLAGS_static_decision_nudge_l_buffer) ||
+              (sl_boundary.end_l() < 0 &&
+                  sl_boundary.start_l() - right_bound <
+                      FLAGS_static_decision_nudge_l_buffer))) {
           ObjectDecisionType object_stop;
           ObjectStop *object_stop_ptr = object_stop.mutable_stop();
           object_stop_ptr->set_distance_s(FLAGS_stop_distance_obstacle);
@@ -255,10 +268,8 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
           ignore = false;
           break;
         } else {
-          if (sl_boundary.start_l() > adc_sl.l() &&
-              sl_boundary.start_l() - adc_sl.l() <
-                  FLAGS_static_decision_ignore_range) {
-            // GO_RIGHT
+          if (sl_boundary.start_l() > 0) {
+            // RIGHT_NUDGE
             ObjectDecisionType object_nudge;
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
             object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
@@ -266,10 +277,8 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
             decisions->emplace_back(obstacle->Id(), object_nudge);
             ignore = false;
             break;
-          } else if (sl_boundary.end_l() < adc_sl.l() &&
-                     adc_sl.l() - sl_boundary.end_l() <
-                         FLAGS_static_decision_ignore_range) {
-            // GO_LEFT
+          } else {
+            // LEFT_NUDGE
             ObjectDecisionType object_nudge;
             ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
             object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
