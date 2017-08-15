@@ -158,7 +158,6 @@ Status StBoundaryMapper::GetGraphBoundary(
       std::string msg = common::util::StrCat("No mapping for decision: ",
                                              decision.DebugString());
       ADEBUG << msg;
-      // Status(ErrorCode::PLANNING_SKIP, msg);
     }
   }
 
