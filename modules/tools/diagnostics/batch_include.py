@@ -24,7 +24,6 @@ from modules.common.proto import geometry_pb2
 from modules.common.proto import header_pb2
 from modules.control.proto import control_cmd_pb2
 from modules.control.proto import pad_msg_pb2
-from modules.decision.proto import decision_pb2
 from modules.localization.proto import localization_pb2
 from modules.localization.proto import gps_pb2
 from modules.localization.proto import imu_pb2
