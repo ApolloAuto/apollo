@@ -145,6 +145,9 @@ Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
     uint32_t highest_row = 0;
     uint32_t lowest_row = cost_table_.back().size() - 1;
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
+      if (cost_table_.at(c).at(r).pre_point() == nullptr) {
+        continue;
+      }
       CalculateCostAt(st_graph_data, c, r);
       uint32_t h_r = 0;
       uint32_t l_r = 0;
