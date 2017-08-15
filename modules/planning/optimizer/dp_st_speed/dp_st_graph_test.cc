@@ -77,7 +77,8 @@ TEST_F(DpStSpeedTest, dp_st_graph_test) {
   DpStSpeedConfig dp_st_speed_config;
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
-  DpStGraph dp_st_graph(dp_st_speed_config, veh_param, path_data_);
+  DpStGraph dp_st_graph(dp_st_speed_config, StGraphData(), veh_param,
+                        path_data_);
 }
 
 }  // namespace planning
