@@ -4,13 +4,7 @@ package apollo.control;
 
 import "modules/control/proto/calibration_table.proto";
 
-message PidConf {
-  optional bool integrator_enable = 1;
-  optional double integrator_saturation_level = 2;
-  optional double kp = 3;
-  optional double ki = 4;
-  optional double kd = 5;
-}
+import "modules/control/proto/pid_conf.proto";
 
 message FilterConf {
   optional int32 cutoff_freq = 1;
