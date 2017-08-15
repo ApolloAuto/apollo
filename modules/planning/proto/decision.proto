@@ -38,13 +38,16 @@ message ObjectStop {
   optional double stop_heading = 4;
 }
 
+// dodge the obstacle in lateral direction when driving
 message ObjectNudge {
   enum Type {
-    LEFT_NUDGE = 1;
-    RIGHT_NUDGE = 2;
+    LEFT_NUDGE = 1; // drive from the left side of the obstacle
+    RIGHT_NUDGE = 2; // drive from the right side of the obstacle
   };
   optional Type type = 1;
-  optional double distance_l = 2;  // minimum lateral distance in meters
+  // minimum lateral distance in meters. positive if type = LEFT_NUDGE
+  // negative if type = RIGHT_NUDGE
+  optional double distance_l = 2; 
 }
 
 message ObjectYield {
