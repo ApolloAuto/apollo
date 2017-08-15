@@ -326,6 +326,8 @@ Status QpSplineStGraph::GetSConstraintByTime(
         boundary.boundary_type() == StGraphBoundary::BoundaryType::YIELD) {
       *s_upper_bound = std::fmin(*s_upper_bound, s_upper);
     } else {
+      DCHECK(boundary.boundary_type() ==
+             StGraphBoundary::BoundaryType::OVERTAKE);
       *s_lower_bound = std::fmax(*s_lower_bound, s_lower);
     }
   }

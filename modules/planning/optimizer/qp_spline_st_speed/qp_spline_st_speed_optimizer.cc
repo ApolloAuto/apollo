@@ -82,6 +82,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR,
                   "Mapping obstacle for qp st speed optimizer failed!");
   }
+
   SpeedLimit speed_limits;
   if (boundary_mapper.GetSpeedLimits(&speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
