@@ -134,7 +134,7 @@ class RtkPlayer(object):
         self.logger.info("before replan self.start=%s, self.closestpoint=%s" %
                          (self.start, self.closestpoint))
 
-        self.closestpoint = closest_dist()
+        self.closestpoint = self.closest_dist()
         self.start = max(self.closestpoint - 100, 0)
         self.starttime = rospy.get_time()
         self.end = min(self.start + 1000, len(self.data) - 1)
@@ -195,8 +195,8 @@ class RtkPlayer(object):
                 % (self.replan, self.sequence_num, self.automode))
             self.restart()
         else:
-            timepoint = closest_time()
-            distpoint = closest_dist()
+            timepoint = self.closest_time()
+            distpoint = self.closest_dist()
             self.start = max(min(timepoint, distpoint) - 100, 0)
             self.end = min(max(timepoint, distpoint) + 900, len(self.data) - 1)
 
@@ -243,7 +243,7 @@ class RtkPlayer(object):
             self.data['s'][self.start]
         planningdata.total_path_time = self.data['time'][self.end] - \
             self.data['time'][self.start]
-        planningdata.gear = int(self.data['gear'][closest_time()])
+        planningdata.gear = int(self.data['gear'][self.closest_time()])
 
         self.planning_pub.publish(planningdata)
         self.logger.debug("Generated Planning Sequence: " +
