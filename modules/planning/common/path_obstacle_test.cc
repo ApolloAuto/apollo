@@ -64,37 +64,37 @@ TEST(IsLateralDecision, AllDecisions) {
   EXPECT_FALSE(PathObstacle::IsLateralDecision(decision_sidepass));
 }
 
-TEST(IsLongitutionalDecision, AllDecisions) {
+TEST(IsLongitudinalDecision, AllDecisions) {
   ObjectDecisionType decision_ignore;
   decision_ignore.mutable_ignore();
-  EXPECT_TRUE(PathObstacle::IsLongitutionalDecision(decision_ignore));
+  EXPECT_TRUE(PathObstacle::IsLongitudinalDecision(decision_ignore));
 
   ObjectDecisionType decision_overtake;
   decision_overtake.mutable_overtake();
-  EXPECT_TRUE(PathObstacle::IsLongitutionalDecision(decision_overtake));
+  EXPECT_TRUE(PathObstacle::IsLongitudinalDecision(decision_overtake));
 
   ObjectDecisionType decision_follow;
   decision_follow.mutable_follow();
-  EXPECT_TRUE(PathObstacle::IsLongitutionalDecision(decision_follow));
+  EXPECT_TRUE(PathObstacle::IsLongitudinalDecision(decision_follow));
 
   ObjectDecisionType decision_yield;
   decision_yield.mutable_yield();
-  EXPECT_TRUE(PathObstacle::IsLongitutionalDecision(decision_yield));
+  EXPECT_TRUE(PathObstacle::IsLongitudinalDecision(decision_yield));
 
   ObjectDecisionType decision_stop;
   decision_stop.mutable_stop();
-  EXPECT_TRUE(PathObstacle::IsLongitutionalDecision(decision_stop));
+  EXPECT_TRUE(PathObstacle::IsLongitudinalDecision(decision_stop));
 
   ObjectDecisionType decision_nudge;
   decision_nudge.mutable_nudge();
-  EXPECT_FALSE(PathObstacle::IsLongitutionalDecision(decision_nudge));
+  EXPECT_FALSE(PathObstacle::IsLongitudinalDecision(decision_nudge));
 
   ObjectDecisionType decision_sidepass;
   decision_sidepass.mutable_sidepass();
-  EXPECT_FALSE(PathObstacle::IsLongitutionalDecision(decision_sidepass));
+  EXPECT_FALSE(PathObstacle::IsLongitudinalDecision(decision_sidepass));
 }
 
-TEST(MergeLongitutionalDecision, AllDecisions) {
+TEST(MergeLongitudinalDecision, AllDecisions) {
   ObjectDecisionType decision_ignore;
   decision_ignore.mutable_ignore();
 
@@ -118,120 +118,120 @@ TEST(MergeLongitutionalDecision, AllDecisions) {
 
   // vertical decision comparison
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_stop, decision_ignore)
+      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_ignore)
           .has_stop());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_stop, decision_overtake)
+      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_overtake)
           .has_stop());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_stop, decision_follow)
+      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_follow)
           .has_stop());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_stop, decision_yield)
+      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_yield)
           .has_stop());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_yield, decision_ignore)
+      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_ignore)
           .has_yield());
-  EXPECT_TRUE(PathObstacle::MergeLongitutionalDecision(decision_yield,
-                                                       decision_overtake)
-                  .has_yield());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_yield, decision_follow)
+      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_overtake)
+          .has_yield());
+  EXPECT_TRUE(
+      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_follow)
           .has_yield());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_follow, decision_ignore)
+      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_ignore)
           .has_follow());
-  EXPECT_TRUE(PathObstacle::MergeLongitutionalDecision(decision_follow,
-                                                       decision_overtake)
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_follow,
+                                                      decision_overtake)
                   .has_follow());
 
-  EXPECT_TRUE(PathObstacle::MergeLongitutionalDecision(decision_overtake,
-                                                       decision_ignore)
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_overtake,
+                                                      decision_ignore)
                   .has_overtake());
 
-  EXPECT_TRUE(PathObstacle::MergeLongitutionalDecision(decision_ignore,
-                                                       decision_overtake)
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_ignore,
+                                                      decision_overtake)
                   .has_overtake());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_ignore, decision_follow)
+      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_follow)
           .has_follow());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_ignore, decision_yield)
+      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_yield)
           .has_yield());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_ignore, decision_stop)
+      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_stop)
           .has_stop());
 
-  EXPECT_TRUE(PathObstacle::MergeLongitutionalDecision(decision_overtake,
-                                                       decision_follow)
+  EXPECT_TRUE(PathObstacle::MergeLongitudinalDecision(decision_overtake,
+                                                      decision_follow)
                   .has_follow());
-  EXPECT_TRUE(PathObstacle::MergeLongitutionalDecision(decision_overtake,
-                                                       decision_yield)
-                  .has_yield());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_overtake, decision_stop)
-          .has_stop());
-
-  EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_follow, decision_yield)
+      PathObstacle::MergeLongitudinalDecision(decision_overtake, decision_yield)
           .has_yield());
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_follow, decision_stop)
+      PathObstacle::MergeLongitudinalDecision(decision_overtake, decision_stop)
           .has_stop());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_yield, decision_stop)
+      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_yield)
+          .has_yield());
+  EXPECT_TRUE(
+      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_stop)
           .has_stop());
 
   EXPECT_TRUE(
-      PathObstacle::MergeLongitutionalDecision(decision_ignore, decision_ignore)
+      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_stop)
+          .has_stop());
+
+  EXPECT_TRUE(
+      PathObstacle::MergeLongitudinalDecision(decision_ignore, decision_ignore)
           .has_ignore());
 
-  EXPECT_DEATH(PathObstacle::MergeLongitutionalDecision(decision_overtake,
-                                                        decision_nudge),
+  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_overtake,
+                                                       decision_nudge),
                ".*decision : nudge \\{ \\} not found in safety sorter.*");
   EXPECT_DEATH(
-      PathObstacle::MergeLongitutionalDecision(decision_follow, decision_nudge),
+      PathObstacle::MergeLongitudinalDecision(decision_follow, decision_nudge),
       ".*decision : nudge \\{ \\} not found in safety sorter.*");
   EXPECT_DEATH(
-      PathObstacle::MergeLongitutionalDecision(decision_yield, decision_nudge),
+      PathObstacle::MergeLongitudinalDecision(decision_yield, decision_nudge),
       ".*decision : nudge \\{ \\} not found in safety sorter.*");
   EXPECT_DEATH(
-      PathObstacle::MergeLongitutionalDecision(decision_stop, decision_nudge),
+      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_nudge),
       ".*decision : nudge \\{ \\} not found in safety sorter.*");
 
-  EXPECT_DEATH(PathObstacle::MergeLongitutionalDecision(decision_overtake,
-                                                        decision_sidepass),
+  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_overtake,
+                                                       decision_sidepass),
                ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(PathObstacle::MergeLongitutionalDecision(decision_follow,
-                                                        decision_sidepass),
+  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_follow,
+                                                       decision_sidepass),
                ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(PathObstacle::MergeLongitutionalDecision(decision_yield,
-                                                        decision_sidepass),
+  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_yield,
+                                                       decision_sidepass),
                ".*decision : sidepass \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(PathObstacle::MergeLongitutionalDecision(decision_stop,
-                                                        decision_sidepass),
-               ".*decision : sidepass \\{ \\} not found in safety sorter.*");
+  EXPECT_DEATH(
+      PathObstacle::MergeLongitudinalDecision(decision_stop, decision_sidepass),
+      ".*decision : sidepass \\{ \\} not found in safety sorter.*");
 
-  EXPECT_DEATH(PathObstacle::MergeLongitutionalDecision(decision_nudge,
-                                                        decision_overtake),
+  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_nudge,
+                                                       decision_overtake),
                ".*decision : nudge \\{ \\} not found in safety sorter.*");
-  EXPECT_DEATH(PathObstacle::MergeLongitutionalDecision(decision_sidepass,
-                                                        decision_overtake),
+  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_sidepass,
+                                                       decision_overtake),
                ".*decision : sidepass \\{ \\} not found in safety sorter.*");
 
-  EXPECT_DEATH(PathObstacle::MergeLongitutionalDecision(decision_nudge,
-                                                        decision_sidepass),
+  EXPECT_DEATH(PathObstacle::MergeLongitudinalDecision(decision_nudge,
+                                                       decision_sidepass),
                ".*decision : nudge \\{ \\} not found in safety sorter.*");
 
   ObjectDecisionType decision_overtake1;
   decision_overtake1.mutable_overtake()->set_distance_s(1);
   ObjectDecisionType decision_overtake2;
   decision_overtake2.mutable_overtake()->set_distance_s(2);
-  EXPECT_EQ(2, PathObstacle::MergeLongitutionalDecision(decision_overtake1,
-                                                        decision_overtake2)
+  EXPECT_EQ(2, PathObstacle::MergeLongitudinalDecision(decision_overtake1,
+                                                       decision_overtake2)
                    .overtake()
                    .distance_s());
 
@@ -239,8 +239,8 @@ TEST(MergeLongitutionalDecision, AllDecisions) {
   decision_follow1.mutable_follow()->set_distance_s(-1);
   ObjectDecisionType decision_follow2;
   decision_follow2.mutable_follow()->set_distance_s(-2);
-  EXPECT_EQ(-2, PathObstacle::MergeLongitutionalDecision(decision_follow1,
-                                                         decision_follow2)
+  EXPECT_EQ(-2, PathObstacle::MergeLongitudinalDecision(decision_follow1,
+                                                        decision_follow2)
                     .follow()
                     .distance_s());
 
@@ -248,8 +248,8 @@ TEST(MergeLongitutionalDecision, AllDecisions) {
   decision_yield1.mutable_yield()->set_distance_s(-1);
   ObjectDecisionType decision_yield2;
   decision_yield2.mutable_yield()->set_distance_s(-2);
-  EXPECT_EQ(-2, PathObstacle::MergeLongitutionalDecision(decision_yield1,
-                                                         decision_yield2)
+  EXPECT_EQ(-2, PathObstacle::MergeLongitudinalDecision(decision_yield1,
+                                                        decision_yield2)
                     .yield()
                     .distance_s());
 
@@ -257,8 +257,8 @@ TEST(MergeLongitutionalDecision, AllDecisions) {
   decision_stop1.mutable_stop()->set_distance_s(-1);
   ObjectDecisionType decision_stop2;
   decision_stop2.mutable_stop()->set_distance_s(-2);
-  EXPECT_EQ(-2, PathObstacle::MergeLongitutionalDecision(decision_stop1,
-                                                         decision_stop2)
+  EXPECT_EQ(-2, PathObstacle::MergeLongitudinalDecision(decision_stop1,
+                                                        decision_stop2)
                     .stop()
                     .distance_s());
 }

@@ -48,14 +48,14 @@ namespace planning {
  * The `s` and `l` values are examples of path properties.
  * The decision of an obstacle is also associated with a path.
  *
- * The decisions have two categories: lateral decision and longitutional
+ * The decisions have two categories: lateral decision and longitudinal
  * decision.
  * Lateral decision includes: nudge, ignore.
  * Lateral decision saftey priority: nudge > ignore.
- * Longitutional decision includes: stop, yield, follow, overtake, ignore.
+ * Longitudinal decision includes: stop, yield, follow, overtake, ignore.
  * Decision saftey priorities order: stop > yield >= follow > overtake > ignore
  *
- * Ignore decision belongs to both lateral decision and longitutional decision,
+ * Ignore decision belongs to both lateral decision and longitudinal decision,
  * and it has the lowest priority.
  */
 class PathObstacle {
@@ -73,7 +73,7 @@ class PathObstacle {
   /**
    * @class Add decision to this obstacle. This function will
    * also calculate the merged decision. i.e., if there are multiple lateral
-   * decisions or longitutional decisions, this function will merge them into
+   * decisions or longitudinal decisions, this function will merge them into
    * one. The rule of merging decisions are as follows
    * * Priorities of different decisions: stop > yield > follow > overtake >
    * ignore
@@ -82,11 +82,14 @@ class PathObstacle {
    * @param decider_tag identifies which component added this decision
    * @param the decision to be added to this path obstacle.
    **/
-  void AddDecision(const std::string& decider_tag,
-                   const ObjectDecisionType& decision);
+  void AddLateralDecision(const std::string& decider_tag,
+                          const ObjectDecisionType& lateral_decision);
+
+  void AddLongitudinalDecision(const std::string& decider_tag,
+                               const ObjectDecisionType& longitudinal_decision);
 
   bool HasLateralDecision() const;
-  bool HasLongitutionalDecision() const;
+  bool HasLongitudinalDecision() const;
   /**
    * return the merged lateral decision
    * Lateral decision is one of {Nudge, Ignore}
@@ -94,10 +97,10 @@ class PathObstacle {
   const ObjectDecisionType& LateralDecision() const;
 
   /**
-   * @brief return the merged longitutional decision
-   * Longitutional decision is one of {Stop, Yield, Follow, Overtake, Ignore}
+   * @brief return the merged longitudinal decision
+   * Longitudinal decision is one of {Stop, Yield, Follow, Overtake, Ignore}
    **/
-  const ObjectDecisionType& LongitutionalDecision() const;
+  const ObjectDecisionType& LongitudinalDecision() const;
 
   const std::string DebugString() const;
 
@@ -113,13 +116,13 @@ class PathObstacle {
   static bool IsLateralDecision(const ObjectDecisionType& decision);
 
   /**
-   * @brief check if a ObjectDecisionType is longitutional decision.
+   * @brief check if a ObjectDecisionType is longitudinal decision.
    **/
-  FRIEND_TEST(IsLongitutionalDecision, AllDecisions);
-  static bool IsLongitutionalDecision(const ObjectDecisionType& decision);
+  FRIEND_TEST(IsLongitudinalDecision, AllDecisions);
+  static bool IsLongitudinalDecision(const ObjectDecisionType& decision);
 
-  FRIEND_TEST(MergeLongitutionalDecision, AllDecisions);
-  static ObjectDecisionType MergeLongitutionalDecision(
+  FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
+  static ObjectDecisionType MergeLongitudinalDecision(
       const ObjectDecisionType& lhs, const ObjectDecisionType& rhs);
   FRIEND_TEST(MergeLateralDecision, AllDecisions);
   static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
@@ -136,8 +139,8 @@ class PathObstacle {
 
   ObjectDecisionType lateral_decision_;
   bool has_lateral_decision_ = false;
-  ObjectDecisionType longitutional_decision_;
-  bool has_longitutional_decision_ = false;
+  ObjectDecisionType longitudinal_decision_;
+  bool has_longitudinal_decision_ = false;
 
   struct ObjectTagCaseHash {
     std::size_t operator()(
@@ -151,7 +154,7 @@ class PathObstacle {
       s_lateral_decision_safety_sorter_;
   static const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
                                   ObjectTagCaseHash>
-      s_longitutional_decision_safety_sorter_;
+      s_longitudinal_decision_safety_sorter_;
 };
 
 }  // namespace planning
