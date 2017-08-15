@@ -1,7 +1,7 @@
 total_path_length: 80
 total_time: 8.0
-matrix_dimension_s: 100
-matrix_dimension_t: 10
+matrix_dimension_s: 200
+matrix_dimension_t: 20
 
 speed_weight: 0.0
 accel_weight: 10.0

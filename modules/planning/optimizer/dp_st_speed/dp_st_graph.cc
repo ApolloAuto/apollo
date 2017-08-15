@@ -21,6 +21,7 @@
 #include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 
 #include <algorithm>
+#include <iostream>
 #include <limits>
 #include <string>
 
@@ -108,7 +109,6 @@ Status DpStGraph::InitCostTable() {
   for (uint32_t i = 0; i < cost_table_.size(); ++i) {
     for (uint32_t j = 0; j < cost_table_[i].size(); ++j) {
       cost_table_[i][j].init(i, j, STPoint(unit_s_ * j, unit_t_ * i));
-      cost_table_[i][j].set_total_cost(std::numeric_limits<double>::infinity());
     }
   }
 
@@ -140,13 +140,6 @@ void DpStGraph::CalculatePointwiseCost(
 Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
   // s corresponding to row
   // time corresponding to col
-  /*
-  for (uint32_t c = 0; c < cost_table_.size(); ++c) {
-    for (uint32_t r = 0; r < cost_table_.back().size(); ++r) {
-      CalculateCostAt(st_graph_data, c, r);
-    }
-  }
-  */
   uint32_t c = 0;
   uint32_t next_highest_row = 0;
   uint32_t next_lowest_row = 0;
@@ -167,7 +160,7 @@ Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
     }
     ++c;
     next_highest_row = highest_row;
-    next_lowest_row = lowest_row;
+    next_lowest_row = std::max(next_lowest_row, lowest_row);
   }
 
   return Status::OK();
@@ -176,7 +169,6 @@ Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
 void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
                             uint32_t* next_highest_row,
                             uint32_t* next_lowest_row) {
-  // TODO: finish the implementation of this function.
   const auto& curr_point = cost_table_[curr_col][curr_row];
 
   double v0 = 0.0;
@@ -244,8 +236,21 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
     }
     return;
   }
-
   for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
+    if (std::isinf(cost_table_[c - 1][r_pre].total_cost()) ||
+        cost_table_[c - 1][r_pre].pre_point() == nullptr) {
+      continue;
+    }
+
+    const double curr_a = (cost_table_[c][r].index_s() +
+                           cost_table_[c - 1][r_pre].pre_point()->index_s() -
+                           2 * cost_table_[c - 1][r_pre].index_s()) *
+                          unit_s_ / (unit_t_ * unit_t_);
+    if (curr_a > vehicle_param_.max_acceleration() ||
+        curr_a < vehicle_param_.max_deceleration()) {
+      continue;
+    }
+
     uint32_t lower_bound = 0;
     uint32_t upper_bound = 0;
     if (!CalculateFeasibleAccelRange(static_cast<double>(r_pre),
@@ -256,23 +261,25 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
 
     for (uint32_t r_prepre = lower_bound; r_prepre <= upper_bound; ++r_prepre) {
       const StGraphPoint& prepre_graph_point = cost_table_[c - 2][r_prepre];
+      if (std::isinf(prepre_graph_point.total_cost())) {
+        continue;
+      }
+
       if (!prepre_graph_point.pre_point()) {
         continue;
-      } else {
-        const STPoint& triple_pre_point =
-            prepre_graph_point.pre_point()->point();
-        const STPoint& prepre_point = prepre_graph_point.point();
-        const STPoint& pre_point = cost_table_[c - 1][r_pre].point();
-        const STPoint& curr_point = cost_table_[c][r].point();
-        double cost = cost_table_[c][r].obstacle_cost() +
-                      cost_table_[c - 1][r_pre].total_cost() +
-                      CalculateEdgeCost(triple_pre_point, prepre_point,
-                                        pre_point, curr_point, speed_limit);
+      }
+      const STPoint& triple_pre_point = prepre_graph_point.pre_point()->point();
+      const STPoint& prepre_point = prepre_graph_point.point();
+      const STPoint& pre_point = cost_table_[c - 1][r_pre].point();
+      const STPoint& curr_point = cost_table_[c][r].point();
+      double cost = cost_table_[c][r].obstacle_cost() +
+                    cost_table_[c - 1][r_pre].total_cost() +
+                    CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
+                                      curr_point, speed_limit);
 
-        if (cost < cost_table_[c][r].total_cost()) {
-          cost_table_[c][r].set_total_cost(cost);
-          cost_table_[c][r].set_pre_point(cost_table_[c - 1][r_pre]);
-        }
+      if (cost < cost_table_[c][r].total_cost()) {
+        cost_table_[c][r].set_total_cost(cost);
+        cost_table_[c][r].set_pre_point(cost_table_[c - 1][r_pre]);
       }
     }
   }
@@ -333,9 +340,6 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
     SpeedPoint speed_point;
     speed_point.set_s(cur_point->point().s());
     speed_point.set_t(cur_point->point().t());
-    speed_point.set_v(0);
-    speed_point.set_a(0);
-    speed_point.set_da(0);
     speed_profile.emplace_back(speed_point);
     cur_point = cur_point->pre_point();
   }
