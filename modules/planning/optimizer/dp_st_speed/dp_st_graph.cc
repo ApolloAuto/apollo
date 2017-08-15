@@ -415,8 +415,8 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
           return Status(ErrorCode::PLANNING_ERROR,
                         "faind to create follow decision");
         }
-        if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
-                                        follow_decision)) {
+        if (!path_decision->AddLongitudinalDecision(
+                "dp_st_graph", boundary_it->id(), follow_decision)) {
           AERROR << "Failed to add follow decision to object "
                  << boundary_it->id();
           return Status(ErrorCode::PLANNING_ERROR,
@@ -431,8 +431,8 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
           return Status(ErrorCode::PLANNING_ERROR,
                         "faind to create yield decision");
         }
-        if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
-                                        yield_decision)) {
+        if (!path_decision->AddLongitudinalDecision(
+                "dp_st_graph", boundary_it->id(), yield_decision)) {
           AERROR << "Failed to add yield decision to object "
                  << boundary_it->id();
           return Status(ErrorCode::PLANNING_ERROR,
@@ -448,8 +448,8 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
         return Status(ErrorCode::PLANNING_ERROR,
                       "faind to create overtake decision");
       }
-      if (!path_decision->AddDecision("dp_st_graph", boundary_it->id(),
-                                      overtake_decision)) {
+      if (!path_decision->AddLongitudinalDecision(
+              "dp_st_graph", boundary_it->id(), overtake_decision)) {
         AERROR << "Failed to add overtake decision to object "
                << boundary_it->id();
         return Status(ErrorCode::PLANNING_ERROR,
@@ -458,11 +458,11 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
     }
   }
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    if (!path_obstacle->HasLongitutionalDecision()) {
+    if (!path_obstacle->HasLongitudinalDecision()) {
       ObjectDecisionType ignore_decision;
       ignore_decision.mutable_ignore();
-      path_decision->AddDecision("dp_st_graph", path_obstacle->Id(),
-                                 ignore_decision);
+      path_decision->AddLongitudinalDecision("dp_st_graph", path_obstacle->Id(),
+                                             ignore_decision);
     }
   }
   return Status::OK();

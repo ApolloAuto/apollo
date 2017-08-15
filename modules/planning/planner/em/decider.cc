@@ -78,7 +78,7 @@ int Decider::MakeMainStopDecision(Frame* frame,
   const auto& path_obstacles = path_decision->path_obstacles();
   for (const auto path_obstacle : path_obstacles.Items()) {
     const auto& obstacle = path_obstacle->Obstacle();
-    const auto& object_decision = path_obstacle->LongitutionalDecision();
+    const auto& object_decision = path_obstacle->LongitudinalDecision();
     if (not object_decision.has_stop()) {
       continue;
     }
@@ -150,9 +150,9 @@ int Decider::SetObjectDecisions(PathDecision* const path_decision) {
       object_decision->add_object_decision()->CopyFrom(
           path_obstacle->LateralDecision());
     }
-    if (path_obstacle->HasLongitutionalDecision()) {
+    if (path_obstacle->HasLongitudinalDecision()) {
       object_decision->add_object_decision()->CopyFrom(
-          path_obstacle->LongitutionalDecision());
+          path_obstacle->LongitudinalDecision());
     }
   }
   return 0;
