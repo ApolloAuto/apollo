@@ -215,7 +215,10 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
     if (!obstacle->IsStatic()) {
       continue;
     }
-    bool ignore = true;
+
+    // IGNORE by default
+    ObjectDecisionType object_decision;
+    object_decision.mutable_ignore();
 
     const auto &sl_boundary = path_obstacle->perception_sl_boundary();
     for (std::size_t j = 0; j < adc_sl_points.size(); ++j) {
@@ -253,9 +256,8 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
                             FLAGS_static_decision_nudge_l_buffer;
 
       if (!left_nudgable && !right_nudgable) {
-        // stop
-        ObjectDecisionType object_stop;
-        ObjectStop *object_stop_ptr = object_stop.mutable_stop();
+        // STOP: and break
+        ObjectStop *object_stop_ptr = object_decision.mutable_stop();
         object_stop_ptr->set_distance_s(FLAGS_stop_distance_obstacle);
         object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
 
@@ -265,11 +267,10 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
         object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
         object_stop_ptr->set_stop_heading(stop_ref_point.heading());
 
-        decisions->emplace_back(obstacle->Id(), object_stop);
+        break;
       } else {
-        // nudge
-        ObjectDecisionType object_nudge;
-        ObjectNudge *object_nudge_ptr = object_nudge.mutable_nudge();
+        // NUDGE: and continue to check potential STOP along the ref line
+        ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
 
         if (left_nudgable) {
@@ -279,20 +280,13 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
           // RIGHT_NUDGE
           object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
         }
-        decisions->emplace_back(obstacle->Id(), object_nudge);
       }
-
-      ignore = false;
-      break;
     }
 
-    if (ignore) {
-      // IGNORE
-      ObjectDecisionType object_ignore;
-      object_ignore.mutable_ignore();
-      decisions->emplace_back(obstacle->Id(), object_ignore);
-    }
+    // set object_decision
+    decisions->emplace_back(obstacle->Id(), object_decision);
   }
+
   return true;
 }
 
