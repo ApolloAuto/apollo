@@ -42,7 +42,7 @@ using TrajectoryPoint = apollo::common::TrajectoryPoint;
 QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
-bool QpSplineStSpeedOptimizer::Init() {
+bool QpSplineStSpeedOptimizer::Init(const PlanningConfig& config) {
   // load boundary mapper
   if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
                                       &st_boundary_config_)) {

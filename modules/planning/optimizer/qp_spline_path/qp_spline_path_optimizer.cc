@@ -33,7 +33,7 @@ using apollo::common::Status;
 QpSplinePathOptimizer::QpSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
-bool QpSplinePathOptimizer::Init() {
+bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
   if (!common::util::GetProtoFromFile(FLAGS_qp_spline_path_config_file,
                                       &qp_spline_path_config_)) {
     AERROR << "Failed to load config file for path generator. config file: "

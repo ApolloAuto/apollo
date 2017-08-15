@@ -24,6 +24,7 @@
 #include <string>
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -38,7 +39,7 @@ class Optimizer {
 
   virtual apollo::common::Status Optimize(Frame* frame);
 
-  virtual bool Init();
+  virtual bool Init(const PlanningConfig& config);
 
  protected:
   bool is_init_ = false;

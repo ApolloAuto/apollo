@@ -36,7 +36,7 @@ using IdDecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
 DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
     : PathOptimizer(name) {}
 
-bool DpPolyPathOptimizer::Init() {
+bool DpPolyPathOptimizer::Init(const PlanningConfig& config) {
   if (!common::util::GetProtoFromFile(FLAGS_dp_poly_path_config_file,
                                       &config_)) {
     AERROR << "failed to load config file " << FLAGS_dp_poly_path_config_file;
