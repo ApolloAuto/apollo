@@ -36,7 +36,7 @@ double PIDController::Control(const double error, const double dt) {
   } else {
     diff = (error - previous_error_) / dt;
   }
-  // integral handling
+  // integral hold
   if (!integrator_enabled_) {
     integral_ = 0;
   } else if (!integrator_hold_) {
@@ -83,11 +83,16 @@ void PIDController::SetPID(const PidConf &pid_conf) {
   kp_ = pid_conf.kp();
   ki_ = pid_conf.ki();
   kd_ = pid_conf.kd();
+  kaw_ = pid_conf.kaw();
 }
 
-int PIDController::saturation_status() const { return saturation_status_; }
+int PIDController::SaturationStatus() const {
+  return saturation_status_;
+}
 
-bool PIDController::integrator_hold() const { return integrator_hold_; }
+bool PIDController::IntegratorHold() const {
+  return integrator_hold_;
+}
 
 }  // namespace control
 }  // namespace apollo
