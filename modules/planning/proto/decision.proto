@@ -47,7 +47,7 @@ message ObjectNudge {
   optional Type type = 1;
   // minimum lateral distance in meters. positive if type = LEFT_NUDGE
   // negative if type = RIGHT_NUDGE
-  optional double distance_l = 2; 
+  optional double distance_l = 2;
 }
 
 message ObjectYield {

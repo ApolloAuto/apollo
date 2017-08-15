@@ -84,6 +84,9 @@ class Planning : public apollo::common::ApolloApp {
 
   void RunOnce();
 
+  void PublishPlanningPb(ADCTrajectory* trajectory_pb);
+  void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
+
  private:
   void RegisterPlanners();
 
