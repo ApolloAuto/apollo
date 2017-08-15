@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package apollo.planning;
 
+import "modules/planning/proto/st_boundary_config.proto";
+
 message QpSplineStSpeedConfig {
   optional double total_path_length = 1 [ default = 80.0 ];
   optional double total_time = 2 [ default = 8.0 ];
@@ -20,4 +22,5 @@ message QpSplineStSpeedConfig {
   optional double max_acceleration = 15 [ default = 4.5 ];
   optional double max_deceleration = 16 [ default = -4.5 ];
   optional double reference_line_kernel_weight = 17 [ default = 1.0 ];
+  optional apollo.planning.StBoundaryConfig st_boudnary_config = 18;
 }

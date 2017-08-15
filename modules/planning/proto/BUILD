@@ -18,7 +18,6 @@ proto_library(
         "planning_internal.proto",
         "qp_spline_st_speed_config.proto",
         "sl_boundary.proto",
-        "st_boundary_config.proto",
     ],
     deps = [
         ":dp_poly_path_config_proto_lib",
@@ -78,6 +77,7 @@ proto_library(
     name = "dp_st_speed_config_proto_lib",
     srcs = [
         "dp_st_speed_config.proto",
+        "st_boundary_config.proto",
     ],
 )
 
@@ -92,6 +92,13 @@ proto_library(
     name = "qp_spline_path_config_proto_lib",
     srcs = [
         "qp_spline_path_config.proto",
+    ],
+)
+
+proto_library(
+    name = "st_boundary_config_proto_lib",
+    srcs = [
+        "st_boundary_config.proto",
     ],
 )
 
