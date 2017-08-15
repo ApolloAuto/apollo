@@ -21,6 +21,9 @@ proto_library(
         "st_boundary_config.proto",
     ],
     deps = [
+        ":dp_poly_path_config_proto_lib",
+        ":dp_st_speed_config_proto_lib",
+        ":qp_spline_path_config_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
