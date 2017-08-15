@@ -10,5 +10,5 @@ PREDICTION prediction_obstacle_pb2.PredictionObstacles() /apollo/prediction 200
 Pad pad_msg_pb2.PadMessage() /apollo/control/pad 500
 Odometry gps_pb2.Gps() /apollo/sensor/gnss/odometry 10
 IMU imu_pb2.Imu() /apollo/sensor/gnss/corrected_imu 10
-ROUTING routing_pb2.RoutingResponse() /apollo/routing_response 1
-MAP routing_pb2.RoutingRequest() /apollo/routing_request 1
+ROUTING_RES routing_pb2.RoutingResponse() /apollo/routing_response 1
+ROUTING_REQ routing_pb2.RoutingRequest() /apollo/routing_request 1
