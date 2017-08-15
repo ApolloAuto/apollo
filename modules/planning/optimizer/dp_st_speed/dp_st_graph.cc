@@ -409,8 +409,10 @@ Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
     if (go_down) {
       if (CheckIsFollowByT(*boundary_it)) {
         // FOLLOW decision
+        const auto obstacle = path_decision->Find(boundary_it->id());
+        const auto &obstacle_boundary = obstacle->perception_sl_boundary();
         ObjectDecisionType follow_decision;
-        if (!CreateFollowDecision(*boundary_it, &follow_decision)) {
+        if (!CreateFollowDecision(obstacle_boundary, &follow_decision)) {
           AERROR << "Failed to create follow decision for boundary with id "
                  << boundary_it->id();
           return Status(ErrorCode::PLANNING_ERROR,
@@ -470,7 +472,7 @@ Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
 }
 
 bool DpStGraph::CreateFollowDecision(
-    const StGraphBoundary& boundary,
+    const SLBoundary& obstacle_boundary,
     ObjectDecisionType* const follow_decision) const {
   DCHECK_NOTNULL(follow_decision);
 
@@ -478,10 +480,11 @@ bool DpStGraph::CreateFollowDecision(
   const double follow_distance_s = -FLAGS_follow_min_distance;
   follow->set_distance_s(follow_distance_s);
 
-  const double reference_line_fence_s = boundary.min_s() + follow_distance_s;
+  const double reference_line_fence_s =
+      obstacle_boundary.start_s() + follow_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
-    AERROR << "Failed to get path point from reference line s "
+    AERROR << "Failed to get path point from reference line s: "
            << reference_line_fence_s;
     return false;
   }
