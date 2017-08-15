@@ -40,15 +40,15 @@ void Bitmap2D::Set(const size_t x_id, const size_t min_y_id, const size_t max_y_
   size_t right_block_id = max_y_id >> 6; // max_y_id / 64
   size_t right_bit_id = max_y_id & 63;   // max_y_id % 64
 
-  auto &row_bits = bitmap_[x_id];
+  auto &blocks = bitmap_[x_id];
   if (left_block_id == right_block_id) {
-    SetUint64RangeBits(row_bits[left_block_id], left_bit_id, right_bit_id);
+    SetUint64RangeBits(blocks[left_block_id], left_bit_id, right_bit_id);
   } else {
-    SetUint64HeadBits(row_bits[left_block_id], left_bit_id);
-    SetUint64TailBits(row_bits[right_block_id], right_bit_id);
+    SetUint64HeadBits(blocks[left_block_id], left_bit_id);
+    SetUint64TailBits(blocks[right_block_id], right_bit_id);
 
     for (size_t i = left_block_id + 1; i < right_block_id; ++i) {
-      row_bits[i] = all_ones;
+      blocks[i] = all_ones;
     }
   }
 }

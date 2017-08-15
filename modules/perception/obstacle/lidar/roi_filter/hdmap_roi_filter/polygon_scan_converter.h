@@ -28,13 +28,12 @@
 namespace apollo {
 namespace perception {
 
-/*
+/**
  * @class PolygonScanConverter
  * @brief: This is a converter from polygon to scan lines, by which we can build
  * bitmap. Assume major direction as x direction, we scan polygons in x ascending
  * order.
  */
-
 class PolygonScanConverter {
  public:
   typedef Eigen::Matrix<double, 2, 1> Point;
@@ -55,19 +54,18 @@ class PolygonScanConverter {
 
   typedef Bitmap2D::DirectionMajor DirectionMajor;
 
-  PolygonScanConverter(DirectionMajor major_dir) : major_dir_(major_dir) {
-    op_major_dir_ = opposite_direction(major_dir);
-  }
+  void Init(const DirectionMajor major_dir, const Interval& valid_range,
+            const Polygon& polygon, const double step);
 
-  static inline DirectionMajor opposite_direction(DirectionMajor dir_major) {
+  static inline DirectionMajor OppositeDirection(DirectionMajor dir_major) {
     return static_cast<DirectionMajor>(dir_major ^ 1);
   }
 
-  void ConvertScans(const Interval& valid_range, const Polygon& polygon,
-                    const double step,
-                    std::vector<std::vector<Interval>>* scans_intervals);
+  void ConvertScans(std::vector<std::vector<Interval>>* scans_intervals);
 
  private:
+  static const double kEpsilon;
+  static const double kInf;
   Polygon polygon_;
   std::vector<Segment> segments_;
 
@@ -77,18 +75,17 @@ class PolygonScanConverter {
 
   std::vector<Edge> active_edge_table_;
 
-  double bottom_x_;
+  double min_x_;
   double step_;
   size_t scans_size_;
   DirectionMajor major_dir_;
   DirectionMajor op_major_dir_;
 
-  /*
-   * @brief: If some point of polygon happens to be around the scan line we will
-   * use, lightly change the x coordinate to avoid situation of singular point.
+  /**
+   * @brief: If some point of polygon happens to be around the scan line,
+   * lightly modify the x coordinate to avoid situation of singular point.
    */
   void DisturbPolygon();
-
 
   void BuildEdgeTable();
 
@@ -97,7 +94,7 @@ class PolygonScanConverter {
 
   void ConvertPolygonToSegments();
 
-  bool ConvertSegmentToEdge(size_t seg_id, std::pair<int, Edge>& out_edge);
+  bool ConvertSegmentToEdge(const size_t seg_id, std::pair<int, Edge>* out_edge);
 };
 
 }  // perception
