@@ -27,6 +27,7 @@ const MenuIdOptionMapping = {
         perceptionUnknown: 'showObstaclesUnknown',
         perceptionVirtual: 'showObstaclesVirtual',
         perceptionArrow: 'showObstaclesArrow',
+        perceptionId: 'showObstaclesId',
         predictionMajor: 'showPredictionMajor',
         predictionMinor: 'showPredictionMinor',
         routing: 'showRouting',

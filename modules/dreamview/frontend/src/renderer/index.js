@@ -15,7 +15,7 @@ class Renderer {
     constructor() {
         this.coordinates = new Coordinates();
         this.renderer = new THREE.WebGLRenderer({
-            preserveDrawingBuffer: true
+            preserveDrawingBuffer: true, antialias: true
         });
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x031C31);
@@ -62,6 +62,7 @@ class Renderer {
             PARAMETERS.camera[this.options.cameraAngle].near,
             PARAMETERS.camera[this.options.cameraAngle].far
         );
+        this.camera.name = "camera";
         this.scene.add(this.camera);
 
         this.updateDimension(width, height);
@@ -182,6 +183,7 @@ class Renderer {
         // added it to the scene.
         if (!this.adcMeshAddedToScene) {
             this.adcMeshAddedToScene = true;
+            this.adc.mesh.name = "adc";
             this.scene.add(this.adc.mesh);
         }
 
@@ -189,6 +191,7 @@ class Renderer {
         // added it to the scene.
         if (!this.ground.initialized) {
             this.ground.initialize(this.coordinates);
+            this.ground.mesh.name = "ground";
             this.scene.add(this.ground.mesh);
         }
 
