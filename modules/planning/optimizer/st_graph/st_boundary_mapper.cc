@@ -155,9 +155,7 @@ Status StBoundaryMapper::GetGraphBoundary(
                       "Fail to map overtake/yield decision");
       }
     } else {
-      std::string msg = common::util::StrCat("No mapping for decision: ",
-                                             decision.DebugString());
-      ADEBUG << msg;
+      ADEBUG << "No mapping for decision: " << decision.DebugString();
     }
   }
 
@@ -171,6 +169,10 @@ Status StBoundaryMapper::GetGraphBoundary(
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     st_graph_boundaries->push_back(stop_boundary);
+  }
+  for (const auto& st_graph_boundary : *st_graph_boundaries) {
+    DCHECK_EQ(st_graph_boundary.points().size(), 4);
+    DCHECK_NE(st_graph_boundary.id().length(), 0);
   }
   return Status::OK();
 }
