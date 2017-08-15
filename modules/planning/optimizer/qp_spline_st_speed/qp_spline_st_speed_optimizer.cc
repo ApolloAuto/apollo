@@ -88,6 +88,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
 
   for (const auto& boundary : boundaries) {
     ADEBUG << "QPST mapped boundary: " << boundary.DebugString() << std::endl;
+    DCHECK(boundary.boundary_type() != StGraphBoundary::BoundaryType::UNKNOWN);
   }
 
   SpeedLimit speed_limits;
