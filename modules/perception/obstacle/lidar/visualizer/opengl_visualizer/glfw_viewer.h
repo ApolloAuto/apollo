@@ -14,118 +14,133 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_VISUALIZER_GLFW_VIEWER_H
-#define ADU_PERCEPTION_OBSTACLE_VISUALIZER_GLFW_VIEWER_H
+#ifndef APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
+#define APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "Eigen/Dense"
-#include "camera.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/camera.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 
 namespace apollo {
 namespace perception {
-// 使用此宏来简化偏移量的表达形式
-#define BUFFER_OFFSET(offset) ((GLvoid*)offset)
+class GLFWViewer {
+ public:
+  explicit GLFWViewer();
+  virtual ~GLFWViewer();
 
-typedef struct {
-  GLfloat x;
-  GLfloat y;
-  GLfloat z;
-} vec3;
+  bool Initialize();
 
-class FrameContent;
+  void SetFrameContent(FrameContent *frame_content) {
+    frame_content_ = frame_content;
+  }
+  void Spin();
+  void SpinOnce();
+  void Close();
 
-class GLFWViewer{
-public:
-    explicit GLFWViewer();
-    virtual ~GLFWViewer();
+  void SetBackgroundColor(Eigen::Vector3d i_bg_color) {
+    bg_color_ = i_bg_color;
+  }
+  void SetSize(int w, int h);
+  void SetCameraPara(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center,
+                     Eigen::Vector3d i_up_vector);
+  void SetForwardDir(Eigen::Vector3d forward) { forward_dir_ = forward; }
 
-    bool Initialize();
- 
-    void SetFrameContent(FrameContent* frame_content){ frame_content_ = frame_content;}
-    void Spin();
-    void SpinOnce();
-    void Close();
+  // callback assistants
+  void ResizeFramebuffer(int width, int height);
+  void MouseMove(double xpos, double ypos);
+  void MouseWheel(double delta);
+  void Reset();
+  void Keyboard(int key);
 
-    void SetBackgroundColor(Eigen::Vector3d i_bg_color) { bg_color_ = i_bg_color;}
-    void SetSize(int w, int h);
-    void SetCameraPara(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center, Eigen::Vector3d i_up_vector);
-    void SetForwardDir(Eigen::Vector3d forward){ forward_dir_ = forward;}
-    
-    //callback assistants
-    void ResizeFramebuffer(int width, int height);
-    void MouseMove(double xpos, double ypos);
-    void MouseWheel(double delta);
-    void Reset();
-    void Keyboard(int key);
+  // callback functions
+  static void FramebufferSizeCallback(GLFWwindow *window, int width,
+                                      int height);
+  static void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
+                          int mods);
+  static void MouseButtonCallback(GLFWwindow *window, int button, int action,
+                                  int mods);
+  static void MouseCursorPositionCallback(GLFWwindow *window, double xpos,
+                                          double ypos);
+  static void MouseScrollCallback(GLFWwindow *window, double xoffset,
+                                  double yoffset);
+  static void ErrorCallback(int error, const char *description);
 
-    //callback functions
-    static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
-    //input related
-    static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-    static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-    static void MouseCursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
-    static void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-    //error handling
-    static void ErrorCallback(int error, const char* description);
+ private:
+  bool WindowInit();
+  bool CameraInit();
+  bool OpenglInit();
+  void PreDraw();
+  void Render();
 
-private:
-    bool WindowInit();
-    bool CameraInit();
-    bool OpenglInit();
-    void PreDraw();
-    void Render();
-private:
-    bool init_;
+  void GetClassColor(int cls, float rgb[3]);
+  void DrawCloud();
+  void DrawCircle();
+  void DrawCarForwardDir();
+  void DrawObstacles();
+  void DrawObstacle(const ObjectPtr obj, bool show_cloud, bool show_polygon,
+                    bool show_velocity, bool show_direction);
+  void DrawOffsetVolumn(Eigen::Vector3d *polygon_points, double h,
+                        int polygon_size);
 
-    GLFWwindow* window_;
-    Camera* pers_camera_; 
-	
-    Eigen::Vector3d forward_dir_;
+ private:
+  bool init_;
 
-    int win_width_;
-    int win_height_;
-    int mouse_prev_x_;
-    int mouse_prev_y_;
-    Eigen::Matrix4d mode_mat_;
-    Eigen::Matrix4d view_mat_;
-    Eigen::Vector3d bg_color_;
- 
-    /***************************************************************************************/
-    bool show_cloud_;
-    int  show_cloud_state_;
-    bool show_box_;
-    bool show_velocity_;
-    bool show_polygon_;
-    bool show_text_;
-    
-    FrameContent* frame_content_;
-    /***************************************************************************************/
-    void GetClassColor(int cls, float rgb[3]);
-    enum { circle, cube, cloud, polygon,  NumVAOs_typs };   //{0, 1, 2, 3, 4}
-    enum { vertices, colors, elements, NumVBOs };   //{0, 1, 2, 3}
-         
-    //cloud
-    static const int VAO_cloud_num = 35;
-    static const int VBO_cloud_num = 10000;
-    GLuint   VAO_cloud[VAO_cloud_num];
-    GLuint   buffers_cloud[VAO_cloud_num][NumVBOs];
-    GLfloat  cloudVerts[VBO_cloud_num][3]; 
-    bool DrawCloud(FrameContent* content);
-    //circle
-    static const int VAO_circle_num = 6;
-    static const int VBO_circle_num = 256;
-    GLuint VAO_circle[VAO_circle_num];
-    void DrawCircle();
-    void DrawCarForwardDir();
-    //objects
-    void DrawObjects(FrameContent* content , bool draw_cube, bool draw_polygon, bool draw_velocity);
-    vec3 GetVelocitySrcPosition(FrameContent* content, int id);
-    //map_roi 
-    //bool show_map(FrameContent* content, bool show_map_roi, bool show_map_boundary);
+  GLFWwindow *window_;
+  Camera *pers_camera_;
+
+  FrameContent *frame_content_;
+  Eigen::Vector3d forward_dir_;
+  Eigen::Vector3d scn_center_;
+  Eigen::Vector3d bg_color_;
+
+  int win_width_;
+  int win_height_;
+  int mouse_prev_x_;
+  int mouse_prev_y_;
+
+  Eigen::Matrix4d mode_mat_;
+  Eigen::Matrix4d view_mat_;
+
+  bool show_cloud_;
+  int show_cloud_state_;
+  bool show_velocity_;
+  bool show_direction_;
+  bool show_polygon_;
+
+  enum OBJ_Type {
+    CIRCIE = 0,
+    CUBE = 1,
+    CLOUD = 2,
+    POLYGON = 3,
+    NUM_VAO_TYPE = 4
+  };
+
+  enum VBO_Type {
+    VBO_VERTICES = 0,
+    VBO_COLORS = 1,
+    VBO_ELEMENTS = 2,
+    NUM_VBO_TYPE = 3
+  };
+
+  // cloud
+  static const int cloud_VAO_num_ = 35;
+  static const int point_num_per_cloud_VAO_ = 10000;
+  GLuint cloud_VAO_buf_ids_[cloud_VAO_num_];
+  GLuint cloud_VBO_buf_ids_[cloud_VAO_num_][NUM_VBO_TYPE]; // each VAO has
+                                                           // NUM_VBO_TYPE VBOs
+  GLfloat cloud_verts_[point_num_per_cloud_VAO_][3];
+
+  // circle
+  static const int circle_VAO_num_ = 3;
+  static const int point_num_per_circle_VAO_ = 256;
+  GLuint circle_VAO_buf_ids_[circle_VAO_num_];
+  GLuint circle_VBO_buf_ids_[circle_VAO_num_][NUM_VBO_TYPE];
 };
 
-}  // namespace obstacle
-}  // namespace perception
-#endif
+} // namespace obstacle
+} // namespace perception
+
+#endif // APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
