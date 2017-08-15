@@ -258,12 +258,36 @@ bool QpSplinePathGenerator::AddConstraint(
   std::vector<double> boundary_low;
   std::vector<double> boundary_high;
   for (const double s : evaluated_s_) {
-    std::pair<double, double> boundary = std::make_pair(0.0, 0.0);
-    qp_frenet_frame.GetMapBound(s, &boundary);
+    std::pair<double, double> road_boundary = std::make_pair(0.0, 0.0);
+    std::pair<double, double> static_obs_boundary = std::make_pair(0.0, 0.0);
+    std::pair<double, double> dynamic_obs_boundary = std::make_pair(0.0, 0.0);
+    qp_frenet_frame.GetMapBound(s, &road_boundary);
+    qp_frenet_frame.GetStaticObstacleBound(s, &static_obs_boundary);
+    qp_frenet_frame.GetDynamicObstacleBound(s, &dynamic_obs_boundary);
+
+    if (init_frenet_point_.l() > road_boundary.second) {
+      road_boundary.second = init_frenet_point_.l() +
+        qp_spline_path_config_.cross_lane_extension_buffer();
+    } else if (init_frenet_point_.l() < road_boundary.first) {
+      road_boundary.first = init_frenet_point_.l() -
+        qp_spline_path_config_.cross_lane_extension_buffer();
+    }
+
+    std::pair<double, double> boundary = road_boundary;
+    boundary.first = std::max(boundary.first,
+        std::max(static_obs_boundary.first, dynamic_obs_boundary.first));
+    boundary.second = std::min(boundary.second,
+        std::min(static_obs_boundary.second, dynamic_obs_boundary.second));
     boundary_low.push_back(boundary.first);
     boundary_high.push_back(boundary.second);
     ADEBUG << "s:" << s << " boundary_low:" << boundary.first
-        << " boundary_high:" << boundary.second;
+           << " boundary_high:" << boundary.second << " road_boundary_low: "
+           << road_boundary.first << "road_boundary_high: "
+           << road_boundary.second << " static_obs_boundary_low: "
+           << static_obs_boundary.first << "static_obs_boundary_high: "
+           << static_obs_boundary.second << "dynamic_obs_boundary_low: "
+           << dynamic_obs_boundary.first << "dynamic_obs_boundary_high: "
+           << dynamic_obs_boundary.second;
   }
   if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low,
                                           boundary_high)) {
