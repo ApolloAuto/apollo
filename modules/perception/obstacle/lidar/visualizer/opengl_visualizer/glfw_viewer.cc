@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
 #include <iomanip>
 #include <fstream>
 #include <iostream>
@@ -22,7 +23,6 @@
 #include <pcl/io/pcd_io.h>
 #include "modules/common/log.h"
 
-#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/arc_ball.h"
@@ -32,12 +32,28 @@ namespace perception {
 
 #define BUFFER_OFFSET(offset) ((GLvoid *)offset)
 
-GLFWViewer::GLFWViewer()
-    : init_(false), window_(NULL), pers_camera_(NULL), win_width_(800),
-      win_height_(600), mouse_prev_x_(0), mouse_prev_y_(0), show_cloud_(1),
-      show_cloud_state_(0), show_velocity_(1), show_polygon_(0),
-      bg_color_(0.0, 0.0, 0.0), frame_content_(NULL) {
+GLFWViewer::GLFWViewer() {
+  init_ = false;
+  window_ = NULL;
+  pers_camera_ = NULL;
+  frame_content_ = NULL;
+  forward_dir_ = Eigen::Vector3d::Zero();
+  scn_center_ = Eigen::Vector3d::Zero();
+  bg_color_ = Eigen::Vector3d::Zero();
+
   mode_mat_ = Eigen::Matrix4d::Identity();
+  view_mat_ = Eigen::Matrix4d::Identity();
+
+  win_width_ = 800;
+  win_height_ = 600;
+  mouse_prev_x_ = 0;
+  mouse_prev_y_ = 0;
+
+  show_cloud_ = true;
+  show_cloud_state_ = 0;
+  show_velocity_ = true;
+  show_direction_ = false;
+  show_polygon_ = false;
 }
 
 GLFWViewer::~GLFWViewer() {
@@ -623,10 +639,10 @@ void GLFWViewer::MouseMove(double xpos, double ypos) {
   int y_delta = ypos - mouse_prev_y_;
   if (state_left == GLFW_PRESS) {
     Eigen::Vector3d obj_cen_screen = pers_camera_->PointOnScreen(scn_center_);
-    Eigen::Quaterniond rot = ArcBall::RotateByMouse(
-        double(mouse_prev_x_), double(mouse_prev_y_), xpos, ypos,
-        obj_cen_screen(0), obj_cen_screen(1), double(win_width_),
-        double(win_height_));
+    Eigen::Quaterniond rot =
+        ArcBall::RotateByMouse(double(mouse_prev_x_), double(mouse_prev_y_),
+                               xpos, ypos, obj_cen_screen(0), obj_cen_screen(1),
+                               double(win_width_), double(win_height_));
 
     Eigen::Matrix3d rot_mat = rot.inverse().toRotationMatrix();
     Eigen::Vector3d scn_center = scn_center_;

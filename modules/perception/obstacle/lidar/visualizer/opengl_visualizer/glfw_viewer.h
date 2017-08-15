@@ -96,13 +96,13 @@ class GLFWViewer {
   Eigen::Vector3d scn_center_;
   Eigen::Vector3d bg_color_;
 
+  Eigen::Matrix4d mode_mat_;
+  Eigen::Matrix4d view_mat_;
+
   int win_width_;
   int win_height_;
   int mouse_prev_x_;
   int mouse_prev_y_;
-
-  Eigen::Matrix4d mode_mat_;
-  Eigen::Matrix4d view_mat_;
 
   bool show_cloud_;
   int show_cloud_state_;

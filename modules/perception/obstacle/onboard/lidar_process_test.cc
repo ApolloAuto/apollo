@@ -18,6 +18,7 @@
 
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
@@ -51,6 +52,7 @@ TEST_F(LidarProcessTest, test_Init) {
   EXPECT_FALSE(lidar_process_.Init());
   FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
   FLAGS_enable_hdmap_input = true;
+  FLAGS_map_file_path = "not_exit_path";
   EXPECT_FALSE(lidar_process_.InitFrameDependence());
   FLAGS_enable_hdmap_input = false;
   EXPECT_TRUE(lidar_process_.InitFrameDependence());

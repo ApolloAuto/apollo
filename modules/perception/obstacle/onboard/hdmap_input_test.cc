@@ -50,9 +50,9 @@ TEST_F(HDMapInputTest, test_Init) {
 
 TEST_F(HDMapInputTest, test_GetROI) {
   HdmapStructPtr hdmap;
-  pcl_util::PointD velodyne_pose_world = {435730.0, 4436777.0, 0.0};
+  pcl_util::PointD velodyne_pose_world = {587054.96336391149, 4141606.3593586856, 0.0};
   EXPECT_FALSE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
-  FLAGS_map_file_path = "modules/map/data/base_map_with_boundary.txt";
+  FLAGS_map_file_path = "modules/map/data/sunnyvale_loop.xml.txt";
   EXPECT_TRUE(hdmap_input_->Init());
   EXPECT_TRUE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
   EXPECT_TRUE(hdmap != nullptr);
