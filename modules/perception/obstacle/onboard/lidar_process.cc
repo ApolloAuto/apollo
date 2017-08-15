@@ -146,12 +146,12 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
     SegmentationOptions segmentation_options;
     segmentation_options.origin_cloud = point_cloud;
     PointIndices non_ground_indices;
-    // non_ground_indices.indices.resize(roi_cloud->points.size());
-    non_ground_indices.indices.resize(point_cloud->points.size());
+    non_ground_indices.indices.resize(roi_cloud->points.size());
+    // non_ground_indices.indices.resize(point_cloud->points.size());
 
     std::iota(non_ground_indices.indices.begin(),
               non_ground_indices.indices.end(), 0);
-    if (!segmentor_->Segment(point_cloud, non_ground_indices,
+    if (!segmentor_->Segment(roi_cloud, non_ground_indices,
                              segmentation_options, &objects)) {
       AERROR << "failed to call segmention.";
       error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;

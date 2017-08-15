@@ -124,7 +124,7 @@ void HdmapROIFilter::MergeRoadBoundariesToPolygons(
     polygon.insert(polygon.end(), left_boundary.begin(), left_boundary.end());
 
     CHECK(right_boundary.size() > 0);
-    for (size_t j = right_boundary.size() - 1; j != 0; --j) {
+    for (int j = (int)right_boundary.size() - 1; j >= 0; --j) {
       polygon.push_back(right_boundary[j]);
     }
   }
