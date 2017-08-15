@@ -29,12 +29,11 @@ namespace apollo {
 namespace planning {
 
 DpStCost::DpStCost(const DpStSpeedConfig& dp_st_speed_config)
-    : dp_st_speed_config_(dp_st_speed_config) {
-  unit_s_ = dp_st_speed_config_.total_path_length() /
-            dp_st_speed_config_.matrix_dimension_s();
-  unit_t_ = dp_st_speed_config_.total_time() /
-            dp_st_speed_config_.matrix_dimension_t();
-}
+    : dp_st_speed_config_(dp_st_speed_config),
+      unit_s_(dp_st_speed_config_.total_path_length() /
+              dp_st_speed_config_.matrix_dimension_s()),
+      unit_t_(dp_st_speed_config_.total_time() /
+              dp_st_speed_config_.matrix_dimension_t()) {}
 
 // TODO(all): normalize cost with time
 double DpStCost::GetObstacleCost(
@@ -43,15 +42,15 @@ double DpStCost::GetObstacleCost(
   double total_cost = 0.0;
   for (const StGraphBoundary& boundary : st_graph_boundaries) {
     if (point.s() < 0 || boundary.IsPointInBoundary(point)) {
-      total_cost += dp_st_speed_config_.st_graph_default_point_cost();
+      total_cost = std::numeric_limits<double>::infinity();
     } else {
       double distance = boundary.DistanceTo(point);
-      total_cost += dp_st_speed_config_.st_graph_default_point_cost() *
+      total_cost += dp_st_speed_config_.default_obstacle_cost() *
                     std::exp(dp_st_speed_config_.obstacle_cost_factor() /
                              boundary.characteristic_length() * distance);
     }
   }
-  return total_cost;
+  return total_cost * unit_t_;
 }
 
 double DpStCost::GetReferenceCost(const STPoint& point,
@@ -66,7 +65,7 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   double cost = 0.0;
   double speed = (second.s() - first.s()) / unit_t_;
   if (Double::Compare(speed, 0.0) < 0) {
-    cost = dp_st_speed_config_.st_graph_default_point_cost();
+    cost = std::numeric_limits<double>::infinity();
   }
   double det_speed = (speed - speed_limit) / speed_limit;
   if (Double::Compare(det_speed, 0.0) > 0) {
