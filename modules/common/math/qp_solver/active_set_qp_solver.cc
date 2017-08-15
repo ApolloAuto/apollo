@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace common {
@@ -59,7 +60,7 @@ bool ActiveSetQpSolver::Solve() {
     qp_problem.setPrintLevel(qpOASES::PL_NONE);
   }
 
-  // qp_problem.setOptions(my_options);
+  qp_problem.setOptions(my_options);
   // definition of qpOASESproblem
   double h_matrix[kernel_matrix_.rows() * kernel_matrix_.cols()];  // NOLINT
   double g_matrix[offset_.rows()];                                 // NOLINT
@@ -114,10 +115,17 @@ bool ActiveSetQpSolver::Solve() {
   // initialize problem
   int max_iter = std::max(max_iteration_, num_constraint_);
 
-  if (qp_problem.init(h_matrix, g_matrix, affine_constraint_matrix, lower_bound,
+  auto ret = qp_problem.init(h_matrix, g_matrix, affine_constraint_matrix, lower_bound,
                       upper_bound, constraint_lower_bound,
                       constraint_upper_bound,
-                      max_iter) != qpOASES::SUCCESSFUL_RETURN) {
+                      max_iter);
+  if (ret != qpOASES::SUCCESSFUL_RETURN) {
+    AERROR << "Fail to initialze qp problem";
+    if (ret == qpOASES::RET_MAX_NWSR_REACHED) {
+      AERROR << "Qp solver failed due to reach max iteration";
+    } else {
+      AERROR << "Qp is failed due to infeasibility or other internal reason";
+    }
     return false;
   }
 

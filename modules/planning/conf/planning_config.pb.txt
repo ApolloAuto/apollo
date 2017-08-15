@@ -92,13 +92,13 @@ em_planner_config {
         speed_kernel_weight: 0.0
         accel_kernel_weight: 0.0
         jerk_kernel_weight: 1000.0
-        follow_weight: 1.0
-        stop_weight: 1.0
-        cruise_weight: 1.0
+        follow_weight: 0.2
+        stop_weight: 0.2
+        cruise_weight: 0.2
         max_speed: 20.0
-        max_acceleration: 4.5
+        max_acceleration: 2.5
         max_deceleration: -4.5
-        reference_line_kernel_weight: 1.0
+        reference_line_kernel_weight: 0.2
 
         st_boundary_config {
             boundary_buffer: 0.1
