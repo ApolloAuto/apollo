@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

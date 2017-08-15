@@ -21,7 +21,6 @@
 #include "modules/planning/optimizer/dp_st_speed/dp_st_graph.h"
 
 #include <algorithm>
-#include <iostream>
 #include <limits>
 #include <string>
 
@@ -106,10 +105,14 @@ Status DpStGraph::InitCostTable() {
   cost_table_ = std::vector<std::vector<StGraphPoint>>(
       dim_t, std::vector<StGraphPoint>(dim_s, StGraphPoint()));
 
+  double curr_t = 0.0;
   for (uint32_t i = 0; i < cost_table_.size(); ++i) {
+    double curr_s = 0.0;
     for (uint32_t j = 0; j < cost_table_[i].size(); ++j) {
-      cost_table_[i][j].Init(i, j, STPoint(unit_s_ * j, unit_t_ * i));
+      cost_table_[i][j].Init(i, j, STPoint(curr_s, curr_t));
+      curr_s += unit_s_;
     }
+    curr_t += unit_t_;
   }
 
   return Status::OK();
@@ -119,9 +122,11 @@ void DpStGraph::CalculatePointwiseCost(
     const std::vector<StGraphBoundary>& boundaries) {
   // TODO(all): extract reference line from decision first
   std::vector<STPoint> reference_points;
+  double curr_t = 0.0;
   for (uint32_t i = 0; i < cost_table_.size(); ++i) {
-    reference_points.emplace_back(unit_t_ * i * dp_st_speed_config_.max_speed(),
-                                  unit_t_ * i);
+    reference_points.emplace_back(curr_t * dp_st_speed_config_.max_speed(),
+                                  curr_t);
+    curr_t += unit_t_;
   }
 
   for (uint32_t i = 0; i < cost_table_.size(); ++i) {
@@ -179,9 +184,10 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
     DCHECK_NOTNULL(pre_point);
     v0 = (curr_point.index_s() - pre_point->index_s()) * unit_s_ / unit_t_;
   }
+  const double speed_coeff = 0.5 * unit_t_ * unit_t_;
+
   const double delta_s_upper_bound =
-      v0 * unit_t_ +
-      0.5 * vehicle_param_.max_acceleration() * unit_t_ * unit_t_;
+      v0 * unit_t_ + vehicle_param_.max_acceleration() * speed_coeff;
   *next_highest_row = curr_point.index_s() +
                       static_cast<uint32_t>(delta_s_upper_bound / unit_s_);
   if (*next_highest_row >= cost_table_.back().size()) {
@@ -189,8 +195,7 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
   }
 
   const double delta_s_lower_bound = std::fmax(
-      0.0, v0 * unit_t_ +
-               0.5 * vehicle_param_.max_deceleration() * unit_t_ * unit_t_);
+      0.0, v0 * unit_t_ + vehicle_param_.max_deceleration() * speed_coeff);
   *next_lowest_row =
       *next_lowest_row + static_cast<int32_t>(delta_s_lower_bound / unit_s_);
   if (*next_lowest_row >= cost_table_.back().size()) {
@@ -201,11 +206,8 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
 void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
                                 const uint32_t c, const uint32_t r) {
   if (c == 0) {
-    if (r == 0) {
-      cost_table_[c][r].SetTotalCost(0.0);
-    } else {
-      cost_table_[c][r].SetTotalCost(std::numeric_limits<double>::infinity());
-    }
+    DCHECK_EQ(r, 0) << "Incorrect. Row should be 0 with col = 0. row: " << r;
+    cost_table_[c][r].SetTotalCost(0.0);
     return;
   }
 
