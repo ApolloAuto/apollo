@@ -339,9 +339,6 @@ DEFINE_string(planning_config_file,
 DEFINE_string(qp_spline_path_config_file,
               "modules/planning/conf/qp_spline_path_config.pb.txt",
               "Qp spline path config file");
-DEFINE_string(dp_poly_path_config_file,
-              "modules/planning/conf/dp_poly_path_config.pb.txt",
-              "Dp poly path config file");
 DEFINE_string(dp_st_speed_config_file,
               "modules/planning/conf/dp_st_speed_config.pb.txt",
               "Dp st speed config file");
