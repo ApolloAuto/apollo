@@ -17,7 +17,9 @@
 ###############################################################################
 
 import argparse
+
 import matplotlib.pyplot as plt
+
 from map import Map
 from localization import Localization
 

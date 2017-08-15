@@ -19,9 +19,9 @@
 This module provides the logging function.
 """
 
-import os
 import logging
 import logging.handlers
+import os
 
 
 class Logger(object):

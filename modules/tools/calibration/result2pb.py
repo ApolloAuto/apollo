@@ -16,12 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-import numpy as np
 import sys
+
+from google.protobuf import text_format
+import numpy as np
+
 sys.path.append("../../bazel-genfiles")
 from modules.control.proto import calibration_table_pb2
 from modules.control.proto import control_conf_pb2
-from google.protobuf import text_format
 
 
 def load_calibration_raw_data(fn):

@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-import os
-import rospy
 import argparse
+import os
 import threading
-import matplotlib.pyplot as plt
+
 import matplotlib.animation as animation
-from map import Map
+import matplotlib.pyplot as plt
+import rospy
+
 from localization import Localization
+from map import Map
 from modules.planning.proto import planning_pb2
 from modules.localization.proto import localization_pb2
 from planning import Planning

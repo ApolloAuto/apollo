@@ -17,12 +17,12 @@
 ###############################################################################
 
 import sys
-import rospy
+
 import gflags
-from gflags import FLAGS
-from std_msgs.msg import String
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import rospy
+from std_msgs.msg import String
 
 from modules.control.proto import control_cmd_pb2
 

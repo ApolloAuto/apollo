@@ -19,9 +19,11 @@
 Message Handle
 """
 import curses
-from curses import panel
-from google.protobuf import text_format
 import importlib
+from curses import panel
+
+from google.protobuf import text_format
+
 APOLLO_ROOT = '../../../..'
 
 
