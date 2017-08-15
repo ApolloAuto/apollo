@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 import STORE from "store";
+import Text3D from "renderer/text3d";
 import { copyProperty, hideArrayObjects } from "utils/misc";
 import { drawSegmentsFromPoints, drawBox, drawArrow } from "utils/draw";
 const _ = require('lodash');
@@ -17,12 +18,26 @@ const LINE_THICKNESS = 1.5;
 
 export default class PerceptionObstacles {
     constructor() {
+        this.textRender = new Text3D();
         this.arrows = []; // for indication of direction of moving obstacles
+        this.ids = []; // for obstacle id labels
         this.cubes = []; // for obstacles with only length/width/height
         this.extrusionFaces = []; // for obstacles with polygon points
     }
 
     update(world, coordinates, scene) {
+        // Id meshes need to be recreated everytime.
+        // Each text mesh needs to be removed from the scene,
+        // and its char meshes need to be hidden for reuse purpose.
+        if (!_.isEmpty(this.ids)) {
+            this.ids.forEach(t => {
+                t.children.forEach(c => c.visible = false);
+                scene.remove(t);
+            });
+            this.ids = [];
+        }
+        this.textRender.reset();
+
         const objects = world.object;
         if (_.isEmpty(objects)) {
             hideArrayObjects(this.arrows);
@@ -53,6 +68,11 @@ export default class PerceptionObstacles {
                 arrowMesh.scale.set(scale, scale, scale);
                 arrowMesh.visible = true;
             }
+            if (STORE.options.showObstaclesId) {
+                this.updateId(obstacle.id,
+                        new THREE.Vector3(position.x, position.y, obstacle.height),
+                        scene);
+            }
             const polygon = obstacle.polygonPoint;
             if (polygon.length > 0) {
                 const scale = this.updatePolygon(polygon, obstacle.height, color, coordinates,
@@ -76,6 +96,17 @@ export default class PerceptionObstacles {
         arrowMesh.material.color.setHex(color);
         arrowMesh.rotation.set(0, 0, -(Math.PI / 2 - heading));
         return arrowMesh;
+    }
+
+    updateId(id, position, scene) {
+        const text = this.textRender.composeText(id);
+        text.position.set(position.x, position.y, position.z || 3);
+        text.quaternion.copy(scene.getObjectByName("camera").quaternion);
+        text.children.forEach(c => c.visible = true);
+        text.visible = true;
+        text.name = "id_" + id;
+        this.ids.push(text);
+        scene.add(text);
     }
 
     updatePolygon(points, height, color, coordinates, extrusionFaceIdx, scene) {
