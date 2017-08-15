@@ -39,30 +39,28 @@ double StGraphPoint::obstacle_cost() const { return obstacle_cost_; }
 
 double StGraphPoint::total_cost() const { return total_cost_; }
 
-void StGraphPoint::init(const std::uint32_t index_t,
+void StGraphPoint::Init(const std::uint32_t index_t,
                         const std::uint32_t index_s, const STPoint& st_point) {
   index_t_ = index_t;
   index_s_ = index_s;
   point_ = st_point;
 }
 
-void StGraphPoint::set_reference_cost(const double reference_cost) {
+void StGraphPoint::SetReferenceCost(const double reference_cost) {
   reference_cost_ = reference_cost;
 }
 
-void StGraphPoint::set_obstacle_cost(const double obs_cost) {
+void StGraphPoint::SetObstacleCost(const double obs_cost) {
   obstacle_cost_ = obs_cost;
 }
 
-void StGraphPoint::set_total_cost(const double total_cost) {
+void StGraphPoint::SetTotalCost(const double total_cost) {
   total_cost_ = total_cost;
 }
 
-void StGraphPoint::set_pre_point(const StGraphPoint& pre_point) {
+void StGraphPoint::SetPrePoint(const StGraphPoint& pre_point) {
   pre_point_ = &pre_point;
 }
-
-STPoint* StGraphPoint::mutable_point() { return &point_; }
 
 }  // namespace planning
 }  // namespace apollo

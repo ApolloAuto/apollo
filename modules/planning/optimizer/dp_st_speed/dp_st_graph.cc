@@ -108,7 +108,7 @@ Status DpStGraph::InitCostTable() {
 
   for (uint32_t i = 0; i < cost_table_.size(); ++i) {
     for (uint32_t j = 0; j < cost_table_[i].size(); ++j) {
-      cost_table_[i][j].init(i, j, STPoint(unit_s_ * j, unit_t_ * i));
+      cost_table_[i][j].Init(i, j, STPoint(unit_s_ * j, unit_t_ * i));
     }
   }
 
@@ -130,9 +130,9 @@ void DpStGraph::CalculatePointwiseCost(
                                                      reference_points[i]);
       double obs_cost =
           dp_st_cost_.GetObstacleCost(cost_table_[i][j].point(), boundaries);
-      cost_table_[i][j].set_reference_cost(ref_cost);
-      cost_table_[i][j].set_obstacle_cost(obs_cost);
-      cost_table_[i][j].set_total_cost(std::numeric_limits<double>::infinity());
+      cost_table_[i][j].SetReferenceCost(ref_cost);
+      cost_table_[i][j].SetObstacleCost(obs_cost);
+      cost_table_[i][j].SetTotalCost(std::numeric_limits<double>::infinity());
     }
   }
 }
@@ -202,9 +202,9 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
                                 const uint32_t c, const uint32_t r) {
   if (c == 0) {
     if (r == 0) {
-      cost_table_[c][r].set_total_cost(0.0);
+      cost_table_[c][r].SetTotalCost(0.0);
     } else {
-      cost_table_[c][r].set_total_cost(std::numeric_limits<double>::infinity());
+      cost_table_[c][r].SetTotalCost(std::numeric_limits<double>::infinity());
     }
     return;
   }
@@ -212,10 +212,10 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
   double speed_limit =
       st_graph_data.speed_limit().GetSpeedLimitByS(unit_s_ * r);
   if (c == 1) {
-    cost_table_[c][r].set_total_cost(
+    cost_table_[c][r].SetTotalCost(
         cost_table_[c][r].obstacle_cost() + cost_table_[0][0].total_cost() +
         CalculateEdgeCostForSecondCol(r, speed_limit));
-    cost_table_[c][r].set_pre_point(cost_table_[0][0]);
+    cost_table_[c][r].SetPrePoint(cost_table_[0][0]);
     return;
   }
 
@@ -230,8 +230,8 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
                     CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
 
       if (cost < cost_table_[c][r].total_cost()) {
-        cost_table_[c][r].set_total_cost(cost);
-        cost_table_[c][r].set_pre_point(cost_table_[c - 1][r_pre]);
+        cost_table_[c][r].SetTotalCost(cost);
+        cost_table_[c][r].SetPrePoint(cost_table_[c - 1][r_pre]);
       }
     }
     return;
@@ -278,8 +278,8 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
                                       curr_point, speed_limit);
 
       if (cost < cost_table_[c][r].total_cost()) {
-        cost_table_[c][r].set_total_cost(cost);
-        cost_table_[c][r].set_pre_point(cost_table_[c - 1][r_pre]);
+        cost_table_[c][r].SetTotalCost(cost);
+        cost_table_[c][r].SetPrePoint(cost_table_[c - 1][r_pre]);
       }
     }
   }

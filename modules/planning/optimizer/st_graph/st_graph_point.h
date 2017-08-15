@@ -40,21 +40,19 @@ class StGraphPoint {
   double obstacle_cost() const;
   double total_cost() const;
 
-  void init(const std::uint32_t index_t, const std::uint32_t index_s,
+  void Init(const std::uint32_t index_t, const std::uint32_t index_s,
             const STPoint& st_point);
 
   // given reference speed profile, reach the cost, including position
-  void set_reference_cost(const double reference_cost);
+  void SetReferenceCost(const double reference_cost);
 
   // given obstacle info, get the cost;
-  void set_obstacle_cost(const double obs_cost);
+  void SetObstacleCost(const double obs_cost);
 
   // total cost
-  void set_total_cost(const double total_cost);
+  void SetTotalCost(const double total_cost);
 
-  void set_pre_point(const StGraphPoint& pre_point);
-
-  STPoint* mutable_point();
+  void SetPrePoint(const StGraphPoint& pre_point);
 
  private:
   STPoint point_;
