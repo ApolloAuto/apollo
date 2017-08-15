@@ -36,8 +36,6 @@ DEFINE_string(test_chassis_file,
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 
 void PlanningTestBase::SetUpTestCase() {
-  FLAGS_qp_spline_path_config_file =
-      "modules/planning/testdata/conf/qp_spline_path_config.pb.txt";
   FLAGS_qp_spline_st_speed_config_file =
       "modules/planning/testdata/conf/qp_spline_st_speed_config_file.pb.txt";
   FLAGS_st_boundary_config_file =

@@ -34,12 +34,7 @@ QpSplinePathOptimizer::QpSplinePathOptimizer(const std::string& name)
     : PathOptimizer(name) {}
 
 bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
-  if (!common::util::GetProtoFromFile(FLAGS_qp_spline_path_config_file,
-                                      &qp_spline_path_config_)) {
-    AERROR << "Failed to load config file for path generator. config file: "
-           << FLAGS_qp_spline_path_config_file;
-    return false;
-  }
+  qp_spline_path_config_ = config.em_planner_config().qp_spline_path_config();
   is_init_ = true;
   return true;
 }
