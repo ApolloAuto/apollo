@@ -18,8 +18,8 @@
 namespace apollo {
 namespace perception {
 
-void GetValidXRange(const typename PolygonScanConverter::Polygon &polygon,
-                    const Bitmap2D &bitmap,
+void GetValidXRange(const typename PolygonScanConverter::Polygon& polygon,
+                    const Bitmap2D& bitmap,
                     const PolygonScanConverter::DirectionMajor major_dir,
                     const double major_dir_grid_size,
                     Interval* valid_x_range) {
@@ -96,7 +96,6 @@ void DrawPolygonInBitmap(
         DrawPolygonInBitmap(polygon, extend_dist, bitmap);
     }
 }
-
 
 } // perception
 } // apollo

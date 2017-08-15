@@ -97,6 +97,6 @@ class PolygonScanConverter {
   bool ConvertSegmentToEdge(const size_t seg_id, std::pair<int, Edge>* out_edge);
 };
 
-}  // perception
-}  // apollo
+}  // namespace perception
+}  // namespace apollo
 #endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_

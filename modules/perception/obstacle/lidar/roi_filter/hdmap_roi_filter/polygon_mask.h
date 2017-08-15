@@ -46,7 +46,7 @@ void GetValidXRange(const PolygonScanConverter::Polygon& polygon,
                     const PolygonScanConverter::DirectionMajor major_dir,
                     const double major_dir_grid_size, Interval* valid_x_range);
 
-}  // perception
-}  // apollo
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PLYGON_MASK_H_

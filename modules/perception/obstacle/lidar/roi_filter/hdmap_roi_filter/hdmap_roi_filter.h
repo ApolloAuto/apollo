@@ -129,7 +129,7 @@ class HdmapROIFilter : public BaseROIFilter {
 
 REGISTER_ROIFILTER(HdmapROIFilter);
 
-}  // perception
-}  // apollo
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_HDMAP_ROI_FILTER_H_

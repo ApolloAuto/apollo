@@ -50,7 +50,6 @@ void PolygonScanConverter::ConvertScans(
     }
   }
 
-  CHECK((active_edge_table_.size() & 1) == 0);
   std::sort(active_edge_table_.begin(), active_edge_table_.end());
   for (size_t i = 0; i < active_edge_table_.size(); i += 2) {
     double min_y = active_edge_table_[i].y;
@@ -58,7 +57,6 @@ void PolygonScanConverter::ConvertScans(
     (*scans_intervals)[0].push_back(Interval(min_y, max_y));
   }
 
-  CHECK((active_edge_table_.size() & 1) == 0);
 
   for (size_t i = 1; i < scans_size_; ++i) {
     UpdateActiveEdgeTable(i, &(scans_intervals->at(i)) );
@@ -90,17 +88,12 @@ void PolygonScanConverter::UpdateActiveEdgeTable(
     }
   }
 
-  //TODO: Whether to check valid edges num even?
-  CHECK_EQ(valid_edges_num & 1, 0);
-
   if (invalid_edges_num != 0 || new_edges_num != 0) {
     std::sort(active_edge_table_.begin(), active_edge_table_.end(),
               [](const Edge &a, const Edge &b) {return a.y < b.y;});
     active_edge_table_.erase(next(active_edge_table_.begin(), valid_edges_num),
                              active_edge_table_.end());
   }
-
-  CHECK_EQ(valid_edges_num & 1, 0);
 
   for (size_t i = 0; i + 1 < active_edge_table_.size(); i += 2) {
     double min_y = active_edge_table_[i].y;
