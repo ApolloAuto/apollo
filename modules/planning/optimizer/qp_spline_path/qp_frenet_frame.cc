@@ -424,12 +424,21 @@ void QpFrenetFrame::CalculateHDMapBound() {
     bool suc = reference_line_.get_lane_width(evaluated_knots_[i], &left_bound,
                                               &right_bound);
     if (!suc) {
+      AERROR << "Extracting lane width failed at s = " << evaluated_knots_[i];
       left_bound = FLAGS_default_reference_line_width / 2;
       right_bound = FLAGS_default_reference_line_width / 2;
     }
 
-    hdmap_bound_[i].first = -right_bound;
-    hdmap_bound_[i].second = left_bound;
+    hdmap_bound_[i].first = -right_bound + vehicle_param_.width() / 2;
+    hdmap_bound_[i].second = left_bound - vehicle_param_.width() / 2;
+
+    if (hdmap_bound_[i].first >= hdmap_bound_[i].second) {
+      AERROR << "HD Map bound at " << evaluated_knots_[i] << " is infeasible ("
+             << hdmap_bound_[i].first << ", " << hdmap_bound_[i].second
+             << ") " << std::endl;
+      feasible_longitudinal_upper_bound_ =
+        std::min(evaluated_knots_[i], feasible_longitudinal_upper_bound_);
+    }
   }
 }
 
