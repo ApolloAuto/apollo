@@ -100,6 +100,8 @@ Status DpStGraph::InitCostTable() {
 
   unit_t_ = dp_st_speed_config_.total_time() /
             dp_st_speed_config_.matrix_dimension_t();
+  DCHECK_GT(dim_s, 2);
+  DCHECK_GT(dim_t, 2);
   cost_table_ = std::vector<std::vector<StGraphPoint>>(
       dim_t, std::vector<StGraphPoint>(dim_s, StGraphPoint()));
 
@@ -176,8 +178,6 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
                             uint32_t* next_lowest_row) {
   // TODO: finish the implementation of this function.
   const auto& curr_point = cost_table_[curr_col][curr_row];
-  *next_highest_row = cost_table_.back().size() - 1;
-  *next_lowest_row = curr_point.index_s();
 
   double v0 = 0.0;
   if (curr_col == 0) {
@@ -190,16 +190,20 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
   const double delta_s_upper_bound =
       v0 * unit_t_ +
       0.5 * vehicle_param_.max_acceleration() * unit_t_ * unit_t_;
-  *next_highest_row = std::min(
-      static_cast<uint32_t>(cost_table_.back().size() - 1),
-      *next_lowest_row + static_cast<uint32_t>(delta_s_upper_bound / unit_s_));
+  *next_highest_row = curr_point.index_s() +
+                      static_cast<uint32_t>(delta_s_upper_bound / unit_s_);
+  if (*next_highest_row >= cost_table_.back().size()) {
+    *next_highest_row = cost_table_.back().size() - 1;
+  }
 
-  const double delta_s_lower_bound =
-      v0 * unit_t_ +
-      0.5 * vehicle_param_.max_deceleration() * unit_t_ * unit_t_;
+  const double delta_s_lower_bound = std::fmax(
+      0.0, v0 * unit_t_ +
+               0.5 * vehicle_param_.max_deceleration() * unit_t_ * unit_t_);
   *next_lowest_row =
-      *next_lowest_row +
-      std::max(0, static_cast<int32_t>(delta_s_lower_bound / unit_s_));
+      *next_lowest_row + static_cast<int32_t>(delta_s_lower_bound / unit_s_);
+  if (*next_lowest_row >= cost_table_.back().size()) {
+    *next_lowest_row = cost_table_.back().size() - 1;
+  }
 }
 
 void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
