@@ -77,14 +77,15 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
-  if (!boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).ok()) {
+  if (boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).code() ==
+      ErrorCode::PLANNING_ERROR) {
     return Status(ErrorCode::PLANNING_ERROR,
-                  "Mapping obstacle for dp st speed optimizer failed!");
+                  "Mapping obstacle for qp st speed optimizer failed!");
   }
   SpeedLimit speed_limits;
   if (boundary_mapper.GetSpeedLimits(&speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
-                  "Mapping obstacle for dp st speed optimizer failed!");
+                  "GetSpeedLimits for dp st speed optimizer failed!");
   }
 
   // step 2 perform graph search
