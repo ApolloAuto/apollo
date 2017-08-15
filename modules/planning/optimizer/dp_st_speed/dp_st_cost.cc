@@ -43,8 +43,9 @@ double DpStCost::GetObstacleCost(
   for (const StGraphBoundary& boundary : st_graph_boundaries) {
     if (point.s() < 0 || boundary.IsPointInBoundary(point)) {
       total_cost = std::numeric_limits<double>::infinity();
+      break;
     } else {
-      double distance = boundary.DistanceTo(point);
+      const double distance = boundary.DistanceTo(point);
       total_cost += dp_st_speed_config_.default_obstacle_cost() *
                     std::exp(dp_st_speed_config_.obstacle_cost_factor() /
                              boundary.characteristic_length() * distance);
@@ -63,9 +64,9 @@ double DpStCost::GetReferenceCost(const STPoint& point,
 double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
                               const double speed_limit) const {
   double cost = 0.0;
-  double speed = (second.s() - first.s()) / unit_t_;
+  const double speed = (second.s() - first.s()) / unit_t_;
   if (Double::Compare(speed, 0.0) < 0) {
-    cost = std::numeric_limits<double>::infinity();
+    return std::numeric_limits<double>::infinity();
   }
   double det_speed = (speed - speed_limit) / speed_limit;
   if (Double::Compare(det_speed, 0.0) > 0) {
@@ -82,22 +83,22 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
 }
 
 double DpStCost::GetAccelCost(const double accel) const {
-  double accel_sq = accel * accel;
+  const double accel_sq = accel * accel;
   double max_acc = dp_st_speed_config_.max_acceleration();
   double max_dec = dp_st_speed_config_.max_deceleration();
   double accel_penalty = dp_st_speed_config_.accel_penalty();
   double decel_penalty = dp_st_speed_config_.decel_penalty();
   double cost = 0.0;
   if (accel > 0.0) {
-    cost = accel_penalty * accel_sq * unit_t_;
+    cost = accel_penalty * accel_sq;
   } else {
-    cost = decel_penalty * accel_sq * unit_t_;
+    cost = decel_penalty * accel_sq;
   }
   cost += accel_sq * decel_penalty * decel_penalty /
               (1 + std::exp(1.0 * (accel - max_dec))) +
           accel_sq * accel_penalty * accel_penalty /
               (1 + std::exp(-1.0 * (accel - max_acc)));
-  return cost;
+  return cost * unit_t_;
 }
 
 double DpStCost::GetAccelCostByThreePoints(const STPoint& first,
@@ -141,9 +142,9 @@ double DpStCost::GetJerkCostByTwoPoints(const double pre_speed,
                                         const double pre_acc,
                                         const STPoint& pre_point,
                                         const STPoint& curr_point) const {
-  double curr_speed = (curr_point.s() - pre_point.s()) / unit_t_;
-  double curr_accel = (curr_speed - pre_speed) / unit_t_;
-  double jerk = (curr_accel - pre_acc) / unit_t_;
+  const double curr_speed = (curr_point.s() - pre_point.s()) / unit_t_;
+  const double curr_accel = (curr_speed - pre_speed) / unit_t_;
+  const double jerk = (curr_accel - pre_acc) / unit_t_;
   return JerkCost(jerk);
 }
 
@@ -151,11 +152,11 @@ double DpStCost::GetJerkCostByThreePoints(const double first_speed,
                                           const STPoint& first,
                                           const STPoint& second,
                                           const STPoint& third) const {
-  double pre_speed = (second.s() - first.s()) / unit_t_;
-  double pre_acc = (pre_speed - first_speed) / unit_t_;
-  double curr_speed = (third.s() - second.s()) / unit_t_;
-  double curr_acc = (curr_speed - pre_speed) / unit_t_;
-  double jerk = (curr_acc - pre_acc) / unit_t_;
+  const double pre_speed = (second.s() - first.s()) / unit_t_;
+  const double pre_acc = (pre_speed - first_speed) / unit_t_;
+  const double curr_speed = (third.s() - second.s()) / unit_t_;
+  const double curr_acc = (curr_speed - pre_speed) / unit_t_;
+  const double jerk = (curr_acc - pre_acc) / unit_t_;
   return JerkCost(jerk);
 }
 
