@@ -503,9 +503,15 @@ bool QpFrenetFrame::GetBound(
     high_second = low_second;
   }
 
-  bound->first = low_first * (1 - weight) + high_first * weight;
-  bound->second = low_second * (1 - weight) + high_second * weight;
+  if (std::isinf(low_first)) {
+    bound->first = low_first;
+  } else {
+    bound->first = low_first * (1 - weight) + high_first * weight;
+  }
 
+  if (std::isinf(low_second)) {
+    bound->second = low_second * (1 - weight) + high_second * weight;
+  }
   return true;
 }
 
