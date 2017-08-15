@@ -101,7 +101,6 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   if (!Solve().ok()) {
     const std::string msg = "Solve qp problem failed!";
     AERROR << msg;
-    DCHECK(false) << init_point_.DebugString();
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
