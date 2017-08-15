@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
-#define APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -143,4 +143,4 @@ class GLFWViewer {
 } // namespace obstacle
 } // namespace perception
 
-#endif // APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
-#define APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
 
 #include <string>
 #include <sstream>
@@ -69,4 +69,4 @@ private:
 } // namespace perception
 } // namespace apollo
 
-#endif //  APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
+#endif //  MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_

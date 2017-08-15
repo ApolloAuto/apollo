@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_ARC_BALL_H_
-#define APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_ARC_BALL_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_ARC_BALL_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_ARC_BALL_H_
 
 #include <Eigen/Dense>
 
@@ -59,4 +59,4 @@ public:
 } // namespace perception
 } // namespace apollo
 
-#endif // APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_ARC_BALL_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_ARC_BALL_H_

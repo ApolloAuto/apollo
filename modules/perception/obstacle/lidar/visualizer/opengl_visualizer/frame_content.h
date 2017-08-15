@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
-#define APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
+
 #include <deque>
 #include <iomanip>
 #include <string>
@@ -71,4 +72,4 @@ class FrameContent {
 } // namespace perception
 } // namespace apollo
 
-#endif // APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
