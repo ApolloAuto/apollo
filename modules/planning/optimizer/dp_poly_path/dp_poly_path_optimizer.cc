@@ -37,11 +37,7 @@ DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
     : PathOptimizer(name) {}
 
 bool DpPolyPathOptimizer::Init(const PlanningConfig& config) {
-  if (!common::util::GetProtoFromFile(FLAGS_dp_poly_path_config_file,
-                                      &config_)) {
-    AERROR << "failed to load config file " << FLAGS_dp_poly_path_config_file;
-    return false;
-  }
+  config_ = config.em_planner_config().dp_poly_path_config();
   is_init_ = true;
   return true;
 }
