@@ -418,9 +418,9 @@ function build_gnss() {
 
   protoc modules/drivers/gnss/proto/gnss.proto --cpp_out=./
   protoc modules/drivers/gnss/proto/imu.proto --cpp_out=./
-  protoc modules/drivers/gnss/proto/ins.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/ins.proto --cpp_out=./ --python_out=./
   protoc modules/drivers/gnss/proto/config.proto --cpp_out=./
-  protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./ --python_out=./
   protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
 
   cd modules
@@ -434,6 +434,7 @@ function build_gnss() {
   rm -rf modules/common/proto/*.pb.h
   rm -rf modules/drivers/gnss/proto/*.pb.cc
   rm -rf modules/drivers/gnss/proto/*.pb.h
+  rm -rf modules/drivers/gnss/proto/*_pb2.py
   rm -rf modules/localization/proto/*.pb.cc
   rm -rf modules/localization/proto/*.pb.h
 
