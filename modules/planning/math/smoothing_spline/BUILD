@@ -190,4 +190,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "spline_1d_generator_test",
+    size = "small",
+    srcs = [
+        "spline_1d_generator_test.cc",
+    ],
+    deps = [
+        ":spline_1d_generator",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

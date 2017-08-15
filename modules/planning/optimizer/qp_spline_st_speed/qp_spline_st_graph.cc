@@ -193,11 +193,6 @@ Status QpSplineStGraph::ApplyConstraint(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
-    ADEBUG << "t_evaluated_: " << t_evaluated_[i] << std::endl;
-    ADEBUG << "s_lower_bound: " << s_lower_bound[i] << std::endl;
-    ADEBUG << "s_upper_bound: " << s_upper_bound[i] << std::endl;
-  }
 
   std::vector<double> speed_upper_bound;
   if (!EstimateSpeedUpperBound(init_point, speed_limit, &speed_upper_bound)
@@ -218,11 +213,12 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   for (size_t i = 0; i < t_evaluated_.size(); ++i) {
-    ADEBUG << "t_evaluated_: " << t_evaluated_[i] << std::endl;
-    ADEBUG << "speed_lower_bound: " << speed_lower_bound[i] << std::endl;
-    ADEBUG << "speed_upper_bound: " << speed_upper_bound[i] << std::endl;
+    ADEBUG << "t_evaluated_: " << t_evaluated_[i]
+           << "speed_lower_bound: " << speed_lower_bound[i]
+           << "speed_upper_bound: " << speed_upper_bound[i] << std::endl;
   }
 
+  // TODO : add acceleration constraint here
   return Status::OK();
 }
 
@@ -246,11 +242,13 @@ Status QpSplineStGraph::ApplyKernel(
         qp_spline_st_speed_config_.jerk_kernel_weight());
   }
 
-  if (AddCruiseReferenceLineKernel(t_evaluated_, speed_limit) != Status::OK()) {
+  if (AddCruiseReferenceLineKernel(t_evaluated_, speed_limit,
+      qp_spline_st_speed_config_.cruise_weight()) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
 
-  if (AddFollowReferenceLineKernel(t_evaluated_, boundaries, 1.0) !=
+  if (AddFollowReferenceLineKernel(t_evaluated_, boundaries,
+      qp_spline_st_speed_config_.follow_weight()) !=
       Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
@@ -264,7 +262,8 @@ Status QpSplineStGraph::Solve() {
 }
 
 Status QpSplineStGraph::AddCruiseReferenceLineKernel(
-    const std::vector<double>& evaluate_t, const SpeedLimit& speed_limit) {
+    const std::vector<double>& evaluate_t, const SpeedLimit& speed_limit,
+    const double weight) {
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
   std::vector<double> s_vec;
   if (speed_limit.speed_limit_points().size() == 0) {
@@ -275,15 +274,23 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
   double dist_ref = 0.0;
   s_vec.push_back(dist_ref);
   for (uint32_t i = 1; i < evaluate_t.size(); ++i) {
-    s_vec.push_back(dist_ref);
     dist_ref += (evaluate_t[i] - evaluate_t[i - 1]) *
                 speed_limit.GetSpeedLimitByS(dist_ref);
+    s_vec.push_back(dist_ref);
   }
   DCHECK_EQ(evaluate_t.size(), s_vec.size());
-  spline_kernel->add_reference_line_kernel_matrix(
-      evaluate_t, s_vec,
-      qp_spline_st_speed_config_.reference_line_kernel_weight());
 
+  for (std::size_t i = 0; i < evaluate_t.size(); ++i) {
+    ADEBUG << "Cruise Ref S: " << s_vec[i]
+           <<" Relative time: " << evaluate_t[i] << std::endl;
+  }
+
+  if (evaluate_t.size() > 0) {
+    spline_kernel->add_reference_line_kernel_matrix(
+      evaluate_t, s_vec,
+      weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
+  }
+  spline_kernel->AddRegularization(0.01);
   return Status::OK();
 }
 
@@ -313,9 +320,16 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
     }
   }
   DCHECK_EQ(filtered_evaluate_t.size(), ref_s.size());
+
   if (!ref_s.empty()) {
-    spline_kernel->add_reference_line_kernel_matrix(filtered_evaluate_t, ref_s,
-                                                    weight);
+    spline_kernel->add_reference_line_kernel_matrix(
+      filtered_evaluate_t, ref_s,
+      weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
+  }
+
+  for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
+    ADEBUG << "Follow Ref S: " << ref_s[i]
+           <<" Relative time: " << filtered_evaluate_t[i] << std::endl;
   }
   return Status::OK();
 }
