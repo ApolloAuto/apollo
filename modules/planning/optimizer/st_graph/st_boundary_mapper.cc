@@ -112,15 +112,19 @@ Status StBoundaryMapper::GetGraphBoundary(
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
+      continue;
     }
     const auto& decision = path_obstacle->LongitutionalDecision();
-    StGraphBoundary boundary(path_obstacle);
     if (decision.has_follow()) {
+      StGraphBoundary boundary(path_obstacle);
       const auto ret = MapFollowDecision(*path_obstacle, decision, &boundary);
-      if (!ret.ok()) {
+      if (ret.code() == ErrorCode::PLANNING_ERROR) {
         AERROR << "Fail to map obstacle " << path_obstacle->Id()
                << " with follow decision: " << decision.DebugString();
         return Status(ErrorCode::PLANNING_ERROR, "Fail to map follow decision");
+      }
+      if (ret.ok()) {
+        st_graph_boundaries->push_back(boundary);
       }
     } else if (decision.has_stop()) {
       // TODO(all) change start_s() to st_boundary.min_s()
@@ -153,9 +157,9 @@ Status StBoundaryMapper::GetGraphBoundary(
     } else {
       std::string msg = common::util::StrCat("No mapping for decision: ",
                                              decision.DebugString());
-      return Status(ErrorCode::PLANNING_SKIP, msg);
+      ADEBUG << msg;
+      // Status(ErrorCode::PLANNING_SKIP, msg);
     }
-    boundary.set_id(path_obstacle->Id());
   }
 
   if (stop_obstacle) {
@@ -169,7 +173,6 @@ Status StBoundaryMapper::GetGraphBoundary(
     }
     st_graph_boundaries->push_back(stop_boundary);
   }
-
   return Status::OK();
 }
 
