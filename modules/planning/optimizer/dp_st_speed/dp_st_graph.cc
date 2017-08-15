@@ -106,6 +106,7 @@ Status DpStGraph::InitCostTable() {
   for (uint32_t i = 0; i < cost_table_.size(); ++i) {
     for (uint32_t j = 0; j < cost_table_[i].size(); ++j) {
       cost_table_[i][j].init(i, j, STPoint(unit_s_ * j, unit_t_ * i));
+      cost_table_[i][j].set_total_cost(std::numeric_limits<double>::infinity());
     }
   }
 
@@ -137,6 +138,13 @@ void DpStGraph::CalculatePointwiseCost(
 Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
   // s corresponding to row
   // time corresponding to col
+  /*
+  for (uint32_t c = 0; c < cost_table_.size(); ++c) {
+    for (uint32_t r = 0; r < cost_table_.back().size(); ++r) {
+      CalculateCostAt(st_graph_data, c, r);
+    }
+  }
+  */
   uint32_t c = 0;
   uint32_t next_highest_row = 0;
   uint32_t next_lowest_row = 0;
@@ -145,15 +153,15 @@ Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
     uint32_t highest_row = 0;
     uint32_t lowest_row = cost_table_.back().size() - 1;
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
-      if (cost_table_.at(c).at(r).pre_point() == nullptr) {
-        continue;
-      }
       CalculateCostAt(st_graph_data, c, r);
       uint32_t h_r = 0;
       uint32_t l_r = 0;
-      GetRowRange(r, c, &h_r, &l_r);
-      highest_row = std::max(highest_row, h_r);
-      lowest_row = std::min(lowest_row, l_r);
+      if (cost_table_.at(c).at(r).total_cost() <
+          std::numeric_limits<double>::infinity()) {
+        GetRowRange(r, c, &h_r, &l_r);
+        highest_row = std::max(highest_row, h_r);
+        lowest_row = std::min(lowest_row, l_r);
+      }
     }
     ++c;
     next_highest_row = highest_row;
@@ -167,29 +175,31 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
                             uint32_t* next_highest_row,
                             uint32_t* next_lowest_row) {
   // TODO: finish the implementation of this function.
-  *next_highest_row = cost_table_.back().size() - 1;
-  *next_lowest_row = 0;
   const auto& curr_point = cost_table_[curr_col][curr_row];
+  *next_highest_row = cost_table_.back().size() - 1;
+  *next_lowest_row = curr_point.index_s();
+
   double v0 = 0.0;
   if (curr_col == 0) {
     v0 = init_point_.v();
   } else {
     const auto* pre_point = curr_point.pre_point();
     DCHECK_NOTNULL(pre_point);
-    v0 = (curr_point.index_s() - pre_point->index_s()) / unit_t_;
+    v0 = (curr_point.index_s() - pre_point->index_s()) * unit_s_ / unit_t_;
   }
-  const double s_upper_bound =
+  const double delta_s_upper_bound =
       v0 * unit_t_ +
       0.5 * vehicle_param_.max_acceleration() * unit_t_ * unit_t_;
   *next_highest_row = std::min(
       static_cast<uint32_t>(cost_table_.back().size() - 1),
-      *next_lowest_row + static_cast<uint32_t>(s_upper_bound / unit_s_));
+      *next_lowest_row + static_cast<uint32_t>(delta_s_upper_bound / unit_s_));
 
-  const double s_lower_bound =
+  const double delta_s_lower_bound =
       v0 * unit_t_ +
       0.5 * vehicle_param_.max_deceleration() * unit_t_ * unit_t_;
-  *next_lowest_row = *next_lowest_row +
-                     std::max(0, static_cast<int32_t>(s_lower_bound / unit_s_));
+  *next_lowest_row =
+      *next_lowest_row +
+      std::max(0, static_cast<int32_t>(delta_s_lower_bound / unit_s_));
 }
 
 void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,

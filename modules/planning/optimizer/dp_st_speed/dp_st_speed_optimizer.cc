@@ -74,7 +74,8 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
 
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
-  if (!boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).ok()) {
+  if (boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).code() ==
+      ErrorCode::PLANNING_ERROR) {
     const std::string msg =
         "Mapping obstacle for dp st speed optimizer failed.";
     AERROR << msg;
