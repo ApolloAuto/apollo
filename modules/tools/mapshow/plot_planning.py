@@ -40,13 +40,16 @@ speed_line_pool_size = 4
 vehicle_position_line = None
 vehicle_polygon_line = None
 
-st_line_pool = []
-st_line_pool_size = 2
+st_line_1 = None
+st_line_2 = None
 
 obstacle_line_pool = []
 obstacle_annotation_pool = []
 obstacle_line_pool_size = 10
 
+obstacle_line_pool2 = []
+obstacle_annotation_pool2 = []
+obstacle_line_pool_size2 = 10
 
 def localization_callback(localization_pb):
     localization.update_localization_pb(localization_pb)
@@ -76,12 +79,17 @@ def update(frame_number):
     for line in path_line_pool:
         line.set_visible(False)
         line.set_label(None)
+    st_line_1.set_visible(False)
+    st_line_1.set_label(None)
+    st_line_2.set_visible(False)
+    st_line_2.set_label(None)
     for line in obstacle_line_pool:
         line.set_visible(False)
-    for line in st_line_pool:
-        line.set_visible(False)
-        line.set_label(None)
     for line in obstacle_annotation_pool:
+        line.set_visible(False)
+    for line in obstacle_line_pool2:
+        line.set_visible(False)
+    for line in obstacle_annotation_pool2:
         line.set_visible(False)
 
     vehicle_position_line.set_visible(False)
@@ -90,24 +98,32 @@ def update(frame_number):
     planning.replot_path_data(path_line_pool)
     planning.replot_speed_data(speed_line_pool)
 
-    planning.replot_st_data(obstacle_line_pool, st_line_pool, obstacle_annotation_pool)
+    if len(planning.st_data_s.keys()) >= 1:
+        planning.replot_st_data(
+            obstacle_line_pool, st_line_1,
+            obstacle_annotation_pool, planning.st_data_s.keys()[0])
+    if len(planning.st_data_s.keys()) >= 2:
+        planning.replot_st_data(
+            obstacle_line_pool2, st_line_2,
+            obstacle_annotation_pool2, planning.st_data_s.keys()[1])
     localization.replot_vehicle(vehicle_position_line, vehicle_polygon_line)
     ax.relim()
     ax.autoscale_view()
     ax.legend(loc="upper left")
-    ax1.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1))
-    ax2.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1))
+    ax1.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), ncol=5)
+    ax2.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), ncol=5)
+    ax3.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), ncol=5)
     return obstacle_annotation_pool[0]
 
 
 def init_line_pool(central_x, central_y):
     global vehicle_position_line, vehicle_polygon_line, s_speed_line
-    global obstacle_line_pool, st_line_pool
+    global obstacle_line_pool, st_line_1, st_line_2
     colors = ['b', 'g', 'r', 'k']
 
     for i in range(path_line_pool_size):
         line, = ax.plot([central_x], [central_y],
-                        colors[i % len(colors)], lw=3, alpha=0.5)
+                        colors[i % len(colors)], lw=3+i*3, alpha=0.2)
         path_line_pool.append(line)
 
     for i in range(speed_line_pool_size):
@@ -115,10 +131,10 @@ def init_line_pool(central_x, central_y):
                         colors[i % len(colors)]+".", lw=3, alpha=0.5)
         speed_line_pool.append(line)
 
-    for i in range(st_line_pool_size):
-        line, = ax2.plot([0], [0],
-                         colors[i % len(colors)]+".", lw=3, alpha=0.5)
-        st_line_pool.append(line)
+    st_line_1, = ax2.plot([0], [0],
+                          colors[i % len(colors)]+".", lw=3, alpha=0.5)
+    st_line_2, = ax3.plot([0], [0],
+                          colors[i % len(colors)]+".", lw=3, alpha=0.5)
 
     for i in range(obstacle_line_pool_size):
         line, = ax2.plot([0], [0],
@@ -127,8 +143,17 @@ def init_line_pool(central_x, central_y):
         obstacle_line_pool.append(line)
         obstacle_annotation_pool.append(anno)
 
+    for i in range(obstacle_line_pool_size2):
+        line, = ax3.plot([0], [0],
+                         'r-', lw=3, alpha=0.5)
+        anno = ax3.text(0, 0, "")
+        obstacle_line_pool2.append(line)
+        obstacle_annotation_pool2.append(anno)
+
     ax2.set_xlim(-1, 9)
     ax2.set_ylim(-1,90)
+    ax3.set_xlim(-1, 9)
+    ax3.set_ylim(-1,90)
 
     vehicle_position_line, = ax.plot([central_x], [central_y], 'go', alpha=0.3)
     vehicle_polygon_line, = ax.plot([central_x], [central_y], 'g-')
@@ -150,9 +175,10 @@ if __name__ == '__main__':
 
     add_listener()
     fig = plt.figure()
-    ax = plt.subplot2grid((2, 3), (0, 0), rowspan=2, colspan=2)
-    ax1 = plt.subplot2grid((2, 3), (0, 2))
-    ax2 = plt.subplot2grid((2, 3), (1, 2))
+    ax = plt.subplot2grid((3, 3), (0, 0), rowspan=3, colspan=2)
+    ax1 = plt.subplot2grid((3, 3), (0, 2))
+    ax2 = plt.subplot2grid((3, 3), (1, 2))
+    ax3 = plt.subplot2grid((3, 3), (2, 2))
     ax1.set_xlabel("t (second)")
     ax1.set_xlim([-2, 10])
     ax1.set_ylim([-1, 10])
