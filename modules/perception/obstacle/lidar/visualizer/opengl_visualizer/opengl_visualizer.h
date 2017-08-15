@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_VISUALIZER_OPENGL_VISUALIZER_H
-#define ADU_PERCEPTION_OBSTACLE_VISUALIZER_OPENGL_VISUALIZER_H
+#ifndef APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
+#define APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
 
 #include <string>
 #include <sstream>
@@ -23,54 +23,50 @@
 #include <boost/shared_ptr.hpp>
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
 
 namespace apollo {
-namespace perception { 
+namespace perception {
 
 class OpenglVisualizer {
 public:
-    OpenglVisualizer();
-    virtual ~OpenglVisualizer() = default;
+  OpenglVisualizer();
+  virtual ~OpenglVisualizer() = default;
 
-    virtual bool Init();
+  virtual bool Init();
 
-    virtual std::string Name() const {
-        return name_;
-}
-    
-    void UpdateCameraSystem(FrameContent* content);
+  virtual std::string Name() const { return name_; }
 
-    virtual void Render(FrameContent& content);    
+  void UpdateCameraSystem(FrameContent *content);
+
+  virtual void Render(FrameContent &content);
 
 private:
-    void SetSize(int w, int h);
-    void SetBackgroundColor(float r, float g, float b, float a);
-    void SetVelodyneHeight(float h);
-    void SetMainCarPoints();
-    void SetCameraPosition();
+  void SetSize(int w, int h);
+  void SetBackgroundColor(float r, float g, float b, float a);
+  void SetVelodyneHeight(float h);
+  void SetMainCarPoints();
+  void SetCameraPosition();
 
-    float velodyne_height_;
-    pcl_util::Point camera_center_velodyne_;
-    pcl_util::Point view_point_velodyne_;
-    pcl_util::Point up_velodyne_;
-    pcl_util::Point forward_velodyne_;
-    pcl_util::PointCloud main_car_points_velodyne_;
-    
-    pcl_util::Point camera_center_world_;
-    pcl_util::Point view_point_world_;
-    pcl_util::Point up_world_;
-    pcl_util::Point forward_world_;
-    pcl_util::PointCloud main_car_points_world_;
+  float velodyne_height_;
+  pcl_util::Point camera_center_velodyne_;
+  pcl_util::Point view_point_velodyne_;
+  pcl_util::Point up_velodyne_;
+  pcl_util::Point forward_velodyne_;
+  pcl_util::PointCloud main_car_points_velodyne_;
 
-    boost::shared_ptr<GLFWViewer> opengl_vs_;
-    std::string name_;
-    bool init_ = false;
+  pcl_util::Point camera_center_world_;
+  pcl_util::Point view_point_world_;
+  pcl_util::Point up_world_;
+  pcl_util::Point forward_world_;
+  pcl_util::PointCloud main_car_points_world_;
 
+  boost::shared_ptr<GLFWViewer> opengl_vs_;
+  std::string name_;
+  bool init_ = false;
 };
 
 } // namespace perception
 } // namespace apollo
 
-#endif //  ADU_PERCEPTION_OBSTACLE_VISUALIZER_PCL_VISUALIZER_H
+#endif //  APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_

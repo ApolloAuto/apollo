@@ -178,9 +178,9 @@ public:
 
                 pcl_util::PointIndices roi_indices_1;
                 FrameContent content;
-                content.set_lidar_pose(pose);
-                content.set_lidar_cloud(cloud);
-                content.set_tracked_objects(result_objects);
+                content.SetLidarPose(pose);
+                content.SetLidarCloud(cloud);
+                content.SetTrackedObjects(result_objects);
                 visualizer_->UpdateCameraSystem(&content);
                 visualizer_->Render(content);
             }

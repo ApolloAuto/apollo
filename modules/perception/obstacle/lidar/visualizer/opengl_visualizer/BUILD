@@ -6,17 +6,16 @@ cc_library(
     name = "perception_obstacle_lidar_opengl_visualizer",
     srcs = [
         "camera.cc",
-        "frame.cc",
         "frame_content.cc",
         "glfw_viewer.cc",
         "opengl_visualizer.cc",
     ],
     hdrs = [
         "camera.h",
-        "frame.h",
         "frame_content.h",
         "glfw_viewer.h",
         "opengl_visualizer.h",
+	"arc_ball.h",
     ],
     copts = [
         "-Wno-deprecated",

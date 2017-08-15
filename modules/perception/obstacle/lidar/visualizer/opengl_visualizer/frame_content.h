@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_FRAME_CONTENT_H
-#define ADU_PERCEPTION_OBSTACLE_FRAME_CONTENT_H
+#ifndef APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
+#define APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
 #include <deque>
 #include <iomanip>
 #include <string>
@@ -28,44 +28,47 @@
 
 namespace apollo {
 namespace perception {
- 
+
 class FrameContent {
-public:
-    FrameContent();
-    ~FrameContent();
-    
-    void set_lidar_pose(const Eigen::Matrix4d& pose);
-    Eigen::Matrix4d get_pose_v2w();
+ public:
+  FrameContent();
+  ~FrameContent();
 
-    void set_lidar_cloud(pcl_util::PointCloudPtr cloud);
-    void set_lidar_roi_cloud(pcl_util::PointCloudPtr cloud);
-    pcl_util::PointCloudPtr get_cloud();
-    pcl_util::PointCloudPtr get_roi_cloud();
+  void SetLidarPose(const Eigen::Matrix4d &pose);
+  Eigen::Matrix4d get_pose_v2w();
 
-    bool has_cloud();
+  void SetLidarCloud(pcl_util::PointCloudPtr cloud);
+  void SetLidarRoiCloud(pcl_util::PointCloudPtr cloud);
+  pcl_util::PointCloudPtr GetCloud();
+  pcl_util::PointCloudPtr GetRoiCloud();
 
-    void set_tracked_objects(const std::vector<ObjectPtr>& objects);                                  
+  bool HasCloud();
 
-    std::vector<ObjectPtr> get_tracked_objects();                         
+  void SetTrackedObjects(const std::vector<ObjectPtr> &objects);
 
-protected:
-    //coordinate transform utilities
-    void offset_pointcloud(pcl_util::PointCloud& cloud, const Eigen::Vector3d& offset);
-    void offset_pointcloud(pcl_util::PointDCloud& cloud, const Eigen::Vector3d& offset);
-    void offset_object(ObjectPtr object, const Eigen::Vector3d& offset);
-private:
-    //input
-    //1.lidar
-    Eigen::Matrix4d _pose_v2w;
-    pcl_util::PointCloudPtr _cloud;
-    pcl_util::PointCloudPtr _roi_cloud;
+  std::vector<ObjectPtr> GetTrackedObjects();
 
-    Eigen::Vector3d _global_offset;  
-    bool _global_offset_initialized;
-    std::vector<ObjectPtr> _tracked_objects_lidar;    //after tracking
+ protected:
+  // coordinate transform utilities
+  void OffsetPointcloud(pcl_util::PointCloud &cloud,
+                        const Eigen::Vector3d &offset);
+  void OffsetPointcloud(pcl_util::PointDCloud &cloud,
+                        const Eigen::Vector3d &offset);
+  void OffsetObject(ObjectPtr object, const Eigen::Vector3d &offset);
+
+ private:
+  // input
+  // 1.lidar
+  Eigen::Matrix4d pose_v2w_;
+  pcl_util::PointCloudPtr cloud_;
+  pcl_util::PointCloudPtr roi_cloud_;
+
+  Eigen::Vector3d global_offset_;
+  bool global_offset_initialized_;
+  std::vector<ObjectPtr> tracked_objects_lidar_; // after tracking
 };
 
 } // namespace perception
 } // namespace apollo
 
-#endif //  ADU_PERCEPTION_OBSTACLE_FRAME_CONTENT_H
+#endif // APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
