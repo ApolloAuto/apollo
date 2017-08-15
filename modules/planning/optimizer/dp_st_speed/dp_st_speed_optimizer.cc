@@ -43,16 +43,8 @@ DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
 bool DpStSpeedOptimizer::Init(const PlanningConfig& config) {
-  if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
-                                      &st_boundary_config_)) {
-    AERROR << "failed to load config file " << FLAGS_st_boundary_config_file;
-    return false;
-  }
-  if (!common::util::GetProtoFromFile(FLAGS_dp_st_speed_config_file,
-                                      &dp_st_speed_config_)) {
-    AERROR << "failed to load config file " << FLAGS_dp_st_speed_config_file;
-    return false;
-  }
+  dp_st_speed_config_ = config.em_planner_config().dp_st_speed_config();
+  st_boundary_config_ = dp_st_speed_config_.st_boundary_config();
   is_init_ = true;
   return true;
 }

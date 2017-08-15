@@ -222,7 +222,6 @@ DECLARE_string(reference_line_smoother_config_file);
 
 // Optimizers
 DECLARE_string(qp_spline_path_config_file);
-DECLARE_string(dp_st_speed_config_file);
 DECLARE_string(st_boundary_config_file);
 DECLARE_string(qp_spline_st_speed_config_file);
 
