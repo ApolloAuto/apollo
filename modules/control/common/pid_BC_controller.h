@@ -16,14 +16,14 @@
 
 /**
  * @file pid_controller.h
- * @brief Defines the PIDController class.
+ * @brief Defines the PIDBCController class.
  */
 
-#ifndef MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
-#define MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
+#ifndef MODULES_CONTROL_COMMON_PID_BACKWARD_CACULATION_CONTROLLER_H_
+#define MODULES_CONTROL_COMMON_PID_BACKWARD_CACULATION_CONTROLLER_H_
 
+#include "modules/control/common/pid_controller.h"
 #include "modules/control/proto/pid_conf.pb.h"
-
 /**
  * @namespace apollo::control
  * @brief apollo::control
@@ -32,32 +32,15 @@ namespace apollo {
 namespace control {
 
 /**
- * @class PIDController
+ * @class PIDBCController
  * @brief A proportional–integral–derivative controller for speed and steering
- using defualt integral hold
+with backward-caculation-anti-windup
  */
-class PIDController {
+class PIDBCController : public PIDController {
  public:
   /**
- * @brief initialize pid controller
- * @param pid_conf configuration for pid controller
- */
-  void Init(const PidConf &pid_conf);
-
-  /**
-   * @brief set pid controller coefficients for the proportional,
-   * integral, and derivative
-   * @param pid_conf configuration for pid controller
-   */
-  void SetPID(const PidConf &pid_conf);
-
-  /**
-   * @brief reset variables for pid controller
-   */
-  void Reset();
-
-  /**
-   * @brief compute control value based on the error
+   * @brief compute control value based on the error,
+   with backward-caculation-anti-windup
    * @param error error value, the difference between
    * a desired value and a measured value
    * @param dt sampling time interval
@@ -75,7 +58,7 @@ class PIDController {
    * @brief get status that if integrator is hold
    * @return if integrator is hold return true
    */
-  bool IntegratorHold() const;
+  bool integrator_hold() const;
 
  private:
   double kp_ = 0.0;
@@ -83,6 +66,7 @@ class PIDController {
   double kd_ = 0.0;
   double kaw_ = 0.0;
   double previous_error_ = 0.0;
+  double previous_error_i_ = 0.0;
   double previous_output_ = 0.0;
   double integral_ = 0.0;
   double saturation_high_ = 0.0;
@@ -96,4 +80,4 @@ class PIDController {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
+#endif  // MODULES_CONTROL_COMMON_PID_BACKWARD_CACULATION_CONTROLLER_H_

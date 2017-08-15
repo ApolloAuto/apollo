@@ -67,6 +67,22 @@ cc_library(
 )
 
 cc_library(
+    name = "pid_BC_controller",
+    srcs = [
+        "pid_BC_controller.cc",
+    ],
+    hdrs = [
+        "pid_BC_controller.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        ":pid_controller",
+        "//modules/common/math",
+        "//modules/control/proto:control_proto",
+    ],
+)
+
+cc_library(
     name = "trajectory_analyzer",
     srcs = [
         "trajectory_analyzer.cc",
@@ -149,6 +165,21 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":pid_controller",
+        "//modules/common/util",
+        "//modules/control/proto:control_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "pid_BC_controller_test",
+    size = "small",
+    srcs = [
+        "pid_BC_controller_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":pid_BC_controller",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
         "@gtest//:main",
