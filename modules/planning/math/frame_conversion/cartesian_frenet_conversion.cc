@@ -80,9 +80,9 @@ void CartesianFrenetConverter::frenet_to_cartesian(
     const std::array<double, 3>& d_condition, double* const ptr_x,
     double* const ptr_y, double* const ptr_theta, double* const ptr_kappa,
     double* const ptr_v, double* const ptr_a) {
-  CHECK_DOUBLE_EQ(
-      rs,
-      s_condition[0] && "The reference point s and s_condition[0] don't match");
+
+  CHECK(std::abs(rs - s_condition[0]) < 1.0e-6
+      && "The reference point s and s_condition[0] don't match");
 
   double cos_theta_r = std::cos(rtheta);
   double sin_theta_r = std::sin(rtheta);
@@ -96,7 +96,7 @@ void CartesianFrenetConverter::frenet_to_cartesian(
   double delta_theta = std::atan2(d_condition[1], one_minus_kappa_r_d);
   double cos_delta_theta = std::cos(delta_theta);
 
-  *ptr_theta = ::apollo::common::math::NormalizeAngle(delta_theta + rtheta);
+  *ptr_theta = common::math::NormalizeAngle(delta_theta + rtheta);
 
   double kappa_r_d_prime = rdkappa * d_condition[0] + rkappa * d_condition[1];
   *ptr_kappa = (((d_condition[2] + kappa_r_d_prime * tan_delta_theta) *
