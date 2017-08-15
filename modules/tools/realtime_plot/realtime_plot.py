@@ -21,12 +21,12 @@ Real Time Plotting of planning and control
 import math
 import sys
 import threading
+import time
 
 import gflags
 import matplotlib.pyplot as plt
 import numpy
 import rospy
-import time
 
 from item import Item
 from modules.localization.proto.localization_pb2 import LocalizationEstimate

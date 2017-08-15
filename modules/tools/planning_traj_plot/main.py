@@ -17,10 +17,12 @@
 ###############################################################################
 
 import sys
+
 import gflags
-from gflags import FLAGS
 import matplotlib.pyplot as plt
+from gflags import FLAGS
 from google.protobuf import text_format
+
 import mkz_polygon
 from modules.planning.proto import planning_pb2
 from modules.localization.proto import localization_pb2

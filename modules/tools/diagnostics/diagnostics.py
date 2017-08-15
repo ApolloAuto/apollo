@@ -21,13 +21,14 @@ Real Time Plotting of planning and control
 import curses
 import os
 import random
-import rospy
 import threading
 import traceback
+
+import rospy
 from std_msgs.msg import String
 
-from Message import Message
 import batch_include
+from Message import Message
 
 primitive = (int, str, bool, unicode)
 

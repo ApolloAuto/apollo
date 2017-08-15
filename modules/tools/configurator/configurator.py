@@ -21,6 +21,7 @@ Tool to modify configuration files
 import curses
 import os
 import traceback
+
 from ModuleConf import ModuleConf
 
 # Reduce ESC input delay

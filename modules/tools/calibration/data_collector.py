@@ -18,14 +18,16 @@
 """
 Data Collector
 """
+import os
 import sys
+import time
+
 import rospy
 from std_msgs.msg import String
-from modules.localization.proto import localization_pb2
+
 from modules.canbus.proto import chassis_pb2
 from modules.control.proto import control_cmd_pb2
-import time
-import os
+from modules.localization.proto import localization_pb2
 
 
 class DataCollector(object):

@@ -17,10 +17,11 @@
 ###############################################################################
 
 import random
-from google.protobuf import text_format
+
 import matplotlib.pyplot as plt
-from matplotlib import colors as mcolors
+from google.protobuf import text_format
 from matplotlib import cm as cmx
+from matplotlib import colors as mcolors
 
 from modules.map.proto import map_pb2
 

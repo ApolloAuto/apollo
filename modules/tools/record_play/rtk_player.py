@@ -20,21 +20,22 @@ Generate Planning Path
 """
 
 import argparse
-import os
-import rospy
-import sys
-from numpy import genfromtxt
-import scipy.signal as signal
 import atexit
 import logging
+import os
+import sys
+
+import rospy
+import scipy.signal as signal
 from logger import Logger
+from numpy import genfromtxt
 
 from modules.canbus.proto import chassis_pb2
+from modules.common.proto import pnc_point_pb2
 from modules.control.proto import pad_msg_pb2
 from modules.hmi.proto import runtime_status_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
-from modules.common.proto import pnc_point_pb2
 
 # Import hmi_status_helper
 APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')
