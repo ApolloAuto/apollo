@@ -101,6 +101,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   if (!Solve().ok()) {
     const std::string msg = "Solve qp problem failed!";
     AERROR << msg;
+    DCHECK(false) << init_point_.DebugString();
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
@@ -185,10 +186,18 @@ Status QpSplineStGraph::ApplyConstraint(
     ADEBUG << "Add constraint by time: " << curr_t << " upper_s: " << upper_s
            << " lower_s: " << lower_s;
   }
+
+  DCHECK_EQ(t_evaluated_.size(), s_lower_bound.size());
+  DCHECK_EQ(t_evaluated_.size(), s_upper_bound.size());
   if (!constraint->AddBoundary(t_evaluated_, s_lower_bound, s_upper_bound)) {
     const std::string msg = "Fail to apply distance constraints.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+    ADEBUG << "t_evaluated_: " << t_evaluated_[i] << std::endl;
+    ADEBUG << "s_lower_bound: " << s_lower_bound[i] << std::endl;
+    ADEBUG << "s_upper_bound: " << s_upper_bound[i] << std::endl;
   }
 
   std::vector<double> speed_upper_bound;
@@ -208,6 +217,11 @@ Status QpSplineStGraph::ApplyConstraint(
     const std::string msg = "Fail to apply speed constraints.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+    ADEBUG << "t_evaluated_: " << t_evaluated_[i] << std::endl;
+    ADEBUG << "speed_lower_bound: " << speed_lower_bound[i] << std::endl;
+    ADEBUG << "speed_upper_bound: " << speed_upper_bound[i] << std::endl;
   }
 
   return Status::OK();
@@ -372,6 +386,13 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
   for (uint32_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
     speed_upper_bound->push_back(qp_spline_st_speed_config_.max_speed());
     ADEBUG << "speed upper bound:" << speed_upper_bound->back();
+  }
+
+  const double kTimeBuffer = 2.0;
+  for (uint32_t k = 0; k < t_evaluated_.size() && t_evaluated_[k] < kTimeBuffer;
+       ++k) {
+    speed_upper_bound->at(k) =
+        std::fmax(init_point_.v(), speed_upper_bound->at(k));
   }
   return Status::OK();
 }
