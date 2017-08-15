@@ -270,16 +270,17 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
         break;
       } else {
         // NUDGE: and continue to check potential STOP along the ref line
-        ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
-
-        if (left_nudgable) {
-          // LEFT_NUDGE
-          object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
-          object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
-        } else {
-          // RIGHT_NUDGE
-          object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
-          object_nudge_ptr->set_distance_l(-FLAGS_nudge_distance_obstacle);
+        if (!object_decision.has_nudge()) {
+          ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
+          if (left_nudgable) {
+            // LEFT_NUDGE
+            object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
+            object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
+          } else {
+            // RIGHT_NUDGE
+            object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
+            object_nudge_ptr->set_distance_l(-FLAGS_nudge_distance_obstacle);
+          }
         }
       }
     }
