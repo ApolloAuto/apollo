@@ -30,9 +30,9 @@ namespace apollo {
 namespace perception {
 
 const std::string polygon_file_name =
-    "modules/perception/data/hdmap_roi_filter_test/poly_mask_ut.poly";
+    "/apollo/modules/perception/data/hdmap_roi_filter_test/poly_mask_ut.poly";
 const std::string pcd_file_name =
-    "modules/perception/data/hdmap_roi_filter_test/poly_mask_ut.pcd";
+    "/apollo/modules/perception/data/hdmap_roi_filter_test/poly_mask_ut.pcd";
 
 bool LoadPolygonFile(const std::string& absolute_file_name,
                      std::vector<PolygonType>* polygons_ptr) {
@@ -85,7 +85,7 @@ class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
 };
 
 void HdmapROIFilterTest::init() {
-  FLAGS_work_root = "modules/perception/data";
+  FLAGS_work_root = "/apollo/modules/perception/data";
   FLAGS_config_manager_path = "config_manager_test/config_manager.config";
   ASSERT_TRUE(Init());
 }
@@ -125,7 +125,7 @@ void HdmapROIFilterTest::filter() {
     }
   }
 
-  AERROR << "True positive: " << true_positive
+  ADEBUG << "True positive: " << true_positive
          << ", False positive: " << false_positive
          << ", True negitive: " << true_negitive
          << ", False negative: " << false_negitive;

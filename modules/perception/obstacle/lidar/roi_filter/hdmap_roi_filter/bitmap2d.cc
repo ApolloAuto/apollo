@@ -53,16 +53,16 @@ void Bitmap2D::Set(const size_t x_id, const size_t min_y_id, const size_t max_y_
   }
 }
 
-inline void Bitmap2D::SetUint64RangeBits(uint64_t &block, const size_t head,
+inline void Bitmap2D::SetUint64RangeBits(uint64_t& block, const size_t head,
                                          const size_t tail) {
   block |= (all_ones >> head) & (~(all_ones >> tail));
 }
 
-inline void Bitmap2D::SetUint64HeadBits(uint64_t &block, const size_t head) {
+inline void Bitmap2D::SetUint64HeadBits(uint64_t& block, const size_t head) {
   block |= all_ones >> head;
 }
 
-inline void Bitmap2D::SetUint64TailBits(uint64_t &block, const size_t tail) {
+inline void Bitmap2D::SetUint64TailBits(uint64_t& block, const size_t tail) {
   block |= (~(all_ones >> tail));
 }
 
@@ -76,7 +76,7 @@ bool Bitmap2D::IsExist(const Eigen::Vector2d& p) const {
   return true;
 }
 
-bool Bitmap2D::Check(const Eigen::Vector2d &p) const {
+bool Bitmap2D::Check(const Eigen::Vector2d& p) const {
 
   Vec2ui grid_pt = ((p - min_p_).array() / grid_size_.array()).cast<size_t>();
 
@@ -92,8 +92,8 @@ bool Bitmap2D::Check(const Eigen::Vector2d &p) const {
   return block & (first_one >> bit_id);
 }
 
-Bitmap2D::Bitmap2D(const Eigen::Vector2d &min_p, const Eigen::Vector2d &max_p,
-                    const Eigen::Vector2d &grid_size, DirectionMajor dir_major) {
+Bitmap2D::Bitmap2D(const Eigen::Vector2d& min_p, const Eigen::Vector2d& max_p,
+                    const Eigen::Vector2d& grid_size, DirectionMajor dir_major) {
   dir_major_ = dir_major;
   op_dir_major_ = opposite_direction(dir_major);
 
