@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/planning/planning.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planner_factory.h"
+#include "modules/planning/planner/rtk_replay_planner.h"
+#include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {
@@ -26,15 +26,25 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
 using TrajectoryPb = ADCTrajectory;
 
-Planning::Planning() {
-  ptr_planner_ = PlannerFactory::CreateInstance(PlannerType::RTK_PLANNER);
+void Planning::RegisterPlanners() {
+  planner_factory_.Register(PlannerType::RTK_PLANNER, []() -> Planner * {
+    return new RTKReplayPlanner();
+  });
 }
+
+Planning::Planning() { RegisterPlanners(); }
 
 bool Planning::Plan(const common::vehicle_state::VehicleState &vehicle_state,
                     const bool is_on_auto_mode, const double publish_time,
                     std::vector<TrajectoryPoint> *planning_trajectory) {
   double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   double execution_start_time = publish_time;
+
+  ptr_planner_ = planner_factory_.CreateObject(PlannerType::RTK_PLANNER);
+  if (!ptr_planner_) {
+    AERROR << "Failed to create RTK planner";
+    return false;
+  }
 
   if (is_on_auto_mode && !last_trajectory_.empty()) {
     // if the auto-driving mode is on and we have the trajectory from last
