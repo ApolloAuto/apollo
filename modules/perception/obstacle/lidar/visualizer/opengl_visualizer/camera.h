@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_CAMERA_H_
-#define APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_CAMERA_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_CAMERA_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_CAMERA_H_
 
 #include <Eigen/Dense>
 
@@ -55,4 +55,4 @@ private:
 } // namespace perception
 } // namespace apollo
 
-#endif // APOLLO_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_CAMERA_H_
+#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_CAMERA_H_
