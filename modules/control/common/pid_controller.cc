@@ -86,13 +86,9 @@ void PIDController::SetPID(const PidConf &pid_conf) {
   kaw_ = pid_conf.kaw();
 }
 
-int PIDController::SaturationStatus() const {
-  return saturation_status_;
-}
+int PIDController::SaturationStatus() const { return saturation_status_; }
 
-bool PIDController::IntegratorHold() const {
-  return integrator_hold_;
-}
+bool PIDController::IntegratorHold() const { return integrator_hold_; }
 
 }  // namespace control
 }  // namespace apollo
