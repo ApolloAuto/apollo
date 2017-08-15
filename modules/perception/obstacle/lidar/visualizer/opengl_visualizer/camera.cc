@@ -15,13 +15,11 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/camera.h"
-
+#include <math.h>
 #include <GL/glut.h>
 
 namespace apollo {
 namespace perception {
-
-const double My_PI = 3.141592653;
 
 Camera::Camera()
     : rot_c2w_(Eigen::Matrix3d::Identity()), t_c2w_(0, 0, 0), fov_(45.0),
@@ -82,7 +80,7 @@ Eigen::Matrix4d Camera::GetProjectionMat() {
   double z_far = 1000.0;
   GLdouble aspect_ratio = static_cast<GLdouble>(screen_width_) /
                           static_cast<GLdouble>(screen_height_);
-  double fov_arc = fov_ * My_PI / 180.0;
+  double fov_arc = fov_ * M_PI / 180.0;
   double f = 1.0 / tan(fov_arc / 2.0);
   proj_mat_(0, 0) = f / aspect_ratio;
   proj_mat_(1, 1) = f;
