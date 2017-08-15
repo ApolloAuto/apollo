@@ -38,7 +38,9 @@ using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const { return "planning"; }
+std::string Planning::Name() const {
+  return "planning";
+}
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -47,8 +49,12 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
 }
 
-const Frame* Planning::GetFrame() const { return frame_.get(); }
-const hdmap::PncMap* Planning::GetPncMap() const { return pnc_map_.get(); }
+const Frame* Planning::GetFrame() const {
+  return frame_.get();
+}
+const hdmap::PncMap* Planning::GetPncMap() const {
+  return pnc_map_.get();
+}
 
 bool Planning::InitFrame(const uint32_t sequence_num) {
   frame_.reset(new Frame(sequence_num));
@@ -149,28 +155,54 @@ Status Planning::Start() {
   return Status::OK();
 }
 
+void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb) {
+  AdapterManager::FillPlanningHeader("planning", trajectory_pb);
+  // TODO(all): integrate reverse gear
+  trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+  AdapterManager::PublishPlanning(*trajectory_pb);
+}
+
+void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
+                                 double timestamp) {
+  AdapterManager::FillPlanningHeader("planning", trajectory_pb);
+  trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
+  // TODO(all): integrate reverse gear
+  trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+  AdapterManager::PublishPlanning(*trajectory_pb);
+}
+
 void Planning::RunOnce() {
   AdapterManager::Observe();
+  ADCTrajectory not_ready_pb;
+  auto* not_ready = not_ready_pb.mutable_decision()
+                        ->mutable_main_decision()
+                        ->mutable_not_ready();
   if (AdapterManager::GetLocalization()->Empty()) {
     AERROR << "Localization is not available; skip the planning cycle";
+    not_ready->set_reason("localization not ready");
+    PublishPlanningPb(&not_ready_pb);
     return;
   }
 
   if (AdapterManager::GetChassis()->Empty()) {
     AERROR << "Chassis is not available; skip the planning cycle";
+    not_ready->set_reason("chassis not ready");
+    PublishPlanningPb(&not_ready_pb);
     return;
   }
   if (AdapterManager::GetRoutingResponse()->Empty()) {
     AERROR << "RoutingResponse is not available; skip the planning cycle";
+    not_ready->set_reason("routing not ready");
+    PublishPlanningPb(&not_ready_pb);
     return;
   }
 
-  // FIXME(all): enable prediction check when perception and prediction is
-  // ready.
-  // if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
-  //   AERROR << "Prediction is not available; skip the planning cycle";
-  //   return;
-  // }
+  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
+    AERROR << "Prediction is not available; skip the planning cycle";
+    not_ready->set_reason("prediction not ready");
+    PublishPlanningPb(&not_ready_pb);
+    return;
+  }
 
   AINFO << "Start planning ...";
   const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
@@ -205,11 +237,7 @@ void Planning::RunOnce() {
          << trajectory_pb->latency_stats().DebugString();
 
   if (res_planning) {
-    AdapterManager::FillPlanningHeader("planning", trajectory_pb);
-    trajectory_pb->mutable_header()->set_timestamp_sec(start_timestamp);
-    // TODO(all): integrate reverse gear
-    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-    AdapterManager::PublishPlanning(*trajectory_pb);
+    PublishPlanningPb(trajectory_pb, start_timestamp);
     ADEBUG << "Planning succeeded:" << trajectory_pb->header().DebugString();
   } else {
     AERROR << "Planning failed";
