@@ -51,19 +51,19 @@ message ObjectNudge {
 }
 
 message ObjectYield {
-  optional double distance_s = 1;  // minimum longitutional distance in meters
+  optional double distance_s = 1;  // minimum longitudinal distance in meters
   optional apollo.common.PointENU fence_point = 2;
   optional double fence_heading = 3;
 }
 
 message ObjectFollow {
-  optional double distance_s = 1;  // minimum longitutional distance in meters
+  optional double distance_s = 1;  // minimum longitudinal distance in meters
   optional apollo.common.PointENU fence_point = 2;
   optional double fence_heading = 3;
 }
 
 message ObjectOvertake {
-  optional double distance_s = 1;  // minimum longitutional distance in meters
+  optional double distance_s = 1;  // minimum longitudinal distance in meters
   optional apollo.common.PointENU fence_point = 2;
   optional double fence_heading = 3;
 }

@@ -103,7 +103,7 @@ Status StBoundaryMapper::GetGraphBoundary(
   double min_stop_s = std::numeric_limits<double>::max();
 
   for (const auto* path_obstacle : path_obstacles.Items()) {
-    if (!path_obstacle->HasLongitutionalDecision()) {
+    if (!path_obstacle->HasLongitudinalDecision()) {
       const auto ret =
           MapObstacleWithoutDecision(*path_obstacle, st_graph_boundaries);
       if (ret.code() == ErrorCode::PLANNING_ERROR) {
@@ -114,7 +114,7 @@ Status StBoundaryMapper::GetGraphBoundary(
       }
       continue;
     }
-    const auto& decision = path_obstacle->LongitutionalDecision();
+    const auto& decision = path_obstacle->LongitudinalDecision();
     if (decision.has_follow()) {
       StGraphBoundary boundary(path_obstacle);
       const auto ret = MapFollowDecision(*path_obstacle, decision, &boundary);

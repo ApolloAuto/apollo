@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.planning;
 
 /////////////////////////////////////////////////////////////////
-// The start_s and end_s are longitutional values.
+// The start_s and end_s are longitudinal values.
 // start_s <= end_s.
 //
 //              end_s
