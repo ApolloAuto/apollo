@@ -38,32 +38,31 @@ using apollo::common::Status;
 using apollo::common::VehicleParam;
 
 DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config,
+                     const StGraphData& st_graph_data,
                      const VehicleParam& vehicle_param,
                      const PathData& path_data)
     : dp_st_speed_config_(dp_config),
+      st_graph_data_(st_graph_data),
       vehicle_param_(vehicle_param),
       path_data_(path_data),
-      dp_st_cost_(dp_config) {}
+      dp_st_cost_(dp_config),
+      init_point_(st_graph_data.init_point()) {
+  dp_st_speed_config_.set_total_path_length(
+      std::fmin(dp_st_speed_config_.total_path_length(),
+                st_graph_data_.path_data_length()));
+}
 
-Status DpStGraph::Search(const StGraphData& st_graph_data,
-                         PathDecision* const path_decision,
+Status DpStGraph::Search(PathDecision* const path_decision,
                          SpeedData* const speed_data) {
-  init_point_ = st_graph_data.init_point();
-
-  if (st_graph_data.path_data_length() <
-      dp_st_speed_config_.total_path_length()) {
-    dp_st_speed_config_.set_total_path_length(st_graph_data.path_data_length());
-  }
-
   if (!InitCostTable().ok()) {
     const std::string msg = "Initialize cost table failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  CalculatePointwiseCost(st_graph_data.st_graph_boundaries());
+  CalculatePointwiseCost(st_graph_data_.st_graph_boundaries());
 
-  if (!CalculateTotalCost(st_graph_data).ok()) {
+  if (!CalculateTotalCost().ok()) {
     const std::string msg = "Calculate total cost failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -75,7 +74,7 @@ Status DpStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!GetObjectDecision(st_graph_data, *speed_data, path_decision).ok()) {
+  if (!GetObjectDecision(*speed_data, path_decision).ok()) {
     const std::string msg = "Get object decision by speed profile failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -142,7 +141,7 @@ void DpStGraph::CalculatePointwiseCost(
   }
 }
 
-Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
+Status DpStGraph::CalculateTotalCost() {
   // s corresponding to row
   // time corresponding to col
   uint32_t c = 0;
@@ -153,7 +152,7 @@ Status DpStGraph::CalculateTotalCost(const StGraphData& st_graph_data) {
     uint32_t highest_row = 0;
     uint32_t lowest_row = cost_table_.back().size() - 1;
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
-      CalculateCostAt(st_graph_data, c, r);
+      CalculateCostAt(c, r);
       uint32_t h_r = 0;
       uint32_t l_r = 0;
       if (cost_table_.at(c).at(r).total_cost() <
@@ -203,8 +202,7 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
   }
 }
 
-void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
-                                const uint32_t c, const uint32_t r) {
+void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   if (c == 0) {
     DCHECK_EQ(r, 0) << "Incorrect. Row should be 0 with col = 0. row: " << r;
     cost_table_[c][r].SetTotalCost(0.0);
@@ -212,7 +210,7 @@ void DpStGraph::CalculateCostAt(const StGraphData& st_graph_data,
   }
 
   double speed_limit =
-      st_graph_data.speed_limit().GetSpeedLimitByS(unit_s_ * r);
+      st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
   if (c == 1) {
     cost_table_[c][r].SetTotalCost(
         cost_table_[c][r].obstacle_cost() + cost_table_[0][0].total_cost() +
@@ -357,8 +355,7 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
   return Status::OK();
 }
 
-Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
-                                    const SpeedData& speed_profile,
+Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
                                     PathDecision* const path_decision) const {
   if (speed_profile.speed_vector().size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
@@ -367,7 +364,7 @@ Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
   }
 
   const std::vector<StGraphBoundary>& obs_boundaries =
-      st_graph_data.st_graph_boundaries();
+      st_graph_data_.st_graph_boundaries();
   const std::vector<SpeedPoint>& speed_points = speed_profile.speed_vector();
 
   for (std::vector<StGraphBoundary>::const_iterator boundary_it =
@@ -410,7 +407,7 @@ Status DpStGraph::GetObjectDecision(const StGraphData& st_graph_data,
       if (CheckIsFollowByT(*boundary_it)) {
         // FOLLOW decision
         const auto obstacle = path_decision->Find(boundary_it->id());
-        const auto &obstacle_boundary = obstacle->perception_sl_boundary();
+        const auto& obstacle_boundary = obstacle->perception_sl_boundary();
         ObjectDecisionType follow_decision;
         if (!CreateFollowDecision(obstacle_boundary, &follow_decision)) {
           AERROR << "Failed to create follow decision for boundary with id "

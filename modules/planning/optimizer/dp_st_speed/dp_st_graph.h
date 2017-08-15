@@ -40,12 +40,11 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const DpStSpeedConfig& dp_config,
+  DpStGraph(const DpStSpeedConfig& dp_config, const StGraphData& st_graph_data,
             const common::VehicleParam& vehicle_param,
             const PathData& path_data);
 
-  apollo::common::Status Search(const StGraphData& st_graph_data,
-                                PathDecision* const path_decision,
+  apollo::common::Status Search(PathDecision* const path_decision,
                                 SpeedData* const speed_data);
 
  private:
@@ -57,12 +56,10 @@ class DpStGraph {
       SpeedData* const speed_data) const;
 
   apollo::common::Status GetObjectDecision(
-      const StGraphData& st_graph_data, const SpeedData& speed_profile,
-      PathDecision* const path_decision) const;
+      const SpeedData& speed_profile, PathDecision* const path_decision) const;
 
-  apollo::common::Status CalculateTotalCost(const StGraphData& st_graph_data);
-  void CalculateCostAt(const StGraphData& st_graph_data, const uint32_t r,
-                       const uint32_t c);
+  apollo::common::Status CalculateTotalCost();
+  void CalculateCostAt(const uint32_t r, const uint32_t c);
 
   double CalculateEdgeCost(const STPoint& first, const STPoint& second,
                            const STPoint& third, const STPoint& forth,
@@ -117,6 +114,8 @@ class DpStGraph {
  private:
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
+
+  const StGraphData& st_graph_data_;
 
   // vehicle configuration parameter
   const common::VehicleParam& vehicle_param_;
