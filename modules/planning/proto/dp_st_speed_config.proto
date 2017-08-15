@@ -17,7 +17,7 @@ message DpStSpeedConfig {
   optional double go_up_buffer = 11 [ default = 5.0 ];
 
   // obstacle cost config
-  optional double st_graph_default_point_cost = 12 [ default = 1e10 ];
+  optional double default_obstacle_cost = 12 [ default = 1e10 ];
   optional double obstacle_cost_factor = 13 [ default = -300 ];
 
   // speed cost config
