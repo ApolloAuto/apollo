@@ -185,7 +185,10 @@ const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
 
 void PathObstacle::AddDecision(const std::string& decider_tag,
                                const ObjectDecisionType& decision) {
-  if (IsLateralDecision(decision)) {
+  bool is_lateral = IsLateralDecision(decision);
+  bool is_longitudinal = IsLongitutionalDecision(decision);
+
+  if (is_lateral) {
     const auto merged_decision =
         MergeLateralDecision(lateral_decision_, decision);
     if (IsLongitutionalDecision(merged_decision)) {
@@ -195,11 +198,13 @@ void PathObstacle::AddDecision(const std::string& decider_tag,
       lateral_decision_ = merged_decision;
       has_lateral_decision_ = true;
     }
-  } else if (IsLongitutionalDecision(decision)) {
+  }
+  if (is_longitudinal) {
     longitutional_decision_ =
         MergeLongitutionalDecision(longitutional_decision_, decision);
     has_longitutional_decision_ = true;
-  } else {
+  }
+  if (!(is_lateral || is_longitudinal)) {
     DCHECK(false) << "Unkown decision type: " << decision.DebugString();
   }
   decisions_.push_back(decision);

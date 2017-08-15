@@ -75,6 +75,9 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
       qp_spline_st_speed_config_.total_path_length(),
       qp_spline_st_speed_config_.total_time());
 
+  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
+    DCHECK(path_obstacle->HasLongitutionalDecision());
+  }
   // step 1 get boundaries
   std::vector<StGraphBoundary> boundaries;
   if (boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).code() ==
