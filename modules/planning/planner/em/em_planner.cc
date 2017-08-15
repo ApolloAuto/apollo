@@ -76,7 +76,7 @@ Status EMPlanner::Init(const PlanningConfig& config) {
     AINFO << "Created optimizer:" << optimizers_.back()->name();
   }
   for (auto& optimizer : optimizers_) {
-    if (!optimizer->Init()) {
+    if (!optimizer->Init(config)) {
       std::string msg(common::util::StrCat("Init optimizer[", optimizer->name(),
                                            "] failed."));
       AERROR << msg;

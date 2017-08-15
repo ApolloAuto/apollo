@@ -36,7 +36,7 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
   explicit DpStSpeedOptimizer(const std::string& name);
 
-  bool Init() override;
+  bool Init(const PlanningConfig& config) override;
 
  private:
   apollo::common::Status Process(const PathData& path_data,

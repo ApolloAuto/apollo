@@ -42,7 +42,7 @@ using apollo::localization::LocalizationEstimate;
 DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
-bool DpStSpeedOptimizer::Init() {
+bool DpStSpeedOptimizer::Init(const PlanningConfig& config) {
   if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
                                       &st_boundary_config_)) {
     AERROR << "failed to load config file " << FLAGS_st_boundary_config_file;

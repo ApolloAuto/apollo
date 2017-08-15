@@ -48,7 +48,7 @@ em_planner_config {
         max_acceleration: 4.5
         max_deceleration: -4.5
 
-        st_boudnary_config {
+        st_boundary_config {
             boundary_buffer: 0.1
             minimal_follow_time: 3.0
             follow_buffer: 1.0
@@ -56,7 +56,7 @@ em_planner_config {
             follow_speed_threshold: 10.0
             follow_speed_damping_factor: 0.7
             success_tunnel:0.01
-            expending_coeff: 1.2
+            expanding_coeff: 1.2
             follow_distance_buffer: 5.0
             centric_acceleration_limit: 1.0
             kappa_threshold: 0.04
@@ -100,7 +100,7 @@ em_planner_config {
         max_deceleration: -4.5
         reference_line_kernel_weight: 1.0
 
-        st_boudnary_config {
+        st_boundary_config {
             boundary_buffer: 0.1
             minimal_follow_time: 3.0
             follow_buffer: 1.0
@@ -108,7 +108,7 @@ em_planner_config {
             follow_speed_threshold: 10.0
             follow_speed_damping_factor: 0.7
             success_tunnel:0.01
-            expending_coeff: 1.2
+            expanding_coeff: 1.2
             follow_distance_buffer: 5.0
             centric_acceleration_limit: 1.0
             kappa_threshold: 0.04

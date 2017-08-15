@@ -19,6 +19,7 @@
  **/
 
 #include "modules/planning/optimizer/optimizer.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -29,7 +30,7 @@ Optimizer::Optimizer(const std::string& name) : _name(name) {}
 
 const std::string& Optimizer::name() const { return _name; }
 
-bool Optimizer::Init() { return true; }
+bool Optimizer::Init(const PlanningConfig& config) { return true; }
 
 Status Optimizer::Optimize(Frame* frame) {
   frame_ = frame;

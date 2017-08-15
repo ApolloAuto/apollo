@@ -26,6 +26,7 @@
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 
 #include "modules/planning/optimizer/path_optimizer.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -34,7 +35,7 @@ class DpPolyPathOptimizer : public PathOptimizer {
  public:
   explicit DpPolyPathOptimizer(const std::string &name);
 
-  bool Init() override;
+  bool Init(const PlanningConfig& config) override;
 
  private:
   apollo::common::Status Process(
