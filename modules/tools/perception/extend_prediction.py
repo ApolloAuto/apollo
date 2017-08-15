@@ -8,24 +8,11 @@ import time
 
 import numpy
 import rospy
-from google.protobuf import text_format
 from std_msgs.msg import String
 
+import common.proto_utils as proto_utils
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacle
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
-
-
-def load_pb_from_file(filename, pb_value):
-    """load pb from file"""
-    try:
-        f_handle = open(filename, "rb")
-        pb_value.ParseFromString(f_handle.read())
-        f_handle.close()
-    except Exception as e:
-        f_handle = open(filename, 'r')
-        text_format.Merge(f_handle.read(), pb_value)
-        f_handle.close()
-    return pb_value
 
 
 def distance(p1, p2):
@@ -80,6 +67,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--distance", action="store", type=float, default=70.0,
             help="set the prediction distance")
     args = parser.parse_args()
-    prediction_data = load_pb_from_file(args.prediction, PredictionObstacles())
+    prediction_data = proto_utils.get_pb_from_file(args.prediction,
+                                                   PredictionObstacles())
     extended_prediction = extend_prediction(prediction_data, args.distance, args.period)
     print extended_prediction

@@ -19,10 +19,10 @@
 import random
 
 import matplotlib.pyplot as plt
-from google.protobuf import text_format
 from matplotlib import cm as cmx
 from matplotlib import colors as mcolors
 
+import common.proto_utils as proto_utils
 from modules.map.proto import map_pb2
 
 class Map:
@@ -43,20 +43,8 @@ class Map:
             self.colors.append(color_val)
 
     def load(self, map_file_name):
-        try:
-            f_handle = open(map_file_name, "rb")
-            self.map_pb.ParseFromString(f_handle.read())
-            f_handle.close()
-            return True
-        except Exception as e:
-            try:
-                f_handle = open(map_file_name, 'r')
-                text_format.Merge(f_handle.read(), self.map_pb)
-                f_handle.close()
-                return True
-            except Exception as e:
-                print "Error: map file is incorrect!"
-                return False
+        res = proto_utils.get_pb_from_file(map_file_name, self.map_pb)
+        return res != None
 
     def draw_lanes(self, ax, is_show_lane_ids, laneids):
         cnt = 1

@@ -1,9 +1,8 @@
 import math
 import threading
 
-from google.protobuf import text_format
-
-from modules.localization.proto import localization_pb2
+import common.proto_utils as proto_utils
+from modules.localization.proto.localization_pb2 import LocalizationEstimate
 
 
 class Localization:
@@ -17,10 +16,8 @@ class Localization:
         self.localization_data_lock.release()
 
     def load(self, localization_file_name):
-        self.localization_pb = localization_pb2.LocalizationEstimate()
-        f_handle = open(localization_file_name, 'r')
-        text_format.Merge(f_handle.read(), self.localization_pb)
-        f_handle.close()
+        self.localization_pb = proto_utils.get_pb_from_text_file(
+            localization_file_name, LocalizationEstimate())
 
     def plot_vehicle(self, ax):
         self.plot_vehicle_position(ax)
