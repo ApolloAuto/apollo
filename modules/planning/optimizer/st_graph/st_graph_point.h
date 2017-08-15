@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_POINT_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_POINT_H_
 
+#include <limits>
+
 #include "modules/planning/common/speed/st_point.h"
 
 namespace apollo {
@@ -62,7 +64,7 @@ class StGraphPoint {
 
   double reference_cost_ = 0.0;
   double obstacle_cost_ = 0.0;
-  double total_cost_ = 0.0;
+  double total_cost_ = std::numeric_limits<double>::infinity();
 };
 
 }  // namespace planning
