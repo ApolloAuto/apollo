@@ -20,13 +20,14 @@ Generate Planning Path
 """
 
 import argparse
-import os
-import rospy
-import sys
-from numpy import genfromtxt
-import scipy.signal as signal
 import atexit
+import os
+import sys
 import time
+
+import rospy
+import scipy.signal as signal
+from numpy import genfromtxt
 
 from modules.routing.proto import routing_pb2
 

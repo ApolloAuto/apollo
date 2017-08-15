@@ -19,13 +19,13 @@
 This program can dump a rosbag into separate text files that contains the pb messages
 """
 
-import rosbag
-import std_msgs
 import argparse
-import shutil
 import os
+import shutil
 import sys
 
+import rosbag
+import std_msgs
 from std_msgs.msg import String
 
 

@@ -19,6 +19,7 @@
 Message Handle
 """
 import curses
+
 import rospy
 
 import batch_include

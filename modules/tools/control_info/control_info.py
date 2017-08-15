@@ -18,25 +18,27 @@
 """
 Control Planning Analyzer
 """
+import argparse
+import math
 import sys
-import rospy
-import rosbag
+import threading
+import time
+
 import matplotlib
-from std_msgs.msg import String
 import matplotlib.pyplot as plt
+import numpy
+import rosbag
+import rospy
+import tf
+import tkFileDialog
 from matplotlib import patches
 from matplotlib import lines
-import numpy
+from std_msgs.msg import String
+
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.planning.proto import planning_pb2
 from modules.control.proto import control_cmd_pb2
-import time
-import tf
-import math
-import argparse
-import threading
-import tkFileDialog
 
 
 class ControlInfo(object):

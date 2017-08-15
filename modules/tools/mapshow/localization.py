@@ -1,7 +1,10 @@
 import math
-from google.protobuf import text_format
-from modules.localization.proto import localization_pb2
 import threading
+
+from google.protobuf import text_format
+
+from modules.localization.proto import localization_pb2
+
 
 class Localization:
     def __init__(self, localization_pb=None):

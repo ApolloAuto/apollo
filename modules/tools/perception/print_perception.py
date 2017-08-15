@@ -5,8 +5,8 @@ import argparse
 import math
 import time
 
-import rospy
 import numpy
+import rospy
 from std_msgs.msg import String
 
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
