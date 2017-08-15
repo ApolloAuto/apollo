@@ -104,7 +104,6 @@ public:
     ~OfflineLidarPerceptionTool() = default;
 
     bool Init(bool use_visualization = false) {
-        FLAGS_config_manager_path = "tool/offline_visualizer_tool/conf/config_manager.config";
         config_manager_ = Singleton<ConfigManager>::Get();
        
         if (config_manager_ == NULL || !config_manager_->Init()) {
@@ -170,6 +169,9 @@ public:
 
             std::vector<ObjectPtr> result_objects = lidar_process_->GetObjects();
             const pcl_util::PointIndicesPtr roi_indices = lidar_process_->GetROIIndices();
+
+            pcl_util::PointCloudPtr roi_cloud(new pcl_util::PointCloud);
+						pcl::copyPointCloud(*cloud, *roi_indices, *roi_cloud);
             
             if (visualizer_) {
                 pcl_util::PointDCloudPtr transformed_cloud(new pcl_util::PointDCloud);
@@ -180,6 +182,7 @@ public:
                 FrameContent content;
                 content.SetLidarPose(pose);
                 content.SetLidarCloud(cloud);
+                content.SetLidarRoiCloud(roi_cloud);
                 content.SetTrackedObjects(result_objects);
                 visualizer_->UpdateCameraSystem(&content);
                 visualizer_->Render(content);
