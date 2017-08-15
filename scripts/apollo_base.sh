@@ -105,13 +105,16 @@ function set_lib_path() {
   if [ "$RELEASE_DOCKER" == 1 ];then
       source /apollo/ros/setup.bash
       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib
-      export PYTHONPATH=/apollo/lib:${PYTHONPATH}
+      PY_LIB_PATH=/apollo/lib
+      PY_TOOLS_PATH=/apollo/modules/tools
   else
       if [ -e "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash" ]; then
          source "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash"
       fi
-      export PYTHONPATH=${APOLLO_ROOT_DIR}/bazel-genfiles:${PYTHONPATH}
+      PY_LIB_PATH=${APOLLO_ROOT_DIR}/bazel-genfiles
+      PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
   fi
+  export PYTHONPATH=${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
 }
 
 function create_data_dir() {

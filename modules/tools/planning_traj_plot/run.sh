@@ -24,6 +24,6 @@ then
 fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${DIR}/../../../scripts/apollo_base.sh"
 
-export PYTHONPATH="${DIR}/../../../bazel-genfiles:${PYTHONPATH}"
 eval "python ${DIR}/main.py $1 $2"
