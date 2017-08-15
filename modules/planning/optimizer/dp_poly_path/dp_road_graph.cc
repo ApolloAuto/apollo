@@ -258,7 +258,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
       if (!left_nudgable && !right_nudgable) {
         // STOP: and break
         ObjectStop *object_stop_ptr = object_decision.mutable_stop();
-        object_stop_ptr->set_distance_s(FLAGS_stop_distance_obstacle);
+        object_stop_ptr->set_distance_s(-FLAGS_stop_distance_obstacle);
         object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
 
         auto stop_ref_s = sl_boundary.start_s() - FLAGS_stop_distance_obstacle;
