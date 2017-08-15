@@ -304,6 +304,7 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
     if (!std::isinf(cur_point.total_cost()) &&
         cur_point.total_cost() < min_cost) {
       best_end_point = &cur_point;
+      min_cost = cur_point.total_cost();
     }
   }
 
@@ -312,6 +313,7 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
     if (!std::isinf(cur_point.total_cost()) &&
         cur_point.total_cost() < min_cost) {
       best_end_point = &cur_point;
+      min_cost = cur_point.total_cost();
     }
   }
 
