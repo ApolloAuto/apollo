@@ -34,15 +34,10 @@ class QpSplineStSpeedOptimizerTest : public ::testing::Test {
   virtual void SetUp() {
     FLAGS_reference_line_smoother_config_file =
         "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
-    FLAGS_qp_spline_path_config_file =
-        "modules/planning/testdata/qp_spline_path/qp_spline_path_config.pb.txt";
-    FLAGS_qp_spline_st_speed_config_file =
-        "modules/planning/testdata/qp_spline_st_speed"
-            "/qp_spline_st_speed_config_file.pb.txt";
-    FLAGS_st_boundary_config_file =
-        "modules/planning/testdata/qp_spline_st_speed"
-        "/st_boundary_config_file.pb.txt";
+    FLAGS_planning_config_file =
+        "modules/planning/testdata/qp_spline_st_speed/planning_config.pb.txt";
 
+    LoadPlanningConfig();
     optimizer_.reset(new QpSplineStSpeedOptimizer("ST_SPEED"));
     planning_pb = LoadPlanningPb(
         "modules/planning/testdata"
@@ -56,6 +51,13 @@ class QpSplineStSpeedOptimizerTest : public ::testing::Test {
     CHECK(apollo::common::util::GetProtoFromFile(filename, &planning_pb))
     << "Failed to open file " << filename;
     return std::move(planning_pb);
+  }
+
+  void LoadPlanningConfig() {
+    PlanningPb planning_pb;
+    CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
+                                                 &planning_config_))
+    << "Failed to open file " << FLAGS_planning_config_file;
   }
 
   void InitFrame() {
@@ -99,13 +101,14 @@ class QpSplineStSpeedOptimizerTest : public ::testing::Test {
   std::unique_ptr<Frame> frame;
   PlanningPb planning_pb;
   std::unique_ptr<Optimizer> optimizer_;
+  PlanningConfig planning_config_;
 };
 
 TEST_F(QpSplineStSpeedOptimizerTest, Process) {
   PlanningData* planning_data = frame->mutable_planning_data();
   EXPECT_EQ(planning_data->speed_data().speed_vector().size()
   , 0);
-  optimizer_->Init();
+  optimizer_->Init(planning_config_);
   optimizer_->Optimize(frame.get());
 
   planning_internal::STGraphDebug st_graph_ground_truth;

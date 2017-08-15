@@ -43,20 +43,9 @@ QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const std::string& name)
     : SpeedOptimizer(name) {}
 
 bool QpSplineStSpeedOptimizer::Init(const PlanningConfig& config) {
-  // load boundary mapper
-  if (!common::util::GetProtoFromFile(FLAGS_st_boundary_config_file,
-                                      &st_boundary_config_)) {
-    AERROR << "Failed to load config file: " << FLAGS_st_boundary_config_file;
-    return false;
-  }
-
-  // load qp_spline_st_speed_config_
-  if (!common::util::GetProtoFromFile(FLAGS_qp_spline_st_speed_config_file,
-                                      &qp_spline_st_speed_config_)) {
-    AERROR << "Failed to load config file: "
-           << FLAGS_qp_spline_st_speed_config_file;
-    return false;
-  }
+  qp_spline_st_speed_config_ =
+      config.em_planner_config().qp_spline_st_speed_config();
+  st_boundary_config_ = qp_spline_st_speed_config_.st_boundary_config();
   is_init_ = true;
   return true;
 }
