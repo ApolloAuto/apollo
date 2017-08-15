@@ -10,7 +10,7 @@ message StBoundaryConfig {
   optional double follow_speed_threshold = 5 [ default = 10.0 ];
   optional double follow_speed_damping_factor = 6 [ default = 0.7 ];
   optional double success_tunnel = 7 [ default = 0.01 ];
-  optional double expending_coeff = 8 [ default = 1.2 ];
+  optional double expanding_coeff = 8 [ default = 1.2 ];
   optional double follow_distance_buffer = 9 [ default = 5.0 ];
   optional double centric_acceleration_limit = 10 [ default = 1.0 ];
   optional double kappa_threshold = 11 [ default = 0.04 ];

@@ -5,7 +5,7 @@ follow_coeff:1.0
 follow_speed_threshold: 10.0
 follow_speed_damping_factor: 0.7
 success_tunnel:0.01
-expending_coeff: 1.2
+expanding_coeff: 1.2
 follow_distance_buffer: 5.0
 centric_acceleration_limit: 1.0
 kappa_threshold: 0.04
