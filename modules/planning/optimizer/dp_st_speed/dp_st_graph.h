@@ -91,7 +91,7 @@ class DpStGraph {
    * @return true if the follow decision is created successfully, and
    *         false otherwise.
    **/
-  bool CreateFollowDecision(const StGraphBoundary& boundary,
+  bool CreateFollowDecision(const SLBoundary& obstacle_boundary,
                             ObjectDecisionType* const follow_decision) const;
 
   /**
