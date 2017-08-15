@@ -355,11 +355,14 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
   }
   if (lower_points.size() > 0 && upper_points.size() > 0) {
     boundary_points.clear();
-    const double buffer = st_boundary_config_.follow_buffer();
-    boundary_points.emplace_back(lower_points.at(0).s() - buffer,
-                                 lower_points.at(0).t());
-    boundary_points.emplace_back(lower_points.back().s() - buffer,
-                                 lower_points.back().t());
+    const double buffer = st_boundary_config_.boundary_buffer();
+
+    boundary_points.emplace_back(
+        std::fmax(0.0, lower_points.at(0).s() - buffer),
+        lower_points.at(0).t());
+    boundary_points.emplace_back(
+        std::fmax(0.0, lower_points.back().s() - buffer),
+        lower_points.back().t());
     boundary_points.emplace_back(upper_points.back().s() + buffer +
                                      st_boundary_config_.boundary_buffer(),
                                  upper_points.back().t());
@@ -394,24 +397,27 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
       // TODO(all): remove the arbitrary numbers in this part.
       if (boundary_points.at(0).s() - dis < 0.0) {
         boundary_points.at(0).set_s(
-            std::fmax(boundary_points.at(0).s() - 2.0, 0.0));
+            std::fmax(boundary_points.at(0).s() - buffer, 0.0));
       } else {
-        boundary_points.at(0).set_s(
-            std::fmax(boundary_points.at(0).s() - dis, 0.0));
+        boundary_points.at(0).set_s(boundary_points.at(0).s() - dis);
       }
+
       if (boundary_points.at(1).s() - dis < 0.0) {
         boundary_points.at(1).set_s(
-            std::fmax(boundary_points.at(0).s() - 4.0, 0.0));
+            std::fmax(boundary_points.at(1).s() - buffer, 0.0));
       } else {
-        boundary_points.at(1).set_s(
-            std::fmax(boundary_points.at(0).s() - dis, 0.0));
+        boundary_points.at(1).set_s(boundary_points.at(1).s() - dis);
       }
       b_type = StGraphBoundary::BoundaryType::YIELD;
+
     } else if (obj_decision.has_overtake()) {
       const double dis = std::fabs(obj_decision.overtake().distance_s());
       characteristic_length = dis;
       boundary_points.at(2).set_s(boundary_points.at(2).s() + dis);
       boundary_points.at(3).set_s(boundary_points.at(3).s() + dis);
+    } else {
+      DCHECK(false) << "Obj decision should be either yield or overtake: "
+                    << obj_decision.DebugString();
     }
     const double area = GetArea(boundary_points);
     if (Double::Compare(area, 0.0) > 0) {
@@ -441,16 +447,15 @@ Status StBoundaryMapper::MapFollowDecision(
 
   const auto* obstacle = path_obstacle.Obstacle();
 
-  const auto& speed = obstacle->Perception().velocity();
-
   SLPoint obstacle_sl_point;
   reference_line_.get_point_in_frenet_frame(
-      Vec2d(obj_decision.follow().fence_point().x(),
-            obj_decision.follow().fence_point().y()),
+      Vec2d(obstacle->Perception().position().x(),
+            obstacle->Perception().position().y()),
       &obstacle_sl_point);
+
   const auto& ref_point = reference_line_.get_reference_point(
-      obj_decision.follow().fence_point().x(),
-      obj_decision.follow().fence_point().y());
+      obstacle->Perception().position().x(),
+      obstacle->Perception().position().y());
 
   const double speed_coeff =
       std::cos(obj_decision.follow().fence_heading() - ref_point.heading());
@@ -469,10 +474,12 @@ Status StBoundaryMapper::MapFollowDecision(
     return common::Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  const double distance_to_obstacle = obstacle_sl_point.s() -
-                                      start_sl_point.s() -
-                                      vehicle_param_.front_edge_to_center() -
-                                      st_boundary_config_.follow_buffer();
+  const double distance_to_obstacle =
+      obstacle_sl_point.s() -
+      obstacle->Perception().length() / 2.0 *
+          st_boundary_config_.expanding_coeff() -
+      start_sl_point.s() - vehicle_param_.front_edge_to_center() -
+      st_boundary_config_.follow_buffer();
 
   if (distance_to_obstacle > planning_distance_) {
     std::string msg = "obstacle is out of range.";
@@ -481,6 +488,7 @@ Status StBoundaryMapper::MapFollowDecision(
   }
 
   double follow_speed = 0.0;
+  const auto& speed = obstacle->Perception().velocity();
   const double scalar_speed = std::hypot(speed.x(), speed.y());
   if (scalar_speed > st_boundary_config_.follow_speed_threshold()) {
     follow_speed = st_boundary_config_.follow_speed_threshold() * speed_coeff;
