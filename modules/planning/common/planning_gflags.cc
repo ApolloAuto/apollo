@@ -336,13 +336,6 @@ DEFINE_string(planning_config_file,
               "modules/planning/conf/planning_config.pb.txt",
               "planning config file");
 
-DEFINE_string(st_boundary_config_file,
-              "modules/planning/conf/st_boundary_config_file.pb.txt",
-              "The config file for st_boundary_config.");
-DEFINE_string(qp_spline_st_speed_config_file,
-              "modules/planning/conf/qp_spline_st_speed_config_file.pb.txt",
-              "The config file for qp_spline_st_speed_config_file.");
-
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
 

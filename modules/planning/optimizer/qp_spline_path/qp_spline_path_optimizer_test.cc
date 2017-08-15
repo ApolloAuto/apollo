@@ -33,14 +33,15 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
   virtual void SetUp() {
     FLAGS_reference_line_smoother_config_file =
         "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
-    FLAGS_qp_spline_path_config_file =
-        "modules/planning/testdata/qp_spline_path/qp_spline_path_config.pb.txt";
+    FLAGS_planning_config_file =
+        "modules/planning/testdata/qp_spline_path/planning_config.pb.txt";
     optimizer_.reset(new QpSplinePathOptimizer(""));
     frame.reset(new Frame(1));
     hdmap::PncMap* pnc_map;
     pnc_map = new hdmap::PncMap("modules/planning/testdata/base_map.txt");
     Frame::SetMap(pnc_map);
 
+    LoadPlanningConfig();
     planning_pb = LoadPlanningPb(
         "modules/planning/testdata"
             "/qp_spline_path/42_apollo_planning.pb.txt");
@@ -56,6 +57,13 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
     CHECK(apollo::common::util::GetProtoFromFile(filename, &planning_pb))
     << "Failed to open file " << filename;
     return std::move(planning_pb);
+  }
+
+  void LoadPlanningConfig() {
+    PlanningPb planning_pb;
+    CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
+                                                 &planning_config_))
+    << "Failed to open file " << FLAGS_planning_config_file;
   }
 
   common::TrajectoryPoint GetInitPoint() {
@@ -82,6 +90,7 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
   std::unique_ptr<Frame> frame;
   PlanningPb planning_pb;
   std::unique_ptr<Optimizer> optimizer_;
+  PlanningConfig planning_config_;
 };
 
 TEST_F(QpSplinePathOptimizerTest, Process) {
@@ -91,7 +100,7 @@ TEST_F(QpSplinePathOptimizerTest, Process) {
   PlanningData* planning_data = frame->mutable_planning_data();
   EXPECT_EQ(planning_data->path_data().discretized_path().path_points().size()
   , 0);
-  optimizer_->Init();
+  optimizer_->Init(planning_config_);
   optimizer_->Optimize(frame.get());
 
   common::Path qp_path_ground_truth;
@@ -110,7 +119,7 @@ TEST_F(QpSplinePathOptimizerTest, Process) {
         qp_path_ground_truth.path_point().Get(i);
     common::PathPoint computed_point = planning_data
         ->path_data().discretized_path().path_points()[i];
-    EXPECT_NEAR(ground_truth_point.x(), computed_point.x(), 1.0e-3);
+    EXPECT_NEAR(ground_truth_point.x(), computed_point.x(), 1.0e-2);
     EXPECT_NEAR(ground_truth_point.y(), computed_point.y(), 1.0e-3);
     EXPECT_NEAR(ground_truth_point.kappa(), computed_point.kappa(), 1.0e-3);
     EXPECT_NEAR(ground_truth_point.theta(), computed_point.theta(), 1.0e-3);
