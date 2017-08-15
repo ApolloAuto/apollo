@@ -17,4 +17,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "cartesian_frenet_conversion_test",
+    size = "small",
+    srcs = [
+        "cartesian_frenet_conversion_test.cc",
+    ],
+    deps = [
+        ":cartesian_frenet_conversion",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
