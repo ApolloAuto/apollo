@@ -10,8 +10,7 @@ set(${PROJECT_NAME}_CATKIN_DEPS
     sensor_msgs
     velodyne_driver
     velodyne_msgs
-    eigen_conversions
-)
+    eigen_conversions)
 
 find_package(catkin REQUIRED COMPONENTS ${${PROJECT_NAME}_CATKIN_DEPS})
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -41,7 +40,7 @@ if(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
     add_definitions(-DHAVE_NEW_YAMLCPP)
 endif(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -fopenmp")
 
 catkin_package(
     CATKIN_DEPENDS ${${PROJECT_NAME}_CATKIN_DEPS}
@@ -104,40 +103,6 @@ target_link_libraries(compensator_nodelet
 	${catkin_LIBRARIES}
     ${PCL_LIBRARIES})
 
-add_executable(velodyne_parser_utest test/unit_test_velodyne_parser.cpp)
-target_link_libraries(
-    velodyne_parser_utest 
-    gtest
-    ${catkin_LIBRARIES} 
-    ${PROJ_LIBRARY} 
-    velodyne_parser
-)
-
-if (CATKIN_ENABLE_TESTING)
-  # these dependencies are only needed for unit testing
-  find_package(roslaunch REQUIRED)
-  find_package(rostest REQUIRED)
-
-  add_executable(verify_pointcloud test/verify_pointcloud.cpp)
-  target_link_libraries(
-    verify_pointcloud 
-    gtest
-    ${catkin_LIBRARIES} 
-    ${PROJ_LIBRARY} 
-    velodyne_parser)
-  
-  add_executable(verify_compensator test/verify_compensator.cpp)
-  target_link_libraries(
-    verify_compensator 
-    gtest
-    ${catkin_LIBRARIES} 
-    ${PROJ_LIBRARY}
-    velodyne_parser)
-  
-  # parse check all the launch/*.launch files
-  roslaunch_add_file_check(launch)
-endif(CATKIN_ENABLE_TESTING)
-
 catkin_install_python(PROGRAMS 
     src/extrinsics_broadcaster.py
     src/velodyne_check.py
@@ -147,12 +112,12 @@ install(
     TARGETS 
     convert_node
     compensator_node
+    pcd_exporter_node
+    pointcloud_dump_node
     convert_nodelet 
     compensator_nodelet
-    pointcloud_dump_nodelet 
-    verify_pointcloud 
     pcd_exporter_nodelet
-    velodyne_parser_utest
+    pointcloud_dump_nodelet 
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
@@ -165,8 +130,8 @@ install(DIRECTORY launch/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 install(DIRECTORY params/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/params)
-install(DIRECTORY test/
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test
-        FILES_MATCHING PATTERN "*.msg")
+# install(DIRECTORY test/
+#         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test
+#         FILES_MATCHING PATTERN "*.msg")
 install(DIRECTORY scripts/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts)
