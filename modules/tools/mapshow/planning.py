@@ -42,16 +42,20 @@ class Planning:
         st_data_s = {}
         st_data_t = {}
         for st_graph in self.planning_pb.debug.planning_data.st_graph:
+            st_data_boundary_s[st_graph.name] = {}
+            st_data_boundary_t[st_graph.name] = {}
             for boundary in st_graph.boundary:
-                st_data_boundary_s[boundary.name] = []
-                st_data_boundary_t[boundary.name] = []
+                st_data_boundary_s[st_graph.name][boundary.name] = []
+                st_data_boundary_t[st_graph.name][boundary.name] = []
                 for point in boundary.point:
-                    st_data_boundary_s[boundary.name].append(point.s)
-                    st_data_boundary_t[boundary.name].append(point.t)
-                st_data_boundary_s[boundary.name].append(
-                    st_data_boundary_s[boundary.name][0])
-                st_data_boundary_t[boundary.name].append(
-                    st_data_boundary_t[boundary.name][0])
+                    st_data_boundary_s[st_graph.name][boundary.name]\
+                        .append(point.s)
+                    st_data_boundary_t[st_graph.name][boundary.name]\
+                        .append(point.t)
+                st_data_boundary_s[st_graph.name][boundary.name].append(
+                    st_data_boundary_s[st_graph.name][boundary.name][0])
+                st_data_boundary_t[st_graph.name][boundary.name].append(
+                    st_data_boundary_t[st_graph.name][boundary.name][0])
 
             st_data_s[st_graph.name] = []
             st_data_t[st_graph.name] = []
@@ -65,52 +69,49 @@ class Planning:
         self.st_data_t = st_data_t
         self.st_data_lock.release()
 
-    def replot_st_data(self, boundaries, st_lines, obstacle_annotation_pool):
+    def replot_st_data(self, boundaries_pool, st_line,
+                       obstacle_annotation_pool, st_graph_name):
+        if st_graph_name not in self.st_data_boundary_s:
+            return
+        if st_graph_name not in self.st_data_s:
+            return
+
         cnt = 0
         self.st_data_lock.acquire()
-        for name in self.st_data_boundary_s.keys():
-            if cnt >= len(boundaries):
+
+        st_graph_boudnary_s = self.st_data_boundary_s[st_graph_name]
+        st_graph_boudnary_t = self.st_data_boundary_t[st_graph_name]
+        for boundary_name in st_graph_boudnary_s.keys():
+            if cnt >= len(boundaries_pool):
                 print "WARNING: number of path lines is more than " \
-                      + len(boundaries)
+                      + len(boundaries_pool)
                 continue
-            if len(self.st_data_boundary_s[name]) <= 1:
-                continue
-            boundary = boundaries[cnt]
+            boundary = boundaries_pool[cnt]
             boundary.set_visible(True)
 
-            boundary.set_xdata(self.st_data_boundary_t[name])
-            boundary.set_ydata(self.st_data_boundary_s[name])
+            boundary.set_xdata(st_graph_boudnary_t[boundary_name])
+            boundary.set_ydata(st_graph_boudnary_s[boundary_name])
             center_t = 0
             center_s = 0
-            for i in range(len(self.st_data_boundary_t[name])-1):
-                center_s += self.st_data_boundary_s[name][i]
-                center_t += self.st_data_boundary_t[name][i]
-            center_s /= float(len(self.st_data_boundary_t[name])-1)
-            center_t /= float(len(self.st_data_boundary_t[name])-1)
+            for i in range(len(st_graph_boudnary_t[boundary_name])-1):
+                center_s += st_graph_boudnary_s[boundary_name][i]
+                center_t += st_graph_boudnary_t[boundary_name][i]
+            center_s /= float(len(st_graph_boudnary_s[boundary_name])-1)
+            center_t /= float(len(st_graph_boudnary_t[boundary_name])-1)
 
             annotation = obstacle_annotation_pool[cnt]
             annotation.set_visible(True)
-            annotation.set_text(name)
+            annotation.set_text(boundary_name)
             annotation.set_x(center_t)
             annotation.set_y(center_s)
 
-
             cnt += 1
 
-        cnt = 0
-        for name in self.st_data_s.keys():
-            if cnt >= len(st_lines):
-                print "WARNING: number of path lines is more than " \
-                      + len(st_lines)
-                continue
-            if len(self.st_data_s[name]) <= 1:
-                continue
-            line = st_lines[cnt]
-            line.set_visible(True)
-            line.set_xdata(self.st_data_t[name])
-            line.set_ydata(self.st_data_s[name])
-            line.set_label(name)
-            cnt += 1
+        st_line.set_visible(True)
+        st_line.set_xdata(self.st_data_t[st_graph_name])
+        st_line.set_ydata(self.st_data_s[st_graph_name])
+        st_line.set_label(st_graph_name)
+
         self.st_data_lock.release()
 
     def compute_path_data(self):
