@@ -45,6 +45,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_localization_file =
       "modules/planning/testdata/garage_localization.pb.txt";
   FLAGS_test_chassis_file = "modules/planning/testdata/garage_chassis.pb.txt",
+  FLAGS_test_prediction_file = "modules/planning/testdata/garage_prediction.pb.txt",
   FLAGS_v = 4;
 }
 
@@ -80,7 +81,7 @@ bool PlanningTestBase::SetUpAdapters() {
     AERROR << "Failed to load prediction file: " << FLAGS_test_prediction_file;
     return false;
   }
-  AINFO << "Using Prediction file: " << FLAGS_test_chassis_file;
+  AINFO << "Using Prediction file: " << FLAGS_test_prediction_file;
   return true;
 }
 
