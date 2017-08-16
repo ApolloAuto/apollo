@@ -704,11 +704,11 @@ lane {
         length: 156.61603286829296
       }
     }
+    length: 156.61603286829296
     boundary_type {
       s: 0
       types: DOTTED_YELLOW
     }
-    length: 156.61603286829296
   }
   right_boundary {
     curve {
@@ -1051,11 +1051,11 @@ lane {
         length: 151.14875772478879
       }
     }
+    length: 151.14875772478879
     boundary_type {
       s: 0
       types: CURB
     }
-    length: 151.14875772478879
   }
   length: 153.87421245705966
   speed_limit: 4.5

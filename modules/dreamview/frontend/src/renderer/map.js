@@ -11,9 +11,9 @@ import { loadObject } from "utils/models";
 
 const colorMapping = {
     YELLOW: 0XDAA520,
-    WHITE: 0xcccccc,
+    WHITE: 0xCCCCCC,
     CORAL: 0xFF7F50,
-    RED: 0xff6666,
+    RED: 0xFF6666,
     GREEN: 0x006400,
     PURE_WHITE: 0xFFFFFF,
     DEFAULT: 0xC0C0C0
@@ -87,7 +87,8 @@ function addLane(lane, coordinates, scene) {
         drewObjects.push(centerLine);
     });
 
-    const rightLaneType = lane.rightBoundary.type;
+    // TODO: this is a temp. fix for repeated boundary types.
+    const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
     lane.rightBoundary.curve.segment.forEach((segment, index) => {
         const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
         const boundary = addLaneMesh(rightLaneType, points);
@@ -95,7 +96,7 @@ function addLane(lane, coordinates, scene) {
         drewObjects.push(boundary);
     });
 
-    const leftLaneType = lane.leftBoundary.type;
+    const leftLaneType = lane.leftBoundary.boundaryType[0].types[0];
     lane.leftBoundary.curve.segment.forEach((segment, index) => {
         const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
         const boundary = addLaneMesh(leftLaneType, points);
