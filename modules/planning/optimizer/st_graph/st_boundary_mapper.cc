@@ -186,6 +186,10 @@ bool StBoundaryMapper::MapStopDecision(const PathObstacle& stop_obstacle,
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
   PathPoint obstacle_point;
+  if (stop_obstacle.perception_sl_boundary().start_s() >
+      path_data_.frenet_frame_path().points().back().s()) {
+    return true;
+  }
   if (!path_data_.GetPathPointWithRefS(
           stop_obstacle.perception_sl_boundary().start_s(), &obstacle_point)) {
     AERROR << "Fail to get path point from reference s. The sl boundary of "
