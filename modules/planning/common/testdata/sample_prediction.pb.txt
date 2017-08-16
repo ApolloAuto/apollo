@@ -104,7 +104,7 @@ prediction_obstacle {
     type: VEHICLE
     timestamp: 0
   }
-  time_stamp: 1171064942.14
+  timestamp: 1171064942.14
   predicted_period: 5000
   trajectory {
     probability: 0.614424703209
@@ -1189,7 +1189,7 @@ prediction_obstacle {
     type: VEHICLE
     timestamp: 0
   }
-  time_stamp: 1171064942.14
+  timestamp: 1171064942.14
   predicted_period: 5000
   trajectory {
     probability: 0.918794968878

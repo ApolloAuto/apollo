@@ -14,7 +14,7 @@ message Trajectory {
 
 message PredictionObstacle {
   optional apollo.perception.PerceptionObstacle perception_obstacle = 1;
-  optional double time_stamp = 2;  // GPS time in seconds
+  optional double timestamp = 2;  // GPS time in seconds
   // the length of the time for this prediction (e.g. 10s)
   optional double predicted_period = 3;
   // can have multiple trajectories per obstacle
