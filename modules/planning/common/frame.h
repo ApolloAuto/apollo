@@ -38,6 +38,7 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/planning_data.h"
+#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -54,7 +55,7 @@ class Frame {
   void SetPlanningStartPoint(const common::TrajectoryPoint &start_point);
   void SetVehicleInitPose(const localization::Pose &pose);
   const common::TrajectoryPoint &PlanningStartPoint() const;
-  bool Init(const PlanningConfig& config);
+  bool Init(const PlanningConfig &config);
 
   static const hdmap::PncMap *PncMap();
   static void SetMap(hdmap::PncMap *pnc_map);
@@ -81,7 +82,6 @@ class Frame {
   void RecordInputDebug();
 
   void AlignPredictionTime(const double trajectory_header_time);
-
 
  private:
   /**
@@ -119,11 +119,8 @@ class Frame {
   bool CreateDestinationObstacle();
 
   std::unique_ptr<Obstacle> CreateVirtualObstacle(
-      const std::string &obstacle_id,
-      const common::math::Vec2d &position,
-      const double length,
-      const double width,
-      const double height);
+      const std::string &obstacle_id, const common::math::Vec2d &position,
+      const double length, const double width, const double height);
 
   /**
    * @brief Create traffic obstacles in  this function.
@@ -139,13 +136,17 @@ class Frame {
   bool MakeTrafficDecision(const routing::RoutingResponse &routing,
                            const ReferenceLine &reference_line);
 
+  bool InitReferenceLineInfo(const std::vector<ReferenceLine> &reference_lines);
+
  private:
   common::TrajectoryPoint planning_start_point_;
+
+  std::vector<ReferenceLineInfo> reference_line_list_;
 
   routing::RoutingResponse routing_response_;
   prediction::PredictionObstacles prediction_;
   IndexedObstacles obstacles_;
-  std::unique_ptr<PathDecision> path_decision_;
+  PathDecision *path_decision_ = nullptr;
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
   PublishableTrajectory computed_trajectory_;

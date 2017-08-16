@@ -29,25 +29,21 @@ namespace planning {
 
 using IndexedPathObstacles = IndexedList<std::string, PathObstacle>;
 
-PathDecision::PathDecision(const std::vector<const Obstacle *> &obstacles,
-                           const ReferenceLine &reference_line) {
-  Init(obstacles, reference_line);
-}
-
-PathDecision::PathDecision(
+bool PathDecision::AddPathObstacles(
     const std::vector<const PathObstacle *> &path_obstacles) {
   for (const auto *path_obstacle : path_obstacles) {
-    path_obstacles_.Add(path_obstacle->Id(), *path_obstacle);
+    if (!path_obstacles_.Add(path_obstacle->Id(), *path_obstacle)) {
+      AERROR << "Failed to add obstacle: " << path_obstacle->Id();
+      return false;
+    }
   }
+  return true;
 }
 
-void PathDecision::Init(const std::vector<const Obstacle *> &obstacles,
-                        const ReferenceLine &reference_line) {
-  for (const auto obstacle : obstacles) {
-    auto path_obstacle = common::util::make_unique<PathObstacle>(obstacle);
-    path_obstacle->Init(&reference_line);
-    path_obstacles_.Add(obstacle->Id(), std::move(path_obstacle));
-  }
+bool PathDecision::AddPathObstacle(
+    std::unique_ptr<PathObstacle> &&path_obstacle) {
+  auto id = path_obstacle->Id();
+  return path_obstacles_.Add(id, std::move(path_obstacle));
 }
 
 const IndexedPathObstacles &PathDecision::path_obstacles() const {
