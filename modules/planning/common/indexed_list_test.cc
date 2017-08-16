@@ -31,7 +31,7 @@ namespace apollo {
 namespace planning {
 
 using StringIndexedList = IndexedList<int, std::string>;
-TEST(IndexedList, Add) {
+TEST(IndexedList, Add_UniquePtr) {
   StringIndexedList object;
   {
     ASSERT_TRUE(object.Add(1, common::util::make_unique<std::string>("one")));
@@ -45,6 +45,29 @@ TEST(IndexedList, Add) {
   {
     ASSERT_TRUE(object.Add(2, common::util::make_unique<std::string>("two")));
     ASSERT_FALSE(object.Add(2, common::util::make_unique<std::string>("two")));
+    ASSERT_TRUE(object.Find(1) != nullptr);
+    ASSERT_TRUE(object.Find(2) != nullptr);
+    const auto& items = object.Items();
+    ASSERT_EQ(2, items.size());
+    ASSERT_EQ("one", *items[0]);
+    ASSERT_EQ("two", *items[1]);
+  }
+}
+
+TEST(IndexedList, Add_ConstRef) {
+  StringIndexedList object;
+  {
+    ASSERT_TRUE(object.Add(1, "one"));
+    ASSERT_TRUE(object.Find(1) != nullptr);
+    const auto& items = object.Items();
+    ASSERT_TRUE(object.Find(2) == nullptr);
+    ASSERT_FALSE(object.Add(1, "one"));
+    ASSERT_EQ(1, items.size());
+    ASSERT_EQ("one", *items[0]);
+  }
+  {
+    ASSERT_TRUE(object.Add(2, "two"));
+    ASSERT_FALSE(object.Add(2, "two"));
     ASSERT_TRUE(object.Find(1) != nullptr);
     ASSERT_TRUE(object.Find(2) != nullptr);
     const auto& items = object.Items();
