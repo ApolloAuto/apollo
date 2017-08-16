@@ -53,7 +53,7 @@ class HDMap {
   // Call SetDefaultMap() before your first call to DefaultMap(), or it will not
   // take effect. It's generally used in test cases' SetUp() function.
   static void SetDefaultMap(const std::string& map_filename);
-  // Get default map loaded from the file specified by FLAGS_default_map_file.
+  // Get default map loaded from the file specified by FLAGS_map_file_path.
   static const HDMap& DefaultMap();
 
   /**
