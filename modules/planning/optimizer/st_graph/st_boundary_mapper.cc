@@ -250,11 +250,8 @@ Status StBoundaryMapper::MapWithoutDecision(
       AWARN << "lower/upper points are reversed.";
     }
 
-    const double area = GetArea(boundary_points);
-    if (Double::Compare(area, 0.0) > 0) {
-      *boundary = StGraphBoundary(boundary_points);
-      boundary->SetId(path_obstacle.Obstacle()->Id());
-    }
+    *boundary = StGraphBoundary(boundary_points);
+    boundary->SetId(path_obstacle.Obstacle()->Id());
   }
   return Status::OK();
 }
@@ -422,13 +419,10 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
       DCHECK(false) << "Obj decision should be either yield or overtake: "
                     << obj_decision.DebugString();
     }
-    const double area = GetArea(boundary_points);
-    if (Double::Compare(area, 0.0) > 0) {
-      *boundary = StGraphBoundary(boundary_points);
-      boundary->SetBoundaryType(b_type);
-      boundary->SetId(path_obstacle.Obstacle()->Id());
-      boundary->SetCharacteristicLength(characteristic_length);
-    }
+    *boundary = StGraphBoundary(boundary_points);
+    boundary->SetBoundaryType(b_type);
+    boundary->SetId(path_obstacle.Obstacle()->Id());
+    boundary->SetCharacteristicLength(characteristic_length);
   }
   return Status::OK();
 }
@@ -505,12 +499,6 @@ Status StBoundaryMapper::MapFollowDecision(
   boundary_points.emplace_back(s_max_upper, planning_time_);
   boundary_points.emplace_back(s_min_upper, 0.0);
 
-  const double area = GetArea(boundary_points);
-  if (Double::Compare(area, 0.0) <= 0) {
-    std::string msg = "Do not need to map because area is zero.";
-    ADEBUG << msg;
-    return Status::OK();
-  }
   *boundary = StGraphBoundary(boundary_points);
 
   const double characteristic_length =
@@ -525,25 +513,6 @@ Status StBoundaryMapper::MapFollowDecision(
   boundary->SetId(obstacle->Id());
   boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
   return Status::OK();
-}
-
-double StBoundaryMapper::GetArea(
-    const std::vector<STPoint>& boundary_points) const {
-  if (boundary_points.size() < 3) {
-    return 0.0;
-  }
-
-  double area = 0.0;
-  for (uint32_t i = 2; i < boundary_points.size(); ++i) {
-    const double ds1 = boundary_points[i - 1].s() - boundary_points[0].s();
-    const double dt1 = boundary_points[i - 1].t() - boundary_points[0].t();
-
-    const double ds2 = boundary_points[i].s() - boundary_points[0].s();
-    const double dt2 = boundary_points[i].t() - boundary_points[0].t();
-    // cross product
-    area += (ds1 * dt2 - ds2 * dt1);
-  }
-  return fabs(area * 0.5);
 }
 
 bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
@@ -597,7 +566,7 @@ Status StBoundaryMapper::GetSpeedLimits(
 void StBoundaryMapper::AppendBoundary(
     const StGraphBoundary& boundary,
     std::vector<StGraphBoundary>* st_graph_boundaries) const {
-  if (boundary.points().empty()) {
+  if (Double::Compare(boundary.area(), 0.0) <= 0) {
     return;
   }
   st_graph_boundaries->push_back(std::move(boundary));
