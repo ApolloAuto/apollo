@@ -36,6 +36,10 @@ limitations under the License.
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
 
+/**
+ * @namespace apollo::hdmap
+ * @brief apollo::hdmap
+ */
 namespace apollo {
 namespace hdmap {
 

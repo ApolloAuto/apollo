@@ -14,38 +14,10 @@ message LineSegment {
   repeated apollo.common.PointENU point = 1;
 }
 
-message Arc {
-  optional apollo.common.PointENU center = 1;
-  optional double radius = 2;
-  optional double start_angle = 3;
-  optional double end_angle = 4;
-}
-
-message Spiral {
-  // TODO: define spiral.
-  optional double curv_start = 1;
-  optional double curv_end = 2;
-}
-
-message Spline {
-  optional int32 dimension = 1;
-  optional int32 degree = 2;
-  repeated double knot = 3 [packed = true];
-  repeated apollo.common.PointENU control = 4;
-}
-
-message Poly3 {
-  // TODO: define poly3.
-}
-
 // Generalization of a line.
 message CurveSegment {
   oneof curve_type {
     LineSegment line_segment = 1;
-    Arc arc = 2;
-    Spiral spiral = 3;
-    Spline spline = 4;
-    Poly3 poly3 = 5;
   }
   optional double s = 6;  // start position (s-coordinate)
   optional apollo.common.PointENU start_position = 7;

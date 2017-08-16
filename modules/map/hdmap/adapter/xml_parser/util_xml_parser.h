@@ -27,47 +27,37 @@ namespace adapter {
 
 class UtilXmlParser {
  public:
-    static Status parse_geometry(const tinyxml2::XMLElement& xml_node,
-                                PbCurveSegment* curve_segment);
-    static Status parse_point_set(const tinyxml2::XMLElement& xml_node,
-                                PbLineSegment* line_segment);
-    static Status parse_outline(const tinyxml2::XMLElement& xml_node,
-                                PbPolygon* polygon);
-    static Status parse_point(const tinyxml2::XMLElement& xml_node,
-                                PbPoint3D* pt);
+  static Status parse_curve(const tinyxml2::XMLElement& xml_node,
+                            PbCurve* curve);
+  static Status parse_geometry(const tinyxml2::XMLElement& xml_node,
+                              PbCurveSegment* curve_segment);
+  static Status parse_point_set(const tinyxml2::XMLElement& xml_node,
+                              PbLineSegment* line_segment);
+  static Status parse_outline(const tinyxml2::XMLElement& xml_node,
+                              PbPolygon* polygon);
+  static Status parse_point(const tinyxml2::XMLElement& xml_node,
+                              PbPoint3D* pt);
 
-    static std::vector<std::string> split(const std::string str,
-                                        const std::string pattern);
-    static std::string get_road_id(const std::string& lane_id);
-    static std::string get_lane_id(const std::string& lane_id);
-    static std::string get_traffic_light_sub_signal_id(const std::string& id);
+  static std::string create_lane_id(const std::string& road_id,
+                                  const std::string& section_id,
+                                  const int lane_id);
+  static std::string to_upper(const std::string& s);
 
-    static std::string create_lane_id(const std::string& road_id,
-                                    const std::string& section_id,
-                                    const int lane_id);
-    static void to_upper(std::string* s);
+  static void wgs84_to_utm(const double x, const double y, const double z,
+                      double* output_x, double* output_y, double* output_z);
 
-    static void utm_to_wgs84(const double x, const double y, const double z,
-                        double* output_x, double* output_y, double* output_z);
-    static void wgs84_to_utm(const double x, const double y, const double z,
-                        double* output_x, double* output_y, double* output_z);
+  static double curve_length(const PbCurve& curve);
 
-    static void get_map_boundary(double* x_min, double* x_max,
-                                double* y_min, double* y_max);
-
-    static double curve_length(PbCurve* curve);
-
-    static tinyxml2::XMLError query_string_attribute(
-                                        const tinyxml2::XMLElement& xml_node,
-                                        const std::string& name,
-                                        std::string* value);
-    static tinyxml2::XMLElement* create_xml_element(const std::string& name);
+  static tinyxml2::XMLError query_string_attribute(
+                                      const tinyxml2::XMLElement& xml_node,
+                                      const std::string& name,
+                                      std::string* value);
 
  private:
-    static double _x_min;
-    static double _x_max;
-    static double _y_min;
-    static double _y_max;
+  static double _x_min;
+  static double _x_max;
+  static double _y_min;
+  static double _y_max;
 };
 
 }  // namespace adapter

@@ -53,11 +53,13 @@ void ShiftMap(Map* map_pb) {
     }
   }
   for (auto& stop_sign : *(map_pb->mutable_stop_sign())) {
-    for (auto& segment : *(stop_sign.mutable_stop_line()->mutable_segment())) {
-      for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
+    for (auto& stop_line : *(stop_sign.mutable_stop_line())) {
+      for (auto& segment : *(stop_line.mutable_segment())) {
+        for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
         point.set_y(point.y() + FLAGS_y_offset);
       }
+    }
     }
   }
 }

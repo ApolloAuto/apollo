@@ -217,7 +217,7 @@ void HDMapCommonTestSuite::init_stop_sign_obj(
     apollo::hdmap::StopSign* stop_sign) {
   stop_sign->mutable_id()->set_id("stop_sign_1");
   apollo::hdmap::CurveSegment* curve_segment =
-      stop_sign->mutable_stop_line()->add_segment();
+      stop_sign->add_stop_line()->add_segment();
   apollo::hdmap::LineSegment* line_segment =
       curve_segment->mutable_line_segment();
   apollo::common::PointENU* pt = line_segment->add_point();
@@ -237,7 +237,7 @@ void HDMapCommonTestSuite::init_yield_sign_obj(
     apollo::hdmap::YieldSign* yield_sign) {
   yield_sign->mutable_id()->set_id("yield_sign_1");
   apollo::hdmap::CurveSegment* curve_segment =
-      yield_sign->mutable_stop_line()->add_segment();
+      yield_sign->add_stop_line()->add_segment();
   apollo::hdmap::LineSegment* line_segment =
       curve_segment->mutable_line_segment();
   apollo::common::PointENU* pt = line_segment->add_point();
@@ -318,7 +318,6 @@ TEST_F(HDMapCommonTestSuite, lane_info_get_width) {
   apollo::hdmap::Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
-  // double width = 0.0;
   EXPECT_NEAR(2.0, lane_info.get_width(2.0), 1E-3);
   EXPECT_NEAR(1.65, lane_info.get_width(3.5), 1E-3);
 }
@@ -327,7 +326,6 @@ TEST_F(HDMapCommonTestSuite, lane_info_get_effective_width) {
   apollo::hdmap::Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
-  // double width = 0.0;
   EXPECT_NEAR(2.0, lane_info.get_effective_width(2.0), 1E-3);
   EXPECT_NEAR(1.3, lane_info.get_effective_width(3.5), 1E-3);
 }
@@ -515,7 +513,7 @@ TEST_F(HDMapCommonTestSuite, stop_sign_info) {
   init_stop_sign_obj(&stop_sign);
   StopSignInfo stop_sign_info(stop_sign);
   EXPECT_STREQ(stop_sign.id().id().c_str(), stop_sign_info.id().id().c_str());
-  EXPECT_EQ(stop_sign.stop_line().segment(0).line_segment().point_size() - 1,
+  EXPECT_EQ(stop_sign.stop_line(0).segment(0).line_segment().point_size() - 1,
             stop_sign_info.segments().size());
   for (std::size_t i = 0; i < stop_sign_info.segments().size(); ++i) {
     EXPECT_NEAR(1.0, stop_sign_info.segments()[i].length(), 1E-4);
@@ -527,7 +525,7 @@ TEST_F(HDMapCommonTestSuite, yield_sign_info) {
   init_yield_sign_obj(&yield_sign);
   YieldSignInfo yield_sign_info(yield_sign);
   EXPECT_STREQ(yield_sign.id().id().c_str(), yield_sign_info.id().id().c_str());
-  EXPECT_EQ(yield_sign.stop_line().segment(0).line_segment().point_size() - 1,
+  EXPECT_EQ(yield_sign.stop_line(0).segment(0).line_segment().point_size() - 1,
             yield_sign_info.segments().size());
   for (std::size_t i = 0; i < yield_sign_info.segments().size(); ++i) {
     EXPECT_NEAR(1.0, yield_sign_info.segments()[i].length(), 1E-4);

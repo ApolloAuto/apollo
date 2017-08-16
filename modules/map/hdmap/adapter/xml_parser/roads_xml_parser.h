@@ -28,8 +28,8 @@ namespace adapter {
 
 class RoadsXmlParser {
  public:
-    static Status parse(const tinyxml2::XMLElement& xml_node,
-                        std::vector<Road>* roads);
+  static Status parse(const tinyxml2::XMLElement& xml_node,
+                    std::vector<RoadInternal>* roads);
 };
 
 }  // namespace adapter
