@@ -31,7 +31,7 @@
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
-#include "modules/planning/math/sl_analytic_transformation.h"
+#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
 namespace planning {
@@ -98,8 +98,8 @@ bool QpSplinePathGenerator::Generate(
   double start_l = spline(init_frenet_point_.s());
   ReferencePoint ref_point =
       reference_line_.get_reference_point(init_frenet_point_.s());
-  common::math::Vec2d xy_point = SLAnalyticTransformation::CalculateXYPoint(
-      ref_point.heading(), common::math::Vec2d(ref_point.x(), ref_point.y()),
+  Eigen::Vector2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
+      ref_point.heading(), {ref_point.x(), ref_point.y()},
       start_l);
 
   double x_diff = xy_point.x() - init_point.path_point().x();
@@ -113,14 +113,14 @@ bool QpSplinePathGenerator::Generate(
     double dl = spline.Derivative(s);
     double ddl = spline.SecondOrderDerivative(s);
     ReferencePoint ref_point = reference_line_.get_reference_point(s);
-    common::math::Vec2d xy_point = SLAnalyticTransformation::CalculateXYPoint(
-        ref_point.heading(), common::math::Vec2d(ref_point.x(), ref_point.y()),
+    Eigen::Vector2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
+        ref_point.heading(), {ref_point.x(), ref_point.y()},
         l);
-    xy_point.set_x(xy_point.x() - x_diff);
-    xy_point.set_y(xy_point.y() - y_diff);
-    double theta = SLAnalyticTransformation::CalculateTheta(
+    xy_point[0] = xy_point.x() - x_diff;
+    xy_point[1] = xy_point.y() - y_diff;
+    double theta = CartesianFrenetConverter::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), l, dl);
-    double kappa = SLAnalyticTransformation::CalculateKappa(
+    double kappa = CartesianFrenetConverter::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), l, dl, ddl);
     common::PathPoint path_point = common::util::MakePathPoint(
         xy_point.x(), xy_point.y(), 0.0, theta, kappa, 0.0, 0.0);
@@ -162,10 +162,10 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
   const double kappa_ref = ref_point.kappa();
   const double dkappa_ref = ref_point.dkappa();
 
-  const double dl = SLAnalyticTransformation::CalculateLateralDerivative(
+  const double dl = CartesianFrenetConverter::CalculateLateralDerivative(
       theta_ref, theta, l, kappa_ref);
   const double ddl =
-      SLAnalyticTransformation::CalculateSecondOrderLateralDerivative(
+      CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
           theta_ref, theta, kappa_ref, kappa, dkappa_ref, l);
   frenet_frame_point->set_dl(dl);
   frenet_frame_point->set_ddl(ddl);

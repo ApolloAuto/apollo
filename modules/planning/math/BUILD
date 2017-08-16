@@ -51,20 +51,6 @@ cc_library(
 )
 
 cc_library(
-    name = "sl_analytic_transformation",
-    srcs = [
-        "sl_analytic_transformation.cc",
-    ],
-    hdrs = [
-        "sl_analytic_transformation.h",
-    ],
-    deps = [
-        ":double",
-        "//modules/common/math:vec2d",
-    ],
-)
-
-cc_library(
     name = "hermite_spline",
     hdrs = [
         "hermite_spline.h",
