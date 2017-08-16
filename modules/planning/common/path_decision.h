@@ -36,6 +36,8 @@ namespace planning {
 
 class PathDecision {
  public:
+  PathDecision(const std::vector<const PathObstacle *> &path_obstacles);
+
   PathDecision(const std::vector<const Obstacle *> &obstacles,
                const ReferenceLine &reference_line);
 
@@ -47,10 +49,10 @@ class PathDecision {
   PathObstacle *Find(const std::string &object_id);
 
  private:
-  void Init(const std::vector<const Obstacle *> &obstacles);
+  void Init(const std::vector<const Obstacle *> &obstacles,
+            const ReferenceLine &reference_line);
 
  private:
-  const ReferenceLine &reference_line_;
   IndexedList<std::string, PathObstacle> path_obstacles_;
 };
 

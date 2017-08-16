@@ -32,6 +32,13 @@ namespace planning {
 template <typename I, typename T>
 class IndexedList {
  public:
+  /**
+   * @brief move a unique ptr into the container.
+   * @param id the id of the object
+   * @param ptr the unique pointer of the object to be moved to the container.
+   * @return true if successly added and return false if the id already exists
+   * in the container.
+   */
   bool Add(const I id, std::unique_ptr<T> ptr) {
     if (Find(id)) {
       return false;
@@ -40,6 +47,31 @@ class IndexedList {
     _object_dict[id] = std::move(ptr);
     return true;
   }
+
+  /**
+   * @brief copy ref into the container
+   * @param id the id of the object
+   * @param ref the const reference of the objected to be copied to the
+   * container.
+   * @return true if successly added and return false if the id already exists
+   * in the container.
+   */
+  bool Add(const I id, const T& ref) {
+    if (Find(id)) {
+      return false;
+    }
+    auto ptr = std::unique_ptr<T>(new T(ref));
+    _object_list.push_back(ptr.get());
+    _object_dict[id] = std::move(ptr);
+    return true;
+  }
+
+  /**
+   * @brief Find object by id in the container
+   * @param id the id of the object
+   * @return the raw pointer to the object if found.
+   * @return nullptr if the object is not found.
+   */
   T* Find(const I id) {
     auto iter = _object_dict.find(id);
     if (iter == _object_dict.end()) {
@@ -48,6 +80,11 @@ class IndexedList {
       return iter->second.get();
     }
   }
+
+  /**
+   * @brief List all the items in the container.
+   * @return the list of const raw pointers of the objects in the container.
+   */
   const std::vector<const T*>& Items() const { return _object_list; }
 
  private:
