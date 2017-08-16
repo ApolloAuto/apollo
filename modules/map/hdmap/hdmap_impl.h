@@ -37,177 +37,274 @@ limitations under the License.
 #include "modules/map/proto/map_overlap.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 
+/**
+ * @namespace apollo::hdmap
+ * @brief apollo::hdmap
+ */
 namespace apollo {
 namespace hdmap {
 
+/**
+ * @class HDMapImpl
+ *
+ * @brief High-precision map loader implement.
+ */
 class HDMapImpl {
  public:
-    using LaneTable =
-        std::unordered_map<std::string, std::shared_ptr<LaneInfo>>;
-    using JunctionTable =
-        std::unordered_map<std::string, std::shared_ptr<JunctionInfo>>;
-    using SignalTable =
-        std::unordered_map<std::string, std::shared_ptr<SignalInfo>>;
-    using CrosswalkTable =
-        std::unordered_map<std::string, std::shared_ptr<CrosswalkInfo>>;
-    using StopSignTable =
-        std::unordered_map<std::string, std::shared_ptr<StopSignInfo>>;
-    using YieldSignTable =
-        std::unordered_map<std::string, std::shared_ptr<YieldSignInfo>>;
-    using OverlapTable =
-        std::unordered_map<std::string, std::shared_ptr<OverlapInfo>>;
-    using RoadTable =
-        std::unordered_map<std::string, std::shared_ptr<RoadInfo>>;
-
+  using LaneTable =
+      std::unordered_map<std::string, std::shared_ptr<LaneInfo>>;
+  using JunctionTable =
+      std::unordered_map<std::string, std::shared_ptr<JunctionInfo>>;
+  using SignalTable =
+      std::unordered_map<std::string, std::shared_ptr<SignalInfo>>;
+  using CrosswalkTable =
+      std::unordered_map<std::string, std::shared_ptr<CrosswalkInfo>>;
+  using StopSignTable =
+      std::unordered_map<std::string, std::shared_ptr<StopSignInfo>>;
+  using YieldSignTable =
+      std::unordered_map<std::string, std::shared_ptr<YieldSignInfo>>;
+  using OverlapTable =
+      std::unordered_map<std::string, std::shared_ptr<OverlapInfo>>;
+  using RoadTable =
+      std::unordered_map<std::string, std::shared_ptr<RoadInfo>>;
  public:
-    int load_map_from_file(const std::string& map_filename);
+  /**
+  * @brief load map from local file
+  * @param map_filename path of map data file
+  * @return 0:success, otherwise failed
+  */
+  int load_map_from_file(const std::string& map_filename);
 
-    LaneInfoConstPtr get_lane_by_id(const Id& id) const;
-    JunctionInfoConstPtr get_junction_by_id(const Id& id) const;
-    SignalInfoConstPtr get_signal_by_id(const Id& id) const;
-    CrosswalkInfoConstPtr get_crosswalk_by_id(const Id& id) const;
-    StopSignInfoConstPtr get_stop_sign_by_id(const Id& id) const;
-    YieldSignInfoConstPtr get_yield_sign_by_id(const Id& id) const;
-    OverlapInfoConstPtr get_overlap_by_id(const Id& id) const;
-    RoadInfoConstPtr get_road_by_id(const apollo::hdmap::Id& id) const;
+  LaneInfoConstPtr get_lane_by_id(const apollo::hdmap::Id& id) const;
+  JunctionInfoConstPtr get_junction_by_id(const apollo::hdmap::Id& id) const;
+  SignalInfoConstPtr get_signal_by_id(const apollo::hdmap::Id& id) const;
+  CrosswalkInfoConstPtr get_crosswalk_by_id(const apollo::hdmap::Id& id) const;
+  StopSignInfoConstPtr get_stop_sign_by_id(const apollo::hdmap::Id& id) const;
+  YieldSignInfoConstPtr get_yield_sign_by_id(const apollo::hdmap::Id& id) const;
+  OverlapInfoConstPtr get_overlap_by_id(const apollo::hdmap::Id& id) const;
+  RoadInfoConstPtr get_road_by_id(const apollo::hdmap::Id& id) const;
 
-    int get_lanes(const apollo::common::PointENU& point,
-                double distance,
-                std::vector<LaneInfoConstPtr>* lanes) const;
-    int get_junctions(const apollo::common::PointENU& point,
-                    double distance,
-                    std::vector<JunctionInfoConstPtr>* junctions) const;
-    int get_crosswalks(const apollo::common::PointENU& point,
-                    double distance,
-                    std::vector<CrosswalkInfoConstPtr>* crosswalks) const;
-    int get_signals(const apollo::common::PointENU& point,
-                    double distance,
-                    std::vector<SignalInfoConstPtr>* signals) const;
-    int get_stop_signs(const apollo::common::PointENU& point,
-                    double distance,
-                    std::vector<StopSignInfoConstPtr>* stop_signs) const;
-    int get_yield_signs(const apollo::common::PointENU& point,
-                    double distance,
-                    std::vector<YieldSignInfoConstPtr>* yield_signs) const;
+  /**
+   * @brief get all lanes in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param lanes store all lanes in target range
+   * @return 0:success, otherwise failed
+   */
+  int get_lanes(const apollo::common::PointENU& point,
+              double distance,
+              std::vector<LaneInfoConstPtr>* lanes) const;
+  /**
+   * @brief get all junctions in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param junctions store all junctions in target range
+   * @return 0:success, otherwise failed
+   */
+  int get_junctions(const apollo::common::PointENU& point,
+                  double distance,
+                  std::vector<JunctionInfoConstPtr>* junctions) const;
+  /**
+   * @brief get all crosswalks in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param crosswalks store all crosswalks in target range
+   * @return 0:success, otherwise failed
+   */
+  int get_crosswalks(const apollo::common::PointENU& point,
+                  double distance,
+                  std::vector<CrosswalkInfoConstPtr>* crosswalks) const;
+  /**
+   * @brief get all signals in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param signals store all signals in target range
+   * @return 0:success, otherwise failed
+   */
+  int get_signals(const apollo::common::PointENU& point,
+                  double distance,
+                  std::vector<SignalInfoConstPtr>* signals) const;
+  /**
+   * @brief get all stop signs in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param stop signs store all stop signs in target range
+   * @return 0:success, otherwise failed
+   */
+  int get_stop_signs(const apollo::common::PointENU& point,
+                  double distance,
+                  std::vector<StopSignInfoConstPtr>* stop_signs) const;
+  /**
+   * @brief get all yield signs in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param yield signs store all yield signs in target range
+   * @return 0:success, otherwise failed
+   */
+  int get_yield_signs(const apollo::common::PointENU& point,
+                  double distance,
+                  std::vector<YieldSignInfoConstPtr>* yield_signs) const;
+  /**
+   * @brief get all roads in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param roads store all roads in target range
+   * @return 0:success, otherwise failed
+   */
+  int get_roads(const apollo::common::PointENU& point, double distance,
+                      std::vector<RoadInfoConstPtr>* roads) const;
 
-    int get_nearest_lane(const apollo::common::PointENU& point,
-                    LaneInfoConstPtr* nearest_lane,
-                    double* nearest_s,
-                    double* nearest_l) const;
-    int get_nearest_lane_with_heading(const apollo::common::PointENU& point,
-                                    const double distance,
-                                    const double central_heading,
-                                    const double max_heading_difference,
-                                    LaneInfoConstPtr* nearest_lane,
-                                    double* nearest_s,
-                                    double* nearest_l) const;
-    int get_lanes_with_heading(const apollo::common::PointENU& point,
-                               const double distance,
-                               const double central_heading,
-                               const double max_heading_difference,
-                               std::vector<LaneInfoConstPtr>* lanes) const;
-    int get_roads(const apollo::common::PointENU& point, double distance,
-                        std::vector<RoadInfoConstPtr>* roads) const;
-    int get_road_boundaries(const apollo::common::PointENU& point,
-                            double radius,
-                            std::vector<RoadROIBoundaryPtr>* road_boundaries,
-                            std::vector<JunctionBoundaryPtr>* junctions) const;
-
- private:
-    int get_lanes(const apollo::common::math::Vec2d& point,
-                double distance,
-                std::vector<LaneInfoConstPtr>* lanes) const;
-    int get_junctions(const apollo::common::math::Vec2d& point,
-                double distance,
-                std::vector<JunctionInfoConstPtr>* junctions) const;
-    int get_crosswalks(const apollo::common::math::Vec2d& point,
-                    double distance,
-                    std::vector<CrosswalkInfoConstPtr>* crosswalks) const;
-    int get_signals(const apollo::common::math::Vec2d& point,
-                    double distance,
-                    std::vector<SignalInfoConstPtr>* signals) const;
-    int get_stop_signs(const apollo::common::math::Vec2d& point,
-                    double distance,
-                    std::vector<StopSignInfoConstPtr>* stop_signs) const;
-    int get_yield_signs(const apollo::common::math::Vec2d& point,
-                    double distance,
-                    std::vector<YieldSignInfoConstPtr>* yield_signs) const;
-    int get_nearest_lane(const apollo::common::math::Vec2d &point,
-                    LaneInfoConstPtr* nearest_lane,
-                    double *nearest_s,
-                    double *nearest_l) const;
-    int get_nearest_lane_with_heading(const apollo::common::math::Vec2d& point,
+  /**
+   * @brief get nearest lane from target point,
+   * @param point the target point
+   * @param nearest_lane the nearest lane that match search conditions
+   * @param nearest_s the offset from lane start point along lane center line
+   * @param nearest_l the lateral offset from lane center line
+   * @return 0:success, otherwise, failed.
+   */
+  int get_nearest_lane(const apollo::common::PointENU& point,
+                  LaneInfoConstPtr* nearest_lane,
+                  double* nearest_s,
+                  double* nearest_l) const;
+  /**
+   * @brief get the nearest lane within a certain range by pose
+   * @param point the target position
+   * @param distance the search radius
+   * @param central_heading the base heading
+   * @param max_heading_difference the heading range
+   * @param nearest_lane the nearest lane that match search conditions
+   * @param nearest_s the offset from lane start point along lane center line
+   * @param nearest_l the lateral offset from lane center line
+   * @return 0:success, otherwise, failed.
+   */
+  int get_nearest_lane_with_heading(const apollo::common::PointENU& point,
                                   const double distance,
                                   const double central_heading,
                                   const double max_heading_difference,
                                   LaneInfoConstPtr* nearest_lane,
                                   double* nearest_s,
                                   double* nearest_l) const;
-    int get_lanes_with_heading(const apollo::common::math::Vec2d &point,
+  /**
+   * @brief get all lanes within a certain range by pose
+   * @param point the target position
+   * @param distance the search radius
+   * @param central_heading the base heading
+   * @param max_heading_difference the heading range
+   * @param nearest_lane all lanes that match search conditions
+   * @return 0:success, otherwise, failed.
+   */
+  int get_lanes_with_heading(const apollo::common::PointENU& point,
+                             const double distance,
+                             const double central_heading,
+                             const double max_heading_difference,
+                             std::vector<LaneInfoConstPtr>* lanes) const;
+  /**
+   * @brief get all road and junctions boundaries within certain range
+   * @param point the target position
+   * @param radius the search radius
+   * @param road_boundaries the roads' boundaries
+   * @param junctions the junctions' boundaries
+   * @return 0:success, otherwise failed
+   */
+  int get_road_boundaries(const apollo::common::PointENU& point,
+                          double radius,
+                          std::vector<RoadROIBoundaryPtr>* road_boundaries,
+                          std::vector<JunctionBoundaryPtr>* junctions) const;
+
+ private:
+  int get_lanes(const apollo::common::math::Vec2d& point,
+              double distance,
+              std::vector<LaneInfoConstPtr>* lanes) const;
+  int get_junctions(const apollo::common::math::Vec2d& point,
+              double distance,
+              std::vector<JunctionInfoConstPtr>* junctions) const;
+  int get_crosswalks(const apollo::common::math::Vec2d& point,
+                  double distance,
+                  std::vector<CrosswalkInfoConstPtr>* crosswalks) const;
+  int get_signals(const apollo::common::math::Vec2d& point,
+                  double distance,
+                  std::vector<SignalInfoConstPtr>* signals) const;
+  int get_stop_signs(const apollo::common::math::Vec2d& point,
+                  double distance,
+                  std::vector<StopSignInfoConstPtr>* stop_signs) const;
+  int get_yield_signs(const apollo::common::math::Vec2d& point,
+                  double distance,
+                  std::vector<YieldSignInfoConstPtr>* yield_signs) const;
+  int get_nearest_lane(const apollo::common::math::Vec2d &point,
+                  LaneInfoConstPtr* nearest_lane,
+                  double *nearest_s,
+                  double *nearest_l) const;
+  int get_nearest_lane_with_heading(const apollo::common::math::Vec2d& point,
                                 const double distance,
                                 const double central_heading,
                                 const double max_heading_difference,
-                                std::vector<LaneInfoConstPtr> *lanes) const;
-    int get_roads(const apollo::common::math::Vec2d& point,
-                    double distance,
-                    std::vector<RoadInfoConstPtr>* roads) const;
+                                LaneInfoConstPtr* nearest_lane,
+                                double* nearest_s,
+                                double* nearest_l) const;
+  int get_lanes_with_heading(const apollo::common::math::Vec2d &point,
+                              const double distance,
+                              const double central_heading,
+                              const double max_heading_difference,
+                              std::vector<LaneInfoConstPtr> *lanes) const;
+  int get_roads(const apollo::common::math::Vec2d& point,
+                  double distance,
+                  std::vector<RoadInfoConstPtr>* roads) const;
 
-    template<class Table, class BoxTable, class KDTree>
-    static void build_segment_kdtree(const Table& table,
+  template<class Table, class BoxTable, class KDTree>
+  static void build_segment_kdtree(const Table& table,
+          const apollo::common::math::AABoxKDTreeParams& params,
+          BoxTable* const box_table,
+          std::unique_ptr<KDTree>* const kdtree);
+  template<class Table, class BoxTable, class KDTree>
+  static void build_polygon_kdtree(const Table& table,
             const apollo::common::math::AABoxKDTreeParams& params,
             BoxTable* const box_table,
             std::unique_ptr<KDTree>* const kdtree);
 
-    template<class Table, class BoxTable, class KDTree>
-    static void build_polygon_kdtree(const Table& table,
-                const apollo::common::math::AABoxKDTreeParams& params,
-                BoxTable* const box_table,
-                std::unique_ptr<KDTree>* const kdtree);
+  void build_lane_segment_kdtree();
+  void build_junction_polygon_kdtree();
+  void build_crosswalk_polygon_kdtree();
+  void build_signal_segment_kdtree();
+  void build_stop_sign_segment_kdtree();
+  void build_yield_sign_segment_kdtree();
 
-    void build_lane_segment_kdtree();
-    void build_junction_polygon_kdtree();
-    void build_crosswalk_polygon_kdtree();
-    void build_signal_segment_kdtree();
-    void build_stop_sign_segment_kdtree();
-    void build_yield_sign_segment_kdtree();
+  template<class KDTree>
+  static int search_objects(const apollo::common::math::Vec2d& center,
+                  const double radius,
+                  const KDTree& kdtree,
+                  std::vector<std::string>* const results);
 
-    template<class KDTree>
-    static int search_objects(const apollo::common::math::Vec2d& center,
-                    const double radius,
-                    const KDTree& kdtree,
-                    std::vector<std::string>* const results);
-
-    void clear();
+  void clear();
 
  private:
-    apollo::hdmap::Map _map;
+  apollo::hdmap::Map _map;
 
-    LaneTable           _lane_table;
-    JunctionTable       _junction_table;
-    CrosswalkTable      _crosswalk_table;
-    SignalTable         _signal_table;
-    StopSignTable       _stop_sign_table;
-    YieldSignTable      _yield_sign_table;
-    OverlapTable        _overlap_table;
-    RoadTable           _road_table;
+  LaneTable           _lane_table;
+  JunctionTable       _junction_table;
+  CrosswalkTable      _crosswalk_table;
+  SignalTable         _signal_table;
+  StopSignTable       _stop_sign_table;
+  YieldSignTable      _yield_sign_table;
+  OverlapTable        _overlap_table;
+  RoadTable           _road_table;
 
-    std::vector<LaneSegmentBox> _lane_segment_boxes;
-    std::unique_ptr<LaneSegmentKDTree> _lane_segment_kdtree;
+  std::vector<LaneSegmentBox> _lane_segment_boxes;
+  std::unique_ptr<LaneSegmentKDTree> _lane_segment_kdtree;
 
-    std::vector<JunctionPolygonBox> _junction_polygon_boxes;
-    std::unique_ptr<JunctionPolygonKDTree> _junction_polygon_kdtree;
+  std::vector<JunctionPolygonBox> _junction_polygon_boxes;
+  std::unique_ptr<JunctionPolygonKDTree> _junction_polygon_kdtree;
 
-    std::vector<CrosswalkPolygonBox> _crosswalk_polygon_boxes;
-    std::unique_ptr<CrosswalkPolygonKDTree> _crosswalk_polygon_kdtree;
+  std::vector<CrosswalkPolygonBox> _crosswalk_polygon_boxes;
+  std::unique_ptr<CrosswalkPolygonKDTree> _crosswalk_polygon_kdtree;
 
-    std::vector<SignalSegmentBox> _signal_segment_boxes;
-    std::unique_ptr<SignalSegmentKDTree> _signal_segment_kdtree;
+  std::vector<SignalSegmentBox> _signal_segment_boxes;
+  std::unique_ptr<SignalSegmentKDTree> _signal_segment_kdtree;
 
-    std::vector<StopSignSegmentBox> _stop_sign_segment_boxes;
-    std::unique_ptr<StopSignSegmentKDTree> _stop_sign_segment_kdtree;
+  std::vector<StopSignSegmentBox> _stop_sign_segment_boxes;
+  std::unique_ptr<StopSignSegmentKDTree> _stop_sign_segment_kdtree;
 
-    std::vector<YieldSignSegmentBox> _yield_sign_segment_boxes;
-    std::unique_ptr<YieldSignSegmentKDTree> _yield_sign_segment_kdtree;
+  std::vector<YieldSignSegmentBox> _yield_sign_segment_boxes;
+  std::unique_ptr<YieldSignSegmentKDTree> _yield_sign_segment_kdtree;
 };
 
 }  // namespace hdmap

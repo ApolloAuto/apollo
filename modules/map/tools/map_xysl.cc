@@ -239,10 +239,10 @@ int main(int argc, char *argv[]) {
               << "] length[" << lane_ptr->total_length()
               << "] type[" << Lane_LaneType_Name(lane.type())
               << "] turn[" << Lane_LaneTurn_Name(lane.turn())
-              << "] left_boundary["
-              << LaneBoundary_Type_Name(lane.left_boundary().type())
-              << "] right_boundary["
-              << LaneBoundary_Type_Name(lane.right_boundary().type())
+              // << "] left_boundary["
+              // << LaneBoundary_Type_Name(lane.left_boundary().type())
+              // << "] right_boundary["
+              // << LaneBoundary_Type_Name(lane.right_boundary().type())
               << "] speed_limit[" << lane.speed_limit()
               << "] predecessor[" << lane.predecessor_id()
               << "] successor[" << lane.successor_id()
@@ -251,8 +251,8 @@ int main(int argc, char *argv[]) {
               << "] left_reverse[" << lane.left_neighbor_reverse_lane_id()
               << "] right_reverse[" << lane.right_neighbor_reverse_lane_id()
               << "] overlap[" << lane.overlap_id()
-              << "] crosswalk[" << lane.crosswalk_id()
-              << "] yield_sign[" << lane.yield_sign_id()
+              // << "] crosswalk[" << lane.crosswalk_id()
+              // << "] yield_sign[" << lane.yield_sign_id()
                << "] stop_sign num:[" << lane_ptr->stop_signs().size()
               << "]"
               << " start point(x,y,heading):" << start_point.x() << ","

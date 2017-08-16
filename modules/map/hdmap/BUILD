@@ -19,6 +19,7 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
+        "//modules/map/hdmap/adapter:opendrive_adapter",
         "@glog//:glog",
     ],
 )
