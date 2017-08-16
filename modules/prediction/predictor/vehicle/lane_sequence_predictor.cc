@@ -82,7 +82,6 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     Trajectory trajectory;
     GenerateTrajectory(points, &trajectory);
     trajectory.set_probability(sequence.probability());
-    prediction_obstacle_.set_predicted_period(FLAGS_prediction_duration);
     prediction_obstacle_.add_trajectory()->CopyFrom(trajectory);
   }
   ADEBUG << "Obstacle [" << obstacle->id()

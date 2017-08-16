@@ -80,7 +80,9 @@ void EvaluatorManager::Run(
       perception_obstacles.perception_obstacle()) {
     int id = perception_obstacle.id();
     Obstacle* obstacle = container->GetObstacle(id);
-    CHECK_NOTNULL(obstacle);
+    if (obstacle == nullptr) {
+      continue;
+    }
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
         if (obstacle->IsOnLane()) {

@@ -37,7 +37,7 @@ namespace prediction {
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::hdmap::MapPathPoint;
-  
+
 PredictionMap::PredictionMap() : hdmap_(apollo::hdmap::HDMap::DefaultMap()) {}
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
