@@ -96,6 +96,11 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
   for (const auto& perception_obstacle :
       perception_obstacles.perception_obstacle()) {
     PredictionObstacle prediction_obstacle;
+    prediction_obstacle.set_predicted_period(FLAGS_prediction_duration);
+    prediction_obstacle.set_time_stamp(perception_obstacle.timestamp());
+    prediction_obstacle.mutable_perception_obstacle()->
+        CopyFrom(perception_obstacle);
+
     int id = perception_obstacle.id();
     Obstacle* obstacle = container->GetObstacle(id);
     if (obstacle != nullptr) {
@@ -127,11 +132,6 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
       }
     }
-
-    prediction_obstacle.set_predicted_period(FLAGS_prediction_duration);
-    prediction_obstacle.set_time_stamp(perception_obstacle.timestamp());
-    prediction_obstacle.mutable_perception_obstacle()->
-        CopyFrom(perception_obstacle);
 
     prediction_obstacles_.add_prediction_obstacle()->
         CopyFrom(prediction_obstacle);
