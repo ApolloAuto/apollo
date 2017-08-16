@@ -25,6 +25,8 @@
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 
+#include "modules/planning/math/double.h"
+
 namespace apollo {
 namespace planning {
 
@@ -117,6 +119,55 @@ void CartesianFrenetConverter::frenet_to_cartesian(
            s_condition[1] * s_condition[1] / cos_delta_theta *
                (d_condition[1] * delta_theta_prime - kappa_r_d_prime);
   return;
+}
+
+double CartesianFrenetConverter::CalculateTheta(const double rtheta,
+                                                const double rkappa,
+                                                const double l,
+                                                const double dl) {
+  return common::math::NormalizeAngle(rtheta + std::atan2(dl, 1 - l * rkappa));
+}
+
+double CartesianFrenetConverter::CalculateKappa(const double rkappa,
+                                                const double rdkappa,
+                                                const double l,
+                                                const double dl,
+                                                const double ddl) {
+  double denominator = (dl * dl + (1 - l * rkappa) * (1 - l * rkappa));
+  if (Double::Compare(denominator, 0.0, 1e-8) == 0) {
+    return 0.0;
+  }
+  denominator = std::pow(denominator, 1.5);
+  const double numerator = rkappa + ddl - 2 * l * rkappa * rkappa -
+                           l * ddl * rkappa +
+                           l * l * rkappa * rkappa * rkappa +
+                           l * dl * rdkappa + 2 * dl * dl * rkappa;
+  return numerator / denominator;
+}
+
+Eigen::Vector2d CartesianFrenetConverter::CalculateCartsianPoint(
+    const double rtheta, const Eigen::Vector2d& rpoint, const double l) {
+  double x = rpoint[0] - l * std::sin(rtheta);
+  double y = rpoint[1] + l * std::cos(rtheta);
+  return {x, y};
+}
+
+double CartesianFrenetConverter::CalculateLateralDerivative(
+    const double rtheta, const double theta, const double l,
+    const double rkappa) {
+  return (1 - rkappa * l) * std::tan(theta - rtheta);
+}
+
+double CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
+    const double rtheta, const double theta, const double rkappa,
+    const double kappa, const double rdkappa, const double l) {
+  const double dl = CalculateLateralDerivative(rtheta, theta, l, rkappa);
+  const double theta_diff = theta - rtheta;
+  const double cos_theta_diff = std::cos(theta_diff);
+  // TODO(fanhaoyang): add sanity check for invalid input
+  return -(rdkappa * l + rkappa * dl) * std::tan(theta - rtheta) +
+         (1 - rkappa * l) / (cos_theta_diff * cos_theta_diff) *
+             (kappa * (1 - rkappa * l) / cos_theta_diff - rkappa);
 }
 
 }  // namespace planning
