@@ -605,7 +605,7 @@ void SimulationWorldService::UpdateSimulationWorld(
     CreatePredictionTrajectory(&world_obj, obstacle);
 
     world_obj.set_timestamp_sec(
-        std::max(obstacle.time_stamp(), world_obj.timestamp_sec()));
+        std::max(obstacle.timestamp(), world_obj.timestamp_sec()));
   }
   world_.set_timestamp_sec(
       std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));

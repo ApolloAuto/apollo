@@ -97,7 +97,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
       perception_obstacles.perception_obstacle()) {
     PredictionObstacle prediction_obstacle;
     prediction_obstacle.set_predicted_period(FLAGS_prediction_duration);
-    prediction_obstacle.set_time_stamp(perception_obstacle.timestamp());
+    prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
     prediction_obstacle.mutable_perception_obstacle()->
         CopyFrom(perception_obstacle);
 
