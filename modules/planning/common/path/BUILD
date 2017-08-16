@@ -43,7 +43,7 @@ cc_library(
         ":frenet_frame_path",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:double",
-        "//modules/planning/math:sl_analytic_transformation",
+        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion",
         "//modules/planning/reference_line",
     ],
 )

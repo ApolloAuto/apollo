@@ -77,7 +77,7 @@ class CartesianFrenetConverter {
                                 const double l, const double dl,
                                 const double ddl);
 
-  static Eigen::Vector2d CalculateCartsianPoint(
+  static Eigen::Vector2d CalculateCartesianPoint(
       const double rtheta, const Eigen::Vector2d& rpoint,
       const double l);
   /**

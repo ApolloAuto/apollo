@@ -145,7 +145,7 @@ double CartesianFrenetConverter::CalculateKappa(const double rkappa,
   return numerator / denominator;
 }
 
-Eigen::Vector2d CartesianFrenetConverter::CalculateCartsianPoint(
+Eigen::Vector2d CartesianFrenetConverter::CalculateCartesianPoint(
     const double rtheta, const Eigen::Vector2d& rpoint, const double l) {
   double x = rpoint[0] - l * std::sin(rtheta);
   double y = rpoint[1] + l * std::cos(rtheta);
