@@ -29,7 +29,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/double.h"
-#include "modules/planning/math/sl_analytic_transformation.h"
+#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
 namespace planning {
@@ -165,10 +165,10 @@ bool PathData::FrenetToCartesian(const FrenetFramePath &frenet_path,
     }
     ReferencePoint ref_point =
         reference_line_->get_reference_point(frenet_point.s());
-    double theta = SLAnalyticTransformation::CalculateTheta(
+    double theta = CartesianFrenetConverter::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), frenet_point.l(),
         frenet_point.dl());
-    double kappa = SLAnalyticTransformation::CalculateKappa(
+    double kappa = CartesianFrenetConverter::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), frenet_point.l(),
         frenet_point.dl(), frenet_point.ddl());
 
