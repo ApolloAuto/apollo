@@ -60,7 +60,7 @@ namespace planning {
  */
 class PathObstacle {
  public:
-  PathObstacle() = default;
+  PathObstacle();
 
   PathObstacle(const planning::Obstacle* obstacle);
 
