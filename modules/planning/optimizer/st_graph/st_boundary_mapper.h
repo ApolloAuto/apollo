@@ -63,21 +63,23 @@ class StBoundaryMapper {
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,
       std::vector<STPoint>* lower_points) const;
 
-  apollo::common::Status MapObstacleWithoutDecision(
-      const PathObstacle& path_obstacle,
-      std::vector<StGraphBoundary>* const boundary) const;
+  apollo::common::Status MapWithoutDecision(
+      const PathObstacle& path_obstacle, StGraphBoundary* const boundary) const;
 
-  bool MapObstacleWithStopDecision(const PathObstacle& stop_obstacle,
-                                   const ObjectDecisionType& stop_decision,
-                                   StGraphBoundary* const boundary) const;
+  bool MapStopDecision(const PathObstacle& stop_obstacle,
+                       const ObjectDecisionType& stop_decision,
+                       StGraphBoundary* const boundary) const;
 
-  apollo::common::Status MapObstacleWithPredictionTrajectory(
+  apollo::common::Status MapWithPredictionTrajectory(
       const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
-      std::vector<StGraphBoundary>* const boundary) const;
+      StGraphBoundary* const boundary) const;
 
-  apollo::common::Status AddFollowBoundary(
+  apollo::common::Status MapFollowDecision(
       const PathObstacle& obstacle, const ObjectDecisionType& obj_decision,
-      std::vector<StGraphBoundary>* const boundary) const;
+      StGraphBoundary* const boundary) const;
+
+  void AppendBoundary(const StGraphBoundary& boundary,
+                      std::vector<StGraphBoundary>* st_graph_boundaries) const;
 
  private:
   StBoundaryConfig st_boundary_config_;
