@@ -22,7 +22,6 @@ import glog
 import google.protobuf.json_format as json_format
 import requests
 
-# Make sure <apollo>/bazel-genfiles is in your PYTHONPATH.
 from modules.hmi.proto.runtime_status_pb2 import RuntimeStatus
 
 gflags.DEFINE_string('hmi_runtime_status_api',
