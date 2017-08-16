@@ -204,7 +204,6 @@ void Planning::RunOnce() {
     return;
   }
 
-  AINFO << "Start planning ...";
   const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
 
   // localization

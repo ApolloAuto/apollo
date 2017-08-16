@@ -106,7 +106,7 @@ Status StBoundaryMapper::GetGraphBoundary(
     if (!path_obstacle->HasLongitudinalDecision()) {
       const auto ret =
           MapObstacleWithoutDecision(*path_obstacle, st_graph_boundaries);
-      if (ret.code() == ErrorCode::PLANNING_ERROR) {
+      if (!ret.ok()) {
         std::string msg = common::util::StrCat(
             "Fail to map obstacle ", path_obstacle->Id(), " without decision.");
         AERROR << msg;
@@ -223,12 +223,11 @@ Status StBoundaryMapper::MapObstacleWithoutDecision(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  bool skip = true;
   std::vector<STPoint> boundary_points;
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
                                 *(path_obstacle.Obstacle()), &upper_points,
                                 &lower_points)) {
-    return Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP");
+    return Status::OK();
   }
 
   if (lower_points.size() > 0 && upper_points.size() > 0) {
@@ -254,11 +253,9 @@ Status StBoundaryMapper::MapObstacleWithoutDecision(
     if (Double::Compare(area, 0.0) > 0) {
       boundary->emplace_back(&path_obstacle, boundary_points);
       boundary->back().set_id(path_obstacle.Obstacle()->Id());
-      skip = false;
     }
   }
-  return skip ? Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP")
-              : Status::OK();
+  return Status::OK();
 }
 
 bool StBoundaryMapper::GetOverlapBoundaryPoints(
@@ -346,7 +343,6 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  bool skip = true;
   std::vector<STPoint> boundary_points;
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
                                 *(path_obstacle.Obstacle()), &upper_points,
@@ -425,11 +421,9 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
       boundary->back().SetBoundaryType(b_type);
       boundary->back().set_id(path_obstacle.Obstacle()->Id());
       boundary->back().SetCharacteristicLength(characteristic_length);
-      skip = false;
     }
   }
-  return skip ? Status(ErrorCode::PLANNING_SKIP, "PLANNING_SKIP")
-              : Status::OK();
+  return Status::OK();
 }
 
 Status StBoundaryMapper::MapFollowDecision(
@@ -483,8 +477,8 @@ Status StBoundaryMapper::MapFollowDecision(
 
   if (distance_to_obstacle > planning_distance_) {
     std::string msg = "obstacle is out of range.";
-    AINFO << msg;
-    return Status(ErrorCode::PLANNING_SKIP, msg);
+    ADEBUG << msg;
+    return Status::OK();
   }
 
   double follow_speed = 0.0;
@@ -512,8 +506,8 @@ Status StBoundaryMapper::MapFollowDecision(
   const double area = GetArea(boundary_points);
   if (Double::Compare(area, 0.0) <= 0) {
     std::string msg = "Do not need to map because area is zero.";
-    AINFO << msg;
-    return Status(ErrorCode::PLANNING_SKIP, msg);
+    ADEBUG << msg;
+    return Status::OK();
   }
   *boundary = StGraphBoundary(&path_obstacle, boundary_points);
 
