@@ -209,6 +209,8 @@ void PathObstacle::AddDecision(const std::string& decider_tag,
       longitudinal_decision_ =
           MergeLongitudinalDecision(longitudinal_decision_, merged_decision);
       has_longitudinal_decision_ = true;
+      lateral_decision_.mutable_ignore();
+      has_lateral_decision_ = true;
     } else {
       lateral_decision_ = merged_decision;
       has_lateral_decision_ = true;
