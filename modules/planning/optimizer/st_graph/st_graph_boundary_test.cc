@@ -23,7 +23,6 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/log.h"
-#include "modules/planning/common/path_obstacle.h"
 
 namespace apollo {
 namespace planning {
@@ -35,8 +34,7 @@ TEST(StGraphBoundaryTest, basic_test) {
   st_points.emplace_back(5.0, 10.0);
   st_points.emplace_back(5.0, 0.0);
 
-  PathObstacle path_obstacle;
-  StGraphBoundary boundary(&path_obstacle, st_points);
+  StGraphBoundary boundary(st_points);
   EXPECT_EQ(boundary.id(), "");
   EXPECT_EQ(boundary.boundary_type(), StGraphBoundary::BoundaryType::UNKNOWN);
   EXPECT_FLOAT_EQ(0.0, boundary.min_s());
@@ -51,8 +49,7 @@ TEST(StGraphBoundaryTest, boundary_range) {
   st_points.emplace_back(1.0, 10.0);
   st_points.emplace_back(5.0, 10.0);
   st_points.emplace_back(5.0, 0.0);
-  PathObstacle path_obstacle;
-  StGraphBoundary boundary(&path_obstacle, st_points);
+  StGraphBoundary boundary(st_points);
   boundary.SetBoundaryType(StGraphBoundary::BoundaryType::YIELD);
   double t = -10.0;
   const double dt = 0.01;
