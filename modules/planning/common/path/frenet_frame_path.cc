@@ -23,8 +23,8 @@
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -38,7 +38,7 @@ void FrenetFramePath::set_points(std::vector<common::FrenetFramePoint> points) {
   points_ = std::move(points);
 }
 
-const std::vector<common::FrenetFramePoint> &FrenetFramePath::points() const {
+const std::vector<common::FrenetFramePoint>& FrenetFramePath::points() const {
   return points_;
 }
 
@@ -49,17 +49,10 @@ double FrenetFramePath::Length() const {
   return points_.back().s() - points_.front().s();
 }
 
-std::uint32_t FrenetFramePath::NumOfPoints() const {
-  return points_.size();
-}
+std::uint32_t FrenetFramePath::NumOfPoints() const { return points_.size(); }
 
-const common::FrenetFramePoint &FrenetFramePath::PointAt(
+const common::FrenetFramePoint& FrenetFramePath::PointAt(
     const std::uint32_t index) const {
-  CHECK_LT(index, points_.size());
-  return points_[index];
-}
-
-common::FrenetFramePoint &FrenetFramePath::PointAt(const std::uint32_t index) {
   CHECK_LT(index, points_.size());
   return points_[index];
 }
@@ -90,9 +83,7 @@ common::FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
   return p;
 }
 
-void FrenetFramePath::Clear() {
-  points_.clear();
-}
+void FrenetFramePath::Clear() { points_.clear(); }
 
 }  // namespace planning
 }  // namespace apollo
