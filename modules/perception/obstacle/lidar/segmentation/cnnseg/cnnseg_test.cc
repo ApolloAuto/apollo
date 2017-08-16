@@ -66,6 +66,7 @@ class CNNSegmentationTest : public testing::Test {
   CNNSegmentationTest() {}
   ~CNNSegmentationTest() {}
   void SetUp() {
+    google::InitGoogleLogging("CNNSegmentationTest");
     cnn_segmentor_.reset(new CNNSegmentation());
   }
   void TearDown() {}
@@ -207,9 +208,8 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
   FLAGS_config_manager_path = "./conf/config_manager.config";
 
   // generate input point cloud data
-  string in_pcd_file(FLAGS_test_dir);
-  in_pcd_file = in_pcd_file + FLAGS_pcd_name + ".pcd";
-  AERROR << "pcd file: " << in_pcd_file;
+  const string in_pcd_file = FLAGS_test_dir + FLAGS_pcd_name + ".pcd";
+  AINFO << "pcd file: " << in_pcd_file;
   PointCloudPtr in_pc;
   in_pc.reset(new PointCloud());
   EXPECT_TRUE(GetPointCloudFromFile(in_pcd_file, in_pc));
@@ -229,7 +229,8 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
 
   // testing segment function
   for (int i = 0; i < 10; ++i) {
-    EXPECT_TRUE(cnn_segmentor_->Segment(in_pc, valid_idx, options, &out_objects));
+    EXPECT_TRUE(
+        cnn_segmentor_->Segment(in_pc, valid_idx, options, &out_objects));
     EXPECT_EQ(out_objects.size(), 15);
   }
 
