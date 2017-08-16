@@ -48,33 +48,7 @@ class PIDBCController : public PIDController {
    */
   virtual double Control(const double error, const double dt);
 
-  /**
-   * @brief get saturation status
-   * @return saturation status
-   */
-  int SaturationStatus() const;
-
-  /**
-   * @brief get status that if integrator is hold
-   * @return if integrator is hold return true
-   */
-  bool integrator_hold() const;
-
  private:
-  double kp_ = 0.0;
-  double ki_ = 0.0;
-  double kd_ = 0.0;
-  double kaw_ = 0.0;
-  double previous_error_ = 0.0;
-  double previous_error_i_ = 0.0;
-  double previous_output_ = 0.0;
-  double integral_ = 0.0;
-  double saturation_high_ = 0.0;
-  double saturation_low_ = 0.0;
-  bool first_hit_ = false;
-  bool integrator_enabled_ = false;
-  bool integrator_hold_ = false;
-  int saturation_status_ = 0;
 };
 
 }  // namespace control

@@ -95,6 +95,7 @@ lon_controller_conf {
     kp: 1.5
     ki: 0.5
     kd: 0.0
+    kaw: 1.0
   }
   high_speed_pid_conf {
     integrator_enable: true

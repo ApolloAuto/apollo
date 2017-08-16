@@ -25,7 +25,7 @@ namespace control {
 
 double PIDController::Control(const double error, const double dt) {
   if (dt <= 0) {
-    AWARN << "dt <= 0, will use the last output";
+    AWARN << "dt <= 0, will use the last output, dt: " << dt;
     return previous_output_;
   }
   double diff = 0;
@@ -42,14 +42,14 @@ double PIDController::Control(const double error, const double dt) {
   } else if (!integrator_hold_) {
     integral_ += error * dt * ki_;
     // apply Ki before integrating to avoid steps when change Ki at steady state
-    if (integral_ > saturation_high_) {
-      integral_ = saturation_high_;
-      saturation_status_ = 1;
-    } else if (integral_ < saturation_low_) {
-      integral_ = saturation_low_;
-      saturation_status_ = -1;
+    if (integral_ > integrator_saturation_high_) {
+      integral_ = integrator_saturation_high_;
+      integrator_saturation_status_ = 1;
+    } else if (integral_ < integrator_saturation_low_) {
+      integral_ = integrator_saturation_low_;
+      integrator_saturation_status_ = -1;
     } else {
-      saturation_status_ = 0;
+      integrator_saturation_status_ = 0;
     }
   }
   previous_error_ = error;
@@ -63,6 +63,7 @@ void PIDController::Reset() {
   previous_output_ = 0.0;
   integral_ = 0.0;
   first_hit_ = true;
+  integrator_saturation_status_ = 0;
 }
 
 void PIDController::Init(const PidConf &pid_conf) {
@@ -71,9 +72,11 @@ void PIDController::Init(const PidConf &pid_conf) {
   integral_ = 0.0;
   first_hit_ = true;
   integrator_enabled_ = pid_conf.integrator_enable();
-  saturation_high_ = std::fabs(pid_conf.integrator_saturation_level());
-  saturation_low_ = -std::fabs(pid_conf.integrator_saturation_level());
-  saturation_status_ = 0;
+  integrator_saturation_high_ =
+      std::fabs(pid_conf.integrator_saturation_level());
+  integrator_saturation_low_ =
+      -std::fabs(pid_conf.integrator_saturation_level());
+  integrator_saturation_status_ = 0;
   integrator_hold_ = false;
 
   SetPID(pid_conf);
@@ -86,9 +89,13 @@ void PIDController::SetPID(const PidConf &pid_conf) {
   kaw_ = pid_conf.kaw();
 }
 
-int PIDController::SaturationStatus() const { return saturation_status_; }
+int PIDController::IntegratorSaturationStatus() const {
+  return integrator_saturation_status_;
+}
 
-bool PIDController::IntegratorHold() const { return integrator_hold_; }
+bool PIDController::IntegratorHold() const {
+  return integrator_hold_;
+}
 
 }  // namespace control
 }  // namespace apollo
