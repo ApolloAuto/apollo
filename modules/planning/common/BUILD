@@ -160,6 +160,22 @@ cc_library(
 )
 
 cc_library(
+    name = "reference_line_info",
+    srcs = [
+        "reference_line_info.cc",
+    ],
+    hdrs = [
+        "reference_line_info.h",
+    ],
+    deps = [
+        ":path_decision",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed:speed_data",
+        "//modules/planning/reference_line",
+    ],
+)
+
+cc_library(
     name = "planning_data",
     srcs = [
         "planning_data.cc",
@@ -194,6 +210,7 @@ cc_library(
         ":path_decision",
         ":path_obstacle",
         ":planning_data",
+        ":reference_line_info",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/vehicle_state",

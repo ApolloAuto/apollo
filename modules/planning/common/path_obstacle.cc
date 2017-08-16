@@ -58,6 +58,10 @@ bool PathObstacle::Init(const ReferenceLine* reference_line) {
   return true;
 }
 
+void PathObstacle::SetPerceptionSLBoundary(const SLBoundary& sl_boundary) {
+  perception_sl_boundary_ = sl_boundary;
+}
+
 bool PathObstacle::InitPerceptionSLBoundary(
     const ReferenceLine* reference_line) {
   double start_s(std::numeric_limits<double>::max());
