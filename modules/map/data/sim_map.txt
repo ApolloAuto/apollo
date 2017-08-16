@@ -704,7 +704,10 @@ lane {
         length: 156.61603286829296
       }
     }
-    type: DOTTED_YELLOW
+    boundary_type {
+      s: 0
+      types: DOTTED_YELLOW
+    }
     length: 156.61603286829296
   }
   right_boundary {
@@ -1048,10 +1051,12 @@ lane {
         length: 151.14875772478879
       }
     }
-    type: CURB
+    boundary_type {
+      s: 0
+      types: CURB
+    }
     length: 151.14875772478879
   }
-  width: 3.4909957887267926
   length: 153.87421245705966
   speed_limit: 4.5
   overlap_id {
@@ -1059,9 +1064,6 @@ lane {
   }
   type: CITY_DRIVING
   turn: NO_TURN
-  stop_sign_id {
-    id: "2"
-  }
   left_sample {
     s: 0
     width: 1.7499999999999969
