@@ -96,7 +96,8 @@ void PlanningTestBase::SetUp() {
 }
 
 void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {
-  origin->mutable_latency_stats()->Clear();
+  origin->clear_latency_stats();
+  origin->clear_debug();
   origin->mutable_header()->clear_radar_timestamp();
   origin->mutable_header()->clear_lidar_timestamp();
   origin->mutable_header()->clear_timestamp_sec();
