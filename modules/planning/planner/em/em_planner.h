@@ -77,7 +77,6 @@ class EMPlanner : public Planner {
   void PopulateDecision(Frame* frame);
 
   void RecordDebugInfo(const std::string& name,
-                       const PlanningData* planning_data,
                        const double time_diff_ms,
                        planning_internal::Debug* ptr_debug,
                        planning::LatencyStats* ptr_latency_stats);
