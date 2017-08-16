@@ -37,10 +37,6 @@ DEFINE_double(trajectory_resolution, 0.01,
               "The time resolution of "
               "output trajectory.");
 
-DEFINE_string(reference_line_smoother_config_file,
-              "modules/planning/conf/reference_line_smoother_config.pb.txt",
-              "The reference line smoother config file");
-
 DEFINE_double(
     look_backward_distance, 10,
     "look backward this distance when creating reference line from routing");

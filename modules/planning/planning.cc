@@ -73,7 +73,7 @@ bool Planning::InitFrame(const uint32_t sequence_num) {
     ADEBUG << "Get prediction";
   }
 
-  if (!frame_->Init()) {
+  if (!frame_->Init(config_)) {
     AERROR << "failed to init frame";
     return false;
   }
