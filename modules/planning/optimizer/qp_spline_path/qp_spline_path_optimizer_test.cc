@@ -31,8 +31,6 @@ using PlanningPb = planning::ADCTrajectory;
 
 class QpSplinePathOptimizerTest : public ::testing::Test {
   virtual void SetUp() {
-    FLAGS_reference_line_smoother_config_file =
-        "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
     FLAGS_planning_config_file =
         "modules/planning/testdata/qp_spline_path/planning_config.pb.txt";
     optimizer_.reset(new QpSplinePathOptimizer(""));
@@ -94,7 +92,7 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
 };
 
 TEST_F(QpSplinePathOptimizerTest, Process) {
-  EXPECT_EQ(frame->Init(), true);
+  EXPECT_EQ(frame->Init(planning_config_), true);
   common::TrajectoryPoint init_point = GetInitPoint();
   frame->SetPlanningStartPoint(init_point);
   PlanningData* planning_data = frame->mutable_planning_data();

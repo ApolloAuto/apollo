@@ -36,8 +36,6 @@ class PlanningTest : public ::testing::Test {
         "modules/planning/testdata/conf/planning_config.pb.txt";
 
     FLAGS_adapter_config_path = "modules/planning/testdata/conf/adapter.conf";
-    FLAGS_reference_line_smoother_config_file =
-        "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
 
     FLAGS_enable_record_debug = false;
   }

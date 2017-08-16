@@ -32,8 +32,6 @@ using PlanningPb = planning::ADCTrajectory;
 
 class QpSplineStSpeedOptimizerTest : public ::testing::Test {
   virtual void SetUp() {
-    FLAGS_reference_line_smoother_config_file =
-        "modules/planning/testdata/conf/reference_line_smoother_config.pb.txt";
     FLAGS_planning_config_file =
         "modules/planning/testdata/qp_spline_st_speed/planning_config.pb.txt";
 
@@ -71,7 +69,7 @@ class QpSplineStSpeedOptimizerTest : public ::testing::Test {
     frame->SetRoutingResponse(
         planning_pb.debug().planning_data().routing());
 
-    frame->Init();
+    frame->Init(planning_config_);
     frame->SetPlanningStartPoint(planning_pb.debug()
                                      .planning_data().init_point());
 
