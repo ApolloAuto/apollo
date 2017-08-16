@@ -2271,10 +2271,6 @@ decision {
         ignore {
         }
       }
-      object_decision {
-        ignore {
-        }
-      }
     }
   }
 }

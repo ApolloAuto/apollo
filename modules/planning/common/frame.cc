@@ -185,7 +185,8 @@ bool Frame::MakeTrafficDecision(const routing::RoutingResponse &,
       object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
       object_stop_ptr->set_stop_heading(stop_ref_point.heading());
 
-      path_decision_->AddDecision("TBD", obstacle->Id(), object_stop);
+      path_decision_->AddLongitudinalDecision("TBD", obstacle->Id(),
+                                              object_stop);
     }
   }
 

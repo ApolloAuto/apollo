@@ -38,7 +38,7 @@ using IdDecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
 DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
     : PathOptimizer(name) {}
 
-bool DpPolyPathOptimizer::Init(const PlanningConfig& config) {
+bool DpPolyPathOptimizer::Init(const PlanningConfig &config) {
   config_ = config.em_planner_config().dp_poly_path_config();
   is_init_ = true;
   return true;
@@ -62,19 +62,10 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
   }
   const auto &path_obstacles =
       frame_->path_decision()->path_obstacles().Items();
-  IdDecisionList decision_list;
-  if (!dp_road_graph.ComputeObjectDecision(*path_data, path_obstacles,
-                                           &decision_list)) {
+  if (!dp_road_graph.MakeObjectDecision(*path_data, path_obstacles,
+                                        path_decision)) {
     AERROR << "Failed to make decision based on tunnel";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
-  }
-  for (const auto &decision : decision_list) {
-    if (!path_decision->AddDecision("dp_poly_path", decision.first,
-                                    decision.second)) {
-      AERROR << "Failed to add decision for object: " << decision.first;
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "obstacles and PathDecision does not match");
-    }
   }
   return Status::OK();
 }
