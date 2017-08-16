@@ -16,6 +16,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:macro",
+        "//modules/common/configs:config_gflags",
         "//modules/common/math",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
