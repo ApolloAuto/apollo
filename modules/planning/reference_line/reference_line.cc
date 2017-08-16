@@ -24,6 +24,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <limits>
 
 #include "boost/math/tools/minima.hpp"
 

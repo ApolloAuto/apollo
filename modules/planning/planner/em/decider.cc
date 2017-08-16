@@ -18,6 +18,8 @@
  * @file decider.cpp
  **/
 
+#include <limits>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
@@ -79,7 +81,7 @@ int Decider::MakeMainStopDecision(Frame* frame,
   for (const auto path_obstacle : path_obstacles.Items()) {
     const auto& obstacle = path_obstacle->Obstacle();
     const auto& object_decision = path_obstacle->LongitudinalDecision();
-    if (not object_decision.has_stop()) {
+    if (!object_decision.has_stop()) {
       continue;
     }
 

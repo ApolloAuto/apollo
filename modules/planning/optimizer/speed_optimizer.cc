@@ -22,8 +22,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_limit.h"
 
-#include <string>
-
 namespace apollo {
 namespace planning {
 
@@ -79,7 +77,6 @@ void SpeedOptimizer::RecordSTGraphDebug(
   st_graph_debug->mutable_speed_profile()->CopyFrom(
       {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
 }
-
 
 }  // namespace planning
 }  // namespace apollo

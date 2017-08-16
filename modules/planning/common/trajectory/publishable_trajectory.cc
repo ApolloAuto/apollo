@@ -18,6 +18,8 @@
  * @file publishable_trajectory.cpp
  **/
 
+#include <utility>
+
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 
 namespace apollo {

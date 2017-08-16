@@ -37,8 +37,8 @@ namespace planning {
 class ReferenceLine {
  public:
   ReferenceLine() = default;
-  ReferenceLine(const std::vector<ReferencePoint>& reference_points);
-  ReferenceLine(const hdmap::Path& hdmap_path);
+  explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
+  explicit ReferenceLine(const hdmap::Path& hdmap_path);
   ReferenceLine(const std::vector<ReferencePoint>& reference_points,
                 const std::vector<hdmap::LaneSegment>& lane_segments,
                 const double max_approximation_error);

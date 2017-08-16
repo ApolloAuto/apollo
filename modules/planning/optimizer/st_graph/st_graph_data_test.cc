@@ -14,12 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/common/path_obstacle.h"
-#include "modules/planning/optimizer/st_graph/st_graph_data.h"
-
 #include <algorithm>
 #include <cmath>
 
+#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/optimizer/st_graph/st_graph_data.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
