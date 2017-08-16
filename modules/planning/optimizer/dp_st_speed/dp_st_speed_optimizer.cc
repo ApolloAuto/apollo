@@ -59,6 +59,12 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
 
+  if (path_data.discretized_path().NumOfPoints() == 0) {
+    std::string msg("Empty path data");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   StBoundaryMapper boundary_mapper(st_boundary_config_, reference_line,
                                    path_data,
                                    dp_st_speed_config_.total_path_length(),
