@@ -18,11 +18,11 @@
 #include <utility>
 
 #include "gtest/gtest.h"
-#include "modules/common/util/file.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
 #include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
+#include "modules/common/util/file.h"
+#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_generator.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 
 namespace apollo {
 namespace planning {
@@ -44,17 +44,18 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
     LoadPlanningConfig();
     planning_pb = LoadPlanningPb(
         "modules/planning/testdata"
-        "/qp_spline_path/42_apollo_planning.pb.txt");
+            "/qp_spline_path/42_apollo_planning.pb.txt");
     frame->SetVehicleInitPose(
         planning_pb.debug().planning_data().adc_position().pose());
-    frame->SetRoutingResponse(planning_pb.debug().planning_data().routing());
+    frame->SetRoutingResponse(
+        planning_pb.debug().planning_data().routing());
   }
 
  protected:
-  PlanningPb LoadPlanningPb(const std::string& filename) {
+  PlanningPb LoadPlanningPb(const std::string &filename) {
     PlanningPb planning_pb;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &planning_pb))
-        << "Failed to open file " << filename;
+    << "Failed to open file " << filename;
     return std::move(planning_pb);
   }
 
@@ -62,7 +63,7 @@ class QpSplinePathOptimizerTest : public ::testing::Test {
     PlanningPb planning_pb;
     CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                  &planning_config_))
-        << "Failed to open file " << FLAGS_planning_config_file;
+    << "Failed to open file " << FLAGS_planning_config_file;
   }
 
   common::TrajectoryPoint GetInitPoint() {
@@ -97,8 +98,8 @@ TEST_F(QpSplinePathOptimizerTest, Process) {
   common::TrajectoryPoint init_point = GetInitPoint();
   frame->SetPlanningStartPoint(init_point);
   PlanningData* planning_data = frame->mutable_planning_data();
-  EXPECT_EQ(planning_data->path_data().discretized_path().path_points().size(),
-            0);
+  EXPECT_EQ(planning_data->path_data().discretized_path().path_points().size()
+  , 0);
   optimizer_->Init(planning_config_);
   optimizer_->Optimize(frame.get());
 
@@ -110,18 +111,14 @@ TEST_F(QpSplinePathOptimizerTest, Process) {
   }
 
   EXPECT_EQ(qp_path_ground_truth.path_point().size(), 101);
-  EXPECT_EQ(frame->planning_data()
-                .path_data()
-                .discretized_path()
-                .path_points()
-                .size(),
-            101);
+  EXPECT_EQ(frame->planning_data().path_data()
+                .discretized_path().path_points().size(), 101);
 
   for (std::int32_t i = 0; i < qp_path_ground_truth.path_point().size(); i++) {
     common::PathPoint ground_truth_point =
         qp_path_ground_truth.path_point().Get(i);
-    common::PathPoint computed_point =
-        planning_data->path_data().discretized_path().path_points()[i];
+    common::PathPoint computed_point = planning_data
+        ->path_data().discretized_path().path_points()[i];
     EXPECT_NEAR(ground_truth_point.x(), computed_point.x(), 1.0e-2);
     EXPECT_NEAR(ground_truth_point.y(), computed_point.y(), 1.0e-3);
     EXPECT_NEAR(ground_truth_point.kappa(), computed_point.kappa(), 1.0e-3);

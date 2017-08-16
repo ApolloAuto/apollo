@@ -82,11 +82,8 @@ class PathObstacle {
    * @param decider_tag identifies which component added this decision
    * @param the decision to be added to this path obstacle.
    **/
-  void AddLateralDecision(const std::string& decider_tag,
-                          const ObjectDecisionType& lateral_decision);
-
-  void AddLongitudinalDecision(const std::string& decider_tag,
-                               const ObjectDecisionType& longitudinal_decision);
+  void AddDecision(const std::string& decider_tag,
+                   const ObjectDecisionType& decision);
 
   bool HasLateralDecision() const;
   bool HasLongitudinalDecision() const;
