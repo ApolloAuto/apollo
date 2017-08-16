@@ -41,6 +41,7 @@ class GarageTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_map_file_path = "modules/planning/testdata/base_map.txt";
+    FLAGS_test_data_dir = "modules/planning/testdata/garage_test/";
   }
 };
 
@@ -54,10 +55,8 @@ TEST_F(GarageTest, Stop) {
   FLAGS_test_chassis_file =
       "modules/planning/testdata/garage_test/"
       "stop_obstacle_chassis.pb.txt";
-  // EXPECT_DEATH(PlanningTestBase::SetUp(), ".*SetUpAdapters.*");
   PlanningTestBase::SetUp();
-  RunPlanning();
-  ASSERT_TRUE(adc_trajectory_ != nullptr);
+  RUN_GOLDEN_TEST;
 }
 
 }  // namespace planning

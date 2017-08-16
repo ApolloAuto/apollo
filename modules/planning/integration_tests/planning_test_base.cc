@@ -24,6 +24,9 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
+DEFINE_string(test_data_dir, "", "the test data folder");
+DEFINE_bool(test_update_golden_log, false,
+            "true to update decision golden log file.");
 DEFINE_string(test_routing_response_file,
               "modules/planning/testdata/garage_routing.pb.txt",
               "The routing file used in test");
@@ -45,7 +48,8 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_localization_file =
       "modules/planning/testdata/garage_localization.pb.txt";
   FLAGS_test_chassis_file = "modules/planning/testdata/garage_chassis.pb.txt",
-  FLAGS_test_prediction_file = "modules/planning/testdata/garage_prediction.pb.txt",
+  FLAGS_test_prediction_file =
+      "modules/planning/testdata/garage_prediction.pb.txt",
   FLAGS_v = 4;
 }
 
@@ -91,9 +95,55 @@ void PlanningTestBase::SetUp() {
   planning_.Init();
 }
 
-void PlanningTestBase::RunPlanning() {
+void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {
+  origin->mutable_latency_stats()->Clear();
+  origin->mutable_header()->clear_radar_timestamp();
+  origin->mutable_header()->clear_lidar_timestamp();
+  origin->mutable_header()->clear_timestamp_sec();
+  origin->mutable_header()->clear_camera_timestamp();
+}
+
+bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
+                                   int case_num) {
+  const std::string golden_result_file = apollo::common::util::StrCat(
+      "result_", test_case_name, "_", case_num, ".pb.txt");
+  std::string tmp_golden_path = "/tmp/" + golden_result_file;
+  std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   planning_.RunOnce();
   adc_trajectory_ = AdapterManager::GetPlanning()->GetLatestPublished();
+  if (!adc_trajectory_) {
+    AERROR << " did not get latest adc trajectory";
+    return false;
+  }
+  TrimPlanning(adc_trajectory_);
+  if (FLAGS_test_update_golden_log) {
+    AINFO << "The golden file is " << tmp_golden_path << " Remember to:\n"
+          << "mv " << tmp_golden_path << " " << FLAGS_test_data_dir << "\n"
+          << "git add " << FLAGS_test_data_dir << "/" << golden_result_file;
+    ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
+                                                golden_result_file);
+  } else {
+    ADCTrajectory golden_result;
+    bool load_success = ::apollo::common::util::GetProtoFromASCIIFile(
+        full_golden_path, &golden_result);
+    if (!load_success) {
+      AERROR << "Failed to load golden file: " << full_golden_path;
+      ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
+                                                  tmp_golden_path);
+      AINFO << "Current result is written to " << tmp_golden_path;
+      return false;
+    }
+    bool same_result =
+        ::apollo::common::util::IsProtoEqual(golden_result, *adc_trajectory_);
+    if (!same_result) {
+      std::string tmp_planning_file = tmp_golden_path + ".tmp";
+      ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
+                                                  tmp_planning_file);
+      AERROR << "found diff " << tmp_planning_file << " " << full_golden_path;
+      return false;
+    }
+  }
+  return true;
 }
 
 void PlanningTestBase::export_sl_points(

@@ -35,9 +35,18 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
+#define RUN_GOLDEN_TEST                                            \
+  {                                                                \
+    const ::testing::TestInfo* const test_info =                   \
+        ::testing::UnitTest::GetInstance()->current_test_info();   \
+    bool run_planning_success = RunPlanning(test_info->name(), 0); \
+    EXPECT_TRUE(run_planning_success);                             \
+  }
+
 DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
 DECLARE_string(test_chassis_file);
+DECLARE_string(test_data_dir);
 DECLARE_string(test_prediction_file);
 
 class PlanningTestBase : public ::testing::Test {
@@ -51,7 +60,7 @@ class PlanningTestBase : public ::testing::Test {
    * @return true if planning is success. The ADCTrajectory will be used to
    * store the planing results.  Otherwise false.
    */
-  void RunPlanning();
+  bool RunPlanning(const std::string& test_case_name, int case_num);
 
   /**
    * @brief Print out the points to a file for debug and visualization purpose.
@@ -66,7 +75,9 @@ class PlanningTestBase : public ::testing::Test {
                                const std::string& filename);
 
  protected:
+  void TrimPlanning(ADCTrajectory* origin);
   bool SetUpAdapters();
+
   Planning planning_;
   ADCTrajectory* adc_trajectory_ = nullptr;
 };
