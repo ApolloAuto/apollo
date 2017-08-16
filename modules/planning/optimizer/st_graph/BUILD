@@ -28,7 +28,6 @@ cc_library(
         ":st_graph_point",
         "//modules/common:log",
         "//modules/common/math",
-        "//modules/planning/common:path_obstacle",
         "//modules/planning/proto:planning_proto",
     ],
 )
@@ -120,6 +119,7 @@ cc_test(
         "st_graph_data_test.cc",
     ],
     deps = [
+        ":st_graph_boundary",
         ":st_graph_data",
         "//modules/common:log",
         "//modules/common/time",

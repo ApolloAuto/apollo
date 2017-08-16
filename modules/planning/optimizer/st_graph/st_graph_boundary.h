@@ -21,14 +21,14 @@
 #ifndef MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_BOUNDARY_H_
 #define MODULES_PLANNING_OPTIMIZER_ST_GRAPH_ST_GRAPH_BOUNDARY_H_
 
-#include <memory>
-#include <vector>
 #include <limits>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
+
 #include "modules/common/math/polygon2d.h"
-#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/optimizer/st_graph/st_graph_point.h"
 
 namespace apollo {
@@ -36,14 +36,15 @@ namespace planning {
 
 class StGraphBoundary : public common::math::Polygon2d {
  public:
-  explicit StGraphBoundary(const PathObstacle* path_obstacle);
-  // boundary points go counter clockwise.
-  explicit StGraphBoundary(const PathObstacle* path_obstacle,
-                           const std::vector<STPoint>& points);
+  StGraphBoundary() = default;
 
   // boundary points go counter clockwise.
-  explicit StGraphBoundary(const PathObstacle* path_obstacle,
-                           const std::vector<common::math::Vec2d>& points);
+  explicit StGraphBoundary(const std::vector<STPoint>& points);
+
+  // boundary points go counter clockwise.
+  explicit StGraphBoundary(const std::vector<common::math::Vec2d>& points);
+  ~StGraphBoundary() = default;
+
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
   enum class BoundaryType {
@@ -53,8 +54,6 @@ class StGraphBoundary : public common::math::Polygon2d {
     YIELD,
     OVERTAKE,
   };
-
-  ~StGraphBoundary() = default;
 
   // TODO(all): add this function.
   // bool IsEmpty() const { return points.empty(); }
@@ -67,7 +66,7 @@ class StGraphBoundary : public common::math::Polygon2d {
   const std::string& id() const;
   double characteristic_length() const;
 
-  void set_id(const std::string& id);
+  void SetId(const std::string& id);
   void SetBoundaryType(const BoundaryType& boundary_type);
   void SetCharacteristicLength(const double characteristic_length);
 
@@ -77,15 +76,12 @@ class StGraphBoundary : public common::math::Polygon2d {
   bool GetBoundarySRange(const double curr_time, double* s_upper,
                          double* s_lower) const;
 
-  const PathObstacle* path_obstacle() const;
-
   double min_s() const;
   double min_t() const;
   double max_s() const;
   double max_t() const;
 
  private:
-  const PathObstacle* path_obstacle_ = nullptr;
   BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
   std::string id_;
   double characteristic_length_ = 1.0;
