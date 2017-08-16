@@ -216,7 +216,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
 
     // update state
     if (::apollo::common::math::DoubleCompare(lane_speed, 0.0) <= 0) {
-      AINFO << "Non-positive lane_speed tacked : " << lane_speed;
+      AWARN << "Non-positive lane_speed tacked : " << lane_speed;
       lane_speed = 0.0;
       lane_acc = 0.0;
       transition(1, 1) = 1.0;

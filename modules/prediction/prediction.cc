@@ -121,16 +121,6 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   AdapterManager::PublishPrediction(prediction_obstacles);
   ADEBUG << "Published a prediction message ["
          << prediction_obstacles.ShortDebugString() << "].";
-  // for (const auto& pob : prediction_obstacles.prediction_obstacle()) {
-  //   for (const auto& traj : pob.trajectory()) {
-  //     for (const auto& traj_point : traj.trajectory_point()) {
-  //       AINFO << "[" << std::fixed << std::setprecision(6)
-  //             << traj_point.path_point().x() << ", "
-  //             << std::fixed << std::setprecision(6)
-  //             << traj_point.path_point().y() << "]";
-  //     }
-  //   }
-  // }
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
