@@ -147,11 +147,11 @@ void DownsampleByDistance(const std::vector<PointType> &points,
   int downsampleRate =
       is_steep_turn ? steepTurnDownsampleDistance : downsampleDistance;
 
+  // Make sure the first point is included
   sampled_indices->push_back(0);
 
   double accum_distance = 0.0;
-  size_t pos = 1;
-  for (; pos < points.size() - 1; ++pos) {
+  for (size_t pos = 1; pos < points.size() - 1; ++pos) {
     Vec2d point_start = Vec2d(points[pos - 1].x(), points[pos - 1].y());
     Vec2d point_end = Vec2d(points[pos].x(), points[pos].y());
     accum_distance += point_start.DistanceTo(point_end);
@@ -161,7 +161,9 @@ void DownsampleByDistance(const std::vector<PointType> &points,
       accum_distance = 0.0;
     }
   }
-  sampled_indices->push_back(pos);
+
+  // Make sure the last point is included
+  sampled_indices->push_back(points.size() - 1);
 }
 
 }  // namespace util

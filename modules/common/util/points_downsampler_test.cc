@@ -18,8 +18,8 @@
 
 #include <vector>
 
-#include "modules/common/math/vec2d.h"
 #include "gtest/gtest.h"
+#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace common {
@@ -63,10 +63,11 @@ TEST(DownSamplerTest, DownsampleByDistanceNormal) {
   std::vector<int> sampled_indices;
 
   DownsampleByDistance(points, 5, 1, &sampled_indices);
-  EXPECT_EQ(3, sampled_indices.size());
+  EXPECT_EQ(4, sampled_indices.size());
   EXPECT_EQ(0, sampled_indices[0]);
   EXPECT_EQ(2, sampled_indices[1]);
   EXPECT_EQ(4, sampled_indices[2]);
+  EXPECT_EQ(5, sampled_indices[3]);
 }
 
 TEST(DownSamplerTest, DownsampleByDistanceSteepTurn) {
