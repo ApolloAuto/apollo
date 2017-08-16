@@ -17,7 +17,6 @@
 #include "modules/control/common/pid_BC_controller.h"
 
 #include <string>
-
 #include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_conf.pb.h"
@@ -43,39 +42,38 @@ class PidBCControllerTest : public ::testing::Test {
 
 TEST_F(PidBCControllerTest, StationPidController) {
   PidConf pid_conf = lon_controller_conf_.station_pid_conf();
-  PIDController pid_controller;
-  pid_controller.Init(pid_conf);
-  pid_controller.Reset();
+  PIDBCController pid_BC_controller;
+  pid_BC_controller.Init(pid_conf);
+  pid_BC_controller.Reset();
   double dt = 0.01;
-  EXPECT_NEAR(pid_controller.Control(0.0, dt), 0.0, 1e-6);
-  pid_controller.Reset();
-  EXPECT_NEAR(pid_controller.Control(0.1, dt), 0.01, 1e-6);
-  pid_controller.Reset();
-  double control_value = pid_controller.Control(-0.1, dt);
+  EXPECT_NEAR(pid_BC_controller.Control(0.0, dt), 0.0, 1e-6);
+  pid_BC_controller.Reset();
+  EXPECT_NEAR(pid_BC_controller.Control(0.1, dt), 0.01, 1e-6);
+  pid_BC_controller.Reset();
+  double control_value = pid_BC_controller.Control(-0.1, dt);
   EXPECT_NEAR(control_value, -0.01, 1e-6);
   dt = 0.0;
-  EXPECT_EQ(pid_controller.Control(100, dt), control_value);
-  EXPECT_EQ(pid_controller.IntegratorHold(), false);
+  EXPECT_EQ(pid_BC_controller.Control(100, dt), control_value);
+  EXPECT_EQ(pid_BC_controller.IntegratorHold(), false);
 }
 
 TEST_F(PidBCControllerTest, SpeedPidController) {
   PidConf pid_conf = lon_controller_conf_.low_speed_pid_conf();
-  PIDController pid_controller;
-  pid_controller.Init(pid_conf);
-  pid_controller.Reset();
+  PIDBCController pid_BC_controller;
+  pid_BC_controller.Init(pid_conf);
+  pid_BC_controller.Reset();
   double dt = 0.01;
-  EXPECT_NEAR(pid_controller.Control(0.0, dt), 0.0, 1e-6);
-  pid_controller.Reset();
-  EXPECT_NEAR(pid_controller.Control(0.1, dt), 0.1505, 1e-6);
-  pid_controller.Reset();
-  EXPECT_NEAR(pid_controller.Control(-0.1, dt), -0.1505, 1e-6);
-  pid_controller.Reset();
-  EXPECT_NEAR(pid_controller.Control(500.0, dt), 750.3, 1e-6);
-  pid_controller.Reset();
-  EXPECT_EQ(pid_controller.SaturationStatus(), 1);
-  pid_controller.Reset();
-  EXPECT_NEAR(pid_controller.Control(-500.0, dt), -750.3, 1e-6);
-  EXPECT_EQ(pid_controller.SaturationStatus(), -1);
+  EXPECT_NEAR(pid_BC_controller.Control(0.0, dt), 0.0, 1e-6);
+  pid_BC_controller.Reset();
+  EXPECT_NEAR(pid_BC_controller.Control(0.1, dt), 0.151, 1e-6);
+  pid_BC_controller.Reset();
+  EXPECT_NEAR(pid_BC_controller.Control(-0.1, dt), -0.151, 1e-6);
+  pid_BC_controller.Reset();
+  EXPECT_NEAR(pid_BC_controller.Control(500.0, dt), 2.8, 1e-6);
+  EXPECT_EQ(pid_BC_controller.IntegratorSaturationStatus(), 1);
+  pid_BC_controller.Reset();
+  EXPECT_NEAR(pid_BC_controller.Control(-500.0, dt), -2.8, 1e-6);
+  EXPECT_EQ(pid_BC_controller.IntegratorSaturationStatus(), -1);
 }
 
 }  // namespace control
