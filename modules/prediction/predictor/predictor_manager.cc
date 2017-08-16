@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/vehicle/free_move_predictor.h"
 #include "modules/prediction/predictor/pedestrian/regional_predictor.h"
@@ -94,38 +95,44 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
   Predictor *predictor = nullptr;
   for (const auto& perception_obstacle :
       perception_obstacles.perception_obstacle()) {
+    PredictionObstacle prediction_obstacle;
     int id = perception_obstacle.id();
     Obstacle* obstacle = container->GetObstacle(id);
-    CHECK_NOTNULL(obstacle);
-    switch (perception_obstacle.type()) {
-      case PerceptionObstacle::VEHICLE: {
-        if (obstacle->IsOnLane()) {
-          predictor = GetPredictor(vehicle_on_lane_predictor_);
-        } else {
-          predictor = GetPredictor(vehicle_off_lane_predictor_);
+    if (obstacle != nullptr) {
+      switch (perception_obstacle.type()) {
+        case PerceptionObstacle::VEHICLE: {
+          if (obstacle->IsOnLane()) {
+            predictor = GetPredictor(vehicle_on_lane_predictor_);
+          } else {
+            predictor = GetPredictor(vehicle_off_lane_predictor_);
+          }
+          break;
         }
-        break;
-      }
-      case PerceptionObstacle::PEDESTRIAN: {
-        predictor = GetPredictor(pedestrian_predictor_);
-        break;
-      }
-      default: {
-        if (obstacle->IsOnLane()) {
-          predictor = GetPredictor(vehicle_on_lane_predictor_);
-        } else {
-          predictor = GetPredictor(vehicle_off_lane_predictor_);
+        case PerceptionObstacle::PEDESTRIAN: {
+          predictor = GetPredictor(pedestrian_predictor_);
+          break;
         }
-        break;
+        default: {
+          if (obstacle->IsOnLane()) {
+            predictor = GetPredictor(vehicle_on_lane_predictor_);
+          } else {
+            predictor = GetPredictor(vehicle_off_lane_predictor_);
+          }
+          break;
+        }
+      }
+
+      if (predictor != nullptr) {
+        predictor->Predict(obstacle);
+        prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
       }
     }
-    PredictionObstacle prediction_obstacle;
-    if (predictor != nullptr) {
-      predictor->Predict(obstacle);
-      prediction_obstacle.CopyFrom(predictor->prediction_obstacle());
-    }
+
+    prediction_obstacle.set_predicted_period(FLAGS_prediction_duration);
+    prediction_obstacle.set_time_stamp(perception_obstacle.timestamp());
     prediction_obstacle.mutable_perception_obstacle()->
         CopyFrom(perception_obstacle);
+
     prediction_obstacles_.add_prediction_obstacle()->
         CopyFrom(prediction_obstacle);
   }
