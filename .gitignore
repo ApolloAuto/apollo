@@ -64,5 +64,16 @@ docs/doxygen
 # Caffe
 third_party/caffe.BUILD
 
+# Esd can lib
+third_party/can_card_library/esd_can/include
+third_party/can_card_library/esd_can/lib
+
+# Map data files
+modules/map/data
+!modules/map/data/base_map.txt
+!modules/map/data/garage_routing.pb.txt
+!modules/map/data/routing_map.txt
+!modules/map/data/sim_map.txt
+
 # python proto
 py_proto
