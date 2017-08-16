@@ -45,7 +45,10 @@ class GarageTest : public PlanningTestBase {
   }
 };
 
-TEST_F(GarageTest, Stop) {
+/*
+ * test stop for not-nudgable obstacle
+ */
+TEST_F(GarageTest, stop) {
   FLAGS_test_prediction_file =
       "modules/planning/testdata/garage_test/"
       "stop_obstacle_prediction.pb.txt";
@@ -55,6 +58,20 @@ TEST_F(GarageTest, Stop) {
   FLAGS_test_chassis_file =
       "modules/planning/testdata/garage_test/"
       "stop_obstacle_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test follow head_vehicle
+ */
+TEST_F(GarageTest, follow) {
+  FLAGS_test_prediction_file =
+      "modules/planning/testdata/garage_test/follow_prediction.pb.txt";
+  FLAGS_test_localization_file =
+      "modules/planning/testdata/garage_test/follow_localization.pb.txt";
+  FLAGS_test_chassis_file =
+      "modules/planning/testdata/garage_test/follow_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
