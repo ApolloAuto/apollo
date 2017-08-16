@@ -331,5 +331,27 @@ TEST(MergeLateralDecision, AllDecisions) {
           .has_stop());
 }
 
+TEST(PathObstacleTest, add_decision_test) {
+  PathObstacle path_obstacle;
+  EXPECT_FALSE(path_obstacle.HasLateralDecision());
+  EXPECT_FALSE(path_obstacle.HasLongitudinalDecision());
+
+  ObjectDecisionType decision;
+
+  decision.mutable_stop();
+  path_obstacle.AddDecision("test_stop", decision);
+
+  EXPECT_FALSE(path_obstacle.HasLateralDecision());
+  EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+  EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
+
+  decision.mutable_ignore();
+  path_obstacle.AddDecision("test_ignore", decision);
+  EXPECT_TRUE(path_obstacle.HasLateralDecision());
+  EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+  EXPECT_TRUE(path_obstacle.LateralDecision().has_ignore());
+  EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
+}
+
 }  // namespace planning
 }  // namespace apollo
