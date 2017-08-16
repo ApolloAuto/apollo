@@ -183,39 +183,31 @@ bool PathObstacle::HasLongitudinalDecision() const {
 
 const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
 
-void PathObstacle::AddLateralDecision(
-    const std::string& decider_tag,
-    const ObjectDecisionType& lateral_decision) {
-  DCHECK(IsLateralDecision(lateral_decision)) << "Unkown decision type: "
-                                              << lateral_decision.DebugString();
+void PathObstacle::AddDecision(const std::string& decider_tag,
+                               const ObjectDecisionType& decision) {
+  bool is_lateral = IsLateralDecision(decision);
+  bool is_longitudinal = IsLongitudinalDecision(decision);
 
-  const auto merged_decision =
-      MergeLateralDecision(lateral_decision_, lateral_decision);
-  if (lateral_decision.has_ignore()) {
-    lateral_decision_ = merged_decision;
-    has_lateral_decision_ = true;
-  } else if (IsLongitudinalDecision(merged_decision)) {
-    longitudinal_decision_ =
-        MergeLongitudinalDecision(longitudinal_decision_, merged_decision);
-    has_longitudinal_decision_ = true;
-  } else {
-    lateral_decision_ = merged_decision;
-    has_lateral_decision_ = true;
+  if (is_lateral) {
+    const auto merged_decision =
+        MergeLateralDecision(lateral_decision_, decision);
+    if (IsLongitudinalDecision(merged_decision)) {
+      longitudinal_decision_ =
+          MergeLongitudinalDecision(longitudinal_decision_, merged_decision);
+    } else {
+      lateral_decision_ = merged_decision;
+      has_lateral_decision_ = true;
+    }
   }
-  decisions_.push_back(lateral_decision);
-  decider_tags_.push_back(decider_tag);
-}
-
-void PathObstacle::AddLongitudinalDecision(
-    const std::string& decider_tag,
-    const ObjectDecisionType& longitudinal_decision) {
-  DCHECK(IsLongitudinalDecision(longitudinal_decision))
-      << "Unkown decision type: " << longitudinal_decision.DebugString();
-
-  longitudinal_decision_ =
-      MergeLongitudinalDecision(longitudinal_decision_, longitudinal_decision);
-  has_longitudinal_decision_ = true;
-  decisions_.push_back(longitudinal_decision);
+  if (is_longitudinal) {
+    longitudinal_decision_ =
+        MergeLongitudinalDecision(longitudinal_decision_, decision);
+    has_longitudinal_decision_ = true;
+  }
+  if (!(is_lateral || is_longitudinal)) {
+    DCHECK(false) << "Unkown decision type: " << decision.DebugString();
+  }
+  decisions_.push_back(decision);
   decider_tags_.push_back(decider_tag);
 }
 

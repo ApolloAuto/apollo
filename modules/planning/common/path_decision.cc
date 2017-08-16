@@ -51,27 +51,15 @@ PathObstacle *PathDecision::Find(const std::string &object_id) {
   return path_obstacles_.Find(object_id);
 }
 
-bool PathDecision::AddLateralDecision(
-    const std::string &tag, const std::string &object_id,
-    const ObjectDecisionType &lateral_decision) {
+bool PathDecision::AddDecision(const std::string &tag,
+                               const std::string &object_id,
+                               const ObjectDecisionType &decision) {
   auto *path_obstacle = path_obstacles_.Find(object_id);
   if (!path_obstacle) {
     AERROR << "failed to find obstacle";
     return false;
   }
-  path_obstacle->AddLateralDecision(tag, lateral_decision);
-  return true;
-}
-
-bool PathDecision::AddLongitudinalDecision(
-    const std::string &tag, const std::string &object_id,
-    const ObjectDecisionType &longitudinal_decision) {
-  auto *path_obstacle = path_obstacles_.Find(object_id);
-  if (!path_obstacle) {
-    AERROR << "failed to find obstacle";
-    return false;
-  }
-  path_obstacle->AddLongitudinalDecision(tag, longitudinal_decision);
+  path_obstacle->AddDecision(tag, decision);
   return true;
 }
 
