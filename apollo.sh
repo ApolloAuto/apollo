@@ -122,14 +122,21 @@ function apollo_build() {
     fail 'Build failed!'
   fi
   #build python proto
-  chmod -R +w bazel-genfiles/modules
-  PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
-  find modules/ -name "*.proto" | grep -v gnss | xargs ${PROTOC} --python_out=bazel-genfiles
-  find bazel-genfiles/* -type d -exec touch "{}/__init__.py" \;
+  build_py_proto
   if [ -d "/home/tmp/conf" ];then
     sudo cp -r /home/tmp/conf bazel-apollo/external/ros/share/gnss_driver/
     sudo chown -R ${DOCKER_USER}:${DOCKER_GRP} "bazel-apollo/external/ros/share/gnss_driver/conf"
   fi
+}
+
+function build_py_proto() {
+  if [ -d "./py_proto" ];then
+    rm -rf py_proto
+  fi
+  mkdir py_proto
+  PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
+  find modules/ -name "*.proto" | grep -v gnss | xargs ${PROTOC} --python_out=py_proto
+  find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 
 function check() {
@@ -227,7 +234,8 @@ function release() {
     mkdir -p $MODULES_DIR/monitor/hwmonitor/hw/tools/
     cp bazel-bin/modules/monitor/hwmonitor/hw/tools/esdcan_test_app $MODULES_DIR/monitor/hwmonitor/hw/tools/
   fi
-  cp -r bazel-genfiles/* $LIB_DIR
+  cp -r bazel-genfiles/external $LIB_DIR
+  cp -r py_proto/modules $LIB_DIR
 
   # doc
   cp -r docs $ROOT_DIR
@@ -514,6 +522,9 @@ function main() {
       ;;
     buildgnss)
       build_gnss
+      ;;
+    build_py)
+      build_py_proto
       ;;
     buildvelodyne)
       build_velodyne
