@@ -33,7 +33,6 @@ enum ErrorCode {
 
   // Planning module error codes start from here
   PLANNING_ERROR = 6000;
-  PLANNING_SKIP = 6001;
 
   // HDMap module error codes start from here
   HDMAP_DATA_ERROR = 7000;
