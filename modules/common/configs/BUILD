@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "config_gflags.h",
     ],
+    data = [
+        "//modules/common/data:global_flagfile",
+    ],
     deps = [
         "//external:gflags",
     ],

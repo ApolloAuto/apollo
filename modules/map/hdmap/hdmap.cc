@@ -15,10 +15,7 @@ limitations under the License.
 
 #include "modules/map/hdmap/hdmap.h"
 
-#include "gflags/gflags.h"
-
-DEFINE_string(default_map_file, "modules/map/data/base_map.txt",
-              "Default map file");
+#include "modules/common/configs/config_gflags.h"
 
 namespace apollo {
 namespace hdmap {
@@ -31,11 +28,11 @@ std::unique_ptr<HDMap> HDMap::CreateMap(const std::string& map_filename) {
 }
 
 void HDMap::SetDefaultMap(const std::string& map_filename) {
-  FLAGS_default_map_file = map_filename;
+  FLAGS_map_file_path = map_filename;
 }
 
 const HDMap& HDMap::DefaultMap() {
-  static const HDMap* hdmap = CreateMap(FLAGS_default_map_file).release();
+  static const HDMap* hdmap = CreateMap(FLAGS_map_file_path).release();
   return *hdmap;
 }
 
