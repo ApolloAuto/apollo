@@ -401,7 +401,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
         traj_pt->set_z(pt);
       }
     }
-    obstacle->set_time_stamp(123.456);
+    obstacle->set_timestamp(123.456);
   }
   sim_world_service_->UpdateSimulationWorld(prediction_obstacles);
   sim_world_service_->world_.clear_object();
