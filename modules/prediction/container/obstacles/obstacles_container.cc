@@ -87,7 +87,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
 bool ObstaclesContainer::IsPredictable(
     const PerceptionObstacle& perception_obstacle) {
   if (!perception_obstacle.has_type() ||
-      perception_obstacle.type() == PerceptionObstacle::UNKNOWN_MOVABLE) {
+      perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
     return false;
   }
   return true;

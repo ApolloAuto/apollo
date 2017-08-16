@@ -30,6 +30,7 @@ cc_library(
         "//modules/prediction/predictor/vehicle:lane_sequence_predictor",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/common:prediction_gflags",
         "@glog//:glog",
     ],
 )
