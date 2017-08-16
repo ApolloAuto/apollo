@@ -161,27 +161,21 @@ bool DPRoadGraph::GenerateMinCostPath(
   return true;
 }
 
-bool DPRoadGraph::ComputeObjectDecision(
+bool DPRoadGraph::MakeObjectDecision(
     const PathData &path_data, const ConstPathObstacleList &path_obstacles,
-    IdDecisionList *const decisions) {
-  DCHECK_NOTNULL(decisions);
-  if (!MakeStaticObstacleDecision(path_data, path_obstacles, decisions)) {
+    PathDecision *const path_decision) {
+  DCHECK_NOTNULL(path_decision);
+  if (!MakeStaticObstacleDecision(path_data, path_obstacles, path_decision)) {
     AERROR << "Failed to make decisions for static obstacles";
     return false;
   }
-  // TODO(all) enable this function call when nudge dynamic obstacle is
-  // implemented.
-  // if (!MakeDynamicObstcleDecision(path_data, path_obstacles, decisions)) {
-  //   AERROR << "Failed to make decisions for dynamic obstacles";
-  //   return false;
-  // }
   return true;
 }
 
 bool DPRoadGraph::MakeStaticObstacleDecision(
     const PathData &path_data, const ConstPathObstacleList &path_obstacles,
-    IdDecisionList *const decisions) {
-  DCHECK_NOTNULL(decisions);
+    PathDecision *const path_decision) {
+  DCHECK_NOTNULL(path_decision);
   std::vector<common::SLPoint> adc_sl_points;
   std::vector<common::math::Box2d> adc_bounding_box;
   const auto &vehicle_param =
@@ -221,6 +215,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
     object_decision.mutable_ignore();
 
     const auto &sl_boundary = path_obstacle->perception_sl_boundary();
+    bool has_stop = false;
     for (std::size_t j = 0; j < adc_sl_points.size(); ++j) {
       const auto &adc_sl = adc_sl_points[j];
       if (adc_sl.s() + adc_max_edge_to_center_dist +
@@ -257,7 +252,8 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
 
       if (!left_nudgable && !right_nudgable) {
         // STOP: and break
-        ObjectStop *object_stop_ptr = object_decision.mutable_stop();
+        ObjectDecisionType stop_decision;
+        ObjectStop *object_stop_ptr = stop_decision.mutable_stop();
         object_stop_ptr->set_distance_s(-FLAGS_stop_distance_obstacle);
         object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
 
@@ -266,7 +262,10 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
         object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
         object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
         object_stop_ptr->set_stop_heading(stop_ref_point.heading());
+        path_decision->AddLongitudinalDecision("DpRoadGraph", obstacle->Id(),
+                                               stop_decision);
 
+        has_stop = true;
         break;
       } else {
         // NUDGE: and continue to check potential STOP along the ref line
@@ -284,9 +283,10 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
         }
       }
     }
-
-    // set object_decision
-    decisions->emplace_back(obstacle->Id(), object_decision);
+    if (!has_stop) {
+      path_decision->AddLateralDecision("DpRoadGraph", obstacle->Id(),
+                                        object_decision);
+    }
   }
 
   return true;
@@ -294,7 +294,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
 
 bool DPRoadGraph::MakeDynamicObstcleDecision(
     const PathData &path_data, const ConstPathObstacleList &path_obstacles,
-    IdDecisionList *decisions) {
+    PathDecision *const path_decision) {
   // Compute dynamic obstacle decision
   const double interval = config_.eval_time_interval();
   const double total_time =

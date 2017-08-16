@@ -18,11 +18,11 @@
  * @file
  **/
 
-#include <unordered_map>
 #include <limits>
+#include <unordered_map>
 
-#include "modules/planning/common/path_obstacle.h"
 #include "modules/common/log.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -44,17 +44,10 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
 
 const std::string& PathObstacle::Id() const { return id_; }
 
-PathObstacle::PathObstacle() {
-  lateral_decision_.mutable_ignore();
-  longitudinal_decision_.mutable_ignore();
-}
-
 PathObstacle::PathObstacle(const planning::Obstacle* obstacle)
     : obstacle_(obstacle) {
   CHECK_NOTNULL(obstacle);
   id_ = obstacle_->Id();
-  lateral_decision_.mutable_ignore();
-  longitudinal_decision_.mutable_ignore();
 }
 
 bool PathObstacle::Init(const ReferenceLine* reference_line) {
@@ -103,6 +96,12 @@ bool PathObstacle::IsLongitudinalDecision(const ObjectDecisionType& decision) {
 
 ObjectDecisionType PathObstacle::MergeLongitudinalDecision(
     const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
+  if (lhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
+    return rhs;
+  }
+  if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
+    return lhs;
+  }
   auto lhs_iter =
       s_longitudinal_decision_safety_sorter_.find(lhs.object_tag_case());
   DCHECK(lhs_iter != s_longitudinal_decision_safety_sorter_.end())
@@ -129,11 +128,10 @@ ObjectDecisionType PathObstacle::MergeLongitudinalDecision(
     } else if (lhs.has_overtake()) {
       return lhs.overtake().distance_s() > rhs.overtake().distance_s() ? lhs
                                                                        : rhs;
+    } else {
+      DCHECK(false) << "Unknown decision";
     }
   }
-  DCHECK(false) << "Does not have rule to merge decision: "
-                << lhs.ShortDebugString()
-                << " and decision: " << rhs.ShortDebugString();
 }
 
 const ObjectDecisionType& PathObstacle::LongitudinalDecision() const {
@@ -144,8 +142,18 @@ const ObjectDecisionType& PathObstacle::LateralDecision() const {
   return lateral_decision_;
 }
 
+bool PathObstacle::IsIgnore() const {
+  return longitudinal_decision_.has_ignore() && lateral_decision_.has_ignore();
+}
+
 ObjectDecisionType PathObstacle::MergeLateralDecision(
     const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
+  if (lhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
+    return rhs;
+  }
+  if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
+    return lhs;
+  }
   auto lhs_iter = s_lateral_decision_safety_sorter_.find(lhs.object_tag_case());
   DCHECK(lhs_iter != s_lateral_decision_safety_sorter_.end())
       << "decision : " << lhs.ShortDebugString()
@@ -162,17 +170,12 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
     if (lhs.has_ignore()) {
       return rhs;
     } else if (lhs.has_nudge()) {
-      if (lhs.nudge().type() == rhs.nudge().type()) {
-        return std::fabs(lhs.nudge().distance_l()) >
-                       std::fabs(rhs.nudge().distance_l())
-                   ? lhs
-                   : rhs;
-      } else {
-        ObjectDecisionType stop_decision;
-        stop_decision.mutable_stop()->set_distance_s(
-            FLAGS_static_decision_stop_buffer);
-        return stop_decision;
-      }
+      DCHECK(lhs.nudge().type() == rhs.nudge().type())
+          << "could not merge left nudge and right nudge";
+      return std::fabs(lhs.nudge().distance_l()) >
+                     std::fabs(rhs.nudge().distance_l())
+                 ? lhs
+                 : rhs;
     }
   }
   DCHECK(false) << "Does not have rule to merge decision: "
@@ -180,48 +183,43 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
                 << " and decision: " << rhs.ShortDebugString();
 }
 
-bool PathObstacle::HasLateralDecision() const { return has_lateral_decision_; }
+bool PathObstacle::HasLateralDecision() const {
+  return lateral_decision_.object_tag_case() !=
+         ObjectDecisionType::OBJECT_TAG_NOT_SET;
+}
 
 bool PathObstacle::HasLongitudinalDecision() const {
-  return has_longitudinal_decision_;
+  return longitudinal_decision_.object_tag_case() !=
+         ObjectDecisionType::OBJECT_TAG_NOT_SET;
 }
 
 const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
 
-void PathObstacle::AddDecision(const std::string& decider_tag,
-                               const ObjectDecisionType& decision) {
-  if (decision.has_ignore()) {
-    if (!has_lateral_decision_) {
-      lateral_decision_ = decision;
-      has_lateral_decision_ = true;
-    }
-    if (!has_longitudinal_decision_) {
-      longitudinal_decision_ = decision;
-      has_longitudinal_decision_ = true;
-    }
-    return;
-  }
+void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
+                                           const ObjectDecisionType& decision) {
+  DCHECK(IsLongitudinalDecision(decision))
+      << "Decision: " << decision.ShortDebugString()
+      << " is not a longitudinal decision";
+  longitudinal_decision_ =
+      MergeLongitudinalDecision(longitudinal_decision_, decision);
+  ADEBUG << decider_tag << " added obstacle " << Id()
+         << " a longitudinal decision: " << decision.ShortDebugString()
+         << ". The merged decision is: "
+         << longitudinal_decision_.ShortDebugString();
+  decisions_.push_back(decision);
+  decider_tags_.push_back(decider_tag);
+}
 
-  if (IsLateralDecision(decision)) {
-    const auto merged_decision =
-        MergeLateralDecision(lateral_decision_, decision);
-    if (IsLongitudinalDecision(merged_decision)) {
-      longitudinal_decision_ =
-          MergeLongitudinalDecision(longitudinal_decision_, merged_decision);
-      has_longitudinal_decision_ = true;
-      lateral_decision_.mutable_ignore();
-      has_lateral_decision_ = true;
-    } else {
-      lateral_decision_ = merged_decision;
-      has_lateral_decision_ = true;
-    }
-  } else if (IsLongitudinalDecision(decision)) {
-    longitudinal_decision_ =
-        MergeLongitudinalDecision(longitudinal_decision_, decision);
-    has_longitudinal_decision_ = true;
-  } else {
-    DCHECK(false) << "Unkown decision type: " << decision.DebugString();
-  }
+void PathObstacle::AddLateralDecision(const std::string& decider_tag,
+                                      const ObjectDecisionType& decision) {
+  DCHECK(IsLateralDecision(decision))
+      << "Decision: " << decision.ShortDebugString()
+      << " is not a lateral decision";
+  lateral_decision_ = MergeLateralDecision(lateral_decision_, decision);
+  ADEBUG << decider_tag << " added obstacle " << Id()
+         << " a lateral decision: " << decision.ShortDebugString()
+         << ". The merged decision is: "
+         << lateral_decision_.ShortDebugString();
   decisions_.push_back(decision);
   decider_tags_.push_back(decider_tag);
 }
@@ -231,6 +229,15 @@ const std::string PathObstacle::DebugString() const {
   for (std::size_t i = 0; i < decisions_.size(); ++i) {
     ss << "id: " << id_ << " decision: " << decisions_[i].DebugString()
        << ", made by " << decider_tags_[i];
+  }
+  if (lateral_decision_.object_tag_case() !=
+      ObjectDecisionType::OBJECT_TAG_NOT_SET) {
+    ss << "lateral decision: " << lateral_decision_.ShortDebugString();
+  }
+  if (longitudinal_decision_.object_tag_case() !=
+      ObjectDecisionType::OBJECT_TAG_NOT_SET) {
+    ss << "longitutional decision: "
+       << longitudinal_decision_.ShortDebugString();
   }
   return ss.str();
 }

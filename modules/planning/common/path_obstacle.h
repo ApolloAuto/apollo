@@ -23,8 +23,8 @@
 
 #include <list>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "gtest/gtest_prod.h"
 
@@ -61,8 +61,7 @@ namespace planning {
  */
 class PathObstacle {
  public:
-  PathObstacle();
-
+  PathObstacle() = default;
   explicit PathObstacle(const planning::Obstacle* obstacle);
 
   bool Init(const ReferenceLine* reference_line);
@@ -71,23 +70,6 @@ class PathObstacle {
 
   const planning::Obstacle* Obstacle() const;
 
-  /**
-   * @class Add decision to this obstacle. This function will
-   * also calculate the merged decision. i.e., if there are multiple lateral
-   * decisions or longitudinal decisions, this function will merge them into
-   * one. The rule of merging decisions are as follows
-   * * Priorities of different decisions: stop > yield > follow > overtake >
-   * ignore
-   * * Priorities of the same decisions: decision1.distance_s <
-   * decision2.distance_s
-   * @param decider_tag identifies which component added this decision
-   * @param the decision to be added to this path obstacle.
-   **/
-  void AddDecision(const std::string& decider_tag,
-                   const ObjectDecisionType& decision);
-
-  bool HasLateralDecision() const;
-  bool HasLongitudinalDecision() const;
   /**
    * return the merged lateral decision
    * Lateral decision is one of {Nudge, Ignore}
@@ -103,6 +85,23 @@ class PathObstacle {
   const std::string DebugString() const;
 
   const SLBoundary& perception_sl_boundary() const;
+
+  void AddLongitudinalDecision(const std::string& decider_tag,
+                               const ObjectDecisionType& decision);
+
+  void AddLateralDecision(const std::string& decider_tag,
+                          const ObjectDecisionType& decision);
+  bool HasLateralDecision() const;
+
+  bool HasLongitudinalDecision() const;
+
+  /**
+   * @brief Check if this object can be safely ignored.
+   * The object will be ignored if the lateral decision is ignore and the
+   * longitudinal decision is ignore
+   *  return longitudinal_decision_ == ignore && lateral_decision == ignore.
+   */
+  bool IsIgnore() const;
 
  private:
   bool InitPerceptionSLBoundary(const ReferenceLine* reference_line);
@@ -136,9 +135,7 @@ class PathObstacle {
   // StGraphBoundary st_boundary_;
 
   ObjectDecisionType lateral_decision_;
-  bool has_lateral_decision_ = false;
   ObjectDecisionType longitudinal_decision_;
-  bool has_longitudinal_decision_ = false;
 
   struct ObjectTagCaseHash {
     std::size_t operator()(
