@@ -17,6 +17,7 @@
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 
 #include <fstream>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_tokenizer.h"

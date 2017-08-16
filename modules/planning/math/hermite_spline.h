@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
 #define MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
 
+#include <utility>
 #include <array>
 
 #include "modules/common/log.h"
@@ -28,8 +29,8 @@
 namespace apollo {
 namespace planning {
 
-//Hermite spline implementation that works for 1d and 2d space interpolation.
-//Valid input type T: double, Eigen::Vector2d
+// Hermite spline implementation that works for 1d and 2d space interpolation.
+// Valid input type T: double, Eigen::Vector2d
 template <typename T, std::uint32_t N>
 class HermiteSpline {
  public:

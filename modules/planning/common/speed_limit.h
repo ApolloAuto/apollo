@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
 #define MODULES_PLANNING_COMMON_SPEED_LIMIT_H_
 
+#include <utility>
 #include <vector>
 
 namespace apollo {

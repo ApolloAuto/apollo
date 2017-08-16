@@ -24,6 +24,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "gtest/gtest_prod.h"
 
@@ -62,7 +63,7 @@ class PathObstacle {
  public:
   PathObstacle();
 
-  PathObstacle(const planning::Obstacle* obstacle);
+  explicit PathObstacle(const planning::Obstacle* obstacle);
 
   bool Init(const ReferenceLine* reference_line);
 

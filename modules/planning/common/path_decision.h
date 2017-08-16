@@ -36,7 +36,8 @@ namespace planning {
 
 class PathDecision {
  public:
-  PathDecision(const std::vector<const PathObstacle *> &path_obstacles);
+  explicit PathDecision(
+      const std::vector<const PathObstacle *> &path_obstacles);
 
   PathDecision(const std::vector<const Obstacle *> &obstacles,
                const ReferenceLine &reference_line);

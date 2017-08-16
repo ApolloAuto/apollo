@@ -43,7 +43,7 @@ std::vector<common::TrajectoryPoint> compute_reinit_stitching_trajectory() {
 
   init_point.set_relative_time(0.0);
   return std::vector<common::TrajectoryPoint>(1, init_point);
-};
+}
 
 // Planning from current vehicle state:
 // if 1. the auto-driving mode is off or

@@ -37,9 +37,10 @@ PathData* PlanningData::mutable_path_data() { return &path_data_; }
 
 SpeedData* PlanningData::mutable_speed_data() { return &speed_data_; }
 
-bool PlanningData::CombinePathAndSpeedProfile(const double time_resolution,
-                             const double relative_time,
-                             DiscretizedTrajectory* ptr_discretized_trajectory) {
+bool PlanningData::CombinePathAndSpeedProfile(
+    const double time_resolution,
+    const double relative_time,
+    DiscretizedTrajectory* ptr_discretized_trajectory) {
   CHECK(time_resolution > 0.0);
   CHECK(ptr_discretized_trajectory != nullptr);
 

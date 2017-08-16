@@ -24,6 +24,7 @@
 
 #include <cmath>
 #include <vector>
+#include <algorithm>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"

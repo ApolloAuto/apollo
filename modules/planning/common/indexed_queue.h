@@ -24,6 +24,7 @@
 #include <memory>
 #include <queue>
 #include <unordered_map>
+#include <utility>
 
 namespace apollo {
 namespace planning {
@@ -31,7 +32,8 @@ namespace planning {
 template <typename I, typename T>
 class IndexedQueue {
  public:
-  IndexedQueue(std::size_t max_queue_size) : max_queue_size_(max_queue_size){};
+  explicit IndexedQueue(std::size_t max_queue_size) :
+      max_queue_size_(max_queue_size) {}
   const T *Find(const I id) const {
     auto iter = map_.find(id);
     if (iter == map_.end()) {
