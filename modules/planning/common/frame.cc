@@ -112,7 +112,21 @@ const ADCTrajectory &Frame::GetADCTrajectory() const { return trajectory_pb_; }
 
 ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
 
-PathDecision *Frame::path_decision() { return path_decision_.get(); }
+PathDecision *Frame::path_decision() { return path_decision_; }
+
+bool Frame::InitReferenceLineInfo(
+    const std::vector<ReferenceLine> &reference_lines) {
+  reference_line_list_.clear();
+  for (const auto &reference_line : reference_lines) {
+    reference_line_list_.emplace_back(reference_line);
+    auto &info = reference_line_list_.back();
+    if (!info.AddObstacles(obstacles_.Items())) {
+      AERROR << "Failed to add obstacles to reference line";
+      return false;
+    }
+  }
+  return true;
+}
 
 bool Frame::Init(const PlanningConfig &config) {
   if (!pnc_map_) {
@@ -132,15 +146,17 @@ bool Frame::Init(const PlanningConfig &config) {
            << init_pose_.DebugString();
     return false;
   }
-  // TODO(all) add fuctions to help select the best reference_line(s)
-  reference_line_ = reference_lines.front();
 
   if (FLAGS_enable_prediction) {
     CreatePredictionObstacles(prediction_);
   }
 
-  path_decision_ = common::util::make_unique<PathDecision>(obstacles_.Items(),
-                                                           reference_line_);
+  InitReferenceLineInfo(reference_lines);
+  reference_line_ = reference_lines.front();
+
+  // FIXME(all) remove path decision from Frame.
+  path_decision_ = reference_line_list_[0].path_decision();
+  CHECK(path_decision_->path_obstacles().Items().size() > 0);
 
   if (FLAGS_enable_traffic_decision) {
     MakeTrafficDecision(routing_response_, reference_line_);

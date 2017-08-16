@@ -36,11 +36,12 @@ namespace planning {
 
 class PathDecision {
  public:
-  explicit PathDecision(
+  PathDecision() = default;
+
+  bool AddPathObstacles(
       const std::vector<const PathObstacle *> &path_obstacles);
 
-  PathDecision(const std::vector<const Obstacle *> &obstacles,
-               const ReferenceLine &reference_line);
+  bool AddPathObstacle(std::unique_ptr<PathObstacle> &&path_obstacle);
 
   const IndexedList<std::string, PathObstacle> &path_obstacles() const;
 
@@ -51,10 +52,6 @@ class PathDecision {
                                const ObjectDecisionType &decision);
 
   PathObstacle *Find(const std::string &object_id);
-
- private:
-  void Init(const std::vector<const Obstacle *> &obstacles,
-            const ReferenceLine &reference_line);
 
  private:
   IndexedList<std::string, PathObstacle> path_obstacles_;
