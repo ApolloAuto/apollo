@@ -16,6 +16,7 @@
 
 #include "modules/control/common/pid_controller.h"
 
+#include <iostream>
 #include <string>
 
 #include "gtest/gtest.h"
@@ -71,11 +72,10 @@ TEST_F(PidControllerTest, SpeedPidController) {
   EXPECT_NEAR(pid_controller.Control(-0.1, dt), -0.1505, 1e-6);
   pid_controller.Reset();
   EXPECT_NEAR(pid_controller.Control(500.0, dt), 750.3, 1e-6);
-  pid_controller.Reset();
-  EXPECT_EQ(pid_controller.SaturationStatus(), 1);
+  EXPECT_EQ(pid_controller.IntegratorSaturationStatus(), 1);
   pid_controller.Reset();
   EXPECT_NEAR(pid_controller.Control(-500.0, dt), -750.3, 1e-6);
-  EXPECT_EQ(pid_controller.SaturationStatus(), -1);
+  EXPECT_EQ(pid_controller.IntegratorSaturationStatus(), -1);
 }
 
 }  // namespace control

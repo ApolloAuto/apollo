@@ -39,9 +39,9 @@ namespace control {
 class PIDController {
  public:
   /**
- * @brief initialize pid controller
- * @param pid_conf configuration for pid controller
- */
+   * @brief initialize pid controller
+   * @param pid_conf configuration for pid controller
+   */
   void Init(const PidConf &pid_conf);
 
   /**
@@ -69,7 +69,7 @@ class PIDController {
    * @brief get saturation status
    * @return saturation status
    */
-  int SaturationStatus() const;
+  int IntegratorSaturationStatus() const;
 
   /**
    * @brief get status that if integrator is hold
@@ -77,7 +77,7 @@ class PIDController {
    */
   bool IntegratorHold() const;
 
- private:
+ protected:
   double kp_ = 0.0;
   double ki_ = 0.0;
   double kd_ = 0.0;
@@ -85,12 +85,12 @@ class PIDController {
   double previous_error_ = 0.0;
   double previous_output_ = 0.0;
   double integral_ = 0.0;
-  double saturation_high_ = 0.0;
-  double saturation_low_ = 0.0;
+  double integrator_saturation_high_ = 0.0;
+  double integrator_saturation_low_ = 0.0;
   bool first_hit_ = false;
   bool integrator_enabled_ = false;
   bool integrator_hold_ = false;
-  int saturation_status_ = 0;
+  int integrator_saturation_status_ = 0;
 };
 
 }  // namespace control
