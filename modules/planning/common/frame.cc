@@ -44,10 +44,6 @@ FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
 
 Frame::Frame(const uint32_t sequence_num) : sequence_num_(sequence_num) {
-  DCHECK(common::util::GetProtoFromFile(
-      FLAGS_reference_line_smoother_config_file, &smoother_config_))
-      << "Failed to init reference line smoother config with file "
-      << FLAGS_reference_line_smoother_config_file;
 }
 
 void Frame::SetVehicleInitPose(const localization::Pose &pose) {
@@ -122,7 +118,7 @@ ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
 
 PathDecision *Frame::path_decision() { return path_decision_.get(); }
 
-bool Frame::Init() {
+bool Frame::Init(const PlanningConfig& config) {
   if (!pnc_map_) {
     AERROR << "map is null, call SetMap() first";
     return false;
@@ -132,6 +128,7 @@ bool Frame::Init() {
     AERROR << "init point is not set";
     return false;
   }
+  smoother_config_ = config.reference_line_smoother_config();
   std::vector<ReferenceLine> reference_lines;
   if (!CreateReferenceLineFromRouting(init_pose_.position(), routing_response_,
                                       &reference_lines)) {
