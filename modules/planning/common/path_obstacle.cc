@@ -18,10 +18,10 @@
  * @file
  **/
 
-#include "modules/planning/common/path_obstacle.h"
-
+#include <unordered_map>
 #include <limits>
 
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 

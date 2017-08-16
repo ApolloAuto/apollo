@@ -113,7 +113,8 @@ bool QpSplinePathGenerator::Generate(
     double dl = spline.Derivative(s);
     double ddl = spline.SecondOrderDerivative(s);
     ReferencePoint ref_point = reference_line_.get_reference_point(s);
-    Eigen::Vector2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
+    Eigen::Vector2d xy_point =
+        CartesianFrenetConverter::CalculateCartesianPoint(
         ref_point.heading(), {ref_point.x(), ref_point.y()},
         l);
     xy_point[0] = xy_point.x() - x_diff;

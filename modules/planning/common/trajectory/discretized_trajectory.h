@@ -62,7 +62,8 @@ class DiscretizedTrajectory : public Trajectory {
   template <typename Iter>
   void PrependTrajectoryPoints(Iter begin, Iter end) {
     if (!trajectory_points_.empty() && begin != end) {
-      CHECK((end - 1)->relative_time() < trajectory_points_.front().relative_time());
+      CHECK((end - 1)->relative_time()
+                < trajectory_points_.front().relative_time());
     }
     trajectory_points_.insert(trajectory_points_.begin(), begin, end);
   }

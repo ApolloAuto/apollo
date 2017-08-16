@@ -23,9 +23,10 @@
 
 #include <memory>
 #include <vector>
+#include <limits>
+#include <string>
 
 #include "modules/planning/proto/planning.pb.h"
-
 #include "modules/common/math/polygon2d.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/optimizer/st_graph/st_graph_point.h"
@@ -55,7 +56,7 @@ class StGraphBoundary : public common::math::Polygon2d {
 
   ~StGraphBoundary() = default;
 
-  // TODO: add this function.
+  // TODO(all): add this function.
   // bool IsEmpty() const { return points.empty(); }
   bool IsPointInBoundary(const StGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;

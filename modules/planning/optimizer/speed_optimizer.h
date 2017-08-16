@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_OPTIMIZER_SPEED_OPTIMIZER_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/planning/optimizer/optimizer.h"
 
@@ -50,7 +51,6 @@ class SpeedOptimizer : public Optimizer {
     const SpeedLimit& speed_limits, const SpeedData& speed_data);
 
   void RecordDebugInfo(const SpeedData& speed_data);
-
 };
 
 }  // namespace planning

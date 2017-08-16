@@ -22,6 +22,9 @@
 #define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_
 
 #include <vector>
+#include <utility>
+#include <limits>
+#include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
