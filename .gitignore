@@ -64,3 +64,5 @@ docs/doxygen
 # Caffe
 third_party/caffe.BUILD
 
+# python proto
+py_proto
