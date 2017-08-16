@@ -58,12 +58,7 @@ class DpStSpeedTest : public PlanningTestBase {
   }
 
   virtual void SetUp() {
-    google::InitGoogleLogging("DpStSpeedTest");
-    PlanningTestBase::SetUp();
-    RunPlanning();
-    const auto* frame = planning_.GetFrame();
-    reference_line_ = &(frame->reference_line());
-    SetPathDataWithStraightLine();
+    FLAGS_test_data_dir = "modules/planning/testdata/dp_st_speed_test";
   }
 
  protected:
@@ -74,6 +69,9 @@ class DpStSpeedTest : public PlanningTestBase {
 };
 
 TEST_F(DpStSpeedTest, dp_st_graph_test) {
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+
   DpStSpeedConfig dp_st_speed_config;
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
