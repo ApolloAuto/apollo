@@ -27,68 +27,38 @@ namespace hdmap {
 namespace adapter {
 
 struct ProtoData {
-    PbHeader header;
-    std::unordered_map<std::string, PbLane> pb_lanes;
-    std::unordered_map<std::string, PbCrosswalk> pb_crosswalks;
-    std::unordered_map<std::string, PbClearArea> pb_clear_areas;
-    std::unordered_map<std::string, PbSpeedBump> pb_speed_bumps;
-    std::unordered_map<std::string, PbJunction> pb_junction;
-    std::unordered_map<std::string, PbSignal> pb_signals;
-    std::unordered_map<std::string, PbStopSign> pb_stop_signs;
-    std::unordered_map<std::string, PbYieldSign> pb_yield_signs;
-    std::unordered_map<std::string, PbOverlap> pb_overlaps;
-    std::unordered_map<std::string, PbJunction> pb_junctions;
-    std::unordered_map<std::string, StopLineInternal> pb_stop_lines;
+  PbHeader header;
+  std::unordered_map<std::string, PbLane> pb_lanes;
+  std::unordered_map<std::string, PbRoad> pb_roads;
+  std::unordered_map<std::string, PbCrosswalk> pb_crosswalks;
+  std::unordered_map<std::string, PbClearArea> pb_clear_areas;
+  std::unordered_map<std::string, PbSpeedBump> pb_speed_bumps;
+  std::unordered_map<std::string, PbJunction> pb_junction;
+  std::unordered_map<std::string, PbSignal> pb_signals;
+  std::unordered_map<std::string, PbStopSign> pb_stop_signs;
+  std::unordered_map<std::string, PbYieldSign> pb_yield_signs;
+  std::unordered_map<std::string, PbOverlap> pb_overlaps;
+  std::unordered_map<std::string, PbJunction> pb_junctions;
+  std::unordered_map<std::string, StopLineInternal> pb_stop_lines;
 };
 
 class ProtoOrganization {
  public:
-    ProtoOrganization();
-    explicit ProtoOrganization(::apollo::hdmap::Map* pb_map);
-    ~ProtoOrganization();
+  ProtoOrganization();
+  ~ProtoOrganization();
 
  public:
-    void load_data();
-
-    PbHeader get_header();
-
-    std::unordered_map<std::string, Road> get_roads();
-
-    std::vector<PbCrosswalk> get_crosswalks();
-    std::vector<PbClearArea> get_clear_areas();
-    std::vector<PbSpeedBump> get_speed_bumps();
-    std::vector<StopLineInternal> get_stop_lines();
-
-    std::vector<TrafficLightInternal> get_traffic_lights();
-    std::vector<StopSignInternal> get_stop_signs();
-    std::vector<YieldSignInternal> get_yield_signs();
-
-    std::vector<JunctionInternal> get_junctions();
-
-    void get_road_elements(std::vector<Road>* roads,
+  void get_road_elements(std::vector<RoadInternal>* roads,
                         ProtoData* proto_data);
-    void get_junction_elements(const std::vector<JunctionInternal>& junctions,
+  void get_junction_elements(const std::vector<JunctionInternal>& junctions,
                         ProtoData* proto_data);
-    void get_overlap_elements(const std::vector<Road>& roads,
+  void get_overlap_elements(const std::vector<RoadInternal>& roads,
                         const std::vector<JunctionInternal>& junctions,
                         ProtoData* proto_data);
-    void output_data(const ProtoData& proto_data, ::apollo::hdmap::Map* pb_map);
-
-    bool is_road_in_junction(const std::string& road_id);
-    std::string get_road_junction_id(const std::string& road_id);
+  void output_data(const ProtoData& proto_data, ::apollo::hdmap::Map* pb_map);
 
  private:
-    bool stop_line_in_lane_boundary(const PbCurve& stop_line,
-                                    const PbLane& lane);
-    bool point_in_lane_boundary(const PbPoint3D& pt,
-                                const PbLane& lane);
-
- private:
-    ::apollo::hdmap::Map* _pb_map;
-    ProtoData   _pb_map_data;
-    std::vector<StopLineInternal> _stop_lines;
-    std::unordered_map<std::string,
-                    std::unordered_set<std::string> > _road_in_junctions;
+  ProtoData   _pb_map_data;
 };
 
 }  // namespace adapter

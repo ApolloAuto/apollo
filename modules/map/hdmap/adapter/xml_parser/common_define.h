@@ -25,6 +25,8 @@ namespace hdmap {
 namespace adapter {
 
 typedef ::apollo::hdmap::Header        PbHeader;
+typedef ::apollo::hdmap::Road          PbRoad;
+typedef ::apollo::hdmap::RoadSection   PbRoadSection;
 typedef ::apollo::hdmap::Lane          PbLane;
 typedef ::apollo::hdmap::Junction      PbJunction;
 typedef ::apollo::hdmap::Signal        PbSignal;
@@ -44,114 +46,115 @@ typedef ::apollo::hdmap::Lane_LaneType PbLaneType;
 typedef ::apollo::hdmap::Lane_LaneTurn PbTurnType;
 typedef ::apollo::hdmap::Id            PbID;
 typedef ::apollo::hdmap::LaneBoundary  PbLaneBoundary;
-typedef ::apollo::hdmap::LaneBoundary_Type PbLaneBoundaryType;
+// typedef ::apollo::hdmap::LaneBoundary_Type PbLaneBoundaryType;
+typedef ::apollo::hdmap::LaneBoundaryType_Type PbLaneBoundaryTypeType;
 typedef ::apollo::hdmap::Polygon       PbPolygon;
+typedef ::apollo::hdmap::BoundaryPolygon PbBoundaryPolygon;
+typedef ::apollo::hdmap::BoundaryEdge  PbBoundaryEdge;
 
 typedef ::apollo::hdmap::Lane_LaneDirection PbLaneDirection;
-typedef ::apollo::hdmap::Signal_Type PbSignalType;
-typedef ::apollo::hdmap::Subsignal_Type PbSubSignalType;
+typedef ::apollo::hdmap::Signal_Type        PbSignalType;
+typedef ::apollo::hdmap::Subsignal_Type     PbSubSignalType;
+typedef ::apollo::hdmap::BoundaryEdge_Type  PbBoundaryEdgeType;
 
 enum OverlapType {
-    LANE,
-    JUNCTION,
-    OBJECT,
-    SIGNAL,
+  LANE,
+  JUNCTION,
+  OBJECT,
+  SIGNAL,
 };
 
 struct OverlapChildRecord {
-    OverlapType type;
-    std::string id;
+  OverlapType type;
+  std::string id;
 };
 
 struct OverlapRecord {
-    OverlapChildRecord c1;
-    OverlapChildRecord c2;
+  OverlapChildRecord c1;
+  OverlapChildRecord c2;
 };
 
 struct Header {
-    PbHeader header;
+  PbHeader header;
 };
 
 struct StopLineInternal {
-    std::string id;
-    PbCurve curve;
+  std::string id;
+  PbCurve curve;
 };
 
-// struct SpeedBumpInternal {
-//     std::string id;
-//     PbSpeedBump speed_bump;
-//     std::unordered_set<std::string> stop_line_ids;
-// };
-
 struct StopSignInternal {
-    std::string id;
-    PbStopSign stop_sign;
-    std::unordered_set<std::string> stop_line_ids;
+  std::string id;
+  PbStopSign stop_sign;
+  std::unordered_set<std::string> stop_line_ids;
 };
 
 struct YieldSignInternal {
-    std::string id;
-    PbYieldSign yield_sign;
-    std::unordered_set<std::string> stop_line_ids;
+  std::string id;
+  PbYieldSign yield_sign;
+  std::unordered_set<std::string> stop_line_ids;
 };
 
 struct TrafficLightInternal {
-    std::string id;
-    PbSignal traffic_light;
-    std::unordered_set<std::string> stop_line_ids;
+  std::string id;
+  PbSignal traffic_light;
+  std::unordered_set<std::string> stop_line_ids;
 };
 
 struct OverlapWithLane {
-    std::string object_id;
-    double start_s;
-    double end_s;
+  std::string object_id;
+  double start_s;
+  double end_s;
+  bool is_merge;
 
-    bool is_merge;
-
-    OverlapWithLane() : is_merge(false) {}
+  OverlapWithLane() : is_merge(false) {}
 };
 
 struct OverlapWithJunction {
-    std::string object_id;
+  std::string object_id;
 };
 
 struct LaneInternal {
-    PbLane lane;
-    std::vector<OverlapWithLane> overlap_signals;
-    std::vector<OverlapWithLane> overlap_objects;
-    std::vector<OverlapWithLane> overlap_junctions;
-    // somewhat trick
-    std::vector<OverlapWithLane> overlap_lanes;
+  PbLane lane;
+  std::vector<OverlapWithLane> overlap_signals;
+  std::vector<OverlapWithLane> overlap_objects;
+  std::vector<OverlapWithLane> overlap_junctions;
+  // somewhat trick
+  std::vector<OverlapWithLane> overlap_lanes;
 };
 
 struct JunctionInternal {
-    PbJunction junction;
-    std::unordered_set<std::string> road_ids;
-    std::vector<OverlapWithJunction> overlap_with_junctions;
+  PbJunction junction;
+  std::unordered_set<std::string> road_ids;
+  std::vector<OverlapWithJunction> overlap_with_junctions;
 };
 
-struct Road {
-    std::string id;
+struct RoadSectionInternal {
+  std::string id;
+  PbRoadSection section;
+  std::vector<LaneInternal> lanes;
+};
 
-    std::unordered_set<std::string> predecessor_ids;
-    std::unordered_set<std::string> successor_ids;
+struct RoadInternal {
+  std::string id;
+  PbRoad road;
 
-    std::unordered_set<std::string> junction_predecessor_ids;
-    std::unordered_set<std::string> junction_successor_ids;
+  bool in_junction;
+  std::string junction_id;
 
-    bool in_junction;
-    std::string junction_id;
+  std::vector<RoadSectionInternal> sections;
 
-    std::unordered_set<std::string> lane_ids;
-    std::vector<LaneInternal> lanes;
+  std::vector<TrafficLightInternal> traffic_lights;
+  std::vector<StopSignInternal> stop_signs;
+  std::vector<YieldSignInternal> yield_signs;
+  std::vector<PbCrosswalk> crosswalks;
+  std::vector<PbClearArea> clear_areas;
+  std::vector<PbSpeedBump> speed_bumps;
+  std::vector<StopLineInternal> stop_lines;
 
-    std::vector<TrafficLightInternal> traffic_lights;
-    std::vector<StopSignInternal> stop_signs;
-    std::vector<YieldSignInternal> yield_signs;
-    std::vector<PbCrosswalk> crosswalks;
-    std::vector<PbClearArea> clear_areas;
-    std::vector<PbSpeedBump> speed_bumps;
-    std::vector<StopLineInternal> stop_lines;
+  RoadInternal() : in_junction(false) {
+    junction_id = "";
+  }
 };
 
 }  // namespace adapter

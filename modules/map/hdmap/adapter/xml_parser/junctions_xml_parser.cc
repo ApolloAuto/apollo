@@ -27,63 +27,61 @@ namespace adapter {
 
 Status JunctionsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
                         std::vector<JunctionInternal>* junctions) {
-    const tinyxml2::XMLElement* junction_node
-                                    = xml_node.FirstChildElement("junction");
-    while (junction_node) {
-        // id
-        std::string junction_id;
-        int checker = UtilXmlParser::query_string_attribute(*junction_node,
-                                                            "id", &junction_id);
-        if (checker != tinyxml2::XML_SUCCESS) {
-            std::string err_msg = "Error parse junction id";
-            return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
-        }
-
-        // outline
-        const tinyxml2::XMLElement* sub_node =
-                                    junction_node->FirstChildElement("outline");
-        if (!sub_node) {
-            std::string err_msg = "Error parse junction outline";
-            return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
-        }
-
-        PbJunction junction;
-        junction.mutable_id()->set_id(junction_id);
-        PbPolygon* polygon = junction.mutable_polygon();
-        RETURN_IF_ERROR(UtilXmlParser::parse_outline(*sub_node, polygon));
-
-        JunctionInternal junction_internal;
-        junction_internal.junction = junction;
-
-        // overlap
-        sub_node = junction_node->FirstChildElement("objectOverlapGroup");
-        if (sub_node) {
-            sub_node = sub_node->FirstChildElement("objectReference");
-            while (sub_node) {
-                std::string object_id;
-                checker = UtilXmlParser::query_string_attribute(*sub_node, "id",
-                                                    &object_id);
-                if (checker != tinyxml2::XML_SUCCESS) {
-                    std::string err_msg = "Error parse junction overlap id";
-                    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR,
-                                err_msg);
-                }
-
-                OverlapWithJunction overlap_with_juntion;
-                overlap_with_juntion.object_id = object_id;
-                junction_internal.overlap_with_junctions.push_back(
-                                                        overlap_with_juntion);
-
-                sub_node = sub_node->NextSiblingElement("objectReference");
-            }
-        }
-
-        junctions->push_back(junction_internal);
-
-        junction_node = junction_node->NextSiblingElement("junction");
+  const tinyxml2::XMLElement* junction_node
+                                  = xml_node.FirstChildElement("junction");
+  while (junction_node) {
+    // id
+    std::string junction_id;
+    int checker = UtilXmlParser::query_string_attribute(*junction_node,
+                                                        "id", &junction_id);
+    if (checker != tinyxml2::XML_SUCCESS) {
+        std::string err_msg = "Error parse junction id";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
-    return Status::OK();
+    // outline
+    const tinyxml2::XMLElement* sub_node =
+                                junction_node->FirstChildElement("outline");
+    if (!sub_node) {
+        std::string err_msg = "Error parse junction outline";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+
+    PbJunction junction;
+    junction.mutable_id()->set_id(junction_id);
+    PbPolygon* polygon = junction.mutable_polygon();
+    RETURN_IF_ERROR(UtilXmlParser::parse_outline(*sub_node, polygon));
+
+    JunctionInternal junction_internal;
+    junction_internal.junction = junction;
+
+    // overlap
+    sub_node = junction_node->FirstChildElement("objectOverlapGroup");
+    if (sub_node) {
+      sub_node = sub_node->FirstChildElement("objectReference");
+      while (sub_node) {
+          std::string object_id;
+          checker = UtilXmlParser::query_string_attribute(*sub_node, "id",
+                                              &object_id);
+          if (checker != tinyxml2::XML_SUCCESS) {
+              std::string err_msg = "Error parse junction overlap id";
+              return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR,
+                          err_msg);
+          }
+
+          OverlapWithJunction overlap_with_juntion;
+          overlap_with_juntion.object_id = object_id;
+          junction_internal.overlap_with_junctions.push_back(
+                                                  overlap_with_juntion);
+
+          sub_node = sub_node->NextSiblingElement("objectReference");
+      }
+    }
+
+    junctions->push_back(junction_internal);
+    junction_node = junction_node->NextSiblingElement("junction");
+  }
+  return Status::OK();
 }
 
 }  // namespace adapter

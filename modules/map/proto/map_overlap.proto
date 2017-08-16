@@ -8,7 +8,6 @@ message LaneOverlapInfo {
   optional double start_s = 1;  //position (s-coordinate)
   optional double end_s = 2;    //position (s-coordinate)
   optional bool is_merge = 3;
-  optional bool has_precedence = 4;
 }
 
 message SignalOverlapInfo {
@@ -50,8 +49,6 @@ message ObjectOverlapInfo {
     SpeedBumpOverlapInfo speed_bump_overlap_info = 10;
     ParkingSpaceOverlapInfo parking_space_overlap_info = 11;
   }
-
-  // TODO: add region_overlap_info
 }
 
 // Here, the "overlap" includes any pair of objects on the map

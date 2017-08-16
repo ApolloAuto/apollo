@@ -39,7 +39,7 @@ void remove_duplicates(std::vector<apollo::common::math::Vec2d> *points) {
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
   for (size_t i = 0; i < points->size(); ++i) {
     if (count == 0 ||
-        (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
+      (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
       (*points)[count++] = (*points)[i];
     }
   }
@@ -435,10 +435,9 @@ StopSignInfo::StopSignInfo(const apollo::hdmap::StopSign &stop_sign)
 }
 
 void StopSignInfo::init() {
-  // for (const auto &stop_line : _stop_sign.stop_line()) {
-  //     segments_from_curve(stop_line, &_segments);
-  // }
-  segments_from_curve(_stop_sign.stop_line(), &_segments);
+  for (const auto &stop_line : _stop_sign.stop_line()) {
+      segments_from_curve(stop_line, &_segments);
+  }
   CHECK(!_segments.empty());
 }
 
@@ -448,10 +447,10 @@ YieldSignInfo::YieldSignInfo(const apollo::hdmap::YieldSign &yield_sign)
 }
 
 void YieldSignInfo::init() {
-  // for (const auto &stop_line : _yield_sign.stop_line()) {
-  //     segments_from_curve(stop_line, &_segments);
-  // }
-  segments_from_curve(_yield_sign.stop_line(), &_segments);
+  for (const auto &stop_line : _yield_sign.stop_line()) {
+      segments_from_curve(stop_line, &_segments);
+  }
+  // segments_from_curve(_yield_sign.stop_line(), &_segments);
   CHECK(!_segments.empty());
 }
 

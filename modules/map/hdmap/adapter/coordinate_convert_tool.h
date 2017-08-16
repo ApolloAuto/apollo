@@ -26,6 +26,7 @@ class CoordinateConvertTool {
  public:
   CoordinateConvertTool();
   ~CoordinateConvertTool();
+
  public:
   static CoordinateConvertTool* get_instance();
 
