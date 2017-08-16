@@ -111,7 +111,7 @@ function set_lib_path() {
       if [ -e "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash" ]; then
          source "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash"
       fi
-      PY_LIB_PATH=${APOLLO_ROOT_DIR}/bazel-genfiles
+      PY_LIB_PATH=${APOLLO_ROOT_DIR}/py_proto
       PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
   fi
   export PYTHONPATH=${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
