@@ -341,6 +341,12 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
 Status StBoundaryMapper::MapWithPredictionTrajectory(
     const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
     StGraphBoundary* const boundary) const {
+  DCHECK_NOTNULL(boundary);
+  DCHECK(obj_decision.has_follow() || obj_decision.has_yield() ||
+         obj_decision.has_overtake())
+      << "obj_decision must be follow or yield or overtake.\n"
+      << obj_decision.DebugString();
+
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
@@ -430,18 +436,13 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
 Status StBoundaryMapper::MapFollowDecision(
     const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
     StGraphBoundary* const boundary) const {
-  if (!obj_decision.has_follow()) {
-    std::string msg = common::util::StrCat(
-        "Map obstacle without prediction trajectory is ONLY supported when "
-        "the "
-        "object decision is follow. The current object decision is: \n",
-        obj_decision.DebugString());
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  DCHECK_NOTNULL(boundary);
+  DCHECK(obj_decision.has_follow())
+      << "Map obstacle without prediction trajectory is ONLY supported when "
+         "the object decision is follow. The current object decision is: "
+      << obj_decision.DebugString();
 
   const auto* obstacle = path_obstacle.Obstacle();
-
   SLPoint obstacle_sl_point;
   reference_line_.get_point_in_frenet_frame(
       Vec2d(obstacle->Perception().position().x(),
