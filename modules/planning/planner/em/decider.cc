@@ -148,6 +148,10 @@ int Decider::SetObjectDecisions(PathDecision* const path_decision) {
     const auto& obstacle = path_obstacle->Obstacle();
     object_decision->set_id(obstacle->Id());
     object_decision->set_perception_id(obstacle->PerceptionId());
+    if (path_obstacle->IsIgnore()) {
+      object_decision->add_object_decision()->mutable_ignore();
+      continue;
+    }
     if (path_obstacle->HasLateralDecision()) {
       object_decision->add_object_decision()->CopyFrom(
           path_obstacle->LateralDecision());

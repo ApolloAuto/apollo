@@ -53,10 +53,10 @@ class DPRoadGraph {
   bool FindPathTunnel(const common::TrajectoryPoint &init_point,
                       PathData *const path_data);
 
-  bool ComputeObjectDecision(
+  bool MakeObjectDecision(
       const PathData &path_data,
       const std::vector<const PathObstacle *> &path_obstacles,
-      std::vector<std::pair<std::string, ObjectDecisionType>> *const decisions);
+      PathDecision *const path_decision);
 
  private:
   /**
@@ -103,12 +103,12 @@ class DPRoadGraph {
   bool MakeDynamicObstcleDecision(
       const PathData &path_data,
       const std::vector<const PathObstacle *> &path_obstacles,
-      std::vector<std::pair<std::string, ObjectDecisionType>> *decisions);
+      PathDecision *const path_decision);
 
   bool MakeStaticObstacleDecision(
       const PathData &path_data,
       const std::vector<const PathObstacle *> &path_obstacles,
-      std::vector<std::pair<std::string, ObjectDecisionType>> *const decisions);
+      PathDecision *const path_decision);
 
  private:
   DpPolyPathConfig config_;

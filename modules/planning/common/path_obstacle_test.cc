@@ -326,9 +326,9 @@ TEST(MergeLateralDecision, AllDecisions) {
       PathObstacle::MergeLateralDecision(decision_nudge, decision_nudge2)
           .has_nudge());
   decision_nudge2.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
-  EXPECT_TRUE(
-      PathObstacle::MergeLateralDecision(decision_nudge, decision_nudge2)
-          .has_stop());
+  EXPECT_DEATH(
+      PathObstacle::MergeLateralDecision(decision_nudge, decision_nudge2),
+      ".*could not merge left nudge and right nudge");
 }
 
 TEST(PathObstacleTest, add_decision_test) {
@@ -345,17 +345,17 @@ TEST(PathObstacleTest, add_decision_test) {
     ObjectDecisionType decision;
 
     decision.mutable_stop();
-    path_obstacle.AddDecision("test_stop", decision);
+    path_obstacle.AddLongitudinalDecision("test_stop", decision);
 
     EXPECT_FALSE(path_obstacle.HasLateralDecision());
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
 
     decision.mutable_ignore();
-    path_obstacle.AddDecision("test_ignore", decision);
-    EXPECT_TRUE(path_obstacle.HasLateralDecision());
+    path_obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(path_obstacle.HasLateralDecision());
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
-    EXPECT_TRUE(path_obstacle.LateralDecision().has_ignore());
+    EXPECT_FALSE(path_obstacle.LateralDecision().has_ignore());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
   }
 
@@ -365,18 +365,18 @@ TEST(PathObstacleTest, add_decision_test) {
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
-    path_obstacle.AddDecision("test_nudge", decision);
+    path_obstacle.AddLateralDecision("test_nudge", decision);
 
     EXPECT_TRUE(path_obstacle.HasLateralDecision());
     EXPECT_FALSE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LateralDecision().has_nudge());
 
     decision.mutable_ignore();
-    path_obstacle.AddDecision("test_ignore", decision);
+    path_obstacle.AddLateralDecision("test_ignore", decision);
     EXPECT_TRUE(path_obstacle.HasLateralDecision());
-    EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LateralDecision().has_nudge());
-    EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_ignore());
+    EXPECT_FALSE(path_obstacle.LongitudinalDecision().has_ignore());
   }
 
   // right nudge and ignore
@@ -385,18 +385,18 @@ TEST(PathObstacleTest, add_decision_test) {
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
-    path_obstacle.AddDecision("test_nudge", decision);
+    path_obstacle.AddLateralDecision("test_nudge", decision);
 
     EXPECT_TRUE(path_obstacle.HasLateralDecision());
     EXPECT_FALSE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LateralDecision().has_nudge());
 
     decision.mutable_ignore();
-    path_obstacle.AddDecision("test_ignore", decision);
+    path_obstacle.AddLateralDecision("test_ignore", decision);
     EXPECT_TRUE(path_obstacle.HasLateralDecision());
-    EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LateralDecision().has_nudge());
-    EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_ignore());
+    EXPECT_FALSE(path_obstacle.LongitudinalDecision().has_ignore());
   }
 
   // left nudge and right nudge
@@ -405,18 +405,15 @@ TEST(PathObstacleTest, add_decision_test) {
     ObjectDecisionType decision;
 
     decision.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
-    path_obstacle.AddDecision("test_left_nudge", decision);
+    path_obstacle.AddLateralDecision("test_left_nudge", decision);
 
     EXPECT_TRUE(path_obstacle.HasLateralDecision());
     EXPECT_FALSE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LateralDecision().has_nudge());
 
     decision.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
-    path_obstacle.AddDecision("test_right_nudge", decision);
-    EXPECT_TRUE(path_obstacle.HasLateralDecision());
-    EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
-    EXPECT_TRUE(path_obstacle.LateralDecision().has_ignore());
-    EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
+    EXPECT_DEATH(path_obstacle.AddLateralDecision("test_right_nudge", decision),
+                 ".*could not merge left nudge and right nudge");
   }
 
   // overtake and ignore
@@ -425,17 +422,17 @@ TEST(PathObstacleTest, add_decision_test) {
     ObjectDecisionType decision;
 
     decision.mutable_overtake();
-    path_obstacle.AddDecision("test_overtake", decision);
+    path_obstacle.AddLongitudinalDecision("test_overtake", decision);
 
     EXPECT_FALSE(path_obstacle.HasLateralDecision());
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_overtake());
 
     decision.mutable_ignore();
-    path_obstacle.AddDecision("test_ignore", decision);
-    EXPECT_TRUE(path_obstacle.HasLateralDecision());
+    path_obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(path_obstacle.HasLateralDecision());
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
-    EXPECT_TRUE(path_obstacle.LateralDecision().has_ignore());
+    EXPECT_FALSE(path_obstacle.LateralDecision().has_ignore());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_overtake());
   }
 
@@ -445,17 +442,17 @@ TEST(PathObstacleTest, add_decision_test) {
     ObjectDecisionType decision;
 
     decision.mutable_yield();
-    path_obstacle.AddDecision("test_yield", decision);
+    path_obstacle.AddLongitudinalDecision("test_yield", decision);
 
     EXPECT_FALSE(path_obstacle.HasLateralDecision());
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_yield());
 
     decision.mutable_ignore();
-    path_obstacle.AddDecision("test_ignore", decision);
-    EXPECT_TRUE(path_obstacle.HasLateralDecision());
+    path_obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(path_obstacle.HasLateralDecision());
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
-    EXPECT_TRUE(path_obstacle.LateralDecision().has_ignore());
+    EXPECT_FALSE(path_obstacle.LateralDecision().has_ignore());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_yield());
   }
 
@@ -465,14 +462,14 @@ TEST(PathObstacleTest, add_decision_test) {
     ObjectDecisionType decision;
 
     decision.mutable_stop();
-    path_obstacle.AddDecision("test_stop", decision);
+    path_obstacle.AddLongitudinalDecision("test_stop", decision);
 
     EXPECT_FALSE(path_obstacle.HasLateralDecision());
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
 
     decision.mutable_nudge();
-    path_obstacle.AddDecision("test_nudge", decision);
+    path_obstacle.AddLateralDecision("test_nudge", decision);
     EXPECT_TRUE(path_obstacle.HasLateralDecision());
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LateralDecision().has_nudge());
