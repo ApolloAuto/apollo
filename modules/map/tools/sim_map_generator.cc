@@ -23,6 +23,7 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/points_downsampler.h"
+#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/proto/map.pb.h"
 
 /**
@@ -111,7 +112,12 @@ int main(int32_t argc, char** argv) {
 
   Map map_pb;
 
-  if (!GetProtoFromFile(FLAGS_map_file_path, &map_pb)) {
+  if (apollo::common::util::EndWith(FLAGS_map_file_path, ".xml")) {
+      apollo::hdmap::adapter::OpendriveAdapter opendrive_adapter;
+      if (opendrive_adapter.load_data(FLAGS_map_file_path, &map_pb) != 0) {
+        return -1;
+      }
+  } else if (!GetProtoFromFile(FLAGS_map_file_path, &map_pb)) {
     AERROR << "Fail to open:" << FLAGS_map_file_path;
     return -1;
   }
