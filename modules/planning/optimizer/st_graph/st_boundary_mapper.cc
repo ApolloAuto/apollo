@@ -116,15 +116,12 @@ Status StBoundaryMapper::GetGraphBoundary(
     }
     const auto& decision = path_obstacle->LongitudinalDecision();
     if (decision.has_follow()) {
-      StGraphBoundary boundary(path_obstacle);
-      const auto ret = MapFollowDecision(*path_obstacle, decision, &boundary);
-      if (ret.code() == ErrorCode::PLANNING_ERROR) {
+      const auto ret =
+          AddFollowBoundary(*path_obstacle, decision, st_graph_boundaries);
+      if (!ret.ok()) {
         AERROR << "Fail to map obstacle " << path_obstacle->Id()
                << " with follow decision: " << decision.DebugString();
         return Status(ErrorCode::PLANNING_ERROR, "Fail to map follow decision");
-      }
-      if (ret.ok()) {
-        st_graph_boundaries->push_back(boundary);
       }
     } else if (decision.has_stop()) {
       // TODO(all) change start_s() to st_boundary.min_s()
@@ -426,9 +423,9 @@ Status StBoundaryMapper::MapObstacleWithPredictionTrajectory(
   return Status::OK();
 }
 
-Status StBoundaryMapper::MapFollowDecision(
+Status StBoundaryMapper::AddFollowBoundary(
     const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
-    StGraphBoundary* const boundary) const {
+    std::vector<StGraphBoundary>* const boundary) const {
   if (!obj_decision.has_follow()) {
     std::string msg = common::util::StrCat(
         "Map obstacle without prediction trajectory is ONLY supported when "
@@ -509,7 +506,7 @@ Status StBoundaryMapper::MapFollowDecision(
     ADEBUG << msg;
     return Status::OK();
   }
-  *boundary = StGraphBoundary(&path_obstacle, boundary_points);
+  boundary->emplace_back(&path_obstacle, boundary_points);
 
   const double characteristic_length =
       std::fmax(scalar_speed * speed_coeff *
@@ -518,10 +515,10 @@ Status StBoundaryMapper::MapFollowDecision(
       vehicle_param_.front_edge_to_center() +
       st_boundary_config_.follow_buffer();
 
-  boundary->SetCharacteristicLength(characteristic_length *
-                                    st_boundary_config_.follow_coeff());
-  boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
-  boundary->set_id(obstacle->Id());
+  boundary->back().SetCharacteristicLength(characteristic_length *
+                                           st_boundary_config_.follow_coeff());
+  boundary->back().SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
+  boundary->back().set_id(obstacle->Id());
 
   return Status::OK();
 }
