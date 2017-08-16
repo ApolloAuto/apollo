@@ -233,6 +233,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
       EXPECT_DOUBLE_EQ(5.0, object.width());
       EXPECT_DOUBLE_EQ(6.0, object.height());
       EXPECT_DOUBLE_EQ(5.0, object.speed());
+      EXPECT_NEAR(0.927295, object.speed_heading(), kEpsilon);
       EXPECT_EQ(0, object.polygon_point_size());
       EXPECT_EQ(Object_Type_VEHICLE, object.type());
     } else {

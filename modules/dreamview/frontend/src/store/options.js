@@ -22,8 +22,10 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesUnknown;
     @observable showObstaclesVirtual =
         PARAMETERS.options.defaults.showObstaclesVirtual;
-    @observable showObstaclesArrow =
-        PARAMETERS.options.defaults.showObstaclesArrow;
+    @observable showObstaclesVelocity =
+        PARAMETERS.options.defaults.showObstaclesVelocity;
+    @observable showObstaclesHeading =
+        PARAMETERS.options.defaults.showObstaclesHeading;
     @observable showObstaclesId =
         PARAMETERS.options.defaults.showObstaclesId;
     @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
