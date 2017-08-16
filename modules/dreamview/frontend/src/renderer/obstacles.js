@@ -60,12 +60,18 @@ export default class PerceptionObstacles {
                                       obstacle.positionY,
                                       (obstacle.height || DEFAULT_HEIGHT) / 2));
             const color = ObstacleColorMapping[obstacle.type] || DEFAULT_COLOR;
-            if (STORE.options.showObstaclesArrow && obstacle.type &&
+            if (STORE.options.showObstaclesVelocity && obstacle.type &&
                     obstacle.type !== 'UNKNOWN_UNMOVABLE' && obstacle.speed > 0.5) {
-                const arrowMesh = this.updateArrow(position, obstacle.heading,
-                        color, arrowIdx++, scene);
+                const arrowMesh = this.updateArrow(position,
+                        obstacle.speedHeading, color, arrowIdx++, scene);
                 const scale = 1 + Math.log2(obstacle.speed);
                 arrowMesh.scale.set(scale, scale, scale);
+                arrowMesh.visible = true;
+            }
+            if (STORE.options.showObstaclesHeading) {
+                const arrowMesh = this.updateArrow(position, obstacle.heading,
+                        0xFFFFFF, arrowIdx++, scene);
+                arrowMesh.scale.set(1, 1, 1);
                 arrowMesh.visible = true;
             }
             if (STORE.options.showObstaclesId) {

@@ -48,7 +48,8 @@ options:
     showObstaclesUnknownUnmovable: true
     showObstaclesUnknown: true
     showObstaclesVirtual: false
-    showObstaclesArrow: true
+    showObstaclesVelocity: true
+    showObstaclesHeading: true
     showObstaclesId: true
     cameraAngle: Default
 debug:
