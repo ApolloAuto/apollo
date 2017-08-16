@@ -73,6 +73,7 @@ void DownsampleCurve(Curve* curve) {
     *line_segment->add_point() = downsampled_points[index];
   }
   int new_size = line_segment->point_size();
+  CHECK_GT(new_size, 1);
 
   AINFO << "Lane curve downsampled from " << original_size << " points to "
         << new_size << " points.";

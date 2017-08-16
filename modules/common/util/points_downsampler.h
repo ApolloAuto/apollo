@@ -150,7 +150,8 @@ void DownsampleByDistance(const std::vector<PointType> &points,
   sampled_indices->push_back(0);
 
   double accum_distance = 0.0;
-  for (size_t pos = 1; pos < points.size(); ++pos) {
+  size_t pos = 1;
+  for (; pos < points.size() - 1; ++pos) {
     Vec2d point_start = Vec2d(points[pos - 1].x(), points[pos - 1].y());
     Vec2d point_end = Vec2d(points[pos].x(), points[pos].y());
     accum_distance += point_start.DistanceTo(point_end);
@@ -160,6 +161,7 @@ void DownsampleByDistance(const std::vector<PointType> &points,
       accum_distance = 0.0;
     }
   }
+  sampled_indices->push_back(pos);
 }
 
 }  // namespace util
