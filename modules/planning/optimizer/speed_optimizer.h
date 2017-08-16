@@ -49,6 +49,8 @@ class SpeedOptimizer : public Optimizer {
   void RecordSTGraphDebug(const std::vector<StGraphBoundary>& boundaries,
     const SpeedLimit& speed_limits, const SpeedData& speed_data);
 
+  void RecordDebugInfo(const SpeedData& speed_data);
+
 };
 
 }  // namespace planning
