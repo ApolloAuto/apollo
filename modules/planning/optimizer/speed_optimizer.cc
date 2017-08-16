@@ -32,9 +32,20 @@ SpeedOptimizer::SpeedOptimizer(const std::string& name) : Optimizer(name) {}
 apollo::common::Status SpeedOptimizer::Optimize(Frame* frame) {
   frame_ = frame;
   auto* planning_data = frame->mutable_planning_data();
-  return Process(planning_data->path_data(), frame->PlanningStartPoint(),
+  auto ret = Process(planning_data->path_data(), frame->PlanningStartPoint(),
                  frame->reference_line(), frame->path_decision(),
                  planning_data->mutable_speed_data());
+  RecordDebugInfo(planning_data->speed_data());
+  return ret;
+}
+
+void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
+  auto debug = frame_->MutableADCTrajectory()->mutable_debug();
+  auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
+  ptr_speed_plan->set_name(name());
+  ptr_speed_plan->mutable_speed_point()->CopyFrom(
+    {speed_data.speed_vector().begin(),
+     speed_data.speed_vector().end()});
 }
 
 void SpeedOptimizer::RecordSTGraphDebug(
