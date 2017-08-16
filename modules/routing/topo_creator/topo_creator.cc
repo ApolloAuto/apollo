@@ -16,7 +16,7 @@
 
 #include <memory>
 
-#include "gflags/gflags.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/topo_creator/graph_creator.h"
@@ -25,14 +25,12 @@ int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   std::unique_ptr<::apollo::routing::GraphCreator> creator_ptr;
-  creator_ptr.reset(new ::apollo::routing::GraphCreator(
-      FLAGS_map_dir + "/" + FLAGS_map_file_name,
-      FLAGS_map_dir + "/" + FLAGS_graph_file_name));
+  creator_ptr.reset(new ::apollo::routing::GraphCreator(FLAGS_map_file_path,
+                                                        FLAGS_graph_file_path));
   if (!creator_ptr->Create()) {
     AERROR << "Create routing topo failed!";
     return -1;
   }
-  AERROR << "Create routing topo succesful!";
-  AINFO << FLAGS_map_dir + "/" + FLAGS_graph_file_name;
+  AINFO << "Create routing topo successfully from " << FLAGS_graph_file_path;
   return 0;
 }
