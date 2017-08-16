@@ -66,14 +66,7 @@ class DpRoadGraphTest : public PlanningTestBase {
   }
 
   virtual void SetUp() {
-    google::InitGoogleLogging("DpRoadGraphTest");
-    PlanningTestBase::SetUp();
-    RunPlanning();
-    SetInitPoint();
-    SetSpeedDataWithConstVeolocity(10.0);
-    const auto* frame = planning_.GetFrame();
-    ASSERT_TRUE(frame != nullptr);
-    reference_line_ = &(frame->reference_line());
+    FLAGS_test_data_dir = "modules/planning/testdata/dp_road_graph_test";
   }
 
  protected:
@@ -84,6 +77,16 @@ class DpRoadGraphTest : public PlanningTestBase {
 };
 
 TEST_F(DpRoadGraphTest, speed_road_graph) {
+  PlanningTestBase::SetUp();
+
+  RUN_GOLDEN_TEST;
+
+  // specialized tests
+  SetInitPoint();
+  SetSpeedDataWithConstVeolocity(10.0);
+  const auto* frame = planning_.GetFrame();
+  ASSERT_TRUE(frame != nullptr);
+  reference_line_ = &(frame->reference_line());
   DpPolyPathConfig dp_poly_path_config;  // default values
   DPRoadGraph road_graph(dp_poly_path_config, *reference_line_, speed_data_);
   ASSERT_TRUE(reference_line_ != nullptr);

@@ -116,7 +116,10 @@ bool ControlTestBase::test_control() {
 }
 
 void ControlTestBase::trim_control_command(ControlCommand *origin) {
+  origin->mutable_header()->clear_radar_timestamp();
+  origin->mutable_header()->clear_lidar_timestamp();
   origin->mutable_header()->clear_timestamp_sec();
+  origin->mutable_header()->clear_camera_timestamp();
 }
 
 bool ControlTestBase::test_control(const std::string &test_case_name,
