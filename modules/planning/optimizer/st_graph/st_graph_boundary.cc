@@ -29,20 +29,8 @@ namespace planning {
 
 using Vec2d = common::math::Vec2d;
 
-StGraphBoundary::StGraphBoundary(const PathObstacle* path_obstacle)
-    : path_obstacle_(path_obstacle) {
-  CHECK_NOTNULL(path_obstacle);
-}
-
-const PathObstacle* StGraphBoundary::path_obstacle() const {
-  return path_obstacle_;
-}
-
-StGraphBoundary::StGraphBoundary(const PathObstacle* path_obstacle,
-                                 const std::vector<STPoint>& points)
-    : Polygon2d(std::vector<Vec2d>(points.begin(), points.end())),
-      path_obstacle_(path_obstacle) {
-  CHECK_NOTNULL(path_obstacle);
+StGraphBoundary::StGraphBoundary(const std::vector<STPoint>& points)
+    : Polygon2d(std::vector<Vec2d>(points.begin(), points.end())) {
   CHECK_EQ(points.size(), 4)
       << "StGraphBoundary must have exactly four points. Input points size: "
       << points.size();
@@ -55,10 +43,8 @@ StGraphBoundary::StGraphBoundary(const PathObstacle* path_obstacle,
 }
 
 StGraphBoundary::StGraphBoundary(
-    const PathObstacle* path_obstacle,
     const std::vector<::apollo::common::math::Vec2d>& points)
-    : Polygon2d(points), path_obstacle_(path_obstacle) {
-  CHECK_NOTNULL(path_obstacle);
+    : Polygon2d(points) {
   CHECK_EQ(points.size(), 4)
       << "StGraphBoundary must have exactly four points. Input points size: "
       << points.size();
@@ -94,7 +80,7 @@ void StGraphBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
 
 const std::string& StGraphBoundary::id() const { return id_; }
 
-void StGraphBoundary::set_id(const std::string& id) { id_ = id; }
+void StGraphBoundary::SetId(const std::string& id) { id_ = id; }
 
 double StGraphBoundary::characteristic_length() const {
   return characteristic_length_;
