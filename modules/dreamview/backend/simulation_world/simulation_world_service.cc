@@ -283,6 +283,13 @@ SimulationWorldService::SimulationWorldService(MapService *map_service,
   if (routing_from_file) {
     ReadRoutingFromFile(FLAGS_routing_response_file);
   }
+
+  // Populate vehicle parameters.
+  Object *auto_driving_car = world_.mutable_auto_driving_car();
+  const auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
+  auto_driving_car->set_height(vehicle_param.height());
+  auto_driving_car->set_width(vehicle_param.width());
+  auto_driving_car->set_length(vehicle_param.length());
 }
 
 const SimulationWorld &SimulationWorldService::Update() {
@@ -404,11 +411,6 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
 
   auto_driving_car->set_disengage_type(DeduceDisengageType(chassis));
-
-  const auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
-  auto_driving_car->set_height(vehicle_param.height());
-  auto_driving_car->set_width(vehicle_param.width());
-  auto_driving_car->set_length(vehicle_param.length());
 
   // Updates the timestamp with the timestamp inside the chassis message header.
   world_.set_timestamp_sec(
