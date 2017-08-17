@@ -60,7 +60,7 @@ class QpSplinePathGenerator {
 
   bool AddConstraint(const QpFrenetFrame& qp_frenet_frame);
 
-  bool AddKernel();
+  void AddKernel();
 
   bool Solve();
 
