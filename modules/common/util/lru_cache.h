@@ -18,10 +18,10 @@
 #define MODULES_COMMON_UTIL_LRU_CACHE_H_
 
 #include <iostream>
-#include <vector>
-#include <unordered_map>
 #include <mutex>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace apollo {
 namespace common {
@@ -40,25 +40,18 @@ struct Node {
 
   template <typename VV>
   Node(const K& key, VV&& val)
-      : key(key), val(std::forward<VV>(val)), prev(nullptr), next(nullptr){}
+      : key(key), val(std::forward<VV>(val)), prev(nullptr), next(nullptr) {}
 };
 
 template <class K, class V>
 class LRUCache {
- private:
-  size_t _capacity;
-  size_t _size;
-  std::unordered_map<K, Node<K, V>> _map;
-  Node<K, V> _head;
-  Node<K, V> _tail;
-
  public:
-  LRUCache() : _capacity(10), _map(0), _head(), _tail() {
+  LRUCache() : capacity_(kDefaultCapacity), map_(0), head_(), tail_() {
     Init();
   }
 
-  explicit LRUCache(size_t capacity)
-      : _capacity(capacity), _map(0), _head(), _tail() {
+  explicit LRUCache(const size_t capacity)
+      : capacity_(capacity), map_(0), head_(), tail_() {
     Init();
   }
 
@@ -67,7 +60,7 @@ class LRUCache {
   }
 
   void GetCache(std::unordered_map<K, V>* cache) {
-    for (auto it = _map.begin(); it != _map.end(); ++it) {
+    for (auto it = map_.begin(); it != map_.end(); ++it) {
       cache->operator[](it->first) = it->second.val;
     }
   }
@@ -77,14 +70,14 @@ class LRUCache {
       K obsolete;
       GetObsolete(&obsolete);
     }
-    return _map[key].val;
+    return map_[key].val;
   }
 
   /*
    * Silently get all as vector
    */
   void GetAllSilently(std::vector<V*>* ret) {
-    for (auto it = _map.begin(); it != _map.end(); ++it) {
+    for (auto it = map_.begin(); it != map_.end(); ++it) {
       ret->push_back(&it->second.val);
     }
   }
@@ -158,11 +151,11 @@ class LRUCache {
   }
 
   size_t size() {
-    return _size;
+    return size_;
   }
 
   bool Full() {
-    return size() > 0 && size() >= _capacity;
+    return size() > 0 && size() >= capacity_;
   }
 
   bool Empty() {
@@ -170,27 +163,23 @@ class LRUCache {
   }
 
   size_t capacity() {
-    return _capacity;
-  }
-
-  void set_capacity(size_t capacity) {
-    _capacity = capacity;
+    return capacity_;
   }
 
   Node<K, V>* First() {
     if (size()) {
-      return _head.next;
+      return head_.next;
     }
     return nullptr;
   }
 
   bool Contains(const K& key) {
-    return _map.find(key) != _map.end();
+    return map_.find(key) != map_.end();
   }
 
   bool Prioritize(const K& key) {
     if (Contains(key)) {
-      auto* node = &_map[key];
+      auto* node = &map_[key];
       Detach(node);
       Attach(node);
       return true;
@@ -199,17 +188,25 @@ class LRUCache {
   }
 
   void Clear() {
-    _map.clear();
-    _size = 0;
+    map_.clear();
+    size_ = 0;
   }
 
  private:
+  static constexpr size_t kDefaultCapacity = 10;
+
+  const size_t capacity_;
+  size_t size_;
+  std::unordered_map<K, Node<K, V>> map_;
+  Node<K, V> head_;
+  Node<K, V> tail_;
+
   void Init() {
-    _head.prev = nullptr;
-    _head.next = &_tail;
-    _tail.prev = &_head;
-    _tail.next = nullptr;
-    _size = 0;
+    head_.prev = nullptr;
+    head_.next = &tail_;
+    tail_.prev = &head_;
+    tail_.next = nullptr;
+    size_ = 0;
   }
 
   void Detach(Node<K, V>* node) {
@@ -221,17 +218,17 @@ class LRUCache {
     }
     node->prev = nullptr;
     node->next = nullptr;
-    --_size;
+    --size_;
   }
 
   void Attach(Node<K, V>* node) {
-    node->prev = &_head;
-    node->next = _head.next;
-    _head.next = node;
+    node->prev = &head_;
+    node->next = head_.next;
+    head_.next = node;
     if (node->next != nullptr) {
       node->next->prev = node;
     }
-    ++_size;
+    ++size_;
   }
 
   template <typename VV>
@@ -242,9 +239,9 @@ class LRUCache {
     }
     if (Contains(key)) {
       if (!add_only) {
-        _map[key].val = std::forward<VV>(val);
+        map_[key].val = std::forward<VV>(val);
         if (!silent_update) {
-          auto* node = &_map[key];
+          auto* node = &map_[key];
           Detach(node);
           Attach(node);
         } else {
@@ -256,15 +253,15 @@ class LRUCache {
         return false;
       }
 
-      _map.emplace(key, Node<K, V>(key, std::forward<VV>(val)));
-      Attach(&_map[key]);
+      map_.emplace(key, Node<K, V>(key, std::forward<VV>(val)));
+      Attach(&map_[key]);
     }
     return true;
   }
 
   V* Get(const K& key, bool silent) {
     if (Contains(key)) {
-      auto* node = &_map[key];
+      auto* node = &map_[key];
       if (!silent) {
         Detach(node);
         Attach(node);
@@ -276,7 +273,7 @@ class LRUCache {
 
   bool GetCopy(const K& key, const V* val, bool silent) {
     if (Contains(key)) {
-      auto* node = &_map[key];
+      auto* node = &map_[key];
       if (!silent) {
         Detach(node);
         Attach(node);
@@ -289,16 +286,15 @@ class LRUCache {
 
   bool GetObsolete(K* key) {
     if (Full()) {
-      auto* node = _tail.prev;
+      auto* node = tail_.prev;
       Detach(node);
-      _map.erase(node->key);
+      map_.erase(node->key);
       *key = node->key;
       return true;
     }
     return false;
   }
 };
-
 
 }  // namespace util
 }  // namespace common

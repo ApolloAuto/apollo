@@ -29,10 +29,8 @@ using apollo::perception::PerceptionObstacles;
 
 std::mutex ObstaclesContainer::g_mutex_;
 
-ObstaclesContainer::ObstaclesContainer() {
-  obstacles_.set_capacity(FLAGS_max_num_obstacles_stored),
-  timestamp_ = 0.0;
-}
+ObstaclesContainer::ObstaclesContainer()
+    : timestamp_(0.0), obstacles_(FLAGS_max_num_obstacles_stored) {}
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   AINFO << "message: " << message.ShortDebugString();
