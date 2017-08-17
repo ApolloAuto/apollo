@@ -84,6 +84,8 @@ class Planning : public apollo::common::ApolloApp {
 
   void RunOnce();
 
+  void SetConfig(const PlanningConfig& config);
+
   void PublishPlanningPb(ADCTrajectory* trajectory_pb);
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
 
