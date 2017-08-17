@@ -102,3 +102,5 @@ TEST_F(DpRoadGraphTest, speed_road_graph) {
 
 }  // namespace planning
 }  // namespace apollo
+
+TMAIN;

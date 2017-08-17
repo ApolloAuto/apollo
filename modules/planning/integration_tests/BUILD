@@ -39,7 +39,6 @@ cc_test(
     ],
     deps = [
         ":planning_test_base",
-        "@gtest//:main",
     ],
 )
 

@@ -58,7 +58,6 @@ cc_test(
     deps = [
         ":dp_poly_path",
         "//modules/planning/integration_tests:planning_test_base",
-        "@gtest//:main",
     ],
 )
 
