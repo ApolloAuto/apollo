@@ -373,26 +373,6 @@ function build_fe() {
   cd -
 }
 
-function print_usage() {
-  echo 'Usage:
-  ./apollo.sh [OPTION]'
-  echo 'Options:
-  build: run build only
-  build_fe: compile frontend javascript code, this requires all the node_modules to be installed already
-  buildify: fix style of BUILD files
-  check: run build/lint/test, please make sure it passes before checking in new code
-  clean: runs Bazel clean
-  config: run configurator tool
-  coverage: generate test coverage report
-  doc: generate doxygen document
-  lint: run code style check
-  print_usage: prints this menu
-  release: to build release version
-  test: run all the unit tests
-  version: current commit and date
-  '
-}
-
 function gen_doc() {
   rm -rf docs/doxygen
   doxygen apollo.doxygen
@@ -500,6 +480,51 @@ function link_cpu_caffe_build() {
   cd ..
 }
 
+function build_perception() {
+  START_TIME=$(get_now)
+
+  echo "Start building, please wait ..."
+  generate_build_targets
+  echo "Building on $MACHINE_ARCH, with targets:"
+  bazel --batch --batch_cpu_scheduling build \
+    --jobs=10 --define ARCH="$MACHINE_ARCH" \
+    --define CAN_CARD=${CAN_CARD} \
+    --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} \
+    -c opt \
+    //modules/perception/... \
+    //modules/dreamview/...
+
+  if [ $? -eq 0 ]; then
+    success 'Build passed!'
+  else
+    fail 'Build failed!'
+  fi
+  #build python proto
+  build_py_proto
+}
+
+
+function print_usage() {
+  echo 'Usage:
+  ./apollo.sh [OPTION]'
+  echo 'Options:
+  build: run build only
+  build_fe: compile frontend javascript code, this requires all the node_modules to be installed already
+  build_perception: build perception module
+  buildify: fix style of BUILD files
+  check: run build/lint/test, please make sure it passes before checking in new code
+  clean: runs Bazel clean
+  config: run configurator tool
+  coverage: generate test coverage report
+  doc: generate doxygen document
+  lint: run code style check
+  print_usage: prints this menu
+  release: to build release version
+  test: run all the unit tests
+  version: current commit and date
+  '
+}
+
 function main() {
   source_apollo_base
   apollo_check_system_config
@@ -516,6 +541,9 @@ function main() {
       ;;
     build_fe)
       build_fe
+      ;;
+    build_perception)
+      build_perception
       ;;
     buildify)
       buildify
