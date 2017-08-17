@@ -38,6 +38,7 @@ cc_test(
     deps = [
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
