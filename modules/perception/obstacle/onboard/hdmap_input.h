@@ -34,15 +34,12 @@ namespace perception {
 // Singleton HDMapInput, interfaces are thread-safe.
 class HDMapInput {
  public:
-  // thread safe
-  bool Init();
-
   // @brief: get roi polygon
   //         all points are in the world frame
   bool GetROI(const pcl_util::PointD& pointd, HdmapStructPtr* mapptr);
 
  private:
-  HDMapInput() = default;
+  HDMapInput();
 
   void DownSampleBoundary(const apollo::hdmap::LineSegment& line,
                           PolygonDType* out_boundary_line) const;
@@ -54,9 +51,8 @@ class HDMapInput {
 
   friend class Singleton<HDMapInput>;
 
-  bool inited_ = false;
   std::mutex mutex_;  // multi-thread init safe.
-  std::unique_ptr<apollo::hdmap::HDMap> hdmap_;
+  const apollo::hdmap::HDMap& hdmap_;
 
   DISALLOW_COPY_AND_ASSIGN(HDMapInput);
 

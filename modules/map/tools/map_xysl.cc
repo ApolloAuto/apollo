@@ -24,6 +24,7 @@
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_geometry.pb.h"
 
 DEFINE_bool(xy_to_sl, false, "calculate xy to sl");
@@ -52,12 +53,6 @@ class MapUtil {
   explicit MapUtil(const std::string &map_filename) : _map_client(nullptr) {
     _map_client.reset(new apollo::hdmap::HDMapImpl());
     _map_client->load_map_from_file(map_filename);
-  }
-
-  static ::apollo::hdmap::Id create_id(const std::string &id) {
-    ::apollo::hdmap::Id hdmap_id;
-    hdmap_id.set_id(id);
-    return hdmap_id;
   }
 
   const ::apollo::hdmap::OverlapInfo *get_overlap(
@@ -125,7 +120,7 @@ class MapUtil {
                       double *s, double *l) {
     QUIT_IF(s == nullptr, -1, ERROR, "arg s is nullptr");
     const ::apollo::hdmap::LaneInfo *lane =
-        _map_client->get_lane_by_id(create_id(lane_id)).get();
+        _map_client->get_lane_by_id(hdmap::MakeMapId(lane_id)).get();
     QUIT_IF(lane == nullptr, -2, ERROR, "get_lane_by_id[%s] failed",
             lane_id.c_str());
     bool ret = lane->get_projection(vec2d, s, l);
@@ -160,8 +155,8 @@ std::ostream &operator<<(
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::string map_file = FLAGS_map_file_path;
-  ::apollo::tools::MapUtil map_util(FLAGS_map_file_path);
+  const std::string map_file = apollo::hdmap::BaseMapFile();
+  ::apollo::tools::MapUtil map_util(map_file);
 
   if (FLAGS_xy_to_sl) {
     double x = FLAGS_x;
@@ -279,7 +274,7 @@ int main(int argc, char *argv[]) {
   }
   if (!FLAGS_dump_txt_map.empty()) {
     apollo::hdmap::Map map;
-    apollo::common::util::GetProtoFromFile(FLAGS_map_file_path, &map);
+    apollo::common::util::GetProtoFromFile(map_file, &map);
 
     std::ofstream ofs(FLAGS_dump_txt_map);
     ofs << map.DebugString();
@@ -287,7 +282,7 @@ int main(int argc, char *argv[]) {
   }
   if (!FLAGS_dump_bin_map.empty()) {
     apollo::hdmap::Map map;
-    apollo::common::util::GetProtoFromFile(FLAGS_map_file_path, &map);
+    apollo::common::util::GetProtoFromFile(map_file, &map);
 
     std::ofstream ofs(FLAGS_dump_bin_map);
     std::string map_str;

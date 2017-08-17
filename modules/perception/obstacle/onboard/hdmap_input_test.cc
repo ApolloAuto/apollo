@@ -25,36 +25,14 @@
 namespace apollo {
 namespace perception {
 
-using std::vector;
-
-class HDMapInputTest : public testing::Test {
- protected:
-  HDMapInputTest() : hdmap_input_(NULL) {}
-  virtual ~HDMapInputTest() {}
-  virtual void SetUp() {
-    hdmap_input_ = Singleton<HDMapInput>::Get();
-    ASSERT_TRUE(hdmap_input_ != NULL);
-  }
-
-  HDMapInput* hdmap_input_;
-};
-
-TEST_F(HDMapInputTest, test_Init) {
-  hdmap_input_->inited_ = true;
-  EXPECT_TRUE(hdmap_input_->Init());
-
-  hdmap_input_->inited_ = false;
-  FLAGS_map_file_path = "not_exit_dir";
-  EXPECT_FALSE(hdmap_input_->Init());
-}
-
-TEST_F(HDMapInputTest, test_GetROI) {
+TEST(HDMapInputTest, test_GetROI) {
   HdmapStructPtr hdmap;
-  pcl_util::PointD velodyne_pose_world = {587054.96336391149, 4141606.3593586856, 0.0};
-  EXPECT_FALSE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
-  FLAGS_map_file_path = "modules/map/data/sunnyvale_loop.xml.txt";
-  EXPECT_TRUE(hdmap_input_->Init());
-  EXPECT_TRUE(hdmap_input_->GetROI(velodyne_pose_world, &hdmap));
+  pcl_util::PointD velodyne_pose_world = {
+      587054.96336391149, 4141606.3593586856, 0.0};
+  FLAGS_map_dir = "modules/map/data";
+  FLAGS_base_map_filename = "sunnyvale_loop.xml.txt";
+  EXPECT_TRUE(
+      Singleton<HDMapInput>::Get()->GetROI(velodyne_pose_world, &hdmap));
   EXPECT_TRUE(hdmap != nullptr);
 }
 
