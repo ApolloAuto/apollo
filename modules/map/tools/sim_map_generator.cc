@@ -24,6 +24,7 @@
 #include "modules/common/util/file.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map.pb.h"
 
 /**
@@ -111,14 +112,14 @@ int main(int32_t argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   Map map_pb;
-
-  if (apollo::common::util::EndWith(FLAGS_map_file_path, ".xml")) {
+  const auto map_file = apollo::hdmap::BaseMapFile();
+  if (apollo::common::util::EndWith(map_file, ".xml")) {
       apollo::hdmap::adapter::OpendriveAdapter opendrive_adapter;
-      if (opendrive_adapter.load_data(FLAGS_map_file_path, &map_pb) != 0) {
+      if (opendrive_adapter.load_data(map_file, &map_pb) != 0) {
         return -1;
       }
-  } else if (!GetProtoFromFile(FLAGS_map_file_path, &map_pb)) {
-    AERROR << "Fail to open:" << FLAGS_map_file_path;
+  } else if (!GetProtoFromFile(map_file, &map_pb)) {
+    AERROR << "Fail to open:" << map_file;
     return -1;
   }
 

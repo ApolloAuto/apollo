@@ -5,6 +5,5 @@
 # 3. To override the flag values, you must set it after this file, as all Flags
 #    are evaluated strictly in order.
 
---map_file_path=modules/map/data/base_map.txt
 --map_dir=modules/map/data/new_garage
 --vehicle_config_path=modules/common/data/mkz_config.pb.txt

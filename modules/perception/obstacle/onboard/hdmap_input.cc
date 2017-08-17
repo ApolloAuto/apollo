@@ -45,24 +45,8 @@ using std::string;
 using std::vector;
 
 // HDMapInput
-bool HDMapInput::Init() {
-  std::unique_lock<std::mutex> lock(mutex_);
-  if (inited_) {
-    return true;
-  }
 
-  hdmap_.reset(new apollo::hdmap::HDMap());
-  if (hdmap_->load_map_from_file(FLAGS_map_file_path) != SUCC) {
-    AERROR << "Failed to load map file: " << FLAGS_map_file_path;
-    inited_ = false;
-    return false;
-  }
-
-  AINFO << "Init HDMap successfully, "
-        << "load map file: " << FLAGS_map_file_path;
-  inited_ = true;
-  return true;
-}
+HDMapInput::HDMapInput() : hdmap_(apollo::hdmap::HDMap::DefaultMap()) {}
 
 bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   std::unique_lock<std::mutex> lock(mutex_);
@@ -76,8 +60,8 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   std::vector<RoadROIBoundaryPtr> boundary_vec;
   std::vector<JunctionBoundaryPtr> junctions_vec;
 
-  int status = hdmap_->get_road_boundaries(point, FLAGS_map_radius,
-                                           &boundary_vec, &junctions_vec);
+  int status = hdmap_.get_road_boundaries(point, FLAGS_map_radius,
+                                          &boundary_vec, &junctions_vec);
   if (status != SUCC) {
     AERROR << "Failed to get road boundaries for point " << point.DebugString();
     return false;

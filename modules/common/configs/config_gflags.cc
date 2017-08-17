@@ -16,9 +16,6 @@
 
 #include "modules/common/configs/config_gflags.h"
 
-DEFINE_string(map_file_path, "modules/map/data/base_map.txt",
-              "the file path of map data file");
-
 DEFINE_string(map_dir, "modules/map/data/new_garage",
               "Directory which contains a group of related maps.");
 

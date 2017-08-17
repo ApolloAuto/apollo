@@ -19,9 +19,6 @@
 
 #include "gflags/gflags.h"
 
-// TODO(xiangquan): To be deprecated.
-DECLARE_string(map_file_path);
-
 // The directory which contains a group of related maps, such as base_map,
 // sim_map, routing_topo_grapth, etc.
 DECLARE_string(map_dir);
