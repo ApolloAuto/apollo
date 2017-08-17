@@ -86,9 +86,6 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
     double probability = ComputeProbability(feature_values);
     lane_sequence_ptr->set_probability(probability);
-    ADEBUG << "Obstacle [" << id << "] has lane sequence ["
-           << lane_sequence_ptr->ShortDebugString()
-           << "].";
   }
 }
 

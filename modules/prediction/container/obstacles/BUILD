@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/common/math:math_utils",
         "//modules/common/util:lru_cache",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/container/pose:pose_container",
