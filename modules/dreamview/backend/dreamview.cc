@@ -20,6 +20,7 @@
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
@@ -52,7 +53,7 @@ Status Dreamview::Init() {
   websocket_.reset(new WebSocketHandler());
   server_->addWebSocketHandler("/websocket", *websocket_);
 
-  map_service_.reset(new MapService(FLAGS_dreamview_map));
+  map_service_.reset(new MapService(apollo::hdmap::SimMapFile()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_service_.get(), FLAGS_routing_from_file));
   sim_control_.reset(new SimControl());
