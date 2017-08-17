@@ -34,9 +34,9 @@ class WebSocketEndpoint {
                         // NOTE: This is a hack to limit the rate
                         // of map updates.
                         this.counter = 0;
-                        RENDERER.updateMapIndex(
-                            message.mapHash, message.mapElements);
+                        RENDERER.updateMapIndex(message.mapHash, message.mapElementIds);
                     }
+                    this.counter += 1;
                     break;
                 case "MapData":
                     RENDERER.updateMap(message.data);
