@@ -24,7 +24,6 @@
 
 #include "modules/routing/proto/routing.pb.h"
 
-#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
 
 using Id = apollo::hdmap::Id;
@@ -864,7 +863,7 @@ TEST(TestSuite, lane_info) {
   HDMap hdmap;
   EXPECT_EQ(hdmap.load_map_from_file(kMapFilename), 0);
   LaneInfoConstPtr lane1 =
-      hdmap.get_lane_by_id(apollo::common::util::MakeMapId("l1"));
+      hdmap.get_lane_by_id(apollo::hdmap::MakeMapId("l1"));
   EXPECT_EQ("l1", lane1->id().id());
   EXPECT_EQ(lane1->points().size(), 2);
   EXPECT_NEAR(lane1->points()[0].x(), 2.0, 1e-6);

@@ -22,7 +22,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/util/util.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
@@ -180,7 +180,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
   for (size_t i = 0; i < static_cast<size_t>(total_time / freq); ++i) {
     Eigen::Vector2d point;
     double theta = M_PI;
-    if (map->SmoothPointFromLane(apollo::common::util::MakeMapId(lane_id),
+    if (map->SmoothPointFromLane(apollo::hdmap::MakeMapId(lane_id),
                                  lane_s, lane_l, &point, &theta) != 0) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l

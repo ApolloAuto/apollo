@@ -26,8 +26,8 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
@@ -86,7 +86,7 @@ std::shared_ptr<const LaneInfo> PredictionMap::LaneById(const Id& id) {
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
     const std::string& str_id) {
-  return LaneById(apollo::common::util::MakeMapId(str_id));
+  return LaneById(apollo::hdmap::MakeMapId(str_id));
 }
 
 void PredictionMap::GetProjection(const Eigen::Vector2d& position,
@@ -393,7 +393,7 @@ int PredictionMap::LaneTurnType(const Id& id) {
 }
 
 int PredictionMap::LaneTurnType(const std::string& lane_id) {
-  return LaneTurnType(apollo::common::util::MakeMapId(lane_id));
+  return LaneTurnType(apollo::hdmap::MakeMapId(lane_id));
 }
 
 }  // namespace prediction
