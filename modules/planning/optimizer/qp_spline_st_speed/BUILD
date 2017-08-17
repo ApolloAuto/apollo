@@ -46,22 +46,4 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "qp_spline_st_speed_optimizer_test",
-    size = "small",
-    srcs = [
-        "qp_spline_st_speed_optimizer_test.cc",
-    ],
-    data = [
-        "//modules/planning:planning_testdata",
-    ],
-    deps = [
-        "@gtest//:main",
-        ":qp_spline_st_graph",
-        ":qp_spline_st_speed_optimizer",
-        "//modules/planning/optimizer/qp_spline_path",
-        "//modules/planning/proto:qp_spline_path_config_proto",
-    ],
-)
-
 cpplint()
