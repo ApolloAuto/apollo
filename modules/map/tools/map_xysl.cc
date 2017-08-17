@@ -21,6 +21,7 @@
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/proto/map_geometry.pb.h"
@@ -30,8 +31,8 @@ DEFINE_bool(sl_to_xy, false, "calculate sl to xy");
 DEFINE_bool(xy_to_lane, false, "calculate xy to lane");
 DEFINE_bool(lane_to_lane, false, "calculate lane to lane");
 DEFINE_bool(lane_width, false, "calculate lane width");
-DEFINE_string(print_map, "", "print the map");
-DEFINE_string(print_map_bin, "", "print the map binary");
+DEFINE_string(dump_txt_map, "", "text file name for dumping map");
+DEFINE_string(dump_bin_map, "", "binary file name for dumping map");
 DEFINE_string(overlap, "", "get overlap information");
 DEFINE_string(lane_info, "", "print lane info");
 DEFINE_string(signal_info, "", "print signal info");
@@ -276,20 +277,22 @@ int main(int argc, char *argv[]) {
                 << signal_ptr->signal().DebugString() << "]" << std::endl;
     }
   }
-  if (!FLAGS_print_map.empty()) {
-    //const auto *map_client = map_util.get_map_client();
-    std::ofstream ofs(FLAGS_print_map);
-    // TODO(yifei) map api is not available
-    //ofs << map_client->_map.DebugString();
+  if (!FLAGS_dump_txt_map.empty()) {
+    apollo::hdmap::Map map;
+    apollo::common::util::GetProtoFromFile(FLAGS_map_file_path, &map);
+
+    std::ofstream ofs(FLAGS_dump_txt_map);
+    ofs << map.DebugString();
     ofs.close();
   }
-  if (!FLAGS_print_map_bin.empty()) {
-    // const auto *map_client = map_util.get_map_client();
-    std::ofstream ofs(FLAGS_print_map_bin);
+  if (!FLAGS_dump_bin_map.empty()) {
+    apollo::hdmap::Map map;
+    apollo::common::util::GetProtoFromFile(FLAGS_map_file_path, &map);
+
+    std::ofstream ofs(FLAGS_dump_bin_map);
     std::string map_str;
-    // TODO(yifei) map api is not available
-    // map_client->_map.SerializeToString(&map_str);
-    // ofs << map_str;
+    map.SerializeToString(&map_str);
+    ofs << map_str;
     ofs.close();
   }
   if (!FLAGS_sl_to_xy
@@ -297,14 +300,14 @@ int main(int argc, char *argv[]) {
       && !FLAGS_xy_to_lane
       && !FLAGS_lane_to_lane
       && !FLAGS_lane_width
-      && FLAGS_print_map.empty()
-      && FLAGS_print_map_bin.empty()
+      && FLAGS_dump_txt_map.empty()
+      && FLAGS_dump_bin_map.empty()
       && FLAGS_lane_info.empty()
       && FLAGS_signal_info.empty()
       && FLAGS_overlap.empty()) {
     std::cout << "usage: --map_file" << std::endl;
-    std::cout << "usage: --print_map" << std::endl;
-    std::cout << "usage: --print_map_bin" << std::endl;
+    std::cout << "usage: --dump_txt_map" << std::endl;
+    std::cout << "usage: --dump_bin_map" << std::endl;
     std::cout << "usage: --xy_to_sl --x --y" << std::endl;
     std::cout << "usage: --sl_to_xy --lane --s --l" << std::endl;
     std::cout << "usage: --xy_to_lane --x --y --lane" << std::endl;
