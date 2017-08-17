@@ -219,8 +219,8 @@ class Renderer {
         this.map.appendMapData(newData, this.coordinates, this.scene);
     }
 
-    updateMapIndex(hash, elements) {
-        this.map.updateIndex(hash, elements, this.scene);
+    updateMapIndex(hash, elementIds) {
+        this.map.updateIndex(hash, elementIds, this.scene);
     }
 }
 

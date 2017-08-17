@@ -19,28 +19,33 @@ const colorMapping = {
     DEFAULT: 0xC0C0C0
 };
 
-// The result will be the all the elements in current but
-// not in data.
-function diffMapElements(elements, data) {
+function base64Decode(encoded) {
+    return Buffer.from(encoded, 'base64').toString();
+}
+
+// The result will be the all the elements in current but not in data.
+function diffMapElements(elementIds, data) {
     const result = {};
+    let empty = true;
 
-    for (const kind in elements) {
+    for (const kind in elementIds) {
         result[kind] = [];
-        const newOnes = elements[kind];
-        const oldOnes = data[kind];
+        const newIds = elementIds[kind];
+        const oldData = data[kind];
 
-        for (let i = 0; i < newOnes.length; ++i) {
-            const found = oldOnes ? oldOnes.find(x => {
-                return x.id.id === newOnes[i];
+        for (let i = 0; i < newIds.length; ++i) {
+            const found = oldData ? oldData.find(old => {
+                return base64Decode(old.id.id) === newIds[i];
             }) : false;
 
             if (!found) {
-                result[kind].push(newOnes[i]);
+                empty = false;
+                result[kind].push(newIds[i]);
             }
         }
     }
 
-    return result;
+    return empty ? {} : result;
 }
 
 function addLaneMesh(laneType, points) {
@@ -232,16 +237,18 @@ export default class Map {
         this.data = {};
     }
 
-    removeExpiredElements(elements, scene) {
+    removeExpiredElements(elementIds, scene) {
         const newData = {};
 
         for (const kind in this.data) {
             newData[kind] = [];
             const oldDataOfThisKind = this.data[kind];
-            const current = elements[kind];
+            const current = elementIds[kind];
             if (current) {
                 for (let i = 0; i < oldDataOfThisKind.length; ++i) {
-                    if (current.includes(oldDataOfThisKind[i].id.id)) {
+                    // Map elements Id is base64 encoded by MessageToJsonString
+                    const id = base64Decode(oldDataOfThisKind[i].id.id);
+                    if (current.includes(id)) {
                         newData[kind].push(oldDataOfThisKind[i]);
                     } else if (oldDataOfThisKind[i].drewObjects) {
                         oldDataOfThisKind[i].drewObjects.forEach(object => {
@@ -301,12 +308,14 @@ export default class Map {
         }
     }
 
-    updateIndex(hash, elements, scene) {
+    updateIndex(hash, elementIds, scene) {
         if (hash !== this.hash) {
             this.hash = hash;
-            const diff = diffMapElements(elements, this.data);
-            this.removeExpiredElements(elements, scene);
-            WS.requestMapData(diff);
+            const diff = diffMapElements(elementIds, this.data);
+            this.removeExpiredElements(elementIds, scene);
+            if (!_.isEmpty(diff)) {
+                WS.requestMapData(diff);
+            }
         }
     }
 }

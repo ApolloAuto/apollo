@@ -127,8 +127,8 @@ nlohmann::json MapElementIds::Json() const {
 MapService::MapService(const std::string &map_filename)
     : pnc_map_(map_filename) {}
 
-MapElementIds MapService::CollectMapElements(const PointENU &point,
-                                             double radius) const {
+MapElementIds MapService::CollectMapElementIds(const PointENU &point,
+                                               double radius) const {
   MapElementIds result;
 
   std::vector<LaneInfoConstPtr> lanes;
@@ -232,7 +232,7 @@ bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
   }
 
   std::vector<int> sampled_indices;
-  constexpr double angle_threshold = 0.1; // threshold is about 5.72 degree.
+  constexpr double angle_threshold = 0.1;  // threshold is about 5.72 degree.
   DownsampleByAngle(path.path_points(), angle_threshold, &sampled_indices);
   for (int index : sampled_indices) {
     points->push_back(path.path_points()[index]);
