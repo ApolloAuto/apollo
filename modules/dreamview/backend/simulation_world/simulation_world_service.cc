@@ -113,7 +113,7 @@ void SetObstacleInfo(const PerceptionObstacle &obstacle, Object *world_object) {
   world_object->set_speed(
       std::hypot(obstacle.velocity().x(), obstacle.velocity().y()));
   world_object->set_speed_heading(
-        std::atan2(obstacle.velocity().y(), obstacle.velocity().x()));
+      std::atan2(obstacle.velocity().y(), obstacle.velocity().x()));
   world_object->set_timestamp_sec(obstacle.timestamp());
 }
 
@@ -224,8 +224,7 @@ bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
     world_decision->set_type(Decision_Type_YIELD);
     fence_point = decision.yield().fence_point();
     heading = decision.yield().fence_heading();
-  } else if (decision.has_overtake() &&
-             decision.overtake().has_fence_point()) {
+  } else if (decision.has_overtake() && decision.overtake().has_fence_point()) {
     world_decision->set_type(Decision_Type_OVERTAKE);
     fence_point = decision.overtake().fence_point();
     heading = decision.overtake().fence_heading();
@@ -319,13 +318,13 @@ Json SimulationWorldService::GetUpdateAsJson() const {
   point.set_y(world_.auto_driving_car().position_y());
 
   MapElementIds map_element_ids =
-      map_service_->CollectMapElements(point, kMapRadius);
+      map_service_->CollectMapElementIds(point, kMapRadius);
 
   Json update;
   update["type"] = "sim_world_update";
   update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
   update["world"] = Json::parse(sim_world_json);
-  update["mapElements"] = map_element_ids.Json();
+  update["mapElementIds"] = map_element_ids.Json();
   update["mapHash"] = map_element_ids.Hash();
 
   return update;
@@ -546,8 +545,8 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   // Update obstacle decision.
   for (const auto &obj_decision : decision_res.object_decision().decision()) {
     if (obj_decision.has_perception_id()) {
-      Object &world_obj = obj_map_[std::to_string(
-          obj_decision.perception_id())];
+      Object &world_obj =
+          obj_map_[std::to_string(obj_decision.perception_id())];
       if (!world_obj.has_type()) {
         world_obj.set_type(Object_Type_VIRTUAL);
       }

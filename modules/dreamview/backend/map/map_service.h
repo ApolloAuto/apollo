@@ -62,8 +62,8 @@ struct MapElementIds {
 class MapService {
  public:
   explicit MapService(const std::string &map_filename);
-  MapElementIds CollectMapElements(const apollo::common::PointENU &point,
-                                   double raidus) const;
+  MapElementIds CollectMapElementIds(const apollo::common::PointENU &point,
+                                     double raidus) const;
 
   bool GetPointsFromRouting(
       const apollo::routing::RoutingResponse &routing,

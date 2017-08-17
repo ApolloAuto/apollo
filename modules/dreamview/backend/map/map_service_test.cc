@@ -72,11 +72,11 @@ TEST_F(MapServiceTest, LoadMap) {
   EXPECT_EQ("l1", map_service.hdmap()->get_lane_by_id(id)->id().id());
 }
 
-TEST_F(MapServiceTest, CollectMapElements) {
+TEST_F(MapServiceTest, CollectMapElementIds) {
   PointENU p;
   p.set_x(0.0);
   p.set_y(0.0);
-  MapElementIds map_element_ids = map_service.CollectMapElements(p, 20000.0);
+  MapElementIds map_element_ids = map_service.CollectMapElementIds(p, 20000.0);
 
   EXPECT_THAT(map_element_ids.lane, UnorderedElementsAre("l1"));
   EXPECT_THAT(map_element_ids.crosswalk, UnorderedElementsAre());
