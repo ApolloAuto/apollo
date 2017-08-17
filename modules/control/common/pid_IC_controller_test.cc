@@ -69,12 +69,10 @@ TEST_F(PidICControllerTest, SpeedPidController) {
   pid_IC_controller.Reset();
   EXPECT_NEAR(pid_IC_controller.Control(-0.1, dt), -0.1505, 1e-6);
   pid_IC_controller.Reset();
-  EXPECT_NEAR(pid_IC_controller.Control(500.0, dt), 750.3, 1e-6);
-  pid_IC_controller.Reset();
-  EXPECT_EQ(pid_IC_controller.SaturationStatus(), 1);
-  pid_IC_controller.Reset();
-  EXPECT_NEAR(pid_IC_controller.Control(-500.0, dt), -750.3, 1e-6);
-  EXPECT_EQ(pid_IC_controller.SaturationStatus(), -1);
+  dt = 2;
+  EXPECT_NEAR(pid_IC_controller.Control(0.1, dt), 0.25, 1e-6);
+  EXPECT_EQ(pid_IC_controller.IntegratorSaturationStatus(), 0);
+  EXPECT_NEAR(pid_IC_controller.Control(0.1, dt), 0.25, 1e-6);
 }
 }  // namespace control
 }  // namespace apollo
