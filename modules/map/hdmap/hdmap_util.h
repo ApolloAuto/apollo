@@ -39,6 +39,24 @@ inline std::string BaseMapFile() {
 }
 
 /**
+ * @brief get simulation map file path from flags.
+ * @return simulation map path
+ */
+inline std::string SimMapFile() {
+  return apollo::common::util::StrCat(
+      FLAGS_map_dir, "/", FLAGS_sim_map_filename);
+}
+
+/**
+ * @brief get routing map file path from flags.
+ * @return routing map path
+ */
+inline std::string RoutingMapFile() {
+  return apollo::common::util::StrCat(
+      FLAGS_map_dir, "/", FLAGS_routing_map_filename);
+}
+
+/**
  * @brief create a Map ID given a string.
  * @param id a string id
  * @return a Map ID instance

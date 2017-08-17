@@ -17,6 +17,7 @@
 #include "modules/routing/routing.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/core/navigator.h"
 
@@ -31,8 +32,9 @@ std::string Routing::Name() const { return FLAGS_node_name; }
 
 Routing::Routing()
     : monitor_(apollo::common::monitor::MonitorMessageItem::ROUTING) {
-  AINFO << "Use routing topology graph path: " << FLAGS_graph_file_path;
-  navigator_ptr_.reset(new Navigator(FLAGS_graph_file_path));
+  const auto routing_map_file = apollo::hdmap::RoutingMapFile();
+  AINFO << "Use routing topology graph path: " << routing_map_file;
+  navigator_ptr_.reset(new Navigator(routing_map_file));
 }
 
 apollo::common::Status Routing::Init() {

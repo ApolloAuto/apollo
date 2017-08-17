@@ -17,6 +17,7 @@ cc_library(
         "//modules/common/monitor",
         "//modules/common/status",
         "//modules/common/util",
+        "//modules/map/hdmap",
         "//modules/routing/common:routing_gflags",
         "//modules/routing/core",
         "//modules/routing/proto:routing_proto",

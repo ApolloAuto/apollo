@@ -18,19 +18,20 @@
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
-#include "modules/routing/common/routing_gflags.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/topo_creator/graph_creator.h"
 
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   std::unique_ptr<::apollo::routing::GraphCreator> creator_ptr;
-  creator_ptr.reset(new ::apollo::routing::GraphCreator(FLAGS_map_file_path,
-                                                        FLAGS_graph_file_path));
+  const auto routing_map_file = apollo::hdmap::RoutingMapFile();
+  creator_ptr.reset(new ::apollo::routing::GraphCreator(
+      apollo::hdmap::BaseMapFile(), routing_map_file));
   if (!creator_ptr->Create()) {
     AERROR << "Create routing topo failed!";
     return -1;
   }
-  AINFO << "Create routing topo successfully from " << FLAGS_graph_file_path;
+  AINFO << "Create routing topo successfully from " << routing_map_file;
   return 0;
 }

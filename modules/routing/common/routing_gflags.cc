@@ -21,9 +21,6 @@ DEFINE_string(node_namespace, "routing", "the namespace for this node");
 
 DEFINE_bool(use_road_id, true, "enable use road id to cut routing result");
 
-DEFINE_string(graph_file_path, "modules/map/data/routing_map.txt",
-              "the default file name of topology graph data");
-
 DEFINE_bool(enable_debug_mode, true, "enable debug mode");
 DEFINE_string(debug_route_path, "",
               "the default path of routing result debug file");

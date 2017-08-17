@@ -24,6 +24,10 @@ DEFINE_string(map_dir, "modules/map/data/new_garage",
 
 DEFINE_string(base_map_filename, "base_map.xml",
               "Base map file which locates in the map_dir.");
+DEFINE_string(sim_map_filename, "sim_map.bin",
+              "Simulation map file which locates in the map_dir.");
+DEFINE_string(routing_map_filename, "routing_map.bin",
+              "Routing map file which locates in the map_dir.");
 
 DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
               "the file path of vehicle config file");
