@@ -55,12 +55,10 @@ bool ActiveSetQpSolver::Solve() {
   my_options.epsNum = qp_eps_num_;
   my_options.epsDen = qp_eps_den_;
   my_options.epsIterRef = qp_eps_iter_ref_;
-
+  qp_problem.setOptions(my_options);  
   if (!debug_info_) {
     qp_problem.setPrintLevel(qpOASES::PL_NONE);
   }
-
-  qp_problem.setOptions(my_options);
   // definition of qpOASESproblem
   double h_matrix[kernel_matrix_.rows() * kernel_matrix_.cols()];  // NOLINT
   double g_matrix[offset_.rows()];                                 // NOLINT
