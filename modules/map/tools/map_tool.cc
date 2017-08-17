@@ -21,6 +21,7 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map.pb.h"
 
 DEFINE_double(x_offset, 587318.4866268333, "x offset");
@@ -79,8 +80,9 @@ int main(int32_t argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   Map map_pb;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_map_file_path, &map_pb)) {
-    AERROR << "Fail to open:" << FLAGS_map_file_path;
+  const auto map_file = apollo::hdmap::BaseMapFile();
+  if (!apollo::common::util::GetProtoFromFile(map_file, &map_pb)) {
+    AERROR << "Fail to open:" << map_file;
     return 1;
   }
   ShiftMap(&map_pb);

@@ -51,9 +51,6 @@ TEST_F(LidarProcessTest, test_Init) {
   EXPECT_FALSE(lidar_process_.InitFrameDependence());
   EXPECT_FALSE(lidar_process_.Init());
   FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
-  FLAGS_enable_hdmap_input = true;
-  FLAGS_map_file_path = "not_exit_path";
-  EXPECT_FALSE(lidar_process_.InitFrameDependence());
   FLAGS_enable_hdmap_input = false;
   EXPECT_TRUE(lidar_process_.InitFrameDependence());
 
