@@ -91,6 +91,9 @@ bool GetProtoFromASCIIFile(const std::string &file_name, MessageType *message) {
 
   ZeroCopyInputStream *input = new FileInputStream(file_descriptor);
   bool success = TextFormat::Parse(input, message);
+  if (!success) {
+    AERROR << "Failed to parse file " << file_name;
+  }
   delete input;
   close(file_descriptor);
   return success;
@@ -123,7 +126,14 @@ template <typename MessageType>
 bool GetProtoFromBinaryFile(const std::string &file_name,
                             MessageType *message) {
   std::fstream input(file_name, std::ios::in | std::ios::binary);
-  return message->ParseFromIstream(&input);
+  if (!input.good()) {
+    AERROR << "Failed to open file " << file_name;
+    return false;
+  }
+  if (!message->ParseFromIstream(&input)) {
+    AERROR << "Failed to parse file " << file_name;
+  }
+  return true;
 }
 
 /**
