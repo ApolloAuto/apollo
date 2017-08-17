@@ -42,7 +42,16 @@ QpSplinePathGenerator::QpSplinePathGenerator(
     const ReferenceLine& reference_line,
     const QpSplinePathConfig& qp_spline_path_config)
     : reference_line_(reference_line),
-      qp_spline_path_config_(qp_spline_path_config) {}
+      qp_spline_path_config_(qp_spline_path_config) {
+  CHECK_GE(qp_spline_path_config_.regularization_weight(), 0.0)
+      << "regularization_weight should NOT be negative.";
+  CHECK_GE(qp_spline_path_config_.derivative_weight(), 0.0)
+      << "derivative_weight should NOT be negative.";
+  CHECK_GE(qp_spline_path_config_.second_derivative_weight(), 0.0)
+      << "second_derivative_weight should NOT be negative.";
+  CHECK_GE(qp_spline_path_config_.third_derivative_weight(), 0.0)
+      << "third_derivative_weight should NOT be negative.";
+}
 
 bool QpSplinePathGenerator::Generate(
     const ConstPathObstacleList& path_obstacles, const SpeedData& speed_data,
@@ -99,8 +108,7 @@ bool QpSplinePathGenerator::Generate(
   ReferencePoint ref_point =
       reference_line_.get_reference_point(init_frenet_point_.s());
   Eigen::Vector2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
-      ref_point.heading(), {ref_point.x(), ref_point.y()},
-      start_l);
+      ref_point.heading(), {ref_point.x(), ref_point.y()}, start_l);
 
   double x_diff = xy_point.x() - init_point.path_point().x();
   double y_diff = xy_point.y() - init_point.path_point().y();
@@ -115,8 +123,7 @@ bool QpSplinePathGenerator::Generate(
     ReferencePoint ref_point = reference_line_.get_reference_point(s);
     Eigen::Vector2d xy_point =
         CartesianFrenetConverter::CalculateCartesianPoint(
-        ref_point.heading(), {ref_point.x(), ref_point.y()},
-        l);
+            ref_point.heading(), {ref_point.x(), ref_point.y()}, l);
     xy_point[0] = xy_point.x() - x_diff;
     xy_point[1] = xy_point.y() - y_diff;
     double theta = CartesianFrenetConverter::CalculateTheta(
@@ -133,7 +140,7 @@ bool QpSplinePathGenerator::Generate(
     if (Double::Compare(path_point.s(), end_s) >= 0) {
       break;
     }
-    path_points.push_back(path_point);
+    path_points.push_back(std::move(path_point));
     s += s_resolution;
   }
   path_data->SetReferenceLine(&reference_line_);
@@ -176,18 +183,16 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
 bool QpSplinePathGenerator::InitCoordRange(const QpFrenetFrame& qp_frenet_frame,
                                            double* const start_s,
                                            double* const end_s) {
+  DCHECK_NOTNULL(start_s);
+  DCHECK_NOTNULL(end_s);
+
   // TODO(all): step 1 get current sl coordinate - with init coordinate point
-  double start_point = std::max(init_frenet_point_.s() - 5.0, 0.0);
-
-  const ReferenceLine& reference_line_ = qp_frenet_frame.GetReferenceLine();
-
-  double end_point = std::min(reference_line_.length(),
-                              *start_s + FLAGS_look_forward_distance);
-
-  end_point =
-      std::min(qp_frenet_frame.feasible_longitudinal_upper_bound(), end_point);
-  *start_s = start_point;
-  *end_s = end_point;
+  const double kStartPointBackwardDistance = 5.0;
+  *start_s =
+      std::max(init_frenet_point_.s() - kStartPointBackwardDistance, 0.0);
+  *end_s = std::min(qp_frenet_frame.feasible_longitudinal_upper_bound(),
+                    std::min(qp_frenet_frame.GetReferenceLine().length(),
+                             *start_s + FLAGS_look_forward_distance));
   return true;
 }
 
@@ -243,9 +248,9 @@ bool QpSplinePathGenerator::AddConstraint(
 
   // add init status constraint
   spline_constraint->AddPointConstraint(init_frenet_point_.s(),
-                                             init_frenet_point_.l());
+                                        init_frenet_point_.l());
   spline_constraint->AddPointDerivativeConstraint(init_frenet_point_.s(),
-                                                     init_frenet_point_.dl());
+                                                  init_frenet_point_.dl());
   spline_constraint->AddPointSecondDerivativeConstraint(
       init_frenet_point_.s(), init_frenet_point_.ddl());
   ADEBUG << "init frenet point: " << init_frenet_point_.ShortDebugString();
@@ -267,31 +272,35 @@ bool QpSplinePathGenerator::AddConstraint(
     qp_frenet_frame.GetDynamicObstacleBound(s, &dynamic_obs_boundary);
 
     if (init_frenet_point_.l() > road_boundary.second) {
-      road_boundary.second = init_frenet_point_.l() +
-        qp_spline_path_config_.cross_lane_extension_buffer();
+      road_boundary.second =
+          init_frenet_point_.l() +
+          qp_spline_path_config_.cross_lane_extension_buffer();
     } else if (init_frenet_point_.l() < road_boundary.first) {
-      road_boundary.first = init_frenet_point_.l() -
-        qp_spline_path_config_.cross_lane_extension_buffer();
+      road_boundary.first =
+          init_frenet_point_.l() -
+          qp_spline_path_config_.cross_lane_extension_buffer();
     }
 
     std::pair<double, double> boundary = road_boundary;
-    boundary.first = std::max(boundary.first,
+    boundary.first = std::max(
+        boundary.first,
         std::max(static_obs_boundary.first, dynamic_obs_boundary.first));
-    boundary.second = std::min(boundary.second,
+    boundary.second = std::min(
+        boundary.second,
         std::min(static_obs_boundary.second, dynamic_obs_boundary.second));
     boundary_low.push_back(boundary.first);
     boundary_high.push_back(boundary.second);
     ADEBUG << "s:" << s << " boundary_low:" << boundary.first
-           << " boundary_high:" << boundary.second << " road_boundary_low: "
-           << road_boundary.first << "road_boundary_high: "
-           << road_boundary.second << " static_obs_boundary_low: "
-           << static_obs_boundary.first << "static_obs_boundary_high: "
-           << static_obs_boundary.second << "dynamic_obs_boundary_low: "
-           << dynamic_obs_boundary.first << "dynamic_obs_boundary_high: "
-           << dynamic_obs_boundary.second;
+           << " boundary_high:" << boundary.second
+           << " road_boundary_low: " << road_boundary.first
+           << "road_boundary_high: " << road_boundary.second
+           << " static_obs_boundary_low: " << static_obs_boundary.first
+           << "static_obs_boundary_high: " << static_obs_boundary.second
+           << "dynamic_obs_boundary_low: " << dynamic_obs_boundary.first
+           << "dynamic_obs_boundary_high: " << dynamic_obs_boundary.second;
   }
   if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low,
-                                          boundary_high)) {
+                                      boundary_high)) {
     AERROR << "Add boundary constraint failed";
     return false;
   }
@@ -308,22 +317,22 @@ bool QpSplinePathGenerator::AddConstraint(
 bool QpSplinePathGenerator::AddKernel() {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
-  if (qp_spline_path_config_.regularization_weight() > 0) {
+  if (qp_spline_path_config_.regularization_weight() > 0.0) {
     spline_kernel->AddRegularization(
         qp_spline_path_config_.regularization_weight());
   }
 
-  if (qp_spline_path_config_.derivative_weight() > 0) {
+  if (qp_spline_path_config_.derivative_weight() > 0.0) {
     spline_kernel->add_derivative_kernel_matrix(
         qp_spline_path_config_.derivative_weight());
   }
 
-  if (qp_spline_path_config_.second_derivative_weight() > 0) {
+  if (qp_spline_path_config_.second_derivative_weight() > 0.0) {
     spline_kernel->add_second_order_derivative_matrix(
         qp_spline_path_config_.second_derivative_weight());
   }
 
-  if (qp_spline_path_config_.third_derivative_weight() > 0) {
+  if (qp_spline_path_config_.third_derivative_weight() > 0.0) {
     spline_kernel->add_third_order_derivative_matrix(
         qp_spline_path_config_.third_derivative_weight());
   }
@@ -339,6 +348,12 @@ bool QpSplinePathGenerator::AddKernel() {
 
 bool QpSplinePathGenerator::Solve() {
   if (!spline_generator_->Solve()) {
+    for (size_t i = 0; i < knots_.size(); ++i) {
+      AERROR << "knots_[" << i << "]: " << knots_[i];
+    }
+    for (size_t i = 0; i < evaluated_s_.size(); ++i) {
+      AERROR << "evaluated_s_[" << i << "]: " << evaluated_s_[i];
+    }
     AERROR << "Could not solve the qp problem in spline path generator.";
     return false;
   }
