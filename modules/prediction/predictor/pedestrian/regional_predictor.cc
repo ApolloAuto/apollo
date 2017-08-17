@@ -109,7 +109,7 @@ void RegionalPredictor::GenerateStillTrajectory(
   double delta_heading = 2.0 * M_PI / num_traj;
   double speed = FLAGS_pedestrian_min_speed;
   double total_time = FLAGS_prediction_pedestrian_total_time;
-  int start_index = GetTrajectorySize();
+  int start_index = NumOfTrajectories();
 
   for (int i = 0; i < num_traj; ++i) {
     std::vector<TrajectoryPoint> points;
@@ -158,7 +158,7 @@ void RegionalPredictor::GenerateMovingTrajectory(
   DrawMovingTrajectory(position, velocity, acc,
                        obstacle->kf_pedestrian_tracker(), total_time,
                        &left_points, &right_points);
-  int start_index = GetTrajectorySize();
+  int start_index = NumOfTrajectories();
 
   Trajectory left_trajectory;
   Trajectory right_trajectory;

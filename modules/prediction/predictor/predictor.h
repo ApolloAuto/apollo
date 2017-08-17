@@ -63,7 +63,7 @@ class Predictor {
    * @brief Get trajectory size
    * @return Size of trajectories
    */
-  int GetTrajectorySize();
+  int NumOfTrajectories();
 
  protected:
   /**
