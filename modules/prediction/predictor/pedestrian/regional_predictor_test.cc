@@ -24,6 +24,7 @@
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
@@ -32,14 +33,13 @@
 namespace apollo {
 namespace prediction {
 
-class RegionalPredictorTest : public ::testing::Test {
+class RegionalPredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
+    KMLMapBasedTest::SetUp();
     std::string file =
       "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
-    apollo::hdmap::HDMap::SetDefaultMap(
-        "modules/prediction/testdata/kml_map.bin");
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.01;
     FLAGS_r_var = 0.25;

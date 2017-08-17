@@ -30,6 +30,7 @@ cc_test(
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/predictor/pedestrian:regional_predictor",

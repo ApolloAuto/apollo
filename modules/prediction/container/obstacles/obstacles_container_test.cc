@@ -23,21 +23,21 @@
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 namespace apollo {
 namespace prediction {
 
-class ObstaclesContainerTest : public ::testing::Test {
+class ObstaclesContainerTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
+    KMLMapBasedTest::SetUp();
     std::string file =
       "modules/prediction/testdata/perception_vehicles_pedestrians.pb.txt";
     apollo::perception::PerceptionObstacles perception_obstacles;
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles);
-    apollo::hdmap::HDMap::SetDefaultMap(
-        "modules/prediction/testdata/kml_map.bin");
     container_.Insert(perception_obstacles);
   }
  protected:
