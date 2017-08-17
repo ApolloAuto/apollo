@@ -57,6 +57,7 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        ":kml_map_based_test",
         ":prediction_gflags",
         ":prediction_map",
         "@gtest//:main",
@@ -85,10 +86,20 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        ":kml_map_based_test",
         ":prediction_gflags",
         ":prediction_map",
         ":road_graph",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "kml_map_based_test",
+    hdrs = ["kml_map_based_test.h"],
+    deps = [
+        "//modules/common/configs:config_gflags",
+        "@gtest//:gtest",
     ],
 )
 

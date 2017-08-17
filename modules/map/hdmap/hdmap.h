@@ -50,10 +50,7 @@ class HDMap {
  public:
   static std::unique_ptr<HDMap> CreateMap(const std::string& map_filename);
 
-  // Call SetDefaultMap() before your first call to DefaultMap(), or it will not
-  // take effect. It's generally used in test cases' SetUp() function.
-  static void SetDefaultMap(const std::string& map_filename);
-  // Get default map loaded from the file specified by FLAGS_map_file_path.
+  // Get default map loaded from the file specified by BaseMapFile().
   static const HDMap& DefaultMap();
 
   /**

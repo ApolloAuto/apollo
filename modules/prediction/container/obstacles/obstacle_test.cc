@@ -24,19 +24,19 @@
 
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/map/hdmap/hdmap.h"
 
 namespace apollo {
 namespace prediction {
 
-class ObstacleTest : public ::testing::Test {
+class ObstacleTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    apollo::hdmap::HDMap::SetDefaultMap(
-        "modules/prediction/testdata/kml_map.bin");
+    KMLMapBasedTest::SetUp();
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.1;
     FLAGS_r_var = 0.001;

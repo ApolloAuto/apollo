@@ -17,6 +17,7 @@
 #include "modules/prediction/common/prediction_map.h"
 
 #include "gtest/gtest.h"
+#include "modules/prediction/common/kml_map_based_test.h"
 
 namespace apollo {
 namespace prediction {
@@ -25,11 +26,10 @@ using ::apollo::hdmap::Id;
 using ::apollo::hdmap::LaneInfo;
 using ::apollo::hdmap::MapPathPoint;
 
-class PredictionMapTest : public ::testing::Test {
+class PredictionMapTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    apollo::hdmap::HDMap::SetDefaultMap(
-        "modules/prediction/testdata/kml_map.bin");
+    KMLMapBasedTest::SetUp();
     map_ = PredictionMap::instance();
   }
 

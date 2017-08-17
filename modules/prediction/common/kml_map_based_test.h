@@ -14,16 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
+#ifndef MODULES_PREDICTION_COMMON_KML_MAP_BASED_TEST_H_
+#define MODULES_PREDICTION_COMMON_KML_MAP_BASED_TEST_H_
+
+#include "gtest/gtest.h"
+
 #include "modules/common/configs/config_gflags.h"
 
-DEFINE_string(map_file_path, "modules/map/data/base_map.txt",
-              "the file path of map data file");
+namespace apollo {
+namespace prediction {
 
-DEFINE_string(map_dir, "modules/map/data/new_garage",
-              "Directory which contains a group of related maps.");
+class KMLMapBasedTest : public ::testing::Test {
+ public:
+  void SetUp() override {
+    FLAGS_map_dir = "modules/prediction/testdata";
+    FLAGS_base_map_filename = "kml_map.bin";
+  }
+};
 
-DEFINE_string(base_map_filename, "base_map.xml",
-              "Base map file which locates in the map_dir.");
+}  // namespace prediction
+}  // namespace apollo
 
-DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
-              "the file path of vehicle config file");
+#endif  // MODULES_PREDICTION_COMMON_KML_MAP_BASED_TEST_H_
