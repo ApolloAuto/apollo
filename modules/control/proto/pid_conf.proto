@@ -9,4 +9,5 @@ message PidConf {
   optional double ki = 4;
   optional double kd = 5;
   optional double kaw = 6 [default = 0.0];
+  optional double output_saturation_level = 7;
 }
