@@ -38,9 +38,7 @@ using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const {
-  return "planning";
-}
+std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -49,12 +47,8 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
 }
 
-const Frame* Planning::GetFrame() const {
-  return frame_.get();
-}
-const hdmap::PncMap* Planning::GetPncMap() const {
-  return pnc_map_.get();
-}
+const Frame* Planning::GetFrame() const { return frame_.get(); }
+const hdmap::PncMap* Planning::GetPncMap() const { return pnc_map_.get(); }
 
 bool Planning::InitFrame(const uint32_t sequence_num) {
   frame_.reset(new Frame(sequence_num));
@@ -80,6 +74,8 @@ bool Planning::InitFrame(const uint32_t sequence_num) {
   frame_->RecordInputDebug();
   return true;
 }
+
+void Planning::SetConfig(const PlanningConfig& config) { config_ = config; }
 
 Status Planning::Init() {
   pnc_map_.reset(new hdmap::PncMap(apollo::hdmap::BaseMapFile()));
