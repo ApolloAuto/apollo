@@ -21,12 +21,12 @@
 namespace apollo {
 namespace prediction {
 
-const PredictionObstacle& Predictor::prediction_obstacle() {
-  return prediction_obstacle_;
+const std::vector<Trajectory>& Predictor::trajectories() {
+  return trajectories_;
 }
 
 int Predictor::GetTrajectorySize() {
-  return prediction_obstacle_.trajectory_size();
+  return trajectories_.size();
 }
 
 void Predictor::GenerateTrajectory(
@@ -41,7 +41,7 @@ void Predictor::SetEqualProbability(double probability, int start_index) {
   if (start_index >= 0 && num > start_index) {
     probability /= static_cast<double>(num - start_index);
     for (int i = start_index; i < num; ++i) {
-      prediction_obstacle_.mutable_trajectory(i)->set_probability(probability);
+      trajectories_[i].set_probability(probability);
     }
   }
 }
