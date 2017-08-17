@@ -17,6 +17,7 @@
 #include "modules/control/common/pid_IC_controller.h"
 
 #include <cmath>
+#include <iostream>
 
 #include "modules/common/log.h"
 
@@ -41,11 +42,19 @@ double PIDICController::Control(const double error, const double dt) {
     integral_ = 0;
   } else {
     double u = error * kp_ + integral_ + error * dt * ki_ + diff * kd_;
-    if (((error * u) > 0) &&
-        ((u > saturation_high_) || (u < saturation_low_))) {
-      // Do not update integral_
+    if (((error * u) > 0) && ((u > integrator_saturation_high_) ||
+                              (u < integrator_saturation_low_))) {
     } else {
+      // Only update integral then
       integral_ += error * dt * ki_;
+    }
+
+    if (integral_ > integrator_saturation_high_) {
+      integrator_saturation_status_ = 1;
+    } else if (integral_ < integrator_saturation_low_) {
+      integrator_saturation_status_ = -1;
+    } else {
+      integrator_saturation_status_ = 0;
     }
   }
 
