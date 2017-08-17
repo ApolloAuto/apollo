@@ -21,8 +21,8 @@ limitations under the License.
 
 #include "glog/logging.h"
 
-#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_impl.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 namespace {
 
@@ -334,7 +334,7 @@ void LaneInfo::post_process(const HDMapImpl &map_instance) {
 void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
   for (const auto &overlap_id : _overlap_ids) {
     const auto &overlap_ptr = map_instance.get_overlap_by_id(
-        apollo::common::util::MakeMapId(overlap_id));
+        apollo::hdmap::MakeMapId(overlap_id));
     if (overlap_ptr == nullptr) {
       continue;
     }
@@ -344,7 +344,7 @@ void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
       if (object_id == _lane.id().id()) {
         continue;
       }
-      const auto &object_map_id = apollo::common::util::MakeMapId(object_id);
+      const auto &object_map_id = apollo::hdmap::MakeMapId(object_id);
       if (map_instance.get_lane_by_id(object_map_id) != nullptr) {
         _cross_lanes.emplace_back(overlap_ptr);
       }

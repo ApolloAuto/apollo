@@ -30,7 +30,7 @@
 #include "modules/map/proto/map_id.pb.h"
 
 #include "modules/common/log.h"
-#include "modules/common/util/util.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 
 namespace apollo {
@@ -92,8 +92,7 @@ bool PncMap::validate_routing(const ::apollo::routing::RoutingResponse &routing)
   const double kLargeEps = 1e-3;
   for (int i = 0; i < num_routes; ++i) {
     const auto &segment = routing.route(i);
-    const auto lane =
-        hdmap_.get_lane_by_id(common::util::MakeMapId(segment.id()));
+    const auto lane = hdmap_.get_lane_by_id(hdmap::MakeMapId(segment.id()));
     if (lane == nullptr) {
       AERROR << "Can not find lane with id = " + segment.id() + ".";
       return false;
@@ -142,8 +141,7 @@ bool PncMap::validate_routing(const ::apollo::routing::RoutingResponse &routing)
       continue;
     }
     const auto &segment = routing.route(i);
-    const auto lane =
-        hdmap_.get_lane_by_id(common::util::MakeMapId(segment.id()));
+    const auto lane = hdmap_.get_lane_by_id(hdmap::MakeMapId(segment.id()));
     const std::string next_id = routing.route(i + 1).id();
     bool is_successor = false;
     for (const auto &other_lane_id : lane->lane().successor_id()) {
@@ -292,8 +290,7 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
   // Extend the trajectory towards the start of the trajectory.
   if (start_s < 0) {
     const auto &first_segment = routing.route(0).road_info().passage_region(0).segment(0);
-    auto lane =
-        hdmap_.get_lane_by_id(common::util::MakeMapId(first_segment.id()));
+    auto lane = hdmap_.get_lane_by_id(hdmap::MakeMapId(first_segment.id()));
     if (!lane) {
       AERROR << "failed to get lane from id " << first_segment.id();
       return false;
@@ -334,7 +331,7 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
         end_s - router_s + lane_segment.start_s(), lane_segment.end_s());
     if (adjusted_start_s < adjusted_end_s) {
       const auto lane_info =
-          hdmap_.get_lane_by_id(common::util::MakeMapId(lane_segment.id()));
+          hdmap_.get_lane_by_id(hdmap::MakeMapId(lane_segment.id()));
       if (lane_info == nullptr) {
         AERROR << "Failed to find lane " << lane_segment.id() << " in map";
         return false;
@@ -353,8 +350,7 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
     std::string last_lane_id = last_segment.id();
     double last_s = last_segment.end_s();
     while (router_s < end_s - kRouteEpsilon) {
-      const auto lane =
-          hdmap_.get_lane_by_id(common::util::MakeMapId(last_lane_id));
+      const auto lane = hdmap_.get_lane_by_id(hdmap::MakeMapId(last_lane_id));
       if (lane == nullptr) {
         break;
       }
