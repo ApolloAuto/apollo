@@ -113,6 +113,7 @@ function set_lib_path() {
       fi
       PY_LIB_PATH=${APOLLO_ROOT_DIR}/py_proto
       PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib
   fi
   export PYTHONPATH=${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
 }
