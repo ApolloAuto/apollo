@@ -25,7 +25,10 @@ DECLARE_string(map_file_path);
 // The directory which contains a group of related maps, such as base_map,
 // sim_map, routing_topo_grapth, etc.
 DECLARE_string(map_dir);
+
 DECLARE_string(base_map_filename);
+DECLARE_string(sim_map_filename);
+DECLARE_string(routing_map_filename);
 
 DECLARE_string(vehicle_config_path);
 
