@@ -97,7 +97,7 @@ Status SignalsXmlParser::parse_traffic_lights(
           std::string stop_line_id;
           int checker = UtilXmlParser::query_string_attribute(
                                               *sub_node, "id", &stop_line_id);
-          assert(checker == tinyxml2::XML_SUCCESS);
+          CHECK(checker == tinyxml2::XML_SUCCESS);
           trafficlight_internal.stop_line_ids.insert(stop_line_id);
           sub_node = sub_node->NextSiblingElement("objectReference");
         }
