@@ -31,8 +31,7 @@ export default class Prediction {
         });
         this.predCircles = [];
 
-        if (!STORE.options.showObstacles ||
-            (!STORE.options.showPredictionMajor && !STORE.options.showPredictionMinor)) {
+        if (!STORE.options.showPredictionMajor && !STORE.options.showPredictionMinor) {
             return;
         }
 
@@ -43,6 +42,10 @@ export default class Prediction {
             const predictionLineColor = ObstacleColorMapping[obj.type] || DEFAULT_COLOR;
             const predictions = obj.prediction;
             if (_.isEmpty(predictions)) {
+                return;
+            }
+
+            if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(obj.type))]) {
                 return;
             }
 
