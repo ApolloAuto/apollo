@@ -13,6 +13,7 @@ cc_library(
         "hdmap.h",
         "hdmap_common.h",
         "hdmap_impl.h",
+        "hdmap_util.h",
     ],
     deps = [
         "//modules/common:macro",

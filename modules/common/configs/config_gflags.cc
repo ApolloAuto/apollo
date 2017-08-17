@@ -19,5 +19,11 @@
 DEFINE_string(map_file_path, "modules/map/data/base_map.txt",
               "the file path of map data file");
 
+DEFINE_string(map_dir, "modules/map/data",
+              "Directory which contains a group of related maps.");
+
+DEFINE_string(base_map_filename, "base_map.txt",
+              "Base map file which locates in the map_dir.");
+
 DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
               "the file path of vehicle config file");
