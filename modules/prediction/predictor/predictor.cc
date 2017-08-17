@@ -25,7 +25,7 @@ const std::vector<Trajectory>& Predictor::trajectories() {
   return trajectories_;
 }
 
-int Predictor::GetTrajectorySize() {
+int Predictor::NumOfTrajectories() {
   return trajectories_.size();
 }
 
@@ -37,7 +37,7 @@ void Predictor::GenerateTrajectory(
 }
 
 void Predictor::SetEqualProbability(double probability, int start_index) {
-  int num = GetTrajectorySize();
+  int num = NumOfTrajectories();
   if (start_index >= 0 && num > start_index) {
     probability /= static_cast<double>(num - start_index);
     for (int i = start_index; i < num; ++i) {
