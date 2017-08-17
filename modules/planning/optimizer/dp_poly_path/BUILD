@@ -45,20 +45,4 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "dp_road_graph_test",
-    size = "small",
-    srcs = [
-        "dp_road_graph_test.cc",
-    ],
-    data = [
-        "//modules/map:map_data",
-        "//modules/planning:planning_testdata",
-    ],
-    deps = [
-        ":dp_poly_path",
-        "//modules/planning/integration_tests:planning_test_base",
-    ],
-)
-
 cpplint()
