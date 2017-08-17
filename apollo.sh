@@ -500,25 +500,30 @@ function link_gpu_caffe_build() {
 }
 
 function print_usage() {
-  echo 'Usage:
-  ./apollo.sh [OPTION]'
-  echo 'Options:
-  build: run build only
-  build_opt: build optimized binary for the code (please choose this option if using perception).
-  build_opt_gpu: build optimized binary with Caffe GPU mode support.
-  build_fe: compile frontend javascript code, this requires all the node_modules to be installed already
-  buildify: fix style of BUILD files
-  check: run build/lint/test, please make sure it passes before checking in new code
-  clean: runs Bazel clean
-  config: run configurator tool
-  coverage: generate test coverage report
-  doc: generate doxygen document
-  lint: run code style check
-  print_usage: prints this menu
-  release: to build release version
-  test: run all the unit tests
-  version: current commit and date
-  '
+  RED='\033[0;31m'
+  BLUE='\033[0;34m'
+  BOLD='\033[1m'
+  NONE='\033[0m'
+
+  echo -e "\n${RED}Usage${NONE}:
+  .${BOLD}/apollo.sh${NONE} [OPTION]"
+
+  echo -e "\n${RED}Options${NONE}:
+  ${BLUE}build${NONE}: run build only
+  ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
+  ${BLUE}build_perception${NONE}: build perception module
+  ${BLUE}buildify${NONE}: fix style of BUILD files
+  ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
+  ${BLUE}clean${NONE}: run Bazel clean
+  ${BLUE}config${NONE}: run configurator tool
+  ${BLUE}coverage${NONE}: generate test coverage report
+  ${BLUE}doc${NONE}: generate doxygen document
+  ${BLUE}lint${NONE}: run code style check
+  ${BLUE}usage${NONE}: print this menu
+  ${BLUE}release${NONE}: build release version
+  ${BLUE}test${NONE}: run all unit tests
+  ${BLUE}version${NONE}: display current commit and date
+  "
 }
 
 function main() {
@@ -585,6 +590,9 @@ function main() {
       ;;
     version)
       version
+      ;;
+    usage)
+      print_usage
       ;;
     *)
       print_usage
