@@ -41,7 +41,7 @@ class GarageTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_map_file_path = "modules/planning/testdata/base_map.txt";
-    FLAGS_test_data_dir = "modules/planning/testdata/garage_test/";
+    FLAGS_test_data_dir = "modules/planning/testdata/garage_test";
   }
 };
 
