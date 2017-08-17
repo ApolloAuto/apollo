@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/string_util.h"
+#include "modules/map/proto/map_id.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -35,6 +36,17 @@ namespace hdmap {
 inline std::string BaseMapFile() {
   return apollo::common::util::StrCat(
       FLAGS_map_dir, "/", FLAGS_base_map_filename);
+}
+
+/**
+ * @brief create a Map ID given a string.
+ * @param id a string id
+ * @return a Map ID instance
+ */
+inline apollo::hdmap::Id MakeMapId(const std::string& id) {
+  apollo::hdmap::Id map_id;
+  map_id.set_id(id);
+  return map_id;
 }
 
 }  // namespace hdmap

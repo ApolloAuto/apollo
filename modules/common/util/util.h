@@ -30,7 +30,6 @@
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/map/proto/map_id.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 /**
@@ -86,13 +85,6 @@ apollo::common::TrajectoryPoint MakeTrajectoryPoint(
  * dimension
  */
 double Distance2D(const PathPoint& a, const PathPoint& b);
-
-/**
- * @brief create a Map ID given a string.
- * @param id a string id
- * @return a Map ID instance
- */
-apollo::hdmap::Id MakeMapId(const std::string& id);
 
 }  // namespace util
 }  // namespace common
