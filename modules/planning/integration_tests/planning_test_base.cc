@@ -119,7 +119,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
           << "mv " << tmp_golden_path << " " << FLAGS_test_data_dir << "\n"
           << "git add " << FLAGS_test_data_dir << "/" << golden_result_file;
     ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
-                                                golden_result_file);
+                                                full_golden_path);
   } else {
     ADCTrajectory golden_result;
     bool load_success = ::apollo::common::util::GetProtoFromASCIIFile(

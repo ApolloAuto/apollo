@@ -78,3 +78,5 @@ TEST_F(GarageTest, follow) {
 
 }  // namespace planning
 }  // namespace apollo
+
+TMAIN;

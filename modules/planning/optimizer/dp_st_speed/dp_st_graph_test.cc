@@ -80,3 +80,5 @@ TEST_F(DpStSpeedTest, dp_st_graph_test) {
 
 }  // namespace planning
 }  // namespace apollo
+
+TMAIN;
