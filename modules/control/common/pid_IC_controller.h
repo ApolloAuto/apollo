@@ -49,18 +49,6 @@ class PIDICController : public PIDController {
    */
   virtual double Control(const double error, const double dt);
 
-  /**
-   * @brief get saturation status
-   * @return saturation status
-   */
-  int SaturationStatus() const;
-
-  /**
-   * @brief get status that if integrator is hold
-   * @return if integrator is hold return true
-   */
-  bool integrator_hold() const;
-
  private:
 };
 
