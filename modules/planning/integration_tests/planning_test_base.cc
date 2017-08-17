@@ -115,9 +115,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   }
   TrimPlanning(adc_trajectory_);
   if (FLAGS_test_update_golden_log) {
-    AINFO << "The golden file is " << tmp_golden_path << " Remember to:\n"
-          << "mv " << tmp_golden_path << " " << FLAGS_test_data_dir << "\n"
-          << "git add " << FLAGS_test_data_dir << "/" << golden_result_file;
+    AINFO << "The golden file is regenerated:"  << full_golden_path;
     ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
                                                 full_golden_path);
   } else {
