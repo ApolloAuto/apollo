@@ -2,8 +2,8 @@
 # | Test Configurations                                        |
 # +------------------------------------------------------------+
 
-# By default prints output for all tests, including those which passed.
-test --test_output=all
+# By default prints output only from failed tests.
+test --test_output=errors
 
 # Work around the sandbox issue.
 test --spawn_strategy=standalone
