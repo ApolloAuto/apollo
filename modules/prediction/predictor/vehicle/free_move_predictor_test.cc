@@ -60,15 +60,12 @@ TEST_F(FreeMovePredictorTest, General) {
   EXPECT_TRUE(obstacle_ptr != nullptr);
   FreeMovePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  const PredictionObstacle& prediction_obstacle =
-      predictor.prediction_obstacle();
-  EXPECT_EQ(prediction_obstacle.trajectory_size(), 1);
+  const std::vector<Trajectory>& trajectories = predictor.trajectories();
+  EXPECT_EQ(trajectories.size(), 1);
   EXPECT_NEAR(
-      prediction_obstacle.trajectory(0).trajectory_point(9).path_point().x(),
-      -432.459, 0.001);
+      trajectories[0].trajectory_point(9).path_point().x(), -432.459, 0.001);
   EXPECT_NEAR(
-      prediction_obstacle.trajectory(0).trajectory_point(9).path_point().y(),
-      -156.451, 0.001);
+      trajectories[0].trajectory_point(9).path_point().y(), -156.451, 0.001);
 }
 
 }  // namespace prediction

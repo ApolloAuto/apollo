@@ -68,6 +68,7 @@ double CrossProduct(const Eigen::Vector2d& vec1, const Eigen::Vector2d& vec2) {
 }  // namespace
 
 void RegionalPredictor::Predict(Obstacle* obstacle) {
+  trajectories_.clear();
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
@@ -115,7 +116,7 @@ void RegionalPredictor::GenerateStillTrajectory(
     DrawStillTrajectory(position, heading, speed, total_time, &points);
     Trajectory trajectory;
     GenerateTrajectory(points, &trajectory);
-    prediction_obstacle_.add_trajectory()->CopyFrom(std::move(trajectory));
+    trajectories_.push_back(std::move(trajectory));
     heading += delta_heading;
   }
   SetEqualProbability(probability, start_index);
@@ -163,8 +164,8 @@ void RegionalPredictor::GenerateMovingTrajectory(
   Trajectory right_trajectory;
   GenerateTrajectory(left_points, &left_trajectory);
   GenerateTrajectory(right_points, &right_trajectory);
-  prediction_obstacle_.add_trajectory()->CopyFrom(std::move(left_trajectory));
-  prediction_obstacle_.add_trajectory()->CopyFrom(std::move(right_trajectory));
+  trajectories_.push_back(std::move(left_trajectory));
+  trajectories_.push_back(std::move(right_trajectory));
   SetEqualProbability(probability, start_index);
 }
 
