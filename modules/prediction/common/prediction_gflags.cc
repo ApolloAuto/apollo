@@ -69,6 +69,8 @@ DEFINE_int32(num_trajectory_still_pedestrian, 6,
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
 DEFINE_string(vehicle_model_file,
     "modules/prediction/data/mlp_vehicle_model.bin", "Vehicle model file");
+DEFINE_int32(max_num_obstacles_stored, 100,
+    "maximal number of obstacles stored in obstacles container.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,

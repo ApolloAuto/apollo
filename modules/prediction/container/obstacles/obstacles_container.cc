@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "modules/common/math/math_utils.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -28,7 +29,10 @@ using apollo::perception::PerceptionObstacles;
 
 std::mutex ObstaclesContainer::g_mutex_;
 
-ObstaclesContainer::ObstaclesContainer() { timestamp_ = 0.0; }
+ObstaclesContainer::ObstaclesContainer() {
+  obstacles_.set_capacity(FLAGS_max_num_obstacles_stored),
+  timestamp_ = 0.0;
+}
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   AINFO << "message: " << message.ShortDebugString();
