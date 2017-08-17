@@ -49,9 +49,9 @@ class Predictor {
   virtual ~Predictor() = default;
 
   /**
-   * @brief Get prediction obstacle
+   * @brief Get prediction trajectories
    */
-  virtual const PredictionObstacle& prediction_obstacle();
+  virtual const std::vector<Trajectory>& trajectories();
 
   /**
    * @brief Make prediction
@@ -78,7 +78,7 @@ class Predictor {
   void SetEqualProbability(double probability, int start_index);
 
  protected:
-  PredictionObstacle prediction_obstacle_;
+  std::vector<Trajectory> trajectories_;
 };
 
 }  // namespace prediction

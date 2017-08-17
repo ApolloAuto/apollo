@@ -34,7 +34,7 @@ using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::math::KalmanFilter;
 
 void LaneSequencePredictor::Predict(Obstacle* obstacle) {
-  prediction_obstacle_.Clear();
+  trajectories_.clear();
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
@@ -82,10 +82,10 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     Trajectory trajectory;
     GenerateTrajectory(points, &trajectory);
     trajectory.set_probability(sequence.probability());
-    prediction_obstacle_.add_trajectory()->CopyFrom(trajectory);
+    trajectories_.push_back(std::move(trajectory));
   }
   ADEBUG << "Obstacle [" << obstacle->id()
-         << "] has total " << prediction_obstacle_.trajectory_size()
+         << "] has total " << trajectories_.size()
          << " trajectories.";
 }
 

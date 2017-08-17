@@ -35,7 +35,7 @@ using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::math::KalmanFilter;
 
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
-  prediction_obstacle_.Clear();
+  trajectories_.clear();
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
@@ -69,10 +69,10 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   Trajectory trajectory;
   GenerateTrajectory(points, &trajectory);
   int start_index = 0;
-  prediction_obstacle_.add_trajectory()->CopyFrom(trajectory);
+  trajectories_.push_back(std::move(trajectory));
   SetEqualProbability(1.0, start_index);
   ADEBUG << "Obstacle [" << obstacle->id()
-           << "] has " << prediction_obstacle_.trajectory_size()
+           << "] has " << trajectories_.size()
            << " trajectories.";
 }
 
