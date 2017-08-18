@@ -121,7 +121,8 @@ class Frame {
   bool CreateDestinationObstacle();
 
   std::unique_ptr<Obstacle> CreateVirtualObstacle(
-      const std::string &obstacle_id, const common::math::Vec2d &position,
+      const std::string &obstacle_id,
+      const double route_s,
       const double length, const double width, const double height);
 
   /**
