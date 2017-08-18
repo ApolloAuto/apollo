@@ -33,13 +33,9 @@
 namespace apollo {
 namespace planning {
 
-const std::string& Obstacle::Id() const {
-  return id_;
-}
+const std::string& Obstacle::Id() const { return id_; }
 
-std::int32_t Obstacle::PerceptionId() const {
-  return perception_id_;
-}
+std::int32_t Obstacle::PerceptionId() const { return perception_id_; }
 
 Obstacle::Obstacle(const std::string& id,
                    const perception::PerceptionObstacle& perception_obstacle)
@@ -74,9 +70,7 @@ Obstacle::Obstacle(const std::string& id,
   }
 }
 
-bool Obstacle::IsStatic() const {
-  return is_static_;
-}
+bool Obstacle::IsStatic() const { return is_static_; }
 
 bool Obstacle::IsStaticObstacle(
     const perception::PerceptionObstacle& perception_obstacle) {
@@ -137,8 +131,8 @@ void Obstacle::CreateObstacles(
   for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
     const auto perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
-    int trajectory_index = 0;
     if (prediction_obstacle.trajectory_size() > 0) {
+      int trajectory_index = 0;
       for (const auto& trajectory : prediction_obstacle.trajectory()) {
         const std::string obstacle_id =
             apollo::common::util::StrCat(perception_id, "_", trajectory_index);

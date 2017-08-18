@@ -242,14 +242,15 @@ Status QpSplineStGraph::ApplyKernel(
         qp_spline_st_speed_config_.jerk_kernel_weight());
   }
 
-  if (AddCruiseReferenceLineKernel(t_evaluated_, speed_limit,
-      qp_spline_st_speed_config_.cruise_weight()) != Status::OK()) {
+  if (AddCruiseReferenceLineKernel(
+          t_evaluated_, speed_limit,
+          qp_spline_st_speed_config_.cruise_weight()) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
 
-  if (AddFollowReferenceLineKernel(t_evaluated_, boundaries,
-      qp_spline_st_speed_config_.follow_weight()) !=
-      Status::OK()) {
+  if (AddFollowReferenceLineKernel(
+          t_evaluated_, boundaries,
+          qp_spline_st_speed_config_.follow_weight()) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
   return Status::OK();
@@ -282,13 +283,13 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
 
   for (std::size_t i = 0; i < evaluate_t.size(); ++i) {
     ADEBUG << "Cruise Ref S: " << s_vec[i]
-           <<" Relative time: " << evaluate_t[i] << std::endl;
+           << " Relative time: " << evaluate_t[i] << std::endl;
   }
 
   if (evaluate_t.size() > 0) {
     spline_kernel->add_reference_line_kernel_matrix(
-      evaluate_t, s_vec,
-      weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
+        evaluate_t, s_vec,
+        weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
   }
   spline_kernel->AddRegularization(0.01);
   return Status::OK();
@@ -323,13 +324,13 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
 
   if (!ref_s.empty()) {
     spline_kernel->add_reference_line_kernel_matrix(
-      filtered_evaluate_t, ref_s,
-      weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
+        filtered_evaluate_t, ref_s,
+        weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
   }
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
     ADEBUG << "Follow Ref S: " << ref_s[i]
-           <<" Relative time: " << filtered_evaluate_t[i] << std::endl;
+           << " Relative time: " << filtered_evaluate_t[i] << std::endl;
   }
   return Status::OK();
 }
@@ -375,11 +376,10 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
 
   uint32_t i = 0;
   uint32_t j = 0;
-  double distance = 0.0;
   const double kDistanceEpsilon = 1e-6;
   while (i < t_evaluated_.size() &&
          j + 1 < speed_limit.speed_limit_points().size()) {
-    distance = v * t_evaluated_[i];
+    const double distance = v * t_evaluated_[i];
     if (fabs(distance - speed_limit.speed_limit_points()[j].first) <
         kDistanceEpsilon) {
       speed_upper_bound->push_back(speed_limit.speed_limit_points()[j].second);

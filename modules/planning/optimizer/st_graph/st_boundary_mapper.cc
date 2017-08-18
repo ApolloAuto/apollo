@@ -538,7 +538,6 @@ Status StBoundaryMapper::GetSpeedLimits(
     SpeedLimit* const speed_limit_data) const {
   CHECK_NOTNULL(speed_limit_data);
 
-  std::vector<double> speed_limits;
   for (const auto& path_point : path_data_.discretized_path().path_points()) {
     if (Double::Compare(path_point.s(), reference_line_.length()) > 0) {
       std::string msg = common::util::StrCat(
