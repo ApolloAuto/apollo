@@ -31,11 +31,11 @@
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
-#include "modules/planning/optimizer/dp_poly_path/dp_poly_path_optimizer.h"
-#include "modules/planning/optimizer/dp_st_speed/dp_st_speed_optimizer.h"
-#include "modules/planning/optimizer/qp_spline_path/qp_spline_path_optimizer.h"
-#include "modules/planning/optimizer/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/planner/em/decider.h"
+#include "modules/planning/tasks/dp_poly_path/dp_poly_path_optimizer.h"
+#include "modules/planning/tasks/dp_st_speed/dp_st_speed_optimizer.h"
+#include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
+#include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -50,32 +50,31 @@ using common::TrajectoryPoint;
 using common::VehicleState;
 using common::math::Vec2d;
 
-void EMPlanner::RegisterOptimizers() {
-  optimizer_factory_.Register(DP_POLY_PATH_OPTIMIZER, []() -> Optimizer* {
-    return new DpPolyPathOptimizer(OptimizerType_Name(DP_POLY_PATH_OPTIMIZER));
+void EMPlanner::RegisterTasks() {
+  task_factory_.Register(DP_POLY_PATH_OPTIMIZER, []() -> Task* {
+    return new DpPolyPathOptimizer(TaskType_Name(DP_POLY_PATH_OPTIMIZER));
   });
-  optimizer_factory_.Register(DP_ST_SPEED_OPTIMIZER, []() -> Optimizer* {
-    return new DpStSpeedOptimizer(OptimizerType_Name(DP_ST_SPEED_OPTIMIZER));
+  task_factory_.Register(DP_ST_SPEED_OPTIMIZER, []() -> Task* {
+    return new DpStSpeedOptimizer(TaskType_Name(DP_ST_SPEED_OPTIMIZER));
   });
-  optimizer_factory_.Register(QP_SPLINE_PATH_OPTIMIZER, []() -> Optimizer* {
-    return new QpSplinePathOptimizer(
-        OptimizerType_Name(QP_SPLINE_PATH_OPTIMIZER));
+  task_factory_.Register(QP_SPLINE_PATH_OPTIMIZER, []() -> Task* {
+    return new QpSplinePathOptimizer(TaskType_Name(QP_SPLINE_PATH_OPTIMIZER));
   });
-  optimizer_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Optimizer* {
+  task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Task* {
     return new QpSplineStSpeedOptimizer(
-        OptimizerType_Name(QP_SPLINE_ST_SPEED_OPTIMIZER));
+        TaskType_Name(QP_SPLINE_ST_SPEED_OPTIMIZER));
   });
 }
 
 Status EMPlanner::Init(const PlanningConfig& config) {
   AINFO << "In EMPlanner::Init()";
-  RegisterOptimizers();
-  for (int i = 0; i < config.em_planner_config().optimizer_size(); ++i) {
-    optimizers_.emplace_back(optimizer_factory_.CreateObject(
-        config.em_planner_config().optimizer(i)));
-    AINFO << "Created optimizer:" << optimizers_.back()->name();
+  RegisterTasks();
+  for (const auto task : config.em_planner_config().task()) {
+    tasks_.emplace_back(
+        task_factory_.CreateObject(static_cast<TaskType>(task)));
+    AINFO << "Created task:" << tasks_.back()->name();
   }
-  for (auto& optimizer : optimizers_) {
+  for (auto& optimizer : tasks_) {
     if (!optimizer->Init(config)) {
       std::string msg(common::util::StrCat("Init optimizer[", optimizer->name(),
                                            "] failed."));
@@ -88,14 +87,14 @@ Status EMPlanner::Init(const PlanningConfig& config) {
 
 void EMPlanner::RecordDebugInfo(const std::string& name,
                                 const double time_diff_ms,
-                                planning_internal::Debug* ptr_debug,
+                                planning_internal::Debug*,
                                 planning::LatencyStats* ptr_latency_stats) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;
   }
-  OptimizerType type;
-  DCHECK(OptimizerType_Parse(name, &type));
+  TaskType type;
+  DCHECK(TaskType_Parse(name, &type));
 
   auto ptr_stats = ptr_latency_stats->add_processor_stats();
   ptr_stats->set_name(name);
@@ -126,11 +125,11 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   auto ptr_debug = frame->MutableADCTrajectory()->mutable_debug();
   auto ptr_latency_stats =
       frame->MutableADCTrajectory()->mutable_latency_stats();
-  for (auto& optimizer : optimizers_) {
+  for (auto& optimizer : tasks_) {
     const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
     auto ret = optimizer->Optimize(frame);
     if (!ret.ok()) {
-      AERROR << "Failed to run optimizer:" << optimizer->name()
+      AERROR << "Failed to run tasks:" << optimizer->name()
              << ret.error_message();
       return ret;
     }

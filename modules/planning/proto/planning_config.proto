@@ -8,7 +8,7 @@ import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_spline_st_speed_config.proto";
 import "modules/planning/proto/reference_line_smoother_config.proto";
 
-enum OptimizerType {
+enum TaskType {
   DP_POLY_PATH_OPTIMIZER = 0;
   DP_ST_SPEED_OPTIMIZER = 1;
   QP_SPLINE_PATH_OPTIMIZER = 2;
@@ -16,7 +16,7 @@ enum OptimizerType {
 };
 
 message EMPlannerConfig {
-  repeated OptimizerType optimizer = 1;
+  repeated TaskType task = 1;
   optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
   optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
   optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
