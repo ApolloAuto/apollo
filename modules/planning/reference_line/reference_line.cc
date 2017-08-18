@@ -21,10 +21,10 @@
 #include "modules/planning/reference_line/reference_line.h"
 
 #include <algorithm>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
-#include <limits>
 
 #include "boost/math/tools/minima.hpp"
 
@@ -272,26 +272,6 @@ std::string ReferenceLine::DebugString() const {
       "point num:", reference_points_.size(),
       apollo::common::util::PrintDebugStringIter(
           reference_points_.begin(), reference_points_.begin() + limit, ""));
-}
-
-void ReferenceLine::get_s_range_from_box2d(
-    const ::apollo::common::math::Box2d& box2d, double* max_s,
-    double* min_s) const {
-  std::vector<apollo::common::math::Vec2d> corners;
-  box2d.GetAllCorners(&corners);
-  double ret_max_s = std::numeric_limits<double>::min();
-  double ret_min_s = std::numeric_limits<double>::max();
-  for (auto& corner : corners) {
-    ::apollo::common::SLPoint sl_point;
-    get_point_in_frenet_frame(common::math::Vec2d(corner.x(), corner.y()),
-                              &sl_point);
-    if (sl_point.s() > ret_max_s) {
-      *max_s = sl_point.s();
-    }
-    if (sl_point.s() < ret_min_s) {
-      *min_s = sl_point.s();
-    }
-  }
 }
 
 double ReferenceLine::GetSpeedLimitFromS(const double s) const {

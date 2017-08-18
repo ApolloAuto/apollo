@@ -481,20 +481,13 @@ Status StBoundaryMapper::MapFollowDecision(
     return Status::OK();
   }
 
-  double follow_speed = 0.0;
-  const auto& speed = obstacle->Perception().velocity();
-  const double scalar_speed = std::hypot(speed.x(), speed.y());
-  if (scalar_speed > st_boundary_config_.follow_speed_threshold()) {
-    follow_speed = st_boundary_config_.follow_speed_threshold() * speed_coeff;
-  } else {
-    follow_speed = scalar_speed * speed_coeff *
-                   st_boundary_config_.follow_speed_damping_factor();
-  }
+  const auto& velocity = obstacle->Perception().velocity();
+  const double speed = std::hypot(velocity.x(), velocity.y());
 
   const double s_min_lower = distance_to_obstacle;
   const double s_min_upper =
       std::max(distance_to_obstacle + 1.0, planning_distance_);
-  const double s_max_lower = s_min_lower + planning_time_ * follow_speed;
+  const double s_max_lower = s_min_lower + planning_time_ * speed;
   const double s_max_upper = std::max(s_max_lower, planning_distance_);
 
   std::vector<STPoint> boundary_points;
@@ -506,16 +499,13 @@ Status StBoundaryMapper::MapFollowDecision(
   *boundary = StGraphBoundary(boundary_points);
 
   const double characteristic_length =
-      std::fmax(scalar_speed * speed_coeff *
-                    st_boundary_config_.minimal_follow_time(),
-                std::fabs(obj_decision.follow().distance_s())) +
-      vehicle_param_.front_edge_to_center() +
+      std::fabs(obj_decision.follow().distance_s()) +
       st_boundary_config_.follow_buffer();
 
-  boundary->SetCharacteristicLength(characteristic_length *
-                                    st_boundary_config_.follow_coeff());
+  boundary->SetCharacteristicLength(characteristic_length);
   boundary->SetId(obstacle->Id());
   boundary->SetBoundaryType(StGraphBoundary::BoundaryType::FOLLOW);
+
   return Status::OK();
 }
 

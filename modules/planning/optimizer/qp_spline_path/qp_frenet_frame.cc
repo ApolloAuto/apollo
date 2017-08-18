@@ -107,31 +107,6 @@ double QpFrenetFrame::feasible_longitudinal_upper_bound() const {
   return feasible_longitudinal_upper_bound_;
 }
 
-bool QpFrenetFrame::GetOverallBound(
-    const double s, std::pair<double, double>* const bound) const {
-  if (!GetMapBound(s, bound)) {
-    return false;
-  }
-
-  std::pair<double, double> obs_bound(-std::numeric_limits<double>::infinity(),
-                                      std::numeric_limits<double>::infinity());
-
-  if (!GetStaticObstacleBound(s, &obs_bound)) {
-    return false;
-  }
-
-  bound->first = std::max(obs_bound.first, bound->first);
-  bound->second = std::min(obs_bound.second, bound->second);
-
-  if (!GetDynamicObstacleBound(s, &obs_bound)) {
-    return false;
-  }
-
-  bound->first = std::max(obs_bound.first, bound->first);
-  bound->second = std::min(obs_bound.second, bound->second);
-  return true;
-}
-
 bool QpFrenetFrame::GetMapBound(const double s,
                                 std::pair<double, double>* const bound) const {
   return GetBound(s, hdmap_bound_, bound);
@@ -145,11 +120,6 @@ bool QpFrenetFrame::GetStaticObstacleBound(
 bool QpFrenetFrame::GetDynamicObstacleBound(
     const double s, std::pair<double, double>* const bound) const {
   return GetBound(s, dynamic_obstacle_bound_, bound);
-}
-
-bool QpFrenetFrame::FindLongitudinalDistance(const double time,
-                                             SpeedPoint* const speed_point) {
-  return speed_data_.EvaluateByTime(time, speed_point);
 }
 
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
