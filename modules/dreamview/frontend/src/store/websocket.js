@@ -7,6 +7,7 @@ class WebSocketEndpoint {
         this.server = server;
         this.websocket = null;
         this.counter = 0;
+        this.lastUpdateTimestamp = 0;
     }
 
     initialize() {
@@ -23,6 +24,13 @@ class WebSocketEndpoint {
             const message = JSON.parse(event.data);
             switch (message.type) {
                 case "sim_world_update":
+                    if (this.lastUpdateTimestamp !== 0
+                        && message.timestamp - this.lastUpdateTimestamp > 150) {
+                        console.log("Last sim_world_update took " +
+                            (message.timestamp - this.lastUpdateTimestamp) + "ms");
+                    }
+                    this.lastUpdateTimestamp = message.timestamp;
+
                     STORE.updateTimestamp(message.timestamp);
                     RENDERER.maybeInitializeOffest(
                         message.world.autoDrivingCar.positionX,
@@ -31,8 +39,7 @@ class WebSocketEndpoint {
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
                     if (message.mapHash && (this.counter % 10 === 0)) {
-                        // NOTE: This is a hack to limit the rate
-                        // of map updates.
+                        // NOTE: This is a hack to limit the rate of map updates.
                         this.counter = 0;
                         RENDERER.updateMapIndex(message.mapHash, message.mapElementIds);
                     }
