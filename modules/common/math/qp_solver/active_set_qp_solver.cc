@@ -55,7 +55,7 @@ bool ActiveSetQpSolver::Solve() {
   my_options.epsNum = qp_eps_num_;
   my_options.epsDen = qp_eps_den_;
   my_options.epsIterRef = qp_eps_iter_ref_;
-  qp_problem.setOptions(my_options);  
+  qp_problem.setOptions(my_options);
   if (!debug_info_) {
     qp_problem.setPrintLevel(qpOASES::PL_NONE);
   }
@@ -113,10 +113,9 @@ bool ActiveSetQpSolver::Solve() {
   // initialize problem
   int max_iter = std::max(max_iteration_, num_constraint_);
 
-  auto ret = qp_problem.init(h_matrix, g_matrix, affine_constraint_matrix, lower_bound,
-                      upper_bound, constraint_lower_bound,
-                      constraint_upper_bound,
-                      max_iter);
+  auto ret = qp_problem.init(h_matrix, g_matrix, affine_constraint_matrix,
+                             lower_bound, upper_bound, constraint_lower_bound,
+                             constraint_upper_bound, max_iter);
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
     AERROR << "Fail to initialze qp problem";
     if (ret == qpOASES::RET_MAX_NWSR_REACHED) {

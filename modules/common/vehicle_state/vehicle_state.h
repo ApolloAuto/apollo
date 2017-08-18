@@ -21,6 +21,8 @@
 #ifndef MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 #define MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 
+#include <string>
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/macro.h"
 #include "modules/common/math/vec2d.h"
@@ -57,9 +59,9 @@ class VehicleState {
   void Update(const std::string& localization_file,
               const std::string& chassis_file);
 
-  double timestamp() const { return timestamp_; };
+  double timestamp() const { return timestamp_; }
 
-  const apollo::localization::Pose& pose() const { return pose_; };
+  const apollo::localization::Pose& pose() const { return pose_; }
 
   /**
    * @brief Default destructor.
@@ -234,7 +236,7 @@ class VehicleState {
   double pitch_ = 0.0;
   double yaw_ = 0.0;
   double heading_ = 0.0;
-  // TODO: check the setting of kappa_
+  // TODO(all): check the setting of kappa_
   double kappa_ = 0.0;
   double linear_v_ = 0.0;
   double angular_v_ = 0.0;

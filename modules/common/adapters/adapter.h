@@ -27,6 +27,7 @@
 #include <mutex>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "glog/logging.h"
 #include "google/protobuf/descriptor.h"
