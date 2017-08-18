@@ -106,7 +106,7 @@ class DpStGraph {
    *         false otherwise.
    **/
   bool CreateOvertakeDecision(
-      const StGraphBoundary& boundary,
+      const PathObstacle& path_obstacle, const StGraphBoundary& boundary,
       ObjectDecisionType* const overtake_decision) const;
 
   void GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
