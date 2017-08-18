@@ -31,6 +31,7 @@ function start() {
     echo "Start HMI ros bridge..."
     LOG="${APOLLO_ROOT_DIR}/data/log/hmi_ros_bridge.out"
     nohup ${APOLLO_BIN_PREFIX}/modules/hmi/ros_bridge/ros_bridge \
+        --flagfile=modules/common/data/global_flagfile.txt \
         --v=3 \
         --log_dir=${APOLLO_ROOT_DIR}/data/log \
         >${LOG} 2>&1 &
