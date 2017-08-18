@@ -233,30 +233,34 @@ export default class Map {
         this.data = {};
     }
 
+    removeDrewObjects(drewObjects, scene) {
+        if (drewObjects) {
+            drewObjects.forEach(object => {
+                scene.remove(object);
+                if (object.geometry) {
+                    object.geometry.dispose();
+                }
+                if (object.material) {
+                    object.material.dispose();
+                }
+            });
+        }
+    }
+
     removeExpiredElements(elementIds, scene) {
         const newData = {};
 
         for (const kind in this.data) {
             newData[kind] = [];
             const oldDataOfThisKind = this.data[kind];
-            const current = elementIds[kind];
-            if (current) {
-                for (let i = 0; i < oldDataOfThisKind.length; ++i) {
-                    if (current.includes(oldDataOfThisKind[i].id.id)) {
-                        newData[kind].push(oldDataOfThisKind[i]);
-                    } else if (oldDataOfThisKind[i].drewObjects) {
-                        oldDataOfThisKind[i].drewObjects.forEach(object => {
-                            scene.remove(object);
-                            if (object.geometry) {
-                                object.geometry.dispose();
-                            }
-                            if (object.material) {
-                                object.material.dispose();
-                            }
-                        });
-                    }
+            const currentIds = elementIds[kind];
+            oldDataOfThisKind.forEach(oldData => {
+                if (currentIds && currentIds.includes(oldData.id.id)) {
+                    newData[kind].push(oldData);
+                } else {
+                    this.removeDrewObjects(oldData.drewObjects, scene);
                 }
-            }
+            });
         }
         this.data = newData;
     }
