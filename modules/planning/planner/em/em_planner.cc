@@ -96,7 +96,7 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
   TaskType type;
   DCHECK(TaskType_Parse(name, &type));
 
-  auto ptr_stats = ptr_latency_stats->add_processor_stats();
+  auto ptr_stats = ptr_latency_stats->add_task_stats();
   ptr_stats->set_name(name);
   ptr_stats->set_time_ms(time_diff_ms);
 }
@@ -130,7 +130,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     auto ret = optimizer->Optimize(frame, reference_line_info);
     if (!ret.ok()) {
       AERROR << "Failed to run tasks:" << optimizer->name()
-             << ret.error_message();
+             << ":" << ret.error_message();
       return ret;
     }
     const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
