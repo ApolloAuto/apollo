@@ -60,14 +60,14 @@ message EStop {
   optional string reason = 2;
 }
 
-message ProcessorStats {
+message TaskStats {
   optional string name = 1;
   optional double time_ms = 2;
 }
 
 message LatencyStats {
   optional double total_time_ms = 1;
-  repeated ProcessorStats processor_stats = 2;
+  repeated TaskStats task_stats = 2;
 }
 
 // next id: 16
