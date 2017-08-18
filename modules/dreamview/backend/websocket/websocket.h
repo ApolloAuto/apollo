@@ -23,7 +23,6 @@
 
 #include <memory>
 #include <mutex>
-#include <set>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -122,8 +121,9 @@ class WebSocketHandler : public CivetWebSocketHandler {
   // (connections).
   mutable std::mutex mutex_;
 
-  // The pool of all maintained connections.
-  std::set<Connection *> connections_;
+  // The pool of all maintained connections. Each connection has a lock to
+  // against simultaneous write.
+  std::unordered_map<Connection *, std::mutex> connections_;
 };
 
 }  // namespace dreamview

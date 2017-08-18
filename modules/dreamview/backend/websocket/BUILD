@@ -11,7 +11,7 @@ cc_library(
         "websocket.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//modules/common",
         "//modules/common/util:string_util",
         "//third_party/json",
         "@civetweb//:civetweb++",
