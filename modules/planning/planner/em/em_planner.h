@@ -80,7 +80,6 @@ class EMPlanner : public Planner {
                         Frame* frame);
 
   void RecordDebugInfo(const std::string& name, const double time_diff_ms,
-                       planning_internal::Debug* ptr_debug,
                        planning::LatencyStats* ptr_latency_stats);
 
   apollo::common::util::Factory<TaskType, Task> task_factory_;
