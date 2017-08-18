@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/common/monitor/monitor_buffer.h"
+
 #include <string>
 #include "gtest/gtest.h"
 #include "modules/common/monitor/monitor.h"
@@ -42,7 +44,7 @@ TEST_F(MonitorBufferTest, PrintLog) {
     testing::internal::CaptureStderr();
     buffer_->PrintLog();
     EXPECT_NE(std::string::npos,
-              testing::internal::GetCapturedStderr().find("[INFO] INFO_msg"));
+              testing::internal::GetCapturedStderr().find("INFO_msg"));
   }
   {
     buffer_->ERROR("ERROR_msg");
