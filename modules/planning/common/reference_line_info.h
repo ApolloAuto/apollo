@@ -37,8 +37,10 @@ class ReferenceLineInfo {
  public:
   explicit ReferenceLineInfo(const ReferenceLine& reference_line);
   const std::string& Id() const;
+
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
-  bool AddObstacle(const Obstacle* obstacle);
+  PathObstacle* AddObstacle(const Obstacle* obstacle);
+
   // FIXME(all) this interface is temp. solution to make the code work.
   // remove this interface when ready.
   PathDecision* path_decision() { return &path_decision_; }
@@ -55,6 +57,10 @@ class ReferenceLineInfo {
   }
 
   double Cost() const { return cost_; }
+
+  std::unique_ptr<Obstacle> CreateVirtualObstacle(
+      const std::string& obstacle_id, const double route_s, const double length,
+      const double width, const double height) const;
 
   bool CombinePathAndSpeedProfile(const double time_resolution,
                                   const double relative_time);
