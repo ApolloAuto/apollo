@@ -36,6 +36,7 @@ namespace planning {
 class ReferenceLineInfo {
  public:
   explicit ReferenceLineInfo(const ReferenceLine& reference_line);
+  const std::string& Id() const;
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   bool AddObstacle(const Obstacle* obstacle);
   // FIXME(all) this interface is temp. solution to make the code work.
@@ -62,6 +63,10 @@ class ReferenceLineInfo {
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
 
+ private:
+  static uint32_t s_reference_line_id_;
+
+  std::string id_;
   /**
    * @brief this is the number that measures the goodness of this reference
    * line.
