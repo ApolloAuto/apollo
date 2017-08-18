@@ -184,10 +184,7 @@ bool QpSplinePathGenerator::InitCoordRange(double* const start_s,
   DCHECK_NOTNULL(start_s);
   DCHECK_NOTNULL(end_s);
 
-  // TODO(all): step 1 get current sl coordinate - with init coordinate point
-  const double kStartPointBackwardDistance = 5.0;
-  *start_s =
-      std::fmax(init_frenet_point_.s() - kStartPointBackwardDistance, 0.0);
+  *start_s = init_frenet_point_.s();
   *end_s = std::fmin(reference_line_.length(),
                      *start_s + FLAGS_look_forward_distance);
   return true;
