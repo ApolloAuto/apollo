@@ -409,7 +409,8 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
         const auto obstacle = path_decision->Find(boundary_it->id());
         const auto& obstacle_boundary = obstacle->perception_sl_boundary();
         ObjectDecisionType follow_decision;
-        if (!CreateFollowDecision(obstacle_boundary, &follow_decision)) {
+        if (!CreateFollowDecision(*obstacle, obstacle_boundary,
+                                  &follow_decision)) {
           AERROR << "Failed to create follow decision for boundary with id "
                  << boundary_it->id();
           return Status(ErrorCode::PLANNING_ERROR,
@@ -469,16 +470,24 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
 }
 
 bool DpStGraph::CreateFollowDecision(
-    const SLBoundary& obstacle_boundary,
+    const PathObstacle& path_obstacle, const SLBoundary& obstacle_boundary,
     ObjectDecisionType* const follow_decision) const {
   DCHECK_NOTNULL(follow_decision);
 
   auto* follow = follow_decision->mutable_follow();
-  const double follow_distance_s = -FLAGS_follow_min_distance;
+
+  constexpr double kFollowTimeBuffer = 3.0;
+  const auto& velocity = path_obstacle.Obstacle()->Perception().velocity();
+  const double follow_speed =
+      std::fmax(init_point_.v(), std::hypot(velocity.x(), velocity.y()));
+  const double follow_distance_s =
+      std::fmax(follow_speed * kFollowTimeBuffer, FLAGS_follow_min_distance) +
+      vehicle_param_.front_edge_to_center();
+
   follow->set_distance_s(follow_distance_s);
 
   const double reference_line_fence_s =
-      obstacle_boundary.start_s() + follow_distance_s;
+      obstacle_boundary.start_s() - follow_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s: "
