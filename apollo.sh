@@ -104,6 +104,14 @@ function generate_test_targets_opt() {
   TEST_TARGETS=$(bazel query //... | grep "_test$" | grep "perception")
 }
 
+function generate_build_targets_caffe() {
+  BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
+    | grep -v "_cpplint$" | grep -v "release" | grep -v "kernel" | grep "caffe")
+  if [ $? -ne 0 ]; then
+    fail 'Build caffe failed!'
+  fi    
+}
+
 #=================================================
 #              Build functions
 #=================================================
@@ -130,11 +138,11 @@ function build() {
   fi
 }
 
-function apollo_build() {
+function apollo_build_dbg() {
   build "dbg"
 }
 
-function build_opt() {
+function apollo_build_opt() {
   build "opt"
 }
 
@@ -316,7 +324,6 @@ function run_test() {
 
   generate_test_targets_opt
   build_caffe_opt
-  run_ldconfig
   echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c opt --test_verbose_timeout_warnings
   if [ $? -eq 0 ]; then
     success 'Test passed!'
@@ -461,10 +468,6 @@ function build_velodyne() {
   rm -rf modules/devel_isolated/
 }
 
-function run_ldconfig() {
-  sudo ldconfig
-}
-
 function build_caffe_opt() {
   echo "Build Caffe (opt model) ..."
   bazel build $DEFINES -c opt @caffe//:lib
@@ -492,8 +495,8 @@ function print_usage() {
   ./apollo.sh [OPTION]'
   echo 'Options:
   build: run build only
+  build_opt: build optimized binary for the code (please choose this option if using perception).
   build_fe: compile frontend javascript code, this requires all the node_modules to be installed already
-  build_opt: build optimized binary for the code.
   buildify: fix style of BUILD files
   check: run build/lint/test, please make sure it passes before checking in new code
   clean: runs Bazel clean
@@ -522,13 +525,13 @@ function main() {
       check
       ;;
     build)
-      apollo_build
-      ;;
-    build_fe)
-      build_fe
+      apollo_build_dbg
       ;;
     build_opt)
-      build_opt
+      apollo_build_opt
+      ;;  
+    build_fe)
+      build_fe
       ;;
     buildify)
       buildify
