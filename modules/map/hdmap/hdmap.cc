@@ -20,18 +20,6 @@ limitations under the License.
 namespace apollo {
 namespace hdmap {
 
-std::unique_ptr<HDMap> HDMap::CreateMap(const std::string& map_filename) {
-  std::unique_ptr<HDMap> hdmap(new HDMap());
-  CHECK_EQ(hdmap->load_map_from_file(map_filename), 0)
-      << "Failed to load HDMap " << map_filename;
-  return hdmap;
-}
-
-const HDMap& HDMap::DefaultMap() {
-  static const HDMap* hdmap = CreateMap(BaseMapFile()).release();
-  return *hdmap;
-}
-
 int HDMap::load_map_from_file(const std::string& map_filename) {
   return _impl.load_map_from_file(map_filename);
 }
