@@ -38,9 +38,7 @@ namespace planning {
 using common::SpeedPoint;
 using ConstPathObstacleList = std::vector<const PathObstacle*>;
 
-namespace {
 constexpr double kEpsilontol = 1e-6;
-}
 
 QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
                              const ConstPathObstacleList& path_obstacles,
@@ -66,12 +64,13 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
     return false;
   }
 
-  const double resolution = (end_s_ - start_s_) / num_points;
   if (Double::Compare(start_s_, end_s_, 1e-8) > 0) {
     AERROR << "Not enough s distance. start_s: " << start_s_
            << ", end_s: " << end_s_;
     return false;
   }
+
+  const double resolution = (end_s_ - start_s_) / num_points;
 
   if (!CalculateDiscretizedVehicleLocation()) {
     AERROR << "Fail to calculate discretized vehicle location!";

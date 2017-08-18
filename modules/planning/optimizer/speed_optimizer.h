@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/speed_limit.h"
+#include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/optimizer/optimizer.h"
 
 #include "modules/common/status/status.h"
@@ -31,9 +33,6 @@
 
 namespace apollo {
 namespace planning {
-
-class SpeedLimit;
-class SpeedData;
 
 class SpeedOptimizer : public Optimizer {
  public:
