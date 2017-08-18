@@ -171,14 +171,6 @@ const PlanningData &Frame::planning_data() const { return _planning_data; }
 
 PlanningData *Frame::mutable_planning_data() { return &_planning_data; }
 
-void Frame::SetComputedTrajectory(const PublishableTrajectory &trajectory) {
-  computed_trajectory_ = trajectory;
-}
-
-const PublishableTrajectory &Frame::computed_trajectory() const {
-  return computed_trajectory_;
-}
-
 const ReferenceLine &Frame::reference_line() const { return reference_line_; }
 
 bool Frame::MakeTrafficDecision(const routing::RoutingResponse &,

@@ -153,7 +153,6 @@ class Frame {
   PathDecision *path_decision_ = nullptr;
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
-  PublishableTrajectory computed_trajectory_;
   ReferenceLine reference_line_;
   PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;
