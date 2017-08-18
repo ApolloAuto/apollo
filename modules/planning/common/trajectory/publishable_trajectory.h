@@ -31,14 +31,16 @@ namespace planning {
 class PublishableTrajectory : public DiscretizedTrajectory {
  public:
   PublishableTrajectory() = default;
+  explicit PublishableTrajectory(
+      const double header_time,
+      const DiscretizedTrajectory& discretized_trajectory);
 
   PublishableTrajectory(const double header_time,
-      std::vector<common::TrajectoryPoint> trajectory_points);
+                        std::vector<common::TrajectoryPoint> trajectory_points);
 
   virtual ~PublishableTrajectory() = default;
 
-  common::TrajectoryPoint EvaluateAbsoluteTime(
-      const double abs_time) const;
+  common::TrajectoryPoint EvaluateAbsoluteTime(const double abs_time) const;
 
   common::TrajectoryPoint EvaluateAbsoluteTimeUsingLinearApproximation(
       const double abs_time) const;

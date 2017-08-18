@@ -36,9 +36,11 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
 
-  DiscretizedTrajectory trajectory;
-  auto status = planner.Plan(start_point, nullptr, &trajectory);
+  ReferenceLine reference_line;
+  ReferenceLineInfo info(reference_line);
+  auto status = planner.Plan(start_point, nullptr, &info);
 
+  const auto& trajectory = info.trajectory();
   EXPECT_TRUE(status.ok());
   EXPECT_TRUE(!trajectory.trajectory_points().empty());
   EXPECT_EQ(trajectory.trajectory_points().size(),
@@ -62,9 +64,9 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   TrajectoryPoint start_point;
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
-  DiscretizedTrajectory trajectory;
-  EXPECT_TRUE(
-      !(planner_with_error_csv.Plan(start_point, nullptr, &trajectory)).ok());
+  ReferenceLine ref;
+  ReferenceLineInfo info(ref);
+  EXPECT_TRUE(!(planner_with_error_csv.Plan(start_point, nullptr, &info)).ok());
 }
 
 }  // namespace planning

@@ -64,20 +64,19 @@ class EMPlanner : public Planner {
    * @param trajectory_pb The computed trajectory
    * @return OK if planning succeeds; error otherwise.
    */
-  common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame, DiscretizedTrajectory* ptr_trajectory) override;
+  common::Status Plan(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame,
+                      ReferenceLineInfo* reference_line_info) override;
 
  private:
   void RegisterOptimizers();
 
   std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
-        const common::TrajectoryPoint& planning_init_point);
+      const common::TrajectoryPoint& planning_init_point);
   // TODO(all): change to return Status.
   void PopulateDecision(Frame* frame);
 
-  void RecordDebugInfo(const std::string& name,
-                       const double time_diff_ms,
+  void RecordDebugInfo(const std::string& name, const double time_diff_ms,
                        planning_internal::Debug* ptr_debug,
                        planning::LatencyStats* ptr_latency_stats);
 
