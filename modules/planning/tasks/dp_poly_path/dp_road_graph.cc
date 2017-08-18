@@ -161,11 +161,10 @@ bool DPRoadGraph::GenerateMinCostPath(
   return true;
 }
 
-bool DPRoadGraph::MakeObjectDecision(
-    const PathData &path_data, const ConstPathObstacleList &path_obstacles,
-    PathDecision *const path_decision) {
+bool DPRoadGraph::MakeObjectDecision(const PathData &path_data,
+                                     PathDecision *const path_decision) {
   DCHECK_NOTNULL(path_decision);
-  if (!MakeStaticObstacleDecision(path_data, path_obstacles, path_decision)) {
+  if (!MakeStaticObstacleDecision(path_data, path_decision)) {
     AERROR << "Failed to make decisions for static obstacles";
     return false;
   }
@@ -173,8 +172,7 @@ bool DPRoadGraph::MakeObjectDecision(
 }
 
 bool DPRoadGraph::MakeStaticObstacleDecision(
-    const PathData &path_data, const ConstPathObstacleList &path_obstacles,
-    PathDecision *const path_decision) {
+    const PathData &path_data, PathDecision *const path_decision) {
   DCHECK_NOTNULL(path_decision);
   std::vector<common::SLPoint> adc_sl_points;
   std::vector<common::math::Box2d> adc_bounding_box;
@@ -204,7 +202,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
     }
   }
 
-  for (const auto *path_obstacle : path_obstacles) {
+  for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
     const auto *obstacle = path_obstacle->Obstacle();
     if (!obstacle->IsStatic()) {
       continue;
@@ -293,8 +291,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
 }
 
 bool DPRoadGraph::MakeDynamicObstcleDecision(
-    const PathData &path_data, const ConstPathObstacleList &path_obstacles,
-    PathDecision *const path_decision) {
+    const PathData &path_data, PathDecision *const path_decision) {
   // Compute dynamic obstacle decision
   const double interval = config_.eval_time_interval();
   const double total_time =
@@ -309,7 +306,7 @@ bool DPRoadGraph::MakeDynamicObstcleDecision(
     return false;
   }
 
-  for (const auto *path_obstacle : path_obstacles) {
+  for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
     const auto *obstacle = path_obstacle->Obstacle();
     if (obstacle->IsStatic()) {
       continue;

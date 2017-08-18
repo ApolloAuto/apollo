@@ -37,7 +37,8 @@ class PathOptimizer : public Task {
  public:
   explicit PathOptimizer(const std::string &name);
   virtual ~PathOptimizer() = default;
-  apollo::common::Status Optimize(Frame *frame) override;
+  apollo::common::Status Optimize(
+      Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
  protected:
   virtual apollo::common::Status Process(

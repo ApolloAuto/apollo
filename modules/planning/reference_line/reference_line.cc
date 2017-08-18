@@ -71,7 +71,7 @@ ReferenceLine::ReferenceLine(
 ReferencePoint ReferenceLine::get_reference_point(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front()) {
-    AWARN << "The requested s is nearer than the start point of the reference "
+    AWARN << "The requested s is before the start point of the reference "
              "line; reference line starts at "
           << accumulated_s.back() << ", requested " << s << ".";
     ReferencePoint ref_point(map_path_.get_smooth_point(s), 0.0, 0.0, 0.0, 0.0);

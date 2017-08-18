@@ -208,8 +208,6 @@ cc_library(
     deps = [
         ":indexed_queue",
         ":obstacle",
-        ":path_decision",
-        ":path_obstacle",
         ":planning_data",
         ":reference_line_info",
         "//modules/common/configs:vehicle_config_helper",
