@@ -60,10 +60,7 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
     AERROR << "Failed to find tunnel in road graph";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph path generation");
   }
-  const auto &path_obstacles =
-      frame_->path_decision()->path_obstacles().Items();
-  if (!dp_road_graph.MakeObjectDecision(*path_data, path_obstacles,
-                                        path_decision)) {
+  if (!dp_road_graph.MakeObjectDecision(*path_data, path_decision)) {
     AERROR << "Failed to make decision based on tunnel";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
   }

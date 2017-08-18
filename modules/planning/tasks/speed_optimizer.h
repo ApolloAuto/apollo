@@ -24,12 +24,11 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/tasks/task.h"
-
-#include "modules/common/status/status.h"
 #include "modules/planning/tasks/st_graph/st_graph_boundary.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
@@ -38,7 +37,8 @@ class SpeedOptimizer : public Task {
  public:
   explicit SpeedOptimizer(const std::string& name);
   virtual ~SpeedOptimizer() = default;
-  apollo::common::Status Optimize(Frame* frame) override;
+  apollo::common::Status Optimize(
+      Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  protected:
   virtual apollo::common::Status Process(

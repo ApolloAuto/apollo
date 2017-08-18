@@ -21,10 +21,10 @@
 #ifndef MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
 #define MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
 
-#include <vector>
-#include <utility>
 #include <limits>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
@@ -53,10 +53,8 @@ class DPRoadGraph {
   bool FindPathTunnel(const common::TrajectoryPoint &init_point,
                       PathData *const path_data);
 
-  bool MakeObjectDecision(
-      const PathData &path_data,
-      const std::vector<const PathObstacle *> &path_obstacles,
-      PathDecision *const path_decision);
+  bool MakeObjectDecision(const PathData &path_data,
+                          PathDecision *const path_decision);
 
  private:
   /**
@@ -100,15 +98,11 @@ class DPRoadGraph {
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
 
-  bool MakeDynamicObstcleDecision(
-      const PathData &path_data,
-      const std::vector<const PathObstacle *> &path_obstacles,
-      PathDecision *const path_decision);
+  bool MakeDynamicObstcleDecision(const PathData &path_data,
+                                  PathDecision *const path_decision);
 
-  bool MakeStaticObstacleDecision(
-      const PathData &path_data,
-      const std::vector<const PathObstacle *> &path_obstacles,
-      PathDecision *const path_decision);
+  bool MakeStaticObstacleDecision(const PathData &path_data,
+                                  PathDecision *const path_decision);
 
  private:
   DpPolyPathConfig config_;

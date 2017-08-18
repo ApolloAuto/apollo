@@ -106,10 +106,10 @@ bool Frame::CreateDestinationObstacle() {
 
   // adjust destination based on adc_front_s
   common::SLPoint adc_sl;
-  auto& adc_position = common::VehicleState::instance()->pose().position();
+  auto &adc_position = common::VehicleState::instance()->pose().position();
   reference_line_.get_point_in_frenet_frame(
       {adc_position.x(), adc_position.y()}, &adc_sl);
-  const auto& vehicle_param =
+  const auto &vehicle_param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   double adc_front_s = adc_sl.s() + vehicle_param.front_edge_to_center();
   if (destination_sl.s() <= adc_front_s) {
@@ -117,10 +117,8 @@ bool Frame::CreateDestinationObstacle() {
   }
 
   std::unique_ptr<Obstacle> obstacle_ptr = CreateVirtualObstacle(
-      FLAGS_destination_obstacle_id,
-      destination_s,
-      FLAGS_virtual_stop_wall_length,
-      FLAGS_virtual_stop_wall_width,
+      FLAGS_destination_obstacle_id, destination_s,
+      FLAGS_virtual_stop_wall_length, FLAGS_virtual_stop_wall_width,
       FLAGS_virtual_stop_wall_height);
 
   obstacles_.Add(FLAGS_destination_obstacle_id, std::move(obstacle_ptr));
@@ -143,11 +141,6 @@ bool Frame::InitReferenceLineInfo(
   reference_line_info_.clear();
   for (const auto &reference_line : reference_lines) {
     reference_line_info_.emplace_back(reference_line);
-    auto &info = reference_line_info_.back();
-    if (!info.AddObstacles(obstacles_.Items())) {
-      AERROR << "Failed to add obstacles to reference line";
-      return false;
-    }
   }
   return true;
 }
@@ -180,9 +173,15 @@ bool Frame::Init(const PlanningConfig &config) {
 
   CreateDestinationObstacle();
 
+  for (auto &info : reference_line_info_) {
+    if (!info.AddObstacles(obstacles_.Items())) {
+      AERROR << "Failed to add obstacles to reference line";
+      return false;
+    }
+  }
+
   // FIXME(all) remove path decision from Frame.
   path_decision_ = reference_line_info_[0].path_decision();
-  CHECK(path_decision_->path_obstacles().Items().size() > 0);
 
   if (FLAGS_enable_traffic_decision) {
     MakeTrafficDecision(routing_response_, reference_line_);
@@ -211,31 +210,30 @@ bool Frame::MakeTrafficDecision(const routing::RoutingResponse &routing,
       auto stop_position = obstacle->Perception().position();
       common::SLPoint stop_line_sl;
       reference_line.get_point_in_frenet_frame(
-          { stop_position.x(),  stop_position.x()}, &stop_line_sl);
+          {stop_position.x(), stop_position.x()}, &stop_line_sl);
       if (!reference_line.is_on_road(stop_line_sl)) {
         continue;
       }
 
       // check stop_line_s vs adc_s. stop_line_s must be ahead of adc_front_s
       common::SLPoint adc_sl;
-      auto& adc_position = common::VehicleState::instance()->pose().position();
+      auto &adc_position = common::VehicleState::instance()->pose().position();
       reference_line.get_point_in_frenet_frame(
           {adc_position.x(), adc_position.y()}, &adc_sl);
-      const auto& vehicle_param =
+      const auto &vehicle_param =
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
       double adc_front_s = adc_sl.s() + vehicle_param.front_edge_to_center();
       if (stop_line_sl.s() <= adc_front_s) {
         ADEBUG << "skip: object:" << obstacle->Id() << " fence route_s["
-               << stop_line_sl.s() << "] behind adc_front_s["
-               << adc_front_s << "]";
+               << stop_line_sl.s() << "] behind adc_front_s[" << adc_front_s
+               << "]";
         continue;
       }
 
       ObjectDecisionType object_stop;
       ObjectStop *object_stop_ptr = object_stop.mutable_stop();
       object_stop_ptr->set_distance_s(FLAGS_stop_line_min_distance);
-      object_stop_ptr->set_reason_code(
-          StopReasonCode::STOP_REASON_DESTINATION);
+      object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
 
       auto stop_ref_point = reference_line_.get_reference_point(
           stop_position.x(), stop_position.y());
@@ -321,16 +319,14 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
 }
 
 std::unique_ptr<Obstacle> Frame::CreateVirtualObstacle(
-    const std::string &obstacle_id,
-    const double route_s,
-    const double length, const double width, const double height) {
+    const std::string &obstacle_id, const double route_s, const double length,
+    const double width, const double height) {
   std::unique_ptr<Obstacle> obstacle_ptr(nullptr);
 
   // create a "virtual" perception_obstacle
   perception::PerceptionObstacle perception_obstacle;
   perception_obstacle.set_id(-1);  // simulator needs a valid integer
-  auto dest_ref_point =
-      reference_line_.get_reference_point(route_s);
+  auto dest_ref_point = reference_line_.get_reference_point(route_s);
   perception_obstacle.mutable_position()->set_x(dest_ref_point.x());
   perception_obstacle.mutable_position()->set_y(dest_ref_point.y());
   perception_obstacle.set_theta(dest_ref_point.heading());
