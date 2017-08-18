@@ -124,14 +124,14 @@ bool QpSplinePathGenerator::Generate(
     Eigen::Vector2d xy_point =
         CartesianFrenetConverter::CalculateCartesianPoint(
             ref_point.heading(), {ref_point.x(), ref_point.y()}, l);
-    xy_point[0] = xy_point.x() - x_diff;
-    xy_point[1] = xy_point.y() - y_diff;
+    xy_point[0] = xy_point[0] - x_diff;
+    xy_point[1] = xy_point[1] - y_diff;
     double theta = CartesianFrenetConverter::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), l, dl);
     double kappa = CartesianFrenetConverter::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), l, dl, ddl);
     common::PathPoint path_point = common::util::MakePathPoint(
-        xy_point.x(), xy_point.y(), 0.0, theta, kappa, 0.0, 0.0);
+        xy_point[0], xy_point[1], 0.0, theta, kappa, 0.0, 0.0);
     if (path_points.size() != 0) {
       double distance =
           common::util::Distance2D(path_points.back(), path_point);
