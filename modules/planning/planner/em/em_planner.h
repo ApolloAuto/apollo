@@ -73,6 +73,10 @@ class EMPlanner : public Planner {
   void RegisterTasks();
 
   std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
+      const common::TrajectoryPoint& planning_init_point,
+      const ReferenceLineInfo* reference_line_info);
+
+  std::vector<common::SpeedPoint> DummyHotStart(
       const common::TrajectoryPoint& planning_init_point);
 
   std::vector<common::SpeedPoint> GenerateSpeedHotStart(

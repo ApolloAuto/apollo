@@ -122,10 +122,11 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   auto* planning_data = frame->mutable_planning_data();
   auto* heuristic_speed_data = planning_data->mutable_speed_data();
-  auto speed_profile = GenerateInitSpeedProfile(planning_start_point);
+  auto speed_profile =
+      GenerateInitSpeedProfile(planning_start_point, reference_line_info);
   if (speed_profile.empty()) {
     speed_profile = GenerateSpeedHotStart(planning_start_point);
-    AINFO << "Using hot start speed profile";
+    AINFO << "Using dummy hot start for speed vector";
   }
   heuristic_speed_data->set_speed_vector(speed_profile);
 
@@ -168,7 +169,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   if (FLAGS_enable_record_debug && ptr_debug != nullptr) {
     auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
     reference_line->set_name("planning_reference_line");
-    const auto& reference_points = frame->reference_line().reference_points();
+    const auto& reference_points =
+        reference_line_info->reference_line().reference_points();
     for (const auto& reference_point : reference_points) {
       auto* path_point = reference_line->add_path_point();
       path_point->set_x(reference_point.x());
@@ -182,10 +184,25 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
 }
 
 std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
-    const common::TrajectoryPoint& planning_init_point) {
+    const common::TrajectoryPoint& planning_init_point,
+    const ReferenceLineInfo* reference_line_info) {
   std::vector<SpeedPoint> speed_profile;
   const auto* last_frame = FrameHistory::instance()->Latest();
   if (!last_frame) {
+    AERROR << "last frame is empty";
+    return speed_profile;
+  }
+  const ReferenceLineInfo* last_reference_line_info = nullptr;
+  auto reference_line_id = reference_line_info->Id();
+  for (const auto& ref_info : last_frame->reference_line_info()) {
+    // WARNING: weak association between reference lines of two frames.
+    if (ref_info.Id() == reference_line_id) {
+      last_reference_line_info = &ref_info;
+      break;
+    }
+  }
+  if (!last_reference_line_info) {
+    AERROR << "last reference line info is empty";
     return speed_profile;
   }
   const auto& last_speed_vector =
@@ -195,14 +212,14 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     const auto& last_init_point = last_frame->PlanningStartPoint().path_point();
     Vec2d last_xy_point = {last_init_point.x(), last_init_point.y()};
     SLPoint last_sl_point;
-    if (!last_frame->reference_line().get_point_in_frenet_frame(
+    if (!last_reference_line_info->reference_line().get_point_in_frenet_frame(
             last_xy_point, &last_sl_point)) {
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }
     Vec2d xy_point = {planning_init_point.path_point().x(),
                       planning_init_point.path_point().y()};
     SLPoint sl_point;
-    if (!last_frame->reference_line().get_point_in_frenet_frame(
+    if (!last_reference_line_info->reference_line().get_point_in_frenet_frame(
             xy_point, &last_sl_point)) {
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }

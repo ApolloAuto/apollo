@@ -59,8 +59,6 @@ class Frame {
   static const hdmap::PncMap *PncMap();
   static void SetMap(hdmap::PncMap *pnc_map);
 
-  const ReferenceLine &reference_line() const;
-
   uint32_t sequence_num() const;
   const PlanningData &planning_data() const;
 
@@ -83,6 +81,7 @@ class Frame {
   void AlignPredictionTime(const double trajectory_header_time);
 
   std::vector<ReferenceLineInfo> &reference_line_info();
+  const std::vector<ReferenceLineInfo> &reference_line_info() const;
 
   bool AddObstacle(std::unique_ptr<Obstacle> obstacle);
 
@@ -118,7 +117,6 @@ class Frame {
   IndexedObstacles obstacles_;
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
-  ReferenceLine reference_line_;
   PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;
   ReferenceLineSmootherConfig smoother_config_;
