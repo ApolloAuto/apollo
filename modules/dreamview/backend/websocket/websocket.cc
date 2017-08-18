@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "modules/dreamview/backend/websocket/websocket.h"
 
+#include <utility>
 #include <vector>
 
 #include "modules/common/log.h"
@@ -26,7 +27,8 @@ namespace dreamview {
 void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
-    connections_.insert(conn);
+    connections_[conn];  // This is acutally an insertion as the mutex is
+                         // neither copyable nor movable.
   }
   AINFO << "Accepted connection. Total connections: " << connections_.size();
 }
@@ -42,30 +44,50 @@ void WebSocketHandler::handleClose(CivetServer *server,
 }
 
 bool WebSocketHandler::SendData(const std::string &data) {
-  std::vector<Connection *> connections_to_send;
+  std::vector<std::pair<Connection *, std::mutex *>> connections_to_send;
   {
     std::unique_lock<std::mutex> lock(mutex_);
     if (connections_.empty()) {
       return true;
     }
-    for (Connection *conn : connections_) {
-      connections_to_send.push_back(conn);
+    for (auto &kv : connections_) {
+      Connection *conn = kv.first;
+      std::mutex *lock = &kv.second;
+      // If another thread is writing via this connection, we just skip this
+      // round of broadcasting.
+      if (lock->try_lock()) {
+        connections_to_send.emplace_back(conn, lock);
+      }
     }
   }
 
   bool all_success = true;
-  for (Connection *conn : connections_to_send) {
+  for (auto &pair : connections_to_send) {
+    Connection *conn = pair.first;
+    std::mutex *lock = pair.second;
+
     if (!SendData(data, conn)) {
       all_success = false;
     }
+
+    lock->unlock();
   }
 
   return all_success;
 }
 
 bool WebSocketHandler::SendData(const std::string &data, Connection *conn) {
+  if (connections_.find(conn) == connections_.end()) {
+    AERROR << "Trying to send to an uncached connection, skipping.";
+    return false;
+  }
+
+  // Lock the connection while sending.
+  connections_[conn].try_lock();
   int ret = mg_websocket_write(conn, WEBSOCKET_OPCODE_TEXT, data.c_str(),
                                data.size());
+  connections_[conn].unlock();
+
   if (ret != static_cast<int>(data.size())) {
     // Determine error message based on return value.
     std::string msg;
@@ -74,8 +96,8 @@ bool WebSocketHandler::SendData(const std::string &data, Connection *conn) {
     } else if (ret < 0) {
       msg = "Send Error";
     } else {
-      msg = apollo::common::util::StrCat(
-          "Expect to send ", data.size(), " bytes. But sent ", ret, " bytes");
+      msg = apollo::common::util::StrCat("Expect to send ", data.size(),
+                                         " bytes. But sent ", ret, " bytes");
     }
     AWARN << "Failed to send data via websocket connection. Reason: " << msg;
     return false;
@@ -96,7 +118,7 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
 
   if (message_handlers_.find(type) == message_handlers_.end()) {
     AERROR << "No message handler found for message type " << type
-               << ". The message will be discarded!";
+           << ". The message will be discarded!";
     return true;
   }
   message_handlers_[type](json, conn);
