@@ -28,64 +28,48 @@
 namespace apollo {
 namespace planning {
 
-using common::ErrorCode;
-using common::Status;
-using common::VehicleState;
-
-Decider::Decider(DecisionResult* decision_result)
-    : decision_(decision_result) {}
-
-const DecisionResult& Decider::Decision() const { return *decision_; }
-
-Status Decider::MakeDecision(Frame* frame) {
-  decision_->Clear();
-
-  auto path_decision = frame->path_decision();
+const DecisionResult& Decider::MakeDecision(
+    const ReferenceLineInfo& reference_line_info) {
+  decision_result_.Clear();
+  const auto& path_decision = reference_line_info.path_decision();
 
   bool estop = 0;
   if (estop) {
     MakeEStopDecision(path_decision);
-    return Status(ErrorCode::OK, "estop");
+    return decision_result_;
   }
 
   // cruise by default
-  decision_->mutable_main_decision()->mutable_cruise();
+  decision_result_.mutable_main_decision()->mutable_cruise();
 
   // check stop decision
-  int error_code = MakeMainStopDecision(frame, path_decision);
+  int error_code = MakeMainStopDecision(reference_line_info);
   if (error_code < 0) {
     MakeEStopDecision(path_decision);
-    return Status(ErrorCode::OK, "MakeDecision failed. estop.");
+    return decision_result_;
   } else if (error_code == 0) {
     // TODO(all): check other main decisions
   }
 
   SetObjectDecisions(path_decision);
-  return Status(ErrorCode::OK, "MakeDecision completed");
+  return decision_result_;
 }
 
-int Decider::MakeMainStopDecision(Frame* frame,
-                                  PathDecision* const path_decision) {
-  if (!frame) {
-    AERROR << "Frame is empty in Decider";
-    return 0;
-  }
-
-  CHECK_NOTNULL(path_decision);
-
+int Decider::MakeMainStopDecision(
+    const ReferenceLineInfo& reference_line_info) {
   double min_stop_line_s = std::numeric_limits<double>::infinity();
   const Obstacle* stop_obstacle = nullptr;
   const ObjectStop* stop_decision = nullptr;
 
-  const auto& path_obstacles = path_decision->path_obstacles();
-  for (const auto path_obstacle : path_obstacles.Items()) {
+  for (const auto path_obstacle :
+       reference_line_info.path_decision().path_obstacles().Items()) {
     const auto& obstacle = path_obstacle->Obstacle();
     const auto& object_decision = path_obstacle->LongitudinalDecision();
     if (!object_decision.has_stop()) {
       continue;
     }
 
-    const auto& reference_line = frame->reference_line();
+    const auto& reference_line = reference_line_info.reference_line();
     apollo::common::PointENU stop_point = object_decision.stop().stop_point();
     common::SLPoint stop_line_sl;
     reference_line.get_point_in_frenet_frame({stop_point.x(), stop_point.y()},
@@ -101,7 +85,7 @@ int Decider::MakeMainStopDecision(Frame* frame,
 
     // check stop_line_s vs adc_s
     common::SLPoint adc_sl;
-    auto& adc_position = VehicleState::instance()->pose().position();
+    auto& adc_position = common::VehicleState::instance()->pose().position();
     reference_line.get_point_in_frenet_frame(
         {adc_position.x(), adc_position.y()}, &adc_sl);
     const auto& vehicle_param =
@@ -120,7 +104,8 @@ int Decider::MakeMainStopDecision(Frame* frame,
   }
 
   if (stop_obstacle != nullptr) {
-    MainStop* main_stop = decision_->mutable_main_decision()->mutable_stop();
+    MainStop* main_stop =
+        decision_result_.mutable_main_decision()->mutable_stop();
     main_stop->set_reason_code(stop_decision->reason_code());
     main_stop->set_reason("stop by " + stop_obstacle->Id());
     main_stop->mutable_stop_point()->set_x(stop_decision->stop_point().x());
@@ -138,11 +123,11 @@ int Decider::MakeMainStopDecision(Frame* frame,
   return 0;
 }
 
-int Decider::SetObjectDecisions(PathDecision* const path_decision) {
-  ObjectDecisions* object_decisions = decision_->mutable_object_decision();
+void Decider::SetObjectDecisions(const PathDecision& path_decision) {
+  ObjectDecisions* object_decisions =
+      decision_result_.mutable_object_decision();
 
-  const auto& path_obstacles = path_decision->path_obstacles();
-  for (const auto path_obstacle : path_obstacles.Items()) {
+  for (const auto path_obstacle : path_decision.path_obstacles().Items()) {
     auto* object_decision = object_decisions->add_decision();
 
     const auto& obstacle = path_obstacle->Obstacle();
@@ -161,32 +146,27 @@ int Decider::SetObjectDecisions(PathDecision* const path_decision) {
           path_obstacle->LongitudinalDecision());
     }
   }
-  return 0;
 }
 
-int Decider::MakeEStopDecision(PathDecision* const path_decision) {
-  CHECK_NOTNULL(path_decision);
-  decision_->Clear();
+void Decider::MakeEStopDecision(const PathDecision& path_decision) {
+  decision_result_.Clear();
 
-  // main decision
-  // TODO(all): to be added
   MainEmergencyStop* main_estop =
-      decision_->mutable_main_decision()->mutable_estop();
+      decision_result_.mutable_main_decision()->mutable_estop();
   main_estop->set_reason_code(MainEmergencyStop::ESTOP_REASON_INTERNAL_ERR);
   main_estop->set_reason("estop reason to be added");
   main_estop->mutable_cruise_to_stop();
 
   // set object decisions
-  ObjectDecisions* object_decisions = decision_->mutable_object_decision();
-  const auto& path_obstacles = path_decision->path_obstacles();
-  for (const auto path_obstacle : path_obstacles.Items()) {
+  ObjectDecisions* object_decisions =
+      decision_result_.mutable_object_decision();
+  for (const auto path_obstacle : path_decision.path_obstacles().Items()) {
     auto* object_decision = object_decisions->add_decision();
     const auto& obstacle = path_obstacle->Obstacle();
     object_decision->set_id(obstacle->Id());
     object_decision->set_perception_id(obstacle->PerceptionId());
     object_decision->add_object_decision()->mutable_avoid();
   }
-  return 0;
 }
 
 }  // namespace planning
