@@ -36,6 +36,7 @@
 #include "modules/planning/tasks/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
+#include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -51,6 +52,9 @@ using common::VehicleState;
 using common::math::Vec2d;
 
 void EMPlanner::RegisterTasks() {
+  task_factory_.Register(TRAFFIC_DECIDER, []() -> Task* {
+    return new TrafficDecider(TaskType_Name(TRAFFIC_DECIDER));
+  });
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER, []() -> Task* {
     return new DpPolyPathOptimizer(TaskType_Name(DP_POLY_PATH_OPTIMIZER));
   });
