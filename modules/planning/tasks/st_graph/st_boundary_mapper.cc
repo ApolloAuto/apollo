@@ -451,11 +451,13 @@ Status StBoundaryMapper::MapFollowDecision(
       obstacle->Perception().position().y());
 
   const double speed_coeff =
-      std::cos(obj_decision.follow().fence_heading() - ref_point.heading());
+      std::cos(obstacle->Perception().theta() - ref_point.heading());
   if (speed_coeff < 0.0) {
-    AERROR << "Obstacle is moving opposite to the reference line.";
-    return common::Status(ErrorCode::PLANNING_ERROR,
-                          "obstacle is moving opposite the reference line");
+    std::string msg = common::util::StrCat(
+        "Obstacle is moving opposite to the reference line. ref_point: ",
+        ref_point.DebugString(), ", path obstacle:\n",
+        path_obstacle.Obstacle()->Perception().DebugString());
+    AERROR << msg;
   }
 
   const auto& start_point = path_data_.discretized_path().StartPoint();
@@ -481,7 +483,7 @@ Status StBoundaryMapper::MapFollowDecision(
   }
 
   const auto& velocity = obstacle->Perception().velocity();
-  const double speed = std::hypot(velocity.x(), velocity.y());
+  const double speed = std::hypot(velocity.x(), velocity.y()) * speed_coeff;
 
   const double s_min_lower = distance_to_obstacle;
   const double s_min_upper =
