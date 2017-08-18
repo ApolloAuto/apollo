@@ -13,6 +13,7 @@ enum TaskType {
   DP_ST_SPEED_OPTIMIZER = 1;
   QP_SPLINE_PATH_OPTIMIZER = 2;
   QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
+  TRAFFIC_DECIDER = 4;
 };
 
 message EMPlannerConfig {
