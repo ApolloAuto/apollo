@@ -67,9 +67,10 @@ bool QpFrenetFrame::Init(const uint32_t num_points) {
     return false;
   }
 
-  if (Double::Compare(start_s_, end_s_, 1e-8) > 0) {
+  constexpr double kMinDistance = 1.0e-8;
+  if (std::fabs(start_s_ - end_s_) < kMinDistance) {
     AERROR << "Not enough s distance. start_s: " << start_s_
-           << ", end_s: " << end_s_;
+           << ", end_s: " << end_s_ << ", kMinDistance: " << kMinDistance;
     return false;
   }
 
@@ -123,8 +124,8 @@ bool QpFrenetFrame::GetDynamicObstacleBound(
 }
 
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
-  for (double relative_time = 0.0; relative_time < speed_data_.TotalTime();
-       relative_time += time_resolution_) {
+  double relative_time = 0.0;
+  while (relative_time < speed_data_.TotalTime()) {
     SpeedPoint veh_point;
     if (!speed_data_.EvaluateByTime(relative_time, &veh_point)) {
       AERROR << "Fail to get speed point at relative time " << relative_time;
@@ -132,6 +133,7 @@ bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
     }
     veh_point.set_t(relative_time);
     discretized_vehicle_location_.push_back(std::move(veh_point));
+    relative_time += time_resolution_;
   }
   return true;
 }

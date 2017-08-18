@@ -18,6 +18,7 @@
  * @file: active_set_qp_solver.h
  * @brief: wrapper class for active set method in qpOases
  **/
+
 #ifndef MODULES_COMMON_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
 #define MODULES_COMMON_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_
 
@@ -37,6 +38,7 @@ class ActiveSetQpSolver : public QpSolver {
                     const Eigen::MatrixXd& affine_inequality_boundary,
                     const Eigen::MatrixXd& affine_equality_matrix,
                     const Eigen::MatrixXd& affine_equality_boundary);
+  virtual ~ActiveSetQpSolver() = default;
 
   bool Solve() override;
 
@@ -65,14 +67,14 @@ class ActiveSetQpSolver : public QpSolver {
 
  private:
   // equality constriant + inequality constraint
-  int num_constraint_;
+  int num_constraint_ = 0;
   // number of parameters
-  int num_param_;
+  int num_param_ = 0;
 
-  double qp_eps_num_;
-  double qp_eps_den_;
-  double qp_eps_iter_ref_;
-  bool debug_info_;
+  double qp_eps_num_ = 0.0;
+  double qp_eps_den_ = 0.0;
+  double qp_eps_iter_ref_ = 0.0;
+  bool debug_info_ = false;
 
   // parameter search bound
   double l_lower_bound_ = -1e10;
@@ -86,4 +88,5 @@ class ActiveSetQpSolver : public QpSolver {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
+
 #endif  // MODULES_COMMON_MATH_QP_SOLVER_ACTIVE_SET_QP_SOLVER_H_

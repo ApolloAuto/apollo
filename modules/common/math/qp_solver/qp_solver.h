@@ -40,6 +40,7 @@ class QpSolver {
            const Eigen::MatrixXd& affine_inequality_boundary,
            const Eigen::MatrixXd& affine_equality_matrix,
            const Eigen::MatrixXd& affine_equality_boundary);
+  virtual ~QpSolver() = default;
 
   virtual bool Solve() = 0;
   const Eigen::MatrixXd& params() const;
