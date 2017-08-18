@@ -128,8 +128,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
     auto ret = optimizer->Optimize(frame, reference_line_info);
     if (!ret.ok()) {
-      AERROR << "Failed to run tasks:" << optimizer->name()
-             << ":" << ret.error_message();
+      AERROR << "Failed to run tasks[" << optimizer->name()
+             << "], Error message: " << ret.error_message();
       return ret;
     }
     const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
