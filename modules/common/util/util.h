@@ -23,6 +23,7 @@
 #define MODULES_COMMON_UTIL_H_
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <utility>
 
