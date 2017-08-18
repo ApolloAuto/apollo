@@ -114,12 +114,16 @@ ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
 
 PathDecision *Frame::path_decision() { return path_decision_; }
 
+std::vector<ReferenceLineInfo> &Frame::reference_line_info() {
+  return reference_line_info_;
+}
+
 bool Frame::InitReferenceLineInfo(
     const std::vector<ReferenceLine> &reference_lines) {
-  reference_line_list_.clear();
+  reference_line_info_.clear();
   for (const auto &reference_line : reference_lines) {
-    reference_line_list_.emplace_back(reference_line);
-    auto &info = reference_line_list_.back();
+    reference_line_info_.emplace_back(reference_line);
+    auto &info = reference_line_info_.back();
     if (!info.AddObstacles(obstacles_.Items())) {
       AERROR << "Failed to add obstacles to reference line";
       return false;
@@ -155,7 +159,7 @@ bool Frame::Init(const PlanningConfig &config) {
   reference_line_ = reference_lines.front();
 
   // FIXME(all) remove path decision from Frame.
-  path_decision_ = reference_line_list_[0].path_decision();
+  path_decision_ = reference_line_info_[0].path_decision();
   CHECK(path_decision_->path_obstacles().Items().size() > 0);
 
   if (FLAGS_enable_traffic_decision) {
