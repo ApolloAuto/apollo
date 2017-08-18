@@ -85,7 +85,6 @@ bool QuinticSpiralCurve::calculate_path() {
   // integration point initialization:
   double ds =
       sg / (spiral_config().simpson_size() - 1);  // bandwith for integration
-  double s = 0;
   // basic theta value vectors:
   std::vector<double> theta(spiral_config().simpson_size(), 0.0);
   std::vector<double> cos_theta(spiral_config().simpson_size(), 0.0);
@@ -109,7 +108,7 @@ bool QuinticSpiralCurve::calculate_path() {
 
   for (int32_t nt = 0; nt < spiral_config().newton_raphson_max_iter(); ++nt) {
     // calculate parameters for simpson integration
-    s = 0;
+    double s = 0;
 
     for (int32_t i = 0; i < spiral_config().simpson_size(); ++i) {
       theta[i] = SpiralFormula::theta_func_k5(s, sg, p_shoot);

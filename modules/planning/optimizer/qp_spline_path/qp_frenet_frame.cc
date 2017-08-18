@@ -330,10 +330,9 @@ bool QpFrenetFrame::MapLine(
 
   double distance =
       std::max(std::abs(near_point.s() - further_point.s()), 1e-8);
-  double weight = 0.0;
 
   for (uint32_t i = impact_index.first; i <= impact_index.second; ++i) {
-    weight = std::abs((evaluated_knots_[i] - near_point.s())) / distance;
+    double weight = std::abs((evaluated_knots_[i] - near_point.s())) / distance;
     weight = std::max(weight, 0.0);
     weight = std::min(weight, 1.0);
     double boundary =
