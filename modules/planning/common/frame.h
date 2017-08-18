@@ -77,6 +77,8 @@ class Frame {
   const PublishableTrajectory &computed_trajectory() const;
   const localization::Pose &VehicleInitPose() const;
 
+  const routing::RoutingResponse &routing_response() const;
+
   PathDecision *path_decision();
 
   void RecordInputDebug();
@@ -84,6 +86,8 @@ class Frame {
   void AlignPredictionTime(const double trajectory_header_time);
 
   std::vector<ReferenceLineInfo> &reference_line_info();
+
+  bool AddObstacle(std::unique_ptr<Obstacle> obstacle);
 
  private:
   /**
@@ -99,45 +103,11 @@ class Frame {
       std::vector<ReferenceLine> *reference_lines);
 
   /**
-   * @brief This is the function can smooth an hdmap::Path to a ReferenceLine
-   * @param hdmap_path an hdmap::Path instance
-   * @param reference_line the smoothed reference_line
-   *
-   * TODO move this function to a helper class in
-   * modules/planning/reference_line folder
-   */
-
-  /**
    * @brief create obstacles from prediction input.
    * @param prediction the received prediction result.
    */
   void CreatePredictionObstacles(
       const prediction::PredictionObstacles &prediction);
-
-  /**
-   * @brief create destination obstacle based on routing end point
-   * @param
-   */
-  bool CreateDestinationObstacle();
-
-  std::unique_ptr<Obstacle> CreateVirtualObstacle(
-      const std::string &obstacle_id,
-      const double route_s,
-      const double length, const double width, const double height);
-
-  /**
-   * @brief Create traffic obstacles in  this function.
-   * The created obstacles is added to obstacles_, and the decision is added to
-   * path_obstacles_
-   * Traffic obstacle examples include:
-   *  * Traffic Light
-   *  * End of routing
-   *  * Select the drivable reference line.
-   *  TODO impolement this function
-   *  TODO move this function to folder `planning/traffic_decision`
-   */
-  bool MakeTrafficDecision(const routing::RoutingResponse &routing,
-                           const ReferenceLine &reference_line);
 
   bool InitReferenceLineInfo(const std::vector<ReferenceLine> &reference_lines);
 

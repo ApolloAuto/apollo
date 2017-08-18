@@ -20,12 +20,17 @@
 
 #include "modules/planning/common/reference_line_info.h"
 
+#include <functional>
+
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
-
 uint32_t ReferenceLineInfo::s_reference_line_id_ = 0;
+
+namespace {
+std::hash<std::string> string_hash;
+}
 
 ReferenceLineInfo::ReferenceLineInfo(const ReferenceLine& reference_line)
     : reference_line_(reference_line) {
@@ -35,17 +40,18 @@ ReferenceLineInfo::ReferenceLineInfo(const ReferenceLine& reference_line)
 
 const std::string& ReferenceLineInfo::Id() const { return id_; }
 
-bool ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
+PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   auto path_obstacle = CreatePathObstacle(obstacle);
   if (!path_obstacle) {
     AERROR << "Failed to create path obstacle for " << obstacle->Id();
-    return false;
+    return nullptr;
   }
+  auto* ptr = path_obstacle.get();
   if (!path_decision_.AddPathObstacle(std::move(path_obstacle))) {
     AERROR << "Failed to add path_obstacle " << obstacle->Id();
-    return false;
+    return nullptr;
   }
-  return true;
+  return ptr;
 }
 
 bool ReferenceLineInfo::AddObstacles(
@@ -99,6 +105,30 @@ bool ReferenceLineInfo::InitPerceptionSLBoundary(PathObstacle* path_obstacle) {
   path_obstacle->SetPerceptionSLBoundary(perception_sl_boundary);
 
   return true;
+}
+
+std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
+    const std::string& obstacle_id, const double route_s, const double length,
+    const double width, const double height) const {
+  // create a "virtual" perception_obstacle
+  perception::PerceptionObstacle perception_obstacle;
+  // simulator needs a valid integer
+  perception_obstacle.set_id(-string_hash(obstacle_id));
+  auto dest_ref_point = reference_line_.get_reference_point(route_s);
+  perception_obstacle.mutable_position()->set_x(dest_ref_point.x());
+  perception_obstacle.mutable_position()->set_y(dest_ref_point.y());
+  perception_obstacle.set_theta(dest_ref_point.heading());
+  perception_obstacle.mutable_velocity()->set_x(0);
+  perception_obstacle.mutable_velocity()->set_y(0);
+  perception_obstacle.set_length(length);
+  perception_obstacle.set_width(width);
+  perception_obstacle.set_height(height);
+  perception_obstacle.set_type(
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_tracking_time(1.0);
+
+  return std::unique_ptr<Obstacle>(
+      new Obstacle(obstacle_id, perception_obstacle));
 }
 
 }  // namespace planning
