@@ -175,10 +175,10 @@ bool Frame::Init(const PlanningConfig &config) {
     CreatePredictionObstacles(prediction_);
   }
 
-  CreateDestinationObstacle();
-
   InitReferenceLineInfo(reference_lines);
   reference_line_ = reference_lines.front();
+
+  CreateDestinationObstacle();
 
   // FIXME(all) remove path decision from Frame.
   path_decision_ = reference_line_info_[0].path_decision();
