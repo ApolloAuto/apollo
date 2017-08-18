@@ -62,9 +62,6 @@ class ReferenceLine {
 
   std::string DebugString() const;
 
-  void get_s_range_from_box2d(const ::apollo::common::math::Box2d& box2d,
-                              double* max_s, double* min_s) const;
-
   double GetSpeedLimitFromS(const double s) const;
   double GetSpeedLimitFromPoint(const common::math::Vec2d& point) const;
 

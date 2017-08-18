@@ -55,9 +55,6 @@ class QpFrenetFrame {
 
   double feasible_longitudinal_upper_bound() const;
 
-  bool GetOverallBound(const double s,
-                       std::pair<double, double>* const bound) const;
-
   bool GetMapBound(const double s,
                    std::pair<double, double>* const bound) const;
 
@@ -68,9 +65,6 @@ class QpFrenetFrame {
                                std::pair<double, double>* const bound) const;
 
  private:
-  bool FindLongitudinalDistance(const double time,
-                                common::SpeedPoint* const speed_point);
-
   bool CalculateDiscretizedVehicleLocation();
 
   bool MapDynamicObstacleWithDecision(const PathObstacle& path_obstacle);
