@@ -23,7 +23,7 @@
 
 #include <array>
 
-#include "Eigen/Dense"
+#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace planning {
@@ -74,12 +74,11 @@ class CartesianFrenetConverter {
                                const double l, const double dl);
 
   static double CalculateKappa(const double rkappa, const double rdkappa,
-                                const double l, const double dl,
-                                const double ddl);
+                               const double l, const double dl,
+                               const double ddl);
 
-  static Eigen::Vector2d CalculateCartesianPoint(
-      const double rtheta, const Eigen::Vector2d& rpoint,
-      const double l);
+  static common::math::Vec2d CalculateCartesianPoint(
+      const double rtheta, const common::math::Vec2d& rpoint, const double l);
   /**
    * @brief: given sl, theta, and road's theta, kappa, extract derivative l,
    *second order derivative l:

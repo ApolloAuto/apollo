@@ -37,6 +37,7 @@ namespace apollo {
 namespace planning {
 
 using ConstPathObstacleList = std::vector<const PathObstacle*>;
+using Vec2d = apollo::common::math::Vec2d;
 
 QpSplinePathGenerator::QpSplinePathGenerator(
     const ReferenceLine& reference_line,
@@ -56,7 +57,6 @@ QpSplinePathGenerator::QpSplinePathGenerator(
 bool QpSplinePathGenerator::Generate(
     const ConstPathObstacleList& path_obstacles, const SpeedData& speed_data,
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
-
   if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
@@ -107,8 +107,8 @@ bool QpSplinePathGenerator::Generate(
   double start_l = spline(init_frenet_point_.s());
   ReferencePoint ref_point =
       reference_line_.get_reference_point(init_frenet_point_.s());
-  Eigen::Vector2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
-      ref_point.heading(), {ref_point.x(), ref_point.y()}, start_l);
+  Vec2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
+      ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), start_l);
 
   double x_diff = xy_point.x() - init_point.path_point().x();
   double y_diff = xy_point.y() - init_point.path_point().y();
@@ -121,17 +121,16 @@ bool QpSplinePathGenerator::Generate(
     double dl = spline.Derivative(s);
     double ddl = spline.SecondOrderDerivative(s);
     ReferencePoint ref_point = reference_line_.get_reference_point(s);
-    Eigen::Vector2d xy_point =
-        CartesianFrenetConverter::CalculateCartesianPoint(
-            ref_point.heading(), {ref_point.x(), ref_point.y()}, l);
-    xy_point[0] = xy_point[0] - x_diff;
-    xy_point[1] = xy_point[1] - y_diff;
+    Vec2d curr_xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
+        ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), l);
+    curr_xy_point.set_x(curr_xy_point.x() - x_diff);
+    curr_xy_point.set_y(curr_xy_point.y() - y_diff);
     double theta = CartesianFrenetConverter::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), l, dl);
     double kappa = CartesianFrenetConverter::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), l, dl, ddl);
     common::PathPoint path_point = common::util::MakePathPoint(
-        xy_point[0], xy_point[1], 0.0, theta, kappa, 0.0, 0.0);
+        curr_xy_point.x(), curr_xy_point.y(), 0.0, theta, kappa, 0.0, 0.0);
     if (path_points.size() != 0) {
       double distance =
           common::util::Distance2D(path_points.back(), path_point);
@@ -348,8 +347,8 @@ void QpSplinePathGenerator::AddKernel() {
   }
 
   // reference line kernel
-  if (qp_spline_path_config_.number_of_knots() > 1
-      && qp_spline_path_config_.reference_line_weight() > 0) {
+  if (qp_spline_path_config_.number_of_knots() > 1 &&
+      qp_spline_path_config_.reference_line_weight() > 0) {
     std::vector<double> l_vec(knots_.size(), 0.0);
     spline_kernel->add_reference_line_kernel_matrix(
         knots_, l_vec, qp_spline_path_config_.reference_line_weight());
