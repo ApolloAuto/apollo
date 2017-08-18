@@ -3,10 +3,12 @@ import * as THREE from "three";
 const _ = require('lodash');
 
 const fonts = {};
+let fontsLoaded = false;
 const loader = new THREE.FontLoader();
 const fontPath = "fonts/gentilis_bold.typeface.json";
 loader.load(fontPath, font => {
         fonts['gentilis_bold'] = font;
+        fontsLoaded = true;
     },
     function (xhr) {
         console.log(fontPath + (xhr.loaded / xhr.total * 100) + '% loaded');
@@ -32,6 +34,9 @@ export default class Text3D {
     }
 
     composeText(text) {
+        if (!fontsLoaded) {
+            return null;
+        }
         // 32 is the ASCII code for white space.
         const charIndices = _.map(text, l => l.charCodeAt(0) - 32);
         const letterOffset = 0.4;
