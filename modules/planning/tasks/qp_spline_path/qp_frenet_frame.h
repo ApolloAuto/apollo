@@ -19,8 +19,8 @@
  * @brief: natural coordinate system
  **/
 
-#ifndef MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_FRENET_FRAME_H_
-#define MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_FRENET_FRAME_H_
+#ifndef MODULES_PLANNING_TASKS_QP_SPLINE_PATH_QP_FRENET_FRAME_H_
+#define MODULES_PLANNING_TASKS_QP_SPLINE_PATH_QP_FRENET_FRAME_H_
 
 #include <memory>
 #include <utility>
@@ -123,4 +123,4 @@ class QpFrenetFrame {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPTIMIZER_QP_SPLINE_PATH_QP_FRENET_FRAME_H_
+#endif  // MODULES_PLANNING_TASKS_QP_SPLINE_PATH_QP_FRENET_FRAME_H_

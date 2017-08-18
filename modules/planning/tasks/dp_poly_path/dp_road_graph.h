@@ -18,8 +18,8 @@
  * @file dp_road_graph.h
  **/
 
-#ifndef MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_
-#define MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_
+#ifndef MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
+#define MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
 
 #include <vector>
 #include <utility>
@@ -121,4 +121,4 @@ class DPRoadGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPTIMIZER_DP_POLY_PATH_DP_ROAD_GRAPH_H_
+#endif  // MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
