@@ -63,8 +63,8 @@ class Planner {
    */
 
   virtual apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame, DiscretizedTrajectory* ptr_trajectory) = 0;
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ReferenceLineInfo* reference_line_info) = 0;
 };
 
 }  // namespace planning
