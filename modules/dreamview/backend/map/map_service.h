@@ -42,7 +42,7 @@ struct MapElementIds {
   std::vector<std::string> yield;
   std::vector<std::string> overlap;
 
-  MapElementIds();
+  MapElementIds() = default;
   explicit MapElementIds(const nlohmann::json &json_object);
 
   void LogDebugInfo() const {

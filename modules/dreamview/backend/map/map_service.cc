@@ -79,15 +79,6 @@ void ExtractStringVectorFromJson(const nlohmann::json &json_object,
 
 }  // namespace
 
-MapElementIds::MapElementIds()
-    : lane(),
-      crosswalk(),
-      junction(),
-      signal(),
-      stop_sign(),
-      yield(),
-      overlap() {}
-
 MapElementIds::MapElementIds(const nlohmann::json &json_object)
     : MapElementIds() {
   ExtractStringVectorFromJson(json_object, "lane", &lane);
@@ -133,7 +124,6 @@ MapElementIds MapService::CollectMapElementIds(const PointENU &point,
 
   std::vector<LaneInfoConstPtr> lanes;
   hdmap()->get_lanes(point, radius, &lanes);
-
   ExtractIds(lanes, &result.lane);
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;
