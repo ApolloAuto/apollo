@@ -108,18 +108,6 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  // TODO(all) temporarily use the offline routing data.
-  if (!AdapterManager::GetRoutingResponse()->HasReceived()) {
-    if (!AdapterManager::GetRoutingResponse()->FeedFile(
-            FLAGS_offline_routing_file)) {
-      auto error_msg = common::util::StrCat(
-          "Failed to load offline routing file ", FLAGS_offline_routing_file);
-      AERROR << error_msg;
-      return Status(ErrorCode::PLANNING_ERROR, error_msg);
-    } else {
-      AWARN << "Using offline routing file " << FLAGS_offline_routing_file;
-    }
-  }
   if (AdapterManager::GetPrediction() == nullptr) {
     std::string error_msg("Prediction is not registered");
     AERROR << error_msg;
