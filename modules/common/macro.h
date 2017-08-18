@@ -21,6 +21,9 @@
 #ifndef MODULES_COMMON_MACRO_H_
 #define MODULES_COMMON_MACRO_H_
 
+#include <ctime>
+#include <iostream>
+
 #define DISALLOW_COPY_AND_ASSIGN(classname) \
  private:                                   \
   classname(const classname &);             \
@@ -39,4 +42,19 @@
   }                                         \
   DISALLOW_IMPLICIT_CONSTRUCTORS(classname) \
  private:
+
+// Measure run time of a code block, for debugging puprpose only, don't check in
+// code with this macro!
+// Example usage:
+// PERF_BLOCK("Function Foo took: ") {
+//  Foo();
+// }
+#define PERF_BLOCK(message)                                                 \
+  for (long block_start_time = 0;                                           \
+       (block_start_time == 0 ? (block_start_time = std::clock()) : false); \
+       std::cout << std::fixed << message << ": "                           \
+                 << static_cast<double>(std::clock() - block_start_time) /  \
+                        CLOCKS_PER_SEC                                      \
+                 << std::endl)
+
 #endif  // MODULES_COMMON_MACRO_H_
