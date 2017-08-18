@@ -28,6 +28,7 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {
@@ -41,6 +42,13 @@ class ReferenceLineInfo {
   // remove this interface when ready.
   PathDecision* path_decision() { return &path_decision_; }
 
+  void SetTrajectory(const DiscretizedTrajectory& trajectory) {
+    discretized_trajectory_ = trajectory;
+  }
+  const DiscretizedTrajectory& trajectory() const {
+    return discretized_trajectory_;
+  }
+
  private:
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
@@ -49,6 +57,7 @@ class ReferenceLineInfo {
   PathDecision path_decision_;
   PathData path_data_;
   SpeedData speed_dta_;
+  DiscretizedTrajectory discretized_trajectory_;
 };
 
 }  // namespace planning

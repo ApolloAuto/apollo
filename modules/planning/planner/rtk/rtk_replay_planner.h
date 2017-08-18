@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -59,8 +60,8 @@ class RTKReplayPlanner : public Planner {
    * @return OK if planning succeeds; error otherwise.
    */
   apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame, DiscretizedTrajectory* ptr_trajectory) override;
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ReferenceLineInfo* reference_line_info) override;
   /**
    * @brief Read the recorded trajectory file.
    * @param filename The name of the trajectory file.

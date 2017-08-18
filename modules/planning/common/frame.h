@@ -83,6 +83,10 @@ class Frame {
 
   void AlignPredictionTime(const double trajectory_header_time);
 
+  std::vector<ReferenceLineInfo> &reference_line_info() {
+    return reference_line_list_;
+  }
+
  private:
   /**
    * @brief This is the function that can create one reference lines
