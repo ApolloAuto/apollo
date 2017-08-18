@@ -210,7 +210,7 @@ void Planning::RunOnce() {
   }
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
-  bool res_planning = Plan(is_auto_mode, start_timestamp, planning_cycle_time);
+  auto status = Plan(is_auto_mode, start_timestamp, planning_cycle_time);
 
   const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
@@ -219,17 +219,19 @@ void Planning::RunOnce() {
   ADEBUG << "Planning latency: "
          << trajectory_pb->latency_stats().DebugString();
 
-  if (res_planning) {
+  if (status.ok()) {
     PublishPlanningPb(trajectory_pb, start_timestamp);
     ADEBUG << "Planning succeeded:" << trajectory_pb->header().DebugString();
   } else {
+    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    PublishPlanningPb(trajectory_pb, start_timestamp);
     AERROR << "Planning failed";
   }
 }
 
 void Planning::Stop() {}
 
-bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
+common::Status Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
                     const double planning_cycle_time) {
   const auto& stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
@@ -263,9 +265,10 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
     }
   }
   if (!best_reference_line) {
-    AERROR << "planner failed to make a driving plan";
+    std::string msg("planner failed to make a driving plan");
+    AERROR << msg;
     last_publishable_trajectory_.Clear();
-    return false;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   PublishableTrajectory publishable_trajectory(
       current_time_stamp, best_reference_line->trajectory());
@@ -281,7 +284,7 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
   // update last publishable trajectory;
   last_publishable_trajectory_ = std::move(publishable_trajectory);
 
-  return true;
+  return Status::OK();
 }
 
 }  // namespace planning

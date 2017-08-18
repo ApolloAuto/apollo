@@ -87,7 +87,6 @@ Status EMPlanner::Init(const PlanningConfig& config) {
 
 void EMPlanner::RecordDebugInfo(const std::string& name,
                                 const double time_diff_ms,
-                                planning_internal::Debug*,
                                 planning::LatencyStats* ptr_latency_stats) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
@@ -141,8 +140,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
 
     if (FLAGS_enable_record_debug && ptr_debug != nullptr &&
         ptr_latency_stats != nullptr) {
-      RecordDebugInfo(optimizer->name(), time_diff_ms, ptr_debug,
-                      ptr_latency_stats);
+      RecordDebugInfo(optimizer->name(), time_diff_ms, ptr_latency_stats);
     }
   }
   DiscretizedTrajectory trajectory;
