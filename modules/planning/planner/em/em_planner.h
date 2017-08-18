@@ -28,10 +28,10 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/optimizer/optimizer.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
+#include "modules/planning/tasks/task.h"
 
 /**
  * @namespace apollo::planning
@@ -70,7 +70,7 @@ class EMPlanner : public Planner {
                       ReferenceLineInfo* reference_line_info) override;
 
  private:
-  void RegisterOptimizers();
+  void RegisterTasks();
 
   std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
       const common::TrajectoryPoint& planning_init_point);
@@ -83,8 +83,8 @@ class EMPlanner : public Planner {
                        planning_internal::Debug* ptr_debug,
                        planning::LatencyStats* ptr_latency_stats);
 
-  apollo::common::util::Factory<OptimizerType, Optimizer> optimizer_factory_;
-  std::vector<std::unique_ptr<Optimizer>> optimizers_;
+  apollo::common::util::Factory<TaskType, Task> task_factory_;
+  std::vector<std::unique_ptr<Task>> tasks_;
 };
 
 }  // namespace planning
