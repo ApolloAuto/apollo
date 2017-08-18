@@ -110,7 +110,7 @@ bool TrafficDecider::MakeDestinationStopDecision() {
   auto stop_position = obstacle->Perception().position();
   common::SLPoint stop_line_sl;
   reference_line.get_point_in_frenet_frame(
-      {stop_position.x(), stop_position.x()}, &stop_line_sl);
+      {stop_position.x(), stop_position.y()}, &stop_line_sl);
   if (!reference_line.is_on_road(stop_line_sl)) {
     return false;
   }
