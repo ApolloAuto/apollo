@@ -127,7 +127,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
       frame->MutableADCTrajectory()->mutable_latency_stats();
   for (auto& optimizer : tasks_) {
     const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
-    auto ret = optimizer->Optimize(frame);
+    auto ret = optimizer->Optimize(frame, reference_line_info);
     if (!ret.ok()) {
       AERROR << "Failed to run tasks:" << optimizer->name()
              << ret.error_message();

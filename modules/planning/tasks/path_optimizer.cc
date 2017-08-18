@@ -25,12 +25,14 @@ namespace planning {
 
 PathOptimizer::PathOptimizer(const std::string& name) : Task(name) {}
 
-apollo::common::Status PathOptimizer::Optimize(Frame* frame) {
+apollo::common::Status PathOptimizer::Optimize(
+    Frame* frame, ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
   auto* planning_data = frame->mutable_planning_data();
-  auto ret = Process(planning_data->speed_data(), frame->reference_line(),
-                     frame->PlanningStartPoint(), frame->path_decision(),
-                     planning_data->mutable_path_data());
+  auto ret = Process(
+      planning_data->speed_data(), reference_line_info->reference_line(),
+      frame->PlanningStartPoint(), reference_line_info->path_decision(),
+      planning_data->mutable_path_data());
   RecordDebugInfo(planning_data->path_data());
 
   return ret;
