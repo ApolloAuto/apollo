@@ -36,7 +36,6 @@
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
@@ -79,8 +78,6 @@ class Frame {
 
   const routing::RoutingResponse &routing_response() const;
 
-  PathDecision *path_decision();
-
   void RecordInputDebug();
 
   void AlignPredictionTime(const double trajectory_header_time);
@@ -119,7 +116,6 @@ class Frame {
   routing::RoutingResponse routing_response_;
   prediction::PredictionObstacles prediction_;
   IndexedObstacles obstacles_;
-  PathDecision *path_decision_ = nullptr;
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
   ReferenceLine reference_line_;

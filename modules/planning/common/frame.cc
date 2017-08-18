@@ -92,8 +92,6 @@ const ADCTrajectory &Frame::GetADCTrajectory() const { return trajectory_pb_; }
 
 ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
 
-PathDecision *Frame::path_decision() { return path_decision_; }
-
 std::vector<ReferenceLineInfo> &Frame::reference_line_info() {
   return reference_line_info_;
 }
@@ -138,9 +136,6 @@ bool Frame::Init(const PlanningConfig &config) {
 
   InitReferenceLineInfo(reference_lines);
   reference_line_ = reference_lines.front();
-
-  // FIXME(all) remove path decision from Frame.
-  path_decision_ = reference_line_info_[0].path_decision();
 
   return true;
 }
@@ -224,7 +219,7 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
 
 bool Frame::AddObstacle(std::unique_ptr<Obstacle> obstacle) {
   auto id(obstacle->Id());
-  obstacles_.Add(id, std::move(obstacle));
+  return obstacles_.Add(id, std::move(obstacle));
 }
 
 }  // namespace planning
