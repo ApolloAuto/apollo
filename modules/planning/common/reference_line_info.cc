@@ -24,8 +24,16 @@
 
 namespace apollo {
 namespace planning {
+
+uint32_t ReferenceLineInfo::s_reference_line_id_ = 0;
+
 ReferenceLineInfo::ReferenceLineInfo(const ReferenceLine& reference_line)
-    : reference_line_(reference_line) {}
+    : reference_line_(reference_line) {
+  id_ = std::to_string(s_reference_line_id_);
+  ++s_reference_line_id_;
+}
+
+const std::string& ReferenceLineInfo::Id() const { return id_; }
 
 bool ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   auto path_obstacle = CreatePathObstacle(obstacle);
