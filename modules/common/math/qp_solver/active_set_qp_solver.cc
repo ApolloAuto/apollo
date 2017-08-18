@@ -23,8 +23,8 @@
 #include <climits>
 #include <vector>
 
-#include "modules/common/math/qp_solver/qp_solver_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/math/qp_solver/qp_solver_gflags.h"
 
 namespace apollo {
 namespace common {
@@ -38,16 +38,14 @@ ActiveSetQpSolver::ActiveSetQpSolver(
     const Eigen::MatrixXd& affine_equality_boundary)
     : QpSolver(kernel_matrix, offset, affine_inequality_matrix,
                affine_inequality_boundary, affine_equality_matrix,
-               affine_equality_boundary) {
-  num_param_ = kernel_matrix.rows();
-  num_constraint_ =
-      affine_equality_matrix_.rows() + affine_inequality_matrix_.rows();
-
-  qp_eps_num_ = FLAGS_default_active_set_eps_num;
-  qp_eps_den_ = FLAGS_default_active_set_eps_den;
-  qp_eps_iter_ref_ = FLAGS_default_active_set_eps_iter_ref;
-  debug_info_ = FLAGS_default_enable_active_set_debug_info;
-}
+               affine_equality_boundary),
+      num_constraint_(affine_equality_matrix_.rows() +
+                      affine_inequality_matrix_.rows()),
+      num_param_(kernel_matrix.rows()),
+      qp_eps_num_(FLAGS_default_active_set_eps_num),
+      qp_eps_den_(FLAGS_default_active_set_eps_den),
+      qp_eps_iter_ref_(FLAGS_default_active_set_eps_iter_ref),
+      debug_info_(FLAGS_default_enable_active_set_debug_info) {}
 
 bool ActiveSetQpSolver::Solve() {
   ::qpOASES::QProblem qp_problem(num_param_, num_constraint_);
@@ -189,6 +187,7 @@ double ActiveSetQpSolver::constraint_upper_bound() const {
 }
 
 int ActiveSetQpSolver::max_iteration() const { return max_iteration_; }
+
 // pure virtual
 bool ActiveSetQpSolver::sanity_check() {
   return kernel_matrix_.rows() == kernel_matrix_.cols() &&

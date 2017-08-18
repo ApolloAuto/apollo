@@ -36,7 +36,6 @@
 namespace apollo {
 namespace planning {
 
-using ConstPathObstacleList = std::vector<const PathObstacle*>;
 using Vec2d = apollo::common::math::Vec2d;
 
 QpSplinePathGenerator::QpSplinePathGenerator(
@@ -55,15 +54,19 @@ QpSplinePathGenerator::QpSplinePathGenerator(
 }
 
 bool QpSplinePathGenerator::Generate(
-    const ConstPathObstacleList& path_obstacles, const SpeedData& speed_data,
-    const common::TrajectoryPoint& init_point, PathData* const path_data) {
+    const std::vector<const PathObstacle*>& path_obstacles,
+    const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
+    PathData* const path_data) {
   if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
   }
-  double start_s = init_frenet_point_.s();
-  double end_s = std::min(reference_line_.length(),
-                          init_frenet_point_.s() + FLAGS_look_forward_distance);
+  double start_s = 0.0;
+  double end_s = 0.0;
+  if (!InitCoordRange(&start_s, &end_s)) {
+    AERROR << "Measure natural coord system with s range failed!";
+    return false;
+  }
 
   QpFrenetFrame qp_frenet_frame(reference_line_, path_obstacles, speed_data,
                                 init_frenet_point_, start_s, end_s,
@@ -73,13 +76,10 @@ bool QpSplinePathGenerator::Generate(
     return false;
   }
 
-  if (!InitCoordRange(qp_frenet_frame, &start_s, &end_s)) {
-    AERROR << "Measure natural coord system with s range failed!";
-    return false;
-  }
-
   AINFO << "pss path start with " << start_s << ", end with " << end_s;
-  if (!InitSpline(init_frenet_point_, start_s, end_s - 0.1)) {
+
+  constexpr double kSplineEndBuffer = 0.1;
+  if (!InitSpline(init_frenet_point_, start_s, end_s - kSplineEndBuffer)) {
     AERROR << "Init smoothing spline failed with (" << start_s << ",  end_s "
            << end_s;
     return false;
@@ -179,8 +179,7 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
   return true;
 }
 
-bool QpSplinePathGenerator::InitCoordRange(const QpFrenetFrame& qp_frenet_frame,
-                                           double* const start_s,
+bool QpSplinePathGenerator::InitCoordRange(double* const start_s,
                                            double* const end_s) {
   DCHECK_NOTNULL(start_s);
   DCHECK_NOTNULL(end_s);
@@ -188,10 +187,9 @@ bool QpSplinePathGenerator::InitCoordRange(const QpFrenetFrame& qp_frenet_frame,
   // TODO(all): step 1 get current sl coordinate - with init coordinate point
   const double kStartPointBackwardDistance = 5.0;
   *start_s =
-      std::max(init_frenet_point_.s() - kStartPointBackwardDistance, 0.0);
-  *end_s = std::min(qp_frenet_frame.feasible_longitudinal_upper_bound(),
-                    std::min(qp_frenet_frame.GetReferenceLine().length(),
-                             *start_s + FLAGS_look_forward_distance));
+      std::fmax(init_frenet_point_.s() - kStartPointBackwardDistance, 0.0);
+  *end_s = std::fmin(reference_line_.length(),
+                     *start_s + FLAGS_look_forward_distance);
   return true;
 }
 
