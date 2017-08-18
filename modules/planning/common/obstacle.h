@@ -36,11 +36,8 @@
 namespace apollo {
 namespace planning {
 
+//TODO (all): disable "using" in header file.
 class Obstacle;
-using Obstacles = IndexedList<std::string, Obstacle>;
-
-class Obstacle;
-using ConstObstacleList = std::vector<const Obstacle *>;
 using IndexedObstacles = IndexedList<std::string, Obstacle>;
 
 class Obstacle {
