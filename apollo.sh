@@ -108,25 +108,34 @@ function generate_test_targets_opt() {
 #              Build functions
 #=================================================
 
-function apollo_build() {
+function build() {
   START_TIME=$(get_now)
 
   echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
   echo "$BUILD_TARGETS"
-  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg
+  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 $DEFINES -c $1
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
     fail 'Build failed!'
   fi
-  #build python proto
+
+  # Build python proto
   build_py_proto
   if [ -d "/home/tmp/conf" ];then
     sudo cp -r /home/tmp/conf bazel-apollo/external/ros/share/gnss_driver/
     sudo chown -R ${DOCKER_USER}:${DOCKER_GRP} "bazel-apollo/external/ros/share/gnss_driver/conf"
   fi
+}
+
+function apollo_build() {
+  build "dbg"
+}
+
+function build_opt() {
+  build "opt"
 }
 
 function build_py_proto() {
@@ -251,13 +260,13 @@ function release() {
 function gen_coverage() {
   bazel clean
   generate_test_targets_dbg
-  echo "$TEST_TARGETS" | xargs bazel test --define ARCH="$(uname -m)" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --config=coverage
+  echo "$TEST_TARGETS" | xargs bazel test $DEFINES -c dbg --config=coverage
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
 
   generate_test_targets_opt
-  echo "$TEST_TARGETS" | xargs bazel test --define ARCH="$(uname -m)" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --config=coverage
+  echo "$TEST_TARGETS" | xargs bazel test $DEFINES -c opt --config=coverage
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
@@ -299,9 +308,8 @@ function run_test() {
   # FIXME(all): when all unit test passed, switch back.
   # bazel test --config=unit_test -c dbg //...
   generate_test_targets_dbg
-  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings
-  RES1=$?
-  if [ $RES1 -ne 0 ]; then
+  echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  if [ $? -ne 0 ]; then
       fail "Test failed!"
       return 1
   fi
@@ -309,9 +317,8 @@ function run_test() {
   generate_test_targets_opt
   build_caffe_opt
   run_ldconfig
-  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt --test_verbose_timeout_warnings
-  RES2=$?
-  if [ $RES2 -eq 0 ]; then
+  echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c opt --test_verbose_timeout_warnings
+  if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
   else
@@ -460,12 +467,12 @@ function run_ldconfig() {
 
 function build_caffe_opt() {
   echo "Build Caffe (opt model) ..."
-  bazel build --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c opt @caffe//:lib
+  bazel build $DEFINES -c opt @caffe//:lib
 }
 
 function build_caffe_dbg() {
   echo "Build Caffe (dbg model) ..."
-  bazel build --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg @caffe//:lib
+  bazel build $DEFINES -c dbg @caffe//:lib
 }
 
 function config() {
@@ -479,28 +486,6 @@ function link_cpu_caffe_build() {
   ln -sf caffe_cpu.BUILD caffe.BUILD
   cd ..
 }
-
-function build_opt() {
-  START_TIME=$(get_now)
-
-  echo "Start building, please wait ..."
-  generate_build_targets
-  echo "Building on $MACHINE_ARCH, with targets:"
-  echo $BUILD_TARGETS | xargs bazel --batch --batch_cpu_scheduling build \
-    --jobs=10 --define ARCH="$MACHINE_ARCH" \
-    --define CAN_CARD=${CAN_CARD} \
-    --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} \
-    -c opt
-
-  if [ $? -eq 0 ]; then
-    success 'Build passed!'
-  else
-    fail 'Build failed!'
-  fi
-  #build python proto
-  build_py_proto
-}
-
 
 function print_usage() {
   echo 'Usage:
@@ -529,6 +514,8 @@ function main() {
   check_machine_arch
   check_esd_files
   link_cpu_caffe_build
+
+  DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
 
   case $1 in
     check)
