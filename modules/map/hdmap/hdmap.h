@@ -48,11 +48,6 @@ namespace hdmap {
  */
 class HDMap {
  public:
-  static std::unique_ptr<HDMap> CreateMap(const std::string& map_filename);
-
-  // Get default map loaded from the file specified by BaseMapFile().
-  static const HDMap& DefaultMap();
-
   /**
    * @brief load map from local file
    * @param map_filename path of map data file

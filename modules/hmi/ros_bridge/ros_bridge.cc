@@ -25,7 +25,7 @@
 #include "modules/common/util/file.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/pad_msg.pb.h"
-#include "modules/map/hdmap/hdmap.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 
 DEFINE_string(adapter_config_file,
@@ -40,7 +40,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterManagerConfig;
 using apollo::control::DrivingAction;
 using apollo::canbus::Chassis;
-using apollo::hdmap::HDMap;
+using apollo::hdmap::HDMapUtil;
 
 namespace apollo {
 namespace hmi {
@@ -62,7 +62,7 @@ class RosBridge {
     CHECK(apollo::common::util::GetProtoFromASCIIFile(
         FLAGS_routing_request_template, &routing_request_template));
     // Init HDMap.
-    hdmap_ = &HDMap::DefaultMap();
+    CHECK(HDMapUtil::instance()->BaseMap());
   }
 
  private:
@@ -134,7 +134,8 @@ class RosBridge {
     // Look up lane info from map.
     apollo::hdmap::LaneInfoConstPtr lane = nullptr;
     double s, l;
-    hdmap_->get_nearest_lane(pos, &lane, &s, &l);
+
+    HDMapUtil::instance()->BaseMapRef().get_nearest_lane(pos, &lane, &s, &l);
     if (lane == nullptr) {
       AERROR << "Cannot get nearest lane from current position.";
       return;
@@ -155,7 +156,6 @@ class RosBridge {
   }
 
  private:
-  const HDMap* hdmap_;
   routing::RoutingRequest routing_request_template;
 
   DECLARE_SINGLETON(RosBridge);

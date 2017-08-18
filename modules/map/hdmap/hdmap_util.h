@@ -16,10 +16,12 @@ limitations under the License.
 #ifndef MODULES_MAP_HDMAP_HDMAP_UTIL_H
 #define MODULES_MAP_HDMAP_HDMAP_UTIL_H
 
+#include <mutex>
 #include <string>
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/string_util.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/map/proto/map_id.pb.h"
 
 /**
@@ -66,6 +68,27 @@ inline apollo::hdmap::Id MakeMapId(const std::string& id) {
   map_id.set_id(id);
   return map_id;
 }
+
+std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path);
+
+class HDMapUtil {
+ public:
+  // Get default base map from the file specified by global flags.
+  // Return nullptr if failed to load.
+  const HDMap* BaseMap();
+  // Similar to BaseMap(), but garantee to return a valid HDMap, or else raise
+  // fatal error.
+  const HDMap& BaseMapRef();
+
+  // Reload the base map from the file specified by global flags.
+  bool ReloadBaseMap();
+
+ private:
+  std::unique_ptr<HDMap> base_map_ = nullptr;
+  std::mutex base_map_mutex_;
+
+  DECLARE_SINGLETON(HDMapUtil);
+};
 
 }  // namespace hdmap
 }  // namespace apollo
