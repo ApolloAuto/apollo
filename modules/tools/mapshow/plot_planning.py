@@ -163,7 +163,7 @@ def init_line_pool(central_x, central_y):
 
 if __name__ == '__main__':
     default_map_path = os.path.dirname(os.path.realpath(__file__))
-    default_map_path += "/../../map/data/base_map.txt"
+    default_map_path += "/../../map/data/demo/base_map.xml.txt"
 
     parser = argparse.ArgumentParser(
         description="plot_planning is a tool to display "
