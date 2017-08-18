@@ -55,12 +55,14 @@ class StGraphBoundary : public common::math::Polygon2d {
     OVERTAKE,
   };
 
-  // TODO(all): add this function.
-  // bool IsEmpty() const { return points.empty(); }
+  bool IsEmpty() const { return points_.empty(); }
   bool IsPointInBoundary(const StGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;
 
-  STPoint point(const uint32_t index) const;
+  STPoint BottomLeftPoint() const;
+  STPoint BottomRightPoint() const;
+  STPoint TopRightPoint() const;
+  STPoint TopLeftPoint() const;
 
   BoundaryType boundary_type() const;
   const std::string& id() const;
