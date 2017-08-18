@@ -80,6 +80,7 @@ DECLARE_double(static_decision_stop_buffer);
 DECLARE_double(dynamic_decision_follow_range);
 DECLARE_double(stop_distance_pedestrian);
 DECLARE_double(stop_distance_obstacle);
+DECLARE_double(destination_adjust_distance_buffer);
 DECLARE_double(nudge_distance_vehicle);
 DECLARE_double(nudge_distance_bicycle);
 DECLARE_double(nudge_distance_obstacle);

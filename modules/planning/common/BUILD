@@ -212,6 +212,7 @@ cc_library(
         ":path_obstacle",
         ":planning_data",
         ":reference_line_info",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/vehicle_state",
