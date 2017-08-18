@@ -20,7 +20,9 @@
 
 #include "modules/map/pnc_map/pnc_map.h"
 
+#include <algorithm>
 #include <fstream>
+#include <limits>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -35,8 +37,8 @@
 
 namespace apollo {
 namespace hdmap {
-
 namespace {
+using apollo::routing::RoutingResponse;
 
 // Minimum error in lane segmentation.
 const double kSegmentationEpsilon = 0.2;
@@ -74,7 +76,8 @@ void remove_duplicates(std::vector<hdmap::MapPathPoint> *points) {
   }
   points->resize(count);
 }
-}
+
+}  // namespace
 
 PncMap::PncMap(const std::string &map_file) {
   CHECK(!hdmap_.load_map_from_file(map_file)) << "Failed to load map file:"
@@ -82,7 +85,7 @@ PncMap::PncMap(const std::string &map_file) {
   AINFO << "map loaded, Map file: " << map_file;
 }
 
-bool PncMap::validate_routing(const ::apollo::routing::RoutingResponse &routing) const {
+bool PncMap::validate_routing(const RoutingResponse &routing) const {
   const int num_routes = routing.route_size();
   if (num_routes == 0) {
     AERROR << "Route is empty.";
@@ -160,7 +163,7 @@ bool PncMap::validate_routing(const ::apollo::routing::RoutingResponse &routing)
   return true;
 }
 
-bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &routing,
+bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
                                    const common::PointENU &point,
                                    const double backward_length,
                                    const double forward_length,
@@ -187,8 +190,9 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
     return false;
   }
   std::unordered_set<std::string> routing_lane_ids;
-  for (int i = 0; i < routing.route(0).road_info().passage_region(0).segment_size(); ++i ){
-    const auto& lane_segment = routing.route(0).road_info().passage_region(0).segment(i);
+  const auto& segments =
+      routing.route(0).road_info().passage_region(0).segment();
+  for (const auto& lane_segment : segments) {
     routing_lane_ids.insert(lane_segment.id());
   }
   double min_distance = std::numeric_limits<double>::infinity();
@@ -219,8 +223,7 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
   double min_overlap_distance = std::numeric_limits<double>::infinity();
   double proj_s = 0.0;
   double accumulate_s = 0.0;
-  for (int i = 0; i < routing.route(0).road_info().passage_region(0).segment_size(); ++i){
-    const auto& lane_segment = routing.route(0).road_info().passage_region(0).segment(i);
+  for (const auto& lane_segment : segments) {
     const double length = lane_segment.end_s() - lane_segment.start_s();
     if (lane_segment.id() == nearest_waypoint.lane->id().id()) {
       double overlap_distance = 0.0;
@@ -247,15 +250,15 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
   }
 }
 
-bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &routing,
+bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
                                    hdmap::Path *path) const {
   if (!validate_routing(routing)) {
     AERROR << "routing is invalid";
     return false;
   }
   double length = 0.0;
-  for (int i = 0; i < routing.route(0).road_info().passage_region(0).segment_size(); ++i){
-    const auto& lane_segment = routing.route(0).road_info().passage_region(0).segment(i);
+  for (const auto& lane_segment :
+       routing.route(0).road_info().passage_region(0).segment()) {
     CHECK_LE(lane_segment.start_s(),
              lane_segment.end_s() + common::math::kMathEpsilon);
     length += lane_segment.end_s() - lane_segment.start_s();
@@ -269,7 +272,7 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
   return CreatePathFromRouting(routing, 0.0, length, path);
 }
 
-bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &routing,
+bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
                                    double start_s, double end_s,
                                    hdmap::Path *path) const {
   if (path == nullptr) {
@@ -289,7 +292,8 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
   std::vector<hdmap::LaneSegment> lane_segments;
   // Extend the trajectory towards the start of the trajectory.
   if (start_s < 0) {
-    const auto &first_segment = routing.route(0).road_info().passage_region(0).segment(0);
+    const auto &first_segment =
+        routing.route(0).road_info().passage_region(0).segment(0);
     auto lane = hdmap_.get_lane_by_id(hdmap::MakeMapId(first_segment.id()));
     if (!lane) {
       AERROR << "failed to get lane from id " << first_segment.id();
@@ -323,8 +327,8 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
     }
   }
   double router_s = 0;
-  for (int i = 0; i < routing.route(0).road_info().passage_region(0).segment_size(); ++i ){
-    const auto& lane_segment = routing.route(0).road_info().passage_region(0).segment(i);
+  for (const auto& lane_segment :
+       routing.route(0).road_info().passage_region(0).segment()) {
     const double adjusted_start_s = std::max(
         start_s - router_s + lane_segment.start_s(), lane_segment.start_s());
     const double adjusted_end_s = std::min(
@@ -346,9 +350,10 @@ bool PncMap::CreatePathFromRouting(const ::apollo::routing::RoutingResponse &rou
   }
   // Extend the trajectory towards the end of the trajectory.
   if (router_s < end_s && routing.route_size() > 0) {
-    const auto &last_segment = routing.route(routing.route_size() - 1).road_info().passage_region(0).segment(routing.route(routing.route_size() - 1).road_info().passage_region(0).segment_size() - 1);
-    std::string last_lane_id = last_segment.id();
-    double last_s = last_segment.end_s();
+    const auto last_segment = routing.route().rbegin()->road_info()
+                              .passage_region(0).segment().rbegin();
+    std::string last_lane_id = last_segment->id();
+    double last_s = last_segment->end_s();
     while (router_s < end_s - kRouteEpsilon) {
       const auto lane = hdmap_.get_lane_by_id(hdmap::MakeMapId(last_lane_id));
       if (lane == nullptr) {

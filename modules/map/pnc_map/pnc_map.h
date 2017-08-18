@@ -18,11 +18,13 @@
  * @file: pnc_map.h
  **/
 
-#ifndef MODULES_MAP_COMMON_PNC_MAP_H_
-#define MODULES_MAP_COMMON_PNC_MAP_H_
+#ifndef MODULES_MAP_PNC_MAP_PNC_MAP_H_
+#define MODULES_MAP_PNC_MAP_PNC_MAP_H_
 
 #include <memory>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/path.h"
@@ -39,7 +41,7 @@ class PncMap {
  public:
   PncMap() = default;
   ~PncMap() = default;
-  PncMap(const std::string &map_file);
+  explicit PncMap(const std::string &map_file);
 
   const hdmap::HDMap *HDMap() const;
 
@@ -56,7 +58,8 @@ class PncMap {
                              double start_s, double end_s,
                              hdmap::Path *path) const;
 
-  bool validate_routing(const ::apollo::routing::RoutingResponse &routing) const;
+  bool validate_routing(
+      const ::apollo::routing::RoutingResponse &routing) const;
 
  private:
   void append_lane_to_points(
@@ -69,4 +72,4 @@ class PncMap {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_COMMON_PNC_MAP_H_
+#endif  // MODULES_MAP_PNC_MAP_PNC_MAP_H_

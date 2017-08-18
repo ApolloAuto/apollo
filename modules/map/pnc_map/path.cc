@@ -330,7 +330,7 @@ void Path::init_overlaps() {
   get_all_overlaps(std::bind(&LaneInfo::crosswalks, _1), &_crosswalk_overlaps);
   get_all_overlaps(std::bind(&LaneInfo::junctions, _1), &_junction_overlaps);
 
-  // TODO: add support for parking and speed bumps.
+  // TODO(all): add support for parking and speed bumps.
   /*
   get_all_overlaps(std::bind(&LaneInfo::parking_spaces, _1),
                    &_parking_space_overlaps);
