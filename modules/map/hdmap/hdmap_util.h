@@ -60,6 +60,15 @@ inline std::string RoutingMapFile() {
 }
 
 /**
+ * @brief get end way point file path from flags.
+ * @return end way point file path
+ */
+inline std::string EndWayPointFile() {
+  return apollo::common::util::StrCat(
+      FLAGS_map_dir, "/", FLAGS_end_way_point_filename);
+}
+
+/**
  * @brief create a Map ID given a string.
  * @param id a string id
  * @return a Map ID instance
