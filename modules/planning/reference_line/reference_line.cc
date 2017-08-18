@@ -73,7 +73,7 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
   if (s < accumulated_s.front()) {
     AWARN << "The requested s is before the start point of the reference "
              "line; reference line starts at "
-          << accumulated_s.back() << ", requested " << s << ".";
+          << accumulated_s.front() << ", requested " << s << ".";
     ReferencePoint ref_point(map_path_.get_smooth_point(s), 0.0, 0.0, 0.0, 0.0);
     if (ref_point.lane_waypoints().empty()) {
       ref_point.add_lane_waypoints(reference_points_.front().lane_waypoints());
