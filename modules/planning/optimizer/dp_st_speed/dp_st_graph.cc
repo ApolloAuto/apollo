@@ -24,18 +24,21 @@
 #include <limits>
 #include <string>
 
-#include "modules/common/log.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/common/log.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::ErrorCode;
-using apollo::common::SpeedPoint;
-using apollo::common::Status;
-using apollo::common::VehicleParam;
+using ErrorCode = apollo::common::ErrorCode;
+using SpeedPoint = apollo::common::SpeedPoint;
+using Status = apollo::common::Status;
+using VehicleParam = apollo::common::VehicleParam;
+using Vec2d = apollo::common::math::Vec2d;
 
 DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config,
                      const StGraphData& st_graph_data,
@@ -443,7 +446,9 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
     } else {
       // OVERTAKE decision
       ObjectDecisionType overtake_decision;
-      if (!CreateOvertakeDecision(*boundary_it, &overtake_decision)) {
+      const auto obstacle = path_decision->Find(boundary_it->id());
+      if (!CreateOvertakeDecision(*obstacle, *boundary_it,
+                                  &overtake_decision)) {
         AERROR << "Failed to create overtake decision for boundary with id "
                << boundary_it->id();
         return Status(ErrorCode::PLANNING_ERROR,
@@ -476,6 +481,7 @@ bool DpStGraph::CreateFollowDecision(
 
   auto* follow = follow_decision->mutable_follow();
 
+  // in seconds
   constexpr double kFollowTimeBuffer = 3.0;
   const auto& velocity = path_obstacle.Obstacle()->Perception().velocity();
   const double follow_speed =
@@ -529,12 +535,24 @@ bool DpStGraph::CreateYieldDecision(
 }
 
 bool DpStGraph::CreateOvertakeDecision(
-    const StGraphBoundary& boundary,
+    const PathObstacle& path_obstacle, const StGraphBoundary& boundary,
     ObjectDecisionType* const overtake_decision) const {
   DCHECK_NOTNULL(overtake_decision);
 
   auto* overtake = overtake_decision->mutable_overtake();
-  const double overtake_distance_s = boundary.characteristic_length();
+
+  // in seconds
+  constexpr double kOvertakeTimeBuffer = 3.0;
+  constexpr double kMinOvertakeDistance = 10.0;
+  const auto& velocity = path_obstacle.Obstacle()->Perception().velocity();
+  const double obstacle_speed =
+      Vec2d::CreateUnitVec2d(init_point_.path_point().theta())
+          .InnerProd(Vec2d(velocity.x(), velocity.y()));
+
+  // in meters
+  const double overtake_distance_s = std::fmax(
+      std::fmax(init_point_.v(), obstacle_speed) * kOvertakeTimeBuffer,
+      kMinOvertakeDistance);
   overtake->set_distance_s(overtake_distance_s);
 
   const double reference_line_fence_s = boundary.max_s() + overtake_distance_s;
