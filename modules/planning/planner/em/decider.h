@@ -21,11 +21,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/status/status.h"
-#include "modules/planning/common/frame.h"
+#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/proto/decision.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/reference_line/reference_line.h"
 
 /**
  * @namespace apollo::planning
@@ -36,20 +33,19 @@ namespace planning {
 
 class Decider {
  public:
-  explicit Decider(DecisionResult* decision_result);
+  Decider() = default;
   ~Decider() = default;
 
-  const DecisionResult &Decision() const;
-  apollo::common::Status MakeDecision(Frame* frame);
+  const DecisionResult &MakeDecision(
+      const ReferenceLineInfo &reference_line_info);
 
  private:
-  int MakeMainStopDecision(Frame* frame,
-                           PathDecision *const path_decision);
-  int MakeEStopDecision(PathDecision *const path_decision);
-  int SetObjectDecisions(PathDecision *const path_decision);
+  int MakeMainStopDecision(const ReferenceLineInfo &reference_line_info);
+  void MakeEStopDecision(const PathDecision &path_decision);
+  void SetObjectDecisions(const PathDecision &path_decision);
 
  private:
-  DecisionResult* decision_ = nullptr;  // not owned
+  DecisionResult decision_result_;
 };
 
 }  // namespace planning

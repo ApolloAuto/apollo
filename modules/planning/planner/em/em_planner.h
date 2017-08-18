@@ -27,6 +27,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
+#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/optimizer/optimizer.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -73,8 +74,10 @@ class EMPlanner : public Planner {
 
   std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
       const common::TrajectoryPoint& planning_init_point);
-  // TODO(all): change to return Status.
-  void PopulateDecision(Frame* frame);
+
+  // FIXME(all) remove frame from this function.
+  void PopulateDecision(const ReferenceLineInfo& reference_line_info,
+                        Frame* frame);
 
   void RecordDebugInfo(const std::string& name, const double time_diff_ms,
                        planning_internal::Debug* ptr_debug,

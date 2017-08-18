@@ -102,10 +102,12 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
   ptr_stats->set_time_ms(time_diff_ms);
 }
 
-void EMPlanner::PopulateDecision(Frame* frame) {
-  auto planning_pb = frame->MutableADCTrajectory();
-  Decider decider(planning_pb->mutable_decision());
-  decider.MakeDecision(frame);
+void EMPlanner::PopulateDecision(const ReferenceLineInfo& reference_line_info,
+                                 Frame* frame) {
+  auto* planning_pb = frame->MutableADCTrajectory();
+  Decider decider;
+  planning_pb->mutable_decision()->CopyFrom(
+      decider.MakeDecision(reference_line_info));
 }
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
@@ -154,7 +156,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
   reference_line_info->SetTrajectory(trajectory);
 
-  PopulateDecision(frame);
+  PopulateDecision(*reference_line_info, frame);
 
   // Add debug information.
   if (FLAGS_enable_record_debug && ptr_debug != nullptr) {
