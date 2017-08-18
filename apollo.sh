@@ -83,7 +83,7 @@ function check_esd_files() {
 
 function generate_build_targets() {
   BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
-    | grep -v "_cpplint$" | grep -v "release" | grep -v "kernel")
+    | grep -v "_cpplint$")
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
@@ -94,7 +94,7 @@ function generate_build_targets() {
 
 function generate_test_targets_dbg() {
   #because of pcl seg fault of 1.7.2 exclude perception on debug build of test
-  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party" | grep -v "kernel" | grep -v "perception")
+  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party" | grep -v "perception")
   if ! $USE_ESD_CAN; then
      TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
@@ -106,10 +106,10 @@ function generate_test_targets_opt() {
 
 function generate_build_targets_caffe() {
   BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
-    | grep -v "_cpplint$" | grep -v "release" | grep -v "kernel" | grep "caffe")
+    | grep -v "_cpplint$" | grep "caffe")
   if [ $? -ne 0 ]; then
     fail 'Build caffe failed!'
-  fi    
+  fi
 }
 
 #=================================================
@@ -339,7 +339,7 @@ function run_cpp_lint() {
 }
 
 function run_bash_lint() {
-  FILES=$(find "${APOLLO_ROOT_DIR}" -type f -name "*.sh" | grep -v ros | grep -v kernel)
+  FILES=$(find "${APOLLO_ROOT_DIR}" -type f -name "*.sh" | grep -v ros)
   echo "${FILES}" | xargs shellcheck
 }
 
@@ -529,7 +529,7 @@ function main() {
       ;;
     build_opt)
       apollo_build_opt
-      ;;  
+      ;;
     build_fe)
       build_fe
       ;;
