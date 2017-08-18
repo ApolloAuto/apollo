@@ -106,6 +106,9 @@ export default class PerceptionObstacles {
 
     updateId(id, position, scene) {
         const text = this.textRender.composeText(id);
+        if (text === null) {
+            return;
+        }
         text.position.set(position.x, position.y, position.z || 3);
         text.quaternion.copy(scene.getObjectByName("camera").quaternion);
         text.children.forEach(c => c.visible = true);
