@@ -398,7 +398,6 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
     } else if (obj_decision.has_yield()) {
       const double dis = std::fabs(obj_decision.yield().distance_s());
       characteristic_length = dis;
-      // TODO(all): remove the arbitrary numbers in this part.
       if (boundary_points.at(0).s() - dis < 0.0) {
         boundary_points.at(0).set_s(
             std::fmax(boundary_points.at(0).s() - buffer, 0.0));

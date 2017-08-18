@@ -515,7 +515,10 @@ bool DpStGraph::CreateYieldDecision(
   DCHECK_NOTNULL(yield_decision);
 
   auto* yield = yield_decision->mutable_yield();
-  const double yield_distance_s = -1.0 * boundary.characteristic_length();
+
+  // in meters
+  constexpr double kMinYieldDistance = 10.0;
+  const double yield_distance_s = -1.0 * kMinYieldDistance;
   yield->set_distance_s(yield_distance_s);
 
   const double reference_line_fence_s = boundary.min_s() + yield_distance_s;
@@ -543,13 +546,14 @@ bool DpStGraph::CreateOvertakeDecision(
 
   // in seconds
   constexpr double kOvertakeTimeBuffer = 3.0;
+  // in meters
   constexpr double kMinOvertakeDistance = 10.0;
+
   const auto& velocity = path_obstacle.Obstacle()->Perception().velocity();
   const double obstacle_speed =
       Vec2d::CreateUnitVec2d(init_point_.path_point().theta())
           .InnerProd(Vec2d(velocity.x(), velocity.y()));
 
-  // in meters
   const double overtake_distance_s = std::fmax(
       std::fmax(init_point_.v(), obstacle_speed) * kOvertakeTimeBuffer,
       kMinOvertakeDistance);
