@@ -11,3 +11,4 @@
 --base_map_filename=base_map.xml.txt
 --routing_map_filename=routing_map.txt
 --sim_map_filename=sim_map.txt
+--end_way_point_filename=default_end_way_point.txt

@@ -32,10 +32,6 @@ DEFINE_string(adapter_config_file,
               "modules/hmi/conf/ros_bridge_adapter.pb.txt",
               "Adapter config file for ros bridge.");
 
-DEFINE_string(routing_request_template,
-              "modules/hmi/conf/routing_request_template.pb.txt",
-              "RoutingRequest template file.");
-
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterManagerConfig;
 using apollo::control::DrivingAction;
@@ -60,7 +56,8 @@ class RosBridge {
 
     // Init RoutingRequest template.
     CHECK(apollo::common::util::GetProtoFromASCIIFile(
-        FLAGS_routing_request_template, &routing_request_template));
+        apollo::hdmap::EndWayPointFile(),
+        routing_request_template.mutable_end()));
     // Init HDMap.
     CHECK(HDMapUtil::instance()->BaseMap());
   }
