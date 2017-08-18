@@ -136,7 +136,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     ADEBUG << "after optimizer " << optimizer->name() << ":"
-           << planning_data->DebugString();
+           << planning_data->DebugString() << std::endl;
+    ADEBUG << optimizer->name() << " time spend: " << time_diff_ms << " ms.";
 
     if (FLAGS_enable_record_debug && ptr_debug != nullptr &&
         ptr_latency_stats != nullptr) {
