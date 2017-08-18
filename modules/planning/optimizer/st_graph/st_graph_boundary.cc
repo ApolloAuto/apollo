@@ -65,15 +65,29 @@ bool StGraphBoundary::IsPointInBoundary(const STPoint& st_point) const {
   return IsPointIn(st_point);
 }
 
-STPoint StGraphBoundary::point(const uint32_t index) const {
-  CHECK_LT(index, points_.size()) << "Index[" << index << "] is out of range.";
-  return STPoint(points_[index].y(), points_[index].x());
+STPoint StGraphBoundary::BottomLeftPoint() const {
+  DCHECK(!points_.empty()) << "StGraphBoundary has zero points.";
+  return STPoint(points_.at(0).y(), points_.at(0).x());
+}
+
+STPoint StGraphBoundary::BottomRightPoint() const {
+  DCHECK(!points_.empty()) << "StGraphBoundary has zero points.";
+  return STPoint(points_.at(1).y(), points_.at(1).x());
+}
+
+STPoint StGraphBoundary::TopRightPoint() const {
+  DCHECK(!points_.empty()) << "StGraphBoundary has zero points.";
+  return STPoint(points_.at(2).y(), points_.at(2).x());
+}
+
+STPoint StGraphBoundary::TopLeftPoint() const {
+  DCHECK(!points_.empty()) << "StGraphBoundary has zero points.";
+  return STPoint(points_.at(3).y(), points_.at(3).x());
 }
 
 StGraphBoundary::BoundaryType StGraphBoundary::boundary_type() const {
   return boundary_type_;
 }
-
 void StGraphBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
   boundary_type_ = boundary_type;
 }
