@@ -23,6 +23,7 @@
 #include "Eigen/Core"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/common/define.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -36,6 +37,7 @@ using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::JunctionBoundaryPtr;
 using apollo::hdmap::BoundaryEdge_Type_LEFT_BOUNDARY;
 using apollo::hdmap::BoundaryEdge_Type_RIGHT_BOUNDARY;
+using apollo::hdmap::HDMapUtil;
 using apollo::common::math::Vec2d;
 using apollo::common::math::Polygon2d;
 using pcl_util::PointD;
@@ -45,10 +47,17 @@ using std::string;
 using std::vector;
 
 // HDMapInput
+HDMapInput::HDMapInput() {}
 
-HDMapInput::HDMapInput() : hdmap_(apollo::hdmap::HDMap::DefaultMap()) {}
+bool HDMapInput::Init() {
+  return HDMapUtil::instance()->ReloadBaseMap();
+}
 
 bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
+  auto* hdmap = HDMapUtil::instance()->BaseMap();
+  if (hdmap == nullptr) {
+    return false;
+  }
   std::unique_lock<std::mutex> lock(mutex_);
   if (mapptr != NULL && *mapptr == nullptr) {
     (*mapptr).reset(new HdmapStruct);
@@ -60,8 +69,8 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   std::vector<RoadROIBoundaryPtr> boundary_vec;
   std::vector<JunctionBoundaryPtr> junctions_vec;
 
-  int status = hdmap_.get_road_boundaries(point, FLAGS_map_radius,
-                                          &boundary_vec, &junctions_vec);
+  int status = hdmap->get_road_boundaries(
+      point, FLAGS_map_radius, &boundary_vec, &junctions_vec);
   if (status != SUCC) {
     AERROR << "Failed to get road boundaries for point " << point.DebugString();
     return false;

@@ -284,7 +284,6 @@ class PredictionMap {
   }
 
  private:
-  const apollo::hdmap::HDMap& hdmap_;
   DECLARE_SINGLETON(PredictionMap);
 };
 

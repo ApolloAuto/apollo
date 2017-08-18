@@ -13,26 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <vector>
+ #include "modules/perception/obstacle/onboard/hdmap_input.h"
+ 
+ #include <vector>
 
 #include "gtest/gtest.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 
-#include "modules/perception/obstacle/onboard/hdmap_input.h"
-
 namespace apollo {
 namespace perception {
 
+TEST(HDMapInputTest, test_Init) {
+  auto* hdmap_input = HDMapInput::instance();
+  EXPECT_TRUE(hdmap_input->Init());
+
+  FLAGS_base_map_filename = "not_exit_dir";
+  EXPECT_FALSE(hdmap_input->Init());
+}
+
 TEST(HDMapInputTest, test_GetROI) {
   HdmapStructPtr hdmap;
+  auto* hdmap_input = HDMapInput::instance();
   pcl_util::PointD velodyne_pose_world = {
       587054.96336391149, 4141606.3593586856, 0.0};
+  EXPECT_FALSE(hdmap_input->GetROI(velodyne_pose_world, &hdmap));
   FLAGS_map_dir = "modules/map/data";
   FLAGS_base_map_filename = "sunnyvale_loop.xml.txt";
-  EXPECT_TRUE(
-      Singleton<HDMapInput>::Get()->GetROI(velodyne_pose_world, &hdmap));
+  EXPECT_TRUE(hdmap_input->Init());
+  EXPECT_TRUE(hdmap_input->GetROI(velodyne_pose_world, &hdmap));
   EXPECT_TRUE(hdmap != nullptr);
 }
 

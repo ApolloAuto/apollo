@@ -11,6 +11,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/configs:config_gflags",
         "//modules/map/hdmap",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/base",
         "//modules/perception/lib/pcl_util",

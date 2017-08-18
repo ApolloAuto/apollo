@@ -219,9 +219,13 @@ bool LidarProcess::InitFrameDependence() {
 
   /// init hdmap
   if (FLAGS_enable_hdmap_input) {
-    hdmap_input_ = Singleton<HDMapInput>::Get();
+    hdmap_input_ = HDMapInput::instance();
     if (!hdmap_input_) {
       AERROR << "failed to get HDMapInput instance.";
+      return false;
+    }
+    if (!hdmap_input_->Init()) {
+      AERROR << "failed to init HDMapInput";
       return false;
     }
     AINFO << "get and init hdmap_input succ.";

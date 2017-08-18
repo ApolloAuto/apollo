@@ -41,7 +41,7 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:vec2d",
-        "//modules/map/hdmap",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "@eigen//:eigen",
     ],

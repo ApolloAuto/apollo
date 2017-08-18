@@ -26,7 +26,6 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -37,8 +36,9 @@ namespace prediction {
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::Id;
 using apollo::hdmap::MapPathPoint;
+using apollo::hdmap::HDMapUtil;
 
-PredictionMap::PredictionMap() : hdmap_(apollo::hdmap::HDMap::DefaultMap()) {}
+PredictionMap::PredictionMap() {}
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
     std::shared_ptr<const LaneInfo> lane_info,
@@ -81,7 +81,7 @@ double PredictionMap::LaneTotalWidth(
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(const Id& id) {
-  return hdmap_.get_lane_by_id(id);
+  return HDMapUtil::instance()->BaseMapRef().get_lane_by_id(id);
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
@@ -126,7 +126,7 @@ void PredictionMap::OnLane(
   apollo::common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
-  if (hdmap_.get_lanes_with_heading(
+  if (HDMapUtil::instance()->BaseMapRef().get_lanes_with_heading(
         hdmap_point, radius, heading, M_PI, &candidate_lanes) != 0) {
     return;
   }
