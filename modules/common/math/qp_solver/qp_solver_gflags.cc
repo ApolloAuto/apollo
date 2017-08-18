@@ -17,7 +17,7 @@
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
 
 // math : active set solver
-DEFINE_double(default_active_set_eps_num, 1e-7,
+DEFINE_double(default_active_set_eps_num, -1e-7,
               "qpOases wrapper error control numerator");
 DEFINE_double(default_active_set_eps_den, 1e-7,
               "qpOases wrapper error control numerator");
