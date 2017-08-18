@@ -83,9 +83,7 @@ class Frame {
 
   void AlignPredictionTime(const double trajectory_header_time);
 
-  std::vector<ReferenceLineInfo> &reference_line_info() {
-    return reference_line_list_;
-  }
+  std::vector<ReferenceLineInfo> &reference_line_info();
 
  private:
   /**
@@ -145,7 +143,7 @@ class Frame {
  private:
   common::TrajectoryPoint planning_start_point_;
 
-  std::vector<ReferenceLineInfo> reference_line_list_;
+  std::vector<ReferenceLineInfo> reference_line_info_;
 
   routing::RoutingResponse routing_response_;
   prediction::PredictionObstacles prediction_;

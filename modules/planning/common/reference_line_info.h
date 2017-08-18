@@ -44,16 +44,31 @@ class ReferenceLineInfo {
   const PathDecision& path_decision() const { return path_decision_; }
   const ReferenceLine& reference_line() const { return reference_line_; }
 
+  // TODO remove this inteface when ready.
   void SetTrajectory(const DiscretizedTrajectory& trajectory) {
     discretized_trajectory_ = trajectory;
   }
+
   const DiscretizedTrajectory& trajectory() const {
     return discretized_trajectory_;
   }
 
+  double Cost() const { return cost_; }
+
+  bool CombinePathAndSpeedProfile(const double time_resolution,
+                                  const double relative_time);
+
  private:
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
+
+  /**
+   * @brief this is the number that measures the goodness of this reference
+   * line.
+   * The lower the better.
+   * TODO: implement trajectory cost calculation
+   */
+  double cost_ = 0.0;
 
   const ReferenceLine reference_line_;
   PathDecision path_decision_;

@@ -249,6 +249,8 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
   frame_->AlignPredictionTime(current_time_stamp);
 
   ReferenceLineInfo* best_reference_line = nullptr;
+  double previous_reference_line_cost = std::numeric_limits<double>::infinity();
+
   for (auto& reference_line_info : frame_->reference_line_info()) {
     auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
                                  &reference_line_info);
@@ -256,15 +258,15 @@ bool Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
       AERROR << "planner failed to make a driving plan";
       continue;
     }
-    // FIXME: compare reference_lines;
-    best_reference_line = &reference_line_info;
+    if (reference_line_info.Cost() < previous_reference_line_cost) {
+      best_reference_line = &reference_line_info;
+    }
   }
   if (!best_reference_line) {
     AERROR << "planner failed to make a driving plan";
     last_publishable_trajectory_.Clear();
     return false;
   }
-
   PublishableTrajectory publishable_trajectory(
       current_time_stamp, best_reference_line->trajectory());
 
