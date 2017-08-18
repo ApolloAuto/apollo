@@ -25,7 +25,7 @@
 #include "glog/raw_logging.h"
 
 #define ADEBUG VLOG(4) << "[DEBUG] "
-#define AINFO VLOG(3) << "[INFO] "
+#define AINFO LOG(INFO)
 #define AWARN LOG(WARNING)
 #define AERROR LOG(ERROR)
 #define AFATAL LOG(FATAL)
