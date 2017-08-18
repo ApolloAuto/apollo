@@ -116,6 +116,8 @@ DEFINE_double(stop_distance_pedestrian, 5.0,
               "stop distance from in-lane pedestrian (meters)");
 DEFINE_double(stop_distance_obstacle, 5.0,
               "stop distance from in-lane obstacle (meters)");
+DEFINE_double(destination_adjust_distance_buffer, 1.0,
+              "distance buffer when adjusting destination stop line");
 DEFINE_double(nudge_distance_vehicle, 0.3,
               "minimum distance to nudge a vehicle");
 DEFINE_double(nudge_distance_bicycle, 0.9144,
