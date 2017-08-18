@@ -30,6 +30,8 @@
 namespace apollo {
 namespace planning {
 
+using Vec2d = apollo::common::math::Vec2d;
+
 void CartesianFrenetConverter::cartesian_to_frenet(
     const double rs, const double rx, const double ry, const double rtheta,
     const double rkappa, const double rdkappa, const double x, const double y,
@@ -82,9 +84,8 @@ void CartesianFrenetConverter::frenet_to_cartesian(
     const std::array<double, 3>& d_condition, double* const ptr_x,
     double* const ptr_y, double* const ptr_theta, double* const ptr_kappa,
     double* const ptr_v, double* const ptr_a) {
-
-  CHECK(std::abs(rs - s_condition[0]) < 1.0e-6
-      && "The reference point s and s_condition[0] don't match");
+  CHECK(std::abs(rs - s_condition[0]) < 1.0e-6 &&
+        "The reference point s and s_condition[0] don't match");
 
   double cos_theta_r = std::cos(rtheta);
   double sin_theta_r = std::sin(rtheta);
@@ -130,8 +131,7 @@ double CartesianFrenetConverter::CalculateTheta(const double rtheta,
 
 double CartesianFrenetConverter::CalculateKappa(const double rkappa,
                                                 const double rdkappa,
-                                                const double l,
-                                                const double dl,
+                                                const double l, const double dl,
                                                 const double ddl) {
   double denominator = (dl * dl + (1 - l * rkappa) * (1 - l * rkappa));
   if (Double::Compare(denominator, 0.0, 1e-8) == 0) {
@@ -139,17 +139,17 @@ double CartesianFrenetConverter::CalculateKappa(const double rkappa,
   }
   denominator = std::pow(denominator, 1.5);
   const double numerator = rkappa + ddl - 2 * l * rkappa * rkappa -
-                           l * ddl * rkappa +
-                           l * l * rkappa * rkappa * rkappa +
+                           l * ddl * rkappa + l * l * rkappa * rkappa * rkappa +
                            l * dl * rdkappa + 2 * dl * dl * rkappa;
   return numerator / denominator;
 }
 
-Eigen::Vector2d CartesianFrenetConverter::CalculateCartesianPoint(
-    const double rtheta, const Eigen::Vector2d& rpoint, const double l) {
-  double x = rpoint[0] - l * std::sin(rtheta);
-  double y = rpoint[1] + l * std::cos(rtheta);
-  return {x, y};
+Vec2d CartesianFrenetConverter::CalculateCartesianPoint(const double rtheta,
+                                                        const Vec2d& rpoint,
+                                                        const double l) {
+  double x = rpoint.x() - l * std::sin(rtheta);
+  double y = rpoint.y() + l * std::cos(rtheta);
+  return Vec2d(x, y);
 }
 
 double CartesianFrenetConverter::CalculateLateralDerivative(
@@ -164,10 +164,17 @@ double CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
   const double dl = CalculateLateralDerivative(rtheta, theta, l, rkappa);
   const double theta_diff = theta - rtheta;
   const double cos_theta_diff = std::cos(theta_diff);
-  // TODO(fanhaoyang): add sanity check for invalid input
-  return -(rdkappa * l + rkappa * dl) * std::tan(theta - rtheta) +
-         (1 - rkappa * l) / (cos_theta_diff * cos_theta_diff) *
-             (kappa * (1 - rkappa * l) / cos_theta_diff - rkappa);
+  double res = -(rdkappa * l + rkappa * dl) * std::tan(theta - rtheta) +
+               (1 - rkappa * l) / (cos_theta_diff * cos_theta_diff) *
+                   (kappa * (1 - rkappa * l) / cos_theta_diff - rkappa);
+  if (std::isinf(res)) {
+    AWARN << "result is inf when calculate second order lateral "
+             "derivative. input values are rtheta:"
+          << rtheta << " theta: " << theta << ", rkappa: " << rkappa
+          << ", kappa: " << kappa << ", rdkappa: " << rdkappa << ", l: " << l
+          << std::endl;
+  }
+  return res;
 }
 
 }  // namespace planning
