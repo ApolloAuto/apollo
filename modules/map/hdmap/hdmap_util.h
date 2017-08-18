@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef MODULES_MAP_HDMAP_HDMAP_UTIL_H
 #define MODULES_MAP_HDMAP_HDMAP_UTIL_H
 
+#include <memory>
 #include <mutex>
 #include <string>
 

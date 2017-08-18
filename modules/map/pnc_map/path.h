@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MAP_PNC_MAP_TRAJECTORY_H_
-#define MODULES_MAP_PNC_MAP_TRAJECTORY_H_
+#ifndef MODULES_MAP_PNC_MAP_PATH_H_
+#define MODULES_MAP_PNC_MAP_PATH_H_
 
 #pragma once
 
@@ -181,7 +181,7 @@ class InterpolatedIndex {
 class Path {
  public:
   Path() = default;
-  Path(std::vector<MapPathPoint> path_points);
+  explicit Path(std::vector<MapPathPoint> path_points);
 
   Path(std::vector<MapPathPoint> path_points,
        std::vector<LaneSegment> lane_segments);
@@ -310,4 +310,4 @@ class Path {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_PNC_MAP_TRAJECTORY_H_
+#endif  // MODULES_MAP_PNC_MAP_PATH_H_
