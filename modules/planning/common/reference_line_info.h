@@ -41,6 +41,8 @@ class ReferenceLineInfo {
   // FIXME(all) this interface is temp. solution to make the code work.
   // remove this interface when ready.
   PathDecision* path_decision() { return &path_decision_; }
+  const PathDecision& path_decision() const { return path_decision_; }
+  const ReferenceLine& reference_line() const { return reference_line_; }
 
   void SetTrajectory(const DiscretizedTrajectory& trajectory) {
     discretized_trajectory_ = trajectory;
