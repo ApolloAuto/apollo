@@ -19,10 +19,6 @@ const colorMapping = {
     DEFAULT: 0xC0C0C0
 };
 
-function base64Decode(encoded) {
-    return Buffer.from(encoded, 'base64').toString();
-}
-
 // The result will be the all the elements in current but not in data.
 function diffMapElements(elementIds, data) {
     const result = {};
@@ -35,7 +31,7 @@ function diffMapElements(elementIds, data) {
 
         for (let i = 0; i < newIds.length; ++i) {
             const found = oldData ? oldData.find(old => {
-                return base64Decode(old.id.id) === newIds[i];
+                return old.id.id === newIds[i];
             }) : false;
 
             if (!found) {
@@ -246,9 +242,7 @@ export default class Map {
             const current = elementIds[kind];
             if (current) {
                 for (let i = 0; i < oldDataOfThisKind.length; ++i) {
-                    // Map elements Id is base64 encoded by MessageToJsonString
-                    const id = base64Decode(oldDataOfThisKind[i].id.id);
-                    if (current.includes(id)) {
+                    if (current.includes(oldDataOfThisKind[i].id.id)) {
                         newData[kind].push(oldDataOfThisKind[i]);
                     } else if (oldDataOfThisKind[i].drewObjects) {
                         oldDataOfThisKind[i].drewObjects.forEach(object => {
