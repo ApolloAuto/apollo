@@ -18,7 +18,7 @@ Each segment *i* has accumulated distance $d_i$ along reference line. And the tr
 
 $$
 l = f_i(s)
-  = a_i + b_i * s + c_i * s^2 + d_i * s^3 + e_i * s^4 + f_i * s^5   (0 \leq s \leq d_{i})
+  = a_{i0} + a_{i1} * s + a_{i2} * s^2 + a_{i3} * s^3 + a_{i4} * s^4 + a_{i5} * s^5   (0 \leq s \leq d_{i})
 $$
 
 ### 1.4 Define objective function of optimization for each segment
@@ -41,35 +41,64 @@ Ax \leq b
 $$
 Below is the example for converting cost function to QP formulaiton. 
 $$
-f_i(s) ＝\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix} \cdot  \begin{vmatrix} 1 \\ s \\ s^2 \\ s^3 \\ s^4 \\ s^5 \end{vmatrix}
+f_i(s) ＝
+\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+\cdot  
+\begin{vmatrix} 1 \\ s \\ s^2 \\ s^3 \\ s^4 \\ s^5 \end{vmatrix}
 $$
 
 and
 $$
-f_i'(s) =\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix} \cdot  \begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix}
+f_i'(s) =
+\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+\cdot  
+\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix}
 $$
 
 
 and 
 $$
-f_i'(s)^2 =\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix} \cdot  \begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} \cdot \begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix}
+f_i'(s)^2 =
+\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5}  \end{vmatrix} 
+\cdot 
+\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\cdot 
+\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
+\cdot 
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
 and 
 $$
-\int\limits_{0}^{d_i} f_i'(s)^2 ds ＝\int\limits_{0}^{d_i}\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix} \cdot  \begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} \cdot \begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix}
+\int\limits_{0}^{d_i} f_i'(s)^2 ds ＝
+\int\limits_{0}^{d_i}
+\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+\cdot  
+\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\cdot 
+\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
+\cdot 
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
 
 
 and
 $$
-\int\limits_{0}^{d_i} f'(s)^2 ds ＝\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix} \cdot \int\limits_{0}^{d_i}  \begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} \cdot \begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} ds \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix}
+\int\limits_{0}^{d_i} f'(s)^2 ds ＝
+\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
+\cdot 
+\int\limits_{0}^{d_i}  
+\begin{vmatrix} 0 \\ 1 \\ s \\ s^2 \\ s^3 \\ s^4 \end{vmatrix} 
+\cdot 
+\begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} ds 
+\cdot 
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
 
 
 and
 $$
 \int\limits_{0}^{d_i} 
-f'(s)^2 ds ＝\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix} 
+f'(s)^2 ds ＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot \int\limits_{0}^{d_i}
 \begin{vmatrix} 
 0  & 0 &0&0&0&0\\ 
@@ -78,12 +107,14 @@ f'(s)^2 ds ＝\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix}
 0 & s^2 &  s^3 & s^4&s^5&s^6 \\ 
 0 & s^3 & s^4 &s^5 &s^6&s^7 \\ 
 0 & s^4 & s^5 & s^6 & s^7 & s^8 
-\end{vmatrix} ds \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix}
+\end{vmatrix} ds 
+\cdot 
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
 and
 $$
 \int\limits_{0}^{d_i} 
-f'_i(s)^2 ds ＝\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix} 
+f'_i(s)^2 ds ＝\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
 \cdot \begin{vmatrix} 
 0 & 0 & 0 & 0 &0&0\\ 
 0 & d_i & \frac{d_i^2}{2} & \frac{d_i^3}{3} & \frac{d_i^4}{4}&\frac{d_i^5}{5}\\ 
@@ -93,7 +124,7 @@ f'_i(s)^2 ds ＝\begin{vmatrix} a_i & b_i & c_i & d_i & e_i & f_i \end{vmatrix}
 0& \frac{d_i^5}{5} & \frac{d_i^6}{6} & \frac{d_i^7}{7} & \frac{d_i^8}{8}&\frac{d_i^9}{9}\\ 
 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
 
 ## 2 Constraints  
@@ -106,15 +137,24 @@ A_{eq}x = b_{eq}
 $$
 Below is the steps of conversion
 $$
-f_i(s_0) = \begin{vmatrix} 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} = l_0
+f_i(s_0) = 
+\begin{vmatrix} 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \end{vmatrix} 
+\cdot 
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}\end{vmatrix} = l_0
 $$
 and
 $$
-f'_i(s_0) = \begin{vmatrix} 0& 1 & s_0 & s_0^2 & s_0^3 & s_0^4 \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} = l_0
+f'_i(s_0) = 
+\begin{vmatrix} 0& 1 & s_0 & s_0^2 & s_0^3 & s_0^4 \end{vmatrix} 
+\cdot 
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l_0
 $$
 and 
 $$
-f''_i(s_0) = \begin{vmatrix} 0&0& 1 & s_0 & s_0^2 & s_0^3  \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} = l_0
+f''_i(s_0) = 
+\begin{vmatrix} 0&0& 1 & s_0 & s_0^2 & s_0^3  \end{vmatrix} 
+\cdot 
+\begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l_0
 $$
 $i$ is the index of segment that contains the $s_0$.
 
@@ -124,7 +164,9 @@ $$
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
  0&1 & s_0 & s_0^2 & s_0^3 & s_0^4 \\
  0& 0&1 & s_0 & s_0^2 & s_0^3  
- \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} 
+ \end{vmatrix} 
+ \cdot 
+ \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} 
  = 
  \begin{vmatrix}
  l_0\\
@@ -146,7 +188,9 @@ $$
  1 & s_e & s_e^2 & s_e^3 & s_e^4&s_e^5 \\
  0&1 & s_e & s_e^2 & s_e^3 & s_e^4 \\
  0& 0&1 & s_e & s_e^2 & s_e^3  
- \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} 
+ \end{vmatrix} 
+ \cdot 
+ \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} 
  = 
  \begin{vmatrix}
  l_0\\
@@ -172,7 +216,7 @@ $$
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix} 
- a_k \\ b_k \\ c_k \\ d_k \\ e_k \\ f_k 
+ a_{k0} \\ a_{k1} \\ a_{k2} \\ a_{k3} \\ a_{k4} \\ a_{k5} 
  \end{vmatrix} 
  = 
 \begin{vmatrix} 
@@ -180,7 +224,7 @@ $$
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix} 
- a_{k+1} \\ b_{k+1} \\ c_{k+1} \\ d_{k+1} \\ e_{k+1} \\ f_{k+1} 
+ a_{k+1,0} \\ a_{k+1,1} \\ a_{k+1,2} \\ a_{k+1,3} \\ a_{k+1,4} \\ a_{k+1,5} 
  \end{vmatrix}
 $$
 then
@@ -190,7 +234,7 @@ $$
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix} 
- a_k \\ b_k \\ c_k \\ d_k \\ e_k \\ f_k \\ a_{k+1} \\ b_{k+1} \\ c_{k+1} \\ d_{k+1} \\ e_{k+1} \\ f_{k+1}  
+ a_{k0} \\ a_{k1} \\ a_{k2} \\ a_{k3} \\ a_{k4} \\ a_{k5} \\ a_{k+1,0} \\ a_{k+1,1} \\ a_{k+1,2} \\ a_{k+1,3} \\ a_{k+1,4} \\ a_{k+1,5}  
  \end{vmatrix} 
  = 0
 $$
@@ -218,7 +262,7 @@ $$
   1 & s_1 & s_1^2 & s_1^3 & s_1^4&s_1^5 \\
  ...&...&...&...&...&... \\
  1 & s_m & s_m^2 & s_m^3 & s_m^4&s_m^5 \\
- \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} 
+ \end{vmatrix} \cdot \begin{vmatrix}a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} 
  \leq 
  \begin{vmatrix}
  l_{lb,0}\\
@@ -236,7 +280,9 @@ $$
   1 & s_1 & s_1^2 & s_1^3 & s_1^4&s_1^5 \\
  ...&...&...&...&...&... \\
  1 & s_m & s_m^2 & s_m^3 & s_m^4&s_m^5 \\
- \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} 
+ \end{vmatrix} 
+ \cdot 
+ \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} 
  \leq
  -1 \cdot
  \begin{vmatrix}
