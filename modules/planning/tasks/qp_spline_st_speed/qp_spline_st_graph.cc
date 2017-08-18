@@ -372,24 +372,58 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
   // use v to estimate position: not accurate, but feasible in cyclic
   // processing. We can do the following process multiple times and use
   // previous cycle's results for better estimation.
-  auto cmp = [](const std::pair<double, double>& p1, const double s) {
-    return p1.first < s;
-  };
-
   const double v = init_point.v();
-  for (const double t : t_evaluated_) {
-    const double s = v * t;
 
-    // NOTICE: we are using binary search here based on two assumptions:
-    // (1) The s in speed_limit_points increase monotonically.
-    // (2) The evaluated_t_.size() << number of speed_limit_points.size()
-    //
-    // If either of the two assumption is failed, a new algorithm must be used
-    // to replace the binary search.
-    const auto& it =
-        std::lower_bound(speed_limit.speed_limit_points().begin(),
-                         speed_limit.speed_limit_points().end(), s, cmp);
-    speed_upper_bound->push_back(it->second);
+  if (static_cast<double>(t_evaluated_.size() +
+                          speed_limit.speed_limit_points().size()) <
+      t_evaluated_.size() * std::log(static_cast<double>(
+                                speed_limit.speed_limit_points().size()))) {
+    uint32_t i = 0;
+    uint32_t j = 0;
+    const double kDistanceEpsilon = 1e-6;
+    while (i < t_evaluated_.size() &&
+           j + 1 < speed_limit.speed_limit_points().size()) {
+      const double distance = v * t_evaluated_[i];
+      if (fabs(distance - speed_limit.speed_limit_points()[j].first) <
+          kDistanceEpsilon) {
+        speed_upper_bound->push_back(
+            speed_limit.speed_limit_points()[j].second);
+        ++i;
+        ADEBUG << "speed upper bound:" << speed_upper_bound->back();
+      } else if (distance < speed_limit.speed_limit_points()[j].first) {
+        ++i;
+      } else if (distance <= speed_limit.speed_limit_points()[j + 1].first) {
+        speed_upper_bound->push_back(speed_limit.GetSpeedLimitByS(distance));
+        ADEBUG << "speed upper bound:" << speed_upper_bound->back();
+        ++i;
+      } else {
+        ++j;
+      }
+    }
+
+    for (uint32_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
+      speed_upper_bound->push_back(qp_spline_st_speed_config_.max_speed());
+      ADEBUG << "speed upper bound:" << speed_upper_bound->back();
+    }
+  } else {
+    auto cmp = [](const std::pair<double, double>& p1, const double s) {
+      return p1.first < s;
+    };
+
+    for (const double t : t_evaluated_) {
+      const double s = v * t;
+
+      // NOTICE: we are using binary search here based on two assumptions:
+      // (1) The s in speed_limit_points increase monotonically.
+      // (2) The evaluated_t_.size() << number of speed_limit_points.size()
+      //
+      // If either of the two assumption is failed, a new algorithm must be used
+      // to replace the binary search.
+      const auto& it =
+          std::lower_bound(speed_limit.speed_limit_points().begin(),
+                           speed_limit.speed_limit_points().end(), s, cmp);
+      speed_upper_bound->push_back(it->second);
+    }
   }
 
   const double kTimeBuffer = 2.0;
