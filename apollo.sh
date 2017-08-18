@@ -480,19 +480,17 @@ function link_cpu_caffe_build() {
   cd ..
 }
 
-function build_perception() {
+function build_opt() {
   START_TIME=$(get_now)
 
   echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
-  bazel --batch --batch_cpu_scheduling build \
+  echo $BUILD_TARGETS | xargs bazel --batch --batch_cpu_scheduling build \
     --jobs=10 --define ARCH="$MACHINE_ARCH" \
     --define CAN_CARD=${CAN_CARD} \
     --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} \
-    -c opt \
-    //modules/perception/... \
-    //modules/dreamview/...
+    -c opt
 
   if [ $? -eq 0 ]; then
     success 'Build passed!'
@@ -510,7 +508,7 @@ function print_usage() {
   echo 'Options:
   build: run build only
   build_fe: compile frontend javascript code, this requires all the node_modules to be installed already
-  build_perception: build perception module
+  build_opt: build optimized binary for the code.
   buildify: fix style of BUILD files
   check: run build/lint/test, please make sure it passes before checking in new code
   clean: runs Bazel clean
@@ -542,8 +540,8 @@ function main() {
     build_fe)
       build_fe
       ;;
-    build_perception)
-      build_perception
+    build_opt)
+      build_opt
       ;;
     buildify)
       buildify
