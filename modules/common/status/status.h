@@ -60,7 +60,7 @@ class Status {
    * @brief Create a status with the specified error code and empty msg
    * @param code the error code.
    */
-  Status(ErrorCode code) : code_(code), msg_("") {}
+  explicit Status(ErrorCode code) : code_(code), msg_("") {}
 
   /**
    * @brief generate a success status.
