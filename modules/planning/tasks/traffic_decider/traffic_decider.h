@@ -47,7 +47,7 @@ class TrafficDecider : public Task {
  public:
   explicit TrafficDecider(const std::string &name);
   virtual ~TrafficDecider() = default;
-  apollo::common::Status Optimize(
+  apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
  private:
@@ -58,9 +58,6 @@ class TrafficDecider : public Task {
    * @return the created path obstacle
    */
   PathObstacle *CreateDestinationObstacle();
-
-  Frame *frame_ = nullptr;
-  ReferenceLineInfo *reference_line_info_ = nullptr;
 };
 
 }  // namespace planning

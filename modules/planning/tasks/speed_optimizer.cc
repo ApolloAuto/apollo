@@ -27,9 +27,10 @@ namespace planning {
 
 SpeedOptimizer::SpeedOptimizer(const std::string& name) : Task(name) {}
 
-apollo::common::Status SpeedOptimizer::Optimize(
+apollo::common::Status SpeedOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
+  Task::Execute(frame, reference_line_info);
+
   auto* planning_data = frame->mutable_planning_data();
   auto ret = Process(planning_data->path_data(), frame->PlanningStartPoint(),
                      reference_line_info->reference_line(),

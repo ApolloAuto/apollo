@@ -78,10 +78,10 @@ Status EMPlanner::Init(const PlanningConfig& config) {
         task_factory_.CreateObject(static_cast<TaskType>(task)));
     AINFO << "Created task:" << tasks_.back()->name();
   }
-  for (auto& optimizer : tasks_) {
-    if (!optimizer->Init(config)) {
-      std::string msg(common::util::StrCat("Init optimizer[", optimizer->name(),
-                                           "] failed."));
+  for (auto& task : tasks_) {
+    if (!task->Init(config)) {
+      std::string msg(
+          common::util::StrCat("Init task[", task->name(), "] failed."));
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -135,7 +135,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
       frame->MutableADCTrajectory()->mutable_latency_stats();
   for (auto& optimizer : tasks_) {
     const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
-    auto ret = optimizer->Optimize(frame, reference_line_info);
+    auto ret = optimizer->Execute(frame, reference_line_info);
     if (!ret.ok()) {
       AERROR << "Failed to run tasks[" << optimizer->name()
              << "], Error message: " << ret.error_message();

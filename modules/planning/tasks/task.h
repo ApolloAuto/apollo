@@ -36,7 +36,7 @@ class Task {
   virtual ~Task() = default;
   virtual const std::string& name() const;
 
-  virtual apollo::common::Status Optimize(
+  virtual apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info);
 
   virtual bool Init(const PlanningConfig& config);
@@ -44,6 +44,7 @@ class Task {
  protected:
   bool is_init_ = false;
   Frame* frame_ = nullptr;
+  ReferenceLineInfo* reference_line_info_ = nullptr;
 
  private:
   const std::string _name;
