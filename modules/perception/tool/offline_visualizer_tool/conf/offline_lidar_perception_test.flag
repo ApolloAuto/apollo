@@ -14,10 +14,15 @@
 # default: ./pose/
 --pose_path=/data/pose/
 
+# output path
+# type: string
+# default: ./output/
+--output_path=/data/output/
+
 # enable visualization
 # type: bool
 # default: true
---enable_visualization=true
+--enable_visualization=false
 
 ####################################################################
 # Flags from obstacle/onboard/hdmap_input.cc
