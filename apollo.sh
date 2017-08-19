@@ -490,12 +490,22 @@ function link_cpu_caffe_build() {
   cd ..
 }
 
+function link_gpu_caffe_build() {
+  echo "Link GPU version of caffe.BUILD ..."
+  rm -f third_party/caffe.BUILD
+  cd third_party
+  ln -sf caffe_gpu.BUILD caffe.BUILD
+  cd ..
+  source /etc/profile
+}
+
 function print_usage() {
   echo 'Usage:
   ./apollo.sh [OPTION]'
   echo 'Options:
   build: run build only
   build_opt: build optimized binary for the code (please choose this option if using perception).
+  build_opt_gpu: build optimized binary with Caffe GPU mode support.
   build_fe: compile frontend javascript code, this requires all the node_modules to be installed already
   buildify: fix style of BUILD files
   check: run build/lint/test, please make sure it passes before checking in new code
@@ -528,6 +538,10 @@ function main() {
       apollo_build_dbg
       ;;
     build_opt)
+      apollo_build_opt
+      ;;
+    build_opt_gpu)
+      link_gpu_caffe_build
       apollo_build_opt
       ;;
     build_fe)
