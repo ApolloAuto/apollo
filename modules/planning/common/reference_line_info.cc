@@ -131,5 +131,17 @@ std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
       new Obstacle(obstacle_id, perception_obstacle));
 }
 
+const PlanningData& ReferenceLineInfo::planning_data() const {
+  return planning_data_;
+}
+
+PlanningData* ReferenceLineInfo::mutable_planning_data() {
+  return &planning_data_;
+}
+
+const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
+  return discretized_trajectory_;
+}
+
 }  // namespace planning
 }  // namespace apollo

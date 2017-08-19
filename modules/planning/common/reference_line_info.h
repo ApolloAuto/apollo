@@ -27,6 +27,7 @@
 
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
@@ -52,9 +53,10 @@ class ReferenceLineInfo {
     discretized_trajectory_ = trajectory;
   }
 
-  const DiscretizedTrajectory& trajectory() const {
-    return discretized_trajectory_;
-  }
+  PlanningData* mutable_planning_data();
+  const PlanningData& planning_data() const;
+
+  const DiscretizedTrajectory& trajectory() const;
 
   double Cost() const { return cost_; }
 
@@ -83,8 +85,7 @@ class ReferenceLineInfo {
 
   const ReferenceLine reference_line_;
   PathDecision path_decision_;
-  PathData path_data_;
-  SpeedData speed_dta_;
+  PlanningData planning_data_;
   DiscretizedTrajectory discretized_trajectory_;
 };
 

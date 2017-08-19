@@ -141,10 +141,6 @@ bool Frame::Init(const PlanningConfig &config) {
 
 uint32_t Frame::sequence_num() const { return sequence_num_; }
 
-const PlanningData &Frame::planning_data() const { return _planning_data; }
-
-PlanningData *Frame::mutable_planning_data() { return &_planning_data; }
-
 const std::vector<ReferenceLineInfo> &Frame::reference_line_info() const {
   return reference_line_info_;
 }

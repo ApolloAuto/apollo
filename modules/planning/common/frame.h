@@ -36,7 +36,6 @@
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -60,9 +59,7 @@ class Frame {
   static void SetMap(hdmap::PncMap *pnc_map);
 
   uint32_t sequence_num() const;
-  const PlanningData &planning_data() const;
 
-  PlanningData *mutable_planning_data();
   std::string DebugString() const;
 
   const IndexedObstacles &GetObstacles() const;
@@ -117,7 +114,6 @@ class Frame {
   IndexedObstacles obstacles_;
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
-  PlanningData _planning_data;
   static const hdmap::PncMap *pnc_map_;
   ReferenceLineSmootherConfig smoother_config_;
 
