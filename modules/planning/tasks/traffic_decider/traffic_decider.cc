@@ -83,10 +83,9 @@ PathObstacle *TrafficDecider::CreateDestinationObstacle() {
   return ptr;
 }
 
-apollo::common::Status TrafficDecider::Optimize(
+apollo::common::Status TrafficDecider::Execute(
     Frame *frame, ReferenceLineInfo *reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
+  Task::Execute(frame, reference_line_info);
 
   // 1. add destination stop
   if (!MakeDestinationStopDecision()) {

@@ -37,7 +37,7 @@ class SpeedOptimizer : public Task {
  public:
   explicit SpeedOptimizer(const std::string& name);
   virtual ~SpeedOptimizer() = default;
-  apollo::common::Status Optimize(
+  apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  protected:
