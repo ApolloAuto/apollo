@@ -31,7 +31,7 @@ apollo::common::Status SpeedOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
 
-  auto* planning_data = frame->mutable_planning_data();
+  auto* planning_data = reference_line_info->mutable_planning_data();
   auto ret = Process(planning_data->path_data(), frame->PlanningStartPoint(),
                      reference_line_info->reference_line(),
                      reference_line_info->path_decision(),

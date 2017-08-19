@@ -160,23 +160,6 @@ cc_library(
 )
 
 cc_library(
-    name = "reference_line_info",
-    srcs = [
-        "reference_line_info.cc",
-    ],
-    hdrs = [
-        "reference_line_info.h",
-    ],
-    deps = [
-        ":path_decision",
-        "//modules/planning/common/path:path_data",
-        "//modules/planning/common/speed:speed_data",
-        "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/reference_line",
-    ],
-)
-
-cc_library(
     name = "planning_data",
     srcs = [
         "planning_data.cc",
@@ -198,6 +181,24 @@ cc_library(
 )
 
 cc_library(
+    name = "reference_line_info",
+    srcs = [
+        "reference_line_info.cc",
+    ],
+    hdrs = [
+        "reference_line_info.h",
+    ],
+    deps = [
+        ":path_decision",
+        ":planning_data",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed:speed_data",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/reference_line",
+    ],
+)
+
+cc_library(
     name = "frame",
     srcs = [
         "frame.cc",
@@ -208,11 +209,10 @@ cc_library(
     deps = [
         ":indexed_queue",
         ":obstacle",
-        ":planning_data",
         ":reference_line_info",
-        "//modules/common/configs:vehicle_config_helper",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state",
         "//modules/map/pnc_map",
         "//modules/planning/common/trajectory:discretized_trajectory",
