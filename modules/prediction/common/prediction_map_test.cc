@@ -159,8 +159,7 @@ TEST_F(PredictionMapTest, get_path_heading) {
 }
 
 TEST_F(PredictionMapTest, get_smooth_point_from_lane) {
-  Id id;
-  id.set_id("l20");
+  const std::string id = "l20";
   double s = 10.0;
   double l = 0.0;
   double heading = M_PI;

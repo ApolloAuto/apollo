@@ -772,7 +772,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
   }
   double min_heading_diff = std::numeric_limits<double>::infinity();
   for (std::shared_ptr<const LaneInfo> current_lane : current_lanes) {
-    int turn_type = map->LaneTurnType(current_lane->id());
+    int turn_type = map->LaneTurnType(current_lane->id().id());
     std::string lane_id = current_lane->id().id();
     double s = 0.0;
     double l = 0.0;
@@ -843,7 +843,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     if (s < 0.0 || s >= nearby_lane->total_length()) {
       continue;
     }
-    int turn_type = map->LaneTurnType(nearby_lane->id());
+    int turn_type = map->LaneTurnType(nearby_lane->id().id());
     double heading = feature->theta();
     if (FLAGS_enable_kf_tracking) {
       heading = feature->t_velocity_heading();

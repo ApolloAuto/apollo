@@ -65,19 +65,11 @@ class PredictionMap {
 
   /**
    * @brief Get a shared pointer to a lane by lane ID.
-   * @param id The ID of the target lane ID.
-   * @return A shared pointer to the lane with the input lane ID.
-   */
-  std::shared_ptr<const apollo::hdmap::LaneInfo> LaneById(
-      const apollo::hdmap::Id& id);
-
-  /**
-   * @brief Get a shared pointer to a lane by lane ID.
    * @param id The ID of the target lane ID in the form of string.
    * @return A shared pointer to the lane with the input lane ID.
    */
   std::shared_ptr<const apollo::hdmap::LaneInfo> LaneById(
-      const std::string& str_id);
+      const std::string& id);
 
   /**
    * @brief Get the frenet coordinates (s, l) on a lane by a position.
@@ -139,7 +131,7 @@ class PredictionMap {
    * @return If the process is successful. 0: success, -1: failure.
    */
   int SmoothPointFromLane(
-      const apollo::hdmap::Id& id, const double s,
+      const std::string& id, const double s,
       const double l, Eigen::Vector2d* point,
       double* heading);
 
@@ -261,27 +253,10 @@ class PredictionMap {
 
   /**
    * @brief Get lane turn type.
-   * @param id The lane ID.
-   * @return Integer corresponding to the lane turn type.
-   */
-  int LaneTurnType(const apollo::hdmap::Id& id);
-
-  /**
-   * @brief Get lane turn type.
    * @param lane_id The lane ID.
    * @return Integer corresponding to the lane turn type.
    */
   int LaneTurnType(const std::string& lane_id);
-
-  /**
-   * @brief Get the ID in the form of string.
-   * @param info Map information.
-   * @return String of ID.
-   */
-  template <class MapInfo>
-  static std::string id_string(std::shared_ptr<const MapInfo> info) {
-    return info->id().id();
-  }
 
  private:
   DECLARE_SINGLETON(PredictionMap);
