@@ -120,7 +120,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
-  auto* planning_data = frame->mutable_planning_data();
+  auto* planning_data = reference_line_info->mutable_planning_data();
   auto* heuristic_speed_data = planning_data->mutable_speed_data();
   auto speed_profile =
       GenerateInitSpeedProfile(planning_start_point, reference_line_info);
@@ -206,7 +206,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     return speed_profile;
   }
   const auto& last_speed_vector =
-      last_frame->planning_data().speed_data().speed_vector();
+      last_reference_line_info->planning_data().speed_data().speed_vector();
 
   if (!last_speed_vector.empty()) {
     const auto& last_init_point = last_frame->PlanningStartPoint().path_point();
