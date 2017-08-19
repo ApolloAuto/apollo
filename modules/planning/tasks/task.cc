@@ -33,8 +33,9 @@ const std::string& Task::name() const { return _name; }
 
 bool Task::Init(const PlanningConfig&) { return true; }
 
-Status Task::Optimize(Frame* frame, ReferenceLineInfo*) {
+Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
   frame_ = frame;
+  reference_line_info_ = reference_line_info;
   return Status::OK();
 }
 
