@@ -80,13 +80,10 @@ double PredictionMap::LaneTotalWidth(
   return left + right;
 }
 
-std::shared_ptr<const LaneInfo> PredictionMap::LaneById(const Id& id) {
-  return HDMapUtil::instance()->BaseMapRef().get_lane_by_id(id);
-}
-
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
     const std::string& str_id) {
-  return LaneById(apollo::hdmap::MakeMapId(str_id));
+  return HDMapUtil::instance()->BaseMapRef().get_lane_by_id(
+      apollo::hdmap::MakeMapId(str_id));
 }
 
 void PredictionMap::GetProjection(const Eigen::Vector2d& position,
@@ -162,16 +159,14 @@ void PredictionMap::OnLane(
 
 double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
                                   const apollo::common::PointENU& point) {
-  apollo::common::math::Vec2d vec_point;
-  vec_point.set_x(point.x());
-  vec_point.set_y(point.y());
+  apollo::common::math::Vec2d vec_point = {point.x(), point.y()};
   double s = -1.0;
   double l = 0.0;
   lane_info->get_projection(vec_point, &s, &l);
   return HeadingOnLane(lane_info, s);
 }
 
-int PredictionMap::SmoothPointFromLane(const apollo::hdmap::Id& id,
+int PredictionMap::SmoothPointFromLane(const std::string& id,
                                        const double s, const double l,
                                        Eigen::Vector2d* point,
                                        double* heading) {
@@ -203,10 +198,11 @@ void PredictionMap::NearbyLanesByCurrentLanes(
         continue;
       }
       for (auto& lane_id : lane_ptr->lane().left_neighbor_forward_lane_id()) {
-        if (lane_ids.find(lane_id.id()) != lane_ids.end()) {
+        const std::string& id = lane_id.id();
+        if (lane_ids.find(id) != lane_ids.end()) {
           continue;
         }
-        std::shared_ptr<const LaneInfo> nearby_lane = LaneById(lane_id);
+        std::shared_ptr<const LaneInfo> nearby_lane = LaneById(id);
         double s = -1.0;
         double l = 0.0;
         GetProjection(point, nearby_lane, &s, &l);
@@ -214,14 +210,15 @@ void PredictionMap::NearbyLanesByCurrentLanes(
             ::apollo::common::math::DoubleCompare(std::fabs(l), radius) > 0) {
           continue;
         }
-        lane_ids.insert(lane_id.id());
+        lane_ids.insert(id);
         nearby_lanes->push_back(nearby_lane);
       }
       for (auto& lane_id : lane_ptr->lane().right_neighbor_forward_lane_id()) {
-        if (lane_ids.find(lane_id.id()) != lane_ids.end()) {
+        const std::string& id = lane_id.id();
+        if (lane_ids.find(id) != lane_ids.end()) {
           continue;
         }
-        std::shared_ptr<const LaneInfo> nearby_lane = LaneById(lane_id);
+        std::shared_ptr<const LaneInfo> nearby_lane = LaneById(id);
         double s = -1.0;
         double l = 0.0;
         GetProjection(point, nearby_lane, &s, &l);
@@ -229,7 +226,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
             ::apollo::common::math::DoubleCompare(std::fabs(l), radius) > 0) {
           continue;
         }
-        lane_ids.insert(lane_id.id());
+        lane_ids.insert(id);
         nearby_lanes->push_back(nearby_lane);
       }
     }
@@ -246,7 +243,7 @@ bool PredictionMap::IsLeftNeighborLane(
     return false;
   }
   for (auto& left_lane_id : curr_lane->lane().left_neighbor_forward_lane_id()) {
-    if (id_string(left_lane) == left_lane_id.id()) {
+    if (left_lane->id().id() == left_lane_id.id()) {
       return true;
     }
   }
@@ -278,7 +275,7 @@ bool PredictionMap::IsRightNeighborLane(
   }
   for (auto& right_lane_id :
        curr_lane->lane().right_neighbor_forward_lane_id()) {
-    if (id_string(right_lane) == right_lane_id.id()) {
+    if (right_lane->id().id() == right_lane_id.id()) {
       return true;
     }
   }
@@ -309,7 +306,7 @@ bool PredictionMap::IsSuccessorLane(
     return false;
   }
   for (auto& successor_lane_id : curr_lane->lane().successor_id()) {
-    if (id_string(succ_lane) == successor_lane_id.id()) {
+    if (succ_lane->id().id() == successor_lane_id.id()) {
       return true;
     }
   }
@@ -340,7 +337,7 @@ bool PredictionMap::IsPredecessorLane(
     return false;
   }
   for (auto& predecessor_lane_id : curr_lane->lane().predecessor_id()) {
-    if (id_string(pred_lane) == predecessor_lane_id.id()) {
+    if (pred_lane->id().id() == predecessor_lane_id.id()) {
       return true;
     }
   }
@@ -367,7 +364,7 @@ bool PredictionMap::IsIdenticalLane(
   if (curr_lane == nullptr || other_lane == nullptr) {
     return true;
   }
-  return id_string(other_lane) == id_string(curr_lane);
+  return other_lane->id().id() == curr_lane->id().id();
 }
 
 bool PredictionMap::IsIdenticalLane(
@@ -384,16 +381,12 @@ bool PredictionMap::IsIdenticalLane(
   return false;
 }
 
-int PredictionMap::LaneTurnType(const Id& id) {
-  std::shared_ptr<const LaneInfo> lane = LaneById(id);
+int PredictionMap::LaneTurnType(const std::string& lane_id) {
+  std::shared_ptr<const LaneInfo> lane = LaneById(lane_id);
   if (lane != nullptr) {
     return static_cast<int>(lane->lane().turn());
   }
   return 1;
-}
-
-int PredictionMap::LaneTurnType(const std::string& lane_id) {
-  return LaneTurnType(apollo::hdmap::MakeMapId(lane_id));
 }
 
 }  // namespace prediction
