@@ -17,6 +17,7 @@
 #include "modules/planning/planning.h"
 
 #include <algorithm>
+#include <thread>
 
 #include "google/protobuf/repeated_field.h"
 #include "modules/common/adapters/adapter_manager.h"
@@ -231,8 +232,9 @@ void Planning::RunOnce() {
 
 void Planning::Stop() {}
 
-common::Status Planning::Plan(const bool is_on_auto_mode, const double current_time_stamp,
-                    const double planning_cycle_time) {
+common::Status Planning::Plan(const bool is_on_auto_mode,
+                              const double current_time_stamp,
+                              const double planning_cycle_time) {
   const auto& stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
           is_on_auto_mode, current_time_stamp, planning_cycle_time,
@@ -250,18 +252,31 @@ common::Status Planning::Plan(const bool is_on_auto_mode, const double current_t
 
   frame_->AlignPredictionTime(current_time_stamp);
 
-  ReferenceLineInfo* best_reference_line = nullptr;
-  double previous_reference_line_cost = std::numeric_limits<double>::infinity();
-
+  std::vector<std::unique_ptr<std::thread>> threads;
   for (auto& reference_line_info : frame_->reference_line_info()) {
-    auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
-                                 &reference_line_info);
-    if (status != Status::OK()) {
-      AERROR << "planner failed to make a driving plan";
-      continue;
+    threads.emplace_back(
+        new std::thread([this, stitching_trajectory, &reference_line_info] {
+          auto status = this->planner_->Plan(
+              stitching_trajectory.back(), frame_.get(), &reference_line_info);
+          if (!status.ok()) {
+            AERROR << "planner failed to make a driving plan.";
+          }
+        }));
+  }
+  for (const auto& thread : threads) {
+    if (thread->joinable()) {
+      thread->join();
     }
-    if (reference_line_info.Cost() < previous_reference_line_cost) {
+  }
+
+  const ReferenceLineInfo* best_reference_line = nullptr;
+  double previous_reference_line_cost = std::numeric_limits<double>::infinity();
+  for (const auto& reference_line_info : frame_->reference_line_info()) {
+    if (best_reference_line == nullptr ||
+        (!std::isinf(reference_line_info.Cost()) &&
+         reference_line_info.Cost() < previous_reference_line_cost)) {
       best_reference_line = &reference_line_info;
+      previous_reference_line_cost = reference_line_info.Cost();
     }
   }
   if (!best_reference_line) {

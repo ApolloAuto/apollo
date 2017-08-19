@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
 #define MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
 
+#include <limits>
 #include <list>
 #include <string>
 #include <vector>
@@ -81,7 +82,7 @@ class ReferenceLineInfo {
    * The lower the better.
    * TODO: implement trajectory cost calculation
    */
-  double cost_ = 0.0;
+  double cost_ = std::numeric_limits<double>::infinity();
 
   const ReferenceLine reference_line_;
   PathDecision path_decision_;
