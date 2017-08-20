@@ -70,10 +70,14 @@ void VehicleState::ConstructExceptLinearVelocity(
   }
 
   if (FLAGS_enable_map_reference_unify) {
+    CHECK(localization.pose().has_angular_velocity_vrf());
     angular_v_ = localization.pose().angular_velocity_vrf().z();
+    CHECK(localization.pose().has_linear_acceleration_vrf());
     linear_a_y_ = localization.pose().linear_acceleration_vrf().y();
   } else {
+    CHECK(localization.pose().has_angular_velocity());
     angular_v_ = localization.pose().angular_velocity().z();
+    CHECK(localization.pose().has_linear_acceleration());
     linear_a_y_ = localization.pose().linear_acceleration().y();
   }
 

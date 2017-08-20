@@ -249,4 +249,4 @@ class VehicleState {
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_ */
+#endif  // MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
