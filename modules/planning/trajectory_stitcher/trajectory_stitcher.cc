@@ -31,18 +31,31 @@ namespace planning {
 
 using VehicleState = apollo::common::VehicleState;
 
+namespace {
+
 std::vector<common::TrajectoryPoint> compute_reinit_stitching_trajectory() {
   common::TrajectoryPoint init_point;
   init_point.mutable_path_point()->set_x(VehicleState::instance()->x());
   init_point.mutable_path_point()->set_y(VehicleState::instance()->y());
-  init_point.set_v(VehicleState::instance()->linear_velocity());
-  init_point.set_a(VehicleState::instance()->linear_acceleration());
+  init_point.mutable_path_point()->set_z(VehicleState::instance()->z());
   init_point.mutable_path_point()->set_theta(
       VehicleState::instance()->heading());
   init_point.mutable_path_point()->set_kappa(VehicleState::instance()->kappa());
 
+  init_point.set_v(VehicleState::instance()->linear_velocity());
+  init_point.set_a(VehicleState::instance()->linear_acceleration());
   init_point.set_relative_time(0.0);
+
+  DCHECK(!std::isnan(init_point.path_point().x()));
+  DCHECK(!std::isnan(init_point.path_point().y()));
+  DCHECK(!std::isnan(init_point.path_point().z()));
+  DCHECK(!std::isnan(init_point.path_point().theta()));
+  DCHECK(!std::isnan(init_point.path_point().kappa()));
+  DCHECK(!std::isnan(init_point.v()));
+  DCHECK(!std::isnan(init_point.a()));
+
   return std::vector<common::TrajectoryPoint>(1, init_point);
+}
 }
 
 // Planning from current vehicle state:
