@@ -65,7 +65,7 @@ bool Planning::InitFrame(const uint32_t sequence_num) {
     const auto& prediction =
         AdapterManager::GetPrediction()->GetLatestObserved();
     frame_->SetPrediction(prediction);
-    ADEBUG << "Get prediction";
+    ADEBUG << "Get prediction done.";
   }
 
   if (!frame_->Init(config_)) {
