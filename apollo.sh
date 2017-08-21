@@ -316,7 +316,7 @@ function run_test() {
   # FIXME(all): when all unit test passed, switch back.
   # bazel test --config=unit_test -c dbg //...
   generate_test_targets_dbg
-  echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  echo "$TEST_TARGETS" | xargs bazel --batch --batch_cpu_scheduling test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
   if [ $? -ne 0 ]; then
       fail "Test failed!"
       return 1
@@ -324,7 +324,7 @@ function run_test() {
 
   generate_test_targets_opt
   build_caffe_opt
-  echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c opt --test_verbose_timeout_warnings
+  echo "$TEST_TARGETS" | xargs bazel --batch --batch_cpu_scheduling test $DEFINES --config=unit_test -c opt --test_verbose_timeout_warnings
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
