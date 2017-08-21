@@ -204,10 +204,10 @@ void Planning::RunOnce() {
       common::VehicleState::instance()->Update(localization, chassis);
 
   if (!status.ok()) {
-    ADCTrajectory trajectory_pb;
-    status.Save(trajectory_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&trajectory_pb, start_timestamp);
     AERROR << "Update VehicleState failed.";
+    not_ready->set_reason("Update VehicleState failed.");
+    status.Save(not_ready_pb.mutable_header()->mutable_status());
+    PublishPlanningPb(&not_ready_pb);
     return;
   }
 
