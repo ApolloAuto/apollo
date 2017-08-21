@@ -210,14 +210,15 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
 
   if (!last_speed_vector.empty()) {
     const auto& last_init_point = last_frame->PlanningStartPoint().path_point();
-    Vec2d last_xy_point = {last_init_point.x(), last_init_point.y()};
+    Vec2d last_xy_point(last_init_point.x(), last_init_point.y());
     SLPoint last_sl_point;
     if (!last_reference_line_info->reference_line().get_point_in_frenet_frame(
             last_xy_point, &last_sl_point)) {
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }
-    Vec2d xy_point = {planning_init_point.path_point().x(),
-                      planning_init_point.path_point().y()};
+
+    Vec2d xy_point(planning_init_point.path_point().x(),
+                   planning_init_point.path_point().y());
     SLPoint sl_point;
     if (!last_reference_line_info->reference_line().get_point_in_frenet_frame(
             xy_point, &last_sl_point)) {
@@ -242,7 +243,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
       refined_speed_point.set_v(speed_point.v());
       refined_speed_point.set_a(speed_point.a());
       refined_speed_point.set_da(speed_point.da());
-      speed_profile.push_back(refined_speed_point);
+      speed_profile.push_back(std::move(refined_speed_point));
     }
   }
   return speed_profile;
@@ -251,7 +252,6 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
 // This is a dummy simple hot start, need refine later
 std::vector<common::SpeedPoint> EMPlanner::GenerateSpeedHotStart(
     const common::TrajectoryPoint& planning_init_point) {
-  std::vector<common::SpeedPoint> speed_profile;
   std::array<double, 3> start_state;
 
   // distance 0.0
@@ -265,35 +265,35 @@ std::vector<common::SpeedPoint> EMPlanner::GenerateSpeedHotStart(
 
   std::array<double, 2> end_state;
   // end state velocity
-  end_state[0] = 10.0;
+  end_state[0] = std::max(10.0, planning_init_point.v());
 
   // end state acceleration
   end_state[1] = 0.0;
 
-  // pre assume the curve time is 8 second, can be change later
-  QuarticPolynomialCurve1d speed_curve(start_state, end_state,
+  QuarticPolynomialCurve1d speed_profile(start_state, end_state,
                                        FLAGS_trajectory_time_length);
   // assume the time resolution is 0.1
   std::uint32_t num_time_steps =
       static_cast<std::uint32_t>(FLAGS_trajectory_time_length /
                                  FLAGS_trajectory_time_resolution) + 1;
-  speed_profile.reserve(num_time_steps);
 
+  std::vector<common::SpeedPoint> discretized_speed_profile;
+  discretized_speed_profile.reserve(num_time_steps);
   for (std::uint32_t i = 0; i < num_time_steps; ++i) {
     double t = i * FLAGS_trajectory_time_resolution;
-    double s = speed_curve.Evaluate(0, t);
-    double v = speed_curve.Evaluate(1, t);
-    double a = speed_curve.Evaluate(2, t);
-    double da = speed_curve.Evaluate(3, t);
+    double s = speed_profile.Evaluate(0, t);
+    double v = speed_profile.Evaluate(1, t);
+    double a = speed_profile.Evaluate(2, t);
+    double da = speed_profile.Evaluate(3, t);
     SpeedPoint speed_point;
     speed_point.set_s(s);
     speed_point.set_t(t);
     speed_point.set_v(v);
     speed_point.set_a(a);
     speed_point.set_da(da);
-    speed_profile.push_back(std::move(speed_point));
+    discretized_speed_profile.push_back(std::move(speed_point));
   }
-  return speed_profile;
+  return discretized_speed_profile;
 }
 
 }  // namespace planning
