@@ -68,7 +68,7 @@ void SimulationWorldUpdater::OnPushTimer(const ros::TimerEvent &event) {
     return;
   }
   auto json = sim_world_service_.GetUpdateAsJson();
-  websocket_->SendData(json.dump());
+  websocket_->BroadcastData(json.dump());
 }
 
 }  // namespace dreamview

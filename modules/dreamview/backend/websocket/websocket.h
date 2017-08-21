@@ -100,8 +100,16 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * @brief Sends the provided data to all the connected clients.
    * @param data The message string to be sent.
    */
-  bool SendData(const std::string &data);
-  bool SendData(const std::string &data, Connection *conn);
+  bool BroadcastData(const std::string &data);
+
+  /**
+   * @brief Sends the provided data to a specific connected client.
+   * @param data The message string to be sent.
+   * @param conn The connection to send to.
+   * @param is_broadcast whether this is a broadcast send.
+   */
+  bool SendData(const std::string &data, Connection *conn,
+                bool is_broadcast = false);
 
   /**
    * @brief Add a new message handler for a message type.
@@ -123,7 +131,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
 
   // The pool of all maintained connections. Each connection has a lock to
   // against simultaneous write.
-  std::unordered_map<Connection *, std::mutex> connections_;
+  std::unordered_map<Connection *, std::shared_ptr<std::mutex>> connections_;
 };
 
 }  // namespace dreamview
