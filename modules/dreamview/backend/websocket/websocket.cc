@@ -27,8 +27,7 @@ namespace dreamview {
 void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
-    connections_[conn];  // This is acutally an insertion as the mutex is
-                         // neither copyable nor movable.
+    connections_.emplace(conn, std::make_shared<std::mutex>());
   }
   AINFO << "Accepted connection. Total connections: " << connections_.size();
 }
@@ -37,14 +36,21 @@ void WebSocketHandler::handleClose(CivetServer *server,
                                    const Connection *conn) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
-    // Remove from the store of currently open connections.
-    connections_.erase(const_cast<Connection *>(conn));
+
+    // Remove from the store of currently open connections. Copy the mutex out
+    // so that it won't be reclaimed during map.erase().
+    Connection *connection = const_cast<Connection *>(conn);
+    std::shared_ptr<std::mutex> connection_lock = connections_[connection];
+    {
+      std::unique_lock<std::mutex> lock(*connection_lock);
+      connections_.erase(connection);
+    }
   }
   AINFO << "Connection closed. Total connections: " << connections_.size();
 }
 
-bool WebSocketHandler::SendData(const std::string &data) {
-  std::vector<std::pair<Connection *, std::mutex *>> connections_to_send;
+bool WebSocketHandler::BroadcastData(const std::string &data) {
+  std::vector<Connection *> connections_to_send;
   {
     std::unique_lock<std::mutex> lock(mutex_);
     if (connections_.empty()) {
@@ -52,41 +58,53 @@ bool WebSocketHandler::SendData(const std::string &data) {
     }
     for (auto &kv : connections_) {
       Connection *conn = kv.first;
-      std::mutex *lock = &kv.second;
-      // If another thread is writing via this connection, we just skip this
-      // round of broadcasting.
-      if (lock->try_lock()) {
-        connections_to_send.emplace_back(conn, lock);
-      }
+      connections_to_send.push_back(conn);
     }
   }
 
   bool all_success = true;
-  for (auto &pair : connections_to_send) {
-    Connection *conn = pair.first;
-    std::mutex *lock = pair.second;
-
-    if (!SendData(data, conn)) {
+  for (Connection *conn : connections_to_send) {
+    if (!SendData(data, conn, true)) {
       all_success = false;
     }
-
-    lock->unlock();
   }
 
   return all_success;
 }
 
-bool WebSocketHandler::SendData(const std::string &data, Connection *conn) {
-  if (connections_.find(conn) == connections_.end()) {
-    AERROR << "Trying to send to an uncached connection, skipping.";
-    return false;
+bool WebSocketHandler::SendData(const std::string &data, Connection *conn,
+                                bool is_broadcast) {
+  std::shared_ptr<std::mutex> connection_lock;
+  {
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (connections_.find(conn) == connections_.end()) {
+      AERROR << "Trying to send to an uncached connection, skipping.";
+      return false;
+    }
+    // Copy the lock so that it still exists if the connection is closed after
+    // this block.
+    connection_lock = connections_[conn];
   }
 
   // Lock the connection while sending.
-  connections_[conn].try_lock();
+  if (!connection_lock->try_lock()) {
+    // Skip sending data if:
+    // 1. This is a broadcast and there's higher priority data being sent.
+    // 2. The connection has been closed.
+    if (is_broadcast) {
+      return false;
+    } else {
+      connection_lock->lock();  // Block to acquire the lock.
+      if (connections_.find(conn) == connections_.end()) {
+        return false;
+      }
+    }
+  }
+  // Note that while we are holding the connection lock, the connection won't be
+  // closed and removed.
   int ret = mg_websocket_write(conn, WEBSOCKET_OPCODE_TEXT, data.c_str(),
                                data.size());
-  connections_[conn].unlock();
+  connection_lock->unlock();
 
   if (ret != static_cast<int>(data.size())) {
     // Determine error message based on return value.
