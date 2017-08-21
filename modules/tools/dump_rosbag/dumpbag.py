@@ -22,7 +22,6 @@ This program can dump a rosbag into separate text files that contains the pb mes
 import argparse
 import os
 import shutil
-import sys
 
 import rosbag
 import std_msgs
