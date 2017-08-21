@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <cstddef>
 #include <fstream>
 #include <iomanip>
 #include <sstream>
@@ -52,7 +53,7 @@ class OfflineLidarPerceptionTool {
   ~OfflineLidarPerceptionTool() = default;
 
   bool Init(bool use_visualization = false) {
-    config_manager_ = Singleton<ConfigManager>::Get(); 
+    config_manager_ = Singleton<ConfigManager>::Get();
     if (config_manager_ == NULL || !config_manager_->Init()) {
       AERROR << "failed to init ConfigManager";
       return false;
@@ -70,7 +71,7 @@ class OfflineLidarPerceptionTool {
       visualizer_.reset(new OpenglVisualizer());
       if(!visualizer_->Init()) {
         AERROR<<"init visialuzer failed"<<std::endl;
-      }; 
+      };
     }
     return true;
   }
@@ -81,11 +82,11 @@ class OfflineLidarPerceptionTool {
     std::string pose_folder = pose_path;
     std::vector<std::string> pcd_file_names;
     std::vector<std::string> pose_file_names;
-    AINFO << "starting to run"; 
+    AINFO << "starting to run";
     GetFileNamesInFolderById(pose_folder, ".pose", &pose_file_names);
     GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
     AINFO<<" pose size " << pose_file_names.size();
-    AINFO<<" pcd size " << pcd_file_names.size(); 
+    AINFO<<" pcd size " << pcd_file_names.size();
     if (pose_file_names.size() != pcd_file_names.size()) {
       AERROR << "pcd file number does not match pose file number";
       return;
@@ -109,7 +110,7 @@ class OfflineLidarPerceptionTool {
         AERROR << "Failed to read pose file" << pose_file_names[i];
         return;
       }
-      
+
       std::shared_ptr<Eigen::Matrix4d> velodyne_trans = std::make_shared<Eigen::Matrix4d>(pose);
       lidar_process_->Process(time_stamp, cloud, velodyne_trans);
 
@@ -118,7 +119,7 @@ class OfflineLidarPerceptionTool {
 
       pcl_util::PointCloudPtr roi_cloud(new pcl_util::PointCloud);
   	  	pcl::copyPointCloud(*cloud, *roi_indices, *roi_cloud);
-      
+
       if (visualizer_) {
         pcl_util::PointDCloudPtr transformed_cloud(new pcl_util::PointDCloud);
         transform_perception_cloud(cloud, pose, transformed_cloud);
@@ -134,7 +135,7 @@ class OfflineLidarPerceptionTool {
         visualizer_->Render(content);
       }
       AINFO << "finish pc";
-      
+
       if (FLAGS_save_obstacles) {
         oss << std::setfill('0') << std::setw(6) << i;
         std::string filename = FLAGS_output_path + oss.str() + ".txt";
@@ -155,7 +156,7 @@ class OfflineLidarPerceptionTool {
     }
     // write frame id & number of objects at the beignning
     fout << frame_id << " " << objects.size() << std::endl;
-    
+
     typename pcl::PointCloud<pcl_util::Point>::Ptr
       trans_cloud(new pcl::PointCloud<pcl_util::Point>());
     Eigen::Matrix4d pose_velo2tw = pose_v2w;
@@ -168,21 +169,21 @@ class OfflineLidarPerceptionTool {
     std::vector<float> k_sqrt_dist;
     Eigen::Matrix4d pose_tw2velo = pose_velo2tw.inverse();
 
-    for (int i = 0; i < objects.size(); i++) {
+    for (std::size_t i = 0; i < objects.size(); i++) {
       Eigen::Vector3f coord_dir(0.0, 1.0, 0.0);
       Eigen::Vector4d dir_velo = pose_tw2velo * Eigen::Vector4d(objects[i]->direction[0],
-        objects[i]->direction[1], objects[i]->direction[2], 0);     
+        objects[i]->direction[1], objects[i]->direction[2], 0);
       Eigen::Vector4d ct_velo = pose_tw2velo * Eigen::Vector4d(objects[i]->center[0],
-        objects[i]->center[1], objects[i]->center[2], 1);                           
+        objects[i]->center[1], objects[i]->center[2], 1);
       Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
       double theta = vector_theta_2d_xy(coord_dir, dir_velo3);
-      std::string type ="unknown";                                                            
-      if (objects[i]->type == PEDESTRIAN) {                                                   
-          type = "pedestrain";                                                                
-      } else if (objects[i]->type == VEHICLE) {                                               
-          type = "smallMot";                                                                  
-      } else if (objects[i]->type == BICYCLE) {                                               
-          type = "nonMot";                                                                    
+      std::string type ="unknown";
+      if (objects[i]->type == PEDESTRIAN) {
+          type = "pedestrain";
+      } else if (objects[i]->type == VEHICLE) {
+          type = "smallMot";
+      } else if (objects[i]->type == BICYCLE) {
+          type = "nonMot";
       }
       // write tracking details
       fout << objects[i]->id << " " << objects[i]->track_id << " "
@@ -192,28 +193,28 @@ class OfflineLidarPerceptionTool {
         << ct_velo[1] << " "
         << ct_velo[2] << " "
         << objects[i]->length << " "
-        << objects[i]->width << " " 
+        << objects[i]->width << " "
         << objects[i]->height << " "
-        << theta << " "             
-        << 0 << " "                 
-        << 0 << " "                 
+        << theta << " "
+        << 0 << " "
+        << 0 << " "
         << objects[i]->velocity[0] << " "
         << objects[i]->velocity[1] << " "
         << objects[i]->velocity[2] << " "
-        << objects[i]->cloud->size() << " "; 
+        << objects[i]->cloud->size() << " ";
 
-      for (int j = 0; j < objects[i]->cloud->size(); j++) {                                   
-        const pcl_util::Point& pt = objects[i]->cloud->points[j];                           
-        pcl_util::Point query_pt;                                                           
-        query_pt.x = pt.x;                                                                  
-        query_pt.y = pt.y;                                                                  
-        query_pt.z = pt.z;                                                                  
-        k_indices.resize(1);                                                                
-        k_sqrt_dist.resize(1);                                                              
-        pcl_kdtree.nearestKSearch(query_pt, 1, k_indices, k_sqrt_dist);                     
-        fout << k_indices[0] << " ";                                                        
-      }                                                                                       
-      fout << std::endl;      
+      for (std::size_t j = 0; j < objects[i]->cloud->size(); j++) {
+        const pcl_util::Point& pt = objects[i]->cloud->points[j];
+        pcl_util::Point query_pt;
+        query_pt.x = pt.x;
+        query_pt.y = pt.y;
+        query_pt.z = pt.z;
+        k_indices.resize(1);
+        k_sqrt_dist.resize(1);
+        pcl_kdtree.nearestKSearch(query_pt, 1, k_indices, k_sqrt_dist);
+        fout << k_indices[0] << " ";
+      }
+      fout << std::endl;
     }
     fout.close();
     return;
