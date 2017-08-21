@@ -46,7 +46,7 @@ PathObstacle *TrafficDecider::CreateDestinationObstacle() {
   const auto &reference_line = reference_line_info_->reference_line();
   reference_line.get_point_in_frenet_frame(destination, &destination_sl);
   double destination_s = destination_sl.s();
-  if (destination_s < 0 || destination_s > reference_line.length()) {
+  if (destination_s < 0 || destinnation_s > reference_line.length()) {
     AINFO << "destination(s[:" << destination_sl.s()
           << "]) out of planning range. Skip";
     return nullptr;
