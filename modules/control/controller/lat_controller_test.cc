@@ -51,7 +51,7 @@ class LatControllerTest : public ::testing::Test, LatController {
                                                  &control_conf));
     lateral_conf_ = control_conf.lat_controller_conf();
 
-    timestamp_ = apollo::common::time::ToSecond(Clock::Now());
+    timestamp_ = Clock::NowInSecond();
   }
 
   void ComputeLateralErrors(const double x, const double y, const double theta,

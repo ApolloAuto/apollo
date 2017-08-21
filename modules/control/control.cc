@@ -48,7 +48,9 @@ using apollo::common::ErrorCode;
                   #a " missing pb field:" #b);                     \
   }
 
-std::string Control::Name() const { return FLAGS_node_name; }
+std::string Control::Name() const {
+  return FLAGS_node_name;
+}
 
 Status Control::Init() {
   AINFO << "Control init, starting ...";
@@ -205,7 +207,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {
-  double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  double start_timestamp = Clock::NowInSecond();
 
   ControlCommand control_command;
 
@@ -214,7 +216,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
     AERROR << "Failed to produce control command:" << status.error_message();
   }
 
-  double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  double end_timestamp = Clock::NowInSecond();
 
   if (pad_received_) {
     control_command.mutable_pad_msg()->CopyFrom(pad_msg_);
@@ -264,7 +266,7 @@ Status Control::CheckTimestamp() {
     ADEBUG << "Skip input timestamp check by gflags.";
     return Status::OK();
   }
-  double current_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  double current_timestamp = Clock::NowInSecond();
   double localization_diff =
       current_timestamp - localization_.header().timestamp_sec();
   if (localization_diff >
@@ -314,13 +316,13 @@ void Control::Alert() {
   // do not alert too frequently
   // though "0" means first hit
   if (last_alert_timestamp_ > 0. &&
-      (apollo::common::time::ToSecond(Clock::Now()) - last_alert_timestamp_) <
+      (Clock::NowInSecond() - last_alert_timestamp_) <
           FLAGS_min_alert_interval) {
     return;
   }
 
   // update timestamp
-  last_alert_timestamp_ = apollo::common::time::ToSecond(Clock::Now());
+  last_alert_timestamp_ = Clock::NowInSecond();
 }
 
 void Control::Stop() {}

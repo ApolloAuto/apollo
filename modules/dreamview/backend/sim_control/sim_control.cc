@@ -125,7 +125,7 @@ bool SimControl::NextPointWithinRange() {
 void SimControl::TimerCallback(const ros::TimerEvent& event) {
   // Result of the interpolation.
   double lambda = 0;
-  auto current_time = apollo::common::time::ToSecond(Clock::Now());
+  auto current_time = Clock::NowInSecond();
 
   if (!received_planning_) {
     prev_point_ = next_point_;

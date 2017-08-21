@@ -151,12 +151,11 @@ TEST_F(TrajectoryAnalyzerTest, QueryNearestPointByAbsoluteTimeInterpolation) {
   std::vector<double> ts = {0.0, 0.1, 0.2, 0.3, 0.4};
   SetTrajectoryWithTime(xs, ys, ts, &adc_trajectory);
 
-  double timestamp_ = apollo::common::time::ToSecond(Clock::Now()) - 2.0;
+  double timestamp_ = Clock::NowInSecond() - 2.0;
   adc_trajectory.mutable_header()->set_timestamp_sec(timestamp_);
   TrajectoryAnalyzer trajectory_analyzer(&adc_trajectory);
 
-  double current_time = apollo::common::time::ToSecond(Clock::Now());
-  current_time = apollo::common::time::ToSecond(Clock::Now()) - 20.0;
+  double current_time = Clock::NowInSecond() - 20.0;
   TrajectoryPoint point_2 =
       trajectory_analyzer.QueryNearestPointByAbsoluteTime(current_time);
   EXPECT_NEAR(point_2.path_point().x(), 1.0, 1e-6);
