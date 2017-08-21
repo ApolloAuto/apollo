@@ -15,6 +15,7 @@ class WebSocketEndpoint {
         try {
             this.websocket = new WebSocket(this.server);
         } catch (error) {
+            console.error("Failed to establish a connection: " + error);
             setTimeout(() => {
                 this.initialize();
             }, 1000);
@@ -50,10 +51,9 @@ class WebSocketEndpoint {
                     break;
             }
         };
-        this.websocket.onclose = () => {
-            setTimeout(() => {
-                this.initialize();
-            }, 1000);
+        this.websocket.onclose = event => {
+            console.log(event);
+            this.initialize();
         };
     }
 
