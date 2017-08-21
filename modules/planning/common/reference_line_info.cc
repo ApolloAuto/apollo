@@ -18,19 +18,16 @@
  * @file
  **/
 
-#include "modules/planning/common/reference_line_info.h"
 
 #include <functional>
 
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/planning/common/reference_line_info.h"
 
 namespace apollo {
 namespace planning {
 uint32_t ReferenceLineInfo::s_reference_line_id_ = 0;
-
-namespace {
-std::hash<std::string> string_hash;
-}
 
 ReferenceLineInfo::ReferenceLineInfo(const ReferenceLine& reference_line)
     : reference_line_(reference_line) {
@@ -113,7 +110,7 @@ std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
   // create a "virtual" perception_obstacle
   perception::PerceptionObstacle perception_obstacle;
   // simulator needs a valid integer
-  perception_obstacle.set_id(-string_hash(obstacle_id));
+  perception_obstacle.set_id(FLAGS_virtual_obstacle_perception_id);
   auto dest_ref_point = reference_line_.get_reference_point(route_s);
   perception_obstacle.mutable_position()->set_x(dest_ref_point.x());
   perception_obstacle.mutable_position()->set_y(dest_ref_point.y());

@@ -49,7 +49,7 @@ class GarageTest : public PlanningTestBase {
 /*
  * test stop for not-nudgable obstacle
  */
-TEST_F(GarageTest, stop) {
+TEST_F(GarageTest, stop_obstacle) {
   FLAGS_test_prediction_file =
       "modules/planning/testdata/garage_test/"
       "stop_obstacle_prediction.pb.txt";
@@ -77,6 +77,19 @@ TEST_F(GarageTest, follow) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test stop for destination
+ */
+TEST_F(GarageTest, stop_dest) {
+  FLAGS_test_prediction_file =
+      "modules/planning/testdata/garage_test/stop_dest_prediction.pb.txt";
+  FLAGS_test_localization_file =
+      "modules/planning/testdata/garage_test/stop_dest_localization.pb.txt";
+  FLAGS_test_chassis_file =
+      "modules/planning/testdata/garage_test/stop_dest_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
 }  // namespace planning
 }  // namespace apollo
 
