@@ -7,7 +7,8 @@
   for the obstacles.
 
 ## Input
-  * Obstacles from the perception module (future work)
+  * Obstacles from perception module
+  * Localizaton from localization module
 
 ## Output
-  * Obstacles additionally with predicted trajectories (future work)
+  * Obstacles additionally with predicted trajectories
