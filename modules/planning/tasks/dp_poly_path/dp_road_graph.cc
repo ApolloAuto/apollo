@@ -204,6 +204,9 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
 
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
     const auto *obstacle = path_obstacle->Obstacle();
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
     if (!obstacle->IsStatic()) {
       continue;
     }
@@ -308,6 +311,9 @@ bool DPRoadGraph::MakeDynamicObstcleDecision(
 
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
     const auto *obstacle = path_obstacle->Obstacle();
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
     if (obstacle->IsStatic()) {
       continue;
     }

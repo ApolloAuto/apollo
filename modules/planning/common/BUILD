@@ -192,6 +192,7 @@ cc_library(
         ":path_decision",
         ":planning_data",
         "//modules/planning/common/path:path_data",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/reference_line",

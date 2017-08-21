@@ -48,6 +48,7 @@ Obstacle::Obstacle(const std::string& id,
                                perception_obstacle_.length(),
                                perception_obstacle_.width()) {
   is_static_ = IsStaticObstacle(perception_obstacle);
+  is_virtual_ = IsVirtualObstacle(perception_obstacle);
 }
 
 Obstacle::Obstacle(const std::string& id,
@@ -72,6 +73,8 @@ Obstacle::Obstacle(const std::string& id,
 
 bool Obstacle::IsStatic() const { return is_static_; }
 
+bool Obstacle::IsVirtual() const { return is_virtual_; }
+
 bool Obstacle::IsStaticObstacle(
     const perception::PerceptionObstacle& perception_obstacle) {
   if (perception_obstacle.type() ==
@@ -81,6 +84,11 @@ bool Obstacle::IsStaticObstacle(
   auto moving_speed = std::hypot(perception_obstacle.velocity().x(),
                                  perception_obstacle.velocity().y());
   return moving_speed <= FLAGS_static_speed_threshold;
+}
+
+bool Obstacle::IsVirtualObstacle(
+    const perception::PerceptionObstacle &perception_obstacle) {
+  return perception_obstacle.id() < 0;
 }
 
 common::TrajectoryPoint Obstacle::GetPointAtTime(
