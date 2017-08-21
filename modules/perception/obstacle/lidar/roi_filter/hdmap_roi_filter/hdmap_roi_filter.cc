@@ -19,6 +19,11 @@ namespace perception {
 bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
                           const ROIFilterOptions &roi_filter_options,
                           pcl_util::PointIndices* roi_indices) {
+  if (roi_filter_options.hdmap == nullptr
+      || roi_filter_options.velodyne_trans == nullptr) {
+    return false;
+  }
+
   Eigen::Affine3d temp_trans(*(roi_filter_options.velodyne_trans));
 
   std::vector<PolygonDType> polygons;
