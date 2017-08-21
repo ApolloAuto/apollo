@@ -204,8 +204,9 @@ ReferencePoint ReferenceLine::interpolate(const ReferencePoint& p0,
   if (std::fabs(s0 - s1) < common::math::kMathEpsilon) {
     return p0;
   }
-  DCHECK_LE(s0, s) << " s: " << s << " is less than s0 :" << s0;
-  DCHECK_LE(s, s1) << "s: " << s << "is larger than s1: " << s1;
+  DCHECK_LE(s0 - 1.0e-6, s) << " s: " << s << " is less than s0 :" << s0;
+  DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << "is larger than s1: " << s1;
+
   CHECK(!p0.lane_waypoints().empty());
   CHECK(!p1.lane_waypoints().empty());
   const double x = common::math::lerp(p0.x(), s0, p1.x(), s1, s);
