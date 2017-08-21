@@ -24,9 +24,11 @@
 #include <string>
 
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+
 #include "modules/common/macro.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common/status/status.h"
 
 /**
  * @namespace apollo::common
@@ -48,8 +50,8 @@ class VehicleState {
    * @param localization Localization information of the vehicle.
    * @param chassis Chassis information of the vehicle.
    */
-  void Update(const localization::LocalizationEstimate& localization,
-              const canbus::Chassis& chassis);
+  common::Status Update(const localization::LocalizationEstimate& localization,
+                        const canbus::Chassis& chassis);
 
   /**
    * @brief Update VehicleState instance by protobuf files.
@@ -226,7 +228,7 @@ class VehicleState {
  private:
   DECLARE_SINGLETON(VehicleState);
 
-  void ConstructExceptLinearVelocity(
+  bool ConstructExceptLinearVelocity(
       const localization::LocalizationEstimate& localization);
 
   double x_ = 0.0;

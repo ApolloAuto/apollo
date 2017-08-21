@@ -200,7 +200,16 @@ void Planning::RunOnce() {
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
-  common::VehicleState::instance()->Update(localization, chassis);
+  common::Status status =
+      common::VehicleState::instance()->Update(localization, chassis);
+
+  if (!status.ok()) {
+    ADCTrajectory trajectory_pb;
+    status.Save(trajectory_pb.mutable_header()->mutable_status());
+    PublishPlanningPb(&trajectory_pb, start_timestamp);
+    AERROR << "Update VehicleState failed.";
+    return;
+  }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
@@ -211,7 +220,7 @@ void Planning::RunOnce() {
   }
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
-  auto status = Plan(is_auto_mode, start_timestamp, planning_cycle_time);
+  status = Plan(is_auto_mode, start_timestamp, planning_cycle_time);
 
   const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
