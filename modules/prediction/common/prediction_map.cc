@@ -47,28 +47,32 @@ Eigen::Vector2d PredictionMap::PositionOnLane(
   return {point.x(), point.y()};
 }
 
-double PredictionMap::HeadingOnLane(std::shared_ptr<const LaneInfo> lane_info,
-                                    const double s) {
+double PredictionMap::HeadingOnLane(
+    std::shared_ptr<const LaneInfo> lane_info,
+    const double s) {
   const std::vector<double>& headings = lane_info->headings();
   const std::vector<double>& accumulated_s = lane_info->accumulate_s();
   CHECK(headings.size() == accumulated_s.size());
   size_t size = headings.size();
+
   if (size == 0) {
     return 0.0;
   }
+
   if (size == 1) {
     return headings[0];
   }
+
   const auto low_itr =
       std::lower_bound(accumulated_s.begin(), accumulated_s.end(), s);
-  // CHECK(low_itr != accumulated_s.end());
   size_t index = low_itr - accumulated_s.begin();
   if (index >= size - 1) {
     return headings.back();
+  } else {
+    return apollo::common::math::slerp(headings[index], accumulated_s[index],
+                                       headings[index + 1],
+                                       accumulated_s[index + 1], s);
   }
-  return apollo::common::math::slerp(headings[index], accumulated_s[index],
-                                     headings[index + 1],
-                                     accumulated_s[index + 1], s);
 }
 
 double PredictionMap::LaneTotalWidth(
@@ -86,10 +90,11 @@ std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
       apollo::hdmap::MakeMapId(str_id));
 }
 
-void PredictionMap::GetProjection(const Eigen::Vector2d& position,
-                                  std::shared_ptr<const LaneInfo> lane_info,
-                                  double* s,
-                                  double* l) {
+void PredictionMap::GetProjection(
+    const Eigen::Vector2d& position,
+    std::shared_ptr<const LaneInfo> lane_info,
+    double* s,
+    double* l) {
   if (lane_info == nullptr) {
     return;
   }
@@ -154,8 +159,9 @@ void PredictionMap::OnLane(
   }
 }
 
-double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
-                                  const apollo::common::PointENU& point) {
+double PredictionMap::PathHeading(
+    std::shared_ptr<const LaneInfo> lane_info,
+    const apollo::common::PointENU& point) {
   apollo::common::math::Vec2d vec_point = {point.x(), point.y()};
   double s = -1.0;
   double l = 0.0;
@@ -163,10 +169,11 @@ double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
   return HeadingOnLane(lane_info, s);
 }
 
-int PredictionMap::SmoothPointFromLane(const std::string& id,
-                                       const double s, const double l,
-                                       Eigen::Vector2d* point,
-                                       double* heading) {
+int PredictionMap::SmoothPointFromLane(
+    const std::string& id,
+    const double s, const double l,
+    Eigen::Vector2d* point,
+    double* heading) {
   if (point == nullptr || heading == nullptr) {
     return -1;
   }
