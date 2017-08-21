@@ -57,7 +57,8 @@ class TrafficDecider : public Task {
    * @brief create destination obstacle based on routing end point
    * @return the created path obstacle
    */
-  PathObstacle *CreateDestinationObstacle();
+  const Obstacle *CreateDestinationObstacle();
+  const PathObstacle *CreateDestinationPathObstacle();
 };
 
 }  // namespace planning

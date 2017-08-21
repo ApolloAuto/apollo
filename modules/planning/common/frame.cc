@@ -145,6 +145,10 @@ const std::vector<ReferenceLineInfo> &Frame::reference_line_info() const {
   return reference_line_info_;
 }
 
+Obstacle *Frame::FindObstacle(const std::string &obstacle_id) {
+  return obstacles_.Find(obstacle_id);
+}
+
 bool Frame::CreateReferenceLineFromRouting(
     const common::PointENU &position, const routing::RoutingResponse &routing,
     std::vector<ReferenceLine> *reference_lines) {
@@ -217,6 +221,23 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
 bool Frame::AddObstacle(std::unique_ptr<Obstacle> obstacle) {
   auto id(obstacle->Id());
   return obstacles_.Add(id, std::move(obstacle));
+}
+
+const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
+  if (!drive_reference_line_info_) {
+    double reference_line_cost = std::numeric_limits<double>::infinity();
+    for (const auto &reference_line_info : reference_line_info_) {
+      if (reference_line_info.Cost() < reference_line_cost) {
+        drive_reference_line_info_ = &reference_line_info;
+        reference_line_cost = reference_line_info.Cost();
+      }
+    }
+  }
+  return drive_reference_line_info_;
+}
+
+const ReferenceLineInfo *Frame::DriveReferenceLinfInfo() const {
+  return drive_reference_line_info_;
 }
 
 }  // namespace planning

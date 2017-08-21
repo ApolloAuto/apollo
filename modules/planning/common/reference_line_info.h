@@ -38,7 +38,6 @@ namespace planning {
 class ReferenceLineInfo {
  public:
   explicit ReferenceLineInfo(const ReferenceLine& reference_line);
-  const std::string& Id() const;
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
@@ -66,14 +65,13 @@ class ReferenceLineInfo {
       const double width, const double height) const;
 
   /**
-   * @brief check if current reference line is extending previous reference
-   *line.  The method is to check if the start point of current reference line
-   *is on previous reference line info.
+   * @brief check if current reference line is started from another reference
+   *line info line. The method is to check if the start point of current
+   *reference line is on previous reference line info.
    * @return returns true if current reference line starts on previous reference
    *line, otherwise false.
    **/
-  bool IsExtendedFrom(
-      const ReferenceLineInfo& previous_reference_line_info) const;
+  bool IsStartFrom(const ReferenceLineInfo& previous_reference_line_info) const;
 
   bool CombinePathAndSpeedProfile(const double time_resolution,
                                   const double relative_time);
@@ -83,16 +81,13 @@ class ReferenceLineInfo {
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
 
  private:
-  static uint32_t s_reference_line_id_;
-
-  std::string id_;
   /**
    * @brief this is the number that measures the goodness of this reference
    * line.
    * The lower the better.
    * TODO: implement trajectory cost calculation
    */
-  double cost_ = std::numeric_limits<double>::infinity();
+  double cost_ = 0.0;
 
   const ReferenceLine reference_line_;
   PathDecision path_decision_;
