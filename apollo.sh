@@ -123,7 +123,7 @@ function build() {
   generate_build_targets
   echo "Building on $MACHINE_ARCH, with targets:"
   echo "$BUILD_TARGETS"
-  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 $DEFINES -c $1
+  echo "$BUILD_TARGETS" | xargs bazel build --jobs=10 $DEFINES -c $1
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
@@ -316,7 +316,7 @@ function run_test() {
   # FIXME(all): when all unit test passed, switch back.
   # bazel test --config=unit_test -c dbg //...
   generate_test_targets_dbg
-  echo "$TEST_TARGETS" | xargs bazel --batch --batch_cpu_scheduling test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
   if [ $? -ne 0 ]; then
       fail "Test failed!"
       return 1
@@ -324,7 +324,7 @@ function run_test() {
 
   generate_test_targets_opt
   build_caffe_opt
-  echo "$TEST_TARGETS" | xargs bazel --batch --batch_cpu_scheduling test $DEFINES --config=unit_test -c opt --test_verbose_timeout_warnings
+  echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c opt --test_verbose_timeout_warnings
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -335,7 +335,7 @@ function run_test() {
 }
 
 function run_cpp_lint() {
-  bazel test --config=cpplint //...
+  bazel test --config=cpplint -c dbg //...
 }
 
 function run_bash_lint() {
