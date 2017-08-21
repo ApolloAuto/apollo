@@ -510,8 +510,9 @@ function print_usage() {
 
   echo -e "\n${RED}Options${NONE}:
   ${BLUE}build${NONE}: run build only
+  ${BLUE}build_opt${NONE}: build optimized binary for the code (please choose this option if using perception)
+  ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
-  ${BLUE}build_perception${NONE}: build perception module
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
   ${BLUE}clean${NONE}: run Bazel clean
