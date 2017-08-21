@@ -286,6 +286,29 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
     last_publishable_trajectory_.Clear();
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  auto* ptr_debug = frame_->MutableADCTrajectory()->mutable_debug();
+  auto* ptr_latency_stats =
+      frame_->MutableADCTrajectory()->mutable_latency_stats();
+  ptr_debug->CopyFrom(best_reference_line->debug());
+  ptr_latency_stats->CopyFrom(best_reference_line->latency_stats());
+
+  // Add debug information.
+  if (FLAGS_enable_record_debug) {
+    auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
+    reference_line->set_name("planning_reference_line");
+    const auto& reference_points =
+        best_reference_line->reference_line().reference_points();
+    for (const auto& reference_point : reference_points) {
+      auto* path_point = reference_line->add_path_point();
+      path_point->set_x(reference_point.x());
+      path_point->set_y(reference_point.y());
+      path_point->set_theta(reference_point.heading());
+      path_point->set_kappa(reference_point.kappa());
+      path_point->set_dkappa(reference_point.dkappa());
+    }
+  }
+
   PublishableTrajectory publishable_trajectory(
       current_time_stamp, best_reference_line->trajectory());
 

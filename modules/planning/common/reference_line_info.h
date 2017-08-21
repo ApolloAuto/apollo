@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/proto/planning.pb.h"
+
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/planning_data.h"
@@ -75,6 +77,10 @@ class ReferenceLineInfo {
 
   bool CombinePathAndSpeedProfile(const double time_resolution,
                                   const double relative_time);
+  planning_internal::Debug* mutable_debug() { return &debug_; }
+  const planning_internal::Debug& debug() const { return debug_; }
+  LatencyStats* mutable_latency_stats() { return &latency_stats_; }
+  const LatencyStats& latency_stats() const { return latency_stats_; }
 
  private:
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
@@ -93,6 +99,9 @@ class ReferenceLineInfo {
   PathDecision path_decision_;
   PlanningData planning_data_;
   DiscretizedTrajectory discretized_trajectory_;
+
+  planning_internal::Debug debug_;
+  LatencyStats latency_stats_;
 };
 
 }  // namespace planning
