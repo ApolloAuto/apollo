@@ -119,7 +119,6 @@ void PredictionMap::OnLane(
     std::vector<std::shared_ptr<const LaneInfo>>* lanes) {
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
 
-  // TODO(kechxu) clean the messy code of this function
   apollo::common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
@@ -128,9 +127,7 @@ void PredictionMap::OnLane(
     return;
   }
 
-  apollo::common::math::Vec2d vec_point;
-  vec_point.set_x(point[0]);
-  vec_point.set_y(point[1]);
+  apollo::common::math::Vec2d vec_point(point[0], point[1]);
   for (const auto &candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
       continue;
@@ -170,7 +167,6 @@ int PredictionMap::SmoothPointFromLane(const std::string& id,
                                        const double s, const double l,
                                        Eigen::Vector2d* point,
                                        double* heading) {
-  // TODO(kechxu) Double check this implement
   if (point == nullptr || heading == nullptr) {
     return -1;
   }
