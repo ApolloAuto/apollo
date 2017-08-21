@@ -51,6 +51,7 @@ class Map:
         for lane in  self.map_pb.lane:
             color_val = self.colors[cnt % len(self.colors)]
             self._draw_lane_boundary(lane, ax, color_val)
+            self._draw_lane_central(lane, ax, color_val)
             if is_show_lane_ids:
                 self._draw_lane_id(lane, ax, color_val)
             elif lane.id.id in laneids:
@@ -124,3 +125,15 @@ class Map:
                     px.append(float(p.x))
                     py.append(float(p.y))
                 ax.plot(px, py, ls='-', c=color_val, alpha = 0.5)
+
+    @staticmethod
+    def _draw_lane_central(lane, ax, color_val):
+        """draw boundary"""
+        for curve in lane.central_curve.segment:
+            if curve.HasField('line_segment'):
+                px = []
+                py = []
+                for p in curve.line_segment.point:
+                    px.append(float(p.x))
+                    py.append(float(p.y))
+                ax.plot(px, py, ls=':', c=color_val, alpha = 0.5)
