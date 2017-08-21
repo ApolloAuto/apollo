@@ -47,9 +47,11 @@ Status Dreamview::Init() {
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
-  server_.reset(
-      new CivetServer({"document_root", FLAGS_static_file_dir,
-                       "listening_ports", std::to_string(FLAGS_server_port)}));
+  server_.reset(new CivetServer({
+      "document_root", FLAGS_static_file_dir, "listening_ports",
+      std::to_string(FLAGS_server_port), "websocket_timeout_ms",
+      FLAGS_websocket_timeout_ms,
+  }));
   websocket_.reset(new WebSocketHandler());
   server_->addWebSocketHandler("/websocket", *websocket_);
 

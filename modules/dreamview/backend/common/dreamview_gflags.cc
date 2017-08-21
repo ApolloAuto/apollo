@@ -36,3 +36,7 @@ DEFINE_string(routing_response_file, "modules/map/data/garage_routing.pb.txt",
               "start point from. If this is absent, SimControl will directly "
               "take the RoutingResponse from ROS to determine the start "
               "point.");
+
+DEFINE_string(websocket_timeout_ms, "36000000",
+              "Time span that CivetServer keeps the websocket connection alive "
+              "without dropping it.");

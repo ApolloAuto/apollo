@@ -31,4 +31,6 @@ DECLARE_bool(routing_from_file);
 
 DECLARE_string(routing_response_file);
 
+DECLARE_string(websocket_timeout_ms);
+
 #endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
