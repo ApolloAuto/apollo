@@ -140,5 +140,18 @@ const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
 }
 
+bool ReferenceLineInfo::IsExtendedFrom(
+    const ReferenceLineInfo& previous_reference_line_info) const {
+  if (reference_line_.reference_points().empty()) {
+    return false;
+  }
+  auto start_point = reference_line_.reference_points().front();
+  const auto& prev_reference_line =
+      previous_reference_line_info.reference_line();
+  common::SLPoint sl_point;
+  prev_reference_line.get_point_in_frenet_frame(start_point, &sl_point);
+  return previous_reference_line_info.reference_line_.is_on_road(sl_point);
+}
+
 }  // namespace planning
 }  // namespace apollo
