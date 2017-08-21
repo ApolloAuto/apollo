@@ -15,6 +15,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common:macro",
         "//modules/common/math:quaternion",
+        "//modules/common/status",
         "//modules/localization/common:localization_common",
         "@eigen//:eigen",
     ],

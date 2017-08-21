@@ -21,6 +21,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -29,10 +30,15 @@ namespace common {
 
 VehicleState::VehicleState() {}
 
-void VehicleState::Update(
+common::Status VehicleState::Update(
     const localization::LocalizationEstimate &localization,
     const canbus::Chassis &chassis) {
-  ConstructExceptLinearVelocity(localization);
+  if (!ConstructExceptLinearVelocity(localization)) {
+    std::string msg = common::util::StrCat(
+        "Fail to update because ConstructExceptLinearVelocity error.",
+        "localization:\n", localization.DebugString());
+    return Status(ErrorCode::LOCALIZATION_ERROR, msg);
+  }
   if (chassis.has_header() && chassis.header().has_timestamp_sec()) {
     timestamp_ = chassis.header().timestamp_sec();
   }
@@ -45,13 +51,14 @@ void VehicleState::Update(
   } else {
     gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
   }
+  return Status::OK();
 }
 
-void VehicleState::ConstructExceptLinearVelocity(
+bool VehicleState::ConstructExceptLinearVelocity(
     const localization::LocalizationEstimate &localization) {
   if (!localization.has_pose()) {
     AERROR << "Invalid localization input.";
-    return;
+    return false;
   }
   pose_ = localization.pose();
   if (localization.pose().has_position()) {
@@ -70,9 +77,18 @@ void VehicleState::ConstructExceptLinearVelocity(
   }
 
   if (FLAGS_enable_map_reference_unify) {
-    CHECK(localization.pose().has_angular_velocity_vrf());
+    if (!localization.pose().has_angular_velocity_vrf()) {
+      AERROR << "localization.pose().has_angular_velocity_vrf() must be true "
+                "when FLAGS_enable_map_reference_unify is true.";
+      return false;
+    }
     angular_v_ = localization.pose().angular_velocity_vrf().z();
-    CHECK(localization.pose().has_linear_acceleration_vrf());
+
+    if (!localization.pose().has_linear_acceleration_vrf()) {
+      AERROR << "localization.pose().has_linear_acceleration_vrf() must be "
+                "true when FLAGS_enable_map_reference_unify is true.";
+      return false;
+    }
     linear_a_y_ = localization.pose().linear_acceleration_vrf().y();
   } else {
     CHECK(localization.pose().has_angular_velocity());
@@ -98,6 +114,8 @@ void VehicleState::ConstructExceptLinearVelocity(
     pitch_ = euler_angle.pitch();
     yaw_ = euler_angle.yaw();
   }
+
+  return true;
 }
 
 double VehicleState::x() const { return x_; }
