@@ -77,7 +77,7 @@ $$
 \cdot 
 \begin{vmatrix} 0 & 1 & s & s^2 & s^3 & s^4 \end{vmatrix} 
 \cdot 
-\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
+\begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} ds
 $$
 
 
