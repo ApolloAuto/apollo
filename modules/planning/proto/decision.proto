@@ -54,6 +54,7 @@ message ObjectYield {
   optional double distance_s = 1;  // minimum longitudinal distance in meters
   optional apollo.common.PointENU fence_point = 2;
   optional double fence_heading = 3;
+  optional double time_buffer = 4;  // minimum time buffer required after the obstacle reaches the intersect point.
 }
 
 message ObjectFollow {
@@ -66,6 +67,7 @@ message ObjectOvertake {
   optional double distance_s = 1;  // minimum longitudinal distance in meters
   optional apollo.common.PointENU fence_point = 2;
   optional double fence_heading = 3;
+  optional double time_buffer = 4;  // minimum time buffer required before the obstacle reaches the intersect point.
 }
 
 message ObjectSidePass {

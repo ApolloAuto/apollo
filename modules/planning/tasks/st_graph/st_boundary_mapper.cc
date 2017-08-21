@@ -51,6 +51,12 @@ using VehicleParam = apollo::common::VehicleParam;
 using Box2d = apollo::common::math::Box2d;
 using Vec2d = apollo::common::math::Vec2d;
 
+namespace {
+
+constexpr double boundary_t_buffer = 2.0;
+constexpr double boundary_s_buffer = 5.0;
+}
+
 StBoundaryMapper::StBoundaryMapper(const StBoundaryConfig& config,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
@@ -237,18 +243,15 @@ Status StBoundaryMapper::MapWithoutDecision(
 
   if (lower_points.size() > 0 && upper_points.size() > 0) {
     boundary_points.clear();
-    boundary_points.emplace_back(
-        lower_points.at(0).s() - st_boundary_config_.boundary_buffer(),
-        lower_points.at(0).t() - st_boundary_config_.boundary_buffer());
-    boundary_points.emplace_back(
-        lower_points.back().s() - st_boundary_config_.boundary_buffer(),
-        lower_points.back().t() + st_boundary_config_.boundary_buffer());
-    boundary_points.emplace_back(
-        upper_points.back().s() + st_boundary_config_.boundary_buffer(),
-        upper_points.back().t() + st_boundary_config_.boundary_buffer());
-    boundary_points.emplace_back(
-        upper_points.at(0).s() + st_boundary_config_.boundary_buffer(),
-        upper_points.at(0).t() - st_boundary_config_.boundary_buffer());
+    boundary_points.emplace_back(lower_points.at(0).s() - boundary_s_buffer,
+                                 lower_points.at(0).t() - boundary_t_buffer);
+    boundary_points.emplace_back(lower_points.back().s() - boundary_s_buffer,
+                                 lower_points.back().t() + boundary_t_buffer);
+    boundary_points.emplace_back(upper_points.back().s() + boundary_s_buffer,
+                                 upper_points.back().t() + boundary_t_buffer);
+    boundary_points.emplace_back(upper_points.at(0).s() + boundary_s_buffer,
+                                 upper_points.at(0).t() - boundary_t_buffer);
+
     if (lower_points.at(0).t() > lower_points.back().t() ||
         upper_points.at(0).t() > upper_points.back().t()) {
       AWARN << "lower/upper points are reversed.";
@@ -359,19 +362,25 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
   }
   if (lower_points.size() > 0 && upper_points.size() > 0) {
     boundary_points.clear();
-    const double buffer = st_boundary_config_.boundary_buffer();
 
+    // lower left point
     boundary_points.emplace_back(
-        std::fmax(0.0, lower_points.at(0).s() - buffer),
-        lower_points.at(0).t());
+        std::fmax(0.0, lower_points.at(0).s() - boundary_s_buffer),
+        std::fmax(0.0, lower_points.at(0).t() - boundary_t_buffer));
+    // lower right point
     boundary_points.emplace_back(
-        std::fmax(0.0, lower_points.back().s() - buffer),
-        lower_points.back().t());
-    boundary_points.emplace_back(upper_points.back().s() + buffer +
-                                     st_boundary_config_.boundary_buffer(),
-                                 upper_points.back().t());
-    boundary_points.emplace_back(upper_points.at(0).s() + buffer,
-                                 upper_points.at(0).t());
+        std::fmax(0.0, lower_points.back().s() - boundary_s_buffer),
+        lower_points.back().t() + boundary_t_buffer);
+
+    // upper right point
+    boundary_points.emplace_back(upper_points.back().s() + boundary_s_buffer,
+                                 upper_points.back().t() + boundary_t_buffer);
+
+    // upper left point
+    boundary_points.emplace_back(
+        upper_points.at(0).s() + boundary_s_buffer,
+        std::fmax(0.0, upper_points.at(0).t() - boundary_t_buffer));
+
     if (lower_points.at(0).t() > lower_points.back().t() ||
         upper_points.at(0).t() > upper_points.back().t()) {
       AWARN << "lower/upper points are reversed.";
@@ -381,6 +390,7 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
     StGraphBoundary::BoundaryType b_type =
         StGraphBoundary::BoundaryType::UNKNOWN;
     double characteristic_length = 0.0;
+    constexpr double kBoundaryEpsilon = 1e-3;
     if (obj_decision.has_follow()) {
       const auto& speed = path_obstacle.Obstacle()->Perception().velocity();
       const double scalar_speed = std::hypot(speed.x(), speed.y());
@@ -400,24 +410,29 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
       characteristic_length = dis;
       if (boundary_points.at(0).s() - dis < 0.0) {
         boundary_points.at(0).set_s(
-            std::fmax(boundary_points.at(0).s() - buffer, 0.0));
+            std::fmax(boundary_points.at(0).s() - dis / 2, 0.0));
       } else {
         boundary_points.at(0).set_s(boundary_points.at(0).s() - dis);
       }
 
       if (boundary_points.at(1).s() - dis < 0.0) {
         boundary_points.at(1).set_s(
-            std::fmax(boundary_points.at(1).s() - buffer, 0.0));
+            std::fmax(boundary_points.at(1).s() - dis / 2, 0.0));
       } else {
         boundary_points.at(1).set_s(boundary_points.at(1).s() - dis);
       }
+      boundary_points.at(3).set_t(-kBoundaryEpsilon);
       b_type = StGraphBoundary::BoundaryType::YIELD;
 
     } else if (obj_decision.has_overtake()) {
       const double dis = std::fabs(obj_decision.overtake().distance_s());
       characteristic_length = dis;
+      boundary_points.at(0).set_s(-kBoundaryEpsilon);
       boundary_points.at(2).set_s(boundary_points.at(2).s() + dis);
       boundary_points.at(3).set_s(boundary_points.at(3).s() + dis);
+
+      const double time_buffer = obj_decision.overtake().time_buffer();
+      boundary_points.at(3).set_t(boundary_points.at(3).t() - time_buffer);
     } else {
       DCHECK(false) << "Obj decision should be either yield or overtake: "
                     << obj_decision.DebugString();
