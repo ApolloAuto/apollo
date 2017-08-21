@@ -50,8 +50,13 @@ class Map:
         cnt = 1
         for lane in  self.map_pb.lane:
             color_val = self.colors[cnt % len(self.colors)]
-            self._draw_lane_boundary(lane, ax, color_val)
-            self._draw_lane_central(lane, ax, color_val)
+            if len(laneids) == 0:
+                self._draw_lane_boundary(lane, ax, color_val)
+                self._draw_lane_central(lane, ax, color_val)
+            else:
+                if lane.id.id in laneids:
+                    self._draw_lane_boundary(lane, ax, color_val)
+                    self._draw_lane_central(lane, ax, color_val)
             if is_show_lane_ids:
                 self._draw_lane_id(lane, ax, color_val)
             elif lane.id.id in laneids:
