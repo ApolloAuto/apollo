@@ -32,3 +32,6 @@ The ROS package will be downloaded when you start to build apollo with command `
 
 ## How to clean the existing build output?
 Log into the docker with command `bash docker/scripts/dev_into.sh`, and run command `bash apollo.sh clean`.
+
+## How to delete downloaded third party dependent packages?
+Log into the docker with command `bash docker/scripts/dev_into.sh`, and run command `bazel clean --expunge`. After this command, the build command `bash apollo.sh build` will redownload all the dependent packages according to the *WORKSPACE* file.
