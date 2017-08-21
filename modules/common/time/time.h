@@ -153,6 +153,14 @@ class Clock {
   }
 
   /**
+   * @brief gets the current time in second.
+   * @return the current time in second.
+   */
+  static double NowInSecond() {
+    return ToSecond(Clock::Now());
+  }
+
+  /**
    * @brief Set the behavior of the \class Clock.
    * @param is_system_clock if provided with value TRUE, further call
    * to Now() will return timestamp based on the system clock. If
@@ -166,7 +174,9 @@ class Clock {
    * @brief Check whether the \class Clock instance is using system clock.
    * @return TRUE if it is using system clock, and FALSE otherwise.
    */
-  static bool IsSystemClock() { return instance()->is_system_clock_; }
+  static bool IsSystemClock() {
+    return instance()->is_system_clock_;
+  }
 
   /**
    * @brief This is for mock clock mode only. It will set the timestamp
@@ -214,6 +224,19 @@ class Clock {
 };
 
 inline Clock::Clock() : Clock(true) {}
+
+// Measure run time of a code block, for debugging puprpose only, don't check in
+// code with this macro!
+// Example usage:
+// PERF_BLOCK("Function Foo took: ") {
+//  Foo();
+// }
+#define PERF_BLOCK(message)                                                  \
+  using apollo::common::time::NowInSecond;                                   \
+  for (double block_start_time = 0;                                          \
+       (block_start_time == 0 ? (block_start_time = NowInSecond()) : false); \
+       std::cout << std::fixed << message << ": "                            \
+                 << NowInSecond() - block_start_time << std::endl)
 
 }  // namespace time
 }  // namespace common
