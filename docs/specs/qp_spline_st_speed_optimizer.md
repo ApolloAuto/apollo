@@ -58,7 +58,7 @@ $$
 
 ### 2.1 The init point constraints
 
-Let's assume the the first point is ($s_0$, $l_0$), and $l_0$ should be on the planned path $f_i(s)$, $f'_i(s)$, and $f_i(s)''$ (position, velocity, acceleration).  we convert those constraint into QP equality constraints 
+Let's assume the the first point is ($t_0$, $s_0$), and $s_0$ should be on the planned path $f_i(t)$, $f'_i(t)$, and $f_i(t)''$ (position, velocity, acceleration).  we convert those constraint into QP equality constraints 
 $$
 A_{eq}x = b_{eq}
 $$
@@ -67,6 +67,28 @@ $$
 
 The path need to be monotone, e.g., vehicle can only drive forward. 
 
+sample m points on the path, for each $j$ and $j-1$ point pairs ($j\in[1,...,m]$) 
+
+if the two pionts on the same spline $k​$
+$$
+\begin{vmatrix}  1 & t_j & t_j^2 & t_j^3 & t_j^4&t_j^5 \\ \end{vmatrix} 
+\cdot 
+\begin{vmatrix}  a_k \\ b_k \\ c_k \\ d_k \\ e_k \\ f_k  \end{vmatrix} 
+> 
+\begin{vmatrix}  1 & t_{j-1} & t_{j-1}^2 & t_{j-1}^3 & t_{j-1}^4&t_{j-1}^5 \\ \end{vmatrix}  
+\cdot 
+\begin{vmatrix}  a_{k} \\ b_{k} \\ c_{k} \\ d_{k} \\ e_{k} \\ f_{k}  \end{vmatrix}
+$$
+ if the two points on the different spline $k$ and $l$
+$$
+\begin{vmatrix}  1 & t_j & t_j^2 & t_j^3 & t_j^4&t_j^5 \\ \end{vmatrix} 
+\cdot 
+\begin{vmatrix}  a_k \\ b_k \\ c_k \\ d_k \\ e_k \\ f_k  \end{vmatrix} 
+> 
+\begin{vmatrix}  1 & t_{j-1} & t_{j-1}^2 & t_{j-1}^3 & t_{j-1}^4&t_{j-1}^5 \\ \end{vmatrix}  
+\cdot 
+\begin{vmatrix}  a_{l} \\ b_{l} \\ c_{l} \\ d_{l} \\ e_{l} \\ f_{l}  \end{vmatrix}
+$$
 
 
 
@@ -74,46 +96,46 @@ The path need to be monotone, e.g., vehicle can only drive forward.
 
 This constraint is to make the spline joint smooth.  Let's assume two segment $seg_k$ and $seg_{k+1}$ are connected, and the accumulated s of segment $seg_k$ is $s_k$. The we can get the constraint euqation as 
 $$
-f_k(s_k) = f_{k+1} (s_0)
+f_k(t_k) = f_{k+1} (t_0)
 $$
 namely
 $$
 \begin{vmatrix} 
- 1 & s_k & s_k^2 & s_k^3 & s_k^4&s_k^5 \\
+ 1 & t_k & t_k^2 & t_k^3 & t_k^4&t_k^5 \\
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix} 
- a_k \\ b_k \\ c_k \\ d_k \\ e_k \\ f_k 
+ a_{k0} \\ a_{k1} \\ a_{k2} \\ a_{k3} \\ a_{k4} \\ a_{k5} 
  \end{vmatrix} 
  = 
 \begin{vmatrix} 
- 1 & s_{0} & s_{0}^2 & s_{0}^3 & s_{0}^4&s_{0}^5 \\
+ 1 & t_{0} & t_{0}^2 & t_{0}^3 & t_{0}^4&t_{0}^5 \\
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix} 
- a_{k+1} \\ b_{k+1} \\ c_{k+1} \\ d_{k+1} \\ e_{k+1} \\ f_{k+1} 
+ a_{k+1,0} \\ a_{k+1,1} \\ a_{k+1,2} \\ a_{k+1,3} \\ a_{k+1,4} \\ a_{k+1,5} 
  \end{vmatrix}
 $$
 then
 $$
 \begin{vmatrix} 
- 1 & s_k & s_k^2 & s_k^3 & s_k^4&s_k^5 &  -1 & -s_{0} & -s_{0}^2 & -s_{0}^3 & -s_{0}^4&-s_{0}^5\\
+ 1 & t_k & t_k^2 & t_k^3 & t_k^4&t_k^5 &  -1 & -t_{0} & -t_{0}^2 & -t_{0}^3 & -t_{0}^4&-t_{0}^5\\
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix} 
- a_k \\ b_k \\ c_k \\ d_k \\ e_k \\ f_k \\ a_{k+1} \\ b_{k+1} \\ c_{k+1} \\ d_{k+1} \\ e_{k+1} \\ f_{k+1}  
+ a_{k0} \\ a_{k1} \\ a_{k2} \\ a_{k3} \\ a_{k4} \\ a_{k5} \\ a_{k+1,0} \\ a_{k+1,1} \\ a_{k+1,2} \\ a_{k+1,3} \\ a_{k+1,4} \\ a_{k+1,5}   
  \end{vmatrix} 
  = 0
 $$
-$s_0$ = 0 in the equation.
+$t_0$ = 0 in the equation.
 
 Similarly we can get the equality constraints for 
 $$
-f'_k(s_k) = f'_{k+1} (s_0)
+f'_k(t_k) = f'_{k+1} (t_0)
 \\
-f''_k(s_k) = f''_{k+1} (s_0)
+f''_k(t_k) = f''_{k+1} (t_0)
 \\
-f'''_k(s_k) = f'''_{k+1} (s_0)
+f'''_k(t_k) = f'''_{k+1} (t_0)
 $$
 
 ### 2.4 Sampled points for boundary constraint
@@ -125,10 +147,10 @@ $$
 We first find lower boundary $l_{lb,j}$ at those points ($s_j$, $l_j$) and  $j\in[0, m]$ based on road width and surrounding obstacles. The calculate the inequality constraints as
 $$
 \begin{vmatrix} 
- 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
-  1 & s_1 & s_1^2 & s_1^3 & s_1^4&s_1^5 \\
+ 1 & t_0 & t_0^2 & t_0^3 & t_0^4&t_0^5 \\
+  1 & t_1 & t_1^2 & t_1^3 & t_1^4&t_1^5 \\
  ...&...&...&...&...&... \\
- 1 & s_m & s_m^2 & s_m^3 & s_m^4&s_m^5 \\
+ 1 & t_m & t_m^2 & t_m^3 & t_m^4&t_m^5 \\
  \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} 
  \leq 
  \begin{vmatrix}
@@ -143,10 +165,10 @@ $$
 similarly, for upper boundary $l_{ub,j}$, we get the ineuqality constraints as 
 $$
 \begin{vmatrix} 
- 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
-  1 & s_1 & s_1^2 & s_1^3 & s_1^4&s_1^5 \\
+ 1 & t_0 & t_0^2 & t_0^3 & t_0^4&t_0^5 \\
+  1 & t_1 & t_1^2 & t_1^3 & t_1^4&t_1^5 \\
  ...&...&...&...&...&... \\
- 1 & s_m & s_m^2 & s_m^3 & s_m^4&s_m^5 \\
+ 1 & t_m & t_m^2 & t_m^3 & t_m^4&t_m^5 \\
  \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} 
  \leq
  -1 \cdot
@@ -163,3 +185,35 @@ $$
 ### 2.5 Speed Boundary constraint
 
 We need to limit speed boundary as well.
+
+Sample m points on st curve, and get speed limits upper bound and lower bound for each point $j$, e.g., $v_{ubj}$ and $v_{lbj}$ . The constraints is defined as 
+$$
+\begin{vmatrix}  
+1 & t_0 & t_0^2 & t_0^3 & t_0^4&t_0^5 \\  
+1 & t_1 & t_1^2 & t_1^3 & t_1^4&t_1^5 \\ 
+...&...&...&...&...&... \\ 
+1 & t_m & t_m^2 & t_m^3 & t_m^4&t_m^5 \\ 
+\end{vmatrix} 
+\cdot 
+\begin{vmatrix} 
+a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i 
+\end{vmatrix}  
+\geq  
+\begin{vmatrix} v_{lb,0}\\ v_{lb,1}\\ ...\\ v_{lb,m}\\ \end{vmatrix}
+$$
+and 
+$$
+\begin{vmatrix} 
+ 1 & t_0 & t_0^2 & t_0^3 & t_0^4&t_0^5 \\
+  1 & t_1 & t_1^2 & t_1^3 & t_1^4&t_1^5 \\
+ ...&...&...&...&...&... \\
+ 1 & t_m & t_m^2 & t_m^3 & t_m^4&t_m^5 \\
+ \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} 
+ \leq
+ \begin{vmatrix}
+ v_{ub,0}\\
+ v_{ub,1}\\
+ ...\\
+ v_{ub,m}\\
+ \end{vmatrix}
+$$
