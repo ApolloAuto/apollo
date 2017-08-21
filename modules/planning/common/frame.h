@@ -81,6 +81,10 @@ class Frame {
   const std::vector<ReferenceLineInfo> &reference_line_info() const;
 
   bool AddObstacle(std::unique_ptr<Obstacle> obstacle);
+  Obstacle *FindObstacle(const std::string &obstacle_id);
+
+  const ReferenceLineInfo *FindDriveReferenceLineInfo();
+  const ReferenceLineInfo *DriveReferenceLinfInfo() const;
 
  private:
   /**
@@ -108,6 +112,11 @@ class Frame {
   common::TrajectoryPoint planning_start_point_;
 
   std::vector<ReferenceLineInfo> reference_line_info_;
+
+  /**
+   * the reference line info that the vehicle finally choose to drive on.
+   **/
+  const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
   routing::RoutingResponse routing_response_;
   prediction::PredictionObstacles prediction_;

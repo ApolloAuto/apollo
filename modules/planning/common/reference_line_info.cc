@@ -18,24 +18,17 @@
  * @file
  **/
 
-
 #include <functional>
 
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
-uint32_t ReferenceLineInfo::s_reference_line_id_ = 0;
 
 ReferenceLineInfo::ReferenceLineInfo(const ReferenceLine& reference_line)
-    : reference_line_(reference_line) {
-  id_ = std::to_string(s_reference_line_id_);
-  ++s_reference_line_id_;
-}
-
-const std::string& ReferenceLineInfo::Id() const { return id_; }
+    : reference_line_(reference_line) {}
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   auto path_obstacle = CreatePathObstacle(obstacle);
@@ -140,7 +133,7 @@ const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
 }
 
-bool ReferenceLineInfo::IsExtendedFrom(
+bool ReferenceLineInfo::IsStartFrom(
     const ReferenceLineInfo& previous_reference_line_info) const {
   if (reference_line_.reference_points().empty()) {
     return false;

@@ -278,16 +278,8 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
     }
   }
 
-  const ReferenceLineInfo* best_reference_line = nullptr;
-  double previous_reference_line_cost = std::numeric_limits<double>::infinity();
-  for (const auto& reference_line_info : frame_->reference_line_info()) {
-    if (best_reference_line == nullptr ||
-        (!std::isinf(reference_line_info.Cost()) &&
-         reference_line_info.Cost() < previous_reference_line_cost)) {
-      best_reference_line = &reference_line_info;
-      previous_reference_line_cost = reference_line_info.Cost();
-    }
-  }
+  const ReferenceLineInfo* best_reference_line =
+      frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg("planner failed to make a driving plan");
     AERROR << msg;

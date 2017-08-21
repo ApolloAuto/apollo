@@ -192,17 +192,14 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     AWARN << "last frame is empty";
     return speed_profile;
   }
-  const ReferenceLineInfo* last_reference_line_info = nullptr;
-  auto reference_line_id = reference_line_info->Id();
-  for (const auto& ref_info : last_frame->reference_line_info()) {
-    // WARNING: weak association between reference lines of two frames.
-    if (ref_info.Id() == reference_line_id) {
-      last_reference_line_info = &ref_info;
-      break;
-    }
-  }
+  const ReferenceLineInfo* last_reference_line_info =
+      last_frame->DriveReferenceLinfInfo();
   if (!last_reference_line_info) {
-    AERROR << "last reference line info is empty";
+    AINFO << "last reference line info is empty";
+    return speed_profile;
+  }
+  if (!reference_line_info->IsStartFrom(*last_reference_line_info)) {
+    AINFO << "Current reference line is not started previous drived line";
     return speed_profile;
   }
   const auto& last_speed_vector =
@@ -271,11 +268,12 @@ std::vector<common::SpeedPoint> EMPlanner::GenerateSpeedHotStart(
   end_state[1] = 0.0;
 
   QuarticPolynomialCurve1d speed_profile(start_state, end_state,
-                                       FLAGS_trajectory_time_length);
+                                         FLAGS_trajectory_time_length);
   // assume the time resolution is 0.1
   std::uint32_t num_time_steps =
       static_cast<std::uint32_t>(FLAGS_trajectory_time_length /
-                                 FLAGS_trajectory_time_resolution) + 1;
+                                 FLAGS_trajectory_time_resolution) +
+      1;
 
   std::vector<common::SpeedPoint> discretized_speed_profile;
   discretized_speed_profile.reserve(num_time_steps);
