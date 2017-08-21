@@ -146,13 +146,9 @@ void HdmapROIFilter::MergeHdmapStructToPolygons(
 
 bool HdmapROIFilter::Init() {
   // load model config
-  ConfigManager* config_manager = Singleton<ConfigManager>::Get();
   std::string model_name = name();
   const ModelConfig* model_config = nullptr;
-  if (config_manager == nullptr) {
-    AERROR << "Failed to get config manager";
-    return false;
-  } else if (!config_manager->GetModelConfig(model_name, &model_config)) {
+  if (!ConfigManager::instance()->GetModelConfig(model_name, &model_config)) {
     AERROR << "Failed to get model: " << model_name;
     return false;
   } else {

@@ -47,8 +47,7 @@ DEFINE_int32(start_frame, 1, "start frame");
 class OfflineLidarPerceptionTool {
  public:
   bool Init(bool use_visualization = false) {
-    config_manager_ = Singleton<ConfigManager>::Get();
-    if (config_manager_ == NULL || !config_manager_->Init()) {
+    if (!ConfigManager::instance()->Init()) {
       AERROR << "failed to init ConfigManager";
       return false;
     }
@@ -213,7 +212,6 @@ class OfflineLidarPerceptionTool {
   }
 
 protected:
-    ConfigManager* config_manager_ = nullptr;
     std::unique_ptr<LidarProcess> lidar_process_;
     std::unique_ptr<OpenglVisualizer> visualizer_;
 };

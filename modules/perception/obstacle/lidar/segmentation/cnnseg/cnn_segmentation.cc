@@ -41,8 +41,8 @@ bool CNNSegmentation::Init() {
   }
 
   /// set parameters
-  apollo::perception::cnnseg::NetworkParam network_param = cnnseg_param_.network_param();
-  apollo::perception::cnnseg::FeatureParam feature_param = cnnseg_param_.feature_param();
+  auto network_param = cnnseg_param_.network_param();
+  auto feature_param = cnnseg_param_.feature_param();
 
   range_ = static_cast<float>(feature_param.point_cloud_range());
   width_ = static_cast<int>(feature_param.width());
@@ -164,8 +164,7 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
 bool CNNSegmentation::GetConfigs(string& config_file,
                                  string& proto_file,
                                  string& weight_file) {
-  ConfigManager *config_manager = Singleton<ConfigManager>::Get();
-  CHECK_NOTNULL(config_manager);
+  ConfigManager *config_manager = ConfigManager::instance();
 
   const ModelConfig *model_config = nullptr;
   if (!config_manager->GetModelConfig("CNNSegmentation", &model_config)) {

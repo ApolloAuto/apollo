@@ -23,7 +23,6 @@
 
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/perception/lib/base/singleton.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/base/types.h"

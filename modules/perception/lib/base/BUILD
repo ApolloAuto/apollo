@@ -12,7 +12,6 @@ cc_library(
     hdrs = [
         "file_util.h",
         "registerer.h",
-        "singleton.h",
         "timer.h",
     ],
     linkopts = [
@@ -32,7 +31,6 @@ cc_test(
     srcs = [
         "file_util_test.cc",
         "registerer_test.cc",
-        "singleton_test.cc",
         "timer_test.cc",
     ],
     data = ["//modules/perception:perception_data"],
