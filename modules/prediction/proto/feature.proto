@@ -34,7 +34,7 @@ message LaneFeature {
 
 message Feature {
     // Obstacle ID
-    optional uint32 id = 1;
+    optional int32 id = 1;
 
     // Obstacle features
     optional apollo.common.Point3D position = 2;
