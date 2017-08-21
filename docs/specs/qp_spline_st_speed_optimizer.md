@@ -186,13 +186,17 @@ $$
 
 We need to limit speed boundary as well.
 
-Sample m points on st curve, and get speed limits upper bound and lower bound for each point $j$, e.g., $v_{ubj}$ and $v_{lbj}$ . The constraints is defined as 
+Sample m points on st curve, and get speed limits upper bound and lower bound for each point $j$, e.g., $v_{ub,j}$ and $v_{lb,j}$ . The constraints is defined as 
+$$
+f'(t_j) \geq v_{lb,j}
+$$
+namely
 $$
 \begin{vmatrix}  
-1 & t_0 & t_0^2 & t_0^3 & t_0^4&t_0^5 \\  
-1 & t_1 & t_1^2 & t_1^3 & t_1^4&t_1^5 \\ 
+0& 1 & t_0 & t_0^2 & t_0^3 & t_0^4 \\  
+0 & 1 & t_1 & t_1^2 & t_1^3 & t_1^4 \\ 
 ...&...&...&...&...&... \\ 
-1 & t_m & t_m^2 & t_m^3 & t_m^4&t_m^5 \\ 
+0& 1 & t_m & t_m^2 & t_m^3 & t_m^4 \\ 
 \end{vmatrix} 
 \cdot 
 \begin{vmatrix} 
@@ -203,11 +207,15 @@ a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i
 $$
 and 
 $$
+f'(t_j) \leq v_{ub,j}
+$$
+namely
+$$
 \begin{vmatrix} 
- 1 & t_0 & t_0^2 & t_0^3 & t_0^4&t_0^5 \\
-  1 & t_1 & t_1^2 & t_1^3 & t_1^4&t_1^5 \\
+ 0& 1 & t_0 & t_0^2 & t_0^3 & t_0^4 \\
+ 0 & 1 & t_1 & t_1^2 & t_1^3 & t_1^4 \\
  ...&...&...&...&...&... \\
- 1 & t_m & t_m^2 & t_m^3 & t_m^4&t_m^5 \\
+ 0 &1 & t_m & t_m^2 & t_m^3 & t_m^4 \\
  \end{vmatrix} \cdot \begin{vmatrix} a_i \\ b_i \\ c_i \\ d_i \\ e_i \\ f_i \end{vmatrix} 
  \leq
  \begin{vmatrix}
