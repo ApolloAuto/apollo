@@ -17,6 +17,24 @@ modules {
   }
 }
 modules {
+  name: "velodyne"
+  display_name: "Velodyne"
+  supported_commands {
+    name: "start"
+    command: "scripts/velodyne.sh"
+    command: "start"
+    stdout_file: "data/log/velodyne.stdout"
+    stderr_file: "data/log/velodyne.stderr"
+  }
+  supported_commands {
+    name: "stop"
+    command: "scripts/velodyne.sh"
+    command: "stop"
+    stdout_file: "data/log/velodyne.stdout"
+    stderr_file: "data/log/velodyne.stderr"
+  }
+}
+modules {
   name: "localization"
   display_name: "Localization"
   supported_commands {
