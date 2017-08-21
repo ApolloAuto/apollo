@@ -189,7 +189,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   std::vector<SpeedPoint> speed_profile;
   const auto* last_frame = FrameHistory::instance()->Latest();
   if (!last_frame) {
-    AERROR << "last frame is empty";
+    AWARN << "last frame is empty";
     return speed_profile;
   }
   const ReferenceLineInfo* last_reference_line_info = nullptr;
@@ -276,8 +276,7 @@ std::vector<common::SpeedPoint> EMPlanner::GenerateSpeedHotStart(
   // assume the time resolution is 0.1
   std::uint32_t num_time_steps =
       static_cast<std::uint32_t>(FLAGS_trajectory_time_length /
-                                 FLAGS_trajectory_time_resolution) +
-      1;
+                                 FLAGS_trajectory_time_resolution) + 1;
   speed_profile.reserve(num_time_steps);
 
   for (std::uint32_t i = 0; i < num_time_steps; ++i) {
