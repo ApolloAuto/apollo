@@ -130,9 +130,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
   heuristic_speed_data->set_speed_vector(speed_profile);
 
-  auto ptr_debug = frame->MutableADCTrajectory()->mutable_debug();
-  auto ptr_latency_stats =
-      frame->MutableADCTrajectory()->mutable_latency_stats();
+  auto ptr_debug = reference_line_info->mutable_debug();
+  auto ptr_latency_stats = reference_line_info->mutable_latency_stats();
   for (auto& optimizer : tasks_) {
     const double start_timestamp = Clock::NowInSecond();
     auto ret = optimizer->Execute(frame, reference_line_info);
@@ -162,24 +161,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   reference_line_info->SetTrajectory(trajectory);
-
   PopulateDecision(*reference_line_info, frame);
 
-  // Add debug information.
-  if (FLAGS_enable_record_debug && ptr_debug != nullptr) {
-    auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
-    reference_line->set_name("planning_reference_line");
-    const auto& reference_points =
-        reference_line_info->reference_line().reference_points();
-    for (const auto& reference_point : reference_points) {
-      auto* path_point = reference_line->add_path_point();
-      path_point->set_x(reference_point.x());
-      path_point->set_y(reference_point.y());
-      path_point->set_theta(reference_point.heading());
-      path_point->set_kappa(reference_point.kappa());
-      path_point->set_dkappa(reference_point.dkappa());
-    }
-  }
   return Status::OK();
 }
 
