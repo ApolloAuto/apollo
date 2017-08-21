@@ -57,6 +57,8 @@ class Obstacle {
 
   bool IsStatic() const;
 
+  bool IsVirtual() const;
+
   common::TrajectoryPoint GetPointAtTime(const double time) const;
   common::math::Box2d GetBoundingBox(
       const common::TrajectoryPoint &point) const;
@@ -84,10 +86,14 @@ class Obstacle {
   static bool IsStaticObstacle(
       const perception::PerceptionObstacle &perception_obstacle);
 
+  static bool IsVirtualObstacle(
+      const perception::PerceptionObstacle &perception_obstacle);
+
  private:
   std::string id_;
   std::int32_t perception_id_;
   bool is_static_;
+  bool is_virtual_;
   bool has_trajectory_ = false;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;

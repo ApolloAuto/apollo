@@ -140,8 +140,11 @@ DEFINE_double(stop_line_max_distance, 3.0,
               "max distance to the stop line to be considered as a valid stop");
 DEFINE_double(stop_line_min_distance, 0.0,
               "min distance (meters) to stop line for a valid stop");
+
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
+DEFINE_int32(virtual_obstacle_perception_id, -1,
+              "virtual obstacle perception id(a negative int)");
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_width, 3.7, "virtual stop wall width (meters)");

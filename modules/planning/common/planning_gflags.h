@@ -91,6 +91,7 @@ DECLARE_double(stop_line_max_distance);
 DECLARE_double(stop_line_min_distance);
 
 DECLARE_string(destination_obstacle_id);
+DECLARE_int32(virtual_obstacle_perception_id);
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_width);
 DECLARE_double(virtual_stop_wall_height);

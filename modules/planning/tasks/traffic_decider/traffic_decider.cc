@@ -64,8 +64,7 @@ PathObstacle *TrafficDecider::CreateDestinationObstacle() {
     destination_s = adc_front_s + FLAGS_destination_adjust_distance_buffer;
   }
 
-  const std::string id =
-      FLAGS_destination_obstacle_id + "_" + reference_line_info_->Id();
+  const std::string id = FLAGS_destination_obstacle_id;
   std::unique_ptr<Obstacle> obstacle_ptr =
       reference_line_info_->CreateVirtualObstacle(
           id, destination_s, FLAGS_virtual_stop_wall_length,
