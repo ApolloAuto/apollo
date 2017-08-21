@@ -65,6 +65,16 @@ class ReferenceLineInfo {
       const std::string& obstacle_id, const double route_s, const double length,
       const double width, const double height) const;
 
+  /**
+   * @brief check if current reference line is extending previous reference
+   *line.  The method is to check if the start point of current reference line
+   *is on previous reference line info.
+   * @return returns true if current reference line starts on previous reference
+   *line, otherwise false.
+   **/
+  bool IsExtendedFrom(
+      const ReferenceLineInfo& previous_reference_line_info) const;
+
   bool CombinePathAndSpeedProfile(const double time_resolution,
                                   const double relative_time);
 
