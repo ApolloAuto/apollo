@@ -145,7 +145,7 @@ const std::vector<ReferenceLineInfo> &Frame::reference_line_info() const {
   return reference_line_info_;
 }
 
-Obstacle *Frame::FindObstacle(const std::string &obstacle_id) {
+const Obstacle *Frame::FindObstacle(const std::string &obstacle_id) {
   return obstacles_.Find(obstacle_id);
 }
 
@@ -220,6 +220,8 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
 
 bool Frame::AddObstacle(std::unique_ptr<Obstacle> obstacle) {
   auto id(obstacle->Id());
+
+  std::lock_guard<std::mutex> lock(obstacles_mutex_);
   return obstacles_.Add(id, std::move(obstacle));
 }
 

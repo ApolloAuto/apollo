@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -48,6 +49,7 @@ class Frame {
  public:
   explicit Frame(const uint32_t sequence_num);
 
+  // functions called out of optimizers
   void SetRoutingResponse(const routing::RoutingResponse &routing);
   void SetPrediction(const prediction::PredictionObstacles &prediction);
   void SetPlanningStartPoint(const common::TrajectoryPoint &start_point);
@@ -67,7 +69,6 @@ class Frame {
   const ADCTrajectory &GetADCTrajectory() const;
   ADCTrajectory *MutableADCTrajectory();
 
-  void SetComputedTrajectory(const PublishableTrajectory &trajectory);
   const PublishableTrajectory &computed_trajectory() const;
   const localization::Pose &VehicleInitPose() const;
 
@@ -81,7 +82,7 @@ class Frame {
   const std::vector<ReferenceLineInfo> &reference_line_info() const;
 
   bool AddObstacle(std::unique_ptr<Obstacle> obstacle);
-  Obstacle *FindObstacle(const std::string &obstacle_id);
+  const Obstacle *FindObstacle(const std::string &obstacle_id);
 
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
   const ReferenceLineInfo *DriveReferenceLinfInfo() const;
@@ -120,7 +121,10 @@ class Frame {
 
   routing::RoutingResponse routing_response_;
   prediction::PredictionObstacles prediction_;
+
+  std::mutex obstacles_mutex_;
   IndexedObstacles obstacles_;
+
   uint32_t sequence_num_ = 0;
   localization::Pose init_pose_;
   static const hdmap::PncMap *pnc_map_;
