@@ -778,7 +778,6 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     double l = 0.0;
     map->GetProjection(point, current_lane, &s, &l);
 
-    // TODO(kechxu) clean the follow code
     apollo::common::math::Vec2d vec_point(point[0], point[1]);
     double distance = 0.0;
     apollo::common::PointENU nearest_point =
