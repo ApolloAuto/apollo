@@ -21,7 +21,7 @@
 //
 //         #include "lib/config_manager/config_manager.h"
 //
-//         ConfigManager* config_manager = Singleton<ConfigManager>::get();
+//         ConfigManager* config_manager = ConfigManager::instance();
 //
 //         string model_name = "FrameClassifier";
 //         const ModelConfig* model_config = NULL;
@@ -125,9 +125,7 @@
 #include <vector>
 
 #include "google/protobuf/message.h"
-
 #include "modules/common/macro.h"
-#include "modules/perception/lib/base/singleton.h"
 
 namespace apollo {
 namespace perception {
@@ -159,12 +157,9 @@ class ConfigManager {
   }
 
  private:
-  ConfigManager();
   ~ConfigManager();
 
   bool InitInternal();
-
-  friend class Singleton<ConfigManager>;
 
   typedef std::map<std::string, ModelConfig*> ModelConfigMap;
   typedef ModelConfigMap::iterator ModelConfigMapIterator;
@@ -176,7 +171,7 @@ class ConfigManager {
   bool inited_ = false;
   std::string work_root_;  // ConfigManager work root dir.
 
-  DISALLOW_COPY_AND_ASSIGN(ConfigManager);
+  DECLARE_SINGLETON(ConfigManager);
 };
 
 class ModelConfig {

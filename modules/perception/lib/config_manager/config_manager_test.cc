@@ -32,8 +32,7 @@ class ConfigManagerTest : public testing::Test {
   virtual void SetUp() {
     FLAGS_work_root = "modules/perception/data";
     FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
-    config_manager_ = Singleton<ConfigManager>::Get();
-    ASSERT_TRUE(config_manager_ != NULL);
+    config_manager_ = ConfigManager::instance();
   }
 
  protected:

@@ -205,11 +205,7 @@ void LidarProcess::RegistAllAlgorithm() {
 
 bool LidarProcess::InitFrameDependence() {
   /// init config manager
-  ConfigManager* config_manager = Singleton<ConfigManager>::Get();
-  if (!config_manager) {
-    AERROR << "failed to get ConfigManager instance.";
-    return false;
-  }
+  ConfigManager* config_manager = ConfigManager::instance();
   if (!config_manager->Init()) {
     AERROR << "failed to init ConfigManager";
     return false;

@@ -38,18 +38,11 @@ namespace perception {
 
 class HmObjectTrackerTest : public testing::Test {
  protected:
-  HmObjectTrackerTest() : config_manager_(NULL) {}
-  virtual ~HmObjectTrackerTest() {}
   void SetUp() {
     RegisterFactoryHmObjectTracker();
     FLAGS_work_root = "modules/perception";
     FLAGS_config_manager_path = "conf/config_manager.config";
-    config_manager_ = Singleton<ConfigManager>::Get();
-    if (config_manager_ == NULL) {
-      AERROR << "failed to get ConfigManager instance.";
-      return;
-    }
-    if (!config_manager_->Init()) {
+    if (!ConfigManager::instance()->Init()) {
       AERROR << "failed to init ConfigManager";
       return;
     }
@@ -68,7 +61,6 @@ class HmObjectTrackerTest : public testing::Test {
   }
 
  protected:
-  ConfigManager* config_manager_;
   HmObjectTracker* hm_tracker_;
   MinBoxObjectBuilder* object_builder_;
   ObjectBuilderOptions object_builder_options_;
