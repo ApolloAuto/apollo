@@ -295,7 +295,9 @@ Navigator::Navigator(const std::string& topo_file_path) : _is_ready(false) {
 
 Navigator::~Navigator() {}
 
-bool Navigator::is_ready() const { return _is_ready; }
+bool Navigator::is_ready() const {
+  return _is_ready;
+}
 
 bool Navigator::search_route(
     const ::apollo::routing::RoutingRequest& request,
@@ -345,8 +347,7 @@ bool Navigator::generate_passage_region(
     const std::unordered_set<const TopoNode*>& black_list,
     NodeRangeManager* const range_manager,
     ::apollo::routing::RoutingResponse* result) const {
-  result->mutable_header()->set_timestamp_sec(
-      apollo::common::time::ToSecond(Clock::Now()));
+  result->mutable_header()->set_timestamp_sec(Clock::NowInSecond());
   result->mutable_header()->set_module_name(FLAGS_node_name);
   result->mutable_header()->set_sequence_num(1);
 

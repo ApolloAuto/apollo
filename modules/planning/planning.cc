@@ -189,7 +189,7 @@ void Planning::RunOnce() {
     return;
   }
 
-  const double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  const double start_timestamp = Clock::NowInSecond();
 
   // localization
   const auto& localization =
@@ -222,7 +222,7 @@ void Planning::RunOnce() {
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
   status = Plan(is_auto_mode, start_timestamp, planning_cycle_time);
 
-  const double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
+  const double end_timestamp = Clock::NowInSecond();
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   auto trajectory_pb = frame_->MutableADCTrajectory();
   trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);

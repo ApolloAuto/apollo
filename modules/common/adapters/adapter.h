@@ -242,8 +242,7 @@ class Adapter {
     static_assert(std::is_base_of<google::protobuf::Message, D>::value,
                   "Can only fill header to proto messages!");
     auto* header = data->mutable_header();
-    double timestamp =
-        apollo::common::time::ToSecond(apollo::common::time::Clock::Now());
+    double timestamp = apollo::common::time::Clock::NowInSecond();
     header->set_module_name(module_name);
     header->set_timestamp_sec(timestamp);
     header->set_sequence_num(++seq_num_);
@@ -253,11 +252,11 @@ class Adapter {
     return seq_num_;
   }
 
-  void SetLatestPublished(const D &data) {
+  void SetLatestPublished(const D& data) {
     latest_published_data_.reset(new D(data));
   }
 
-  D *GetLatestPublished() {
+  D* GetLatestPublished() {
     return latest_published_data_.get();
   }
 

@@ -85,9 +85,9 @@ Status ControllerAgent::ComputeControlCommand(
     ::apollo::control::ControlCommand *cmd) {
   for (auto &controller : controller_list_) {
     ADEBUG << "controller:" << controller->Name() << " processing ...";
-    double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
+    double start_timestamp = Clock::NowInSecond();
     controller->ComputeControlCommand(localization, chassis, trajectory, cmd);
-    double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
+    double end_timestamp = Clock::NowInSecond();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     AINFO << "controller: " << controller->Name()

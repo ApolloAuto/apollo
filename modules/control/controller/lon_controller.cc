@@ -334,7 +334,7 @@ void LonController::ComputeLongitudinalErrors(
       VehicleState::instance()->linear_velocity(), matched_point, &s_matched,
       &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = apollo::common::time::ToSecond(Clock::Now());
+  double current_control_time = Clock::NowInSecond();
   double preview_control_time = current_control_time + preview_time;
 
   TrajectoryPoint reference_point =
