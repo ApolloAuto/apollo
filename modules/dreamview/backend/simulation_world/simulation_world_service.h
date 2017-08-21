@@ -95,7 +95,9 @@ class SimulationWorldService {
    * @return True if the object is ready to push.
    */
   bool ReadyToPush() const {
-    return world_.has_auto_driving_car();
+    return world_.has_auto_driving_car() &&
+           world_.auto_driving_car().has_position_x() &&
+           world_.auto_driving_car().has_position_y();
   }
 
  private:
