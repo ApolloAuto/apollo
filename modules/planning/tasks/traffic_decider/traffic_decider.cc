@@ -26,12 +26,34 @@
 
 namespace apollo {
 namespace planning {
-using apollo::common::Status;
+using ::apollo::common::Status;
+using ::apollo::common::VehicleState;
+using ::apollo::common::VehicleConfigHelper;
 
 TrafficDecider::TrafficDecider(const std::string &name) : Task(name) {}
 
-PathObstacle *TrafficDecider::CreateDestinationObstacle() {
+const PathObstacle *TrafficDecider::CreateDestinationPathObstacle() {
   // set destination point
+
+  const auto *destination_obstacle =
+      frame_->FindObstacle(FLAGS_destination_obstacle_id);
+  if (!destination_obstacle) {
+    destination_obstacle = CreateDestinationObstacle();
+    ADEBUG << "Created destination obstacle";
+  }
+  if (!destination_obstacle) {
+    return nullptr;
+  } else {
+    const auto *ptr = reference_line_info_->AddObstacle(destination_obstacle);
+    if (!ptr) {
+      AERROR << "Failed to add destination obstacle's projection";
+      return nullptr;
+    }
+    return ptr;
+  }
+}
+
+const Obstacle *TrafficDecider::CreateDestinationObstacle() {
   const auto &routing_response = frame_->routing_response();
   if (!routing_response.routing_request().has_end()) {
     ADEBUG << "routing_request has no end";
@@ -54,36 +76,31 @@ PathObstacle *TrafficDecider::CreateDestinationObstacle() {
 
   // adjust destination based on adc_front_s
   common::SLPoint adc_sl;
-  auto &adc_position = common::VehicleState::instance()->pose().position();
+  auto &adc_position = VehicleState::instance()->pose().position();
   reference_line.get_point_in_frenet_frame({adc_position.x(), adc_position.y()},
                                            &adc_sl);
   const auto &vehicle_param =
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   double adc_front_s = adc_sl.s() + vehicle_param.front_edge_to_center();
   if (destination_sl.s() <= adc_front_s) {
     destination_s = adc_front_s + FLAGS_destination_adjust_distance_buffer;
   }
 
-  const std::string id = FLAGS_destination_obstacle_id;
   std::unique_ptr<Obstacle> obstacle_ptr =
       reference_line_info_->CreateVirtualObstacle(
-          id, destination_s, FLAGS_virtual_stop_wall_length,
-          FLAGS_virtual_stop_wall_width, FLAGS_virtual_stop_wall_height);
+          FLAGS_destination_obstacle_id, destination_s,
+          FLAGS_virtual_stop_wall_length, FLAGS_virtual_stop_wall_width,
+          FLAGS_virtual_stop_wall_height);
   const auto *obstacle = obstacle_ptr.get();
   if (!frame_->AddObstacle(std::move(obstacle_ptr))) {
-    AERROR << "Failed to add destination obstacle: " << id;
+    AERROR << "Failed to add destination obstacle";
     return nullptr;
   }
-  auto *ptr = reference_line_info_->AddObstacle(obstacle);
-  if (!ptr) {
-    AERROR << "Failed to add destination obstacle: " << id << "'s projection";
-    return nullptr;
-  }
-  return ptr;
+  return obstacle;
 }
 
-apollo::common::Status TrafficDecider::Execute(
-    Frame *frame, ReferenceLineInfo *reference_line_info) {
+Status TrafficDecider::Execute(Frame *frame,
+                               ReferenceLineInfo *reference_line_info) {
   Task::Execute(frame, reference_line_info);
 
   // 1. add destination stop
@@ -96,12 +113,12 @@ apollo::common::Status TrafficDecider::Execute(
 }
 
 bool TrafficDecider::MakeDestinationStopDecision() {
-  auto *path_obstacle = CreateDestinationObstacle();
+  const auto *path_obstacle = CreateDestinationPathObstacle();
   if (!path_obstacle) {
     AINFO << "The path obstacle is not found";
     return false;
   }
-  const auto &obstacle = path_obstacle->Obstacle();
+  const auto *obstacle = path_obstacle->Obstacle();
   const auto &reference_line = reference_line_info_->reference_line();
 
   // check stop_posision on reference line
@@ -115,11 +132,11 @@ bool TrafficDecider::MakeDestinationStopDecision() {
 
   // check stop_line_s vs adc_s. stop_line_s must be ahead of adc_front_s
   common::SLPoint adc_sl;
-  auto &adc_position = common::VehicleState::instance()->pose().position();
+  auto &adc_position = VehicleState::instance()->pose().position();
   reference_line.get_point_in_frenet_frame({adc_position.x(), adc_position.y()},
                                            &adc_sl);
   const auto &vehicle_param =
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   double adc_front_s = adc_sl.s() + vehicle_param.front_edge_to_center();
   if (stop_line_sl.s() <= adc_front_s) {
     ADEBUG << "skip: object:" << obstacle->Id() << " fence route_s["
