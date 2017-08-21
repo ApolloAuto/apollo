@@ -26,16 +26,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include "modules/routing/proto/routing.pb.h"
+
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace hdmap {
-
-class Path;
-class MapPathPoint;
-class LaneSegment;
 
 class PncMap {
  public:
