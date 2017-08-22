@@ -34,6 +34,8 @@
 namespace apollo {
 namespace hdmap {
 
+using LaneSegments = std::vector<::apollo::hdmap::LaneSegment>;
+
 class PncMap {
  public:
   PncMap() = default;
@@ -42,27 +44,32 @@ class PncMap {
 
   const hdmap::HDMap *HDMap() const;
 
+  /**
+   * @brief Warning: this function only works if there is no change lane in
+   *routing.
+   **/
   bool CreatePathFromRouting(const ::apollo::routing::RoutingResponse &routing,
-                             const common::PointENU &point,
-                             const double backward_length,
-                             const double forward_length,
-                             hdmap::Path *path) const;
+                             Path *const path) const;
 
-  bool CreatePathFromRouting(const ::apollo::routing::RoutingResponse &routing,
-                             hdmap::Path *path) const;
+  bool GetLaneSegmentsFromRouting(
+      const ::apollo::routing::RoutingResponse &routing,
+      const common::PointENU &point, const double backward_length,
+      const double forward_length,
+      std::vector<LaneSegments> *const route_segments) const;
 
-  bool CreatePathFromRouting(const ::apollo::routing::RoutingResponse &routing,
-                             double start_s, double end_s,
-                             hdmap::Path *path) const;
+  static void CreatePathFromLaneSegments(const LaneSegments &segments,
+                                         Path *const path);
+
+ private:
+  bool TruncateLaneSegments(const LaneSegments &segments, double start_s,
+                            double end_s,
+                            LaneSegments *const truncated_segments) const;
 
   bool validate_routing(
       const ::apollo::routing::RoutingResponse &routing) const;
-
- private:
-  void append_lane_to_points(
+  static void append_lane_to_points(
       hdmap::LaneInfoConstPtr lane, const double start_s, const double end_s,
-      std::vector<hdmap::MapPathPoint> *const points,
-      std::vector<hdmap::LaneSegment> *const lane_segments) const;
+      std::vector<hdmap::MapPathPoint> *const points);
   hdmap::HDMap hdmap_;
 };
 

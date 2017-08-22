@@ -24,6 +24,8 @@
 #include <string>
 #include <utility>
 
+#include "modules/routing/proto/routing.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
@@ -76,7 +78,7 @@ void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
 
 void Frame::CreatePredictionObstacles(
     const prediction::PredictionObstacles &prediction) {
-  std::list<std::unique_ptr<Obstacle> > obstacles;
+  std::list<std::unique_ptr<Obstacle>> obstacles;
   Obstacle::CreateObstacles(prediction, &obstacles);
   for (auto &ptr : obstacles) {
     auto id(ptr->Id());
@@ -154,19 +156,24 @@ bool Frame::CreateReferenceLineFromRouting(
     std::vector<ReferenceLine> *reference_lines) {
   CHECK_NOTNULL(reference_lines);
 
-  hdmap::Path hdmap_path;
-  if (!pnc_map_->CreatePathFromRouting(
+  std::vector<std::vector<hdmap::LaneSegment>> route_segments;
+  if (!pnc_map_->GetLaneSegmentsFromRouting(
           routing, position, FLAGS_look_backward_distance,
-          FLAGS_look_forward_distance, &hdmap_path)) {
-    AERROR << "Failed to get path from routing";
+          FLAGS_look_forward_distance, &route_segments)) {
+    AERROR << "Failed to extract segments from routing";
     return false;
   }
-  reference_lines->emplace_back(ReferenceLine());
-  ReferenceLineSmoother smoother;
-  smoother.Init(smoother_config_);
-  if (!smoother.smooth(ReferenceLine(hdmap_path), &reference_lines->back())) {
-    AERROR << "Failed to smooth reference line";
-    return false;
+
+  for (const auto &segments : route_segments) {
+    hdmap::Path hdmap_path;
+    pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
+    reference_lines->emplace_back(ReferenceLine());
+    ReferenceLineSmoother smoother;
+    smoother.Init(smoother_config_);
+    if (!smoother.smooth(ReferenceLine(hdmap_path), &reference_lines->back())) {
+      AERROR << "Failed to smooth reference line";
+      return false;
+    }
   }
   return true;
 }
