@@ -99,6 +99,7 @@ class LaneInfo {
   const std::vector<apollo::common::math::Vec2d> &unit_directions() const {
     return _unit_directions;
   }
+  double heading(const double s) const;
   const std::vector<double> &headings() const { return _headings; }
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
     return _segments;

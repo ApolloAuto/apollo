@@ -39,7 +39,7 @@ void remove_duplicates(std::vector<apollo::common::math::Vec2d> *points) {
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
   for (size_t i = 0; i < points->size(); ++i) {
     if (count == 0 ||
-      (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
+        (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
       (*points)[count++] = (*points)[i];
     }
   }
@@ -155,6 +155,20 @@ void LaneInfo::get_width(const double s, double *left_width,
   }
   if (right_width != nullptr) {
     *right_width = get_width_from_sample(_sampled_right_width, s);
+  }
+}
+
+double LaneInfo::heading(const double s) const {
+  CHECK_GE(s, _accumulated_s.front()) << "s should be >= "
+                                      << _accumulated_s.front();
+  CHECK_LE(s, _accumulated_s.back()) << "s should be <= "
+                                     << _accumulated_s.back();
+  auto iter = std::lower_bound(_accumulated_s.begin(), _accumulated_s.end(), s);
+  int index = std::distance(_accumulated_s.begin(), iter);
+  if (index == 0 || *iter - s <= common::math::kMathEpsilon) {
+    return _headings[index];
+  } else {
+    return _headings[index - 1];
   }
 }
 
@@ -333,8 +347,8 @@ void LaneInfo::post_process(const HDMapImpl &map_instance) {
 
 void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
   for (const auto &overlap_id : _overlap_ids) {
-    const auto &overlap_ptr = map_instance.get_overlap_by_id(
-        apollo::hdmap::MakeMapId(overlap_id));
+    const auto &overlap_ptr =
+        map_instance.get_overlap_by_id(apollo::hdmap::MakeMapId(overlap_id));
     if (overlap_ptr == nullptr) {
       continue;
     }
@@ -436,7 +450,7 @@ StopSignInfo::StopSignInfo(const apollo::hdmap::StopSign &stop_sign)
 
 void StopSignInfo::init() {
   for (const auto &stop_line : _stop_sign.stop_line()) {
-      segments_from_curve(stop_line, &_segments);
+    segments_from_curve(stop_line, &_segments);
   }
   CHECK(!_segments.empty());
 }
@@ -448,7 +462,7 @@ YieldSignInfo::YieldSignInfo(const apollo::hdmap::YieldSign &yield_sign)
 
 void YieldSignInfo::init() {
   for (const auto &stop_line : _yield_sign.stop_line()) {
-      segments_from_curve(stop_line, &_segments);
+    segments_from_curve(stop_line, &_segments);
   }
   // segments_from_curve(_yield_sign.stop_line(), &_segments);
   CHECK(!_segments.empty());
