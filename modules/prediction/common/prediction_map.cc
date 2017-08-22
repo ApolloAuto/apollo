@@ -50,29 +50,30 @@ Eigen::Vector2d PredictionMap::PositionOnLane(
 double PredictionMap::HeadingOnLane(
     std::shared_ptr<const LaneInfo> lane_info,
     const double s) {
-  const std::vector<double>& headings = lane_info->headings();
-  const std::vector<double>& accumulated_s = lane_info->accumulate_s();
-  CHECK(headings.size() == accumulated_s.size());
-  size_t size = headings.size();
+  // const std::vector<double>& headings = lane_info->headings();
+  // const std::vector<double>& accumulated_s = lane_info->accumulate_s();
+  // CHECK(headings.size() == accumulated_s.size());
+  // size_t size = headings.size();
 
-  if (size == 0) {
-    return 0.0;
-  }
+  // if (size == 0) {
+  //   return 0.0;
+  // }
 
-  if (size == 1) {
-    return headings[0];
-  }
+  // if (size == 1) {
+  //   return headings[0];
+  // }
 
-  const auto low_itr =
-      std::lower_bound(accumulated_s.begin(), accumulated_s.end(), s);
-  size_t index = low_itr - accumulated_s.begin();
-  if (index >= size - 1) {
-    return headings.back();
-  } else {
-    return apollo::common::math::slerp(headings[index], accumulated_s[index],
-                                       headings[index + 1],
-                                       accumulated_s[index + 1], s);
-  }
+  // const auto low_itr =
+  //     std::lower_bound(accumulated_s.begin(), accumulated_s.end(), s);
+  // size_t index = low_itr - accumulated_s.begin();
+  // if (index >= size - 1) {
+  //   return headings.back();
+  // } else {
+  //   return apollo::common::math::slerp(headings[index], accumulated_s[index],
+  //                                      headings[index + 1],
+  //                                      accumulated_s[index + 1], s);
+  // }
+  return lane_info->heading(s);
 }
 
 double PredictionMap::LaneTotalWidth(
