@@ -635,14 +635,14 @@ void SimulationWorldService::UpdateSimulationWorld(
 
 void SimulationWorldService::ReadRoutingFromFile(
     const std::string &routing_response_file) {
-  RoutingResponse routing;
-  if (!GetProtoFromFile(routing_response_file, &routing)) {
+  RoutingResponse routing_response;
+  if (!GetProtoFromFile(routing_response_file, &routing_response)) {
     AWARN << "Unable to read routing response from file: "
           << routing_response_file;
     return;
   }
   AINFO << "Loaded routing from " << routing_response_file;
-  UpdateSimulationWorld(routing);
+  AdapterManager::PublishRoutingResponse(routing_response);
 }
 
 void SimulationWorldService::RegisterMessageCallbacks() {
