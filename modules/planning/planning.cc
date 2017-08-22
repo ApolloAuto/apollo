@@ -290,8 +290,8 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
   auto* ptr_debug = frame_->MutableADCTrajectory()->mutable_debug();
   auto* ptr_latency_stats =
       frame_->MutableADCTrajectory()->mutable_latency_stats();
-  ptr_debug->CopyFrom(best_reference_line->debug());
-  ptr_latency_stats->CopyFrom(best_reference_line->latency_stats());
+  ptr_debug->MergeFrom(best_reference_line->debug());
+  ptr_latency_stats->MergeFrom(best_reference_line->latency_stats());
 
   // Add debug information.
   if (FLAGS_enable_record_debug) {
