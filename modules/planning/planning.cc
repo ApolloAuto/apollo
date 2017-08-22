@@ -48,16 +48,12 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
 }
 
-const Frame* Planning::GetFrame() const { return frame_.get(); }
-const hdmap::PncMap* Planning::GetPncMap() const { return pnc_map_.get(); }
-
 bool Planning::InitFrame(const uint32_t sequence_num) {
   frame_.reset(new Frame(sequence_num));
   if (AdapterManager::GetRoutingResponse()->Empty()) {
     AERROR << "Routing is empty";
     return false;
   }
-  common::TrajectoryPoint point;
   frame_->SetVehicleInitPose(VehicleState::instance()->pose());
   frame_->SetRoutingResponse(
       AdapterManager::GetRoutingResponse()->GetLatestObserved());
@@ -75,8 +71,6 @@ bool Planning::InitFrame(const uint32_t sequence_num) {
   frame_->RecordInputDebug();
   return true;
 }
-
-void Planning::SetConfig(const PlanningConfig& config) { config_ = config; }
 
 Status Planning::Init() {
   pnc_map_.reset(new hdmap::PncMap(apollo::hdmap::BaseMapFile()));
@@ -109,7 +103,8 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  if (AdapterManager::GetPrediction() == nullptr) {
+  if (FLAGS_enable_prediction &&
+      AdapterManager::GetPrediction() == nullptr) {
     std::string error_msg("Prediction is not registered");
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
