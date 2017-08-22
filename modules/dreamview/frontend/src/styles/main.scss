@@ -341,10 +341,10 @@ body {
                                 rgba(4, 36, 65, 0.8) 50%,
                                 rgba(4, 36, 65, 0));
 
-    min-height: 650px;
+    min-height: 300px;
     
     @include small-screen {
-        min-height: 450px;
+        min-height: 200px;
     }
     
     .label-text {
