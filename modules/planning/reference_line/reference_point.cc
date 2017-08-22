@@ -29,6 +29,10 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
+namespace {
+// Minimum distance to remove duplicated points.
+const double kDuplicatedPointsEpsilon = 1e-7;
+}
 
 ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
                                const double kappa, const double dkappa,
@@ -55,6 +59,21 @@ const std::string ReferencePoint::DebugString() const {
          kappa(), ", " "dkappa: ", dkappa(), ", " "upper_bound: ",
          upper_bound(), ", " "lower_bound: ", lower_bound(), "}");
   // clang-format on
+}
+
+void ReferencePoint::remove_duplicates(std::vector<ReferencePoint>* points) {
+  CHECK_NOTNULL(points);
+  int count = 0;
+  const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
+  for (size_t i = 0; i < points->size(); ++i) {
+    if (count == 0 ||
+        (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
+      (*points)[count++] = (*points)[i];
+    } else {
+      (*points)[count - 1].add_lane_waypoints((*points)[i].lane_waypoints());
+    }
+  }
+  points->resize(count);
 }
 
 }  // namespace planning

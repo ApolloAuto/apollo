@@ -465,6 +465,7 @@ void PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
     append_lane_to_points(segment.lane, segment.start_s, segment.end_s,
                           &points);
   }
+  remove_duplicates(&points);
   *path = hdmap::Path(points, segments, kTrajectoryApproximationMaxError);
 }
 

@@ -87,7 +87,8 @@ bool ReferenceLineSmoother::smooth(
       (end_t - start_t) / (smoother_config_.num_of_total_points() - 1);
   double t = start_t;
   for (std::uint32_t i = 0;
-       i < smoother_config_.num_of_total_points() && t < end_t; ++i) {
+       i < smoother_config_.num_of_total_points() && t < end_t;
+       ++i, t += resolution) {
     std::pair<double, double> xy = spline_solver_->spline()(t);
     const double heading = std::atan2(spline_solver_->spline().derivative_y(t),
                                       spline_solver_->spline().DerivativeX(t));
@@ -108,20 +109,13 @@ bool ReferenceLineSmoother::smooth(
       AERROR << "Get corresponding s failed!";
       return false;
     }
-
-    common::SLPoint ref_sl_point;
-    if (!raw_reference_line.xy_to_sl({xy.first, xy.second}, &ref_sl_point)) {
-      AERROR << "get sl point failed!" << std::endl;
-      return false;
-    }
-    ReferencePoint rlp =
-        raw_reference_line.get_reference_point(ref_sl_point.s());
+    ReferencePoint rlp = raw_reference_line.get_reference_point(s);
     ref_points.emplace_back(ReferencePoint(
         hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
                             rlp.lane_waypoints()),
         kappa, dkappa, 0.0, 0.0));
-    t = start_t + (i + 1) * resolution;
   }
+  ReferencePoint::remove_duplicates(&ref_points);
   *smoothed_reference_line = ReferenceLine(ref_points);
   return true;
 }
