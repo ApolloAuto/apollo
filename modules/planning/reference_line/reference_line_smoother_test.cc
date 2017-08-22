@@ -73,7 +73,7 @@ TEST_F(ReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_FLOAT_EQ(153.87421, reference_line_->length());
   EXPECT_TRUE(smoother_.smooth(*reference_line_, &smoothed_reference_line));
-  EXPECT_FLOAT_EQ(154.16287, smoothed_reference_line.length());
+  EXPECT_FLOAT_EQ(153.54385, smoothed_reference_line.length());
 }
 
 }  // namespace planning

@@ -104,12 +104,18 @@ bool ReferenceLineSmoother::smooth(
         spline_solver_->spline().derivative_y(t),
         spline_solver_->spline().second_derivative_y(t),
         spline_solver_->spline().third_derivative_y(t));
-    double s = 0.0;
-    if (!get_s_from_param_t(t, &s)) {
-      AERROR << "Get corresponding s failed!";
+
+    common::SLPoint ref_sl_point;
+    if (!raw_reference_line.xy_to_sl({xy.first, xy.second}, &ref_sl_point)) {
       return false;
     }
-    ReferencePoint rlp = raw_reference_line.get_reference_point(s);
+    if (ref_sl_point.s() < 0 ||
+        ref_sl_point.s() > raw_reference_line.length()) {
+      continue;
+    }
+
+    ReferencePoint rlp =
+        raw_reference_line.get_reference_point(ref_sl_point.s());
     ref_points.emplace_back(ReferencePoint(
         hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
                             rlp.lane_waypoints()),
