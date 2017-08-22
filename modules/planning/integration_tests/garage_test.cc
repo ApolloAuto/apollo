@@ -40,7 +40,7 @@ DECLARE_string(test_chassis_file);
 class GarageTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
-    FLAGS_map_dir = "modules/planning/testdata";
+    FLAGS_map_dir = "modules/planning/testdata/garage_map";
     FLAGS_base_map_filename = "base_map.txt";
     FLAGS_test_data_dir = "modules/planning/testdata/garage_test";
   }

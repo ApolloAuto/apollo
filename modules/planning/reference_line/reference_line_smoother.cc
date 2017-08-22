@@ -86,10 +86,11 @@ bool ReferenceLineSmoother::smooth(
   const double resolution =
       (end_t - start_t) / (smoother_config_.num_of_total_points() - 1);
   double t = start_t;
+  const auto& spline = spline_solver_->spline();
   for (std::uint32_t i = 0;
        i < smoother_config_.num_of_total_points() && t < end_t;
        ++i, t += resolution) {
-    std::pair<double, double> xy = spline_solver_->spline()(t);
+    std::pair<double, double> xy = spline(t);
     const double heading = std::atan2(spline_solver_->spline().derivative_y(t),
                                       spline_solver_->spline().DerivativeX(t));
     const double kappa = CurveMath::ComputeCurvature(

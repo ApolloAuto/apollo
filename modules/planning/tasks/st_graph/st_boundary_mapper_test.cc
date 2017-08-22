@@ -72,7 +72,8 @@ class StBoundaryMapperTest : public ::testing::Test {
   }
 
  protected:
-  const std::string map_file = "modules/planning/testdata/base_map.txt";
+  const std::string map_file =
+      "modules/planning/testdata/garage_map/base_map.txt";
   hdmap::HDMap hdmap_;
   ReferenceLineSmoother smoother_;
   common::math::Vec2d vehicle_position_;
