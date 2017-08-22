@@ -60,7 +60,8 @@ class ReferenceLineSmootherTest : public ::testing::Test {
     vehicle_position_ = points[0];
   }
 
-  const std::string map_file = "modules/planning/testdata/base_map.txt";
+  const std::string map_file =
+      "modules/planning/testdata/garage_map/base_map.txt";
 
   hdmap::HDMap hdmap_;
   ReferenceLineSmoother smoother_;
