@@ -108,6 +108,13 @@ inline Eigen::Vector3d QuaternionRotate(const Quaternion &orientation,
   return quaternion.toRotationMatrix() * original;
 }
 
+inline Eigen::Vector3d InverseQuaternionRotate(const Quaternion &orientation,
+                                               const Eigen::Vector3d &rotated) {
+  Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
+                                       orientation.qy(), orientation.qz());
+  return quaternion.toRotationMatrix().inverse() * rotated;
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
