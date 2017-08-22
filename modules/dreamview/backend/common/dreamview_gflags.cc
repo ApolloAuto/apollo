@@ -31,7 +31,7 @@ DEFINE_bool(
 DEFINE_bool(routing_from_file, false,
             "Whether Dreamview reads initial routing response from file.");
 
-DEFINE_string(routing_response_file, "modules/map/data/garage_routing.pb.txt",
+DEFINE_string(routing_response_file, "modules/map/data/demo/garage_routing.pb.txt",
               "File path of the routing response that SimControl will read the "
               "start point from. If this is absent, SimControl will directly "
               "take the RoutingResponse from ROS to determine the start "
