@@ -50,15 +50,9 @@ class GarageTest : public PlanningTestBase {
  * test stop for not-nudgable obstacle
  */
 TEST_F(GarageTest, stop_obstacle) {
-  FLAGS_test_prediction_file =
-      "modules/planning/testdata/garage_test/"
-      "stop_obstacle_prediction.pb.txt";
-  FLAGS_test_localization_file =
-      "modules/planning/testdata/garage_test/"
-      "stop_obstacle_localization.pb.txt";
-  FLAGS_test_chassis_file =
-      "modules/planning/testdata/garage_test/"
-      "stop_obstacle_chassis.pb.txt";
+  FLAGS_test_prediction_file = "stop_obstacle_prediction.pb.txt";
+  FLAGS_test_localization_file = "stop_obstacle_localization.pb.txt";
+  FLAGS_test_chassis_file = "stop_obstacle_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
@@ -67,12 +61,9 @@ TEST_F(GarageTest, stop_obstacle) {
  * test follow head_vehicle
  */
 TEST_F(GarageTest, follow) {
-  FLAGS_test_prediction_file =
-      "modules/planning/testdata/garage_test/follow_prediction.pb.txt";
-  FLAGS_test_localization_file =
-      "modules/planning/testdata/garage_test/follow_localization.pb.txt";
-  FLAGS_test_chassis_file =
-      "modules/planning/testdata/garage_test/follow_chassis.pb.txt";
+  FLAGS_test_prediction_file = "follow_prediction.pb.txt";
+  FLAGS_test_localization_file = "follow_localization.pb.txt";
+  FLAGS_test_chassis_file = "follow_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }
@@ -81,12 +72,9 @@ TEST_F(GarageTest, follow) {
  * test stop for destination
  */
 TEST_F(GarageTest, stop_dest) {
-  FLAGS_test_prediction_file =
-      "modules/planning/testdata/garage_test/stop_dest_prediction.pb.txt";
-  FLAGS_test_localization_file =
-      "modules/planning/testdata/garage_test/stop_dest_localization.pb.txt";
-  FLAGS_test_chassis_file =
-      "modules/planning/testdata/garage_test/stop_dest_chassis.pb.txt";
+  FLAGS_test_prediction_file = "stop_dest_prediction.pb.txt";
+  FLAGS_test_localization_file = "stop_dest_localization.pb.txt";
+  FLAGS_test_chassis_file = "stop_dest_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST;
 }

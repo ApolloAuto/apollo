@@ -27,15 +27,11 @@ using common::adapter::AdapterManager;
 DEFINE_string(test_data_dir, "", "the test data folder");
 DEFINE_bool(test_update_golden_log, false,
             "true to update decision golden log file.");
-DEFINE_string(test_routing_response_file,
-              "modules/planning/testdata/garage_test/garage_routing.pb.txt",
+DEFINE_string(test_routing_response_file, "garage_routing.pb.txt",
               "The routing file used in test");
-DEFINE_string(
-    test_localization_file,
-    "modules/planning/testdata/garage_test/garage_localization.pb.txt",
-    "The localization test file");
-DEFINE_string(test_chassis_file,
-              "modules/planning/testdata/garage_test/garage_chassis.pb.txt",
+DEFINE_string(test_localization_file, "garage_localization.pb.txt",
+              "The localization test file");
+DEFINE_string(test_chassis_file, "garage_chassis.pb.txt",
               "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 
@@ -45,12 +41,9 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_adapter_config_path = "modules/planning/testdata/conf/adapter.conf";
   FLAGS_map_dir = "modules/planning/testdata";
   FLAGS_base_map_filename = "base_map.txt";
-  FLAGS_test_localization_file =
-      "modules/planning/testdata/garage_localization.pb.txt";
-  FLAGS_test_chassis_file =
-      "modules/planning/testdata/garage_test/garage_chassis.pb.txt";
-  FLAGS_test_prediction_file =
-      "modules/planning/testdata/garage_prediction.pb.txt";
+  FLAGS_test_localization_file = "garage_localization.pb.txt";
+  FLAGS_test_chassis_file = "garage_chassis.pb.txt";
+  FLAGS_test_prediction_file = "garage_prediction.pb.txt";
 }
 
 bool PlanningTestBase::SetUpAdapters() {
@@ -63,29 +56,33 @@ bool PlanningTestBase::SetUpAdapters() {
            << FLAGS_adapter_config_path;
     return false;
   }
-  if (!AdapterManager::FeedRoutingResponseFile(
-          FLAGS_test_routing_response_file)) {
-    AERROR << "failed to routing file: " << FLAGS_test_routing_response_file;
+  auto routing_response_file =
+      FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file;
+  if (!AdapterManager::FeedRoutingResponseFile(routing_response_file)) {
+    AERROR << "failed to routing file: " << routing_response_file;
     return false;
   }
-  AINFO << "Using Routing " << FLAGS_test_routing_response_file;
-  if (!AdapterManager::FeedLocalizationFile(FLAGS_test_localization_file)) {
-    AERROR << "Failed to load localization file: "
-           << FLAGS_test_localization_file;
+  AINFO << "Using Routing " << routing_response_file;
+  auto localization_file =
+      FLAGS_test_data_dir + "/" + FLAGS_test_localization_file;
+  if (!AdapterManager::FeedLocalizationFile(localization_file)) {
+    AERROR << "Failed to load localization file: " << localization_file;
     return false;
   }
-  AINFO << "Using Localization file: " << FLAGS_test_localization_file;
-  if (!AdapterManager::FeedChassisFile(FLAGS_test_chassis_file)) {
-    AERROR << "Failed to load chassis file: " << FLAGS_test_chassis_file;
+  AINFO << "Using Localization file: " << localization_file;
+  auto chassis_file = FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file;
+  if (!AdapterManager::FeedChassisFile(chassis_file)) {
+    AERROR << "Failed to load chassis file: " << chassis_file;
     return false;
   }
-  AINFO << "Using Chassis file: " << FLAGS_test_chassis_file;
+  AINFO << "Using Chassis file: " << chassis_file;
+  auto prediction_file = FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
   if (!FLAGS_test_prediction_file.empty() &&
-      !AdapterManager::FeedPredictionFile(FLAGS_test_prediction_file)) {
-    AERROR << "Failed to load prediction file: " << FLAGS_test_prediction_file;
+      !AdapterManager::FeedPredictionFile(prediction_file)) {
+    AERROR << "Failed to load prediction file: " << prediction_file;
     return false;
   }
-  AINFO << "Using Prediction file: " << FLAGS_test_prediction_file;
+  AINFO << "Using Prediction file: " << prediction_file;
   return true;
 }
 
