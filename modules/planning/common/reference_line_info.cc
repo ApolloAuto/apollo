@@ -79,7 +79,7 @@ bool ReferenceLineInfo::InitPerceptionSLBoundary(PathObstacle* path_obstacle) {
   path_obstacle->Obstacle()->PerceptionBoundingBox().GetAllCorners(&corners);
   for (const auto& point : corners) {
     common::SLPoint sl_point;
-    if (!reference_line_.get_point_in_frenet_frame(point, &sl_point)) {
+    if (!reference_line_.xy_to_sl(point, &sl_point)) {
       AERROR << "failed to get projection for point: " << point.DebugString()
              << " on reference line.";
       return false;
@@ -137,7 +137,7 @@ bool ReferenceLineInfo::IsStartFrom(
   const auto& prev_reference_line =
       previous_reference_line_info.reference_line();
   common::SLPoint sl_point;
-  prev_reference_line.get_point_in_frenet_frame(start_point, &sl_point);
+  prev_reference_line.xy_to_sl(start_point, &sl_point);
   return previous_reference_line_info.reference_line_.is_on_road(sl_point);
 }
 

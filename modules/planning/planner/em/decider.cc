@@ -72,8 +72,7 @@ int Decider::MakeMainStopDecision(
     const auto& reference_line = reference_line_info.reference_line();
     apollo::common::PointENU stop_point = object_decision.stop().stop_point();
     common::SLPoint stop_line_sl;
-    reference_line.get_point_in_frenet_frame({stop_point.x(), stop_point.y()},
-                                             &stop_line_sl);
+    reference_line.xy_to_sl({stop_point.x(), stop_point.y()}, &stop_line_sl);
 
     double stop_line_s = stop_line_sl.s();
     if (stop_line_s < 0 || stop_line_s > reference_line.length()) {
@@ -86,8 +85,7 @@ int Decider::MakeMainStopDecision(
     // check stop_line_s vs adc_s
     common::SLPoint adc_sl;
     auto& adc_position = common::VehicleState::instance()->pose().position();
-    reference_line.get_point_in_frenet_frame(
-        {adc_position.x(), adc_position.y()}, &adc_sl);
+    reference_line.xy_to_sl({adc_position.x(), adc_position.y()}, &adc_sl);
     const auto& vehicle_param =
         common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
     if (stop_line_s <= adc_sl.s() + vehicle_param.front_edge_to_center()) {

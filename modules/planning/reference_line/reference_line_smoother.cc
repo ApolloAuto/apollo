@@ -110,8 +110,7 @@ bool ReferenceLineSmoother::smooth(
     }
 
     common::SLPoint ref_sl_point;
-    if (!raw_reference_line.get_point_in_frenet_frame({xy.first, xy.second},
-                                                      &ref_sl_point)) {
+    if (!raw_reference_line.xy_to_sl({xy.first, xy.second}, &ref_sl_point)) {
       AERROR << "get sl point failed!" << std::endl;
       return false;
     }

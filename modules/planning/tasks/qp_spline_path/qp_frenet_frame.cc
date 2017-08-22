@@ -166,13 +166,11 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
     obs_box.GetAllCorners(&corners);
     std::vector<common::SLPoint> sl_corners;
 
-    for (uint32_t i = 0; i < corners.size(); ++i) {
+    for (const auto& corner_xy : corners) {
       common::SLPoint cur_point;
-      if (!reference_line_.get_point_in_frenet_frame(
-              {corners[i].x(), corners[i].y()}, &cur_point)) {
-        AERROR << "Fail to map xy point " << corners[i].DebugString() << " to "
+      if (!reference_line_.xy_to_sl(corner_xy, &cur_point)) {
+        AERROR << "Fail to map xy point " << corner_xy.DebugString() << " to "
                << cur_point.ShortDebugString();
-
         return false;
       }
       // shift box base on buffer
@@ -259,11 +257,10 @@ bool QpFrenetFrame::MapPolygon(
     std::vector<std::pair<double, double>>* const bound_map) {
   std::vector<common::SLPoint> sl_corners;
 
-  for (uint32_t i = 0; i < corners.size(); ++i) {
+  for (const auto& corner_xy : corners) {
     common::SLPoint cur_point;
-    common::math::Vec2d xy_point(corners[i].x(), corners[i].y());
-    if (!reference_line_.get_point_in_frenet_frame(xy_point, &cur_point)) {
-      AERROR << "Fail to map xy point " << corners[i].DebugString() << " to "
+    if (!reference_line_.xy_to_sl(corner_xy, &cur_point)) {
+      AERROR << "Fail to map xy point " << corner_xy.DebugString() << " to "
              << cur_point.DebugString();
       return false;
     }
