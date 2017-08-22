@@ -81,14 +81,13 @@ class Planning : public apollo::common::ApolloApp {
 
   void RunOnce();
 
+  bool InitFrame(const uint32_t sequence_num);
  private:
   void PublishPlanningPb(ADCTrajectory* trajectory_pb);
 
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
 
   void RegisterPlanners();
-
-  bool InitFrame(const uint32_t sequence_num);
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
