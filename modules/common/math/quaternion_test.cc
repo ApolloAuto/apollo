@@ -44,6 +44,19 @@ TEST(QuaternionTest, QuaternionToHeading) {
                 QuaternionToHeading(HeadingToQuaternion<double>(heading)),
                 1e-15);
   }
+  {
+    apollo::common::Quaternion q;
+    q.set_qx(0.016590540978116377);
+    q.set_qy(0.012968083311103572);
+    q.set_qz(-0.99256254167039326);
+    q.set_qw(-0.1199007240933047);
+    Eigen::Vector3d rotated(-0.26184808017295008, -0.32827419468368224,
+                            -0.17535585973456849);
+    auto original = InverseQuaternionRotate(q, rotated);
+    EXPECT_NEAR(original[0], 0.18112868882363914, 1e-9);
+    EXPECT_NEAR(original[1], 0.38614886414425986, 1e-9);
+    EXPECT_NEAR(original[2], -0.15861744649897938, 1e-9);
+  }
 }
 
 }  // namespace math
