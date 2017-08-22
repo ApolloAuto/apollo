@@ -129,14 +129,16 @@ bool ReferenceLineSmoother::smooth(
 bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.length();
   const double resolution = length / smoother_config_.num_spline();
+  double accumulated_s = 0.0;
   for (std::uint32_t i = 0;
-       i <= smoother_config_.num_spline() && i * resolution <= length; ++i) {
-    ReferencePoint rlp = raw_reference_line.get_reference_point(resolution * i);
+       i <= smoother_config_.num_spline() && accumulated_s <= length;
+       ++i, accumulated_s += resolution) {
+    ReferencePoint rlp = raw_reference_line.get_reference_point(accumulated_s);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
     path_point.set_y(rlp.y());
     path_point.set_theta(rlp.heading());
-    path_point.set_s(i * resolution);
+    path_point.set_s(accumulated_s);
     ref_points_.push_back(std::move(path_point));
     t_knots_.push_back(i);
   }
@@ -146,10 +148,12 @@ bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
 bool ReferenceLineSmoother::apply_constraint(
     const ReferenceLine& raw_reference_line) {
   const double t_length = t_knots_.back() - t_knots_.front();
-  double dt = t_length / (smoother_config_.num_evaluated_points() - 1);
+  const double dt = t_length / (smoother_config_.num_evaluated_points() - 1);
   std::vector<double> evaluated_t;
-  for (std::uint32_t i = 0; i < smoother_config_.num_evaluated_points(); ++i) {
-    evaluated_t.push_back(i * dt);
+  double accumulated_eval_t = 0.0;
+  for (std::uint32_t i = 0; i < smoother_config_.num_evaluated_points();
+       ++i, accumulated_eval_t += dt) {
+    evaluated_t.push_back(accumulated_eval_t);
   }
   std::vector<common::PathPoint> path_points;
   if (!extract_evaluated_points(raw_reference_line, evaluated_t,
@@ -213,10 +217,10 @@ bool ReferenceLineSmoother::Solve() { return spline_solver_->Solve(); }
 bool ReferenceLineSmoother::extract_evaluated_points(
     const ReferenceLine& raw_reference_line, const std::vector<double>& vec_t,
     std::vector<common::PathPoint>* const path_points) const {
-  for (std::uint32_t i = 0; i < vec_t.size(); ++i) {
+  for (const auto t : vec_t) {
     double s = 0.0;
-    if (!get_s_from_param_t(vec_t[i], &s)) {
-      AERROR << "Extract point " << i << " failed";
+    if (!get_s_from_param_t(t, &s)) {
+      AERROR << "get s from " << t << " failed";
       return false;
     }
     ReferencePoint rlp = raw_reference_line.get_reference_point(s);
