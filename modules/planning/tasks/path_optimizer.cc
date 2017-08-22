@@ -28,12 +28,11 @@ PathOptimizer::PathOptimizer(const std::string& name) : Task(name) {}
 apollo::common::Status PathOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {
   Task::Execute(frame, reference_line_info);
-  auto* planning_data = reference_line_info->mutable_planning_data();
   auto ret = Process(
-      planning_data->speed_data(), reference_line_info->reference_line(),
+      reference_line_info->speed_data(), reference_line_info->reference_line(),
       frame->PlanningStartPoint(), reference_line_info->path_decision(),
-      planning_data->mutable_path_data());
-  RecordDebugInfo(planning_data->path_data());
+      reference_line_info->mutable_path_data());
+  RecordDebugInfo(reference_line_info->path_data());
 
   return ret;
 }

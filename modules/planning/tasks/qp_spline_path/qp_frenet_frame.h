@@ -32,7 +32,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/planning/common/path_obstacle.h"
-#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/reference_line/reference_line.h"
 

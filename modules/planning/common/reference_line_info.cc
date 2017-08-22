@@ -18,11 +18,14 @@
  * @file
  **/
 
+#include "modules/planning/common/reference_line_info.h"
+
 #include <functional>
 
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
+
+#include "modules/common/util/string_util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -121,14 +124,6 @@ std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
       new Obstacle(obstacle_id, perception_obstacle));
 }
 
-const PlanningData& ReferenceLineInfo::planning_data() const {
-  return planning_data_;
-}
-
-PlanningData* ReferenceLineInfo::mutable_planning_data() {
-  return &planning_data_;
-}
-
 const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
 }
@@ -144,6 +139,53 @@ bool ReferenceLineInfo::IsStartFrom(
   common::SLPoint sl_point;
   prev_reference_line.get_point_in_frenet_frame(start_point, &sl_point);
   return previous_reference_line_info.reference_line_.is_on_road(sl_point);
+}
+
+const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
+
+const SpeedData& ReferenceLineInfo::speed_data() const { return speed_data_; }
+
+PathData* ReferenceLineInfo::mutable_path_data() { return &path_data_; }
+
+SpeedData* ReferenceLineInfo::mutable_speed_data() { return &speed_data_; }
+
+bool ReferenceLineInfo::CombinePathAndSpeedProfile(
+    const double time_resolution, const double relative_time,
+    DiscretizedTrajectory* ptr_discretized_trajectory) {
+  CHECK(time_resolution > 0.0);
+  CHECK(ptr_discretized_trajectory != nullptr);
+
+  for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
+       cur_rel_time += time_resolution) {
+    common::SpeedPoint speed_point;
+    if (!speed_data_.EvaluateByTime(cur_rel_time, &speed_point)) {
+      AERROR << "Fail to get speed point with relative time " << cur_rel_time;
+      return false;
+    }
+
+    if (speed_point.s() > path_data_.discretized_path().Length()) {
+      break;
+    }
+    common::PathPoint path_point;
+    if (!path_data_.GetPathPointWithPathS(speed_point.s(), &path_point)) {
+      AERROR << "Fail to get path data with s " << speed_point.s()
+             << "path total length " << path_data_.discretized_path().Length();
+      return false;
+    }
+
+    common::TrajectoryPoint trajectory_point;
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(speed_point.v());
+    trajectory_point.set_a(speed_point.a());
+    trajectory_point.set_relative_time(speed_point.t() + relative_time);
+    ptr_discretized_trajectory->AppendTrajectoryPoint(trajectory_point);
+  }
+  return true;
+}
+
+std::string ReferenceLineInfo::PathSpeedDebugString() const {
+  return apollo::common::util::StrCat("path_data:", path_data_.DebugString(),
+                                      "speed_data:", speed_data_.DebugString());
 }
 
 }  // namespace planning

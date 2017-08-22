@@ -23,7 +23,6 @@ cc_library(
         "//modules/map/proto:map_proto",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",
-        "//modules/planning/common:planning_data",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/path:frenet_frame_path",
@@ -37,9 +36,9 @@ cc_library(
         "//modules/planning/math/smoothing_spline:spline_1d_generator",
         "//modules/planning/math/smoothing_spline:spline_1d_kernel",
         "//modules/planning/math/smoothing_spline:spline_1d_seg",
-        "//modules/planning/tasks:path_optimizer",
         "//modules/planning/proto:qp_spline_path_config_proto",
         "//modules/planning/reference_line",
+        "//modules/planning/tasks:path_optimizer",
         "@eigen//:eigen",
     ],
 )
