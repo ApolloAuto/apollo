@@ -13,7 +13,7 @@ cc_library(
         "xml_parser/signals_xml_parser.cc",
         "xml_parser/util_xml_parser.cc",
         "coordinate_convert_tool.cc",
-        "proto_reorganization.cc",
+        "proto_organizer.cc",
         "opendrive_adapter.cc",
     ],
     hdrs = [
@@ -27,7 +27,7 @@ cc_library(
         "xml_parser/status.h",
         "xml_parser/util_xml_parser.h",
         "coordinate_convert_tool.h",
-        "proto_reorganization.h",
+        "proto_organizer.h",
         "opendrive_adapter.h",
     ],
     deps = [

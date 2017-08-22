@@ -13,12 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/hdmap_impl.h"
+
 #include <fstream>
 #include <iostream>
 #include <unordered_set>
+
 #include "modules/common/util/file.h"
-#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/common/util/string_util.h"
+#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 
 namespace {
 apollo::hdmap::Id create_hdmap_id(const std::string& string_id) {
@@ -35,8 +37,8 @@ int HDMapImpl::load_map_from_file(const std::string& map_filename) {
   clear();
 
   if (apollo::common::util::EndWith(map_filename, ".xml")) {
-    apollo::hdmap::adapter::OpendriveAdapter opendrive_adapter;
-    if (opendrive_adapter.load_data(map_filename, &_map) != 0) {
+    if (!apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_filename,
+                                                            &_map)) {
       return -1;
     }
   } else {

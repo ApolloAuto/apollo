@@ -114,16 +114,15 @@ int main(int32_t argc, char** argv) {
   Map map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
   if (apollo::common::util::EndWith(map_file, ".xml")) {
-      apollo::hdmap::adapter::OpendriveAdapter opendrive_adapter;
-      if (opendrive_adapter.load_data(map_file, &map_pb) != 0) {
-        return -1;
-      }
-  } else if (!GetProtoFromFile(map_file, &map_pb)) {
-    AERROR << "Fail to open:" << map_file;
-    return -1;
+    CHECK(apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_file,
+                                                             &map_pb));
+  } else {
+    CHECK(GetProtoFromFile(map_file, &map_pb)) << "Fail to open: " << map_file;
   }
 
   DownsampleMap(&map_pb);
   OutputMap(map_pb);
   AINFO << "sim_map generated at:" << FLAGS_output_dir;
+
+  return 0;
 }

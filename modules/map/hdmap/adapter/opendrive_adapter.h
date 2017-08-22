@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_OPENDRIVE_ADAPTER_H
-#define MODULES_MAP_MAP_LOADER_ADAPTER_OPENDRIVE_ADAPTER_H
+#ifndef MODULES_MAP_HDMAP_ADAPTER_OPENDRIVE_ADAPTER_H
+#define MODULES_MAP_HDMAP_ADAPTER_OPENDRIVE_ADAPTER_H
 
 #include <iostream>
 #include <string>
@@ -27,7 +27,6 @@ limitations under the License.
 #include "modules/map/hdmap/adapter/xml_parser/signals_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/header_xml_parser.h"
-#include "modules/map/hdmap/adapter/proto_reorganization.h"
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 
@@ -37,11 +36,11 @@ namespace adapter {
 
 class OpendriveAdapter {
  public:
-  int load_data(const std::string& filename, apollo::hdmap::Map* pb_map);
+  static bool LoadData(const std::string& filename, apollo::hdmap::Map* pb_map);
 };
 
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_OPENDRIVE_ADAPTER_H
+#endif  // MODULES_MAP_HDMAP_ADAPTER_OPENDRIVE_ADAPTER_H
