@@ -13,50 +13,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 
-#include "modules/map/hdmap/adapter/opendrive_adapter.h"
-#include "modules/common/util/string_util.h"
 #include "modules/common/util/file.h"
+#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/proto/map.pb.h"
 
 int main(int argc, char **argv) {
-  if (argc < 2) {
-    std::cout << "missing file path." << std::endl;
-    return -1;
-  }
-  std::string map_filename = argv[1];
+  CHECK_GE(argc, 2) << "missing file path.";
+
+  const std::string map_filename = argv[1];
   apollo::hdmap::Map pb_map;
-  apollo::hdmap::adapter::OpendriveAdapter opendrive_adapter;
-  if (opendrive_adapter.load_data(map_filename, &pb_map) != 0) {
-    std::cout << "fail to load data" << std::endl;
-    return -1;
-  }
+  CHECK(apollo::hdmap::adapter::OpendriveAdapter::LoadData(
+      map_filename, &pb_map)) << "fail to load data";
 
-  std::string output_ascii_file = map_filename + ".txt";
-  apollo::common::util::SetProtoToASCIIFile(pb_map, output_ascii_file);
+  const std::string output_ascii_file = map_filename + ".txt";
+  CHECK(apollo::common::util::SetProtoToASCIIFile(pb_map, output_ascii_file));
 
-  std::string output_bin_file = map_filename + ".bin";
-  std::fstream output(output_bin_file.c_str(),
-                    std::ios::out | std::ios::binary);
-  if (!output) {
-    std::string err_msg = "fail to open " + output_bin_file;
-    std::cout << err_msg << std::endl;
-    return false;
-  }
-
-  if (!pb_map.SerializeToOstream(&output)) {
-    std::string err_msg = "fail to parse " + output_bin_file;
-    std::cout << err_msg << std::endl;
-    return false;
-  }
-  output.close();
+  const std::string output_bin_file = map_filename + ".bin";
+  CHECK(apollo::common::util::SetProtoToBinaryFile(pb_map, output_bin_file));
 
   pb_map.Clear();
-  using apollo::common::util::GetProtoFromFile;
-  if (!GetProtoFromFile(output_bin_file, &pb_map)) {
-    std::cout << "load map fail" << std::endl;
-    return -1;
-  }
+  CHECK(apollo::common::util::GetProtoFromFile(output_bin_file, &pb_map))
+      << "load map fail";
 
-  std::cout << "load map success" << std::endl;
+  AINFO << "load map success";
   return 0;
 }

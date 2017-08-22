@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_PROTO_REORGANIZE_H
-#define MODULES_MAP_MAP_LOADER_ADAPTER_PROTO_REORGANIZE_H
+#ifndef MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H
+#define MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H
 
 #include <unordered_map>
 #include <unordered_set>
@@ -42,27 +42,20 @@ struct ProtoData {
   std::unordered_map<std::string, StopLineInternal> pb_stop_lines;
 };
 
-class ProtoOrganization {
+class ProtoOrganizer {
  public:
-  ProtoOrganization();
-  ~ProtoOrganization();
-
- public:
-  void get_road_elements(std::vector<RoadInternal>* roads,
-                        ProtoData* proto_data);
-  void get_junction_elements(const std::vector<JunctionInternal>& junctions,
-                        ProtoData* proto_data);
-  void get_overlap_elements(const std::vector<RoadInternal>& roads,
-                        const std::vector<JunctionInternal>& junctions,
-                        ProtoData* proto_data);
-  void output_data(const ProtoData& proto_data, ::apollo::hdmap::Map* pb_map);
+  void GetRoadElements(std::vector<RoadInternal>* roads);
+  void GetJunctionElements(const std::vector<JunctionInternal>& junctions);
+  void GetOverlapElements(const std::vector<RoadInternal>& roads,
+                          const std::vector<JunctionInternal>& junctions);
+  void OutputData(apollo::hdmap::Map* pb_map);
 
  private:
-  ProtoData   _pb_map_data;
+  ProtoData _proto_data;
 };
 
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_PROTO_REORGANIZE_H
+#endif  // MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H
