@@ -42,6 +42,8 @@ function start() {
             /apollo/control/pad \
             /apollo/planning \
             /apollo/prediction \
+            /apollo/routing_request \
+            /apollo/routing_response \
             /apollo/localization/pose \
             /apollo/monitor </dev/null >"${LOG}" 2>&1 &
     fi
