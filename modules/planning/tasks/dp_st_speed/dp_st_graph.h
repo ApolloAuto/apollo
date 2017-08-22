@@ -55,7 +55,7 @@ class DpStGraph {
   apollo::common::Status RetrieveSpeedProfile(
       SpeedData* const speed_data) const;
 
-  apollo::common::Status GetObjectDecision(
+  apollo::common::Status MakeObjectDecision(
       const SpeedData& speed_profile, PathDecision* const path_decision) const;
 
   apollo::common::Status CalculateTotalCost();

@@ -77,7 +77,7 @@ Status DpStGraph::Search(PathDecision* const path_decision,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!GetObjectDecision(*speed_data, path_decision).ok()) {
+  if (!MakeObjectDecision(*speed_data, path_decision).ok()) {
     const std::string msg = "Get object decision by speed profile failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -358,8 +358,8 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
   return Status::OK();
 }
 
-Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
-                                    PathDecision* const path_decision) const {
+Status DpStGraph::MakeObjectDecision(const SpeedData& speed_profile,
+                                     PathDecision* const path_decision) const {
   if (speed_profile.speed_vector().size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
@@ -367,6 +367,11 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
   }
 
   for (const auto& boundary : st_graph_data_.st_graph_boundaries()) {
+    auto* path_obstacle = path_decision->Find(boundary.id());
+    CHECK(path_obstacle) << "Failed to find obstacle " << boundary.id();
+    if (path_obstacle->HasLongitudinalDecision()) {
+      continue;
+    }
     CHECK_EQ(boundary.points().size(), 4);
 
     double start_t = boundary.min_t();
@@ -402,10 +407,9 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
     if (go_down) {
       if (CheckIsFollowByT(boundary)) {
         // FOLLOW decision
-        const auto obstacle = path_decision->Find(boundary.id());
-        const auto& obstacle_boundary = obstacle->perception_sl_boundary();
+        const auto& obstacle_boundary = path_obstacle->perception_sl_boundary();
         ObjectDecisionType follow_decision;
-        if (!CreateFollowDecision(*obstacle, obstacle_boundary,
+        if (!CreateFollowDecision(*path_obstacle, obstacle_boundary,
                                   &follow_decision)) {
           AERROR << "Failed to create follow decision for boundary with id "
                  << boundary.id();
@@ -437,8 +441,8 @@ Status DpStGraph::GetObjectDecision(const SpeedData& speed_profile,
     } else {
       // OVERTAKE decision
       ObjectDecisionType overtake_decision;
-      const auto obstacle = path_decision->Find(boundary.id());
-      if (!CreateOvertakeDecision(*obstacle, boundary, &overtake_decision)) {
+      if (!CreateOvertakeDecision(*path_obstacle, boundary,
+                                  &overtake_decision)) {
         AERROR << "Failed to create overtake decision for boundary with id "
                << boundary.id();
         return Status(ErrorCode::PLANNING_ERROR,
