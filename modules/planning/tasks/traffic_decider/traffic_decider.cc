@@ -66,7 +66,7 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
   // check if destination point is in planning range
   common::SLPoint destination_sl;
   const auto &reference_line = reference_line_info_->reference_line();
-  reference_line.get_point_in_frenet_frame(destination, &destination_sl);
+  reference_line.xy_to_sl(destination, &destination_sl);
   double destination_s = destination_sl.s();
   if (destination_s < 0 || destination_s > reference_line.length()) {
     AINFO << "destination(s[:" << destination_sl.s()
@@ -77,8 +77,7 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
   // adjust destination based on adc_front_s
   common::SLPoint adc_sl;
   auto &adc_position = VehicleState::instance()->pose().position();
-  reference_line.get_point_in_frenet_frame({adc_position.x(), adc_position.y()},
-                                           &adc_sl);
+  reference_line.xy_to_sl({adc_position.x(), adc_position.y()}, &adc_sl);
   const auto &vehicle_param =
       VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   double adc_front_s = adc_sl.s() + vehicle_param.front_edge_to_center();
@@ -124,7 +123,7 @@ bool TrafficDecider::MakeDestinationStopDecision() {
   // check stop_posision on reference line
   auto stop_position = obstacle->Perception().position();
   common::SLPoint stop_line_sl;
-  reference_line.get_point_in_frenet_frame(
+  reference_line.xy_to_sl(
       {stop_position.x(), stop_position.y()}, &stop_line_sl);
   if (!reference_line.is_on_road(stop_line_sl)) {
     return false;
@@ -133,8 +132,7 @@ bool TrafficDecider::MakeDestinationStopDecision() {
   // check stop_line_s vs adc_s. stop_line_s must be ahead of adc_front_s
   common::SLPoint adc_sl;
   auto &adc_position = VehicleState::instance()->pose().position();
-  reference_line.get_point_in_frenet_frame({adc_position.x(), adc_position.y()},
-                                           &adc_sl);
+  reference_line.xy_to_sl({adc_position.x(), adc_position.y()}, &adc_sl);
   const auto &vehicle_param =
       VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   double adc_front_s = adc_sl.s() + vehicle_param.front_edge_to_center();

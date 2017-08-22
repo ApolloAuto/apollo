@@ -57,7 +57,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
                                  PathData *const path_data) {
   CHECK_NOTNULL(path_data);
   init_point_ = init_point;
-  if (!reference_line_.get_point_in_frenet_frame(
+  if (!reference_line_.xy_to_sl(
           {init_point_.path_point().x(), init_point_.path_point().y()},
           &init_sl_point_)) {
     AERROR << "Fail to create init_sl_point from : "
@@ -192,8 +192,7 @@ bool DPRoadGraph::MakeStaticObstacleDecision(
         common::math::Vec2d{path_point.x(), path_point.y()}, path_point.theta(),
         adc_length, adc_width);
     common::SLPoint adc_sl;
-    if (!reference_line_.get_point_in_frenet_frame(
-            {path_point.x(), path_point.y()}, &adc_sl)) {
+    if (!reference_line_.xy_to_sl({path_point.x(), path_point.y()}, &adc_sl)) {
       AERROR << "get_point_in_Frenet_frame error for ego vehicle "
              << path_point.x() << " " << path_point.y();
       return false;
@@ -359,8 +358,7 @@ bool DPRoadGraph::ComputeBoundingBoxesForAdc(
     common::SLPoint sl_point;
     sl_point.set_s(s);
     sl_point.set_l(l);
-    reference_line_.get_point_in_cartesian_frame(sl_point,
-                                                 &adc_position_cartesian);
+    reference_line_.sl_to_xy(sl_point, &adc_position_cartesian);
 
     ReferencePoint reference_point = reference_line_.get_reference_point(s);
 
@@ -383,8 +381,7 @@ bool DPRoadGraph::SamplePathWaypoints(
   common::math::Vec2d init_cartesian_point(init_point.path_point().x(),
                                            init_point.path_point().y());
   common::SLPoint init_sl_point;
-  if (!reference_line_.get_point_in_frenet_frame(init_cartesian_point,
-                                                 &init_sl_point)) {
+  if (!reference_line_.xy_to_sl(init_cartesian_point, &init_sl_point)) {
     AERROR << "Failed to get sl point from point "
            << init_cartesian_point.DebugString();
     return false;

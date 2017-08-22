@@ -71,7 +71,7 @@ StBoundaryMapper::StBoundaryMapper(const StBoundaryConfig& config,
       planning_time_(planning_time) {
   const auto& path_start_point = path_data_.discretized_path().StartPoint();
   common::SLPoint sl_point;
-  DCHECK(reference_line_.get_point_in_frenet_frame(
+  DCHECK(reference_line_.xy_to_sl(
       {path_start_point.x(), path_start_point.y()}, &sl_point))
       << "Failed to get adc reference line s";
   adc_front_s_ = sl_point.s() + vehicle_param_.front_edge_to_center();
@@ -456,9 +456,9 @@ Status StBoundaryMapper::MapFollowDecision(
 
   const auto* obstacle = path_obstacle.Obstacle();
   SLPoint obstacle_sl_point;
-  reference_line_.get_point_in_frenet_frame(
-      Vec2d(obstacle->Perception().position().x(),
-            obstacle->Perception().position().y()),
+  reference_line_.xy_to_sl(
+      {obstacle->Perception().position().x(),
+       obstacle->Perception().position().y()},
       &obstacle_sl_point);
 
   const auto& ref_point = reference_line_.get_reference_point(
@@ -477,8 +477,8 @@ Status StBoundaryMapper::MapFollowDecision(
 
   const auto& start_point = path_data_.discretized_path().StartPoint();
   SLPoint start_sl_point;
-  if (!reference_line_.get_point_in_frenet_frame(
-          Vec2d(start_point.x(), start_point.y()), &start_sl_point)) {
+  if (!reference_line_.xy_to_sl({start_point.x(), start_point.y()},
+                                &start_sl_point)) {
     std::string msg = "Fail to get s and l of start point.";
     AERROR << msg;
     return common::Status(ErrorCode::PLANNING_ERROR, msg);
