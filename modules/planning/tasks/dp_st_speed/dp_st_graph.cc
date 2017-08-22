@@ -40,6 +40,20 @@ using Status = apollo::common::Status;
 using VehicleParam = apollo::common::VehicleParam;
 using Vec2d = apollo::common::math::Vec2d;
 
+namespace {
+
+bool CheckOverlapOnDpStGraph(const std::vector<StGraphBoundary> boundaries,
+                             const StGraphPoint& p1, const StGraphPoint& p2) {
+  for (const auto& boundary : boundaries) {
+    common::math::LineSegment2d seg(p1.point(), p2.point());
+    if (boundary.HasOverlap(seg)) {
+      return true;
+    }
+  }
+  return false;
+}
+}
+
 DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config,
                      const StGraphData& st_graph_data,
                      const VehicleParam& vehicle_param,
@@ -215,6 +229,10 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   double speed_limit =
       st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
   if (c == 1) {
+    if (CheckOverlapOnDpStGraph(st_graph_data_.st_graph_boundaries(),
+                                cost_table_[c][r], cost_table_[0][0])) {
+      return;
+    }
     cost_table_[c][r].SetTotalCost(
         cost_table_[c][r].obstacle_cost() + cost_table_[0][0].total_cost() +
         CalculateEdgeCostForSecondCol(r, speed_limit));
@@ -228,9 +246,15 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
 
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-      double cost = cost_table_[c][r].obstacle_cost() +
-                    cost_table_[c - 1][r_pre].total_cost() +
-                    CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
+      if (CheckOverlapOnDpStGraph(st_graph_data_.st_graph_boundaries(),
+                                  cost_table_[c][r],
+                                  cost_table_[c - 1][r_pre])) {
+        return;
+      }
+
+      const double cost = cost_table_[c][r].obstacle_cost() +
+                          cost_table_[c - 1][r_pre].total_cost() +
+                          CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
 
       if (cost < cost_table_[c][r].total_cost()) {
         cost_table_[c][r].SetTotalCost(cost);
@@ -260,6 +284,11 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
                                      static_cast<double>(r), &lower_bound,
                                      &upper_bound)) {
       continue;
+    }
+
+    if (CheckOverlapOnDpStGraph(st_graph_data_.st_graph_boundaries(),
+                                cost_table_[c][r], cost_table_[c - 1][r_pre])) {
+      return;
     }
 
     for (uint32_t r_prepre = lower_bound; r_prepre <= upper_bound; ++r_prepre) {
