@@ -23,6 +23,7 @@ limitations under the License.
 
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/common/math/linear_interpolation.h"
 
 namespace {
 
@@ -168,7 +169,10 @@ double LaneInfo::heading(const double s) const {
   if (index == 0 || *iter - s <= common::math::kMathEpsilon) {
     return _headings[index];
   } else {
-    return _headings[index - 1];
+    return ::apollo::common::math::slerp(
+        _headings[index - 1], _accumulated_s[index - 1],
+        _headings[index], _accumulated_s[index], s);
+    // return _headings[index - 1];
   }
 }
 
