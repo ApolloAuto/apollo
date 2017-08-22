@@ -68,7 +68,7 @@ class PredictionMap {
    * @param id The ID of the target lane ID in the form of string.
    * @return A shared pointer to the lane with the input lane ID.
    */
-  std::shared_ptr<const apollo::hdmap::LaneInfo> LaneById(
+  static std::shared_ptr<const apollo::hdmap::LaneInfo> LaneById(
       const std::string& id);
 
   /**
@@ -128,9 +128,9 @@ class PredictionMap {
    * @param l The lateral coordinate of the position.
    * @param point The point corresponding to the s,l-value coordinate.
    * @param heading The lane heading on the point.
-   * @return If the process is successful. 0: success, -1: failure.
+   * @return If the process is successful.
    */
-  int SmoothPointFromLane(
+  bool SmoothPointFromLane(
       const std::string& id, const double s,
       const double l, Eigen::Vector2d* point,
       double* heading);
@@ -256,7 +256,7 @@ class PredictionMap {
    * @param lane_id The lane ID.
    * @return Integer corresponding to the lane turn type.
    */
-  int LaneTurnType(const std::string& lane_id);
+  static int LaneTurnType(const std::string& lane_id);
 
  private:
   DECLARE_SINGLETON(PredictionMap);

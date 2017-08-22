@@ -165,7 +165,7 @@ TEST_F(PredictionMapTest, get_smooth_point_from_lane) {
   double heading = M_PI;
 
   Eigen::Vector2d point;
-  EXPECT_EQ(0, map_->SmoothPointFromLane(id, s, l, &point, &heading));
+  EXPECT_TRUE(map_->SmoothPointFromLane(id, s, l, &point, &heading));
   EXPECT_DOUBLE_EQ(124.85930930657942, point.x());
   EXPECT_DOUBLE_EQ(348.52732962417451, point.y());
   EXPECT_DOUBLE_EQ(-0.061427808505166936, heading);

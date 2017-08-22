@@ -180,8 +180,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
   for (size_t i = 0; i < static_cast<size_t>(total_time / freq); ++i) {
     Eigen::Vector2d point;
     double theta = M_PI;
-    if (map->SmoothPointFromLane(lane_id,
-                                 lane_s, lane_l, &point, &theta) != 0) {
+    if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l
              << "]";

@@ -169,20 +169,20 @@ double PredictionMap::PathHeading(
   return HeadingOnLane(lane_info, s);
 }
 
-int PredictionMap::SmoothPointFromLane(
+bool PredictionMap::SmoothPointFromLane(
     const std::string& id,
     const double s, const double l,
     Eigen::Vector2d* point,
     double* heading) {
   if (point == nullptr || heading == nullptr) {
-    return -1;
+    return false;
   }
   std::shared_ptr<const LaneInfo> lane = LaneById(id);
   apollo::common::PointENU hdmap_point = lane->get_smooth_point(s);
   *heading = PathHeading(lane, hdmap_point);
   point->operator[](0) = hdmap_point.x() - std::sin(*heading) * l;
   point->operator[](1) = hdmap_point.y() + std::cos(*heading) * l;
-  return 0;
+  return true;
 }
 
 void PredictionMap::NearbyLanesByCurrentLanes(
