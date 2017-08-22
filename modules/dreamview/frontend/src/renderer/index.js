@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import "imports-loader?THREE=three!three/examples/js/controls/OrbitControls.js";
 
 import PARAMETERS from "store/config/parameters.yml";
 import Coordinates from "renderer/coordinates";
@@ -75,9 +76,9 @@ class Renderer {
         const directionalLight = new THREE.DirectionalLight(0xffeedd);
         directionalLight.position.set(0, 0, 1).normalize();
 
-        // Hack fix orbit control plugin
-        //
-        // TODO maybe implement this?
+        // Orbit control for moving map
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enable = false;
 
         this.scene.add(ambient);
         this.scene.add(directionalLight);
@@ -98,6 +99,19 @@ class Renderer {
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+    }
+
+    enableOrbitControls(){
+        this.controls.enabled = true;
+        this.controls.enableRotate = false;
+        this.controls.reset();
+        this.controls.minDistance = 10;
+        this.controls.maxDistance = 2000;
+
+        const carPosition = this.adc.mesh.position;
+        this.camera.position.set(carPosition.x, carPosition.y, 50);
+        this.camera.up.set(0, 1, 0);
+        this.camera.lookAt(carPosition.x, carPosition.y, 0);
     }
 
     adjustCamera(target, pov) {
@@ -122,6 +136,8 @@ class Renderer {
                 y: target.position.y + 2 * deltaY,
                 z: 0
             });
+
+            this.controls.enabled = false;
             break;
         case "Near":
             deltaX = (this.viewDistance * 0.5 * Math.cos(target.rotation.y)
@@ -139,6 +155,8 @@ class Renderer {
                 y: target.position.y + 2 * deltaY,
                 z: 0
             });
+
+            this.controls.enabled = false;
             break;
         case "Overhead":
             deltaY = (this.viewDistance * 0.5 * Math.sin(target.rotation.y)
@@ -154,13 +172,16 @@ class Renderer {
                 y: target.position.y + deltaY,
                 z: 0
             });
+
+            this.controls.enabled = false;
             break;
         case "Map":
-            deltaY = (this.viewDistance * 3 * Math.sin(target.rotation.y)
-                    * Math.cos(this.viewAngle));
-            this.camera.position.set(target.position.x, target.position.y + deltaY, 60);
-            this.camera.up.set(0, 1, 0);
-            this.camera.lookAt(target.position.x, target.position.y + deltaY, 0);
+            if (!this.controls.enabled){
+                this.enableOrbitControls();
+            }else {
+                this.camera.up.set(0, 1, 0);
+                this.camera.lookAt(this.camera.position.x, this.camera.position.y, 0);
+            }
             break;
         }
         this.camera.updateProjectionMatrix();
