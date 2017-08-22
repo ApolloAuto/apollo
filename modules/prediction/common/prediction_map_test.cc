@@ -64,7 +64,7 @@ TEST_F(PredictionMapTest, heading_on_lane) {
   std::shared_ptr<const LaneInfo> lane_info = map_->LaneById("l20");
 
   // on lane
-  EXPECT_DOUBLE_EQ(-0.061313674178065762, map_->HeadingOnLane(lane_info, 10.0));
+  EXPECT_DOUBLE_EQ(-0.066794953844859783, map_->HeadingOnLane(lane_info, 10.0));
 }
 
 TEST_F(PredictionMapTest, get_lane_width) {
@@ -105,7 +105,7 @@ TEST_F(PredictionMapTest, get_map_pathpoint) {
   EXPECT_TRUE(map_->ProjectionFromLane(lane_info, s, &point));
   EXPECT_DOUBLE_EQ(124.85930930657942, point.x());
   EXPECT_DOUBLE_EQ(348.52732962417451, point.y());
-  EXPECT_DOUBLE_EQ(-0.061313674178065762, point.heading());
+  EXPECT_DOUBLE_EQ(-0.066794953844859783, point.heading());
 
   // non-existent lane
   lane_info.reset();
@@ -145,7 +145,7 @@ TEST_F(PredictionMapTest, get_path_heading) {
   ::apollo::common::PointENU point;
   point.set_x(124.85931);
   point.set_y(347.52733);
-  EXPECT_DOUBLE_EQ(-0.061313674178065762, map_->PathHeading(lane_info, point));
+  EXPECT_DOUBLE_EQ(-0.066973788088279029, map_->PathHeading(lane_info, point));
 }
 
 TEST_F(PredictionMapTest, get_smooth_point_from_lane) {
@@ -158,7 +158,7 @@ TEST_F(PredictionMapTest, get_smooth_point_from_lane) {
   EXPECT_TRUE(map_->SmoothPointFromLane(id, s, l, &point, &heading));
   EXPECT_DOUBLE_EQ(124.85930930657942, point.x());
   EXPECT_DOUBLE_EQ(348.52732962417451, point.y());
-  EXPECT_DOUBLE_EQ(-0.061313674178065762, heading);
+  EXPECT_DOUBLE_EQ(-0.066794953844859783, heading);
 }
 
 TEST_F(PredictionMapTest, get_nearby_lanes_by_current_lanes) {
