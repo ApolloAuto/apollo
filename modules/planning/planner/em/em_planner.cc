@@ -28,7 +28,6 @@
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/planner/em/decider.h"
@@ -120,8 +119,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
-  auto* planning_data = reference_line_info->mutable_planning_data();
-  auto* heuristic_speed_data = planning_data->mutable_speed_data();
+  auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
   auto speed_profile =
       GenerateInitSpeedProfile(planning_start_point, reference_line_info);
   if (speed_profile.empty()) {
@@ -144,7 +142,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     ADEBUG << "after optimizer " << optimizer->name() << ":"
-           << planning_data->DebugString() << std::endl;
+           << reference_line_info->PathSpeedDebugString() << std::endl;
     ADEBUG << optimizer->name() << " time spend: " << time_diff_ms << " ms.";
 
     if (FLAGS_enable_record_debug && ptr_debug != nullptr &&
@@ -153,7 +151,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     }
   }
   DiscretizedTrajectory trajectory;
-  if (!planning_data->CombinePathAndSpeedProfile(
+  if (!reference_line_info->CombinePathAndSpeedProfile(
           FLAGS_output_trajectory_time_resolution,
           planning_start_point.relative_time(), &trajectory)) {
     std::string msg("Fail to aggregate planning trajectory.");
@@ -186,7 +184,7 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     return speed_profile;
   }
   const auto& last_speed_vector =
-      last_reference_line_info->planning_data().speed_data().speed_vector();
+      last_reference_line_info->speed_data().speed_vector();
 
   if (!last_speed_vector.empty()) {
     const auto& last_init_point = last_frame->PlanningStartPoint().path_point();
