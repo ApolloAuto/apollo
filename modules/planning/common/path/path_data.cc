@@ -158,8 +158,7 @@ bool PathData::FrenetToCartesian(const FrenetFramePath &frenet_path,
     common::math::Vec2d cartesian_point;
     sl_point.set_s(frenet_point.s());
     sl_point.set_l(frenet_point.l());
-    if (!reference_line_->get_point_in_cartesian_frame(sl_point,
-                                                       &cartesian_point)) {
+    if (!reference_line_->sl_to_xy(sl_point, &cartesian_point)) {
       AERROR << "Fail to convert sl point to xy point";
       return false;
     }
@@ -197,8 +196,8 @@ bool PathData::CartesianToFrenet(const DiscretizedPath &discretized_path,
 
   for (const auto &path_point : discretized_path.path_points()) {
     SLPoint sl_point;
-    if (!reference_line_->get_point_in_frenet_frame(
-            Vec2d(path_point.x(), path_point.y()), &sl_point)) {
+    if (!reference_line_->xy_to_sl({path_point.x(), path_point.y()},
+                                   &sl_point)) {
       AERROR << "Fail to transfer cartesian point to frenet point.";
       return false;
     }
