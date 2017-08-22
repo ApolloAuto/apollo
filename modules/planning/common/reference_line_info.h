@@ -26,11 +26,11 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
-#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
@@ -54,9 +54,6 @@ class ReferenceLineInfo {
   void SetTrajectory(const DiscretizedTrajectory& trajectory) {
     discretized_trajectory_ = trajectory;
   }
-
-  PlanningData* mutable_planning_data();
-  const PlanningData& planning_data() const;
 
   const DiscretizedTrajectory& trajectory() const;
 
@@ -82,6 +79,16 @@ class ReferenceLineInfo {
   LatencyStats* mutable_latency_stats() { return &latency_stats_; }
   const LatencyStats& latency_stats() const { return latency_stats_; }
 
+  const PathData& path_data() const;
+  const SpeedData& speed_data() const;
+  PathData* mutable_path_data();
+  SpeedData* mutable_speed_data();
+  // aggregate final result together by some configuration
+  bool CombinePathAndSpeedProfile(
+      const double time_resolution, const double relative_time,
+      DiscretizedTrajectory* discretized_trajectory);
+  std::string PathSpeedDebugString() const;
+
  private:
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
@@ -97,7 +104,10 @@ class ReferenceLineInfo {
 
   const ReferenceLine reference_line_;
   PathDecision path_decision_;
-  PlanningData planning_data_;
+
+  PathData path_data_;
+  SpeedData speed_data_;
+
   DiscretizedTrajectory discretized_trajectory_;
 
   planning_internal::Debug debug_;

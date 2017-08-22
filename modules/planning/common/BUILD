@@ -160,27 +160,6 @@ cc_library(
 )
 
 cc_library(
-    name = "planning_data",
-    srcs = [
-        "planning_data.cc",
-    ],
-    hdrs = [
-        "planning_data.h",
-    ],
-    deps = [
-        "//modules/common:log",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/map/proto:map_proto",
-        "//modules/planning/common/path:path_data",
-        "//modules/planning/common/speed:speed_data",
-        "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/common/trajectory:publishable_trajectory",
-        "//modules/planning/reference_line",
-        "@eigen//:eigen",
-    ],
-)
-
-cc_library(
     name = "reference_line_info",
     srcs = [
         "reference_line_info.cc",
@@ -190,12 +169,16 @@ cc_library(
     ],
     deps = [
         ":path_decision",
-        ":planning_data",
-        "//modules/planning/common/path:path_data",
+        "//modules/common:log",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/map/proto:map_proto",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
+        "@eigen//:eigen",
     ],
 )
 
