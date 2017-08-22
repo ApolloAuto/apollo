@@ -52,7 +52,6 @@ class WebSocketEndpoint {
             }
         };
         this.websocket.onclose = event => {
-            console.log(event);
             this.initialize();
         };
     }
