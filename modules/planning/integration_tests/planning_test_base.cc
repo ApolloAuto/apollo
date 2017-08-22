@@ -28,13 +28,14 @@ DEFINE_string(test_data_dir, "", "the test data folder");
 DEFINE_bool(test_update_golden_log, false,
             "true to update decision golden log file.");
 DEFINE_string(test_routing_response_file,
-              "modules/planning/testdata/garage_routing.pb.txt",
+              "modules/planning/testdata/garage_test/garage_routing.pb.txt",
               "The routing file used in test");
-DEFINE_string(test_localization_file,
-              "modules/planning/testdata/garage_localization.pb.txt",
-              "The localization test file");
+DEFINE_string(
+    test_localization_file,
+    "modules/planning/testdata/garage_test/garage_localization.pb.txt",
+    "The localization test file");
 DEFINE_string(test_chassis_file,
-              "modules/planning/testdata/garage_chassis.pb.txt",
+              "modules/planning/testdata/garage_test/garage_chassis.pb.txt",
               "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 
@@ -46,7 +47,8 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_base_map_filename = "base_map.txt";
   FLAGS_test_localization_file =
       "modules/planning/testdata/garage_localization.pb.txt";
-  FLAGS_test_chassis_file = "modules/planning/testdata/garage_chassis.pb.txt";
+  FLAGS_test_chassis_file =
+      "modules/planning/testdata/garage_test/garage_chassis.pb.txt";
   FLAGS_test_prediction_file =
       "modules/planning/testdata/garage_prediction.pb.txt";
 }
@@ -116,7 +118,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   }
   TrimPlanning(adc_trajectory_);
   if (FLAGS_test_update_golden_log) {
-    AINFO << "The golden file is regenerated:"  << full_golden_path;
+    AINFO << "The golden file is regenerated:" << full_golden_path;
     ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
                                                 full_golden_path);
   } else {
