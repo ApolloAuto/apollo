@@ -20,8 +20,11 @@ export default class Coordinates {
         if (this.offset === null) {
             console.error("Offset is not set.");
             return null;
+        } else if (isNaN(this.offset.x) || isNaN(this.offset.y)) {
+            console.error("Offset contains NaN!");
+            return null;
         } else if (isNaN(point.x) || isNaN(point.y)) {
-            // TODO Add warning.
+            console.warn("Point contains NaN!");
             return null;
         } else if (!isNaN(point.z)) {
             return new THREE.Vector3(
