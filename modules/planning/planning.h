@@ -79,19 +79,16 @@ class Planning : public apollo::common::ApolloApp {
                       const double current_time_stamp,
                       const double planning_cycle_time);
 
-  const Frame* GetFrame() const;
-  const hdmap::PncMap* GetPncMap() const;
-  bool InitFrame(const uint32_t sequence_num);
-
   void RunOnce();
 
-  void SetConfig(const PlanningConfig& config);
-
+ private:
   void PublishPlanningPb(ADCTrajectory* trajectory_pb);
+
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
 
- private:
   void RegisterPlanners();
+
+  bool InitFrame(const uint32_t sequence_num);
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
