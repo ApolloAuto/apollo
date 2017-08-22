@@ -36,6 +36,10 @@ using apollo::perception::PerceptionObstacles;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::adapter::AdapterManagerConfig;
+
 namespace apollo {
 namespace dreamview {
 
@@ -44,6 +48,21 @@ const float kEpsilon = 0.01;
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    // Setup AdapterManager.
+    AdapterManagerConfig config;
+    config.set_is_ros(false);
+    {
+      auto* sub_config = config.add_config();
+      sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
+      sub_config->set_type(AdapterConfig::MONITOR);
+    }
+    {
+      auto* sub_config = config.add_config();
+      sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
+      sub_config->set_type(AdapterConfig::ROUTING_RESPONSE);
+    }
+    AdapterManager::Init(config);
+
     FLAGS_routing_response_file =
         "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
@@ -300,7 +319,7 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   apollo::planning::ObjectDecision* obj_decision1 =
       obj_decisions->add_decision();
   obj_decision1->set_perception_id(1);
-  Object &perception1 = sim_world_service_->obj_map_["1"];
+  Object& perception1 = sim_world_service_->obj_map_["1"];
   perception1.set_type(Object_Type_UNKNOWN_UNMOVABLE);
   perception1.set_id("1");
   perception1.set_position_x(1.0);
@@ -436,6 +455,8 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
 TEST_F(SimulationWorldServiceTest, UpdateRouting) {
   // Load routing from file
   sim_world_service_.reset(new SimulationWorldService(&map_service_, true));
+  sim_world_service_->UpdateSimulationWorld(
+      *AdapterManager::GetRoutingResponse()->GetLatestPublished());
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);
