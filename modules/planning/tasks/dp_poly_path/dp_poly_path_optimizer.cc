@@ -33,7 +33,6 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using IdDecisionList = std::vector<std::pair<std::string, ObjectDecisionType>>;
 
 DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
     : PathOptimizer(name) {}
@@ -47,23 +46,18 @@ bool DpPolyPathOptimizer::Init(const PlanningConfig &config) {
 Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
                                     const ReferenceLine &reference_line,
                                     const common::TrajectoryPoint &init_point,
-                                    PathDecision *const path_decision,
                                     PathData *const path_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process().";
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
-  CHECK_NOTNULL(path_decision);
   CHECK_NOTNULL(path_data);
   DPRoadGraph dp_road_graph(config_, reference_line, speed_data);
   if (!dp_road_graph.FindPathTunnel(init_point, path_data)) {
     AERROR << "Failed to find tunnel in road graph";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph path generation");
   }
-  if (!dp_road_graph.MakeObjectDecision(*path_data, path_decision)) {
-    AERROR << "Failed to make decision based on tunnel";
-    return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
-  }
+
   return Status::OK();
 }
 

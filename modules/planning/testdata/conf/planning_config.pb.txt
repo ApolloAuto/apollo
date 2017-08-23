@@ -3,6 +3,9 @@ em_planner_config {
     task : TRAFFIC_DECIDER
 
     task : DP_POLY_PATH_OPTIMIZER
+
+    task : PATH_DECIDER
+
     task : DP_ST_SPEED_OPTIMIZER
 
     task : QP_SPLINE_PATH_OPTIMIZER

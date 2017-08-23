@@ -53,9 +53,6 @@ class DPRoadGraph {
   bool FindPathTunnel(const common::TrajectoryPoint &init_point,
                       PathData *const path_data);
 
-  bool MakeObjectDecision(const PathData &path_data,
-                          PathDecision *const path_decision);
-
  private:
   /**
    * an private inner struct for the dp algorithm
@@ -89,20 +86,9 @@ class DPRoadGraph {
 
   bool GenerateMinCostPath(std::vector<DPRoadGraphNode> *min_cost_path);
 
-  bool ComputeBoundingBoxesForAdc(
-      const FrenetFramePath &frenet_frame_path,
-      const std::size_t evaluate_times,
-      std::vector<common::math::Box2d> *adc_by_time);
-
   bool SamplePathWaypoints(
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
-
-  bool MakeDynamicObstcleDecision(const PathData &path_data,
-                                  PathDecision *const path_decision);
-
-  bool MakeStaticObstacleDecision(const PathData &path_data,
-                                  PathDecision *const path_decision);
 
  private:
   DpPolyPathConfig config_;

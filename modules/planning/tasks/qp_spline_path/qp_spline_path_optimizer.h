@@ -26,8 +26,8 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
 
-#include "modules/planning/tasks/path_optimizer.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/path_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -41,7 +41,6 @@ class QpSplinePathOptimizer : public PathOptimizer {
   apollo::common::Status Process(const SpeedData& speed_data,
                                  const ReferenceLine& reference_line,
                                  const common::TrajectoryPoint& init_point,
-                                 PathDecision* const path_decision,
                                  PathData* const path_data) override;
 
  private:
