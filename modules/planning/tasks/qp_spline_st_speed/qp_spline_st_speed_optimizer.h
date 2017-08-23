@@ -28,16 +28,16 @@
 #include "modules/planning/proto/qp_spline_st_speed_config.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/speed_optimizer.h"
 #include "modules/planning/tasks/st_graph/st_boundary_mapper.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
 class QpSplineStSpeedOptimizer : public SpeedOptimizer {
  public:
-  explicit QpSplineStSpeedOptimizer(const std::string& name);
+  QpSplineStSpeedOptimizer();
 
   bool Init(const PlanningConfig& config) override;
 

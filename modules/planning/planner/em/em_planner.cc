@@ -52,24 +52,18 @@ using common::VehicleState;
 using common::math::Vec2d;
 
 void EMPlanner::RegisterTasks() {
-  task_factory_.Register(TRAFFIC_DECIDER, []() -> Task* {
-    return new TrafficDecider(TaskType_Name(TRAFFIC_DECIDER));
-  });
-  task_factory_.Register(DP_POLY_PATH_OPTIMIZER, []() -> Task* {
-    return new DpPolyPathOptimizer(TaskType_Name(DP_POLY_PATH_OPTIMIZER));
-  });
-  task_factory_.Register(PATH_DECIDER, []() -> Task* {
-    return new PathDecider(TaskType_Name(PATH_DECIDER));
-  });
-  task_factory_.Register(DP_ST_SPEED_OPTIMIZER, []() -> Task* {
-    return new DpStSpeedOptimizer(TaskType_Name(DP_ST_SPEED_OPTIMIZER));
-  });
-  task_factory_.Register(QP_SPLINE_PATH_OPTIMIZER, []() -> Task* {
-    return new QpSplinePathOptimizer(TaskType_Name(QP_SPLINE_PATH_OPTIMIZER));
-  });
+  task_factory_.Register(TRAFFIC_DECIDER,
+                         []() -> Task* { return new TrafficDecider(); });
+  task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
+                         []() -> Task* { return new DpPolyPathOptimizer(); });
+  task_factory_.Register(PATH_DECIDER,
+                         []() -> Task* { return new PathDecider(); });
+  task_factory_.Register(DP_ST_SPEED_OPTIMIZER,
+                         []() -> Task* { return new DpStSpeedOptimizer(); });
+  task_factory_.Register(QP_SPLINE_PATH_OPTIMIZER,
+                         []() -> Task* { return new QpSplinePathOptimizer(); });
   task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Task* {
-    return new QpSplineStSpeedOptimizer(
-        TaskType_Name(QP_SPLINE_ST_SPEED_OPTIMIZER));
+    return new QpSplineStSpeedOptimizer();
   });
 }
 
@@ -99,9 +93,6 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
     ADEBUG << "Skip record debug info";
     return;
   }
-  TaskType type;
-  DCHECK(TaskType_Parse(name, &type));
-
   auto ptr_stats = ptr_latency_stats->add_task_stats();
   ptr_stats->set_name(name);
   ptr_stats->set_time_ms(time_diff_ms);

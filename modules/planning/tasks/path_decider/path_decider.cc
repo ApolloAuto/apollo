@@ -39,7 +39,7 @@ namespace {
 const double kTimeSampleInterval = 0.1;
 }
 
-PathDecider::PathDecider(const std::string &name) : Task(name) {}
+PathDecider::PathDecider() : Task("PathDecider") {}
 
 apollo::common::Status PathDecider::Execute(
     Frame *, ReferenceLineInfo *reference_line_info) {

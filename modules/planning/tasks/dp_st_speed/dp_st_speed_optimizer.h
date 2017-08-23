@@ -34,7 +34,7 @@ namespace planning {
 
 class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
-  explicit DpStSpeedOptimizer(const std::string& name);
+  DpStSpeedOptimizer();
 
   bool Init(const PlanningConfig& config) override;
 

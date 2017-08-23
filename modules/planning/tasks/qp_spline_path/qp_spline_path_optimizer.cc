@@ -30,8 +30,8 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-QpSplinePathOptimizer::QpSplinePathOptimizer(const std::string& name)
-    : PathOptimizer(name) {}
+QpSplinePathOptimizer::QpSplinePathOptimizer()
+    : PathOptimizer("QpSplinePathOptimizer") {}
 
 bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
   qp_spline_path_config_ = config.em_planner_config().qp_spline_path_config();
