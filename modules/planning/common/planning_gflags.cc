@@ -103,6 +103,7 @@ DEFINE_double(stgraph_max_deceleration_divide_factor_level_2, 2.0,
               "The divide factor for max deceleration at level 2.");
 
 // Decision Part
+DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_double(static_decision_ignore_s_range, 3.0,
               "threshold for judging nudge in dp path computing decision");
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
@@ -118,6 +119,8 @@ DEFINE_double(stop_distance_obstacle, 5.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(destination_adjust_distance_buffer, 1.0,
               "distance buffer when adjusting destination stop line");
+DEFINE_double(min_driving_width, 2.5,
+              "minimum road width(meters) for adc to drive through");
 DEFINE_double(nudge_distance_vehicle, 0.3,
               "minimum distance to nudge a vehicle");
 DEFINE_double(nudge_distance_bicycle, 0.9144,
