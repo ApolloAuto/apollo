@@ -121,7 +121,7 @@ MapService::MapService(const std::string map_filename)
 MapService::MapService(const std::string &base_map_filename,
                        const std::string &sim_map_filename)
     : pnc_map_(base_map_filename) {
-  CHECK(sim_map_.load_map_from_file(sim_map_filename) == 0)
+  CHECK(sim_map_.LoadMapFromFile(sim_map_filename) == 0)
       << "Failed to load sim_map from " << sim_map_filename;
 }
 
@@ -130,28 +130,28 @@ MapElementIds MapService::CollectMapElementIds(const PointENU &point,
   MapElementIds result;
 
   std::vector<LaneInfoConstPtr> lanes;
-  sim_map_.get_lanes(point, radius, &lanes);
+  sim_map_.GetLanes(point, radius, &lanes);
   ExtractIds(lanes, &result.lane);
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;
-  sim_map_.get_crosswalks(point, radius, &crosswalks);
+  sim_map_.GetCrosswalks(point, radius, &crosswalks);
   ExtractIds(crosswalks, &result.crosswalk);
 
   std::vector<JunctionInfoConstPtr> junctions;
-  sim_map_.get_junctions(point, radius, &junctions);
+  sim_map_.GetJunctions(point, radius, &junctions);
   ExtractIds(junctions, &result.junction);
 
   std::vector<SignalInfoConstPtr> signals;
-  sim_map_.get_signals(point, radius, &signals);
+  sim_map_.GetSignals(point, radius, &signals);
   ExtractIds(signals, &result.signal);
   ExtractOverlapIds(signals, &result.overlap);
 
   std::vector<StopSignInfoConstPtr> stop_signs;
-  sim_map_.get_stop_signs(point, radius, &stop_signs);
+  sim_map_.GetStopSigns(point, radius, &stop_signs);
   ExtractIds(stop_signs, &result.stop_sign);
 
   std::vector<YieldSignInfoConstPtr> yield_signs;
-  sim_map_.get_yield_signs(point, radius, &yield_signs);
+  sim_map_.GetYieldSigns(point, radius, &yield_signs);
   ExtractIds(yield_signs, &result.yield);
 
   return result;
@@ -163,7 +163,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.lane) {
     map_id.set_id(id);
-    auto element = sim_map_.get_lane_by_id(map_id);
+    auto element = sim_map_.GetLaneById(map_id);
     if (element) {
       *result.add_lane() = element->lane();
     }
@@ -171,7 +171,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.crosswalk) {
     map_id.set_id(id);
-    auto element = sim_map_.get_crosswalk_by_id(map_id);
+    auto element = sim_map_.GetCrosswalkById(map_id);
     if (element) {
       *result.add_crosswalk() = element->crosswalk();
     }
@@ -179,7 +179,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.junction) {
     map_id.set_id(id);
-    auto element = sim_map_.get_junction_by_id(map_id);
+    auto element = sim_map_.GetJunctionById(map_id);
     if (element) {
       *result.add_junction() = element->junction();
     }
@@ -187,7 +187,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.signal) {
     map_id.set_id(id);
-    auto element = sim_map_.get_signal_by_id(map_id);
+    auto element = sim_map_.GetSignalById(map_id);
     if (element) {
       *result.add_signal() = element->signal();
     }
@@ -195,7 +195,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.stop_sign) {
     map_id.set_id(id);
-    auto element = sim_map_.get_stop_sign_by_id(map_id);
+    auto element = sim_map_.GetStopSignById(map_id);
     if (element) {
       *result.add_stop_sign() = element->stop_sign();
     }
@@ -203,7 +203,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.yield) {
     map_id.set_id(id);
-    auto element = sim_map_.get_yield_sign_by_id(map_id);
+    auto element = sim_map_.GetYieldSignById(map_id);
     if (element) {
       *result.add_yield() = element->yield_sign();
     }
@@ -211,7 +211,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.overlap) {
     map_id.set_id(id);
-    auto element = sim_map_.get_overlap_by_id(map_id);
+    auto element = sim_map_.GetOverlapById(map_id);
     if (element) {
       *result.add_overlap() = element->overlap();
     }
@@ -245,7 +245,7 @@ bool MapService::GetPoseWithLane(const double x, const double y, double *theta,
   point.set_y(y);
   double l;
   LaneInfoConstPtr nearest_lane;
-  if (BaseMap().get_nearest_lane(point, &nearest_lane, s, &l) < 0) {
+  if (BaseMap().GetNearestLane(point, &nearest_lane, s, &l) < 0) {
     AERROR << "Failed to get neareset lane!";
     return false;
   }

@@ -132,7 +132,7 @@ class RosBridge {
     apollo::hdmap::LaneInfoConstPtr lane = nullptr;
     double s, l;
 
-    HDMapUtil::BaseMapRef().get_nearest_lane(pos, &lane, &s, &l);
+    HDMapUtil::BaseMapRef().GetNearestLane(pos, &lane, &s, &l);
     if (lane == nullptr) {
       AERROR << "Cannot get nearest lane from current position.";
       return;
