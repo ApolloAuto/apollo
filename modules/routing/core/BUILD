@@ -21,6 +21,7 @@ cc_library(
     deps = [
         ":routing_node_range_manager",
         "//modules/common",
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/proto:common_proto",
         "//modules/common/time",
         "//modules/common/util",
