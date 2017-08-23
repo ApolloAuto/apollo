@@ -10,10 +10,13 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math:math_utils",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/predictor",
         "//modules/prediction/proto:lane_graph_proto",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/obstacles:obstacles_container",
         "@eigen//:eigen",
     ],
 )

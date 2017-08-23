@@ -61,5 +61,6 @@ DECLARE_int32(max_num_obstacles_stored);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
+DECLARE_double(lane_change_dist);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

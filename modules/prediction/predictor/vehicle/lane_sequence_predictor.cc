@@ -18,13 +18,16 @@
 
 #include <cmath>
 #include <utility>
-#include "Eigen/Dense"
+#include <limits>
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -32,9 +35,17 @@ namespace prediction {
 using ::apollo::common::PathPoint;
 using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::math::KalmanFilter;
+using ::apollo::common::adapter::AdapterConfig;
+
+void LaneSequencePredictor::Clear() {
+  trajectories_.clear();
+  adc_lane_id_.clear();
+  adc_lane_s_ = 0.0;
+}
 
 void LaneSequencePredictor::Predict(Obstacle* obstacle) {
-  trajectories_.clear();
+  Clear();
+
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
@@ -98,12 +109,14 @@ void LaneSequencePredictor::FilterLaneSequences(
   std::pair<int, double> change(-1, -1.0);
   std::pair<int, double> all(-1, -1.0);
 
+  // Get ADC status
+  GetADC();
+
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
     // Get lane change type
-    int lane_change = GetLaneChangeType(lane_id, sequence);
-    lane_change_type[i] = lane_change;
+    lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
 
     double probability = sequence.probability();
 
@@ -122,6 +135,14 @@ void LaneSequencePredictor::FilterLaneSequences(
 
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
+
+    // The obstacle has interference with ADC within a small distance
+    if (::apollo::common::math::DoubleCompare(
+        GetLaneChangeDistanceWithADC(sequence), FLAGS_lane_change_dist) < 0) {
+      (*enable_lane_sequence)[i] = false;
+      continue;
+    }
+
     double probability = sequence.probability();
     if (::apollo::common::math::DoubleCompare(
         probability, FLAGS_lane_sequence_threshold) < 0 &&
@@ -136,6 +157,31 @@ void LaneSequencePredictor::FilterLaneSequences(
   }
 }
 
+void LaneSequencePredictor::GetADC() {
+  ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::instance()->GetContainer(
+          AdapterConfig::PERCEPTION_OBSTACLES));
+  if (container == nullptr) {
+    AERROR << "Unavailable obstacle container";
+    return;
+  }
+
+  int adc_id = -1;
+  Obstacle *adc = container->GetObstacle(adc_id);
+  if (adc != nullptr) {
+    const Feature& feature = adc->latest_feature();
+    if (feature.has_lane() &&
+        feature.lane().has_lane_feature()) {
+      adc_lane_id_ = feature.lane().lane_feature().lane_id();
+      adc_lane_s_ = feature.lane().lane_feature().lane_s();
+    }
+    if (feature.has_position()) {
+      adc_position_[0] = feature.position().x();
+      adc_position_[1] = feature.position().y();
+    }
+  }
+}
+
 int LaneSequencePredictor::GetLaneChangeType(
     const std::string& lane_id,
     const LaneSequence& lane_sequence) {
@@ -145,8 +191,8 @@ int LaneSequencePredictor::GetLaneChangeType(
   if (lane_id == lane_change_id) {
     return 0;
   } else {
-    if (map->IsLeftNeighborLane(map->LaneById(lane_change_id),
-                                map->LaneById(lane_id))) {
+    if (map->IsLeftNeighborLane(
+        map->LaneById(lane_change_id), map->LaneById(lane_id))) {
       return 1;
     } else if (map->IsRightNeighborLane(
         map->LaneById(lane_change_id), map->LaneById(lane_id))) {
@@ -154,6 +200,23 @@ int LaneSequencePredictor::GetLaneChangeType(
     }
   }
   return -1;
+}
+
+double LaneSequencePredictor::GetLaneChangeDistanceWithADC(
+    const LaneSequence& lane_sequence) {
+  if (adc_lane_id_.empty() || lane_sequence.lane_segment_size() <= 0) {
+    return std::numeric_limits<double>::max();
+  }
+
+  PredictionMap *map = PredictionMap::instance();
+  std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
+  double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
+
+  double lane_s = 0.0;
+  double lane_l = 0.0;
+  map->GetProjection(
+      adc_position_, map->LaneById(obstacle_lane_id), &lane_s, &lane_l);
+  return std::fabs(lane_s - obstacle_lane_s);
 }
 
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
