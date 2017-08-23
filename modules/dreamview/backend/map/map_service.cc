@@ -245,7 +245,7 @@ bool MapService::GetPoseWithLane(const double x, const double y, double *theta,
   point.set_y(y);
   double l;
   LaneInfoConstPtr nearest_lane;
-  if (BaseMap()->get_nearest_lane(point, &nearest_lane, s, &l) < 0) {
+  if (BaseMap().get_nearest_lane(point, &nearest_lane, s, &l) < 0) {
     AERROR << "Failed to get neareset lane!";
     return false;
   }
