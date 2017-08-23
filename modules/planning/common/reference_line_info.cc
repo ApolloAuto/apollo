@@ -21,17 +21,21 @@
 #include "modules/planning/common/reference_line_info.h"
 
 #include <functional>
+#include <unordered_set>
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/util.h"
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-ReferenceLineInfo::ReferenceLineInfo(const ReferenceLine& reference_line)
-    : reference_line_(reference_line) {}
+ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
+                                     const ReferenceLine& reference_line)
+    : pnc_map_(pnc_map), reference_line_(reference_line) {}
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   auto path_obstacle = CreatePathObstacle(obstacle);
@@ -110,6 +114,76 @@ bool ReferenceLineInfo::IsStartFrom(
   common::SLPoint sl_point;
   prev_reference_line.XYToSL(start_point, &sl_point);
   return previous_reference_line_info.reference_line_.is_on_road(sl_point);
+}
+
+bool ReferenceLineInfo::IsOnLeftLane(const common::math::Vec2d& xy_point) {
+  common::SLPoint sl_point;
+  if (!reference_line_.XYToSL(xy_point, &sl_point)) {
+    AERROR << "Failed to get sl point from : " << xy_point.DebugString();
+    return false;
+  }
+  const double distance = 1.0;
+  std::vector<hdmap::LaneInfoConstPtr> lanes;
+  if (!pnc_map_->HDMap().get_lanes(common::util::MakePointENU(xy_point),
+                                   distance, &lanes)) {
+    AERROR << "get lanes failed from point : " << xy_point.DebugString();
+    return false;
+  }
+  std::unordered_set<std::string> lane_ids;
+  for (const auto& lane : lanes) {
+    lane_ids.insert(lane->id().id());
+  }
+  auto ref_point = reference_line_.get_reference_point(sl_point.s());
+  for (const auto& waypoint : ref_point.lane_waypoints()) {
+    for (const auto& left_lane_id :
+         waypoint.lane->lane().left_neighbor_forward_lane_id()) {
+      if (lane_ids.count(left_lane_id.id())) {
+        return true;
+      }
+    }
+    for (const auto& left_lane_id :
+         waypoint.lane->lane().left_neighbor_reverse_lane_id()) {
+      if (lane_ids.count(left_lane_id.id())) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool ReferenceLineInfo::IsOnRightLane(const common::math::Vec2d& xy_point) {
+  common::SLPoint sl_point;
+  if (!reference_line_.XYToSL(xy_point, &sl_point)) {
+    AERROR << "Failed to get sl point from : " << xy_point.DebugString();
+    return false;
+  }
+  const double distance = 1.0;
+  std::vector<hdmap::LaneInfoConstPtr> lanes;
+  if (pnc_map_->HDMap().get_lanes(common::util::MakePointENU(xy_point),
+                                  distance, &lanes) != 0) {
+    AERROR << "get lanes failed from point : " << xy_point.DebugString();
+    return false;
+  }
+  std::unordered_set<std::string> lane_ids;
+  for (const auto& lane : lanes) {
+    lane_ids.insert(lane->id().id());
+  }
+  auto ref_point = reference_line_.get_reference_point(sl_point.s());
+  for (const auto& waypoint : ref_point.lane_waypoints()) {
+    for (const auto& right_lane_id :
+         waypoint.lane->lane().right_neighbor_forward_lane_id()) {
+      if (lane_ids.count(right_lane_id.id())) {
+        return true;
+      }
+    }
+    for (const auto& right_lane_id :
+         waypoint.lane->lane().right_neighbor_reverse_lane_id()) {
+      if (lane_ids.count(right_lane_id.id())) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 const PathData& ReferenceLineInfo::path_data() const { return path_data_; }

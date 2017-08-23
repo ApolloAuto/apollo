@@ -290,7 +290,7 @@ bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
   return true;
 }
 
-bool ReferenceLine::has_overlap(const common::math::Box2d& box) const {
+bool ReferenceLine::HasOverlap(const common::math::Box2d& box) const {
   SLBoundary sl_boundary;
   if (!GetSLBoundary(box, &sl_boundary)) {
     AERROR << "Failed to get sl boundary for box " << box.DebugString();

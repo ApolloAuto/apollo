@@ -65,7 +65,7 @@ class ReferenceLine {
   /**
    * @brief check if any part of the box has overlap with the road.
    */
-  bool has_overlap(const common::math::Box2d& box) const;
+  bool HasOverlap(const common::math::Box2d& box) const;
 
   double length() const { return map_path_.length(); }
 
