@@ -9,6 +9,8 @@ cc_library(
     ],
     deps = [
         "//modules/common:macro",
+        "//modules/common:log",
+        "@ros//:ros_common",
     ],
 )
 

@@ -54,9 +54,9 @@ TEST(TimeTest, TimestampFromAndToDouble) {
 }
 
 TEST(TimeTest, MockTime) {
-  EXPECT_TRUE(Clock::IsSystemClock());
-  Clock::UseSystemClock(false);
-  EXPECT_FALSE(Clock::IsSystemClock());
+  EXPECT_EQ(Clock::SYSTEM, Clock::mode());
+  Clock::SetMode(Clock::MOCK);
+  EXPECT_EQ(Clock::MOCK, Clock::mode());
 
   EXPECT_EQ(0, AsInt64<micros>(Clock::Now()));
   Clock::SetNow(micros(123));

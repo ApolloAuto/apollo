@@ -128,7 +128,7 @@ TEST_F(SimControlTest, Test) {
   AdapterManager::GetPlanning()->OnReceive(adc_trajectory);
 
   {
-    Clock::UseSystemClock(false);
+    Clock::SetMode(Clock::MOCK);
     const auto timestamp = apollo::common::time::From(100.01);
     Clock::SetNow(timestamp.time_since_epoch());
     sim_control_.TimerCallback(ros::TimerEvent());
