@@ -64,9 +64,7 @@ class PathObstacle {
   PathObstacle() = default;
   explicit PathObstacle(const planning::Obstacle* obstacle);
 
-  void SetPerceptionSLBoundary(const SLBoundary& sl_boundary);
-
-  bool Init(const ReferenceLine* reference_line);
+  bool Init(const ReferenceLine& reference_line);
 
   const std::string& Id() const;
 
@@ -106,8 +104,6 @@ class PathObstacle {
   bool IsIgnore() const;
 
  private:
-  bool InitPerceptionSLBoundary(const ReferenceLine* reference_line);
-
   /**
    * @brief check if a ObjectDecisionType is a lateral decision.
    **/
