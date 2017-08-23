@@ -42,7 +42,7 @@ class PncMap {
   virtual ~PncMap() = default;
   explicit PncMap(const std::string &map_file);
 
-  const hdmap::HDMap *HDMap() const;
+  const hdmap::HDMap& HDMap() const;
 
   /**
    * @brief Warning: this function only works if there is no change lane in
@@ -65,9 +65,8 @@ class PncMap {
                             double end_s,
                             LaneSegments *const truncated_segments) const;
 
-  bool validate_routing(
-      const ::apollo::routing::RoutingResponse &routing) const;
-  static void append_lane_to_points(
+  bool ValidateRouting(const ::apollo::routing::RoutingResponse &routing) const;
+  static void AppendLaneToPoints(
       hdmap::LaneInfoConstPtr lane, const double start_s, const double end_s,
       std::vector<hdmap::MapPathPoint> *const points);
   hdmap::HDMap hdmap_;
