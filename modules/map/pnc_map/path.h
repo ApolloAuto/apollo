@@ -49,7 +49,7 @@ struct LaneWaypoint {
   LaneInfoConstPtr lane = nullptr;
   double s = 0.0;
 
-  std::string debug_string() const;
+  std::string DebugString() const;
 };
 
 struct LaneSegment {
@@ -60,7 +60,7 @@ struct LaneSegment {
   double start_s = 0.0;
   double end_s = 0.0;
 
-  std::string debug_string() const;
+  std::string DebugString() const;
 };
 
 struct PathOverlap {
@@ -72,7 +72,7 @@ struct PathOverlap {
   double start_s = 0.0;
   double end_s = 0.0;
 
-  std::string debug_string() const;
+  std::string DebugString() const;
 };
 
 class MapPathPoint : public common::math::Vec2d {
@@ -108,7 +108,7 @@ class MapPathPoint : public common::math::Vec2d {
 
   void clear_lane_waypoints() { _lane_waypoints.clear(); }
 
-  std::string debug_string() const;
+  std::string DebugString() const;
 
  protected:
   double _heading = 0.0;
@@ -261,7 +261,7 @@ class Path {
   bool is_on_path(const common::math::Vec2d& point) const;
   bool overlap_with(const common::math::Box2d& box, double width) const;
 
-  std::string debug_string() const;
+  std::string DebugString() const;
 
  protected:
   void init();

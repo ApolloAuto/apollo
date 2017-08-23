@@ -57,70 +57,37 @@ bool find_lane_segment(const MapPathPoint& p1, const MapPathPoint& p2,
 
 }  // namespace
 
-std::string LaneWaypoint::debug_string() const {
+std::string LaneWaypoint::DebugString() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
   return common::util::StrCat("id = ", lane->id().id(), "  s = ", s);
 }
 
-std::string LaneSegment::debug_string() const {
+std::string LaneSegment::DebugString() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
-  return common::util::StrCat("id = ", lane->id().id(),
-                              "  "
-                              "start_s = ",
-                              start_s,
-                              "  "
-                              "end_s = ",
-                              end_s);
+  return common::util::StrCat("id = ", lane->id().id(), "  "
+                              "start_s = ", start_s, "  "
+                              "end_s = ", end_s);
 }
 
-std::string MapPathPoint::debug_string() const {
-  std::ostringstream sout;
-  sout << "x = " << x_ << "  y = " << y_ << "  heading = " << _heading
-       << "  lwp = {";
-  bool first_lwp = true;
-  for (const auto& lwp : _lane_waypoints) {
-    sout << "(" << lwp.debug_string() << ")";
-    if (!first_lwp) {
-      sout << ", ";
-      first_lwp = false;
-    }
-  }
-  sout << "}";
-  sout.flush();
-  return sout.str();
+std::string MapPathPoint::DebugString() const {
+  return common::util::StrCat(
+      "x = ", x_, "  y = ", y_, "  heading = ", _heading, "  lwp = "
+      "{(", common::util::PrintDebugStringIter(_lane_waypoints, "), ("), ")}");
 }
 
-std::string Path::debug_string() const {
-  std::ostringstream sout;
-  sout << "num_points = " << _num_points << "  points = {";
-  bool first_point = true;
-  for (const auto& point : _path_points) {
-    sout << "(" << point.debug_string() << ")";
-    if (!first_point) {
-      sout << ", ";
-      first_point = false;
-    }
-  }
-  sout << "}  num_lane_segments = " << _lane_segments.size()
-       << "  lane_segments = {";
-  bool first_segment = true;
-  for (const auto& segment : _lane_segments) {
-    sout << "(" << segment.debug_string() << ")";
-    if (!first_segment) {
-      sout << ", ";
-      first_segment = false;
-    }
-  }
-  sout << "}";
-  sout.flush();
-  return sout.str();
+std::string Path::DebugString() const {
+  return common::util::StrCat(
+      "num_points = ", _num_points, "  points = "
+      "{(", common::util::PrintDebugStringIter(_path_points, "), ("), ")}  "
+      "num_lane_segments = ", _lane_segments.size(), "  lane_segments = "
+      "{(", common::util::PrintDebugStringIter(_lane_segments, "), ("), ")}");
 }
 
-std::string PathOverlap::debug_string() const {
+std::string PathOverlap::DebugString() const {
   return common::util::StrCat(object_id, " ", start_s, " ", end_s);
 }
 
