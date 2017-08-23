@@ -22,12 +22,15 @@
 #define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_TRAFFIC_DECIDER_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/common/util/factory.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/tasks/task.h"
+#include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
@@ -45,11 +48,14 @@ namespace planning {
 class TrafficDecider : public Task {
  public:
   TrafficDecider();
+  bool Init(const PlanningConfig &config) override;
   virtual ~TrafficDecider() = default;
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
  private:
+  void RegisterRules();
+
   bool MakeDestinationStopDecision();
 
   /**
@@ -58,6 +64,9 @@ class TrafficDecider : public Task {
    */
   const Obstacle *CreateDestinationObstacle();
   const PathObstacle *CreateDestinationPathObstacle();
+
+  apollo::common::util::Factory<std::string, TrafficRule> rule_factory_;
+  google::protobuf::RepeatedPtrField<RuleConfig> rule_configs_;
 };
 
 }  // namespace planning

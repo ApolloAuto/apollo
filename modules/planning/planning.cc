@@ -76,15 +76,9 @@ Status Planning::Init() {
   pnc_map_.reset(new hdmap::PncMap(apollo::hdmap::BaseMapFile()));
   Frame::SetMap(pnc_map_.get());
 
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                              &config_)) {
-    AERROR << "failed to load planning config file "
-           << FLAGS_planning_config_file;
-    return Status(
-        ErrorCode::PLANNING_ERROR,
-        "failed to load planning config file: " + FLAGS_planning_config_file);
-  }
-
+  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
+                                               &config_))
+      << "failed to load planning config file " << FLAGS_planning_config_file;
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_adapter_config_path);
   }
@@ -103,8 +97,7 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  if (FLAGS_enable_prediction &&
-      AdapterManager::GetPrediction() == nullptr) {
+  if (FLAGS_enable_prediction && AdapterManager::GetPrediction() == nullptr) {
     std::string error_msg("Prediction is not registered");
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
