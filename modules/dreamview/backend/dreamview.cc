@@ -31,6 +31,8 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::Status;
 using apollo::common::time::Clock;
+using apollo::hdmap::SimMapFile;
+using apollo::hdmap::BaseMapFile;
 
 std::string Dreamview::Name() const {
   return FLAGS_dreamview_module_name;
@@ -55,7 +57,7 @@ Status Dreamview::Init() {
   websocket_.reset(new WebSocketHandler());
   server_->addWebSocketHandler("/websocket", *websocket_);
 
-  map_service_.reset(new MapService(apollo::hdmap::SimMapFile()));
+  map_service_.reset(new MapService(BaseMapFile(), SimMapFile()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_service_.get(), FLAGS_routing_from_file));
   sim_control_.reset(new SimControl(map_service_.get()));

@@ -59,7 +59,7 @@ class RosBridge {
         apollo::hdmap::EndWayPointFile(),
         routing_request_template.mutable_end()));
     // Init HDMap.
-    CHECK(HDMapUtil::instance()->BaseMap());
+    CHECK(HDMapUtil::BaseMap());
   }
 
  private:
@@ -132,7 +132,7 @@ class RosBridge {
     apollo::hdmap::LaneInfoConstPtr lane = nullptr;
     double s, l;
 
-    HDMapUtil::instance()->BaseMapRef().get_nearest_lane(pos, &lane, &s, &l);
+    HDMapUtil::BaseMapRef().get_nearest_lane(pos, &lane, &s, &l);
     if (lane == nullptr) {
       AERROR << "Cannot get nearest lane from current position.";
       return;

@@ -19,6 +19,7 @@ limitations under the License.
 
 namespace apollo {
 namespace hdmap {
+
 namespace {
 
 // Find the first existing file from a list of candidates: "file_a|file_b|...".
@@ -61,7 +62,8 @@ std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
   return hdmap;
 }
 
-HDMapUtil::HDMapUtil() {}
+std::unique_ptr<HDMap> HDMapUtil::base_map_ = nullptr;
+std::mutex HDMapUtil::base_map_mutex_;
 
 const HDMap* HDMapUtil::BaseMap() {
   if (base_map_ == nullptr) {

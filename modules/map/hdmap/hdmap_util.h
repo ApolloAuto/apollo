@@ -55,8 +55,8 @@ std::string RoutingMapFile();
  * @return end way point file path
  */
 inline std::string EndWayPointFile() {
-  return apollo::common::util::StrCat(
-      FLAGS_map_dir, "/", FLAGS_end_way_point_filename);
+  return apollo::common::util::StrCat(FLAGS_map_dir, "/",
+                                      FLAGS_end_way_point_filename);
 }
 
 /**
@@ -76,19 +76,19 @@ class HDMapUtil {
  public:
   // Get default base map from the file specified by global flags.
   // Return nullptr if failed to load.
-  const HDMap* BaseMap();
+  static const HDMap* BaseMap();
   // Similar to BaseMap(), but garantee to return a valid HDMap, or else raise
   // fatal error.
-  const HDMap& BaseMapRef();
+  static const HDMap& BaseMapRef();
 
   // Reload the base map from the file specified by global flags.
-  bool ReloadBaseMap();
+  static bool ReloadBaseMap();
 
  private:
-  std::unique_ptr<HDMap> base_map_ = nullptr;
-  std::mutex base_map_mutex_;
+  HDMapUtil() = delete;
 
-  DECLARE_SINGLETON(HDMapUtil);
+  static std::unique_ptr<HDMap> base_map_;
+  static std::mutex base_map_mutex_;
 };
 
 }  // namespace hdmap
