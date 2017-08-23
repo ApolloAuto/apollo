@@ -53,7 +53,7 @@ std::string RoutingMapFile() {
 
 std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
   std::unique_ptr<HDMap> hdmap(new HDMap());
-  if (hdmap->load_map_from_file(map_file_path) != 0) {
+  if (hdmap->LoadMapFromFile(map_file_path) != 0) {
     AERROR << "Failed to load HDMap " << map_file_path;
     hdmap.reset(nullptr);
   } else {

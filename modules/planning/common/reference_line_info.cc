@@ -124,8 +124,8 @@ bool ReferenceLineInfo::IsOnLeftLane(const common::math::Vec2d& xy_point) {
   }
   const double distance = 1.0;
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  if (!pnc_map_->HDMap().get_lanes(common::util::MakePointENU(xy_point),
-                                   distance, &lanes)) {
+  if (!pnc_map_->HDMap().GetLanes(common::util::MakePointENU(xy_point),
+                                  distance, &lanes)) {
     AERROR << "get lanes failed from point : " << xy_point.DebugString();
     return false;
   }
@@ -159,8 +159,8 @@ bool ReferenceLineInfo::IsOnRightLane(const common::math::Vec2d& xy_point) {
   }
   const double distance = 1.0;
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  if (pnc_map_->HDMap().get_lanes(common::util::MakePointENU(xy_point),
-                                  distance, &lanes) != 0) {
+  if (pnc_map_->HDMap().GetLanes(common::util::MakePointENU(xy_point),
+                                 distance, &lanes) != 0) {
     AERROR << "get lanes failed from point : " << xy_point.DebugString();
     return false;
   }

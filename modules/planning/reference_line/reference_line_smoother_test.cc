@@ -33,11 +33,11 @@ namespace planning {
 class ReferenceLineSmootherTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    hdmap_.load_map_from_file(map_file);
+    hdmap_.LoadMapFromFile(map_file);
     const std::string lane_id_str = "1_-1";
     hdmap::Id lane_id;
     lane_id.set_id(lane_id_str);
-    lane_info_ptr = hdmap_.get_lane_by_id(lane_id);
+    lane_info_ptr = hdmap_.GetLaneById(lane_id);
     if (!lane_info_ptr) {
       AERROR << "failed to find lane " << lane_id_str << " from map "
              << map_file;

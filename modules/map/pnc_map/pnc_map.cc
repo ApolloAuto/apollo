@@ -80,7 +80,7 @@ void RemoveDuplicates(std::vector<hdmap::MapPathPoint> *points) {
 }  // namespace
 
 PncMap::PncMap(const std::string &map_file) {
-  CHECK(!hdmap_.load_map_from_file(map_file)) << "Failed to load map file:"
+  CHECK(!hdmap_.LoadMapFromFile(map_file)) << "Failed to load map file:"
                                               << map_file;
   AINFO << "map loaded, Map file: " << map_file;
 }
@@ -185,7 +185,7 @@ bool PncMap::GetLaneSegmentsFromRouting(
   route_segments->clear();
   const double kMaxDistance = 20.0;  // meters.
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  const int status = hdmap_.get_lanes(point, kMaxDistance, &lanes);
+  const int status = hdmap_.GetLanes(point, kMaxDistance, &lanes);
   if (status < 0) {
     AERROR << "failed to get lane from point " << point.DebugString();
     return false;
@@ -258,7 +258,7 @@ bool PncMap::GetLaneSegmentsFromRouting(
       }
       for (const auto &lane_segment : passage_region.segment()) {
         const double length = lane_segment.end_s() - lane_segment.start_s();
-        auto lane = hdmap_.get_lane_by_id(hdmap::MakeMapId(lane_segment.id()));
+        auto lane = hdmap_.GetLaneById(hdmap::MakeMapId(lane_segment.id()));
         if (!lane) {
           AERROR << "Failed to fine lane " << lane_segment.id();
           return false;
@@ -336,7 +336,7 @@ bool PncMap::TruncateLaneSegments(
           break;
         }
         const auto &next_lane_id = lane->lane().predecessor_id(0);
-        lane = hdmap_.get_lane_by_id(next_lane_id);
+        lane = hdmap_.GetLaneById(next_lane_id);
         if (lane == nullptr) {
           break;
         }
@@ -373,7 +373,7 @@ bool PncMap::TruncateLaneSegments(
     std::string last_lane_id = last_segment.lane->id().id();
     double last_s = last_segment.end_s;
     while (router_s < end_s - kRouteEpsilon) {
-      const auto lane = hdmap_.get_lane_by_id(hdmap::MakeMapId(last_lane_id));
+      const auto lane = hdmap_.GetLaneById(hdmap::MakeMapId(last_lane_id));
       if (lane == nullptr) {
         break;
       }
@@ -435,7 +435,7 @@ bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
   for (const auto &way : routing.route()) {
     if (way.has_road_info() && !way.road_info().passage_region().empty()) {
       for (const auto &segment : way.road_info().passage_region(0).segment()) {
-        auto lane_ptr = hdmap_.get_lane_by_id(hdmap::MakeMapId(segment.id()));
+        auto lane_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(segment.id()));
         if (!lane_ptr) {
           AERROR << "Failed to fine lane: " << segment.id();
           return false;
@@ -445,7 +445,7 @@ bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
     } else if (way.has_junction_info()) {
       for (const auto &segment :
            way.junction_info().passage_region().segment()) {
-        auto lane_ptr = hdmap_.get_lane_by_id(hdmap::MakeMapId(segment.id()));
+        auto lane_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(segment.id()));
         if (!lane_ptr) {
           AERROR << "Failed to fine lane: " << segment.id();
           return false;

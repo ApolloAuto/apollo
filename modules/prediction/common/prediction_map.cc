@@ -84,8 +84,7 @@ double PredictionMap::LaneTotalWidth(
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
     const std::string& str_id) {
-  return HDMapUtil::BaseMapRef().get_lane_by_id(
-      apollo::hdmap::MakeMapId(str_id));
+  return HDMapUtil::BaseMapRef().GetLaneById(apollo::hdmap::MakeMapId(str_id));
 }
 
 bool PredictionMap::GetProjection(const Eigen::Vector2d& position,
@@ -121,7 +120,7 @@ void PredictionMap::OnLane(
   apollo::common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
-  if (HDMapUtil::BaseMapRef().get_lanes_with_heading(
+  if (HDMapUtil::BaseMapRef().GetLanesWithHeading(
           hdmap_point, radius, heading, M_PI, &candidate_lanes) != 0) {
     return;
   }
