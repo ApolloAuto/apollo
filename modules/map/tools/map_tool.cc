@@ -57,10 +57,10 @@ void ShiftMap(Map* map_pb) {
     for (auto& stop_line : *(stop_sign.mutable_stop_line())) {
       for (auto& segment : *(stop_line.mutable_segment())) {
         for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
-        point.set_x(point.x() + FLAGS_x_offset);
-        point.set_y(point.y() + FLAGS_y_offset);
+          point.set_x(point.x() + FLAGS_x_offset);
+          point.set_y(point.y() + FLAGS_y_offset);
+        }
       }
-    }
     }
   }
 }
@@ -81,10 +81,8 @@ int main(int32_t argc, char** argv) {
 
   Map map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
-  if (!apollo::common::util::GetProtoFromFile(map_file, &map_pb)) {
-    AERROR << "Fail to open:" << map_file;
-    return 1;
-  }
+  CHECK(apollo::common::util::GetProtoFromFile(map_file, &map_pb))
+      << "Fail to open:" << map_file;
   ShiftMap(&map_pb);
   OutputMap(map_pb);
   AINFO << "modified map at:" << FLAGS_output_dir;

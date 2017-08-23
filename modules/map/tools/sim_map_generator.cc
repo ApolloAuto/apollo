@@ -44,6 +44,7 @@ using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::DownsampleByDistance;
 using apollo::common::util::GetProtoFromFile;
 using apollo::common::PointENU;
+using apollo::hdmap::adapter::OpendriveAdapter;
 using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
 
@@ -114,8 +115,7 @@ int main(int32_t argc, char** argv) {
   Map map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
   if (apollo::common::util::EndWith(map_file, ".xml")) {
-    CHECK(apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_file,
-                                                             &map_pb));
+    CHECK(OpendriveAdapter::LoadData(map_file, &map_pb));
   } else {
     CHECK(GetProtoFromFile(map_file, &map_pb)) << "Fail to open: " << map_file;
   }

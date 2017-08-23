@@ -55,34 +55,21 @@ class MapUtil {
     _map_client->load_map_from_file(map_filename);
   }
 
-  const ::apollo::hdmap::OverlapInfo *get_overlap(
-      const std::string &overlap_id) {
-    ::apollo::hdmap::Id id;
-    id.set_id(overlap_id);
-    auto ret = _map_client->get_overlap_by_id(id);
-    if (ret == nullptr) {
-      fprintf(stderr, "failed to find overlap[%s]\n", overlap_id.c_str());
-    }
+  const apollo::hdmap::OverlapInfo *get_overlap(const std::string &overlap_id) {
+    auto ret = _map_client->get_overlap_by_id(hdmap::MakeMapId(overlap_id));
+    AERROR_IF(ret == nullptr) << "failed to find overlap[" << overlap_id << "]";
     return ret.get();
   }
 
   const ::apollo::hdmap::SignalInfo *get_signal(const std::string &signal_id) {
-    ::apollo::hdmap::Id id;
-    id.set_id(signal_id);
-    auto ret = _map_client->get_signal_by_id(id);
-    if (ret == nullptr) {
-      fprintf(stderr, "failed to find overlap[%s]\n", signal_id.c_str());
-    }
+    auto ret = _map_client->get_signal_by_id(hdmap::MakeMapId(signal_id));
+    AERROR_IF(ret == nullptr) << "failed to find overlap[" << signal_id << "]";
     return ret.get();
   }
 
   const ::apollo::hdmap::LaneInfo *get_lane(const std::string &lane_id) {
-    ::apollo::hdmap::Id id;
-    id.set_id(lane_id);
-    auto ret = _map_client->get_lane_by_id(id);
-    if (ret == nullptr) {
-      fprintf(stderr, "failed to find lane[%s]\n", lane_id.c_str());
-    }
+    auto ret = _map_client->get_lane_by_id(hdmap::MakeMapId(lane_id));
+    AERROR_IF(ret == nullptr) << "failed to find lane[" << lane_id << "]";
     return ret.get();
   }
 
@@ -104,10 +91,8 @@ class MapUtil {
                   double *heading) {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
-    ::apollo::hdmap::Id id;
-    id.set_id(lane_id);
-    const ::apollo::hdmap::LaneInfo* lane_info_ptr
-        = _map_client->get_lane_by_id(id).get();
+    const ::apollo::hdmap::LaneInfo* lane_info_ptr =
+        _map_client->get_lane_by_id(hdmap::MakeMapId(lane_id)).get();
     QUIT_IF(lane_info_ptr == nullptr, -3,
             ERROR, "get_smooth_point_from_lane[%s] failed",
             lane_id.c_str());
@@ -275,21 +260,13 @@ int main(int argc, char *argv[]) {
   }
   if (!FLAGS_dump_txt_map.empty()) {
     apollo::hdmap::Map map;
-    apollo::common::util::GetProtoFromFile(map_file, &map);
-
-    std::ofstream ofs(FLAGS_dump_txt_map);
-    ofs << map.DebugString();
-    ofs.close();
+    CHECK(apollo::common::util::GetProtoFromFile(map_file, &map));
+    CHECK(apollo::common::util::SetProtoToASCIIFile(map, FLAGS_dump_txt_map));
   }
   if (!FLAGS_dump_bin_map.empty()) {
     apollo::hdmap::Map map;
-    apollo::common::util::GetProtoFromFile(map_file, &map);
-
-    std::ofstream ofs(FLAGS_dump_bin_map);
-    std::string map_str;
-    map.SerializeToString(&map_str);
-    ofs << map_str;
-    ofs.close();
+    CHECK(apollo::common::util::GetProtoFromFile(map_file, &map));
+    CHECK(apollo::common::util::SetProtoToBinaryFile(map, FLAGS_dump_bin_map));
   }
   if (!FLAGS_sl_to_xy
       && !FLAGS_xy_to_sl
