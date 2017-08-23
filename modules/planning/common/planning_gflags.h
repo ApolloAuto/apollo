@@ -74,6 +74,7 @@ DECLARE_double(stgraph_max_deceleration_divide_factor_level_1);
 DECLARE_double(stgraph_max_deceleration_divide_factor_level_2);
 
 // Decision Part
+DECLARE_bool(enable_nudge_decision);
 DECLARE_double(static_decision_ignore_s_range);
 DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(static_decision_stop_buffer);
@@ -81,6 +82,7 @@ DECLARE_double(dynamic_decision_follow_range);
 DECLARE_double(stop_distance_pedestrian);
 DECLARE_double(stop_distance_obstacle);
 DECLARE_double(destination_adjust_distance_buffer);
+DECLARE_double(min_driving_width);
 DECLARE_double(nudge_distance_vehicle);
 DECLARE_double(nudge_distance_bicycle);
 DECLARE_double(nudge_distance_obstacle);
