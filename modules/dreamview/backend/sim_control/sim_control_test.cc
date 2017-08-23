@@ -133,8 +133,8 @@ TEST_F(SimControlTest, Test) {
     Clock::SetNow(timestamp.time_since_epoch());
     sim_control_.TimerCallback(ros::TimerEvent());
 
-    Chassis *chassis = AdapterManager::GetChassis()->GetLatestPublished();
-    LocalizationEstimate *localization =
+    const Chassis *chassis = AdapterManager::GetChassis()->GetLatestPublished();
+    const LocalizationEstimate *localization =
         AdapterManager::GetLocalization()->GetLatestPublished();
 
     EXPECT_EQ(chassis->engine_started(), true);
