@@ -21,9 +21,9 @@ limitations under the License.
 
 #include "glog/logging.h"
 
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/common/math/linear_interpolation.h"
 
 namespace {
 
@@ -148,14 +148,20 @@ void LaneInfo::init() {
 
   const double kMinHalfWidth = 1.05;
   for (const auto &p : _sampled_left_width) {
-    AERROR << "lane[id = " << _lane.id() << "]. _sampled_left_width[" << p
-           << "] is too small. It should be larger than half vehicle width["
-           << kMinHalfWidth << "].";
+    if (p.second < kMinHalfWidth) {
+      AERROR << "lane[id = " << _lane.id().DebugString()
+             << "]. _sampled_left_width[" << p.second
+             << "] is too small. It should be larger than half vehicle width["
+             << kMinHalfWidth << "].";
+    }
   }
   for (const auto &p : _sampled_right_width) {
-    AERROR << "lane[id = " << _lane.id() << "]. _sampled_right_width[" << p
-           << "] is too small. It should be larger than half vehicle width["
-           << kMinHalfWidth << "].";
+    if (p.second < kMinHalfWidth) {
+      AERROR << "lane[id = " << _lane.id().DebugString()
+             << "]. _sampled_right_width[" << p.second
+             << "] is too small. It should be larger than half vehicle width["
+             << kMinHalfWidth << "].";
+    }
   }
 
   create_kdtree();
@@ -182,8 +188,8 @@ double LaneInfo::heading(const double s) const {
     return _headings[index];
   } else {
     return ::apollo::common::math::slerp(
-        _headings[index - 1], _accumulated_s[index - 1],
-        _headings[index], _accumulated_s[index], s);
+        _headings[index - 1], _accumulated_s[index - 1], _headings[index],
+        _accumulated_s[index], s);
     // return _headings[index - 1];
   }
 }
