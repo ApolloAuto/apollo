@@ -46,7 +46,7 @@ DEFINE_string(routing_request_topic, "/apollo/routing_request",
               "routing request topic name");
 DEFINE_string(routing_response_topic, "/apollo/routing_response",
               "routing response topic name");
-DEFINE_string(relative_odometry_topic, "/apollo/calibrtion/relative_odometry",
+DEFINE_string(relative_odometry_topic, "/apollo/calibration/relative_odometry",
               "relative odometry topic name");
 DEFINE_string(ins_stat_topic, "/apollo/sensor/gnss/ins_stat",
               "ins stat topic name");
