@@ -86,7 +86,7 @@ class PlanningTestBase : public ::testing::Test {
   bool SetUpAdapters();
 
   Planning planning_;
-  ADCTrajectory* adc_trajectory_ = nullptr;
+  ADCTrajectory adc_trajectory_;
 };
 
 }  // namespace planning
