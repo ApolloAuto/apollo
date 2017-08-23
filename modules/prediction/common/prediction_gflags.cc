@@ -75,3 +75,4 @@ DEFINE_int32(max_num_obstacles_stored, 100,
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
     "Threshold for trimming lane sequence trajectories");
+DEFINE_double(lane_change_dist, 10.0, "Lane change distance with ADC");
