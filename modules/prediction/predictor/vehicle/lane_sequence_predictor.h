@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include "Eigen/Dense"
 
 #include "modules/prediction/predictor/predictor.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
@@ -52,6 +53,11 @@ class LaneSequencePredictor : public Predictor {
 
  protected:
   /**
+   * @brief Clear private members
+   */
+  void Clear();
+
+  /**
    * @brief Filter lane sequences
    * @param Lane graph
    * @param Current lane id
@@ -75,6 +81,18 @@ class LaneSequencePredictor : public Predictor {
                         const LaneSequence& lane_sequence);
 
   /**
+   * @brief Get lane change distance with ADC
+   * @param Target lane sequence
+   * @return Lane change distance with ADC
+   */
+  double GetLaneChangeDistanceWithADC(const LaneSequence& lane_sequence);
+
+  /**
+   * @brief Get ADC status
+   */
+  void GetADC();
+
+  /**
    * @brief Draw lane sequence trajectory points
    * @param Kalman filter
    * @param Lane sequence
@@ -95,6 +113,11 @@ class LaneSequencePredictor : public Predictor {
    * @return String describing the lane sequence
    */
   std::string ToString(const LaneSequence& sequence);
+
+ private:
+  std::string adc_lane_id_ = "";
+  double adc_lane_s_ = 0.0;
+  Eigen::Vector2d adc_position_;
 };
 
 }  // namespace prediction
