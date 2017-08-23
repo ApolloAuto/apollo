@@ -19,12 +19,12 @@
 
 #include <memory>
 
-#include "modules/routing/core/navigator.h"
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/monitor/monitor.h"
 #include "modules/common/status/status.h"
+#include "modules/routing/core/navigator.h"
 
 namespace apollo {
 namespace routing {
