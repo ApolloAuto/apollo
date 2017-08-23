@@ -72,7 +72,7 @@ bool PathObstacle::InitPerceptionSLBoundary(
   obstacle_->PerceptionBoundingBox().GetAllCorners(&corners);
   for (const auto& point : corners) {
     common::SLPoint sl_point;
-    if (!reference_line->xy_to_sl(point, &sl_point)) {
+    if (!reference_line->XYToSL(point, &sl_point)) {
       AERROR << "failed to get projection for point: " << point.DebugString()
              << " on reference line.";
       return false;

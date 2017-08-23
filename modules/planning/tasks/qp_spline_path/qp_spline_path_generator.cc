@@ -151,7 +151,7 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
     const common::TrajectoryPoint& traj_point,
     common::FrenetFramePoint* const frenet_frame_point) {
   common::SLPoint sl_point;
-  if (!reference_line_.xy_to_sl(
+  if (!reference_line_.XYToSL(
           {traj_point.path_point().x(), traj_point.path_point().y()},
           &sl_point)) {
     return false;

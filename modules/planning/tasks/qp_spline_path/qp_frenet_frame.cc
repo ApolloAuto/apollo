@@ -168,7 +168,7 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
 
     for (const auto& corner_xy : corners) {
       common::SLPoint cur_point;
-      if (!reference_line_.xy_to_sl(corner_xy, &cur_point)) {
+      if (!reference_line_.XYToSL(corner_xy, &cur_point)) {
         AERROR << "Fail to map xy point " << corner_xy.DebugString() << " to "
                << cur_point.ShortDebugString();
         return false;
@@ -259,7 +259,7 @@ bool QpFrenetFrame::MapPolygon(
 
   for (const auto& corner_xy : corners) {
     common::SLPoint cur_point;
-    if (!reference_line_.xy_to_sl(corner_xy, &cur_point)) {
+    if (!reference_line_.XYToSL(corner_xy, &cur_point)) {
       AERROR << "Fail to map xy point " << corner_xy.DebugString() << " to "
              << cur_point.DebugString();
       return false;
