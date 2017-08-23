@@ -39,8 +39,8 @@ using Status = apollo::common::Status;
 using ErrorCode = apollo::common::ErrorCode;
 using TrajectoryPoint = apollo::common::TrajectoryPoint;
 
-QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const std::string& name)
-    : SpeedOptimizer(name) {}
+QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer()
+    : SpeedOptimizer("QpSplineStSpeedOptimizer") {}
 
 bool QpSplineStSpeedOptimizer::Init(const PlanningConfig& config) {
   qp_spline_st_speed_config_ =

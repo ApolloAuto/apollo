@@ -30,7 +30,7 @@ namespace planning {
 
 class PathDecider : public Task {
  public:
-  explicit PathDecider(const std::string &name);
+  PathDecider();
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

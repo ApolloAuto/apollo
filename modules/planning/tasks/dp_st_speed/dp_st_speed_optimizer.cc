@@ -39,8 +39,8 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::localization::LocalizationEstimate;
 
-DpStSpeedOptimizer::DpStSpeedOptimizer(const std::string& name)
-    : SpeedOptimizer(name) {}
+DpStSpeedOptimizer::DpStSpeedOptimizer()
+    : SpeedOptimizer("DpStSpeedOptimizer") {}
 
 bool DpStSpeedOptimizer::Init(const PlanningConfig& config) {
   dp_st_speed_config_ = config.em_planner_config().dp_st_speed_config();

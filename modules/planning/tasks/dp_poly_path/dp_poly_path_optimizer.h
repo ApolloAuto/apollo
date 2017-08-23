@@ -33,7 +33,7 @@ namespace planning {
 
 class DpPolyPathOptimizer : public PathOptimizer {
  public:
-  explicit DpPolyPathOptimizer(const std::string &name);
+  DpPolyPathOptimizer();
 
   bool Init(const PlanningConfig &config) override;
 

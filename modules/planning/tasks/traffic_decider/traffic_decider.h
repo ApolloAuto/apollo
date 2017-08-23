@@ -44,7 +44,7 @@ namespace planning {
  */
 class TrafficDecider : public Task {
  public:
-  explicit TrafficDecider(const std::string &name);
+  TrafficDecider();
   virtual ~TrafficDecider() = default;
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
