@@ -155,6 +155,7 @@ bool Frame::CreateReferenceLineFromRouting(
     const common::PointENU &position, const routing::RoutingResponse &routing,
     std::vector<ReferenceLine> *reference_lines) {
   CHECK_NOTNULL(reference_lines);
+  CHECK(reference_lines->empty());
 
   std::vector<std::vector<hdmap::LaneSegment>> route_segments;
   if (!pnc_map_->GetLaneSegmentsFromRouting(
@@ -164,16 +165,23 @@ bool Frame::CreateReferenceLineFromRouting(
     return false;
   }
 
+  ReferenceLineSmoother smoother;
+  smoother.Init(smoother_config_);
+
   for (const auto &segments : route_segments) {
     hdmap::Path hdmap_path;
     pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
-    reference_lines->emplace_back(ReferenceLine());
-    ReferenceLineSmoother smoother;
-    smoother.Init(smoother_config_);
-    if (!smoother.smooth(ReferenceLine(hdmap_path), &reference_lines->back())) {
+    ReferenceLine reference_line;
+    if (!smoother.smooth(ReferenceLine(hdmap_path), &reference_line)) {
       AERROR << "Failed to smooth reference line";
-      return false;
+      continue;
     }
+    reference_lines->push_back(std::move(reference_line));
+  }
+
+  if (reference_lines->empty()) {
+    AERROR << "No smooth reference lines available";
+    return false;
   }
   return true;
 }
