@@ -53,16 +53,16 @@ class HDMap {
    * @param map_filename path of map data file
    * @return 0:success, otherwise failed
    */
-  int load_map_from_file(const std::string& map_filename);
+  int LoadMapFromFile(const std::string& map_filename);
 
-  LaneInfoConstPtr get_lane_by_id(const apollo::hdmap::Id& id) const;
-  JunctionInfoConstPtr get_junction_by_id(const apollo::hdmap::Id& id) const;
-  SignalInfoConstPtr get_signal_by_id(const apollo::hdmap::Id& id) const;
-  CrosswalkInfoConstPtr get_crosswalk_by_id(const apollo::hdmap::Id& id) const;
-  StopSignInfoConstPtr get_stop_sign_by_id(const apollo::hdmap::Id& id) const;
-  YieldSignInfoConstPtr get_yield_sign_by_id(const apollo::hdmap::Id& id) const;
-  OverlapInfoConstPtr get_overlap_by_id(const apollo::hdmap::Id& id) const;
-  RoadInfoConstPtr get_road_by_id(const apollo::hdmap::Id& id) const;
+  LaneInfoConstPtr GetLaneById(const Id& id) const;
+  JunctionInfoConstPtr GetJunctionById(const Id& id) const;
+  SignalInfoConstPtr GetSignalById(const Id& id) const;
+  CrosswalkInfoConstPtr GetCrosswalkById(const Id& id) const;
+  StopSignInfoConstPtr GetStopSignById(const Id& id) const;
+  YieldSignInfoConstPtr GetYieldSignById(const Id& id) const;
+  OverlapInfoConstPtr GetOverlapById(const Id& id) const;
+  RoadInfoConstPtr GetRoadById(const Id& id) const;
 
   /**
    * @brief get all lanes in certain range
@@ -71,8 +71,8 @@ class HDMap {
    * @param lanes store all lanes in target range
    * @return 0:success, otherwise failed
    */
-  int get_lanes(const apollo::common::PointENU& point, double distance,
-                std::vector<LaneInfoConstPtr>* lanes) const;
+  int GetLanes(const apollo::common::PointENU& point, double distance,
+               std::vector<LaneInfoConstPtr>* lanes) const;
   /**
    * @brief get all junctions in certain range
    * @param point the central point of the range
@@ -80,8 +80,8 @@ class HDMap {
    * @param junctions store all junctions in target range
    * @return 0:success, otherwise failed
    */
-  int get_junctions(const apollo::common::PointENU& point, double distance,
-                    std::vector<JunctionInfoConstPtr>* junctions) const;
+  int GetJunctions(const apollo::common::PointENU& point, double distance,
+                   std::vector<JunctionInfoConstPtr>* junctions) const;
   /**
    * @brief get all signals in certain range
    * @param point the central point of the range
@@ -89,8 +89,8 @@ class HDMap {
    * @param signals store all signals in target range
    * @return 0:success, otherwise failed
    */
-  int get_signals(const apollo::common::PointENU& point, double distance,
-                  std::vector<SignalInfoConstPtr>* signals) const;
+  int GetSignals(const apollo::common::PointENU& point, double distance,
+                 std::vector<SignalInfoConstPtr>* signals) const;
   /**
    * @brief get all crosswalks in certain range
    * @param point the central point of the range
@@ -98,8 +98,8 @@ class HDMap {
    * @param crosswalks store all crosswalks in target range
    * @return 0:success, otherwise failed
    */
-  int get_crosswalks(const apollo::common::PointENU& point, double distance,
-                     std::vector<CrosswalkInfoConstPtr>* crosswalks) const;
+  int GetCrosswalks(const apollo::common::PointENU& point, double distance,
+                    std::vector<CrosswalkInfoConstPtr>* crosswalks) const;
   /**
    * @brief get all stop signs in certain range
    * @param point the central point of the range
@@ -107,8 +107,8 @@ class HDMap {
    * @param stop signs store all stop signs in target range
    * @return 0:success, otherwise failed
    */
-  int get_stop_signs(const apollo::common::PointENU& point, double distance,
-                     std::vector<StopSignInfoConstPtr>* stop_signs) const;
+  int GetStopSigns(const apollo::common::PointENU& point, double distance,
+                   std::vector<StopSignInfoConstPtr>* stop_signs) const;
   /**
    * @brief get all yield signs in certain range
    * @param point the central point of the range
@@ -116,8 +116,8 @@ class HDMap {
    * @param yield signs store all yield signs in target range
    * @return 0:success, otherwise failed
    */
-  int get_yield_signs(const apollo::common::PointENU& point, double distance,
-                      std::vector<YieldSignInfoConstPtr>* yield_signs) const;
+  int GetYieldSigns(const apollo::common::PointENU& point, double distance,
+                    std::vector<YieldSignInfoConstPtr>* yield_signs) const;
   /**
    * @brief get all roads in certain range
    * @param point the central point of the range
@@ -125,8 +125,8 @@ class HDMap {
    * @param roads store all roads in target range
    * @return 0:success, otherwise failed
    */
-  int get_roads(const apollo::common::PointENU& point, double distance,
-                      std::vector<RoadInfoConstPtr>* roads) const;
+  int GetRoads(const apollo::common::PointENU& point, double distance,
+               std::vector<RoadInfoConstPtr>* roads) const;
   /**
    * @brief get nearest lane from target point,
    * @param point the target point
@@ -135,9 +135,9 @@ class HDMap {
    * @param nearest_l the lateral offset from lane center line
    * @return 0:success, otherwise, failed.
    */
-  int get_nearest_lane(const apollo::common::PointENU& point,
-                       LaneInfoConstPtr* nearest_lane, double* nearest_s,
-                       double* nearest_l) const;
+  int GetNearestLane(const apollo::common::PointENU& point,
+                     LaneInfoConstPtr* nearest_lane,
+                     double* nearest_s, double* nearest_l) const;
   /**
    * @brief get the nearest lane within a certain range by pose
    * @param point the target position
@@ -149,13 +149,12 @@ class HDMap {
    * @param nearest_l the lateral offset from lane center line
    * @return 0:success, otherwise, failed.
    */
-  int get_nearest_lane_with_heading(const apollo::common::PointENU& point,
-                                  const double distance,
-                                  const double central_heading,
-                                  const double max_heading_difference,
-                                  LaneInfoConstPtr* nearest_lane,
-                                  double* nearest_s,
-                                  double* nearest_l) const;
+  int GetNearestLaneWithHeading(const apollo::common::PointENU& point,
+                                const double distance,
+                                const double central_heading,
+                                const double max_heading_difference,
+                                LaneInfoConstPtr* nearest_lane,
+                                double* nearest_s, double* nearest_l) const;
   /**
    * @brief get all lanes within a certain range by pose
    * @param point the target position
@@ -165,11 +164,11 @@ class HDMap {
    * @param nearest_lane all lanes that match search conditions
    * @return 0:success, otherwise, failed.
    */
-  int get_lanes_with_heading(const apollo::common::PointENU& point,
-                            const double distance,
-                            const double central_heading,
-                            const double max_heading_difference,
-                            std::vector<LaneInfoConstPtr>* lanes) const;
+  int GetLanesWithHeading(const apollo::common::PointENU& point,
+                          const double distance,
+                          const double central_heading,
+                          const double max_heading_difference,
+                          std::vector<LaneInfoConstPtr>* lanes) const;
   /**
    * @brief get all road and junctions boundaries within certain range
    * @param point the target position
@@ -178,10 +177,9 @@ class HDMap {
    * @param junctions the junctions' boundaries
    * @return 0:success, otherwise failed
    */
-  int get_road_boundaries(const apollo::common::PointENU& point,
-                          double radius,
-                          std::vector<RoadROIBoundaryPtr>* road_boundaries,
-                          std::vector<JunctionBoundaryPtr>* junctions) const;
+  int GetRoadBoundaries(const apollo::common::PointENU& point, double radius,
+                        std::vector<RoadROIBoundaryPtr>* road_boundaries,
+                        std::vector<JunctionBoundaryPtr>* junctions) const;
 
  private:
   HDMapImpl _impl;

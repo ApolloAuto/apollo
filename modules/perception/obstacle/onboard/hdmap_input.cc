@@ -69,7 +69,7 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   std::vector<RoadROIBoundaryPtr> boundary_vec;
   std::vector<JunctionBoundaryPtr> junctions_vec;
 
-  int status = hdmap->get_road_boundaries(
+  int status = hdmap->GetRoadBoundaries(
       point, FLAGS_map_radius, &boundary_vec, &junctions_vec);
   if (status != SUCC) {
     AERROR << "Failed to get road boundaries for point " << point.DebugString();
@@ -130,13 +130,14 @@ int HDMapInput::MergeBoundaryJunction(
   for (size_t i = 0; i < junctions.size(); i++) {
     const Polygon2d& polygon = junctions[i]->junction_info->polygon();
     const vector<Vec2d>& points = polygon.points();
-    (*mapptr)->junction[i].reserve(points.size());
-    for (size_t idj = 0; idj < points.size(); ++idj) {
+    auto& junction = (*mapptr)->junction[i];
+    junction.reserve(points.size());
+    for (const auto& point : points) {
       PointD pointd;
-      pointd.x = points[idj].x();
-      pointd.y = points[idj].y();
+      pointd.x = point.x();
+      pointd.y = point.y();
       pointd.z = 0.0;
-      (*mapptr)->junction[i].push_back(pointd);
+      junction.push_back(pointd);
     }
   }
 
