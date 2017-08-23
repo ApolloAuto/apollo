@@ -25,8 +25,8 @@
 
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 
-#include "modules/planning/tasks/path_optimizer.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/path_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -41,7 +41,6 @@ class DpPolyPathOptimizer : public PathOptimizer {
   apollo::common::Status Process(const SpeedData &speed_data,
                                  const ReferenceLine &reference_line,
                                  const common::TrajectoryPoint &init_point,
-                                 PathDecision *const path_decision,
                                  PathData *const path_data) override;
 
  private:

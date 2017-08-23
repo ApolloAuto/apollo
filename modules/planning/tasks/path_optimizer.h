@@ -42,8 +42,7 @@ class PathOptimizer : public Task {
  protected:
   virtual apollo::common::Status Process(
       const SpeedData &speed_data, const ReferenceLine &reference_line,
-      const common::TrajectoryPoint &init_point,
-      PathDecision *const path_decision, PathData *const path_data) = 0;
+      const common::TrajectoryPoint &init_point, PathData *const path_data) = 0;
 
   void RecordDebugInfo(const PathData &path_data);
 };

@@ -33,6 +33,7 @@
 #include "modules/planning/planner/em/decider.h"
 #include "modules/planning/tasks/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_speed_optimizer.h"
+#include "modules/planning/tasks/path_decider/path_decider.h"
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
@@ -56,6 +57,9 @@ void EMPlanner::RegisterTasks() {
   });
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER, []() -> Task* {
     return new DpPolyPathOptimizer(TaskType_Name(DP_POLY_PATH_OPTIMIZER));
+  });
+  task_factory_.Register(PATH_DECIDER, []() -> Task* {
+    return new PathDecider(TaskType_Name(PATH_DECIDER));
   });
   task_factory_.Register(DP_ST_SPEED_OPTIMIZER, []() -> Task* {
     return new DpStSpeedOptimizer(TaskType_Name(DP_ST_SPEED_OPTIMIZER));

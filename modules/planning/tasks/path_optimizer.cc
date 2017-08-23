@@ -30,8 +30,7 @@ apollo::common::Status PathOptimizer::Execute(
   Task::Execute(frame, reference_line_info);
   auto ret = Process(
       reference_line_info->speed_data(), reference_line_info->reference_line(),
-      frame->PlanningStartPoint(), reference_line_info->path_decision(),
-      reference_line_info->mutable_path_data());
+      frame->PlanningStartPoint(), reference_line_info->mutable_path_data());
   RecordDebugInfo(reference_line_info->path_data());
 
   return ret;
