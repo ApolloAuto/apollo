@@ -101,15 +101,19 @@ bool ReferenceLineInfo::InitPerceptionSLBoundary(PathObstacle* path_obstacle) {
 }
 
 std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
-    const std::string& obstacle_id, const double route_s, const double length,
-    const double width, const double height) const {
+    const std::string& obstacle_id,
+    const common::math::Vec2d& position,
+    const double length,
+    const double width,
+    const double height) const {
   // create a "virtual" perception_obstacle
   perception::PerceptionObstacle perception_obstacle;
   // simulator needs a valid integer
   perception_obstacle.set_id(FLAGS_virtual_obstacle_perception_id);
-  auto dest_ref_point = reference_line_.get_reference_point(route_s);
-  perception_obstacle.mutable_position()->set_x(dest_ref_point.x());
-  perception_obstacle.mutable_position()->set_y(dest_ref_point.y());
+  auto dest_ref_point = reference_line_.get_reference_point(
+      position.x(), position.y());
+  perception_obstacle.mutable_position()->set_x(position.x());
+  perception_obstacle.mutable_position()->set_y(position.y());
   perception_obstacle.set_theta(dest_ref_point.heading());
   perception_obstacle.mutable_velocity()->set_x(0);
   perception_obstacle.mutable_velocity()->set_y(0);

@@ -60,8 +60,11 @@ class ReferenceLineInfo {
   double Cost() const { return cost_; }
 
   std::unique_ptr<Obstacle> CreateVirtualObstacle(
-      const std::string& obstacle_id, const double route_s, const double length,
-      const double width, const double height) const;
+      const std::string& obstacle_id,
+      const common::math::Vec2d& position,
+      const double length,
+      const double width,
+      const double height) const;
 
   /**
    * @brief check if current reference line is started from another reference
