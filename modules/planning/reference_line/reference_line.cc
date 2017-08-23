@@ -263,6 +263,60 @@ bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
   return true;
 }
 
+bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
+                                  SLBoundary* const sl_boundary) const {
+  double start_s(std::numeric_limits<double>::max());
+  double end_s(std::numeric_limits<double>::lowest());
+  double start_l(std::numeric_limits<double>::max());
+  double end_l(std::numeric_limits<double>::lowest());
+  std::vector<common::math::Vec2d> corners;
+  box.GetAllCorners(&corners);
+  for (const auto& point : corners) {
+    common::SLPoint sl_point;
+    if (!XYToSL(point, &sl_point)) {
+      AERROR << "failed to get projection for point: " << point.DebugString()
+             << " on reference line.";
+      return false;
+    }
+    start_s = std::fmin(start_s, sl_point.s());
+    end_s = std::fmax(end_s, sl_point.s());
+    start_l = std::fmin(start_l, sl_point.l());
+    end_l = std::fmax(end_l, sl_point.l());
+  }
+  sl_boundary->set_start_s(start_s);
+  sl_boundary->set_end_s(end_s);
+  sl_boundary->set_start_l(start_l);
+  sl_boundary->set_end_l(end_l);
+  return true;
+}
+
+bool ReferenceLine::has_overlap(const common::math::Box2d& box) const {
+  SLBoundary sl_boundary;
+  if (!GetSLBoundary(box, &sl_boundary)) {
+    AERROR << "Failed to get sl boundary for box " << box.DebugString();
+    return false;
+  }
+  if (sl_boundary.end_s() < 0 || sl_boundary.start_s() > length()) {
+    return false;
+  }
+  if (sl_boundary.start_l() * sl_boundary.end_l() < 0) {
+    return false;
+  }
+
+  double left_width = 0.0;
+  double right_width = 0.0;
+  const double mid_s = (sl_boundary.start_s() + sl_boundary.end_s()) / 2.0;
+  if (!map_path_.get_width(mid_s, &left_width, &right_width)) {
+    AERROR << "failed to get width at s = " << mid_s;
+    return false;
+  }
+  if (sl_boundary.start_l() > 0) {
+    return sl_boundary.start_l() < left_width;
+  } else {
+    return sl_boundary.end_l() > -right_width;
+  }
+}
+
 std::string ReferenceLine::DebugString() const {
   const auto limit =
       std::min(reference_points_.size(),

@@ -50,42 +50,12 @@ PathObstacle::PathObstacle(const planning::Obstacle* obstacle)
   id_ = obstacle_->Id();
 }
 
-bool PathObstacle::Init(const ReferenceLine* reference_line) {
-  if (!InitPerceptionSLBoundary(reference_line)) {
-    AERROR << "Failed to init perception sl boundary";
+bool PathObstacle::Init(const ReferenceLine& reference_line) {
+  if (!reference_line.GetSLBoundary(obstacle_->PerceptionBoundingBox(),
+                                    &perception_sl_boundary_)) {
+    AERROR << "Failed to get sl boundary for obstacle: " << id_;
     return false;
   }
-  return true;
-}
-
-void PathObstacle::SetPerceptionSLBoundary(const SLBoundary& sl_boundary) {
-  perception_sl_boundary_ = sl_boundary;
-}
-
-bool PathObstacle::InitPerceptionSLBoundary(
-    const ReferenceLine* reference_line) {
-  double start_s(std::numeric_limits<double>::max());
-  double end_s(std::numeric_limits<double>::lowest());
-  double start_l(std::numeric_limits<double>::max());
-  double end_l(std::numeric_limits<double>::lowest());
-  std::vector<common::math::Vec2d> corners;
-  obstacle_->PerceptionBoundingBox().GetAllCorners(&corners);
-  for (const auto& point : corners) {
-    common::SLPoint sl_point;
-    if (!reference_line->XYToSL(point, &sl_point)) {
-      AERROR << "failed to get projection for point: " << point.DebugString()
-             << " on reference line.";
-      return false;
-    }
-    start_s = std::fmin(start_s, sl_point.s());
-    end_s = std::fmax(end_s, sl_point.s());
-    start_l = std::fmin(start_l, sl_point.l());
-    end_l = std::fmax(end_l, sl_point.l());
-  }
-  perception_sl_boundary_.set_start_s(start_s);
-  perception_sl_boundary_.set_end_s(end_s);
-  perception_sl_boundary_.set_start_l(start_l);
-  perception_sl_boundary_.set_end_l(end_l);
   return true;
 }
 

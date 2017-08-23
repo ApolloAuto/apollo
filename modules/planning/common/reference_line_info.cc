@@ -62,7 +62,7 @@ std::unique_ptr<PathObstacle> ReferenceLineInfo::CreatePathObstacle(
     const Obstacle* obstacle) {
   auto path_obstacle =
       std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
-  if (!InitPerceptionSLBoundary(path_obstacle.get())) {
+  if (!path_obstacle->Init(reference_line_)) {
     AERROR << "Failed to create perception sl boundary for obstacle "
            << obstacle->Id();
     return nullptr;
@@ -70,48 +70,15 @@ std::unique_ptr<PathObstacle> ReferenceLineInfo::CreatePathObstacle(
   return path_obstacle;
 }
 
-bool ReferenceLineInfo::InitPerceptionSLBoundary(PathObstacle* path_obstacle) {
-  double start_s(std::numeric_limits<double>::max());
-  double end_s(std::numeric_limits<double>::lowest());
-  double start_l(std::numeric_limits<double>::max());
-  double end_l(std::numeric_limits<double>::lowest());
-  std::vector<common::math::Vec2d> corners;
-  path_obstacle->Obstacle()->PerceptionBoundingBox().GetAllCorners(&corners);
-  for (const auto& point : corners) {
-    common::SLPoint sl_point;
-    if (!reference_line_.XYToSL(point, &sl_point)) {
-      AERROR << "failed to get projection for point: " << point.DebugString()
-             << " on reference line.";
-      return false;
-    }
-    start_s = std::fmin(start_s, sl_point.s());
-    end_s = std::fmax(end_s, sl_point.s());
-    start_l = std::fmin(start_l, sl_point.l());
-    end_l = std::fmax(end_l, sl_point.l());
-  }
-
-  SLBoundary perception_sl_boundary;
-  perception_sl_boundary.set_start_s(start_s);
-  perception_sl_boundary.set_end_s(end_s);
-  perception_sl_boundary.set_start_l(start_l);
-  perception_sl_boundary.set_end_l(end_l);
-  path_obstacle->SetPerceptionSLBoundary(perception_sl_boundary);
-
-  return true;
-}
-
 std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
-    const std::string& obstacle_id,
-    const common::math::Vec2d& position,
-    const double length,
-    const double width,
-    const double height) const {
+    const std::string& obstacle_id, const common::math::Vec2d& position,
+    const double length, const double width, const double height) const {
   // create a "virtual" perception_obstacle
   perception::PerceptionObstacle perception_obstacle;
   // simulator needs a valid integer
   perception_obstacle.set_id(FLAGS_virtual_obstacle_perception_id);
-  auto dest_ref_point = reference_line_.get_reference_point(
-      position.x(), position.y());
+  auto dest_ref_point =
+      reference_line_.get_reference_point(position.x(), position.y());
   perception_obstacle.mutable_position()->set_x(position.x());
   perception_obstacle.mutable_position()->set_y(position.y());
   perception_obstacle.set_theta(dest_ref_point.heading());
