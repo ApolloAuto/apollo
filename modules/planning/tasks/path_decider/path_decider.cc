@@ -71,6 +71,10 @@ bool PathDecider::MakeObjectDecision(const PathData &path_data,
 
 bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, PathDecision *const path_decision) {
+  if (!FLAGS_enable_nudge_decision) {
+    return true;
+  }
+
   DCHECK_NOTNULL(path_decision);
   std::vector<common::SLPoint> adc_sl_points;
   std::vector<common::math::Box2d> adc_bounding_box;
@@ -137,16 +141,42 @@ bool PathDecider::MakeStaticObstacleDecision(
       }
 
       // check STOP/NUDGE
-      double left_bound;
-      double right_bound;
-      if (!reference_line_->get_lane_width(adc_sl.s(), &left_bound,
-                                           &right_bound)) {
-        left_bound = right_bound = FLAGS_default_reference_line_width / 2;
+      double left_width;
+      double right_width;
+      if (!reference_line_->get_lane_width(adc_sl.s(), &left_width,
+                                           &right_width)) {
+        left_width = right_width = FLAGS_default_reference_line_width / 2;
       }
-      bool left_nudgable = left_bound - sl_boundary.end_l() >=
-                           FLAGS_static_decision_nudge_l_buffer;
-      bool right_nudgable = sl_boundary.start_l() - right_bound >=
-                            FLAGS_static_decision_nudge_l_buffer;
+      double driving_width;
+      bool left_nudgable = false;
+      bool right_nudgable = false;
+      if (sl_boundary.start_l() >= 0) {
+        // obstacle on the left, check RIGHT_NUDGE
+        driving_width = sl_boundary.start_l() -
+            FLAGS_static_decision_nudge_l_buffer + right_width;
+        right_nudgable = (driving_width >= FLAGS_min_driving_width) ?
+            true : false;
+      } else if (sl_boundary.end_l() <= 0) {
+        // obstacle on the right, check LEFT_NUDGE
+        driving_width = std::fabs(sl_boundary.end_l()) -
+            FLAGS_static_decision_nudge_l_buffer + left_width;
+        left_nudgable = (driving_width >= FLAGS_min_driving_width) ?
+            true : false;
+      } else {
+        // obstacle across the central line, decide RIGHT_NUDGE/LEFT_NUDGE
+        double driving_width_left = left_width - sl_boundary.end_l() -
+            FLAGS_static_decision_nudge_l_buffer;
+        double driving_width_right = right_width -
+            std::fabs(sl_boundary.start_l()) -
+            FLAGS_static_decision_nudge_l_buffer;
+        if (std::max(driving_width_right, driving_width_left) >=
+            FLAGS_min_driving_width) {
+          // nudgable
+          left_nudgable = driving_width_left > driving_width_right ?
+              true : false;
+          right_nudgable = !left_nudgable;
+        }
+      }
 
       if (!left_nudgable && !right_nudgable) {
         // STOP: and break
