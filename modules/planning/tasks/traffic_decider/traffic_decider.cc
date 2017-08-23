@@ -68,9 +68,17 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
   const auto &reference_line = reference_line_info_->reference_line();
   reference_line.xy_to_sl(destination, &destination_sl);
   double destination_s = destination_sl.s();
-  if (destination_s < 0 || destination_s > reference_line.length()) {
-    AINFO << "destination(s[:" << destination_sl.s()
-          << "]) out of planning range. Skip";
+  double destination_l = destination_sl.l();
+  double left_bound;
+  double right_bound;
+  if (!reference_line.get_lane_width(destination_s, &left_bound,
+                                     &right_bound)) {
+    left_bound = right_bound = FLAGS_default_reference_line_width / 2;
+  }
+  if (destination_s < 0 || destination_s > reference_line.length() ||
+      destination_l > left_bound || destination_l < -right_bound) {
+    AINFO << "destination[s=" << destination_s
+          << "; l=" << destination_l << "] out of planning range. Skip";
     return nullptr;
   }
 
@@ -87,8 +95,10 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
 
   std::unique_ptr<Obstacle> obstacle_ptr =
       reference_line_info_->CreateVirtualObstacle(
-          FLAGS_destination_obstacle_id, destination_s,
-          FLAGS_virtual_stop_wall_length, FLAGS_virtual_stop_wall_width,
+          FLAGS_destination_obstacle_id,
+          {destination.x(), destination.y()},
+          FLAGS_virtual_stop_wall_length,
+          FLAGS_virtual_stop_wall_width,
           FLAGS_virtual_stop_wall_height);
   const auto *obstacle = obstacle_ptr.get();
   if (!frame_->AddObstacle(std::move(obstacle_ptr))) {
