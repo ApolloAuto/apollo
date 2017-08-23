@@ -15,9 +15,10 @@
   *****************************************************************************/
 
 #include "modules/routing/topo_creator/node_creator.h"
-#include "modules/routing/common/routing_gflags.h"
 
-#include <math.h>
+#include <cmath>
+
+#include "modules/routing/common/routing_gflags.h"
 
 namespace apollo {
 namespace routing {
