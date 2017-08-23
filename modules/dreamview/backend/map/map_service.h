@@ -81,7 +81,7 @@ class MapService {
                        double *s) const;
 
  private:
-  const ::apollo::hdmap::HDMap *BaseMap() const {
+  const ::apollo::hdmap::HDMap& BaseMap() const {
     return pnc_map_.HDMap();
   }
 

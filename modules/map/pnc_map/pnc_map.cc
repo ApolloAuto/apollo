@@ -49,7 +49,7 @@ const double kDuplicatedPointsEpsilon = 1e-7;
 // Maximum lateral error used in trajectory approximation.
 const double kTrajectoryApproximationMaxError = 2.0;
 
-void remove_duplicates(std::vector<common::math::Vec2d> *points) {
+void RemoveDuplicates(std::vector<common::math::Vec2d> *points) {
   CHECK_NOTNULL(points);
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
@@ -62,7 +62,7 @@ void remove_duplicates(std::vector<common::math::Vec2d> *points) {
   points->resize(count);
 }
 
-void remove_duplicates(std::vector<hdmap::MapPathPoint> *points) {
+void RemoveDuplicates(std::vector<hdmap::MapPathPoint> *points) {
   CHECK_NOTNULL(points);
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
@@ -85,7 +85,7 @@ PncMap::PncMap(const std::string &map_file) {
   AINFO << "map loaded, Map file: " << map_file;
 }
 
-bool PncMap::validate_routing(const RoutingResponse &routing) const {
+bool PncMap::ValidateRouting(const RoutingResponse &routing) const {
   const int num_routes = routing.route_size();
   if (num_routes == 0) {
     AERROR << "Route is empty.";
@@ -178,7 +178,7 @@ bool PncMap::GetLaneSegmentsFromRouting(
            << forward_length << "] are invalid";
     return false;
   }
-  if (!validate_routing(routing)) {
+  if (!ValidateRouting(routing)) {
     AERROR << "The provided routing result is invalid";
     return false;
   }
@@ -395,7 +395,7 @@ bool PncMap::TruncateLaneSegments(
   return true;
 }
 
-void PncMap::append_lane_to_points(
+void PncMap::AppendLaneToPoints(
     hdmap::LaneInfoConstPtr lane, const double start_s, const double end_s,
     std::vector<hdmap::MapPathPoint> *const points) {
   if (points == nullptr || start_s >= end_s) {
@@ -429,8 +429,8 @@ void PncMap::append_lane_to_points(
   }
 }
 
-bool PncMap::CreatePathFromRouting(
-    const ::apollo::routing::RoutingResponse &routing, Path *const path) const {
+bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
+                                   Path *const path) const {
   LaneSegments segments;
   for (const auto &way : routing.route()) {
     if (way.has_road_info() && !way.road_info().passage_region().empty()) {
@@ -462,14 +462,13 @@ void PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
                                         Path *const path) {
   std::vector<hdmap::MapPathPoint> points;
   for (const auto &segment : segments) {
-    append_lane_to_points(segment.lane, segment.start_s, segment.end_s,
-                          &points);
+    AppendLaneToPoints(segment.lane, segment.start_s, segment.end_s, &points);
   }
-  remove_duplicates(&points);
+  RemoveDuplicates(&points);
   *path = hdmap::Path(points, segments, kTrajectoryApproximationMaxError);
 }
 
-const hdmap::HDMap *PncMap::HDMap() const { return &hdmap_; }
+const hdmap::HDMap& PncMap::HDMap() const { return hdmap_; }
 
 }  // namespace hdmap
 }  // namespace apollo
