@@ -29,6 +29,8 @@
 #define AWARN LOG(WARNING)
 #define AERROR LOG(ERROR)
 #define AFATAL LOG(FATAL)
+#define AINFO_IF(cond) LOG_IF(INFO, cond)
+#define AERROR_IF(cond) LOG_IF(ERROR, cond)
 
 // quit if condition is met
 #define QUIT_IF(CONDITION, RET, LEVEL, MSG, ...) \
