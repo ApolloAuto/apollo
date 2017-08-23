@@ -405,6 +405,9 @@ void QpFrenetFrame::CalculateHDMapBound() {
       AERROR << "HD Map bound at " << evaluated_knots_[i] << " is infeasible ("
              << hdmap_bound_[i].first << ", " << hdmap_bound_[i].second << ") "
              << std::endl;
+      AERROR << "vehicle_param_.width = " << vehicle_param_.width();
+      AERROR << "left_bound: " << left_bound;
+      AERROR << "right_bound: " << right_bound;
       feasible_longitudinal_upper_bound_ =
           std::min(evaluated_knots_[i], feasible_longitudinal_upper_bound_);
     }
