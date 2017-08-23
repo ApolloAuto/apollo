@@ -36,6 +36,7 @@ class GraphCreator {
   bool Create();
 
  private:
+  void InitForbiddenLanes();
   std::string GetEdgeID(const std::string& from_id, const std::string& to_id);
 
   void AddEdge(const ::apollo::routing::Node& from_node,
@@ -51,6 +52,7 @@ class GraphCreator {
   std::unordered_map<std::string, int> node_index_map_;
   std::unordered_map<std::string, std::string> road_id_map_;
   std::unordered_set<std::string> showed_edge_id_set_;
+  std::unordered_set<std::string> forbidden_lane_id_set_;
 };
 
 }  // namespace routing
