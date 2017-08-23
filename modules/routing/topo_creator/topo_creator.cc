@@ -28,10 +28,7 @@ int main(int argc, char **argv) {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
   creator_ptr.reset(new ::apollo::routing::GraphCreator(
       apollo::hdmap::BaseMapFile(), routing_map_file));
-  if (!creator_ptr->Create()) {
-    AERROR << "Create routing topo failed!";
-    return -1;
-  }
+  CHECK(creator_ptr->Create()) << "Create routing topo failed!";
   AINFO << "Create routing topo successfully from " << routing_map_file;
   return 0;
 }

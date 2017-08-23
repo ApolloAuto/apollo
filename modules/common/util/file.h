@@ -159,6 +159,13 @@ bool GetProtoFromFile(const std::string &file_name, MessageType *message) {
   }
   return true;
 }
+
+/**
+ * @brief Check if the path exists.
+ * @return If the path exists.
+ */
+bool PathExists(const std::string &path);
+
 /**
  * @brief Check if the directory specified by directory_path exists
  *        and is indeed a directory.

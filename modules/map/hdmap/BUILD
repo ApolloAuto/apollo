@@ -36,6 +36,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common:macro",
         "//modules/common/configs:config_gflags",
+        "//modules/common/util",
         "//modules/common/util:string_util",
     ],
 )

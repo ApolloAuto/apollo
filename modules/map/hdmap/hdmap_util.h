@@ -36,28 +36,19 @@ namespace hdmap {
  * @brief get base map file path from flags.
  * @return base map path
  */
-inline std::string BaseMapFile() {
-  return apollo::common::util::StrCat(
-      FLAGS_map_dir, "/", FLAGS_base_map_filename);
-}
+std::string BaseMapFile();
 
 /**
  * @brief get simulation map file path from flags.
  * @return simulation map path
  */
-inline std::string SimMapFile() {
-  return apollo::common::util::StrCat(
-      FLAGS_map_dir, "/", FLAGS_sim_map_filename);
-}
+std::string SimMapFile();
 
 /**
  * @brief get routing map file path from flags.
  * @return routing map path
  */
-inline std::string RoutingMapFile() {
-  return apollo::common::util::StrCat(
-      FLAGS_map_dir, "/", FLAGS_routing_map_filename);
-}
+std::string RoutingMapFile();
 
 /**
  * @brief get end way point file path from flags.
