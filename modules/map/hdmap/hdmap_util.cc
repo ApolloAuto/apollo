@@ -47,7 +47,7 @@ std::string SimMapFile() {
 }
 
 std::string RoutingMapFile() {
-  return FindFirstExist(FLAGS_map_dir, FLAGS_sim_map_filename);
+  return FindFirstExist(FLAGS_map_dir, FLAGS_routing_map_filename);
 }
 
 std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
