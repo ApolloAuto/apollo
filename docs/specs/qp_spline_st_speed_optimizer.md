@@ -94,7 +94,7 @@ $$
 
 ### 2.3 Joint smoothness  constraints
 
-This constraint is to make the spline joint smooth.  Let's assume two segment $seg_k$ and $seg_{k+1}$ are connected, and the accumulated s of segment $seg_k$ is $s_k$. The we can get the constraint euqation as 
+This constraint is to make the spline joint smooth.  Let's assume two segment $seg_k$ and $seg_{k+1}$ are connected, and the accumulated s of segment $seg_k$ is $s_k$. The we can get the constraint equations as 
 $$
 f_k(t_k) = f_{k+1} (t_0)
 $$
@@ -162,7 +162,7 @@ $$
 $$
 
 
-similarly, for upper boundary $l_{ub,j}$, we get the ineuqality constraints as 
+similarly, for upper boundary $l_{ub,j}$, we get the inequality constraints as
 $$
 \begin{vmatrix} 
  1 & t_0 & t_0^2 & t_0^3 & t_0^4&t_0^5 \\
