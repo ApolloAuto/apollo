@@ -51,7 +51,6 @@ TEST_F(SimpleControlTest, simple_test) {
 }
 
 TEST_F(SimpleControlTest, state_exact_match) {
-  FLAGS_use_state_exact_match = true;
   FLAGS_test_localization_file = "1_localization.pb.txt";
   FLAGS_test_pad_file = "1_pad.pb.txt";
   FLAGS_test_planning_file = "1_planning.pb.txt";

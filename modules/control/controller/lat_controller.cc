@@ -26,6 +26,7 @@
 
 #include "Eigen/LU"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/linear_quadratic_regulator.h"
 #include "modules/common/math/math_utils.h"
@@ -88,16 +89,19 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
     AERROR << "[LatController] control_conf == nullptr";
     return false;
   }
+  const auto &vehicle_param_ = common::config::VehicleConfigHelper::instance()
+                                   ->GetConfig()
+                                   .vehicle_param();
+
   ts_ = control_conf->lat_controller_conf().ts();
   CHECK_GT(ts_, 0.0) << "[LatController] Invalid control update interval.";
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
-  wheelbase_ = control_conf->lat_controller_conf().wheelbase();
-  steer_transmission_ratio_ =
-      control_conf->lat_controller_conf().steer_transmission_ratio();
+  wheelbase_ = vehicle_param_.wheel_base();
+  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
-      control_conf->lat_controller_conf().steer_single_direction_max_degree();
+      vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
 
   double mass_fl = control_conf->lat_controller_conf().mass_fl();
@@ -114,6 +118,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
   lqr_eps_ = control_conf->lat_controller_conf().eps();
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
+
   return true;
 }
 
@@ -212,7 +217,10 @@ Status LatController::Init(const ControlConf *control_conf) {
     matrix_q_(i, i) = control_conf->lat_controller_conf().matrix_q(i);
   }
 
+  matrix_q_updated_ = matrix_q_;
   InitializeFilters(control_conf);
+  auto &lat_controller_conf = control_conf->lat_controller_conf();
+  LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
   return Status::OK();
 }
@@ -221,6 +229,30 @@ void LatController::CloseLogFile() {
   if (FLAGS_enable_csv_debug && steer_log_file_.is_open()) {
     steer_log_file_.close();
   }
+}
+
+void LatController::LoadLatGainScheduler(
+    const LatControllerConf &lat_controller_conf) {
+  const auto &lat_err_gain_scheduler =
+      lat_controller_conf.lat_err_gain_scheduler();
+  const auto &heading_err_gain_scheduler =
+      lat_controller_conf.heading_err_gain_scheduler();
+  AINFO << "Lateral control gain scheduler loaded";
+  Interpolation1D::DataType xy1, xy2;
+  for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
+    xy1.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+  for (const auto &scheduler : heading_err_gain_scheduler.scheduler()) {
+    xy2.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+
+  lat_err_interpolation_.reset(new Interpolation1D);
+  CHECK(lat_err_interpolation_->Init(xy1))
+      << "Fail to load lateral error gain scheduler";
+
+  heading_err_interpolation_.reset(new Interpolation1D);
+  CHECK(heading_err_interpolation_->Init(xy2))
+      << "Fail to load heading error gain scheduler";
 }
 
 void LatController::Stop() { CloseLogFile(); }
@@ -244,16 +276,22 @@ Status LatController::ComputeControlCommand(
 
   // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
   // Error Rate, preview lateral error1 , preview lateral error2, ...]
-  if (FLAGS_use_state_exact_match) {
-    UpdateStateAnalyticalMatching(debug);
-  } else {
-    UpdateState(debug);
-  }
+  UpdateStateAnalyticalMatching(debug);
 
   UpdateMatrix();
 
   // Compound discrete matrix with road preview model
   UpdateMatrixCompound();
+
+  // Add gain sheduler for higher speed steering
+  if (FLAGS_enable_gain_scheduler) {
+    matrix_q_updated_(0, 0) =
+        matrix_q_(0, 0) *
+        lat_err_interpolation_->Interpolate(vehicle_state_.linear_velocity());
+    matrix_q_updated_(2, 2) = matrix_q_(2, 2) *
+                              heading_err_interpolation_->Interpolate(
+                                  vehicle_state_.linear_velocity());
+  }
 
   common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_, matrix_r_,
                                 lqr_eps_, lqr_max_iteration_, &matrix_k_);
@@ -275,7 +313,7 @@ Status LatController::ComputeControlCommand(
                                  (vehicle_state_.linear_velocity() *
                                   vehicle_state_.linear_velocity())) *
                        steer_transmission_ratio_ * 180 / M_PI /
-                       steer_single_direction_max_degree_;
+                       steer_single_direction_max_degree_ * 100;
 
   // Clamp the steer angle
   double steer_angle_limited =
@@ -302,8 +340,6 @@ Status LatController::ComputeControlCommand(
       -matrix_k_(0, 3) * matrix_state_(3, 0) * 180 / M_PI *
       steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
 
-  // TODO(yifei): move up temporary values to use debug fields.
-
   debug->set_heading(vehicle_state_.heading());
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforward);
@@ -327,67 +363,17 @@ Status LatController::Reset() {
   return Status::OK();
 }
 
-// state = [Lateral Error, Lateral Error Rate, Heading Error, Heading Error
-// Rate, Preview Lateral1, Preview Lateral2, ...]
-void LatController::UpdateState(SimpleLateralDebug *debug) {
-  TrajectoryPoint traj_point;
-  Eigen::Vector2d com = vehicle_state_.ComputeCOMPosition(lr_);
-  double raw_lateral_error = GetLateralError(com, &traj_point);
-
-  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
-  debug->set_lateral_error(lateral_error_filter_.Update(raw_lateral_error));
-
-  // ref_curvature_ = traj_point.kappa();
-  debug->set_curvature(traj_point.kappa());
-
-  // ref_heading_ = traj_point.theta;
-  debug->set_ref_heading(traj_point.theta());
-
-  // heading_error_ =
-  //    common::math::NormalizeAngle(vehicle_state_.heading() - ref_heading_);
-  debug->set_heading_error(common::math::NormalizeAngle(
-      vehicle_state_.heading() - traj_point.theta()));
-
-  // Reverse heading error if vehicle is going in reverse
-  if (vehicle_state_.gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
-    debug->set_heading_error(-debug->heading_error());
-  }
-
-  // heading_error_rate_ = (heading_error_ - previous_heading_error_) / ts_;
-  debug->set_heading_error_rate(
-      (debug->heading_error() - previous_heading_error_) / ts_);
-  // lateral_error_rate_ = (lateral_error_ - previous_lateral_error_) / ts_;
-  debug->set_lateral_error_rate(
-      (debug->lateral_error() - previous_lateral_error_) / ts_);
-
-  // Prepare for next iteration.
-  previous_heading_error_ = debug->heading_error();
-  previous_lateral_error_ = debug->lateral_error();
-
-  // State matrix update;
-  // First four elements are fixed;
-  matrix_state_(0, 0) = debug->lateral_error();
-  matrix_state_(1, 0) = debug->lateral_error_rate();
-  matrix_state_(2, 0) = debug->heading_error();
-  matrix_state_(3, 0) = debug->heading_error_rate();
-
-  // Next elements are depending on preview window size;
-  for (int i = 0; i < preview_window_; ++i) {
-    double preview_time = ts_ * (i + 1);
-    Eigen::Vector2d future_position_estimate =
-        vehicle_state_.EstimateFuturePosition(preview_time);
-    double preview_lateral = GetLateralError(future_position_estimate, nullptr);
-    matrix_state_(basic_state_size_ + i, 0) = preview_lateral;
-  }
-  // preview matrix update;
-}
-
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
   Eigen::Vector2d com = vehicle_state_.ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(), vehicle_state_.heading(),
                        vehicle_state_.linear_velocity(),
                        vehicle_state_.angular_velocity(), trajectory_analyzer_,
                        debug);
+
+  // Reverse heading error if vehicle is going in reverse
+  if (vehicle_state_.gear() == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+    debug->set_heading_error(-debug->heading_error());
+  }
 
   // State matrix update;
   // First four elements are fixed;

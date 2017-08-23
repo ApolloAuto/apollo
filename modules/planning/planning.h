@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/util/factory.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/planner/planner.h"
 
@@ -42,8 +43,7 @@ class Planning {
   /**
    * @brief Plan the trajectory given current vehicle state
    * @param vehicle_state variable describes the vehicle state, including
-   * position,
-   *        velocity, acceleration, heading, etc
+   * position, velocity, acceleration, heading, etc
    * @param is_on_auto_mode whether the current system is on auto-driving mode
    * @param publishable_trajectory the computed planning trajectory
    */
@@ -57,6 +57,9 @@ class Planning {
   void Reset();
 
  private:
+  void RegisterPlanners();
+
+ private:
   std::pair<common::TrajectoryPoint, std::size_t>
   ComputeStartingPointFromLastTrajectory(const double curr_time) const;
 
@@ -68,6 +71,12 @@ class Planning {
       const std::size_t matched_index, const std::size_t buffer_size);
 
   std::unique_ptr<Planner> ptr_planner_;
+
+  enum PlannerType {
+    RTK_PLANNER,
+  };
+
+  common::util::Factory<PlannerType, Planner> planner_factory_;
 
   std::vector<common::TrajectoryPoint> last_trajectory_;
 

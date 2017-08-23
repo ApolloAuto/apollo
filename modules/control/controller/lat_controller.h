@@ -23,8 +23,11 @@
 #define MODULES_CONTROL_CONTROLLER_LAT_CONTROLLER_H_
 
 #include <fstream>
+#include <memory>
 #include <string>
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/filters/digital_filter.h"
@@ -96,8 +99,6 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleLateralDebug *debug);
-
   void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
 
   void UpdateMatrix();
@@ -116,6 +117,7 @@ class LatController : public Controller {
                             SimpleLateralDebug *debug) const;
   bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
+  void LoadLatGainScheduler(const LatControllerConf &lat_controller_conf);
   void LogInitParameters();
   void ProcessLogs(const SimpleLateralDebug *debug,
                    const canbus::Chassis *chassis);
@@ -124,6 +126,9 @@ class LatController : public Controller {
 
   // a proxy to access vehicle movement state
   ::apollo::common::vehicle_state::VehicleState vehicle_state_;
+
+  // vehicle parameter
+  ::apollo::common::config::VehicleParam vehicle_param_;
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
@@ -176,6 +181,8 @@ class LatController : public Controller {
   Eigen::MatrixXd matrix_r_;
   // state weighting matrix
   Eigen::MatrixXd matrix_q_;
+  // updated state weighting matrix
+  Eigen::MatrixXd matrix_q_updated_;
   // vehicle state matrix coefficients
   Eigen::MatrixXd matrix_a_coeff_;
   // 4 by 1 matrix; state matrix
@@ -207,6 +214,10 @@ class LatController : public Controller {
   double lqr_eps_ = 0.0;
 
   DigitalFilter digital_filter_;
+
+  std::unique_ptr<Interpolation1D> lat_err_interpolation_;
+
+  std::unique_ptr<Interpolation1D> heading_err_interpolation_;
 
   // MeanFilter heading_rate_filter_;
   MeanFilter lateral_error_filter_;

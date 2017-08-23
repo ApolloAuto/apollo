@@ -91,23 +91,23 @@ void esdcan_print_if_status(int id, const CAN_IF_STATUS &if_status) {
 void esdcan_print_stats(const NTCAN_BUS_STATISTIC &stats) {
   printf("CAN bus statistics:\n");
   printf("Rcv frames      : Std(Data/RTR): %ld/%ld Ext(Data/RTR) %ld/%ld\n",
-         static_cast<int64>(stats.rcv_count.std_data),
-         static_cast<int64>(stats.rcv_count.std_rtr),
-         static_cast<int64>(stats.rcv_count.ext_data),
-         static_cast<int64>(stats.rcv_count.ext_rtr));
+         static_cast<int64_t>(stats.rcv_count.std_data),
+         static_cast<int64_t>(stats.rcv_count.std_rtr),
+         static_cast<int64_t>(stats.rcv_count.ext_data),
+         static_cast<int64_t>(stats.rcv_count.ext_rtr));
   printf("Xmit frames     : Std(Data/RTR): %ld/%ld Ext(Data/RTR) %ld/%ld\n",
-         static_cast<int64>(stats.xmit_count.std_data),
-         static_cast<int64>(stats.xmit_count.std_rtr),
-         static_cast<int64>(stats.xmit_count.ext_data),
-         static_cast<int64>(stats.xmit_count.ext_rtr));
+         static_cast<int64_t>(stats.xmit_count.std_data),
+         static_cast<int64_t>(stats.xmit_count.std_rtr),
+         static_cast<int64_t>(stats.xmit_count.ext_data),
+         static_cast<int64_t>(stats.xmit_count.ext_rtr));
   printf("Bytes           : (Rcv/Xmit): %ld/%ld\n",
-         static_cast<int64>(stats.rcv_byte_count),
-         static_cast<int64>(stats.xmit_byte_count));
+         static_cast<int64_t>(stats.rcv_byte_count),
+         static_cast<int64_t>(stats.xmit_byte_count));
   printf("Overruns        : (Controller/FIFO): %ld/%ld\n",
-         static_cast<int64>(stats.ctrl_ovr),
-         static_cast<int64>(stats.fifo_ovr));
-  printf("Err frames      : %ld\n", static_cast<int64>(stats.err_frames));
-  printf("Aborted frames  : %ld\n", static_cast<int64>(stats.aborted_frames));
+         static_cast<int64_t>(stats.ctrl_ovr),
+         static_cast<int64_t>(stats.fifo_ovr));
+  printf("Err frames      : %ld\n", static_cast<int64_t>(stats.err_frames));
+  printf("Aborted frames  : %ld\n", static_cast<int64_t>(stats.aborted_frames));
   printf("Rcv bits        : %" PRIu64 "\n", stats.bit_count);
 }
 
@@ -119,29 +119,29 @@ void esdcan_print_ctrl_state(const NTCAN_CTRL_STATE &c_state) {
 void esdcan_print_bitrate(const NTCAN_BITRATE &bitrate) {
   printf("CAN bitrate:\n");
   printf("Value set by canSetBaudrate()  : 0x%08lX\n",
-         static_cast<int64>(bitrate.baud));
+         static_cast<int64_t>(bitrate.baud));
   if (NTCAN_SUCCESS == bitrate.valid) {
     printf("Actual Bitrate                 : %ld Bits/s\n",
-           static_cast<int64>(bitrate.rate));
+           static_cast<int64_t>(bitrate.rate));
     printf("Timequantas per Bit            : %ld\n",
-           static_cast<int64>(bitrate.tq_pre_sp + bitrate.tq_post_sp));
+           static_cast<int64_t>(bitrate.tq_pre_sp + bitrate.tq_post_sp));
     printf("Timequantas before samplepoint : %ld\n",
-           static_cast<int64>(bitrate.tq_pre_sp));
+           static_cast<int64_t>(bitrate.tq_pre_sp));
     printf("Timequantas after samplepoint  : %ld\n",
-           static_cast<int64>(bitrate.tq_post_sp));
+           static_cast<int64_t>(bitrate.tq_post_sp));
     printf("Syncronization Jump Width      : %ld\n",
-           static_cast<int64>(bitrate.sjw));
+           static_cast<int64_t>(bitrate.sjw));
     printf("Additional flags               : 0x%08lX\n",
-           static_cast<int64>(bitrate.flags));
-    int64 sp = static_cast<int64>(bitrate.tq_pre_sp * 10000) /
-               static_cast<int64>(bitrate.tq_pre_sp + bitrate.tq_post_sp);
+           static_cast<int64_t>(bitrate.flags));
+    int64_t sp = static_cast<int64_t>(bitrate.tq_pre_sp * 10000) /
+               static_cast<int64_t>(bitrate.tq_pre_sp + bitrate.tq_post_sp);
     printf("Position samplepoint           : %ld.%ld%%\n", sp / 100, sp % 100);
     printf("Deviation from configured rate : %ld.%02ld%%\n",
-           static_cast<int64>(bitrate.error / 100),
-           static_cast<int64>(bitrate.error % 100));
+           static_cast<int64_t>(bitrate.error / 100),
+           static_cast<int64_t>(bitrate.error % 100));
     printf("Controller clockrate           : %ld.%ldMHz\n",
-           static_cast<int64>(bitrate.clock / 1000000),
-           static_cast<int64>(bitrate.clock % 1000000));
+           static_cast<int64_t>(bitrate.clock / 1000000),
+           static_cast<int64_t>(bitrate.clock % 1000000));
   }
 }
 

@@ -24,10 +24,10 @@ message ControlCommand {
   // target brake in percentage [0, 100]
   optional double brake = 4;
 
-  // target steering rate, in percentage of full scale per second [-100, 100]
+  // target non-directional steering rate, in percentage of full scale per second [0, 100]
   optional double steering_rate = 6;
 
-  // target steerig angle, in percentage of full scalce [-100, 100]
+  // target steering angle, in percentage of full scale [-100, 100]
   optional double steering_target = 7;
 
   // parking brake engage. true: engaged

@@ -72,7 +72,7 @@ add_executable(test_monitor tests/test_monitor.cpp)
 target_link_libraries(test_monitor utils ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 install(
-     TARGETS stream_nodelet parser_nodelet utils test_monitor
+     TARGETS stream_nodelet parser_nodelet utils test_monitor parser_cli
      ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
      LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
      RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

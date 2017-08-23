@@ -26,3 +26,12 @@ So far, many build problems are related to environment setting. You can run the 
 ## Which ports need be white list to run Apollo in public cloud instance?
 8887: HMI
 8888: Dreamview
+
+## Why there is no ROS environment in dev docker?
+The ROS package will be downloaded when you start to build apollo with command `bash apollo.sh build`. Please run command `source /apollo/scripts/apollo_base.sh` inside docker to set up the ROS environment after build is complete, and then you can run ROS related comands, such as rosbag, rostopic and so on.
+
+## How to clean the existing build output?
+Log into the docker with command `bash docker/scripts/dev_into.sh`, and run command `bash apollo.sh clean`.
+
+## How to delete downloaded third party dependent packages?
+Log into the docker with command `bash docker/scripts/dev_into.sh`, and run command `bazel clean --expunge`. After this command, the build command `bash apollo.sh build` will redownload all the dependent packages according to the *WORKSPACE* file.

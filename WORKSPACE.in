@@ -65,7 +65,7 @@ cpp_proto_repositories(
         # with all BUILD files ready to go.
         "boringssl": {
             "rule": "http_archive",
-            "url": "https://github.com/google/boringssl/archive/chromium-stable-with-bazel.zip",
+            "url": "https://github.com/wanglei828/third-party/raw/master/chromium-stable-with-bazel.zip",
         },
 
         # libssl is required for c++ grpc where it is expected in

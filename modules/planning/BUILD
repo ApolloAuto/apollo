@@ -3,9 +3,8 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "lib_planning",
+    name = "planning_impl",
     srcs = [
-        "planner_factory.cc",
         "planning.cc",
         "planning_node.cc",
     ],
@@ -17,6 +16,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/proto:path_point_proto",
+        "//modules/common/util:factory",
         "//modules/common/vehicle_state",
         "//modules/decision/proto:decision_proto",
         "//modules/perception/proto:perception_proto",
@@ -32,7 +32,7 @@ cc_binary(
     name = "planning",
     srcs = ["main.cc"],
     deps = [
-        ":lib_planning",
+        ":planning_impl",
         "//external:gflags",
     ],
 )
@@ -45,7 +45,7 @@ cc_test(
     ],
     data = ["//modules/planning:planning_testdata"],
     deps = [
-        ":lib_planning",
+        ":planning_impl",
         "//modules/common:log",
         "//modules/common/time",
         "//modules/common/util",

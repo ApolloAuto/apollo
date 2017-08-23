@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planning.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planner_factory.h"
+#include "modules/planning/planner/rtk_replay_planner.h"
+#include "modules/planning/planning.h"
 #include "modules/planning/proto/planning.pb.h"
 
 #include "gmock/gmock.h"
@@ -92,11 +92,6 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
 
   // check Reset runs gracefully.
   planning.Reset();
-}
-
-TEST_F(PlanningTest, PlannerFactory) {
-  auto ptr_planner = PlannerFactory::CreateInstance(PlannerType::OTHER);
-  EXPECT_TRUE(ptr_planner == nullptr);
 }
 
 }  // namespace planning
