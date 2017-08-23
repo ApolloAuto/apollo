@@ -23,6 +23,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
 
 namespace apollo {
 namespace planning {
@@ -31,6 +32,19 @@ using ::apollo::common::VehicleState;
 using ::apollo::common::VehicleConfigHelper;
 
 TrafficDecider::TrafficDecider() : Task("TrafficDecider") {}
+
+void TrafficDecider::RegisterRules() {
+  rule_factory_.Register("BackSideVehicles", []() -> TrafficRule * {
+    return new BackSideVehicles();
+  });
+}
+
+bool TrafficDecider::Init(const PlanningConfig &config) {
+  RegisterRules();
+  rule_configs_ = config.rule_config();
+  is_init_ = true;
+  return true;
+}
 
 const PathObstacle *TrafficDecider::CreateDestinationPathObstacle() {
   // set destination point
@@ -115,6 +129,15 @@ Status TrafficDecider::Execute(Frame *frame,
     AINFO << "There is no destination stop";
   } else {
     AINFO << "destination is created";
+  }
+  for (const auto rule_config : rule_configs_) {
+    auto rule = rule_factory_.CreateObject(rule_config.name());
+    if (!rule) {
+      AERROR << "Could not find rule " << rule_config.DebugString();
+      continue;
+    }
+    rule->ApplyRule(reference_line_info);
+    AINFO << "Applied rule " << rule_config.name();
   }
   return Status::OK();
 }

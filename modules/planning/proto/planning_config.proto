@@ -17,6 +17,10 @@ enum TaskType {
   PATH_DECIDER = 5;
 };
 
+message RuleConfig {
+    optional string name = 1;
+}
+
 message EMPlannerConfig {
   repeated TaskType task = 1;
   optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
@@ -34,4 +38,5 @@ message PlanningConfig {
 
   optional EMPlannerConfig em_planner_config = 2;
   optional apollo.planning.ReferenceLineSmootherConfig reference_line_smoother_config = 3;
+  repeated RuleConfig rule_config = 4;
 }
