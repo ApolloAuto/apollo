@@ -137,9 +137,9 @@ TEST_F(SimControlTest, Test) {
     const LocalizationEstimate *localization =
         AdapterManager::GetLocalization()->GetLatestPublished();
 
-    EXPECT_EQ(chassis->engine_started(), true);
-    EXPECT_EQ(chassis->driving_mode(), Chassis::COMPLETE_AUTO_DRIVE);
-    EXPECT_EQ(chassis->gear_location(), Chassis::GEAR_DRIVE);
+    EXPECT_TRUE(chassis->engine_started());
+    EXPECT_EQ(Chassis::COMPLETE_AUTO_DRIVE, chassis->driving_mode());
+    EXPECT_EQ(Chassis::GEAR_DRIVE, chassis->gear_location());
 
     EXPECT_NEAR(chassis->speed_mps(), 41.0, 1e-6);
     EXPECT_NEAR(chassis->throttle_percentage(), 0.0, 1e-6);

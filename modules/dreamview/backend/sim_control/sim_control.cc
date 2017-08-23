@@ -28,14 +28,30 @@ namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::HeadingToQuaternion;
+using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::QuaternionToHeading;
 using apollo::common::math::NormalizeAngle;
+using apollo::common::Point3D;
+using apollo::common::Quaternion;
 using apollo::common::time::Clock;
 using apollo::common::TrajectoryPoint;
 using apollo::common::util::GetProtoFromFile;
 using apollo::routing::RoutingResponse;
 using apollo::localization::LocalizationEstimate;
 using apollo::canbus::Chassis;
+
+namespace {
+
+void TransformToVRF(const Point3D& point_mrf, const Quaternion& orientation,
+                    Point3D* point_vrf) {
+  Eigen::Vector3d v_mrf(point_mrf.x(), point_mrf.y(), point_mrf.z());
+  auto v_vrf = InverseQuaternionRotate(orientation, v_mrf);
+  point_vrf->set_x(v_vrf.x());
+  point_vrf->set_y(v_vrf.y());
+  point_vrf->set_z(v_vrf.z());
+}
+
+}  // namespace
 
 SimControl::SimControl(const MapService* map_service)
     : map_service_(map_service),
@@ -226,19 +242,27 @@ void SimControl::PublishLocalization(double lambda) {
   pose->mutable_linear_velocity()->set_y(std::sin(cur_theta) * cur_speed);
   pose->mutable_linear_velocity()->set_z(0);
 
-  // Set angular_velocity
+  // Set angular_velocity in both map reference frame and vehicle reference
+  // frame
   double cur_curvature = Interpolate(prev.kappa(), next.kappa(), lambda);
   pose->mutable_angular_velocity()->set_x(0);
   pose->mutable_angular_velocity()->set_y(0);
   pose->mutable_angular_velocity()->set_z(cur_speed * cur_curvature);
 
-  // Set linear_acceleration
+  TransformToVRF(pose->angular_velocity(), pose->orientation(),
+                 pose->mutable_angular_velocity_vrf());
+
+  // Set linear_acceleration in both map reference frame and vehicle reference
+  // frame
   double cur_acceleration_s =
       Interpolate(prev_point_.a(), next_point_.a(), lambda);
   auto* linear_acceleration = pose->mutable_linear_acceleration();
   linear_acceleration->set_x(std::cos(cur_theta) * cur_acceleration_s);
   linear_acceleration->set_y(std::sin(cur_theta) * cur_acceleration_s);
   linear_acceleration->set_z(0);
+
+  TransformToVRF(pose->linear_acceleration(), pose->orientation(),
+                 pose->mutable_linear_acceleration_vrf());
 
   AdapterManager::PublishLocalization(localization);
 }
