@@ -146,6 +146,18 @@ void LaneInfo::init() {
     _sampled_right_width.emplace_back(sample.s(), sample.width());
   }
 
+  const double kMinHalfWidth = 1.05;
+  for (const auto &p : _sampled_left_width) {
+    AERROR << "lane[id = " << _lane.id() << "]. _sampled_left_width[" << p
+           << "] is too small. It should be larger than half vehicle width["
+           << kMinHalfWidth << "].";
+  }
+  for (const auto &p : _sampled_right_width) {
+    AERROR << "lane[id = " << _lane.id() << "]. _sampled_right_width[" << p
+           << "] is too small. It should be larger than half vehicle width["
+           << kMinHalfWidth << "].";
+  }
+
   create_kdtree();
 }
 

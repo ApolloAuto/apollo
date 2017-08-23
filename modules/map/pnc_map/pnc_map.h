@@ -39,7 +39,7 @@ using LaneSegments = std::vector<::apollo::hdmap::LaneSegment>;
 class PncMap {
  public:
   PncMap() = default;
-  ~PncMap() = default;
+  virtual ~PncMap() = default;
   explicit PncMap(const std::string &map_file);
 
   const hdmap::HDMap *HDMap() const;
