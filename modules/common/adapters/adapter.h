@@ -256,7 +256,7 @@ class Adapter {
     latest_published_data_.reset(new D(data));
   }
 
-  D* GetLatestPublished() {
+  const D* GetLatestPublished() {
     return latest_published_data_.get();
   }
 

@@ -86,7 +86,6 @@ bool PlanningTestBase::SetUpAdapters() {
 }
 
 void PlanningTestBase::SetUp() {
-  adc_trajectory_ = nullptr;
   CHECK(SetUpAdapters()) << "Failed to setup adapters";
   planning_.Init();
 }
@@ -107,15 +106,19 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   std::string tmp_golden_path = "/tmp/" + golden_result_file;
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   planning_.RunOnce();
-  adc_trajectory_ = AdapterManager::GetPlanning()->GetLatestPublished();
-  if (!adc_trajectory_) {
+
+  const ADCTrajectory* trajectory_pointer =
+      AdapterManager::GetPlanning()->GetLatestPublished();
+  if (!trajectory_pointer) {
     AERROR << " did not get latest adc trajectory";
     return false;
   }
-  TrimPlanning(adc_trajectory_);
+
+  adc_trajectory_ = *trajectory_pointer;
+  TrimPlanning(&adc_trajectory_);
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
-    ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
+    ::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_,
                                                 full_golden_path);
   } else {
     ADCTrajectory golden_result;
@@ -123,16 +126,16 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
         full_golden_path, &golden_result);
     if (!load_success) {
       AERROR << "Failed to load golden file: " << full_golden_path;
-      ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
+      ::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_,
                                                   tmp_golden_path);
       AINFO << "Current result is written to " << tmp_golden_path;
       return false;
     }
     bool same_result =
-        ::apollo::common::util::IsProtoEqual(golden_result, *adc_trajectory_);
+        ::apollo::common::util::IsProtoEqual(golden_result, adc_trajectory_);
     if (!same_result) {
       std::string tmp_planning_file = tmp_golden_path + ".tmp";
-      ::apollo::common::util::SetProtoToASCIIFile(*adc_trajectory_,
+      ::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_,
                                                   tmp_planning_file);
       AERROR << "found diff " << tmp_planning_file << " " << full_golden_path;
       return false;
