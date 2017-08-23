@@ -4,10 +4,25 @@ A bundle of correlated maps are organized as a directory, with a structure like:
 
 ```txt
 <map_dir>                        # Defined by FLAGS_map_dir
-  |-- base_map.xml.txt           # Defined by FLAGS_base_map_filename
-  |-- routing_map.txt            # Defined by FLAGS_routing_map_filename
-  |-- sim_map.txt                # Defined by FLAGS_sim_map_filename
+  |-- base_map.xml               # Defined by FLAGS_base_map_filename
+  |-- routing_map.bin            # Defined by FLAGS_routing_map_filename
+  |-- sim_map.bin                # Defined by FLAGS_sim_map_filename
   |-- default_end_way_point.txt  # Defined by FLAGS_end_way_point_filename
+```
+
+You can specify the map filenames as a list of candidates:
+
+```txt
+--base_map_filename="base.xml|base.bin|base.txt"
+```
+
+Then it will find the first available file to load. Generally we follow the
+extension pattern of:
+
+```txt
+x.xml  # An OpenDrive formatted map.
+x.bin  # A binary pb map.
+x.txt  # A text pb map.
 ```
 
 ## Use a different map

@@ -14,8 +14,41 @@ limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/hdmap_util.h"
 
+#include "modules/common/util/file.h"
+#include "modules/common/util/string_tokenizer.h"
+
 namespace apollo {
 namespace hdmap {
+namespace {
+
+// Find the first existing file from a list of candidates: "file_a|file_b|...".
+std::string FindFirstExist(const std::string& dir, const std::string& files) {
+  const auto candidates =
+      apollo::common::util::StringTokenizer::Split(files, "|");
+  for (const auto& filename : candidates) {
+    const std::string file_path =
+        apollo::common::util::StrCat(FLAGS_map_dir, "/", filename);
+    if (apollo::common::util::PathExists(file_path)) {
+      return file_path;
+    }
+  }
+  AERROR << "No existing file found in " << dir << "/" << files;
+  return "";
+}
+
+}  // namespace
+
+std::string BaseMapFile() {
+  return FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename);
+}
+
+std::string SimMapFile() {
+  return FindFirstExist(FLAGS_map_dir, FLAGS_sim_map_filename);
+}
+
+std::string RoutingMapFile() {
+  return FindFirstExist(FLAGS_map_dir, FLAGS_sim_map_filename);
+}
 
 std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
   std::unique_ptr<HDMap> hdmap(new HDMap());

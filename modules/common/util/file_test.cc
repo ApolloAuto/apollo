@@ -70,6 +70,11 @@ TEST_F(FileTest, GetSetBinaryFile) {
   EXPECT_EQ(message.text(), read_message.text());
 }
 
+TEST_F(FileTest, PathExists) {
+  EXPECT_TRUE(PathExists("/root"));
+  EXPECT_FALSE(PathExists("/something_impossible"));
+}
+
 TEST_F(FileTest, EnsureAndRemoveDirectory) {
   const std::string directory_path = FilePath("my_directory/haha/hehe");
   EXPECT_FALSE(DirectoryExists(directory_path));

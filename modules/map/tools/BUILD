@@ -11,7 +11,7 @@ cc_binary(
         "//modules/common",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
-        "//modules/map/hdmap",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/map/proto:map_proto",
     ],
 )
@@ -25,7 +25,7 @@ cc_binary(
         "//modules/common",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
-        "//modules/map/hdmap",
+        "//modules/map/hdmap:hdmap_util",
     ],
 )
 
@@ -39,7 +39,7 @@ cc_binary(
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:points_downsampler",
-        "//modules/map/hdmap",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",
     ],

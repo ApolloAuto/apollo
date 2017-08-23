@@ -19,12 +19,12 @@
 DEFINE_string(map_dir, "modules/map/data/new_garage",
               "Directory which contains a group of related maps.");
 
-DEFINE_string(base_map_filename, "base_map.xml",
-              "Base map file which locates in the map_dir.");
-DEFINE_string(sim_map_filename, "sim_map.bin",
-              "Simulation map file which locates in the map_dir.");
-DEFINE_string(routing_map_filename, "routing_map.bin",
-              "Routing map file which locates in the map_dir.");
+DEFINE_string(base_map_filename, "base_map.xml|base_map.bin|base_map.txt",
+              "Base map files in the map_dir, search in order.");
+DEFINE_string(sim_map_filename, "sim_map.bin|sim_map.txt",
+              "Simulation map files in the map_dir, search in order.");
+DEFINE_string(routing_map_filename, "routing_map.bin|routing_map.txt",
+              "Routing map files in the map_dir, search in order.");
 DEFINE_string(end_way_point_filename, "default_end_way_point.txt",
               "End way point of the map, will be sent in RoutingRequest.");
 
