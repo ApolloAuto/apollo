@@ -78,7 +78,7 @@ class PredictionMap {
    * @param s The longitudinal coordinate of the position.
    * @param l The lateral coordinate of the position.
    */
-  static void GetProjection(
+  static bool GetProjection(
       const Eigen::Vector2d& position,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
       double* s,
