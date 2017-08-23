@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//modules/common/adapters:adapter_manager",
         "//modules/dreamview/backend/common:dreamview_gflags",
+        "//modules/dreamview/backend/map:map_service",
         "@gtest//:gtest",
     ],
 )
