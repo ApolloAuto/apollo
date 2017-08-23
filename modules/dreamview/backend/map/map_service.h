@@ -85,9 +85,9 @@ class MapService {
     return pnc_map_.HDMap();
   }
 
-  // A wrapper around HDMap to provide some convenient utils dramview needs.
+  // A wrapper around HDMap to provide some convenient utils dreamview needs.
   const ::apollo::hdmap::PncMap pnc_map_;
-  // A downsampled map for dramview frontend display.
+  // A downsampled map for dreamview frontend display.
   ::apollo::hdmap::HDMap sim_map_;
 };
 
