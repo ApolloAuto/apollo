@@ -29,6 +29,9 @@ npm-debug.log
 .settings
 .classpath
 
+# Vscode files
+.vscode
+
 # atom.io files
 *.gch
 
@@ -57,6 +60,7 @@ data/log
 data/core
 data/bag
 data/cov
+data/pcd
 
 # Doxygen
 docs/doxygen
