@@ -83,8 +83,11 @@ bool GraphCreator::Create() {
     }
   }
 
+  InitForbiddenLanes();
+
   for (const auto& lane : pbmap_.lane()) {
-    if (lane.type() != hdmap::Lane::CITY_DRIVING) {
+    if (forbidden_lane_id_set_.find(lane.id().id()) !=
+        forbidden_lane_id_set_.end()) {
       ADEBUG << "Ignored lane id: " << lane.id().id()
              << " because its type is NOT CITY_DRIVING.";
       continue;
@@ -102,7 +105,8 @@ bool GraphCreator::Create() {
 
   std::string edge_id = "";
   for (const auto& lane : pbmap_.lane()) {
-    if (lane.type() != hdmap::Lane::CITY_DRIVING) {
+    if (forbidden_lane_id_set_.find(lane.id().id()) !=
+        forbidden_lane_id_set_.end()) {
       ADEBUG << "Ignored lane id: " << lane.id().id()
              << " because its type is NOT CITY_DRIVING.";
       continue;
@@ -138,6 +142,11 @@ void GraphCreator::AddEdge(const Node& from_node,
                            const Edge::DirectionType& type) {
   std::string edge_id = "";
   for (const auto& to_id : to_node_vec) {
+    if (forbidden_lane_id_set_.find(to_id.id()) !=
+        forbidden_lane_id_set_.end()) {
+      ADEBUG << "Ignored lane [id = " << to_id.id();
+      continue;
+    }
     edge_id = GetEdgeID(from_node.lane_id(), to_id.id());
     if (showed_edge_id_set_.count(edge_id) != 0) {
       continue;
@@ -149,6 +158,14 @@ void GraphCreator::AddEdge(const Node& from_node,
     }
     const auto& to_node = graph_.node(iter->second);
     EdgeCreator::GetPbEdge(from_node, to_node, type, graph_.add_edge());
+  }
+}
+
+void GraphCreator::InitForbiddenLanes() {
+  for (const auto& lane : pbmap_.lane()) {
+    if (lane.type() != hdmap::Lane::CITY_DRIVING) {
+      forbidden_lane_id_set_.insert(lane.id().id());
+    }
   }
 }
 
