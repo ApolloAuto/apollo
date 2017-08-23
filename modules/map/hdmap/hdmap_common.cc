@@ -147,21 +147,32 @@ void LaneInfo::init() {
   }
 
   const double kMinHalfWidth = 1.05;
-  for (const auto &p : _sampled_left_width) {
-    if (p.second < kMinHalfWidth) {
-      AERROR << "lane[id = " << _lane.id().DebugString()
-             << "]. _sampled_left_width[" << p.second
-             << "] is too small. It should be larger than half vehicle width["
-             << kMinHalfWidth << "].";
+  if (_lane.has_type()) {
+    if (_lane.type() == Lane::CITY_DRIVING) {
+      for (const auto &p : _sampled_left_width) {
+        if (p.second < kMinHalfWidth) {
+          AERROR
+              << "lane[id = " << _lane.id().DebugString()
+              << "]. _sampled_left_width[" << p.second
+              << "] is too small. It should be larger than half vehicle width["
+              << kMinHalfWidth << "].";
+        }
+      }
+      for (const auto &p : _sampled_right_width) {
+        if (p.second < kMinHalfWidth) {
+          AERROR
+              << "lane[id = " << _lane.id().DebugString()
+              << "]. _sampled_right_width[" << p.second
+              << "] is too small. It should be larger than half vehicle width["
+              << kMinHalfWidth << "].";
+        }
+      }
+    } else if (_lane.type() == Lane::NONE) {
+      AERROR << "_lane[id = " << _lane.id().DebugString() << " type is NONE.";
     }
-  }
-  for (const auto &p : _sampled_right_width) {
-    if (p.second < kMinHalfWidth) {
-      AERROR << "lane[id = " << _lane.id().DebugString()
-             << "]. _sampled_right_width[" << p.second
-             << "] is too small. It should be larger than half vehicle width["
-             << kMinHalfWidth << "].";
-    }
+
+  } else {
+    AERROR << "_lane[id = " << _lane.id().DebugString() << "has NO type.";
   }
 
   create_kdtree();
