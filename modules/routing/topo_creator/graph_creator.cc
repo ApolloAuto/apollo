@@ -31,6 +31,22 @@ using ::apollo::hdmap::Id;
 using ::apollo::routing::Node;
 using ::apollo::routing::Edge;
 
+using ::apollo::hdmap::LaneBoundary;
+using ::apollo::hdmap::LaneBoundaryType;
+
+namespace {
+
+bool IsAllowedToCross(const LaneBoundary& boundary) {
+  for (int i = 0; i < boundary.boundary_type_size(); ++i) {
+    if (boundary.boundary_type(i).types(0) != LaneBoundaryType::DOTTED_YELLOW &&
+        boundary.boundary_type(i).types(0) != LaneBoundaryType::DOTTED_WHITE) {
+      return false;
+    }
+  }
+  return true;
+}
+}
+
 GraphCreator::GraphCreator(const std::string& base_map_file_path,
                            const std::string& dump_topo_file_path)
     : base_map_file_path_(base_map_file_path),
@@ -69,8 +85,8 @@ bool GraphCreator::Create() {
 
   for (const auto& lane : pbmap_.lane()) {
     if (lane.type() != hdmap::Lane::CITY_DRIVING) {
-      AINFO << "Ignored lane id: " << lane.id().id()
-            << " because its type is NOT CITY_DRIVING.";
+      ADEBUG << "Ignored lane id: " << lane.id().id()
+             << " because its type is NOT CITY_DRIVING.";
       continue;
     }
     AINFO << "Current lane id: " << lane.id().id();
@@ -87,14 +103,19 @@ bool GraphCreator::Create() {
   std::string edge_id = "";
   for (const auto& lane : pbmap_.lane()) {
     if (lane.type() != hdmap::Lane::CITY_DRIVING) {
-      AINFO << "Ignored lane id: " << lane.id().id()
-            << " because its type is NOT CITY_DRIVING.";
+      ADEBUG << "Ignored lane id: " << lane.id().id()
+             << " because its type is NOT CITY_DRIVING.";
       continue;
     }
     const auto& from_node = graph_.node(node_index_map_[lane.id().id()]);
-    // TODO: check boundary type here.
-    AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
-    AddEdge(from_node, lane.right_neighbor_forward_lane_id(), Edge::RIGHT);
+
+    if (lane.has_left_boundary() && IsAllowedToCross(lane.left_boundary())) {
+      AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
+    }
+
+    if (lane.has_right_boundary() && IsAllowedToCross(lane.right_boundary())) {
+      AddEdge(from_node, lane.right_neighbor_forward_lane_id(), Edge::RIGHT);
+    }
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
   }
 
