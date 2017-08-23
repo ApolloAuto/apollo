@@ -58,7 +58,7 @@ Status Dreamview::Init() {
   map_service_.reset(new MapService(apollo::hdmap::SimMapFile()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_service_.get(), FLAGS_routing_from_file));
-  sim_control_.reset(new SimControl());
+  sim_control_.reset(new SimControl(map_service_.get()));
 
   return Status::OK();
 }

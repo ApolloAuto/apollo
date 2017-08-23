@@ -26,6 +26,7 @@
 #include "gtest/gtest_prod.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/map/map_service.h"
 
 /**
  * @namespace apollo::dreamview
@@ -42,7 +43,11 @@ namespace dreamview {
  */
 class SimControl {
  public:
-  SimControl();
+  /**
+ * @brief Constructor of SimControl.
+ * @param map_service the pointer of MapService.
+ */
+  explicit SimControl(const MapService *map_service);
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
@@ -76,6 +81,8 @@ class SimControl {
   T Interpolate(T prev, T next, double lambda) {
     return (1 - lambda) * prev + lambda * next;
   }
+
+  const MapService *map_service_;
 
   // The timer to publish simulated localization and chassis messages.
   ros::Timer sim_control_timer_;

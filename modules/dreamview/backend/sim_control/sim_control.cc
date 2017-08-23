@@ -37,8 +37,9 @@ using apollo::routing::RoutingResponse;
 using apollo::localization::LocalizationEstimate;
 using apollo::canbus::Chassis;
 
-SimControl::SimControl()
-    : prev_point_index_(0),
+SimControl::SimControl(const MapService* map_service)
+    : map_service_(map_service),
+      prev_point_index_(0),
       next_point_index_(0),
       received_planning_(false),
       initial_start_(true),
@@ -64,10 +65,14 @@ void SimControl::SetStartPoint(const RoutingResponse& routing) {
   p->set_y(routing.routing_request().start().pose().y());
   p->set_z(0.0);
 
-  // TODO(siyangy): Calculate the real theta when the API is ready.
-  p->set_theta(0.0);
+  double theta = 0.0;
+  double s = 0.0;
+  if (!map_service_->GetPoseWithLane(p->x(), p->y(), &theta, &s)) {
+    AERROR << "Failed to get heading!";
+  }
+  p->set_theta(theta);
+  p->set_s(s);
   p->set_kappa(0.0);
-  p->set_s(0.0);
 
   prev_point_index_ = next_point_index_ = 0;
   received_planning_ = false;
