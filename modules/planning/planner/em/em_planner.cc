@@ -185,16 +185,16 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
     const auto& last_init_point = last_frame->PlanningStartPoint().path_point();
     Vec2d last_xy_point(last_init_point.x(), last_init_point.y());
     SLPoint last_sl_point;
-    if (!last_reference_line_info->reference_line().xy_to_sl(last_xy_point,
-                                                             &last_sl_point)) {
+    if (!last_reference_line_info->reference_line().XYToSL(last_xy_point,
+                                                           &last_sl_point)) {
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }
 
     Vec2d xy_point(planning_init_point.path_point().x(),
                    planning_init_point.path_point().y());
     SLPoint sl_point;
-    if (!last_reference_line_info->reference_line().xy_to_sl(xy_point,
-                                                             &last_sl_point)) {
+    if (!last_reference_line_info->reference_line().XYToSL(xy_point,
+                                                           &last_sl_point)) {
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }
     double s_diff = sl_point.s() - last_sl_point.s();
