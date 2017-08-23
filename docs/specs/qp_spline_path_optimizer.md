@@ -158,7 +158,7 @@ f''_i(s_0) =
 $$
 $i$ is the index of segment that contains the $s_0$.
 
-so we get the equality constraint as 
+so we get the equality constraint as
 $$
 \begin{vmatrix} 
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
@@ -205,7 +205,7 @@ $$
 
 ### 2.3 Joint smoothness  constraints
 
-This constraint is to make the spline joint smooth.  Let's assume two segment $seg_k$ and $seg_{k+1}$ are connected, and the accumulated s of segment $seg_k$ is $s_k$. The we can get the constraint euqation as 
+This constraint is to make the spline joint smooth.  Let's assume two segment $seg_k$ and $seg_{k+1}$ are connected, and the accumulated s of segment $seg_k$ is $s_k$. The we can get the constraint equation as 
 $$
 f_k(s_k) = f_{k+1} (s_0)
 $$
@@ -251,7 +251,7 @@ $$
 
 ### 2.4 Sampled points for boundary constraint
 
-Evenly sample m points along the path, and check the obstacle boundary at those points.  convert the constraint into QP inequality constraints
+Evenly sample m points along the path, and check the obstacle boundary at those points. Convert the constraint into QP inequality constraints
 $$
 Ax \leq b
 $$
@@ -273,7 +273,7 @@ $$
 $$
 
 
-similarly, for upper boundary $l_{ub,j}$, we get the ineuqality constraints as 
+similarly, for upper boundary $l_{ub,j}$, we get the inequality constraints as
 $$
 \begin{vmatrix} 
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
