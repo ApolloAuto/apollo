@@ -433,6 +433,7 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
 
       const double time_buffer = obj_decision.overtake().time_buffer();
       boundary_points.at(3).set_t(boundary_points.at(3).t() - time_buffer);
+      b_type = StGraphBoundary::BoundaryType::OVERTAKE;
     } else {
       DCHECK(false) << "Obj decision should be either yield or overtake: "
                     << obj_decision.DebugString();
