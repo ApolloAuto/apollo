@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/math/vec2d.h"
 #include "modules/map/pnc_map/path.h"
@@ -49,6 +50,9 @@ class ReferenceLine {
   ReferencePoint get_reference_point(const double s) const;
   ReferencePoint get_reference_point(const double x, const double y) const;
 
+  bool GetSLBoundary(const common::math::Box2d& box,
+                     SLBoundary* const sl_boundary) const;
+
   bool SLToXY(const common::SLPoint& sl_point,
               common::math::Vec2d* const xy_point) const;
   bool XYToSL(const common::math::Vec2d& xy_point,
@@ -57,6 +61,11 @@ class ReferenceLine {
   bool get_lane_width(const double s, double* const left_width,
                       double* const right_width) const;
   bool is_on_road(const common::SLPoint& sl_point) const;
+
+  /**
+   * @brief check if any part of the box has overlap with the road.
+   */
+  bool has_overlap(const common::math::Box2d& box) const;
 
   double length() const { return map_path_.length(); }
 
@@ -74,11 +83,13 @@ class ReferenceLine {
    * parallel neighboring lanes. Otherwise the interpolated result may not
    * valid.
    * @param p0 the first anchor point for interpolation.
-   * @param s0 the longitutial distance (s) of p0 on current reference line. s0
-   * <= s && s0 <= s1
+   * @param s0 the longitutial distance (s) of p0 on current reference line.
+   * s0 <= s && s0 <= s1
    * @param p1 the second anchor point for interpolation
-   * @param s1 the longitutial distance (s) of p1 on current reference line. s1
-   * @param s identifies the the middle point that is going to be interpolated.
+   * @param s1 the longitutial distance (s) of p1 on current reference line.
+   * s1
+   * @param s identifies the the middle point that is going to be
+   * interpolated.
    * s >= s0 && s <= s1
    * @return The interpolated ReferencePoint.
    */

@@ -20,6 +20,7 @@ cc_library(
         "//modules/map/pnc_map:path",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:double",
+        "//modules/planning/proto:planning_proto",
     ],
 )
 
