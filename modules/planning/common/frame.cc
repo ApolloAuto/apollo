@@ -102,7 +102,7 @@ bool Frame::InitReferenceLineInfo(
     const std::vector<ReferenceLine> &reference_lines) {
   reference_line_info_.clear();
   for (const auto &reference_line : reference_lines) {
-    reference_line_info_.emplace_back(reference_line);
+    reference_line_info_.emplace_back(pnc_map_, reference_line);
   }
   for (auto &info : reference_line_info_) {
     if (!info.AddObstacles(obstacles_.Items())) {

@@ -29,6 +29,7 @@
 
 #include "google/protobuf/util/message_differencer.h"
 
+#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -61,6 +62,11 @@ apollo::common::SLPoint MakeSLPoint(const double s, const double l);
 
 apollo::common::Point3D MakePoint3D(const double x, const double y,
                                     const double z);
+
+apollo::common::PointENU MakePointENU(const double x, const double y,
+                                      const double z);
+
+apollo::common::PointENU MakePointENU(const common::math::Vec2d& xy);
 
 apollo::perception::Point MakePerceptionPoint(const double x, const double y,
                                               const double z);

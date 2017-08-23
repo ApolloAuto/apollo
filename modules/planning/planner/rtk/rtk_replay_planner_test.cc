@@ -37,7 +37,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_y(4140674.76063);
 
   ReferenceLine reference_line;
-  ReferenceLineInfo info(reference_line);
+  ReferenceLineInfo info(nullptr, reference_line);
   auto status = planner.Plan(start_point, nullptr, &info);
 
   const auto& trajectory = info.trajectory();
@@ -65,7 +65,7 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
   ReferenceLine ref;
-  ReferenceLineInfo info(ref);
+  ReferenceLineInfo info(nullptr, ref);
   EXPECT_TRUE(!(planner_with_error_csv.Plan(start_point, nullptr, &info)).ok());
 }
 

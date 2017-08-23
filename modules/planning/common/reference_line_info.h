@@ -29,6 +29,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -39,7 +40,17 @@ namespace planning {
 
 class ReferenceLineInfo {
  public:
-  explicit ReferenceLineInfo(const ReferenceLine& reference_line);
+  explicit ReferenceLineInfo(const hdmap::PncMap* pnc_map,
+                             const ReferenceLine& reference_line);
+
+  /**
+   * Check if xy_point is on the left side lane of current reference line.
+   */
+  bool IsOnLeftLane(const common::math::Vec2d& xy_point);
+  /**
+   * Check if xy_point is on the right side lane of current reference line.
+   */
+  bool IsOnRightLane(const common::math::Vec2d& xy_point);
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
@@ -60,11 +71,8 @@ class ReferenceLineInfo {
   double Cost() const { return cost_; }
 
   std::unique_ptr<Obstacle> CreateVirtualObstacle(
-      const std::string& obstacle_id,
-      const common::math::Vec2d& position,
-      const double length,
-      const double width,
-      const double height) const;
+      const std::string& obstacle_id, const common::math::Vec2d& position,
+      const double length, const double width, const double height) const;
 
   /**
    * @brief check if current reference line is started from another reference
@@ -96,7 +104,8 @@ class ReferenceLineInfo {
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
 
- private:
+  const hdmap::PncMap* pnc_map_ = nullptr;
+
   /**
    * @brief this is the number that measures the goodness of this reference
    * line.
