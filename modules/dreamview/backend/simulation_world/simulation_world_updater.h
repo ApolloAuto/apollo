@@ -49,7 +49,8 @@ class SimulationWorldUpdater {
    * of hdmap.
    * @param routing_from_file whether to read intial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket, MapService *map_service,
+  SimulationWorldUpdater(WebSocketHandler *websocket,
+                         const MapService *map_service,
                          bool routing_from_file = false);
 
   /**
@@ -71,7 +72,7 @@ class SimulationWorldUpdater {
 
   ros::Timer timer_;
   SimulationWorldService sim_world_service_;
-  MapService *map_service_;
+  const MapService *map_service_;
   WebSocketHandler *websocket_;
 };
 

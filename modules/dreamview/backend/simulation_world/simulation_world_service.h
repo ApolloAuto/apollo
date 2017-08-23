@@ -64,7 +64,7 @@ class SimulationWorldService {
    * @param map_service the pointer of MapService.
    * @param routing_from_file whether to read intial routing from file.
    */
-  SimulationWorldService(MapService *map_service,
+  SimulationWorldService(const MapService *map_service,
                          bool routing_from_file = false);
 
   /**
@@ -160,7 +160,7 @@ class SimulationWorldService {
   SimulationWorld world_;
 
   // The handle of MapService, not owned by SimulationWorldService.
-  MapService *map_service_;
+  const MapService *map_service_;
 
   // The map holding obstacle string id to the actual object
   std::unordered_map<std::string, Object> obj_map_;

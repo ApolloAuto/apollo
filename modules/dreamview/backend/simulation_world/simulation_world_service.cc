@@ -276,7 +276,7 @@ void CreatePredictionTrajectory(Object *world_object,
 constexpr int SimulationWorldService::kMaxMonitorItems;
 constexpr double SimulationWorldService::kMapRadius;
 
-SimulationWorldService::SimulationWorldService(MapService *map_service,
+SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
     : map_service_(map_service) {
   RegisterMessageCallbacks();

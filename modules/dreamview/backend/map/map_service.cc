@@ -216,6 +216,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
                                       std::vector<MapPathPoint> *points) const {
   Path path;
+  // TODO(siyangy): Don't use sim_map here
   if (!pnc_map_.CreatePathFromRouting(routing, &path)) {
     AERROR << "Unable to get points from routing!";
     return false;
@@ -228,6 +229,23 @@ bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
     points->push_back(path.path_points()[index]);
   }
 
+  return true;
+}
+
+bool MapService::GetPoseWithLane(const double x, const double y, double *theta,
+                                 double *s) const {
+  apollo::common::PointENU point;
+  point.set_x(x);
+  point.set_y(y);
+  double l;
+  LaneInfoConstPtr nearest_lane;
+  // TODO(siyangy): Don't use sim_map here
+  if (hdmap()->get_nearest_lane(point, &nearest_lane, s, &l) < 0) {
+    AERROR << "Failed to get neareset lane!";
+    return false;
+  }
+
+  *theta = nearest_lane->heading(*s);
   return true;
 }
 
