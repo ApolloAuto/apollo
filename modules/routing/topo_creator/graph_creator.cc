@@ -19,6 +19,7 @@
 #include "glog/logging.h"
 
 #include "modules/common/util/file.h"
+#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/routing/topo_creator/edge_creator.h"
 #include "modules/routing/topo_creator/node_creator.h"
 
@@ -36,10 +37,19 @@ GraphCreator::GraphCreator(const std::string& base_map_file_path,
       dump_topo_file_path_(dump_topo_file_path) {}
 
 bool GraphCreator::Create() {
-  if (!::apollo::common::util::GetProtoFromFile(base_map_file_path_, &pbmap_)) {
-    AERROR << "Failed to load base map file from " << base_map_file_path_;
-    return false;
+  if (common::util::EndWith(base_map_file_path_, ".xml")) {
+    if (!hdmap::adapter::OpendriveAdapter::LoadData(base_map_file_path_,
+                                                    &pbmap_)) {
+      AERROR << "Failed to load base map file from " << base_map_file_path_;
+      return false;
+    }
+  } else {
+    if (!common::util::GetProtoFromFile(base_map_file_path_, &pbmap_)) {
+      AERROR << "Failed to load base map file from " << base_map_file_path_;
+      return false;
+    }
   }
+
   AINFO << "Number of lanes: " << pbmap_.lane_size();
 
   graph_.set_hdmap_version(pbmap_.header().version());
@@ -58,6 +68,11 @@ bool GraphCreator::Create() {
   }
 
   for (const auto& lane : pbmap_.lane()) {
+    if (lane.type() != hdmap::Lane::CITY_DRIVING) {
+      AINFO << "Ignored lane id: " << lane.id().id()
+            << " because its type is NOT CITY_DRIVING.";
+      continue;
+    }
     AINFO << "Current lane id: " << lane.id().id();
     node_index_map_[lane.id().id()] = graph_.node_size();
     const auto iter = road_id_map_.find(lane.id().id());
@@ -71,7 +86,13 @@ bool GraphCreator::Create() {
 
   std::string edge_id = "";
   for (const auto& lane : pbmap_.lane()) {
+    if (lane.type() != hdmap::Lane::CITY_DRIVING) {
+      AINFO << "Ignored lane id: " << lane.id().id()
+            << " because its type is NOT CITY_DRIVING.";
+      continue;
+    }
     const auto& from_node = graph_.node(node_index_map_[lane.id().id()]);
+    // TODO: check boundary type here.
     AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
     AddEdge(from_node, lane.right_neighbor_forward_lane_id(), Edge::RIGHT);
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
