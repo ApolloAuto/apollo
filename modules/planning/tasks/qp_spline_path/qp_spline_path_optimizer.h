@@ -34,7 +34,7 @@ namespace planning {
 
 class QpSplinePathOptimizer : public PathOptimizer {
  public:
-  explicit QpSplinePathOptimizer(const std::string& name);
+  QpSplinePathOptimizer();
   bool Init(const PlanningConfig& config) override;
 
  private:

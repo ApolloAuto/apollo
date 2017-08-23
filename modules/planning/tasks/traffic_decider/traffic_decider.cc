@@ -30,7 +30,7 @@ using ::apollo::common::Status;
 using ::apollo::common::VehicleState;
 using ::apollo::common::VehicleConfigHelper;
 
-TrafficDecider::TrafficDecider(const std::string &name) : Task(name) {}
+TrafficDecider::TrafficDecider() : Task("TrafficDecider") {}
 
 const PathObstacle *TrafficDecider::CreateDestinationPathObstacle() {
   // set destination point
@@ -77,8 +77,8 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
   }
   if (destination_s < 0 || destination_s > reference_line.length() ||
       destination_l > left_bound || destination_l < -right_bound) {
-    AINFO << "destination[s=" << destination_s
-          << "; l=" << destination_l << "] out of planning range. Skip";
+    AINFO << "destination[s=" << destination_s << "; l=" << destination_l
+          << "] out of planning range. Skip";
     return nullptr;
   }
 
@@ -95,10 +95,8 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
 
   std::unique_ptr<Obstacle> obstacle_ptr =
       reference_line_info_->CreateVirtualObstacle(
-          FLAGS_destination_obstacle_id,
-          {destination.x(), destination.y()},
-          FLAGS_virtual_stop_wall_length,
-          FLAGS_virtual_stop_wall_width,
+          FLAGS_destination_obstacle_id, {destination.x(), destination.y()},
+          FLAGS_virtual_stop_wall_length, FLAGS_virtual_stop_wall_width,
           FLAGS_virtual_stop_wall_height);
   const auto *obstacle = obstacle_ptr.get();
   if (!frame_->AddObstacle(std::move(obstacle_ptr))) {
@@ -133,8 +131,8 @@ bool TrafficDecider::MakeDestinationStopDecision() {
   // check stop_posision on reference line
   auto stop_position = obstacle->Perception().position();
   common::SLPoint stop_line_sl;
-  reference_line.xy_to_sl(
-      {stop_position.x(), stop_position.y()}, &stop_line_sl);
+  reference_line.xy_to_sl({stop_position.x(), stop_position.y()},
+                          &stop_line_sl);
   if (!reference_line.is_on_road(stop_line_sl)) {
     return false;
   }

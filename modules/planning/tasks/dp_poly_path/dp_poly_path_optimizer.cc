@@ -34,8 +34,8 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-DpPolyPathOptimizer::DpPolyPathOptimizer(const std::string &name)
-    : PathOptimizer(name) {}
+DpPolyPathOptimizer::DpPolyPathOptimizer()
+    : PathOptimizer("DpPolyPathOptimizer") {}
 
 bool DpPolyPathOptimizer::Init(const PlanningConfig &config) {
   config_ = config.em_planner_config().dp_poly_path_config();
