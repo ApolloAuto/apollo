@@ -88,14 +88,14 @@ std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
       apollo::hdmap::MakeMapId(str_id));
 }
 
-void PredictionMap::GetProjection(const Eigen::Vector2d& position,
+bool PredictionMap::GetProjection(const Eigen::Vector2d& position,
                                   std::shared_ptr<const LaneInfo> lane_info,
                                   double* s, double* l) {
   if (lane_info == nullptr) {
-    return;
+    return false;
   }
   apollo::common::math::Vec2d pos(position[0], position[1]);
-  lane_info->get_projection(pos, s, l);
+  return lane_info->get_projection(pos, s, l);
 }
 
 bool PredictionMap::ProjectionFromLane(
