@@ -35,19 +35,20 @@ int OnlineCalibration::decode(
     return -1;
   }
   get_unit_index();
-  if (_unit_indexs.size() < 2) {
+  int unit_size = _unit_indexs.size();
+  if (unit_size < 2) {
     // can not find two unit# index, may be lost packet
     ROS_ERROR_STREAM("unit count less than 2, maybe lost packets");
     return -1;
   }
 
-  if (_unit_indexs[1] - _unit_indexs[0] != 65 * 64) {  // 64 lasers
+  if (_unit_indexs[unit_size - 1] - _unit_indexs[unit_size - 2] != 65 * 64) {  // 64 lasers
     // lost packet
     ROS_ERROR_STREAM("two unit distance is wrong");
     return -1;
   }
 
-  int start_index = _unit_indexs[0];
+  int start_index = _unit_indexs[unit_size - 2];
   for (int i = 0; i < 64; ++i) {
     LaserCorrection laser_correction;
 
@@ -59,33 +60,23 @@ int OnlineCalibration::decode(
 
     laser_correction.vert_correction =
         *(int16_t*)(&_status_values[index_16 + 1]) / 100.0 * DEGRESS_TO_RADIANS;
-
     laser_correction.rot_correction =
         *(int16_t*)(&_status_values[index_16 + 3]) / 100.0 * DEGRESS_TO_RADIANS;
-
     laser_correction.dist_correction =
         *(int16_t*)(&_status_values[index_16 + 5]) / 10.0 / 100.0;  // to meter
-
     laser_correction.dist_correction_x =
         *(int16_t*)(&_status_values[index_32]) / 10.0 / 100.0;  // to meter
-
     laser_correction.dist_correction_y =
         *(int16_t*)(&_status_values[index_32 + 2]) / 10.0 / 100.0;  // to meter
-
     laser_correction.vert_offset_correction =
         *(int16_t*)(&_status_values[index_32 + 4]) / 10.0 / 100.0;  // to meter
-
     laser_correction.horiz_offset_correction =
         (int16_t)((int16_t)_status_values[index_48] << 8 |
-                  _status_values[index_32 + 6]) /
-        10.0 / 100.0;  // to meter
-
+                  _status_values[index_32 + 6]) / 10.0 / 100.0;  // to meter
     laser_correction.focal_distance =
         *(int16_t*)(&_status_values[index_48 + 1]) / 10.0 / 100.0;  // to meter
-
     laser_correction.focal_slope =
         *(int16_t*)(&_status_values[index_48 + 3]) / 10.0;  // to meter
-
     laser_correction.max_intensity = _status_values[index_48 + 6];
     laser_correction.min_intensity = _status_values[index_48 + 5];
 
@@ -110,13 +101,17 @@ int OnlineCalibration::decode(
 void OnlineCalibration::get_unit_index() {
   int size = _status_values.size();
   // simple check only for value, maybe need more check fro status tyep
-  for (int i = 0; i < size - 5; ++i) {
-    if (_status_values[i] == 85            // "U"
-        && _status_values[i + 1] == 78     // "N"
-        && _status_values[i + 2] == 73     // "I"
-        && _status_values[i + 3] == 84     // "T"
-        && _status_values[i + 4] == 35) {  // "#"
-      _unit_indexs.emplace_back(i);
+  int start_index = 0;
+  if (_unit_indexs.size() > 0) {
+    start_index = _unit_indexs.back() + 5;
+  }
+  for (int start_index = 0; start_index < size - 5; ++start_index) {
+    if (_status_values[start_index] == 85            // "U"
+        && _status_values[start_index + 1] == 78     // "N"
+        && _status_values[start_index + 2] == 73     // "I"
+        && _status_values[start_index + 3] == 84     // "T"
+        && _status_values[start_index + 4] == 35) {  // "#"
+      _unit_indexs.emplace_back(start_index);
     }
   }
 }

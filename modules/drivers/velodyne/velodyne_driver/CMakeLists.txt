@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(velodyne_driver)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2 -fopenmp")
 
 set(${PROJECT_NAME}_CATKIN_DEPS
     nodelet
