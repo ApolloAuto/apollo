@@ -42,7 +42,6 @@ bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
 Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
                                       const ReferenceLine& reference_line,
                                       const common::TrajectoryPoint& init_point,
-                                      PathDecision* const path_decision,
                                       PathData* const path_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process.";
@@ -50,8 +49,9 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
   }
   QpSplinePathGenerator path_generator(reference_line, qp_spline_path_config_);
 
-  if (!path_generator.Generate(path_decision->path_obstacles().Items(),
-                               speed_data, init_point, path_data)) {
+  if (!path_generator.Generate(
+          reference_line_info_->path_decision()->path_obstacles().Items(),
+          speed_data, init_point, path_data)) {
     const std::string msg = "failed to generate spline path!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
