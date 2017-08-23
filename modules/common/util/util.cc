@@ -43,6 +43,23 @@ apollo::common::Point3D MakePoint3D(const double x, const double y,
   return point3d;
 }
 
+apollo::common::PointENU MakePointENU(const double x, const double y,
+                                      const double z) {
+  common::PointENU point_enu;
+  point_enu.set_x(x);
+  point_enu.set_y(y);
+  point_enu.set_z(z);
+  return point_enu;
+}
+
+apollo::common::PointENU MakePointENU(const common::math::Vec2d& xy) {
+  common::PointENU point_enu;
+  point_enu.set_x(xy.x());
+  point_enu.set_y(xy.y());
+  point_enu.set_z(0.0);
+  return point_enu;
+}
+
 apollo::perception::Point MakePerceptionPoint(const double x, const double y,
                                               const double z) {
   perception::Point point3d;
