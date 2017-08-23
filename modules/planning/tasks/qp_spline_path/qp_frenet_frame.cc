@@ -410,6 +410,12 @@ void QpFrenetFrame::CalculateHDMapBound() {
       AERROR << "right_bound: " << right_bound;
       feasible_longitudinal_upper_bound_ =
           std::min(evaluated_knots_[i], feasible_longitudinal_upper_bound_);
+      common::SLPoint sl;
+      sl.set_s(evaluated_knots_[i]);
+      common::math::Vec2d xy;
+      reference_line_.SLToXY(sl, &xy);
+      AERROR << "evaluated_knot x: " << std::fixed << xy.x()
+             << " y: " << xy.y();
     }
   }
 }
