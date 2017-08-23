@@ -31,11 +31,10 @@ DEFINE_bool(xy_to_sl, false, "calculate xy to sl");
 DEFINE_bool(sl_to_xy, false, "calculate sl to xy");
 DEFINE_bool(xy_to_lane, false, "calculate xy to lane");
 DEFINE_bool(lane_to_lane, false, "calculate lane to lane");
-DEFINE_bool(lane_width, false, "calculate lane width");
+DEFINE_bool(dump_lane_width, false, "dump all lane width info");
 DEFINE_string(dump_txt_map, "", "text file name for dumping map");
 DEFINE_string(dump_bin_map, "", "binary file name for dumping map");
 DEFINE_string(overlap, "", "get overlap information");
-DEFINE_string(lane_info, "", "print lane info");
 DEFINE_string(signal_info, "", "print signal info");
 DEFINE_double(x, 0.0, "x");
 DEFINE_double(y, 0.0, "y");
@@ -195,53 +194,65 @@ int main(int argc, char *argv[]) {
     printf("lane[%s] s[%f], l[%f]\n", FLAGS_to_lane.c_str(),
            target_s, target_l);
   }
-  if (FLAGS_lane_width) {
-    auto lane_ptr = map_util.get_lane(FLAGS_lane);
-    double left_width = 0.0;
-    double right_width = 0.0;
-    lane_ptr->get_width(FLAGS_s, &left_width, &right_width);
-    printf("lane[%s] s[%f]: left_width[%f], right_width[%f], total_width[%f]\n",
-           FLAGS_lane.c_str(), FLAGS_s, left_width, right_width,
-           left_width + right_width);
-  }
-  if (!FLAGS_lane_info.empty()) {
-    const auto *lane_ptr = map_util.get_lane(FLAGS_lane_info);
+  if (!FLAGS_lane.empty()) {
+    const auto *lane_ptr = map_util.get_lane(FLAGS_lane);
     const auto &lane = lane_ptr->lane();
 
     ::apollo::common::PointENU start_point;
     double start_heading = 0.0;
-    map_util.sl_to_point(FLAGS_lane_info, 0, 0, &start_point, &start_heading);
+    map_util.sl_to_point(FLAGS_lane, 0, 0, &start_point, &start_heading);
 
     ::apollo::common::PointENU end_point;
     double end_heading = 0.0;
-    map_util.sl_to_point(FLAGS_lane_info, lane_ptr->total_length(), 0,
+    map_util.sl_to_point(FLAGS_lane, lane_ptr->total_length(), 0,
                          &end_point, &end_heading);
 
-    std::cout << "lane[" << FLAGS_lane_info
-              << "] length[" << lane_ptr->total_length()
-              << "] type[" << Lane_LaneType_Name(lane.type())
-              << "] turn[" << Lane_LaneTurn_Name(lane.turn())
-              // << "] left_boundary["
-              // << LaneBoundary_Type_Name(lane.left_boundary().type())
-              // << "] right_boundary["
-              // << LaneBoundary_Type_Name(lane.right_boundary().type())
-              << "] speed_limit[" << lane.speed_limit()
-              << "] predecessor[" << lane.predecessor_id()
-              << "] successor[" << lane.successor_id()
-              << "] left_forward[" << lane.left_neighbor_forward_lane_id()
-              << "] right_forward[" << lane.right_neighbor_forward_lane_id()
-              << "] left_reverse[" << lane.left_neighbor_reverse_lane_id()
-              << "] right_reverse[" << lane.right_neighbor_reverse_lane_id()
-              << "] overlap[" << lane.overlap_id()
-              // << "] crosswalk[" << lane.crosswalk_id()
-              // << "] yield_sign[" << lane.yield_sign_id()
-               << "] stop_sign num:[" << lane_ptr->stop_signs().size()
-              << "]"
+    double left_width = 0.0;
+    double right_width = 0.0;
+    lane_ptr->get_width(FLAGS_s, &left_width, &right_width);
+
+    std::cout << "lane[" << FLAGS_lane << std::fixed << "] length["
+              << lane_ptr->total_length() << "] type["
+              << Lane_LaneType_Name(lane.type()) << "] turn["
+              << Lane_LaneTurn_Name(lane.turn()) << "] speed_limit["
+              << lane.speed_limit() << "] predecessor[" << lane.predecessor_id()
+              << "] successor[" << lane.successor_id() << "] left_forward["
+              << lane.left_neighbor_forward_lane_id() << "] right_forward["
+              << lane.right_neighbor_forward_lane_id() << "] left_reverse["
+              << lane.left_neighbor_reverse_lane_id() << "] right_reverse["
+              << lane.right_neighbor_reverse_lane_id() << "] overlap["
+              << lane.overlap_id() << "] stop_sign num:["
+              << lane_ptr->stop_signs().size() << "]"
               << " start point(x,y,heading):" << start_point.x() << ","
               << start_point.y() << "," << start_heading
               << " end point(x,y,heading):" << end_point.x() << ","
               << end_point.y() << "," << end_heading
+              << " left_width:" << left_width << " right_width:" << right_width
               << std::endl;
+    if (FLAGS_dump_lane_width) {
+      const auto sample_left_widthes = lane_ptr->sampled_left_width();
+      std::cout << "left width num: " << sample_left_widthes.size()
+                << std::endl;
+      int num = 0;
+      for (auto w : sample_left_widthes) {
+        std::cout << " " << w.second;
+        if (++num % 10 == 0)  {
+          std::cout << std::endl;
+        }
+      }
+      std::cout << std::endl;
+      num = 0;
+      const auto sample_right_widthes = lane_ptr->sampled_right_width();
+      std::cout << "right width num: " << sample_right_widthes.size()
+                << std::endl;
+      for (auto w : sample_right_widthes) {
+        std::cout << " " << w.second;
+        if (++num % 10 == 0)  {
+          std::cout << std::endl;
+        }
+      }
+      std::cout << std::endl;
+    }
   }
   if (!FLAGS_overlap.empty()) {
     const auto *overlap_ptr = map_util.get_overlap(FLAGS_overlap);
@@ -272,10 +283,9 @@ int main(int argc, char *argv[]) {
       && !FLAGS_xy_to_sl
       && !FLAGS_xy_to_lane
       && !FLAGS_lane_to_lane
-      && !FLAGS_lane_width
+      && FLAGS_lane.empty()
       && FLAGS_dump_txt_map.empty()
       && FLAGS_dump_bin_map.empty()
-      && FLAGS_lane_info.empty()
       && FLAGS_signal_info.empty()
       && FLAGS_overlap.empty()) {
     std::cout << "usage: --map_file" << std::endl;
@@ -285,8 +295,7 @@ int main(int argc, char *argv[]) {
     std::cout << "usage: --sl_to_xy --lane --s --l" << std::endl;
     std::cout << "usage: --xy_to_lane --x --y --lane" << std::endl;
     std::cout << "usage: --lane_to_lane --from_lane --s --to_lane" << std::endl;
-    std::cout << "usage: --lane_width --lane --s" << std::endl;
-    std::cout << "usage: --lane_info" << std::endl;
+    std::cout << "usage: --lane" << std::endl;
     std::cout << "usage: --signal_info" << std::endl;
     std::cout << "usage: --overlap" << std::endl;
   }
