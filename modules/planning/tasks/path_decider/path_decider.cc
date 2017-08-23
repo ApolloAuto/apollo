@@ -90,7 +90,7 @@ bool PathDecider::MakeStaticObstacleDecision(
         common::math::Vec2d{path_point.x(), path_point.y()}, path_point.theta(),
         adc_length, adc_width);
     common::SLPoint adc_sl;
-    if (!reference_line_->xy_to_sl({path_point.x(), path_point.y()}, &adc_sl)) {
+    if (!reference_line_->XYToSL({path_point.x(), path_point.y()}, &adc_sl)) {
       AERROR << "get_point_in_Frenet_frame error for ego vehicle "
              << path_point.x() << " " << path_point.y();
       return false;
@@ -256,7 +256,7 @@ bool PathDecider::ComputeBoundingBoxesForAdc(
     common::SLPoint sl_point;
     sl_point.set_s(s);
     sl_point.set_l(l);
-    reference_line_->sl_to_xy(sl_point, &adc_position_cartesian);
+    reference_line_->SLToXY(sl_point, &adc_position_cartesian);
 
     ReferencePoint reference_point = reference_line_->get_reference_point(s);
 

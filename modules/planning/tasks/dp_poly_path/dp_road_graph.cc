@@ -55,7 +55,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
                                  PathData *const path_data) {
   CHECK_NOTNULL(path_data);
   init_point_ = init_point;
-  if (!reference_line_.xy_to_sl(
+  if (!reference_line_.XYToSL(
           {init_point_.path_point().x(), init_point_.path_point().y()},
           &init_sl_point_)) {
     AERROR << "Fail to create init_sl_point from : "
@@ -167,7 +167,7 @@ bool DPRoadGraph::SamplePathWaypoints(
   common::math::Vec2d init_cartesian_point(init_point.path_point().x(),
                                            init_point.path_point().y());
   common::SLPoint init_sl_point;
-  if (!reference_line_.xy_to_sl(init_cartesian_point, &init_sl_point)) {
+  if (!reference_line_.XYToSL(init_cartesian_point, &init_sl_point)) {
     AERROR << "Failed to get sl point from point "
            << init_cartesian_point.DebugString();
     return false;

@@ -107,7 +107,7 @@ bool ReferenceLineSmoother::smooth(
         spline_solver_->spline().third_derivative_y(t));
 
     common::SLPoint ref_sl_point;
-    if (!raw_reference_line.xy_to_sl({xy.first, xy.second}, &ref_sl_point)) {
+    if (!raw_reference_line.XYToSL({xy.first, xy.second}, &ref_sl_point)) {
       return false;
     }
     if (ref_sl_point.s() < 0 ||

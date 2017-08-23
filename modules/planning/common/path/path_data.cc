@@ -44,7 +44,7 @@ bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
     return false;
   }
   discretized_path_ = path;
-  if (!CartesianToFrenet(discretized_path_, &frenet_path_)) {
+  if (!XYToSL(discretized_path_, &frenet_path_)) {
     AERROR << "Fail to transfer discretized path to frenet path.";
     return false;
   }
@@ -60,7 +60,7 @@ bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
     return false;
   }
   frenet_path_ = frenet_path;
-  if (!FrenetToCartesian(frenet_path_, &discretized_path_)) {
+  if (!SLToXY(frenet_path_, &discretized_path_)) {
     AERROR << "Fail to transfer frenet path to discretized path.";
     return false;
   }
@@ -149,8 +149,8 @@ std::string PathData::DebugString() const {
       "]\n");
 }
 
-bool PathData::FrenetToCartesian(const FrenetFramePath &frenet_path,
-                                 DiscretizedPath *const discretized_path) {
+bool PathData::SLToXY(const FrenetFramePath &frenet_path,
+                      DiscretizedPath *const discretized_path) {
   DCHECK_NOTNULL(discretized_path);
   std::vector<common::PathPoint> path_points;
   for (const common::FrenetFramePoint &frenet_point : frenet_path.points()) {
@@ -158,7 +158,7 @@ bool PathData::FrenetToCartesian(const FrenetFramePath &frenet_path,
     common::math::Vec2d cartesian_point;
     sl_point.set_s(frenet_point.s());
     sl_point.set_l(frenet_point.l());
-    if (!reference_line_->sl_to_xy(sl_point, &cartesian_point)) {
+    if (!reference_line_->SLToXY(sl_point, &cartesian_point)) {
       AERROR << "Fail to convert sl point to xy point";
       return false;
     }
@@ -189,15 +189,14 @@ bool PathData::FrenetToCartesian(const FrenetFramePath &frenet_path,
   return true;
 }
 
-bool PathData::CartesianToFrenet(const DiscretizedPath &discretized_path,
-                                 FrenetFramePath *const frenet_path) {
+bool PathData::XYToSL(const DiscretizedPath &discretized_path,
+                      FrenetFramePath *const frenet_path) {
   DCHECK_NOTNULL(frenet_path);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
 
   for (const auto &path_point : discretized_path.path_points()) {
     SLPoint sl_point;
-    if (!reference_line_->xy_to_sl({path_point.x(), path_point.y()},
-                                   &sl_point)) {
+    if (!reference_line_->XYToSL({path_point.x(), path_point.y()}, &sl_point)) {
       AERROR << "Fail to transfer cartesian point to frenet point.";
       return false;
     }

@@ -49,10 +49,10 @@ class ReferenceLine {
   ReferencePoint get_reference_point(const double s) const;
   ReferencePoint get_reference_point(const double x, const double y) const;
 
-  bool sl_to_xy(const common::SLPoint& sl_point,
-                common::math::Vec2d* const xy_point) const;
-  bool xy_to_sl(const common::math::Vec2d& xy_point,
-                common::SLPoint* const sl_point) const;
+  bool SLToXY(const common::SLPoint& sl_point,
+              common::math::Vec2d* const xy_point) const;
+  bool XYToSL(const common::math::Vec2d& xy_point,
+              common::SLPoint* const sl_point) const;
 
   bool get_lane_width(const double s, double* const left_width,
                       double* const right_width) const;
