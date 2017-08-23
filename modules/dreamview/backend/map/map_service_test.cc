@@ -66,12 +66,6 @@ class MapServiceTest : public ::testing::Test {
   MapService map_service;
 };
 
-TEST_F(MapServiceTest, LoadMap) {
-  Id id;
-  id.set_id("l1");
-  EXPECT_EQ("l1", map_service.hdmap()->get_lane_by_id(id)->id().id());
-}
-
 TEST_F(MapServiceTest, CollectMapElementIds) {
   PointENU p;
   p.set_x(0.0);

@@ -61,7 +61,10 @@ struct MapElementIds {
 
 class MapService {
  public:
-  explicit MapService(const std::string &map_filename);
+  explicit MapService(const std::string map_filename);
+
+  MapService(const std::string &base_map_filename,
+             const std::string &sim_map_filename);
   MapElementIds CollectMapElementIds(const apollo::common::PointENU &point,
                                      double raidus) const;
 
@@ -77,12 +80,15 @@ class MapService {
   bool GetPoseWithLane(const double x, const double y, double *theta,
                        double *s) const;
 
-  const ::apollo::hdmap::HDMap *hdmap() const {
+ private:
+  const ::apollo::hdmap::HDMap *BaseMap() const {
     return pnc_map_.HDMap();
   }
 
- private:
-  ::apollo::hdmap::PncMap pnc_map_;
+  // A wrapper around HDMap to provide some convenient utils dramview needs.
+  const ::apollo::hdmap::PncMap pnc_map_;
+  // A downsampled map for dramview frontend display.
+  ::apollo::hdmap::HDMap sim_map_;
 };
 
 }  // namespace dreamview

@@ -50,11 +50,11 @@ using std::vector;
 HDMapInput::HDMapInput() {}
 
 bool HDMapInput::Init() {
-  return HDMapUtil::instance()->ReloadBaseMap();
+  return HDMapUtil::ReloadBaseMap();
 }
 
 bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
-  auto* hdmap = HDMapUtil::instance()->BaseMap();
+  auto* hdmap = HDMapUtil::BaseMap();
   if (hdmap == nullptr) {
     return false;
   }
