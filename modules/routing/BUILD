@@ -7,9 +7,9 @@ cc_library(
     srcs = [
         "routing.cc",
     ],
-    hdrs = glob([
-        "*.h",
-    ]),
+    hdrs = [
+        "routing.h",
+    ],
     deps = [
         "//modules/common",
         "//modules/common:apollo_app",
@@ -17,7 +17,7 @@ cc_library(
         "//modules/common/monitor",
         "//modules/common/status",
         "//modules/common/util",
-        "//modules/map/hdmap",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/routing/common:routing_gflags",
         "//modules/routing/core",
         "//modules/routing/proto:routing_proto",

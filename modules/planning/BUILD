@@ -18,6 +18,7 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_common",
         "//modules/planning/planner/em:em_planner",
