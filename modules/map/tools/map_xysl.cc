@@ -154,6 +154,7 @@ std::ostream &operator<<(
 }
 
 int main(int argc, char *argv[]) {
+  google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   const std::string map_file = apollo::hdmap::BaseMapFile();
   ::apollo::tools::MapUtil map_util(map_file);
