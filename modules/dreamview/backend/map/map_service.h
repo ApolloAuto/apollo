@@ -77,11 +77,11 @@ class MapService {
   // javascript clients.
   ::apollo::hdmap::Map RetrieveMapElements(const MapElementIds &ids) const;
 
-  bool GetPoseWithLane(const double x, const double y, double *theta,
-                       double *s) const;
+  bool GetPoseWithRegardToLane(const double x, const double y, double *theta,
+                               double *s) const;
 
  private:
-  const ::apollo::hdmap::HDMap& BaseMap() const {
+  const ::apollo::hdmap::HDMap &BaseMap() const {
     return pnc_map_.HDMap();
   }
 

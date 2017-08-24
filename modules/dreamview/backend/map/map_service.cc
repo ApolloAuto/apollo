@@ -238,8 +238,8 @@ bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
   return true;
 }
 
-bool MapService::GetPoseWithLane(const double x, const double y, double *theta,
-                                 double *s) const {
+bool MapService::GetPoseWithRegardToLane(const double x, const double y,
+                                         double *theta, double *s) const {
   apollo::common::PointENU point;
   point.set_x(x);
   point.set_y(y);
