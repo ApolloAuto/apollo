@@ -32,7 +32,7 @@ class TrafficRule {
  public:
   explicit TrafficRule(const std::string& name) : name_(name) {}
   virtual ~TrafficRule() = default;
-  virtual const std::string& name() const { return name_; }
+  virtual const std::string& Name() const { return name_; }
   virtual bool ApplyRule(ReferenceLineInfo* const reference_line_info) = 0;
 
  private:

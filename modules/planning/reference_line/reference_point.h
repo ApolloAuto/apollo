@@ -47,7 +47,7 @@ class ReferencePoint : public hdmap::MapPathPoint {
 
   const std::string DebugString() const;
 
-  static void remove_duplicates(std::vector<ReferencePoint>* points);
+  static void RemoveDuplicates(std::vector<ReferencePoint>* points);
 
  private:
   double kappa_ = 0.0;

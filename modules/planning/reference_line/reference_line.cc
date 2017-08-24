@@ -68,7 +68,7 @@ ReferenceLine::ReferenceLine(
                             reference_points.begin(), reference_points.end()),
                         lane_segments, max_approximation_error)) {}
 
-ReferencePoint ReferenceLine::get_reference_point(const double s) const {
+ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front()) {
     AWARN << "The requested s is before the start point of the reference "
@@ -104,17 +104,17 @@ ReferencePoint ReferenceLine::get_reference_point(const double s) const {
     auto s0 = accumulated_s[index - 1];
     auto s1 = accumulated_s[index];
 
-    return interpolate(p0, s0, p1, s1, s);
+    return Interpolate(p0, s0, p1, s1, s);
   }
 }
 
-double ReferenceLine::find_min_distance_point(const ReferencePoint& p0,
-                                              const double s0,
-                                              const ReferencePoint& p1,
-                                              const double s1, const double x,
-                                              const double y) {
+double ReferenceLine::FindMinDistancePoint(const ReferencePoint& p0,
+                                           const double s0,
+                                           const ReferencePoint& p1,
+                                           const double s1, const double x,
+                                           const double y) {
   auto func_dist_square = [&p0, &p1, &s0, &s1, &x, &y](const double s) {
-    auto p = interpolate(p0, s0, p1, s1, s);
+    auto p = Interpolate(p0, s0, p1, s1, s);
     double dx = p.x() - x;
     double dy = p.y() - y;
     return dx * dx + dy * dy;
@@ -124,8 +124,8 @@ double ReferenceLine::find_min_distance_point(const ReferencePoint& p0,
       .first;
 }
 
-ReferencePoint ReferenceLine::get_reference_point(const double x,
-                                                  const double y) const {
+ReferencePoint ReferenceLine::GetReferencePoint(const double x,
+                                                const double y) const {
   CHECK_GE(reference_points_.size(), 0);
 
   auto func_distance_square = [](const ReferencePoint& point, const double x,
@@ -157,11 +157,11 @@ ReferencePoint ReferenceLine::get_reference_point(const double x,
   double s0 = map_path_.accumulated_s()[index_start];
   double s1 = map_path_.accumulated_s()[index_end];
 
-  double s = ReferenceLine::find_min_distance_point(
+  double s = ReferenceLine::FindMinDistancePoint(
       reference_points_[index_start], s0, reference_points_[index_end], s1, x,
       y);
 
-  return interpolate(reference_points_[index_start], s0,
+  return Interpolate(reference_points_[index_start], s0,
                      reference_points_[index_end], s1, s);
 }
 
@@ -173,7 +173,7 @@ bool ReferenceLine::SLToXY(const common::SLPoint& sl_point,
     return false;
   }
 
-  const auto matched_point = get_reference_point(sl_point.s());
+  const auto matched_point = GetReferencePoint(sl_point.s());
   const auto angle = common::math::Angle16::from_rad(matched_point.heading());
   xy_point->set_x(matched_point.x() - common::math::sin(angle) * sl_point.l());
   xy_point->set_y(matched_point.y() + common::math::cos(angle) * sl_point.l());
@@ -195,7 +195,7 @@ bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
   return true;
 }
 
-ReferencePoint ReferenceLine::interpolate(const ReferencePoint& p0,
+ReferencePoint ReferenceLine::Interpolate(const ReferencePoint& p0,
                                           const double s0,
                                           const ReferencePoint& p1,
                                           const double s1, const double s) {
@@ -244,19 +244,19 @@ const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {
 
 const MapPath& ReferenceLine::map_path() const { return map_path_; }
 
-bool ReferenceLine::get_lane_width(const double s, double* const left_width,
-                                   double* const right_width) const {
+bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
+                                 double* const right_width) const {
   return map_path_.get_width(s, left_width, right_width);
 }
 
-bool ReferenceLine::is_on_road(const common::SLPoint& sl_point) const {
+bool ReferenceLine::IsOnRoad(const common::SLPoint& sl_point) const {
   if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
     return false;
   }
   double left_width = 0.0;
   double right_width = 0.0;
 
-  if (!get_lane_width(sl_point.s(), &left_width, &right_width)) {
+  if (!GetLaneWidth(sl_point.s(), &left_width, &right_width)) {
     return false;
   }
 
@@ -300,7 +300,7 @@ bool ReferenceLine::HasOverlap(const common::math::Box2d& box) const {
     AERROR << "Failed to get sl boundary for box " << box.DebugString();
     return false;
   }
-  if (sl_boundary.end_s() < 0 || sl_boundary.start_s() > length()) {
+  if (sl_boundary.end_s() < 0 || sl_boundary.start_s() > Length()) {
     return false;
   }
   if (sl_boundary.start_l() * sl_boundary.end_l() < 0) {
@@ -332,7 +332,7 @@ std::string ReferenceLine::DebugString() const {
 }
 
 double ReferenceLine::GetSpeedLimitFromS(const double s) const {
-  const auto& map_path_point = get_reference_point(s);
+  const auto& map_path_point = GetReferencePoint(s);
   double speed_limit = FLAGS_planning_speed_upper_limit;
   for (const auto& lane_waypoint : map_path_point.lane_waypoints()) {
     if (lane_waypoint.lane == nullptr) {

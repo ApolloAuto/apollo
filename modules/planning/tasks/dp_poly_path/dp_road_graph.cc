@@ -134,7 +134,7 @@ bool DPRoadGraph::GenerateMinCostPath(
                                        cur_point.l(), 0.0, 0.0,
                                        cur_point.s() - prev_sl_point.s());
         const double cost =
-            trajectory_cost.calculate(curve, prev_sl_point.s(), cur_point.s()) +
+            trajectory_cost.Calculate(curve, prev_sl_point.s(), cur_point.s()) +
             prev_dp_node.min_cost;
         cur_node.UpdateCost(&prev_dp_node, curve, cost);
       }
@@ -194,7 +194,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     for (int32_t j = -num; j < num + 1; ++j) {
       double l = config_.lateral_sample_offset() * j;
       auto sl = common::util::MakeSLPoint(s, l);
-      if (reference_line_.is_on_road(sl)) {
+      if (reference_line_.IsOnRoad(sl)) {
         level_points.push_back(sl);
       }
     }

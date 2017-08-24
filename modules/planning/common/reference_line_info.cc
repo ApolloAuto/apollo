@@ -96,7 +96,7 @@ std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
   // simulator needs a valid integer
   perception_obstacle.set_id(FLAGS_virtual_obstacle_perception_id);
   auto dest_ref_point =
-      reference_line_.get_reference_point(position.x(), position.y());
+      reference_line_.GetReferencePoint(position.x(), position.y());
   perception_obstacle.mutable_position()->set_x(position.x());
   perception_obstacle.mutable_position()->set_y(position.y());
   perception_obstacle.set_theta(dest_ref_point.heading());
@@ -127,7 +127,7 @@ bool ReferenceLineInfo::IsStartFrom(
       previous_reference_line_info.reference_line();
   common::SLPoint sl_point;
   prev_reference_line.XYToSL(start_point, &sl_point);
-  return previous_reference_line_info.reference_line_.is_on_road(sl_point);
+  return previous_reference_line_info.reference_line_.IsOnRoad(sl_point);
 }
 
 bool ReferenceLineInfo::IsOnLeftLane(const common::math::Vec2d& xy_point) {
@@ -147,7 +147,7 @@ bool ReferenceLineInfo::IsOnLeftLane(const common::math::Vec2d& xy_point) {
   for (const auto& lane : lanes) {
     lane_ids.insert(lane->id().id());
   }
-  auto ref_point = reference_line_.get_reference_point(sl_point.s());
+  auto ref_point = reference_line_.GetReferencePoint(sl_point.s());
   for (const auto& waypoint : ref_point.lane_waypoints()) {
     for (const auto& left_lane_id :
          waypoint.lane->lane().left_neighbor_forward_lane_id()) {
@@ -182,7 +182,7 @@ bool ReferenceLineInfo::IsOnRightLane(const common::math::Vec2d& xy_point) {
   for (const auto& lane : lanes) {
     lane_ids.insert(lane->id().id());
   }
-  auto ref_point = reference_line_.get_reference_point(sl_point.s());
+  auto ref_point = reference_line_.GetReferencePoint(sl_point.s());
   for (const auto& waypoint : ref_point.lane_waypoints()) {
     for (const auto& right_lane_id :
          waypoint.lane->lane().right_neighbor_forward_lane_id()) {
