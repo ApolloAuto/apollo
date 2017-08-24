@@ -18,6 +18,36 @@ cc_library(
 )
 
 cc_library(
+    name = "st_boundary",
+    srcs = [
+        "st_boundary.cc",
+    ],
+    hdrs = [
+        "st_boundary.h",
+    ],
+    deps = [
+        ":st_point",
+        "//modules/common:log",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
+cc_test(
+    name = "st_boundary_test",
+    size = "small",
+    srcs = [
+        "st_boundary_test.cc",
+    ],
+    deps = [
+        ":st_boundary",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "speed_data",
     srcs = [
         "speed_data.cc",
