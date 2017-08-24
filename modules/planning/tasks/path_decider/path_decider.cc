@@ -100,7 +100,7 @@ bool PathDecider::MakeStaticObstacleDecision(
   }
 
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
-    const auto *obstacle = path_obstacle->Obstacle();
+    const auto *obstacle = path_obstacle->obstacle();
     if (obstacle->IsVirtual()) {
       continue;
     }
@@ -248,7 +248,7 @@ bool PathDecider::MakeDynamicObstcleDecision(
   }
 
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
-    const auto *obstacle = path_obstacle->Obstacle();
+    const auto *obstacle = path_obstacle->obstacle();
     if (obstacle->IsVirtual()) {
       continue;
     }

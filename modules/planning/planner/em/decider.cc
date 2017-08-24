@@ -63,7 +63,7 @@ int Decider::MakeMainStopDecision(
 
   for (const auto path_obstacle :
        reference_line_info.path_decision().path_obstacles().Items()) {
-    const auto& obstacle = path_obstacle->Obstacle();
+    const auto& obstacle = path_obstacle->obstacle();
     const auto& object_decision = path_obstacle->LongitudinalDecision();
     if (!object_decision.has_stop()) {
       continue;
@@ -128,7 +128,7 @@ void Decider::SetObjectDecisions(const PathDecision& path_decision) {
   for (const auto path_obstacle : path_decision.path_obstacles().Items()) {
     auto* object_decision = object_decisions->add_decision();
 
-    const auto& obstacle = path_obstacle->Obstacle();
+    const auto& obstacle = path_obstacle->obstacle();
     object_decision->set_id(obstacle->Id());
     object_decision->set_perception_id(obstacle->PerceptionId());
     if (path_obstacle->IsIgnore()) {
@@ -160,7 +160,7 @@ void Decider::MakeEStopDecision(const PathDecision& path_decision) {
       decision_result_.mutable_object_decision();
   for (const auto path_obstacle : path_decision.path_obstacles().Items()) {
     auto* object_decision = object_decisions->add_decision();
-    const auto& obstacle = path_obstacle->Obstacle();
+    const auto& obstacle = path_obstacle->obstacle();
     object_decision->set_id(obstacle->Id());
     object_decision->set_perception_id(obstacle->PerceptionId());
     object_decision->add_object_decision()->mutable_avoid();
