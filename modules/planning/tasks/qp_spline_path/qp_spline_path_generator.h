@@ -34,6 +34,7 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 #include "modules/planning/tasks/qp_spline_path/qp_frenet_frame.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -46,7 +47,8 @@ class QpSplinePathGenerator {
   bool Generate(const std::vector<const PathObstacle*>& obstacles,
                 const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,
-                PathData* const path_data);
+                PathData* const path_data,
+                apollo::planning_internal::Debug* planning_debug);
 
  private:
   bool CalculateInitFrenetPoint(const common::TrajectoryPoint& traj_point,
