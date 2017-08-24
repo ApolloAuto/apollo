@@ -17,12 +17,12 @@ cc_library(
 )
 
 cc_library(
-    name = "st_graph_boundary",
+    name = "st_boundary",
     srcs = [
-        "st_graph_boundary.cc",
+        "st_boundary.cc",
     ],
     hdrs = [
-        "st_graph_boundary.h",
+        "st_boundary.h",
     ],
     deps = [
         ":st_graph_point",
@@ -41,7 +41,7 @@ cc_library(
         "st_graph_data.h",
     ],
     deps = [
-        ":st_graph_boundary",
+        ":st_boundary",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:speed_limit",
     ],
@@ -56,7 +56,7 @@ cc_library(
         "st_boundary_mapper.h",
     ],
     deps = [
-        ":st_graph_boundary",
+        ":st_boundary",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:pnc_point_proto",
@@ -98,13 +98,13 @@ cc_test(
 )
 
 cc_test(
-    name = "st_graph_boundary_test",
+    name = "st_boundary_test",
     size = "small",
     srcs = [
-        "st_graph_boundary_test.cc",
+        "st_boundary_test.cc",
     ],
     deps = [
-        ":st_graph_boundary",
+        ":st_boundary",
         "//modules/common:log",
         "//modules/common/time",
         "//modules/common/util",
@@ -119,7 +119,7 @@ cc_test(
         "st_graph_data_test.cc",
     ],
     deps = [
-        ":st_graph_boundary",
+        ":st_boundary",
         ":st_graph_data",
         "//modules/common:log",
         "//modules/common/time",

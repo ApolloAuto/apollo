@@ -30,7 +30,7 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/tasks/st_graph/st_graph_boundary.h"
+#include "modules/planning/tasks/st_graph/st_boundary.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -45,7 +45,7 @@ class StBoundaryMapper {
 
   apollo::common::Status GetGraphBoundary(
       const PathDecision& path_decision,
-      std::vector<StGraphBoundary>* const boundary) const;
+      std::vector<StBoundary>* const boundary) const;
 
   virtual apollo::common::Status GetSpeedLimits(
       SpeedLimit* const speed_limit_data) const;
@@ -62,22 +62,22 @@ class StBoundaryMapper {
       std::vector<STPoint>* lower_points) const;
 
   apollo::common::Status MapWithoutDecision(
-      const PathObstacle& path_obstacle, StGraphBoundary* const boundary) const;
+      const PathObstacle& path_obstacle, StBoundary* const boundary) const;
 
   bool MapStopDecision(const PathObstacle& stop_obstacle,
                        const ObjectDecisionType& stop_decision,
-                       StGraphBoundary* const boundary) const;
+                       StBoundary* const boundary) const;
 
   apollo::common::Status MapWithPredictionTrajectory(
       const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
-      StGraphBoundary* const boundary) const;
+      StBoundary* const boundary) const;
 
   apollo::common::Status MapFollowDecision(
       const PathObstacle& obstacle, const ObjectDecisionType& obj_decision,
-      StGraphBoundary* const boundary) const;
+      StBoundary* const boundary) const;
 
-  void AppendBoundary(const StGraphBoundary& boundary,
-                      std::vector<StGraphBoundary>* st_graph_boundaries) const;
+  void AppendBoundary(const StBoundary& boundary,
+                      std::vector<StBoundary>* st_graph_boundaries) const;
 
  private:
   StBoundaryConfig st_boundary_config_;

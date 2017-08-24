@@ -71,7 +71,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
                                    dp_st_speed_config_.total_time());
 
   // step 1 get boundaries
-  std::vector<StGraphBoundary> boundaries;
+  std::vector<StBoundary> boundaries;
   if (boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).code() ==
       ErrorCode::PLANNING_ERROR) {
     const std::string msg =

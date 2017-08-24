@@ -34,7 +34,7 @@
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
-#include "modules/planning/tasks/st_graph/st_graph_boundary.h"
+#include "modules/planning/tasks/st_graph/st_boundary.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
 
 namespace apollo {
@@ -54,10 +54,10 @@ class QpSplineStGraph {
   // apply st graph constraint
   common::Status ApplyConstraint(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-      const std::vector<StGraphBoundary>& boundaries);
+      const std::vector<StBoundary>& boundaries);
 
   // apply objective function
-  common::Status ApplyKernel(const std::vector<StGraphBoundary>& boundaries,
+  common::Status ApplyKernel(const std::vector<StBoundary>& boundaries,
                              const SpeedLimit& speed_limit);
 
   // solve
@@ -65,7 +65,7 @@ class QpSplineStGraph {
 
   // extract upper lower bound for constraint;
   common::Status GetSConstraintByTime(
-      const std::vector<StGraphBoundary>& boundaries, const double time,
+      const std::vector<StBoundary>& boundaries, const double time,
       const double total_path_s, double* const s_upper_bound,
       double* const s_lower_bound) const;
 
@@ -77,7 +77,7 @@ class QpSplineStGraph {
 
   common::Status AddFollowReferenceLineKernel(
       const std::vector<double>& evaluate_t,
-      const std::vector<StGraphBoundary>& boundaries, const double weight);
+      const std::vector<StBoundary>& boundaries, const double weight);
 
   common::Status EstimateSpeedUpperBound(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
