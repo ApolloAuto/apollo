@@ -17,6 +17,7 @@
 # output path
 # type: string
 # default: ./output/
+--save_obstacles=false
 --output_path=/data/output/
 
 # enable visualization
