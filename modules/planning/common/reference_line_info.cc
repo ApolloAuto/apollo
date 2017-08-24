@@ -140,7 +140,7 @@ bool ReferenceLineInfo::IsOnLeftLane(const common::math::Vec2d& xy_point) {
   std::vector<hdmap::LaneInfoConstPtr> lanes;
   if (!pnc_map_->HDMap().GetLanes(common::util::MakePointENU(xy_point),
                                   distance, &lanes)) {
-    AERROR << "get lanes failed from point : " << xy_point.DebugString();
+    ADEBUG << "get lanes failed from point : " << xy_point.DebugString();
     return false;
   }
   std::unordered_set<std::string> lane_ids;

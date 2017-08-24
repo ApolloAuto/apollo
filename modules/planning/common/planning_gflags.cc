@@ -103,7 +103,7 @@ DEFINE_double(stgraph_max_deceleration_divide_factor_level_2, 2.0,
               "The divide factor for max deceleration at level 2.");
 
 // Decision Part
-DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
+DEFINE_bool(enable_nudge_decision, false, "enable nudge decision");
 DEFINE_double(static_decision_ignore_s_range, 3.0,
               "threshold for judging nudge in dp path computing decision");
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
