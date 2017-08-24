@@ -53,6 +53,14 @@ obstacle_line_pool2 = []
 obstacle_annotation_pool2 = []
 obstacle_line_pool_size2 = 10
 
+sl_static_obstacle_lower_boundary = None
+sl_static_obstacle_upper_boundary = None
+sl_dynamic_obstacle_lower_boundary = None
+sl_dynamic_obstacle_upper_boundary = None
+sl_map_lower_boundary = None
+sl_map_upper_boundary = None
+
+
 def localization_callback(localization_pb):
     localization.update_localization_pb(localization_pb)
 
@@ -62,6 +70,7 @@ def planning_callback(planning_pb):
     planning.compute_path_data()
     planning.compute_speed_data()
     planning.compute_st_data()
+    planning.compute_sl_data()
 
 
 def add_listener():
@@ -93,12 +102,24 @@ def update(frame_number):
         line.set_visible(False)
     for line in obstacle_annotation_pool2:
         line.set_visible(False)
+    sl_static_obstacle_lower_boundary.set_visible(False)
+    sl_static_obstacle_upper_boundary.set_visible(False)
+    sl_dynamic_obstacle_lower_boundary.set_visible(False)
+    sl_dynamic_obstacle_upper_boundary.set_visible(False)
+    sl_map_lower_boundary.set_visible(False)
+    sl_map_upper_boundary.set_visible(False)
 
     vehicle_position_line.set_visible(False)
     vehicle_polygon_line.set_visible(False)
 
     planning.replot_path_data(path_line_pool)
     planning.replot_speed_data(speed_line_pool)
+    planning.replot_sl_data(sl_static_obstacle_lower_boundary,
+                            sl_static_obstacle_upper_boundary,
+                            sl_dynamic_obstacle_lower_boundary,
+                            sl_dynamic_obstacle_upper_boundary,
+                            sl_map_lower_boundary,
+                            sl_map_upper_boundary)
 
     if len(planning.st_data_s.keys()) >= 1:
         planning.replot_st_data(
@@ -128,6 +149,13 @@ def update(frame_number):
 def init_line_pool(central_x, central_y):
     global vehicle_position_line, vehicle_polygon_line, s_speed_line
     global obstacle_line_pool, st_line_1, st_line_2
+    global sl_static_obstacle_lower_boundary
+    global sl_static_obstacle_upper_boundary
+    global sl_dynamic_obstacle_lower_boundary
+    global sl_dynamic_obstacle_upper_boundary
+    global sl_map_lower_boundary
+    global sl_map_upper_boundary
+
     colors = ['b', 'g', 'r', 'k']
 
     for i in range(path_line_pool_size):
@@ -144,6 +172,19 @@ def init_line_pool(central_x, central_y):
                           colors[i % len(colors)]+".", lw=3, alpha=0.5)
     st_line_2, = ax3.plot([0], [0],
                           colors[i % len(colors)]+".", lw=3, alpha=0.5)
+
+    sl_static_obstacle_lower_boundary, = \
+        ax4.plot([0], [0], "r.", lw=2, alpha=0.8)
+    sl_static_obstacle_upper_boundary, = \
+        ax4.plot([0], [0], "r.", lw=5, alpha=0.8)
+    sl_dynamic_obstacle_lower_boundary, = \
+        ax4.plot([0], [0], "y.", lw=2, alpha=0.8)
+    sl_dynamic_obstacle_upper_boundary, = \
+        ax4.plot([0], [0], "y.", lw=5, alpha=0.8)
+    sl_map_lower_boundary, = \
+        ax4.plot([0], [0], "b.", lw=2, ms=2, alpha=0.8)
+    sl_map_upper_boundary, = \
+        ax4.plot([0], [0], "b.", lw=5, ms=4, alpha=0.8)
 
     for i in range(obstacle_line_pool_size):
         line, = ax2.plot([0], [0],
@@ -184,10 +225,15 @@ if __name__ == '__main__':
 
     add_listener()
     fig = plt.figure()
-    ax = plt.subplot2grid((3, 3), (0, 0), rowspan=3, colspan=2)
+    ax = plt.subplot2grid((3, 3), (0, 0), rowspan=2, colspan=2)
     ax1 = plt.subplot2grid((3, 3), (0, 2))
     ax2 = plt.subplot2grid((3, 3), (1, 2))
     ax3 = plt.subplot2grid((3, 3), (2, 2))
+
+    ax4 = plt.subplot2grid((3, 3), (2, 0), colspan=2)
+    ax4.set_xlim([-20, 100])
+    ax4.set_ylim([-10, 10])
+
     ax1.set_xlabel("t (second)")
     ax1.set_xlim([-2, 10])
     ax1.set_ylim([-1, 10])
