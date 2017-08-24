@@ -171,6 +171,7 @@ cc_library(
         ":path_decision",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/vehicle_state",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:planning_gflags",

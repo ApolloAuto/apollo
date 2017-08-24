@@ -43,6 +43,8 @@ class ReferenceLineInfo {
   explicit ReferenceLineInfo(const hdmap::PncMap* pnc_map,
                              const ReferenceLine& reference_line);
 
+  bool Init();
+
   /**
    * Check if xy_point is on the left side lane of current reference line.
    */
@@ -98,6 +100,8 @@ class ReferenceLineInfo {
   bool CombinePathAndSpeedProfile(
       const double time_resolution, const double relative_time,
       DiscretizedTrajectory* discretized_trajectory);
+
+  const SLBoundary& ADCBoundary() const;
   std::string PathSpeedDebugString() const;
 
  private:
@@ -121,6 +125,8 @@ class ReferenceLineInfo {
   SpeedData speed_data_;
 
   DiscretizedTrajectory discretized_trajectory_;
+
+  SLBoundary adc_boundary_;
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;

@@ -18,6 +18,7 @@
 
 #include "Eigen/Core"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/quaternion.h"
@@ -51,7 +52,27 @@ common::Status VehicleState::Update(
   } else {
     gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
   }
+
+  InitAdcBoundingBox();
+
   return Status::OK();
+}
+
+void VehicleState::InitAdcBoundingBox() {
+  const auto &param =
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  common::math::Vec2d position(x_, y_);
+  common::math::Vec2d vec_to_center(
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0,
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0);
+  common::math::Vec2d center(position + vec_to_center.rotate(heading_));
+  adc_bounding_box_ = std::unique_ptr<common::math::Box2d>(
+      new common::math::Box2d(center, heading_, param.length(), param.width()));
+}
+
+const common::math::Box2d &VehicleState::AdcBoundingBox() const {
+  CHECK(adc_bounding_box_) << "ADC bounding box not initialized";
+  return *adc_bounding_box_;
 }
 
 bool VehicleState::ConstructExceptLinearVelocity(
