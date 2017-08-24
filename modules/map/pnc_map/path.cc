@@ -197,6 +197,7 @@ void Path::init_width() {
     if (point.lane_waypoints().empty()) {
       _left_width.push_back(0.0);
       _right_width.push_back(0.0);
+      AERROR << "path point:" << point.DebugString() << " has invalid width.";
     } else {
       const LaneWaypoint waypoint = point.lane_waypoints()[0];
       CHECK_NOTNULL(waypoint.lane);
@@ -321,6 +322,9 @@ MapPathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
         point.add_lane_waypoint(LaneWaypoint(
             lane_segment.lane, lane_segment.start_s + index.offset));
       }
+    }
+    if (point.lane_waypoints().empty() && !ref_point.lane_waypoints().empty()) {
+      point.add_lane_waypoint(ref_point.lane_waypoints()[0]);
     }
     return point;
   } else {
