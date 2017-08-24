@@ -50,22 +50,22 @@ const double TEST_START_S = 0.0;
 const double TEST_MIDDLE_S = 0.0;
 const double TEST_END_S = TEST_LANE_LENGTH;
 
-void GetNodeDetailForTest(::apollo::routing::Node* const node,
+void GetNodeDetailForTest(Node* const node,
                           const std::string& lane_id,
                           const std::string& road_id);
 
-void GetNodeForTest(::apollo::routing::Node* const node,
+void GetNodeForTest(Node* const node,
                     const std::string& lane_id, const std::string& road_id);
 
-void GetEdgeForTest(::apollo::routing::Edge* const edge,
+void GetEdgeForTest(Edge* const edge,
                     const std::string& lane_id_1, const std::string& lane_id_2,
-                    const ::apollo::routing::Edge::DirectionType& type);
+                    const Edge::DirectionType& type);
 
-void GetGraphForTest(::apollo::routing::Graph* graph);
+void GetGraphForTest(Graph* graph);
 
-void GetGraph2ForTest(::apollo::routing::Graph* graph);
+void GetGraph2ForTest(Graph* graph);
 
-void GetGraph3ForTest(::apollo::routing::Graph* graph);
+void GetGraph3ForTest(Graph* graph);
 
 }  // namespace routing
 }  // namespace apollo

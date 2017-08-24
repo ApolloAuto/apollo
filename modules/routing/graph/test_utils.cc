@@ -21,9 +21,6 @@ namespace routing {
 
 namespace {
 
-using ::apollo::routing::Graph;
-using ::apollo::routing::Node;
-using ::apollo::routing::Edge;
 using ::apollo::hdmap::Curve;
 
 void AddCurve(Curve* curve) {
