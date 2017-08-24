@@ -642,7 +642,11 @@ void SimulationWorldService::ReadRoutingFromFile(
     return;
   }
   AINFO << "Loaded routing from " << routing_response_file;
+
+  sleep(1);  // Wait to make sure the connection has been established before
+             // publishing.
   AdapterManager::PublishRoutingResponse(routing_response);
+  AINFO << "Published RoutingResponse read from file.";
 }
 
 void SimulationWorldService::RegisterMessageCallbacks() {
