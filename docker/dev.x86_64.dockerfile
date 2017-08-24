@@ -94,13 +94,17 @@ RUN ln -s -f /bin/true /usr/bin/chfn
 # install pcl and opencv, prerequisites for Caffe (CPU_ONLY mode)
 RUN apt-get update && apt-get install -y \
     libatlas-base-dev \
+    libflann-dev \
     libhdf5-serial-dev \
     libicu-dev \
     libleveldb-dev \
     liblmdb-dev \
     libopencv-dev \
-    libpcl-1.7-all \
+    libopenni-dev \
+    libqhull-dev \
     libsnappy-dev \
+    libvtk5-dev \
+    libvtk5-qt4-dev \
     mpi-default-dev
 
 WORKDIR /tmp
