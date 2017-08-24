@@ -27,7 +27,7 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/tasks/st_graph/st_boundary.h"
+#include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
