@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/tasks/st_graph/st_graph_boundary.h"
+#include "modules/planning/tasks/st_graph/st_boundary.h"
 
 #include <algorithm>
 #include <cmath>
@@ -27,30 +27,30 @@
 namespace apollo {
 namespace planning {
 
-TEST(StGraphBoundaryTest, basic_test) {
+TEST(StBoundaryTest, basic_test) {
   std::vector<STPoint> st_points;
   st_points.emplace_back(0.0, 0.0);
   st_points.emplace_back(0.0, 10.0);
   st_points.emplace_back(5.0, 10.0);
   st_points.emplace_back(5.0, 0.0);
 
-  StGraphBoundary boundary(st_points);
+  StBoundary boundary(st_points);
   EXPECT_EQ(boundary.id(), "");
-  EXPECT_EQ(boundary.boundary_type(), StGraphBoundary::BoundaryType::UNKNOWN);
+  EXPECT_EQ(boundary.boundary_type(), StBoundary::BoundaryType::UNKNOWN);
   EXPECT_FLOAT_EQ(0.0, boundary.min_s());
   EXPECT_FLOAT_EQ(5.0, boundary.max_s());
   EXPECT_FLOAT_EQ(0.0, boundary.min_t());
   EXPECT_FLOAT_EQ(10.0, boundary.max_t());
 }
 
-TEST(StGraphBoundaryTest, boundary_range) {
+TEST(StBoundaryTest, boundary_range) {
   std::vector<STPoint> st_points;
   st_points.emplace_back(1.0, 0.0);
   st_points.emplace_back(1.0, 10.0);
   st_points.emplace_back(5.0, 10.0);
   st_points.emplace_back(5.0, 0.0);
-  StGraphBoundary boundary(st_points);
-  boundary.SetBoundaryType(StGraphBoundary::BoundaryType::YIELD);
+  StBoundary boundary(st_points);
+  boundary.SetBoundaryType(StBoundary::BoundaryType::YIELD);
   double t = -10.0;
   const double dt = 0.01;
   while (t < 10.0) {

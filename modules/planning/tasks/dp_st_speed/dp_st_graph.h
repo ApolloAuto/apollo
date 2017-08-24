@@ -50,7 +50,7 @@ class DpStGraph {
  private:
   apollo::common::Status InitCostTable();
 
-  void CalculatePointwiseCost(const std::vector<StGraphBoundary>& boundaries);
+  void CalculatePointwiseCost(const std::vector<StBoundary>& boundaries);
 
   apollo::common::Status RetrieveSpeedProfile(
       SpeedData* const speed_data) const;
@@ -76,12 +76,12 @@ class DpStGraph {
 
   /**
    * @brief check if the ADC should follow an obstacle by examing the
-   *StGraphBoundary of the obstacle.
+   *StBoundary of the obstacle.
    * @param boundary The boundary of the obstacle.
    * @return true if the ADC believe it should follow the obstacle, and
    *         false otherwise.
    **/
-  bool CheckIsFollowByT(const StGraphBoundary& boundary) const;
+  bool CheckIsFollowByT(const StBoundary& boundary) const;
 
   /**
    * @brief create follow decision based on the boundary
@@ -97,7 +97,7 @@ class DpStGraph {
    * @return true if the yield decision is created successfully, and
    *         false otherwise.
    **/
-  bool CreateYieldDecision(const StGraphBoundary& boundary,
+  bool CreateYieldDecision(const StBoundary& boundary,
                            ObjectDecisionType* const yield_decision) const;
 
   /**
@@ -106,7 +106,7 @@ class DpStGraph {
    *         false otherwise.
    **/
   bool CreateOvertakeDecision(
-      const PathObstacle& path_obstacle, const StGraphBoundary& boundary,
+      const PathObstacle& path_obstacle, const StBoundary& boundary,
       ObjectDecisionType* const overtake_decision) const;
 
   void GetRowRange(const uint32_t curr_row, const uint32_t curr_col,

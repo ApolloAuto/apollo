@@ -23,7 +23,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/log.h"
-#include "modules/planning/tasks/st_graph/st_graph_boundary.h"
+#include "modules/planning/tasks/st_graph/st_boundary.h"
 
 namespace apollo {
 namespace planning {
@@ -43,8 +43,8 @@ TEST(StGraphDataTest, basic_test) {
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().relative_time(), 0.0);
   EXPECT_DOUBLE_EQ(st_graph_data.path_data_length(), 0.0);
 
-  std::vector<StGraphBoundary> boundary_vec;
-  boundary_vec.push_back(StGraphBoundary());
+  std::vector<StBoundary> boundary_vec;
+  boundary_vec.push_back(StBoundary());
   apollo::common::TrajectoryPoint traj_point;
   traj_point.mutable_path_point()->set_x(1.1);
   traj_point.mutable_path_point()->set_y(2.1);

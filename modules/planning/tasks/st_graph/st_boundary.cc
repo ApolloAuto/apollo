@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /**
-  * @file: obstacle_st_boundary.cc
+  * @file
   **/
 
-#include "modules/planning/tasks/st_graph/st_graph_boundary.h"
+#include "modules/planning/tasks/st_graph/st_boundary.h"
 
 #include <algorithm>
 
@@ -29,10 +29,10 @@ namespace planning {
 
 using Vec2d = common::math::Vec2d;
 
-StGraphBoundary::StGraphBoundary(const std::vector<STPoint>& points)
+StBoundary::StBoundary(const std::vector<STPoint>& points)
     : Polygon2d(std::vector<Vec2d>(points.begin(), points.end())) {
   CHECK_EQ(points.size(), 4)
-      << "StGraphBoundary must have exactly four points. Input points size: "
+      << "StBoundary must have exactly four points. Input points size: "
       << points.size();
   for (const auto& point : points) {
     min_s_ = std::fmin(min_s_, point.s());
@@ -42,11 +42,10 @@ StGraphBoundary::StGraphBoundary(const std::vector<STPoint>& points)
   }
 }
 
-StGraphBoundary::StGraphBoundary(
-    const std::vector<::apollo::common::math::Vec2d>& points)
+StBoundary::StBoundary(const std::vector<::apollo::common::math::Vec2d>& points)
     : Polygon2d(points) {
   CHECK_EQ(points.size(), 4)
-      << "StGraphBoundary must have exactly four points. Input points size: "
+      << "StBoundary must have exactly four points. Input points size: "
       << points.size();
   for (const auto& point : points) {
     min_s_ = std::fmin(min_s_, point.y());
@@ -56,57 +55,55 @@ StGraphBoundary::StGraphBoundary(
   }
 }
 
-bool StGraphBoundary::IsPointInBoundary(
-    const StGraphPoint& st_graph_point) const {
+bool StBoundary::IsPointInBoundary(const StGraphPoint& st_graph_point) const {
   return IsPointInBoundary(st_graph_point.point());
 }
 
-bool StGraphBoundary::IsPointInBoundary(const STPoint& st_point) const {
+bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
   return IsPointIn(st_point);
 }
 
-STPoint StGraphBoundary::BottomLeftPoint() const {
-  DCHECK(!points_.empty()) << "StGraphBoundary has zero points.";
+STPoint StBoundary::BottomLeftPoint() const {
+  DCHECK(!points_.empty()) << "StBoundary has zero points.";
   return STPoint(points_.at(0).y(), points_.at(0).x());
 }
 
-STPoint StGraphBoundary::BottomRightPoint() const {
-  DCHECK(!points_.empty()) << "StGraphBoundary has zero points.";
+STPoint StBoundary::BottomRightPoint() const {
+  DCHECK(!points_.empty()) << "StBoundary has zero points.";
   return STPoint(points_.at(1).y(), points_.at(1).x());
 }
 
-STPoint StGraphBoundary::TopRightPoint() const {
-  DCHECK(!points_.empty()) << "StGraphBoundary has zero points.";
+STPoint StBoundary::TopRightPoint() const {
+  DCHECK(!points_.empty()) << "StBoundary has zero points.";
   return STPoint(points_.at(2).y(), points_.at(2).x());
 }
 
-STPoint StGraphBoundary::TopLeftPoint() const {
-  DCHECK(!points_.empty()) << "StGraphBoundary has zero points.";
+STPoint StBoundary::TopLeftPoint() const {
+  DCHECK(!points_.empty()) << "StBoundary has zero points.";
   return STPoint(points_.at(3).y(), points_.at(3).x());
 }
 
-StGraphBoundary::BoundaryType StGraphBoundary::boundary_type() const {
+StBoundary::BoundaryType StBoundary::boundary_type() const {
   return boundary_type_;
 }
-void StGraphBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
+void StBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
   boundary_type_ = boundary_type;
 }
 
-const std::string& StGraphBoundary::id() const { return id_; }
+const std::string& StBoundary::id() const { return id_; }
 
-void StGraphBoundary::SetId(const std::string& id) { id_ = id; }
+void StBoundary::SetId(const std::string& id) { id_ = id; }
 
-double StGraphBoundary::characteristic_length() const {
+double StBoundary::characteristic_length() const {
   return characteristic_length_;
 }
 
-void StGraphBoundary::SetCharacteristicLength(
-    const double characteristic_length) {
+void StBoundary::SetCharacteristicLength(const double characteristic_length) {
   characteristic_length_ = characteristic_length;
 }
 
-bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
-                                       double* s_lower) const {
+bool StBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
+                                  double* s_lower) const {
   const common::math::LineSegment2d segment = {Vec2d(curr_time, 0.0),
                                                Vec2d(curr_time, s_high_limit_)};
   *s_upper = s_high_limit_;
@@ -135,8 +132,8 @@ bool StGraphBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
   return true;
 }
 
-bool StGraphBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
-                                        double* s_lower) const {
+bool StBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
+                                   double* s_lower) const {
   const common::math::LineSegment2d segment = {Vec2d(curr_time, 0.0),
                                                Vec2d(curr_time, s_high_limit_)};
   *s_upper = s_high_limit_;
@@ -154,10 +151,10 @@ bool StGraphBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
   return true;
 }
 
-double StGraphBoundary::min_s() const { return min_s_; }
-double StGraphBoundary::min_t() const { return min_t_; }
-double StGraphBoundary::max_s() const { return max_s_; }
-double StGraphBoundary::max_t() const { return max_t_; }
+double StBoundary::min_s() const { return min_s_; }
+double StBoundary::min_t() const { return min_t_; }
+double StBoundary::max_s() const { return max_s_; }
+double StBoundary::max_t() const { return max_t_; }
 
 }  // namespace planning
 }  // namespace apollo

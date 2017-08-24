@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- *   @file: st_graph_boundary.h
+ *   @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_ST_GRAPH_ST_GRAPH_BOUNDARY_H_
@@ -34,16 +34,16 @@
 namespace apollo {
 namespace planning {
 
-class StGraphBoundary : public common::math::Polygon2d {
+class StBoundary : public common::math::Polygon2d {
  public:
-  StGraphBoundary() = default;
+  StBoundary() = default;
 
   // boundary points go counter clockwise.
-  explicit StGraphBoundary(const std::vector<STPoint>& points);
+  explicit StBoundary(const std::vector<STPoint>& points);
 
   // boundary points go counter clockwise.
-  explicit StGraphBoundary(const std::vector<common::math::Vec2d>& points);
-  ~StGraphBoundary() = default;
+  explicit StBoundary(const std::vector<common::math::Vec2d>& points);
+  ~StBoundary() = default;
 
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
