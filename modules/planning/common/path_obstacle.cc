@@ -200,8 +200,9 @@ void PathObstacle::AddLateralDecision(const std::string& decider_tag,
 
 const std::string PathObstacle::DebugString() const {
   std::stringstream ss;
+  ss << "PathObstacle id: " << id_;
   for (std::size_t i = 0; i < decisions_.size(); ++i) {
-    ss << "id: " << id_ << " decision: " << decisions_[i].DebugString()
+    ss << " decision: " << decisions_[i].DebugString()
        << ", made by " << decider_tags_[i];
   }
   if (lateral_decision_.object_tag_case() !=
