@@ -46,7 +46,7 @@ apollo::common::Status Routing::Init() {
 }
 
 apollo::common::Status Routing::Start() {
-  if (!navigator_ptr_->is_ready()) {
+  if (!navigator_ptr_->IsReady()) {
     AERROR << "Navigator is not ready!";
     return apollo::common::Status(ErrorCode::ROUTING_ERROR,
                                   "Navigator not ready");
@@ -62,7 +62,7 @@ void Routing::OnRouting_Request(
     const apollo::routing::RoutingRequest &routing_request) {
   AINFO << "Get new routing request!!!";
   ::apollo::routing::RoutingResponse routing_response;
-  if (!navigator_ptr_->search_route(routing_request, &routing_response)) {
+  if (!navigator_ptr_->SearchRoute(routing_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";
     return;
   }

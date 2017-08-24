@@ -34,15 +34,15 @@ class Navigator {
  public:
   explicit Navigator(const std::string& topo_file_path);
   ~Navigator();
-  bool is_ready() const;
+  bool IsReady() const;
 
   // search new request to new response
-  bool search_route(const RoutingRequest& request,
-                    RoutingResponse* response) const;
+  bool SearchRoute(const RoutingRequest& request,
+                   RoutingResponse* response) const;
 
  private:
   // new request to new response
-  bool generate_passage_region(
+  bool GeneratePassageRegion(
       const RoutingRequest& request,
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
@@ -50,19 +50,19 @@ class Navigator {
       RoutingResponse* result) const;
 
   // use internal generate result
-  void generate_passage_region(
+  void GeneratePassageRegion(
       const std::vector<const TopoNode*>& nodes,
       const std::unordered_set<const TopoNode*>& black_list,
       NodeRangeManager* const range_manager,
       RoutingResponse* result) const;
 
-  void dump_debug_data(
+  void DumpDebugData(
       const std::vector<const TopoNode*>& nodes,
       const NodeRangeManager& range_manager,
       const RoutingResponse& response) const;
 
  private:
-  bool _is_ready;
+  bool is_ready_;
   std::unique_ptr<TopoGraph> graph_;
 };
 
