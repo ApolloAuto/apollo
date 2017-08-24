@@ -15,7 +15,7 @@ cc_library(
         "frame_content.h",
         "glfw_viewer.h",
         "opengl_visualizer.h",
-	"arc_ball.h",
+	    "arc_ball.h",
     ],
     copts = [
         "-Wno-deprecated",
