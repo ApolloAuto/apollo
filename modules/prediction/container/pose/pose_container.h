@@ -62,14 +62,20 @@ class PoseContainer : public Container {
   double GetTimestamp();
 
  private:
+  /**
+   * @brief Update pose
+   * @param Received localization message
+   */
   void Update(const localization::LocalizationEstimate &localization);
+
+ public:
+  static const int ID = -1;
+  static const apollo::perception::PerceptionObstacle::Type type_ =
+      ::apollo::perception::PerceptionObstacle::VEHICLE;
 
  private:
   std::unique_ptr<apollo::perception::PerceptionObstacle> obstacle_ptr_;
-
   static std::mutex g_mutex_;
-  static int id_;
-  static apollo::perception::PerceptionObstacle::Type type_;
 };
 
 }  // namespace prediction
