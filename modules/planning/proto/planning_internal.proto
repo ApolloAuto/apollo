@@ -60,6 +60,15 @@ message StGraphBoundaryDebug {
   repeated apollo.common.SpeedPoint point = 2;
 }
 
+message SLFrameDebug {
+  optional string name = 1;
+  repeated double sampled_s = 2;
+  repeated double obstacle_lower_bound = 3;
+  repeated double obstacle_upper_bound = 4;
+  repeated double map_lower_bound = 5;
+  repeated double map_upper_bound = 6;
+}
+
 message STGraphDebug {
   optional string name = 1;
   repeated StGraphBoundaryDebug boundary = 2;
@@ -78,4 +87,5 @@ message PlanningData {
   repeated apollo.common.Path path = 6;
   repeated SpeedPlan speed_plan = 13;
   repeated STGraphDebug st_graph = 14;
+  repeated SLFrameDebug sl_frame = 15;
 }

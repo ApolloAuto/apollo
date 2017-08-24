@@ -95,11 +95,11 @@ bool Spline1dConstraint::AddBoundary(const std::vector<double>& x_coord,
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
-      inequality_constraint(i + filtered_upper_bound.size(),
+      inequality_constraint(i + filtered_lower_bound.size(),
                             j + index * spline_order_) = coef;
       coef *= corrected_x;
     }
-    inequality_boundary(i + filtered_upper_bound.size(), 0) =
+    inequality_boundary(i + filtered_lower_bound.size(), 0) =
         -filtered_upper_bound[i];
   }
 
@@ -148,11 +148,11 @@ bool Spline1dConstraint::AddDerivativeBoundary(
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
     for (std::uint32_t j = 1; j < spline_order_; ++j) {
-      inequality_constraint(i + filtered_upper_bound.size(),
+      inequality_constraint(i + filtered_lower_bound.size(),
                             j + index * spline_order_) = coef * j;
       coef *= corrected_x;
     }
-    inequality_boundary(i + filtered_upper_bound.size(), 0) =
+    inequality_boundary(i + filtered_lower_bound.size(), 0) =
         -filtered_upper_bound[i];
   }
   return inequality_constraint_.AddConstraint(inequality_constraint,
@@ -200,11 +200,11 @@ bool Spline1dConstraint::AddSecondDerivativeBoundary(
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
     for (std::uint32_t j = 2; j < spline_order_; ++j) {
-      inequality_constraint(i + filtered_upper_bound.size(),
+      inequality_constraint(i + filtered_lower_bound.size(),
                             j + index * spline_order_) = coef * j * (j - 1);
       coef *= corrected_x;
     }
-    inequality_boundary(i + filtered_upper_bound.size(), 0) =
+    inequality_boundary(i + filtered_lower_bound.size(), 0) =
         -filtered_upper_bound[i];
   }
   return inequality_constraint_.AddConstraint(inequality_constraint,
@@ -253,12 +253,12 @@ bool Spline1dConstraint::AddThirdDerivativeBoundary(
     const double corrected_x = filtered_upper_bound_x[i] - x_knots_[index];
     double coef = -1.0;
     for (std::uint32_t j = 3; j < spline_order_; ++j) {
-      inequality_constraint(i + filtered_upper_bound.size(),
+      inequality_constraint(i + filtered_lower_bound.size(),
                             j + index * spline_order_) =
           coef * j * (j - 1) * (j - 2);
       coef *= corrected_x;
     }
-    inequality_boundary(i + filtered_upper_bound.size(), 0) =
+    inequality_boundary(i + filtered_lower_bound.size(), 0) =
         -filtered_upper_bound[i];
   }
   return inequality_constraint_.AddConstraint(inequality_constraint,
@@ -591,7 +591,7 @@ bool Spline1dConstraint::FilterConstraints(
     }
   }
 
-  for (std::uint32_t i = 0; i < lower_bound.size(); ++i) {
+  for (std::uint32_t i = 0; i < upper_bound.size(); ++i) {
     if (std::isnan(upper_bound[i]) || upper_bound[i] == -inf) {
       return false;
     }
