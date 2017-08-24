@@ -28,6 +28,7 @@
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -166,8 +167,7 @@ void LaneSequencePredictor::GetADC() {
     return;
   }
 
-  int adc_id = -1;
-  Obstacle *adc = container->GetObstacle(adc_id);
+  Obstacle *adc = container->GetObstacle(PoseContainer::ID);
   if (adc != nullptr) {
     const Feature& feature = adc->latest_feature();
     if (feature.has_lane() &&

@@ -26,8 +26,6 @@ using apollo::perception::Point;
 using apollo::localization::LocalizationEstimate;
 
 std::mutex PoseContainer::g_mutex_;
-int PoseContainer::id_ = -1;
-PerceptionObstacle::Type PoseContainer::type_ = PerceptionObstacle::VEHICLE;
 
 void PoseContainer::Insert(const ::google::protobuf::Message& message) {
   Update(dynamic_cast<const LocalizationEstimate&>(message));
@@ -53,7 +51,7 @@ void PoseContainer::Update(
   if (obstacle_ptr_.get() == nullptr) {
     obstacle_ptr_.reset(new PerceptionObstacle());
   }
-  obstacle_ptr_->set_id(id_);
+  obstacle_ptr_->set_id(ID);
   Point position;
   position.set_x(localization.pose().position().x());
   position.set_y(localization.pose().position().y());
