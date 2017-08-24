@@ -297,11 +297,11 @@ bool QpSplinePathGenerator::AddConstraint(
     ADEBUG << "s:" << s << " boundary_low:" << boundary.first
            << " boundary_high:" << boundary.second
            << " road_boundary_low: " << road_boundary.first
-           << "road_boundary_high: " << road_boundary.second
+           << " road_boundary_high: " << road_boundary.second
            << " static_obs_boundary_low: " << static_obs_boundary.first
-           << "static_obs_boundary_high: " << static_obs_boundary.second
-           << "dynamic_obs_boundary_low: " << dynamic_obs_boundary.first
-           << "dynamic_obs_boundary_high: " << dynamic_obs_boundary.second;
+           << " static_obs_boundary_high: " << static_obs_boundary.second
+           << " dynamic_obs_boundary_low: " << dynamic_obs_boundary.first
+           << " dynamic_obs_boundary_high: " << dynamic_obs_boundary.second;
   }
   if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low,
                                       boundary_high)) {
