@@ -35,11 +35,6 @@ namespace routing {
 
 namespace {
 
-using ::apollo::routing::RoutingResponse_Road;
-using ::apollo::routing::RoutingResponse_Junction;
-using ::apollo::routing::RoutingResponse_PassageRegion;
-using ::apollo::routing::RoutingResponse_LaneSegment;
-using ::apollo::routing::RoutingResponse_LaneChangeInfo;
 using ::apollo::common::util::SetProtoToASCIIFile;
 using ::apollo::common::adapter::AdapterManager;
 
@@ -172,7 +167,7 @@ void show_request_info(const T& request) {
 }
 
 void generate_black_set_from_road(
-    const ::apollo::routing::RoutingRequest& request, const TopoGraph* graph,
+    const RoutingRequest& request, const TopoGraph* graph,
     std::unordered_set<const TopoNode*>* const black_list) {
   for (const auto& road_id : request.blacklisted_road()) {
     graph->get_nodes_by_road_id(road_id, black_list);
@@ -300,9 +295,8 @@ bool Navigator::is_ready() const {
   return _is_ready;
 }
 
-bool Navigator::search_route(
-    const ::apollo::routing::RoutingRequest& request,
-    ::apollo::routing::RoutingResponse* response) const {
+bool Navigator::search_route(const RoutingRequest& request,
+                             RoutingResponse* response) const {
   if (!is_ready()) {
     AERROR << "Topo graph is not ready!";
     return false;
@@ -343,11 +337,11 @@ bool Navigator::search_route(
 
 // new request to new response
 bool Navigator::generate_passage_region(
-    const ::apollo::routing::RoutingRequest& request,
+    const RoutingRequest& request,
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     NodeRangeManager* const range_manager,
-    ::apollo::routing::RoutingResponse* result) const {
+    RoutingResponse* result) const {
   AdapterManager::FillRoutingResponseHeader(FLAGS_node_name, result);
 
   generate_passage_region(nodes, black_list, range_manager, result);
@@ -364,7 +358,7 @@ void Navigator::generate_passage_region(
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     NodeRangeManager* const range_manager,
-    ::apollo::routing::RoutingResponse* result) const {
+    RoutingResponse* result) const {
   std::vector<std::vector<const TopoNode*>> nodes_of_ways;
   if (FLAGS_use_road_id) {
     get_nodes_of_ways(nodes, &nodes_of_ways);
@@ -426,7 +420,7 @@ void Navigator::generate_passage_region(
 void Navigator::dump_debug_data(
     const std::vector<const TopoNode*>& nodes,
     const NodeRangeManager& range_manager,
-    const ::apollo::routing::RoutingResponse& response) const {
+    const RoutingResponse& response) const {
   std::ofstream fout(FLAGS_debug_route_path);
   AINFO << "Route lane id\tis virtual\tstart s\tend s";
   for (const auto& node : nodes) {

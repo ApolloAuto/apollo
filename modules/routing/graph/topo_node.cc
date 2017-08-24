@@ -21,9 +21,6 @@
 namespace apollo {
 namespace routing {
 
-using ::apollo::routing::Node;
-using ::apollo::routing::Edge;
-
 TopoNode::TopoNode(const Node& node)
     : pb_node_(node), start_s_(0.0), end_s_(pb_node_.length()) {
   int total_size = 0;
@@ -188,7 +185,7 @@ void TopoNode::set_start_s(double start_s) { start_s_ = start_s; }
 
 void TopoNode::set_end_s(double end_s) { end_s_ = end_s; }
 
-TopoEdge::TopoEdge(const ::apollo::routing::Edge& edge,
+TopoEdge::TopoEdge(const Edge& edge,
                    const TopoNode* from_node, const TopoNode* to_node)
     : pb_edge_(edge), from_node_(from_node), to_node_(to_node) {}
 
@@ -211,10 +208,10 @@ const std::string& TopoEdge::to_lane_id() const {
 }
 
 TopoEdgeType TopoEdge::type() const {
-  if (pb_edge_.direction_type() == ::apollo::routing::Edge::LEFT) {
+  if (pb_edge_.direction_type() == Edge::LEFT) {
     return TET_LEFT;
   }
-  if (pb_edge_.direction_type() == ::apollo::routing::Edge::RIGHT) {
+  if (pb_edge_.direction_type() == Edge::RIGHT) {
     return TET_RIGHT;
   }
   return TET_FORWARD;

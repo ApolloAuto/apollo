@@ -28,9 +28,6 @@ namespace routing {
 
 using ::google::protobuf::RepeatedPtrField;
 using ::apollo::hdmap::Id;
-using ::apollo::routing::Node;
-using ::apollo::routing::Edge;
-
 using ::apollo::hdmap::LaneBoundary;
 using ::apollo::hdmap::LaneBoundaryType;
 
@@ -39,9 +36,9 @@ using ::apollo::common::util::EndWith;
 namespace {
 
 bool IsAllowedToCross(const LaneBoundary& boundary) {
-  for (int i = 0; i < boundary.boundary_type_size(); ++i) {
-    if (boundary.boundary_type(i).types(0) != LaneBoundaryType::DOTTED_YELLOW &&
-        boundary.boundary_type(i).types(0) != LaneBoundaryType::DOTTED_WHITE) {
+  for (const auto& boundary_type : boundary.boundary_type()) {
+    if (boundary_type.types(0) != LaneBoundaryType::DOTTED_YELLOW &&
+        boundary_type.types(0) != LaneBoundaryType::DOTTED_WHITE) {
       return false;
     }
   }
@@ -88,32 +85,32 @@ bool GraphCreator::Create() {
   InitForbiddenLanes();
 
   for (const auto& lane : pbmap_.lane()) {
-    if (forbidden_lane_id_set_.find(lane.id().id()) !=
-        forbidden_lane_id_set_.end()) {
-      ADEBUG << "Ignored lane id: " << lane.id().id()
+    const auto& lane_id = lane.id().id();
+    if (forbidden_lane_id_set_.find(lane_id) != forbidden_lane_id_set_.end()) {
+      ADEBUG << "Ignored lane id: " << lane_id
              << " because its type is NOT CITY_DRIVING.";
       continue;
     }
-    AINFO << "Current lane id: " << lane.id().id();
-    node_index_map_[lane.id().id()] = graph_.node_size();
-    const auto iter = road_id_map_.find(lane.id().id());
+    AINFO << "Current lane id: " << lane_id;
+    node_index_map_[lane_id] = graph_.node_size();
+    const auto iter = road_id_map_.find(lane_id);
     if (iter != road_id_map_.end()) {
       NodeCreator::GetPbNode(lane, iter->second, graph_.add_node());
     } else {
-      LOG(WARNING) << "Failed to find road id of lane " << lane.id().id();
+      LOG(WARNING) << "Failed to find road id of lane " << lane_id;
       NodeCreator::GetPbNode(lane, "", graph_.add_node());
     }
   }
 
   std::string edge_id = "";
   for (const auto& lane : pbmap_.lane()) {
-    if (forbidden_lane_id_set_.find(lane.id().id()) !=
-        forbidden_lane_id_set_.end()) {
-      ADEBUG << "Ignored lane id: " << lane.id().id()
+    const auto& lane_id = lane.id().id();
+    if (forbidden_lane_id_set_.find(lane_id) != forbidden_lane_id_set_.end()) {
+      ADEBUG << "Ignored lane id: " << lane_id
              << " because its type is NOT CITY_DRIVING.";
       continue;
     }
-    const auto& from_node = graph_.node(node_index_map_[lane.id().id()]);
+    const auto& from_node = graph_.node(node_index_map_[lane_id]);
 
     if (lane.has_left_boundary() && IsAllowedToCross(lane.left_boundary())) {
       AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
@@ -134,14 +131,12 @@ bool GraphCreator::Create() {
   int type_pos = dump_topo_file_path_.find_last_of(".") + 1;
   std::string bin_file = dump_topo_file_path_.replace(type_pos, 3, "bin");
   std::string txt_file = dump_topo_file_path_.replace(type_pos, 3, "txt");
-  if (!::apollo::common::util::SetProtoToASCIIFile(graph_,
-                                                   txt_file)) {
+  if (!::apollo::common::util::SetProtoToASCIIFile(graph_, txt_file)) {
     AERROR << "Failed to dump topo data into file " << txt_file;
     return false;
   }
   AINFO << "Txt file is dumped successfully. Path: " << txt_file;
-  if (!::apollo::common::util::SetProtoToBinaryFile(graph_,
-                                                   bin_file)) {
+  if (!::apollo::common::util::SetProtoToBinaryFile(graph_, bin_file)) {
     AERROR << "Failed to dump topo data into file " << bin_file;
     return false;
   }

@@ -21,9 +21,6 @@
 namespace apollo {
 namespace routing {
 
-using ::apollo::routing::Node;
-using ::apollo::routing::Edge;
-
 TEST(TopoEdgeTestSuit, basic_test) {
   Node node_1;
   Node node_2;

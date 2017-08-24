@@ -39,16 +39,16 @@ class GraphCreator {
   void InitForbiddenLanes();
   std::string GetEdgeID(const std::string& from_id, const std::string& to_id);
 
-  void AddEdge(const ::apollo::routing::Node& from_node,
+  void AddEdge(const Node& from_node,
                const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Id>&
                    to_node_vec,
-               const ::apollo::routing::Edge::DirectionType& type);
+               const Edge::DirectionType& type);
 
  private:
   std::string base_map_file_path_;
   std::string dump_topo_file_path_;
   ::apollo::hdmap::Map pbmap_;
-  ::apollo::routing::Graph graph_;
+  Graph graph_;
   std::unordered_map<std::string, int> node_index_map_;
   std::unordered_map<std::string, std::string> road_id_map_;
   std::unordered_set<std::string> showed_edge_id_set_;
