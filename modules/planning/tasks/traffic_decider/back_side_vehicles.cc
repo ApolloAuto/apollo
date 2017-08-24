@@ -26,6 +26,25 @@ namespace planning {
 BackSideVehicles::BackSideVehicles() : TrafficRule("BackSideVehicles") {}
 
 bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
+  auto* path_decision = reference_line_info->path_decision();
+  const auto& reference_line = reference_line_info->reference_line();
+  const auto& adc_boundary = reference_line_info->ADCBoundary();
+  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
+    if (path_obstacle->perception_sl_boundary().end_s() >=
+        adc_boundary.end_s()) {
+      continue;
+    }
+
+    const auto& bounding_box =
+        path_obstacle->Obstacle()->PerceptionBoundingBox();
+    if (reference_line.HasOverlap(bounding_box) ||
+        reference_line_info->IsOnLeftLane(bounding_box.center()) ||
+        reference_line_info->IsOnRightLane(bounding_box.center())) {
+      ObjectDecisionType ignore;
+      ignore.mutable_ignore();
+      path_decision->AddLateralDecision(name(), path_obstacle->Id(), ignore);
+    }
+  }
   return true;
 }
 
