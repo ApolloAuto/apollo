@@ -38,7 +38,7 @@ namespace {
 using ::apollo::common::util::SetProtoToASCIIFile;
 using ::apollo::common::adapter::AdapterManager;
 
-void get_nodes_of_ways_based_on_virtual(
+void GetNodesOfWaysBasedOnVirtual(
     const std::vector<const TopoNode*>& nodes,
     std::vector<std::vector<const TopoNode*>>* const nodes_of_ways) {
   AINFO << "Cut routing ways based on is_virtual.";
@@ -58,7 +58,7 @@ void get_nodes_of_ways_based_on_virtual(
   nodes_of_ways->push_back(nodes_of_way);
 }
 
-void get_nodes_of_ways(
+void GetNodesOfWays(
     const std::vector<const TopoNode*>& nodes,
     std::vector<std::vector<const TopoNode*>>* const nodes_of_ways) {
   AINFO << "Cut routing ways based on road id.";
@@ -78,7 +78,7 @@ void get_nodes_of_ways(
   nodes_of_ways->push_back(nodes_of_way);
 }
 
-void extract_basic_passages(
+void ExtractBasicPassages(
     const std::vector<const TopoNode*>& nodes,
     std::vector<std::vector<const TopoNode*>>* const nodes_of_passages,
     std::vector<RoutingResponse_LaneChangeInfo::Type>* const
@@ -90,10 +90,7 @@ void extract_basic_passages(
   nodes_of_passage.push_back(nodes.at(0));
   for (auto iter = nodes.begin() + 1; iter != nodes.end(); ++iter) {
     auto edge = (*(iter - 1))->get_out_edge_to(*iter);
-    if (edge == nullptr) {
-      AERROR << "Get null pointer to edge";
-      exit(-1);
-    }
+    CHECK(edge) << "Get null pointer to edge";
     if (edge->type() == TET_LEFT || edge->type() == TET_RIGHT) {
       nodes_of_passages->push_back(nodes_of_passage);
       nodes_of_passage.clear();
@@ -110,19 +107,19 @@ void extract_basic_passages(
   nodes_of_passages->push_back(nodes_of_passage);
 }
 
-void passage_lane_ids_to_passage_region(
+void PassageLaneIdsToPassageRegion(
     const std::vector<const TopoNode*>& nodes,
     NodeRangeManager* const range_manager,
     RoutingResponse_PassageRegion* const region) {
   for (const auto& node : nodes) {
     RoutingResponse_LaneSegment* seg = region->add_segment();
     seg->set_id(node->lane_id());
-    NodeRange range = range_manager->get_node_range(node);
+    NodeRange range = range_manager->GetNodeRange(node);
     // handle start and end on the same node, but start is later than end
     if (range.start_s > range.end_s) {
       seg->set_start_s(range.start_s);
       seg->set_end_s(node->length());
-      range_manager->set_node_s(node, 0.0, range.end_s);
+      range_manager->SetNodeS(node, 0.0, range.end_s);
     } else {
       seg->set_start_s(range.start_s);
       seg->set_end_s(range.end_s);
@@ -130,23 +127,23 @@ void passage_lane_ids_to_passage_region(
   }
 }
 
-double calculate_distance(const std::vector<const TopoNode*>& nodes,
-                          NodeRangeManager* const range_manager) {
-  NodeRange range = range_manager->get_node_range(nodes.at(0));
+double CalculateDistance(const std::vector<const TopoNode*>& nodes,
+                         NodeRangeManager* const range_manager) {
+  NodeRange range = range_manager->GetNodeRange(nodes.at(0));
   double distance = range.end_s - range.start_s;
   for (auto iter = nodes.begin() + 1; iter != nodes.end(); ++iter) {
     auto edge = (*(iter - 1))->get_out_edge_to(*iter);
     if (edge->type() != TET_FORWARD) {
       continue;
     }
-    range = range_manager->get_node_range(*iter);
+    range = range_manager->GetNodeRange(*iter);
     distance += range.end_s - range.start_s;
   }
   return distance;
 }
 
 template <typename T>
-void show_request_info(const T& request) {
+void ShowRequestInfo(const T& request) {
   const auto& start = request.start();
   const auto& end = request.end();
   AERROR << "Start point - lane id: " << start.id() << " s " << start.s()
@@ -166,7 +163,7 @@ void show_request_info(const T& request) {
          << end.pose().x() << " y " << end.pose().y();
 }
 
-void generate_black_set_from_road(
+void GenerateBlackSetFromRoad(
     const RoutingRequest& request, const TopoGraph* graph,
     std::unordered_set<const TopoNode*>* const black_list) {
   for (const auto& road_id : request.blacklisted_road()) {
@@ -175,7 +172,7 @@ void generate_black_set_from_road(
 }
 
 template <typename T>
-void generate_black_set_from_lane(
+void GenerateBlackSetFromLane(
     const T& request, const TopoGraph* graph,
     std::unordered_set<const TopoNode*>* const black_list) {
   for (const auto& point : request.blacklisted_lane()) {
@@ -188,9 +185,9 @@ void generate_black_set_from_lane(
 }
 
 template <typename T>
-bool get_way_nodes(const T& request, const TopoGraph* graph,
-                   std::vector<const TopoNode*>* const way_nodes,
-                   NodeRangeManager* const range_manager) {
+bool GetWayNodes(const T& request, const TopoGraph* graph,
+                 std::vector<const TopoNode*>* const way_nodes,
+                 NodeRangeManager* const range_manager) {
   const auto* start_node = graph->get_node(request.start().id());
   const auto* end_node = graph->get_node(request.end().id());
   if (start_node == nullptr) {
@@ -243,13 +240,13 @@ bool get_way_nodes(const T& request, const TopoGraph* graph,
 
   way_nodes->push_back(end_node);
 
-  range_manager->init_node_range(request.start().s(), request.end().s(),
-                                 start_node, end_node);
+  range_manager->InitNodeRange(request.start().s(), request.end().s(),
+                               start_node, end_node);
 
   return true;
 }
 
-bool search_route_by_strategy(
+bool SearchRouteByStrategy(
     const TopoGraph* graph, const std::vector<const TopoNode*>& way_nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     std::vector<const TopoNode*>* const result_nodes) {
@@ -279,64 +276,64 @@ bool search_route_by_strategy(
 
 }  // namespace
 
-Navigator::Navigator(const std::string& topo_file_path) : _is_ready(false) {
+Navigator::Navigator(const std::string& topo_file_path) : is_ready_(false) {
   graph_.reset(new TopoGraph());
   if (!graph_->load_graph(topo_file_path)) {
     AERROR << "Navigator init graph failed! File path: " << topo_file_path;
     return;
   }
-  _is_ready = true;
+  is_ready_ = true;
   AINFO << "The navigator is ready.";
 };
 
 Navigator::~Navigator() {}
 
-bool Navigator::is_ready() const {
-  return _is_ready;
+bool Navigator::IsReady() const {
+  return is_ready_;
 }
 
-bool Navigator::search_route(const RoutingRequest& request,
-                             RoutingResponse* response) const {
-  if (!is_ready()) {
+bool Navigator::SearchRoute(const RoutingRequest& request,
+                            RoutingResponse* response) const {
+  if (!IsReady()) {
     AERROR << "Topo graph is not ready!";
     return false;
   }
-  show_request_info(request);
+  ShowRequestInfo(request);
 
   std::vector<const TopoNode*> way_nodes;
   NodeRangeManager range_manager;
 
-  if (!get_way_nodes(request, graph_.get(), &way_nodes, &range_manager)) {
+  if (!GetWayNodes(request, graph_.get(), &way_nodes, &range_manager)) {
     AERROR << "Can't find way point in graph!";
     return false;
   }
 
   std::vector<const TopoNode*> result_nodes;
   std::unordered_set<const TopoNode*> black_list;
-  generate_black_set_from_lane(request, graph_.get(), &black_list);
-  generate_black_set_from_road(request, graph_.get(), &black_list);
+  GenerateBlackSetFromLane(request, graph_.get(), &black_list);
+  GenerateBlackSetFromRoad(request, graph_.get(), &black_list);
 
-  if (!search_route_by_strategy(graph_.get(), way_nodes, black_list,
-                                &result_nodes)) {
+  if (!SearchRouteByStrategy(graph_.get(), way_nodes, black_list,
+                             &result_nodes)) {
     AERROR << "Can't find route from request!";
     return false;
   }
 
-  if (!generate_passage_region(request, result_nodes, black_list,
-                               &range_manager, response)) {
+  if (!GeneratePassageRegion(request, result_nodes, black_list,
+                             &range_manager, response)) {
     AERROR
         << "Failed to generate new passage regions based on route result lane";
     return false;
   }
 
   if (FLAGS_enable_debug_mode) {
-    dump_debug_data(result_nodes, range_manager, *response);
+    DumpDebugData(result_nodes, range_manager, *response);
   }
   return true;
 }
 
 // new request to new response
-bool Navigator::generate_passage_region(
+bool Navigator::GeneratePassageRegion(
     const RoutingRequest& request,
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
@@ -344,26 +341,26 @@ bool Navigator::generate_passage_region(
     RoutingResponse* result) const {
   AdapterManager::FillRoutingResponseHeader(FLAGS_node_name, result);
 
-  generate_passage_region(nodes, black_list, range_manager, result);
+  GeneratePassageRegion(nodes, black_list, range_manager, result);
 
   result->set_map_version(graph_->map_version());
   result->mutable_measurement()->set_distance(
-      calculate_distance(nodes, range_manager));
+      CalculateDistance(nodes, range_manager));
   result->mutable_routing_request()->CopyFrom(request);
   return true;
 }
 
 // use internal generate result
-void Navigator::generate_passage_region(
+void Navigator::GeneratePassageRegion(
     const std::vector<const TopoNode*>& nodes,
     const std::unordered_set<const TopoNode*>& black_list,
     NodeRangeManager* const range_manager,
     RoutingResponse* result) const {
   std::vector<std::vector<const TopoNode*>> nodes_of_ways;
   if (FLAGS_use_road_id) {
-    get_nodes_of_ways(nodes, &nodes_of_ways);
+    GetNodesOfWays(nodes, &nodes_of_ways);
   } else {
-    get_nodes_of_ways_based_on_virtual(nodes, &nodes_of_ways);
+    GetNodesOfWaysBasedOnVirtual(nodes, &nodes_of_ways);
   }
   size_t num_of_roads = 0;
   size_t num_of_junctions = 0;
@@ -373,20 +370,20 @@ void Navigator::generate_passage_region(
     if (FLAGS_use_road_id || !nodes_of_way.at(0)->is_virtual()) {
       std::vector<std::vector<const TopoNode*>> nodes_of_basic_passages;
       std::vector<RoutingResponse_LaneChangeInfo::Type> lane_change_types;
-      extract_basic_passages(nodes_of_way, &nodes_of_basic_passages,
-                             &lane_change_types);
+      ExtractBasicPassages(nodes_of_way, &nodes_of_basic_passages,
+                           &lane_change_types);
 
       RoutingResponse_Road road;
       road.set_id("r" + std::to_string(num_of_roads));
       auto node = nodes_of_basic_passages.front().front();
       road.mutable_in_lane()->set_id(node->lane_id());
-      road.mutable_in_lane()->set_s(range_manager->get_node_start_s(node));
+      road.mutable_in_lane()->set_s(range_manager->GetNodeStartS(node));
       node = nodes_of_basic_passages.back().back();
       road.mutable_out_lane()->set_id(node->lane_id());
-      road.mutable_out_lane()->set_s(range_manager->get_node_end_s(node));
+      road.mutable_out_lane()->set_s(range_manager->GetNodeEndS(node));
       for (const auto& nodes_of_passage : nodes_of_basic_passages) {
-        passage_lane_ids_to_passage_region(nodes_of_passage, range_manager,
-                                           road.add_passage_region());
+        PassageLaneIdsToPassageRegion(nodes_of_passage, range_manager,
+                                      road.add_passage_region());
       }
       for (size_t i = 0; i < lane_change_types.size(); ++i) {
         RoutingResponse_LaneChangeInfo* lc_info = road.add_lane_change_info();
@@ -405,7 +402,7 @@ void Navigator::generate_passage_region(
       for (const auto& node : nodes_of_way) {
         RoutingResponse_LaneSegment* seg = region.add_segment();
         seg->set_id(node->lane_id());
-        NodeRange range = range_manager->get_node_range(node);
+        NodeRange range = range_manager->GetNodeRange(node);
         seg->set_start_s(range.start_s);
         seg->set_end_s(range.end_s);
       }
@@ -417,14 +414,14 @@ void Navigator::generate_passage_region(
   }
 }
 
-void Navigator::dump_debug_data(
+void Navigator::DumpDebugData(
     const std::vector<const TopoNode*>& nodes,
     const NodeRangeManager& range_manager,
     const RoutingResponse& response) const {
   std::ofstream fout(FLAGS_debug_route_path);
   AINFO << "Route lane id\tis virtual\tstart s\tend s";
   for (const auto& node : nodes) {
-    NodeRange range = range_manager.get_node_range(node);
+    NodeRange range = range_manager.GetNodeRange(node);
     fout << node->lane_id() << ", " << node->is_virtual() << ","
          << range.start_s << "," << range.end_s << "\n";
     AINFO << node->lane_id() << "\t" << node->is_virtual() << range.start_s
