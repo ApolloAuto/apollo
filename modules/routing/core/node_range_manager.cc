@@ -21,26 +21,26 @@
 namespace apollo {
 namespace routing {
 
-void NodeRangeManager::init_node_range(double start_node_s, double end_node_s,
-                                       const TopoNode* start_node,
-                                       const TopoNode* end_node) {
+void NodeRangeManager::InitNodeRange(double start_node_s, double end_node_s,
+                                     const TopoNode* start_node,
+                                     const TopoNode* end_node) {
   range_map_.clear();
   if (start_node == end_node) {
     auto& range = range_map_[start_node];
     range.start_s = start_node_s;
     range.end_s = end_node_s;
-    init_in_neighbor(start_node, start_node_s, end_node_s);
-    init_out_neighbor(start_node, start_node_s, end_node_s);
+    InitInNeighbor(start_node, start_node_s, end_node_s);
+    InitOutNeighbor(start_node, start_node_s, end_node_s);
   } else {
-    init_in_neighbor(start_node, start_node_s, start_node->length());
-    init_out_neighbor(start_node, start_node_s, start_node->length());
+    InitInNeighbor(start_node, start_node_s, start_node->length());
+    InitOutNeighbor(start_node, start_node_s, start_node->length());
 
-    init_in_neighbor(end_node, 0.0, end_node_s);
-    init_out_neighbor(end_node, 0.0, end_node_s);
+    InitInNeighbor(end_node, 0.0, end_node_s);
+    InitOutNeighbor(end_node, 0.0, end_node_s);
   }
 }
 
-NodeRange NodeRangeManager::get_node_range(const TopoNode* topo_node) const {
+NodeRange NodeRangeManager::GetNodeRange(const TopoNode* topo_node) const {
   const auto& iter = range_map_.find(topo_node);
   if (iter != range_map_.end()) {
     return iter->second;
@@ -48,23 +48,23 @@ NodeRange NodeRangeManager::get_node_range(const TopoNode* topo_node) const {
   return NodeRange(0.0, topo_node->length());
 }
 
-void NodeRangeManager::set_node_s(const TopoNode* topo_node,
-                                  double node_start_s, double node_end_s) {
+void NodeRangeManager::SetNodeS(const TopoNode* topo_node,
+                                double node_start_s, double node_end_s) {
   auto& range = range_map_[topo_node];
   range.start_s = node_start_s;
   range.end_s = node_end_s;
 }
 
-double NodeRangeManager::get_node_start_s(const TopoNode* topo_node) const {
-  return get_node_range(topo_node).start_s;
+double NodeRangeManager::GetNodeStartS(const TopoNode* topo_node) const {
+  return GetNodeRange(topo_node).start_s;
 }
 
-double NodeRangeManager::get_node_end_s(const TopoNode* topo_node) const {
-  return get_node_range(topo_node).end_s;
+double NodeRangeManager::GetNodeEndS(const TopoNode* topo_node) const {
+  return GetNodeRange(topo_node).end_s;
 }
 
-void NodeRangeManager::init_in_neighbor(const TopoNode* cur_node,
-                                        double start_s, double end_s) {
+void NodeRangeManager::InitInNeighbor(const TopoNode* cur_node,
+                                      double start_s, double end_s) {
   for (const auto* edge : cur_node->in_from_left_or_right_edge()) {
     const auto* from_node = edge->from_node();
     if (range_map_.count(from_node) != 0) {
@@ -76,13 +76,13 @@ void NodeRangeManager::init_in_neighbor(const TopoNode* cur_node,
       auto& range = range_map_[from_node];
       range.start_s = start_s;
       range.end_s = end_s;
-      init_in_neighbor(from_node, start_s, end_s);
+      InitInNeighbor(from_node, start_s, end_s);
     }
   }
 }
 
-void NodeRangeManager::init_out_neighbor(const TopoNode* cur_node,
-                                         double start_s, double end_s) {
+void NodeRangeManager::InitOutNeighbor(const TopoNode* cur_node,
+                                       double start_s, double end_s) {
   for (const auto* edge : cur_node->out_to_left_or_right_edge()) {
     const auto* to_node = edge->to_node();
     if (range_map_.count(to_node) != 0) {
@@ -94,7 +94,7 @@ void NodeRangeManager::init_out_neighbor(const TopoNode* cur_node,
       auto& range = range_map_[to_node];
       range.start_s = start_s;
       range.end_s = end_s;
-      init_out_neighbor(to_node, start_s, end_s);
+      InitOutNeighbor(to_node, start_s, end_s);
     }
   }
 }

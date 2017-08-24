@@ -36,19 +36,18 @@ class NodeRangeManager {
   NodeRangeManager() = default;
   ~NodeRangeManager() = default;
 
-  void init_node_range(double start_node_s, double end_node_s,
-                       const TopoNode* start_node, const TopoNode* end_node);
+  void InitNodeRange(double start_node_s, double end_node_s,
+                     const TopoNode* start_node, const TopoNode* end_node);
 
-  NodeRange get_node_range(const TopoNode* topo_node) const;
-  double get_node_start_s(const TopoNode* topo_node) const;
-  double get_node_end_s(const TopoNode* topo_node) const;
-  void set_node_s(const TopoNode* topo_node, double node_start_s,
-                  double node_end_s);
+  NodeRange GetNodeRange(const TopoNode* topo_node) const;
+  double GetNodeStartS(const TopoNode* topo_node) const;
+  double GetNodeEndS(const TopoNode* topo_node) const;
+  void SetNodeS(const TopoNode* topo_node,
+                double node_start_s, double node_end_s);
 
  private:
-  void init_in_neighbor(const TopoNode* cur_node, double start_s, double end_s);
-  void init_out_neighbor(const TopoNode* cur_node, double start_s,
-                         double end_s);
+  void InitInNeighbor(const TopoNode* cur_node, double start_s, double end_s);
+  void InitOutNeighbor(const TopoNode* cur_node, double start_s, double end_s);
 
  private:
   std::unordered_map<const TopoNode*, NodeRange> range_map_;
