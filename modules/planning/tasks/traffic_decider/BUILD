@@ -13,6 +13,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/util:factory",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
     ],
 )
