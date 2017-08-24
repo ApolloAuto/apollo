@@ -27,6 +27,7 @@
 
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -36,6 +37,19 @@ namespace planning {
 ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
                                      const ReferenceLine& reference_line)
     : pnc_map_(pnc_map), reference_line_(reference_line) {}
+
+bool ReferenceLineInfo::Init() {
+  const auto& box = common::VehicleState::instance()->AdcBoundingBox();
+  if (!reference_line_.GetSLBoundary(box, &adc_boundary_)) {
+    AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
+    return false;
+  }
+  return true;
+}
+
+const SLBoundary& ReferenceLineInfo::ADCBoundary() const {
+  return adc_boundary_;
+}
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   auto path_obstacle = CreatePathObstacle(obstacle);
@@ -159,8 +173,8 @@ bool ReferenceLineInfo::IsOnRightLane(const common::math::Vec2d& xy_point) {
   }
   const double distance = 1.0;
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  if (pnc_map_->HDMap().GetLanes(common::util::MakePointENU(xy_point),
-                                 distance, &lanes) != 0) {
+  if (pnc_map_->HDMap().GetLanes(common::util::MakePointENU(xy_point), distance,
+                                 &lanes) != 0) {
     AERROR << "get lanes failed from point : " << xy_point.DebugString();
     return false;
   }

@@ -21,12 +21,14 @@
 #ifndef MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 #define MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 
+#include <memory>
 #include <string>
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 
 #include "modules/common/macro.h"
+#include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/status/status.h"
 
@@ -216,17 +218,25 @@ class VehicleState {
   common::math::Vec2d EstimateFuturePosition(const double t) const;
 
   /**
- * @brief Compute the position of center of mass(COM) of the vehicle,
- *        given the distance from rear wheels to the center of mass.
- * @param rear_to_com_distance Distance from rear wheels to
- *        the vehicle's center of mass.
- * @return The position of the vehicle's center of mass.
- */
+   * @brief Compute the position of center of mass(COM) of the vehicle,
+   *        given the distance from rear wheels to the center of mass.
+   * @param rear_to_com_distance Distance from rear wheels to
+   *        the vehicle's center of mass.
+   * @return The position of the vehicle's center of mass.
+   */
   common::math::Vec2d ComputeCOMPosition(
       const double rear_to_com_distance) const;
 
+  /**
+   * @brief Compute the bouding box of the vehicle.
+   * @return the bounding box of the vehicle represented by Box2d.
+   */
+  const common::math::Box2d& AdcBoundingBox() const;
+
  private:
   DECLARE_SINGLETON(VehicleState);
+
+  void InitAdcBoundingBox();
 
   bool ConstructExceptLinearVelocity(
       const localization::LocalizationEstimate& localization);
@@ -246,6 +256,7 @@ class VehicleState {
   double linear_a_y_ = 0.0;
   canbus::Chassis::GearPosition gear_;
   localization::Pose pose_;
+  std::unique_ptr<common::math::Box2d> adc_bounding_box_ = nullptr;
 };
 
 }  // namespace common

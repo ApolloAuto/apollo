@@ -19,6 +19,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
 using apollo::common::TrajectoryPoint;
@@ -30,6 +32,7 @@ class RTKReplayPlannerTest : public ::testing::Test {};
 
 TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
+  FLAGS_enable_map_reference_unify = false;
   RTKReplayPlanner planner;
 
   TrajectoryPoint start_point;
@@ -37,6 +40,17 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   start_point.mutable_path_point()->set_y(4140674.76063);
 
   ReferenceLine reference_line;
+  localization::LocalizationEstimate localization;
+  canbus::Chassis chassis;
+  localization.mutable_pose()->mutable_position()->set_x(586385.782842);
+  localization.mutable_pose()->mutable_position()->set_y(4140674.76063);
+  localization.mutable_pose()->mutable_angular_velocity()->set_x(0.0);
+  localization.mutable_pose()->mutable_angular_velocity()->set_y(0.0);
+  localization.mutable_pose()->mutable_angular_velocity()->set_z(0.0);
+  localization.mutable_pose()->mutable_linear_acceleration()->set_x(0.0);
+  localization.mutable_pose()->mutable_linear_acceleration()->set_y(0.0);
+  localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
+  common::VehicleState::instance()->Update(localization, chassis);
   ReferenceLineInfo info(nullptr, reference_line);
   auto status = planner.Plan(start_point, nullptr, &info);
 
@@ -58,12 +72,24 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
 TEST_F(RTKReplayPlannerTest, ErrorTest) {
   FLAGS_rtk_trajectory_filename =
       "modules/planning/testdata/garage_no_file.csv";
+  FLAGS_enable_map_reference_unify = false;
   RTKReplayPlanner planner;
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage_error.csv";
   RTKReplayPlanner planner_with_error_csv;
   TrajectoryPoint start_point;
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);
+  localization::LocalizationEstimate localization;
+  canbus::Chassis chassis;
+  localization.mutable_pose()->mutable_position()->set_x(586385.782842);
+  localization.mutable_pose()->mutable_position()->set_y(4140674.76063);
+  localization.mutable_pose()->mutable_angular_velocity()->set_x(0.0);
+  localization.mutable_pose()->mutable_angular_velocity()->set_y(0.0);
+  localization.mutable_pose()->mutable_angular_velocity()->set_z(0.0);
+  localization.mutable_pose()->mutable_linear_acceleration()->set_x(0.0);
+  localization.mutable_pose()->mutable_linear_acceleration()->set_y(0.0);
+  localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
+  common::VehicleState::instance()->Update(localization, chassis);
   ReferenceLine ref;
   ReferenceLineInfo info(nullptr, ref);
   EXPECT_TRUE(!(planner_with_error_csv.Plan(start_point, nullptr, &info)).ok());

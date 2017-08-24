@@ -14,6 +14,8 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
         "//modules/common:macro",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math:box2d",
         "//modules/common/math:quaternion",
         "//modules/common/status",
         "//modules/localization/common:localization_common",

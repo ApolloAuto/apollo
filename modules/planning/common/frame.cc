@@ -103,6 +103,10 @@ bool Frame::InitReferenceLineInfo(
   reference_line_info_.clear();
   for (const auto &reference_line : reference_lines) {
     reference_line_info_.emplace_back(pnc_map_, reference_line);
+    if (!reference_line_info_.back().Init()) {
+      AERROR << "Failed to init reference line info";
+      return false;
+    }
   }
   for (auto &info : reference_line_info_) {
     if (!info.AddObstacles(obstacles_.Items())) {
@@ -136,7 +140,10 @@ bool Frame::Init(const PlanningConfig &config) {
     CreatePredictionObstacles(prediction_);
   }
 
-  InitReferenceLineInfo(reference_lines);
+  if (!InitReferenceLineInfo(reference_lines)) {
+    AERROR << "Failed to init reference line info";
+    return false;
+  }
 
   return true;
 }
