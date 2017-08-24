@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <type_traits>
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "ros/include/ros/ros.h"
@@ -240,7 +241,8 @@ class Clock {
   DECLARE_SINGLETON(Clock);
 };
 
-inline Clock::Clock() : Clock(ClockMode::SYSTEM) {}
+inline Clock::Clock()
+    : Clock(FLAGS_use_ros_time ? ClockMode::ROS : ClockMode::SYSTEM) {}
 
 // Measure run time of a code block, for debugging puprpose only, don't check in
 // code with this macro!
