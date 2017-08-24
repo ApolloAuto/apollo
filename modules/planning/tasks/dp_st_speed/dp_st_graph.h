@@ -34,6 +34,7 @@
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_cost.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
+#include "modules/planning/tasks/st_graph/st_graph_point.h"
 
 namespace apollo {
 namespace planning {
