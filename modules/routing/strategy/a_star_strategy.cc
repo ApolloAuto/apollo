@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <fstream>
 #include <limits>
-#include <limits>
 #include <queue>
 
 #include "modules/routing/graph/topo_graph.h"
@@ -49,7 +48,7 @@ struct SearchNode {
   }
 };
 
-double get_cost_to_neighbor(const TopoEdge* edge) {
+double GetCostToNeighbor(const TopoEdge* edge) {
   return (edge->Cost() + edge->ToNode()->Cost());
 }
 
@@ -132,7 +131,7 @@ bool AStarStrategy::Search(
         continue;
       }
       tentativeg_score_ =
-          g_score_[current_node.topo_node] + get_cost_to_neighbor(edge);
+          g_score_[current_node.topo_node] + GetCostToNeighbor(edge);
       if (open_set_.count(to_node) != 0 &&
           tentativeg_score_ >= g_score_[to_node]) {
         continue;

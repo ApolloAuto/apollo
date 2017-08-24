@@ -16,17 +16,19 @@
 
 #ifndef MODULES_ROUTING_STRATEGY_STRATEGY_H_
 #define MODULES_ROUTING_STRATEGY_STRATEGY_H_
+
 #include <unordered_set>
+#include <vector>
+
+#include "modules/routing/graph/topo_graph.h"
+#include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
 namespace routing {
 
-class TopoGraph;
-class TopoNode;
-
 class Strategy {
  public:
-  virtual ~Strategy(){};
+  virtual ~Strategy() {}
 
   virtual bool Search(const TopoGraph* graph, const TopoNode* src_node,
                       const TopoNode* dest_node,

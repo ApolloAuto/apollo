@@ -76,11 +76,12 @@ void Routing::Stop() {}
 
 void Routing::OnMonitor(
     const apollo::common::monitor::MonitorMessage &monitor_message) {
-  for (const auto &item : monitor_message.item()) {
-    if (item.log_level() == MonitorMessageItem::FATAL) {
-      return;
-    }
-  }
+  // TODO(all): Do something meaningful.
+  // for (const auto &item : monitor_message.item()) {
+  //   if (item.log_level() == MonitorMessageItem::FATAL) {
+  //     return;
+  //   }
+  // }
 }
 
 }  // namespace routing
