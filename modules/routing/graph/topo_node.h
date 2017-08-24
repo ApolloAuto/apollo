@@ -35,40 +35,40 @@ class TopoNode {
 
   ~TopoNode();
 
-  const Node& node() const;
-  double length() const;
-  double cost() const;
-  bool is_virtual() const;
+  const Node& PbNode() const;
+  double Length() const;
+  double Cost() const;
+  bool IsVirtual() const;
 
-  const std::string& lane_id() const;
-  const std::string& road_id() const;
-  const ::apollo::hdmap::Curve& central_curve() const;
-  const ::apollo::common::PointENU& anchor_point() const;
+  const std::string& LaneId() const;
+  const std::string& RoadId() const;
+  const ::apollo::hdmap::Curve& CentralCurve() const;
+  const ::apollo::common::PointENU& AnchorPoint() const;
 
-  const std::unordered_set<const TopoEdge*>& in_from_all_edge() const;
-  const std::unordered_set<const TopoEdge*>& in_from_left_edge() const;
-  const std::unordered_set<const TopoEdge*>& in_from_right_edge() const;
-  const std::unordered_set<const TopoEdge*>& in_from_left_or_right_edge() const;
-  const std::unordered_set<const TopoEdge*>& in_from_pre_edge() const;
-  const std::unordered_set<const TopoEdge*>& out_to_all_edge() const;
-  const std::unordered_set<const TopoEdge*>& out_to_left_edge() const;
-  const std::unordered_set<const TopoEdge*>& out_to_right_edge() const;
-  const std::unordered_set<const TopoEdge*>& out_to_left_or_right_edge() const;
-  const std::unordered_set<const TopoEdge*>& out_to_suc_edge() const;
+  const std::unordered_set<const TopoEdge*>& InFromAllEdge() const;
+  const std::unordered_set<const TopoEdge*>& InFromLeftEdge() const;
+  const std::unordered_set<const TopoEdge*>& InFromRightEdge() const;
+  const std::unordered_set<const TopoEdge*>& InFromLeftOrRightEdge() const;
+  const std::unordered_set<const TopoEdge*>& InFromPreEdge() const;
+  const std::unordered_set<const TopoEdge*>& OutToAllEdge() const;
+  const std::unordered_set<const TopoEdge*>& OutToLeftEdge() const;
+  const std::unordered_set<const TopoEdge*>& OutToRightEdge() const;
+  const std::unordered_set<const TopoEdge*>& OutToLeftOrRightEdge() const;
+  const std::unordered_set<const TopoEdge*>& OutToSucEdge() const;
 
-  const TopoEdge* get_in_edge_from(const TopoNode* from_node) const;
-  const TopoEdge* get_out_edge_to(const TopoNode* to_node) const;
+  const TopoEdge* GetInEdgeFrom(const TopoNode* from_node) const;
+  const TopoEdge* GetOutEdgeTo(const TopoNode* to_node) const;
 
-  const TopoNode* origin_node() const;
-  double start_s() const;
-  double end_s() const;
-  bool is_sub_node() const;
+  const TopoNode* OriginNode() const;
+  double StartS() const;
+  double EndS() const;
+  bool IsSubNode() const;
 
-  void add_in_edge(const TopoEdge* edge);
-  void add_out_edge(const TopoEdge* edge);
-  void setorigin_node_(const TopoNode* origin_node);
-  void set_start_s(double start_s);
-  void set_end_s(double end_s);
+  void AddInEdge(const TopoEdge* edge);
+  void AddOutEdge(const TopoEdge* edge);
+  void SetOriginNode(const TopoNode* origin_node);
+  void SetStartS(double start_s);
+  void SetEndS(double end_s);
 
  private:
   Node pb_node_;
@@ -107,14 +107,14 @@ class TopoEdge {
 
   ~TopoEdge();
 
-  const Edge& edge() const;
-  double cost() const;
-  const std::string& from_lane_id() const;
-  const std::string& to_lane_id() const;
-  TopoEdgeType type() const;
+  const Edge& PbEdge() const;
+  double Cost() const;
+  const std::string& FromLaneId() const;
+  const std::string& ToLaneId() const;
+  TopoEdgeType Type() const;
 
-  const TopoNode* from_node() const;
-  const TopoNode* to_node() const;
+  const TopoNode* FromNode() const;
+  const TopoNode* ToNode() const;
 
  private:
   Edge pb_edge_;

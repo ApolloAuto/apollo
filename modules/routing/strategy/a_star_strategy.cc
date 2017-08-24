@@ -50,7 +50,7 @@ struct SearchNode {
 };
 
 double get_cost_to_neighbor(const TopoEdge* edge) {
-  return (edge->cost() + edge->to_node()->cost());
+  return (edge->Cost() + edge->ToNode()->Cost());
 }
 
 bool ReConstruct(
@@ -80,8 +80,8 @@ void AStarStrategy::Clear() {
 
 double AStarStrategy::HeuristicCost(const TopoNode* src_node,
                                     const TopoNode* dest_node) {
-  const ::apollo::common::PointENU& src_point = src_node->anchor_point();
-  const ::apollo::common::PointENU& dest_point = dest_node->anchor_point();
+  const ::apollo::common::PointENU& src_point = src_node->AnchorPoint();
+  const ::apollo::common::PointENU& dest_point = dest_node->AnchorPoint();
   double distance = sqrt(pow(src_point.x() - dest_point.x(), 2) +
                          pow(src_point.y() - dest_point.y(), 2) +
                          pow(src_point.z() - dest_point.z(), 2));
@@ -126,8 +126,8 @@ bool AStarStrategy::Search(
     closed_set_.emplace(current_node.topo_node);
 
     double tentativeg_score_ = 0.0;
-    for (const auto* edge : current_node.topo_node->out_to_all_edge()) {
-      const auto* to_node = edge->to_node();
+    for (const auto* edge : current_node.topo_node->OutToAllEdge()) {
+      const auto* to_node = edge->ToNode();
       if (closed_set_.count(to_node) == 1) {
         continue;
       }

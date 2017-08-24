@@ -32,8 +32,8 @@ void NodeRangeManager::InitNodeRange(double start_node_s, double end_node_s,
     InitInNeighbor(start_node, start_node_s, end_node_s);
     InitOutNeighbor(start_node, start_node_s, end_node_s);
   } else {
-    InitInNeighbor(start_node, start_node_s, start_node->length());
-    InitOutNeighbor(start_node, start_node_s, start_node->length());
+    InitInNeighbor(start_node, start_node_s, start_node->Length());
+    InitOutNeighbor(start_node, start_node_s, start_node->Length());
 
     InitInNeighbor(end_node, 0.0, end_node_s);
     InitOutNeighbor(end_node, 0.0, end_node_s);
@@ -45,7 +45,7 @@ NodeRange NodeRangeManager::GetNodeRange(const TopoNode* topo_node) const {
   if (iter != range_map_.end()) {
     return iter->second;
   }
-  return NodeRange(0.0, topo_node->length());
+  return NodeRange(0.0, topo_node->Length());
 }
 
 void NodeRangeManager::SetNodeS(const TopoNode* topo_node,
@@ -65,8 +65,8 @@ double NodeRangeManager::GetNodeEndS(const TopoNode* topo_node) const {
 
 void NodeRangeManager::InitInNeighbor(const TopoNode* cur_node,
                                       double start_s, double end_s) {
-  for (const auto* edge : cur_node->in_from_left_or_right_edge()) {
-    const auto* from_node = edge->from_node();
+  for (const auto* edge : cur_node->InFromLeftOrRightEdge()) {
+    const auto* from_node = edge->FromNode();
     if (range_map_.count(from_node) != 0) {
       // in case of start and end in the same lane
       auto& range = range_map_[from_node];
@@ -83,8 +83,8 @@ void NodeRangeManager::InitInNeighbor(const TopoNode* cur_node,
 
 void NodeRangeManager::InitOutNeighbor(const TopoNode* cur_node,
                                        double start_s, double end_s) {
-  for (const auto* edge : cur_node->out_to_left_or_right_edge()) {
-    const auto* to_node = edge->to_node();
+  for (const auto* edge : cur_node->OutToLeftOrRightEdge()) {
+    const auto* to_node = edge->ToNode();
     if (range_map_.count(to_node) != 0) {
       // in case of start and end in the same lane
       auto& range = range_map_[to_node];
