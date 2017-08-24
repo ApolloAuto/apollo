@@ -23,6 +23,3 @@ DEFINE_int32(capture_cloud_count, 3, "the number of cloud count to capture");
 
 DEFINE_double(capture_distance, 15.0, "the distance between two clouds");
 
-DEFINE_string(velodyne64_extrinsics_path, "/apollo/docs/demo_guide/velodyne64_novatel_extrinsics.yaml",
-              "The Velodyne64 extrinsics file path");
-

@@ -25,7 +25,5 @@ DECLARE_string(node_name);
 DECLARE_int32(capture_cloud_count);
 // the distance between two clouds
 DECLARE_double(capture_distance);
-// the extrinsics file path of lidar
-DECLARE_string(velodyne64_extrinsics_path);
 
 #endif /* MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_ */
