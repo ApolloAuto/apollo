@@ -57,25 +57,20 @@ constexpr double boundary_t_buffer = 2.0;
 constexpr double boundary_s_buffer = 5.0;
 }
 
-StBoundaryMapper::StBoundaryMapper(const StBoundaryConfig& config,
+StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
+                                   const StBoundaryConfig& config,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
                                    const double planning_distance,
                                    const double planning_time)
-    : st_boundary_config_(config),
+    : adc_sl_boundary_(adc_sl_boundary),
+      st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
       planning_distance_(planning_distance),
-      planning_time_(planning_time) {
-  const auto& path_start_point = path_data_.discretized_path().StartPoint();
-  common::SLPoint sl_point;
-  DCHECK(reference_line_.XYToSL(
-      {path_start_point.x(), path_start_point.y()}, &sl_point))
-      << "Failed to get adc reference line s";
-  adc_front_s_ = sl_point.s() + vehicle_param_.front_edge_to_center();
-}
+      planning_time_(planning_time) {}
 
 Status StBoundaryMapper::GetGraphBoundary(
     const PathDecision& path_decision,
@@ -136,10 +131,11 @@ Status StBoundaryMapper::GetGraphBoundary(
       // TODO(all) change start_s() to st_boundary.min_s()
       const double stop_s = path_obstacle->perception_sl_boundary().start_s() +
                             decision.stop().distance_s();
-      if (stop_s < adc_front_s_) {
+      if (stop_s < adc_sl_boundary_.end_s()) {
         AERROR << "Invalid stop decision. not stop at ahead of current "
                   "position. stop_s : "
-               << stop_s << ", and current adc_s is; " << adc_front_s_;
+               << stop_s << ", and current adc_s is; "
+               << adc_sl_boundary_.end_s();
         return Status(ErrorCode::PLANNING_ERROR, "invalid decision");
       }
       if (!stop_obstacle) {
@@ -229,8 +225,8 @@ bool StBoundaryMapper::MapStopDecision(const PathObstacle& stop_obstacle,
   return true;
 }
 
-Status StBoundaryMapper::MapWithoutDecision(
-    const PathObstacle& path_obstacle, StBoundary* const boundary) const {
+Status StBoundaryMapper::MapWithoutDecision(const PathObstacle& path_obstacle,
+                                            StBoundary* const boundary) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
@@ -387,8 +383,7 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
     }
 
     // change boundary according to obj_decision.
-    StBoundary::BoundaryType b_type =
-        StBoundary::BoundaryType::UNKNOWN;
+    StBoundary::BoundaryType b_type = StBoundary::BoundaryType::UNKNOWN;
     double characteristic_length = 0.0;
     constexpr double kBoundaryEpsilon = 1e-3;
     if (obj_decision.has_follow()) {
@@ -457,14 +452,13 @@ Status StBoundaryMapper::MapFollowDecision(
 
   const auto* obstacle = path_obstacle.Obstacle();
   SLPoint obstacle_sl_point;
-  reference_line_.XYToSL(
-      {obstacle->Perception().position().x(),
-       obstacle->Perception().position().y()},
-      &obstacle_sl_point);
+  reference_line_.XYToSL({obstacle->Perception().position().x(),
+                          obstacle->Perception().position().y()},
+                         &obstacle_sl_point);
 
-  const auto& ref_point = reference_line_.GetReferencePoint(
-      obstacle->Perception().position().x(),
-      obstacle->Perception().position().y());
+  const auto& ref_point =
+      reference_line_.GetReferencePoint(obstacle->Perception().position().x(),
+                                        obstacle->Perception().position().y());
 
   const double speed_coeff =
       std::cos(obstacle->Perception().theta() - ref_point.heading());

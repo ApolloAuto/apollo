@@ -39,7 +39,8 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
   bool Init(const PlanningConfig& config) override;
 
  private:
-  apollo::common::Status Process(const PathData& path_data,
+  apollo::common::Status Process(const SLBoundary& adc_sl_boundary,
+                                 const PathData& path_data,
                                  const common::TrajectoryPoint& init_point,
                                  const ReferenceLine& reference_line,
                                  PathDecision* const path_decision,

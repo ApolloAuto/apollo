@@ -49,7 +49,8 @@ bool DpStSpeedOptimizer::Init(const PlanningConfig& config) {
   return true;
 }
 
-Status DpStSpeedOptimizer::Process(const PathData& path_data,
+Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
+                                   const PathData& path_data,
                                    const common::TrajectoryPoint& init_point,
                                    const ReferenceLine& reference_line,
                                    PathDecision* const path_decision,
@@ -65,8 +66,8 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  StBoundaryMapper boundary_mapper(st_boundary_config_, reference_line,
-                                   path_data,
+  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_,
+                                   reference_line, path_data,
                                    dp_st_speed_config_.total_path_length(),
                                    dp_st_speed_config_.total_time());
 
@@ -94,7 +95,7 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
-  DpStGraph st_graph(reference_line, dp_st_speed_config_, st_graph_data,
+  DpStGraph st_graph(adc_sl_boundary, dp_st_speed_config_, st_graph_data,
                      veh_param, path_data);
   if (!st_graph.Search(path_decision, speed_data).ok()) {
     const std::string msg = "Failed to search graph with dynamic programming.";

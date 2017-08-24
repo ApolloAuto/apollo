@@ -97,23 +97,22 @@ bool QpFrenetFrame::Init(const uint32_t num_points,
   // initialize calculation here
   CalculateHDMapBound();
 
-
   if (!CalculateObstacleBound()) {
     AERROR << "Calculate obstacle bound failed!";
     return false;
   }
-  for (int i = 0; i < evaluated_knots_.size(); i++) {
+  for (size_t i = 0; i < evaluated_knots_.size(); ++i) {
     sl_frame->mutable_sampled_s()->Add(evaluated_knots_[i]);
     sl_frame->mutable_map_lower_bound()->Add(hdmap_bound_[i].first);
     sl_frame->mutable_map_upper_bound()->Add(hdmap_bound_[i].second);
-    sl_frame->mutable_static_obstacle_lower_bound()
-        ->Add(static_obstacle_bound_[i].first);
-    sl_frame->mutable_static_obstacle_upper_bound()
-        ->Add(static_obstacle_bound_[i].second);
-    sl_frame->mutable_dynamic_obstacle_lower_bound()
-        ->Add(dynamic_obstacle_bound_[i].first);
-    sl_frame->mutable_dynamic_obstacle_upper_bound()
-        ->Add(dynamic_obstacle_bound_[i].second);
+    sl_frame->mutable_static_obstacle_lower_bound()->Add(
+        static_obstacle_bound_[i].first);
+    sl_frame->mutable_static_obstacle_upper_bound()->Add(
+        static_obstacle_bound_[i].second);
+    sl_frame->mutable_dynamic_obstacle_lower_bound()->Add(
+        dynamic_obstacle_bound_[i].first);
+    sl_frame->mutable_dynamic_obstacle_upper_bound()->Add(
+        dynamic_obstacle_bound_[i].second);
   }
   return true;
 }
@@ -408,8 +407,8 @@ void QpFrenetFrame::CalculateHDMapBound() {
   for (uint32_t i = 0; i < hdmap_bound_.size(); ++i) {
     double left_bound = 0.0;
     double right_bound = 0.0;
-    bool suc = reference_line_.GetLaneWidth(evaluated_knots_[i],
-                                            &left_bound, &right_bound);
+    bool suc = reference_line_.GetLaneWidth(evaluated_knots_[i], &left_bound,
+                                            &right_bound);
     if (!suc) {
       AWARN << "Extracting lane width failed at s = " << evaluated_knots_[i];
       right_bound = FLAGS_default_reference_line_width / 2;

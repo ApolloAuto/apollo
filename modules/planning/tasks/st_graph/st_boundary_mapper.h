@@ -30,15 +30,16 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/tasks/st_graph/st_boundary.h"
 #include "modules/planning/reference_line/reference_line.h"
+#include "modules/planning/tasks/st_graph/st_boundary.h"
 
 namespace apollo {
 namespace planning {
 
 class StBoundaryMapper {
  public:
-  StBoundaryMapper(const StBoundaryConfig& config,
+  StBoundaryMapper(const SLBoundary& adc_sl_boundary,
+                   const StBoundaryConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
                    const double planning_time);
@@ -61,8 +62,8 @@ class StBoundaryMapper {
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,
       std::vector<STPoint>* lower_points) const;
 
-  apollo::common::Status MapWithoutDecision(
-      const PathObstacle& path_obstacle, StBoundary* const boundary) const;
+  apollo::common::Status MapWithoutDecision(const PathObstacle& path_obstacle,
+                                            StBoundary* const boundary) const;
 
   bool MapStopDecision(const PathObstacle& stop_obstacle,
                        const ObjectDecisionType& stop_decision,
@@ -80,13 +81,13 @@ class StBoundaryMapper {
                       std::vector<StBoundary>* st_graph_boundaries) const;
 
  private:
+  const SLBoundary& adc_sl_boundary_;
   StBoundaryConfig st_boundary_config_;
   const ReferenceLine& reference_line_;
   const PathData& path_data_;
   const apollo::common::VehicleParam vehicle_param_;
   const double planning_distance_;
   const double planning_time_;
-  double adc_front_s_ = 0.0;
 };
 
 }  // namespace planning
