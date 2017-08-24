@@ -34,6 +34,7 @@
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/reference_line/reference_line.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -48,7 +49,8 @@ class QpFrenetFrame {
                 const double time_resolution);
   virtual ~QpFrenetFrame() = default;
 
-  bool Init(const uint32_t num_points);
+  bool Init(const uint32_t num_points,
+            apollo::planning_internal::Debug* planning_debug);
 
   const ReferenceLine& GetReferenceLine() const;
 
