@@ -61,6 +61,11 @@ double Vec2d::InnerProd(const Vec2d &other) const {
   return x_ * other.x() + y_ * other.y();
 }
 
+Vec2d Vec2d::rotate(const double angle) const {
+  return Vec2d(x_ * cos(angle) - y_ * sin(angle),
+               x_ * sin(angle) + y_ * cos(angle));
+}
+
 Vec2d Vec2d::operator+(const Vec2d &other) const {
   return Vec2d(x_ + other.x(), y_ + other.y());
 }
