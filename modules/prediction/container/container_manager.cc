@@ -28,14 +28,6 @@ using ::apollo::common::adapter::AdapterManagerConfig;
 
 ContainerManager::ContainerManager() {}
 
-ContainerManager::~ContainerManager() {
-  for (auto it = containers_.begin(); it != containers_.end(); ++it) {
-    it->second.reset();
-  }
-  containers_.clear();
-  config_.Clear();
-}
-
 void ContainerManager::Init(const AdapterManagerConfig& config) {
   config_.CopyFrom(config);
   RegisterContainers();
@@ -44,7 +36,6 @@ void ContainerManager::Init(const AdapterManagerConfig& config) {
 void ContainerManager::RegisterContainers() {
   for (const auto& adapter_config : config_.config()) {
     if (adapter_config.has_type() &&
-        adapter_config.has_mode() &&
         (adapter_config.mode() == AdapterConfig::RECEIVE_ONLY ||
          adapter_config.mode() == AdapterConfig::DUPLEX)) {
       RegisterContainer(adapter_config.type());
