@@ -139,8 +139,8 @@ bool PathDecider::MakeStaticObstacleDecision(
       // check STOP/NUDGE
       double left_width;
       double right_width;
-      if (!reference_line_->get_lane_width(adc_sl.s(), &left_width,
-                                           &right_width)) {
+      if (!reference_line_->GetLaneWidth(adc_sl.s(), &left_width,
+                                         &right_width)) {
         left_width = right_width = FLAGS_default_reference_line_width / 2;
       }
       double driving_width;
@@ -189,7 +189,7 @@ bool PathDecider::MakeStaticObstacleDecision(
                       sl_boundary.start_s() - FLAGS_stop_distance_obstacle);
         object_stop_ptr->set_distance_s(stop_ref_s - sl_boundary.start_s());
 
-        auto stop_ref_point = reference_line_->get_reference_point(stop_ref_s);
+        auto stop_ref_point = reference_line_->GetReferencePoint(stop_ref_s);
         object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
         object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
         object_stop_ptr->set_stop_heading(stop_ref_point.heading());
@@ -299,7 +299,7 @@ bool PathDecider::ComputeBoundingBoxesForAdc(
     sl_point.set_l(l);
     reference_line_->SLToXY(sl_point, &adc_position_cartesian);
 
-    ReferencePoint reference_point = reference_line_->get_reference_point(s);
+    ReferencePoint reference_point = reference_line_->GetReferencePoint(s);
 
     double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
     double delta_theta = std::atan2(dl, one_minus_kappa_r_d);

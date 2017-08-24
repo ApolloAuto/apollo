@@ -73,12 +73,12 @@ Status EMPlanner::Init(const PlanningConfig& config) {
   for (const auto task : config.em_planner_config().task()) {
     tasks_.emplace_back(
         task_factory_.CreateObject(static_cast<TaskType>(task)));
-    AINFO << "Created task:" << tasks_.back()->name();
+    AINFO << "Created task:" << tasks_.back()->Name();
   }
   for (auto& task : tasks_) {
     if (!task->Init(config)) {
       std::string msg(
-          common::util::StrCat("Init task[", task->name(), "] failed."));
+          common::util::StrCat("Init task[", task->Name(), "] failed."));
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -129,20 +129,20 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     const double start_timestamp = Clock::NowInSecond();
     auto ret = optimizer->Execute(frame, reference_line_info);
     if (!ret.ok()) {
-      AERROR << "Failed to run tasks[" << optimizer->name()
+      AERROR << "Failed to run tasks[" << optimizer->Name()
              << "], Error message: " << ret.error_message();
       return ret;
     }
     const double end_timestamp = Clock::NowInSecond();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
-    ADEBUG << "after optimizer " << optimizer->name() << ":"
+    ADEBUG << "after optimizer " << optimizer->Name() << ":"
            << reference_line_info->PathSpeedDebugString() << std::endl;
-    ADEBUG << optimizer->name() << " time spend: " << time_diff_ms << " ms.";
+    ADEBUG << optimizer->Name() << " time spend: " << time_diff_ms << " ms.";
 
     if (FLAGS_enable_record_debug && ptr_debug != nullptr &&
         ptr_latency_stats != nullptr) {
-      RecordDebugInfo(optimizer->name(), time_diff_ms, ptr_latency_stats);
+      RecordDebugInfo(optimizer->Name(), time_diff_ms, ptr_latency_stats);
     }
   }
   DiscretizedTrajectory trajectory;

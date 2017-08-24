@@ -75,9 +75,9 @@ int Decider::MakeMainStopDecision(
     reference_line.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
 
     double stop_line_s = stop_line_sl.s();
-    if (stop_line_s < 0 || stop_line_s > reference_line.length()) {
+    if (stop_line_s < 0 || stop_line_s > reference_line.Length()) {
       AERROR << "Ignore object:" << obstacle->Id() << " fence route_s["
-             << stop_line_s << "] not in range[0, " << reference_line.length()
+             << stop_line_s << "] not in range[0, " << reference_line.Length()
              << "]";
       continue;
     }

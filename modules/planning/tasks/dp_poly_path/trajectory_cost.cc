@@ -49,7 +49,7 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
       std::floor(total_time / config.eval_time_interval()));
 }
 
-double TrajectoryCost::calculate(const QuinticPolynomialCurve1d &curve,
+double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
                                  const double start_s,
                                  const double end_s) const {
   double total_cost = 0.0;

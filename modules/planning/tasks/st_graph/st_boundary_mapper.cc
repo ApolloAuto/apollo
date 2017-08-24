@@ -214,7 +214,7 @@ bool StBoundaryMapper::MapStopDecision(const PathObstacle& stop_obstacle,
 
   const double s_min = st_stop_s;
   const double s_max =
-      std::fmax(s_min, std::fmax(planning_distance_, reference_line_.length()));
+      std::fmax(s_min, std::fmax(planning_distance_, reference_line_.Length()));
   std::vector<STPoint> boundary_points;
   boundary_points.emplace_back(s_min, 0.0);
   boundary_points.emplace_back(s_min, planning_time_);
@@ -462,7 +462,7 @@ Status StBoundaryMapper::MapFollowDecision(
        obstacle->Perception().position().y()},
       &obstacle_sl_point);
 
-  const auto& ref_point = reference_line_.get_reference_point(
+  const auto& ref_point = reference_line_.GetReferencePoint(
       obstacle->Perception().position().x(),
       obstacle->Perception().position().y());
 
@@ -546,10 +546,10 @@ Status StBoundaryMapper::GetSpeedLimits(
   CHECK_NOTNULL(speed_limit_data);
 
   for (const auto& path_point : path_data_.discretized_path().path_points()) {
-    if (Double::Compare(path_point.s(), reference_line_.length()) > 0) {
+    if (Double::Compare(path_point.s(), reference_line_.Length()) > 0) {
       std::string msg = common::util::StrCat(
           "path length [", path_data_.discretized_path().Length(),
-          "] is LARGER than reference_line_ length [", reference_line_.length(),
+          "] is LARGER than reference_line_ length [", reference_line_.Length(),
           "]. Please debug before proceeding.");
       AWARN << msg;
       break;

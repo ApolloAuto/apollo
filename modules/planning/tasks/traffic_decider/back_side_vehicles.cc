@@ -43,7 +43,7 @@ bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
         reference_line_info->IsOnRightLane(bounding_box.center())) {
       ObjectDecisionType ignore;
       ignore.mutable_ignore();
-      path_decision->AddLongitudinalDecision(name(), path_obstacle->Id(),
+      path_decision->AddLongitudinalDecision(Name(), path_obstacle->Id(),
                                              ignore);
     } else if (std::fabs(path_obstacle->perception_sl_boundary().start_l()) <
                    FLAGS_min_driving_width &&
@@ -51,7 +51,7 @@ bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
                    FLAGS_min_driving_width) {
       ObjectDecisionType ignore;
       ignore.mutable_ignore();
-      path_decision->AddLongitudinalDecision(name(), path_obstacle->Id(),
+      path_decision->AddLongitudinalDecision(Name(), path_obstacle->Id(),
                                              ignore);
     }
   }

@@ -42,7 +42,7 @@ class TrajectoryCost {
                           const ReferenceLine &reference_line,
                           const common::VehicleParam &vehicle_param,
                           const SpeedData &heuristic_speed_data);
-  double calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
+  double Calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
                    const double end_s) const;
 
  private:

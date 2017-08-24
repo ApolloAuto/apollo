@@ -111,30 +111,30 @@ bool ReferenceLineSmoother::smooth(
       return false;
     }
     if (ref_sl_point.s() < 0 ||
-        ref_sl_point.s() > raw_reference_line.length()) {
+        ref_sl_point.s() > raw_reference_line.Length()) {
       continue;
     }
 
     ReferencePoint rlp =
-        raw_reference_line.get_reference_point(ref_sl_point.s());
+        raw_reference_line.GetReferencePoint(ref_sl_point.s());
     ref_points.emplace_back(ReferencePoint(
         hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
                             rlp.lane_waypoints()),
         kappa, dkappa, 0.0, 0.0));
   }
-  ReferencePoint::remove_duplicates(&ref_points);
+  ReferencePoint::RemoveDuplicates(&ref_points);
   *smoothed_reference_line = ReferenceLine(ref_points);
   return true;
 }
 
 bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
-  const double length = raw_reference_line.length();
+  const double length = raw_reference_line.Length();
   const double resolution = length / smoother_config_.num_spline();
   double accumulated_s = 0.0;
   for (std::uint32_t i = 0;
        i <= smoother_config_.num_spline() && accumulated_s <= length;
        ++i, accumulated_s += resolution) {
-    ReferencePoint rlp = raw_reference_line.get_reference_point(accumulated_s);
+    ReferencePoint rlp = raw_reference_line.GetReferencePoint(accumulated_s);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
     path_point.set_y(rlp.y());
@@ -224,7 +224,7 @@ bool ReferenceLineSmoother::extract_evaluated_points(
       AERROR << "get s from " << t << " failed";
       return false;
     }
-    ReferencePoint rlp = raw_reference_line.get_reference_point(s);
+    ReferencePoint rlp = raw_reference_line.GetReferencePoint(s);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
     path_point.set_y(rlp.y());

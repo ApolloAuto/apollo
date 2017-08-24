@@ -47,8 +47,8 @@ class ReferenceLine {
   const hdmap::Path& map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;
 
-  ReferencePoint get_reference_point(const double s) const;
-  ReferencePoint get_reference_point(const double x, const double y) const;
+  ReferencePoint GetReferencePoint(const double s) const;
+  ReferencePoint GetReferencePoint(const double x, const double y) const;
 
   bool GetSLBoundary(const common::math::Box2d& box,
                      SLBoundary* const sl_boundary) const;
@@ -58,16 +58,16 @@ class ReferenceLine {
   bool XYToSL(const common::math::Vec2d& xy_point,
               common::SLPoint* const sl_point) const;
 
-  bool get_lane_width(const double s, double* const left_width,
-                      double* const right_width) const;
-  bool is_on_road(const common::SLPoint& sl_point) const;
+  bool GetLaneWidth(const double s, double* const left_width,
+                    double* const right_width) const;
+  bool IsOnRoad(const common::SLPoint& sl_point) const;
 
   /**
    * @brief check if any part of the box has overlap with the road.
    */
   bool HasOverlap(const common::math::Box2d& box) const;
 
-  double length() const { return map_path_.length(); }
+  double Length() const { return map_path_.length(); }
 
   std::string DebugString() const;
 
@@ -93,15 +93,15 @@ class ReferenceLine {
    * s >= s0 && s <= s1
    * @return The interpolated ReferencePoint.
    */
-  static ReferencePoint interpolate(const ReferencePoint& p0, const double s0,
+  static ReferencePoint Interpolate(const ReferencePoint& p0, const double s0,
                                     const ReferencePoint& p1, const double s1,
                                     const double s);
 
-  static double find_min_distance_point(const ReferencePoint& p0,
-                                        const double s0,
-                                        const ReferencePoint& p1,
-                                        const double s1, const double x,
-                                        const double y);
+  static double FindMinDistancePoint(const ReferencePoint& p0,
+                                     const double s0,
+                                     const ReferencePoint& p1,
+                                     const double s1, const double x,
+                                     const double y);
 
  private:
   std::vector<ReferencePoint> reference_points_;

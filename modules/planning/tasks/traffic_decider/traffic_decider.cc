@@ -85,11 +85,10 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
   double destination_l = destination_sl.l();
   double left_bound;
   double right_bound;
-  if (!reference_line.get_lane_width(destination_s, &left_bound,
-                                     &right_bound)) {
+  if (!reference_line.GetLaneWidth(destination_s, &left_bound, &right_bound)) {
     left_bound = right_bound = FLAGS_default_reference_line_width / 2;
   }
-  if (destination_s < 0 || destination_s > reference_line.length() ||
+  if (destination_s < 0 || destination_s > reference_line.Length() ||
       destination_l > left_bound || destination_l < -right_bound) {
     AINFO << "destination[s=" << destination_s << "; l=" << destination_l
           << "] out of planning range. Skip";
@@ -155,7 +154,7 @@ bool TrafficDecider::MakeDestinationStopDecision() {
   auto stop_position = obstacle->Perception().position();
   common::SLPoint stop_line_sl;
   reference_line.XYToSL({stop_position.x(), stop_position.y()}, &stop_line_sl);
-  if (!reference_line.is_on_road(stop_line_sl)) {
+  if (!reference_line.IsOnRoad(stop_line_sl)) {
     return false;
   }
 
@@ -178,7 +177,7 @@ bool TrafficDecider::MakeDestinationStopDecision() {
   object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
 
   auto stop_ref_point =
-      reference_line.get_reference_point(stop_position.x(), stop_position.y());
+      reference_line.GetReferencePoint(stop_position.x(), stop_position.y());
   object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
   object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
   object_stop_ptr->set_stop_heading(stop_ref_point.heading());
