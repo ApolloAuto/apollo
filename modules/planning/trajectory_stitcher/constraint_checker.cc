@@ -36,7 +36,7 @@ bool within_range(const T v, const T lower, const T upper) {
 }
 }
 
-bool ConstraintChecker::valid_trajectory(
+bool ConstraintChecker::ValidTrajectory(
     const DiscretizedTrajectory& trajectory) {
   for (const auto& p : trajectory.trajectory_points()) {
     double t = p.relative_time();

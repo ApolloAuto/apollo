@@ -43,7 +43,7 @@ apollo::common::Status SpeedOptimizer::Execute(
 void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
   auto debug = frame_->MutableADCTrajectory()->mutable_debug();
   auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
-  ptr_speed_plan->set_name(name());
+  ptr_speed_plan->set_name(Name());
   ptr_speed_plan->mutable_speed_point()->CopyFrom(
       {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
 }
@@ -58,7 +58,7 @@ void SpeedOptimizer::RecordSTGraphDebug(
 
   auto debug = frame_->MutableADCTrajectory()->mutable_debug();
   auto st_graph_debug = debug->mutable_planning_data()->add_st_graph();
-  st_graph_debug->set_name(name());
+  st_graph_debug->set_name(Name());
   for (const auto& boundary : boundaries) {
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary.id());

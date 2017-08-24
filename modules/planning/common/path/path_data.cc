@@ -163,7 +163,7 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
       return false;
     }
     ReferencePoint ref_point =
-        reference_line_->get_reference_point(frenet_point.s());
+        reference_line_->GetReferencePoint(frenet_point.s());
     double theta = CartesianFrenetConverter::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), frenet_point.l(),
         frenet_point.dl());

@@ -29,7 +29,7 @@ using apollo::common::Status;
 
 Task::Task(const std::string& name) : _name(name) {}
 
-const std::string& Task::name() const { return _name; }
+const std::string& Task::Name() const { return _name; }
 
 bool Task::Init(const PlanningConfig&) { return true; }
 

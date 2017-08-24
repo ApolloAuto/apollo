@@ -29,7 +29,7 @@ namespace planning {
 class ConstraintChecker {
  public:
   ConstraintChecker() = delete;
-  static bool valid_trajectory(const DiscretizedTrajectory& trajectory);
+  static bool ValidTrajectory(const DiscretizedTrajectory& trajectory);
 };
 
 }  // namespace planning

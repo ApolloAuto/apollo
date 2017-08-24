@@ -108,7 +108,7 @@ bool QpSplinePathGenerator::Generate(
 
   double start_l = spline(init_frenet_point_.s());
   ReferencePoint ref_point =
-      reference_line_.get_reference_point(init_frenet_point_.s());
+      reference_line_.GetReferencePoint(init_frenet_point_.s());
   Vec2d xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
       ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), start_l);
 
@@ -122,7 +122,7 @@ bool QpSplinePathGenerator::Generate(
     double l = spline(s);
     double dl = spline.Derivative(s);
     double ddl = spline.SecondOrderDerivative(s);
-    ReferencePoint ref_point = reference_line_.get_reference_point(s);
+    ReferencePoint ref_point = reference_line_.GetReferencePoint(s);
     Vec2d curr_xy_point = CartesianFrenetConverter::CalculateCartesianPoint(
         ref_point.heading(), Vec2d(ref_point.x(), ref_point.y()), l);
     curr_xy_point.set_x(curr_xy_point.x() - x_diff);
@@ -165,7 +165,7 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
   const double l = frenet_frame_point->l();
 
   ReferencePoint ref_point =
-      reference_line_.get_reference_point(frenet_frame_point->s());
+      reference_line_.GetReferencePoint(frenet_frame_point->s());
 
   const double theta_ref = ref_point.heading();
   const double kappa_ref = ref_point.kappa();
@@ -187,7 +187,7 @@ bool QpSplinePathGenerator::InitCoordRange(double* const start_s,
   DCHECK_NOTNULL(end_s);
 
   *start_s = init_frenet_point_.s();
-  *end_s = std::fmin(reference_line_.length(),
+  *end_s = std::fmin(reference_line_.Length(),
                      *start_s + FLAGS_look_forward_distance);
   return true;
 }

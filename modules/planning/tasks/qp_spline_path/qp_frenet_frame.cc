@@ -408,8 +408,8 @@ void QpFrenetFrame::CalculateHDMapBound() {
   for (uint32_t i = 0; i < hdmap_bound_.size(); ++i) {
     double left_bound = 0.0;
     double right_bound = 0.0;
-    bool suc = reference_line_.get_lane_width(evaluated_knots_[i], &left_bound,
-                                              &right_bound);
+    bool suc = reference_line_.GetLaneWidth(evaluated_knots_[i],
+                                            &left_bound, &right_bound);
     if (!suc) {
       AWARN << "Extracting lane width failed at s = " << evaluated_knots_[i];
       right_bound = FLAGS_default_reference_line_width / 2;
