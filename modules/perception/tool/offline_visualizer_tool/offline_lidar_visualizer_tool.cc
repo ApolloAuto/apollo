@@ -60,9 +60,9 @@ class OfflineLidarPerceptionTool {
 
     if (use_visualization) {
       visualizer_.reset(new OpenglVisualizer());
-      if(!visualizer_->Init()) {
-        AERROR<<"init visialuzer failed"<<std::endl;
-      };
+      if (!visualizer_->Init()) {
+        AERROR << "init visialuzer failed" << std::endl;
+      }
     }
     return true;
   }
@@ -76,24 +76,25 @@ class OfflineLidarPerceptionTool {
     AINFO << "starting to run";
     GetFileNamesInFolderById(pose_folder, ".pose", &pose_file_names);
     GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
-    AINFO<<" pose size " << pose_file_names.size();
-    AINFO<<" pcd size " << pcd_file_names.size();
+    AINFO << " pose size " << pose_file_names.size();
+    AINFO << " pcd size " << pcd_file_names.size();
     if (pose_file_names.size() != pcd_file_names.size()) {
       AERROR << "pcd file number does not match pose file number";
       return;
     }
     double time_stamp = 0.0;
     int start_frame = FLAGS_start_frame;
-    AINFO << "starting frame is "<<start_frame;
+    AINFO << "starting frame is " << start_frame;
     sleep(1);
     for (size_t i = 0; i < pcd_file_names.size(); i++) {
       AINFO << "***************** Frame " << i << " ******************";
       std::ostringstream oss;
       pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
       AINFO << "load pcd file from file path" << pcd_folder + pcd_file_names[i];
-      pcl::io::loadPCDFile<pcl_util::Point>(pcd_folder + pcd_file_names[i], *cloud);
+      pcl::io::loadPCDFile<pcl_util::Point>(pcd_folder + pcd_file_names[i],
+        *cloud);
 
-      //read pose
+      // read pose
       Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
       int frame_id = -1;
       if (!ReadPoseFile(pose_folder + pose_file_names[i],
@@ -115,7 +116,7 @@ class OfflineLidarPerceptionTool {
       if (visualizer_) {
         pcl_util::PointDCloudPtr transformed_cloud(new pcl_util::PointDCloud);
         transform_perception_cloud(cloud, pose, transformed_cloud);
-        AERROR<<"transformed cloud size is "<<transformed_cloud->size();
+        AERROR << "transformed cloud size is " << transformed_cloud->size();
 
         pcl_util::PointIndices roi_indices_1;
         FrameContent content;
@@ -151,7 +152,7 @@ class OfflineLidarPerceptionTool {
     fout << frame_id << " " << objects.size() << std::endl;
 
     typename pcl::PointCloud<pcl_util::Point>::Ptr trans_cloud(
-        new pcl::PointCloud<pcl_util::Point>());
+      new pcl::PointCloud<pcl_util::Point>());
     Eigen::Matrix4d pose_velo2tw = pose_v2w;
     pcl::copyPointCloud(*cloud, *trans_cloud);
     transform_point_cloud<pcl_util::Point>(*trans_cloud, pose_v2w);
@@ -165,18 +166,18 @@ class OfflineLidarPerceptionTool {
     for (const auto& obj : objects) {
       Eigen::Vector3f coord_dir(0.0, 1.0, 0.0);
       Eigen::Vector4d dir_velo = pose_tw2velo * Eigen::Vector4d(
-          obj->direction[0], obj->direction[1], obj->direction[2], 0);
+        obj->direction[0], obj->direction[1], obj->direction[2], 0);
       Eigen::Vector4d ct_velo = pose_tw2velo * Eigen::Vector4d(
-          obj->center[0], obj->center[1], obj->center[2], 1);
+        obj->center[0], obj->center[1], obj->center[2], 1);
       Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
       double theta = vector_theta_2d_xy(coord_dir, dir_velo3);
       std::string type ="unknown";
       if (obj->type == PEDESTRIAN) {
-          type = "pedestrain";
+        type = "pedestrain";
       } else if (obj->type == VEHICLE) {
-          type = "smallMot";
+        type = "smallMot";
       } else if (obj->type == BICYCLE) {
-          type = "nonMot";
+        type = "nonMot";
       }
       // write tracking details
       fout << obj->id << " " << obj->track_id << " "
@@ -211,9 +212,9 @@ class OfflineLidarPerceptionTool {
     fout.close();
   }
 
-protected:
-    std::unique_ptr<LidarProcess> lidar_process_;
-    std::unique_ptr<OpenglVisualizer> visualizer_;
+ protected:
+  std::unique_ptr<LidarProcess> lidar_process_;
+  std::unique_ptr<OpenglVisualizer> visualizer_;
 };
 
 }  // namespace perception
@@ -221,11 +222,11 @@ protected:
 
 
 int main(int argc, char* argv[]) {
-    FLAGS_flagfile = "./modules/perception/tool/offline_visualizer_tool/conf/"
-                     "offline_lidar_perception_test.flag";
-    gflags::ParseCommandLineFlags(&argc, &argv, true);
-    apollo::perception::OfflineLidarPerceptionTool tool;
-    tool.Init(FLAGS_enable_visualization);
-    tool.Run(FLAGS_pcd_path, FLAGS_pose_path, FLAGS_output_path);
-    return 0;
+  FLAGS_flagfile = "./modules/perception/tool/offline_visualizer_tool/conf/"
+                   "offline_lidar_perception_test.flag";
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  apollo::perception::OfflineLidarPerceptionTool tool;
+  tool.Init(FLAGS_enable_visualization);
+  tool.Run(FLAGS_pcd_path, FLAGS_pose_path, FLAGS_output_path);
+  return 0;
 }
