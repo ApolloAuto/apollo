@@ -26,9 +26,7 @@ message LonControllerConf {
   optional PidConf high_speed_pid_conf = 10;
   optional double switch_speed = 11; // low/high speed controller switch speed
 
-  optional FilterConf throttle_filter_conf = 12;
-  optional FilterConf brake_filter_conf = 13;
-  optional FilterConf acceleration_filter_conf = 14;
+  optional FilterConf pitch_angle_filter_conf = 12;
 
-  optional calibrationtable.ControlCalibrationTable calibration_table = 15;
+  optional calibrationtable.ControlCalibrationTable calibration_table = 13;
 }
