@@ -142,7 +142,7 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
     const PathObstacle& path_obstacle) {
   const Obstacle* ptr_obstacle = path_obstacle.Obstacle();
   if (!path_obstacle.HasLateralDecision()) {
-    AERROR << "object has no lateral decision";
+    ADEBUG << "object has no lateral decision";
     return false;
   }
   const auto& decision = path_obstacle.LateralDecision();
@@ -219,7 +219,7 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
     const PathObstacle& path_obstacle) {
   const auto ptr_obstacle = path_obstacle.Obstacle();
   if (!path_obstacle.HasLateralDecision()) {
-    AERROR << "obstacle has no lateral decision";
+    ADEBUG << "obstacle has no lateral decision";
     return false;
   }
   const auto& decision = path_obstacle.LateralDecision();
