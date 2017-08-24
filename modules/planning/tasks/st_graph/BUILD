@@ -3,20 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "st_graph_point",
-    srcs = [
-        "st_graph_point.cc",
-    ],
-    hdrs = [
-        "st_graph_point.h",
-    ],
-    deps = [
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/common/speed:st_point",
-    ],
-)
-
-cc_library(
     name = "st_boundary",
     srcs = [
         "st_boundary.cc",
@@ -25,9 +11,9 @@ cc_library(
         "st_boundary.h",
     ],
     deps = [
-        ":st_graph_point",
         "//modules/common:log",
         "//modules/common/math",
+        "//modules/planning/common/speed:st_point",
         "//modules/planning/proto:planning_proto",
     ],
 )
