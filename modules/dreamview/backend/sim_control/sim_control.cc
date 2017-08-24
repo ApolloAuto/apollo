@@ -83,7 +83,7 @@ void SimControl::SetStartPoint(const RoutingResponse& routing) {
 
   double theta = 0.0;
   double s = 0.0;
-  if (!map_service_->GetPoseWithLane(p->x(), p->y(), &theta, &s)) {
+  if (!map_service_->GetPoseWithRegardToLane(p->x(), p->y(), &theta, &s)) {
     AERROR << "Failed to get heading!";
   }
   p->set_theta(theta);
