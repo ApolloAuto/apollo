@@ -16,7 +16,7 @@
 
 #include "modules/common/configs/config_gflags.h"
 
-DEFINE_string(map_dir, "modules/map/data/sunnyvale_loop",
+DEFINE_string(map_dir, "modules/map/data/demo",
               "Directory which contains a group of related maps.");
 
 DEFINE_string(base_map_filename, "base_map.xml|base_map.bin|base_map.txt",
