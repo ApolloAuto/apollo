@@ -44,8 +44,7 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
 
 const std::string& PathObstacle::Id() const { return id_; }
 
-PathObstacle::PathObstacle(const planning::Obstacle* obstacle)
-    : obstacle_(obstacle) {
+PathObstacle::PathObstacle(const Obstacle* obstacle) : obstacle_(obstacle) {
   CHECK_NOTNULL(obstacle);
   id_ = obstacle_->Id();
 }
@@ -167,7 +166,7 @@ bool PathObstacle::HasLongitudinalDecision() const {
          ObjectDecisionType::OBJECT_TAG_NOT_SET;
 }
 
-const planning::Obstacle* PathObstacle::Obstacle() const { return obstacle_; }
+const Obstacle* PathObstacle::obstacle() const { return obstacle_; }
 
 void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
                                            const ObjectDecisionType& decision) {
@@ -202,8 +201,8 @@ const std::string PathObstacle::DebugString() const {
   std::stringstream ss;
   ss << "PathObstacle id: " << id_;
   for (std::size_t i = 0; i < decisions_.size(); ++i) {
-    ss << " decision: " << decisions_[i].DebugString()
-       << ", made by " << decider_tags_[i];
+    ss << " decision: " << decisions_[i].DebugString() << ", made by "
+       << decider_tags_[i];
   }
   if (lateral_decision_.object_tag_case() !=
       ObjectDecisionType::OBJECT_TAG_NOT_SET) {

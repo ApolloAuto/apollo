@@ -232,7 +232,7 @@ Status StBoundaryMapper::MapWithoutDecision(const PathObstacle& path_obstacle,
 
   std::vector<STPoint> boundary_points;
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
-                                *(path_obstacle.Obstacle()), &upper_points,
+                                *(path_obstacle.obstacle()), &upper_points,
                                 &lower_points)) {
     return Status::OK();
   }
@@ -254,7 +254,7 @@ Status StBoundaryMapper::MapWithoutDecision(const PathObstacle& path_obstacle,
     }
 
     *boundary = StBoundary(boundary_points);
-    boundary->SetId(path_obstacle.Obstacle()->Id());
+    boundary->SetId(path_obstacle.obstacle()->Id());
   }
   return Status::OK();
 }
@@ -352,7 +352,7 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
 
   std::vector<STPoint> boundary_points;
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
-                                *(path_obstacle.Obstacle()), &upper_points,
+                                *(path_obstacle.obstacle()), &upper_points,
                                 &lower_points)) {
     return Status(ErrorCode::PLANNING_ERROR, "PLANNING_ERROR");
   }
@@ -387,7 +387,7 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
     double characteristic_length = 0.0;
     constexpr double kBoundaryEpsilon = 1e-3;
     if (obj_decision.has_follow()) {
-      const auto& speed = path_obstacle.Obstacle()->Perception().velocity();
+      const auto& speed = path_obstacle.obstacle()->Perception().velocity();
       const double scalar_speed = std::hypot(speed.x(), speed.y());
       const double minimal_follow_time =
           st_boundary_config_.minimal_follow_time();
@@ -435,7 +435,7 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
     }
     *boundary = StBoundary(boundary_points);
     boundary->SetBoundaryType(b_type);
-    boundary->SetId(path_obstacle.Obstacle()->Id());
+    boundary->SetId(path_obstacle.obstacle()->Id());
     boundary->SetCharacteristicLength(characteristic_length);
   }
   return Status::OK();
@@ -450,7 +450,7 @@ Status StBoundaryMapper::MapFollowDecision(
          "the object decision is follow. The current object decision is: "
       << obj_decision.DebugString();
 
-  const auto* obstacle = path_obstacle.Obstacle();
+  const auto* obstacle = path_obstacle.obstacle();
   SLPoint obstacle_sl_point;
   reference_line_.XYToSL({obstacle->Perception().position().x(),
                           obstacle->Perception().position().y()},
@@ -466,7 +466,7 @@ Status StBoundaryMapper::MapFollowDecision(
     std::string msg = common::util::StrCat(
         "Obstacle is moving opposite to the reference line. ref_point: ",
         ref_point.DebugString(), ", path obstacle:\n",
-        path_obstacle.Obstacle()->Perception().DebugString());
+        path_obstacle.obstacle()->Perception().DebugString());
     AERROR << msg;
   }
 

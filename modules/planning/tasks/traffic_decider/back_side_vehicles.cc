@@ -37,7 +37,7 @@ bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
     }
 
     const auto& bounding_box =
-        path_obstacle->Obstacle()->PerceptionBoundingBox();
+        path_obstacle->obstacle()->PerceptionBoundingBox();
     if (reference_line.HasOverlap(bounding_box) ||
         reference_line_info->IsOnLeftLane(bounding_box.center()) ||
         reference_line_info->IsOnRightLane(bounding_box.center())) {

@@ -142,7 +142,7 @@ bool TrafficDecider::MakeDestinationStopDecision() {
     AINFO << "The path obstacle is not found";
     return false;
   }
-  const auto *obstacle = path_obstacle->Obstacle();
+  const auto *obstacle = path_obstacle->obstacle();
   const auto &reference_line = reference_line_info_->reference_line();
 
   // check stop_posision on reference line
