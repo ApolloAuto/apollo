@@ -153,27 +153,27 @@ bool PathDecider::MakeStaticObstacleDecision(
       if (sl_boundary.start_l() >= 0) {
         // obstacle on the left, check RIGHT_NUDGE
         driving_width = sl_boundary.start_l() -
-            FLAGS_static_decision_nudge_l_buffer + right_width;
-        right_nudgable = (driving_width >= FLAGS_min_driving_width) ?
-            true : false;
+                        FLAGS_static_decision_nudge_l_buffer + right_width;
+        right_nudgable =
+            (driving_width >= FLAGS_min_driving_width) ? true : false;
       } else if (sl_boundary.end_l() <= 0) {
         // obstacle on the right, check LEFT_NUDGE
         driving_width = std::fabs(sl_boundary.end_l()) -
-            FLAGS_static_decision_nudge_l_buffer + left_width;
-        left_nudgable = (driving_width >= FLAGS_min_driving_width) ?
-            true : false;
+                        FLAGS_static_decision_nudge_l_buffer + left_width;
+        left_nudgable =
+            (driving_width >= FLAGS_min_driving_width) ? true : false;
       } else {
         // obstacle across the central line, decide RIGHT_NUDGE/LEFT_NUDGE
         double driving_width_left = left_width - sl_boundary.end_l() -
-            FLAGS_static_decision_nudge_l_buffer;
+                                    FLAGS_static_decision_nudge_l_buffer;
         double driving_width_right = right_width -
-            std::fabs(sl_boundary.start_l()) -
-            FLAGS_static_decision_nudge_l_buffer;
+                                     std::fabs(sl_boundary.start_l()) -
+                                     FLAGS_static_decision_nudge_l_buffer;
         if (std::max(driving_width_right, driving_width_left) >=
             FLAGS_min_driving_width) {
           // nudgable
-          left_nudgable = driving_width_left > driving_width_right ?
-              true : false;
+          left_nudgable =
+              driving_width_left > driving_width_right ? true : false;
           right_nudgable = !left_nudgable;
         }
       }
@@ -182,10 +182,18 @@ bool PathDecider::MakeStaticObstacleDecision(
         // STOP: and break
         ObjectDecisionType stop_decision;
         ObjectStop *object_stop_ptr = stop_decision.mutable_stop();
-        object_stop_ptr->set_distance_s(-FLAGS_stop_distance_obstacle);
         object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
 
-        auto stop_ref_s = sl_boundary.start_s() - FLAGS_stop_distance_obstacle;
+        const auto &vehicle_param = common::VehicleConfigHelper::instance()
+                                        ->GetConfig()
+                                        .vehicle_param();
+        constexpr double kStopBuffer = 1.0e-6;
+        auto stop_ref_s =
+            std::fmax(adc_sl_points[0].s() +
+                          vehicle_param.front_edge_to_center() + kStopBuffer,
+                      sl_boundary.start_s() - FLAGS_stop_distance_obstacle);
+        object_stop_ptr->set_distance_s(stop_ref_s - sl_boundary.start_s());
+
         auto stop_ref_point = reference_line_->get_reference_point(stop_ref_s);
         object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
         object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
