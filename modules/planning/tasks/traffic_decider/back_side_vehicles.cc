@@ -29,10 +29,10 @@ BackSideVehicles::BackSideVehicles() : TrafficRule("BackSideVehicles") {}
 bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& reference_line = reference_line_info->reference_line();
-  const auto& adc_boundary = reference_line_info->ADCBoundary();
+  const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     if (path_obstacle->perception_sl_boundary().end_s() >=
-        adc_boundary.end_s()) {
+        adc_sl_boundary.end_s()) {
       continue;
     }
 
