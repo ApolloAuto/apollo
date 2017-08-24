@@ -27,6 +27,7 @@
 #include "modules/planning/proto/decision.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -43,6 +44,8 @@ PathDecider::PathDecider() : Task("PathDecider") {}
 
 apollo::common::Status PathDecider::Execute(
     Frame *, ReferenceLineInfo *reference_line_info) {
+  Task::Execute(nullptr, reference_line_info);
+
   reference_line_ = &reference_line_info->reference_line();
   speed_data_ = &reference_line_info->speed_data();
   return Process(reference_line_info->path_data(),
@@ -183,10 +186,21 @@ bool PathDecider::MakeStaticObstacleDecision(
                                         ->GetConfig()
                                         .vehicle_param();
         constexpr double kStopBuffer = 1.0e-6;
-        auto stop_ref_s =
-            std::fmax(adc_sl_points[0].s() +
-                          vehicle_param.front_edge_to_center() + kStopBuffer,
+        const double adc_v =
+            common::VehicleState::instance()->linear_velocity();
+        const double distance_to_full_stop =
+            0.5 * (adc_v * adc_v) / std::fabs(vehicle_param.max_deceleration());
+        double stop_ref_s =
+            std::fmax(reference_line_info_->AdcSlBoundary().end_s() +
+                          distance_to_full_stop + kStopBuffer,
                       sl_boundary.start_s() - FLAGS_stop_distance_obstacle);
+
+        constexpr double kMinStopDistanceToObstacle = 1.0;
+        if (stop_ref_s + kMinStopDistanceToObstacle > sl_boundary.start_s()) {
+          stop_ref_s = std::fmax(
+              reference_line_info_->AdcSlBoundary().end_s() + kStopBuffer,
+              sl_boundary.start_s() - kMinStopDistanceToObstacle);
+        }
         object_stop_ptr->set_distance_s(stop_ref_s - sl_boundary.start_s());
 
         auto stop_ref_point = reference_line_->GetReferencePoint(stop_ref_s);
