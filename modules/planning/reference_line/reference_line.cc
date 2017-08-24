@@ -229,7 +229,11 @@ ReferencePoint ReferenceLine::interpolate(const ReferencePoint& p0,
     waypoints.emplace_back(p1_waypoint.lane, lane_s);
     p1_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
   }
-
+  if (waypoints.empty()) {
+    const double lane_s = p0_waypoint.s;
+    waypoints.emplace_back(p0_waypoint.lane, lane_s);
+    p0_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
+  }
   return ReferencePoint(hdmap::MapPathPoint({x, y}, heading, waypoints), kappa,
                         dkappa, lower_bound, upper_bound);
 }
