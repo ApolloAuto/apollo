@@ -109,6 +109,13 @@ def update(frame_number):
             obstacle_line_pool2, st_line_2,
             obstacle_annotation_pool2, planning.st_data_s.keys()[1])
     localization.replot_vehicle(vehicle_position_line, vehicle_polygon_line)
+    try:
+        ax.set_xlim(localization.localization_pb.pose.position.x - 60,
+                localization.localization_pb.pose.position.x + 60)
+        ax.set_ylim(localization.localization_pb.pose.position.y - 60,
+                localization.localization_pb.pose.position.y + 60)
+    except:
+        pass
     ax.relim()
     ax.autoscale_view()
     ax.legend(loc="upper left")
@@ -163,7 +170,7 @@ def init_line_pool(central_x, central_y):
 
 if __name__ == '__main__':
     default_map_path = os.path.dirname(os.path.realpath(__file__))
-    default_map_path += "/../../map/data/demo/base_map.xml.txt"
+    default_map_path += "/../../map/data/sunnyvale_loop/sim_map.bin"
 
     parser = argparse.ArgumentParser(
         description="plot_planning is a tool to display "
