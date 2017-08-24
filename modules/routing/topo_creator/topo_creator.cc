@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <memory>
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -24,12 +22,13 @@
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::unique_ptr<::apollo::routing::GraphCreator> creator_ptr;
-  const auto routing_map_file = apollo::hdmap::RoutingMapFile();
-  creator_ptr.reset(new ::apollo::routing::GraphCreator(
-      apollo::hdmap::BaseMapFile(), routing_map_file));
-  CHECK(creator_ptr->Create()) << "Create routing topo failed!";
-  AINFO << "Create routing topo successfully from " 
-        << apollo::hdmap::BaseMapFile();
+
+  const auto base_map = apollo::hdmap::BaseMapFile();
+  const auto routing_map = apollo::hdmap::RoutingMapFile();
+  apollo::routing::GraphCreator creator(base_map, routing_map);
+  CHECK(creator.Create()) << "Create routing topo failed!";
+
+  AINFO << "Create routing topo successfully from "
+        << base_map << " to " << routing_map;
   return 0;
 }
