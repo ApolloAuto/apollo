@@ -19,6 +19,7 @@
  **/
 
 #include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -42,7 +43,16 @@ bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
         reference_line_info->IsOnRightLane(bounding_box.center())) {
       ObjectDecisionType ignore;
       ignore.mutable_ignore();
-      path_decision->AddLateralDecision(name(), path_obstacle->Id(), ignore);
+      path_decision->AddLongitudinalDecision(name(), path_obstacle->Id(),
+                                             ignore);
+    } else if (std::fabs(path_obstacle->perception_sl_boundary().start_l()) <
+                   FLAGS_min_driving_width &&
+               std::fabs(path_obstacle->perception_sl_boundary().end_l()) <
+                   FLAGS_min_driving_width) {
+      ObjectDecisionType ignore;
+      ignore.mutable_ignore();
+      path_decision->AddLongitudinalDecision(name(), path_obstacle->Id(),
+                                             ignore);
     }
   }
   return true;
