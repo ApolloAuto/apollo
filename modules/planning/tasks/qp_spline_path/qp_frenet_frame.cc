@@ -157,7 +157,7 @@ bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
 
 bool QpFrenetFrame::MapDynamicObstacleWithDecision(
     const PathObstacle& path_obstacle) {
-  const Obstacle* ptr_obstacle = path_obstacle.Obstacle();
+  const Obstacle* ptr_obstacle = path_obstacle.obstacle();
   if (!path_obstacle.HasLateralDecision()) {
     ADEBUG << "object has no lateral decision";
     return false;
@@ -234,7 +234,7 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
 
 bool QpFrenetFrame::MapStaticObstacleWithDecision(
     const PathObstacle& path_obstacle) {
-  const auto ptr_obstacle = path_obstacle.Obstacle();
+  const auto ptr_obstacle = path_obstacle.obstacle();
   if (!path_obstacle.HasLateralDecision()) {
     ADEBUG << "obstacle has no lateral decision";
     return false;
@@ -442,7 +442,7 @@ bool QpFrenetFrame::CalculateObstacleBound() {
     if (!ptr_path_obstacle->HasLateralDecision()) {
       continue;
     }
-    if (ptr_path_obstacle->Obstacle()->IsStatic()) {
+    if (ptr_path_obstacle->obstacle()->IsStatic()) {
       if (!MapStaticObstacleWithDecision(*ptr_path_obstacle)) {
         AERROR << "mapping obstacle with id [" << ptr_path_obstacle->Id()
                << "] failed in qp frenet frame.";

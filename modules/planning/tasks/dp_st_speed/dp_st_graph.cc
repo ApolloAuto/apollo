@@ -507,7 +507,7 @@ bool DpStGraph::CreateFollowDecision(
 
   // in seconds
   constexpr double kFollowTimeBuffer = 3.0;
-  const auto& velocity = path_obstacle.Obstacle()->Perception().velocity();
+  const auto& velocity = path_obstacle.obstacle()->Perception().velocity();
   const double follow_speed =
       std::fmax(init_point_.v(), std::hypot(velocity.x(), velocity.y()));
   const double follow_distance_s =
@@ -575,7 +575,7 @@ bool DpStGraph::CreateOvertakeDecision(
   // in meters
   constexpr double kMinOvertakeDistance = 10.0;
 
-  const auto& velocity = path_obstacle.Obstacle()->Perception().velocity();
+  const auto& velocity = path_obstacle.obstacle()->Perception().velocity();
   const double obstacle_speed =
       Vec2d::CreateUnitVec2d(init_point_.path_point().theta())
           .InnerProd(Vec2d(velocity.x(), velocity.y()));

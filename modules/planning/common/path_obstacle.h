@@ -62,13 +62,13 @@ namespace planning {
 class PathObstacle {
  public:
   PathObstacle() = default;
-  explicit PathObstacle(const planning::Obstacle* obstacle);
+  explicit PathObstacle(const Obstacle* obstacle);
 
   bool Init(const ReferenceLine& reference_line);
 
   const std::string& Id() const;
 
-  const planning::Obstacle* Obstacle() const;
+  const Obstacle* obstacle() const;
 
   /**
    * return the merged lateral decision
@@ -124,7 +124,7 @@ class PathObstacle {
                                                  const ObjectDecisionType& rhs);
 
   std::string id_;
-  const planning::Obstacle* obstacle_ = nullptr;
+  const Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
   SLBoundary perception_sl_boundary_;
