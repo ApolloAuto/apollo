@@ -94,7 +94,8 @@ Status DpStSpeedOptimizer::Process(const PathData& path_data,
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
-  DpStGraph st_graph(dp_st_speed_config_, st_graph_data, veh_param, path_data);
+  DpStGraph st_graph(reference_line, dp_st_speed_config_, st_graph_data,
+                     veh_param, path_data);
   if (!st_graph.Search(path_decision, speed_data).ok()) {
     const std::string msg = "Failed to search graph with dynamic programming.";
     AERROR << msg;
