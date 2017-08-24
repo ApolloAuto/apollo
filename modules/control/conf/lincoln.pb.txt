@@ -103,14 +103,8 @@ lon_controller_conf {
     kd: 0.0
   }
   switch_speed: 2.0
-  throttle_filter_conf {
-    cutoff_freq: 10
-  }
-  brake_filter_conf {
-    cutoff_freq: 10
-  }
-  acceleration_filter_conf {
-    cutoff_freq: 5
+  pitch_angle_filter_conf {
+    cutoff_freq: 0.2
   }
   calibration_table {
     calibration {
