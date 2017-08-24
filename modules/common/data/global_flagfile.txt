@@ -7,5 +7,4 @@
 
 --vehicle_config_path=modules/common/data/mkz_config.pb.txt
 
---map_dir=modules/map/data/demo
---end_way_point_filename=default_end_way_point.txt
+#--map_dir=modules/map/data/sunnyvale_loop
