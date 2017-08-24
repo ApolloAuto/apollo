@@ -218,9 +218,8 @@ double LaneSequencePredictor::GetLaneChangeDistanceWithADC(
                          map->LaneById(obstacle_lane_id),
                          &lane_s, &lane_l)) {
     return std::fabs(lane_s - obstacle_lane_s);
-  } else {
-    return std::numeric_limits<double>::max();
   }
+  return std::numeric_limits<double>::max();
 }
 
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
