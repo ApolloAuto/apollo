@@ -22,4 +22,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${DIR}/apollo_base.sh"
 
 # run function from apollo_base.sh
-./bazel-bin/modules/routing/topo_creator/topo_creator --map_file_name=base_map.txt
+./bazel-bin/modules/routing/topo_creator/topo_creator --flagfile=modules/common/data/global_flagfile.txt -alsologtostderr
