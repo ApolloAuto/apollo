@@ -40,11 +40,6 @@ namespace prediction {
 class ContainerManager {
  public:
   /**
-   * @brief Destructor
-   */ 
-  virtual ~ContainerManager();
-
-  /**
    * @brief Container manager initialization
    * @param Adapter config
    */

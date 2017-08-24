@@ -214,9 +214,9 @@ double LaneSequencePredictor::GetLaneChangeDistanceWithADC(
 
   double lane_s = 0.0;
   double lane_l = 0.0;
-  if(map->GetProjection(adc_position_,
-                        map->LaneById(obstacle_lane_id),
-                        &lane_s, &lane_l)) {
+  if (map->GetProjection(adc_position_,
+                         map->LaneById(obstacle_lane_id),
+                         &lane_s, &lane_l)) {
     return std::fabs(lane_s - obstacle_lane_s);
   } else {
     return std::numeric_limits<double>::max();
