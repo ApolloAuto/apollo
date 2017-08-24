@@ -55,10 +55,6 @@ StBoundary::StBoundary(const std::vector<::apollo::common::math::Vec2d>& points)
   }
 }
 
-bool StBoundary::IsPointInBoundary(const StGraphPoint& st_graph_point) const {
-  return IsPointInBoundary(st_graph_point.point());
-}
-
 bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
   return IsPointIn(st_point);
 }

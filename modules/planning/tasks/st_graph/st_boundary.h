@@ -26,10 +26,9 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
-
 #include "modules/common/math/polygon2d.h"
-#include "modules/planning/tasks/st_graph/st_graph_point.h"
+#include "modules/planning/common/speed/st_point.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -56,7 +55,6 @@ class StBoundary : public common::math::Polygon2d {
   };
 
   bool IsEmpty() const { return points_.empty(); }
-  bool IsPointInBoundary(const StGraphPoint& st_graph_point) const;
   bool IsPointInBoundary(const STPoint& st_point) const;
 
   STPoint BottomLeftPoint() const;
