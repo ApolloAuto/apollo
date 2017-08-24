@@ -104,12 +104,7 @@ class LonController : public Controller {
                                  SimpleLongitudinalDebug *debug);
 
  private:
-  void SetDigitalFilterAcceleration(
-      const LonControllerConf &lon_controller_conf);
-
-  void SetDigitalFilterThrottle(const LonControllerConf &lon_controller_conf);
-
-  void SetDigitalFilterBrake(const LonControllerConf &lon_controller_conf);
+  void SetDigitalFilterPitchAngle(const LonControllerConf &lon_controller_conf);
 
   void LoadControlCalibrationTable(
       const LonControllerConf &lon_controller_conf);
@@ -134,9 +129,7 @@ class LonController : public Controller {
 
   FILE *speed_log_file_ = nullptr;
 
-  DigitalFilter digital_filter_throttle_;
-  DigitalFilter digital_filter_brake_;
-  DigitalFilter digital_filter_acceleration_;
+  DigitalFilter digital_filter_pitch_angle_;
 
   const ControlConf *control_conf_ = nullptr;
 };

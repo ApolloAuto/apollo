@@ -103,9 +103,7 @@ Status LonController::Init(const ControlConf *control_conf) {
   station_pid_controller_.Init(lon_controller_conf.station_pid_conf());
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
 
-  SetDigitalFilterAcceleration(lon_controller_conf);
-  SetDigitalFilterThrottle(lon_controller_conf);
-  SetDigitalFilterBrake(lon_controller_conf);
+  SetDigitalFilterPitchAngle(lon_controller_conf);
 
   LoadControlCalibrationTable(lon_controller_conf);
   controller_initialized_ = true;
@@ -113,26 +111,12 @@ Status LonController::Init(const ControlConf *control_conf) {
   return Status::OK();
 }
 
-void LonController::SetDigitalFilterAcceleration(
+void LonController::SetDigitalFilterPitchAngle(
     const LonControllerConf &lon_controller_conf) {
   double cutoff_freq =
-      lon_controller_conf.acceleration_filter_conf().cutoff_freq();
+      lon_controller_conf.pitch_angle_filter_conf().cutoff_freq();
   double ts = lon_controller_conf.ts();
-  SetDigitalFilter(ts, cutoff_freq, &digital_filter_acceleration_);
-}
-
-void LonController::SetDigitalFilterThrottle(
-    const LonControllerConf &lon_controller_conf) {
-  double cutoff_freq = lon_controller_conf.throttle_filter_conf().cutoff_freq();
-  double ts = lon_controller_conf.ts();
-  SetDigitalFilter(ts, cutoff_freq, &digital_filter_throttle_);
-}
-
-void LonController::SetDigitalFilterBrake(
-    const LonControllerConf &lon_controller_conf) {
-  double cutoff_freq = lon_controller_conf.brake_filter_conf().cutoff_freq();
-  double ts = lon_controller_conf.ts();
-  SetDigitalFilter(ts, cutoff_freq, &digital_filter_brake_);
+  SetDigitalFilter(ts, cutoff_freq, &digital_filter_pitch_angle_);
 }
 
 void LonController::LoadControlCalibrationTable(
@@ -231,7 +215,7 @@ Status LonController::ComputeControlCommand(
 
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
-      digital_filter_acceleration_.Filter(
+      digital_filter_pitch_angle_.Filter(
           GRA_ACC * std::sin(VehicleState::instance()->pitch()));
   debug->set_is_full_stop(false);
   if (std::abs(debug->preview_acceleration_reference()) <=
