@@ -27,7 +27,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/tasks/st_graph/st_graph_boundary.h"
+#include "modules/planning/tasks/st_graph/st_boundary.h"
 
 namespace apollo {
 namespace planning {
@@ -36,11 +36,11 @@ class StGraphData {
  public:
   StGraphData() = default;
 
-  StGraphData(const std::vector<StGraphBoundary>& st_graph_boundaries,
+  StGraphData(const std::vector<StBoundary>& st_graph_boundaries,
               const apollo::common::TrajectoryPoint& init_point,
               const SpeedLimit& speed_limit, const double path_data_length);
 
-  const std::vector<StGraphBoundary>& st_graph_boundaries() const;
+  const std::vector<StBoundary>& st_graph_boundaries() const;
 
   const apollo::common::TrajectoryPoint& init_point() const;
 
@@ -49,7 +49,7 @@ class StGraphData {
   double path_data_length() const;
 
  private:
-  std::vector<StGraphBoundary> st_graph_boundaries_;
+  std::vector<StBoundary> st_graph_boundaries_;
   apollo::common::TrajectoryPoint init_point_;
 
   SpeedLimit speed_limit_;

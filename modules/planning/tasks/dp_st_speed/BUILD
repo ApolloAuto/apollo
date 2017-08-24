@@ -14,7 +14,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:frame",
         "//modules/planning/math:double",
-        "//modules/planning/tasks/st_graph:st_graph_boundary",
+        "//modules/planning/tasks/st_graph:st_boundary",
         "//modules/planning/proto:dp_st_speed_config_proto",
     ],
 )

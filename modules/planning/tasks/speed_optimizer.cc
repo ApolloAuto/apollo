@@ -49,7 +49,7 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
 }
 
 void SpeedOptimizer::RecordSTGraphDebug(
-    const std::vector<StGraphBoundary>& boundaries,
+    const std::vector<StBoundary>& boundaries,
     const SpeedLimit& speed_limits, const SpeedData& speed_data) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";

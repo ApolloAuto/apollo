@@ -42,7 +42,7 @@ using Vec2d = apollo::common::math::Vec2d;
 
 namespace {
 
-bool CheckOverlapOnDpStGraph(const std::vector<StGraphBoundary> boundaries,
+bool CheckOverlapOnDpStGraph(const std::vector<StBoundary> boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
   for (const auto& boundary : boundaries) {
     common::math::LineSegment2d seg(p1.point(), p2.point());
@@ -135,7 +135,7 @@ Status DpStGraph::InitCostTable() {
 }
 
 void DpStGraph::CalculatePointwiseCost(
-    const std::vector<StGraphBoundary>& boundaries) {
+    const std::vector<StBoundary>& boundaries) {
   // TODO(all): extract reference line from decision first
   std::vector<STPoint> reference_points;
   double curr_t = 0.0;
@@ -533,7 +533,7 @@ bool DpStGraph::CreateFollowDecision(
 }
 
 bool DpStGraph::CreateYieldDecision(
-    const StGraphBoundary& boundary,
+    const StBoundary& boundary,
     ObjectDecisionType* const yield_decision) const {
   DCHECK_NOTNULL(yield_decision);
 
@@ -561,7 +561,7 @@ bool DpStGraph::CreateYieldDecision(
 }
 
 bool DpStGraph::CreateOvertakeDecision(
-    const PathObstacle& path_obstacle, const StGraphBoundary& boundary,
+    const PathObstacle& path_obstacle, const StBoundary& boundary,
     ObjectDecisionType* const overtake_decision) const {
   DCHECK_NOTNULL(overtake_decision);
 
@@ -631,7 +631,7 @@ double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
          dp_st_cost_.GetJerkCostByThreePoints(init_speed, first, second, third);
 }
 
-bool DpStGraph::CheckIsFollowByT(const StGraphBoundary& boundary) const {
+bool DpStGraph::CheckIsFollowByT(const StBoundary& boundary) const {
   DCHECK_EQ(boundary.points().size(), 4);
 
   if (boundary.BottomLeftPoint().s() > boundary.BottomRightPoint().s()) {

@@ -75,7 +75,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
     DCHECK(path_obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
-  std::vector<StGraphBoundary> boundaries;
+  std::vector<StBoundary> boundaries;
   if (boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).code() ==
       ErrorCode::PLANNING_ERROR) {
     return Status(ErrorCode::PLANNING_ERROR,
@@ -84,7 +84,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
 
   for (const auto& boundary : boundaries) {
     ADEBUG << "QPST mapped boundary: " << boundary.DebugString() << std::endl;
-    DCHECK(boundary.boundary_type() != StGraphBoundary::BoundaryType::UNKNOWN);
+    DCHECK(boundary.boundary_type() != StBoundary::BoundaryType::UNKNOWN);
   }
 
   SpeedLimit speed_limits;
