@@ -31,11 +31,11 @@ apollo::common::Status SpeedOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
 
-  auto ret =
-      Process(reference_line_info->path_data(), frame->PlanningStartPoint(),
-              reference_line_info->reference_line(),
-              reference_line_info->path_decision(),
-              reference_line_info->mutable_speed_data());
+  auto ret = Process(
+      reference_line_info->AdcSlBoundary(), reference_line_info->path_data(),
+      frame->PlanningStartPoint(), reference_line_info->reference_line(),
+      reference_line_info->path_decision(),
+      reference_line_info->mutable_speed_data());
   RecordDebugInfo(reference_line_info->speed_data());
   return ret;
 }
@@ -49,8 +49,8 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
 }
 
 void SpeedOptimizer::RecordSTGraphDebug(
-    const std::vector<StBoundary>& boundaries,
-    const SpeedLimit& speed_limits, const SpeedData& speed_data) {
+    const std::vector<StBoundary>& boundaries, const SpeedLimit& speed_limits,
+    const SpeedData& speed_data) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;

@@ -40,8 +40,8 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const ReferenceLine& reference_line,
-            const DpStSpeedConfig& dp_config, const StGraphData& st_graph_data,
+  DpStGraph(const SLBoundary& adc_sl_boundary, const DpStSpeedConfig& dp_config,
+            const StGraphData& st_graph_data,
             const common::VehicleParam& vehicle_param,
             const PathData& path_data);
 
@@ -50,7 +50,6 @@ class DpStGraph {
 
  private:
   apollo::common::Status InitCostTable();
-  bool InitAdcReferenceLineS();
 
   void CalculatePointwiseCost(const std::vector<StBoundary>& boundaries);
 
@@ -115,7 +114,7 @@ class DpStGraph {
                    uint32_t* highest_row, uint32_t* lowest_row);
 
  private:
-  const ReferenceLine& reference_line_;
+  const SLBoundary& adc_sl_boundary_;
 
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
@@ -142,7 +141,6 @@ class DpStGraph {
   // cost_table_[t][s]
   // row: s, col: t --- NOTICE: Please do NOT change.
   std::vector<std::vector<StGraphPoint>> cost_table_;
-  double adc_reference_line_s_ = 0.0;
 };
 
 }  // namespace planning

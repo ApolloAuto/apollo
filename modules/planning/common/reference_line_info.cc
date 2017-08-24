@@ -40,15 +40,15 @@ ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
 
 bool ReferenceLineInfo::Init() {
   const auto& box = common::VehicleState::instance()->AdcBoundingBox();
-  if (!reference_line_.GetSLBoundary(box, &adc_boundary_)) {
+  if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
   }
   return true;
 }
 
-const SLBoundary& ReferenceLineInfo::ADCBoundary() const {
-  return adc_boundary_;
+const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
+  return adc_sl_boundary_;
 }
 
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {

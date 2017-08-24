@@ -50,7 +50,8 @@ bool QpSplineStSpeedOptimizer::Init(const PlanningConfig& config) {
   return true;
 }
 
-Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
+Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
+                                         const PathData& path_data,
                                          const TrajectoryPoint& init_point,
                                          const ReferenceLine& reference_line,
                                          PathDecision* const path_decision,
@@ -67,7 +68,7 @@ Status QpSplineStSpeedOptimizer::Process(const PathData& path_data,
   }
 
   StBoundaryMapper boundary_mapper(
-      st_boundary_config_, reference_line, path_data,
+      adc_sl_boundary, st_boundary_config_, reference_line, path_data,
       qp_spline_st_speed_config_.total_path_length(),
       qp_spline_st_speed_config_.total_time());
 

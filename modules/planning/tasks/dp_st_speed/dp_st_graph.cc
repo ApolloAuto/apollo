@@ -28,7 +28,6 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/double.h"
 
@@ -39,7 +38,6 @@ using ErrorCode = apollo::common::ErrorCode;
 using SpeedPoint = apollo::common::SpeedPoint;
 using Status = apollo::common::Status;
 using VehicleParam = apollo::common::VehicleParam;
-using VehicleState = apollo::common::VehicleState;
 using Vec2d = apollo::common::math::Vec2d;
 
 namespace {
@@ -56,12 +54,12 @@ bool CheckOverlapOnDpStGraph(const std::vector<StBoundary> boundaries,
 }
 }
 
-DpStGraph::DpStGraph(const ReferenceLine& reference_line,
+DpStGraph::DpStGraph(const SLBoundary& adc_sl_boundary,
                      const DpStSpeedConfig& dp_config,
                      const StGraphData& st_graph_data,
                      const VehicleParam& vehicle_param,
                      const PathData& path_data)
-    : reference_line_(reference_line),
+    : adc_sl_boundary_(adc_sl_boundary),
       dp_st_speed_config_(dp_config),
       st_graph_data_(st_graph_data),
       vehicle_param_(vehicle_param),
@@ -77,12 +75,6 @@ Status DpStGraph::Search(PathDecision* const path_decision,
                          SpeedData* const speed_data) {
   if (!InitCostTable().ok()) {
     const std::string msg = "Initialize cost table failed.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
-  if (!InitAdcReferenceLineS()) {
-    const std::string msg = "Fail to init adc reference_line_fence_s.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -142,19 +134,6 @@ Status DpStGraph::InitCostTable() {
   }
 
   return Status::OK();
-}
-
-bool DpStGraph::InitAdcReferenceLineS() {
-  Vec2d adc_vec2d(VehicleState::instance()->pose().position().x(),
-                  VehicleState::instance()->pose().position().y());
-  common::SLPoint sl;
-  if (!reference_line_.XYToSL(adc_vec2d, &sl)) {
-    AERROR << "Fail to calculate adc init sl point. adc_vec2d: "
-           << adc_vec2d.DebugString();
-    return false;
-  }
-  adc_reference_line_s_ = sl.s();
-  return true;
 }
 
 void DpStGraph::CalculatePointwiseCost(
@@ -567,9 +546,8 @@ bool DpStGraph::CreateYieldDecision(
   const double yield_distance_s = -1.0 * kMinYieldDistance;
   yield->set_distance_s(yield_distance_s);
 
-  const double reference_line_fence_s = adc_reference_line_s_ +
-                                        vehicle_param_.front_edge_to_center() +
-                                        boundary.min_s() + yield_distance_s;
+  const double reference_line_fence_s =
+      adc_sl_boundary_.end_s() + boundary.min_s() + yield_distance_s;
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
     AERROR << "Failed to get path point from reference line s "
@@ -607,9 +585,8 @@ bool DpStGraph::CreateOvertakeDecision(
       kMinOvertakeDistance);
   overtake->set_distance_s(overtake_distance_s);
 
-  const double reference_line_fence_s = adc_reference_line_s_ +
-                                        vehicle_param_.front_edge_to_center() +
-                                        boundary.max_s() + overtake_distance_s;
+  const double reference_line_fence_s =
+      adc_sl_boundary_.end_s() + boundary.max_s() + overtake_distance_s;
 
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {

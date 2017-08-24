@@ -95,15 +95,10 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
     return nullptr;
   }
 
-  // adjust destination based on adc_front_s
-  common::SLPoint adc_sl;
-  auto &adc_position = VehicleState::instance()->pose().position();
-  reference_line.XYToSL({adc_position.x(), adc_position.y()}, &adc_sl);
-  const auto &vehicle_param =
-      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-  double adc_front_s = adc_sl.s() + vehicle_param.front_edge_to_center();
-  if (destination_sl.s() <= adc_front_s) {
-    destination_s = adc_front_s + FLAGS_destination_adjust_distance_buffer;
+  // adjust destination based on adc front s
+  if (destination_sl.s() <= reference_line_info_->AdcSlBoundary().end_s()) {
+    destination_s = reference_line_info_->AdcSlBoundary().end_s() +
+                    FLAGS_destination_adjust_distance_buffer;
   }
 
   std::unique_ptr<Obstacle> obstacle_ptr =
@@ -159,15 +154,10 @@ bool TrafficDecider::MakeDestinationStopDecision() {
   }
 
   // check stop_line_s vs adc_s. stop_line_s must be ahead of adc_front_s
-  common::SLPoint adc_sl;
-  auto &adc_position = VehicleState::instance()->pose().position();
-  reference_line.XYToSL({adc_position.x(), adc_position.y()}, &adc_sl);
-  const auto &vehicle_param =
-      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-  double adc_front_s = adc_sl.s() + vehicle_param.front_edge_to_center();
-  if (stop_line_sl.s() <= adc_front_s) {
+  if (stop_line_sl.s() <= reference_line_info_->AdcSlBoundary().end_s()) {
     ADEBUG << "skip: object:" << obstacle->Id() << " fence route_s["
-           << stop_line_sl.s() << "] behind adc_front_s[" << adc_front_s << "]";
+           << stop_line_sl.s() << "] behind adc_front_s["
+           << reference_line_info_->AdcSlBoundary().end_s() << "]";
     return false;
   }
 

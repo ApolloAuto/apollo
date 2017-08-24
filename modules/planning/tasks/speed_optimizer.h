@@ -42,7 +42,8 @@ class SpeedOptimizer : public Task {
 
  protected:
   virtual apollo::common::Status Process(
-      const PathData& path_data, const common::TrajectoryPoint& init_point,
+      const SLBoundary& adc_sl_boundary, const PathData& path_data,
+      const common::TrajectoryPoint& init_point,
       const ReferenceLine& reference_line, PathDecision* const path_decision,
       SpeedData* const speed_data) = 0;
 
