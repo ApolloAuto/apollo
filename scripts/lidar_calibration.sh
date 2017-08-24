@@ -27,13 +27,40 @@ fi
 
 cd "${APOLLO_ROOT_DIR}/data/bag"
 
+function check_bag() {
+  INFO=`rosbag info lidar_calib.bag`
+
+  # check InsStat topic
+  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/sensor/gnss/ins_stat")}'`
+  if [ ${FLAG} -eq 0 ]; then
+    echo "No InsStat topic. "
+    return 1
+  fi
+
+  # check VelodyneScan topic
+  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/sensor/velodyne64/VelodyneScanUnified")}'`
+  if [ ${FLAG} -eq 0 ]; then
+    echo "No VelodyneScan topic. "
+    return 1
+  fi
+
+  # check Relative Odometry topic
+  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/calibration/relative_odometry")}'`
+  if [ ${FLAG} -eq 0 ]; then
+    echo "No Relative Odometry topic. "
+    return 1
+  fi
+
+  return 0
+}
+
 function pack() {
-  if [ -f lidar_calib_data.tar ]; then
-    rm lidar_calib_data.tar
+  if [ -f lidar_calib_data.tar.gz ]; then
+    rm lidar_calib_data.tar.gz
   fi
   
   md5sum lidar_calib.bag > bag_md5
-  tar -cvf lidar_calib_data.tar ./lidar_calib.bag ./bag_md5 > /dev/null
+  tar -czvf lidar_calib_data.tar.gz ./lidar_calib.bag ./bag_md5 > /dev/null
 }
 
 function start_record() {
@@ -71,7 +98,13 @@ function stop_record() {
 
   sleep 1
 
-  pack
+  if check_bag; then
+    echo "Checking bag successful. Start packing. "
+    pack
+    echo "Packing done. "
+  else
+    echo "Checking bag failed. Please find the error message above. "
+  fi
 }
 
 function start_check_extrin() {
