@@ -20,11 +20,12 @@ import sys
 import itertools
 import matplotlib.pyplot as plt
 import debug_topo
-import gen.topo_graph_pb2 as topo_graph_pb2
+import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import plot_map
 
-color_iter = itertools.cycle(['navy', 'c', 'cornflowerblue', 'gold',
-                              'darkorange'])
+color_iter = itertools.cycle(
+    ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])
+
 
 def read_route(route_file_name):
     """Read route result text file"""
@@ -51,10 +52,12 @@ def plot_route(lanes, central_curve_dict):
             color = 'red'
         else:
             color = 'green'
-        debug_topo.plot_central_curve_with_s_range(central_curve_dict[lane_id],
-                                                   lane['start s'],
-                                                   lane['end s'],
-                                                   color=color)
+        mid_pt = debug_topo.plot_central_curve_with_s_range(
+            central_curve_dict[lane_id],
+            lane['start s'],
+            lane['end s'],
+            color=color)
+        debug_topo.draw_id(mid_pt, lane_id, 'y')
     plt.gca().set_aspect(1)
     plt.title('Routing result')
     plt.xlabel('x')

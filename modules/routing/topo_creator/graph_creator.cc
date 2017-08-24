@@ -34,6 +34,8 @@ using ::apollo::routing::Edge;
 using ::apollo::hdmap::LaneBoundary;
 using ::apollo::hdmap::LaneBoundaryType;
 
+using ::apollo::common::util::EndWith;
+
 namespace {
 
 bool IsAllowedToCross(const LaneBoundary& boundary) {
@@ -123,12 +125,27 @@ bool GraphCreator::Create() {
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
   }
 
-  if (!::apollo::common::util::SetProtoToASCIIFile(graph_,
-                                                   dump_topo_file_path_)) {
-    AERROR << "Failed to dump topo data into file " << dump_topo_file_path_;
+  if(!EndWith(dump_topo_file_path_, ".bin") && 
+     !EndWith(dump_topo_file_path_, ".txt")){
+    AERROR << "Failed to dump topo data into file, incorrect file type " 
+           << dump_topo_file_path_;
     return false;
   }
-  AINFO << "File is dumped successfully. Path: " << dump_topo_file_path_;
+  int type_pos = dump_topo_file_path_.find_last_of(".") + 1;
+  std::string bin_file = dump_topo_file_path_.replace(type_pos, 3, "bin");
+  std::string txt_file = dump_topo_file_path_.replace(type_pos, 3, "txt");
+  if (!::apollo::common::util::SetProtoToASCIIFile(graph_,
+                                                   txt_file)) {
+    AERROR << "Failed to dump topo data into file " << txt_file;
+    return false;
+  }
+  AINFO << "Txt file is dumped successfully. Path: " << txt_file;
+  if (!::apollo::common::util::SetProtoToBinaryFile(graph_,
+                                                   bin_file)) {
+    AERROR << "Failed to dump topo data into file " << bin_file;
+    return false;
+  }
+  AINFO << "Bin file is dumped successfully. Path: " << bin_file;
   return true;
 }
 
