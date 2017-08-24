@@ -93,10 +93,9 @@ function generate_build_targets() {
 }
 
 function generate_test_targets() {
-  #because of pcl seg fault of 1.7.2 exclude perception on debug build of test
   TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party")
   if ! $USE_ESD_CAN; then
-     TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
+    TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
 }
 
@@ -295,8 +294,6 @@ function gen_coverage() {
 function run_test() {
   START_TIME=$(get_now)
 
-  # FIXME(all): when all unit test passed, switch back.
-  # bazel test --config=unit_test -c dbg //...
   generate_test_targets
   echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
   if [ $? -eq 0 ]; then
@@ -474,7 +471,7 @@ function print_usage() {
 
   echo -e "\n${RED}Options${NONE}:
   ${BLUE}build${NONE}: run build only
-  ${BLUE}build_opt${NONE}: build optimized binary for the code (please choose this option if using perception)
+  ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}buildify${NONE}: fix style of BUILD files

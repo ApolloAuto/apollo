@@ -6,6 +6,9 @@ cc_library(
     name = "lidar_ex_checker_lib",
     srcs = ["lidar_ex_checker.cc"],
     hdrs = ["lidar_ex_checker.h"],
+    copts = [
+        "-Wno-deprecated",
+    ],
     deps = [
         "//modules/common:apollo_app",
         "//modules/common:log",
@@ -21,8 +24,8 @@ cc_library(
 cc_binary(
     name = "lidar_ex_checker",
     srcs = ["main.cc"],
-    data = [ 
-        "//modules/calibration/lidar_ex_checker/conf:lidar_ex_checker_adapter_manager_config"
+    data = [
+        "//modules/calibration/lidar_ex_checker/conf:lidar_ex_checker_adapter_manager_config",
     ],
     deps = [
         ":lidar_ex_checker_lib",
