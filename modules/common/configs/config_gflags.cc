@@ -30,3 +30,7 @@ DEFINE_string(end_way_point_filename, "default_end_way_point.txt",
 
 DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
               "the file path of vehicle config file");
+
+DEFINE_bool(use_ros_time, false,
+            "Whether Clock::Now() gets time from system_clock::now() or from "
+            "ros::Time::now().");

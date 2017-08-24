@@ -30,4 +30,6 @@ DECLARE_string(end_way_point_filename);
 
 DECLARE_string(vehicle_config_path);
 
+DECLARE_bool(use_ros_time);
+
 #endif  // MODULES_COMMON_CONFIGS_GFLAGS_H_

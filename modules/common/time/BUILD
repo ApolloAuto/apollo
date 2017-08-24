@@ -10,6 +10,7 @@ cc_library(
     deps = [
         "//modules/common:macro",
         "//modules/common:log",
+        "//modules/common/configs:config_gflags",
         "@ros//:ros_common",
     ],
 )
