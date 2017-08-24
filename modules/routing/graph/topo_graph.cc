@@ -21,13 +21,13 @@
 namespace apollo {
 namespace routing {
 
-void TopoGraph::clear() {
+void TopoGraph::Clear() {
   topo_nodes_.clear();
   topo_edges_.clear();
   node_index_map_.clear();
 }
 
-bool TopoGraph::load_nodes(const Graph& graph) {
+bool TopoGraph::LoadNodes(const Graph& graph) {
   if (graph.node_size() == 0) {
     AERROR << "No nodes found in topology graph.";
     return false;
@@ -43,7 +43,7 @@ bool TopoGraph::load_nodes(const Graph& graph) {
 }
 
 // Need to execute load_nodes() firstly
-bool TopoGraph::load_edges(const Graph& graph) {
+bool TopoGraph::LoadEdges(const Graph& graph) {
   if (graph.edge_size() == 0) {
     AINFO << "0 edges found in topology graph, but it's fine";
     return true;
@@ -59,31 +59,30 @@ bool TopoGraph::load_edges(const Graph& graph) {
     TopoNode* from_node = topo_nodes_[node_index_map_[from_lane_id]].get();
     TopoNode* to_node = topo_nodes_[node_index_map_[to_lane_id]].get();
     topo_edge.reset(new TopoEdge(edge, from_node, to_node));
-    from_node->add_out_edge(topo_edge.get());
-    to_node->add_in_edge(topo_edge.get());
+    from_node->AddOutEdge(topo_edge.get());
+    to_node->AddInEdge(topo_edge.get());
     topo_edges_.push_back(std::move(topo_edge));
   }
   return true;
 }
 
-bool TopoGraph::load_graph(const std::string& file_path) {
-  clear();
+bool TopoGraph::LoadGraph(const std::string& file_path) {
+  Clear();
 
-  ::apollo::routing::Graph graph;
+  Graph graph;
   if (!::apollo::common::util::GetProtoFromFile(file_path, &graph)) {
-    AERROR << "Failed to read topology graph from data.";
-    AERROR << "File Path: " << file_path;
+    AERROR << "Failed to read topology graph from " << file_path;
     return false;
   }
 
-  _map_version = graph.hdmap_version();
-  _map_district = graph.hdmap_district();
+  map_version_ = graph.hdmap_version();
+  map_district_ = graph.hdmap_district();
 
-  if (!load_nodes(graph)) {
+  if (!LoadNodes(graph)) {
     AERROR << "Failed to load nodes from topology graph.";
     return false;
   }
-  if (!load_edges(graph)) {
+  if (!LoadEdges(graph)) {
     AERROR << "Failed to load edges from topology graph.";
     return false;
   }
@@ -91,11 +90,11 @@ bool TopoGraph::load_graph(const std::string& file_path) {
   return true;
 }
 
-const std::string& TopoGraph::map_version() const { return _map_version; }
+const std::string& TopoGraph::MapVersion() const { return map_version_; }
 
-const std::string& TopoGraph::map_district() const { return _map_district; }
+const std::string& TopoGraph::MapDistrict() const { return map_district_; }
 
-const TopoNode* TopoGraph::get_node(const std::string& id) const {
+const TopoNode* TopoGraph::GetNode(const std::string& id) const {
   const auto& iter = node_index_map_.find(id);
   if (iter == node_index_map_.end()) {
     return nullptr;
@@ -103,7 +102,7 @@ const TopoNode* TopoGraph::get_node(const std::string& id) const {
   return topo_nodes_[iter->second].get();
 }
 
-void TopoGraph::get_nodes_by_road_id(
+void TopoGraph::GetNodesByRoadId(
     const std::string& road_id,
     std::unordered_set<const TopoNode*>* const node_in_road) const {
   const auto& iter = road_node_map_.find(road_id);

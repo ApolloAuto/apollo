@@ -36,23 +36,23 @@ class TopoGraph {
   TopoGraph() = default;
   ~TopoGraph() = default;
 
-  bool load_graph(const std::string& filename);
+  bool LoadGraph(const std::string& filename);
 
-  const std::string& map_version() const;
-  const std::string& map_district() const;
-  const TopoNode* get_node(const std::string& id) const;
-  void get_nodes_by_road_id(
+  const std::string& MapVersion() const;
+  const std::string& MapDistrict() const;
+  const TopoNode* GetNode(const std::string& id) const;
+  void GetNodesByRoadId(
       const std::string& road_id,
       std::unordered_set<const TopoNode*>* const node_in_road) const;
 
  private:
-  void clear();
-  bool load_nodes(const Graph& graph);
-  bool load_edges(const Graph& graph);
+  void Clear();
+  bool LoadNodes(const Graph& graph);
+  bool LoadEdges(const Graph& graph);
 
  private:
-  std::string _map_version;
-  std::string _map_district;
+  std::string map_version_;
+  std::string map_district_;
   std::vector<std::shared_ptr<TopoNode> > topo_nodes_;
   std::vector<std::shared_ptr<TopoEdge> > topo_edges_;
   std::unordered_map<std::string, int> node_index_map_;

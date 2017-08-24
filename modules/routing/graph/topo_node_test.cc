@@ -36,14 +36,14 @@ TEST(TopoEdgeTestSuit, basic_test) {
   const TopoNode* tn_2 = &topo_node_2;
   TopoEdge topo_edge(edge, tn_1, tn_2);
 
-  ASSERT_EQ(edge.DebugString(), topo_edge.edge().DebugString());
-  ASSERT_DOUBLE_EQ(TEST_EDGE_COST, topo_edge.cost());
-  ASSERT_EQ(TEST_L1, topo_edge.from_lane_id());
-  ASSERT_EQ(TEST_L2, topo_edge.to_lane_id());
-  ASSERT_EQ(TET_FORWARD, topo_edge.type());
+  ASSERT_EQ(edge.DebugString(), topo_edge.PbEdge().DebugString());
+  ASSERT_DOUBLE_EQ(TEST_EDGE_COST, topo_edge.Cost());
+  ASSERT_EQ(TEST_L1, topo_edge.FromLaneId());
+  ASSERT_EQ(TEST_L2, topo_edge.ToLaneId());
+  ASSERT_EQ(TET_FORWARD, topo_edge.Type());
 
-  ASSERT_EQ(tn_1, topo_edge.from_node());
-  ASSERT_EQ(tn_2, topo_edge.to_node());
+  ASSERT_EQ(tn_1, topo_edge.FromNode());
+  ASSERT_EQ(tn_2, topo_edge.ToNode());
 }
 
 }  // namespace routing
