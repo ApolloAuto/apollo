@@ -37,6 +37,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -123,14 +124,16 @@ class PathObstacle {
   static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
                                                  const ObjectDecisionType& rhs);
 
+  bool BuildStBoundary(const ReferenceLine& reference_line,
+                       const Obstacle* obstacle);
+
   std::string id_;
   const Obstacle* obstacle_ = nullptr;
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
   SLBoundary perception_sl_boundary_;
 
-  // TODO(zhangliangliang): add st_boundary_ here.
-  // StBoundary st_boundary_;
+  StBoundary st_boundary_;
 
   ObjectDecisionType lateral_decision_;
   ObjectDecisionType longitudinal_decision_;

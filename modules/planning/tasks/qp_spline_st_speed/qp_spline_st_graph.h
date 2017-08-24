@@ -34,7 +34,7 @@
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
-#include "modules/planning/tasks/st_graph/st_boundary.h"
+#include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
 
 namespace apollo {
