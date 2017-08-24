@@ -92,23 +92,11 @@ function generate_build_targets() {
   fi
 }
 
-function generate_test_targets_dbg() {
+function generate_test_targets() {
   #because of pcl seg fault of 1.7.2 exclude perception on debug build of test
-  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party" | grep -v "perception")
+  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party")
   if ! $USE_ESD_CAN; then
      TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
-  fi
-}
-
-function generate_test_targets_opt() {
-  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep "perception")
-}
-
-function generate_build_targets_caffe() {
-  BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
-    | grep -v "_cpplint$" | grep "caffe")
-  if [ $? -ne 0 ]; then
-    fail 'Build caffe failed!'
   fi
 }
 
@@ -267,14 +255,8 @@ function release() {
 
 function gen_coverage() {
   bazel clean
-  generate_test_targets_dbg
+  generate_test_targets
   echo "$TEST_TARGETS" | xargs bazel test $DEFINES -c dbg --config=coverage
-  if [ $? -ne 0 ]; then
-    fail 'run test failed!'
-  fi
-
-  generate_test_targets_opt
-  echo "$TEST_TARGETS" | xargs bazel test $DEFINES -c opt --config=coverage
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
@@ -315,16 +297,8 @@ function run_test() {
 
   # FIXME(all): when all unit test passed, switch back.
   # bazel test --config=unit_test -c dbg //...
-  generate_test_targets_dbg
+  generate_test_targets
   echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
-  if [ $? -ne 0 ]; then
-      fail "Test failed!"
-      return 1
-  fi
-
-  generate_test_targets_opt
-  build_caffe_opt
-  echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c opt --test_verbose_timeout_warnings
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -466,16 +440,6 @@ function build_velodyne() {
   rm -rf modules/.catkin_workspace
   rm -rf modules/build_isolated/
   rm -rf modules/devel_isolated/
-}
-
-function build_caffe_opt() {
-  echo "Build Caffe (opt model) ..."
-  bazel build $DEFINES -c opt @caffe//:lib
-}
-
-function build_caffe_dbg() {
-  echo "Build Caffe (dbg model) ..."
-  bazel build $DEFINES -c dbg @caffe//:lib
 }
 
 function config() {
