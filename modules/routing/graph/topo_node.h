@@ -30,12 +30,12 @@ class TopoEdge;
 
 class TopoNode {
  public:
-  explicit TopoNode(const ::apollo::routing::Node& node);
+  explicit TopoNode(const Node& node);
   explicit TopoNode(const TopoNode* topo_node);
 
   ~TopoNode();
 
-  const ::apollo::routing::Node& node() const;
+  const Node& node() const;
   double length() const;
   double cost() const;
   bool is_virtual() const;
@@ -71,7 +71,7 @@ class TopoNode {
   void set_end_s(double end_s);
 
  private:
-  ::apollo::routing::Node pb_node_;
+  Node pb_node_;
   ::apollo::common::PointENU anchor_point_;
 
   double start_s_;
@@ -102,12 +102,12 @@ enum TopoEdgeType {
 
 class TopoEdge {
  public:
-  TopoEdge(const ::apollo::routing::Edge& edge, const TopoNode* from_node,
+  TopoEdge(const Edge& edge, const TopoNode* from_node,
            const TopoNode* to_node);
 
   ~TopoEdge();
 
-  const ::apollo::routing::Edge& edge() const;
+  const Edge& edge() const;
   double cost() const;
   const std::string& from_lane_id() const;
   const std::string& to_lane_id() const;
@@ -117,7 +117,7 @@ class TopoEdge {
   const TopoNode* to_node() const;
 
  private:
-  ::apollo::routing::Edge pb_edge_;
+  Edge pb_edge_;
   const TopoNode* from_node_;
   const TopoNode* to_node_;
 };

@@ -27,7 +27,7 @@ void TopoGraph::clear() {
   node_index_map_.clear();
 }
 
-bool TopoGraph::load_nodes(const ::apollo::routing::Graph& graph) {
+bool TopoGraph::load_nodes(const Graph& graph) {
   if (graph.node_size() == 0) {
     AERROR << "No nodes found in topology graph.";
     return false;
@@ -43,7 +43,7 @@ bool TopoGraph::load_nodes(const ::apollo::routing::Graph& graph) {
 }
 
 // Need to execute load_nodes() firstly
-bool TopoGraph::load_edges(const ::apollo::routing::Graph& graph) {
+bool TopoGraph::load_edges(const Graph& graph) {
   if (graph.edge_size() == 0) {
     AINFO << "0 edges found in topology graph, but it's fine";
     return true;

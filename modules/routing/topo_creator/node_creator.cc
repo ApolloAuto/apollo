@@ -31,10 +31,6 @@ using ::apollo::hdmap::Lane;
 using ::apollo::hdmap::LaneBoundary;
 using ::apollo::hdmap::LaneBoundaryType;
 
-using ::apollo::routing::Node;
-using ::apollo::routing::Edge;
-using ::apollo::routing::CurveRange;
-
 bool IsAllowedOut(const LaneBoundaryType& type) {
   if (type.types(0) == LaneBoundaryType::DOTTED_YELLOW ||
       type.types(0) == LaneBoundaryType::DOTTED_WHITE) {
@@ -110,11 +106,11 @@ void NodeCreator::InitNodeCost(const Lane& lane, Node* const node) {
                      : 1.0;
   double cost = lane_length * ratio;
   if (lane.has_turn()) {
-    if (lane.turn() == ::apollo::hdmap::Lane::LEFT_TURN) {
+    if (lane.turn() == Lane::LEFT_TURN) {
       cost += FLAGS_left_turn_penalty;
-    } else if (lane.turn() == ::apollo::hdmap::Lane::RIGHT_TURN) {
+    } else if (lane.turn() == Lane::RIGHT_TURN) {
       cost += FLAGS_right_turn_penalty;
-    } else if (lane.turn() == ::apollo::hdmap::Lane::U_TURN) {
+    } else if (lane.turn() == Lane::U_TURN) {
       cost += FLAGS_uturn_penalty;
     }
   }

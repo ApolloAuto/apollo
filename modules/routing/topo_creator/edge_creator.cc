@@ -22,10 +22,6 @@
 namespace apollo {
 namespace routing {
 
-using ::apollo::routing::Node;
-using ::apollo::routing::Edge;
-using ::apollo::routing::CurveRange;
-
 void EdgeCreator::GetPbEdge(const Node& node_from, const Node& node_to,
                             const Edge::DirectionType& type, Edge* pb_edge) {
   InitEdgeInfo(node_from, node_to, type, pb_edge);

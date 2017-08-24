@@ -24,20 +24,17 @@ namespace routing {
 
 class EdgeCreator {
  public:
-  static void GetPbEdge(const ::apollo::routing::Node& node_from,
-                        const ::apollo::routing::Node& node_to,
-                        const ::apollo::routing::Edge::DirectionType& type,
-                        ::apollo::routing::Edge* pb_edge);
+  static void GetPbEdge(const Node& node_from, const Node& node_to,
+                        const Edge::DirectionType& type,
+                        Edge* pb_edge);
 
  private:
-  static void InitEdgeInfo(const ::apollo::routing::Node& node_from,
-                           const ::apollo::routing::Node& node_to,
-                           const ::apollo::routing::Edge::DirectionType& type,
-                           ::apollo::routing::Edge* pb_edge);
-  static void InitEdgeCost(const ::apollo::routing::Node& node_from,
-                           const ::apollo::routing::Node& node_to,
-                           const ::apollo::routing::Edge::DirectionType& type,
-                           ::apollo::routing::Edge* pb_edge);
+  static void InitEdgeInfo(const Node& node_from, const Node& node_to,
+                           const Edge::DirectionType& type,
+                           Edge* pb_edge);
+  static void InitEdgeCost(const Node& node_from, const Node& node_to,
+                           const Edge::DirectionType& type,
+                           Edge* pb_edge);
 };
 
 }  // namespace routing
