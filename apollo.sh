@@ -447,7 +447,7 @@ function link_cpu_caffe_build() {
   echo "Link CPU version of caffe.BUILD ..."
   rm -f third_party/caffe.BUILD
   cd third_party
-  ln -sf caffe_cpu.BUILD caffe.BUILD
+  cp caffe_cpu.BUILD caffe.BUILD
   cd ..
 }
 
@@ -455,7 +455,7 @@ function link_gpu_caffe_build() {
   echo "Link GPU version of caffe.BUILD ..."
   rm -f third_party/caffe.BUILD
   cd third_party
-  ln -sf caffe_gpu.BUILD caffe.BUILD
+  cp caffe_gpu.BUILD caffe.BUILD
   cd ..
   source /etc/profile
 }
@@ -472,7 +472,7 @@ function print_usage() {
   echo -e "\n${RED}Options${NONE}:
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
-  ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
+  ${BLUE}build_gpu${NONE}: build binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
@@ -507,9 +507,9 @@ function main() {
     build_opt)
       apollo_build_opt
       ;;
-    build_opt_gpu)
+    build_gpu)
       link_gpu_caffe_build
-      apollo_build_opt
+      apollo_build_dbg
       ;;
     build_fe)
       build_fe
