@@ -14,10 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <pcl/io/pcd_io.h>
-#include <pcl/visualization/cloud_viewer.h>
+#include "pcl/io/pcd_io.h"
+#include "pcl/visualization/cloud_viewer.h"
 #include "pcl_conversions/pcl_conversions.h"
+#include "eigen_conversions/eigen_msg.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "tf2_ros/transform_listener.h"
 #include "yaml-cpp/yaml.h"
 
 #include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
@@ -46,13 +48,8 @@ Status LidarExChecker::Init() {
 
   cloud_count_ = FLAGS_capture_cloud_count;
   capture_distance_ = FLAGS_capture_distance;
-  extrin_file_ = FLAGS_velodyne64_extrinsics_path;
 
   position_type_ = 0;
-
-  if (!LoadExtrinsics()) {
-    return Status::OK();
-  }
 
   AdapterManager::Init(FLAGS_adapter_config_path);
 
@@ -65,29 +62,33 @@ Status LidarExChecker::Init() {
   return Status::OK();
 }
 
-bool LidarExChecker::LoadExtrinsics() {
-  ifstream fi(extrin_file_.c_str());
-  if (!fi.good()) {
-    std::cerr << "Fail to open extrinsics file: " << extrin_file_ << std::endl;
+bool LidarExChecker::GetExtrinsics() {
+  static tf2_ros::Buffer tf2_buffer;                                                                                                       
+  static tf2_ros::TransformListener tf2Listener(tf2_buffer);
+
+  std::string err_msg;
+
+  if (!tf2_buffer.canTransform("novatel", "velodyne64", ros::Time(0),
+                               ros::Duration(100), &err_msg)) {
+    std::cerr << "Fail to get velodyne64 extrinsics for tf" << std::endl;
     return false;
   }
 
-  YAML::Node node = YAML::LoadFile(extrin_file_);
+  geometry_msgs::TransformStamped transform_stamped;
+  transform_stamped = tf2_buffer.lookupTransform("novatel", "velodyne64", ros::Time(0));
+  tf::transformMsgToEigen(transform_stamped.transform, extrinsics_);
 
-  Eigen::Quaterniond rotation(node["transform"]["rotation"]["w"].as<double>(),
-                              node["transform"]["rotation"]["x"].as<double>(),
-                              node["transform"]["rotation"]["y"].as<double>(),
-                              node["transform"]["rotation"]["z"].as<double>());
-  Eigen::Translation3d translation(
-      node["transform"]["translation"]["x"].as<double>(),
-      node["transform"]["translation"]["y"].as<double>(),
-      node["transform"]["translation"]["z"].as<double>());
-  extrinsics_ = translation * rotation;
+  std::cout << "velodyne64 extrinsics: " << std::endl;
+  std::cout << extrinsics_.matrix() << std::endl;
 
   return true;
 }
 
 void LidarExChecker::VisualizeClouds() {
+  if (!GetExtrinsics()) {
+    return;
+  }
+
   boost::shared_ptr<pcl::visualization::PCLVisualizer> pcl_vis;
   pcl_vis.reset(new pcl::visualization::PCLVisualizer("3D Viewer"));
   for (uint32_t i = 0; i < clouds_.size(); ++i) {
