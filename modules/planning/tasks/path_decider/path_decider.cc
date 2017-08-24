@@ -71,10 +71,6 @@ bool PathDecider::MakeObjectDecision(const PathData &path_data,
 
 bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, PathDecision *const path_decision) {
-  if (!FLAGS_enable_nudge_decision) {
-    return true;
-  }
-
   DCHECK_NOTNULL(path_decision);
   std::vector<common::SLPoint> adc_sl_points;
   std::vector<common::math::Box2d> adc_bounding_box;
@@ -180,8 +176,7 @@ bool PathDecider::MakeStaticObstacleDecision(
 
       if (!left_nudgable && !right_nudgable) {
         // STOP: and break
-        ObjectDecisionType stop_decision;
-        ObjectStop *object_stop_ptr = stop_decision.mutable_stop();
+        ObjectStop *object_stop_ptr = object_decision.mutable_stop();
         object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
 
         const auto &vehicle_param = common::VehicleConfigHelper::instance()
@@ -198,13 +193,15 @@ bool PathDecider::MakeStaticObstacleDecision(
         object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
         object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
         object_stop_ptr->set_stop_heading(stop_ref_point.heading());
-        path_decision->AddLongitudinalDecision("DpRoadGraph", obstacle->Id(),
-                                               stop_decision);
 
         has_stop = true;
         break;
       } else {
         // NUDGE: and continue to check potential STOP along the ref line
+        if (!FLAGS_enable_nudge_decision) {
+          continue;
+        }
+
         if (!object_decision.has_nudge()) {
           ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
           if (left_nudgable) {
@@ -219,8 +216,14 @@ bool PathDecider::MakeStaticObstacleDecision(
         }
       }
     }
-    if (!has_stop) {
-      path_decision->AddLateralDecision("DpRoadGraph", obstacle->Id(),
+
+    if (has_stop) {
+      // STOP
+      path_decision->AddLongitudinalDecision("PathDecider", obstacle->Id(),
+                                             object_decision);
+    } else {
+      // NUDGE / IGNORE
+      path_decision->AddLateralDecision("PathDecider", obstacle->Id(),
                                         object_decision);
     }
   }
