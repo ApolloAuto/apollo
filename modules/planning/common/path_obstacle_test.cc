@@ -339,6 +339,18 @@ TEST(PathObstacleTest, add_decision_test) {
     EXPECT_FALSE(path_obstacle.HasLongitudinalDecision());
   }
 
+  // Ignore
+  {
+    PathObstacle path_obstacle;
+    ObjectDecisionType decision;
+    decision.mutable_ignore();
+    path_obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(path_obstacle.HasLateralDecision());
+    EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(path_obstacle.LateralDecision().has_ignore());
+    EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_ignore());
+  }
+
   // stop and ignore
   {
     PathObstacle path_obstacle;
