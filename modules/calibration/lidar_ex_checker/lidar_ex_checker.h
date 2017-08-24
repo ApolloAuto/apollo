@@ -53,8 +53,8 @@ class LidarExChecker : public apollo::common::ApolloApp {
   void Stop() override;
 
  private:
-  // load extrinsics which are calibrated before
-  bool LoadExtrinsics();
+  // get extrinsics which are calibrated before
+  bool GetExtrinsics();
   // visualize the checking result
   void VisualizeClouds();
 
@@ -87,8 +87,6 @@ class LidarExChecker : public apollo::common::ApolloApp {
   uint32_t cloud_count_;
   // the distance between two clouds
   double capture_distance_;
-  // the extrinsics file path of lidar
-  std::string extrin_file_;
 
   // latest INS status
   uint32_t position_type_;

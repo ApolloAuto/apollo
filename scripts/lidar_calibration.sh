@@ -81,10 +81,10 @@ function start_check_extrin() {
   # check if the module has started
   NUM_PROCESSES="$(pgrep -c -f "modules/calibration/${MODULE}")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
+    echo "Start program, Ctrl+C to exit."
     eval "${APOLLO_BIN_PREFIX}/modules/calibration/${MODULE}/${MODULE} \
       --flagfile=${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/conf/${MODULE}.conf \
       --log_dir=${APOLLO_ROOT_DIR}/data/log $@ 2>${LOG}"
-    echo "Program started, Ctrl+C to exit."
   fi
 }
 
