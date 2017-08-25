@@ -44,6 +44,14 @@ TEST_F(ConfigManagerTest, test_Init) {
   EXPECT_EQ(config_manager_->NumModels(), 3u);
 }
 
+TEST_F(ConfigManagerTest, test_Reset) {
+  EXPECT_TRUE(config_manager_->Reset());
+  std::string wrong_root = "wrong_root";
+  config_manager_->SetWorkRoot(wrong_root);
+  EXPECT_FALSE(config_manager_->Reset());
+  config_manager_->SetWorkRoot(FLAGS_work_root);
+}
+
 TEST_F(ConfigManagerTest, test_GetModelConfig) {
   std::string model_name = "ROIFilterTest";
   const ModelConfig* model_config = NULL;
@@ -104,6 +112,11 @@ TEST_F(ConfigManagerTest, test_ModelConfig) {
   EXPECT_TRUE(model_config->GetValue("array_p4", &double_list));
   EXPECT_EQ(double_list.size(), 4u);
   EXPECT_EQ(double_list[2], 1.3);
+
+  std::vector<float> float_list;
+  EXPECT_TRUE(model_config->GetValue("array_float", &float_list));
+  EXPECT_EQ(float_list.size(), 4u);
+  EXPECT_FLOAT_EQ(float_list[2], 2.3);
 
   std::vector<bool> bool_list;
   EXPECT_TRUE(model_config->GetValue("array_bool", &bool_list));
