@@ -29,24 +29,34 @@ namespace planning {
 
 using Vec2d = common::math::Vec2d;
 
-StBoundary::StBoundary(const std::vector<STPoint>& points)
-    : Polygon2d(std::vector<Vec2d>(points.begin(), points.end())) {
-  for (const auto& point : points) {
-    min_s_ = std::fmin(min_s_, point.s());
-    min_t_ = std::fmin(min_t_, point.t());
-    max_s_ = std::fmax(max_s_, point.s());
-    max_t_ = std::fmax(max_t_, point.t());
-  }
-}
+StBoundary::StBoundary(
+    const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
+  CHECK(IsValid(point_pairs));
 
-StBoundary::StBoundary(const std::vector<::apollo::common::math::Vec2d>& points)
-    : Polygon2d(points) {
-  for (const auto& point : points) {
+  for (size_t i = 0; i < point_pairs.size(); ++i) {
+    upper_points_.emplace_back(point_pairs[i].first.t(),
+                               point_pairs[i].first.s());
+    lower_points_.emplace_back(point_pairs[i].second.t(),
+                               point_pairs[i].second.s());
+  }
+  points_.reserve(upper_points_.size() + lower_points_.size());
+  points_.insert(points_.end(), lower_points_.begin(), lower_points_.end());
+  points_.insert(points_.end(), upper_points_.rbegin(), upper_points_.rend());
+
+  BuildFromPoints();
+
+  for (const auto& point : points_) {
     min_s_ = std::fmin(min_s_, point.y());
     min_t_ = std::fmin(min_t_, point.x());
     max_s_ = std::fmax(max_s_, point.y());
     max_t_ = std::fmax(max_t_, point.x());
   }
+}
+
+bool StBoundary::IsValid(
+    const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
+  // TODO(Liangliang): implement this function.
+  return true;
 }
 
 bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
@@ -55,22 +65,22 @@ bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
 
 STPoint StBoundary::BottomLeftPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
-  return STPoint(points_.at(0).y(), points_.at(0).x());
+  return STPoint(lower_points_.front());
 }
 
 STPoint StBoundary::BottomRightPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
-  return STPoint(points_.at(1).y(), points_.at(1).x());
+  return STPoint(lower_points_.back());
 }
 
 STPoint StBoundary::TopRightPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
-  return STPoint(points_.at(2).y(), points_.at(2).x());
+  return STPoint(upper_points_.back());
 }
 
 STPoint StBoundary::TopLeftPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
-  return STPoint(points_.at(3).y(), points_.at(3).x());
+  return STPoint(upper_points_.front());
 }
 
 StBoundary::BoundaryType StBoundary::boundary_type() const {
