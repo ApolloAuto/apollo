@@ -336,101 +336,31 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
 
 void ObjectTrack::SmoothTrackOrientation() {
   // Smooth orientation over track history
-  float cur_speed = current_object_->velocity.head(2).norm();
-  Eigen::Vector3f cur_obj_dir = current_object_->direction;
-  cur_obj_dir.normalize();
-  Eigen::Vector3f cur_motion_dir = current_object_->velocity;
-  cur_motion_dir.normalize();
-
-  TrackedObjectPtr previous_obj = history_objects_.back();
-  Eigen::Vector3f previous_motion_dir = previous_obj->velocity;
-  previous_motion_dir.normalize();
-  Eigen::Vector3f previous_dir = previous_obj->direction;
-
-  double acceleration = (current_object_->velocity -
-          previous_obj->velocity).head(2).norm();
-  double w_vel = pow(10, std::min(12.0f, cur_speed - 1));
-
-  double motion_confidence = 1;
-
-  if (age_ > 1 && acceleration > 50) {
-    motion_confidence = 0.01;
-    w_vel = motion_confidence;
-  }
-
-  if (cur_speed > 1.0f) {
-    float dot_val_00 = cur_obj_dir[0] * cur_motion_dir[0] + cur_obj_dir[1] *
-      cur_motion_dir[1];
-    float dot_val_01 = cur_obj_dir[0] * cur_motion_dir[1] - cur_obj_dir[1] *
-      cur_motion_dir[0];
-    if (fabs(dot_val_00) >= fabs(dot_val_01)) {
-      if (dot_val_00 < 0) {
-        cur_obj_dir = -cur_obj_dir;
-      }
-    } else {
-      if (dot_val_01 < 0) {
-        cur_obj_dir = Eigen::Vector3f(cur_obj_dir[1], -cur_obj_dir[0], 0);
-      } else {
-        cur_obj_dir = Eigen::Vector3f(-cur_obj_dir[1], cur_obj_dir[0], 0);
-      }
-    }
-  }
-
-  Eigen::Vector3f obs_dir = cur_obj_dir + cur_motion_dir * w_vel;
-  obs_dir.normalize();
-  if (cur_speed > 2.0f) {
-    float dot_val_00 = obs_dir[0] * previous_dir[0] + obs_dir[1] *
-      previous_dir[1];
-    float dot_val_01 = obs_dir[0] * previous_dir[1] - obs_dir[1] *
-      previous_dir[0];
-    if (fabs(dot_val_00) >= fabs(dot_val_01)) {
-      if (dot_val_00 < 0) {
-        previous_dir = -previous_dir;
-      }
-    } else {
-      if (dot_val_01 > 0) {
-        previous_dir = Eigen::Vector3f(previous_dir[1], -previous_dir[0], 0);
-      } else {
-        previous_dir = Eigen::Vector3f(-previous_dir[1], previous_dir[0], 0);
-      }
-    }
+  TrackedObjectPtr previous_object = history_objects_.back();
+  Eigen::Vector3f previous_dir = previous_object->direction;
+  Eigen::Vector3f current_dir = current_object_->direction;
+  float previous_speed = previous_object->velocity.head(2).norm();
+  float current_speed = current_object_->velocity.head(2).norm();
+  if (current_speed > 1.0f) {
+    current_dir = current_object_->velocity;
   } else {
-    float dot_val_00 = obs_dir[0] * previous_dir[0] + obs_dir[1] *
-      previous_dir[1];
-    float dot_val_01 = obs_dir[0] * previous_dir[1] - obs_dir[1] *
-      previous_dir[0];
-    if (fabs(dot_val_00) >= fabs(dot_val_01)) {
-      if (dot_val_00 < 0) {
-        obs_dir = -obs_dir;
-      }
-    } else {
-      if (dot_val_01 > 0) {
-        obs_dir = Eigen::Vector3f(obs_dir[1], -obs_dir[0], 0);
-      } else {
-        obs_dir = Eigen::Vector3f(-obs_dir[1], obs_dir[0], 0);
-      }
+    ComputeMostConsistentBboxDirection(previous_dir, &current_dir);
+    float previous_weight = 1.0;
+    if (previous_speed + current_speed > FLT_EPSILON) {
+      previous_weight = (previous_speed + 1) / (previous_speed + current_speed + 1);
     }
+    current_dir = previous_weight * previous_dir + (1 - previous_weight) * current_dir;
   }
-
-  Eigen::Vector3f result_dir = previous_dir + obs_dir * w_vel;
-  if (result_dir.norm() < FLT_EPSILON) {
-    result_dir = previous_dir;
-  }
-  result_dir.normalize();
-
-  Eigen::Vector3d bk_size = current_object_->size.cast<double>();
-
+  current_dir(2) = 0;
+  current_dir.normalize();
   Eigen::Vector3d new_size;
   Eigen::Vector3d new_center;
   compute_bbox_size_center_xy<pcl_util::Point>(
     current_object_->object_ptr->cloud,
-    result_dir.cast<double>(), new_size, new_center);
-
-  if (new_size[0] * new_size[1] < 1.2 * bk_size[0] * bk_size[1]) {
-    current_object_->direction = result_dir;
-    current_object_->center = new_center.cast<float>();
-    current_object_->size = new_size.cast<float>();
-  }
+    current_dir.cast<double>(), new_size, new_center);
+  current_object_->direction = current_dir;
+  current_object_->center = new_center.cast<float>();
+  current_object_->size = new_size.cast<float>();
 }
 
 void ObjectTrack::SmoothTrackClassIdx() {

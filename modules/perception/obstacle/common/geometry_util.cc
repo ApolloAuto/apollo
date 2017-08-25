@@ -72,62 +72,22 @@ double vector_cos_theta_2d_xy(Eigen::Vector4f& v1, Eigen::Vector4f& v2) {
     return cos_theta;                                                                               
 }       
 
- float dist_xy_to_bbox(const Eigen::Vector3f& center, const Eigen::Vector3f& dir,                    
-    const Eigen::Vector3f& size, const Eigen::Vector3f& point) {                                    
-                                                                                                
-    Eigen::Vector3f dir2d(dir[0], dir[1], 0);                                                       
-    dir2d.normalize();                                                                              
-    Eigen::Vector3f diff = point - center;                                                          
-    float dx = std::max<float>(0.0f, fabs(dir2d.dot(diff)) - size[0] / 2);                          
-                                                                                                
-    Eigen::Vector3f odir(-dir2d[1], dir2d[0], 0);                                                   
-    float dy = std::max<float>(0.0f, fabs(odir.dot(diff)) - size[1] / 2);                           
-                                                                                                
-    return sqrt(dx*dx + dy*dy);                                                                     
-}     
-
-void max_min_distance_xy_bbox_to_bbox(const Eigen::Vector3f& center0, const Eigen::Vector3f& dir0,  
-    const Eigen::Vector3f& size0, const Eigen::Vector3f& center1,                                   
-    const Eigen::Vector3f& dir1, const Eigen::Vector3f& size1,                                      
-    float& max_dist, float& min_dist) {                                                             
-                                                                                                
-    max_dist = 0;                                                                                   
-    min_dist = 9999999;                                                                             
-    float cx[4] = {-1, 1, -1, 1};                                                                   
-    float cy[4] = {-1, -1, 1, 1};                                                                   
-    Eigen::Vector3f dir0_2d(dir0[0], dir0[1], 0);                                                   
-    dir0_2d.normalize();                                                                            
-    Eigen::Vector3f odir0(-dir0_2d[1], dir0_2d[0], 0);                                              
-                                                                                                
-    Eigen::Vector3f dir1_2d(dir1[0], dir1[1], 0);                                                   
-    dir1_2d.normalize();                                                                            
-    Eigen::Vector3f odir1(-dir1_2d[1], -dir1_2d[0], 0);                                             
-    float hl = size1[0] / 2;                                                                        
-    float hw = size1[1] / 2;                                                                        
-    for (int i = 0; i < 4; i++) {                                                                   
-        Eigen::Vector3f diff = center0 + dir0_2d * cx[i] * size0[0] / 2                             
-            + odir0 * cy[i] * size0[1] / 2 - center1;                                               
-        float dx = fabs(diff.dot(dir1_2d));                                                         
-        float dist = 0;                                                                             
-        if (dx > hl) {                                                                              
-            dist = dx - hl;                                                                         
-        }                                                                                           
-                                                                                                
-        float dy = fabs(diff.dot(odir1));                                                           
-        if (dy > hw) {                                                                              
-            if (dist < dy - hw) {                                                                   
-                dist = dy - hw;                                                                     
-            }                                                                                       
-        }                                                                                           
-                                                                                                
-        if (max_dist < dist) {                                                                      
-            max_dist = dist;                                                                        
-        }                                                                                           
-        if (min_dist > dist) {                                                                      
-            min_dist = dist;                                                                        
-        }                                                                                           
-    }                                                                                               
-}               
+void ComputeMostConsistentBboxDirection(const Eigen::Vector3f& previous_dir,
+  Eigen::Vector3f* current_dir) {
+  float dot_val_00 = previous_dir(0) * (*current_dir)(0) + previous_dir(1) * (*current_dir)(1);
+  float dot_val_01 = previous_dir(0) * (*current_dir)(1) - previous_dir(1) * (*current_dir)(0);
+  if (fabs(dot_val_00) >= fabs(dot_val_01)) {
+    if (dot_val_00 < 0) {
+      (*current_dir) = -(*current_dir);
+    }
+  } else {
+    if (dot_val_01 < 0) {
+      (*current_dir) = Eigen::Vector3f((*current_dir)(1), -(*current_dir)(0), 0);
+    } else {
+      (*current_dir) = Eigen::Vector3f(-(*current_dir)(1), (*current_dir)(0), 0);
+    }
+  }
+}
 
 //compute the angle of two vector                                                                   
 double vector_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {                               

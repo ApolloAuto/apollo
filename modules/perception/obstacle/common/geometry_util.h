@@ -185,18 +185,8 @@ void TransformCloud(pcl_util::PointCloudPtr cloud, std::vector<int> indices,
 double vector_cos_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
 double vector_cos_theta_2d_xy(Eigen::Vector4f& v1, Eigen::Vector4f& v2);
 double vector_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
-
-void max_min_distance_xy_bbox_to_bbox(const Eigen::Vector3f& center0,
-                                      const Eigen::Vector3f& dir0,
-                                      const Eigen::Vector3f& size0,
-                                      const Eigen::Vector3f& center1,
-                                      const Eigen::Vector3f& dir1,
-                                      const Eigen::Vector3f& size1,
-                                      float& max_dist, float& min_dist);
-
-float dist_xy_to_bbox(const Eigen::Vector3f& center, const Eigen::Vector3f& dir,
-                      const Eigen::Vector3f& size,
-                      const Eigen::Vector3f& point);
+void ComputeMostConsistentBboxDirection(const Eigen::Vector3f& previous_dir,
+        Eigen::Vector3f* current_dir);
 
 template <typename VectorIn, typename MatrixOut>
 MatrixOut vector_rot_mat_2d_xy(VectorIn& v1, VectorIn& v2) {
