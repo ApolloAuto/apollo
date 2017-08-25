@@ -17,6 +17,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "mobileye_message_manager",
+    srcs = [
+    ],
+    hdrs = [
+        "mobileye_message_manager.h",
+    ],
+    deps = [
+        "sensor_message_manager_base",
+        "//modules/drivers/mobileye/protocol:drivers_mobileye_protocol",
+    ],
+)
+
 cc_test(
     name = "sensor_protocol_data_test",
     size = "small",
@@ -39,6 +52,18 @@ cc_test(
         "//modules/drivers:sensor_message_manager_base",
         "//modules/drivers/proto:sensor_proto",
 	    "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "mobileye_message_manager_test",
+    size = "small",
+    srcs = [
+        "mobileye_message_manager_test.cc",
+    ],
+    deps = [
+        "mobileye_message_manager",
+        "@gtest//:main",
     ],
 )
 
