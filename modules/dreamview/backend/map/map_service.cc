@@ -130,7 +130,9 @@ MapElementIds MapService::CollectMapElementIds(const PointENU &point,
   MapElementIds result;
 
   std::vector<LaneInfoConstPtr> lanes;
-  sim_map_.GetLanes(point, radius, &lanes);
+  if (sim_map_.GetLanes(point, radius, &lanes) != 0) {
+    AERROR << "Fail to get lanes from sim_map_.";
+  };
   ExtractIds(lanes, &result.lane);
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;
