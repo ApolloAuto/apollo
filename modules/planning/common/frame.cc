@@ -117,7 +117,8 @@ bool Frame::InitReferenceLineInfo(
   return true;
 }
 
-bool Frame::Init(const PlanningConfig &config) {
+bool Frame::Init(const PlanningConfig &config,
+                 const double current_time_stamp) {
   if (!pnc_map_) {
     AERROR << "map is null, call SetMap() first";
     return false;
@@ -136,6 +137,7 @@ bool Frame::Init(const PlanningConfig &config) {
     return false;
   }
 
+  AlignPredictionTime(current_time_stamp);
   if (FLAGS_enable_prediction) {
     CreatePredictionObstacles(prediction_);
   }
@@ -222,14 +224,16 @@ void Frame::RecordInputDebug() {
 }
 
 void Frame::AlignPredictionTime(const double trajectory_header_time) {
+  ADEBUG << "planning header: " << std::to_string(trajectory_header_time);
   double prediction_header_time = prediction_.header().timestamp_sec();
+  ADEBUG << "prediction header: " << std::to_string(prediction_header_time);
 
-  for (int i = 0; i < prediction_.prediction_obstacle_size(); i++) {
+  for (int i = 0; i < prediction_.prediction_obstacle_size(); ++i) {
     prediction::PredictionObstacle *obstacle =
         prediction_.mutable_prediction_obstacle(i);
-    for (int j = 0; j < obstacle->trajectory_size(); j++) {
+    for (int j = 0; j < obstacle->trajectory_size(); ++j) {
       prediction::Trajectory *trajectory = obstacle->mutable_trajectory(j);
-      for (int k = 0; k < trajectory->trajectory_point_size(); k++) {
+      for (int k = 0; k < trajectory->trajectory_point_size(); ++k) {
         common::TrajectoryPoint *point =
             trajectory->mutable_trajectory_point(k);
         double abs_relative_time = point->relative_time();
