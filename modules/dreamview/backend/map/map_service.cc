@@ -131,29 +131,39 @@ MapElementIds MapService::CollectMapElementIds(const PointENU &point,
 
   std::vector<LaneInfoConstPtr> lanes;
   if (sim_map_.GetLanes(point, radius, &lanes) != 0) {
-    AERROR << "Fail to get lanes from sim_map_.";
+    AERROR << "Fail to get lanes from sim_map.";
   };
   ExtractIds(lanes, &result.lane);
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;
-  sim_map_.GetCrosswalks(point, radius, &crosswalks);
+  if (sim_map_.GetCrosswalks(point, radius, &crosswalks) != 0) {
+    AERROR << "Fail to get crosswalks from sim_map.";
+  }
   ExtractIds(crosswalks, &result.crosswalk);
 
   std::vector<JunctionInfoConstPtr> junctions;
-  sim_map_.GetJunctions(point, radius, &junctions);
+  if (sim_map_.GetJunctions(point, radius, &junctions) != 0) {
+    AERROR << "Fail to get junctions from sim_map.";
+  }
   ExtractIds(junctions, &result.junction);
 
   std::vector<SignalInfoConstPtr> signals;
-  sim_map_.GetSignals(point, radius, &signals);
+  if (sim_map_.GetSignals(point, radius, &signals) != 0) {
+    AERROR << "Failed to get signals from sim_map.";
+  }
   ExtractIds(signals, &result.signal);
   ExtractOverlapIds(signals, &result.overlap);
 
   std::vector<StopSignInfoConstPtr> stop_signs;
-  sim_map_.GetStopSigns(point, radius, &stop_signs);
+  if (sim_map_.GetStopSigns(point, radius, &stop_signs) != 0) {
+    AERROR << "Failed to get stop signs from sim_map.";
+  }
   ExtractIds(stop_signs, &result.stop_sign);
 
   std::vector<YieldSignInfoConstPtr> yield_signs;
-  sim_map_.GetYieldSigns(point, radius, &yield_signs);
+  if (sim_map_.GetYieldSigns(point, radius, &yield_signs) != 0) {
+    AERROR << "Failed to get yield signs from sim_map.";
+  }
   ExtractIds(yield_signs, &result.yield);
 
   return result;
