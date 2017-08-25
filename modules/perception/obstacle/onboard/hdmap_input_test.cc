@@ -40,7 +40,7 @@ TEST(HDMapInputTest, test_GetROI) {
       587054.96336391149, 4141606.3593586856, 0.0};
   EXPECT_FALSE(hdmap_input->GetROI(velodyne_pose_world, &hdmap));
   FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
-  FLAGS_base_map_filename = "base_map.xml.txt";
+  FLAGS_base_map_filename = "base_map.xml";
   EXPECT_TRUE(hdmap_input->Init());
   EXPECT_TRUE(hdmap_input->GetROI(velodyne_pose_world, &hdmap));
   EXPECT_TRUE(hdmap != nullptr);

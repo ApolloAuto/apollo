@@ -62,12 +62,12 @@ bool CNNSegmentation::Init() {
   caffe_net_.reset(new caffe::Net<float>(proto_file, caffe::TEST));
   caffe_net_->CopyTrainedLayersFrom(weight_file);
 
-  AERROR << "confidence threshold = "<<cnnseg_param_.confidence_thresh();
+  AINFO << "confidence threshold = "<<cnnseg_param_.confidence_thresh();
   
 #ifdef CPU_ONLY  
-  AERROR << "using Caffe CPU mode";
+  AINFO << "using Caffe CPU mode";
 #else
-  AERROR << "using Caffe GPU mode";
+  AINFO << "using Caffe GPU mode";
 #endif    
 
   /// set related Caffe blobs
@@ -151,7 +151,7 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
 
   tot_time_ = feat_time_ + network_time_ + clust_time_ + post_time_;
 
-  AERROR
+  AINFO
       << "Total runtime: " << tot_time_ << "ms\t"
       << "  Feature generation: " << feat_time_ << "ms\t"
       << "  CNN forward: " << network_time_ << "ms\t"
