@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <limits>
+#include <vector>
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
-
-//#include "lib/base/config.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/common/convex_hullxy.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
@@ -49,9 +49,9 @@ bool MinBoxObjectBuilder::Build(
 
 double MinBoxObjectBuilder::ComputeAreaAlongOneEdge(
         ObjectPtr obj,
-        size_t first_in_point, 
-        Eigen::Vector3d& center,
-        double& lenth, double& width, Eigen::Vector3d& dir) {
+        size_t first_in_point,
+        Eigen::Vector3d* center,
+        double* lenth, double* width, Eigen::Vector3d* dir) {
     std::vector<Eigen::Vector3d> ns;
     Eigen::Vector3d v(0.0, 0.0, 0.0);
     Eigen::Vector3d vn(0.0, 0.0, 0.0);
@@ -74,8 +74,10 @@ double MinBoxObjectBuilder::ComputeAreaAlongOneEdge(
             a[0] = obj->polygon.points[index].x;
             a[1] = obj->polygon.points[index].y;
             a[2] = 0;
-            double k = ((a[0] - o[0]) * (b[0] - a[0]) + (a[1] - o[1]) * (b[1] - a[1]));
-            k = k / ((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]));
+            double k = ((a[0] - o[0]) * (b[0] - a[0]) +
+                         (a[1] - o[1]) * (b[1] - a[1]));
+            k = k / ((b[0] - a[0]) * (b[0] - a[0]) +
+                    (b[1] - a[1]) * (b[1] - a[1]));
             k = k * -1;
             // n is pedal of src
             n[0] = (b[0] - a[0]) * k + a[0];
@@ -106,7 +108,8 @@ double MinBoxObjectBuilder::ComputeAreaAlongOneEdge(
         for (size_t j = i + 1; j < ns.size(); ++j) {
             Eigen::Vector3d p2 = ns[j];
             double dist =
-                    sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]));
+                    sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) +
+                         (p1[1] - p2[1]) * (p1[1] - p2[1]));
             if (dist > len) {
                 len = dist;
                 point_num1 = i;
@@ -116,20 +119,20 @@ double MinBoxObjectBuilder::ComputeAreaAlongOneEdge(
     }
     Eigen::Vector3d vp1 = v + ns[point_num1] - vn;
     Eigen::Vector3d vp2 = v + ns[point_num2] - vn;
-    center = (vp1 + vp2 + ns[point_num1] + ns[point_num2]) / 4;
-    center[2] = obj->polygon.points[0].z;
+    (*center) = (vp1 + vp2 + ns[point_num1] + ns[point_num2]) / 4;
+    (*center)[2] = obj->polygon.points[0].z;
     if (len > wid) {
-        dir = ns[point_num2] - ns[point_num1];
+        *dir = ns[point_num2] - ns[point_num1];
     } else {
-        dir = vp1 - ns[point_num1];
+        *dir = vp1 - ns[point_num1];
     }
-    lenth = len > wid ? len : wid;
-    width = len > wid ? wid : len;
-    return lenth * width;
+    *lenth = len > wid ? len : wid;
+    *width = len > wid ? wid : len;
+    return (*lenth) * (*width);
 }
 
 void  MinBoxObjectBuilder::ReconstructPolygon(
-        Eigen::Vector3d &ref_ct,
+        const Eigen::Vector3d &ref_ct,
         ObjectPtr obj) {
     if (obj->polygon.points.size() <= 0) {
         return;
@@ -215,7 +218,8 @@ void  MinBoxObjectBuilder::ReconstructPolygon(
             Eigen::Vector3d ray = p_x - min_point;
             if (line[0] * ray[1] - ray[0] * line[1] < EPSILON) {
                 double dist =
-                        sqrt((p[0] - p_x[0]) * (p[0] - p_x[0]) + (p[1] - p_x[1])* (p[1] - p_x[1]));
+                        sqrt((p[0] - p_x[0]) * (p[0] - p_x[0]) +
+                            (p[1] - p_x[1])* (p[1] - p_x[1]));
                 total_len += dist;
                 if (dist > max_dis) {
                     max_dis = dist;
@@ -256,7 +260,9 @@ void  MinBoxObjectBuilder::ReconstructPolygon(
                 double length = 0;
                 double width = 0;
                 Eigen::Vector3d dir;
-                double area = ComputeAreaAlongOneEdge(obj, i, center, length, width, dir);
+                double area =
+                    ComputeAreaAlongOneEdge(obj, i,
+                                        &center, &length, &width, &dir);
                 if (area < min_area) {
                     obj->center = center;
                     obj->length = length;
@@ -276,7 +282,8 @@ void  MinBoxObjectBuilder::ReconstructPolygon(
             double length = 0;
             double width = 0;
             Eigen::Vector3d dir;
-            double area = ComputeAreaAlongOneEdge(obj, i, center, length, width, dir);
+            double area =
+               ComputeAreaAlongOneEdge(obj, i, &center, &length, &width, &dir);
             if (area < min_area) {
                 obj->center = center;
                 obj->length = length;
@@ -295,7 +302,9 @@ void  MinBoxObjectBuilder::ReconstructPolygon(
                 double length = 0.0;
                 double width = 0.0;
                 Eigen::Vector3d dir;
-                double area = ComputeAreaAlongOneEdge(obj, i, center, length, width, dir);
+                double area =
+                   ComputeAreaAlongOneEdge(obj, i, &center,
+                                           &length, &width, &dir);
                 if (area < min_area) {
                     obj->center = center;
                     obj->length = length;
@@ -312,7 +321,6 @@ void  MinBoxObjectBuilder::ReconstructPolygon(
 }
 
 void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
-
     Eigen::Vector4f min_pt;
     Eigen::Vector4f max_pt;
     pcl_util::PointCloudPtr cloud = obj->cloud;
@@ -321,7 +329,8 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
         return;
     }
     GetCloudMinMax3D<Point>(cloud, &min_pt, &max_pt);
-    obj->height = static_cast<double>(max_pt[2]) - static_cast<double>(min_pt[2]);
+    obj->height = static_cast<double>(max_pt[2]) -
+                    static_cast<double>(min_pt[2]);
     const double min_eps = 10 * std::numeric_limits<double>::epsilon();
     // double min_eps = 0.1;
     // if ((max_pt[0] - min_pt[0]) < min_eps) {
@@ -361,7 +370,8 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
     hull.Reconstruct2dxy(*plane_hull, poly_vt);
 
     if (poly_vt.size() == 1u) {
-        std::vector<int> ind(poly_vt[0].vertices.begin(), poly_vt[0].vertices.end());   
+        std::vector<int> ind(poly_vt[0].vertices.begin(),
+                            poly_vt[0].vertices.end());
         TransformCloud(plane_hull, ind, &obj->polygon);
     } else {
         obj->polygon.points.resize(4);
@@ -383,7 +393,8 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
     }
 }
 
-void MinBoxObjectBuilder::ComputeGeometricFeature(Eigen::Vector3d &ref_ct, ObjectPtr obj) {
+void MinBoxObjectBuilder::ComputeGeometricFeature(const Eigen::Vector3d &ref_ct,
+                                                    ObjectPtr obj) {
     ComputePolygon2dxy(obj);
     ReconstructPolygon(ref_ct, obj);
 }
