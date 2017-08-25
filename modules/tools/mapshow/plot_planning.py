@@ -59,6 +59,7 @@ sl_dynamic_obstacle_lower_boundary = None
 sl_dynamic_obstacle_upper_boundary = None
 sl_map_lower_boundary = None
 sl_map_upper_boundary = None
+sl_path = None
 
 
 def localization_callback(localization_pb):
@@ -108,6 +109,7 @@ def update(frame_number):
     sl_dynamic_obstacle_upper_boundary.set_visible(False)
     sl_map_lower_boundary.set_visible(False)
     sl_map_upper_boundary.set_visible(False)
+    sl_path.set_visible(False)
 
     vehicle_position_line.set_visible(False)
     vehicle_polygon_line.set_visible(False)
@@ -119,7 +121,7 @@ def update(frame_number):
                             sl_dynamic_obstacle_lower_boundary,
                             sl_dynamic_obstacle_upper_boundary,
                             sl_map_lower_boundary,
-                            sl_map_upper_boundary)
+                            sl_map_upper_boundary, sl_path)
 
     if len(planning.st_data_s.keys()) >= 1:
         planning.replot_st_data(
@@ -154,7 +156,7 @@ def init_line_pool(central_x, central_y):
     global sl_dynamic_obstacle_lower_boundary
     global sl_dynamic_obstacle_upper_boundary
     global sl_map_lower_boundary
-    global sl_map_upper_boundary
+    global sl_map_upper_boundary, sl_path
 
     colors = ['b', 'g', 'r', 'k']
 
@@ -185,6 +187,8 @@ def init_line_pool(central_x, central_y):
         ax4.plot([0], [0], "b-", lw=0.3, ms=2, alpha=0.8)
     sl_map_upper_boundary, = \
         ax4.plot([0], [0], "b-", lw=0.3, ms=4, alpha=0.8)
+
+    sl_path, = ax4.plot([0], [0], "k-")
 
     for i in range(obstacle_line_pool_size):
         line, = ax2.plot([0], [0],
@@ -232,7 +236,7 @@ if __name__ == '__main__':
 
     ax4 = plt.subplot2grid((3, 3), (2, 0), colspan=2)
     ax4.set_xlim([30, 140])
-    ax4.set_ylim([-10, 10])
+    ax4.set_ylim([-5, 5])
 
     ax1.set_xlabel("t (second)")
     ax1.set_xlim([-2, 10])
