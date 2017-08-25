@@ -20,7 +20,6 @@
 #include "eigen_conversions/eigen_msg.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "tf2_ros/transform_listener.h"
-#include "yaml-cpp/yaml.h"
 
 #include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
 #include "modules/calibration/lidar_ex_checker/lidar_ex_checker.h"
@@ -53,8 +52,9 @@ Status LidarExChecker::Init() {
 
   AdapterManager::Init(FLAGS_adapter_config_path);
 
-  CHECK(AdapterManager::GetGps()) << "gps is not initialized.";
+  CHECK(AdapterManager::GetGps()) << "GPS is not initialized.";
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  CHECK(AdapterManager::GetInsStat()) << "InsStat is not initialized.";
   AdapterManager::AddPointCloudCallback(&LidarExChecker::OnPointCloud, this);
   AdapterManager::AddGpsCallback(&LidarExChecker::OnGps, this);
   AdapterManager::AddInsStatCallback(&LidarExChecker::OnInsStat, this);

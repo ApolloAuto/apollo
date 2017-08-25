@@ -17,7 +17,6 @@ cc_library(
         "//modules/perception/lib/pcl_util",
         "//modules/localization/proto:gps_proto",
         "@vtk//:vtk",
-        "@yaml_cpp//:yaml",
     ],
 )
 
