@@ -76,7 +76,7 @@ DECLARE_double(virtual_stop_wall_width);
 DECLARE_double(virtual_stop_wall_height);
 
 DECLARE_double(prediction_total_time);
-
+DECLARE_bool(align_prediction_time);
 DECLARE_int32(trajectory_point_num_for_debug);
 DECLARE_double(decision_valid_stop_range);
 

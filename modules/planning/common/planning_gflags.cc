@@ -111,6 +111,8 @@ DEFINE_double(virtual_stop_wall_height, 2.0,
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
+DEFINE_bool(align_prediction_time, true,
+            "enable align prediction data based planning time");
 
 // Trajectory
 DEFINE_bool(enable_rule_layer, true,
