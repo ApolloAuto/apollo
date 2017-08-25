@@ -78,7 +78,7 @@ class StBoundaryMapper {
       StBoundary* const boundary) const;
 
   void AppendBoundary(const StBoundary& boundary,
-                      std::vector<StBoundary>* st_graph_boundaries) const;
+                      std::vector<StBoundary>* st_boundaries) const;
 
  private:
   const SLBoundary& adc_sl_boundary_;

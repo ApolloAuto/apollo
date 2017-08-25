@@ -30,7 +30,7 @@ namespace planning {
 
 TEST(StGraphDataTest, basic_test) {
   StGraphData st_graph_data;
-  EXPECT_EQ(st_graph_data.st_graph_boundaries().size(), 0);
+  EXPECT_EQ(st_graph_data.st_boundaries().size(), 0);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().x(), 0.0);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().y(), 0.0);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().z(), 0.0);
@@ -58,7 +58,7 @@ TEST(StGraphDataTest, basic_test) {
 
   SpeedLimit speed_limit;
   StGraphData st_graph_data_2(boundary_vec, traj_point, speed_limit, 100.0);
-  EXPECT_EQ(st_graph_data_2.st_graph_boundaries().size(), 1);
+  EXPECT_EQ(st_graph_data_2.st_boundaries().size(), 1);
   EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().x(), 1.1);
   EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().y(), 2.1);
   EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().z(), 0.0);

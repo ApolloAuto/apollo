@@ -130,7 +130,7 @@ class PathObstacle {
   SLBoundary perception_sl_boundary_;
 
   // TODO(zhangliangliang): add st_boundary_ here.
-  // StGraphBoundary st_boundary_;
+  // StBoundary st_boundary_;
 
   ObjectDecisionType lateral_decision_;
   ObjectDecisionType longitudinal_decision_;

@@ -74,10 +74,10 @@ StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
 
 Status StBoundaryMapper::GetGraphBoundary(
     const PathDecision& path_decision,
-    std::vector<StBoundary>* const st_graph_boundaries) const {
+    std::vector<StBoundary>* const st_boundaries) const {
   const auto& path_obstacles = path_decision.path_obstacles();
-  if (st_graph_boundaries == nullptr) {
-    const std::string msg = "st_graph_boundaries is NULL.";
+  if (st_boundaries == nullptr) {
+    const std::string msg = "st_boundaries is NULL.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -96,7 +96,7 @@ Status StBoundaryMapper::GetGraphBoundary(
                   "Fail to get params because of too few path points");
   }
 
-  st_graph_boundaries->clear();
+  st_boundaries->clear();
   Status ret = Status::OK();
 
   const PathObstacle* stop_obstacle = nullptr;
@@ -113,7 +113,7 @@ Status StBoundaryMapper::GetGraphBoundary(
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
-      AppendBoundary(boundary, st_graph_boundaries);
+      AppendBoundary(boundary, st_boundaries);
       continue;
     }
     const auto& decision = path_obstacle->LongitudinalDecision();
@@ -126,7 +126,7 @@ Status StBoundaryMapper::GetGraphBoundary(
                << " with follow decision: " << decision.DebugString();
         return Status(ErrorCode::PLANNING_ERROR, "Fail to map follow decision");
       }
-      AppendBoundary(follow_boundary, st_graph_boundaries);
+      AppendBoundary(follow_boundary, st_boundaries);
     } else if (decision.has_stop()) {
       // TODO(all) change start_s() to st_boundary.min_s()
       const double stop_s = path_obstacle->perception_sl_boundary().start_s() +
@@ -157,7 +157,7 @@ Status StBoundaryMapper::GetGraphBoundary(
         return Status(ErrorCode::PLANNING_ERROR,
                       "Fail to map overtake/yield decision");
       }
-      AppendBoundary(boundary, st_graph_boundaries);
+      AppendBoundary(boundary, st_boundaries);
     } else {
       ADEBUG << "No mapping for decision: " << decision.DebugString();
     }
@@ -172,9 +172,9 @@ Status StBoundaryMapper::GetGraphBoundary(
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    AppendBoundary(stop_boundary, st_graph_boundaries);
+    AppendBoundary(stop_boundary, st_boundaries);
   }
-  for (const auto& st_boundary : *st_graph_boundaries) {
+  for (const auto& st_boundary : *st_boundaries) {
     DCHECK_EQ(st_boundary.points().size(), 4);
     DCHECK_NE(st_boundary.id().length(), 0);
   }
@@ -569,11 +569,11 @@ Status StBoundaryMapper::GetSpeedLimits(
 
 void StBoundaryMapper::AppendBoundary(
     const StBoundary& boundary,
-    std::vector<StBoundary>* st_graph_boundaries) const {
+    std::vector<StBoundary>* st_boundaries) const {
   if (Double::Compare(boundary.area(), 0.0) <= 0) {
     return;
   }
-  st_graph_boundaries->push_back(std::move(boundary));
+  st_boundaries->push_back(std::move(boundary));
 }
 
 }  // namespace planning

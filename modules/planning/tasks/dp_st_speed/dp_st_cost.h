@@ -38,7 +38,7 @@ class DpStCost {
 
   double GetObstacleCost(
       const STPoint& point,
-      const std::vector<StBoundary>& st_graph_boundaries) const;
+      const std::vector<StBoundary>& st_boundaries) const;
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
