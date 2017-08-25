@@ -34,9 +34,9 @@ StBoundary::StBoundary(
   CHECK(IsValid(point_pairs));
 
   for (size_t i = 0; i < point_pairs.size(); ++i) {
-    upper_points_.emplace_back(point_pairs[i].first.t(),
+    lower_points_.emplace_back(point_pairs[i].first.t(),
                                point_pairs[i].first.s());
-    lower_points_.emplace_back(point_pairs[i].second.t(),
+    upper_points_.emplace_back(point_pairs[i].second.t(),
                                point_pairs[i].second.s());
   }
   points_.reserve(upper_points_.size() + lower_points_.size());
@@ -55,7 +55,35 @@ StBoundary::StBoundary(
 
 bool StBoundary::IsValid(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
-  // TODO(Liangliang): implement this function.
+  if (point_pairs.size() < 2) {
+    AERROR << "point_pairs.size() must > 2. current point_pairs.size() = "
+           << point_pairs.size();
+    return false;
+  }
+
+  constexpr double kStBoundaryEpsilon = 1e-9;
+  constexpr double kMinDeltaT = 1e-6;
+  for (size_t i = 0; i < point_pairs.size(); ++i) {
+    const auto& curr_lower = point_pairs[i].first;
+    const auto& curr_upper = point_pairs[i].second;
+    if (curr_upper.s() < curr_lower.s()) {
+      return false;
+    }
+
+    if (std::fabs(curr_lower.t() - curr_upper.t()) > kStBoundaryEpsilon) {
+      return false;
+    }
+
+    if (i + 1 != point_pairs.size()) {
+      const auto& next_lower = point_pairs[i + 1].first;
+      const auto& next_upper = point_pairs[i + 1].second;
+      if (std::fmax(curr_lower.t(), curr_upper.t()) + kMinDeltaT >=
+          std::fmin(next_lower.t(), next_upper.t())) {
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 
