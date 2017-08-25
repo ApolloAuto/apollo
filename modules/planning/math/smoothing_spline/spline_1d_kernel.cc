@@ -53,8 +53,8 @@ void Spline1dKernel::AddRegularization(const double regularized_param) {
 }
 
 bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel,
-                                const Eigen::MatrixXd& offset,
-                                const double weight) {
+                               const Eigen::MatrixXd& offset,
+                               const double weight) {
   if (kernel.rows() != kernel.cols() ||
       kernel.rows() != kernel_matrix_.rows() || offset.cols() != 1 ||
       offset.rows() != offset_.rows()) {
@@ -66,7 +66,7 @@ bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel,
 }
 
 bool Spline1dKernel::AddKernel(const Eigen::MatrixXd& kernel,
-                                const double weight) {
+                               const double weight) {
   Eigen::MatrixXd offset = Eigen::MatrixXd::Zero(kernel.rows(), 1);
   return AddKernel(kernel, offset, weight);
 }
@@ -128,7 +128,7 @@ bool Spline1dKernel::add_reference_line_kernel_matrix(
     double cur_index = find_index(x_coord[i]);
     double cur_rel_x = x_coord[i] - x_knots_[cur_index];
     // update offset
-    double offset_coef = -ref_x[i] * weight;
+    double offset_coef = -2.0 * ref_x[i] * weight;
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
       offset_(j + cur_index * spline_order_, 0) += offset_coef;
       offset_coef *= cur_rel_x;
@@ -165,7 +165,7 @@ std::uint32_t Spline1dKernel::find_index(const double x) const {
 void Spline1dKernel::add_distance_offset(const double weight) {
   for (std::uint32_t i = 1; i < x_knots_.size(); ++i) {
     const double cur_x = x_knots_[i] - x_knots_[i - 1];
-    double pw_x = weight;
+    double pw_x = 2.0 * weight;
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
       offset_((i - 1) * spline_order_ + j, 0) -= pw_x;
       pw_x *= cur_x;
