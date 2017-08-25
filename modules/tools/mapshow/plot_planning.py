@@ -204,10 +204,10 @@ def init_line_pool(central_x, central_y):
         obstacle_line_pool2.append(line)
         obstacle_annotation_pool2.append(anno)
 
-    ax2.set_xlim(-1, 9)
-    ax2.set_ylim(-1,90)
-    ax3.set_xlim(-1, 9)
-    ax3.set_ylim(-1,90)
+    ax2.set_xlim(-3, 9)
+    ax2.set_ylim(-10,90)
+    ax3.set_xlim(-3, 9)
+    ax3.set_ylim(-10,90)
 
     vehicle_position_line, = ax.plot([central_x], [central_y], 'go', alpha=0.3)
     vehicle_polygon_line, = ax.plot([central_x], [central_y], 'g-')
