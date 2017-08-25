@@ -231,7 +231,7 @@ if __name__ == '__main__':
     ax3 = plt.subplot2grid((3, 3), (2, 2))
 
     ax4 = plt.subplot2grid((3, 3), (2, 0), colspan=2)
-    ax4.set_xlim([-20, 100])
+    ax4.set_xlim([30, 140])
     ax4.set_ylim([-10, 10])
 
     ax1.set_xlabel("t (second)")
