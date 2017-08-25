@@ -128,7 +128,6 @@ Status StBoundaryMapper::GetGraphBoundary(
       }
       AppendBoundary(follow_boundary, st_boundaries);
     } else if (decision.has_stop()) {
-      // TODO(all) change start_s() to st_boundary.min_s()
       const double stop_s = path_obstacle->perception_sl_boundary().start_s() +
                             decision.stop().distance_s();
       if (stop_s < adc_sl_boundary_.end_s()) {

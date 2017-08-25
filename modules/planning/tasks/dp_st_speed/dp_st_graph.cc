@@ -642,7 +642,8 @@ bool DpStGraph::CheckIsFollowByT(const StBoundary& boundary) const {
     return false;
   }
   const double kFollowTimeEpsilon = 1e-3;
-  if (boundary.min_t() > kFollowTimeEpsilon) {
+  if (boundary.min_t() > kFollowTimeEpsilon ||
+      boundary.max_t() < kFollowTimeEpsilon()) {
     return false;
   }
   return true;
