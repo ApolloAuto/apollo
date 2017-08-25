@@ -71,12 +71,13 @@ bool PathObstacle::Init(const ReferenceLine& reference_line) {
 void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line) {
   if (obstacle_->IsStatic() ||
       obstacle_->Trajectory().trajectory_point().empty()) {
-    std::vector<STPoint> points;
-    points.emplace_back(perception_sl_boundary_.start_s(), 0.0);
-    points.emplace_back(perception_sl_boundary_.start_s(), FLAGS_st_max_t);
-    points.emplace_back(perception_sl_boundary_.end_s(), FLAGS_st_max_t);
-    points.emplace_back(perception_sl_boundary_.end_s(), 0.0);
-    st_boundary_ = StBoundary(points);
+    std::vector<std::pair<STPoint, STPoint>> point_pairs;
+    point_pairs.emplace_back(STPoint(perception_sl_boundary_.start_s(), 0.0),
+                             STPoint(perception_sl_boundary_.end_s(), 0.0));
+    point_pairs.emplace_back(
+        STPoint(perception_sl_boundary_.start_s(), FLAGS_st_max_t),
+        STPoint(perception_sl_boundary_.end_s(), FLAGS_st_max_t));
+    st_boundary_ = StBoundary(point_pairs);
   } else {
     if (BuildTrajectoryStBoundary(reference_line, &st_boundary_)) {
       ADEBUG << "Found st_boundary for obstacle " << id_;

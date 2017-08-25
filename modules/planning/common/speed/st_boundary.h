@@ -37,11 +37,9 @@ class StBoundary : public common::math::Polygon2d {
  public:
   StBoundary() = default;
 
-  // boundary points go counter clockwise.
-  explicit StBoundary(const std::vector<STPoint>& points);
+  explicit StBoundary(
+      const std::vector<std::pair<STPoint, STPoint>>& point_pairs);
 
-  // boundary points go counter clockwise.
-  explicit StBoundary(const std::vector<common::math::Vec2d>& points);
   ~StBoundary() = default;
 
   // if you need to add boundary type, make sure you modify
@@ -82,7 +80,14 @@ class StBoundary : public common::math::Polygon2d {
   double max_t() const;
 
  private:
+  bool IsValid(const std::vector<std::pair<STPoint, STPoint>>& point_pairs);
+
+ private:
   BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
+
+  std::vector<common::math::Vec2d> upper_points_;
+  std::vector<common::math::Vec2d> lower_points_;
+
   std::string id_;
   double characteristic_length_ = 1.0;
   double s_high_limit_ = 200.0;

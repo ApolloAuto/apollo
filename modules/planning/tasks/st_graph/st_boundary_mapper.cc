@@ -210,14 +210,14 @@ bool StBoundaryMapper::MapStopDecision(const PathObstacle& stop_obstacle,
   const double s_min = st_stop_s;
   const double s_max =
       std::fmax(s_min, std::fmax(planning_distance_, reference_line_.Length()));
-  std::vector<STPoint> boundary_points;
-  boundary_points.emplace_back(s_min, 0.0);
-  boundary_points.emplace_back(s_min, planning_time_);
-  boundary_points.emplace_back(s_max + st_boundary_config_.boundary_buffer(),
-                               planning_time_);
-  boundary_points.emplace_back(s_max, 0.0);
 
-  *boundary = StBoundary(boundary_points);
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+  point_pairs.emplace_back(STPoint(s_min, 0.0), STPoint(s_max, 0.0));
+  point_pairs.emplace_back(
+      STPoint(s_min, planning_time_),
+      STPoint(s_max + st_boundary_config_.boundary_buffer(), planning_time_));
+  *boundary = StBoundary(point_pairs);
+
   boundary->SetBoundaryType(StBoundary::BoundaryType::STOP);
   boundary->SetCharacteristicLength(st_boundary_config_.boundary_buffer());
   boundary->SetId(stop_obstacle.Id());
@@ -229,7 +229,6 @@ Status StBoundaryMapper::MapWithoutDecision(const PathObstacle& path_obstacle,
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  std::vector<STPoint> boundary_points;
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
                                 *(path_obstacle.obstacle()), &upper_points,
                                 &lower_points)) {
@@ -237,21 +236,20 @@ Status StBoundaryMapper::MapWithoutDecision(const PathObstacle& path_obstacle,
   }
 
   if (lower_points.size() > 0 && upper_points.size() > 0) {
-    boundary_points.clear();
-    boundary_points.emplace_back(lower_points.at(0).s() - boundary_s_buffer,
-                                 lower_points.at(0).t() - boundary_t_buffer);
-    boundary_points.emplace_back(lower_points.back().s() - boundary_s_buffer,
-                                 lower_points.back().t() + boundary_t_buffer);
-    boundary_points.emplace_back(upper_points.back().s() + boundary_s_buffer,
-                                 upper_points.back().t() + boundary_t_buffer);
-    boundary_points.emplace_back(upper_points.at(0).s() + boundary_s_buffer,
-                                 upper_points.at(0).t() - boundary_t_buffer);
+    std::vector<std::pair<STPoint, STPoint>> point_pairs;
+    point_pairs.emplace_back(
+        STPoint(lower_points.at(0).s() - boundary_s_buffer,
+                lower_points.at(0).t() - boundary_t_buffer),
+        STPoint(upper_points.at(0).s() + boundary_s_buffer,
+                upper_points.at(0).t() - boundary_t_buffer));
 
-    if (lower_points.at(0).t() > lower_points.back().t() ||
-        upper_points.at(0).t() > upper_points.back().t()) {
-      AWARN << "lower/upper points are reversed.";
-    }
-    *boundary = StBoundary(boundary_points);
+    point_pairs.emplace_back(
+        STPoint(lower_points.back().s() - boundary_s_buffer,
+                lower_points.back().t() + boundary_t_buffer),
+        STPoint(upper_points.back().s() + boundary_s_buffer,
+                upper_points.back().t() + boundary_t_buffer));
+
+    *boundary = StBoundary(point_pairs);
     boundary->SetId(path_obstacle.obstacle()->Id());
   }
   return Status::OK();
@@ -348,36 +346,28 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  std::vector<STPoint> boundary_points;
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
                                 *(path_obstacle.obstacle()), &upper_points,
                                 &lower_points)) {
     return Status(ErrorCode::PLANNING_ERROR, "PLANNING_ERROR");
   }
   if (lower_points.size() > 0 && upper_points.size() > 0) {
-    boundary_points.clear();
+    std::vector<std::pair<STPoint, STPoint>> point_pairs;
+    point_pairs.emplace_back(
+        STPoint(lower_points.at(0).s() - boundary_s_buffer,
+                lower_points.at(0).t() - boundary_t_buffer),
+        STPoint(upper_points.at(0).s() + boundary_s_buffer,
+                upper_points.at(0).t() - boundary_t_buffer));
 
-    // lower left point
-    boundary_points.emplace_back(lower_points.at(0).s() - boundary_s_buffer,
-                                 lower_points.at(0).t() - boundary_t_buffer);
-    // lower right point
-    boundary_points.emplace_back(lower_points.back().s() - boundary_s_buffer,
-                                 lower_points.back().t() + boundary_t_buffer);
+    point_pairs.emplace_back(
+        STPoint(lower_points.back().s() - boundary_s_buffer,
+                lower_points.back().t() + boundary_t_buffer),
+        STPoint(upper_points.back().s() + boundary_s_buffer,
+                upper_points.back().t() + boundary_t_buffer));
 
-    // upper right point
-    boundary_points.emplace_back(upper_points.back().s() + boundary_s_buffer,
-                                 upper_points.back().t() + boundary_t_buffer);
+    *boundary = StBoundary(point_pairs);
 
-    // upper left point
-    boundary_points.emplace_back(upper_points.at(0).s() + boundary_s_buffer,
-                                 upper_points.at(0).t() - boundary_t_buffer);
-
-    if (lower_points.at(0).t() > lower_points.back().t() ||
-        upper_points.at(0).t() > upper_points.back().t()) {
-      AWARN << "lower/upper points are reversed.";
-    }
-
-    // change boundary according to obj_decision.
+    // get characteristic_length and boundary_type.
     StBoundary::BoundaryType b_type = StBoundary::BoundaryType::UNKNOWN;
     double characteristic_length = 0.0;
     if (obj_decision.has_follow()) {
@@ -393,7 +383,6 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
       DCHECK(false) << "Obj decision should be either yield or overtake: "
                     << obj_decision.DebugString();
     }
-    *boundary = StBoundary(boundary_points);
     boundary->SetBoundaryType(b_type);
     boundary->SetId(path_obstacle.obstacle()->Id());
     boundary->SetCharacteristicLength(characteristic_length);
@@ -461,13 +450,12 @@ Status StBoundaryMapper::MapFollowDecision(
   const double s_max_lower = s_min_lower + planning_time_ * speed;
   const double s_max_upper = std::max(s_max_lower, planning_distance_);
 
-  std::vector<STPoint> boundary_points;
-  boundary_points.emplace_back(s_min_lower, 0.0);
-  boundary_points.emplace_back(s_max_lower, planning_time_);
-  boundary_points.emplace_back(s_max_upper, planning_time_);
-  boundary_points.emplace_back(s_min_upper, 0.0);
-
-  *boundary = StBoundary(boundary_points);
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+  point_pairs.emplace_back(STPoint(s_min_lower, 0.0),
+                           STPoint(s_min_upper, 0.0));
+  point_pairs.emplace_back(STPoint(s_max_lower, planning_time_),
+                           STPoint(s_max_upper, planning_time_));
+  *boundary = StBoundary(point_pairs);
 
   const double characteristic_length =
       std::fabs(obj_decision.follow().distance_s()) +
