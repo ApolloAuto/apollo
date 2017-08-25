@@ -134,19 +134,40 @@ class Planning:
         sl_map_lower_boundary.set_visible(True)
         sl_map_upper_boundary.set_visible(True)
 
-        sl_map_lower_boundary.set_xdata(self.sl_sampled_s)
-        sl_map_lower_boundary.set_ydata(self.sl_map_lower_boundary)
-        sl_map_upper_boundary.set_xdata(self.sl_sampled_s)
-        sl_map_upper_boundary.set_ydata(self.sl_map_upper_boundary)
+        new_sampled_s = []
+        for s in self.sl_sampled_s:
+            new_sampled_s.append(s)
+            new_sampled_s.append(s)
+        new_map_lower = []
+        for l in self.sl_map_lower_boundary:
+            new_map_lower.append(l)
+            new_map_lower.append(-11)
+        new_map_upper = []
+        for l in self.sl_map_upper_boundary:
+            new_map_upper.append(l)
+            new_map_upper.append(11)
+        sl_map_lower_boundary.set_xdata(new_sampled_s)
+        sl_map_lower_boundary.set_ydata(new_map_lower)
+        sl_map_upper_boundary.set_xdata(new_sampled_s)
+        sl_map_upper_boundary.set_ydata(new_map_upper)
 
         sl_dynamic_obstacle_lower_boundary.set_xdata(self.sl_sampled_s)
         sl_dynamic_obstacle_lower_boundary.set_ydata(self.sl_dynamic_obstacle_lower_boundary)
         sl_dynamic_obstacle_upper_boundary.set_xdata(self.sl_sampled_s)
         sl_dynamic_obstacle_upper_boundary.set_ydata(self.sl_dynamic_obstacle_upper_boundary)
-        sl_static_obstacle_lower_boundary.set_xdata(self.sl_sampled_s)
-        sl_static_obstacle_lower_boundary.set_ydata(self.sl_static_obstacle_lower_boundary)
-        sl_static_obstacle_upper_boundary.set_xdata(self.sl_sampled_s)
-        sl_static_obstacle_upper_boundary.set_ydata(self.sl_static_obstacle_upper_boundary)
+
+        new_static_lower = []
+        for l in self.sl_static_obstacle_lower_boundary:
+            new_static_lower.append(l)
+            new_static_lower.append(-11)
+        new_static_upper = []
+        for l in self.sl_static_obstacle_upper_boundary:
+            new_static_upper.append(l)
+            new_static_upper.append(11)
+        sl_static_obstacle_lower_boundary.set_xdata(new_sampled_s)
+        sl_static_obstacle_lower_boundary.set_ydata(new_static_lower)
+        sl_static_obstacle_upper_boundary.set_xdata(new_sampled_s)
+        sl_static_obstacle_upper_boundary.set_ydata(new_static_upper)
         self.sl_data_lock.release()
 
     def replot_st_data(self, boundaries_pool, st_line,
