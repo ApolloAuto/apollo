@@ -16,6 +16,8 @@
 
 #include "modules/routing/core/node_range_manager.h"
 
+#include <algorithm>
+
 #include "modules/routing/graph/topo_node.h"
 
 namespace apollo {

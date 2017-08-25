@@ -18,11 +18,12 @@
 #define MODULES_ROUTING_CORE_NAVIGATOR_H_
 
 #include <memory>
+#include <unordered_set>
+#include <vector>
+#include <string>
 
 #include "modules/routing/core/node_range_manager.h"
 #include "modules/routing/proto/routing.pb.h"
-
-#include <unordered_set>
 
 namespace apollo {
 namespace routing {

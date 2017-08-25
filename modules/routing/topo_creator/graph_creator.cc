@@ -44,7 +44,8 @@ bool IsAllowedToCross(const LaneBoundary& boundary) {
   }
   return true;
 }
-}
+
+}  // namespace
 
 GraphCreator::GraphCreator(const std::string& base_map_file_path,
                            const std::string& dump_topo_file_path)
@@ -122,9 +123,9 @@ bool GraphCreator::Create() {
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
   }
 
-  if(!EndWith(dump_topo_file_path_, ".bin") && 
-     !EndWith(dump_topo_file_path_, ".txt")){
-    AERROR << "Failed to dump topo data into file, incorrect file type " 
+  if (!EndWith(dump_topo_file_path_, ".bin") &&
+     !EndWith(dump_topo_file_path_, ".txt")) {
+    AERROR << "Failed to dump topo data into file, incorrect file type "
            << dump_topo_file_path_;
     return false;
   }

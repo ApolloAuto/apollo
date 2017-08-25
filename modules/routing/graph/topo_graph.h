@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <string>
 
 #include "modules/common/log.h"
 #include "modules/routing/proto/topo_graph.pb.h"
