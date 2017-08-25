@@ -17,6 +17,7 @@
 #include "modules/routing/topo_creator/node_creator.h"
 
 #include <cmath>
+#include <algorithm>
 
 #include "modules/routing/common/routing_gflags.h"
 

@@ -17,6 +17,8 @@
 #ifndef MODULES_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
 #define MODULES_ROUTING_TOPO_CREATOR_NODE_CREATOR_H
 
+#include <string>
+
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/routing/proto/topo_graph.pb.h"
 

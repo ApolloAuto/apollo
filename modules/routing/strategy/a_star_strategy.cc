@@ -33,7 +33,7 @@ struct SearchNode {
   double f;
 
   SearchNode() : topo_node(nullptr), f(std::numeric_limits<double>::max()) {}
-  SearchNode(const TopoNode* node)
+  explicit SearchNode(const TopoNode* node)
       : topo_node(node), f(std::numeric_limits<double>::max()) {}
   SearchNode(const SearchNode& search_node)
       : topo_node(search_node.topo_node), f(search_node.f) {}
@@ -108,7 +108,7 @@ bool AStarStrategy::Search(
   SearchNode current_node;
   while (!open_set_detail.empty()) {
     current_node = open_set_detail.top();
-    if (current_node == dest_node) {
+    if (current_node.topo_node == dest_node) {
       if (!ReConstruct(came_from_, current_node.topo_node, result_nodes)) {
         AERROR << "Failed to ReConstruct route.";
         return false;

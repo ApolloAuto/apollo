@@ -15,6 +15,9 @@
   *****************************************************************************/
 
 #include "modules/routing/graph/topo_graph.h"
+
+#include <utility>
+
 #include "modules/common/util/file.h"
 #include "modules/routing/graph/topo_node.h"
 

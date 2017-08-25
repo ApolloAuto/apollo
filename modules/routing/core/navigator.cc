@@ -17,8 +17,9 @@
 #include "modules/routing/core/navigator.h"
 
 #include <assert.h>
-#include <algorithm>
 #include <float.h>
+
+#include <algorithm>
 #include <fstream>
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -276,7 +277,7 @@ Navigator::Navigator(const std::string& topo_file_path) : is_ready_(false) {
   }
   is_ready_ = true;
   AINFO << "The navigator is ready.";
-};
+}
 
 Navigator::~Navigator() {}
 
