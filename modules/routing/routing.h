@@ -18,6 +18,7 @@
 #define MODULES_ROUTING_ROUTING_H_
 
 #include <memory>
+#include <string>
 
 #include "modules/routing/proto/routing.pb.h"
 

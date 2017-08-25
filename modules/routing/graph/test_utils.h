@@ -19,10 +19,9 @@
 
 #include <string>
 
+#include "gtest/gtest.h"
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_node.h"
-
-#include "gtest/gtest.h"
 #include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
