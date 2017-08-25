@@ -194,7 +194,7 @@ bool ActiveSetQpSolver::sanity_check() {
          kernel_matrix_.rows() == affine_inequality_matrix_.cols() &&
          kernel_matrix_.rows() == affine_equality_matrix_.cols() &&
          affine_equality_matrix_.rows() == affine_equality_boundary_.rows() &&
-         affine_inequality_matrix_.rows() == affine_inequality_matrix_.rows();
+         affine_inequality_matrix_.rows() == affine_inequality_boundary_.rows();
 }
 
 }  // namespace math
