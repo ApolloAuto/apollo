@@ -17,6 +17,7 @@
 ###############################################################################
 
 import threading
+from modules.planning.proto import planning_internal_pb2
 
 class Planning:
     def __init__(self, planning_pb=None):
@@ -32,6 +33,8 @@ class Planning:
         self.st_data_t = {}
         self.st_data_boundary_s = {}
         self.st_data_boundary_t = {}
+        self.st_data_boundary_type = {}
+
 
         self.sl_data_lock = threading.Lock()
         self.sl_sampled_s = []
@@ -100,10 +103,14 @@ class Planning:
         st_data_boundary_t = {}
         st_data_s = {}
         st_data_t = {}
+        st_data_boundary_type = {}
         for st_graph in self.planning_pb.debug.planning_data.st_graph:
             st_data_boundary_s[st_graph.name] = {}
             st_data_boundary_t[st_graph.name] = {}
+            st_data_boundary_type[st_graph.name] = {}
             for boundary in st_graph.boundary:
+                st_data_boundary_type[st_graph.name][boundary.name] \
+                    = planning_internal_pb2.StGraphBoundaryDebug.StBoundaryType.Name(boundary.type)
                 st_data_boundary_s[st_graph.name][boundary.name] = []
                 st_data_boundary_t[st_graph.name][boundary.name] = []
                 for point in boundary.point:
@@ -126,6 +133,7 @@ class Planning:
         self.st_data_boundary_t = st_data_boundary_t
         self.st_data_s = st_data_s
         self.st_data_t = st_data_t
+        self.st_data_boundary_type = st_data_boundary_type
         self.st_data_lock.release()
 
     def replot_sl_data(self,
@@ -194,6 +202,7 @@ class Planning:
 
         st_graph_boudnary_s = self.st_data_boundary_s[st_graph_name]
         st_graph_boudnary_t = self.st_data_boundary_t[st_graph_name]
+        st_boundary_type = self.st_data_boundary_type[st_graph_name]
         for boundary_name in st_graph_boudnary_s.keys():
             if cnt >= len(boundaries_pool):
                 print "WARNING: number of path lines is more than " \
@@ -214,7 +223,9 @@ class Planning:
 
             annotation = obstacle_annotation_pool[cnt]
             annotation.set_visible(True)
-            annotation.set_text(boundary_name)
+            annotation.set_text(boundary_name+ "_"
+                + st_boundary_type[boundary_name]
+                                .replace("ST_BOUNDARY_TYPE_",""))
             annotation.set_x(center_t)
             annotation.set_y(center_s)
 

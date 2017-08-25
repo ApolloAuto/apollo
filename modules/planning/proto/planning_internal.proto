@@ -56,8 +56,16 @@ message SpeedPlan {
 }
 
 message StGraphBoundaryDebug {
+  enum StBoundaryType {
+    ST_BOUNDARY_TYPE_UNKNOWN = 1;
+    ST_BOUNDARY_TYPE_STOP = 2;
+    ST_BOUNDARY_TYPE_FOLLOW = 3;
+    ST_BOUNDARY_TYPE_YIELD = 4;
+    ST_BOUNDARY_TYPE_OVERTAKE = 5;
+  }
   optional string name = 1;
   repeated apollo.common.SpeedPoint point = 2;
+  optional StBoundaryType type = 3;
 }
 
 message SLFrameDebug {
