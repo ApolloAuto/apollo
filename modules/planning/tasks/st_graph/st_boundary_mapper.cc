@@ -385,49 +385,14 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
     // change boundary according to obj_decision.
     StBoundary::BoundaryType b_type = StBoundary::BoundaryType::UNKNOWN;
     double characteristic_length = 0.0;
-    constexpr double kBoundaryEpsilon = 1e-3;
     if (obj_decision.has_follow()) {
-      const auto& speed = path_obstacle.obstacle()->Perception().velocity();
-      const double scalar_speed = std::hypot(speed.x(), speed.y());
-      const double minimal_follow_time =
-          st_boundary_config_.minimal_follow_time();
-      characteristic_length =
-          std::fmax(scalar_speed * minimal_follow_time,
-                    std::fabs(obj_decision.follow().distance_s())) +
-          vehicle_param_.front_edge_to_center();
-
-      boundary_points.at(0).set_s(boundary_points.at(0).s());
-      boundary_points.at(1).set_s(boundary_points.at(1).s());
-      boundary_points.at(3).set_t(-1.0);
+      characteristic_length = std::fabs(obj_decision.follow().distance_s());
       b_type = StBoundary::BoundaryType::FOLLOW;
     } else if (obj_decision.has_yield()) {
-      const double dis = std::fabs(obj_decision.yield().distance_s());
-      characteristic_length = dis;
-      if (boundary_points.at(0).s() - dis < 0.0) {
-        boundary_points.at(0).set_s(
-            std::fmax(boundary_points.at(0).s() - dis / 2, 0.0));
-      } else {
-        boundary_points.at(0).set_s(boundary_points.at(0).s() - dis);
-      }
-
-      if (boundary_points.at(1).s() - dis < 0.0) {
-        boundary_points.at(1).set_s(
-            std::fmax(boundary_points.at(1).s() - dis / 2, 0.0));
-      } else {
-        boundary_points.at(1).set_s(boundary_points.at(1).s() - dis);
-      }
-      boundary_points.at(3).set_t(-kBoundaryEpsilon);
+      characteristic_length = std::fabs(obj_decision.yield().distance_s());
       b_type = StBoundary::BoundaryType::YIELD;
-
     } else if (obj_decision.has_overtake()) {
-      const double dis = std::fabs(obj_decision.overtake().distance_s());
-      characteristic_length = dis;
-      boundary_points.at(0).set_s(-kBoundaryEpsilon);
-      boundary_points.at(2).set_s(boundary_points.at(2).s() + dis);
-      boundary_points.at(3).set_s(boundary_points.at(3).s() + dis);
-
-      const double time_buffer = obj_decision.overtake().time_buffer();
-      boundary_points.at(3).set_t(boundary_points.at(3).t() - time_buffer);
+      characteristic_length = std::fabs(obj_decision.overtake().distance_s());
       b_type = StBoundary::BoundaryType::OVERTAKE;
     } else {
       DCHECK(false) << "Obj decision should be either yield or overtake: "
