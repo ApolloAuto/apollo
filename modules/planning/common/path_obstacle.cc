@@ -64,7 +64,7 @@ bool PathObstacle::Init(const ReferenceLine& reference_line) {
     AERROR << "Failed to get sl boundary for obstacle: " << id_;
     return false;
   }
-  BuildStBoundary(reference_line);
+  // BuildStBoundary(reference_line);
   return true;
 }
 
