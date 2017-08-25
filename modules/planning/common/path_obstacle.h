@@ -87,6 +87,8 @@ class PathObstacle {
 
   const SLBoundary& perception_sl_boundary() const;
 
+  const StBoundary& st_boundary() const;
+
   void AddLongitudinalDecision(const std::string& decider_tag,
                                const ObjectDecisionType& decision);
 
@@ -124,8 +126,10 @@ class PathObstacle {
   static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
                                                  const ObjectDecisionType& rhs);
 
-  bool BuildStBoundary(const ReferenceLine& reference_line,
-                       const Obstacle* obstacle);
+  void BuildStBoundary(const ReferenceLine& reference_line);
+
+  bool BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
+                                 StBoundary* const st_boundary);
 
   std::string id_;
   const Obstacle* obstacle_ = nullptr;

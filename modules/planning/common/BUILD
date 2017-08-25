@@ -98,6 +98,7 @@ cc_library(
     deps = [
         ":indexed_list",
         ":obstacle",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
