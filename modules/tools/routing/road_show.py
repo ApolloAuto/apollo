@@ -17,8 +17,8 @@
 ###############################################################################
 
 import sys
-import modules.map.proto.map_pb2 as map_pb2
 import matplotlib.pyplot as plt
+import util
 
 g_color = [
     'navy', 'c', 'cornflowerblue', 'gold', 'darkorange', 'darkviolet',
@@ -140,9 +140,9 @@ def draw_map(drivemap):
                                                g_color[road_idx % len(g_color)])
                 draw_id(center_x, center_y, str(road_idx))
                 #break
-            if curve.HasField('arc'):
-                draw_arc(curve.arc)
-                #print "arc"
+            #if curve.HasField('arc'):
+            #    draw_arc(curve.arc)
+            #print "arc"
 
         for curve in lane.left_boundary.curve.segment:
             if curve.HasField('line_segment'):
@@ -156,27 +156,11 @@ def draw_map(drivemap):
     return drivemap
 
 
-def print_help():
-    """Print help information.
-
-    Print help information of usage.
-
-    Args:
-
-    """
-    print 'usage:'
-    print '     python road_show.py base_map_file_path',
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print 'Wrong number of arguments.'
-        print_help()
-        sys.exit(0)
-    fin = open(sys.argv[1])
-    base_map = map_pb2.Map()
-    base_map.ParseFromString(fin.read())
-
+    print "Reading map data"
+    map_dir = util.get_map_dir(sys.argv)
+    base_map = util.get_mapdata(map_dir)
+    print "Done reading map data"
     plt.subplots()
     draw_map(base_map)
     plt.axis('equal')
