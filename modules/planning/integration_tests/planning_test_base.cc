@@ -105,7 +105,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
                                    int case_num) {
   const std::string golden_result_file = apollo::common::util::StrCat(
       "result_", test_case_name, "_", case_num, ".pb.txt");
-  std::string tmp_golden_path = "/tmp/" + golden_result_file;
+  std::string tmp_golden_path = "/tmp/" + std::string(std::tmpnam(nullptr));
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   planning_.RunOnce();
 
@@ -139,7 +139,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
       std::string tmp_planning_file = tmp_golden_path + ".tmp";
       ::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_,
                                                   tmp_planning_file);
-      AERROR << "found diff " << tmp_planning_file << " " << full_golden_path;
+      AERROR << "found\ndiff " << tmp_planning_file << " " << full_golden_path;
       return false;
     }
   }
