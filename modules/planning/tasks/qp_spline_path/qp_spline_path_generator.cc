@@ -120,6 +120,12 @@ bool QpSplinePathGenerator::Generate(
       (end_s - init_frenet_point_.s()) / qp_spline_path_config_.num_output();
   while (Double::Compare(s, end_s) < 0) {
     double l = spline(s);
+    if (planning_debug->planning_data().sl_frame().size() >= 1) {
+      auto sl_point = planning_debug->mutable_planning_data()
+          ->mutable_sl_frame(0)->mutable_sl_path()->Add();
+      sl_point->set_l(l);
+      sl_point->set_s(s);
+    }
     double dl = spline.Derivative(s);
     double ddl = spline.SecondOrderDerivative(s);
     ReferencePoint ref_point = reference_line_.GetReferencePoint(s);

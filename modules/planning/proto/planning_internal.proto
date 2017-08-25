@@ -69,6 +69,7 @@ message SLFrameDebug {
   repeated double dynamic_obstacle_upper_bound = 6;
   repeated double map_lower_bound = 7;
   repeated double map_upper_bound = 8;
+  repeated apollo.common.SLPoint sl_path = 9;
 }
 
 message STGraphDebug {
