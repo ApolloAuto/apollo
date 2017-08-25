@@ -8,8 +8,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, * WITHOUT
- *WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
@@ -77,6 +77,10 @@ DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
 
 DEFINE_double(kappa_bound, 0.23, "The bound for vehicle curvature");
+
+// ST Boundary
+DEFINE_double(st_max_s, 80, "the maximum s of st boundary");
+DEFINE_double(st_max_t, 10, "the maximum t of st boundary");
 
 // Decision Part
 DEFINE_double(static_obstacle_speed_threshold, 1.0,

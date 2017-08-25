@@ -57,6 +57,10 @@ DECLARE_double(longitudinal_jerk_upper_bound);
 
 DECLARE_double(kappa_bound);
 
+// STBoundary
+DECLARE_double(st_max_s);
+DECLARE_double(st_max_t);
+
 // Decision Part
 DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_bool(enable_nudge_decision);

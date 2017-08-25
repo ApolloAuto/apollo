@@ -31,9 +31,6 @@ using Vec2d = common::math::Vec2d;
 
 StBoundary::StBoundary(const std::vector<STPoint>& points)
     : Polygon2d(std::vector<Vec2d>(points.begin(), points.end())) {
-  CHECK_EQ(points.size(), 4)
-      << "StBoundary must have exactly four points. Input points size: "
-      << points.size();
   for (const auto& point : points) {
     min_s_ = std::fmin(min_s_, point.s());
     min_t_ = std::fmin(min_t_, point.t());
@@ -44,9 +41,6 @@ StBoundary::StBoundary(const std::vector<STPoint>& points)
 
 StBoundary::StBoundary(const std::vector<::apollo::common::math::Vec2d>& points)
     : Polygon2d(points) {
-  CHECK_EQ(points.size(), 4)
-      << "StBoundary must have exactly four points. Input points size: "
-      << points.size();
   for (const auto& point : points) {
     min_s_ = std::fmin(min_s_, point.y());
     min_t_ = std::fmin(min_t_, point.x());
