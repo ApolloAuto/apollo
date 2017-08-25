@@ -174,17 +174,17 @@ def init_line_pool(central_x, central_y):
                           colors[i % len(colors)]+".", lw=3, alpha=0.5)
 
     sl_static_obstacle_lower_boundary, = \
-        ax4.plot([0], [0], "r.", lw=2, alpha=0.8)
+        ax4.plot([0], [0], "r-", lw=0.3, alpha=0.8)
     sl_static_obstacle_upper_boundary, = \
-        ax4.plot([0], [0], "r.", lw=5, alpha=0.8)
+        ax4.plot([0], [0], "r-", lw=0.3, alpha=0.8)
     sl_dynamic_obstacle_lower_boundary, = \
-        ax4.plot([0], [0], "y.", lw=2, alpha=0.8)
+        ax4.plot([0], [0], "y-", lw=0.3, alpha=0.8)
     sl_dynamic_obstacle_upper_boundary, = \
-        ax4.plot([0], [0], "y.", lw=5, alpha=0.8)
+        ax4.plot([0], [0], "y-", lw=0.3, alpha=0.8)
     sl_map_lower_boundary, = \
-        ax4.plot([0], [0], "b.", lw=2, ms=2, alpha=0.8)
+        ax4.plot([0], [0], "b-", lw=0.3, ms=2, alpha=0.8)
     sl_map_upper_boundary, = \
-        ax4.plot([0], [0], "b.", lw=5, ms=4, alpha=0.8)
+        ax4.plot([0], [0], "b-", lw=0.3, ms=4, alpha=0.8)
 
     for i in range(obstacle_line_pool_size):
         line, = ax2.plot([0], [0],
