@@ -62,6 +62,33 @@ void SpeedOptimizer::RecordSTGraphDebug(
   for (const auto& boundary : boundaries) {
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary.id());
+    switch(boundary.boundary_type()){
+      case StBoundary::BoundaryType::FOLLOW:
+        boundary_debug->set_type(
+            ::apollo::planning_internal
+            ::StGraphBoundaryDebug::ST_BOUNDARY_TYPE_FOLLOW);
+        break;
+      case StBoundary::BoundaryType::OVERTAKE:
+        boundary_debug->set_type(
+            ::apollo::planning_internal
+            ::StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
+        break;
+      case StBoundary::BoundaryType::STOP:
+        boundary_debug->set_type(
+            ::apollo::planning_internal
+            ::StGraphBoundaryDebug::ST_BOUNDARY_TYPE_STOP);
+        break;
+      case StBoundary::BoundaryType::UNKNOWN:
+        boundary_debug->set_type(
+            ::apollo::planning_internal
+            ::StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
+        break;
+      case StBoundary::BoundaryType::YIELD:
+        boundary_debug->set_type(
+            ::apollo::planning_internal
+            ::StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
+        break;
+    }
     for (const auto& point : boundary.points()) {
       auto point_debug = boundary_debug->add_point();
       point_debug->set_t(point.x());
