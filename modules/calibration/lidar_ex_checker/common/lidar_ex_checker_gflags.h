@@ -26,4 +26,5 @@ DECLARE_int32(capture_cloud_count);
 // the distance between two clouds
 DECLARE_double(capture_distance);
 
-#endif /* MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_ */
+#endif
+/* MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_ */

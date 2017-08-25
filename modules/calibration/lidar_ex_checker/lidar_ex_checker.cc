@@ -63,7 +63,7 @@ Status LidarExChecker::Init() {
 }
 
 bool LidarExChecker::GetExtrinsics() {
-  static tf2_ros::Buffer tf2_buffer;                                                                                                       
+  static tf2_ros::Buffer tf2_buffer;
   static tf2_ros::TransformListener tf2Listener(tf2_buffer);
 
   std::string err_msg;
@@ -75,7 +75,8 @@ bool LidarExChecker::GetExtrinsics() {
   }
 
   geometry_msgs::TransformStamped transform_stamped;
-  transform_stamped = tf2_buffer.lookupTransform("novatel", "velodyne64", ros::Time(0));
+  transform_stamped =
+      tf2_buffer.lookupTransform("novatel", "velodyne64", ros::Time(0));
   tf::transformMsgToEigen(transform_stamped.transform, extrinsics_);
 
   std::cout << "velodyne64 extrinsics: " << std::endl;
