@@ -67,4 +67,25 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "sensor_canbus_lib",
+    hdrs = ["sensor_canbus.h"],
+    deps = [
+        ":sensor_message_manager_base",
+        "//modules/canbus:canbus_lib",
+        "//modules/drivers/can_comm:can_receiver",
+    ],
+)
+
+cc_test(
+    name = "sensor_canbus_test",
+    size = "small",
+    srcs = ["sensor_canbus_test.cc"],
+    deps = [
+        ":sensor_canbus_lib",
+        "//modules/drivers/proto:sensor_proto",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
