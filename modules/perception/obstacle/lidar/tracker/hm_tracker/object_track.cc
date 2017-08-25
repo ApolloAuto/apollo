@@ -399,7 +399,7 @@ bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
   Eigen::Vector3f previous_velocity =
     history_objects_[history_objects_.size() - 1]->velocity;
   Eigen::Vector3f current_velocity = current_object_->velocity;
-  double velocity_angle_change = vector_theta_2d_xy(previous_velocity,
+  double velocity_angle_change = VectorTheta2dXy(previous_velocity,
     current_velocity);
   // Previously, this threshold is set to PI/3. Now, as the smoothness of the
   // filter is improved by Robust Adaptive Kalman Filter, we would use more

@@ -170,7 +170,7 @@ class OfflineLidarPerceptionTool {
       Eigen::Vector4d ct_velo = pose_tw2velo * Eigen::Vector4d(
         obj->center[0], obj->center[1], obj->center[2], 1);
       Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
-      double theta = vector_theta_2d_xy(coord_dir, dir_velo3);
+      double theta = VectorTheta2dXy(coord_dir, dir_velo3);
       std::string type ="unknown";
       if (obj->type == PEDESTRIAN) {
         type = "pedestrain";
