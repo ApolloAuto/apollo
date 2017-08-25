@@ -250,7 +250,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l
              << "]";
-      continue;
+      break;
     }
 
     if (points->size() > 0) {
