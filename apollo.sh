@@ -472,7 +472,8 @@ function print_usage() {
   echo -e "\n${RED}Options${NONE}:
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
-  ${BLUE}build_gpu${NONE}: build binary with Caffe GPU mode support
+  ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
+  ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
@@ -511,6 +512,10 @@ function main() {
       link_gpu_caffe_build
       apollo_build_dbg
       ;;
+    build_opt_gpu)
+      link_gpu_caffe_build
+      apollo_build_opt
+      ;;  
     build_fe)
       build_fe
       ;;
