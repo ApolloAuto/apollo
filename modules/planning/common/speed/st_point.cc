@@ -29,6 +29,8 @@ namespace planning {
 
 STPoint::STPoint(const double s, const double t) : Vec2d(t, s) {}
 
+STPoint::STPoint(const common::math::Vec2d& vec2d_point) : Vec2d(vec2d_point) {}
+
 double STPoint::s() const { return y_; }
 
 double STPoint::t() const { return x_; }

@@ -27,14 +27,24 @@
 namespace apollo {
 namespace planning {
 
-TEST(StBoundaryTest, basic_test) {
-  std::vector<STPoint> st_points;
-  st_points.emplace_back(0.0, 0.0);
-  st_points.emplace_back(0.0, 10.0);
-  st_points.emplace_back(5.0, 10.0);
-  st_points.emplace_back(5.0, 0.0);
+using Vec2d = apollo::common::math::Vec2d;
 
-  StBoundary boundary(st_points);
+TEST(StBoundaryTest, basic_test) {
+  std::vector<STPoint> upper_points;
+  std::vector<STPoint> lower_points;
+
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+
+  lower_points.emplace_back(0.0, 0.0);
+  lower_points.emplace_back(0.0, 10.0);
+  upper_points.emplace_back(5.0, 0.0);
+  upper_points.emplace_back(5.0, 10.0);
+
+  point_pairs.emplace_back(lower_points[0], upper_points[0]);
+  point_pairs.emplace_back(lower_points[1], upper_points[1]);
+
+  StBoundary boundary(point_pairs);
+
   EXPECT_EQ(boundary.id(), "");
   EXPECT_EQ(boundary.boundary_type(), StBoundary::BoundaryType::UNKNOWN);
   EXPECT_FLOAT_EQ(0.0, boundary.min_s());
@@ -44,12 +54,21 @@ TEST(StBoundaryTest, basic_test) {
 }
 
 TEST(StBoundaryTest, boundary_range) {
-  std::vector<STPoint> st_points;
-  st_points.emplace_back(1.0, 0.0);
-  st_points.emplace_back(1.0, 10.0);
-  st_points.emplace_back(5.0, 10.0);
-  st_points.emplace_back(5.0, 0.0);
-  StBoundary boundary(st_points);
+  std::vector<STPoint> upper_points;
+  std::vector<STPoint> lower_points;
+
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+
+  lower_points.emplace_back(1.0, 0.0);
+  lower_points.emplace_back(1.0, 10.0);
+  upper_points.emplace_back(5.0, 0.0);
+  upper_points.emplace_back(5.0, 10.0);
+
+  point_pairs.emplace_back(lower_points[0], upper_points[0]);
+  point_pairs.emplace_back(lower_points[1], upper_points[1]);
+
+  StBoundary boundary(point_pairs);
+
   boundary.SetBoundaryType(StBoundary::BoundaryType::YIELD);
   double t = -10.0;
   const double dt = 0.01;
