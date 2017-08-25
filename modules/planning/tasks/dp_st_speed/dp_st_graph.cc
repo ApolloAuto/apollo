@@ -79,7 +79,7 @@ Status DpStGraph::Search(PathDecision* const path_decision,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  CalculatePointwiseCost(st_graph_data_.st_graph_boundaries());
+  CalculatePointwiseCost(st_graph_data_.st_boundaries());
 
   if (!CalculateTotalCost().ok()) {
     const std::string msg = "Calculate total cost failed.";
@@ -98,7 +98,6 @@ Status DpStGraph::Search(PathDecision* const path_decision,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
   return Status::OK();
 }
 
@@ -231,7 +230,7 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   double speed_limit =
       st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
   if (c == 1) {
-    if (CheckOverlapOnDpStGraph(st_graph_data_.st_graph_boundaries(),
+    if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(),
                                 cost_table_[c][r], cost_table_[0][0])) {
       return;
     }
@@ -248,7 +247,7 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
 
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-      if (CheckOverlapOnDpStGraph(st_graph_data_.st_graph_boundaries(),
+      if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(),
                                   cost_table_[c][r],
                                   cost_table_[c - 1][r_pre])) {
         return;
@@ -288,7 +287,7 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
       continue;
     }
 
-    if (CheckOverlapOnDpStGraph(st_graph_data_.st_graph_boundaries(),
+    if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(),
                                 cost_table_[c][r], cost_table_[c - 1][r_pre])) {
       return;
     }
@@ -397,7 +396,7 @@ Status DpStGraph::MakeObjectDecision(const SpeedData& speed_profile,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  for (const auto& boundary : st_graph_data_.st_graph_boundaries()) {
+  for (const auto& boundary : st_graph_data_.st_boundaries()) {
     auto* path_obstacle = path_decision->Find(boundary.id());
     CHECK(path_obstacle) << "Failed to find obstacle " << boundary.id();
     if (path_obstacle->HasLongitudinalDecision()) {
@@ -420,7 +419,7 @@ Status DpStGraph::MakeObjectDecision(const SpeedData& speed_profile,
       STPoint st_point(speed_point.s(), speed_point.t());
       if (boundary.IsPointInBoundary(st_point)) {
         const std::string msg =
-            "dp_st_graph failed: speed profile cross st_graph_boundaries.";
+            "dp_st_graph failed: speed profile cross st_boundaries.";
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
