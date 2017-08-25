@@ -67,6 +67,10 @@ template <typename SensorType>
 class SensorMessageManager {
  public:
   /*
+   * @brief constructor function
+   */
+  SensorMessageManager() {}
+  /*
    * @brief destructor function
    */
   virtual ~SensorMessageManager() = default;
