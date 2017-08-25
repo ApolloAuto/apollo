@@ -66,6 +66,7 @@ cc_test(
     ],
     data = [
         "//modules/common/configs:config_gflags",
+        "//modules/localization/common:localization_common",
         "//modules/map:map_data",
         "//modules/planning:planning_testdata",
     ],
