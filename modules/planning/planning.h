@@ -82,6 +82,7 @@ class Planning : public apollo::common::ApolloApp {
   void RunOnce();
 
   bool InitFrame(const uint32_t sequence_num);
+
  private:
   void PublishPlanningPb(ADCTrajectory* trajectory_pb);
 
@@ -101,6 +102,8 @@ class Planning : public apollo::common::ApolloApp {
   std::unique_ptr<Planner> planner_;
 
   PublishableTrajectory last_publishable_trajectory_;
+
+  double start_timestamp_ = 0.0;
 };
 
 }  // namespace planning

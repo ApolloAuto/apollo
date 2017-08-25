@@ -568,8 +568,7 @@ Status StBoundaryMapper::GetSpeedLimits(
 }
 
 void StBoundaryMapper::AppendBoundary(
-    const StBoundary& boundary,
-    std::vector<StBoundary>* st_boundaries) const {
+    const StBoundary& boundary, std::vector<StBoundary>* st_boundaries) const {
   if (Double::Compare(boundary.area(), 0.0) <= 0) {
     return;
   }

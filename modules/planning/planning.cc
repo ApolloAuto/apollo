@@ -64,7 +64,7 @@ bool Planning::InitFrame(const uint32_t sequence_num) {
     ADEBUG << "Get prediction done.";
   }
 
-  if (!frame_->Init(config_)) {
+  if (!frame_->Init(config_, start_timestamp_)) {
     AERROR << "failed to init frame";
     return false;
   }
@@ -145,6 +145,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 }
 
 void Planning::RunOnce() {
+  start_timestamp_ = Clock::NowInSecond();
   AdapterManager::Observe();
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
@@ -177,8 +178,6 @@ void Planning::RunOnce() {
     return;
   }
 
-  const double start_timestamp = Clock::NowInSecond();
-
   // localization
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
@@ -208,21 +207,21 @@ void Planning::RunOnce() {
   }
 
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
-  status = Plan(is_auto_mode, start_timestamp, planning_cycle_time);
+  status = Plan(is_auto_mode, start_timestamp_, planning_cycle_time);
 
   const double end_timestamp = Clock::NowInSecond();
-  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  const double time_diff_ms = (end_timestamp - start_timestamp_) * 1000;
   auto trajectory_pb = frame_->MutableADCTrajectory();
   trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: "
          << trajectory_pb->latency_stats().DebugString();
 
   if (status.ok()) {
-    PublishPlanningPb(trajectory_pb, start_timestamp);
+    PublishPlanningPb(trajectory_pb, start_timestamp_);
     ADEBUG << "Planning succeeded:" << trajectory_pb->header().DebugString();
   } else {
     status.Save(trajectory_pb->mutable_header()->mutable_status());
-    PublishPlanningPb(trajectory_pb, start_timestamp);
+    PublishPlanningPb(trajectory_pb, start_timestamp_);
     AERROR << "Planning failed";
   }
 }
@@ -246,8 +245,6 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
         ->mutable_init_point()
         ->CopyFrom(stitching_trajectory.back());
   }
-
-  frame_->AlignPredictionTime(current_time_stamp);
 
   std::vector<std::unique_ptr<std::thread>> threads;
   for (auto& reference_line_info : frame_->reference_line_info()) {

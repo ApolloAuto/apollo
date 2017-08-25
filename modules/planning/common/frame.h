@@ -55,7 +55,7 @@ class Frame {
   void SetPlanningStartPoint(const common::TrajectoryPoint &start_point);
   void SetVehicleInitPose(const localization::Pose &pose);
   const common::TrajectoryPoint &PlanningStartPoint() const;
-  bool Init(const PlanningConfig &config);
+  bool Init(const PlanningConfig &config, const double current_time_stamp);
 
   static const hdmap::PncMap *PncMap();
   static void SetMap(hdmap::PncMap *pnc_map);
