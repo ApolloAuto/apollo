@@ -41,6 +41,8 @@ class Planning:
         self.sl_dynamic_obstacle_upper_boundary = []
         self.sl_map_lower_boundary = []
         self.sl_map_upper_boundary = []
+        self.sl_path_s = []
+        self.sl_path_l = []
 
     def update_planning_pb(self, planning_pb):
         self.planning_pb = planning_pb
@@ -53,6 +55,8 @@ class Planning:
         sl_static_obstacle_upper_boundary = []
         sl_dynamic_obstacle_lower_boundary = []
         sl_dynamic_obstacle_upper_boundary = []
+        sl_path_s = []
+        sl_path_l = []
 
         for sl_frame in self.planning_pb.debug.planning_data.sl_frame:
             for s in sl_frame.sampled_s:
@@ -75,6 +79,9 @@ class Planning:
                 sl_dynamic_obstacle_lower_boundary.append(l)
             for l in sl_frame.dynamic_obstacle_upper_bound:
                 sl_dynamic_obstacle_upper_boundary.append(l)
+            for slpoint in sl_frame.sl_path:
+                sl_path_s.append(slpoint.s)
+                sl_path_l.append(slpoint.l)
 
         self.sl_data_lock.acquire()
         self.sl_sampled_s = sl_sampled_s
@@ -84,6 +91,8 @@ class Planning:
         self.sl_static_obstacle_upper_boundary = sl_static_obstacle_upper_boundary
         self.sl_dynamic_obstacle_lower_boundary = sl_dynamic_obstacle_lower_boundary
         self.sl_dynamic_obstacle_upper_boundary = sl_dynamic_obstacle_upper_boundary
+        self.sl_path_s = sl_path_s
+        self.sl_path_l = sl_path_l
         self.sl_data_lock.release()
 
     def compute_st_data(self):
@@ -125,7 +134,7 @@ class Planning:
                        sl_dynamic_obstacle_lower_boundary,
                        sl_dynamic_obstacle_upper_boundary,
                        sl_map_lower_boundary,
-                       sl_map_upper_boundary):
+                       sl_map_upper_boundary, sl_path):
         self.sl_data_lock.acquire()
         sl_static_obstacle_lower_boundary.set_visible(True)
         sl_static_obstacle_upper_boundary.set_visible(True)
@@ -133,6 +142,7 @@ class Planning:
         sl_dynamic_obstacle_upper_boundary.set_visible(True)
         sl_map_lower_boundary.set_visible(True)
         sl_map_upper_boundary.set_visible(True)
+        sl_path.set_visible(True)
 
         new_sampled_s = []
         for s in self.sl_sampled_s:
@@ -168,6 +178,8 @@ class Planning:
         sl_static_obstacle_lower_boundary.set_ydata(new_static_lower)
         sl_static_obstacle_upper_boundary.set_xdata(new_sampled_s)
         sl_static_obstacle_upper_boundary.set_ydata(new_static_upper)
+        sl_path.set_xdata(self.sl_path_s)
+        sl_path.set_ydata(self.sl_path_l)
         self.sl_data_lock.release()
 
     def replot_st_data(self, boundaries_pool, st_line,
