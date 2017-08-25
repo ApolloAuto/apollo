@@ -135,9 +135,11 @@ void ProtoOrganizer::GetOverlapElements(
   for (auto& road_internal : roads) {
     for (auto& road_section : road_internal.sections) {
       for (auto& lane_internal : road_section.lanes) {
+        std::string lane_id = lane_internal.lane.id().id();
         for (auto& lane_2_lane_overlap : lane_internal.overlap_lanes) {
-          lane_2_lane_overlaps[lane_2_lane_overlap.object_id] =
-                                                      lane_2_lane_overlap;
+          std::string unique_object_id = lane_id + "_"
+                                        + lane_2_lane_overlap.object_id;
+          lane_2_lane_overlaps[unique_object_id] = lane_2_lane_overlap;
         }
       }
     }
@@ -166,7 +168,8 @@ void ProtoOrganizer::GetOverlapElements(
                                                   overlap_object.start_s);
           object_overlap->mutable_lane_overlap_info()->set_end_s(
                                                   overlap_object.end_s);
-          CHECK(_proto_data.pb_lanes.count(lane_id) > 0);
+          object_overlap->mutable_lane_overlap_info()
+                                  ->set_is_merge(overlap_object.is_merge);
           object_overlap = overlap.add_object();
           object_overlap->mutable_id()->set_id(object_id);
           if (_proto_data.pb_crosswalks.count(object_id) > 0) {
@@ -182,7 +185,8 @@ void ProtoOrganizer::GetOverlapElements(
             _proto_data.pb_speed_bumps[object_id].add_overlap_id()
                     ->set_id(overlap_id);
           } else {
-            assert(0);
+            AERROR << "unknown object, object id:"
+                  << object_id;
           }
           _proto_data.pb_overlaps[overlap_id] = overlap;
         }
@@ -191,8 +195,7 @@ void ProtoOrganizer::GetOverlapElements(
           if (_proto_data.pb_signals.count(object_id) <= 0
             && _proto_data.pb_stop_signs.count(object_id) <= 0
             && _proto_data.pb_yield_signs.count(object_id) <= 0) {
-              std::cout << "cannot find signal object_id:" << object_id
-                  << std::endl;
+              AINFO << "cannot find signal object_id:" << object_id;
               continue;
             }
             PbOverlap overlap;
@@ -205,7 +208,8 @@ void ProtoOrganizer::GetOverlapElements(
                                                       overlap_signal.start_s);
             object_overlap->mutable_lane_overlap_info()->set_end_s(
                                                       overlap_signal.end_s);
-            CHECK(_proto_data.pb_lanes.count(lane_id) > 0);
+            object_overlap->mutable_lane_overlap_info()
+                                  ->set_is_merge(overlap_signal.is_merge);
             object_overlap = overlap.add_object();
             object_overlap->mutable_id()->set_id(object_id);
             if (_proto_data.pb_signals.count(object_id) > 0) {
@@ -221,15 +225,14 @@ void ProtoOrganizer::GetOverlapElements(
               _proto_data.pb_yield_signs[object_id].add_overlap_id()
                               ->set_id(overlap_id);
             } else {
-              assert(0);
+              AERROR << "unknown signal, signal id:" << object_id;
             }
             _proto_data.pb_overlaps[overlap_id] = overlap;
           }
           for (auto& overlap_junction : lane_internal.overlap_junctions) {
             std::string object_id = overlap_junction.object_id;
             if (_proto_data.pb_junctions.count(object_id) <= 0) {
-              std::cout << "cannot find junction object id:"
-                    << object_id << std::endl;
+              AINFO << "cannot find junction object " << object_id;
               continue;
             }
             PbOverlap overlap;
@@ -242,7 +245,8 @@ void ProtoOrganizer::GetOverlapElements(
                                                 overlap_junction.start_s);
             object_overlap->mutable_lane_overlap_info()->set_end_s(
                                                 overlap_junction.end_s);
-            CHECK(_proto_data.pb_lanes.count(lane_id) > 0);
+            object_overlap->mutable_lane_overlap_info()
+                                  ->set_is_merge(overlap_junction.is_merge);
             object_overlap = overlap.add_object();
             object_overlap->mutable_id()->set_id(object_id);
             if (_proto_data.pb_junctions.count(object_id) > 0) {
@@ -250,7 +254,7 @@ void ProtoOrganizer::GetOverlapElements(
               _proto_data.pb_junctions[object_id].add_overlap_id()->set_id(
                                                                 overlap_id);
             } else {
-              assert(0);
+              AERROR << "unknown junction overlap, id:" << object_id;
             }
             _proto_data.pb_overlaps[overlap_id] = overlap;
           }
@@ -275,11 +279,20 @@ void ProtoOrganizer::GetOverlapElements(
                                                 overlap_lane.start_s);
             object_overlap->mutable_lane_overlap_info()->set_end_s(
                                                 overlap_lane.end_s);
-            CHECK(_proto_data.pb_lanes.count(object_id) > 0);
+            object_overlap->mutable_lane_overlap_info()
+                                  ->set_is_merge(overlap_lane.is_merge);
             object_overlap = overlap.add_object();
+            object_overlap->mutable_id()->set_id(object_id);
             if (_proto_data.pb_lanes.count(object_id) > 0) {
-              CHECK(lane_2_lane_overlaps.count(object_id) == 1);
-              auto& lane_2_lane_overlap = lane_2_lane_overlaps[object_id];
+              std::string overlap_pair_id = unique_object_id;
+              if (lane_2_lane_overlaps.count(overlap_pair_id) <= 0) {
+                overlap_pair_id = lane_id + "_" + object_id;
+              }
+              if (lane_2_lane_overlaps.count(overlap_pair_id) <= 0) {
+                AERROR << "lane overlap is not Symmetrical " << overlap_pair_id;
+                continue;
+              }
+              auto& lane_2_lane_overlap = lane_2_lane_overlaps[overlap_pair_id];
               object_overlap->mutable_lane_overlap_info()->set_start_s(
                   lane_2_lane_overlap.start_s);
               object_overlap->mutable_lane_overlap_info()->set_end_s(
@@ -289,7 +302,7 @@ void ProtoOrganizer::GetOverlapElements(
               _proto_data.pb_lanes[object_id].add_overlap_id()->set_id(
                                                               overlap_id);
             } else {
-              assert(0);
+              AERROR << "unknown lane overlap, id:" << object_id;
             }
             _proto_data.pb_overlaps[overlap_id] = overlap;
           }
