@@ -21,7 +21,10 @@ import itertools
 import matplotlib.pyplot as plt
 import debug_topo
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
-import plot_map
+import util
+
+import gflags
+import os
 
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])
@@ -67,19 +70,6 @@ def plot_route(lanes, central_curve_dict):
     plt.draw()
 
 
-def print_help():
-    """Print help information.
-
-    Print help information of usage.
-
-    Args:
-
-    """
-    print 'usage:'
-    print '     python debug_route.py topo_file_path debug_route_file_path, then',
-    print_help_command()
-
-
 def print_help_command():
     """Print command help information.
 
@@ -95,16 +85,11 @@ def print_help_command():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print_help()
-        sys.exit(0)
-    print 'Please wait for loading data...'
+    map_dir = util.get_map_dir(sys.argv)
+    graph = util.get_topodata(map_dir)
+    base_map = util.get_mapdata(map_dir)
+    route = util.get_routingdata()
 
-    map_path = '/home/caros/adu_data/map/base_map.bin'
-    file_name = sys.argv[1]
-    fin = open(file_name)
-    graph = topo_graph_pb2.Graph()
-    graph.ParseFromString(fin.read())
     central_curves = {}
     for nd in graph.node:
         central_curves[nd.lane_id] = nd.central_curve
@@ -119,12 +104,10 @@ if __name__ == '__main__':
             if argv[0] == 'q':
                 sys.exit(0)
             elif argv[0] == 'r':
-                route = read_route(sys.argv[2])
                 plot_route(route, central_curves)
             elif argv[0] == 'r_map':
-                route = read_route(sys.argv[2])
                 plot_route(route, central_curves)
-                plot_map.draw_map(plt.gca(), map_path)
+                util.draw_map(plt.gca(), base_map)
             else:
                 print '[ERROR] wrong command'
             continue
