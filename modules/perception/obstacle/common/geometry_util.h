@@ -81,10 +81,10 @@ void TransformCloud(pcl_util::PointCloudPtr cloud,
                     pcl_util::PointDCloud* trans_cloud);
 
 template <typename PointT>
-void compute_bbox_size_center_xy(typename pcl::PointCloud<PointT>::Ptr cloud,
-                                 const Eigen::Vector3d& direction,
-                                 Eigen::Vector3d& size,
-                                 Eigen::Vector3d& center) {
+void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
+                           const Eigen::Vector3d& direction,
+                           Eigen::Vector3d& size,
+                           Eigen::Vector3d& center) {
   Eigen::Vector3d dir(direction[0], direction[1], 0);
   dir.normalize();
   Eigen::Vector3d ortho_dir(-dir[1], dir[0], 0.0);
@@ -111,7 +111,7 @@ void compute_bbox_size_center_xy(typename pcl::PointCloud<PointT>::Ptr cloud,
 }
 
 template <typename PointT>
-Eigen::Vector3d get_barycenter(typename pcl::PointCloud<PointT>::Ptr cloud) {
+Eigen::Vector3d GetCloudBarycenter(typename pcl::PointCloud<PointT>::Ptr cloud) {
   int point_num = cloud->points.size();
   Eigen::Vector3d barycenter(0, 0, 0);
 
