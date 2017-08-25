@@ -120,17 +120,17 @@ TEST(FileUtilTest, test_GetFileList) {
   EXPECT_EQ(0, files.size());
   std::string path = "modules/perception/data/config_manager_test";
   FileUtil::GetFileList(path, "config", &files);
-  EXPECT_TRUE(files.size() > 0);
+  EXPECT_GT(files.size(), 0);
 
   files.clear();
   FileUtil::GetFileList(path, &files);
-  EXPECT_TRUE(files.size() > 0);
+  EXPECT_GT(files.size(), 0);
 }
 
 TEST(FileUtilTest, test_NumLines) {
   std::string proto_file =
       "modules/perception/data/config_manager_test/config_manager.config";
-  EXPECT_TRUE(FileUtil::NumLines(proto_file) > 0);
+  EXPECT_GT(FileUtil::NumLines(proto_file), 0);
 }
 
 }  // namespace perception

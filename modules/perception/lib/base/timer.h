@@ -42,10 +42,11 @@ class Timer {
   uint64_t end(const std::string& msg);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(Timer);
   // in ms.
   TimePoint _start_time;
   TimePoint _end_time;
+
+  DISALLOW_COPY_AND_ASSIGN(Timer);
 };
 
 class TimerWrapper {
@@ -59,10 +60,10 @@ class TimerWrapper {
   }
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(TimerWrapper);
-
   Timer _timer;
   std::string _msg;
+
+  DISALLOW_COPY_AND_ASSIGN(TimerWrapper);
 };
 
 }  // namespace perception

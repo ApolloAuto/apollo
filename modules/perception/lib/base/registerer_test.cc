@@ -25,9 +25,7 @@ class BaseClass {
  public:
   BaseClass() = default;
   ~BaseClass() = default;
-  virtual std::string name() const {
-    return "BaseClass1";
-  }
+  virtual std::string name() const = 0;
 };
 REGISTER_REGISTERER(BaseClass);
 #define REGISTER_TEST(name) REGISTER_CLASS(BaseClass, name)
@@ -80,6 +78,13 @@ TEST(ObjectFactoryTest, test_ObjectFactory) {
   ObjectFactory obj_fac;
   Any any = obj_fac.NewInstance();
   EXPECT_TRUE(any.content_ == NULL);
+  int value = 100;
+  Any any2(value);
+  EXPECT_FALSE(any2.content_ == NULL);
+  EXPECT_EQ(*any2.AnyCast<int>(), value);
+  Any any3(any2);
+  EXPECT_FALSE(any3.content_ == NULL);
+  EXPECT_EQ(*any3.AnyCast<int>(), value);
 }
 
 }  // namespace perception
