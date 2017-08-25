@@ -202,4 +202,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "spline_1d_kernel_test",
+    size = "small",
+    srcs = [
+        "spline_1d_kernel_test.cc",
+    ],
+    deps = [
+        ":spline_1d_kernel",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
