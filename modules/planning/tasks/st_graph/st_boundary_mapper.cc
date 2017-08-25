@@ -53,8 +53,8 @@ using Vec2d = apollo::common::math::Vec2d;
 
 namespace {
 
-constexpr double boundary_t_buffer = 2.0;
-constexpr double boundary_s_buffer = 5.0;
+constexpr double boundary_t_buffer = 0.001;
+constexpr double boundary_s_buffer = 1.0;
 }
 
 StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
@@ -251,7 +251,6 @@ Status StBoundaryMapper::MapWithoutDecision(const PathObstacle& path_obstacle,
         upper_points.at(0).t() > upper_points.back().t()) {
       AWARN << "lower/upper points are reversed.";
     }
-
     *boundary = StBoundary(boundary_points);
     boundary->SetId(path_obstacle.obstacle()->Id());
   }
