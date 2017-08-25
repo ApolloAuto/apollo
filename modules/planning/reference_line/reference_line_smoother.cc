@@ -115,8 +115,7 @@ bool ReferenceLineSmoother::smooth(
       continue;
     }
 
-    ReferencePoint rlp =
-        raw_reference_line.GetReferencePoint(ref_sl_point.s());
+    ReferencePoint rlp = raw_reference_line.GetReferencePoint(ref_sl_point.s());
     ref_points.emplace_back(ReferencePoint(
         hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
                             rlp.lane_waypoints()),
@@ -131,9 +130,8 @@ bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.Length();
   const double resolution = length / smoother_config_.num_spline();
   double accumulated_s = 0.0;
-  for (std::uint32_t i = 0;
-       i <= smoother_config_.num_spline() && accumulated_s <= length;
-       ++i, accumulated_s += resolution) {
+  for (std::uint32_t i = 0; i <= smoother_config_.num_spline();
+       ++i, accumulated_s = std::min(accumulated_s + resolution, length)) {
     ReferencePoint rlp = raw_reference_line.GetReferencePoint(accumulated_s);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
