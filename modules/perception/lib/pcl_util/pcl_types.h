@@ -23,7 +23,6 @@
 #include <pcl/point_types.h>
 #include <pcl/search/impl/kdtree.hpp>
 #include <pcl/common/transforms.h>
-//#include <pcl_conversions/pcl_conversions.h>
 
 namespace apollo {
 namespace perception {
@@ -89,7 +88,7 @@ struct PointXYZIH {
     data[3] = 1.0f;
   }
 
-  inline PointXYZIH(float _intensity) {
+  explicit PointXYZIH(float _intensity) {
     x = 0.0f;
     y = 0.0f;
     z = 0.0f;
@@ -148,7 +147,7 @@ struct PointXYZITd {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW  // make sure our new allocators are aligned
 } EIGEN_ALIGN16;  // enforce SSE padding for correct memory alignment
 
-} // namespace pcl
+}  // namespace pcl_util
 }  // namespace perception
 }  // namespace apollo
 
