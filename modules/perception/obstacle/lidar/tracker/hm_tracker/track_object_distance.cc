@@ -165,7 +165,7 @@ float TrackObjectDistance::ComputeDirectionDistance(const ObjectTrackPtr& track,
   double cos_theta = 0.994;  // average cos
   if (!track_motion_dir.head(2).isZero() &&
     !anchor_point_shift_dir.head(2).isZero()) {
-    cos_theta = vector_cos_theta_2d_xy(track_motion_dir,
+    cos_theta = VectorCosTheta2dXy(track_motion_dir,
       anchor_point_shift_dir);
   }
   float direction_dist = -cos_theta + 1.0;

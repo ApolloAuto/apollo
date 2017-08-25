@@ -142,7 +142,7 @@ bool SaveTrackingResults(const std::vector<ObjectPtr>& objects,
         pose_w2v * Eigen::Vector4d(objects[i]->center[0], objects[i]->center[1],
                                    objects[i]->center[2], 0);
     Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
-    double theta = vector_theta_2d_xy(coord_dir, dir_velo3);
+    double theta = VectorTheta2dXy(coord_dir, dir_velo3);
     std::string type = "unknown";
     fout << objects[i]->id << " " << objects[i]->track_id << " " << type << " "
          << std::setprecision(10) << ct_velo[0] << " " << ct_velo[1] << " "
