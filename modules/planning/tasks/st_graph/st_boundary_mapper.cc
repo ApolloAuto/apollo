@@ -53,7 +53,7 @@ using Vec2d = apollo::common::math::Vec2d;
 
 namespace {
 
-constexpr double boundary_t_buffer = 0.001;
+constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }
 
@@ -358,22 +358,19 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
     boundary_points.clear();
 
     // lower left point
-    boundary_points.emplace_back(
-        std::fmax(0.0, lower_points.at(0).s() - boundary_s_buffer),
-        std::fmax(0.0, lower_points.at(0).t() - boundary_t_buffer));
+    boundary_points.emplace_back(lower_points.at(0).s() - boundary_s_buffer,
+                                 lower_points.at(0).t() - boundary_t_buffer);
     // lower right point
-    boundary_points.emplace_back(
-        std::fmax(0.0, lower_points.back().s() - boundary_s_buffer),
-        lower_points.back().t() + boundary_t_buffer);
+    boundary_points.emplace_back(lower_points.back().s() - boundary_s_buffer,
+                                 lower_points.back().t() + boundary_t_buffer);
 
     // upper right point
     boundary_points.emplace_back(upper_points.back().s() + boundary_s_buffer,
                                  upper_points.back().t() + boundary_t_buffer);
 
     // upper left point
-    boundary_points.emplace_back(
-        upper_points.at(0).s() + boundary_s_buffer,
-        std::fmax(0.0, upper_points.at(0).t() - boundary_t_buffer));
+    boundary_points.emplace_back(upper_points.at(0).s() + boundary_s_buffer,
+                                 upper_points.at(0).t() - boundary_t_buffer);
 
     if (lower_points.at(0).t() > lower_points.back().t() ||
         upper_points.at(0).t() > upper_points.back().t()) {
