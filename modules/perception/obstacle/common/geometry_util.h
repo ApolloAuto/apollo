@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 
-#include <float.h>
 #include <algorithm>
+#include <float.h>
 #include <vector>
 #include "Eigen/Core"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
@@ -26,10 +26,9 @@
 namespace apollo {
 namespace perception {
 
-void TransAffineToMatrix4(const Eigen::Vector3d& translation,
-                          const Eigen::Vector4d& rotation,
-                          Eigen::Matrix4d* trans_matrix);
-
+/*
+* Transform point cloud methods
+* */
 template <typename PointT>
 void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
                          typename pcl::PointCloud<PointT>::Ptr cloud_in_out) {
@@ -43,6 +42,59 @@ void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
   }
 }
 
+template <typename PointType>
+void transform_point_cloud(const PointType& point_in, PointType& point_out,
+                           const Eigen::Matrix4d& trans_mat) {
+  Eigen::Vector4d v(point_in.x, point_in.y, point_in.z, 1);
+  v = trans_mat * v;
+  point_out = point_in;
+  point_out.x = v.x();
+  point_out.y = v.y();
+  point_out.z = v.z();
+}
+
+template <typename PointType>
+void transform_point_cloud(pcl::PointCloud<PointType>& cloud_in_out,
+                           const Eigen::Matrix4d& trans_mat) {
+  for (int i = 0; i < cloud_in_out.size(); ++i) {
+    PointType& p = cloud_in_out.at(i);
+    Eigen::Vector4d v(p.x, p.y, p.z, 1);
+    v = trans_mat * v;
+    p.x = v.x();
+    p.y = v.y();
+    p.z = v.z();
+  }
+}
+
+template <typename PointType>
+void transform_point_cloud(const pcl::PointCloud<PointType>& cloud_in,
+                           pcl::PointCloud<PointType>& cloud_out,
+                           const Eigen::Matrix4d& trans_mat) {
+  if (cloud_out.points.size() < cloud_in.points.size()) {
+    cloud_out.points.resize(cloud_in.points.size());
+  }
+  for (int i = 0; i < cloud_in.size(); ++i) {
+    const PointType& p = cloud_in.at(i);
+    Eigen::Vector4d v(p.x, p.y, p.z, 1);
+    v = trans_mat * v;
+    PointType& pd = cloud_out.points[i];
+    pd.x = v.x();
+    pd.y = v.y();
+    pd.z = v.z();
+  }
+}
+
+void TransformCloud(pcl_util::PointCloudPtr cloud,
+                    const std::vector<int>& indices,
+                    pcl_util::PointDCloud* trans_cloud);
+
+void transform_perception_cloud(pcl_util::PointCloudPtr cloud,
+                                const Eigen::Matrix4d& pose_velodyne,
+                                typename pcl_util::PointDCloudPtr trans_cloud);
+
+/*
+ * Other point cloud related methods
+ * */
 template <typename PointT>
 void GetCloudMinMax3D(typename pcl::PointCloud<PointT>::Ptr cloud,
                       Eigen::Vector4f* min_point, Eigen::Vector4f* max_point) {
@@ -75,10 +127,6 @@ void GetCloudMinMax3D(typename pcl::PointCloud<PointT>::Ptr cloud,
     }
   }
 }
-
-void TransformCloud(pcl_util::PointCloudPtr cloud,
-                    const std::vector<int>& indices,
-                    pcl_util::PointDCloud* trans_cloud);
 
 template <typename PointT>
 void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
@@ -130,64 +178,9 @@ Eigen::Vector3d GetCloudBarycenter(typename pcl::PointCloud<PointT>::Ptr cloud) 
   return barycenter;
 }
 
-template <typename PointType>
-void transform_point_cloud(const PointType& point_in, PointType& point_out,
-                           const Eigen::Matrix4d& trans_mat) {
-  Eigen::Vector4d v(point_in.x, point_in.y, point_in.z, 1);
-  v = trans_mat * v;
-  point_out = point_in;
-  point_out.x = v.x();
-  point_out.y = v.y();
-  point_out.z = v.z();
-}
-
-template <typename PointType>
-void transform_point_cloud(pcl::PointCloud<PointType>& cloud_in_out,
-                           const Eigen::Matrix4d& trans_mat) {
-  for (int i = 0; i < cloud_in_out.size(); ++i) {
-    PointType& p = cloud_in_out.at(i);
-    Eigen::Vector4d v(p.x, p.y, p.z, 1);
-    v = trans_mat * v;
-    p.x = v.x();
-    p.y = v.y();
-    p.z = v.z();
-  }
-}
-
-template <typename PointType>
-void transform_point_cloud(const pcl::PointCloud<PointType>& cloud_in,
-                           pcl::PointCloud<PointType>& cloud_out,
-                           const Eigen::Matrix4d& trans_mat) {
-  if (cloud_out.points.size() < cloud_in.points.size()) {
-    cloud_out.points.resize(cloud_in.points.size());
-  }
-  for (int i = 0; i < cloud_in.size(); ++i) {
-    const PointType& p = cloud_in.at(i);
-    Eigen::Vector4d v(p.x, p.y, p.z, 1);
-    v = trans_mat * v;
-    PointType& pd = cloud_out.points[i];
-    pd.x = v.x();
-    pd.y = v.y();
-    pd.z = v.z();
-  }
-}
-
 /*
-use double in numerical computation for precision
-*/
-void transform_perception_cloud(pcl_util::PointCloudPtr cloud,
-                                const Eigen::Matrix4d& pose_velodyne,
-                                typename pcl_util::PointDCloudPtr trans_cloud);
-
-void TransformCloud(pcl_util::PointCloudPtr cloud, std::vector<int> indices,
-                    pcl_util::PointDCloud& trans_cloud);
-
-double vector_cos_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
-double vector_cos_theta_2d_xy(Eigen::Vector4f& v1, Eigen::Vector4f& v2);
-double vector_theta_2d_xy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
-void ComputeMostConsistentBboxDirection(const Eigen::Vector3f& previous_dir,
-        Eigen::Vector3f* current_dir);
-
+ * Vector & Matrix related methods
+ * */
 template <typename VectorIn, typename MatrixOut>
 MatrixOut vector_rot_mat_2d_xy(VectorIn& v1, VectorIn& v2) {
   double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
@@ -201,6 +194,17 @@ MatrixOut vector_rot_mat_2d_xy(VectorIn& v1, VectorIn& v2) {
   // std::cout << "drew theta : " << acos(cos_theta) << std::endl;
   return rot_mat;
 }
+
+void TransAffineToMatrix4(const Eigen::Vector3d& translation,
+                          const Eigen::Vector4d& rotation,
+                          Eigen::Matrix4d* trans_matrix);
+
+void ComputeMostConsistentBboxDirection(const Eigen::Vector3f& previous_dir,
+                                        Eigen::Vector3f* current_dir);
+
+double VectorCosTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
+
+double VectorTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
 
 }  // namespace perception
 }  // namespace apollo
