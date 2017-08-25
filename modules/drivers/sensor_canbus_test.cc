@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/drivers/sensor_canbus.h"
+#include "modules/drivers/mobileye/mobileye_message_manager.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 
 #include "gtest/gtest.h"
