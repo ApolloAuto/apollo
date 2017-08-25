@@ -1,0 +1,16 @@
+header {
+  module_name: "planning"
+  sequence_num: 1
+  status {
+    error_code: LOCALIZATION_ERROR
+    msg: "Fail to update because ConstructExceptLinearVelocity error.localization:\nheader {\n  timestamp_sec: 1473698038.46\n  module_name: \"localization\"\n  sequence_num: 8329\n}\npose {\n  position {\n    x: 435707.283186\n    y: 4435948.39609\n    z: 0\n  }\n  orientation {\n    qx: 0\n    qy: 0\n    qz: 0.182976195616\n    qw: 0.98311734388\n  }\n  linear_velocity {\n    x: -0\n    y: 0\n    z: 0\n  }\n  linear_acceleration {\n    x: -0\n    y: 0\n    z: 0\n  }\n  angular_velocity {\n    x: 0\n    y: 0\n    z: 0\n  }\n}\n"
+  }
+}
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    not_ready {
+      reason: "Update VehicleState failed."
+    }
+  }
+}

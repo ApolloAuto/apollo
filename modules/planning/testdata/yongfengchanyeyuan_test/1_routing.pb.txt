@@ -1,0 +1,147 @@
+header {
+  timestamp_sec: 1503587138.97
+  module_name: "routing"
+  sequence_num: 1
+}
+route {
+  road_info {
+    id: "r0"
+    in_lane {
+      id: "877_1_-2"
+      s: 0.0
+    }
+    out_lane {
+      id: "877_1_-2"
+      s: 146.924
+    }
+    passage_region {
+      segment {
+        id: "877_1_-2"
+        start_s: 0.0
+        end_s: 146.924
+      }
+    }
+  }
+}
+route {
+  road_info {
+    id: "r1"
+    in_lane {
+      id: "876_1_-2"
+      s: 0.0
+    }
+    out_lane {
+      id: "876_1_-2"
+      s: 21.4322
+    }
+    passage_region {
+      segment {
+        id: "876_1_-2"
+        start_s: 0.0
+        end_s: 21.4322
+      }
+    }
+  }
+}
+route {
+  road_info {
+    id: "r2"
+    in_lane {
+      id: "874_1_-2"
+      s: 0.0
+    }
+    out_lane {
+      id: "874_1_-2"
+      s: 12.6238
+    }
+    passage_region {
+      segment {
+        id: "874_1_-2"
+        start_s: 0.0
+        end_s: 12.6238
+      }
+    }
+  }
+}
+route {
+  road_info {
+    id: "r3"
+    in_lane {
+      id: "1008_1_-2"
+      s: 0.0
+    }
+    out_lane {
+      id: "1008_1_-2"
+      s: 33.604
+    }
+    passage_region {
+      segment {
+        id: "1008_1_-2"
+        start_s: 0.0
+        end_s: 33.604
+      }
+    }
+  }
+}
+route {
+  road_info {
+    id: "r4"
+    in_lane {
+      id: "988_1_-2"
+      s: 0.0
+    }
+    out_lane {
+      id: "988_1_-2"
+      s: 11.8744
+    }
+    passage_region {
+      segment {
+        id: "988_1_-2"
+        start_s: 0.0
+        end_s: 11.8744
+      }
+    }
+  }
+}
+route {
+  road_info {
+    id: "r5"
+    in_lane {
+      id: "869_1_-2"
+      s: 0.0
+    }
+    out_lane {
+      id: "869_1_-2"
+      s: 71.8469
+    }
+    passage_region {
+      segment {
+        id: "869_1_-2"
+        start_s: 0.0
+        end_s: 71.8469
+      }
+    }
+  }
+}
+measurement {
+  distance: 298.3053
+}
+routing_request {
+  start {
+    id: "877_1_-2"
+    s: 117.168061107
+    pose {
+      x: 435707.283186
+      y: 4435948.39609
+    }
+  }
+  end {
+    id: "869_1_-2"
+    s: 27.9859221654
+    pose {
+      x: 435658.185295
+      y: 4436076.59803
+    }
+  }
+}
+map_version: "1.400000"
