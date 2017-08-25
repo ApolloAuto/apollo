@@ -21,8 +21,7 @@ import math
 import itertools
 import matplotlib.pyplot as plt
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
-import plot_map
-import plot_event
+import util
 
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])
@@ -178,7 +177,7 @@ def plot_all(graph, plot_id=''):
     """plot topology graph"""
     plt.close()
     fig = plt.figure()
-    fig.canvas.mpl_connect('button_press_event', plot_event.onclick)
+    fig.canvas.mpl_connect('button_press_event', util.onclick)
     lane_middle_point_map = {}
     for i, (nd, color) in enumerate(zip(graph.node, color_iter)):
         nd_mid_pt = plot_node(nd, plot_id, color)
@@ -198,7 +197,7 @@ def plot_id(graph, lane_id):
     """plot topology graph"""
     plt.close()
     fig = plt.figure()
-    fig.canvas.mpl_connect('button_press_event', plot_event.onclick)
+    fig.canvas.mpl_connect('button_press_event', util.onclick)
     lane_middle_point_map = {}
     plot_ids = [lane_id]
     for eg in graph.edge:
@@ -220,19 +219,6 @@ def plot_id(graph, lane_id):
     plt.draw()
 
 
-def print_help():
-    """Print help information.
-
-    Print help information of usage.
-
-    Args:
-
-    """
-    print 'usage:'
-    print '     python debug_topo.py file_path, then',
-    print_help_command()
-
-
 def print_help_command():
     """Print command help information.
 
@@ -251,16 +237,9 @@ def print_help_command():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print_help()
-        sys.exit(0)
-    print 'Please wait for loading data...'
-
-    map_path = '/home/caros/adu_data/map/base_map.bin'
-    file_name = sys.argv[1]
-    fin = open(file_name)
-    graph = topo_graph_pb2.Graph()
-    graph.ParseFromString(fin.read())
+    map_dir = util.get_map_dir(sys.argv)
+    graph = util.get_topodata(map_dir)
+    base_map = util.get_mapdata(map_dir)
     print "district: %s" % graph.hdmap_district
     print "version: %s" % graph.hdmap_version
 
@@ -288,7 +267,7 @@ if __name__ == '__main__':
                 plot_id(graph, argv[1])
             elif argv[0] == 'i_map':
                 plot_id(graph, argv[1])
-                plot_map.draw_map(plt.gca(), map_path)
+                util.draw_map(plt.gca(), base_map)
             else:
                 print '[ERROR] wrong command'
             continue
