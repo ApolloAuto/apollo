@@ -1,0 +1,33 @@
+header {
+  timestamp_sec: 1473698038.46
+  module_name: "localization"
+  sequence_num: 8329
+}
+pose {
+  position {
+    x: 435707.283186
+    y: 4435948.39609
+    z: 0.0
+  }
+  orientation {
+    qx: 0.0
+    qy: 0.0
+    qz: 0.182976195616
+    qw: 0.98311734388
+  }
+  linear_velocity {
+    x: -0.0
+    y: 0.0
+    z: 0.0
+  }
+  linear_acceleration {
+    x: -0.0
+    y: 0.0
+    z: 0.0
+  }
+  angular_velocity {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+}
