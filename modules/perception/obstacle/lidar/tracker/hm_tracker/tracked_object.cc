@@ -30,7 +30,7 @@ TrackedObject::TrackedObject(ObjectPtr obj_ptr) : object_ptr(obj_ptr) {
     size = Eigen::Vector3f(object_ptr->length, object_ptr->width,
       object_ptr->height);
     type = object_ptr->type;
-    barycenter = get_barycenter<apollo::perception::pcl_util::Point>(
+    barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
       object_ptr->cloud).cast<float>();
     anchor_point = barycenter;
   }
