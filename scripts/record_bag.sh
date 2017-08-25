@@ -40,6 +40,8 @@ function start() {
             /apollo/canbus/chassis_detail \
             /apollo/control \
             /apollo/control/pad \
+            /apollo/perception/obstacles \
+            /apollo/perception/traffic_light \
             /apollo/planning \
             /apollo/prediction \
             /apollo/routing_request \
