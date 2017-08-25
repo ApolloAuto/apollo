@@ -156,13 +156,14 @@ Chassis LincolnController::chassis() {
   // 3
   chassis_.set_engine_started(true);
   // 4
-  if (chassis_detail.ems().has_engine_rpm()) {
+  if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_rpm()) {
     chassis_.set_engine_rpm(chassis_detail.ems().engine_rpm());
   } else {
     chassis_.set_engine_rpm(0);
   }
   // 5
-  if (chassis_detail.vehicle_spd().has_vehicle_spd()) {
+  if (chassis_detail.has_vehicle_spd() &&
+      chassis_detail.vehicle_spd().has_vehicle_spd()) {
     chassis_.set_speed_mps(chassis_detail.vehicle_spd().vehicle_spd());
   } else {
     chassis_.set_speed_mps(0);
@@ -174,38 +175,39 @@ Chassis LincolnController::chassis() {
   // to avoid confusing, just don't set
   chassis_.set_fuel_range_m(0);
   // 8
-  if (chassis_detail.gas().has_throttle_output()) {
+  if (chassis_detail.has_gas() && chassis_detail.gas().has_throttle_output()) {
     chassis_.set_throttle_percentage(chassis_detail.gas().throttle_output());
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9
-  if (chassis_detail.brake().has_brake_output()) {
+  if (chassis_detail.has_brake() && chassis_detail.brake().has_brake_output()) {
     chassis_.set_brake_percentage(chassis_detail.brake().brake_output());
   } else {
     chassis_.set_brake_percentage(0);
   }
   // 23, previously 10
-  if (chassis_detail.gear().has_gear_state()) {
+  if (chassis_detail.has_gear() && chassis_detail.gear().has_gear_state()) {
     chassis_.set_gear_location(chassis_detail.gear().gear_state());
   } else {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
   // 11
-  if (chassis_detail.eps().has_steering_angle()) {
+  if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
     chassis_.set_steering_percentage(chassis_detail.eps().steering_angle() *
                                      100.0 / params_.max_steer_angle());
   } else {
     chassis_.set_steering_percentage(0);
   }
   // 12
-  if (chassis_detail.eps().has_epas_torque()) {
+  if (chassis_detail.has_eps() && chassis_detail.eps().has_epas_torque()) {
     chassis_.set_steering_torque_nm(chassis_detail.eps().epas_torque());
   } else {
     chassis_.set_steering_torque_nm(0);
   }
   // 13
-  if (chassis_detail.epb().has_parking_brake_status()) {
+  if (chassis_detail.has_eps() &&
+      chassis_detail.epb().has_parking_brake_status()) {
     chassis_.set_parking_brake(chassis_detail.epb().parking_brake_status() ==
                                Epb::PBRAKE_ON);
   } else {
@@ -215,7 +217,8 @@ Chassis LincolnController::chassis() {
   // 14, 15
 
   // 16, 17
-  if (chassis_detail.light().has_turn_light_type() &&
+  if (chassis_detail.has_light() &&
+      chassis_detail.light().has_turn_light_type() &&
       chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
     if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
       chassis_.mutable_signal()->set_turn_signal(
@@ -233,7 +236,7 @@ Chassis LincolnController::chassis() {
         common::VehicleSignal::TURN_NONE);
   }
   // 18
-  if (chassis_detail.light().has_is_horn_on() &&
+  if (chassis_detail.has_light() && chassis_detail.light().has_is_horn_on() &&
       chassis_detail.light().is_horn_on()) {
     chassis_.mutable_signal()->set_horn(true);
   } else {
@@ -242,7 +245,7 @@ Chassis LincolnController::chassis() {
 
   // 19, lincoln wiper is too complicated
   // 24
-  if (chassis_detail.eps().has_timestamp_65()) {
+  if (chassis_detail.has_eps() && chassis_detail.eps().has_timestamp_65()) {
     chassis_.set_steering_timestamp(chassis_detail.eps().timestamp_65());
   }
   // 26
@@ -493,6 +496,10 @@ bool LincolnController::CheckChassisError() {
 
   int32_t error_cnt = 0;
   int32_t chassis_error_mask = 0;
+  if (!chassis_detail.has_eps()) {
+    AERROR << "ChassisDetail has NO eps." << chassis_detail.DebugString();
+    return false;
+  }
   bool steer_fault = chassis_detail.eps().watchdog_fault() |
                      chassis_detail.eps().channel_1_fault() |
                      chassis_detail.eps().channel_2_fault() |
@@ -510,6 +517,10 @@ bool LincolnController::CheckChassisError() {
   chassis_error_mask |=
       ((chassis_detail.eps().connector_fault()) << (error_cnt++));
 
+  if (!chassis_detail.has_brake()) {
+    AERROR << "ChassisDetail has NO brake." << chassis_detail.DebugString();
+    return false;
+  }
   // brake fault
   bool brake_fault = chassis_detail.brake().watchdog_fault() |
                      chassis_detail.brake().channel_1_fault() |
@@ -527,6 +538,10 @@ bool LincolnController::CheckChassisError() {
   chassis_error_mask |=
       ((chassis_detail.brake().connector_fault()) << (error_cnt++));
 
+  if (!chassis_detail.has_gas()) {
+    AERROR << "ChassisDetail has NO gas." << chassis_detail.DebugString();
+    return false;
+  }
   // throttle fault
   bool throttle_fault = chassis_detail.gas().watchdog_fault() |
                         chassis_detail.gas().channel_1_fault() |
@@ -542,6 +557,10 @@ bool LincolnController::CheckChassisError() {
   chassis_error_mask |=
       ((chassis_detail.gas().connector_fault()) << (error_cnt++));
 
+  if (!chassis_detail.has_gear()) {
+    AERROR << "ChassisDetail has NO gear." << chassis_detail.DebugString();
+    return false;
+  }
   // gear fault
   bool gear_fault = chassis_detail.gear().canbus_fault();
 
