@@ -83,14 +83,14 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   Init();
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
-                       st_graph_data.st_graph_boundaries())
+                       st_graph_data.st_boundaries())
            .ok()) {
     const std::string msg = "Apply constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!ApplyKernel(st_graph_data.st_graph_boundaries(),
+  if (!ApplyKernel(st_graph_data.st_boundaries(),
                    st_graph_data.speed_limit())
            .ok()) {
     const std::string msg = "Apply kernel failed!";
