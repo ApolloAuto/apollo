@@ -16,7 +16,7 @@
 
 #include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
 
-DEFINE_string(node_name, "lidar_ex_checker", 
+DEFINE_string(node_name, "lidar_ex_checker",
         "The lidar extrinsics checker module name in proto");
 
 DEFINE_int32(capture_cloud_count, 3, "the number of cloud count to capture");

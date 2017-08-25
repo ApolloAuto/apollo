@@ -16,7 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "${DIR}/apollo_base.sh"
@@ -30,37 +29,45 @@ cd "${APOLLO_ROOT_DIR}/data/bag"
 function check_bag() {
   INFO=`rosbag info lidar_calib.bag`
 
+  RESULT=0
   # check InsStat topic
   FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/sensor/gnss/ins_stat")}'`
   if [ ${FLAG} -eq 0 ]; then
     echo "No InsStat topic. "
-    return 1
+    RESULT=1
   fi
 
   # check VelodyneScan topic
   FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/sensor/velodyne64/VelodyneScanUnified")}'`
   if [ ${FLAG} -eq 0 ]; then
     echo "No VelodyneScan topic. "
-    return 1
+    RESULT=1
   fi
 
   # check Relative Odometry topic
   FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/calibration/relative_odometry")}'`
   if [ ${FLAG} -eq 0 ]; then
     echo "No Relative Odometry topic. "
-    return 1
+    RESULT=1
   fi
 
-  return 0
+  return ${RESULT}
 }
 
 function pack() {
-  if [ -f lidar_calib_data.tar.gz ]; then
-    rm lidar_calib_data.tar.gz
+  LOG="${APOLLO_ROOT_DIR}/data/log/lidar_calibration.out"
+
+  md5sum lidar_calib.bag > bag_md5
+  tar -czvf lidar_calib_data.tar.gz ./lidar_calib.bag ./bag_md5 \
+    </dev/null >"${LOG}" 2>&1
+  
+  if [ -f bag_md5 ]; then
+    rm bag_md5
   fi
   
-  md5sum lidar_calib.bag > bag_md5
-  tar -czvf lidar_calib_data.tar.gz ./lidar_calib.bag ./bag_md5 > /dev/null
+  if [ -f lidar_calib.bag ]; then
+    rm lidar_calib.bag
+  fi
 }
 
 function start_record() {
@@ -97,13 +104,17 @@ function stop_record() {
   pkill -SIGINT -f rosbag
 
   sleep 1
+  
+  if [ -f lidar_calib_data.tar.gz ]; then
+    rm lidar_calib_data.tar.gz
+  fi
 
   if check_bag; then
     echo "Checking bag successful. Start packing. "
     pack
     echo "Packing done. "
   else
-    echo "Checking bag failed. Please find the error message above. "
+    echo "Checking bag failed. Please find the error messages above. "
   fi
 }
 

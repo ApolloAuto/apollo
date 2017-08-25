@@ -16,7 +16,6 @@
 
 #include "modules/calibration/republish_msg/common/republish_msg_gflags.h"
 
-DEFINE_string(node_name, "republish_msg", "The republish message module name in proto");
+DEFINE_string(node_name, "republish_msg",
+        "The republish message module name in proto");
 
-DEFINE_string(adapter_config_file, "/apollo/modules/calibration/republish_msg/conf/adapter.conf",
-              "republish message adapter configuration");
