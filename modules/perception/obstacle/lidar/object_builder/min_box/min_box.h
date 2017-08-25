@@ -17,6 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_BUILDER_MIN_BOX_H
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_BUILDER_MIN_BOX_H
 
+#include <vector>
+#include <string>
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
 
@@ -24,24 +26,24 @@ namespace apollo {
 namespace perception {
 
 class MinBoxObjectBuilder : public BaseObjectBuilder {
-public:
+ public:
     MinBoxObjectBuilder() : BaseObjectBuilder() {}
     virtual ~MinBoxObjectBuilder() {}
 
-    virtual bool Init() override {
+    bool Init() override {
         // Do something.
         return true;
     }
 
-    virtual bool Build(
+    bool Build(
              const ObjectBuilderOptions& options,
              std::vector<ObjectPtr>* objects) override;
 
-    virtual std::string name() const override {
+    std::string name() const override {
         return "MinBoxObjectBuilder";
     }
 
-protected:
+ protected:
     void BuildObject(
             ObjectBuilderOptions options,
             ObjectPtr object);
@@ -51,15 +53,17 @@ protected:
     double ComputeAreaAlongOneEdge(
             ObjectPtr obj,
             size_t first_in_point,
-            Eigen::Vector3d& center,
-            double& lenth, double& width, Eigen::Vector3d& dir);
+            Eigen::Vector3d* center,
+            double* lenth, double* width,
+            Eigen::Vector3d* dir);
 
     void  ReconstructPolygon(
-            Eigen::Vector3d &ref_ct,
+            const Eigen::Vector3d &ref_ct,
             ObjectPtr obj);
 
-    void ComputeGeometricFeature(Eigen::Vector3d &ref_ct, ObjectPtr obj);
+    void ComputeGeometricFeature(const Eigen::Vector3d &ref_ct, ObjectPtr obj);
 
+ private:
     DISALLOW_COPY_AND_ASSIGN(MinBoxObjectBuilder);
 };
 
@@ -69,4 +73,4 @@ REGISTER_OBJECTBUILDER(MinBoxObjectBuilder);
 }  // namespace perception
 }  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_BUILDER_MIN_BOX_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_BUILDER_MIN_BOX_H
