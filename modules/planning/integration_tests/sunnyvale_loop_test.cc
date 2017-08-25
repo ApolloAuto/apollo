@@ -26,12 +26,6 @@
 namespace apollo {
 namespace planning {
 
-using common::adapter::AdapterManager;
-
-DECLARE_string(test_routing_response_file);
-DECLARE_string(test_localization_file);
-DECLARE_string(test_chassis_file);
-
 /**
  * @class SunnyvaleLoopTest
  * @brief This is an integration test that uses the sunnyvale_loop map.

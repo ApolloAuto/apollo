@@ -137,7 +137,11 @@ bool Frame::Init(const PlanningConfig &config,
     return false;
   }
 
-  AlignPredictionTime(current_time_stamp);
+  AINFO << "Enabled align prediction time ? : " << std::boolalpha
+        << FLAGS_align_prediction_time;
+  if (FLAGS_align_prediction_time) {
+    AlignPredictionTime(current_time_stamp);
+  }
   if (FLAGS_enable_prediction) {
     CreatePredictionObstacles(prediction_);
   }

@@ -76,8 +76,6 @@ class Frame {
 
   void RecordInputDebug();
 
-  void AlignPredictionTime(const double trajectory_header_time);
-
   std::vector<ReferenceLineInfo> &reference_line_info();
   const std::vector<ReferenceLineInfo> &reference_line_info() const;
 
@@ -108,6 +106,8 @@ class Frame {
       const prediction::PredictionObstacles &prediction);
 
   bool InitReferenceLineInfo(const std::vector<ReferenceLine> &reference_lines);
+
+  void AlignPredictionTime(const double trajectory_header_time);
 
  private:
   common::TrajectoryPoint planning_start_point_;
