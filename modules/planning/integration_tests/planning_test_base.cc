@@ -18,6 +18,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -43,6 +44,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_localization_file = "garage_localization.pb.txt";
   FLAGS_test_chassis_file = "garage_chassis.pb.txt";
   FLAGS_test_prediction_file = "garage_prediction.pb.txt";
+  FLAGS_align_prediction_time = false;
 }
 
 bool PlanningTestBase::SetUpAdapters() {

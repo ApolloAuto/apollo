@@ -27,7 +27,6 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planning.h"
 
 namespace apollo {
@@ -35,12 +34,12 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-#define TMAIN \
-int main(int argc, char **argv) {  \
-    ::testing::InitGoogleTest(&argc, argv); \
+#define TMAIN                                            \
+  int main(int argc, char** argv) {                      \
+    ::testing::InitGoogleTest(&argc, argv);              \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    return RUN_ALL_TESTS(); \
-}
+    return RUN_ALL_TESTS();                              \
+  }
 
 #define RUN_GOLDEN_TEST                                            \
   {                                                                \
