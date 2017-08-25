@@ -83,7 +83,7 @@ class Any {
 
   template <typename ValueType>
   ValueType *AnyCast() {
-    return content_ ? &static_cast<Holder<ValueType> *>(content_)->held_
+    return content_ ? &(static_cast<Holder<ValueType> *>(content_)->held_)
                     : NULL;  // NOLINT
   }
 
