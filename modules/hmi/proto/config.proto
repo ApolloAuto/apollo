@@ -23,10 +23,19 @@ message Component {
 
 message Config {
   message Server {
-    optional string host = 1 [default = "0.0.0.0"];
-    optional string external_ip = 2 [default = "127.0.0.1"];
+    optional string binding_ip = 1 [default = "0.0.0.0"];
+    optional string domain = 2 [default = "apollo.hmi"];
     optional int32 port = 3 [default = 8887];
     optional string log_file = 4 [default = "data/log/hmi.log"];
+
+    // HTTPS configs.
+    message Https {
+      optional bool enabled = 1;
+      optional string server_key = 2;
+      optional string server_cert = 3;
+      optional bool client_cert_required = 4;
+    }
+    optional Https https = 5;
   }
   optional Server server = 1;
 

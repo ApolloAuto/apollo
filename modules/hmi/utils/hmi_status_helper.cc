@@ -37,7 +37,8 @@ RestfulClient* InitRestfulClient() {
   }
   const auto& server = conf_pb.server();
   const auto url = apollo::common::util::StrCat(
-      "http://", server.external_ip(), ":", server.port(), "/runtime_status");
+      server.https().enabled() ? "https://" : "http://",
+      "127.0.0.1:", server.port(), "/runtime_status");
   return new RestfulClient(url);
 }
 
