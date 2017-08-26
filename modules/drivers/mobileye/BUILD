@@ -40,5 +40,19 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "mobileye",
+    srcs = ["main.cc"],
+    deps = [
+        ":mobileye_canbus_lib",
+        ":mobileye_message_manager",
+        "//external:gflags",
+        "//modules/canbus/common:canbus_common",
+        "//modules/common:log",
+        "//modules/common/monitor",
+        "@ros//:ros_common",
+    ],
+)
+
 cpplint()
 
