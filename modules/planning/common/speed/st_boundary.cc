@@ -38,24 +38,28 @@ StBoundary::StBoundary(
          "1] should have larger t than points in pair[i]";
 
   for (size_t i = 0; i < point_pairs.size(); ++i) {
-    lower_points_.emplace_back(point_pairs[i].first.t(),
-                               point_pairs[i].first.s());
-    upper_points_.emplace_back(point_pairs[i].second.t(),
-                               point_pairs[i].second.s());
+    lower_points_.emplace_back(point_pairs[i].first);
+    upper_points_.emplace_back(point_pairs[i].second);
   }
-  points_.reserve(upper_points_.size() + lower_points_.size());
-  points_.insert(points_.end(), lower_points_.begin(), lower_points_.end());
-  points_.insert(points_.end(), upper_points_.rbegin(), upper_points_.rend());
+
+  for (auto it = lower_points_.begin(); it != lower_points_.end(); ++it) {
+    points_.emplace_back(it->t(), it->s());
+  }
+  for (auto rit = upper_points_.rbegin(); rit != upper_points_.rend(); ++rit) {
+    points_.emplace_back(rit->t(), rit->s());
+  }
 
   BuildFromPoints();
   CalculateArea();
 
-  for (const auto& point : points_) {
-    min_s_ = std::fmin(min_s_, point.y());
-    min_t_ = std::fmin(min_t_, point.x());
-    max_s_ = std::fmax(max_s_, point.y());
-    max_t_ = std::fmax(max_t_, point.x());
+  for (const auto& point : lower_points_) {
+    min_s_ = std::fmin(min_s_, point.s());
   }
+  for (const auto& point : upper_points_) {
+    max_s_ = std::fmax(max_s_, point.s());
+  }
+  min_t_ = std::fmin(lower_points_.front().t(), upper_points_.front().t());
+  max_t_ = std::fmax(lower_points_.back().t(), upper_points_.back().t());
 }
 
 bool StBoundary::IsValid(
@@ -100,6 +104,13 @@ void StBoundary::CalculateArea() {
 }
 
 bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
+  if (st_point.t() < min_t_) {
+    return false;
+  }
+  if (st_point.t() > max_t_) {
+    return false;
+  }
+
   return IsPointIn(st_point);
 }
 

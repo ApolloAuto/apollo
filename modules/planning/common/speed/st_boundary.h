@@ -26,9 +26,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/proto/planning.pb.h"
+
 #include "modules/common/math/polygon2d.h"
 #include "modules/planning/common/speed/st_point.h"
-#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -92,8 +93,8 @@ class StBoundary : public common::math::Polygon2d {
  private:
   BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
 
-  std::vector<common::math::Vec2d> upper_points_;
-  std::vector<common::math::Vec2d> lower_points_;
+  std::vector<STPoint> upper_points_;
+  std::vector<STPoint> lower_points_;
 
   double area_ = 0.0;
 
