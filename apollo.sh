@@ -316,7 +316,6 @@ function run_bash_lint() {
 
 function run_lint() {
   START_TIME=$(get_now)
-  run_cpp_lint
 
   # Add cpplint rule to BUILD files that do not contain it.
   for file in $(find modules -name BUILD | \
@@ -325,6 +324,8 @@ function run_lint() {
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file
     sed -i -e '$a\\ncpplint()' $file
   done
+
+  run_cpp_lint
 
   if [ $? -eq 0 ]; then
     success 'Lint passed!'
@@ -515,7 +516,7 @@ function main() {
     build_opt_gpu)
       link_gpu_caffe_build
       apollo_build_opt
-      ;;  
+      ;;
     build_fe)
       build_fe
       ;;
