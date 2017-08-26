@@ -40,6 +40,9 @@ function GenerateServerKeys() {
 }
 
 function PrepareHost() {
+  sudo cp ca.crt /usr/local/share/ca-certificates/apollo_ca.crt
+  sudo update-ca-certificates
+
   # Add local DNS.
   DNS_CONF="${IP} ${Domain}"
   if ! grep -Fxq "$HOST_CONF" /etc/hosts; then
