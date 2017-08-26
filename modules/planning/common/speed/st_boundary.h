@@ -82,15 +82,20 @@ class StBoundary : public common::math::Polygon2d {
   double max_s() const;
   double max_t() const;
 
+  double area() const { return area_; };
+
  private:
   bool IsValid(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;
+  void CalculateArea();
 
  private:
   BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
 
   std::vector<common::math::Vec2d> upper_points_;
   std::vector<common::math::Vec2d> lower_points_;
+
+  double area_ = 0.0;
 
   std::string id_;
   double characteristic_length_ = 1.0;
