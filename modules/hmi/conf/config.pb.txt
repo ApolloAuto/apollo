@@ -1,3 +1,10 @@
+server {
+  https {
+    enabled: false
+    server_key: 'modules/hmi/conf/keys/server.key'
+    server_cert: 'modules/hmi/conf/keys/server.crt'
+  }
+}
 modules {
   name: "GPS"
   display_name: "GPS Driver"

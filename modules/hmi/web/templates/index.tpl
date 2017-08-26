@@ -122,7 +122,7 @@
 
     // Setup socketio to communicate with HMI server.
     socketio = io.connect(
-        'http://' + document.domain + ':' + location.port + '/io_frontend');
+        '{{ protocol }}://' + document.domain + ':' + location.port + '/io_frontend');
     socketio.on('current_status', function(status_json) {
       on_status_change(status_json);
     });
