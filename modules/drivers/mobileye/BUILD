@@ -28,12 +28,15 @@ cc_test(
 )
 
 cc_library(
-    name = "sensor_canbus_lib",
-    hdrs = ["sensor_canbus.h"],
+    name = "mobileye_canbus_lib",
+    srcs = [
+    ],
+    hdrs = [
+        "mobileye_canbus.h",
+    ],
     deps = [
-        ":sensor_message_manager_base",
-        "//modules/canbus:canbus_lib",
-        "//modules/drivers/can_comm:can_receiver",
+        "//modules/drivers:sensor_canbus_lib",
+        "//modules/drivers/mobileye/protocol:drivers_mobileye_protocol",
     ],
 )
 
