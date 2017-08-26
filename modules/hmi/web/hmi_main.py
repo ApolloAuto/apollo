@@ -43,7 +43,7 @@ def main(argv):
             'keyfile': Config.get_realpath(https.server_key),
             'certfile': Config.get_realpath(https.server_cert)
         }
-        if https_param.client_cert_required:
+        if https.client_cert_required:
             kwargs['cert_reqs'] = ssl.CERT_REQUIRED
     return handlers.socketio.run(handlers.app,
                                  host=conf.server.binding_ip,
