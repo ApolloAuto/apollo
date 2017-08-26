@@ -43,6 +43,22 @@ namespace apollo {
 namespace common {
 namespace util {
 
+template <typename MessageType>
+bool SetProtoToASCIIFile(const MessageType &message, int file_descriptor) {
+  using google::protobuf::io::ZeroCopyOutputStream;
+  using google::protobuf::io::FileOutputStream;
+  using google::protobuf::TextFormat;
+  if (file_descriptor < 0) {
+    AERROR << "Invalid file descriptor";
+    return false;
+  }
+  ZeroCopyOutputStream *output = new FileOutputStream(file_descriptor);
+  bool success = TextFormat::Print(message, output);
+  delete output;
+  close(file_descriptor);
+  return success;
+}
+
 /**
  * @brief Sets the content of the file specified by the file_name to be the
  *        ascii representation of the input protobuf.
@@ -53,20 +69,8 @@ namespace util {
 template <typename MessageType>
 bool SetProtoToASCIIFile(const MessageType &message,
                          const std::string &file_name) {
-  using google::protobuf::io::ZeroCopyOutputStream;
-  using google::protobuf::io::FileOutputStream;
-  using google::protobuf::TextFormat;
-  int file_descriptor =
-      open(file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
-  if (file_descriptor < 0) {
-    // Failed to open;
-    return false;
-  }
-  ZeroCopyOutputStream *output = new FileOutputStream(file_descriptor);
-  bool success = TextFormat::Print(message, output);
-  delete output;
-  close(file_descriptor);
-  return success;
+  return SetProtoToASCIIFile(
+      message, open(file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU));
 }
 
 /**
