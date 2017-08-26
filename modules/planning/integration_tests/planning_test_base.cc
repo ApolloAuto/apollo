@@ -16,6 +16,9 @@
 
 #include "modules/planning/integration_tests/planning_test_base.h"
 
+#include <cstdlib>
+
+#include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -105,7 +108,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
                                    int case_num) {
   const std::string golden_result_file = apollo::common::util::StrCat(
       "result_", test_case_name, "_", case_num, ".pb.txt");
-  std::string tmp_golden_path = std::string(std::tmpnam(nullptr));
+
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   planning_.RunOnce();
 
@@ -126,20 +129,14 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
     ADCTrajectory golden_result;
     bool load_success = ::apollo::common::util::GetProtoFromASCIIFile(
         full_golden_path, &golden_result);
-    if (!load_success) {
-      AERROR << "Failed to load golden file: " << full_golden_path;
-      ::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_,
-                                                  tmp_golden_path);
-      AINFO << "Current result is written to " << tmp_golden_path;
-      return false;
-    }
-    bool same_result =
-        ::apollo::common::util::IsProtoEqual(golden_result, adc_trajectory_);
-    if (!same_result) {
-      std::string tmp_planning_file = tmp_golden_path + ".tmp";
-      ::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_,
-                                                  tmp_planning_file);
-      AERROR << "found\ndiff " << tmp_planning_file << " " << full_golden_path;
+    if (!load_success ||
+        !::apollo::common::util::IsProtoEqual(golden_result, adc_trajectory_)) {
+      char tmp_fname[100] = "/tmp/XXXXXX";
+      int fd = mkstemp(tmp_fname);
+      if (!::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_, fd)) {
+        AERROR << "Failed to write to file " << tmp_fname;
+      }
+      AERROR << "found\ndiff " << tmp_fname << " " << full_golden_path;
       return false;
     }
   }
