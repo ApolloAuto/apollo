@@ -16,10 +16,47 @@
 
 #include <string>
 
-#include "modules/routing/graph/test_utils.h"
+#include "gtest/gtest.h"
+#include "modules/routing/graph/topo_graph.h"
+#include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
 namespace routing {
+
+const std::string TEST_L1 = "L1";
+const std::string TEST_L2 = "L2";
+const std::string TEST_R1 = "R1";
+const std::string TEST_R2 = "R2";
+
+const double TEST_LANE_LENGTH = 100.0;
+const double TEST_LANE_COST = 1.1;
+const double TEST_EDGE_COST = 2.2;
+
+const double TEST_START_S = 0.0;
+const double TEST_END_S = TEST_LANE_LENGTH;
+
+void GetNodeForTest(Node* const node,
+                    const std::string& lane_id, const std::string& road_id) {
+  node->set_lane_id(lane_id);
+  node->set_length(TEST_LANE_LENGTH);
+  node->set_road_id(road_id);
+  node->set_cost(TEST_LANE_COST);
+  auto* left_out = node->add_left_out();
+  left_out->mutable_start()->set_s(TEST_START_S);
+  left_out->mutable_end()->set_s(TEST_END_S);
+  auto* right_out = node->add_right_out();
+  right_out->mutable_start()->set_s(TEST_START_S);
+  right_out->mutable_end()->set_s(TEST_END_S);
+}
+
+void GetEdgeForTest(Edge* const edge,
+                    const std::string& lane_id_1, const std::string& lane_id_2,
+                    const Edge::DirectionType& type) {
+  edge->set_from_lane_id(lane_id_1);
+  edge->set_to_lane_id(lane_id_2);
+  edge->set_cost(TEST_EDGE_COST);
+  edge->set_direction_type(type);
+}
 
 TEST(TopoEdgeTestSuit, basic_test) {
   Node node_1;
