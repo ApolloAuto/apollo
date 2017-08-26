@@ -60,6 +60,9 @@ class StBoundary : public common::math::Polygon2d {
   STPoint TopRightPoint() const;
   STPoint TopLeftPoint() const;
 
+  StBoundary ExpandByS(const double s) const;
+  StBoundary ExpandByT(const double t) const;
+
   BoundaryType boundary_type() const;
   const std::string& id() const;
   double characteristic_length() const;
@@ -80,7 +83,8 @@ class StBoundary : public common::math::Polygon2d {
   double max_t() const;
 
  private:
-  bool IsValid(const std::vector<std::pair<STPoint, STPoint>>& point_pairs);
+  bool IsValid(
+      const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;
 
  private:
   BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
