@@ -30,6 +30,15 @@ namespace planning {
 
 using Vec2d = common::math::Vec2d;
 
+namespace {
+
+uint32_t GetIndex(const std::vector<STPoint>& points, const double t) {
+  auto comp = [](const double t, const STPoint& p) { return t < p.t(); };
+  auto first_gt = std::upper_bound(points.begin(), points.end(), t, comp);
+  return std::distance(points.begin(), first_gt) - 1;
+}
+}
+
 StBoundary::StBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
   CHECK(IsValid(point_pairs))
@@ -107,20 +116,10 @@ void StBoundary::CalculateArea() {
 }
 
 bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
-  if (st_point.t() < min_t_) {
+  if (st_point.t() < min_t_ || st_point.t() > max_t_) {
     return false;
   }
-  if (st_point.t() > max_t_) {
-    return false;
-  }
-
-  auto comp = [](const double t, const STPoint& p) { return t < p.t(); };
-
-  auto first_gt = std::upper_bound(lower_points_.begin(), lower_points_.end(),
-                                   st_point.t(), comp);
-
-  auto index = std::distance(lower_points_.begin(), first_gt) - 1;
-
+  auto index = GetIndex(lower_points_, st_point.t());
   const double check_upper = common::math::CrossProd(
       st_point, upper_points_[index], upper_points_[index + 1]);
   const double check_lower = common::math::CrossProd(
@@ -131,22 +130,22 @@ bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
 
 STPoint StBoundary::BottomLeftPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
-  return STPoint(lower_points_.front());
+  return lower_points_.front();
 }
 
 STPoint StBoundary::BottomRightPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
-  return STPoint(lower_points_.back());
+  return lower_points_.back();
 }
 
 STPoint StBoundary::TopRightPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
-  return STPoint(upper_points_.back());
+  return upper_points_.back();
 }
 
 STPoint StBoundary::TopLeftPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
-  return STPoint(upper_points_.front());
+  return upper_points_.front();
 }
 
 StBoundary StBoundary::ExpandByS(const double s) const {
@@ -205,26 +204,33 @@ void StBoundary::SetCharacteristicLength(const double characteristic_length) {
 
 bool StBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
                                   double* s_lower) const {
-  const common::math::LineSegment2d segment = {Vec2d(curr_time, 0.0),
-                                               Vec2d(curr_time, s_high_limit_)};
+  CHECK_NOTNULL(s_upper);
+  CHECK_NOTNULL(s_lower);
+
   *s_upper = s_high_limit_;
   *s_lower = 0.0;
-
-  Vec2d p_s_first;
-  Vec2d p_s_second;
-
-  if (!GetOverlap(segment, &p_s_first, &p_s_second)) {
-    ADEBUG << "curr_time[" << curr_time
-           << "] is out of the coverage scope of the boundary.";
-    return false;
+  if (curr_time < min_t_ || curr_time > max_t_) {
+    return true;
   }
+
+  auto index = GetIndex(lower_points_, curr_time);
+  const double r =
+      (curr_time - upper_points_[index].t()) /
+      (upper_points_.at(index + 1).t() - upper_points_.at(index).t());
+
+  double upper_cross_s =
+      upper_points_[index].s() +
+      r * (upper_points_[index + 1].s() - upper_points_[index].s());
+  double lower_cross_s =
+      lower_points_[index].s() +
+      r * (lower_points_[index + 1].s() - lower_points_[index].s());
+
   if (boundary_type_ == BoundaryType::STOP ||
       boundary_type_ == BoundaryType::YIELD ||
       boundary_type_ == BoundaryType::FOLLOW) {
-    *s_upper = std::fmin(*s_upper, std::fmin(p_s_first.y(), p_s_second.y()));
+    *s_upper = std::fmin(*s_upper, lower_cross_s);
   } else if (boundary_type_ == BoundaryType::OVERTAKE) {
-    // overtake
-    *s_lower = std::fmax(*s_lower, std::fmax(p_s_first.y(), p_s_second.y()));
+    *s_lower = std::fmax(*s_lower, upper_cross_s);
   } else {
     AERROR << "boundary_type is not supported. boundary_type: "
            << static_cast<int>(boundary_type_);
@@ -235,20 +241,23 @@ bool StBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
 
 bool StBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
                                    double* s_lower) const {
-  const common::math::LineSegment2d segment = {Vec2d(curr_time, 0.0),
-                                               Vec2d(curr_time, s_high_limit_)};
-  *s_upper = s_high_limit_;
-  *s_lower = 0.0;
-
-  Vec2d p_s_first;
-  Vec2d p_s_second;
-  if (!GetOverlap(segment, &p_s_first, &p_s_second)) {
-    ADEBUG << "curr_time[" << curr_time
-           << "] is out of the coverage scope of the boundary.";
+  CHECK_NOTNULL(s_upper);
+  CHECK_NOTNULL(s_lower);
+  if (curr_time < min_t_ || curr_time > max_t_) {
     return false;
   }
-  *s_upper = std::fmin(*s_upper, std::fmax(p_s_first.y(), p_s_second.y()));
-  *s_lower = std::fmax(*s_lower, std::fmin(p_s_first.y(), p_s_second.y()));
+
+  auto index = GetIndex(lower_points_, curr_time);
+  const double r = (curr_time - upper_points_[index].t()) /
+                   (upper_points_[index + 1].t() - upper_points_[index].t());
+
+  *s_upper = upper_points_[index].s() +
+             r * (upper_points_[index + 1].s() - upper_points_[index].s());
+  *s_lower = lower_points_[index].s() +
+             r * (lower_points_[index + 1].s() - lower_points_[index].s());
+
+  *s_upper = std::fmin(*s_upper, s_high_limit_);
+  *s_lower = std::fmax(*s_lower, 0.0);
   return true;
 }
 

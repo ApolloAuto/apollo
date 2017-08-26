@@ -109,7 +109,7 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   std::vector<common::math::Vec2d> polygon_points;
   for (int i = 1; i < trajectory_points.size(); ++i) {
     const auto& first_traj_point = trajectory_points[i - 1];
-    const auto& second_traj_point = trajectory_points[i - 1];
+    const auto& second_traj_point = trajectory_points[i];
     const auto& first_point = first_traj_point.path_point();
     const auto& second_point = second_traj_point.path_point();
     double total_length =
@@ -119,6 +119,9 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     common::math::Box2d object_moving_box(center, first_point.theta(),
                                           total_length, object_width);
     SLBoundary object_boundary;
+    // NOTICE: this method will have errors when the reference line is not
+    // straight.
+    // Need double loop to cover all corner cases.
     if (!reference_line.GetSLBoundary(object_moving_box, &object_boundary)) {
       AERROR << "failed to calculate boundary";
       return false;
