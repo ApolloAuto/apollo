@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.routing;
+
+message RoutingConfig {
+  optional double base_speed = 1;         // base speed for node creator [m/s]
+  optional double left_turn_penalty = 2;  // left turn penalty for node creater [m]
+  optional double right_turn_penalty = 3; // right turn penalty for node creater [m]
+  optional double uturn_penalty = 4 ;     // left turn penalty for node creater [m]
+  optional double change_penalty = 5;     // change penalty for edge creater [m]
+  optional double base_changing_length = 6;  // base change length penalty for edge creater [m]
+}
