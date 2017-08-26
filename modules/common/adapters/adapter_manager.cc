@@ -124,6 +124,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableHMICommand(FLAGS_hmi_command_topic, config.mode(),
                          config.message_history_limit());
         break;
+      case AdapterConfig::MOBILEYE:
+        EnableMobileye(FLAGS_mobileye_topic, config.mode(),
+                         config.message_history_limit());
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;

@@ -34,6 +34,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "modules/drivers/proto/mobileye.pb.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -65,6 +66,7 @@ using RelativeOdometryAdapter =
     Adapter<calibration::republish_msg::RelativeOdometry>;
 using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
+using MobileyeAdapter = Adapter<drivers::Mobileye>;
 
 }  // namespace adapter
 }  // namespace common
