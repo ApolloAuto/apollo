@@ -44,22 +44,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "routing_graph_test_utils",
-    srcs = [
-        "test_utils.cc",
-    ],
-    hdrs = [
-        "test_utils.h",
-    ],
-    deps = [
-        "@gtest//:main",
-        ":routing_topo_node",
-        ":routing_topo_graph",
-        "//modules/map/proto:map_proto",
-    ],
-)
-
 cc_test(
     name = "topo_node_test",
     size = "small",
@@ -67,7 +51,8 @@ cc_test(
         "topo_node_test.cc",
     ],
     deps = [
-        ":routing_graph_test_utils",
+        ":routing_topo_node",
+        ":routing_topo_graph",
         "@gtest//:main",
     ],
 )
