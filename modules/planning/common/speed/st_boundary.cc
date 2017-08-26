@@ -31,7 +31,11 @@ using Vec2d = common::math::Vec2d;
 
 StBoundary::StBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
-  CHECK(IsValid(point_pairs));
+  CHECK(IsValid(point_pairs))
+      << "The input point_pairs are NOT valid.\n The point_pairs should "
+         "satisfy the following requirements:\n(1) point_pairs.size() >= "
+         "2;\n(2) each pair should have same t;\n(3) both points in pair[i + "
+         "1] should have larger t than points in pair[i]";
 
   for (size_t i = 0; i < point_pairs.size(); ++i) {
     lower_points_.emplace_back(point_pairs[i].first.t(),
@@ -54,7 +58,7 @@ StBoundary::StBoundary(
 }
 
 bool StBoundary::IsValid(
-    const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
+    const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const {
   if (point_pairs.size() < 2) {
     AERROR << "point_pairs.size() must > 2. current point_pairs.size() = "
            << point_pairs.size();
@@ -109,6 +113,41 @@ STPoint StBoundary::TopRightPoint() const {
 STPoint StBoundary::TopLeftPoint() const {
   DCHECK(!points_.empty()) << "StBoundary has zero points.";
   return STPoint(upper_points_.front());
+}
+
+StBoundary StBoundary::ExpandByS(const double s) const {
+  if (points_.empty()) {
+    AERROR << "The current st_boundary has NO points.";
+    return StBoundary();
+  }
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+  for (size_t i = 0; i < lower_points_.size(); ++i) {
+    point_pairs.emplace_back(
+        STPoint(lower_points_[i].y() - s, lower_points_[i].x()),
+        STPoint(upper_points_[i].y() + s, upper_points_[i].x()));
+  }
+  return StBoundary(std::move(point_pairs));
+}
+
+StBoundary StBoundary::ExpandByT(const double t) const {
+  if (points_.empty()) {
+    AERROR << "The current st_boundary has NO points.";
+    return StBoundary();
+  }
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+  point_pairs.emplace_back(
+      STPoint(lower_points_.front().y(), lower_points_.front().x() - t),
+      STPoint(upper_points_.front().y(), upper_points_.front().x() - t));
+
+  for (size_t i = 0; i < lower_points_.size(); ++i) {
+    point_pairs.emplace_back(
+        STPoint(lower_points_[i].y(), lower_points_[i].x()),
+        STPoint(upper_points_[i].y(), upper_points_[i].x()));
+  }
+  point_pairs.emplace_back(
+      STPoint(lower_points_.back().y(), lower_points_.back().x() + t),
+      STPoint(upper_points_.back().y(), upper_points_.back().x() + t));
+  return StBoundary(std::move(point_pairs));
 }
 
 StBoundary::BoundaryType StBoundary::boundary_type() const {
