@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace planning {
@@ -38,8 +39,10 @@ StBoundary::StBoundary(
          "1] should have larger t than points in pair[i]";
 
   for (size_t i = 0; i < point_pairs.size(); ++i) {
-    lower_points_.emplace_back(point_pairs[i].first);
-    upper_points_.emplace_back(point_pairs[i].second);
+    // use same t for both points
+    const double t = point_pairs[i].first.t();
+    lower_points_.emplace_back(point_pairs[i].first.s(), t);
+    upper_points_.emplace_back(point_pairs[i].second.s(), t);
   }
 
   for (auto it = lower_points_.begin(); it != lower_points_.end(); ++it) {
@@ -58,8 +61,8 @@ StBoundary::StBoundary(
   for (const auto& point : upper_points_) {
     max_s_ = std::fmax(max_s_, point.s());
   }
-  min_t_ = std::fmin(lower_points_.front().t(), upper_points_.front().t());
-  max_t_ = std::fmax(lower_points_.back().t(), upper_points_.back().t());
+  min_t_ = lower_points_.front().t();
+  max_t_ = lower_points_.back().t();
 }
 
 bool StBoundary::IsValid(
@@ -111,7 +114,19 @@ bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
     return false;
   }
 
-  return IsPointIn(st_point);
+  auto comp = [](const double t, const STPoint& p) { return t < p.t(); };
+
+  auto first_gt = std::upper_bound(lower_points_.begin(), lower_points_.end(),
+                                   st_point.t(), comp);
+
+  auto index = std::distance(lower_points_.begin(), first_gt) - 1;
+
+  const double check_upper = common::math::CrossProd(
+      st_point, upper_points_[index], upper_points_[index + 1]);
+  const double check_lower = common::math::CrossProd(
+      st_point, lower_points_[index], lower_points_[index + 1]);
+
+  return (check_upper * check_lower <= 0);
 }
 
 STPoint StBoundary::BottomLeftPoint() const {
