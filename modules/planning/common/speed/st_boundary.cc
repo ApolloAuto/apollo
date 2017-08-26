@@ -48,6 +48,7 @@ StBoundary::StBoundary(
   points_.insert(points_.end(), upper_points_.rbegin(), upper_points_.rend());
 
   BuildFromPoints();
+  CalculateArea();
 
   for (const auto& point : points_) {
     min_s_ = std::fmin(min_s_, point.y());
@@ -87,8 +88,15 @@ bool StBoundary::IsValid(
       }
     }
   }
-
   return true;
+}
+
+void StBoundary::CalculateArea() {
+  for (size_t i = 0; i + 1 < lower_points_.size(); ++i) {
+    area_ += (upper_points_[i].y() - lower_points_[i].y()) *
+             (lower_points_[i + 1].x() - lower_points_[i].x());
+  }
+  area_ *= 0.5;
 }
 
 bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
