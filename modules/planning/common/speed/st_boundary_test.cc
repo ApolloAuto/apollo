@@ -75,8 +75,10 @@ TEST(StBoundaryTest, boundary_range) {
   while (t < 10.0) {
     double low = 0.0;
     double high = 0.0;
-    if (t < -1e-6) {
-      EXPECT_FALSE(boundary.GetUnblockSRange(t, &high, &low));
+    if (t < 0.0) {
+      EXPECT_TRUE(boundary.GetUnblockSRange(t, &high, &low));
+      EXPECT_DOUBLE_EQ(low, 0.0);
+      EXPECT_DOUBLE_EQ(high, 200.0);
       EXPECT_FALSE(boundary.GetBoundarySRange(t, &high, &low));
     } else {
       EXPECT_TRUE(boundary.GetUnblockSRange(t, &high, &low));

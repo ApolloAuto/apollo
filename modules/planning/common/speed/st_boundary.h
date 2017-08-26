@@ -53,7 +53,7 @@ class StBoundary : public common::math::Polygon2d {
     OVERTAKE,
   };
 
-  bool IsEmpty() const { return points_.empty(); }
+  bool IsEmpty() const { return lower_points_.empty(); }
   bool IsPointInBoundary(const STPoint& st_point) const;
 
   STPoint BottomLeftPoint() const;
