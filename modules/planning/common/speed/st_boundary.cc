@@ -129,27 +129,27 @@ bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
 }
 
 STPoint StBoundary::BottomLeftPoint() const {
-  DCHECK(!points_.empty()) << "StBoundary has zero points.";
+  DCHECK(!lower_points_.empty()) << "StBoundary has zero points.";
   return lower_points_.front();
 }
 
 STPoint StBoundary::BottomRightPoint() const {
-  DCHECK(!points_.empty()) << "StBoundary has zero points.";
+  DCHECK(!lower_points_.empty()) << "StBoundary has zero points.";
   return lower_points_.back();
 }
 
 STPoint StBoundary::TopRightPoint() const {
-  DCHECK(!points_.empty()) << "StBoundary has zero points.";
+  DCHECK(!upper_points_.empty()) << "StBoundary has zero points.";
   return upper_points_.back();
 }
 
 STPoint StBoundary::TopLeftPoint() const {
-  DCHECK(!points_.empty()) << "StBoundary has zero points.";
+  DCHECK(!upper_points_.empty()) << "StBoundary has zero points.";
   return upper_points_.front();
 }
 
 StBoundary StBoundary::ExpandByS(const double s) const {
-  if (points_.empty()) {
+  if (lower_points_.empty()) {
     AERROR << "The current st_boundary has NO points.";
     return StBoundary();
   }
@@ -163,7 +163,7 @@ StBoundary StBoundary::ExpandByS(const double s) const {
 }
 
 StBoundary StBoundary::ExpandByT(const double t) const {
-  if (points_.empty()) {
+  if (lower_points_.empty()) {
     AERROR << "The current st_boundary has NO points.";
     return StBoundary();
   }
@@ -259,6 +259,22 @@ bool StBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
   *s_upper = std::fmin(*s_upper, s_high_limit_);
   *s_lower = std::fmax(*s_lower, 0.0);
   return true;
+}
+
+double StBoundary::DistanceS(const STPoint& st_point) const {
+  constexpr double kMaxDistance = 1.0e10;
+  double s_upper;
+  double s_lower;
+  if (GetBoundarySRange(st_point.t(), &s_upper, &s_lower)) {
+    return kMaxDistance;
+  }
+  if (st_point.s() < s_lower) {
+    return s_lower - st_point.s();
+  } else if (st_point.s() > s_upper) {
+    return st_point.s() - s_upper;
+  } else {
+    return 0.0;
+  }
 }
 
 double StBoundary::min_s() const { return min_s_; }
