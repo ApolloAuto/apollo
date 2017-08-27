@@ -64,6 +64,7 @@ void PIDController::Reset() {
   integral_ = 0.0;
   first_hit_ = true;
   integrator_saturation_status_ = 0;
+  output_saturation_status_ = 0;
 }
 
 void PIDController::Init(const PidConf &pid_conf) {
@@ -78,7 +79,9 @@ void PIDController::Init(const PidConf &pid_conf) {
       -std::fabs(pid_conf.integrator_saturation_level());
   integrator_saturation_status_ = 0;
   integrator_hold_ = false;
-
+  output_saturation_high_ = std::fabs(pid_conf.output_saturation_level());
+  output_saturation_low_ = -std::fabs(pid_conf.output_saturation_level());
+  output_saturation_status_ = 0;
   SetPID(pid_conf);
 }
 
