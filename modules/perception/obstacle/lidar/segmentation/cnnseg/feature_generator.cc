@@ -32,9 +32,9 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
   out_blob_ = out_blob;
 
   // raw feature parameters
-  range_ = (int) feature_param.point_cloud_range();
-  width_ = (int) feature_param.width();
-  height_ = (int) feature_param.height();
+  range_ = static_cast<int>(feature_param.point_cloud_range());
+  width_ = static_cast<int>(feature_param.width());
+  height_ = static_cast<int>(feature_param.height());
   min_height_ = feature_param.min_height();
   max_height_ = feature_param.max_height();
   CHECK_EQ(width_, height_)
@@ -61,14 +61,7 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
   }
 
   Dtype* out_blob_data = nullptr;
-//#ifndef CPU_ONLY
-//  log_table_blob_.reset(new caffe::Blob<Dtype>(1, 1, 1, log_table_.size()));
-//  Dtype* log_table_blob_data = log_table_blob_->mutable_gpu_data();
-//  caffe::caffe_copy(log_table_.size(), log_table_.data(), log_table_blob_data);
-//  out_blob_data = out_blob_->mutable_gpu_data();
-//#else
   out_blob_data = out_blob_->mutable_cpu_data();
-//#endif
 
   int channel_index = 0;
   max_height_data_ = out_blob_data + out_blob_->offset(0, channel_index++);
@@ -105,7 +98,7 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 }
 
 template <typename Dtype>
-void FeatureGenerator<Dtype>::GenerateByCpu(
+void FeatureGenerator<Dtype>::Generate(
     const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr) {
   const auto& points = pc_ptr->points;
 
@@ -123,17 +116,20 @@ void FeatureGenerator<Dtype>::GenerateByCpu(
   caffe::caffe_set(siz, Dtype(0), nonempty_data_);
 
   map_idx_.resize(points.size());
-  float inv_res_x = 0.5 * static_cast<float>(width_) / static_cast<float>(range_);
-  float inv_res_y = 0.5 * static_cast<float>(height_) / static_cast<float>(range_);
+  float inv_res_x =
+      0.5 * static_cast<float>(width_) / static_cast<float>(range_);
+  float inv_res_y =
+      0.5 * static_cast<float>(height_) / static_cast<float>(range_);
 
   for (size_t i = 0; i < points.size(); ++i) {
     if (points[i].z <= min_height_ || points[i].z >= max_height_) {
       map_idx_[i] = -1;
       continue;
     }
-    // * the coordinates of x and y are exchanged here (* row <-> x, column <-> y)
-    int pos_x = F2I(points[i].y, range_, inv_res_x);   // col
-    int pos_y = F2I(points[i].x, range_, inv_res_y);   // row
+    // * the coordinates of x and y are exchanged here
+    // (row <-> x, column <-> y)
+    int pos_x = F2I(points[i].y, range_, inv_res_x);  // col
+    int pos_y = F2I(points[i].x, range_, inv_res_y);  // row
     if (pos_x >= width_ || pos_x < 0 || pos_y >= height_ || pos_y < 0) {
       map_idx_[i] = -1;
       continue;
@@ -167,13 +163,13 @@ void FeatureGenerator<Dtype>::GenerateByCpu(
 template bool FeatureGenerator<float>::Init(const FeatureParam& feature_param,
                                             caffe::Blob<float>* blob);
 
-template void FeatureGenerator<float>::GenerateByCpu(
+template void FeatureGenerator<float>::Generate(
     const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
 
 template bool FeatureGenerator<double>::Init(const FeatureParam& feature_param,
                                              caffe::Blob<double>* blob);
 
-template void FeatureGenerator<double>::GenerateByCpu(
+template void FeatureGenerator<double>::Generate(
     const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
 
 }  // namespace cnnseg

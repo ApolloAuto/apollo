@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CLUSTER2D_H_
 
 #include <vector>
+#include <algorithm>
 #include "caffe/caffe.hpp"
 #include "modules/common/log.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
@@ -35,7 +36,7 @@ struct Obstacle {
   float score;
   float height;
 
-  Obstacle () {
+  Obstacle() {
     grids.clear();
     cloud.reset(new apollo::perception::pcl_util::PointCloud);
     score = 0.0;
@@ -72,11 +73,12 @@ class Cluster2D {
                bool use_all_grids_for_clustering) {
     const float* category_pt_data = category_pt_blob.cpu_data();
     const float* instance_pt_x_data = instance_pt_blob.cpu_data();
-    const float* instance_pt_y_data = instance_pt_blob.cpu_data()
-                                    + instance_pt_blob.offset(0, 1);
+    const float* instance_pt_y_data =
+        instance_pt_blob.cpu_data() + instance_pt_blob.offset(0, 1);
 
     pc_ptr_ = pc_ptr;
-    std::vector<std::vector<Node> > nodes(rows_, std::vector<Node>(cols_, Node()));
+    std::vector<std::vector<Node>> nodes(rows_,
+                                         std::vector<Node>(cols_, Node()));
 
     // map points into grids
     size_t tot_point_num = pc_ptr_->size();
@@ -89,7 +91,8 @@ class Cluster2D {
       CHECK_GE(point_id, 0);
       CHECK_LT(point_id, static_cast<int>(tot_point_num));
       const auto& point = pc_ptr_->points[point_id];
-      // * the coordinates of x and y have been exchanged in feature generation step,
+      // * the coordinates of x and y have been exchanged in feature generation
+      // step,
       // so we swap them back here.
       int pos_x = F2I(point.y, range_, inv_res_x_);  // col
       int pos_y = F2I(point.x, range_, inv_res_y_);  // row
@@ -106,8 +109,9 @@ class Cluster2D {
         int grid = RowCol2Grid(row, col);
         Node* node = &nodes[row][col];
         apollo::perception::DisjointSetMakeSet(node);
-        node->is_object = (use_all_grids_for_clustering || nodes[row][col].point_num > 0) &&
-                          (*(category_pt_data + grid) >= objectness_thresh);
+        node->is_object =
+            (use_all_grids_for_clustering || nodes[row][col].point_num > 0) &&
+            (*(category_pt_data + grid) >= objectness_thresh);
         int center_row = std::round(row + instance_pt_x_data[grid] * scale_);
         int center_col = std::round(col + instance_pt_y_data[grid] * scale_);
         center_row = std::min(std::max(center_row, 0), rows_ - 1);
@@ -172,7 +176,8 @@ class Cluster2D {
               const caffe::Blob<float>& height_pt_blob) {
     const float* confidence_pt_data = confidence_pt_blob.cpu_data();
     const float* height_pt_data = height_pt_blob.cpu_data();
-    for (size_t obstacle_id = 0; obstacle_id < obstacles_.size(); obstacle_id++) {
+    for (size_t obstacle_id = 0; obstacle_id < obstacles_.size();
+         obstacle_id++) {
       Obstacle* obs = &obstacles_[obstacle_id];
       CHECK_GT(obs->grids.size(), 0);
       double score = 0.0;
@@ -207,16 +212,18 @@ class Cluster2D {
       CHECK_GE(point_id, 0);
       CHECK_LT(point_id, static_cast<int>(pc_ptr_->size()));
 
-      if (obstacle_id >= 0 && obstacles_[obstacle_id].score >= confidence_thresh) {
+      if (obstacle_id >= 0 &&
+          obstacles_[obstacle_id].score >= confidence_thresh) {
         if (height_thresh < 0 ||
             pc_ptr_->points[point_id].z <=
-            obstacles_[obstacle_id].height + height_thresh) {
+                obstacles_[obstacle_id].height + height_thresh) {
           obstacles_[obstacle_id].cloud->push_back(pc_ptr_->points[point_id]);
         }
       }
     }
 
-    for (size_t obstacle_id = 0; obstacle_id < obstacles_.size(); obstacle_id++) {
+    for (size_t obstacle_id = 0; obstacle_id < obstacles_.size();
+         obstacle_id++) {
       Obstacle* obs = &obstacles_[obstacle_id];
       if (static_cast<int>(obs->cloud->size()) < min_pts_num) {
         continue;
@@ -268,25 +275,24 @@ class Cluster2D {
   }
 
   void Traverse(Node* x) {
-      std::vector<Node*> p;
-      p.clear();
-      while (x->traversed == 0) {
-          p.push_back(x);
-          x->traversed = 2;
-          x = x->center_node;
+    std::vector<Node*> p;
+    p.clear();
+    while (x->traversed == 0) {
+      p.push_back(x);
+      x->traversed = 2;
+      x = x->center_node;
+    }
+    if (x->traversed == 2) {
+      for (int i = static_cast<int>(p.size()) - 1; i >= 0 && p[i] != x; i--) {
+        p[i]->is_center = true;
       }
-      if (x->traversed == 2) {
-          for (int i = static_cast<int>(p.size()) - 1;
-               i >= 0 && p[i] != x; i--) {
-              p[i]->is_center = true;
-          }
-          x->is_center = true;
-      }
-      for (size_t i = 0; i < p.size(); i++) {
-          Node* y = p[i];
-          y->traversed = 1;
-          y->parent = x->parent;
-      }
+      x->is_center = true;
+    }
+    for (size_t i = 0; i < p.size(); i++) {
+      Node* y = p[i];
+      y->traversed = 1;
+      y->parent = x->parent;
+    }
   }
 
   int rows_;

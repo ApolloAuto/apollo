@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PSC_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PSC_H_
 
 #include <limits>
 #include <vector>
+#include <utility>
+#include <algorithm>
 #include "Eigen/Core"
 #include "Eigen/StdVector"
 #include "gflags/gflags.h"
@@ -94,9 +96,10 @@ class PolygonScanConverter {
 
   void ConvertPolygonToSegments();
 
-  bool ConvertSegmentToEdge(const size_t seg_id, std::pair<int, Edge>* out_edge);
+  bool ConvertSegmentToEdge(const size_t seg_id,
+                            std::pair<int, Edge>* out_edge);
 };
 
 }  // namespace perception
 }  // namespace apollo
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_SCAN_CONVERTER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PSC_H_

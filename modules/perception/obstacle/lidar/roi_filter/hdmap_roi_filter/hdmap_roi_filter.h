@@ -16,14 +16,15 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_HDMAP_ROI_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_HDMAP_ROI_FILTER_H_
 
-#include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
-
 #include <vector>
+#include <string>
+#include <algorithm>
 
 #include "Eigen/Core"
 #include "gflags/gflags.h"
 
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
@@ -83,8 +84,8 @@ class HdmapROIFilter : public BaseROIFilter {
   void TransformFrame(const pcl_util::PointCloudConstPtr& cloud,
                       const Eigen::Affine3d& vel_pose,
                       const std::vector<PolygonDType>& polygons_world,
-                      std::vector<PolygonType>& polygons_local,
-                      pcl_util::PointCloudPtr& cloud_local);
+                      std::vector<PolygonType>* polygons_local,
+                      pcl_util::PointCloudPtr cloud_local);
 
   /**
    * @brief: Get major direction. Transform polygons type to what we want.
@@ -122,7 +123,7 @@ class HdmapROIFilter : public BaseROIFilter {
   // Hight and width of grid in bitmap
   double cell_size_;
 
-  // TODO
+  // The distance extended away from the ROI boundary
   double extend_dist_;
 };
 

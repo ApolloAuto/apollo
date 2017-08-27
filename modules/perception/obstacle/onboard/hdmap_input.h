@@ -18,6 +18,9 @@
 #define MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
 
 #include <mutex>
+#include <memory>
+#include <vector>
+#include <string>
 
 #include "gtest/gtest_prod.h"
 
@@ -44,8 +47,8 @@ class HDMapInput {
                           PolygonDType* out_boundary_line) const;
 
   int MergeBoundaryJunction(
-      std::vector<apollo::hdmap::RoadROIBoundaryPtr>& boundaries,
-      std::vector<apollo::hdmap::JunctionBoundaryPtr>& junctions,
+      const std::vector<apollo::hdmap::RoadROIBoundaryPtr>& boundaries,
+      const std::vector<apollo::hdmap::JunctionBoundaryPtr>& junctions,
       HdmapStructPtr* mapptr);
 
   std::mutex mutex_;  // multi-thread init safe.

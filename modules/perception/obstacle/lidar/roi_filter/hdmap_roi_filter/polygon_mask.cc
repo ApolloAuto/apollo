@@ -23,7 +23,6 @@ void GetValidXRange(const typename PolygonScanConverter::Polygon& polygon,
                     const PolygonScanConverter::DirectionMajor major_dir,
                     const double major_dir_grid_size,
                     Interval* valid_x_range) {
-
   Eigen::Vector2d polygon_min_pt, polygon_max_pt;
   polygon_min_pt.setConstant(std::numeric_limits<double>::max());
   polygon_max_pt.setConstant(std::numeric_limits<double>::min());
@@ -52,27 +51,33 @@ void GetValidXRange(const typename PolygonScanConverter::Polygon& polygon,
 }
 
 void DrawPolygonInBitmap(const typename PolygonScanConverter::Polygon& polygon,
-    const double extend_dist, Bitmap2D* bitmap) {
-  PolygonScanConverter::DirectionMajor major_dir = bitmap->get_dir_major();
-  PolygonScanConverter::DirectionMajor op_major_dir = bitmap->get_op_dir_major();
+                         const double extend_dist,
+                         Bitmap2D* bitmap) {
+  PolygonScanConverter::DirectionMajor major_dir =
+      bitmap->get_dir_major();
+  PolygonScanConverter::DirectionMajor op_major_dir =
+      bitmap->get_op_dir_major();
   double major_dir_grid_size = bitmap->get_grid_size()[major_dir];
 
   // 1. Get valid x range
   Interval valid_x_range;
-  GetValidXRange(polygon, *bitmap, major_dir, major_dir_grid_size, &valid_x_range);
+  GetValidXRange(polygon, *bitmap, major_dir,
+                 major_dir_grid_size, &valid_x_range);
 
   // 2. Convert polygon to scan intervals(Most important)
   std::vector<std::vector<Interval>> scans_intervals;
 
   PolygonScanConverter polygon_scan_converter;
-  polygon_scan_converter.Init(major_dir, valid_x_range, polygon, major_dir_grid_size);
+  polygon_scan_converter.Init(major_dir, valid_x_range,
+                              polygon, major_dir_grid_size);
   polygon_scan_converter.ConvertScans(&scans_intervals);
 
   // 3. Draw grids in bitmap based on scan intervals
   const Eigen::Vector2d& bitmap_min_pt = bitmap->get_min_p();
   const Eigen::Vector2d& bitmap_max_pt = bitmap->get_max_p();
   double x = valid_x_range.first;
-  for (size_t i = 0; i < scans_intervals.size(); x += major_dir_grid_size, ++i) {
+  for (size_t i = 0; i < scans_intervals.size();
+       x += major_dir_grid_size, ++i) {
     for (const auto &scan_interval : scans_intervals[i]) {
       Interval valid_y_range;
       valid_y_range.first = std::max(bitmap_min_pt[op_major_dir],
@@ -91,15 +96,12 @@ void DrawPolygonInBitmap(const typename PolygonScanConverter::Polygon& polygon,
 
 void DrawPolygonInBitmap(
     const std::vector<typename PolygonScanConverter::Polygon>& polygons,
-    const double extend_dist, Bitmap2D* bitmap) {
+    const double extend_dist,
+    Bitmap2D* bitmap) {
     for (const auto &polygon : polygons) {
         DrawPolygonInBitmap(polygon, extend_dist, bitmap);
     }
 }
 
-} // perception
-} // apollo
-
-
-
-
+}  // namespace perception
+}  // namespace apollo
