@@ -41,12 +41,7 @@ uint32_t GetIndex(const std::vector<STPoint>& points, const double t) {
 
 StBoundary::StBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
-  CHECK(IsValid(point_pairs))
-      << "The input point_pairs are NOT valid.\n The point_pairs should "
-         "satisfy the following requirements:\n(1) point_pairs.size() >= "
-         "2;\n(2) each pair should have same t;\n(3) both points in pair[i + "
-         "1] should have larger t than points in pair[i]";
-
+  CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
   for (size_t i = 0; i < point_pairs.size(); ++i) {
     // use same t for both points
     const double t = point_pairs[i].first.t();
@@ -88,10 +83,12 @@ bool StBoundary::IsValid(
     const auto& curr_lower = point_pairs[i].first;
     const auto& curr_upper = point_pairs[i].second;
     if (curr_upper.s() < curr_lower.s()) {
+      AERROR << "s is not increasing";
       return false;
     }
 
     if (std::fabs(curr_lower.t() - curr_upper.t()) > kStBoundaryEpsilon) {
+      AERROR << "t diff is larger in each STPoint pair";
       return false;
     }
 
@@ -100,6 +97,7 @@ bool StBoundary::IsValid(
       const auto& next_upper = point_pairs[i + 1].second;
       if (std::fmax(curr_lower.t(), curr_upper.t()) + kMinDeltaT >=
           std::fmin(next_lower.t(), next_upper.t())) {
+        AERROR << "t is not increasing";
         return false;
       }
     }
