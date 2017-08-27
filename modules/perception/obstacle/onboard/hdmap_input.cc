@@ -86,8 +86,9 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
 }
 
 int HDMapInput::MergeBoundaryJunction(
-    std::vector<RoadROIBoundaryPtr>& boundaries,
-    std::vector<JunctionBoundaryPtr>& junctions, HdmapStructPtr* mapptr) {
+    const std::vector<RoadROIBoundaryPtr>& boundaries,
+    const std::vector<JunctionBoundaryPtr>& junctions,
+    HdmapStructPtr* mapptr) {
   if (*mapptr == nullptr) {
     AERROR << "the HdmapStructPtr mapptr is null";
     return FAIL;

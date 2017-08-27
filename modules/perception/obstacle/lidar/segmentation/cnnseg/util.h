@@ -18,9 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_UTIL_H_
 
 #include <string>
-#include <opencv2/opencv.hpp>
-
-#include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
+#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace perception {

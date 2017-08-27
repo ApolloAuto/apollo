@@ -18,13 +18,15 @@
 namespace apollo {
 namespace perception {
 
-const double PolygonScanConverter::kEpsilon = std::numeric_limits<float>::epsilon();
-const double PolygonScanConverter::kInf = std::numeric_limits<double>::infinity();
+const double PolygonScanConverter::kEpsilon =
+    std::numeric_limits<float>::epsilon();
+const double PolygonScanConverter::kInf =
+    std::numeric_limits<double>::infinity();
 
-void PolygonScanConverter::Init(
-    const DirectionMajor major_dir, const Interval& valid_x_range,
-    const Polygon& polygon, const double step) {
-
+void PolygonScanConverter::Init(const DirectionMajor major_dir,
+                                const Interval& valid_x_range,
+                                const Polygon& polygon,
+                                const double step) {
   major_dir_ = major_dir;
   op_major_dir_ = OppositeDirection(major_dir);
 
@@ -35,7 +37,7 @@ void PolygonScanConverter::Init(
 }
 
 void PolygonScanConverter::ConvertScans(
-  std::vector<std::vector<Interval>>* scans_intervals) {
+    std::vector<std::vector<Interval>>* scans_intervals) {
   scans_intervals->resize(scans_size_);
 
   DisturbPolygon();
@@ -64,7 +66,8 @@ void PolygonScanConverter::ConvertScans(
 }
 
 void PolygonScanConverter::UpdateActiveEdgeTable(
-    const size_t x_id, std::vector<Interval>* scan_intervals){
+    const size_t x_id,
+    std::vector<Interval>* scan_intervals) {
   size_t valid_edges_num = active_edge_table_.size();
   size_t invalid_edges_num = 0;
 
@@ -168,7 +171,6 @@ bool PolygonScanConverter::ConvertSegmentToEdge(
 }
 
 void PolygonScanConverter::ConvertPolygonToSegments() {
-
   size_t vertices_num = polygon_.size();
 
   segments_.reserve(vertices_num);
@@ -221,9 +223,5 @@ bool PolygonScanConverter::Edge::MoveUp(const double delta_x) {
   return true;
 }
 
-} // namespace perception
-} // namespace apollo
-
-
-
-
+}  // namespace perception
+}  // namespace apollo

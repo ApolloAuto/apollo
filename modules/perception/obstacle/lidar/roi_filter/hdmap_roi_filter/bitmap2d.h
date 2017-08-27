@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef apollo_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP_2D_H_
-#define apollo_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP_2D_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BM_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BM_H_
 
 #include <limits>
 #include <vector>
@@ -75,7 +75,9 @@ class Bitmap2D {
   bool Check(const Eigen::Vector2d& p) const;
 
   void Set(double x, double min_y, double max_y);
-  void Set(uint64_t x_id, uint64_t min_y_id, uint64_t max_y_id);
+  void Set(const uint64_t& x_id,
+           const uint64_t& min_y_id,
+           const uint64_t& max_y_id);
 
   void BuildMap();
 
@@ -88,12 +90,14 @@ class Bitmap2D {
 
   std::vector<std::vector<uint64_t>> bitmap_;
 
-  inline void SetUint64RangeBits(uint64_t& block, size_t head, size_t tail);
-  inline void SetUint64HeadBits(uint64_t& block, size_t head);
-  inline void SetUint64TailBits(uint64_t& block, size_t tail);
+  inline void SetUint64RangeBits(const size_t& head,
+                                 const size_t& tail,
+                                 uint64_t* block);
+  inline void SetUint64HeadBits(const size_t& head, uint64_t* block);
+  inline void SetUint64TailBits(const size_t& tail, uint64_t* block);
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP_2D_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_BM_H_

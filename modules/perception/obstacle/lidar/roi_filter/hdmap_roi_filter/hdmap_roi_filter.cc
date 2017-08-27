@@ -36,7 +36,7 @@ bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
   // 1. Transform polygon and point to local coordinates
   pcl_util::PointCloudPtr cloud_local(new pcl_util::PointCloud);
   std::vector<PolygonType> polygons_local;
-  TransformFrame(cloud, temp_trans, polygons, polygons_local, cloud_local);
+  TransformFrame(cloud, temp_trans, polygons, &polygons_local, cloud_local);
 
   return FilterWithPolygonMask(cloud_local, polygons_local, roi_indices);
 }
@@ -128,8 +128,8 @@ void HdmapROIFilter::MergeRoadBoundariesToPolygons(
     polygon.reserve(left_boundary.size() + right_boundary.size());
     polygon.insert(polygon.end(), left_boundary.begin(), left_boundary.end());
 
-    CHECK(right_boundary.size() > 0);
-    for (int j = (int)right_boundary.size() - 1; j >= 0; --j) {
+    CHECK_GT(right_boundary.size(), 0);
+    for (int j = static_cast<int>(right_boundary.size()) - 1; j >= 0; --j) {
       polygon.push_back(right_boundary[j]);
     }
   }
@@ -140,13 +140,17 @@ void HdmapROIFilter::MergeHdmapStructToPolygons(
     std::vector<PolygonDType>* polygons) {
 
   std::vector<PolygonDType> road_polygons;
-  MergeRoadBoundariesToPolygons(hdmap_struct_ptr->road_boundary, &road_polygons);
+  MergeRoadBoundariesToPolygons(hdmap_struct_ptr->road_boundary,
+                                &road_polygons);
 
-  const std::vector<PolygonDType>& junction_polygons = hdmap_struct_ptr->junction;
+  const std::vector<PolygonDType>& junction_polygons =
+      hdmap_struct_ptr->junction;
 
   polygons->reserve(road_polygons.size() + junction_polygons.size());
-  polygons->insert(polygons->end(), road_polygons.begin(), road_polygons.end());
-  polygons->insert(polygons->end(), junction_polygons.begin(), junction_polygons.end());
+  polygons->insert(polygons->end(), road_polygons.begin(),
+                   road_polygons.end());
+  polygons->insert(polygons->end(), junction_polygons.begin(),
+                   junction_polygons.end());
 }
 
 bool HdmapROIFilter::Init() {
@@ -177,18 +181,18 @@ void HdmapROIFilter::TransformFrame(
         const pcl_util::PointCloudConstPtr &cloud,
         const Eigen::Affine3d &vel_pose,
         const std::vector<PolygonDType> &polygons_world,
-        std::vector<PolygonType> &polygons_local,
-        pcl_util::PointCloudPtr &cloud_local) {
+        std::vector<PolygonType>* polygons_local,
+        pcl_util::PointCloudPtr cloud_local) {
   cloud_local->header = cloud->header;
   Eigen::Vector3d vel_location = vel_pose.translation();
   Eigen::Matrix3d vel_rot = vel_pose.linear();
   Eigen::Vector3d x_axis = vel_rot.row(0);
   Eigen::Vector3d y_axis = vel_rot.row(1);
 
-  polygons_local.resize(polygons_world.size());
-  for (size_t i = 0; i < polygons_local.size(); ++i) {
+  polygons_local->resize(polygons_world.size());
+  for (size_t i = 0; i < polygons_local->size(); ++i) {
     const auto& polygon_world = polygons_world[i];
-    auto& polygon_local = polygons_local[i];
+    auto& polygon_local = polygons_local->at(i);
     polygon_local.resize(polygon_world.size());
     for (size_t j = 0; j < polygon_local.size(); ++j) {
         polygon_local[j].x = polygon_world[j].x - vel_location.x();
@@ -206,6 +210,5 @@ void HdmapROIFilter::TransformFrame(
   }
 }
 
-} // namespace perception
-} // namespace apollo
-
+}  // namespace perception
+}  // namespace apollo
