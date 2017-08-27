@@ -85,6 +85,10 @@ class StBoundary : public common::math::Polygon2d {
 
   double area() const { return area_; };
 
+  double DistanceS(const STPoint& st_point) const;
+  std::vector<STPoint> upper_points() const { return upper_points_; }
+  std::vector<STPoint> lower_points() const { return lower_points_; }
+
  private:
   bool IsValid(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;
