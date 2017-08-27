@@ -91,6 +91,10 @@ class PIDController {
   bool integrator_enabled_ = false;
   bool integrator_hold_ = false;
   int integrator_saturation_status_ = 0;
+  // Only used for pid_BC_controller and pid_IC_controller
+  double output_saturation_high_ = 0.0;
+  double output_saturation_low_ = 0.0;
+  int output_saturation_status_ = 0;
 };
 
 }  // namespace control

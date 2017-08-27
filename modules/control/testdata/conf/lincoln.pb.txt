@@ -85,6 +85,7 @@ lon_controller_conf {
   station_pid_conf {
     integrator_enable: false
     integrator_saturation_level: 0.1
+    output_saturation_level: 3.0
     kp: 0.1
     ki: 0.0
     kd: 0.0
@@ -92,6 +93,7 @@ lon_controller_conf {
   low_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.3
+    output_saturation_level: 3.0
     kp: 1.5
     ki: 0.5
     kd: 0.0
@@ -100,6 +102,7 @@ lon_controller_conf {
   high_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.3
+    output_saturation_level: 3.0
     kp: 1.5
     ki: 0.5
     kd: 0.0
