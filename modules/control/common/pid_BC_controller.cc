@@ -44,24 +44,29 @@ double PIDBCController::Control(const double error, const double dt) {
     integral_ = 0;
   } else {
     double u = error * kp_ + integral_ + error * dt * ki_ + diff * kd_;
-    double aw_term =
-        ::apollo::common::math::Clamp(u, integrator_saturation_high_,
-                                      integrator_saturation_low_) -
-        u;
+    double aw_term = ::apollo::common::math::Clamp(u, output_saturation_high_,
+                                                   output_saturation_low_) -
+                     u;
     if (aw_term > 1e-6) {
-      integrator_saturation_status_ = -1;
+      output_saturation_status_ = -1;
     } else if (aw_term < -1e-6) {
-      integrator_saturation_status_ = 1;
+      output_saturation_status_ = 1;
     } else {
-      integrator_saturation_status_ = 0;
+      output_saturation_status_ = 0;
     }
     integral_ += kaw_ * aw_term + error * dt;
   }
 
   previous_error_ = error;
-  output = error * kp_ + integral_ + diff * kd_;  // Ki already applied
+  output = ::apollo::common::math::Clamp(
+      error * kp_ + integral_ + diff * kd_, output_saturation_high_,
+      output_saturation_low_);  // Ki already applied
   previous_output_ = output;
   return output;
+}
+
+int PIDBCController::OutputSaturationStatus() {
+  return output_saturation_status_;
 }
 
 }  // namespace control
