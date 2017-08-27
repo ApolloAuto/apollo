@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEG_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEG_H_
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "caffe/caffe.hpp"
 #include "modules/common/log.h"
@@ -52,30 +53,43 @@ class CNNSegmentation : public BaseSegmentation {
   int height() const { return height_; }
 
  private:
-  bool GetConfigs(std::string& config_file,
-                  std::string& proto_file,
-                  std::string& weight_file);
+  bool GetConfigs(std::string* config_file,
+                  std::string* proto_file,
+                  std::string* weight_file);
+  // range of bird-view field (for each side)
+  float range_;
+  // number of cells in bird-view width
+  int width_;
+  // number of cells in bird-view height
+  int height_;
 
-  float range_;   // range of bird-view field (for each side)   
-  int width_;     // number of cells in bird-view width
-  int height_;    // number of cells in bird-view height
+  // paramters of CNNSegmentation
+  apollo::perception::cnnseg::CNNSegParam cnnseg_param_;
+  // Caffe network object
+  std::shared_ptr<caffe::Net<float> > caffe_net_;
 
-  apollo::perception::cnnseg::CNNSegParam cnnseg_param_;   // paramters of CNNSegmentation
-  std::shared_ptr<caffe::Net<float> > caffe_net_;          // Caffe network object
+  // bird-view raw feature generator
+  std::shared_ptr<cnnseg::FeatureGenerator<float>> feature_generator_;
 
-  std::shared_ptr<cnnseg::FeatureGenerator<float>> feature_generator_;   // bird-view raw feature generator
+  // center offset prediction
+  boost::shared_ptr<caffe::Blob<float> > instance_pt_blob_;
+  // objectness prediction
+  boost::shared_ptr<caffe::Blob<float> > category_pt_blob_;
+  // fg probability prediction
+  boost::shared_ptr<caffe::Blob<float> > confidence_pt_blob_;
+  // object height prediction
+  boost::shared_ptr<caffe::Blob<float> > height_pt_blob_;
+  // raw features to be input into network
+  boost::shared_ptr<caffe::Blob<float> > feature_blob_;
 
-  boost::shared_ptr<caffe::Blob<float> > instance_pt_blob_;    // center offset prediction
-  boost::shared_ptr<caffe::Blob<float> > category_pt_blob_;    // objectness prediction
-  boost::shared_ptr<caffe::Blob<float> > confidence_pt_blob_;  // fg probability prediction
-  boost::shared_ptr<caffe::Blob<float> > height_pt_blob_;      // object height prediction
-  boost::shared_ptr<caffe::Blob<float> > feature_blob_;        // raw features to be input into network
+  // use all points of cloud to compute features
+  bool use_full_cloud_;
 
-  bool use_full_cloud_;                                     // use all points of cloud to compute features
+  // clustering model for post-processing
+  std::shared_ptr<cnnseg::Cluster2D> cluster2d_;
 
-  std::shared_ptr<cnnseg::Cluster2D> cluster2d_;            // clustering model for post-processing
-
-  cnnseg::Timer timer_;                                     // timer
+  // timer
+  cnnseg::Timer timer_;
   double feat_time_ = 0.0;
   double network_time_ = 0.0;
   double clust_time_ = 0.0;
@@ -87,7 +101,7 @@ class CNNSegmentation : public BaseSegmentation {
 
 REGISTER_SEGMENTATION(CNNSegmentation);
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEG_H_

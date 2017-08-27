@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
- #include "modules/perception/obstacle/onboard/hdmap_input.h"
- 
- #include <vector>
-
+#include "modules/perception/obstacle/onboard/hdmap_input.h"
+#include <vector>
 #include "gtest/gtest.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"

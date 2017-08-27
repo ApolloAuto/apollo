@@ -29,9 +29,9 @@
 namespace apollo {
 namespace perception {
 
-const std::string polygon_file_name =
+const char polygon_file_name[] =
     "/apollo/modules/perception/data/hdmap_roi_filter_test/poly_mask_ut.poly";
-const std::string pcd_file_name =
+const char pcd_file_name[] =
     "/apollo/modules/perception/data/hdmap_roi_filter_test/poly_mask_ut.pcd";
 
 bool LoadPolygonFile(const std::string& absolute_file_name,
@@ -65,7 +65,7 @@ bool LoadPolygonFile(const std::string& absolute_file_name,
 
 class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
  public:
-  HdmapROIFilterTest() : _pts_cloud_ptr(new pcl_util::PointCloud){};
+  HdmapROIFilterTest() : _pts_cloud_ptr(new pcl_util::PointCloud) {}
 
  protected:
   void SetUp() {
