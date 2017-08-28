@@ -282,5 +282,10 @@ double StBoundary::min_t() const { return min_t_; }
 double StBoundary::max_s() const { return max_s_; }
 double StBoundary::max_t() const { return max_t_; }
 
+void BuildStBoundaryFromPolygon2d(const common::math::Polygon2d& polygon2d) {
+  // TODO: implement this function
+  return;
+}
+
 }  // namespace planning
 }  // namespace apollo
