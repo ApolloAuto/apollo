@@ -226,12 +226,6 @@ TEST_F(HmObjectTrackerTest, demo_tracking) {
       EXPECT_TRUE(id_pool.find(track_id) == id_pool.end());
       id_pool[track_id] = 1;
     }
-    // save tracking results
-    std::ostringstream oss;
-    oss << std::setfill('0') << std::setw(6) << i;
-    std::string filename = data_path + oss.str() + ".txt";
-    EXPECT_TRUE(
-        SaveTrackingResults(result_objects, pose, frame_id, &cloud, filename));
   }
 }
 
