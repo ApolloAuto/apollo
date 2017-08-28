@@ -213,8 +213,8 @@ Status QpSplineStGraph::ApplyConstraint(
   }
   for (size_t i = 0; i < t_evaluated_.size(); ++i) {
     ADEBUG << "t_evaluated_: " << t_evaluated_[i]
-           << "speed_lower_bound: " << speed_lower_bound[i]
-           << "speed_upper_bound: " << speed_upper_bound[i] << std::endl;
+           << "; speed_lower_bound: " << speed_lower_bound[i]
+           << "; speed_upper_bound: " << speed_upper_bound[i] << std::endl;
   }
 
   // TODO : add acceleration constraint here

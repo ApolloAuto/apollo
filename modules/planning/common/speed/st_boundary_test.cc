@@ -94,5 +94,43 @@ TEST(StBoundaryTest, boundary_range) {
   }
 }
 
+TEST(StBoundaryTest, get_index_range) {
+  std::vector<STPoint> upper_points;
+  std::vector<STPoint> lower_points;
+
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+
+  lower_points.emplace_back(43.000164837720789, -517957.08587679861);
+  lower_points.emplace_back(46.100164825451913, -517955.58587660792);
+
+  upper_points.emplace_back(52.200164801309178, -517957.08587679861);
+  upper_points.emplace_back(55.6001647283625, -517955.58587660792);
+
+  point_pairs.emplace_back(lower_points[0], upper_points[0]);
+  point_pairs.emplace_back(lower_points[1], upper_points[1]);
+
+  StBoundary boundary(point_pairs);
+
+  size_t left = 0;
+  size_t right = 0;
+
+  EXPECT_TRUE(
+      boundary.GetIndexRange(lower_points, -517957.08587679861, &left, &right));
+  EXPECT_EQ(left, 0);
+  EXPECT_EQ(right, 0);
+
+  EXPECT_TRUE(
+      boundary.GetIndexRange(lower_points, -517955.58587660792, &left, &right));
+  EXPECT_EQ(left, 0);
+  EXPECT_EQ(right, 1);
+
+  EXPECT_TRUE(
+      boundary.GetIndexRange(lower_points, -517955.58587660792, &left, &right));
+  EXPECT_EQ(left, 0);
+  EXPECT_EQ(right, 1);
+
+  EXPECT_FALSE(boundary.GetIndexRange(lower_points, 0.0, &left, &right));
+}
+
 }  // namespace planning
 }  // namespace apollo

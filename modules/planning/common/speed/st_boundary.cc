@@ -30,31 +30,6 @@ namespace planning {
 
 using Vec2d = common::math::Vec2d;
 
-namespace {
-
-bool GetIndexRange(const std::vector<STPoint>& points, const double t,
-                   size_t* left, size_t* right) {
-  CHECK_NOTNULL(left);
-  CHECK_NOTNULL(right);
-  if (t < points.front().t() || t > points.back().t()) {
-    AERROR << "t is out of range. t = " << t;
-    return false;
-  }
-  auto comp = [](const STPoint& p, const double t) { return p.t() < t; };
-  auto first_ge = std::lower_bound(points.begin(), points.end(), t, comp);
-  size_t index = std::distance(points.begin(), first_ge);
-  if (index == 0) {
-    *left = *right = 0;
-  } else if (first_ge == points.end()) {
-    *left = *right = points.size() - 1;
-  } else {
-    *left = index - 1;
-    *right = index;
-  }
-  return true;
-}
-}
-
 StBoundary::StBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
   CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
@@ -66,10 +41,10 @@ StBoundary::StBoundary(
   }
 
   for (auto it = lower_points_.begin(); it != lower_points_.end(); ++it) {
-    points_.emplace_back(it->t(), it->s());
+    points_.emplace_back(it->x(), it->y());
   }
   for (auto rit = upper_points_.rbegin(); rit != upper_points_.rend(); ++rit) {
-    points_.emplace_back(rit->t(), rit->s());
+    points_.emplace_back(rit->x(), rit->y());
   }
 
   BuildFromPoints();
@@ -309,6 +284,29 @@ double StBoundary::min_s() const { return min_s_; }
 double StBoundary::min_t() const { return min_t_; }
 double StBoundary::max_s() const { return max_s_; }
 double StBoundary::max_t() const { return max_t_; }
+
+bool StBoundary::GetIndexRange(const std::vector<STPoint>& points,
+                               const double t, size_t* left,
+                               size_t* right) const {
+  CHECK_NOTNULL(left);
+  CHECK_NOTNULL(right);
+  if (t < points.front().t() || t > points.back().t()) {
+    AERROR << "t is out of range. t = " << t;
+    return false;
+  }
+  auto comp = [](const STPoint& p, const double t) { return p.t() < t; };
+  auto first_ge = std::lower_bound(points.begin(), points.end(), t, comp);
+  size_t index = std::distance(points.begin(), first_ge);
+  if (index == 0) {
+    *left = *right = 0;
+  } else if (first_ge == points.end()) {
+    *left = *right = points.size() - 1;
+  } else {
+    *left = index - 1;
+    *right = index;
+  }
+  return true;
+}
 
 }  // namespace planning
 }  // namespace apollo
