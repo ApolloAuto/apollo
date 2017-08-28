@@ -60,6 +60,9 @@ sl_dynamic_obstacle_upper_boundary = None
 sl_map_lower_boundary = None
 sl_map_upper_boundary = None
 sl_path = None
+sl_aggregated_boundary_low_line = None
+sl_aggregated_boundary_high_line = None
+
 
 
 def localization_callback(localization_pb):
@@ -110,6 +113,8 @@ def update(frame_number):
     sl_map_lower_boundary.set_visible(False)
     sl_map_upper_boundary.set_visible(False)
     sl_path.set_visible(False)
+    sl_aggregated_boundary_low_line.set_visible(False)
+    sl_aggregated_boundary_high_line.set_visible(False)
 
     vehicle_position_line.set_visible(False)
     vehicle_polygon_line.set_visible(False)
@@ -121,7 +126,9 @@ def update(frame_number):
                             sl_dynamic_obstacle_lower_boundary,
                             sl_dynamic_obstacle_upper_boundary,
                             sl_map_lower_boundary,
-                            sl_map_upper_boundary, sl_path)
+                            sl_map_upper_boundary, sl_path,
+                            sl_aggregated_boundary_low_line,
+                            sl_aggregated_boundary_high_line)
 
     if len(planning.st_data_s.keys()) >= 1:
         planning.replot_st_data(
@@ -157,6 +164,7 @@ def init_line_pool(central_x, central_y):
     global sl_dynamic_obstacle_upper_boundary
     global sl_map_lower_boundary
     global sl_map_upper_boundary, sl_path
+    global sl_aggregated_boundary_low_line, sl_aggregated_boundary_high_line
 
     colors = ['b', 'g', 'r', 'k']
 
@@ -187,8 +195,11 @@ def init_line_pool(central_x, central_y):
         ax4.plot([0], [0], "b-", lw=0.3, ms=2, alpha=0.8)
     sl_map_upper_boundary, = \
         ax4.plot([0], [0], "b-", lw=0.3, ms=4, alpha=0.8)
-
-    sl_path, = ax4.plot([0], [0], "k-")
+    sl_path, = ax4.plot([0], [0], "k--")
+    sl_aggregated_boundary_low_line, = \
+        ax4.plot([0], [0], "k-", lw=1, ms=2)
+    sl_aggregated_boundary_high_line, = \
+        ax4.plot([0], [0], "k-", lw=1, ms=2)
 
     for i in range(obstacle_line_pool_size):
         line, = ax2.plot([0], [0],
