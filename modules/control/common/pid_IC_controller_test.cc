@@ -55,7 +55,6 @@ TEST_F(PidICControllerTest, StationPidController) {
   EXPECT_NEAR(control_value, -0.01, 1e-6);
   dt = 0.0;
   EXPECT_EQ(pid_IC_controller.Control(100, dt), control_value);
-  EXPECT_EQ(pid_IC_controller.IntegratorHold(), false);
 }
 TEST_F(PidICControllerTest, SpeedPidController) {
   PidConf pid_conf = lon_controller_conf_.low_speed_pid_conf();
@@ -71,8 +70,10 @@ TEST_F(PidICControllerTest, SpeedPidController) {
   pid_IC_controller.Reset();
   dt = 2;
   EXPECT_NEAR(pid_IC_controller.Control(0.1, dt), 0.25, 1e-6);
-  EXPECT_EQ(pid_IC_controller.IntegratorSaturationStatus(), 0);
-  EXPECT_NEAR(pid_IC_controller.Control(0.1, dt), 0.25, 1e-6);
+  EXPECT_EQ(pid_IC_controller.OutputSaturationStatus(), 0);
+  EXPECT_NEAR(pid_IC_controller.Control(10, dt), 3, 1e-6);
+  EXPECT_EQ(pid_IC_controller.OutputSaturationStatus(), 1);
 }
+
 }  // namespace control
 }  // namespace apollo
