@@ -22,7 +22,8 @@
 
   <ul class="list-group">
     {% for hardware in conf_pb.hardware %}
-      <li class="list-group-item debug_item">
+      <li class="list-group-item debug_item
+          {% if loop.index % 2 == 0 %} light {% endif %}">
         <div class="item_content" id="hardware_{{ hardware.name }}">
           {{ hardware.display_name }}
           <span class="glyphicon"></span>
