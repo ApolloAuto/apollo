@@ -33,10 +33,10 @@ ObstaclesContainer::ObstaclesContainer()
     : timestamp_(0.0), obstacles_(FLAGS_max_num_obstacles_stored) {}
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
-  AINFO << "message: " << message.ShortDebugString();
+  ADEBUG << "message: " << message.ShortDebugString();
   const PerceptionObstacles& perception_obstacles =
       dynamic_cast<const PerceptionObstacles&>(message);
-  AINFO << "perception obstacles: " << perception_obstacles.ShortDebugString();
+  ADEBUG << "perception obstacles: " << perception_obstacles.ShortDebugString();
   double timestamp = 0.0;
   if (perception_obstacles.has_header() &&
       perception_obstacles.header().has_timestamp_sec()) {
