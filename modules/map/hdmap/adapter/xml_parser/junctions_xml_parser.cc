@@ -19,7 +19,6 @@ limitations under the License.
 #include "tinyxml2.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
-#include "glog/logging.h"
 
 namespace apollo {
 namespace hdmap {

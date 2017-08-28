@@ -21,81 +21,81 @@ namespace apollo {
 namespace hdmap {
 
 int HDMap::LoadMapFromFile(const std::string& map_filename) {
-  return _impl.load_map_from_file(map_filename);
+  return _impl.LoadMapFromFile(map_filename);
 }
 
 LaneInfoConstPtr HDMap::GetLaneById(const Id& id) const {
-  return _impl.get_lane_by_id(id);
+  return _impl.GetLaneById(id);
 }
 
 JunctionInfoConstPtr HDMap::GetJunctionById(const Id& id) const {
-  return _impl.get_junction_by_id(id);
+  return _impl.GetJunctionById(id);
 }
 
 SignalInfoConstPtr HDMap::GetSignalById(const Id& id) const {
-  return _impl.get_signal_by_id(id);
+  return _impl.GetSignalById(id);
 }
 
 CrosswalkInfoConstPtr HDMap::GetCrosswalkById(const Id& id) const {
-  return _impl.get_crosswalk_by_id(id);
+  return _impl.GetCrosswalkById(id);
 }
 
 StopSignInfoConstPtr HDMap::GetStopSignById(const Id& id) const {
-  return _impl.get_stop_sign_by_id(id);
+  return _impl.GetStopSignById(id);
 }
 
 YieldSignInfoConstPtr HDMap::GetYieldSignById(const Id& id) const {
-  return _impl.get_yield_sign_by_id(id);
+  return _impl.GetYieldSignById(id);
 }
 
 OverlapInfoConstPtr HDMap::GetOverlapById(const Id& id) const {
-  return _impl.get_overlap_by_id(id);
+  return _impl.GetOverlapById(id);
 }
 
 RoadInfoConstPtr HDMap::GetRoadById(const Id& id) const {
-  return _impl.get_road_by_id(id);
+  return _impl.GetRoadById(id);
 }
 
 int HDMap::GetLanes(const apollo::common::PointENU& point, double distance,
                     std::vector<LaneInfoConstPtr>* lanes) const {
-  return _impl.get_lanes(point, distance, lanes);
+  return _impl.GetLanes(point, distance, lanes);
 }
 
 int HDMap::GetJunctions(const apollo::common::PointENU& point, double distance,
                         std::vector<JunctionInfoConstPtr>* junctions) const {
-  return _impl.get_junctions(point, distance, junctions);
+  return _impl.GetJunctions(point, distance, junctions);
 }
 
 int HDMap::GetSignals(const apollo::common::PointENU& point, double distance,
                       std::vector<SignalInfoConstPtr>* signals) const {
-  return _impl.get_signals(point, distance, signals);
+  return _impl.GetSignals(point, distance, signals);
 }
 
 int HDMap::GetCrosswalks(const apollo::common::PointENU& point, double distance,
                          std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
-  return _impl.get_crosswalks(point, distance, crosswalks);
+  return _impl.GetCrosswalks(point, distance, crosswalks);
 }
 
 int HDMap::GetStopSigns(const apollo::common::PointENU& point, double distance,
                         std::vector<StopSignInfoConstPtr>* stop_signs) const {
-  return _impl.get_stop_signs(point, distance, stop_signs);
+  return _impl.GetStopSigns(point, distance, stop_signs);
 }
 
 int HDMap::GetYieldSigns(
     const apollo::common::PointENU& point, double distance,
     std::vector<YieldSignInfoConstPtr>* yield_signs) const {
-  return _impl.get_yield_signs(point, distance, yield_signs);
+  return _impl.GetYieldSigns(point, distance, yield_signs);
 }
 
 int HDMap::GetRoads(const apollo::common::PointENU& point, double distance,
                     std::vector<RoadInfoConstPtr>* roads) const {
-  return _impl.get_roads(point, distance, roads);
+  return _impl.GetRoads(point, distance, roads);
 }
 
 int HDMap::GetNearestLane(const ::apollo::common::PointENU& point,
                           LaneInfoConstPtr* nearest_lane,
                           double* nearest_s, double* nearest_l) const {
-  return _impl.get_nearest_lane(point, nearest_lane, nearest_s, nearest_l);
+  return _impl.GetNearestLane(point, nearest_lane, nearest_s, nearest_l);
 }
 
 int HDMap::GetNearestLaneWithHeading(const apollo::common::PointENU& point,
@@ -105,7 +105,7 @@ int HDMap::GetNearestLaneWithHeading(const apollo::common::PointENU& point,
                                      LaneInfoConstPtr* nearest_lane,
                                      double* nearest_s,
                                      double* nearest_l) const {
-  return _impl.get_nearest_lane_with_heading(
+  return _impl.GetNearestLaneWithHeading(
       point, distance, central_heading, max_heading_difference, nearest_lane,
       nearest_s, nearest_l);
 }
@@ -115,7 +115,7 @@ int HDMap::GetLanesWithHeading(const apollo::common::PointENU& point,
                                const double central_heading,
                                const double max_heading_difference,
                                std::vector<LaneInfoConstPtr>* lanes) const {
-  return _impl.get_lanes_with_heading(
+  return _impl.GetLanesWithHeading(
       point, distance, central_heading, max_heading_difference, lanes);
 }
 
@@ -123,7 +123,7 @@ int HDMap::GetRoadBoundaries(
     const apollo::common::PointENU& point, double radius,
     std::vector<RoadROIBoundaryPtr>* road_boundaries,
     std::vector<JunctionBoundaryPtr>* junctions) const {
-  return _impl.get_road_boundaries(point, radius, road_boundaries, junctions);
+  return _impl.GetRoadBoundaries(point, radius, road_boundaries, junctions);
 }
 
 }  // namespace hdmap

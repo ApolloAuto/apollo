@@ -221,6 +221,16 @@ tinyxml2::XMLError UtilXmlParser::query_string_attribute(
   return tinyxml2::XML_SUCCESS;
 }
 
+int getLongZone(double longitude) {
+  double longZone = 0.0;
+  if (longitude < 0.0) {
+    longZone = ((180.0 + longitude) / 6.0) + 1;
+  } else {
+    longZone = (longitude / 6.0) + 31;
+  }
+  return static_cast<int>(longZone);
+}
+
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo

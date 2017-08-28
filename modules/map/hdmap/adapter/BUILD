@@ -34,7 +34,7 @@ cc_library(
         "//modules/common/math",
         "//modules/common/status",
         "//modules/map/proto:map_proto",
-        "@glog//:glog",
+        "//modules/common:log",
         "@proj4//:proj4",
         "@tinyxml2//:tinyxml2",
     ],
