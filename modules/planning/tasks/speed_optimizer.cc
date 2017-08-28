@@ -92,8 +92,8 @@ void SpeedOptimizer::RecordSTGraphDebug(
 
     for (const auto& point : boundary.lower_points()) {
       auto point_debug = boundary_debug->add_point();
-      point_debug->set_t(point.x());
-      point_debug->set_s(point.y());
+      point_debug->set_t(point.t());
+      point_debug->set_s(point.s());
     }
 
     for (size_t i = 0; i < boundary.upper_points().size(); ++i) {

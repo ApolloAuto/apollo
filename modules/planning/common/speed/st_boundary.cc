@@ -32,10 +32,26 @@ using Vec2d = common::math::Vec2d;
 
 namespace {
 
-uint32_t GetIndex(const std::vector<STPoint>& points, const double t) {
-  auto comp = [](const double t, const STPoint& p) { return t < p.t(); };
-  auto first_gt = std::upper_bound(points.begin(), points.end(), t, comp);
-  return std::distance(points.begin(), first_gt) - 1;
+bool GetIndexRange(const std::vector<STPoint>& points, const double t,
+                   size_t* left, size_t* right) {
+  CHECK_NOTNULL(left);
+  CHECK_NOTNULL(right);
+  if (t < points.front().t() || t > points.back().t()) {
+    AERROR << "t is out of range. t = " << t;
+    return false;
+  }
+  auto comp = [](const STPoint& p, const double t) { return p.t() < t; };
+  auto first_ge = std::lower_bound(points.begin(), points.end(), t, comp);
+  size_t index = std::distance(points.begin(), first_ge);
+  if (index == 0) {
+    *left = *right = 0;
+  } else if (first_ge == points.end()) {
+    *left = *right = points.size() - 1;
+  } else {
+    *left = index - 1;
+    *right = index;
+  }
+  return true;
 }
 }
 
@@ -117,11 +133,16 @@ bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
   if (st_point.t() <= min_t_ || st_point.t() >= max_t_) {
     return false;
   }
-  auto index = GetIndex(lower_points_, st_point.t());
+  size_t left = 0;
+  size_t right = 0;
+  if (!GetIndexRange(lower_points_, st_point.t(), &left, &right)) {
+    AERROR << "fait to get index range.";
+    return false;
+  }
   const double check_upper = common::math::CrossProd(
-      st_point, upper_points_[index], upper_points_[index + 1]);
+      st_point, upper_points_[left], upper_points_[right]);
   const double check_lower = common::math::CrossProd(
-      st_point, lower_points_[index], lower_points_[index + 1]);
+      st_point, lower_points_[left], lower_points_[right]);
 
   return (check_upper * check_lower < 0);
 }
@@ -211,17 +232,21 @@ bool StBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
     return true;
   }
 
-  auto index = GetIndex(lower_points_, curr_time);
-  const double r =
-      (curr_time - upper_points_[index].t()) /
-      (upper_points_.at(index + 1).t() - upper_points_.at(index).t());
+  size_t left = 0;
+  size_t right = 0;
+  if (!GetIndexRange(lower_points_, curr_time, &left, &right)) {
+    AERROR << "Fail to get index range.";
+    return false;
+  }
+  const double r = (curr_time - upper_points_[left].t()) /
+                   (upper_points_.at(right).t() - upper_points_.at(left).t());
 
   double upper_cross_s =
-      upper_points_[index].s() +
-      r * (upper_points_[index + 1].s() - upper_points_[index].s());
+      upper_points_[left].s() +
+      r * (upper_points_[right].s() - upper_points_[left].s());
   double lower_cross_s =
-      lower_points_[index].s() +
-      r * (lower_points_[index + 1].s() - lower_points_[index].s());
+      lower_points_[left].s() +
+      r * (lower_points_[right].s() - lower_points_[left].s());
 
   if (boundary_type_ == BoundaryType::STOP ||
       boundary_type_ == BoundaryType::YIELD ||
@@ -245,14 +270,19 @@ bool StBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
     return false;
   }
 
-  auto index = GetIndex(lower_points_, curr_time);
-  const double r = (curr_time - upper_points_[index].t()) /
-                   (upper_points_[index + 1].t() - upper_points_[index].t());
+  size_t left = 0;
+  size_t right = 0;
+  if (!GetIndexRange(lower_points_, curr_time, &left, &right)) {
+    AERROR << "Fail to get index range.";
+    return false;
+  }
+  const double r = (curr_time - upper_points_[left].t()) /
+                   (upper_points_[right].t() - upper_points_[left].t());
 
-  *s_upper = upper_points_[index].s() +
-             r * (upper_points_[index + 1].s() - upper_points_[index].s());
-  *s_lower = lower_points_[index].s() +
-             r * (lower_points_[index + 1].s() - lower_points_[index].s());
+  *s_upper = upper_points_[left].s() +
+             r * (upper_points_[right].s() - upper_points_[left].s());
+  *s_lower = lower_points_[left].s() +
+             r * (lower_points_[right].s() - lower_points_[left].s());
 
   *s_upper = std::fmin(*s_upper, s_high_limit_);
   *s_lower = std::fmax(*s_lower, 0.0);
