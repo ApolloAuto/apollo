@@ -16,23 +16,18 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import math
 import itertools
+import math
+import sys
+
 import matplotlib.pyplot as plt
+
+import common.proto_utils as proto_utils
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import util
 
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])
-
-
-def downsample_array(array):
-    """down sample given array"""
-    skip = 5
-    result = array[::skip]
-    result.append(array[-1])
-    return result
 
 
 def calculate_s(px, py):
@@ -46,25 +41,10 @@ def calculate_s(px, py):
     return ps
 
 
-def extract_line(line):
-    """extract line, return x array and y array"""
-    px = []
-    py = []
-    for pt in line.point:
-        px.append(float(pt.x))
-        py.append(float(pt.y))
-    return px, py
-
-
 def draw_line(line, color):
     """draw line, return x array and y array"""
-    px = []
-    py = []
-    for pt in line.point:
-        px.append(float(pt.x))
-        py.append(float(pt.y))
-    px = downsample_array(px)
-    py = downsample_array(py)
+    px, py = proto_utils.flatten(line.point, ['x', 'y'])
+    px, py = util.downsample_array(px), util.downsample_array(py)
     plt.gca().plot(px, py, color=color, lw=3, alpha=0.8)
     return px, py
 
@@ -106,11 +86,10 @@ def plot_central_curve_with_s_range(central_curve, start_s, end_s, color):
     """plot topology graph node with given start and end s, return middle point"""
     node_x = []
     node_y = []
-    plot_length = 0.0
     for curve in central_curve.segment:
-        px, py = extract_line(curve.line_segment)
-        node_x = node_x + px
-        node_y = node_y + py
+        px, py = proto_utils.flatten(curve.line_segment.point, ['x', 'y'])
+        node_x.extend(px)
+        node_y.extend(py)
     start_plot_index = 0
     end_plot_index = len(node_x)
     node_s = calculate_s(node_x, node_y)
