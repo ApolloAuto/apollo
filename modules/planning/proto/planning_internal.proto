@@ -78,6 +78,9 @@ message SLFrameDebug {
   repeated double map_lower_bound = 7;
   repeated double map_upper_bound = 8;
   repeated apollo.common.SLPoint sl_path = 9;
+  repeated double aggregated_boundary_s = 10;
+  repeated double aggregated_boundary_low = 11;
+  repeated double aggregated_boundary_high = 12;
 }
 
 message STGraphDebug {
