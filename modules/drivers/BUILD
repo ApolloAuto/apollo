@@ -43,10 +43,24 @@ cc_test(
 )
 
 cc_library(
+    name = "sensor_gflags",
+    srcs = [
+        "sensor_gflags.cc",
+    ],
+    hdrs = [
+        "sensor_gflags.h",
+    ],
+    deps = [
+        "//external:gflags",
+    ],
+)
+
+cc_library(
     name = "sensor_canbus_lib",
     hdrs = ["sensor_canbus.h"],
     deps = [
         ":sensor_message_manager_base",
+        ":sensor_gflags",
         "//modules/canbus/can_client:can_client_factory",
         "//modules/drivers/can_comm:can_receiver",
         "//modules/common",
