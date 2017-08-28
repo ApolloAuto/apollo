@@ -45,6 +45,17 @@ class RoadGraph {
    */
   apollo::common::Status BuildLaneGraph(LaneGraph* lane_graph);
 
+  /**
+   * @brief Check if a lane with an s is on the lane graph
+   * @param Lane ID
+   * @param Lane s
+   * @param The pointer to the given lane graph
+   * @return If the given lane ID and lane s is on the lane graph
+   */
+  bool IsOnLaneGraph(
+      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
+      const LaneGraph& lane_graph);
+
  private:
   void ComputeLaneSequence(
       double accumulated_s,

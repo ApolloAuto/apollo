@@ -19,11 +19,13 @@
 #include <cmath>
 #include <utility>
 #include <limits>
+#include <memory>
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/prediction/common/road_graph.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container_manager.h"
@@ -37,6 +39,7 @@ using ::apollo::common::PathPoint;
 using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::math::KalmanFilter;
 using ::apollo::common::adapter::AdapterConfig;
+using ::apollo::hdmap::LaneInfo;
 
 void LaneSequencePredictor::Clear() {
   trajectories_.clear();
@@ -212,6 +215,10 @@ double LaneSequencePredictor::GetLaneChangeDistanceWithADC(
   std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
   double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
 
+  if (SameLaneSequence(obstacle_lane_id, obstacle_lane_s)) {
+    return std::numeric_limits<double>::max();
+  }
+
   double lane_s = 0.0;
   double lane_l = 0.0;
   if (map->GetProjection(adc_position_,
@@ -220,6 +227,31 @@ double LaneSequencePredictor::GetLaneChangeDistanceWithADC(
     return std::fabs(lane_s - obstacle_lane_s);
   }
   return std::numeric_limits<double>::max();
+}
+
+bool LaneSequencePredictor::SameLaneSequence(
+    const std::string& lane_id, double lane_s) {
+  PredictionMap *map = PredictionMap::instance();
+
+  std::shared_ptr<const LaneInfo> obstacle_lane = map->LaneById(lane_id);
+  std::shared_ptr<const LaneInfo> adc_lane = map->LaneById(adc_lane_id_);
+
+  if (obstacle_lane != nullptr && adc_lane != nullptr) {
+    RoadGraph obstacle_road_graph(
+        lane_s, FLAGS_lane_change_dist, obstacle_lane);
+    LaneGraph obstacle_lane_graph;
+    obstacle_road_graph.BuildLaneGraph(&obstacle_lane_graph);
+
+    RoadGraph adc_road_graph(
+        adc_lane_s_, FLAGS_lane_change_dist, adc_lane);
+    LaneGraph adc_lane_graph;
+    adc_road_graph.BuildLaneGraph(&adc_lane_graph);
+
+    return obstacle_road_graph.IsOnLaneGraph(adc_lane, obstacle_lane_graph) ||
+        adc_road_graph.IsOnLaneGraph(obstacle_lane, adc_lane_graph);
+  }
+
+  return false;
 }
 
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(

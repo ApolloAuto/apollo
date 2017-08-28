@@ -58,6 +58,11 @@ TEST_F(RoadGraphTest, General) {
   EXPECT_EQ("l18", lane_graph.lane_sequence(0).lane_segment(1).lane_id());
   EXPECT_EQ("l21", lane_graph.lane_sequence(0).lane_segment(2).lane_id());
 
+  EXPECT_TRUE(road_graph.IsOnLaneGraph(map_->LaneById("l9"), lane_graph));
+  EXPECT_TRUE(road_graph.IsOnLaneGraph(map_->LaneById("l18"), lane_graph));
+  EXPECT_TRUE(road_graph.IsOnLaneGraph(map_->LaneById("l21"), lane_graph));
+  EXPECT_FALSE(road_graph.IsOnLaneGraph(map_->LaneById("l30"), lane_graph));
+
   for (const auto &lane_sequence : lane_graph.lane_sequence()) {
     double total_length = 0.0;
     for (const auto &lane_segment : lane_sequence.lane_segment()) {

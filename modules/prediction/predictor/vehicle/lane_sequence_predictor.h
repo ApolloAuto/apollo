@@ -88,6 +88,14 @@ class LaneSequencePredictor : public Predictor {
   double GetLaneChangeDistanceWithADC(const LaneSequence& lane_sequence);
 
   /**
+   * @brief Check if the given lane id and s is on the same lane sequence as ADC
+   * @param Lane ID
+   * @param Lane s
+   * @return If the given lane id and s is on the same lane sequence as ADC
+   */
+  bool SameLaneSequence(const std::string& lane_id, double lane_s);
+
+  /**
    * @brief Get ADC status
    */
   void GetADC();
