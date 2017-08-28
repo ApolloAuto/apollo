@@ -87,7 +87,7 @@ bool QpSplinePathGenerator::Generate(
     return false;
   }
 
-  if (!AddConstraint(qp_frenet_frame)) {
+  if (!AddConstraint(qp_frenet_frame, planning_debug)) {
     AERROR << "Fail to setup pss path constraint.";
     return false;
   }
@@ -245,7 +245,8 @@ bool QpSplinePathGenerator::InitSpline(
 }
 
 bool QpSplinePathGenerator::AddConstraint(
-    const QpFrenetFrame& qp_frenet_frame) {
+    const QpFrenetFrame& qp_frenet_frame,
+    apollo::planning_internal::Debug* planning_debug) {
   Spline1dConstraint* spline_constraint =
       spline_generator_->mutable_spline_constraint();
 
@@ -311,6 +312,15 @@ bool QpSplinePathGenerator::AddConstraint(
            << " dynamic_obs_boundary_low: " << dynamic_obs_boundary.first
            << " dynamic_obs_boundary_high: " << dynamic_obs_boundary.second;
   }
+
+  apollo::planning_internal::SLFrameDebug* sl_frame =
+      planning_debug->mutable_planning_data()->mutable_sl_frame()->Add();
+  for (size_t i = 0; i < evaluated_s_.size(); ++i) {
+    sl_frame->mutable_aggregated_boundary_s()->Add(evaluated_s_[i]);
+    sl_frame->mutable_aggregated_boundary_low()->Add(boundary_low[i]);
+    sl_frame->mutable_aggregated_boundary_high()->Add(boundary_high[i]);
+  }
+
   if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low,
                                       boundary_high)) {
     AERROR << "Add boundary constraint failed";
