@@ -26,7 +26,8 @@ using pcl_util::PointCloudPtr;
 /*
  * Transform point cloud methods
  * */
-void TransformCloud(pcl_util::PointCloudPtr cloud, const std::vector<int>& indices,
+void TransformCloud(pcl_util::PointCloudPtr cloud,
+                    const std::vector<int>& indices,
                     pcl_util::PointDCloud* trans_cloud) {
   if (trans_cloud->size() != indices.size()) {
     trans_cloud->resize(indices.size());
@@ -86,41 +87,51 @@ void TransAffineToMatrix4(const Eigen::Vector3d& translation,
 
 void ComputeMostConsistentBboxDirection(const Eigen::Vector3f& previous_dir,
   Eigen::Vector3f* current_dir) {
-  float dot_val_00 = previous_dir(0) * (*current_dir)(0) + previous_dir(1) * (*current_dir)(1);
-  float dot_val_01 = previous_dir(0) * (*current_dir)(1) - previous_dir(1) * (*current_dir)(0);
+  float dot_val_00 = previous_dir(0) * (*current_dir)(0)
+      + previous_dir(1) * (*current_dir)(1);
+  float dot_val_01 = previous_dir(0) * (*current_dir)(1)
+      - previous_dir(1) * (*current_dir)(0);
   if (fabs(dot_val_00) >= fabs(dot_val_01)) {
     if (dot_val_00 < 0) {
       (*current_dir) = -(*current_dir);
     }
   } else {
     if (dot_val_01 < 0) {
-      (*current_dir) = Eigen::Vector3f((*current_dir)(1), -(*current_dir)(0), 0);
+      (*current_dir) = Eigen::Vector3f(
+          (*current_dir)(1), -(*current_dir)(0), 0);
     } else {
-      (*current_dir) = Eigen::Vector3f(-(*current_dir)(1), (*current_dir)(0), 0);
+      (*current_dir) = Eigen::Vector3f(
+          -(*current_dir)(1), (*current_dir)(0), 0);
     }
   }
 }
 
-double VectorCosTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {                           
-    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());                              
-    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());                              
-    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);             
-    return cos_theta;                                                                               
+double VectorCosTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {
+    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
+    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
+    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum()
+        / (v1_len * v2_len);
+    return cos_theta;
 }
 
-double VectorTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {                               
-    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());                              
-    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());                              
-    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);             
-    double sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);                         
-    if (cos_theta > 1) {cos_theta = 1;}                                                             
-    if (cos_theta < -1) {cos_theta = -1;}                                                           
-    double theta = acos(cos_theta);                                                                 
-    if (sin_theta < 0) {                                                                            
-        theta = -theta;                                                                             
-    }                                                                                               
-    return theta;                                                                                   
-}         
+double VectorTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {
+    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
+    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
+    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum()
+        / (v1_len * v2_len);
+    double sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);
+    if (cos_theta > 1) {
+      cos_theta = 1;
+    }
+    if (cos_theta < -1) {
+      cos_theta = -1;
+    }
+    double theta = acos(cos_theta);
+    if (sin_theta < 0) {
+        theta = -theta;
+    }
+    return theta;
+}
 
 }  // namespace perception
 }  // namespace apollo

@@ -159,7 +159,8 @@ void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
 }
 
 template <typename PointT>
-Eigen::Vector3d GetCloudBarycenter(typename pcl::PointCloud<PointT>::Ptr cloud) {
+Eigen::Vector3d GetCloudBarycenter(
+    typename pcl::PointCloud<PointT>::Ptr cloud) {
   int point_num = cloud->points.size();
   Eigen::Vector3d barycenter(0, 0, 0);
 
@@ -176,23 +177,6 @@ Eigen::Vector3d GetCloudBarycenter(typename pcl::PointCloud<PointT>::Ptr cloud) 
     barycenter[2] /= point_num;
   }
   return barycenter;
-}
-
-/*
- * Vector & Matrix related methods
- * */
-template <typename VectorIn, typename MatrixOut>
-MatrixOut vector_rot_mat_2d_xy(VectorIn& v1, VectorIn& v2) {
-  double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
-  double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
-  double cos_theta =
-      (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
-  double sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);
-
-  MatrixOut rot_mat;
-  rot_mat << cos_theta, sin_theta, 0, -sin_theta, cos_theta, 0, 0, 0, 1;
-  // std::cout << "drew theta : " << acos(cos_theta) << std::endl;
-  return rot_mat;
 }
 
 void TransAffineToMatrix4(const Eigen::Vector3d& translation,
