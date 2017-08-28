@@ -15,9 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-"""
-Real Time Plotting of planning and control
-"""
+"""Real Time Plotting of planning and control"""
+
 import math
 import sys
 import threading
@@ -25,9 +24,10 @@ import time
 
 import gflags
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 import rospy
 
+import common.proto_utils as proto_utils
 from item import Item
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.canbus.proto.chassis_pb2 import Chassis
@@ -48,9 +48,7 @@ gflags.DEFINE_boolean('show_st_graph', False, 'Show st graph')
 
 
 class Plotter(object):
-    """
-    Plotter Class
-    """
+    """Plotter Class"""
 
     def __init__(self, ax1, ax2, ax3, ax4, stgraph):
         self.ax = [ax1, ax2, ax3, ax4]
@@ -69,73 +67,50 @@ class Plotter(object):
         self.lock = threading.Lock()
 
     def callback_planning(self, data):
-        """
-        New Planning Trajectory
-        """
+        """New Planning Trajectory"""
         if self.stgraph:
-            stlist = []
-            for st in data.debug.planning_data.st_graph:
-                stdata = {}
-                stdata['st_s'] = [point.s for point in st.speed_profile]
-                stdata['st_t'] = [point.t for point in st.speed_profile]
-                polygons_s = []
-                polygons_t = []
-                for bound in st.boundary:
-                    boundary_s = [point.s for point in bound.point]
-                    boundary_t = [point.t for point in bound.point]
-                    polygons_t.append(boundary_t)
-                    polygons_s.append(boundary_s)
-                stdata['polygons_s'] = polygons_s
-                stdata['polygons_t'] = polygons_t
-                #print stdata['st_s']
-                stlist.append(stdata)
+            st_s, st_t, polygons_s, polygons_t = proto_utils.flatten(
+                data.debug.planning_data.st_graph,
+                ['speed_profile.s',
+                 'speed_profile.t',
+                 'boundary.point.s',
+                 'boundary.point.t'])
 
             with self.lock:
-                for i in range(len(stlist)):
-                    self.ax[i].new_planning(
-                        stlist[i]['st_t'], stlist[i]['st_s'],
-                        stlist[i]['polygons_t'], stlist[i]['polygons_s'])
+                for i in range(len(st_s)):
+                    self.ax[i].new_planning(st_t[i], st_s[i],
+                                            polygons_t[i], polygons_s[i])
 
         else:
-            basetime = data.header.timestamp_sec
-            numpoints = len(data.trajectory_point)
-            if numpoints == 0:
+            if len(data.trajectory_point) == 0:
                 print data
                 return
 
-            pointx = numpy.zeros(numpoints)
-            pointy = numpy.zeros(numpoints)
-            pointspeed = numpy.zeros(numpoints)
-            pointtime = numpy.zeros(numpoints)
-            pointtheta = numpy.zeros(numpoints)
-            pointcur = numpy.zeros(numpoints)
-            pointacc = numpy.zeros(numpoints)
-            for idx in range(numpoints):
-                trajectory_point = data.trajectory_point[idx]
-                pointx[idx] = trajectory_point.path_point.x
-                pointy[idx] = trajectory_point.path_point.y
-                pointspeed[idx] = trajectory_point.v
-                pointtheta[idx] = trajectory_point.path_point.theta
-                pointcur[idx] = trajectory_point.path_point.kappa
-                pointacc[idx] = trajectory_point.a
-                pointtime[idx] = trajectory_point.relative_time + basetime
+            x, y, speed, theta, kappa, acc, relative_time = np.array(
+                proto_utils.flatten(data.trajectory_point,
+                                    ['path_point.x',
+                                     'path_point.y',
+                                     'v',
+                                     'path_point.theta',
+                                     'path_point.kappa',
+                                     'a',
+                                     'relative_time']))
+            relative_time += data.header.timestamp_sec
 
             with self.lock:
-                self.ax[0].new_planning(pointtime, pointx, pointy)
-                self.ax[1].new_planning(pointtime, pointspeed)
+                self.ax[0].new_planning(relative_time, x, y)
+                self.ax[1].new_planning(relative_time, speed)
 
                 if self.ax[2].title == "Curvature":
-                    self.ax[2].new_planning(pointtime, pointcur)
+                    self.ax[2].new_planning(relative_time, kappa)
 
                 if self.ax[3].title == "Heading":
-                    self.ax[3].new_planning(pointtime, pointtheta)
+                    self.ax[3].new_planning(relative_time, theta)
                 else:
-                    self.ax[3].new_planning(pointtime, pointacc)
+                    self.ax[3].new_planning(relative_time, acc)
 
     def callback_chassis(self, data):
-        """
-        New localization pose
-        """
+        """New localization pose"""
         if self.stgraph:
             return
         self.carspeed = data.speed_mps
@@ -147,9 +122,7 @@ class Plotter(object):
             math.radians(self.steer_angle)) / VehicleLength
 
     def callback_localization(self, data):
-        """
-        New localization pose
-        """
+        """New localization pose"""
         if self.stgraph:
             return
         carheading = data.pose.heading
@@ -169,9 +142,7 @@ class Plotter(object):
                 self.ax[3].new_carstatus(cartime, acc, self.autodrive)
 
     def press(self, event):
-        """
-        Keyboard events during plotting
-        """
+        """Keyboard events during plotting"""
         if event.key == 'q' or event.key == 'Q':
             plt.close('all')
             self.closed = True
@@ -192,9 +163,7 @@ class Plotter(object):
 
 
 def main(argv):
-    """
-    Main function
-    """
+    """Main function"""
     argv = FLAGS(argv)
 
     print """
