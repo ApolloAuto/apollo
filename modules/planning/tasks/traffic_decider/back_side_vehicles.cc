@@ -18,8 +18,8 @@
  * @file
  **/
 
-#include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
 
 namespace apollo {
 namespace planning {
@@ -28,31 +28,24 @@ BackSideVehicles::BackSideVehicles() : TrafficRule("BackSideVehicles") {}
 
 bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
-  const auto& reference_line = reference_line_info->reference_line();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
+  ObjectDecisionType ignore;
+  ignore.mutable_ignore();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     if (path_obstacle->perception_sl_boundary().end_s() >=
         adc_sl_boundary.end_s()) {
       continue;
     }
 
-    const auto& bounding_box =
-        path_obstacle->obstacle()->PerceptionBoundingBox();
-    if (reference_line.HasOverlap(bounding_box) ||
-        reference_line_info->IsOnLeftLane(bounding_box.center()) ||
-        reference_line_info->IsOnRightLane(bounding_box.center())) {
-      ObjectDecisionType ignore;
-      ignore.mutable_ignore();
+    if (path_obstacle->st_boundary().IsEmpty()) {
       path_decision->AddLongitudinalDecision(Name(), path_obstacle->Id(),
                                              ignore);
-    } else if (std::fabs(path_obstacle->perception_sl_boundary().start_l()) <
-                   FLAGS_min_driving_width &&
-               std::fabs(path_obstacle->perception_sl_boundary().end_l()) <
-                   FLAGS_min_driving_width) {
-      ObjectDecisionType ignore;
-      ignore.mutable_ignore();
+      continue;
+    }
+    if (path_obstacle->st_boundary().min_s() < 0) {
       path_decision->AddLongitudinalDecision(Name(), path_obstacle->Id(),
                                              ignore);
+      continue;
     }
   }
   return true;
