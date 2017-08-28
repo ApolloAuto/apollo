@@ -37,7 +37,8 @@
 
   <ul class="list-group">
     {% for module in conf_pb.modules %}
-    <li class="list-group-item debug_item">
+    <li class="list-group-item debug_item
+        {% if loop.index % 2 == 0 %} light {% endif %}">
       <div class="item_content" id="module_{{ module.name }}">
         {{ module.display_name }}
         <div class="pull-right module_switch module_switch_close"
