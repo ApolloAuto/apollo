@@ -35,7 +35,12 @@ cc_test(
     name = "perception_obstacle_common_test",
     size = "small",
     srcs = [
+        "convex_hullxy_test.cc",
+        "disjoint_set_test.cc",
+        "file_system_util_test.cc",
         "geometry_util_test.cc",
+        "graph_util_test.cc",
+        "hungarian_bigraph_matcher_test.cc",
         "pose_util_test.cc",
     ],
     data = [
@@ -43,6 +48,7 @@ cc_test(
     ],
     deps = [
         ":perception_obstacle_common",
+        "//modules/perception/obstacle/lidar/object_builder/min_box:perception_obstacle_lidar_object_builder_min_box",
         "@gtest//:main",
     ],
 )
