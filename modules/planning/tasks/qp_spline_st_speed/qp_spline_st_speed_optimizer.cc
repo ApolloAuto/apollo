@@ -106,6 +106,8 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     return Status(ErrorCode::PLANNING_ERROR,
                   "Failed to search graph with dynamic programming!");
   }
+
+  // record debug info
   RecordSTGraphDebug(boundaries, speed_limits, *speed_data);
   return Status::OK();
 }

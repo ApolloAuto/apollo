@@ -89,13 +89,17 @@ void SpeedOptimizer::RecordSTGraphDebug(
                 ST_BOUNDARY_TYPE_YIELD);
         break;
     }
+
     for (const auto& point : boundary.lower_points()) {
       auto point_debug = boundary_debug->add_point();
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());
     }
-    for (const auto& point : boundary.upper_points()) {
+
+    for (size_t i = 0; i < boundary.upper_points().size(); ++i) {
       auto point_debug = boundary_debug->add_point();
+      const auto& point =
+          boundary.upper_points()[boundary.upper_points().size() - i - 1];
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());
     }
