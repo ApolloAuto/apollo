@@ -90,19 +90,12 @@ void SpeedOptimizer::RecordSTGraphDebug(
         break;
     }
 
-    for (const auto& point : boundary.lower_points()) {
+    for (const auto& point : boundary.points()) {
       auto point_debug = boundary_debug->add_point();
-      point_debug->set_t(point.t());
-      point_debug->set_s(point.s());
-    }
-
-    for (size_t i = 0; i < boundary.upper_points().size(); ++i) {
-      auto point_debug = boundary_debug->add_point();
-      const auto& point =
-          boundary.upper_points()[boundary.upper_points().size() - i - 1];
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());
     }
+    std::cout << boundary.DebugString() << std::endl;
   }
 
   for (const auto& point : speed_limits.speed_limit_points()) {
