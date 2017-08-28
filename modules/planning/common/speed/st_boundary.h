@@ -28,7 +28,9 @@
 
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/common/math/box2d.h"
 #include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/common/speed/st_point.h"
 
 namespace apollo {
@@ -38,10 +40,16 @@ class StBoundary : public common::math::Polygon2d {
  public:
   StBoundary() = default;
 
+  StBoundary(const common::math::Box2d& box) = delete;
+  StBoundary(std::vector<common::math::Vec2d> points) = delete;
+
   explicit StBoundary(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs);
 
   ~StBoundary() = default;
+
+  static void BuildStBoundaryFromPolygon2d(
+      const common::math::Polygon2d& polygon2d);
 
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
