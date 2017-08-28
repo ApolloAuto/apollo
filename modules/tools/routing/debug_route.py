@@ -16,15 +16,17 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
 import itertools
+import os
+import sys
+
+import gflags
 import matplotlib.pyplot as plt
+
 import debug_topo
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import util
 
-import gflags
-import os
 
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])

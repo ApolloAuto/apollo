@@ -15,9 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+"""Show road."""
 
 import sys
+
 import matplotlib.pyplot as plt
+
+import common.proto_utils as proto_utils
 import util
 
 g_color = [
@@ -31,13 +35,8 @@ def draw_line(line_segment, color):
     :param line_segment:
     :return: none
     """
-    px = []
-    py = []
-    for p in line_segment.point:
-        px.append(float(p.x))
-        py.append(float(p.y))
-    px = downsample_array(px)
-    py = downsample_array(py)
+    px, py = proto_utils.flatten(line_segment.point, ['x', 'y'])
+    px, py = downsample_array(px), downsample_array(py)
     plt.gca().plot(px, py, lw=10, alpha=0.8, color=color)
     return px[len(px) // 2], py[len(py) // 2]
 
@@ -76,13 +75,8 @@ def draw_boundary(line_segment):
     :param line_segment:
     :return:
     """
-    px = []
-    py = []
-    for p in line_segment.point:
-        px.append(float(p.x))
-        py.append(float(p.y))
-    px = downsample_array(px)
-    py = downsample_array(py)
+    px, py = proto_utils.flatten(line_segment.point, ['x', 'y'])
+    px, py = downsample_array(px), downsample_array(py)
     plt.gca().plot(px, py, 'k')
 
 
@@ -121,15 +115,10 @@ def draw_map(drivemap):
     for road in drivemap.road:
         lanes = []
         for sec in road.section:
-            for lane in sec.lane_id:
-                lanes.append(lane.id)
+            lanes.extend(proto_utils.flatten(sec.lane_id, 'id'))
         road_lane_set.append(lanes)
 
     for lane in drivemap.lane:
-        #print lane.type
-        #print lane.central_curve
-        #break
-        #print [f.name for f in lane.central_curve.DESCRIPTOR.fields]
         for curve in lane.central_curve.segment:
             if curve.HasField('line_segment'):
                 road_idx = get_road_index_of_lane(lane.id.id, road_lane_set)
@@ -142,7 +131,6 @@ def draw_map(drivemap):
                 #break
             #if curve.HasField('arc'):
             #    draw_arc(curve.arc)
-            #print "arc"
 
         for curve in lane.left_boundary.curve.segment:
             if curve.HasField('line_segment'):

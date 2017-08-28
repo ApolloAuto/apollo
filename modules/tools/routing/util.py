@@ -91,10 +91,9 @@ def onclick(event):
     print 'cmd>',
 
 
-def downsample_array(array):
+def downsample_array(array, step=5):
     """down sample given array"""
-    skip = 5
-    result = array[::skip]
+    result = array[::step]
     result.append(array[-1])
     return result
 
