@@ -90,8 +90,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!ApplyKernel(st_graph_data.st_boundaries(),
-                   st_graph_data.speed_limit())
+  if (!ApplyKernel(st_graph_data.st_boundaries(), st_graph_data.speed_limit())
            .ok()) {
     const std::string msg = "Apply kernel failed!";
     AERROR << msg;
@@ -222,9 +221,8 @@ Status QpSplineStGraph::ApplyConstraint(
   return Status::OK();
 }
 
-Status QpSplineStGraph::ApplyKernel(
-    const std::vector<StBoundary>& boundaries,
-    const SpeedLimit& speed_limit) {
+Status QpSplineStGraph::ApplyKernel(const std::vector<StBoundary>& boundaries,
+                                    const SpeedLimit& speed_limit) {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   if (qp_spline_st_speed_config_.speed_kernel_weight() > 0) {
@@ -354,8 +352,7 @@ Status QpSplineStGraph::GetSConstraintByTime(
         boundary.boundary_type() == StBoundary::BoundaryType::YIELD) {
       *s_upper_bound = std::fmin(*s_upper_bound, s_upper);
     } else {
-      DCHECK(boundary.boundary_type() ==
-             StBoundary::BoundaryType::OVERTAKE);
+      DCHECK(boundary.boundary_type() == StBoundary::BoundaryType::OVERTAKE);
       *s_lower_bound = std::fmax(*s_lower_bound, s_lower);
     }
   }
@@ -367,6 +364,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     std::vector<double>* speed_upper_bound) const {
   DCHECK_NOTNULL(speed_upper_bound);
+
   speed_upper_bound->clear();
 
   // use v to estimate position: not accurate, but feasible in cyclic
@@ -410,6 +408,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
       return p1.first < s;
     };
 
+    const auto& speed_limit_points = speed_limit.speed_limit_points();
     for (const double t : t_evaluated_) {
       const double s = v * t;
 
@@ -419,10 +418,14 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
       //
       // If either of the two assumption is failed, a new algorithm must be used
       // to replace the binary search.
-      const auto& it =
-          std::lower_bound(speed_limit.speed_limit_points().begin(),
-                           speed_limit.speed_limit_points().end(), s, cmp);
-      speed_upper_bound->push_back(it->second);
+
+      const auto& it = std::lower_bound(speed_limit_points.begin(),
+                                        speed_limit_points.end(), s, cmp);
+      if (it != speed_limit_points.end()) {
+        speed_upper_bound->push_back(it->second);
+      } else {
+        speed_upper_bound->push_back(speed_limit_points.back().second);
+      }
     }
   }
 
