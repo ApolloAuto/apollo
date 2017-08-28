@@ -27,6 +27,10 @@ import rosbag
 import std_msgs
 from std_msgs.msg import String
 
+g_args = None
+
+g_delta_t = 0.5  # 1 second approximate time match region.
+
 
 def write_to_file(file_path, topic_pb):
     """write pb message to file"""
@@ -39,7 +43,11 @@ def dump_bag(in_bag, out_dir, filter_topic):
     """out_bag = in_bag + routing_bag"""
     bag = rosbag.Bag(in_bag, 'r')
     seq = 0
+    global g_args
     for topic, msg, t in bag.read_messages():
+        if g_args.time and (t.secs < g_args.time - g_delta_t
+                            or t.secs > g_args.time + g_delta_t):
+            continue
         if not filter_topic or (filter_topic and topic == filter_topic):
             message_file = topic.replace("/", "_")
             file_path = os.path.join(out_dir,
@@ -62,10 +70,17 @@ if __name__ == "__main__":
         "--topic",
         action="store",
         help="""the topic that you want to dump. If this option is not provided,
-        the tool will dump all the messages regardless of the message topic.""")
-    args = parser.parse_args()
+        the tool will dump all the messages regardless of the message topic."""
+    )
+    parser.add_argument(
+        "--time",
+        type=float,
+        action="store",
+        help="""The time range to extract""")
 
-    if os.path.exists(args.out_dir):
-        shutil.rmtree(args.out_dir)
-    os.makedirs(args.out_dir)
-    dump_bag(args.in_rosbag, args.out_dir, args.topic)
+    g_args = parser.parse_args()
+
+    if os.path.exists(g_args.out_dir):
+        shutil.rmtree(g_args.out_dir)
+    os.makedirs(g_args.out_dir)
+    dump_bag(g_args.in_rosbag, g_args.out_dir, g_args.topic)
