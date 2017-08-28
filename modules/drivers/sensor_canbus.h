@@ -30,8 +30,6 @@
 
 #include "modules/canbus/can_client/can_client.h"
 #include "modules/canbus/can_client/can_client_factory.h"
-//TODO(lizh): add gflags.h for drivers
-#include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/proto/can_card_parameter.pb.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
@@ -43,6 +41,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/can_comm/can_receiver.h"
+#include "modules/drivers/sensor_gflags.h"
 #include "modules/drivers/sensor_message_manager.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
 
@@ -122,13 +121,13 @@ std::string SensorCanbus<SensorType>::Name() const { return FLAGS_hmi_name; }
 template <typename SensorType>
 Status SensorCanbus<SensorType>::Init() {
   // load conf
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file,
                                                 &canbus_conf_)) {
     return OnError("Unable to load canbus conf file: " +
-                   FLAGS_canbus_conf_file);
+                   FLAGS_sensor_conf_file);
   }
 
-  AINFO << "The canbus conf file is loaded: " << FLAGS_canbus_conf_file;
+  AINFO << "The canbus conf file is loaded: " << FLAGS_sensor_conf_file;
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
   // Init can client
@@ -174,7 +173,7 @@ Status SensorCanbus<SensorType>::Start() {
   AINFO << "Can receiver is started.";
 
   // 3. set timer to triger publish info periodly
-  const double duration = 1.0 / FLAGS_chassis_freq;
+  const double duration = 1.0 / FLAGS_sensor_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &SensorCanbus<SensorType>::OnTimer, this);
 
