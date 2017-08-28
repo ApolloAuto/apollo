@@ -397,6 +397,10 @@ Status DpStGraph::MakeObjectDecision(const SpeedData& speed_profile,
   }
 
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
+    if (boundary.max_s() < 0.0 || boundary.max_t() < 0.0) {
+      continue;
+    }
+
     auto* path_obstacle = path_decision->Find(boundary.id());
     CHECK(path_obstacle) << "Failed to find obstacle " << boundary.id();
     if (path_obstacle->HasLongitudinalDecision()) {

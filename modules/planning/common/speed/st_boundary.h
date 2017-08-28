@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/math/box2d.h"
@@ -98,6 +100,10 @@ class StBoundary : public common::math::Polygon2d {
   bool IsValid(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;
   void CalculateArea();
+
+  FRIEND_TEST(StBoundaryTest, get_index_range);
+  bool GetIndexRange(const std::vector<STPoint>& points, const double t,
+                     size_t* left, size_t* right) const;
 
  private:
   BoundaryType boundary_type_ = BoundaryType::UNKNOWN;
