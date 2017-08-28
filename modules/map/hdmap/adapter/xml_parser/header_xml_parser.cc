@@ -18,7 +18,6 @@ limitations under the License.
 #include <sstream>
 #include <iomanip>
 #include <string>
-#include "glog/logging.h"
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
@@ -74,10 +73,16 @@ Status HeaderXmlParser::parse(const tinyxml2::XMLElement& xml_node,
   }
   
   // coordinate frame
-  std::string from_coordinate = "+proj=longlat \
-                    +ellps=WGS84 +datum=WGS84 +no_defs";
-  std::string to_coordinate = "+proj=utm +zone=10 +ellps=WGS84 \
-                    +datum=WGS84 +units=m +no_defs";
+  std::string from_coordinate = geo_text->Value();
+  int eastZone = getLongZone(east);
+  int westZone = getLongZone(west);
+  if (eastZone != westZone) {
+    std::string err_msg = "unsupport data in more than one zones";
+    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+  }
+  int zone = westZone;
+  std::string to_coordinate = "+proj=utm +zone=" + std::to_string(zone)
+      + " +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
   CoordinateConvertTool::get_instance()->set_convert_param(from_coordinate,
                                                             to_coordinate);
 
