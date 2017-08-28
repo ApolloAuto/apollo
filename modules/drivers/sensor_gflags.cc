@@ -18,12 +18,12 @@
 
 // System gflags
 DEFINE_string(node_namespace, "/apollo/drivers/mobileye", "Global node namespace");
-DEFINE_string(node_name, "mobileye", "The mobileye module name in proto");
+DEFINE_string(node_name, "mobileye", "The sensor module name in proto");
 DEFINE_string(hmi_name, "mobileye", "Module name in HMI");
 
 // data file
-DEFINE_string(sensor_conf_file, "modules/canbus/conf/canbus_conf_dev.pb.txt",
-              "Default canbus conf file");
+DEFINE_string(sensor_conf_file, "modules/drivers/mobileye/conf/mobileye_conf_dev.pb.txt",
+              "Default sensor conf file");
 
 // Canbus gflags
 DEFINE_double(sensor_freq, 100, "Sensor feedback timer frequency.");
