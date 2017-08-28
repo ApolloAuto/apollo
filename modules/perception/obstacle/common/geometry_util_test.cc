@@ -79,7 +79,7 @@ class GeometryUtilTest : public testing::Test {
   Eigen::Matrix4d _trans_matrix;
 };
 
-TEST_F(GeometryUtilTest, TransformPointCloud) {
+TEST_F(GeometryUtilTest, TransformPointCloud1) {
   pcl_util::PointCloudPtr in_out_cloud(new pcl_util::PointCloud);
   pcl::copyPointCloud(*_clouds[0], *in_out_cloud);
   TransformPointCloud<pcl_util::Point>(_trans_matrix, in_out_cloud);
@@ -88,31 +88,31 @@ TEST_F(GeometryUtilTest, TransformPointCloud) {
   EXPECT_NEAR(1.715922, in_out_cloud->at(0).z, EPSILON);
 }
 
-TEST_F(GeometryUtilTest, transform_point_cloud) {
+TEST_F(GeometryUtilTest, TransformPointCloud2) {
   pcl_util::Point point_in, point_out;
   point_in.x = 1.0;
   point_in.y = 1.0;
   point_in.z = 1.0;
-  transform_point_cloud(point_in, point_out, _trans_matrix);
+  TransformPoint(point_in, point_out, _trans_matrix);
   EXPECT_NEAR(-0.985772, point_out.x, EPSILON);
   EXPECT_NEAR(2.010278, point_out.y, EPSILON);
   EXPECT_NEAR(2.027878, point_out.z, EPSILON);
 
   pcl_util::PointCloudPtr in_out_cloud(new pcl_util::PointCloud);
   pcl::copyPointCloud(*_clouds[0], *in_out_cloud);
-  transform_point_cloud(*in_out_cloud, _trans_matrix);
+  TransformPointCloud<Point>(_trans_matrix, in_out_cloud);
   EXPECT_NEAR(64.184380, in_out_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, in_out_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, in_out_cloud->at(0).z, EPSILON);
 
   pcl_util::PointCloudPtr out_cloud(new pcl_util::PointCloud);
-  transform_point_cloud(*_clouds[0], *out_cloud, _trans_matrix);
+  TransformPointCloud(*_clouds[0], *out_cloud, _trans_matrix);
   EXPECT_NEAR(64.184380, out_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, out_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, out_cloud->at(0).z, EPSILON);
 }
 
-TEST_F(GeometryUtilTest, TransformCloud) {
+TEST_F(GeometryUtilTest, TransformPointCloud3) {
   pcl_util::PointCloudPtr in_cloud(new pcl_util::PointCloud);
   for (int i = 0; i < 10; ++i) {
     Point pt;
@@ -125,7 +125,7 @@ TEST_F(GeometryUtilTest, TransformCloud) {
 
   pcl_util::PointDCloud out_cloud;
   std::vector<int> indices{0, 2, 5, 9};
-  TransformCloud(in_cloud, indices, &out_cloud);
+  TransformPointCloud(in_cloud, indices, &out_cloud);
 
   EXPECT_EQ(out_cloud.points.size(), 4);
   EXPECT_NEAR(out_cloud.points[0].x, 0.0, 1e-6);
@@ -134,9 +134,9 @@ TEST_F(GeometryUtilTest, TransformCloud) {
   EXPECT_EQ(out_cloud.points[3].intensity, 123u);
 }
 
-TEST_F(GeometryUtilTest, transform_perception_cloud) {
+TEST_F(GeometryUtilTest, TransformPointCloud) {
   pcl_util::PointDCloudPtr trans_cloud(new pcl_util::PointDCloud);
-  transform_perception_cloud(_clouds[0], _trans_matrix, trans_cloud);
+  TransformPointCloud(_clouds[0], _trans_matrix, trans_cloud);
   EXPECT_NEAR(64.184377, trans_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, trans_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, trans_cloud->at(0).z, EPSILON);
