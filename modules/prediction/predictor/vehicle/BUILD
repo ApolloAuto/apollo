@@ -54,6 +54,7 @@ cc_test(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:road_graph",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/predictor/vehicle:free_move_predictor",
         "//modules/prediction/proto:prediction_proto",

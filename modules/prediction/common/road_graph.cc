@@ -57,6 +57,25 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* lane_graph_ptr) {
   return Status::OK();
 }
 
+bool RoadGraph::IsOnLaneGraph(
+    std::shared_ptr<const LaneInfo> lane_info_ptr,
+    const LaneGraph& lane_graph) {
+  if (!lane_graph.IsInitialized()) {
+    return false;
+  }
+
+  for (const auto& lane_sequence : lane_graph.lane_sequence()) {
+    for (const auto& lane_segment : lane_sequence.lane_segment()) {
+      if (lane_segment.has_lane_id() &&
+          lane_segment.lane_id() == lane_info_ptr->id().id()) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 void RoadGraph::ComputeLaneSequence(
     double accumulated_s, double start_s,
     std::shared_ptr<const LaneInfo> lane_info_ptr,
