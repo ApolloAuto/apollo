@@ -59,7 +59,8 @@ class QpSplinePathGenerator {
   bool InitSpline(const common::FrenetFramePoint& init_frenet_point,
                   const double start_s, const double end_s);
 
-  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame);
+  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame,
+                     apollo::planning_internal::Debug* planning_debug);
 
   void AddKernel();
 
