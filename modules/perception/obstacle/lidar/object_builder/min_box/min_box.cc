@@ -372,7 +372,7 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
     if (poly_vt.size() == 1u) {
         std::vector<int> ind(poly_vt[0].vertices.begin(),
                             poly_vt[0].vertices.end());
-        TransformCloud(plane_hull, ind, &obj->polygon);
+        TransformPointCloud(plane_hull, ind, &obj->polygon);
     } else {
         obj->polygon.points.resize(4);
         obj->polygon.points[0].x = static_cast<double>(min_pt[0]);

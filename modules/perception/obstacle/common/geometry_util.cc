@@ -26,8 +26,8 @@ using pcl_util::PointCloudPtr;
 /*
  * Transform point cloud methods
  * */
-void TransformCloud(pcl_util::PointCloudPtr cloud,
-                    const std::vector<int>& indices,
+void TransformPointCloud(pcl_util::PointCloudPtr cloud,
+                         const std::vector<int>& indices,
                     pcl_util::PointDCloud* trans_cloud) {
   if (trans_cloud->size() != indices.size()) {
     trans_cloud->resize(indices.size());
@@ -43,7 +43,7 @@ void TransformCloud(pcl_util::PointCloudPtr cloud,
   }
 }
 
-void transform_perception_cloud(pcl_util::PointCloudPtr cloud,
+void TransformPointCloud(pcl_util::PointCloudPtr cloud,
                                 const Eigen::Matrix4d& pose_velodyne,
                                 pcl_util::PointDCloudPtr trans_cloud) {
     Eigen::Matrix4d pose = pose_velodyne;

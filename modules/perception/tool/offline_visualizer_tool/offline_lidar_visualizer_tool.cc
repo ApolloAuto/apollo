@@ -115,7 +115,7 @@ class OfflineLidarPerceptionTool {
 
       if (visualizer_) {
         pcl_util::PointDCloudPtr transformed_cloud(new pcl_util::PointDCloud);
-        transform_perception_cloud(cloud, pose, transformed_cloud);
+        TransformPointCloud(cloud, pose, transformed_cloud);
         AERROR << "transformed cloud size is " << transformed_cloud->size();
 
         pcl_util::PointIndices roi_indices_1;
@@ -155,7 +155,7 @@ class OfflineLidarPerceptionTool {
       new pcl::PointCloud<pcl_util::Point>());
     Eigen::Matrix4d pose_velo2tw = pose_v2w;
     pcl::copyPointCloud(*cloud, *trans_cloud);
-    transform_point_cloud<pcl_util::Point>(*trans_cloud, pose_v2w);
+    TransformPointCloud<pcl_util::Point>(pose_v2w, trans_cloud);
     AINFO << "point size of transforming cloud is " << trans_cloud->size();
     pcl::KdTreeFLANN<pcl_util::Point> pcl_kdtree;
     pcl_kdtree.setInputCloud(trans_cloud);
