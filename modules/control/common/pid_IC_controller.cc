@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace control {
@@ -42,26 +43,34 @@ double PIDICController::Control(const double error, const double dt) {
     integral_ = 0;
   } else {
     double u = error * kp_ + integral_ + error * dt * ki_ + diff * kd_;
-    if (((error * u) > 0) && ((u > integrator_saturation_high_) ||
-                              (u < integrator_saturation_low_))) {
+    if (((error * u) > 0) &&
+        ((u > output_saturation_high_) || (u < output_saturation_low_))) {
     } else {
       // Only update integral then
       integral_ += error * dt * ki_;
     }
-
-    if (integral_ > integrator_saturation_high_) {
-      integrator_saturation_status_ = 1;
-    } else if (integral_ < integrator_saturation_low_) {
-      integrator_saturation_status_ = -1;
-    } else {
-      integrator_saturation_status_ = 0;
-    }
   }
 
   previous_error_ = error;
-  output = error * kp_ + integral_ + diff * kd_;  // Ki already applied
+  output = error * kp_ + integral_ + diff * kd_;
+
+  if (output >= output_saturation_high_) {
+    output_saturation_status_ = 1;
+  } else if (output <= output_saturation_low_) {
+    output_saturation_status_ = -1;
+  } else {
+    output_saturation_status_ = 0;
+  }
+
+  output = ::apollo::common::math::Clamp(
+      error * kp_ + integral_ + diff * kd_, output_saturation_high_,
+      output_saturation_low_);  // Ki already applied
   previous_output_ = output;
   return output;
+}
+
+int PIDICController::OutputSaturationStatus() {
+  return output_saturation_status_;
 }
 
 }  // namespace control

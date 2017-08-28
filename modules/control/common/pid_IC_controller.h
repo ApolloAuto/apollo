@@ -49,6 +49,8 @@ class PIDICController : public PIDController {
    */
   virtual double Control(const double error, const double dt);
 
+  virtual int OutputSaturationStatus();
+
  private:
 };
 
