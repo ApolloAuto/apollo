@@ -97,11 +97,9 @@ class ReferenceLine {
                                     const ReferencePoint& p1, const double s1,
                                     const double s);
 
-  static double FindMinDistancePoint(const ReferencePoint& p0,
-                                     const double s0,
-                                     const ReferencePoint& p1,
-                                     const double s1, const double x,
-                                     const double y);
+  static double FindMinDistancePoint(const ReferencePoint& p0, const double s0,
+                                     const ReferencePoint& p1, const double s1,
+                                     const double x, const double y);
 
  private:
   std::vector<ReferencePoint> reference_points_;
