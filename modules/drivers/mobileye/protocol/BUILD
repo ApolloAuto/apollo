@@ -11,7 +11,6 @@ cc_library(
         "details_738.h",
     ],
     deps = [
-        "//modules/canbus/common:canbus_common",
         "//modules/drivers/proto:sensor_proto",
         "//modules/drivers:sensor_message_manager_base",
     ],
