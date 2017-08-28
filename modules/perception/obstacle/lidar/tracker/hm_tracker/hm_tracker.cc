@@ -421,8 +421,8 @@ void HmObjectTracker::TransformObject(ObjectPtr* obj,
   center = (pose * Eigen::Vector4d(
     center[0], center[1], center[2], 1)).head(3);
 
-  transform_point_cloud<pcl_util::Point>(*((*obj)->cloud), pose);
-  transform_point_cloud<pcl_util::PointD>((*obj)->polygon, pose);
+  TransformPointCloud<pcl_util::Point>(pose, (*obj)->cloud);
+  TransformPointCloud<pcl_util::PointD>(pose, &((*obj)->polygon));
 }
 
 void HmObjectTracker::DecomposeForegroundBackgroundObjects(

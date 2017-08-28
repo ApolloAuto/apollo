@@ -26,12 +26,9 @@
 namespace apollo {
 namespace perception {
 
-/*
-* Transform point cloud methods
-* */
 template <typename PointT>
 void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
-                         typename pcl::PointCloud<PointT>::Ptr cloud_in_out) {
+                         pcl::PointCloud<PointT>* cloud_in_out) {
   for (int i = 0; i < cloud_in_out->size(); ++i) {
     PointT& p = cloud_in_out->at(i);
     Eigen::Vector4d v(p.x, p.y, p.z, 1);
@@ -42,8 +39,15 @@ void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
   }
 }
 
+template <typename PointT>
+void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
+                         typename pcl::PointCloud<PointT>::Ptr cloud_in_out) {
+  assert(cloud_in_out.get() != nullptr);
+  return TransformPointCloud(trans_mat, cloud_in_out.get());
+}
+
 template <typename PointType>
-void transform_point_cloud(const PointType& point_in, PointType& point_out,
+void TransformPoint(const PointType& point_in, PointType& point_out,
                            const Eigen::Matrix4d& trans_mat) {
   Eigen::Vector4d v(point_in.x, point_in.y, point_in.z, 1);
   v = trans_mat * v;
@@ -54,20 +58,7 @@ void transform_point_cloud(const PointType& point_in, PointType& point_out,
 }
 
 template <typename PointType>
-void transform_point_cloud(pcl::PointCloud<PointType>& cloud_in_out,
-                           const Eigen::Matrix4d& trans_mat) {
-  for (int i = 0; i < cloud_in_out.size(); ++i) {
-    PointType& p = cloud_in_out.at(i);
-    Eigen::Vector4d v(p.x, p.y, p.z, 1);
-    v = trans_mat * v;
-    p.x = v.x();
-    p.y = v.y();
-    p.z = v.z();
-  }
-}
-
-template <typename PointType>
-void transform_point_cloud(const pcl::PointCloud<PointType>& cloud_in,
+void TransformPointCloud(const pcl::PointCloud<PointType>& cloud_in,
                            pcl::PointCloud<PointType>& cloud_out,
                            const Eigen::Matrix4d& trans_mat) {
   if (cloud_out.points.size() < cloud_in.points.size()) {
@@ -84,14 +75,13 @@ void transform_point_cloud(const pcl::PointCloud<PointType>& cloud_in,
   }
 }
 
-void TransformCloud(pcl_util::PointCloudPtr cloud,
+void TransformPointCloud(pcl_util::PointCloudPtr cloud,
                     const std::vector<int>& indices,
                     pcl_util::PointDCloud* trans_cloud);
 
-void transform_perception_cloud(pcl_util::PointCloudPtr cloud,
+void TransformPointCloud(pcl_util::PointCloudPtr cloud,
                                 const Eigen::Matrix4d& pose_velodyne,
                                 typename pcl_util::PointDCloudPtr trans_cloud);
-
 /*
  * Other point cloud related methods
  * */
