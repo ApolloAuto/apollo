@@ -60,6 +60,8 @@ class UtilXmlParser {
   static double _y_max;
 };
 
+int getLongZone(double longitude);
+
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo

@@ -19,7 +19,6 @@ limitations under the License.
 #include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/signals_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
-#include "glog/logging.h"
 
 namespace {
   bool is_road_belong_to_junction(std::string& road_id) {

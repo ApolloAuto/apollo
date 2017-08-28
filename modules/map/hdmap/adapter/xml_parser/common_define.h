@@ -19,6 +19,7 @@ limitations under the License.
 #include <vector>
 #include <string>
 #include "modules/map/proto/map.pb.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace hdmap {

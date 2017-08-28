@@ -380,7 +380,7 @@ void LaneInfo::post_process(const HDMapImpl &map_instance) {
 void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
   for (const auto &overlap_id : _overlap_ids) {
     const auto &overlap_ptr =
-        map_instance.get_overlap_by_id(apollo::hdmap::MakeMapId(overlap_id));
+        map_instance.GetOverlapById(apollo::hdmap::MakeMapId(overlap_id));
     if (overlap_ptr == nullptr) {
       continue;
     }
@@ -391,22 +391,22 @@ void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
         continue;
       }
       const auto &object_map_id = apollo::hdmap::MakeMapId(object_id);
-      if (map_instance.get_lane_by_id(object_map_id) != nullptr) {
+      if (map_instance.GetLaneById(object_map_id) != nullptr) {
         _cross_lanes.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_signal_by_id(object_map_id) != nullptr) {
+      if (map_instance.GetSignalById(object_map_id) != nullptr) {
         _signals.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_yield_sign_by_id(object_map_id) != nullptr) {
+      if (map_instance.GetYieldSignById(object_map_id) != nullptr) {
         _yield_signs.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_stop_sign_by_id(object_map_id) != nullptr) {
+      if (map_instance.GetStopSignById(object_map_id) != nullptr) {
         _stop_signs.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_crosswalk_by_id(object_map_id) != nullptr) {
+      if (map_instance.GetCrosswalkById(object_map_id) != nullptr) {
         _crosswalks.emplace_back(overlap_ptr);
       }
-      if (map_instance.get_junction_by_id(object_map_id) != nullptr) {
+      if (map_instance.GetJunctionById(object_map_id) != nullptr) {
         _junctions.emplace_back(overlap_ptr);
       }
 
