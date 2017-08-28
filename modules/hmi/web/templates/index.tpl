@@ -26,10 +26,14 @@
   .debug_item {
     overflow: auto;
     border: 0;
-    background-color: #03294b;
+    background: rgba(3, 41, 75, 0.4);
     margin-bottom: 0;
     font-size: 16px;
     padding: 0;
+  }
+
+  .debug_item + .light {
+    background: rgba(3, 41, 75, 1);
   }
 
   .debug_item .item_content {
