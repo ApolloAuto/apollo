@@ -246,20 +246,11 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
         ->CopyFrom(stitching_trajectory.back());
   }
 
-  std::vector<std::unique_ptr<std::thread>> threads;
   for (auto& reference_line_info : frame_->reference_line_info()) {
-    threads.emplace_back(
-        new std::thread([this, stitching_trajectory, &reference_line_info] {
-          auto status = this->planner_->Plan(
-              stitching_trajectory.back(), frame_.get(), &reference_line_info);
-          if (!status.ok()) {
-            AERROR << "planner failed to make a driving plan.";
-          }
-        }));
-  }
-  for (const auto& thread : threads) {
-    if (thread->joinable()) {
-      thread->join();
+    auto status = this->planner_->Plan(stitching_trajectory.back(),
+                                       frame_.get(), &reference_line_info);
+    if (!status.ok()) {
+      AERROR << "planner failed to make a driving plan.";
     }
   }
 

@@ -161,6 +161,7 @@ const std::vector<ReferenceLineInfo> &Frame::reference_line_info() const {
 }
 
 const Obstacle *Frame::FindObstacle(const std::string &obstacle_id) {
+  std::lock_guard<std::mutex> lock(obstacles_mutex_);
   return obstacles_.Find(obstacle_id);
 }
 
