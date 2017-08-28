@@ -114,7 +114,7 @@ void StBoundary::CalculateArea() {
 }
 
 bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
-  if (st_point.t() < min_t_ || st_point.t() > max_t_) {
+  if (st_point.t() <= min_t_ || st_point.t() >= max_t_) {
     return false;
   }
   auto index = GetIndex(lower_points_, st_point.t());
@@ -123,7 +123,7 @@ bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
   const double check_lower = common::math::CrossProd(
       st_point, lower_points_[index], lower_points_[index + 1]);
 
-  return (check_upper * check_lower <= 0);
+  return (check_upper * check_lower < 0);
 }
 
 STPoint StBoundary::BottomLeftPoint() const {
@@ -279,11 +279,6 @@ double StBoundary::min_s() const { return min_s_; }
 double StBoundary::min_t() const { return min_t_; }
 double StBoundary::max_s() const { return max_s_; }
 double StBoundary::max_t() const { return max_t_; }
-
-void BuildStBoundaryFromPolygon2d(const common::math::Polygon2d& polygon2d) {
-  // TODO: implement this function
-  return;
-}
 
 }  // namespace planning
 }  // namespace apollo

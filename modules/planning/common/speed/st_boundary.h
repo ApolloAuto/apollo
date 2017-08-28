@@ -48,9 +48,6 @@ class StBoundary : public common::math::Polygon2d {
 
   ~StBoundary() = default;
 
-  static void BuildStBoundaryFromPolygon2d(
-      const common::math::Polygon2d& polygon2d);
-
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
   enum class BoundaryType {
