@@ -96,7 +96,6 @@ class Control : public apollo::common::ApolloApp {
   common::Status CheckTimestamp();
   common::Status CheckPad();
 
-  void Alert();
   void SendCmd(ControlCommand *control_command);
 
  private:
@@ -114,8 +113,6 @@ class Control : public apollo::common::ApolloApp {
   unsigned int status_sanity_check_failed_ = 0;
   unsigned int total_status_lost_ = 0;
   unsigned int total_status_sanity_check_failed_ = 0;
-
-  double last_alert_timestamp_ = 0.0;
 
   ControlConf control_conf_;
 

@@ -33,20 +33,13 @@ namespace apollo {
 namespace control {
 
 using apollo::canbus::Chassis;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
-
-#define CHECK_PROTO(a, b)                                          \
-  if (!a.has_##b()) {                                              \
-    AERROR << "PB invalid! [" << #a << "] has NO [" << #b << "]!"; \
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,                \
-                  #a " missing pb field:" #b);                     \
-  }
 
 std::string Control::Name() const {
   return FLAGS_node_name;
@@ -116,15 +109,13 @@ Status Control::Start() {
   return Status::OK();
 }
 
-void Control::OnPad(const apollo::control::PadMessage &pad) {
+void Control::OnPad(const PadMessage &pad) {
   pad_msg_ = pad;
-  AINFO << "Received Pad Msg:" << pad.DebugString();
+  ADEBUG << "Received Pad Msg:" << pad.DebugString();
+  AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
 
-  if (!CheckPad().ok()) {
-    AERROR << "pad message check failed!";
-  }
   // do something according to pad message
-  if (pad_msg_.action() == ::apollo::control::DrivingAction::RESET) {
+  if (pad_msg_.action() == DrivingAction::RESET) {
     AINFO << "Control received RESET action!";
     estop_ = false;
   }
@@ -147,13 +138,11 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   if (!status.ok()) {
     AERROR << "Control input data failed: " << status.error_message();
     estop_ = true;
-    Alert();
   } else {
     Status status_ts = CheckTimestamp();
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
       estop_ = true;
-      Alert();
       status = status_ts;
     }
   }
@@ -163,7 +152,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
 
   // if planning set estop, then no control process triggered
   if (!estop_) {
-    if (chassis_.driving_mode() == ::apollo::canbus::Chassis::COMPLETE_MANUAL) {
+    if (chassis_.driving_mode() == Chassis::COMPLETE_MANUAL) {
       controller_agent_.Reset();
       AINFO << "Reset Controllers in Manual Mode";
     }
@@ -194,7 +183,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
     control_command->set_speed(0);
     control_command->set_throttle(0);
     control_command->set_brake(control_conf_.soft_estop_brake());
-    control_command->set_gear_location(::apollo::canbus::Chassis::GEAR_DRIVE);
+    control_command->set_gear_location(Chassis::GEAR_DRIVE);
   }
   // check signal
   if (trajectory_.has_signal()) {
@@ -222,7 +211,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
 
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  AINFO << "control cycle time is: " << time_diff_ms << " ms.";
+  AINFO_EVERY(1000) << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 
   SendCmd(&control_command);
@@ -232,7 +221,6 @@ Status Control::CheckInput() {
   AdapterManager::Observe();
   auto localization_adapter = AdapterManager::GetLocalization();
   if (localization_adapter->Empty()) {
-    AINFO << "No Localization msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No localization msg");
   }
   localization_ = localization_adapter->GetLatestObserved();
@@ -240,7 +228,6 @@ Status Control::CheckInput() {
 
   auto chassis_adapter = AdapterManager::GetChassis();
   if (chassis_adapter->Empty()) {
-    AINFO << "No Chassis msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No chassis msg");
   }
   chassis_ = chassis_adapter->GetLatestObserved();
@@ -248,7 +235,6 @@ Status Control::CheckInput() {
 
   auto trajectory_adapter = AdapterManager::GetPlanning();
   if (trajectory_adapter->Empty()) {
-    AINFO << "No planning msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");
   }
   trajectory_ = trajectory_adapter->GetLatestObserved();
@@ -302,24 +288,6 @@ void Control::SendCmd(ControlCommand *control_command) {
     return;
   }
   AdapterManager::PublishControlCommand(*control_command);
-}
-
-Status Control::CheckPad() {
-  CHECK_PROTO(pad_msg_, action)
-  return Status::OK();
-}
-
-void Control::Alert() {
-  // do not alert too frequently
-  // though "0" means first hit
-  if (last_alert_timestamp_ > 0. &&
-      (Clock::NowInSecond() - last_alert_timestamp_) <
-          FLAGS_min_alert_interval) {
-    return;
-  }
-
-  // update timestamp
-  last_alert_timestamp_ = Clock::NowInSecond();
 }
 
 void Control::Stop() {}
