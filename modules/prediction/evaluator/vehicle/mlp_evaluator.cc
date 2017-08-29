@@ -67,7 +67,7 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(latest_feature_ptr);
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph()) {
-    AERROR << "Obstacle [" << id << "] has no lane graph.";
+    ADEBUG << "Obstacle [" << id << "] has no lane graph.";
     return;
   }
 
@@ -98,12 +98,13 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   auto it = obstacle_feature_values_map_.find(id);
   if (it == obstacle_feature_values_map_.end()) {
     SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
+    obstacle_feature_values_map_[id] = obstacle_feature_values;
   } else {
     obstacle_feature_values = it->second;
   }
 
   if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
-    AERROR << "Obstacle [" << id << "] has fewer than "
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
            << "expected obstacle feature_values "
            << obstacle_feature_values.size() << ".";
     return;
@@ -112,7 +113,7 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   std::vector<double> lane_feature_values;
   SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
   if (lane_feature_values.size() != LANE_FEATURE_SIZE) {
-    AERROR << "Obstacle [" << id << "] has fewer than "
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
            << "expected lane feature_values"
            << lane_feature_values.size() << ".";
     return;
@@ -328,7 +329,7 @@ double MLPEvaluator::ComputeProbability(
   double probability = 0.0;
 
   if (model_ptr_->dim_input() != static_cast<int>(feature_values.size())) {
-    AERROR << "Model feature size not consistent with model proto definition. "
+    ADEBUG << "Model feature size not consistent with model proto definition. "
            << "model input dim = " << model_ptr_->dim_input()
            << "; feature value size = " << feature_values.size();
     return probability;
