@@ -117,17 +117,7 @@ Status StBoundaryMapper::GetGraphBoundary(
       continue;
     }
     const auto& decision = path_obstacle->LongitudinalDecision();
-    if (decision.has_follow()) {
-      StBoundary follow_boundary;
-      const auto ret =
-          MapFollowDecision(*path_obstacle, decision, &follow_boundary);
-      if (!ret.ok()) {
-        AERROR << "Fail to map obstacle " << path_obstacle->Id()
-               << " with follow decision: " << decision.DebugString();
-        return Status(ErrorCode::PLANNING_ERROR, "Fail to map follow decision");
-      }
-      AppendBoundary(follow_boundary, st_boundaries);
-    } else if (decision.has_stop()) {
+    if (decision.has_stop()) {
       const double stop_s = path_obstacle->perception_sl_boundary().start_s() +
                             decision.stop().distance_s();
       if (stop_s < adc_sl_boundary_.end_s()) {
@@ -146,7 +136,8 @@ Status StBoundaryMapper::GetGraphBoundary(
         min_stop_s = stop_s;
         stop_decision = decision;
       }
-    } else if (decision.has_overtake() || decision.has_yield()) {
+    } else if (decision.has_follow() || decision.has_overtake() ||
+               decision.has_yield()) {
       StBoundary boundary;
       const auto ret =
           MapWithPredictionTrajectory(*path_obstacle, decision, &boundary);
