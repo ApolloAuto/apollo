@@ -96,7 +96,7 @@ TrajectoryStitcher::ComputeStitchingTrajectory(
   }
 
   auto matched_point = prev_trajectory.TrajectoryPointAt(matched_index);
-  double position_diff =
+  const double position_diff =
       common::math::Vec2d(
           matched_point.path_point().x() - VehicleState::instance()->x(),
           matched_point.path_point().y() - VehicleState::instance()->y())

@@ -96,13 +96,12 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   if (it_lower == accumulated_s.begin()) {
     return reference_points_.front();
   } else {
-    std::uint32_t index =
-        static_cast<std::uint32_t>(it_lower - accumulated_s.begin());
-    auto p0 = reference_points_[index - 1];
-    auto p1 = reference_points_[index];
+    auto index = std::distance(accumulated_s.begin(), it_lower);
+    const auto& p0 = reference_points_[index - 1];
+    const auto& p1 = reference_points_[index];
 
-    auto s0 = accumulated_s[index - 1];
-    auto s1 = accumulated_s[index];
+    const double s0 = accumulated_s[index - 1];
+    const double s1 = accumulated_s[index];
 
     return Interpolate(p0, s0, p1, s1, s);
   }

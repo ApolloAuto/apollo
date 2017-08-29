@@ -21,14 +21,12 @@
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
 
 namespace apollo {
 namespace planning {
 using ::apollo::common::Status;
-using ::apollo::common::VehicleState;
 using ::apollo::common::VehicleConfigHelper;
 
 TrafficDecider::TrafficDecider() : Task("TrafficDecider") {}
