@@ -24,15 +24,15 @@
 #include <memory>
 #include <mutex>
 #include <set>
+#include <thread>
 #include <unordered_map>
 #include <vector>
-#include <thread>
 
-#include "modules/drivers/sensor_protocol_data.h"
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/canbus/common/byte.h"
 #include "modules/common/log.h"
+#include "modules/common/proto/error_code.pb.h"
 #include "modules/common/time/time.h"
+#include "modules/drivers/sensor_protocol_data.h"
 
 /**
  * @namespace apollo::drivers
@@ -60,7 +60,8 @@ struct CheckIdArg {
 /**
  * @class SensorMessageManager
  *
- * @brief sensor message manager manages sensor protocols. It supports parse and can get
+ * @brief sensor message manager manages sensor protocols. It supports parse and
+ * can get
  * sensor protocol data by message id.
  */
 template <typename SensorType>
@@ -89,24 +90,26 @@ class SensorMessageManager {
    * @param message_id the id of the message
    * @return a pointer to the sensor protocol data
    */
-  SensorProtocolData<SensorType> *GetMutableSensorProtocolDataById(const uint32_t message_id);
+  SensorProtocolData<SensorType> *GetMutableSensorProtocolDataById(
+      const uint32_t message_id);
 
   /**
    * @brief get sensor data. used lock_guard in this function to avoid
    * concurrent read/write issue.
    * @param sensor_data sensor_data to be filled.
    */
-  ::apollo::common::ErrorCode GetSensorData(
-      SensorType *const sensor_data);
+  ::apollo::common::ErrorCode GetSensorData(SensorType *const sensor_data);
 
  protected:
   template <class T, bool need_check>
   void AddRecvProtocolData();
- 
- private:
-  std::vector<std::unique_ptr<SensorProtocolData<SensorType>>> recv_sensor_protocol_data_;
 
-  std::unordered_map<uint32_t, SensorProtocolData<SensorType> *> sensor_protocol_data_map_;
+ private:
+  std::vector<std::unique_ptr<SensorProtocolData<SensorType>>>
+      recv_sensor_protocol_data_;
+
+  std::unordered_map<uint32_t, SensorProtocolData<SensorType> *>
+      sensor_protocol_data_map_;
   std::unordered_map<uint32_t, CheckIdArg> check_ids_;
   std::set<uint32_t> received_ids_;
 
@@ -133,9 +136,11 @@ void SensorMessageManager<SensorType>::AddRecvProtocolData() {
 }
 
 template <typename SensorType>
-SensorProtocolData<SensorType> *SensorMessageManager<SensorType>::GetMutableSensorProtocolDataById(
-    const uint32_t message_id) {
-  if (sensor_protocol_data_map_.find(message_id) == sensor_protocol_data_map_.end()) {
+SensorProtocolData<SensorType>
+    *SensorMessageManager<SensorType>::GetMutableSensorProtocolDataById(
+        const uint32_t message_id) {
+  if (sensor_protocol_data_map_.find(message_id) ==
+      sensor_protocol_data_map_.end()) {
     ADEBUG << "Unable to get protocol data because of invalid message_id:"
            << message_id;
     return nullptr;
@@ -144,16 +149,18 @@ SensorProtocolData<SensorType> *SensorMessageManager<SensorType>::GetMutableSens
 }
 
 template <typename SensorType>
-void SensorMessageManager<SensorType>::Parse(const uint32_t message_id, const uint8_t *data,
-                           int32_t length) {
-  SensorProtocolData<SensorType> *sensor_protocol_data = GetMutableSensorProtocolDataById(message_id);
+void SensorMessageManager<SensorType>::Parse(const uint32_t message_id,
+                                             const uint8_t *data,
+                                             int32_t length) {
+  SensorProtocolData<SensorType> *sensor_protocol_data =
+      GetMutableSensorProtocolDataById(message_id);
   if (sensor_protocol_data == nullptr) {
     return;
   }
-  
+
   std::lock_guard<std::mutex> lock(sensor_data_mutex_);
   sensor_protocol_data->Parse(data, length, &sensor_data_);
-  
+
   received_ids_.insert(message_id);
   // check if need to check period
   const auto it = check_ids_.find(message_id);
@@ -175,7 +182,7 @@ template <typename SensorType>
 ErrorCode SensorMessageManager<SensorType>::GetSensorData(
     SensorType *const sensor_data) {
   if (sensor_data == nullptr) {
-    //TODO(lizh): create a proper ERROR log which can tell mobileye and radar.
+    // TODO(lizh): create a proper ERROR log which can tell mobileye and radar.
     AERROR << "Failed to get sensor_data due to nullptr.";
     return ErrorCode::CANBUS_ERROR;
   }
@@ -184,7 +191,7 @@ ErrorCode SensorMessageManager<SensorType>::GetSensorData(
   return ErrorCode::OK;
 }
 
-}  // namespace drivers 
+}  // namespace drivers
 }  // namespace apollo
 
 #endif  // MODULES_DRIVERS_SENSOR_MESSAGE_MANAGER_H_

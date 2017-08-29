@@ -22,8 +22,8 @@
 #ifndef MODULES_DRIVERS_SENSOR_PROTOCOL_DATA_H_
 #define MODULES_DRIVERS_SENSOR_PROTOCOL_DATA_H_
 
-#include "modules/canbus/common/canbus_consts.h"
 #include <cmath>
+#include "modules/canbus/common/canbus_consts.h"
 
 /**
  * @namespace apollo::drivers
@@ -35,7 +35,8 @@ namespace drivers {
 /**
  * @class SensorProtocolData
  *
- * @brief This is the base class of protocol data for sensors (such as mobileye, radar and so on).
+ * @brief This is the base class of protocol data for sensors (such as mobileye,
+ * radar and so on).
  */
 template <typename SensorType>
 class SensorProtocolData {
@@ -74,7 +75,7 @@ class SensorProtocolData {
    * @brief parse received data
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
-   * @param sensor_data the parsed sensor_data 
+   * @param sensor_data the parsed sensor_data
    */
   virtual void Parse(const uint8_t *bytes, int32_t length,
                      SensorType *sensor_data) const;
@@ -116,8 +117,8 @@ T SensorProtocolData<SensorType>::BoundedValue(T lower, T upper, T val) {
 
 // (SUM(input))^0xFF
 template <typename SensorType>
-uint8_t SensorProtocolData<SensorType>::CalculateCheckSum(const uint8_t *input,
-                                        const uint32_t length) {
+uint8_t SensorProtocolData<SensorType>::CalculateCheckSum(
+    const uint8_t *input, const uint32_t length) {
   uint8_t sum = 0;
   for (std::size_t i = 0; i < length; ++i) {
     sum += input[i];
@@ -132,22 +133,21 @@ uint32_t SensorProtocolData<SensorType>::GetPeriod() const {
 }
 
 template <typename SensorType>
-void SensorProtocolData<SensorType>::Parse(const uint8_t *bytes,
-                     int32_t length, SensorType *sensor_data) const {};
+void SensorProtocolData<SensorType>::Parse(const uint8_t *bytes, int32_t length,
+                                           SensorType *sensor_data) const {};
 
 template <typename SensorType>
-void SensorProtocolData<SensorType>::UpdateData(uint8_t * data) {}
+void SensorProtocolData<SensorType>::UpdateData(uint8_t *data) {}
 
 template <typename SensorType>
 void SensorProtocolData<SensorType>::Reset() {}
 
 template <typename SensorType>
-int32_t SensorProtocolData<SensorType>::GetLength() const
-{
-    return data_length_;
+int32_t SensorProtocolData<SensorType>::GetLength() const {
+  return data_length_;
 }
 
-}  // namespace drivers 
+}  // namespace drivers
 }  // namespace apollo
 
 #endif  // MODULES_DRIVERS_SENSOR_PROTOCOL_DATA_H_

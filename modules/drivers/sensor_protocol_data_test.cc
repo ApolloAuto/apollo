@@ -27,5 +27,5 @@ TEST(SensorProtocolDataTest, CheckSum) {
   EXPECT_EQ(0xE7, result);
 }
 
-}  // namespace drivers 
+}  // namespace drivers
 }  // namespace apollo

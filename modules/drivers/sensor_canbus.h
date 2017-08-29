@@ -33,10 +33,10 @@
 #include "modules/canbus/proto/can_card_parameter.pb.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/common/monitor/monitor.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -71,8 +71,10 @@ using apollo::canbus::CanbusConf;
 template <typename SensorType>
 class SensorCanbus : public apollo::common::ApolloApp {
  public:
-  //TODO(lizh): check whether we need a new msg item, say MonitorMessageItem::SENSORCANBUS
-  SensorCanbus() : monitor_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+  // TODO(lizh): check whether we need a new msg item, say
+  // MonitorMessageItem::SENSORCANBUS
+  SensorCanbus()
+      : monitor_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
   * @brief obtain module name
@@ -116,7 +118,9 @@ class SensorCanbus : public apollo::common::ApolloApp {
 // method implementations
 
 template <typename SensorType>
-std::string SensorCanbus<SensorType>::Name() const { return FLAGS_hmi_name; }
+std::string SensorCanbus<SensorType>::Name() const {
+  return FLAGS_hmi_name;
+}
 
 template <typename SensorType>
 Status SensorCanbus<SensorType>::Init() {
@@ -139,7 +143,8 @@ Status SensorCanbus<SensorType>::Init() {
   }
   AINFO << "Can client is successfully created.";
 
-  sensor_message_manager_ = std::unique_ptr<SensorMessageManager<SensorType>>(new SensorMessageManager<SensorType>());
+  sensor_message_manager_ = std::unique_ptr<SensorMessageManager<SensorType>>(
+      new SensorMessageManager<SensorType>());
   if (sensor_message_manager_ == nullptr) {
     return OnError("Failed to create message manager.");
   }
@@ -174,8 +179,8 @@ Status SensorCanbus<SensorType>::Start() {
 
   // 3. set timer to triger publish info periodly
   const double duration = 1.0 / FLAGS_sensor_freq;
-  timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
-                                       &SensorCanbus<SensorType>::OnTimer, this);
+  timer_ = AdapterManager::CreateTimer(
+      ros::Duration(duration), &SensorCanbus<SensorType>::OnTimer, this);
 
   // last step: publish monitor messages
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
@@ -191,7 +196,7 @@ void SensorCanbus<SensorType>::PublishSensorData() {
 
 template <typename SensorType>
 void SensorCanbus<SensorType>::OnTimer(const ros::TimerEvent &) {
-    PublishSensorData();
+  PublishSensorData();
 }
 
 template <typename SensorType>
@@ -210,8 +215,7 @@ Status SensorCanbus<SensorType>::OnError(const std::string &error_msg) {
   return Status(ErrorCode::CANBUS_ERROR, error_msg);
 }
 
-
-}  // namespace drivers 
+}  // namespace drivers
 }  // namespace apollo
 
 #endif  // MODULES_DRIVERS_SENSOR_CANBUS_H_

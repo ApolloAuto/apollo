@@ -14,9 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/mobileye/mobileye_canbus.h"
 #include "modules/common/apollo_app.h"
+#include "modules/drivers/mobileye/mobileye_canbus.h"
 
 using ::apollo::drivers::Mobileye;
 APOLLO_MAIN(::apollo::drivers::SensorCanbus<Mobileye>);
-
