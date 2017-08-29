@@ -82,20 +82,12 @@ function check_esd_files() {
 }
 
 function generate_build_targets() {
-  BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
-    | grep -v "_cpplint$")
+  BUILD_TARGETS=$(bazel query //...)
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
   if ! $USE_ESD_CAN; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
-  fi
-}
-
-function generate_test_targets() {
-  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party")
-  if ! $USE_ESD_CAN; then
-    TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
 }
 
@@ -254,8 +246,8 @@ function release() {
 
 function gen_coverage() {
   bazel clean
-  generate_test_targets
-  echo "$TEST_TARGETS" | xargs bazel test $DEFINES -c dbg --config=coverage
+  generate_build_targets
+  echo "$BUILD_TARGETS" | xargs bazel test $DEFINES -c dbg --config=coverage
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
@@ -294,8 +286,8 @@ function gen_coverage() {
 function run_test() {
   START_TIME=$(get_now)
 
-  generate_test_targets
-  echo "$TEST_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  generate_build_targets
+  echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -306,7 +298,8 @@ function run_test() {
 }
 
 function run_cpp_lint() {
-  bazel test --config=cpplint -c dbg //...
+  generate_build_targets
+  echo "$BUILD_TARGETS" | xargs bazel test --config=cpplint -c dbg
 }
 
 function run_bash_lint() {

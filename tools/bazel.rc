@@ -26,7 +26,7 @@ test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 # To enable the lint test, the BUILD *must* load the cpplint.bzl by having
 # 'load("//tools:cpplint.bzl", "cpplint")' at the beginning and 'cpplint()'
 # at the end.
-test:cpplint --test_tag_filters=+cpplint
+test:cpplint --test_tag_filters=cpplint
 
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
