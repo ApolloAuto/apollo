@@ -8,6 +8,7 @@ class WebSocketEndpoint {
         this.websocket = null;
         this.counter = 0;
         this.lastUpdateTimestamp = 0;
+        this.lastSeqNum = -1;
     }
 
     initialize() {
@@ -25,12 +26,7 @@ class WebSocketEndpoint {
             const message = JSON.parse(event.data);
             switch (message.type) {
                 case "sim_world_update":
-                    if (this.lastUpdateTimestamp !== 0
-                        && message.timestamp - this.lastUpdateTimestamp > 150) {
-                        console.log("Last sim_world_update took " +
-                            (message.timestamp - this.lastUpdateTimestamp) + "ms");
-                    }
-                    this.lastUpdateTimestamp = message.timestamp;
+                    this.checkMessage(message);
 
                     STORE.updateTimestamp(message.timestamp);
                     RENDERER.maybeInitializeOffest(
@@ -61,6 +57,21 @@ class WebSocketEndpoint {
         this.websocket.onclose = event => {
             this.initialize();
         };
+    }
+
+    checkMessage(message) {
+        if (this.lastUpdateTimestamp !== 0
+            && message.timestamp - this.lastUpdateTimestamp > 150) {
+            console.log("Last sim_world_update took " +
+                (message.timestamp - this.lastUpdateTimestamp) + "ms");
+        }
+        this.lastUpdateTimestamp = message.timestamp;
+        if (this.lastSeqNum !== -1
+            && message.world.sequenceNum > this.lastSeqNum + 1) {
+            console.debug("Last seq: " + this.lastSeqNum +
+                ". New seq: " + message.world.sequenceNum + ".");
+        }
+        this.lastSeqNum = message.world.sequenceNum;
     }
 
     requestMapData(elements) {
