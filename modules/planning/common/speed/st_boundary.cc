@@ -308,5 +308,22 @@ bool StBoundary::GetIndexRange(const std::vector<STPoint>& points,
   return true;
 }
 
+StBoundary StBoundary::GenerateStBoundary(
+    const std::vector<STPoint> lower_points,
+    const std::vector<STPoint> upper_points) {
+  if (lower_points.size() != upper_points.size() || lower_points.size() < 2) {
+    AERROR << "Fail to generate StBoundary because input points are not valid.";
+    return StBoundary();
+  }
+
+  std::vector<std::pair<STPoint, STPoint>> point_pairs;
+  for (size_t i = 0; i < lower_points.size() && i < upper_points.size(); ++i) {
+    point_pairs.emplace_back(
+        STPoint(lower_points.at(i).s(), lower_points.at(i).t()),
+        STPoint(upper_points.at(i).s(), upper_points.at(i).t()));
+  }
+  return StBoundary(point_pairs);
+}
+
 }  // namespace planning
 }  // namespace apollo

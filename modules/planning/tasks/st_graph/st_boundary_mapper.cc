@@ -234,21 +234,17 @@ Status StBoundaryMapper::MapWithoutDecision(const PathObstacle& path_obstacle,
     return Status::OK();
   }
 
-  if (lower_points.size() > 0 && upper_points.size() > 0) {
-    std::vector<std::pair<STPoint, STPoint>> point_pairs;
-    point_pairs.emplace_back(
-        STPoint(lower_points.at(0).s() - boundary_s_buffer,
-                lower_points.at(0).t() - boundary_t_buffer),
-        STPoint(upper_points.at(0).s() + boundary_s_buffer,
-                upper_points.at(0).t() - boundary_t_buffer));
+  if (lower_points.size() != upper_points.size()) {
+    std::string msg = common::util::StrCat(
+        "lower_points.size()[", lower_points.size(),
+        "] and upper_points.size()[", upper_points.size(), "] does NOT match.");
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
 
-    point_pairs.emplace_back(
-        STPoint(lower_points.back().s() - boundary_s_buffer,
-                lower_points.back().t() + boundary_t_buffer),
-        STPoint(upper_points.back().s() + boundary_s_buffer,
-                upper_points.back().t() + boundary_t_buffer));
-
-    *boundary = StBoundary(point_pairs);
+  if (lower_points.size() > 1 && upper_points.size() > 1) {
+    *boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+                    .ExpandByS(boundary_s_buffer)
+                    .ExpandByT(boundary_t_buffer);
     boundary->SetId(path_obstacle.obstacle()->Id());
   }
   return Status::OK();
@@ -350,21 +346,18 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
                                 &lower_points)) {
     return Status(ErrorCode::PLANNING_ERROR, "PLANNING_ERROR");
   }
-  if (lower_points.size() > 0 && upper_points.size() > 0) {
-    std::vector<std::pair<STPoint, STPoint>> point_pairs;
-    point_pairs.emplace_back(
-        STPoint(lower_points.at(0).s() - boundary_s_buffer,
-                lower_points.at(0).t() - boundary_t_buffer),
-        STPoint(upper_points.at(0).s() + boundary_s_buffer,
-                upper_points.at(0).t() - boundary_t_buffer));
 
-    point_pairs.emplace_back(
-        STPoint(lower_points.back().s() - boundary_s_buffer,
-                lower_points.back().t() + boundary_t_buffer),
-        STPoint(upper_points.back().s() + boundary_s_buffer,
-                upper_points.back().t() + boundary_t_buffer));
+  if (lower_points.size() != upper_points.size()) {
+    std::string msg = common::util::StrCat(
+        "lower_points.size()[", lower_points.size(),
+        "] and upper_points.size()[", upper_points.size(), "] does NOT match.");
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
 
-    *boundary = StBoundary(point_pairs);
+  if (lower_points.size() > 1 && upper_points.size() > 1) {
+    *boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+                    .ExpandByS(boundary_s_buffer)
+                    .ExpandByT(boundary_t_buffer);
 
     // get characteristic_length and boundary_type.
     StBoundary::BoundaryType b_type = StBoundary::BoundaryType::UNKNOWN;
@@ -394,7 +387,8 @@ Status StBoundaryMapper::MapFollowDecision(
     StBoundary* const boundary) const {
   DCHECK_NOTNULL(boundary);
   DCHECK(obj_decision.has_follow())
-      << "Map obstacle without prediction trajectory is ONLY supported when "
+      << "Map obstacle without prediction trajectory is ONLY supported "
+         "when "
          "the object decision is follow. The current object decision is: "
       << obj_decision.DebugString();
 

@@ -95,7 +95,6 @@ void SpeedOptimizer::RecordSTGraphDebug(
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());
     }
-    std::cout << boundary.DebugString() << std::endl;
   }
 
   for (const auto& point : speed_limits.speed_limit_points()) {
