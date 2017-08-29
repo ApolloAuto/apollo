@@ -103,6 +103,8 @@ class StBoundary : public common::math::Polygon2d {
  private:
   bool IsValid(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;
+  void RemoveRedundantPoints(
+      std::vector<std::pair<STPoint, STPoint>>& point_pairs);
   void CalculateArea();
 
   FRIEND_TEST(StBoundaryTest, get_index_range);
