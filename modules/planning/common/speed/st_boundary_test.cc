@@ -132,5 +132,41 @@ TEST(StBoundaryTest, get_index_range) {
   EXPECT_FALSE(boundary.GetIndexRange(lower_points, 0.0, &left, &right));
 }
 
+TEST(StBoundaryTest, remove_redundant_points) {
+  std::vector<std::pair<STPoint, STPoint>> points;
+  points.emplace_back(STPoint(0.0, 0.0), STPoint(1.0, 0.0));
+  points.emplace_back(STPoint(0.1, 0.2), STPoint(1.1, 0.2));
+  points.emplace_back(STPoint(0.2, 0.3), STPoint(1.2, 0.3));
+  points.emplace_back(STPoint(0.3, 0.4), STPoint(1.3, 0.4));
+  points.emplace_back(STPoint(0.4, 0.5), STPoint(1.4, 0.5));
+
+  EXPECT_EQ(points.size(), 5);
+
+  StBoundary st_boundary;
+  st_boundary.RemoveRedundantPoints(points);
+
+  for (auto& pair : points) {
+    std::cout << pair.first.DebugString() << std::endl;
+    std::cout << pair.second.DebugString() << std::endl;
+    std::cout << "-----------" << std::endl;
+  }
+
+  EXPECT_EQ(points.size(), 3);
+  EXPECT_DOUBLE_EQ(points.front().first.s(), 0.0);
+  EXPECT_DOUBLE_EQ(points.front().first.t(), 0.0);
+  EXPECT_DOUBLE_EQ(points.front().second.s(), 1.0);
+  EXPECT_DOUBLE_EQ(points.front().second.t(), 0.0);
+
+  EXPECT_DOUBLE_EQ(points[1].first.s(), 0.1);
+  EXPECT_DOUBLE_EQ(points[1].first.t(), 0.2);
+  EXPECT_DOUBLE_EQ(points[1].second.s(), 1.1);
+  EXPECT_DOUBLE_EQ(points[1].second.t(), 0.2);
+
+  EXPECT_DOUBLE_EQ(points.back().first.s(), 0.4);
+  EXPECT_DOUBLE_EQ(points.back().first.t(), 0.5);
+  EXPECT_DOUBLE_EQ(points.back().second.s(), 1.4);
+  EXPECT_DOUBLE_EQ(points.back().second.t(), 0.5);
+}
+
 }  // namespace planning
 }  // namespace apollo

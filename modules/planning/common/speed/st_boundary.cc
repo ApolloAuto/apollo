@@ -34,11 +34,15 @@ using LineSegment2d = common::math::LineSegment2d;
 StBoundary::StBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
   CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
-  for (size_t i = 0; i < point_pairs.size(); ++i) {
+
+  std::vector<std::pair<STPoint, STPoint>> reduced_pairs(point_pairs);
+  RemoveRedundantPoints(reduced_pairs);
+
+  for (size_t i = 0; i < reduced_pairs.size(); ++i) {
     // use same t for both points
-    const double t = point_pairs[i].first.t();
-    lower_points_.emplace_back(point_pairs[i].first.s(), t);
-    upper_points_.emplace_back(point_pairs[i].second.s(), t);
+    const double t = reduced_pairs[i].first.t();
+    lower_points_.emplace_back(reduced_pairs[i].first.s(), t);
+    upper_points_.emplace_back(reduced_pairs[i].second.s(), t);
   }
 
   for (auto it = lower_points_.begin(); it != lower_points_.end(); ++it) {
