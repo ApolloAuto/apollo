@@ -104,7 +104,7 @@ lon_controller_conf {
   }
   switch_speed: 2.0
   pitch_angle_filter_conf {
-    cutoff_freq: 0.2
+    cutoff_freq: 5
   }
   calibration_table {
     calibration {
