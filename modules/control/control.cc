@@ -54,12 +54,9 @@ std::string Control::Name() const {
 
 Status Control::Init() {
   AINFO << "Control init, starting ...";
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
-                                                &control_conf_)) {
-    return Status(
-        ErrorCode::CONTROL_INIT_ERROR,
-        "Unable to load control conf file: " + FLAGS_control_conf_file);
-  }
+  CHECK(::apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
+                                                 &control_conf_))
+      << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
 
