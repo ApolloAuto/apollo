@@ -250,12 +250,28 @@ inline Clock::Clock()
 // PERF_BLOCK("Function Foo took: ") {
 //  Foo();
 // }
-#define PERF_BLOCK(message)                                                  \
-  using apollo::common::time::NowInSecond;                                   \
-  for (double block_start_time = 0;                                          \
-       (block_start_time == 0 ? (block_start_time = NowInSecond()) : false); \
-       std::cout << std::fixed << message << ": "                            \
-                 << NowInSecond() - block_start_time << std::endl)
+// You can optionally pass in a time threshold (in second) so that the log will
+// only be spit out when the elapsed time of running the code block is greater
+// than it.
+#define GET_MACRO(_1, _2, NAME, ...) NAME
+#define PERF_BLOCK(...)                                                      \
+  GET_MACRO(__VA_ARGS__, PERF_BLOCK_WITH_THRESHOLD, PERF_BLOCK_NO_THRESHOLD) \
+  (__VA_ARGS__)
+
+#define PERF_BLOCK_NO_THRESHOLD(message) PERF_BLOCK_WITH_THRESHOLD(message, 0)
+
+#define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                     \
+  using apollo::common::time::Clock;                                      \
+  for (double block_start_time = 0;                                       \
+       (block_start_time == 0 ? (block_start_time = Clock::NowInSecond()) \
+                              : false);                                   \
+       [block_start_time]() {                                             \
+         double now = Clock::NowInSecond();                               \
+         if (now - block_start_time > (threshold)) {                      \
+           std::cout << std::fixed << (message) << ": "                   \
+                     << now - block_start_time << std::endl;              \
+         }                                                                \
+       }())
 
 }  // namespace time
 }  // namespace common
