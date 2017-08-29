@@ -14,21 +14,41 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/sensor_canbus.h"
-#include "modules/drivers/mobileye/mobileye_message_manager.h"
-#include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/drivers/mobileye/protocol/details_73b.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace drivers {
+namespace mobileye {
 
-using apollo::common::ErrorCode;
+class Details73bTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {}
+};
 
-TEST(SensorCanbusTest, Simple) {
-  SensorCanbus<Mobileye> cb;
-  EXPECT_EQ(cb.Name(), "canbus");
+TEST_F(Details73bTest, Parse) {
+  Details73b details_73b;
+  int32_t length = 8;
+  Mobileye mobileye;
+  uint8_t bytes[8];
+
+  bytes[0] = 0b00000000;
+  bytes[1] = 0b00000000;
+  bytes[2] = 0b00000000;
+  bytes[3] = 0b00000000;
+  bytes[4] = 0b00000000;
+  bytes[5] = 0b00010000;
+  bytes[6] = 0b00110000;
+  bytes[7] = 0b00000111;
+
+  details_73b.Parse(bytes, length, &mobileye);
+
+  EXPECT_EQ(1, mobileye.details_73b_size());
+  EXPECT_EQ(true, mobileye.details_73b(0).obstacle_replaced());
+  EXPECT_NEAR(18.4, mobileye.details_73b(0).obstacle_angle(), 1e-6);
 }
 
+}  // namespace mobileye
 }  // namespace drivers
 }  // namespace apollo

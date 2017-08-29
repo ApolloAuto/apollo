@@ -21,8 +21,8 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/drivers/sensor_protocol_data.h"
 #include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/drivers/sensor_protocol_data.h"
 
 namespace apollo {
 namespace drivers {
@@ -37,9 +37,7 @@ class MockProtocolData : public SensorProtocolData<Mobileye> {
 
 class MockMessageManager : public SensorMessageManager<Mobileye> {
  public:
-  MockMessageManager() {
-    AddRecvProtocolData<MockProtocolData, true>();
-  }
+  MockMessageManager() { AddRecvProtocolData<MockProtocolData, true>(); }
 };
 
 TEST(MessageManagerTest, GetMutableProtocolDataById) {
@@ -54,5 +52,5 @@ TEST(MessageManagerTest, GetMutableProtocolDataById) {
   EXPECT_EQ(manager.GetSensorData(nullptr), ErrorCode::CANBUS_ERROR);
 }
 
-}  // namespace drivers 
+}  // namespace drivers
 }  // namespace apollo
