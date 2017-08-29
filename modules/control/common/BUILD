@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -75,8 +76,8 @@ cc_library(
         "pid_BC_controller.h",
     ],
     deps = [
-        "//modules/common:log",
         ":pid_controller",
+        "//modules/common:log",
         "//modules/common/math",
         "//modules/control/proto:control_proto",
     ],
@@ -91,8 +92,8 @@ cc_library(
         "pid_IC_controller.h",
     ],
     deps = [
-        "//modules/common:log",
         ":pid_controller",
+        "//modules/common:log",
         "//modules/common/math",
         "//modules/control/proto:control_proto",
     ],

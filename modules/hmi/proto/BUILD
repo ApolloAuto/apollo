@@ -31,5 +31,5 @@ proto_library(
     deps = [
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:header_proto_lib",
-    ]
+    ],
 )

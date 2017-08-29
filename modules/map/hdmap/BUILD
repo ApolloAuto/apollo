@@ -21,8 +21,8 @@ cc_library(
         "//modules/common/math",
         "//modules/common/math:linear_interpolation",
         "//modules/common/util",
-        "//modules/map/proto:map_proto",
         "//modules/map/hdmap/adapter:opendrive_adapter",
+        "//modules/map/proto:map_proto",
         "@glog//:glog",
     ],
 )

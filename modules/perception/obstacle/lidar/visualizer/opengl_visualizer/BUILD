@@ -11,11 +11,11 @@ cc_library(
         "opengl_visualizer.cc",
     ],
     hdrs = [
+        "arc_ball.h",
         "camera.h",
         "frame_content.h",
         "glfw_viewer.h",
         "opengl_visualizer.h",
-	    "arc_ball.h",
     ],
     copts = [
         "-Wno-deprecated",
