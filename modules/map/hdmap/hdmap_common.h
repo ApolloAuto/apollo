@@ -331,13 +331,7 @@ typedef std::shared_ptr<const CrosswalkInfo> CrosswalkInfoConstPtr;
 typedef std::shared_ptr<const StopSignInfo> StopSignInfoConstPtr;
 typedef std::shared_ptr<const YieldSignInfo> YieldSignInfoConstPtr;
 typedef std::shared_ptr<const RoadInfo> RoadInfoConstPtr;
-
-struct RoadROIBoundary {
-  Id id;
-  std::vector<RoadBoundary> road_boundaries;
-};
-
-using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
+typedef std::shared_ptr<RoadROIBoundary> RoadROIBoundaryPtr;
 
 struct JunctionBoundary {
   JunctionInfoConstPtr junction_info;
