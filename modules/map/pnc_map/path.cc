@@ -105,14 +105,14 @@ std::string PathOverlap::DebugString() const {
 
 Path::Path(std::vector<MapPathPoint> path_points)
     : path_points_(std::move(path_points)) {
-  init();
+  Init();
 }
 
 Path::Path(std::vector<MapPathPoint> path_points,
            std::vector<LaneSegment> lane_segments)
     : path_points_(std::move(path_points)),
       lane_segments_(std::move(lane_segments)) {
-  init();
+  Init();
 }
 
 Path::Path(std::vector<MapPathPoint> path_points,
@@ -120,39 +120,39 @@ Path::Path(std::vector<MapPathPoint> path_points,
            const double max_approximation_error)
     : path_points_(std::move(path_points)),
       lane_segments_(std::move(lane_segments)) {
-  init();
+  Init();
   if (max_approximation_error > 0.0) {
     _use_path_approximation = true;
     _approximation = PathApproximation(*this, max_approximation_error);
   }
 }
 
-void Path::init() {
-  init_points();
-  init_lane_segments();
-  init_point_index();
-  init_width();
-  //  init_overlaps();
+void Path::Init() {
+  InitPoints();
+  InitLaneSegments();
+  InitPointIndex();
+  InitWidth();
+  //  InitOverlaps();
 }
 
-void Path::init_points() {
+void Path::InitPoints() {
   num_points_ = static_cast<int>(path_points_.size());
   CHECK_GE(num_points_, 2);
 
-  _accumulated_s.clear();
-  _accumulated_s.reserve(num_points_);
-  _segments.clear();
-  _segments.reserve(num_points_);
-  _unit_directions.clear();
-  _unit_directions.reserve(num_points_);
+  accumulated_s_.clear();
+  accumulated_s_.reserve(num_points_);
+  segments_.clear();
+  segments_.reserve(num_points_);
+  unit_directions_.clear();
+  unit_directions_.reserve(num_points_);
   double s = 0.0;
   for (int i = 0; i < num_points_; ++i) {
-    _accumulated_s.push_back(s);
+    accumulated_s_.push_back(s);
     Vec2d heading;
     if (i + 1 >= num_points_) {
       heading = path_points_[i] - path_points_[i - 1];
     } else {
-      _segments.emplace_back(path_points_[i], path_points_[i + 1]);
+      segments_.emplace_back(path_points_[i], path_points_[i + 1]);
       heading = path_points_[i + 1] - path_points_[i];
       // TODO(lianglia_apollo):
       // use heading.length when all adjacent lanes are guarantee to be
@@ -160,18 +160,18 @@ void Path::init_points() {
       s += heading.Length();
     }
     heading.Normalize();
-    _unit_directions.push_back(heading);
+    unit_directions_.push_back(heading);
   }
-  _length = s;
-  _num_sample_points = static_cast<int>(_length / kSampleDistance) + 1;
+  length_ = s;
+  _num_sample_points = static_cast<int>(length_ / kSampleDistance) + 1;
   num_segments_ = num_points_ - 1;
 
-  CHECK_EQ(_accumulated_s.size(), num_points_);
-  CHECK_EQ(_unit_directions.size(), num_points_);
-  CHECK_EQ(_segments.size(), num_segments_);
+  CHECK_EQ(accumulated_s_.size(), num_points_);
+  CHECK_EQ(unit_directions_.size(), num_points_);
+  CHECK_EQ(segments_.size(), num_segments_);
 }
 
-void Path::init_lane_segments() {
+void Path::InitLaneSegments() {
   if (lane_segments_.empty()) {
     lane_segments_.reserve(num_points_);
     for (int i = 0; i + 1 < num_points_; ++i) {
@@ -197,7 +197,7 @@ void Path::init_lane_segments() {
   CHECK_EQ(lane_segments_to_next_point_.size(), num_segments_);
 }
 
-void Path::init_width() {
+void Path::InitWidth() {
   _left_width.clear();
   _left_width.reserve(_num_sample_points);
   _right_width.clear();
@@ -225,14 +225,14 @@ void Path::init_width() {
   CHECK_EQ(_right_width.size(), _num_sample_points);
 }
 
-void Path::init_point_index() {
+void Path::InitPointIndex() {
   _last_point_index.clear();
   _last_point_index.reserve(_num_sample_points);
   double s = 0.0;
   int last_index = 0;
   for (int i = 0; i < _num_sample_points; ++i) {
     while (last_index + 1 < num_points_ &&
-           _accumulated_s[last_index + 1] <= s) {
+           accumulated_s_[last_index + 1] <= s) {
       ++last_index;
     }
     _last_point_index.push_back(last_index);
@@ -241,8 +241,8 @@ void Path::init_point_index() {
   CHECK_EQ(_last_point_index.size(), _num_sample_points);
 }
 
-void Path::get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
-                            std::vector<PathOverlap>* const overlaps) const {
+void Path::GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
+                          std::vector<PathOverlap>* const overlaps) const {
   if (overlaps == nullptr) {
     return;
   }
@@ -301,20 +301,19 @@ void Path::get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
             });
 }
 
-void Path::init_overlaps() {
-  get_all_overlaps(std::bind(&LaneInfo::cross_lanes, _1), &_lane_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::signals, _1), &_signal_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::yield_signs, _1),
-                   &_yield_sign_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::stop_signs, _1), &_stop_sign_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::crosswalks, _1), &_crosswalk_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::junctions, _1), &_junction_overlaps);
+void Path::InitOverlaps() {
+  GetAllOverlaps(std::bind(&LaneInfo::cross_lanes, _1), &_lane_overlaps);
+  GetAllOverlaps(std::bind(&LaneInfo::signals, _1), &_signal_overlaps);
+  GetAllOverlaps(std::bind(&LaneInfo::yield_signs, _1), &_yield_sign_overlaps);
+  GetAllOverlaps(std::bind(&LaneInfo::stop_signs, _1), &_stop_sign_overlaps);
+  GetAllOverlaps(std::bind(&LaneInfo::crosswalks, _1), &_crosswalk_overlaps);
+  GetAllOverlaps(std::bind(&LaneInfo::junctions, _1), &_junction_overlaps);
 
   // TODO(all): add support for parking and speed bumps.
   /*
-  get_all_overlaps(std::bind(&LaneInfo::parking_spaces, _1),
+  GetAllOverlaps(std::bind(&LaneInfo::parking_spaces, _1),
                    &_parking_space_overlaps);
-  get_all_overlaps(std::bind(&LaneInfo::speed_bumps, _1),
+  GetAllOverlaps(std::bind(&LaneInfo::speed_bumps, _1),
                    &_speed_bump_overlaps);
   */
 }
@@ -325,7 +324,7 @@ MapPathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
 
   const MapPathPoint& ref_point = path_points_[index.id];
   if (std::abs(index.offset) > kMathEpsilon) {
-    const Vec2d delta = _unit_directions[index.id] * index.offset;
+    const Vec2d delta = unit_directions_[index.id] * index.offset;
     MapPathPoint point({ref_point.x() + delta.x(), ref_point.y() + delta.y()},
                        ref_point.heading());
     if (index.id < num_segments_) {
@@ -353,9 +352,9 @@ double Path::get_s_from_index(const InterpolatedIndex& index) const {
     return 0.0;
   }
   if (index.id >= num_points_) {
-    return _length;
+    return length_;
   }
-  return _accumulated_s[index.id] + index.offset;
+  return accumulated_s_[index.id] + index.offset;
 }
 
 InterpolatedIndex Path::get_index_from_s(double s) const {
@@ -363,7 +362,7 @@ InterpolatedIndex Path::get_index_from_s(double s) const {
     return {0, 0.0};
   }
   CHECK_GT(num_points_, 0);
-  if (s >= _length) {
+  if (s >= length_) {
     return {num_points_ - 1, 0.0};
   }
   const int sample_id = static_cast<int>(s / kSampleDistance);
@@ -377,13 +376,13 @@ InterpolatedIndex Path::get_index_from_s(double s) const {
                   : num_points_);
   while (low + 1 < high) {
     const int mid = (low + high) / 2;
-    if (_accumulated_s[mid] <= s) {
+    if (accumulated_s_[mid] <= s) {
       low = mid;
     } else {
       high = mid;
     }
   }
-  return {low, s - _accumulated_s[low]};
+  return {low, s - accumulated_s_[low]};
 }
 
 bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
@@ -400,8 +399,8 @@ bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
   if (*accumulate_s < 0.0) {
     *accumulate_s = 0.0;
     *min_distance = point.DistanceTo(path_points_[0]);
-  } else if (*accumulate_s > _length) {
-    *accumulate_s = _length;
+  } else if (*accumulate_s > length_) {
+    *accumulate_s = length_;
     *min_distance = point.DistanceTo(path_points_.back());
   }
   return true;
@@ -415,7 +414,7 @@ bool Path::get_projection(const common::math::Vec2d& point,
 
 bool Path::get_projection(const Vec2d& point, double* accumulate_s,
                           double* lateral, double* min_distance) const {
-  if (_segments.empty()) {
+  if (segments_.empty()) {
     return false;
   }
   if (accumulate_s == nullptr || lateral == nullptr ||
@@ -430,7 +429,7 @@ bool Path::get_projection(const Vec2d& point, double* accumulate_s,
   *min_distance = std::numeric_limits<double>::infinity();
 
   for (int i = 0; i < num_segments_; ++i) {
-    const auto& segment = _segments[i];
+    const auto& segment = segments_[i];
     const double distance = segment.DistanceTo(point);
     if (distance < *min_distance) {
       const double proj = segment.ProjectOntoUnit(point);
@@ -438,7 +437,7 @@ bool Path::get_projection(const Vec2d& point, double* accumulate_s,
         continue;
       }
       if (proj > segment.length() && i + 1 < num_segments_) {
-        const auto& next_segment = _segments[i + 1];
+        const auto& next_segment = segments_[i + 1];
         if ((point - next_segment.start())
                 .InnerProd(next_segment.unit_direction()) >= 0.0) {
           continue;
@@ -446,9 +445,9 @@ bool Path::get_projection(const Vec2d& point, double* accumulate_s,
       }
       *min_distance = distance;
       if (i + 1 >= num_segments_) {
-        *accumulate_s = _accumulated_s[i] + proj;
+        *accumulate_s = accumulated_s_[i] + proj;
       } else {
-        *accumulate_s = _accumulated_s[i] + std::min(proj, segment.length());
+        *accumulate_s = accumulated_s_[i] + std::min(proj, segment.length());
       }
       const double prod = segment.ProductOntoUnit(point);
       if ((i == 0 && proj < 0.0) ||
@@ -476,11 +475,11 @@ bool Path::get_heading_along_path(const Vec2d& point, double* heading) const {
 }
 
 double Path::get_left_width(const double s) const {
-  return get_sample(_left_width, s);
+  return GetSample(_left_width, s);
 }
 
 double Path::get_right_width(const double s) const {
-  return get_sample(_right_width, s);
+  return GetSample(_right_width, s);
 }
 
 bool Path::get_width(const double s, double* left_width,
@@ -488,16 +487,16 @@ bool Path::get_width(const double s, double* left_width,
   CHECK_NOTNULL(left_width);
   CHECK_NOTNULL(right_width);
 
-  if (s < 0.0 || s > _length) {
+  if (s < 0.0 || s > length_) {
     return false;
   }
-  *left_width = get_sample(_left_width, s);
-  *right_width = get_sample(_right_width, s);
+  *left_width = GetSample(_left_width, s);
+  *right_width = GetSample(_right_width, s);
   return true;
 }
 
-double Path::get_sample(const std::vector<double>& samples,
-                        const double s) const {
+double Path::GetSample(const std::vector<double>& samples,
+                       const double s) const {
   if (samples.empty()) {
     return 0.0;
   }
@@ -535,7 +534,7 @@ bool Path::overlap_with(const common::math::Box2d& box, double width) const {
   }
   const Vec2d center = box.center();
   const double radius_sqr = Sqr(box.diagonal() / 2.0 + width) + kMathEpsilon;
-  for (const auto& segment : _segments) {
+  for (const auto& segment : segments_) {
     if (segment.DistanceSquareTo(center) > radius_sqr) {
       continue;
     }
@@ -576,7 +575,7 @@ bool PathApproximation::is_within_max_error(const Path& path, const int s,
   return true;
 }
 
-void PathApproximation::init(const Path& path) {
+void PathApproximation::Init(const Path& path) {
   init_dilute(path);
   init_projections(path);
 }
@@ -609,10 +608,10 @@ void PathApproximation::init_dilute(const Path& path) {
     return;
   }
 
-  _segments.clear();
-  _segments.reserve(num_points_ - 1);
+  segments_.clear();
+  segments_.reserve(num_points_ - 1);
   for (int i = 0; i < num_points_ - 1; ++i) {
-    _segments.emplace_back(path.path_points()[_original_ids[i]],
+    segments_.emplace_back(path.path_points()[_original_ids[i]],
                            path.path_points()[_original_ids[i + 1]]);
   }
   _max_error_per_segment.clear();
@@ -628,10 +627,10 @@ void PathApproximation::init_projections(const Path& path) {
     return;
   }
   _projections.clear();
-  _projections.reserve(_segments.size() + 1);
+  _projections.reserve(segments_.size() + 1);
   double s = 0.0;
   _projections.push_back(0);
-  for (const auto& segment : _segments) {
+  for (const auto& segment : segments_) {
     s += segment.length();
     _projections.push_back(s);
   }
@@ -642,7 +641,7 @@ void PathApproximation::init_projections(const Path& path) {
   for (size_t i = 0; i < _projections.size(); ++i) {
     _original_projections.push_back(_projections[i]);
     if (i + 1 < _projections.size()) {
-      const auto& segment = _segments[i];
+      const auto& segment = segments_[i];
       for (int idx = _original_ids[i] + 1; idx < _original_ids[i + 1]; ++idx) {
         const double proj = segment.ProjectOntoUnit(original_points[idx]);
         _original_projections.push_back(
@@ -709,9 +708,9 @@ bool PathApproximation::get_projection(const Path& path,
   double min_distance_sqr = std::numeric_limits<double>::infinity();
   int estimate_nearest_segment_idx = -1;
   std::vector<double> distance_sqr_to_segments;
-  distance_sqr_to_segments.reserve(_segments.size());
-  for (size_t i = 0; i < _segments.size(); ++i) {
-    const double distance_sqr = _segments[i].DistanceSquareTo(point);
+  distance_sqr_to_segments.reserve(segments_.size());
+  for (size_t i = 0; i < segments_.size(); ++i) {
+    const double distance_sqr = segments_[i].DistanceSquareTo(point);
     distance_sqr_to_segments.push_back(distance_sqr);
     if (distance_sqr < min_distance_sqr) {
       min_distance_sqr = distance_sqr;
@@ -729,7 +728,7 @@ bool PathApproximation::get_projection(const Path& path,
           _max_error_per_segment[estimate_nearest_segment_idx] + _max_error);
   *min_distance = std::numeric_limits<double>::infinity();
   int nearest_segment_idx = -1;
-  for (size_t i = 0; i < _segments.size(); ++i) {
+  for (size_t i = 0; i < segments_.size(); ++i) {
     if (distance_sqr_to_segments[i] >= min_distance_sqr_with_error) {
       continue;
     }
@@ -737,7 +736,7 @@ bool PathApproximation::get_projection(const Path& path,
     int last_segment_idx = _original_ids[i + 1] - 1;
     double max_original_projection = std::numeric_limits<double>::infinity();
     if (first_segment_idx < last_segment_idx) {
-      const auto& segment = _segments[i];
+      const auto& segment = segments_[i];
       const double projection = segment.ProjectOntoUnit(point);
       const double prod_sqr = Sqr(segment.ProductOntoUnit(point));
       if (prod_sqr >= min_distance_sqr_with_error) {
@@ -839,8 +838,8 @@ bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
   const double radius = box.diagonal() / 2.0 + width;
   const double radius_sqr = Sqr(radius);
   const auto& original_segments = path.segments();
-  for (size_t i = 0; i < _segments.size(); ++i) {
-    const LineSegment2d& segment = _segments[i];
+  for (size_t i = 0; i < segments_.size(); ++i) {
+    const LineSegment2d& segment = segments_[i];
     const double max_error = _max_error_per_segment[i];
     const double radius_sqr_with_error = Sqr(radius + max_error);
     if (segment.DistanceSquareTo(center) > radius_sqr_with_error) {
@@ -850,7 +849,7 @@ bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
     int last_segment_idx = _original_ids[i + 1] - 1;
     double max_original_projection = std::numeric_limits<double>::infinity();
     if (first_segment_idx < last_segment_idx) {
-      const auto& segment = _segments[i];
+      const auto& segment = segments_[i];
       const double projection = segment.ProjectOntoUnit(center);
       const double prod_sqr = Sqr(segment.ProductOntoUnit(center));
       if (prod_sqr >= radius_sqr_with_error) {
