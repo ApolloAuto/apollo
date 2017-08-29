@@ -35,7 +35,7 @@ DECLARE_double(replan_distance_threshold);
 
 // parameter for reference line
 DECLARE_double(default_reference_line_width);
-DECLARE_double(planning_speed_upper_limit);
+DECLARE_double(planning_upper_speed_limit);
 
 // parameters for trajectory planning
 DECLARE_double(trajectory_time_length);
@@ -86,8 +86,5 @@ DECLARE_double(decision_valid_stop_range);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
-
-DECLARE_double(planning_speed_limit);
-
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
