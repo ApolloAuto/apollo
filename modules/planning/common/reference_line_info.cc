@@ -21,7 +21,6 @@
 #include "modules/planning/common/reference_line_info.h"
 
 #include <functional>
-#include <unordered_set>
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 
@@ -43,6 +42,9 @@ bool ReferenceLineInfo::Init() {
   if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
+  }
+  for (const auto& lane_segment : reference_line_.map_path().lane_segments()) {
+    reference_line_lane_id_set_.insert(lane_segment.lane->id().id());
   }
   return true;
 }

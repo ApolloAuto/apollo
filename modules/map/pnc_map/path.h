@@ -149,7 +149,7 @@ class PathApproximation {
   double _max_error = 0;
   double _max_sqr_error = 0;
 
-  int _num_points = 0;
+  int num_points_ = 0;
   std::vector<int> _original_ids;
   std::vector<common::math::LineSegment2d> _segments;
   std::vector<double> _max_error_per_segment;
@@ -210,14 +210,14 @@ class Path {
   bool get_heading_along_path(const common::math::Vec2d& point,
                               double* heading) const;
 
-  int num_points() const { return _num_points; }
-  int num_segments() const { return _num_segments; }
-  const std::vector<MapPathPoint>& path_points() const { return _path_points; }
+  int num_points() const { return num_points_; }
+  int num_segments() const { return num_segments_; }
+  const std::vector<MapPathPoint>& path_points() const { return path_points_; }
   const std::vector<LaneSegment>& lane_segments() const {
-    return _lane_segments;
+    return lane_segments_;
   }
   const std::vector<LaneSegment>& lane_segments_to_next_point() const {
-    return _lane_segments_to_next_point;
+    return lane_segments_to_next_point_;
   }
   const std::vector<common::math::Vec2d>& unit_directions() const {
     return _unit_directions;
@@ -279,11 +279,11 @@ class Path {
                         std::vector<PathOverlap>* const overlaps) const;
 
  protected:
-  int _num_points = 0;
-  int _num_segments = 0;
-  std::vector<MapPathPoint> _path_points;
-  std::vector<LaneSegment> _lane_segments;
-  std::vector<LaneSegment> _lane_segments_to_next_point;
+  int num_points_ = 0;
+  int num_segments_ = 0;
+  std::vector<MapPathPoint> path_points_;
+  std::vector<LaneSegment> lane_segments_;
+  std::vector<LaneSegment> lane_segments_to_next_point_;
   std::vector<common::math::Vec2d> _unit_directions;
   double _length = 0.0;
   std::vector<double> _accumulated_s;
