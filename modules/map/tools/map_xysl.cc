@@ -45,29 +45,29 @@ DEFINE_double(s, 0.0, "s");
 DEFINE_double(l, 0.0, "l");
 
 namespace apollo {
-namespace tools {
+namespace hdmap {
 
 class MapUtil {
  public:
   explicit MapUtil(const std::string &map_filename) : _map_client(nullptr) {
-    _map_client.reset(new apollo::hdmap::HDMapImpl());
+    _map_client.reset(new HDMapImpl());
     _map_client->LoadMapFromFile(map_filename);
   }
 
-  const apollo::hdmap::OverlapInfo *get_overlap(const std::string &overlap_id) {
-    auto ret = _map_client->GetOverlapById(hdmap::MakeMapId(overlap_id));
+  const OverlapInfo *get_overlap(const std::string &overlap_id) {
+    auto ret = _map_client->GetOverlapById(MakeMapId(overlap_id));
     AERROR_IF(ret == nullptr) << "failed to find overlap[" << overlap_id << "]";
     return ret.get();
   }
 
-  const ::apollo::hdmap::SignalInfo *get_signal(const std::string &signal_id) {
-    auto ret = _map_client->GetSignalById(hdmap::MakeMapId(signal_id));
+  const SignalInfo *get_signal(const std::string &signal_id) {
+    auto ret = _map_client->GetSignalById(MakeMapId(signal_id));
     AERROR_IF(ret == nullptr) << "failed to find overlap[" << signal_id << "]";
     return ret.get();
   }
 
-  const ::apollo::hdmap::LaneInfo *get_lane(const std::string &lane_id) {
-    auto ret = _map_client->GetLaneById(hdmap::MakeMapId(lane_id));
+  const LaneInfo *get_lane(const std::string &lane_id) {
+    auto ret = _map_client->GetLaneById(MakeMapId(lane_id));
     AERROR_IF(ret == nullptr) << "failed to find lane[" << lane_id << "]";
     return ret.get();
   }
@@ -77,7 +77,7 @@ class MapUtil {
     QUIT_IF(lane_id == nullptr, -1, ERROR, "arg lane id is null");
     QUIT_IF(s == nullptr, -2, ERROR, "arg s is null");
     QUIT_IF(l == nullptr, -3, ERROR, "arg l is null");
-    ::apollo::hdmap::LaneInfoConstPtr lane = nullptr;
+    LaneInfoConstPtr lane = nullptr;
     int ret = _map_client->GetNearestLane(point, &lane, s, l);
     QUIT_IF(ret != 0, -4, ERROR, "get_nearest_lane failed with ret[%d]", ret);
     QUIT_IF(lane == nullptr, -5, ERROR, "lane is null");
@@ -90,8 +90,8 @@ class MapUtil {
                   double *heading) {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
-    const ::apollo::hdmap::LaneInfo* lane_info_ptr =
-        _map_client->GetLaneById(hdmap::MakeMapId(lane_id)).get();
+    const LaneInfo* lane_info_ptr =
+        _map_client->GetLaneById(MakeMapId(lane_id)).get();
     QUIT_IF(lane_info_ptr == nullptr, -3,
             ERROR, "get_smooth_point_from_lane[%s] failed",
             lane_id.c_str());
@@ -103,8 +103,7 @@ class MapUtil {
                       const std::string &lane_id,
                       double *s, double *l) {
     QUIT_IF(s == nullptr, -1, ERROR, "arg s is nullptr");
-    const ::apollo::hdmap::LaneInfo *lane =
-        _map_client->GetLaneById(hdmap::MakeMapId(lane_id)).get();
+    const LaneInfo *lane = _map_client->GetLaneById(MakeMapId(lane_id)).get();
     QUIT_IF(lane == nullptr, -2, ERROR, "get_lane_by_id[%s] failed",
             lane_id.c_str());
     bool ret = lane->get_projection(vec2d, s, l);
@@ -114,15 +113,15 @@ class MapUtil {
             vec2d.x(), vec2d.y());
     return 0;
   }
-  const ::apollo::hdmap::HDMapImpl *get_map_client() const {
+  const HDMapImpl *get_map_client() const {
     return _map_client.get();
   }
 
  private:
-  std::unique_ptr<apollo::hdmap::HDMapImpl> _map_client;
+  std::unique_ptr<HDMapImpl> _map_client;
 };
 
-}  // namespace tools
+}  // namespace hdmap
 }  // namespace apollo
 
 std::ostream &operator<<(
@@ -141,7 +140,7 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   const std::string map_file = apollo::hdmap::BaseMapFile();
-  ::apollo::tools::MapUtil map_util(map_file);
+  ::apollo::hdmap::MapUtil map_util(map_file);
 
   if (FLAGS_xy_to_sl) {
     double x = FLAGS_x;
