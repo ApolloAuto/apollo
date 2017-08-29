@@ -34,6 +34,8 @@ using common::TrajectoryPoint;
 
 DiscretizedTrajectory::DiscretizedTrajectory(
     std::vector<TrajectoryPoint> trajectory_points) {
+  CHECK(!trajectory_points.empty())
+      << "trajectory_points should NOT be empty()";
   trajectory_points_ = std::move(trajectory_points);
 }
 
@@ -85,27 +87,32 @@ TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
 
 std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
     const double relative_time) const {
+  CHECK(!trajectory_points_.empty());
+
+  if (relative_time >= trajectory_points_.back().relative_time()) {
+    return trajectory_points_.size() - 1;
+  }
   auto func = [](const TrajectoryPoint& tp, const double relative_time) {
     return tp.relative_time() < relative_time;
   };
   auto it_lower =
       std::lower_bound(trajectory_points_.begin(), trajectory_points_.end(),
                        relative_time, func);
-  return (std::uint32_t)(it_lower - trajectory_points_.begin());
+  return std::distance(trajectory_points_.begin(), it_lower);
 }
 
 std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
     const common::math::Vec2d& position) const {
-  double dist_min = std::numeric_limits<double>::max();
+  double dist_sqr_min = std::numeric_limits<double>::max();
   std::uint32_t index_min = 0;
   for (std::uint32_t i = 0; i < trajectory_points_.size(); ++i) {
-    const common::math::Vec2d coordinate(
+    const common::math::Vec2d curr_point(
         trajectory_points_[i].path_point().x(),
         trajectory_points_[i].path_point().y());
-    common::math::Vec2d dist_vec = coordinate - position;
-    double dist = dist_vec.InnerProd(dist_vec);
-    if (dist < dist_min) {
-      dist_min = dist;
+
+    const double dist_sqr = curr_point.DistanceSquareTo(position);
+    if (dist_sqr < dist_sqr_min) {
+      dist_sqr_min = dist_sqr;
       index_min = i;
     }
   }
@@ -141,8 +148,8 @@ std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
   return trajectory_points_.size();
 }
 
-const std::vector<TrajectoryPoint>&
-DiscretizedTrajectory::trajectory_points() const {
+const std::vector<TrajectoryPoint>& DiscretizedTrajectory::trajectory_points()
+    const {
   return trajectory_points_;
 }
 
@@ -159,8 +166,8 @@ bool DiscretizedTrajectory::Valid() const {
   }
 
   for (std::size_t i = 1; i < size; ++i) {
-    if (!(trajectory_points_[i - 1].relative_time()
-        < trajectory_points_[i].relative_time())) {
+    if (!(trajectory_points_[i - 1].relative_time() <
+          trajectory_points_[i].relative_time())) {
       return false;
     }
   }
