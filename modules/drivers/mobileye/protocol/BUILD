@@ -70,3 +70,4 @@ cc_test(
     ],
 )
 
+cpplint()
