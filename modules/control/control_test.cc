@@ -45,7 +45,7 @@ TEST_F(ControlTest, Init) {
   auto result = common::Status(
       common::ErrorCode::CONTROL_INIT_ERROR,
       "Unable to load control conf file: " + FLAGS_control_conf_file);
-  EXPECT_EQ(result, control_.Init());
+  EXPECT_DEATH(control_.Init(), "Unable to load control conf file");
   FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
   EXPECT_DEATH(control_.Init(), "Unable to parse adapter config file " +
                                     FLAGS_adapter_config_path);
