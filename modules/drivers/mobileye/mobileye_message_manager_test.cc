@@ -21,8 +21,8 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/drivers/sensor_protocol_data.h"
 #include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/drivers/sensor_protocol_data.h"
 
 namespace apollo {
 namespace drivers {
@@ -51,5 +51,123 @@ TEST(MessageManagerTest, TestProtocolDetails738) {
   EXPECT_EQ(mobileye.details_738().go(), 15);
 }
 
-}  // namespace drivers 
+TEST(MessageManagerTest, TestProtocolDetails) {
+  SensorMessageManager<Mobileye> manager;
+
+  int32_t length = 8;
+  uint8_t bytes[8];
+
+  bytes[0] = 0b00000010;
+  bytes[1] = 0b00000101;
+  bytes[2] = 0b00000101;
+  bytes[3] = 0b11111111;
+  bytes[4] = 0b00000001;
+  bytes[5] = 0b00000011;
+
+  manager.Parse(0x738, bytes, length);
+
+  bytes[0] = 0b00000001;
+  bytes[1] = 0b10000000;
+  bytes[2] = 0b00000001;
+  bytes[3] = 0b01000000;
+  bytes[4] = 0b00000010;
+  bytes[5] = 0b00000000;
+  bytes[6] = 0b00110000;
+  bytes[7] = 0b00000011;
+
+  manager.Parse(0x739, bytes, length);
+
+  bytes[0] = 0b00010001;
+  bytes[1] = 0b10000100;
+  bytes[2] = 0b00000011;
+  bytes[3] = 0b00000000;
+  bytes[4] = 0b00000000;
+  bytes[5] = 0b00000000;
+  bytes[6] = 0b00000000;
+  bytes[7] = 0b00000000;
+
+  manager.Parse(0x73a, bytes, length);
+
+  bytes[0] = 0b00000000;
+  bytes[1] = 0b00000000;
+  bytes[2] = 0b00000000;
+  bytes[3] = 0b00000000;
+  bytes[4] = 0b00000000;
+  bytes[5] = 0b00010000;
+  bytes[6] = 0b00110000;
+  bytes[7] = 0b00000111;
+
+  manager.Parse(0x73b, bytes, length);
+
+  bytes[0] = 0b00000001;
+  bytes[1] = 0b10000000;
+  bytes[2] = 0b00000001;
+  bytes[3] = 0b01000000;
+  bytes[4] = 0b00000010;
+  bytes[5] = 0b00000000;
+  bytes[6] = 0b00110000;
+  bytes[7] = 0b00000011;
+
+  manager.Parse(0x73c, bytes, length);
+
+  bytes[0] = 0b00010001;
+  bytes[1] = 0b10000100;
+  bytes[2] = 0b00000011;
+  bytes[3] = 0b00000000;
+  bytes[4] = 0b00000000;
+  bytes[5] = 0b00000000;
+  bytes[6] = 0b00000000;
+  bytes[7] = 0b00000000;
+
+  manager.Parse(0x73d, bytes, length);
+
+  bytes[0] = 0b00000000;
+  bytes[1] = 0b00000000;
+  bytes[2] = 0b00000000;
+  bytes[3] = 0b00000000;
+  bytes[4] = 0b00000000;
+  bytes[5] = 0b00010000;
+  bytes[6] = 0b00110000;
+  bytes[7] = 0b00000111;
+
+  manager.Parse(0x73e, bytes, length);
+
+  Mobileye mobileye;
+  EXPECT_EQ(manager.GetSensorData(&mobileye), ErrorCode::OK);
+
+  EXPECT_EQ(mobileye.details_738().num_obstacles(), 2);
+  EXPECT_EQ(mobileye.details_738().go(), 15);
+
+  EXPECT_EQ(2, mobileye.details_739_size());
+  EXPECT_EQ(2, mobileye.details_73a_size());
+  EXPECT_EQ(2, mobileye.details_73b_size());
+
+  EXPECT_EQ(1, mobileye.details_739(0).obstacle_id());
+  EXPECT_NEAR(24.0, mobileye.details_739(0).obstacle_pos_x(), 1e-6);
+  EXPECT_NEAR(-28.0, mobileye.details_739(0).obstacle_pos_y(), 1e-6);
+  EXPECT_EQ(3, mobileye.details_739(0).obstacle_type());
+  EXPECT_EQ(3, mobileye.details_739(0).obstacle_status());
+
+  EXPECT_NEAR(8.5, mobileye.details_73a(0).obstacle_length(), 1e-6);
+  EXPECT_NEAR(6.6, mobileye.details_73a(0).obstacle_width(), 1e-6);
+  EXPECT_EQ(3, mobileye.details_73a(0).obstacle_age());
+
+  EXPECT_EQ(true, mobileye.details_73b(0).obstacle_replaced());
+  EXPECT_NEAR(18.4, mobileye.details_73b(0).obstacle_angle(), 1e-6);
+
+  EXPECT_EQ(1, mobileye.details_739(1).obstacle_id());
+  EXPECT_NEAR(24.0, mobileye.details_739(1).obstacle_pos_x(), 1e-6);
+  EXPECT_NEAR(-28.0, mobileye.details_739(1).obstacle_pos_y(), 1e-6);
+  EXPECT_EQ(3, mobileye.details_739(1).obstacle_type());
+  EXPECT_EQ(3, mobileye.details_739(1).obstacle_status());
+
+  EXPECT_NEAR(8.5, mobileye.details_73a(1).obstacle_length(), 1e-6);
+  EXPECT_NEAR(6.6, mobileye.details_73a(1).obstacle_width(), 1e-6);
+  EXPECT_EQ(3, mobileye.details_73a(1).obstacle_age());
+
+  EXPECT_EQ(true, mobileye.details_73b(1).obstacle_replaced());
+  EXPECT_NEAR(18.4, mobileye.details_73b(1).obstacle_angle(), 1e-6);
+}
+
+}  // namespace drivers
 }  // namespace apollo

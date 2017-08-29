@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/mobileye/protocol/details_738.h"
+#include "modules/drivers/mobileye/protocol/details_739.h"
 
 #include "gtest/gtest.h"
 
@@ -22,28 +22,34 @@ namespace apollo {
 namespace drivers {
 namespace mobileye {
 
-class Details738Test : public ::testing::Test {
+class Details739Test : public ::testing::Test {
  public:
   virtual void SetUp() {}
 };
 
-TEST_F(Details738Test, Parse) {
-  Details738 details_738;
+TEST_F(Details739Test, Parse) {
+  Details739 details_739;
   int32_t length = 8;
   Mobileye mobileye;
   uint8_t bytes[8];
 
-  bytes[0] = 0b00000010;
-  bytes[1] = 0b00000101;
-  bytes[2] = 0b00000101;
-  bytes[3] = 0b11111111;
-  bytes[4] = 0b00000001;
-  bytes[5] = 0b00000011;
+  bytes[0] = 0b00000001;
+  bytes[1] = 0b10000000;
+  bytes[2] = 0b00000001;
+  bytes[3] = 0b01000000;
+  bytes[4] = 0b00000010;
+  bytes[5] = 0b00000000;
+  bytes[6] = 0b00110000;
+  bytes[7] = 0b00000011;
 
-  details_738.Parse(bytes, length, &mobileye);
-  // TODO(lizh): add more checks
-  EXPECT_EQ(2, mobileye.details_738().num_obstacles());
-  EXPECT_EQ(15, mobileye.details_738().go());
+  details_739.Parse(bytes, length, &mobileye);
+
+  EXPECT_EQ(1, mobileye.details_739_size());
+  EXPECT_EQ(1, mobileye.details_739(0).obstacle_id());
+  EXPECT_NEAR(24.0, mobileye.details_739(0).obstacle_pos_x(), 1e-6);
+  EXPECT_NEAR(-28.0, mobileye.details_739(0).obstacle_pos_y(), 1e-6);
+  EXPECT_EQ(3, mobileye.details_739(0).obstacle_type());
+  EXPECT_EQ(3, mobileye.details_739(0).obstacle_status());
 }
 
 }  // namespace mobileye

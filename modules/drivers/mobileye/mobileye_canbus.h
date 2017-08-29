@@ -21,9 +21,9 @@
 #ifndef MODULES_DRIVERS_MOBILEYE_MOBILEYE_CANBUS_H_
 #define MODULES_DRIVERS_MOBILEYE_MOBILEYE_CANBUS_H_
 
-#include "modules/drivers/sensor_canbus.h"
 #include "modules/drivers/mobileye/mobileye_message_manager.h"
 #include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/drivers/sensor_canbus.h"
 
 /**
  * @namespace apollo::drivers
@@ -44,11 +44,11 @@ void SensorCanbus<Mobileye>::PublishSensorData() {
   sensor_message_manager_->GetSensorData(&mobileye);
   ADEBUG << mobileye.ShortDebugString();
 
+  AdapterManager::FillMobileyeHeader(FLAGS_node_name, &mobileye);
   AdapterManager::PublishMobileye(mobileye);
 }
 
-}  // namespace drivers 
+}  // namespace drivers
 }  // namespace apollo
 
 #endif  // MODULES_DRIVERS_MOBILEYE_MOBILEYE_CANBUS_H_
-
