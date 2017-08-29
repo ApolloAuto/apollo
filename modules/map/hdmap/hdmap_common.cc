@@ -246,15 +246,20 @@ double LaneInfo::get_width_from_sample(
 }
 
 bool LaneInfo::is_on_lane(const apollo::common::math::Vec2d &point) const {
-  apollo::common::math::Vec2d map_point(0.0, 0.0);
-  double s_offset = 0.0;
-  int s_offset_index = 0;
-  double dist = distance_to(point, &map_point, &s_offset, &s_offset_index);
+  double accumulate_s = 0.0;
+  double lateral = 0.0;
+  if (!get_projection(point, &accumulate_s, &lateral)) {
+    return false;
+  }
+
+  if (accumulate_s > total_length() || accumulate_s < 0.0) {
+    return false;
+  }
 
   double left_width = 0.0;
   double right_width = 0.0;
-  get_width(s_offset, &left_width, &right_width);
-  if (dist < left_width && dist > -right_width) {
+  get_width(accumulate_s, &left_width, &right_width);
+  if (lateral < left_width && lateral > -right_width) {
     return true;
   }
   return false;
