@@ -24,6 +24,7 @@
 #include <limits>
 #include <list>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -85,8 +86,6 @@ class ReferenceLineInfo {
    **/
   bool IsStartFrom(const ReferenceLineInfo& previous_reference_line_info) const;
 
-  bool CombinePathAndSpeedProfile(const double time_resolution,
-                                  const double relative_time);
   planning_internal::Debug* mutable_debug() { return &debug_; }
   const planning_internal::Debug& debug() const { return debug_; }
   LatencyStats* mutable_latency_stats() { return &latency_stats_; }
@@ -103,6 +102,8 @@ class ReferenceLineInfo {
 
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
+
+  const hdmap::PncMap* pnc_map() const { return pnc_map_; }
 
  private:
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
@@ -130,6 +131,8 @@ class ReferenceLineInfo {
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;
+
+  std::unordered_set<std::string> reference_line_lane_id_set_;
 };
 
 }  // namespace planning
