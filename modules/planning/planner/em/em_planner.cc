@@ -48,7 +48,6 @@ using common::ErrorCode;
 using common::SpeedPoint;
 using common::SLPoint;
 using common::TrajectoryPoint;
-using common::VehicleState;
 using common::math::Vec2d;
 
 void EMPlanner::RegisterTasks() {

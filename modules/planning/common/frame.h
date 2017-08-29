@@ -70,7 +70,6 @@ class Frame {
   ADCTrajectory *MutableADCTrajectory();
 
   const PublishableTrajectory &computed_trajectory() const;
-  const localization::Pose &VehicleInitPose() const;
 
   const routing::RoutingResponse &routing_response() const;
 
