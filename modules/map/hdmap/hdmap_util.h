@@ -76,10 +76,10 @@ class HDMapUtil {
  public:
   // Get default base map from the file specified by global flags.
   // Return nullptr if failed to load.
-  static const HDMap* BaseMap();
+  static const HDMap* BaseMapPtr();
   // Similar to BaseMap(), but garantee to return a valid HDMap, or else raise
   // fatal error.
-  static const HDMap& BaseMapRef();
+  static const HDMap& BaseMap();
 
   // Reload the base map from the file specified by global flags.
   static bool ReloadBaseMap();

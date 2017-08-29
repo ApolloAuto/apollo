@@ -60,19 +60,19 @@ do { \
 class MapUtil {
  public:
   const OverlapInfo *get_overlap(const std::string &overlap_id) {
-    auto ret = HDMapUtil::BaseMapRef().GetOverlapById(MakeMapId(overlap_id));
+    auto ret = HDMapUtil::BaseMap().GetOverlapById(MakeMapId(overlap_id));
     AERROR_IF(ret == nullptr) << "failed to find overlap[" << overlap_id << "]";
     return ret.get();
   }
 
   const SignalInfo *get_signal(const std::string &signal_id) {
-    auto ret = HDMapUtil::BaseMapRef().GetSignalById(MakeMapId(signal_id));
+    auto ret = HDMapUtil::BaseMap().GetSignalById(MakeMapId(signal_id));
     AERROR_IF(ret == nullptr) << "failed to find overlap[" << signal_id << "]";
     return ret.get();
   }
 
   const LaneInfo *get_lane(const std::string &lane_id) {
-    auto ret = HDMapUtil::BaseMapRef().GetLaneById(MakeMapId(lane_id));
+    auto ret = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     AERROR_IF(ret == nullptr) << "failed to find lane[" << lane_id << "]";
     return ret.get();
   }
@@ -83,7 +83,7 @@ class MapUtil {
     QUIT_IF(s == nullptr, -2, ERROR, "arg s is null");
     QUIT_IF(l == nullptr, -3, ERROR, "arg l is null");
     LaneInfoConstPtr lane = nullptr;
-    int ret = HDMapUtil::BaseMapRef().GetNearestLane(point, &lane, s, l);
+    int ret = HDMapUtil::BaseMap().GetNearestLane(point, &lane, s, l);
     QUIT_IF(ret != 0, -4, ERROR, "get_nearest_lane failed with ret[%d]", ret);
     QUIT_IF(lane == nullptr, -5, ERROR, "lane is null");
     *lane_id = lane->id().id();
@@ -94,7 +94,7 @@ class MapUtil {
                   PointENU *point, double *heading) {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
-    const auto lane = HDMapUtil::BaseMapRef().GetLaneById(MakeMapId(lane_id));
+    const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     QUIT_IF(lane == nullptr, -3, ERROR,
             "get_smooth_point_from_lane[%s] failed", lane_id.c_str());
     *point = lane->get_smooth_point(s);
@@ -105,7 +105,7 @@ class MapUtil {
                       const std::string &lane_id,
                       double *s, double *l) {
     QUIT_IF(s == nullptr, -1, ERROR, "arg s is nullptr");
-    const auto lane = HDMapUtil::BaseMapRef().GetLaneById(MakeMapId(lane_id));
+    const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     QUIT_IF(lane == nullptr, -2, ERROR,
             "get_lane_by_id[%s] failed", lane_id.c_str());
     bool ret = lane->get_projection(vec2d, s, l);

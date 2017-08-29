@@ -36,8 +36,7 @@ namespace hdmap {
 
 apollo::common::PointENU SLToXYZ(const std::string& lane_id,
                                  const double s, const double l) {
-  const auto lane_info = HDMapUtil::BaseMapRef().GetLaneById(
-      MakeMapId(lane_id));
+  const auto lane_info = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
   CHECK(lane_info);
   return lane_info->get_smooth_point(s);
 }
@@ -49,7 +48,7 @@ void XYZToSL(const apollo::common::PointENU& point,
   CHECK(l);
   LaneInfoConstPtr lane = nullptr;
 
-  CHECK_EQ(HDMapUtil::BaseMapRef().GetNearestLane(point, &lane, s, l), 0);
+  CHECK_EQ(HDMapUtil::BaseMap().GetNearestLane(point, &lane, s, l), 0);
   *lane_id = lane->id().id();
 }
 
