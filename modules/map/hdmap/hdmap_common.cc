@@ -19,13 +19,13 @@ limitations under the License.
 #include <iostream>
 #include <limits>
 
-#include "glog/logging.h"
-
+#include "modules/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace {
+using apollo::common::math::Vec2d;
 
 // Minimum error in lane segmentation.
 const double kSegmentationEpsilon = 0.2;
@@ -33,7 +33,7 @@ const double kSegmentationEpsilon = 0.2;
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
 
-void remove_duplicates(std::vector<apollo::common::math::Vec2d> *points) {
+void remove_duplicates(std::vector<Vec2d> *points) {
   CHECK_NOTNULL(points);
 
   int count = 0;
@@ -48,7 +48,7 @@ void remove_duplicates(std::vector<apollo::common::math::Vec2d> *points) {
 }
 
 void points_from_curve(const apollo::hdmap::Curve &input_curve,
-                       std::vector<apollo::common::math::Vec2d> *points) {
+                       std::vector<Vec2d> *points) {
   CHECK_NOTNULL(points)->clear();
 
   for (const auto &curve : input_curve.segment()) {
@@ -65,7 +65,7 @@ void points_from_curve(const apollo::hdmap::Curve &input_curve,
 
 apollo::common::math::Polygon2d convert_to_polygon2d(
     const apollo::hdmap::Polygon &polygon) {
-  std::vector<apollo::common::math::Vec2d> points;
+  std::vector<Vec2d> points;
   points.reserve(polygon.point_size());
   for (const auto &point : polygon.point()) {
     points.emplace_back(point.x(), point.y());
@@ -82,24 +82,21 @@ apollo::common::math::Polygon2d convert_to_polygon2d(
 void segments_from_curve(
     const apollo::hdmap::Curve &curve,
     std::vector<apollo::common::math::LineSegment2d> *segments) {
-  std::vector<apollo::common::math::Vec2d> points;
+  std::vector<Vec2d> points;
   points_from_curve(curve, &points);
   for (size_t i = 0; i + 1 < points.size(); ++i) {
     segments->emplace_back(points[i], points[i + 1]);
   }
 }
 
-apollo::common::PointENU point_from_vec2d(
-    const apollo::common::math::Vec2d &point) {
+apollo::common::PointENU point_from_vec2d(const Vec2d &point) {
   apollo::common::PointENU pt;
   pt.set_x(point.x());
   pt.set_y(point.y());
   return pt;
 }
-apollo::common::math::Vec2d vec2d_from_point(
-    const apollo::common::PointENU &point) {
-  return apollo::common::math::Vec2d(point.x(), point.y());
-  ;
+Vec2d vec2d_from_point(const apollo::common::PointENU &point) {
+  return {point.x(), point.y()};
 }
 
 }  // namespace
@@ -245,7 +242,7 @@ double LaneInfo::get_width_from_sample(
   return sample1.second * ratio + sample2.second * (1.0 - ratio);
 }
 
-bool LaneInfo::is_on_lane(const apollo::common::math::Vec2d &point) const {
+bool LaneInfo::is_on_lane(const Vec2d &point) const {
   double accumulate_s = 0.0;
   double lateral = 0.0;
   if (!get_projection(point, &accumulate_s, &lateral)) {
@@ -266,7 +263,7 @@ bool LaneInfo::is_on_lane(const apollo::common::math::Vec2d &point) const {
 }
 
 bool LaneInfo::is_on_lane(const apollo::common::math::Box2d &box) const {
-  std::vector<apollo::common::math::Vec2d> corners;
+  std::vector<Vec2d> corners;
   box.GetAllCorners(&corners);
   for (const auto &corner : corners) {
     if (!is_on_lane(corner)) {
@@ -300,13 +297,13 @@ apollo::common::PointENU LaneInfo::get_smooth_point(double s) const {
   return point_from_vec2d(smooth_point);
 }
 
-double LaneInfo::distance_to(const apollo::common::math::Vec2d &point) const {
+double LaneInfo::distance_to(const Vec2d &point) const {
   const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
   return segment_box->DistanceTo(point);
 }
 
-double LaneInfo::distance_to(const apollo::common::math::Vec2d &point,
-                             apollo::common::math::Vec2d *map_point,
+double LaneInfo::distance_to(const Vec2d &point,
+                             Vec2d *map_point,
                              double *s_offset, int *s_offset_index) const {
   const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
   int index = segment_box->id();
@@ -317,17 +314,17 @@ double LaneInfo::distance_to(const apollo::common::math::Vec2d &point,
   return distance;
 }
 
-apollo::common::PointENU LaneInfo::get_nearest_point(
-    const apollo::common::math::Vec2d &point, double *distance) const {
+apollo::common::PointENU LaneInfo::get_nearest_point(const Vec2d &point,
+                                                     double *distance) const {
   const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
   int index = segment_box->id();
-  apollo::common::math::Vec2d nearest_point;
+  Vec2d nearest_point;
   *distance = _segments[index].DistanceTo(point, &nearest_point);
 
   return point_from_vec2d(nearest_point);
 }
 
-bool LaneInfo::get_projection(const apollo::common::math::Vec2d &point,
+bool LaneInfo::get_projection(const Vec2d &point,
                               double *accumulate_s, double *lateral) const {
   CHECK_NOTNULL(accumulate_s);
   CHECK_NOTNULL(lateral);
@@ -462,7 +459,7 @@ void SignalInfo::init() {
     segments_from_curve(stop_line, &_segments);
   }
   CHECK(!_segments.empty());
-  std::vector<apollo::common::math::Vec2d> points;
+  std::vector<Vec2d> points;
   for (const auto &segment : _segments) {
     points.emplace_back(segment.start());
     points.emplace_back(segment.end());
