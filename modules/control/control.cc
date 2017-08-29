@@ -221,6 +221,7 @@ Status Control::CheckInput() {
   AdapterManager::Observe();
   auto localization_adapter = AdapterManager::GetLocalization();
   if (localization_adapter->Empty()) {
+    AWARN_EVERY(100) << "No Localization msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No localization msg");
   }
   localization_ = localization_adapter->GetLatestObserved();
@@ -228,6 +229,7 @@ Status Control::CheckInput() {
 
   auto chassis_adapter = AdapterManager::GetChassis();
   if (chassis_adapter->Empty()) {
+    AWARN_EVERY(100) << "No Chassis msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No chassis msg");
   }
   chassis_ = chassis_adapter->GetLatestObserved();
@@ -235,9 +237,15 @@ Status Control::CheckInput() {
 
   auto trajectory_adapter = AdapterManager::GetPlanning();
   if (trajectory_adapter->Empty()) {
+    AWARN_EVERY(100) << "No planning msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");
   }
   trajectory_ = trajectory_adapter->GetLatestObserved();
+  if (trajectory_.trajectory_point_size() == 0) {
+    AWARN_EVERY(100) << "planning has no trajectory point. ";
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
+                  "planning has no trajectory point.");
+  }
 
   common::VehicleState::instance()->Update(localization_, chassis_);
 
