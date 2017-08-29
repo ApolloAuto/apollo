@@ -312,6 +312,8 @@ const SimulationWorld &SimulationWorldService::Update() {
     *world_.add_object() = kv.second;
   }
 
+  world_.set_sequence_num(world_.sequence_num() + 1);
+
   return world_;
 }
 
