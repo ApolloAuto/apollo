@@ -57,5 +57,3 @@ TEST_F(YongfengchanyeyuanTest, cruise) {
 
 }  // namespace planning
 }  // namespace apollo
-
-TMAIN;
