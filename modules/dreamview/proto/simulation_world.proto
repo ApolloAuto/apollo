@@ -156,10 +156,13 @@ message Debug {
     optional string novatel_position_type = 1;
 }
 
-// Next-id: 30
+// Next-id: 17
 message SimulationWorld {
   // Time
   optional double timestamp_sec = 1;
+
+  // Sequence number
+  optional uint64 sequence_num = 2;
 
   // Objects in the world and the associated predictions/decisions
   repeated Object object = 3;
