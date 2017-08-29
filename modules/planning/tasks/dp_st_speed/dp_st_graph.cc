@@ -406,7 +406,6 @@ Status DpStGraph::MakeObjectDecision(const SpeedData& speed_profile,
     if (path_obstacle->HasLongitudinalDecision()) {
       continue;
     }
-    CHECK_EQ(boundary.points().size(), 4);
 
     double start_t = boundary.min_t();
     double end_t = boundary.max_t();
@@ -640,8 +639,6 @@ double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
 }
 
 bool DpStGraph::CheckIsFollowByT(const StBoundary& boundary) const {
-  DCHECK_EQ(boundary.points().size(), 4);
-
   if (boundary.BottomLeftPoint().s() > boundary.BottomRightPoint().s()) {
     return false;
   }
