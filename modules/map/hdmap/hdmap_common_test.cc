@@ -342,7 +342,7 @@ TEST_F(HDMapCommonTestSuite, point_is_on_lane) {
   EXPECT_TRUE(lane_info.is_on_lane(target_in_point_2));
 
   apollo::common::math::Vec2d target_in_point_3(0.5, 1.5);
-  EXPECT_TRUE(lane_info.is_on_lane(target_in_point_3));
+  EXPECT_TRUE(!lane_info.is_on_lane(target_in_point_3));
 
   apollo::common::math::Vec2d target_out_point_4(1.5, 3);
   EXPECT_TRUE(!lane_info.is_on_lane(target_out_point_4));
