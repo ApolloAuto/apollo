@@ -97,31 +97,20 @@ int HDMapInput::MergeBoundaryJunction(
   (*mapptr)->junction.resize(junctions.size());
 
   for (size_t i = 0; i < boundaries.size(); i++) {
-    for (size_t rbi = 0; rbi < boundaries[i]->road_boundaries.size(); ++rbi) {
-      const apollo::hdmap::RoadBoundary& kRoadBoundary =
-          boundaries[i]->road_boundaries[rbi];
-      if (kRoadBoundary.has_outer_polygon() &&
-          kRoadBoundary.outer_polygon().edge_size() > 0) {
-        for (int j = 0; j < kRoadBoundary.outer_polygon().edge_size(); ++j) {
-          const BoundaryEdge& edge = kRoadBoundary.outer_polygon().edge(j);
-          if (edge.type() == BoundaryEdge_Type_LEFT_BOUNDARY &&
-              edge.has_curve()) {
-            for (int k = 0; k < edge.curve().segment_size(); ++k) {
-              if (edge.curve().segment(k).has_line_segment()) {
-                DownSampleBoundary(
-                    edge.curve().segment(k).line_segment(),
-                    &((*mapptr)->road_boundary[i].left_boundary));
-              }
-            }
-          } else if (edge.type() == BoundaryEdge_Type_RIGHT_BOUNDARY &&
-                     edge.has_curve()) {
-            for (int k = 0; k < edge.curve().segment_size(); ++k) {
-              if (edge.curve().segment(k).has_line_segment()) {
-                DownSampleBoundary(
-                    edge.curve().segment(k).line_segment(),
-                    &((*mapptr)->road_boundary[i].right_boundary));
-              }
-            }
+    for (const auto& road_boundary : boundaries[i]->road_boundaries()) {
+      auto& mapped_boundary = (*mapptr)->road_boundary[i];
+      for (const BoundaryEdge& edge : road_boundary.outer_polygon().edge()) {
+        PolygonDType* edge_side = nullptr;
+        if (edge.type() == BoundaryEdge::LEFT_BOUNDARY) {
+          edge_side = &mapped_boundary.left_boundary;
+        } else if (edge.type() == BoundaryEdge::RIGHT_BOUNDARY) {
+          edge_side = &mapped_boundary.right_boundary;
+        } else {
+          continue;
+        }
+        for (const auto& segment : edge.curve().segment()) {
+          if (segment.has_line_segment()) {
+            DownSampleBoundary(segment.line_segment(), edge_side);
           }
         }
       }
@@ -163,8 +152,8 @@ void HDMapInput::DownSampleBoundary(const apollo::hdmap::LineSegment& line,
   double acos_theta = 0.0;
   size_t raw_cloud_size = raw_cloud->points.size();
   if (raw_cloud_size <= 3) {
-    for (size_t i = 0; i < raw_cloud_size; ++i) {
-        out_boundary_line->push_back(raw_cloud->points[i]);
+    for (const auto& point : raw_cloud->points) {
+      out_boundary_line->push_back(point);
     }
     AINFO << "Points num < 3, so no need to downsample.";
     return;
