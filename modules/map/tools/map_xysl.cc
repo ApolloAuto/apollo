@@ -44,81 +44,76 @@ DEFINE_string(to_lane, "", "to_lane");
 DEFINE_double(s, 0.0, "s");
 DEFINE_double(l, 0.0, "l");
 
+using apollo::common::PointENU;
+
 namespace apollo {
 namespace hdmap {
 
+#define QUIT_IF(CONDITION, RET, LEVEL, MSG, ...) \
+do { \
+  if (CONDITION) { \
+    RAW_LOG(LEVEL, MSG, ##__VA_ARGS__); \
+    return RET; \
+  } \
+} while (0);
+
 class MapUtil {
  public:
-  explicit MapUtil(const std::string &map_filename) : _map_client(nullptr) {
-    _map_client.reset(new HDMapImpl());
-    _map_client->LoadMapFromFile(map_filename);
-  }
-
   const OverlapInfo *get_overlap(const std::string &overlap_id) {
-    auto ret = _map_client->GetOverlapById(MakeMapId(overlap_id));
+    auto ret = HDMapUtil::BaseMapRef().GetOverlapById(MakeMapId(overlap_id));
     AERROR_IF(ret == nullptr) << "failed to find overlap[" << overlap_id << "]";
     return ret.get();
   }
 
   const SignalInfo *get_signal(const std::string &signal_id) {
-    auto ret = _map_client->GetSignalById(MakeMapId(signal_id));
+    auto ret = HDMapUtil::BaseMapRef().GetSignalById(MakeMapId(signal_id));
     AERROR_IF(ret == nullptr) << "failed to find overlap[" << signal_id << "]";
     return ret.get();
   }
 
   const LaneInfo *get_lane(const std::string &lane_id) {
-    auto ret = _map_client->GetLaneById(MakeMapId(lane_id));
+    auto ret = HDMapUtil::BaseMapRef().GetLaneById(MakeMapId(lane_id));
     AERROR_IF(ret == nullptr) << "failed to find lane[" << lane_id << "]";
     return ret.get();
   }
 
-  int point_to_sl(const ::apollo::common::PointENU &point,
+  int point_to_sl(const PointENU &point,
                   std::string *lane_id, double *s, double *l) {
     QUIT_IF(lane_id == nullptr, -1, ERROR, "arg lane id is null");
     QUIT_IF(s == nullptr, -2, ERROR, "arg s is null");
     QUIT_IF(l == nullptr, -3, ERROR, "arg l is null");
     LaneInfoConstPtr lane = nullptr;
-    int ret = _map_client->GetNearestLane(point, &lane, s, l);
+    int ret = HDMapUtil::BaseMapRef().GetNearestLane(point, &lane, s, l);
     QUIT_IF(ret != 0, -4, ERROR, "get_nearest_lane failed with ret[%d]", ret);
     QUIT_IF(lane == nullptr, -5, ERROR, "lane is null");
     *lane_id = lane->id().id();
     return 0;
   }
 
-  int sl_to_point(const std::string &lane_id, const double s,
-                  const double l, ::apollo::common::PointENU *point,
-                  double *heading) {
+  int sl_to_point(const std::string &lane_id, const double s, const double l,
+                  PointENU *point, double *heading) {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
-    const LaneInfo* lane_info_ptr =
-        _map_client->GetLaneById(MakeMapId(lane_id)).get();
-    QUIT_IF(lane_info_ptr == nullptr, -3,
-            ERROR, "get_smooth_point_from_lane[%s] failed",
-            lane_id.c_str());
-    *point = lane_info_ptr->get_smooth_point(s);
+    const auto lane = HDMapUtil::BaseMapRef().GetLaneById(MakeMapId(lane_id));
+    QUIT_IF(lane == nullptr, -3, ERROR,
+            "get_smooth_point_from_lane[%s] failed", lane_id.c_str());
+    *point = lane->get_smooth_point(s);
     return 0;
   }
 
-  int lane_projection(const ::apollo::common::math::Vec2d &vec2d,
+  int lane_projection(const apollo::common::math::Vec2d &vec2d,
                       const std::string &lane_id,
                       double *s, double *l) {
     QUIT_IF(s == nullptr, -1, ERROR, "arg s is nullptr");
-    const LaneInfo *lane = _map_client->GetLaneById(MakeMapId(lane_id)).get();
-    QUIT_IF(lane == nullptr, -2, ERROR, "get_lane_by_id[%s] failed",
-            lane_id.c_str());
+    const auto lane = HDMapUtil::BaseMapRef().GetLaneById(MakeMapId(lane_id));
+    QUIT_IF(lane == nullptr, -2, ERROR,
+            "get_lane_by_id[%s] failed", lane_id.c_str());
     bool ret = lane->get_projection(vec2d, s, l);
     QUIT_IF(!ret, -3, ERROR,
             "lane[%s] get projection for point[%f, %f] failed",
-            lane_id.c_str(),
-            vec2d.x(), vec2d.y());
+            lane_id.c_str(), vec2d.x(), vec2d.y());
     return 0;
   }
-  const HDMapImpl *get_map_client() const {
-    return _map_client.get();
-  }
-
- private:
-  std::unique_ptr<HDMapImpl> _map_client;
 };
 
 }  // namespace hdmap
@@ -140,12 +135,12 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   const std::string map_file = apollo::hdmap::BaseMapFile();
-  ::apollo::hdmap::MapUtil map_util(map_file);
+  ::apollo::hdmap::MapUtil map_util;
 
   if (FLAGS_xy_to_sl) {
     double x = FLAGS_x;
     double y = FLAGS_y;
-    ::apollo::common::PointENU point;
+    PointENU point;
     point.set_x(x);
     point.set_y(y);
     point.set_z(0);
@@ -159,16 +154,15 @@ int main(int argc, char *argv[]) {
            lane_id.c_str(), s, l, heading);
   }
   if (FLAGS_sl_to_xy) {
-    ::apollo::common::PointENU point;
+    PointENU point;
     double heading = 0.0;
     map_util.sl_to_point(FLAGS_lane, FLAGS_s, FLAGS_l, &point, &heading);
     printf("x[%f] y[%f], heading[%f]\n", point.x(), point.y(), heading);
   }
   if (FLAGS_xy_to_lane) {
-    ::apollo::common::math::Vec2d vec2d(FLAGS_x, FLAGS_y);
     double s = 0.0;
     double l = 0.0;
-    int ret = map_util.lane_projection(vec2d, FLAGS_lane, &s, &l);
+    int ret = map_util.lane_projection({FLAGS_x, FLAGS_y}, FLAGS_lane, &s, &l);
     if (ret != 0) {
       printf("lane_projection for x[%f], y[%f], lane_id[%s] failed\n",
              FLAGS_x, FLAGS_y, FLAGS_lane.c_str());
@@ -177,13 +171,12 @@ int main(int argc, char *argv[]) {
     printf("lane[%s] s[%f], l[%f]\n", FLAGS_lane.c_str(), s, l);
   }
   if (FLAGS_lane_to_lane) {
-    ::apollo::common::PointENU point;
+    PointENU point;
     double heading = 0.0;
     map_util.sl_to_point(FLAGS_from_lane, FLAGS_s, 0.0, &point, &heading);
     double target_s = 0.0;
     double target_l = 0.0;
-    ::apollo::common::math::Vec2d vec2d(point.x(), point.y());
-    int ret = map_util.lane_projection(vec2d, FLAGS_to_lane,
+    int ret = map_util.lane_projection({point.x(), point.y()}, FLAGS_to_lane,
                                        &target_s, &target_l);
     if (ret != 0) {
       printf("lane_projection for lane[%s], s[%f] to lane_id[%s] failed\n",
@@ -197,11 +190,11 @@ int main(int argc, char *argv[]) {
     const auto *lane_ptr = map_util.get_lane(FLAGS_lane);
     const auto &lane = lane_ptr->lane();
 
-    ::apollo::common::PointENU start_point;
+    PointENU start_point;
     double start_heading = 0.0;
     map_util.sl_to_point(FLAGS_lane, 0, 0, &start_point, &start_heading);
 
-    ::apollo::common::PointENU end_point;
+    PointENU end_point;
     double end_heading = 0.0;
     map_util.sl_to_point(FLAGS_lane, lane_ptr->total_length(), 0,
                          &end_point, &end_heading);
@@ -287,7 +280,6 @@ int main(int argc, char *argv[]) {
       && FLAGS_dump_bin_map.empty()
       && FLAGS_signal_info.empty()
       && FLAGS_overlap.empty()) {
-    std::cout << "usage: --map_file" << std::endl;
     std::cout << "usage: --dump_txt_map" << std::endl;
     std::cout << "usage: --dump_bin_map" << std::endl;
     std::cout << "usage: --xy_to_sl --x --y" << std::endl;
