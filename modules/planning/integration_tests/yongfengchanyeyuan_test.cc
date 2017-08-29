@@ -36,7 +36,6 @@ class YongfengchanyeyuanTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_map_dir = "modules/map/data/yongfengchanyeyuan";
-    FLAGS_base_map_filename = "yongfengchanyeyuan.xml.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/yongfengchanyeyuan_test";
     FLAGS_test_routing_response_file = "1_routing.pb.txt";
   }
