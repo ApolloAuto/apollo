@@ -40,9 +40,9 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/localization/proto:pose_proto",
         "//modules/map/hdmap",
+        "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks:speed_optimizer",
         "//modules/planning/tasks/st_graph:st_boundary_mapper",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 

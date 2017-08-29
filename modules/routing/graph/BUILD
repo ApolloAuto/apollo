@@ -51,8 +51,8 @@ cc_test(
         "topo_node_test.cc",
     ],
     deps = [
-        ":routing_topo_node",
         ":routing_topo_graph",
+        ":routing_topo_node",
         "@gtest//:main",
     ],
 )
