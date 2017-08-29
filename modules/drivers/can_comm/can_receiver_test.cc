@@ -20,7 +20,7 @@
 
 #include "modules/canbus/can_client/fake/fake_can_client.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/drivers/mobileye_message_manager.h"
+#include "modules/drivers/mobileye/mobileye_message_manager.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/drivers/sensor_message_manager.h"
 

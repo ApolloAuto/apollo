@@ -25,7 +25,7 @@ cc_test(
         "//modules/canbus/can_client/fake:fake_can_client",
         "//modules/canbus/common:canbus_common",
         "//modules/common:log",
-        "//modules/drivers:mobileye_message_manager",
+        "//modules/drivers/mobileye:mobileye_message_manager",
         "//modules/drivers/mobileye/protocol:drivers_mobileye_protocol",
         "@gtest//:main",
     ],
