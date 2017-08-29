@@ -8,8 +8,8 @@ cc_library(
         "time.h",
     ],
     deps = [
-        "//modules/common:macro",
         "//modules/common:log",
+        "//modules/common:macro",
         "//modules/common/configs:config_gflags",
         "@ros//:ros_common",
     ],

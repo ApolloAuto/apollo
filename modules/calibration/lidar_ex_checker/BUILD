@@ -10,12 +10,12 @@ cc_library(
         "-Wno-deprecated",
     ],
     deps = [
+        "//modules/calibration/lidar_ex_checker/common:lidar_ex_checker_common",
         "//modules/common:apollo_app",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/calibration/lidar_ex_checker/common:lidar_ex_checker_common",
-        "//modules/perception/lib/pcl_util",
         "//modules/localization/proto:gps_proto",
+        "//modules/perception/lib/pcl_util",
         "@vtk//:vtk",
     ],
 )
@@ -26,13 +26,13 @@ cc_binary(
     data = [
         "//modules/calibration/lidar_ex_checker/conf:lidar_ex_checker_adapter_manager_config",
     ],
+    linkstatic = 0,
     deps = [
         ":lidar_ex_checker_lib",
         "//external:gflags",
         "//modules/common:log",
         "@ros//:ros_common",
     ],
-    linkstatic = 0,
 )
 
 cpplint()
