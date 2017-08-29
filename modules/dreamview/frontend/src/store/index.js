@@ -4,7 +4,9 @@ import * as THREE from "three";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
+import RouteEditingManager from "store/route_editing_manager";
 import PARAMETERS from "store/config/parameters.yml";
+
 
 class DreamviewStore {
     // Mutable States
@@ -20,6 +22,8 @@ class DreamviewStore {
     @observable monitor = new Monitor();
 
     @observable options = new Options();
+
+    @observable routeEditingManager = new RouteEditingManager();
 
     @action updateTimestamp(newTimestamp) {
         this.timestamp = newTimestamp;

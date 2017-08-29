@@ -80,6 +80,19 @@ class MapService {
   bool GetPoseWithRegardToLane(const double x, const double y, double *theta,
                                double *s) const;
 
+
+  /**
+   * @brief The function fills out proper routing lane waypoint
+   * from the given (x,y) position.
+   * @param x position
+   * @param y position
+   * @param laneWayPoint RoutingRequest's lane waypoint
+   * @return True if the lane waypoint is filled successfully.
+   */
+  bool ConstructLaneWayPoint(
+      const double x, const double y,
+      ::apollo::routing::RoutingRequest::LaneWaypoint* laneWayPoint) const;
+
  private:
   const ::apollo::hdmap::HDMap &BaseMap() const {
     return pnc_map_.HDMap();
