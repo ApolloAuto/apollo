@@ -90,7 +90,7 @@ message STGraphDebug {
   repeated apollo.common.SpeedPoint speed_profile = 4;
 }
 
-// next id: 15
+// next id: 16
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;

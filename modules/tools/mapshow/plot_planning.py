@@ -64,27 +64,20 @@ sl_aggregated_boundary_low_line = None
 sl_aggregated_boundary_high_line = None
 
 
-
-def localization_callback(localization_pb):
-    localization.update_localization_pb(localization_pb)
-
-
 def planning_callback(planning_pb):
     planning.update_planning_pb(planning_pb)
     planning.compute_path_data()
     planning.compute_speed_data()
     planning.compute_st_data()
     planning.compute_sl_data()
+    localization.update_localization_pb(
+        planning_pb.debug.planning_data.adc_position)
 
 
 def add_listener():
     rospy.init_node('plot_planning', anonymous=True)
-    rospy.Subscriber('/apollo/planning',
-                     planning_pb2.ADCTrajectory,
+    rospy.Subscriber('/apollo/planning', planning_pb2.ADCTrajectory,
                      planning_callback)
-    rospy.Subscriber('/apollo/localization/pose',
-                     localization_pb2.LocalizationEstimate,
-                     localization_callback)
 
 
 def update(frame_number):
@@ -121,29 +114,26 @@ def update(frame_number):
 
     planning.replot_path_data(path_line_pool)
     planning.replot_speed_data(speed_line_pool)
-    planning.replot_sl_data(sl_static_obstacle_lower_boundary,
-                            sl_static_obstacle_upper_boundary,
-                            sl_dynamic_obstacle_lower_boundary,
-                            sl_dynamic_obstacle_upper_boundary,
-                            sl_map_lower_boundary,
-                            sl_map_upper_boundary, sl_path,
-                            sl_aggregated_boundary_low_line,
-                            sl_aggregated_boundary_high_line)
+    planning.replot_sl_data(
+        sl_static_obstacle_lower_boundary, sl_static_obstacle_upper_boundary,
+        sl_dynamic_obstacle_lower_boundary, sl_dynamic_obstacle_upper_boundary,
+        sl_map_lower_boundary, sl_map_upper_boundary, sl_path,
+        sl_aggregated_boundary_low_line, sl_aggregated_boundary_high_line)
 
     if len(planning.st_data_s.keys()) >= 1:
-        planning.replot_st_data(
-            obstacle_line_pool, st_line_1,
-            obstacle_annotation_pool, planning.st_data_s.keys()[0])
+        planning.replot_st_data(obstacle_line_pool, st_line_1,
+                                obstacle_annotation_pool,
+                                planning.st_data_s.keys()[0])
     if len(planning.st_data_s.keys()) >= 2:
-        planning.replot_st_data(
-            obstacle_line_pool2, st_line_2,
-            obstacle_annotation_pool2, planning.st_data_s.keys()[1])
+        planning.replot_st_data(obstacle_line_pool2, st_line_2,
+                                obstacle_annotation_pool2,
+                                planning.st_data_s.keys()[1])
     localization.replot_vehicle(vehicle_position_line, vehicle_polygon_line)
     try:
         ax.set_xlim(localization.localization_pb.pose.position.x - 60,
-                localization.localization_pb.pose.position.x + 60)
+                    localization.localization_pb.pose.position.x + 60)
         ax.set_ylim(localization.localization_pb.pose.position.y - 60,
-                localization.localization_pb.pose.position.y + 60)
+                    localization.localization_pb.pose.position.y + 60)
     except:
         pass
     ax.relim()
@@ -169,19 +159,25 @@ def init_line_pool(central_x, central_y):
     colors = ['b', 'g', 'r', 'k']
 
     for i in range(path_line_pool_size):
-        line, = ax.plot([central_x], [central_y],
-                        colors[i % len(colors)], lw=3+i*3, alpha=0.2)
+        line, = ax.plot(
+            [central_x], [central_y],
+            colors[i % len(colors)],
+            lw=3 + i * 3,
+            alpha=0.2)
         path_line_pool.append(line)
 
     for i in range(speed_line_pool_size):
-        line, = ax1.plot([central_x], [central_y],
-                        colors[i % len(colors)]+".", lw=3, alpha=0.5)
+        line, = ax1.plot(
+            [central_x], [central_y],
+            colors[i % len(colors)] + ".",
+            lw=3,
+            alpha=0.5)
         speed_line_pool.append(line)
 
-    st_line_1, = ax2.plot([0], [0],
-                          colors[i % len(colors)]+".", lw=3, alpha=0.5)
-    st_line_2, = ax3.plot([0], [0],
-                          colors[i % len(colors)]+".", lw=3, alpha=0.5)
+    st_line_1, = ax2.plot(
+        [0], [0], colors[i % len(colors)] + ".", lw=3, alpha=0.5)
+    st_line_2, = ax3.plot(
+        [0], [0], colors[i % len(colors)] + ".", lw=3, alpha=0.5)
 
     sl_static_obstacle_lower_boundary, = \
         ax4.plot([0], [0], "r-", lw=0.3, alpha=0.8)
@@ -202,23 +198,21 @@ def init_line_pool(central_x, central_y):
         ax4.plot([0], [0], "k-", lw=1, ms=2)
 
     for i in range(obstacle_line_pool_size):
-        line, = ax2.plot([0], [0],
-                         'r-', lw=3, alpha=0.5)
+        line, = ax2.plot([0], [0], 'r-', lw=3, alpha=0.5)
         anno = ax2.text(0, 0, "")
         obstacle_line_pool.append(line)
         obstacle_annotation_pool.append(anno)
 
     for i in range(obstacle_line_pool_size2):
-        line, = ax3.plot([0], [0],
-                         'r-', lw=3, alpha=0.5)
+        line, = ax3.plot([0], [0], 'r-', lw=3, alpha=0.5)
         anno = ax3.text(0, 0, "")
         obstacle_line_pool2.append(line)
         obstacle_annotation_pool2.append(anno)
 
     ax2.set_xlim(-3, 9)
-    ax2.set_ylim(-10,90)
+    ax2.set_ylim(-10, 90)
     ax3.set_xlim(-3, 9)
-    ax3.set_ylim(-10,90)
+    ax3.set_ylim(-10, 90)
 
     vehicle_position_line, = ax.plot([central_x], [central_y], 'go', alpha=0.3)
     vehicle_polygon_line, = ax.plot([central_x], [central_y], 'g-')
@@ -230,10 +224,14 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description="plot_planning is a tool to display "
-                    "planning trajs on a map.",
+        "planning trajs on a map.",
         prog="plot_planning.py")
     parser.add_argument(
-        "-m", "--map", action="store", type=str, required=False,
+        "-m",
+        "--map",
+        action="store",
+        type=str,
+        required=False,
         default=default_map_path,
         help="Specify the map file in txt or binary format")
     args = parser.parse_args()
@@ -257,8 +255,8 @@ if __name__ == '__main__':
     map = Map()
     map.load(args.map)
     map.draw_lanes(ax, False, [])
-    central_y = sum(ax.get_ylim())/2
-    central_x = sum(ax.get_xlim())/2
+    central_y = sum(ax.get_ylim()) / 2
+    central_x = sum(ax.get_xlim()) / 2
 
     init_line_pool(central_x, central_y)
 
