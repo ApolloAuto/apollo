@@ -29,16 +29,13 @@
 #define AWARN LOG(WARNING)
 #define AERROR LOG(ERROR)
 #define AFATAL LOG(FATAL)
+
+// LOG_IF
 #define AINFO_IF(cond) LOG_IF(INFO, cond)
 #define AERROR_IF(cond) LOG_IF(ERROR, cond)
 
-// quit if condition is met
-#define QUIT_IF(CONDITION, RET, LEVEL, MSG, ...) \
-do { \
-    if (CONDITION) { \
-        RAW_LOG(LEVEL, MSG, ##__VA_ARGS__); \
-        return RET; \
-    } \
-} while (0);
+// LOG_EVERY_N
+#define AINFO_EVERY(freq) LOG_EVERY_N(INFO, freq)
+#define AERROR_EVERY(freq) LOG_EVERY_N(ERROR, freq)
 
 #endif  // MODULES_COMMON_LOG_H_
