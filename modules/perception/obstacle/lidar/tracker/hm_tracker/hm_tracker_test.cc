@@ -125,7 +125,7 @@ bool SaveTrackingResults(const std::vector<ObjectPtr>& objects,
 
   Eigen::Matrix4d pose_velo2w = pose_v2w;
   pcl::copyPointCloud(*(*cloud), *trans_cloud);
-  transform_point_cloud<pcl_util::Point>(*trans_cloud, pose_v2w);
+  TransformPointCloud<pcl_util::Point>(pose_v2w, trans_cloud);
   pcl::KdTreeFLANN<pcl_util::Point> pcl_kdtree;
   pcl_kdtree.setInputCloud(trans_cloud);
   std::vector<int> k_indices;
