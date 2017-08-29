@@ -65,7 +65,7 @@ std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
 std::unique_ptr<HDMap> HDMapUtil::base_map_ = nullptr;
 std::mutex HDMapUtil::base_map_mutex_;
 
-const HDMap* HDMapUtil::BaseMap() {
+const HDMap* HDMapUtil::BaseMapPtr() {
   if (base_map_ == nullptr) {
     std::lock_guard<std::mutex> lock(base_map_mutex_);
     if (base_map_ == nullptr) {  // Double check.
@@ -75,8 +75,8 @@ const HDMap* HDMapUtil::BaseMap() {
   return base_map_.get();
 }
 
-const HDMap& HDMapUtil::BaseMapRef() {
-  return *CHECK_NOTNULL(BaseMap());
+const HDMap& HDMapUtil::BaseMap() {
+  return *CHECK_NOTNULL(BaseMapPtr());
 }
 
 bool HDMapUtil::ReloadBaseMap() {
