@@ -55,5 +55,3 @@ TEST_F(SunnyvaleLoopTest, cruise) {
 
 }  // namespace planning
 }  // namespace apollo
-
-TMAIN;

@@ -34,13 +34,6 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-#define TMAIN                                            \
-  int main(int argc, char** argv) {                      \
-    ::testing::InitGoogleTest(&argc, argv);              \
-    ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    return RUN_ALL_TESTS();                              \
-  }
-
 #define RUN_GOLDEN_TEST                                            \
   {                                                                \
     const ::testing::TestInfo* const test_info =                   \
