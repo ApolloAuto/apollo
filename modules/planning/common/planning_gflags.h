@@ -87,4 +87,7 @@ DECLARE_double(decision_valid_stop_range);
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
 
+DECLARE_double(planning_speed_limit);
+
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -31,7 +32,7 @@ void SpeedLimit::AppendSpeedLimit(const double s, const double v) {
   if (!speed_limit_points_.empty()) {
     DCHECK_GE(s, speed_limit_points_.back().first);
   }
-  speed_limit_points_.emplace_back(s, v);
+  speed_limit_points_.emplace_back(s, std::min(v, FLAGS_planning_speed_limit));
 }
 
 const std::vector<std::pair<double, double>>& SpeedLimit::speed_limit_points()
