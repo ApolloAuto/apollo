@@ -82,7 +82,7 @@ new_http_archive(
     strip_prefix = "ros",
     # url = "https://github.com/ApolloAuto/apollo-platform/releases/download/1.0.0/ros-indigo-apollo-1.0.0.MACHINE_ARCH.tar.gz",
     # temporary ros archive for apollo-1.5
-    url = "https://github.com/fengqikai1414/apollo-platform/releases/download/1.5.0/ros-indigo-apollo-1.5.6-x84_64-dev.tar.gz",
+    url = "https://github.com/fengqikai1414/apollo-platform/releases/download/1.5.0/ros_test_pcl.tar.gz",
 )
 
 # OpenCV 2.4.13.2
