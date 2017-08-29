@@ -16,8 +16,6 @@
 
 #include "modules/control/common/control_gflags.h"
 
-DEFINE_double(min_alert_interval, 1.,
-              "minimum alert interval to prevent alerting too frequently.");
 DEFINE_string(control_conf_file, "modules/control/conf/lincoln.pb.txt",
               "default control conf data file");
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");

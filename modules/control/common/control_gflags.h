@@ -22,7 +22,6 @@
 // data file
 DECLARE_string(control_conf_file);
 
-DECLARE_double(min_alert_interval);
 DECLARE_bool(enable_csv_debug);
 
 // temporary gflag for test purpose
