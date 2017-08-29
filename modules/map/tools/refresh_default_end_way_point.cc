@@ -24,12 +24,11 @@
 //   absolute (x,y,z) is still correct. Then we can find the nearest point on
 //   the new map as the new end point.
 
-#include <iostream>
+#include <string>
 
 #include "modules/common/util/file.h"
 #include "modules/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map_geometry.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
