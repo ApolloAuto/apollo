@@ -485,10 +485,11 @@ int HDMapImpl::GetRoadBoundaries(
       junctions->push_back(junction_boundary_ptr);
     } else {
       RoadROIBoundaryPtr road_boundary_ptr(new RoadROIBoundary());
-      road_boundary_ptr->id = road_ptr->id();
+      road_boundary_ptr->mutable_id()->CopyFrom(road_ptr->id());
       for (const auto& section : road_ptr->sections()) {
         if (section.id().id() == section_id.id()) {
-          road_boundary_ptr->road_boundaries.push_back(section.boundary());
+          road_boundary_ptr->add_road_boundaries()->CopyFrom(
+              section.boundary());
         }
       }
       road_boundaries->push_back(road_boundary_ptr);

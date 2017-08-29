@@ -24,6 +24,8 @@ limitations under the License.
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
+namespace apollo {
+namespace hdmap {
 namespace {
 using apollo::common::math::Vec2d;
 
@@ -33,22 +35,20 @@ const double kSegmentationEpsilon = 0.2;
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
 
-void remove_duplicates(std::vector<Vec2d> *points) {
+void RemoveDuplicates(std::vector<Vec2d> *points) {
   CHECK_NOTNULL(points);
 
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
-  for (size_t i = 0; i < points->size(); ++i) {
-    if (count == 0 ||
-        (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
-      (*points)[count++] = (*points)[i];
+  for (const auto& point : *points) {
+    if (count == 0 || point.DistanceSquareTo((*points)[count - 1]) > limit) {
+      (*points)[count++] = point;
     }
   }
   points->resize(count);
 }
 
-void points_from_curve(const apollo::hdmap::Curve &input_curve,
-                       std::vector<Vec2d> *points) {
+void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
   CHECK_NOTNULL(points)->clear();
 
   for (const auto &curve : input_curve.segment()) {
@@ -60,17 +60,16 @@ void points_from_curve(const apollo::hdmap::Curve &input_curve,
       LOG(FATAL) << "Can not handle curve type.";
     }
   }
-  remove_duplicates(points);
+  RemoveDuplicates(points);
 }
 
-apollo::common::math::Polygon2d convert_to_polygon2d(
-    const apollo::hdmap::Polygon &polygon) {
+apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon) {
   std::vector<Vec2d> points;
   points.reserve(polygon.point_size());
   for (const auto &point : polygon.point()) {
     points.emplace_back(point.x(), point.y());
   }
-  remove_duplicates(&points);
+  RemoveDuplicates(&points);
   while (points.size() >= 2 &&
          points[0].DistanceTo(points.back()) <=
              apollo::common::math::kMathEpsilon) {
@@ -79,35 +78,33 @@ apollo::common::math::Polygon2d convert_to_polygon2d(
   return apollo::common::math::Polygon2d(points);
 }
 
-void segments_from_curve(
-    const apollo::hdmap::Curve &curve,
+void SegmentsFromCurve(
+    const Curve &curve,
     std::vector<apollo::common::math::LineSegment2d> *segments) {
   std::vector<Vec2d> points;
-  points_from_curve(curve, &points);
+  PointsFromCurve(curve, &points);
   for (size_t i = 0; i + 1 < points.size(); ++i) {
     segments->emplace_back(points[i], points[i + 1]);
   }
 }
 
-apollo::common::PointENU point_from_vec2d(const Vec2d &point) {
+apollo::common::PointENU PointFromVec2d(const Vec2d &point) {
   apollo::common::PointENU pt;
   pt.set_x(point.x());
   pt.set_y(point.y());
   return pt;
 }
-Vec2d vec2d_from_point(const apollo::common::PointENU &point) {
+
+Vec2d Vec2dFromPoint(const apollo::common::PointENU &point) {
   return {point.x(), point.y()};
 }
 
 }  // namespace
 
-namespace apollo {
-namespace hdmap {
-
-LaneInfo::LaneInfo(const apollo::hdmap::Lane &lane) : _lane(lane) { init(); }
+LaneInfo::LaneInfo(const Lane &lane) : _lane(lane) { init(); }
 
 void LaneInfo::init() {
-  points_from_curve(_lane.central_curve(), &_points);
+  PointsFromCurve(_lane.central_curve(), &_points);
   CHECK_GE(_points.size(), 2);
   _segments.clear();
   _accumulated_s.clear();
@@ -276,11 +273,11 @@ bool LaneInfo::is_on_lane(const apollo::common::math::Box2d &box) const {
 apollo::common::PointENU LaneInfo::get_smooth_point(double s) const {
   CHECK_GE(_points.size(), 2);
   if (s <= 0.0) {
-    return point_from_vec2d(_points[0]);
+    return PointFromVec2d(_points[0]);
   }
 
   if (s >= total_length()) {
-    return point_from_vec2d(_points.back());
+    return PointFromVec2d(_points.back());
   }
 
   const auto low_itr =
@@ -289,12 +286,12 @@ apollo::common::PointENU LaneInfo::get_smooth_point(double s) const {
   size_t index = low_itr - _accumulated_s.begin();
   double delta_s = *low_itr - s;
   if (delta_s < apollo::common::math::kMathEpsilon) {
-    return point_from_vec2d(_points[index]);
+    return PointFromVec2d(_points[index]);
   }
 
   auto smooth_point = _points[index] - _unit_directions[index - 1] * delta_s;
 
-  return point_from_vec2d(smooth_point);
+  return PointFromVec2d(smooth_point);
 }
 
 double LaneInfo::distance_to(const Vec2d &point) const {
@@ -321,7 +318,7 @@ apollo::common::PointENU LaneInfo::get_nearest_point(const Vec2d &point,
   Vec2d nearest_point;
   *distance = _segments[index].DistanceTo(point, &nearest_point);
 
-  return point_from_vec2d(nearest_point);
+  return PointFromVec2d(nearest_point);
 }
 
 bool LaneInfo::get_projection(const Vec2d &point,
@@ -382,7 +379,7 @@ void LaneInfo::post_process(const HDMapImpl &map_instance) {
 void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
   for (const auto &overlap_id : _overlap_ids) {
     const auto &overlap_ptr =
-        map_instance.GetOverlapById(apollo::hdmap::MakeMapId(overlap_id));
+        map_instance.GetOverlapById(MakeMapId(overlap_id));
     if (overlap_ptr == nullptr) {
       continue;
     }
@@ -392,7 +389,7 @@ void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
       if (object_id == _lane.id().id()) {
         continue;
       }
-      const auto &object_map_id = apollo::hdmap::MakeMapId(object_id);
+      const auto &object_map_id = MakeMapId(object_id);
       if (map_instance.GetLaneById(object_map_id) != nullptr) {
         _cross_lanes.emplace_back(overlap_ptr);
       }
@@ -440,23 +437,22 @@ void LaneInfo::create_kdtree() {
   _lane_segment_kdtree.reset(new LaneSegmentKDTree(_segment_box_list, params));
 }
 
-JunctionInfo::JunctionInfo(const apollo::hdmap::Junction &junction)
-    : _junction(junction) {
+JunctionInfo::JunctionInfo(const Junction &junction) : _junction(junction) {
   init();
 }
 
 void JunctionInfo::init() {
-  _polygon = convert_to_polygon2d(_junction.polygon());
+  _polygon = ConvertToPolygon2d(_junction.polygon());
   CHECK_GT(_polygon.num_points(), 2);
 }
 
-SignalInfo::SignalInfo(const apollo::hdmap::Signal &signal) : _signal(signal) {
+SignalInfo::SignalInfo(const Signal &signal) : _signal(signal) {
   init();
 }
 
 void SignalInfo::init() {
   for (const auto &stop_line : _signal.stop_line()) {
-    segments_from_curve(stop_line, &_segments);
+    SegmentsFromCurve(stop_line, &_segments);
   }
   CHECK(!_segments.empty());
   std::vector<Vec2d> points;
@@ -467,45 +463,44 @@ void SignalInfo::init() {
   CHECK_GT(points.size(), 0);
 }
 
-CrosswalkInfo::CrosswalkInfo(const apollo::hdmap::Crosswalk &crosswalk)
+CrosswalkInfo::CrosswalkInfo(const Crosswalk &crosswalk)
     : _crosswalk(crosswalk) {
   init();
 }
 
 void CrosswalkInfo::init() {
-  _polygon = convert_to_polygon2d(_crosswalk.polygon());
+  _polygon = ConvertToPolygon2d(_crosswalk.polygon());
   CHECK_GT(_polygon.num_points(), 2);
 }
 
-StopSignInfo::StopSignInfo(const apollo::hdmap::StopSign &stop_sign)
-    : _stop_sign(stop_sign) {
+StopSignInfo::StopSignInfo(const StopSign &stop_sign) : _stop_sign(stop_sign) {
   init();
 }
 
 void StopSignInfo::init() {
   for (const auto &stop_line : _stop_sign.stop_line()) {
-    segments_from_curve(stop_line, &_segments);
+    SegmentsFromCurve(stop_line, &_segments);
   }
   CHECK(!_segments.empty());
 }
 
-YieldSignInfo::YieldSignInfo(const apollo::hdmap::YieldSign &yield_sign)
+YieldSignInfo::YieldSignInfo(const YieldSign &yield_sign)
     : _yield_sign(yield_sign) {
   init();
 }
 
 void YieldSignInfo::init() {
   for (const auto &stop_line : _yield_sign.stop_line()) {
-    segments_from_curve(stop_line, &_segments);
+    SegmentsFromCurve(stop_line, &_segments);
   }
   // segments_from_curve(_yield_sign.stop_line(), &_segments);
   CHECK(!_segments.empty());
 }
 
-OverlapInfo::OverlapInfo(const apollo::hdmap::Overlap &overlap)
-    : _overlap(overlap) {}
+OverlapInfo::OverlapInfo(const Overlap &overlap) : _overlap(overlap) {}
+
 const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
-    const apollo::hdmap::Id &id) const {
+    const Id &id) const {
   for (const auto &object : _overlap.object()) {
     if (object.id().id() == id.id()) {
       return &object;
@@ -514,15 +509,14 @@ const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
   return nullptr;
 }
 
-RoadInfo::RoadInfo(const apollo::hdmap::Road &road) : _road(road) {
-  for (int i = 0; i < _road.section_size(); ++i) {
-    _sections.push_back(_road.section(i));
-    _road_boundaries.push_back(_road.section(i).boundary());
+RoadInfo::RoadInfo(const Road &road) : _road(road) {
+  for (const auto& section : _road.section()) {
+    _sections.push_back(section);
+    _road_boundaries.push_back(section.boundary());
   }
 }
 
-const std::vector<apollo::hdmap::RoadBoundary> &RoadInfo::get_boundaries()
-    const {
+const std::vector<RoadBoundary> &RoadInfo::get_boundaries() const {
   return _road_boundaries;
 }
 
