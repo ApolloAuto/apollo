@@ -48,7 +48,7 @@ DEFINE_double(replan_distance_threshold, 5.0,
 DEFINE_double(default_reference_line_width, 4.0,
               "Default reference line width");
 
-DEFINE_double(planning_speed_upper_limit, 10.0, "Maximum speed in planning.");
+DEFINE_double(planning_upper_speed_limit, 10.0, "Maximum speed in planning.");
 
 DEFINE_double(planning_distance, 100, "Planning distance");
 
@@ -136,6 +136,3 @@ DEFINE_double(decision_valid_stop_range, 0.5,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
-
-DEFINE_double(planning_speed_limit, 10.0,
-              "planning speed limit (m/s)");

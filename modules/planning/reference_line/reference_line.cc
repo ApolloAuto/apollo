@@ -333,7 +333,7 @@ std::string ReferenceLine::DebugString() const {
 
 double ReferenceLine::GetSpeedLimitFromS(const double s) const {
   const auto& map_path_point = GetReferencePoint(s);
-  double speed_limit = FLAGS_planning_speed_upper_limit;
+  double speed_limit = FLAGS_planning_upper_speed_limit;
   for (const auto& lane_waypoint : map_path_point.lane_waypoints()) {
     if (lane_waypoint.lane == nullptr) {
       AWARN << "lane_waypoint.lane is nullptr";
@@ -350,7 +350,7 @@ double ReferenceLine::GetSpeedLimitFromPoint(
   SLPoint sl;
   if (!XYToSL(point, &sl)) {
     AWARN << "Failed to get projection for point: " << point.DebugString();
-    return FLAGS_planning_speed_upper_limit;
+    return FLAGS_planning_upper_speed_limit;
   }
   return GetSpeedLimitFromS(sl.s());
 }
