@@ -24,6 +24,7 @@
 
 #include <memory>
 #include <thread>
+#include <vector>
 
 #include "modules/canbus/can_client/can_client.h"
 #include "modules/common/macro.h"
@@ -63,7 +64,8 @@ class CanReceiver {
    * @return An error code indicating the status of this initialization.
    */
   ::apollo::common::ErrorCode Init(::apollo::canbus::CanClient *can_client,
-                                   SensorMessageManager<SensorType> *pt_manager, bool enable_log);
+                                   SensorMessageManager<SensorType> *pt_manager,
+                                   bool enable_log);
 
   /**
    * @brief Get the working status of this CAN receiver.
@@ -101,9 +103,9 @@ class CanReceiver {
 };
 
 template <typename SensorType>
-::apollo::common::ErrorCode CanReceiver<SensorType>::Init(::apollo::canbus::CanClient *can_client,
-                            SensorMessageManager<SensorType> *pt_manager,
-                            bool enable_log) {
+::apollo::common::ErrorCode CanReceiver<SensorType>::Init(
+    ::apollo::canbus::CanClient *can_client,
+    SensorMessageManager<SensorType> *pt_manager, bool enable_log) {
   can_client_ = can_client;
   pt_manager_ = pt_manager;
   enable_log_ = enable_log;
@@ -133,7 +135,8 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
   while (IsRunning()) {
     std::vector<::apollo::canbus::CanFrame> buf;
     int32_t frame_num = ::apollo::canbus::MAX_CAN_RECV_FRAME_LEN;
-    if (can_client_->Receive(&buf, &frame_num) != ::apollo::common::ErrorCode::OK) {
+    if (can_client_->Receive(&buf, &frame_num) !=
+        ::apollo::common::ErrorCode::OK) {
       LOG_IF_EVERY_N(ERROR, receive_error_count++ > ERROR_COUNT_MAX,
                      ERROR_COUNT_MAX)
           << "Received " << receive_error_count << " error messages.";
@@ -172,7 +175,9 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
 }
 
 template <typename SensorType>
-bool CanReceiver<SensorType>::IsRunning() const { return is_running_; }
+bool CanReceiver<SensorType>::IsRunning() const {
+  return is_running_;
+}
 
 template <typename SensorType>
 ::apollo::common::ErrorCode CanReceiver<SensorType>::Start() {
