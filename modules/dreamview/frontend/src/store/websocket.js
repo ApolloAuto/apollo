@@ -49,6 +49,13 @@ class WebSocketEndpoint {
                 case "MapData":
                     RENDERER.updateMap(message.data);
                     break;
+                case "RoutingRequestSent":
+                    if (message.status === "Failed") {
+                        alert("Error: failed to send routing request.");
+                    } else {
+                        alert("Routing request sent.");
+                        STORE.routeEditingManager.disableRouteEditing();
+                    }
             }
         };
         this.websocket.onclose = event => {
@@ -60,6 +67,15 @@ class WebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "RetrieveMapData",
             elements: elements,
+        }));
+    }
+
+    requestRoute(start, waypoint, end) {
+        this.websocket.send(JSON.stringify({
+            type: "SendRoutingRequest",
+            start: start,
+            end: end,
+            waypoint: waypoint,
         }));
     }
 }
