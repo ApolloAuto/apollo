@@ -36,6 +36,7 @@
 
 // LOG_EVERY_N
 #define AINFO_EVERY(freq) LOG_EVERY_N(INFO, freq)
+#define AWARN_EVERY(freq) LOG_EVERY_N(WARNING, freq)
 #define AERROR_EVERY(freq) LOG_EVERY_N(ERROR, freq)
 
 #endif  // MODULES_COMMON_LOG_H_
