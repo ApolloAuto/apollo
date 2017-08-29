@@ -56,11 +56,13 @@ bool CheckOverlapOnDpStGraph(const std::vector<StBoundary> boundaries,
 }
 }
 
-DpStGraph::DpStGraph(const DpStSpeedConfig& dp_config,
+DpStGraph::DpStGraph(const ReferenceLine& reference_line,
                      const StGraphData& st_graph_data,
+                     const DpStSpeedConfig& dp_config,
                      const PathData& path_data,
                      const SLBoundary& adc_sl_boundary)
-    : dp_st_speed_config_(dp_config),
+    : reference_line_(reference_line),
+      dp_st_speed_config_(dp_config),
       st_graph_data_(st_graph_data),
       path_data_(path_data),
       adc_sl_boundary_(adc_sl_boundary),
@@ -441,10 +443,8 @@ Status DpStGraph::MakeObjectDecision(const SpeedData& speed_profile,
     if (go_down) {
       if (CheckIsFollowByT(boundary)) {
         // FOLLOW decision
-        const auto& obstacle_boundary = path_obstacle->perception_sl_boundary();
         ObjectDecisionType follow_decision;
-        if (!CreateFollowDecision(*path_obstacle, obstacle_boundary,
-                                  &follow_decision)) {
+        if (!CreateFollowDecision(*path_obstacle, boundary, &follow_decision)) {
           AERROR << "Failed to create follow decision for boundary with id "
                  << boundary.id();
           return Status(ErrorCode::PLANNING_ERROR,
@@ -502,7 +502,7 @@ Status DpStGraph::MakeObjectDecision(const SpeedData& speed_profile,
 }
 
 bool DpStGraph::CreateFollowDecision(
-    const PathObstacle& path_obstacle, const SLBoundary& obstacle_boundary,
+    const PathObstacle& path_obstacle, const StBoundary& boundary,
     ObjectDecisionType* const follow_decision) const {
   DCHECK_NOTNULL(follow_decision);
 
@@ -514,25 +514,18 @@ bool DpStGraph::CreateFollowDecision(
   const double follow_speed =
       std::fmax(init_point_.v(), std::hypot(velocity.x(), velocity.y()));
   const double follow_distance_s =
-      std::fmax(follow_speed * kFollowTimeBuffer, FLAGS_follow_min_distance) +
-      vehicle_param_.front_edge_to_center();
+      -std::fmax(follow_speed * kFollowTimeBuffer, FLAGS_follow_min_distance);
 
   follow->set_distance_s(follow_distance_s);
 
-  const double reference_line_fence_s =
-      obstacle_boundary.start_s() - follow_distance_s;
-  common::PathPoint path_point;
-  if (!path_data_.GetPathPointWithRefS(std::fmax(0.0, reference_line_fence_s),
-                                       &path_point)) {
-    AERROR << "Failed to get path point from reference line s: "
-           << reference_line_fence_s;
-    return false;
-  }
+  const double refence_s =
+      adc_sl_boundary_.end_s() + boundary.min_s() + follow_distance_s;
+  auto ref_point = reference_line_.GetReferencePoint(refence_s);
   auto* fence_point = follow->mutable_fence_point();
-  fence_point->set_x(path_point.x());
-  fence_point->set_y(path_point.y());
+  fence_point->set_x(ref_point.x());
+  fence_point->set_y(ref_point.y());
   fence_point->set_z(0.0);
-  follow->set_fence_heading(path_point.theta());
+  follow->set_fence_heading(ref_point.heading());
 
   return true;
 }
@@ -540,28 +533,22 @@ bool DpStGraph::CreateFollowDecision(
 bool DpStGraph::CreateYieldDecision(
     const StBoundary& boundary,
     ObjectDecisionType* const yield_decision) const {
-  DCHECK_NOTNULL(yield_decision);
-
   auto* yield = yield_decision->mutable_yield();
 
   // in meters
   constexpr double kMinYieldDistance = 10.0;
-  const double yield_distance_s = -1.0 * kMinYieldDistance;
+  const double yield_distance_s =
+      std::max(-boundary.min_s(), -1.0 * kMinYieldDistance);
   yield->set_distance_s(yield_distance_s);
 
   const double reference_line_fence_s =
       adc_sl_boundary_.end_s() + boundary.min_s() + yield_distance_s;
-  common::PathPoint path_point;
-  if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
-    AERROR << "Failed to get path point from reference line s "
-           << reference_line_fence_s;
-    return false;
-  }
+  auto ref_point = reference_line_.GetReferencePoint(reference_line_fence_s);
 
-  yield->mutable_fence_point()->set_x(path_point.x());
-  yield->mutable_fence_point()->set_y(path_point.y());
+  yield->mutable_fence_point()->set_x(ref_point.x());
+  yield->mutable_fence_point()->set_y(ref_point.y());
   yield->mutable_fence_point()->set_z(0.0);
-  yield->set_fence_heading(path_point.theta());
+  yield->set_fence_heading(ref_point.heading());
 
   return true;
 }
@@ -591,17 +578,11 @@ bool DpStGraph::CreateOvertakeDecision(
   const double reference_line_fence_s =
       adc_sl_boundary_.end_s() + boundary.min_s() + overtake_distance_s;
 
-  common::PathPoint path_point;
-  if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
-    AERROR << "Failed to get path point from reference line s "
-           << reference_line_fence_s;
-    return false;
-  }
-
-  overtake->mutable_fence_point()->set_x(path_point.x());
-  overtake->mutable_fence_point()->set_y(path_point.y());
+  auto ref_point = reference_line_.GetReferencePoint(reference_line_fence_s);
+  overtake->mutable_fence_point()->set_x(ref_point.x());
+  overtake->mutable_fence_point()->set_y(ref_point.y());
   overtake->mutable_fence_point()->set_z(0.0);
-  overtake->set_fence_heading(path_point.theta());
+  overtake->set_fence_heading(ref_point.heading());
 
   return true;
 }

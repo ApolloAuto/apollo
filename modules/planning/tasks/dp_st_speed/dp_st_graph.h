@@ -41,7 +41,8 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const DpStSpeedConfig& dp_config, const StGraphData& st_graph_data,
+  DpStGraph(const ReferenceLine& reference_line,
+            const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
             const PathData& path_data, const SLBoundary& adc_sl_boundary);
 
   apollo::common::Status Search(PathDecision* const path_decision,
@@ -89,7 +90,7 @@ class DpStGraph {
    *         false otherwise.
    **/
   bool CreateFollowDecision(const PathObstacle& path_obstacle,
-                            const SLBoundary& obstacle_boundary,
+                            const StBoundary& boundary,
                             ObjectDecisionType* const follow_decision) const;
 
   /**
@@ -113,6 +114,7 @@ class DpStGraph {
                    uint32_t* highest_row, uint32_t* lowest_row);
 
  private:
+  const ReferenceLine& reference_line_;
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
 
