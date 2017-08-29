@@ -30,6 +30,17 @@ cc_binary(
 )
 
 cc_binary(
+    name = "refresh_default_end_way_point",
+    srcs = ["refresh_default_end_way_point.cc"],
+    deps = [
+        "//modules/common/configs:config_gflags",
+        "//modules/common/util",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/routing/proto:routing_proto",
+    ],
+)
+
+cc_binary(
     name = "sim_map_generator",
     srcs = ["sim_map_generator.cc"],
     data = ["//modules/map:map_data"],
