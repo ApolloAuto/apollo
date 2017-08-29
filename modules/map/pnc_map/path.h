@@ -122,12 +122,12 @@ class PathApproximation {
   PathApproximation() = default;
   PathApproximation(const Path& path, const double max_error)
       : _max_error(max_error), _max_sqr_error(max_error * max_error) {
-    init(path);
+    Init(path);
   }
   double max_error() const { return _max_error; }
   const std::vector<int>& original_ids() const { return _original_ids; }
   const std::vector<common::math::LineSegment2d>& segments() const {
-    return _segments;
+    return segments_;
   }
 
   bool get_projection(const Path& path, const common::math::Vec2d& point,
@@ -138,7 +138,7 @@ class PathApproximation {
                     double width) const;
 
  protected:
-  void init(const Path& path);
+  void Init(const Path& path);
   bool is_within_max_error(const Path& path, const int s, const int t);
   double compute_max_error(const Path& path, const int s, const int t);
 
@@ -151,7 +151,7 @@ class PathApproximation {
 
   int num_points_ = 0;
   std::vector<int> _original_ids;
-  std::vector<common::math::LineSegment2d> _segments;
+  std::vector<common::math::LineSegment2d> segments_;
   std::vector<double> _max_error_per_segment;
 
   // TODO(@lianglia_apollo): use direction change checks to early stop.
@@ -220,14 +220,14 @@ class Path {
     return lane_segments_to_next_point_;
   }
   const std::vector<common::math::Vec2d>& unit_directions() const {
-    return _unit_directions;
+    return unit_directions_;
   }
-  const std::vector<double>& accumulated_s() const { return _accumulated_s; }
+  const std::vector<double>& accumulated_s() const { return accumulated_s_; }
   const std::vector<common::math::LineSegment2d>& segments() const {
-    return _segments;
+    return segments_;
   }
   const PathApproximation* approximation() const { return &_approximation; }
-  double length() const { return _length; }
+  double length() const { return length_; }
 
   const std::vector<PathOverlap>& lane_overlaps() const {
     return _lane_overlaps;
@@ -264,19 +264,19 @@ class Path {
   std::string DebugString() const;
 
  protected:
-  void init();
-  void init_points();
-  void init_lane_segments();
-  void init_width();
-  void init_point_index();
-  void init_overlaps();
+  void Init();
+  void InitPoints();
+  void InitLaneSegments();
+  void InitWidth();
+  void InitPointIndex();
+  void InitOverlaps();
 
-  double get_sample(const std::vector<double>& samples, const double s) const;
+  double GetSample(const std::vector<double>& samples, const double s) const;
 
   using GetOverlapFromLaneFunc =
       std::function<const std::vector<OverlapInfoConstPtr>&(const LaneInfo&)>;
-  void get_all_overlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
-                        std::vector<PathOverlap>* const overlaps) const;
+  void GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
+                      std::vector<PathOverlap>* const overlaps) const;
 
  protected:
   int num_points_ = 0;
@@ -284,10 +284,10 @@ class Path {
   std::vector<MapPathPoint> path_points_;
   std::vector<LaneSegment> lane_segments_;
   std::vector<LaneSegment> lane_segments_to_next_point_;
-  std::vector<common::math::Vec2d> _unit_directions;
-  double _length = 0.0;
-  std::vector<double> _accumulated_s;
-  std::vector<common::math::LineSegment2d> _segments;
+  std::vector<common::math::Vec2d> unit_directions_;
+  double length_ = 0.0;
+  std::vector<double> accumulated_s_;
+  std::vector<common::math::LineSegment2d> segments_;
   bool _use_path_approximation = false;
   PathApproximation _approximation;
 
