@@ -136,6 +136,7 @@ bool GetProtoFromBinaryFile(const std::string &file_name,
   }
   if (!message->ParseFromIstream(&input)) {
     AERROR << "Failed to parse file " << file_name;
+    return false;
   }
   return true;
 }
