@@ -19,11 +19,6 @@
 
 #include "gflags/gflags.h"
 
-// System gflags
-DECLARE_string(node_namespace);
-DECLARE_string(node_name);
-DECLARE_string(hmi_name);
-
 // data file
 DECLARE_string(sensor_conf_file);
 

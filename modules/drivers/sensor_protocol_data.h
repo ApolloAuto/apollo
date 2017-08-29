@@ -134,7 +134,7 @@ uint32_t SensorProtocolData<SensorType>::GetPeriod() const {
 
 template <typename SensorType>
 void SensorProtocolData<SensorType>::Parse(const uint8_t *bytes, int32_t length,
-                                           SensorType *sensor_data) const {};
+                                           SensorType *sensor_data) const {}
 
 template <typename SensorType>
 void SensorProtocolData<SensorType>::UpdateData(uint8_t *data) {}
