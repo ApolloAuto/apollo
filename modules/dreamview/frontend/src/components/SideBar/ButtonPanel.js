@@ -29,13 +29,19 @@ export default class ButtonPanel extends React.Component {
     }
 
     render() {
-        const { onConsole, showConsole, onMenu, showMenu } = this.props;
+        const { onConsole, showConsole,
+                onMenu, showMenu,
+                showRouteEditingBar } = this.props;
 
         return (
             <div>
                 <SideBarButton label="HMI Setup" active={false}
                                onClick={this.openHMI.bind(this)}
                                extraClasses={["button-corner"]} />
+                <div className="separator" />
+                <SideBarButton label="Route Editing"
+                               onClick={showRouteEditingBar}
+                               active={false} />
                 <div className="separator" />
                 <SideBarButton label="Notifications"
                                onClick={onConsole}

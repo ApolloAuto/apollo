@@ -52,6 +52,60 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           websocket_->SendData(response.dump(), conn);
         }
       });
+
+  websocket_->RegisterMessageHandler(
+      "SendRoutingRequest",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        routing::RoutingRequest routing_request;
+        bool succeed = ConstructRoutingRequest(json, &routing_request);
+        if (succeed) {
+          AdapterManager::FillRoutingRequestHeader(FLAGS_dreamview_module_name,
+                                                   &routing_request);
+          AdapterManager::PublishRoutingRequest(routing_request);
+        }
+
+        Json response;
+        response["type"] = "RoutingRequestSent";
+        response["status"] = succeed ? "Sent" : "Failed";
+        websocket_->SendData(response.dump(), conn);
+      });
+}
+
+bool SimulationWorldUpdater::ConstructRoutingRequest(
+      const Json &json,
+      routing::RoutingRequest* routing_request) {
+  // set start point
+  auto start = json["start"];
+  if (start.find("x") == start.end() || start.find("y") == start.end()) {
+    AERROR << "Failed to prepare a routing request";
+    return false;
+  }
+  map_service_->ConstructLaneWayPoint(start["x"], start["y"],
+                                      routing_request->mutable_start());
+
+  // set way point(s) if any
+  auto iter = json.find("waypoint");
+  if (iter != json.end()) {
+    auto* waypoint = routing_request->mutable_waypoint();
+    for (size_t i = 0; i < iter->size(); ++i) {
+      auto& point = (*iter)[i];
+      if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
+                                               waypoint->Add())) {
+        waypoint->RemoveLast();
+      }
+    }
+  }
+
+  // set end point
+  auto end = json["end"];
+  if (end.find("x") == end.end() || end.find("y") == end.end()) {
+    AERROR << "Failed to prepare a routing request";
+    return false;
+  }
+  map_service_->ConstructLaneWayPoint(end["x"], end["y"],
+                                      routing_request->mutable_end());
+
+  return true;
 }
 
 void SimulationWorldUpdater::Start() {

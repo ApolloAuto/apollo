@@ -9,7 +9,7 @@ import Notification from "components/SideBar/Notification";
 @inject("store") @observer
 export default class SideBar extends React.Component {
     render() {
-        const { monitor, options } = this.props.store;
+        const { monitor, options, routeEditingManager } = this.props.store;
 
         return (
             <div className="sidebar">
@@ -20,7 +20,10 @@ export default class SideBar extends React.Component {
                              showConsole={options.showConsole}
                              onConsole={() => {
                                      options.toggleShowConsole();
-                                 }} />
+                                 }}
+                            showRouteEditingBar={() => {
+                                      routeEditingManager.enableRouteEditing();
+                                 }}/>
                 {options.showMenu ? <Menu options={options} /> : <div/>}
                 {options.showConsole ? <Console monitor={monitor} /> :
                  <Notification monitor={monitor} />}

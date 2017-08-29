@@ -11,6 +11,7 @@ import PerceptionObstacles from "renderer/obstacles.js";
 import Decision from "renderer/decision.js";
 import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
+import RoutingEditor from "renderer/routing_editor.js";
 
 class Renderer {
     constructor() {
@@ -47,10 +48,14 @@ class Renderer {
 
         // The routing.
         this.routing = new Routing();
+
+        // The route editor
+        this.routingEditor = new RoutingEditor();
     }
 
     initialize(canvasId, width, height, options) {
         this.options = options;
+        this.canvasId = canvasId;
 
         // Camera
         this.viewAngle = PARAMETERS.camera.viewAngle;
@@ -80,6 +85,9 @@ class Renderer {
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enable = false;
 
+        // handler for route editing with mouse down events
+        this.onMouseDownHandler = this.editRoute.bind(this);
+
         this.scene.add(ambient);
         this.scene.add(directionalLight);
 
@@ -101,7 +109,7 @@ class Renderer {
         this.renderer.setSize(width, height);
     }
 
-    enableOrbitControls(){
+    enableOrbitControls() {
         this.controls.enabled = true;
         this.controls.enableRotate = false;
         this.controls.reset();
@@ -115,6 +123,13 @@ class Renderer {
     }
 
     adjustCamera(target, pov) {
+
+        if (this.routingEditor.isInEditingMode()) {
+            this.camera.up.set(0, 1, 0);
+            this.camera.lookAt(this.camera.position.x, this.camera.position.y, 0);
+            return;
+        }
+
         this.camera.fov = PARAMETERS.camera[pov].fov;
         this.camera.near = PARAMETERS.camera[pov].near;
         this.camera.far = PARAMETERS.camera[pov].far;
@@ -176,7 +191,7 @@ class Renderer {
             this.controls.enabled = false;
             break;
         case "Map":
-            if (!this.controls.enabled){
+            if (!this.controls.enabled) {
                 this.enableOrbitControls();
             }else {
                 this.camera.up.set(0, 1, 0);
@@ -185,6 +200,50 @@ class Renderer {
             break;
         }
         this.camera.updateProjectionMatrix();
+    }
+
+    enableRouteEditing() {
+        this.enableOrbitControls();
+        this.routingEditor.enableEditingMode(this.camera, this.adc);
+
+        document.getElementById(this.canvasId).addEventListener('mousedown',
+                                                                this.onMouseDownHandler,
+                                                                false);
+    }
+
+    disableRouteEditing() {
+        this.routingEditor.disableEditingMode(this.scene);
+
+        document.getElementById(this.canvasId).removeEventListener('mousedown',
+                                                                   this.onMouseDownHandler,
+                                                                   false);
+    }
+
+    removeAllRoutingPoints() {
+        this.routingEditor.removeAllRoutePoints(this.scene);
+    }
+
+    removeLastRoutingPoint() {
+        this.routingEditor.removeLastRoutingPoint(this.scene);
+    }
+
+    sendRoutingRequest() {
+        this.routingEditor.sendRoutingRequest(this.scene,
+                                              this.adc.mesh.position,
+                                              this.coordinates);
+    }
+
+    editRoute(event) {
+        if (!this.routingEditor.isInEditingMode() || event.button !== THREE.MOUSE.LEFT) {
+            return;
+        }
+
+        // return if the ground or coordinates is not loaded yet
+        if (!this.coordinates.isInitialized() || !this.ground.mesh) {
+            return;
+        }
+
+        this.routingEditor.addRoutingPoint(event, this.camera, this.ground, this.scene);
     }
 
     // Render one frame. This supports the main draw/render loop.

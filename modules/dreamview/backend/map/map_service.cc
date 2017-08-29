@@ -37,6 +37,7 @@ using ::apollo::hdmap::YieldSignInfoConstPtr;
 using ::apollo::hdmap::Path;
 using ::apollo::hdmap::MapPathPoint;
 using ::apollo::routing::RoutingResponse;
+using ::apollo::routing::RoutingRequest;
 
 namespace {
 
@@ -132,7 +133,7 @@ MapElementIds MapService::CollectMapElementIds(const PointENU &point,
   std::vector<LaneInfoConstPtr> lanes;
   if (sim_map_.GetLanes(point, radius, &lanes) != 0) {
     AERROR << "Fail to get lanes from sim_map.";
-  };
+  }
   ExtractIds(lanes, &result.lane);
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;
@@ -258,7 +259,7 @@ bool MapService::GetPoseWithRegardToLane(const double x, const double y,
   double l;
   LaneInfoConstPtr nearest_lane;
   if (BaseMap().GetNearestLane(point, &nearest_lane, s, &l) < 0) {
-    AERROR << "Failed to get neareset lane!";
+    AERROR << "Failed to get nearest lane!";
     return false;
   }
 
@@ -266,5 +267,28 @@ bool MapService::GetPoseWithRegardToLane(const double x, const double y,
   return true;
 }
 
+bool MapService::ConstructLaneWayPoint(
+    const double x, const double y,
+    RoutingRequest::LaneWaypoint* laneWayPoint) const {
+
+  apollo::common::PointENU point;
+  point.set_x(x);
+  point.set_y(y);
+
+  double s, l;
+  LaneInfoConstPtr lane;
+  if (BaseMap().GetNearestLane(point, &lane, &s, &l) < 0) {
+    AERROR << "Failed to get nearest lane!";
+    return false;
+  }
+
+  laneWayPoint->set_id(lane->id().id());
+  laneWayPoint->set_s(s);
+  auto* pose = laneWayPoint->mutable_pose();
+  pose->set_x(x);
+  pose->set_y(y);
+
+  return true;
+}
 }  // namespace dreamview
 }  // namespace apollo

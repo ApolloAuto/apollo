@@ -67,6 +67,15 @@ class SimulationWorldUpdater {
    */
   void OnPushTimer(const ros::TimerEvent &event);
 
+  /**
+   * @brief The function to construct a routing request from the given json,
+   * @param json that contains start, end, and waypoints
+   * @param routing_request
+   * @return True if routing request is constructed successfully
+   */
+  bool ConstructRoutingRequest(const nlohmann::json &json,
+                               routing::RoutingRequest* routing_request);
+
   // Time interval, in seconds, between pushing SimulationWorld to frontend.
   static constexpr double kSimWorldTimeInterval = 0.1;
 
