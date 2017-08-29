@@ -220,7 +220,6 @@ cc_library(
         "speed_limit.h",
     ],
     deps = [
-        ":planning_gflags",
         "//modules/common/math",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_proto",
