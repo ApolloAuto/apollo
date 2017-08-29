@@ -93,8 +93,8 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   const double path_length = path_data.discretized_path().Length();
   StGraphData st_graph_data(boundaries, init_point, speed_limit, path_length);
 
-  DpStGraph st_graph(dp_st_speed_config_, st_graph_data, path_data,
-                     adc_sl_boundary);
+  DpStGraph st_graph(reference_line, st_graph_data, dp_st_speed_config_,
+                     path_data, adc_sl_boundary);
   if (!st_graph.Search(path_decision, speed_data).ok()) {
     const std::string msg(Name() +
                           ":Failed to search graph with dynamic programming.");
