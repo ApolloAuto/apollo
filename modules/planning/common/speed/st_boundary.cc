@@ -161,19 +161,54 @@ StBoundary StBoundary::ExpandByT(const double t) const {
     AERROR << "The current st_boundary has NO points.";
     return StBoundary();
   }
+
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
+
+  const double lower_left_delta_t = lower_points_[1].t() - lower_points_[0].t();
+  const double lower_left_delta_s = lower_points_[1].s() - lower_points_[0].s();
+  const double upper_left_delta_t = upper_points_[1].t() - upper_points_[0].t();
+  const double upper_left_delta_s = upper_points_[1].s() - upper_points_[0].s();
+
   point_pairs.emplace_back(
-      STPoint(lower_points_.front().y(), lower_points_.front().x() - t),
-      STPoint(upper_points_.front().y(), upper_points_.front().x() - t));
+      STPoint(
+          lower_points_[0].y() - t * lower_left_delta_s / lower_left_delta_t,
+          lower_points_[0].x() - t),
+      STPoint(
+          upper_points_[0].y() - t * upper_left_delta_s / upper_left_delta_t,
+          upper_points_.front().x() - t));
+
+  const double kMinSEpsilon = 1e-3;
+  point_pairs.front().first.set_s(
+      std::fmin(point_pairs.front().second.s() - kMinSEpsilon,
+                point_pairs.front().first.s()));
 
   for (size_t i = 0; i < lower_points_.size(); ++i) {
-    point_pairs.emplace_back(
-        STPoint(lower_points_[i].y(), lower_points_[i].x()),
-        STPoint(upper_points_[i].y(), upper_points_[i].x()));
+    point_pairs.emplace_back(lower_points_[i], upper_points_[i]);
   }
+
+  size_t length = lower_points_.size();
+  DCHECK_GE(length, 2);
+
+  const double lower_right_delta_t =
+      lower_points_[length - 1].t() - lower_points_[length - 2].t();
+  const double lower_right_delta_s =
+      lower_points_[length - 1].s() - lower_points_[length - 2].s();
+  const double upper_right_delta_t =
+      upper_points_[length - 1].t() - upper_points_[length - 2].t();
+  const double upper_right_delta_s =
+      upper_points_[length - 1].s() - upper_points_[length - 2].s();
+
   point_pairs.emplace_back(
-      STPoint(lower_points_.back().y(), lower_points_.back().x() + t),
-      STPoint(upper_points_.back().y(), upper_points_.back().x() + t));
+      STPoint(lower_points_.back().y() +
+                  t * lower_right_delta_s / lower_right_delta_t,
+              lower_points_.back().x() + t),
+      STPoint(upper_points_.back().y() +
+                  t * upper_right_delta_s / upper_right_delta_t,
+              upper_points_.back().x() + t));
+  point_pairs.back().second.set_s(
+      std::fmax(point_pairs.back().second.s(),
+                point_pairs.back().first.s() + kMinSEpsilon));
+
   return StBoundary(std::move(point_pairs));
 }
 
@@ -309,8 +344,8 @@ bool StBoundary::GetIndexRange(const std::vector<STPoint>& points,
 }
 
 StBoundary StBoundary::GenerateStBoundary(
-    const std::vector<STPoint> lower_points,
-    const std::vector<STPoint> upper_points) {
+    const std::vector<STPoint>& lower_points,
+    const std::vector<STPoint>& upper_points) {
   if (lower_points.size() != upper_points.size() || lower_points.size() < 2) {
     AERROR << "Fail to generate StBoundary because input points are not valid.";
     return StBoundary();

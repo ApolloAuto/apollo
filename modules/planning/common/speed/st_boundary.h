@@ -96,8 +96,9 @@ class StBoundary : public common::math::Polygon2d {
   std::vector<STPoint> upper_points() const { return upper_points_; }
   std::vector<STPoint> lower_points() const { return lower_points_; }
 
-  static StBoundary GenerateStBoundary(const std::vector<STPoint> lower_points,
-                                       const std::vector<STPoint> upper_points);
+  static StBoundary GenerateStBoundary(
+      const std::vector<STPoint>& lower_points,
+      const std::vector<STPoint>& upper_points);
 
  private:
   bool IsValid(
