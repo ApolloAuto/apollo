@@ -41,9 +41,7 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const {
-  return FLAGS_node_name;
-}
+std::string Control::Name() const { return FLAGS_node_name; }
 
 Status Control::Init() {
   AINFO << "Control init, starting ...";
@@ -178,7 +176,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   }
 
   if (estop_) {
-    AWARN << "Estop triggered! No control core method executed!";
+    AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
     // set Estop command
     control_command->set_speed(0);
     control_command->set_throttle(0);
