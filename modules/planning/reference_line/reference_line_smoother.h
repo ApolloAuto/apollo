@@ -39,7 +39,7 @@ class ReferenceLineSmoother {
   ReferenceLineSmoother() = default;
   bool Init(const std::string& config_file);
   void Init(const ReferenceLineSmootherConfig& refline_smooth_config);
-  bool smooth(const ReferenceLine& raw_reference_line,
+  bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line);
 
  private:

@@ -52,7 +52,7 @@ void ReferenceLineSmoother::Reset() {
   spline_solver_.reset(nullptr);
 }
 
-bool ReferenceLineSmoother::smooth(
+bool ReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
   Reset();
@@ -122,6 +122,10 @@ bool ReferenceLineSmoother::smooth(
         kappa, dkappa, 0.0, 0.0));
   }
   ReferencePoint::RemoveDuplicates(&ref_points);
+  if (ref_points.size() < 2) {
+    AERROR << "Fail to generate smoothed reference line.";
+    return false;
+  }
   *smoothed_reference_line = ReferenceLine(ref_points);
   return true;
 }
@@ -139,7 +143,9 @@ bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
     path_point.set_theta(rlp.heading());
     path_point.set_s(accumulated_s);
     ref_points_.push_back(std::move(path_point));
-    t_knots_.push_back(i);
+
+    // use t_knots_: 0.0, 1.0, 2.0, 3.0 ...
+    t_knots_.push_back(i * 1.0);
   }
   return true;
 }
@@ -162,19 +168,36 @@ bool ReferenceLineSmoother::apply_constraint(
   }
 
   // Add x, y boundary constraint
-  std::vector<double> angles;
+  std::vector<double> headings;
   std::vector<double> longitidinal_bound;
   std::vector<double> lateral_bound;
   std::vector<common::math::Vec2d> xy_points;
   for (std::uint32_t i = 0; i < path_points.size(); ++i) {
-    angles.push_back(path_points[i].theta());
-    longitidinal_bound.push_back(smoother_config_.boundary_bound());
+    headings.push_back(path_points[i].theta());
+    longitidinal_bound.push_back(0.5 * smoother_config_.boundary_bound());
     lateral_bound.push_back(smoother_config_.boundary_bound());
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
+  constexpr double kFixedBoundLimit = 0.01;
+  if (longitidinal_bound.size() > 0) {
+    longitidinal_bound.front() = kFixedBoundLimit;
+    longitidinal_bound.back() = kFixedBoundLimit;
+  }
+
+  if (lateral_bound.size() > 0) {
+    lateral_bound.front() = 0.0;
+    lateral_bound.back() = kFixedBoundLimit;
+  }
+
+  CHECK_EQ(evaluated_t.size(), headings.size());
+  CHECK_EQ(evaluated_t.size(), xy_points.size());
+  CHECK_EQ(evaluated_t.size(), longitidinal_bound.size());
+  CHECK_EQ(evaluated_t.size(), lateral_bound.size());
+
   if (!spline_solver_->mutable_constraint()->Add2dBoundary(
-          evaluated_t, angles, xy_points, longitidinal_bound, lateral_bound)) {
+          evaluated_t, headings, xy_points, longitidinal_bound,
+          lateral_bound)) {
     AERROR << "Add 2d boundary constraint failed";
     return false;
   }
@@ -192,22 +215,22 @@ bool ReferenceLineSmoother::ApplyKernel() {
   Spline2dKernel* kernel = spline_solver_->mutable_kernel();
 
   // add spline kernel
-  if (smoother_config_.derivative_weight() > 0) {
+  if (smoother_config_.derivative_weight() > 0.0) {
     kernel->add_derivative_kernel_matrix(smoother_config_.derivative_weight());
   }
 
-  if (smoother_config_.second_derivative_weight() > 0) {
+  if (smoother_config_.second_derivative_weight() > 0.0) {
     kernel->add_second_order_derivative_matrix(
         smoother_config_.second_derivative_weight());
   }
 
-  if (smoother_config_.third_derivative_weight() > 0) {
+  if (smoother_config_.third_derivative_weight() > 0.0) {
     kernel->add_third_order_derivative_matrix(
         smoother_config_.third_derivative_weight());
   }
 
-  // TODO(fanhaoyang): change to a configurable param
-  kernel->AddRegularization(0.01);
+  constexpr double kReferenceLineSmootherKernelWeight = 0.005;
+  kernel->AddRegularization(kReferenceLineSmootherKernelWeight);
   return true;
 }
 
