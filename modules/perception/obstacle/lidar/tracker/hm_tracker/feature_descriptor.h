@@ -40,7 +40,7 @@ class FeatureDescriptor {
   // @params[OUT] feature: histogram feature of given cloud
   // @return nothing
   void ComputeHistogram(const int bin_size,
-    std::vector<float>* feature);
+                        std::vector<float>* feature);
 
  private:
   void GetMinMaxCenter();
