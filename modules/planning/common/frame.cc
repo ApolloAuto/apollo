@@ -184,7 +184,7 @@ bool Frame::CreateReferenceLineFromRouting(
     hdmap::Path hdmap_path;
     pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
     ReferenceLine reference_line;
-    if (!smoother.smooth(ReferenceLine(hdmap_path), &reference_line)) {
+    if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
       AERROR << "Failed to smooth reference line";
       continue;
     }
