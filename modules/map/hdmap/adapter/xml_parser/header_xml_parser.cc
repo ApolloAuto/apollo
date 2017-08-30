@@ -25,7 +25,7 @@ namespace apollo {
 namespace hdmap {
 namespace adapter {
 
-Status HeaderXmlParser::parse(const tinyxml2::XMLElement& xml_node,
+Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
                         PbHeader* header) {
   auto header_node = xml_node.FirstChildElement("header");
   if (!header_node) {
@@ -44,16 +44,16 @@ Status HeaderXmlParser::parse(const tinyxml2::XMLElement& xml_node,
   std::string vendor;
   int checker = header_node->QueryIntAttribute("revMajor", &rev_major);
   checker += header_node->QueryIntAttribute("revMinor", &rev_minor);
-  checker += UtilXmlParser::query_string_attribute(*header_node, "name",
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "name",
                                                   &database_name);
   checker += header_node->QueryFloatAttribute("version", &version);
-  checker += UtilXmlParser::query_string_attribute(*header_node, "date",
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "date",
                                                   &date);
   checker += header_node->QueryDoubleAttribute("north", &north);
   checker += header_node->QueryDoubleAttribute("south", &south);
   checker += header_node->QueryDoubleAttribute("east", &east);
   checker += header_node->QueryDoubleAttribute("west", &west);
-  checker += UtilXmlParser::query_string_attribute(*header_node, "vendor",
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "vendor",
                                                     &vendor);
 
   if (checker != tinyxml2::XML_SUCCESS) {
@@ -74,8 +74,8 @@ Status HeaderXmlParser::parse(const tinyxml2::XMLElement& xml_node,
   
   // coordinate frame
   std::string from_coordinate = geo_text->Value();
-  int eastZone = getLongZone(east);
-  int westZone = getLongZone(west);
+  int eastZone = GetLongZone(east);
+  int westZone = GetLongZone(west);
   if (eastZone != westZone) {
     std::string err_msg = "unsupport data in more than one zones";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -83,7 +83,7 @@ Status HeaderXmlParser::parse(const tinyxml2::XMLElement& xml_node,
   int zone = westZone;
   std::string to_coordinate = "+proj=utm +zone=" + std::to_string(zone)
       + " +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
-  CoordinateConvertTool::get_instance()->set_convert_param(from_coordinate,
+  CoordinateConvertTool::GetInstance()->SetConvertParam(from_coordinate,
                                                             to_coordinate);
 
   header->set_version(std::to_string(version));

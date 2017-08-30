@@ -35,23 +35,24 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
 
   // root node;
   const tinyxml2::XMLElement* root_node = document.RootElement();
+  CHECK(root_node != nullptr);
   // header
   PbHeader* map_header = pb_map->mutable_header();
-  Status status = HeaderXmlParser::parse(*root_node, map_header);
+  Status status = HeaderXmlParser::Parse(*root_node, map_header);
   if (!status.ok()) {
     return false;
   }
 
   // roads
   std::vector<RoadInternal> roads;
-  status = RoadsXmlParser::parse(*root_node, &roads);
+  status = RoadsXmlParser::Parse(*root_node, &roads);
   if (!status.ok()) {
     return false;
   }
 
   // junction
   std::vector<JunctionInternal> junctions;
-  status = JunctionsXmlParser::parse(*root_node, &junctions);
+  status = JunctionsXmlParser::Parse(*root_node, &junctions);
   if (!status.ok()) {
     return false;
   }

@@ -31,7 +31,7 @@ namespace apollo {
 namespace hdmap {
 namespace adapter {
 
-Status RoadsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
+Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
                             std::vector<RoadInternal>* roads) {
   CHECK_NOTNULL(roads);
 
@@ -40,9 +40,9 @@ Status RoadsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
     // road attributes
     std::string id;
     std::string junction_id;
-    int checker = UtilXmlParser::query_string_attribute(*road_node,
+    int checker = UtilXmlParser::QueryStringAttribute(*road_node,
                                                         "id", &id);
-    checker += UtilXmlParser::query_string_attribute(*road_node,
+    checker += UtilXmlParser::QueryStringAttribute(*road_node,
                                                 "junction", &junction_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parsing road attributes";
@@ -55,7 +55,7 @@ Status RoadsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
       road_internal.road.mutable_junction_id()->set_id(junction_id);
     }
     // lanes
-    RETURN_IF_ERROR(LanesXmlParser::parse(*road_node, road_internal.id,
+    RETURN_IF_ERROR(LanesXmlParser::Parse(*road_node, road_internal.id,
                                         &road_internal.sections));
 
     // objects
@@ -63,14 +63,14 @@ Status RoadsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
                                     = road_node->FirstChildElement("objects");
     if (sub_node != nullptr) {
       // stop line
-      ObjectsXmlParser::parse_stop_lines(*sub_node, &road_internal.stop_lines);
+      ObjectsXmlParser::ParseStopLines(*sub_node, &road_internal.stop_lines);
       // crosswalks
-      ObjectsXmlParser::parse_crosswalks(*sub_node, &road_internal.crosswalks);
+      ObjectsXmlParser::ParseCrosswalks(*sub_node, &road_internal.crosswalks);
       // clearareas
-      ObjectsXmlParser::parse_clear_areas(*sub_node,  
+      ObjectsXmlParser::ParseClearAreas(*sub_node,  
                                           &road_internal.clear_areas);
       // speed_bumps
-      ObjectsXmlParser::parse_speed_bumps(*sub_node,
+      ObjectsXmlParser::ParseSpeedBumps(*sub_node,
                                           &road_internal.speed_bumps);
     }
 
@@ -78,13 +78,13 @@ Status RoadsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
     sub_node = road_node->FirstChildElement("signals");
     if (sub_node != nullptr) {
       // traffic lights
-      SignalsXmlParser::parse_traffic_lights(*sub_node,
+      SignalsXmlParser::ParseTrafficLights(*sub_node,
                                           &road_internal.traffic_lights);
       // stop signs
-      SignalsXmlParser::parse_stop_signs(*sub_node,
+      SignalsXmlParser::ParseStopSigns(*sub_node,
                                         &road_internal.stop_signs);
       // yield signs
-      SignalsXmlParser::parse_yield_signs(*sub_node,
+      SignalsXmlParser::ParseYieldSigns(*sub_node,
                                           &road_internal.yield_signs);
     }
 
