@@ -258,7 +258,7 @@ class Planning:
         st_line.set_visible(True)
         st_line.set_xdata(self.st_data_t[st_graph_name])
         st_line.set_ydata(self.st_data_s[st_graph_name])
-        st_line.set_label(st_graph_name)
+        st_line.set_label(st_graph_name[0:5])
 
         self.st_data_lock.release()
 
@@ -291,7 +291,7 @@ class Planning:
             line.set_visible(True)
             line.set_xdata(self.path_data_x[name])
             line.set_ydata(self.path_data_y[name])
-            line.set_label(name)
+            line.set_label(name[0:5])
             cnt += 1
         self.path_data_lock.release()
 
@@ -330,6 +330,6 @@ class Planning:
             line.set_visible(True)
             line.set_xdata(self.speed_data_time[name])
             line.set_ydata(self.speed_data_val[name])
-            line.set_label(name)
+            line.set_label(name[0:5])
             cnt += 1
         self.speed_data_lock.release()
