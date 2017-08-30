@@ -84,7 +84,9 @@ LatController::LatController() : name_("LQR-based Lateral Controller") {
   AINFO << "Using " << name_;
 }
 
-LatController::~LatController() { CloseLogFile(); }
+LatController::~LatController() {
+  CloseLogFile();
+}
 
 bool LatController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -253,9 +255,13 @@ void LatController::LoadLatGainScheduler(
       << "Fail to load heading error gain scheduler";
 }
 
-void LatController::Stop() { CloseLogFile(); }
+void LatController::Stop() {
+  CloseLogFile();
+}
 
-std::string LatController::Name() const { return name_; }
+std::string LatController::Name() const {
+  return name_;
+}
 
 Status LatController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
@@ -282,12 +288,12 @@ Status LatController::ComputeControlCommand(
 
   // Add gain sheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
-    matrix_q_updated_(0, 0) = matrix_q_(0, 0) *
-                              lat_err_interpolation_->Interpolate(
-                                  VehicleState::instance()->linear_velocity());
-    matrix_q_updated_(2, 2) = matrix_q_(2, 2) *
-                              heading_err_interpolation_->Interpolate(
-                                  VehicleState::instance()->linear_velocity());
+    matrix_q_updated_(0, 0) =
+        matrix_q_(0, 0) * lat_err_interpolation_->Interpolate(
+                              VehicleState::instance()->linear_velocity());
+    matrix_q_updated_(2, 2) =
+        matrix_q_(2, 2) * heading_err_interpolation_->Interpolate(
+                              VehicleState::instance()->linear_velocity());
   }
 
   common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_, matrix_r_,
@@ -306,21 +312,26 @@ Status LatController::ComputeControlCommand(
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = apollo::common::math::Clamp(steer_angle, -100.0, 100.0);
 
-  double steer_limit =
-      std::atan(max_lat_acc_ * wheelbase_ /
-                (VehicleState::instance()->linear_velocity() *
-                 VehicleState::instance()->linear_velocity())) *
-      steer_transmission_ratio_ * 180 / M_PI /
-      steer_single_direction_max_degree_ * 100;
+  if (FLAGS_set_steer_limit) {
+    double steer_limit =
+        std::atan(max_lat_acc_ * wheelbase_ /
+                  (VehicleState::instance()->linear_velocity() *
+                   VehicleState::instance()->linear_velocity())) *
+        steer_transmission_ratio_ * 180 / M_PI /
+        steer_single_direction_max_degree_ * 100;
 
-  // Clamp the steer angle
-  double steer_angle_limited =
-      apollo::common::math::Clamp(steer_angle, -steer_limit, steer_limit);
+    // Clamp the steer angle
+    double steer_angle_limited =
+        apollo::common::math::Clamp(steer_angle, -steer_limit, steer_limit);
+    steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
+    cmd->set_steering_target(steer_angle_limited);
+    debug->set_steer_angle_limited(steer_angle_limited);
+  } else {
+    steer_angle = digital_filter_.Filter(steer_angle);
+    cmd->set_steering_target(steer_angle);
+  }
 
-  steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
-  cmd->set_steering_target(steer_angle_limited);
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
-
   // compute extra information for logging and debugging
   double steer_angle_lateral_contribution =
       -matrix_k_(0, 0) * matrix_state_(0, 0) * 180 / M_PI *
@@ -350,7 +361,7 @@ Status LatController::ComputeControlCommand(
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
   debug->set_ref_speed(VehicleState::instance()->linear_velocity());
-  debug->set_steer_angle_limited(steer_angle_limited);
+
   ProcessLogs(debug, chassis);
   return Status::OK();
 }
@@ -550,8 +561,8 @@ void LatController::ComputeLateralErrors(
   debug->set_heading_error(delta_theta);
   // theta_error_dot = angular_v - matched_point.path_point().kappa() *
   // matched_point.v();
-  debug->set_heading_error_rate(
-      angular_v - matched_point.path_point().kappa() * matched_point.v());
+  debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
+                                                matched_point.v());
 
   // matched_theta = matched_point.path_point().theta();
   debug->set_ref_heading(matched_point.path_point().theta());
