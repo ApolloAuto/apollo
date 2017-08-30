@@ -17,6 +17,8 @@ class DreamviewStore {
         height: window.innerHeight,
     };
 
+    @observable isInitialized = false;
+
     @observable meters = new Meters();
 
     @observable monitor = new Monitor();
@@ -35,6 +37,11 @@ class DreamviewStore {
             height: window.innerHeight,
         };
     }
+
+    @action setInitializationStatus(status){
+        this.isInitialized = status;
+    }
+
 }
 
 const STORE = new DreamviewStore();
