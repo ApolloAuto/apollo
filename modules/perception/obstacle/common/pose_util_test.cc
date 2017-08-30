@@ -30,7 +30,7 @@ class PoseUtilTest : public testing::Test {
   void TearDown() {}
 };
 
-TEST_F(PoseUtilTest, test_ReadPoseFile) {
+TEST_F(PoseUtilTest, ReadPoseFile) {
   std::string data_path = "modules/perception/data/hm_tracker_test/";
   std::string file_name = "QN68P2_12_1476265365_1476265665_2.pose";
   std::string test_file = data_path + file_name;
