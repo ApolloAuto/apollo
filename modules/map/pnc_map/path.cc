@@ -205,7 +205,7 @@ void Path::InitWidth() {
 
   double s = 0;
   for (int i = 0; i < _num_sample_points; ++i) {
-    const MapPathPoint point = get_smooth_point(s);
+    const MapPathPoint point = GetSmoothPoint(s);
     if (point.lane_waypoints().empty()) {
       _left_width.push_back(0.0);
       _right_width.push_back(0.0);
@@ -318,7 +318,7 @@ void Path::InitOverlaps() {
   */
 }
 
-MapPathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
+MapPathPoint Path::GetSmoothPoint(const InterpolatedIndex& index) const {
   CHECK_GE(index.id, 0);
   CHECK_LT(index.id, num_points_);
 
@@ -343,11 +343,11 @@ MapPathPoint Path::get_smooth_point(const InterpolatedIndex& index) const {
   }
 }
 
-MapPathPoint Path::get_smooth_point(double s) const {
-  return get_smooth_point(get_index_from_s(s));
+MapPathPoint Path::GetSmoothPoint(double s) const {
+  return GetSmoothPoint(GetIndexFromS(s));
 }
 
-double Path::get_s_from_index(const InterpolatedIndex& index) const {
+double Path::GetSFromIndex(const InterpolatedIndex& index) const {
   if (index.id < 0) {
     return 0.0;
   }
@@ -357,7 +357,7 @@ double Path::get_s_from_index(const InterpolatedIndex& index) const {
   return accumulated_s_[index.id] + index.offset;
 }
 
-InterpolatedIndex Path::get_index_from_s(double s) const {
+InterpolatedIndex Path::GetIndexFromS(double s) const {
   if (s <= 0.0) {
     return {0, 0.0};
   }
@@ -385,15 +385,15 @@ InterpolatedIndex Path::get_index_from_s(double s) const {
   return {low, s - accumulated_s_[low]};
 }
 
-bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
+bool Path::GetNearestPoint(const Vec2d& point, double* accumulate_s,
                              double* lateral) const {
   double distance = 0.0;
-  return get_nearest_point(point, accumulate_s, lateral, &distance);
+  return GetNearestPoint(point, accumulate_s, lateral, &distance);
 }
 
-bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
+bool Path::GetNearestPoint(const Vec2d& point, double* accumulate_s,
                              double* lateral, double* min_distance) const {
-  if (!get_projection(point, accumulate_s, lateral, min_distance)) {
+  if (!GetProjection(point, accumulate_s, lateral, min_distance)) {
     return false;
   }
   if (*accumulate_s < 0.0) {
@@ -406,13 +406,13 @@ bool Path::get_nearest_point(const Vec2d& point, double* accumulate_s,
   return true;
 }
 
-bool Path::get_projection(const common::math::Vec2d& point,
+bool Path::GetProjection(const common::math::Vec2d& point,
                           double* accumulate_s, double* lateral) const {
   double distance = 0.0;
-  return get_projection(point, accumulate_s, lateral, &distance);
+  return GetProjection(point, accumulate_s, lateral, &distance);
 }
 
-bool Path::get_projection(const Vec2d& point, double* accumulate_s,
+bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
                           double* lateral, double* min_distance) const {
   if (segments_.empty()) {
     return false;
@@ -422,7 +422,7 @@ bool Path::get_projection(const Vec2d& point, double* accumulate_s,
     return false;
   }
   if (_use_path_approximation) {
-    return _approximation.get_projection(*this, point, accumulate_s, lateral,
+    return _approximation.GetProjection(*this, point, accumulate_s, lateral,
                                          min_distance);
   }
   CHECK_GE(num_points_, 2);
@@ -461,14 +461,14 @@ bool Path::get_projection(const Vec2d& point, double* accumulate_s,
   return true;
 }
 
-bool Path::get_heading_along_path(const Vec2d& point, double* heading) const {
+bool Path::GetHeadingAlongPath(const Vec2d& point, double* heading) const {
   if (heading == nullptr) {
     return false;
   }
   double s = 0;
   double l = 0;
-  if (get_projection(point, &s, &l)) {
-    *heading = get_smooth_point(s).heading();
+  if (GetProjection(point, &s, &l)) {
+    *heading = GetSmoothPoint(s).heading();
     return true;
   }
   return false;
@@ -514,7 +514,7 @@ double Path::GetSample(const std::vector<double>& samples,
 bool Path::is_on_path(const Vec2d& point) const {
   double accumulate_s = 0.0;
   double lateral = 0.0;
-  if (!get_projection(point, &accumulate_s, &lateral)) {
+  if (!GetProjection(point, &accumulate_s, &lateral)) {
     return false;
   }
   double left_width = 0.0;
@@ -694,7 +694,7 @@ void PathApproximation::init_projections(const Path& path) {
            _num_projection_samples);
 }
 
-bool PathApproximation::get_projection(const Path& path,
+bool PathApproximation::GetProjection(const Path& path,
                                        const common::math::Vec2d& point,
                                        double* accumulate_s, double* lateral,
                                        double* min_distance) const {

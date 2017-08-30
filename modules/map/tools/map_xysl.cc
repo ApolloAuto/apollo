@@ -97,7 +97,7 @@ class MapUtil {
     const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     QUIT_IF(lane == nullptr, -3, ERROR,
             "get_smooth_point_from_lane[%s] failed", lane_id.c_str());
-    *point = lane->get_smooth_point(s);
+    *point = lane->GetSmoothPoint(s);
     return 0;
   }
 
@@ -108,7 +108,7 @@ class MapUtil {
     const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
     QUIT_IF(lane == nullptr, -2, ERROR,
             "get_lane_by_id[%s] failed", lane_id.c_str());
-    bool ret = lane->get_projection(vec2d, s, l);
+    bool ret = lane->GetProjection(vec2d, s, l);
     QUIT_IF(!ret, -3, ERROR,
             "lane[%s] get projection for point[%f, %f] failed",
             lane_id.c_str(), vec2d.x(), vec2d.y());

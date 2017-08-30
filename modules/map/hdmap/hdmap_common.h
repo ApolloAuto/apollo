@@ -137,14 +137,14 @@ class LaneInfo {
   bool is_on_lane(const apollo::common::math::Vec2d &point) const;
   bool is_on_lane(const apollo::common::math::Box2d &box) const;
 
-  apollo::common::PointENU get_smooth_point(double s) const;
+  apollo::common::PointENU GetSmoothPoint(double s) const;
   double distance_to(const apollo::common::math::Vec2d &point) const;
   double distance_to(const apollo::common::math::Vec2d &point,
                      apollo::common::math::Vec2d *map_point, double *s_offset,
                      int *s_offset_index) const;
-  apollo::common::PointENU get_nearest_point(
+  apollo::common::PointENU GetNearestPoint(
       const apollo::common::math::Vec2d &point, double *distance) const;
-  bool get_projection(const apollo::common::math::Vec2d &point,
+  bool GetProjection(const apollo::common::math::Vec2d &point,
                       double *accumulate_s, double *lateral) const;
 
  private:

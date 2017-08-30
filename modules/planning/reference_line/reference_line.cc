@@ -74,7 +74,7 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
     AWARN << "The requested s is before the start point of the reference "
              "line; reference line starts at "
           << accumulated_s.front() << ", requested " << s << ".";
-    ReferencePoint ref_point(map_path_.get_smooth_point(s), 0.0, 0.0, 0.0, 0.0);
+    ReferencePoint ref_point(map_path_.GetSmoothPoint(s), 0.0, 0.0, 0.0, 0.0);
     if (ref_point.lane_waypoints().empty()) {
       ref_point.add_lane_waypoints(reference_points_.front().lane_waypoints());
     }
@@ -84,7 +84,7 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
     AWARN << "The requested s exceeds the reference line; reference line "
              "ends at "
           << accumulated_s.back() << "requested " << s << " .";
-    ReferencePoint ref_point(map_path_.get_smooth_point(s), 0.0, 0.0, 0.0, 0.0);
+    ReferencePoint ref_point(map_path_.GetSmoothPoint(s), 0.0, 0.0, 0.0, 0.0);
     if (ref_point.lane_waypoints().empty()) {
       ref_point.add_lane_waypoints(reference_points_.back().lane_waypoints());
     }
@@ -184,7 +184,7 @@ bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
   DCHECK_NOTNULL(sl_point);
   double s = 0;
   double l = 0;
-  if (!map_path_.get_projection(xy_point, &s, &l)) {
+  if (!map_path_.GetProjection(xy_point, &s, &l)) {
     AERROR << "Can't get nearest point from path.";
     return false;
   }
