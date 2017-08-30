@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 
-#include <algorithm>
 #include <float.h>
+#include <algorithm>
 #include <vector>
 #include "Eigen/Core"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
@@ -47,14 +47,14 @@ void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
 }
 
 template <typename PointType>
-void TransformPoint(const PointType& point_in, PointType& point_out,
-                           const Eigen::Matrix4d& trans_mat) {
+void TransformPoint(const PointType& point_in, PointType* point_out,
+                    const Eigen::Matrix4d& trans_mat) {
   Eigen::Vector4d v(point_in.x, point_in.y, point_in.z, 1);
   v = trans_mat * v;
-  point_out = point_in;
-  point_out.x = v.x();
-  point_out.y = v.y();
-  point_out.z = v.z();
+  *point_out = point_in;
+  point_out->x = v.x();
+  point_out->y = v.y();
+  point_out->z = v.z();
 }
 
 template <typename PointType>
@@ -121,8 +121,8 @@ void GetCloudMinMax3D(typename pcl::PointCloud<PointT>::Ptr cloud,
 template <typename PointT>
 void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
                            const Eigen::Vector3d& direction,
-                           Eigen::Vector3d& size,
-                           Eigen::Vector3d& center) {
+                           Eigen::Vector3d* size,
+                           Eigen::Vector3d* center) {
   Eigen::Vector3d dir(direction[0], direction[1], 0);
   dir.normalize();
   Eigen::Vector3d ortho_dir(-dir[1], dir[0], 0.0);
@@ -143,8 +143,8 @@ void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
       max_pt[j] = std::max(max_pt[j], loc_pt[j]);
     }
   }
-  size = max_pt - min_pt;
-  center = dir * ((max_pt[0] + min_pt[0]) * 0.5) +
+  *size = max_pt - min_pt;
+  *center = dir * ((max_pt[0] + min_pt[0]) * 0.5) +
            ortho_dir * ((max_pt[1] + min_pt[1]) * 0.5) + z_dir * min_pt[2];
 }
 
@@ -176,9 +176,9 @@ void TransAffineToMatrix4(const Eigen::Vector3d& translation,
 void ComputeMostConsistentBboxDirection(const Eigen::Vector3f& previous_dir,
                                         Eigen::Vector3f* current_dir);
 
-double VectorCosTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
+double VectorCosTheta2dXy(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2);
 
-double VectorTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2);
+double VectorTheta2dXy(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2);
 
 }  // namespace perception
 }  // namespace apollo

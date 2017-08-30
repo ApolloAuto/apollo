@@ -106,7 +106,8 @@ void ComputeMostConsistentBboxDirection(const Eigen::Vector3f& previous_dir,
   }
 }
 
-double VectorCosTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {
+double VectorCosTheta2dXy(const Eigen::Vector3f& v1,
+                          const Eigen::Vector3f& v2) {
     double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
     double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
     double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum()
@@ -114,7 +115,7 @@ double VectorCosTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {
     return cos_theta;
 }
 
-double VectorTheta2dXy(Eigen::Vector3f& v1, Eigen::Vector3f& v2) {
+double VectorTheta2dXy(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2) {
     double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
     double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
     double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum()
