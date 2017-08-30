@@ -28,7 +28,7 @@ const int Details73b::ID = 0x73B;
 
 void Details73b::Parse(const uint8_t* bytes, int32_t length,
                        Mobileye* mobileye) const {
-  auto details_73b = mobileye->add_details_73b();
+  auto* details_73b = mobileye->add_details_73b();
   details_73b->set_obstacle_angle_rate(obstacle_angle_rate(bytes, length));
   details_73b->set_obstacle_scale_change(obstacle_scale_change(bytes, length));
   details_73b->set_object_accel_x(object_accel_x(bytes, length));

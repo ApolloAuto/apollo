@@ -28,7 +28,7 @@ const int Details739::ID = 0x739;
 
 void Details739::Parse(const uint8_t* bytes, int32_t length,
                        Mobileye* mobileye) const {
-  auto details_739 = mobileye->add_details_739();
+  auto* details_739 = mobileye->add_details_739();
   details_739->set_obstacle_id(obstacle_id(bytes, length));
   details_739->set_obstacle_pos_x(obstacle_pos_x(bytes, length));
   details_739->set_reseved_2(reseved_2(bytes, length));
