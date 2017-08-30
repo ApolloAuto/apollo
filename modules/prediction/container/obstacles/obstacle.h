@@ -35,43 +35,113 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
 
+/**
+ * @namespace apollo::prediction
+ * @brief apollo::prediction
+ */
 namespace apollo {
 namespace prediction {
 
+/**
+ * @class Obstacle
+ * @brief Prediction obstacle.
+ */
 class Obstacle {
  public:
+  /**
+   * @brief Constructor
+   */
   Obstacle();
 
+  /**
+   * @brief Destructor
+   */
   virtual ~Obstacle();
 
+  /**
+   * @brief Insert a perception obstacle with its timestamp.
+   * @param perception_obstacle The obstacle from perception.
+   * @param timestamp The timestamp when the perception obstacle was detected.
+   */
   void Insert(const apollo::perception::PerceptionObstacle& perception_obstacle,
               const double timestamp);
 
+  /**
+   * @brief Get the type of perception obstacle's type.
+   * @return The type pf perception obstacle.
+   */
   apollo::perception::PerceptionObstacle::Type type() const;
 
+  /**
+   * @brief Get the obstacle's ID.
+   * @return The obstacle's ID.
+   */
   int id() const;
 
+  /**
+   * @brief Get the obstacle's timestamp.
+   * @return The obstacle's timestamp.
+   */
   double timestamp() const;
 
+  /**
+   * @brief Get the ith feature from latest to earliest.
+   * @param i The index of the feature.
+   * @return The ith feature.
+   */
   const Feature& feature(size_t i) const;
 
+  /**
+   * @brief Get a pointer to the ith feature from latest to earliest.
+   * @param i The index of the feature.
+   * @return A pointer to the ith feature.
+   */
   Feature* mutable_feature(size_t i);
 
+  /**
+   * @brief Get the latest feature.
+   * @return The latest feature.
+   */
   const Feature& latest_feature() const;
 
+  /**
+   * @brief Get a pointer to the latest feature.
+   * @return A pointer to the latest feature.
+   */
   Feature* mutable_latest_feature();
 
+  /**
+   * @brief Get the number of historical features.
+   * @return The number of historical features.
+   */
   size_t history_size() const;
 
+  /**
+   * @brief Get the lane Kalman filter by lane ID.
+   * @param lane_id The lane ID.
+   * @return The lane Kalman filter.
+   */
   const apollo::common::math::KalmanFilter<double, 4, 2, 0>&
       kf_lane_tracker(const std::string& lane_id);
 
+  /**
+   * @brief Get the motion Kalman filter.
+   * @return The motion Kalman filter.
+   */
   const apollo::common::math::KalmanFilter<double, 6, 2, 0>&
       kf_motion_tracker() const;
 
+  /**
+   * @brief Get the pedestrian Kalman filter.
+   * @return The pedestrian Kalman filter.
+   */
   const apollo::common::math::KalmanFilter<double, 2, 2, 4>&
       kf_pedestrian_tracker() const;
 
+  /**
+   * @brief Check if the obstacle is on any lane.
+   * @return If the obstacle is on any lane.
+   */
   bool IsOnLane();
 
  private:
