@@ -139,6 +139,9 @@ template <typename SensorType>
 SensorProtocolData<SensorType>
     *SensorMessageManager<SensorType>::GetMutableSensorProtocolDataById(
         const uint32_t message_id) {
+  // Generally, ID and parser are one-to-one mapping.
+  // If there exist several IDs corresponding to one parser (e.g., mobileye 739 and 73c),
+  // please specialize this function.
   if (sensor_protocol_data_map_.find(message_id) ==
       sensor_protocol_data_map_.end()) {
     ADEBUG << "Unable to get protocol data because of invalid message_id:"
