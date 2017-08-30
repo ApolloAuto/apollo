@@ -30,8 +30,10 @@ def async_run_command(cmd, stdout_file, stderr_file):
         Config.get_realpath(stderr_file), 'w')
 
     Config.log.info('Run command in background: {}'.format(cmd))
-    subprocess.Popen(
-        cmd, shell=True, stdout=stdout_fd, stderr=stderr_fd, close_fds=True)
+    nohup_cmd = 'nohup {} &'.format(cmd)
+    subprocess.Popen(nohup_cmd, shell=True,
+                     stdout=stdout_fd, stderr=stderr_fd, close_fds=True
+                     ).wait()
 
 
 def async_run_command_pb(cmd_pb):
