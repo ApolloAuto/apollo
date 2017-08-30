@@ -25,7 +25,7 @@ namespace adapter {
 
 class HeaderXmlParser {
  public:
-  static Status parse(const tinyxml2::XMLElement& xml_node, PbHeader* header);
+  static Status Parse(const tinyxml2::XMLElement& xml_node, PbHeader* header);
 };
 
 }  // namespace adapter

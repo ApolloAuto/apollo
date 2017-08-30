@@ -26,13 +26,13 @@ namespace adapter {
 
 class ObjectsXmlParser {
  public:
-  static Status parse_crosswalks(const tinyxml2::XMLElement& xml_node,
+  static Status ParseCrosswalks(const tinyxml2::XMLElement& xml_node,
                               std::vector<PbCrosswalk>* crosswalks);
-  static Status parse_clear_areas(const tinyxml2::XMLElement& xml_node,
+  static Status ParseClearAreas(const tinyxml2::XMLElement& xml_node,
                               std::vector<PbClearArea>* clear_areas);
-  static Status parse_speed_bumps(const tinyxml2::XMLElement& xml_node,
+  static Status ParseSpeedBumps(const tinyxml2::XMLElement& xml_node,
                               std::vector<PbSpeedBump>* speed_bumps);
-  static Status parse_stop_lines(const tinyxml2::XMLElement& xml_node,
+  static Status ParseStopLines(const tinyxml2::XMLElement& xml_node,
                                 std::vector<StopLineInternal>* stop_lines);
 };
 

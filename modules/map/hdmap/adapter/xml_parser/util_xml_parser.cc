@@ -27,7 +27,7 @@ namespace apollo {
 namespace hdmap  {
 namespace adapter {
 
-Status UtilXmlParser::parse_curve(const tinyxml2::XMLElement& xml_node,
+Status UtilXmlParser::ParseCurve(const tinyxml2::XMLElement& xml_node,
                                   PbCurve* curve) {
   CHECK_NOTNULL(curve);
 
@@ -35,7 +35,7 @@ Status UtilXmlParser::parse_curve(const tinyxml2::XMLElement& xml_node,
                                   = xml_node.FirstChildElement("geometry");
   while (sub_node) {
     PbCurveSegment* curve_segment = curve->add_segment();
-    RETURN_IF_ERROR(UtilXmlParser::parse_geometry(*sub_node,
+    RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node,
                                                   curve_segment));
     sub_node = sub_node->NextSiblingElement("geometry");
   }
@@ -43,7 +43,7 @@ Status UtilXmlParser::parse_curve(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-Status UtilXmlParser::parse_geometry(const tinyxml2::XMLElement& xml_node,
+Status UtilXmlParser::ParseGeometry(const tinyxml2::XMLElement& xml_node,
                                     PbCurveSegment* curve_segment) {
   CHECK_NOTNULL(curve_segment);
 
@@ -68,7 +68,7 @@ Status UtilXmlParser::parse_geometry(const tinyxml2::XMLElement& xml_node,
     double output_y = 0.0;
     double output_z = 0.0;
 
-    wgs84_to_utm(ptx, pty, ptz, &output_x, &output_y, &output_z);
+    WGS84ToUTM(ptx, pty, ptz, &output_x, &output_y, &output_z);
 
     curve_segment->mutable_start_position()->set_x(output_x);
     curve_segment->mutable_start_position()->set_y(output_y);
@@ -80,7 +80,7 @@ Status UtilXmlParser::parse_geometry(const tinyxml2::XMLElement& xml_node,
   const auto sub_node = xml_node.FirstChildElement("pointSet");
   if (sub_node) {
     PbLineSegment* line_segment = curve_segment->mutable_line_segment();
-    RETURN_IF_ERROR(parse_point_set(*sub_node, line_segment));
+    RETURN_IF_ERROR(ParsePointSet(*sub_node, line_segment));
     return Status::OK();
   }
 
@@ -88,7 +88,7 @@ Status UtilXmlParser::parse_geometry(const tinyxml2::XMLElement& xml_node,
   return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
 }
 
-Status UtilXmlParser::parse_point_set(const tinyxml2::XMLElement& xml_node,
+Status UtilXmlParser::ParsePointSet(const tinyxml2::XMLElement& xml_node,
                                     PbLineSegment* line_segment) {
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("point");
   while (sub_node) {
@@ -108,7 +108,7 @@ Status UtilXmlParser::parse_point_set(const tinyxml2::XMLElement& xml_node,
     double output_x = 0.0;
     double output_y = 0.0;
     double output_z = 0.0;
-    wgs84_to_utm(ptx, pty, ptz, &output_x, &output_y, &output_z);
+    WGS84ToUTM(ptx, pty, ptz, &output_x, &output_y, &output_z);
     pt->set_x(output_x);
     pt->set_y(output_y);
 
@@ -118,7 +118,7 @@ Status UtilXmlParser::parse_point_set(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-Status UtilXmlParser::parse_outline(const tinyxml2::XMLElement& xml_node,
+Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node,
                                     PbPolygon* polygon) {
   const tinyxml2::XMLElement* sub_node =
                                     xml_node.FirstChildElement("cornerGlobal");
@@ -140,7 +140,7 @@ Status UtilXmlParser::parse_outline(const tinyxml2::XMLElement& xml_node,
     double output_x = 0.0;
     double output_y = 0.0;
     double output_z = 0.0;
-    wgs84_to_utm(ptx, pty, ptz, &output_x, &output_y, &output_z);
+    WGS84ToUTM(ptx, pty, ptz, &output_x, &output_y, &output_z);
     pt->set_x(output_x);
     pt->set_y(output_y);
     // pt->set_z(output_z);
@@ -151,9 +151,12 @@ Status UtilXmlParser::parse_outline(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-Status UtilXmlParser::parse_point(const tinyxml2::XMLElement& xml_node,
+Status UtilXmlParser::ParsePoint(const tinyxml2::XMLElement& xml_node,
                                 PbPoint3D* pt) {
+  CHECK_NOTNULL(pt);
+
   const auto sub_node = xml_node.FirstChildElement("centerPoint");
+  CHECK(sub_node != nullptr);
   int checker = tinyxml2::XML_SUCCESS;
   double ptx = 0.0;
   double pty = 0.0;
@@ -170,7 +173,7 @@ Status UtilXmlParser::parse_point(const tinyxml2::XMLElement& xml_node,
   double output_x = 0.0;
   double output_y = 0.0;
   double output_z = 0.0;
-  wgs84_to_utm(ptx, pty, ptz, &output_x, &output_y, &output_z);
+  WGS84ToUTM(ptx, pty, ptz, &output_x, &output_y, &output_z);
   pt->set_x(output_x);
   pt->set_y(output_y);
   pt->set_z(output_z);
@@ -178,13 +181,13 @@ Status UtilXmlParser::parse_point(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-std::string UtilXmlParser::create_lane_id(const std::string& road_id,
+std::string UtilXmlParser::CreateLaneId(const std::string& road_id,
                                         const std::string& section_id,
                                         const int lane_id) {
   return road_id + "_" + section_id + "_" + std::to_string(lane_id);
 }
 
-std::string UtilXmlParser::to_upper(const std::string& s) {
+std::string UtilXmlParser::ToUpper(const std::string& s) {
   std::string value = s;
   std::transform(value.begin(), value.end(), value.begin(),
     [](unsigned char c) { return std::toupper(c); });
@@ -192,13 +195,13 @@ std::string UtilXmlParser::to_upper(const std::string& s) {
   return value;
 }
 
-void UtilXmlParser::wgs84_to_utm(const double x, const double y, const double z,
+void UtilXmlParser::WGS84ToUTM(const double x, const double y, const double z,
                         double* output_x, double* output_y, double* output_z) {
-  CoordinateConvertTool::get_instance()->coordiate_convert(x, y, z,
+  CoordinateConvertTool::GetInstance()->CoordiateConvert(x, y, z,
                                                 output_x, output_y, output_z);
 }
 
-double UtilXmlParser::curve_length(const PbCurve& curve) {
+double UtilXmlParser::CurveLength(const PbCurve& curve) {
   double length = 0.0;
   for (int i = 0; i < curve.segment_size(); ++i) {
     length += curve.segment(i).length();
@@ -207,7 +210,7 @@ double UtilXmlParser::curve_length(const PbCurve& curve) {
   return length;
 }
 
-tinyxml2::XMLError UtilXmlParser::query_string_attribute(
+tinyxml2::XMLError UtilXmlParser::QueryStringAttribute(
                                         const tinyxml2::XMLElement& xml_node,
                                         const std::string& name,
                                         std::string* value) {
@@ -221,7 +224,7 @@ tinyxml2::XMLError UtilXmlParser::query_string_attribute(
   return tinyxml2::XML_SUCCESS;
 }
 
-int getLongZone(double longitude) {
+int GetLongZone(double longitude) {
   double longZone = 0.0;
   if (longitude < 0.0) {
     longZone = ((180.0 + longitude) / 6.0) + 1;

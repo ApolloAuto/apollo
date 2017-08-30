@@ -27,55 +27,55 @@ namespace adapter {
 
 class LanesXmlParser {
  public:
-  static Status parse(const tinyxml2::XMLElement& xml_node,
+  static Status Parse(const tinyxml2::XMLElement& xml_node,
                     const std::string& road_id,
                     std::vector<RoadSectionInternal> *sections);
-  static Status parse_lane_section(const tinyxml2::XMLElement& xml_node,
+  static Status ParseLaneSection(const tinyxml2::XMLElement& xml_node,
                       const std::string& road_id,
                       const std::string& section_id,
                       std::vector<LaneInternal>* lanes);
 
-  static Status parse_section_boundary(const tinyxml2::XMLElement& xml_node,
+  static Status ParseSectionBoundary(const tinyxml2::XMLElement& xml_node,
                                     PbBoundaryPolygon* boundary);
 
-  static Status to_pb_boundary_type(const std::string& type,
+  static Status ToPbBoundaryType(const std::string& type,
                                  PbBoundaryEdgeType* boundary_type);
-  static Status parse_lane(const tinyxml2::XMLElement& xml_node,
+  static Status ParseLane(const tinyxml2::XMLElement& xml_node,
                           const std::string& road_id,
                           const std::string& section_id,
                           LaneInternal* lane_internal);
-  static Status parse_direction(const tinyxml2::XMLElement& xml_node,
+  static Status ParseDirection(const tinyxml2::XMLElement& xml_node,
                             PbLane* lane);
-  static Status parse_center_curve(const tinyxml2::XMLElement& xml_node,
+  static Status ParseCenterCurve(const tinyxml2::XMLElement& xml_node,
                                 PbLane* lane);
-  static Status parse_speed(const tinyxml2::XMLElement& xml_node,
+  static Status ParseSpeed(const tinyxml2::XMLElement& xml_node,
                             PbLane* lane);
-  static Status parse_sample_associates(const tinyxml2::XMLElement& xml_node,
+  static Status ParseSampleAssociates(const tinyxml2::XMLElement& xml_node,
                                         PbLane* lane);
-  static Status parse_object_overlap_group(const tinyxml2::XMLElement& xml_node,
+  static Status ParseObjectOverlapGroup(const tinyxml2::XMLElement& xml_node,
                                 std::vector<OverlapWithLane>* object_overlaps);
-  static Status parse_signal_overlap_group(const tinyxml2::XMLElement& xml_node,
+  static Status ParseSignalOverlapGroup(const tinyxml2::XMLElement& xml_node,
                                 std::vector<OverlapWithLane>* signal_overlaps);
-  static Status parse_junction_overlap_group(
+  static Status ParseJunctionOverlapGroup(
                               const tinyxml2::XMLElement& xml_node,
                               std::vector<OverlapWithLane>* junction_overlaps);
-  static Status parse_lane_overlap_group(const tinyxml2::XMLElement& xml_node,
+  static Status ParseLaneOverlapGroup(const tinyxml2::XMLElement& xml_node,
                                   std::vector<OverlapWithLane>* lane_overlaps);
 
-  static Status to_pb_lane_type(const std::string& type,
+  static Status ToPbLaneType(const std::string& type,
                               PbLaneType* pb_type);
-  static Status to_pb_turn_type(const std::string& type,
+  static Status ToPbTurnType(const std::string& type,
                               PbTurnType* pb_turn_type);
-  static Status to_pb_dirction(const std::string& type,
+  static Status ToPbDirection(const std::string& type,
                               PbLaneDirection* pb_direction);
 
-  static void parse_lane_link(const tinyxml2::XMLElement& xml_node,
+  static void ParseLaneLink(const tinyxml2::XMLElement& xml_node,
                               const std::string& /*road_id*/,
                               const std::string& /*section_id*/,
                               PbLane* lane);
-  static Status parse_lane_border_mark(const tinyxml2::XMLElement& xml_node,
+  static Status ParseLaneBorderMark(const tinyxml2::XMLElement& xml_node,
                               PbLaneBoundaryTypeType* boundary_type);
-  static Status to_pb_lane_mark_type(const std::string& type,
+  static Status ToPbLaneMarkType(const std::string& type,
                               const std::string& color,
                               PbLaneBoundaryTypeType* boundary_type);
 };

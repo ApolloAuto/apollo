@@ -27,15 +27,15 @@ namespace adapter {
 
 class SignalsXmlParser {
  public:
-  static Status parse_traffic_lights(const tinyxml2::XMLElement& xml_node,
+  static Status ParseTrafficLights(const tinyxml2::XMLElement& xml_node,
                           std::vector<TrafficLightInternal>* traffic_lights);
-  static Status to_pb_signal_type(const std::string& xml_type,
+  static Status ToPbSignalType(const std::string& xml_type,
                           PbSignalType* signal_type);
-  static Status to_pb_subsignal_type(const std::string& xml_type,
+  static Status ToPbSubSignalType(const std::string& xml_type,
                           PbSubSignalType* sub_signal_type);
-  static Status parse_stop_signs(const tinyxml2::XMLElement& xml_node,
+  static Status ParseStopSigns(const tinyxml2::XMLElement& xml_node,
                               std::vector<StopSignInternal>* stop_signs);
-  static Status parse_yield_signs(const tinyxml2::XMLElement& xml_node,
+  static Status ParseYieldSigns(const tinyxml2::XMLElement& xml_node,
                                 std::vector<YieldSignInternal>* yield_signs);
 };
 
