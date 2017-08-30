@@ -32,8 +32,9 @@ namespace planning {
 template <typename I, typename T>
 class IndexedQueue {
  public:
-  explicit IndexedQueue(std::size_t max_queue_size) :
-      max_queue_size_(max_queue_size) {}
+  // Get infinite capacity with 0.
+  explicit IndexedQueue(std::size_t capacity) : capacity_(capacity) {}
+
   const T *Find(const I id) const {
     auto iter = map_.find(id);
     if (iter == map_.end()) {
@@ -54,9 +55,8 @@ class IndexedQueue {
     if (Find(id)) {
       return false;
     }
-    if (!queue_.empty() && queue_.size() == max_queue_size_) {
-      const auto &front = queue_.front();
-      map_.erase(front.first);
+    if (capacity_ > 0 && queue_.size() == capacity_) {
+      map_.erase(queue_.front().first);
       queue_.pop();
     }
     queue_.push(std::make_pair(id, ptr.get()));
@@ -65,7 +65,7 @@ class IndexedQueue {
   }
 
  public:
-  std::size_t max_queue_size_ = 0;
+  std::size_t capacity_ = 0;
   std::queue<std::pair<I, const T *>> queue_;
   std::unordered_map<I, std::unique_ptr<T>> map_;
 };
@@ -73,4 +73,4 @@ class IndexedQueue {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_DATA_CENTER_H_
+#endif  // MODULES_PLANNING_COMMON_INDEXED_QUEUE_H_

@@ -76,8 +76,7 @@ void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
 
 void Frame::CreatePredictionObstacles(
     const prediction::PredictionObstacles &prediction) {
-  std::list<std::unique_ptr<Obstacle>> obstacles;
-  Obstacle::CreateObstacles(prediction, &obstacles);
+  auto obstacles = Obstacle::CreateObstacles(prediction);
   for (auto &ptr : obstacles) {
     auto id(ptr->Id());
     obstacles_.Add(id, std::move(ptr));
