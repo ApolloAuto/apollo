@@ -231,6 +231,7 @@ export default class Map {
     constructor() {
         this.hash = -1;
         this.data = {};
+        this.initialized = false;
     }
 
     removeDrewObjects(drewObjects, scene) {
@@ -311,8 +312,9 @@ export default class Map {
             this.hash = hash;
             const diff = diffMapElements(elementIds, this.data);
             this.removeExpiredElements(elementIds, scene);
-            if (!_.isEmpty(diff)) {
+            if (!_.isEmpty(diff) || !this.initialized) {
                 WS.requestMapData(diff);
+                this.initialized = true;
             }
         }
     }
