@@ -44,3 +44,4 @@ DEFINE_double(steer_angle_rate, 100.0,
               "Steer angle change rate in percentage.");
 DEFINE_bool(enable_gain_scheduler, false,
             "Enable gain scheduler for higher vechile speed");
+DEFINE_bool(set_steer_limit, false, "Set steer limit");
