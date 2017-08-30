@@ -27,28 +27,28 @@ namespace adapter {
 
 class UtilXmlParser {
  public:
-  static Status parse_curve(const tinyxml2::XMLElement& xml_node,
+  static Status ParseCurve(const tinyxml2::XMLElement& xml_node,
                             PbCurve* curve);
-  static Status parse_geometry(const tinyxml2::XMLElement& xml_node,
+  static Status ParseGeometry(const tinyxml2::XMLElement& xml_node,
                               PbCurveSegment* curve_segment);
-  static Status parse_point_set(const tinyxml2::XMLElement& xml_node,
+  static Status ParsePointSet(const tinyxml2::XMLElement& xml_node,
                               PbLineSegment* line_segment);
-  static Status parse_outline(const tinyxml2::XMLElement& xml_node,
+  static Status ParseOutline(const tinyxml2::XMLElement& xml_node,
                               PbPolygon* polygon);
-  static Status parse_point(const tinyxml2::XMLElement& xml_node,
+  static Status ParsePoint(const tinyxml2::XMLElement& xml_node,
                               PbPoint3D* pt);
 
-  static std::string create_lane_id(const std::string& road_id,
+  static std::string CreateLaneId(const std::string& road_id,
                                   const std::string& section_id,
                                   const int lane_id);
-  static std::string to_upper(const std::string& s);
+  static std::string ToUpper(const std::string& s);
 
-  static void wgs84_to_utm(const double x, const double y, const double z,
+  static void WGS84ToUTM(const double x, const double y, const double z,
                       double* output_x, double* output_y, double* output_z);
 
-  static double curve_length(const PbCurve& curve);
+  static double CurveLength(const PbCurve& curve);
 
-  static tinyxml2::XMLError query_string_attribute(
+  static tinyxml2::XMLError QueryStringAttribute(
                                       const tinyxml2::XMLElement& xml_node,
                                       const std::string& name,
                                       std::string* value);
@@ -60,7 +60,7 @@ class UtilXmlParser {
   static double _y_max;
 };
 
-int getLongZone(double longitude);
+int GetLongZone(double longitude);
 
 }  // namespace adapter
 }  // namespace hdmap

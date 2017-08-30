@@ -82,6 +82,8 @@ apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon) {
 void SegmentsFromCurve(
     const Curve &curve,
     std::vector<apollo::common::math::LineSegment2d> *segments) {
+  CHECK_NOTNULL(segments);
+
   std::vector<Vec2d> points;
   PointsFromCurve(curve, &points);
   for (size_t i = 0; i + 1 < points.size(); ++i) {
@@ -297,13 +299,19 @@ PointENU LaneInfo::GetSmoothPoint(double s) const {
 
 double LaneInfo::DistanceTo(const Vec2d &point) const {
   const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
+  CHECK(segment_box != nullptr);
   return segment_box->DistanceTo(point);
 }
 
 double LaneInfo::DistanceTo(const Vec2d &point,
                             Vec2d *map_point,
                             double *s_offset, int *s_offset_index) const {
+  CHECK_NOTNULL(map_point);
+  CHECK_NOTNULL(s_offset);
+  CHECK_NOTNULL(s_offset_index);
+
   const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
+  CHECK(segment_box != nullptr);
   int index = segment_box->id();
   double distance = segments_[index].DistanceTo(point, map_point);
   *s_offset_index = index;
@@ -313,6 +321,8 @@ double LaneInfo::DistanceTo(const Vec2d &point,
 }
 
 PointENU LaneInfo::GetNearestPoint(const Vec2d &point, double *distance) const {
+  CHECK_NOTNULL(distance);
+
   const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
   int index = segment_box->id();
   Vec2d nearest_point;

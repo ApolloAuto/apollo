@@ -24,14 +24,14 @@ namespace apollo {
 namespace hdmap {
 namespace adapter {
 
-Status JunctionsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
+Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
                         std::vector<JunctionInternal>* junctions) {
   const tinyxml2::XMLElement* junction_node
                                   = xml_node.FirstChildElement("junction");
   while (junction_node) {
     // id
     std::string junction_id;
-    int checker = UtilXmlParser::query_string_attribute(*junction_node,
+    int checker = UtilXmlParser::QueryStringAttribute(*junction_node,
                                                         "id", &junction_id);
     if (checker != tinyxml2::XML_SUCCESS) {
         std::string err_msg = "Error parse junction id";
@@ -49,7 +49,7 @@ Status JunctionsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
     PbJunction junction;
     junction.mutable_id()->set_id(junction_id);
     PbPolygon* polygon = junction.mutable_polygon();
-    RETURN_IF_ERROR(UtilXmlParser::parse_outline(*sub_node, polygon));
+    RETURN_IF_ERROR(UtilXmlParser::ParseOutline(*sub_node, polygon));
 
     JunctionInternal junction_internal;
     junction_internal.junction = junction;
@@ -60,7 +60,7 @@ Status JunctionsXmlParser::parse(const tinyxml2::XMLElement& xml_node,
       sub_node = sub_node->FirstChildElement("objectReference");
       while (sub_node) {
           std::string object_id;
-          checker = UtilXmlParser::query_string_attribute(*sub_node, "id",
+          checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
                                               &object_id);
           if (checker != tinyxml2::XML_SUCCESS) {
               std::string err_msg = "Error parse junction overlap id";

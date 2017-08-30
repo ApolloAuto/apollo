@@ -28,12 +28,12 @@ class CoordinateConvertTool {
   ~CoordinateConvertTool();
 
  public:
-  static CoordinateConvertTool* get_instance();
+  static CoordinateConvertTool* GetInstance();
 
  public:
-  Status set_convert_param(const std::string &source_param,
+  Status SetConvertParam(const std::string &source_param,
                         const std::string &dst_param);
-  Status coordiate_convert(const double longitude, const double latitude,
+  Status CoordiateConvert(const double longitude, const double latitude,
                           const double height_ellipsoid, double* ltm_x,
                           double* ltm_y, double* ltm_z);
 
@@ -41,8 +41,8 @@ class CoordinateConvertTool {
   std::string source_convert_param_;
   std::string dst_convert_param_;
 
-  projPJ _pj_from_;
-  projPJ _pj_to_;
+  projPJ pj_from_;
+  projPJ pj_to_;
 };
 
 }  // namespace adapter
