@@ -28,8 +28,8 @@
 namespace apollo {
 namespace perception {
 
-HmObjectTracker::HmObjectTracker(): matcher_method_("hungarian_matcher"),
-  filter_method_("kalman_filter"),
+HmObjectTracker::HmObjectTracker(): matcher_method_(HUNGARIAN_MATCHER),
+  filter_method_(KALMAN_FILTER),
   use_histogram_for_match_(false),
   histogram_bin_size_(10),
   matcher_(NULL),
@@ -56,12 +56,14 @@ bool HmObjectTracker::Init() {
   }
 
   // 1. Initialize params of object track matcher
+  std::string matcher_method_name = "hungarian_matcher";
   if (!model_config->GetValue("object_track_match_algorithm",
-    &matcher_method_)) {
+    &matcher_method_name)) {
     AERROR << "object_track_match_algorithm not found." << name();
     return false;
   }
-  if (matcher_method_ == "hungarian_matcher") {
+  if (matcher_method_name == "hungarian_matcher") {
+    matcher_method_ = HUNGARIAN_MATCHER;
     matcher_ = new HungarianMatcher();
   } else {
     AERROR << "Invalid object_track_match_algorithm " << name();
@@ -79,9 +81,8 @@ bool HmObjectTracker::Init() {
     AERROR << "max_match_distance not found. " << name();
     return false;
   }
-  if (matcher_method_ == "hungarian_matcher") {
-    if (!HungarianMatcher::SetMaxMatchDistance(
-      max_match_dist)) {
+  if (matcher_method_ == HUNGARIAN_MATCHER) {
+    if (!HungarianMatcher::SetMaxMatchDistance(max_match_dist)) {
       return false;
     }
   }
@@ -140,12 +141,16 @@ bool HmObjectTracker::Init() {
     return false;
   }
 
-  // 2. Initialize params of track filter
-  if (!model_config->GetValue("track_filter_algorithm", &filter_method_)) {
+  // 2. Initialize params of object track filter
+  std::string filter_method_name = "kalman_filter";
+  if (!model_config->GetValue("track_filter_algorithm", &filter_method_name)) {
     AERROR << "track_filter_algorithm not found." << name();
     return false;
   }
-  ObjectTrack::SetFilterMethod(filter_method_);
+  if (filter_method_name == "kalman_filter") {
+    filter_method_ = KALMAN_FILTER;
+    ObjectTrack::SetFilterMethod(filter_method_);
+  }
 
   bool use_adaptive = false;
   if (!model_config->GetValue("use_adaptive", &use_adaptive)) {
@@ -153,7 +158,7 @@ bool HmObjectTracker::Init() {
     return false;
   }
 
-  if (filter_method_ == "kalman_filter") {
+  if (filter_method_ == KALMAN_FILTER) {
     KalmanFilter::SetUseAdaptive(use_adaptive);
     double max_adaptive_score = max_match_dist;
     KalmanFilter::SetMaxAdaptiveScore(max_adaptive_score);
@@ -183,9 +188,9 @@ bool HmObjectTracker::Init() {
     }
     KalmanFilter::InitParams(centroid_measurement_noise,
       centroid_initial_velocity_variance,
-      propagation_variance_xy, propagation_variance_z);
+      propagation_variance_xy,
+      propagation_variance_z);
   }
-
   return true;
 }
 
@@ -274,19 +279,6 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
 
   // 4.3 create new tracks for objects without associated tracks
   CreateNewTracks(foreground_objects, unassigned_objects, time_diff);
-
-  /* Previously, we designed a post-processing processure here to handle some
-   * onroad problems that may not general enough. Our original purpose is
-   * designing a method which is easy to switch on/off, and it also could
-   * helps separating reported tracks' state from states that computed via
-   * filtering algorithm. Worth to notice, this separation could help
-   * filtering algorithm avoid maintaining illly calculated covariance
-   * matrices.
-   * 
-   * Althogh keep a post-processing here makes it more comfortable for
-   * understanding the purpose behind it, it is more reasonable to handle
-   * those problems within each object track.
-   */
 
   /* 5. collect results */
   CollectTrackedResults(tracked_objects);
