@@ -29,6 +29,10 @@
 namespace apollo {
 namespace perception {
 
+enum MatcherType {
+  HUNGARIAN_MATCHER = 0,
+};
+
 class BaseMatcher {
  public:
   typedef std::pair<int, int> TrackObjectPair;

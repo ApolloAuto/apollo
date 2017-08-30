@@ -40,7 +40,7 @@ class ObjectTrack {
   // @brief set filter method for all the object track objects
   // @params[IN] filter_method: method name of filtering algorithm
   // @return nothing
-  static void SetFilterMethod(const std::string& filter_method);
+  static void SetFilterMethod(const FilterType& filter_method);
 
   // @brief get next avaiable track id
   // @return next avaiable track id
@@ -98,14 +98,15 @@ class ObjectTrack {
   // @params[IN] time_diff: time interval between last two updating
   // @return true if track is static, otherwise return false
   bool CheckTrackStaticHypothesisByVelocityAngleChange(
-      const ObjectPtr& new_object, const double time_diff);
+    const ObjectPtr& new_object,
+    const double time_diff);
 
  private:
   ObjectTrack();
 
  public:
   // algorithm setup
-  static std::string s_filter_method_;
+  static FilterType s_filter_method_;
   BaseFilter* filter_;
 
   // basic info

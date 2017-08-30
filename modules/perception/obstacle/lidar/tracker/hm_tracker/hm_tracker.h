@@ -49,9 +49,9 @@ class HmObjectTracker : public BaseTracker{
   // occluded temporaryly
   // @return true if track successfully, otherwise return false
   bool Track(const std::vector<ObjectPtr>& objects,
-    double timestamp,
-    const TrackerOptions& options,
-    std::vector<ObjectPtr>* tracked_objects);
+             double timestamp,
+             const TrackerOptions& options,
+             std::vector<ObjectPtr>* tracked_objects);
 
   // @brief get object tracks of tracker
   // @return object tracks maintained in tracker
@@ -73,9 +73,9 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] tracked_objects: tracked  objects
   // @return true if initialize successfully, otherwise return false
   bool Initialize(const std::vector<ObjectPtr>& objects,
-    double timestamp,
-    const TrackerOptions& options,
-    std::vector<ObjectPtr>* tracked_objects);
+                  double timestamp,
+                  const TrackerOptions& options,
+                  std::vector<ObjectPtr>* tracked_objects);
 
   // @brief transform v2world pose to v2local pose intend to avoid big float
   // value
@@ -90,8 +90,8 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
   void ConstructTrackedObjects(const std::vector<ObjectPtr>& objects,
-    std::vector<TrackedObjectPtr>* tracked_objects,
-    const Eigen::Matrix4d& pose);
+                               std::vector<TrackedObjectPtr>* tracked_objects,
+                               const Eigen::Matrix4d& pose);
 
   // @brief compute objects' shape feature
   // @params[IN] object: object for computing shape feature
@@ -103,14 +103,14 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
   void TransformTrackedObject(TrackedObjectPtr* obj,
-    const Eigen::Matrix4d& pose);
+                              const Eigen::Matrix4d& pose);
 
   // @brief transform object with given pose
   // @params[IN] obj: object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
   void TransformObject(ObjectPtr* obj,
-    const Eigen::Matrix4d& pose);
+                       const Eigen::Matrix4d& pose);
 
   // @brief decompose foreground background from detected objects pool
   // @params[IN] objects: detected objects waiting for decomposition
@@ -126,7 +126,7 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] time_diff: time interval for predicting
   // @return nothing
   void ComputeTracksPredict(std::vector<Eigen::VectorXf>* tracks_predict,
-    const double time_diff);
+                            const double time_diff);
 
   // @brief update assigned tracks
   // @params[IN] tracks_predict: tracks' predict states
@@ -135,9 +135,9 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] time_diff: time interval for updating
   // @return nothing
   void UpdateAssignedTracks(std::vector<Eigen::VectorXf>* tracks_predict,
-    std::vector<TrackedObjectPtr>* new_objects,
-    const std::vector<TrackObjectPair>& assignments,
-    const double time_diff);
+                            std::vector<TrackedObjectPtr>* new_objects,
+                            const std::vector<TrackObjectPair>& assignments,
+                            const double time_diff);
 
   // @brief update tracks without matched objects
   // @params[IN] tracks_predict: tracks' predict states
@@ -155,8 +155,8 @@ class HmObjectTracker : public BaseTracker{
   // @params[IN] time_diff: time interval for updating
   // @return nothing
   void CreateNewTracks(const std::vector<TrackedObjectPtr>& new_objects,
-    const std::vector<int>& unassigned_objects,
-    const double time_diff);
+                       const std::vector<int>& unassigned_objects,
+                       const double time_diff);
 
   // @brief delete lost tracks
   // @return nothing
@@ -177,8 +177,8 @@ class HmObjectTracker : public BaseTracker{
 
  private:
   // algorithm setup
-  std::string                                 matcher_method_;
-  std::string                                 filter_method_;
+  MatcherType                                 matcher_method_;
+  FilterType                                  filter_method_;
   bool                                        use_histogram_for_match_;
   int                                         histogram_bin_size_;
 

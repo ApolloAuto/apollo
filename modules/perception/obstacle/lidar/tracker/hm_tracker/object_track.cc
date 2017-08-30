@@ -26,11 +26,11 @@ namespace apollo {
 namespace perception {
 
 int ObjectTrack::s_track_idx_ = 0;
-std::string ObjectTrack::s_filter_method_ = "kalman_filter";
+FilterType ObjectTrack::s_filter_method_ = KALMAN_FILTER;
 
-void ObjectTrack::SetFilterMethod(const std::string& filter_method) {
+void ObjectTrack::SetFilterMethod(const FilterType& filter_method) {
   // Set filter method for all the track objects
-  if (filter_method == "kalman_filter") {
+  if (filter_method == KALMAN_FILTER) {
     s_filter_method_ = filter_method;
   } else {
     AINFO << "invalid filter_method!";
@@ -54,10 +54,9 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   Eigen::Vector3f initial_anchor_point = obj->anchor_point;
   Eigen::Vector3f initial_velocity = Eigen::Vector3f::Zero();
 
-  if (s_filter_method_ == "kalman_filter") {
+  if (s_filter_method_ == KALMAN_FILTER) {
     filter_ = new KalmanFilter();
   }
-
   filter_->Initialize(initial_anchor_point, initial_velocity);
 
   // Initialize track info
@@ -347,9 +346,11 @@ void ObjectTrack::SmoothTrackOrientation() {
     ComputeMostConsistentBboxDirection(previous_dir, &current_dir);
     float previous_weight = 1.0;
     if (previous_speed + current_speed > FLT_EPSILON) {
-      previous_weight = (previous_speed + 1) / (previous_speed + current_speed + 1);
+      previous_weight = (previous_speed + 1) /
+        (previous_speed + current_speed + 1);
     }
-    current_dir = previous_weight * previous_dir + (1 - previous_weight) * current_dir;
+    current_dir = previous_weight * previous_dir +
+      (1 - previous_weight) * current_dir;
   }
   current_dir(2) = 0;
   current_dir.normalize();

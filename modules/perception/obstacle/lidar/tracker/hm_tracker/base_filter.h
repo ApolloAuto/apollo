@@ -25,6 +25,10 @@
 namespace apollo {
 namespace perception {
 
+enum FilterType {
+  KALMAN_FILTER = 0,
+};
+
 class BaseFilter {
  public:
   typedef Object ObjectType;
