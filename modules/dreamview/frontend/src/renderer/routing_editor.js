@@ -6,7 +6,7 @@ import routingPointPin from "assets/images/routing/pin.png";
 
 import PARAMETERS from "store/config/parameters.yml";
 import WS from "store/websocket.js";
-import { drawCircle, drawImage } from "utils/draw";
+import { drawImage } from "utils/draw";
 
 
 export default class RoutingEditor {

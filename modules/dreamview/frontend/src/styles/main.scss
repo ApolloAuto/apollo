@@ -767,9 +767,9 @@ body {
 
             span {
                 font-family:PingFangSC-Light;
-                font-size:14px;
-                color:#d8d8d8;
-                text-align:center;
+                font-size: 14px;
+                color: #d8d8d8;
+                text-align: center;
 
                 @include small-screen {
                     font-size: 12px;
@@ -779,6 +779,33 @@ body {
 
         .button:hover{
             background: #09182C;
+        }
+    }
+}
+
+.loader {
+    width: 100vw;
+    height: 100vh;
+
+    background-color: #000C17;
+
+    .img-container {
+        position: absolute;
+
+        top: 20%;
+        left: 25%;
+        width: 50%;
+        height: 40%;
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+
+        .status-message {
+            font-size: 18px;
+            color: #FFFFFF;
+            text-align: center;
         }
     }
 }
