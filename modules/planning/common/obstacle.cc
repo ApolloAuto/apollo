@@ -33,12 +33,14 @@
 namespace apollo {
 namespace planning {
 
+using apollo::perception::PerceptionObstacle;
+
 const std::string& Obstacle::Id() const { return id_; }
 
 std::int32_t Obstacle::PerceptionId() const { return perception_id_; }
 
 Obstacle::Obstacle(const std::string& id,
-                   const perception::PerceptionObstacle& perception_obstacle)
+                   const PerceptionObstacle& perception_obstacle)
     : id_(id),
       perception_id_(perception_obstacle.id()),
       perception_obstacle_(perception_obstacle),
@@ -52,7 +54,7 @@ Obstacle::Obstacle(const std::string& id,
 }
 
 Obstacle::Obstacle(const std::string& id,
-                   const perception::PerceptionObstacle& perception_obstacle,
+                   const PerceptionObstacle& perception_obstacle,
                    const prediction::Trajectory& trajectory)
     : Obstacle(id, perception_obstacle) {
   has_trajectory_ = true;
@@ -75,10 +77,8 @@ bool Obstacle::IsStatic() const { return is_static_; }
 
 bool Obstacle::IsVirtual() const { return is_virtual_; }
 
-bool Obstacle::IsStaticObstacle(
-    const perception::PerceptionObstacle& perception_obstacle) {
-  if (perception_obstacle.type() ==
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE) {
+bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
+  if (perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
     return true;
   }
   auto moving_speed = std::hypot(perception_obstacle.velocity().x(),
@@ -87,7 +87,7 @@ bool Obstacle::IsStaticObstacle(
 }
 
 bool Obstacle::IsVirtualObstacle(
-    const perception::PerceptionObstacle& perception_obstacle) {
+    const PerceptionObstacle& perception_obstacle) {
   return perception_obstacle.id() < 0;
 }
 
@@ -125,35 +125,32 @@ const prediction::Trajectory& Obstacle::Trajectory() const {
   return trajectory_;
 }
 
-const perception::PerceptionObstacle& Obstacle::Perception() const {
+const PerceptionObstacle& Obstacle::Perception() const {
   return perception_obstacle_;
 }
 
-void Obstacle::CreateObstacles(
-    const prediction::PredictionObstacles& predictions,
-    std::list<std::unique_ptr<Obstacle>>* obstacles) {
-  if (!obstacles) {
-    AERROR << "the provided obstacles is empty";
-    return;
-  }
+std::vector<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
+    const prediction::PredictionObstacles& predictions) {
+  std::vector<std::unique_ptr<Obstacle>> obstacles;
   for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
     const auto perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
-    if (prediction_obstacle.trajectory_size() > 0) {
-      int trajectory_index = 0;
-      for (const auto& trajectory : prediction_obstacle.trajectory()) {
-        const std::string obstacle_id =
-            apollo::common::util::StrCat(perception_id, "_", trajectory_index);
-        obstacles->emplace_back(std::unique_ptr<Obstacle>(
-            new Obstacle(obstacle_id, prediction_obstacle.perception_obstacle(),
-                         trajectory)));
-        ++trajectory_index;
-      }
-    } else {
-      obstacles->emplace_back(std::unique_ptr<Obstacle>(new Obstacle(
-          perception_id, prediction_obstacle.perception_obstacle())));
+    if (prediction_obstacle.trajectory().empty()) {
+      obstacles.emplace_back(new Obstacle(
+          perception_id, prediction_obstacle.perception_obstacle()));
+      continue;
+    }
+
+    int trajectory_index = 0;
+    for (const auto& trajectory : prediction_obstacle.trajectory()) {
+      const std::string obstacle_id = apollo::common::util::StrCat(
+          perception_id, "_", trajectory_index);
+      obstacles.emplace_back(new Obstacle(
+          obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
+      ++trajectory_index;
     }
   }
+  return obstacles;
 }
 
 }  // namespace planning
