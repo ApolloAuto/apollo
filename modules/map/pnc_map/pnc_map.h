@@ -34,7 +34,7 @@
 namespace apollo {
 namespace hdmap {
 
-using LaneSegments = std::vector<::apollo::hdmap::LaneSegment>;
+using LaneSegments = std::vector<LaneSegment>;
 
 class PncMap {
  public:
@@ -53,22 +53,22 @@ class PncMap {
 
   bool GetLaneSegmentsFromRouting(
       const ::apollo::routing::RoutingResponse &routing,
-      const common::PointENU &point, const double backward_length,
-      const double forward_length,
+      const common::PointENU &point,
+      const double backward_length, const double forward_length,
       std::vector<LaneSegments> *const route_segments) const;
 
   static void CreatePathFromLaneSegments(const LaneSegments &segments,
                                          Path *const path);
 
  private:
-  bool TruncateLaneSegments(const LaneSegments &segments, double start_s,
-                            double end_s,
+  bool TruncateLaneSegments(const LaneSegments &segments,
+                            double start_s, double end_s,
                             LaneSegments *const truncated_segments) const;
 
   bool ValidateRouting(const ::apollo::routing::RoutingResponse &routing) const;
   static void AppendLaneToPoints(
-      hdmap::LaneInfoConstPtr lane, const double start_s, const double end_s,
-      std::vector<hdmap::MapPathPoint> *const points);
+      LaneInfoConstPtr lane, const double start_s, const double end_s,
+      std::vector<MapPathPoint> *const points);
   hdmap::HDMap hdmap_;
 };
 
