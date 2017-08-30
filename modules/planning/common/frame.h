@@ -57,10 +57,9 @@ class Frame {
   const common::TrajectoryPoint &PlanningStartPoint() const;
   bool Init(const PlanningConfig &config, const double current_time_stamp);
 
-  static const hdmap::PncMap *PncMap();
   static void SetMap(hdmap::PncMap *pnc_map);
 
-  uint32_t sequence_num() const;
+  uint32_t SequenceNum() const;
 
   std::string DebugString() const;
 
