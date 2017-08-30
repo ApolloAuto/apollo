@@ -182,7 +182,7 @@ class HDMap {
                         std::vector<JunctionBoundaryPtr>* junctions) const;
 
  private:
-  HDMapImpl _impl;
+  HDMapImpl impl_;
 };
 
 }  // namespace hdmap

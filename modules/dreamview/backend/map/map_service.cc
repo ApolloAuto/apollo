@@ -263,7 +263,7 @@ bool MapService::GetPoseWithRegardToLane(const double x, const double y,
     return false;
   }
 
-  *theta = nearest_lane->heading(*s);
+  *theta = nearest_lane->Heading(*s);
   return true;
 }
 

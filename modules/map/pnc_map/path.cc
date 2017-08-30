@@ -215,7 +215,7 @@ void Path::InitWidth() {
       CHECK_NOTNULL(waypoint.lane);
       double left_width = 0.0;
       double right_width = 0.0;
-      waypoint.lane->get_width(waypoint.s, &left_width, &right_width);
+      waypoint.lane->GetWidth(waypoint.s, &left_width, &right_width);
       _left_width.push_back(left_width);
       _right_width.push_back(right_width);
     }

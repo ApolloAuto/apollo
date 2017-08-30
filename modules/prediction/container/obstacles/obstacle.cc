@@ -791,7 +791,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
         apollo::common::math::AngleDiff(heading, nearest_point_heading);
     double left = 0.0;
     double right = 0.0;
-    current_lane->get_width(s, &left, &right);
+    current_lane->GetWidth(s, &left, &right);
     LaneFeature* lane_feature = lane.add_current_lane_feature();
     lane_feature->set_lane_turn_type(turn_type);
     lane_feature->set_lane_id(lane_id);
@@ -859,7 +859,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 
     double left = 0.0;
     double right = 0.0;
-    nearby_lane->get_width(s, &left, &right);
+    nearby_lane->GetWidth(s, &left, &right);
 
     LaneFeature* lane_feature =
         feature->mutable_lane()->add_nearby_lane_feature();
