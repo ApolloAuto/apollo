@@ -39,6 +39,8 @@ DEFINE_double(
 DEFINE_double(
     look_forward_distance, 70,
     "look forward this distance when creating reference line from routing");
+DEFINE_bool(enable_smooth_reference_line, true,
+            "enable smooth the map reference line");
 
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
