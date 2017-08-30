@@ -215,7 +215,11 @@ void Planning::RunOnce() {
   }
 }
 
-void Planning::Stop() {}
+void Planning::Stop() {
+  last_publishable_trajectory_.Clear();
+  frame_.reset(nullptr);
+  planner_.reset(nullptr);
+}
 
 common::Status Planning::Plan(const bool is_on_auto_mode,
                               const double current_time_stamp,
