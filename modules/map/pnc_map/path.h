@@ -130,7 +130,7 @@ class PathApproximation {
     return segments_;
   }
 
-  bool get_projection(const Path& path, const common::math::Vec2d& point,
+  bool GetProjection(const Path& path, const common::math::Vec2d& point,
                       double* accumulate_s, double* lateral,
                       double* distance) const;
 
@@ -190,24 +190,24 @@ class Path {
        const double max_approximation_error);
 
   // Return smooth coordinate by interpolated index or accumulate_s.
-  MapPathPoint get_smooth_point(const InterpolatedIndex& index) const;
-  MapPathPoint get_smooth_point(double s) const;
+  MapPathPoint GetSmoothPoint(const InterpolatedIndex& index) const;
+  MapPathPoint GetSmoothPoint(double s) const;
 
   // Compute accumulate s value of the index.
-  double get_s_from_index(const InterpolatedIndex& index) const;
+  double GetSFromIndex(const InterpolatedIndex& index) const;
   // Compute interpolated index by accumulate_s.
-  InterpolatedIndex get_index_from_s(double s) const;
+  InterpolatedIndex GetIndexFromS(double s) const;
 
-  bool get_nearest_point(const common::math::Vec2d& point, double* accumulate_s,
+  bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
                          double* lateral) const;
-  bool get_nearest_point(const common::math::Vec2d& point, double* accumulate_s,
+  bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
                          double* lateral, double* distance) const;
-  bool get_projection(const common::math::Vec2d& point, double* accumulate_s,
+  bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                       double* lateral) const;
-  bool get_projection(const common::math::Vec2d& point, double* accumulate_s,
+  bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                       double* lateral, double* distance) const;
 
-  bool get_heading_along_path(const common::math::Vec2d& point,
+  bool GetHeadingAlongPath(const common::math::Vec2d& point,
                               double* heading) const;
 
   int num_points() const { return num_points_; }

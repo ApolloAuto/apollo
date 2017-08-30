@@ -38,7 +38,7 @@ apollo::common::PointENU SLToXYZ(const std::string& lane_id,
                                  const double s, const double l) {
   const auto lane_info = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
   CHECK(lane_info);
-  return lane_info->get_smooth_point(s);
+  return lane_info->GetSmoothPoint(s);
 }
 
 void XYZToSL(const apollo::common::PointENU& point,

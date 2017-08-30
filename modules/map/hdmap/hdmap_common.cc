@@ -242,7 +242,7 @@ double LaneInfo::get_width_from_sample(
 bool LaneInfo::is_on_lane(const Vec2d &point) const {
   double accumulate_s = 0.0;
   double lateral = 0.0;
-  if (!get_projection(point, &accumulate_s, &lateral)) {
+  if (!GetProjection(point, &accumulate_s, &lateral)) {
     return false;
   }
 
@@ -270,7 +270,7 @@ bool LaneInfo::is_on_lane(const apollo::common::math::Box2d &box) const {
   return true;
 }
 
-apollo::common::PointENU LaneInfo::get_smooth_point(double s) const {
+apollo::common::PointENU LaneInfo::GetSmoothPoint(double s) const {
   CHECK_GE(_points.size(), 2);
   if (s <= 0.0) {
     return PointFromVec2d(_points[0]);
@@ -311,7 +311,7 @@ double LaneInfo::distance_to(const Vec2d &point,
   return distance;
 }
 
-apollo::common::PointENU LaneInfo::get_nearest_point(const Vec2d &point,
+apollo::common::PointENU LaneInfo::GetNearestPoint(const Vec2d &point,
                                                      double *distance) const {
   const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
   int index = segment_box->id();
@@ -321,7 +321,7 @@ apollo::common::PointENU LaneInfo::get_nearest_point(const Vec2d &point,
   return PointFromVec2d(nearest_point);
 }
 
-bool LaneInfo::get_projection(const Vec2d &point,
+bool LaneInfo::GetProjection(const Vec2d &point,
                               double *accumulate_s, double *lateral) const {
   CHECK_NOTNULL(accumulate_s);
   CHECK_NOTNULL(lateral);
