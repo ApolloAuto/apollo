@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/log.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
 
@@ -95,6 +96,10 @@ Eigen::VectorXf KalmanFilter::Predict(const double time_diff) {
 void KalmanFilter::UpdateWithObject(const TrackedObjectPtr& new_object,
   const TrackedObjectPtr& old_object,
   const double time_diff) {
+  if (time_diff <= DBL_EPSILON) {
+    AWARN << "time diff is too limited to updating";
+    return;
+  }
   // Compute update quality if needed
   // Use adaptive filtering after first measurement could help filter
   // converge more faster

@@ -38,6 +38,8 @@ namespace perception {
 
 class HmObjectTrackerTest : public testing::Test {
  protected:
+  HmObjectTrackerTest() {}
+  virtual ~HmObjectTrackerTest() {}
   void SetUp() {
     RegisterFactoryHmObjectTracker();
     FLAGS_work_root = "modules/perception";
@@ -167,7 +169,7 @@ bool SaveTrackingResults(const std::vector<ObjectPtr>& objects,
   return true;
 }
 
-TEST_F(HmObjectTrackerTest, demo_tracking) {
+TEST_F(HmObjectTrackerTest, Track) {
   // test initialization of hm tracker
   EXPECT_TRUE(hm_tracker_->Init());
   // test tracking via hm tracker
