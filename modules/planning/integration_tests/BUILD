@@ -12,6 +12,7 @@ cc_library(
     ],
     data = [
         "//modules/map:map_data",
+        "//modules/planning:planning_conf",
         "//modules/planning:planning_testdata",
     ],
     deps = [

@@ -219,7 +219,7 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   // acceleration constraint
-  constexpr double kAccelLowerBound = -3.5;
+  constexpr double kAccelLowerBound = -4.0;
   constexpr double kAccelUpperBound = 1.5;
   std::vector<double> accel_lower_bound(t_evaluated_.size(), kAccelLowerBound);
   std::vector<double> accel_upper_bound(t_evaluated_.size(), kAccelUpperBound);
@@ -227,7 +227,6 @@ Status QpSplineStGraph::ApplyConstraint(
   DCHECK_EQ(t_evaluated_.size(), accel_lower_bound.size());
   DCHECK_EQ(t_evaluated_.size(), accel_upper_bound.size());
   // TODO: add accel constraint below
-  /*
   if (!constraint->AddSecondDerivativeBoundary(t_evaluated_, accel_lower_bound,
                                                accel_upper_bound)) {
     const std::string msg = "Fail to apply acceleration constraints.";
@@ -238,7 +237,6 @@ Status QpSplineStGraph::ApplyConstraint(
     }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  */
 
   return Status::OK();
 }

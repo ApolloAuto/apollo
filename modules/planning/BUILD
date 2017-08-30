@@ -65,4 +65,11 @@ filegroup(
     ]),
 )
 
+filegroup(
+    name = "planning_conf",
+    srcs = glob([
+        "conf/**",
+    ]),
+)
+
 cpplint()
