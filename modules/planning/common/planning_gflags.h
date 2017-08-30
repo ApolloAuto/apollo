@@ -27,6 +27,7 @@ DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(trajectory_resolution);
 DECLARE_double(look_backward_distance);
 DECLARE_double(look_forward_distance);
+DECLARE_bool(enable_smooth_reference_line);
 
 DECLARE_int32(max_history_frame_num);
 
