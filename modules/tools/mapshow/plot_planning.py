@@ -130,18 +130,18 @@ def update(frame_number):
                                 planning.st_data_s.keys()[1])
     localization.replot_vehicle(vehicle_position_line, vehicle_polygon_line)
     try:
-        ax.set_xlim(localization.localization_pb.pose.position.x - 60,
-                    localization.localization_pb.pose.position.x + 60)
-        ax.set_ylim(localization.localization_pb.pose.position.y - 60,
-                    localization.localization_pb.pose.position.y + 60)
+        ax.set_xlim(localization.localization_pb.pose.position.x - 80,
+                    localization.localization_pb.pose.position.x + 80)
+        ax.set_ylim(localization.localization_pb.pose.position.y - 80,
+                    localization.localization_pb.pose.position.y + 80)
     except:
         pass
     ax.relim()
     ax.autoscale_view()
-    ax.legend(loc="upper left")
-    ax1.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), ncol=5)
-    ax2.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), ncol=5)
-    ax3.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), ncol=5)
+    ax.legend(loc="upper left", borderaxespad=0., ncol=5)
+    ax1.legend(loc="upper left", ncol=5, borderaxespad=0.)
+    ax2.legend(loc="upper left", ncol=5, borderaxespad=0.)
+    ax3.legend(loc="upper left", ncol=5, borderaxespad=0.)
     return obstacle_annotation_pool[0]
 
 
@@ -234,27 +234,43 @@ if __name__ == '__main__':
         required=False,
         default=default_map_path,
         help="Specify the map file in txt or binary format")
+    parser.add_argument(
+        "-hm",
+        "--hidemap",
+        action="store_const", const=True,
+        help="Hide map in path plot.")
+
     args = parser.parse_args()
 
     add_listener()
     fig = plt.figure()
     ax = plt.subplot2grid((3, 3), (0, 0), rowspan=2, colspan=2)
+
     ax1 = plt.subplot2grid((3, 3), (0, 2))
-    ax2 = plt.subplot2grid((3, 3), (1, 2))
-    ax3 = plt.subplot2grid((3, 3), (2, 2))
-
-    ax4 = plt.subplot2grid((3, 3), (2, 0), colspan=2)
-    ax4.set_xlim([30, 140])
-    ax4.set_ylim([-5, 5])
-
     ax1.set_xlabel("t (second)")
     ax1.set_xlim([-2, 10])
     ax1.set_ylim([-1, 10])
     ax1.set_ylabel("speed (m/s)")
 
-    map = Map()
-    map.load(args.map)
-    map.draw_lanes(ax, False, [])
+    ax2 = plt.subplot2grid((3, 3), (1, 2))
+    ax2.set_xlabel("t (second)")
+    ax2.set_ylabel("s (m)")
+
+    ax3 = plt.subplot2grid((3, 3), (2, 2))
+    ax3.set_xlabel("t (second)")
+    ax3.set_ylabel("s (m)")
+
+    ax4 = plt.subplot2grid((3, 3), (2, 0), colspan=2)
+    ax4.set_xlim([30, 140])
+    ax4.set_ylim([-5, 5])
+    ax4.set_xlabel("s (m)")
+    ax4.set_ylabel("l (m)")
+
+
+    if not args.hidemap:
+        map = Map()
+        map.load(args.map)
+        map.draw_lanes(ax, False, [])
     central_y = sum(ax.get_ylim()) / 2
     central_x = sum(ax.get_xlim()) / 2
 
