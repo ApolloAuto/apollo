@@ -348,7 +348,7 @@ TEST_F(HDMapCommonTestSuite, get_smooth_point) {
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
 
-  auto smooth_point = lane_info.get_smooth_point(1.5);
+  auto smooth_point = lane_info.GetSmoothPoint(1.5);
   EXPECT_NEAR(smooth_point.x(), 2.5, 1E-3);
   EXPECT_NEAR(smooth_point.y(), 1.0, 1E-3);
 }
@@ -394,15 +394,15 @@ TEST_F(HDMapCommonTestSuite, get_nearest_point) {
   LaneInfo lane_info(lane);
 
   double distance = 0.0;
-  auto nearest_point = lane_info.get_nearest_point({2.4, 3.0}, &distance);
+  auto nearest_point = lane_info.GetNearestPoint({2.4, 3.0}, &distance);
   EXPECT_NEAR(nearest_point.x(), 2.4, 1E-3);
   EXPECT_NEAR(nearest_point.y(), 1.0, 1E-3);
 
-  nearest_point = lane_info.get_nearest_point({0.5, 3.0}, &distance);
+  nearest_point = lane_info.GetNearestPoint({0.5, 3.0}, &distance);
   EXPECT_NEAR(nearest_point.x(), 1.0, 1E-3);
   EXPECT_NEAR(nearest_point.y(), 1.0, 1E-3);
 
-  nearest_point = lane_info.get_nearest_point({10.5, 3.0}, &distance);
+  nearest_point = lane_info.GetNearestPoint({10.5, 3.0}, &distance);
   EXPECT_NEAR(nearest_point.x(), 5.0, 1E-3);
   EXPECT_NEAR(nearest_point.y(), 1.0, 1E-3);
 }
@@ -414,17 +414,17 @@ TEST_F(HDMapCommonTestSuite, get_projection) {
 
   double accumulate_s = 0.0;
   double lateral = 0.0;
-  bool success = lane_info.get_projection({2.4, 3.0}, &accumulate_s, &lateral);
+  bool success = lane_info.GetProjection({2.4, 3.0}, &accumulate_s, &lateral);
   EXPECT_TRUE(success);
   EXPECT_NEAR(accumulate_s, 1.4, 1E-3);
   EXPECT_NEAR(lateral, 2.0, 1E-3);
 
-  success = lane_info.get_projection({0.5, 3.0}, &accumulate_s, &lateral);
+  success = lane_info.GetProjection({0.5, 3.0}, &accumulate_s, &lateral);
   EXPECT_TRUE(success);
   EXPECT_NEAR(accumulate_s, -0.5, 1E-3);
   EXPECT_NEAR(lateral, 2.0, 1E-3);
 
-  success = lane_info.get_projection({10.5, 3.0}, &accumulate_s, &lateral);
+  success = lane_info.GetProjection({10.5, 3.0}, &accumulate_s, &lateral);
   EXPECT_TRUE(success);
   EXPECT_NEAR(accumulate_s, 9.5, 1E-3);
   EXPECT_NEAR(lateral, 2.0, 1E-3);

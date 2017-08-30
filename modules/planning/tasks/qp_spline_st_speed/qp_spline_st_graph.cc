@@ -193,6 +193,7 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  // speed constraint
   std::vector<double> speed_upper_bound;
   if (!EstimateSpeedUpperBound(init_point, speed_limit, &speed_upper_bound)
            .ok()) {
@@ -217,7 +218,28 @@ Status QpSplineStGraph::ApplyConstraint(
            << "; speed_upper_bound: " << speed_upper_bound[i] << std::endl;
   }
 
-  // TODO : add acceleration constraint here
+  // acceleration constraint
+  constexpr double kAccelLowerBound = -3.5;
+  constexpr double kAccelUpperBound = 1.5;
+  std::vector<double> accel_lower_bound(t_evaluated_.size(), kAccelLowerBound);
+  std::vector<double> accel_upper_bound(t_evaluated_.size(), kAccelUpperBound);
+
+  DCHECK_EQ(t_evaluated_.size(), accel_lower_bound.size());
+  DCHECK_EQ(t_evaluated_.size(), accel_upper_bound.size());
+  // TODO: add accel constraint below
+  /*
+  if (!constraint->AddSecondDerivativeBoundary(t_evaluated_, accel_lower_bound,
+                                               accel_upper_bound)) {
+    const std::string msg = "Fail to apply acceleration constraints.";
+    for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+      AERROR << "t_evaluated_: " << t_evaluated_[i]
+             << "; accel_lower_bound: " << accel_lower_bound[i]
+             << "; accel_upper_bound: " << accel_upper_bound[i] << std::endl;
+    }
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  */
+
   return Status::OK();
 }
 
@@ -416,7 +438,8 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
       // (1) The s in speed_limit_points increase monotonically.
       // (2) The evaluated_t_.size() << number of speed_limit_points.size()
       //
-      // If either of the two assumption is failed, a new algorithm must be used
+      // If either of the two assumption is failed, a new algorithm must be
+      // used
       // to replace the binary search.
 
       const auto& it = std::lower_bound(speed_limit_points.begin(),

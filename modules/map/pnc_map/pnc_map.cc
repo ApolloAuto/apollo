@@ -215,12 +215,12 @@ bool PncMap::GetLaneSegmentsFromRouting(
     }
     double distance = 0.0;
     common::PointENU map_point =
-        lane->get_nearest_point({point.x(), point.y()}, &distance);
+        lane->GetNearestPoint({point.x(), point.y()}, &distance);
     if (distance < min_distance) {
       min_distance = distance;
       double s = 0.0;
       double l = 0.0;
-      if (!lane->get_projection({map_point.x(), map_point.y()}, &s, &l)) {
+      if (!lane->GetProjection({map_point.x(), map_point.y()}, &s, &l)) {
         AERROR << "Failed to get projection for map_point "
                << map_point.DebugString();
         return false;

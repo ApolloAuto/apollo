@@ -224,49 +224,21 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
 // This is a dummy simple hot start, need refine later
 std::vector<common::SpeedPoint> EMPlanner::GenerateSpeedHotStart(
     const common::TrajectoryPoint& planning_init_point) {
-  std::array<double, 3> start_state;
-
-  // distance 0.0
-  start_state[0] = 0.0;
-
-  // start velocity
-  start_state[1] = planning_init_point.v();
-
-  // start acceleration
-  start_state[2] = planning_init_point.a();
-
-  std::array<double, 2> end_state;
-  // end state velocity
-  end_state[0] = std::max(10.0, planning_init_point.v());
-
-  // end state acceleration
-  end_state[1] = 0.0;
-
-  QuarticPolynomialCurve1d speed_profile(start_state, end_state,
-                                         FLAGS_trajectory_time_length);
-  // assume the time resolution is 0.1
-  std::uint32_t num_time_steps =
-      static_cast<std::uint32_t>(FLAGS_trajectory_time_length /
-                                 FLAGS_trajectory_time_resolution) +
-      1;
-
-  std::vector<common::SpeedPoint> discretized_speed_profile;
-  discretized_speed_profile.reserve(num_time_steps);
-  for (std::uint32_t i = 0; i < num_time_steps; ++i) {
-    double t = i * FLAGS_trajectory_time_resolution;
-    double s = speed_profile.Evaluate(0, t);
-    double v = speed_profile.Evaluate(1, t);
-    double a = speed_profile.Evaluate(2, t);
-    double da = speed_profile.Evaluate(3, t);
+  std::vector<common::SpeedPoint> hot_start_speed_profile;
+  double s = 0.0;
+  double t = 0.0;
+  while (t < FLAGS_trajectory_time_length) {
     SpeedPoint speed_point;
     speed_point.set_s(s);
     speed_point.set_t(t);
-    speed_point.set_v(v);
-    speed_point.set_a(a);
-    speed_point.set_da(da);
-    discretized_speed_profile.push_back(std::move(speed_point));
+    speed_point.set_v(FLAGS_planning_upper_speed_limit);
+
+    hot_start_speed_profile.push_back(std::move(speed_point));
+
+    t += FLAGS_trajectory_time_resolution;
+    s += FLAGS_planning_upper_speed_limit * FLAGS_trajectory_time_resolution;
   }
-  return discretized_speed_profile;
+  return hot_start_speed_profile;
 }
 
 }  // namespace planning
