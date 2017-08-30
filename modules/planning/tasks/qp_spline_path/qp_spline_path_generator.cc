@@ -122,7 +122,9 @@ bool QpSplinePathGenerator::Generate(
     double l = spline(s);
     if (planning_debug->planning_data().sl_frame().size() >= 1) {
       auto sl_point = planning_debug->mutable_planning_data()
-          ->mutable_sl_frame(0)->mutable_sl_path()->Add();
+                          ->mutable_sl_frame(0)
+                          ->mutable_sl_path()
+                          ->Add();
       sl_point->set_l(l);
       sl_point->set_s(s);
     }
@@ -332,7 +334,6 @@ bool QpSplinePathGenerator::AddConstraint(
     AERROR << "Add spline joint third derivative constraint failed!";
     return false;
   }
-
   return true;
 }
 
@@ -357,14 +358,6 @@ void QpSplinePathGenerator::AddKernel() {
   if (qp_spline_path_config_.third_derivative_weight() > 0.0) {
     spline_kernel->add_third_order_derivative_matrix(
         qp_spline_path_config_.third_derivative_weight());
-  }
-
-  // reference line kernel
-  if (qp_spline_path_config_.number_of_knots() > 1 &&
-      qp_spline_path_config_.reference_line_weight() > 0) {
-    std::vector<double> l_vec(knots_.size(), 0.0);
-    spline_kernel->add_reference_line_kernel_matrix(
-        knots_, l_vec, qp_spline_path_config_.reference_line_weight());
   }
 }
 
