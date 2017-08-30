@@ -44,6 +44,7 @@ class WebSocketEndpoint {
                     break;
                 case "MapData":
                     RENDERER.updateMap(message.data);
+                    STORE.setInitializationStatus(true);
                     break;
                 case "RoutingRequestSent":
                     if (message.status === "Failed") {

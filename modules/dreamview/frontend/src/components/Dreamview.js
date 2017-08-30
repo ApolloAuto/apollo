@@ -5,6 +5,7 @@ import SideBar from "components/SideBar";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
 import RouteEditingBar from "components/RouteEditingBar";
+import Loader from "components/common/Loader";
 import WS from "store/websocket";
 
 @inject("store") @observer
@@ -17,7 +18,12 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { dimension, meters, options, routeEditingManager } = this.props.store;
+        const { dimension, meters, options,
+                routeEditingManager, isInitialized} = this.props.store;
+
+        if (!isInitialized) {
+            return <Loader />;
+        }
 
         return (
             <div>
