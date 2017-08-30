@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/sensor_canbus.h"
+#include "modules/drivers/mobileye/mobileye_canbus.h"
 #include "modules/drivers/mobileye/mobileye_message_manager.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 
@@ -25,7 +25,7 @@ namespace drivers {
 
 using apollo::common::ErrorCode;
 
-TEST(SensorCanbusTest, Simple) {
+TEST(MobileyeCanbusTest, Simple) {
   SensorCanbus<Mobileye> cb;
   EXPECT_EQ(cb.Name(), "canbus");
 }

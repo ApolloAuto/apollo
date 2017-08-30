@@ -71,16 +71,4 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "sensor_canbus_test",
-    size = "small",
-    srcs = ["sensor_canbus_test.cc"],
-    deps = [
-        ":sensor_canbus_lib",
-        "//modules/drivers/mobileye:mobileye_message_manager",
-        "//modules/drivers/proto:sensor_proto",
-        "@gtest//:main",
-    ],
-)
-
 cpplint()

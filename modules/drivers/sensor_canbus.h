@@ -190,11 +190,6 @@ Status SensorCanbus<SensorType>::Start() {
 }
 
 template <typename SensorType>
-void SensorCanbus<SensorType>::PublishSensorData() {
-  // need specialization for each sensor type
-}
-
-template <typename SensorType>
 void SensorCanbus<SensorType>::OnTimer(const ros::TimerEvent &) {
   PublishSensorData();
 }
