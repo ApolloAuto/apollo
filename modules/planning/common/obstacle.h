@@ -36,10 +36,6 @@
 namespace apollo {
 namespace planning {
 
-//TODO (all): disable "using" in header file.
-class Obstacle;
-using IndexedObstacles = IndexedList<std::string, Obstacle>;
-
 class Obstacle {
  public:
   Obstacle() = default;
@@ -68,7 +64,7 @@ class Obstacle {
   const common::math::Box2d &PerceptionBoundingBox() const;
 
   const prediction::Trajectory &Trajectory() const;
-  bool has_trajectory() const { return has_trajectory_; }
+  bool HasTrajectory() const { return has_trajectory_; }
 
   const perception::PerceptionObstacle &Perception() const;
 
@@ -77,11 +73,10 @@ class Obstacle {
    * data.  The original prediction may have multiple trajectories for each
    * obstacle. But this function will create one obstacle for each trajectory.
    * @param predictions The prediction results
-   * @param obstacles The output obstacles saved in a list of unique_ptr.
+   * @return obstacles The output obstacles saved in a list of unique_ptr.
    */
-  static void CreateObstacles(
-      const prediction::PredictionObstacles &predictions,
-      std::list<std::unique_ptr<Obstacle>> *obstacles);
+  static std::vector<std::unique_ptr<Obstacle>> CreateObstacles(
+      const prediction::PredictionObstacles &predictions);
 
   static bool IsStaticObstacle(
       const perception::PerceptionObstacle &perception_obstacle);
@@ -91,14 +86,16 @@ class Obstacle {
 
  private:
   std::string id_;
-  std::int32_t perception_id_;
-  bool is_static_;
-  bool is_virtual_;
+  std::int32_t perception_id_ = 0;
+  bool is_static_ = false;
+  bool is_virtual_ = false;
   bool has_trajectory_ = false;
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
   common::math::Box2d perception_bounding_box_;
 };
+
+typedef IndexedList<std::string, Obstacle> IndexedObstacles;
 
 }  // namespace planning
 }  // namespace apollo

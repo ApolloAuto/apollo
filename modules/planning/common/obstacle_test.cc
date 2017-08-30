@@ -36,31 +36,31 @@ namespace apollo {
 namespace planning {
 
 using apollo::perception::PerceptionObstacle;
+
 TEST(Obstacle, IsStaticObstacle) {
-  perception::PerceptionObstacle perception_obstacle;
+  PerceptionObstacle perception_obstacle;
   EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
 
   perception_obstacle.mutable_velocity()->set_x(2.5);
   perception_obstacle.mutable_velocity()->set_y(0.5);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(perception::PerceptionObstacle::UNKNOWN);
+  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN_UNMOVABLE);
   EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(perception::PerceptionObstacle::UNKNOWN_MOVABLE);
+  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN_MOVABLE);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(perception::PerceptionObstacle::PEDESTRIAN);
+  perception_obstacle.set_type(PerceptionObstacle::PEDESTRIAN);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(perception::PerceptionObstacle::BICYCLE);
+  perception_obstacle.set_type(PerceptionObstacle::BICYCLE);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(perception::PerceptionObstacle::VEHICLE);
+  perception_obstacle.set_type(PerceptionObstacle::VEHICLE);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
   perception_obstacle.mutable_velocity()->set_x(0.5);
@@ -75,8 +75,7 @@ class ObstacleTest : public ::testing::Test {
     ASSERT_TRUE(common::util::GetProtoFromFile(
         "modules/planning/common/testdata/sample_prediction.pb.txt",
         &prediction_obstacles));
-    std::list<std::unique_ptr<Obstacle>> obstacles;
-    Obstacle::CreateObstacles(prediction_obstacles, &obstacles);
+    auto obstacles = Obstacle::CreateObstacles(prediction_obstacles);
     ASSERT_EQ(5, obstacles.size());
     for (auto& obstacle : obstacles) {
       const auto id = obstacle->Id();
@@ -90,23 +89,23 @@ class ObstacleTest : public ::testing::Test {
 
 TEST_F(ObstacleTest, CreateObstacles) {
   ASSERT_EQ(5, indexed_obstacles_.Items().size());
-  ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
-  ASSERT_TRUE(indexed_obstacles_.Find("2156_1"));
-  ASSERT_TRUE(indexed_obstacles_.Find("2157_0"));
-  ASSERT_TRUE(indexed_obstacles_.Find("2157_1"));
-  ASSERT_TRUE(indexed_obstacles_.Find("2161"));
+  EXPECT_TRUE(indexed_obstacles_.Find("2156_0"));
+  EXPECT_TRUE(indexed_obstacles_.Find("2156_1"));
+  EXPECT_TRUE(indexed_obstacles_.Find("2157_0"));
+  EXPECT_TRUE(indexed_obstacles_.Find("2157_1"));
+  EXPECT_TRUE(indexed_obstacles_.Find("2161"));
 }
 
 TEST_F(ObstacleTest, Id) {
-  ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
+  ASSERT_TRUE(obstacle);
   EXPECT_EQ("2156_0", obstacle->Id());
   EXPECT_EQ(2156, obstacle->PerceptionId());
 }
 
 TEST_F(ObstacleTest, GetPointAtTime) {
-  ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
+  ASSERT_TRUE(obstacle);
 
   // first
   const auto first_point = obstacle->GetPointAtTime(0.0);
@@ -131,8 +130,8 @@ TEST_F(ObstacleTest, GetPointAtTime) {
 }
 
 TEST_F(ObstacleTest, PerceptionBoundingBox) {
-  ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
+  ASSERT_TRUE(obstacle);
   const auto& box = obstacle->PerceptionBoundingBox();
 
   std::vector<common::math::Vec2d> corners;
@@ -146,8 +145,8 @@ TEST_F(ObstacleTest, PerceptionBoundingBox) {
 }
 
 TEST_F(ObstacleTest, GetBoundingBox) {
-  ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
+  ASSERT_TRUE(obstacle);
   const auto& point = obstacle->Trajectory().trajectory_point(2);
   const auto& box = obstacle->GetBoundingBox(point);
   std::vector<common::math::Vec2d> corners;
@@ -161,15 +160,15 @@ TEST_F(ObstacleTest, GetBoundingBox) {
 }
 
 TEST_F(ObstacleTest, Trajectory) {
-  ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
+  ASSERT_TRUE(obstacle);
   const auto& points = obstacle->Trajectory().trajectory_point();
   EXPECT_EQ(50, points.size());
 }
 
 TEST_F(ObstacleTest, Perception) {
-  ASSERT_TRUE(indexed_obstacles_.Find("2156_0"));
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
+  ASSERT_TRUE(obstacle);
   const auto& perception_obstacle = obstacle->Perception();
   EXPECT_EQ(2156, perception_obstacle.id());
 }
