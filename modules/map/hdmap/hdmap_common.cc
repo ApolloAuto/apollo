@@ -28,6 +28,7 @@ namespace apollo {
 namespace hdmap {
 namespace {
 using apollo::common::math::Vec2d;
+using apollo::common::PointENU;
 
 // Minimum error in lane segmentation.
 const double kSegmentationEpsilon = 0.2;
@@ -88,131 +89,131 @@ void SegmentsFromCurve(
   }
 }
 
-apollo::common::PointENU PointFromVec2d(const Vec2d &point) {
-  apollo::common::PointENU pt;
+PointENU PointFromVec2d(const Vec2d &point) {
+  PointENU pt;
   pt.set_x(point.x());
   pt.set_y(point.y());
   return pt;
 }
 
-Vec2d Vec2dFromPoint(const apollo::common::PointENU &point) {
+Vec2d Vec2dFromPoint(const PointENU &point) {
   return {point.x(), point.y()};
 }
 
 }  // namespace
 
-LaneInfo::LaneInfo(const Lane &lane) : _lane(lane) { init(); }
+LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) { Init(); }
 
-void LaneInfo::init() {
-  PointsFromCurve(_lane.central_curve(), &_points);
-  CHECK_GE(_points.size(), 2);
-  _segments.clear();
-  _accumulated_s.clear();
-  _unit_directions.clear();
-  _headings.clear();
+void LaneInfo::Init() {
+  PointsFromCurve(lane_.central_curve(), &points_);
+  CHECK_GE(points_.size(), 2);
+  segments_.clear();
+  accumulated_s_.clear();
+  unit_directions_.clear();
+  headings_.clear();
 
   double s = 0;
-  for (size_t i = 0; i + 1 < _points.size(); ++i) {
-    _segments.emplace_back(_points[i], _points[i + 1]);
-    _accumulated_s.push_back(s);
-    _unit_directions.push_back(_segments.back().unit_direction());
-    s += _segments.back().length();
+  for (size_t i = 0; i + 1 < points_.size(); ++i) {
+    segments_.emplace_back(points_[i], points_[i + 1]);
+    accumulated_s_.push_back(s);
+    unit_directions_.push_back(segments_.back().unit_direction());
+    s += segments_.back().length();
   }
 
-  _accumulated_s.push_back(s);
-  _total_length = s;
-  CHECK(!_unit_directions.empty());
-  _unit_directions.push_back(_unit_directions.back());
-  for (const auto &direction : _unit_directions) {
-    _headings.push_back(direction.Angle());
+  accumulated_s_.push_back(s);
+  total_length_ = s;
+  CHECK(!unit_directions_.empty());
+  unit_directions_.push_back(unit_directions_.back());
+  for (const auto &direction : unit_directions_) {
+    headings_.push_back(direction.Angle());
   }
-  for (const auto &overlap_id : _lane.overlap_id()) {
-    _overlap_ids.emplace_back(overlap_id.id());
+  for (const auto &overlap_id : lane_.overlap_id()) {
+    overlap_ids_.emplace_back(overlap_id.id());
   }
-  CHECK(!_segments.empty());
+  CHECK(!segments_.empty());
 
-  _sampled_left_width.clear();
-  _sampled_right_width.clear();
-  for (const auto &sample : _lane.left_sample()) {
-    _sampled_left_width.emplace_back(sample.s(), sample.width());
+  sampled_left_width_.clear();
+  sampled_right_width_.clear();
+  for (const auto &sample : lane_.left_sample()) {
+    sampled_left_width_.emplace_back(sample.s(), sample.width());
   }
-  for (const auto &sample : _lane.right_sample()) {
-    _sampled_right_width.emplace_back(sample.s(), sample.width());
+  for (const auto &sample : lane_.right_sample()) {
+    sampled_right_width_.emplace_back(sample.s(), sample.width());
   }
 
   const double kMinHalfWidth = 1.05;
-  if (_lane.has_type()) {
-    if (_lane.type() == Lane::CITY_DRIVING) {
-      for (const auto &p : _sampled_left_width) {
+  if (lane_.has_type()) {
+    if (lane_.type() == Lane::CITY_DRIVING) {
+      for (const auto &p : sampled_left_width_) {
         if (p.second < kMinHalfWidth) {
           AERROR
-              << "lane[id = " << _lane.id().DebugString()
+              << "lane[id = " << lane_.id().DebugString()
               << "]. _sampled_left_width[" << p.second
               << "] is too small. It should be larger than half vehicle width["
               << kMinHalfWidth << "].";
         }
       }
-      for (const auto &p : _sampled_right_width) {
+      for (const auto &p : sampled_right_width_) {
         if (p.second < kMinHalfWidth) {
           AERROR
-              << "lane[id = " << _lane.id().DebugString()
+              << "lane[id = " << lane_.id().DebugString()
               << "]. _sampled_right_width[" << p.second
               << "] is too small. It should be larger than half vehicle width["
               << kMinHalfWidth << "].";
         }
       }
-    } else if (_lane.type() == Lane::NONE) {
-      AERROR << "_lane[id = " << _lane.id().DebugString() << " type is NONE.";
+    } else if (lane_.type() == Lane::NONE) {
+      AERROR << "_lane[id = " << lane_.id().DebugString() << " type is NONE.";
     }
   } else {
-    AERROR << "_lane[id = " << _lane.id().DebugString() << "has NO type.";
+    AERROR << "_lane[id = " << lane_.id().DebugString() << "has NO type.";
   }
 
-  create_kdtree();
+  CreateKDTree();
 }
 
-void LaneInfo::get_width(const double s, double *left_width,
-                         double *right_width) const {
+void LaneInfo::GetWidth(const double s, double *left_width,
+                        double *right_width) const {
   if (left_width != nullptr) {
-    *left_width = get_width_from_sample(_sampled_left_width, s);
+    *left_width = GetWidthFromSample(sampled_left_width_, s);
   }
   if (right_width != nullptr) {
-    *right_width = get_width_from_sample(_sampled_right_width, s);
+    *right_width = GetWidthFromSample(sampled_right_width_, s);
   }
 }
 
-double LaneInfo::heading(const double s) const {
-  CHECK_GE(s, _accumulated_s.front()) << "s should be >= "
-                                      << _accumulated_s.front();
-  CHECK_LE(s, _accumulated_s.back()) << "s should be <= "
-                                     << _accumulated_s.back();
-  auto iter = std::lower_bound(_accumulated_s.begin(), _accumulated_s.end(), s);
-  int index = std::distance(_accumulated_s.begin(), iter);
+double LaneInfo::Heading(const double s) const {
+  CHECK_GE(s, accumulated_s_.front()) << "s should be >= "
+                                      << accumulated_s_.front();
+  CHECK_LE(s, accumulated_s_.back()) << "s should be <= "
+                                     << accumulated_s_.back();
+  auto iter = std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
+  int index = std::distance(accumulated_s_.begin(), iter);
   if (index == 0 || *iter - s <= common::math::kMathEpsilon) {
-    return _headings[index];
+    return headings_[index];
   } else {
     return ::apollo::common::math::slerp(
-        _headings[index - 1], _accumulated_s[index - 1], _headings[index],
-        _accumulated_s[index], s);
+        headings_[index - 1], accumulated_s_[index - 1], headings_[index],
+        accumulated_s_[index], s);
     // return _headings[index - 1];
   }
 }
 
-double LaneInfo::get_width(const double s) const {
+double LaneInfo::GetWidth(const double s) const {
   double left_width = 0.0;
   double right_width = 0.0;
-  get_width(s, &left_width, &right_width);
+  GetWidth(s, &left_width, &right_width);
   return left_width + right_width;
 }
 
-double LaneInfo::get_effective_width(const double s) const {
+double LaneInfo::GetEffectiveWidth(const double s) const {
   double left_width = 0.0;
   double right_width = 0.0;
-  get_width(s, &left_width, &right_width);
+  GetWidth(s, &left_width, &right_width);
   return 2 * std::min(left_width, right_width);
 }
 
-double LaneInfo::get_width_from_sample(
+double LaneInfo::GetWidthFromSample(
     const std::vector<LaneInfo::SampledWidth> &samples, const double s) const {
   if (samples.empty()) {
     return 0.0;
@@ -239,7 +240,7 @@ double LaneInfo::get_width_from_sample(
   return sample1.second * ratio + sample2.second * (1.0 - ratio);
 }
 
-bool LaneInfo::is_on_lane(const Vec2d &point) const {
+bool LaneInfo::IsOnLane(const Vec2d &point) const {
   double accumulate_s = 0.0;
   double lateral = 0.0;
   if (!GetProjection(point, &accumulate_s, &lateral)) {
@@ -252,89 +253,88 @@ bool LaneInfo::is_on_lane(const Vec2d &point) const {
 
   double left_width = 0.0;
   double right_width = 0.0;
-  get_width(accumulate_s, &left_width, &right_width);
+  GetWidth(accumulate_s, &left_width, &right_width);
   if (lateral < left_width && lateral > -right_width) {
     return true;
   }
   return false;
 }
 
-bool LaneInfo::is_on_lane(const apollo::common::math::Box2d &box) const {
+bool LaneInfo::IsOnLane(const apollo::common::math::Box2d &box) const {
   std::vector<Vec2d> corners;
   box.GetAllCorners(&corners);
   for (const auto &corner : corners) {
-    if (!is_on_lane(corner)) {
+    if (!IsOnLane(corner)) {
       return false;
     }
   }
   return true;
 }
 
-apollo::common::PointENU LaneInfo::GetSmoothPoint(double s) const {
-  CHECK_GE(_points.size(), 2);
+PointENU LaneInfo::GetSmoothPoint(double s) const {
+  CHECK_GE(points_.size(), 2);
   if (s <= 0.0) {
-    return PointFromVec2d(_points[0]);
+    return PointFromVec2d(points_[0]);
   }
 
   if (s >= total_length()) {
-    return PointFromVec2d(_points.back());
+    return PointFromVec2d(points_.back());
   }
 
   const auto low_itr =
-      std::lower_bound(_accumulated_s.begin(), _accumulated_s.end(), s);
-  CHECK(low_itr != _accumulated_s.end());
-  size_t index = low_itr - _accumulated_s.begin();
+      std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
+  CHECK(low_itr != accumulated_s_.end());
+  size_t index = low_itr - accumulated_s_.begin();
   double delta_s = *low_itr - s;
   if (delta_s < apollo::common::math::kMathEpsilon) {
-    return PointFromVec2d(_points[index]);
+    return PointFromVec2d(points_[index]);
   }
 
-  auto smooth_point = _points[index] - _unit_directions[index - 1] * delta_s;
+  auto smooth_point = points_[index] - unit_directions_[index - 1] * delta_s;
 
   return PointFromVec2d(smooth_point);
 }
 
-double LaneInfo::distance_to(const Vec2d &point) const {
-  const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
+double LaneInfo::DistanceTo(const Vec2d &point) const {
+  const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
   return segment_box->DistanceTo(point);
 }
 
-double LaneInfo::distance_to(const Vec2d &point,
-                             Vec2d *map_point,
-                             double *s_offset, int *s_offset_index) const {
-  const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
+double LaneInfo::DistanceTo(const Vec2d &point,
+                            Vec2d *map_point,
+                            double *s_offset, int *s_offset_index) const {
+  const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
   int index = segment_box->id();
-  double distance = _segments[index].DistanceTo(point, map_point);
+  double distance = segments_[index].DistanceTo(point, map_point);
   *s_offset_index = index;
   *s_offset =
-      _accumulated_s[index] + _segments[index].start().DistanceTo(*map_point);
+      accumulated_s_[index] + segments_[index].start().DistanceTo(*map_point);
   return distance;
 }
 
-apollo::common::PointENU LaneInfo::GetNearestPoint(const Vec2d &point,
-                                                     double *distance) const {
-  const auto segment_box = _lane_segment_kdtree->GetNearestObject(point);
+PointENU LaneInfo::GetNearestPoint(const Vec2d &point, double *distance) const {
+  const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
   int index = segment_box->id();
   Vec2d nearest_point;
-  *distance = _segments[index].DistanceTo(point, &nearest_point);
+  *distance = segments_[index].DistanceTo(point, &nearest_point);
 
   return PointFromVec2d(nearest_point);
 }
 
 bool LaneInfo::GetProjection(const Vec2d &point,
-                              double *accumulate_s, double *lateral) const {
+                             double *accumulate_s, double *lateral) const {
   CHECK_NOTNULL(accumulate_s);
   CHECK_NOTNULL(lateral);
 
-  if (_segments.empty()) {
+  if (segments_.empty()) {
     return false;
   }
   double min_distance = std::numeric_limits<double>::infinity();
   std::size_t min_index = 0;
   double min_proj = 0.0;
-  std::size_t num_segments = _segments.size();
+  std::size_t num_segments = segments_.size();
   for (std::size_t i = 0; i < num_segments; ++i) {
-    const auto &segment = _segments[i];
+    const auto &segment = segments_[i];
     const double distance = segment.DistanceTo(point);
     if (distance < min_distance) {
       const double proj = segment.ProjectOntoUnit(point);
@@ -342,7 +342,7 @@ bool LaneInfo::GetProjection(const Vec2d &point,
         continue;
       }
       if (proj > segment.length() && i + 1 < num_segments) {
-        const auto &next_segment = _segments[i + 1];
+        const auto &next_segment = segments_[i + 1];
         if ((point - next_segment.start())
                 .InnerProd(next_segment.unit_direction()) >= 0.0) {
           continue;
@@ -354,12 +354,12 @@ bool LaneInfo::GetProjection(const Vec2d &point,
     }
   }
 
-  const auto &segment = _segments[min_index];
+  const auto &segment = segments_[min_index];
   if (min_index + 1 >= num_segments) {
-    *accumulate_s = _accumulated_s[min_index] + min_proj;
+    *accumulate_s = accumulated_s_[min_index] + min_proj;
   } else {
     *accumulate_s =
-        _accumulated_s[min_index] + std::min(min_proj, segment.length());
+        accumulated_s_[min_index] + std::min(min_proj, segment.length());
   }
   const double prod = segment.ProductOntoUnit(point);
   if ((min_index == 0 && min_proj < 0.0) ||
@@ -372,41 +372,41 @@ bool LaneInfo::GetProjection(const Vec2d &point,
   return true;
 }
 
-void LaneInfo::post_process(const HDMapImpl &map_instance) {
-  update_overlaps(map_instance);
+void LaneInfo::PostProcess(const HDMapImpl &map_instance) {
+  UpdateOverlaps(map_instance);
 }
 
-void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
-  for (const auto &overlap_id : _overlap_ids) {
+void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
+  for (const auto &overlap_id : overlap_ids_) {
     const auto &overlap_ptr =
         map_instance.GetOverlapById(MakeMapId(overlap_id));
     if (overlap_ptr == nullptr) {
       continue;
     }
-    _overlaps.emplace_back(overlap_ptr);
+    overlaps_.emplace_back(overlap_ptr);
     for (const auto &object : overlap_ptr->overlap().object()) {
       const auto &object_id = object.id().id();
-      if (object_id == _lane.id().id()) {
+      if (object_id == lane_.id().id()) {
         continue;
       }
       const auto &object_map_id = MakeMapId(object_id);
       if (map_instance.GetLaneById(object_map_id) != nullptr) {
-        _cross_lanes.emplace_back(overlap_ptr);
+        cross_lanes_.emplace_back(overlap_ptr);
       }
       if (map_instance.GetSignalById(object_map_id) != nullptr) {
-        _signals.emplace_back(overlap_ptr);
+        signals_.emplace_back(overlap_ptr);
       }
       if (map_instance.GetYieldSignById(object_map_id) != nullptr) {
-        _yield_signs.emplace_back(overlap_ptr);
+        yield_signs_.emplace_back(overlap_ptr);
       }
       if (map_instance.GetStopSignById(object_map_id) != nullptr) {
-        _stop_signs.emplace_back(overlap_ptr);
+        stop_signs_.emplace_back(overlap_ptr);
       }
       if (map_instance.GetCrosswalkById(object_map_id) != nullptr) {
-        _crosswalks.emplace_back(overlap_ptr);
+        crosswalks_.emplace_back(overlap_ptr);
       }
       if (map_instance.GetJunctionById(object_map_id) != nullptr) {
-        _junctions.emplace_back(overlap_ptr);
+        junctions_.emplace_back(overlap_ptr);
       }
 
       // TODO: support parking and speed bump
@@ -422,41 +422,41 @@ void LaneInfo::update_overlaps(const HDMapImpl &map_instance) {
   }
 }
 
-void LaneInfo::create_kdtree() {
+void LaneInfo::CreateKDTree() {
   apollo::common::math::AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 16;
 
-  _segment_box_list.clear();
-  for (size_t id = 0; id < _segments.size(); ++id) {
-    const auto &segment = _segments[id];
-    _segment_box_list.emplace_back(
+  segment_box_list_.clear();
+  for (size_t id = 0; id < segments_.size(); ++id) {
+    const auto &segment = segments_[id];
+    segment_box_list_.emplace_back(
         apollo::common::math::AABox2d(segment.start(), segment.end()), this,
         &segment, id);
   }
-  _lane_segment_kdtree.reset(new LaneSegmentKDTree(_segment_box_list, params));
+  lane_segment_kdtree_.reset(new LaneSegmentKDTree(segment_box_list_, params));
 }
 
-JunctionInfo::JunctionInfo(const Junction &junction) : _junction(junction) {
-  init();
+JunctionInfo::JunctionInfo(const Junction &junction) : junction_(junction) {
+  Init();
 }
 
-void JunctionInfo::init() {
-  _polygon = ConvertToPolygon2d(_junction.polygon());
-  CHECK_GT(_polygon.num_points(), 2);
+void JunctionInfo::Init() {
+  polygon_ = ConvertToPolygon2d(junction_.polygon());
+  CHECK_GT(polygon_.num_points(), 2);
 }
 
-SignalInfo::SignalInfo(const Signal &signal) : _signal(signal) {
-  init();
+SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) {
+  Init();
 }
 
-void SignalInfo::init() {
-  for (const auto &stop_line : _signal.stop_line()) {
-    SegmentsFromCurve(stop_line, &_segments);
+void SignalInfo::Init() {
+  for (const auto &stop_line : signal_.stop_line()) {
+    SegmentsFromCurve(stop_line, &segments_);
   }
-  CHECK(!_segments.empty());
+  CHECK(!segments_.empty());
   std::vector<Vec2d> points;
-  for (const auto &segment : _segments) {
+  for (const auto &segment : segments_) {
     points.emplace_back(segment.start());
     points.emplace_back(segment.end());
   }
@@ -464,44 +464,44 @@ void SignalInfo::init() {
 }
 
 CrosswalkInfo::CrosswalkInfo(const Crosswalk &crosswalk)
-    : _crosswalk(crosswalk) {
-  init();
+    : crosswalk_(crosswalk) {
+  Init();
 }
 
-void CrosswalkInfo::init() {
-  _polygon = ConvertToPolygon2d(_crosswalk.polygon());
-  CHECK_GT(_polygon.num_points(), 2);
+void CrosswalkInfo::Init() {
+  polygon_ = ConvertToPolygon2d(crosswalk_.polygon());
+  CHECK_GT(polygon_.num_points(), 2);
 }
 
-StopSignInfo::StopSignInfo(const StopSign &stop_sign) : _stop_sign(stop_sign) {
+StopSignInfo::StopSignInfo(const StopSign &stop_sign) : stop_sign_(stop_sign) {
   init();
 }
 
 void StopSignInfo::init() {
-  for (const auto &stop_line : _stop_sign.stop_line()) {
-    SegmentsFromCurve(stop_line, &_segments);
+  for (const auto &stop_line : stop_sign_.stop_line()) {
+    SegmentsFromCurve(stop_line, &segments_);
   }
-  CHECK(!_segments.empty());
+  CHECK(!segments_.empty());
 }
 
 YieldSignInfo::YieldSignInfo(const YieldSign &yield_sign)
-    : _yield_sign(yield_sign) {
-  init();
+    : yield_sign_(yield_sign) {
+  Init();
 }
 
-void YieldSignInfo::init() {
-  for (const auto &stop_line : _yield_sign.stop_line()) {
-    SegmentsFromCurve(stop_line, &_segments);
+void YieldSignInfo::Init() {
+  for (const auto &stop_line : yield_sign_.stop_line()) {
+    SegmentsFromCurve(stop_line, &segments_);
   }
   // segments_from_curve(_yield_sign.stop_line(), &_segments);
-  CHECK(!_segments.empty());
+  CHECK(!segments_.empty());
 }
 
-OverlapInfo::OverlapInfo(const Overlap &overlap) : _overlap(overlap) {}
+OverlapInfo::OverlapInfo(const Overlap &overlap) : overlap_(overlap) {}
 
 const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
     const Id &id) const {
-  for (const auto &object : _overlap.object()) {
+  for (const auto &object : overlap_.object()) {
     if (object.id().id() == id.id()) {
       return &object;
     }
@@ -509,15 +509,15 @@ const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
   return nullptr;
 }
 
-RoadInfo::RoadInfo(const Road &road) : _road(road) {
-  for (const auto& section : _road.section()) {
-    _sections.push_back(section);
-    _road_boundaries.push_back(section.boundary());
+RoadInfo::RoadInfo(const Road &road) : road_(road) {
+  for (const auto& section : road_.section()) {
+    sections_.push_back(section);
+    road_boundaries_.push_back(section.boundary());
   }
 }
 
-const std::vector<RoadBoundary> &RoadInfo::get_boundaries() const {
-  return _road_boundaries;
+const std::vector<RoadBoundary> &RoadInfo::GetBoundaries() const {
+  return road_boundaries_;
 }
 
 }  // namespace hdmap

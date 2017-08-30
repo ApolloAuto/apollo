@@ -280,34 +280,34 @@ class HDMapImpl {
   void Clear();
 
  private:
-  Map _map;
+  Map map_;
 
-  LaneTable           _lane_table;
-  JunctionTable       _junction_table;
-  CrosswalkTable      _crosswalk_table;
-  SignalTable         _signal_table;
-  StopSignTable       _stop_sign_table;
-  YieldSignTable      _yield_sign_table;
-  OverlapTable        _overlap_table;
-  RoadTable           _road_table;
+  LaneTable           lane_table_;
+  JunctionTable       junction_table_;
+  CrosswalkTable      crosswalk_table_;
+  SignalTable         signal_table_;
+  StopSignTable       stop_sign_table_;
+  YieldSignTable      yield_sign_table_;
+  OverlapTable        overlap_table_;
+  RoadTable           road_table_;
 
-  std::vector<LaneSegmentBox> _lane_segment_boxes;
-  std::unique_ptr<LaneSegmentKDTree> _lane_segment_kdtree;
+  std::vector<LaneSegmentBox> lane_segment_boxes_;
+  std::unique_ptr<LaneSegmentKDTree> lane_segment_kdtree_;
 
-  std::vector<JunctionPolygonBox> _junction_polygon_boxes;
-  std::unique_ptr<JunctionPolygonKDTree> _junction_polygon_kdtree;
+  std::vector<JunctionPolygonBox> junction_polygon_boxes_;
+  std::unique_ptr<JunctionPolygonKDTree> junction_polygon_kdtree_;
 
-  std::vector<CrosswalkPolygonBox> _crosswalk_polygon_boxes;
-  std::unique_ptr<CrosswalkPolygonKDTree> _crosswalk_polygon_kdtree;
+  std::vector<CrosswalkPolygonBox> crosswalk_polygon_boxes_;
+  std::unique_ptr<CrosswalkPolygonKDTree> crosswalk_polygon_kdtree_;
 
-  std::vector<SignalSegmentBox> _signal_segment_boxes;
-  std::unique_ptr<SignalSegmentKDTree> _signal_segment_kdtree;
+  std::vector<SignalSegmentBox> signal_segment_boxes_;
+  std::unique_ptr<SignalSegmentKDTree> signal_segment_kdtree_;
 
-  std::vector<StopSignSegmentBox> _stop_sign_segment_boxes;
-  std::unique_ptr<StopSignSegmentKDTree> _stop_sign_segment_kdtree;
+  std::vector<StopSignSegmentBox> stop_sign_segment_boxes_;
+  std::unique_ptr<StopSignSegmentKDTree> stop_sign_segment_kdtree_;
 
-  std::vector<YieldSignSegmentBox> _yield_sign_segment_boxes;
-  std::unique_ptr<YieldSignSegmentKDTree> _yield_sign_segment_kdtree;
+  std::vector<YieldSignSegmentBox> yield_sign_segment_boxes_;
+  std::unique_ptr<YieldSignSegmentKDTree> yield_sign_segment_kdtree_;
 };
 
 }  // namespace hdmap

@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
 
     double left_width = 0.0;
     double right_width = 0.0;
-    lane_ptr->get_width(FLAGS_s, &left_width, &right_width);
+    lane_ptr->GetWidth(FLAGS_s, &left_width, &right_width);
 
     std::cout << "lane[" << FLAGS_lane << std::fixed << "] length["
               << lane_ptr->total_length() << "] type["
