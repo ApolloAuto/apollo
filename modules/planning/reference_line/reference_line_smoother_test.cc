@@ -73,7 +73,7 @@ class ReferenceLineSmootherTest : public ::testing::Test {
 TEST_F(ReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_FLOAT_EQ(153.87421, reference_line_->Length());
-  EXPECT_TRUE(smoother_.smooth(*reference_line_, &smoothed_reference_line));
+  EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
   EXPECT_FLOAT_EQ(153.54385, smoothed_reference_line.Length());
 }
 
