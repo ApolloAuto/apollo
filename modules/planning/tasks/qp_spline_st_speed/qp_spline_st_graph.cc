@@ -163,7 +163,7 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   // smoothness constraint
-  if (!constraint->AddThirdDerivativeSmoothConstraint()) {
+  if (!constraint->AddSecondDerivativeSmoothConstraint()) {
     const std::string msg = "add smoothness joint constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -226,7 +226,6 @@ Status QpSplineStGraph::ApplyConstraint(
 
   DCHECK_EQ(t_evaluated_.size(), accel_lower_bound.size());
   DCHECK_EQ(t_evaluated_.size(), accel_upper_bound.size());
-  // TODO: add accel constraint below
   if (!constraint->AddSecondDerivativeBoundary(t_evaluated_, accel_lower_bound,
                                                accel_upper_bound)) {
     const std::string msg = "Fail to apply acceleration constraints.";
