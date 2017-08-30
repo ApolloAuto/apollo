@@ -182,12 +182,16 @@ bool Frame::CreateReferenceLineFromRouting(
   for (const auto &segments : route_segments) {
     hdmap::Path hdmap_path;
     pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
-    ReferenceLine reference_line;
-    if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
-      AERROR << "Failed to smooth reference line";
-      continue;
+    if (FLAGS_enable_smooth_reference_line) {
+      ReferenceLine reference_line;
+      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
+        AERROR << "Failed to smooth reference line";
+        continue;
+      }
+      reference_lines->push_back(std::move(reference_line));
+    } else {
+      reference_lines->emplace_back(hdmap_path);
     }
-    reference_lines->push_back(std::move(reference_line));
   }
 
   if (reference_lines->empty()) {
