@@ -367,7 +367,7 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
     hull.setDimension(2);
     std::vector<pcl::Vertices> poly_vt;
     PointCloudPtr plane_hull(new PointCloud);
-    hull.Reconstruct2dxy(*plane_hull, poly_vt);
+    hull.Reconstruct2dxy(plane_hull, &poly_vt);
 
     if (poly_vt.size() == 1u) {
         std::vector<int> ind(poly_vt[0].vertices.begin(),

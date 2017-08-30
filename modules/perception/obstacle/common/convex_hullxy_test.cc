@@ -94,14 +94,14 @@ TEST_F(ConvexHull2DXYTest, Reconstruct2dxy) {
   plane_hull->clear();
   convex_hull.setInputCloud(cloud);
   convex_hull.setDimension(2);
-  convex_hull.Reconstruct2dxy(*plane_hull, poly_vt);
+  convex_hull.Reconstruct2dxy(plane_hull, &poly_vt);
   EXPECT_EQ(3, poly_vt[0].vertices.size());
   // case 1
   poly_vt.clear();
   plane_hull->clear();
   convex_hull.setInputCloud(clouds[0]);
   convex_hull.setDimension(2);
-  convex_hull.Reconstruct2dxy(*plane_hull, poly_vt);
+  convex_hull.Reconstruct2dxy(plane_hull, &poly_vt);
   EXPECT_EQ(1, poly_vt.size());
   EXPECT_EQ(3, poly_vt[0].vertices.size());
   // case 2
@@ -109,7 +109,7 @@ TEST_F(ConvexHull2DXYTest, Reconstruct2dxy) {
   plane_hull->clear();
   convex_hull.setInputCloud(clouds[1]);
   convex_hull.setDimension(2);
-  convex_hull.Reconstruct2dxy(*plane_hull, poly_vt);
+  convex_hull.Reconstruct2dxy(plane_hull, &poly_vt);
   EXPECT_EQ(1, poly_vt.size());
   EXPECT_EQ(5, poly_vt[0].vertices.size());
   // case 3
@@ -117,7 +117,7 @@ TEST_F(ConvexHull2DXYTest, Reconstruct2dxy) {
   plane_hull->clear();
   convex_hull.setInputCloud(clouds[2]);
   convex_hull.setDimension(2);
-  convex_hull.Reconstruct2dxy(*plane_hull, poly_vt);
+  convex_hull.Reconstruct2dxy(plane_hull, &poly_vt);
   EXPECT_EQ(1, poly_vt.size());
   EXPECT_EQ(4, poly_vt[0].vertices.size());
   // case 4
@@ -125,7 +125,7 @@ TEST_F(ConvexHull2DXYTest, Reconstruct2dxy) {
   plane_hull->clear();
   convex_hull.setInputCloud(clouds[3]);
   convex_hull.setDimension(2);
-  convex_hull.Reconstruct2dxy(*plane_hull, poly_vt);
+  convex_hull.Reconstruct2dxy(plane_hull, &poly_vt);
   EXPECT_EQ(1, poly_vt.size());
   EXPECT_EQ(6, poly_vt[0].vertices.size());
   // case 5
@@ -133,7 +133,7 @@ TEST_F(ConvexHull2DXYTest, Reconstruct2dxy) {
   plane_hull->clear();
   convex_hull.setInputCloud(clouds[4]);
   convex_hull.setDimension(2);
-  convex_hull.Reconstruct2dxy(*plane_hull, poly_vt);
+  convex_hull.Reconstruct2dxy(plane_hull, &poly_vt);
   EXPECT_EQ(1, poly_vt.size());
   EXPECT_EQ(6, poly_vt[0].vertices.size());
 }

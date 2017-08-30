@@ -93,7 +93,7 @@ TEST_F(GeometryUtilTest, TransformPointCloud2) {
   point_in.x = 1.0;
   point_in.y = 1.0;
   point_in.z = 1.0;
-  TransformPoint(point_in, point_out, _trans_matrix);
+  TransformPoint(point_in, &point_out, _trans_matrix);
   EXPECT_NEAR(-0.985772, point_out.x, EPSILON);
   EXPECT_NEAR(2.010278, point_out.y, EPSILON);
   EXPECT_NEAR(2.027878, point_out.z, EPSILON);
@@ -199,7 +199,7 @@ TEST_F(GeometryUtilTest, ComputeBboxSizeCenter) {
   Eigen::Vector3d new_size = old_size;
   Eigen::Vector3d new_center = old_center;
   ComputeBboxSizeCenter<pcl_util::Point>(objects[0]->cloud,
-    old_dir, new_size, new_center);
+    old_dir, &new_size, &new_center);
   EXPECT_NEAR(0.149998, new_size[0], EPSILON);
   EXPECT_NEAR(0.056100, new_size[1], EPSILON);
   EXPECT_NEAR(0.732072, new_size[2], EPSILON);

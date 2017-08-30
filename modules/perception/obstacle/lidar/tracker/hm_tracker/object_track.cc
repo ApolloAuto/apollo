@@ -357,7 +357,7 @@ void ObjectTrack::SmoothTrackOrientation() {
   Eigen::Vector3d new_center;
   ComputeBboxSizeCenter<pcl_util::Point>(
     current_object_->object_ptr->cloud,
-    current_dir.cast<double>(), new_size, new_center);
+    current_dir.cast<double>(), &new_size, &new_center);
   current_object_->direction = current_dir;
   current_object_->center = new_center.cast<float>();
   current_object_->size = new_size.cast<float>();
