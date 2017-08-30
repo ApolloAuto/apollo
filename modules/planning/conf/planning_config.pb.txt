@@ -91,7 +91,7 @@ em_planner_config {
         output_time_resolution: 0.05
         number_of_discrete_graph_s: 80
         number_of_discrete_graph_t: 4
-        number_of_evaluated_graph_t: 100
+        number_of_evaluated_graph_t: 50
         spline_order: 5
         speed_kernel_weight: 0.0
         accel_kernel_weight: 0.0

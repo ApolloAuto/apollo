@@ -104,7 +104,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   if (st_graph.Search(st_graph_data, path_data, speed_data) != Status::OK()) {
     RecordSTGraphDebug(boundaries, speed_limits, *speed_data);
     return Status(ErrorCode::PLANNING_ERROR,
-                  "Failed to search graph with dynamic programming!");
+                  "Failed to search graph with quadratic programming!");
   }
 
   // record debug info

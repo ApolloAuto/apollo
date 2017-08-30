@@ -40,8 +40,7 @@ DEFINE_string(test_chassis_file, "garage_chassis.pb.txt",
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 
 void PlanningTestBase::SetUpTestCase() {
-  FLAGS_planning_config_file =
-      "modules/planning/testdata/conf/planning_config.pb.txt";
+  FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
   FLAGS_adapter_config_path = "modules/planning/testdata/conf/adapter.conf";
   FLAGS_map_dir = "modules/planning/testdata";
   FLAGS_test_localization_file = "garage_localization.pb.txt";
