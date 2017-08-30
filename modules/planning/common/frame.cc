@@ -61,11 +61,6 @@ void Frame::SetPlanningStartPoint(const common::TrajectoryPoint &start_point) {
   planning_start_point_ = start_point;
 }
 
-const hdmap::PncMap *Frame::PncMap() {
-  DCHECK(pnc_map_) << "map is not setup in frame";
-  return pnc_map_;
-}
-
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
   return planning_start_point_;
 }
@@ -151,7 +146,7 @@ bool Frame::Init(const PlanningConfig &config,
   return true;
 }
 
-uint32_t Frame::sequence_num() const { return sequence_num_; }
+uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
 const std::vector<ReferenceLineInfo> &Frame::reference_line_info() const {
   return reference_line_info_;

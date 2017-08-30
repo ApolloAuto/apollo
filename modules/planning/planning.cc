@@ -119,7 +119,7 @@ Status Planning::Start() {
   while (ros::ok()) {
     RunOnce();
     if (frame_) {
-      auto seq_num = frame_->sequence_num();
+      auto seq_num = frame_->SequenceNum();
       FrameHistory::instance()->Add(seq_num, std::move(frame_));
     }
     ros::spinOnce();
@@ -152,28 +152,17 @@ void Planning::RunOnce() {
                         ->mutable_main_decision()
                         ->mutable_not_ready();
   if (AdapterManager::GetLocalization()->Empty()) {
-    AERROR << "Localization is not available; skip the planning cycle";
     not_ready->set_reason("localization not ready");
-    PublishPlanningPb(&not_ready_pb);
-    return;
-  }
-
-  if (AdapterManager::GetChassis()->Empty()) {
-    AERROR << "Chassis is not available; skip the planning cycle";
+  } else if (AdapterManager::GetChassis()->Empty()) {
     not_ready->set_reason("chassis not ready");
-    PublishPlanningPb(&not_ready_pb);
-    return;
-  }
-  if (AdapterManager::GetRoutingResponse()->Empty()) {
-    AERROR << "RoutingResponse is not available; skip the planning cycle";
+  } else if (AdapterManager::GetRoutingResponse()->Empty()) {
     not_ready->set_reason("routing not ready");
-    PublishPlanningPb(&not_ready_pb);
-    return;
-  }
-
-  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
-    AERROR << "Prediction is not available; skip the planning cycle";
+  } else if (FLAGS_enable_prediction &&
+             AdapterManager::GetPrediction()->Empty()) {
     not_ready->set_reason("prediction not ready");
+  }
+  if (not_ready->has_reason()) {
+    AERROR << not_ready->reason() << "; skip the planning cycle.";
     PublishPlanningPb(&not_ready_pb);
     return;
   }
@@ -247,15 +236,12 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
   }
 
   for (auto& reference_line_info : frame_->reference_line_info()) {
-    auto status = this->planner_->Plan(stitching_trajectory.back(),
-                                       frame_.get(), &reference_line_info);
-    if (!status.ok()) {
-      AERROR << "planner failed to make a driving plan.";
-    }
+    auto status = planner_->Plan(stitching_trajectory.back(),
+                                 frame_.get(), &reference_line_info);
+    AERROR_IF(!status.ok()) << "planner failed to make a driving plan.";
   }
 
-  const ReferenceLineInfo* best_reference_line =
-      frame_->FindDriveReferenceLineInfo();
+  const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
     std::string msg("planner failed to make a driving plan");
     AERROR << msg;
@@ -264,10 +250,9 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
   }
 
   auto* ptr_debug = frame_->MutableADCTrajectory()->mutable_debug();
-  auto* ptr_latency_stats =
-      frame_->MutableADCTrajectory()->mutable_latency_stats();
   ptr_debug->MergeFrom(best_reference_line->debug());
-  ptr_latency_stats->MergeFrom(best_reference_line->latency_stats());
+  frame_->MutableADCTrajectory()->mutable_latency_stats()->MergeFrom(
+      best_reference_line->latency_stats());
 
   // Add debug information.
   if (FLAGS_enable_record_debug) {
