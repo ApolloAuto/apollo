@@ -298,6 +298,18 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
       }
     }
 
+    // update state
+    if (::apollo::common::math::DoubleCompare(lane_speed, 0.0) <= 0) {
+      ADEBUG << "Non-positive lane_speed tacked : " << lane_speed;
+      lane_speed = 0.0;
+      lane_acc = 0.0;
+      transition(1, 1) = 1.0;
+    } else if (::apollo::common::math::DoubleCompare(
+        lane_speed, FLAGS_max_speed) >= 0) {
+      lane_speed = FLAGS_max_speed;
+      lane_acc = 0.0;
+    }
+
     // add trajectory point
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
@@ -311,17 +323,6 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     trajectory_point.set_relative_time(static_cast<double>(i) * freq);
     points->emplace_back(std::move(trajectory_point));
 
-    // update state
-    if (::apollo::common::math::DoubleCompare(lane_speed, 0.0) <= 0) {
-      ADEBUG << "Non-positive lane_speed tacked : " << lane_speed;
-      lane_speed = 0.0;
-      lane_acc = 0.0;
-      transition(1, 1) = 1.0;
-    } else if (::apollo::common::math::DoubleCompare(
-        lane_speed, FLAGS_max_speed) >= 0) {
-      lane_speed = FLAGS_max_speed;
-      lane_acc = 0.0;
-    }
     state(2, 0) = lane_speed;
     state(3, 0) = lane_acc;
 
