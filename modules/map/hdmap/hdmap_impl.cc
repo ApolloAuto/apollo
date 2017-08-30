@@ -40,52 +40,52 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   Clear();
 
   if (apollo::common::util::EndWith(map_filename, ".xml")) {
-    if (!adapter::OpendriveAdapter::LoadData(map_filename, &_map)) {
+    if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) {
       return -1;
     }
-  } else if (!apollo::common::util::GetProtoFromFile(map_filename, &_map)) {
+  } else if (!apollo::common::util::GetProtoFromFile(map_filename, &map_)) {
     return -1;
   }
 
-  for (const auto& lane : _map.lane()) {
-    _lane_table[lane.id().id()].reset(new LaneInfo(lane));
+  for (const auto& lane : map_.lane()) {
+    lane_table_[lane.id().id()].reset(new LaneInfo(lane));
   }
-  for (const auto& junction : _map.junction()) {
-    _junction_table[junction.id().id()].reset(new JunctionInfo(junction));
+  for (const auto& junction : map_.junction()) {
+    junction_table_[junction.id().id()].reset(new JunctionInfo(junction));
   }
-  for (const auto& signal : _map.signal()) {
-    _signal_table[signal.id().id()].reset(new SignalInfo(signal));
+  for (const auto& signal : map_.signal()) {
+    signal_table_[signal.id().id()].reset(new SignalInfo(signal));
   }
-  for (const auto& crosswalk : _map.crosswalk()) {
-    _crosswalk_table[crosswalk.id().id()].reset(new CrosswalkInfo(crosswalk));
+  for (const auto& crosswalk : map_.crosswalk()) {
+    crosswalk_table_[crosswalk.id().id()].reset(new CrosswalkInfo(crosswalk));
   }
-  for (const auto& stop_sign : _map.stop_sign()) {
-    _stop_sign_table[stop_sign.id().id()].reset(new StopSignInfo(stop_sign));
+  for (const auto& stop_sign : map_.stop_sign()) {
+    stop_sign_table_[stop_sign.id().id()].reset(new StopSignInfo(stop_sign));
   }
-  for (const auto& yield_sign : _map.yield()) {
-    _yield_sign_table[yield_sign.id().id()].reset(
+  for (const auto& yield_sign : map_.yield()) {
+    yield_sign_table_[yield_sign.id().id()].reset(
         new YieldSignInfo(yield_sign));
   }
-  for (const auto& overlap : _map.overlap()) {
-    _overlap_table[overlap.id().id()].reset(new OverlapInfo(overlap));
+  for (const auto& overlap : map_.overlap()) {
+    overlap_table_[overlap.id().id()].reset(new OverlapInfo(overlap));
   }
 
-  for (const auto& road : _map.road()) {
-    _road_table[road.id().id()].reset(new RoadInfo(road));
+  for (const auto& road : map_.road()) {
+    road_table_[road.id().id()].reset(new RoadInfo(road));
   }
 
-  for (const auto& road_ptr_pair : _road_table) {
+  for (const auto& road_ptr_pair : road_table_) {
     const auto& road_id = road_ptr_pair.second->id();
     for (const auto& road_section : road_ptr_pair.second->sections()) {
       const auto& section_id = road_section.id();
       for (const auto& lane_id : road_section.lane_id()) {
-        _lane_table[lane_id.id()]->set_road_id(road_id);
-        _lane_table[lane_id.id()]->set_section_id(section_id);
+        lane_table_[lane_id.id()]->set_road_id(road_id);
+        lane_table_[lane_id.id()]->set_section_id(section_id);
       }
     }
   }
-  for (const auto& lane_ptr_pair : _lane_table) {
-    lane_ptr_pair.second->post_process(*this);
+  for (const auto& lane_ptr_pair : lane_table_) {
+    lane_ptr_pair.second->PostProcess(*this);
   }
 
   BuildLaneSegmentKDTree();
@@ -99,43 +99,43 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
 }
 
 LaneInfoConstPtr HDMapImpl::GetLaneById(const Id& id) const {
-  LaneTable::const_iterator it = _lane_table.find(id.id());
-  return it != _lane_table.end() ? it->second : nullptr;
+  LaneTable::const_iterator it = lane_table_.find(id.id());
+  return it != lane_table_.end() ? it->second : nullptr;
 }
 
 JunctionInfoConstPtr HDMapImpl::GetJunctionById(const Id& id) const {
-  JunctionTable::const_iterator it = _junction_table.find(id.id());
-  return it != _junction_table.end() ? it->second : nullptr;
+  JunctionTable::const_iterator it = junction_table_.find(id.id());
+  return it != junction_table_.end() ? it->second : nullptr;
 }
 
 SignalInfoConstPtr HDMapImpl::GetSignalById(const Id& id) const {
-  SignalTable::const_iterator it = _signal_table.find(id.id());
-  return it != _signal_table.end() ? it->second : nullptr;
+  SignalTable::const_iterator it = signal_table_.find(id.id());
+  return it != signal_table_.end() ? it->second : nullptr;
 }
 
 CrosswalkInfoConstPtr HDMapImpl::GetCrosswalkById(const Id& id) const {
-  CrosswalkTable::const_iterator it = _crosswalk_table.find(id.id());
-  return it != _crosswalk_table.end() ? it->second : nullptr;
+  CrosswalkTable::const_iterator it = crosswalk_table_.find(id.id());
+  return it != crosswalk_table_.end() ? it->second : nullptr;
 }
 
 StopSignInfoConstPtr HDMapImpl::GetStopSignById(const Id& id) const {
-  StopSignTable::const_iterator it = _stop_sign_table.find(id.id());
-  return it != _stop_sign_table.end() ? it->second : nullptr;
+  StopSignTable::const_iterator it = stop_sign_table_.find(id.id());
+  return it != stop_sign_table_.end() ? it->second : nullptr;
 }
 
 YieldSignInfoConstPtr HDMapImpl::GetYieldSignById(const Id& id) const {
-  YieldSignTable::const_iterator it = _yield_sign_table.find(id.id());
-  return it != _yield_sign_table.end() ? it->second : nullptr;
+  YieldSignTable::const_iterator it = yield_sign_table_.find(id.id());
+  return it != yield_sign_table_.end() ? it->second : nullptr;
 }
 
 OverlapInfoConstPtr HDMapImpl::GetOverlapById(const Id& id) const {
-  OverlapTable::const_iterator it = _overlap_table.find(id.id());
-  return it != _overlap_table.end() ? it->second : nullptr;
+  OverlapTable::const_iterator it = overlap_table_.find(id.id());
+  return it != overlap_table_.end() ? it->second : nullptr;
 }
 
 RoadInfoConstPtr HDMapImpl::GetRoadById(const Id& id) const {
-  RoadTable::const_iterator it = _road_table.find(id.id());
-  return it != _road_table.end() ? it->second : nullptr;
+  RoadTable::const_iterator it = road_table_.find(id.id());
+  return it != road_table_.end() ? it->second : nullptr;
 }
 
 int HDMapImpl::GetLanes(const PointENU& point, double distance,
@@ -145,13 +145,13 @@ int HDMapImpl::GetLanes(const PointENU& point, double distance,
 
 int HDMapImpl::GetLanes(const Vec2d &point, double distance,
                         std::vector<LaneInfoConstPtr> *lanes) const {
-  if (lanes == nullptr || _lane_segment_kdtree == nullptr) {
+  if (lanes == nullptr || lane_segment_kdtree_ == nullptr) {
     return -1;
   }
 
   lanes->clear();
   std::vector<std::string> ids;
-  const int status = SearchObjects(point, distance, *_lane_segment_kdtree,
+  const int status = SearchObjects(point, distance, *lane_segment_kdtree_,
                                    &ids);
   if (status < 0) {
     return status;
@@ -197,13 +197,13 @@ int HDMapImpl::GetJunctions(
 int HDMapImpl::GetJunctions(
     const Vec2d& point, double distance,
     std::vector<JunctionInfoConstPtr>* junctions) const {
-  if (junctions == nullptr || _junction_polygon_kdtree == nullptr) {
+  if (junctions == nullptr || junction_polygon_kdtree_ == nullptr) {
     return -1;
   }
   junctions->clear();
   std::vector<std::string> ids;
   const int status =
-      SearchObjects(point, distance, *_junction_polygon_kdtree, &ids);
+      SearchObjects(point, distance, *junction_polygon_kdtree_, &ids);
   if (status < 0) {
     return status;
   }
@@ -220,13 +220,13 @@ int HDMapImpl::GetSignals(const PointENU& point, double distance,
 
 int HDMapImpl::GetSignals(const Vec2d& point, double distance,
                           std::vector<SignalInfoConstPtr>* signals) const {
-  if (signals == nullptr || _signal_segment_kdtree == nullptr) {
+  if (signals == nullptr || signal_segment_kdtree_ == nullptr) {
     return -1;
   }
   signals->clear();
   std::vector<std::string> ids;
   const int status =
-      SearchObjects(point, distance, *_signal_segment_kdtree, &ids);
+      SearchObjects(point, distance, *signal_segment_kdtree_, &ids);
   if (status < 0) {
     return status;
   }
@@ -245,13 +245,13 @@ int HDMapImpl::GetCrosswalks(
 int HDMapImpl::GetCrosswalks(
     const Vec2d& point, double distance,
     std::vector<CrosswalkInfoConstPtr>* crosswalks) const {
-  if (crosswalks == nullptr || _crosswalk_polygon_kdtree == nullptr) {
+  if (crosswalks == nullptr || crosswalk_polygon_kdtree_ == nullptr) {
     return -1;
   }
   crosswalks->clear();
   std::vector<std::string> ids;
   const int status =
-      SearchObjects(point, distance, *_crosswalk_polygon_kdtree, &ids);
+      SearchObjects(point, distance, *crosswalk_polygon_kdtree_, &ids);
   if (status < 0) {
     return status;
   }
@@ -270,13 +270,13 @@ int HDMapImpl::GetStopSigns(
 int HDMapImpl::GetStopSigns(
     const Vec2d& point, double distance,
     std::vector<StopSignInfoConstPtr>* stop_signs) const {
-  if (stop_signs == nullptr || _stop_sign_segment_kdtree == nullptr) {
+  if (stop_signs == nullptr || stop_sign_segment_kdtree_ == nullptr) {
     return -1;
   }
   stop_signs->clear();
   std::vector<std::string> ids;
   const int status =
-      SearchObjects(point, distance, *_stop_sign_segment_kdtree, &ids);
+      SearchObjects(point, distance, *stop_sign_segment_kdtree_, &ids);
   if (status < 0) {
     return status;
   }
@@ -295,13 +295,13 @@ int HDMapImpl::GetYieldSigns(
 int HDMapImpl::GetYieldSigns(
     const Vec2d& point, double distance,
     std::vector<YieldSignInfoConstPtr>* yield_signs) const {
-  if (yield_signs == nullptr || _yield_sign_segment_kdtree == nullptr) {
+  if (yield_signs == nullptr || yield_sign_segment_kdtree_ == nullptr) {
     return -1;
   }
   yield_signs->clear();
   std::vector<std::string> ids;
   const int status =
-      SearchObjects(point, distance, *_yield_sign_segment_kdtree, &ids);
+      SearchObjects(point, distance, *yield_sign_segment_kdtree_, &ids);
   if (status < 0) {
     return status;
   }
@@ -326,7 +326,7 @@ int HDMapImpl::GetNearestLane(const Vec2d &point,
   CHECK_NOTNULL(nearest_lane);
   CHECK_NOTNULL(nearest_s);
   CHECK_NOTNULL(nearest_l);
-  const auto *segment_object = _lane_segment_kdtree->GetNearestObject(point);
+  const auto *segment_object = lane_segment_kdtree_->GetNearestObject(point);
   if (segment_object == nullptr) {
     return -1;
   }
@@ -382,8 +382,8 @@ int HDMapImpl::GetNearestLaneWithHeading(const Vec2d& point,
   for (const auto &lane : lanes) {
     double s_offset = 0.0;
     int s_offset_index = 0;
-    double distance = lane->distance_to(point, &map_point, &s_offset,
-                                        &s_offset_index);
+    double distance = lane->DistanceTo(point, &map_point, &s_offset,
+                                       &s_offset_index);
     if (distance < min_distance) {
       min_distance = distance;
       *nearest_lane = lane;
@@ -432,7 +432,7 @@ int HDMapImpl::GetLanesWithHeading(const Vec2d &point,
     Vec2d proj_pt(0.0, 0.0);
     double s_offset = 0.0;
     int s_offset_index = 0;
-    double dis = lane->distance_to(point, &proj_pt, &s_offset, &s_offset_index);
+    double dis = lane->DistanceTo(point, &proj_pt, &s_offset, &s_offset_index);
     if (dis <= distance) {
       double heading_diff = fabs(
           lane->headings()[s_offset_index] - central_heading);
@@ -535,48 +535,48 @@ void HDMapImpl::BuildLaneSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 16;
-  BuildSegmentKDTree(_lane_table, params,
-                     &_lane_segment_boxes, &_lane_segment_kdtree);
+  BuildSegmentKDTree(lane_table_, params,
+                     &lane_segment_boxes_, &lane_segment_kdtree_);
 }
 
 void HDMapImpl::BuildJunctionPolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 1;
-  BuildPolygonKDTree(_junction_table, params,
-                     &_junction_polygon_boxes, &_junction_polygon_kdtree);
+  BuildPolygonKDTree(junction_table_, params,
+                     &junction_polygon_boxes_, &junction_polygon_kdtree_);
 }
 
 void HDMapImpl::BuildCrosswalkPolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 1;
-  BuildPolygonKDTree(_crosswalk_table, params,
-                     &_crosswalk_polygon_boxes, &_crosswalk_polygon_kdtree);
+  BuildPolygonKDTree(crosswalk_table_, params,
+                     &crosswalk_polygon_boxes_, &crosswalk_polygon_kdtree_);
 }
 
 void HDMapImpl::BuildSignalSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 4;
-  BuildSegmentKDTree(_signal_table, params,
-                     &_signal_segment_boxes, &_signal_segment_kdtree);
+  BuildSegmentKDTree(signal_table_, params,
+                     &signal_segment_boxes_, &signal_segment_kdtree_);
 }
 
 void HDMapImpl::BuildStopSignSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 4;
-  BuildSegmentKDTree(_stop_sign_table, params,
-                     &_stop_sign_segment_boxes, &_stop_sign_segment_kdtree);
+  BuildSegmentKDTree(stop_sign_table_, params,
+                     &stop_sign_segment_boxes_, &stop_sign_segment_kdtree_);
 }
 
 void HDMapImpl::BuildYieldSignSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 4;
-  BuildSegmentKDTree(_yield_sign_table, params,
-                     &_yield_sign_segment_boxes, &_yield_sign_segment_kdtree);
+  BuildSegmentKDTree(yield_sign_table_, params,
+                     &yield_sign_segment_boxes_, &yield_sign_segment_kdtree_);
 }
 
 template<class KDTree>
@@ -597,26 +597,26 @@ int HDMapImpl::SearchObjects(const Vec2d& center,
 }
 
 void HDMapImpl::Clear() {
-  _map.Clear();
-  _lane_table.clear();
-  _junction_table.clear();
-  _signal_table.clear();
-  _crosswalk_table.clear();
-  _stop_sign_table.clear();
-  _yield_sign_table.clear();
-  _overlap_table.clear();
-  _lane_segment_boxes.clear();
-  _lane_segment_kdtree.reset(nullptr);
-  _junction_polygon_boxes.clear();
-  _junction_polygon_kdtree.reset(nullptr);
-  _crosswalk_polygon_boxes.clear();
-  _crosswalk_polygon_kdtree.reset(nullptr);
-  _signal_segment_boxes.clear();
-  _signal_segment_kdtree.reset(nullptr);
-  _stop_sign_segment_boxes.clear();
-  _stop_sign_segment_kdtree.reset(nullptr);
-  _yield_sign_segment_boxes.clear();
-  _yield_sign_segment_kdtree.reset(nullptr);
+  map_.Clear();
+  lane_table_.clear();
+  junction_table_.clear();
+  signal_table_.clear();
+  crosswalk_table_.clear();
+  stop_sign_table_.clear();
+  yield_sign_table_.clear();
+  overlap_table_.clear();
+  lane_segment_boxes_.clear();
+  lane_segment_kdtree_.reset(nullptr);
+  junction_polygon_boxes_.clear();
+  junction_polygon_kdtree_.reset(nullptr);
+  crosswalk_polygon_boxes_.clear();
+  crosswalk_polygon_kdtree_.reset(nullptr);
+  signal_segment_boxes_.clear();
+  signal_segment_kdtree_.reset(nullptr);
+  stop_sign_segment_boxes_.clear();
+  stop_sign_segment_kdtree_.reset(nullptr);
+  yield_sign_segment_boxes_.clear();
+  yield_sign_segment_kdtree_.reset(nullptr);
 }
 
 }  // namespace hdmap

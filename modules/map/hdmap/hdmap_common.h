@@ -49,24 +49,24 @@ class ObjectWithAABox {
   ObjectWithAABox(const apollo::common::math::AABox2d &aabox,
                   const Object *object, const GeoObject *geo_object,
                   const int id)
-      : _aabox(aabox), _object(object), _geo_object(geo_object), _id(id) {}
+      : aabox_(aabox), object_(object), geo_object_(geo_object), id_(id) {}
   ~ObjectWithAABox() {}
-  const apollo::common::math::AABox2d &aabox() const { return _aabox; }
+  const apollo::common::math::AABox2d &aabox() const { return aabox_; }
   double DistanceTo(const apollo::common::math::Vec2d &point) const {
-    return _geo_object->DistanceTo(point);
+    return geo_object_->DistanceTo(point);
   }
   double DistanceSquareTo(const apollo::common::math::Vec2d &point) const {
-    return _geo_object->DistanceSquareTo(point);
+    return geo_object_->DistanceSquareTo(point);
   }
-  const Object *object() const { return _object; }
-  const GeoObject *geo_object() const { return _geo_object; }
-  int id() const { return _id; }
+  const Object *object() const { return object_; }
+  const GeoObject *geo_object() const { return geo_object_; }
+  int id() const { return id_; }
 
  private:
-  apollo::common::math::AABox2d _aabox;
-  const Object *_object;
-  const GeoObject *_geo_object;
-  int _id;
+  apollo::common::math::AABox2d aabox_;
+  const Object *object_;
+  const GeoObject *geo_object_;
+  int id_;
 };
 
 class LaneInfo;
@@ -89,119 +89,119 @@ class LaneInfo {
  public:
   explicit LaneInfo(const Lane &lane);
 
-  const Id &id() const { return _lane.id(); }
-  const Id &road_id() const { return _road_id; }
-  const Id &section_id() const { return _section_id; }
-  const Lane &lane() const { return _lane; }
+  const Id &id() const { return lane_.id(); }
+  const Id &road_id() const { return road_id_; }
+  const Id &section_id() const { return section_id_; }
+  const Lane &lane() const { return lane_; }
   const std::vector<apollo::common::math::Vec2d> &points() const {
-    return _points;
+    return points_;
   }
   const std::vector<apollo::common::math::Vec2d> &unit_directions() const {
-    return _unit_directions;
+    return unit_directions_;
   }
-  double heading(const double s) const;
-  const std::vector<double> &headings() const { return _headings; }
+  double Heading(const double s) const;
+  const std::vector<double> &headings() const { return headings_; }
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-    return _segments;
+    return segments_;
   }
-  const std::vector<double> &accumulate_s() const { return _accumulated_s; }
-  const std::vector<OverlapInfoConstPtr> &overlaps() const { return _overlaps; }
+  const std::vector<double> &accumulate_s() const { return accumulated_s_; }
+  const std::vector<OverlapInfoConstPtr> &overlaps() const { return overlaps_; }
   const std::vector<OverlapInfoConstPtr> &cross_lanes() const {
-    return _cross_lanes;
+    return cross_lanes_;
   }
-  const std::vector<OverlapInfoConstPtr> &signals() const { return _signals; }
+  const std::vector<OverlapInfoConstPtr> &signals() const { return signals_; }
   const std::vector<OverlapInfoConstPtr> &yield_signs() const {
-    return _yield_signs;
+    return yield_signs_;
   }
   const std::vector<OverlapInfoConstPtr> &stop_signs() const {
-    return _stop_signs;
+    return stop_signs_;
   }
   const std::vector<OverlapInfoConstPtr> &crosswalks() const {
-    return _crosswalks;
+    return crosswalks_;
   }
   const std::vector<OverlapInfoConstPtr> &junctions() const {
-    return _junctions;
+    return junctions_;
   }
-  double total_length() const { return _total_length; }
+  double total_length() const { return total_length_; }
   using SampledWidth = std::pair<double, double>;
   const std::vector<SampledWidth> &sampled_left_width() const {
-    return _sampled_left_width;
+    return sampled_left_width_;
   }
   const std::vector<SampledWidth> &sampled_right_width() const {
-    return _sampled_right_width;
+    return sampled_right_width_;
   }
-  void get_width(const double s, double *left_width, double *right_width) const;
-  double get_width(const double s) const;
-  double get_effective_width(const double s) const;
+  void GetWidth(const double s, double *left_width, double *right_width) const;
+  double GetWidth(const double s) const;
+  double GetEffectiveWidth(const double s) const;
 
-  bool is_on_lane(const apollo::common::math::Vec2d &point) const;
-  bool is_on_lane(const apollo::common::math::Box2d &box) const;
+  bool IsOnLane(const apollo::common::math::Vec2d &point) const;
+  bool IsOnLane(const apollo::common::math::Box2d &box) const;
 
   apollo::common::PointENU GetSmoothPoint(double s) const;
-  double distance_to(const apollo::common::math::Vec2d &point) const;
-  double distance_to(const apollo::common::math::Vec2d &point,
-                     apollo::common::math::Vec2d *map_point, double *s_offset,
-                     int *s_offset_index) const;
+  double DistanceTo(const apollo::common::math::Vec2d &point) const;
+  double DistanceTo(const apollo::common::math::Vec2d &point,
+                    apollo::common::math::Vec2d *map_point, double *s_offset,
+                    int *s_offset_index) const;
   apollo::common::PointENU GetNearestPoint(
       const apollo::common::math::Vec2d &point, double *distance) const;
   bool GetProjection(const apollo::common::math::Vec2d &point,
-                      double *accumulate_s, double *lateral) const;
+                     double *accumulate_s, double *lateral) const;
 
  private:
   friend class HDMapImpl;
   friend class RoadInfo;
-  void init();
-  void post_process(const HDMapImpl &map_instance);
-  void update_overlaps(const HDMapImpl &map_instance);
-  double get_width_from_sample(
+  void Init();
+  void PostProcess(const HDMapImpl &map_instance);
+  void UpdateOverlaps(const HDMapImpl &map_instance);
+  double GetWidthFromSample(
       const std::vector<LaneInfo::SampledWidth> &samples, const double s) const;
-  void create_kdtree();
-  void set_road_id(const Id &road_id) { _road_id = road_id; }
-  void set_section_id(const Id &section_id) { _section_id = section_id; }
+  void CreateKDTree();
+  void set_road_id(const Id &road_id) { road_id_ = road_id; }
+  void set_section_id(const Id &section_id) { section_id_ = section_id; }
 
  private:
-  const Lane &_lane;
-  std::vector<apollo::common::math::Vec2d> _points;
-  std::vector<apollo::common::math::Vec2d> _unit_directions;
-  std::vector<double> _headings;
-  std::vector<apollo::common::math::LineSegment2d> _segments;
-  std::vector<double> _accumulated_s;
-  std::vector<std::string> _overlap_ids;
-  std::vector<OverlapInfoConstPtr> _overlaps;
-  std::vector<OverlapInfoConstPtr> _cross_lanes;
-  std::vector<OverlapInfoConstPtr> _signals;
-  std::vector<OverlapInfoConstPtr> _yield_signs;
-  std::vector<OverlapInfoConstPtr> _stop_signs;
-  std::vector<OverlapInfoConstPtr> _crosswalks;
-  std::vector<OverlapInfoConstPtr> _parking_spaces;
-  std::vector<OverlapInfoConstPtr> _junctions;
-  double _total_length = 0.0;
-  std::vector<SampledWidth> _sampled_left_width;
-  std::vector<SampledWidth> _sampled_right_width;
+  const Lane &lane_;
+  std::vector<apollo::common::math::Vec2d> points_;
+  std::vector<apollo::common::math::Vec2d> unit_directions_;
+  std::vector<double> headings_;
+  std::vector<apollo::common::math::LineSegment2d> segments_;
+  std::vector<double> accumulated_s_;
+  std::vector<std::string> overlap_ids_;
+  std::vector<OverlapInfoConstPtr> overlaps_;
+  std::vector<OverlapInfoConstPtr> cross_lanes_;
+  std::vector<OverlapInfoConstPtr> signals_;
+  std::vector<OverlapInfoConstPtr> yield_signs_;
+  std::vector<OverlapInfoConstPtr> stop_signs_;
+  std::vector<OverlapInfoConstPtr> crosswalks_;
+  std::vector<OverlapInfoConstPtr> parking_spaces_;
+  std::vector<OverlapInfoConstPtr> junctions_;
+  double total_length_ = 0.0;
+  std::vector<SampledWidth> sampled_left_width_;
+  std::vector<SampledWidth> sampled_right_width_;
 
-  std::vector<LaneSegmentBox> _segment_box_list;
-  std::unique_ptr<LaneSegmentKDTree> _lane_segment_kdtree;
+  std::vector<LaneSegmentBox> segment_box_list_;
+  std::unique_ptr<LaneSegmentKDTree> lane_segment_kdtree_;
 
-  Id _road_id;
-  Id _section_id;
+  Id road_id_;
+  Id section_id_;
 };
 
 class JunctionInfo {
  public:
   explicit JunctionInfo(const Junction &junction);
 
-  const Id &id() const { return _junction.id(); }
-  const Junction &junction() const { return _junction; }
-  const apollo::common::math::Polygon2d &polygon() const { return _polygon; }
-  const apollo::common::math::AABox2d &mbr() const { return _mbr; }
+  const Id &id() const { return junction_.id(); }
+  const Junction &junction() const { return junction_; }
+  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
+  const apollo::common::math::AABox2d &mbr() const { return mbr_; }
 
  private:
-  void init();
+  void Init();
 
  private:
-  const Junction &_junction;
-  apollo::common::math::Polygon2d _polygon;
-  apollo::common::math::AABox2d _mbr;
+  const Junction &junction_;
+  apollo::common::math::Polygon2d polygon_;
+  apollo::common::math::AABox2d mbr_;
 };
 using JunctionPolygonBox =
     ObjectWithAABox<JunctionInfo, apollo::common::math::Polygon2d>;
@@ -212,18 +212,18 @@ class SignalInfo {
  public:
   explicit SignalInfo(const Signal &signal);
 
-  const Id &id() const { return _signal.id(); }
-  const Signal &signal() const { return _signal; }
+  const Id &id() const { return signal_.id(); }
+  const Signal &signal() const { return signal_; }
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-    return _segments;
+    return segments_;
   }
 
  private:
-  void init();
+  void Init();
 
  private:
-  const Signal &_signal;
-  std::vector<apollo::common::math::LineSegment2d> _segments;
+  const Signal &signal_;
+  std::vector<apollo::common::math::LineSegment2d> segments_;
 };
 using SignalSegmentBox =
     ObjectWithAABox<SignalInfo, apollo::common::math::LineSegment2d>;
@@ -234,16 +234,16 @@ class CrosswalkInfo {
  public:
   explicit CrosswalkInfo(const Crosswalk &crosswalk);
 
-  const Id &id() const { return _crosswalk.id(); }
-  const Crosswalk &crosswalk() const { return _crosswalk; }
-  const apollo::common::math::Polygon2d &polygon() const { return _polygon; }
+  const Id &id() const { return crosswalk_.id(); }
+  const Crosswalk &crosswalk() const { return crosswalk_; }
+  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
 
  private:
-  void init();
+  void Init();
 
  private:
-  const Crosswalk &_crosswalk;
-  apollo::common::math::Polygon2d _polygon;
+  const Crosswalk &crosswalk_;
+  apollo::common::math::Polygon2d polygon_;
 };
 using CrosswalkPolygonBox =
     ObjectWithAABox<CrosswalkInfo, apollo::common::math::Polygon2d>;
@@ -254,18 +254,18 @@ class StopSignInfo {
  public:
   explicit StopSignInfo(const StopSign &stop_sign);
 
-  const Id &id() const { return _stop_sign.id(); }
-  const StopSign &stop_sign() const { return _stop_sign; }
+  const Id &id() const { return stop_sign_.id(); }
+  const StopSign &stop_sign() const { return stop_sign_; }
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-    return _segments;
+    return segments_;
   }
 
  private:
   void init();
 
  private:
-  const StopSign &_stop_sign;
-  std::vector<apollo::common::math::LineSegment2d> _segments;
+  const StopSign &stop_sign_;
+  std::vector<apollo::common::math::LineSegment2d> segments_;
 };
 using StopSignSegmentBox =
     ObjectWithAABox<StopSignInfo, apollo::common::math::LineSegment2d>;
@@ -276,18 +276,18 @@ class YieldSignInfo {
  public:
   explicit YieldSignInfo(const YieldSign &yield_sign);
 
-  const Id &id() const { return _yield_sign.id(); }
-  const YieldSign &yield_sign() const { return _yield_sign; }
+  const Id &id() const { return yield_sign_.id(); }
+  const YieldSign &yield_sign() const { return yield_sign_; }
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-    return _segments;
+    return segments_;
   }
 
  private:
-  void init();
+  void Init();
 
  private:
-  const YieldSign &_yield_sign;
-  std::vector<apollo::common::math::LineSegment2d> _segments;
+  const YieldSign &yield_sign_;
+  std::vector<apollo::common::math::LineSegment2d> segments_;
 };
 using YieldSignSegmentBox =
     ObjectWithAABox<YieldSignInfo, apollo::common::math::LineSegment2d>;
@@ -298,30 +298,30 @@ class OverlapInfo {
  public:
   explicit OverlapInfo(const Overlap &overlap);
 
-  const Id &id() const { return _overlap.id(); }
-  const Overlap &overlap() const { return _overlap; }
+  const Id &id() const { return overlap_.id(); }
+  const Overlap &overlap() const { return overlap_; }
   const ObjectOverlapInfo *get_object_overlap_info(const Id &id) const;
 
  private:
-  const Overlap &_overlap;
+  const Overlap &overlap_;
 };
 
 class RoadInfo {
  public:
   explicit RoadInfo(const Road &road);
-  const Id &id() const { return _road.id(); }
-  const Road &road() const { return _road; }
-  const std::vector<RoadSection> &sections() const { return _sections; }
+  const Id &id() const { return road_.id(); }
+  const Road &road() const { return road_; }
+  const std::vector<RoadSection> &sections() const { return sections_; }
 
-  const Id &junction_id() const { return _road.junction_id(); }
-  bool has_junction_id() const { return _road.has_junction_id(); }
+  const Id &junction_id() const { return road_.junction_id(); }
+  bool has_junction_id() const { return road_.has_junction_id(); }
 
-  const std::vector<RoadBoundary> &get_boundaries() const;
+  const std::vector<RoadBoundary> &GetBoundaries() const;
 
  private:
-  Road _road;
-  std::vector<RoadSection> _sections;
-  std::vector<RoadBoundary> _road_boundaries;
+  Road road_;
+  std::vector<RoadSection> sections_;
+  std::vector<RoadBoundary> road_boundaries_;
 };
 
 typedef std::shared_ptr<const LaneInfo> LaneInfoConstPtr;

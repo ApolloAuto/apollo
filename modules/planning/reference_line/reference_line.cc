@@ -219,19 +219,19 @@ ReferencePoint ReferenceLine::Interpolate(const ReferencePoint& p0,
   if ((s - s0) + p0_waypoint.s <= p0_waypoint.lane->total_length()) {
     const double lane_s = p0_waypoint.s + s - s0;
     waypoints.emplace_back(p0_waypoint.lane, lane_s);
-    p0_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
+    p0_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
   }
   const auto& p1_waypoint = p1.lane_waypoints()[0];
   if (p1_waypoint.lane->id().id() != p0_waypoint.lane->id().id() &&
       p1_waypoint.s - (s1 - s) >= 0) {
     const double lane_s = p1_waypoint.s - (s1 - s);
     waypoints.emplace_back(p1_waypoint.lane, lane_s);
-    p1_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
+    p1_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
   }
   if (waypoints.empty()) {
     const double lane_s = p0_waypoint.s;
     waypoints.emplace_back(p0_waypoint.lane, lane_s);
-    p0_waypoint.lane->get_width(lane_s, &upper_bound, &lower_bound);
+    p0_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
   }
   return ReferencePoint(hdmap::MapPathPoint({x, y}, heading, waypoints), kappa,
                         dkappa, lower_bound, upper_bound);

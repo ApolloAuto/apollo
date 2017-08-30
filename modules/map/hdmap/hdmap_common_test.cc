@@ -293,10 +293,10 @@ TEST_F(HDMapCommonTestSuite, lane_info) {
   }
   double left_width = 0.0;
   double right_width = 0.0;
-  lane_info.get_width(2.0, &left_width, &right_width);
+  lane_info.GetWidth(2.0, &left_width, &right_width);
   EXPECT_NEAR(1.0, left_width, 1E-3);
   EXPECT_NEAR(1.0, right_width, 1E-3);
-  lane_info.get_width(3.5, &left_width, &right_width);
+  lane_info.GetWidth(3.5, &left_width, &right_width);
   EXPECT_NEAR(0.65, left_width, 1E-3);
   EXPECT_NEAR(1.0, right_width, 1E-3);
   EXPECT_NEAR(4.0, lane_info.total_length(), 1E-3);
@@ -306,16 +306,16 @@ TEST_F(HDMapCommonTestSuite, lane_info_get_width) {
   Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
-  EXPECT_NEAR(2.0, lane_info.get_width(2.0), 1E-3);
-  EXPECT_NEAR(1.65, lane_info.get_width(3.5), 1E-3);
+  EXPECT_NEAR(2.0, lane_info.GetWidth(2.0), 1E-3);
+  EXPECT_NEAR(1.65, lane_info.GetWidth(3.5), 1E-3);
 }
 
 TEST_F(HDMapCommonTestSuite, lane_info_get_effective_width) {
   Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
-  EXPECT_NEAR(2.0, lane_info.get_effective_width(2.0), 1E-3);
-  EXPECT_NEAR(1.3, lane_info.get_effective_width(3.5), 1E-3);
+  EXPECT_NEAR(2.0, lane_info.GetEffectiveWidth(2.0), 1E-3);
+  EXPECT_NEAR(1.3, lane_info.GetEffectiveWidth(3.5), 1E-3);
 }
 
 TEST_F(HDMapCommonTestSuite, point_is_on_lane) {
@@ -323,10 +323,10 @@ TEST_F(HDMapCommonTestSuite, point_is_on_lane) {
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
 
-  EXPECT_TRUE(lane_info.is_on_lane({1.5, 1.5}));
-  EXPECT_TRUE(lane_info.is_on_lane({1.5, 0.5}));
-  EXPECT_TRUE(!lane_info.is_on_lane({0.5, 1.5}));
-  EXPECT_TRUE(!lane_info.is_on_lane({1.5, 3}));
+  EXPECT_TRUE(lane_info.IsOnLane({1.5, 1.5}));
+  EXPECT_TRUE(lane_info.IsOnLane({1.5, 0.5}));
+  EXPECT_TRUE(!lane_info.IsOnLane({0.5, 1.5}));
+  EXPECT_TRUE(!lane_info.IsOnLane({1.5, 3}));
 }
 
 TEST_F(HDMapCommonTestSuite, box_is_on_lane) {
@@ -336,14 +336,14 @@ TEST_F(HDMapCommonTestSuite, box_is_on_lane) {
 
   apollo::common::math::Box2d target_in_box(
       apollo::common::math::LineSegment2d({2, 1}, {3, 1}), 0.5);
-  EXPECT_TRUE(lane_info.is_on_lane(target_in_box));
+  EXPECT_TRUE(lane_info.IsOnLane(target_in_box));
 
   apollo::common::math::Box2d target_out_box(
       apollo::common::math::LineSegment2d({2, 1}, {3, 1}), 4);
-  EXPECT_TRUE(!lane_info.is_on_lane(target_out_box));
+  EXPECT_TRUE(!lane_info.IsOnLane(target_out_box));
 }
 
-TEST_F(HDMapCommonTestSuite, get_smooth_point) {
+TEST_F(HDMapCommonTestSuite, GetSmoothPoint) {
   Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
@@ -353,15 +353,15 @@ TEST_F(HDMapCommonTestSuite, get_smooth_point) {
   EXPECT_NEAR(smooth_point.y(), 1.0, 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, distance_to) {
+TEST_F(HDMapCommonTestSuite, DistanceTo) {
   Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
 
-  double distance = lane_info.distance_to({2.5, 3.0});
+  double distance = lane_info.DistanceTo({2.5, 3.0});
   EXPECT_NEAR(distance, 2.0, 1E-3);
 
-  distance = lane_info.distance_to({0.5, 3.0});
+  distance = lane_info.DistanceTo({0.5, 3.0});
   EXPECT_NEAR(distance, 2.0615, 1E-3);
 }
 
@@ -373,14 +373,14 @@ TEST_F(HDMapCommonTestSuite, distance_to_with_more_info) {
   apollo::common::math::Vec2d foot_point;
   double s_offset = 0.0;
   int s_offset_index = 0;
-  double distance = lane_info.distance_to(
+  double distance = lane_info.DistanceTo(
       {2.5, 3.0}, &foot_point, &s_offset, &s_offset_index);
   EXPECT_NEAR(distance, 2.0, 1E-3);
   EXPECT_NEAR(foot_point.x(), 2.5, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
   EXPECT_NEAR(s_offset, 1.5, 1E-3);
 
-  distance = lane_info.distance_to(
+  distance = lane_info.DistanceTo(
       {0.5, 3.0}, &foot_point, &s_offset, &s_offset_index);
   EXPECT_NEAR(distance, 2.06155, 1E-3);
   EXPECT_NEAR(foot_point.x(), 1.0, 1E-3);
@@ -388,7 +388,7 @@ TEST_F(HDMapCommonTestSuite, distance_to_with_more_info) {
   EXPECT_NEAR(s_offset, 0.0, 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, get_nearest_point) {
+TEST_F(HDMapCommonTestSuite, GetNearestPoint) {
   Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
@@ -407,7 +407,7 @@ TEST_F(HDMapCommonTestSuite, get_nearest_point) {
   EXPECT_NEAR(nearest_point.y(), 1.0, 1E-3);
 }
 
-TEST_F(HDMapCommonTestSuite, get_projection) {
+TEST_F(HDMapCommonTestSuite, GetProjection) {
   Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);

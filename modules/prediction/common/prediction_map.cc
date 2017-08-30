@@ -48,14 +48,14 @@ Eigen::Vector2d PredictionMap::PositionOnLane(
 
 double PredictionMap::HeadingOnLane(
     std::shared_ptr<const LaneInfo> lane_info, const double s) {
-  return lane_info->heading(s);
+  return lane_info->Heading(s);
 }
 
 double PredictionMap::LaneTotalWidth(
     std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info, const double s) {
   double left = 0.0;
   double right = 0.0;
-  lane_info->get_width(s, &left, &right);
+  lane_info->GetWidth(s, &left, &right);
   return left + right;
 }
 
@@ -107,7 +107,7 @@ void PredictionMap::OnLane(
     if (candidate_lane == nullptr) {
       continue;
     }
-    if (on_lane && !candidate_lane->is_on_lane(vec_point)) {
+    if (on_lane && !candidate_lane->IsOnLane(vec_point)) {
       continue;
     }
     if (!IsIdenticalLane(candidate_lane, prev_lanes) &&
