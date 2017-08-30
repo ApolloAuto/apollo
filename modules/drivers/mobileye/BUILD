@@ -35,8 +35,21 @@ cc_library(
         "mobileye_canbus.h",
     ],
     deps = [
+        ":mobileye_message_manager",
         "//modules/drivers:sensor_canbus_lib",
         "//modules/drivers/mobileye/protocol:drivers_mobileye_protocol",
+    ],
+)
+
+cc_test(
+    name = "mobileye_canbus_test",
+    size = "small",
+    srcs = ["mobileye_canbus_test.cc"],
+    deps = [
+        ":mobileye_canbus_lib",
+        ":mobileye_message_manager",
+        "//modules/drivers/proto:sensor_proto",
+        "@gtest//:main",
     ],
 )
 
@@ -45,7 +58,6 @@ cc_binary(
     srcs = ["main.cc"],
     deps = [
         ":mobileye_canbus_lib",
-        ":mobileye_message_manager",
         "//external:gflags",
         "//modules/canbus/common:canbus_common",
         "//modules/common:log",
