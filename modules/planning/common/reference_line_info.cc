@@ -158,6 +158,16 @@ std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
       perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
   perception_obstacle.set_tracking_time(1.0);
 
+  common::math::Box2d bouding_box{position, dest_ref_point.heading(), length,
+                                  width};
+  std::vector<common::math::Vec2d> corner_points;
+  bouding_box.GetAllCorners(&corner_points);
+  for (const auto& corner_point : corner_points) {
+    auto* point = perception_obstacle.add_polygon_point();
+    point->set_x(corner_point.x());
+    point->set_y(corner_point.y());
+  }
+
   return std::unique_ptr<Obstacle>(
       new Obstacle(obstacle_id, perception_obstacle));
 }

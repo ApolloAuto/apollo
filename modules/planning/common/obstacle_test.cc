@@ -159,6 +159,21 @@ TEST_F(ObstacleTest, GetBoundingBox) {
   EXPECT_FLOAT_EQ(0.040689919, box.heading());
 }
 
+TEST_F(ObstacleTest, PerceptionPolygon) {
+  const auto* obstacle = indexed_obstacles_.Find("2156_0");
+  ASSERT_TRUE(obstacle);
+  const auto& polygon = obstacle->PerceptionPolygon();
+
+  const auto& points = polygon.points();
+  EXPECT_EQ(16, points.size());
+  EXPECT_FLOAT_EQ(74.766182, points[0].x());
+  EXPECT_FLOAT_EQ(350.72986, points[0].y());
+  EXPECT_FLOAT_EQ(74.783195, points[1].x());
+  EXPECT_FLOAT_EQ(350.32602, points[1].y());
+  EXPECT_FLOAT_EQ(74.770554, points[15].x());
+  EXPECT_FLOAT_EQ(350.87857, points[15].y());
+}
+
 TEST_F(ObstacleTest, Trajectory) {
   const auto* obstacle = indexed_obstacles_.Find("2156_0");
   ASSERT_TRUE(obstacle);

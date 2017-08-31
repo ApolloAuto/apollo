@@ -49,6 +49,16 @@ Obstacle::Obstacle(const std::string& id,
                                perception_obstacle_.theta(),
                                perception_obstacle_.length(),
                                perception_obstacle_.width()) {
+  CHECK(perception_obstacle.polygon_point_size() > 2)
+      << "object " << id << "has less than 3 polygon points";
+  std::vector<common::math::Vec2d> polygon_points;
+  for (const auto& point : perception_obstacle.polygon_point()) {
+    polygon_points.emplace_back(point.x(), point.y());
+  }
+  CHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
+                                                   &perception_polygon_))
+      << "object[" << id << "] polygon is not a valid convex hull";
+
   is_static_ = IsStaticObstacle(perception_obstacle);
   is_virtual_ = IsVirtualObstacle(perception_obstacle);
 }
@@ -129,6 +139,10 @@ const PerceptionObstacle& Obstacle::Perception() const {
   return perception_obstacle_;
 }
 
+const common::math::Polygon2d& Obstacle::PerceptionPolygon() const {
+  return perception_polygon_;
+}
+
 std::vector<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     const prediction::PredictionObstacles& predictions) {
   std::vector<std::unique_ptr<Obstacle>> obstacles;
@@ -143,8 +157,8 @@ std::vector<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
 
     int trajectory_index = 0;
     for (const auto& trajectory : prediction_obstacle.trajectory()) {
-      const std::string obstacle_id = apollo::common::util::StrCat(
-          perception_id, "_", trajectory_index);
+      const std::string obstacle_id =
+          apollo::common::util::StrCat(perception_id, "_", trajectory_index);
       obstacles.emplace_back(new Obstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
       ++trajectory_index;

@@ -30,6 +30,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 #include "modules/common/math/box2d.h"
+#include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/indexed_list.h"
 
@@ -63,6 +64,12 @@ class Obstacle {
    */
   const common::math::Box2d &PerceptionBoundingBox() const;
 
+  /**
+   * @brief get the perception polygon for the obstacle. It is more precise than
+   * bounding box
+   */
+  const common::math::Polygon2d &PerceptionPolygon() const;
+
   const prediction::Trajectory &Trajectory() const;
   bool HasTrajectory() const { return has_trajectory_; }
 
@@ -93,6 +100,7 @@ class Obstacle {
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;
   common::math::Box2d perception_bounding_box_;
+  common::math::Polygon2d perception_polygon_;
 };
 
 typedef IndexedList<std::string, Obstacle> IndexedObstacles;
