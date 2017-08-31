@@ -121,9 +121,9 @@ bool Frame::Init(const PlanningConfig &config,
     return false;
   }
   smoother_config_ = config.reference_line_smoother_config();
-  std::vector<ReferenceLine> reference_lines;
-  if (!CreateReferenceLineFromRouting(init_pose_.position(), routing_response_,
-                                      &reference_lines)) {
+  auto reference_lines = CreateReferenceLineFromRouting(init_pose_.position(),
+                                                        routing_response_);
+  if (reference_lines.empty()) {
     AERROR << "Failed to create reference line from position: "
            << init_pose_.DebugString();
     return false;
@@ -148,27 +148,20 @@ bool Frame::Init(const PlanningConfig &config,
 
 uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
-const std::vector<ReferenceLineInfo> &Frame::reference_line_info() const {
-  return reference_line_info_;
-}
-
 const Obstacle *Frame::FindObstacle(const std::string &obstacle_id) {
   std::lock_guard<std::mutex> lock(obstacles_mutex_);
   return obstacles_.Find(obstacle_id);
 }
 
-bool Frame::CreateReferenceLineFromRouting(
-    const common::PointENU &position, const routing::RoutingResponse &routing,
-    std::vector<ReferenceLine> *reference_lines) {
-  CHECK_NOTNULL(reference_lines);
-  CHECK(reference_lines->empty());
-
+std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
+    const common::PointENU &position, const routing::RoutingResponse &routing) {
+  std::vector<ReferenceLine> reference_lines;
   std::vector<std::vector<hdmap::LaneSegment>> route_segments;
   if (!pnc_map_->GetLaneSegmentsFromRouting(
           routing, position, FLAGS_look_backward_distance,
           FLAGS_look_forward_distance, &route_segments)) {
     AERROR << "Failed to extract segments from routing";
-    return false;
+    return reference_lines;
   }
 
   ReferenceLineSmoother smoother;
@@ -183,17 +176,14 @@ bool Frame::CreateReferenceLineFromRouting(
         AERROR << "Failed to smooth reference line";
         continue;
       }
-      reference_lines->push_back(std::move(reference_line));
+      reference_lines.push_back(std::move(reference_line));
     } else {
-      reference_lines->emplace_back(hdmap_path);
+      reference_lines.emplace_back(hdmap_path);
     }
   }
 
-  if (reference_lines->empty()) {
-    AERROR << "No smooth reference lines available";
-    return false;
-  }
-  return true;
+  AERROR_IF(reference_lines.empty()) << "No smooth reference lines available";
+  return reference_lines;
 }
 
 const IndexedObstacles &Frame::GetObstacles() const { return obstacles_; }
