@@ -84,13 +84,13 @@
 
 <div class="row body_row">
   <div class="col-md-4 body_col">
-    {% include 'cards/quick_start_panel.tpl' %}
+    {% include 'cards/left_panel.tpl' %}
   </div>
   <div class="col-md-4 body_col">
-    {% include 'cards/modules_panel.tpl' %}
+    {% include 'cards/center_panel.tpl' %}
   </div>
   <div class="col-md-4 body_col">
-    {% include 'cards/hardware_panel.tpl' %}
+    {% include 'cards/right_panel.tpl' %}
   </div>
 </div>
 
@@ -104,6 +104,7 @@
     on_hardware_status_change(global_status);
     on_modules_status_change(global_status);
     on_tools_status_change(global_status);
+    on_config_status_change(global_status);
   }
 
   //////////////////////////////////////////////////////////////////////////////

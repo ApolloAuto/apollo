@@ -34,16 +34,19 @@ class HardwareApi(object):
         """SocketIO Api: health_check(hardware_name)"""
         if len(args) != 1:
             Config.log.critical('HardwareApi::health_check bad args')
+            return
         hardware_name = args[0]
 
         def __single_check(hardware_name):
             conf = Config.get_hardware(hardware_name)
             if conf is None:
                 Config.log.critical('HardwareApi::health_check conf is None')
+                return
             cmd = next((cmd for cmd in conf.supported_commands
                         if cmd.name == 'health_check'), None)
             if cmd is None:
                 Config.log.critical('HardwareApi::health_check cmd is None')
+                return
 
             # Update status and run command.
             RuntimeStatus.get_hardware(hardware_name).status = \

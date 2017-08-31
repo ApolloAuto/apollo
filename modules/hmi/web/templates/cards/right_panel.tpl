@@ -1,16 +1,33 @@
-<div class="hardware_panel">
-  <style type="text/css" scoped>
-    .quick_link .btn {
-      width: 100px;
-      margin-top: 16px;
-      margin-bottom: 10px;
-    }
+<style type="text/css" scoped>
+  .quick_link .btn {
+    width: 100px;
+    margin-top: 16px;
+    margin-bottom: 10px;
+  }
 
-    .hardware_panel .glyphicon {
-      font-size: 16px;
-    }
-  </style>
+  .right_panel .glyphicon {
+    font-size: 16px;
+  }
+  
+  .dropdown .dropdown-toggle {
+    width: 180px;
+  }
 
+  .dropdown-menu {
+    position: fixed;
+    width: 180px;
+    left: auto;
+    top: auto;
+    margin-right: 40px;
+    background: rgba(50, 90, 125, 0.5);
+  }
+
+  .dropdown-menu li a {
+    color: #ffffff;
+  }
+</style>
+
+<div class="right_panel">
   <div class="pull-right quick_link">
     <button type="button" class="btn hmi_small_btn"
         onclick="io_request('tool_api', 'reset_all');">Reset All</button>
@@ -18,7 +35,7 @@
         onclick="goto_dreamview()">Dreamview</button>
   </div>
   <div class="clearfix"></div>
-  <h2 class="panel_header hardware_panel">Hardware</h2>
+  <h2 class="panel_header">Hardware</h2>
 
   <ul class="list-group">
     {% for hardware in conf_pb.hardware %}
@@ -34,6 +51,28 @@
         </div>
       </li>
     {% endfor %}
+  </ul>
+
+  <h2 class="panel_header">Configs</h2>
+  <ul class="list-group">
+    <li class="list-group-item debug_item light">
+      <div class="item_content">Map
+        <div class="dropdown pull-right">
+          <button class="btn hmi_small_btn dropdown-toggle" type="button"
+              data-toggle="dropdown">
+              <span id="current_map">Select Map</span>
+              <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            {% for map in conf_pb.available_maps %}
+            <li><a onclick="
+                io_request('tool_api', 'switch_map', ['{{ map.name }}'])">
+              {{ map.name }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </li>
   </ul>
 </div>
 
@@ -70,5 +109,10 @@
         $glyphicon.addClass("glyphicon-remove");
       }
     });
+  }
+
+  function on_config_status_change(global_status) {
+    // Config status change.
+    $('#current_map').text(global_status['config']['current_map']);
   }
 </script>

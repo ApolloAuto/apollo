@@ -44,6 +44,7 @@ class RosBridgeApi(object):
         """SocketIO Api: change_driving_mode(target_mode)"""
         if len(args) != 1:
             Config.log.critical('RosBridgeApi::change_driving_mode bad args')
+            return
         target_mode = args[0]
 
         Config.log.info('RosBridgeApi change_driving_mode %s', target_mode)

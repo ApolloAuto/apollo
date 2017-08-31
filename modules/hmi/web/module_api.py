@@ -35,16 +35,19 @@ class ModuleApi(object):
         """SocketIO Api: start(module_name)"""
         if len(args) != 1:
             Config.log.critical('ModuleApi::start bad args')
+            return
         module_name = args[0]
 
         def __single_start(module_name):
             conf = Config.get_module(module_name)
             if conf is None:
                 Config.log.critical('ModuleApi::start conf is None')
+                return
             cmd = next((cmd for cmd in conf.supported_commands
                         if cmd.name == 'start'), None)
             if cmd is None:
                 Config.log.critical('ModuleApi::start cmd is None')
+                return
             # Update status and run command.
             RuntimeStatus.get_module(module_name).status = ModuleStatus.STARTED
             system_cmd.async_run_command_pb(cmd)
@@ -60,16 +63,19 @@ class ModuleApi(object):
         """SocketIO Api: stop(module_name)"""
         if len(args) != 1:
             Config.log.critical('ModuleApi::stop bad args')
+            return
         module_name = args[0]
 
         def __single_stop(module_name):
             conf = Config.get_module(module_name)
             if conf is None:
                 Config.log.critical('ModuleApi::stop conf is None')
+                return
             cmd = next((cmd for cmd in conf.supported_commands
                         if cmd.name == 'stop'), None)
             if cmd is None:
                 Config.log.critical('ModuleApi::stop cmd is None')
+                return
             # Update status and run command.
             RuntimeStatus.get_module(module_name).status = ModuleStatus.STOPPED
             system_cmd.async_run_command_pb(cmd)
