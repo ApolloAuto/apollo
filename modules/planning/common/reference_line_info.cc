@@ -29,13 +29,17 @@
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/reference_line/reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
 
-ReferenceLineInfo::ReferenceLineInfo(const hdmap::PncMap* pnc_map,
-                                     const ReferenceLine& reference_line)
-    : pnc_map_(pnc_map), reference_line_(reference_line) {}
+ReferenceLineInfo::ReferenceLineInfo(
+    const hdmap::PncMap* pnc_map, const ReferenceLine& reference_line,
+    const ReferenceLineSmootherConfig& smoother_config)
+    : pnc_map_(pnc_map),
+      reference_line_(reference_line),
+      smoother_config_(smoother_config) {}
 
 bool ReferenceLineInfo::Init() {
   const auto& box = common::VehicleState::instance()->AdcBoundingBox();
@@ -46,6 +50,36 @@ bool ReferenceLineInfo::Init() {
   for (const auto& lane_segment : reference_line_.map_path().lane_segments()) {
     reference_line_lane_id_set_.insert(lane_segment.lane->id().id());
   }
+  if (!CalculateAdcSmoothReferenLinePoint()) {
+    AERROR << "Fail to get ADC smooth reference line point.";
+    return false;
+  }
+  return true;
+}
+
+bool ReferenceLineInfo::CalculateAdcSmoothReferenLinePoint() {
+  const double backward_s = -5.0;
+  const double forward_s = 10.0;
+  const double delta_s = 2.0;
+  double s = backward_s + adc_sl_boundary_.start_s();
+
+  std::vector<ReferencePoint> local_ref_points;
+
+  while (s <= forward_s + adc_sl_boundary_.end_s()) {
+    local_ref_points.push_back(reference_line_.GetReferencePoint(s));
+    s += delta_s;
+  }
+  ReferencePoint::RemoveDuplicates(&local_ref_points);
+
+  ReferenceLineSmoother smoother;
+  smoother.Init(smoother_config_);
+  ReferenceLine smoothed_segment;
+  if (!smoother.Smooth(ReferenceLine(local_ref_points), &smoothed_segment)) {
+    AERROR << "Failed to smooth reference line";
+    return false;
+  }
+  adc_smooth_ref_point_ =
+      smoothed_segment.GetReferencePoint(adc_sl_boundary_.end_s());
   return true;
 }
 
