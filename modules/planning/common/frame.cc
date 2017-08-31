@@ -94,14 +94,14 @@ bool Frame::InitReferenceLineInfo(
     const std::vector<ReferenceLine> &reference_lines) {
   reference_line_info_.clear();
   for (const auto &reference_line : reference_lines) {
-    reference_line_info_.emplace_back(planning_start_point_, pnc_map_,
-                                      reference_line, smoother_config_);
-    if (!reference_line_info_.back().Init()) {
-      AERROR << "Failed to init reference line info";
-      return false;
-    }
+    reference_line_info_.emplace_back(pnc_map_, reference_line,
+                                      planning_start_point_, smoother_config_);
   }
   for (auto &info : reference_line_info_) {
+    if (!info.Init()) {
+      AERROR << "Failed to init adc sl boundary";
+      return false;
+    }
     if (!info.AddObstacles(obstacles_.Items())) {
       AERROR << "Failed to add obstacles to reference line";
       return false;
@@ -131,7 +131,7 @@ bool Frame::Init(const PlanningConfig &config,
   }
 
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
-        << FLAGS_align_prediction_time;
+         << FLAGS_align_prediction_time;
   if (FLAGS_align_prediction_time) {
     AlignPredictionTime(current_time_stamp);
   }

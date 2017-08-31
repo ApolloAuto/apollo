@@ -52,7 +52,7 @@ TEST_F(RTKReplayPlannerTest, ComputeTrajectory) {
   localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
   common::VehicleState::instance()->Update(localization, chassis);
   ReferenceLineSmootherConfig smooth_config;
-  ReferenceLineInfo info(start_point, nullptr, reference_line, smooth_config);
+  ReferenceLineInfo info(nullptr, reference_line, start_point, smooth_config);
   auto status = planner.Plan(start_point, nullptr, &info);
 
   const auto& trajectory = info.trajectory();
@@ -93,7 +93,7 @@ TEST_F(RTKReplayPlannerTest, ErrorTest) {
   common::VehicleState::instance()->Update(localization, chassis);
   ReferenceLine ref;
   ReferenceLineSmootherConfig smooth_config;
-  ReferenceLineInfo info(start_point, nullptr, ref, smooth_config);
+  ReferenceLineInfo info(nullptr, ref, start_point, smooth_config);
   EXPECT_TRUE(!(planner_with_error_csv.Plan(start_point, nullptr, &info)).ok());
 }
 
