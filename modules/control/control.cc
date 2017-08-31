@@ -239,7 +239,8 @@ Status Control::CheckInput() {
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");
   }
   trajectory_ = trajectory_adapter->GetLatestObserved();
-  if (trajectory_.trajectory_point_size() == 0) {
+  if (!trajectory_.estop().is_estop() &&
+      trajectory_.trajectory_point_size() == 0) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
                   "planning has no trajectory point.");
