@@ -289,11 +289,6 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
   double filter_accelaration = filter_velocity_accelaration.norm();
   bool need_keep_motion = filter_accelaration >
     s_claping_accelaration_threshold_;
-  // use tighter threshold for pedestrian
-  if (filter_accelaration > s_claping_accelaration_threshold_ / 2 &&
-    current_object_->object_ptr->type == PEDESTRIAN) {
-    need_keep_motion = true;
-  }
   if (need_keep_motion) {
     Eigen::Vector3f last_velocity = Eigen::Vector3f::Zero();
     if (history_objects_.size() > 0) {
@@ -329,7 +324,8 @@ void ObjectTrack::SmoothTrackOrientation() {
   // Smooth orientation over track history
   Eigen::Vector3f current_dir = current_object_->direction;
   float current_speed = current_object_->velocity.head(2).norm();
-  if (current_speed > 1.0f) {
+  bool velocity_is_obvious = current_speed > (s_claping_speed_threshold_ * 2);
+  if (velocity_is_obvious) {
     current_dir = current_object_->velocity;
   } else {
     current_dir = current_object_->lane_direction;
@@ -352,16 +348,15 @@ void ObjectTrack::SmoothTrackClassIdx() {
 bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
   const double time_diff) {
   // Check whether track is static
+  // Check whether track velocity is consistant
   bool is_velocity_angle_change =
     CheckTrackStaticHypothesisByVelocityAngleChange(new_object, time_diff);
-  // Define track as static & clap velocity to 0
-  // when velocity angle change & it is smaller than a threshold
+  // Evaluate velocity level
   double speed = belief_velocity_.head(2).norm();
-  bool velocity_is_small = speed < (s_claping_speed_threshold_ / 2);
-  // use loose threshold for pedestrian
-  if (speed < s_claping_speed_threshold_ &&
-    current_object_->object_ptr->type != PEDESTRIAN) {
-    velocity_is_small = true;
+  bool velocity_is_noise = speed < (s_claping_speed_threshold_ / 2);
+  bool velocity_is_small = speed < (s_claping_speed_threshold_ / 1);
+  if (velocity_is_noise) {
+    return true;
   }
   // Need to notice: claping small velocity may not reasonable when the true
   // velocity of target object is really small. e.g. a moving out vehicle in
