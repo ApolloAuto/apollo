@@ -34,10 +34,16 @@
 namespace apollo {
 namespace planning {
 
+using TrajectoryPoint = apollo::common::TrajectoryPoint;
+using Vec2d = apollo::common::math::Vec2d;
+using SLPoint = apollo::common::SLPoint;
+
 ReferenceLineInfo::ReferenceLineInfo(
-    const hdmap::PncMap* pnc_map, const ReferenceLine& reference_line,
+    const TrajectoryPoint& init_adc_point, const hdmap::PncMap* pnc_map,
+    const ReferenceLine& reference_line,
     const ReferenceLineSmootherConfig& smoother_config)
-    : pnc_map_(pnc_map),
+    : init_adc_point_(init_adc_point),
+      pnc_map_(pnc_map),
       reference_line_(reference_line),
       smoother_config_(smoother_config) {}
 
@@ -58,14 +64,23 @@ bool ReferenceLineInfo::Init() {
 }
 
 bool ReferenceLineInfo::CalculateAdcSmoothReferenLinePoint() {
+  SLPoint adc_sl_on_raw_ref;
+  if (!reference_line_.XYToSL(Vec2d(init_adc_point_.path_point().x(),
+                                    init_adc_point_.path_point().y()),
+                              &adc_sl_on_raw_ref)) {
+    AERROR << "Fail to get sl point for init_adc_point. init_adc_point: "
+           << init_adc_point_.DebugString();
+    return false;
+  }
+
   const double backward_s = -5.0;
   const double forward_s = 10.0;
   const double delta_s = 2.0;
-  double s = backward_s + adc_sl_boundary_.start_s();
+  double s = backward_s + adc_sl_on_raw_ref.s();
 
   std::vector<ReferencePoint> local_ref_points;
 
-  while (s <= forward_s + adc_sl_boundary_.end_s()) {
+  while (s <= forward_s + adc_sl_on_raw_ref.s()) {
     local_ref_points.push_back(reference_line_.GetReferencePoint(s));
     s += delta_s;
   }
@@ -78,8 +93,8 @@ bool ReferenceLineInfo::CalculateAdcSmoothReferenLinePoint() {
     AERROR << "Failed to smooth reference line";
     return false;
   }
-  adc_smooth_ref_point_ =
-      smoothed_segment.GetReferencePoint(adc_sl_boundary_.end_s());
+  adc_smooth_ref_point_ = smoothed_segment.GetReferencePoint(
+      init_adc_point_.path_point().x(), init_adc_point_.path_point().y());
   return true;
 }
 

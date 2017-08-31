@@ -43,6 +43,7 @@ namespace planning {
 class ReferenceLineInfo {
  public:
   explicit ReferenceLineInfo(
+      const common::TrajectoryPoint& init_adc_point,
       const hdmap::PncMap* pnc_map, const ReferenceLine& reference_line,
       const ReferenceLineSmootherConfig& smoother_config);
 
@@ -112,6 +113,7 @@ class ReferenceLineInfo {
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
   bool CalculateAdcSmoothReferenLinePoint();
 
+  const common::TrajectoryPoint& init_adc_point_;
   const hdmap::PncMap* pnc_map_ = nullptr;
 
   /**
