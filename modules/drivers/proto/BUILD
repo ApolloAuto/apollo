@@ -11,6 +11,7 @@ proto_library(
     name = "sensor_proto_lib",
     srcs = [
         "mobileye.proto",
+        "delphi_esr.proto",
     ],
     deps = [
         "//modules/common/proto:header_proto_lib",
