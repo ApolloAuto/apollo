@@ -63,6 +63,7 @@ sl_path = None
 sl_aggregated_boundary_low_line = None
 sl_aggregated_boundary_high_line = None
 
+MAP_BOUNDARY_BUFFER= 80;
 
 def planning_callback(planning_pb):
     planning.update_planning_pb(planning_pb)
@@ -130,10 +131,10 @@ def update(frame_number):
                                 planning.st_data_s.keys()[1])
     localization.replot_vehicle(vehicle_position_line, vehicle_polygon_line)
     try:
-        ax.set_xlim(localization.localization_pb.pose.position.x - 80,
-                    localization.localization_pb.pose.position.x + 80)
-        ax.set_ylim(localization.localization_pb.pose.position.y - 80,
-                    localization.localization_pb.pose.position.y + 80)
+        ax.set_xlim(localization.localization_pb.pose.position.x - MAP_BOUNDARY_BUFFER,
+                    localization.localization_pb.pose.position.x + MAP_BOUNDARY_BUFFER)
+        ax.set_ylim(localization.localization_pb.pose.position.y - MAP_BOUNDARY_BUFFER,
+                    localization.localization_pb.pose.position.y + MAP_BOUNDARY_BUFFER)
     except:
         pass
     ax.relim()
@@ -217,6 +218,18 @@ def init_line_pool(central_x, central_y):
     vehicle_position_line, = ax.plot([central_x], [central_y], 'go', alpha=0.3)
     vehicle_polygon_line, = ax.plot([central_x], [central_y], 'g-')
 
+def press(event):
+    global MAP_BOUNDARY_BUFFER
+    if event.key == '+' or event.key == '=':
+        MAP_BOUNDARY_BUFFER -= 20;
+        if MAP_BOUNDARY_BUFFER <= 20:
+            MAP_BOUNDARY_BUFFER = 20
+
+    if event.key == '-' or event.key == '_':
+        MAP_BOUNDARY_BUFFER += 20;
+        if MAP_BOUNDARY_BUFFER >= 200:
+            MAP_BOUNDARY_BUFFER = 200
+
 
 if __name__ == '__main__':
     default_map_path = os.path.dirname(os.path.realpath(__file__))
@@ -244,6 +257,7 @@ if __name__ == '__main__':
 
     add_listener()
     fig = plt.figure()
+    fig.canvas.mpl_connect('key_press_event', press)
     ax = plt.subplot2grid((3, 3), (0, 0), rowspan=2, colspan=2)
 
     ax1 = plt.subplot2grid((3, 3), (0, 2))
