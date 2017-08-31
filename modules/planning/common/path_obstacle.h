@@ -65,7 +65,7 @@ class PathObstacle {
   PathObstacle() = default;
   explicit PathObstacle(const Obstacle* obstacle);
 
-  bool Init(const ReferenceLine& reference_line);
+  bool Init(const ReferenceLine& reference_line, const double adc_start_s);
 
   const std::string& Id() const;
 
@@ -126,9 +126,11 @@ class PathObstacle {
   static ObjectDecisionType MergeLateralDecision(const ObjectDecisionType& lhs,
                                                  const ObjectDecisionType& rhs);
 
-  void BuildStBoundary(const ReferenceLine& reference_line);
+  void BuildStBoundary(const ReferenceLine& reference_line,
+                       const double adc_start_s);
 
   bool BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
+                                 const double adc_start_s,
                                  StBoundary* const st_boundary);
 
   std::string id_;
