@@ -3,12 +3,12 @@ FROM ubuntu:14.04
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
-    software-properties-common \
     git \
     libatlas-base-dev \
     libboost-all-dev \
     libconsole-bridge-dev \
     libcurl4-openssl-dev \
+    libflann-dev \
     libfreetype6-dev \
     libgflags-dev \
     libgoogle-glog-dev \
@@ -19,11 +19,15 @@ RUN apt-get update && apt-get install -y \
     liblog4cxx10 \
     liblz4-dev \
     libopencv-dev \
+    libopenni-dev \
     libpoco-dev \
     libproj-dev \
     libpython2.7-dev \
+    libqhull-dev \
     libsnappy-dev \
     libtinyxml-dev \
+    libvtk5-dev \
+    libvtk5-qt4-dev \
     libyaml-cpp-dev \
     libyaml-dev \
     mpi-default-dev \
@@ -32,12 +36,11 @@ RUN apt-get update && apt-get install -y \
     python-scipy \
     python-software-properties \
     realpath \
+    software-properties-common \
     tmux \
     unzip \
-    wget 
+    wget
 
-RUN add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
-RUN apt-get update && apt-get install -y libpcl-1.7-all 
 RUN apt-get clean autoclean && apt-get autoremove -y
 RUN rm -fr /var/lib/apt/lists/*
 COPY ./modules/tools/py27_requirements.txt /tmp/
@@ -79,15 +82,6 @@ WORKDIR /tmp/glew-2.0.0
 RUN make && make install
 RUN ln -s /usr/lib64/libGLEW.so /usr/lib/libGLEW.so
 RUN ln -s /usr/lib64/libGLEW.so.2.0 /usr/lib/libGLEW.so.2.0
-
-# install cpu_only caffe
-WORKDIR /tmp
-RUN wget https://github.com/BVLC/caffe/archive/1.0.zip
-RUN unzip 1.0.zip
-WORKDIR /tmp/caffe-1.0
-RUN sed "s/# CPU_ONLY := 1/CPU_ONLY := 1/g" Makefile.config.example > Makefile.config
-RUN make all
-RUN cp -P build/lib/* /usr/lib
 
 # Remove all temporary files.
 RUN rm -fr /tmp/*
