@@ -75,6 +75,9 @@ Status Prediction::Init() {
   // Set perception obstacle callback function
   AdapterManager::AddPerceptionObstaclesCallback(&Prediction::OnPerception,
                                                  this);
+  // Set localization callback function
+  AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
+
   return Status::OK();
 }
 
@@ -84,32 +87,30 @@ Status Prediction::Start() {
 
 void Prediction::Stop() {}
 
-void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
-  auto localization_adapter = AdapterManager::GetLocalization();
+void Prediction::OnLocalization(const LocalizationEstimate &localization) {
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
       AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
-  if (localization_adapter->Empty()) {
-    ADEBUG << "No localization message.";
-  } else {
-    const LocalizationEstimate& localization =
-        localization_adapter->GetLatestObserved();
-    ADEBUG << "Received localization message ["
-           << localization.ShortDebugString()
-           << "].";
-    PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-        ContainerManager::instance()->GetContainer(
-        AdapterConfig::LOCALIZATION));
-    pose_container->Insert(localization);
-    obstacles_container->InsertPerceptionObstacle(
+
+  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
+      ContainerManager::instance()->GetContainer(
+      AdapterConfig::LOCALIZATION));
+  CHECK_NOTNULL(pose_container);
+
+  pose_container->Insert(localization);
+  obstacles_container->InsertPerceptionObstacle(
         *(pose_container->ToPerceptionObstacle()),
         pose_container->GetTimestamp());
-  }
-  if (obstacles_container == nullptr) {
-    AERROR << "Null obstacles container";
-    return;
-  }
+  ADEBUG << "Received a localization message ["
+         << localization.ShortDebugString() << "].";
+}
+
+void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
+  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::instance()->GetContainer(
+      AdapterConfig::PERCEPTION_OBSTACLES));
+  CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles);
   EvaluatorManager::instance()->Run(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
