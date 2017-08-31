@@ -58,30 +58,26 @@ bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
  * @param l the l value
  * @return a SLPoint instance
  */
-apollo::common::SLPoint MakeSLPoint(const double s, const double l);
+SLPoint MakeSLPoint(const double s, const double l);
 
-apollo::common::Point3D MakePoint3D(const double x, const double y,
-                                    const double z);
+Point3D MakePoint3D(const double x, const double y, const double z);
 
-apollo::common::PointENU MakePointENU(const double x, const double y,
-                                      const double z);
+PointENU MakePointENU(const double x, const double y, const double z);
 
-apollo::common::PointENU MakePointENU(const common::math::Vec2d& xy);
+PointENU MakePointENU(const math::Vec2d& xy);
 
 apollo::perception::Point MakePerceptionPoint(const double x, const double y,
                                               const double z);
 
-apollo::common::SpeedPoint MakeSpeedPoint(const double s, const double t,
-                                          const double v, const double a,
-                                          const double da);
+SpeedPoint MakeSpeedPoint(const double s, const double t,
+                          const double v, const double a, const double da);
 
-apollo::common::PathPoint MakePathPoint(const double x, const double y,
-                                        const double z, const double theta,
-                                        const double kappa, const double dkappa,
-                                        const double ddkappa);
+PathPoint MakePathPoint(const double x, const double y, const double z,
+                        const double theta, const double kappa,
+                        const double dkappa, const double ddkappa);
 
-apollo::common::TrajectoryPoint MakeTrajectoryPoint(
-    const apollo::common::PathPoint& path_point, const double v, const double a,
+TrajectoryPoint MakeTrajectoryPoint(
+    const PathPoint& path_point, const double v, const double a,
     const double relative_time);
 
 /**

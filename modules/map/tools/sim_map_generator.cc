@@ -49,28 +49,24 @@ using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
 
 void DownsampleCurve(Curve* curve) {
-  std::vector<PointENU> points;
-  std::vector<int> sampled_indices;
-
   auto* line_segment = curve->mutable_segment(0)->mutable_line_segment();
-  for (const auto& point : line_segment->point()) {
-    points.push_back(point);
-  }
-  int original_size = line_segment->point_size();
+  std::vector<PointENU> points(line_segment->point().begin(),
+                               line_segment->point().end());
   line_segment->clear_point();
 
   // NOTE: this not the most efficient implementation, but since this map tool
   // is only run once for each, we can probably live with that.
 
   // Downsample points by angle then by distance.
-  DownsampleByAngle(points, FLAGS_angle_threshold, &sampled_indices);
+  auto sampled_indices = DownsampleByAngle(points, FLAGS_angle_threshold);
   std::vector<PointENU> downsampled_points;
   for (int index : sampled_indices) {
     downsampled_points.push_back(points[index]);
   }
 
-  DownsampleByDistance(downsampled_points, FLAGS_downsample_distance,
-                       FLAGS_steep_turn_downsample_distance, &sampled_indices);
+  sampled_indices = DownsampleByDistance(downsampled_points,
+                                         FLAGS_downsample_distance,
+                                         FLAGS_steep_turn_downsample_distance);
 
   for (int index : sampled_indices) {
     *line_segment->add_point() = downsampled_points[index];
@@ -78,7 +74,7 @@ void DownsampleCurve(Curve* curve) {
   int new_size = line_segment->point_size();
   CHECK_GT(new_size, 1);
 
-  AINFO << "Lane curve downsampled from " << original_size << " points to "
+  AINFO << "Lane curve downsampled from " << points.size() << " points to "
         << new_size << " points.";
 }
 
