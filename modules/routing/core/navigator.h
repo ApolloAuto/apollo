@@ -22,52 +22,55 @@
 #include <vector>
 #include <string>
 
-#include "modules/routing/core/node_range_manager.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "modules/routing/core/result_generator.h"
+#include "modules/routing/core/black_list_range_generator.h"
+#include "modules/routing/graph/topo_graph.h"
+#include "modules/routing/graph/topo_range_manager.h"
+#include "modules/routing/graph/node_with_range.h"
 
 namespace apollo {
 namespace routing {
-
-class TopoGraph;
-class TopoNode;
 
 class Navigator {
  public:
   explicit Navigator(const std::string& topo_file_path);
   ~Navigator();
+
   bool IsReady() const;
 
-  // search new request to new response
   bool SearchRoute(const RoutingRequest& request,
-                   RoutingResponse* response) const;
+                   RoutingResponse* const response);
 
  private:
-  // new request to new response
-  bool GeneratePassageRegion(
-      const RoutingRequest& request,
-      const std::vector<const TopoNode*>& nodes,
-      const std::unordered_set<const TopoNode*>& black_list,
-      NodeRangeManager* const range_manager,
-      RoutingResponse* result) const;
+  bool Init(const RoutingRequest& request,
+            const TopoGraph* graph,
+            std::vector<const TopoNode*>* const way_nodes,
+            std::vector<double>* const way_s);
 
-  // use internal generate result
-  void GeneratePassageRegion(
-      const std::vector<const TopoNode*>& nodes,
-      const std::unordered_set<const TopoNode*>& black_list,
-      NodeRangeManager* const range_manager,
-      RoutingResponse* result) const;
+  void Clear();
 
-  void DumpDebugData(
-      const std::vector<const TopoNode*>& nodes,
-      const NodeRangeManager& range_manager,
-      const RoutingResponse& response) const;
+  bool SearchRouteByStrategy(
+      const TopoGraph* graph,
+      const std::vector<const TopoNode*>& way_nodes,
+      const std::vector<double>& way_s,
+      std::vector<NodeWithRange>* const result_nodes) const;
+
+  bool MergeRoute(const std::vector<NodeWithRange>& node_vec,
+                  std::vector<NodeWithRange>* const result_node_vec) const;
 
  private:
   bool is_ready_;
   std::unique_ptr<TopoGraph> graph_;
+
+  TopoRangeManager topo_range_manager_;
+
+  std::unique_ptr<BlackListRangeGenerator> black_list_generator_;
+  std::unique_ptr<ResultGenerator> result_generator_;
 };
 
 }  // namespace routing
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_CORE_NAVIGATOR_H_
+

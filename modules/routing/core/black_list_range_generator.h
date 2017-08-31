@@ -14,31 +14,38 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_STRATEGY_STRATEGY_H_
-#define MODULES_ROUTING_STRATEGY_STRATEGY_H_
+#ifndef MODULES_ROUTING_CORE_BLACK_LIST_RANGE_GENERATOR_H
+#define MODULES_ROUTING_CORE_BLACK_LIST_RANGE_GENERATOR_H
 
+#include <memory>
 #include <unordered_set>
-#include <vector>
+#include <unordered_map>
 
+#include "modules/routing/graph/topo_range_manager.h"
 #include "modules/routing/graph/topo_graph.h"
-#include "modules/routing/graph/sub_topo_graph.h"
-#include "modules/routing/graph/topo_node.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace routing {
 
-class Strategy {
+class BlackListRangeGenerator {
  public:
-  virtual ~Strategy() {}
+  BlackListRangeGenerator() = default;
+  ~BlackListRangeGenerator() = default;
 
-  virtual bool Search(const TopoGraph* graph,
-                      const SubTopoGraph* sub_graph,
-                      const TopoNode* src_node,
-                      const TopoNode* dest_node,
-                      std::vector<NodeWithRange>* const result_nodes)= 0;
+  void GenerateBlackMapFromRequest(const RoutingRequest& request,
+                                   const TopoGraph* graph,
+                                   TopoRangeManager* const range_manager) const;
+
+  void AddBlackMapFromTerminal(const TopoNode* src_node,
+                               const TopoNode* dest_node,
+                               double start_s,
+                               double end_s,
+                               TopoRangeManager* const range_manager) const;
 };
 
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_STRATEGY_STRATEGY_H_
+#endif  // MODULES_ROUTING_CORE_BLACK_LIST_RANGE_GENERATOR_H
+

@@ -6,7 +6,6 @@ cc_library(
     name = "core",
     deps = [
         ":routing_navigator",
-        ":routing_node_range_manager",
     ],
 )
 
@@ -19,13 +18,12 @@ cc_library(
         "navigator.h",
     ],
     deps = [
-        ":routing_node_range_manager",
-        "//modules/common",
+        ":routing_black_list_range_generator",
+        ":routing_result_generator",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/proto:common_proto",
         "//modules/common/time",
         "//modules/common/util",
-        "//modules/map/proto:map_proto",
         "//modules/routing/common:routing_gflags",
         "//modules/routing/graph",
         "//modules/routing/proto:routing_proto",
@@ -34,17 +32,30 @@ cc_library(
 )
 
 cc_library(
-    name = "routing_node_range_manager",
+    name = "routing_black_list_range_generator",
     srcs = [
-        "node_range_manager.cc",
+        "black_list_range_generator.cc",
     ],
     hdrs = [
-        "node_range_manager.h",
+        "black_list_range_generator.h",
     ],
     deps = [
-        "//modules/common/proto:common_proto",
-        "//modules/routing/common:routing_gflags",
         "//modules/routing/graph",
+    ],
+)
+
+cc_library(
+    name = "routing_result_generator",
+    srcs = [
+        "result_generator.cc",
+    ],
+    hdrs = [
+        "result_generator.h",
+    ],
+    deps = [
+        "//modules/routing/proto:routing_proto",
+        "//modules/routing/graph",
+        "//modules/common/time",
     ],
 )
 

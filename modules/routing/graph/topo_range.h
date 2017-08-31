@@ -14,31 +14,42 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_STRATEGY_STRATEGY_H_
-#define MODULES_ROUTING_STRATEGY_STRATEGY_H_
-
-#include <unordered_set>
-#include <vector>
-
-#include "modules/routing/graph/topo_graph.h"
-#include "modules/routing/graph/sub_topo_graph.h"
-#include "modules/routing/graph/topo_node.h"
+#ifndef MODULES_ROUTING_GRAPH_TOPO_RANGE_H
+#define MODULES_ROUTING_GRAPH_TOPO_RANGE_H
 
 namespace apollo {
 namespace routing {
 
-class Strategy {
+class NodeSRange {
  public:
-  virtual ~Strategy() {}
+  static bool IsEnoughForChangeLane(double start_s, double end_s);
+  static bool IsEnoughForChangeLane(double length);
 
-  virtual bool Search(const TopoGraph* graph,
-                      const SubTopoGraph* sub_graph,
-                      const TopoNode* src_node,
-                      const TopoNode* dest_node,
-                      std::vector<NodeWithRange>* const result_nodes)= 0;
+ public:
+  NodeSRange();
+  NodeSRange(double s1, double s2);
+  NodeSRange(const NodeSRange& other);
+  ~NodeSRange() = default;
+
+  bool operator < (const NodeSRange& other) const;
+  bool IsValid() const;
+  double StartS() const;
+  double EndS() const;
+  bool IsEnoughForChangeLane() const;
+  double Length() const;
+
+  void SetStartS(double start_s);
+  void SetEndS(double end_s);
+  void SetRangeS(double start_s, double end_s);
+  bool MergeRangeOverlap(const NodeSRange& other);
+
+ private:
+  double start_s_;
+  double end_s_;
 };
 
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_STRATEGY_STRATEGY_H_
+#endif  // MODULES_ROUTING_GRAPH_TOPO_RANGE_H
+

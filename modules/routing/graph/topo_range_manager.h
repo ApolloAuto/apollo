@@ -14,31 +14,40 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_STRATEGY_STRATEGY_H_
-#define MODULES_ROUTING_STRATEGY_STRATEGY_H_
+#ifndef MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
+#define MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
 
-#include <unordered_set>
 #include <vector>
+#include <unordered_map>
 
-#include "modules/routing/graph/topo_graph.h"
-#include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/graph/topo_node.h"
+#include "modules/routing/graph/topo_range.h"
 
 namespace apollo {
 namespace routing {
 
-class Strategy {
+class TopoRangeManager {
  public:
-  virtual ~Strategy() {}
+  TopoRangeManager() = default;
+  ~TopoRangeManager() = default;
 
-  virtual bool Search(const TopoGraph* graph,
-                      const SubTopoGraph* sub_graph,
-                      const TopoNode* src_node,
-                      const TopoNode* dest_node,
-                      std::vector<NodeWithRange>* const result_nodes)= 0;
+  const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>&
+        RangeMap() const;
+  bool Find(const TopoNode* node) const;
+  double RangeStart(const TopoNode* node) const;
+  double RangeEnd(const TopoNode* node) const;
+  void PrintDebugInfo() const;
+
+  void Clear();
+  void Add(const TopoNode* node, double start_s, double end_s);
+  void SortAndMerge();
+
+ private:
+    std::unordered_map<const TopoNode*, std::vector<NodeSRange> > range_map_;
 };
 
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_STRATEGY_STRATEGY_H_
+#endif  // MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
+
