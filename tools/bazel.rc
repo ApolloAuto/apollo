@@ -27,6 +27,7 @@ test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 # 'load("//tools:cpplint.bzl", "cpplint")' at the beginning and 'cpplint()'
 # at the end.
 test:cpplint --test_tag_filters=cpplint
+test:cpplint --build_tests_only
 
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
