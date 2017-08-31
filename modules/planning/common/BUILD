@@ -182,6 +182,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
+        "//modules/planning/reference_line:reference_line_smoother",
         "@eigen//:eigen",
     ],
 )
