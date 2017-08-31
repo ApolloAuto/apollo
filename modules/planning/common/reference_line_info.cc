@@ -63,9 +63,11 @@ bool ReferenceLineInfo::Init() {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
   }
-  if (!CalculateAdcSmoothReferenLinePoint()) {
-    AERROR << "Fail to get ADC smooth reference line point.";
-    return false;
+  if (!FLAGS_enable_smooth_reference_line) {
+    if (!CalculateAdcSmoothReferenLinePoint()) {
+      AERROR << "Fail to get ADC smooth reference line point.";
+      return false;
+    }
   }
   return true;
 }
@@ -77,7 +79,6 @@ bool ReferenceLineInfo::CalculateAdcSmoothReferenLinePoint() {
   double s = backward_s + adc_sl_boundary_.start_s();
 
   std::vector<ReferencePoint> local_ref_points;
-
   while (s <= forward_s + adc_sl_boundary_.end_s()) {
     local_ref_points.push_back(reference_line_.GetReferencePoint(s));
     s += delta_s;
