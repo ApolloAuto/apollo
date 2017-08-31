@@ -588,7 +588,7 @@ bool DpStGraph::CreateOvertakeDecision(
   overtake->set_distance_s(overtake_distance_s);
 
   const double reference_line_fence_s =
-      adc_sl_boundary_.end_s() + boundary.max_s() + overtake_distance_s;
+      adc_sl_boundary_.end_s() + boundary.min_s() + overtake_distance_s;
 
   common::PathPoint path_point;
   if (!path_data_.GetPathPointWithRefS(reference_line_fence_s, &path_point)) {
