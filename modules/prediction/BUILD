@@ -15,6 +15,7 @@ cc_library(
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
+        "//modules/localization/proto:localization_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator:evaluator_manager",
