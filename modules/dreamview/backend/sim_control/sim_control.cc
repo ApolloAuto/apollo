@@ -61,34 +61,33 @@ SimControl::SimControl(const MapService* map_service)
       initial_start_(true),
       enabled_(FLAGS_enable_sim_control) {
   if (enabled_) {
-    RoutingResponse routing;
-    if (!GetProtoFromFile(FLAGS_routing_response_file, &routing)) {
-      AWARN << "Unable to read start point from file: "
-            << FLAGS_routing_response_file;
+    apollo::common::PointENU start_point;
+    if (!map_service_->GetStartPoint(&start_point)) {
+      AWARN << "Failed to get a dummy start point from map!";
       return;
     }
-    SetStartPoint(routing);
+    SetStartPoint(start_point.x(), start_point.y());
   }
 }
 
-void SimControl::SetStartPoint(const RoutingResponse& routing) {
+void SimControl::SetStartPoint(const double x, const double y) {
   next_point_.set_v(0.0);
   next_point_.set_a(0.0);
 
-  auto* p = next_point_.mutable_path_point();
-
-  p->set_x(routing.routing_request().start().pose().x());
-  p->set_y(routing.routing_request().start().pose().y());
-  p->set_z(0.0);
+  auto* next_point = next_point_.mutable_path_point();
+  next_point->set_x(x);
+  next_point->set_y(y);
+  next_point->set_z(0.0);
 
   double theta = 0.0;
   double s = 0.0;
-  if (!map_service_->GetPoseWithRegardToLane(p->x(), p->y(), &theta, &s)) {
-    AERROR << "Failed to get heading!";
+  if (!map_service_->GetPoseWithRegardToLane(next_point->x(), next_point->y(),
+                                             &theta, &s)) {
+    AERROR << "Failed to get heading from map! Treat theta and s as 0.0!";
   }
-  p->set_theta(theta);
-  p->set_s(s);
-  p->set_kappa(0.0);
+  next_point->set_theta(theta);
+  next_point->set_s(s);
+  next_point->set_kappa(0.0);
 
   prev_point_index_ = next_point_index_ = 0;
   received_planning_ = false;
@@ -98,11 +97,16 @@ void SimControl::SetStartPoint(const RoutingResponse& routing) {
   }
 }
 
+void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
+  const auto& start_pose = routing.routing_request().start().pose();
+  SetStartPoint(start_pose.x(), start_pose.y());
+}
+
 void SimControl::Start() {
   if (initial_start_) {
     // Setup planning and routing result data callback.
     AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
-    AdapterManager::AddRoutingResponseCallback(&SimControl::SetStartPoint,
+    AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
                                                this);
 
     // Start timer to publish localiztion and chassis messages.

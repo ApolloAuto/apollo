@@ -80,6 +80,8 @@ class MapService {
   bool GetPoseWithRegardToLane(const double x, const double y, double *theta,
                                double *s) const;
 
+  // Get a point on the map to serve as dummy start point of SimControl
+  bool GetStartPoint(apollo::common::PointENU *start_point) const;
 
   /**
    * @brief The function fills out proper routing lane waypoint
@@ -91,12 +93,16 @@ class MapService {
    */
   bool ConstructLaneWayPoint(
       const double x, const double y,
-      ::apollo::routing::RoutingRequest::LaneWaypoint* laneWayPoint) const;
+      ::apollo::routing::RoutingRequest::LaneWaypoint *laneWayPoint) const;
 
  private:
   const ::apollo::hdmap::HDMap &BaseMap() const {
     return pnc_map_.HDMap();
   }
+
+  bool GetNearestLane(const double x, const double y,
+                      apollo::hdmap::LaneInfoConstPtr *nearest_lane,
+                      double *nearest_s, double *nearest_l) const;
 
   // A wrapper around HDMap to provide some convenient utils dreamview needs.
   const ::apollo::hdmap::PncMap pnc_map_;
