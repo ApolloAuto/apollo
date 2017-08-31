@@ -116,13 +116,7 @@ TEST_F(SimControlTest, Test) {
   const double timestamp = 100.0;
   adc_trajectory.mutable_header()->set_timestamp_sec(timestamp);
 
-  RoutingResponse routing;
-  routing.mutable_routing_request()->mutable_start()->mutable_pose()->set_x(
-      1.0);
-  routing.mutable_routing_request()->mutable_start()->mutable_pose()->set_y(
-      1.0);
-
-  sim_control_.SetStartPoint(routing);
+  sim_control_.SetStartPoint(1.0, 1.0);
 
   AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, &sim_control_);
   AdapterManager::GetPlanning()->OnReceive(adc_trajectory);

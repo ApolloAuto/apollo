@@ -89,5 +89,13 @@ TEST_F(MapServiceTest, RetrieveMapElements) {
   EXPECT_EQ("l1", map.lane(0).id().id());
 }
 
+TEST_F(MapServiceTest, GetStartPoint) {
+  PointENU start_point;
+  EXPECT_TRUE(map_service.GetStartPoint(&start_point));
+  EXPECT_DOUBLE_EQ(-1826.4050789145094, start_point.x());
+  EXPECT_DOUBLE_EQ(-3027.5187874953263, start_point.y());
+  EXPECT_DOUBLE_EQ(0.0, start_point.z());
+}
+
 }  // namespace dreamview
 }  // namespace apollo
