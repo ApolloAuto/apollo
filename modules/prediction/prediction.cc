@@ -31,6 +31,7 @@ namespace apollo {
 namespace prediction {
 
 using ::apollo::perception::PerceptionObstacles;
+using ::apollo::perception::PerceptionObstacle;
 using ::apollo::localization::LocalizationEstimate;
 using ::apollo::common::adapter::AdapterManager;
 using ::apollo::common::adapter::AdapterConfig;
@@ -99,9 +100,15 @@ void Prediction::OnLocalization(const LocalizationEstimate &localization) {
   CHECK_NOTNULL(pose_container);
 
   pose_container->Insert(localization);
-  obstacles_container->InsertPerceptionObstacle(
-        *(pose_container->ToPerceptionObstacle()),
+  PerceptionObstacle* pose_ptr = pose_container->ToPerceptionObstacle();
+  if (pose_ptr != nullptr) {
+    obstacles_container->InsertPerceptionObstacle(
+        *(pose_ptr),
         pose_container->GetTimestamp());
+  } else {
+    ADEBUG << "Invalid pose found.";
+  }
+  
   ADEBUG << "Received a localization message ["
          << localization.ShortDebugString() << "].";
 }
