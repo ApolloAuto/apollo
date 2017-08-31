@@ -238,9 +238,9 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
         ->mutable_init_point()
         ->CopyFrom(stitching_trajectory.back());
   }
-
+  auto status = Status::OK();
   for (auto& reference_line_info : frame_->reference_line_info()) {
-    auto status = planner_->Plan(stitching_trajectory.back(),
+    status = planner_->Plan(stitching_trajectory.back(),
                                  frame_.get(), &reference_line_info);
     AERROR_IF(!status.ok()) << "planner failed to make a driving plan.";
   }
@@ -288,7 +288,7 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
   // update last publishable trajectory;
   last_publishable_trajectory_ = std::move(publishable_trajectory);
 
-  return Status::OK();
+  return status;
 }
 
 }  // namespace planning
