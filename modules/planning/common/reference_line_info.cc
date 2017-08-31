@@ -129,7 +129,7 @@ std::unique_ptr<PathObstacle> ReferenceLineInfo::CreatePathObstacle(
     const Obstacle* obstacle) {
   auto path_obstacle =
       std::unique_ptr<PathObstacle>(new PathObstacle(obstacle));
-  if (!path_obstacle->Init(reference_line_)) {
+  if (!path_obstacle->Init(reference_line_, adc_sl_boundary_.end_s())) {
     AERROR << "Failed to create perception sl boundary for obstacle "
            << obstacle->Id();
     return nullptr;
