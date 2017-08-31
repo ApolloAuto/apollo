@@ -297,7 +297,7 @@ bool PathDecider::ComputeBoundingBoxesForAdc(
        ++i, time_stamp += interval) {
     common::SpeedPoint speed_point;
     if (!speed_data_->EvaluateByTime(time_stamp, &speed_point)) {
-      AINFO << "get_speed_point_with_time for time_stamp[" << time_stamp << "]";
+      ADEBUG << "get_speed_point_with_time for time_stamp[" << time_stamp << "]";
       return false;
     }
 

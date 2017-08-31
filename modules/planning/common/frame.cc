@@ -129,7 +129,7 @@ bool Frame::Init(const PlanningConfig &config,
     return false;
   }
 
-  AINFO << "Enabled align prediction time ? : " << std::boolalpha
+  ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
         << FLAGS_align_prediction_time;
   if (FLAGS_align_prediction_time) {
     AlignPredictionTime(current_time_stamp);
