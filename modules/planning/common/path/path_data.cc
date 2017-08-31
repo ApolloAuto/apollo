@@ -34,8 +34,8 @@
 namespace apollo {
 namespace planning {
 
-using SLPoint = apollo::common::SLPoint;
-using Vec2d = apollo::common::math::Vec2d;
+using apollo::common::SLPoint;
+using apollo::common::math::Vec2d;
 
 bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
   if (reference_line_ == nullptr) {

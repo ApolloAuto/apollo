@@ -33,7 +33,6 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
@@ -68,14 +67,13 @@ class Frame {
   const ADCTrajectory &GetADCTrajectory() const;
   ADCTrajectory *MutableADCTrajectory();
 
-  const PublishableTrajectory &computed_trajectory() const;
+  const PublishableTrajectory &ComputedTrajectory() const;
 
   const routing::RoutingResponse &routing_response() const;
 
   void RecordInputDebug();
 
   std::vector<ReferenceLineInfo> &reference_line_info();
-  const std::vector<ReferenceLineInfo> &reference_line_info() const;
 
   bool AddObstacle(std::unique_ptr<Obstacle> obstacle);
   const Obstacle *FindObstacle(const std::string &obstacle_id);
@@ -88,13 +86,13 @@ class Frame {
    * @brief This is the function that can create one reference lines
    * from routing result.
    * In current implementation, only one reference line will be returned.
-   * But this is in sufficient when multiple driving options exist.
+   * But this is insufficient when multiple driving options exist.
    *
    * TODO create multiple reference_lines from this function.
    */
-  bool CreateReferenceLineFromRouting(
-      const common::PointENU &position, const routing::RoutingResponse &routing,
-      std::vector<ReferenceLine> *reference_lines);
+  std::vector<ReferenceLine> CreateReferenceLineFromRouting(
+      const common::PointENU &position,
+      const routing::RoutingResponse &routing);
 
   /**
    * @brief create obstacles from prediction input.

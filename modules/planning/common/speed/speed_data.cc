@@ -37,8 +37,8 @@ SpeedData::SpeedData(std::vector<common::SpeedPoint> speed_points)
     : speed_vector_(std::move(speed_points)) {}
 
 void SpeedData::AppendSpeedPoint(const double s, const double time,
-                                const double v, const double a,
-                                const double da) {
+                                 const double v, const double a,
+                                 const double da) {
   if (!speed_vector_.empty()) {
     CHECK(speed_vector_.back().t() < time);
   }
