@@ -167,11 +167,14 @@ function release() {
   # modules
   MODULES_DIR=$ROOT_DIR/modules
   mkdir -p $MODULES_DIR
-  for m in control canbus localization decision perception prediction planning routing
+  for m in control canbus localization decision perception \
+       prediction planning routing calibration
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
-    cp bazel-bin/modules/$m/$m $TARGET_DIR
+     if [ -e bazel-bin/modules/$m/$m ]; then
+         cp bazel-bin/modules/$m/$m $TARGET_DIR
+     fi
     if [ -d modules/$m/conf ];then
         cp -r modules/$m/conf $TARGET_DIR
     fi
