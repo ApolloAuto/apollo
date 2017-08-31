@@ -102,6 +102,7 @@ void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {
   origin->mutable_header()->clear_lidar_timestamp();
   origin->mutable_header()->clear_timestamp_sec();
   origin->mutable_header()->clear_camera_timestamp();
+  origin->mutable_header()->clear_sequence_num();
 }
 
 bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
@@ -129,6 +130,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
     ADCTrajectory golden_result;
     bool load_success = ::apollo::common::util::GetProtoFromASCIIFile(
         full_golden_path, &golden_result);
+    TrimPlanning(&golden_result);
     if (!load_success ||
         !::apollo::common::util::IsProtoEqual(golden_result, adc_trajectory_)) {
       char tmp_fname[100] = "/tmp/XXXXXX";
