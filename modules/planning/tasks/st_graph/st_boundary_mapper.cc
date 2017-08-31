@@ -167,6 +167,7 @@ Status StBoundaryMapper::GetGraphBoundary(
   for (const auto& st_boundary : *st_boundaries) {
     DCHECK_NE(st_boundary.id().length(), 0);
   }
+
   return Status::OK();
 }
 
@@ -285,6 +286,12 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       int64_t high = path_points.size() - 1;
       bool find_low = false;
       bool find_high = false;
+
+      double low_s = path_points[low].s();
+      double high_s = path_points[high].s();
+      const double kBoundaryMapperDeltaS = 1.0;
+      const double kBoundaryMapperReferenceS = 10.0;
+
       while (low < high) {
         if (find_low && find_high) {
           break;
@@ -293,6 +300,13 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
           if (!CheckOverlap(path_points[low], obs_box,
                             st_boundary_config_.boundary_buffer())) {
             ++low;
+            while (low < high &&
+                   path_points[low].s() - low_s <
+                       kBoundaryMapperDeltaS * path_points[low].s() /
+                           kBoundaryMapperReferenceS) {
+              ++low;
+            }
+            low_s = path_points[low].s();
           } else {
             find_low = true;
           }
@@ -301,6 +315,13 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
           if (!CheckOverlap(path_points[high], obs_box,
                             st_boundary_config_.boundary_buffer())) {
             --high;
+            while (low < high &&
+                   high_s - path_points[high].s() <
+                       kBoundaryMapperDeltaS * kBoundaryMapperDeltaS *
+                           path_points[high].s() / kBoundaryMapperReferenceS) {
+              --high;
+            }
+            high_s = path_points[high].s();
           } else {
             find_high = true;
           }
