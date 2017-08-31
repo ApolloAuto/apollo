@@ -9,10 +9,10 @@ export default class Scene extends React.Component {
                 this.props.options);
     }
 
-    componentWillUpdate() {
+    componentWillUpdate(nextProps) {
         // The dimension of the renderer should always be consistent with
         // the dimension of this component.
-        RENDERER.updateDimension(this.props.width, this.props.height);
+        RENDERER.updateDimension(nextProps.width, nextProps.height);
     }
 
     render() {
