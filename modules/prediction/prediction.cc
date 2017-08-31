@@ -108,7 +108,7 @@ void Prediction::OnLocalization(const LocalizationEstimate &localization) {
   } else {
     ADEBUG << "Invalid pose found.";
   }
-  
+
   ADEBUG << "Received a localization message ["
          << localization.ShortDebugString() << "].";
 }

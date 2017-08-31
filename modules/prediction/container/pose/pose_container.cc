@@ -65,7 +65,7 @@ void PoseContainer::Update(
   obstacle_ptr_->mutable_velocity()->CopyFrom(velocity);
 
   obstacle_ptr_->set_type(type_);
-  obstacle_ptr_->set_timestamp(localization.measurement_time());
+  obstacle_ptr_->set_timestamp(localization.header().timestamp_sec());
 
   ADEBUG << "ADC obstacle [" << obstacle_ptr_->ShortDebugString() << "].";
 }
