@@ -116,7 +116,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   const ADCTrajectory* trajectory_pointer =
       AdapterManager::GetPlanning()->GetLatestPublished();
 
-  if (!trajectory_pointer) {
+  if (!trajectory_pointer || trajectory_pointer->trajectory_point().empty()) {
     AERROR << " did not get latest adc trajectory";
     return false;
   }

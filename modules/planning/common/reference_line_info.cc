@@ -63,11 +63,10 @@ bool ReferenceLineInfo::Init() {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
   }
-  if (!FLAGS_enable_smooth_reference_line) {
-    if (!CalculateAdcSmoothReferenLinePoint()) {
-      AERROR << "Fail to get ADC smooth reference line point.";
-      return false;
-    }
+  if (!FLAGS_enable_smooth_reference_line &&
+      !CalculateAdcSmoothReferenLinePoint()) {
+    AERROR << "Fail to get ADC smooth reference line point.";
+    return false;
   }
   return true;
 }
