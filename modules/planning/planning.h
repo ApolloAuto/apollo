@@ -75,13 +75,14 @@ class Planning : public apollo::common::ApolloApp {
    * @brief Plan the trajectory given current vehicle state
    * @param is_on_auto_mode whether the current system is on auto-driving mode
    */
-  common::Status Plan(const bool is_on_auto_mode,
-                      const double current_time_stamp,
-                      const double planning_cycle_time);
+  common::Status Plan(
+      const double current_time_stamp,
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory);
 
   void RunOnce();
 
-  bool InitFrame(const uint32_t sequence_num);
+  bool InitFrame(const uint32_t sequence_num,
+                 const common::TrajectoryPoint& init_adc_point);
 
  private:
   void PublishPlanningPb(ADCTrajectory* trajectory_pb);
