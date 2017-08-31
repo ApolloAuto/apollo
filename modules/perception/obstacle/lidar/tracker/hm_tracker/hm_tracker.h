@@ -26,6 +26,7 @@
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/base_matcher.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/object_track.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
+#include "modules/perception/obstacle/onboard/hdmap_input.h"
 
 namespace apollo {
 namespace perception {
@@ -91,7 +92,8 @@ class HmObjectTracker : public BaseTracker{
   // @return nothing
   void ConstructTrackedObjects(const std::vector<ObjectPtr>& objects,
                                std::vector<TrackedObjectPtr>* tracked_objects,
-                               const Eigen::Matrix4d& pose);
+                               const Eigen::Matrix4d& pose,
+                               const TrackerOptions& options);
 
   // @brief compute objects' shape feature
   // @params[IN] object: object for computing shape feature

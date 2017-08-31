@@ -51,6 +51,7 @@ struct TrackedObject {
   Eigen::Vector3f center;
   Eigen::Vector3f size;
   Eigen::Vector3f direction;
+  Eigen::Vector3f lane_direction;
 
   // states
   Eigen::Vector3f anchor_point;

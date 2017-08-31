@@ -233,7 +233,8 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
 
   // 1.2 construct objects for tracking
   std::vector<TrackedObjectPtr> transformed_objects;
-  ConstructTrackedObjects(objects, &transformed_objects, velo2world_pose);
+  ConstructTrackedObjects(objects, &transformed_objects, velo2world_pose,
+                          options);
 
   // 1.3 decompose foreground & background
   std::vector<TrackedObjectPtr> foreground_objects;
@@ -313,7 +314,8 @@ bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
 
   // 1.2 construct tracked objects
   std::vector<TrackedObjectPtr> transformed_objects;
-  ConstructTrackedObjects(objects, &transformed_objects, velo2world_pose);
+  ConstructTrackedObjects(objects, &transformed_objects, velo2world_pose,
+                          options);
 
   // 1.3 decompose foreground & background
   std::vector<TrackedObjectPtr> foreground_objects;
@@ -357,9 +359,10 @@ void HmObjectTracker::TransformPoseGlobal2Local(Eigen::Matrix4d* pose) {
 void HmObjectTracker::ConstructTrackedObjects(
   const std::vector<ObjectPtr>& objects,
   std::vector<TrackedObjectPtr>* tracked_objects,
-  const Eigen::Matrix4d& pose) {
-  // Construct tracked objects via necessary transformation & feature
-  // computing
+  const Eigen::Matrix4d& pose,
+  const TrackerOptions& options) {
+  // Construct tracked objects. Help tracked objects with necessary
+  // transformation & feature extraction & lane direction query
   int num_objects = objects.size();
   tracked_objects->clear();
   tracked_objects->resize(num_objects);
@@ -367,14 +370,27 @@ void HmObjectTracker::ConstructTrackedObjects(
     ObjectPtr obj(new Object());
     obj->clone(*objects[i]);
     (*tracked_objects)[i].reset(new TrackedObject(obj));
-    // compute foreground objects' shape feature
+    // Computing shape featrue for foreground objects
     if (!obj->is_background && use_histogram_for_match_) {
       ComputeShapeFeatures(&((*tracked_objects)[i]));
     }
-    // transform all objects' coordinates
+    // Transforming all tracked objects
     TransformTrackedObject(&((*tracked_objects)[i]), pose);
-    // set barycenter as objects' anchor point
-    (*tracked_objects)[i]->anchor_point = (*tracked_objects)[i]->barycenter;
+    // Setting barycenter as anchor point of tracked objects
+    Eigen::Vector3f anchor_point = (*tracked_objects)[i]->barycenter;
+    (*tracked_objects)[i]->anchor_point = anchor_point;
+    // Getting lane direction of tracked objects
+    pcl_util::PointD query_pt;
+    query_pt.x = anchor_point(0) - global_to_local_offset_(0);
+    query_pt.y = anchor_point(1) - global_to_local_offset_(1);
+    query_pt.z = anchor_point(2) - global_to_local_offset_(2);
+    Eigen::Vector3d lane_dir;
+    if (!options.hdmap_input->GetNearestLaneDirection(query_pt, &lane_dir)) {
+      AERROR << "Failed to initialize the lane direction of tracked object";
+      // Set lane dir as host dir if query lane direction failed
+      lane_dir = (pose * Eigen::Vector4d(1, 0, 0, 0)).head(3);
+    }
+    (*tracked_objects)[i]->lane_direction = lane_dir.cast<float>();
   }
 }
 

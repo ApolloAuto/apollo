@@ -25,14 +25,17 @@ TrackedObject::TrackedObject() {
 
 TrackedObject::TrackedObject(ObjectPtr obj_ptr) : object_ptr(obj_ptr) {
   if (object_ptr != nullptr) {
-    center = object_ptr->center.cast<float>();
-    direction = object_ptr->direction.cast<float>();
-    size = Eigen::Vector3f(object_ptr->length, object_ptr->width,
-      object_ptr->height);
-    type = object_ptr->type;
     barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
       object_ptr->cloud).cast<float>();
+    center = object_ptr->center.cast<float>();
+    size = Eigen::Vector3f(object_ptr->length, object_ptr->width,
+      object_ptr->height);
+    direction = object_ptr->direction.cast<float>();
+    lane_direction = Eigen::Vector3f::Zero();
     anchor_point = barycenter;
+    velocity = Eigen::Vector3f::Zero();
+    acceleration = Eigen::Vector3f::Zero();
+    type = object_ptr->type;
   }
 }
 
@@ -40,6 +43,7 @@ TrackedObject::TrackedObject(const TrackedObject& rhs) {
   object_ptr = rhs.object_ptr;
   center = rhs.center;
   direction = rhs.direction;
+  lane_direction = rhs.lane_direction;
   size = rhs.size;
   type = rhs.type;
   barycenter = rhs.barycenter;
@@ -58,6 +62,7 @@ TrackedObject& TrackedObject::operator = (const TrackedObject& rhs) {
   object_ptr = rhs.object_ptr;
   center = rhs.center;
   direction = rhs.direction;
+  lane_direction = rhs.lane_direction;
   size = rhs.size;
   type = rhs.type;
   barycenter = rhs.barycenter;
@@ -79,6 +84,7 @@ void TrackedObject::clone(const TrackedObject& rhs) {
 
   center = rhs.center;
   direction = rhs.direction;
+  lane_direction = rhs.lane_direction;
   size = rhs.size;
   type = rhs.type;
   barycenter = rhs.barycenter;

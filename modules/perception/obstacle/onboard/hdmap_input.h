@@ -42,6 +42,10 @@ class HDMapInput {
   //         all points are in the world frame
   bool GetROI(const pcl_util::PointD& pointd, HdmapStructPtr* mapptr);
 
+  // @brief: get nearest lane direction
+  bool GetNearestLaneDirection(const pcl_util::PointD& pointd,
+                               Eigen::Vector3d* lane_direction);
+
  private:
   void DownSampleBoundary(const apollo::hdmap::LineSegment& line,
                           PolygonDType* out_boundary_line) const;
