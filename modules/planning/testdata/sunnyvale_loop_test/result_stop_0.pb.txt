@@ -1,0 +1,10 @@
+header {
+  module_name: "planning"
+  sequence_num: 2
+  status {
+    error_code: PLANNING_ERROR
+    msg: "QpSplineStSpeedOptimizer:Failed to search graph with quadratic programming!"
+  }
+}
+is_replan: true
+gear: GEAR_DRIVE
