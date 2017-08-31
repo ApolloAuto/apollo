@@ -30,6 +30,8 @@ DEFINE_double(prediction_freq, 0.1, "Prediction frequency (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(max_prediction_length, 100.0,
     "Max length of prediction trajectory");
+DEFINE_double(min_prediction_length, 5.0,
+    "Max length of prediction trajectory");
 
 // Map
 DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");

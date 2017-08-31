@@ -878,10 +878,15 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
-
+  double speed = feature->speed();
+  double acc = feature->acc();
+  double road_graph_distance =
+      speed * FLAGS_prediction_duration +
+      0.5 * acc * FLAGS_prediction_duration * FLAGS_prediction_duration +
+      FLAGS_min_prediction_length;
   for (auto& lane : feature->lane().current_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane.lane_id());
-    RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
+    RoadGraph road_graph(lane.lane_s(), road_graph_distance, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
@@ -893,7 +898,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
   }
   for (auto& lane : feature->lane().nearby_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane.lane_id());
-    RoadGraph road_graph(lane.lane_s(), FLAGS_max_prediction_length, lane_info);
+    RoadGraph road_graph(lane.lane_s(), road_graph_distance, lane_info);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
