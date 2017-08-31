@@ -186,7 +186,7 @@ bool CameraLocalization::PublishLocalization() {
 
   // publish localization messages
   AdapterManager::PublishLocalization(localization);
-  AINFO << "[OnTimer]: Localization message publish success!";
+  ADEBUG << "[OnTimer]: Localization message publish success!";
   return true;
 }
 
