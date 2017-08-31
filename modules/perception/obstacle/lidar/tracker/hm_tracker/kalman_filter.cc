@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <algorithm>
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
@@ -97,13 +98,11 @@ void KalmanFilter::UpdateWithObject(const TrackedObjectPtr& new_object,
   const TrackedObjectPtr& old_object,
   const double time_diff) {
   if (time_diff <= DBL_EPSILON) {
-    AWARN << "time diff is too limited to updating";
+    AWARN << "Time diff is too limited to updating filter.";
     return;
   }
   // Compute update quality if needed
-  // Use adaptive filtering after first measurement could help filter
-  // converge more faster
-  if (s_use_adaptive_ && (age_ > 0)) {
+  if (s_use_adaptive_) {
     ComputeUpdateQuality(new_object, old_object);
   } else {
     update_quality_ = 1.0;
@@ -205,7 +204,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
   Eigen::Vector3f measured_bbox_center_velocity =
     measured_bbox_center_velocity_with_old_dir;
   Eigen::Vector3f project_dir = new_object->anchor_point -
-      old_object->anchor_point;
+    old_object->anchor_point;
   if (measured_bbox_center_velocity.dot(project_dir) <= 0) {
     measured_bbox_center_velocity = Eigen::Vector3f::Zero();
   }
@@ -362,22 +361,47 @@ void KalmanFilter::UpdateModel(const Eigen::VectorXf measured_anchor_point,
 void KalmanFilter::ComputeUpdateQuality(const TrackedObjectPtr& new_object,
   const TrackedObjectPtr& old_object) {
   // Compute update quality for adaptive filtering
-  // Strategy I: define update quality by use association score
-  ComputeUpdateQualityByAssociationScore(new_object);
+  // Strategy A: according to association score
+  float update_quality_according_association_score =
+    ComputeUpdateQualityAccordingAssociationScore(new_object);
+  // Strategy B: according to point number change
+  float update_quality_according_point_num_change =
+    ComputeUpdateQualityAccordingPointNumChange(new_object, old_object);
+  // Pick a smaller one to control possible filter distraction of noises
+  update_quality_ = update_quality_according_association_score;
+  if (update_quality_according_association_score >
+      update_quality_according_point_num_change) {
+    update_quality_ = update_quality_according_point_num_change;
+  }
 }
 
-void KalmanFilter::ComputeUpdateQualityByAssociationScore(
+float KalmanFilter::ComputeUpdateQualityAccordingAssociationScore(
   const TrackedObjectPtr& new_object) {
-  // Compute update quality by using association score
+  // Compute update quality according association score
   float association_score = new_object->association_score;
+  float update_quality = 1;
   if (s_max_adaptive_score_ == 0) {
-    update_quality_ = 1;
-    return;
+    return update_quality;
   }
-  double update_quality_ = 1 - (association_score / s_max_adaptive_score_);
-  update_quality_ = update_quality_ > 1 ? 1 : update_quality_;
-  update_quality_ = update_quality_ < 0 ? 0 : update_quality_;
-  update_quality_ = update_quality_ * update_quality_;
+  update_quality = 1 - (association_score / s_max_adaptive_score_);
+  update_quality = update_quality > 1 ? 1 : update_quality;
+  update_quality = update_quality < 0 ? 0 : update_quality;
+  update_quality = update_quality * update_quality;
+  return update_quality;
+}
+
+float KalmanFilter::ComputeUpdateQualityAccordingPointNumChange(
+  const TrackedObjectPtr& new_object,
+  const TrackedObjectPtr& old_object) {
+  // Compute updaet quality according point number change
+  int new_pt_num = new_object->object_ptr->cloud->size();
+  int old_pt_num = old_object->object_ptr->cloud->size();
+  if (new_pt_num <= 0 || old_pt_num <= 0) {
+    return 0;
+  }
+  float update_quality = 1 - fabs(new_pt_num - old_pt_num) /
+    std::max(new_pt_num, old_pt_num);
+  return update_quality;
 }
 
 float KalmanFilter::ComputeBreakdownThreshold() {
