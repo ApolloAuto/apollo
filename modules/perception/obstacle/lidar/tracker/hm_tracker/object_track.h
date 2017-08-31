@@ -139,7 +139,7 @@ class ObjectTrack {
   static int s_track_idx_;
   static const int s_max_cached_object_size_ = 20;
   static constexpr double s_claping_speed_threshold_ = 0.4;
-  static constexpr double s_claping_accelaration_threshold_ = 10;
+  static constexpr double s_claping_accelaration_threshold_ = 5;
 
   DISALLOW_COPY_AND_ASSIGN(ObjectTrack);
 };  // class ObjectTrack
