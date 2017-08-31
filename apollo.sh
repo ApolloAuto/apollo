@@ -482,10 +482,6 @@ function print_usage() {
   "
 }
 
-function cleanup() {
-    sed -i '$ d' tools/bazel.rc
-}
-
 function main() {
   source_apollo_base
   apollo_check_system_config
@@ -494,7 +490,6 @@ function main() {
   link_cpu_caffe_build
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
-  echo "startup --output_base=${HOME}/.cache/bazel/_bazel_${USER}/apollo_build" >> tools/bazel.rc
 
   case $1 in
     check)
@@ -565,5 +560,4 @@ function main() {
   esac
 }
 
-trap cleanup EXIT
 main $@
