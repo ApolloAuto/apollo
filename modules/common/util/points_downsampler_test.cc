@@ -43,9 +43,7 @@ TEST(DownSamplerTest, DownsampleByAngle) {
   points.emplace_back(-367.583, 10.4028);
   points.emplace_back(-363.025, 27.4212);
 
-  std::vector<int> sampled_indices;
-
-  EXPECT_TRUE(DownsampleByAngle(points, 0.1, &sampled_indices));
+  std::vector<int> sampled_indices = DownsampleByAngle(points, 0.1);
   EXPECT_EQ(2, sampled_indices.size());
   EXPECT_EQ(0, sampled_indices[0]);
   EXPECT_EQ(12, sampled_indices[1]);
@@ -60,9 +58,7 @@ TEST(DownSamplerTest, DownsampleByDistanceNormal) {
   points.emplace_back(0, 16);
   points.emplace_back(0, 20);
 
-  std::vector<int> sampled_indices;
-
-  DownsampleByDistance(points, 5, 1, &sampled_indices);
+  std::vector<int> sampled_indices = DownsampleByDistance(points, 5, 1);
   EXPECT_EQ(4, sampled_indices.size());
   EXPECT_EQ(0, sampled_indices[0]);
   EXPECT_EQ(2, sampled_indices[1]);
@@ -78,9 +74,7 @@ TEST(DownSamplerTest, DownsampleByDistanceSteepTurn) {
   points.emplace_back(1, 1);
   points.emplace_back(2, 0);
 
-  std::vector<int> sampled_indices;
-
-  DownsampleByDistance(points, 5, 1, &sampled_indices);
+  std::vector<int> sampled_indices = DownsampleByDistance(points, 5, 1);
   EXPECT_EQ(5, sampled_indices.size());
   EXPECT_EQ(0, sampled_indices[0]);
   EXPECT_EQ(1, sampled_indices[1]);

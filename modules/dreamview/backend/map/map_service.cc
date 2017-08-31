@@ -241,9 +241,9 @@ bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
     return false;
   }
 
-  std::vector<int> sampled_indices;
   constexpr double angle_threshold = 0.1;  // threshold is about 5.72 degree.
-  DownsampleByAngle(path.path_points(), angle_threshold, &sampled_indices);
+  std::vector<int> sampled_indices = DownsampleByAngle(path.path_points(),
+                                                       angle_threshold);
   for (int index : sampled_indices) {
     points->push_back(path.path_points()[index]);
   }
