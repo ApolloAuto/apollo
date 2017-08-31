@@ -53,7 +53,8 @@ TEST_F(PlanningTest, ComputeTrajectory) {
 
   ADCTrajectory trajectory1;
   planning.Init();
-  planning.InitFrame(1);
+  common::TrajectoryPoint init_adc_point;
+  planning.InitFrame(1, init_adc_point);
   /**
   double time1 = 0.1;
   planning.Plan(false, time1, &trajectory1);
@@ -98,7 +99,9 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
   FLAGS_rtk_trajectory_filename = "";
   Planning planning;
   planning.Init();
-  planning.InitFrame(1);
+
+  common::TrajectoryPoint init_adc_point;
+  planning.InitFrame(1, init_adc_point);
 
   common::VehicleState::instance()->set_x(586385.782841);
   common::VehicleState::instance()->set_y(4140674.76065);
