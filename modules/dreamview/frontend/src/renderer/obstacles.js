@@ -110,7 +110,10 @@ export default class PerceptionObstacles {
             return;
         }
         text.position.set(position.x, position.y, position.z || 3);
-        text.quaternion.copy(scene.getObjectByName("camera").quaternion);
+        const camera = scene.getObjectByName("camera");
+        if (camera !== undefined) {
+            text.quaternion.copy(camera.quaternion);
+        }
         text.children.forEach(c => c.visible = true);
         text.visible = true;
         text.name = "id_" + id;
