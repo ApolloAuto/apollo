@@ -880,6 +880,10 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
   PredictionMap* map = PredictionMap::instance();
   double speed = feature->speed();
   double acc = feature->acc();
+  if (FLAGS_enable_kf_tracking) {
+    speed = feature->t_speed();
+    acc = feature->t_acc();
+  }
   double road_graph_distance =
       speed * FLAGS_prediction_duration +
       0.5 * acc * FLAGS_prediction_duration * FLAGS_prediction_duration +
