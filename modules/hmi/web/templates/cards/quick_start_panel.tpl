@@ -3,7 +3,7 @@
     .quick_start_body {
       overflow: auto;
       background: #03223e;
-      margin-bottom: 20px;
+      padding-bottom: 20px;
     }
 
     .quick_start_body .info_window {
@@ -28,7 +28,7 @@
     }
 
     .hmi_large_btn, .hmi_large_btn:hover, .hmi_large_btn:focus {
-      width: 100%;
+      width: 96%;
       height: 40px;
       background: #2284d0;
       border-radius: 0;
@@ -51,7 +51,7 @@
 
     .quick_start_col1 {
       padding-left: 0;
-      padding-right: 13px;
+      padding-right: 14px;
       text-align: center;
     }
 
@@ -62,7 +62,7 @@
     }
 
     .quick_start_col3 {
-      padding-left: 13px;
+      padding-left: 14px;
       padding-right: 0;
       text-align: center;
     }
