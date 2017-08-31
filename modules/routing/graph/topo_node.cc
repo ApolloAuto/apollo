@@ -16,31 +16,140 @@
 
 #include "modules/routing/graph/topo_node.h"
 
-#include <math.h>
+#include <algorithm>
+#include <cmath>
+#include <utility>
+
+#include "modules/routing/graph/range_utils.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace routing {
 
+namespace {
+
+const double MIN_INTERNAL_FOR_NODE = 0.01;  // in meter
+
+using ::google::protobuf::RepeatedPtrField;
+
+void ConvertOutRange(const RepeatedPtrField<CurveRange>& range_vec,
+                     double start_s,
+                     double end_s,
+                     std::vector<NodeSRange>* out_range,
+                     int* prefer_index) {
+  out_range->clear();
+  double s_s = 0.0;
+  double e_s = 0.0;
+  for (const auto& c_range : range_vec) {
+    s_s = c_range.start().s();
+    e_s = c_range.end().s();
+    if (e_s < start_s || s_s > end_s || e_s < s_s) {
+      continue;
+    }
+    s_s = std::max(start_s, s_s);
+    e_s = std::min(end_s, e_s);
+    NodeSRange s_range(s_s, e_s);
+    out_range->push_back(std::move(s_range));
+  }
+  sort(out_range->begin(), out_range->end());
+  int max_index = -1;
+  double max_diff = 0.0;
+  for (size_t i = 0; i < out_range->size(); ++i) {
+    if (out_range->at(i).Length() > max_diff) {
+      max_index = i;
+      max_diff = out_range->at(i).Length();
+    }
+  }
+  *prefer_index = max_index;
+}
+
+}  // namespace
+
+bool TopoNode::IsOutRangeEnough(const std::vector<NodeSRange>& range_vec,
+                                double start_s,
+                                double end_s) {
+  if (!NodeSRange::IsEnoughForChangeLane(start_s, end_s)) {
+    return false;
+  }
+  int start_index = BinarySearchForSLarger(range_vec, start_s);
+  int end_index = BinarySearchForSSmaller(range_vec, end_s);
+
+  int index_diff = end_index - start_index;
+  if (start_index < 0 || end_index < 0) {
+    return false;
+  }
+  if (index_diff > 1) {
+    return true;
+  }
+
+  double pre_s_s = std::max(start_s, range_vec[start_index].StartS());
+  double suc_e_s = std::min(end_s, range_vec[end_index].EndS());
+
+  if (index_diff == 1) {
+    double dlt = range_vec[start_index].EndS() - pre_s_s;
+    dlt += suc_e_s - range_vec[end_index].StartS();
+    return NodeSRange::IsEnoughForChangeLane(dlt);
+  }
+  if (index_diff == 0) {
+    return NodeSRange::IsEnoughForChangeLane(pre_s_s, suc_e_s);
+  }
+  return false;
+}
+
 TopoNode::TopoNode(const Node& node)
     : pb_node_(node), start_s_(0.0), end_s_(pb_node_.length()) {
-  int total_size = 0;
-  for (const auto& seg : CentralCurve().segment()) {
-    total_size += seg.line_segment().point_size();
-  }
-  int half_size = total_size / 2;
-  for (const auto& seg : CentralCurve().segment()) {
-    if (half_size < seg.line_segment().point_size()) {
-      anchor_point_ = seg.line_segment().point(half_size);
-      break;
-    }
-    half_size -= seg.line_segment().point_size();
-  }
+  Init();
   origin_node_ = this;
 }
 
-TopoNode::TopoNode(const TopoNode* topo_node) : TopoNode(topo_node->PbNode()) {}
+TopoNode::TopoNode(const TopoNode* topo_node, const NodeSRange& range)
+    : TopoNode(topo_node->PbNode()) {
+  origin_node_ = topo_node;
+  start_s_ = range.StartS();
+  end_s_ = range.EndS();
+  Init();
+}
 
 TopoNode::~TopoNode() {}
+
+void TopoNode::Init() {
+  if (!FindAnchorPoint()) {
+    AWARN << "Be attention!!! Find anchor point failed for lane: " << LaneId();
+  }
+  ConvertOutRange(pb_node_.left_out(), start_s_, end_s_,
+                  &left_out_sorted_range_, &left_prefer_range_index_);
+
+  is_left_range_enough_ = (left_prefer_range_index_ >= 0) &&
+      left_out_sorted_range_[left_prefer_range_index_].IsEnoughForChangeLane();
+
+  ConvertOutRange(pb_node_.right_out(), start_s_, end_s_,
+                  &right_out_sorted_range_, &right_prefer_range_index_);
+  is_right_range_enough_ = (right_prefer_range_index_ >= 0) &&
+      right_out_sorted_range_[right_prefer_range_index_]
+        .IsEnoughForChangeLane();
+}
+
+bool TopoNode::FindAnchorPoint() {
+  double total_size = 0;
+  for (const auto& seg : CentralCurve().segment()) {
+    total_size += seg.line_segment().point_size();
+  }
+  double rate = (StartS() + EndS()) / 2.0 / Length();
+  int anchor_index = static_cast<int>(total_size * rate);
+  for (const auto& seg : CentralCurve().segment()) {
+    if (anchor_index < seg.line_segment().point_size()) {
+      SetAnchorPoint(seg.line_segment().point(anchor_index));
+      return true;
+    }
+    anchor_index -= seg.line_segment().point_size();
+  }
+  return false;
+}
+
+void TopoNode::SetAnchorPoint(
+    const ::apollo::common::PointENU& anchor_point) {
+  anchor_point_ = anchor_point;
+}
 
 const Node& TopoNode::PbNode() const { return pb_node_; }
 
@@ -60,6 +169,14 @@ const ::apollo::hdmap::Curve& TopoNode::CentralCurve() const {
 
 const ::apollo::common::PointENU& TopoNode::AnchorPoint() const {
   return anchor_point_;
+}
+
+const std::vector<NodeSRange>& TopoNode::LeftOutRange() const {
+  return left_out_sorted_range_;
+}
+
+const std::vector<NodeSRange>& TopoNode::RightOutRange() const {
+  return right_out_sorted_range_;
 }
 
 const std::unordered_set<const TopoEdge*>& TopoNode::InFromAllEdge() const {
@@ -96,8 +213,8 @@ const std::unordered_set<const TopoEdge*>& TopoNode::OutToRightEdge() const {
   return out_to_right_edge_set_;
 }
 
-const std::unordered_set<const TopoEdge*>& TopoNode::OutToLeftOrRightEdge()
-    const {
+const std::unordered_set<const TopoEdge*>&
+TopoNode::OutToLeftOrRightEdge() const {
   return out_to_left_or_right_edge_set_;
 }
 
@@ -128,6 +245,26 @@ double TopoNode::StartS() const { return start_s_; }
 double TopoNode::EndS() const { return end_s_; }
 
 bool TopoNode::IsSubNode() const { return OriginNode() != this; }
+
+bool TopoNode::IsOverlapEnough(const TopoNode* sub_node,
+                               const TopoEdge* edge_for_type) const {
+  if (edge_for_type->Type() == TET_LEFT) {
+    return (is_left_range_enough_ &&
+            IsOutRangeEnough(left_out_sorted_range_,
+                             sub_node->StartS(),
+                             sub_node->EndS()));
+  }
+  if (edge_for_type->Type() == TET_RIGHT) {
+    return (is_right_range_enough_ &&
+            IsOutRangeEnough(right_out_sorted_range_,
+                             sub_node->StartS(),
+                             sub_node->EndS()));
+  }
+  if (edge_for_type->Type() == TET_FORWARD) {
+    return IsOutToSucEdgeValid() && sub_node->IsInFromPreEdgeValid();
+  }
+  return true;
+}
 
 void TopoNode::AddInEdge(const TopoEdge* edge) {
   if (edge->ToNode() != this) {
@@ -177,13 +314,14 @@ void TopoNode::AddOutEdge(const TopoEdge* edge) {
   out_edge_map_[edge->ToNode()] = edge;
 }
 
-void TopoNode::SetOriginNode(const TopoNode* origin_node) {
-  origin_node_ = origin_node;
+bool TopoNode::IsInFromPreEdgeValid() const {
+  return std::fabs(StartS() - OriginNode()->StartS()) < MIN_INTERNAL_FOR_NODE;
 }
 
-void TopoNode::SetStartS(double start_s) { start_s_ = start_s; }
+bool TopoNode::IsOutToSucEdgeValid() const {
+  return std::fabs(EndS() - OriginNode()->EndS()) < MIN_INTERNAL_FOR_NODE;
+}
 
-void TopoNode::SetEndS(double end_s) { end_s_ = end_s; }
 
 TopoEdge::TopoEdge(const Edge& edge,
                    const TopoNode* from_node, const TopoNode* to_node)

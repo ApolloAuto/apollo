@@ -17,45 +17,85 @@
 #include <string>
 
 #include "gtest/gtest.h"
-#include "modules/routing/graph/topo_graph.h"
-#include "modules/routing/graph/topo_node.h"
+
+#include "modules/routing/graph/topo_test_utils.h"
 
 namespace apollo {
 namespace routing {
 
-const std::string TEST_L1 = "L1";
-const std::string TEST_L2 = "L2";
-const std::string TEST_R1 = "R1";
-const std::string TEST_R2 = "R2";
+namespace {
 
-const double TEST_LANE_LENGTH = 100.0;
-const double TEST_LANE_COST = 1.1;
-const double TEST_EDGE_COST = 2.2;
+void GetRangeVec(std::vector<NodeSRange>* range_vec) {
+  double s_s_1 = 1.0;
+  double e_s_1 = 12.0;
+  double s_s_2 = 15.0;
+  double e_s_2 = 27.0;
+  double s_s_3 = 30.0;
+  double e_s_3 = 45.1;
+  double s_s_4 = 55.5;
+  double e_s_4 = 70.0;
 
-const double TEST_START_S = 0.0;
-const double TEST_END_S = TEST_LANE_LENGTH;
+  range_vec->push_back(NodeSRange(s_s_2, e_s_2));
+  range_vec->push_back(NodeSRange(s_s_4, e_s_4));
+  range_vec->push_back(NodeSRange(s_s_1, e_s_1));
+  range_vec->push_back(NodeSRange(s_s_3, e_s_3));
 
-void GetNodeForTest(Node* const node,
-                    const std::string& lane_id, const std::string& road_id) {
-  node->set_lane_id(lane_id);
-  node->set_length(TEST_LANE_LENGTH);
-  node->set_road_id(road_id);
-  node->set_cost(TEST_LANE_COST);
-  auto* left_out = node->add_left_out();
-  left_out->mutable_start()->set_s(TEST_START_S);
-  left_out->mutable_end()->set_s(TEST_END_S);
-  auto* right_out = node->add_right_out();
-  right_out->mutable_start()->set_s(TEST_START_S);
-  right_out->mutable_end()->set_s(TEST_END_S);
+  sort(range_vec->begin(), range_vec->end());
+
+  ASSERT_DOUBLE_EQ(s_s_1, range_vec->at(0).StartS());
+  ASSERT_DOUBLE_EQ(e_s_1, range_vec->at(0).EndS());
+  ASSERT_DOUBLE_EQ(s_s_2, range_vec->at(1).StartS());
+  ASSERT_DOUBLE_EQ(e_s_2, range_vec->at(1).EndS());
+  ASSERT_DOUBLE_EQ(s_s_3, range_vec->at(2).StartS());
+  ASSERT_DOUBLE_EQ(e_s_3, range_vec->at(2).EndS());
+  ASSERT_DOUBLE_EQ(s_s_4, range_vec->at(3).StartS());
+  ASSERT_DOUBLE_EQ(e_s_4, range_vec->at(3).EndS());
 }
 
-void GetEdgeForTest(Edge* const edge,
-                    const std::string& lane_id_1, const std::string& lane_id_2,
-                    const Edge::DirectionType& type) {
-  edge->set_from_lane_id(lane_id_1);
-  edge->set_to_lane_id(lane_id_2);
-  edge->set_cost(TEST_EDGE_COST);
-  edge->set_direction_type(type);
+}  // namespace
+
+TEST(TopoNodeTestSuit, static_func_test) {
+  std::vector<NodeSRange> range_vec;
+  GetRangeVec(&range_vec);
+  {
+      double start_s = 13.0;
+      double end_s = 26.0;
+      ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+  }
+  {
+      double start_s = 13.0;
+      double end_s = 23.0;
+      ASSERT_FALSE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+  }
+  {
+      double start_s = 22.0;
+      double end_s = 32.0;
+      ASSERT_FALSE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+  }
+  {
+      double start_s = 31.0;
+      double end_s = 44.0;
+      ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+  }
+  {
+      double start_s = -10;
+      double end_s = 100;
+      ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+  }
+}
+
+TEST(TopoNodeTestSuit, basic_test) {
+  Node node;
+  GetNodeDetailForTest(&node, TEST_L1, TEST_R1);
+  TopoNode topo_node(node);
+  ASSERT_EQ(node.DebugString(), topo_node.PbNode().DebugString());
+  ASSERT_EQ(TEST_L1, topo_node.LaneId());
+  ASSERT_EQ(TEST_R1, topo_node.RoadId());
+  ASSERT_DOUBLE_EQ(TEST_MIDDLE_S, topo_node.AnchorPoint().x());
+  ASSERT_DOUBLE_EQ(0.0, topo_node.AnchorPoint().y());
+  ASSERT_DOUBLE_EQ(TEST_LANE_LENGTH, topo_node.Length());
+  ASSERT_DOUBLE_EQ(TEST_LANE_COST, topo_node.Cost());
+  ASSERT_TRUE(topo_node.IsVirtual());
 }
 
 TEST(TopoEdgeTestSuit, basic_test) {
@@ -85,3 +125,9 @@ TEST(TopoEdgeTestSuit, basic_test) {
 
 }  // namespace routing
 }  // namespace apollo
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
+

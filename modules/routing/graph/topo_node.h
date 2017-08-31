@@ -17,12 +17,14 @@
 #ifndef MODULES_ROUTING_GRAPH_TOPO_NODE_H
 #define MODULES_ROUTING_GRAPH_TOPO_NODE_H
 
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <string>
+#include <vector>
 
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/routing/proto/topo_graph.pb.h"
+#include "modules/routing/graph/topo_range.h"
 
 namespace apollo {
 namespace routing {
@@ -31,8 +33,13 @@ class TopoEdge;
 
 class TopoNode {
  public:
+  static bool IsOutRangeEnough(const std::vector<NodeSRange>& range_vec,
+                               double start_s,
+                               double end_s);
+
+ public:
   explicit TopoNode(const Node& node);
-  explicit TopoNode(const TopoNode* topo_node);
+  TopoNode(const TopoNode* topo_node, const NodeSRange& range);
 
   ~TopoNode();
 
@@ -45,6 +52,8 @@ class TopoNode {
   const std::string& RoadId() const;
   const ::apollo::hdmap::Curve& CentralCurve() const;
   const ::apollo::common::PointENU& AnchorPoint() const;
+  const std::vector<NodeSRange>& LeftOutRange() const;
+  const std::vector<NodeSRange>& RightOutRange() const;
 
   const std::unordered_set<const TopoEdge*>& InFromAllEdge() const;
   const std::unordered_set<const TopoEdge*>& InFromLeftEdge() const;
@@ -64,19 +73,30 @@ class TopoNode {
   double StartS() const;
   double EndS() const;
   bool IsSubNode() const;
-
+  bool IsInFromPreEdgeValid() const;
+  bool IsOutToSucEdgeValid() const;
+  bool IsOverlapEnough(const TopoNode* sub_node,
+                       const TopoEdge* edge_for_type) const;
   void AddInEdge(const TopoEdge* edge);
   void AddOutEdge(const TopoEdge* edge);
-  void SetOriginNode(const TopoNode* origin_node);
-  void SetStartS(double start_s);
-  void SetEndS(double end_s);
 
  private:
+  void Init();
+  bool FindAnchorPoint();
+  void SetAnchorPoint(const ::apollo::common::PointENU& anchor_point);
+
   Node pb_node_;
   ::apollo::common::PointENU anchor_point_;
 
   double start_s_;
   double end_s_;
+  bool is_left_range_enough_;
+  int left_prefer_range_index_;
+  bool is_right_range_enough_;
+  int right_prefer_range_index_;
+
+  std::vector<NodeSRange> left_out_sorted_range_;
+  std::vector<NodeSRange> right_out_sorted_range_;
 
   std::unordered_set<const TopoEdge*> in_from_all_edge_set_;
   std::unordered_set<const TopoEdge*> in_from_left_edge_set_;
@@ -103,7 +123,8 @@ enum TopoEdgeType {
 
 class TopoEdge {
  public:
-  TopoEdge(const Edge& edge, const TopoNode* from_node,
+  TopoEdge(const Edge& edge,
+           const TopoNode* from_node,
            const TopoNode* to_node);
 
   ~TopoEdge();

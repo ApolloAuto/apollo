@@ -14,26 +14,35 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
-#define MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
+#ifndef MODULES_ROUTING_GRAPH_NODE_WITH_RANGE_H
+#define MODULES_ROUTING_GRAPH_NODE_WITH_RANGE_H
 
-#include "gflags/gflags.h"
+#include <string>
 
-DECLARE_string(node_name);
-DECLARE_string(node_namespace);
+#include "modules/routing/graph/topo_range.h"
+#include "modules/routing/graph/topo_node.h"
 
-DECLARE_bool(use_road_id);
-DECLARE_double(min_length_for_lane_change);
+namespace apollo {
+namespace routing {
 
-DECLARE_bool(enable_debug_mode);
-DECLARE_string(debug_route_path);
-DECLARE_string(debug_passage_region_path);
+class NodeWithRange : public NodeSRange {
+ public:
+  NodeWithRange(const NodeSRange& range, const TopoNode* node);
+  ~NodeWithRange();
+  bool operator < (const NodeWithRange& other) const;
 
-DECLARE_double(base_speed);
-DECLARE_double(left_turn_penalty);
-DECLARE_double(right_turn_penalty);
-DECLARE_double(uturn_penalty);
-DECLARE_double(change_penalty);
-DECLARE_double(base_changing_length);
+  const TopoNode* GetTopoNode() const;
+  bool IsVirtual() const;
+  const std::string& RoadId() const;
+  const std::string& LaneId() const;
+  double FullLength() const;
 
-#endif  // MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
+ private:
+  const TopoNode* topo_node_;
+};
+
+}  // namespace routing
+}  // namespace apollo
+
+#endif  // MODULES_ROUTING_GRAPH_NODE_WITH_RANGE_H
+
