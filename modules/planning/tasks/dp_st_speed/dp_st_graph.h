@@ -41,10 +41,8 @@ namespace planning {
 
 class DpStGraph {
  public:
-  DpStGraph(const SLBoundary& adc_sl_boundary, const DpStSpeedConfig& dp_config,
-            const StGraphData& st_graph_data,
-            const common::VehicleParam& vehicle_param,
-            const PathData& path_data);
+  DpStGraph(const DpStSpeedConfig& dp_config, const StGraphData& st_graph_data,
+            const PathData& path_data, const SLBoundary& adc_sl_boundary);
 
   apollo::common::Status Search(PathDecision* const path_decision,
                                 SpeedData* const speed_data);
@@ -115,17 +113,17 @@ class DpStGraph {
                    uint32_t* highest_row, uint32_t* lowest_row);
 
  private:
-  const SLBoundary& adc_sl_boundary_;
-
   // dp st configuration
   DpStSpeedConfig dp_st_speed_config_;
 
   const StGraphData& st_graph_data_;
 
   // vehicle configuration parameter
-  const common::VehicleParam& vehicle_param_;
+  common::VehicleParam vehicle_param_;
 
   const PathData& path_data_;
+
+  const SLBoundary& adc_sl_boundary_;
 
   // cost utility with configuration;
   DpStCost dp_st_cost_;
