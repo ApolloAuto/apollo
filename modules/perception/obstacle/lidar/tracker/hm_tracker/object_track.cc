@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/object_track.h"
@@ -79,7 +81,9 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
   // of track !!!!!
-  obj->velocity = initial_velocity;
+  obj->velocity = belief_velocity_;
+  // Initialize object direction with its lane direction
+  obj->direction = obj->lane_direction;
 }
 
 ObjectTrack::~ObjectTrack() {
@@ -91,28 +95,16 @@ ObjectTrack::~ObjectTrack() {
 
 Eigen::VectorXf ObjectTrack::Predict(const double time_diff) {
   // Predict the state of track
-
-  /* Previously, we use the predict of filtering algorithm directly. However, it is hard to
-   * ensure that measurements are perfect all the time. To avoid bad estimation generated 
-   * from imperfect detection, we use filtering result as prior guidance, while some other
-   * post-processing may correct the state of track after filtering. 
-   * Thus, aftering predicting of filtering algorithm, we return predicts of states of track.
-   * NEED TO NOTICE: predicting is a very necessary part of filtering algorithm !!!!!
-   * */
-
   // Get the predict of filter
   Eigen::VectorXf filter_predict = filter_->Predict(time_diff);
-
   // Get the predict of track
   Eigen::VectorXf track_predict = filter_predict;
-
   track_predict(0) = belief_anchor_point_(0) + belief_velocity_(0) * time_diff;
   track_predict(1) = belief_anchor_point_(1) + belief_velocity_(1) * time_diff;
   track_predict(2) = belief_anchor_point_(2) + belief_velocity_(2) * time_diff;
   track_predict(3) = belief_velocity_(0);
   track_predict(4) = belief_velocity_(1);
   track_predict(5) = belief_velocity_(2);
-
   return track_predict;
 }
 
@@ -335,22 +327,12 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
 
 void ObjectTrack::SmoothTrackOrientation() {
   // Smooth orientation over track history
-  TrackedObjectPtr previous_object = history_objects_.back();
-  Eigen::Vector3f previous_dir = previous_object->direction;
   Eigen::Vector3f current_dir = current_object_->direction;
-  float previous_speed = previous_object->velocity.head(2).norm();
   float current_speed = current_object_->velocity.head(2).norm();
   if (current_speed > 1.0f) {
     current_dir = current_object_->velocity;
   } else {
-    ComputeMostConsistentBboxDirection(previous_dir, &current_dir);
-    float previous_weight = 1.0;
-    if (previous_speed + current_speed > FLT_EPSILON) {
-      previous_weight = (previous_speed + 1) /
-        (previous_speed + current_speed + 1);
-    }
-    current_dir = previous_weight * previous_dir +
-      (1 - previous_weight) * current_dir;
+    current_dir = current_object_->lane_direction;
   }
   current_dir(2) = 0;
   current_dir.normalize();

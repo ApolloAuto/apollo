@@ -31,6 +31,7 @@ cc_library(
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
+        "//modules/perception/obstacle/onboard:perception_obstacle_hdmapinput",
         "@eigen//:eigen",
         "@pcl//:pcl",
     ],

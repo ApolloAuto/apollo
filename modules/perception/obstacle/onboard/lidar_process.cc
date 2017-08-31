@@ -178,6 +178,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
     TrackerOptions tracker_options;
     tracker_options.velodyne_trans = velodyne_trans;
     tracker_options.hdmap = hdmap;
+    tracker_options.hdmap_input = hdmap_input_;
     if (!tracker_->Track(objects, timestamp, tracker_options, &objects_)) {
       AERROR << "failed to call tracker.";
       error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
