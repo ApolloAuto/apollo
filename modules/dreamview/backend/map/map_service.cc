@@ -233,6 +233,19 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
   return result;
 }
 
+bool MapService::GetNearestLane(const double x, const double y,
+                                LaneInfoConstPtr *nearest_lane,
+                                double *nearest_s, double *nearest_l) const {
+  PointENU point;
+  point.set_x(x);
+  point.set_y(y);
+  if (BaseMap().GetNearestLane(point, nearest_lane, nearest_s, nearest_l) < 0) {
+    AERROR << "Failed to get nearest lane!";
+    return false;
+  }
+  return true;
+}
+
 bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
                                       std::vector<MapPathPoint> *points) const {
   Path path;
@@ -253,13 +266,9 @@ bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
 
 bool MapService::GetPoseWithRegardToLane(const double x, const double y,
                                          double *theta, double *s) const {
-  apollo::common::PointENU point;
-  point.set_x(x);
-  point.set_y(y);
   double l;
   LaneInfoConstPtr nearest_lane;
-  if (BaseMap().GetNearestLane(point, &nearest_lane, s, &l) < 0) {
-    AERROR << "Failed to get nearest lane!";
+  if (!GetNearestLane(x, y, &nearest_lane, s, &l)) {
     return false;
   }
 
@@ -269,26 +278,33 @@ bool MapService::GetPoseWithRegardToLane(const double x, const double y,
 
 bool MapService::ConstructLaneWayPoint(
     const double x, const double y,
-    RoutingRequest::LaneWaypoint* laneWayPoint) const {
-
-  apollo::common::PointENU point;
-  point.set_x(x);
-  point.set_y(y);
-
+    RoutingRequest::LaneWaypoint *laneWayPoint) const {
   double s, l;
   LaneInfoConstPtr lane;
-  if (BaseMap().GetNearestLane(point, &lane, &s, &l) < 0) {
-    AERROR << "Failed to get nearest lane!";
+  if (!GetNearestLane(x, y, &lane, &s, &l)) {
     return false;
   }
 
   laneWayPoint->set_id(lane->id().id());
   laneWayPoint->set_s(s);
-  auto* pose = laneWayPoint->mutable_pose();
+  auto *pose = laneWayPoint->mutable_pose();
   pose->set_x(x);
   pose->set_y(y);
 
   return true;
 }
+
+bool MapService::GetStartPoint(apollo::common::PointENU *start_point) const {
+  // Start from origin to find a lane from the map.
+  double s, l;
+  LaneInfoConstPtr lane;
+  if (!GetNearestLane(0.0, 0.0, &lane, &s, &l)) {
+    return false;
+  }
+
+  *start_point = lane->GetSmoothPoint(0.0);
+  return true;
+}
+
 }  // namespace dreamview
 }  // namespace apollo
