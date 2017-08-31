@@ -22,7 +22,7 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20170825_1054-gpu-glut"
+VERSION_X86_64="dev-x86_64-20170830_1832-gpu-glut"
 VERSION_AARCH64="dev-aarch64-20170712_1533"
 if [[ $# == 1 ]];then
     VERSION=$1
