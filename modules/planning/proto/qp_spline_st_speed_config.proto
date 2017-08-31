@@ -21,6 +21,5 @@ message QpSplineStSpeedConfig {
   optional double max_speed = 14 [ default = 20.0 ];
   optional double max_acceleration = 15 [ default = 4.5 ];
   optional double max_deceleration = 16 [ default = -4.5 ];
-  optional double reference_line_kernel_weight = 17 [ deprecated = true ];
   optional apollo.planning.StBoundaryConfig st_boundary_config = 18;
 }
