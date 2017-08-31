@@ -51,7 +51,7 @@ void PoseContainerTest::InitPose(LocalizationEstimate *localization) {
       velocity_[0]);
   localization->mutable_pose()->mutable_linear_velocity()->set_y(
       velocity_[1]);
-  localization->set_measurement_time(timestamp_);
+  localization->mutable_header()->set_timestamp_sec(timestamp_);
 }
 
 TEST_F(PoseContainerTest, Insertion) {
