@@ -61,6 +61,7 @@
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/onboard/hdmap_input.h"
 
 namespace apollo {
 namespace perception {
@@ -71,6 +72,7 @@ struct TrackerOptions {
 
   std::shared_ptr<Eigen::Matrix4d> velodyne_trans;
   HdmapStructPtr hdmap = nullptr;
+  HDMapInput* hdmap_input = NULL;
 };
 
 class BaseTracker {

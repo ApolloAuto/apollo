@@ -85,6 +85,30 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
   return true;
 }
 
+bool HDMapInput::GetNearestLaneDirection(const pcl_util::PointD& pointd,
+                                         Eigen::Vector3d* lane_direction) {
+  auto* hdmap = HDMapUtil::BaseMapPtr();
+  if (hdmap == nullptr) {
+    return false;
+  }
+  apollo::common::PointENU point;
+  point.set_x(pointd.x);
+  point.set_y(pointd.y);
+  point.set_z(pointd.z);
+  apollo::hdmap::LaneInfoConstPtr nearest_lane;
+  double nearest_s;
+  double nearest_l;
+
+  int status = hdmap->GetNearestLane(point, &nearest_lane, &nearest_s, &nearest_l);
+  if (status != SUCC) {
+    AERROR << "Failed to get nearest lane for point " << point.DebugString();
+    return false;
+  }
+  double lane_heading = nearest_lane->Heading(nearest_s);
+  (*lane_direction) = Eigen::Vector3d(cos(lane_heading), sin(lane_heading), 0);
+  return true;
+}
+
 int HDMapInput::MergeBoundaryJunction(
     const std::vector<RoadROIBoundaryPtr>& boundaries,
     const std::vector<JunctionBoundaryPtr>& junctions,
