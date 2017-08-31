@@ -118,7 +118,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
       GenerateInitSpeedProfile(planning_start_point, reference_line_info);
   if (speed_profile.empty()) {
     speed_profile = GenerateSpeedHotStart(planning_start_point);
-    AINFO << "Using dummy hot start for speed vector";
+    ADEBUG << "Using dummy hot start for speed vector";
   }
   heuristic_speed_data->set_speed_vector(speed_profile);
 
@@ -170,11 +170,11 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
   const ReferenceLineInfo* last_reference_line_info =
       last_frame->DriveReferenceLinfInfo();
   if (!last_reference_line_info) {
-    AINFO << "last reference line info is empty";
+    ADEBUG << "last reference line info is empty";
     return speed_profile;
   }
   if (!reference_line_info->IsStartFrom(*last_reference_line_info)) {
-    AINFO << "Current reference line is not started previous drived line";
+    ADEBUG << "Current reference line is not started previous drived line";
     return speed_profile;
   }
   const auto& last_speed_vector =

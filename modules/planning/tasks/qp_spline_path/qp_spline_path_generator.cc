@@ -78,7 +78,7 @@ bool QpSplinePathGenerator::Generate(
     return false;
   }
 
-  AINFO << "pss path start with " << start_s << ", end with " << end_s;
+  ADEBUG << "pss path start with " << start_s << ", end with " << end_s;
 
   constexpr double kSplineEndBuffer = 0.1;
   if (!InitSpline(init_frenet_point_, start_s, end_s - kSplineEndBuffer)) {
@@ -99,7 +99,7 @@ bool QpSplinePathGenerator::Generate(
     return false;
   }
 
-  AINFO << common::util::StrCat("Spline dl:", init_frenet_point_.dl(), ", ddl:",
+  ADEBUG << common::util::StrCat("Spline dl:", init_frenet_point_.dl(), ", ddl:",
                                 init_frenet_point_.ddl());
 
   // extract data
