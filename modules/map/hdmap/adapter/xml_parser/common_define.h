@@ -47,7 +47,6 @@ typedef ::apollo::hdmap::Lane_LaneType PbLaneType;
 typedef ::apollo::hdmap::Lane_LaneTurn PbTurnType;
 typedef ::apollo::hdmap::Id            PbID;
 typedef ::apollo::hdmap::LaneBoundary  PbLaneBoundary;
-// typedef ::apollo::hdmap::LaneBoundary_Type PbLaneBoundaryType;
 typedef ::apollo::hdmap::LaneBoundaryType_Type PbLaneBoundaryTypeType;
 typedef ::apollo::hdmap::Polygon       PbPolygon;
 typedef ::apollo::hdmap::BoundaryPolygon PbBoundaryPolygon;
@@ -57,27 +56,6 @@ typedef ::apollo::hdmap::Lane_LaneDirection PbLaneDirection;
 typedef ::apollo::hdmap::Signal_Type        PbSignalType;
 typedef ::apollo::hdmap::Subsignal_Type     PbSubSignalType;
 typedef ::apollo::hdmap::BoundaryEdge_Type  PbBoundaryEdgeType;
-
-enum OverlapType {
-  LANE,
-  JUNCTION,
-  OBJECT,
-  SIGNAL,
-};
-
-struct OverlapChildRecord {
-  OverlapType type;
-  std::string id;
-};
-
-struct OverlapRecord {
-  OverlapChildRecord c1;
-  OverlapChildRecord c2;
-};
-
-struct Header {
-  PbHeader header;
-};
 
 struct StopLineInternal {
   std::string id;
