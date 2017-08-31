@@ -26,6 +26,7 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/apollo_app.h"
@@ -69,6 +70,9 @@ class Prediction : public apollo::common::ApolloApp {
 
  private:
   ::apollo::common::Status OnError(const std::string& error_msg);
+
+  void OnLocalization(
+      const localization::LocalizationEstimate &localization);
 
   void OnPerception(
       const perception::PerceptionObstacles &perception_obstacles);
