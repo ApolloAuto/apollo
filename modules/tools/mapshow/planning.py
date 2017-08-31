@@ -21,6 +21,8 @@ from modules.planning.proto import planning_internal_pb2
 
 class Planning:
     def __init__(self, planning_pb=None):
+        self.data_lock = threading.Lock()
+
         self.planning_pb = planning_pb
         self.path_data_lock = threading.Lock()
         self.path_data_x = {}
@@ -28,12 +30,16 @@ class Planning:
         self.speed_data_lock = threading.Lock()
         self.speed_data_time = {}
         self.speed_data_val = {}
+
         self.st_data_lock = threading.Lock()
         self.st_data_s = {}
         self.st_data_t = {}
+        self.st_data_v = {}
         self.st_data_boundary_s = {}
         self.st_data_boundary_t = {}
         self.st_data_boundary_type = {}
+        self.st_speed_limit_s = {}
+        self.st_speed_limit_v = {}
 
 
         self.sl_data_lock = threading.Lock()
@@ -119,8 +125,12 @@ class Planning:
         st_data_boundary_t = {}
         st_data_s = {}
         st_data_t = {}
+        st_data_v = {}
         st_data_boundary_type = {}
+        st_speed_limit_s = {}
+        st_speed_limit_v = {}
         for st_graph in self.planning_pb.debug.planning_data.st_graph:
+
             st_data_boundary_s[st_graph.name] = {}
             st_data_boundary_t[st_graph.name] = {}
             st_data_boundary_type[st_graph.name] = {}
@@ -141,16 +151,32 @@ class Planning:
 
             st_data_s[st_graph.name] = []
             st_data_t[st_graph.name] = []
+            st_data_v[st_graph.name] = []
             for point in st_graph.speed_profile:
                 st_data_s[st_graph.name].append(point.s)
                 st_data_t[st_graph.name].append(point.t)
+                st_data_v[st_graph.name].append(point.v)
+
+            st_speed_limit_s[st_graph.name] = []
+            st_speed_limit_v[st_graph.name] = []
+            for point in st_graph.speed_limit:
+                st_speed_limit_s[st_graph.name].append(point.s)
+                st_speed_limit_v[st_graph.name].append(point.v)
+
+        self.data_lock.acquire()
         self.st_data_lock.acquire()
+
         self.st_data_boundary_s = st_data_boundary_s
         self.st_data_boundary_t = st_data_boundary_t
         self.st_data_s = st_data_s
         self.st_data_t = st_data_t
+        self.st_data_v = st_data_v
+        self.st_speed_limit_v = st_speed_limit_v
+        self.st_speed_limit_s = st_speed_limit_s
         self.st_data_boundary_type = st_data_boundary_type
+
         self.st_data_lock.release()
+        self.data_lock.release()
 
     def replot_sl_data(self,
                        sl_static_obstacle_lower_boundary,
@@ -298,6 +324,7 @@ class Planning:
     def compute_speed_data(self):
         speed_data_time = {}
         speed_data_val = {}
+
         for speed_plan in self.planning_pb.debug.planning_data.speed_plan:
             name = speed_plan.name
             speed_data_time[name] = []
