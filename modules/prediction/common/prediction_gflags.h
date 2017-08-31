@@ -27,6 +27,7 @@ DECLARE_double(prediction_duration);
 DECLARE_double(prediction_freq);
 DECLARE_double(double_precision);
 DECLARE_double(max_prediction_length);
+DECLARE_double(min_prediction_length);
 
 // Map
 DECLARE_double(search_radius);
