@@ -89,7 +89,7 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
   if (destination_s < 0 || destination_s > reference_line.Length() ||
       destination_l > left_bound || destination_l < -right_bound) {
     ADEBUG << "destination[s=" << destination_s << "; l=" << destination_l
-          << "] out of planning range. Skip";
+           << "] out of planning range. Skip";
     return nullptr;
   }
 
