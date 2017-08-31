@@ -45,21 +45,21 @@ class ReferenceLineSmoother {
  private:
   void Reset();
 
-  bool sampling(const ReferenceLine& raw_reference_line);
+  bool Sampling(const ReferenceLine& raw_reference_line);
 
-  bool apply_constraint(const ReferenceLine& raw_reference_line);
+  bool ApplyConstraint(const ReferenceLine& raw_reference_line);
 
   bool ApplyKernel();
 
   bool Solve();
 
-  bool extract_evaluated_points(
+  bool ExtractEvaluatedPoints(
       const ReferenceLine& raw_reference_line, const std::vector<double>& vec_t,
       std::vector<common::PathPoint>* const path_points) const;
 
-  bool get_s_from_param_t(const double t, double* const s) const;
+  bool GetSFromParamT(const double t, double* const s) const;
 
-  std::uint32_t find_index(const double t) const;
+  std::uint32_t FindIndex(const double t) const;
 
  private:
   ReferenceLineSmootherConfig smoother_config_;

@@ -57,7 +57,7 @@ bool ReferenceLineSmoother::Smooth(
     ReferenceLine* const smoothed_reference_line) {
   Reset();
   std::vector<ReferencePoint> ref_points;
-  if (!sampling(raw_reference_line)) {
+  if (!Sampling(raw_reference_line)) {
     AERROR << "Fail to sample reference line smoother points!";
     return false;
   }
@@ -65,7 +65,7 @@ bool ReferenceLineSmoother::Smooth(
   spline_solver_.reset(
       new Spline2dSolver(t_knots_, smoother_config_.spline_order()));
 
-  if (!apply_constraint(raw_reference_line)) {
+  if (!ApplyConstraint(raw_reference_line)) {
     AERROR << "Add constraint for spline smoother failed";
     return false;
   }
@@ -130,7 +130,7 @@ bool ReferenceLineSmoother::Smooth(
   return true;
 }
 
-bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
+bool ReferenceLineSmoother::Sampling(const ReferenceLine& raw_reference_line) {
   const double length = raw_reference_line.Length();
   const double resolution = length / smoother_config_.num_spline();
   double accumulated_s = 0.0;
@@ -150,7 +150,7 @@ bool ReferenceLineSmoother::sampling(const ReferenceLine& raw_reference_line) {
   return true;
 }
 
-bool ReferenceLineSmoother::apply_constraint(
+bool ReferenceLineSmoother::ApplyConstraint(
     const ReferenceLine& raw_reference_line) {
   const double t_length = t_knots_.back() - t_knots_.front();
   const double dt = t_length / (smoother_config_.num_evaluated_points() - 1);
@@ -161,8 +161,7 @@ bool ReferenceLineSmoother::apply_constraint(
     evaluated_t.push_back(accumulated_eval_t);
   }
   std::vector<common::PathPoint> path_points;
-  if (!extract_evaluated_points(raw_reference_line, evaluated_t,
-                                &path_points)) {
+  if (!ExtractEvaluatedPoints(raw_reference_line, evaluated_t, &path_points)) {
     AERROR << "Extract evaluated points failed";
     return false;
   }
@@ -203,7 +202,7 @@ bool ReferenceLineSmoother::apply_constraint(
   }
 
   if (!spline_solver_->mutable_constraint()
-           ->AddSecondDerivativeSmoothConstraint()) {
+           ->AddThirdDerivativeSmoothConstraint()) {
     AERROR << "Add jointness constraint failed";
     return false;
   }
@@ -236,12 +235,12 @@ bool ReferenceLineSmoother::ApplyKernel() {
 
 bool ReferenceLineSmoother::Solve() { return spline_solver_->Solve(); }
 
-bool ReferenceLineSmoother::extract_evaluated_points(
+bool ReferenceLineSmoother::ExtractEvaluatedPoints(
     const ReferenceLine& raw_reference_line, const std::vector<double>& vec_t,
     std::vector<common::PathPoint>* const path_points) const {
   for (const auto t : vec_t) {
     double s = 0.0;
-    if (!get_s_from_param_t(t, &s)) {
+    if (!GetSFromParamT(t, &s)) {
       AERROR << "get s from " << t << " failed";
       return false;
     }
@@ -256,12 +255,12 @@ bool ReferenceLineSmoother::extract_evaluated_points(
   return true;
 }
 
-bool ReferenceLineSmoother::get_s_from_param_t(const double t,
-                                               double* const s) const {
+bool ReferenceLineSmoother::GetSFromParamT(const double t,
+                                           double* const s) const {
   if (t_knots_.size() < 2 || Double::Compare(t, t_knots_.back(), 1e-8) > 0) {
     return false;
   }
-  std::uint32_t lower = find_index(t);
+  std::uint32_t lower = FindIndex(t);
   std::uint32_t upper = lower + 1;
   double weight = 0.0;
   if (Double::Compare(t_knots_[upper], t_knots_[lower], 1e-8) > 0) {
@@ -272,7 +271,7 @@ bool ReferenceLineSmoother::get_s_from_param_t(const double t,
   return true;
 }
 
-std::uint32_t ReferenceLineSmoother::find_index(const double t) const {
+std::uint32_t ReferenceLineSmoother::FindIndex(const double t) const {
   auto upper_bound = std::upper_bound(t_knots_.begin() + 1, t_knots_.end(), t);
   return std::min(t_knots_.size() - 1,
                   static_cast<std::size_t>(upper_bound - t_knots_.begin())) -
