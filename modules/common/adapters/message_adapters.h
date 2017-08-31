@@ -35,6 +35,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -67,6 +68,7 @@ using RelativeOdometryAdapter =
 using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
 using HMICommandAdapter = Adapter<hmi::HMICommand>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
+using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 
 }  // namespace adapter
 }  // namespace common
