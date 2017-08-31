@@ -49,10 +49,16 @@ ReferenceLineInfo::ReferenceLineInfo(
       smoother_config_(smoother_config) {}
 
 bool ReferenceLineInfo::Init() {
-  const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
+  const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
   const auto& path_point = init_adc_point_.path_point();
-  common::math::Box2d box({path_point.x(), path_point.y()}, path_point.theta(),
-                          vehicle_param.length(), vehicle_param.width());
+  common::math::Vec2d position(path_point.x(), path_point.y());
+  common::math::Vec2d vec_to_center(
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0,
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0);
+  common::math::Vec2d center(position +
+                             vec_to_center.rotate(path_point.theta()));
+  common::math::Box2d box(center, path_point.theta(), param.length(),
+                          param.width());
   if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
