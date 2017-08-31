@@ -79,6 +79,11 @@ void DrawPolygonInBitmap(const typename PolygonScanConverter::Polygon& polygon,
   for (size_t i = 0; i < scans_intervals.size();
        x += major_dir_grid_size, ++i) {
     for (const auto &scan_interval : scans_intervals[i]) {
+      if (scan_interval.first > scan_interval.second) {
+        AERROR << "scan interval is not valid: "
+               << "scan_interval.first = " << scan_interval.first << ", "
+               << "scan_interval.second = " << scan_interval.second << ".";
+      }
       Interval valid_y_range;
       valid_y_range.first = std::max(bitmap_min_pt[op_major_dir],
           scan_interval.first - extend_dist);
