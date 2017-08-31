@@ -53,5 +53,18 @@ TEST_F(SunnyvaleLoopTest, cruise) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * stop case to trigger QP ST failed to solve
+ */
+TEST_F(SunnyvaleLoopTest, stop) {
+  std::string seq_num = "2";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
