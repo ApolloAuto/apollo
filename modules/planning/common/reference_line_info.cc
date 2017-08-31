@@ -24,9 +24,9 @@
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
@@ -34,27 +34,28 @@
 namespace apollo {
 namespace planning {
 
+using SLPoint = apollo::common::SLPoint;
 using TrajectoryPoint = apollo::common::TrajectoryPoint;
 using Vec2d = apollo::common::math::Vec2d;
-using SLPoint = apollo::common::SLPoint;
+using apollo::common::VehicleConfigHelper;
 
 ReferenceLineInfo::ReferenceLineInfo(
-    const TrajectoryPoint& init_adc_point, const hdmap::PncMap* pnc_map,
-    const ReferenceLine& reference_line,
+    const hdmap::PncMap* pnc_map, const ReferenceLine& reference_line,
+    const TrajectoryPoint& init_adc_point,
     const ReferenceLineSmootherConfig& smoother_config)
-    : init_adc_point_(init_adc_point),
-      pnc_map_(pnc_map),
+    : pnc_map_(pnc_map),
       reference_line_(reference_line),
+      init_adc_point_(init_adc_point),
       smoother_config_(smoother_config) {}
 
 bool ReferenceLineInfo::Init() {
-  const auto& box = common::VehicleState::instance()->AdcBoundingBox();
+  const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
+  const auto& path_point = init_adc_point_.path_point();
+  common::math::Box2d box({path_point.x(), path_point.y()}, path_point.theta(),
+                          vehicle_param.length(), vehicle_param.width());
   if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
-  }
-  for (const auto& lane_segment : reference_line_.map_path().lane_segments()) {
-    reference_line_lane_id_set_.insert(lane_segment.lane->id().id());
   }
   if (!CalculateAdcSmoothReferenLinePoint()) {
     AERROR << "Fail to get ADC smooth reference line point.";
@@ -64,23 +65,14 @@ bool ReferenceLineInfo::Init() {
 }
 
 bool ReferenceLineInfo::CalculateAdcSmoothReferenLinePoint() {
-  SLPoint adc_sl_on_raw_ref;
-  if (!reference_line_.XYToSL(Vec2d(init_adc_point_.path_point().x(),
-                                    init_adc_point_.path_point().y()),
-                              &adc_sl_on_raw_ref)) {
-    AERROR << "Fail to get sl point for init_adc_point. init_adc_point: "
-           << init_adc_point_.DebugString();
-    return false;
-  }
-
   const double backward_s = -5.0;
   const double forward_s = 10.0;
   const double delta_s = 2.0;
-  double s = backward_s + adc_sl_on_raw_ref.s();
+  double s = backward_s + adc_sl_boundary_.start_s();
 
   std::vector<ReferencePoint> local_ref_points;
 
-  while (s <= forward_s + adc_sl_on_raw_ref.s()) {
+  while (s <= forward_s + adc_sl_boundary_.end_s()) {
     local_ref_points.push_back(reference_line_.GetReferencePoint(s));
     s += delta_s;
   }
