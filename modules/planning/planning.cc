@@ -48,8 +48,11 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
 }
 
-bool Planning::InitFrame(const uint32_t sequence_num) {
+bool Planning::InitFrame(const uint32_t sequence_num,
+                         const TrajectoryPoint& init_adc_point) {
   frame_.reset(new Frame(sequence_num));
+  frame_->SetPlanningStartPoint(init_adc_point);
+
   if (AdapterManager::GetRoutingResponse()->Empty()) {
     AERROR << "Routing is empty";
     return false;
@@ -189,14 +192,19 @@ void Planning::RunOnce() {
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
+  bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
+  const auto& stitching_trajectory =
+      TrajectoryStitcher::ComputeStitchingTrajectory(
+          is_auto_mode, start_timestamp_, planning_cycle_time,
+          last_publishable_trajectory_);
+
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
-  if (!InitFrame(frame_num)) {
+  if (!InitFrame(frame_num, stitching_trajectory.back())) {
     AERROR << "Init frame failed";
     return;
   }
 
-  bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
-  status = Plan(is_auto_mode, start_timestamp_, planning_cycle_time);
+  status = Plan(start_timestamp_, stitching_trajectory);
 
   const double end_timestamp = Clock::NowInSecond();
   const double time_diff_ms = (end_timestamp - start_timestamp_) * 1000;
@@ -221,16 +229,9 @@ void Planning::Stop() {
   planner_.reset(nullptr);
 }
 
-common::Status Planning::Plan(const bool is_on_auto_mode,
-                              const double current_time_stamp,
-                              const double planning_cycle_time) {
-  const auto& stitching_trajectory =
-      TrajectoryStitcher::ComputeStitchingTrajectory(
-          is_on_auto_mode, current_time_stamp, planning_cycle_time,
-          last_publishable_trajectory_);
-
-  frame_->SetPlanningStartPoint(stitching_trajectory.back());
-
+common::Status Planning::Plan(
+    const double current_time_stamp,
+    const std::vector<common::TrajectoryPoint>& stitching_trajectory) {
   auto trajectory_pb = frame_->MutableADCTrajectory();
   if (FLAGS_enable_record_debug) {
     trajectory_pb->mutable_debug()
@@ -240,8 +241,8 @@ common::Status Planning::Plan(const bool is_on_auto_mode,
   }
   auto status = Status::OK();
   for (auto& reference_line_info : frame_->reference_line_info()) {
-    status = planner_->Plan(stitching_trajectory.back(),
-                                 frame_.get(), &reference_line_info);
+    status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
+                            &reference_line_info);
     AERROR_IF(!status.ok()) << "planner failed to make a driving plan.";
   }
 
