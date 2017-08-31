@@ -88,7 +88,7 @@ const Obstacle *TrafficDecider::CreateDestinationObstacle() {
   }
   if (destination_s < 0 || destination_s > reference_line.Length() ||
       destination_l > left_bound || destination_l < -right_bound) {
-    AINFO << "destination[s=" << destination_s << "; l=" << destination_l
+    ADEBUG << "destination[s=" << destination_s << "; l=" << destination_l
           << "] out of planning range. Skip";
     return nullptr;
   }
@@ -118,9 +118,9 @@ Status TrafficDecider::Execute(Frame *frame,
 
   // 1. add destination stop
   if (!MakeDestinationStopDecision()) {
-    AINFO << "There is no destination stop";
+    ADEBUG << "There is no destination stop";
   } else {
-    AINFO << "destination is created";
+    ADEBUG << "destination is created";
   }
   for (const auto rule_config : rule_configs_) {
     auto rule = rule_factory_.CreateObject(rule_config.name());
@@ -129,7 +129,7 @@ Status TrafficDecider::Execute(Frame *frame,
       continue;
     }
     rule->ApplyRule(reference_line_info);
-    AINFO << "Applied rule " << rule_config.name();
+    ADEBUG << "Applied rule " << rule_config.name();
   }
   return Status::OK();
 }
@@ -137,7 +137,7 @@ Status TrafficDecider::Execute(Frame *frame,
 bool TrafficDecider::MakeDestinationStopDecision() {
   const auto *path_obstacle = CreateDestinationPathObstacle();
   if (!path_obstacle) {
-    AINFO << "The path obstacle is not found";
+    ADEBUG << "The path obstacle is not found";
     return false;
   }
   const auto *obstacle = path_obstacle->obstacle();
