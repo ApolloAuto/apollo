@@ -89,7 +89,7 @@ TEST_F(GarageTest, out_of_map) {
   FLAGS_test_chassis_file = "out_of_map_chassis.pb.txt";
   PlanningTestBase::SetUp();
   bool run_planning_success = RunPlanning("out_of_map", 0);
-  EXPECT_FALSE(run_planning_success);
+  EXPECT_TRUE(run_planning_success);
 }
 }  // namespace planning
 }  // namespace apollo

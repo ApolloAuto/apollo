@@ -1,0 +1,9 @@
+header {
+  module_name: "planning"
+  status {
+    error_code: PLANNING_ERROR
+    msg: "Empty path data"
+  }
+}
+is_replan: true
+gear: GEAR_DRIVE
