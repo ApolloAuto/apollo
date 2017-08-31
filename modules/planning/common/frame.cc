@@ -94,8 +94,8 @@ bool Frame::InitReferenceLineInfo(
     const std::vector<ReferenceLine> &reference_lines) {
   reference_line_info_.clear();
   for (const auto &reference_line : reference_lines) {
-    reference_line_info_.emplace_back(pnc_map_, reference_line,
-                                      smoother_config_);
+    reference_line_info_.emplace_back(planning_start_point_, pnc_map_,
+                                      reference_line, smoother_config_);
     if (!reference_line_info_.back().Init()) {
       AERROR << "Failed to init reference line info";
       return false;
@@ -122,8 +122,8 @@ bool Frame::Init(const PlanningConfig &config,
     return false;
   }
   smoother_config_ = config.reference_line_smoother_config();
-  auto reference_lines = CreateReferenceLineFromRouting(init_pose_.position(),
-                                                        routing_response_);
+  auto reference_lines =
+      CreateReferenceLineFromRouting(init_pose_.position(), routing_response_);
   if (reference_lines.empty()) {
     AERROR << "Failed to create reference line from position: "
            << init_pose_.DebugString();
