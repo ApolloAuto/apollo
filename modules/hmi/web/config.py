@@ -33,9 +33,6 @@ class Config(object):
     """Global config."""
 
     pb_singleton = None
-    hardware_dict = None
-    module_dict = None
-    tool_dict = None
     apollo_root = os.path.join(os.path.dirname(__file__), '../../..')
     log = logging.getLogger('HMI')
 
@@ -70,26 +67,27 @@ class Config(object):
     @classmethod
     def get_hardware(cls, hardware_name):
         """Get Hardware config by name."""
-        if cls.hardware_dict is None:
-            # Init the hardware_dict once.
-            cls.hardware_dict = {hw.name: hw for hw in cls.get_pb().hardware}
-        return cls.hardware_dict.get(hardware_name)
+        return cls.__find_by_name(hardware_name, cls.get_pb().hardware)
 
     @classmethod
     def get_module(cls, module_name):
         """Get module config by name."""
-        if cls.module_dict is None:
-            # Init the module_dict once.
-            cls.module_dict = {mod.name: mod for mod in cls.get_pb().modules}
-        return cls.module_dict.get(module_name)
+        return cls.__find_by_name(module_name, cls.get_pb().modules)
 
     @classmethod
     def get_tool(cls, tool_name):
         """Get module config by name."""
-        if cls.tool_dict is None:
-            # Init the module_dict once.
-            cls.tool_dict = {tool.name: tool for tool in cls.get_pb().tools}
-        return cls.tool_dict.get(tool_name)
+        return cls.__find_by_name(tool_name, cls.get_pb().tools)
+
+    @classmethod
+    def get_map(cls, map_name):
+        """Get map config by name."""
+        return cls.__find_by_name(map_name, cls.get_pb().available_maps)
+
+    @classmethod
+    def global_flagfile(cls):
+        """Get global flagfile path."""
+        return cls.get_realpath(cls.get_pb().global_flagfile)
 
     @classmethod
     def get_realpath(cls, path_str):
@@ -102,3 +100,8 @@ class Config(object):
         if path_str.startswith('/'):
             return path_str
         return os.path.abspath(os.path.join(cls.apollo_root, path_str))
+
+    @staticmethod
+    def __find_by_name(name, value_list):
+        """Find a value in list by name."""
+        return next((value for value in value_list if value.name == name), None)

@@ -118,6 +118,7 @@ class RuntimeStatus(object):
             'modules': pb_dict_to_json(cls.module_dict),
             'hardware': pb_dict_to_json(cls.hardware_dict),
             'tools': pb_to_json(cls.pb_singleton.tools, True),
+            'config': pb_to_json(cls.pb_singleton.config, True),
         }
 
     @classmethod

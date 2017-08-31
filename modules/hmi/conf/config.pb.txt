@@ -245,3 +245,19 @@ hardware {
     command: "can"
   }
 }
+available_maps {
+  name: "Demo"
+  map_dir: "modules/map/data/demo"
+}
+available_maps {
+  name: "Garage"
+  map_dir: "modules/map/data/new_garage"
+}
+available_maps {
+  name: "Sunnyvale Loop"
+  map_dir: "modules/map/data/sunnyvale_loop"
+}
+available_maps {
+  name: "Sunnyvale Office"
+  map_dir: "modules/map/data/sunnyvale_office"
+}
