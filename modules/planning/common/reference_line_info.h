@@ -103,6 +103,9 @@ class ReferenceLineInfo {
       const double time_resolution, const double relative_time,
       DiscretizedTrajectory* discretized_trajectory);
 
+  ReferencePoint GetAdcPointOnSmoothReferenceLine() {
+    return adc_smooth_ref_point_;
+  }
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
 

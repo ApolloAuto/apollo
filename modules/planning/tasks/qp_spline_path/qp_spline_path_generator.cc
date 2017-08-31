@@ -40,9 +40,11 @@ using Vec2d = apollo::common::math::Vec2d;
 
 QpSplinePathGenerator::QpSplinePathGenerator(
     const ReferenceLine& reference_line,
-    const QpSplinePathConfig& qp_spline_path_config)
+    const QpSplinePathConfig& qp_spline_path_config,
+    const ReferencePoint& adc_smooth_ref_point)
     : reference_line_(reference_line),
-      qp_spline_path_config_(qp_spline_path_config) {
+      qp_spline_path_config_(qp_spline_path_config),
+      adc_smooth_ref_point_(adc_smooth_ref_point) {
   CHECK_GE(qp_spline_path_config_.regularization_weight(), 0.0)
       << "regularization_weight should NOT be negative.";
   CHECK_GE(qp_spline_path_config_.derivative_weight(), 0.0)
@@ -99,8 +101,8 @@ bool QpSplinePathGenerator::Generate(
     return false;
   }
 
-  ADEBUG << common::util::StrCat("Spline dl:", init_frenet_point_.dl(), ", ddl:",
-                                init_frenet_point_.ddl());
+  ADEBUG << common::util::StrCat("Spline dl:", init_frenet_point_.dl(),
+                                 ", ddl:", init_frenet_point_.ddl());
 
   // extract data
   const Spline1d& spline = spline_generator_->spline();
@@ -168,12 +170,17 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
   }
   frenet_frame_point->set_s(sl_point.s());
   frenet_frame_point->set_l(sl_point.l());
+
   const double theta = traj_point.path_point().theta();
   const double kappa = traj_point.path_point().kappa();
   const double l = frenet_frame_point->l();
 
-  ReferencePoint ref_point =
-      reference_line_.GetReferencePoint(frenet_frame_point->s());
+  ReferencePoint ref_point;
+  if (FLAGS_enable_smooth_reference_line) {
+    ref_point = reference_line_.GetReferencePoint(frenet_frame_point->s());
+  } else {
+    ref_point = adc_smooth_ref_point_;
+  }
 
   const double theta_ref = ref_point.heading();
   const double kappa_ref = ref_point.kappa();

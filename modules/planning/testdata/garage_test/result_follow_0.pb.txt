@@ -1,6 +1,5 @@
 header {
   module_name: "planning"
-  sequence_num: 2
 }
 is_replan: true
 gear: GEAR_DRIVE
