@@ -41,6 +41,7 @@ class ToolApi(object):
         start_playing
         stop_playing
         reset_all
+        switch_map
     """
     tools_status = RuntimeStatus.get_tools()
 
@@ -118,10 +119,28 @@ class ToolApi(object):
         cls.__exec_bash_tool('stop_recording')
         RuntimeStatus.broadcast_status_if_changed()
 
+    @classmethod
+    def switch_map(cls, *args):
+        """SocketIO Api: switch_map(map_name)"""
+        if len(args) != 1:
+            Config.log.critical('ToolApi::switch_map bad args')
+            return
+        map_name = args[0]
+        map_conf = Config.get_map(map_name)
+        if map_conf is None:
+            Config.log.critical('Cannot find %s map', map_name)
+            return
+        with open(Config.global_flagfile(), 'a') as fout:
+            fout.write('\n--map_dir={}\n'.format(map_conf.map_dir))
+
+        RuntimeStatus.pb_singleton.config.current_map = map_name
+        RuntimeStatus.broadcast_status_if_changed()
+
     @staticmethod
     def __exec_bash_tool(tool_name):
         """Execute bash tool configured in config."""
         tool = Config.get_tool(tool_name)
         if tool is None:
             Config.log.critical('Unknown tool %s', tool_name)
+            return
         system_cmd.async_run_command_pb(tool)

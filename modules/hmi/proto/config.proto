@@ -42,4 +42,13 @@ message Config {
   repeated Component modules = 2;
   repeated Component hardware = 3;
   repeated Command tools = 4;
+  optional string global_flagfile = 5
+      [default = "modules/common/data/global_flagfile.txt"];
+
+  // HDMaps.
+  message HDMap {
+    optional string name = 1;
+    optional string map_dir = 2;
+  }
+  repeated HDMap available_maps = 6;
 }

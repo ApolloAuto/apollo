@@ -47,5 +47,6 @@ class SocketIOApi(object):
         api = cls.API.get(socketio_request.api_name)
         if api is None:
             Config.log.critical('Cannot find %s', socketio_request.api_name)
+            return
         cmd = eval('api.' + socketio_request.command_name)
         cmd(*socketio_request.args)

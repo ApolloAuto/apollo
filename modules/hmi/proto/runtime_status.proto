@@ -55,8 +55,13 @@ message ToolStatus {
   optional bool planning_ready = 4;
 }
 
+message ConfigStatus {
+  optional string current_map = 1 [default = "Demo"];
+}
+
 message RuntimeStatus {
   repeated ModuleStatus modules = 1;
   repeated HardwareStatus hardware = 2;
   optional ToolStatus tools = 3;
+  optional ConfigStatus config = 4;
 }
