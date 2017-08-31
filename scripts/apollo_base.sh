@@ -108,8 +108,8 @@ function set_lib_path() {
       PY_LIB_PATH=/apollo/lib
       PY_TOOLS_PATH=/apollo/modules/tools
   else
-      if [ -e "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash" ]; then
-         source "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash"
+      if [ -e "${HOME}/.cache/bazel/_bazel_${USER}/apollo_build/external/ros/setup.bash" ]; then
+         source "${HOME}/.cache/bazel/_bazel_${USER}/apollo_build/external/ros/setup.bash"
       fi
       PY_LIB_PATH=${APOLLO_ROOT_DIR}/py_proto
       PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
