@@ -22,11 +22,6 @@ namespace apollo {
 namespace common {
 namespace util {
 
-using SLPoint = apollo::common::SLPoint;
-using SpeedPoint = apollo::common::SpeedPoint;
-using PathPoint = apollo::common::PathPoint;
-using TrajectoryPoint = apollo::common::TrajectoryPoint;
-
 SLPoint MakeSLPoint(const double s, const double l) {
   SLPoint sl;
   sl.set_s(s);
@@ -34,26 +29,24 @@ SLPoint MakeSLPoint(const double s, const double l) {
   return sl;
 }
 
-apollo::common::Point3D MakePoint3D(const double x, const double y,
-                                    const double z) {
-  common::Point3D point3d;
+Point3D MakePoint3D(const double x, const double y, const double z) {
+  Point3D point3d;
   point3d.set_x(x);
   point3d.set_y(y);
   point3d.set_z(z);
   return point3d;
 }
 
-apollo::common::PointENU MakePointENU(const double x, const double y,
-                                      const double z) {
-  common::PointENU point_enu;
+PointENU MakePointENU(const double x, const double y, const double z) {
+  PointENU point_enu;
   point_enu.set_x(x);
   point_enu.set_y(y);
   point_enu.set_z(z);
   return point_enu;
 }
 
-apollo::common::PointENU MakePointENU(const common::math::Vec2d& xy) {
-  common::PointENU point_enu;
+PointENU MakePointENU(const math::Vec2d& xy) {
+  PointENU point_enu;
   point_enu.set_x(xy.x());
   point_enu.set_y(xy.y());
   point_enu.set_z(0.0);
@@ -93,7 +86,7 @@ PathPoint MakePathPoint(const double x, const double y, const double z,
   path_point.set_ddkappa(ddkappa);
   return path_point;
 }
-TrajectoryPoint MakeTrajectoryPoint(const apollo::common::PathPoint& path_point,
+TrajectoryPoint MakeTrajectoryPoint(const PathPoint& path_point,
                                     const double v, const double a,
                                     const double relative_time) {
   TrajectoryPoint point;

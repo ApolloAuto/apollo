@@ -74,21 +74,17 @@ double GetPathAngle(const std::vector<PointType> &points, const int start,
  * @param points Points on the path.
  * @param angle_threshold Points are sampled when the accumulated direction
  * change exceeds the threshold.
- * @param sampled_indices Indecies of all sampled points.
- * @return true if downsampling is successful.
+ * @return sampled_indices Indices of all sampled points, or empty when fail.
  */
 template <typename PointType>
-bool DownsampleByAngle(const std::vector<PointType> &points,
-                       const double angle_threshold,
-                       std::vector<int> *sampled_indices) {
-  CHECK(sampled_indices);
-  sampled_indices->clear();
-
+std::vector<int> DownsampleByAngle(const std::vector<PointType> &points,
+                                   const double angle_threshold) {
+  std::vector<int> sampled_indices;
   if (angle_threshold < 0.0) {
     AERROR << "Input angle threshold is negative.";
-    return false;
+    return sampled_indices;
   }
-  sampled_indices->push_back(0);
+  sampled_indices.push_back(0);
   if (points.size() > 1) {
     int start = 0;
     int end = 1;
@@ -98,19 +94,19 @@ bool DownsampleByAngle(const std::vector<PointType> &points,
       accum_degree += std::fabs(angle);
 
       if (accum_degree > angle_threshold) {
-        sampled_indices->push_back(end);
+        sampled_indices.push_back(end);
         start = end;
         accum_degree = 0.0;
       }
       ++end;
     }
-    sampled_indices->push_back(end);
+    sampled_indices.push_back(end);
   }
 
   AINFO << "Point Vector is downsampled from " << points.size() << " to "
-        << sampled_indices->size();
+        << sampled_indices.size();
 
-  return true;
+  return sampled_indices;
 }
 
 /**
@@ -118,23 +114,19 @@ bool DownsampleByAngle(const std::vector<PointType> &points,
  * @param points Points on the path.
  * @param downsampleDistance downsample rate for a normal path
  * @param steepTurnDownsampleDistance downsample rate for a steep turn path
- * @param sampled_indices Indecies of all sampled points.
- * @return true if downsampling is successful.
+ * @return sampled_indices Indices of all sampled points, or empty when fail.
  */
 template <typename PointType>
-void DownsampleByDistance(const std::vector<PointType> &points,
-                          int downsampleDistance,
-                          int steepTurnDownsampleDistance,
-                          std::vector<int> *sampled_indices) {
-  CHECK(sampled_indices);
-  sampled_indices->clear();
-
+std::vector<int> DownsampleByDistance(const std::vector<PointType> &points,
+                                      int downsampleDistance,
+                                      int steepTurnDownsampleDistance) {
+  std::vector<int> sampled_indices;
   if (points.size() <= 4) {
     // No need to downsample if there are not too many points.
     for (int i = 0; i < points.size(); ++i) {
-      sampled_indices->push_back(i);
+      sampled_indices.push_back(i);
     }
-    return;
+    return sampled_indices;
   }
 
   using apollo::common::math::Vec2d;
@@ -148,7 +140,7 @@ void DownsampleByDistance(const std::vector<PointType> &points,
       is_steep_turn ? steepTurnDownsampleDistance : downsampleDistance;
 
   // Make sure the first point is included
-  sampled_indices->push_back(0);
+  sampled_indices.push_back(0);
 
   double accum_distance = 0.0;
   for (size_t pos = 1; pos < points.size() - 1; ++pos) {
@@ -157,13 +149,14 @@ void DownsampleByDistance(const std::vector<PointType> &points,
     accum_distance += point_start.DistanceTo(point_end);
 
     if (accum_distance > downsampleRate) {
-      sampled_indices->push_back(pos);
+      sampled_indices.push_back(pos);
       accum_distance = 0.0;
     }
   }
 
   // Make sure the last point is included
-  sampled_indices->push_back(points.size() - 1);
+  sampled_indices.push_back(points.size() - 1);
+  return sampled_indices;
 }
 
 }  // namespace util
