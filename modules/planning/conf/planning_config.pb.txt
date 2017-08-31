@@ -102,7 +102,6 @@ em_planner_config {
         max_speed: 20.0
         max_acceleration: 2.5
         max_deceleration: -4.5
-        reference_line_kernel_weight: 0.2
 
         st_boundary_config {
             boundary_buffer: 0.1
