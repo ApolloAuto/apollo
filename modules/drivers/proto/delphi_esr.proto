@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.drivers;
+
+import "modules/common/proto/header.proto";
+
+//TODO(lizh): this is just a toy example to test the pipeline.
+message Test_4E0 {
+    optional int32 scan_index = 1;
+}
+
+message DelphiESR {
+  optional apollo.common.Header header = 1;
+  optional Test_4E0 test_4e0 = 2;
+}
