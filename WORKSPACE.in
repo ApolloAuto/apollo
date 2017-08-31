@@ -99,7 +99,7 @@ new_http_archive(
 new_local_repository(
     name = "pcl",
     build_file = "third_party/pcl.BUILD",
-    path = "/usr/include/pcl-1.7",
+    path = "/usr/local/include/pcl-1.7",
 )
 
 new_local_repository(
