@@ -24,20 +24,18 @@
 #include <string>
 
 #include "modules/common/log.h"
+#include "modules/routing/graph/topo_node.h"
 #include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
-
-class TopoNode;
-class TopoEdge;
 
 class TopoGraph {
  public:
   TopoGraph() = default;
   ~TopoGraph() = default;
 
-  bool LoadGraph(const std::string& filename);
+  bool LoadGraph(const Graph& filename);
 
   const std::string& MapVersion() const;
   const std::string& MapDistrict() const;

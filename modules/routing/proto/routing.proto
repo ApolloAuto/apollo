@@ -110,6 +110,17 @@ message RoutingResponse {
     }
   }
 
+  message ErrorCode {
+    enum ErrorID {
+        SUCCESS = 0;
+        ERROR_REQUEST = 1;
+        ERROR_RESPONSE_FAILED = 2;
+        ERROR_ROUTER_NOT_READY = 3;
+    }
+    optional ErrorID error_id = 1 [default = SUCCESS];
+    optional string error_string = 2;
+  }
+
   optional apollo.common.Header header = 1;
   repeated Way route = 2;
   optional Measurement measurement = 3;
@@ -117,4 +128,5 @@ message RoutingResponse {
 
   // the map version which is used to build road graph
   optional bytes map_version = 5;
+  optional ErrorCode error_code = 6;
 }

@@ -19,6 +19,7 @@
 #include "glog/logging.h"
 
 #include "modules/common/util/file.h"
+#include "modules/routing/common/routing_gflags.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/routing/topo_creator/edge_creator.h"
 #include "modules/routing/topo_creator/node_creator.h"
@@ -113,6 +114,10 @@ bool GraphCreator::Create() {
     }
     const auto& from_node = graph_.node(node_index_map_[lane_id]);
 
+    AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
+    if (lane.length() < FLAGS_min_length_for_lane_change) {
+        continue;
+    }
     if (lane.has_left_boundary() && IsAllowedToCross(lane.left_boundary())) {
       AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
     }
@@ -120,7 +125,6 @@ bool GraphCreator::Create() {
     if (lane.has_right_boundary() && IsAllowedToCross(lane.right_boundary())) {
       AddEdge(from_node, lane.right_neighbor_forward_lane_id(), Edge::RIGHT);
     }
-    AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
   }
 
   if (!EndWith(dump_topo_file_path_, ".bin") &&

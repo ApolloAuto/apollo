@@ -14,31 +14,40 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_STRATEGY_STRATEGY_H_
-#define MODULES_ROUTING_STRATEGY_STRATEGY_H_
-
-#include <unordered_set>
-#include <vector>
-
-#include "modules/routing/graph/topo_graph.h"
-#include "modules/routing/graph/sub_topo_graph.h"
-#include "modules/routing/graph/topo_node.h"
+#include "modules/routing/graph/node_with_range.h"
 
 namespace apollo {
 namespace routing {
 
-class Strategy {
- public:
-  virtual ~Strategy() {}
+NodeWithRange::NodeWithRange(const NodeSRange& range, const TopoNode* node)
+    : NodeSRange(range), topo_node_(node) { }
 
-  virtual bool Search(const TopoGraph* graph,
-                      const SubTopoGraph* sub_graph,
-                      const TopoNode* src_node,
-                      const TopoNode* dest_node,
-                      std::vector<NodeWithRange>* const result_nodes)= 0;
-};
+NodeWithRange::~NodeWithRange() { }
+
+bool NodeWithRange::operator < (const NodeWithRange& other) const {
+  return StartS() > other.StartS();
+}
+
+const TopoNode* NodeWithRange::GetTopoNode() const {
+  return topo_node_;
+}
+
+bool NodeWithRange::IsVirtual() const {
+  return topo_node_->IsVirtual();
+}
+
+const std::string& NodeWithRange::RoadId() const {
+  return topo_node_->RoadId();
+}
+
+const std::string& NodeWithRange::LaneId() const {
+  return topo_node_->LaneId();
+}
+
+double NodeWithRange::FullLength() const {
+  return topo_node_->Length();
+}
 
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_STRATEGY_STRATEGY_H_

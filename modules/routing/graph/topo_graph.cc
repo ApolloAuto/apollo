@@ -69,14 +69,8 @@ bool TopoGraph::LoadEdges(const Graph& graph) {
   return true;
 }
 
-bool TopoGraph::LoadGraph(const std::string& file_path) {
+bool TopoGraph::LoadGraph(const Graph& graph) {
   Clear();
-
-  Graph graph;
-  if (!::apollo::common::util::GetProtoFromFile(file_path, &graph)) {
-    AERROR << "Failed to read topology graph from " << file_path;
-    return false;
-  }
 
   map_version_ = graph.hdmap_version();
   map_district_ = graph.hdmap_district();
