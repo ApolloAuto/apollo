@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file esd_can_client.cpp
+ * @file esd_can_client.cc
  * @brief the encapsulate call the api of esd can card according to can_client.h
  *interface
  **/

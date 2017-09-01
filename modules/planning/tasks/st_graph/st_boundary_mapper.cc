@@ -123,6 +123,7 @@ Status StBoundaryMapper::GetGraphBoundary(
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
       AppendBoundary(boundary, st_boundaries);
+      continue;
     }
     const auto& decision = path_obstacle->LongitudinalDecision();
     if (decision.has_stop()) {
@@ -285,13 +286,26 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       }
     }
   } else {
-    DiscretizedPath discretized_path(path_points);
+    const int default_num_point = 50;
+    DiscretizedPath discretized_path;
+    if (path_points.size() > 2 * default_num_point) {
+      const int ratio = path_points.size() / default_num_point;
+      std::vector<PathPoint> sampled_path_points;
+      for (size_t i = 0; i < path_points.size(); ++i) {
+        if (i % ratio == 0) {
+          sampled_path_points.push_back(path_points[i]);
+        }
+      }
+      discretized_path.set_path_points(sampled_path_points);
+    } else {
+      discretized_path.set_path_points(path_points);
+    }
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
 
       const double distance = obs_box.length() + obs_box.width();
-      if (HasLaneOverlap(trajectory_point, distance)) {
+      if (!HasLaneOverlap(trajectory_point, distance)) {
         continue;
       }
 
@@ -302,62 +316,65 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       }
 
       const double step_length = vehicle_param_.length() / 2;
-      double path_s = path_points.front().s();
+      double path_s = 0.0;
 
-      while (path_s < path_points.back().s()) {
+      while (path_s < discretized_path.Length()) {
         const auto curr_adc_path_point =
-            discretized_path.EvaluateUsingLinearApproximation(path_s);
-        if (!CheckOverlap(curr_adc_path_point, obs_box,
-                          st_boundary_config_.boundary_buffer())) {
-          path_s += step_length;
-        }
+            discretized_path.EvaluateUsingLinearApproximation(
+                path_s + discretized_path.StartPoint().s());
+        if (CheckOverlap(curr_adc_path_point, obs_box,
+                         st_boundary_config_.boundary_buffer())) {
+          // found overlap, start searching with higher resolution
+          const double backward_distance = -step_length;
+          const double forward_distance = vehicle_param_.length() +
+                                          vehicle_param_.width() +
+                                          obs_box.length() + obs_box.width();
+          const double fine_tuning_step_length = 0.1;
 
-        // found overlap, start searching with higher resolution
-        const double backward_distance = -step_length;
-        const double forward_distance = vehicle_param_.length() +
-                                        vehicle_param_.width() +
-                                        obs_box.length() + obs_box.width();
-        const double fine_tuning_step_length = 0.2;
+          bool find_low = false;
+          bool find_high = false;
+          double low_s = std::fmax(0.0, path_s + backward_distance);
+          double high_s =
+              std::fmin(discretized_path.Length(), path_s + forward_distance);
 
-        bool find_low = false;
-        bool find_high = false;
-        double low_s = path_s + backward_distance;
-        double high_s = path_s + forward_distance;
-
-        while (low_s < high_s) {
-          if (find_low && find_high) {
-            break;
-          }
-          if (!find_low) {
-            const auto& point_low =
-                discretized_path.EvaluateUsingLinearApproximation(low_s);
-            if (!CheckOverlap(point_low, obs_box,
-                              st_boundary_config_.boundary_buffer())) {
-              low_s += fine_tuning_step_length;
-            } else {
-              find_low = true;
+          while (low_s < high_s) {
+            if (find_low && find_high) {
+              break;
+            }
+            if (!find_low) {
+              const auto& point_low =
+                  discretized_path.EvaluateUsingLinearApproximation(
+                      low_s + discretized_path.StartPoint().s());
+              if (!CheckOverlap(point_low, obs_box,
+                                st_boundary_config_.boundary_buffer())) {
+                low_s += fine_tuning_step_length;
+              } else {
+                find_low = true;
+              }
+            }
+            if (!find_high) {
+              const auto& point_high =
+                  discretized_path.EvaluateUsingLinearApproximation(
+                      high_s + discretized_path.StartPoint().s());
+              if (!CheckOverlap(point_high, obs_box,
+                                st_boundary_config_.boundary_buffer())) {
+                high_s -= fine_tuning_step_length;
+              } else {
+                find_high = true;
+              }
             }
           }
-          if (!find_high) {
-            const auto& point_high =
-                discretized_path.EvaluateUsingLinearApproximation(high_s);
-            if (!CheckOverlap(point_high, obs_box,
-                              st_boundary_config_.boundary_buffer())) {
-              high_s -= fine_tuning_step_length;
-            } else {
-              find_high = true;
-            }
+          if (find_high && find_low) {
+            lower_points->emplace_back(
+                low_s - st_boundary_config_.point_extension(),
+                trajectory_point_time);
+            upper_points->emplace_back(
+                high_s + st_boundary_config_.point_extension(),
+                trajectory_point_time);
           }
+          break;
         }
-        if (find_high && find_low) {
-          lower_points->emplace_back(
-              low_s - st_boundary_config_.point_extension(),
-              trajectory_point_time);
-          upper_points->emplace_back(
-              high_s + st_boundary_config_.point_extension(),
-              trajectory_point_time);
-        }
-        break;
+        path_s += step_length;
       }
     }
   }
