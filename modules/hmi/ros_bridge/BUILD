@@ -13,7 +13,6 @@ cc_binary(
         "//modules/common/adapters:adapter_manager",
         "//modules/control/common",
         "//modules/control/proto:control_proto",
-        "//modules/map/hdmap:hdmap_util",
         "@ros//:ros_common",
     ],
 )
