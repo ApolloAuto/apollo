@@ -171,11 +171,13 @@ class ObjectTrackSet {
 
   void clear();
 
+ public:
+  static int s_maximum_consecutive_invisible_count_;
+
  private:
   std::vector<ObjectTrackPtr> tracks_;
   int age_threshold_;
   double minimum_visible_ratio_;
-  int maximum_consecutive_invisible_count_;
 };  // class ObjectTrackSet
 
 }  // namespace perception
