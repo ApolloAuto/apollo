@@ -1,14 +1,34 @@
+#!/usr/bin/env python
+
+###############################################################################
+# Copyright 2017 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
 import rospy
-from modules.planning.proto import planning_pb2
+import argparse
 import matplotlib.pyplot as plt
-from planning import Planning
 import matplotlib.animation as animation
+
+from modules.planning.proto import planning_pb2
 from subplot_st_main import StMainSubplot
 from subplot_path import PathSubplot
 from subplot_sl_main import SlMainSubplot
+from subplot_st_speed import StSpeedSubplot
 from subplot_speed import SpeedSubplot
 from localization import Localization
-import argparse
+from planning import Planning
 
 planning = Planning()
 localization = Localization()
@@ -21,6 +41,7 @@ def update(frame_number):
     qp_st_main_subplot.show(planning)
     speed_subplot.show(planning)
     sl_main_subplot.show(planning)
+    st_speed_subplot.show(planning)
 
 def planning_callback(planning_pb):
     planning.update_planning_pb(planning_pb)
@@ -74,8 +95,11 @@ if __name__ == '__main__':
     ax3 = plt.subplot2grid((3, 3), (2, 2))
     qp_st_main_subplot = StMainSubplot(ax3, 'DpStSpeedOptimizer')
 
-    ax4 = plt.subplot2grid((3, 3), (2, 0), colspan=2)
+    ax4 = plt.subplot2grid((3, 3), (2, 0), colspan=1)
     sl_main_subplot = SlMainSubplot(ax4)
+
+    ax5 = plt.subplot2grid((3, 3), (2, 1), colspan=1)
+    st_speed_subplot = StSpeedSubplot(ax5, 'QpSplineStSpeedOptimizer')
 
     ani = animation.FuncAnimation(fig, update, interval=100)
 
