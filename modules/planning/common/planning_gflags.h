@@ -28,6 +28,7 @@ DECLARE_double(trajectory_resolution);
 DECLARE_double(look_backward_distance);
 DECLARE_double(look_forward_distance);
 DECLARE_bool(enable_smooth_reference_line);
+DECLARE_double(max_collision_distance);
 
 DECLARE_int32(max_history_frame_num);
 

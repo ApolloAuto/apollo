@@ -48,14 +48,14 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
 }
 
-bool Planning::InitFrame(const uint32_t sequence_num,
-                         const TrajectoryPoint& init_adc_point) {
+Status Planning::InitFrame(const uint32_t sequence_num,
+                           const TrajectoryPoint& init_adc_point) {
   frame_.reset(new Frame(sequence_num));
   frame_->SetPlanningStartPoint(init_adc_point);
 
   if (AdapterManager::GetRoutingResponse()->Empty()) {
     AERROR << "Routing is empty";
-    return false;
+    return Status(ErrorCode::PLANNING_ERROR, "routing is empty");
   }
   frame_->SetVehicleInitPose(VehicleState::instance()->pose());
   frame_->SetRoutingResponse(
@@ -67,12 +67,13 @@ bool Planning::InitFrame(const uint32_t sequence_num,
     ADEBUG << "Get prediction done.";
   }
 
-  if (!frame_->Init(config_, start_timestamp_)) {
+  auto status = frame_->Init(config_, start_timestamp_);
+  if (!status.ok()) {
     AERROR << "failed to init frame";
-    return false;
+    return Status(ErrorCode::PLANNING_ERROR, "init frame failed");
   }
   frame_->RecordInputDebug();
-  return true;
+  return Status::OK();
 }
 
 Status Planning::Init() {
@@ -199,8 +200,13 @@ void Planning::RunOnce() {
           last_publishable_trajectory_);
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
-  if (!InitFrame(frame_num, stitching_trajectory.back())) {
+  status = InitFrame(frame_num, stitching_trajectory.back());
+  if (!status.ok()) {
+    ADCTrajectory estop;
+    estop.mutable_estop();
     AERROR << "Init frame failed";
+    status.Save(estop.mutable_header()->mutable_status());
+    PublishPlanningPb(&estop, start_timestamp_);
     return;
   }
 
