@@ -82,12 +82,13 @@ class WebSocketEndpoint {
         }));
     }
 
-    requestRoute(start, waypoint, end) {
+    requestRoute(start, waypoint, end, sendDefaultRoute = false) {
         this.websocket.send(JSON.stringify({
             type: "SendRoutingRequest",
             start: start,
             end: end,
             waypoint: waypoint,
+            sendDefaultRoute: sendDefaultRoute,
         }));
     }
 }

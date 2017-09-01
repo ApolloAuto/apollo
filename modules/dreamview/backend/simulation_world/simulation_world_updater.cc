@@ -20,11 +20,13 @@
 
 #include "google/protobuf/util/json_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
+using apollo::routing::RoutingRequest;
 using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
 
@@ -34,6 +36,12 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket) {
+
+  // Initialize default end point
+  CHECK(apollo::common::util::GetProtoFromASCIIFile(
+      apollo::hdmap::EndWayPointFile(),
+      &default_end_point_));
+
   websocket_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -56,7 +64,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
   websocket_->RegisterMessageHandler(
       "SendRoutingRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        routing::RoutingRequest routing_request;
+        RoutingRequest routing_request;
         bool succeed = ConstructRoutingRequest(json, &routing_request);
         if (succeed) {
           AdapterManager::FillRoutingRequestHeader(FLAGS_dreamview_module_name,
@@ -73,11 +81,11 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
       const Json &json,
-      routing::RoutingRequest* routing_request) {
+      RoutingRequest* routing_request) {
   // set start point
   auto start = json["start"];
   if (start.find("x") == start.end() || start.find("y") == start.end()) {
-    AERROR << "Failed to prepare a routing request";
+    AERROR << "Failed to prepare a routing request: start point not found";
     return false;
   }
   map_service_->ConstructLaneWayPoint(start["x"], start["y"],
@@ -97,13 +105,21 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
   }
 
   // set end point
-  auto end = json["end"];
-  if (end.find("x") == end.end() || end.find("y") == end.end()) {
-    AERROR << "Failed to prepare a routing request";
-    return false;
+  RoutingRequest::LaneWaypoint *endLane = routing_request->mutable_end();
+  if (json["sendDefaultRoute"]) {
+    endLane->set_id(default_end_point_.id());
+    endLane->set_s(default_end_point_.s());
+    auto *pose = endLane->mutable_pose();
+    pose->set_x(default_end_point_.pose().x());
+    pose->set_y(default_end_point_.pose().y());
+  } else {
+    auto end = json["end"];
+    if (end.find("x") == end.end() || end.find("y") == end.end()) {
+      AERROR << "Failed to prepare a routing request: end point not found";
+      return false;
+    }
+    map_service_->ConstructLaneWayPoint(end["x"], end["y"], endLane);
   }
-  map_service_->ConstructLaneWayPoint(end["x"], end["y"],
-                                      routing_request->mutable_end());
 
   return true;
 }
