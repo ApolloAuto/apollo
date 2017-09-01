@@ -48,6 +48,12 @@ if [ ! -e "${LOCAL_DIR}/data/core" ]; then
     mkdir -p "${LOCAL_DIR}/data/core"
 fi
 
+if [ ! -e /apollo ]; then
+    sudo ln -sf ${LOCAL_DIR} /apollo
+fi
+
+echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
+
 source ${LOCAL_DIR}/scripts/apollo_base.sh
 
 function find_device() {
@@ -69,7 +75,7 @@ function main(){
     #FIX ME: remove login when open source.
     docker login -u autoapollo -p baidu123
     docker pull $IMG
-    
+
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
         docker stop apollo_dev 1>/dev/null

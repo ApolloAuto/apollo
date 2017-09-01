@@ -41,6 +41,10 @@ if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
     mkdir -p "${APOLLO_ROOT_DIR}/data/core"
 fi
 
+if [ ! -e /apollo ]; then
+    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
+fi
+echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 echo "APOLLO_ROOT_DIR=$APOLLO_ROOT_DIR"
 
 VERSION=release-20170810_2158

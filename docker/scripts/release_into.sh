@@ -18,10 +18,10 @@
 
 
 xhost +local:root 1>/dev/null 2>&1
-echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
+
 docker exec \
     -u $USER \
     -it apollo_release \
     /bin/bash
-echo "~/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
+
 xhost -local:root 1>/dev/null 2>&1
