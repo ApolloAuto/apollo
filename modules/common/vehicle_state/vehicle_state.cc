@@ -63,8 +63,8 @@ void VehicleState::InitAdcBoundingBox() {
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   common::math::Vec2d position(x_, y_);
   common::math::Vec2d vec_to_center(
-      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0,
-      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0);
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
   common::math::Vec2d center(position + vec_to_center.rotate(heading_));
   adc_bounding_box_ = std::unique_ptr<common::math::Box2d>(
       new common::math::Box2d(center, heading_, param.length(), param.width()));
