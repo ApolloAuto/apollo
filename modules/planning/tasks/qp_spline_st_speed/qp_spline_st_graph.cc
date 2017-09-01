@@ -202,7 +202,9 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  std::vector<double> speed_lower_bound(t_evaluated_.size(), 0.0);
+  constexpr double kSpeedBoundEpsilon = 1e-12;
+  std::vector<double> speed_lower_bound(t_evaluated_.size(),
+                                        kSpeedBoundEpsilon);
 
   DCHECK_EQ(t_evaluated_.size(), speed_upper_bound.size());
   DCHECK_EQ(t_evaluated_.size(), speed_lower_bound.size());

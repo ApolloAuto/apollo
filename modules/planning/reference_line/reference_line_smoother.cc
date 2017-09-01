@@ -172,9 +172,11 @@ bool ReferenceLineSmoother::ApplyConstraint(
   std::vector<double> lateral_bound;
   std::vector<common::math::Vec2d> xy_points;
   for (std::uint32_t i = 0; i < path_points.size(); ++i) {
+    const double kLateralBoundCoeff = 0.2;
     headings.push_back(path_points[i].theta());
-    longitidinal_bound.push_back(0.5 * smoother_config_.boundary_bound());
-    lateral_bound.push_back(smoother_config_.boundary_bound());
+    longitidinal_bound.push_back(smoother_config_.boundary_bound());
+    lateral_bound.push_back(kLateralBoundCoeff *
+                            smoother_config_.boundary_bound());
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
@@ -228,7 +230,7 @@ bool ReferenceLineSmoother::ApplyKernel() {
         smoother_config_.third_derivative_weight());
   }
 
-  constexpr double kReferenceLineSmootherKernelWeight = 0.005;
+  constexpr double kReferenceLineSmootherKernelWeight = 0.01;
   kernel->AddRegularization(kReferenceLineSmootherKernelWeight);
   return true;
 }
