@@ -25,6 +25,8 @@
 namespace apollo {
 namespace planning {
 
+using ::apollo::planning_internal::STGraphDebug;
+
 SpeedOptimizer::SpeedOptimizer(const std::string& name) : Task(name) {}
 
 apollo::common::Status SpeedOptimizer::Execute(
@@ -50,14 +52,14 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
 
 void SpeedOptimizer::RecordSTGraphDebug(
     const std::vector<StBoundary>& boundaries, const SpeedLimit& speed_limits,
-    const SpeedData& speed_data) {
+    const SpeedData& speed_data, STGraphDebug* st_graph_debug) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;
   }
 
-  auto debug = frame_->MutableADCTrajectory()->mutable_debug();
-  auto st_graph_debug = debug->mutable_planning_data()->add_st_graph();
+  //auto debug = frame_->MutableADCTrajectory()->mutable_debug();
+  //auto st_graph_debug = debug->mutable_planning_data()->add_st_graph();
   st_graph_debug->set_name(Name());
   for (const auto& boundary : boundaries) {
     auto boundary_debug = st_graph_debug->add_boundary();
