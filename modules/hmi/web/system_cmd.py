@@ -17,6 +17,7 @@
 ###############################################################################
 """System command utils."""
 
+import shutil
 import subprocess
 
 from config import Config
@@ -42,3 +43,16 @@ def async_run_command_pb(cmd_pb):
     cmd_pb.command[0] = Config.get_realpath(cmd_pb.command[0])
     cmd_str = ' '.join(cmd_pb.command)
     async_run_command(cmd_str, cmd_pb.stdout_file, cmd_pb.stderr_file)
+
+
+def copy(src, dst):
+    """Copy file from src to dst if they are not the same."""
+    if src != dst:
+        shutil.copy(Config.get_realpath(src), Config.get_realpath(dst))
+
+
+def copytree(src, dst):
+    """Copy directory, clear the dst if it existed."""
+    dst = Config.get_realpath(dst)
+    shutil.rmtree(dst, ignore_errors=True)
+    shutil.copytree(Config.get_realpath(src), dst)

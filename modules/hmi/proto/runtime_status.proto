@@ -57,6 +57,7 @@ message ToolStatus {
 
 message ConfigStatus {
   optional string current_map = 1 [default = "Demo"];
+  optional string current_vehicle = 2 [default = "MKZ 8"];
 }
 
 message RuntimeStatus {
