@@ -216,6 +216,9 @@ function release() {
   cp -r modules/hmi/web $MODULES_DIR/hmi
   cp -r modules/hmi/utils/*.py $MODULES_DIR/hmi/utils
 
+  # perception
+  cp -r modules/perception/model/ $MODULES_DIR/perception
+
   # lib
   LIB_DIR=$ROOT_DIR/lib
   mkdir $LIB_DIR
