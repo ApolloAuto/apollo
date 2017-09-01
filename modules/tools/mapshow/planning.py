@@ -17,6 +17,7 @@
 ###############################################################################
 
 import threading
+import numpy as np
 from modules.planning.proto import planning_internal_pb2
 
 class Planning:
@@ -32,15 +33,18 @@ class Planning:
         self.speed_data_val = {}
 
         self.st_data_lock = threading.Lock()
-        self.st_data_s = {}
-        self.st_data_t = {}
-        self.st_data_v = {}
+        self.st_curve_s = {}
+        self.st_curve_t = {}
+        self.st_curve_v = {}
         self.st_data_boundary_s = {}
         self.st_data_boundary_t = {}
         self.st_data_boundary_type = {}
         self.st_speed_limit_s = {}
         self.st_speed_limit_v = {}
 
+        self.st_speed_constraint_s = {}
+        self.st_speed_constraint_lower = {}
+        self.st_speed_constraint_upper = {}
 
         self.sl_data_lock = threading.Lock()
         self.sl_sampled_s = []
@@ -123,12 +127,15 @@ class Planning:
     def compute_st_data(self):
         st_data_boundary_s = {}
         st_data_boundary_t = {}
-        st_data_s = {}
-        st_data_t = {}
-        st_data_v = {}
+        st_curve_s = {}
+        st_curve_t = {}
+        st_curve_v = {}
         st_data_boundary_type = {}
         st_speed_limit_s = {}
         st_speed_limit_v = {}
+        st_speed_constraint_s = {}
+        st_speed_constraint_lower = {}
+        st_speed_constraint_upper = {}
         for st_graph in self.planning_pb.debug.planning_data.st_graph:
 
             st_data_boundary_s[st_graph.name] = {}
@@ -149,13 +156,14 @@ class Planning:
                 st_data_boundary_t[st_graph.name][boundary.name].append(
                     st_data_boundary_t[st_graph.name][boundary.name][0])
 
-            st_data_s[st_graph.name] = []
-            st_data_t[st_graph.name] = []
-            st_data_v[st_graph.name] = []
+
+            st_curve_s[st_graph.name] = []
+            st_curve_t[st_graph.name] = []
+            st_curve_v[st_graph.name] = []
             for point in st_graph.speed_profile:
-                st_data_s[st_graph.name].append(point.s)
-                st_data_t[st_graph.name].append(point.t)
-                st_data_v[st_graph.name].append(point.v)
+                st_curve_s[st_graph.name].append(point.s)
+                st_curve_t[st_graph.name].append(point.t)
+                st_curve_v[st_graph.name].append(point.v)
 
             st_speed_limit_s[st_graph.name] = []
             st_speed_limit_v[st_graph.name] = []
@@ -163,17 +171,30 @@ class Planning:
                 st_speed_limit_s[st_graph.name].append(point.s)
                 st_speed_limit_v[st_graph.name].append(point.v)
 
+            st_speed_constraint_s[st_graph.name] = []
+            st_speed_constraint_lower[st_graph.name] = []
+            st_speed_constraint_upper[st_graph.name] = []
+            for speed_constraint in st_graph.speed_constraint:
+                interp_s = np.interp(speed_constraint.t, st_curve_t[st_graph.name], st_curve_s[st_graph.name])
+                st_speed_constraint_s[st_graph.name].append(interp_s)
+                st_speed_constraint_lower[st_graph.name].append(speed_constraint.lower_bound)
+                st_speed_constraint_upper[st_graph.name].append(speed_constraint.upper_bound)
+
         self.data_lock.acquire()
         self.st_data_lock.acquire()
 
         self.st_data_boundary_s = st_data_boundary_s
         self.st_data_boundary_t = st_data_boundary_t
-        self.st_data_s = st_data_s
-        self.st_data_t = st_data_t
-        self.st_data_v = st_data_v
+        self.st_curve_s = st_curve_s
+        self.st_curve_t = st_curve_t
+        self.st_curve_v = st_curve_v
         self.st_speed_limit_v = st_speed_limit_v
         self.st_speed_limit_s = st_speed_limit_s
         self.st_data_boundary_type = st_data_boundary_type
+
+        self.st_speed_constraint_s = st_speed_constraint_s
+        self.st_speed_constraint_lower = st_speed_constraint_lower
+        self.st_speed_constraint_upper = st_speed_constraint_upper
 
         self.st_data_lock.release()
         self.data_lock.release()
@@ -244,7 +265,7 @@ class Planning:
                        obstacle_annotation_pool, st_graph_name):
         if st_graph_name not in self.st_data_boundary_s:
             return
-        if st_graph_name not in self.st_data_s:
+        if st_graph_name not in self.st_curve_s:
             return
 
         cnt = 0
@@ -282,8 +303,8 @@ class Planning:
             cnt += 1
 
         st_line.set_visible(True)
-        st_line.set_xdata(self.st_data_t[st_graph_name])
-        st_line.set_ydata(self.st_data_s[st_graph_name])
+        st_line.set_xdata(self.st_curve_t[st_graph_name])
+        st_line.set_ydata(self.st_curve_s[st_graph_name])
         st_line.set_label(st_graph_name[0:5])
 
         self.st_data_lock.release()
