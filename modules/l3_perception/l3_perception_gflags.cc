@@ -14,15 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_SENSOR_GFLAGS_H_
-#define MODULES_DRIVERS_SENSOR_GFLAGS_H_
+#include "modules/l3_perception/l3_perception_gflags.h"
 
-#include "gflags/gflags.h"
+DEFINE_string(node_namespace, "/apollo/l3_perception", "Global node namespace");
+DEFINE_string(node_name, "l3_perception", "The chassis module name in proto");
+DEFINE_string(hmi_name, "l3_perception", "Module name in HMI");
 
-// data file
-DECLARE_string(sensor_conf_file);
-
-// Sensor gflags
-DECLARE_double(sensor_freq);
-
-#endif
+DEFINE_double(l3_perception_freq, 100, "L3 perception timer frequency.");
