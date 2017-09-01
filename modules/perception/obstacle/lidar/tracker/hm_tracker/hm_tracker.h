@@ -179,31 +179,33 @@ class HmObjectTracker : public BaseTracker{
 
  private:
   // algorithm setup
-  MatcherType                                 matcher_method_;
-  FilterType                                  filter_method_;
-  bool                                        use_histogram_for_match_;
-  int                                         histogram_bin_size_;
+  int                                   consecutive_invisible_count_minimum_;
+  int                                   collect_age_minimum_;
+  MatcherType                           matcher_method_;
+  FilterType                            filter_method_;
+  bool                                  use_histogram_for_match_;
+  int                                   histogram_bin_size_;
 
   // matcher
-  BaseMatcher*                                matcher_;
+  BaseMatcher*                          matcher_;
 
   // tracks
-  ObjectTrackSet                              object_tracks_;
-  std::vector<int>                            track_ids_for_recent_objects_;
+  ObjectTrackSet                        object_tracks_;
+  std::vector<int>                      track_ids_for_recent_objects_;
 
   // add background objects which are not tracked and are per-frame updated
-  std::vector<TrackedObjectPtr>               background_objects_;
+  std::vector<TrackedObjectPtr>         background_objects_;
 
   // track data is stored in a local coordinate system, which is offset of
   // the global coordinate system by _global_to_local_offset
-  Eigen::Matrix4d                             velodyne_to_local_pose_;
-  Eigen::Vector3d                             global_to_local_offset_;
-  double                                      time_stamp_;
-  bool                                        valid_;
+  Eigen::Matrix4d                       velodyne_to_local_pose_;
+  Eigen::Vector3d                       global_to_local_offset_;
+  double                                time_stamp_;
+  bool                                  valid_;
   // local coordinate system
-  Eigen::Vector3f                             ref_location_;
-  Eigen::Vector3f                             ref_orientation_;
-  Eigen::Vector3f                             ref_translation_;
+  Eigen::Vector3f                       ref_location_;
+  Eigen::Vector3f                       ref_orientation_;
+  Eigen::Vector3f                       ref_translation_;
 
   DISALLOW_COPY_AND_ASSIGN(HmObjectTracker);
 };  // class HmObjectTracker

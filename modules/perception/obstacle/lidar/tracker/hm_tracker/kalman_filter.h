@@ -179,7 +179,7 @@ class KalmanFilter : public BaseFilter {
   float ComputeUpdateQualityAccordingPointNumChange(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object);
-  
+
   // @brief compute breakdown threshold
   // @return breakdown threshold
   float ComputeBreakdownThreshold();
