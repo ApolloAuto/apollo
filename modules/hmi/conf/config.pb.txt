@@ -261,3 +261,13 @@ available_maps {
   name: "Sunnyvale Office"
   map_dir: "modules/map/data/sunnyvale_office"
 }
+available_vehicles {
+  name: "MKZ 8"
+  velodyne_params_path: "modules/calibration/data/mkz8"
+}
+available_vehicles {
+  name: "MKZ 9"
+  velodyne_params_path: "modules/calibration/data/mkz9"
+}
+velodyne_params_target_path: "bazel-apollo/external/ros/share/velodyne_pointcloud/params"
+velodyne_params_target_path: "ros/share/velodyne_pointcloud/params"

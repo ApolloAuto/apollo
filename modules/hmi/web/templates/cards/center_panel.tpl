@@ -32,7 +32,7 @@
     }
 </style>
 
-  <h3>Debug</h3>
+  <h3>Controllers</h3>
   <h2 class="panel_header">Modules</h2>
 
   <ul class="list-group">

@@ -73,6 +73,25 @@
         </div>
       </div>
     </li>
+
+    <li class="list-group-item debug_item">
+      <div class="item_content">Vehicle
+        <div class="dropdown pull-right">
+          <button class="btn hmi_small_btn dropdown-toggle" type="button"
+              data-toggle="dropdown">
+              <span id="current_vehicle">Select Vehicle</span>
+              <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            {% for vehicle in conf_pb.available_vehicles %}
+            <li><a onclick="
+                io_request('tool_api', 'switch_vehicle', ['{{ vehicle.name }}'])">
+              {{ vehicle.name }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </li>
   </ul>
 </div>
 
@@ -114,5 +133,6 @@
   function on_config_status_change(global_status) {
     // Config status change.
     $('#current_map').text(global_status['config']['current_map']);
+    $('#current_vehicle').text(global_status['config']['current_vehicle']);
   }
 </script>

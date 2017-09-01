@@ -85,6 +85,11 @@ class Config(object):
         return cls.__find_by_name(map_name, cls.get_pb().available_maps)
 
     @classmethod
+    def get_vehicle(cls, vehicle_name):
+        """Get map config by name."""
+        return cls.__find_by_name(vehicle_name, cls.get_pb().available_vehicles)
+
+    @classmethod
     def global_flagfile(cls):
         """Get global flagfile path."""
         return cls.get_realpath(cls.get_pb().global_flagfile)
