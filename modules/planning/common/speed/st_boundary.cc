@@ -65,20 +65,26 @@ StBoundary::StBoundary(
   max_t_ = lower_points_.back().t();
 }
 
+bool StBoundary::IsPointNear(const common::math::LineSegment2d& seg,
+                             const Vec2d& point, const double max_dist) {
+  return seg.DistanceSquareTo(point) < max_dist * max_dist;
+}
+
 void StBoundary::RemoveRedundantPoints(
     std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
   if (point_pairs.size() == 2) {
     return;
   }
 
+  const double kMaxDist = 0.1;
   size_t i = 0;
   size_t j = 1;
 
   while (i < point_pairs.size() && j + 1 < point_pairs.size()) {
     LineSegment2d lower_seg(point_pairs[i].first, point_pairs[j + 1].first);
     LineSegment2d upper_seg(point_pairs[i].second, point_pairs[j + 1].second);
-    if (!lower_seg.IsPointIn(point_pairs[j].first) ||
-        !upper_seg.IsPointIn(point_pairs[j].second)) {
+    if (!IsPointNear(lower_seg, point_pairs[j].first, kMaxDist) ||
+        !IsPointNear(upper_seg, point_pairs[j].second, kMaxDist)) {
       ++i;
       if (i != j) {
         point_pairs[i] = point_pairs[j];
