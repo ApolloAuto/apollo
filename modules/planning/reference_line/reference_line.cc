@@ -309,6 +309,10 @@ bool ReferenceLine::HasOverlap(const common::math::Box2d& box) const {
   double left_width = 0.0;
   double right_width = 0.0;
   const double mid_s = (sl_boundary.start_s() + sl_boundary.end_s()) / 2.0;
+  if (mid_s < 0 || mid_s > Length()) {
+    ADEBUG << "ref_s out of range:" << mid_s;
+    return false;
+  }
   if (!map_path_.get_width(mid_s, &left_width, &right_width)) {
     AERROR << "failed to get width at s = " << mid_s;
     return false;
