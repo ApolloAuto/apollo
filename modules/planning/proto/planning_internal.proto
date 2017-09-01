@@ -84,10 +84,16 @@ message SLFrameDebug {
 }
 
 message STGraphDebug {
+  message STGraphSpeedConstraint {
+    repeated double t = 1;
+    repeated double lower_bound = 2;
+    repeated double upper_bound = 3;
+  }
   optional string name = 1;
   repeated StGraphBoundaryDebug boundary = 2;
   repeated apollo.common.SpeedPoint speed_limit = 3;
   repeated apollo.common.SpeedPoint speed_profile = 4;
+  repeated STGraphSpeedConstraint speed_constraint = 5;
 }
 
 // next id: 16

@@ -49,7 +49,8 @@ class SpeedOptimizer : public Task {
 
   void RecordSTGraphDebug(const std::vector<StBoundary>& boundaries,
                           const SpeedLimit& speed_limits,
-                          const SpeedData& speed_data);
+                          const SpeedData& speed_data,
+                          ::apollo::planning_internal::STGraphDebug* stGraphDebug);
 
   void RecordDebugInfo(const SpeedData& speed_data);
 };

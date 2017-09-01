@@ -39,6 +39,7 @@
 
 namespace apollo {
 namespace planning {
+using ::apollo::planning_internal::STGraphDebug;
 
 class QpSplineStGraph {
  public:
@@ -46,7 +47,8 @@ class QpSplineStGraph {
                   const apollo::common::VehicleParam& veh_param);
 
   common::Status Search(const StGraphData& st_graph_data,
-                        const PathData& path_data, SpeedData* const speed_data);
+                        const PathData& path_data, SpeedData* const speed_data,
+                        STGraphDebug* st_graph_debug);
 
  private:
   void Init();
@@ -54,7 +56,8 @@ class QpSplineStGraph {
   // apply st graph constraint
   common::Status ApplyConstraint(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-      const std::vector<StBoundary>& boundaries);
+      const std::vector<StBoundary>& boundaries,
+      STGraphDebug* st_graph_debug);
 
   // apply objective function
   common::Status ApplyKernel(const std::vector<StBoundary>& boundaries,
