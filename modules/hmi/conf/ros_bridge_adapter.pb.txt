@@ -1,9 +1,4 @@
 config {
-  type: LOCALIZATION
-  mode: RECEIVE_ONLY
-  message_history_limit: 1
-}
-config {
   type: CHASSIS
   mode: RECEIVE_ONLY
   message_history_limit: 1
@@ -15,10 +10,6 @@ config {
 }
 config {
   type: PAD
-  mode: PUBLISH_ONLY
-}
-config {
-  type: ROUTING_REQUEST
   mode: PUBLISH_ONLY
 }
 is_ros: true

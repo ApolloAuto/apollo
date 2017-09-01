@@ -22,6 +22,4 @@ message HMICommand {
     optional bool reset_first = 2;
   }
   optional ChangeDrivingMode change_driving_mode = 2;
-
-  optional bool new_routing_request = 3;
 }

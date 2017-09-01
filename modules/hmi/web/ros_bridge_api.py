@@ -27,7 +27,6 @@ class RosBridgeApi(object):
     """
     HMI ros API:
         change_driving_mode [manual | auto]
-        new_routing_request
     """
     ros_command_pub = None
     ros_command_seq_num = 0
@@ -59,15 +58,6 @@ class RosBridgeApi(object):
         else:
             Config.log.critical('Unknown args: %s', str(args))
             return
-        Config.log.debug('Publishing message: %s', str(cmd_msg))
-        cls.ros_command_pub.publish(cmd_msg)
-
-    @classmethod
-    def new_routing_request(cls):
-        """SocketIO Api: new_routing_request()"""
-        Config.log.info('RosBridgeApi new_routing_request')
-        cmd_msg = cls.__new_command_message()
-        cmd_msg.new_routing_request = True
         Config.log.debug('Publishing message: %s', str(cmd_msg))
         cls.ros_command_pub.publish(cmd_msg)
 
