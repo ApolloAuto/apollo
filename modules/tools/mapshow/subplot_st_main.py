@@ -21,7 +21,7 @@ class StMainSubplot:
         ax.set_ylim(-10, 90)
         ax.set_xlabel("t (second)")
         ax.set_ylabel("s (m)")
-        ax.set_title("ST graph")
+        ax.set_title(st_name)
 
         self.set_visible(False)
 
@@ -34,9 +34,9 @@ class StMainSubplot:
 
     def show(self, planning):
         self.set_visible(False)
-        planning.data_lock.acquire()
+        planning.st_data_lock.acquire()
         if self.st_name not in planning.st_data_boundary_s:
-            planning.data_lock.release()
+            planning.st_data_lock.release()
             return
         obstacles_boundary_s = planning.st_data_boundary_s[self.st_name]
         obstacles_boundary_t = planning.st_data_boundary_t[self.st_name]
@@ -75,7 +75,7 @@ class StMainSubplot:
         self.st_curve_line.set_ydata(planning.st_curve_s[self.st_name])
         self.st_curve_line.set_label(self.st_name[0:5])
 
-        planning.data_lock.release()
+        planning.st_data_lock.release()
 
 
 

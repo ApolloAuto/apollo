@@ -10,9 +10,9 @@ class StSpeedSubplot:
         self.speed_line = ax.plot([0], [0], "k-",
                                   lw=3, alpha=0.5, label="speed planned")[0]
         self.speed_upper_bound_line = \
-            ax.plot([0], [0], "y-", lw=1, alpha=1, label="speed upper bound")[0]
+            ax.plot([0], [0], "b-", lw=1, alpha=1, label="speed upper bound")[0]
         self.speed_lower_bound_line = \
-            ax.plot([0], [0], "y-", lw=3, alpha=0.5, label="speed lower bound")[0]
+            ax.plot([0], [0], "b-", lw=3, alpha=1, label="speed lower bound")[0]
         self.st_name = st_name
         ax.set_xlim(-10, 70)
         ax.set_ylim(-1, 15)
@@ -31,9 +31,9 @@ class StSpeedSubplot:
     def show(self, planning):
         self.set_visible(False)
 
-        planning.data_lock.acquire()
+        planning.st_data_lock.acquire()
         if self.st_name not in planning.st_curve_s:
-            planning.data_lock.release()
+            planning.st_data_lock.release()
             return
         planned_speed_s = planning.st_curve_s[self.st_name]
         planned_speed_v = planning.st_curve_v[self.st_name]
@@ -53,7 +53,7 @@ class StSpeedSubplot:
         self.speed_lower_bound_line.set_ydata(planning.st_speed_constraint_lower[self.st_name])
         self.speed_lower_bound_line.set_visible(True)
 
-        planning.data_lock.release()
+        planning.st_data_lock.release()
 
 
 
