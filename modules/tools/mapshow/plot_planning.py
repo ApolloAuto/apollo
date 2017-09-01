@@ -121,14 +121,14 @@ def update(frame_number):
         sl_map_lower_boundary, sl_map_upper_boundary, sl_path,
         sl_aggregated_boundary_low_line, sl_aggregated_boundary_high_line)
 
-    if len(planning.st_data_s.keys()) >= 1:
+    if len(planning.st_curve_s.keys()) >= 1:
         planning.replot_st_data(obstacle_line_pool, st_line_1,
                                 obstacle_annotation_pool,
-                                planning.st_data_s.keys()[0])
-    if len(planning.st_data_s.keys()) >= 2:
+                                planning.st_curve_s.keys()[0])
+    if len(planning.st_curve_s.keys()) >= 2:
         planning.replot_st_data(obstacle_line_pool2, st_line_2,
                                 obstacle_annotation_pool2,
-                                planning.st_data_s.keys()[1])
+                                planning.st_curve_s.keys()[1])
     localization.replot_vehicle(vehicle_position_line, vehicle_polygon_line)
     try:
         ax.set_xlim(localization.localization_pb.pose.position.x - MAP_BOUNDARY_BUFFER,
