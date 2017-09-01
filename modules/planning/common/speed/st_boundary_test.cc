@@ -145,27 +145,16 @@ TEST(StBoundaryTest, remove_redundant_points) {
   StBoundary st_boundary;
   st_boundary.RemoveRedundantPoints(points);
 
-  for (auto& pair : points) {
-    std::cout << pair.first.DebugString() << std::endl;
-    std::cout << pair.second.DebugString() << std::endl;
-    std::cout << "-----------" << std::endl;
-  }
+  EXPECT_EQ(points.size(), 2);
+  EXPECT_DOUBLE_EQ(points[0].first.s(), 0.0);
+  EXPECT_DOUBLE_EQ(points[0].first.t(), 0.0);
+  EXPECT_DOUBLE_EQ(points[0].second.s(), 1.0);
+  EXPECT_DOUBLE_EQ(points[0].second.t(), 0.0);
 
-  EXPECT_EQ(points.size(), 3);
-  EXPECT_DOUBLE_EQ(points.front().first.s(), 0.0);
-  EXPECT_DOUBLE_EQ(points.front().first.t(), 0.0);
-  EXPECT_DOUBLE_EQ(points.front().second.s(), 1.0);
-  EXPECT_DOUBLE_EQ(points.front().second.t(), 0.0);
-
-  EXPECT_DOUBLE_EQ(points[1].first.s(), 0.1);
-  EXPECT_DOUBLE_EQ(points[1].first.t(), 0.2);
-  EXPECT_DOUBLE_EQ(points[1].second.s(), 1.1);
-  EXPECT_DOUBLE_EQ(points[1].second.t(), 0.2);
-
-  EXPECT_DOUBLE_EQ(points.back().first.s(), 0.4);
-  EXPECT_DOUBLE_EQ(points.back().first.t(), 0.5);
-  EXPECT_DOUBLE_EQ(points.back().second.s(), 1.4);
-  EXPECT_DOUBLE_EQ(points.back().second.t(), 0.5);
+  EXPECT_DOUBLE_EQ(points[1].first.s(), 0.4);
+  EXPECT_DOUBLE_EQ(points[1].first.t(), 0.5);
+  EXPECT_DOUBLE_EQ(points[1].second.s(), 1.4);
+  EXPECT_DOUBLE_EQ(points[1].second.t(), 0.5);
 }
 
 }  // namespace planning

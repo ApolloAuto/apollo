@@ -214,8 +214,8 @@ double LineSegment2d::GetPerpendicularFoot(const Vec2d &point,
 }
 
 std::string LineSegment2d::DebugString() const {
-  return util::StrCat("segment2d ( start = ", start_.DebugString(),
-                      "  end = ", end_.DebugString(), " )");
+  return util::StrCat("segment2d ( start = ", start_.DebugString(), "  end = ",
+                      end_.DebugString(), " )");
 }
 
 }  // namespace math

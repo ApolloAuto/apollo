@@ -104,6 +104,9 @@ class StBoundary : public common::math::Polygon2d {
   bool IsValid(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs) const;
 
+  bool IsPointNear(const common::math::LineSegment2d& seg,
+                   const common::math::Vec2d& point, const double max_dist);
+
   FRIEND_TEST(StBoundaryTest, remove_redundant_points);
   void RemoveRedundantPoints(
       std::vector<std::pair<STPoint, STPoint>>& point_pairs);
