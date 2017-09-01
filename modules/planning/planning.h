@@ -81,8 +81,8 @@ class Planning : public apollo::common::ApolloApp {
 
   void RunOnce();
 
-  bool InitFrame(const uint32_t sequence_num,
-                 const common::TrajectoryPoint& init_adc_point);
+  common::Status InitFrame(const uint32_t sequence_num,
+                           const common::TrajectoryPoint& init_adc_point);
 
  private:
   void PublishPlanningPb(ADCTrajectory* trajectory_pb);

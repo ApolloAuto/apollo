@@ -44,6 +44,10 @@ DEFINE_bool(enable_smooth_reference_line, true,
 
 DEFINE_int32(max_history_frame_num, 5, "The maximum history frame number");
 
+DEFINE_double(max_collision_distance, 0.1,
+              "considered as collision if distance (meters) is smaller than or "
+              "equal to this (meters)");
+
 DEFINE_double(replan_distance_threshold, 5.0,
               "The distance threshold of replan");
 

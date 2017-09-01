@@ -39,6 +39,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::adapter::AdapterManager;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 const hdmap::PncMap *Frame::pnc_map_ = nullptr;
 
@@ -110,16 +112,16 @@ bool Frame::InitReferenceLineInfo(
   return true;
 }
 
-bool Frame::Init(const PlanningConfig &config,
-                 const double current_time_stamp) {
+Status Frame::Init(const PlanningConfig &config,
+                   const double current_time_stamp) {
   if (!pnc_map_) {
     AERROR << "map is null, call SetMap() first";
-    return false;
+    return Status(ErrorCode::PLANNING_ERROR, "map is empty");
   }
   const auto &point = init_pose_.position();
   if (std::isnan(point.x()) || std::isnan(point.y())) {
     AERROR << "init point is not set";
-    return false;
+    return Status(ErrorCode::PLANNING_ERROR, "init point is not set");
   }
   smoother_config_ = config.reference_line_smoother_config();
   auto reference_lines =
@@ -127,7 +129,8 @@ bool Frame::Init(const PlanningConfig &config,
   if (reference_lines.empty()) {
     AERROR << "Failed to create reference line from position: "
            << init_pose_.DebugString();
-    return false;
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Failed to create reference line from routing");
   }
 
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
@@ -138,13 +141,44 @@ bool Frame::Init(const PlanningConfig &config,
   if (FLAGS_enable_prediction) {
     CreatePredictionObstacles(prediction_);
   }
+  if (CheckCollision()) {
+    AERROR << "Found collision with obstacle: " << collision_obstacle_id_;
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Collision found with " + collision_obstacle_id_);
+  }
 
   if (!InitReferenceLineInfo(reference_lines)) {
     AERROR << "Failed to init reference line info";
-    return false;
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "failed to init reference line info");
   }
+  return Status::OK();
+}
 
-  return true;
+bool Frame::CheckCollision() {
+  const auto &adc_box = common::VehicleState::instance()->AdcBoundingBox();
+  common::math::Polygon2d adc_polygon(adc_box);
+  const double adc_half_diagnal = adc_box.diagonal() / 2.0;
+  for (const auto &obstacle : obstacles_.Items()) {
+    double center_dist =
+        adc_box.center().DistanceTo(obstacle->PerceptionBoundingBox().center());
+    if (center_dist > obstacle->PerceptionBoundingBox().diagonal() / 2.0 +
+                          adc_half_diagnal + FLAGS_max_collision_distance) {
+      ADEBUG << "Obstacle : " << obstacle->Id() << " is too far to collide";
+      continue;
+    }
+    if (adc_polygon.DistanceTo(obstacle->PerceptionPolygon()) <
+        FLAGS_max_collision_distance) {
+      AERROR << "Found collision with obstacle " << obstacle->Id();
+      collision_obstacle_id_ = obstacle->Id();
+      return true;
+    }
+  }
+  return false;
+}
+
+const std::string &Frame::CollisionObstacle() const {
+  return collision_obstacle_id_;
 }
 
 uint32_t Frame::SequenceNum() const { return sequence_num_; }
