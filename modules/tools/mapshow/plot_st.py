@@ -3,8 +3,8 @@ from modules.planning.proto import planning_pb2
 import matplotlib.pyplot as plt
 from planning import Planning
 import matplotlib.animation as animation
-from st_main_subplot import StMainSubplot
-from st_speed_subplot import StSpeedSubplot
+from subplot_st_main import StMainSubplot
+from subplot_st_speed import StSpeedSubplot
 
 planning = Planning()
 

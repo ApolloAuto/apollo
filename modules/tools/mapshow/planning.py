@@ -180,7 +180,6 @@ class Planning:
                 st_speed_constraint_lower[st_graph.name].append(speed_constraint.lower_bound)
                 st_speed_constraint_upper[st_graph.name].append(speed_constraint.upper_bound)
 
-        self.data_lock.acquire()
         self.st_data_lock.acquire()
 
         self.st_data_boundary_s = st_data_boundary_s
@@ -197,7 +196,6 @@ class Planning:
         self.st_speed_constraint_upper = st_speed_constraint_upper
 
         self.st_data_lock.release()
-        self.data_lock.release()
 
     def replot_sl_data(self,
                        sl_static_obstacle_lower_boundary,
