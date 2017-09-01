@@ -84,16 +84,20 @@ bool ReferenceLineInfo::CalculateAdcSmoothReferenLinePoint() {
     s += delta_s;
   }
   ReferencePoint::RemoveDuplicates(&local_ref_points);
-
-  ReferenceLineSmoother smoother;
-  smoother.Init(smoother_config_);
-  ReferenceLine smoothed_segment;
-  if (!smoother.Smooth(ReferenceLine(local_ref_points), &smoothed_segment)) {
-    AERROR << "Failed to smooth reference line";
-    return false;
+  if (local_ref_points.size() > 1) {
+    ReferenceLineSmoother smoother;
+    smoother.Init(smoother_config_);
+    ReferenceLine smoothed_segment;
+    if (!smoother.Smooth(ReferenceLine(local_ref_points), &smoothed_segment)) {
+      AERROR << "Failed to smooth reference line";
+      return false;
+    }
+    adc_smooth_ref_point_ = smoothed_segment.GetReferencePoint(
+        init_adc_point_.path_point().x(), init_adc_point_.path_point().y());
+  } else {
+    adc_smooth_ref_point_ = reference_line_.GetReferencePoint(
+        init_adc_point_.path_point().x(), init_adc_point_.path_point().y());
   }
-  adc_smooth_ref_point_ = smoothed_segment.GetReferencePoint(
-      init_adc_point_.path_point().x(), init_adc_point_.path_point().y());
   return true;
 }
 

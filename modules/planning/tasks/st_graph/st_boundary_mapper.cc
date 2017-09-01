@@ -174,7 +174,6 @@ Status StBoundaryMapper::GetGraphBoundary(
   for (const auto& st_boundary : *st_boundaries) {
     DCHECK_NE(st_boundary.id().length(), 0);
   }
-
   return Status::OK();
 }
 
