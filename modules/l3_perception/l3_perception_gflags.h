@@ -14,15 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_SENSOR_GFLAGS_H_
-#define MODULES_DRIVERS_SENSOR_GFLAGS_H_
+#ifndef MODULES_L3_PERCEPTION_L3_PERCEPTION_GFLAGS_H_
+#define MODULES_L3_PERCEPTION_L3_PERCEPTION_GFLAGS_H_
 
 #include "gflags/gflags.h"
 
-// data file
-DECLARE_string(sensor_conf_file);
+DECLARE_string(node_namespace);
+DECLARE_string(node_name);
+DECLARE_string(hmi_name);
 
-// Sensor gflags
-DECLARE_double(sensor_freq);
+DECLARE_double(l3_perception_freq);
 
 #endif
