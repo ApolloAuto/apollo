@@ -33,6 +33,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
+#include "modules/common/status/status.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
@@ -54,7 +55,8 @@ class Frame {
   void SetPlanningStartPoint(const common::TrajectoryPoint &start_point);
   void SetVehicleInitPose(const localization::Pose &pose);
   const common::TrajectoryPoint &PlanningStartPoint() const;
-  bool Init(const PlanningConfig &config, const double current_time_stamp);
+  common::Status Init(const PlanningConfig &config,
+                      const double current_time_stamp);
 
   static void SetMap(hdmap::PncMap *pnc_map);
 
@@ -105,6 +107,13 @@ class Frame {
 
   void AlignPredictionTime(const double trajectory_header_time);
 
+  const std::string &CollisionObstacle() const;
+
+  /**
+   * Check if there is collision with obstacles
+   */
+  bool CheckCollision();
+
  private:
   common::TrajectoryPoint planning_start_point_;
 
@@ -127,6 +136,8 @@ class Frame {
   ReferenceLineSmootherConfig smoother_config_;
 
   ADCTrajectory trajectory_pb_;  // planning output pb
+
+  std::string collision_obstacle_id_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
