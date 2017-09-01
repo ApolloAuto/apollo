@@ -33,6 +33,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleParam;
+using ::apollo::planning_internal::STGraphDebug;
 
 QpSplineStGraph::QpSplineStGraph(
     const QpSplineStSpeedConfig& qp_spline_st_speed_config,
@@ -69,7 +70,9 @@ void QpSplineStGraph::Init() {
 
 Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
                                const PathData& path_data,
-                               SpeedData* const speed_data) {
+                               SpeedData* const speed_data,
+                               STGraphDebug* st_graph_debug
+                              ) {
   init_point_ = st_graph_data.init_point();
   if (st_graph_data.path_data_length() <
       qp_spline_st_speed_config_.total_path_length()) {
@@ -83,7 +86,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   Init();
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
-                       st_graph_data.st_boundaries())
+                       st_graph_data.st_boundaries(), st_graph_debug)
            .ok()) {
     const std::string msg = "Apply constraint failed!";
     AERROR << msg;
@@ -124,7 +127,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
 
 Status QpSplineStGraph::ApplyConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-    const std::vector<StBoundary>& boundaries) {
+    const std::vector<StBoundary>& boundaries, STGraphDebug* st_graph_debug) {
   Spline1dConstraint* constraint =
       spline_generator_->mutable_spline_constraint();
   // position, velocity, acceleration
@@ -208,6 +211,15 @@ Status QpSplineStGraph::ApplyConstraint(
 
   DCHECK_EQ(t_evaluated_.size(), speed_upper_bound.size());
   DCHECK_EQ(t_evaluated_.size(), speed_lower_bound.size());
+
+
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+    auto speed_constraint = st_graph_debug->mutable_speed_constraint()->Add();
+    speed_constraint->add_t(t_evaluated_[i]);
+    speed_constraint->add_lower_bound(speed_lower_bound[i]);
+    speed_constraint->add_upper_bound(speed_upper_bound[i]);
+  }
+
   if (!constraint->AddDerivativeBoundary(t_evaluated_, speed_lower_bound,
                                          speed_upper_bound)) {
     const std::string msg = "Fail to apply speed constraints.";

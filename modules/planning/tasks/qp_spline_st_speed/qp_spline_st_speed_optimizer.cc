@@ -38,6 +38,7 @@ namespace planning {
 using Status = apollo::common::Status;
 using ErrorCode = apollo::common::ErrorCode;
 using TrajectoryPoint = apollo::common::TrajectoryPoint;
+using ::apollo::planning_internal::STGraphDebug;
 
 QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer()
     : SpeedOptimizer("QpSplineStSpeedOptimizer") {}
@@ -101,15 +102,21 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
                             path_data.discretized_path().Length());
-  if (st_graph.Search(st_graph_data, path_data, speed_data) != Status::OK()) {
-    RecordSTGraphDebug(boundaries, speed_limits, *speed_data);
+
+  auto debug = frame_->MutableADCTrajectory()->mutable_debug();
+  STGraphDebug* st_graph_debug
+      = debug->mutable_planning_data()->add_st_graph();
+
+  if (st_graph.Search(st_graph_data, path_data,
+                      speed_data, st_graph_debug) != Status::OK()) {
+    RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
     return Status(
         ErrorCode::PLANNING_ERROR,
         Name() + ":Failed to search graph with quadratic programming!");
   }
 
   // record debug info
-  RecordSTGraphDebug(boundaries, speed_limits, *speed_data);
+  RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
   return Status::OK();
 }
 

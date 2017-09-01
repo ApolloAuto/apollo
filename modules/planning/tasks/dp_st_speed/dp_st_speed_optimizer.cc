@@ -29,6 +29,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_graph.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -38,6 +39,7 @@ using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::localization::LocalizationEstimate;
+using ::apollo::planning_internal::STGraphDebug;
 
 DpStSpeedOptimizer::DpStSpeedOptimizer()
     : SpeedOptimizer("DpStSpeedOptimizer") {}
@@ -95,15 +97,19 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
   DpStGraph st_graph(reference_line, st_graph_data, dp_st_speed_config_,
                      path_data, adc_sl_boundary);
+  auto debug = frame_->MutableADCTrajectory()->mutable_debug();
+  STGraphDebug* st_graph_debug
+      = debug->mutable_planning_data()->add_st_graph();
+
   if (!st_graph.Search(path_decision, speed_data).ok()) {
     const std::string msg(Name() +
                           ":Failed to search graph with dynamic programming.");
     AERROR << msg;
-    RecordSTGraphDebug(boundaries, speed_limit, *speed_data);
+    RecordSTGraphDebug(boundaries, speed_limit, *speed_data, st_graph_debug);
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  RecordSTGraphDebug(boundaries, speed_limit, *speed_data);
+  RecordSTGraphDebug(boundaries, speed_limit, *speed_data, st_graph_debug);
 
   return Status::OK();
 }
