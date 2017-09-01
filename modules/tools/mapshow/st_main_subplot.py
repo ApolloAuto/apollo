@@ -71,8 +71,8 @@ class StMainSubplot:
             cnt += 1
 
         self.st_curve_line.set_visible(True)
-        self.st_curve_line.set_xdata(planning.st_data_t[self.st_name])
-        self.st_curve_line.set_ydata(planning.st_data_s[self.st_name])
+        self.st_curve_line.set_xdata(planning.st_curve_t[self.st_name])
+        self.st_curve_line.set_ydata(planning.st_curve_s[self.st_name])
         self.st_curve_line.set_label(self.st_name[0:5])
 
         planning.data_lock.release()
