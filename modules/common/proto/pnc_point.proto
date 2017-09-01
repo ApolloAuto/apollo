@@ -33,7 +33,7 @@ message PathPoint {
   optional double y = 2;
   optional double z = 3;
 
-  // derivative direction on the x-y plane
+  // direction on the x-y plane
   optional double theta = 4;
   // curvature on the x-y planning
   optional double kappa = 5;

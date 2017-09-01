@@ -76,6 +76,7 @@ class PlanningTestBase : public ::testing::Test {
  protected:
   void TrimPlanning(ADCTrajectory* origin);
   bool SetUpAdapters();
+  bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
   Planning planning_;
   ADCTrajectory adc_trajectory_;

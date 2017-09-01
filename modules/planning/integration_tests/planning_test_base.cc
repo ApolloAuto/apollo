@@ -116,8 +116,13 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   const ADCTrajectory* trajectory_pointer =
       AdapterManager::GetPlanning()->GetLatestPublished();
 
-  if (!trajectory_pointer || trajectory_pointer->trajectory_point().empty()) {
+  if (!trajectory_pointer) {
     AERROR << " did not get latest adc trajectory";
+    return false;
+  }
+
+  if (!IsValidTrajectory(*trajectory_pointer)) {
+    AERROR << "Fail to pass trajectory check.";
     return false;
   }
 
@@ -182,6 +187,53 @@ void PlanningTestBase::export_path_data(const PathData& path_data,
         << std::endl;
   }
   ofs.close();
+}
+
+bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
+  if (trajectory.trajectory_point().empty()) {
+    AERROR << "trajectory has NO point.";
+    return false;
+  }
+
+  for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
+    const auto& point = trajectory.trajectory_point(i);
+
+    const double kMaxAccelThreshold = 1.5;
+    const double kMinAccelThreshold = -4.0;
+    if (point.a() > kMaxAccelThreshold || point.a() < kMinAccelThreshold) {
+      AERROR << "Invalid trajectory point because accel out of range: "
+             << point.DebugString();
+      return false;
+    }
+
+    if (!point.has_path_point()) {
+      AERROR << "Invalid trajectory point because NO path_point in "
+                "trajectory_point: "
+             << point.DebugString();
+      return false;
+    }
+
+    const double kDkappaThreshold = 0.1;
+    if (point.path_point().dkappa() > kDkappaThreshold ||
+        point.path_point().dkappa() < -kDkappaThreshold) {
+      AERROR << "Invalid trajectory point because dkappa out of range: "
+             << point.DebugString();
+      return false;
+    }
+
+    if (i > 0) {
+      const double kPathSEpsilon = 1e-3;
+      const auto& last_point = trajectory.trajectory_point(i - 1);
+      if (point.path_point().s() + kPathSEpsilon <
+          last_point.path_point().s()) {
+        AERROR << "Invalid trajectory point because s value error. last point: "
+               << last_point.DebugString()
+               << ", curr point: " << point.DebugString();
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 }  // namespace planning
