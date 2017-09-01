@@ -193,7 +193,7 @@ class Renderer {
         case "Map":
             if (!this.controls.enabled) {
                 this.enableOrbitControls();
-            }else {
+            } else {
                 this.camera.up.set(0, 1, 0);
                 this.camera.lookAt(this.camera.position.x, this.camera.position.y, 0);
             }
@@ -227,10 +227,15 @@ class Renderer {
         this.routingEditor.removeLastRoutingPoint(this.scene);
     }
 
-    sendRoutingRequest() {
-        this.routingEditor.sendRoutingRequest(this.scene,
-                                              this.adc.mesh.position,
-                                              this.coordinates);
+    sendRoutingRequest(sendDefaultRoute = false) {
+        if (sendDefaultRoute) {
+            this.routingEditor.sendDefaultRoutingRequest(this.adc.mesh.position,
+                                                         this.coordinates);
+        } else {
+            this.routingEditor.sendRoutingRequest(this.Scene,
+                                                  this.adc.mesh.position,
+                                                  this.coordinates);
+        }
     }
 
     editRoute(event) {

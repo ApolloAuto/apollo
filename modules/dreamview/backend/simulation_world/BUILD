@@ -21,6 +21,7 @@ cc_library(
         "//modules/dreamview/backend/util:trajectory_point_collector",
         "//modules/dreamview/proto:simulation_world_proto",
         "//modules/localization/proto:localization_proto",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/planning/proto:planning_proto",
         "//third_party/json",
         "@com_google_protobuf//:protobuf",

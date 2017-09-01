@@ -13,16 +13,19 @@ export default class SideBar extends React.Component {
 
         return (
             <div className="sidebar">
-                <ButtonPanel showMenu={options.showMenu}
+                <ButtonPanel showRouteEditingBar={() => {
+                                     routeEditingManager.enableRouteEditing();
+                                 }}
+                             sendDefaultRoutingRequest={() => {
+                                     routeEditingManager.sendRoutingRequest(true);
+                                 }}
+                             showMenu={options.showMenu}
                              onMenu={() => {
                                      options.toggleShowMenu();
                                  }}
                              showConsole={options.showConsole}
                              onConsole={() => {
                                      options.toggleShowConsole();
-                                 }}
-                            showRouteEditingBar={() => {
-                                      routeEditingManager.enableRouteEditing();
                                  }}/>
                 {options.showMenu ? <Menu options={options} /> : <div/>}
                 {options.showConsole ? <Console monitor={monitor} /> :
