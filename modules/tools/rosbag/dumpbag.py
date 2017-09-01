@@ -76,7 +76,7 @@ def dump_bag(in_bag, out_dir):
                     continue
                 file_path = os.path.join(out_dir,
                                         str(seq) + "_" + name_pb[0] + ".pb.txt")
-                write_to_file(file_path, msg)
+                write_to_file(file_path, name_pb[1])
         topic_name_map[topic][1] = msg
 
 
@@ -102,7 +102,6 @@ if __name__ == "__main__":
         action="store",
         default=-1,
         help="""time duration to extract in second, negative to extract all""")
-
 
     g_args = parser.parse_args()
 
