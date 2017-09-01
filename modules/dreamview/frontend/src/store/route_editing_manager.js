@@ -24,7 +24,7 @@ export default class RouteEditingManager {
         RENDERER.removeAllRoutingPoints();
     }
 
-    @action sendRoutingRequest() {
-        RENDERER.sendRoutingRequest();
+    @action sendRoutingRequest(sendDefaultRoute = false) {
+        RENDERER.sendRoutingRequest(sendDefaultRoute);
     }
 }

@@ -47,7 +47,7 @@ class SimulationWorldUpdater {
    * the server.
    * @param map_service Pointer of the map service to provide a high-level API
    * of hdmap.
-   * @param routing_from_file whether to read intial routing from file.
+   * @param routing_from_file whether to read initial routing from file.
    */
   SimulationWorldUpdater(WebSocketHandler *websocket,
                          const MapService *map_service,
@@ -73,8 +73,9 @@ class SimulationWorldUpdater {
    * @param routing_request
    * @return True if routing request is constructed successfully
    */
-  bool ConstructRoutingRequest(const nlohmann::json &json,
-                               routing::RoutingRequest* routing_request);
+  bool ConstructRoutingRequest(
+        const nlohmann::json &json,
+        apollo::routing::RoutingRequest *routing_request);
 
   // Time interval, in seconds, between pushing SimulationWorld to frontend.
   static constexpr double kSimWorldTimeInterval = 0.1;
@@ -83,6 +84,9 @@ class SimulationWorldUpdater {
   SimulationWorldService sim_world_service_;
   const MapService *map_service_;
   WebSocketHandler *websocket_;
+
+  // End point for requesting default route
+  apollo::routing::RoutingRequest::LaneWaypoint default_end_point_;
 };
 
 }  // namespace dreamview

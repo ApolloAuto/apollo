@@ -98,4 +98,13 @@ export default class RoutingEditor {
 
         return;
     }
+
+    sendDefaultRoutingRequest(carOffsetPosition, coordinates) {
+        const start    = coordinates.applyOffset(carOffsetPosition, true);
+        const end      = undefined;
+        const waypoint = undefined;
+        WS.requestRoute(start, waypoint, end, true);
+
+        return;
+    }
 }
