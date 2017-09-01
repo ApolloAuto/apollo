@@ -289,8 +289,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
 
       double low_s = path_points[low].s();
       double high_s = path_points[high].s();
-      const double kBoundaryMapperDeltaS = 1.0;
-      const double kBoundaryMapperReferenceS = 10.0;
+      const double kBoundaryMapperSCoeff = 0.1;
+      const double half_adc_length = vehicle_param_.length() / 2;
 
       while (low < high) {
         if (find_low && find_high) {
@@ -302,8 +302,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
             ++low;
             while (low < high &&
                    path_points[low].s() - low_s <
-                       kBoundaryMapperDeltaS * path_points[low].s() /
-                           kBoundaryMapperReferenceS) {
+                       std::fmin(half_adc_length, kBoundaryMapperSCoeff *
+                                                      path_points[low].s())) {
               ++low;
             }
             low_s = path_points[low].s();
@@ -317,8 +317,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
             --high;
             while (low < high &&
                    high_s - path_points[high].s() <
-                       kBoundaryMapperDeltaS * kBoundaryMapperDeltaS *
-                           path_points[high].s() / kBoundaryMapperReferenceS) {
+                       std::fmin(half_adc_length, kBoundaryMapperSCoeff *
+                                                      path_points[high].s())) {
               --high;
             }
             high_s = path_points[high].s();
