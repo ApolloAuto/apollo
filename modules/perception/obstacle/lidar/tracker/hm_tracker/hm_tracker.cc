@@ -55,21 +55,55 @@ bool HmObjectTracker::Init() {
     return false;
   }
 
-  // 1. Initialize params of object track matcher
+  // A. Tracker setup
   std::string matcher_method_name = "hungarian_matcher";
-  if (!model_config->GetValue("object_track_match_algorithm",
+  if (!model_config->GetValue("matcher_method_name",
     &matcher_method_name)) {
-    AERROR << "object_track_match_algorithm not found." << name();
+    AERROR << "matcher_method_name not found." << name();
     return false;
   }
   if (matcher_method_name == "hungarian_matcher") {
     matcher_method_ = HUNGARIAN_MATCHER;
     matcher_ = new HungarianMatcher();
   } else {
-    AERROR << "Invalid object_track_match_algorithm " << name();
+    AERROR << "Invalid matcher_method_name " << name();
     return false;
   }
 
+  std::string filter_method_name = "kalman_filter";
+  if (!model_config->GetValue("filter_method_name", &filter_method_name)) {
+    AERROR << "filter_method_name not found." << name();
+    return false;
+  }
+  if (filter_method_name == "kalman_filter") {
+    filter_method_ = KALMAN_FILTER;
+    ObjectTrack::SetFilterMethod(filter_method_);
+  } else {
+    AERROR << "Invalid filter_method_name " << name();
+    return false;
+  }
+
+  if (!model_config->GetValue("consecutive_invisible_count_minimum",
+    &consecutive_invisible_count_minimum_)) {
+    AERROR << "Failed to get consecutive invisible count minimum! "
+      << name();
+    return false;
+  }
+  if (!model_config->GetValue("collect_age_minimum",
+    &collect_age_minimum_)) {
+    AERROR << "Failed to get collect age minimum! " << name();
+    return false;
+  }
+
+  int invisible_window = 1;
+  if (!model_config->GetValue("invisible_window",
+    &invisible_window)) {
+    AERROR << "Failed to get invisible window! " << name();
+    return false;
+  }
+  ObjectTrackSet::s_maximum_consecutive_invisible_count_ = invisible_window;
+
+  // B. Matcher setup
   float max_match_dist = 4.0;
   float weight_location_dist = 0.6;
   float weight_direction_dist = 0.2f;
@@ -141,17 +175,7 @@ bool HmObjectTracker::Init() {
     return false;
   }
 
-  // 2. Initialize params of object track filter
-  std::string filter_method_name = "kalman_filter";
-  if (!model_config->GetValue("track_filter_algorithm", &filter_method_name)) {
-    AERROR << "track_filter_algorithm not found." << name();
-    return false;
-  }
-  if (filter_method_name == "kalman_filter") {
-    filter_method_ = KALMAN_FILTER;
-    ObjectTrack::SetFilterMethod(filter_method_);
-  }
-
+  // C. Filter setup
   bool use_adaptive = false;
   if (!model_config->GetValue("use_adaptive", &use_adaptive)) {
     AERROR << "use_adaptive not found." << name();
@@ -519,7 +543,10 @@ void HmObjectTracker::CollectTrackedResults(
 
   int track_number = 0;
   for (size_t i = 0; i < tracks.size(); i++) {
-    if (tracks[i]->consecutive_invisible_count_ > 0)
+    if (tracks[i]->consecutive_invisible_count_ >
+      consecutive_invisible_count_minimum_)
+      continue;
+    if (tracks[i]->age_ < collect_age_minimum_)
       continue;
     ObjectPtr obj(new Object);
     TrackedObjectPtr result_obj = tracks[i]->current_object_;

@@ -29,6 +29,7 @@ namespace perception {
 
 int ObjectTrack::s_track_idx_ = 0;
 FilterType ObjectTrack::s_filter_method_ = KALMAN_FILTER;
+int ObjectTrackSet::s_maximum_consecutive_invisible_count_ = 1;
 
 void ObjectTrack::SetFilterMethod(const FilterType& filter_method) {
   // Set filter method for all the track objects
@@ -390,8 +391,7 @@ bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
 
 /*class ObjectTrackSet*/
 ObjectTrackSet::ObjectTrackSet(): age_threshold_(5),
-  minimum_visible_ratio_(0.6f),
-  maximum_consecutive_invisible_count_(1) {
+  minimum_visible_ratio_(0.6f) {
   tracks_.reserve(1000);
 }
 
@@ -426,7 +426,7 @@ int ObjectTrackSet::remove_lost_tracks() {
     }
 
     if (tracks_[i]->consecutive_invisible_count_
-      > maximum_consecutive_invisible_count_) {
+      > s_maximum_consecutive_invisible_count_) {
       continue;
     }
 
