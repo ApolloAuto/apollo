@@ -14,15 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_SENSOR_GFLAGS_H_
-#define MODULES_DRIVERS_SENSOR_GFLAGS_H_
-
 #include "gflags/gflags.h"
+#include "modules/common/log.h"
+#include "ros/include/ros/ros.h"
 
-// data file
-DECLARE_string(sensor_conf_file);
+#include "modules/l3_perception/l3_perception.h"
 
-// Sensor gflags
-DECLARE_double(sensor_freq);
-
-#endif
+APOLLO_MAIN(apollo::l3_perception::L3Perception);
