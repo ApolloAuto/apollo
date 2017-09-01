@@ -18,6 +18,7 @@
 """Tool API."""
 
 import os
+import shutil
 
 import gflags
 
@@ -128,12 +129,49 @@ class ToolApi(object):
         map_name = args[0]
         map_conf = Config.get_map(map_name)
         if map_conf is None:
-            Config.log.critical('Cannot find %s map', map_name)
+            Config.log.critical('Cannot find map %s', map_name)
             return
         with open(Config.global_flagfile(), 'a') as fout:
             fout.write('\n--map_dir={}\n'.format(map_conf.map_dir))
 
         RuntimeStatus.pb_singleton.config.current_map = map_name
+        RuntimeStatus.broadcast_status_if_changed()
+
+    @classmethod
+    def switch_vehicle(cls, *args):
+        """SocketIO Api: switch_vehicle(vehicle_name)"""
+        if len(args) != 1:
+            Config.log.critical('ToolApi::switch_vehicle bad args')
+            return
+        vehicle_name = args[0]
+        vehicle_conf = Config.get_vehicle(vehicle_name)
+        if vehicle_conf is None:
+            Config.log.critical('Cannot find vehicle %s', vehicle_name)
+            return
+
+        conf_pb = Config.get_pb()
+
+        # Copy velodyne_params to the first existing target path.
+        first_existing = None
+        for target_path in conf_pb.velodyne_params_target_path:
+            target_path = Config.get_realpath(target_path)
+            if os.path.exists(target_path):
+                first_existing = target_path
+                break
+        if first_existing is None:
+            Config.log.critical('Cannot find velodyne params path')
+            return
+        system_cmd.copytree(vehicle_conf.velodyne_params_path, first_existing)
+        Config.log.info('Copied velodyne params from %s to %s',
+                        vehicle_conf.velodyne_params_path, target_path)
+        # Copy vehicle_param_pb.
+        system_cmd.copy(vehicle_conf.vehicle_param_pb_path,
+                        conf_pb.vehicle_param_pb_target_path)
+        # Copy calibration_table.
+        system_cmd.copy(vehicle_conf.calibration_table_path,
+                        conf_pb.calibration_table_target_path)
+
+        RuntimeStatus.pb_singleton.config.current_vehicle = vehicle_name
         RuntimeStatus.broadcast_status_if_changed()
 
     @staticmethod

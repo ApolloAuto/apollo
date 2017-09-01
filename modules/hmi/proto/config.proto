@@ -51,4 +51,21 @@ message Config {
     optional string map_dir = 2;
   }
   repeated HDMap available_maps = 6;
+
+  // Vehicle config.
+  message VehicleConfig {
+    optional string name = 1;
+    optional string vehicle_param_pb_path = 2
+        [default = "modules/common/data/mkz_config.pb.txt"];
+    optional string calibration_table_path = 3
+        [default = "modules/control/conf/lincoln.pb.txt"];
+    optional string velodyne_params_path = 4;
+  }
+  repeated VehicleConfig available_vehicles = 7;
+  optional string vehicle_param_pb_target_path = 8
+      [default = "modules/common/data/mkz_config.pb.txt"];
+  optional string calibration_table_target_path = 9
+      [default = "modules/control/conf/lincoln.pb.txt"];
+  // Will use the first existing path.
+  repeated string velodyne_params_target_path = 10;
 }
