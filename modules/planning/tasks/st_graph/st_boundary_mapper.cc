@@ -72,12 +72,7 @@ StBoundaryMapper::StBoundaryMapper(const hdmap::PncMap* pnc_map,
       vehicle_param_(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
       planning_distance_(planning_distance),
-      planning_time_(planning_time) {
-  const auto& lane_segments = reference_line_.map_path().lane_segments();
-  for (const auto& segment : lane_segments) {
-    reference_line_lane_ids_.insert(segment.lane->id().id());
-  }
-}
+      planning_time_(planning_time) {}
 
 Status StBoundaryMapper::GetGraphBoundary(
     const PathDecision& path_decision,
@@ -110,9 +105,7 @@ Status StBoundaryMapper::GetGraphBoundary(
   ObjectDecisionType stop_decision;
   double min_stop_s = std::numeric_limits<double>::max();
 
-  int ii = 0;
   for (const auto* path_obstacle : path_obstacles.Items()) {
-    ++ii;
     if (!path_obstacle->HasLongitudinalDecision()) {
       StBoundary boundary;
       const auto ret = MapWithoutDecision(*path_obstacle, &boundary);
@@ -304,18 +297,13 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       const auto& trajectory_point = trajectory.trajectory_point(i);
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
 
-      const double distance = obs_box.length() + obs_box.width();
-      if (!HasLaneOverlap(trajectory_point, distance)) {
-        continue;
-      }
-
       double trajectory_point_time = trajectory_point.relative_time();
       const double kNegtiveTimeThreshold = -1.0;
       if (trajectory_point_time < kNegtiveTimeThreshold) {
         continue;
       }
 
-      const double step_length = vehicle_param_.length() / 2;
+      const double step_length = vehicle_param_.front_edge_to_center();
       double path_s = 0.0;
 
       while (path_s < discretized_path.Length()) {
@@ -329,7 +317,9 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
           const double forward_distance = vehicle_param_.length() +
                                           vehicle_param_.width() +
                                           obs_box.length() + obs_box.width();
-          const double fine_tuning_step_length = 0.1;
+          const double default_min_step = 0.1;  // in meters
+          const double fine_tuning_step_length = std::fmin(
+              default_min_step, discretized_path.Length() / default_num_point);
 
           bool find_low = false;
           bool find_high = false;
@@ -380,26 +370,6 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
   }
   DCHECK_EQ(lower_points->size(), upper_points->size());
   return (lower_points->size() > 0 && upper_points->size() > 0);
-}
-
-bool StBoundaryMapper::HasLaneOverlap(
-    const common::TrajectoryPoint& obstacle_position,
-    const double distance) const {
-  std::vector<hdmap::LaneInfoConstPtr> lanes;
-  if (!pnc_map_->HDMap().GetLanes(
-          common::util::MakePointENU(obstacle_position.path_point().x(),
-                                     obstacle_position.path_point().y(), 0.0),
-          distance, &lanes)) {
-    ADEBUG << "get lanes failed from point : "
-           << obstacle_position.DebugString();
-  }
-  for (const auto& lane : lanes) {
-    if (reference_line_lane_ids_.find(lane->id().id()) !=
-        reference_line_lane_ids_.end()) {
-      return true;
-    }
-  }
-  return false;
 }
 
 Status StBoundaryMapper::MapWithPredictionTrajectory(
