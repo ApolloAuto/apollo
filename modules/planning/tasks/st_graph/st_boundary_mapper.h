@@ -21,12 +21,14 @@
 #ifndef MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 
+#include <unordered_set>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/st_boundary.h"
@@ -38,7 +40,8 @@ namespace planning {
 
 class StBoundaryMapper {
  public:
-  StBoundaryMapper(const SLBoundary& adc_sl_boundary,
+  StBoundaryMapper(const hdmap::PncMap* pnc_map,
+                   const SLBoundary& adc_sl_boundary,
                    const StBoundaryConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
@@ -81,6 +84,7 @@ class StBoundaryMapper {
                       std::vector<StBoundary>* st_boundaries) const;
 
  private:
+  const hdmap::PncMap* pnc_map_ = nullptr;
   const SLBoundary& adc_sl_boundary_;
   StBoundaryConfig st_boundary_config_;
   const ReferenceLine& reference_line_;
@@ -88,6 +92,8 @@ class StBoundaryMapper {
   const apollo::common::VehicleParam vehicle_param_;
   const double planning_distance_;
   const double planning_time_;
+
+  std::unordered_set<std::string> reference_line_lane_ids_;
 };
 
 }  // namespace planning
