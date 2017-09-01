@@ -21,7 +21,6 @@
 #ifndef MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 
-#include <unordered_set>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -60,9 +59,6 @@ class StBoundaryMapper {
                     const apollo::common::math::Box2d& obs_box,
                     const double buffer) const;
 
-  bool HasLaneOverlap(const common::TrajectoryPoint& obstacle_position,
-                      const double distance) const;
-
   bool GetOverlapBoundaryPoints(
       const std::vector<apollo::common::PathPoint>& path_points,
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,
@@ -95,8 +91,6 @@ class StBoundaryMapper {
   const apollo::common::VehicleParam vehicle_param_;
   const double planning_distance_;
   const double planning_time_;
-
-  std::unordered_set<std::string> reference_line_lane_ids_;
 };
 
 }  // namespace planning
