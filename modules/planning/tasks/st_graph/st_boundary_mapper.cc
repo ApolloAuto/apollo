@@ -110,7 +110,9 @@ Status StBoundaryMapper::GetGraphBoundary(
   ObjectDecisionType stop_decision;
   double min_stop_s = std::numeric_limits<double>::max();
 
+  int ii = 0;
   for (const auto* path_obstacle : path_obstacles.Items()) {
+    ++ii;
     if (!path_obstacle->HasLongitudinalDecision()) {
       StBoundary boundary;
       const auto ret = MapWithoutDecision(*path_obstacle, &boundary);
@@ -121,7 +123,6 @@ Status StBoundaryMapper::GetGraphBoundary(
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
       AppendBoundary(boundary, st_boundaries);
-      continue;
     }
     const auto& decision = path_obstacle->LongitudinalDecision();
     if (decision.has_stop()) {
@@ -284,28 +285,13 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       }
     }
   } else {
+    DiscretizedPath discretized_path(path_points);
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
 
-      const double distance = obs_box.diagonal();
-      std::vector<hdmap::LaneInfoConstPtr> lanes;
-      if (!pnc_map_->HDMap().GetLanes(
-              common::util::MakePointENU(trajectory_point.path_point().x(),
-                                         trajectory_point.path_point().y(),
-                                         0.0),
-              distance, &lanes)) {
-        ADEBUG << "get lanes failed from point : "
-               << trajectory_point.DebugString();
-      }
-      bool overlap = false;
-      for (const auto& lane : lanes) {
-        if (reference_line_lane_ids_.count(lane->id().id())) {
-          overlap = true;
-          break;
-        }
-      }
-      if (overlap) {
+      const double distance = obs_box.length() + obs_box.width();
+      if (HasLaneOverlap(trajectory_point, distance)) {
         continue;
       }
 
@@ -314,63 +300,89 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       if (trajectory_point_time < kNegtiveTimeThreshold) {
         continue;
       }
-      int64_t low = 0;
-      int64_t high = path_points.size() - 1;
-      bool find_low = false;
-      bool find_high = false;
 
-      double low_s = path_points[low].s();
-      double high_s = path_points[high].s();
-      const double kBoundaryMapperSCoeff = 0.1;
-      const double half_adc_length = vehicle_param_.length() / 2;
+      const double step_length = vehicle_param_.length() / 2;
+      double path_s = path_points.front().s();
 
-      while (low < high) {
-        if (find_low && find_high) {
-          break;
+      while (path_s < path_points.back().s()) {
+        const auto curr_adc_path_point =
+            discretized_path.EvaluateUsingLinearApproximation(path_s);
+        if (!CheckOverlap(curr_adc_path_point, obs_box,
+                          st_boundary_config_.boundary_buffer())) {
+          path_s += step_length;
         }
-        if (!find_low) {
-          if (!CheckOverlap(path_points[low], obs_box,
-                            st_boundary_config_.boundary_buffer())) {
-            ++low;
-            while (low < high &&
-                   path_points[low].s() - low_s <
-                       std::fmin(half_adc_length, kBoundaryMapperSCoeff *
-                                                      path_points[low].s())) {
-              ++low;
+
+        // found overlap, start searching with higher resolution
+        const double backward_distance = -step_length;
+        const double forward_distance = vehicle_param_.length() +
+                                        vehicle_param_.width() +
+                                        obs_box.length() + obs_box.width();
+        const double fine_tuning_step_length = 0.2;
+
+        bool find_low = false;
+        bool find_high = false;
+        double low_s = path_s + backward_distance;
+        double high_s = path_s + forward_distance;
+
+        while (low_s < high_s) {
+          if (find_low && find_high) {
+            break;
+          }
+          if (!find_low) {
+            const auto& point_low =
+                discretized_path.EvaluateUsingLinearApproximation(low_s);
+            if (!CheckOverlap(point_low, obs_box,
+                              st_boundary_config_.boundary_buffer())) {
+              low_s += fine_tuning_step_length;
+            } else {
+              find_low = true;
             }
-            low_s = path_points[low].s();
-          } else {
-            find_low = true;
+          }
+          if (!find_high) {
+            const auto& point_high =
+                discretized_path.EvaluateUsingLinearApproximation(high_s);
+            if (!CheckOverlap(point_high, obs_box,
+                              st_boundary_config_.boundary_buffer())) {
+              high_s -= fine_tuning_step_length;
+            } else {
+              find_high = true;
+            }
           }
         }
-        if (!find_high) {
-          if (!CheckOverlap(path_points[high], obs_box,
-                            st_boundary_config_.boundary_buffer())) {
-            --high;
-            while (low < high &&
-                   high_s - path_points[high].s() <
-                       std::fmin(half_adc_length, kBoundaryMapperSCoeff *
-                                                      path_points[high].s())) {
-              --high;
-            }
-            high_s = path_points[high].s();
-          } else {
-            find_high = true;
-          }
+        if (find_high && find_low) {
+          lower_points->emplace_back(
+              low_s - st_boundary_config_.point_extension(),
+              trajectory_point_time);
+          upper_points->emplace_back(
+              high_s + st_boundary_config_.point_extension(),
+              trajectory_point_time);
         }
-      }
-      if (find_high && find_low) {
-        lower_points->emplace_back(
-            path_points[low].s() - st_boundary_config_.point_extension(),
-            trajectory_point_time);
-        upper_points->emplace_back(
-            path_points[high].s() + st_boundary_config_.point_extension(),
-            trajectory_point_time);
+        break;
       }
     }
   }
   DCHECK_EQ(lower_points->size(), upper_points->size());
   return (lower_points->size() > 0 && upper_points->size() > 0);
+}
+
+bool StBoundaryMapper::HasLaneOverlap(
+    const common::TrajectoryPoint& obstacle_position,
+    const double distance) const {
+  std::vector<hdmap::LaneInfoConstPtr> lanes;
+  if (!pnc_map_->HDMap().GetLanes(
+          common::util::MakePointENU(obstacle_position.path_point().x(),
+                                     obstacle_position.path_point().y(), 0.0),
+          distance, &lanes)) {
+    ADEBUG << "get lanes failed from point : "
+           << obstacle_position.DebugString();
+  }
+  for (const auto& lane : lanes) {
+    if (reference_line_lane_ids_.find(lane->id().id()) !=
+        reference_line_lane_ids_.end()) {
+      return true;
+    }
+  }
+  return false;
 }
 
 Status StBoundaryMapper::MapWithPredictionTrajectory(

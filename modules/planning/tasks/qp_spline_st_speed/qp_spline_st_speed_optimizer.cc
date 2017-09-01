@@ -104,11 +104,10 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                             path_data.discretized_path().Length());
 
   auto debug = frame_->MutableADCTrajectory()->mutable_debug();
-  STGraphDebug* st_graph_debug
-      = debug->mutable_planning_data()->add_st_graph();
+  STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
-  if (st_graph.Search(st_graph_data, path_data,
-                      speed_data, st_graph_debug) != Status::OK()) {
+  if (st_graph.Search(st_graph_data, path_data, speed_data, st_graph_debug) !=
+      Status::OK()) {
     RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
     return Status(
         ErrorCode::PLANNING_ERROR,
