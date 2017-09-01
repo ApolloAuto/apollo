@@ -68,8 +68,8 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   }
 
   StBoundaryMapper boundary_mapper(
-      adc_sl_boundary, st_boundary_config_, reference_line, path_data,
-      qp_spline_st_speed_config_.total_path_length(),
+      reference_line_info_->pnc_map(), adc_sl_boundary, st_boundary_config_,
+      reference_line, path_data, qp_spline_st_speed_config_.total_path_length(),
       qp_spline_st_speed_config_.total_time());
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {

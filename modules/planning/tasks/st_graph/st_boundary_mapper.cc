@@ -57,20 +57,27 @@ constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }
 
-StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
+StBoundaryMapper::StBoundaryMapper(const hdmap::PncMap* pnc_map,
+                                   const SLBoundary& adc_sl_boundary,
                                    const StBoundaryConfig& config,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
                                    const double planning_distance,
                                    const double planning_time)
-    : adc_sl_boundary_(adc_sl_boundary),
+    : pnc_map_(pnc_map),
+      adc_sl_boundary_(adc_sl_boundary),
       st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(
           common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
       planning_distance_(planning_distance),
-      planning_time_(planning_time) {}
+      planning_time_(planning_time) {
+  const auto& lane_segments = reference_line_.map_path().lane_segments();
+  for (const auto& segment : lane_segments) {
+    reference_line_lane_ids_.insert(segment.lane->id().id());
+  }
+}
 
 Status StBoundaryMapper::GetGraphBoundary(
     const PathDecision& path_decision,
@@ -280,8 +287,34 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
   } else {
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
-      double trajectory_point_time = trajectory_point.relative_time();
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
+
+      const double distance = obs_box.diagonal();
+      std::vector<hdmap::LaneInfoConstPtr> lanes;
+      if (!pnc_map_->HDMap().GetLanes(
+              common::util::MakePointENU(trajectory_point.path_point().x(),
+                                         trajectory_point.path_point().y(),
+                                         0.0),
+              distance, &lanes)) {
+        ADEBUG << "get lanes failed from point : "
+               << trajectory_point.DebugString();
+      }
+      bool overlap = false;
+      for (const auto& lane : lanes) {
+        if (reference_line_lane_ids_.count(lane->id().id())) {
+          overlap = true;
+          break;
+        }
+      }
+      if (overlap) {
+        continue;
+      }
+
+      double trajectory_point_time = trajectory_point.relative_time();
+      const double kNegtiveTimeThreshold = -1.0;
+      if (trajectory_point_time < kNegtiveTimeThreshold) {
+        continue;
+      }
       int64_t low = 0;
       int64_t high = path_points.size() - 1;
       bool find_low = false;
