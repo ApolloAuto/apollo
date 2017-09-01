@@ -60,6 +60,9 @@ class StBoundaryMapper {
                     const apollo::common::math::Box2d& obs_box,
                     const double buffer) const;
 
+  bool HasLaneOverlap(const common::TrajectoryPoint& obstacle_position,
+                      const double distance) const;
+
   bool GetOverlapBoundaryPoints(
       const std::vector<apollo::common::PathPoint>& path_points,
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,

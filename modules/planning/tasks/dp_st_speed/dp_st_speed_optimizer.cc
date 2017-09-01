@@ -23,13 +23,14 @@
 #include <algorithm>
 #include <vector>
 
+#include "modules/planning/proto/planning_internal.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_graph.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -98,8 +99,7 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   DpStGraph st_graph(reference_line, st_graph_data, dp_st_speed_config_,
                      path_data, adc_sl_boundary);
   auto debug = frame_->MutableADCTrajectory()->mutable_debug();
-  STGraphDebug* st_graph_debug
-      = debug->mutable_planning_data()->add_st_graph();
+  STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
   if (!st_graph.Search(path_decision, speed_data).ok()) {
     const std::string msg(Name() +
