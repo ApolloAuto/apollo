@@ -3,6 +3,7 @@
     width: 100px;
     margin-top: 16px;
     margin-bottom: 10px;
+    margin-right: 20px;
   }
 
   .right_panel .glyphicon {
@@ -19,7 +20,7 @@
     left: auto;
     top: auto;
     margin-right: 40px;
-    background: rgba(50, 90, 125, 0.5);
+    background: rgba(50, 90, 125, 1);
   }
 
   .dropdown-menu li a {
