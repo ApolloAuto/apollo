@@ -186,8 +186,9 @@ bool StBoundaryMapper::MapStopDecision(const PathObstacle& stop_obstacle,
   if (!path_data_.GetPathPointWithRefS(
           stop_obstacle.perception_sl_boundary().start_s(), &obstacle_point)) {
     AERROR << "Fail to get path point from reference s. The sl boundary of "
-              "stop obstacle is: "
-           << stop_obstacle.perception_sl_boundary().DebugString();
+              "stop obstacle "
+           << stop_obstacle.Id()
+           << " is: " << stop_obstacle.perception_sl_boundary().DebugString();
     return false;
   }
 
@@ -195,7 +196,8 @@ bool StBoundaryMapper::MapStopDecision(const PathObstacle& stop_obstacle,
       obstacle_point.s() + stop_decision.stop().distance_s() -
       vehicle_param_.front_edge_to_center() - FLAGS_decision_valid_stop_range;
   if (st_stop_s < 0.0) {
-    AERROR << "obstacle st stop_s " << st_stop_s << " is less than 0.";
+    AERROR << "obstacle " << stop_obstacle.Id() << " st stop_s " << st_stop_s
+           << " is less than 0.";
     return false;
   }
 

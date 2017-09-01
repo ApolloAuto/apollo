@@ -33,7 +33,7 @@ DEFINE_double(trajectory_resolution, 0.01,
               "output trajectory.");
 
 DEFINE_double(
-    look_backward_distance, 60,
+    look_backward_distance, 10,
     "look backward this distance when creating reference line from routing");
 
 DEFINE_double(
