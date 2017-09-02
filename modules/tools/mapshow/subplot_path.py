@@ -41,6 +41,7 @@ class PathSubplot:
         self.vehicle_polygon_line, = ax.plot([0], [0], 'g-')
 
         self.set_visible(False)
+        ax.set_title("PLANNING PATH")
 
     def set_visible(self, visible):
         for line in self.path_lines:

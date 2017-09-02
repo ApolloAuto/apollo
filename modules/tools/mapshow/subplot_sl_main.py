@@ -37,10 +37,11 @@ class SlMainSubplot:
         self.sl_aggregated_boundary_high_line, = \
             ax.plot([0], [0], "k-", lw=1, ms=2)
 
-        ax.set_xlim([30, 140])
-        ax.set_ylim([-5, 5])
+        ax.set_xlim([-10, 100])
+        ax.set_ylim([-2.5, 2.5])
         ax.set_xlabel("s (m)")
         ax.set_ylabel("l (m)")
+        ax.set_title("QP Path - sl Graph")
 
         self.set_visible(False)
 
