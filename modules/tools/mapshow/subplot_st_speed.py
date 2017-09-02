@@ -30,7 +30,7 @@ class StSpeedSubplot:
         self.st_name = st_name
         ax.set_xlim(-10, 70)
         ax.set_ylim(-1, 20)
-        ax.set_xlabel("s (m)")
+        ax.set_xlabel("s - qp_path(m)")
         ax.set_ylabel("v (m/s)")
         ax.set_title("QP Speed - sv graph")
         ax.legend(loc="upper left", bbox_to_anchor=(0, 1), ncol=2, borderaxespad=0.)

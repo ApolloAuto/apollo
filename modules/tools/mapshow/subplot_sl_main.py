@@ -39,7 +39,7 @@ class SlMainSubplot:
 
         ax.set_xlim([-10, 100])
         ax.set_ylim([-2.5, 2.5])
-        ax.set_xlabel("s (m)")
+        ax.set_xlabel("s - ref_line (m)")
         ax.set_ylabel("l (m)")
         ax.set_title("QP Path - sl Graph")
 
