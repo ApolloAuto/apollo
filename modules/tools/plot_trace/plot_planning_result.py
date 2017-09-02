@@ -50,9 +50,15 @@ def plot_planning(ax, planning_file):
 
 
 def press_key(event):
-    files = " ".join(g_args.planning_files)
-    if evnet.key == 'f':
-        call(["cp", files])
+    if event.key == 'c':
+        files = g_args.planning_files
+        if len(files) != 2:
+            print "Need more than two files"
+            return
+        command = ["cp"]
+        for f in files:
+            command.append(f)
+        call(command)
 
 
 if __name__ == '__main__':

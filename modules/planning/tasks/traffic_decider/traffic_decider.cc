@@ -44,84 +44,10 @@ bool TrafficDecider::Init(const PlanningConfig &config) {
   return true;
 }
 
-const PathObstacle *TrafficDecider::CreateDestinationPathObstacle() {
-  // set destination point
-
-  const auto *destination_obstacle =
-      frame_->FindObstacle(FLAGS_destination_obstacle_id);
-  if (!destination_obstacle) {
-    destination_obstacle = CreateDestinationObstacle();
-    ADEBUG << "Created destination obstacle";
-  }
-  if (!destination_obstacle) {
-    return nullptr;
-  } else {
-    const auto *ptr = reference_line_info_->AddObstacle(destination_obstacle);
-    if (!ptr) {
-      AERROR << "Failed to add destination obstacle's projection";
-      return nullptr;
-    }
-    return ptr;
-  }
-}
-
-const Obstacle *TrafficDecider::CreateDestinationObstacle() {
-  const auto &routing_response = frame_->routing_response();
-  if (!routing_response.routing_request().has_end()) {
-    ADEBUG << "routing_request has no end";
-    return nullptr;
-  }
-  common::math::Vec2d destination;
-  destination.set_x(routing_response.routing_request().end().pose().x());
-  destination.set_y(routing_response.routing_request().end().pose().y());
-
-  // check if destination point is in planning range
-  common::SLPoint destination_sl;
-  const auto &reference_line = reference_line_info_->reference_line();
-  reference_line.XYToSL(destination, &destination_sl);
-  double destination_s = destination_sl.s();
-  double destination_l = destination_sl.l();
-  double left_bound;
-  double right_bound;
-  if (!reference_line.GetLaneWidth(destination_s, &left_bound, &right_bound)) {
-    left_bound = right_bound = FLAGS_default_reference_line_width / 2;
-  }
-  if (destination_s < 0 || destination_s > reference_line.Length() ||
-      destination_l > left_bound || destination_l < -right_bound) {
-    ADEBUG << "destination[s=" << destination_s << "; l=" << destination_l
-           << "] out of planning range. Skip";
-    return nullptr;
-  }
-
-  // adjust destination based on adc front s
-  if (destination_sl.s() <= reference_line_info_->AdcSlBoundary().end_s()) {
-    destination_s = reference_line_info_->AdcSlBoundary().end_s() +
-                    FLAGS_destination_adjust_distance_buffer;
-  }
-
-  std::unique_ptr<Obstacle> obstacle_ptr =
-      reference_line_info_->CreateVirtualObstacle(
-          FLAGS_destination_obstacle_id, {destination.x(), destination.y()},
-          FLAGS_virtual_stop_wall_length, FLAGS_virtual_stop_wall_width,
-          FLAGS_virtual_stop_wall_height);
-  const auto *obstacle = obstacle_ptr.get();
-  if (!frame_->AddObstacle(std::move(obstacle_ptr))) {
-    AERROR << "Failed to add destination obstacle";
-    return nullptr;
-  }
-  return obstacle;
-}
-
 Status TrafficDecider::Execute(Frame *frame,
                                ReferenceLineInfo *reference_line_info) {
   Task::Execute(frame, reference_line_info);
 
-  // 1. add destination stop
-  if (!MakeDestinationStopDecision()) {
-    ADEBUG << "There is no destination stop";
-  } else {
-    ADEBUG << "destination is created";
-  }
   for (const auto rule_config : rule_configs_) {
     auto rule = rule_factory_.CreateObject(rule_config.name());
     if (!rule) {
@@ -132,48 +58,6 @@ Status TrafficDecider::Execute(Frame *frame,
     ADEBUG << "Applied rule " << rule_config.name();
   }
   return Status::OK();
-}
-
-bool TrafficDecider::MakeDestinationStopDecision() {
-  const auto *path_obstacle = CreateDestinationPathObstacle();
-  if (!path_obstacle) {
-    ADEBUG << "The path obstacle is not found";
-    return false;
-  }
-  const auto *obstacle = path_obstacle->obstacle();
-  const auto &reference_line = reference_line_info_->reference_line();
-
-  // check stop_posision on reference line
-  auto stop_position = obstacle->Perception().position();
-  common::SLPoint stop_line_sl;
-  reference_line.XYToSL({stop_position.x(), stop_position.y()}, &stop_line_sl);
-  if (!reference_line.IsOnRoad(stop_line_sl)) {
-    return false;
-  }
-
-  // check stop_line_s vs adc_s. stop_line_s must be ahead of adc_front_s
-  if (stop_line_sl.s() <= reference_line_info_->AdcSlBoundary().end_s()) {
-    ADEBUG << "skip: object:" << obstacle->Id() << " fence route_s["
-           << stop_line_sl.s() << "] behind adc_front_s["
-           << reference_line_info_->AdcSlBoundary().end_s() << "]";
-    return false;
-  }
-
-  ObjectDecisionType object_stop;
-  ObjectStop *object_stop_ptr = object_stop.mutable_stop();
-  object_stop_ptr->set_distance_s(FLAGS_stop_line_min_distance);
-  object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
-
-  auto stop_ref_point =
-      reference_line.GetReferencePoint(stop_position.x(), stop_position.y());
-  object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
-  object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
-  object_stop_ptr->set_stop_heading(stop_ref_point.heading());
-
-  reference_line_info_->path_decision()->AddLongitudinalDecision(
-      "Destination", obstacle->Id(), object_stop);
-
-  return true;
 }
 
 }  // namespace planning
