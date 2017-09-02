@@ -396,9 +396,9 @@ bool PncMap::TruncateLaneSegments(
   return true;
 }
 
-void PncMap::AppendLaneToPoints(
-    LaneInfoConstPtr lane, const double start_s, const double end_s,
-    std::vector<MapPathPoint> *const points) {
+void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
+                                const double end_s,
+                                std::vector<MapPathPoint> *const points) {
   if (points == nullptr || start_s >= end_s) {
     return;
   }
@@ -455,21 +455,30 @@ bool PncMap::CreatePathFromRouting(const RoutingResponse &routing,
       }
     }
   }
-  CreatePathFromLaneSegments(segments, path);
-  return true;
+  return CreatePathFromLaneSegments(segments, path);
 }
 
-void PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
+bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
                                         Path *const path) {
   std::vector<MapPathPoint> points;
   for (const auto &segment : segments) {
     AppendLaneToPoints(segment.lane, segment.start_s, segment.end_s, &points);
   }
   RemoveDuplicates(&points);
+
+  if (points.size() < 2) {
+    AWARN << "Cannot create path from " << points.size()
+          << " points. Expecting more than 2.";
+    return false;
+  }
+
   *path = Path(points, segments, kTrajectoryApproximationMaxError);
+  return true;
 }
 
-const HDMap &PncMap::HDMap() const { return hdmap_; }
+const HDMap &PncMap::HDMap() const {
+  return hdmap_;
+}
 
 }  // namespace hdmap
 }  // namespace apollo

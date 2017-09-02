@@ -57,7 +57,7 @@ class PncMap {
       const double backward_length, const double forward_length,
       std::vector<LaneSegments> *const route_segments) const;
 
-  static void CreatePathFromLaneSegments(const LaneSegments &segments,
+  static bool CreatePathFromLaneSegments(const LaneSegments &segments,
                                          Path *const path);
 
  private:
