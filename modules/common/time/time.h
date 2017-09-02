@@ -268,8 +268,8 @@ inline Clock::Clock()
        [block_start_time]() {                                             \
          double now = Clock::NowInSecond();                               \
          if (now - block_start_time > (threshold)) {                      \
-           std::cout << std::fixed << (message) << ": "                   \
-                     << now - block_start_time << std::endl;              \
+           ADEBUG << std::fixed << (message) << ": "                      \
+                  << now - block_start_time;                              \
          }                                                                \
        }())
 

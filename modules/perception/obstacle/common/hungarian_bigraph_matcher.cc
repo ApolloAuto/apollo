@@ -276,7 +276,6 @@ void HungarianOptimizer::do_munkres() {
     (this->*_state)();
     ++iter_num;
   }
-  // std::cout << "do_munkres iterations: " << iter_num << std::endl;
   if (iter_num >= max_iter) {
     check_star();
   }

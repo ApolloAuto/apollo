@@ -125,7 +125,7 @@ void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
     filter_->UpdateWithObject((*new_object), current_object_, time_diff);
     filter_->GetState(&belief_anchor_point_, &belief_velocity_);
   } else {
-    /* Here, we only update belief anchor point with anchor point of new detected object. In 
+    /* Here, we only update belief anchor point with anchor point of new detected object. In
      * the future, new method that handle outlier could be designed to handle more complicated
      * strategies. */
     belief_anchor_point_ = (*new_object)->anchor_point;
@@ -140,7 +140,7 @@ void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
   belief_velocity_accelaration_ = ((*new_object)->velocity -
     current_object_->velocity) / time_diff;
 
-  /* Currently, we only considered outliers' influence on motion estimation. Track level 
+  /* Currently, we only considered outliers' influence on motion estimation. Track level
    * smoothness of orientation & class idx may also take into acount it in the future. */
 
   // 1.4 update track info
@@ -161,7 +161,7 @@ void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
    * is more reasonable to be used in the smoothing of orientation & type. */
 
   /* Previously, track static hypothesis is checked before smoothing strategies. Now, it has been
-   * moved in the method of smooth track velocity. This is more reasonable, as track static 
+   * moved in the method of smooth track velocity. This is more reasonable, as track static
    * hypothesis is decided by velocity more directly when velocity estimation improved. */
 
   /* 2. smooth object track */
@@ -396,9 +396,7 @@ ObjectTrackSet::ObjectTrackSet(): age_threshold_(5),
 }
 
 ObjectTrackSet::~ObjectTrackSet() {
-  std::cout << "Release ObjectTrackSet...\n";
   clear();
-  std::cout << "Release ObjectTrackSet End\n";
 }
 
 void ObjectTrackSet::clear() {

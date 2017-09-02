@@ -204,10 +204,8 @@ void  MinBoxObjectBuilder::ReconstructPolygon(
             p_j[2] = obj->polygon.points[j].z;
             Eigen::Vector3d ray = p - min_point;
             if (line[0] * ray[1] - ray[0] * line[1] < 0) {
-                // std::cout << "in :" << std::endl;
             } else {
                 // outline
-                // std::cout << "out :" << std::endl;
                 has_out = true;
             }
         } else if (j == min_point_index || j == max_point_index) {
