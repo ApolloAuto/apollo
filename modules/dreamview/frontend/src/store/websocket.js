@@ -46,13 +46,6 @@ class WebSocketEndpoint {
                     RENDERER.updateMap(message.data);
                     STORE.setInitializationStatus(true);
                     break;
-                case "RoutingRequestSent":
-                    if (message.status === "Failed") {
-                        alert("Error: failed to send routing request.");
-                    } else {
-                        alert("Routing request sent.");
-                        STORE.routeEditingManager.disableRouteEditing();
-                    }
             }
         };
         this.websocket.onclose = event => {
