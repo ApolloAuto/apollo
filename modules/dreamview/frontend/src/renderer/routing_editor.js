@@ -82,7 +82,7 @@ export default class RoutingEditor {
     sendRoutingRequest(scene, carOffsetPosition, coordinates) {
         if (this.routePoints.length === 0) {
             alert("Please provide at least an end point.");
-            return;
+            return false;
         }
 
         const points = this.routePoints.map((object) => {
@@ -96,7 +96,7 @@ export default class RoutingEditor {
         const waypoint = (this.routePoints.length > 1) ? points.slice(1,-1) : [];
         WS.requestRoute(start, waypoint, end);
 
-        return;
+        return true;
     }
 
     sendDefaultRoutingRequest(carOffsetPosition, coordinates) {
@@ -105,6 +105,6 @@ export default class RoutingEditor {
         const waypoint = undefined;
         WS.requestRoute(start, waypoint, end, true);
 
-        return;
+        return true;
     }
 }

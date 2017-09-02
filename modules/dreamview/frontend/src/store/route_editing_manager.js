@@ -25,6 +25,8 @@ export default class RouteEditingManager {
     }
 
     @action sendRoutingRequest(sendDefaultRoute = false) {
-        RENDERER.sendRoutingRequest(sendDefaultRoute);
+        if (RENDERER.sendRoutingRequest(sendDefaultRoute)){
+            this.disableRouteEditing();
+        }
     }
 }

@@ -229,10 +229,10 @@ class Renderer {
 
     sendRoutingRequest(sendDefaultRoute = false) {
         if (sendDefaultRoute) {
-            this.routingEditor.sendDefaultRoutingRequest(this.adc.mesh.position,
+            return this.routingEditor.sendDefaultRoutingRequest(this.adc.mesh.position,
                                                          this.coordinates);
         } else {
-            this.routingEditor.sendRoutingRequest(this.Scene,
+            return this.routingEditor.sendRoutingRequest(this.Scene,
                                                   this.adc.mesh.position,
                                                   this.coordinates);
         }
