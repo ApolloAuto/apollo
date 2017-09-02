@@ -142,3 +142,10 @@ DEFINE_double(decision_valid_stop_range, 0.5,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
+
+// QpSt optimizer
+DEFINE_bool(enable_slowdown_profile_generator, true,
+            "True to enable slowdown speed profile generator.");
+DEFINE_double(slowdown_speed_threshold, 3.0,
+              "Only generator slowdown profile when adc speed is lower than "
+              "this threshold. unit : m/s.");
