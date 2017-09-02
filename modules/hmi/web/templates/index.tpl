@@ -37,7 +37,7 @@
   }
 
   .debug_item .item_content {
-    margin: 15px 20px;
+    margin: 12px 20px;
   }
 
   .hmi_small_btn, .hmi_small_btn:hover, .hmi_small_btn:focus {
