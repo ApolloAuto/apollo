@@ -111,7 +111,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="replay a planning result pb file")
     parser.add_argument(
-        "filename", action="store", type=str, help="planning result files")
+        "--filename", action="store", type=str, help="planning result files")
     parser.add_argument(
         "--topic",
         action="store",
