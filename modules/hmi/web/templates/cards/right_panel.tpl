@@ -108,6 +108,11 @@
           </li>
         </ul>
       </div>
+      <div class="modal-footer">
+        <div class="text-center">
+          <button class="btn hmi_small_btn" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
