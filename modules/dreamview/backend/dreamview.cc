@@ -20,6 +20,7 @@
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -31,6 +32,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::Status;
 using apollo::common::time::Clock;
+using apollo::common::util::PathExists;
 using apollo::hdmap::SimMapFile;
 using apollo::hdmap::BaseMapFile;
 
@@ -49,10 +51,18 @@ Status Dreamview::Init() {
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
-  server_.reset(new CivetServer(
-      {"document_root", FLAGS_static_file_dir, "listening_ports", FLAGS_server_ports,
-       "websocket_timeout_ms", FLAGS_websocket_timeout_ms, "ssl_certificate",
-       FLAGS_ssl_certificate}));
+  std::vector<std::string> options = {
+      "document_root",    FLAGS_static_file_dir,  "listening_ports",
+      FLAGS_server_ports, "websocket_timeout_ms", FLAGS_websocket_timeout_ms};
+  if (PathExists(FLAGS_ssl_certificate)) {
+    options.push_back("ssl_certificate");
+    options.push_back(FLAGS_ssl_certificate);
+  } else if (FLAGS_ssl_certificate.size() > 0) {
+    AERROR << "Certificate file " << FLAGS_ssl_certificate
+           << " does not exist!";
+  }
+  server_.reset(new CivetServer(options));
+
   websocket_.reset(new WebSocketHandler());
   server_->addWebSocketHandler("/websocket", *websocket_);
 
