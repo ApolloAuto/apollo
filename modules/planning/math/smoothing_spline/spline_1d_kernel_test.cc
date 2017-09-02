@@ -31,14 +31,10 @@ TEST(Spline1dKernel, add_reference_line_kernel) {
   Spline1dKernel kernel(x_knots, spline_order);
   Eigen::IOFormat OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[",
                             "]");
-  std::cout << kernel.kernel_matrix().format(OctaveFmt) << std::endl;
 
   std::vector<double> x_coord = {0.0, 1.0, 2.0, 3.0};
   std::vector<double> ref_x = {0.0, 0.5, 0.6, 2.0};
   kernel.add_reference_line_kernel_matrix(x_coord, ref_x, 1.0);
-
-  std::cout << kernel.kernel_matrix().format(OctaveFmt) << std::endl;
-  std::cout << kernel.offset().format(OctaveFmt) << std::endl;
 
   Eigen::MatrixXd ref_kernel_matrix = Eigen::MatrixXd::Zero(15, 15);
   ref_kernel_matrix << 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

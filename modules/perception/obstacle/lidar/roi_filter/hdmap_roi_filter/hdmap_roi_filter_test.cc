@@ -133,7 +133,6 @@ void HdmapROIFilterTest::filter() {
 
 TEST_F(HdmapROIFilterTest, test_filter) {
   init();
-  std::cout << "Successfully init." << std::endl;
   filter();
 }
 
