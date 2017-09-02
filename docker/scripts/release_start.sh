@@ -56,22 +56,6 @@ if [ -z "${DOCKER_REPO}" ]; then
 fi
 IMG=${DOCKER_REPO}:$VERSION
 
-
-function find_device() {
-    # ${1} = device pattern
-    local device_list=$(find /dev -name "${1}")
-    if [ -z "${device_list}" ]; then
-        warning "Failed to find device with pattern \"${1}\" ..."
-    else
-        local devices=""
-        for device in $(find /dev -name "${1}"); do
-            ok "Found device: ${device}."
-            devices="${devices} --device ${device}:${device}"
-        done
-        echo "${devices}"
-    fi
-}
-
 function main() {
     #FIX ME: remove login when open source.
     docker login -u autoapollo -p baidu123
@@ -83,10 +67,7 @@ function main() {
         docker rm -f apollo_release 1>/dev/null
     fi
 
-    # setup CAN device
-    if [ ! -e /dev/can0 ]; then
-        sudo mknod --mode=a+rw /dev/can0 c 52 0
-    fi
+    setup_device
 
     local devices=""
     devices="${devices} $(find_device ttyUSB*)"

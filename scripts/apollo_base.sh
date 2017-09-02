@@ -142,6 +142,41 @@ function determine_bin_prefix() {
   export APOLLO_BIN_PREFIX
 }
 
+function find_device() {
+    # ${1} = device pattern
+    local device_list=$(find /dev -name "${1}")
+    if [ -z "${device_list}" ]; then
+        warning "Failed to find device with pattern \"${1}\" ..."
+    else
+        local devices=""
+        for device in $(find /dev -name "${1}"); do
+            ok "Found device: ${device}."
+            devices="${devices} --device ${device}:${device}"
+        done
+        echo "${devices}"
+    fi
+}
+
+function setup_device() {
+    # setup CAN device
+    if [ ! -e /dev/can0 ]; then
+        sudo mknod --mode=a+rw /dev/can0 c 52 0
+    fi
+    # setup nvidia device
+    if [ ! -e /dev/nvidia0 ];then
+        sudo mknod -m 666 /dev/nvidia0 c 195 0
+    fi
+    if [ ! -e /dev/nvidiactl ];then
+        sudo mknod -m 666 /dev/nvidiactl c 195 255
+    fi
+    if [ ! -e /dev/nvidia-uvm ];then
+        sudo mknod -m 666 /dev/nvidia-uvm c 243 0
+    fi
+    if [ ! -e /dev/nvidia-uvm-tools ];then
+        sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
+    fi
+}
+
 function is_stopped() {
     MODULE=${1}
     NUM_PROCESSES="$(pgrep -c -f "modules/${MODULE}/${MODULE}")"
