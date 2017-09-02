@@ -31,15 +31,12 @@ source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 export APOLLO_ROOT_DIR
 
-if [ ! -e "${APOLLO_ROOT_DIR}/data/log" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/log"
+if [ -e "${APOLLO_ROOT_DIR}/data" ]; then
+    rm -rf ${APOLLO_ROOT_DIR}/data 
 fi
-if [ ! -e "${APOLLO_ROOT_DIR}/data/bag" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
-fi
-if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/core"
-fi
+mkdir -p "${APOLLO_ROOT_DIR}/data/log"
+mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
+mkdir -p "${APOLLO_ROOT_DIR}/data/core"
 
 if [ ! -e /apollo ]; then
     sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
@@ -47,7 +44,7 @@ fi
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 echo "APOLLO_ROOT_DIR=$APOLLO_ROOT_DIR"
 
-VERSION=release-20170810_2158
+VERSION=release-latest
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
@@ -119,7 +116,8 @@ function main() {
         $IMG
     if [ "${USER}" != "root" ]; then
         docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
-        docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo"
+        docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
+        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne_pointcloud"
     fi
     docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
 }
