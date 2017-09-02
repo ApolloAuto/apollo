@@ -33,6 +33,7 @@ from modules.planning.proto import planning_pb2
 from modules.prediction.proto import prediction_obstacle_pb2
 from modules.routing.proto import routing_pb2
 
+
 def generate_message(topic, filename):
     """generate message from file"""
     message = None
@@ -61,11 +62,12 @@ def topic_publisher(topic, filename, period):
     """publisher"""
     rospy.init_node('replay_node', anonymous=True)
     pub = rospy.Publisher(topic, String, queue_size=1)
-    rate = rospy.Rate(int(1.0 / period))  # 10hz
+    rate = rospy.Rate(int(1.0 / period))
     message = generate_message(topic, filename)
     while not rospy.is_shutdown():
         pub.publish(str(message))
         rate.sleep()
+
 
 def seq_publisher(seq_num, period):
     """publisher"""
@@ -73,22 +75,26 @@ def seq_publisher(seq_num, period):
 
     # topic_name => module_name, pb type, pb, publish_handler
     topic_name_map = {
-        "/apollo/localization/pose" : ["localization",
-            localization_pb2.LocalizationEstimate, None, None],
-        "/apollo/routing_response" : ["routing",
-            routing_pb2.RoutingResponse, None, None],
-        "/apollo/perception/obstacles" : ["perception",
-            perception_obstacle_pb2.PerceptionObstacles, None, None],
-        "/apollo/prediction" : ["prediction",
-            prediction_obstacle_pb2.PredictionObstacles, None, None],
-        "/apollo/planning" : ["planning",
-            planning_pb2.ADCTrajectory, None, None],
+        "/apollo/localization/pose":
+        ["localization", localization_pb2.LocalizationEstimate, None, None],
+        "/apollo/routing_response":
+        ["routing", routing_pb2.RoutingResponse, None, None],
+        "/apollo/perception/obstacles": [
+            "perception", perception_obstacle_pb2.PerceptionObstacles, None,
+            None
+        ],
+        "/apollo/prediction": [
+            "prediction", prediction_obstacle_pb2.PredictionObstacles, None,
+            None
+        ],
+        "/apollo/planning":
+        ["planning", planning_pb2.ADCTrajectory, None, None],
     }
     for topic, module_features in topic_name_map.iteritems():
         filename = str(seq_num) + "_" + module_features[0] + ".pb.txt"
         print "trying to load pb file:", filename
-        module_features[3] = rospy.Publisher(topic,
-            module_features[1], queue_size=1)
+        module_features[3] = rospy.Publisher(
+            topic, module_features[1], queue_size=1)
         module_features[2] = generate_message(topic, filename)
         if module_features[2] is None:
             print topic, " pb is none"
@@ -105,7 +111,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="replay a planning result pb file")
     parser.add_argument(
-        "--filename", action="store", type=str, help="planning result files")
+        "filename", action="store", type=str, help="planning result files")
     parser.add_argument(
         "--topic",
         action="store",
