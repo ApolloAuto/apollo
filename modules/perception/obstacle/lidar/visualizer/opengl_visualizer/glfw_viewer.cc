@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
+#include <math.h>
+#include <pcl/io/pcd_io.h>
 #include <iomanip>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <math.h>
-#include <pcl/io/pcd_io.h>
-#include "modules/common/log.h"
+#include <vector>
 
+#include "modules/common/log.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/arc_ball.h"
@@ -30,13 +31,12 @@
 namespace apollo {
 namespace perception {
 
-#define BUFFER_OFFSET(offset) ((GLvoid *)offset)
+#define BUFFER_OFFSET(offset) (reinterpret_cast<GLvoid *>(offset))
 
 GLFWViewer::GLFWViewer() {
   init_ = false;
   window_ = NULL;
   pers_camera_ = NULL;
-  frame_content_ = NULL;
   forward_dir_ = Eigen::Vector3d::Zero();
   scn_center_ = Eigen::Vector3d::Zero();
   bg_color_ = Eigen::Vector3d::Zero();
@@ -93,7 +93,7 @@ bool GLFWViewer::Initialize() {
 }
 
 void GLFWViewer::Spin() {
-  while (!glfwWindowShouldClose(window_) && frame_content_) {
+  while (!glfwWindowShouldClose(window_)) {
     glfwPollEvents();
     Render();
     glfwSwapBuffers(window_);
@@ -102,10 +102,6 @@ void GLFWViewer::Spin() {
 }
 
 void GLFWViewer::SpinOnce() {
-  if (!frame_content_) // if frame_content_ may be always guarantteed, remove
-                       // this line.
-    return;
-
   glfwPollEvents();
   Render();
   glfwSwapBuffers(window_);
@@ -197,17 +193,17 @@ bool GLFWViewer::OpenglInit() {
   // allocation of vbo
   // point cloud
   {
-    GLfloat cloud_colors[point_num_per_cloud_VAO_][3];
-    GLuint cloud_indices[point_num_per_cloud_VAO_];
-    for (int i = 0; i < point_num_per_cloud_VAO_; i++) {
+    GLfloat cloud_colors[kPoint_Num_Per_Cloud_VAO_][3];
+    GLuint cloud_indices[kPoint_Num_Per_Cloud_VAO_];
+    for (int i = 0; i < kPoint_Num_Per_Cloud_VAO_; i++) {
       cloud_colors[i][0] = 0.7;
       cloud_colors[i][1] = 0.7;
       cloud_colors[i][2] = 0.7;
       cloud_indices[i] = GLuint(i);
     }
 
-    glGenVertexArrays(cloud_VAO_num_, cloud_VAO_buf_ids_);
-    for (int i = 0; i < cloud_VAO_num_; i++) {
+    glGenVertexArrays(kCloud_VAO_Num_, cloud_VAO_buf_ids_);
+    for (int i = 0; i < kCloud_VAO_Num_; i++) {
       glBindVertexArray(cloud_VAO_buf_ids_[i]);
 
       glGenBuffers(NUM_VBO_TYPE, cloud_VBO_buf_ids_[i]);
@@ -231,11 +227,11 @@ bool GLFWViewer::OpenglInit() {
   }
   // circle
   {
-    GLfloat circle_verts[point_num_per_circle_VAO_][3];
-    GLfloat circle_colors[point_num_per_circle_VAO_][3];
-    GLuint circle_indices[point_num_per_circle_VAO_];
+    GLfloat circle_verts[kPoint_Num_Per_Circle_VAO_][3];
+    GLfloat circle_colors[kPoint_Num_Per_Circle_VAO_][3];
+    GLuint circle_indices[kPoint_Num_Per_Circle_VAO_];
 
-    for (int i = 0; i < point_num_per_circle_VAO_; ++i) {
+    for (int i = 0; i < kPoint_Num_Per_Circle_VAO_; ++i) {
       circle_verts[i][2] = -1.0;
       circle_colors[i][0] = 0.0;
       circle_colors[i][1] = 0.0;
@@ -243,10 +239,11 @@ bool GLFWViewer::OpenglInit() {
       circle_indices[i] = GLuint(i);
     }
 
-    float ang_interv = 2 * M_PI / (float)point_num_per_circle_VAO_;
-    glGenVertexArrays(circle_VAO_num_, circle_VAO_buf_ids_);
-    for (int vao = 0; vao < circle_VAO_num_; ++vao) {
-      for (int i = 0; i < point_num_per_circle_VAO_; ++i) {
+    float ang_interv = 2 * M_PI /
+                  static_cast<float>(kPoint_Num_Per_Circle_VAO_);
+    glGenVertexArrays(kCircle_VAO_Num_, circle_VAO_buf_ids_);
+    for (int vao = 0; vao < kCircle_VAO_Num_; ++vao) {
+      for (int i = 0; i < kPoint_Num_Per_Circle_VAO_; ++i) {
         float theta = i * ang_interv;
         circle_verts[i][0] = 20 * (vao + 1) * cos(theta);
         circle_verts[i][1] = 20 * (vao + 1) * sin(theta);
@@ -324,13 +321,13 @@ void GLFWViewer::DrawCloud() {
   pcl_util::PointCloudPtr cloud;
   pcl_util::PointCloudPtr roi_cloud;
 
-  if (show_cloud_state_ == 0) { // only show original point cloud
-    cloud = frame_content_->GetCloud();
-  } else if (show_cloud_state_ == 1) { // show roi
-    roi_cloud = frame_content_->GetRoiCloud();
-  } else { // show both
-    cloud = frame_content_->GetCloud();
-    roi_cloud = frame_content_->GetRoiCloud();
+  if (show_cloud_state_ == 0) {  // only show original point cloud
+    cloud = frame_content_.GetCloud();
+  } else if (show_cloud_state_ == 1) {  // show roi
+    roi_cloud = frame_content_.GetRoiCloud();
+  } else {  // show both
+    cloud = frame_content_.GetCloud();
+    roi_cloud = frame_content_.GetRoiCloud();
   }
 
   // draw original point cloud
@@ -338,15 +335,15 @@ void GLFWViewer::DrawCloud() {
     glPointSize(1);
     int count = 0;
     int p_num = 0;
-    int vao_num = (cloud->points.size() / point_num_per_cloud_VAO_) + 1;
+    int vao_num = (cloud->points.size() / kPoint_Num_Per_Cloud_VAO_) + 1;
     for (int vao = 0; vao < vao_num; vao++) {
-      for (p_num = 0; p_num < point_num_per_cloud_VAO_; ++p_num) {
+      for (p_num = 0; p_num < kPoint_Num_Per_Cloud_VAO_; ++p_num) {
         cloud_verts_[p_num][0] = cloud->points[count].x;
         cloud_verts_[p_num][1] = cloud->points[count].y;
         cloud_verts_[p_num][2] = cloud->points[count].z;
         count++;
 
-        if (count >= (int)cloud->points.size()) {
+        if (count >= static_cast<int>(cloud->points.size())) {
           break;
         }
       }
@@ -357,12 +354,12 @@ void GLFWViewer::DrawCloud() {
       glDrawElements(GL_POINTS, p_num, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
       glBindVertexArray(0);
 
-      if (count >= (int)cloud->points.size()) {
+      if (count >= static_cast<int>(cloud->points.size())) {
         break;
       }
     }
 
-    if (count < (int)cloud->points.size()) {
+    if (count < static_cast<int>(cloud->points.size())) {
       AINFO << "VAO_num * VBO_num < cloud->points.size()";
     }
   }
@@ -380,7 +377,7 @@ void GLFWViewer::DrawCloud() {
 }
 
 void GLFWViewer::DrawCircle() {
-  Eigen::Matrix4d v2w_pose = frame_content_->get_pose_v2w();
+  Eigen::Matrix4d v2w_pose = frame_content_.GetPoseV2w();
   GLdouble mat[16] = {
       v2w_pose(0, 0), v2w_pose(1, 0), v2w_pose(2, 0), v2w_pose(3, 0),
       v2w_pose(0, 1), v2w_pose(1, 1), v2w_pose(2, 1), v2w_pose(3, 1),
@@ -391,9 +388,9 @@ void GLFWViewer::DrawCircle() {
   glPushMatrix();
   glMultMatrixd(mat);
   int vao = 0;
-  for (vao = 0; vao < circle_VAO_num_; vao++) {
+  for (vao = 0; vao < kCircle_VAO_Num_; vao++) {
     glBindVertexArray(circle_VAO_buf_ids_[vao]);
-    glDrawElements(GL_LINE_LOOP, point_num_per_circle_VAO_, GL_UNSIGNED_INT,
+    glDrawElements(GL_LINE_LOOP, kPoint_Num_Per_Circle_VAO_, GL_UNSIGNED_INT,
                    BUFFER_OFFSET(0));
     glBindVertexArray(0);
   }
@@ -414,7 +411,6 @@ void GLFWViewer::DrawCarForwardDir() {
 void GLFWViewer::DrawObstacle(const ObjectPtr obj, bool show_cloud,
                               bool show_polygon, bool show_velocity,
                               bool show_direction) {
-
   float type_color[3];
   GetClassColor(obj->type, type_color);
   if (show_polygon) {
@@ -488,7 +484,7 @@ void GLFWViewer::DrawObstacle(const ObjectPtr obj, bool show_cloud,
 }
 
 void GLFWViewer::DrawObstacles() {
-  std::vector<ObjectPtr> tracked_objects = frame_content_->GetTrackedObjects();
+  std::vector<ObjectPtr> tracked_objects = frame_content_.GetTrackedObjects();
   for (std::size_t i = 0; i < tracked_objects.size(); i++) {
     DrawObstacle(tracked_objects[i], true, show_polygon_, show_velocity_,
                  show_direction_);
@@ -497,7 +493,6 @@ void GLFWViewer::DrawObstacles() {
 
 void GLFWViewer::DrawOffsetVolumn(Eigen::Vector3d *polygon_points, double h,
                                   int polygon_size) {
-
   if (polygon_points == nullptr) {
     return;
   }
@@ -531,42 +526,42 @@ void GLFWViewer::GetClassColor(int cls, float rgb[3]) {
   case 0:
     rgb[0] = 0.5;
     rgb[1] = 0;
-    rgb[2] = 1; //紫
+    rgb[2] = 1;  // purple
     break;
   case 1:
     rgb[0] = 0;
     rgb[1] = 1;
-    rgb[2] = 1; //青
+    rgb[2] = 1;  // cryan
     break;
   case 2:
     rgb[0] = 1;
     rgb[1] = 1;
-    rgb[2] = 0; //黄
+    rgb[2] = 0;  // yellow
     break;
   case 3:
     rgb[0] = 1;
     rgb[1] = 0.5;
-    rgb[2] = 0.5; //赤
+    rgb[2] = 0.5;  // red
     break;
   case 4:
     rgb[0] = 0;
     rgb[1] = 0;
-    rgb[2] = 1; //蓝
+    rgb[2] = 1;  // blue
     break;
   case 5:
     rgb[0] = 0;
     rgb[1] = 1;
-    rgb[2] = 0; //绿
+    rgb[2] = 0;  // green
     break;
   case 6:
     rgb[0] = 1;
     rgb[1] = 0.5;
-    rgb[2] = 0; //橙
+    rgb[2] = 0;  // orange
     break;
   case 7:
     rgb[0] = 1;
     rgb[1] = 0;
-    rgb[2] = 0; //赤
+    rgb[2] = 0;  // red
     break;
   }
 }
@@ -640,9 +635,11 @@ void GLFWViewer::MouseMove(double xpos, double ypos) {
   if (state_left == GLFW_PRESS) {
     Eigen::Vector3d obj_cen_screen = pers_camera_->PointOnScreen(scn_center_);
     Eigen::Quaterniond rot =
-        ArcBall::RotateByMouse(double(mouse_prev_x_), double(mouse_prev_y_),
+        ArcBall::RotateByMouse(static_cast<double>(mouse_prev_x_),
+                               static_cast<double>(mouse_prev_y_),
                                xpos, ypos, obj_cen_screen(0), obj_cen_screen(1),
-                               double(win_width_), double(win_height_));
+                               static_cast<double>(win_width_),
+                               static_cast<double>(win_height_));
 
     Eigen::Matrix3d rot_mat = rot.inverse().toRotationMatrix();
     Eigen::Vector3d scn_center = scn_center_;
@@ -670,23 +667,23 @@ void GLFWViewer::Reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
 
 void GLFWViewer::Keyboard(int key) {
   switch (key) {
-  case GLFW_KEY_R: //'R'
+  case GLFW_KEY_R:  // 'R'
     Reset();
     break;
-  case GLFW_KEY_P: //'P'
+  case GLFW_KEY_P:  // 'P'
     show_polygon_ = !show_polygon_;
     break;
-  case GLFW_KEY_V: //'V'
+  case GLFW_KEY_V:  // 'V'
     show_velocity_ = !show_velocity_;
     break;
-  case GLFW_KEY_D: // d
+  case GLFW_KEY_D:  // d
     show_direction_ = !show_direction_;
     break;
-  case GLFW_KEY_S: //'S'
+  case GLFW_KEY_S:  // 'S'
     show_cloud_state_ = (show_cloud_state_ + 1) % 3;
     break;
   }
 }
 
-} // namespace perception
-} // namespace adu
+}  // namespace perception
+}  // namespace apollo

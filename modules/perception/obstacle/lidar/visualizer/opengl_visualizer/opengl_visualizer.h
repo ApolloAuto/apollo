@@ -17,10 +17,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
 
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <sstream>
 #include <vector>
-#include <boost/shared_ptr.hpp>
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
@@ -29,7 +29,7 @@ namespace apollo {
 namespace perception {
 
 class OpenglVisualizer {
-public:
+ public:
   OpenglVisualizer();
   virtual ~OpenglVisualizer() = default;
 
@@ -39,9 +39,9 @@ public:
 
   void UpdateCameraSystem(FrameContent *content);
 
-  virtual void Render(FrameContent &content);
+  virtual void Render(const FrameContent &content);
 
-private:
+ private:
   void SetSize(int w, int h);
   void SetBackgroundColor(float r, float g, float b, float a);
   void SetVelodyneHeight(float h);
@@ -66,7 +66,7 @@ private:
   bool init_ = false;
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif //  MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
+#endif  //  MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_OPENGL_VISUALIZER_H_
