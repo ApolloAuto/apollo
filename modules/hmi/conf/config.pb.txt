@@ -1,8 +1,8 @@
 server {
   https {
     enabled: false
-    server_key: 'modules/hmi/conf/keys/server.key'
-    server_cert: 'modules/hmi/conf/keys/server.crt'
+    server_key: 'modules/common/data/ssl_keys/server.key'
+    server_cert: 'modules/common/data/ssl_keys/server.crt'
   }
 }
 modules {

@@ -4,7 +4,7 @@ set -x
 
 Domain=apollo.hmi
 IP=127.0.0.1
-KEYS_DIR="$(dirname $0)"/../conf/keys
+KEYS_DIR="$(dirname $0)"/../modules/common/data/ssl_keys
 
 # Clear KEYS_DIR and cd into it.
 rm -fr "${KEYS_DIR}"
@@ -27,7 +27,6 @@ function GenerateServerKeys() {
   OPENSSL_CONF_FILE="./openssl.conf"
   echo "[req]req_extensions = v3_req
         [v3_req]
-        basicConstraints = CA:TRUE
         subjectAltName = @alt_names
         [alt_names]
         IP.1 = ${IP}
