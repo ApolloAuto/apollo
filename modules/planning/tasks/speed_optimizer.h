@@ -26,8 +26,8 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/common/speed_limit.h"
 #include "modules/planning/common/speed/st_boundary.h"
+#include "modules/planning/common/speed_limit.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -47,10 +47,12 @@ class SpeedOptimizer : public Task {
       const ReferenceLine& reference_line, PathDecision* const path_decision,
       SpeedData* const speed_data) = 0;
 
-  void RecordSTGraphDebug(const std::vector<StBoundary>& boundaries,
-                          const SpeedLimit& speed_limits,
-                          const SpeedData& speed_data,
-                          ::apollo::planning_internal::STGraphDebug* stGraphDebug);
+  SpeedData GenerateStopProfile(const double init_speed) const;
+
+  void RecordSTGraphDebug(
+      const std::vector<StBoundary>& boundaries, const SpeedLimit& speed_limits,
+      const SpeedData& speed_data,
+      ::apollo::planning_internal::STGraphDebug* stGraphDebug);
 
   void RecordDebugInfo(const SpeedData& speed_data);
 };
