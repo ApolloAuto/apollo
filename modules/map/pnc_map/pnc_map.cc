@@ -232,7 +232,8 @@ bool PncMap::GetLaneSegmentsFromRouting(
     AERROR << "Failed to find point on routing. Point:" << point.DebugString();
     return false;
   }
-  const auto &start_waypoint = nearest_waypoints[0];
+
+  const auto &start_waypoint = nearest_waypoints.back();
   double min_overlap_distance = std::numeric_limits<double>::infinity();
   double proj_s = 0.0;
   double accumulate_s = 0.0;
@@ -476,9 +477,7 @@ bool PncMap::CreatePathFromLaneSegments(const LaneSegments &segments,
   return true;
 }
 
-const HDMap &PncMap::HDMap() const {
-  return hdmap_;
-}
+const HDMap &PncMap::HDMap() const { return hdmap_; }
 
 }  // namespace hdmap
 }  // namespace apollo
