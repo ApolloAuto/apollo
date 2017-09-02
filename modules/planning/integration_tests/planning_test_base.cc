@@ -145,6 +145,9 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
         AERROR << "Failed to write to file " << tmp_fname;
       }
       AERROR << "found\ndiff " << tmp_fname << " " << full_golden_path;
+      AERROR << "visualize diff\n python "
+                "modules/tools/plot_trace/plot_planning_result.py "
+             << tmp_fname << " " << full_golden_path;
       return false;
     }
   }
