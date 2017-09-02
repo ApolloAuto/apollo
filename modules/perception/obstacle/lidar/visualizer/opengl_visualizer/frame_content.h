@@ -36,7 +36,7 @@ class FrameContent {
   ~FrameContent();
 
   void SetLidarPose(const Eigen::Matrix4d &pose);
-  Eigen::Matrix4d get_pose_v2w();
+  Eigen::Matrix4d GetPoseV2w();
 
   void SetLidarCloud(pcl_util::PointCloudPtr cloud);
   void SetLidarRoiCloud(pcl_util::PointCloudPtr cloud);
@@ -51,9 +51,9 @@ class FrameContent {
 
  protected:
   // coordinate transform utilities
-  void OffsetPointcloud(pcl_util::PointCloud &cloud,
+  void OffsetPointcloud(pcl_util::PointCloud* cloud,
                         const Eigen::Vector3d &offset);
-  void OffsetPointcloud(pcl_util::PointDCloud &cloud,
+  void OffsetPointcloud(pcl_util::PointDCloud* cloud,
                         const Eigen::Vector3d &offset);
   void OffsetObject(ObjectPtr object, const Eigen::Vector3d &offset);
 
@@ -66,10 +66,10 @@ class FrameContent {
 
   Eigen::Vector3d global_offset_;
   bool global_offset_initialized_;
-  std::vector<ObjectPtr> tracked_objects_lidar_; // after tracking
+  std::vector<ObjectPtr> tracked_objects_lidar_;  // after tracking
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_FRAME_CONTENT_H_

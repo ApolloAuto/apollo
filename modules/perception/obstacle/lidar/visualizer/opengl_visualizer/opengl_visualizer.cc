@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "opengl_visualizer.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
 
@@ -45,7 +45,7 @@ bool OpenglVisualizer::Init() {
   return true;
 }
 
-void OpenglVisualizer::Render(FrameContent &content) {
+void OpenglVisualizer::Render(const FrameContent &content) {
   Eigen::Vector3d camera_world_pos(
       camera_center_world_.x, camera_center_world_.y, camera_center_world_.z);
   Eigen::Vector3d camera_scene_center(view_point_world_.x, view_point_world_.y,
@@ -59,7 +59,7 @@ void OpenglVisualizer::Render(FrameContent &content) {
       Eigen::Vector3d(up_world_.x, up_world_.y, up_world_.z));
   opengl_vs_->SetForwardDir(
       Eigen::Vector3d(forward_world_.x, forward_world_.y, forward_world_.z));
-  opengl_vs_->SetFrameContent(&content);
+  opengl_vs_->SetFrameContent(content);
   opengl_vs_->SpinOnce();
   AINFO << "OpenglVisualizer spin_once";
 }
@@ -122,7 +122,7 @@ void OpenglVisualizer::SetMainCarPoints() {
 }
 
 void OpenglVisualizer::UpdateCameraSystem(FrameContent *content) {
-  Eigen::Matrix4d pose_v2w = content->get_pose_v2w();
+  Eigen::Matrix4d pose_v2w = content->GetPoseV2w();
 
   TransformPoint<pcl_util::Point>(camera_center_velodyne_,
                                   &camera_center_world_, pose_v2w);
@@ -148,5 +148,5 @@ void OpenglVisualizer::UpdateCameraSystem(FrameContent *content) {
   forward_world_.z = fd_w[2];
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
