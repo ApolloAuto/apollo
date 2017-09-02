@@ -287,8 +287,6 @@ common::Status Planning::Plan(
   publishable_trajectory.PrependTrajectoryPoints(
       stitching_trajectory.begin(), stitching_trajectory.end() - 1);
 
-  publishable_trajectory.set_header_time(current_time_stamp);
-
   publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
 
