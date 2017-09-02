@@ -38,8 +38,35 @@ apollo::common::Status SpeedOptimizer::Execute(
       frame->PlanningStartPoint(), reference_line_info->reference_line(),
       reference_line_info->path_decision(),
       reference_line_info->mutable_speed_data());
+
+  if (!ret.ok() && FLAGS_enable_slowdown_profile_generator &&
+      frame->PlanningStartPoint().v() > FLAGS_slowdown_speed_threshold) {
+    *reference_line_info->mutable_speed_data() =
+        GenerateStopProfile(frame->PlanningStartPoint().v());
+  }
   RecordDebugInfo(reference_line_info->speed_data());
   return ret;
+}
+
+SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed) const {
+  AERROR << "Slowing down the car.";
+  SpeedData speed_data;
+
+  const double min_acc = FLAGS_slowdown_profile_deceleration;
+  const size_t max_t = 3.0;
+  const double unit_t = 0.02;
+
+  double pre_s = 0.0;
+  double t = 0.0;
+
+  while (t < max_t) {
+    const double s = std::fmax(pre_s, init_speed * t + 0.5 * min_acc * t * t);
+    const double v = std::fmax(0.0, init_speed + min_acc * t);
+    speed_data.AppendSpeedPoint(s, t, v, min_acc, 0.0);
+    pre_s = s;
+    t += unit_t;
+  }
+  return speed_data;
 }
 
 void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
