@@ -101,7 +101,8 @@ function deduceWebsocketServer() {
     const server = window.location.origin;
     const link = document.createElement("a");
     link.href = server;
-    return `ws://${link.hostname}:${window.location.port}/websocket`;
+    const protocol = location.protocol === "https:" ? "wss" : "ws";
+    return `${protocol}://${link.hostname}:${window.location.port}/websocket`;
 }
 
 // NOTE: process.env.NODE_ENV will be set to "production" by webpack when
