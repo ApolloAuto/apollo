@@ -28,12 +28,12 @@ namespace apollo {
 namespace perception {
 class GLFWViewer {
  public:
-  explicit GLFWViewer();
+  GLFWViewer();
   virtual ~GLFWViewer();
 
   bool Initialize();
 
-  void SetFrameContent(FrameContent *frame_content) {
+  void SetFrameContent(const FrameContent& frame_content) {
     frame_content_ = frame_content;
   }
   void Spin();
@@ -91,7 +91,7 @@ class GLFWViewer {
   GLFWwindow *window_;
   Camera *pers_camera_;
 
-  FrameContent *frame_content_;
+  FrameContent frame_content_;
   Eigen::Vector3d forward_dir_;
   Eigen::Vector3d scn_center_;
   Eigen::Vector3d bg_color_;
@@ -126,21 +126,21 @@ class GLFWViewer {
   };
 
   // cloud
-  static const int cloud_VAO_num_ = 35;
-  static const int point_num_per_cloud_VAO_ = 10000;
-  GLuint cloud_VAO_buf_ids_[cloud_VAO_num_];
-  GLuint cloud_VBO_buf_ids_[cloud_VAO_num_][NUM_VBO_TYPE]; // each VAO has
+  static const int kCloud_VAO_Num_ = 35;
+  static const int kPoint_Num_Per_Cloud_VAO_ = 10000;
+  GLuint cloud_VAO_buf_ids_[kCloud_VAO_Num_];
+  GLuint cloud_VBO_buf_ids_[kCloud_VAO_Num_][NUM_VBO_TYPE];  // each VAO has
                                                            // NUM_VBO_TYPE VBOs
-  GLfloat cloud_verts_[point_num_per_cloud_VAO_][3];
+  GLfloat cloud_verts_[kPoint_Num_Per_Cloud_VAO_][3];
 
   // circle
-  static const int circle_VAO_num_ = 3;
-  static const int point_num_per_circle_VAO_ = 256;
-  GLuint circle_VAO_buf_ids_[circle_VAO_num_];
-  GLuint circle_VBO_buf_ids_[circle_VAO_num_][NUM_VBO_TYPE];
+  static const int kCircle_VAO_Num_ = 3;
+  static const int kPoint_Num_Per_Circle_VAO_ = 256;
+  GLuint circle_VAO_buf_ids_[kCircle_VAO_Num_];
+  GLuint circle_VBO_buf_ids_[kCircle_VAO_Num_][NUM_VBO_TYPE];
 };
 
-} // namespace obstacle
-} // namespace perception
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_

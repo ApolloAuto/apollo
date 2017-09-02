@@ -35,7 +35,7 @@ void Camera::SetUpDirection(Eigen::Vector3d world_vec) {
   Eigen::Vector3d cam_y_axis = Eigen::Vector3d(0, 1, 0);
   Eigen::Vector3d align_axis = cam_y_axis.cross(up_vec_proj_in_cam_frame);
   align_axis
-      .normalize(); // the axis for Eigen::AngleAxisd must be a unit vector
+      .normalize();  // the axis for Eigen::AngleAxisd must be a unit vector
   double align_ang = acos(cam_y_axis.dot(up_vec_proj_in_cam_frame));
   Eigen::Matrix3d align_rot_mat =
       Eigen::AngleAxisd(align_ang, align_axis).toRotationMatrix();
@@ -63,7 +63,7 @@ void Camera::LookAt(Eigen::Vector3d world_tgt) {
 
   rot_c2w_.col(0) = right_dir;
   rot_c2w_.col(1) = up_dir;
-  rot_c2w_.col(2) = -view_dir; // view_dir == minor z axis
+  rot_c2w_.col(2) = -view_dir;  // view_dir == minor z axis
 }
 
 Eigen::Matrix4d Camera::GetViewMat() {
@@ -100,7 +100,7 @@ Eigen::Vector3d Camera::PointOnScreen(Eigen::Vector3d point) {
   viewport[1] = screen_height_;
   viewport[2] = screen_width_;
   viewport[3] =
-      -screen_height_; // origin of opengl frame is at left-bottom corner
+      -screen_height_;  // origin of opengl frame is at left-bottom corner
 
   GLdouble view_mat[16] = {
       view_mat_(0, 0), view_mat_(1, 0), view_mat_(2, 0), view_mat_(3, 0),
@@ -120,5 +120,5 @@ Eigen::Vector3d Camera::PointOnScreen(Eigen::Vector3d point) {
   return Eigen::Vector3d(x, y, z);
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo

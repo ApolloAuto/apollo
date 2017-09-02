@@ -23,7 +23,7 @@ namespace apollo {
 namespace perception {
 
 class Camera {
-public:
+ public:
   Camera();
   ~Camera() = default;
 
@@ -42,7 +42,7 @@ public:
 
   Eigen::Vector3d PointOnScreen(Eigen::Vector3d point);
 
-private:
+ private:
   Eigen::Matrix3d rot_c2w_;
   Eigen::Vector3d t_c2w_;
   double fov_;
@@ -52,7 +52,7 @@ private:
   Eigen::Matrix4d proj_mat_;
 };
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_CAMERA_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_CAMERA_H_

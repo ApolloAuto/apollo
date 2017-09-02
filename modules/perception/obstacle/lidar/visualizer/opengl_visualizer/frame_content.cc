@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "frame_content.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -42,7 +42,7 @@ void FrameContent::SetLidarPose(const Eigen::Matrix4d &pose) {
   pose_v2w_(2, 3) += global_offset_[2];
 }
 
-Eigen::Matrix4d FrameContent::get_pose_v2w() { return pose_v2w_; }
+Eigen::Matrix4d FrameContent::GetPoseV2w() { return pose_v2w_; }
 
 void FrameContent::SetLidarCloud(pcl_util::PointCloudPtr cloud) {
   pcl::transformPointCloud(*cloud, *(cloud_), pose_v2w_);
@@ -63,28 +63,28 @@ bool FrameContent::HasCloud() {
   return true;
 }
 
-void FrameContent::OffsetPointcloud(pcl_util::PointCloud &cloud,
+void FrameContent::OffsetPointcloud(pcl_util::PointCloud* cloud,
                                     const Eigen::Vector3d &offset) {
-  for (size_t i = 0; i < cloud.size(); ++i) {
-    cloud.points[i].x += offset[0];
-    cloud.points[i].y += offset[1];
-    cloud.points[i].z += offset[2];
+  for (size_t i = 0; i < cloud->size(); ++i) {
+    cloud->points[i].x += offset[0];
+    cloud->points[i].y += offset[1];
+    cloud->points[i].z += offset[2];
   }
 }
 
-void FrameContent::OffsetPointcloud(pcl_util::PointDCloud &cloud,
+void FrameContent::OffsetPointcloud(pcl_util::PointDCloud* cloud,
                                     const Eigen::Vector3d &offset) {
-  for (size_t i = 0; i < cloud.size(); ++i) {
-    cloud.points[i].x += offset[0];
-    cloud.points[i].y += offset[1];
-    cloud.points[i].z += offset[2];
+  for (size_t i = 0; i < cloud->size(); ++i) {
+    cloud->points[i].x += offset[0];
+    cloud->points[i].y += offset[1];
+    cloud->points[i].z += offset[2];
   }
 }
 
 void FrameContent::OffsetObject(ObjectPtr object,
                                 const Eigen::Vector3d &offset) {
-  OffsetPointcloud(*(object->cloud), offset);
-  OffsetPointcloud(object->polygon, offset);
+  OffsetPointcloud(object->cloud.get(), offset);
+  OffsetPointcloud(&(object->polygon), offset);
 
   object->center[0] += offset[0];
   object->center[1] += offset[1];
@@ -104,5 +104,5 @@ std::vector<ObjectPtr> FrameContent::GetTrackedObjects() {
   return tracked_objects_lidar_;
 }
 
-} // namespace perception
-} // namespace apollo
+}  // namespace perception
+}  // namespace apollo
