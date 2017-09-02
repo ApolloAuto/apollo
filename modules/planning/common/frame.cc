@@ -20,6 +20,7 @@
 #include "modules/planning/common/frame.h"
 
 #include <cmath>
+#include <functional>
 #include <list>
 #include <string>
 #include <utility>
@@ -31,6 +32,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
@@ -112,6 +114,75 @@ bool Frame::InitReferenceLineInfo(
   return true;
 }
 
+const Obstacle *Frame::AddStaticVirtualObstacle(
+    const std::string &id, const common::math::Box2d &box) {
+  const auto *object = obstacles_.Find(id);
+  if (object) {
+    AWARN << "obstacle " << id << " already exist.";
+    return object;
+  }
+  // create a "virtual" perception_obstacle
+  perception::PerceptionObstacle perception_obstacle;
+  // simulator needs a valid integer
+  perception_obstacle.set_id(-(std::hash<std::string>{}(id) >> 1));
+  perception_obstacle.mutable_position()->set_x(box.center().x());
+  perception_obstacle.mutable_position()->set_y(box.center().y());
+  perception_obstacle.set_theta(box.heading());
+  perception_obstacle.mutable_velocity()->set_x(0);
+  perception_obstacle.mutable_velocity()->set_y(0);
+  perception_obstacle.set_length(box.length());
+  perception_obstacle.set_width(box.width());
+  perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
+  perception_obstacle.set_type(
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_tracking_time(1.0);
+
+  std::vector<common::math::Vec2d> corner_points;
+  box.GetAllCorners(&corner_points);
+  for (const auto &corner_point : corner_points) {
+    auto *point = perception_obstacle.add_polygon_point();
+    point->set_x(corner_point.x());
+    point->set_y(corner_point.y());
+  }
+
+  auto ptr = std::unique_ptr<Obstacle>(new Obstacle(id, perception_obstacle));
+  auto *obstacle_ptr = ptr.get();
+  obstacles_.Add(id, std::move(ptr));
+  return obstacle_ptr;
+}
+
+const Obstacle *Frame::CreateDestinationObstacle() {
+  if (!routing_response_.routing_request().has_end()) {
+    ADEBUG << "routing_request has no end";
+    return nullptr;
+  }
+  const auto &routing_end = routing_response_.routing_request().end();
+  common::PointENU dest_point = common::util::MakePointENU(
+      routing_end.pose().x(), routing_end.pose().y(), 0.0);
+  const auto lane =
+      pnc_map_->HDMap().GetLaneById(hdmap::MakeMapId(routing_end.id()));
+  if (!lane) {
+    AERROR << "Failed to find lane for destination : "
+           << routing_end.DebugString();
+    return nullptr;
+  }
+  double dest_s = 0.0;
+  double dest_l = 0.0;
+  if (!lane->GetProjection({dest_point.x(), dest_point.y()}, &dest_s,
+                           &dest_l)) {
+    AERROR << "Failed to get projection for " << dest_point.DebugString()
+           << " on lane " << lane->id().id();
+    return nullptr;
+  }
+  // check if destination point is in planning range
+  common::math::Box2d destination_box{{dest_point.x(), dest_point.y()},
+                                      lane->Heading(dest_s),
+                                      FLAGS_virtual_stop_wall_length,
+                                      FLAGS_virtual_stop_wall_width};
+  return AddStaticVirtualObstacle(FLAGS_destination_obstacle_id,
+                                  destination_box);
+}
+
 Status Frame::Init(const PlanningConfig &config,
                    const double current_time_stamp) {
   if (!pnc_map_) {
@@ -141,6 +212,12 @@ Status Frame::Init(const PlanningConfig &config,
   if (FLAGS_enable_prediction) {
     CreatePredictionObstacles(prediction_);
   }
+
+  if (!CreateDestinationObstacle()) {
+    AERROR << "Failed to create the destination obstacle";
+    return Status(ErrorCode::PLANNING_ERROR, "failed to find destination");
+  }
+
   if (CheckCollision()) {
     AERROR << "Found collision with obstacle: " << collision_obstacle_id_;
     return Status(ErrorCode::PLANNING_ERROR,
