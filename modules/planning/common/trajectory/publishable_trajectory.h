@@ -40,13 +40,6 @@ class PublishableTrajectory : public DiscretizedTrajectory {
 
   virtual ~PublishableTrajectory() = default;
 
-  common::TrajectoryPoint EvaluateAbsoluteTime(const double abs_time) const;
-
-  common::TrajectoryPoint EvaluateAbsoluteTimeUsingLinearApproximation(
-      const double abs_time) const;
-
-  std::uint32_t QueryNearestPointAbsoluteTime(const double abs_time) const;
-
   double header_time() const;
 
   void set_header_time(const double header_time);

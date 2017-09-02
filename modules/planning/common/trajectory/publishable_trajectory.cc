@@ -40,22 +40,6 @@ PublishableTrajectory::PublishableTrajectory(
   trajectory_points_ = std::move(trajectory_points);
 }
 
-TrajectoryPoint PublishableTrajectory::EvaluateAbsoluteTime(
-    const double abs_time) const {
-  return Evaluate(abs_time - header_time_);
-}
-
-TrajectoryPoint
-PublishableTrajectory::EvaluateAbsoluteTimeUsingLinearApproximation(
-    const double abs_time) const {
-  return EvaluateUsingLinearApproximation(abs_time - header_time_);
-}
-
-std::uint32_t PublishableTrajectory::QueryNearestPointAbsoluteTime(
-    const double abs_time) const {
-  return QueryNearestPoint(abs_time - header_time_);
-}
-
 double PublishableTrajectory::header_time() const { return header_time_; }
 
 void PublishableTrajectory::set_header_time(const double header_time) {
