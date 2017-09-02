@@ -75,8 +75,7 @@
               <div class="dropdown pull-right">
                 <button class="btn hmi_small_btn dropdown-toggle" type="button"
                     data-toggle="dropdown">
-                  <span id="current_map">Please select</span>
-                  <span class="caret"></span>
+                  <span id="current_map"></span><span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
                 {% for map in conf_pb.available_maps %}
@@ -93,8 +92,7 @@
             <div class="item_content">Vehicle
               <div class="dropdown pull-right">
                 <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
-                  <span id="current_vehicle">Please select</span>
-                  <span class="caret"></span>
+                  <span id="current_vehicle"></span><span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
                 {% for vehicle in conf_pb.available_vehicles %}
@@ -156,12 +154,10 @@
     // Config status change.
     var current_map = global_status['config']['current_map'];
     var current_vehicle = global_status['config']['current_vehicle'];
-    if (current_map != 'Unknown') {
-      $('#current_map').text(current_map);
-    }
-    if (current_vehicle != 'Unknown') {
-      $('#current_vehicle').text(current_vehicle);
-    }
+    $('#current_map').text(
+        current_map != 'Unknown' ? current_map : 'Please select');
+    $('#current_vehicle').text(
+        current_vehicle != 'Unknown' ? current_vehicle : 'Please select');
     if (current_map == 'Unknown' || current_vehicle == 'Unknown') {
       // Show profile dialog if map or vehicle is not selected.
       $("#profile_dialog").modal();
