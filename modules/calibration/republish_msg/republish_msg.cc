@@ -32,8 +32,6 @@ std::string RepublishMsg::Name() const {
 }
 
 Status RepublishMsg::Init() {
-  std::cout << FLAGS_adapter_config_path << std::endl;
-
   AdapterManager::Init(FLAGS_adapter_config_path);
 
   CHECK(AdapterManager::GetInsStat()) << "INS status is not initialized.";

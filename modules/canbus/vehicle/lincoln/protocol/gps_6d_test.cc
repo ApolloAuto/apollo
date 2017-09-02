@@ -33,8 +33,6 @@ TEST(Gps6dTest, General) {
   EXPECT_DOUBLE_EQ(cd.basic().latitude(), -244.245646);
   EXPECT_DOUBLE_EQ(cd.basic().longitude(), -61.779717);
 
-  std::cout << cd.DebugString() << std::endl;
-
   EXPECT_EQ(data[0], 0b01010110);
   EXPECT_EQ(data[1], 0b01010010);
   EXPECT_EQ(data[2], 0b01010011);

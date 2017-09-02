@@ -79,9 +79,6 @@ bool LidarExChecker::GetExtrinsics() {
       tf2_buffer.lookupTransform("novatel", "velodyne64", ros::Time(0));
   tf::transformMsgToEigen(transform_stamped.transform, extrinsics_);
 
-  std::cout << "velodyne64 extrinsics: " << std::endl;
-  std::cout << extrinsics_.matrix() << std::endl;
-
   return true;
 }
 
@@ -164,7 +161,6 @@ void LidarExChecker::OnPointCloud(const sensor_msgs::PointCloud2& message) {
   if (clouds_.size() < cloud_count_) {
     last_position_ = position;
     clouds_.push_back(cld);
-    std::cout << "take " << clouds_.size() << " cloud(s)." << std::endl;
   }
 
   if (clouds_.size() >= cloud_count_) {
