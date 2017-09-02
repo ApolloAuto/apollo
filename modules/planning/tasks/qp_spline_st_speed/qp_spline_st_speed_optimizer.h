@@ -49,6 +49,9 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
                          PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
 
+  void GenerateStopProfile(const double init_speed,
+                           SpeedData* const speed_data) const;
+
   QpSplineStSpeedConfig qp_spline_st_speed_config_;
   StBoundaryConfig st_boundary_config_;
 };

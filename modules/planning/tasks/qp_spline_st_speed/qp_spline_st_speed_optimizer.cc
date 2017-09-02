@@ -108,15 +108,41 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
   if (st_graph.Search(st_graph_data, path_data, speed_data, st_graph_debug) !=
       Status::OK()) {
-    RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
-    return Status(
-        ErrorCode::PLANNING_ERROR,
-        Name() + ":Failed to search graph with quadratic programming!");
-  }
+    std::string msg = common::util::StrCat(
+        Name(), ":Failed to search graph with quadratic programming!");
 
+    if (FLAGS_enable_slowdown_profile_generator &&
+        init_point.v() > FLAGS_slowdown_speed_threshold) {
+      GenerateStopProfile(init_point.v(), speed_data);
+    } else {
+      RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+  }
   // record debug info
   RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
   return Status::OK();
+}
+
+void QpSplineStSpeedOptimizer::GenerateStopProfile(
+    const double init_speed, SpeedData* const speed_data) const {
+  AERROR << "Slowing down the car.";
+  *speed_data = SpeedData();
+
+  const double min_acc = -3.5;
+  const size_t max_t = 3.0;
+  const double unit_t = 0.02;
+
+  double pre_s = 0.0;
+  double t = 0.0;
+
+  while (t < max_t) {
+    const double s = std::fmax(pre_s, init_speed * t + 0.5 * min_acc * t * t);
+    const double v = std::fmax(0.0, init_speed + min_acc * t);
+    speed_data->AppendSpeedPoint(s, t, v, min_acc, 0.0);
+    pre_s = s;
+    t += unit_t;
+  }
 }
 
 }  // namespace planning
