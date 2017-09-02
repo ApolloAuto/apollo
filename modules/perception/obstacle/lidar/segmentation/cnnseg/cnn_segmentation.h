@@ -24,10 +24,10 @@
 #include "caffe/caffe.hpp"
 #include "modules/common/log.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/lib/base/timer.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
-#include "modules/perception/obstacle/lidar/segmentation/cnnseg/util.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/feature_generator.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cluster2d.h"
 
@@ -89,12 +89,7 @@ class CNNSegmentation : public BaseSegmentation {
   std::shared_ptr<cnnseg::Cluster2D> cluster2d_;
 
   // timer
-  cnnseg::Timer timer_;
-  double feat_time_ = 0.0;
-  double network_time_ = 0.0;
-  double clust_time_ = 0.0;
-  double post_time_ = 0.0;
-  double tot_time_ = 0.0;
+  Timer timer_;
 
   DISALLOW_COPY_AND_ASSIGN(CNNSegmentation);
 };

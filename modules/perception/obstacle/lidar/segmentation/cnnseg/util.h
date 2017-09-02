@@ -18,33 +18,10 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_UTIL_H_
 
 #include <string>
-#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace perception {
 namespace cnnseg {
-
-class Timer {
- public:
-  Timer() {
-    Tic();
-    scale_ = 1.0 / (static_cast<double>(cvGetTickFrequency()) * 1000.);
-  }
-  void Tic() {
-    start_ = static_cast<double>(cv::getTickCount());
-  }
-  double Toc(bool reset = false) {
-    double time = (static_cast<double>(cvGetTickCount()) - start_) * scale_;
-    if (reset) {
-      Tic();
-    }
-    return time;
-  }
-
- private:
-  double start_;
-  double scale_;
-};
 
 inline int F2I(float val, float ori, float scale) {
   return static_cast<int>(std::floor((ori - val) * scale));

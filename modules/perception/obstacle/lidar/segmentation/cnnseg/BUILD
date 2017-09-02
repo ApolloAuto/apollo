@@ -25,7 +25,6 @@ cc_library(
 cc_library(
     name = "cnnseg_util",
     hdrs = ["util.h"],
-    deps = ["@opencv2//:core"],
 )
 
 cc_library(
