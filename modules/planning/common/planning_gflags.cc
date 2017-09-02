@@ -96,7 +96,7 @@ DEFINE_bool(enable_nudge_decision, false, "enable nudge decision");
 DEFINE_double(static_decision_ignore_s_range, 3.0,
               "threshold for judging nudge in dp path computing decision");
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
-DEFINE_double(stop_distance_obstacle, 5.0,
+DEFINE_double(stop_distance_obstacle, 10.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(destination_adjust_distance_buffer, 1.0,
               "distance buffer when adjusting destination stop line");
