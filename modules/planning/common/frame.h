@@ -114,6 +114,11 @@ class Frame {
    */
   bool CheckCollision();
 
+  const Obstacle *AddStaticVirtualObstacle(const std::string &id,
+                                           const common::math::Box2d &box);
+
+  const Obstacle *CreateDestinationObstacle();
+
  private:
   common::TrajectoryPoint planning_start_point_;
 

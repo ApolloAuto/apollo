@@ -175,27 +175,9 @@ bool PathDecider::MakeStaticObstacleDecision(
         // STOP: and break
         ObjectStop *object_stop_ptr = object_decision.mutable_stop();
         object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
-
-        const auto &vehicle_param = common::VehicleConfigHelper::instance()
-                                        ->GetConfig()
-                                        .vehicle_param();
-        constexpr double kStopBuffer = 1.0e-6;
-        const double adc_v =
-            common::VehicleState::instance()->linear_velocity();
-        const double distance_to_full_stop =
-            0.5 * (adc_v * adc_v) / std::fabs(vehicle_param.max_deceleration());
         double stop_ref_s =
-            std::fmax(reference_line_info_->AdcSlBoundary().end_s() +
-                          distance_to_full_stop + kStopBuffer,
-                      sl_boundary.start_s() - FLAGS_stop_distance_obstacle);
-
-        constexpr double kMinStopDistanceToObstacle = 1.0;
-        if (stop_ref_s + kMinStopDistanceToObstacle > sl_boundary.start_s()) {
-          stop_ref_s = std::fmax(
-              reference_line_info_->AdcSlBoundary().end_s() + kStopBuffer,
-              sl_boundary.start_s() - kMinStopDistanceToObstacle);
-        }
-        object_stop_ptr->set_distance_s(stop_ref_s - sl_boundary.start_s());
+            sl_boundary.start_s() - FLAGS_stop_distance_obstacle;
+        object_stop_ptr->set_distance_s(-FLAGS_stop_distance_obstacle);
 
         auto stop_ref_point = reference_line_->GetReferencePoint(stop_ref_s);
         object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());

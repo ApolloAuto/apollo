@@ -56,15 +56,6 @@ class TrafficDecider : public Task {
  private:
   void RegisterRules();
 
-  bool MakeDestinationStopDecision();
-
-  /**
-   * @brief create destination obstacle based on routing end point
-   * @return the created path obstacle
-   */
-  const Obstacle *CreateDestinationObstacle();
-  const PathObstacle *CreateDestinationPathObstacle();
-
   apollo::common::util::Factory<std::string, TrafficRule> rule_factory_;
   google::protobuf::RepeatedPtrField<RuleConfig> rule_configs_;
 };
