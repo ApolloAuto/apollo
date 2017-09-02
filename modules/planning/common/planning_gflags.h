@@ -92,5 +92,6 @@ DECLARE_bool(enable_prediction);
 // QpSt optimizer
 DECLARE_bool(enable_slowdown_profile_generator);
 DECLARE_double(slowdown_speed_threshold);
+DECLARE_double(slowdown_profile_deceleration);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

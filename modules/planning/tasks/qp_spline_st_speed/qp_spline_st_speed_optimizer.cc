@@ -129,7 +129,7 @@ void QpSplineStSpeedOptimizer::GenerateStopProfile(
   AERROR << "Slowing down the car.";
   *speed_data = SpeedData();
 
-  const double min_acc = -3.5;
+  const double min_acc = FLAGS_slowdown_profile_deceleration;
   const size_t max_t = 3.0;
   const double unit_t = 0.02;
 
