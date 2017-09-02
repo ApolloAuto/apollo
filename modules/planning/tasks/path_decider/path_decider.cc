@@ -76,11 +76,8 @@ bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, PathDecision *const path_decision) {
   DCHECK_NOTNULL(path_decision);
   std::vector<common::SLPoint> adc_sl_points;
-  std::vector<common::math::Box2d> adc_bounding_box;
   const auto &vehicle_param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-  const double adc_length = vehicle_param.length();
-  const double adc_width = vehicle_param.length();
   const double adc_max_edge_to_center_dist =
       std::hypot(std::max(vehicle_param.front_edge_to_center(),
                           vehicle_param.back_edge_to_center()),
@@ -89,9 +86,6 @@ bool PathDecider::MakeStaticObstacleDecision(
 
   for (const common::PathPoint &path_point :
        path_data.discretized_path().path_points()) {
-    adc_bounding_box.emplace_back(
-        common::math::Vec2d{path_point.x(), path_point.y()}, path_point.theta(),
-        adc_length, adc_width);
     common::SLPoint adc_sl;
     if (!reference_line_->XYToSL({path_point.x(), path_point.y()}, &adc_sl)) {
       AERROR << "get_point_in_Frenet_frame error for ego vehicle "
@@ -140,8 +134,8 @@ bool PathDecider::MakeStaticObstacleDecision(
       }
 
       // check STOP/NUDGE
-      double left_width;
-      double right_width;
+      double left_width = 0.0;
+      double right_width = 0.0;
       if (!reference_line_->GetLaneWidth(adc_sl.s(), &left_width,
                                          &right_width)) {
         left_width = right_width = FLAGS_default_reference_line_width / 2;
@@ -242,87 +236,6 @@ bool PathDecider::MakeStaticObstacleDecision(
     }
   }
 
-  return true;
-}
-
-bool PathDecider::MakeDynamicObstcleDecision(
-    const PathData &path_data, PathDecision *const path_decision) {
-  // Compute dynamic obstacle decision
-  const double interval = kTimeSampleInterval;
-  const double total_time =
-      std::min(speed_data_->TotalTime(), FLAGS_prediction_total_time);
-  std::size_t evaluate_time_slots =
-      static_cast<std::size_t>(std::floor(total_time / interval));
-  // list of Box2d for adc given speed profile
-  std::vector<common::math::Box2d> adc_by_time;
-  if (!ComputeBoundingBoxesForAdc(path_data.frenet_frame_path(),
-                                  evaluate_time_slots, &adc_by_time)) {
-    AERROR << "fill adc_by_time error";
-    return false;
-  }
-
-  for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
-    const auto *obstacle = path_obstacle->obstacle();
-    if (obstacle->IsVirtual()) {
-      continue;
-    }
-    if (obstacle->IsStatic()) {
-      continue;
-    }
-    double timestamp = 0.0;
-    for (std::size_t k = 0; k < evaluate_time_slots;
-         ++k, timestamp += interval) {
-      // TODO(all) make nudge decision for dynamic obstacles.
-      // const auto obstacle_by_time =
-      //     obstacle->GetBoundingBox(obstacle->GetPointAtTime(timestamp));
-    }
-  }
-  return true;
-}
-
-bool PathDecider::ComputeBoundingBoxesForAdc(
-    const FrenetFramePath &frenet_frame_path,
-    const std::size_t evaluate_time_slots,
-    std::vector<common::math::Box2d> *adc_boxes) {
-  CHECK(adc_boxes != nullptr);
-
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
-  double adc_length = vehicle_config.vehicle_param().length();
-  double adc_width = vehicle_config.vehicle_param().length();
-
-  double time_stamp = 0.0;
-  const double interval = kTimeSampleInterval;
-  for (std::size_t i = 0; i < evaluate_time_slots;
-       ++i, time_stamp += interval) {
-    common::SpeedPoint speed_point;
-    if (!speed_data_->EvaluateByTime(time_stamp, &speed_point)) {
-      ADEBUG << "get_speed_point_with_time for time_stamp[" << time_stamp << "]";
-      return false;
-    }
-
-    const common::FrenetFramePoint &interpolated_frenet_point =
-        frenet_frame_path.EvaluateByS(speed_point.s());
-    double s = interpolated_frenet_point.s();
-    double l = interpolated_frenet_point.l();
-    double dl = interpolated_frenet_point.dl();
-
-    common::math::Vec2d adc_position_cartesian;
-    common::SLPoint sl_point;
-    sl_point.set_s(s);
-    sl_point.set_l(l);
-    reference_line_->SLToXY(sl_point, &adc_position_cartesian);
-
-    ReferencePoint reference_point = reference_line_->GetReferencePoint(s);
-
-    double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
-    double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
-    double theta = ::apollo::common::math::NormalizeAngle(
-        delta_theta + reference_point.heading());
-
-    adc_boxes->emplace_back(adc_position_cartesian, theta, adc_length,
-                            adc_width);
-  }
   return true;
 }
 
