@@ -39,17 +39,10 @@ class PathDecider : public Task {
   apollo::common::Status Process(const PathData &path_data,
                                  PathDecision *const path_decision);
 
-  bool ComputeBoundingBoxesForAdc(const FrenetFramePath &frenet_frame_path,
-                                  const std::size_t evaluate_time_slots,
-                                  std::vector<common::math::Box2d> *adc_boxes);
-
   bool MakeObjectDecision(const PathData &path_data,
                           PathDecision *const path_decision);
 
   bool MakeStaticObstacleDecision(const PathData &path_data,
-                                  PathDecision *const path_decision);
-
-  bool MakeDynamicObstcleDecision(const PathData &path_data,
                                   PathDecision *const path_decision);
 
   const ReferenceLine *reference_line_ = nullptr;
