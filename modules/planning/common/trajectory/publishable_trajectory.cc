@@ -25,26 +25,13 @@
 namespace apollo {
 namespace planning {
 
-using common::TrajectoryPoint;
-
 PublishableTrajectory::PublishableTrajectory(
     const double header_time,
     const DiscretizedTrajectory& discretized_trajectory)
     : DiscretizedTrajectory(discretized_trajectory),
       header_time_(header_time) {}
 
-PublishableTrajectory::PublishableTrajectory(
-    const double header_time,
-    std::vector<common::TrajectoryPoint> trajectory_points) {
-  header_time_ = header_time;
-  trajectory_points_ = std::move(trajectory_points);
-}
-
 double PublishableTrajectory::header_time() const { return header_time_; }
-
-void PublishableTrajectory::set_header_time(const double header_time) {
-  header_time_ = header_time;
-}
 
 void PublishableTrajectory::PopulateTrajectoryProtobuf(
     ADCTrajectory* trajectory_pb) const {
