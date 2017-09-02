@@ -23,6 +23,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "opencv2/opencv.hpp"
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"

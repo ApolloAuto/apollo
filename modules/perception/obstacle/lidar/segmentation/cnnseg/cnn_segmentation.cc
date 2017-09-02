@@ -128,7 +128,7 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
 
   use_full_cloud_ =
       cnnseg_param_.use_full_cloud() && (options.origin_cloud != nullptr);
-  timer_.Tic();
+  PERF_BLOCK_START();
 
   // generate raw features
   if (use_full_cloud_) {
@@ -136,34 +136,26 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   } else {
     feature_generator_->Generate(pc_ptr);
   }
-  feat_time_ = timer_.Toc(true);
+  PERF_BLOCK_END("[CNNSeg] feature generation");
 
 // network forward process
 #ifndef CPU_ONLY
   caffe::Caffe::set_mode(caffe::Caffe::GPU);
 #endif
   caffe_net_->Forward();
-  network_time_ = timer_.Toc(true);
+  PERF_BLOCK_END("[CNNSeg] CNN forward");
 
   // clutser points and construct segments/objects
   cluster2d_->Cluster(*category_pt_blob_, *instance_pt_blob_, pc_ptr,
                       valid_indices, cnnseg_param_.objectness_thresh(),
                       cnnseg_param_.use_all_grids_for_clustering());
-  clust_time_ = timer_.Toc(true);
+  PERF_BLOCK_END("[CNNSeg] clustering");
 
   cluster2d_->Filter(*confidence_pt_blob_, *height_pt_blob_);
   cluster2d_->GetObjects(cnnseg_param_.confidence_thresh(),
                          cnnseg_param_.height_thresh(),
                          cnnseg_param_.min_pts_num(), objects);
-  post_time_ = timer_.Toc(true);
-
-  tot_time_ = feat_time_ + network_time_ + clust_time_ + post_time_;
-
-  AINFO << "Total runtime: " << tot_time_ << "ms\t"
-        << "  Feature generation: " << feat_time_ << "ms\t"
-        << "  CNN forward: " << network_time_ << "ms\t"
-        << "  Clustering: " << clust_time_ << "ms\t"
-        << "  Post-processing: " << post_time_ << "ms";
+  PERF_BLOCK_END("[CNNSeg] post-processing");
 
   return true;
 }
