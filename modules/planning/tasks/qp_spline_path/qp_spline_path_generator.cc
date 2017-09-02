@@ -64,12 +64,8 @@ bool QpSplinePathGenerator::Generate(
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
   }
-  double start_s = 0.0;
-  double end_s = 0.0;
-  if (!InitCoordRange(&start_s, &end_s)) {
-    AERROR << "Measure natural coord system with s range failed!";
-    return false;
-  }
+  double start_s = init_frenet_point_.s();
+  double end_s = reference_line_.Length();
 
   QpFrenetFrame qp_frenet_frame(reference_line_, path_obstacles, speed_data,
                                 init_frenet_point_, start_s, end_s,
@@ -82,8 +78,7 @@ bool QpSplinePathGenerator::Generate(
 
   ADEBUG << "pss path start with " << start_s << ", end with " << end_s;
 
-  constexpr double kSplineEndBuffer = 0.1;
-  if (!InitSpline(init_frenet_point_, start_s, end_s - kSplineEndBuffer)) {
+  if (!InitSpline(start_s, end_s)) {
     AERROR << "Init smoothing spline failed with (" << start_s << ",  end_s "
            << end_s;
     return false;
@@ -196,36 +191,21 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
   return true;
 }
 
-bool QpSplinePathGenerator::InitCoordRange(double* const start_s,
-                                           double* const end_s) {
-  DCHECK_NOTNULL(start_s);
-  DCHECK_NOTNULL(end_s);
-
-  *start_s = init_frenet_point_.s();
-  *end_s = std::fmin(reference_line_.Length(),
-                     *start_s + FLAGS_look_forward_distance);
-  return true;
-}
-
-bool QpSplinePathGenerator::InitSpline(
-    const common::FrenetFramePoint& init_frenet_point, const double start_s,
-    const double end_s) {
+bool QpSplinePathGenerator::InitSpline(const double start_s,
+                                       const double end_s) {
   // set knots
   if (qp_spline_path_config_.number_of_knots() <= 1) {
     AERROR << "Too few number of knots: "
            << qp_spline_path_config_.number_of_knots();
     return false;
   }
-  // reference_line_.map_path() always starts from zero?
-  double distance = std::fmin(reference_line_.map_path().length(), end_s) -
-                    init_frenet_point.s();
-  distance = std::fmin(distance, FLAGS_look_forward_distance);
-  const double delta_s = distance / qp_spline_path_config_.number_of_knots();
-  double curr_knot_s = init_frenet_point.s();
+  const double delta_s =
+      (end_s - start_s) / qp_spline_path_config_.number_of_knots();
+  double curr_knot_s = start_s;
 
-  for (uint32_t i = 0; i <= qp_spline_path_config_.number_of_knots(); ++i) {
+  for (uint32_t i = 0; i <= qp_spline_path_config_.number_of_knots();
+       ++i, curr_knot_s = std::min(curr_knot_s + delta_s, end_s)) {
     knots_.push_back(curr_knot_s);
-    curr_knot_s += delta_s;
   }
 
   // spawn a new spline generator
@@ -240,12 +220,13 @@ bool QpSplinePathGenerator::InitSpline(
            << num_evaluated_s;
     return false;
   }
-  const double ds = (spline_generator_->spline().x_knots().back() -
-                     spline_generator_->spline().x_knots().front()) /
-                    num_evaluated_s;
-  double curr_evaluated_s = spline_generator_->spline().x_knots().front();
-
-  for (uint32_t i = 0; i < num_evaluated_s; ++i) {
+  const auto& x_knots = spline_generator_->spline().x_knots();
+  const double back_s = x_knots.back();
+  const double front_s = x_knots.front();
+  const double ds = (back_s - front_s) / num_evaluated_s;
+  double curr_evaluated_s = front_s;
+  for (uint32_t i = 0; i < num_evaluated_s;
+       ++i, curr_evaluated_s = std::min(curr_evaluated_s + ds, back_s)) {
     evaluated_s_.push_back(curr_evaluated_s);
     curr_evaluated_s += ds;
   }
