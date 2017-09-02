@@ -52,6 +52,7 @@ def planning_callback(planning_pb):
     planning.compute_sl_data()
     planning.compute_path_data()
     planning.compute_speed_data()
+    planning.compute_init_point()
 
 def add_listener():
     rospy.init_node('st_plot', anonymous=True)

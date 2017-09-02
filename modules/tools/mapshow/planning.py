@@ -23,7 +23,7 @@ from modules.planning.proto import planning_internal_pb2
 class Planning:
     def __init__(self, planning_pb=None):
         self.data_lock = threading.Lock()
-
+        self.init_point_lock = threading.Lock()
         self.planning_pb = planning_pb
         self.path_data_lock = threading.Lock()
         self.path_data_x = {}
@@ -60,9 +60,18 @@ class Planning:
         self.sl_aggregated_boundary_high_l = []
         self.sl_aggregated_boundary_s = []
 
+        self.init_point_x = []
+        self.init_point_y = []
 
     def update_planning_pb(self, planning_pb):
         self.planning_pb = planning_pb
+
+    def compute_init_point(self):
+        self.init_point_lock.acquire()
+        init_point = self.planning_pb.debug.planning_data.init_point
+        self.init_point_x = [init_point.path_point.x]
+        self.init_point_y = [init_point.path_point.y]
+        self.init_point_lock.release()
 
     def compute_sl_data(self):
         sl_sampled_s = []
