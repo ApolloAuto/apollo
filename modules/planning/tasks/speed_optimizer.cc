@@ -58,10 +58,10 @@ void SpeedOptimizer::RecordSTGraphDebug(
     return;
   }
 
-  //auto debug = frame_->MutableADCTrajectory()->mutable_debug();
-  //auto st_graph_debug = debug->mutable_planning_data()->add_st_graph();
+  // auto debug = frame_->MutableADCTrajectory()->mutable_debug();
+  // auto st_graph_debug = debug->mutable_planning_data()->add_st_graph();
   st_graph_debug->set_name(Name());
-  for (const auto& boundary : boundaries) {
+  for (const auto boundary : boundaries) {
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary.id());
     switch (boundary.boundary_type()) {
@@ -92,14 +92,14 @@ void SpeedOptimizer::RecordSTGraphDebug(
         break;
     }
 
-    for (const auto& point : boundary.points()) {
+    for (const auto point : boundary.points()) {
       auto point_debug = boundary_debug->add_point();
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());
     }
   }
 
-  for (const auto& point : speed_limits.speed_limit_points()) {
+  for (const auto point : speed_limits.speed_limit_points()) {
     common::SpeedPoint speed_point;
     speed_point.set_s(point.first);
     speed_point.set_v(point.second);

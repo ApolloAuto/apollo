@@ -172,7 +172,7 @@ bool ReferenceLineSmoother::ApplyConstraint(
   std::vector<double> lateral_bound;
   std::vector<common::math::Vec2d> xy_points;
   for (std::uint32_t i = 0; i < path_points.size(); ++i) {
-    const double kBoundCoeff = 0.2;
+    const double kBoundCoeff = 0.5;
     headings.push_back(path_points[i].theta());
     longitidinal_bound.push_back(kBoundCoeff *
                                  smoother_config_.boundary_bound());
