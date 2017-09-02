@@ -278,7 +278,8 @@ constexpr double SimulationWorldService::kMapRadius;
 
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
-    : map_service_(map_service) {
+    : map_service_(map_service),
+      monitor_(apollo::common::monitor::MonitorMessageItem::SIMULATOR) {
   RegisterMessageCallbacks();
   if (routing_from_file) {
     ReadRoutingFromFile(FLAGS_routing_response_file);

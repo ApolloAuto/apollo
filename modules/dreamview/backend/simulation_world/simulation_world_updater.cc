@@ -26,6 +26,7 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
+using apollo::common::monitor::MonitorMessageItem;
 using apollo::routing::RoutingRequest;
 using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
@@ -72,10 +73,16 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           AdapterManager::PublishRoutingRequest(routing_request);
         }
 
-        Json response;
-        response["type"] = "RoutingRequestSent";
-        response["status"] = succeed ? "Sent" : "Failed";
-        websocket_->SendData(response.dump(), conn);
+        // publish message
+        if (succeed) {
+          sim_world_service_.PublishMessage(
+              MonitorMessageItem::LogLevel::MonitorMessageItem_LogLevel_INFO,
+              "Routing Request Sent");
+        } else {
+          sim_world_service_.PublishMessage(
+              MonitorMessageItem::LogLevel::MonitorMessageItem_LogLevel_ERROR,
+              "Failed to send routing request");
+        }
       });
 }
 

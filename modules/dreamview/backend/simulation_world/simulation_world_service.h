@@ -32,6 +32,7 @@
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/monitor/monitor.h"
 #include "modules/common/log.h"
 
 /**
@@ -100,6 +101,18 @@ class SimulationWorldService {
            world_.auto_driving_car().has_position_y();
   }
 
+  /**
+   * @brief Publish message to the monitor
+   * @param msg the string to send to monitor
+   * @param log_level defined in modules/common/monitor/proto/monitor.proto
+   */
+  void PublishMessage(
+        apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
+        const std::string &msg) {
+    apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+    buffer.AddMonitorMsgItem(log_level, msg);
+  }
+
  private:
   /**
    * @brief Update simulation world with incoming data, e.g., chassis,
@@ -164,6 +177,9 @@ class SimulationWorldService {
 
   // The map holding obstacle string id to the actual object
   std::unordered_map<std::string, Object> obj_map_;
+
+  // The SIMULATOR monitor for publishing messages.
+  apollo::common::monitor::Monitor monitor_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);
