@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+
+###############################################################################
+# Copyright 2017 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
+import sys
+
+import matplotlib
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+from subprocess import call
+import numpy as np
+import rosbag
+import rospy
+from std_msgs.msg import String
+from google.protobuf import text_format
+from mpl_toolkits.mplot3d import Axes3D
+
+from modules.canbus.proto import chassis_pb2
+from modules.localization.proto import localization_pb2
+from modules.planning.proto import planning_pb2
+
+g_args = None
+
+
+def plot_planning(ax, planning_file):
+    fhandle = file(planning_file, 'r')
+    if not fhandle:
+        print "Failed to open file %s" % (planning_file)
+    planning_pb = planning_pb2.ADCTrajectory()
+    text_format.Merge(fhandle.read(), planning_pb)
+    x = [p.path_point.x for p in planning_pb.trajectory_point]
+    y = [p.path_point.y for p in planning_pb.trajectory_point]
+    z = [p.v for p in planning_pb.trajectory_point]
+    ax.plot(x, y, z, label=planning_file)
+    ax.legend()
+
+
+def press_key(event):
+    files = " ".join(g_args.planning_files)
+    if evnet.key == 'f':
+        call(["cp", files])
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(
+        description=
+        """A visualization tool that can plot one or multiple planning "
+        results, so that we can compare the differences.
+        Example: plot_planning_result.py result_file1.pb.txt result_file2.pb.txt"""
+    )
+    parser.add_argument(
+        "planning_files",
+        action='store',
+        nargs="+",
+        help="The planning results")
+    g_args = parser.parse_args()
+
+    matplotlib.rcParams['legend.fontsize'] = 10
+    fig = plt.figure()
+    fig.canvas.mpl_connect('key_press_event', press_key)
+    ax = fig.gca(projection='3d')
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("speed")
+
+    for planning_file in g_args.planning_files:
+        plot_planning(ax, planning_file)
+
+    plt.show()
