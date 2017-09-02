@@ -149,3 +149,5 @@ DEFINE_bool(enable_slowdown_profile_generator, true,
 DEFINE_double(slowdown_speed_threshold, 3.0,
               "Only generator slowdown profile when adc speed is lower than "
               "this threshold. unit : m/s.");
+DEFINE_double(slowdown_profile_deceleration, -3.0,
+              "The deceleration to generate slowdown profile. unit: m/s^2.");
