@@ -73,7 +73,7 @@ function main(){
     #FIX ME: remove login when open source.
     docker login -u autoapollo -p baidu123
     docker pull $IMG
-    
+
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
         docker stop apollo_dev 1>/dev/null
@@ -97,6 +97,7 @@ function main(){
     devices="${devices} $(find_device can*)"
     devices="${devices} $(find_device ram*)"
     devices="${devices} $(find_device loop*)"
+    devices="${devices} $(find_device nvidia*)"
     USER_ID=$(id -u)
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
