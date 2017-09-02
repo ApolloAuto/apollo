@@ -89,10 +89,10 @@ if __name__ == '__main__':
     ax1 = plt.subplot2grid((3, 3), (0, 2))
     speed_subplot = SpeedSubplot(ax1)
 
-    ax2 = plt.subplot2grid((3, 3), (1, 2))
+    ax2 = plt.subplot2grid((3, 3), (2, 2))
     dp_st_main_subplot = StMainSubplot(ax2, 'QpSplineStSpeedOptimizer')
 
-    ax3 = plt.subplot2grid((3, 3), (2, 2))
+    ax3 = plt.subplot2grid((3, 3), (1, 2))
     qp_st_main_subplot = StMainSubplot(ax3, 'DpStSpeedOptimizer')
 
     ax4 = plt.subplot2grid((3, 3), (2, 0), colspan=1)
