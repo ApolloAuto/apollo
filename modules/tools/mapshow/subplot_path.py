@@ -69,7 +69,6 @@ class PathSubplot:
         planning.path_data_lock.release()
 
         planning.init_point_lock.acquire()
-        print planning.init_point_x
         self.init_point_line.set_xdata(planning.init_point_x)
         self.init_point_line.set_ydata(planning.init_point_y)
         self.init_point_line.set_visible(True)
