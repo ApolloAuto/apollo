@@ -18,7 +18,7 @@ node_modules
 # generated files
 generatedViews
 generatedScripts
-modules/hmi/conf/keys
+modules/common/data/ssl_keys
 # database/log files
 *.sqlite
 dreamview.log
