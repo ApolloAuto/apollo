@@ -39,7 +39,7 @@ class PathSubplot:
 
         self.vehicle_position_line, = ax.plot([0], [0], 'go', alpha=0.3)
         self.vehicle_polygon_line, = ax.plot([0], [0], 'g-')
-
+        self.init_point_line, = ax.plot([0], [0], 'ro', alpha=0.3)
         self.set_visible(False)
         ax.set_title("PLANNING PATH")
 
@@ -48,6 +48,7 @@ class PathSubplot:
             line.set_visible(visible)
         self.vehicle_position_line.set_visible(False)
         self.vehicle_polygon_line.set_visible(False)
+        self.init_point_line.set_visible(False)
 
     def show(self, planning, localization):
         cnt = 0
@@ -66,6 +67,13 @@ class PathSubplot:
             path_line.set_label(name[0:5])
             cnt += 1
         planning.path_data_lock.release()
+
+        planning.init_point_lock.acquire()
+        print planning.init_point_x
+        self.init_point_line.set_xdata(planning.init_point_x)
+        self.init_point_line.set_ydata(planning.init_point_y)
+        self.init_point_line.set_visible(True)
+        planning.init_point_lock.release()
 
         localization.localization_data_lock.acquire()
         self.draw_vehicle(localization)
