@@ -30,16 +30,7 @@ chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
 
 # grant caros user to access GPS device
 if [ -e /dev/ttyUSB0 ]; then
-    sudo chown ${DOCKER_USER}:${DOCKER_GRP} /dev/ttyUSB0 /dev/ttyUSB1
-fi
-
-# setup can device
-if [ ! -e /dev/can0 ]; then
-    sudo mknod --mode=a+rw /dev/can0 c 52 0
-fi
-
-if [ -e /dev/can0 ]; then
-    sudo chown ${DOCKER_USER}:${DOCKER_GRP} /dev/can0
+    sudo chmod a+rw /dev/ttyUSB0 /dev/ttyUSB1
 fi
 
 if [ "$RELEASE_DOCKER" != "1" ];then
