@@ -116,11 +116,13 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   while (time < qp_spline_st_speed_config_.total_time() + t_output_resolution) {
     double s = spline(time);
     double v = spline.Derivative(time);
-    if (v < FLAGS_qp_st_low_velocity_threshold) {
-      v = 0.0;
-    }
     double a = spline.SecondOrderDerivative(time);
     double da = spline.ThirdOrderDerivative(time);
+    if (v < FLAGS_qp_st_low_velocity_threshold) {
+      v = 0.0;
+      a = 0.0;
+      da = 0.0;
+    }
     speed_data->AppendSpeedPoint(s, time, v, a, da);
     time += t_output_resolution;
   }

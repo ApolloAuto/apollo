@@ -14,7 +14,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 0
-  a: 3.3019420531132937e-13
+  a: 0
   relative_time: 0
 }
 trajectory_point {
@@ -28,7 +28,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 0
-  a: 0.049836006382971851
+  a: 0
   relative_time: 0.05
 }
 trajectory_point {
@@ -42,7 +42,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 0
-  a: 0.098711190482835179
+  a: 0
   relative_time: 0.1
 }
 trajectory_point {
@@ -56,7 +56,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 0
-  a: 0.14662555229992019
+  a: 0
   relative_time: 0.15000000000000002
 }
 trajectory_point {
@@ -70,7 +70,7 @@ trajectory_point {
     ddkappa: 0
   }
   v: 0
-  a: 0.19357909183422695
+  a: 0
   relative_time: 0.2
 }
 trajectory_point {
@@ -83,7 +83,7 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 0
+  v: 0.03044690440811414
   a: 0.23957180908575532
   relative_time: 0.25
 }
@@ -97,7 +97,7 @@ trajectory_point {
     dkappa: 0
     ddkappa: 0
   }
-  v: 0
+  v: 0.0435552956627989
   a: 0.28460370405450536
   relative_time: 0.3
 }
