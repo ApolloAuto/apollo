@@ -41,7 +41,7 @@ apollo::common::Status SpeedOptimizer::Execute(
       reference_line_info->mutable_speed_data());
 
   if (!ret.ok() && FLAGS_enable_slowdown_profile_generator &&
-      frame->PlanningStartPoint().v() > FLAGS_slowdown_speed_threshold) {
+      frame->PlanningStartPoint().v() < FLAGS_slowdown_speed_threshold) {
     *reference_line_info->mutable_speed_data() =
         GenerateStopProfile(frame->PlanningStartPoint().v());
   }
