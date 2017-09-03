@@ -91,5 +91,18 @@ TEST_F(GarageTest, out_of_map) {
   bool run_planning_success = RunPlanning("out_of_map", 0);
   EXPECT_FALSE(run_planning_success);
 }
+
+/*
+ * test stop passed stop line
+ */
+ TEST_F(GarageTest, stop_over_line) {
+  std::string seq_num = "1";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
