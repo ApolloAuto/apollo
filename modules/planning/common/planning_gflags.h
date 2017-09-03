@@ -93,5 +93,6 @@ DECLARE_bool(enable_prediction);
 DECLARE_bool(enable_slowdown_profile_generator);
 DECLARE_double(slowdown_speed_threshold);
 DECLARE_double(slowdown_profile_deceleration);
+DECLARE_double(qp_st_low_velocity_threshold);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
