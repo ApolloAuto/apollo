@@ -35,10 +35,10 @@
 namespace apollo {
 namespace planning {
 
-using Status = apollo::common::Status;
-using ErrorCode = apollo::common::ErrorCode;
-using TrajectoryPoint = apollo::common::TrajectoryPoint;
-using ::apollo::planning_internal::STGraphDebug;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::planning_internal::STGraphDebug;
 
 QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer()
     : SpeedOptimizer("QpSplineStSpeedOptimizer") {}

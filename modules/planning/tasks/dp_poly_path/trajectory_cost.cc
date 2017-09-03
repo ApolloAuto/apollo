@@ -30,9 +30,9 @@
 namespace apollo {
 namespace planning {
 
-using Box2d = ::apollo::common::math::Box2d;
-using Vec2d = ::apollo::common::math::Vec2d;
-using TrajectoryPoint = ::apollo::common::TrajectoryPoint;
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
+using apollo::common::TrajectoryPoint;
 
 TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
                                const ReferenceLine &reference_line,

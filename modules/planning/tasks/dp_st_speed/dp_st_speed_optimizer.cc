@@ -40,7 +40,7 @@ using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::localization::LocalizationEstimate;
-using ::apollo::planning_internal::STGraphDebug;
+using apollo::planning_internal::STGraphDebug;
 
 DpStSpeedOptimizer::DpStSpeedOptimizer()
     : SpeedOptimizer("DpStSpeedOptimizer") {}

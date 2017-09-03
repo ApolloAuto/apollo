@@ -122,12 +122,10 @@ bool DPRoadGraph::GenerateMinCostPath(
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
     const auto &prev_dp_nodes = graph_nodes[level - 1];
     const auto &level_points = path_waypoints[level];
-    for (std::size_t i = 0; i < level_points.size(); ++i) {
-      const auto &cur_point = level_points[i];
+    for (const auto &cur_point : level_points) {
       graph_nodes[level].emplace_back(cur_point, nullptr);
       auto &cur_node = graph_nodes[level].back();
-      for (std::size_t j = 0; j < prev_dp_nodes.size(); ++j) {
-        const auto &prev_dp_node = prev_dp_nodes[j];
+      for (const auto &prev_dp_node : prev_dp_nodes) {
         const auto &prev_sl_point = prev_dp_node.sl_point;
         QuinticPolynomialCurve1d curve(prev_sl_point.l(), 0.0, 0.0,
                                        cur_point.l(), 0.0, 0.0,
@@ -142,9 +140,7 @@ bool DPRoadGraph::GenerateMinCostPath(
 
   // find best path
   DPRoadGraphNode fake_head;
-  const auto &last_dp_nodes = graph_nodes.back();
-  for (std::size_t i = 0; i < last_dp_nodes.size(); ++i) {
-    const auto &cur_dp_node = last_dp_nodes[i];
+  for (const auto &cur_dp_node : graph_nodes.back()) {
     fake_head.UpdateCost(&cur_dp_node, cur_dp_node.min_cost_curve,
                          cur_dp_node.min_cost);
   }
