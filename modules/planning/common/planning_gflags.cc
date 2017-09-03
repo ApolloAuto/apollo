@@ -146,8 +146,8 @@ DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
 // QpSt optimizer
 DEFINE_bool(enable_slowdown_profile_generator, true,
             "True to enable slowdown speed profile generator.");
-DEFINE_double(slowdown_speed_threshold, 3.0,
+DEFINE_double(slowdown_speed_threshold, 8.0,
               "Only generator slowdown profile when adc speed is lower than "
               "this threshold. unit : m/s.");
-DEFINE_double(slowdown_profile_deceleration, -3.0,
+DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");

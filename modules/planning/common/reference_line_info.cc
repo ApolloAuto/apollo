@@ -277,7 +277,10 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     DiscretizedTrajectory* ptr_discretized_trajectory) {
   CHECK(time_resolution > 0.0);
   CHECK(ptr_discretized_trajectory != nullptr);
-
+  if (path_data_.discretized_path().NumOfPoints() == 0) {
+    AWARN << "path data is empty";
+    return false;
+  }
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
        cur_rel_time += time_resolution) {
     common::SpeedPoint speed_point;
