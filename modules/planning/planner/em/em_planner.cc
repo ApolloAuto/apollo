@@ -124,13 +124,14 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
 
   auto ptr_debug = reference_line_info->mutable_debug();
   auto ptr_latency_stats = reference_line_info->mutable_latency_stats();
+  auto ret = Status::OK();
   for (auto& optimizer : tasks_) {
     const double start_timestamp = Clock::NowInSecond();
-    auto ret = optimizer->Execute(frame, reference_line_info);
+    ret = optimizer->Execute(frame, reference_line_info);
     if (!ret.ok()) {
       AERROR << "Failed to run tasks[" << optimizer->Name()
              << "], Error message: " << ret.error_message();
-      return ret;
+      break;
     }
     const double end_timestamp = Clock::NowInSecond();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
@@ -155,7 +156,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   reference_line_info->SetTrajectory(trajectory);
   PopulateDecision(*reference_line_info, frame);
 
-  return Status::OK();
+  return ret;
 }
 
 std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
