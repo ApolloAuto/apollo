@@ -33,7 +33,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleParam;
-using ::apollo::planning_internal::STGraphDebug;
+using apollo::planning_internal::STGraphDebug;
 
 QpSplineStGraph::QpSplineStGraph(
     const QpSplineStSpeedConfig& qp_spline_st_speed_config,
@@ -71,8 +71,7 @@ void QpSplineStGraph::Init() {
 Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
                                const PathData& path_data,
                                SpeedData* const speed_data,
-                               STGraphDebug* st_graph_debug
-                              ) {
+                               STGraphDebug* st_graph_debug) {
   init_point_ = st_graph_data.init_point();
   if (st_graph_data.path_data_length() <
       qp_spline_st_speed_config_.total_path_length()) {

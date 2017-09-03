@@ -118,12 +118,11 @@ double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
 double DpStCost::JerkCost(const double jerk) const {
   double jerk_sq = jerk * jerk;
   double cost = 0.0;
-  if (Double::Compare(jerk, 0.0) > 0) {
+  const auto diff = Double::Compare(jerk, 0.0);
+  if (diff > 0) {
     cost = dp_st_speed_config_.positive_jerk_coeff() * jerk_sq * unit_t_;
-  } else if (Double::Compare(jerk, 0.0) < 0) {
+  } else if (diff < 0) {
     cost = dp_st_speed_config_.negative_jerk_coeff() * jerk_sq * unit_t_;
-  } else {
-    cost = 0.0;
   }
   return cost;
 }
