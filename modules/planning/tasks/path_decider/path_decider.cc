@@ -36,8 +36,6 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-const double kTimeSampleInterval = 0.1;
-
 PathDecider::PathDecider() : Task("PathDecider") {}
 
 apollo::common::Status PathDecider::Execute(
