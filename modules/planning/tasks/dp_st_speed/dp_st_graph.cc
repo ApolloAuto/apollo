@@ -35,12 +35,12 @@
 namespace apollo {
 namespace planning {
 
-using ErrorCode = apollo::common::ErrorCode;
-using SpeedPoint = apollo::common::SpeedPoint;
-using Status = apollo::common::Status;
-using Vec2d = apollo::common::math::Vec2d;
-using VehicleConfigHelper = apollo::common::VehicleConfigHelper;
-using VehicleParam = apollo::common::VehicleParam;
+using apollo::common::ErrorCode;
+using apollo::common::SpeedPoint;
+using apollo::common::Status;
+using apollo::common::math::Vec2d;
+using apollo::common::VehicleConfigHelper;
+using apollo::common::VehicleParam;
 
 namespace {
 
@@ -150,14 +150,14 @@ void DpStGraph::CalculatePointwiseCost(
   }
 
   for (uint32_t i = 0; i < cost_table_.size(); ++i) {
-    for (uint32_t j = 0; j < cost_table_[i].size(); ++j) {
-      double ref_cost = dp_st_cost_.GetReferenceCost(cost_table_[i][j].point(),
+    for (auto& st_graph_point : cost_table_[i]) {
+      double ref_cost = dp_st_cost_.GetReferenceCost(st_graph_point.point(),
                                                      reference_points[i]);
       double obs_cost =
-          dp_st_cost_.GetObstacleCost(cost_table_[i][j].point(), boundaries);
-      cost_table_[i][j].SetReferenceCost(ref_cost);
-      cost_table_[i][j].SetObstacleCost(obs_cost);
-      cost_table_[i][j].SetTotalCost(std::numeric_limits<double>::infinity());
+          dp_st_cost_.GetObstacleCost(st_graph_point.point(), boundaries);
+      st_graph_point.SetReferenceCost(ref_cost);
+      st_graph_point.SetObstacleCost(obs_cost);
+      st_graph_point.SetTotalCost(std::numeric_limits<double>::infinity());
     }
   }
 }
@@ -165,11 +165,10 @@ void DpStGraph::CalculatePointwiseCost(
 Status DpStGraph::CalculateTotalCost() {
   // s corresponding to row
   // time corresponding to col
-  uint32_t c = 0;
   uint32_t next_highest_row = 0;
   uint32_t next_lowest_row = 0;
 
-  while (c < cost_table_.size()) {
+  for (size_t c = 0; c < cost_table_.size(); ++c) {
     uint32_t highest_row = 0;
     uint32_t lowest_row = cost_table_.back().size() - 1;
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
@@ -183,7 +182,6 @@ Status DpStGraph::CalculateTotalCost() {
         lowest_row = std::min(lowest_row, l_r);
       }
     }
-    ++c;
     next_highest_row = highest_row;
     next_lowest_row = std::max(next_lowest_row, lowest_row);
   }
@@ -216,8 +214,7 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
 
   const double delta_s_lower_bound = std::fmax(
       0.0, v0 * unit_t_ + vehicle_param_.max_deceleration() * speed_coeff);
-  *next_lowest_row =
-      *next_lowest_row + static_cast<int32_t>(delta_s_lower_bound / unit_s_);
+  *next_lowest_row += static_cast<int32_t>(delta_s_lower_bound / unit_s_);
   if (*next_lowest_row >= cost_table_.back().size()) {
     *next_lowest_row = cost_table_.back().size() - 1;
   }
@@ -342,12 +339,8 @@ bool DpStGraph::CalculateFeasibleAccelRange(const double r_pre,
 
 Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
   double min_cost = std::numeric_limits<double>::infinity();
-  uint32_t n = cost_table_.back().size();
-  uint32_t m = cost_table_.size();
-
   const StGraphPoint* best_end_point = nullptr;
-  for (uint32_t i = 0; i < n; ++i) {
-    const StGraphPoint& cur_point = cost_table_.back()[i];
+  for (const StGraphPoint& cur_point : cost_table_.back()) {
     if (!std::isinf(cur_point.total_cost()) &&
         cur_point.total_cost() < min_cost) {
       best_end_point = &cur_point;
@@ -355,8 +348,8 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) const {
     }
   }
 
-  for (uint32_t i = 0; i < m; ++i) {
-    const StGraphPoint& cur_point = cost_table_[i].back();
+  for (const auto& row : cost_table_) {
+    const StGraphPoint& cur_point = row.back();
     if (!std::isinf(cur_point.total_cost()) &&
         cur_point.total_cost() < min_cost) {
       best_end_point = &cur_point;

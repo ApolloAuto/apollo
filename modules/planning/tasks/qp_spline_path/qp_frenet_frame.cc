@@ -85,13 +85,11 @@ bool QpFrenetFrame::Init(const uint32_t num_points,
 
   const auto inf = std::numeric_limits<double>::infinity();
   const double resolution = (end_s_ - start_s_) / num_points;
-  double s = start_s_;
-  while (s <= end_s_) {
+  for (double s = start_s_; s <= end_s_; s += resolution) {
     evaluated_knots_.push_back(s);
     hdmap_bound_.emplace_back(-inf, inf);
     static_obstacle_bound_.emplace_back(-inf, inf);
     dynamic_obstacle_bound_.emplace_back(-inf, inf);
-    s += resolution;
   }
 
   // initialize calculation here
@@ -141,8 +139,8 @@ bool QpFrenetFrame::GetDynamicObstacleBound(
 }
 
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
-  double relative_time = 0.0;
-  while (relative_time < speed_data_.TotalTime()) {
+  for (double relative_time = 0.0; relative_time < speed_data_.TotalTime();
+      relative_time += time_resolution_) {
     SpeedPoint veh_point;
     if (!speed_data_.EvaluateByTime(relative_time, &veh_point)) {
       AERROR << "Fail to get speed point at relative time " << relative_time;
@@ -150,7 +148,6 @@ bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
     }
     veh_point.set_t(relative_time);
     discretized_vehicle_location_.push_back(std::move(veh_point));
-    relative_time += time_resolution_;
   }
   return true;
 }

@@ -36,9 +36,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-namespace {
 const double kTimeSampleInterval = 0.1;
-}
 
 PathDecider::PathDecider() : Task("PathDecider") {}
 
@@ -108,8 +106,7 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     const auto &sl_boundary = path_obstacle->perception_sl_boundary();
     bool has_stop = false;
-    for (std::size_t j = 0; j < adc_sl_points.size(); ++j) {
-      const auto &adc_sl = adc_sl_points[j];
+    for (const auto &adc_sl : adc_sl_points) {
       if (adc_sl.s() + adc_max_edge_to_center_dist +
                   FLAGS_static_decision_ignore_s_range <
               sl_boundary.start_s() ||

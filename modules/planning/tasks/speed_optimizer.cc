@@ -25,7 +25,8 @@
 namespace apollo {
 namespace planning {
 
-using ::apollo::planning_internal::STGraphDebug;
+using apollo::planning_internal::StGraphBoundaryDebug;
+using apollo::planning_internal::STGraphDebug;
 
 SpeedOptimizer::SpeedOptimizer(const std::string& name) : Task(name) {}
 
@@ -93,29 +94,21 @@ void SpeedOptimizer::RecordSTGraphDebug(
     boundary_debug->set_name(boundary.id());
     switch (boundary.boundary_type()) {
       case StBoundary::BoundaryType::FOLLOW:
-        boundary_debug->set_type(
-            ::apollo::planning_internal::StGraphBoundaryDebug::
-                ST_BOUNDARY_TYPE_FOLLOW);
+        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_FOLLOW);
         break;
       case StBoundary::BoundaryType::OVERTAKE:
         boundary_debug->set_type(
-            ::apollo::planning_internal::StGraphBoundaryDebug::
-                ST_BOUNDARY_TYPE_OVERTAKE);
+            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
         break;
       case StBoundary::BoundaryType::STOP:
-        boundary_debug->set_type(
-            ::apollo::planning_internal::StGraphBoundaryDebug::
-                ST_BOUNDARY_TYPE_STOP);
+        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_STOP);
         break;
       case StBoundary::BoundaryType::UNKNOWN:
         boundary_debug->set_type(
-            ::apollo::planning_internal::StGraphBoundaryDebug::
-                ST_BOUNDARY_TYPE_UNKNOWN);
+            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
         break;
       case StBoundary::BoundaryType::YIELD:
-        boundary_debug->set_type(
-            ::apollo::planning_internal::StGraphBoundaryDebug::
-                ST_BOUNDARY_TYPE_YIELD);
+        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
         break;
     }
 
