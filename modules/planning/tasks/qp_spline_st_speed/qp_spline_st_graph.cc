@@ -26,6 +26,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -115,6 +116,9 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   while (time < qp_spline_st_speed_config_.total_time() + t_output_resolution) {
     double s = spline(time);
     double v = spline.Derivative(time);
+    if (v < FLAGS_qp_st_low_velocity_threshold) {
+      v = 0.0;
+    }
     double a = spline.SecondOrderDerivative(time);
     double da = spline.ThirdOrderDerivative(time);
     speed_data->AppendSpeedPoint(s, time, v, a, da);
@@ -210,7 +214,6 @@ Status QpSplineStGraph::ApplyConstraint(
 
   DCHECK_EQ(t_evaluated_.size(), speed_upper_bound.size());
   DCHECK_EQ(t_evaluated_.size(), speed_lower_bound.size());
-
 
   for (size_t i = 0; i < t_evaluated_.size(); ++i) {
     auto speed_constraint = st_graph_debug->mutable_speed_constraint()->Add();
