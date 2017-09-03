@@ -54,6 +54,6 @@ class HMIStatusHelper(object):
         try:
             req = requests.post(gflags.FLAGS.hmi_runtime_status_api,
                                 json=json_dict)
-            glog.info('Put RuntimeStatus: {}'.format(req.json()))
+            glog.info('Put RuntimeStatus result: {}'.format(req.status_code))
         except requests.exceptions.RequestException as exception:
             glog.error('Failed to put RuntimeStatus: {}'.format(exception))
