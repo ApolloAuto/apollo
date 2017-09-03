@@ -151,3 +151,5 @@ DEFINE_double(slowdown_speed_threshold, 8.0,
               "this threshold. unit : m/s.");
 DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
+DEFINE_double(qp_st_low_velocity_threshold, 0.05,
+              "The low velocity threshold for control usage. unit: m/s.");
