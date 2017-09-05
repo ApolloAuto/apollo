@@ -212,7 +212,7 @@ bool QpSplinePathGenerator::InitSpline(
     const double end_s) {
   // set knots
   if (qp_spline_path_config_.number_of_knots() <= 1) {
-    AERROR << "Two few number of knots: "
+    AERROR << "Too few number of knots: "
            << qp_spline_path_config_.number_of_knots();
     return false;
   }
