@@ -210,31 +210,31 @@ TEST(TestSuite, hdmap_line_path) {
   EXPECT_NEAR(lateral, 0.0, 1e-6);
   EXPECT_NEAR(distance, 0.5, 1e-6);
 
-  EXPECT_NEAR(path.get_left_width(-0.5), 4.0, 1e-6);
-  EXPECT_NEAR(path.get_left_width(0.0), 4.0, 1e-6);
-  EXPECT_NEAR(path.get_left_width(0.5), 4.5, 1e-6);
-  EXPECT_NEAR(path.get_left_width(1.0), 5.0, 1e-6);
-  EXPECT_NEAR(path.get_left_width(1.5), 5.25, 1e-6);
-  EXPECT_NEAR(path.get_left_width(2.0), 5.5, 1e-6);
-  EXPECT_NEAR(path.get_left_width(2.5), 5.75, 1e-6);
-  EXPECT_NEAR(path.get_left_width(3.0), 6.0, 1e-6);
-  EXPECT_NEAR(path.get_left_width(3.5), 6.0, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(-0.5), 4.0, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(0.0), 4.0, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(0.5), 4.5, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(1.0), 5.0, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(1.5), 5.25, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(2.0), 5.5, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(2.5), 5.75, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(3.0), 6.0, 1e-6);
+  EXPECT_NEAR(path.GetLeftWidth(3.5), 6.0, 1e-6);
 
-  EXPECT_NEAR(path.get_right_width(-0.5), 7.0, 1e-6);
-  EXPECT_NEAR(path.get_right_width(0.0), 7.0, 1e-6);
-  EXPECT_NEAR(path.get_right_width(0.5), 7.25, 1e-6);
-  EXPECT_NEAR(path.get_right_width(1.0), 7.5, 1e-6);
-  EXPECT_NEAR(path.get_right_width(1.5), 7.75, 1e-6);
-  EXPECT_NEAR(path.get_right_width(2.0), 8.0, 1e-6);
-  EXPECT_NEAR(path.get_right_width(2.5), 6.5, 1e-6);
-  EXPECT_NEAR(path.get_right_width(3.0), 5.0, 1e-6);
-  EXPECT_NEAR(path.get_right_width(3.5), 5.0, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(-0.5), 7.0, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(0.0), 7.0, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(0.5), 7.25, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(1.0), 7.5, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(1.5), 7.75, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(2.0), 8.0, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(2.5), 6.5, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(3.0), 5.0, 1e-6);
+  EXPECT_NEAR(path.GetRightWidth(3.5), 5.0, 1e-6);
 }
 
 TEST(TestSuite, hdmap_curvy_path) {
   const std::vector<MapPathPoint> points{
-      MakeMapPathPoint(2, 0), MakeMapPathPoint(2, 1),
-      MakeMapPathPoint(1, 2), MakeMapPathPoint(0, 2)};
+      MakeMapPathPoint(2, 0), MakeMapPathPoint(2, 1), MakeMapPathPoint(1, 2),
+      MakeMapPathPoint(0, 2)};
   Path path(points, {}, 2.0);
   EXPECT_EQ(path.num_points(), 4);
   EXPECT_EQ(path.num_segments(), 3);
@@ -323,17 +323,17 @@ TEST(TestSuite, hdmap_curvy_path) {
   EXPECT_EQ(other_path_approximation->original_ids()[0], 0);
   EXPECT_EQ(other_path_approximation->original_ids()[1], 3);
 
-  EXPECT_TRUE(other_path.GetProjection({1.5, 0.5}, &accumulate_s, &lateral,
-                                        &distance));
+  EXPECT_TRUE(
+      other_path.GetProjection({1.5, 0.5}, &accumulate_s, &lateral, &distance));
   EXPECT_NEAR(accumulate_s, 0.5, 1e-6);
   EXPECT_NEAR(lateral, 0.5, 1e-6);
   EXPECT_NEAR(distance, 0.5, 1e-6);
-  EXPECT_TRUE(other_path.GetProjection({2.5, 1.1}, &accumulate_s, &lateral,
-                                        &distance));
+  EXPECT_TRUE(
+      other_path.GetProjection({2.5, 1.1}, &accumulate_s, &lateral, &distance));
   EXPECT_NEAR(accumulate_s, 1.0, 1e-6);
   EXPECT_NEAR(distance, hypot(0.5, 0.1), 1e-6);
-  EXPECT_TRUE(other_path.GetProjection({1.6, 1.6}, &accumulate_s, &lateral,
-                                        &distance));
+  EXPECT_TRUE(
+      other_path.GetProjection({1.6, 1.6}, &accumulate_s, &lateral, &distance));
   EXPECT_NEAR(accumulate_s, 1.0 + 0.5 * sqrt(2.0), 1e-6);
   EXPECT_NEAR(lateral, -0.1 * sqrt(2.0), 1e-6);
   EXPECT_NEAR(distance, 0.1 * sqrt(2.0), 1e-6);
@@ -368,26 +368,26 @@ TEST(TestSuite, hdmap_circle_path) {
   double lateral;
   double distance;
   EXPECT_TRUE(path.GetProjection({kRadius + 1, -1}, &accumulate_s, &lateral,
-                                  &distance));
+                                 &distance));
   EXPECT_NEAR(accumulate_s, -1.0, kLargeEps);
   EXPECT_NEAR(lateral, -1.0, kLargeEps);
   EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
 
   EXPECT_TRUE(path.GetProjection({-1, kRadius - 1}, &accumulate_s, &lateral,
-                                  &distance));
+                                 &distance));
   EXPECT_NEAR(accumulate_s, total_length + 1.0, kLargeEps);
   EXPECT_NEAR(lateral, 1.0, kLargeEps);
   EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
 
   EXPECT_TRUE(
       path.GetProjection({kRadius / sqrt(2.0) + 1, kRadius / sqrt(2.0) + 1},
-                          &accumulate_s, &lateral, &distance));
+                         &accumulate_s, &lateral, &distance));
   EXPECT_NEAR(accumulate_s, total_length / 2.0, 1e-6);
   EXPECT_NEAR(lateral, -sqrt(2.0), 1e-6);
   EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
 
   EXPECT_TRUE(path.GetProjection({kRadius / sqrt(2.0), kRadius / sqrt(2.0)},
-                                  &accumulate_s, &lateral, &distance));
+                                 &accumulate_s, &lateral, &distance));
   EXPECT_NEAR(accumulate_s, total_length / 2.0, 1e-6);
   EXPECT_NEAR(lateral, 0.0, 1e-6);
   EXPECT_NEAR(distance, 0.0, 1e-6);
@@ -407,8 +407,8 @@ TEST(TestSuite, hdmap_circle_path) {
         {x, y}, &other_accumulate_s, &other_lateral, &other_distance));
 
     EXPECT_NEAR(distance, other_distance, 1e-6);
-    EXPECT_NEAR(path.GetSmoothPoint(accumulate_s).DistanceTo({x, y}),
-                distance, 1e-6);
+    EXPECT_NEAR(path.GetSmoothPoint(accumulate_s).DistanceTo({x, y}), distance,
+                1e-6);
   }
 
   // Test path.get_smooth_point and get_s_from_index
@@ -440,15 +440,15 @@ TEST(TestSuite, hdmap_circle_path) {
     EXPECT_NEAR(expected_point.y(), point.y(), 1e-6);
   }
 
-  // Test get_width, get_left_width, get_right_width
+  // Test get_width, GetLeftWidth, GetRightWidth
   double delta_s = 0.1;
   double cur_s = 0.0;
   while (cur_s < path.accumulated_s().back()) {
     double left_width = 0.0;
     double right_width = 0.0;
-    EXPECT_TRUE(path.get_width(cur_s, &left_width, &right_width));
-    EXPECT_NEAR(left_width, path.get_left_width(cur_s), 1e-6);
-    EXPECT_NEAR(right_width, path.get_right_width(cur_s), 1e-6);
+    EXPECT_TRUE(path.GetWidth(cur_s, &left_width, &right_width));
+    EXPECT_NEAR(left_width, path.GetLeftWidth(cur_s), 1e-6);
+    EXPECT_NEAR(right_width, path.GetRightWidth(cur_s), 1e-6);
     cur_s += delta_s;
   }
 }
@@ -495,7 +495,7 @@ TEST(TestSuite, hdmap_jerky_path) {
     EXPECT_NEAR(lateral, 0.0, 1e-6);
     EXPECT_NEAR(distance, 0.0, 1e-6);
     EXPECT_TRUE(path.GetProjection(points[num_segments], &accumulate_s,
-                                    &lateral, &distance));
+                                   &lateral, &distance));
     EXPECT_NEAR(accumulate_s, path.length(), 1e-6);
     EXPECT_NEAR(lateral, 0.0, 1e-6);
     EXPECT_NEAR(distance, 0.0, 1e-6);
@@ -573,13 +573,13 @@ TEST(TestSuite, hdmap_s_path) {
   double lateral;
   double distance;
   EXPECT_TRUE(path.GetProjection({-1, -2.0 * kRadius - 1}, &accumulate_s,
-                                  &lateral, &distance));
+                                 &lateral, &distance));
   EXPECT_NEAR(accumulate_s, -1.0, kLargeEps);
   EXPECT_NEAR(lateral, -1.0, kLargeEps);
   EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
 
   EXPECT_TRUE(path.GetProjection({1, 2.0 * kRadius + 1}, &accumulate_s,
-                                  &lateral, &distance));
+                                 &lateral, &distance));
   EXPECT_NEAR(accumulate_s, total_length + 1.0, kLargeEps);
   EXPECT_NEAR(lateral, 1.0, kLargeEps);
   EXPECT_NEAR(distance, sqrt(2.0), 1e-6);
@@ -598,8 +598,8 @@ TEST(TestSuite, hdmap_s_path) {
         {x, y}, &other_accumulate_s, &other_lateral, &other_distance));
 
     EXPECT_NEAR(distance, other_distance, 1e-6);
-    EXPECT_NEAR(path.GetSmoothPoint(accumulate_s).DistanceTo({x, y}),
-                distance, 1e-6);
+    EXPECT_NEAR(path.GetSmoothPoint(accumulate_s).DistanceTo({x, y}), distance,
+                1e-6);
   }
 }
 
@@ -712,19 +712,16 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
   index = path.GetIndexFromS(segment_length * kNumSegments);
   EXPECT_EQ(index.id, kNumSegments);
   EXPECT_NEAR(index.offset, 0, 1e-6);
-  EXPECT_NEAR(path.GetSFromIndex(index), segment_length * kNumSegments,
-              1e-6);
+  EXPECT_NEAR(path.GetSFromIndex(index), segment_length * kNumSegments, 1e-6);
   index = path.GetIndexFromS(segment_length * kNumSegments + 0.2);
   EXPECT_EQ(index.id, kNumSegments);
   EXPECT_NEAR(index.offset, 0, 1e-6);
-  EXPECT_NEAR(path.GetSFromIndex(index), segment_length * kNumSegments,
-              1e-6);
+  EXPECT_NEAR(path.GetSFromIndex(index), segment_length * kNumSegments, 1e-6);
 }
 
 TEST(TestSuite, compute_lane_segments_from_points) {
-  std::vector<MapPathPoint> points{MakeMapPathPoint(2, 0),
-                                   MakeMapPathPoint(2, 1),
-                                   MakeMapPathPoint(2, 2)};
+  std::vector<MapPathPoint> points{
+      MakeMapPathPoint(2, 0), MakeMapPathPoint(2, 1), MakeMapPathPoint(2, 2)};
   Lane lane1;
   lane1.mutable_id()->set_id("id1");
   auto* curve = lane1.mutable_central_curve();
@@ -873,8 +870,8 @@ TEST(TestSuite, lane_info) {
   EXPECT_NEAR(s, 150.0, 1e-6);
   EXPECT_NEAR(lateral, 52.0, 1e-6);
 
-  // EXPECT_NEAR(lane1->path().get_right_width(123.0), 1.9, 1e-6);
-  // EXPECT_NEAR(lane1->path().get_left_width(45.0), 1.9, 1e-6);
+  // EXPECT_NEAR(lane1->path().GetRightWidth(123.0), 1.9, 1e-6);
+  // EXPECT_NEAR(lane1->path().GetLeftWidth(45.0), 1.9, 1e-6);
 
   // Make sure overlaps are correctly computed.
   // EXPECT_EQ(1, lane1->path().junction_overlaps().size());
