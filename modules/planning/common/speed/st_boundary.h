@@ -24,6 +24,7 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "gtest/gtest_prod.h"
@@ -42,11 +43,11 @@ class StBoundary : public common::math::Polygon2d {
  public:
   StBoundary() = default;
 
-  StBoundary(const common::math::Box2d& box) = delete;
-  StBoundary(std::vector<common::math::Vec2d> points) = delete;
-
   explicit StBoundary(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs);
+
+  explicit StBoundary(const common::math::Box2d& box) = delete;
+  explicit StBoundary(std::vector<common::math::Vec2d> points) = delete;
 
   ~StBoundary() = default;
 
@@ -90,7 +91,7 @@ class StBoundary : public common::math::Polygon2d {
   double max_s() const;
   double max_t() const;
 
-  double area() const { return area_; };
+  double Area() const;
 
   double DistanceS(const STPoint& st_point) const;
   std::vector<STPoint> upper_points() const { return upper_points_; }
@@ -109,7 +110,7 @@ class StBoundary : public common::math::Polygon2d {
 
   FRIEND_TEST(StBoundaryTest, remove_redundant_points);
   void RemoveRedundantPoints(
-      std::vector<std::pair<STPoint, STPoint>>& point_pairs);
+      std::vector<std::pair<STPoint, STPoint>>* point_pairs);
   void CalculateArea();
 
   FRIEND_TEST(StBoundaryTest, get_index_range);

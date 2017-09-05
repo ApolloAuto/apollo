@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <limits>
 #include <string>
+#include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"
@@ -446,9 +447,10 @@ Status StBoundaryMapper::MapFollowDecision(
 
   const double speed_coeff =
       std::cos(obstacle->Perception().theta() - ref_point.heading());
-  AERROR_IF(speed_coeff < 0.0) << "Obstacle is moving opposite to the "
-      "reference line. ref_point: " << ref_point.DebugString()
-      << ", path obstacle:\n"
+  AERROR_IF(speed_coeff < 0.0)
+      << "Obstacle is moving opposite to the "
+         "reference line. ref_point: "
+      << ref_point.DebugString() << ", path obstacle:\n"
       << path_obstacle.obstacle()->Perception().DebugString();
 
   const auto& start_point = path_data_.discretized_path().StartPoint();
@@ -547,7 +549,7 @@ Status StBoundaryMapper::GetSpeedLimits(
 
 void StBoundaryMapper::AppendBoundary(
     const StBoundary& boundary, std::vector<StBoundary>* st_boundaries) const {
-  if (Double::Compare(boundary.area(), 0.0) <= 0) {
+  if (Double::Compare(boundary.Area(), 0.0) <= 0) {
     return;
   }
   st_boundaries->push_back(std::move(boundary));

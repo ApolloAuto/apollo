@@ -140,7 +140,7 @@ bool QpFrenetFrame::GetDynamicObstacleBound(
 
 bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
   for (double relative_time = 0.0; relative_time < speed_data_.TotalTime();
-      relative_time += time_resolution_) {
+       relative_time += time_resolution_) {
     SpeedPoint veh_point;
     if (!speed_data_.EvaluateByTime(relative_time, &veh_point)) {
       AERROR << "Fail to get speed point at relative time " << relative_time;
@@ -505,7 +505,7 @@ bool QpFrenetFrame::GetBound(
 
   if (std::isinf(low_second)) {
     bound->second = low_second;
-  }else {
+  } else {
     bound->second = low_second * (1 - weight) + high_second * weight;
   }
   return true;
