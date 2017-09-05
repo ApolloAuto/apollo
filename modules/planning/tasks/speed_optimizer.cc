@@ -58,14 +58,11 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed) const {
   const double unit_t = 0.02;
 
   double pre_s = 0.0;
-  double t = 0.0;
-
-  while (t < max_t) {
+  for (double t = 0.0; t < max_t; t += unit_t) {
     const double s = std::fmax(pre_s, init_speed * t + 0.5 * min_acc * t * t);
     const double v = std::fmax(0.0, init_speed + min_acc * t);
     speed_data.AppendSpeedPoint(s, t, v, min_acc, 0.0);
     pre_s = s;
-    t += unit_t;
   }
   return speed_data;
 }

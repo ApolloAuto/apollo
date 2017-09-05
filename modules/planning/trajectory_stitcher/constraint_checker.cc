@@ -28,11 +28,8 @@ namespace planning {
 
 namespace {
 template <typename T>
-bool within_range(const T v, const T lower, const T upper) {
-  if (v < lower || v > upper) {
-    return false;
-  }
-  return true;
+bool WithinRange(const T v, const T lower, const T upper) {
+  return lower <= v && v <= upper;
 }
 }
 
@@ -41,8 +38,7 @@ bool ConstraintChecker::ValidTrajectory(
   for (const auto& p : trajectory.trajectory_points()) {
     double t = p.relative_time();
     double lon_v = p.v();
-    if (!within_range(lon_v, FLAGS_speed_lower_bound,
-                      FLAGS_speed_upper_bound)) {
+    if (!WithinRange(lon_v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
       AWARN << "Velocity at relative time " << t
             << " exceeds bound, value: " << lon_v << ", bound ["
             << FLAGS_speed_lower_bound << ", " << FLAGS_speed_upper_bound
@@ -51,8 +47,8 @@ bool ConstraintChecker::ValidTrajectory(
     }
 
     double lon_a = p.a();
-    if (!within_range(lon_a, FLAGS_longitudinal_acceleration_lower_bound,
-                      FLAGS_longitudinal_acceleration_upper_bound)) {
+    if (!WithinRange(lon_a, FLAGS_longitudinal_acceleration_lower_bound,
+                     FLAGS_longitudinal_acceleration_upper_bound)) {
       AWARN << "Longitudinal acceleration at relative time " << t
             << " exceeds bound, value: " << lon_a << ", bound ["
             << FLAGS_longitudinal_acceleration_lower_bound << ", "
@@ -61,8 +57,8 @@ bool ConstraintChecker::ValidTrajectory(
     }
 
     double lat_a = lon_v * lon_v * p.path_point().kappa();
-    if (!within_range(lat_a, -FLAGS_lateral_acceleration_bound,
-                      FLAGS_lateral_acceleration_bound)) {
+    if (!WithinRange(lat_a, -FLAGS_lateral_acceleration_bound,
+                     FLAGS_lateral_acceleration_bound)) {
       AWARN << "Lateral acceleration at relative time " << t
             << " exceeds bound, value: " << lat_a << ", bound ["
             << -FLAGS_lateral_acceleration_bound << ", "
@@ -71,7 +67,7 @@ bool ConstraintChecker::ValidTrajectory(
     }
 
     double kappa = p.path_point().kappa();
-    if (!within_range(kappa, -FLAGS_kappa_bound, FLAGS_kappa_bound)) {
+    if (!WithinRange(kappa, -FLAGS_kappa_bound, FLAGS_kappa_bound)) {
       AWARN << "Kappa at relative time " << t
             << " exceeds bound, value: " << kappa << ", bound ["
             << -FLAGS_kappa_bound << ", " << FLAGS_kappa_bound << "].";

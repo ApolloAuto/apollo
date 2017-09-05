@@ -35,9 +35,9 @@
 namespace apollo {
 namespace planning {
 
-using SLPoint = apollo::common::SLPoint;
-using TrajectoryPoint = apollo::common::TrajectoryPoint;
-using Vec2d = apollo::common::math::Vec2d;
+using apollo::common::math::Vec2d;
+using apollo::common::SLPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 
 ReferenceLineInfo::ReferenceLineInfo(
@@ -52,12 +52,11 @@ ReferenceLineInfo::ReferenceLineInfo(
 bool ReferenceLineInfo::Init() {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
   const auto& path_point = init_adc_point_.path_point();
-  common::math::Vec2d position(path_point.x(), path_point.y());
-  common::math::Vec2d vec_to_center(
+  Vec2d position(path_point.x(), path_point.y());
+  Vec2d vec_to_center(
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0,
       (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0);
-  common::math::Vec2d center(position +
-                             vec_to_center.rotate(path_point.theta()));
+  Vec2d center(position + vec_to_center.rotate(path_point.theta()));
   common::math::Box2d box(center, path_point.theta(), param.length(),
                           param.width());
   if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
