@@ -37,6 +37,7 @@
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
+#include "modules/planning/trajectory_stitcher/constraint_checker.h"
 
 namespace apollo {
 namespace planning {
@@ -153,6 +154,12 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  if (!ConstraintChecker::ValidTrajectory(trajectory)) {
+    std::string msg = "Trajectory cannot pass constraint checker.";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   reference_line_info->SetTrajectory(trajectory);
   PopulateDecision(*reference_line_info, frame);
 
