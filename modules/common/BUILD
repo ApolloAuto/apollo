@@ -38,6 +38,7 @@ cc_library(
         "apollo_app.h",
     ],
     deps = [
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
         "//modules/hmi/utils:hmi_status_helper",
         "@glog//:glog",
