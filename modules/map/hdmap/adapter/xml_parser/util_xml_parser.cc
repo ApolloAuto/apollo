@@ -14,29 +14,29 @@ limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
-#include <sstream>
-#include <iomanip>
 #include <algorithm>
+#include <iomanip>
 #include <limits>
-#include <vector>
+#include <sstream>
 #include <string>
-#include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
+#include <vector>
+
 #include "glog/logging.h"
 
+#include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
+
 namespace apollo {
-namespace hdmap  {
+namespace hdmap {
 namespace adapter {
 
 Status UtilXmlParser::ParseCurve(const tinyxml2::XMLElement& xml_node,
-                                  PbCurve* curve) {
+                                 PbCurve* curve) {
   CHECK_NOTNULL(curve);
 
-  const tinyxml2::XMLElement* sub_node
-                                  = xml_node.FirstChildElement("geometry");
+  const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("geometry");
   while (sub_node) {
     PbCurveSegment* curve_segment = curve->add_segment();
-    RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node,
-                                                  curve_segment));
+    RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node, curve_segment));
     sub_node = sub_node->NextSiblingElement("geometry");
   }
 
@@ -119,9 +119,9 @@ Status UtilXmlParser::ParsePointSet(const tinyxml2::XMLElement& xml_node,
 }
 
 Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node,
-                                    PbPolygon* polygon) {
+                                   PbPolygon* polygon) {
   const tinyxml2::XMLElement* sub_node =
-                                    xml_node.FirstChildElement("cornerGlobal");
+      xml_node.FirstChildElement("cornerGlobal");
   while (sub_node) {
     double ptx = 0.0;
     double pty = 0.0;
@@ -152,7 +152,7 @@ Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node,
 }
 
 Status UtilXmlParser::ParsePoint(const tinyxml2::XMLElement& xml_node,
-                                PbPoint3D* pt) {
+                                 PbPoint3D* pt) {
   CHECK_NOTNULL(pt);
 
   const auto sub_node = xml_node.FirstChildElement("centerPoint");
@@ -190,15 +190,16 @@ std::string UtilXmlParser::CreateLaneId(const std::string& road_id,
 std::string UtilXmlParser::ToUpper(const std::string& s) {
   std::string value = s;
   std::transform(value.begin(), value.end(), value.begin(),
-    [](unsigned char c) { return std::toupper(c); });
+                 [](unsigned char c) { return std::toupper(c); });
 
   return value;
 }
 
 void UtilXmlParser::WGS84ToUTM(const double x, const double y, const double z,
-                        double* output_x, double* output_y, double* output_z) {
-  CoordinateConvertTool::GetInstance()->CoordiateConvert(x, y, z,
-                                                output_x, output_y, output_z);
+                               double* output_x, double* output_y,
+                               double* output_z) {
+  CoordinateConvertTool::GetInstance()->CoordiateConvert(x, y, z, output_x,
+                                                         output_y, output_z);
 }
 
 double UtilXmlParser::CurveLength(const PbCurve& curve) {
@@ -211,9 +212,8 @@ double UtilXmlParser::CurveLength(const PbCurve& curve) {
 }
 
 tinyxml2::XMLError UtilXmlParser::QueryStringAttribute(
-                                        const tinyxml2::XMLElement& xml_node,
-                                        const std::string& name,
-                                        std::string* value) {
+    const tinyxml2::XMLElement& xml_node, const std::string& name,
+    std::string* value) {
   CHECK_NOTNULL(value);
   const char* val = xml_node.Attribute(name.c_str());
   if (val == nullptr) {

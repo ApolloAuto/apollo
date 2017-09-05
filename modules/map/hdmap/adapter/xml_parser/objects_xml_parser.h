@@ -12,12 +12,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_OBJECTS_XML_PARSER_H
-#define MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_OBJECTS_XML_PARSER_H
+#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_OBJECTS_XML_PARSER_H_
+#define MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_OBJECTS_XML_PARSER_H_
 
 #include <vector>
+
+#include "tinyxml2/tinyxml2.h"
+
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
-#include "tinyxml2.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 
 namespace apollo {
@@ -27,17 +29,17 @@ namespace adapter {
 class ObjectsXmlParser {
  public:
   static Status ParseCrosswalks(const tinyxml2::XMLElement& xml_node,
-                              std::vector<PbCrosswalk>* crosswalks);
+                                std::vector<PbCrosswalk>* crosswalks);
   static Status ParseClearAreas(const tinyxml2::XMLElement& xml_node,
-                              std::vector<PbClearArea>* clear_areas);
+                                std::vector<PbClearArea>* clear_areas);
   static Status ParseSpeedBumps(const tinyxml2::XMLElement& xml_node,
-                              std::vector<PbSpeedBump>* speed_bumps);
+                                std::vector<PbSpeedBump>* speed_bumps);
   static Status ParseStopLines(const tinyxml2::XMLElement& xml_node,
-                                std::vector<StopLineInternal>* stop_lines);
+                               std::vector<StopLineInternal>* stop_lines);
 };
 
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_OBJECTS_XML_PARSER_H
+#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_OBJECTS_XML_PARSER_H_

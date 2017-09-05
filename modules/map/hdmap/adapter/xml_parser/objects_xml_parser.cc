@@ -12,9 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
+
+#include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
+
 #include <string>
 #include <vector>
-#include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
+
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 namespace apollo {
