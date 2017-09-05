@@ -33,12 +33,6 @@ const DecisionResult& Decider::MakeDecision(
   decision_result_.Clear();
   const auto& path_decision = reference_line_info.path_decision();
 
-  bool estop = 0;
-  if (estop) {
-    MakeEStopDecision(path_decision);
-    return decision_result_;
-  }
-
   // cruise by default
   decision_result_.mutable_main_decision()->mutable_cruise();
 
