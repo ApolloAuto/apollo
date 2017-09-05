@@ -25,6 +25,7 @@
 #include <string>
 
 #include "gflags/gflags.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/status/status.h"
 #include "modules/hmi/utils/hmi_status_helper.h"
@@ -107,15 +108,19 @@ void apollo_app_sigint_handler(int signal_num);
 }  // namespace common
 }  // namespace apollo
 
-#define APOLLO_MAIN(APP)                                       \
-  int main(int argc, char **argv) {                            \
-    google::InitGoogleLogging(argv[0]);                        \
-    google::ParseCommandLineFlags(&argc, &argv, true);         \
-    signal(SIGINT, apollo::common::apollo_app_sigint_handler); \
-    APP apollo_app_;                                           \
-    ros::init(argc, argv, apollo_app_.Name());                 \
-    apollo_app_.Spin();                                        \
-    return 0;                                                  \
+#define APOLLO_MAIN(APP)                                                      \
+  DECLARE_string(flagfile);                                                   \
+  APP apollo_app_;                                                            \
+  int main(int argc, char **argv) {                                           \
+    const std::string app_name(apollo_app_.Name());                           \
+    FLAGS_adapter_config_path = "modules/" + app_name + "/conf/adapter.conf"; \
+    FLAGS_flagfile = "modules/" + app_name + "/conf/" + app_name + ".conf";   \
+    google::InitGoogleLogging(argv[0]);                                       \
+    google::ParseCommandLineFlags(&argc, &argv, true);                        \
+    signal(SIGINT, apollo::common::apollo_app_sigint_handler);                \
+    ros::init(argc, argv, app_name);                                          \
+    apollo_app_.Spin();                                                       \
+    return 0;                                                                 \
   }
 
 #endif  // MODULES_APOLLO_APP_H_
