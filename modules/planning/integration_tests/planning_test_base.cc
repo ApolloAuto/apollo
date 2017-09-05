@@ -154,44 +154,6 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   return true;
 }
 
-void PlanningTestBase::export_sl_points(
-    const std::vector<std::vector<common::SLPoint>>& points,
-    const std::string& filename) {
-  AINFO << "Write sl_points to file " << filename;
-  std::ofstream ofs(filename);
-  ofs << "level, s, l" << std::endl;
-  int level = 0;
-  for (const auto& level_points : points) {
-    for (const auto& point : level_points) {
-      ofs << level << ", " << point.s() << ", " << point.l() << std::endl;
-    }
-    ++level;
-  }
-  ofs.close();
-}
-
-void PlanningTestBase::export_path_data(const PathData& path_data,
-                                        const std::string& filename) {
-  AINFO << "Write path_data to file " << filename;
-  std::ofstream ofs(filename);
-  ofs << "s, l, dl, ddl, x, y, z" << std::endl;
-  const auto& frenet_path = path_data.frenet_frame_path();
-  const auto& discrete_path = path_data.discretized_path();
-  if (frenet_path.NumOfPoints() != discrete_path.NumOfPoints()) {
-    AERROR << "frenet_path and discrete path have different number of points";
-    return;
-  }
-  for (uint32_t i = 0; i < frenet_path.NumOfPoints(); ++i) {
-    const auto& frenet_point = frenet_path.PointAt(i);
-    const auto& discrete_point = discrete_path.PathPointAt(i);
-    ofs << frenet_point.s() << ", " << frenet_point.l() << ", "
-        << frenet_point.dl() << ", " << frenet_point.ddl() << discrete_point.x()
-        << ", " << discrete_point.y() << ", " << discrete_point.z()
-        << std::endl;
-  }
-  ofs.close();
-}
-
 bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
   if (trajectory.trajectory_point().empty()) {
     AERROR << "trajectory has NO point.";

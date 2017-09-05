@@ -348,15 +348,5 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
   return speed_limit;
 }
 
-double ReferenceLine::GetSpeedLimitFromPoint(
-    const common::math::Vec2d& point) const {
-  SLPoint sl;
-  if (!XYToSL(point, &sl)) {
-    AWARN << "Failed to get projection for point: " << point.DebugString();
-    return FLAGS_planning_upper_speed_limit;
-  }
-  return GetSpeedLimitFromS(sl.s());
-}
-
 }  // namespace planning
 }  // namespace apollo

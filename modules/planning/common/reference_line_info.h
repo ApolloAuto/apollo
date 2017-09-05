@@ -49,15 +49,6 @@ class ReferenceLineInfo {
 
   bool Init();
 
-  /**
-   * Check if xy_point is on the left side lane of current reference line.
-   */
-  bool IsOnLeftLane(const common::math::Vec2d& xy_point);
-  /**
-   * Check if xy_point is on the right side lane of current reference line.
-   */
-  bool IsOnRightLane(const common::math::Vec2d& xy_point);
-
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
 
@@ -75,10 +66,6 @@ class ReferenceLineInfo {
   const DiscretizedTrajectory& trajectory() const;
 
   double Cost() const { return cost_; }
-
-  std::unique_ptr<Obstacle> CreateVirtualObstacle(
-      const std::string& obstacle_id, const common::math::Vec2d& position,
-      const double length, const double width, const double height) const;
 
   /**
    * @brief check if current reference line is started from another reference

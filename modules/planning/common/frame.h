@@ -64,9 +64,6 @@ class Frame {
 
   std::string DebugString() const;
 
-  const IndexedObstacles &GetObstacles() const;
-
-  const ADCTrajectory &GetADCTrajectory() const;
   ADCTrajectory *MutableADCTrajectory();
 
   const PublishableTrajectory &ComputedTrajectory() const;
@@ -106,8 +103,6 @@ class Frame {
   bool InitReferenceLineInfo(const std::vector<ReferenceLine> &reference_lines);
 
   void AlignPredictionTime(const double trajectory_header_time);
-
-  const std::string &CollisionObstacle() const;
 
   /**
    * Check if there is collision with obstacles

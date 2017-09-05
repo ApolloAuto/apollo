@@ -72,7 +72,6 @@ class ReferenceLine {
   std::string DebugString() const;
 
   double GetSpeedLimitFromS(const double s) const;
-  double GetSpeedLimitFromPoint(const common::math::Vec2d& point) const;
 
  private:
   /**
