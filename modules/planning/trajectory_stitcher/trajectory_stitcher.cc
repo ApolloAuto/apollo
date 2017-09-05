@@ -33,7 +33,7 @@ using VehicleState = apollo::common::VehicleState;
 
 namespace {
 
-std::vector<common::TrajectoryPoint> compute_reinit_stitching_trajectory() {
+std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory() {
   common::TrajectoryPoint init_point;
   init_point.mutable_path_point()->set_x(VehicleState::instance()->x());
   init_point.mutable_path_point()->set_y(VehicleState::instance()->y());
@@ -68,7 +68,7 @@ TrajectoryStitcher::ComputeStitchingTrajectory(
     const double planning_cycle_time,
     const PublishableTrajectory& prev_trajectory) {
   if (!is_on_auto_mode) {
-    return compute_reinit_stitching_trajectory();
+    return ComputeReinitStitchingTrajectory();
   }
 
   std::size_t prev_trajectory_size = prev_trajectory.NumOfPoints();
@@ -77,7 +77,7 @@ TrajectoryStitcher::ComputeStitchingTrajectory(
     AWARN << "Projected trajectory at time [" << prev_trajectory.header_time()
           << "] size is zero! Previous planning not exist or failed. Use "
              "origin car status instead.";
-    return compute_reinit_stitching_trajectory();
+    return ComputeReinitStitchingTrajectory();
   }
 
   const double veh_rel_time = current_timestamp - prev_trajectory.header_time();
@@ -86,13 +86,13 @@ TrajectoryStitcher::ComputeStitchingTrajectory(
 
   if (matched_index == prev_trajectory_size) {
     AWARN << "The previous trajectory is not long enough, something is wrong";
-    return compute_reinit_stitching_trajectory();
+    return ComputeReinitStitchingTrajectory();
   }
 
   if (matched_index == 0 &&
       veh_rel_time < prev_trajectory.StartPoint().relative_time()) {
     AWARN << "the previous trajectory doesn't cover current time";
-    return compute_reinit_stitching_trajectory();
+    return ComputeReinitStitchingTrajectory();
   }
 
   auto matched_point = prev_trajectory.TrajectoryPointAt(matched_index);
@@ -105,7 +105,7 @@ TrajectoryStitcher::ComputeStitchingTrajectory(
   if (position_diff > FLAGS_replan_distance_threshold) {
     AWARN << "the distance between matched point and actual position is too "
              "large";
-    return compute_reinit_stitching_trajectory();
+    return ComputeReinitStitchingTrajectory();
   }
 
   double forward_rel_time = veh_rel_time + planning_cycle_time;
