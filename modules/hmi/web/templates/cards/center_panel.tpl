@@ -81,10 +81,10 @@
       }
 
       $btn = $("#module_" + module_name + " .module_switch");
-      if (status_code != 'STARTED') {
-        $btn.removeClass("module_switch_open").addClass("module_switch_close");
-      } else {
+      if (status_code == 'STARTED' || status_code == 'INITIALIZED') {
         $btn.removeClass("module_switch_close").addClass("module_switch_open");
+      } else {
+        $btn.removeClass("module_switch_open").addClass("module_switch_close");
       }
     });
   }
