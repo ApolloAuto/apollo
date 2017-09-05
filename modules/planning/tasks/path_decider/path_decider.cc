@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/path_decider/path_decider.h"
 
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
@@ -169,11 +170,13 @@ bool PathDecider::MakeStaticObstacleDecision(
         double stop_distance = 0;
         if (obstacle->Id() == FLAGS_destination_obstacle_id) {
           // destination
-          object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
+          object_stop_ptr->set_reason_code(
+              StopReasonCode::STOP_REASON_DESTINATION);
           stop_distance = FLAGS_stop_distance_destination;
         } else {
           // static obstacle
-          object_stop_ptr->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
+          object_stop_ptr->set_reason_code(
+              StopReasonCode::STOP_REASON_OBSTACLE);
           stop_distance = FLAGS_stop_distance_obstacle;
         }
         object_stop_ptr->set_distance_s(-stop_distance);
