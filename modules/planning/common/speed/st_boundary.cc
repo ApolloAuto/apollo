@@ -38,11 +38,11 @@ StBoundary::StBoundary(
   std::vector<std::pair<STPoint, STPoint>> reduced_pairs(point_pairs);
   RemoveRedundantPoints(reduced_pairs);
 
-  for (size_t i = 0; i < reduced_pairs.size(); ++i) {
+  for (const auto& item : reduced_pairs) {
     // use same t for both points
-    const double t = reduced_pairs[i].first.t();
-    lower_points_.emplace_back(reduced_pairs[i].first.s(), t);
-    upper_points_.emplace_back(reduced_pairs[i].second.s(), t);
+    const double t = item.first.t();
+    lower_points_.emplace_back(item.first.s(), t);
+    upper_points_.emplace_back(item.second.s(), t);
   }
 
   for (auto it = lower_points_.begin(); it != lower_points_.end(); ++it) {
