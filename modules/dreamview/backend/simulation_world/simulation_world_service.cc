@@ -82,20 +82,25 @@ double CalculateAcceleration(const Point3D &acceleration,
   return std::signbit(projection) ? -magnitude : magnitude;
 }
 
-Object::DisengageType DeduceDisengageType(const ::Chassis &chassis) {
+Object::DisengageType DeduceDisengageType(const Chassis &chassis) {
   if (chassis.error_code() != Chassis::NO_ERROR) {
-    return Object::DISENGAGE_UNKNOWN;
+    return Object::DISENGAGE_CHASSIS_ERROR;
   }
 
-  if (chassis.driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) {
-    return Object::DISENGAGE_NONE;
+  switch (chassis.driving_mode()) {
+    case Chassis::COMPLETE_AUTO_DRIVE:
+      return Object::DISENGAGE_NONE;
+    case Chassis::COMPLETE_MANUAL:
+      return Object::DISENGAGE_MANUAL;
+    case Chassis::AUTO_STEER_ONLY:
+      return Object::DISENGAGE_AUTO_STEER_ONLY;
+    case Chassis::AUTO_SPEED_ONLY:
+      return Object::DISENGAGE_AUTO_SPEED_ONLY;
+    case Chassis::EMERGENCY_MODE:
+      return Object::DISENGAGE_EMERGENCY;
+    default:
+      return Object::DISENGAGE_UNKNOWN;
   }
-
-  if (chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
-    return Object::DISENGAGE_MANUAL;
-  }
-
-  return Object::DISENGAGE_UNKNOWN;
 }
 
 void SetObstacleInfo(const PerceptionObstacle &obstacle, Object *world_object) {
