@@ -33,7 +33,7 @@ bool HungarianMatcher::SetMatchDistanceMaximum(
   const float& match_distance_maximum) {
   if (match_distance_maximum >= 0) {
     s_match_distance_maximum_ = match_distance_maximum;
-    AINFO << "match distance maximum of HungarianMatcher is "
+    ADEBUG << "match distance maximum of HungarianMatcher is "
           << s_match_distance_maximum_;
     return true;
   }
@@ -58,7 +58,7 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
   std::vector<std::vector<int> > track_components;
   ComputeConnectedComponents(association_mat, s_match_distance_maximum_,
                              &track_components, &object_components);
-  AINFO << "HungarianMatcher: partition graph into "
+  ADEBUG << "HungarianMatcher: partition graph into "
         << track_components.size() << " sub-graphs.";
 
   // C. matching each sub-graph
