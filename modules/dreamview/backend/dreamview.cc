@@ -16,6 +16,8 @@
 
 #include "modules/dreamview/backend/dreamview.h"
 
+#include <vector>
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"

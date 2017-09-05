@@ -106,7 +106,7 @@ class SimulationWorldService {
    * @param msg the string to send to monitor
    * @param log_level defined in modules/common/monitor/proto/monitor.proto
    */
-  void PublishMessage(
+  void PublishMonitorMessage(
         apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
         const std::string &msg) {
     apollo::common::monitor::MonitorBuffer buffer(&monitor_);
