@@ -110,7 +110,7 @@ Status DpStGraph::InitCostTable() {
 
   if (Double::Compare(dp_st_speed_config_.total_path_length(), 0.0) == 0) {
     unit_s_ = 1e-8;
-    uint32_t dim_s =
+    dim_s =
         std::min(dim_s, static_cast<uint32_t>(
                             dp_st_speed_config_.total_path_length() / unit_s_) +
                             1);
@@ -126,15 +126,13 @@ Status DpStGraph::InitCostTable() {
       dim_t, std::vector<StGraphPoint>(dim_s, StGraphPoint()));
 
   double curr_t = 0.0;
-  for (uint32_t i = 0; i < cost_table_.size(); ++i) {
+  for (uint32_t i = 0; i < cost_table_.size(); ++i, curr_t += unit_t_) {
+    auto& cost_table_i = cost_table_[i];
     double curr_s = 0.0;
-    for (uint32_t j = 0; j < cost_table_[i].size(); ++j) {
-      cost_table_[i][j].Init(i, j, STPoint(curr_s, curr_t));
-      curr_s += unit_s_;
+    for (uint32_t j = 0; j < cost_table_i.size(); ++j, curr_s += unit_s_) {
+      cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
     }
-    curr_t += unit_t_;
   }
-
   return Status::OK();
 }
 
@@ -172,12 +170,12 @@ Status DpStGraph::CalculateTotalCost() {
     uint32_t highest_row = 0;
     uint32_t lowest_row = cost_table_.back().size() - 1;
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
+      const auto& cost_cr = cost_table_[c][r];
       CalculateCostAt(c, r);
       uint32_t h_r = 0;
       uint32_t l_r = 0;
-      if (cost_table_.at(c).at(r).total_cost() <
-          std::numeric_limits<double>::infinity()) {
-        GetRowRange(r, c, &h_r, &l_r);
+      if (cost_cr.total_cost() < std::numeric_limits<double>::infinity()) {
+        GetRowRange(cost_cr, &h_r, &l_r);
         highest_row = std::max(highest_row, h_r);
         lowest_row = std::min(lowest_row, l_r);
       }
@@ -189,25 +187,21 @@ Status DpStGraph::CalculateTotalCost() {
   return Status::OK();
 }
 
-void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
+void DpStGraph::GetRowRange(const StGraphPoint& point,
                             uint32_t* next_highest_row,
                             uint32_t* next_lowest_row) {
-  const auto& curr_point = cost_table_[curr_col][curr_row];
-
   double v0 = 0.0;
-  if (curr_col == 0) {
+  if (!point.pre_point()) {
     v0 = init_point_.v();
   } else {
-    const auto* pre_point = curr_point.pre_point();
-    DCHECK_NOTNULL(pre_point);
-    v0 = (curr_point.index_s() - pre_point->index_s()) * unit_s_ / unit_t_;
+    v0 = (point.index_s() - point.pre_point()->index_s()) * unit_s_ / unit_t_;
   }
   const double speed_coeff = 0.5 * unit_t_ * unit_t_;
 
   const double delta_s_upper_bound =
       v0 * unit_t_ + vehicle_param_.max_acceleration() * speed_coeff;
-  *next_highest_row = curr_point.index_s() +
-                      static_cast<uint32_t>(delta_s_upper_bound / unit_s_);
+  *next_highest_row =
+      point.index_s() + static_cast<uint32_t>(delta_s_upper_bound / unit_s_);
   if (*next_highest_row >= cost_table_.back().size()) {
     *next_highest_row = cost_table_.back().size() - 1;
   }
@@ -221,23 +215,24 @@ void DpStGraph::GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
 }
 
 void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
+  auto& cost_cr = cost_table_[c][r];
+  const auto& cost_init = cost_table_[0][0];
   if (c == 0) {
     DCHECK_EQ(r, 0) << "Incorrect. Row should be 0 with col = 0. row: " << r;
-    cost_table_[c][r].SetTotalCost(0.0);
+    cost_cr.SetTotalCost(0.0);
     return;
   }
 
   double speed_limit =
       st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
   if (c == 1) {
-    if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(),
-                                cost_table_[c][r], cost_table_[0][0])) {
+    if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
+                                cost_init)) {
       return;
     }
-    cost_table_[c][r].SetTotalCost(
-        cost_table_[c][r].obstacle_cost() + cost_table_[0][0].total_cost() +
-        CalculateEdgeCostForSecondCol(r, speed_limit));
-    cost_table_[c][r].SetPrePoint(cost_table_[0][0]);
+    cost_cr.SetTotalCost(cost_cr.obstacle_cost() + cost_init.total_cost() +
+                         CalculateEdgeCostForSecondCol(r, speed_limit));
+    cost_cr.SetPrePoint(cost_init);
     return;
   }
 
@@ -245,35 +240,36 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
       dp_st_speed_config_.max_speed() * unit_t_ / unit_s_);
   const uint32_t r_low = (max_s_diff < r ? r - max_s_diff : 0);
 
+  const auto& pre_col = cost_table_[c - 1];
+
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-      if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(),
-                                  cost_table_[c][r],
-                                  cost_table_[c - 1][r_pre])) {
+      if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
+                                  pre_col[r_pre])) {
         return;
       }
 
-      const double cost = cost_table_[c][r].obstacle_cost() +
-                          cost_table_[c - 1][r_pre].total_cost() +
+      const double cost = cost_cr.obstacle_cost() +
+                          pre_col[r_pre].total_cost() +
                           CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
 
-      if (cost < cost_table_[c][r].total_cost()) {
-        cost_table_[c][r].SetTotalCost(cost);
-        cost_table_[c][r].SetPrePoint(cost_table_[c - 1][r_pre]);
+      if (cost < cost_cr.total_cost()) {
+        cost_cr.SetTotalCost(cost);
+        cost_cr.SetPrePoint(pre_col[r_pre]);
       }
     }
     return;
   }
   for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-    if (std::isinf(cost_table_[c - 1][r_pre].total_cost()) ||
-        cost_table_[c - 1][r_pre].pre_point() == nullptr) {
+    if (std::isinf(pre_col[r_pre].total_cost()) ||
+        pre_col[r_pre].pre_point() == nullptr) {
       continue;
     }
 
-    const double curr_a = (cost_table_[c][r].index_s() +
-                           cost_table_[c - 1][r_pre].pre_point()->index_s() -
-                           2 * cost_table_[c - 1][r_pre].index_s()) *
-                          unit_s_ / (unit_t_ * unit_t_);
+    const double curr_a =
+        (cost_cr.index_s() + pre_col[r_pre].pre_point()->index_s() -
+         2 * pre_col[r_pre].index_s()) *
+        unit_s_ / (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;
@@ -287,8 +283,8 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
       continue;
     }
 
-    if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(),
-                                cost_table_[c][r], cost_table_[c - 1][r_pre])) {
+    if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
+                                pre_col[r_pre])) {
       return;
     }
 
@@ -303,16 +299,15 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
       }
       const STPoint& triple_pre_point = prepre_graph_point.pre_point()->point();
       const STPoint& prepre_point = prepre_graph_point.point();
-      const STPoint& pre_point = cost_table_[c - 1][r_pre].point();
-      const STPoint& curr_point = cost_table_[c][r].point();
-      double cost = cost_table_[c][r].obstacle_cost() +
-                    cost_table_[c - 1][r_pre].total_cost() +
+      const STPoint& pre_point = pre_col[r_pre].point();
+      const STPoint& curr_point = cost_cr.point();
+      double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
                     CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
                                       curr_point, speed_limit);
 
-      if (cost < cost_table_[c][r].total_cost()) {
-        cost_table_[c][r].SetTotalCost(cost);
-        cost_table_[c][r].SetPrePoint(cost_table_[c - 1][r_pre]);
+      if (cost < cost_cr.total_cost()) {
+        cost_cr.SetTotalCost(cost);
+        cost_cr.SetPrePoint(pre_col[r_pre]);
       }
     }
   }

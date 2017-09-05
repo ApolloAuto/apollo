@@ -110,8 +110,8 @@ class DpStGraph {
       const PathObstacle& path_obstacle, const StBoundary& boundary,
       ObjectDecisionType* const overtake_decision) const;
 
-  void GetRowRange(const uint32_t curr_row, const uint32_t curr_col,
-                   uint32_t* highest_row, uint32_t* lowest_row);
+  void GetRowRange(const StGraphPoint& point, uint32_t* highest_row,
+                   uint32_t* lowest_row);
 
  private:
   const ReferenceLine& reference_line_;
