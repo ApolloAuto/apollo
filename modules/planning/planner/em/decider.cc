@@ -28,9 +28,14 @@
 namespace apollo {
 namespace planning {
 
-const DecisionResult& Decider::MakeDecision(
+DecisionResult Decider::MakeDecision(
+    const ReferenceLineInfo &reference_line_info) {
+  Decider decider;
+  return decider.InternalMakeDecision(reference_line_info);
+}
+
+DecisionResult &Decider::InternalMakeDecision(
     const ReferenceLineInfo& reference_line_info) {
-  decision_result_.Clear();
   const auto& path_decision = reference_line_info.path_decision();
 
   // cruise by default
@@ -41,9 +46,8 @@ const DecisionResult& Decider::MakeDecision(
   if (error_code < 0) {
     MakeEStopDecision(path_decision);
     return decision_result_;
-  } else if (error_code == 0) {
-    // TODO(all): check other main decisions
   }
+  // TODO(all): check other main decisions
 
   SetObjectDecisions(path_decision);
   return decision_result_;

@@ -101,9 +101,7 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
 void EMPlanner::PopulateDecision(const ReferenceLineInfo& reference_line_info,
                                  Frame* frame) {
   auto* planning_pb = frame->MutableADCTrajectory();
-  Decider decider;
-  planning_pb->mutable_decision()->CopyFrom(
-      decider.MakeDecision(reference_line_info));
+  *planning_pb->mutable_decision() = Decider::MakeDecision(reference_line_info);
 }
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
@@ -167,7 +165,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
 }
 
 std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
-    const common::TrajectoryPoint& planning_init_point,
+    const TrajectoryPoint& planning_init_point,
     const ReferenceLineInfo* reference_line_info) {
   std::vector<SpeedPoint> speed_profile;
   const auto* last_frame = FrameHistory::instance()->Latest();
@@ -230,9 +228,9 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
 }
 
 // This is a dummy simple hot start, need refine later
-std::vector<common::SpeedPoint> EMPlanner::GenerateSpeedHotStart(
-    const common::TrajectoryPoint& planning_init_point) {
-  std::vector<common::SpeedPoint> hot_start_speed_profile;
+std::vector<SpeedPoint> EMPlanner::GenerateSpeedHotStart(
+    const TrajectoryPoint& planning_init_point) {
+  std::vector<SpeedPoint> hot_start_speed_profile;
   double s = 0.0;
   double t = 0.0;
   while (t < FLAGS_trajectory_time_length) {
