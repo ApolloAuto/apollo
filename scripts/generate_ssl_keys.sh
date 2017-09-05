@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
-
-Domain=apollo.hmi
+Domain=apollo.car
 IP=127.0.0.1
 KEYS_DIR="$(dirname $0)"/../modules/common/data/ssl_keys
 
@@ -36,14 +34,18 @@ function GenerateServerKeys() {
       -in server.csr -CAcreateserial -CA ca.crt -CAkey ca.key -out server.crt
 
   openssl verify -verbose -CAfile ca.crt server.crt
+
+  cat server.crt >> server.pem
+  cat server.key >> server.pem
+  sed -i -e 's/BEGIN PRIVATE KEY/BEGIN RSA PRIVATE KEY/g' server.pem
+  sed -i -e 's/END PRIVATE KEY/END RSA PRIVATE KEY/g' server.pem
 }
 
 function PrepareHost() {
   sudo cp ca.crt /usr/local/share/ca-certificates/apollo_ca.crt
   sudo update-ca-certificates
 
-  # Add local DNS.
-  DNS_CONF="${IP} ${Domain}"
+  HOST_CONF="${IP} ${Domain}"
   if ! grep -Fxq "$HOST_CONF" /etc/hosts; then
     echo ${HOST_CONF} | sudo tee -a /etc/hosts
   fi
