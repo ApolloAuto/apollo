@@ -344,6 +344,7 @@ bool QpFrenetFrame::MapLine(
              << "further_point: " << further_point.DebugString()
              << "impact_index: " << impact_index << "(*constraint)[" << i << "]"
              << (*constraint)[i];
+      break;
     }
   }
 
@@ -430,6 +431,7 @@ void QpFrenetFrame::CalculateHDMapBound() {
       reference_line_.SLToXY(sl, &xy);
       AERROR << "evaluated_knot x: " << std::fixed << xy.x()
              << " y: " << xy.y();
+      break;
     }
   }
 }
