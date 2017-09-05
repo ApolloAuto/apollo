@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
@@ -29,40 +30,42 @@ namespace perception {
 
 int ObjectTrack::s_track_idx_ = 0;
 FilterType ObjectTrack::s_filter_method_ = KALMAN_FILTER;
-int ObjectTrack::s_track_cached_history_size_maximum_ = 20;
-double ObjectTrack::s_speed_noise_maximum_ = 0.4;
-double ObjectTrack::s_acceleration_noise_maximum_ = 5;
 int ObjectTrackSet::s_track_consecutive_invisible_maximum_ = 1;
+float ObjectTrackSet::s_track_visible_ratio_minimum_ = 0.6;
+int ObjectTrack::s_track_cached_history_size_maximum_ = 20;
+double ObjectTrack::s_acceleration_noise_maximum_ = 5;
+double ObjectTrack::s_speed_noise_maximum_ = 0.4;
 
-void ObjectTrack::SetFilterMethod(const FilterType& filter_method) {
-  // Set filter method for all the track objects
-  if (filter_method == KALMAN_FILTER) {
-    s_filter_method_ = filter_method;
-  } else {
-    AINFO << "invalid filter_method!";
+bool ObjectTrack::SetFilterMethod(const std::string& filter_method_name) {
+  if (filter_method_name == "kalman_filter") {
+    s_filter_method_ = KALMAN_FILTER;
+    AINFO << "filter method of object track is " << filter_method_name;
+    return true;
   }
-  AINFO << "track filter algorithm is " << s_filter_method_;
+  AERROR << "invalid filter method name of object track!";
+  return false;
 }
 
 bool ObjectTrack::SetTrackCachedHistorySizeMaximum(
   const int& track_cached_history_size_maximum) {
   if (track_cached_history_size_maximum > 0) {
     s_track_cached_history_size_maximum_ = track_cached_history_size_maximum;
-    AINFO << "track cached history size maximum is "
+    AINFO << "track cached history size maximum of object track is "
           << s_track_cached_history_size_maximum_;
     return true;
   }
-  AERROR << "invalid track cached history size maximum!";
+  AERROR << "invalid track cached history size maximum of object track!";
   return false;
 }
 
 bool ObjectTrack::SetSpeedNoiseMaximum(const double& speed_noise_maximum) {
   if (speed_noise_maximum > 0) {
     s_speed_noise_maximum_ = speed_noise_maximum;
-    AINFO << "speed noise maximum is " << s_speed_noise_maximum_;
+    AINFO << "speed noise maximum of object track is "
+          << s_speed_noise_maximum_;
     return true;
   }
-  AERROR << "invalid speed noise maximum!";
+  AERROR << "invalid speed noise maximum of object track!";
   return false;
 }
 
@@ -70,10 +73,11 @@ bool ObjectTrack::SetAccelerationNoiseMaximum(
   const double& acceleration_noise_maximum) {
   if (acceleration_noise_maximum > 0) {
     s_acceleration_noise_maximum_ = acceleration_noise_maximum;
-    AINFO << "acceleration noise maximum is " << s_acceleration_noise_maximum_;
+    AINFO << "acceleration noise maximum of object track is "
+          << s_acceleration_noise_maximum_;
     return true;
   }
-  AERROR << "invalid acceleration noise maximum!";
+  AERROR << "invalid acceleration noise maximum of object track!";
   return false;
 }
 
@@ -89,10 +93,9 @@ int ObjectTrack::GetNextTrackId() {
 }
 
 ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
-  // Setup filter
+  // Initialize filter
   Eigen::Vector3f initial_anchor_point = obj->anchor_point;
   Eigen::Vector3f initial_velocity = Eigen::Vector3f::Zero();
-
   if (s_filter_method_ == KALMAN_FILTER) {
     filter_ = new KalmanFilter();
   }
@@ -111,11 +114,11 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   belief_anchor_point_ = initial_anchor_point;
   belief_velocity_ = initial_velocity;
   belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
-
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
   // of track !!!!!
   obj->velocity = belief_velocity_;
+
   // Initialize object direction with its lane direction
   obj->direction = obj->lane_direction;
 }
@@ -127,8 +130,7 @@ ObjectTrack::~ObjectTrack() {
   }
 }
 
-Eigen::VectorXf ObjectTrack::Predict(const double time_diff) {
-  // Predict the state of track
+Eigen::VectorXf ObjectTrack::Predict(const double& time_diff) {
   // Get the predict of filter
   Eigen::VectorXf filter_predict = filter_->Predict(time_diff);
   // Get the predict of track
@@ -143,27 +145,15 @@ Eigen::VectorXf ObjectTrack::Predict(const double time_diff) {
 }
 
 void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Update track with object
-  if ((*new_object) == nullptr) {
+  if ((*new_object) == nullptr)
     UpdateWithoutObject(time_diff);
-  }
 
-  /* 1. update object track */
-  // 1.1 check measurement outliers
-  bool updating_new_object_is_outlier = false;
-
-  // 1.2 update with object if observation is not outlier
-  if (!updating_new_object_is_outlier) {
-    filter_->UpdateWithObject((*new_object), current_object_, time_diff);
-    filter_->GetState(&belief_anchor_point_, &belief_velocity_);
-  } else {
-    /* Here, we only update belief anchor point with anchor point of new detected object. In
-     * the future, new method that handle outlier could be designed to handle more complicated
-     * strategies. */
-    belief_anchor_point_ = (*new_object)->anchor_point;
-  }
-
+  // A. update object track
+  // A.1 update filter
+  filter_->UpdateWithObject((*new_object), current_object_, time_diff);
+  filter_->GetState(&belief_anchor_point_, &belief_velocity_);
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
   // of track !!!!!
@@ -172,17 +162,12 @@ void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
 
   belief_velocity_accelaration_ = ((*new_object)->velocity -
     current_object_->velocity) / time_diff;
-
-  /* Currently, we only considered outliers' influence on motion estimation. Track level
-   * smoothness of orientation & class idx may also take into acount it in the future. */
-
-  // 1.4 update track info
+  // A.2 update track info
   age_++;
   total_visible_count_++;
   consecutive_invisible_count_ = 0;
   period_ += time_diff;
-
-  // 1.5 update history
+  // A.3 update history
   int history_size = history_objects_.size();
   if (history_size >= s_track_cached_history_size_maximum_) {
     history_objects_.pop_front();
@@ -190,44 +175,29 @@ void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
   history_objects_.push_back(current_object_);
   current_object_ = *new_object;
 
-  /* Previously, velocity of object track is smoothed after the smoothing of orientation & type.
-   * However, compared to the output of original filter, smoothed velocity, which is a posteriori,
-   * is more reasonable to be used in the smoothing of orientation & type. */
-
-  /* Previously, track static hypothesis is checked before smoothing strategies. Now, it has been
-   * moved in the method of smooth track velocity. This is more reasonable, as track static
-   * hypothesis is decided by velocity more directly when velocity estimation improved. */
-
-  /* 2. smooth object track */
-  // 2.1 smooth velocity
+  // B. smooth object track
+  // B.1 smooth velocity
   SmoothTrackVelocity((*new_object), time_diff);
-
-  // 2.2 smooth orientation
+  // B.2 smooth orientation
   SmoothTrackOrientation();
-
-  // 2.3 smooth class idx
-  SmoothTrackClassIdx();
 }
 
-void ObjectTrack::UpdateWithoutObject(const double time_diff) {
-  // Update track's obstacle object
+void ObjectTrack::UpdateWithoutObject(const double& time_diff) {
+  // A. update object of track
   TrackedObjectPtr new_obj(new TrackedObject());
   new_obj->clone(*current_object_);
-
   Eigen::Vector3f predicted_shift = belief_velocity_ * time_diff;
   new_obj->anchor_point = current_object_->anchor_point + predicted_shift;
   new_obj->barycenter = current_object_->barycenter + predicted_shift;
   new_obj->center = current_object_->center + predicted_shift;
 
-  // Update obstacle cloud
+  // B. update cloud & polygon
   pcl_util::PointCloudPtr pc = new_obj->object_ptr->cloud;
   for (size_t j = 0; j < pc->points.size(); ++j) {
     pc->points[j].x += predicted_shift[0];
     pc->points[j].y += predicted_shift[1];
     pc->points[j].z += predicted_shift[2];
   }
-
-  // Update obstacle polygon
   PolygonDType& polygon = new_obj->object_ptr->polygon;
   for (size_t j = 0; j < polygon.points.size(); ++j) {
     polygon.points[j].x += predicted_shift[0];
@@ -235,23 +205,22 @@ void ObjectTrack::UpdateWithoutObject(const double time_diff) {
     polygon.points[j].z += predicted_shift[2];
   }
 
-  // Update filter
+  // C. update filter
   filter_->UpdateWithoutObject(time_diff);
 
-  // Update states of track
+  // D. update states of track
   belief_anchor_point_ = new_obj->anchor_point;
-
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object included temporaryly occluded ones. Thus, update
   // tracked object when you update the state of track !!!!
   new_obj->velocity = belief_velocity_;
 
-  // Update track info
+  // E. update track info
   age_++;
   consecutive_invisible_count_++;
   period_ += time_diff;
 
-  // Update history
+  // F. update history
   int history_size = history_objects_.size();
   if (history_size >= s_track_cached_history_size_maximum_) {
     history_objects_.pop_front();
@@ -261,25 +230,22 @@ void ObjectTrack::UpdateWithoutObject(const double time_diff) {
 }
 
 void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
-  const double time_diff) {
-  // Update track's obstacle object
+  const double& time_diff) {
+  // A. update object of track
   TrackedObjectPtr new_obj(new TrackedObject());
   new_obj->clone(*current_object_);
-
   Eigen::Vector3f predicted_shift = predict_state.tail(3) * time_diff;
   new_obj->anchor_point = current_object_->anchor_point + predicted_shift;
   new_obj->barycenter = current_object_->barycenter + predicted_shift;
   new_obj->center = current_object_->center + predicted_shift;
 
-  // Update obstacle cloud
+  // B. update cloud & polygon
   pcl_util::PointCloudPtr pc = new_obj->object_ptr->cloud;
   for (size_t j = 0; j < pc->points.size(); ++j) {
     pc->points[j].x += predicted_shift[0];
     pc->points[j].y += predicted_shift[1];
     pc->points[j].z += predicted_shift[2];
   }
-
-  // Update obstacle polygon
   PolygonDType& polygon = new_obj->object_ptr->polygon;
   for (size_t j = 0; j < polygon.points.size(); ++j) {
     polygon.points[j].x += predicted_shift[0];
@@ -287,25 +253,22 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
     polygon.points[j].z += predicted_shift[2];
   }
 
-  /* No need to update filter*/
-
-  // Update filter
+  // C. update filter without object
   filter_->UpdateWithoutObject(time_diff);
 
-  // Update states of track
+  // D. update states of track
   belief_anchor_point_ = new_obj->anchor_point;
-
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object included temporaryly occluded ones. Thus, update
   // tracked object when you update the state of track !!!!
   new_obj->velocity = belief_velocity_;
 
-  // Update track info
+  // E. update track info
   age_++;
   consecutive_invisible_count_++;
   period_ += time_diff;
 
-  // Update history
+  // F. update history
   int history_size = history_objects_.size();
   if (history_size >= s_track_cached_history_size_maximum_) {
     history_objects_.pop_front();
@@ -315,9 +278,8 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
 }
 
 void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
-  const double time_diff) {
-  // Smooth velocity over track history
-  // 1. keep motion if accelaration of filter is greater than a threshold
+  const double& time_diff) {
+  // A. keep motion if accelaration of filter is greater than a threshold
   Eigen::Vector3f filter_anchor_point = Eigen::Vector3f::Zero();
   Eigen::Vector3f filter_velocity = Eigen::Vector3f::Zero();
   Eigen::Vector3f filter_velocity_accelaration = Eigen::Vector3f::Zero();
@@ -333,23 +295,19 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
     }
     belief_velocity_ = last_velocity;
     belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
-
     // NEED TO NOTICE: All the states would be collected mainly based on
     // states of tracked object included temporaryly occluded ones. Thus,
     // update tracked object when you update the state of track !!!!
     current_object_->velocity = belief_velocity_;
-
     // keep static hypothesis
     return;
   }
-  // 2. static hypothesis check
+  // B. static hypothesis check & claping noise
   is_static_hypothesis_ = CheckTrackStaticHypothesis(new_object->object_ptr,
     time_diff);
-
   if (is_static_hypothesis_) {
     belief_velocity_ = Eigen::Vector3f::Zero();
     belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
-
     // NEED TO NOTICE: All the states would be collected mainly based on
     // states of tracked object included temporaryly occluded ones. Thus,
     // update tracked object when you update the state of track !!!!
@@ -358,7 +316,6 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
 }
 
 void ObjectTrack::SmoothTrackOrientation() {
-  // Smooth orientation over track history
   Eigen::Vector3f current_dir = current_object_->direction;
   float current_speed = current_object_->velocity.head(2).norm();
   bool velocity_is_obvious = current_speed > (s_speed_noise_maximum_ * 2);
@@ -379,16 +336,13 @@ void ObjectTrack::SmoothTrackOrientation() {
   current_object_->size = new_size.cast<float>();
 }
 
-void ObjectTrack::SmoothTrackClassIdx() {
-}
-
 bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
-  const double time_diff) {
-  // Check whether track is static
-  // Check whether track velocity is consistant
+  const double& time_diff) {
+  // A. check whether track velocity angle changed obviously
   bool is_velocity_angle_change =
     CheckTrackStaticHypothesisByVelocityAngleChange(new_object, time_diff);
-  // Evaluate velocity level
+
+  // B. evaluate velocity level
   double speed = belief_velocity_.head(2).norm();
   bool velocity_is_noise = speed < (s_speed_noise_maximum_ / 2);
   bool velocity_is_small = speed < (s_speed_noise_maximum_ / 1);
@@ -407,18 +361,12 @@ bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
 
 bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
   const ObjectPtr& new_object,
-  const double time_diff) {
-  // Sub strategy of checking whether track is static or not - let track be
-  // static if velocity angle change from previous and current frame is
-  // larger than M_PI / 3.0
+  const double& time_diff) {
   Eigen::Vector3f previous_velocity =
     history_objects_[history_objects_.size() - 1]->velocity;
   Eigen::Vector3f current_velocity = current_object_->velocity;
   double velocity_angle_change = VectorTheta2dXy(previous_velocity,
     current_velocity);
-  // Previously, this threshold is set to PI/3. Now, as the smoothness of the
-  // filter is improved by Robust Adaptive Kalman Filter, we would use more
-  // strict threshold in the future.
   if (fabs(velocity_angle_change) > M_PI / 4.0) {
     return true;
   }
@@ -426,8 +374,7 @@ bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
 }
 
 /*class ObjectTrackSet*/
-ObjectTrackSet::ObjectTrackSet(): age_threshold_(5),
-  minimum_visible_ratio_(0.6f) {
+ObjectTrackSet::ObjectTrackSet() {
   tracks_.reserve(1000);
 }
 
@@ -440,9 +387,24 @@ bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
   if (track_consecutive_invisible_maximum >= 0) {
     s_track_consecutive_invisible_maximum_ =
       track_consecutive_invisible_maximum;
+    AINFO << "track consecutive invisible maximum of object track set is "
+          << s_track_consecutive_invisible_maximum_;
     return true;
   }
-  AERROR << "Failed to set track consecutive invisible maximum! ";
+  AERROR << "invalid track consecutive invisible maximum of object track! ";
+  return false;
+}
+
+bool ObjectTrackSet::SetTrackVisibleRatioMinimum(
+  const float& track_visible_ratio_minimum) {
+  if (track_visible_ratio_minimum >= 0 &&
+      track_visible_ratio_minimum <= 1) {
+    s_track_visible_ratio_minimum_ = track_visible_ratio_minimum;
+    AINFO << "track visible ratio minimum of object track set is "
+          << s_track_visible_ratio_minimum_;
+    return true;
+  }
+  AERROR << "invalid track visible ratio minimum of object track! ";
   return false;
 }
 
@@ -458,26 +420,21 @@ void ObjectTrackSet::Clear() {
 
 int ObjectTrackSet::RemoveLostTracks() {
   size_t track_num = 0;
-  for (size_t i = 0; i < tracks_.size(); i++) {
-    if (tracks_[i]->age_ < age_threshold_ &&
-      tracks_[i]->consecutive_invisible_count_ > 1) {
-      continue;
-    }
-
-    float visible_ratio = tracks_[i]->total_visible_count_ * 1.0f /
+  for (size_t i = 0; i < tracks_.size(); ++i) {
+    // A. remove tracks invisible ratio less than given minimum
+    float track_visible_ratio = tracks_[i]->total_visible_count_ * 1.0f /
       tracks_[i]->age_;
-    if (visible_ratio < minimum_visible_ratio_) {
+    if (track_visible_ratio < s_track_visible_ratio_minimum_)
       continue;
-    }
-
-    if (tracks_[i]->consecutive_invisible_count_
-      > s_track_consecutive_invisible_maximum_) {
+    // B. remove tracks consecutive invisible count greater than given maximum
+    int track_consecutive_invisible_count =
+      tracks_[i]->consecutive_invisible_count_;
+    if (track_consecutive_invisible_count >
+        s_track_consecutive_invisible_maximum_)
       continue;
-    }
-
+    // C. update
     if (i == track_num) {
       track_num++;
-      continue;
     } else {
       ObjectTrackPtr tmp = tracks_[i];
       tracks_[i] = tracks_[track_num];
@@ -485,9 +442,9 @@ int ObjectTrackSet::RemoveLostTracks() {
       track_num++;
     }
   }
-
+  // remove lost tracks
   int no_removed = tracks_.size() - track_num;
-  for (size_t i = track_num; i < tracks_.size(); i++) {
+  for (size_t i = track_num; i < tracks_.size(); ++i) {
     if (tracks_[i] != NULL) {
       delete (tracks_[i]);
       tracks_[i] = NULL;

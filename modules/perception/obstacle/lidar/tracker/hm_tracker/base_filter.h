@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_FILTER_H_
 
 #include <string>
+
 #include "Eigen/Core"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
@@ -50,23 +51,23 @@ class BaseFilter {
   // @params[IN] time_diff: time interval for predicting
   // @return predicted states of filtering
   virtual Eigen::VectorXf Predict(
-    const double time_diff) = 0;
+    const double& time_diff) = 0;
 
   // @brief update filter with object
-  // @params[IN] new_object: new object for current updating
-  // @params[IN] old_object: old object for last updating
+  // @params[IN] new_object: recently detected object for current updating
+  // @params[IN] old_object: last detected object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
   virtual void UpdateWithObject(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
-    const double time_diff) = 0;
+    const double& time_diff) = 0;
 
   // @brief update filter without object
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
   virtual void UpdateWithoutObject(
-    const double time_diff) = 0;
+    const double& time_diff) = 0;
 
   // @brief get state of filter
   // @params[OUT] anchor_point: anchor point of current state

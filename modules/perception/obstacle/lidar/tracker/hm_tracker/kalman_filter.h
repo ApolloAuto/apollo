@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
 
 #include <vector>
+
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/base_filter.h"
 
@@ -27,31 +28,31 @@ namespace perception {
 class KalmanFilter : public BaseFilter {
  public:
   KalmanFilter();
-  ~KalmanFilter();
+  ~KalmanFilter() {}
 
   // @brief set use adaptive for all the filter objects
   // @params[IN] use_adaptive: flag of whether use adaptive version or not
   // @return nothing
   static void SetUseAdaptive(
-    const bool use_adaptive);
+    const bool& use_adaptive);
 
-  // @brief set max adaptive score for computing update qaulity
-  // @params[IN] max_adaptive_score: adaptive score upperbound
-  // @return nothing
-  static void SetMaxAdaptiveScore(
-    const double max_adaptive_score);
+  // @brief set association score maximum for computing update qaulity
+  // @params[IN] association_score_maximum: association score maximum
+  // @return true if set successfully, otherwise return false
+  static bool SetAssociationScoreMaximum(
+    const double& association_score_maximum);
 
-  // @brief init core parameters of all the filter objects
-  // @params[IN] centroid_measurement_noise: noise of centroid measurement
-  // @params[IN] init_velocity_variance: initial variance of velocity
-  // @params[IN] propagation_variance_xy: propagation uncertainty of xy
-  // @params[IN] propagation_variance_z: propagation uncertainty of z
-  // @return nothing
-  static void InitParams(
-    const double measurement_noise,
-    const double init_velocity_variance,
-    const double propagation_variance_xy,
-    const double propagation_variance_z);
+  // @brief init initialize parameters for kalman filter
+  // @params[IN] measurement_noise: noise of measurement
+  // @params[IN] initial_velocity_noise: initial uncertainty of velocity
+  // @params[IN] xy_propagation_noise: propagation uncertainty of xy
+  // @params[IN] z_propagation_noise: propagation uncertainty of z
+  // @return true if set successfully, otherwise return false
+  static bool InitParams(
+    const double& measurement_noise,
+    const double& initial_velocity_noise,
+    const double& xy_propagation_noise,
+    const double& z_propagation_noise);
 
   // @brief initialize the state of filter
   // @params[IN] anchor_point: initial anchor point for filtering
@@ -65,7 +66,7 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] time_diff: time interval for predicting
   // @return predicted states of filtering
   Eigen::VectorXf Predict(
-    const double time_diff);
+    const double& time_diff);
 
   // @brief update filter with object
   // @params[IN] new_object: new object for current updating
@@ -75,13 +76,13 @@ class KalmanFilter : public BaseFilter {
   void UpdateWithObject(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
-    const double time_diff);
+    const double& time_diff);
 
   // @brief update filter without object
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
   void UpdateWithoutObject(
-    const double time_diff);
+    const double& time_diff);
 
   // @brief get state of filter
   // @params[OUT] anchor_point: anchor point of current state
@@ -106,7 +107,7 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
   void Propagate(
-    const double time_diff);
+    const double& time_diff);
 
   // @brief compute measured velocity
   // @params[IN] new_object: new object for current updating
@@ -116,7 +117,7 @@ class KalmanFilter : public BaseFilter {
   Eigen::VectorXf ComputeMeasuredVelocity(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
-    const double time_diff);
+    const double& time_diff);
 
   // @brief compute measured anchor point velocity
   // @params[IN] new_object: new object for current updating
@@ -126,7 +127,7 @@ class KalmanFilter : public BaseFilter {
   Eigen::VectorXf ComputeMeasuredAnchorPointVelocity(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
-    const double time_diff);
+    const double& time_diff);
 
   // @brief compute measured bbox center velocity
   // @params[IN] new_object: new object for current updating
@@ -136,7 +137,7 @@ class KalmanFilter : public BaseFilter {
   Eigen::VectorXf ComputeMeasuredBboxCenterVelocity(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
-    const double time_diff);
+    const double& time_diff);
 
   // @brief compute measured bbox corner velocity
   // @params[IN] new_object: new object for current updating
@@ -146,7 +147,7 @@ class KalmanFilter : public BaseFilter {
   Eigen::VectorXf ComputeMeasuredBboxCornerVelocity(
     const TrackedObjectPtr& new_object,
     const TrackedObjectPtr& old_object,
-    const double time_diff);
+    const double& time_diff);
 
   // @brief select measured velocity among candidates
   // @params[IN] candidates: candidates of measured velocity
@@ -167,9 +168,9 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
   void UpdateModel(
-    const Eigen::VectorXf measured_anchor_point,
-    const Eigen::VectorXf measured_velocity,
-    const double time_diff);
+    const Eigen::VectorXf& measured_anchor_point,
+    const Eigen::VectorXf& measured_velocity,
+    const double& time_diff);
 
   // @brief compute update quality for adaptive filtering
   // @params[IN] new_object: new object for current updating
@@ -196,29 +197,29 @@ class KalmanFilter : public BaseFilter {
   // @return breakdown threshold
   float ComputeBreakdownThreshold();
 
+
+
  protected:
   // adaptive
-  static bool             s_use_adaptive_;
-  static double           s_max_adaptive_score_;
+  static bool               s_use_adaptive_;
+  static double             s_association_score_maximum_;
 
   // parameters
-  static double           s_measurement_noise_;
-  static double           s_init_velocity_variance_;
-  static double           s_propagation_variance_xy_;
-  static double           s_propagation_variance_z_;
+  static Eigen::Matrix3d    s_propagation_noise_;
+  static double             s_measurement_noise_;
+  static double             s_initial_velocity_noise_;
 
   // filter history
-  int                     age_;
+  int                       age_;
 
   // filter covariances
-  Eigen::Matrix3d         covariance_velocity_;
-  Eigen::Matrix3d         covariance_propagation_uncertainty_;
+  Eigen::Matrix3d           velocity_covariance_;
 
   // filter states
-  double                  update_quality_;
-  Eigen::Vector3d         belief_anchor_point_;
-  Eigen::Vector3d         belief_velocity_;
-  Eigen::Vector3d         belief_velocity_accelaration_;
+  Eigen::Vector3d           belief_anchor_point_;
+  Eigen::Vector3d           belief_velocity_;
+  Eigen::Vector3d           belief_velocity_accelaration_;
+  double                    update_quality_;
 };  // class KalmanFilter
 
 }  // namespace perception

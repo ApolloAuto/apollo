@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <algorithm>
+
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
@@ -23,47 +24,71 @@ namespace apollo {
 namespace perception {
 
 bool KalmanFilter::s_use_adaptive_ = true;
-double KalmanFilter::s_max_adaptive_score_ = 1.0;
+double KalmanFilter::s_association_score_maximum_ = 1.0;
+Eigen::Matrix3d KalmanFilter::s_propagation_noise_ = 10 *
+  Eigen::Matrix3d::Identity();
 double KalmanFilter::s_measurement_noise_ = 0.4;
-double KalmanFilter::s_init_velocity_variance_ = 5;
-double KalmanFilter::s_propagation_variance_xy_ = 10;
-double KalmanFilter::s_propagation_variance_z_ = 10;
+double KalmanFilter::s_initial_velocity_noise_ = 5;
 
-void KalmanFilter::SetUseAdaptive(const bool use_adaptive) {
+void KalmanFilter::SetUseAdaptive(const bool& use_adaptive) {
   s_use_adaptive_ = use_adaptive;
+  AINFO << "use adaptive of KalmanFilter is " << s_use_adaptive_;
 }
 
-void KalmanFilter::SetMaxAdaptiveScore(
-  const double max_adaptive_score) {
-  s_max_adaptive_score_ = max_adaptive_score;
+bool KalmanFilter::SetAssociationScoreMaximum(
+  const double& association_score_maximum) {
+  if (association_score_maximum > 0) {
+    s_association_score_maximum_ = association_score_maximum;
+    AINFO << "association score maximum of KalmanFilter is "
+          << s_association_score_maximum_;
+    return true;
+  }
+  AERROR << "invalid association score maximum of KalmanFilter!";
+  return false;
 }
 
-void KalmanFilter::InitParams(const double measurement_noise,
-  const double init_velocity_variance,
-  const double propagation_variance_xy,
-  const double propagation_variance_z) {
+bool KalmanFilter::InitParams(
+  const double& measurement_noise,
+  const double& initial_velocity_noise,
+  const double& xy_propagation_noise,
+  const double& z_propagation_noise) {
+  if (measurement_noise < 0) {
+    AERROR << "invalid measurement noise of KalmanFilter!";
+    return false;
+  }
+  if (initial_velocity_noise < 0) {
+    AERROR << "invalid intial velocity noise of KalmanFilter!";
+    return false;
+  }
+  if (xy_propagation_noise < 0) {
+    AERROR << "invalid xy propagation noise of KalmanFilter!";
+    return false;
+  }
+  if (z_propagation_noise < 0) {
+    AERROR << "invalid z propagation noise of KalmanFilter!";
+    return false;
+  }
   s_measurement_noise_ = measurement_noise;
-  s_init_velocity_variance_ = init_velocity_variance;
-  s_propagation_variance_xy_ = propagation_variance_xy;
-  s_propagation_variance_z_ = propagation_variance_z;
+  s_initial_velocity_noise_ = initial_velocity_noise;
+  s_propagation_noise_(0, 0) = xy_propagation_noise;
+  s_propagation_noise_(1, 1) = xy_propagation_noise;
+  s_propagation_noise_(2, 2) = z_propagation_noise;
+  AINFO << "measurment noise of KalmanFilter is " << s_measurement_noise_;
+  AINFO << "initial velocity noise of KalmanFilter is "
+        << s_initial_velocity_noise_;
+  AINFO << "propagation noise of KalmanFilter is\n" << s_propagation_noise_;
+  return true;
 }
 
 KalmanFilter::KalmanFilter() {
   name_ = "KalmanFilter";
   age_ = 0;
-  covariance_velocity_ = s_init_velocity_variance_ *
+  velocity_covariance_ = s_initial_velocity_noise_ *
     Eigen::Matrix3d::Identity();
-  covariance_propagation_uncertainty_ = Eigen::Matrix3d::Zero();
-  covariance_propagation_uncertainty_(0, 0) = s_propagation_variance_xy_;
-  covariance_propagation_uncertainty_(1, 1) = s_propagation_variance_xy_;
-  covariance_propagation_uncertainty_(2, 2) = s_propagation_variance_z_;
-
+  // states
   update_quality_ = 1.0;
   belief_velocity_ = Eigen::Vector3d::Zero();
   belief_velocity_accelaration_ = Eigen::Vector3d::Zero();
-}
-
-KalmanFilter::~KalmanFilter() {
 }
 
 void KalmanFilter::Initialize(const Eigen::Vector3f& anchor_point,
@@ -74,7 +99,7 @@ void KalmanFilter::Initialize(const Eigen::Vector3f& anchor_point,
   belief_velocity_accelaration_ = Eigen::Vector3d::Zero();
 }
 
-Eigen::VectorXf KalmanFilter::Predict(const double time_diff) {
+Eigen::VectorXf KalmanFilter::Predict(const double& time_diff) {
   // Compute predict states
   Eigen::VectorXf predicted_state;
   predicted_state.resize(6);
@@ -87,7 +112,6 @@ Eigen::VectorXf KalmanFilter::Predict(const double time_diff) {
   predicted_state(3) = belief_velocity_(0);
   predicted_state(4) = belief_velocity_(1);
   predicted_state(5) = belief_velocity_(2);
-
   // Compute predicted covariance
   Propagate(time_diff);
   return predicted_state;
@@ -95,29 +119,29 @@ Eigen::VectorXf KalmanFilter::Predict(const double time_diff) {
 
 void KalmanFilter::UpdateWithObject(const TrackedObjectPtr& new_object,
   const TrackedObjectPtr& old_object,
-  const double time_diff) {
+  const double& time_diff) {
   if (time_diff <= DBL_EPSILON) {
-    AWARN << "Time diff is too limited to updating filter.";
+    AWARN << "Time diff is too limited to updating KalmanFilter!";
     return;
   }
-  // Compute update quality if needed
+  // A. Compute update quality if needed
   if (s_use_adaptive_) {
     ComputeUpdateQuality(new_object, old_object);
   } else {
     update_quality_ = 1.0;
   }
 
-  // Compute measurements
+  // B. Compute measurements
   Eigen::Vector3f measured_anchor_point = new_object->anchor_point;
   Eigen::Vector3f measured_velocity = ComputeMeasuredVelocity(new_object,
     old_object, time_diff);
 
-  // Update model
+  // C. Update model
   UpdateModel(measured_anchor_point, measured_velocity, time_diff);
   age_ += 1;
 }
 
-void KalmanFilter::UpdateWithoutObject(const double time_diff) {
+void KalmanFilter::UpdateWithoutObject(const double& time_diff) {
   // Only update belief anchor point
   belief_anchor_point_ += belief_velocity_ * time_diff;
   age_ += 1;
@@ -137,19 +161,19 @@ void KalmanFilter::GetState(Eigen::Vector3f* anchor_point,
   (*velocity_accelaration) = belief_velocity_accelaration_.cast<float>();
 }
 
-void KalmanFilter::Propagate(const double time_diff) {
+void KalmanFilter::Propagate(const double& time_diff) {
   // Only propagate tracked motion
   if (age_ <= 0) {
     return;
   }
-  covariance_velocity_ += covariance_propagation_uncertainty_ * (time_diff *
-    time_diff);
+  velocity_covariance_ += s_propagation_noise_ *
+    (time_diff * time_diff);
 }
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
   const TrackedObjectPtr& new_object,
   const TrackedObjectPtr& old_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute 2D velocity measurment for filtering
   // Obtain robust measurment via observation redundency
 
@@ -175,7 +199,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
 Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
   const TrackedObjectPtr& new_object,
   const TrackedObjectPtr& old_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute 2D anchor point velocity measurment
   Eigen::Vector3f measured_anchor_point_velocity = new_object->anchor_point -
     old_object->anchor_point;
@@ -187,7 +211,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
 Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
   const TrackedObjectPtr& new_object,
   const TrackedObjectPtr& old_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute 2D bbox center velocity measurment
   Eigen::Vector3d old_dir = old_object->direction.cast<double>();
   Eigen::Vector3d old_size = old_object->size.cast<double>();
@@ -213,7 +237,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
 Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
   const TrackedObjectPtr& new_object,
   const TrackedObjectPtr& old_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute 2D bbox corner velocity measurment
   Eigen::Vector3f project_dir = new_object->anchor_point -
     old_object->anchor_point;
@@ -318,14 +342,14 @@ Eigen::Vector3f KalmanFilter::SelectMeasuredVelocityAccordingMotionConsistency(
   return measured_velocity;
 }
 
-void KalmanFilter::UpdateModel(const Eigen::VectorXf measured_anchor_point,
-  const Eigen::VectorXf measured_velocity,
-  const double time_diff) {
+void KalmanFilter::UpdateModel(const Eigen::VectorXf& measured_anchor_point,
+  const Eigen::VectorXf& measured_velocity,
+  const double& time_diff) {
   // Compute kalman gain
   Eigen::Matrix3d mat_c = Eigen::Matrix3d::Identity();
   Eigen::Matrix3d mat_q = s_measurement_noise_ * Eigen::Matrix3d::Identity();
-  Eigen::Matrix3d mat_k = covariance_velocity_ * mat_c.transpose() *
-    (mat_c * covariance_velocity_ * mat_c.transpose() + mat_q).inverse();
+  Eigen::Matrix3d mat_k = velocity_covariance_ * mat_c.transpose() *
+    (mat_c * velocity_covariance_ * mat_c.transpose() + mat_q).inverse();
 
   // Compute posterior belief
   Eigen::Vector3d measured_anchor_point_d =
@@ -353,8 +377,8 @@ void KalmanFilter::UpdateModel(const Eigen::VectorXf measured_anchor_point,
   }
 
   // Compute posterior covariance
-  covariance_velocity_ = (Eigen::Matrix3d::Identity() - mat_k * mat_c) *
-    covariance_velocity_;
+  velocity_covariance_ = (Eigen::Matrix3d::Identity() - mat_k * mat_c) *
+    velocity_covariance_;
 }
 
 void KalmanFilter::ComputeUpdateQuality(const TrackedObjectPtr& new_object,
@@ -379,10 +403,10 @@ float KalmanFilter::ComputeUpdateQualityAccordingAssociationScore(
   // Compute update quality according association score
   float association_score = new_object->association_score;
   float update_quality = 1;
-  if (s_max_adaptive_score_ == 0) {
+  if (s_association_score_maximum_ == 0) {
     return update_quality;
   }
-  update_quality = 1 - (association_score / s_max_adaptive_score_);
+  update_quality = 1 - (association_score / s_association_score_maximum_);
   update_quality = update_quality > 1 ? 1 : update_quality;
   update_quality = update_quality < 0 ? 0 : update_quality;
   update_quality = update_quality * update_quality;
