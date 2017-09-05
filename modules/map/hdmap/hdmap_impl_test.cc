@@ -187,13 +187,8 @@
 //   EXPECT_EQ(-1, hdmap_impl_.get_nearest_lane_with_heading(point, 1e-6, 0.86,
 //     0.2, &nearest_lane, &nearest_s, &nearest_l));
 
-<<<<<<< HEAD
-//   EXPECT_EQ(0, _hdmap_impl.get_nearest_lane_with_heading(point, 5, 0.86,
-//   0.86,
-=======
 //   EXPECT_EQ(0, hdmap_impl_.get_nearest_lane_with_heading(point, 5, 0.86,
 //   0.86,
->>>>>>> Planning: fixed coding styles in planning.
 //     &nearest_lane, &nearest_s, &nearest_l));
 //   EXPECT_EQ("1476761826058_1_-1", nearest_lane->id().id());
 //   EXPECT_NEAR(nearest_l, -1.9609, 1E-3);
@@ -211,13 +206,8 @@
 //   EXPECT_EQ(-1, hdmap_impl_.get_lanes_with_heading(point, 1e-6, 0.86,
 //     0.2, &lanes));
 
-<<<<<<< HEAD
-//   EXPECT_EQ(0, _hdmap_impl.get_lanes_with_heading(point, 5, 0, 1.71,
-//   &lanes));
-=======
 //   EXPECT_EQ(0, hdmap_impl_.get_lanes_with_heading(point, 5, 0, 1.71,
 //   &lanes));
->>>>>>> Planning: fixed coding styles in planning.
 //   EXPECT_EQ(1, lanes.size());
 //   EXPECT_EQ("1476761826058_1_-1", lanes[0]->id().id());
 // }
