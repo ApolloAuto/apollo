@@ -78,7 +78,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
   timestamp_ = kTimeStamp;
   seq_num_++;
 
-  AINFO << "process the " << seq_num_ << " frame. timestamp: " << timestamp_;
+  ADEBUG << "process the " << seq_num_ << " frame. timestamp: " << timestamp_;
 
   PERF_BLOCK_START();
   /// get velodyne2world transfrom
@@ -158,7 +158,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
       return false;
     }
   }
-  AERROR << "call segmentation succ. The num of objects is: " << objects.size();
+  ADEBUG << "call segmentation succ. The num of objects is: " << objects.size();
   PERF_BLOCK_END("lidar_segmentation");
 
   /// call object builder
@@ -170,7 +170,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
       return false;
     }
   }
-  AERROR << "call object_builder succ.";
+  ADEBUG << "call object_builder succ.";
   PERF_BLOCK_END("lidar_object_builder");
 
   /// call tracker
@@ -187,7 +187,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
   }
 
   PERF_BLOCK_END("lidar_tracker");
-  AINFO << "lidar process succ, there are " << objects_.size()
+  ADEBUG << "lidar process succ, there are " << objects_.size()
         << " tracked objects.";
   return true;
 }
@@ -352,7 +352,7 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   tf::transformMsgToEigen(transform_stamped.transform, affine_3d);
   *trans = affine_3d.matrix();
 
-  AINFO << "get " << FLAGS_lidar_tf2_frame_id << " to "
+  ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
         << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
   return true;
 }
