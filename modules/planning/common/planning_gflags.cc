@@ -98,8 +98,8 @@ DEFINE_double(static_decision_ignore_s_range, 3.0,
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(stop_distance_obstacle, 10.0,
               "stop distance from in-lane obstacle (meters)");
-DEFINE_double(destination_adjust_distance_buffer, 1.0,
-              "distance buffer when adjusting destination stop line");
+DEFINE_double(stop_distance_destination, 3.0,
+              "stop distance from destination line");
 DEFINE_double(min_driving_width, 2.5,
               "minimum road width(meters) for adc to drive through");
 DEFINE_double(nudge_distance_obstacle, 0.3,
