@@ -134,7 +134,7 @@ class DpStGraph {
   common::TrajectoryPoint init_point_;
 
   // mappign obstacle to st graph
-  // std::unique_ptr<StBoundaryMapper> _st_mapper = nullptr;
+  // std::unique_ptr<StBoundaryMapper> st_mapper_ = nullptr;
 
   double unit_s_ = 0.0;
   double unit_t_ = 0.0;

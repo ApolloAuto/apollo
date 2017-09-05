@@ -45,16 +45,16 @@
 //   void initial_context();
 //   void initial_boundary_context();
 //  public:
-//     HDMapImpl _hdmap_impl;
+//     HDMapImpl hdmap_impl_;
 // };
 
 // void HDMapImplTestSuite::initial_context() {
-//   int ret = _hdmap_impl.load_map_from_file(kMapFilename);
+//   int ret = hdmap_impl_.load_map_from_file(kMapFilename);
 //   ASSERT_EQ(0, ret);
 // }
 
 // void HDMapImplTestSuite::initial_boundary_context() {
-//   int ret = _hdmap_impl.load_map_from_file(kBoundaryMapFilename);
+//   int ret = hdmap_impl_.load_map_from_file(kBoundaryMapFilename);
 //   ASSERT_EQ(0, ret);
 // }
 
@@ -62,9 +62,9 @@
 //   initial_context();
 //   Id lane_id;
 //   lane_id.set_id("1");
-//   EXPECT_TRUE(nullptr == _hdmap_impl.get_lane_by_id(lane_id));
+//   EXPECT_TRUE(nullptr == hdmap_impl_.get_lane_by_id(lane_id));
 //   lane_id.set_id("1476433313307_1_-1");
-//   LaneInfoConstPtr lane_ptr = _hdmap_impl.get_lane_by_id(lane_id);
+//   LaneInfoConstPtr lane_ptr = hdmap_impl_.get_lane_by_id(lane_id);
 //   EXPECT_TRUE(nullptr != lane_ptr);
 //   EXPECT_STREQ(lane_id.id().c_str(), lane_ptr->id().id().c_str());
 // }
@@ -73,9 +73,9 @@
 //   initial_context();
 //   Id junction_id;
 //   junction_id.set_id("1");
-//   EXPECT_TRUE(nullptr == _hdmap_impl.get_junction_by_id(junction_id));
+//   EXPECT_TRUE(nullptr == hdmap_impl_.get_junction_by_id(junction_id));
 //   junction_id.set_id("1473834008594");
-//   JunctionInfoConstPtr junction_ptr = _hdmap_impl.get_junction_by_id(
+//   JunctionInfoConstPtr junction_ptr = hdmap_impl_.get_junction_by_id(
 //                                                             junction_id);
 //   EXPECT_TRUE(nullptr != junction_ptr);
 //   EXPECT_STREQ(junction_id.id().c_str(), junction_ptr->id().id().c_str());
@@ -85,9 +85,9 @@
 //   initial_context();
 //   Id signal_id;
 //   signal_id.set_id("abc");
-//   EXPECT_TRUE(nullptr == _hdmap_impl.get_signal_by_id(signal_id));
+//   EXPECT_TRUE(nullptr == hdmap_impl_.get_signal_by_id(signal_id));
 //   signal_id.set_id("0");
-//   SignalInfoConstPtr signal_ptr = _hdmap_impl.get_signal_by_id(signal_id);
+//   SignalInfoConstPtr signal_ptr = hdmap_impl_.get_signal_by_id(signal_id);
 //   EXPECT_TRUE(nullptr != signal_ptr);
 //   EXPECT_STREQ(signal_id.id().c_str(), signal_ptr->id().id().c_str());
 // }
@@ -96,9 +96,9 @@
 //   initial_context();
 //   Id crosswalk_id;
 //   crosswalk_id.set_id("1");
-//   EXPECT_TRUE(nullptr == _hdmap_impl.get_crosswalk_by_id(crosswalk_id));
+//   EXPECT_TRUE(nullptr == hdmap_impl_.get_crosswalk_by_id(crosswalk_id));
 //   crosswalk_id.set_id("1473840237307");
-//   CrosswalkInfoConstPtr crosswalk_ptr = _hdmap_impl.get_crosswalk_by_id(
+//   CrosswalkInfoConstPtr crosswalk_ptr = hdmap_impl_.get_crosswalk_by_id(
 //                                                               crosswalk_id);
 //   EXPECT_TRUE(nullptr != crosswalk_ptr);
 //   EXPECT_STREQ(crosswalk_id.id().c_str(), crosswalk_ptr->id().id().c_str());
@@ -108,9 +108,9 @@
 //   initial_context();
 //   Id stop_sign_id;
 //   stop_sign_id.set_id("1");
-//   EXPECT_TRUE(nullptr == _hdmap_impl.get_stop_sign_by_id(stop_sign_id));
+//   EXPECT_TRUE(nullptr == hdmap_impl_.get_stop_sign_by_id(stop_sign_id));
 //   stop_sign_id.set_id("stop_sign_1");
-//   StopSignInfoConstPtr stop_sign_ptr = _hdmap_impl.get_stop_sign_by_id(
+//   StopSignInfoConstPtr stop_sign_ptr = hdmap_impl_.get_stop_sign_by_id(
 //                                                               stop_sign_id);
 //   EXPECT_TRUE(nullptr != stop_sign_ptr);
 //   EXPECT_STREQ(stop_sign_id.id().c_str(), stop_sign_ptr->id().id().c_str());
@@ -120,9 +120,9 @@
 //   initial_context();
 //   Id yield_sign_id;
 //   yield_sign_id.set_id("1");
-//   EXPECT_TRUE(nullptr == _hdmap_impl.get_yield_sign_by_id(yield_sign_id));
+//   EXPECT_TRUE(nullptr == hdmap_impl_.get_yield_sign_by_id(yield_sign_id));
 //   yield_sign_id.set_id("yield_sign_1");
-//   YieldSignInfoConstPtr yield_sign_ptr = _hdmap_impl.get_yield_sign_by_id(
+//   YieldSignInfoConstPtr yield_sign_ptr = hdmap_impl_.get_yield_sign_by_id(
 //                                                               yield_sign_id);
 //   EXPECT_TRUE(nullptr != yield_sign_ptr);
 //   EXPECT_STREQ(yield_sign_id.id().c_str(),
@@ -133,10 +133,10 @@
 //   initial_context();
 //   Id overlap_id;
 //   overlap_id.set_id("1");
-//   EXPECT_TRUE(nullptr == _hdmap_impl.get_overlap_by_id(overlap_id));
+//   EXPECT_TRUE(nullptr == hdmap_impl_.get_overlap_by_id(overlap_id));
 //   overlap_id.set_id("overlap_533");
 //   OverlapInfoConstPtr overlap_ptr =
-//   _hdmap_impl.get_overlap_by_id(overlap_id);
+//   hdmap_impl_.get_overlap_by_id(overlap_id);
 //   EXPECT_TRUE(nullptr != overlap_ptr);
 //   EXPECT_STREQ(overlap_id.id().c_str(), overlap_ptr->id().id().c_str());
 // }
@@ -145,9 +145,9 @@
 //   initial_boundary_context();
 //   Id road_id;
 //   road_id.set_id("road_1");
-//   EXPECT_TRUE(nullptr == _hdmap_impl.get_road_by_id(road_id));
+//   EXPECT_TRUE(nullptr == hdmap_impl_.get_road_by_id(road_id));
 //   road_id.set_id("99");
-//   RoadInfoConstPtr road_ptr = _hdmap_impl.get_road_by_id(road_id);
+//   RoadInfoConstPtr road_ptr = hdmap_impl_.get_road_by_id(road_id);
 //   EXPECT_TRUE(nullptr != road_ptr);
 //   EXPECT_STREQ(road_id.id().c_str(), road_ptr->id().id().c_str());
 // }
@@ -159,9 +159,9 @@
 //   point.set_x(0.0);
 //   point.set_y(0.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_lanes(point, 1e-6, &lanes));
+//   EXPECT_EQ(0, hdmap_impl_.get_lanes(point, 1e-6, &lanes));
 //   EXPECT_EQ(0, lanes.size());
-//   EXPECT_EQ(0, _hdmap_impl.get_lanes(point, 5, &lanes));
+//   EXPECT_EQ(0, hdmap_impl_.get_lanes(point, 5, &lanes));
 //   EXPECT_EQ(3, lanes.size());
 //   std::vector<std::string> ids;
 //   for (const auto &lane : lanes) {
@@ -184,11 +184,16 @@
 //   LaneInfoConstPtr nearest_lane;
 //   double nearest_s = 0.0;
 //   double nearest_l = 0.0;
-//   EXPECT_EQ(-1, _hdmap_impl.get_nearest_lane_with_heading(point, 1e-6, 0.86,
+//   EXPECT_EQ(-1, hdmap_impl_.get_nearest_lane_with_heading(point, 1e-6, 0.86,
 //     0.2, &nearest_lane, &nearest_s, &nearest_l));
 
+<<<<<<< HEAD
 //   EXPECT_EQ(0, _hdmap_impl.get_nearest_lane_with_heading(point, 5, 0.86,
 //   0.86,
+=======
+//   EXPECT_EQ(0, hdmap_impl_.get_nearest_lane_with_heading(point, 5, 0.86,
+//   0.86,
+>>>>>>> Planning: fixed coding styles in planning.
 //     &nearest_lane, &nearest_s, &nearest_l));
 //   EXPECT_EQ("1476761826058_1_-1", nearest_lane->id().id());
 //   EXPECT_NEAR(nearest_l, -1.9609, 1E-3);
@@ -203,11 +208,16 @@
 //   point.set_z(0.0);
 
 //   std::vector<LaneInfoConstPtr> lanes;
-//   EXPECT_EQ(-1, _hdmap_impl.get_lanes_with_heading(point, 1e-6, 0.86,
+//   EXPECT_EQ(-1, hdmap_impl_.get_lanes_with_heading(point, 1e-6, 0.86,
 //     0.2, &lanes));
 
+<<<<<<< HEAD
 //   EXPECT_EQ(0, _hdmap_impl.get_lanes_with_heading(point, 5, 0, 1.71,
 //   &lanes));
+=======
+//   EXPECT_EQ(0, hdmap_impl_.get_lanes_with_heading(point, 5, 0, 1.71,
+//   &lanes));
+>>>>>>> Planning: fixed coding styles in planning.
 //   EXPECT_EQ(1, lanes.size());
 //   EXPECT_EQ("1476761826058_1_-1", lanes[0]->id().id());
 // }
@@ -219,9 +229,9 @@
 //   point.set_x(-36.0);
 //   point.set_y(-28.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_junctions(point, 1, &junctions));
+//   EXPECT_EQ(0, hdmap_impl_.get_junctions(point, 1, &junctions));
 //   EXPECT_EQ(0, junctions.size());
-//   EXPECT_EQ(0, _hdmap_impl.get_junctions(point, 3, &junctions));
+//   EXPECT_EQ(0, hdmap_impl_.get_junctions(point, 3, &junctions));
 //   EXPECT_EQ(1, junctions.size());
 //   EXPECT_EQ("1476433239227", junctions[0]->id().id());
 // }
@@ -233,9 +243,9 @@
 //   point.set_x(199.0);
 //   point.set_y(-440.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_crosswalks(point, 1, &crosswalks));
+//   EXPECT_EQ(0, hdmap_impl_.get_crosswalks(point, 1, &crosswalks));
 //   EXPECT_EQ(0, crosswalks.size());
-//   EXPECT_EQ(0, _hdmap_impl.get_crosswalks(point, 3, &crosswalks));
+//   EXPECT_EQ(0, hdmap_impl_.get_crosswalks(point, 3, &crosswalks));
 //   EXPECT_EQ(1, crosswalks.size());
 //   EXPECT_EQ("1473840237307", crosswalks[0]->id().id());
 // }
@@ -248,9 +258,9 @@
 //   point.set_x(-250.0);
 //   point.set_y(405.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_signals(point, 4.8, &signals));
+//   EXPECT_EQ(0, hdmap_impl_.get_signals(point, 4.8, &signals));
 //   EXPECT_EQ(0, signals.size());
-//   EXPECT_EQ(0, _hdmap_impl.get_signals(point, 6.6, &signals));
+//   EXPECT_EQ(0, hdmap_impl_.get_signals(point, 6.6, &signals));
 //   EXPECT_EQ(3, signals.size());
 //   EXPECT_EQ("11", signals[0]->id().id());
 //   EXPECT_EQ("22", signals[1]->id().id());
@@ -265,7 +275,7 @@
 //   point.set_x(0.0);
 //   point.set_y(0.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_stop_signs(point, 100.0, &stop_signs));
+//   EXPECT_EQ(0, hdmap_impl_.get_stop_signs(point, 100.0, &stop_signs));
 //   EXPECT_EQ(1, stop_signs.size());
 //   EXPECT_EQ("stop_sign_8", stop_signs[0]->id().id());
 // }
@@ -278,7 +288,7 @@
 //   point.set_x(0.0);
 //   point.set_y(0.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_yield_signs(point, 100.0, &yield_signs));
+//   EXPECT_EQ(0, hdmap_impl_.get_yield_signs(point, 100.0, &yield_signs));
 //   EXPECT_EQ(0, yield_signs.size());
 // }
 
@@ -290,7 +300,7 @@
 //   point.set_x(435730.0);
 //   point.set_y(4436777.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_roads(point, 3.0, &roads));
+//   EXPECT_EQ(0, hdmap_impl_.get_roads(point, 3.0, &roads));
 //   EXPECT_EQ(1, roads.size());
 
 //   EXPECT_EQ(roads[0]->id().id(), "87");
@@ -321,7 +331,7 @@
 //   point.set_x(2.5);
 //   point.set_y(-20.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_nearest_lane(point, &lane, &s, &l));
+//   EXPECT_EQ(0, hdmap_impl_.get_nearest_lane(point, &lane, &s, &l));
 //   EXPECT_EQ("1476433297955_1_-1", lane->id().id());
 //   EXPECT_NEAR(s, 4.18, 1e-3);
 //   EXPECT_NEAR(l, -1.931, 1e-3);
@@ -329,7 +339,7 @@
 //   point.set_x(-40.0);
 //   point.set_y(1.8);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_nearest_lane(point, &lane, &s, &l));
+//   EXPECT_EQ(0, hdmap_impl_.get_nearest_lane(point, &lane, &s, &l));
 //   EXPECT_EQ("14791047360960_2_-1", lane->id().id());
 //   EXPECT_NEAR(s, 285.365, 1e-3);
 //   EXPECT_NEAR(l, -4.734, 1e-3);
@@ -343,14 +353,14 @@
 //   point.set_z(0.0);
 //   std::vector<RoadROIBoundaryPtr> road_boundaries;
 //   std::vector<JunctionBoundaryPtr> junctions;
-//   EXPECT_EQ(-1, _hdmap_impl.get_road_boundaries(point, 10.0,
+//   EXPECT_EQ(-1, hdmap_impl_.get_road_boundaries(point, 10.0,
 //                                         &road_boundaries,
 //                                         &junctions));
 
 //   point.set_x(435730.0);
 //   point.set_y(4436777.0);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_road_boundaries(point, 10.0,
+//   EXPECT_EQ(0, hdmap_impl_.get_road_boundaries(point, 10.0,
 //                                         &road_boundaries,
 //                                         &junctions));
 //   EXPECT_EQ(1, road_boundaries.size());
@@ -359,7 +369,7 @@
 //   point.set_x(435776.9);
 //   point.set_y(4436640.7);
 //   point.set_z(0.0);
-//   EXPECT_EQ(0, _hdmap_impl.get_road_boundaries(point, 3.0,
+//   EXPECT_EQ(0, hdmap_impl_.get_road_boundaries(point, 3.0,
 //                                         &road_boundaries,
 //                                         &junctions));
 //   EXPECT_EQ(0, road_boundaries.size());

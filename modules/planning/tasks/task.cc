@@ -27,9 +27,9 @@ namespace planning {
 
 using apollo::common::Status;
 
-Task::Task(const std::string& name) : _name(name) {}
+Task::Task(const std::string& name) : name_(name) {}
 
-const std::string& Task::Name() const { return _name; }
+const std::string& Task::Name() const { return name_; }
 
 bool Task::Init(const PlanningConfig&) { return true; }
 

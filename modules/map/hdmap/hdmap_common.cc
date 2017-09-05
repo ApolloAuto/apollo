@@ -148,7 +148,7 @@ void LaneInfo::Init() {
         if (p.second < kMinHalfWidth) {
           AERROR
               << "lane[id = " << lane_.id().DebugString()
-              << "]. _sampled_left_width[" << p.second
+              << "]. sampled_left_width_[" << p.second
               << "] is too small. It should be larger than half vehicle width["
               << kMinHalfWidth << "].";
         }
@@ -157,16 +157,16 @@ void LaneInfo::Init() {
         if (p.second < kMinHalfWidth) {
           AERROR
               << "lane[id = " << lane_.id().DebugString()
-              << "]. _sampled_right_width[" << p.second
+              << "]. sampled_right_width_[" << p.second
               << "] is too small. It should be larger than half vehicle width["
               << kMinHalfWidth << "].";
         }
       }
     } else if (lane_.type() == Lane::NONE) {
-      AERROR << "_lane[id = " << lane_.id().DebugString() << " type is NONE.";
+      AERROR << "lane_[id = " << lane_.id().DebugString() << " type is NONE.";
     }
   } else {
-    AERROR << "_lane[id = " << lane_.id().DebugString() << "has NO type.";
+    AERROR << "lane_[id = " << lane_.id().DebugString() << "has NO type.";
   }
 
   CreateKDTree();
@@ -195,7 +195,7 @@ double LaneInfo::Heading(const double s) const {
     return ::apollo::common::math::slerp(
         headings_[index - 1], accumulated_s_[index - 1], headings_[index],
         accumulated_s_[index], s);
-    // return _headings[index - 1];
+    // return headings_[index - 1];
   }
 }
 
@@ -419,10 +419,10 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       // TODO(all): support parking and speed bump
       /*
       if (map_instance.get_parking_space_by_id(object_map_id) != nullptr) {
-        _parking_spaces.emplace_back(overlap_ptr);
+        parking_spaces_.emplace_back(overlap_ptr);
       }
       if (map_instance.get_speed_bump_by_id(object_map_id) != nullptr) {
-        _speed_bumps.emplace_back(overlap_ptr);
+        speed_bumps_.emplace_back(overlap_ptr);
       }
       */
     }
@@ -498,7 +498,7 @@ void YieldSignInfo::Init() {
   for (const auto &stop_line : yield_sign_.stop_line()) {
     SegmentsFromCurve(stop_line, &segments_);
   }
-  // segments_from_curve(_yield_sign.stop_line(), &_segments);
+  // segments_from_curve(yield_sign_.stop_line(), &segments_);
   CHECK(!segments_.empty());
 }
 

@@ -43,8 +43,8 @@ class IndexedList {
     if (Find(id)) {
       return false;
     }
-    _object_list.push_back(ptr.get());
-    _object_dict[id] = std::move(ptr);
+    object_list_.push_back(ptr.get());
+    object_dict_[id] = std::move(ptr);
     return true;
   }
 
@@ -61,8 +61,8 @@ class IndexedList {
       return false;
     }
     auto ptr = std::unique_ptr<T>(new T(ref));
-    _object_list.push_back(ptr.get());
-    _object_dict[id] = std::move(ptr);
+    object_list_.push_back(ptr.get());
+    object_dict_[id] = std::move(ptr);
     return true;
   }
 
@@ -73,8 +73,8 @@ class IndexedList {
    * @return nullptr if the object is not found.
    */
   T* Find(const I id) {
-    auto iter = _object_dict.find(id);
-    if (iter == _object_dict.end()) {
+    auto iter = object_dict_.find(id);
+    if (iter == object_dict_.end()) {
       return nullptr;
     } else {
       return iter->second.get();
@@ -85,11 +85,11 @@ class IndexedList {
    * @brief List all the items in the container.
    * @return the list of const raw pointers of the objects in the container.
    */
-  const std::vector<const T*>& Items() const { return _object_list; }
+  const std::vector<const T*>& Items() const { return object_list_; }
 
  private:
-  std::vector<const T*> _object_list;
-  std::unordered_map<I, std::unique_ptr<T>> _object_dict;
+  std::vector<const T*> object_list_;
+  std::unordered_map<I, std::unique_ptr<T>> object_dict_;
 };
 
 }  // namespace planning
