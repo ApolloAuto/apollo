@@ -136,7 +136,7 @@ function build_py_proto() {
 
 function check() {
   local check_start_time=$(get_now)
-  apollo_build && run_test && run_lint
+  apollo_build_dbg && run_test && run_lint
 
   START_TIME=$check_start_time
   if [ $? -eq 0 ]; then
