@@ -217,8 +217,8 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
       std::pair<uint32_t, uint32_t> update_index_range =
           FindInterval(updated_start_s, updated_end_s);
 
-      for (uint32_t j = update_index_range.first; j < update_index_range.second;
-           ++j) {
+      for (uint32_t j = update_index_range.first;
+           j <= update_index_range.second; ++j) {
         dynamic_obstacle_bound_[j].first =
             std::max(bound.first, dynamic_obstacle_bound_[j].first);
         dynamic_obstacle_bound_[j].second =
