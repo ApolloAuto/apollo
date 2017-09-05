@@ -39,8 +39,6 @@ class Double {
   static int Compare(const Double& d1, const Double& d2, const double epsilon);
   static int Compare(const Double& d1, const Double& d2);
 
-  static Double Sqrt(const Double& d1);
-
   int CompareTo(const double d1, const double epsilon) const;
   int CompareTo(const double d1) const;
   int CompareTo(const Double& d1, const double epsilon) const;

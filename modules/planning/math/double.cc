@@ -54,8 +54,6 @@ int Double::Compare(const Double& d1, const Double& d2) {
   return Compare(d1.Value(), d2.Value());
 }
 
-Double Double::Sqrt(const Double& d1) { return Double(std::sqrt(d1.Value())); }
-
 int Double::CompareTo(const double d1, const double epsilon) const {
   CHECK(!std::isnan(d1));
   if (DefinitelyGreaterThan(value_, d1, epsilon)) {

@@ -61,18 +61,6 @@ class PlanningTestBase : public ::testing::Test {
    */
   bool RunPlanning(const std::string& test_case_name, int case_num);
 
-  /**
-   * @brief Print out the points to a file for debug and visualization purpose.
-   * User can see the file, or feed it
-   * into a graphic visualizer.
-   */
-  static void export_sl_points(
-      const std::vector<std::vector<common::SLPoint>>& points,
-      const std::string& filename);
-
-  static void export_path_data(const PathData& path_data,
-                               const std::string& filename);
-
  protected:
   void TrimPlanning(ADCTrajectory* origin);
   bool SetUpAdapters();

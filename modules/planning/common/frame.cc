@@ -86,8 +86,6 @@ const routing::RoutingResponse &Frame::routing_response() const {
   return routing_response_;
 }
 
-const ADCTrajectory &Frame::GetADCTrajectory() const { return trajectory_pb_; }
-
 ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
 
 std::vector<ReferenceLineInfo> &Frame::reference_line_info() {
@@ -254,10 +252,6 @@ bool Frame::CheckCollision() {
   return false;
 }
 
-const std::string &Frame::CollisionObstacle() const {
-  return collision_obstacle_id_;
-}
-
 uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
 const Obstacle *Frame::FindObstacle(const std::string &obstacle_id) {
@@ -297,8 +291,6 @@ std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
   AERROR_IF(reference_lines.empty()) << "No smooth reference lines available";
   return reference_lines;
 }
-
-const IndexedObstacles &Frame::GetObstacles() const { return obstacles_; }
 
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);

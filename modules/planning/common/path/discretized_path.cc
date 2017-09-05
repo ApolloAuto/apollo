@@ -103,12 +103,6 @@ std::uint32_t DiscretizedPath::NumOfPoints() const {
   return path_points_.size();
 }
 
-const common::PathPoint &DiscretizedPath::PathPointAt(
-    const std::uint32_t index) const {
-  CHECK_LT(index, path_points_.size());
-  return path_points_[index];
-}
-
 const common::PathPoint &DiscretizedPath::StartPoint() const {
   CHECK(!path_points_.empty());
   return path_points_.front();

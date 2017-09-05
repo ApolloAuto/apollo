@@ -54,8 +54,6 @@ class DiscretizedPath {
 
   std::uint32_t NumOfPoints() const;
 
-  const common::PathPoint& PathPointAt(const std::uint32_t index) const;
-
   virtual void Clear();
 
  protected:

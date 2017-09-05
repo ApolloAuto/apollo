@@ -142,41 +142,6 @@ std::unique_ptr<PathObstacle> ReferenceLineInfo::CreatePathObstacle(
   return path_obstacle;
 }
 
-std::unique_ptr<Obstacle> ReferenceLineInfo::CreateVirtualObstacle(
-    const std::string& obstacle_id, const common::math::Vec2d& position,
-    const double length, const double width, const double height) const {
-  // create a "virtual" perception_obstacle
-  perception::PerceptionObstacle perception_obstacle;
-  // simulator needs a valid integer
-  perception_obstacle.set_id(FLAGS_virtual_obstacle_perception_id);
-  auto dest_ref_point =
-      reference_line_.GetReferencePoint(position.x(), position.y());
-  perception_obstacle.mutable_position()->set_x(position.x());
-  perception_obstacle.mutable_position()->set_y(position.y());
-  perception_obstacle.set_theta(dest_ref_point.heading());
-  perception_obstacle.mutable_velocity()->set_x(0);
-  perception_obstacle.mutable_velocity()->set_y(0);
-  perception_obstacle.set_length(length);
-  perception_obstacle.set_width(width);
-  perception_obstacle.set_height(height);
-  perception_obstacle.set_type(
-      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
-  perception_obstacle.set_tracking_time(1.0);
-
-  common::math::Box2d bouding_box{position, dest_ref_point.heading(), length,
-                                  width};
-  std::vector<common::math::Vec2d> corner_points;
-  bouding_box.GetAllCorners(&corner_points);
-  for (const auto& corner_point : corner_points) {
-    auto* point = perception_obstacle.add_polygon_point();
-    point->set_x(corner_point.x());
-    point->set_y(corner_point.y());
-  }
-
-  return std::unique_ptr<Obstacle>(
-      new Obstacle(obstacle_id, perception_obstacle));
-}
-
 const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
 }
@@ -192,76 +157,6 @@ bool ReferenceLineInfo::IsStartFrom(
   common::SLPoint sl_point;
   prev_reference_line.XYToSL(start_point, &sl_point);
   return previous_reference_line_info.reference_line_.IsOnRoad(sl_point);
-}
-
-bool ReferenceLineInfo::IsOnLeftLane(const common::math::Vec2d& xy_point) {
-  common::SLPoint sl_point;
-  if (!reference_line_.XYToSL(xy_point, &sl_point)) {
-    AERROR << "Failed to get sl point from : " << xy_point.DebugString();
-    return false;
-  }
-  const double distance = 1.0;
-  std::vector<hdmap::LaneInfoConstPtr> lanes;
-  if (!pnc_map_->HDMap().GetLanes(common::util::MakePointENU(xy_point),
-                                  distance, &lanes)) {
-    ADEBUG << "get lanes failed from point : " << xy_point.DebugString();
-    return false;
-  }
-  std::unordered_set<std::string> lane_ids;
-  for (const auto& lane : lanes) {
-    lane_ids.insert(lane->id().id());
-  }
-  auto ref_point = reference_line_.GetReferencePoint(sl_point.s());
-  for (const auto& waypoint : ref_point.lane_waypoints()) {
-    for (const auto& left_lane_id :
-         waypoint.lane->lane().left_neighbor_forward_lane_id()) {
-      if (lane_ids.count(left_lane_id.id())) {
-        return true;
-      }
-    }
-    for (const auto& left_lane_id :
-         waypoint.lane->lane().left_neighbor_reverse_lane_id()) {
-      if (lane_ids.count(left_lane_id.id())) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-bool ReferenceLineInfo::IsOnRightLane(const common::math::Vec2d& xy_point) {
-  common::SLPoint sl_point;
-  if (!reference_line_.XYToSL(xy_point, &sl_point)) {
-    AERROR << "Failed to get sl point from : " << xy_point.DebugString();
-    return false;
-  }
-  const double distance = 1.0;
-  std::vector<hdmap::LaneInfoConstPtr> lanes;
-  if (pnc_map_->HDMap().GetLanes(common::util::MakePointENU(xy_point), distance,
-                                 &lanes) != 0) {
-    AERROR << "get lanes failed from point : " << xy_point.DebugString();
-    return false;
-  }
-  std::unordered_set<std::string> lane_ids;
-  for (const auto& lane : lanes) {
-    lane_ids.insert(lane->id().id());
-  }
-  auto ref_point = reference_line_.GetReferencePoint(sl_point.s());
-  for (const auto& waypoint : ref_point.lane_waypoints()) {
-    for (const auto& right_lane_id :
-         waypoint.lane->lane().right_neighbor_forward_lane_id()) {
-      if (lane_ids.count(right_lane_id.id())) {
-        return true;
-      }
-    }
-    for (const auto& right_lane_id :
-         waypoint.lane->lane().right_neighbor_reverse_lane_id()) {
-      if (lane_ids.count(right_lane_id.id())) {
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
