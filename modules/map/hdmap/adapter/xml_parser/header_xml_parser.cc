@@ -12,13 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#include "modules/map/hdmap/adapter/xml_parser/header_xml_parser.h"
 #include <chrono>
 #include <ctime>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 #include <string>
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
+#include "modules/map/hdmap/adapter/xml_parser/header_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 namespace apollo {
@@ -26,11 +26,11 @@ namespace hdmap {
 namespace adapter {
 
 Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
-                        PbHeader* header) {
+                              PbHeader* header) {
   auto header_node = xml_node.FirstChildElement("header");
   if (!header_node) {
-      std::string err_msg = "error xml data missing header";
-      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    std::string err_msg = "error xml data missing header";
+    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
   int rev_major = 0;
   int rev_minor = 0;
@@ -44,17 +44,16 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   std::string vendor;
   int checker = header_node->QueryIntAttribute("revMajor", &rev_major);
   checker += header_node->QueryIntAttribute("revMinor", &rev_minor);
-  checker += UtilXmlParser::QueryStringAttribute(*header_node, "name",
-                                                  &database_name);
+  checker +=
+      UtilXmlParser::QueryStringAttribute(*header_node, "name", &database_name);
   checker += header_node->QueryFloatAttribute("version", &version);
-  checker += UtilXmlParser::QueryStringAttribute(*header_node, "date",
-                                                  &date);
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "date", &date);
   checker += header_node->QueryDoubleAttribute("north", &north);
   checker += header_node->QueryDoubleAttribute("south", &south);
   checker += header_node->QueryDoubleAttribute("east", &east);
   checker += header_node->QueryDoubleAttribute("west", &west);
-  checker += UtilXmlParser::QueryStringAttribute(*header_node, "vendor",
-                                                    &vendor);
+  checker +=
+      UtilXmlParser::QueryStringAttribute(*header_node, "vendor", &vendor);
 
   if (checker != tinyxml2::XML_SUCCESS) {
     std::string err_msg = "Error parsing header attributes";
@@ -71,7 +70,7 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     std::string err_msg = "Error parsing header geoReoference text";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
-  
+
   // coordinate frame
   std::string from_coordinate = geo_text->Value();
   int eastZone = GetLongZone(east);
@@ -81,10 +80,10 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
   int zone = westZone;
-  std::string to_coordinate = "+proj=utm +zone=" + std::to_string(zone)
-      + " +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+  std::string to_coordinate = "+proj=utm +zone=" + std::to_string(zone) +
+                              " +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
   CoordinateConvertTool::GetInstance()->SetConvertParam(from_coordinate,
-                                                            to_coordinate);
+                                                        to_coordinate);
 
   header->set_version(std::to_string(version));
   header->set_date(date);

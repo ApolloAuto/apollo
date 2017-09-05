@@ -12,9 +12,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
 #include <string>
 #include <vector>
+#include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 namespace apollo {
@@ -22,19 +22,18 @@ namespace hdmap {
 namespace adapter {
 
 Status ObjectsXmlParser::ParseCrosswalks(const tinyxml2::XMLElement& xml_node,
-                                std::vector<PbCrosswalk>* crosswalks) {
+                                         std::vector<PbCrosswalk>* crosswalks) {
   CHECK_NOTNULL(crosswalks);
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
   while (sub_node) {
     std::string object_type;
     std::string object_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node,
-                                                    "type", &object_type);
-    checker += UtilXmlParser::QueryStringAttribute(*sub_node,
-                                                    "id", &object_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "type", &object_type);
+    checker += UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
     if (checker != tinyxml2::XML_SUCCESS) {
-        std::string err_msg = "Error parse object type.";
-        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      std::string err_msg = "Error parse object type.";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
     if (object_type == "crosswalk") {
@@ -42,7 +41,7 @@ Status ObjectsXmlParser::ParseCrosswalks(const tinyxml2::XMLElement& xml_node,
       crosswalk.mutable_id()->set_id(object_id);
       PbPolygon* polygon = crosswalk.mutable_polygon();
       const tinyxml2::XMLElement* outline_node =
-                                      sub_node->FirstChildElement("outline");
+          sub_node->FirstChildElement("outline");
       if (outline_node == nullptr) {
         std::string err_msg = "Error parse crosswalk outline";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -55,17 +54,18 @@ Status ObjectsXmlParser::ParseCrosswalks(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-Status ObjectsXmlParser::ParseClearAreas(const tinyxml2::XMLElement& xml_node,
-                                    std::vector<PbClearArea>* clear_areas) {
+Status ObjectsXmlParser::ParseClearAreas(
+    const tinyxml2::XMLElement& xml_node,
+    std::vector<PbClearArea>* clear_areas) {
   CHECK_NOTNULL(clear_areas);
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
   while (sub_node) {
     std::string object_type;
     std::string object_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node,
-                                                    "id", &object_id);
-    checker += UtilXmlParser::QueryStringAttribute(*sub_node,
-                                                    "type", &object_type);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
+    checker +=
+        UtilXmlParser::QueryStringAttribute(*sub_node, "type", &object_type);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse object type.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -75,9 +75,9 @@ Status ObjectsXmlParser::ParseClearAreas(const tinyxml2::XMLElement& xml_node,
       PbClearArea clear_area;
       clear_area.mutable_id()->set_id(object_id);
       PbPolygon* polygon = clear_area.mutable_polygon();
-	  CHECK(polygon != nullptr);
+      CHECK(polygon != nullptr);
       const tinyxml2::XMLElement* outline_node =
-                                    sub_node->FirstChildElement("outline");
+          sub_node->FirstChildElement("outline");
       if (outline_node == nullptr) {
         std::string err_msg = "Error parse cleararea outline";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -91,19 +91,19 @@ Status ObjectsXmlParser::ParseClearAreas(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-Status  ObjectsXmlParser::ParseSpeedBumps(
-                                    const tinyxml2::XMLElement& xml_node,
-                                    std::vector<PbSpeedBump>* speed_bumps) {
+Status ObjectsXmlParser::ParseSpeedBumps(
+    const tinyxml2::XMLElement& xml_node,
+    std::vector<PbSpeedBump>* speed_bumps) {
   CHECK_NOTNULL(speed_bumps);
-  const tinyxml2::XMLElement* object_node
-                                        = xml_node.FirstChildElement("object");
+  const tinyxml2::XMLElement* object_node =
+      xml_node.FirstChildElement("object");
   while (object_node) {
     std::string object_type;
     std::string object_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*object_node,
-                                                    "id", &object_id);
-    checker += UtilXmlParser::QueryStringAttribute(*object_node,
-                                                    "type", &object_type);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*object_node, "id", &object_id);
+    checker +=
+        UtilXmlParser::QueryStringAttribute(*object_node, "type", &object_type);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse object type.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -112,13 +112,12 @@ Status  ObjectsXmlParser::ParseSpeedBumps(
     if (object_type == "speedBump") {
       PbSpeedBump speed_bump;
       const tinyxml2::XMLElement* sub_node =
-                                object_node->FirstChildElement("geometry");
+          object_node->FirstChildElement("geometry");
       speed_bump.mutable_id()->set_id(object_id);
       while (sub_node) {
         PbCurve* curve = speed_bump.add_position();
         PbCurveSegment* curve_segment = curve->add_segment();
-        RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node,
-                                                    curve_segment));
+        RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node, curve_segment));
         sub_node = sub_node->NextSiblingElement("geometry");
       }
       if (speed_bump.position_size() <= 0) {
@@ -132,18 +131,19 @@ Status  ObjectsXmlParser::ParseSpeedBumps(
   return Status::OK();
 }
 
-Status ObjectsXmlParser::ParseStopLines(const tinyxml2::XMLElement& xml_node,
-                        std::vector<StopLineInternal>* stop_lines) {
+Status ObjectsXmlParser::ParseStopLines(
+    const tinyxml2::XMLElement& xml_node,
+    std::vector<StopLineInternal>* stop_lines) {
   CHECK_NOTNULL(stop_lines);
-  const tinyxml2::XMLElement* object_node
-                                      = xml_node.FirstChildElement("object");
+  const tinyxml2::XMLElement* object_node =
+      xml_node.FirstChildElement("object");
   while (object_node) {
     std::string object_type;
     std::string object_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*object_node,
-                                                      "id", &object_id);
-    checker += UtilXmlParser::QueryStringAttribute(*object_node,
-                                                      "type", &object_type);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*object_node, "id", &object_id);
+    checker +=
+        UtilXmlParser::QueryStringAttribute(*object_node, "type", &object_type);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse object type.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -153,14 +153,13 @@ Status ObjectsXmlParser::ParseStopLines(const tinyxml2::XMLElement& xml_node,
       StopLineInternal stop_line;
       stop_line.id = object_id;
       PbCurveSegment* curve_segment = stop_line.curve.add_segment();
-	  CHECK(curve_segment != nullptr);
+      CHECK(curve_segment != nullptr);
       const auto sub_node = object_node->FirstChildElement("geometry");
       if (sub_node == nullptr) {
         std::string err_msg = "Error parse stopline geometry";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
       }
-      RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node,
-                                                    curve_segment));
+      RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node, curve_segment));
       stop_lines->emplace_back(stop_line);
     }
     object_node = object_node->NextSiblingElement("object");

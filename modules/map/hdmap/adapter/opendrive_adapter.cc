@@ -15,7 +15,8 @@ limitations under the License.
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 
 #include <vector>
-#include <glog/logging.h>
+
+#include "glog/logging.h"
 
 #include "modules/map/hdmap/adapter/proto_organizer.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"

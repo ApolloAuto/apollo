@@ -12,8 +12,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
+
 #include "modules/map/hdmap/hdmap_impl.h"
 
+#include <algorithm>
 #include <unordered_set>
 
 #include "modules/common/util/file.h"
@@ -143,21 +145,21 @@ int HDMapImpl::GetLanes(const PointENU& point, double distance,
   return GetLanes({point.x(), point.y()}, distance, lanes);
 }
 
-int HDMapImpl::GetLanes(const Vec2d &point, double distance,
-                        std::vector<LaneInfoConstPtr> *lanes) const {
+int HDMapImpl::GetLanes(const Vec2d& point, double distance,
+                        std::vector<LaneInfoConstPtr>* lanes) const {
   if (lanes == nullptr || lane_segment_kdtree_ == nullptr) {
     return -1;
   }
 
   lanes->clear();
   std::vector<std::string> ids;
-  const int status = SearchObjects(point, distance, *lane_segment_kdtree_,
-                                   &ids);
+  const int status =
+      SearchObjects(point, distance, *lane_segment_kdtree_, &ids);
   if (status < 0) {
     return status;
   }
 
-  for (const auto &id : ids) {
+  for (const auto& id : ids) {
     lanes->emplace_back(GetLaneById(CreateHDMapId(id)));
   }
   return 0;
@@ -313,20 +315,19 @@ int HDMapImpl::GetYieldSigns(
 }
 
 int HDMapImpl::GetNearestLane(const PointENU& point,
-                              LaneInfoConstPtr* nearest_lane,
-                              double* nearest_s,
+                              LaneInfoConstPtr* nearest_lane, double* nearest_s,
                               double* nearest_l) const {
-  return GetNearestLane({point.x(), point.y()},
-                        nearest_lane, nearest_s, nearest_l);
+  return GetNearestLane({point.x(), point.y()}, nearest_lane, nearest_s,
+                        nearest_l);
 }
 
-int HDMapImpl::GetNearestLane(const Vec2d &point,
-                              LaneInfoConstPtr* nearest_lane,
-                              double *nearest_s, double *nearest_l) const {
+int HDMapImpl::GetNearestLane(const Vec2d& point,
+                              LaneInfoConstPtr* nearest_lane, double* nearest_s,
+                              double* nearest_l) const {
   CHECK_NOTNULL(nearest_lane);
   CHECK_NOTNULL(nearest_s);
   CHECK_NOTNULL(nearest_l);
-  const auto *segment_object = lane_segment_kdtree_->GetNearestObject(point);
+  const auto* segment_object = lane_segment_kdtree_->GetNearestObject(point);
   if (segment_object == nullptr) {
     return -1;
   }
@@ -334,37 +335,29 @@ int HDMapImpl::GetNearestLane(const Vec2d &point,
   *nearest_lane = GetLaneById(lane_id);
   CHECK(*nearest_lane);
   const int id = segment_object->id();
-  const auto &segment = (*nearest_lane)->segments()[id];
+  const auto& segment = (*nearest_lane)->segments()[id];
   Vec2d nearest_pt;
   segment.DistanceTo(point, &nearest_pt);
-  *nearest_s = (*nearest_lane)->accumulate_s()[id]
-      + nearest_pt.DistanceTo(segment.start());
+  *nearest_s = (*nearest_lane)->accumulate_s()[id] +
+               nearest_pt.DistanceTo(segment.start());
   *nearest_l = segment.unit_direction().CrossProd(point - segment.start());
 
   return 0;
 }
 
-int HDMapImpl::GetNearestLaneWithHeading(const PointENU& point,
-                                         const double distance,
-                                         const double central_heading,
-                                         const double max_heading_difference,
-                                         LaneInfoConstPtr* nearest_lane,
-                                         double* nearest_s,
-                                         double* nearest_l) const {
-  return GetNearestLaneWithHeading({point.x(), point.y()},
-                                   distance,
-                                   central_heading,
-                                   max_heading_difference,
+int HDMapImpl::GetNearestLaneWithHeading(
+    const PointENU& point, const double distance, const double central_heading,
+    const double max_heading_difference, LaneInfoConstPtr* nearest_lane,
+    double* nearest_s, double* nearest_l) const {
+  return GetNearestLaneWithHeading({point.x(), point.y()}, distance,
+                                   central_heading, max_heading_difference,
                                    nearest_lane, nearest_s, nearest_l);
 }
 
-int HDMapImpl::GetNearestLaneWithHeading(const Vec2d& point,
-                                         const double distance,
-                                         const double central_heading,
-                                         const double max_heading_difference,
-                                         LaneInfoConstPtr* nearest_lane,
-                                         double* nearest_s,
-                                         double* nearest_l) const {
+int HDMapImpl::GetNearestLaneWithHeading(
+    const Vec2d& point, const double distance, const double central_heading,
+    const double max_heading_difference, LaneInfoConstPtr* nearest_lane,
+    double* nearest_s, double* nearest_l) const {
   CHECK_NOTNULL(nearest_lane);
   CHECK_NOTNULL(nearest_s);
   CHECK_NOTNULL(nearest_l);
@@ -379,11 +372,11 @@ int HDMapImpl::GetNearestLaneWithHeading(const Vec2d& point,
   size_t s_index = 0;
   Vec2d map_point;
   double min_distance = distance;
-  for (const auto &lane : lanes) {
+  for (const auto& lane : lanes) {
     double s_offset = 0.0;
     int s_offset_index = 0;
-    double distance = lane->DistanceTo(point, &map_point, &s_offset,
-                                       &s_offset_index);
+    double distance =
+        lane->DistanceTo(point, &map_point, &s_offset, &s_offset_index);
     if (distance < min_distance) {
       min_distance = distance;
       *nearest_lane = lane;
@@ -399,27 +392,24 @@ int HDMapImpl::GetNearestLaneWithHeading(const Vec2d& point,
   *nearest_s = s;
   int segment_index = std::min(s_index, (*nearest_lane)->segments().size() - 1);
   const auto& segment_2d = (*nearest_lane)->segments()[segment_index];
-  *nearest_l = segment_2d.unit_direction().CrossProd(
-      point - segment_2d.start());
+  *nearest_l =
+      segment_2d.unit_direction().CrossProd(point - segment_2d.start());
 
   return 0;
 }
 
-int HDMapImpl::GetLanesWithHeading(const PointENU& point,
-                                   const double distance,
+int HDMapImpl::GetLanesWithHeading(const PointENU& point, const double distance,
                                    const double central_heading,
                                    const double max_heading_difference,
                                    std::vector<LaneInfoConstPtr>* lanes) const {
-  return GetLanesWithHeading({point.x(), point.y()}, distance,
-                             central_heading, max_heading_difference,
-                             lanes);
+  return GetLanesWithHeading({point.x(), point.y()}, distance, central_heading,
+                             max_heading_difference, lanes);
 }
 
-int HDMapImpl::GetLanesWithHeading(const Vec2d &point,
-                                   const double distance,
+int HDMapImpl::GetLanesWithHeading(const Vec2d& point, const double distance,
                                    const double central_heading,
                                    const double max_heading_difference,
-                                   std::vector<LaneInfoConstPtr> *lanes) const {
+                                   std::vector<LaneInfoConstPtr>* lanes) const {
   CHECK_NOTNULL(lanes);
   std::vector<LaneInfoConstPtr> all_lanes;
   const int status = GetLanes(point, distance, &all_lanes);
@@ -434,10 +424,10 @@ int HDMapImpl::GetLanesWithHeading(const Vec2d &point,
     int s_offset_index = 0;
     double dis = lane->DistanceTo(point, &proj_pt, &s_offset, &s_offset_index);
     if (dis <= distance) {
-      double heading_diff = fabs(
-          lane->headings()[s_offset_index] - central_heading);
-      if (fabs(apollo::common::math::NormalizeAngle(heading_diff))
-          <= max_heading_difference) {
+      double heading_diff =
+          fabs(lane->headings()[s_offset_index] - central_heading);
+      if (fabs(apollo::common::math::NormalizeAngle(heading_diff)) <=
+          max_heading_difference) {
         lanes->push_back(lane);
       }
     }
@@ -499,7 +489,7 @@ int HDMapImpl::GetRoadBoundaries(
   return 0;
 }
 
-template<class Table, class BoxTable, class KDTree>
+template <class Table, class BoxTable, class KDTree>
 void HDMapImpl::BuildSegmentKDTree(const Table& table,
                                    const AABoxKDTreeParams& params,
                                    BoxTable* const box_table,
@@ -510,14 +500,14 @@ void HDMapImpl::BuildSegmentKDTree(const Table& table,
     for (size_t id = 0; id < info->segments().size(); ++id) {
       const auto& segment = info->segments()[id];
       box_table->emplace_back(
-          apollo::common::math::AABox2d(segment.start(), segment.end()),
-          info, &segment, id);
+          apollo::common::math::AABox2d(segment.start(), segment.end()), info,
+          &segment, id);
     }
   }
   kdtree->reset(new KDTree(*box_table, params));
 }
 
-template<class Table, class BoxTable, class KDTree>
+template <class Table, class BoxTable, class KDTree>
 void HDMapImpl::BuildPolygonKDTree(const Table& table,
                                    const AABoxKDTreeParams& params,
                                    BoxTable* const box_table,
@@ -535,53 +525,52 @@ void HDMapImpl::BuildLaneSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 16;
-  BuildSegmentKDTree(lane_table_, params,
-                     &lane_segment_boxes_, &lane_segment_kdtree_);
+  BuildSegmentKDTree(lane_table_, params, &lane_segment_boxes_,
+                     &lane_segment_kdtree_);
 }
 
 void HDMapImpl::BuildJunctionPolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 1;
-  BuildPolygonKDTree(junction_table_, params,
-                     &junction_polygon_boxes_, &junction_polygon_kdtree_);
+  BuildPolygonKDTree(junction_table_, params, &junction_polygon_boxes_,
+                     &junction_polygon_kdtree_);
 }
 
 void HDMapImpl::BuildCrosswalkPolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 1;
-  BuildPolygonKDTree(crosswalk_table_, params,
-                     &crosswalk_polygon_boxes_, &crosswalk_polygon_kdtree_);
+  BuildPolygonKDTree(crosswalk_table_, params, &crosswalk_polygon_boxes_,
+                     &crosswalk_polygon_kdtree_);
 }
 
 void HDMapImpl::BuildSignalSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 4;
-  BuildSegmentKDTree(signal_table_, params,
-                     &signal_segment_boxes_, &signal_segment_kdtree_);
+  BuildSegmentKDTree(signal_table_, params, &signal_segment_boxes_,
+                     &signal_segment_kdtree_);
 }
 
 void HDMapImpl::BuildStopSignSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 4;
-  BuildSegmentKDTree(stop_sign_table_, params,
-                     &stop_sign_segment_boxes_, &stop_sign_segment_kdtree_);
+  BuildSegmentKDTree(stop_sign_table_, params, &stop_sign_segment_boxes_,
+                     &stop_sign_segment_kdtree_);
 }
 
 void HDMapImpl::BuildYieldSignSegmentKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 4;
-  BuildSegmentKDTree(yield_sign_table_, params,
-                     &yield_sign_segment_boxes_, &yield_sign_segment_kdtree_);
+  BuildSegmentKDTree(yield_sign_table_, params, &yield_sign_segment_boxes_,
+                     &yield_sign_segment_kdtree_);
 }
 
-template<class KDTree>
-int HDMapImpl::SearchObjects(const Vec2d& center,
-                             const double radius,
+template <class KDTree>
+int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
                              const KDTree& kdtree,
                              std::vector<std::string>* const results) {
   if (results == nullptr) {

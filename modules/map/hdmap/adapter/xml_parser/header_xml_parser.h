@@ -15,8 +15,9 @@ limitations under the License.
 #ifndef MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_HEADER_XML_PARSER_H
 #define MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_HEADER_XML_PARSER_H
 
-#include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 #include "tinyxml2.h"
+
+#include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 
 namespace apollo {
