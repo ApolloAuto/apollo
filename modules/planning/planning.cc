@@ -17,7 +17,7 @@
 #include "modules/planning/planning.h"
 
 #include <algorithm>
-#include <thread>
+#include <vector>
 
 #include "google/protobuf/repeated_field.h"
 #include "modules/common/adapters/adapter_manager.h"
@@ -48,8 +48,7 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
 }
 
-Status Planning::InitFrame(const uint32_t sequence_num,
-                           const double time_stamp,
+Status Planning::InitFrame(const uint32_t sequence_num, const double time_stamp,
                            const TrajectoryPoint& init_adc_point) {
   frame_.reset(new Frame(sequence_num));
   frame_->SetPlanningStartPoint(init_adc_point);

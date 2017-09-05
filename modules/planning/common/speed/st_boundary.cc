@@ -21,6 +21,7 @@
 #include "modules/planning/common/speed/st_boundary.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -36,7 +37,7 @@ StBoundary::StBoundary(
   CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
 
   std::vector<std::pair<STPoint, STPoint>> reduced_pairs(point_pairs);
-  RemoveRedundantPoints(reduced_pairs);
+  RemoveRedundantPoints(&reduced_pairs);
 
   for (const auto& item : reduced_pairs) {
     // use same t for both points
@@ -71,8 +72,8 @@ bool StBoundary::IsPointNear(const common::math::LineSegment2d& seg,
 }
 
 void StBoundary::RemoveRedundantPoints(
-    std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
-  if (point_pairs.size() == 2) {
+    std::vector<std::pair<STPoint, STPoint>>* point_pairs) {
+  if (!point_pairs || point_pairs->size() <= 2) {
     return;
   }
 
@@ -80,20 +81,22 @@ void StBoundary::RemoveRedundantPoints(
   size_t i = 0;
   size_t j = 1;
 
-  while (i < point_pairs.size() && j + 1 < point_pairs.size()) {
-    LineSegment2d lower_seg(point_pairs[i].first, point_pairs[j + 1].first);
-    LineSegment2d upper_seg(point_pairs[i].second, point_pairs[j + 1].second);
-    if (!IsPointNear(lower_seg, point_pairs[j].first, kMaxDist) ||
-        !IsPointNear(upper_seg, point_pairs[j].second, kMaxDist)) {
+  while (i < point_pairs->size() && j + 1 < point_pairs->size()) {
+    LineSegment2d lower_seg(point_pairs->at(i).first,
+                            point_pairs->at(j + 1).first);
+    LineSegment2d upper_seg(point_pairs->at(i).second,
+                            point_pairs->at(j + 1).second);
+    if (!IsPointNear(lower_seg, point_pairs->at(j).first, kMaxDist) ||
+        !IsPointNear(upper_seg, point_pairs->at(j).second, kMaxDist)) {
       ++i;
       if (i != j) {
-        point_pairs[i] = point_pairs[j];
+        point_pairs->at(i) = point_pairs->at(j);
       }
     }
     ++j;
   }
-  point_pairs[++i] = point_pairs.back();
-  point_pairs.resize(i + 1);
+  point_pairs->at(++i) = point_pairs->back();
+  point_pairs->resize(i + 1);
 }
 
 bool StBoundary::IsValid(
@@ -132,7 +135,10 @@ bool StBoundary::IsValid(
   return true;
 }
 
+double StBoundary::Area() const { return area_; }
+
 void StBoundary::CalculateArea() {
+  area_ = 0.0;
   for (size_t i = 0; i + 1 < lower_points_.size(); ++i) {
     area_ += (upper_points_[i].y() - lower_points_[i].y()) *
              (lower_points_[i + 1].x() - lower_points_[i].x());

@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_COMMON_PATH_DECISION_H_
 
 #include <list>
+#include <memory>
 #include <string>
 #include <vector>
 
