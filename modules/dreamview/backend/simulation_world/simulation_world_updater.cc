@@ -37,11 +37,9 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket) {
-
   // Initialize default end point
   CHECK(apollo::common::util::GetProtoFromASCIIFile(
-      apollo::hdmap::EndWayPointFile(),
-      &default_end_point_));
+      apollo::hdmap::EndWayPointFile(), &default_end_point_));
 
   websocket_->RegisterMessageHandler(
       "RetrieveMapData",
@@ -75,20 +73,17 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
         // publish message
         if (succeed) {
-          sim_world_service_.PublishMessage(
-              MonitorMessageItem::LogLevel::MonitorMessageItem_LogLevel_INFO,
-              "Routing Request Sent");
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
+                                                   "Routing Request Sent");
         } else {
-          sim_world_service_.PublishMessage(
-              MonitorMessageItem::LogLevel::MonitorMessageItem_LogLevel_ERROR,
-              "Failed to send routing request");
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR, "Failed to send routing request");
         }
       });
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
-      const Json &json,
-      RoutingRequest* routing_request) {
+    const Json &json, RoutingRequest *routing_request) {
   // set start point
   auto start = json["start"];
   if (start.find("x") == start.end() || start.find("y") == start.end()) {
@@ -101,9 +96,9 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
   // set way point(s) if any
   auto iter = json.find("waypoint");
   if (iter != json.end()) {
-    auto* waypoint = routing_request->mutable_waypoint();
+    auto *waypoint = routing_request->mutable_waypoint();
     for (size_t i = 0; i < iter->size(); ++i) {
-      auto& point = (*iter)[i];
+      auto &point = (*iter)[i];
       if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
                                                waypoint->Add())) {
         waypoint->RemoveLast();
