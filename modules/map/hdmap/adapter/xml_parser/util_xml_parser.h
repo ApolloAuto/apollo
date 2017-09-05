@@ -12,13 +12,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H
-#define MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H
+#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_
+#define MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "tinyxml2/tinyxml2.h"
+
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
-#include "tinyxml2.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 
 namespace apollo {
@@ -28,15 +30,14 @@ namespace adapter {
 class UtilXmlParser {
  public:
   static Status ParseCurve(const tinyxml2::XMLElement& xml_node,
-                            PbCurve* curve);
+                           PbCurve* curve);
   static Status ParseGeometry(const tinyxml2::XMLElement& xml_node,
                               PbCurveSegment* curve_segment);
   static Status ParsePointSet(const tinyxml2::XMLElement& xml_node,
                               PbLineSegment* line_segment);
   static Status ParseOutline(const tinyxml2::XMLElement& xml_node,
-                              PbPolygon* polygon);
-  static Status ParsePoint(const tinyxml2::XMLElement& xml_node,
-                              PbPoint3D* pt);
+                             PbPolygon* polygon);
+  static Status ParsePoint(const tinyxml2::XMLElement& xml_node, PbPoint3D* pt);
 
   static std::string CreateLaneId(const std::string& road_id,
                                   const std::string& section_id,
@@ -44,14 +45,13 @@ class UtilXmlParser {
   static std::string ToUpper(const std::string& s);
 
   static void WGS84ToUTM(const double x, const double y, const double z,
-                      double* output_x, double* output_y, double* output_z);
+                         double* output_x, double* output_y, double* output_z);
 
   static double CurveLength(const PbCurve& curve);
 
   static tinyxml2::XMLError QueryStringAttribute(
-                                      const tinyxml2::XMLElement& xml_node,
-                                      const std::string& name,
-                                      std::string* value);
+      const tinyxml2::XMLElement& xml_node, const std::string& name,
+      std::string* value);
 
  private:
   static double x_min_;
@@ -66,4 +66,4 @@ int GetLongZone(double longitude);
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H
+#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_

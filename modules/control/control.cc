@@ -134,7 +134,8 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   Status status = CheckInput();
   // check data
   if (!status.ok()) {
-    AERROR_EVERY(100) << "Control input data failed: " << status.error_message();
+    AERROR_EVERY(100) << "Control input data failed: "
+                      << status.error_message();
     estop_ = true;
   } else {
     Status status_ts = CheckTimestamp();

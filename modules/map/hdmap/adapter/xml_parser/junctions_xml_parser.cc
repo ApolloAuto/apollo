@@ -13,10 +13,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/adapter/xml_parser/junctions_xml_parser.h"
+
 #include <string>
 #include <vector>
+
+#include "tinyxml2/tinyxml2.h"
+
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
-#include "tinyxml2.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
@@ -25,25 +28,25 @@ namespace hdmap {
 namespace adapter {
 
 Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
-                        std::vector<JunctionInternal>* junctions) {
-  const tinyxml2::XMLElement* junction_node
-                                  = xml_node.FirstChildElement("junction");
+                                 std::vector<JunctionInternal>* junctions) {
+  const tinyxml2::XMLElement* junction_node =
+      xml_node.FirstChildElement("junction");
   while (junction_node) {
     // id
     std::string junction_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*junction_node,
-                                                        "id", &junction_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*junction_node, "id", &junction_id);
     if (checker != tinyxml2::XML_SUCCESS) {
-        std::string err_msg = "Error parse junction id";
-        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      std::string err_msg = "Error parse junction id";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
     // outline
     const tinyxml2::XMLElement* sub_node =
-                                junction_node->FirstChildElement("outline");
+        junction_node->FirstChildElement("outline");
     if (!sub_node) {
-        std::string err_msg = "Error parse junction outline";
-        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      std::string err_msg = "Error parse junction outline";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
     PbJunction junction;
@@ -59,21 +62,20 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     if (sub_node) {
       sub_node = sub_node->FirstChildElement("objectReference");
       while (sub_node) {
-          std::string object_id;
-          checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                              &object_id);
-          if (checker != tinyxml2::XML_SUCCESS) {
-              std::string err_msg = "Error parse junction overlap id";
-              return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR,
-                          err_msg);
-          }
+        std::string object_id;
+        checker =
+            UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
+        if (checker != tinyxml2::XML_SUCCESS) {
+          std::string err_msg = "Error parse junction overlap id";
+          return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+        }
 
-          OverlapWithJunction overlap_with_juntion;
-          overlap_with_juntion.object_id = object_id;
-          junction_internal.overlap_with_junctions.push_back(
-                                                  overlap_with_juntion);
+        OverlapWithJunction overlap_with_juntion;
+        overlap_with_juntion.object_id = object_id;
+        junction_internal.overlap_with_junctions.push_back(
+            overlap_with_juntion);
 
-          sub_node = sub_node->NextSiblingElement("objectReference");
+        sub_node = sub_node->NextSiblingElement("objectReference");
       }
     }
 
