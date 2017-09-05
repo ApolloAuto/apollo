@@ -3,19 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "evaluator_factory",
-    srcs = ["evaluator_factory.cc"],
-    hdrs = ["evaluator_factory.h"],
-    deps = [
-        "//modules/common:macro",
-        "//modules/common/util:factory",
-        "//modules/prediction/evaluator/vehicle:mlp_evaluator",
-        "//modules/prediction/proto:prediction_conf_proto",
-        "@glog//:glog",
-    ],
-)
-
-cc_library(
     name = "evaluator_manager",
     srcs = ["evaluator_manager.cc"],
     hdrs = ["evaluator_manager.h"],
