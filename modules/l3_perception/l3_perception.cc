@@ -97,20 +97,42 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
                      adc_quaternion.qz() * adc_quaternion.qz())) +
       acos(-1.0) / 2.0;
 
-  for (int index = 0; index < mobileye.details_738().num_obstacles(); ++index) {
+  for (int index = 0; index < mobileye.details_738().num_obstacles() && index < mobileye.details_739_size(); ++index) {
     auto* mob = obstacles.add_perception_obstacle();
     const auto& data_739 = mobileye.details_739(index);
-    const auto& data_73a = mobileye.details_73a(index);
     int mob_id = data_739.obstacle_id();
     double mob_pos_x = data_739.obstacle_pos_x();
     double mob_pos_y = - data_739.obstacle_pos_y();
     double mob_vel_x = data_739.obstacle_rel_vel_x();
     int mob_type = data_739.obstacle_type();
 
-    double mob_l = data_73a.obstacle_length();
-    double mob_w = data_73a.obstacle_width();
+    double mob_l = 0.0;
+    if (mob_type == 0) {
+      mob_l = 5; // car
+    } else if (mob_type == 1) {
+      mob_l = 10; // truck
+    } else if (mob_type == 2 || mob_type == 4) {
+      mob_l = 2; // bike
+    } else if (mob_type == 3) {
+      mob_l = .5; // ped
+    }
 
-    mob_pos_x += 3;
+    double mob_w = 0.0;
+    if (mobileye.details_73a_size() <= index) {
+        if (mob_type == 0) {
+            mob_w = 3;
+        } else if (mob_type == 1) {
+            mob_w = 5;
+        } else if (mob_type == 2 || mob_type == 4) {
+            mob_w = 1;
+        } else if (mob_type == 3) {
+            mob_w = 0.5;
+        }
+    } else {
+        mob_w = mobileye.details_73a(index).obstacle_width();
+    }
+
+    mob_pos_x += 3.0; // offset: imu <-> mobileye
 
     double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) + mob_pos_y * std::sin(adc_theta);
     double converted_y = adc_y + mob_pos_x * std::sin(adc_theta) - mob_pos_y * std::cos(adc_theta);
@@ -197,10 +219,10 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
 
   apollo::perception::PerceptionObstacles obstacles;
 
-  if (mobileye_.header().timestamp_sec() >= last_timestamp_) {
+  // if (mobileye_.header().timestamp_sec() >= last_timestamp_) {
     apollo::perception::PerceptionObstacles mobileye_obstacles = ConvertToPerceptionObstacles(mobileye_, localization_);
     obstacles.MergeFrom(mobileye_obstacles);
-  }
+  // }
 
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
   AdapterManager::PublishPerceptionObstacles(obstacles);
