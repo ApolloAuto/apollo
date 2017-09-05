@@ -40,7 +40,17 @@ class ObjectTrack {
   // @brief set filter method for all the object track objects
   // @params[IN] filter_method: method name of filtering algorithm
   // @return nothing
-  static void SetFilterMethod(const FilterType& filter_method);
+  static void SetFilterMethod(
+    const FilterType& filter_method);
+
+  static bool SetTrackCachedHistorySizeMaximum(
+    const int& track_cached_history_size_maximum);
+
+  static bool SetSpeedNoiseMaximum(
+    const double& speed_noise_maximum);
+
+  static bool SetAccelerationNoiseMaximum(
+    const double& acceleration_noise_maximum);
 
   // @brief get next avaiable track id
   // @return next avaiable track id
@@ -49,33 +59,39 @@ class ObjectTrack {
   // @brief predict the state of track
   // @params[IN] time_diff: time interval for predicting
   // @return predicted states of track
-  Eigen::VectorXf Predict(const double time_diff);
+  Eigen::VectorXf Predict(
+    const double time_diff);
 
   // @brief update track with object
   // @params[IN] new_object: new object for current updating
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithObject(TrackedObjectPtr* new_object, const double time_diff);
+  void UpdateWithObject(
+    TrackedObjectPtr* new_object,
+    const double time_diff);
 
   // @brief update track without object
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithoutObject(const double time_diff);
+  void UpdateWithoutObject(
+    const double time_diff);
 
   // @brief update track without object with given predicted state
   // @params[IN] predict_state: given predicted state of track
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithoutObject(const Eigen::VectorXf& predict_state,
-                           const double time_diff);
+  void UpdateWithoutObject(
+    const Eigen::VectorXf& predict_state,
+    const double time_diff);
 
  protected:
   // @brief smooth velocity over track history
   // @params[IN] new_object: new detected object for updating
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void SmoothTrackVelocity(const TrackedObjectPtr& new_object,
-                           const double time_diff);
+  void SmoothTrackVelocity(
+    const TrackedObjectPtr& new_object,
+    const double time_diff);
 
   // @brief smooth orientation over track history
   // @return nothing
@@ -89,8 +105,9 @@ class ObjectTrack {
   // @params[IN] new_object: new detected object just updated
   // @params[IN] time_diff: time interval between last two updating
   // @return true if track is static, otherwise return false
-  bool CheckTrackStaticHypothesis(const ObjectPtr& new_object,
-                                  const double time_diff);
+  bool CheckTrackStaticHypothesis(
+    const ObjectPtr& new_object,
+    const double time_diff);
 
   // @brief sub strategy of checking whether track is static or not via
   // considering the velocity angle change
@@ -106,40 +123,36 @@ class ObjectTrack {
 
  public:
   // algorithm setup
-  static FilterType s_filter_method_;
-  BaseFilter* filter_;
+  static FilterType             s_filter_method_;
+  BaseFilter*                   filter_;
 
   // basic info
-  int idx_;
-  int age_;
-  int total_visible_count_;
-  int consecutive_invisible_count_;
-  double period_;
+  int                           idx_;
+  int                           age_;
+  int                           total_visible_count_;
+  int                           consecutive_invisible_count_;
+  double                        period_;
 
-  TrackedObjectPtr current_object_;
+  TrackedObjectPtr              current_object_;
 
   // history
-  std::deque<TrackedObjectPtr> history_objects_;
-
-  // history type info
-  std::vector<float> accumulated_type_probs_;
-  int type_life_time_;
+  std::deque<TrackedObjectPtr>  history_objects_;
 
   // states
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
   // of track !!!!!
-  bool is_static_hypothesis_;
-  Eigen::Vector3f belief_anchor_point_;
-  Eigen::Vector3f belief_velocity_;
-  Eigen::Vector3f belief_velocity_accelaration_;
+  bool                          is_static_hypothesis_;
+  Eigen::Vector3f               belief_anchor_point_;
+  Eigen::Vector3f               belief_velocity_;
+  Eigen::Vector3f               belief_velocity_accelaration_;
 
  private:
   // global setup
-  static int s_track_idx_;
-  static const int s_max_cached_object_size_ = 20;
-  static constexpr double s_claping_speed_threshold_ = 0.4;
-  static constexpr double s_claping_accelaration_threshold_ = 5;
+  static int                    s_track_idx_;
+  static int                    s_track_cached_history_size_maximum_;
+  static double                 s_speed_noise_maximum_;
+  static double                 s_acceleration_noise_maximum_;
 
   DISALLOW_COPY_AND_ASSIGN(ObjectTrack);
 };  // class ObjectTrack
@@ -151,33 +164,36 @@ class ObjectTrackSet {
   ObjectTrackSet();
   ~ObjectTrackSet();
 
-  inline std::vector<ObjectTrackPtr>& get_tracks() {
+  static bool SetTrackConsecutiveInvisibleMaximum(
+    const int& track_consecutive_invisible_maximum);
+
+  inline std::vector<ObjectTrackPtr>& GetTracks() {
     return tracks_;
   }
 
-  inline const std::vector<ObjectTrackPtr>& get_tracks() const {
+  inline const std::vector<ObjectTrackPtr>& GetTracks() const {
     return tracks_;
   }
 
-  inline int size() const {
+  inline int Size() const {
     return tracks_.size();
   }
 
-  void add_track(const ObjectTrackPtr& track) {
+  void AddTrack(const ObjectTrackPtr& track) {
     tracks_.push_back(track);
   }
 
-  int remove_lost_tracks();
+  int RemoveLostTracks();
 
-  void clear();
+  void Clear();
 
  public:
-  static int s_maximum_consecutive_invisible_count_;
+  static int s_track_consecutive_invisible_maximum_;
 
  private:
-  std::vector<ObjectTrackPtr> tracks_;
-  int age_threshold_;
-  double minimum_visible_ratio_;
+  std::vector<ObjectTrackPtr>   tracks_;
+  int                           age_threshold_;
+  double                        minimum_visible_ratio_;
 };  // class ObjectTrackSet
 
 }  // namespace perception

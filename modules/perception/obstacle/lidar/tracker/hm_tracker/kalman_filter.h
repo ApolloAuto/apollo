@@ -32,12 +32,14 @@ class KalmanFilter : public BaseFilter {
   // @brief set use adaptive for all the filter objects
   // @params[IN] use_adaptive: flag of whether use adaptive version or not
   // @return nothing
-  static void SetUseAdaptive(const bool use_adaptive);
+  static void SetUseAdaptive(
+    const bool use_adaptive);
 
   // @brief set max adaptive score for computing update qaulity
   // @params[IN] max_adaptive_score: adaptive score upperbound
   // @return nothing
-  static void SetMaxAdaptiveScore(const double max_adaptive_score);
+  static void SetMaxAdaptiveScore(
+    const double max_adaptive_score);
 
   // @brief init core parameters of all the filter objects
   // @params[IN] centroid_measurement_noise: noise of centroid measurement
@@ -45,58 +47,66 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] propagation_variance_xy: propagation uncertainty of xy
   // @params[IN] propagation_variance_z: propagation uncertainty of z
   // @return nothing
-  static void InitParams(const double measurement_noise,
-                         const double init_velocity_variance,
-                         const double propagation_variance_xy,
-                         const double propagation_variance_z);
+  static void InitParams(
+    const double measurement_noise,
+    const double init_velocity_variance,
+    const double propagation_variance_xy,
+    const double propagation_variance_z);
 
   // @brief initialize the state of filter
   // @params[IN] anchor_point: initial anchor point for filtering
   // @params[IN] velocity: initial velocity for filtering
   // @return nothing
-  void Initialize(const Eigen::Vector3f& anchor_point,
-                  const Eigen::Vector3f& velocity);
+  void Initialize(
+    const Eigen::Vector3f& anchor_point,
+    const Eigen::Vector3f& velocity);
 
   // @brief predict the state of filter
   // @params[IN] time_diff: time interval for predicting
   // @return predicted states of filtering
-  Eigen::VectorXf Predict(const double time_diff);
+  Eigen::VectorXf Predict(
+    const double time_diff);
 
   // @brief update filter with object
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithObject(const TrackedObjectPtr& new_object,
-                        const TrackedObjectPtr& old_object,
-                        const double time_diff);
+  void UpdateWithObject(
+    const TrackedObjectPtr& new_object,
+    const TrackedObjectPtr& old_object,
+    const double time_diff);
 
   // @brief update filter without object
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithoutObject(const double time_diff);
+  void UpdateWithoutObject(
+    const double time_diff);
 
   // @brief get state of filter
   // @params[OUT] anchor_point: anchor point of current state
   // @params[OUT] velocity: velocity of current state
   // @return nothing
-  void GetState(Eigen::Vector3f* anchor_point,
-                Eigen::Vector3f* velocity);
+  void GetState(
+    Eigen::Vector3f* anchor_point,
+    Eigen::Vector3f* velocity);
 
   // @brief get state of filter with accelaration
   // @params[OUT] anchor_point: anchor point of current state
   // @params[OUT] velocity: velocity of current state
   // @params[OUT] velocity_accelaration: accelaration of current state
   // @return nothing
-  void GetState(Eigen::Vector3f* anchor_point,
-                Eigen::Vector3f* velocity,
-                Eigen::Vector3f* velocity_accelaration);
+  void GetState(
+    Eigen::Vector3f* anchor_point,
+    Eigen::Vector3f* velocity,
+    Eigen::Vector3f* velocity_accelaration);
 
  protected:
   // @brief propagate covariance of filter
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void Propagate(const double time_diff);
+  void Propagate(
+    const double time_diff);
 
   // @brief compute measured velocity
   // @params[IN] new_object: new object for current updating
@@ -156,16 +166,18 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] measured_velocity: velocity of given measurement
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateModel(const Eigen::VectorXf measured_anchor_point,
-                   const Eigen::VectorXf measured_velocity,
-                   const double time_diff);
+  void UpdateModel(
+    const Eigen::VectorXf measured_anchor_point,
+    const Eigen::VectorXf measured_velocity,
+    const double time_diff);
 
   // @brief compute update quality for adaptive filtering
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @reutrn nothing
-  void ComputeUpdateQuality(const TrackedObjectPtr& new_object,
-                            const TrackedObjectPtr& old_object);
+  void ComputeUpdateQuality(
+    const TrackedObjectPtr& new_object,
+    const TrackedObjectPtr& old_object);
 
   // @brief compute update quality by using association score
   // @params[IN] new_object: new object for current updating

@@ -84,8 +84,8 @@ bool ConstructObjects(const std::string& filename,
     ObjectPtr obj(new Object());
     obj->cloud->resize(no_point);
     for (int j = 0; j < no_point; ++j) {
-      ifs >> obj->cloud->points[j].x >> obj->cloud->points[j].y >>
-          obj->cloud->points[j].z >> obj->cloud->points[j].intensity;
+      ifs >> obj->cloud->points[j].x >> obj->cloud->points[j].y
+          >> obj->cloud->points[j].z >> obj->cloud->points[j].intensity;
     }
     (*objects).push_back(obj);
   }
@@ -108,63 +108,6 @@ bool LoadPclPcds(const std::string filename,
     pt.intensity = org_cloud.points[i].intensity;
     if (isnan(org_cloud.points[i].x)) continue;
     (*cloud_out)->push_back(pt);
-  }
-  return true;
-}
-
-bool SaveTrackingResults(const std::vector<ObjectPtr>& objects,
-                         const Eigen::Matrix4d& pose_v2w, const int frame_id,
-                         pcl_util::PointCloudPtr* cloud,
-                         const std::string& filename) {
-  std::ofstream fout(filename.c_str(), std::ios::out);
-  if (!fout) {
-    AERROR << filename << " is not exist!";
-    return false;
-  }
-  fout << frame_id << " " << objects.size() << std::endl;
-  typename pcl::PointCloud<pcl_util::Point>::Ptr trans_cloud(
-      new pcl::PointCloud<pcl_util::Point>());
-
-  Eigen::Matrix4d pose_velo2w = pose_v2w;
-  pcl::copyPointCloud(*(*cloud), *trans_cloud);
-  TransformPointCloud<pcl_util::Point>(pose_v2w, trans_cloud);
-  pcl::KdTreeFLANN<pcl_util::Point> pcl_kdtree;
-  pcl_kdtree.setInputCloud(trans_cloud);
-  std::vector<int> k_indices;
-  std::vector<float> k_sqrt_dist;
-  Eigen::Matrix4d pose_w2v = pose_velo2w.inverse();
-
-  for (size_t i = 0; i < objects.size(); ++i) {
-    Eigen::Vector3f coord_dir(0, 1, 0);
-    Eigen::Vector4d dir_velo =
-        pose_w2v * Eigen::Vector4d(objects[i]->direction[0],
-                                   objects[i]->direction[1],
-                                   objects[i]->direction[2], 0);
-    Eigen::Vector4d ct_velo =
-        pose_w2v * Eigen::Vector4d(objects[i]->center[0], objects[i]->center[1],
-                                   objects[i]->center[2], 0);
-    Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
-    double theta = VectorTheta2dXy(coord_dir, dir_velo3);
-    std::string type = "unknown";
-    fout << objects[i]->id << " " << objects[i]->track_id << " " << type << " "
-         << std::setprecision(10) << ct_velo[0] << " " << ct_velo[1] << " "
-         << ct_velo[2] << " " << objects[i]->length << " " << objects[i]->width
-         << " " << objects[i]->height << " " << theta << " " << 0 << " " << 0
-         << " " << objects[i]->velocity[0] << " " << objects[i]->velocity[1]
-         << " " << objects[i]->velocity[2] << " " << objects[i]->cloud->size()
-         << " ";
-    for (size_t j = 0; j < objects[i]->cloud->size(); ++j) {
-      const pcl_util::Point& pt = objects[i]->cloud->points[j];
-      pcl_util::Point query_pt;
-      query_pt.x = pt.x;
-      query_pt.y = pt.y;
-      query_pt.z = pt.z;
-      k_indices.resize(1);
-      k_sqrt_dist.resize(1);
-      pcl_kdtree.nearestKSearch(query_pt, 1, k_indices, k_sqrt_dist);
-      fout << k_indices[0] << " ";
-    }
-    fout << std::endl;
   }
   return true;
 }

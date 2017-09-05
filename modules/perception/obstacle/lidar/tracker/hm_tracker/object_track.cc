@@ -29,7 +29,10 @@ namespace perception {
 
 int ObjectTrack::s_track_idx_ = 0;
 FilterType ObjectTrack::s_filter_method_ = KALMAN_FILTER;
-int ObjectTrackSet::s_maximum_consecutive_invisible_count_ = 1;
+int ObjectTrack::s_track_cached_history_size_maximum_ = 20;
+double ObjectTrack::s_speed_noise_maximum_ = 0.4;
+double ObjectTrack::s_acceleration_noise_maximum_ = 5;
+int ObjectTrackSet::s_track_consecutive_invisible_maximum_ = 1;
 
 void ObjectTrack::SetFilterMethod(const FilterType& filter_method) {
   // Set filter method for all the track objects
@@ -39,6 +42,39 @@ void ObjectTrack::SetFilterMethod(const FilterType& filter_method) {
     AINFO << "invalid filter_method!";
   }
   AINFO << "track filter algorithm is " << s_filter_method_;
+}
+
+bool ObjectTrack::SetTrackCachedHistorySizeMaximum(
+  const int& track_cached_history_size_maximum) {
+  if (track_cached_history_size_maximum > 0) {
+    s_track_cached_history_size_maximum_ = track_cached_history_size_maximum;
+    AINFO << "track cached history size maximum is "
+          << s_track_cached_history_size_maximum_;
+    return true;
+  }
+  AERROR << "invalid track cached history size maximum!";
+  return false;
+}
+
+bool ObjectTrack::SetSpeedNoiseMaximum(const double& speed_noise_maximum) {
+  if (speed_noise_maximum > 0) {
+    s_speed_noise_maximum_ = speed_noise_maximum;
+    AINFO << "speed noise maximum is " << s_speed_noise_maximum_;
+    return true;
+  }
+  AERROR << "invalid speed noise maximum!";
+  return false;
+}
+
+bool ObjectTrack::SetAccelerationNoiseMaximum(
+  const double& acceleration_noise_maximum) {
+  if (acceleration_noise_maximum > 0) {
+    s_acceleration_noise_maximum_ = acceleration_noise_maximum;
+    AINFO << "acceleration noise maximum is " << s_acceleration_noise_maximum_;
+    return true;
+  }
+  AERROR << "invalid acceleration noise maximum!";
+  return false;
 }
 
 int ObjectTrack::GetNextTrackId() {
@@ -69,9 +105,6 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   consecutive_invisible_count_ = 0;
   period_ = 0.0;
   current_object_ = obj;
-  accumulated_type_probs_ = std::vector<float>(MAX_OBJECT_TYPE, 0.0);
-  accumulated_type_probs_ = obj->object_ptr->type_probs;
-  type_life_time_ = 0;
 
   // Initialize track states
   is_static_hypothesis_ = false;
@@ -150,7 +183,8 @@ void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
   period_ += time_diff;
 
   // 1.5 update history
-  if (history_objects_.size() >= s_max_cached_object_size_) {
+  int history_size = history_objects_.size();
+  if (history_size >= s_track_cached_history_size_maximum_) {
     history_objects_.pop_front();
   }
   history_objects_.push_back(current_object_);
@@ -218,7 +252,8 @@ void ObjectTrack::UpdateWithoutObject(const double time_diff) {
   period_ += time_diff;
 
   // Update history
-  if (history_objects_.size() >= s_max_cached_object_size_) {
+  int history_size = history_objects_.size();
+  if (history_size >= s_track_cached_history_size_maximum_) {
     history_objects_.pop_front();
   }
   history_objects_.push_back(current_object_);
@@ -271,7 +306,8 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
   period_ += time_diff;
 
   // Update history
-  if (history_objects_.size() >= s_max_cached_object_size_) {
+  int history_size = history_objects_.size();
+  if (history_size >= s_track_cached_history_size_maximum_) {
     history_objects_.pop_front();
   }
   history_objects_.push_back(current_object_);
@@ -289,7 +325,7 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
     &filter_velocity_accelaration);
   double filter_accelaration = filter_velocity_accelaration.norm();
   bool need_keep_motion = filter_accelaration >
-    s_claping_accelaration_threshold_;
+    s_acceleration_noise_maximum_;
   if (need_keep_motion) {
     Eigen::Vector3f last_velocity = Eigen::Vector3f::Zero();
     if (history_objects_.size() > 0) {
@@ -325,7 +361,7 @@ void ObjectTrack::SmoothTrackOrientation() {
   // Smooth orientation over track history
   Eigen::Vector3f current_dir = current_object_->direction;
   float current_speed = current_object_->velocity.head(2).norm();
-  bool velocity_is_obvious = current_speed > (s_claping_speed_threshold_ * 2);
+  bool velocity_is_obvious = current_speed > (s_speed_noise_maximum_ * 2);
   if (velocity_is_obvious) {
     current_dir = current_object_->velocity;
   } else {
@@ -354,8 +390,8 @@ bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
     CheckTrackStaticHypothesisByVelocityAngleChange(new_object, time_diff);
   // Evaluate velocity level
   double speed = belief_velocity_.head(2).norm();
-  bool velocity_is_noise = speed < (s_claping_speed_threshold_ / 2);
-  bool velocity_is_small = speed < (s_claping_speed_threshold_ / 1);
+  bool velocity_is_noise = speed < (s_speed_noise_maximum_ / 2);
+  bool velocity_is_small = speed < (s_speed_noise_maximum_ / 1);
   if (velocity_is_noise) {
     return true;
   }
@@ -396,10 +432,21 @@ ObjectTrackSet::ObjectTrackSet(): age_threshold_(5),
 }
 
 ObjectTrackSet::~ObjectTrackSet() {
-  clear();
+  Clear();
 }
 
-void ObjectTrackSet::clear() {
+bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
+  const int& track_consecutive_invisible_maximum) {
+  if (track_consecutive_invisible_maximum >= 0) {
+    s_track_consecutive_invisible_maximum_ =
+      track_consecutive_invisible_maximum;
+    return true;
+  }
+  AERROR << "Failed to set track consecutive invisible maximum! ";
+  return false;
+}
+
+void ObjectTrackSet::Clear() {
   for (size_t i = 0; i < tracks_.size(); i++) {
     if (tracks_[i]) {
       delete (tracks_[i]);
@@ -409,7 +456,7 @@ void ObjectTrackSet::clear() {
   tracks_.clear();
 }
 
-int ObjectTrackSet::remove_lost_tracks() {
+int ObjectTrackSet::RemoveLostTracks() {
   size_t track_num = 0;
   for (size_t i = 0; i < tracks_.size(); i++) {
     if (tracks_[i]->age_ < age_threshold_ &&
@@ -424,7 +471,7 @@ int ObjectTrackSet::remove_lost_tracks() {
     }
 
     if (tracks_[i]->consecutive_invisible_count_
-      > s_maximum_consecutive_invisible_count_) {
+      > s_track_consecutive_invisible_maximum_) {
       continue;
     }
 
