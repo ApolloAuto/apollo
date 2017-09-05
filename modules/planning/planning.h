@@ -82,6 +82,7 @@ class Planning : public apollo::common::ApolloApp {
   void RunOnce();
 
   common::Status InitFrame(const uint32_t sequence_num,
+                           const double time_stamp,
                            const common::TrajectoryPoint& init_adc_point);
 
  private:
@@ -106,8 +107,6 @@ class Planning : public apollo::common::ApolloApp {
   std::unique_ptr<Planner> planner_;
 
   PublishableTrajectory last_publishable_trajectory_;
-
-  double start_timestamp_ = 0.0;
 
   ros::Timer timer_;
 };
