@@ -14,13 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <opencv2/opencv.hpp>
 #include <fstream>
 #include <iostream>
-#include <opencv2/opencv.hpp>
 #include <string>
 #include "gflags/gflags.h"
-
-using namespace std;
 
 DEFINE_string(test_dir, "/apollo/modules/perception/data/cnnseg_test/",
               "test data directory");
@@ -30,22 +28,22 @@ DEFINE_string(pcd_name, "uscar_12_1470770225_1470770492_1349",
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  string test_dir(FLAGS_test_dir);
-  string det_res_file = test_dir + FLAGS_pcd_name + "-detection.txt";
-  ifstream f_res(det_res_file.c_str(), std::ifstream::in);
+  std::string test_dir(FLAGS_test_dir);
+  std::string det_res_file = test_dir + FLAGS_pcd_name + "-detection.txt";
+  std::ifstream f_res(det_res_file.c_str(), std::ifstream::in);
 
-  string line;
+  std::string line;
 
-  getline(f_res, line);
+  std::getline(f_res, line);
   int rows, cols;
-  istringstream iss(line);
+  std::istringstream iss(line);
   iss >> rows >> cols;
-  cout << "#rows = " << rows << ", #cols = " << cols << endl;
+  std::cout << "#rows = " << rows << ", #cols = " << cols << endl;
 
   cv::Mat img(rows, cols, CV_8UC3, cv::Scalar(0.0));
   int grid = 0;
-  while (getline(f_res, line)) {
-    istringstream iss(line);
+  while (std::getline(f_res, line)) {
+    std::istringstream iss(line);
     int blue, green, red;
     iss >> blue >> green >> red;
     img.at<cv::Vec3b>(grid / cols, grid % cols) = cv::Vec3b(blue, green, red);
@@ -56,7 +54,7 @@ int main(int argc, char** argv) {
   }
   f_res.close();
 
-  string res_img_file = test_dir + FLAGS_pcd_name + "-detection.png";
+  std::string res_img_file = test_dir + FLAGS_pcd_name + "-detection.png";
   if (!cv::imwrite(res_img_file, img)) {
     return -1;
   }
@@ -64,3 +62,4 @@ int main(int argc, char** argv) {
   google::ShutDownCommandLineFlags();
   return 0;
 }
+

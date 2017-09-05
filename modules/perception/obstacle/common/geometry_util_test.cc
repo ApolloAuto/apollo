@@ -106,7 +106,7 @@ TEST_F(GeometryUtilTest, TransformPointCloud2) {
   EXPECT_NEAR(1.715922, in_out_cloud->at(0).z, EPSILON);
 
   pcl_util::PointCloudPtr out_cloud(new pcl_util::PointCloud);
-  TransformPointCloud(*_clouds[0], *out_cloud, _trans_matrix);
+  TransformPointCloud(*_clouds[0], out_cloud.get(), _trans_matrix);
   EXPECT_NEAR(64.184380, out_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, out_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, out_cloud->at(0).z, EPSILON);

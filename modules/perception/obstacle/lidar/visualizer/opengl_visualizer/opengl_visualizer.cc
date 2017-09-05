@@ -131,7 +131,7 @@ void OpenglVisualizer::UpdateCameraSystem(FrameContent *content) {
                                   &view_point_world_, pose_v2w);
 
   TransformPointCloud<pcl_util::Point>(main_car_points_velodyne_,
-                                       main_car_points_world_, pose_v2w);
+                                       &main_car_points_world_, pose_v2w);
 
   Eigen::Vector4d up_w(up_velodyne_.x, up_velodyne_.y, up_velodyne_.z, 0);
 

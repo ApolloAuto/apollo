@@ -53,6 +53,7 @@
 // using tracker to do somethings.
 // ////////////////////////////////////////////////////
 
+#include <memory>
 #include <string>
 #include <vector>
 

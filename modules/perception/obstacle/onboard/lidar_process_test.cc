@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include <pcl/io/pcd_io.h>
+#include <string>
 #include <vector>
 
 #include "gtest/gtest.h"
