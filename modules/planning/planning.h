@@ -85,6 +85,9 @@ class Planning : public apollo::common::ApolloApp {
                            const common::TrajectoryPoint& init_adc_point);
 
  private:
+  // Watch dog timer
+  void OnTimer(const ros::TimerEvent&);
+
   void PublishPlanningPb(ADCTrajectory* trajectory_pb);
 
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
@@ -105,6 +108,8 @@ class Planning : public apollo::common::ApolloApp {
   PublishableTrajectory last_publishable_trajectory_;
 
   double start_timestamp_ = 0.0;
+
+  ros::Timer timer_;
 };
 
 }  // namespace planning
