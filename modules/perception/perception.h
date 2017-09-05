@@ -22,6 +22,7 @@
 #define MODEULES_PERCEPTION_PERCEPTION_H_
 
 #include <string>
+#include <memory>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"

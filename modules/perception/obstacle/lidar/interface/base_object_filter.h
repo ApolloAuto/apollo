@@ -52,6 +52,7 @@
 // using roi_filter to do somethings.
 // ////////////////////////////////////////////////////
 
+#include <memory>
 #include <string>
 #include <vector>
 

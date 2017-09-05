@@ -99,7 +99,8 @@ bool HDMapInput::GetNearestLaneDirection(const pcl_util::PointD& pointd,
   double nearest_s;
   double nearest_l;
 
-  int status = hdmap->GetNearestLane(point, &nearest_lane, &nearest_s, &nearest_l);
+  int status = hdmap->GetNearestLane(point,
+          &nearest_lane, &nearest_s, &nearest_l);
   if (status != SUCC) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
     return false;

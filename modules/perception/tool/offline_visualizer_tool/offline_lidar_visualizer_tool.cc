@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <pcl/io/pcd_io.h>
 #include <cstddef>
 #include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <vector>
 #include <string>
-#include <pcl/io/pcd_io.h>
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -132,13 +132,13 @@ class OfflineLidarPerceptionTool {
       if (FLAGS_save_obstacles) {
         oss << std::setfill('0') << std::setw(6) << i;
         std::string filename = FLAGS_output_path + oss.str() + ".txt";
-        SaveTrackingInformation(result_objects, pose, frame_id, cloud,
+        SaveTrackingInformation(&result_objects, pose, frame_id, cloud,
                                 filename);
       }
     }
   }
 
-  void SaveTrackingInformation(std::vector<ObjectPtr>& objects,
+  void SaveTrackingInformation(std::vector<ObjectPtr>* objects,
                                const Eigen::Matrix4d& pose_v2w,
                                const int& frame_id,
                                const pcl_util::PointCloudPtr& cloud,
@@ -149,7 +149,7 @@ class OfflineLidarPerceptionTool {
       return;
     }
     // write frame id & number of objects at the beignning
-    fout << frame_id << " " << objects.size() << std::endl;
+    fout << frame_id << " " << objects->size() << std::endl;
 
     typename pcl::PointCloud<pcl_util::Point>::Ptr trans_cloud(
       new pcl::PointCloud<pcl_util::Point>());
@@ -163,7 +163,7 @@ class OfflineLidarPerceptionTool {
     std::vector<float> k_sqrt_dist;
     Eigen::Matrix4d pose_tw2velo = pose_velo2tw.inverse();
 
-    for (const auto& obj : objects) {
+    for (const auto& obj : *objects) {
       Eigen::Vector3f coord_dir(0.0, 1.0, 0.0);
       Eigen::Vector4d dir_velo = pose_tw2velo * Eigen::Vector4d(
         obj->direction[0], obj->direction[1], obj->direction[2], 0);

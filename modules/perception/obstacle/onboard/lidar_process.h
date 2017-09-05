@@ -17,6 +17,8 @@
 #ifndef MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
 #define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_LIDAR_PROCESS_H_
 
+#include <memory>
+#include <vector>
 #include "Eigen/Core"
 #include "gtest/gtest_prod.h"
 

@@ -322,7 +322,7 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
     Eigen::Vector4f min_pt;
     Eigen::Vector4f max_pt;
     pcl_util::PointCloudPtr cloud = obj->cloud;
-    SetDefaultValue(cloud, obj, min_pt, max_pt);
+    SetDefaultValue(cloud, obj, &min_pt, &max_pt);
     if (cloud->points.size() < 4u) {
         return;
     }

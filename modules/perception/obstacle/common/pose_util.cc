@@ -34,8 +34,11 @@ bool ReadPoseFile(const std::string& filename,
   double time_samp = 0;
   double quat[4];
   double matrix3x3[9];
+  double& pose03 = (*pose)(0, 3);
+  double& pose13 = (*pose)(1, 3);
+  double& pose23 = (*pose)(2, 3);
   sscanf(buffer, "%d %lf %lf %lf %lf %lf %lf %lf %lf", &id, &(time_samp),
-    &((*pose)(0, 3)), &((*pose)(1, 3)), &((*pose)(2, 3)),
+    &pose03, &pose13, &pose23,
     &(quat[0]), &(quat[1]), &(quat[2]), &(quat[3]));
   QuaternionToRotationMatrix<double>(quat, matrix3x3);
 
