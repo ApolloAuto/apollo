@@ -32,7 +32,6 @@ struct TrackedObject {
    * states of tracked
    * object. Thus, update tracked object's state when you update the state of
    * track !!! */
-
   TrackedObject();
   explicit TrackedObject(ObjectPtr obj_ptr);
   TrackedObject(const TrackedObject& rhs);
@@ -47,7 +46,7 @@ struct TrackedObject {
 
   Eigen::Vector3f barycenter;
 
-  // oriented
+  // bbox
   Eigen::Vector3f center;
   Eigen::Vector3f size;
   Eigen::Vector3f direction;
@@ -57,19 +56,13 @@ struct TrackedObject {
   Eigen::Vector3f anchor_point;
   Eigen::Vector3f velocity;
   Eigen::Vector3f acceleration;
-  float angle = 0.0f;
-  float angular_velocity = 0.0f;
 
   // class type
   ObjectType type;
 
   // association distance
-  // range from 0 to max_match_distance
+  // range from 0 to association_score_maximum
   float association_score = 0.0f;
-
-  // relative polar coordinate of barycenter point to the main car
-  float distance_to_ref = 0.0f;
-  float angle_to_ref = 0.0f;
 };  // struct TrackedObject
 
 typedef std::shared_ptr<TrackedObject> TrackedObjectPtr;

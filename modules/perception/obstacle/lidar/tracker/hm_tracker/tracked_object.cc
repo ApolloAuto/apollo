@@ -48,12 +48,8 @@ TrackedObject::TrackedObject(const TrackedObject& rhs) {
   type = rhs.type;
   barycenter = rhs.barycenter;
   anchor_point = rhs.anchor_point;
-  distance_to_ref = rhs.distance_to_ref;
-  angle_to_ref = rhs.angle_to_ref;
   velocity = rhs.velocity;
   acceleration = rhs.acceleration;
-  angle = rhs.angle;
-  angular_velocity = rhs.angular_velocity;
   type = rhs.type;
   association_score = rhs.association_score;
 }
@@ -67,12 +63,8 @@ TrackedObject& TrackedObject::operator = (const TrackedObject& rhs) {
   type = rhs.type;
   barycenter = rhs.barycenter;
   anchor_point = rhs.anchor_point;
-  distance_to_ref = rhs.distance_to_ref;
-  angle_to_ref = rhs.angle_to_ref;
   velocity = rhs.velocity;
   acceleration = rhs.acceleration;
-  angle = rhs.angle;
-  angular_velocity = rhs.angular_velocity;
   type = rhs.type;
   association_score = rhs.association_score;
   return (*this);
@@ -89,12 +81,8 @@ void TrackedObject::clone(const TrackedObject& rhs) {
   type = rhs.type;
   barycenter = rhs.barycenter;
   anchor_point = rhs.anchor_point;
-  distance_to_ref = rhs.distance_to_ref;
-  angle_to_ref = rhs.angle_to_ref;
   velocity = rhs.velocity;
   acceleration = rhs.acceleration;
-  angle = rhs.angle;
-  angular_velocity = rhs.angular_velocity;
   type = rhs.type;
   association_score = rhs.association_score;
 }

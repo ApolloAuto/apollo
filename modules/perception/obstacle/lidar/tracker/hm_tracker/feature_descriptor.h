@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <vector>
+
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 
 namespace apollo {
@@ -36,7 +37,7 @@ class FeatureDescriptor {
   ~FeatureDescriptor() {}
 
   // @brief compute histogram feature of given cloud
-  // @params[IN] bin_size: bin size of histogram feature computing
+  // @params[IN] bin_size: bin size of histogram
   // @params[OUT] feature: histogram feature of given cloud
   // @return nothing
   void ComputeHistogram(

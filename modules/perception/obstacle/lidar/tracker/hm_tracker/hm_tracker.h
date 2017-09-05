@@ -20,6 +20,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
@@ -42,11 +43,36 @@ class HmObjectTracker : public BaseTracker{
   // @return true if initialize successfully, otherwise return false
   bool Init();
 
+  // @brief set matcher method
+  // @params[IN] matcher_method_name: name of mathcer method
+  // @return true if set successfully, otherwise return fasle
+  bool SetMatcherMethod(
+    const std::string& matcher_method_name);
+
+  // @brief set collect consecutive invisible maximum
+  // @params[IN] collect_consecutive_invisible_maximum: collect consecutive
+  // invisible maximum
+  // @return true if set successfully, otherwise return fasle
+  bool SetCollectConsecutiveInvisibleMaximum(
+    const int& collect_consecutive_invisible_maximum);
+
+  // @brief set collect age minimum
+  // @params[IN] collect_age_minimum: collect age minimum
+  // @return true if set successfully, otherwise return fasle
+  bool SetCollectAgeMinimum(
+    const int& collect_age_minimum);
+
+  // @brief set histogram bin size
+  // @params[IN] histogram_bin_size: histogram bin size
+  // @return true if set successfully, otherwise return fasle
+  bool SetHistogramBinSize(
+    const int& histogram_bin_size);
+
   // @brief track detected objects over consecutive frames
-  // @params[IN] objects: new detected objects for tracking
-  // @params[IN] timestamp: current timestamp for tracking
-  // @params[IN] options: tracker options contain information like pose
-  // @params[OUT] tracked_objects: tracked objects with track id
+  // @params[IN] objects: recently detected objects
+  // @params[IN] timestamp: timestamp of recently detected objects
+  // @params[IN] options: tracker options with necessary information
+  // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return true if track successfully, otherwise return false
   bool Track(
     const std::vector<ObjectPtr>& objects,
@@ -63,30 +89,31 @@ class HmObjectTracker : public BaseTracker{
   }
 
  protected:
-  // @brief initialize tracker after obtaining first frame's detections
-  // @params[IN] objects: new objects for tracking
-  // @params[IN] timestamp: current timestamp for tracking
-  // @params[IN] options: tracker options contain information like pose
-  // @params[IN] tracked_objects: tracked objects
+  // @brief initialize tracker after obtaining detection of first frame
+  // @params[IN] objects: recently detected objects
+  // @params[IN] timestamp: timestamp of recently detected objects
+  // @params[IN] options: tracker options with necessary information
+  // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return true if initialize successfully, otherwise return false
   bool Initialize(
     const std::vector<ObjectPtr>& objects,
-    double timestamp,
+    const double& timestamp,
     const TrackerOptions& options,
     std::vector<ObjectPtr>* tracked_objects);
 
   // @brief transform v2world pose to v2local pose intend to avoid huge value
   // float computing
-  // @params[IN] pose: v2world pose
+  // @params[OUT] pose: v2world pose
   // @return nothing
   void TransformPoseGlobal2Local(
     Eigen::Matrix4d* pose);
 
   // @brief construct tracked objects via necessray transformation & feature
   // computing
-  // @params[IN] objects: new objects for constructions
-  // @params[OUT] tracked_objects: constructed objects for tracking
+  // @params[IN] objects: objects for construction
+  // @params[OUT] tracked_objects: constructed objects
   // @params[IN] pose: pose using for coordinate transformation
+  // @params[IN] options: tracker options with necessary information
   // @return nothing
   void ConstructTrackedObjects(
     const std::vector<ObjectPtr>& objects,
@@ -95,13 +122,13 @@ class HmObjectTracker : public BaseTracker{
     const TrackerOptions& options);
 
   // @brief compute objects' shape feature
-  // @params[IN] object: object for computing shape feature
+  // @params[OUT] object: object for computing shape feature
   // @return nothing
   void ComputeShapeFeatures(
     TrackedObjectPtr* obj);
 
   // @brief transform tracked object with given pose
-  // @params[IN] obj: tracked object for transfromation
+  // @params[OUT] obj: tracked object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
   void TransformTrackedObject(
@@ -109,69 +136,61 @@ class HmObjectTracker : public BaseTracker{
     const Eigen::Matrix4d& pose);
 
   // @brief transform object with given pose
-  // @params[IN] obj: object for transfromation
+  // @params[OUT] obj: object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
   void TransformObject(
     ObjectPtr* obj,
     const Eigen::Matrix4d& pose);
 
-  // @brief compute tracks' predict states
-  // @params[OUT] tracks_predict: tracks' predict states
+  // @brief compute predicted states of maintained tracks
+  // @params[OUT] tracks_predict: predicted states of maintained tracks
   // @params[IN] time_diff: time interval for predicting
   // @return nothing
   void ComputeTracksPredict(
     std::vector<Eigen::VectorXf>* tracks_predict,
-    const double time_diff);
+    const double& time_diff);
 
   // @brief update assigned tracks
-  // @params[IN] tracks_predict: tracks' predict states
-  // @params[IN] new_objects: new objects for current updating
-  // @params[IN] assignments: assignment pair of new objects & tracks
+  // @params[IN] tracks_predict: predicted states of maintained tracks
+  // @params[IN] new_objects: recently detected objects
+  // @params[IN] assignments: assignment pair of <track, object>
   // @params[IN] time_diff: time interval for updating
   // @return nothing
   void UpdateAssignedTracks(
     std::vector<Eigen::VectorXf>* tracks_predict,
     std::vector<TrackedObjectPtr>* new_objects,
     const std::vector<TrackObjectPair>& assignments,
-    const double time_diff);
+    const double& time_diff);
 
   // @brief update tracks without matched objects
-  // @params[IN] tracks_predict: tracks' predict states
+  // @params[IN] tracks_predict: predicted states of maintained tracks
   // @params[IN] unassigned_tracks: index of unassigned tracks
   // @params[IN] time_diff: time interval for updating
   // @return nothing
   void UpdateUnassignedTracks(
     const std::vector<Eigen::VectorXf>& tracks_predict,
     const std::vector<int>& unassigned_tracks,
-    const double time_diff);
+    const double& time_diff);
 
-  // @brief create new tracks for objects without matched tracks
-  // @params[IN] new_objects: new objects for current updating
+  // @brief create new tracks for objects without matched track
+  // @params[IN] new_objects: recently detected objects
   // @params[IN] unassigned_objects: index of unassigned objects
   // @params[IN] time_diff: time interval for updating
   // @return nothing
   void CreateNewTracks(
     const std::vector<TrackedObjectPtr>& new_objects,
     const std::vector<int>& unassigned_objects,
-    const double time_diff);
+    const double& time_diff);
 
   // @brief delete lost tracks
   // @return nothing
   void DeleteLostTracks();
 
-  // @brief collect tracked results for reporting
-  // @params[OUT] tracked_objects: tracked objects include objects may be
-  // occluded temporaryly
+  // @brief collect tracked results
+  // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return nothing
   void CollectTrackedResults(std::vector<ObjectPtr>* tracked_objects);
-
-  // @brief compute track ids for rencet objects
-  // @params[OUT] tracked_objects: tracked objects include objects may be
-  // occluded temporaryly
-  // @return nothing
-  void ComputeTrackIdsForRecentObjects(
-    const std::vector<TrackedObjectPtr>& objects);
 
  private:
   // algorithm setup
