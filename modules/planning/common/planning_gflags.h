@@ -69,7 +69,7 @@ DECLARE_bool(enable_nudge_decision);
 DECLARE_double(static_decision_ignore_s_range);
 DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(stop_distance_obstacle);
-DECLARE_double(destination_adjust_distance_buffer);
+DECLARE_double(stop_distance_destination);
 DECLARE_double(min_driving_width);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
