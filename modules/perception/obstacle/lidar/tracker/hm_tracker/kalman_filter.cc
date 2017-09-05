@@ -90,7 +90,6 @@ Eigen::VectorXf KalmanFilter::Predict(const double time_diff) {
 
   // Compute predicted covariance
   Propagate(time_diff);
-
   return predicted_state;
 }
 

@@ -19,7 +19,8 @@
 namespace apollo {
 namespace perception {
 
-void FeatureDescriptor::ComputeHistogram(const int bin_size,
+void FeatureDescriptor::ComputeHistogram(
+  const int bin_size,
   std::vector<float>* feature) {
   GetMinMaxCenter();
 

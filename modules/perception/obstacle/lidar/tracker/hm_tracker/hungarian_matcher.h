@@ -26,8 +26,8 @@ namespace perception {
 
 class HungarianMatcher: public BaseMatcher{
  public:
-  HungarianMatcher();
-  ~HungarianMatcher();
+  HungarianMatcher() {}
+  ~HungarianMatcher() {}
 
   // @brief set max match distance for matcher object
   // @params[IN] max_match_distance: threshold of match distance
@@ -42,13 +42,29 @@ class HungarianMatcher: public BaseMatcher{
   // @params[OUT] unassigned_tracks: tracks without matched object
   // @params[OUT] unassigned_objects: objects without matched track
   // @return nothing
-  void Match(std::vector<TrackedObjectPtr>* objects,
+  void Match(
+    std::vector<TrackedObjectPtr>* objects,
     const std::vector<ObjectTrackPtr>& tracks,
     const std::vector<Eigen::VectorXf>& tracks_predict,
     const double time_diff,
     std::vector<TrackObjectPair>* assignments,
     std::vector<int>* unassigned_tracks,
     std::vector<int>* unassigned_objects);
+
+  // @brief match detected objects to tracks in component level
+  // @params[IN] association_mat: association matrix of all objects to tracks
+  // @params[IN] track_component: component of track
+  // @params[IN] object_component: component of object
+  // @params[OUT] sub_assignments: component assignment pair of object & track
+  // @params[OUT] sub_unassigned_tracks: component tracks not matched
+  // @params[OUT] sub_unasgined_objects: component objects not matched
+  void MatchComponents(
+    const Eigen::MatrixXf association_mat,
+    const std::vector<int> track_component,
+    const std::vector<int> obj_component,
+    std::vector<TrackObjectPair>* sub_assignments,
+    std::vector<int>* sub_unassigned_tracks,
+    std::vector<int>* sub_unassigned_objects);
 
   std::string Name() const {
     return "HungarianMatcher";
@@ -62,7 +78,8 @@ class HungarianMatcher: public BaseMatcher{
   // @params[IN] time_diff: time interval from last matching
   // @params[OUT] association_mat: matrix of association distance
   // @return nothing
-  void ComputeAssociateMatrix(const std::vector<ObjectTrackPtr>& tracks,
+  void ComputeAssociateMatrix(
+    const std::vector<ObjectTrackPtr>& tracks,
     const std::vector<Eigen::VectorXf>& tracks_predict,
     const std::vector<TrackedObjectPtr>& new_objects,
     const double time_diff,
@@ -74,7 +91,8 @@ class HungarianMatcher: public BaseMatcher{
   // @params[IN] new_object: new detected object for matching
   // @params[IN] time_diff: time interval from last matching
   // @return distance of given track & object
-  float ComputeTrackObjectDistance(const ObjectTrackPtr& track,
+  float ComputeTrackObjectDistance(
+    const ObjectTrackPtr& track,
     const Eigen::VectorXf& track_predict,
     const TrackedObjectPtr& new_object,
     const double time_diff) const;
@@ -85,32 +103,20 @@ class HungarianMatcher: public BaseMatcher{
   // @params[OUT] track_components: connected objects of given tracks
   // @params[OUT] obj_components: connected tracks of given objects
   // @return nothing
-  void ComputeConnectedComponents(const Eigen::MatrixXf& association_mat,
+  void ComputeConnectedComponents(
+    const Eigen::MatrixXf& association_mat,
     const float connected_threshold,
     std::vector<std::vector<int> >* track_components,
     std::vector<std::vector<int> >* obj_components);
 
-  // @brief assign objects to tracks without null tracks setup
+  // @brief assign objects to tracks using components
   // @params[IN] association_mat: matrix of association distance
   // @params[IN] max_distance: threshold of matching
   // @params[OUT] assignments: assignment pair of matched object & track
   // @params[OUT] unassigned_tracks: tracks without matched object
   // @params[OUT] unassigned_objects: objects without matched track
   // @return nothing
-  void AssignObjectsToTracks(const Eigen::MatrixXf& association_mat,
-    const double max_distance,
-    std::vector<TrackObjectPair>* assignments,
-    std::vector<int>* unassigned_tracks,
-    std::vector<int>* unassigned_objects);
-
-  // @brief assign objects to tracks with null tracks setup
-  // @params[IN] association_mat: matrix of association distance
-  // @params[IN] max_distance: threshold of matching
-  // @params[OUT] assignments: assignment pair of matched object & track
-  // @params[OUT] unassigned_tracks: tracks without matched object
-  // @params[OUT] unassigned_objects: objects without matched track
-  // @return nothing
-  void AssignObjectsToTracksUsingNullTracks(
+  void AssignObjectsToTracks(
     const Eigen::MatrixXf& association_mat,
     const double max_distance,
     std::vector<TrackObjectPair>* assignments,
