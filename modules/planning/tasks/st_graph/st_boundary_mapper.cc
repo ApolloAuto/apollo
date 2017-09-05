@@ -42,17 +42,16 @@
 namespace apollo {
 namespace planning {
 
-using ErrorCode = apollo::common::ErrorCode;
-using Status = apollo::common::Status;
-using PathPoint = apollo::common::PathPoint;
-using TrajectoryPoint = apollo::common::TrajectoryPoint;
-using SLPoint = apollo::common::SLPoint;
-using VehicleParam = apollo::common::VehicleParam;
-using Box2d = apollo::common::math::Box2d;
-using Vec2d = apollo::common::math::Vec2d;
+using apollo::common::ErrorCode;
+using apollo::common::PathPoint;
+using apollo::common::SLPoint;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleParam;
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
 
 namespace {
-
 constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }
@@ -256,10 +255,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
   DCHECK_GT(path_points.size(), 0);
 
   if (path_points.size() == 0) {
-    std::string msg = common::util::StrCat(
-        "Too few points in path_data_.discretized_path(); size = ",
-        path_points.size());
-    AERROR << msg;
+    AERROR << "Too few points in path_data_.discretized_path(); size = "
+           << path_points.size();
     return false;
   }
 
@@ -449,13 +446,10 @@ Status StBoundaryMapper::MapFollowDecision(
 
   const double speed_coeff =
       std::cos(obstacle->Perception().theta() - ref_point.heading());
-  if (speed_coeff < 0.0) {
-    std::string msg = common::util::StrCat(
-        "Obstacle is moving opposite to the reference line. ref_point: ",
-        ref_point.DebugString(), ", path obstacle:\n",
-        path_obstacle.obstacle()->Perception().DebugString());
-    AERROR << msg;
-  }
+  AERROR_IF(speed_coeff < 0.0) << "Obstacle is moving opposite to the "
+      "reference line. ref_point: " << ref_point.DebugString()
+      << ", path obstacle:\n"
+      << path_obstacle.obstacle()->Perception().DebugString();
 
   const auto& start_point = path_data_.discretized_path().StartPoint();
   SLPoint start_sl_point;
@@ -527,11 +521,9 @@ Status StBoundaryMapper::GetSpeedLimits(
 
   for (const auto& path_point : path_data_.discretized_path().path_points()) {
     if (Double::Compare(path_point.s(), reference_line_.Length()) > 0) {
-      std::string msg = common::util::StrCat(
-          "path length [", path_data_.discretized_path().Length(),
-          "] is LARGER than reference_line_ length [", reference_line_.Length(),
-          "]. Please debug before proceeding.");
-      AWARN << msg;
+      AWARN << "path length [" << path_data_.discretized_path().Length()
+            << "] is LARGER than reference_line_ length ["
+            << reference_line_.Length() << "]. Please debug before proceeding.";
       break;
     }
 

@@ -29,21 +29,22 @@
 namespace apollo {
 namespace planning {
 
-using VehicleState = apollo::common::VehicleState;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleState;
 
 namespace {
 
-std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory() {
-  common::TrajectoryPoint init_point;
-  init_point.mutable_path_point()->set_x(VehicleState::instance()->x());
-  init_point.mutable_path_point()->set_y(VehicleState::instance()->y());
-  init_point.mutable_path_point()->set_z(VehicleState::instance()->z());
-  init_point.mutable_path_point()->set_theta(
-      VehicleState::instance()->heading());
-  init_point.mutable_path_point()->set_kappa(VehicleState::instance()->kappa());
+std::vector<TrajectoryPoint> ComputeReinitStitchingTrajectory() {
+  TrajectoryPoint init_point;
+  const auto& vehicle_state = *VehicleState::instance();
+  init_point.mutable_path_point()->set_x(vehicle_state.x());
+  init_point.mutable_path_point()->set_y(vehicle_state.y());
+  init_point.mutable_path_point()->set_z(vehicle_state.z());
+  init_point.mutable_path_point()->set_theta(vehicle_state.heading());
+  init_point.mutable_path_point()->set_kappa(vehicle_state.kappa());
 
-  init_point.set_v(VehicleState::instance()->linear_velocity());
-  init_point.set_a(VehicleState::instance()->linear_acceleration());
+  init_point.set_v(vehicle_state.linear_velocity());
+  init_point.set_a(vehicle_state.linear_acceleration());
   init_point.set_relative_time(0.0);
 
   DCHECK(!std::isnan(init_point.path_point().x()));
@@ -54,7 +55,7 @@ std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory() {
   DCHECK(!std::isnan(init_point.v()));
   DCHECK(!std::isnan(init_point.a()));
 
-  return std::vector<common::TrajectoryPoint>(1, init_point);
+  return std::vector<TrajectoryPoint>(1, init_point);
 }
 }
 
@@ -62,8 +63,7 @@ std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory() {
 // if 1. the auto-driving mode is off or
 //    2. we don't have the trajectory from last planning cycle or
 //    3. the position deviation from actual and target is too high
-std::vector<common::TrajectoryPoint>
-TrajectoryStitcher::ComputeStitchingTrajectory(
+std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const bool is_on_auto_mode, const double current_timestamp,
     const double planning_cycle_time,
     const PublishableTrajectory& prev_trajectory) {
@@ -95,12 +95,11 @@ TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory();
   }
 
+  const auto& vehicle_state = *VehicleState::instance();
   auto matched_point = prev_trajectory.TrajectoryPointAt(matched_index);
-  const double position_diff =
-      common::math::Vec2d(
-          matched_point.path_point().x() - VehicleState::instance()->x(),
-          matched_point.path_point().y() - VehicleState::instance()->y())
-          .Length();
+  const double position_diff = std::hypot(
+      matched_point.path_point().x() - vehicle_state.x(),
+      matched_point.path_point().y() - vehicle_state.y());
 
   if (position_diff > FLAGS_replan_distance_threshold) {
     AWARN << "the distance between matched point and actual position is too "
@@ -112,26 +111,19 @@ TrajectoryStitcher::ComputeStitchingTrajectory(
   std::size_t forward_index =
       prev_trajectory.QueryNearestPoint(forward_rel_time);
 
-  std::vector<common::TrajectoryPoint> stitching_trajectory(
+  std::vector<TrajectoryPoint> stitching_trajectory(
       prev_trajectory.trajectory_points().begin() + matched_index,
       prev_trajectory.trajectory_points().begin() + forward_index + 1);
 
-  double zero_time =
+  const double zero_time =
       prev_trajectory.TrajectoryPointAt(matched_index).relative_time();
-
-  std::for_each(stitching_trajectory.begin(), stitching_trajectory.end(),
-                [&zero_time](common::TrajectoryPoint& tp) {
-                  tp.set_relative_time(tp.relative_time() - zero_time);
-                });
-
-  double zero_s =
+  const double zero_s =
       prev_trajectory.TrajectoryPointAt(forward_index).path_point().s();
-  std::for_each(stitching_trajectory.begin(), stitching_trajectory.end(),
-                [&zero_s](common::TrajectoryPoint& tp) {
-                  double s = tp.path_point().s();
-                  tp.mutable_path_point()->set_s(s - zero_s);
-                });
 
+  for (auto& tp : stitching_trajectory) {
+    tp.set_relative_time(tp.relative_time() - zero_time);
+    tp.mutable_path_point()->set_s(tp.path_point().s() - zero_s);
+  }
   return stitching_trajectory;
 }
 
