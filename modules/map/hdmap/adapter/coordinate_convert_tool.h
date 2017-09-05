@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_COORDINATE_CONVERT_TOOL_H
-#define MODULES_MAP_MAP_LOADER_ADAPTER_COORDINATE_CONVERT_TOOL_H
+#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_COORDINATE_CONVERT_TOOL_H_
+#define MODULES_MAP_MAP_LOADER_ADAPTER_COORDINATE_CONVERT_TOOL_H_
 #include <proj_api.h>
 #include <string>
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
@@ -49,4 +49,4 @@ class CoordinateConvertTool {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_COORDINATE_CONVERT_TOOL_H
+#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_COORDINATE_CONVERT_TOOL_H_

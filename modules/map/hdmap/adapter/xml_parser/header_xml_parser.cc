@@ -12,13 +12,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
+
+#include "modules/map/hdmap/adapter/xml_parser/header_xml_parser.h"
+
 #include <chrono>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
 #include <string>
+
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
-#include "modules/map/hdmap/adapter/xml_parser/header_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 namespace apollo {

@@ -10,6 +10,7 @@ cc_library(
     includes = [
         ".",
     ],
+    include_prefix= "tinyxml2",
     copts = [
         "-Wno-unused-variable",
         "-Wno-implicit-function-declaration",
