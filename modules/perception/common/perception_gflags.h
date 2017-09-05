@@ -21,7 +21,7 @@
 
 DECLARE_int32(perception_loop_rate);
 
-/// lib/config_manager/config_manager.cc 
+/// lib/config_manager/config_manager.cc
 DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 

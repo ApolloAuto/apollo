@@ -59,16 +59,16 @@ void TransformPoint(const PointType& point_in, PointType* point_out,
 
 template <typename PointType>
 void TransformPointCloud(const pcl::PointCloud<PointType>& cloud_in,
-                           pcl::PointCloud<PointType>& cloud_out,
+                           pcl::PointCloud<PointType>* cloud_out,
                            const Eigen::Matrix4d& trans_mat) {
-  if (cloud_out.points.size() < cloud_in.points.size()) {
-    cloud_out.points.resize(cloud_in.points.size());
+  if (cloud_out->points.size() < cloud_in.points.size()) {
+    cloud_out->points.resize(cloud_in.points.size());
   }
   for (int i = 0; i < cloud_in.size(); ++i) {
     const PointType& p = cloud_in.at(i);
     Eigen::Vector4d v(p.x, p.y, p.z, 1);
     v = trans_mat * v;
-    PointType& pd = cloud_out.points[i];
+    PointType& pd = cloud_out->points[i];
     pd.x = v.x();
     pd.y = v.y();
     pd.z = v.z();

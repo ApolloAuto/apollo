@@ -16,11 +16,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_BASE_HDMAP_STRUCT_H_
 #define MODULES_PERCEPTION_OBSTACLE_BASE_HDMAP_STRUCT_H_
 
-#include "modules/perception/obstacle/base/types.h"
-
 #include <memory>
 #include <vector>
 
+#include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {

@@ -84,26 +84,26 @@ class BaseObjectBuilder {
 
  protected:
   virtual void SetDefaultValue(pcl_util::PointCloudPtr cloud, ObjectPtr obj,
-                               Eigen::Vector4f &min_pt,
-                               Eigen::Vector4f &max_pt) {
-    GetCloudMinMax3D<pcl_util::Point>(cloud, &min_pt, &max_pt);
-    Eigen::Vector3f center((min_pt[0] + max_pt[0]) / 2,
-                           (min_pt[1] + max_pt[1]) / 2,
-                           (min_pt[2] + max_pt[2]) / 2);
+                               Eigen::Vector4f* min_pt,
+                               Eigen::Vector4f* max_pt) {
+    GetCloudMinMax3D<pcl_util::Point>(cloud, min_pt, max_pt);
+    Eigen::Vector3f center(((*min_pt)[0] + (*max_pt)[0]) / 2,
+                           ((*min_pt)[1] + (*max_pt)[1]) / 2,
+                           ((*min_pt)[2] + (*max_pt)[2]) / 2);
 
     // handle degeneration case
     float epslin = 1e-3;
     for (int i = 0; i < 3; i++) {
-      if (max_pt[i] - min_pt[i] < epslin) {
-        max_pt[i] = center[i] + epslin / 2;
-        min_pt[i] = center[i] - epslin / 2;
+      if ((*max_pt)[i] - (*min_pt)[i] < epslin) {
+        (*max_pt)[i] = center[i] + epslin / 2;
+        (*min_pt)[i] = center[i] - epslin / 2;
       }
     }
 
     // length
-    obj->length = max_pt[0] - min_pt[0];
+    obj->length = (*max_pt)[0] - (*min_pt)[0];
     // width
-    obj->width = max_pt[1] - min_pt[1];
+    obj->width = (*max_pt)[1] - (*min_pt)[1];
     if (obj->length - obj->width < 0) {
       float tmp = obj->length;
       obj->length = obj->width;
@@ -113,29 +113,29 @@ class BaseObjectBuilder {
       obj->direction = Eigen::Vector3d(1.0, 0.0, 0.0);
     }
     // height
-    obj->height = max_pt[2] - min_pt[2];
+    obj->height = (*max_pt)[2] - (*min_pt)[2];
     // center
-    obj->center = Eigen::Vector3d((max_pt[0] + min_pt[0]) / 2,
-                                  (max_pt[1] + min_pt[1]) / 2,
-                                  (max_pt[2] + min_pt[2]) / 2);
+    obj->center = Eigen::Vector3d(((*max_pt)[0] + (*min_pt)[0]) / 2,
+                                  ((*max_pt)[1] + (*min_pt)[1]) / 2,
+                                  ((*max_pt)[2] + (*min_pt)[2]) / 2);
     // polygon
     if (cloud->size() < 4) {
       obj->polygon.points.resize(4);
-      obj->polygon.points[0].x = static_cast<double>(min_pt[0]);
-      obj->polygon.points[0].y = static_cast<double>(min_pt[1]);
-      obj->polygon.points[0].z = static_cast<double>(min_pt[2]);
+      obj->polygon.points[0].x = static_cast<double>((*min_pt)[0]);
+      obj->polygon.points[0].y = static_cast<double>((*min_pt)[1]);
+      obj->polygon.points[0].z = static_cast<double>((*min_pt)[2]);
 
-      obj->polygon.points[1].x = static_cast<double>(max_pt[0]);
-      obj->polygon.points[1].y = static_cast<double>(min_pt[1]);
-      obj->polygon.points[1].z = static_cast<double>(min_pt[2]);
+      obj->polygon.points[1].x = static_cast<double>((*max_pt)[0]);
+      obj->polygon.points[1].y = static_cast<double>((*min_pt)[1]);
+      obj->polygon.points[1].z = static_cast<double>((*min_pt)[2]);
 
-      obj->polygon.points[2].x = static_cast<double>(max_pt[0]);
-      obj->polygon.points[2].y = static_cast<double>(max_pt[1]);
-      obj->polygon.points[2].z = static_cast<double>(min_pt[2]);
+      obj->polygon.points[2].x = static_cast<double>((*max_pt)[0]);
+      obj->polygon.points[2].y = static_cast<double>((*max_pt)[1]);
+      obj->polygon.points[2].z = static_cast<double>((*min_pt)[2]);
 
-      obj->polygon.points[3].x = static_cast<double>(min_pt[0]);
-      obj->polygon.points[3].y = static_cast<double>(max_pt[1]);
-      obj->polygon.points[3].z = static_cast<double>(min_pt[2]);
+      obj->polygon.points[3].x = static_cast<double>((*min_pt)[0]);
+      obj->polygon.points[3].y = static_cast<double>((*max_pt)[1]);
+      obj->polygon.points[3].z = static_cast<double>((*min_pt)[2]);
     }
   }
 
