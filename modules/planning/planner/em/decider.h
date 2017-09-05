@@ -33,13 +33,12 @@ namespace planning {
 
 class Decider {
  public:
-  Decider() = default;
-  ~Decider() = default;
-
-  const DecisionResult &MakeDecision(
+  static DecisionResult MakeDecision(
       const ReferenceLineInfo &reference_line_info);
 
  private:
+  DecisionResult &InternalMakeDecision(
+      const ReferenceLineInfo &reference_line_info);
   int MakeMainStopDecision(const ReferenceLineInfo &reference_line_info);
   void MakeEStopDecision(const PathDecision &path_decision);
   void SetObjectDecisions(const PathDecision &path_decision);

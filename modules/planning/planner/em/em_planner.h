@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNER_EM_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_EM_PLANNER_H_
+#ifndef MODULES_PLANNING_PLANNER_EM_EM_PLANNER_H_
+#define MODULES_PLANNING_PLANNER_EM_EM_PLANNER_H_
 
 #include <memory>
 #include <string>
@@ -96,4 +96,4 @@ class EMPlanner : public Planner {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_EM_PLANNER_H_
+#endif  // MODULES_PLANNING_PLANNER_EM_EM_PLANNER_H_

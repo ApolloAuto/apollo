@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_
+#ifndef MODULES_PLANNING_PLANNER_RTK_RTK_REPLAY_PLANNER_H_
+#define MODULES_PLANNING_PLANNER_RTK_RTK_REPLAY_PLANNER_H_
 
 #include <string>
 #include <vector>
@@ -79,4 +79,4 @@ class RTKReplayPlanner : public Planner {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_PLANNER_RTK_REPLAY_PLANNER_H_ */
+#endif  // MODULES_PLANNING_PLANNER_RTK_RTK_REPLAY_PLANNER_H_
