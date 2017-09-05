@@ -49,6 +49,7 @@ void Planning::RegisterPlanners() {
 }
 
 Status Planning::InitFrame(const uint32_t sequence_num,
+                           const double time_stamp,
                            const TrajectoryPoint& init_adc_point) {
   frame_.reset(new Frame(sequence_num));
   frame_->SetPlanningStartPoint(init_adc_point);
@@ -67,7 +68,7 @@ Status Planning::InitFrame(const uint32_t sequence_num,
     ADEBUG << "Get prediction done.";
   }
 
-  auto status = frame_->Init(config_, start_timestamp_);
+  auto status = frame_->Init(config_, time_stamp);
   if (!status.ok()) {
     AERROR << "failed to init frame";
     return Status(ErrorCode::PLANNING_ERROR, "init frame failed");
@@ -149,7 +150,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 }
 
 void Planning::RunOnce() {
-  start_timestamp_ = Clock::NowInSecond();
+  double start_timestamp = Clock::NowInSecond();
   AdapterManager::Observe();
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
@@ -196,35 +197,35 @@ void Planning::RunOnce() {
   bool is_auto_mode = chassis.driving_mode() == chassis.COMPLETE_AUTO_DRIVE;
   const auto& stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          is_auto_mode, start_timestamp_, planning_cycle_time,
+          is_auto_mode, start_timestamp, planning_cycle_time,
           last_publishable_trajectory_);
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
-  status = InitFrame(frame_num, stitching_trajectory.back());
+  status = InitFrame(frame_num, start_timestamp, stitching_trajectory.back());
   if (!status.ok()) {
     ADCTrajectory estop;
     estop.mutable_estop();
     AERROR << "Init frame failed";
     status.Save(estop.mutable_header()->mutable_status());
-    PublishPlanningPb(&estop, start_timestamp_);
+    PublishPlanningPb(&estop, start_timestamp);
     return;
   }
 
-  status = Plan(start_timestamp_, stitching_trajectory);
+  status = Plan(start_timestamp, stitching_trajectory);
 
   const double end_timestamp = Clock::NowInSecond();
-  const double time_diff_ms = (end_timestamp - start_timestamp_) * 1000;
+  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   auto trajectory_pb = frame_->MutableADCTrajectory();
   trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: "
          << trajectory_pb->latency_stats().DebugString();
 
   if (status.ok()) {
-    PublishPlanningPb(trajectory_pb, start_timestamp_);
+    PublishPlanningPb(trajectory_pb, start_timestamp);
     ADEBUG << "Planning succeeded:" << trajectory_pb->header().DebugString();
   } else {
     status.Save(trajectory_pb->mutable_header()->mutable_status());
-    PublishPlanningPb(trajectory_pb, start_timestamp_);
+    PublishPlanningPb(trajectory_pb, start_timestamp);
     AERROR << "Planning failed";
   }
 }
