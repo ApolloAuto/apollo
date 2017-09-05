@@ -57,6 +57,7 @@ cc_library(
         "//modules/planning/tasks/qp_spline_path",
         "//modules/planning/tasks/qp_spline_st_speed:qp_spline_st_speed_optimizer",
         "//modules/planning/tasks/traffic_decider",
+        "//modules/planning/trajectory_stitcher:constraint_checker",
         "@eigen//:eigen",
     ],
 )
