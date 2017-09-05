@@ -79,40 +79,40 @@ class MapPathPoint : public common::math::Vec2d {
  public:
   MapPathPoint() = default;
   MapPathPoint(const common::math::Vec2d& point, double heading)
-      : Vec2d(point.x(), point.y()), _heading(heading) {}
+      : Vec2d(point.x(), point.y()), heading_(heading) {}
   MapPathPoint(const common::math::Vec2d& point, double heading,
                LaneWaypoint lane_waypoint)
-      : Vec2d(point.x(), point.y()), _heading(heading) {
-    _lane_waypoints.emplace_back(std::move(lane_waypoint));
+      : Vec2d(point.x(), point.y()), heading_(heading) {
+    lane_waypoints_.emplace_back(std::move(lane_waypoint));
   }
   MapPathPoint(const common::math::Vec2d& point, double heading,
                std::vector<LaneWaypoint> lane_waypoints)
       : Vec2d(point.x(), point.y()),
-        _heading(heading),
-        _lane_waypoints(std::move(lane_waypoints)) {}
+        heading_(heading),
+        lane_waypoints_(std::move(lane_waypoints)) {}
 
-  double heading() const { return _heading; }
-  void set_heading(const double heading) { _heading = heading; }
+  double heading() const { return heading_; }
+  void set_heading(const double heading) { heading_ = heading; }
 
   const std::vector<LaneWaypoint>& lane_waypoints() const {
-    return _lane_waypoints;
+    return lane_waypoints_;
   }
 
   void add_lane_waypoint(LaneWaypoint lane_waypoint) {
-    _lane_waypoints.emplace_back(std::move(lane_waypoint));
+    lane_waypoints_.emplace_back(std::move(lane_waypoint));
   }
   void add_lane_waypoints(const std::vector<LaneWaypoint>& lane_waypoints) {
-    _lane_waypoints.insert(_lane_waypoints.end(), lane_waypoints.begin(),
+    lane_waypoints_.insert(lane_waypoints_.end(), lane_waypoints.begin(),
                            lane_waypoints.end());
   }
 
-  void clear_lane_waypoints() { _lane_waypoints.clear(); }
+  void clear_lane_waypoints() { lane_waypoints_.clear(); }
 
   std::string DebugString() const;
 
  protected:
-  double _heading = 0.0;
-  std::vector<LaneWaypoint> _lane_waypoints;
+  double heading_ = 0.0;
+  std::vector<LaneWaypoint> lane_waypoints_;
 };
 
 class Path;
@@ -121,54 +121,54 @@ class PathApproximation {
  public:
   PathApproximation() = default;
   PathApproximation(const Path& path, const double max_error)
-      : _max_error(max_error), _max_sqr_error(max_error * max_error) {
+      : max_error_(max_error), max_sqr_error_(max_error * max_error) {
     Init(path);
   }
-  double max_error() const { return _max_error; }
-  const std::vector<int>& original_ids() const { return _original_ids; }
+  double max_error() const { return max_error_; }
+  const std::vector<int>& original_ids() const { return original_ids_; }
   const std::vector<common::math::LineSegment2d>& segments() const {
     return segments_;
   }
 
   bool GetProjection(const Path& path, const common::math::Vec2d& point,
-                      double* accumulate_s, double* lateral,
-                      double* distance) const;
+                     double* accumulate_s, double* lateral,
+                     double* distance) const;
 
-  bool overlap_with(const Path& path, const common::math::Box2d& box,
-                    double width) const;
+  bool OverlapWith(const Path& path, const common::math::Box2d& box,
+                   double width) const;
 
  protected:
   void Init(const Path& path);
   bool is_within_max_error(const Path& path, const int s, const int t);
   double compute_max_error(const Path& path, const int s, const int t);
 
-  void init_dilute(const Path& path);
-  void init_projections(const Path& path);
+  void InitDilute(const Path& path);
+  void InitProjections(const Path& path);
 
  protected:
-  double _max_error = 0;
-  double _max_sqr_error = 0;
+  double max_error_ = 0;
+  double max_sqr_error_ = 0;
 
   int num_points_ = 0;
-  std::vector<int> _original_ids;
+  std::vector<int> original_ids_;
   std::vector<common::math::LineSegment2d> segments_;
-  std::vector<double> _max_error_per_segment;
+  std::vector<double> max_error_per_segment_;
 
   // TODO(@lianglia_apollo): use direction change checks to early stop.
 
   // Projection of points onto the diluated segments.
-  std::vector<double> _projections;
-  double _max_projection;
-  int _num_projection_samples = 0;
+  std::vector<double> projections_;
+  double max_projection_;
+  int num_projection_samples_ = 0;
 
   // The original_projection is the projection of original points onto the
   // diluated segments.
-  std::vector<double> _original_projections;
+  std::vector<double> original_projections_;
   // max_p_to_left[i] = max(p[0], p[1], ... p[i]).
   // min_p_to_right[i] = min(p[i], p[i + 1], ... p[size - 1]).
-  std::vector<double> _max_original_projections_to_left;
-  std::vector<double> _min_original_projections_to_right;
-  std::vector<int> _sampled_max_original_projections_to_left;
+  std::vector<double> max_original_projections_to_left_;
+  std::vector<double> min_original_projections_to_right_;
+  std::vector<int> sampled_max_original_projections_to_left_;
 };
 
 class InterpolatedIndex {
@@ -199,16 +199,16 @@ class Path {
   InterpolatedIndex GetIndexFromS(double s) const;
 
   bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
-                         double* lateral) const;
+                       double* lateral) const;
   bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
-                         double* lateral, double* distance) const;
+                       double* lateral, double* distance) const;
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
-                      double* lateral) const;
+                     double* lateral) const;
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
-                      double* lateral, double* distance) const;
+                     double* lateral, double* distance) const;
 
   bool GetHeadingAlongPath(const common::math::Vec2d& point,
-                              double* heading) const;
+                           double* heading) const;
 
   int num_points() const { return num_points_; }
   int num_segments() const { return num_segments_; }
@@ -226,40 +226,40 @@ class Path {
   const std::vector<common::math::LineSegment2d>& segments() const {
     return segments_;
   }
-  const PathApproximation* approximation() const { return &_approximation; }
+  const PathApproximation* approximation() const { return &approximation_; }
   double length() const { return length_; }
 
   const std::vector<PathOverlap>& lane_overlaps() const {
-    return _lane_overlaps;
+    return lane_overlaps_;
   }
   const std::vector<PathOverlap>& signal_overlaps() const {
-    return _signal_overlaps;
+    return signal_overlaps_;
   }
   const std::vector<PathOverlap>& yield_sign_overlaps() const {
-    return _yield_sign_overlaps;
+    return yield_sign_overlaps_;
   }
   const std::vector<PathOverlap>& stop_sign_overlaps() const {
-    return _stop_sign_overlaps;
+    return stop_sign_overlaps_;
   }
   const std::vector<PathOverlap>& crosswalk_overlaps() const {
-    return _crosswalk_overlaps;
+    return crosswalk_overlaps_;
   }
   const std::vector<PathOverlap>& parking_space_overlaps() const {
-    return _parking_space_overlaps;
+    return parking_space_overlaps_;
   }
   const std::vector<PathOverlap>& junction_overlaps() const {
-    return _junction_overlaps;
+    return junction_overlaps_;
   }
   const std::vector<PathOverlap>& speed_bump_overlaps() const {
-    return _speed_bump_overlaps;
+    return speed_bump_overlaps_;
   }
 
-  double get_left_width(const double s) const;
-  double get_right_width(const double s) const;
-  bool get_width(const double s, double* left_width, double* right_width) const;
+  double GetLeftWidth(const double s) const;
+  double GetRightWidth(const double s) const;
+  bool GetWidth(const double s, double* left_width, double* right_width) const;
 
-  bool is_on_path(const common::math::Vec2d& point) const;
-  bool overlap_with(const common::math::Box2d& box, double width) const;
+  bool IsOnPath(const common::math::Vec2d& point) const;
+  bool OverlapWith(const common::math::Box2d& box, double width) const;
 
   std::string DebugString() const;
 
@@ -288,23 +288,23 @@ class Path {
   double length_ = 0.0;
   std::vector<double> accumulated_s_;
   std::vector<common::math::LineSegment2d> segments_;
-  bool _use_path_approximation = false;
-  PathApproximation _approximation;
+  bool use_path_approximation_ = false;
+  PathApproximation approximation_;
 
   // Sampled every fixed length.
-  int _num_sample_points = 0;
-  std::vector<double> _left_width;
-  std::vector<double> _right_width;
-  std::vector<int> _last_point_index;
+  int num_sample_points_ = 0;
+  std::vector<double> left_width_;
+  std::vector<double> right_width_;
+  std::vector<int> last_point_index_;
 
-  std::vector<PathOverlap> _lane_overlaps;
-  std::vector<PathOverlap> _signal_overlaps;
-  std::vector<PathOverlap> _yield_sign_overlaps;
-  std::vector<PathOverlap> _stop_sign_overlaps;
-  std::vector<PathOverlap> _crosswalk_overlaps;
-  std::vector<PathOverlap> _parking_space_overlaps;
-  std::vector<PathOverlap> _junction_overlaps;
-  std::vector<PathOverlap> _speed_bump_overlaps;
+  std::vector<PathOverlap> lane_overlaps_;
+  std::vector<PathOverlap> signal_overlaps_;
+  std::vector<PathOverlap> yield_sign_overlaps_;
+  std::vector<PathOverlap> stop_sign_overlaps_;
+  std::vector<PathOverlap> crosswalk_overlaps_;
+  std::vector<PathOverlap> parking_space_overlaps_;
+  std::vector<PathOverlap> junction_overlaps_;
+  std::vector<PathOverlap> speed_bump_overlaps_;
 };
 
 }  // namespace hdmap

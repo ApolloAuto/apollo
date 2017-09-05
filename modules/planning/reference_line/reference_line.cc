@@ -245,7 +245,7 @@ const MapPath& ReferenceLine::map_path() const { return map_path_; }
 
 bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
                                  double* const right_width) const {
-  return map_path_.get_width(s, left_width, right_width);
+  return map_path_.GetWidth(s, left_width, right_width);
 }
 
 bool ReferenceLine::IsOnRoad(const common::SLPoint& sl_point) const {
@@ -313,7 +313,7 @@ bool ReferenceLine::HasOverlap(const common::math::Box2d& box) const {
     ADEBUG << "ref_s out of range:" << mid_s;
     return false;
   }
-  if (!map_path_.get_width(mid_s, &left_width, &right_width)) {
+  if (!map_path_.GetWidth(mid_s, &left_width, &right_width)) {
     AERROR << "failed to get width at s = " << mid_s;
     return false;
   }

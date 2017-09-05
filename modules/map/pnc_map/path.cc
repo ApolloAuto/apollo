@@ -79,10 +79,10 @@ std::string LaneSegment::DebugString() const {
 
 std::string MapPathPoint::DebugString() const {
   return common::util::StrCat(
-      "x = ", x_, "  y = ", y_, "  heading = ", _heading,
+      "x = ", x_, "  y = ", y_, "  heading = ", heading_,
       "  lwp = "
       "{(",
-      common::util::PrintDebugStringIter(_lane_waypoints, "), ("), ")}");
+      common::util::PrintDebugStringIter(lane_waypoints_, "), ("), ")}");
 }
 
 std::string Path::DebugString() const {
@@ -122,8 +122,8 @@ Path::Path(std::vector<MapPathPoint> path_points,
       lane_segments_(std::move(lane_segments)) {
   Init();
   if (max_approximation_error > 0.0) {
-    _use_path_approximation = true;
-    _approximation = PathApproximation(*this, max_approximation_error);
+    use_path_approximation_ = true;
+    approximation_ = PathApproximation(*this, max_approximation_error);
   }
 }
 
@@ -163,7 +163,7 @@ void Path::InitPoints() {
     unit_directions_.push_back(heading);
   }
   length_ = s;
-  _num_sample_points = static_cast<int>(length_ / kSampleDistance) + 1;
+  num_sample_points_ = static_cast<int>(length_ / kSampleDistance) + 1;
   num_segments_ = num_points_ - 1;
 
   CHECK_EQ(accumulated_s_.size(), num_points_);
@@ -198,17 +198,17 @@ void Path::InitLaneSegments() {
 }
 
 void Path::InitWidth() {
-  _left_width.clear();
-  _left_width.reserve(_num_sample_points);
-  _right_width.clear();
-  _right_width.reserve(_num_sample_points);
+  left_width_.clear();
+  left_width_.reserve(num_sample_points_);
+  right_width_.clear();
+  right_width_.reserve(num_sample_points_);
 
   double s = 0;
-  for (int i = 0; i < _num_sample_points; ++i) {
+  for (int i = 0; i < num_sample_points_; ++i) {
     const MapPathPoint point = GetSmoothPoint(s);
     if (point.lane_waypoints().empty()) {
-      _left_width.push_back(0.0);
-      _right_width.push_back(0.0);
+      left_width_.push_back(0.0);
+      right_width_.push_back(0.0);
       AERROR << "path point:" << point.DebugString() << " has invalid width.";
     } else {
       const LaneWaypoint waypoint = point.lane_waypoints()[0];
@@ -216,29 +216,29 @@ void Path::InitWidth() {
       double left_width = 0.0;
       double right_width = 0.0;
       waypoint.lane->GetWidth(waypoint.s, &left_width, &right_width);
-      _left_width.push_back(left_width);
-      _right_width.push_back(right_width);
+      left_width_.push_back(left_width);
+      right_width_.push_back(right_width);
     }
     s += kSampleDistance;
   }
-  CHECK_EQ(_left_width.size(), _num_sample_points);
-  CHECK_EQ(_right_width.size(), _num_sample_points);
+  CHECK_EQ(left_width_.size(), num_sample_points_);
+  CHECK_EQ(right_width_.size(), num_sample_points_);
 }
 
 void Path::InitPointIndex() {
-  _last_point_index.clear();
-  _last_point_index.reserve(_num_sample_points);
+  last_point_index_.clear();
+  last_point_index_.reserve(num_sample_points_);
   double s = 0.0;
   int last_index = 0;
-  for (int i = 0; i < _num_sample_points; ++i) {
+  for (int i = 0; i < num_sample_points_; ++i) {
     while (last_index + 1 < num_points_ &&
            accumulated_s_[last_index + 1] <= s) {
       ++last_index;
     }
-    _last_point_index.push_back(last_index);
+    last_point_index_.push_back(last_index);
     s += kSampleDistance;
   }
-  CHECK_EQ(_last_point_index.size(), _num_sample_points);
+  CHECK_EQ(last_point_index_.size(), num_sample_points_);
 }
 
 void Path::GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
@@ -302,19 +302,19 @@ void Path::GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
 }
 
 void Path::InitOverlaps() {
-  GetAllOverlaps(std::bind(&LaneInfo::cross_lanes, _1), &_lane_overlaps);
-  GetAllOverlaps(std::bind(&LaneInfo::signals, _1), &_signal_overlaps);
-  GetAllOverlaps(std::bind(&LaneInfo::yield_signs, _1), &_yield_sign_overlaps);
-  GetAllOverlaps(std::bind(&LaneInfo::stop_signs, _1), &_stop_sign_overlaps);
-  GetAllOverlaps(std::bind(&LaneInfo::crosswalks, _1), &_crosswalk_overlaps);
-  GetAllOverlaps(std::bind(&LaneInfo::junctions, _1), &_junction_overlaps);
+  GetAllOverlaps(std::bind(&LaneInfo::cross_lanes, _1), &lane_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::signals, _1), &signal_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::yield_signs, _1), &yield_sign_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::stop_signs, _1), &stop_sign_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::crosswalks, _1), &crosswalk_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::junctions, _1), &junction_overlaps_);
 
   // TODO(all): add support for parking and speed bumps.
   /*
   GetAllOverlaps(std::bind(&LaneInfo::parking_spaces, _1),
-                   &_parking_space_overlaps);
+                   &parking_space_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::speed_bumps, _1),
-                   &_speed_bump_overlaps);
+                   &speed_bump_overlaps_);
   */
 }
 
@@ -366,13 +366,13 @@ InterpolatedIndex Path::GetIndexFromS(double s) const {
     return {num_points_ - 1, 0.0};
   }
   const int sample_id = static_cast<int>(s / kSampleDistance);
-  if (sample_id >= _num_sample_points) {
+  if (sample_id >= num_sample_points_) {
     return {num_points_ - 1, 0.0};
   }
   const int next_sample_id = sample_id + 1;
-  int low = _last_point_index[sample_id];
-  int high = (next_sample_id < _num_sample_points
-                  ? std::min(num_points_, _last_point_index[next_sample_id] + 1)
+  int low = last_point_index_[sample_id];
+  int high = (next_sample_id < num_sample_points_
+                  ? std::min(num_points_, last_point_index_[next_sample_id] + 1)
                   : num_points_);
   while (low + 1 < high) {
     const int mid = (low + high) / 2;
@@ -386,13 +386,13 @@ InterpolatedIndex Path::GetIndexFromS(double s) const {
 }
 
 bool Path::GetNearestPoint(const Vec2d& point, double* accumulate_s,
-                             double* lateral) const {
+                           double* lateral) const {
   double distance = 0.0;
   return GetNearestPoint(point, accumulate_s, lateral, &distance);
 }
 
 bool Path::GetNearestPoint(const Vec2d& point, double* accumulate_s,
-                             double* lateral, double* min_distance) const {
+                           double* lateral, double* min_distance) const {
   if (!GetProjection(point, accumulate_s, lateral, min_distance)) {
     return false;
   }
@@ -406,14 +406,14 @@ bool Path::GetNearestPoint(const Vec2d& point, double* accumulate_s,
   return true;
 }
 
-bool Path::GetProjection(const common::math::Vec2d& point,
-                          double* accumulate_s, double* lateral) const {
+bool Path::GetProjection(const common::math::Vec2d& point, double* accumulate_s,
+                         double* lateral) const {
   double distance = 0.0;
   return GetProjection(point, accumulate_s, lateral, &distance);
 }
 
 bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
-                          double* lateral, double* min_distance) const {
+                         double* lateral, double* min_distance) const {
   if (segments_.empty()) {
     return false;
   }
@@ -421,9 +421,9 @@ bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
       min_distance == nullptr) {
     return false;
   }
-  if (_use_path_approximation) {
-    return _approximation.GetProjection(*this, point, accumulate_s, lateral,
-                                         min_distance);
+  if (use_path_approximation_) {
+    return approximation_.GetProjection(*this, point, accumulate_s, lateral,
+                                        min_distance);
   }
   CHECK_GE(num_points_, 2);
   *min_distance = std::numeric_limits<double>::infinity();
@@ -474,24 +474,24 @@ bool Path::GetHeadingAlongPath(const Vec2d& point, double* heading) const {
   return false;
 }
 
-double Path::get_left_width(const double s) const {
-  return GetSample(_left_width, s);
+double Path::GetLeftWidth(const double s) const {
+  return GetSample(left_width_, s);
 }
 
-double Path::get_right_width(const double s) const {
-  return GetSample(_right_width, s);
+double Path::GetRightWidth(const double s) const {
+  return GetSample(right_width_, s);
 }
 
-bool Path::get_width(const double s, double* left_width,
-                     double* right_width) const {
+bool Path::GetWidth(const double s, double* left_width,
+                    double* right_width) const {
   CHECK_NOTNULL(left_width);
   CHECK_NOTNULL(right_width);
 
   if (s < 0.0 || s > length_) {
     return false;
   }
-  *left_width = GetSample(_left_width, s);
-  *right_width = GetSample(_right_width, s);
+  *left_width = GetSample(left_width_, s);
+  *right_width = GetSample(right_width_, s);
   return true;
 }
 
@@ -504,14 +504,14 @@ double Path::GetSample(const std::vector<double>& samples,
     return samples[0];
   }
   const int idx = static_cast<int>(s / kSampleDistance);
-  if (idx >= _num_sample_points - 1) {
+  if (idx >= num_sample_points_ - 1) {
     return samples.back();
   }
   const double ratio = (s - idx * kSampleDistance) / kSampleDistance;
   return samples[idx] * (1.0 - ratio) + samples[idx + 1] * ratio;
 }
 
-bool Path::is_on_path(const Vec2d& point) const {
+bool Path::IsOnPath(const Vec2d& point) const {
   double accumulate_s = 0.0;
   double lateral = 0.0;
   if (!GetProjection(point, &accumulate_s, &lateral)) {
@@ -519,7 +519,7 @@ bool Path::is_on_path(const Vec2d& point) const {
   }
   double left_width = 0.0;
   double right_width = 0.0;
-  if (!get_width(accumulate_s, &left_width, &right_width)) {
+  if (!GetWidth(accumulate_s, &left_width, &right_width)) {
     return false;
   }
   if (lateral < left_width && lateral > -right_width) {
@@ -528,9 +528,9 @@ bool Path::is_on_path(const Vec2d& point) const {
   return false;
 }
 
-bool Path::overlap_with(const common::math::Box2d& box, double width) const {
-  if (_use_path_approximation) {
-    return _approximation.overlap_with(*this, box, width);
+bool Path::OverlapWith(const common::math::Box2d& box, double width) const {
+  if (use_path_approximation_) {
+    return approximation_.OverlapWith(*this, box, width);
   }
   const Vec2d center = box.center();
   const double radius_sqr = Sqr(box.diagonal() / 2.0 + width) + kMathEpsilon;
@@ -568,7 +568,7 @@ bool PathApproximation::is_within_max_error(const Path& path, const int s,
   const auto& points = path.path_points();
   const LineSegment2d segment(points[s], points[t]);
   for (int i = s + 1; i < t; ++i) {
-    if (segment.DistanceSquareTo(points[i]) > _max_sqr_error) {
+    if (segment.DistanceSquareTo(points[i]) > max_sqr_error_) {
       return false;
     }
   }
@@ -576,16 +576,16 @@ bool PathApproximation::is_within_max_error(const Path& path, const int s,
 }
 
 void PathApproximation::Init(const Path& path) {
-  init_dilute(path);
-  init_projections(path);
+  InitDilute(path);
+  InitProjections(path);
 }
 
-void PathApproximation::init_dilute(const Path& path) {
+void PathApproximation::InitDilute(const Path& path) {
   const int num_original_points = path.num_points();
-  _original_ids.clear();
+  original_ids_.clear();
   int last_idx = 0;
   while (last_idx < num_original_points - 1) {
-    _original_ids.push_back(last_idx);
+    original_ids_.push_back(last_idx);
     int next_idx = last_idx + 1;
     int delta = 2;
     for (; last_idx + delta < num_original_points; delta *= 2) {
@@ -602,8 +602,8 @@ void PathApproximation::init_dilute(const Path& path) {
     }
     last_idx = next_idx;
   }
-  _original_ids.push_back(last_idx);
-  num_points_ = static_cast<int>(_original_ids.size());
+  original_ids_.push_back(last_idx);
+  num_points_ = static_cast<int>(original_ids_.size());
   if (num_points_ == 0) {
     return;
   }
@@ -611,93 +611,93 @@ void PathApproximation::init_dilute(const Path& path) {
   segments_.clear();
   segments_.reserve(num_points_ - 1);
   for (int i = 0; i < num_points_ - 1; ++i) {
-    segments_.emplace_back(path.path_points()[_original_ids[i]],
-                           path.path_points()[_original_ids[i + 1]]);
+    segments_.emplace_back(path.path_points()[original_ids_[i]],
+                           path.path_points()[original_ids_[i + 1]]);
   }
-  _max_error_per_segment.clear();
-  _max_error_per_segment.reserve(num_points_ - 1);
+  max_error_per_segment_.clear();
+  max_error_per_segment_.reserve(num_points_ - 1);
   for (int i = 0; i < num_points_ - 1; ++i) {
-    _max_error_per_segment.push_back(
-        compute_max_error(path, _original_ids[i], _original_ids[i + 1]));
+    max_error_per_segment_.push_back(
+        compute_max_error(path, original_ids_[i], original_ids_[i + 1]));
   }
 }
 
-void PathApproximation::init_projections(const Path& path) {
+void PathApproximation::InitProjections(const Path& path) {
   if (num_points_ == 0) {
     return;
   }
-  _projections.clear();
-  _projections.reserve(segments_.size() + 1);
+  projections_.clear();
+  projections_.reserve(segments_.size() + 1);
   double s = 0.0;
-  _projections.push_back(0);
+  projections_.push_back(0);
   for (const auto& segment : segments_) {
     s += segment.length();
-    _projections.push_back(s);
+    projections_.push_back(s);
   }
   const auto& original_points = path.path_points();
   const int num_original_points = original_points.size();
-  _original_projections.clear();
-  _original_projections.reserve(num_original_points);
-  for (size_t i = 0; i < _projections.size(); ++i) {
-    _original_projections.push_back(_projections[i]);
-    if (i + 1 < _projections.size()) {
+  original_projections_.clear();
+  original_projections_.reserve(num_original_points);
+  for (size_t i = 0; i < projections_.size(); ++i) {
+    original_projections_.push_back(projections_[i]);
+    if (i + 1 < projections_.size()) {
       const auto& segment = segments_[i];
-      for (int idx = _original_ids[i] + 1; idx < _original_ids[i + 1]; ++idx) {
+      for (int idx = original_ids_[i] + 1; idx < original_ids_[i + 1]; ++idx) {
         const double proj = segment.ProjectOntoUnit(original_points[idx]);
-        _original_projections.push_back(
-            _projections[i] + std::max(0.0, std::min(proj, segment.length())));
+        original_projections_.push_back(
+            projections_[i] + std::max(0.0, std::min(proj, segment.length())));
       }
     }
   }
 
   // max_p_to_left[i] = max(p[0], p[1], ... p[i]).
-  _max_original_projections_to_left.resize(num_original_points);
+  max_original_projections_to_left_.resize(num_original_points);
   double last_projection = -std::numeric_limits<double>::infinity();
   for (int i = 0; i < num_original_points; ++i) {
-    last_projection = std::max(last_projection, _original_projections[i]);
-    _max_original_projections_to_left[i] = last_projection;
+    last_projection = std::max(last_projection, original_projections_[i]);
+    max_original_projections_to_left_[i] = last_projection;
   }
   for (int i = 0; i + 1 < num_original_points; ++i) {
-    CHECK_LE(_max_original_projections_to_left[i],
-             _max_original_projections_to_left[i + 1] + kMathEpsilon);
+    CHECK_LE(max_original_projections_to_left_[i],
+             max_original_projections_to_left_[i + 1] + kMathEpsilon);
   }
 
   // min_p_to_right[i] = min(p[i], p[i + 1], ... p[size - 1]).
-  _min_original_projections_to_right.resize(_original_projections.size());
+  min_original_projections_to_right_.resize(original_projections_.size());
   last_projection = std::numeric_limits<double>::infinity();
   for (int i = num_original_points - 1; i >= 0; --i) {
-    last_projection = std::min(last_projection, _original_projections[i]);
-    _min_original_projections_to_right[i] = last_projection;
+    last_projection = std::min(last_projection, original_projections_[i]);
+    min_original_projections_to_right_[i] = last_projection;
   }
   for (int i = 0; i + 1 < num_original_points; ++i) {
-    CHECK_LE(_min_original_projections_to_right[i],
-             _min_original_projections_to_right[i + 1] + kMathEpsilon);
+    CHECK_LE(min_original_projections_to_right_[i],
+             min_original_projections_to_right_[i + 1] + kMathEpsilon);
   }
 
   // Sample max_p_to_left by sample_distance.
-  _max_projection = _projections.back();
-  _num_projection_samples =
-      static_cast<int>(_max_projection / kSampleDistance) + 1;
-  _sampled_max_original_projections_to_left.clear();
-  _sampled_max_original_projections_to_left.reserve(_num_projection_samples);
+  max_projection_ = projections_.back();
+  num_projection_samples_ =
+      static_cast<int>(max_projection_ / kSampleDistance) + 1;
+  sampled_max_original_projections_to_left_.clear();
+  sampled_max_original_projections_to_left_.reserve(num_projection_samples_);
   double proj = 0.0;
   int last_index = 0;
-  for (int i = 0; i < _num_projection_samples; ++i) {
+  for (int i = 0; i < num_projection_samples_; ++i) {
     while (last_index + 1 < num_original_points &&
-           _max_original_projections_to_left[last_index + 1] < proj) {
+           max_original_projections_to_left_[last_index + 1] < proj) {
       ++last_index;
     }
-    _sampled_max_original_projections_to_left.push_back(last_index);
+    sampled_max_original_projections_to_left_.push_back(last_index);
     proj += kSampleDistance;
   }
-  CHECK_EQ(_sampled_max_original_projections_to_left.size(),
-           _num_projection_samples);
+  CHECK_EQ(sampled_max_original_projections_to_left_.size(),
+           num_projection_samples_);
 }
 
 bool PathApproximation::GetProjection(const Path& path,
-                                       const common::math::Vec2d& point,
-                                       double* accumulate_s, double* lateral,
-                                       double* min_distance) const {
+                                      const common::math::Vec2d& point,
+                                      double* accumulate_s, double* lateral,
+                                      double* min_distance) const {
   if (num_points_ == 0) {
     return false;
   }
@@ -725,15 +725,15 @@ bool PathApproximation::GetProjection(const Path& path,
   const auto& original_accumulated_s = path.accumulated_s();
   double min_distance_sqr_with_error =
       Sqr(sqrt(min_distance_sqr) +
-          _max_error_per_segment[estimate_nearest_segment_idx] + _max_error);
+          max_error_per_segment_[estimate_nearest_segment_idx] + max_error_);
   *min_distance = std::numeric_limits<double>::infinity();
   int nearest_segment_idx = -1;
   for (size_t i = 0; i < segments_.size(); ++i) {
     if (distance_sqr_to_segments[i] >= min_distance_sqr_with_error) {
       continue;
     }
-    int first_segment_idx = _original_ids[i];
-    int last_segment_idx = _original_ids[i + 1] - 1;
+    int first_segment_idx = original_ids_[i];
+    int last_segment_idx = original_ids_[i + 1] - 1;
     double max_original_projection = std::numeric_limits<double>::infinity();
     if (first_segment_idx < last_segment_idx) {
       const auto& segment = segments_[i];
@@ -744,22 +744,22 @@ bool PathApproximation::GetProjection(const Path& path,
       }
       const double scan_distance = sqrt(min_distance_sqr_with_error - prod_sqr);
       const double min_projection = projection - scan_distance;
-      max_original_projection = _projections[i] + projection + scan_distance;
+      max_original_projection = projections_[i] + projection + scan_distance;
       if (min_projection > 0.0) {
-        const double limit = _projections[i] + min_projection;
+        const double limit = projections_[i] + min_projection;
         const int sample_index =
             std::max(0, static_cast<int>(limit / kSampleDistance));
-        if (sample_index >= _num_projection_samples) {
+        if (sample_index >= num_projection_samples_) {
           first_segment_idx = last_segment_idx;
         } else {
           first_segment_idx =
               std::max(first_segment_idx,
-                       _sampled_max_original_projections_to_left[sample_index]);
+                       sampled_max_original_projections_to_left_[sample_index]);
           if (first_segment_idx >= last_segment_idx) {
             first_segment_idx = last_segment_idx;
           } else {
             while (first_segment_idx < last_segment_idx &&
-                   _max_original_projections_to_left[first_segment_idx + 1] <
+                   max_original_projections_to_left_[first_segment_idx + 1] <
                        limit) {
               ++first_segment_idx;
             }
@@ -770,7 +770,7 @@ bool PathApproximation::GetProjection(const Path& path,
     bool min_distance_updated = false;
     bool is_within_end_point = false;
     for (int idx = first_segment_idx; idx <= last_segment_idx; ++idx) {
-      if (_min_original_projections_to_right[idx] > max_original_projection) {
+      if (min_original_projections_to_right_[idx] > max_original_projection) {
         break;
       }
       const auto& original_segment = original_segments[idx];
@@ -803,7 +803,7 @@ bool PathApproximation::GetProjection(const Path& path,
       }
     }
     if (min_distance_updated) {
-      min_distance_sqr_with_error = Sqr(*min_distance + _max_error);
+      min_distance_sqr_with_error = Sqr(*min_distance + max_error_);
     }
   }
   if (nearest_segment_idx >= 0) {
@@ -829,8 +829,8 @@ bool PathApproximation::GetProjection(const Path& path,
   return false;
 }
 
-bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
-                                     double width) const {
+bool PathApproximation::OverlapWith(const Path& path, const Box2d& box,
+                                    double width) const {
   if (num_points_ == 0) {
     return false;
   }
@@ -840,13 +840,13 @@ bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
   const auto& original_segments = path.segments();
   for (size_t i = 0; i < segments_.size(); ++i) {
     const LineSegment2d& segment = segments_[i];
-    const double max_error = _max_error_per_segment[i];
+    const double max_error = max_error_per_segment_[i];
     const double radius_sqr_with_error = Sqr(radius + max_error);
     if (segment.DistanceSquareTo(center) > radius_sqr_with_error) {
       continue;
     }
-    int first_segment_idx = _original_ids[i];
-    int last_segment_idx = _original_ids[i + 1] - 1;
+    int first_segment_idx = original_ids_[i];
+    int last_segment_idx = original_ids_[i + 1] - 1;
     double max_original_projection = std::numeric_limits<double>::infinity();
     if (first_segment_idx < last_segment_idx) {
       const auto& segment = segments_[i];
@@ -857,22 +857,22 @@ bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
       }
       const double scan_distance = sqrt(radius_sqr_with_error - prod_sqr);
       const double min_projection = projection - scan_distance;
-      max_original_projection = _projections[i] + projection + scan_distance;
+      max_original_projection = projections_[i] + projection + scan_distance;
       if (min_projection > 0.0) {
-        const double limit = _projections[i] + min_projection;
+        const double limit = projections_[i] + min_projection;
         const int sample_index =
             std::max(0, static_cast<int>(limit / kSampleDistance));
-        if (sample_index >= _num_projection_samples) {
+        if (sample_index >= num_projection_samples_) {
           first_segment_idx = last_segment_idx;
         } else {
           first_segment_idx =
               std::max(first_segment_idx,
-                       _sampled_max_original_projections_to_left[sample_index]);
+                       sampled_max_original_projections_to_left_[sample_index]);
           if (first_segment_idx >= last_segment_idx) {
             first_segment_idx = last_segment_idx;
           } else {
             while (first_segment_idx < last_segment_idx &&
-                   _max_original_projections_to_left[first_segment_idx + 1] <
+                   max_original_projections_to_left_[first_segment_idx + 1] <
                        limit) {
               ++first_segment_idx;
             }
@@ -881,7 +881,7 @@ bool PathApproximation::overlap_with(const Path& path, const Box2d& box,
       }
     }
     for (int idx = first_segment_idx; idx <= last_segment_idx; ++idx) {
-      if (_min_original_projections_to_right[idx] > max_original_projection) {
+      if (min_original_projections_to_right_[idx] > max_original_projection) {
         break;
       }
       const auto& original_segment = original_segments[idx];
