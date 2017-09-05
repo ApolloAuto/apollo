@@ -54,7 +54,7 @@ TEST_F(PlanningTest, ComputeTrajectory) {
   ADCTrajectory trajectory1;
   planning.Init();
   common::TrajectoryPoint init_adc_point;
-  planning.InitFrame(1, init_adc_point);
+  planning.InitFrame(1, 0.0, init_adc_point);
   /**
   double time1 = 0.1;
   planning.Plan(false, time1, &trajectory1);
@@ -101,7 +101,7 @@ TEST_F(PlanningTest, ComputeTrajectoryNoRTKFile) {
   planning.Init();
 
   common::TrajectoryPoint init_adc_point;
-  planning.InitFrame(1, init_adc_point);
+  planning.InitFrame(1, 0.0, init_adc_point);
 
   common::VehicleState::instance()->set_x(586385.782841);
   common::VehicleState::instance()->set_y(4140674.76065);
