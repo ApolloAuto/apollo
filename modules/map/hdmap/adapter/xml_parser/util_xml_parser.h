@@ -54,10 +54,10 @@ class UtilXmlParser {
                                       std::string* value);
 
  private:
-  static double _x_min;
-  static double _x_max;
-  static double _y_min;
-  static double _y_max;
+  static double x_min_;
+  static double x_max_;
+  static double y_min_;
+  static double y_max_;
 };
 
 int GetLongZone(double longitude);

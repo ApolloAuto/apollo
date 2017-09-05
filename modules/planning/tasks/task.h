@@ -47,7 +47,7 @@ class Task {
   ReferenceLineInfo* reference_line_info_ = nullptr;
 
  private:
-  const std::string _name;
+  const std::string name_;
 };
 
 }  // namespace planning
