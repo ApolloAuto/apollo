@@ -133,7 +133,7 @@ Status Planning::Start() {
 }
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb) {
-  AdapterManager::FillPlanningHeader("planning", trajectory_pb);
+  AdapterManager::FillPlanningHeader(Name(), trajectory_pb);
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
   AdapterManager::PublishPlanning(*trajectory_pb);
@@ -141,7 +141,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb) {
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {
-  AdapterManager::FillPlanningHeader("planning", trajectory_pb);
+  AdapterManager::FillPlanningHeader(Name(), trajectory_pb);
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
