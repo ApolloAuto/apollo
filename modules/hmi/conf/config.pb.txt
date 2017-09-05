@@ -246,10 +246,6 @@ hardware {
   }
 }
 available_maps {
-  name: "Demo"
-  map_dir: "modules/map/data/demo"
-}
-available_maps {
   name: "Garage"
   map_dir: "modules/map/data/new_garage"
 }
@@ -260,6 +256,10 @@ available_maps {
 available_maps {
   name: "Sunnyvale Office"
   map_dir: "modules/map/data/sunnyvale_office"
+}
+available_maps {
+  name: "Yongfeng Industrial Park"
+  map_dir: "modules/map/data/yongfengchanyeyuan"
 }
 available_vehicles {
   name: "MKZ 8"
