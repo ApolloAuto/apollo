@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <vector>
+
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/track_object_distance.h"
@@ -23,71 +24,76 @@
 namespace apollo {
 namespace perception {
 
-double TrackObjectDistance::s_weight_location_dist_ = 0.6;
-double TrackObjectDistance::s_weight_direction_dist_ = 0.2;
-double TrackObjectDistance::s_weight_bbox_size_dist_ = 0.1;
-double TrackObjectDistance::s_weight_point_num_dist_ = 0.1;
-double TrackObjectDistance::s_weight_histogram_dist_ = 0.5;
+double TrackObjectDistance::s_location_distance_weight_ = 0.6;
+double TrackObjectDistance::s_direction_distance_weight_ = 0.2;
+double TrackObjectDistance::s_bbox_size_distance_weight_ = 0.1;
+double TrackObjectDistance::s_point_num_distance_weight_ = 0.1;
+double TrackObjectDistance::s_histogram_distance_weight_ = 0.5;
 
-bool TrackObjectDistance::SetWeightLocationDist(float weight_location_dist) {
-  // Set weight of location dist for all the track object distance objects
-  if (weight_location_dist >= 0) {
-    s_weight_location_dist_ = weight_location_dist;
+bool TrackObjectDistance::SetLocationDistanceWeight(
+  const float& location_distance_weight) {
+  if (location_distance_weight >= 0) {
+    s_location_distance_weight_ = location_distance_weight;
+    AINFO << "location distance weight of TrackObjectDistance is "
+          << s_location_distance_weight_;
     return true;
-  } else {
-    AERROR << "invalid weight_location_dist. TrackObjectDistance";
-    return false;
   }
+  AERROR << "invalid location distance weight of TrackeObjectDistance!";
+  return false;
 }
 
-bool TrackObjectDistance::SetWeightDirectionDist(float weight_direction_dist) {
-  // Set weight of direction dist for all the track object distance objects
-  if (weight_direction_dist >= 0) {
-    s_weight_direction_dist_ = weight_direction_dist;
+bool TrackObjectDistance::SetDirectionDistanceWeight(
+  const float& direction_distance_weight) {
+  if (direction_distance_weight >= 0) {
+    s_direction_distance_weight_ = direction_distance_weight;
+    AINFO << "direction distance weight of TrackObjectDistance is "
+          << s_direction_distance_weight_;
     return true;
-  } else {
-    AERROR << "invalid weight_direction_dist. TrackObjectDistance";
-    return false;
   }
+  AERROR << "invalid direction distance weight of TrackObjectDistance!";
+  return false;
 }
 
-bool TrackObjectDistance::SetWeightBboxSizeDist(float weight_bbox_size_dist) {
-  // Set weight of bbox size dist for all the track object distance objects
-  if (weight_bbox_size_dist >= 0) {
-    s_weight_bbox_size_dist_ = weight_bbox_size_dist;
+bool TrackObjectDistance::SetBboxSizeDistanceWeight(
+  const float& bbox_size_distance_weight) {
+  if (bbox_size_distance_weight >= 0) {
+    s_bbox_size_distance_weight_ = bbox_size_distance_weight;
+    AINFO << "bbox size distance weight of TrackObjectDistance is "
+          << s_bbox_size_distance_weight_;
     return true;
-  } else {
-    AERROR << "invalid weight_bbox_size_dist. TrackedObjectDistance";
-    return false;
   }
+  AERROR << "invalid bbox size distance weight of TrackObjectDistance!";
+  return false;
 }
 
-bool TrackObjectDistance::SetWeightPointNumDist(float weight_point_num_dist) {
-  // Set weight of point num dist for all the track object distance objects
-  if (weight_point_num_dist >= 0) {
-    s_weight_point_num_dist_ = weight_point_num_dist;
+bool TrackObjectDistance::SetPointNumDistanceWeight(
+  const float& point_num_distance_weight) {
+  if (point_num_distance_weight >= 0) {
+    s_point_num_distance_weight_ = point_num_distance_weight;
+    AINFO << "point num distance weight of TrackObjectDistance is "
+          << s_point_num_distance_weight_;
     return true;
-  } else {
-    AERROR << "invalid weight_point_num_dist. TrackedObjectDistance";
-    return false;
   }
+  AERROR << "invalid point num distance weight of TrackObjectDistance!";
+  return false;
 }
 
-bool TrackObjectDistance::SetWeightHistogramDist(float weight_histogram_dist) {
-  // Set weight of histogram dist for all the track objects distance objects
-  if (weight_histogram_dist >= 0) {
-    s_weight_histogram_dist_ = weight_histogram_dist;
+bool TrackObjectDistance::SetHistogramDistanceWeight(
+  const float& histogram_distance_weight) {
+  if (histogram_distance_weight >= 0) {
+    s_histogram_distance_weight_ = histogram_distance_weight;
+    AINFO << "histogram distance weight of TrackObjectDistance is "
+          << s_histogram_distance_weight_;
     return true;
-  } else {
-    AERROR << "invalid weight_histogram_dist. TrackedObjectDistance";
-    return false;
   }
+  AERROR << "invalid histogram distance weight of TrackObjectDistance!";
+  return false;
 }
 
 float TrackObjectDistance::ComputeDistance(const ObjectTrackPtr& track,
   const Eigen::VectorXf& track_predict,
   const TrackedObjectPtr& new_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute distance for given trakc & object
   float location_dist = ComputeLocationDistance(track, track_predict,
     new_object, time_diff);
@@ -100,11 +106,11 @@ float TrackObjectDistance::ComputeDistance(const ObjectTrackPtr& track,
   float histogram_dist = ComputeHistogramDistance(track, track_predict,
     new_object, time_diff);
 
-  float result_dist = s_weight_location_dist_ * location_dist +
-    s_weight_direction_dist_ * direction_dist +
-    s_weight_bbox_size_dist_ * bbox_size_dist +
-    s_weight_point_num_dist_ * point_num_dist +
-    s_weight_histogram_dist_ * histogram_dist;
+  float result_dist = s_location_distance_weight_ * location_dist +
+    s_direction_distance_weight_ * direction_dist +
+    s_bbox_size_distance_weight_ * bbox_size_dist +
+    s_point_num_distance_weight_ * point_num_dist +
+    s_histogram_distance_weight_ * histogram_dist;
 
   return result_dist;
 }
@@ -112,7 +118,7 @@ float TrackObjectDistance::ComputeDistance(const ObjectTrackPtr& track,
 float TrackObjectDistance::ComputeLocationDistance(const ObjectTrackPtr& track,
   const Eigen::VectorXf& track_predict,
   const TrackedObjectPtr& new_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute locatin distance for given track & object
   // range from 0 to positive infinity
   const TrackedObjectPtr& last_object = track->current_object_;
@@ -149,7 +155,7 @@ float TrackObjectDistance::ComputeLocationDistance(const ObjectTrackPtr& track,
 float TrackObjectDistance::ComputeDirectionDistance(const ObjectTrackPtr& track,
   const Eigen::VectorXf& track_predict,
   const TrackedObjectPtr& new_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute direction distance for given track & object
   // range from 0 to 2
   const TrackedObjectPtr& last_object = track->current_object_;
@@ -176,7 +182,7 @@ float TrackObjectDistance::ComputeDirectionDistance(const ObjectTrackPtr& track,
 float TrackObjectDistance::ComputeBboxSizeDistance(const ObjectTrackPtr& track,
   const Eigen::VectorXf& track_predict,
   const TrackedObjectPtr& new_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute bbox size distance for given track & object
   // range from 0 to 1
   const TrackedObjectPtr& last_object = track->current_object_;
@@ -212,7 +218,7 @@ float TrackObjectDistance::ComputeBboxSizeDistance(const ObjectTrackPtr& track,
 float TrackObjectDistance::ComputePointNumDistance(const ObjectTrackPtr& track,
   const Eigen::VectorXf& track_predict,
   const TrackedObjectPtr& new_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute point num distance for given track & object
   // range from 0 and 1
   const TrackedObjectPtr& last_object = track->current_object_;
@@ -229,7 +235,7 @@ float TrackObjectDistance::ComputePointNumDistance(const ObjectTrackPtr& track,
 float TrackObjectDistance::ComputeHistogramDistance(const ObjectTrackPtr& track,
   const Eigen::VectorXf& track_predict,
   const TrackedObjectPtr& new_object,
-  const double time_diff) {
+  const double& time_diff) {
   // Compute histogram distance for given track & object
   // range from 0 to 3
   const TrackedObjectPtr& last_object = track->current_object_;
