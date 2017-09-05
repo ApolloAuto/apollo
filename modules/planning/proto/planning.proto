@@ -68,6 +68,7 @@ message TaskStats {
 message LatencyStats {
   optional double total_time_ms = 1;
   repeated TaskStats task_stats = 2;
+  optional double init_frame_time_ms = 3;
 }
 
 // next id: 16
