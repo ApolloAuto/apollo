@@ -167,7 +167,7 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
   const auto& nudge = decision.nudge();
   double buffer = std::fabs(nudge.distance_l());
 
-  int nudge_side = (nudge.type() == ObjectNudge::RIGHT_NUDGE) ? 1 : -1;
+  int nudge_side = (nudge.type() == ObjectNudge::RIGHT_NUDGE) ? -1 : 1;
 
   for (const SpeedPoint& veh_point : discretized_vehicle_location_) {
     double time = veh_point.t();
