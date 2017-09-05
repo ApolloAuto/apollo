@@ -354,7 +354,6 @@ function buildify() {
 function build_fe() {
   cd modules/dreamview/frontend
   yarn build
-  cd -
 }
 
 function gen_doc() {
