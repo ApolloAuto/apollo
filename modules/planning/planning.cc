@@ -201,6 +201,10 @@ void Planning::RunOnce() {
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   status = InitFrame(frame_num, start_timestamp, stitching_trajectory.back());
+  double end_timestamp = Clock::NowInSecond();
+  double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  auto trajectory_pb = frame_->MutableADCTrajectory();
+  trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(time_diff_ms);
   if (!status.ok()) {
     ADCTrajectory estop;
     estop.mutable_estop();
@@ -212,9 +216,8 @@ void Planning::RunOnce() {
 
   status = Plan(start_timestamp, stitching_trajectory);
 
-  const double end_timestamp = Clock::NowInSecond();
-  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
-  auto trajectory_pb = frame_->MutableADCTrajectory();
+  end_timestamp = Clock::NowInSecond();
+  time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: "
          << trajectory_pb->latency_stats().DebugString();
