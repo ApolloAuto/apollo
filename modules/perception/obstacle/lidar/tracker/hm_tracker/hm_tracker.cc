@@ -375,7 +375,7 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   // B. preprocessing
   // B.1 transform given pose to local one
   TransformPoseGlobal2Local(&velo2world_pose);
-  AINFO << "velo2local_pose\n" << velo2world_pose;
+  ADEBUG << "velo2local_pose\n" << velo2world_pose;
   // B.2 construct objects for tracking
   std::vector<TrackedObjectPtr> transformed_objects;
   ConstructTrackedObjects(objects, &transformed_objects, velo2world_pose,
@@ -392,7 +392,7 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
   matcher_->Match(&transformed_objects, tracks, tracks_predict, time_diff,
                   &assignments, &unassigned_tracks, &unassigned_objects);
-  AINFO << "multi-object-tracking: " << tracks.size() << "  "
+  ADEBUG << "multi-object-tracking: " << tracks.size() << "  "
         << assignments.size() << "  " << transformed_objects.size() << "  "
         << unassigned_objects.size() << "  " << time_diff;
 

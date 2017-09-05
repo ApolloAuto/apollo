@@ -75,7 +75,7 @@ bool HDMapInput::GetROI(const PointD& pointd, HdmapStructPtr* mapptr) {
     AERROR << "Failed to get road boundaries for point " << point.DebugString();
     return false;
   }
-  AINFO << "Get road boundaries : num_boundary = " << boundary_vec.size()
+  ADEBUG << "Get road boundaries : num_boundary = " << boundary_vec.size()
         << " num_junction = " << junctions_vec.size();
 
   if (MergeBoundaryJunction(boundary_vec, junctions_vec, mapptr) != SUCC) {
@@ -180,7 +180,7 @@ void HDMapInput::DownSampleBoundary(const apollo::hdmap::LineSegment& line,
     for (const auto& point : raw_cloud->points) {
       out_boundary_line->push_back(point);
     }
-    AINFO << "Points num < 3, so no need to downsample.";
+    ADEBUG << "Points num < 3, so no need to downsample.";
     return;
   }
   out_boundary_line->points.reserve(out_boundary_line->points.size() +

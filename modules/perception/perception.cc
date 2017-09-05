@@ -49,7 +49,7 @@ Status Perception::Init() {
 }
 
 void Perception::OnPointCloud(const sensor_msgs::PointCloud2& message) {
-  AINFO << "get point cloud callback";
+  ADEBUG << "get point cloud callback";
 
   if (lidar_process_ != nullptr && lidar_process_->IsInit()) {
     lidar_process_->Process(message);
