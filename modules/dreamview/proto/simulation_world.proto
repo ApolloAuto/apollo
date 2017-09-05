@@ -116,6 +116,10 @@ message Object {
     DISENGAGE_NONE = 0;
     DISENGAGE_UNKNOWN = 1;
     DISENGAGE_MANUAL = 2;
+    DISENGAGE_EMERGENCY = 3;
+    DISENGAGE_AUTO_STEER_ONLY = 4;
+    DISENGAGE_AUTO_SPEED_ONLY = 5;
+    DISENGAGE_CHASSIS_ERROR = 6;
   };
 
   optional DisengageType disengage_type = 24;
