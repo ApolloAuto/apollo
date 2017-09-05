@@ -5,12 +5,23 @@ function roundToTens(percent) {
 }
 
 function toDrivingMode(disengageType) {
-    if (disengageType === "DISENGAGE_MANUAL") {
-        return "MANUAL";
-    } else if (disengageType === "DISENGAGE_NONE") {
-        return "AUTO";
+    switch (disengageType) {
+        case "DISENGAGE_MANUAL":
+            return "MANUAL";
+        case "DISENGAGE_NONE":
+            return "AUTO";
+        case "DISENGAGE_EMERGENCY":
+            return "EMERGENCY";
+        case "DISENGAGE_AUTO_STEER_ONLY":
+            return "AUTO STEER ONLY";
+        case "DISENGAGE_AUTO_SPEED_ONLY":
+            return "AUTO SPEED ONLY";
+        case "DISENGAGE_CHASSIS_ERROR":
+            return "CHASSIS ERROR";
+        default:
+            return "?";
     }
-    return "?";
+
 }
 
 function meterPerSecondToKmPerHour(speed) {
