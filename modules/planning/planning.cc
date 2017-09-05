@@ -119,17 +119,17 @@ Status Planning::Init() {
 }
 
 Status Planning::Start() {
-  static ros::Rate loop_rate(FLAGS_planning_loop_rate);
-  while (ros::ok()) {
-    RunOnce();
-    if (frame_) {
-      auto seq_num = frame_->SequenceNum();
-      FrameHistory::instance()->Add(seq_num, std::move(frame_));
-    }
-    ros::spinOnce();
-    loop_rate.sleep();
-  }
+  timer_ = AdapterManager::CreateTimer(
+      ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
   return Status::OK();
+}
+
+void Planning::OnTimer(const ros::TimerEvent&) {
+  RunOnce();
+  if (frame_) {
+    auto seq_num = frame_->SequenceNum();
+    FrameHistory::instance()->Add(seq_num, std::move(frame_));
+  }
 }
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb) {
