@@ -39,25 +39,6 @@ cc_binary(
     ],
 )
 
-cc_test(
-    name = "planning_test",
-    size = "small",
-    srcs = [
-        "planning_test.cc",
-    ],
-    data = [
-        "//modules/map:map_data",
-        "//modules/planning:planning_testdata",
-    ],
-    deps = [
-        ":planning_impl",
-        "//modules/common:log",
-        "//modules/common/time",
-        "//modules/common/util",
-        "@gtest//:main",
-    ],
-)
-
 filegroup(
     name = "planning_testdata",
     srcs = glob([
