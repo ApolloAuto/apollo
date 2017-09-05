@@ -41,7 +41,7 @@ void RemoveDuplicates(std::vector<Vec2d> *points) {
 
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
-  for (const auto& point : *points) {
+  for (const auto &point : *points) {
     if (count == 0 || point.DistanceSquareTo((*points)[count - 1]) > limit) {
       (*points)[count++] = point;
     }
@@ -98,9 +98,7 @@ PointENU PointFromVec2d(const Vec2d &point) {
   return pt;
 }
 
-Vec2d Vec2dFromPoint(const PointENU &point) {
-  return {point.x(), point.y()};
-}
+Vec2d Vec2dFromPoint(const PointENU &point) { return {point.x(), point.y()}; }
 
 }  // namespace
 
@@ -303,8 +301,7 @@ double LaneInfo::DistanceTo(const Vec2d &point) const {
   return segment_box->DistanceTo(point);
 }
 
-double LaneInfo::DistanceTo(const Vec2d &point,
-                            Vec2d *map_point,
+double LaneInfo::DistanceTo(const Vec2d &point, Vec2d *map_point,
                             double *s_offset, int *s_offset_index) const {
   CHECK_NOTNULL(map_point);
   CHECK_NOTNULL(s_offset);
@@ -331,8 +328,8 @@ PointENU LaneInfo::GetNearestPoint(const Vec2d &point, double *distance) const {
   return PointFromVec2d(nearest_point);
 }
 
-bool LaneInfo::GetProjection(const Vec2d &point,
-                             double *accumulate_s, double *lateral) const {
+bool LaneInfo::GetProjection(const Vec2d &point, double *accumulate_s,
+                             double *lateral) const {
   CHECK_NOTNULL(accumulate_s);
   CHECK_NOTNULL(lateral);
 
@@ -419,7 +416,7 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
         junctions_.emplace_back(overlap_ptr);
       }
 
-      // TODO: support parking and speed bump
+      // TODO(all): support parking and speed bump
       /*
       if (map_instance.get_parking_space_by_id(object_map_id) != nullptr) {
         _parking_spaces.emplace_back(overlap_ptr);
@@ -456,9 +453,7 @@ void JunctionInfo::Init() {
   CHECK_GT(polygon_.num_points(), 2);
 }
 
-SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) {
-  Init();
-}
+SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) { Init(); }
 
 void SignalInfo::Init() {
   for (const auto &stop_line : signal_.stop_line()) {
@@ -520,7 +515,7 @@ const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
 }
 
 RoadInfo::RoadInfo(const Road &road) : road_(road) {
-  for (const auto& section : road_.section()) {
+  for (const auto &section : road_.section()) {
     sections_.push_back(section);
     road_boundaries_.push_back(section.boundary());
   }

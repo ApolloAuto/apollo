@@ -12,14 +12,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H
-#define MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H
 
+#ifndef MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H_
+#define MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H_
+
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <string>
+#include <utility>
 #include <vector>
+
 #include "modules/map/proto/map.pb.h"
+
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 
 namespace apollo {
@@ -42,10 +46,9 @@ struct ProtoData {
   std::unordered_map<std::string, StopLineInternal> pb_stop_lines;
 };
 
-
 struct HashFunc {
-  template<typename T, typename U>
-  size_t operator()(const std::pair<T, U> &k) const {
+  template <typename T, typename U>
+  size_t operator()(const std::pair<T, U>& k) const {
     return std::hash<T>()(k.first) ^ std::hash<U>()(k.second);
   }
 };
@@ -60,20 +63,20 @@ class ProtoOrganizer {
 
  private:
   void GetLaneObjectOverlapElements(
-				const std::string& lane_id,
-				const std::vector<OverlapWithLane>& overlap_with_lanes);
+      const std::string& lane_id,
+      const std::vector<OverlapWithLane>& overlap_with_lanes);
   void GetLaneSignalOverlapElements(
-		        const std::string& lane_id,
-				const std::vector<OverlapWithLane>& overlap_with_lanes);
+      const std::string& lane_id,
+      const std::vector<OverlapWithLane>& overlap_with_lanes);
   void GetLaneJunctionOverlapElements(
-				const std::string& lane_id,
-				const std::vector<OverlapWithLane>& overlap_with_lanes);
+      const std::string& lane_id,
+      const std::vector<OverlapWithLane>& overlap_with_lanes);
   void GetLaneLaneOverlapElements(
-			const std::unordered_map<std::pair<std::string, std::string>,
-			OverlapWithLane,
-			HashFunc>& lane_lane_overlaps);
+      const std::unordered_map<std::pair<std::string, std::string>,
+                               OverlapWithLane, HashFunc>& lane_lane_overlaps);
   void GetJunctionObjectOverlapElements(
-			const std::vector<JunctionInternal>& junctions);
+      const std::vector<JunctionInternal>& junctions);
+
  private:
   ProtoData proto_data_;
 };
@@ -82,4 +85,4 @@ class ProtoOrganizer {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H
+#endif  // MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H_

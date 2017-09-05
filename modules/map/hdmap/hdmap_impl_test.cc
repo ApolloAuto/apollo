@@ -125,7 +125,8 @@
 //   YieldSignInfoConstPtr yield_sign_ptr = _hdmap_impl.get_yield_sign_by_id(
 //                                                               yield_sign_id);
 //   EXPECT_TRUE(nullptr != yield_sign_ptr);
-//   EXPECT_STREQ(yield_sign_id.id().c_str(), yield_sign_ptr->id().id().c_str());
+//   EXPECT_STREQ(yield_sign_id.id().c_str(),
+//   yield_sign_ptr->id().id().c_str());
 // }
 
 // TEST_F(HDMapImplTestSuite, get_overlap_by_id) {
@@ -134,7 +135,8 @@
 //   overlap_id.set_id("1");
 //   EXPECT_TRUE(nullptr == _hdmap_impl.get_overlap_by_id(overlap_id));
 //   overlap_id.set_id("overlap_533");
-//   OverlapInfoConstPtr overlap_ptr = _hdmap_impl.get_overlap_by_id(overlap_id);
+//   OverlapInfoConstPtr overlap_ptr =
+//   _hdmap_impl.get_overlap_by_id(overlap_id);
 //   EXPECT_TRUE(nullptr != overlap_ptr);
 //   EXPECT_STREQ(overlap_id.id().c_str(), overlap_ptr->id().id().c_str());
 // }
@@ -185,7 +187,8 @@
 //   EXPECT_EQ(-1, _hdmap_impl.get_nearest_lane_with_heading(point, 1e-6, 0.86,
 //     0.2, &nearest_lane, &nearest_s, &nearest_l));
 
-//   EXPECT_EQ(0, _hdmap_impl.get_nearest_lane_with_heading(point, 5, 0.86, 0.86,
+//   EXPECT_EQ(0, _hdmap_impl.get_nearest_lane_with_heading(point, 5, 0.86,
+//   0.86,
 //     &nearest_lane, &nearest_s, &nearest_l));
 //   EXPECT_EQ("1476761826058_1_-1", nearest_lane->id().id());
 //   EXPECT_NEAR(nearest_l, -1.9609, 1E-3);
@@ -203,11 +206,11 @@
 //   EXPECT_EQ(-1, _hdmap_impl.get_lanes_with_heading(point, 1e-6, 0.86,
 //     0.2, &lanes));
 
-//   EXPECT_EQ(0, _hdmap_impl.get_lanes_with_heading(point, 5, 0, 1.71, &lanes));
+//   EXPECT_EQ(0, _hdmap_impl.get_lanes_with_heading(point, 5, 0, 1.71,
+//   &lanes));
 //   EXPECT_EQ(1, lanes.size());
 //   EXPECT_EQ("1476761826058_1_-1", lanes[0]->id().id());
 // }
-
 
 // TEST_F(HDMapImplTestSuite, get_junctions) {
 //   initial_context();

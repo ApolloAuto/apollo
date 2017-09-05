@@ -44,7 +44,7 @@ namespace apollo {
 namespace hdmap {
 namespace {
 
-const std::string kMapFilename =
+const char kMapFilename[] =
     "modules/map/pnc_map/testdata/example_intersection.graph";
 
 Point MakePoint(double x, double y, double z) {
@@ -80,11 +80,11 @@ int RandomInt(int s, int t) {
   if (s >= t) {
     return s;
   }
-  return s + rand() % (t - s + 1);
+  return s + rand() % (t - s + 1);  // NOLINT
 }
 
 double RandomDouble(double s, double t) {
-  return s + (t - s) / 16383.0 * (rand() & 16383);
+  return s + (t - s) / 16383.0 * (rand() & 16383);  // NOLINT
 }
 
 template <class T>
@@ -316,7 +316,6 @@ TEST(TestSuite, hdmap_curvy_path) {
 
   // Test move constructor.
   Path other_path(std::move(path));
-  // TODO: check why path.approximation() is not nullptr here.
   const auto* other_path_approximation = other_path.approximation();
   EXPECT_NEAR(other_path_approximation->max_error(), 2.0, 1e-6);
   EXPECT_EQ(other_path_approximation->original_ids().size(), 2);
@@ -817,88 +816,7 @@ TEST(TestSuite, lane_info) {
   EXPECT_NEAR(right_width, 0.0, 1e-6);
   EXPECT_NEAR(lane_width, 30.0, 1e-6);
   EXPECT_NEAR(effective_width, 0.0, 1e-6);
-
-  // TOOD: (Liangliang) add function to build path from lane info.
-  /*
-  HDMap hdmap;
-  EXPECT_EQ(hdmap.load_map_from_file(kMapFilename), 0);
-  LaneInfoConstPtr lane1 =
-      hdmap.get_lane_by_id(apollo::hdmap::MakeMapId("l1"));
-  EXPECT_EQ("l1", lane1->id().id());
-  EXPECT_EQ(lane1->points().size(), 2);
-  EXPECT_NEAR(lane1->points()[0].x(), 2.0, 1e-6);
-  EXPECT_NEAR(lane1->points()[0].y(), -200.0, 1e-6);
-  EXPECT_NEAR(lane1->points()[1].x(), 2.0, 1e-6);
-  EXPECT_NEAR(lane1->points()[1].y(), -10.0, 1e-6);
-  EXPECT_EQ(lane1->unit_directions().size(), 2);
-  EXPECT_NEAR(lane1->unit_directions()[0].x(), 0.0, 1e-6);
-  EXPECT_NEAR(lane1->unit_directions()[0].y(), 1.0, 1e-6);
-  EXPECT_NEAR(lane1->unit_directions()[1].x(), 0.0, 1e-6);
-  EXPECT_NEAR(lane1->unit_directions()[1].y(), 1.0, 1e-6);
-  EXPECT_EQ(lane1->headings().size(), 2);
-  EXPECT_NEAR(lane1->headings()[0], M_PI_2, 1e-6);
-  EXPECT_NEAR(lane1->headings()[1], M_PI_2, 1e-6);
-  EXPECT_EQ(lane1->accumulate_s().size(), 2);
-  EXPECT_NEAR(lane1->accumulate_s()[0], 0, 1e-6);
-  EXPECT_NEAR(lane1->accumulate_s()[1], 190, 1e-6);
-  EXPECT_NEAR(lane1->total_length(), 190, 1e-6);
-
-  MapPathPoint point = lane1->GetSmoothPoint(50.0);
-  EXPECT_NEAR(point.x(), 2.0, 1e-6);
-  EXPECT_NEAR(point.y(), -150.0, 1e-6);
-  EXPECT_NEAR(point.heading(), M_PI_2, 1e-6);
-  EXPECT_EQ(point.lane_waypoints().size(), 1);
-  EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), "l1");
-  EXPECT_NEAR(point.lane_waypoints()[0].s, 50.0, 1e-6);
-
-  InterpolatedIndex index = lane1->GetIndexFromS(30.0);
-  EXPECT_EQ(0, index.id);
-  EXPECT_NEAR(30.0, index.offset, 1e-6);
-
-  double distance = 0.0;
-  point = lane1->GetNearestPoint({-50, -50}, &distance);
-  EXPECT_NEAR(point.x(), 2.0, 1e-6);
-  EXPECT_NEAR(point.y(), -50.0, 1e-6);
-  EXPECT_NEAR(point.heading(), M_PI_2, 1e-6);
-  EXPECT_EQ(point.lane_waypoints().size(), 1);
-  EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), "l1");
-  EXPECT_NEAR(point.lane_waypoints()[0].s, 150.0, 1e-6);
-
-  double s = 0.0;
-  double lateral = 0.0;
-  EXPECT_TRUE(lane1->GetProjection({-50, -50}, &s, &lateral));
-  EXPECT_NEAR(s, 150.0, 1e-6);
-  EXPECT_NEAR(lateral, 52.0, 1e-6);
-
-  // EXPECT_NEAR(lane1->path().GetRightWidth(123.0), 1.9, 1e-6);
-  // EXPECT_NEAR(lane1->path().GetLeftWidth(45.0), 1.9, 1e-6);
-
-  // Make sure overlaps are correctly computed.
-  // EXPECT_EQ(1, lane1->path().junction_overlaps().size());
-  // EXPECT_EQ(1, lane1->path().crosswalk_overlaps().size());
-
-  // Test is_on_lane, is_on_road
-  MapPathPoint cur_point = lane1->GetSmoothPoint(45.0);
-  EXPECT_TRUE(lane1->is_on_lane(cur_point));
-  EXPECT_TRUE(hdmap.is_on_road(cur_point));
-  Box2d small_box{
-      {cur_point.x(), cur_point.y()}, cur_point.heading(), 0.2, 0.5};
-  Box2d big_box{{cur_point.x(), cur_point.y()}, cur_point.heading(), 20, 50};
-  EXPECT_TRUE(lane1->is_on_lane(small_box));
-  EXPECT_FALSE(lane1->is_on_lane(big_box));
-  EXPECT_TRUE(hdmap.is_on_road(small_box));
-  EXPECT_FALSE(hdmap.is_on_road(big_box));
-
-  // 2 overlaps on the u-turn lane.
-  const LaneInfo* uturn_lane = hdmap.get_lane_by_id("int-l1-l2-uturn");
-  EXPECT_EQ("int-l1-l2-uturn", uturn_lane->id().id());
-  EXPECT_EQ(2, uturn_lane->crosswalks().size());
-  EXPECT_EQ("int-l1-l2-uturn-and-cross-l1-l2-part1",
-            uturn_lane->crosswalks()[0]->id().id());
-  EXPECT_EQ("int-l1-l2-uturn-and-cross-l1-l2-part2",
-            uturn_lane->crosswalks()[1]->id().id());
-  */
 }
 
-}  // hdmap
-}  // apollo
+}  // namespace hdmap
+}  // namespace apollo
