@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJ_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJ_H_
 
 #include <memory>
 #include <string>
@@ -78,4 +78,4 @@ typedef std::shared_ptr<const TrackedObject> TrackedObjectConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJ_H_
