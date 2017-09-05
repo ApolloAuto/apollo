@@ -54,7 +54,7 @@ bool CheckOverlapOnDpStGraph(const std::vector<StBoundary> boundaries,
   }
   return false;
 }
-}
+}  // namespace
 
 DpStGraph::DpStGraph(const ReferenceLine& reference_line,
                      const StGraphData& st_graph_data,

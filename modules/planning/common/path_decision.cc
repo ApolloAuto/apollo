@@ -20,6 +20,7 @@
 
 #include "modules/planning/common/path_decision.h"
 
+#include <memory>
 #include <utility>
 
 #include "modules/common/util/util.h"

@@ -143,7 +143,7 @@ TEST(StBoundaryTest, remove_redundant_points) {
   EXPECT_EQ(points.size(), 5);
 
   StBoundary st_boundary;
-  st_boundary.RemoveRedundantPoints(points);
+  st_boundary.RemoveRedundantPoints(&points);
 
   EXPECT_EQ(points.size(), 2);
   EXPECT_DOUBLE_EQ(points[0].first.s(), 0.0);

@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/path_decider/path_decider.h"
 
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>

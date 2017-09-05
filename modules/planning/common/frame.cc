@@ -21,6 +21,7 @@
 
 #include <cmath>
 #include <functional>
+#include <limits>
 #include <list>
 #include <string>
 #include <utility>

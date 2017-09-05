@@ -20,17 +20,19 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
+
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/apollo_app.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -81,8 +83,7 @@ class Planning : public apollo::common::ApolloApp {
 
   void RunOnce();
 
-  common::Status InitFrame(const uint32_t sequence_num,
-                           const double time_stamp,
+  common::Status InitFrame(const uint32_t sequence_num, const double time_stamp,
                            const common::TrajectoryPoint& init_adc_point);
 
  private:

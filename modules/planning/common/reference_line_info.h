@@ -23,6 +23,7 @@
 
 #include <limits>
 #include <list>
+#include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -58,7 +59,7 @@ class ReferenceLineInfo {
   const PathDecision& path_decision() const { return path_decision_; }
   const ReferenceLine& reference_line() const { return reference_line_; }
 
-  // TODO remove this inteface when ready.
+  // TODO(all) remove this inteface when ready.
   void SetTrajectory(const DiscretizedTrajectory& trajectory) {
     discretized_trajectory_ = trajectory;
   }

@@ -21,7 +21,9 @@
 #include "modules/planning/common/reference_line_info.h"
 
 #include <functional>
+#include <memory>
 #include <unordered_set>
+#include <utility>
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 

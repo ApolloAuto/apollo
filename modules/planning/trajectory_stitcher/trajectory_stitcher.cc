@@ -57,7 +57,7 @@ std::vector<TrajectoryPoint> ComputeReinitStitchingTrajectory() {
 
   return std::vector<TrajectoryPoint>(1, init_point);
 }
-}
+}  // namespace
 
 // Planning from current vehicle state:
 // if 1. the auto-driving mode is off or
