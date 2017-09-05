@@ -142,7 +142,7 @@ void LatController::ProcessLogs(const SimpleLateralDebug *debug,
   if (FLAGS_enable_csv_debug) {
     steer_log_file_ << log_str << std::endl;
   }
-  AINFO << "Steer_Control_Detail: " << log_str;
+  ADEBUG << "Steer_Control_Detail: " << log_str;
 }
 
 void LatController::LogInitParameters() {

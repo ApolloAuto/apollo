@@ -134,7 +134,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   Status status = CheckInput();
   // check data
   if (!status.ok()) {
-    AERROR << "Control input data failed: " << status.error_message();
+    AERROR_EVERY(100) << "Control input data failed: " << status.error_message();
     estop_ = true;
   } else {
     Status status_ts = CheckTimestamp();
@@ -152,7 +152,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   if (!estop_) {
     if (chassis_.driving_mode() == Chassis::COMPLETE_MANUAL) {
       controller_agent_.Reset();
-      AINFO << "Reset Controllers in Manual Mode";
+      AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
     }
 
     auto debug = control_command->mutable_debug()->mutable_input_debug();
@@ -209,7 +209,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
 
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  AINFO_EVERY(1000) << "control cycle time is: " << time_diff_ms << " ms.";
+  ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 
   SendCmd(&control_command);

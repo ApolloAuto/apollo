@@ -90,7 +90,7 @@ Status ControllerAgent::ComputeControlCommand(
     double end_timestamp = Clock::NowInSecond();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
-    AINFO << "controller: " << controller->Name()
+    ADEBUG << "controller: " << controller->Name()
           << " calculation time is: " << time_diff_ms << " ms.";
     cmd->mutable_latency_stats()->add_controller_time_ms(time_diff_ms);
   }
