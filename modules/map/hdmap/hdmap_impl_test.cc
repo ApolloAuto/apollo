@@ -14,8 +14,8 @@ limitations under the License.
 =========================================================================*/
 
 #include <algorithm>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "gtest/gtest.h"
 #include "modules/map/hdmap/hdmap_impl.h"
@@ -32,25 +32,14 @@ namespace hdmap {
 class HDMapImplTestSuite : public ::testing::Test {
  public:
   HDMapImplTestSuite() {
+    EXPECT_EQ(0, hdmap_impl_.LoadMapFromFile(kMapFilename));
   }
-  virtual ~HDMapImplTestSuite() {
-  }
-  virtual void SetUp() {
-  }
-  virtual void TearDown() {
-  }
-  void InitialContext();
+
  public:
-    HDMapImpl hdmap_impl_;
+  HDMapImpl hdmap_impl_;
 };
 
-void HDMapImplTestSuite::InitialContext() {
-  int ret = hdmap_impl_.LoadMapFromFile(kMapFilename);
-  ASSERT_EQ(0, ret);
-}
-
 TEST_F(HDMapImplTestSuite, GetLaneById) {
-  InitialContext();
   Id lane_id;
   lane_id.set_id("1");
   EXPECT_TRUE(nullptr == hdmap_impl_.GetLaneById(lane_id));
@@ -61,19 +50,16 @@ TEST_F(HDMapImplTestSuite, GetLaneById) {
 }
 
 TEST_F(HDMapImplTestSuite, GetJunctionById) {
-  InitialContext();
   Id junction_id;
   junction_id.set_id("1");
   EXPECT_TRUE(nullptr == hdmap_impl_.GetJunctionById(junction_id));
   junction_id.set_id("1183");
-  JunctionInfoConstPtr junction_ptr = hdmap_impl_.GetJunctionById(
-                                                            junction_id);
+  JunctionInfoConstPtr junction_ptr = hdmap_impl_.GetJunctionById(junction_id);
   EXPECT_TRUE(nullptr != junction_ptr);
   EXPECT_STREQ(junction_id.id().c_str(), junction_ptr->id().id().c_str());
 }
 
 TEST_F(HDMapImplTestSuite, GetSignalById) {
-  InitialContext();
   Id signal_id;
   signal_id.set_id("abc");
   EXPECT_TRUE(nullptr == hdmap_impl_.GetSignalById(signal_id));
@@ -84,56 +70,49 @@ TEST_F(HDMapImplTestSuite, GetSignalById) {
 }
 
 TEST_F(HDMapImplTestSuite, GetCrosswalkById) {
-  InitialContext();
   Id crosswalk_id;
   crosswalk_id.set_id("1");
   EXPECT_TRUE(nullptr == hdmap_impl_.GetCrosswalkById(crosswalk_id));
   crosswalk_id.set_id("1277");
-  CrosswalkInfoConstPtr crosswalk_ptr = hdmap_impl_.GetCrosswalkById(
-                                                              crosswalk_id);
+  CrosswalkInfoConstPtr crosswalk_ptr =
+      hdmap_impl_.GetCrosswalkById(crosswalk_id);
   EXPECT_TRUE(nullptr != crosswalk_ptr);
   EXPECT_STREQ(crosswalk_id.id().c_str(), crosswalk_ptr->id().id().c_str());
 }
 
 TEST_F(HDMapImplTestSuite, GetStopSignById) {
-  InitialContext();
   Id stop_sign_id;
   stop_sign_id.set_id("1");
   EXPECT_TRUE(nullptr == hdmap_impl_.GetStopSignById(stop_sign_id));
   stop_sign_id.set_id("1276");
-  StopSignInfoConstPtr stop_sign_ptr = hdmap_impl_.GetStopSignById(
-                                                              stop_sign_id);
+  StopSignInfoConstPtr stop_sign_ptr =
+      hdmap_impl_.GetStopSignById(stop_sign_id);
   EXPECT_TRUE(nullptr != stop_sign_ptr);
   EXPECT_STREQ(stop_sign_id.id().c_str(), stop_sign_ptr->id().id().c_str());
 }
 
 TEST_F(HDMapImplTestSuite, GetYieldSignById) {
-  InitialContext();
   Id yield_sign_id;
   yield_sign_id.set_id("1");
   EXPECT_TRUE(nullptr == hdmap_impl_.GetYieldSignById(yield_sign_id));
   yield_sign_id.set_id("1275");
-  YieldSignInfoConstPtr yield_sign_ptr = hdmap_impl_.GetYieldSignById(
-                                                              yield_sign_id);
+  YieldSignInfoConstPtr yield_sign_ptr =
+      hdmap_impl_.GetYieldSignById(yield_sign_id);
   EXPECT_TRUE(nullptr != yield_sign_ptr);
-  EXPECT_STREQ(yield_sign_id.id().c_str(),
-  yield_sign_ptr->id().id().c_str());
+  EXPECT_STREQ(yield_sign_id.id().c_str(), yield_sign_ptr->id().id().c_str());
 }
 
 TEST_F(HDMapImplTestSuite, GetOverlapById) {
-  InitialContext();
   Id overlap_id;
   overlap_id.set_id("1");
   EXPECT_TRUE(nullptr == hdmap_impl_.GetOverlapById(overlap_id));
   overlap_id.set_id("overlap_20");
-  OverlapInfoConstPtr overlap_ptr =
-  hdmap_impl_.GetOverlapById(overlap_id);
+  OverlapInfoConstPtr overlap_ptr = hdmap_impl_.GetOverlapById(overlap_id);
   EXPECT_TRUE(nullptr != overlap_ptr);
   EXPECT_STREQ(overlap_id.id().c_str(), overlap_ptr->id().id().c_str());
 }
 
 TEST_F(HDMapImplTestSuite, GetRoadById) {
-  InitialContext();
   Id road_id;
   road_id.set_id("1");
   EXPECT_TRUE(nullptr == hdmap_impl_.GetRoadById(road_id));
@@ -144,7 +123,6 @@ TEST_F(HDMapImplTestSuite, GetRoadById) {
 }
 
 TEST_F(HDMapImplTestSuite, GetLanes) {
-  InitialContext();
   std::vector<LaneInfoConstPtr> lanes;
   apollo::common::PointENU point;
   point.set_x(586424.09);
@@ -155,15 +133,14 @@ TEST_F(HDMapImplTestSuite, GetLanes) {
   EXPECT_EQ(0, hdmap_impl_.GetLanes(point, 5, &lanes));
   EXPECT_EQ(1, lanes.size());
   std::vector<std::string> ids;
-  for (const auto &lane : lanes) {
-      ids.push_back(lane->id().id());
+  for (const auto& lane : lanes) {
+    ids.push_back(lane->id().id());
   }
 
   EXPECT_EQ("773_1_-2", ids[0]);
 }
 
 TEST_F(HDMapImplTestSuite, GetNearestLaneWithHeading) {
-  InitialContext();
   apollo::common::PointENU point;
   point.set_x(586424.09);
   point.set_y(4140727.02);
@@ -172,35 +149,34 @@ TEST_F(HDMapImplTestSuite, GetNearestLaneWithHeading) {
   LaneInfoConstPtr nearest_lane;
   double nearest_s = 0.0;
   double nearest_l = 0.0;
-  EXPECT_EQ(-1, hdmap_impl_.GetNearestLaneWithHeading(point, 1e-6, 0.86,
-      0.2, &nearest_lane, &nearest_s, &nearest_l));
+  EXPECT_EQ(-1,
+            hdmap_impl_.GetNearestLaneWithHeading(
+                point, 1e-6, 0.86, 0.2, &nearest_lane, &nearest_s, &nearest_l));
 
-  EXPECT_EQ(0, hdmap_impl_.GetNearestLaneWithHeading(point, 5, -2.35,
-      1.0, &nearest_lane, &nearest_s, &nearest_l));
+  EXPECT_EQ(0,
+            hdmap_impl_.GetNearestLaneWithHeading(
+                point, 5, -2.35, 1.0, &nearest_lane, &nearest_s, &nearest_l));
   EXPECT_EQ("773_1_-2", nearest_lane->id().id());
   EXPECT_NEAR(nearest_l, -3.257, 1E-3);
   EXPECT_NEAR(nearest_s, 25.891, 1E-3);
 }
 
 TEST_F(HDMapImplTestSuite, GetLanesWithHeading) {
-  InitialContext();
   apollo::common::PointENU point;
   point.set_x(586424.09);
   point.set_y(4140727.02);
   point.set_z(0.0);
 
   std::vector<LaneInfoConstPtr> lanes;
-  EXPECT_EQ(-1, hdmap_impl_.GetLanesWithHeading(point, 1e-6, 0.86,
-    0.2, &lanes));
+  EXPECT_EQ(-1,
+            hdmap_impl_.GetLanesWithHeading(point, 1e-6, 0.86, 0.2, &lanes));
 
-  EXPECT_EQ(0, hdmap_impl_.GetLanesWithHeading(point, 5, -2.35, 1.0,
-  &lanes));
+  EXPECT_EQ(0, hdmap_impl_.GetLanesWithHeading(point, 5, -2.35, 1.0, &lanes));
   EXPECT_EQ(1, lanes.size());
   EXPECT_EQ("773_1_-2", lanes[0]->id().id());
 }
 
 TEST_F(HDMapImplTestSuite, GetJunctions) {
-  InitialContext();
   std::vector<JunctionInfoConstPtr> junctions;
   apollo::common::PointENU point;
   point.set_x(586441.61);
@@ -214,7 +190,6 @@ TEST_F(HDMapImplTestSuite, GetJunctions) {
 }
 
 TEST_F(HDMapImplTestSuite, GetCrosswalks) {
-  InitialContext();
   std::vector<CrosswalkInfoConstPtr> crosswalks;
   apollo::common::PointENU point;
   point.set_x(586449.32);
@@ -228,7 +203,6 @@ TEST_F(HDMapImplTestSuite, GetCrosswalks) {
 }
 
 TEST_F(HDMapImplTestSuite, GetSignals) {
-  InitialContext();
   std::vector<SignalInfoConstPtr> signals;
 
   apollo::common::PointENU point;
@@ -243,7 +217,6 @@ TEST_F(HDMapImplTestSuite, GetSignals) {
 }
 
 TEST_F(HDMapImplTestSuite, GetStopSigns) {
-  InitialContext();
   std::vector<StopSignInfoConstPtr> stop_signs;
 
   apollo::common::PointENU point;
@@ -256,7 +229,6 @@ TEST_F(HDMapImplTestSuite, GetStopSigns) {
 }
 
 TEST_F(HDMapImplTestSuite, GetYieldSigns) {
-  InitialContext();
   std::vector<YieldSignInfoConstPtr> yield_signs;
 
   apollo::common::PointENU point;
@@ -269,7 +241,6 @@ TEST_F(HDMapImplTestSuite, GetYieldSigns) {
 }
 
 TEST_F(HDMapImplTestSuite, GetRoads) {
-  InitialContext();
   std::vector<RoadInfoConstPtr> roads;
 
   apollo::common::PointENU point;
@@ -297,7 +268,6 @@ TEST_F(HDMapImplTestSuite, GetRoads) {
 }
 
 TEST_F(HDMapImplTestSuite, GetNearestLane) {
-  InitialContext();
   LaneInfoConstPtr lane;
   double s = 0.0;
   double l = 0.0;
@@ -313,32 +283,28 @@ TEST_F(HDMapImplTestSuite, GetNearestLane) {
 }
 
 TEST_F(HDMapImplTestSuite, GetRoadBoundaries) {
-  InitialContext();
   apollo::common::PointENU point;
   point.set_x(586427.58);
   point.set_y(4140749.35);
   point.set_z(0.0);
   std::vector<RoadROIBoundaryPtr> road_boundaries;
   std::vector<JunctionBoundaryPtr> junctions;
-  EXPECT_EQ(-1, hdmap_impl_.GetRoadBoundaries(point, 3.0,
-                                        &road_boundaries,
-                                        &junctions));
+  EXPECT_EQ(-1, hdmap_impl_.GetRoadBoundaries(point, 3.0, &road_boundaries,
+                                              &junctions));
 
   point.set_x(586434.75);
   point.set_y(4140746.94);
   point.set_z(0.0);
-  EXPECT_EQ(0, hdmap_impl_.GetRoadBoundaries(point, 2.0,
-                                        &road_boundaries,
-                                        &junctions));
+  EXPECT_EQ(0, hdmap_impl_.GetRoadBoundaries(point, 2.0, &road_boundaries,
+                                             &junctions));
   EXPECT_EQ(1, road_boundaries.size());
   EXPECT_EQ(0, junctions.size());
 
   point.set_x(586434.75);
   point.set_y(4140746.94);
   point.set_z(0.0);
-  EXPECT_EQ(0, hdmap_impl_.GetRoadBoundaries(point, 4.5,
-                                        &road_boundaries,
-                                        &junctions));
+  EXPECT_EQ(0, hdmap_impl_.GetRoadBoundaries(point, 4.5, &road_boundaries,
+                                             &junctions));
   EXPECT_EQ(1, road_boundaries.size());
   EXPECT_EQ(1, junctions.size());
 }

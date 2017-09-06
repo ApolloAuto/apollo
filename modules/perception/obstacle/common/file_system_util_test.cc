@@ -22,15 +22,7 @@
 namespace apollo {
 namespace perception {
 
-class FileSystemUtilTest : public testing::Test {
- protected:
-  FileSystemUtilTest() {}
-  virtual ~FileSystemUtilTest() {}
-  void SetUp() {}
-  void TearDown() {}
-};
-
-TEST_F(FileSystemUtilTest, GetFileNamesInFolderById) {
+TEST(FileSystemUtilTest, GetFileNamesInFolderById) {
   std::string data_path = "modules/perception/data/hm_tracker_test/";
   std::vector<std::string> pcd_filenames;
   GetFileNamesInFolderById(data_path, ".pcd", &pcd_filenames);

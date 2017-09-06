@@ -30,15 +30,6 @@ using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
 using pcl_util::PointDCloud;
 
-class ConvexHull2DXYTest : public testing::Test {
- protected:
-  ConvexHull2DXYTest() {}
-  virtual ~ConvexHull2DXYTest() {}
-  void SetUp() {
-  }
-  void TearDown() {}
-};
-
 static bool ConstructPointCloud(std::vector<pcl_util::PointCloudPtr>* clouds) {
   std::string pcd_data(
       "modules/perception/data/obstacle_common_test/"
@@ -67,7 +58,7 @@ static bool ConstructPointCloud(std::vector<pcl_util::PointCloudPtr>* clouds) {
   return true;
 }
 
-TEST_F(ConvexHull2DXYTest, Reconstruct2dxy) {
+TEST(ConvexHull2DXYTest, Reconstruct2dxy) {
   std::vector<pcl_util::PointCloudPtr> clouds;
   ConstructPointCloud(&clouds);
   EXPECT_EQ(5, clouds.size());

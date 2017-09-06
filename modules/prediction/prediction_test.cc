@@ -21,18 +21,9 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::Status;
-
-class PredictionTest : public ::testing::Test {
- public:
-  virtual void SetUp() {}
-
- protected:
-  Prediction prediction_;
-};
-
-TEST_F(PredictionTest, Simple) {
-  EXPECT_EQ(prediction_.Name(), "prediction");
+TEST(PredictionTest, Simple) {
+  Prediction prediction;
+  EXPECT_EQ(prediction.Name(), "prediction");
 }
 
 }  // namespace prediction

@@ -125,9 +125,3 @@ TEST(TopoEdgeTestSuit, basic_test) {
 
 }  // namespace routing
 }  // namespace apollo
-
-int main(int argc, char **argv) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-

@@ -23,19 +23,7 @@
 namespace apollo {
 namespace perception {
 
-class HungarianOptimizerTest : public testing::Test {
- protected:
-  HungarianOptimizerTest() {
-  }
-  virtual ~HungarianOptimizerTest() {
-  }
-  void SetUp() {
-  }
-  void TearDown() {
-  }
-};
-
-TEST_F(HungarianOptimizerTest, maximize) {
+TEST(HungarianOptimizerTest, maximize) {
   // case 1
   Eigen::MatrixXf association_mat_1(3, 4);
   association_mat_1 << 4.7, 3.8, 1.0, 2.0,
@@ -112,7 +100,7 @@ TEST_F(HungarianOptimizerTest, maximize) {
   EXPECT_EQ(0, task.size());
 }
 
-TEST_F(HungarianOptimizerTest, minimize) {
+TEST(HungarianOptimizerTest, minimize) {
   Eigen::MatrixXf association_mat(3, 4);
   association_mat << 0.3, 1.2, 4.0, 3.0,
                      0.9, 2.0, 3.0, 8.0,
