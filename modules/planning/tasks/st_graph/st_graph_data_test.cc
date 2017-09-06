@@ -29,20 +29,6 @@ namespace apollo {
 namespace planning {
 
 TEST(StGraphDataTest, basic_test) {
-  StGraphData st_graph_data;
-  EXPECT_EQ(st_graph_data.st_boundaries().size(), 0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().x(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().y(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().z(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().theta(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().kappa(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().dkappa(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().ddkappa(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().v(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().a(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.init_point().relative_time(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data.path_data_length(), 0.0);
-
   std::vector<StBoundary> boundary_vec;
   boundary_vec.push_back(StBoundary());
   apollo::common::TrajectoryPoint traj_point;

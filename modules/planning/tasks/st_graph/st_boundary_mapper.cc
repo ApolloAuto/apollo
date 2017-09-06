@@ -99,7 +99,6 @@ Status StBoundaryMapper::GetGraphBoundary(
   }
 
   st_boundaries->clear();
-  Status ret = Status::OK();
 
   const PathObstacle* stop_obstacle = nullptr;
   ObjectDecisionType stop_decision;
