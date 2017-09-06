@@ -31,12 +31,18 @@ source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 export APOLLO_ROOT_DIR
 
-if [ -e "${APOLLO_ROOT_DIR}/data" ]; then
-    rm -rf ${APOLLO_ROOT_DIR}/data 
+if [ ! -e "${APOLLO_ROOT_DIR}/data" ]; then
+    mkdir -p ${APOLLO_ROOT_DIR}/data
 fi
-mkdir -p "${APOLLO_ROOT_DIR}/data/log"
-mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
-mkdir -p "${APOLLO_ROOT_DIR}/data/core"
+if [ ! -e "${APOLLO_ROOT_DIR}/data/log" ]; then
+    mkdir -p ${APOLLO_ROOT_DIR}/data/log
+fi
+if [ ! -e "${APOLLO_ROOT_DIR}/data/bag" ]; then
+    mkdir -p ${APOLLO_ROOT_DIR}/data/bag
+fi
+if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
+    mkdir -p ${APOLLO_ROOT_DIR}/data/core
+fi
 
 if [ ! -e /apollo ]; then
     sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
