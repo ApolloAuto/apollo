@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
   apollo::hmi::RosBridge::instance()->Init();
 
   ros::Rate rate(FLAGS_spin_rate);
-  while (true) {
+  while (ros::ok()) {
     ros::spinOnce();
     rate.sleep();
   }
