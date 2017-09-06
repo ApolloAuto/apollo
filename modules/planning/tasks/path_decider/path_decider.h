@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file dp_poly_path_optimizer.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_PATH_DECIDER_PATH_DECIDER_H_
@@ -31,6 +31,7 @@ namespace planning {
 class PathDecider : public Task {
  public:
   PathDecider();
+  ~PathDecider() = default;
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
@@ -45,11 +46,11 @@ class PathDecider : public Task {
   bool MakeStaticObstacleDecision(const PathData &path_data,
                                   PathDecision *const path_decision);
 
-  ObjectNudge::Type DecideNudge(const SLBoundary& obstacle_boundary,
-                                const common::SLPoint& adc_sl);
+  ObjectNudge::Type DecideNudge(const SLBoundary &obstacle_boundary,
+                                const common::SLPoint &adc_sl);
 
   ObjectStop GenerateObjectStopDecision(
-      const PathObstacle& path_obstacle) const;
+      const PathObstacle &path_obstacle) const;
 };
 
 }  // namespace planning
