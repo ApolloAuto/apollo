@@ -49,7 +49,7 @@ bool CNNSegmentation::Init() {
   height_ = static_cast<int>(feature_param.height());
 
   /// Instantiate Caffe net
-#ifdef CPU_ONLY
+#ifndef USE_CAFFE_GPU
   caffe::Caffe::set_mode(caffe::Caffe::CPU);
 #else
   int gpu_id = static_cast<int>(cnnseg_param_.gpu_id());
@@ -63,7 +63,7 @@ bool CNNSegmentation::Init() {
   caffe_net_->CopyTrainedLayersFrom(weight_file);
 
   AINFO << "confidence threshold = " << cnnseg_param_.confidence_thresh();
-#ifdef CPU_ONLY
+#ifndef USE_CAFFE_GPU
   AINFO << "using Caffe CPU mode";
 #else
   AINFO << "using Caffe GPU mode";
@@ -139,7 +139,7 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   PERF_BLOCK_END("[CNNSeg] feature generation");
 
 // network forward process
-#ifndef CPU_ONLY
+#ifdef USE_CAFFE_GPU
   caffe::Caffe::set_mode(caffe::Caffe::GPU);
 #endif
   caffe_net_->Forward();
