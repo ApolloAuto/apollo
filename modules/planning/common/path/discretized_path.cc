@@ -69,30 +69,7 @@ common::PathPoint DiscretizedPath::EvaluateUsingLinearApproximation(
     return path_points_.back();
   }
   return util::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower,
-                                                path_s);
-}
-
-int DiscretizedPath::QueryClosestPoint(const double path_s) const {
-  if (path_points_.empty()) {
-    return -1;
-  }
-  auto it_lower = QueryLowerBound(path_s);
-
-  if (it_lower == path_points_.begin()) {
-    return 0;
-  }
-  if (it_lower == path_points_.end()) {
-    return path_points_.size() - 1;
-  }
-
-  double d0 = path_s - (it_lower - 1)->s();
-  double d1 = it_lower->s() - path_s;
-
-  if (d0 < d1) {
-    return static_cast<int>(it_lower - path_points_.begin()) - 1;
-  } else {
-    return static_cast<int>(it_lower - path_points_.begin());
-  }
+                                                   path_s);
 }
 
 const std::vector<common::PathPoint> &DiscretizedPath::path_points() const {

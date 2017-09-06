@@ -30,17 +30,6 @@ namespace planning {
 
 using IndexedPathObstacles = IndexedList<std::string, PathObstacle>;
 
-bool PathDecision::AddPathObstacles(
-    const std::vector<const PathObstacle *> &path_obstacles) {
-  for (const auto *path_obstacle : path_obstacles) {
-    if (!path_obstacles_.Add(path_obstacle->Id(), *path_obstacle)) {
-      AERROR << "Failed to add obstacle: " << path_obstacle->Id();
-      return false;
-    }
-  }
-  return true;
-}
-
 bool PathDecision::AddPathObstacle(
     std::unique_ptr<PathObstacle> &&path_obstacle) {
   auto id = path_obstacle->Id();

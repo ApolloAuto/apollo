@@ -29,8 +29,8 @@
 namespace apollo {
 namespace planning {
 
-using Vec2d = common::math::Vec2d;
-using LineSegment2d = common::math::LineSegment2d;
+using common::math::Vec2d;
+using common::math::LineSegment2d;
 
 StBoundary::StBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {
@@ -172,16 +172,6 @@ STPoint StBoundary::BottomLeftPoint() const {
 STPoint StBoundary::BottomRightPoint() const {
   DCHECK(!lower_points_.empty()) << "StBoundary has zero points.";
   return lower_points_.back();
-}
-
-STPoint StBoundary::TopRightPoint() const {
-  DCHECK(!upper_points_.empty()) << "StBoundary has zero points.";
-  return upper_points_.back();
-}
-
-STPoint StBoundary::TopLeftPoint() const {
-  DCHECK(!upper_points_.empty()) << "StBoundary has zero points.";
-  return upper_points_.front();
 }
 
 StBoundary StBoundary::ExpandByS(const double s) const {
@@ -336,10 +326,10 @@ bool StBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
 }
 
 double StBoundary::DistanceS(const STPoint& st_point) const {
-  constexpr double kMaxDistance = 1.0e10;
   double s_upper;
   double s_lower;
   if (GetBoundarySRange(st_point.t(), &s_upper, &s_lower)) {
+    constexpr double kMaxDistance = 1.0e10;
     return kMaxDistance;
   }
   if (st_point.s() < s_lower) {

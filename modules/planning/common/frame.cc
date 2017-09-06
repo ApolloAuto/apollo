@@ -255,11 +255,6 @@ bool Frame::CheckCollision() {
 
 uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
-const Obstacle *Frame::FindObstacle(const std::string &obstacle_id) {
-  std::lock_guard<std::mutex> lock(obstacles_mutex_);
-  return obstacles_.Find(obstacle_id);
-}
-
 std::vector<ReferenceLine> Frame::CreateReferenceLineFromRouting(
     const common::PointENU &position, const routing::RoutingResponse &routing) {
   std::vector<ReferenceLine> reference_lines;
