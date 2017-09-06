@@ -38,9 +38,9 @@ class Spline2dConstraint {
 
   // direct method
   bool AddInequalityConstraint(const Eigen::MatrixXd& constraint_matrix,
-                                 const Eigen::MatrixXd& constraint_boundary);
-  bool AddEqualityConstraint(const Eigen::MatrixXd& constraint_matrix,
                                const Eigen::MatrixXd& constraint_boundary);
+  bool AddEqualityConstraint(const Eigen::MatrixXd& constraint_matrix,
+                             const Eigen::MatrixXd& constraint_boundary);
 
   // preset method
   /**
@@ -48,35 +48,35 @@ class Spline2dConstraint {
   *   if no boundary, do specify either by std::infinity or let vector.size() =
   *0
   **/
-  bool Add2dBoundary(
-      const std::vector<double>& t_coord, const std::vector<double>& angle,
-      const std::vector<apollo::common::math::Vec2d>& ref_point,
-      const std::vector<double>& longitidinal_bound,
-      const std::vector<double>& lateral_bound);
+  bool Add2dBoundary(const std::vector<double>& t_coord,
+                     const std::vector<double>& angle,
+                     const std::vector<apollo::common::math::Vec2d>& ref_point,
+                     const std::vector<double>& longitidinal_bound,
+                     const std::vector<double>& lateral_bound);
 
   // ref point refer to derivative reference point
-  bool add_2d_derivative_boundary(
+  bool Add2dDerivativeBoundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
       const std::vector<apollo::common::math::Vec2d>& ref_point,
       const std::vector<double>& longitidinal_bound,
       const std::vector<double>& lateral_bound);
 
   // ref point refer to second derivative ref point
-  bool add_2d_second_derivative_boundary(
+  bool Add2dSecondDerivativeBoundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
       const std::vector<apollo::common::math::Vec2d>& ref_point,
       const std::vector<double>& longitidinal_bound,
       const std::vector<double>& lateral_bound);
 
   // ref point refer to third derivative ref point
-  bool add_2d_third_derivative_boundary(
+  bool Add2dThirdDerivativeBoundary(
       const std::vector<double>& t_coord, const std::vector<double>& angle,
       const std::vector<apollo::common::math::Vec2d>& ref_point,
       const std::vector<double>& longitidinal_bound,
       const std::vector<double>& lateral_bound);
 
-  bool add_point_constraint(const double t, const double x, const double y);
-  bool add_point_angle_constraint(const double t, const double angle);
+  bool AddPointConstraint(const double t, const double x, const double y);
+  bool AddPointAngleConstraint(const double t, const double angle);
 
   // guarantee upto values are joint
   bool AddSmoothConstraint();
@@ -97,20 +97,20 @@ class Spline2dConstraint {
   const AffineConstraint& equality_constraint() const;
 
  private:
-  std::uint32_t find_index(const double t) const;
-  std::vector<double> affine_coef(const double angle, const double t) const;
-  std::vector<double> affine_derivative_coef(const double angle,
-                                             const double t) const;
-  std::vector<double> affine_second_derivative_coef(const double angle,
-                                                    const double t) const;
-  std::vector<double> affine_third_derivative_coef(const double angle,
-                                                   const double t) const;
-  std::vector<double> poly_coef(const double t) const;
-  std::vector<double> derivative_coef(const double t) const;
-  std::vector<double> second_derivative_coef(const double t) const;
-  std::vector<double> third_derivative_coef(const double t) const;
-  double sign_distance(const apollo::common::math::Vec2d& xy_point,
-                       const double angle) const;
+  std::uint32_t FindIndex(const double t) const;
+  std::vector<double> AffineCoef(const double angle, const double t) const;
+  std::vector<double> AffineDerivativeCoef(const double angle,
+                                           const double t) const;
+  std::vector<double> AffineSecondDerivativeCoef(const double angle,
+                                                 const double t) const;
+  std::vector<double> AffineThirdDerivativeCoef(const double angle,
+                                                const double t) const;
+  std::vector<double> PolyCoef(const double t) const;
+  std::vector<double> DerivativeCoef(const double t) const;
+  std::vector<double> SecondDerivativeCoef(const double t) const;
+  std::vector<double> ThirdDerivativeCoef(const double t) const;
+  double SignDistance(const apollo::common::math::Vec2d& xy_point,
+                      const double angle) const;
 
  private:
   AffineConstraint inequality_constraint_;

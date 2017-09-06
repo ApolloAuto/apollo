@@ -263,17 +263,17 @@ Status QpSplineStGraph::ApplyKernel(const std::vector<StBoundary>& boundaries,
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   if (qp_spline_st_speed_config_.speed_kernel_weight() > 0) {
-    spline_kernel->add_derivative_kernel_matrix(
+    spline_kernel->AddDerivativeKernelMatrix(
         qp_spline_st_speed_config_.speed_kernel_weight());
   }
 
   if (qp_spline_st_speed_config_.accel_kernel_weight() > 0) {
-    spline_kernel->add_second_order_derivative_matrix(
+    spline_kernel->AddSecondOrderDerivativeMatrix(
         qp_spline_st_speed_config_.accel_kernel_weight());
   }
 
   if (qp_spline_st_speed_config_.jerk_kernel_weight() > 0) {
-    spline_kernel->add_third_order_derivative_matrix(
+    spline_kernel->AddThirdOrderDerivativeMatrix(
         qp_spline_st_speed_config_.jerk_kernel_weight());
   }
 
@@ -322,7 +322,7 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
   }
 
   if (evaluate_t.size() > 0) {
-    spline_kernel->add_reference_line_kernel_matrix(
+    spline_kernel->AddReferenceLineKernelMatrix(
         evaluate_t, s_vec,
         weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
   }
@@ -358,7 +358,7 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
   DCHECK_EQ(filtered_evaluate_t.size(), ref_s.size());
 
   if (!ref_s.empty()) {
-    spline_kernel->add_reference_line_kernel_matrix(
+    spline_kernel->AddReferenceLineKernelMatrix(
         filtered_evaluate_t, ref_s,
         weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
   }
