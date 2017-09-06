@@ -16,6 +16,8 @@
 
 #include "modules/canbus/vehicle/lincoln/lincoln_controller.h"
 
+#include "modules/common/proto/vehicle_signal.pb.h"
+
 #include "modules/canbus/can_comm/can_sender.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
@@ -25,7 +27,6 @@
 #include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/log.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 
 namespace apollo {
@@ -498,7 +499,7 @@ bool LincolnController::CheckChassisError() {
   int32_t chassis_error_mask = 0;
   if (!chassis_detail.has_eps()) {
     AERROR_EVERY(100) << "ChassisDetail has NO eps."
-        << chassis_detail.DebugString();
+                      << chassis_detail.DebugString();
     return false;
   }
   bool steer_fault = chassis_detail.eps().watchdog_fault() |
@@ -520,7 +521,7 @@ bool LincolnController::CheckChassisError() {
 
   if (!chassis_detail.has_brake()) {
     AERROR_EVERY(100) << "ChassisDetail has NO brake."
-        << chassis_detail.DebugString();
+                      << chassis_detail.DebugString();
     return false;
   }
   // brake fault
@@ -542,7 +543,7 @@ bool LincolnController::CheckChassisError() {
 
   if (!chassis_detail.has_gas()) {
     AERROR_EVERY(100) << "ChassisDetail has NO gas."
-        << chassis_detail.DebugString();
+                      << chassis_detail.DebugString();
     return false;
   }
   // throttle fault
@@ -562,7 +563,7 @@ bool LincolnController::CheckChassisError() {
 
   if (!chassis_detail.has_gear()) {
     AERROR_EVERY(100) << "ChassisDetail has NO gear."
-        << chassis_detail.DebugString();
+                      << chassis_detail.DebugString();
     return false;
   }
   // gear fault
@@ -575,33 +576,33 @@ bool LincolnController::CheckChassisError() {
 
   if (steer_fault) {
     AERROR_EVERY(100) << "Steering fault detected: "
-        << chassis_detail.eps().watchdog_fault() << ", "
-        << chassis_detail.eps().channel_1_fault() << ", "
-        << chassis_detail.eps().channel_2_fault() << ", "
-        << chassis_detail.eps().calibration_fault() << ", "
-        << chassis_detail.eps().connector_fault();
+                      << chassis_detail.eps().watchdog_fault() << ", "
+                      << chassis_detail.eps().channel_1_fault() << ", "
+                      << chassis_detail.eps().channel_2_fault() << ", "
+                      << chassis_detail.eps().calibration_fault() << ", "
+                      << chassis_detail.eps().connector_fault();
   }
 
   if (brake_fault) {
     AERROR_EVERY(100) << "Brake fault detected: "
-        << chassis_detail.brake().watchdog_fault() << ", "
-        << chassis_detail.brake().channel_1_fault() << ", "
-        << chassis_detail.brake().channel_2_fault() << ", "
-        << chassis_detail.brake().boo_fault() << ", "
-        << chassis_detail.brake().connector_fault();
+                      << chassis_detail.brake().watchdog_fault() << ", "
+                      << chassis_detail.brake().channel_1_fault() << ", "
+                      << chassis_detail.brake().channel_2_fault() << ", "
+                      << chassis_detail.brake().boo_fault() << ", "
+                      << chassis_detail.brake().connector_fault();
   }
 
   if (throttle_fault) {
     AERROR_EVERY(100) << "Throttle fault detected: "
-        << chassis_detail.gas().watchdog_fault() << ", "
-        << chassis_detail.gas().channel_1_fault() << ", "
-        << chassis_detail.gas().channel_2_fault() << ", "
-        << chassis_detail.gas().connector_fault();
+                      << chassis_detail.gas().watchdog_fault() << ", "
+                      << chassis_detail.gas().channel_1_fault() << ", "
+                      << chassis_detail.gas().channel_2_fault() << ", "
+                      << chassis_detail.gas().connector_fault();
   }
 
   if (gear_fault) {
     AERROR_EVERY(100) << "Gear fault detected: "
-        << chassis_detail.gear().canbus_fault();
+                      << chassis_detail.gear().canbus_fault();
   }
 
   if (steer_fault || brake_fault || throttle_fault) {
