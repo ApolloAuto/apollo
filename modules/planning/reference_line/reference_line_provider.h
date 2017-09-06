@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 
+#include <list>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -76,7 +77,7 @@ class ReferenceLineProvider {
   ReferenceLineSmootherConfig smoother_config_;
 
   std::mutex reference_line_groups_mutex_;
-  std::vector<std::vector<ReferenceLine>> reference_line_groups_;
+  std::list<std::vector<ReferenceLine>> reference_line_groups_;
 };
 
 }  // namespace planning
