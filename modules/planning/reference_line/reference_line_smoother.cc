@@ -217,16 +217,16 @@ bool ReferenceLineSmoother::ApplyKernel() {
 
   // add spline kernel
   if (smoother_config_.derivative_weight() > 0.0) {
-    kernel->add_derivative_kernel_matrix(smoother_config_.derivative_weight());
+    kernel->AddDerivativeKernelMatrix(smoother_config_.derivative_weight());
   }
 
   if (smoother_config_.second_derivative_weight() > 0.0) {
-    kernel->add_second_order_derivative_matrix(
+    kernel->AddSecondOrderDerivativeMatrix(
         smoother_config_.second_derivative_weight());
   }
 
   if (smoother_config_.third_derivative_weight() > 0.0) {
-    kernel->add_third_order_derivative_matrix(
+    kernel->AddThirdOrderDerivativeMatrix(
         smoother_config_.third_derivative_weight());
   }
 

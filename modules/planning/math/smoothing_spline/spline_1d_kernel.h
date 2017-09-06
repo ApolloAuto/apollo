@@ -40,7 +40,7 @@ class Spline1dKernel {
   // customized input / output method
   void AddRegularization(const double regularized_param);
   bool AddKernel(const Eigen::MatrixXd& kernel, const Eigen::MatrixXd& offset,
-                  const double weight);
+                 const double weight);
   bool AddKernel(const Eigen::MatrixXd& kernel, const double weight);
 
   Eigen::MatrixXd* mutable_kernel_matrix();
@@ -50,15 +50,15 @@ class Spline1dKernel {
   const Eigen::MatrixXd& offset() const;
 
   // build-in kernel methods
-  void add_derivative_kernel_matrix(const double weight);
-  void add_second_order_derivative_matrix(const double weight);
-  void add_third_order_derivative_matrix(const double weight);
+  void AddDerivativeKernelMatrix(const double weight);
+  void AddSecondOrderDerivativeMatrix(const double weight);
+  void AddThirdOrderDerivativeMatrix(const double weight);
 
   // reference line kernel, x_coord in strictly increasing order (for path
   // optimizer)
-  bool add_reference_line_kernel_matrix(const std::vector<double>& x_coord,
-                                        const std::vector<double>& ref_fx,
-                                        const double weight);
+  bool AddReferenceLineKernelMatrix(const std::vector<double>& x_coord,
+                                    const std::vector<double>& ref_fx,
+                                    const double weight);
 
   // distance offset (for speed optimizer, given time optimize the distance can
   // go);

@@ -61,8 +61,8 @@ TEST(Spline1dGenerator, one) {
   // add kernel (optimize kernel);
   // jerk cost
 
-  spline_kernel->add_third_order_derivative_matrix(1000.0);
-  spline_kernel->add_reference_line_kernel_matrix(x_coord, fx_guide, 0.4);
+  spline_kernel->AddThirdOrderDerivativeMatrix(1000.0);
+  spline_kernel->AddReferenceLineKernelMatrix(x_coord, fx_guide, 0.4);
 
   EXPECT_TRUE(pg.Solve());
   // extract parameters
@@ -104,8 +104,8 @@ TEST(Spline1dGenerator, two) {
   // add kernel (optimize kernel);
   // jerk cost
 
-  spline_kernel->add_third_order_derivative_matrix(1000.0);
-  spline_kernel->add_reference_line_kernel_matrix(x_coord, fx_guide, 0.4);
+  spline_kernel->AddThirdOrderDerivativeMatrix(1000.0);
+  spline_kernel->AddReferenceLineKernelMatrix(x_coord, fx_guide, 0.4);
 
   EXPECT_TRUE(pg.Solve());
   // extract parameters

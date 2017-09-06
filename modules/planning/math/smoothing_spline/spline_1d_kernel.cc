@@ -84,7 +84,7 @@ const Eigen::MatrixXd& Spline1dKernel::kernel_matrix() const {
 const Eigen::MatrixXd& Spline1dKernel::offset() const { return offset_; }
 
 // build-in kernel methods
-void Spline1dKernel::add_derivative_kernel_matrix(const double weight) {
+void Spline1dKernel::AddDerivativeKernelMatrix(const double weight) {
   for (std::uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
     Eigen::MatrixXd cur_kernel =
         SplineSegKernel::instance()->DerivativeKernel(
@@ -95,7 +95,7 @@ void Spline1dKernel::add_derivative_kernel_matrix(const double weight) {
   }
 }
 
-void Spline1dKernel::add_second_order_derivative_matrix(const double weight) {
+void Spline1dKernel::AddSecondOrderDerivativeMatrix(const double weight) {
   for (std::uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
     Eigen::MatrixXd cur_kernel =
         SplineSegKernel::instance()->SecondOrderDerivativeKernel(
@@ -106,7 +106,7 @@ void Spline1dKernel::add_second_order_derivative_matrix(const double weight) {
   }
 }
 
-void Spline1dKernel::add_third_order_derivative_matrix(const double weight) {
+void Spline1dKernel::AddThirdOrderDerivativeMatrix(const double weight) {
   for (std::uint32_t i = 0; i + 1 < x_knots_.size(); ++i) {
     Eigen::MatrixXd cur_kernel =
         SplineSegKernel::instance()->ThirdOrderDerivativeKernel(
@@ -117,7 +117,7 @@ void Spline1dKernel::add_third_order_derivative_matrix(const double weight) {
   }
 }
 
-bool Spline1dKernel::add_reference_line_kernel_matrix(
+bool Spline1dKernel::AddReferenceLineKernelMatrix(
     const std::vector<double>& x_coord, const std::vector<double>& ref_x,
     const double weight) {
   if (ref_x.size() != x_coord.size()) {

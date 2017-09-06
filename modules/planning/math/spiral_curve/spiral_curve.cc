@@ -29,15 +29,13 @@ using apollo::common::PathPoint;
 
 SpiralCurve::SpiralCurve(const common::PathPoint& s, const common::PathPoint& e,
                          const std::uint32_t order)
-    : p_params_(order + 1, 0.0),
+    : start_point_(&s),
+      end_point_(&e),
+      p_params_(order + 1, 0.0),
       sg_(0.0),
-      error_(std::numeric_limits<double>::infinity()) {
-  start_point_ = &s;
-  end_point_ = &e;
-}
+      error_(std::numeric_limits<double>::infinity()) {}
 
-SpiralCurve::~SpiralCurve() {}
-void SpiralCurve::set_spiral_config(const SpiralCurveConfig& spiral_config) {
+void SpiralCurve::SetSpiralConfig(const SpiralCurveConfig& spiral_config) {
   spiral_config_ = spiral_config;
 }
 
@@ -61,7 +59,7 @@ void SpiralCurve::set_sg(const double sg) { sg_ = sg; }
 
 void SpiralCurve::set_error(const double error) { error_ = error; }
 
-bool SpiralCurve::result_sanity_check() const {
+bool SpiralCurve::ResultSanityCheck() const {
   for (const auto& p : p_params_) {
     if (std::isnan(p)) {
       return false;
