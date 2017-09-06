@@ -33,7 +33,6 @@ cc_library(
         "//modules/control/common:interpolation_1d",
         "//modules/control/common:trajectory_analyzer",
         "//modules/control/filters:digital_filter",
-        "//modules/control/filters:digital_filter_coefficients",
         "//modules/control/filters:mean_filter",
         "//modules/control/proto:control_proto",
         "@eigen//:eigen",
@@ -59,7 +58,6 @@ cc_library(
         "//modules/control/common:pid_controller",
         "//modules/control/common:trajectory_analyzer",
         "//modules/control/filters:digital_filter",
-        "//modules/control/filters:digital_filter_coefficients",
         "//modules/localization/common:localization_common",
     ],
 )

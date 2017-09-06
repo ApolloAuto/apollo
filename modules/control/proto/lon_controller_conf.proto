@@ -18,7 +18,7 @@ message LonControllerConf {
   optional double throttle_deadzone = 3;
   optional double speed_controller_input_limit = 4;
   optional double station_error_limit = 5;
-  optional double preview_window = 6;
+  optional double preview_time = 6;
   optional double standstill_acceleration = 7;
 
   optional PidConf station_pid_conf = 8;
