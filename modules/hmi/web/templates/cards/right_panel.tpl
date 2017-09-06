@@ -34,8 +34,6 @@
 
 <div class="right_panel">
   <div class="pull-right quick_link">
-    <button type="button" class="btn hmi_small_btn" data-toggle="modal"
-        data-target="#profile_dialog">Profile</button>
     <button type="button" class="btn hmi_small_btn"
         onclick="io_request('tool_api', 'reset_all');">Reset All</button>
     <button type="button" class="btn hmi_small_btn"
@@ -59,6 +57,45 @@
       </li>
     {% endfor %}
   </ul>
+
+  <h2 class="panel_header">Profile</h2>
+  <ul class="list-group">
+    <li class="list-group-item debug_item">
+      <div class="item_content">Map
+        <div class="dropdown pull-right">
+          <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
+            <span class="current_map">Please select</span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            {% for map in conf_pb.available_maps %}
+            <li><a onclick="io_request('tool_api', 'switch_map', ['{{ map.name }}'])">
+              {{ map.name }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </li>
+
+    <li class="list-group-item debug_item light">
+      <div class="item_content">Vehicle
+        <div class="dropdown pull-right">
+          <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
+            <span class="current_vehicle">Please select</span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            {% for vehicle in conf_pb.available_vehicles %}
+            <li><a onclick="io_request('tool_api', 'switch_vehicle', ['{{ vehicle.name }}'])">
+              {{ vehicle.name }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </li>
+  </ul>
 </div>
 
 <div id="profile_dialog" class="modal fade" role="dialog" align="center">
@@ -75,7 +112,7 @@
               <div class="dropdown pull-right">
                 <button class="btn hmi_small_btn dropdown-toggle" type="button"
                     data-toggle="dropdown">
-                  <span id="current_map"></span><span class="caret"></span>
+                  <span class="current_map"></span><span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
                 {% for map in conf_pb.available_maps %}
@@ -92,7 +129,7 @@
             <div class="item_content">Vehicle
               <div class="dropdown pull-right">
                 <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
-                  <span id="current_vehicle"></span><span class="caret"></span>
+                  <span class="current_vehicle"></span><span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
                 {% for vehicle in conf_pb.available_vehicles %}
@@ -154,9 +191,9 @@
     // Config status change.
     var current_map = global_status['config']['current_map'];
     var current_vehicle = global_status['config']['current_vehicle'];
-    $('#current_map').text(
+    $('.current_map').text(
         current_map != 'Unknown' ? current_map : 'Please select');
-    $('#current_vehicle').text(
+    $('.current_vehicle').text(
         current_vehicle != 'Unknown' ? current_vehicle : 'Please select');
     if (current_map == 'Unknown' || current_vehicle == 'Unknown') {
       // Show profile dialog if map or vehicle is not selected.
