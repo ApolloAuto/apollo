@@ -507,10 +507,12 @@ function main() {
       apollo_build_opt
       ;;
     build_gpu)
+      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
       link_gpu_caffe_build
       apollo_build_dbg
       ;;
     build_opt_gpu)
+      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
       link_gpu_caffe_build
       apollo_build_opt
       ;;
