@@ -28,7 +28,7 @@
 #include "modules/planning/proto/decision.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -69,31 +69,20 @@ bool PathDecider::MakeObjectDecision(const PathData &path_data,
 bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, PathDecision *const path_decision) {
   DCHECK_NOTNULL(path_decision);
-  std::vector<common::SLPoint> adc_sl_points;
+
   const auto &vehicle_param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-  const auto &reference_line = reference_line_info_->reference_line();
 
   const double adc_max_edge_to_center_dist =
       std::hypot(std::max(vehicle_param.front_edge_to_center(),
                           vehicle_param.back_edge_to_center()),
                  std::max(vehicle_param.left_edge_to_center(),
                           vehicle_param.right_edge_to_center()));
-
-  for (const auto &path_point : path_data.discretized_path().path_points()) {
-    common::SLPoint adc_sl;
-    if (!reference_line.XYToSL({path_point.x(), path_point.y()}, &adc_sl)) {
-      AERROR << "get_point_in_Frenet_frame error for ego vehicle "
-             << path_point.x() << " " << path_point.y();
-      return false;
-    }
-    adc_sl_points.push_back(std::move(adc_sl));
-  }
-
   const double adc_allowed_s_radius =
       adc_max_edge_to_center_dist + FLAGS_static_decision_ignore_s_range;
   const double adc_allowed_l_radius =
       adc_max_edge_to_center_dist + FLAGS_static_decision_nudge_l_buffer;
+
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
     const auto &obstacle = *path_obstacle->obstacle();
     if (!obstacle.IsStatic()) {
@@ -105,22 +94,28 @@ bool PathDecider::MakeStaticObstacleDecision(
     object_decision.mutable_ignore();
 
     const auto &sl_boundary = path_obstacle->perception_sl_boundary();
+
     bool has_stop = false;
-    for (const auto &adc_sl : adc_sl_points) {
-      if (adc_sl.s() + adc_allowed_s_radius < sl_boundary.start_s() ||
-          adc_sl.s() - adc_allowed_s_radius > sl_boundary.end_s()) {
+    for (const auto &adc_frenet_frame_point :
+         path_data.frenet_frame_path().points()) {
+      const double curr_s = adc_frenet_frame_point.s();
+      const double curr_l = adc_frenet_frame_point.l();
+
+      if (curr_s + adc_allowed_s_radius < sl_boundary.start_s() ||
+          curr_s - adc_allowed_s_radius > sl_boundary.end_s()) {
         // ignore: no overlap in s direction
         continue;
       }
 
-      if (adc_sl.l() + adc_allowed_l_radius < sl_boundary.start_l() ||
-          adc_sl.l() - adc_allowed_l_radius > sl_boundary.end_l()) {
+      if (curr_l + adc_allowed_l_radius < sl_boundary.start_l() ||
+          curr_l - adc_allowed_l_radius > sl_boundary.end_l()) {
         // ignore: no overlap in l direction
         continue;
       }
 
       // check STOP/NUDGE
-      const auto nudge_type = DecideNudge(sl_boundary, adc_sl);
+      const auto nudge_type =
+          DecideNudge(sl_boundary, common::util::MakeSLPoint(curr_s, curr_l));
       if (nudge_type == ObjectNudge::NO_NUDGE) {
         // STOP: and break
         *object_decision.mutable_stop() =
@@ -131,9 +126,9 @@ bool PathDecider::MakeStaticObstacleDecision(
         // NUDGE: and continue to check potential STOP along the ref line
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(nudge_type);
-        object_nudge_ptr->set_distance_l(nudge_type == ObjectNudge::LEFT_NUDGE ?
-            FLAGS_nudge_distance_obstacle :
-            -FLAGS_nudge_distance_obstacle);
+        object_nudge_ptr->set_distance_l(nudge_type == ObjectNudge::LEFT_NUDGE
+                                             ? FLAGS_nudge_distance_obstacle
+                                             : -FLAGS_nudge_distance_obstacle);
       }
     }
 
@@ -151,49 +146,51 @@ bool PathDecider::MakeStaticObstacleDecision(
   return true;
 }
 
-ObjectNudge::Type PathDecider::DecideNudge(const SLBoundary& obstacle_boundary,
-                                           const common::SLPoint& adc_sl) {
+ObjectNudge::Type PathDecider::DecideNudge(const SLBoundary &obstacle_boundary,
+                                           const common::SLPoint &adc_sl) {
   double left_width = 0.0;
   double right_width = 0.0;
   if (!reference_line_info_->reference_line().GetLaneWidth(
-      adc_sl.s(), &left_width, &right_width)) {
+          adc_sl.s(), &left_width, &right_width)) {
     left_width = right_width = FLAGS_default_reference_line_width / 2;
   }
 
   // obstacle on the left, check RIGHT_NUDGE
   if (obstacle_boundary.start_l() >= 0) {
     const double driving_width = obstacle_boundary.start_l() -
-        FLAGS_static_decision_nudge_l_buffer + right_width;
-    return driving_width >= FLAGS_min_driving_width ?
-        ObjectNudge::RIGHT_NUDGE : ObjectNudge::NO_NUDGE;
+                                 FLAGS_static_decision_nudge_l_buffer +
+                                 right_width;
+    return driving_width >= FLAGS_min_driving_width ? ObjectNudge::RIGHT_NUDGE
+                                                    : ObjectNudge::NO_NUDGE;
   }
 
   // obstacle on the right, check LEFT_NUDGE
   if (obstacle_boundary.end_l() <= 0) {
     const double driving_width = std::fabs(obstacle_boundary.end_l()) -
-        FLAGS_static_decision_nudge_l_buffer + left_width;
-    return driving_width >= FLAGS_min_driving_width ?
-        ObjectNudge::LEFT_NUDGE : ObjectNudge::NO_NUDGE;
+                                 FLAGS_static_decision_nudge_l_buffer +
+                                 left_width;
+    return driving_width >= FLAGS_min_driving_width ? ObjectNudge::LEFT_NUDGE
+                                                    : ObjectNudge::NO_NUDGE;
   }
 
   // obstacle across the central line, decide RIGHT_NUDGE/LEFT_NUDGE
   double driving_width_left = left_width - obstacle_boundary.end_l() -
-                                FLAGS_static_decision_nudge_l_buffer;
+                              FLAGS_static_decision_nudge_l_buffer;
   double driving_width_right = right_width -
-                                 std::fabs(obstacle_boundary.start_l()) -
-                                 FLAGS_static_decision_nudge_l_buffer;
+                               std::fabs(obstacle_boundary.start_l()) -
+                               FLAGS_static_decision_nudge_l_buffer;
   if (std::max(driving_width_right, driving_width_left) >=
       FLAGS_min_driving_width) {
     // Nudge is possible, then select the wider side.
-    return driving_width_left > driving_width_right ?
-        ObjectNudge::LEFT_NUDGE : ObjectNudge::RIGHT_NUDGE;
+    return driving_width_left > driving_width_right ? ObjectNudge::LEFT_NUDGE
+                                                    : ObjectNudge::RIGHT_NUDGE;
   }
   // Nudge is impossible.
   return ObjectNudge::NO_NUDGE;
 }
 
 ObjectStop PathDecider::GenerateObjectStopDecision(
-    const PathObstacle& path_obstacle) const {
+    const PathObstacle &path_obstacle) const {
   ObjectStop object_stop;
   double stop_distance = 0;
   if (path_obstacle.obstacle()->Id() == FLAGS_destination_obstacle_id) {
