@@ -39,38 +39,38 @@ bool ConstraintChecker::ValidTrajectory(
     double t = p.relative_time();
     double lon_v = p.v();
     if (!WithinRange(lon_v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
-      AWARN << "Velocity at relative time " << t
-            << " exceeds bound, value: " << lon_v << ", bound ["
-            << FLAGS_speed_lower_bound << ", " << FLAGS_speed_upper_bound
-            << "].";
+      AERROR << "Velocity at relative time " << t
+             << " exceeds bound, value: " << lon_v << ", bound ["
+             << FLAGS_speed_lower_bound << ", " << FLAGS_speed_upper_bound
+             << "].";
       return false;
     }
 
     double lon_a = p.a();
     if (!WithinRange(lon_a, FLAGS_longitudinal_acceleration_lower_bound,
                      FLAGS_longitudinal_acceleration_upper_bound)) {
-      AWARN << "Longitudinal acceleration at relative time " << t
-            << " exceeds bound, value: " << lon_a << ", bound ["
-            << FLAGS_longitudinal_acceleration_lower_bound << ", "
-            << FLAGS_longitudinal_acceleration_upper_bound << "].";
+      AERROR << "Longitudinal acceleration at relative time " << t
+             << " exceeds bound, value: " << lon_a << ", bound ["
+             << FLAGS_longitudinal_acceleration_lower_bound << ", "
+             << FLAGS_longitudinal_acceleration_upper_bound << "].";
       return false;
     }
 
     double lat_a = lon_v * lon_v * p.path_point().kappa();
     if (!WithinRange(lat_a, -FLAGS_lateral_acceleration_bound,
                      FLAGS_lateral_acceleration_bound)) {
-      AWARN << "Lateral acceleration at relative time " << t
-            << " exceeds bound, value: " << lat_a << ", bound ["
-            << -FLAGS_lateral_acceleration_bound << ", "
-            << FLAGS_lateral_acceleration_bound << "].";
+      AERROR << "Lateral acceleration at relative time " << t
+             << " exceeds bound, value: " << lat_a << ", bound ["
+             << -FLAGS_lateral_acceleration_bound << ", "
+             << FLAGS_lateral_acceleration_bound << "].";
       return false;
     }
 
     double kappa = p.path_point().kappa();
     if (!WithinRange(kappa, -FLAGS_kappa_bound, FLAGS_kappa_bound)) {
-      AWARN << "Kappa at relative time " << t
-            << " exceeds bound, value: " << kappa << ", bound ["
-            << -FLAGS_kappa_bound << ", " << FLAGS_kappa_bound << "].";
+      AERROR << "Kappa at relative time " << t
+             << " exceeds bound, value: " << kappa << ", bound ["
+             << -FLAGS_kappa_bound << ", " << FLAGS_kappa_bound << "].";
       return false;
     }
   }

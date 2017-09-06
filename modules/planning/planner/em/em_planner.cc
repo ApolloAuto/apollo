@@ -153,7 +153,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!ConstraintChecker::ValidTrajectory(trajectory)) {
+  if (FLAGS_enable_trajectory_check &&
+      !ConstraintChecker::ValidTrajectory(trajectory)) {
     std::string msg = "Trajectory cannot pass constraint checker.";
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
