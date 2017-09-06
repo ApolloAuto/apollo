@@ -497,7 +497,8 @@ bool LincolnController::CheckChassisError() {
   int32_t error_cnt = 0;
   int32_t chassis_error_mask = 0;
   if (!chassis_detail.has_eps()) {
-    AERROR << "ChassisDetail has NO eps." << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has NO eps."
+        << chassis_detail.DebugString();
     return false;
   }
   bool steer_fault = chassis_detail.eps().watchdog_fault() |
@@ -518,7 +519,8 @@ bool LincolnController::CheckChassisError() {
       ((chassis_detail.eps().connector_fault()) << (error_cnt++));
 
   if (!chassis_detail.has_brake()) {
-    AERROR << "ChassisDetail has NO brake." << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has NO brake."
+        << chassis_detail.DebugString();
     return false;
   }
   // brake fault
@@ -539,7 +541,8 @@ bool LincolnController::CheckChassisError() {
       ((chassis_detail.brake().connector_fault()) << (error_cnt++));
 
   if (!chassis_detail.has_gas()) {
-    AERROR << "ChassisDetail has NO gas." << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has NO gas."
+        << chassis_detail.DebugString();
     return false;
   }
   // throttle fault
@@ -558,7 +561,8 @@ bool LincolnController::CheckChassisError() {
       ((chassis_detail.gas().connector_fault()) << (error_cnt++));
 
   if (!chassis_detail.has_gear()) {
-    AERROR << "ChassisDetail has NO gear." << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has NO gear."
+        << chassis_detail.DebugString();
     return false;
   }
   // gear fault
@@ -570,33 +574,34 @@ bool LincolnController::CheckChassisError() {
   set_chassis_error_mask(chassis_error_mask);
 
   if (steer_fault) {
-    AERROR << "Steering fault detected: "
-           << chassis_detail.eps().watchdog_fault() << ", "
-           << chassis_detail.eps().channel_1_fault() << ", "
-           << chassis_detail.eps().channel_2_fault() << ", "
-           << chassis_detail.eps().calibration_fault() << ", "
-           << chassis_detail.eps().connector_fault();
+    AERROR_EVERY(100) << "Steering fault detected: "
+        << chassis_detail.eps().watchdog_fault() << ", "
+        << chassis_detail.eps().channel_1_fault() << ", "
+        << chassis_detail.eps().channel_2_fault() << ", "
+        << chassis_detail.eps().calibration_fault() << ", "
+        << chassis_detail.eps().connector_fault();
   }
 
   if (brake_fault) {
-    AERROR << "Brake fault detected: "
-           << chassis_detail.brake().watchdog_fault() << ", "
-           << chassis_detail.brake().channel_1_fault() << ", "
-           << chassis_detail.brake().channel_2_fault() << ", "
-           << chassis_detail.brake().boo_fault() << ", "
-           << chassis_detail.brake().connector_fault();
+    AERROR_EVERY(100) << "Brake fault detected: "
+        << chassis_detail.brake().watchdog_fault() << ", "
+        << chassis_detail.brake().channel_1_fault() << ", "
+        << chassis_detail.brake().channel_2_fault() << ", "
+        << chassis_detail.brake().boo_fault() << ", "
+        << chassis_detail.brake().connector_fault();
   }
 
   if (throttle_fault) {
-    AERROR << "Throttle fault detected: "
-           << chassis_detail.gas().watchdog_fault() << ", "
-           << chassis_detail.gas().channel_1_fault() << ", "
-           << chassis_detail.gas().channel_2_fault() << ", "
-           << chassis_detail.gas().connector_fault();
+    AERROR_EVERY(100) << "Throttle fault detected: "
+        << chassis_detail.gas().watchdog_fault() << ", "
+        << chassis_detail.gas().channel_1_fault() << ", "
+        << chassis_detail.gas().channel_2_fault() << ", "
+        << chassis_detail.gas().connector_fault();
   }
 
   if (gear_fault) {
-    AERROR << "Gear fault detected: " << chassis_detail.gear().canbus_fault();
+    AERROR_EVERY(100) << "Gear fault detected: "
+        << chassis_detail.gear().canbus_fault();
   }
 
   if (steer_fault || brake_fault || throttle_fault) {
@@ -669,7 +674,7 @@ void LincolnController::SecurityDogThreadFunc() {
       std::this_thread::sleep_for(default_period - elapsed);
       start += (default_period - elapsed).count();
     } else {
-      AERROR
+      AERROR_EVERY(100)
           << "Too much time consumption in LincolnController looping process:"
           << elapsed.count();
       start = end;
@@ -688,7 +693,7 @@ bool LincolnController::CheckResponse(const int32_t flags, bool need_wait) {
 
   do {
     if (message_manager_->GetChassisDetail(&chassis_detail) != ErrorCode::OK) {
-      AERROR << "get chassis detail failed.";
+      AERROR_EVERY(100) << "get chassis detail failed.";
       return false;
     }
     bool check_ok = true;
