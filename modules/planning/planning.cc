@@ -149,7 +149,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 }
 
 void Planning::RunOnce() {
-  double start_timestamp = Clock::NowInSecond();
+  const double start_timestamp = Clock::NowInSecond();
   AdapterManager::Observe();
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
