@@ -29,11 +29,11 @@ int Predictor::NumOfTrajectories() {
   return trajectories_.size();
 }
 
-void Predictor::GenerateTrajectory(
-    const std::vector<::apollo::common::TrajectoryPoint>& points,
-    Trajectory* trajectory) {
-  trajectory->mutable_trajectory_point()->MergeFrom(
-      {points.begin(), points.end()});
+Trajectory Predictor::GenerateTrajectory(
+    const std::vector<apollo::common::TrajectoryPoint>& points) {
+  Trajectory trajectory;
+  *trajectory.mutable_trajectory_point() = {points.begin(), points.end()};
+  return trajectory;
 }
 
 void Predictor::SetEqualProbability(double probability, int start_index) {

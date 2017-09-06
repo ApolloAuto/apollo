@@ -66,8 +66,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
                                FLAGS_prediction_freq,
                                &points);
 
-  Trajectory trajectory;
-  GenerateTrajectory(points, &trajectory);
+  Trajectory trajectory = GenerateTrajectory(points);
   int start_index = 0;
   trajectories_.push_back(std::move(trajectory));
   SetEqualProbability(1.0, start_index);
