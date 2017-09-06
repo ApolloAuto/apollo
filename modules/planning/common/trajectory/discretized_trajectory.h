@@ -34,7 +34,8 @@ class DiscretizedTrajectory : public Trajectory {
  public:
   DiscretizedTrajectory() = default;
 
-  DiscretizedTrajectory(std::vector<common::TrajectoryPoint> trajectory_points);
+  explicit DiscretizedTrajectory(
+      std::vector<common::TrajectoryPoint> trajectory_points);
 
   virtual ~DiscretizedTrajectory() = default;
 
