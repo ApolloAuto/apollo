@@ -31,16 +31,18 @@ DEFINE_string(adapter_config_file,
               "modules/hmi/conf/ros_bridge_adapter.pb.txt",
               "Adapter config file for ros bridge.");
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterManagerConfig;
-using apollo::control::DrivingAction;
-using apollo::canbus::Chassis;
+DEFINE_int32(spin_rate, 10, "ROS spin rate");
 
 namespace apollo {
 namespace hmi {
 namespace {
 
-static constexpr char kHMIRosBridgeName[] = "hmi_ros_bridge";
+using apollo::common::adapter::AdapterManager;
+using apollo::common::adapter::AdapterManagerConfig;
+using apollo::control::DrivingAction;
+using apollo::canbus::Chassis;
+
+constexpr char kHMIRosBridgeName[] = "hmi_ros_bridge";
 
 class RosBridge {
  public:
@@ -121,6 +123,11 @@ int main(int argc, char **argv) {
 
   ros::init(argc, argv, apollo::hmi::kHMIRosBridgeName);
   apollo::hmi::RosBridge::instance()->Init();
-  ros::spin();
+
+  ros::Rate rate(FLAGS_spin_rate);
+  while (true) {
+    ros::spinOnce();
+    rate.sleep();
+  }
   return 0;
 }
