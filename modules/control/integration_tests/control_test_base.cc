@@ -46,7 +46,7 @@ using apollo::common::monitor::MonitorMessage;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
 
-uint32_t ControlTestBase::_s_seq_num = 0;
+uint32_t ControlTestBase::s_seq_num_ = 0;
 
 bool ControlTestBase::test_control() {
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
@@ -172,7 +172,7 @@ void ControlTestBase::SetUpTestCase() {
   FLAGS_is_control_test_mode = true;
 }
 
-void ControlTestBase::SetUp() { ++_s_seq_num; }
+void ControlTestBase::SetUp() { ++s_seq_num_; }
 
 }  // namespace control
 }  // namespace apollo

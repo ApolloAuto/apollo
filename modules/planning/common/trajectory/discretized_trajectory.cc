@@ -81,7 +81,7 @@ TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
   if (it_lower == trajectory_points_.begin()) {
     return trajectory_points_.front();
   }
-  return util::interpolate_linear_approximation(*(it_lower - 1), *it_lower,
+  return util::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower,
                                                 relative_time);
 }
 

@@ -115,28 +115,28 @@ class Teleop {
     double brake = 0;
     double throttle = 0;
     double steering = 0;
-    struct termios _cooked;
-    struct termios _raw;
-    int32_t _kfd = 0;
+    struct termios cooked_;
+    struct termios raw_;
+    int32_t kfd_ = 0;
     bool parking_brake = false;
     Chassis::GearPosition gear = Chassis::GEAR_INVALID;
     PadMessage pad_msg;
     ControlCommand &control_command_ = control_command();
 
     // get the console in raw mode
-    tcgetattr(_kfd, &_cooked);
-    std::memcpy(&_raw, &_cooked, sizeof(struct termios));
-    _raw.c_lflag &= ~(ICANON | ECHO);
+    tcgetattr(kfd_, &cooked_);
+    std::memcpy(&raw_, &cooked_, sizeof(struct termios));
+    raw_.c_lflag &= ~(ICANON | ECHO);
     // Setting a new line, then end of file
-    _raw.c_cc[VEOL] = 1;
-    _raw.c_cc[VEOF] = 2;
-    tcsetattr(_kfd, TCSANOW, &_raw);
+    raw_.c_cc[VEOL] = 1;
+    raw_.c_cc[VEOF] = 2;
+    tcsetattr(kfd_, TCSANOW, &raw_);
     puts("Teleop:\nReading from keyboard now.");
     puts("---------------------------");
     puts("Use arrow keys to drive the car.");
     while (IsRunning()) {
       // get the next event from the keyboard
-      if (read(_kfd, &c, 1) < 0) {
+      if (read(kfd_, &c, 1) < 0) {
         perror("read():");
         exit(-1);
       }
@@ -196,7 +196,7 @@ class Teleop {
         case KEYCODE_SETT1:  // set throttle
         case KEYCODE_SETT2:
           // read keyboard again
-          if (read(_kfd, &c, 1) < 0) {
+          if (read(kfd_, &c, 1) < 0) {
             exit(-1);
           }
           level = c - KEYCODE_ZERO;
@@ -208,7 +208,7 @@ class Teleop {
         case KEYCODE_SETG1:
         case KEYCODE_SETG2:
           // read keyboard again
-          if (read(_kfd, &c, 1) < 0) {
+          if (read(kfd_, &c, 1) < 0) {
             exit(-1);
           }
           level = c - KEYCODE_ZERO;
@@ -219,7 +219,7 @@ class Teleop {
         case KEYCODE_SETB1:
         case KEYCODE_SETB2:
           // read keyboard again
-          if (read(_kfd, &c, 1) < 0) {
+          if (read(kfd_, &c, 1) < 0) {
             exit(-1);
           }
           level = c - KEYCODE_ZERO;
@@ -230,7 +230,7 @@ class Teleop {
           break;
         case KEYCODE_MODE:
           // read keyboard again
-          if (read(_kfd, &c, 1) < 0) {
+          if (read(kfd_, &c, 1) < 0) {
             exit(-1);
           }
           level = c - KEYCODE_ZERO;
@@ -248,7 +248,7 @@ class Teleop {
           break;
       }
     }  // keyboard_loop big while
-    tcsetattr(_kfd, TCSANOW, &_cooked);
+    tcsetattr(kfd_, TCSANOW, &cooked_);
     printf("keyboard_loop thread quited.\n");
     return;
   }  // end of keyboard loop thread
