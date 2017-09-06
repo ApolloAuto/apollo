@@ -103,20 +103,16 @@ Status LonController::Init(const ControlConf *control_conf) {
   station_pid_controller_.Init(lon_controller_conf.station_pid_conf());
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
 
-  SetDigitalFilterPitchAngle(lon_controller_conf);
+  digital_filter_pitch_angle_.set_coefficients(lon_controller_conf.ts(),
+       lon_controller_conf.pitch_angle_filter_conf().cutoff_freq());
 
   LoadControlCalibrationTable(lon_controller_conf);
+
+  previous_control_time_ = Clock::NowInSecond();
+
   controller_initialized_ = true;
 
   return Status::OK();
-}
-
-void LonController::SetDigitalFilterPitchAngle(
-    const LonControllerConf &lon_controller_conf) {
-  double cutoff_freq =
-      lon_controller_conf.pitch_angle_filter_conf().cutoff_freq();
-  double ts = lon_controller_conf.ts();
-  SetDigitalFilter(ts, cutoff_freq, &digital_filter_pitch_angle_);
 }
 
 void LonController::LoadControlCalibrationTable(
@@ -144,6 +140,10 @@ Status LonController::ComputeControlCommand(
   localization_ = localization;
   chassis_ = chassis;
 
+  current_control_time_ = Clock::NowInSecond();
+  dt_ = current_control_time_ - previous_control_time_;
+  previous_control_time_ = current_control_time_;
+
   trajectory_message_ = planning_published_trajectory;
   if (!control_interpolation_) {
     AERROR << "Fail to initialize calibration table.";
@@ -164,8 +164,7 @@ Status LonController::ComputeControlCommand(
 
   double brake_cmd = 0.0;
   double throttle_cmd = 0.0;
-  double ts = lon_controller_conf.ts();
-  double preview_time = lon_controller_conf.preview_window() * ts;
+  double preview_time = lon_controller_conf.preview_time();
 
   if (preview_time < 0.0) {
     const auto error_msg = apollo::common::util::StrCat(
@@ -186,7 +185,7 @@ Status LonController::ComputeControlCommand(
         debug->station_error(), -station_error_limit, station_error_limit);
   }
   double speed_offset =
-      station_pid_controller_.Control(station_error_limited, ts);
+      station_pid_controller_.Control(station_error_limited, dt_);
 
   double speed_controller_input = 0.0;
   double speed_controller_input_limit =
@@ -206,11 +205,11 @@ Status LonController::ComputeControlCommand(
       lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
     acceleration_cmd_closeloop =
-        speed_pid_controller_.Control(speed_controller_input_limited, ts);
+        speed_pid_controller_.Control(speed_controller_input_limited, dt_);
   } else {
     speed_pid_controller_.SetPID(lon_controller_conf.high_speed_pid_conf());
     acceleration_cmd_closeloop =
-        speed_pid_controller_.Control(speed_controller_input_limited, ts);
+        speed_pid_controller_.Control(speed_controller_input_limited, dt_);
   }
 
   double acceleration_cmd =
@@ -340,14 +339,6 @@ void LonController::ComputeLongitudinalErrors(
   debug->set_preview_speed_error(preview_point.v() - s_dot_matched);
   debug->set_preview_speed_reference(preview_point.v());
   debug->set_preview_acceleration_reference(preview_point.a());
-}
-
-void LonController::SetDigitalFilter(double ts, double cutoff_freq,
-                                     DigitalFilter *digital_filter) {
-  std::vector<double> denominators;
-  std::vector<double> numerators;
-  LpfCoefficients(ts, cutoff_freq, &denominators, &numerators);
-  digital_filter->set_coefficients(denominators, numerators);
 }
 
 }  // namespace control

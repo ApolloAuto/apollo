@@ -13,7 +13,7 @@ max_steering_percentage_allowed: 100
 minimum_speed_resolution: 0.2
 lat_controller_conf {
   ts: 0.01
-  preview_window: 0
+  preview_time: 0.0
   cf: 155494.663
   cr: 155494.663
   mass_fl: 520
@@ -80,7 +80,7 @@ lon_controller_conf {
   throttle_deadzone: 18.0
   speed_controller_input_limit: 2.0
   station_error_limit: 2.0
-  preview_window: 20.0
+  preview_time: 0.20
   standstill_acceleration: -3.0
   station_pid_conf {
     integrator_enable: false
