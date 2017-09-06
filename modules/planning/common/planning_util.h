@@ -40,7 +40,7 @@ common::SLPoint interpolate(const common::SLPoint &start,
 common::PathPoint interpolate(const common::PathPoint &p0,
                               const common::PathPoint &p1, const double s);
 
-common::PathPoint interpolate_linear_approximation(const common::PathPoint &p0,
+common::PathPoint InterpolateUsingLinearApproximation(const common::PathPoint &p0,
                                                    const common::PathPoint &p1,
                                                    const double s);
 
@@ -48,7 +48,7 @@ common::TrajectoryPoint interpolate(const common::TrajectoryPoint &tp0,
                                     const common::TrajectoryPoint &tp1,
                                     const double t);
 
-common::TrajectoryPoint interpolate_linear_approximation(
+common::TrajectoryPoint InterpolateUsingLinearApproximation(
     const common::TrajectoryPoint &tp0, const common::TrajectoryPoint &tp1,
     const double t);
 
