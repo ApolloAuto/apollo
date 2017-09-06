@@ -46,6 +46,8 @@ class StBoundaryMapper {
                    const PathData& path_data, const double planning_distance,
                    const double planning_time);
 
+  virtual ~StBoundaryMapper() = default;
+
   apollo::common::Status GetGraphBoundary(
       const PathDecision& path_decision,
       std::vector<StBoundary>* const boundary) const;
