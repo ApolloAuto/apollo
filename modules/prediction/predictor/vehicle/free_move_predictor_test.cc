@@ -35,8 +35,7 @@ namespace prediction {
 
 class FreeMovePredictorTest : public KMLMapBasedTest {
  public:
-  virtual void SetUp() {
-    KMLMapBasedTest::SetUp();
+  FreeMovePredictorTest() {
     CHECK(apollo::common::util::GetProtoFromFile(
         "modules/prediction/testdata/single_perception_vehicle_offlane.pb.txt",
         &perception_obstacles_));

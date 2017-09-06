@@ -29,7 +29,6 @@ using ::apollo::hdmap::MapPathPoint;
 class PredictionMapTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    KMLMapBasedTest::SetUp();
     map_ = PredictionMap::instance();
   }
 

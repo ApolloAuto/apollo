@@ -36,7 +36,6 @@ namespace prediction {
 class ObstacleTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    KMLMapBasedTest::SetUp();
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.1;
     FLAGS_r_var = 0.001;

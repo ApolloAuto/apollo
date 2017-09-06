@@ -34,7 +34,6 @@ using ::apollo::common::Status;
 class RoadGraphTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    KMLMapBasedTest::SetUp();
     map_ = PredictionMap::instance();
   }
 

@@ -36,7 +36,6 @@ namespace prediction {
 class LaneSequencePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    KMLMapBasedTest::SetUp();
     std::string file =
       "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);

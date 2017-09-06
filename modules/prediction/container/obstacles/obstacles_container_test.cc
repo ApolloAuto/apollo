@@ -33,7 +33,6 @@ namespace prediction {
 class ObstaclesContainerTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    KMLMapBasedTest::SetUp();
     std::string file =
       "modules/prediction/testdata/perception_vehicles_pedestrians.pb.txt";
     apollo::perception::PerceptionObstacles perception_obstacles;

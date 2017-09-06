@@ -580,10 +580,3 @@ TEST(SubTopoGraphTestSuit, one_sub_graph_whole_lane_block) {
 
 }  // namespace routing
 }  // namespace apollo
-
-int main(int argc, char **argv) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-
-
