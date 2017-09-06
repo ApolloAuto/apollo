@@ -114,8 +114,7 @@ void RegionalPredictor::GenerateStillTrajectory(
   for (int i = 0; i < num_traj; ++i) {
     std::vector<TrajectoryPoint> points;
     DrawStillTrajectory(position, heading, speed, total_time, &points);
-    Trajectory trajectory;
-    GenerateTrajectory(points, &trajectory);
+    Trajectory trajectory = GenerateTrajectory(points);
     trajectories_.push_back(std::move(trajectory));
     heading += delta_heading;
   }
@@ -160,10 +159,8 @@ void RegionalPredictor::GenerateMovingTrajectory(
                        &left_points, &right_points);
   int start_index = NumOfTrajectories();
 
-  Trajectory left_trajectory;
-  Trajectory right_trajectory;
-  GenerateTrajectory(left_points, &left_trajectory);
-  GenerateTrajectory(right_points, &right_trajectory);
+  Trajectory left_trajectory = GenerateTrajectory(left_points);
+  Trajectory right_trajectory = GenerateTrajectory(right_points);
   trajectories_.push_back(std::move(left_trajectory));
   trajectories_.push_back(std::move(right_trajectory));
   SetEqualProbability(probability, start_index);

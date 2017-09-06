@@ -95,8 +95,7 @@ void Prediction::OnLocalization(const LocalizationEstimate &localization) {
   CHECK_NOTNULL(obstacles_container);
 
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::instance()->GetContainer(
-      AdapterConfig::LOCALIZATION));
+      ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
   CHECK_NOTNULL(pose_container);
 
   pose_container->Insert(localization);
@@ -122,9 +121,8 @@ void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
   EvaluatorManager::instance()->Run(perception_obstacles);
   PredictorManager::instance()->Run(perception_obstacles);
 
-  PredictionObstacles prediction_obstacles;
-  prediction_obstacles.CopyFrom(
-      PredictorManager::instance()->prediction_obstacles());
+  auto prediction_obstacles =
+      PredictorManager::instance()->prediction_obstacles();
   AdapterManager::FillPredictionHeader(Name(), &prediction_obstacles);
   AdapterManager::PublishPrediction(prediction_obstacles);
   ADEBUG << "Published a prediction message ["

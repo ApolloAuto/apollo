@@ -94,8 +94,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
         obstacle->kf_lane_tracker(curr_lane_id), sequence,
         FLAGS_prediction_duration, FLAGS_prediction_freq, &points);
 
-    Trajectory trajectory;
-    GenerateTrajectory(points, &trajectory);
+    Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
     trajectories_.push_back(std::move(trajectory));
   }

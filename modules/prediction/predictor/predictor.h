@@ -69,11 +69,10 @@ class Predictor {
   /**
    * @brief Generate trajectory from trajectory points
    * @param A vector of trajectory points
-   *        A pointer to generated trajectory
+   * @return Generated trajectory
    */
-  void GenerateTrajectory(
-      const std::vector<::apollo::common::TrajectoryPoint>& points,
-      Trajectory* trajectory);
+  static Trajectory GenerateTrajectory(
+      const std::vector<apollo::common::TrajectoryPoint>& points);
 
   void SetEqualProbability(double probability, int start_index);
 
