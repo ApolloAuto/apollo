@@ -33,7 +33,6 @@
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/filters/digital_filter.h"
-#include "modules/control/filters/digital_filter_coefficients.h"
 
 /**
  * @namespace apollo::control
@@ -104,13 +103,8 @@ class LonController : public Controller {
                                  SimpleLongitudinalDebug *debug);
 
  private:
-  void SetDigitalFilterPitchAngle(const LonControllerConf &lon_controller_conf);
-
   void LoadControlCalibrationTable(
       const LonControllerConf &lon_controller_conf);
-
-  void SetDigitalFilter(double ts, double cutoff_freq,
-                        DigitalFilter *digital_filter);
 
   void CloseLogFile();
 
@@ -130,6 +124,10 @@ class LonController : public Controller {
   FILE *speed_log_file_ = nullptr;
 
   DigitalFilter digital_filter_pitch_angle_;
+
+  double current_control_time_ = 0.0;
+  double previous_control_time_ = 0.0;
+  double dt_ = 0.0;
 
   const ControlConf *control_conf_ = nullptr;
 };

@@ -12,7 +12,7 @@ active_controllers: LON_CONTROLLER
 max_steering_percentage_allowed: 100
 lat_controller_conf {
   ts: 0.01
-  preview_window: 0
+  preview_time: 0.0
   cf: 155494.663
   cr: 155494.663
   mass_fl: 520
@@ -80,7 +80,7 @@ lon_controller_conf {
   throttle_deadzone: 0.2
   speed_controller_input_limit: 3.0
   station_error_limit: 3.0
-  preview_window: 40.0
+  preview_time: 0.40
   standstill_acceleration: -3.0
   station_pid_conf {
     integrator_enable: false
