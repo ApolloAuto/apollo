@@ -33,8 +33,8 @@
 
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
@@ -51,10 +51,6 @@ class QpFrenetFrame {
 
   bool Init(const uint32_t num_points,
             apollo::planning_internal::Debug* planning_debug);
-
-  const ReferenceLine& GetReferenceLine() const;
-
-  double feasible_longitudinal_upper_bound() const;
 
   bool GetMapBound(const double s,
                    std::pair<double, double>* const bound) const;

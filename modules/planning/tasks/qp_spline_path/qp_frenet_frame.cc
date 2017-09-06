@@ -115,14 +115,6 @@ bool QpFrenetFrame::Init(const uint32_t num_points,
   return true;
 }
 
-const ReferenceLine& QpFrenetFrame::GetReferenceLine() const {
-  return reference_line_;
-}
-
-double QpFrenetFrame::feasible_longitudinal_upper_bound() const {
-  return feasible_longitudinal_upper_bound_;
-}
-
 bool QpFrenetFrame::GetMapBound(const double s,
                                 std::pair<double, double>* const bound) const {
   return GetBound(s, hdmap_bound_, bound);

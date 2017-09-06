@@ -75,7 +75,6 @@ class Frame {
   std::vector<ReferenceLineInfo> &reference_line_info();
 
   bool AddObstacle(std::unique_ptr<Obstacle> obstacle);
-  const Obstacle *FindObstacle(const std::string &obstacle_id);
 
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
   const ReferenceLineInfo *DriveReferenceLinfInfo() const;

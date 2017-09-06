@@ -75,10 +75,6 @@ class StBoundaryMapper {
       const PathObstacle& path_obstacle, const ObjectDecisionType& obj_decision,
       StBoundary* const boundary) const;
 
-  apollo::common::Status MapFollowDecision(
-      const PathObstacle& obstacle, const ObjectDecisionType& obj_decision,
-      StBoundary* const boundary) const;
-
   void AppendBoundary(const StBoundary& boundary,
                       std::vector<StBoundary>* st_boundaries) const;
 

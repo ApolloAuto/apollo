@@ -23,9 +23,9 @@
 
 #include <vector>
 
+#include "glog/logging.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/trajectory/trajectory.h"
-#include "glog/logging.h"
 
 namespace apollo {
 namespace planning {
@@ -34,27 +34,20 @@ class DiscretizedTrajectory : public Trajectory {
  public:
   DiscretizedTrajectory() = default;
 
-  DiscretizedTrajectory(
-      std::vector<common::TrajectoryPoint> trajectory_points);
+  DiscretizedTrajectory(std::vector<common::TrajectoryPoint> trajectory_points);
 
   virtual ~DiscretizedTrajectory() = default;
 
-  double TimeLength() const override;
-
-  common::TrajectoryPoint Evaluate(
-      const double relative_time) const override;
+  common::TrajectoryPoint Evaluate(const double relative_time) const override;
 
   common::TrajectoryPoint StartPoint() const override;
-
-  common::TrajectoryPoint EndPoint() const override;
 
   virtual common::TrajectoryPoint EvaluateUsingLinearApproximation(
       const double relative_time) const;
 
   virtual uint32_t QueryNearestPoint(const double relative_time) const;
 
-  virtual uint32_t QueryNearestPoint(
-      const common::math::Vec2d& position) const;
+  virtual uint32_t QueryNearestPoint(const common::math::Vec2d& position) const;
 
   virtual void AppendTrajectoryPoint(
       const common::TrajectoryPoint& trajectory_point);
@@ -62,8 +55,8 @@ class DiscretizedTrajectory : public Trajectory {
   template <typename Iter>
   void PrependTrajectoryPoints(Iter begin, Iter end) {
     if (!trajectory_points_.empty() && begin != end) {
-      CHECK((end - 1)->relative_time()
-                < trajectory_points_.front().relative_time());
+      CHECK((end - 1)->relative_time() <
+            trajectory_points_.front().relative_time());
     }
     trajectory_points_.insert(trajectory_points_.begin(), begin, end);
   }
@@ -73,11 +66,7 @@ class DiscretizedTrajectory : public Trajectory {
 
   uint32_t NumOfPoints() const;
 
-  void set_trajectory_points(std::vector<common::TrajectoryPoint> points);
-
   const std::vector<common::TrajectoryPoint>& trajectory_points() const;
-
-  virtual bool Valid() const;
 
   virtual void Clear();
 
