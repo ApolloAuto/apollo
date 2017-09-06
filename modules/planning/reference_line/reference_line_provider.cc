@@ -44,7 +44,7 @@ void ReferenceLineProvider::Init(
 
 bool ReferenceLineProvider::Start() {
   if (!is_initialized_) {
-    AERROR << "LincolnController has NOT been initiated.";
+    AERROR << "ReferenceLineProvider has NOT been initiated.";
     return false;
   }
   const auto &func = [this] { Generate(); };
@@ -71,18 +71,19 @@ std::vector<ReferenceLine> ReferenceLineProvider::GetReferenceLines() {
   // can cover thoroughly the current adc position so that planning can be make
   // with a minimum planning distance of 100 meters ahead and 10 meters
   // backward.
+  while (reference_line_groups_.empty()) {
+    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(20));
+  }
   std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
   return reference_line_groups_.back();
 }
 
 bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     const common::PointENU &position, const routing::RoutingResponse &routing) {
-  std::vector<ReferenceLine> reference_lines;
   std::vector<std::vector<hdmap::LaneSegment>> route_segments;
 
   const double kBackwardDistance = 20;
   const double kForwardDistance = 100;
-
   if (!pnc_map_->GetLaneSegmentsFromRouting(routing, position,
                                             kBackwardDistance, kForwardDistance,
                                             &route_segments)) {
@@ -93,6 +94,8 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   ReferenceLineSmoother smoother;
   smoother.Init(smoother_config_);
 
+  std::vector<ReferenceLine> reference_lines;
+  // TODO: Added code to enable partially smoothed reference line here.
   for (const auto &segments : route_segments) {
     hdmap::Path hdmap_path;
     pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
@@ -115,6 +118,11 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
 
   std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
   reference_line_groups_.push_back(reference_lines);
+  const size_t kMaxStoredReferenceLineGroups = 3;
+  while (reference_line_groups_.size() > kMaxStoredReferenceLineGroups) {
+    reference_line_groups_.pop_front();
+  }
+
   return true;
 }
 
