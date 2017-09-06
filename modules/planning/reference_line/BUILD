@@ -58,6 +58,7 @@ cc_library(
     deps = [
         "reference_line",
         "reference_line_smoother",
+        "//modules/map/pnc_map",
     ],
 )
 
