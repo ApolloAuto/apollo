@@ -16,15 +16,15 @@ export default class RouteEditingManager {
         RENDERER.disableRouteEditing();
     }
 
-    @action removeLastRoutingPoint() {
+    removeLastRoutingPoint() {
         RENDERER.removeLastRoutingPoint();
     }
 
-    @action removeAllRoutingPoints() {
+    removeAllRoutingPoints() {
         RENDERER.removeAllRoutingPoints();
     }
 
-    @action sendRoutingRequest(sendDefaultRoute = false) {
+    sendRoutingRequest(sendDefaultRoute = false) {
         if (RENDERER.sendRoutingRequest(sendDefaultRoute)){
             this.disableRouteEditing();
         }

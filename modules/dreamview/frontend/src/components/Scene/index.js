@@ -1,5 +1,6 @@
 import React from "react";
 import { observer, inject } from "mobx-react";
+import classNames from "classnames";
 
 import RENDERER from "renderer";
 
@@ -17,9 +18,14 @@ export default class Scene extends React.Component {
 
     render() {
         // TODO The position of the canvas should not be absolute, maybe.
+        const {invisible} = this.props;
+
         return (
-            <div id="canvas"
-                 className="dreamview-canvas" />
+            <div id = "canvas"
+                 className={classNames({
+                            "dreamview-canvas" : true,
+                             "hidden" : invisible})}/>
+
         );
     }
 }

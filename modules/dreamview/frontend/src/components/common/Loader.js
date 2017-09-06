@@ -7,7 +7,7 @@ import loaderImg from "assets/images/loader_apollo.gif";
 export default class Loader extends React.Component {
 
     render() {
-        const message = "Waiting for car initial position and map data ...";
+        const message = "Please send car initial position and map data.";
 
         return (
             <div className="loader">
