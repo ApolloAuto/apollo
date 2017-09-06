@@ -24,11 +24,6 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "Eigen/LU"
-
-#include "modules/common/math/qp_solver/qp_solver.h"
-#include "modules/common/math/qp_solver/active_set_qp_solver.h"
-
 
 /**
  * @namespace apollo::common::math
