@@ -381,7 +381,7 @@ void RegionalPredictor::InsertTrajectoryPoint(
       prev_point.mutable_path_point()->set_theta(*left_heading);
       prev_point.set_v(speed);
       prev_point.set_relative_time((*left_i) * delta_ts);
-      ++left_i;
+      ++(*left_i);
     }
     left_points->push_back(boundary_point);
   } else {
@@ -392,7 +392,7 @@ void RegionalPredictor::InsertTrajectoryPoint(
       prev_point.mutable_path_point()->set_theta(*right_heading);
       prev_point.set_v(speed);
       prev_point.set_relative_time((*right_i) * delta_ts);
-      ++right_i;
+      ++(*right_i);
     }
     right_points->push_back(boundary_point);
   }
