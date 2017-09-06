@@ -20,6 +20,7 @@
  * @brief Implementation of the class ReferenceLineProvider.
  */
 
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
 /**
@@ -29,8 +30,15 @@
 namespace apollo {
 namespace planning {
 
-void ReferenceLineProvider::Init() {
-  // TODO: implement this function.
+using apollo::common::VehicleState;
+
+void ReferenceLineProvider::Init(
+    const hdmap::PncMap *pnc_map,
+    const routing::RoutingResponse &routing_response,
+    const ReferenceLineSmootherConfig &smoother_config) {
+  pnc_map_ = pnc_map;
+  routing_response_ = routing_response;
+  smoother_config_ = smoother_config;
   is_initialized_ = true;
 }
 
@@ -46,11 +54,68 @@ bool ReferenceLineProvider::Start() {
 
 void ReferenceLineProvider::Generate() {
   // TODO: implement this function.
+  const auto &curr_adc_position =
+      common::VehicleState::instance()->pose().position();
+  const auto adc_point_enu = common::util::MakePointENU(
+      curr_adc_position.x(), curr_adc_position.y(), curr_adc_position.z());
+
+  if (!CreateReferenceLineFromRouting(adc_point_enu, routing_response_)) {
+    AERROR << "Fail to create reference line at position: "
+           << curr_adc_position.ShortDebugString();
+  };
 }
 
 std::vector<ReferenceLine> ReferenceLineProvider::GetReferenceLines() {
-  // TODO: implement this function.
+  // TODO: implement this function using the current adc position and the
+  // existing reference lines. It is required that the current reference lines
+  // can cover thoroughly the current adc position so that planning can be make
+  // with a minimum planning distance of 100 meters ahead and 10 meters
+  // backward.
+  std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
   return reference_line_groups_.back();
+}
+
+bool ReferenceLineProvider::CreateReferenceLineFromRouting(
+    const common::PointENU &position, const routing::RoutingResponse &routing) {
+  std::vector<ReferenceLine> reference_lines;
+  std::vector<std::vector<hdmap::LaneSegment>> route_segments;
+
+  const double kBackwardDistance = 20;
+  const double kForwardDistance = 100;
+
+  if (!pnc_map_->GetLaneSegmentsFromRouting(routing, position,
+                                            kBackwardDistance, kForwardDistance,
+                                            &route_segments)) {
+    AERROR << "Failed to extract segments from routing";
+    return false;
+  }
+
+  ReferenceLineSmoother smoother;
+  smoother.Init(smoother_config_);
+
+  for (const auto &segments : route_segments) {
+    hdmap::Path hdmap_path;
+    pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
+    if (FLAGS_enable_smooth_reference_line) {
+      ReferenceLine reference_line;
+      if (!smoother.Smooth(ReferenceLine(hdmap_path), &reference_line)) {
+        AERROR << "Failed to smooth reference line";
+        continue;
+      }
+      reference_lines.push_back(std::move(reference_line));
+    } else {
+      reference_lines.emplace_back(hdmap_path);
+    }
+  }
+
+  if (reference_lines.empty()) {
+    AERROR << "No smooth reference lines available";
+    return false;
+  }
+
+  std::lock_guard<std::mutex> lock(reference_line_groups_mutex_);
+  reference_line_groups_.push_back(reference_lines);
+  return true;
 }
 
 }  // namespace planning
