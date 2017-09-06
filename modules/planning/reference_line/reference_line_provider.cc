@@ -32,6 +32,12 @@ namespace planning {
 
 using apollo::common::VehicleState;
 
+ReferenceLineProvider::~ReferenceLineProvider() {
+  if (thread_ && thread_->joinable()) {
+    thread_->join();
+  }
+}
+
 void ReferenceLineProvider::Init(
     const hdmap::PncMap *pnc_map,
     const routing::RoutingResponse &routing_response,
@@ -49,20 +55,24 @@ bool ReferenceLineProvider::Start() {
   }
   const auto &func = [this] { Generate(); };
   thread_.reset(new std::thread(func));
-  return false;
+  return true;
 }
 
 void ReferenceLineProvider::Generate() {
   // TODO: implement this function.
-  const auto &curr_adc_position =
-      common::VehicleState::instance()->pose().position();
-  const auto adc_point_enu = common::util::MakePointENU(
-      curr_adc_position.x(), curr_adc_position.y(), curr_adc_position.z());
 
-  if (!CreateReferenceLineFromRouting(adc_point_enu, routing_response_)) {
-    AERROR << "Fail to create reference line at position: "
-           << curr_adc_position.ShortDebugString();
-  };
+  while (true) {
+    const auto &curr_adc_position =
+        common::VehicleState::instance()->pose().position();
+    const auto adc_point_enu = common::util::MakePointENU(
+        curr_adc_position.x(), curr_adc_position.y(), curr_adc_position.z());
+
+    if (!CreateReferenceLineFromRouting(adc_point_enu, routing_response_)) {
+      AERROR << "Fail to create reference line at position: "
+             << curr_adc_position.ShortDebugString();
+    };
+    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(500));
+  }
 }
 
 std::vector<ReferenceLine> ReferenceLineProvider::GetReferenceLines() {

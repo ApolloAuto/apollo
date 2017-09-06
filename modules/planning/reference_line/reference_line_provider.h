@@ -50,7 +50,7 @@ class ReferenceLineProvider {
   /**
    * @brief Default destructor.
    */
-  virtual ~ReferenceLineProvider() = default;
+  ~ReferenceLineProvider();
 
   void Init(const hdmap::PncMap* pnc_map_,
             const routing::RoutingResponse& routing_response,
