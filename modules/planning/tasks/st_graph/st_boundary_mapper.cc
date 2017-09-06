@@ -295,6 +295,16 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
     }
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
+      if (i > 0) {
+        const auto& pre_point = trajectory.trajectory_point(i - 1);
+        if (trajectory_point.relative_time() <= pre_point.relative_time()) {
+          AERROR << "Fail to map because prediction time is not increasing."
+                 << "current point: " << trajectory_point.ShortDebugString()
+                 << "previous point: " << pre_point.ShortDebugString();
+          return false;
+        }
+      }
+
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
 
       double trajectory_point_time = trajectory_point.relative_time();
