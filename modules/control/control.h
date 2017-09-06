@@ -102,7 +102,7 @@ class Control : public apollo::common::ApolloApp {
   ::apollo::localization::LocalizationEstimate localization_;
   ::apollo::canbus::Chassis chassis_;
   ::apollo::planning::ADCTrajectory trajectory_;
-  ::apollo::control::PadMessage pad_msg_;
+  PadMessage pad_msg_;
 
   ControllerAgent controller_agent_;
 
