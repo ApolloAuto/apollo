@@ -29,6 +29,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/planner/em/decider.h"
 #include "modules/planning/tasks/dp_poly_path/dp_poly_path_optimizer.h"
@@ -37,7 +38,6 @@
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
-#include "modules/planning/trajectory_stitcher/constraint_checker.h"
 
 namespace apollo {
 namespace planning {
