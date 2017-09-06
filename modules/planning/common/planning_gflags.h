@@ -45,6 +45,7 @@ DECLARE_double(trajectory_time_resolution);
 DECLARE_double(output_trajectory_time_resolution);
 
 // parameters for trajectory sanity check
+DECLARE_bool(enable_trajectory_check);
 DECLARE_double(speed_lower_bound);
 DECLARE_double(speed_upper_bound);
 
