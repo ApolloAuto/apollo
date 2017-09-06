@@ -67,7 +67,7 @@ void ExtractOverlapIds(const std::vector<MapElementInfoConstPtr> &items,
 }
 
 void ExtractStringVectorFromJson(const nlohmann::json &json_object,
-                                 const std::string key,
+                                 const std::string &key,
                                  std::vector<std::string> *result) {
   auto iter = json_object.find(key);
   if (iter != json_object.end()) {
@@ -255,8 +255,8 @@ bool MapService::GetPointsFromRouting(const RoutingResponse &routing,
   }
 
   constexpr double angle_threshold = 0.1;  // threshold is about 5.72 degree.
-  std::vector<int> sampled_indices = DownsampleByAngle(path.path_points(),
-                                                       angle_threshold);
+  std::vector<int> sampled_indices =
+      DownsampleByAngle(path.path_points(), angle_threshold);
   for (int index : sampled_indices) {
     points->push_back(path.path_points()[index]);
   }

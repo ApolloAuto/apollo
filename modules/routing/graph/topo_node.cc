@@ -20,8 +20,8 @@
 #include <cmath>
 #include <utility>
 
-#include "modules/routing/graph/range_utils.h"
 #include "modules/common/log.h"
+#include "modules/routing/graph/range_utils.h"
 
 namespace apollo {
 namespace routing {
@@ -33,16 +33,12 @@ const double MIN_INTERNAL_FOR_NODE = 0.01;  // in meter
 using ::google::protobuf::RepeatedPtrField;
 
 void ConvertOutRange(const RepeatedPtrField<CurveRange>& range_vec,
-                     double start_s,
-                     double end_s,
-                     std::vector<NodeSRange>* out_range,
-                     int* prefer_index) {
+                     double start_s, double end_s,
+                     std::vector<NodeSRange>* out_range, int* prefer_index) {
   out_range->clear();
-  double s_s = 0.0;
-  double e_s = 0.0;
   for (const auto& c_range : range_vec) {
-    s_s = c_range.start().s();
-    e_s = c_range.end().s();
+    double s_s = c_range.start().s();
+    double e_s = c_range.end().s();
     if (e_s < start_s || s_s > end_s || e_s < s_s) {
       continue;
     }
@@ -66,8 +62,7 @@ void ConvertOutRange(const RepeatedPtrField<CurveRange>& range_vec,
 }  // namespace
 
 bool TopoNode::IsOutRangeEnough(const std::vector<NodeSRange>& range_vec,
-                                double start_s,
-                                double end_s) {
+                                double start_s, double end_s) {
   if (!NodeSRange::IsEnoughForChangeLane(start_s, end_s)) {
     return false;
   }
@@ -119,14 +114,15 @@ void TopoNode::Init() {
   ConvertOutRange(pb_node_.left_out(), start_s_, end_s_,
                   &left_out_sorted_range_, &left_prefer_range_index_);
 
-  is_left_range_enough_ = (left_prefer_range_index_ >= 0) &&
+  is_left_range_enough_ =
+      (left_prefer_range_index_ >= 0) &&
       left_out_sorted_range_[left_prefer_range_index_].IsEnoughForChangeLane();
 
   ConvertOutRange(pb_node_.right_out(), start_s_, end_s_,
                   &right_out_sorted_range_, &right_prefer_range_index_);
   is_right_range_enough_ = (right_prefer_range_index_ >= 0) &&
-      right_out_sorted_range_[right_prefer_range_index_]
-        .IsEnoughForChangeLane();
+                           right_out_sorted_range_[right_prefer_range_index_]
+                               .IsEnoughForChangeLane();
 }
 
 bool TopoNode::FindAnchorPoint() {
@@ -146,8 +142,7 @@ bool TopoNode::FindAnchorPoint() {
   return false;
 }
 
-void TopoNode::SetAnchorPoint(
-    const ::apollo::common::PointENU& anchor_point) {
+void TopoNode::SetAnchorPoint(const ::apollo::common::PointENU& anchor_point) {
   anchor_point_ = anchor_point;
 }
 
@@ -187,13 +182,12 @@ const std::unordered_set<const TopoEdge*>& TopoNode::InFromLeftEdge() const {
   return in_from_left_edge_set_;
 }
 
-const std::unordered_set<const TopoEdge*>& TopoNode::InFromRightEdge()
-    const {
+const std::unordered_set<const TopoEdge*>& TopoNode::InFromRightEdge() const {
   return in_from_right_edge_set_;
 }
 
-const std::unordered_set<const TopoEdge*>&
-TopoNode::InFromLeftOrRightEdge() const {
+const std::unordered_set<const TopoEdge*>& TopoNode::InFromLeftOrRightEdge()
+    const {
   return in_from_left_or_right_edge_set_;
 }
 
@@ -213,8 +207,8 @@ const std::unordered_set<const TopoEdge*>& TopoNode::OutToRightEdge() const {
   return out_to_right_edge_set_;
 }
 
-const std::unordered_set<const TopoEdge*>&
-TopoNode::OutToLeftOrRightEdge() const {
+const std::unordered_set<const TopoEdge*>& TopoNode::OutToLeftOrRightEdge()
+    const {
   return out_to_left_or_right_edge_set_;
 }
 
@@ -250,14 +244,12 @@ bool TopoNode::IsOverlapEnough(const TopoNode* sub_node,
                                const TopoEdge* edge_for_type) const {
   if (edge_for_type->Type() == TET_LEFT) {
     return (is_left_range_enough_ &&
-            IsOutRangeEnough(left_out_sorted_range_,
-                             sub_node->StartS(),
+            IsOutRangeEnough(left_out_sorted_range_, sub_node->StartS(),
                              sub_node->EndS()));
   }
   if (edge_for_type->Type() == TET_RIGHT) {
     return (is_right_range_enough_ &&
-            IsOutRangeEnough(right_out_sorted_range_,
-                             sub_node->StartS(),
+            IsOutRangeEnough(right_out_sorted_range_, sub_node->StartS(),
                              sub_node->EndS()));
   }
   if (edge_for_type->Type() == TET_FORWARD) {
@@ -322,9 +314,8 @@ bool TopoNode::IsOutToSucEdgeValid() const {
   return std::fabs(EndS() - OriginNode()->EndS()) < MIN_INTERNAL_FOR_NODE;
 }
 
-
-TopoEdge::TopoEdge(const Edge& edge,
-                   const TopoNode* from_node, const TopoNode* to_node)
+TopoEdge::TopoEdge(const Edge& edge, const TopoNode* from_node,
+                   const TopoNode* to_node)
     : pb_edge_(edge), from_node_(from_node), to_node_(to_node) {}
 
 TopoEdge::~TopoEdge() {}
@@ -341,9 +332,7 @@ const std::string& TopoEdge::FromLaneId() const {
   return pb_edge_.from_lane_id();
 }
 
-const std::string& TopoEdge::ToLaneId() const {
-  return pb_edge_.to_lane_id();
-}
+const std::string& TopoEdge::ToLaneId() const { return pb_edge_.to_lane_id(); }
 
 TopoEdgeType TopoEdge::Type() const {
   if (pb_edge_.direction_type() == Edge::LEFT) {
