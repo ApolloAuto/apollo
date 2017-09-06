@@ -249,11 +249,10 @@ Status Control::CheckInput() {
 
   for (int i = 0; i < trajectory_.trajectory_point_size(); ++i) {
     if (trajectory_.trajectory_point(i).v() <
-       control_conf_.minimum_speed_resolution()){
+       control_conf_.minimum_speed_resolution()) {
       trajectory_.mutable_trajectory_point(i)->set_v(0.0);
       trajectory_.mutable_trajectory_point(i)->set_a(0.0);
-   }
-
+    }
   }
 
   common::VehicleState::instance()->Update(localization_, chassis_);
