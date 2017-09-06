@@ -68,7 +68,7 @@ common::PathPoint DiscretizedPath::EvaluateUsingLinearApproximation(
   if (it_lower == path_points_.end()) {
     return path_points_.back();
   }
-  return util::interpolate_linear_approximation(*(it_lower - 1), *it_lower,
+  return util::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower,
                                                 path_s);
 }
 

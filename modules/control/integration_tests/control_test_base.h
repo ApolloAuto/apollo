@@ -61,7 +61,7 @@ class ControlTestBase : public ::testing::Test {
   void trim_control_command(apollo::control::ControlCommand *origin);
   ControlCommand control_command_;
   Control control_;
-  static uint32_t _s_seq_num;
+  static uint32_t s_seq_num_;
 };
 
 }  // namespace control

@@ -71,7 +71,7 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   return p;
 }
 
-PathPoint interpolate_linear_approximation(const PathPoint &p0,
+PathPoint InterpolateUsingLinearApproximation(const PathPoint &p0,
                                            const PathPoint &p1,
                                            const double s) {
   double s0 = p0.s();
@@ -167,7 +167,7 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   return tp;
 }
 
-TrajectoryPoint interpolate_linear_approximation(const TrajectoryPoint &tp0,
+TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
                                                  const TrajectoryPoint &tp1,
                                                  const double t) {
   const PathPoint &pp0 = tp0.path_point();
