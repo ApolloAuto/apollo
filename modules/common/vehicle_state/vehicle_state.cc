@@ -31,11 +31,11 @@ namespace common {
 
 VehicleState::VehicleState() {}
 
-common::Status VehicleState::Update(
+Status VehicleState::Update(
     const localization::LocalizationEstimate &localization,
     const canbus::Chassis &chassis) {
   if (!ConstructExceptLinearVelocity(localization)) {
-    std::string msg = common::util::StrCat(
+    std::string msg = util::StrCat(
         "Fail to update because ConstructExceptLinearVelocity error.",
         "localization:\n", localization.DebugString());
     return Status(ErrorCode::LOCALIZATION_ERROR, msg);
@@ -50,7 +50,7 @@ common::Status VehicleState::Update(
   if (chassis.has_gear_location()) {
     gear_ = chassis.gear_location();
   } else {
-    gear_ = ::apollo::canbus::Chassis::GEAR_NONE;
+    gear_ = canbus::Chassis::GEAR_NONE;
   }
 
   InitAdcBoundingBox();
@@ -59,18 +59,17 @@ common::Status VehicleState::Update(
 }
 
 void VehicleState::InitAdcBoundingBox() {
-  const auto &param =
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-  common::math::Vec2d position(x_, y_);
-  common::math::Vec2d vec_to_center(
+  const auto &param = VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  math::Vec2d position(x_, y_);
+  math::Vec2d vec_to_center(
       (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
-  common::math::Vec2d center(position + vec_to_center.rotate(heading_));
-  adc_bounding_box_ = std::unique_ptr<common::math::Box2d>(
-      new common::math::Box2d(center, heading_, param.length(), param.width()));
+  math::Vec2d center(position + vec_to_center.rotate(heading_));
+  adc_bounding_box_ = std::unique_ptr<math::Box2d>(
+      new math::Box2d(center, heading_, param.length(), param.width()));
 }
 
-const common::math::Box2d &VehicleState::AdcBoundingBox() const {
+const math::Box2d &VehicleState::AdcBoundingBox() const {
   CHECK(adc_bounding_box_) << "ADC bounding box not initialized";
   return *adc_bounding_box_;
 }
@@ -93,7 +92,7 @@ bool VehicleState::ConstructExceptLinearVelocity(
   if (localization.pose().has_heading()) {
     heading_ = localization.pose().heading();
   } else {
-    heading_ = ::apollo::common::math::QuaternionToHeading(
+    heading_ = math::QuaternionToHeading(
         orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
   }
 
@@ -129,7 +128,7 @@ bool VehicleState::ConstructExceptLinearVelocity(
     pitch_ = localization.pose().euler_angles().y();
     yaw_ = localization.pose().euler_angles().z();
   } else {
-    ::apollo::common::math::EulerAnglesZXYd euler_angle(
+    math::EulerAnglesZXYd euler_angle(
         orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
     roll_ = euler_angle.roll();
     pitch_ = euler_angle.pitch();
@@ -187,14 +186,14 @@ void VehicleState::set_angular_velocity(const double angular_velocity) {
 }
 
 void VehicleState::set_gear(
-    const ::apollo::canbus::Chassis::GearPosition gear_position) {
+    const canbus::Chassis::GearPosition gear_position) {
   gear_ = gear_position;
 }
 
-common::math::Vec2d VehicleState::EstimateFuturePosition(const double t) const {
+math::Vec2d VehicleState::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
   double v = linear_v_;
-  if (gear_ == ::apollo::canbus::Chassis::GEAR_REVERSE) {
+  if (gear_ == canbus::Chassis::GEAR_REVERSE) {
     v = -linear_v_;
   }
   // Predict distance travel vector
@@ -213,15 +212,15 @@ common::math::Vec2d VehicleState::EstimateFuturePosition(const double t) const {
                                          orientation.qy(), orientation.qz());
     Eigen::Vector3d pos_vec(x_, y_, z_);
     auto future_pos_3d = quaternion.toRotationMatrix() * vec_distance + pos_vec;
-    return common::math::Vec2d(future_pos_3d[0], future_pos_3d[1]);
+    return math::Vec2d(future_pos_3d[0], future_pos_3d[1]);
   }
 
   // If no valid rotation information provided from localization,
   // return the estimated future position without rotation.
-  return common::math::Vec2d(vec_distance[0] + x_, vec_distance[1] + y_);
+  return math::Vec2d(vec_distance[0] + x_, vec_distance[1] + y_);
 }
 
-common::math::Vec2d VehicleState::ComputeCOMPosition(
+math::Vec2d VehicleState::ComputeCOMPosition(
     const double rear_to_com_distance) const {
   // set length as distance between rear wheel and center of mass.
   Eigen::Vector3d v(0.0, rear_to_com_distance, 0.0);
@@ -237,7 +236,7 @@ common::math::Vec2d VehicleState::ComputeCOMPosition(
     // Update the COM position with rotation
     com_pos_3d = quaternion.toRotationMatrix() * v + pos_vec;
   }
-  return common::math::Vec2d(com_pos_3d[0], com_pos_3d[1]);
+  return math::Vec2d(com_pos_3d[0], com_pos_3d[1]);
 }
 
 }  // namespace common
