@@ -252,12 +252,7 @@ void DataParser::publish_odometry_pb_message(const MessagePtr message) {
   x *= DEG_TO_RAD_LOCAL;
   y *= DEG_TO_RAD_LOCAL;
 
-  int ret = pj_transform(_wgs84pj_source, _utm_target, 1, 1, &x, &y, NULL);
-  if (ret != 0) {
-    ROS_ERROR_STREAM("prj transform failed, x: " << x << ", y: " << y
-                                                 << ", ret: " << ret);
-    return;
-  }
+  pj_transform(_wgs84pj_source, _utm_target, 1, 1, &x, &y, NULL);
 
   gps_msg->mutable_position()->set_x(x);
   gps_msg->mutable_position()->set_y(y);
