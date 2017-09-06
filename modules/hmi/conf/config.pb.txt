@@ -258,8 +258,12 @@ available_maps {
   map_dir: "modules/map/data/sunnyvale_office"
 }
 available_maps {
-  name: "Yongfeng Industrial Park"
+  name: "Beijing Yongfeng Park"
   map_dir: "modules/map/data/yongfengchanyeyuan"
+}
+available_maps {
+  name: "Beijing Dongbutou Rd"
+  map_dir: "modules/map/data/dongbutoulu"
 }
 available_vehicles {
   name: "MKZ 8"
@@ -268,6 +272,10 @@ available_vehicles {
 available_vehicles {
   name: "MKZ 9"
   velodyne_params_path: "modules/calibration/data/mkz9"
+}
+available_vehicles {
+  name: "Beijing MKZ"
+  velodyne_params_path: "modules/calibration/data/beijing_mkz"
 }
 velodyne_params_target_path: "bazel-apollo/external/ros/share/velodyne_pointcloud/params"
 velodyne_params_target_path: "ros/share/velodyne_pointcloud/params"
