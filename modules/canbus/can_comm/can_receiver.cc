@@ -69,9 +69,9 @@ void CanReceiver::RecvThreadFunc() {
     receive_error_count = 0;
 
     if (buf.size() != static_cast<size_t>(frame_num)) {
-      AERROR << "Receiver buf size[" << buf.size()
-             << "] does not match can_client returned length[" << frame_num
-             << "].";
+      AERROR_EVERY(100) << "Receiver buf size [" << buf.size()
+         << "] does not match can_client returned length[" << frame_num
+         << "].";
     }
 
     if (frame_num == 0) {
