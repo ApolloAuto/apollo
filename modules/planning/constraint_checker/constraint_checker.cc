@@ -18,7 +18,7 @@
  * @file constraint_checker.cc
  **/
 
-#include "modules/planning/trajectory_stitcher/constraint_checker.h"
+#include "modules/planning/constraint_checker/constraint_checker.h"
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
