@@ -47,6 +47,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "reference_line_provider",
+    srcs = [
+        "reference_line_provider.cc",
+    ],
+    hdrs = [
+        "reference_line_provider.h",
+    ],
+    deps = [
+        "reference_line",
+        "reference_line_smoother",
+    ],
+)
+
 cc_test(
     name = "reference_line_smoother_test",
     size = "small",
