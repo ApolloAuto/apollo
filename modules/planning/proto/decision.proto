@@ -41,8 +41,9 @@ message ObjectStop {
 // dodge the obstacle in lateral direction when driving
 message ObjectNudge {
   enum Type {
-    LEFT_NUDGE = 1; // drive from the left side of the obstacle
-    RIGHT_NUDGE = 2; // drive from the right side of the obstacle
+    LEFT_NUDGE = 1;  // drive from the left side of the obstacle
+    RIGHT_NUDGE = 2;  // drive from the right side of the obstacle
+    NO_NUDGE = 3;  // No nudge is set.
   };
   optional Type type = 1;
   // minimum lateral distance in meters. positive if type = LEFT_NUDGE
