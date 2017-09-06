@@ -22,9 +22,9 @@
 #ifndef MODULES_PLANNING_MATH_SPIRAL_CURVE_SPIRAL_CURVE_H_
 #define MODULES_PLANNING_MATH_SPIRAL_CURVE_SPIRAL_CURVE_H_
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
-#include <algorithm>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
@@ -35,20 +35,20 @@ namespace planning {
 
 class SpiralCurve {
  public:
-  explicit SpiralCurve(const common::PathPoint& s, const common::PathPoint& e,
-                       const std::uint32_t order);
-  virtual ~SpiralCurve();
+  SpiralCurve(const common::PathPoint& s, const common::PathPoint& e,
+              const std::uint32_t order);
+  virtual ~SpiralCurve() = default;
 
   /**
   *   @brief: set configuration if desired (default setting was defined in
   *constructor)
   **/
-  void set_spiral_config(const SpiralCurveConfig& spiral_config);
+  void SetSpiralConfig(const SpiralCurveConfig& spiral_config);
   /**
   *   @brief : default process of calculating path without lookup table
   *   @return: errors of final state: fitted value vs true end point
   **/
-  virtual bool calculate_path() = 0;
+  virtual bool CalculatePath() = 0;
 
   /**
   *   @brief: output methods
@@ -64,7 +64,7 @@ class SpiralCurve {
   *   @brief : get path vector with sampling size n
   *   @return: sequence of sampling points
   **/
-  virtual common::Status get_path_vec(
+  virtual common::Status GetPathVec(
       const std::uint32_t n,
       std::vector<common::PathPoint>* path_points) const = 0;
   /**
@@ -72,7 +72,7 @@ class SpiralCurve {
   *   along the whole path.
   *   @return: vector of path points
   **/
-  virtual common::Status get_path_vec_with_s(
+  virtual common::Status GetPathVecWithS(
       const std::vector<double>& vec_s,
       std::vector<common::PathPoint>* path_points) const = 0;
 
@@ -87,9 +87,11 @@ class SpiralCurve {
  protected:
   void set_sg(const double sg);
   void set_error(const double error);
-  bool result_sanity_check() const;
+
+  bool ResultSanityCheck() const;
+
   template <typename T>
-  void prepend_to_p_params(T begin, T end) {
+  void PrependToPParams(T begin, T end) {
     std::copy(begin, end, p_params_.begin());
   }
   static constexpr double s_two_pi_ = 2 * M_PI;

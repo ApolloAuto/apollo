@@ -40,7 +40,7 @@ QuinticSpiralCurve::QuinticSpiralCurve(const common::PathPoint& s,
   // generate an order 5 spiral path with four parameters
 }
 
-bool QuinticSpiralCurve::calculate_path() {
+bool QuinticSpiralCurve::CalculatePath() {
   // extract infos
   double x_s = start_point().x();
   double y_s = start_point().y();
@@ -184,14 +184,14 @@ bool QuinticSpiralCurve::calculate_path() {
   }
 
   // update params
-  prepend_to_p_params(p_shoot.begin(), p_shoot.end());
+  PrependToPParams(p_shoot.begin(), p_shoot.end());
   set_sg(sg);
   set_error(diff);
 
-  return diff < spiral_config().newton_raphson_tol() && result_sanity_check();
+  return diff < spiral_config().newton_raphson_tol() && ResultSanityCheck();
 }
 
-Status QuinticSpiralCurve::get_path_vec(
+Status QuinticSpiralCurve::GetPathVec(
     const std::uint32_t n, std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
@@ -247,7 +247,7 @@ Status QuinticSpiralCurve::get_path_vec(
   return Status::OK();
 }
 
-Status QuinticSpiralCurve::get_path_vec_with_s(
+Status QuinticSpiralCurve::GetPathVecWithS(
     const std::vector<double>& vec_s,
     std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);

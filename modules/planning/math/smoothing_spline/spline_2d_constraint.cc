@@ -41,14 +41,14 @@ bool Spline2dConstraint::AddInequalityConstraint(
     const Eigen::MatrixXd& constraint_matrix,
     const Eigen::MatrixXd& constraint_boundary) {
   return inequality_constraint_.AddConstraint(constraint_matrix,
-                                               constraint_boundary);
+                                              constraint_boundary);
 }
 
 bool Spline2dConstraint::AddEqualityConstraint(
     const Eigen::MatrixXd& constraint_matrix,
     const Eigen::MatrixXd& constraint_boundary) {
   return equality_constraint_.AddConstraint(constraint_matrix,
-                                             constraint_boundary);
+                                            constraint_boundary);
 }
 
 // preset method
@@ -71,13 +71,13 @@ bool Spline2dConstraint::Add2dBoundary(
   Eigen::MatrixXd affine_boundary =
       Eigen::MatrixXd::Zero(4 * t_coord.size(), 1);
   for (std::uint32_t i = 0; i < t_coord.size(); ++i) {
-    const double d_longitudinal = sign_distance(ref_point[i], angle[i]);
-    const double d_lateral = sign_distance(ref_point[i], angle[i] - M_PI / 2.0);
-    const std::uint32_t index = find_index(t_coord[i]);
+    const double d_longitudinal = SignDistance(ref_point[i], angle[i]);
+    const double d_lateral = SignDistance(ref_point[i], angle[i] - M_PI / 2.0);
+    const std::uint32_t index = FindIndex(t_coord[i]);
     const double rel_t = t_coord[i] - t_knots_[index];
     const std::uint32_t index_offset = 2 * index * spline_order_;
-    std::vector<double> longi_coef = affine_coef(angle[i], rel_t);
-    std::vector<double> lateral_coef = affine_coef(angle[i] - M_PI / 2, rel_t);
+    std::vector<double> longi_coef = AffineCoef(angle[i], rel_t);
+    std::vector<double> lateral_coef = AffineCoef(angle[i] - M_PI / 2, rel_t);
     for (std::uint32_t j = 0; j < 2 * spline_order_; ++j) {
       // upper longi
       affine_inequality(4 * i, index_offset + j) = longi_coef[j];
@@ -97,7 +97,7 @@ bool Spline2dConstraint::Add2dBoundary(
   return AddInequalityConstraint(affine_inequality, affine_boundary);
 }
 
-bool Spline2dConstraint::add_2d_derivative_boundary(
+bool Spline2dConstraint::Add2dDerivativeBoundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
     const std::vector<Vec2d>& ref_point,
     const std::vector<double>& longitidinal_bound,
@@ -112,14 +112,14 @@ bool Spline2dConstraint::add_2d_derivative_boundary(
   Eigen::MatrixXd affine_boundary =
       Eigen::MatrixXd::Zero(4 * t_coord.size(), 1);
   for (std::uint32_t i = 0; i < t_coord.size(); ++i) {
-    const double d_longitudinal = sign_distance(ref_point[i], angle[i]);
-    const double d_lateral = sign_distance(ref_point[i], angle[i] - M_PI / 2.0);
-    const std::uint32_t index = find_index(t_coord[i]);
+    const double d_longitudinal = SignDistance(ref_point[i], angle[i]);
+    const double d_lateral = SignDistance(ref_point[i], angle[i] - M_PI / 2.0);
+    const std::uint32_t index = FindIndex(t_coord[i]);
     const double rel_t = t_coord[i] - t_knots_[index];
     const std::uint32_t index_offset = 2 * index * spline_order_;
-    std::vector<double> longi_coef = affine_derivative_coef(angle[i], rel_t);
+    std::vector<double> longi_coef = AffineDerivativeCoef(angle[i], rel_t);
     std::vector<double> lateral_coef =
-        affine_derivative_coef(angle[i] - M_PI / 2, rel_t);
+        AffineDerivativeCoef(angle[i] - M_PI / 2, rel_t);
     for (std::uint32_t j = 0; j < 2 * spline_order_; ++j) {
       // upper longi
       affine_inequality(4 * i, index_offset + j) = longi_coef[j];
@@ -139,7 +139,7 @@ bool Spline2dConstraint::add_2d_derivative_boundary(
   return AddInequalityConstraint(affine_inequality, affine_boundary);
 }
 
-bool Spline2dConstraint::add_2d_second_derivative_boundary(
+bool Spline2dConstraint::Add2dSecondDerivativeBoundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
     const std::vector<Vec2d>& ref_point,
     const std::vector<double>& longitidinal_bound,
@@ -154,15 +154,15 @@ bool Spline2dConstraint::add_2d_second_derivative_boundary(
   Eigen::MatrixXd affine_boundary =
       Eigen::MatrixXd::Zero(4 * t_coord.size(), 1);
   for (std::uint32_t i = 0; i < t_coord.size(); ++i) {
-    const double d_longitudinal = sign_distance(ref_point[i], angle[i]);
-    const double d_lateral = sign_distance(ref_point[i], angle[i] - M_PI / 2.0);
-    const std::uint32_t index = find_index(t_coord[i]);
+    const double d_longitudinal = SignDistance(ref_point[i], angle[i]);
+    const double d_lateral = SignDistance(ref_point[i], angle[i] - M_PI / 2.0);
+    const std::uint32_t index = FindIndex(t_coord[i]);
     const double rel_t = t_coord[i] - t_knots_[index];
     const std::uint32_t index_offset = 2 * index * spline_order_;
     std::vector<double> longi_coef =
-        affine_second_derivative_coef(angle[i], rel_t);
+        AffineSecondDerivativeCoef(angle[i], rel_t);
     std::vector<double> lateral_coef =
-        affine_second_derivative_coef(angle[i] - M_PI / 2, rel_t);
+        AffineSecondDerivativeCoef(angle[i] - M_PI / 2, rel_t);
     for (std::uint32_t j = 0; j < 2 * spline_order_; ++j) {
       // upper longi
       affine_inequality(4 * i, index_offset + j) = longi_coef[j];
@@ -182,7 +182,7 @@ bool Spline2dConstraint::add_2d_second_derivative_boundary(
   return AddInequalityConstraint(affine_inequality, affine_boundary);
 }
 
-bool Spline2dConstraint::add_2d_third_derivative_boundary(
+bool Spline2dConstraint::Add2dThirdDerivativeBoundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
     const std::vector<Vec2d>& ref_point,
     const std::vector<double>& longitidinal_bound,
@@ -197,15 +197,14 @@ bool Spline2dConstraint::add_2d_third_derivative_boundary(
   Eigen::MatrixXd affine_boundary =
       Eigen::MatrixXd::Zero(4 * t_coord.size(), 1);
   for (std::uint32_t i = 0; i < t_coord.size(); ++i) {
-    const double d_longitudinal = sign_distance(ref_point[i], angle[i]);
-    const double d_lateral = sign_distance(ref_point[i], angle[i] - M_PI / 2.0);
-    const std::uint32_t index = find_index(t_coord[i]);
+    const double d_longitudinal = SignDistance(ref_point[i], angle[i]);
+    const double d_lateral = SignDistance(ref_point[i], angle[i] - M_PI / 2.0);
+    const std::uint32_t index = FindIndex(t_coord[i]);
     const double rel_t = t_coord[i] - t_knots_[index];
     const std::uint32_t index_offset = 2 * index * spline_order_;
-    std::vector<double> longi_coef =
-        affine_third_derivative_coef(angle[i], rel_t);
+    std::vector<double> longi_coef = AffineThirdDerivativeCoef(angle[i], rel_t);
     std::vector<double> lateral_coef =
-        affine_third_derivative_coef(angle[i] - M_PI / 2, rel_t);
+        AffineThirdDerivativeCoef(angle[i] - M_PI / 2, rel_t);
     for (std::uint32_t j = 0; j < 2 * spline_order_; ++j) {
       // upper longi
       affine_inequality(4 * i, index_offset + j) = longi_coef[j];
@@ -225,16 +224,16 @@ bool Spline2dConstraint::add_2d_third_derivative_boundary(
   return AddInequalityConstraint(affine_inequality, affine_boundary);
 }
 
-bool Spline2dConstraint::add_point_constraint(const double t, const double x,
-                                              const double y) {
-  const std::uint32_t index = find_index(t);
+bool Spline2dConstraint::AddPointConstraint(const double t, const double x,
+                                            const double y) {
+  const std::uint32_t index = FindIndex(t);
   const std::uint32_t index_offset = index * 2 * spline_order_;
   const double rel_t = t - t_knots_[index];
 
   Eigen::MatrixXd affine_equality = Eigen::MatrixXd::Zero(2, total_param_);
   Eigen::MatrixXd affine_boundary = Eigen::MatrixXd::Zero(2, 1);
   affine_boundary << x, y;
-  std::vector<double> power_t = poly_coef(rel_t);
+  std::vector<double> power_t = PolyCoef(rel_t);
   for (std::uint32_t i = 0; i < spline_order_; ++i) {
     affine_equality(0, i + index_offset) = power_t[i];
     affine_equality(1, i + spline_order_ + index_offset) = power_t[i];
@@ -242,17 +241,16 @@ bool Spline2dConstraint::add_point_constraint(const double t, const double x,
   return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
-bool Spline2dConstraint::add_point_angle_constraint(const double t,
-                                                    const double angle) {
-  const std::uint32_t index = find_index(t);
+bool Spline2dConstraint::AddPointAngleConstraint(const double t,
+                                                 const double angle) {
+  const std::uint32_t index = FindIndex(t);
   const std::uint32_t index_offset = index * 2 * spline_order_;
   const double rel_t = t - t_knots_[index];
 
   // add equality constraint
   Eigen::MatrixXd affine_equality = Eigen::MatrixXd::Zero(1, total_param_);
   Eigen::MatrixXd affine_boundary = Eigen::MatrixXd::Zero(1, 1);
-  std::vector<double> line_derivative_coef =
-      affine_derivative_coef(angle, rel_t);
+  std::vector<double> line_derivative_coef = AffineDerivativeCoef(angle, rel_t);
   for (std::uint32_t i = 0; i < line_derivative_coef.size(); ++i) {
     affine_equality(0, i + index_offset) = line_derivative_coef[i];
   }
@@ -260,7 +258,7 @@ bool Spline2dConstraint::add_point_angle_constraint(const double t,
   // add inequality constraint
   Eigen::MatrixXd affine_inequality = Eigen::MatrixXd::Zero(2, total_param_);
   Eigen::MatrixXd affine_inequality_boundary = Eigen::MatrixXd::Zero(2, 1);
-  std::vector<double> t_coef = derivative_coef(rel_t);
+  std::vector<double> t_coef = DerivativeCoef(rel_t);
   int x_sign = 1;
   int y_sign = 1;
   double normalized_angle = fmod(angle, M_PI * 2);
@@ -284,8 +282,7 @@ bool Spline2dConstraint::add_point_angle_constraint(const double t,
   if (!AddEqualityConstraint(affine_equality, affine_boundary)) {
     return false;
   }
-  return AddInequalityConstraint(affine_inequality,
-                                   affine_inequality_boundary);
+  return AddInequalityConstraint(affine_inequality, affine_inequality_boundary);
 }
 
 // guarantee upto values are joint
@@ -300,7 +297,7 @@ bool Spline2dConstraint::AddSmoothConstraint() {
   for (std::uint32_t i = 0; i + 2 < t_knots_.size(); ++i) {
     const double rel_t = t_knots_[i + 1] - t_knots_[i];
     const std::uint32_t index_offset = 2 * i * spline_order_;
-    std::vector<double> power_t = poly_coef(rel_t);
+    std::vector<double> power_t = PolyCoef(rel_t);
 
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
       affine_equality(2 * i, j + index_offset) = power_t[j];
@@ -325,8 +322,8 @@ bool Spline2dConstraint::AddDerivativeSmoothConstraint() {
   for (std::uint32_t i = 0; i + 2 < t_knots_.size(); ++i) {
     const double rel_t = t_knots_[i + 1] - t_knots_[i];
     const std::uint32_t index_offset = 2 * i * spline_order_;
-    std::vector<double> power_t = poly_coef(rel_t);
-    std::vector<double> derivative_t = derivative_coef(rel_t);
+    std::vector<double> power_t = PolyCoef(rel_t);
+    std::vector<double> derivative_t = DerivativeCoef(rel_t);
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
       affine_equality(4 * i, j + index_offset) = power_t[j];
       affine_equality(4 * i + 1, j + index_offset) = derivative_t[j];
@@ -355,9 +352,9 @@ bool Spline2dConstraint::AddSecondDerivativeSmoothConstraint() {
   for (std::uint32_t i = 0; i + 2 < t_knots_.size(); ++i) {
     const double rel_t = t_knots_[i + 1] - t_knots_[i];
     const std::uint32_t index_offset = 2 * i * spline_order_;
-    std::vector<double> power_t = poly_coef(rel_t);
-    std::vector<double> derivative_t = derivative_coef(rel_t);
-    std::vector<double> second_derivative_t = second_derivative_coef(rel_t);
+    std::vector<double> power_t = PolyCoef(rel_t);
+    std::vector<double> derivative_t = DerivativeCoef(rel_t);
+    std::vector<double> second_derivative_t = SecondDerivativeCoef(rel_t);
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
       affine_equality(6 * i, j + index_offset) = power_t[j];
       affine_equality(6 * i + 1, j + index_offset) = derivative_t[j];
@@ -391,10 +388,10 @@ bool Spline2dConstraint::AddThirdDerivativeSmoothConstraint() {
   for (std::uint32_t i = 0; i + 2 < t_knots_.size(); ++i) {
     const double rel_t = t_knots_[i + 1] - t_knots_[i];
     const std::uint32_t index_offset = 2 * i * spline_order_;
-    std::vector<double> power_t = poly_coef(rel_t);
-    std::vector<double> derivative_t = derivative_coef(rel_t);
-    std::vector<double> second_derivative_t = second_derivative_coef(rel_t);
-    std::vector<double> third_derivative_t = third_derivative_coef(rel_t);
+    std::vector<double> power_t = PolyCoef(rel_t);
+    std::vector<double> derivative_t = DerivativeCoef(rel_t);
+    std::vector<double> second_derivative_t = SecondDerivativeCoef(rel_t);
+    std::vector<double> third_derivative_t = ThirdDerivativeCoef(rel_t);
     for (std::uint32_t j = 0; j < spline_order_; ++j) {
       affine_equality(8 * i, j + index_offset) = power_t[j];
       affine_equality(8 * i + 1, j + index_offset) = derivative_t[j];
@@ -431,15 +428,15 @@ const AffineConstraint& Spline2dConstraint::equality_constraint() const {
   return equality_constraint_;
 }
 
-std::uint32_t Spline2dConstraint::find_index(const double t) const {
+std::uint32_t Spline2dConstraint::FindIndex(const double t) const {
   auto upper_bound = std::upper_bound(t_knots_.begin() + 1, t_knots_.end(), t);
   return std::min(static_cast<std::uint32_t>(t_knots_.size() - 1),
                   static_cast<std::uint32_t>(upper_bound - t_knots_.begin())) -
          1;
 }
 
-std::vector<double> Spline2dConstraint::affine_coef(const double angle,
-                                                    const double t) const {
+std::vector<double> Spline2dConstraint::AffineCoef(const double angle,
+                                                   const double t) const {
   std::vector<double> result(spline_order_ * 2, 0.0);
   double x_coef = -std::sin(angle);
   double y_coef = std::cos(angle);
@@ -452,12 +449,12 @@ std::vector<double> Spline2dConstraint::affine_coef(const double angle,
   return result;
 }
 
-std::vector<double> Spline2dConstraint::affine_derivative_coef(
+std::vector<double> Spline2dConstraint::AffineDerivativeCoef(
     const double angle, const double t) const {
   std::vector<double> result(spline_order_ * 2, 0.0);
   double x_coef = -std::sin(angle);
   double y_coef = std::cos(angle);
-  std::vector<double> power_t = poly_coef(t);
+  std::vector<double> power_t = PolyCoef(t);
   for (std::uint32_t i = 1; i < spline_order_; ++i) {
     result[i] = x_coef * power_t[i - 1] * i;
     result[i + spline_order_] = y_coef * power_t[i - 1] * i;
@@ -465,12 +462,12 @@ std::vector<double> Spline2dConstraint::affine_derivative_coef(
   return result;
 }
 
-std::vector<double> Spline2dConstraint::affine_second_derivative_coef(
+std::vector<double> Spline2dConstraint::AffineSecondDerivativeCoef(
     const double angle, const double t) const {
   std::vector<double> result(spline_order_ * 2, 0.0);
   double x_coef = -std::sin(angle);
   double y_coef = std::cos(angle);
-  std::vector<double> power_t = poly_coef(t);
+  std::vector<double> power_t = PolyCoef(t);
   for (std::uint32_t i = 2; i < spline_order_; ++i) {
     result[i] = x_coef * power_t[i - 2] * i * (i - 1);
     result[i + spline_order_] = y_coef * power_t[i - 2] * i * (i - 1);
@@ -478,12 +475,12 @@ std::vector<double> Spline2dConstraint::affine_second_derivative_coef(
   return result;
 }
 
-std::vector<double> Spline2dConstraint::affine_third_derivative_coef(
+std::vector<double> Spline2dConstraint::AffineThirdDerivativeCoef(
     const double angle, const double t) const {
   std::vector<double> result(spline_order_ * 2, 0.0);
   double x_coef = -std::sin(angle);
   double y_coef = std::cos(angle);
-  std::vector<double> power_t = poly_coef(t);
+  std::vector<double> power_t = PolyCoef(t);
   for (std::uint32_t i = 3; i < spline_order_; ++i) {
     result[i] = x_coef * power_t[i - 3] * i * (i - 1) * (i - 2);
     result[i + spline_order_] = y_coef * power_t[i - 3] * i * (i - 1) * (i - 2);
@@ -491,12 +488,12 @@ std::vector<double> Spline2dConstraint::affine_third_derivative_coef(
   return result;
 }
 
-double Spline2dConstraint::sign_distance(const Vec2d& xy_point,
-                                         const double angle) const {
+double Spline2dConstraint::SignDistance(const Vec2d& xy_point,
+                                        const double angle) const {
   return -std::sin(angle) * xy_point.x() + std::cos(angle) * xy_point.y();
 }
 
-std::vector<double> Spline2dConstraint::poly_coef(const double t) const {
+std::vector<double> Spline2dConstraint::PolyCoef(const double t) const {
   std::vector<double> result(spline_order_, 1.0);
   for (std::uint32_t i = 1; i < result.size(); ++i) {
     result[i] = result[i - 1] * t;
@@ -504,29 +501,29 @@ std::vector<double> Spline2dConstraint::poly_coef(const double t) const {
   return result;
 }
 
-std::vector<double> Spline2dConstraint::derivative_coef(const double t) const {
+std::vector<double> Spline2dConstraint::DerivativeCoef(const double t) const {
   std::vector<double> result(spline_order_, 0.0);
-  std::vector<double> power_t = poly_coef(t);
+  std::vector<double> power_t = PolyCoef(t);
   for (std::uint32_t i = 1; i < result.size(); ++i) {
     result[i] = power_t[i - 1] * i;
   }
   return result;
 }
 
-std::vector<double> Spline2dConstraint::second_derivative_coef(
+std::vector<double> Spline2dConstraint::SecondDerivativeCoef(
     const double t) const {
   std::vector<double> result(spline_order_, 0.0);
-  std::vector<double> power_t = poly_coef(t);
+  std::vector<double> power_t = PolyCoef(t);
   for (std::uint32_t i = 2; i < result.size(); ++i) {
     result[i] = power_t[i - 2] * i * (i - 1);
   }
   return result;
 }
 
-std::vector<double> Spline2dConstraint::third_derivative_coef(
+std::vector<double> Spline2dConstraint::ThirdDerivativeCoef(
     const double t) const {
   std::vector<double> result(spline_order_, 0.0);
-  std::vector<double> power_t = poly_coef(t);
+  std::vector<double> power_t = PolyCoef(t);
   for (std::uint32_t i = 3; i < result.size(); ++i) {
     result[i] = power_t[i - 3] * i * (i - 1) * (i - 2);
   }

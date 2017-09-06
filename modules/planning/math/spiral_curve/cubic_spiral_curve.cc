@@ -39,7 +39,7 @@ CubicSpiralCurve::CubicSpiralCurve(const common::PathPoint& s,
   // generate an order 3 cubic spiral path with four parameters
 }
 
-bool CubicSpiralCurve::calculate_path() {
+bool CubicSpiralCurve::CalculatePath() {
   // calculate path with initialize table
   double x_s = start_point().x();
   double y_s = start_point().y();
@@ -173,14 +173,14 @@ bool CubicSpiralCurve::calculate_path() {
     ds = sg / (spiral_config().simpson_size() - 1);
   }
 
-  prepend_to_p_params(p_shoot.begin(), p_shoot.end());
+  PrependToPParams(p_shoot.begin(), p_shoot.end());
   set_sg(sg);
   set_error(diff);
 
-  return diff < spiral_config().newton_raphson_tol() && result_sanity_check();
+  return diff < spiral_config().newton_raphson_tol() && ResultSanityCheck();
 }
 
-Status CubicSpiralCurve::get_path_vec(
+Status CubicSpiralCurve::GetPathVec(
     const std::uint32_t n, std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
@@ -238,7 +238,7 @@ Status CubicSpiralCurve::get_path_vec(
   return Status::OK();
 }
 
-Status CubicSpiralCurve::get_path_vec_with_s(
+Status CubicSpiralCurve::GetPathVecWithS(
     const std::vector<double>& vec_s,
     std::vector<common::PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);

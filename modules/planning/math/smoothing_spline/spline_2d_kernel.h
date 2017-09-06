@@ -38,7 +38,7 @@ class Spline2dKernel {
   // customized input output
   void AddRegularization(const double regularization_param);
   bool AddKernel(const Eigen::MatrixXd& kernel, const Eigen::MatrixXd& offset,
-                  const double weight);
+                 const double weight);
   bool AddKernel(const Eigen::MatrixXd& kernel, const double weight);
 
   Eigen::MatrixXd* mutable_kernel_matrix();
@@ -48,12 +48,12 @@ class Spline2dKernel {
   const Eigen::MatrixXd& offset() const;
 
   // build-in kernel methods
-  void add_derivative_kernel_matrix(const double weight);
-  void add_second_order_derivative_matrix(const double weight);
-  void add_third_order_derivative_matrix(const double weight);
+  void AddDerivativeKernelMatrix(const double weight);
+  void AddSecondOrderDerivativeMatrix(const double weight);
+  void AddThirdOrderDerivativeMatrix(const double weight);
 
   // reference line kernel, x_coord in strictly increasing order
-  bool add_reference_line_kernel_matrix(
+  bool AddReferenceLineKernelMatrix(
       const std::vector<double>& t_coord,
       const std::vector<common::math::Vec2d>& ref_points, const double weight);
 
