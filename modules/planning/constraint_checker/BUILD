@@ -3,19 +3,20 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "trajectory_stitcher",
+    name = "constraint_checker",
     srcs = [
-        "trajectory_stitcher.cc",
+        "constraint_checker.cc",
     ],
     hdrs = [
-        "trajectory_stitcher.h",
+        "constraint_checker.h",
     ],
     deps = [
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state",
-        "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory",
+        "//modules/planning/common/trajectory:discretized_trajectory",
     ],
 )
 
