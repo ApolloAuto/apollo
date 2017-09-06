@@ -44,9 +44,6 @@ class PathDecider : public Task {
 
   bool MakeStaticObstacleDecision(const PathData &path_data,
                                   PathDecision *const path_decision);
-
-  const ReferenceLine *reference_line_ = nullptr;
-  const SpeedData *speed_data_ = nullptr;
 };
 
 }  // namespace planning

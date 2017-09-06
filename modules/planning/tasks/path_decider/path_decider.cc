@@ -42,9 +42,6 @@ PathDecider::PathDecider() : Task("PathDecider") {}
 apollo::common::Status PathDecider::Execute(
     Frame *, ReferenceLineInfo *reference_line_info) {
   Task::Execute(nullptr, reference_line_info);
-
-  reference_line_ = &reference_line_info->reference_line();
-  speed_data_ = &reference_line_info->speed_data();
   return Process(reference_line_info->path_data(),
                  reference_line_info->path_decision());
 }
@@ -75,16 +72,17 @@ bool PathDecider::MakeStaticObstacleDecision(
   std::vector<common::SLPoint> adc_sl_points;
   const auto &vehicle_param =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  const auto &reference_line = reference_line_info_->reference_line();
+
   const double adc_max_edge_to_center_dist =
       std::hypot(std::max(vehicle_param.front_edge_to_center(),
                           vehicle_param.back_edge_to_center()),
                  std::max(vehicle_param.left_edge_to_center(),
                           vehicle_param.right_edge_to_center()));
 
-  for (const common::PathPoint &path_point :
-       path_data.discretized_path().path_points()) {
+  for (const auto &path_point : path_data.discretized_path().path_points()) {
     common::SLPoint adc_sl;
-    if (!reference_line_->XYToSL({path_point.x(), path_point.y()}, &adc_sl)) {
+    if (!reference_line.XYToSL({path_point.x(), path_point.y()}, &adc_sl)) {
       AERROR << "get_point_in_Frenet_frame error for ego vehicle "
              << path_point.x() << " " << path_point.y();
       return false;
@@ -93,6 +91,10 @@ bool PathDecider::MakeStaticObstacleDecision(
     }
   }
 
+  const double adc_allowed_s_radius =
+      adc_max_edge_to_center_dist + FLAGS_static_decision_ignore_s_range;
+  const double adc_allowed_l_radius =
+      adc_max_edge_to_center_dist + FLAGS_static_decision_nudge_l_buffer;
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
     const auto *obstacle = path_obstacle->obstacle();
     if (!obstacle->IsStatic()) {
@@ -106,22 +108,14 @@ bool PathDecider::MakeStaticObstacleDecision(
     const auto &sl_boundary = path_obstacle->perception_sl_boundary();
     bool has_stop = false;
     for (const auto &adc_sl : adc_sl_points) {
-      if (adc_sl.s() + adc_max_edge_to_center_dist +
-                  FLAGS_static_decision_ignore_s_range <
-              sl_boundary.start_s() ||
-          adc_sl.s() - adc_max_edge_to_center_dist -
-                  FLAGS_static_decision_ignore_s_range >
-              sl_boundary.end_s()) {
+      if (adc_sl.s() + adc_allowed_s_radius < sl_boundary.start_s() ||
+          adc_sl.s() - adc_allowed_s_radius > sl_boundary.end_s()) {
         // ignore: no overlap in s direction
         continue;
       }
 
-      if (adc_sl.l() + adc_max_edge_to_center_dist +
-                  FLAGS_static_decision_nudge_l_buffer <
-              sl_boundary.start_l() ||
-          adc_sl.l() - adc_max_edge_to_center_dist -
-                  FLAGS_static_decision_nudge_l_buffer >
-              sl_boundary.end_l()) {
+      if (adc_sl.l() + adc_allowed_l_radius < sl_boundary.start_l() ||
+          adc_sl.l() - adc_allowed_l_radius > sl_boundary.end_l()) {
         // ignore: no overlap in l direction
         continue;
       }
@@ -129,8 +123,7 @@ bool PathDecider::MakeStaticObstacleDecision(
       // check STOP/NUDGE
       double left_width = 0.0;
       double right_width = 0.0;
-      if (!reference_line_->GetLaneWidth(adc_sl.s(), &left_width,
-                                         &right_width)) {
+      if (!reference_line.GetLaneWidth(adc_sl.s(), &left_width, &right_width)) {
         left_width = right_width = FLAGS_default_reference_line_width / 2;
       }
       double driving_width;
@@ -182,7 +175,7 @@ bool PathDecider::MakeStaticObstacleDecision(
         object_stop_ptr->set_distance_s(-stop_distance);
 
         double stop_ref_s = sl_boundary.start_s() - stop_distance;
-        auto stop_ref_point = reference_line_->GetReferencePoint(stop_ref_s);
+        auto stop_ref_point = reference_line.GetReferencePoint(stop_ref_s);
         object_stop_ptr->mutable_stop_point()->set_x(stop_ref_point.x());
         object_stop_ptr->mutable_stop_point()->set_y(stop_ref_point.y());
         object_stop_ptr->set_stop_heading(stop_ref_point.heading());
