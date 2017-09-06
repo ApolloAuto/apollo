@@ -141,9 +141,9 @@ void LaneInfo::Init() {
     sampled_right_width_.emplace_back(sample.s(), sample.width());
   }
 
-  const double kMinHalfWidth = 1.05;
   if (lane_.has_type()) {
     if (lane_.type() == Lane::CITY_DRIVING) {
+      const double kMinHalfWidth = 1.05;
       for (const auto &p : sampled_left_width_) {
         if (p.second < kMinHalfWidth) {
           AERROR
