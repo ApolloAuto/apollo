@@ -168,15 +168,15 @@ TEST_F(HDMapImplTestSuite, GetNearestLaneWithHeading) {
   point.set_x(586424.09);
   point.set_y(4140727.02);
   point.set_z(0.0);
-  
+
   LaneInfoConstPtr nearest_lane;
   double nearest_s = 0.0;
   double nearest_l = 0.0;
   EXPECT_EQ(-1, hdmap_impl_.GetNearestLaneWithHeading(point, 1e-6, 0.86,
-    0.2, &nearest_lane, &nearest_s, &nearest_l));
+      0.2, &nearest_lane, &nearest_s, &nearest_l));
 
   EXPECT_EQ(0, hdmap_impl_.GetNearestLaneWithHeading(point, 5, -2.35,
-    1.0 ,&nearest_lane, &nearest_s, &nearest_l));
+      1.0, &nearest_lane, &nearest_s, &nearest_l));
   EXPECT_EQ("773_1_-2", nearest_lane->id().id());
   EXPECT_NEAR(nearest_l, -3.257, 1E-3);
   EXPECT_NEAR(nearest_s, 25.891, 1E-3);
@@ -188,7 +188,7 @@ TEST_F(HDMapImplTestSuite, GetLanesWithHeading) {
   point.set_x(586424.09);
   point.set_y(4140727.02);
   point.set_z(0.0);
-  
+
   std::vector<LaneInfoConstPtr> lanes;
   EXPECT_EQ(-1, hdmap_impl_.GetLanesWithHeading(point, 1e-6, 0.86,
     0.2, &lanes));
@@ -292,7 +292,7 @@ TEST_F(HDMapImplTestSuite, GetRoads) {
   lane_ids.insert("773_1_-2");
   for (int i = 0; i < section.lane_id_size(); ++i) {
     const apollo::hdmap::Id& lane_id = section.lane_id(i);
-    EXPECT_TRUE(lane_ids.count(lane_id.id()) > 0);
+    EXPECT_GT(lane_ids.count(lane_id.id()), 0);
   }
 }
 
