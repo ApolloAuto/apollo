@@ -52,8 +52,8 @@ class VehicleState {
    * @param localization Localization information of the vehicle.
    * @param chassis Chassis information of the vehicle.
    */
-  common::Status Update(const localization::LocalizationEstimate& localization,
-                        const canbus::Chassis& chassis);
+  Status Update(const localization::LocalizationEstimate& localization,
+                const canbus::Chassis& chassis);
 
   /**
    * @brief Update VehicleState instance by protobuf files.
@@ -65,7 +65,7 @@ class VehicleState {
 
   double timestamp() const { return timestamp_; }
 
-  const apollo::localization::Pose& pose() const { return pose_; }
+  const localization::Pose& pose() const { return pose_; }
 
   /**
    * @brief Default destructor.
@@ -206,7 +206,7 @@ class VehicleState {
    * @brief Set the vehicle's gear position.
    * @param gear_position The vehicle's gear position.
    */
-  void set_gear(const ::apollo::canbus::Chassis::GearPosition gear_position);
+  void set_gear(const canbus::Chassis::GearPosition gear_position);
 
   /**
    * @brief Estimate future position from current position and heading,
@@ -215,7 +215,7 @@ class VehicleState {
    * @param t The length of time period.
    * @return The estimated future position in time t.
    */
-  common::math::Vec2d EstimateFuturePosition(const double t) const;
+  math::Vec2d EstimateFuturePosition(const double t) const;
 
   /**
    * @brief Compute the position of center of mass(COM) of the vehicle,
@@ -224,14 +224,14 @@ class VehicleState {
    *        the vehicle's center of mass.
    * @return The position of the vehicle's center of mass.
    */
-  common::math::Vec2d ComputeCOMPosition(
+  math::Vec2d ComputeCOMPosition(
       const double rear_to_com_distance) const;
 
   /**
    * @brief Compute the bouding box of the vehicle.
    * @return the bounding box of the vehicle represented by Box2d.
    */
-  const common::math::Box2d& AdcBoundingBox() const;
+  const math::Box2d& AdcBoundingBox() const;
 
  private:
   DECLARE_SINGLETON(VehicleState);
@@ -256,7 +256,7 @@ class VehicleState {
   double linear_a_y_ = 0.0;
   canbus::Chassis::GearPosition gear_;
   localization::Pose pose_;
-  std::unique_ptr<common::math::Box2d> adc_bounding_box_ = nullptr;
+  std::unique_ptr<math::Box2d> adc_bounding_box_ = nullptr;
 };
 
 }  // namespace common
