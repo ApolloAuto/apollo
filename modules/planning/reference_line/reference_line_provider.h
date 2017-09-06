@@ -22,9 +22,13 @@
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
 
+#include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 
@@ -47,19 +51,31 @@ class ReferenceLineProvider {
    */
   virtual ~ReferenceLineProvider() = default;
 
-  void Init();
+  void Init(const hdmap::PncMap* pnc_map_,
+            const routing::RoutingResponse& routing_response,
+            const ReferenceLineSmootherConfig& smoother_config);
 
   bool Start();
 
   std::vector<ReferenceLine> GetReferenceLines();
 
  private:
-  DECLARE_SINGLETON(ReferenceLineProvider);
-
   void Generate();
+  void IsValidReferenceLine();
+  bool CreateReferenceLineFromRouting(const common::PointENU& position,
+                                      const routing::RoutingResponse& routing);
+
+ private:
+  DECLARE_SINGLETON(ReferenceLineProvider);
 
   bool is_initialized_ = false;
   std::unique_ptr<std::thread> thread_;
+
+  const hdmap::PncMap* pnc_map_ = nullptr;
+  routing::RoutingResponse routing_response_;
+  ReferenceLineSmootherConfig smoother_config_;
+
+  std::mutex reference_line_groups_mutex_;
   std::vector<std::vector<ReferenceLine>> reference_line_groups_;
 };
 
