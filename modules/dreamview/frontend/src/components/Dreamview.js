@@ -21,16 +21,21 @@ export default class Dreamview extends React.Component {
         const { dimension, meters, options,
                 routeEditingManager, isInitialized} = this.props.store;
 
-        if (!isInitialized) {
-            return <Loader />;
-        }
+        const showBars = !routeEditingManager.inEditingView && isInitialized;
+        const showRoutingBar = routeEditingManager.inEditingView;
+        const showLoader = !isInitialized;
 
         return (
             <div>
-                {!routeEditingManager.inEditingView ? <SideBar /> : null}
-                {!routeEditingManager.inEditingView ? <StatusBar meters={meters} /> : null}
-                { routeEditingManager.inEditingView ? <RouteEditingBar /> : null}
-                <Scene width={dimension.width} height={dimension.height} options={options}/>
+                {showBars ? <SideBar /> : null}
+                {showBars ? <StatusBar meters={meters} /> : null}
+                {showRoutingBar ? <RouteEditingBar /> : null}
+                <Scene
+                    width={dimension.width}
+                    height={dimension.height}
+                    options={options}
+                    invisible={!isInitialized}/>
+                {showLoader ? <Loader /> : null}
             </div>
         );
     }
