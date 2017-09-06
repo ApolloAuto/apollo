@@ -70,9 +70,7 @@ Obstacle::~Obstacle() {
   current_lanes_.clear();
 }
 
-PerceptionObstacle::Type Obstacle::type() const {
-  return type_;
-}
+PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
 int Obstacle::id() const {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -152,8 +150,8 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
                       const double timestamp) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (feature_history_.size() > 0 &&
-      apollo::common::math::DoubleCompare(timestamp,
-          feature_history_.front().timestamp()) <= 0) {
+      apollo::common::math::DoubleCompare(
+          timestamp, feature_history_.front().timestamp()) <= 0) {
     AERROR << "Obstacle [" << id_ << "] received an older frame [" << timestamp
            << "] than the most recent timestamp [ "
            << feature_history_.front().timestamp() << "].";
@@ -234,8 +232,8 @@ void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
   }
   feature->set_timestamp(ts);
 
-  ADEBUG << "Obstacle [" << id_ << "] has timestamp ["
-         << std::fixed << std::setprecision(6) << ts << "].";
+  ADEBUG << "Obstacle [" << id_ << "] has timestamp [" << std::fixed
+         << std::setprecision(6) << ts << "].";
 }
 
 void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
@@ -293,14 +291,14 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   feature->set_velocity_heading(velocity_heading);
   feature->set_speed(speed);
 
-  ADEBUG << "Obstacle [" << id_ << "] has velocity ["
-         << std::fixed << std::setprecision(6) << velocity_x << ", "
-         << std::fixed << std::setprecision(6) << velocity_y << ", "
-         << std::fixed << std::setprecision(6) << velocity_z << "]";
-  ADEBUG << "Obstacle [" << id_ << "] has velocity heading ["
-         << std::fixed << std::setprecision(6) << velocity_heading << "] ";
-  ADEBUG << "Obstacle [" << id_ << "] has speed ["
-         << std::fixed << std::setprecision(6) << speed << "].";
+  ADEBUG << "Obstacle [" << id_ << "] has velocity [" << std::fixed
+         << std::setprecision(6) << velocity_x << ", " << std::fixed
+         << std::setprecision(6) << velocity_y << ", " << std::fixed
+         << std::setprecision(6) << velocity_z << "]";
+  ADEBUG << "Obstacle [" << id_ << "] has velocity heading [" << std::fixed
+         << std::setprecision(6) << velocity_heading << "] ";
+  ADEBUG << "Obstacle [" << id_ << "] has speed [" << std::fixed
+         << std::setprecision(6) << speed << "].";
 }
 
 void Obstacle::SetAcceleration(Feature* feature) {
@@ -339,12 +337,12 @@ void Obstacle::SetAcceleration(Feature* feature) {
   double acc = std::hypot(std::hypot(acc_x, acc_y), acc_z);
   feature->set_acc(acc);
 
-    ADEBUG << "Obstacle [" << id_ << "] has acceleration ["
-           << std::fixed << std::setprecision(6) << acc_x << ", "
-           << std::fixed << std::setprecision(6) << acc_y << ", "
-           << std::fixed << std::setprecision(6) << acc_z << "]";
-    ADEBUG << "Obstacle [" << id_ << "] has acceleration value ["
-           << std::fixed << std::setprecision(6) << acc << "].";
+  ADEBUG << "Obstacle [" << id_ << "] has acceleration [" << std::fixed
+         << std::setprecision(6) << acc_x << ", " << std::fixed
+         << std::setprecision(6) << acc_y << ", " << std::fixed
+         << std::setprecision(6) << acc_z << "]";
+  ADEBUG << "Obstacle [" << id_ << "] has acceleration value [" << std::fixed
+         << std::setprecision(6) << acc << "].";
 }
 
 void Obstacle::SetTheta(const PerceptionObstacle& perception_obstacle,
@@ -355,8 +353,8 @@ void Obstacle::SetTheta(const PerceptionObstacle& perception_obstacle,
   }
   feature->set_theta(theta);
 
-  ADEBUG << "Obstacle [" << id_ << "] has theta ["
-         << std::fixed << std::setprecision(6) << theta << "].";
+  ADEBUG << "Obstacle [" << id_ << "] has theta [" << std::fixed
+         << std::setprecision(6) << theta << "].";
 }
 
 void Obstacle::SetLengthWidthHeight(
@@ -472,30 +470,23 @@ void Obstacle::UpdateMotionBelief(Feature* feature) {
   feature->mutable_t_acceleration()->set_x(acc_x);
   feature->mutable_t_acceleration()->set_y(acc_y);
   feature->mutable_t_acceleration()->set_z(0.0);
-  ADEBUG << "Obstacle [" << id_ << "] has tracked position ["
-         << std::fixed << std::setprecision(6)
-         << feature->t_position().x() << ", "
-         << std::fixed << std::setprecision(6)
-         << feature->t_position().y() << ", "
-         << std::fixed << std::setprecision(6)
+  ADEBUG << "Obstacle [" << id_ << "] has tracked position [" << std::fixed
+         << std::setprecision(6) << feature->t_position().x() << ", "
+         << std::fixed << std::setprecision(6) << feature->t_position().y()
+         << ", " << std::fixed << std::setprecision(6)
          << feature->t_position().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] has tracked velocity ["
-         << std::fixed << std::setprecision(6)
-         << feature->t_velocity().x() << ", "
-         << std::fixed << std::setprecision(6)
-         << feature->t_velocity().y() << ", "
-         << std::fixed << std::setprecision(6)
+  ADEBUG << "Obstacle [" << id_ << "] has tracked velocity [" << std::fixed
+         << std::setprecision(6) << feature->t_velocity().x() << ", "
+         << std::fixed << std::setprecision(6) << feature->t_velocity().y()
+         << ", " << std::fixed << std::setprecision(6)
          << feature->t_velocity().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] has tracked acceleration ["
-         << std::fixed << std::setprecision(6)
-         << feature->t_acceleration().x() << ", "
-         << std::fixed << std::setprecision(6)
-         << feature->t_acceleration().y() << ", "
-         << std::fixed << std::setprecision(6)
+  ADEBUG << "Obstacle [" << id_ << "] has tracked acceleration [" << std::fixed
+         << std::setprecision(6) << feature->t_acceleration().x() << ", "
+         << std::fixed << std::setprecision(6) << feature->t_acceleration().y()
+         << ", " << std::fixed << std::setprecision(6)
          << feature->t_acceleration().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] has velocity heading ["
-         << std::fixed << std::setprecision(6)
-         << feature->t_velocity_heading() << "].";
+  ADEBUG << "Obstacle [" << id_ << "] has velocity heading [" << std::fixed
+         << std::setprecision(6) << feature->t_velocity_heading() << "].";
 }
 
 void Obstacle::InitKFLaneTracker(const std::string& lane_id,
@@ -660,8 +651,8 @@ void Obstacle::UpdateLaneBelief(Feature* feature) {
   feature->set_t_speed(lane_speed);
   feature->set_t_acc(lane_acc);
 
-  ADEBUG << "Obstacle [" << id_ << "] has tracked lane speed ["
-         << std::fixed << std::setprecision(6) << lane_speed << "]";
+  ADEBUG << "Obstacle [" << id_ << "] has tracked lane speed [" << std::fixed
+         << std::setprecision(6) << lane_speed << "]";
   ADEBUG << "Obstacle [" << id_ << "] has tracked lane acceleration ["
          << std::fixed << std::setprecision(6) << lane_acc << "]";
 }
@@ -828,8 +819,8 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   }
 
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
-  map->NearbyLanesByCurrentLanes(
-      point, theta, FLAGS_search_radius * 2.0, current_lanes_, &nearby_lanes);
+  map->NearbyLanesByCurrentLanes(point, theta, FLAGS_search_radius * 2.0,
+                                 current_lanes_, &nearby_lanes);
   if (nearby_lanes.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no nearby lanes.";
     return;
@@ -894,8 +885,10 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
-      feature->mutable_lane()->mutable_lane_graph()
-          ->add_lane_sequence()->CopyFrom(lane_seq);
+      feature->mutable_lane()
+          ->mutable_lane_graph()
+          ->add_lane_sequence()
+          ->CopyFrom(lane_seq);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
@@ -906,8 +899,10 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
-      feature->mutable_lane()->mutable_lane_graph()
-          ->add_lane_sequence()->CopyFrom(lane_seq);
+      feature->mutable_lane()
+          ->mutable_lane_graph()
+          ->add_lane_sequence()
+          ->CopyFrom(lane_seq);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
@@ -1037,23 +1032,19 @@ void Obstacle::SetMotionStatus() {
                                            : feature_history_.front().speed());
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
   if (apollo::common::math::DoubleCompare(speed, speed_threshold) < 0) {
-    is_still = true;
     ADEBUG << "Obstacle [" << id_
            << "] has a small speed and is considered stationary.";
   } else if (apollo::common::math::DoubleCompare(speed_sensibility,
                                                  speed_threshold) < 0) {
-    is_still = false;
     ADEBUG << "Obstacle [" << id_ << "] has a too short history ["
-           << history_size << "] considered moving [sensibility = "
-           << speed_sensibility << "]";
+           << history_size
+           << "] considered moving [sensibility = " << speed_sensibility << "]";
   } else {
     double distance = std::hypot(avg_drift_x, avg_drift_y);
     double distance_std = std::sqrt(2.0 / len) * std;
     if (apollo::common::math::DoubleCompare(distance, 2.0 * distance_std) > 0) {
-      is_still = false;
       ADEBUG << "Obstacle [" << id_ << "] is moving.";
     } else {
-      is_still = true;
       ADEBUG << "Obstacle [" << id_ << "] is stationary.";
     }
   }
@@ -1077,8 +1068,8 @@ void Obstacle::Trim() {
     ++count;
   }
   if (count > 0) {
-    ADEBUG << "Obstacle [" << id_ << "] trimmed "
-           << count << " historical features";
+    ADEBUG << "Obstacle [" << id_ << "] trimmed " << count
+           << " historical features";
   }
 }
 
