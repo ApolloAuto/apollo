@@ -36,7 +36,6 @@ namespace prediction {
 class RegionalPredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    KMLMapBasedTest::SetUp();
     std::string file =
       "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);

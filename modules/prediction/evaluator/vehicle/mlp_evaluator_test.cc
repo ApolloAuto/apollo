@@ -35,7 +35,6 @@ namespace prediction {
 class MLPEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    KMLMapBasedTest::SetUp();
     std::string file =
       "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
