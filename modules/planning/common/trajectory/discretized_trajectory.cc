@@ -39,14 +39,6 @@ DiscretizedTrajectory::DiscretizedTrajectory(
   trajectory_points_ = std::move(trajectory_points);
 }
 
-double DiscretizedTrajectory::TimeLength() const {
-  if (trajectory_points_.empty()) {
-    return 0.0;
-  }
-  return trajectory_points_.back().relative_time() -
-         trajectory_points_.front().relative_time();
-}
-
 TrajectoryPoint DiscretizedTrajectory::Evaluate(
     const double relative_time) const {
   CHECK(!trajectory_points_.empty());
@@ -82,7 +74,7 @@ TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
     return trajectory_points_.front();
   }
   return util::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower,
-                                                relative_time);
+                                                   relative_time);
 }
 
 std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
@@ -139,11 +131,6 @@ TrajectoryPoint DiscretizedTrajectory::StartPoint() const {
   return trajectory_points_.front();
 }
 
-TrajectoryPoint DiscretizedTrajectory::EndPoint() const {
-  CHECK(!trajectory_points_.empty());
-  return trajectory_points_.back();
-}
-
 std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
   return trajectory_points_.size();
 }
@@ -151,27 +138,6 @@ std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
 const std::vector<TrajectoryPoint>& DiscretizedTrajectory::trajectory_points()
     const {
   return trajectory_points_;
-}
-
-void DiscretizedTrajectory::set_trajectory_points(
-    std::vector<TrajectoryPoint> points) {
-  trajectory_points_ = std::move(points);
-  CHECK(Valid() && "The input trajectory points have wrong relative time!");
-}
-
-bool DiscretizedTrajectory::Valid() const {
-  std::size_t size = trajectory_points_.size();
-  if (size == 0 || size == 1) {
-    return true;
-  }
-
-  for (std::size_t i = 1; i < size; ++i) {
-    if (!(trajectory_points_[i - 1].relative_time() <
-          trajectory_points_[i].relative_time())) {
-      return false;
-    }
-  }
-  return true;
 }
 
 void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }

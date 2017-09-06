@@ -48,8 +48,6 @@ class DiscretizedPath {
 
   common::PathPoint EvaluateUsingLinearApproximation(const double path_s) const;
 
-  int QueryClosestPoint(const double path_s) const;
-
   const std::vector<common::PathPoint>& path_points() const;
 
   std::uint32_t NumOfPoints() const;

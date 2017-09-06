@@ -39,9 +39,6 @@ class PathDecision {
  public:
   PathDecision() = default;
 
-  bool AddPathObstacles(
-      const std::vector<const PathObstacle *> &path_obstacles);
-
   bool AddPathObstacle(std::unique_ptr<PathObstacle> &&path_obstacle);
 
   const IndexedList<std::string, PathObstacle> &path_obstacles() const;

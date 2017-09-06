@@ -66,8 +66,6 @@ class StBoundary : public common::math::Polygon2d {
 
   STPoint BottomLeftPoint() const;
   STPoint BottomRightPoint() const;
-  STPoint TopRightPoint() const;
-  STPoint TopLeftPoint() const;
 
   StBoundary ExpandByS(const double s) const;
   StBoundary ExpandByT(const double t) const;

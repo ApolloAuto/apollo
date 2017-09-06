@@ -44,7 +44,7 @@ using apollo::common::VehicleParam;
 
 namespace {
 
-bool CheckOverlapOnDpStGraph(const std::vector<StBoundary> boundaries,
+bool CheckOverlapOnDpStGraph(const std::vector<StBoundary>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
   for (const auto& boundary : boundaries) {
     common::math::LineSegment2d seg(p1.point(), p2.point());

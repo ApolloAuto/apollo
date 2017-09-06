@@ -73,13 +73,9 @@ class CanAgent {
  public:
   explicit CanAgent(TestCanParam *param_ptr) : param_ptr_(param_ptr) {}
 
-  TestCanParam *param_ptr() {
-    return param_ptr_;
-  }
+  TestCanParam *param_ptr() { return param_ptr_; }
 
-  CanAgent *other_agent() {
-    return other_agent_;
-  }
+  CanAgent *other_agent() { return other_agent_; }
 
   bool Start() {
     thread_recv_.reset(new std::thread([this] { RecvThreadFunc(); }));
@@ -170,25 +166,15 @@ class CanAgent {
     return;
   }
 
-  void AddOtherAgent(CanAgent *agent) {
-    other_agent_ = agent;
-  }
+  void AddOtherAgent(CanAgent *agent) { other_agent_ = agent; }
 
-  bool is_receiving() {
-    return is_receiving_;
-  }
+  bool is_receiving() const { return is_receiving_; }
 
-  void is_receiving(bool val) {
-    is_receiving_ = val;
-  }
+  void is_receiving(bool val) { is_receiving_ = val; }
 
-  bool is_sending_finish() {
-    return is_sending_finish_;
-  }
+  bool is_sending_finish() const { return is_sending_finish_; }
 
-  void is_sending_finish(bool val) {
-    is_sending_finish_ = val;
-  }
+  void is_sending_finish(bool val) { is_sending_finish_ = val; }
 
   void RecvThreadFunc() {
     using ::apollo::common::time::Clock;
