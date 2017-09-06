@@ -18,14 +18,14 @@
 #include <memory>
 
 #include "modules/common/log.h"
+#include "modules/common/math/qp_solver/qp_solver.h"
+#include "modules/common/math/qp_solver/active_set_qp_solver.h"
 
 namespace apollo {
 namespace common {
 namespace math {
 
 using Matrix = Eigen::MatrixXd;
-using ::apollo::common::math::QpSolver;
-using ::apollo::common::math::ActiveSetQpSolver;
 
 // discrete linear predictive control solver, with control format
 // x(i + 1) = A * x(i) + B * u (i) + C
@@ -109,27 +109,31 @@ void SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
   Matrix matrix_m2 = matrix_k.transpose() * matrix_qq * (matrix_m - matrix_t);
 
   // Method 1: QPOASES
-  Eigen::MatrixXd matrix_inequality_constrain_ll =
-      -Eigen::MatrixXd::Identity(matrix_ll.rows(), matrix_ll.rows());
-  Eigen::MatrixXd matrix_inequality_constrain_uu =
-      Eigen::MatrixXd::Identity(matrix_uu.rows(), matrix_uu.rows());
-  Eigen::MatrixXd matrix_inequality_constrain = Eigen::MatrixXd::Zero(
+  Matrix matrix_inequality_constrain_ll =
+      -Matrix::Identity(matrix_ll.rows(), matrix_ll.rows());
+  Matrix matrix_inequality_constrain_uu =
+      Matrix::Identity(matrix_uu.rows(), matrix_uu.rows());
+  Matrix matrix_inequality_constrain = Matrix::Zero(
       matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
   matrix_inequality_constrain << -matrix_inequality_constrain_ll,
       -matrix_inequality_constrain_uu;
-  Eigen::MatrixXd matrix_inequality_boundary = Eigen::MatrixXd::Zero(
+  Matrix matrix_inequality_boundary = Matrix::Zero(
       matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
   matrix_inequality_boundary << matrix_ll, -matrix_uu;
-  Eigen::MatrixXd matrix_equality_constrain = Eigen::MatrixXd::Zero(
+  Matrix matrix_equality_constrain = Matrix::Zero(
       matrix_ll.rows() + matrix_uu.rows(), matrix_ll.rows());
-  Eigen::MatrixXd matrix_equality_boundary = Eigen::MatrixXd::Zero(
+  Matrix matrix_equality_boundary = Matrix::Zero(
       matrix_ll.rows() + matrix_uu.rows(), matrix_ll.cols());
 
   std::unique_ptr<QpSolver> qp_solver(new ActiveSetQpSolver(
       matrix_m1, matrix_m2, matrix_inequality_constrain,
       matrix_inequality_boundary, matrix_equality_constrain,
       matrix_equality_boundary));
-  qp_solver->Solve();
+
+  auto result = qp_solver->Solve();
+  if (!result) {
+    AWARN << "Linear MPC solver failed";
+  }
   matrix_v = qp_solver->params();
 
   for (unsigned int i = 0; i < horizon; ++i) {
