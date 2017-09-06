@@ -31,4 +31,6 @@ message ControlConf {
   optional double trajectory_period = 12;
   optional double chassis_period = 13;
   optional double localization_period = 14;
+
+  optional double minimum_speed_resolution = 15;
 }
