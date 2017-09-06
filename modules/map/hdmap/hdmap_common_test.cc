@@ -55,35 +55,37 @@ void HDMapCommonTestSuite::init_lane_obj(Lane* lane) {
   pt->set_y(1.0);
   LaneSampleAssociation* lane_sample = lane->add_left_sample();
   lane_sample->set_s(0.0);
-  lane_sample->set_width(1.0);
+  lane_sample->set_width(1.5);
   lane_sample = lane->add_left_sample();
   lane_sample->set_s(1.0);
-  lane_sample->set_width(1.0);
+  lane_sample->set_width(1.5);
   lane_sample = lane->add_left_sample();
   lane_sample->set_s(2.0);
-  lane_sample->set_width(1.0);
+  lane_sample->set_width(1.5);
   lane_sample = lane->add_left_sample();
   lane_sample->set_s(3.0);
-  lane_sample->set_width(0.8);
+  lane_sample->set_width(1.2);
   lane_sample = lane->add_left_sample();
   lane_sample->set_s(4.0);
-  lane_sample->set_width(0.5);
+  lane_sample->set_width(1.2);
 
   lane_sample = lane->add_right_sample();
   lane_sample->set_s(0.0);
-  lane_sample->set_width(1.0);
+  lane_sample->set_width(1.5);
   lane_sample = lane->add_right_sample();
   lane_sample->set_s(1.0);
-  lane_sample->set_width(1.0);
+  lane_sample->set_width(1.5);
   lane_sample = lane->add_right_sample();
   lane_sample->set_s(2.0);
-  lane_sample->set_width(1.0);
+  lane_sample->set_width(1.5);
   lane_sample = lane->add_right_sample();
   lane_sample->set_s(3.0);
-  lane_sample->set_width(1.0);
+  lane_sample->set_width(1.2);
   lane_sample = lane->add_right_sample();
   lane_sample->set_s(4.0);
-  lane_sample->set_width(1.0);
+  lane_sample->set_width(1.2);
+
+  lane->set_type(Lane::CITY_DRIVING);
 }
 
 void HDMapCommonTestSuite::init_junction_obj(Junction* junction) {
@@ -294,11 +296,11 @@ TEST_F(HDMapCommonTestSuite, lane_info) {
   double left_width = 0.0;
   double right_width = 0.0;
   lane_info.GetWidth(2.0, &left_width, &right_width);
-  EXPECT_NEAR(1.0, left_width, 1E-3);
-  EXPECT_NEAR(1.0, right_width, 1E-3);
+  EXPECT_NEAR(1.5, left_width, 1E-3);
+  EXPECT_NEAR(1.5, right_width, 1E-3);
   lane_info.GetWidth(3.5, &left_width, &right_width);
-  EXPECT_NEAR(0.65, left_width, 1E-3);
-  EXPECT_NEAR(1.0, right_width, 1E-3);
+  EXPECT_NEAR(1.2, left_width, 1E-3);
+  EXPECT_NEAR(1.2, right_width, 1E-3);
   EXPECT_NEAR(4.0, lane_info.total_length(), 1E-3);
 }
 
@@ -306,16 +308,16 @@ TEST_F(HDMapCommonTestSuite, lane_info_get_width) {
   Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
-  EXPECT_NEAR(2.0, lane_info.GetWidth(2.0), 1E-3);
-  EXPECT_NEAR(1.65, lane_info.GetWidth(3.5), 1E-3);
+  EXPECT_NEAR(3.0, lane_info.GetWidth(2.0), 1E-3);
+  EXPECT_NEAR(2.4, lane_info.GetWidth(3.5), 1E-3);
 }
 
 TEST_F(HDMapCommonTestSuite, lane_info_get_effective_width) {
   Lane lane;
   init_lane_obj(&lane);
   LaneInfo lane_info(lane);
-  EXPECT_NEAR(2.0, lane_info.GetEffectiveWidth(2.0), 1E-3);
-  EXPECT_NEAR(1.3, lane_info.GetEffectiveWidth(3.5), 1E-3);
+  EXPECT_NEAR(3.0, lane_info.GetEffectiveWidth(2.0), 1E-3);
+  EXPECT_NEAR(2.4, lane_info.GetEffectiveWidth(3.5), 1E-3);
 }
 
 TEST_F(HDMapCommonTestSuite, point_is_on_lane) {
