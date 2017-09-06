@@ -197,9 +197,8 @@ void Control::OnTimer(const ros::TimerEvent &) {
   ControlCommand control_command;
 
   Status status = ProduceControlCommand(&control_command);
-  if (!status.ok()) {
-    AERROR << "Failed to produce control command:" << status.error_message();
-  }
+  AERROR_IF(!status.ok()) << "Failed to produce control command:"
+                          << status.error_message();
 
   double end_timestamp = Clock::NowInSecond();
 
@@ -247,11 +246,10 @@ Status Control::CheckInput() {
                   "planning has no trajectory point.");
   }
 
-  for (int i = 0; i < trajectory_.trajectory_point_size(); ++i) {
-    if (trajectory_.trajectory_point(i).v() <
-       control_conf_.minimum_speed_resolution()) {
-      trajectory_.mutable_trajectory_point(i)->set_v(0.0);
-      trajectory_.mutable_trajectory_point(i)->set_a(0.0);
+  for (auto& trajectory_point : *trajectory_.mutable_trajectory_point()) {
+    if (trajectory_point.v() < control_conf_.minimum_speed_resolution()) {
+      trajectory_point.set_v(0.0);
+      trajectory_point.set_a(0.0);
     }
   }
 
