@@ -51,7 +51,12 @@ ErrorCode EsdCanClient::Start() {
   // &dev_handler_);
   uint32_t mode = 0;
   // mode |= NTCAN_MODE_NO_RTR;
-  int32_t ret = canOpen(port_ > 0 ? 1 : 0, mode, NTCAN_MAX_TX_QUEUESIZE,
+  if (port_ > FLAGS_max_port || port_ < 0) {
+    AERROR << "can port number [" << port_ << "] is out of the range [0,"
+           << FLAGS_max_port << "]";
+    return ErrorCode::CAN_CLIENT_ERROR_BASE;
+  }
+  int32_t ret = canOpen(port_, mode, NTCAN_MAX_TX_QUEUESIZE,
                         NTCAN_MAX_RX_QUEUESIZE, 5, 5, &dev_handler_);
   if (ret != NTCAN_SUCCESS) {
     AERROR << "open device error code [" << ret << "]: " << GetErrorString(ret);

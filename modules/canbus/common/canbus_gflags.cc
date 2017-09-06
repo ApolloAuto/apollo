@@ -25,6 +25,9 @@ DEFINE_string(hmi_name, "canbus", "Module name in HMI");
 DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf_dev.pb.txt",
               "Default canbus conf file");
 
+// maximum can port number
+DEFINE_int32(max_port, 3, "The maximum can port number (available can ports are 0 - max_port)");
+
 // Canbus gflags
 DEFINE_double(chassis_freq, 100, "Chassis feedback timer frequency.");
 DEFINE_int64(min_cmd_interval, 5, "Minimum control command interval in us.");
