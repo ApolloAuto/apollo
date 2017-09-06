@@ -29,7 +29,7 @@ void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
                      const uint max_num_iteration, Matrix *ptr_K) {
   if (A.rows() != A.cols() || B.rows() != A.rows() || Q.rows() != Q.cols() ||
       Q.rows() != A.rows() || R.rows() != R.cols() || R.rows() != B.cols()) {
-    AERROR << "One or more matrices have incompatible dimensions.";
+    AERROR << "LQR solver: one or more matrices have incompatible dimensions.";
     return;
   }
 
@@ -40,24 +40,21 @@ void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
   // Calculate Matrix Difference Riccati Equation, initialize P and Q
   Matrix P = Q;
   uint num_iteration = 0;
-  double diff = 0.0;
-  while (num_iteration++ < max_num_iteration) {
+  double diff = std::numeric_limits<double>::max();
+  while (num_iteration++ < max_num_iteration && diff > tolerance) {
     Matrix P_next =
         AT * P * A - AT * P * B * (R + BT * P * B).inverse() * BT * P * A + Q;
     // check the difference between P and P_next
     diff = fabs((P_next - P).maxCoeff());
     P = P_next;
-
-    if (diff < tolerance) {
-      break;
-    }
   }
 
   if (num_iteration >= max_num_iteration) {
-    AWARN << "lqr_not_convergence, last_diff_is:" << diff;
+    AWARN << "LQR solver cannot converge to a solution, "
+        "last consecutive result diff. is:" << diff;
   } else {
-    ADEBUG << "Number of iterations until convergence: " << num_iteration
-           << ", max difference: " << diff;
+    ADEBUG << "LQR solver converged at iteration: " << num_iteration
+           << ", max consecutive result diff.: " << diff;
   }
   *ptr_K = (R + BT * P * B).inverse() * BT * P * A;
 }
