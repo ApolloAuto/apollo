@@ -219,7 +219,9 @@ Status LanesXmlParser::ParseLane(const tinyxml2::XMLElement& xml_node,
   }
 
   // road mark
-  sub_node = sub_node->FirstChildElement("borderType");
+  if (sub_node) {
+    sub_node = sub_node->FirstChildElement("borderType");
+  }
   while (sub_node) {
     PbLaneBoundary* lane_boundary = lane->mutable_right_boundary();
     PbLaneBoundaryTypeType boundary_type;

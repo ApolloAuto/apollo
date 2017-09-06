@@ -29,14 +29,6 @@ SLPoint MakeSLPoint(const double s, const double l) {
   return sl;
 }
 
-Point3D MakePoint3D(const double x, const double y, const double z) {
-  Point3D point3d;
-  point3d.set_x(x);
-  point3d.set_y(y);
-  point3d.set_z(z);
-  return point3d;
-}
-
 PointENU MakePointENU(const double x, const double y, const double z) {
   PointENU point_enu;
   point_enu.set_x(x);
@@ -85,16 +77,6 @@ PathPoint MakePathPoint(const double x, const double y, const double z,
   path_point.set_dkappa(dkappa);
   path_point.set_ddkappa(ddkappa);
   return path_point;
-}
-TrajectoryPoint MakeTrajectoryPoint(const PathPoint& path_point,
-                                    const double v, const double a,
-                                    const double relative_time) {
-  TrajectoryPoint point;
-  point.mutable_path_point()->CopyFrom(path_point);
-  point.set_v(v);
-  point.set_a(a);
-  point.set_relative_time(relative_time);
-  return point;
 }
 
 double Distance2D(const PathPoint& a, const PathPoint& b) {

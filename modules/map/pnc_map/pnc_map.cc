@@ -323,8 +323,6 @@ bool PncMap::TruncateLaneSegments(
     return false;
   }
   const double kRouteEpsilon = 1e-3;
-  std::vector<MapPathPoint> points;
-  std::vector<LaneSegment> lane_segments;
   // Extend the trajectory towards the start of the trajectory.
   if (start_s < 0) {
     const auto &first_segment = segments[0];
