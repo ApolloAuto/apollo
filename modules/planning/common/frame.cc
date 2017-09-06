@@ -319,17 +319,11 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
   double prediction_header_time = prediction_.header().timestamp_sec();
   ADEBUG << "prediction header: " << std::to_string(prediction_header_time);
 
-  for (int i = 0; i < prediction_.prediction_obstacle_size(); ++i) {
-    prediction::PredictionObstacle *obstacle =
-        prediction_.mutable_prediction_obstacle(i);
-    for (int j = 0; j < obstacle->trajectory_size(); ++j) {
-      prediction::Trajectory *trajectory = obstacle->mutable_trajectory(j);
-      for (int k = 0; k < trajectory->trajectory_point_size(); ++k) {
-        common::TrajectoryPoint *point =
-            trajectory->mutable_trajectory_point(k);
-        double abs_relative_time = point->relative_time();
-        point->set_relative_time(prediction_header_time + abs_relative_time -
-                                 trajectory_header_time);
+  for (auto &obstacle : *prediction_.mutable_prediction_obstacle()) {
+    for (auto &trajectory : *obstacle.mutable_trajectory()) {
+      for (auto &point : *trajectory.mutable_trajectory_point()) {
+        point.set_relative_time(prediction_header_time + point.relative_time() -
+                                trajectory_header_time);
       }
     }
   }
