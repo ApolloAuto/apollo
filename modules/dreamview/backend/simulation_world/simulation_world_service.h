@@ -32,8 +32,8 @@
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/monitor/monitor.h"
 #include "modules/common/log.h"
+#include "modules/common/monitor/monitor.h"
 
 /**
  * @namespace apollo::dreamview
@@ -107,8 +107,8 @@ class SimulationWorldService {
    * @param log_level defined in modules/common/monitor/proto/monitor.proto
    */
   void PublishMonitorMessage(
-        apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
-        const std::string &msg) {
+      apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
+      const std::string &msg) {
     apollo::common::monitor::MonitorBuffer buffer(&monitor_);
     buffer.AddMonitorMsgItem(log_level, msg);
   }
@@ -157,7 +157,8 @@ class SimulationWorldService {
     }
 
     if (adapter->Empty()) {
-      AINFO << adapter_name << " adapter has not received any data yet.";
+      AINFO_EVERY(100) << adapter_name
+                       << " adapter has not received any data yet.";
       return;
     }
 
