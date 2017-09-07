@@ -121,7 +121,8 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 
-  double preview_time = longitudinal_conf_.preview_time();
+  double ts = longitudinal_conf_.ts();
+  double preview_time = longitudinal_conf_.preview_window() * ts;
 
   SimpleLongitudinalDebug debug;
   ComputeLongitudinalErrors(&trajectory_analyzer, preview_time, &debug);

@@ -33,6 +33,7 @@
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/filters/digital_filter.h"
+#include "modules/control/filters/digital_filter_coefficients.h"
 #include "modules/control/filters/mean_filter.h"
 
 /**
@@ -158,8 +159,8 @@ class LatController : public Controller {
   // limit steering to maximum theoretical lateral acceleration
   double max_lat_acc_ = 0.0;
 
-  // look ahead time (preview controller)
-  double preview_time_ = 0;
+  // number of control cycles look ahead (preview controller)
+  int preview_window_ = 0;
   // number of states without previews, includes
   // lateral error, lateral error rate, heading error, heading error rate
   const int basic_state_size_ = 4;

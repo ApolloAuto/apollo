@@ -11,6 +11,7 @@ cc_library(
         "digital_filter.h",
     ],
     deps = [
+        ":digital_filter_coefficients",
         "//modules/common:log",
     ],
 )
@@ -29,9 +30,20 @@ cc_library(
 )
 
 cc_library(
+    name = "digital_filter_coefficients",
+    srcs = [
+        "digital_filter_coefficients.cc",
+    ],
+    hdrs = [
+        "digital_filter_coefficients.h",
+    ],
+)
+
+cc_library(
     name = "filters",
     deps = [
         ":digital_filter",
+        ":digital_filter_coefficients",
         ":mean_filter",
     ],
 )
@@ -44,6 +56,7 @@ cc_test(
     ],
     deps = [
         ":digital_filter",
+        ":digital_filter_coefficients",
         "//modules/common",
         "@gtest//:main",
         "@ros//:ros_common",
@@ -58,6 +71,18 @@ cc_test(
     ],
     deps = [
         ":mean_filter",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "digital_filter_coefficients_test",
+    size = "small",
+    srcs = [
+        "digital_filter_coefficients_test.cc",
+    ],
+    deps = [
+        ":digital_filter_coefficients",
         "@gtest//:main",
     ],
 )
