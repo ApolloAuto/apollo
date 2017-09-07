@@ -163,11 +163,12 @@ function getLaneHeading(lane) {
 }
 
 function getSignalPositionAndHeading(signal, overlapMap, laneHeading, coordinates) {
-  let locations = _.pickBy(
+    let locations = _.pickBy(
       _.mapValues(signal.subsignal, obj => obj.location), v => !_.isEmpty(v));
-  if (_.isEmpty(locations)) {
-    locations = _.attempt(() => signal.boundary.point);
+    if (_.isEmpty(locations)) {
+        locations = _.attempt(() => signal.boundary.point);
     }
+
     if (_.isError(locations) || locations === undefined) {
         return null;
     }
@@ -210,7 +211,7 @@ function addTrafficLight(signal, overlapMap, laneHeading, coordinates, scene) {
     const posAndHeadings = [];
     const posAndHeading = getSignalPositionAndHeading(signal, overlapMap, laneHeading, coordinates);
     if (posAndHeading) {
-        const scale = 0.006;
+        const scale = 0.01;
         loadObject(trafficLightMaterial, trafficLightObject,
             { x: scale, y: scale, z: scale},
             mesh => {
@@ -219,6 +220,7 @@ function addTrafficLight(signal, overlapMap, laneHeading, coordinates, scene) {
                 mesh.position.set(posAndHeading[0].x, posAndHeading[0].y, 0);
                 mesh.matrixAutoUpdate = false;
                 mesh.updateMatrix();
+
                 scene.add(mesh);
                 drewObjects.push(mesh);
             });

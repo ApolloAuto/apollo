@@ -1,8 +1,6 @@
 import * as THREE from "three";
+import OBJLoader from "three/examples/js/loaders/OBJLoader.js";
 import MTLLoader from "three/examples/js/loaders/MTLLoader.js";
-import OBJLoader from "three-obj-loader";
-
-OBJLoader(THREE);
 
 // The two loaders for material and object files, respectively.
 const mtlLoader = new THREE.MTLLoader();
@@ -14,7 +12,6 @@ const loadedMaterialAndObject = {};
 export function loadObject(materialFile, objectFile, scale, callback) {
     function placeMtlAndObj(loaded) {
         const object = loaded.clone();
-        object.scale.set(scale.x, scale.y, scale.z);
         if (callback) {
             callback(object);
         }
@@ -27,6 +24,7 @@ export function loadObject(materialFile, objectFile, scale, callback) {
             objLoader.setMaterials(materials);
             objLoader.load(objectFile, loaded => {
                 loaded.name = objectFile;
+                loaded.scale.set(scale.x, scale.y, scale.z);
                 loadedMaterialAndObject[objectFile] = loaded;
                 placeMtlAndObj(loaded);
             });
