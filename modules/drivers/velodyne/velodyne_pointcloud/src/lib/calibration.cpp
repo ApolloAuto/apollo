@@ -1,16 +1,3 @@
-/**
- * \file  calibration.cc
- * \brief
- *
- * \author  Piyush Khandelwal (piyushk@cs.utexas.edu)
- * Copyright (C) 2012, Austin Robot Technology,
- *                     The University of Texas at Austin
- *
- * License: Modified BSD License
- *
- * $ Id: 02/14/2012 11:36:36 AM piyushk $
- */
-
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -26,6 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+/**
+ * \file  calibration.cc
+ * \brief
+ *
+ * \author  Piyush Khandelwal (piyushk@cs.utexas.edu)
+ * Copyright (C) 2012, Austin Robot Technology,
+ *                     The University of Texas at Austin
+ *
+ * License: Modified BSD License
+ *
+ * $ Id: 02/14/2012 11:36:36 AM piyushk $
+ */
 
 #include "velodyne_pointcloud/calibration.h"
 

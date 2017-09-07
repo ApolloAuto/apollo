@@ -14,6 +14,40 @@
  * limitations under the License.
  *****************************************************************************/
 
+/* -*- mode: C++ -*-
+ *
+ *  Copyright (C) 2007 Austin Robot Technology, Yaxin Liu, Patrick Beeson
+ *  Copyright (C) 2009 Austin Robot Technology, Jack O'Quin
+ *
+ *  License: Modified BSD Software License Agreement
+ *
+ *  $Id$
+ */
+
+/** \file
+ *
+ *  Velodyne HDL-64E 3D LIDAR data accessors
+ *
+ *  \ingroup velodyne
+ *
+ *  These classes unpack raw Velodyne LIDAR packets into several
+ *  useful formats.
+ *
+ *     velodyne::Data -- virtual base class for unpacking data into
+ *                      various formats
+ *
+ *     velodyne::DataScans -- derived class, unpacks into vector of
+ *                      individual laser scans
+ *
+ *     velodyne::DataXYZ -- derived class, unpacks into XYZ format
+ *
+ *  \todo make a separate header for each class?
+ *
+ *  \author Yaxin Liu
+ *  \author Patrick Beeson
+ *  \author Jack O'Quin
+ */
+
 #ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_VELODYNE_PARSER_H_
 #define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_VELODYNE_PARSER_H_
 
