@@ -29,6 +29,7 @@ Eigen::Matrix3d KalmanFilter::s_propagation_noise_ = 10 *
   Eigen::Matrix3d::Identity();
 double KalmanFilter::s_measurement_noise_ = 0.4;
 double KalmanFilter::s_initial_velocity_noise_ = 5;
+double KalmanFilter::s_breakdown_threshold_maximum_ = 10;
 
 void KalmanFilter::SetUseAdaptive(const bool& use_adaptive) {
   s_use_adaptive_ = use_adaptive;
@@ -44,6 +45,18 @@ bool KalmanFilter::SetAssociationScoreMaximum(
     return true;
   }
   AERROR << "invalid association score maximum of KalmanFilter!";
+  return false;
+}
+
+bool KalmanFilter::SetBreakdownThresholdMaximum(
+  const double& breakdown_threshold_maximum) {
+  if (breakdown_threshold_maximum > 0) {
+    s_breakdown_threshold_maximum_ = breakdown_threshold_maximum;
+    AINFO << "breakdown threshold maximum of KalmanFilter is "
+          << s_breakdown_threshold_maximum_;
+    return true;
+  }
+  AERROR << "invalid breakdown threshold maximum of KalmanFilter!";
   return false;
 }
 
@@ -84,9 +97,10 @@ KalmanFilter::KalmanFilter() {
   name_ = "KalmanFilter";
   age_ = 0;
   velocity_covariance_ = s_initial_velocity_noise_ *
-    Eigen::Matrix3d::Identity();
+                         Eigen::Matrix3d::Identity();
   // states
   update_quality_ = 1.0;
+  breakdown_threshold_ = s_breakdown_threshold_maximum_;
   belief_velocity_ = Eigen::Vector3d::Zero();
   belief_velocity_accelaration_ = Eigen::Vector3d::Zero();
 }
@@ -94,6 +108,7 @@ KalmanFilter::KalmanFilter() {
 void KalmanFilter::Initialize(const Eigen::Vector3f& anchor_point,
   const Eigen::Vector3f& velocity) {
   update_quality_ = 1.0;
+  breakdown_threshold_ = s_breakdown_threshold_maximum_;
   belief_anchor_point_ = anchor_point.cast<double>();
   belief_velocity_ = velocity.cast<double>();
   belief_velocity_accelaration_ = Eigen::Vector3d::Zero();
@@ -104,11 +119,11 @@ Eigen::VectorXf KalmanFilter::Predict(const double& time_diff) {
   Eigen::VectorXf predicted_state;
   predicted_state.resize(6);
   predicted_state(0) = belief_anchor_point_(0) +
-    belief_velocity_(0) * time_diff;
+                       belief_velocity_(0) * time_diff;
   predicted_state(1) = belief_anchor_point_(1) +
-    belief_velocity_(1) * time_diff;
+                       belief_velocity_(1) * time_diff;
   predicted_state(2) = belief_anchor_point_(2) +
-    belief_velocity_(2) * time_diff;
+                       belief_velocity_(2) * time_diff;
   predicted_state(3) = belief_velocity_(0);
   predicted_state(4) = belief_velocity_(1);
   predicted_state(5) = belief_velocity_(2);
@@ -133,8 +148,8 @@ void KalmanFilter::UpdateWithObject(const TrackedObjectPtr& new_object,
 
   // B. Compute measurements
   Eigen::Vector3f measured_anchor_point = new_object->anchor_point;
-  Eigen::Vector3f measured_velocity = ComputeMeasuredVelocity(new_object,
-    old_object, time_diff);
+  Eigen::Vector3f measured_velocity = ComputeMeasuredVelocity(
+    new_object, old_object, time_diff);
 
   // C. Update model
   UpdateModel(measured_anchor_point, measured_velocity, time_diff);
@@ -166,8 +181,7 @@ void KalmanFilter::Propagate(const double& time_diff) {
   if (age_ <= 0) {
     return;
   }
-  velocity_covariance_ += s_propagation_noise_ *
-    (time_diff * time_diff);
+  velocity_covariance_ += s_propagation_noise_ * time_diff * time_diff;
 }
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
@@ -202,7 +216,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
   const double& time_diff) {
   // Compute 2D anchor point velocity measurment
   Eigen::Vector3f measured_anchor_point_velocity = new_object->anchor_point -
-    old_object->anchor_point;
+                                                   old_object->anchor_point;
   measured_anchor_point_velocity /= time_diff;
   measured_anchor_point_velocity(2) = 0.0;
   return measured_anchor_point_velocity;
@@ -218,16 +232,16 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
   Eigen::Vector3d old_center = old_object->center.cast<double>();
   Eigen::Vector3d new_size = old_size;
   Eigen::Vector3d new_center = old_center;
-  ComputeBboxSizeCenter<pcl_util::Point>(new_object->object_ptr->cloud,
-    old_dir, &new_size, &new_center);
-  Eigen::Vector3f measured_bbox_center_velocity_with_old_dir = (new_center -
-    old_center).cast<float>();
+  ComputeBboxSizeCenter<pcl_util::Point>(
+    new_object->object_ptr->cloud, old_dir, &new_size, &new_center);
+  Eigen::Vector3f measured_bbox_center_velocity_with_old_dir =
+    (new_center - old_center).cast<float>();
   measured_bbox_center_velocity_with_old_dir /= time_diff;
   measured_bbox_center_velocity_with_old_dir(2) = 0.0;
   Eigen::Vector3f measured_bbox_center_velocity =
     measured_bbox_center_velocity_with_old_dir;
   Eigen::Vector3f project_dir = new_object->anchor_point -
-    old_object->anchor_point;
+                                old_object->anchor_point;
   if (measured_bbox_center_velocity.dot(project_dir) <= 0) {
     measured_bbox_center_velocity = Eigen::Vector3f::Zero();
   }
@@ -247,34 +261,34 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
   Eigen::Vector3d old_center = old_object->center.cast<double>();
   Eigen::Vector3d new_size = old_size;
   Eigen::Vector3d new_center = old_center;
-  ComputeBboxSizeCenter<pcl_util::Point>(new_object->object_ptr->cloud,
-    old_dir, &new_size, &new_center);
+  ComputeBboxSizeCenter<pcl_util::Point>(
+    new_object->object_ptr->cloud, old_dir, &new_size, &new_center);
   Eigen::Vector3d ortho_old_dir(-old_dir(1), old_dir(0), 0.0);
 
   Eigen::Vector3d old_bbox_corner_list[4];
   Eigen::Vector3d new_bbox_corner_list[4];
-  Eigen::Vector3d old_bbox_corner = old_center + old_dir * old_size(0) * 0.5 +
-    ortho_old_dir * old_size(1) * 0.5;
-  Eigen::Vector3d new_bbox_corner = new_center + old_dir * new_size(0) * 0.5 +
-    ortho_old_dir * new_size(1) * 0.5;
+  Eigen::Vector3d old_bbox_corner = old_center +
+    old_dir * old_size(0) * 0.5 + ortho_old_dir * old_size(1) * 0.5;
+  Eigen::Vector3d new_bbox_corner = new_center +
+    old_dir * new_size(0) * 0.5 + ortho_old_dir * new_size(1) * 0.5;
   old_bbox_corner_list[0] = old_bbox_corner;
   new_bbox_corner_list[0] = new_bbox_corner;
-  old_bbox_corner = old_center - old_dir * old_size(0) * 0.5 +
-    ortho_old_dir * old_size(1) * 0.5;
-  new_bbox_corner = new_center - old_dir * new_size(0) * 0.5 +
-    ortho_old_dir * new_size(1) * 0.5;
+  old_bbox_corner = old_center -
+    old_dir * old_size(0) * 0.5 + ortho_old_dir * old_size(1) * 0.5;
+  new_bbox_corner = new_center -
+    old_dir * new_size(0) * 0.5 + ortho_old_dir * new_size(1) * 0.5;
   old_bbox_corner_list[1] = old_bbox_corner;
   new_bbox_corner_list[1] = new_bbox_corner;
-  old_bbox_corner = old_center + old_dir * old_size(0) * 0.5 -
-    ortho_old_dir * old_size(1) * 0.5;
-  new_bbox_corner = new_center + old_dir * new_size(0) * 0.5 -
-    ortho_old_dir * new_size(1) * 0.5;
+  old_bbox_corner = old_center +
+    old_dir * old_size(0) * 0.5 - ortho_old_dir * old_size(1) * 0.5;
+  new_bbox_corner = new_center +
+    old_dir * new_size(0) * 0.5 - ortho_old_dir * new_size(1) * 0.5;
   old_bbox_corner_list[2] = old_bbox_corner;
   new_bbox_corner_list[2] = new_bbox_corner;
-  old_bbox_corner = old_center - old_dir * old_size(0) * 0.5 -
-    ortho_old_dir * old_size(1) * 0.5;
-  new_bbox_corner = new_center - old_dir * new_size(0) * 0.5 -
-    ortho_old_dir * new_size(1) * 0.5;
+  old_bbox_corner = old_center -
+    old_dir * old_size(0) * 0.5 - ortho_old_dir * old_size(1) * 0.5;
+  new_bbox_corner = new_center -
+    old_dir * new_size(0) * 0.5 - ortho_old_dir * new_size(1) * 0.5;
   old_bbox_corner_list[3] = old_bbox_corner;
   new_bbox_corner_list[3] = new_bbox_corner;
 
@@ -300,7 +314,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
       bbox_corner_velocity_norm_on_project_dir;
     bbox_corner_velocity_on_project_dir(2) = 0.0;
     if (bbox_corner_velocity_on_project_dir(0) * project_dir(0) <= 0) {
-        bbox_corner_velocity_on_project_dir = Eigen::Vector3f::Zero();
+      bbox_corner_velocity_on_project_dir = Eigen::Vector3f::Zero();
     }
     Eigen::Vector3f bbox_corner_velocity_on_project_dir_gain =
       bbox_corner_velocity_on_project_dir - belief_velocity_.cast<float>();
@@ -325,15 +339,14 @@ Eigen::Vector3f KalmanFilter::SelectMeasuredVelocity(
 Eigen::Vector3f KalmanFilter::SelectMeasuredVelocityAccordingMotionConsistency(
   const std::vector<Eigen::Vector3f>& candidates) {
   // Select measured velocity among candidates according motion consistency
-  if (candidates.size() <= 0) {
+  if (candidates.size() <= 0)
     return Eigen::Vector3f::Zero();
-  }
   Eigen::Vector3f measured_velocity = candidates[0];
-  Eigen::Vector3f measured_velocity_gain = measured_velocity -
-    belief_velocity_.cast<float>();
+  Eigen::Vector3f measured_velocity_gain =
+    measured_velocity - belief_velocity_.cast<float>();
   for (size_t i = 1; i < candidates.size(); ++i) {
-    Eigen::Vector3f candidate_velocity_gain = candidates[i] -
-      belief_velocity_.cast<float>();
+    Eigen::Vector3f candidate_velocity_gain =
+      candidates[i] - belief_velocity_.cast<float>();
     if (candidate_velocity_gain.norm() < measured_velocity_gain.norm()) {
       measured_velocity = candidates[i];
       measured_velocity_gain = candidate_velocity_gain;
@@ -355,14 +368,14 @@ void KalmanFilter::UpdateModel(const Eigen::VectorXf& measured_anchor_point,
   Eigen::Vector3d measured_anchor_point_d =
     measured_anchor_point.cast<double>();
   Eigen::Vector3d measured_velocity_d = measured_velocity.cast<double>();
-  Eigen::Vector3d velocity_gain = mat_k * (measured_velocity_d - mat_c *
-    belief_velocity_);
+  Eigen::Vector3d velocity_gain = mat_k *
+    (measured_velocity_d - mat_c * belief_velocity_);
 
   // Breakdown
-  float breakdown_threshold = ComputeBreakdownThreshold();
-  if (velocity_gain.norm() > breakdown_threshold) {
+  ComputeBreakdownThreshold();
+  if (velocity_gain.norm() > breakdown_threshold_) {
     velocity_gain.normalize();
-    velocity_gain *= breakdown_threshold;
+    velocity_gain *= breakdown_threshold_;
   }
 
   belief_anchor_point_ = measured_anchor_point_d;
@@ -378,7 +391,7 @@ void KalmanFilter::UpdateModel(const Eigen::VectorXf& measured_anchor_point,
 
   // Compute posterior covariance
   velocity_covariance_ = (Eigen::Matrix3d::Identity() - mat_k * mat_c) *
-    velocity_covariance_;
+                         velocity_covariance_;
 }
 
 void KalmanFilter::ComputeUpdateQuality(const TrackedObjectPtr& new_object,
@@ -423,16 +436,18 @@ float KalmanFilter::ComputeUpdateQualityAccordingPointNumChange(
     return 0;
   }
   float update_quality = 1 - fabs(new_pt_num - old_pt_num) /
-    std::max(new_pt_num, old_pt_num);
+                             std::max(new_pt_num, old_pt_num);
   return update_quality;
 }
 
-float KalmanFilter::ComputeBreakdownThreshold() {
-  // Compute breakdown threshold
-  // Strategy I: define breakdown threshold as a linear
-  float breakdown_threshold = 10 - age_ * 2;
-  breakdown_threshold = breakdown_threshold > 0.5 ? breakdown_threshold : 0.5;
-  return breakdown_threshold;
+void KalmanFilter::ComputeBreakdownThreshold() {
+  // Set breakdown threshold as 2 times of velocity covariance, and smooth
+  // it somehow.
+  breakdown_threshold_ += velocity_covariance_(0, 0) * 2;
+  breakdown_threshold_ /= 2;
+  if (breakdown_threshold_ > s_breakdown_threshold_maximum_) {
+    breakdown_threshold_ = s_breakdown_threshold_maximum_;
+  }
 }
 
 }  // namespace perception

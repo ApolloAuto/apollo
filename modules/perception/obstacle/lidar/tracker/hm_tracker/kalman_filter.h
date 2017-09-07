@@ -42,6 +42,12 @@ class KalmanFilter : public BaseFilter {
   static bool SetAssociationScoreMaximum(
     const double& association_score_maximum);
 
+  // @brief set breakdown threshold maximum for computing breakdown ratio
+  // @params[IN] breakdown_threshold_maximum: breakdown threshold maximum
+  // @return true if set successfully, otherwise return false
+  static bool SetBreakdownThresholdMaximum(
+    const double& breakdown_threshold_maximum);
+
   // @brief init initialize parameters for kalman filter
   // @params[IN] measurement_noise: noise of measurement
   // @params[IN] initial_velocity_noise: initial uncertainty of velocity
@@ -194,10 +200,8 @@ class KalmanFilter : public BaseFilter {
     const TrackedObjectPtr& old_object);
 
   // @brief compute breakdown threshold
-  // @return breakdown threshold
-  float ComputeBreakdownThreshold();
-
-
+  // @return nothing
+  void ComputeBreakdownThreshold();
 
  protected:
   // adaptive
@@ -208,6 +212,7 @@ class KalmanFilter : public BaseFilter {
   static Eigen::Matrix3d    s_propagation_noise_;
   static double             s_measurement_noise_;
   static double             s_initial_velocity_noise_;
+  static double             s_breakdown_threshold_maximum_;
 
   // filter history
   int                       age_;
@@ -220,6 +225,7 @@ class KalmanFilter : public BaseFilter {
   Eigen::Vector3d           belief_velocity_;
   Eigen::Vector3d           belief_velocity_accelaration_;
   double                    update_quality_;
+  double                    breakdown_threshold_;
 };  // class KalmanFilter
 
 }  // namespace perception

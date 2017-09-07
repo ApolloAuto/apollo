@@ -29,16 +29,13 @@ namespace perception {
 
 struct TrackedObject {
   /* NEED TO NOTICE: All the states of track would be collected mainly based on
-   * states of tracked
-   * object. Thus, update tracked object's state when you update the state of
-   * track !!! */
+   * the states of tracked object. Thus, update tracked object's state when you
+   * update the state of track !!! */
   TrackedObject();
   explicit TrackedObject(ObjectPtr obj_ptr);
   TrackedObject(const TrackedObject& rhs);
   TrackedObject& operator=(const TrackedObject& rhs);
   void clone(const TrackedObject& rhs);
-
-  std::string to_string() const;
 
   // cloud
   // store transformed object before tracking
