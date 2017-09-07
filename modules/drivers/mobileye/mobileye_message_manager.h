@@ -21,6 +21,7 @@
 #ifndef MODULES_DRIVERS_MOBILEYE_MESSAGE_MANAGER_H_
 #define MODULES_DRIVERS_MOBILEYE_MESSAGE_MANAGER_H_
 
+#include "modules/drivers/mobileye/protocol/aftermarket_669.h"
 #include "modules/drivers/mobileye/protocol/details_738.h"
 #include "modules/drivers/mobileye/protocol/details_739.h"
 #include "modules/drivers/mobileye/protocol/details_73a.h"
@@ -33,6 +34,7 @@ namespace drivers {
 
 template <>
 SensorMessageManager<Mobileye>::SensorMessageManager() {
+  AddRecvProtocolData<::apollo::drivers::mobileye::Aftermarket669, true>();
   AddRecvProtocolData<::apollo::drivers::mobileye::Details738, true>();
   AddRecvProtocolData<::apollo::drivers::mobileye::Details739, true>();
   AddRecvProtocolData<::apollo::drivers::mobileye::Details73a, true>();
