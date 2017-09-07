@@ -57,9 +57,9 @@ void QpSplineStGraph::Init() {
   }
 
   // init evaluated t positions
-  curr_t = 0.0;
+  curr_t = t_evaluated_resolution_;
   for (uint32_t i = 0;
-       i <= qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
+       i < qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
     t_evaluated_.push_back(curr_t);
     curr_t += t_evaluated_resolution_;
   }
@@ -144,13 +144,6 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!constraint->AddPointSecondDerivativeConstraint(0.0, init_point_.a())) {
-    const std::string msg =
-        "add st start point acceleration constraint failed!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
   if (!constraint->AddPointSecondDerivativeConstraint(
           spline_generator_->spline().x_knots().back(), 0.0)) {
     const std::string msg = "add st end point acceleration constraint failed!";
@@ -205,9 +198,7 @@ Status QpSplineStGraph::ApplyConstraint(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  constexpr double kSpeedBoundEpsilon = 1e-12;
-  std::vector<double> speed_lower_bound(t_evaluated_.size(),
-                                        kSpeedBoundEpsilon);
+  std::vector<double> speed_lower_bound(t_evaluated_.size(), 0.0);
 
   DCHECK_EQ(t_evaluated_.size(), speed_upper_bound.size());
   DCHECK_EQ(t_evaluated_.size(), speed_lower_bound.size());
@@ -228,26 +219,38 @@ Status QpSplineStGraph::ApplyConstraint(
   for (size_t i = 0; i < t_evaluated_.size(); ++i) {
     ADEBUG << "t_evaluated_: " << t_evaluated_[i]
            << "; speed_lower_bound: " << speed_lower_bound[i]
-           << "; speed_upper_bound: " << speed_upper_bound[i] << std::endl;
+           << "; speed_upper_bound: " << speed_upper_bound[i];
   }
 
   // acceleration constraint
-  constexpr double kAccelLowerBound = -4.0;
-  constexpr double kAccelUpperBound = 1.5;
+  constexpr double kAccelLowerBound = -4.5;
+  constexpr double kAccelUpperBound = 2.0;
   std::vector<double> accel_lower_bound(t_evaluated_.size(), kAccelLowerBound);
   std::vector<double> accel_upper_bound(t_evaluated_.size(), kAccelUpperBound);
+
+  constexpr double kInitPointAccelRelaxedRange = 1.0;
+  if (init_point_.v() < kInitPointAccelRelaxedRange * 1.0) {
+    accel_lower_bound.front() = init_point_.a() - kInitPointAccelRelaxedRange;
+    accel_upper_bound.front() = init_point_.a() + kInitPointAccelRelaxedRange;
+  } else if (!constraint->AddPointSecondDerivativeConstraint(0.0,
+                                                             init_point_.a())) {
+    const std::string msg =
+        "add st start point acceleration constraint failed!";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
 
   DCHECK_EQ(t_evaluated_.size(), accel_lower_bound.size());
   DCHECK_EQ(t_evaluated_.size(), accel_upper_bound.size());
   if (!constraint->AddSecondDerivativeBoundary(t_evaluated_, accel_lower_bound,
                                                accel_upper_bound)) {
     const std::string msg = "Fail to apply acceleration constraints.";
-    for (size_t i = 0; i < t_evaluated_.size(); ++i) {
-      AERROR << "t_evaluated_: " << t_evaluated_[i]
-             << "; accel_lower_bound: " << accel_lower_bound[i]
-             << "; accel_upper_bound: " << accel_upper_bound[i] << std::endl;
-    }
     return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+    ADEBUG << "t_evaluated_: " << t_evaluated_[i]
+           << "; accel_lower_bound: " << accel_lower_bound[i]
+           << "; accel_upper_bound: " << accel_upper_bound[i];
   }
 
   return Status::OK();
