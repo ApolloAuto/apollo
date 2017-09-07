@@ -21,7 +21,7 @@
 
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
@@ -34,13 +34,10 @@ class ReferenceLineSmootherTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     hdmap_.LoadMapFromFile(map_file);
-    const std::string lane_id_str = "1_-1";
-    hdmap::Id lane_id;
-    lane_id.set_id(lane_id_str);
-    lane_info_ptr = hdmap_.GetLaneById(lane_id);
+    const std::string lane_id = "1_-1";
+    lane_info_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(lane_id));
     if (!lane_info_ptr) {
-      AERROR << "failed to find lane " << lane_id_str << " from map "
-             << map_file;
+      AERROR << "failed to find lane " << lane_id << " from map " << map_file;
       return;
     }
     ReferenceLineSmootherConfig config;
