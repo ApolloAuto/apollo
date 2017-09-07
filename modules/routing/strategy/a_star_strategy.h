@@ -28,7 +28,7 @@ namespace routing {
 
 class AStarStrategy : public Strategy {
  public:
-  AStarStrategy() = default;
+  explicit AStarStrategy(bool enable_change);
   ~AStarStrategy() = default;
 
   virtual bool Search(const TopoGraph* graph,
@@ -43,6 +43,7 @@ class AStarStrategy : public Strategy {
   double GetResidualS(const TopoEdge* edge, const TopoNode* to_node);
 
  private:
+  bool change_lane_enabled_;
   std::unordered_set<const TopoNode*> open_set_;
   std::unordered_set<const TopoNode*> closed_set_;
   std::unordered_map<const TopoNode*, const TopoNode*> came_from_;

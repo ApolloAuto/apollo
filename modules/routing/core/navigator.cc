@@ -207,7 +207,7 @@ bool Navigator::SearchRouteByStrategy(
     const std::vector<double>& way_s,
     std::vector<NodeWithRange>* const result_nodes) const {
   std::unique_ptr<Strategy> strategy_ptr;
-  strategy_ptr.reset(new AStarStrategy());
+  strategy_ptr.reset(new AStarStrategy(FLAGS_enable_change_lane_in_result));
 
   result_nodes->clear();
   std::vector<NodeWithRange> node_vec;
