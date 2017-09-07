@@ -321,6 +321,7 @@ PointENU LaneInfo::GetNearestPoint(const Vec2d &point, double *distance) const {
   CHECK_NOTNULL(distance);
 
   const auto segment_box = lane_segment_kdtree_->GetNearestObject(point);
+  CHECK(segment_box != nullptr);
   int index = segment_box->id();
   Vec2d nearest_point;
   *distance = segments_[index].DistanceTo(point, &nearest_point);
