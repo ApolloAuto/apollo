@@ -1,14 +1,3 @@
-/* -*- mode: C++ -*-
- *
- *  Copyright (C) 2007 Austin Robot Technology, Yaxin Liu, Patrick Beeson
- *  Copyright (C) 2009, 2010 Austin Robot Technology, Jack O'Quin
- *  Copyright (C) 2015, Jack O'Quin
- *
- *  License: Modified BSD Software License Agreement
- *
- *  $Id$
- */
-
  /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -24,6 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+/* -*- mode: C++ -*-
+ *
+ *  Copyright (C) 2007 Austin Robot Technology, Yaxin Liu, Patrick Beeson
+ *  Copyright (C) 2009, 2010 Austin Robot Technology, Jack O'Quin
+ *  Copyright (C) 2015, Jack O'Quin
+ *
+ *  License: Modified BSD Software License Agreement
+ *
+ *  $Id$
+ */
 
 #include <arpa/inet.h>
 #include <errno.h>
