@@ -26,7 +26,7 @@ import system_cmd
 class ModuleApi(object):
     """
     Module SocketIO API:
-        start [all | <module>]
+        start [all | record_replay | <module>]
         stop [all | <module>]
     """
 
@@ -53,7 +53,11 @@ class ModuleApi(object):
             system_cmd.async_run_command_pb(cmd)
 
         if module_name == 'all':
-            _ = [__single_start(conf.name) for conf in Config.get_pb().modules]
+            for conf in Config.get_pb().modules:
+                __single_start(conf.name)
+        elif module_name == 'record_replay_required_modules':
+            for mod in Config.record_replay_required_modules:
+                __single_start(mod)
         else:
             __single_start(module_name)
         RuntimeStatus.broadcast_status_if_changed()

@@ -35,6 +35,8 @@ class Config(object):
     pb_singleton = None
     apollo_root = os.path.join(os.path.dirname(__file__), '../../..')
     log = logging.getLogger('HMI')
+    record_replay_required_modules = [
+        'GPS', 'control', 'canbus', 'localization', 'dreamview', 'record_bag']
 
     @classmethod
     def get_pb(cls):
