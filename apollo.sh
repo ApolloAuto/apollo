@@ -480,6 +480,7 @@ function main() {
 
   case $1 in
     check)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       check
       ;;
     build)
@@ -523,6 +524,7 @@ function main() {
       run_lint
       ;;
     test)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       run_test
       ;;
     release)
