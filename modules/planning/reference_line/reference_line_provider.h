@@ -57,7 +57,8 @@ class ReferenceLineProvider {
             const ReferenceLineSmootherConfig& smoother_config);
 
   bool Start();
-  void Stop() { is_stop_ = true; }
+
+  void Stop();
 
   std::vector<ReferenceLine> GetReferenceLines();
 
