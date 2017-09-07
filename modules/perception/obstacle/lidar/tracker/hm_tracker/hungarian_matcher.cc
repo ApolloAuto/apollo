@@ -33,7 +33,7 @@ bool HungarianMatcher::SetMatchDistanceMaximum(
   const float& match_distance_maximum) {
   if (match_distance_maximum >= 0) {
     s_match_distance_maximum_ = match_distance_maximum;
-    ADEBUG << "match distance maximum of HungarianMatcher is "
+    AINFO << "match distance maximum of HungarianMatcher is "
           << s_match_distance_maximum_;
     return true;
   }
@@ -50,8 +50,7 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
   std::vector<int>* unassigned_objects) {
   // A. computing association matrix
   Eigen::MatrixXf association_mat(tracks.size(), objects->size());
-  ComputeAssociateMatrix(tracks, tracks_predict, (*objects), time_diff,
-                         &association_mat);
+  ComputeAssociateMatrix(tracks, tracks_predict, (*objects), &association_mat);
 
   // B. computing connected components
   std::vector<std::vector<int> > object_components;
@@ -59,7 +58,7 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
   ComputeConnectedComponents(association_mat, s_match_distance_maximum_,
                              &track_components, &object_components);
   ADEBUG << "HungarianMatcher: partition graph into "
-        << track_components.size() << " sub-graphs.";
+         << track_components.size() << " sub-graphs.";
 
   // C. matching each sub-graph
   assignments->clear();
@@ -170,25 +169,14 @@ void HungarianMatcher::ComputeAssociateMatrix(
   const std::vector<ObjectTrackPtr>& tracks,
   const std::vector<Eigen::VectorXf>& tracks_predict,
   const std::vector<TrackedObjectPtr>& new_objects,
-  const double& time_diff,
   Eigen::MatrixXf* association_mat) {
   // Compute matrix of association distance
   for (size_t i = 0; i < tracks.size(); ++i) {
     for (size_t j = 0; j < new_objects.size(); ++j) {
-      (*association_mat)(i, j) = ComputeTrackObjectDistance(
-        tracks[i], tracks_predict[i], new_objects[j], time_diff);
+      (*association_mat)(i, j) = TrackObjectDistance::ComputeDistance(
+        tracks[i], tracks_predict[i], new_objects[j]);
     }
   }
-}
-
-float HungarianMatcher::ComputeTrackObjectDistance(
-  const ObjectTrackPtr& track,
-  const Eigen::VectorXf& track_predict,
-  const TrackedObjectPtr& new_object,
-  const double& time_diff) const {
-  // Compute distance of given track & object
-  return TrackObjectDistance::ComputeDistance(
-    track, track_predict, new_object, time_diff);
 }
 
 void HungarianMatcher::ComputeConnectedComponents(
