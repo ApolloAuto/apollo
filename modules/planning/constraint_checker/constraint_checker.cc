@@ -35,8 +35,12 @@ bool WithinRange(const T v, const T lower, const T upper) {
 
 bool ConstraintChecker::ValidTrajectory(
     const DiscretizedTrajectory& trajectory) {
+  const double kMaxCheckRelativeTime = 2.0;
   for (const auto& p : trajectory.trajectory_points()) {
     double t = p.relative_time();
+    if (t > kMaxCheckRelativeTime) {
+      continue;
+    }
     double lon_v = p.v();
     if (!WithinRange(lon_v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
       AERROR << "Velocity at relative time " << t
