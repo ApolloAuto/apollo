@@ -223,17 +223,14 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   // acceleration constraint
-  constexpr double kAccelLowerBound = -4.5;
-  constexpr double kAccelUpperBound = 2.0;
+  constexpr double kAccelLowerBound = -4.0;
+  constexpr double kAccelUpperBound = 1.5;
   std::vector<double> accel_lower_bound(t_evaluated_.size(), kAccelLowerBound);
   std::vector<double> accel_upper_bound(t_evaluated_.size(), kAccelUpperBound);
 
-  constexpr double kInitPointAccelRelaxedRange = 1.0;
-  if (init_point_.v() < kInitPointAccelRelaxedRange * 1.0) {
-    accel_lower_bound.front() = init_point_.a() - kInitPointAccelRelaxedRange;
-    accel_upper_bound.front() = init_point_.a() + kInitPointAccelRelaxedRange;
-  } else if (!constraint->AddPointSecondDerivativeConstraint(0.0,
-                                                             init_point_.a())) {
+  constexpr double kInitPointAccelRelaxedSpeed = 1.0;
+  if (init_point_.v() > kInitPointAccelRelaxedSpeed &&
+      !constraint->AddPointSecondDerivativeConstraint(0.0, init_point_.a())) {
     const std::string msg =
         "add st start point acceleration constraint failed!";
     AERROR << msg;
@@ -466,10 +463,11 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
   }
 
   const double kTimeBuffer = 2.0;
+  const double kSpeedBuffer = 0.1;
   for (uint32_t k = 0; k < t_evaluated_.size() && t_evaluated_[k] < kTimeBuffer;
        ++k) {
     speed_upper_bound->at(k) =
-        std::fmax(init_point_.v(), speed_upper_bound->at(k));
+        std::fmax(init_point_.v() + kSpeedBuffer, speed_upper_bound->at(k));
   }
 
   return Status::OK();
