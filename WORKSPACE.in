@@ -126,12 +126,12 @@ new_local_repository(
 )
 
 # Caffe
-new_http_archive(
+new_local_repository(
     name = "caffe",
     build_file = "third_party/caffe.BUILD",
-    strip_prefix = "caffe-1.0",
-    url = "https://github.com/BVLC/caffe/archive/1.0.zip",
+    path = "/usr/include/caffe",
 )
+
 
 
 # YAML-CPP

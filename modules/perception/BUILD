@@ -21,7 +21,6 @@ cc_binary(
     data = [
         "//modules/perception/conf:perception_adapter_manager_config",
     ],
-    linkstatic = 0,
     deps = [
         ":perception_lib",
         "//external:gflags",
