@@ -87,10 +87,5 @@ void TrackedObject::clone(const TrackedObject& rhs) {
   association_score = rhs.association_score;
 }
 
-std::string TrackedObject::to_string() const {
-  std::string txt;
-  return txt;
-}
-
 }  // namespace perception
 }  // namespace apollo

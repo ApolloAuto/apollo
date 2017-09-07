@@ -264,6 +264,7 @@ bool HmObjectTracker::Init() {
     float initial_velocity_noise = 5.0f;
     float xy_propagation_noise = 10.0f;
     float z_propagation_noise = 10.0f;
+    float breakdown_threshold_maximum = 10.0;
     KalmanFilter::SetUseAdaptive(use_adaptive);
     if (!KalmanFilter::SetAssociationScoreMaximum(
       association_score_maximum)) {
@@ -293,6 +294,16 @@ bool HmObjectTracker::Init() {
                                   xy_propagation_noise,
                                   z_propagation_noise)) {
       AERROR << "Failed to set params for kalman filter! " << name();
+      return false;
+    }
+    if (!model_config->GetValue("breakdown_threshold_maximum",
+      &breakdown_threshold_maximum)) {
+      AERROR << "Failed to get breakdown threshold maximum! " << name();
+      return false;
+    }
+    if (!KalmanFilter::SetBreakdownThresholdMaximum(
+      breakdown_threshold_maximum)) {
+      AERROR << "Failed to set breakdown threshold maximum! " << name();
       return false;
     }
   }
@@ -430,7 +441,7 @@ bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
   // B. preprocessing
   // B.1 coordinate transformation
   TransformPoseGlobal2Local(&velo2world_pose);
-  AINFO << "velo2local_pose\n" << velo2world_pose;
+  ADEBUG << "velo2local_pose\n" << velo2world_pose;
   // B.2 construct tracked objects
   std::vector<TrackedObjectPtr> transformed_objects;
   ConstructTrackedObjects(objects, &transformed_objects, velo2world_pose,

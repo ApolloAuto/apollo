@@ -84,20 +84,7 @@ class HungarianMatcher: public BaseMatcher{
     const std::vector<ObjectTrackPtr>& tracks,
     const std::vector<Eigen::VectorXf>& tracks_predict,
     const std::vector<TrackedObjectPtr>& new_objects,
-    const double& time_diff,
     Eigen::MatrixXf* association_mat);
-
-  // @brief compute distance between track & object
-  // @params[IN] track: maintained track
-  // @params[IN] track_predict: predicted states of given track
-  // @params[IN] new_object: recently detected object
-  // @params[IN] time_diff: time interval from last matching
-  // @return distance of given track & object
-  float ComputeTrackObjectDistance(
-    const ObjectTrackPtr& track,
-    const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object,
-    const double& time_diff) const;
 
   // @brief compute connected components within given threshold
   // @params[IN] association_mat: matrix of association distance
