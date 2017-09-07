@@ -161,11 +161,6 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 void Planning::RunOnce() {
   const double start_timestamp = Clock::NowInSecond();
   AdapterManager::Observe();
-  if (FLAGS_enable_reference_line_provider_thread) {
-    ReferenceLineProvider::instance()->UpdateRoutingResponse(
-        AdapterManager::GetRoutingResponse()->GetLatestObserved());
-  }
-
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
                         ->mutable_main_decision()
@@ -204,6 +199,11 @@ void Planning::RunOnce() {
     status.Save(not_ready_pb.mutable_header()->mutable_status());
     PublishPlanningPb(&not_ready_pb);
     return;
+  }
+
+  if (FLAGS_enable_reference_line_provider_thread) {
+    ReferenceLineProvider::instance()->UpdateRoutingResponse(
+        AdapterManager::GetRoutingResponse()->GetLatestObserved());
   }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
