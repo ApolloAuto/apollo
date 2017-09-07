@@ -47,7 +47,8 @@ class DigitalFilter {
    * @param denominators The denominators of the DigitalFilter.
    * @param numerators The numerators of the DigitalFilter.
    */
-  DigitalFilter(const double ts, const double cutoff_freq);
+  DigitalFilter(const std::vector<double> &denominators,
+                const std::vector<double> &numerators);
 
   /**
    * @brief Default destructor.
@@ -71,11 +72,24 @@ class DigitalFilter {
    */
 
   /**
+   * @brief set denominators by an input vector
+   * @param denominators The denominators of filter
+   */
+  void set_denominators(const std::vector<double> &denominators);
+
+  /**
+   * @brief set numerators by an input vector
+   * @param numerators The numerators of filter
+   */
+  void set_numerators(const std::vector<double> &numerators);
+
+  /**
    * @brief set denominators and numerators
    * @param denominators The denominators of filter
    * @param numerators The numerators of filter
    */
-  void set_coefficients(const double ts, const double cutoff_freq);
+  void set_coefficients(const std::vector<double> &denominators,
+                        const std::vector<double> &numerators);
 
   /**
    * @brief set filter deadzone
