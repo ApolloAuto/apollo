@@ -52,7 +52,6 @@ TEST_F(YongfengchanyeyuanTest, cruise) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
 }
 
 }  // namespace planning
