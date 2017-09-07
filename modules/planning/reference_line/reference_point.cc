@@ -52,7 +52,7 @@ double ReferencePoint::lower_bound() const { return lower_bound_; }
 
 double ReferencePoint::upper_bound() const { return upper_bound_; }
 
-const std::string ReferencePoint::DebugString() const {
+std::string ReferencePoint::DebugString() const {
   // clang-format off
   return apollo::common::util::StrCat("{x: ", std::fixed, x(),
          ", " "y: ", y(), ", " "theta: ", heading(), ", " "kappa: ",

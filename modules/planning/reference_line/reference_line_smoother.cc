@@ -180,7 +180,7 @@ bool ReferenceLineSmoother::ApplyConstraint(
     xy_points.emplace_back(path_points[i].x(), path_points[i].y());
   }
 
-  constexpr double kFixedBoundLimit = 0.01;
+  static constexpr double kFixedBoundLimit = 0.01;
   if (longitidinal_bound.size() > 0) {
     longitidinal_bound.front() = kFixedBoundLimit;
     longitidinal_bound.back() = kFixedBoundLimit;
@@ -196,15 +196,15 @@ bool ReferenceLineSmoother::ApplyConstraint(
   CHECK_EQ(evaluated_t.size(), longitidinal_bound.size());
   CHECK_EQ(evaluated_t.size(), lateral_bound.size());
 
-  if (!spline_solver_->mutable_constraint()->Add2dBoundary(
+  auto* spline_constraint = spline_solver_->mutable_constraint();
+  if (!spline_constraint->Add2dBoundary(
           evaluated_t, headings, xy_points, longitidinal_bound,
           lateral_bound)) {
     AERROR << "Add 2d boundary constraint failed";
     return false;
   }
 
-  if (!spline_solver_->mutable_constraint()
-           ->AddThirdDerivativeSmoothConstraint()) {
+  if (!spline_constraint->AddThirdDerivativeSmoothConstraint()) {
     AERROR << "Add jointness constraint failed";
     return false;
   }
@@ -246,7 +246,7 @@ bool ReferenceLineSmoother::ExtractEvaluatedPoints(
       AERROR << "get s from " << t << " failed";
       return false;
     }
-    ReferencePoint rlp = raw_reference_line.GetReferencePoint(s);
+    const ReferencePoint rlp = raw_reference_line.GetReferencePoint(s);
     common::PathPoint path_point;
     path_point.set_x(rlp.x());
     path_point.set_y(rlp.y());

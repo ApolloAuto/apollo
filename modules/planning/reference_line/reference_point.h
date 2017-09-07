@@ -45,7 +45,7 @@ class ReferencePoint : public hdmap::MapPathPoint {
   double lower_bound() const;
   double upper_bound() const;
 
-  const std::string DebugString() const;
+  std::string DebugString() const;
 
   static void RemoveDuplicates(std::vector<ReferencePoint>* points);
 
