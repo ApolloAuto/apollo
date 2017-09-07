@@ -24,6 +24,7 @@ cc_library(
         "//modules/planning/planner/em:em_planner",
         "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/reference_line:reference_line_provider",
         "//modules/planning/trajectory_stitcher",
         "//modules/prediction/proto:prediction_proto",
         "@ros//:ros_common",

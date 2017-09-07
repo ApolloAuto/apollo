@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "google/protobuf/repeated_field.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
@@ -27,6 +28,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
+#include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/trajectory_stitcher/trajectory_stitcher.h"
 
 namespace apollo {
@@ -107,6 +109,13 @@ Status Planning::Init() {
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
 
+  if (FLAGS_enable_reference_line_provider_thread) {
+    ReferenceLineProvider::instance()->Init(
+        pnc_map_.get(),
+        AdapterManager::GetRoutingResponse()->GetLatestObserved(),
+        config_.reference_line_smoother_config());
+  }
+
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
   if (!planner_) {
@@ -119,6 +128,9 @@ Status Planning::Init() {
 }
 
 Status Planning::Start() {
+  if (FLAGS_enable_reference_line_provider_thread) {
+    ReferenceLineProvider::instance()->Start();
+  }
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
   return Status::OK();
@@ -236,6 +248,9 @@ void Planning::Stop() {
   last_publishable_trajectory_.Clear();
   frame_.reset(nullptr);
   planner_.reset(nullptr);
+  if (FLAGS_enable_reference_line_provider_thread) {
+    ReferenceLineProvider::instance()->Stop();
+  }
 }
 
 common::Status Planning::Plan(
