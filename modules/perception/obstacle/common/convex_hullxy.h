@@ -87,6 +87,12 @@ class ConvexHull2DXY : public pcl::ConvexHull<PointInT> {
     // Array of coordinates for each point
     coordT *points = reinterpret_cast<coordT *>(
         calloc(indices_->size() * dimension, sizeof(coordT)));
+    if (points == NULL) {
+      hull->points.resize(0);
+      hull->width = hull->height = 0;
+      polygons->resize(0);
+      return;
+    }
 
     // Build input data, using appropriate projection
     int j = 0;
@@ -121,7 +127,6 @@ class ConvexHull2DXY : public pcl::ConvexHull<PointInT> {
       qh_freeqhull(!qh_ALL);
       int curlong, totlong;
       qh_memfreeshort(&curlong, &totlong);
-
       return;
     }
 
