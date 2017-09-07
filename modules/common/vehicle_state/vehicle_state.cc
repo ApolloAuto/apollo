@@ -59,7 +59,8 @@ Status VehicleState::Update(
 }
 
 void VehicleState::InitAdcBoundingBox() {
-  const auto &param = VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  const auto &param =
+      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   math::Vec2d position(x_, y_);
   math::Vec2d vec_to_center(
       (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
@@ -92,8 +93,8 @@ bool VehicleState::ConstructExceptLinearVelocity(
   if (localization.pose().has_heading()) {
     heading_ = localization.pose().heading();
   } else {
-    heading_ = math::QuaternionToHeading(
-        orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
+    heading_ = math::QuaternionToHeading(orientation.qw(), orientation.qx(),
+                                         orientation.qy(), orientation.qz());
   }
 
   if (FLAGS_enable_map_reference_unify) {
@@ -128,8 +129,8 @@ bool VehicleState::ConstructExceptLinearVelocity(
     pitch_ = localization.pose().euler_angles().y();
     yaw_ = localization.pose().euler_angles().z();
   } else {
-    math::EulerAnglesZXYd euler_angle(
-        orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
+    math::EulerAnglesZXYd euler_angle(orientation.qw(), orientation.qx(),
+                                      orientation.qy(), orientation.qz());
     roll_ = euler_angle.roll();
     pitch_ = euler_angle.pitch();
     yaw_ = euler_angle.yaw();
@@ -185,8 +186,7 @@ void VehicleState::set_angular_velocity(const double angular_velocity) {
   angular_v_ = angular_velocity;
 }
 
-void VehicleState::set_gear(
-    const canbus::Chassis::GearPosition gear_position) {
+void VehicleState::set_gear(const canbus::Chassis::GearPosition gear_position) {
   gear_ = gear_position;
 }
 
