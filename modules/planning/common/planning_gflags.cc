@@ -67,7 +67,7 @@ DEFINE_double(trajectory_time_resolution, 0.1,
 DEFINE_double(output_trajectory_time_resolution, 0.05,
               "Trajectory time resolution when publish");
 
-DEFINE_bool(enable_trajectory_check, true,
+DEFINE_bool(enable_trajectory_check, false,
             "Enable sanity check for planning trajectory.");
 
 DEFINE_double(speed_lower_bound, -0.02, "The lowest speed allowed.");
