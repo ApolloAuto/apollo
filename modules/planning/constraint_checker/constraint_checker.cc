@@ -68,6 +68,42 @@ bool ConstraintChecker::ValidTrajectory(
       return false;
     }
   }
+
+  for (std::size_t i = 1; i < trajectory.NumOfPoints(); ++i) {
+    const auto& p0 = trajectory.TrajectoryPointAt(i - 1);
+    const auto& p1 = trajectory.TrajectoryPointAt(i);
+
+    if (p1.relative_time() > kMaxCheckRelativeTime) {
+      break;
+    }
+
+    double t = p0.relative_time();
+
+    double dt = p1.relative_time() - p0.relative_time();
+    double d_lon_a = p1.a() - p0.a();
+    double lon_jerk = d_lon_a / dt;
+    if (!WithinRange(d_lon_a / dt, FLAGS_longitudinal_jerk_lower_bound,
+                     FLAGS_longitudinal_jerk_upper_bound)) {
+      AERROR << "Longitudinal jerk at relative time " << t
+             << " exceeds bound, value: " << lon_jerk << ", bound ["
+             << FLAGS_longitudinal_jerk_lower_bound << ", "
+             << FLAGS_longitudinal_jerk_upper_bound << "].";
+      return false;
+    }
+
+    double d_lat_a = p1.v() * p1.v() * p1.path_point().kappa() -
+                     p0.v() * p0.v() * p0.path_point().kappa();
+    double lat_jerk = d_lat_a / dt;
+    if (!WithinRange(lat_jerk, -FLAGS_lateral_jerk_bound,
+                     FLAGS_lateral_jerk_bound)) {
+      AERROR << "Lateral jerk at relative time " << t
+             << " exceeds bound, value: " << lat_jerk << ", bound ["
+             << -FLAGS_lateral_jerk_bound << ", " << FLAGS_lateral_jerk_bound
+             << "].";
+      return false;
+    }
+  }
+
   return true;
 }
 
