@@ -38,12 +38,10 @@ using apollo::common::util::PathExists;
 using apollo::hdmap::SimMapFile;
 using apollo::hdmap::BaseMapFile;
 
-std::string Dreamview::Name() const {
-  return FLAGS_dreamview_module_name;
-}
+std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
 
 Status Dreamview::Init() {
-  AdapterManager::Init();
+  AdapterManager::Init(FLAGS_adapter_config_path);
   VehicleConfigHelper::Init();
 
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";

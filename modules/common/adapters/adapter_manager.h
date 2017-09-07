@@ -110,9 +110,7 @@ namespace adapter {
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
   }                                                                            \
-  name##Adapter *InternalGet##name() {                                         \
-    return name##_.get();                                                      \
-  }                                                                            \
+  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
     if (node_handle_) {                                                        \
@@ -137,11 +135,6 @@ namespace adapter {
  */
 class AdapterManager {
  public:
-  /**
-   * @brief Initialize the /class AdapterManager singleton.
-   */
-  static void Init();
-
   /**
    * @brief Initialize the /class AdapterManager singleton with the
    * provided configuration. The configuration is specified by the
