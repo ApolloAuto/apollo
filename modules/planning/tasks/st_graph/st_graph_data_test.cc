@@ -43,19 +43,19 @@ TEST(StGraphDataTest, basic_test) {
   traj_point.set_relative_time(1010.022);
 
   SpeedLimit speed_limit;
-  StGraphData st_graph_data_2(boundary_vec, traj_point, speed_limit, 100.0);
-  EXPECT_EQ(st_graph_data_2.st_boundaries().size(), 1);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().x(), 1.1);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().y(), 2.1);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().z(), 0.0);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().theta(), 0.2);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().kappa(), 0.02);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().dkappa(), 0.123);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().path_point().ddkappa(), 0.003);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().v(), 10.001);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().a(), 1.022);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.init_point().relative_time(), 1010.022);
-  EXPECT_DOUBLE_EQ(st_graph_data_2.path_data_length(), 100.0);
+  StGraphData st_graph_data(boundary_vec, traj_point, speed_limit, 100.0);
+  EXPECT_EQ(st_graph_data.st_boundaries().size(), 1);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().x(), 1.1);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().y(), 2.1);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().z(), 0.0);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().theta(), 0.2);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().kappa(), 0.02);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().dkappa(), 0.123);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().ddkappa(), 0.003);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().v(), 10.001);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().a(), 1.022);
+  EXPECT_DOUBLE_EQ(st_graph_data.init_point().relative_time(), 1010.022);
+  EXPECT_DOUBLE_EQ(st_graph_data.path_data_length(), 100.0);
 }
 
 }  // namespace planning

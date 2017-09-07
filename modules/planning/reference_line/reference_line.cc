@@ -40,7 +40,7 @@ namespace apollo {
 namespace planning {
 
 using MapPath = hdmap::Path;
-using SLPoint = apollo::common::SLPoint;
+using apollo::common::SLPoint;
 
 ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points)
@@ -164,7 +164,7 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double x,
                      reference_points_[index_end], s1, s);
 }
 
-bool ReferenceLine::SLToXY(const common::SLPoint& sl_point,
+bool ReferenceLine::SLToXY(const SLPoint& sl_point,
                            common::math::Vec2d* const xy_point) const {
   CHECK_NOTNULL(xy_point);
   if (map_path_.num_points() < 2) {
@@ -180,7 +180,7 @@ bool ReferenceLine::SLToXY(const common::SLPoint& sl_point,
 }
 
 bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
-                           common::SLPoint* const sl_point) const {
+                           SLPoint* const sl_point) const {
   DCHECK_NOTNULL(sl_point);
   double s = 0;
   double l = 0;
@@ -248,7 +248,7 @@ bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
   return map_path_.GetWidth(s, left_width, right_width);
 }
 
-bool ReferenceLine::IsOnRoad(const common::SLPoint& sl_point) const {
+bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
   if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
     return false;
   }
@@ -275,7 +275,7 @@ bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
   std::vector<common::math::Vec2d> corners;
   box.GetAllCorners(&corners);
   for (const auto& point : corners) {
-    common::SLPoint sl_point;
+    SLPoint sl_point;
     if (!XYToSL(point, &sl_point)) {
       AERROR << "failed to get projection for point: " << point.DebugString()
              << " on reference line.";

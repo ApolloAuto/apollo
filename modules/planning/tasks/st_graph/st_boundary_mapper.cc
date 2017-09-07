@@ -254,9 +254,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
   DCHECK(lower_points->empty());
   DCHECK_GT(path_points.size(), 0);
 
-  if (path_points.size() == 0) {
-    AERROR << "Too few points in path_data_.discretized_path(); size = "
-           << path_points.size();
+  if (path_points.empty()) {
+    AERROR << "No points in path_data_.discretized_path().";
     return false;
   }
 
@@ -313,9 +312,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       }
 
       const double step_length = vehicle_param_.front_edge_to_center();
-      double path_s = 0.0;
-
-      while (path_s < discretized_path.Length()) {
+      for (double path_s = 0.0; path_s < discretized_path.Length();
+           path_s += step_length) {
         const auto curr_adc_path_point =
             discretized_path.EvaluateUsingLinearApproximation(
                 path_s + discretized_path.StartPoint().s());
@@ -373,7 +371,6 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
           }
           break;
         }
-        path_s += step_length;
       }
     }
   }
