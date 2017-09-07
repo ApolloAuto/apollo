@@ -40,7 +40,7 @@ TEST_F(DigitalFilterTest, SetGet) {
   EXPECT_NEAR(numerators_got[2], 0.1729, 0.01);
   EXPECT_NEAR(denominators_got[0], 1.0, 0.01);
   EXPECT_NEAR(denominators_got[2], 0.2217, 0.01);
-  
+
   double dead_zone = 1.0;
   digital_filter.set_dead_zone(dead_zone);
   EXPECT_FLOAT_EQ(digital_filter.dead_zone(), dead_zone);

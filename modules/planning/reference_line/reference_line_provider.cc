@@ -20,6 +20,8 @@
  * @brief Implementation of the class ReferenceLineProvider.
  */
 
+#include <utility>
+
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
@@ -68,7 +70,7 @@ void ReferenceLineProvider::Stop() {
 void ReferenceLineProvider::UpdateRoutingResponse(
     const routing::RoutingResponse &routing_response) {
   std::lock_guard<std::mutex> lock(routing_response_mutex_);
-  // TODO: check if routing needs to be updated before assigning.
+  // TODO(all): check if routing needs to be updated before assigning.
   routing_response_ = routing_response;
 }
 
@@ -82,20 +84,20 @@ void ReferenceLineProvider::Generate() {
     routing::RoutingResponse routing;
     {
       std::lock_guard<std::mutex> lock(routing_response_mutex_);
-      // TODO: check if routing needs to be updated before assigning.
+      // TODO(all): check if routing needs to be updated before assigning.
       routing = routing_response_;
     }
 
     if (!CreateReferenceLineFromRouting(adc_point_enu, routing)) {
       AERROR << "Fail to create reference line at position: "
              << curr_adc_position.ShortDebugString();
-    };
+    }
     std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(500));
   }
 }
 
 std::vector<ReferenceLine> ReferenceLineProvider::GetReferenceLines() {
-  // TODO: implement this function using the current adc position and the
+  // TODO(all): implement this function using the current adc position and the
   // existing reference lines. It is required that the current reference lines
   // can cover thoroughly the current adc position so that planning can be make
   // with a minimum planning distance of 100 meters ahead and 10 meters
@@ -124,7 +126,7 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   smoother.Init(smoother_config_);
 
   std::vector<ReferenceLine> reference_lines;
-  // TODO: Added code to enable partially smoothed reference line here.
+  // TODO(all): Added code to enable partially smoothed reference line here.
   for (const auto &segments : route_segments) {
     hdmap::Path hdmap_path;
     pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
