@@ -7,7 +7,7 @@
     "license": "MIT",
     "scripts": {
         "build": "node_modules/.bin/webpack -p",
-        "start": "node_modules/.bin/webpack-dev-server"
+        "start": "node_modules/.bin/webpack-dev-server --watch-poll"
     },
     "dependencies": {
         "classnames": "^2.2.5",
