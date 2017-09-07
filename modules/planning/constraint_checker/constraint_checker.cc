@@ -39,7 +39,7 @@ bool ConstraintChecker::ValidTrajectory(
   for (const auto& p : trajectory.trajectory_points()) {
     double t = p.relative_time();
     if (t > kMaxCheckRelativeTime) {
-      continue;
+      break;
     }
     double lon_v = p.v();
     if (!WithinRange(lon_v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
