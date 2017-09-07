@@ -5,12 +5,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "drivers_mobileye_protocol",
     srcs = [
+        "aftermarket_669.cc",
         "details_738.cc",
         "details_739.cc",
         "details_73a.cc",
         "details_73b.cc",
     ],
     hdrs = [
+        "aftermarket_669.h",
         "details_738.h",
         "details_739.h",
         "details_73a.h",
@@ -19,6 +21,18 @@ cc_library(
     deps = [
         "//modules/drivers/proto:sensor_proto",
         "//modules/drivers:sensor_message_manager_base",
+    ],
+)
+
+cc_test(
+    name = "aftermarket_669_test",
+    size = "small",
+    srcs = [
+        "aftermarket_669_test.cc",
+    ],
+    deps = [
+        ":drivers_mobileye_protocol",
+        "@gtest//:main",
     ],
 )
 
