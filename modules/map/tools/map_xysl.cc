@@ -221,6 +221,8 @@ int main(int argc, char *argv[]) {
               << end_point.y() << "," << end_heading
               << " left_width:" << left_width << " right_width:" << right_width
               << std::endl;
+    std::cout.unsetf(std::ios_base::fixed);
+
     if (FLAGS_dump_lane_width) {
       const auto sample_left_widthes = lane_ptr->sampled_left_width();
       std::cout << "left width num: " << sample_left_widthes.size()
