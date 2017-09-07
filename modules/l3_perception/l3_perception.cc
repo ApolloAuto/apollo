@@ -15,13 +15,13 @@
  *****************************************************************************/
 #include "modules/l3_perception/l3_perception.h"
 
-#include "ros/include/ros/ros.h"
+#include <cmath>
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
-
-#include <cmath>
+#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace l3_perception {
@@ -35,9 +35,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
 
-std::string L3Perception::Name() const {
-  return FLAGS_hmi_name;
-}
+std::string L3Perception::Name() const { return FLAGS_hmi_name; }
 
 Status L3Perception::Init() {
   AdapterManager::Init(FLAGS_adapter_config_path);
@@ -46,7 +44,8 @@ Status L3Perception::Init() {
   AdapterManager::AddMobileyeCallback(&L3Perception::OnMobileye, this);
   CHECK(AdapterManager::GetDelphiESR()) << "DelphiESR is not initialized.";
   AdapterManager::AddDelphiESRCallback(&L3Perception::OnDelphiESR, this);
-  CHECK(AdapterManager::GetLocalization()) << "Localization is not initialized.";
+  CHECK(AdapterManager::GetLocalization())
+      << "Localization is not initialized.";
   AdapterManager::AddLocalizationCallback(&L3Perception::OnLocalization, this);
 
   return Status::OK();
@@ -54,15 +53,13 @@ Status L3Perception::Init() {
 
 Status L3Perception::Start() {
   const double duration = 1.0 / FLAGS_l3_perception_freq;
-  timer_ = AdapterManager::CreateTimer(
-      ros::Duration(duration), &L3Perception::OnTimer, this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
+                                       &L3Perception::OnTimer, this);
 
   return Status::OK();
 }
 
-void L3Perception::Stop() {
-  timer_.stop();
-}
+void L3Perception::Stop() { timer_.stop(); }
 
 void L3Perception::OnMobileye(const Mobileye& message) {
   AINFO << "receive Mobileye callback";
@@ -91,51 +88,56 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
   double adc_velocity = std::sqrt(adc_vx * adc_vx + adc_vy * adc_vy);
 
   double adc_theta =
-      std::atan2(2.0 * adc_quaternion.qw() * adc_quaternion.qz() + 
-        adc_quaternion.qx() * adc_quaternion.qy(),
-        1.0 - 2.0 * (adc_quaternion.qy() * adc_quaternion.qy() +
-                     adc_quaternion.qz() * adc_quaternion.qz())) +
+      std::atan2(2.0 * adc_quaternion.qw() * adc_quaternion.qz() +
+                     adc_quaternion.qx() * adc_quaternion.qy(),
+                 1.0 -
+                     2.0 * (adc_quaternion.qy() * adc_quaternion.qy() +
+                            adc_quaternion.qz() * adc_quaternion.qz())) +
       acos(-1.0) / 2.0;
 
-  for (int index = 0; index < mobileye.details_738().num_obstacles() && index < mobileye.details_739_size(); ++index) {
+  for (int index = 0; index < mobileye.details_738().num_obstacles() &&
+                      index < mobileye.details_739_size();
+       ++index) {
     auto* mob = obstacles.add_perception_obstacle();
     const auto& data_739 = mobileye.details_739(index);
     int mob_id = data_739.obstacle_id();
     double mob_pos_x = data_739.obstacle_pos_x();
-    double mob_pos_y = - data_739.obstacle_pos_y();
+    double mob_pos_y = -data_739.obstacle_pos_y();
     double mob_vel_x = data_739.obstacle_rel_vel_x();
     int mob_type = data_739.obstacle_type();
 
     double mob_l = 0.0;
     if (mob_type == 0) {
-      mob_l = 5; // car
+      mob_l = 5;  // car
     } else if (mob_type == 1) {
-      mob_l = 10; // truck
+      mob_l = 10;  // truck
     } else if (mob_type == 2 || mob_type == 4) {
-      mob_l = 2; // bike
+      mob_l = 2;  // bike
     } else if (mob_type == 3) {
-      mob_l = .5; // ped
+      mob_l = .5;  // ped
     }
 
     double mob_w = 0.0;
     if (mobileye.details_73a_size() <= index) {
-        if (mob_type == 0) {
-            mob_w = 3;
-        } else if (mob_type == 1) {
-            mob_w = 5;
-        } else if (mob_type == 2 || mob_type == 4) {
-            mob_w = 1;
-        } else if (mob_type == 3) {
-            mob_w = 0.5;
-        }
+      if (mob_type == 0) {
+        mob_w = 3;
+      } else if (mob_type == 1) {
+        mob_w = 5;
+      } else if (mob_type == 2 || mob_type == 4) {
+        mob_w = 1;
+      } else if (mob_type == 3) {
+        mob_w = 0.5;
+      }
     } else {
-        mob_w = mobileye.details_73a(index).obstacle_width();
+      mob_w = mobileye.details_73a(index).obstacle_width();
     }
 
-    mob_pos_x += 3.0; // offset: imu <-> mobileye
+    mob_pos_x += 3.0;  // offset: imu <-> mobileye
 
-    double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) + mob_pos_y * std::sin(adc_theta);
-    double converted_y = adc_y + mob_pos_x * std::sin(adc_theta) - mob_pos_y * std::cos(adc_theta);
+    double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) +
+                         mob_pos_y * std::sin(adc_theta);
+    double converted_y = adc_y + mob_pos_x * std::sin(adc_theta) -
+                         mob_pos_y * std::cos(adc_theta);
     double converted_speed = adc_velocity + mob_vel_x;
     double converted_vx = converted_speed * std::cos(adc_theta);
     double converted_vy = converted_speed * std::sin(adc_theta);
@@ -147,21 +149,21 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     switch (mob_type) {
       case 0:
       case 1: {
-          mob->set_type(PerceptionObstacle::VEHICLE); // VEHICLE
-          break;
+        mob->set_type(PerceptionObstacle::VEHICLE);  // VEHICLE
+        break;
       }
       case 2:
       case 4: {
-          mob->set_type(PerceptionObstacle::BICYCLE); // BIKE
-          break;
+        mob->set_type(PerceptionObstacle::BICYCLE);  // BIKE
+        break;
       }
       case 3: {
-          mob->set_type(PerceptionObstacle::PEDESTRIAN); // PED
-          break;
+        mob->set_type(PerceptionObstacle::PEDESTRIAN);  // PED
+        break;
       }
       default: {
-          mob->set_type(PerceptionObstacle::UNKNOWN); // UNKNOWN
-          break;
+        mob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
+        break;
       }
     }
 
@@ -178,36 +180,52 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     double z0 = 0.0;
     double heading = mob->theta();
     auto* p1_upper = mob->add_polygon_point();
-    p1_upper->set_x(x0 + mob_l * std::cos(heading) / 2.0 + mob_w * std::sin(heading) / 2.0);
-    p1_upper->set_y(y0 + mob_l * std::sin(heading) / 2.0 - mob_w * std::cos(heading) / 2.0);
+    p1_upper->set_x(x0 + mob_l * std::cos(heading) / 2.0 +
+                    mob_w * std::sin(heading) / 2.0);
+    p1_upper->set_y(y0 + mob_l * std::sin(heading) / 2.0 -
+                    mob_w * std::cos(heading) / 2.0);
     p1_upper->set_z(z0 + mob->height() / 2.0);
     auto* p1_lower = mob->add_polygon_point();
-    p1_lower->set_x(x0 + mob_l * std::cos(heading) / 2.0 + mob_w * std::sin(heading) / 2.0);
-    p1_lower->set_y(y0 + mob_l * std::sin(heading) / 2.0 - mob_w * std::cos(heading) / 2.0);
+    p1_lower->set_x(x0 + mob_l * std::cos(heading) / 2.0 +
+                    mob_w * std::sin(heading) / 2.0);
+    p1_lower->set_y(y0 + mob_l * std::sin(heading) / 2.0 -
+                    mob_w * std::cos(heading) / 2.0);
     p1_lower->set_z(z0 - mob->height() / 2.0);
     auto* p2_upper = mob->add_polygon_point();
-    p2_upper->set_x(x0 + mob_l * std::cos(heading) / 2.0 - mob_w * std::sin(heading) / 2.0);
-    p2_upper->set_y(y0 + mob_l * std::sin(heading) / 2.0 + mob_w * std::cos(heading) / 2.0);
+    p2_upper->set_x(x0 + mob_l * std::cos(heading) / 2.0 -
+                    mob_w * std::sin(heading) / 2.0);
+    p2_upper->set_y(y0 + mob_l * std::sin(heading) / 2.0 +
+                    mob_w * std::cos(heading) / 2.0);
     p2_upper->set_z(z0 + mob->height() / 2.0);
     auto* p2_lower = mob->add_polygon_point();
-    p2_lower->set_x(x0 + mob_l * std::cos(heading) / 2.0 - mob_w * std::sin(heading) / 2.0);
-    p2_lower->set_y(y0 + mob_l * std::sin(heading) / 2.0 + mob_w * std::cos(heading) / 2.0);
+    p2_lower->set_x(x0 + mob_l * std::cos(heading) / 2.0 -
+                    mob_w * std::sin(heading) / 2.0);
+    p2_lower->set_y(y0 + mob_l * std::sin(heading) / 2.0 +
+                    mob_w * std::cos(heading) / 2.0);
     p2_lower->set_z(z0 - mob->height() / 2.0);
     auto* p3_upper = mob->add_polygon_point();
-    p3_upper->set_x(x0 - mob_l * std::cos(heading) / 2.0 - mob_w * std::sin(heading) / 2.0);
-    p3_upper->set_y(y0 - mob_l * std::sin(heading) / 2.0 + mob_w * std::cos(heading) / 2.0);
+    p3_upper->set_x(x0 - mob_l * std::cos(heading) / 2.0 -
+                    mob_w * std::sin(heading) / 2.0);
+    p3_upper->set_y(y0 - mob_l * std::sin(heading) / 2.0 +
+                    mob_w * std::cos(heading) / 2.0);
     p3_upper->set_z(z0 + mob->height() / 2.0);
     auto* p3_lower = mob->add_polygon_point();
-    p3_lower->set_x(x0 - mob_l * std::cos(heading) / 2.0 - mob_w * std::sin(heading) / 2.0);
-    p3_lower->set_y(y0 - mob_l * std::sin(heading) / 2.0 + mob_w * std::cos(heading) / 2.0);
+    p3_lower->set_x(x0 - mob_l * std::cos(heading) / 2.0 -
+                    mob_w * std::sin(heading) / 2.0);
+    p3_lower->set_y(y0 - mob_l * std::sin(heading) / 2.0 +
+                    mob_w * std::cos(heading) / 2.0);
     p3_lower->set_z(z0 - mob->height() / 2.0);
     auto* p4_upper = mob->add_polygon_point();
-    p4_upper->set_x(x0 - mob_l * std::cos(heading) / 2.0 + mob_w * std::sin(heading) / 2.0);
-    p4_upper->set_y(y0 - mob_l * std::sin(heading) / 2.0 - mob_w * std::cos(heading) / 2.0);
+    p4_upper->set_x(x0 - mob_l * std::cos(heading) / 2.0 +
+                    mob_w * std::sin(heading) / 2.0);
+    p4_upper->set_y(y0 - mob_l * std::sin(heading) / 2.0 -
+                    mob_w * std::cos(heading) / 2.0);
     p4_upper->set_z(z0 + mob->height() / 2.0);
     auto* p4_lower = mob->add_polygon_point();
-    p4_lower->set_x(x0 - mob_l * std::cos(heading) / 2.0 + mob_w * std::sin(heading) / 2.0);
-    p4_lower->set_y(y0 - mob_l * std::sin(heading) / 2.0 - mob_w * std::cos(heading) / 2.0);
+    p4_lower->set_x(x0 - mob_l * std::cos(heading) / 2.0 +
+                    mob_w * std::sin(heading) / 2.0);
+    p4_lower->set_y(y0 - mob_l * std::sin(heading) / 2.0 -
+                    mob_w * std::cos(heading) / 2.0);
     p4_lower->set_z(z0 - mob->height() / 2.0);
   }
 
@@ -220,8 +238,9 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   apollo::perception::PerceptionObstacles obstacles;
 
   // if (mobileye_.header().timestamp_sec() >= last_timestamp_) {
-    apollo::perception::PerceptionObstacles mobileye_obstacles = ConvertToPerceptionObstacles(mobileye_, localization_);
-    obstacles.MergeFrom(mobileye_obstacles);
+  apollo::perception::PerceptionObstacles mobileye_obstacles =
+      ConvertToPerceptionObstacles(mobileye_, localization_);
+  obstacles.MergeFrom(mobileye_obstacles);
   // }
 
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
