@@ -132,8 +132,6 @@ new_local_repository(
     path = "/usr/include/caffe",
 )
 
-
-
 # YAML-CPP
 new_http_archive(
     name = "yaml_cpp",
