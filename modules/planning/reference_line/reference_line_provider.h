@@ -57,6 +57,7 @@ class ReferenceLineProvider {
             const ReferenceLineSmootherConfig& smoother_config);
 
   bool Start();
+  void Stop() { is_stop_ = true; }
 
   std::vector<ReferenceLine> GetReferenceLines();
 
@@ -75,6 +76,8 @@ class ReferenceLineProvider {
   const hdmap::PncMap* pnc_map_ = nullptr;
   routing::RoutingResponse routing_response_;
   ReferenceLineSmootherConfig smoother_config_;
+
+  bool is_stop_ = false;
 
   std::mutex reference_line_groups_mutex_;
   std::list<std::vector<ReferenceLine>> reference_line_groups_;

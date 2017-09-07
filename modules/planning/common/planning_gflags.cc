@@ -51,6 +51,9 @@ DEFINE_double(max_collision_distance, 0.1,
 DEFINE_double(replan_distance_threshold, 5.0,
               "The distance threshold of replan");
 
+DEFINE_bool(enable_reference_line_provider_thread, false,
+            "Enable reference line provider thread.");
+
 DEFINE_double(default_reference_line_width, 4.0,
               "Default reference line width");
 

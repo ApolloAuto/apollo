@@ -32,6 +32,8 @@ namespace planning {
 
 using apollo::common::VehicleState;
 
+ReferenceLineProvider::ReferenceLineProvider() {}
+
 ReferenceLineProvider::~ReferenceLineProvider() {
   if (thread_ && thread_->joinable()) {
     thread_->join();
@@ -59,9 +61,7 @@ bool ReferenceLineProvider::Start() {
 }
 
 void ReferenceLineProvider::Generate() {
-  // TODO: implement this function.
-
-  while (true) {
+  while (!is_stop_) {
     const auto &curr_adc_position =
         common::VehicleState::instance()->pose().position();
     const auto adc_point_enu = common::util::MakePointENU(
