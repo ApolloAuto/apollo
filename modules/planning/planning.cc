@@ -233,6 +233,8 @@ void Planning::RunOnce() {
 
   end_timestamp = Clock::NowInSecond();
   time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
+
   trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: "
          << trajectory_pb->latency_stats().DebugString();

@@ -92,7 +92,11 @@ void ReferenceLineProvider::Generate() {
       AERROR << "Fail to create reference line at position: "
              << curr_adc_position.ShortDebugString();
     }
-    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(500));
+    AINFO << "ReferenceLine smoothed with adc position: "
+          << curr_adc_position.ShortDebugString();
+    const int32_t kReferenceLineProviderSleepTime = 1000;
+    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
+        kReferenceLineProviderSleepTime));
   }
 }
 
@@ -113,11 +117,12 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
     const common::PointENU &position, const routing::RoutingResponse &routing) {
   std::vector<std::vector<hdmap::LaneSegment>> route_segments;
 
-  const double kBackwardDistance = 20;
-  const double kForwardDistance = 100;
-  if (!pnc_map_->GetLaneSegmentsFromRouting(routing, position,
-                                            kBackwardDistance, kForwardDistance,
-                                            &route_segments)) {
+  // additional smooth reference line length, unit: meter
+  const double kForwardAdditionalLength = 30;
+  if (!pnc_map_->GetLaneSegmentsFromRouting(
+          routing, position, FLAGS_look_backward_distance,
+          FLAGS_look_forward_distance + kForwardAdditionalLength,
+          &route_segments)) {
     AERROR << "Failed to extract segments from routing";
     return false;
   }
