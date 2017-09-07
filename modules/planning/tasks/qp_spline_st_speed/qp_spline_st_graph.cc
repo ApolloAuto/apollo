@@ -338,6 +338,9 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
       if (boundary.boundary_type() != StBoundary::BoundaryType::FOLLOW) {
         continue;
       }
+      if (curr_t < boundary.min_t() || curr_t > boundary.max_t()) {
+        continue;
+      }
       double s_upper = 0.0;
       double s_lower = 0.0;
       if (boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
