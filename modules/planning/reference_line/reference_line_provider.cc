@@ -60,6 +60,13 @@ bool ReferenceLineProvider::Start() {
   return true;
 }
 
+void ReferenceLineProvider::Stop() {
+  is_stop_ = true;
+  if (thread_ && thread_->joinable()) {
+    thread_->join();
+  }
+}
+
 void ReferenceLineProvider::Generate() {
   while (!is_stop_) {
     const auto &curr_adc_position =
