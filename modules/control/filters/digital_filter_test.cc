@@ -30,16 +30,33 @@ class DigitalFilterTest : public ::testing::Test {
 
 TEST_F(DigitalFilterTest, SetGet) {
   DigitalFilter digital_filter;
-  digital_filter.set_coefficients(0.01, 20);
+  std::vector<double> numerators = {1.0, 2.0, 3.0};
+  std::vector<double> denominators = {4.0, 5.0, 6.0};
+  digital_filter.set_denominators(denominators);
+  digital_filter.set_numerators(numerators);
   std::vector<double> denominators_got = digital_filter.denominators();
   std::vector<double> numerators_got = digital_filter.numerators();
-  EXPECT_EQ(numerators_got.size(), 3);
-  EXPECT_EQ(denominators_got.size(), 3);
-  EXPECT_NEAR(numerators_got[0], 0.1729, 0.01);
-  EXPECT_NEAR(numerators_got[1], 0.3458, 0.01);
-  EXPECT_NEAR(numerators_got[2], 0.1729, 0.01);
-  EXPECT_NEAR(denominators_got[0], 1.0, 0.01);
-  EXPECT_NEAR(denominators_got[2], 0.2217, 0.01);
+  EXPECT_EQ(numerators_got.size(), numerators.size());
+  EXPECT_EQ(denominators_got.size(), denominators.size());
+  for (size_t i = 0; i < numerators.size(); ++i) {
+    EXPECT_DOUBLE_EQ(numerators_got[i], numerators[i]);
+  }
+  for (size_t i = 0; i < denominators.size(); ++i) {
+    EXPECT_DOUBLE_EQ(denominators_got[i], denominators[i]);
+  }
+  digital_filter.set_coefficients(denominators, numerators);
+  denominators_got.clear();
+  denominators_got = digital_filter.denominators();
+  numerators_got.clear();
+  numerators_got = digital_filter.numerators();
+  EXPECT_EQ(numerators_got.size(), numerators.size());
+  EXPECT_EQ(denominators_got.size(), denominators.size());
+  for (size_t i = 0; i < numerators.size(); ++i) {
+    EXPECT_DOUBLE_EQ(numerators_got[i], numerators[i]);
+  }
+  for (size_t i = 0; i < denominators.size(); ++i) {
+    EXPECT_DOUBLE_EQ(denominators_got[i], denominators[i]);
+  }
 
   double dead_zone = 1.0;
   digital_filter.set_dead_zone(dead_zone);
@@ -47,7 +64,9 @@ TEST_F(DigitalFilterTest, SetGet) {
 }
 
 TEST_F(DigitalFilterTest, FilterOff) {
-  DigitalFilter digital_filter(0.1, 0);
+  std::vector<double> numerators = {0.0, 0.0, 0.0};
+  std::vector<double> denominators = {1.0, 0.0, 0.0};
+  DigitalFilter digital_filter(denominators, numerators);
 
   const std::vector<double> step_input(100, 1.0);
   std::vector<double> rand_input(100, 1.0);
@@ -67,17 +86,21 @@ TEST_F(DigitalFilterTest, FilterOff) {
 }
 
 TEST_F(DigitalFilterTest, MovingAverage) {
-  DigitalFilter digital_filter(0.25, 1);
+  std::vector<double> numerators = {0.25, 0.25, 0.25, 0.25};
+  std::vector<double> denominators = {1.0, 0.0, 0.0};
+  DigitalFilter digital_filter;
+  digital_filter.set_numerators(numerators);
+  digital_filter.set_denominators(denominators);
 
   const std::vector<double> step_input(100, 1.0);
   // Check step input, transients.
   for (size_t i = 0; i < 4; ++i) {
     double expected_filter_out = (i + 1) * 0.25;
-    EXPECT_NEAR(digital_filter.Filter(step_input[i]), expected_filter_out, 0.5);
+    EXPECT_FLOAT_EQ(digital_filter.Filter(step_input[i]), expected_filter_out);
   }
   // Check step input, steady state
   for (size_t i = 4; i < step_input.size(); ++i) {
-    EXPECT_NEAR(digital_filter.Filter(step_input[i]), 1.0, 0.1);
+    EXPECT_FLOAT_EQ(digital_filter.Filter(step_input[i]), 1.0);
   }
 }
 

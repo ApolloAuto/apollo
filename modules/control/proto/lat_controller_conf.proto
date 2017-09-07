@@ -5,7 +5,8 @@ package apollo.control;
 // simple optimal steer control param
 message LatControllerConf {
   optional double ts = 1;            // sample time (dt) 0.01 now, configurable
-  optional double preview_time = 2;
+  // preview window n, preview time = preview window * ts
+  optional int32 preview_window = 2;
   optional double cf = 3;
   optional double cr = 4;            // N/rad
   optional int32 mass_fl = 5;

@@ -29,37 +29,27 @@ const double kDoubleEpsilon = 1.0e-6;
 namespace apollo {
 namespace control {
 
-DigitalFilter::DigitalFilter(const double ts, const double cutoff_freq) {
+DigitalFilter::DigitalFilter(const std::vector<double> &denominators,
+                             const std::vector<double> &numerators) {
   dead_zone_ = 0.0;
   last_ = 0.0;
-
-  set_coefficients(ts, cutoff_freq);
+  set_coefficients(denominators, numerators);
 }
 
-void DigitalFilter::set_coefficients(const double ts,
-                                     const double cutoff_freq) {
-  denominators_.clear();
-  numerators_.clear();
-  denominators_.reserve(3);
-  numerators_.reserve(3);
-
-  double wa = 2.0 * M_PI * cutoff_freq;  // Analog frequency in rad/s
-  double alpha = wa * ts / 2.0;          // tan(Wd/2), Wd is discrete frequency
-  double alpha_sqr = alpha * alpha;
-  double tmp_term = std::sqrt(2.0) * alpha + alpha_sqr;
-  double gain = alpha_sqr / (1.0 + tmp_term);
-
-  denominators_.push_back(1.0);
-  denominators_.push_back(2.0 * (alpha_sqr - 1.0) / (1.0 + tmp_term));
-  denominators_.push_back((1.0 - std::sqrt(2.0) * alpha + alpha_sqr) /
-                          (1.0 + tmp_term));
-
-  numerators_.push_back(gain);
-  numerators_.push_back(2.0 * gain);
-  numerators_.push_back(gain);
-
-  x_values_.resize(numerators_.size(), 0.0);
+void DigitalFilter::set_denominators(const std::vector<double> &denominators) {
+  denominators_ = denominators;
   y_values_.resize(denominators_.size(), 0.0);
+}
+
+void DigitalFilter::set_numerators(const std::vector<double> &numerators) {
+  numerators_ = numerators;
+  x_values_.resize(numerators_.size(), 0.0);
+}
+
+void DigitalFilter::set_coefficients(const std::vector<double> &denominators,
+                                     const std::vector<double> &numerators) {
+  set_denominators(denominators);
+  set_numerators(numerators);
 }
 
 void DigitalFilter::set_dead_zone(const double deadzone) {

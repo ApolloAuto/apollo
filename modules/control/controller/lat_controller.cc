@@ -100,7 +100,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   CHECK_GT(ts_, 0.0) << "[LatController] Invalid control update interval.";
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
-  preview_time_ = control_conf->lat_controller_conf().preview_time();
+  preview_window_ = control_conf->lat_controller_conf().preview_window();
   wheelbase_ = vehicle_param_.wheel_base();
   steer_transmission_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
@@ -156,8 +156,11 @@ void LatController::LogInitParameters() {
 
 void LatController::InitializeFilters(const ControlConf *control_conf) {
   // Low pass filter
-  digital_filter_.set_coefficients(ts_,
-                            control_conf->lat_controller_conf().cutoff_freq());
+  std::vector<double> den(3, 0.0);
+  std::vector<double> num(3, 0.0);
+  LpfCoefficients(ts_, control_conf->lat_controller_conf().cutoff_freq(), &den,
+                  &num);
+  digital_filter_.set_coefficients(den, num);
   // Mean filters
   /**
   heading_rate_filter_ = MeanFilter(
@@ -174,7 +177,7 @@ Status LatController::Init(const ControlConf *control_conf) {
                   "failed to load control_conf");
   }
   // Matrix init operations.
-  int matrix_size = basic_state_size_ + std::floor(preview_time_/ts_);
+  int matrix_size = basic_state_size_ + preview_window_;
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_adc_ = Matrix::Zero(matrix_size, matrix_size);
@@ -420,8 +423,7 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
   matrix_state_(3, 0) = debug->heading_error_rate();
 
   // Next elements are depending on preview window size;
-  int preview_window = std::floor(preview_time_ / ts_);
-  for (int i = 0; i < preview_window; ++i) {
+  for (int i = 0; i < preview_window_; ++i) {
     double preview_time = ts_ * (i + 1);
     const auto &future_position_estimate =
         VehicleState::instance()->EstimateFuturePosition(preview_time);
@@ -452,8 +454,7 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
   matrix_state_(3, 0) = debug->heading_error_rate();
 
   // Next elements are depending on preview window size;
-  int preview_window = std::floor(preview_time_ / ts_);
-  for (int i = 0; i < preview_window; ++i) {
+  for (int i = 0; i < preview_window_; ++i) {
     double preview_time = ts_ * (i + 1);
     auto preview_point =
         trajectory_analyzer_.QueryNearestPointByRelativeTime(preview_time);
@@ -487,11 +488,10 @@ void LatController::UpdateMatrixCompound() {
   // Initialize preview matrix
   matrix_adc_.block(0, 0, basic_state_size_, basic_state_size_) = matrix_ad_;
   matrix_bdc_.block(0, 0, basic_state_size_, 1) = matrix_bd_;
-  if (preview_time_ > 0.0) {
+  if (preview_window_ > 0) {
     matrix_bdc_(matrix_bdc_.rows() - 1, 0) = 1;
     // Update augument A matrix;
-    int preview_window = std::floor(preview_time_ / ts_);
-    for (int i = 0; i < preview_window - 1; ++i) {
+    for (int i = 0; i < preview_window_ - 1; ++i) {
       matrix_adc_(basic_state_size_ + i, basic_state_size_ + 1 + i) = 1;
     }
   }
