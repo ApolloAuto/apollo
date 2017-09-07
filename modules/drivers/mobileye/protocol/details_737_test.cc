@@ -14,37 +14,39 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/delphi_esr/protocol/test_4e0.h"
+#include "modules/drivers/mobileye/protocol/details_737.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace drivers {
-namespace delphi_esr {
+namespace mobileye {
 
-class Test4e0Test : public ::testing::Test {
+class Details737Test : public ::testing::Test {
  public:
   virtual void SetUp() {}
 };
 
-TEST_F(Test4e0Test, Parse) {
-  Test4e0 test_4e0;
+TEST_F(Details737Test, Parse) {
+  Details737 details_737;
   int32_t length = 8;
-  DelphiESR delphi_esr;
+  Mobileye mobileye;
   uint8_t bytes[8];
 
-  bytes[0] = 0b00000010;
-  bytes[1] = 0b00000101;
-  bytes[2] = 0b00000101;
-  bytes[3] = 0b00000001;
-  bytes[4] = 0b00000101;
-  bytes[5] = 0b00000011;
+  bytes[0] = 0b00000000;
+  bytes[1] = 0b01000000;
+  bytes[2] = 0b00100000;
+  bytes[3] = 0b00000010;
+  bytes[4] = 0b00000000;
+  bytes[5] = 0b00000000;
+  bytes[6] = 0b00000000;
+  bytes[7] = 0b00000000;
 
-  test_4e0.Parse(bytes, length, &delphi_esr);
-  // TODO(lizh): add more checks
-  EXPECT_EQ(261, delphi_esr.test_4e0().scan_index());
+  details_737.Parse(bytes, length, &mobileye);
+  EXPECT_NEAR(0.065536, mobileye.details_737().lane_curvature(), 1e-6);
+  EXPECT_NEAR(0.272, mobileye.details_737().lane_heading(), 1e-6);
 }
 
-}  // namespace delphi_esr
+}  // namespace mobileye
 }  // namespace drivers
 }  // namespace apollo

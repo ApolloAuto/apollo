@@ -22,10 +22,19 @@
 #define MODULES_DRIVERS_MOBILEYE_MESSAGE_MANAGER_H_
 
 #include "modules/drivers/mobileye/protocol/aftermarket_669.h"
+#include "modules/drivers/mobileye/protocol/details_737.h"
 #include "modules/drivers/mobileye/protocol/details_738.h"
 #include "modules/drivers/mobileye/protocol/details_739.h"
 #include "modules/drivers/mobileye/protocol/details_73a.h"
 #include "modules/drivers/mobileye/protocol/details_73b.h"
+#include "modules/drivers/mobileye/protocol/lka_766.h"
+#include "modules/drivers/mobileye/protocol/lka_767.h"
+#include "modules/drivers/mobileye/protocol/lka_768.h"
+#include "modules/drivers/mobileye/protocol/lka_769.h"
+#include "modules/drivers/mobileye/protocol/next_76c.h"
+#include "modules/drivers/mobileye/protocol/next_76d.h"
+#include "modules/drivers/mobileye/protocol/num_76b.h"
+#include "modules/drivers/mobileye/protocol/reference_76a.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/drivers/sensor_message_manager.h"
 
@@ -35,10 +44,19 @@ namespace drivers {
 template <>
 SensorMessageManager<Mobileye>::SensorMessageManager() {
   AddRecvProtocolData<::apollo::drivers::mobileye::Aftermarket669, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Details737, true>();
   AddRecvProtocolData<::apollo::drivers::mobileye::Details738, true>();
   AddRecvProtocolData<::apollo::drivers::mobileye::Details739, true>();
   AddRecvProtocolData<::apollo::drivers::mobileye::Details73a, true>();
   AddRecvProtocolData<::apollo::drivers::mobileye::Details73b, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Lka766, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Lka767, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Lka768, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Lka769, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Next76c, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Next76d, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Num76b, true>();
+  AddRecvProtocolData<::apollo::drivers::mobileye::Reference76a, true>();
 }
 
 template <>
