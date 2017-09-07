@@ -96,7 +96,7 @@ Status Canbus::Init() {
   }
   AINFO << "The vehicle controller is successfully initialized.";
 
-  AdapterManager::Init();
+  AdapterManager::Init(FLAGS_adapter_config_path);
 
   AINFO << "The adapter manager is successfully initialized.";
 

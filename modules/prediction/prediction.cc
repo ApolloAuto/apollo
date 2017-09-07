@@ -16,16 +16,16 @@
 
 #include "modules/prediction/prediction.h"
 
-#include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/evaluator/evaluator_manager.h"
-#include "modules/prediction/predictor/predictor_manager.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/file.h"
+#include "modules/prediction/evaluator/evaluator_manager.h"
+#include "modules/prediction/predictor/predictor_manager.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -38,9 +38,7 @@ using ::apollo::common::adapter::AdapterConfig;
 using ::apollo::common::Status;
 using ::apollo::common::ErrorCode;
 
-std::string Prediction::Name() const {
-  return FLAGS_prediction_module_name;
-}
+std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 Status Prediction::Init() {
   // Load prediction conf
@@ -65,7 +63,7 @@ Status Prediction::Init() {
   }
 
   // Initialization of all managers
-  AdapterManager::instance()->Init();
+  AdapterManager::instance()->Init(adapter_conf_);
   ContainerManager::instance()->Init(adapter_conf_);
   EvaluatorManager::instance()->Init(prediction_conf_);
   PredictorManager::instance()->Init(prediction_conf_);
@@ -82,16 +80,14 @@ Status Prediction::Init() {
   return Status::OK();
 }
 
-Status Prediction::Start() {
-  return Status::OK();
-}
+Status Prediction::Start() { return Status::OK(); }
 
 void Prediction::Stop() {}
 
-void Prediction::OnLocalization(const LocalizationEstimate &localization) {
+void Prediction::OnLocalization(const LocalizationEstimate& localization) {
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
-      AdapterConfig::PERCEPTION_OBSTACLES));
+          AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
 
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
@@ -102,8 +98,7 @@ void Prediction::OnLocalization(const LocalizationEstimate &localization) {
   PerceptionObstacle* pose_ptr = pose_container->ToPerceptionObstacle();
   if (pose_ptr != nullptr) {
     obstacles_container->InsertPerceptionObstacle(
-        *(pose_ptr),
-        pose_container->GetTimestamp());
+        *(pose_ptr), pose_container->GetTimestamp());
   } else {
     ADEBUG << "Invalid pose found.";
   }
@@ -112,10 +107,10 @@ void Prediction::OnLocalization(const LocalizationEstimate &localization) {
          << localization.ShortDebugString() << "].";
 }
 
-void Prediction::OnPerception(const PerceptionObstacles &perception_obstacles) {
+void Prediction::OnPerception(const PerceptionObstacles& perception_obstacles) {
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
-      AdapterConfig::PERCEPTION_OBSTACLES));
+          AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles);
   EvaluatorManager::instance()->Run(perception_obstacles);
