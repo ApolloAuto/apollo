@@ -87,6 +87,7 @@ bool FileUtil::DeleteFile(const string& filename) {
     FileType temp_type;
     if (!GetType(temp_file, &temp_type)) {
       AWARN << "failed to get file type: " << temp_file;
+      closedir(dir);
       return false;
     }
     if (type == TYPE_DIR) {
@@ -124,7 +125,7 @@ bool FileUtil::CreateDir(const string& dir) {
   int ret = mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
   if (ret != 0) {
     AWARN << "failed to create dir. [dir: " << dir
-          << "] [err: " << strerror(ret) << "]";
+          << "] [err: " << strerror(errno) << "]";
     return false;
   }
   return true;
@@ -143,6 +144,7 @@ bool FileUtil::GetFileContent(const string& path, string* content) {
   struct stat buf;
   if (::fstat(fd, &buf) != 0) {
     AWARN << "failed to lstat file: " << path;
+    ::close(fd);
     return false;
   }
 
@@ -159,6 +161,7 @@ bool FileUtil::GetFileContent(const string& path, string* content) {
     }
     has_read += size;
   } while (size > 0);
+  ::close(fd);
   return true;
 }
 

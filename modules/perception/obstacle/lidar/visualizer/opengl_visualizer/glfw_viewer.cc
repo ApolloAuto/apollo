@@ -411,7 +411,7 @@ void GLFWViewer::DrawCarForwardDir() {
 void GLFWViewer::DrawObstacle(const ObjectPtr obj, bool show_cloud,
                               bool show_polygon, bool show_velocity,
                               bool show_direction) {
-  float type_color[3];
+  float type_color[3] = {0, 0, 0};
   GetClassColor(obj->type, type_color);
   if (show_polygon) {
     double h = obj->height;
