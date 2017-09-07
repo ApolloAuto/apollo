@@ -10,7 +10,11 @@
   .right_panel .glyphicon {
     font-size: 16px;
   }
-  
+
+  .right_panel .caret {
+  	margin-top: 5px;
+  }
+
   .dropdown .dropdown-toggle {
     width: 180px;
   }
@@ -64,8 +68,8 @@
       <div class="item_content">Map
         <div class="dropdown pull-right">
           <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
-            <span class="current_map">Please select</span>
-            <span class="caret"></span>
+            <span class="current_map pull-left">Please select</span>
+            <span class="caret pull-right"></span>
           </button>
           <ul class="dropdown-menu">
             {% for map in conf_pb.available_maps %}
@@ -82,8 +86,8 @@
       <div class="item_content">Vehicle
         <div class="dropdown pull-right">
           <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
-            <span class="current_vehicle">Please select</span>
-            <span class="caret"></span>
+            <span class="current_vehicle pull-left">Please select</span>
+            <span class="caret pull-right vcenter"></span>
           </button>
           <ul class="dropdown-menu">
             {% for vehicle in conf_pb.available_vehicles %}
@@ -96,7 +100,6 @@
       </div>
     </li>
   </ul>
-</div>
 
 <div id="profile_dialog" class="modal fade" role="dialog" align="center">
   <div class="modal-dialog">
@@ -112,7 +115,8 @@
               <div class="dropdown pull-right">
                 <button class="btn hmi_small_btn dropdown-toggle" type="button"
                     data-toggle="dropdown">
-                  <span class="current_map"></span><span class="caret"></span>
+                  <span class="current_map pull-left"></span>
+                  <span class="caret pull-right"></span>
                 </button>
                 <ul class="dropdown-menu">
                 {% for map in conf_pb.available_maps %}
@@ -129,7 +133,8 @@
             <div class="item_content">Vehicle
               <div class="dropdown pull-right">
                 <button class="btn hmi_small_btn dropdown-toggle" type="button" data-toggle="dropdown">
-                  <span class="current_vehicle"></span><span class="caret"></span>
+                  <span class="current_vehicle pull-left"></span>
+                  <span class="caret pull-right"></span>
                 </button>
                 <ul class="dropdown-menu">
                 {% for vehicle in conf_pb.available_vehicles %}
@@ -150,6 +155,8 @@
       </div>
     </div>
   </div>
+</div>
+
 </div>
 
 <script>

@@ -33,6 +33,7 @@
       background: #2284d0;
       border-radius: 0;
       color: #ffffff;
+      padding: 0;
     }
 
     .hmi_large_btn:active {
@@ -119,8 +120,12 @@
         <span class="glyphicon"></span>
       </div>
     </div>
+  </div>
 
-    <h4 class="quick_start_row">Apollo Dev</h4>
+  <h3></h3>
+
+  <div class="quick_start_body">
+    <h4 class="quick_start_row">Follow Traffic</h4>
 
     <div class="row quick_start_row">
       <div class="col-xs-4 quick_start_col1">
