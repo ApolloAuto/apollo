@@ -32,7 +32,7 @@ int ObjectTrack::s_track_idx_ = 0;
 FilterType ObjectTrack::s_filter_method_ = KALMAN_FILTER;
 int ObjectTrackSet::s_track_consecutive_invisible_maximum_ = 1;
 float ObjectTrackSet::s_track_visible_ratio_minimum_ = 0.6;
-int ObjectTrack::s_track_cached_history_size_maximum_ = 20;
+int ObjectTrack::s_track_cached_history_size_maximum_ = 5;
 double ObjectTrack::s_acceleration_noise_maximum_ = 5;
 double ObjectTrack::s_speed_noise_maximum_ = 0.4;
 
@@ -98,6 +98,9 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   Eigen::Vector3f initial_velocity = Eigen::Vector3f::Zero();
   if (s_filter_method_ == KALMAN_FILTER) {
     filter_ = new KalmanFilter();
+  } else {
+    filter_ = new KalmanFilter();
+    AWARN << "invalid filter method! default filter (KalmanFilter) in use!";
   }
   filter_->Initialize(initial_anchor_point, initial_velocity);
 
@@ -211,8 +214,8 @@ void ObjectTrack::UpdateWithoutObject(const double& time_diff) {
   // D. update states of track
   belief_anchor_point_ = new_obj->anchor_point;
   // NEED TO NOTICE: All the states would be collected mainly based on states
-  // of tracked object included temporaryly occluded ones. Thus, update
-  // tracked object when you update the state of track !!!!
+  // of tracked object. Thus, update tracked object when you update the state
+  // of track !!!!
   new_obj->velocity = belief_velocity_;
 
   // E. update track info
@@ -259,8 +262,8 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
   // D. update states of track
   belief_anchor_point_ = new_obj->anchor_point;
   // NEED TO NOTICE: All the states would be collected mainly based on states
-  // of tracked object included temporaryly occluded ones. Thus, update
-  // tracked object when you update the state of track !!!!
+  // of tracked object. Thus, update tracked object when you update the state
+  // of track !!!!
   new_obj->velocity = belief_velocity_;
 
   // E. update track info
@@ -295,9 +298,9 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
     }
     belief_velocity_ = last_velocity;
     belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
-    // NEED TO NOTICE: All the states would be collected mainly based on
-    // states of tracked object included temporaryly occluded ones. Thus,
-    // update tracked object when you update the state of track !!!!
+    // NEED TO NOTICE: All the states would be collected mainly based on states
+    // of tracked object. Thus, update tracked object when you update the state
+    // of track !!!!
     current_object_->velocity = belief_velocity_;
     // keep static hypothesis
     return;
@@ -308,9 +311,9 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
   if (is_static_hypothesis_) {
     belief_velocity_ = Eigen::Vector3f::Zero();
     belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
-    // NEED TO NOTICE: All the states would be collected mainly based on
-    // states of tracked object included temporaryly occluded ones. Thus,
-    // update tracked object when you update the state of track !!!!
+    // NEED TO NOTICE: All the states would be collected mainly based on states
+    // of tracked object. Thus, update tracked object when you update the state
+    // of track !!!!
     current_object_->velocity = belief_velocity_;
   }
 }
@@ -349,7 +352,7 @@ bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
   if (velocity_is_noise) {
     return true;
   }
-  // Need to notice: claping small velocity may not reasonable when the true
+  // NEED TO NOTICE: claping small velocity may not reasonable when the true
   // velocity of target object is really small. e.g. a moving out vehicle in
   // a parking lot. Thus, instead of clapping all the small velocity, we clap
   // those whose history trajectory or performance is close to a static one.

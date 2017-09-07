@@ -39,7 +39,7 @@ class HungarianMatcher: public BaseMatcher{
   // @brief match detected objects to tracks
   // @params[IN] objects: new detected objects for matching
   // @params[IN] tracks: maintaining tracks for matching
-  // @params[IN] time_diff: time interval from last matching
+  // @params[IN] tracks_predict: predicted state of maintained tracks
   // @params[OUT] assignments: assignment pair of object & track
   // @params[OUT] unassigned_tracks: tracks without matched object
   // @params[OUT] unassigned_objects: objects without matched track
@@ -48,7 +48,6 @@ class HungarianMatcher: public BaseMatcher{
     std::vector<TrackedObjectPtr>* objects,
     const std::vector<ObjectTrackPtr>& tracks,
     const std::vector<Eigen::VectorXf>& tracks_predict,
-    const double& time_diff,
     std::vector<TrackObjectPair>* assignments,
     std::vector<int>* unassigned_tracks,
     std::vector<int>* unassigned_objects);
@@ -60,7 +59,8 @@ class HungarianMatcher: public BaseMatcher{
   // @params[OUT] sub_assignments: component assignment pair of object & track
   // @params[OUT] sub_unassigned_tracks: component tracks not matched
   // @params[OUT] sub_unasgined_objects: component objects not matched
-  void MatchComponents(
+  // @return nothing
+  void MatchInComponents(
     const Eigen::MatrixXf& association_mat,
     const std::vector<int>& track_component,
     const std::vector<int>& obj_component,
@@ -77,7 +77,6 @@ class HungarianMatcher: public BaseMatcher{
   // @params[IN] tracks: maintained tracks for matching
   // @params[IN] tracks_predict: predicted states of maintained tracks
   // @params[IN] new_objects: recently detected objects
-  // @params[IN] time_diff: time interval from last matching
   // @params[OUT] association_mat: matrix of association distance
   // @return nothing
   void ComputeAssociateMatrix(

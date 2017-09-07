@@ -59,7 +59,7 @@ bool HmObjectTracker::Init() {
   // A. Basic tracker setup
   std::string matcher_method_name = "hungarian_matcher";
   std::string filter_method_name = "kalman_filter";
-  int track_cached_history_size_maximum = 20;
+  int track_cached_history_size_maximum = 5;
   int track_consecutive_invisible_maximum = 1;
   float track_visible_ratio_minimum = 0.6;
   int collect_age_minimum = 0;
@@ -78,6 +78,10 @@ bool HmObjectTracker::Init() {
   }
   if (matcher_method_ == HUNGARIAN_MATCHER) {
     matcher_ = new HungarianMatcher();
+  } else {
+    matcher_method_ = HUNGARIAN_MATCHER;
+    matcher_ = new HungarianMatcher();
+    AWARN << "invalid matcher method! default HungarianMatcher in use!";
   }
   // load filter method
   if (!model_config->GetValue("filter_method_name", &filter_method_name)) {
@@ -401,7 +405,7 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   std::vector<int> unassigned_objects;
   std::vector<int> unassigned_tracks;
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
-  matcher_->Match(&transformed_objects, tracks, tracks_predict, time_diff,
+  matcher_->Match(&transformed_objects, tracks, tracks_predict,
                   &assignments, &unassigned_tracks, &unassigned_objects);
   ADEBUG << "multi-object-tracking: " << tracks.size() << "  "
         << assignments.size() << "  " << transformed_objects.size() << "  "

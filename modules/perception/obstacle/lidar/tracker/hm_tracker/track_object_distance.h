@@ -68,7 +68,7 @@ class TrackObjectDistance {
   // @params[IN] track: track for <track, object> distance computing
   // @params[IN] track_predict: predicted state of given track
   // @params[IN] new_object: recently detected object
-  // @return nothing
+  // @return computed <track, object> distance
   static float ComputeDistance(
     const ObjectTrackPtr& track,
     const Eigen::VectorXf& track_predict,

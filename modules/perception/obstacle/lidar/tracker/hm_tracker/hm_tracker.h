@@ -190,7 +190,8 @@ class HmObjectTracker : public BaseTracker{
   // @brief collect tracked results
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return nothing
-  void CollectTrackedResults(std::vector<ObjectPtr>* tracked_objects);
+  void CollectTrackedResults(
+    std::vector<ObjectPtr>* tracked_objects);
 
  private:
   // algorithm setup
