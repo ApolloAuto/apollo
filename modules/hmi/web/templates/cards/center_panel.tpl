@@ -69,18 +69,11 @@
 
   // Change UI according to status.
   function on_modules_status_change(global_status) {
-    var modules = [{% for module in conf_pb.modules %} '{{ module.name }}', {% endfor %}];
-    modules.forEach(function(module_name) {
+    global_status['modules'].forEach(function(module_status) {
       // Get module status.
-      status_code = 'UNINITIALIZED';
-      if (module_name in global_status['modules']) {
-        module_status = global_status['modules'][module_name];
-        if ('status' in module_status) {
-          status_code = module_status['status'];
-        }
-      }
-
-      $btn = $("#module_" + module_name + " .module_switch");
+      status_code = 'status' in module_status ? module_status['status']
+                                              : 'UNINITIALIZED';
+      $btn = $("#module_" + module_status['name'] + " .module_switch");
       if (status_code == 'STARTED' || status_code == 'INITIALIZED') {
         $btn.removeClass("module_switch_close").addClass("module_switch_open");
       } else {

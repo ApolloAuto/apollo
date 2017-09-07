@@ -44,31 +44,33 @@ class ToolApi(object):
         reset_all
         switch_map
     """
-    tools_status = RuntimeStatus.get_tools()
 
     @classmethod
     def setup_recording(cls):
         """SocketIO Api: setup_recording()"""
-        if not RuntimeStatus.are_all_modules_ready():
-            ModuleApi.start('all')
+        if not RuntimeStatus.are_record_replay_modules_ready():
+            ModuleApi.start('record_replay_required_modules')
         if not RuntimeStatus.are_all_hardware_ready():
             HardwareApi.health_check('all')
-        cls.tools_status.recording_status = ToolStatus.RECORDING_CHECKING
+        RuntimeStatus.get_tools().recording_status = (
+            ToolStatus.RECORDING_CHECKING)
         RuntimeStatus.broadcast_status_if_changed()
 
     @classmethod
     def start_recording(cls):
         """SocketIO Api: start_recording()"""
         cls.__exec_bash_tool('start_recording')
-        cls.tools_status.recording_status = ToolStatus.RECORDING
-        cls.tools_status.playing_status = ToolStatus.PLAYING_NOT_READY
+        tool_status = RuntimeStatus.get_tools()
+        tool_status.recording_status = ToolStatus.RECORDING
+        tool_status.playing_status = ToolStatus.PLAYING_NOT_READY
         RuntimeStatus.broadcast_status_if_changed()
 
     @classmethod
     def stop_recording(cls):
         """SocketIO Api: stop_recording()"""
         cls.__exec_bash_tool('stop_recording')
-        cls.tools_status.recording_status = ToolStatus.RECORDING_FINISHED
+        RuntimeStatus.get_tools().recording_status = (
+            ToolStatus.RECORDING_FINISHED)
         RuntimeStatus.stat_playable_duration()
 
     @classmethod
@@ -79,27 +81,28 @@ class ToolApi(object):
             os.rename(file_to_play, file_to_play + '.bak')
         # Also stop player in case user has set it up.
         cls.__exec_bash_tool('stop_player')
-        cls.tools_status.recording_status = ToolStatus.RECORDING_READY_TO_CHECK
-        cls.tools_status.playing_status = ToolStatus.PLAYING_NOT_READY
-        cls.tools_status.planning_ready = False
+        tool_status = RuntimeStatus.get_tools()
+        Rtool_status.recording_status = ToolStatus.RECORDING_READY_TO_CHECK
+        tool_status.playing_status = ToolStatus.PLAYING_NOT_READY
+        tool_status.planning_ready = False
         RuntimeStatus.broadcast_status_if_changed()
 
     @classmethod
     def setup_playing(cls):
         """SocketIO Api: setup_playing()"""
-        if not RuntimeStatus.are_all_modules_ready():
-            ModuleApi.start('all')
+        if not RuntimeStatus.are_record_replay_modules_ready():
+            ModuleApi.start('record_replay_required_modules')
         if not RuntimeStatus.are_all_hardware_ready():
             HardwareApi.health_check('all')
         cls.__exec_bash_tool('start_player')
-        cls.tools_status.playing_status = ToolStatus.PLAYING_CHECKING
+        RuntimeStatus.get_tools().playing_status = ToolStatus.PLAYING_CHECKING
         RuntimeStatus.broadcast_status_if_changed()
 
     @classmethod
     def start_playing(cls):
         """SocketIO Api: start_playing()"""
         RosBridgeApi.change_driving_mode('auto')
-        cls.tools_status.playing_status = ToolStatus.PLAYING
+        RuntimeStatus.get_tools().playing_status = ToolStatus.PLAYING
         RuntimeStatus.broadcast_status_if_changed()
 
     @classmethod
@@ -107,8 +110,9 @@ class ToolApi(object):
         """SocketIO Api: stop_playing()"""
         RosBridgeApi.change_driving_mode('manual')
         cls.__exec_bash_tool('stop_player')
-        cls.tools_status.playing_status = ToolStatus.PLAYING_READY_TO_CHECK
-        cls.tools_status.planning_ready = False
+        tool_status = RuntimeStatus.get_tools()
+        tool_status.playing_status = ToolStatus.PLAYING_READY_TO_CHECK
+        tool_status.planning_ready = False
         RuntimeStatus.broadcast_status_if_changed()
 
     @classmethod
