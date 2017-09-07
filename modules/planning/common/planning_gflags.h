@@ -36,6 +36,7 @@ DECLARE_int32(max_history_frame_num);
 DECLARE_double(replan_distance_threshold);
 
 // parameter for reference line
+DECLARE_bool(enable_reference_line_provider_thread);
 DECLARE_double(default_reference_line_width);
 DECLARE_double(planning_upper_speed_limit);
 
