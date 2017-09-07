@@ -33,8 +33,6 @@ void AdapterManager::Observe() {
 
 bool AdapterManager::Initialized() { return instance()->initialized_; }
 
-void AdapterManager::Init() { Init(FLAGS_adapter_config_path); }
-
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   // Parse config file
   AdapterManagerConfig configs;
@@ -96,7 +94,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::ROUTING_RESPONSE:
         EnableRoutingResponse(FLAGS_routing_response_topic, config.mode(),
-                             config.message_history_limit());
+                              config.message_history_limit());
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning(FLAGS_planning_trajectory_topic, config.mode(),
@@ -116,11 +114,11 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::RELATIVE_ODOMETRY:
         EnableRelativeOdometry(FLAGS_relative_odometry_topic, config.mode(),
-                          config.message_history_limit());
+                               config.message_history_limit());
         break;
       case AdapterConfig::INS_STAT:
         EnableInsStat(FLAGS_ins_stat_topic, config.mode(),
-                          config.message_history_limit());
+                      config.message_history_limit());
         break;
       case AdapterConfig::HMI_COMMAND:
         EnableHMICommand(FLAGS_hmi_command_topic, config.mode(),

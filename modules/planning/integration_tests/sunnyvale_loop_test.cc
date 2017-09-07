@@ -63,7 +63,6 @@ TEST_F(SunnyvaleLoopTest, stop) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   PlanningTestBase::SetUp();
-  bool run_planning_success = RunPlanning("sunnyvale_stop", 0);
   RUN_GOLDEN_TEST;
 }
 

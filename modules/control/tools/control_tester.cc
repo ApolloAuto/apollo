@@ -54,14 +54,14 @@ using ::apollo::control::PadMessage;
 using ::apollo::localization::LocalizationEstimate;
 using ::apollo::planning::ADCTrajectory;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_alsologtostderr = true;
-  FLAGS_adapter_config_path =
+  const std::string& config_file =
       "modules/control/testdata/control_tester/adapter.conf";
   ros::init(argc, argv, "control_tester");
-  AdapterManager::Init();
+  AdapterManager::Init(config_file);
   AINFO << "AdapterManager is initialized.";
   for (int i = 0; i < FLAGS_num_seconds * FLAGS_feed_frequency; ++i) {
     AdapterManager::FeedChassisFile(FLAGS_chassis_test_file);
