@@ -18,8 +18,7 @@
         "react": "^15.5.4",
         "react-dom": "^15.5.4",
         "three": "~0.84.0",
-        "three-line-2d": "^1.1.6",
-        "three-obj-loader": "^1.1.2"
+        "three-line-2d": "^1.1.6"
     },
     "devDependencies": {
         "babel-core": "^6.24.1",
