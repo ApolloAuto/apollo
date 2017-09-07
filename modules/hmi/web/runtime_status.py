@@ -37,9 +37,6 @@ class RuntimeStatus(object):
 
     pb_singleton = runtime_status_pb2.RuntimeStatus()
     pb_fingerprint = 0
-
-    module_dict = {}
-    hardware_dict = {}
     playable_duration = 0
 
     @classmethod
@@ -47,8 +44,6 @@ class RuntimeStatus(object):
         """Reset runtime status to start."""
         cls.pb_singleton.Clear()
         cls.pb_fingerprint = 0
-        cls.module_dict.clear()
-        cls.hardware_dict.clear()
 
         tool_status = cls.get_tools()
         if check_playable_file and cls.stat_playable_duration() > 0:
@@ -77,20 +72,16 @@ class RuntimeStatus(object):
     @classmethod
     def get_module(cls, module_name):
         """Get module status by name."""
-        if cls.module_dict.get(module_name) is None:
-            # Init module status for once.
-            module_status = cls.pb_singleton.modules.add(name=module_name)
-            cls.module_dict[module_name] = module_status
-        return cls.module_dict[module_name]
+        mod = cls.__find_by_name(module_name, cls.pb_singleton.modules)
+        # Init module status if not exist.
+        return mod if mod else cls.pb_singleton.modules.add(name=module_name)
 
     @classmethod
     def get_hardware(cls, hardware_name):
-        """Get harware status by name."""
-        if cls.hardware_dict.get(hardware_name) is None:
-            # Init hardware status for once.
-            hardware_status = cls.pb_singleton.hardware.add(name=hardware_name)
-            cls.hardware_dict[hardware_name] = hardware_status
-        return cls.hardware_dict[hardware_name]
+        """Get hardware status by name."""
+        hdw = cls.__find_by_name(hardware_name, cls.pb_singleton.hardware)
+        # Init hardware status for once.
+        return hdw if hdw else cls.pb_singleton.hardware.add(name=hardware_name)
 
     @classmethod
     def get_tools(cls):
@@ -100,26 +91,10 @@ class RuntimeStatus(object):
     @classmethod
     def status_json(cls):
         """Convert status to json dict."""
-
-        def pb_to_json(proto, include_default_values=False):
-            """Convert proto to json dict."""
-            return json_format.MessageToDict(
-                proto, include_default_values, True)
-
-        def pb_dict_to_json(pb_dict):
-            """Convert {key: value_pb} to {key, value_dict}."""
-            return {
-                key: pb_to_json(value_pb)
-                for key, value_pb in pb_dict.iteritems()
-            }
-
-        return {
-            'timestamp': cls._current_timestamp(),
-            'modules': pb_dict_to_json(cls.module_dict),
-            'hardware': pb_dict_to_json(cls.hardware_dict),
-            'tools': pb_to_json(cls.pb_singleton.tools, True),
-            'config': pb_to_json(cls.pb_singleton.config, True),
-        }
+        json_dict = json_format.MessageToDict(cls.pb_singleton, True, True)
+        # Inject current timestamp.
+        json_dict['timestamp'] = cls._current_timestamp()
+        return json_dict
 
     @classmethod
     def broadcast_status_if_changed(cls):
@@ -134,17 +109,17 @@ class RuntimeStatus(object):
     @classmethod
     def _calculate(cls):
         """Update runtime status fields which need to be calculated."""
-        modules_and_hardware_ready = cls.are_all_modules_ready(
+        modules_and_hardware_ready = cls.are_record_replay_modules_ready(
         ) and cls.are_all_hardware_ready()
         cls._calculate_recording_status(modules_and_hardware_ready)
         cls._calculate_playing_status(modules_and_hardware_ready)
         cls._calculate_guide_message()
 
     @classmethod
-    def are_all_modules_ready(cls):
+    def are_record_replay_modules_ready(cls):
         """Check if all modules are ready."""
-        for mod in Config.get_pb().modules:
-            mod_status = cls.get_module(mod.name).status
+        for mod in Config.record_replay_required_modules:
+            mod_status = cls.get_module(mod).status
             if mod_status != runtime_status_pb2.ModuleStatus.STARTED:
                 return False
         return True
@@ -251,3 +226,8 @@ class RuntimeStatus(object):
     def _current_timestamp(cls):
         """Current timestamp in milliseconds."""
         return int(time.time() * 1000)
+
+    @staticmethod
+    def __find_by_name(name, value_list):
+        """Find a value in list by name."""
+        return next((value for value in value_list if value.name == name), None)

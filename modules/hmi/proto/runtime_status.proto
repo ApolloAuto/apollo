@@ -56,8 +56,8 @@ message ToolStatus {
 }
 
 message ConfigStatus {
-  optional string current_map = 1 [default = "Unknown"];
-  optional string current_vehicle = 2 [default = "Unknown"];
+  optional string current_map = 1;
+  optional string current_vehicle = 2;
 }
 
 message RuntimeStatus {

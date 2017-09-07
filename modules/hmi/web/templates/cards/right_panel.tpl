@@ -162,17 +162,10 @@
 <script>
   // Change UI according to status.
   function on_hardware_status_change(global_status) {
-    var hw_list = [{% for hw in conf_pb.hardware %} '{{ hw.name }}', {% endfor %}];
-    hw_list.forEach(function(hw_name) {
-      var status_code = undefined;
-      if (hw_name in global_status['hardware']) {
-        hw_status = global_status['hardware'][hw_name];
-        if ('status' in hw_status) {
-          status_code = hw_status['status'];
-        }
-      }
+    global_status['hardware'].forEach(function(hw_status) {
+      status_code = 'status' in hw_status ? hw_status['status'] : undefined;
 
-      $glyphicon = $("#hardware_" + hw_name + " .glyphicon");
+      $glyphicon = $("#hardware_" + hw_status['name'] + " .glyphicon");
       $glyphicon.attr("class", "glyphicon");
       if (status_code == undefined || status_code == -1) {
         return;
@@ -196,13 +189,21 @@
 
   function on_config_status_change(global_status) {
     // Config status change.
-    var current_map = global_status['config']['current_map'];
-    var current_vehicle = global_status['config']['current_vehicle'];
-    $('.current_map').text(
-        current_map != 'Unknown' ? current_map : 'Please select');
-    $('.current_vehicle').text(
-        current_vehicle != 'Unknown' ? current_vehicle : 'Please select');
-    if (current_map == 'Unknown' || current_vehicle == 'Unknown') {
+    var current_map = undefined;
+    var current_vehicle = undefined;
+    if ('config' in global_status) {
+      if ('current_map' in global_status['config']) {
+      	current_map = global_status['config']['current_map'];
+      }
+      if ('current_vehicle' in global_status['config']) {
+      	current_vehicle = global_status['config']['current_vehicle'];
+      }
+    }
+
+    const kTextEmpty = 'Please select';
+    $('.current_map').text(current_map ? current_map : kTextEmpty);
+    $('.current_vehicle').text(current_vehicle ? current_vehicle : kTextEmpty);
+    if (!current_map || !current_vehicle) {
       // Show profile dialog if map or vehicle is not selected.
       $("#profile_dialog").modal();
     }
