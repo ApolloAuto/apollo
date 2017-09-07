@@ -64,7 +64,7 @@ TEST_F(SunnyvaleLoopTest, stop) {
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   PlanningTestBase::SetUp();
   bool run_planning_success = RunPlanning("sunnyvale_stop", 0);
-  EXPECT_FALSE(run_planning_success);
+  RUN_GOLDEN_TEST;
 }
 
 }  // namespace planning
