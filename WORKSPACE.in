@@ -82,7 +82,7 @@ new_http_archive(
     strip_prefix = "ros",
     # url = "https://github.com/ApolloAuto/apollo-platform/releases/download/1.0.0/ros-indigo-apollo-1.0.0.MACHINE_ARCH.tar.gz",
     # temporary ros archive for apollo-1.5
-    url = "https://github.com/quning78/apollo-platform/releases/download/testing/ros_test_pcl.tar.gz",
+    url = "https://github.com/fengqikai1414/apollo-platform/releases/download/1.5.0/ros_test_pcl.tar.gz",
 )
 
 # OpenCV 2.4.13.2
@@ -113,6 +113,7 @@ new_local_repository(
     build_file = "third_party/opengl.BUILD",
     path = "/usr/include",
 )
+
 new_local_repository(
     name = "glfw",
     build_file = "third_party/glfw.BUILD",
@@ -152,22 +153,22 @@ new_http_archive(
 # Proj.4
 new_http_archive(
     name = "proj4",
-    url = "https://github.com/OSGeo/proj.4/archive/4.9.3.zip",
     build_file = "third_party/proj4.BUILD",
     strip_prefix = "proj.4-4.9.3",
+    url = "https://github.com/OSGeo/proj.4/archive/4.9.3.zip",
 )
 
 # tinyxml2
 new_http_archive(
     name = "tinyxml2",
-    url = "https://github.com/leethomason/tinyxml2/archive/5.0.1.zip",
     build_file = "third_party/tinyxml2.BUILD",
     strip_prefix = "tinyxml2-5.0.1",
+    url = "https://github.com/leethomason/tinyxml2/archive/5.0.1.zip",
 )
 
 #protobuf 3.3
 http_archive(
     name = "com_google_protobuf",
-    url = "https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz",
     strip_prefix = "protobuf-3.3.0",
+    url = "https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz",
 )
