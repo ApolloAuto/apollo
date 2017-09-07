@@ -24,6 +24,7 @@ DECLARE_string(node_namespace);
 
 DECLARE_bool(use_road_id);
 DECLARE_double(min_length_for_lane_change);
+DECLARE_bool(enable_change_lane_in_result);
 
 DECLARE_bool(enable_debug_mode);
 DECLARE_string(debug_route_path);

@@ -22,6 +22,8 @@ DEFINE_string(node_namespace, "routing", "the namespace for this node");
 DEFINE_bool(use_road_id, true, "enable use road id to cut routing result");
 DEFINE_double(min_length_for_lane_change, 10.0,
               "min length for lane change, in creater, in meter");
+DEFINE_bool(enable_change_lane_in_result, false,
+            "contain change lane operator in result");
 
 DEFINE_bool(enable_debug_mode, true, "enable debug mode");
 DEFINE_string(debug_route_path, "",
