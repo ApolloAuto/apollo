@@ -15,17 +15,16 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/common/pose_util.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
 
-bool ReadPoseFile(const std::string& filename,
-  Eigen::Matrix4d* pose,
-  int* frame_id,
-  double* time_stamp) {
+bool ReadPoseFile(const std::string &filename, Eigen::Matrix4d *pose,
+                  int *frame_id, double *time_stamp) {
   std::ifstream ifs(filename.c_str());
   if (!ifs.is_open()) {
-    std::cerr << "Failed to open file " << filename << std::endl;
+    AERROR << "Failed to open file " << filename;
     return false;
   }
   char buffer[1024];
@@ -34,12 +33,16 @@ bool ReadPoseFile(const std::string& filename,
   double time_samp = 0;
   double quat[4];
   double matrix3x3[9];
-  double& pose03 = (*pose)(0, 3);
-  double& pose13 = (*pose)(1, 3);
-  double& pose23 = (*pose)(2, 3);
-  sscanf(buffer, "%d %lf %lf %lf %lf %lf %lf %lf %lf", &id, &(time_samp),
-    &pose03, &pose13, &pose23,
-    &(quat[0]), &(quat[1]), &(quat[2]), &(quat[3]));
+  double &pose03 = (*pose)(0, 3);
+  double &pose13 = (*pose)(1, 3);
+  double &pose23 = (*pose)(2, 3);
+  int ret = sscanf(buffer, "%d %lf %lf %lf %lf %lf %lf %lf %lf", &id,
+                   &(time_samp), &pose03, &pose13, &pose23, &(quat[0]),
+                   &(quat[1]), &(quat[2]), &(quat[3]));
+  if (ret != 9) {
+    AERROR << "Failed to scan parameters.";
+    return false;
+  }
   QuaternionToRotationMatrix<double>(quat, matrix3x3);
 
   for (int i = 0; i < 3; ++i) {
