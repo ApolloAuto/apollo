@@ -35,11 +35,11 @@ class DisjointSetTest : public testing::Test {
       _node1 = nullptr;
     }
     if (_node2 != nullptr) {
-      delete _node1;
+      delete _node2;
       _node2 = nullptr;
     }
     if (_node3 != nullptr) {
-      delete _node1;
+      delete _node3;
       _node3 = nullptr;
     }
   }
