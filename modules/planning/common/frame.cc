@@ -36,6 +36,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 
 namespace apollo {
@@ -194,8 +195,15 @@ Status Frame::Init(const PlanningConfig &config,
     return Status(ErrorCode::PLANNING_ERROR, "init point is not set");
   }
   smoother_config_ = config.reference_line_smoother_config();
-  auto reference_lines =
-      CreateReferenceLineFromRouting(init_pose_.position(), routing_response_);
+
+  std::vector<ReferenceLine> reference_lines;
+  if (FLAGS_enable_reference_line_provider_thread) {
+    reference_lines = ReferenceLineProvider::instance()->GetReferenceLines();
+  } else {
+    reference_lines = CreateReferenceLineFromRouting(init_pose_.position(),
+                                                     routing_response_);
+  }
+
   if (reference_lines.empty()) {
     AERROR << "Failed to create reference line from position: "
            << init_pose_.DebugString();
