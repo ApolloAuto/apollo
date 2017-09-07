@@ -32,28 +32,21 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
   out_blob_ = out_blob;
 
   // raw feature parameters
-  range_ = static_cast<int>(feature_param.point_cloud_range());
-  width_ = static_cast<int>(feature_param.width());
-  height_ = static_cast<int>(feature_param.height());
-  min_height_ = feature_param.min_height();
-  max_height_ = feature_param.max_height();
+  range_ = feature_param.has_point_cloud_range()
+               ? static_cast<int>(feature_param.point_cloud_range()) : 60;
+  width_ = feature_param.has_width()
+               ? static_cast<int>(feature_param.width()) : 512;
+  height_ = feature_param.has_height()
+                ? static_cast<int>(feature_param.height()) : 512;
+  min_height_ = feature_param.has_min_height()
+                    ? feature_param.min_height() : -5.0;
+  max_height_ = feature_param.has_max_height()
+                    ? feature_param.max_height() : 5.0;
   CHECK_EQ(width_, height_)
       << "Current implementation version requires input_width == input_height.";
 
-  CHECK(feature_param.use_max_height());
-  CHECK(feature_param.use_mean_height());
-  CHECK(feature_param.use_log_count());
-  CHECK(feature_param.use_direction());
-  CHECK(feature_param.use_top_intensity());
-  CHECK(feature_param.use_mean_intensity());
-  CHECK(feature_param.use_distance());
-  CHECK(feature_param.use_nonempty());
-  data_channel_ = 8;
-  CHECK(feature_param.use_height_filter());
-  CHECK(feature_param.use_dense_feat());
-
   // set output blob and log lookup table
-  out_blob_->Reshape(1, data_channel_, height_, width_);
+  out_blob_->Reshape(1, 8, height_, width_);
 
   log_table_.resize(256);
   for (size_t i = 0; i < log_table_.size(); ++i) {

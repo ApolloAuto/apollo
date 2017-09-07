@@ -57,7 +57,6 @@ class FeatureGenerator {
 
   int width_;
   int height_;
-  int data_channel_;
   int range_;
 
   float min_height_;
