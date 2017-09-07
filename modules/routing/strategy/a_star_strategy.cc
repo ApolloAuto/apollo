@@ -214,6 +214,9 @@ bool Reconstruct(
 
 }  // namespace
 
+AStarStrategy::AStarStrategy(bool enable_change) :
+    change_lane_enabled_(enable_change) { }
+
 void AStarStrategy::Clear() {
   closed_set_.clear();
   open_set_.clear();
@@ -273,7 +276,7 @@ bool AStarStrategy::Search(const TopoGraph* graph,
 
     // if residual_s is less than LANE_CHANGE_SKIP_S, only move forward
     const auto& neighbor_edges =
-        (GetResidualS(from_node) > LANE_CHANGE_SKIP_S) ?
+        (GetResidualS(from_node) > LANE_CHANGE_SKIP_S && change_lane_enabled_) ?
         from_node->OutToAllEdge() :
         from_node->OutToSucEdge();
     double tentative_g_score = 0.0;
