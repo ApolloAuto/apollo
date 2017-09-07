@@ -56,16 +56,6 @@ bool ConstraintChecker::ValidTrajectory(
       return false;
     }
 
-    double lat_a = lon_v * lon_v * p.path_point().kappa();
-    if (!WithinRange(lat_a, -FLAGS_lateral_acceleration_bound,
-                     FLAGS_lateral_acceleration_bound)) {
-      AERROR << "Lateral acceleration at relative time " << t
-             << " exceeds bound, value: " << lat_a << ", bound ["
-             << -FLAGS_lateral_acceleration_bound << ", "
-             << FLAGS_lateral_acceleration_bound << "].";
-      return false;
-    }
-
     double kappa = p.path_point().kappa();
     if (!WithinRange(kappa, -FLAGS_kappa_bound, FLAGS_kappa_bound)) {
       AERROR << "Kappa at relative time " << t
