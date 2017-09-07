@@ -441,23 +441,6 @@ function config() {
   ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
 
-function link_cpu_caffe_build() {
-  echo "Link CPU version of caffe.BUILD ..."
-  rm -f third_party/caffe.BUILD
-  cd third_party
-  cp caffe_cpu.BUILD caffe.BUILD
-  cd ..
-}
-
-function link_gpu_caffe_build() {
-  echo "Link GPU version of caffe.BUILD ..."
-  rm -f third_party/caffe.BUILD
-  cd third_party
-  cp caffe_gpu.BUILD caffe.BUILD
-  cd ..
-  source /etc/profile
-}
-
 function print_usage() {
   RED='\033[0;31m'
   BLUE='\033[0;34m'
@@ -492,7 +475,6 @@ function main() {
   apollo_check_system_config
   check_machine_arch
   check_esd_files
-  link_cpu_caffe_build
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
 
@@ -501,19 +483,19 @@ function main() {
       check
       ;;
     build)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       apollo_build_dbg
       ;;
     build_opt)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       apollo_build_opt
       ;;
     build_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
-      link_gpu_caffe_build
       apollo_build_dbg
       ;;
     build_opt_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
-      link_gpu_caffe_build
       apollo_build_opt
       ;;
     build_fe)
