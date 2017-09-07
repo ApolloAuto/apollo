@@ -44,15 +44,28 @@ bool CNNSegmentation::Init() {
   auto network_param = cnnseg_param_.network_param();
   auto feature_param = cnnseg_param_.feature_param();
 
-  range_ = static_cast<float>(feature_param.point_cloud_range());
-  width_ = static_cast<int>(feature_param.width());
-  height_ = static_cast<int>(feature_param.height());
+  if (feature_param.has_point_cloud_range()) {
+    range_ = static_cast<float>(feature_param.point_cloud_range());
+  } else {
+    range_ = 60.0;
+  }
+  if (feature_param.has_width()) {
+    width_ = static_cast<int>(feature_param.width());
+  } else {
+    width_ = 512;
+  }
+  if (feature_param.has_height()) {
+    height_ = static_cast<int>(feature_param.height());
+  } else {
+    height_ = 512;
+  }
 
-  /// Instantiate Caffe net
+/// Instantiate Caffe net
 #ifndef USE_CAFFE_GPU
   caffe::Caffe::set_mode(caffe::Caffe::CPU);
 #else
-  int gpu_id = static_cast<int>(cnnseg_param_.gpu_id());
+  int gpu_id = cnnseg_param_.has_gpu_id()
+                   ? static_cast<int>(cnnseg_param_.gpu_id()) : 0;
   CHECK_GE(gpu_id, 0);
   caffe::Caffe::SetDevice(gpu_id);
   caffe::Caffe::set_mode(caffe::Caffe::GPU);
@@ -62,7 +75,6 @@ bool CNNSegmentation::Init() {
   caffe_net_.reset(new caffe::Net<float>(proto_file, caffe::TEST));
   caffe_net_->CopyTrainedLayersFrom(weight_file);
 
-  AINFO << "confidence threshold = " << cnnseg_param_.confidence_thresh();
 #ifndef USE_CAFFE_GPU
   AINFO << "using Caffe CPU mode";
 #else
@@ -71,34 +83,39 @@ bool CNNSegmentation::Init() {
 
   /// set related Caffe blobs
   // center offset prediction
-  instance_pt_blob_ =
-      caffe_net_->blob_by_name(network_param.instance_pt_blob());
-  CHECK(instance_pt_blob_ != nullptr) << "`"
-                                      << network_param.instance_pt_blob()
+  string instance_pt_blob_name = network_param.has_instance_pt_blob()
+                                     ? network_param.instance_pt_blob()
+                                     : "instance_pt";
+  instance_pt_blob_ = caffe_net_->blob_by_name(instance_pt_blob_name);
+  CHECK(instance_pt_blob_ != nullptr) << "`" << instance_pt_blob_name
                                       << "` not exists!";
   // objectness prediction
-  category_pt_blob_ =
-      caffe_net_->blob_by_name(network_param.category_pt_blob());
-  CHECK(category_pt_blob_ != nullptr) << "`"
-                                      << network_param.category_pt_blob()
+  string category_pt_blob_name = network_param.has_category_pt_blob()
+                                     ? network_param.category_pt_blob()
+                                     : "category_score";
+  category_pt_blob_ = caffe_net_->blob_by_name(category_pt_blob_name);
+  CHECK(category_pt_blob_ != nullptr) << "`" << category_pt_blob_name
                                       << "` not exists!";
-  // positiveness (foreground probability) prediction
-  confidence_pt_blob_ =
-      caffe_net_->blob_by_name(network_param.confidence_pt_blob());
-  CHECK(confidence_pt_blob_ != nullptr) << "`"
-                                        << network_param.confidence_pt_blob()
+  // positiveness (foreground object probability) prediction
+  string confidence_pt_blob_name = network_param.has_confidence_pt_blob()
+                                       ? network_param.confidence_pt_blob()
+                                       : "confidence_score";
+  confidence_pt_blob_ = caffe_net_->blob_by_name(confidence_pt_blob_name);
+  CHECK(confidence_pt_blob_ != nullptr) << "`" << confidence_pt_blob_name
                                         << "` not exists!";
   // object height prediction
-  height_pt_blob_ =
-      caffe_net_->blob_by_name(network_param.height_pt_blob());
-  CHECK(height_pt_blob_ != nullptr) << "`"
-                                    << network_param.height_pt_blob()
+  string height_pt_blob_name = network_param.has_height_pt_blob()
+                                   ? network_param.height_pt_blob()
+                                   : "height_pt";
+  height_pt_blob_ = caffe_net_->blob_by_name(height_pt_blob_name);
+  CHECK(height_pt_blob_ != nullptr) << "`" << height_pt_blob_name
                                     << "` not exists!";
   // raw feature data
-  feature_blob_ =
-      caffe_net_->blob_by_name(network_param.feature_blob());
-  CHECK(feature_blob_ != nullptr) << "`"
-                                  << network_param.feature_blob()
+  string feature_blob_name = network_param.has_feature_blob()
+                                 ? network_param.feature_blob()
+                                 : "data";
+  feature_blob_ = caffe_net_->blob_by_name(feature_blob_name);
+  CHECK(feature_blob_ != nullptr) << "`" << feature_blob_name
                                   << "` not exists!";
 
   cluster2d_.reset(new cnnseg::Cluster2D());
@@ -127,7 +144,9 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   }
 
   use_full_cloud_ =
-      cnnseg_param_.use_full_cloud() && (options.origin_cloud != nullptr);
+      (cnnseg_param_.has_use_full_cloud() ?
+       cnnseg_param_.use_full_cloud() : false) &&
+      (options.origin_cloud != nullptr);
   PERF_BLOCK_START();
 
   // generate raw features
@@ -146,15 +165,26 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   PERF_BLOCK_END("[CNNSeg] CNN forward");
 
   // clutser points and construct segments/objects
+  float objectness_thresh = cnnseg_param_.has_objectness_thresh()
+                                ? cnnseg_param_.objectness_thresh() : 0.5;
+  bool use_all_grids_for_clustering =
+      cnnseg_param_.has_use_all_grids_for_clustering()
+          ? cnnseg_param_.use_all_grids_for_clustering() : false;
   cluster2d_->Cluster(*category_pt_blob_, *instance_pt_blob_, pc_ptr,
-                      valid_indices, cnnseg_param_.objectness_thresh(),
-                      cnnseg_param_.use_all_grids_for_clustering());
+                      valid_indices, objectness_thresh,
+                      use_all_grids_for_clustering);
   PERF_BLOCK_END("[CNNSeg] clustering");
 
   cluster2d_->Filter(*confidence_pt_blob_, *height_pt_blob_);
-  cluster2d_->GetObjects(cnnseg_param_.confidence_thresh(),
-                         cnnseg_param_.height_thresh(),
-                         cnnseg_param_.min_pts_num(), objects);
+
+  float confidence_thresh = cnnseg_param_.has_confidence_thresh()
+                                ? cnnseg_param_.confidence_thresh() : 0.1;
+  float height_thresh = cnnseg_param_.has_height_thresh()
+                            ? cnnseg_param_.height_thresh() : 0.5;
+  int min_pts_num = cnnseg_param_.has_min_pts_num()
+                        ? static_cast<int>(cnnseg_param_.min_pts_num()) : 3;
+  cluster2d_->GetObjects(confidence_thresh, height_thresh,
+                         min_pts_num, objects);
   PERF_BLOCK_END("[CNNSeg] post-processing");
 
   return true;
