@@ -66,9 +66,6 @@ data/pcd
 # Doxygen
 docs/doxygen
 
-# Caffe
-third_party/caffe.BUILD
-
 # Esd can lib
 third_party/can_card_library/esd_can/include
 third_party/can_card_library/esd_can/lib
