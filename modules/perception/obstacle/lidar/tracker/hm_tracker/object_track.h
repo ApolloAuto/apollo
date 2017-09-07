@@ -202,8 +202,10 @@ class ObjectTrackSet {
   }
 
   // @brief add track to current set of maintained tracks
+  // @params[IN] track: adding track
   // @return nothing
-  void AddTrack(const ObjectTrackPtr& track) {
+  void AddTrack(
+    const ObjectTrackPtr& track) {
     tracks_.push_back(track);
   }
 

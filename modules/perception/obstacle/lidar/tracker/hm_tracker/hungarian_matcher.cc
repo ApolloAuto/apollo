@@ -44,7 +44,6 @@ bool HungarianMatcher::SetMatchDistanceMaximum(
 void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
   const std::vector<ObjectTrackPtr>& tracks,
   const std::vector<Eigen::VectorXf>& tracks_predict,
-  const double& time_diff,
   std::vector<TrackObjectPair>* assignments,
   std::vector<int>* unassigned_tracks,
   std::vector<int>* unassigned_objects) {
@@ -68,9 +67,9 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
     std::vector<TrackObjectPair> sub_assignments;
     std::vector<int> sub_unassigned_tracks;
     std::vector<int> sub_unassigned_objects;
-    MatchComponents(association_mat, track_components[i], object_components[i],
-                    &sub_assignments, &sub_unassigned_tracks,
-                    &sub_unassigned_objects);
+    MatchInComponents(association_mat, track_components[i], object_components[i],
+                      &sub_assignments, &sub_unassigned_tracks,
+                      &sub_unassigned_objects);
     for (size_t j = 0; j < sub_assignments.size(); ++j) {
       int track_id = sub_assignments[j].first;
       int object_id = sub_assignments[j].second;
@@ -87,7 +86,7 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
   }
 }
 
-void HungarianMatcher::MatchComponents(const Eigen::MatrixXf& association_mat,
+void HungarianMatcher::MatchInComponents(const Eigen::MatrixXf& association_mat,
   const std::vector<int>& track_component,
   const std::vector<int>& object_component,
   std::vector<TrackObjectPair>* sub_assignments,
