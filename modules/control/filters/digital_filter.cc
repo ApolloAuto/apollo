@@ -36,7 +36,8 @@ DigitalFilter::DigitalFilter(const double ts, const double cutoff_freq) {
   set_coefficients(ts, cutoff_freq);
 }
 
-void DigitalFilter::set_coefficients(const double ts, const double cutoff_freq) {
+void DigitalFilter::set_coefficients(const double ts,
+                                     const double cutoff_freq) {
   denominators_.clear();
   numerators_.clear();
   denominators_.reserve(3);
