@@ -53,12 +53,13 @@ class ReferenceLineProvider {
   ~ReferenceLineProvider();
 
   void Init(const hdmap::PncMap* pnc_map_,
-            const routing::RoutingResponse& routing_response,
             const ReferenceLineSmootherConfig& smoother_config);
 
   bool Start();
 
   void Stop();
+
+  void UpdateRoutingResponse(const routing::RoutingResponse& routing_response);
 
   std::vector<ReferenceLine> GetReferenceLines();
 
@@ -75,7 +76,10 @@ class ReferenceLineProvider {
   std::unique_ptr<std::thread> thread_;
 
   const hdmap::PncMap* pnc_map_ = nullptr;
+
+  std::mutex routing_response_mutex_;
   routing::RoutingResponse routing_response_;
+
   ReferenceLineSmootherConfig smoother_config_;
 
   bool is_stop_ = false;
