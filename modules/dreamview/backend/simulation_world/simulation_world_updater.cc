@@ -136,7 +136,8 @@ void SimulationWorldUpdater::Start() {
 void SimulationWorldUpdater::OnPushTimer(const ros::TimerEvent &event) {
   sim_world_service_.Update();
   if (!sim_world_service_.ReadyToPush()) {
-    AWARN << "Not sending simulation world as the data is not ready!";
+    AWARN_EVERY(100)
+        << "Not sending simulation world as the data is not ready!";
     return;
   }
   auto json = sim_world_service_.GetUpdateAsJson();
