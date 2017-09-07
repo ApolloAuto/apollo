@@ -59,6 +59,14 @@ bool ConstraintChecker::ValidTrajectory(
              << FLAGS_longitudinal_acceleration_upper_bound << "].";
       return false;
     }
+
+    double kappa = p.path_point().kappa();
+    if (!WithinRange(kappa, -FLAGS_kappa_bound, FLAGS_kappa_bound)) {
+      AERROR << "Kappa at relative time " << t
+             << " exceeds bound, value: " << kappa << ", bound ["
+             << -FLAGS_kappa_bound << ", " << FLAGS_kappa_bound << "].";
+      return false;
+    }
   }
   return true;
 }
