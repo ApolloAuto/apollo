@@ -25,8 +25,8 @@
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
+#include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "ros/include/ros/ros.h"
@@ -50,11 +50,13 @@ class L3Perception : public apollo::common::ApolloApp {
   void OnMobileye(const apollo::drivers::Mobileye& message);
   // Upon receiving radar data
   void OnDelphiESR(const apollo::drivers::DelphiESR& message);
-  void OnLocalization(const apollo::localization::LocalizationEstimate& message);
-  void OnTimer(const ros::TimerEvent &);
+  void OnLocalization(
+      const apollo::localization::LocalizationEstimate& message);
+  void OnTimer(const ros::TimerEvent&);
 
   apollo::perception::PerceptionObstacles ConvertToPerceptionObstacles(
-    const apollo::drivers::Mobileye& mobileye, const apollo::localization::LocalizationEstimate& localization);
+      const apollo::drivers::Mobileye& mobileye,
+      const apollo::localization::LocalizationEstimate& localization);
 
   double last_timestamp_ = 0;
   ros::Timer timer_;

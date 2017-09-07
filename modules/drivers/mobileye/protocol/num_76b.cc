@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -15,35 +14,38 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/delphi_esr/protocol/test_4e0.h"
+#include "modules/drivers/mobileye/protocol/num_76b.h"
 #include "modules/canbus/common/byte.h"
 
 namespace apollo {
 namespace drivers {
-namespace delphi_esr {
+namespace mobileye {
 
 using ::apollo::canbus::Byte;
 
-const int Test4e0::ID = 0x738;
+const int Num76b::ID = 0x76b;
 
-void Test4e0::Parse(const uint8_t *bytes, int32_t length,
-                       DelphiESR *delphi_esr) const {
-  delphi_esr->mutable_test_4e0()->set_scan_index(
-      scan_index(bytes, length));
+void Num76b::Parse(const uint8_t* bytes, int32_t length,
+                   Mobileye* mobileye) const {
+  mobileye->mutable_num_76b()->set_num_of_next_lane_mark_reported(
+      num_of_next_lane_mark_reported(bytes, length));
+  mobileye->mutable_next_76c()->Clear();
+  mobileye->mutable_next_76d()->Clear();
 }
 
-// config detail: {'name': 'num_obstacles', 'offset': 0.0, 'precision': 1.0,
-// 'len': 8, 'f_type': 'value', 'is_signed_var': False, 'physical_range':
-// '[0|255]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '""'}
-int Test4e0::scan_index(const uint8_t *bytes, int32_t length) const {
-  Byte t0(bytes + 3);
-  Byte t1(bytes + 4);
+// config detail: {'name': 'num_of_next_lane_mark_reported', 'offset': 0.0,
+// 'precision': 1.0, 'len': 8, 'f_type': 'value', 'is_signed_var': False,
+// 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola',
+// 'physical_unit': '"Number  apollo  of  apollo  next  apollo  lane  apollo
+// markers"'}
+int Num76b::num_of_next_lane_mark_reported(const uint8_t* bytes,
+                                           int32_t length) const {
+  Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
-  int32_t y = t1.get_byte(0, 8) + (x << 8);
 
-  return y;
+  return x;
 }
 
-}  // namespace delphi_esr
+}  // namespace mobileye
 }  // namespace drivers
 }  // namespace apollo

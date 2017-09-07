@@ -50,7 +50,7 @@ class Test4e0 : public SensorProtocolData<DelphiESR> {
   int scan_index(const uint8_t *bytes, int32_t length) const;
 };
 
-}  // namespace delphi_esr 
+}  // namespace delphi_esr
 }  // namespace drivers
 }  // namespace apollo
 
