@@ -19,6 +19,9 @@ const colorMapping = {
     DEFAULT: 0xC0C0C0
 };
 
+const scale = 0.01;
+const scales = { x: scale, y: scale, z: scale};
+
 // The result will be the all the elements in current but not in data.
 function diffMapElements(elementIds, data) {
     const result = {};
@@ -211,9 +214,8 @@ function addTrafficLight(signal, overlapMap, laneHeading, coordinates, scene) {
     const posAndHeadings = [];
     const posAndHeading = getSignalPositionAndHeading(signal, overlapMap, laneHeading, coordinates);
     if (posAndHeading) {
-        const scale = 0.01;
         loadObject(trafficLightMaterial, trafficLightObject,
-            { x: scale, y: scale, z: scale},
+            scales,
             mesh => {
                 mesh.rotation.x = Math.PI / 2;
                 mesh.rotation.y = posAndHeading[1];
@@ -231,6 +233,7 @@ function addTrafficLight(signal, overlapMap, laneHeading, coordinates, scene) {
 
 export default class Map {
     constructor() {
+        loadObject(trafficLightMaterial, trafficLightObject, scales);
         this.hash = -1;
         this.data = {};
         this.initialized = false;
