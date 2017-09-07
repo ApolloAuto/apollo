@@ -42,10 +42,8 @@ ReferenceLineProvider::~ReferenceLineProvider() {
 
 void ReferenceLineProvider::Init(
     const hdmap::PncMap *pnc_map,
-    const routing::RoutingResponse &routing_response,
     const ReferenceLineSmootherConfig &smoother_config) {
   pnc_map_ = pnc_map;
-  routing_response_ = routing_response;
   smoother_config_ = smoother_config;
   is_initialized_ = true;
 }
@@ -67,6 +65,13 @@ void ReferenceLineProvider::Stop() {
   }
 }
 
+void ReferenceLineProvider::UpdateRoutingResponse(
+    const routing::RoutingResponse &routing_response) {
+  std::lock_guard<std::mutex> lock(routing_response_mutex_);
+  // TODO: check if routing needs to be updated before assigning.
+  routing_response_ = routing_response;
+}
+
 void ReferenceLineProvider::Generate() {
   while (!is_stop_) {
     const auto &curr_adc_position =
@@ -74,7 +79,14 @@ void ReferenceLineProvider::Generate() {
     const auto adc_point_enu = common::util::MakePointENU(
         curr_adc_position.x(), curr_adc_position.y(), curr_adc_position.z());
 
-    if (!CreateReferenceLineFromRouting(adc_point_enu, routing_response_)) {
+    routing::RoutingResponse routing;
+    {
+      std::lock_guard<std::mutex> lock(routing_response_mutex_);
+      // TODO: check if routing needs to be updated before assigning.
+      routing = routing_response_;
+    }
+
+    if (!CreateReferenceLineFromRouting(adc_point_enu, routing)) {
       AERROR << "Fail to create reference line at position: "
              << curr_adc_position.ShortDebugString();
     };

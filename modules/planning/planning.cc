@@ -111,9 +111,7 @@ Status Planning::Init() {
 
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->Init(
-        pnc_map_.get(),
-        AdapterManager::GetRoutingResponse()->GetLatestObserved(),
-        config_.reference_line_smoother_config());
+        pnc_map_.get(), config_.reference_line_smoother_config());
   }
 
   RegisterPlanners();
@@ -163,6 +161,11 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 void Planning::RunOnce() {
   const double start_timestamp = Clock::NowInSecond();
   AdapterManager::Observe();
+  if (FLAGS_enable_reference_line_provider_thread) {
+    ReferenceLineProvider::instance()->UpdateRoutingResponse(
+        AdapterManager::GetRoutingResponse()->GetLatestObserved());
+  }
+
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
                         ->mutable_main_decision()
