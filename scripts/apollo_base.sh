@@ -169,6 +169,8 @@ function setup_device() {
         sudo mknod --mode=a+rw /dev/can0 c 52 0
     fi
     # setup nvidia device
+    sudo /sbin/modprobe nvidia
+    sudo /sbin/modprobe nvidia-uvm
     if [ ! -e /dev/nvidia0 ];then
         sudo mknod -m 666 /dev/nvidia0 c 195 0
     fi
