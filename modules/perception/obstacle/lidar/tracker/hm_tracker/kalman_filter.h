@@ -157,14 +157,14 @@ class KalmanFilter : public BaseFilter {
 
   // @brief select measured velocity among candidates
   // @params[IN] candidates: candidates of measured velocity
-  // @return measured velocity
+  // @return selected measurement of velocity
   Eigen::Vector3f SelectMeasuredVelocity(
     const std::vector<Eigen::Vector3f>& candidates);
 
   // @brief select measured velocity among candidates according motion
   // consistency
   // @params[IN] candidates: candidates of measured velocity
-  // @return measured velocity
+  // @return selected measurement of velocity
   Eigen::Vector3f SelectMeasuredVelocityAccordingMotionConsistency(
     const std::vector<Eigen::Vector3f>& candidates);
 
@@ -193,6 +193,7 @@ class KalmanFilter : public BaseFilter {
     const TrackedObjectPtr& new_object);
 
   // @brief compute update quality by using association score
+  // @params[IN] old_object: old object for last updaitng
   // @params[IN] new_object: new object for current updating
   // @return update quality according point number change
   float ComputeUpdateQualityAccordingPointNumChange(

@@ -44,7 +44,6 @@ class BaseMatcher {
   // @params[IN] objects: detected objects
   // @params[IN] tracks: maintained tracks
   // @params[IN] tracks_predict: predicted states of maintained tracks
-  // @params[IN] time_diff: time interval from last match
   // @params[OUT] assignments: matched pair of <track, object>
   // @params[OUT] unassigned_tracks: unmatched tracks
   // @params[OUT] unassigned_objects: unmatched objects
@@ -53,7 +52,6 @@ class BaseMatcher {
     std::vector<TrackedObjectPtr>* objects,
     const std::vector<ObjectTrackPtr>& tracks,
     const std::vector<Eigen::VectorXf>& tracks_predict,
-    const double& time_diff,
     std::vector<TrackObjectPair>* assignments,
     std::vector<int>* unassigned_tracks,
     std::vector<int>* unassigned_objects) = 0;
