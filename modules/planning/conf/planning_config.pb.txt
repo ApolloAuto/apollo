@@ -96,7 +96,7 @@ em_planner_config {
         speed_kernel_weight: 0.0
         accel_kernel_weight: 0.0
         jerk_kernel_weight: 1000.0
-        follow_weight: 0.2
+        follow_weight: 10.0
         stop_weight: 0.2
         cruise_weight: 0.2
         max_speed: 20.0
