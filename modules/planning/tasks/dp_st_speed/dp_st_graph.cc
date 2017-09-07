@@ -196,7 +196,7 @@ void DpStGraph::GetRowRange(const StGraphPoint& point,
   } else {
     v0 = (point.index_s() - point.pre_point()->index_s()) * unit_s_ / unit_t_;
   }
-  const double speed_coeff = 0.5 * unit_t_ * unit_t_;
+  const double speed_coeff = unit_t_ * unit_t_;
 
   const double delta_s_upper_bound =
       v0 * unit_t_ + vehicle_param_.max_acceleration() * speed_coeff;
