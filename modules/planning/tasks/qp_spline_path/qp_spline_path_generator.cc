@@ -278,6 +278,17 @@ bool QpSplinePathGenerator::AddConstraint(
 
   spline_constraint->AddPointSecondDerivativeConstraint(knots_.back(), 0.0);
 
+  // kappa bound is based on the inequality:
+  // kappa = d(phi)/ds <= d(phi)/dx = d2y/dx2
+  std::vector<double> kappa_lower_bound(evaluated_s_.size(),
+                                        -FLAGS_kappa_bound);
+  std::vector<double> kappa_upper_bound(evaluated_s_.size(), FLAGS_kappa_bound);
+  if (!spline_constraint->AddSecondDerivativeBoundary(
+          evaluated_s_, kappa_lower_bound, kappa_upper_bound)) {
+    AERROR << "Fail to add second derivative boundary.";
+    return false;
+  }
+
   // add map bound constraint
   std::vector<double> boundary_low;
   std::vector<double> boundary_high;
