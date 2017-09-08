@@ -46,9 +46,6 @@ class PathDecider : public Task {
   bool MakeStaticObstacleDecision(const PathData &path_data,
                                   PathDecision *const path_decision);
 
-  ObjectNudge::Type DecideNudge(const SLBoundary &obstacle_boundary,
-                                const common::SLPoint &adc_sl);
-
   ObjectStop GenerateObjectStopDecision(
       const PathObstacle &path_obstacle) const;
 };

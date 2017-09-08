@@ -47,6 +47,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_chassis_file = "garage_chassis.pb.txt";
   FLAGS_test_prediction_file = "garage_prediction.pb.txt";
   FLAGS_align_prediction_time = false;
+  FLAGS_enable_reference_line_provider_thread = false;
 }
 
 bool PlanningTestBase::SetUpAdapters() {
