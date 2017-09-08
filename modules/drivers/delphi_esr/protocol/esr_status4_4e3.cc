@@ -26,24 +26,26 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrstatus44e3::Esrstatus44e3() {}
 const int32_t Esrstatus44e3::ID = 0x4E3;
 
 void Esrstatus44e3::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_truck_target_det(can_tx_truck_target_det(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_lr_only_grating_lobe_det(can_tx_lr_only_grating_lobe_det(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_sidelobe_blockage(can_tx_sidelobe_blockage(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_partial_blockage(can_tx_partial_blockage(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_path_id_acc_stat(can_tx_path_id_acc_stat(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_mr_lr_mode(can_tx_mr_lr_mode(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_auto_align_angle(can_tx_auto_align_angle(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_rolling_count_3(can_tx_rolling_count_3(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_path_id_fcw_stat(can_tx_path_id_fcw_stat(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_path_id_fcw_move(can_tx_path_id_fcw_move(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_path_id_cmbb_stat(can_tx_path_id_cmbb_stat(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_path_id_cmbb_move(can_tx_path_id_cmbb_move(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status4_4e3()->set_can_tx_path_id_acc(can_tx_path_id_acc(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_truck_target_det(can_tx_truck_target_det(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_lr_only_grating_lobe_det(can_tx_lr_only_grating_lobe_det(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_sidelobe_blockage(can_tx_sidelobe_blockage(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_partial_blockage(can_tx_partial_blockage(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_path_id_acc_stat(can_tx_path_id_acc_stat(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_mr_lr_mode(can_tx_mr_lr_mode(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_auto_align_angle(can_tx_auto_align_angle(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_rolling_count_3(can_tx_rolling_count_3(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_path_id_fcw_stat(can_tx_path_id_fcw_stat(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_path_id_fcw_move(can_tx_path_id_fcw_move(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_path_id_cmbb_stat(can_tx_path_id_cmbb_stat(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_path_id_cmbb_move(can_tx_path_id_cmbb_move(bytes, length));
+  delphi_esr->mutable_esr_status4_4e3()->set_can_tx_path_id_acc(can_tx_path_id_acc(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_truck_target_det', 'enum': {0: 'CAN_TX_TRUCK_TARGET_DET_NOT_DETECTED', 1: 'CAN_TX_TRUCK_TARGET_DET_DETECTED'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}

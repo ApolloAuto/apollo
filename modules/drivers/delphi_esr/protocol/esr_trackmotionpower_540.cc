@@ -26,12 +26,14 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrtrackmotionpower540::Esrtrackmotionpower540() {}
 const int32_t Esrtrackmotionpower540::ID = 0x540;
 
 void Esrtrackmotionpower540::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_trackmotionpower_540()->set_can_tx_track_rolling_count_2(can_tx_track_rolling_count_2(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_trackmotionpower_540()->set_can_tx_track_rolling_count_2(can_tx_track_rolling_count_2(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_track_rolling_count_2', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}

@@ -26,29 +26,31 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Vehicle24f1::Vehicle24f1() {}
 const int32_t Vehicle24f1::ID = 0x4F1;
 
 void Vehicle24f1::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_volvo_short_track_roc(can_rx_volvo_short_track_roc(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_mr_only_transmit(can_rx_mr_only_transmit(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_lr_only_transmit(can_rx_lr_only_transmit(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_high_yaw_angle(can_rx_high_yaw_angle(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_clear_faults(can_rx_clear_faults(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_use_angle_misalignment(can_rx_use_angle_misalignment(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_turn_signal_status(can_rx_turn_signal_status(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_blockage_disable(can_rx_blockage_disable(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_vehicle_speed_validity(can_rx_vehicle_speed_validity(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_mmr_upside_down(can_rx_mmr_upside_down(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_wiper_status(can_rx_wiper_status(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_raw_data_enable(can_rx_raw_data_enable(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_radar_cmd_radiate(can_rx_radar_cmd_radiate(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_grouping_mode(can_rx_grouping_mode(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_maximum_tracks(can_rx_maximum_tracks(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_lateral_mounting_offset(can_rx_lateral_mounting_offset(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_angle_misalignment(can_rx_angle_misalignment(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle2_4f1()->set_can_rx_scan_index_ack(can_rx_scan_index_ack(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_volvo_short_track_roc(can_rx_volvo_short_track_roc(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_mr_only_transmit(can_rx_mr_only_transmit(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_lr_only_transmit(can_rx_lr_only_transmit(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_high_yaw_angle(can_rx_high_yaw_angle(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_clear_faults(can_rx_clear_faults(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_use_angle_misalignment(can_rx_use_angle_misalignment(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_turn_signal_status(can_rx_turn_signal_status(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_blockage_disable(can_rx_blockage_disable(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_vehicle_speed_validity(can_rx_vehicle_speed_validity(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_mmr_upside_down(can_rx_mmr_upside_down(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_wiper_status(can_rx_wiper_status(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_raw_data_enable(can_rx_raw_data_enable(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_radar_cmd_radiate(can_rx_radar_cmd_radiate(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_grouping_mode(can_rx_grouping_mode(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_maximum_tracks(can_rx_maximum_tracks(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_lateral_mounting_offset(can_rx_lateral_mounting_offset(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_angle_misalignment(can_rx_angle_misalignment(bytes, length));
+  delphi_esr->mutable_vehicle2_4f1()->set_can_rx_scan_index_ack(can_rx_scan_index_ack(bytes, length));
 }
 
 // config detail: {'name': 'can_rx_volvo_short_track_roc', 'offset': 0.0, 'precision': 500.0, 'len': 4, 'is_signed_var': True, 'physical_range': '[-4000|3500]', 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}

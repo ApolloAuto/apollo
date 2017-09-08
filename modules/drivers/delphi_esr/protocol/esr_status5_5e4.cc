@@ -26,19 +26,21 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrstatus55e4::Esrstatus55e4() {}
 const int32_t Esrstatus55e4::ID = 0x5E4;
 
 void Esrstatus55e4::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_status5_5e4()->set_can_tx_supply_10v_a2d(can_tx_supply_10v_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status5_5e4()->set_can_tx_temp2_a2d(can_tx_temp2_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status5_5e4()->set_can_tx_temp1_a2d(can_tx_temp1_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status5_5e4()->set_can_tx_swbatt_a2d(can_tx_swbatt_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status5_5e4()->set_can_tx_supply_5vdx_a2d(can_tx_supply_5vdx_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status5_5e4()->set_can_tx_supply_5va_a2d(can_tx_supply_5va_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status5_5e4()->set_can_tx_supply_3p3v_a2d(can_tx_supply_3p3v_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status5_5e4()->set_can_tx_ignp_a2d(can_tx_ignp_a2d(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status5_5e4()->set_can_tx_supply_10v_a2d(can_tx_supply_10v_a2d(bytes, length));
+  delphi_esr->mutable_esr_status5_5e4()->set_can_tx_temp2_a2d(can_tx_temp2_a2d(bytes, length));
+  delphi_esr->mutable_esr_status5_5e4()->set_can_tx_temp1_a2d(can_tx_temp1_a2d(bytes, length));
+  delphi_esr->mutable_esr_status5_5e4()->set_can_tx_swbatt_a2d(can_tx_swbatt_a2d(bytes, length));
+  delphi_esr->mutable_esr_status5_5e4()->set_can_tx_supply_5vdx_a2d(can_tx_supply_5vdx_a2d(bytes, length));
+  delphi_esr->mutable_esr_status5_5e4()->set_can_tx_supply_5va_a2d(can_tx_supply_5va_a2d(bytes, length));
+  delphi_esr->mutable_esr_status5_5e4()->set_can_tx_supply_3p3v_a2d(can_tx_supply_3p3v_a2d(bytes, length));
+  delphi_esr->mutable_esr_status5_5e4()->set_can_tx_ignp_a2d(can_tx_ignp_a2d(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_supply_10v_a2d', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}

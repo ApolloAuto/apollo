@@ -26,24 +26,26 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrstatus24e1::Esrstatus24e1() {}
 const int32_t Esrstatus24e1::ID = 0x4E1;
 
 void Esrstatus24e1::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_yaw_rate_bias(can_tx_yaw_rate_bias(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_veh_spd_comp_factor(can_tx_veh_spd_comp_factor(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_sw_version_dsp(can_tx_sw_version_dsp(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_temperature(can_tx_temperature(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_raw_data_mode(can_tx_raw_data_mode(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_range_perf_error(can_tx_range_perf_error(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_overheat_error(can_tx_overheat_error(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_maximum_tracks_ack(can_tx_maximum_tracks_ack(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_internal_error(can_tx_internal_error(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_grouping_mode(can_tx_grouping_mode(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_xcvr_operational(can_tx_xcvr_operational(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_steering_angle_ack(can_tx_steering_angle_ack(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status2_4e1()->set_can_tx_rolling_count_2(can_tx_rolling_count_2(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_yaw_rate_bias(can_tx_yaw_rate_bias(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_veh_spd_comp_factor(can_tx_veh_spd_comp_factor(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_sw_version_dsp(can_tx_sw_version_dsp(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_temperature(can_tx_temperature(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_raw_data_mode(can_tx_raw_data_mode(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_range_perf_error(can_tx_range_perf_error(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_overheat_error(can_tx_overheat_error(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_maximum_tracks_ack(can_tx_maximum_tracks_ack(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_internal_error(can_tx_internal_error(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_grouping_mode(can_tx_grouping_mode(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_xcvr_operational(can_tx_xcvr_operational(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_steering_angle_ack(can_tx_steering_angle_ack(bytes, length));
+  delphi_esr->mutable_esr_status2_4e1()->set_can_tx_rolling_count_2(can_tx_rolling_count_2(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_yaw_rate_bias', 'offset': 0.0, 'precision': 0.125, 'len': 8, 'is_signed_var': True, 'physical_range': '[-16|15.875]', 'bit': 47, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}

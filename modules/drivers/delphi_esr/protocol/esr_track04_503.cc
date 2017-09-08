@@ -26,23 +26,25 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrtrack04503::Esrtrack04503() {}
 const int32_t Esrtrack04503::ID = 0x503;
 
 void Esrtrack04503::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_grouping_changed(can_tx_track_grouping_changed(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_oncoming(can_tx_track_oncoming(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_lat_rate(can_tx_track_lat_rate(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_bridge_object(can_tx_track_bridge_object(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_width(can_tx_track_width(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_status(can_tx_track_status(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_rolling_count(can_tx_track_rolling_count(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_range_rate(can_tx_track_range_rate(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_range_accel(can_tx_track_range_accel(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_range(can_tx_track_range(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_med_range_mode(can_tx_track_med_range_mode(bytes, length));
-  chassis->mutable_esr()->mutable_esr_track04_503()->set_can_tx_track_angle(can_tx_track_angle(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_grouping_changed(can_tx_track_grouping_changed(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_oncoming(can_tx_track_oncoming(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_lat_rate(can_tx_track_lat_rate(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_bridge_object(can_tx_track_bridge_object(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_width(can_tx_track_width(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_status(can_tx_track_status(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_rolling_count(can_tx_track_rolling_count(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_range_rate(can_tx_track_range_rate(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_range_accel(can_tx_track_range_accel(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_range(can_tx_track_range(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_med_range_mode(can_tx_track_med_range_mode(bytes, length));
+  delphi_esr->mutable_esr_track04_503()->set_can_tx_track_angle(can_tx_track_angle(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_track_grouping_changed', 'enum': {0: 'CAN_TX_TRACK_GROUPING_CHANGED_GROUPINGUNCHANGED', 1: 'CAN_TX_TRACK_GROUPING_CHANGED_GROUPINGCHANGED'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 1, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}

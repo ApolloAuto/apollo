@@ -26,21 +26,23 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Vehicle14f0::Vehicle14f0() {}
 const int32_t Vehicle14f0::ID = 0x4F0;
 
 void Vehicle14f0::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_steering_angle_validity(can_rx_steering_angle_validity(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_steering_angle_rate(can_rx_steering_angle_rate(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_steering_angle_sign(can_rx_steering_angle_sign(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_steering_angle_rate_sign(can_rx_steering_angle_rate_sign(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_steering_angle(can_rx_steering_angle(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_radius_curvature(can_rx_radius_curvature(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_yaw_rate_validity(can_rx_yaw_rate_validity(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_yaw_rate(can_rx_yaw_rate(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_vehicle_speed_direction(can_rx_vehicle_speed_direction(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle1_4f0()->set_can_rx_vehicle_speed(can_rx_vehicle_speed(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_steering_angle_validity(can_rx_steering_angle_validity(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_steering_angle_rate(can_rx_steering_angle_rate(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_steering_angle_sign(can_rx_steering_angle_sign(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_steering_angle_rate_sign(can_rx_steering_angle_rate_sign(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_steering_angle(can_rx_steering_angle(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_radius_curvature(can_rx_radius_curvature(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_yaw_rate_validity(can_rx_yaw_rate_validity(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_yaw_rate(can_rx_yaw_rate(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_vehicle_speed_direction(can_rx_vehicle_speed_direction(bytes, length));
+  delphi_esr->mutable_vehicle1_4f0()->set_can_rx_vehicle_speed(can_rx_vehicle_speed(bytes, length));
 }
 
 // config detail: {'name': 'can_rx_steering_angle_validity', 'enum': {0: 'CAN_RX_STEERING_ANGLE_VALIDITY_INVALID', 1: 'CAN_RX_STEERING_ANGLE_VALIDITY_VALID'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 47, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}

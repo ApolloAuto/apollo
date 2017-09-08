@@ -26,24 +26,26 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrstatus65e5::Esrstatus65e5() {}
 const int32_t Esrstatus65e5::ID = 0x5E5;
 
 void Esrstatus65e5::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_sw_version_dsp_3rd_byte(can_tx_sw_version_dsp_3rd_byte(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_vertical_align_updated(can_tx_vertical_align_updated(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_vertical_misalignment(can_tx_vertical_misalignment(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_serv_align_updates_done(can_tx_serv_align_updates_done(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_found_target(can_tx_found_target(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_factory_misalignment(can_tx_factory_misalignment(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_factory_align_status_2(can_tx_factory_align_status_2(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_factory_align_status_1(can_tx_factory_align_status_1(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_recommend_unconverge(can_tx_recommend_unconverge(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_wave_diff_a2d(can_tx_wave_diff_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_system_power_mode(can_tx_system_power_mode(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_supply_n5v_a2d(can_tx_supply_n5v_a2d(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status6_5e5()->set_can_tx_supply_1p8v_a2d(can_tx_supply_1p8v_a2d(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_sw_version_dsp_3rd_byte(can_tx_sw_version_dsp_3rd_byte(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_vertical_align_updated(can_tx_vertical_align_updated(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_vertical_misalignment(can_tx_vertical_misalignment(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_serv_align_updates_done(can_tx_serv_align_updates_done(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_found_target(can_tx_found_target(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_factory_misalignment(can_tx_factory_misalignment(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_factory_align_status_2(can_tx_factory_align_status_2(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_factory_align_status_1(can_tx_factory_align_status_1(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_recommend_unconverge(can_tx_recommend_unconverge(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_wave_diff_a2d(can_tx_wave_diff_a2d(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_system_power_mode(can_tx_system_power_mode(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_supply_n5v_a2d(can_tx_supply_n5v_a2d(bytes, length));
+  delphi_esr->mutable_esr_status6_5e5()->set_can_tx_supply_1p8v_a2d(can_tx_supply_1p8v_a2d(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_sw_version_dsp_3rd_byte', 'offset': 0.0, 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}

@@ -26,19 +26,21 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrstatus75e6::Esrstatus75e6() {}
 const int32_t Esrstatus75e6::ID = 0x5E6;
 
 void Esrstatus75e6::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_status7_5e6()->set_can_tx_active_fault_7(can_tx_active_fault_7(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status7_5e6()->set_can_tx_active_fault_6(can_tx_active_fault_6(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status7_5e6()->set_can_tx_active_fault_5(can_tx_active_fault_5(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status7_5e6()->set_can_tx_active_fault_4(can_tx_active_fault_4(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status7_5e6()->set_can_tx_active_fault_3(can_tx_active_fault_3(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status7_5e6()->set_can_tx_active_fault_2(can_tx_active_fault_2(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status7_5e6()->set_can_tx_active_fault_0(can_tx_active_fault_0(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status7_5e6()->set_can_tx_active_fault_1(can_tx_active_fault_1(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status7_5e6()->set_can_tx_active_fault_7(can_tx_active_fault_7(bytes, length));
+  delphi_esr->mutable_esr_status7_5e6()->set_can_tx_active_fault_6(can_tx_active_fault_6(bytes, length));
+  delphi_esr->mutable_esr_status7_5e6()->set_can_tx_active_fault_5(can_tx_active_fault_5(bytes, length));
+  delphi_esr->mutable_esr_status7_5e6()->set_can_tx_active_fault_4(can_tx_active_fault_4(bytes, length));
+  delphi_esr->mutable_esr_status7_5e6()->set_can_tx_active_fault_3(can_tx_active_fault_3(bytes, length));
+  delphi_esr->mutable_esr_status7_5e6()->set_can_tx_active_fault_2(can_tx_active_fault_2(bytes, length));
+  delphi_esr->mutable_esr_status7_5e6()->set_can_tx_active_fault_0(can_tx_active_fault_0(bytes, length));
+  delphi_esr->mutable_esr_status7_5e6()->set_can_tx_active_fault_1(can_tx_active_fault_1(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_active_fault_7', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}

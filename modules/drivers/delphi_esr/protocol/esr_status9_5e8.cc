@@ -26,18 +26,20 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrstatus95e8::Esrstatus95e8() {}
 const int32_t Esrstatus95e8::ID = 0x5E8;
 
 void Esrstatus95e8::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_status9_5e8()->set_can_tx_path_id_acc_3(can_tx_path_id_acc_3(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status9_5e8()->set_can_tx_path_id_acc_2(can_tx_path_id_acc_2(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status9_5e8()->set_can_tx_filtered_xohp_acc_cipv(can_tx_filtered_xohp_acc_cipv(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status9_5e8()->set_can_tx_water_spray_target_id(can_tx_water_spray_target_id(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status9_5e8()->set_can_tx_serial_num_3rd_byte(can_tx_serial_num_3rd_byte(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status9_5e8()->set_can_tx_sideslip_angle(can_tx_sideslip_angle(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status9_5e8()->set_can_tx_avg_pwr_cwblkg(can_tx_avg_pwr_cwblkg(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_path_id_acc_3(can_tx_path_id_acc_3(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_path_id_acc_2(can_tx_path_id_acc_2(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_filtered_xohp_acc_cipv(can_tx_filtered_xohp_acc_cipv(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_water_spray_target_id(can_tx_water_spray_target_id(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_serial_num_3rd_byte(can_tx_serial_num_3rd_byte(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_sideslip_angle(can_tx_sideslip_angle(bytes, length));
+  delphi_esr->mutable_esr_status9_5e8()->set_can_tx_avg_pwr_cwblkg(can_tx_avg_pwr_cwblkg(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_path_id_acc_3', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|64]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}

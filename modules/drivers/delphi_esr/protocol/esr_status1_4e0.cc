@@ -26,18 +26,20 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrstatus14e0::Esrstatus14e0() {}
 const int32_t Esrstatus14e0::ID = 0x4E0;
 
 void Esrstatus14e0::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_status1_4e0()->set_can_tx_dsp_timestamp(can_tx_dsp_timestamp(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status1_4e0()->set_can_tx_comm_error(can_tx_comm_error(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status1_4e0()->set_can_tx_yaw_rate_calc(can_tx_yaw_rate_calc(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status1_4e0()->set_can_tx_vehicle_speed_calc(can_tx_vehicle_speed_calc(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status1_4e0()->set_can_tx_scan_index(can_tx_scan_index(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status1_4e0()->set_can_tx_rolling_count_1(can_tx_rolling_count_1(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status1_4e0()->set_can_tx_radius_curvature_calc(can_tx_radius_curvature_calc(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status1_4e0()->set_can_tx_dsp_timestamp(can_tx_dsp_timestamp(bytes, length));
+  delphi_esr->mutable_esr_status1_4e0()->set_can_tx_comm_error(can_tx_comm_error(bytes, length));
+  delphi_esr->mutable_esr_status1_4e0()->set_can_tx_yaw_rate_calc(can_tx_yaw_rate_calc(bytes, length));
+  delphi_esr->mutable_esr_status1_4e0()->set_can_tx_vehicle_speed_calc(can_tx_vehicle_speed_calc(bytes, length));
+  delphi_esr->mutable_esr_status1_4e0()->set_can_tx_scan_index(can_tx_scan_index(bytes, length));
+  delphi_esr->mutable_esr_status1_4e0()->set_can_tx_rolling_count_1(can_tx_rolling_count_1(bytes, length));
+  delphi_esr->mutable_esr_status1_4e0()->set_can_tx_radius_curvature_calc(can_tx_radius_curvature_calc(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_dsp_timestamp', 'offset': 0.0, 'precision': 2.0, 'len': 7, 'is_signed_var': False, 'physical_range': '[0|254]', 'bit': 5, 'type': 'double', 'order': 'motorola', 'physical_unit': 'ms'}
