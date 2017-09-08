@@ -113,9 +113,9 @@ TEST_F(MonitorBufferTest, Operator) {
   buffer_->INFO() << 3 << "pieces";
   EXPECT_EQ(MonitorMessageItem::INFO, buffer_->level_);
   ASSERT_EQ(2, buffer_->monitor_msg_items_.size());
-  item = buffer_->monitor_msg_items_.back();
-  EXPECT_EQ(MonitorMessageItem::INFO, item.first);
-  EXPECT_EQ("3pieces", item.second);
+  auto item2 = buffer_->monitor_msg_items_.back();
+  EXPECT_EQ(MonitorMessageItem::INFO, item2.first);
+  EXPECT_EQ("3pieces", item2.second);
 
   const char *fake_input = nullptr;
   EXPECT_TRUE(&(buffer_->INFO() << fake_input) == buffer_);
