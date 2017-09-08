@@ -42,7 +42,7 @@ void EdgeCreator::InitEdgeCost(const Node& node_from, const Node& node_to,
   edge->set_cost(0.0);
   if (type == Edge::LEFT || type == Edge::RIGHT) {
     const auto& target_range =
-        (type == Edge::LEFT) ? node_from.left_out() : node_to.right_out();
+        (type == Edge::LEFT) ? node_from.left_out() : node_from.right_out();
     double changing_area_length = 0.0;
     for (const auto& range : target_range) {
       changing_area_length += range.end().s() - range.start().s();
