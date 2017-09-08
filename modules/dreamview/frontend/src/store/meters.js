@@ -11,7 +11,7 @@ function toDrivingMode(disengageType) {
         case "DISENGAGE_NONE":
             return "AUTO";
         case "DISENGAGE_EMERGENCY":
-            return "EMERGENCY";
+            return "DISENGAGED";
         case "DISENGAGE_AUTO_STEER_ONLY":
             return "AUTO STEER ONLY";
         case "DISENGAGE_AUTO_SPEED_ONLY":
