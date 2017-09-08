@@ -26,16 +26,18 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrstatus34e2::Esrstatus34e2() {}
 const int32_t Esrstatus34e2::ID = 0x4E2;
 
 void Esrstatus34e2::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_status3_4e2()->set_can_tx_sw_version_pld(can_tx_sw_version_pld(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status3_4e2()->set_can_tx_sw_version_host(can_tx_sw_version_host(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status3_4e2()->set_can_tx_hw_version(can_tx_hw_version(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status3_4e2()->set_can_tx_interface_version(can_tx_interface_version(bytes, length));
-  chassis->mutable_esr()->mutable_esr_status3_4e2()->set_can_tx_serial_num(can_tx_serial_num(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_status3_4e2()->set_can_tx_sw_version_pld(can_tx_sw_version_pld(bytes, length));
+  delphi_esr->mutable_esr_status3_4e2()->set_can_tx_sw_version_host(can_tx_sw_version_host(bytes, length));
+  delphi_esr->mutable_esr_status3_4e2()->set_can_tx_hw_version(can_tx_hw_version(bytes, length));
+  delphi_esr->mutable_esr_status3_4e2()->set_can_tx_interface_version(can_tx_interface_version(bytes, length));
+  delphi_esr->mutable_esr_status3_4e2()->set_can_tx_serial_num(can_tx_serial_num(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_sw_version_pld', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 63, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}

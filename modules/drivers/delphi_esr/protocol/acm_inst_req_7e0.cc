@@ -26,17 +26,19 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Acminstreq7e0::Acminstreq7e0() {}
 const int32_t Acminstreq7e0::ID = 0x7E0;
 
 void Acminstreq7e0::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_acm_inst_req_7e0()->set_command_ctr(command_ctr(bytes, length));
-  chassis->mutable_esr()->mutable_acm_inst_req_7e0()->set_command_code(command_code(bytes, length));
-  chassis->mutable_esr()->mutable_acm_inst_req_7e0()->set_cc_word_2(cc_word_2(bytes, length));
-  chassis->mutable_esr()->mutable_acm_inst_req_7e0()->set_cc_word_1(cc_word_1(bytes, length));
-  chassis->mutable_esr()->mutable_acm_inst_req_7e0()->set_cc_byte_2(cc_byte_2(bytes, length));
-  chassis->mutable_esr()->mutable_acm_inst_req_7e0()->set_cc_byte_1(cc_byte_1(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_acm_inst_req_7e0()->set_command_ctr(command_ctr(bytes, length));
+  delphi_esr->mutable_acm_inst_req_7e0()->set_command_code(command_code(bytes, length));
+  delphi_esr->mutable_acm_inst_req_7e0()->set_cc_word_2(cc_word_2(bytes, length));
+  delphi_esr->mutable_acm_inst_req_7e0()->set_cc_word_1(cc_word_1(bytes, length));
+  delphi_esr->mutable_acm_inst_req_7e0()->set_cc_byte_2(cc_byte_2(bytes, length));
+  delphi_esr->mutable_acm_inst_req_7e0()->set_cc_byte_1(cc_byte_1(bytes, length));
 }
 
 // config detail: {'name': 'command_ctr', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 15, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}

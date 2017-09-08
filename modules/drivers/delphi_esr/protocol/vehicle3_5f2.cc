@@ -26,26 +26,28 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Vehicle35f2::Vehicle35f2() {}
 const int32_t Vehicle35f2::ID = 0x5F2;
 
 void Vehicle35f2::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_serv_align_updates_need(can_rx_serv_align_updates_need(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_serv_align_type(can_rx_serv_align_type(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_serv_align_enable(can_rx_serv_align_enable(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_aalign_avg_ctr_total(can_rx_aalign_avg_ctr_total(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_auto_align_converged(can_rx_auto_align_converged(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_auto_align_disable(can_rx_auto_align_disable(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_angle_mounting_offset(can_rx_angle_mounting_offset(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_wheel_slip(can_rx_wheel_slip(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_radar_height(can_rx_radar_height(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_radar_fov_mr(can_rx_radar_fov_mr(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_radar_fov_lr(can_rx_radar_fov_lr(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_long_accel_validity(can_rx_long_accel_validity(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_long_accel(can_rx_long_accel(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_lat_accel_validity(can_rx_lat_accel_validity(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle3_5f2()->set_can_rx_lat_accel(can_rx_lat_accel(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_serv_align_updates_need(can_rx_serv_align_updates_need(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_serv_align_type(can_rx_serv_align_type(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_serv_align_enable(can_rx_serv_align_enable(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_aalign_avg_ctr_total(can_rx_aalign_avg_ctr_total(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_auto_align_converged(can_rx_auto_align_converged(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_auto_align_disable(can_rx_auto_align_disable(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_angle_mounting_offset(can_rx_angle_mounting_offset(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_wheel_slip(can_rx_wheel_slip(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_radar_height(can_rx_radar_height(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_radar_fov_mr(can_rx_radar_fov_mr(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_radar_fov_lr(can_rx_radar_fov_lr(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_long_accel_validity(can_rx_long_accel_validity(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_long_accel(can_rx_long_accel(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_lat_accel_validity(can_rx_lat_accel_validity(bytes, length));
+  delphi_esr->mutable_vehicle3_5f2()->set_can_rx_lat_accel(can_rx_lat_accel(bytes, length));
 }
 
 // config detail: {'name': 'can_rx_serv_align_updates_need', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
