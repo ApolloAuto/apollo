@@ -57,9 +57,9 @@ void QpSplineStGraph::Init() {
   }
 
   // init evaluated t positions
-  curr_t = t_evaluated_resolution_;
+  curr_t = 0;
   for (uint32_t i = 0;
-       i < qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
+       i <= qp_spline_st_speed_config_.number_of_evaluated_graph_t(); ++i) {
     t_evaluated_.push_back(curr_t);
     curr_t += t_evaluated_resolution_;
   }
@@ -228,13 +228,26 @@ Status QpSplineStGraph::ApplyConstraint(
   std::vector<double> accel_lower_bound(t_evaluated_.size(), kAccelLowerBound);
   std::vector<double> accel_upper_bound(t_evaluated_.size(), kAccelUpperBound);
 
-  constexpr double kInitPointAccelRelaxedSpeed = 1.0;
-  if (init_point_.v() > kInitPointAccelRelaxedSpeed &&
-      !constraint->AddPointSecondDerivativeConstraint(0.0, init_point_.a())) {
-    const std::string msg =
-        "add st start point acceleration constraint failed!";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+  bool has_follow = false;
+  double delta_s = 1.0;
+  for (const auto& boundary : boundaries) {
+    if (boundary.boundary_type() == StBoundary::BoundaryType::FOLLOW) {
+      has_follow = true;
+      delta_s = std::fmin(
+          delta_s, boundary.min_s() - fabs(boundary.characteristic_length()));
+    }
+  }
+  if (has_follow && delta_s < 0.0) {
+    accel_upper_bound.front() = 0.0;
+  } else {
+    constexpr double kInitPointAccelRelaxedSpeed = 1.0;
+    if (init_point_.v() > kInitPointAccelRelaxedSpeed &&
+        !constraint->AddPointSecondDerivativeConstraint(0.0, init_point_.a())) {
+      const std::string msg =
+          "add st start point acceleration constraint failed!";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
   }
 
   DCHECK_EQ(t_evaluated_.size(), accel_lower_bound.size());
@@ -296,29 +309,28 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
     const std::vector<double>& evaluate_t, const SpeedLimit& speed_limit,
     const double weight) {
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
-  std::vector<double> s_vec;
   if (speed_limit.speed_limit_points().size() == 0) {
     std::string msg = "Fail to apply_kernel due to empty speed limits.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   double dist_ref = 0.0;
-  s_vec.push_back(dist_ref);
+  cruise_.push_back(dist_ref);
   for (uint32_t i = 1; i < evaluate_t.size(); ++i) {
     dist_ref += (evaluate_t[i] - evaluate_t[i - 1]) *
                 speed_limit.GetSpeedLimitByS(dist_ref);
-    s_vec.push_back(dist_ref);
+    cruise_.push_back(dist_ref);
   }
-  DCHECK_EQ(evaluate_t.size(), s_vec.size());
+  DCHECK_EQ(evaluate_t.size(), cruise_.size());
 
   for (std::size_t i = 0; i < evaluate_t.size(); ++i) {
-    ADEBUG << "Cruise Ref S: " << s_vec[i]
+    ADEBUG << "Cruise Ref S: " << cruise_[i]
            << " Relative time: " << evaluate_t[i] << std::endl;
   }
 
   if (evaluate_t.size() > 0) {
     spline_kernel->AddReferenceLineKernelMatrix(
-        evaluate_t, s_vec,
+        evaluate_t, cruise_,
         weight * qp_spline_st_speed_config_.total_time() / evaluate_t.size());
   }
   spline_kernel->AddRegularization(0.01);
@@ -331,7 +343,8 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
-  for (const double curr_t : evaluate_t) {
+  for (size_t i = 0; i < evaluate_t.size(); ++i) {
+    double curr_t = evaluate_t[i];
     double s_min = std::numeric_limits<double>::infinity();
     bool success = false;
     for (const auto& boundary : boundaries) {
@@ -345,10 +358,12 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
       double s_lower = 0.0;
       if (boundary.GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
         success = true;
-        s_min = std::min(s_min, s_upper - boundary.characteristic_length());
+        s_min = std::min(s_min,
+                         s_upper - boundary.characteristic_length() -
+                             qp_spline_st_speed_config_.follow_drag_distance());
       }
     }
-    if (success && init_point_.v() * curr_t > s_min) {
+    if (success && s_min < cruise_[i]) {
       filtered_evaluate_t.push_back(curr_t);
       ref_s.push_back(s_min);
     }

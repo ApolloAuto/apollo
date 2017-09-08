@@ -102,6 +102,7 @@ em_planner_config {
         max_speed: 20.0
         max_acceleration: 2.5
         max_deceleration: -4.5
+        follow_drag_distance: 15.0
 
         st_boundary_config {
             boundary_buffer: 0.1
