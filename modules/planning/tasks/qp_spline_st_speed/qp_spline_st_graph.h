@@ -33,8 +33,8 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 #include "modules/planning/common/speed/st_boundary.h"
+#include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
 
 namespace apollo {
@@ -66,10 +66,11 @@ class QpSplineStGraph {
   common::Status Solve();
 
   // extract upper lower bound for constraint;
-  common::Status GetSConstraintByTime(
-      const std::vector<StBoundary>& boundaries, const double time,
-      const double total_path_s, double* const s_upper_bound,
-      double* const s_lower_bound) const;
+  common::Status GetSConstraintByTime(const std::vector<StBoundary>& boundaries,
+                                      const double time,
+                                      const double total_path_s,
+                                      double* const s_upper_bound,
+                                      double* const s_lower_bound) const;
 
   // generate reference speed profile
   // common::Status ApplyReferenceSpeedProfile();
@@ -106,6 +107,9 @@ class QpSplineStGraph {
 
   // evaluated points
   std::vector<double> t_evaluated_;
+
+  // reference line kernel
+  std::vector<double> cruise_;
 };
 
 }  // namespace planning
