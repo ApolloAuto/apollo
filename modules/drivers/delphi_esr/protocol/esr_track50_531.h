@@ -17,7 +17,8 @@
 #ifndef MODULES_DRIVERS_DELPHI_ESR_PROTOCOL_ESR_TRACK50_531_H_
 #define MODULES_DRIVERS_DELPHI_ESR_PROTOCOL_ESR_TRACK50_531_H_
 
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
+#include "modules/drivers/sensor_protocol_data.h"
 
 namespace apollo {
 namespace drivers {

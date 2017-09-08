@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/esr/protocol/esr_trackmotionpower_540.h"
+#include "modules/drivers/delphi_esr/protocol/esr_trackmotionpower_540.h"
 
 
 #include "glog/logging.h"
