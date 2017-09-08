@@ -497,7 +497,7 @@ bool DpStGraph::CreateFollowDecision(
   auto* follow = follow_decision->mutable_follow();
 
   // in seconds
-  constexpr double kFollowTimeBuffer = 3.0;
+  constexpr double kFollowTimeBuffer = 4.0;
   const auto& velocity = path_obstacle.obstacle()->Perception().velocity();
   const double follow_speed =
       std::fmax(init_point_.v(), std::hypot(velocity.x(), velocity.y()));

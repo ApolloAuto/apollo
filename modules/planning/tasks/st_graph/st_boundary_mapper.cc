@@ -404,6 +404,18 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
   }
 
   if (lower_points.size() > 1 && upper_points.size() > 1) {
+    if (obj_decision.has_follow()) {
+      const double diff_s = lower_points.back().s() - lower_points.front().s();
+      const double diff_t = lower_points.back().t() - lower_points.front().t();
+      double extend_lower_s =
+          diff_s / diff_t * planning_time_ + lower_points.front().s();
+      const double extend_upper_s =
+          extend_lower_s + (upper_points.back().s() - lower_points.back().s()) +
+          1.0;
+      upper_points.emplace_back(extend_upper_s, planning_time_);
+      lower_points.emplace_back(extend_lower_s, planning_time_);
+    }
+
     *boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
                     .ExpandByS(boundary_s_buffer)
                     .ExpandByT(boundary_t_buffer);
