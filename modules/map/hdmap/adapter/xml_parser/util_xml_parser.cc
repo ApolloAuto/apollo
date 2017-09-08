@@ -72,8 +72,6 @@ Status UtilXmlParser::ParseGeometry(const tinyxml2::XMLElement& xml_node,
 
     curve_segment->mutable_start_position()->set_x(output_x);
     curve_segment->mutable_start_position()->set_y(output_y);
-    // TODO(liuyang23): add heading
-    // curve_segment->set_heading(hdg);
     curve_segment->set_length(length);
   }
 
@@ -179,12 +177,6 @@ Status UtilXmlParser::ParsePoint(const tinyxml2::XMLElement& xml_node,
   pt->set_z(output_z);
 
   return Status::OK();
-}
-
-std::string UtilXmlParser::CreateLaneId(const std::string& road_id,
-                                        const std::string& section_id,
-                                        const int lane_id) {
-  return road_id + "_" + section_id + "_" + std::to_string(lane_id);
 }
 
 std::string UtilXmlParser::ToUpper(const std::string& s) {

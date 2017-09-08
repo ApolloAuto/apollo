@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_SIGNALS_XML_PARSER_H_
-#define MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_SIGNALS_XML_PARSER_H_
+#ifndef MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_SIGNALS_XML_PARSER_H_
+#define MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_SIGNALS_XML_PARSER_H_
 
 #include <string>
 #include <vector>
@@ -46,4 +46,4 @@ class SignalsXmlParser {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_SIGNALS_XML_PARSER_H_
+#endif  // MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_SIGNALS_XML_PARSER_H_

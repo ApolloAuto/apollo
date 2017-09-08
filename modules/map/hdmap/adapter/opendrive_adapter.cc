@@ -31,6 +31,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
 
   tinyxml2::XMLDocument document;
   if (document.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS) {
+    AERROR << "fail to load file " << filename;
     return false;
   }
 
@@ -41,6 +42,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
   PbHeader* map_header = pb_map->mutable_header();
   Status status = HeaderXmlParser::Parse(*root_node, map_header);
   if (!status.ok()) {
+    AERROR << "fail to parse opendrive header, " << status.error_message();
     return false;
   }
 
@@ -48,6 +50,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
   std::vector<RoadInternal> roads;
   status = RoadsXmlParser::Parse(*root_node, &roads);
   if (!status.ok()) {
+    AERROR << "fail to parse opendrive road, " << status.error_message();
     return false;
   }
 
@@ -55,6 +58,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
   std::vector<JunctionInternal> junctions;
   status = JunctionsXmlParser::Parse(*root_node, &junctions);
   if (!status.ok()) {
+    AERROR << "fail to parse opendrive junction, " << status.error_message();
     return false;
   }
 

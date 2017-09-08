@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_
-#define MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_
+#ifndef MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_
+#define MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_
 
 #include <string>
 #include <vector>
@@ -39,9 +39,6 @@ class UtilXmlParser {
                              PbPolygon* polygon);
   static Status ParsePoint(const tinyxml2::XMLElement& xml_node, PbPoint3D* pt);
 
-  static std::string CreateLaneId(const std::string& road_id,
-                                  const std::string& section_id,
-                                  const int lane_id);
   static std::string ToUpper(const std::string& s);
 
   static void WGS84ToUTM(const double x, const double y, const double z,
@@ -66,4 +63,4 @@ int GetLongZone(double longitude);
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_
+#endif  // MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_UTIL_XML_PARSER_H_
