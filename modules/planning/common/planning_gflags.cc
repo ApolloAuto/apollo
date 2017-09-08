@@ -57,7 +57,8 @@ DEFINE_bool(enable_reference_line_provider_thread, false,
 DEFINE_double(default_reference_line_width, 4.0,
               "Default reference line width");
 
-DEFINE_double(planning_upper_speed_limit, 10.0, "Maximum speed in planning.");
+DEFINE_double(planning_upper_speed_limit, 7.5,
+              "Maximum speed (m/s) in planning.");
 
 DEFINE_double(planning_distance, 100, "Planning distance");
 
