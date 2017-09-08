@@ -348,7 +348,7 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
         s_min = std::min(s_min, s_upper - boundary.characteristic_length());
       }
     }
-    if (success) {
+    if (success && init_point_.v() * curr_t > s_min) {
       filtered_evaluate_t.push_back(curr_t);
       ref_s.push_back(s_min);
     }
