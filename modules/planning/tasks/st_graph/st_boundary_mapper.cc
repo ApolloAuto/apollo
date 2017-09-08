@@ -404,11 +404,12 @@ Status StBoundaryMapper::MapWithPredictionTrajectory(
   }
 
   if (lower_points.size() > 1 && upper_points.size() > 1) {
-    if (obj_decision.has_follow()) {
+    if (obj_decision.has_follow() && lower_points.back().t() < planning_time_) {
       const double diff_s = lower_points.back().s() - lower_points.front().s();
       const double diff_t = lower_points.back().t() - lower_points.front().t();
       double extend_lower_s =
-          diff_s / diff_t * planning_time_ + lower_points.front().s();
+          diff_s / diff_t * (planning_time_ - lower_points.front().t()) +
+          lower_points.front().s();
       const double extend_upper_s =
           extend_lower_s + (upper_points.back().s() - lower_points.back().s()) +
           1.0;
