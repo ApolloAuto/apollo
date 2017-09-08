@@ -60,7 +60,8 @@ class QpSplineStGraph {
 
   // apply objective function
   common::Status ApplyKernel(const std::vector<StBoundary>& boundaries,
-                             const SpeedLimit& speed_limit);
+                             const SpeedLimit& speed_limit,
+                             planning_internal::STGraphDebug* st_graph_debug);
 
   // solve
   common::Status Solve();
@@ -74,11 +75,13 @@ class QpSplineStGraph {
 
   // generate reference speed profile
   // common::Status ApplyReferenceSpeedProfile();
-  common::Status AddCruiseReferenceLineKernel(const SpeedLimit& speed_limit,
-                                              const double weight);
+  common::Status AddCruiseReferenceLineKernel(
+      const SpeedLimit& speed_limit,
+      const double weight, planning_internal::STGraphDebug* st_graph_debug);
 
   common::Status AddFollowReferenceLineKernel(
-      const std::vector<StBoundary>& boundaries, const double weight);
+      const std::vector<StBoundary>& boundaries, const double weight,
+      planning_internal::STGraphDebug* st_graph_debug);
 
   common::Status EstimateSpeedUpperBound(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,

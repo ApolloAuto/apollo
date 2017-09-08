@@ -20,6 +20,8 @@ class StMainSubplot:
 
     def __init__(self, ax, st_name):
         self.st_curve_line, = ax.plot([0], [0], "k.", lw=3, alpha=0.5)
+        self.kernel_cruise_line, = ax.plot([0], [0], "g.", lw=3, alpha=0.5)
+        self.kernel_follow_line, = ax.plot([0], [0], "y.", lw=3, alpha=0.5)
         self.obstacle_boundary_lines = []
         self.obstacle_annotations = []
         self.obstacle_boundary_size = 10
@@ -41,6 +43,8 @@ class StMainSubplot:
 
     def set_visible(self, visible):
         self.st_curve_line.set_visible(visible)
+        self.kernel_cruise_line.set_visible(visible)
+        self.kernel_follow_line.set_visible(visible)
         for line in self.obstacle_boundary_lines:
             line.set_visible(visible)
         for text in self.obstacle_annotations:
@@ -88,6 +92,13 @@ class StMainSubplot:
         self.st_curve_line.set_xdata(planning.st_curve_t[self.st_name])
         self.st_curve_line.set_ydata(planning.st_curve_s[self.st_name])
         self.st_curve_line.set_label(self.st_name[0:5])
+
+        self.kernel_cruise_line.set_visible(True)
+        self.kernel_cruise_line.set_xdata(planning.kernel_cruise_t[self.st_name])
+        self.kernel_cruise_line.set_ydata(planning.kernel_cruise_s[self.st_name])
+        self.kernel_follow_line.set_visible(True)
+        self.kernel_follow_line.set_xdata(planning.kernel_follow_t[self.st_name])
+        self.kernel_follow_line.set_ydata(planning.kernel_follow_s[self.st_name])
 
         planning.st_data_lock.release()
 
