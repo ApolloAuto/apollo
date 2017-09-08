@@ -17,9 +17,12 @@
 #include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
 
 DEFINE_string(node_name, "lidar_ex_checker",
-        "The lidar extrinsics checker module name in proto");
+              "The lidar extrinsics checker module name in proto");
 
 DEFINE_int32(capture_cloud_count, 3, "the number of cloud count to capture");
 
 DEFINE_double(capture_distance, 15.0, "the distance between two clouds");
 
+DEFINE_string(adapter_config_filename,
+              "/apollo/modules/calibration/lidar_ex_checker/conf/adapter.conf",
+              "The adapter config file");

@@ -22,7 +22,6 @@
 
 #include "modules/localization/proto/localization.pb.h"
 
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
@@ -51,7 +50,7 @@ Status Control::Init() {
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
 
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  AdapterManager::Init(FLAGS_adapter_config_filename);
 
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
 
@@ -246,7 +245,7 @@ Status Control::CheckInput() {
                   "planning has no trajectory point.");
   }
 
-  for (auto& trajectory_point : *trajectory_.mutable_trajectory_point()) {
+  for (auto &trajectory_point : *trajectory_.mutable_trajectory_point()) {
     if (trajectory_point.v() < control_conf_.minimum_speed_resolution()) {
       trajectory_point.set_v(0.0);
       trajectory_point.set_a(0.0);

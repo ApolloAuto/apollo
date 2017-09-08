@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "eigen_conversions/eigen_msg.h"
 #include "pcl/io/pcd_io.h"
 #include "pcl/visualization/cloud_viewer.h"
 #include "pcl_conversions/pcl_conversions.h"
-#include "eigen_conversions/eigen_msg.h"
+#include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "tf2_ros/transform_listener.h"
 
@@ -25,7 +26,6 @@
 #include "modules/calibration/lidar_ex_checker/lidar_ex_checker.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace calibration {
@@ -34,9 +34,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 
-std::string LidarExChecker::Name() const {
-  return "lidar_extrinsics_checker";
-}
+std::string LidarExChecker::Name() const { return "lidar_extrinsics_checker"; }
 
 Status LidarExChecker::Init() {
   is_first_gps_msg_ = true;
@@ -50,7 +48,7 @@ Status LidarExChecker::Init() {
 
   position_type_ = 0;
 
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  AdapterManager::Init(FLAGS_adapter_config_filename);
 
   CHECK(AdapterManager::GetGps()) << "GPS is not initialized.";
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
@@ -202,9 +200,7 @@ void LidarExChecker::OnInsStat(
   position_type_ = message.pos_type();
 }
 
-Status LidarExChecker::Start() {
-  return Status::OK();
-}
+Status LidarExChecker::Start() { return Status::OK(); }
 
 void LidarExChecker::Stop() {}
 

@@ -20,16 +20,19 @@
 
 // System gflags
 DEFINE_string(prediction_module_name, "prediction",
-    "Default prediciton module name");
+              "Default prediciton module name");
 DEFINE_string(prediction_conf_file,
-    "modules/prediction/conf/prediction_conf.pb.txt",
-    "Default conf file for prediction");
+              "modules/prediction/conf/prediction_conf.pb.txt",
+              "Default conf file for prediction");
+
+DEFINE_string(adapter_config_filename, "modules/prediction/conf/adapter.conf",
+              "Default conf file for prediction");
 
 DEFINE_double(prediction_duration, 3.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_freq, 0.1, "Prediction frequency (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 5.0,
-    "Minimal length of prediction trajectory");
+              "Minimal length of prediction trajectory");
 
 // Map
 DEFINE_double(search_radius, 3.0, "Search radius for a candidate lane");
@@ -43,19 +46,19 @@ DEFINE_double(q_var, 0.01, "Processing noise covariance");
 DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
 DEFINE_double(go_approach_rate, 0.995,
-    "The rate to approach to the reference line of going straight");
+              "The rate to approach to the reference line of going straight");
 DEFINE_double(cutin_approach_rate, 0.9,
-    "The rate to approach to the reference line of lane change");
+              "The rate to approach to the reference line of lane change");
 DEFINE_int32(still_obstacle_history_length, 10,
-    "Min # historical frames for still obstacles");
+             "Min # historical frames for still obstacles");
 DEFINE_double(still_obstacle_speed_threshold, 1.0,
-    "Speed threshold for still obstacles");
+              "Speed threshold for still obstacles");
 DEFINE_double(still_obstacle_position_std, 1.0,
-    "Position standard deviation for still obstacles");
+              "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
 DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
-    "Max angle difference for a candiate lane");
+              "Max angle difference for a candiate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
 DEFINE_double(pedestrian_min_speed, 0.1, "min speed for still pedestrian");
@@ -63,16 +66,17 @@ DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
 DEFINE_double(pedestrian_min_acc, -4.0, "minimum pedestrian acceleration");
 DEFINE_double(pedestrian_max_acc, 2.0, "maximum pedestrian acceleration");
 DEFINE_double(prediction_pedestrian_total_time, 10.0,
-    "Total prediction time for pedestrians");
+              "Total prediction time for pedestrians");
 DEFINE_int32(num_trajectory_still_pedestrian, 6,
-    "number of trajectories for static pedestrian");
+             "number of trajectories for static pedestrian");
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
 DEFINE_string(vehicle_model_file,
-    "modules/prediction/data/mlp_vehicle_model.bin", "Vehicle model file");
+              "modules/prediction/data/mlp_vehicle_model.bin",
+              "Vehicle model file");
 DEFINE_int32(max_num_obstacles_stored, 100,
-    "maximal number of obstacles stored in obstacles container.");
+             "maximal number of obstacles stored in obstacles container.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
-    "Threshold for trimming lane sequence trajectories");
+              "Threshold for trimming lane sequence trajectories");
 DEFINE_double(lane_change_dist, 10.0, "Lane change distance with ADC");
