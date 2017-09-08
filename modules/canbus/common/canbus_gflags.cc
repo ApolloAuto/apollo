@@ -21,6 +21,9 @@ DEFINE_string(node_namespace, "/apollo/canbus", "Global node namespace");
 DEFINE_string(node_name, "chassis", "The chassis module name in proto");
 DEFINE_string(hmi_name, "canbus", "Module name in HMI");
 
+DEFINE_string(adapter_config_filename, "modules/canbus/conf/adapter.conf",
+              "The adapter config file");
+
 // data file
 DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf_dev.pb.txt",
               "Default canbus conf file");

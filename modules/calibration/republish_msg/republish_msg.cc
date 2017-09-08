@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/calibration/republish_msg/common/republish_msg_gflags.h"
 #include "modules/calibration/republish_msg/republish_msg.h"
-#include "ros/include/ros/ros.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/calibration/republish_msg/common/republish_msg_gflags.h"
+#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace calibration {
@@ -27,12 +27,10 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 
-std::string RepublishMsg::Name() const {
-  return "republish_msg";
-}
+std::string RepublishMsg::Name() const { return "republish_msg"; }
 
 Status RepublishMsg::Init() {
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  AdapterManager::Init(FLAGS_adapter_config_filename);
 
   CHECK(AdapterManager::GetInsStat()) << "INS status is not initialized.";
   CHECK(AdapterManager::GetGps()) << "Gps is not initialized.";
@@ -56,10 +54,9 @@ void RepublishMsg::OnGps(const ::apollo::localization::Gps& msg) {
   if (msg.has_localization()) {
     const auto pose_msg = msg.localization();
 
-    Eigen::Quaterniond rotation(pose_msg.orientation().qw(),
-                                pose_msg.orientation().qx(),
-                                pose_msg.orientation().qy(),
-                                pose_msg.orientation().qz());
+    Eigen::Quaterniond rotation(
+        pose_msg.orientation().qw(), pose_msg.orientation().qx(),
+        pose_msg.orientation().qy(), pose_msg.orientation().qz());
     Eigen::Translation3d translation(pose_msg.position().x(),
                                      pose_msg.position().y(),
                                      pose_msg.position().z());
@@ -90,9 +87,7 @@ void RepublishMsg::OnGps(const ::apollo::localization::Gps& msg) {
   }
 }
 
-Status RepublishMsg::Start() {
-  return Status::OK();
-}
+Status RepublishMsg::Start() { return Status::OK(); }
 
 void RepublishMsg::Stop() {}
 

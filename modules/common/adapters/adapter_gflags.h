@@ -19,7 +19,6 @@
 
 #include "gflags/gflags.h"
 
-DECLARE_string(adapter_config_path);
 DECLARE_bool(enable_adapter_dump);
 DECLARE_string(monitor_topic);
 DECLARE_string(gps_topic);

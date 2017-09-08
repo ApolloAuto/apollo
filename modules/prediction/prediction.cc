@@ -16,7 +16,6 @@
 
 #include "modules/prediction/prediction.h"
 
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -53,10 +52,10 @@ Status Prediction::Init() {
   }
 
   adapter_conf_.Clear();
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_adapter_config_path,
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_adapter_config_filename,
                                                 &adapter_conf_)) {
     return OnError("Unable to load adapter conf file: " +
-                   FLAGS_adapter_config_path);
+                   FLAGS_adapter_config_filename);
   } else {
     ADEBUG << "Adapter config file is loaded into: "
            << adapter_conf_.ShortDebugString();

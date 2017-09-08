@@ -16,8 +16,6 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 
-DEFINE_string(adapter_config_path, "", "the file path of adapter config file");
-
 DEFINE_bool(enable_adapter_dump, false,
             "Whether enable dumping the messages to "
             "/tmp/adapters/<topic_name>/<seq_num>.txt for debugging purposes.");

@@ -18,6 +18,10 @@
 
 DEFINE_string(control_conf_file, "modules/control/conf/lincoln.pb.txt",
               "default control conf data file");
+
+DEFINE_string(adapter_config_filename, "modules/control/conf/adapter.conf",
+              "The adapter config file");
+
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
 DEFINE_bool(enable_control_watchdog, true, "True to enable control watchdog");

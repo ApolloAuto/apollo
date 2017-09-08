@@ -19,6 +19,9 @@
 DEFINE_string(node_name, "routing", "the name for this node");
 DEFINE_string(node_namespace, "routing", "the namespace for this node");
 
+DEFINE_string(adapter_config_filename, "modules/routing/conf/adapter.conf",
+              "The adapter config filename");
+
 DEFINE_bool(use_road_id, true, "enable use road id to cut routing result");
 DEFINE_double(min_length_for_lane_change, 10.0,
               "min length for lane change, in creater, in meter");

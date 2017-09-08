@@ -41,7 +41,7 @@ using apollo::hdmap::BaseMapFile;
 std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
 
 Status Dreamview::Init() {
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  AdapterManager::Init(FLAGS_adapter_config_filename);
   VehicleConfigHelper::Init();
 
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
