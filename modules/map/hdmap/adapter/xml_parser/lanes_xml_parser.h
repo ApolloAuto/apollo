@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
-#ifndef MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_LANE_XML_PARSER_H_
-#define MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_LANE_XML_PARSER_H_
+#ifndef MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_LANE_XML_PARSER_H_
+#define MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_LANE_XML_PARSER_H_
 
 #include <string>
 #include <vector>
@@ -33,8 +33,6 @@ class LanesXmlParser {
                       const std::string& road_id,
                       std::vector<RoadSectionInternal>* sections);
   static Status ParseLaneSection(const tinyxml2::XMLElement& xml_node,
-                                 const std::string& road_id,
-                                 const std::string& section_id,
                                  std::vector<LaneInternal>* lanes);
 
   static Status ParseSectionBoundary(const tinyxml2::XMLElement& xml_node,
@@ -43,8 +41,6 @@ class LanesXmlParser {
   static Status ToPbBoundaryType(const std::string& type,
                                  PbBoundaryEdgeType* boundary_type);
   static Status ParseLane(const tinyxml2::XMLElement& xml_node,
-                          const std::string& road_id,
-                          const std::string& section_id,
                           LaneInternal* lane_internal);
   static Status ParseDirection(const tinyxml2::XMLElement& xml_node,
                                PbLane* lane);
@@ -72,8 +68,7 @@ class LanesXmlParser {
                               PbLaneDirection* pb_direction);
 
   static void ParseLaneLink(const tinyxml2::XMLElement& xml_node,
-                            const std::string& /*road_id*/,
-                            const std::string& /*section_id*/, PbLane* lane);
+                            PbLane* lane);
   static Status ParseLaneBorderMark(const tinyxml2::XMLElement& xml_node,
                                     PbLaneBoundaryTypeType* boundary_type);
   static Status ToPbLaneMarkType(const std::string& type,
@@ -85,4 +80,4 @@ class LanesXmlParser {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_MAP_LOADER_ADAPTER_XML_PARSER_LANE_XML_PARSER_H_
+#endif  // MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_LANE_XML_PARSER_H_

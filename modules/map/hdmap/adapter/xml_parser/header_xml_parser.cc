@@ -32,7 +32,7 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
                               PbHeader* header) {
   auto header_node = xml_node.FirstChildElement("header");
   if (!header_node) {
-    std::string err_msg = "error xml data missing header";
+    std::string err_msg = "xml data missing header";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
   int rev_major = 0;
