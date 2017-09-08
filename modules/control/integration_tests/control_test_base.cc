@@ -20,7 +20,6 @@
 #include <sstream>
 
 #include "google/protobuf/text_format.h"
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/monitor/proto/monitor.pb.h"
 #include "modules/common/util/file.h"
@@ -64,7 +63,7 @@ bool ControlTestBase::test_control() {
   }
   control_.controller_agent_.Reset();
 
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  AdapterManager::Init(FLAGS_adapter_config_filename);
   if (!FLAGS_test_pad_file.empty()) {
     PadMessage pad_message;
     if (!apollo::common::util::GetProtoFromFile(
@@ -168,7 +167,7 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
 void ControlTestBase::SetUpTestCase() {
   ros::Time::init();
   FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
-  FLAGS_adapter_config_path = "modules/control/testdata/conf/adapter.conf";
+  FLAGS_adapter_config_filename = "modules/control/testdata/conf/adapter.conf";
   FLAGS_is_control_test_mode = true;
 }
 

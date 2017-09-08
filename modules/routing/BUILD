@@ -31,7 +31,6 @@ cc_binary(
     deps = [
         ":lib_routing",
         "//external:gflags",
-        "//modules/routing/common:routing_gflags",
     ],
 )
 

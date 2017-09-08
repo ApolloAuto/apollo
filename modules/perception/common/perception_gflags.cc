@@ -20,6 +20,9 @@ DEFINE_int32(perception_loop_rate, 10, "Loop rate for perception node, in Hz.");
 
 DEFINE_string(node_name, "perception", "The perception module name in proto");
 
+DEFINE_string(adapter_config_filename, "modules/perception/conf/adapter.conf",
+              "The adapter config filename");
+
 /// lib/config_manager/config_manager.cc
 DEFINE_string(config_manager_path, "./conf/config_manager.config",
               "The ModelConfig config paths file.");

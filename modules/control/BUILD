@@ -55,7 +55,6 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":lib_control",
-        "//modules/common/adapters:adapter_manager",
         "@gtest//:main",
     ],
 )

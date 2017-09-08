@@ -22,6 +22,8 @@
 DECLARE_string(node_name);
 DECLARE_string(node_namespace);
 
+DECLARE_string(adapter_config_filename);
+
 DECLARE_bool(use_road_id);
 DECLARE_double(min_length_for_lane_change);
 DECLARE_bool(enable_change_lane_in_result);
