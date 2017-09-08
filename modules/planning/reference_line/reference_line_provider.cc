@@ -92,8 +92,8 @@ void ReferenceLineProvider::Generate() {
       AERROR << "Fail to create reference line at position: "
              << curr_adc_position.ShortDebugString();
     }
-    AINFO << "ReferenceLine smoothed with adc position: "
-          << curr_adc_position.ShortDebugString();
+    ADEBUG << "ReferenceLine smoothed with adc position: "
+           << curr_adc_position.ShortDebugString();
     const int32_t kReferenceLineProviderSleepTime = 1000;
     std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
         kReferenceLineProviderSleepTime));
