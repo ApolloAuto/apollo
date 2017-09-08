@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -15,35 +14,34 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/delphi_esr/protocol/test_4e0.h"
+#include "modules/canbus/vehicle/esr/protocol/esr_trackmotionpower_540.h"
+
+
+#include "glog/logging.h"
+
 #include "modules/canbus/common/byte.h"
+#include "modules/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
-using ::apollo::canbus::Byte;
+Esrtrackmotionpower540::Esrtrackmotionpower540() {}
+const int32_t Esrtrackmotionpower540::ID = 0x540;
 
-const int Test4e0::ID = 0x4E0;
-
-void Test4e0::Parse(const uint8_t *bytes, int32_t length,
-                       DelphiESR *delphi_esr) const {
-  delphi_esr->mutable_test_4e0()->set_scan_index(
-      scan_index(bytes, length));
+void Esrtrackmotionpower540::Parse(const std::uint8_t* bytes, int32_t length,
+                         ChassisDetail* chassis) const {
+  chassis->mutable_esr()->mutable_esr_trackmotionpower_540()->set_can_tx_track_rolling_count_2(can_tx_track_rolling_count_2(bytes, length));
 }
 
-// config detail: {'name': 'num_obstacles', 'offset': 0.0, 'precision': 1.0,
-// 'len': 8, 'f_type': 'value', 'is_signed_var': False, 'physical_range':
-// '[0|255]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '""'}
-int Test4e0::scan_index(const uint8_t *bytes, int32_t length) const {
-  Byte t0(bytes + 3);
-  Byte t1(bytes + 4);
-  int32_t x = t0.get_byte(0, 8);
-  int32_t y = t1.get_byte(0, 8) + (x << 8);
+// config detail: {'name': 'can_tx_track_rolling_count_2', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Esrtrackmotionpower540::can_tx_track_rolling_count_2(const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(4, 1);
 
-  return y;
+  bool ret = x;
+  return ret;
 }
-
 }  // namespace delphi_esr
 }  // namespace drivers
 }  // namespace apollo
