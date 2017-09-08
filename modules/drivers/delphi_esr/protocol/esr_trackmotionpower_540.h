@@ -14,37 +14,30 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/delphi_esr/protocol/test_4e0.h"
+#ifndef MODULES_DRIVERS_DELPHI_ESR_PROTOCOL_ESR_TRACKMOTIONPOWER_540_H_
+#define MODULES_DRIVERS_DELPHI_ESR_PROTOCOL_ESR_TRACKMOTIONPOWER_540_H_
 
-#include "gtest/gtest.h"
+#include "modules/canbus/vehicle/protocol_data.h"
 
 namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
-class Test4e0Test : public ::testing::Test {
+class Esrtrackmotionpower540 : public SensorProtocolData<DelphiESR> {
  public:
-  virtual void SetUp() {}
+  static const int32_t ID;
+  Esrtrackmotionpower540();
+  void Parse(const std::uint8_t* bytes, int32_t length,
+                     ChassisDetail* chassis) const override;
+
+ private:
+
+  // config detail: {'name': 'CAN_TX_TRACK_ROLLING_COUNT_2', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 4, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+  bool can_tx_track_rolling_count_2(const std::uint8_t* bytes, const int32_t length) const;
 };
-
-TEST_F(Test4e0Test, Parse) {
-  Test4e0 test_4e0;
-  int32_t length = 8;
-  DelphiESR delphi_esr;
-  uint8_t bytes[8];
-
-  bytes[0] = 0b00000010;
-  bytes[1] = 0b00000101;
-  bytes[2] = 0b00000101;
-  bytes[3] = 0b00000001;
-  bytes[4] = 0b00000101;
-  bytes[5] = 0b00000011;
-
-  test_4e0.Parse(bytes, length, &delphi_esr);
-  // TODO(lizh): add more checks
-  EXPECT_EQ(261, delphi_esr.test_4e0().scan_index());
-}
 
 }  // namespace delphi_esr
 }  // namespace drivers
 }  // namespace apollo
+
+#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_ESR_TRACKMOTIONPOWER_540_H_
