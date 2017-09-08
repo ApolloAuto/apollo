@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/esr/protocol/acm_inst_req_7e0.h"
+#include "modules/drivers/delphi_esr/protocol/acm_inst_req_7e0.h"
 
 
 #include "glog/logging.h"

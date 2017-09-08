@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/esr/protocol/vehicle5_5f4.h"
+#include "modules/drivers/delphi_esr/protocol/vehicle5_5f4.h"
 
 
 #include "glog/logging.h"
