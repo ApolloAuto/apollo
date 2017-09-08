@@ -103,9 +103,10 @@ DEFINE_double(static_obstacle_speed_threshold, 1.0,
               "obstacles are considered as static obstacle if its speed is "
               "less than this value (m/s)");
 DEFINE_bool(enable_nudge_decision, false, "enable nudge decision");
-DEFINE_double(static_decision_ignore_s_range, 3.0,
-              "threshold for judging nudge in dp path computing decision");
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
+DEFINE_double(lateral_ignore_buffer, 2.0,
+              "If an obstacle's lateral distance is further away than this "
+              "distance, ignore it");
 DEFINE_double(stop_distance_obstacle, 10.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 3.0,

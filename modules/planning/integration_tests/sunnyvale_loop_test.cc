@@ -73,7 +73,20 @@ TEST_F(SunnyvaleLoopTest, stop) {
  */
 TEST_F(SunnyvaleLoopTest, follow_01) {
   std::string seq_num = "3";
-  FLAGS_enable_reference_line_provider_thread = false;
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test nudge a static vehicle with medium distance
+ * A nudge test case
+ */
+TEST_F(SunnyvaleLoopTest, nudge) {
+  std::string seq_num = "4";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
