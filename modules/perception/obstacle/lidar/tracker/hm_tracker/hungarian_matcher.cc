@@ -67,9 +67,9 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
     std::vector<TrackObjectPair> sub_assignments;
     std::vector<int> sub_unassigned_tracks;
     std::vector<int> sub_unassigned_objects;
-    MatchInComponents(association_mat, track_components[i], object_components[i],
-                      &sub_assignments, &sub_unassigned_tracks,
-                      &sub_unassigned_objects);
+    MatchInComponents(association_mat, track_components[i],
+                      object_components[i], &sub_assignments,
+                      &sub_unassigned_tracks, &sub_unassigned_objects);
     for (size_t j = 0; j < sub_assignments.size(); ++j) {
       int track_id = sub_assignments[j].first;
       int object_id = sub_assignments[j].second;
