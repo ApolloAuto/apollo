@@ -75,6 +75,8 @@ DECLARE_double(stop_distance_destination);
 DECLARE_double(min_driving_width);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
+DECLARE_double(follow_time_buffer);
+
 DECLARE_double(stop_line_min_distance);
 
 DECLARE_string(destination_obstacle_id);
