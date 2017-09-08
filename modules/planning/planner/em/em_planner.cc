@@ -25,6 +25,7 @@
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/frame.h"
@@ -232,7 +233,8 @@ std::vector<SpeedPoint> EMPlanner::GenerateSpeedHotStart(
   std::vector<SpeedPoint> hot_start_speed_profile;
   double s = 0.0;
   double t = 0.0;
-  double v = planning_init_point.v();
+  double v = common::math::Clamp(planning_init_point.v(), 5.0,
+                                 FLAGS_planning_upper_speed_limit);
   while (t < FLAGS_trajectory_time_length) {
     SpeedPoint speed_point;
     speed_point.set_s(s);
