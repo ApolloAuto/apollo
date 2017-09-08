@@ -24,7 +24,7 @@ namespace delphi_esr {
 
 using ::apollo::canbus::Byte;
 
-const int Test4e0::ID = 0x738;
+const int Test4e0::ID = 0x4E0;
 
 void Test4e0::Parse(const uint8_t *bytes, int32_t length,
                        DelphiESR *delphi_esr) const {
