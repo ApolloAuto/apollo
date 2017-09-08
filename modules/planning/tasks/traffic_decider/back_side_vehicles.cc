@@ -40,11 +40,13 @@ bool BackSideVehicles::ApplyRule(ReferenceLineInfo* const reference_line_info) {
     if (path_obstacle->st_boundary().IsEmpty()) {
       path_decision->AddLongitudinalDecision(Name(), path_obstacle->Id(),
                                              ignore);
+      path_decision->AddLateralDecision(Name(), path_obstacle->Id(), ignore);
       continue;
     }
     if (path_obstacle->st_boundary().min_s() < 0) {
       path_decision->AddLongitudinalDecision(Name(), path_obstacle->Id(),
                                              ignore);
+      path_decision->AddLateralDecision(Name(), path_obstacle->Id(), ignore);
       continue;
     }
   }

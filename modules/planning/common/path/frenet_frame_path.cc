@@ -30,12 +30,13 @@ namespace apollo {
 namespace planning {
 
 FrenetFramePath::FrenetFramePath(
-    std::vector<common::FrenetFramePoint> sl_points) {
-  points_ = std::move(sl_points);
+    const std::vector<common::FrenetFramePoint>& sl_points) {
+  points_ = sl_points;
 }
 
-void FrenetFramePath::set_points(std::vector<common::FrenetFramePoint> points) {
-  points_ = std::move(points);
+void FrenetFramePath::set_points(
+    const std::vector<common::FrenetFramePoint>& points) {
+  points_ = points;
 }
 
 const std::vector<common::FrenetFramePoint>& FrenetFramePath::points() const {

@@ -69,8 +69,8 @@ DECLARE_double(st_max_t);
 // Decision Part
 DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_bool(enable_nudge_decision);
-DECLARE_double(static_decision_ignore_s_range);
 DECLARE_double(static_decision_nudge_l_buffer);
+DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(stop_distance_obstacle);
 DECLARE_double(stop_distance_destination);
 DECLARE_double(min_driving_width);
