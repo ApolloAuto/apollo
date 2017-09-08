@@ -836,7 +836,7 @@ body {
     .img-container {
         position: absolute;
 
-        top: 20%;
+        top: 35%;
         left: 25%;
         width: 50%;
         height: 40%;
@@ -850,6 +850,18 @@ body {
             font-size: 18px;
             color: #FFFFFF;
             text-align: center;
+
+            animation-name: flash;
+            animation-duration: 2s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            animation-play-state: running;
+
+            @keyframes flash {
+                from {color: #FFFFFF;}
+                to {color: #000C17;}
+            }
         }
     }
 }
