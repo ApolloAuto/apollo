@@ -26,16 +26,18 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrvalid15d0::Esrvalid15d0() {}
 const int32_t Esrvalid15d0::ID = 0x5D0;
 
 void Esrvalid15d0::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_sn(can_tx_valid_lr_sn(bytes, length));
-  chassis->mutable_esr()->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_range_rate(can_tx_valid_lr_range_rate(bytes, length));
-  chassis->mutable_esr()->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_range(can_tx_valid_lr_range(bytes, length));
-  chassis->mutable_esr()->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_power(can_tx_valid_lr_power(bytes, length));
-  chassis->mutable_esr()->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_angle(can_tx_valid_lr_angle(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_sn(can_tx_valid_lr_sn(bytes, length));
+  delphi_esr->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_range_rate(can_tx_valid_lr_range_rate(bytes, length));
+  delphi_esr->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_range(can_tx_valid_lr_range(bytes, length));
+  delphi_esr->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_power(can_tx_valid_lr_power(bytes, length));
+  delphi_esr->mutable_esr_valid1_5d0()->set_can_tx_valid_lr_angle(can_tx_valid_lr_angle(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_valid_lr_sn', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}

@@ -26,20 +26,22 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Vehicle55f4::Vehicle55f4() {}
 const int32_t Vehicle55f4::ID = 0x5F4;
 
 void Vehicle55f4::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_yaw_rate_bias_shift(can_rx_yaw_rate_bias_shift(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_steering_gear_ratio(can_rx_steering_gear_ratio(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_wheelbase(can_rx_wheelbase(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_distance_rear_axle(can_rx_distance_rear_axle(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_cw_blockage_threshold(can_rx_cw_blockage_threshold(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_funnel_offset_right(can_rx_funnel_offset_right(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_funnel_offset_left(can_rx_funnel_offset_left(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_beamwidth_vert(can_rx_beamwidth_vert(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle5_5f4()->set_can_rx_oversteer_understeer(can_rx_oversteer_understeer(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_yaw_rate_bias_shift(can_rx_yaw_rate_bias_shift(bytes, length));
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_steering_gear_ratio(can_rx_steering_gear_ratio(bytes, length));
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_wheelbase(can_rx_wheelbase(bytes, length));
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_distance_rear_axle(can_rx_distance_rear_axle(bytes, length));
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_cw_blockage_threshold(can_rx_cw_blockage_threshold(bytes, length));
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_funnel_offset_right(can_rx_funnel_offset_right(bytes, length));
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_funnel_offset_left(can_rx_funnel_offset_left(bytes, length));
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_beamwidth_vert(can_rx_beamwidth_vert(bytes, length));
+  delphi_esr->mutable_vehicle5_5f4()->set_can_rx_oversteer_understeer(can_rx_oversteer_understeer(bytes, length));
 }
 
 // config detail: {'name': 'can_rx_yaw_rate_bias_shift', 'enum': {0: 'CAN_RX_YAW_RATE_BIAS_SHIFT_NO_DETECT', 1: 'CAN_RX_YAW_RATE_BIAS_SHIFT_DETECT'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}

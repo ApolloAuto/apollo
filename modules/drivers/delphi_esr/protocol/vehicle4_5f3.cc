@@ -26,21 +26,23 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Vehicle45f3::Vehicle45f3() {}
 const int32_t Vehicle45f3::ID = 0x5F3;
 
 void Vehicle45f3::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_range_r2m(can_rx_fac_tgt_range_r2m(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_range_m2t(can_rx_fac_tgt_range_m2t(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_range_1(can_rx_fac_tgt_range_1(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_mtg_space_ver(can_rx_fac_tgt_mtg_space_ver(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_mtg_space_hor(can_rx_fac_tgt_mtg_space_hor(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_mtg_offset(can_rx_fac_tgt_mtg_offset(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_align_samp_req(can_rx_fac_align_samp_req(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_align_max_nt(can_rx_fac_align_max_nt(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_align_cmd_2(can_rx_fac_align_cmd_2(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle4_5f3()->set_can_rx_fac_align_cmd_1(can_rx_fac_align_cmd_1(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_range_r2m(can_rx_fac_tgt_range_r2m(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_range_m2t(can_rx_fac_tgt_range_m2t(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_range_1(can_rx_fac_tgt_range_1(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_mtg_space_ver(can_rx_fac_tgt_mtg_space_ver(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_mtg_space_hor(can_rx_fac_tgt_mtg_space_hor(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_tgt_mtg_offset(can_rx_fac_tgt_mtg_offset(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_align_samp_req(can_rx_fac_align_samp_req(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_align_max_nt(can_rx_fac_align_max_nt(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_align_cmd_2(can_rx_fac_align_cmd_2(bytes, length));
+  delphi_esr->mutable_vehicle4_5f3()->set_can_rx_fac_align_cmd_1(can_rx_fac_align_cmd_1(bytes, length));
 }
 
 // config detail: {'name': 'can_rx_fac_tgt_range_r2m', 'offset': 0.0, 'precision': 0.0625, 'len': 8, 'is_signed_var': False, 'physical_range': '[2|10]', 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}

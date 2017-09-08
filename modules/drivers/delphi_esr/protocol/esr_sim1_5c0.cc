@@ -26,20 +26,22 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Esrsim15c0::Esrsim15c0() {}
 const int32_t Esrsim15c0::ID = 0x5C0;
 
 void Esrsim15c0::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_track_id(can_rx_sim_track_id(bytes, length));
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_status(can_rx_sim_status(bytes, length));
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_range_rate(can_rx_sim_range_rate(bytes, length));
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_range_accel(can_rx_sim_range_accel(bytes, length));
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_range(can_rx_sim_range(bytes, length));
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_lat_rate(can_rx_sim_lat_rate(bytes, length));
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_lat_pos(can_rx_sim_lat_pos(bytes, length));
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_function(can_rx_sim_function(bytes, length));
-  chassis->mutable_esr()->mutable_esr_sim1_5c0()->set_can_rx_sim_angle(can_rx_sim_angle(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_track_id(can_rx_sim_track_id(bytes, length));
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_status(can_rx_sim_status(bytes, length));
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_range_rate(can_rx_sim_range_rate(bytes, length));
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_range_accel(can_rx_sim_range_accel(bytes, length));
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_range(can_rx_sim_range(bytes, length));
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_lat_rate(can_rx_sim_lat_rate(bytes, length));
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_lat_pos(can_rx_sim_lat_pos(bytes, length));
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_function(can_rx_sim_function(bytes, length));
+  delphi_esr->mutable_esr_sim1_5c0()->set_can_rx_sim_angle(can_rx_sim_angle(bytes, length));
 }
 
 // config detail: {'name': 'can_rx_sim_track_id', 'enum': {0: 'CAN_RX_SIM_TRACK_ID_NO_TARGET', 1: 'CAN_RX_SIM_TRACK_ID_TARGET_1', 2: 'CAN_RX_SIM_TRACK_ID_TARGET_2'}, 'precision': 1.0, 'len': 2, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 6, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}

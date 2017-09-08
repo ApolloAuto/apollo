@@ -24,12 +24,15 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::drivers::DelphiESR;
+
+
 class Esrstatus55e4 : public SensorProtocolData<DelphiESR> {
  public:
   static const int32_t ID;
   Esrstatus55e4();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+                     DelphiESR* delphi_esr) const override;
 
  private:
 

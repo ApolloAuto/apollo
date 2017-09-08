@@ -30,7 +30,7 @@ namespace drivers {
 using apollo::common::ErrorCode;
 
 TEST(DelphiESRMessageManagerTest, TestProtocolTest4e0) {
-  ::apollo::drivers::delphi_esr::Test4e0 test_4e0;
+  ::apollo::drivers::delphi_esr::Esrstatus14e0 test_4e0;
   SensorMessageManager<DelphiESR> manager;
 
   int32_t length = 8;
@@ -47,7 +47,7 @@ TEST(DelphiESRMessageManagerTest, TestProtocolTest4e0) {
   DelphiESR delphi_esr;
   EXPECT_EQ(manager.GetSensorData(&delphi_esr), ErrorCode::OK);
 
-  EXPECT_EQ(delphi_esr.test_4e0().scan_index(), 261);
+  EXPECT_EQ(delphi_esr.esr_status1_4e0().can_tx_scan_index(), 261);
 }
 
 }  // namespace drivers

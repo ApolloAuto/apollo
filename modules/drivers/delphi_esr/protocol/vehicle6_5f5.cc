@@ -26,16 +26,18 @@ namespace apollo {
 namespace drivers {
 namespace delphi_esr {
 
+using apollo::canbus::Byte;
+
 Vehicle65f5::Vehicle65f5() {}
 const int32_t Vehicle65f5::ID = 0x5F5;
 
 void Vehicle65f5::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_esr()->mutable_vehicle6_5f5()->set_can_rx_inner_funnel_offset_right(can_rx_inner_funnel_offset_right(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle6_5f5()->set_can_rx_inner_funnel_offset_left(can_rx_inner_funnel_offset_left(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle6_5f5()->set_can_volvo_fa_range_max_short(can_volvo_fa_range_max_short(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle6_5f5()->set_can_volvo_fa_min_vspeed_short(can_volvo_fa_min_vspeed_short(bytes, length));
-  chassis->mutable_esr()->mutable_vehicle6_5f5()->set_can_volvo_fa_aalign_estimate(can_volvo_fa_aalign_estimate(bytes, length));
+                         DelphiESR* delphi_esr) const {
+  delphi_esr->mutable_vehicle6_5f5()->set_can_rx_inner_funnel_offset_right(can_rx_inner_funnel_offset_right(bytes, length));
+  delphi_esr->mutable_vehicle6_5f5()->set_can_rx_inner_funnel_offset_left(can_rx_inner_funnel_offset_left(bytes, length));
+  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_range_max_short(can_volvo_fa_range_max_short(bytes, length));
+  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_min_vspeed_short(can_volvo_fa_min_vspeed_short(bytes, length));
+  delphi_esr->mutable_vehicle6_5f5()->set_can_volvo_fa_aalign_estimate(can_volvo_fa_aalign_estimate(bytes, length));
 }
 
 // config detail: {'name': 'can_rx_inner_funnel_offset_right', 'offset': 0.0, 'precision': 0.1, 'len': 8, 'is_signed_var': True, 'physical_range': '[-2|10]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
