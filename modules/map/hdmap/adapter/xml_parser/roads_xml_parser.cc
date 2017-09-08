@@ -22,7 +22,7 @@ limitations under the License.
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 namespace {
-bool is_road_belong_to_junction(const std::string& road_id) {
+bool IsRoadBelongToJunction(const std::string& road_id) {
   CHECK(!road_id.empty());
   return road_id != "-1";
 }
@@ -36,7 +36,7 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
                              std::vector<RoadInternal>* roads) {
   CHECK_NOTNULL(roads);
 
-  const tinyxml2::XMLElement* road_node = xml_node.FirstChildElement("road");
+  auto road_node = xml_node.FirstChildElement("road");
   while (road_node) {
     // road attributes
     std::string id;
@@ -51,7 +51,7 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     RoadInternal road_internal;
     road_internal.id = id;
     road_internal.road.mutable_id()->set_id(id);
-    if (is_road_belong_to_junction(junction_id)) {
+    if (IsRoadBelongToJunction(junction_id)) {
       road_internal.road.mutable_junction_id()->set_id(junction_id);
     }
     // lanes
@@ -59,8 +59,7 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
                                           &road_internal.sections));
 
     // objects
-    const tinyxml2::XMLElement* sub_node =
-        road_node->FirstChildElement("objects");
+    auto sub_node = road_node->FirstChildElement("objects");
     if (sub_node != nullptr) {
       // stop line
       ObjectsXmlParser::ParseStopLines(*sub_node, &road_internal.stop_lines);
