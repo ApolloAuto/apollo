@@ -19,7 +19,7 @@ const colorMapping = {
     DEFAULT: 0xC0C0C0
 };
 
-const scale = 0.01;
+const scale = 0.006;
 const scales = { x: scale, y: scale, z: scale};
 
 // The result will be the all the elements in current but not in data.
@@ -171,31 +171,34 @@ function getSignalPositionAndHeading(signal, overlapMap, laneHeading, coordinate
     if (_.isEmpty(locations)) {
         locations = _.attempt(() => signal.boundary.point);
     }
-
     if (_.isError(locations) || locations === undefined) {
         return null;
     }
+
     let heading = _.attempt(() => laneHeading[_.first(
         overlapMap[_.last(signal.overlapId).id].split('_and_')
     )]);
     if (_.isError(heading) || heading === undefined) {
-        heading = _.attempt(() => {
-            const stopLine = signal.stopLine[0].segment[0].lineSegment.point;
-            return Math.PI / 2 + Math.atan2(
-                _.takeRight(stopLine).y - stopLine[0].y, _.takeRight(stopLine).x - stopLine[0].x);
-        });
+        console.warn("Unable to get traffic light heading, use orthogonal direction of StopLine.");
+        const stopLine = signal.stopLine[0].segment[0].lineSegment.point;
+        const len = stopLine.length;
+        if (len >= 2) {
+            const stopLineDirection = Math.atan2(stopLine[len - 1].y - stopLine[0].y,
+                                                 stopLine[len - 1].x - stopLine[0].x);
+            heading = Math.PI * 1.5 + stopLineDirection;
+        }
     }
-    let res = null;
-    if (!_.isError(heading) && heading !== undefined) {
+
+    if (!isNaN(heading)) {
         let position = new THREE.Vector3(0, 0, 0);
         position.x = _.meanBy(_.values(locations), l => l.x);
         position.y = _.meanBy(_.values(locations), l => l.y);
         position = coordinates.applyOffset(position);
-        res = [position, heading];
+        return [position, heading];
     } else {
         console.error('Error loading traffic light. Unable to determine heading.');
+        return null;
     }
-    return res;
 }
 
 function drawStopLine(stopLines, drewObjects, coordinates, scene) {
@@ -236,6 +239,7 @@ export default class Map {
         loadObject(trafficLightMaterial, trafficLightObject, scales);
         this.hash = -1;
         this.data = {};
+        this.laneHeading = {};
         this.initialized = false;
     }
 
@@ -265,6 +269,9 @@ export default class Map {
                     newData[kind].push(oldData);
                 } else {
                     this.removeDrewObjects(oldData.drewObjects, scene);
+                    if (kind === 'lane') {
+                        delete this.laneHeading[oldData.id.id];
+                    }
                 }
             });
         }
@@ -277,7 +284,6 @@ export default class Map {
     // (possibly) visible elements, presummably in the global store.
     appendMapData(newData, coordinates, scene) {
         const overlapMap = extractOverlaps(newData['overlap']);
-        const laneHeading = {};
 
         for (const kind in newData) {
             if (!this.data[kind]) {
@@ -290,7 +296,7 @@ export default class Map {
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: addLane(lane, coordinates, scene)
                         }));
-                        laneHeading[lane.id.id] = getLaneHeading(lane);
+                        this.laneHeading[lane.id.id] = getLaneHeading(lane);
                         break;
                     case "crosswalk":
                         this.data[kind].push(Object.assign(newData[kind][i], {
@@ -301,7 +307,7 @@ export default class Map {
                     case "signal":
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: addTrafficLight(newData[kind][i],
-                                overlapMap, laneHeading, coordinates, scene)
+                                overlapMap, this.laneHeading, coordinates, scene)
                         }));
                         break;
                     default:
