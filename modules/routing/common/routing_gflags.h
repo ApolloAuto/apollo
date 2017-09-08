@@ -19,6 +19,7 @@
 
 #include "gflags/gflags.h"
 
+DECLARE_string(routing_conf_file);
 DECLARE_string(node_name);
 DECLARE_string(node_namespace);
 

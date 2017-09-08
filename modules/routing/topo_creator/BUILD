@@ -30,12 +30,10 @@ cc_library(
     deps = [
         ":edge_creator",
         ":node_creator",
-        "//external:gflags",
         "//modules/common",
         "//modules/common/util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",
-        "//modules/routing/common:routing_gflags",
         "//modules/routing/proto:routing_proto",
     ],
 )
@@ -65,7 +63,10 @@ cc_binary(
         "//external:gflags",
         "//modules/common",
         "//modules/common:log",
+        "//modules/common:apollo_app",
         "//modules/common/configs:config_gflags",
+        "//modules/common/status",
+        "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/proto:map_proto",
         "//modules/routing/common:routing_gflags",
