@@ -64,8 +64,6 @@ class Routing : public apollo::common::ApolloApp {
 
  private:
   void OnRouting_Request(const RoutingRequest &routing_request);
-  void OnMonitor(
-      const apollo::common::monitor::MonitorMessage &monitor_message);
 
  private:
   std::unique_ptr<Navigator> navigator_ptr_;

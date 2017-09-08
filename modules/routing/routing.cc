@@ -39,7 +39,6 @@ Routing::Routing()
 
 apollo::common::Status Routing::Init() {
   AdapterManager::Init(FLAGS_adapter_config_path);
-  AdapterManager::AddMonitorCallback(&Routing::OnMonitor, this);
   AdapterManager::AddRoutingRequestCallback(&Routing::OnRouting_Request, this);
 
   return apollo::common::Status::OK();
@@ -62,27 +61,20 @@ void Routing::OnRouting_Request(
     const apollo::routing::RoutingRequest &routing_request) {
   AINFO << "Get new routing request!!!";
   ::apollo::routing::RoutingResponse routing_response;
+  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
   if (!navigator_ptr_->SearchRoute(routing_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";
+
+    buffer.WARN("Routing failed! " +
+                routing_response.error_code().error_string());
     return;
   }
-
-  // AdapterManager::FillRoutingResponseHeader(Name(), routing_response);
+  buffer.INFO("Routing success!");
   AdapterManager::PublishRoutingResponse(routing_response);
   return;
 }
 
 void Routing::Stop() {}
-
-void Routing::OnMonitor(
-    const apollo::common::monitor::MonitorMessage &monitor_message) {
-  // TODO(all): Do something meaningful.
-  // for (const auto &item : monitor_message.item()) {
-  //   if (item.log_level() == MonitorMessageItem::FATAL) {
-  //     return;
-  //   }
-  // }
-}
 
 }  // namespace routing
 }  // namespace apollo
