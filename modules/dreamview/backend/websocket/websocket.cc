@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
+#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace dreamview {
@@ -102,8 +103,11 @@ bool WebSocketHandler::SendData(const std::string &data, Connection *conn,
   }
   // Note that while we are holding the connection lock, the connection won't be
   // closed and removed.
-  int ret = mg_websocket_write(conn, WEBSOCKET_OPCODE_TEXT, data.c_str(),
+  int ret;
+  PERF_BLOCK("Websocket write took too long", 0.5) {
+    ret = mg_websocket_write(conn, WEBSOCKET_OPCODE_TEXT, data.c_str(),
                                data.size());
+  }
   connection_lock->unlock();
 
   if (ret != static_cast<int>(data.size())) {
