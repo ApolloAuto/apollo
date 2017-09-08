@@ -152,6 +152,7 @@ MapElementIds MapService::CollectMapElementIds(const PointENU &point,
   if (sim_map_.GetSignals(point, radius, &signals) != 0) {
     AERROR << "Failed to get signals from sim_map.";
   }
+
   ExtractIds(signals, &result.signal);
   ExtractOverlapIds(signals, &result.overlap);
 

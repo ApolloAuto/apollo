@@ -244,8 +244,7 @@ class Clock {
 inline Clock::Clock()
     : Clock(FLAGS_use_ros_time ? ClockMode::ROS : ClockMode::SYSTEM) {}
 
-// Measure run time of a code block, for debugging puprpose only, don't check in
-// code with this macro!
+// Measure run time of a code block, mostly for debugging puprpose.
 // Example usage:
 // PERF_BLOCK("Function Foo took: ") {
 //  Foo();
@@ -260,19 +259,18 @@ inline Clock::Clock()
 
 #define PERF_BLOCK_NO_THRESHOLD(message) PERF_BLOCK_WITH_THRESHOLD(message, 0)
 
-#define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                     \
-  using apollo::common::time::Clock;                                      \
-  for (double block_start_time = 0;                                       \
-       (block_start_time == 0 ? (block_start_time = Clock::NowInSecond()) \
-                              : false);                                   \
-       [block_start_time]() {                                             \
-         double now = Clock::NowInSecond();                               \
-         if (now - block_start_time > (threshold)) {                      \
-           ADEBUG << std::fixed << (message) << ": "                      \
-                  << now - block_start_time;                              \
-         }                                                                \
+#define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                          \
+  using apollo::common::time::Clock;                                           \
+  for (double block_start_time = 0;                                            \
+       (block_start_time == 0 ? (block_start_time = Clock::NowInSecond())      \
+                              : false);                                        \
+       [block_start_time]() {                                                  \
+         double now = Clock::NowInSecond();                                    \
+         if (now - block_start_time > (threshold)) {                           \
+           ADEBUG << std::fixed << (message) << ": " << now - block_start_time \
+                  << "s.";                                                     \
+         }                                                                     \
        }())
-
 }  // namespace time
 }  // namespace common
 }  // namespace apollo
