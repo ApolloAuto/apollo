@@ -677,8 +677,9 @@ body {
 }
 
 .route-editing-bar {
-    top: 0;
-    left: 0;
+    position: relative;
+    top: 0px;
+    left: 0px;
     width: 100%;
 
     background: #102244;
@@ -689,72 +690,23 @@ body {
         min-height: 60px;
     }
 
-    /* The Apollo logo on the route editing menu. */
-    .apollo-logo {
-        position: absolute;
-
-        top: 25px;
-        left: 20px;
-        height: 46px;
-        width: 141px;
-
-        @include small-screen {
-            top: 20px;
-            left: 40px;
-            height: 27.6px;
-            width: 84.6px;
-        }
-    }
-
-    .exit-button {
-        position: absolute;
-
-        top: 0px;
-        right: 0px;
-
-        height: 90px;
-        width: 106px;
-        border: none;
-        padding: 25px;
-
-        background: #102244;
-        color:#d8d8d8;
-
-        font-size: 35px;
-
-        @include small-screen {
-            height: 60px;
-            width:  76px;
-            border: none;
-            padding: 18px;
-
-            font-size: 20px;
-        }
-    }
-
-    .exit-button:hover {
-        background: #09182C;
-    }
-
-    .editing-panel{
-        position: absolute;
-
-        top: 0px;
-        left: 23%;
+    .editing-panel {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
         .button {
             height: 90px;
-            width: 180px;
+            width: 15%;
+            min-width: 150px;
+
             border: none;
             padding: 10px;
 
-            margin: 0 auto;
-            display: inline-block;
             background: #102244;
 
             @include small-screen {
                 height: 60px;
-                width: 150px;
                 padding: 5px;
             }
 
@@ -785,7 +737,95 @@ body {
             background: #09182C;
         }
     }
+
+    .exit-button, .editing-tip {
+        position: absolute;
+        top: 0px;
+
+        height: 90px;
+        width: 90px;
+        border: none;
+
+        background: #102244;
+        color:#d8d8d8;
+        font-size: 35px;
+
+        @include small-screen {
+            height: 60px;
+            width:  60px;
+
+            font-size: 20px;
+        }
+    }
+
+    .exit-button {
+        right: 0px;
+        padding: 25px;
+
+        @include small-screen {
+            padding: 18px;
+        }
+    }
+
+    .exit-button:hover {
+        background: #09182C;
+    }
+
+    .editing-tip {
+        left: 0px;
+
+        img {
+            position: absolute;
+            top: 35%;
+            left: 37%;
+
+           @include small-screen {
+                top: 30%;
+                left: 32%;
+            }
+        }
+
+        p {
+            position: absolute;
+            width: 400px;
+            top: 120%;
+            left: 15px;
+            padding: 20px;
+
+            background-color: #FFFFFF;
+            color: #999999;
+            font-size: 14px;
+            text-align: left;
+            white-space: pre-wrap;
+            border-radius: 3px;
+
+            @include small-screen {
+                left: 5px;
+            }
+        }
+
+        p:before {
+            position: absolute;
+            top: -20px;
+            left: 13px;
+            content: '';
+
+            border-style: solid;
+            border-width: 0px 20px 20px 20px;
+            border-color: rgba(0,0,0,0) rgba(0,0,0,0) #FFFFFF rgba(0,0,0,0);
+
+            @-moz-document url-prefix() {
+                top: -38px;
+            }
+
+            @include small-screen {
+                left: 8px;
+            }
+        }
+    }
 }
+
+
 
 .loader {
     width: 100vw;
