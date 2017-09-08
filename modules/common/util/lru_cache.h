@@ -55,9 +55,7 @@ class LRUCache {
     Init();
   }
 
-  ~LRUCache() {
-    Clear();
-  }
+  ~LRUCache() { Clear(); }
 
   void GetCache(std::unordered_map<K, V>* cache) {
     for (auto it = map_.begin(); it != map_.end(); ++it) {
@@ -134,37 +132,23 @@ class LRUCache {
     return Update(key, std::forward<VV>(*val), obs, true, false);
   }
 
-  V* GetSilently(const K& key) {
-    return Get(key, true);
-  }
+  V* GetSilently(const K& key) { return Get(key, true); }
 
-  V* Get(const K& key) {
-    return Get(key, false);
-  }
+  V* Get(const K& key) { return Get(key, false); }
 
   bool GetCopySilently(const K& key, const V* val) {
     return GetCopy(key, val, true);
   }
 
-  bool GetCopy(const K& key, const V* val) {
-    return GetCopy(key, val, false);
-  }
+  bool GetCopy(const K& key, const V* val) { return GetCopy(key, val, false); }
 
-  size_t size() {
-    return size_;
-  }
+  size_t size() { return size_; }
 
-  bool Full() {
-    return size() > 0 && size() >= capacity_;
-  }
+  bool Full() { return size() > 0 && size() >= capacity_; }
 
-  bool Empty() {
-    return size() == 0;
-  }
+  bool Empty() { return size() == 0; }
 
-  size_t capacity() {
-    return capacity_;
-  }
+  size_t capacity() { return capacity_; }
 
   Node<K, V>* First() {
     if (size()) {
@@ -173,9 +157,7 @@ class LRUCache {
     return nullptr;
   }
 
-  bool Contains(const K& key) {
-    return map_.find(key) != map_.end();
-  }
+  bool Contains(const K& key) { return map_.find(key) != map_.end(); }
 
   bool Prioritize(const K& key) {
     if (Contains(key)) {
@@ -288,8 +270,8 @@ class LRUCache {
     if (Full()) {
       auto* node = tail_.prev;
       Detach(node);
-      map_.erase(node->key);
       *key = node->key;
+      map_.erase(node->key);
       return true;
     }
     return false;
