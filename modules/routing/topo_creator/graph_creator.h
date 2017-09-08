@@ -23,6 +23,7 @@
 
 #include "modules/map/proto/map.pb.h"
 #include "modules/routing/proto/topo_graph.pb.h"
+#include "modules/routing/proto/routing_config.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -30,7 +31,8 @@ namespace routing {
 class GraphCreator {
  public:
   GraphCreator(const std::string& base_map_file_path,
-               const std::string& dump_topo_file_path);
+               const std::string& dump_topo_file_path,
+               const RoutingConfig *routing_conf);
 
   ~GraphCreator() = default;
 
@@ -54,6 +56,8 @@ class GraphCreator {
   std::unordered_map<std::string, std::string> road_id_map_;
   std::unordered_set<std::string> showed_edge_id_set_;
   std::unordered_set<std::string> forbidden_lane_id_set_;
+
+  const RoutingConfig *routing_conf_ = nullptr;
 };
 
 }  // namespace routing

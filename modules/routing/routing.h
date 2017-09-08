@@ -21,6 +21,7 @@
 #include <string>
 
 #include "modules/routing/proto/routing.pb.h"
+#include "modules/routing/proto/routing_config.pb.h"
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/monitor/monitor.h"
@@ -68,6 +69,8 @@ class Routing : public apollo::common::ApolloApp {
  private:
   std::unique_ptr<Navigator> navigator_ptr_;
   apollo::common::monitor::Monitor monitor_;
+
+  RoutingConfig routing_conf_;
 };
 
 }  // namespace routing

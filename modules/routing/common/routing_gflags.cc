@@ -16,6 +16,9 @@
 
 #include "modules/routing/common/routing_gflags.h"
 
+DEFINE_string(routing_conf_file, "modules/routing/conf/routing.pb.txt",
+              "default routing conf data file");
+
 DEFINE_string(node_name, "routing", "the name for this node");
 DEFINE_string(node_namespace, "routing", "the namespace for this node");
 
