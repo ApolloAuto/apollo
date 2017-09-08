@@ -37,6 +37,12 @@ apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
   AINFO << "Use routing topology graph path: " << routing_map_file;
   navigator_ptr_.reset(new Navigator(routing_map_file));
+  CHECK(::apollo::common::util::GetProtoFromFile(FLAGS_routing_conf_file,
+                                                 &routing_conf_))
+      << "Unable to load control conf file: " + FLAGS_routing_conf_file;
+
+  AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
+
   AdapterManager::Init(FLAGS_adapter_config_filename);
   AdapterManager::AddRoutingRequestCallback(&Routing::OnRouting_Request, this);
   return apollo::common::Status::OK();

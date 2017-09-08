@@ -11,6 +11,7 @@ proto_library(
     name = "routing_proto_lib",
     srcs = [
         "routing.proto",
+        "routing_config.proto",
         "topo_graph.proto",
     ],
     deps = [

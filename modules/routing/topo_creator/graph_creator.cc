@@ -19,7 +19,6 @@
 #include "glog/logging.h"
 
 #include "modules/common/util/file.h"
-#include "modules/routing/common/routing_gflags.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/routing/topo_creator/edge_creator.h"
 #include "modules/routing/topo_creator/node_creator.h"
@@ -49,9 +48,11 @@ bool IsAllowedToCross(const LaneBoundary& boundary) {
 }  // namespace
 
 GraphCreator::GraphCreator(const std::string& base_map_file_path,
-                           const std::string& dump_topo_file_path)
+                           const std::string& dump_topo_file_path,
+                           const RoutingConfig *routing_conf)
     : base_map_file_path_(base_map_file_path),
-      dump_topo_file_path_(dump_topo_file_path) {}
+      dump_topo_file_path_(dump_topo_file_path),
+      routing_conf_(routing_conf) {}
 
 bool GraphCreator::Create() {
   if (common::util::EndWith(base_map_file_path_, ".xml")) {
@@ -115,7 +116,7 @@ bool GraphCreator::Create() {
     const auto& from_node = graph_.node(node_index_map_[lane_id]);
 
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
-    if (lane.length() < FLAGS_min_length_for_lane_change) {
+    if (lane.length() < routing_conf_->min_length_for_lane_change()) {
         continue;
     }
     if (lane.has_left_boundary() && IsAllowedToCross(lane.left_boundary())) {
