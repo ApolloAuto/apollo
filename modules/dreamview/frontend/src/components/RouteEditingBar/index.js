@@ -1,12 +1,13 @@
 import React from "react";
-import { inject, observer } from "mobx-react";
+import { inject } from "mobx-react";
 
 import Image from "components/common/Image";
 import logoApollo from "assets/images/logo_apollo.png";
 import EditingPanel from "components/RouteEditingBar/EditingPanel";
+import EditingTip from "components/RouteEditingBar/EditingTip";
+import helpIcon from "assets/images/icons/help.png";
 
 
-@observer
 class EditorExitButton extends React.Component {
     render() {
         const { label, onClick } = this.props;
@@ -17,14 +18,14 @@ class EditorExitButton extends React.Component {
     }
 }
 
-@inject("store") @observer
+@inject("store")
 export default class RouteEditingMenu extends React.Component {
     render() {
         const { routeEditingManager } = this.props.store;
 
         return (
             <div className="route-editing-bar">
-                <Image image={logoApollo} className="apollo-logo" />
+                <EditingTip />
                 <EditingPanel clickRemoveLast={() => {
                                     routeEditingManager.removeLastRoutingPoint();
                               }}
