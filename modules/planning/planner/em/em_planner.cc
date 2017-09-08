@@ -232,16 +232,17 @@ std::vector<SpeedPoint> EMPlanner::GenerateSpeedHotStart(
   std::vector<SpeedPoint> hot_start_speed_profile;
   double s = 0.0;
   double t = 0.0;
+  double v = planning_init_point.v();
   while (t < FLAGS_trajectory_time_length) {
     SpeedPoint speed_point;
     speed_point.set_s(s);
     speed_point.set_t(t);
-    speed_point.set_v(FLAGS_planning_upper_speed_limit);
+    speed_point.set_v(v);
 
     hot_start_speed_profile.push_back(std::move(speed_point));
 
     t += FLAGS_trajectory_time_resolution;
-    s += FLAGS_planning_upper_speed_limit * FLAGS_trajectory_time_resolution;
+    s += v * FLAGS_trajectory_time_resolution;
   }
   return hot_start_speed_profile;
 }
