@@ -47,6 +47,8 @@ function start() {
             /apollo/routing_request \
             /apollo/routing_response \
             /apollo/localization/pose \
+            /apollo/mobileye \
+            /apollo/delphi_esr \
             /apollo/monitor </dev/null >"${LOG}" 2>&1 &
     fi
 }
