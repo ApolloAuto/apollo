@@ -58,7 +58,11 @@ def press_key(event):
         command = ["cp"]
         for f in files:
             command.append(f)
-        call(command)
+        if call(command) == 0:
+            print "command success: %s" % " ".join(command)
+            sys.exit(0)
+        else:
+            print "Failed to run command: %s " % " ".join(command)
 
 
 if __name__ == '__main__':
