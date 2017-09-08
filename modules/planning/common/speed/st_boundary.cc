@@ -128,6 +128,10 @@ bool StBoundary::IsValid(
       if (std::fmax(curr_lower.t(), curr_upper.t()) + kMinDeltaT >=
           std::fmin(next_lower.t(), next_upper.t())) {
         AERROR << "t is not increasing";
+        AERROR << " curr_lower: " << curr_lower.DebugString();
+        AERROR << " curr_upper: " << curr_upper.DebugString();
+        AERROR << " next_lower: " << next_lower.DebugString();
+        AERROR << " next_upper: " << next_upper.DebugString();
         return false;
       }
     }
