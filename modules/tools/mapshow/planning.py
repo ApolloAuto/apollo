@@ -60,6 +60,11 @@ class Planning:
         self.sl_aggregated_boundary_high_l = []
         self.sl_aggregated_boundary_s = []
 
+        self.kernel_cruise_t = {}
+        self.kernel_cruise_s = {}
+        self.kernel_follow_t = {}
+        self.kernel_follow_s = {}
+
         self.init_point_x = []
         self.init_point_y = []
 
@@ -145,6 +150,11 @@ class Planning:
         st_speed_constraint_s = {}
         st_speed_constraint_lower = {}
         st_speed_constraint_upper = {}
+        kernel_cruise_t = {}
+        kernel_cruise_s = {}
+        kernel_follow_t = {}
+        kernel_follow_s = {}
+
         for st_graph in self.planning_pb.debug.planning_data.st_graph:
 
             st_data_boundary_s[st_graph.name] = {}
@@ -189,6 +199,18 @@ class Planning:
                 st_speed_constraint_lower[st_graph.name].append(speed_constraint.lower_bound)
                 st_speed_constraint_upper[st_graph.name].append(speed_constraint.upper_bound)
 
+            kernel_cruise_t[st_graph.name] = []
+            kernel_cruise_s[st_graph.name] = []
+            kernel_cruise = st_graph.kernel_cruise_ref
+            kernel_cruise_t[st_graph.name].append(kernel_cruise.t)
+            kernel_cruise_s[st_graph.name].append(kernel_cruise.cruise_line_s)
+
+            kernel_follow_t[st_graph.name] = []
+            kernel_follow_s[st_graph.name] = []
+            kernel_follow = st_graph.kernel_follow_ref
+            kernel_follow_t[st_graph.name].append(kernel_follow.t)
+            kernel_follow_s[st_graph.name].append(kernel_follow.follow_line_s)
+
         self.st_data_lock.acquire()
 
         self.st_data_boundary_s = st_data_boundary_s
@@ -203,6 +225,11 @@ class Planning:
         self.st_speed_constraint_s = st_speed_constraint_s
         self.st_speed_constraint_lower = st_speed_constraint_lower
         self.st_speed_constraint_upper = st_speed_constraint_upper
+
+        self.kernel_cruise_t = kernel_cruise_t
+        self.kernel_cruise_s = kernel_cruise_s
+        self.kernel_follow_t = kernel_follow_t
+        self.kernel_follow_s = kernel_follow_s
 
         self.st_data_lock.release()
 
