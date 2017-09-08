@@ -1,7 +1,7 @@
 import React from "react";
 
 import RENDERER from "renderer";
-import loaderImg from "assets/images/loader_apollo.gif";
+import loaderImg from "assets/images/logo_apollo.png";
 
 
 export default class Loader extends React.Component {
