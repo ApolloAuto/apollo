@@ -6,7 +6,7 @@ Quadratic programming + Spline interpolation
 
 ### 1.1 Segment routing path
 
-Segment routing path into n segments. each segment trajectory is defined by two polynomials.
+Segment routing path into **n** segments. each segment trajectory is defined by two polynomials:
 
 $$
 x = f_i(t)
@@ -47,11 +47,11 @@ $$
 
 ### 2.1 Joint smoothness  constraints
 
-This constraint is to make the spline joint smooth.  Let's assume two segment $seg_k$ and $seg_{k+1}$ are connected, and the accumulated s of segment $seg_k$ is $s_k$. The we can get the constraint euqation as 
+This constraint smoothes the spline joint.  Let's assume two segments, $seg_k$ and $seg_{k+1}$, are connected and the accumulated **s** of segment $seg_k$ is $s_k$. Calculate the constraint equation as: 
 $$
 f_k(s_k) = f_{k+1} (s_0)
 $$
-Similarly we can get the equality constraints for 
+Similarly the formula works for the equality constraints, such as: 
 $$
 f'_k(s_k) = f'_{k+1} (s_0)
 \\
@@ -70,7 +70,7 @@ $$
 
 ### 2.2 Sampled points for boundary constraint
 
-Evenly sample m points along the path, and check predefined boundary at those points.  
+Evenly sample **m** points along the path and check the predefined boundaries at those points.  
 $$
 f_i(t_l) - x_l< boundary
 \\
