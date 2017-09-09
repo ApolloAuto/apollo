@@ -62,11 +62,16 @@ Status Planning::InitFrame(const uint32_t sequence_num, const double time_stamp,
   frame_->SetVehicleInitPose(VehicleState::instance()->pose());
   frame_->SetRoutingResponse(
       AdapterManager::GetRoutingResponse()->GetLatestObserved());
+  ADEBUG << "Get routing: "
+         << AdapterManager::GetRoutingResponse()
+                ->GetLatestObserved()
+                .DebugString();
+
   if (FLAGS_enable_prediction && !AdapterManager::GetPrediction()->Empty()) {
     const auto& prediction =
         AdapterManager::GetPrediction()->GetLatestObserved();
     frame_->SetPrediction(prediction);
-    ADEBUG << "Get prediction done.";
+    ADEBUG << "Get prediction: " << prediction.DebugString();
   }
 
   auto status = frame_->Init(config_, time_stamp);
