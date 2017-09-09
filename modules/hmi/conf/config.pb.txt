@@ -258,12 +258,8 @@ available_maps {
   map_dir: "modules/map/data/sunnyvale_office"
 }
 available_maps {
-  name: "Beijing Yongfeng Park"
-  map_dir: "modules/map/data/yongfengchanyeyuan"
-}
-available_maps {
-  name: "Beijing Dongbutou Rd"
-  map_dir: "modules/map/data/dongbutoulu"
+  name: "Huanbaoyuan BZone"
+  map_dir: "modules/map/data/huanbaoyuan_bzone"
 }
 available_vehicles {
   name: "MKZ 8"
