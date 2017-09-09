@@ -268,14 +268,16 @@ available_maps {
 available_vehicles {
   name: "MKZ 8"
   velodyne_params_path: "modules/calibration/data/mkz8"
+  gnss_conf_path: "modules/drivers/gnss/conf/conf_us/gnss_conf_mkz8.txt"
 }
 available_vehicles {
   name: "MKZ 9"
   velodyne_params_path: "modules/calibration/data/mkz9"
+  gnss_conf_path: "modules/drivers/gnss/conf/conf_us/gnss_conf_mkz9.txt"
 }
 available_vehicles {
   name: "Beijing MKZ"
-  velodyne_params_path: "modules/calibration/data/beijing_mkz"
+  velodyne_params_path: "modules/calibration/data/mkz056"
+  gnss_driver_path: "modules/drivers/gnss/conf/conf_beijing/gnss_driver_bj.launch"
+  gnss_conf_path: "modules/drivers/gnss/conf/conf_beijing/gnss_conf_mkz_BDKJ.txt"
 }
-velodyne_params_target_path: "bazel-apollo/external/ros/share/velodyne_pointcloud/params"
-velodyne_params_target_path: "ros/share/velodyne_pointcloud/params"

@@ -33,7 +33,11 @@ class Config(object):
     """Global config."""
 
     pb_singleton = None
-    apollo_root = os.path.join(os.path.dirname(__file__), '../../..')
+    apollo_root = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '../../..'))
+    ros_root = os.path.abspath(os.path.join(
+        os.environ.get('ROS_ROOT', '/apollo/ros/share/ros'), '../..'))
+
     log = logging.getLogger('HMI')
     record_replay_required_modules = [
         'GPS', 'control', 'canbus', 'localization', 'dreamview', 'record_bag']
@@ -97,16 +101,19 @@ class Config(object):
         return cls.get_realpath(cls.get_pb().global_flagfile)
 
     @classmethod
-    def get_realpath(cls, path_str):
+    def get_realpath(cls, path_str, from_ros_root=False):
         """
         Get realpath from a path string in config.
 
-        Starting with '/' indicates an absolute path, otherwise it will be taken
-        as a relative path of the Apollo root.
+        1. Starting with '/' indicates an absolute path.
+        2. from_ros_root=True indicates a relative path against ROS root.
+        3. Otherwise it will be taken as a relative path against Apollo root.
         """
         if path_str.startswith('/'):
             return path_str
-        return os.path.abspath(os.path.join(cls.apollo_root, path_str))
+        if from_ros_root:
+            return os.path.join(cls.ros_root, path_str)
+        return os.path.join(cls.apollo_root, path_str)
 
     @staticmethod
     def __find_by_name(name, value_list):
