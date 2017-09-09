@@ -23,6 +23,8 @@ DECLARE_string(node_namespace);
 DECLARE_string(node_name);
 DECLARE_string(hmi_name);
 
+DECLARE_string(adapter_config_filename);
+
 DECLARE_double(l3_perception_freq);
 
 #endif
