@@ -154,26 +154,29 @@ class ToolApi(object):
             return
 
         conf_pb = Config.get_pb()
-
-        # Copy velodyne_params to the first existing target path.
-        first_existing = None
-        for target_path in conf_pb.velodyne_params_target_path:
-            target_path = Config.get_realpath(target_path)
-            if os.path.exists(target_path):
-                first_existing = target_path
-                break
-        if first_existing is None:
-            Config.log.critical('Cannot find velodyne params path')
-            return
-        system_cmd.copytree(vehicle_conf.velodyne_params_path, first_existing)
-        Config.log.info('Copied velodyne params from %s to %s',
-                        vehicle_conf.velodyne_params_path, target_path)
         # Copy vehicle_param_pb.
-        system_cmd.copy(vehicle_conf.vehicle_param_pb_path,
-                        conf_pb.vehicle_param_pb_target_path)
+        if vehicle_conf.HasField('vehicle_param_pb_path'):
+            system_cmd.copy(vehicle_conf.vehicle_param_pb_path,
+                            conf_pb.vehicle_param_pb_target_path)
         # Copy calibration_table.
-        system_cmd.copy(vehicle_conf.calibration_table_path,
-                        conf_pb.calibration_table_target_path)
+        if vehicle_conf.HasField('calibration_table_path'):
+            system_cmd.copy(vehicle_conf.calibration_table_path,
+                            conf_pb.calibration_table_target_path)
+        # Copy velodyne_params.
+        if vehicle_conf.HasField('velodyne_params_path'):
+            system_cmd.copytree(
+                vehicle_conf.velodyne_params_path,
+                Config.get_realpath(conf_pb.velodyne_params_target_path, True))
+        # Copy gnss_driver.
+        if vehicle_conf.HasField('gnss_driver_path'):
+            system_cmd.copy(
+                vehicle_conf.gnss_driver_path,
+                Config.get_realpath(conf_pb.gnss_driver_target_path, True))
+        # Copy gnss_conf.
+        if vehicle_conf.HasField('gnss_conf_path'):
+            system_cmd.copy(
+                vehicle_conf.gnss_conf_path,
+                Config.get_realpath(conf_pb.gnss_conf_target_path, True))
 
         RuntimeStatus.pb_singleton.config.current_vehicle = vehicle_name
         RuntimeStatus.broadcast_status_if_changed()

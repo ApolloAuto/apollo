@@ -47,12 +47,18 @@ def async_run_command_pb(cmd_pb):
 
 def copy(src, dst):
     """Copy file from src to dst if they are not the same."""
+    src = Config.get_realpath(src)
+    dst = Config.get_realpath(dst)
     if src != dst:
-        shutil.copy(Config.get_realpath(src), Config.get_realpath(dst))
+        shutil.copy(src, dst)
+        Config.log.debug('HMI: Copying file from %s to %s', src, dst)
 
 
 def copytree(src, dst):
     """Copy directory, clear the dst if it existed."""
+    src = Config.get_realpath(src)
     dst = Config.get_realpath(dst)
-    shutil.rmtree(dst, ignore_errors=True)
-    shutil.copytree(Config.get_realpath(src), dst)
+    if src != dst:
+        shutil.rmtree(dst, ignore_errors=True)
+        shutil.copytree(src, dst)
+        Config.log.debug('HMI: Copying directory from %s to %s', src, dst)
