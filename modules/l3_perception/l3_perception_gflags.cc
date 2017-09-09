@@ -20,4 +20,6 @@ DEFINE_string(node_namespace, "/apollo/l3_perception", "Global node namespace");
 DEFINE_string(node_name, "l3_perception", "The chassis module name in proto");
 DEFINE_string(hmi_name, "l3_perception", "Module name in HMI");
 
+DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
+
 DEFINE_double(l3_perception_freq, 100, "L3 perception timer frequency.");

@@ -38,7 +38,7 @@ using apollo::perception::PerceptionObstacle;
 std::string L3Perception::Name() const { return FLAGS_hmi_name; }
 
 Status L3Perception::Init() {
-  AdapterManager::Init(FLAGS_adapter_config_path);
+  AdapterManager::Init(FLAGS_adapter_config_filename);
 
   CHECK(AdapterManager::GetMobileye()) << "Mobileye is not initialized.";
   AdapterManager::AddMobileyeCallback(&L3Perception::OnMobileye, this);
