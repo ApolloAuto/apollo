@@ -61,22 +61,4 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "yongfengchanyeyuan_test",
-    size = "small",
-    srcs = [
-        "yongfengchanyeyuan_test.cc",
-    ],
-    data = [
-        "//modules/common/configs:config_gflags",
-        "//modules/localization/common:localization_common",
-        "//modules/map:map_data",
-        "//modules/planning:planning_testdata",
-    ],
-    deps = [
-        ":planning_test_base",
-        "@gtest//:main",
-    ],
-)
-
 cpplint()

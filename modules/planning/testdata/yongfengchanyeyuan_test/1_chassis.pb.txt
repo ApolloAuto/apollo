@@ -1,8 +1,0 @@
-speed_mps: 0.0
-driving_mode: COMPLETE_AUTO_DRIVE
-gear_location: GEAR_DRIVE
-header {
-  timestamp_sec: 1473698038.46
-  module_name: "chassis"
-  sequence_num: 8329
-}
