@@ -163,8 +163,10 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
   for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
     const auto& point = trajectory.trajectory_point(i);
 
-    const double kMaxAccelThreshold = 1.5;
-    const double kMinAccelThreshold = -4.0;
+    const double kMaxAccelThreshold =
+        FLAGS_longitudinal_acceleration_upper_bound;
+    const double kMinAccelThreshold =
+        FLAGS_longitudinal_acceleration_lower_bound;
     if (point.a() > kMaxAccelThreshold || point.a() < kMinAccelThreshold) {
       AERROR << "Invalid trajectory point because accel out of range: "
              << point.DebugString();
