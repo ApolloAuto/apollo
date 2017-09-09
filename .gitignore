@@ -75,3 +75,10 @@ modules/map/data
 
 # python proto
 py_proto
+
+# gnss conf files
+modules/drivers/gnss/conf/conf_beijing
+modules/drivers/gnss/conf/conf_us
+
+# calibration files
+modules/calibration/data/mkz056

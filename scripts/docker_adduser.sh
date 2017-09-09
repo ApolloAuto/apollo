@@ -41,4 +41,6 @@ if [ "$RELEASE_DOCKER" != "1" ];then
   cp -r /home/tmp/esd_can/include /apollo/third_party/can_card_library/esd_can
   cp -r /home/tmp/esd_can/lib /apollo/third_party/can_card_library/esd_can
   chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/third_party/can_card_library/esd_can"
+  cp -r /home/tmp/gnss_conf/* /apollo/modules/drivers/gnss/conf/
+  chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/drivers/gnss/conf/"
 fi

@@ -110,10 +110,6 @@ function build() {
 
   # Build python proto
   build_py_proto
-  if [ -d "/home/tmp/conf" ];then
-    sudo cp -r /home/tmp/conf bazel-apollo/external/ros/share/gnss_driver/
-    sudo chown -R ${DOCKER_USER}:${DOCKER_GRP} "bazel-apollo/external/ros/share/gnss_driver/conf"
-  fi
 }
 
 function apollo_build_dbg() {
@@ -218,6 +214,10 @@ function release() {
 
   # perception
   cp -r modules/perception/model/ $MODULES_DIR/perception
+
+  # gnss config
+  mkdir -p $MODULES_DIR/drivers/gnss
+  cp -r modules/drivers/gnss/conf/ $MODULES_DIR/drivers/gnss
 
   # lib
   LIB_DIR=$ROOT_DIR/lib
