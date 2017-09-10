@@ -206,6 +206,7 @@ void Planning::RunOnce() {
     return;
   }
 
+  // update routing
   if (FLAGS_enable_reference_line_provider_thread) {
     ReferenceLineProvider::instance()->UpdateRoutingResponse(
         AdapterManager::GetRoutingResponse()->GetLatestObserved());
