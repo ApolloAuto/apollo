@@ -45,12 +45,12 @@ def async_run_command_pb(cmd_pb):
     async_run_command(cmd_str, cmd_pb.stdout_file, cmd_pb.stderr_file)
 
 
-def copy(src, dst):
+def copyfile(src, dst):
     """Copy file from src to dst if they are not the same."""
     src = Config.get_realpath(src)
     dst = Config.get_realpath(dst)
     if src != dst:
-        shutil.copy(src, dst)
+        shutil.copyfile(src, dst)
         Config.log.debug('HMI: Copying file from %s to %s', src, dst)
 
 
