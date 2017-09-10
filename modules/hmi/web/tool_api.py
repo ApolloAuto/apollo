@@ -156,12 +156,12 @@ class ToolApi(object):
         conf_pb = Config.get_pb()
         # Copy vehicle_param_pb.
         if vehicle_conf.HasField('vehicle_param_pb_path'):
-            system_cmd.copy(vehicle_conf.vehicle_param_pb_path,
-                            conf_pb.vehicle_param_pb_target_path)
+            system_cmd.copyfile(vehicle_conf.vehicle_param_pb_path,
+                                conf_pb.vehicle_param_pb_target_path)
         # Copy calibration_table.
         if vehicle_conf.HasField('calibration_table_path'):
-            system_cmd.copy(vehicle_conf.calibration_table_path,
-                            conf_pb.calibration_table_target_path)
+            system_cmd.copyfile(vehicle_conf.calibration_table_path,
+                                conf_pb.calibration_table_target_path)
         # Copy velodyne_params.
         if vehicle_conf.HasField('velodyne_params_path'):
             system_cmd.copytree(
@@ -169,12 +169,12 @@ class ToolApi(object):
                 Config.get_realpath(conf_pb.velodyne_params_target_path, True))
         # Copy gnss_driver.
         if vehicle_conf.HasField('gnss_driver_path'):
-            system_cmd.copy(
+            system_cmd.copyfile(
                 vehicle_conf.gnss_driver_path,
                 Config.get_realpath(conf_pb.gnss_driver_target_path, True))
         # Copy gnss_conf.
         if vehicle_conf.HasField('gnss_conf_path'):
-            system_cmd.copy(
+            system_cmd.copyfile(
                 vehicle_conf.gnss_conf_path,
                 Config.get_realpath(conf_pb.gnss_conf_target_path, True))
 
