@@ -242,12 +242,10 @@ Status QpSplineStGraph::ApplyConstraint(
     accel_upper_bound.front() = 0.0;
   } else {
     constexpr double kInitPointAccelRelaxedSpeed = 1.0;
-    if (init_point_.v() > kInitPointAccelRelaxedSpeed &&
-        !constraint->AddPointSecondDerivativeConstraint(0.0, init_point_.a())) {
-      const std::string msg =
-          "add st start point acceleration constraint failed!";
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+    constexpr double kInitPointAccelRelaxedRange = 0.5;
+    if (init_point_.v() > kInitPointAccelRelaxedSpeed) {
+      accel_lower_bound.front() = init_point_.a() - kInitPointAccelRelaxedRange;
+      accel_upper_bound.front() = init_point_.a() + kInitPointAccelRelaxedRange;
     }
   }
 
@@ -287,17 +285,15 @@ Status QpSplineStGraph::ApplyKernel(const std::vector<StBoundary>& boundaries,
         qp_spline_st_speed_config_.jerk_kernel_weight());
   }
 
-  if (AddCruiseReferenceLineKernel(
-          speed_limit, qp_spline_st_speed_config_.cruise_weight(),
-              st_graph_debug) !=
-      Status::OK()) {
+  if (AddCruiseReferenceLineKernel(speed_limit,
+                                   qp_spline_st_speed_config_.cruise_weight(),
+                                   st_graph_debug) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
 
-  if (AddFollowReferenceLineKernel(
-          boundaries, qp_spline_st_speed_config_.follow_weight()
-              ,st_graph_debug) !=
-      Status::OK()) {
+  if (AddFollowReferenceLineKernel(boundaries,
+                                   qp_spline_st_speed_config_.follow_weight(),
+                                   st_graph_debug) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
   return Status::OK();
