@@ -40,8 +40,7 @@ apollo::common::Status SpeedOptimizer::Execute(
       reference_line_info->path_decision(),
       reference_line_info->mutable_speed_data());
 
-  if (!ret.ok() && FLAGS_enable_slowdown_profile_generator &&
-      frame->PlanningStartPoint().v() < FLAGS_slowdown_speed_threshold) {
+  if (!ret.ok() && FLAGS_enable_slowdown_profile_generator) {
     *reference_line_info->mutable_speed_data() =
         GenerateStopProfile(frame->PlanningStartPoint().v());
   }
@@ -53,15 +52,21 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed) const {
   AERROR << "Slowing down the car.";
   SpeedData speed_data;
 
-  const double min_acc = FLAGS_slowdown_profile_deceleration;
+  double slowdown_decel = FLAGS_slowdown_profile_deceleration;
+  if (frame_->PlanningStartPoint().v() > FLAGS_slowdown_speed_threshold) {
+    // TODO(all): select the best deceleration for slow down.
+    slowdown_decel = FLAGS_slowdown_speed_threshold / 2.0;
+  }
+
   const size_t max_t = 3.0;
   const double unit_t = 0.02;
 
   double pre_s = 0.0;
   for (double t = 0.0; t < max_t; t += unit_t) {
-    const double s = std::fmax(pre_s, init_speed * t + 0.5 * min_acc * t * t);
-    const double v = std::fmax(0.0, init_speed + min_acc * t);
-    speed_data.AppendSpeedPoint(s, t, v, min_acc, 0.0);
+    const double s =
+        std::fmax(pre_s, init_speed * t + 0.5 * slowdown_decel * t * t);
+    const double v = std::fmax(0.0, init_speed + slowdown_decel * t);
+    speed_data.AppendSpeedPoint(s, t, v, slowdown_decel, 0.0);
     pre_s = s;
   }
   return speed_data;
