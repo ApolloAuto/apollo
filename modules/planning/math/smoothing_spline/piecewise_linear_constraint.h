@@ -15,13 +15,12 @@
  *****************************************************************************/
 
 /**
- * @file : spline_1d_constraint.h
- * @brief: wrapp up solver constraint interface with direct methods and preset
- *methods
+ * @file : piecewise_linear_constraint.h
+ * @brief: Definition of PiecewiseLinearConstraint class.
  **/
 
-#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_CONSTRAINT_H_
-#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_CONSTRAINT_H_
+#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_CONSTRAINT_H_
+#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_CONSTRAINT_H_
 
 #include <algorithm>
 #include <vector>
@@ -129,4 +128,4 @@ class Spline1dConstraint {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_CONSTRAINT_H_
+#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_CONSTRAINT_H_
