@@ -3,8 +3,8 @@ import STORE from "store";
 import RENDERER from "renderer";
 
 class WebSocketEndpoint {
-    constructor(server) {
-        this.server = server;
+    constructor(serverAddr) {
+        this.serverAddr = serverAddr;
         this.websocket = null;
         this.counter = 0;
         this.lastUpdateTimestamp = 0;
@@ -14,7 +14,7 @@ class WebSocketEndpoint {
     initialize() {
         this.counter = 0;
         try {
-            this.websocket = new WebSocket(this.server);
+            this.websocket = new WebSocket(this.serverAddr);
         } catch (error) {
             console.error("Failed to establish a connection: " + error);
             setTimeout(() => {
@@ -49,6 +49,7 @@ class WebSocketEndpoint {
             }
         };
         this.websocket.onclose = event => {
+            console.log("WebSocket connection closed, close_code: " + event.code);
             this.initialize();
         };
     }
@@ -90,7 +91,7 @@ class WebSocketEndpoint {
 // Follows the convention that the websocket is served on the same host
 // as the web server, the port number of websocket is the port number of
 // the webserver plus one.
-function deduceWebsocketServer() {
+function deduceWebsocketServerAddr() {
     const server = window.location.origin;
     const link = document.createElement("a");
     link.href = server;
@@ -101,8 +102,8 @@ function deduceWebsocketServer() {
 // NOTE: process.env.NODE_ENV will be set to "production" by webpack when
 // invoked in production mode ("-p"). We rely on this to determine which
 // websocket server to use.
-const server = process.env.NODE_ENV === "production" ?
-               deduceWebsocketServer() : `ws://${devConfig.websocketServer}`;
-const WS = new WebSocketEndpoint(server);
+const serverAddr = process.env.NODE_ENV === "production" ?
+                   deduceWebsocketServerAddr() : `ws://${devConfig.websocketServer}`;
+const WS = new WebSocketEndpoint(serverAddr);
 
 export default WS;
