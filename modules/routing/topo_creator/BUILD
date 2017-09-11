@@ -11,7 +11,6 @@ cc_library(
         "edge_creator.h",
     ],
     deps = [
-        "//external:gflags",
         "//modules/common",
         "//modules/map/proto:map_proto",
         "//modules/routing/common:routing_gflags",
@@ -47,7 +46,6 @@ cc_library(
         "node_creator.h",
     ],
     deps = [
-        "//external:gflags",
         "//modules/common",
         "//modules/map/proto:map_proto",
         "//modules/routing/common:routing_gflags",
