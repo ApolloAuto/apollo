@@ -75,7 +75,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           AdapterManager::PublishRoutingRequest(routing_request);
         }
 
-        // publish message
+        // Publish monitor message.
         if (succeed) {
           sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
                                                    "Routing Request Sent");
@@ -84,6 +84,10 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
               MonitorMessageItem::ERROR, "Failed to send routing request");
         }
       });
+
+  // Register an empty callback for heartbeat package.
+  websocket_->RegisterMessageHandler(
+      "Ping", [](const Json &json, WebSocketHandler::Connection *conn) {});
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
