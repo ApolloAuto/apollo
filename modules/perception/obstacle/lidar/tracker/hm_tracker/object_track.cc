@@ -129,7 +129,7 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
 ObjectTrack::~ObjectTrack() {
   if (filter_) {
     delete filter_;
-    filter_ = NULL;
+    filter_ = nullptr;
   }
 }
 
@@ -415,7 +415,7 @@ void ObjectTrackSet::Clear() {
   for (size_t i = 0; i < tracks_.size(); i++) {
     if (tracks_[i]) {
       delete (tracks_[i]);
-      tracks_[i] = NULL;
+      tracks_[i] = nullptr;
     }
   }
   tracks_.clear();
@@ -448,9 +448,9 @@ int ObjectTrackSet::RemoveLostTracks() {
   // remove lost tracks
   int no_removed = tracks_.size() - track_num;
   for (size_t i = track_num; i < tracks_.size(); ++i) {
-    if (tracks_[i] != NULL) {
+    if (tracks_[i] != nullptr) {
       delete (tracks_[i]);
-      tracks_[i] = NULL;
+      tracks_[i] = nullptr;
     }
   }
   tracks_.resize(track_num);
