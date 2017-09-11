@@ -23,16 +23,19 @@
 
 #include "modules/planning/math/smoothing_spline/piecewise_linear_generator.h"
 
+#include "modules/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 
 namespace apollo {
 namespace planning {
 
-PiecewiseLinearGenerator(const uint32_t num_of_segments,
-                         const double unit_segment)
+PiecewiseLinearGenerator::PiecewiseLinearGenerator(
+    const uint32_t num_of_segments, const double unit_segment)
     : num_of_segments_(num_of_segments),
       unit_segment_(unit_segment),
-      total_t_(num_of_segments * unit_segment) {
+      total_t_(num_of_segments * unit_segment),
+      constraint_(num_of_segments + 1),
+      kernel_(num_of_segments + 1) {
   CHECK_GE(num_of_segments, 3);
 }
 
@@ -46,15 +49,17 @@ PiecewiseLinearKernel* PiecewiseLinearGenerator::mutable_kernel() {
 
 bool PiecewiseLinearGenerator::Solve() {
   const Eigen::MatrixXd& kernel_matrix = kernel_.kernel_matrix();
-  const Eigen::MatrixXd& offset = kernel_.offset();
+  const Eigen::MatrixXd& offset = kernel_.offset_matrix();
+
   const Eigen::MatrixXd& inequality_constraint_matrix =
-      constraint_.inequality_constraint().constraint_matrix();
+      constraint_.inequality_constraint_matrix();
   const Eigen::MatrixXd& inequality_constraint_boundary =
-      constraint_.inequality_constraint().constraint_boundary();
+      constraint_.inequality_constraint_boundary();
+
   const Eigen::MatrixXd& equality_constraint_matrix =
-      constraint_.equality_constraint().constraint_matrix();
+      constraint_.equality_constraint_matrix();
   const Eigen::MatrixXd& equality_constraint_boundary =
-      constraint_.equality_constraint().constraint_boundary();
+      constraint_.equality_constraint_boundary();
 
   qp_solver_.reset(new apollo::common::math::ActiveSetQpSolver(
       kernel_matrix, offset, inequality_constraint_matrix,
