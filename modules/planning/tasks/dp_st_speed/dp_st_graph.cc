@@ -497,8 +497,8 @@ bool DpStGraph::CreateFollowDecision(
   auto* follow = follow_decision->mutable_follow();
 
   const double follow_speed = init_point_.v();
-  const double follow_distance_s =
-      -std::fmax(follow_speed * FLAGS_follow_time_buffer, FLAGS_follow_min_distance);
+  const double follow_distance_s = -std::fmax(
+      follow_speed * FLAGS_follow_time_buffer, FLAGS_follow_min_distance);
 
   follow->set_distance_s(follow_distance_s);
 
