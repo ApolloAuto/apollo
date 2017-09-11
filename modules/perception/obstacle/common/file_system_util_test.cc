@@ -24,15 +24,12 @@ namespace perception {
 
 TEST(FileSystemUtilTest, GetFileNamesInFolderById) {
   std::string data_path = "modules/perception/data/hm_tracker_test/";
-  std::vector<std::string> pcd_filenames;
-  GetFileNamesInFolderById(data_path, ".pcd", &pcd_filenames);
   std::vector<std::string> seg_filenames;
   GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
   std::vector<std::string> pose_filenames;
   GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
-  EXPECT_GT(pcd_filenames.size(), 0);
-  EXPECT_EQ(pcd_filenames.size(), seg_filenames.size());
-  EXPECT_EQ(pcd_filenames.size(), pose_filenames.size());
+  EXPECT_EQ(seg_filenames.size(), 8);
+  EXPECT_EQ(pose_filenames.size(), 8);
 }
 
 }  // namespace perception

@@ -176,12 +176,10 @@ class HmObjectTracker : public BaseTracker{
   // @brief create new tracks for objects without matched track
   // @params[IN] new_objects: recently detected objects
   // @params[IN] unassigned_objects: index of unassigned objects
-  // @params[IN] time_diff: time interval for updating
   // @return nothing
   void CreateNewTracks(
     const std::vector<TrackedObjectPtr>& new_objects,
-    const std::vector<int>& unassigned_objects,
-    const double& time_diff);
+    const std::vector<int>& unassigned_objects);
 
   // @brief delete lost tracks
   // @return nothing

@@ -33,7 +33,7 @@ HmObjectTracker::HmObjectTracker(): matcher_method_(HUNGARIAN_MATCHER),
   filter_method_(KALMAN_FILTER),
   use_histogram_for_match_(false),
   histogram_bin_size_(10),
-  matcher_(NULL),
+  matcher_(nullptr),
   time_stamp_(0.0),
   valid_(false) {
 }
@@ -41,7 +41,7 @@ HmObjectTracker::HmObjectTracker(): matcher_method_(HUNGARIAN_MATCHER),
 HmObjectTracker::~HmObjectTracker() {
   if (matcher_) {
     delete matcher_;
-    matcher_ = NULL;
+    matcher_ = nullptr;
   }
 }
 
@@ -50,7 +50,7 @@ bool HmObjectTracker::Init() {
   using apollo::perception::ConfigManager;
   using apollo::perception::ModelConfig;
 
-  const ModelConfig* model_config = NULL;
+  const ModelConfig* model_config = nullptr;
   if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
     AERROR << "not found model config: " << name();
     return false;
@@ -371,14 +371,14 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   const TrackerOptions& options,
   std::vector<ObjectPtr>* tracked_objects) {
   // A. track setup
-  if (tracked_objects == NULL)
+  if (tracked_objects == nullptr)
     return false;
   if (!valid_) {
     valid_ = true;
     return Initialize(objects, timestamp, options, tracked_objects);
   }
   Eigen::Matrix4d velo2world_pose = Eigen::Matrix4d::Identity();
-  if (options.velodyne_trans != NULL) {
+  if (options.velodyne_trans != nullptr) {
     velo2world_pose = *(options.velodyne_trans);
   } else {
     AERROR << "Input velodyne_trans is null";
@@ -419,7 +419,7 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   UpdateUnassignedTracks(tracks_predict, unassigned_tracks, time_diff);
   DeleteLostTracks();
   // E.3 create new tracks for objects without associated tracks
-  CreateNewTracks(transformed_objects, unassigned_objects, time_diff);
+  CreateNewTracks(transformed_objects, unassigned_objects);
 
   // F. collect tracked results
   CollectTrackedResults(tracked_objects);
@@ -432,7 +432,7 @@ bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
   std::vector<ObjectPtr>* tracked_objects) {
   // A. track setup
   Eigen::Matrix4d velo2world_pose = Eigen::Matrix4d::Identity();
-  if (options.velodyne_trans != NULL) {
+  if (options.velodyne_trans != nullptr) {
     velo2world_pose = *(options.velodyne_trans);
   } else {
     AERROR << "Input velodyne_trans is null";
@@ -454,11 +454,9 @@ bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
   // C. create tracks
   std::vector<int> unassigned_objects;
   unassigned_objects.resize(transformed_objects.size());
-  for (size_t i = 0; i < transformed_objects.size(); i++) {
-    unassigned_objects[i] = i;
-  }
+  std::iota(unassigned_objects.begin(), unassigned_objects.end(), 0);
   double time_diff = 0.1;
-  CreateNewTracks(transformed_objects, unassigned_objects, time_diff);
+  CreateNewTracks(transformed_objects, unassigned_objects);
   time_stamp_ = timestamp;
 
   // D. collect tracked results
@@ -588,8 +586,7 @@ void HmObjectTracker::UpdateUnassignedTracks(
 
 void HmObjectTracker::CreateNewTracks(
   const std::vector<TrackedObjectPtr>& new_objects,
-  const std::vector<int>& unassigned_objects,
-  const double& time_diff) {
+  const std::vector<int>& unassigned_objects) {
   // Create new tracks for objects without matched tracks
   for (size_t i = 0; i < unassigned_objects.size(); i++) {
     int obj_id = unassigned_objects[i];
