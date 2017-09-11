@@ -34,21 +34,33 @@ class PiecewiseLinearConstraint {
   PiecewiseLinearConstraint(const uint32_t dimension);
   virtual ~PiecewiseLinearConstraint() = default;
 
+  Eigen::MatrixXd inequality_constraint_matrix() const {
+    return inequality_constraint_matrix_;
+  }
+
+  Eigen::MatrixXd inequality_constraint_boundary() const {
+    return inequality_constraint_boundary_;
+  }
+
+  Eigen::MatrixXd equality_constraint_matrix() const {
+    return equality_constraint_matrix_;
+  }
+  Eigen::MatrixXd equality_constraint_boundary() const {
+    return equality_constraint_boundary_;
+  }
+
   /**
    * @brief: inequality boundary constraints
    **/
   bool AddBoundary(const std::vector<uint32_t>& index_list,
                    const std::vector<double>& lower_bound,
                    const std::vector<double>& upper_bound);
-
   bool AddDerivativeBoundary(const std::vector<uint32_t>& index_list,
                              const std::vector<double>& lower_bound,
                              const std::vector<double>& upper_bound);
-
   bool AddSecondDerivativeBoundary(const std::vector<uint32_t>& index_list,
                                    const std::vector<double>& lower_bound,
                                    const std::vector<double>& upper_bound);
-
   bool AddThirdDerivativeBoundary(const std::vector<uint32_t>& index_list,
                                   const std::vector<double>& lower_bound,
                                   const std::vector<double>& upper_bound);
@@ -68,8 +80,11 @@ class PiecewiseLinearConstraint {
 
  private:
   const uint32_t dimension_;
-  Eigen::MatrixXd inequality_constraint_;
-  Eigen::MatrixXd equality_constraint_;
+  Eigen::MatrixXd inequality_constraint_matrix_;
+  Eigen::MatrixXd inequality_constraint_boundary_;
+
+  Eigen::MatrixXd equality_constraint_matrix_;
+  Eigen::MatrixXd equality_constraint_boundary_;
 };
 
 }  // namespace planning

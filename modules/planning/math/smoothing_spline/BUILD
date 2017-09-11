@@ -190,6 +190,49 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "piecewise_linear_constraint",
+    srcs = [
+        "piecewise_linear_constraint.cc",
+    ],
+    hdrs = [
+        "piecewise_linear_constraint.h",
+    ],
+    deps = [
+        "@eigen//:eigen",
+    ],
+)
+
+cc_library(
+    name = "piecewise_linear_kernel",
+    srcs = [
+        "piecewise_linear_kernel.cc",
+    ],
+    hdrs = [
+        "piecewise_linear_kernel.h",
+    ],
+    deps = [
+        "@eigen//:eigen",
+    ],
+)
+
+cc_library(
+    name = "piecewise_linear_generator",
+    srcs = [
+        "piecewise_linear_generator.cc",
+    ],
+    hdrs = [
+        "piecewise_linear_generator.h",
+    ],
+    deps = [
+        ":piecewise_linear_constraint",
+        ":piecewise_linear_kernel",
+        "//modules/common/math/qp_solver",
+        "//modules/common/math/qp_solver:active_set_qp_solver",
+        "@eigen//:eigen",
+    ],
+)
+
 cc_test(
     name = "spline_1d_generator_test",
     size = "small",
