@@ -259,17 +259,17 @@ inline Clock::Clock()
 
 #define PERF_BLOCK_NO_THRESHOLD(message) PERF_BLOCK_WITH_THRESHOLD(message, 0)
 
-#define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                          \
-  using apollo::common::time::Clock;                                           \
-  for (double block_start_time = 0;                                            \
-       (block_start_time == 0 ? (block_start_time = Clock::NowInSecond())      \
-                              : false);                                        \
-       [block_start_time]() {                                                  \
-         double now = Clock::NowInSecond();                                    \
-         if (now - block_start_time > (threshold)) {                           \
-           ADEBUG << std::fixed << (message) << ": " << now - block_start_time \
-                  << "s.";                                                     \
-         }                                                                     \
+#define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                         \
+  using apollo::common::time::Clock;                                          \
+  for (double block_start_time = 0;                                           \
+       (block_start_time == 0 ? (block_start_time = Clock::NowInSecond())     \
+                              : false);                                       \
+       [&]() {                                                                \
+         double now = Clock::NowInSecond();                                   \
+         if (now - block_start_time > (threshold)) {                          \
+           AINFO << std::fixed << (message) << ": " << now - block_start_time \
+                 << "s.";                                                     \
+         }                                                                    \
        }())
 }  // namespace time
 }  // namespace common
