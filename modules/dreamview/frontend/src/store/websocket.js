@@ -52,6 +52,14 @@ class WebSocketEndpoint {
             console.log("WebSocket connection closed, close_code: " + event.code);
             this.initialize();
         };
+
+        // Periodically send heartbeat to server to indicate the connection is still alive.
+        clearInterval(this.timer);
+        this.timer = setInterval(() => {
+            if (this.websocket.readyState === this.websocket.OPEN) {
+                this.websocket.send(JSON.stringify({type : "Ping"}));
+            }
+        }, 10000);
     }
 
     checkMessage(message) {
