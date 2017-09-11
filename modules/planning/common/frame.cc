@@ -166,17 +166,10 @@ const Obstacle *Frame::CreateDestinationObstacle() {
            << routing_end.DebugString();
     return nullptr;
   }
-  double dest_s = 0.0;
-  double dest_l = 0.0;
-  if (!lane->GetProjection({dest_point.x(), dest_point.y()}, &dest_s,
-                           &dest_l)) {
-    AERROR << "Failed to get projection for " << dest_point.DebugString()
-           << " on lane " << lane->id().id();
-    return nullptr;
-  }
+  double dest_lane_s = routing_end.s();
   // check if destination point is in planning range
   common::math::Box2d destination_box{{dest_point.x(), dest_point.y()},
-                                      lane->Heading(dest_s),
+                                      lane->Heading(dest_lane_s),
                                       FLAGS_virtual_stop_wall_length,
                                       FLAGS_virtual_stop_wall_width};
   return AddStaticVirtualObstacle(FLAGS_destination_obstacle_id,
