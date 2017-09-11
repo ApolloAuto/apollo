@@ -19,11 +19,13 @@ limitations under the License.
 #include <vector>
 
 #include "modules/common/log.h"
-#include "modules/common/util/string_util.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace dreamview {
+
+using apollo::common::util::StrCat;
 
 void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
@@ -104,9 +106,10 @@ bool WebSocketHandler::SendData(const std::string &data, Connection *conn,
   // Note that while we are holding the connection lock, the connection won't be
   // closed and removed.
   int ret;
-  PERF_BLOCK("Websocket write took too long", 0.5) {
+  PERF_BLOCK(StrCat("Writing ", data.size(), " bytes via websocket took"),
+             0.1) {
     ret = mg_websocket_write(conn, WEBSOCKET_OPCODE_TEXT, data.c_str(),
-                               data.size());
+                             data.size());
   }
   connection_lock->unlock();
 
@@ -118,8 +121,8 @@ bool WebSocketHandler::SendData(const std::string &data, Connection *conn,
     } else if (ret < 0) {
       msg = "Send Error";
     } else {
-      msg = apollo::common::util::StrCat("Expect to send ", data.size(),
-                                         " bytes. But sent ", ret, " bytes");
+      msg = StrCat("Expect to send ", data.size(), " bytes. But sent ", ret,
+                   " bytes");
     }
     AWARN << "Failed to send data via websocket connection. Reason: " << msg;
     return false;
