@@ -39,9 +39,9 @@ TEST_F(PoseUtilTest, ReadPoseFile) {
   double time_stamp;
   EXPECT_TRUE(ReadPoseFile(test_file, &pose, &frame_id, &time_stamp));
   EXPECT_EQ(frame_id, 11989);
-  EXPECT_EQ(time_stamp, 1160300588.419051);
-  EXPECT_EQ(pose(0, 3), 428033.330463);
-  EXPECT_EQ(pose(1, 3), 4435145.010161);
+  EXPECT_EQ(time_stamp, 588.419051);
+  EXPECT_EQ(pose(0, 3), 33.330463);
+  EXPECT_EQ(pose(1, 3), 45.010161);
   EXPECT_EQ(pose(2, 3), 40.746964);
 }
 

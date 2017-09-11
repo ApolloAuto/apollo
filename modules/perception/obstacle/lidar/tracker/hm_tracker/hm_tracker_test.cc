@@ -16,9 +16,6 @@
 
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 
-#include <pcl/io/pcd_io.h>
-#include <pcl/kdtree/kdtree.h>
-#include <pcl/kdtree/kdtree_flann.h>
 #include <fstream>
 #include <iomanip>
 #include <map>
@@ -57,9 +54,9 @@ class HmObjectTrackerTest : public testing::Test {
   }
   void TearDown() {
     delete hm_tracker_;
-    hm_tracker_ = NULL;
+    hm_tracker_ = nullptr;
     delete object_builder_;
-    object_builder_ = NULL;
+    object_builder_ = nullptr;
   }
 
  protected:
@@ -92,47 +89,21 @@ bool ConstructObjects(const std::string& filename,
   return true;
 }
 
-bool LoadPclPcds(const std::string filename,
-                 pcl_util::PointCloudPtr* cloud_out) {
-  pcl::PointCloud<pcl_util::PointXYZIT> org_cloud;
-  if (pcl::io::loadPCDFile(filename, org_cloud) < 0) {
-    AERROR << "failed to load pcd file: " << filename;
-    return false;
-  }
-  (*cloud_out)->points.reserve(org_cloud.points.size());
-  for (size_t i = 0; i < org_cloud.points.size(); ++i) {
-    pcl_util::Point pt;
-    pt.x = org_cloud.points[i].x;
-    pt.y = org_cloud.points[i].y;
-    pt.z = org_cloud.points[i].z;
-    pt.intensity = org_cloud.points[i].intensity;
-    if (isnan(org_cloud.points[i].x)) continue;
-    (*cloud_out)->push_back(pt);
-  }
-  return true;
-}
-
 TEST_F(HmObjectTrackerTest, Track) {
   // test initialization of hm tracker
   EXPECT_TRUE(hm_tracker_->Init());
   // test tracking via hm tracker
   std::string data_path = "modules/perception/data/hm_tracker_test/";
-  std::vector<std::string> pcd_filenames;
-  GetFileNamesInFolderById(data_path, ".pcd", &pcd_filenames);
   std::vector<std::string> seg_filenames;
   GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
   std::vector<std::string> pose_filenames;
   GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
   int frame_id = -1;
   double time_stamp = 0.0;
-  EXPECT_GT(pcd_filenames.size(), 0);
-  EXPECT_EQ(pcd_filenames.size(), seg_filenames.size());
-  EXPECT_EQ(pcd_filenames.size(), pose_filenames.size());
+  EXPECT_GT(seg_filenames.size(), 0);
+  EXPECT_EQ(seg_filenames.size(), pose_filenames.size());
   Eigen::Vector3d global_offset(0, 0, 0);
   for (size_t i = 0; i < seg_filenames.size(); ++i) {
-    // load frame clouds
-    pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
-    EXPECT_TRUE(LoadPclPcds(data_path + pcd_filenames[i], &cloud));
     // read pose
     Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
     if (!ReadPoseFile(data_path + pose_filenames[i], &pose, &frame_id,
