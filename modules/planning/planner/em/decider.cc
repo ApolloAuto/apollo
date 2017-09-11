@@ -87,8 +87,8 @@ int Decider::MakeMainStopDecision(
     const auto& vehicle_param =
         common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
     if (stop_line_s <= adc_sl.s() + vehicle_param.front_edge_to_center()) {
-      AERROR << "object:" << obstacle->Id() << " fence route_s[" << stop_line_s
-             << "] behind adc route_s[" << adc_sl.s() << "]";
+      AERROR << "object:" << obstacle->Id() << " stop fence route_s["
+             << stop_line_s << "] behind adc route_s[" << adc_sl.s() << "]";
       continue;
     }
 
