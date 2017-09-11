@@ -17,20 +17,21 @@
 #include "modules/routing/topo_creator/edge_creator.h"
 
 #include <math.h>
-#include "modules/routing/common/routing_gflags.h"
 
 namespace apollo {
 namespace routing {
 
 void EdgeCreator::GetPbEdge(const Node& node_from, const Node& node_to,
-                            const Edge::DirectionType& type, Edge* pb_edge) {
-  InitEdgeInfo(node_from, node_to, type, pb_edge);
-  InitEdgeCost(node_from, node_to, type, pb_edge);
+                            const Edge::DirectionType& type, Edge* pb_edge,
+                            const RoutingConfig *routing_config) {
+  InitEdgeInfo(node_from, node_to, type, pb_edge, routing_config);
+  InitEdgeCost(node_from, node_to, type, pb_edge, routing_config);
 }
 
 void EdgeCreator::InitEdgeInfo(const Node& node_from, const Node& node_to,
                                const Edge::DirectionType& type,
-                               Edge* const edge) {
+                               Edge* const edge,
+                               const RoutingConfig *routing_config) {
   edge->set_from_lane_id(node_from.lane_id());
   edge->set_to_lane_id(node_to.lane_id());
   edge->set_direction_type(type);
@@ -38,7 +39,8 @@ void EdgeCreator::InitEdgeInfo(const Node& node_from, const Node& node_to,
 
 void EdgeCreator::InitEdgeCost(const Node& node_from, const Node& node_to,
                                const Edge::DirectionType& type,
-                               Edge* const edge) {
+                               Edge* const edge,
+                               const RoutingConfig *routing_config) {
   edge->set_cost(0.0);
   if (type == Edge::LEFT || type == Edge::RIGHT) {
     const auto& target_range =
@@ -48,10 +50,10 @@ void EdgeCreator::InitEdgeCost(const Node& node_from, const Node& node_to,
       changing_area_length += range.end().s() - range.start().s();
     }
     double ratio =
-        (changing_area_length >= FLAGS_base_changing_length)
-            ? pow(changing_area_length / FLAGS_base_changing_length, -1.5)
-            : 1.0;
-    edge->set_cost(FLAGS_change_penalty * ratio);
+      (changing_area_length >= routing_config->base_changing_length()) ?
+        pow(changing_area_length / routing_config->base_changing_length(), -1.5)
+        : 1.0;
+    edge->set_cost(routing_config->change_penalty() * ratio);
   }
 }
 

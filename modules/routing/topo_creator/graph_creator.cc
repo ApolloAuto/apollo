@@ -98,10 +98,11 @@ bool GraphCreator::Create() {
     node_index_map_[lane_id] = graph_.node_size();
     const auto iter = road_id_map_.find(lane_id);
     if (iter != road_id_map_.end()) {
-      NodeCreator::GetPbNode(lane, iter->second, graph_.add_node());
+      NodeCreator::GetPbNode(lane, iter->second, graph_.add_node(),
+                             routing_conf_);
     } else {
       LOG(WARNING) << "Failed to find road id of lane " << lane_id;
-      NodeCreator::GetPbNode(lane, "", graph_.add_node());
+      NodeCreator::GetPbNode(lane, "", graph_.add_node(), routing_conf_);
     }
   }
 
@@ -175,7 +176,8 @@ void GraphCreator::AddEdge(const Node& from_node,
       continue;
     }
     const auto& to_node = graph_.node(iter->second);
-    EdgeCreator::GetPbEdge(from_node, to_node, type, graph_.add_edge());
+    EdgeCreator::GetPbEdge(from_node, to_node, type, graph_.add_edge(),
+      routing_conf_);
   }
 }
 

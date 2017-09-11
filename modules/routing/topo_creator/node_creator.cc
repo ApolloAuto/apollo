@@ -19,8 +19,6 @@
 #include <cmath>
 #include <algorithm>
 
-#include "modules/routing/common/routing_gflags.h"
-
 namespace apollo {
 namespace routing {
 
@@ -57,9 +55,9 @@ double GetLaneLength(const Lane& lane) {
 }  // namespace
 
 void NodeCreator::GetPbNode(const Lane& lane, const std::string& road_id,
-                            Node* pb_node) {
-  InitNodeInfo(lane, road_id, pb_node);
-  InitNodeCost(lane, pb_node);
+                            Node* pb_node, const RoutingConfig * routingconfig){
+  InitNodeInfo(lane, road_id, pb_node, routingconfig);
+  InitNodeCost(lane, pb_node, routingconfig);
 }
 
 void NodeCreator::AddOutBoundary(
@@ -82,7 +80,8 @@ void NodeCreator::AddOutBoundary(
 }
 
 void NodeCreator::InitNodeInfo(const Lane& lane, const std::string& road_id,
-                               Node* const node) {
+                               Node* const node,
+                               const RoutingConfig * routingconfig) {
   double lane_length = GetLaneLength(lane);
   node->set_lane_id(lane.id().id());
   node->set_road_id(road_id);
@@ -98,21 +97,22 @@ void NodeCreator::InitNodeInfo(const Lane& lane, const std::string& road_id,
   }
 }
 
-void NodeCreator::InitNodeCost(const Lane& lane, Node* const node) {
+void NodeCreator::InitNodeCost(const Lane& lane, Node* const node,
+                               const RoutingConfig * routingconfig) {
   double lane_length = GetLaneLength(lane);
   double speed_limit =
-      (lane.has_speed_limit()) ? lane.speed_limit() : FLAGS_base_speed;
-  double ratio = (speed_limit >= FLAGS_base_speed)
-                     ? (1 / sqrt(speed_limit / FLAGS_base_speed))
+    (lane.has_speed_limit()) ? lane.speed_limit() : routingconfig->base_speed();
+  double ratio = (speed_limit >= routingconfig->base_speed())
+                     ? (1 / sqrt(speed_limit / routingconfig->base_speed()))
                      : 1.0;
   double cost = lane_length * ratio;
   if (lane.has_turn()) {
     if (lane.turn() == Lane::LEFT_TURN) {
-      cost += FLAGS_left_turn_penalty;
+      cost += routingconfig->left_turn_penalty();
     } else if (lane.turn() == Lane::RIGHT_TURN) {
-      cost += FLAGS_right_turn_penalty;
+      cost += routingconfig->right_turn_penalty();
     } else if (lane.turn() == Lane::U_TURN) {
-      cost += FLAGS_uturn_penalty;
+      cost += routingconfig->uturn_penalty();
     }
   }
   node->set_cost(cost);

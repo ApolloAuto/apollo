@@ -36,14 +36,3 @@ DEFINE_string(debug_route_path, "",
               "the default path of routing result debug file");
 DEFINE_string(debug_passage_region_path, "",
               "the default path of passage region debug file");
-
-DEFINE_double(base_speed, 4.167, "base speed for node creator, in m/s");
-DEFINE_double(left_turn_penalty, 50,
-              "left turn penalty for node creater, in meter");
-DEFINE_double(right_turn_penalty, 50,
-              "right turn penalty for node creater, in meter");
-DEFINE_double(uturn_penalty, 50,
-              "left turn penalty for node creater, in meter");
-DEFINE_double(change_penalty, 50, "change penalty for edge creater, in meter");
-DEFINE_double(base_changing_length, 50,
-              "base change length penalty for edge creater, in meter");
