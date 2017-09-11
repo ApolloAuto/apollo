@@ -27,6 +27,8 @@ namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::hdmap::EndWayPointFile;
 using apollo::routing::RoutingRequest;
 using google::protobuf::util::MessageToJsonString;
 using Json = nlohmann::json;
@@ -38,8 +40,9 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
       map_service_(map_service),
       websocket_(websocket) {
   // Initialize default end point
-  CHECK(apollo::common::util::GetProtoFromASCIIFile(
-      apollo::hdmap::EndWayPointFile(), &default_end_point_));
+  if (!GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
+    AWARN << "Failed to load default end point from " << EndWayPointFile();
+  }
 
   websocket_->RegisterMessageHandler(
       "RetrieveMapData",
@@ -64,6 +67,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
       "SendRoutingRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         RoutingRequest routing_request;
+
         bool succeed = ConstructRoutingRequest(json, &routing_request);
         if (succeed) {
           AdapterManager::FillRoutingRequestHeader(FLAGS_dreamview_module_name,
@@ -84,6 +88,13 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
     const Json &json, RoutingRequest *routing_request) {
+  // Try to reload end point if it hasn't be loaded yet.
+  if (!default_end_point_.has_id() &&
+      !GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {
+    AERROR << "Failed to load default end point from " << EndWayPointFile();
+    return false;
+  }
+
   // set start point
   auto start = json["start"];
   if (start.find("x") == start.end() || start.find("y") == start.end()) {
