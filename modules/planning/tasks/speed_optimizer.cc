@@ -55,7 +55,7 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed) const {
   double slowdown_decel = FLAGS_slowdown_profile_deceleration;
   if (frame_->PlanningStartPoint().v() > FLAGS_slowdown_speed_threshold) {
     // TODO(all): select the best deceleration for slow down.
-    slowdown_decel = FLAGS_slowdown_speed_threshold / 2.0;
+    slowdown_decel = FLAGS_slowdown_profile_deceleration / 2.0;
   }
 
   const size_t max_t = 3.0;
