@@ -40,7 +40,7 @@ DEFINE_double(
     "look backward this distance when creating reference line from routing");
 
 DEFINE_double(
-    look_forward_distance, 70,
+    look_forward_distance, 100,
     "look forward this distance when creating reference line from routing");
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
@@ -62,8 +62,6 @@ DEFINE_double(default_reference_line_width, 4.0,
 
 DEFINE_double(planning_upper_speed_limit, 7.5,
               "Maximum speed (m/s) in planning.");
-
-DEFINE_double(planning_distance, 100, "Planning distance");
 
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
 DEFINE_double(trajectory_time_resolution, 0.1,
@@ -95,8 +93,8 @@ DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
 DEFINE_double(kappa_bound, 1.00, "The bound for vehicle curvature");
 
 // ST Boundary
-DEFINE_double(st_max_s, 80, "the maximum s of st boundary");
-DEFINE_double(st_max_t, 10, "the maximum t of st boundary");
+DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
+DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 
 // Decision Part
 DEFINE_double(static_obstacle_speed_threshold, 1.0,
