@@ -47,9 +47,6 @@ DEFINE_bool(enable_watchdog, true, "enable watchdog");
 DEFINE_double(gps_time_delay_tolerance, 1.0,
               "gps message time delay tolerance (sec)");
 
-DEFINE_double(imu_time_delay_tolerance, 1.0,
-              "imu message time delay tolerance (sec)");
-
 DEFINE_double(camera_time_delay_tolerance, 1.0,
               "camera imu message time delay tolerance (sec)");
 
@@ -61,10 +58,6 @@ DEFINE_double(timestamp_sec_tolerance, 10e-7, "timestamp second tolerance");
 DEFINE_double(map_offset_x, 0.0, "map_offsite: x");
 DEFINE_double(map_offset_y, 0.0, "map_offsite: y");
 DEFINE_double(map_offset_z, 0.0, "map_offsite: z");
-
-DEFINE_int32(monitor_level, 2,
-             "minimum log level(INFO=0; WARN=1;"
-             "ERROR=2;FATAL=3) for monitor msg");
 
 DEFINE_int32(report_threshold_err_num, 10, "report threshold error num");
 DEFINE_double(report_gps_imu_time_diff_threshold, 0.02,
