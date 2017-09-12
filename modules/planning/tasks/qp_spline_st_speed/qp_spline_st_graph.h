@@ -47,6 +47,7 @@ class QpSplineStGraph {
 
   common::Status Search(const StGraphData& st_graph_data,
                         const PathData& path_data, SpeedData* const speed_data,
+                        const std::pair<double, double>& accel_bound,
                         planning_internal::STGraphDebug* st_graph_debug);
 
  private:
@@ -56,6 +57,7 @@ class QpSplineStGraph {
   common::Status ApplyConstraint(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
       const std::vector<StBoundary>& boundaries,
+      const std::pair<double, double>& accel_bound,
       planning_internal::STGraphDebug* st_graph_debug);
 
   // apply objective function
@@ -76,8 +78,8 @@ class QpSplineStGraph {
   // generate reference speed profile
   // common::Status ApplyReferenceSpeedProfile();
   common::Status AddCruiseReferenceLineKernel(
-      const SpeedLimit& speed_limit,
-      const double weight, planning_internal::STGraphDebug* st_graph_debug);
+      const SpeedLimit& speed_limit, const double weight,
+      planning_internal::STGraphDebug* st_graph_debug);
 
   common::Status AddFollowReferenceLineKernel(
       const std::vector<StBoundary>& boundaries, const double weight,
