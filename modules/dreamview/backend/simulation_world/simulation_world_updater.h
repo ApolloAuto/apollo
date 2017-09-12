@@ -23,6 +23,7 @@
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+#include <string>
 
 #include "modules/common/log.h"
 #include "modules/dreamview/backend/map/map_service.h"
@@ -64,11 +65,10 @@ class SimulationWorldUpdater {
  private:
   /**
    * @brief The callback function to get updates from SimulationWorldService,
-   * and push them to the frontend clients via websocket when the periodic timer
-   * is triggered.
+   * and update simulation_world_json_.
    * @param event Timer event
    */
-  void OnPushTimer(const ros::TimerEvent &event);
+  void OnTimer(const ros::TimerEvent &event);
 
   /**
    * @brief The function to construct a routing request from the given json,
