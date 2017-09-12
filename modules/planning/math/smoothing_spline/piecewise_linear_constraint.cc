@@ -75,6 +75,8 @@ bool PiecewiseLinearConstraint::AddBoundary(
     const std::vector<double>& upper_bound) {
   if (index_list.size() != lower_bound.size() ||
       index_list.size() != upper_bound.size()) {
+    AERROR << "The sizes of index list, lower_bound, upper_bound are not "
+              "identical.";
     return false;
   }
   Eigen::MatrixXd inequality_matrix =
@@ -130,18 +132,52 @@ bool PiecewiseLinearConstraint::AddDerivativeBoundary(
 }
 
 bool PiecewiseLinearConstraint::AddSecondDerivativeBoundary(
-    const std::vector<uint32_t>& index_list,
+    const double init_derivative, const std::vector<uint32_t>& index_list,
     const std::vector<double>& lower_bound,
     const std::vector<double>& upper_bound) {
   // TODO(Liangliang): implement this function
-  return true;
-}
+  if (index_list.size() != lower_bound.size() ||
+      index_list.size() != upper_bound.size()) {
+    AERROR << "The sizes of index list, lower_bound, upper_bound are not "
+              "identical.";
+    return false;
+  }
+  Eigen::MatrixXd inequality_matrix =
+      Eigen::MatrixXd::Zero(2 * index_list.size(), dimension_);
+  Eigen::MatrixXd inequality_boundary =
+      Eigen::MatrixXd::Zero(2 * index_list.size(), 1);
 
-bool PiecewiseLinearConstraint::AddThirdDerivativeBoundary(
-    const std::vector<uint32_t>& index_list,
-    const std::vector<double>& lower_bound,
-    const std::vector<double>& upper_bound) {
-  // TODO(Liangliang): implement this function
+  for (uint32_t i = 0; i < index_list.size(); ++i) {
+    uint32_t index = index_list[i];
+    if (index == 0) {
+      AERROR << "Index should NOT be 0.";
+      return false;
+    }
+
+    const double upper = upper_bound[i];
+    const double lower = lower_bound[i];
+    if (index == 1) {
+      inequality_matrix(2 * i, 1) = -1.0;
+      inequality_boundary(2 * i, 1) = -(upper * unit_segment_ * unit_segment_ +
+                                        init_derivative * unit_segment_);
+      inequality_matrix(2 * i + 1, 1) = 1.0;
+      inequality_boundary(2 * i + 1, 1) =
+          lower * unit_segment_ * unit_segment_ +
+          init_derivative * unit_segment_;
+    } else {
+      inequality_matrix(2 * i, index - 2) = -1.0;
+      inequality_matrix(2 * i, index - 1) = 2.0;
+      inequality_matrix(2 * i, index) = -1.0;
+      inequality_boundary(2 * i, 0) = -upper * unit_segment_ * unit_segment_;
+
+      inequality_matrix(2 * i + 1, index - 2) = 1.0;
+      inequality_matrix(2 * i + 1, index - 1) = -2.0;
+      inequality_matrix(2 * i + 1, index) = 1.0;
+      inequality_boundary(2 * i + 1, 0) = lower * unit_segment_ * unit_segment_;
+    }
+  }
+  inequality_matrices_.push_back(inequality_matrix);
+  inequality_boundaries_.push_back(inequality_boundary);
   return true;
 }
 

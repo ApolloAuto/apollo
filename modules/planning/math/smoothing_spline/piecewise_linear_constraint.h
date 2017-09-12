@@ -49,12 +49,10 @@ class PiecewiseLinearConstraint {
   bool AddDerivativeBoundary(const std::vector<uint32_t>& index_list,
                              const std::vector<double>& lower_bound,
                              const std::vector<double>& upper_bound);
-  bool AddSecondDerivativeBoundary(const std::vector<uint32_t>& index_list,
+  bool AddSecondDerivativeBoundary(const double init_derivative,
+                                   const std::vector<uint32_t>& index_list,
                                    const std::vector<double>& lower_bound,
                                    const std::vector<double>& upper_bound);
-  bool AddThirdDerivativeBoundary(const std::vector<uint32_t>& index_list,
-                                  const std::vector<double>& lower_bound,
-                                  const std::vector<double>& upper_bound);
 
   /**
    * @brief: equality constraints
