@@ -312,13 +312,18 @@ bool QpSplinePathGenerator::AddConstraint(
     }
 
     std::pair<double, double> boundary = road_boundary;
-    boundary.first = std::max(
-        boundary.first,
-        std::max(static_obs_boundary.first, dynamic_obs_boundary.first));
 
-    boundary.second = std::min(
-        boundary.second,
-        std::min(static_obs_boundary.second, dynamic_obs_boundary.second));
+    const double merged_first =
+        std::max(static_obs_boundary.first, dynamic_obs_boundary.first);
+    const double merged_second =
+        std::min(static_obs_boundary.second, dynamic_obs_boundary.second);
+
+    if (merged_first < road_boundary.second) {
+      boundary.first = std::max(boundary.first, merged_first);
+    }
+    if (merged_second > road_boundary.first) {
+      boundary.second = std::min(boundary.second, merged_second);
+    }
 
     boundary_low.push_back(boundary.first);
     boundary_high.push_back(boundary.second);
