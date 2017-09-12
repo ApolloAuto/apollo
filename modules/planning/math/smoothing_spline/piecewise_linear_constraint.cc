@@ -26,8 +26,45 @@
 namespace apollo {
 namespace planning {
 
+namespace {
+
+Eigen::MatrixXd MergeMaxtrices(const std::vector<Eigen::MatrixXd> matrices) {
+  int32_t d = 0;
+  for (const auto& mat : matrices) {
+    d += mat.rows();
+  }
+  int32_t col = matrices.front().cols();
+  Eigen::MatrixXd res = Eigen::MatrixXd::Zero(d, col);
+  int32_t index = 0;
+  for (const auto& mat : matrices) {
+    res.block(index, 0, mat.rows(), mat.cols()) = mat;
+    index += mat.rows();
+  }
+  return res;
+}
+}
+
 PiecewiseLinearConstraint::PiecewiseLinearConstraint(const uint32_t dimension)
     : dimension_(dimension) {}
+
+Eigen::MatrixXd PiecewiseLinearConstraint::inequality_constraint_matrix()
+    const {
+  return MergeMaxtrices(inequality_matrices_);
+}
+
+Eigen::MatrixXd PiecewiseLinearConstraint::inequality_constraint_boundary()
+    const {
+  return MergeMaxtrices(inequality_boundaries_);
+}
+
+Eigen::MatrixXd PiecewiseLinearConstraint::equality_constraint_matrix() const {
+  return MergeMaxtrices(equality_matrices_);
+}
+
+Eigen::MatrixXd PiecewiseLinearConstraint::equality_constraint_boundary()
+    const {
+  return MergeMaxtrices(equality_boundaries_);
+}
 
 bool PiecewiseLinearConstraint::AddBoundary(
     const std::vector<uint32_t>& index_list,
@@ -87,6 +124,18 @@ bool PiecewiseLinearConstraint::AddPointThirdDerivativeConstraint(
 
 bool PiecewiseLinearConstraint::AddMonotoneInequalityConstraint() {
   // TODO(Liangliang): implement this function
+  Eigen::MatrixXd inequality_matrix =
+      Eigen::MatrixXd::Zero(dimension_ - 1, dimension_ - 1);
+  Eigen::MatrixXd inequality_boundary =
+      Eigen::MatrixXd::Zero(dimension_ - 1, 1);
+
+  for (uint32_t i = 1; i < dimension_; ++i) {
+    inequality_matrix(i, i - 1) = -1.0;
+    inequality_matrix(i, i) = 1.0;
+  }
+  inequality_matrices_.push_back(inequality_matrix);
+  inequality_boundaries_.push_back(inequality_boundary);
+
   return true;
 }
 
