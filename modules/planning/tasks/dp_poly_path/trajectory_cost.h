@@ -40,6 +40,7 @@ class TrajectoryCost {
  public:
   explicit TrajectoryCost(const DpPolyPathConfig &config,
                           const ReferenceLine &reference_line,
+                          const std::vector<const PathObstacle*>& obstacles,
                           const common::VehicleParam &vehicle_param,
                           const SpeedData &heuristic_speed_data);
   double Calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
@@ -51,6 +52,8 @@ class TrajectoryCost {
   const common::VehicleParam vehicle_param_;
   SpeedData heuristic_speed_data_;
   uint32_t num_of_time_stamps_;
+  std::vector<std::vector<::apollo::common::math::Box2d>> obstacle_boxes_;
+  std::vector<double> obstacle_probabilities_;
 };
 
 }  // namespace planning
