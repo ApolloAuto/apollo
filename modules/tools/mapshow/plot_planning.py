@@ -33,6 +33,7 @@ from planning import Planning
 planning = Planning()
 localization = Localization()
 
+
 def update(frame_number):
     #st_main_subplot.show(planning)
     #st_speed_subplot.show(planning)
@@ -42,6 +43,7 @@ def update(frame_number):
     speed_subplot.show(planning)
     sl_main_subplot.show(planning)
     st_speed_subplot.show(planning)
+
 
 def planning_callback(planning_pb):
     planning.update_planning_pb(planning_pb)
@@ -54,10 +56,12 @@ def planning_callback(planning_pb):
     planning.compute_speed_data()
     planning.compute_init_point()
 
+
 def add_listener():
     rospy.init_node('st_plot', anonymous=True)
     rospy.Subscriber('/apollo/planning', planning_pb2.ADCTrajectory,
                      planning_callback)
+
 
 def press_key(event):
     if event.key == '+' or event.key == '=':
@@ -65,10 +69,11 @@ def press_key(event):
     if event.key == '-' or event.key == '_':
         map_path_subplot.zoom_out()
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="plot_planning is a tool to display "
-                    "planning trajs on a map.",
+        "planning trajs on a map.",
         prog="plot_planning_old.py")
     parser.add_argument(
         "-m",
