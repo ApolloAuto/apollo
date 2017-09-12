@@ -18,8 +18,9 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "modules/common/log.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
@@ -36,7 +37,19 @@ using Eigen::Matrix4d;
 
 class LidarProcessTest : public testing::Test {
  protected:
-  LidarProcessTest() {}
+  LidarProcessTest() {
+    apollo::common::adapter::AdapterManagerConfig config;
+    config.set_is_ros(false);
+    {
+      auto *sub_config = config.add_config();
+      sub_config->set_mode(
+          apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
+      sub_config->set_type(
+          apollo::common::adapter::AdapterConfig::PERCEPTION_OBSTACLES);
+    }
+
+    apollo::common::adapter::AdapterManager::Init(config);
+  }
   virtual ~LidarProcessTest() {}
 
   LidarProcess lidar_process_;

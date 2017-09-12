@@ -13,6 +13,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   *****************************************************************************/
+#include "modules/routing/core/result_generator.h"
 
 #include <algorithm>
 #include <memory>
@@ -21,17 +22,18 @@
 #include <utility>
 #include <vector>
 
-#include "modules/routing/core/result_generator.h"
-
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-
 #include "modules/common/time/time.h"
+
 #include "modules/routing/common/routing_gflags.h"
-#include "modules/routing/graph/range_utils.h"
 #include "modules/routing/graph/node_with_range.h"
+#include "modules/routing/graph/range_utils.h"
 
 namespace apollo {
 namespace routing {
+
+using apollo::common::adapter::AdapterManager;
 
 namespace {
 
@@ -43,7 +45,7 @@ bool IsCloseEnough(double value_1, double value_2) {
 }
 
 std::string GetRoadId(
-    const std::vector<std::vector<NodeWithRange> >& node_vecs) {
+    const std::vector<std::vector<NodeWithRange>>& node_vecs) {
   std::unordered_set<std::string> road_id_set;
   std::string road_id = "";
   for (const auto& node_vec : node_vecs) {
@@ -68,8 +70,7 @@ void NodeVecToSet(const std::vector<NodeWithRange>& vec,
   }
 }
 
-NodeWithRange BuildNodeRange(const TopoNode* node,
-                             double start_s,
+NodeWithRange BuildNodeRange(const TopoNode* node, double start_s,
                              double end_s) {
   NodeSRange range(start_s, end_s);
   NodeWithRange node_with_range(range, node);
@@ -82,17 +83,17 @@ const NodeWithRange& GetLargestRange(
   size_t result_idx = 0;
   double result_range_length = 0.0;
   for (size_t i = 1; i < node_vec.size(); ++i) {
-      if (node_vec[i].Length() > result_range_length) {
-          result_range_length = node_vec[i].Length();
-          result_idx = i;
-      }
+    if (node_vec[i].Length() > result_range_length) {
+      result_range_length = node_vec[i].Length();
+      result_idx = i;
+    }
   }
   return node_vec[result_idx];
 }
 
 void GetNodesOfWaysBasedOnVirtual(
     const std::vector<NodeWithRange>& nodes,
-    std::vector<std::vector<NodeWithRange> >* const nodes_of_ways) {
+    std::vector<std::vector<NodeWithRange>>* const nodes_of_ways) {
   AINFO << "Cut routing ways based on is_virtual.";
   assert(!nodes.empty());
   nodes_of_ways->clear();
@@ -116,7 +117,7 @@ void GetNodesOfWaysBasedOnVirtual(
 
 void GetNodesOfWays(
     const std::vector<NodeWithRange>& nodes,
-    std::vector<std::vector<NodeWithRange> >* const nodes_of_ways) {
+    std::vector<std::vector<NodeWithRange>>* const nodes_of_ways) {
   AINFO << "Cut routing ways based on road id.";
   assert(!nodes.empty());
   nodes_of_ways->clear();
@@ -136,20 +137,20 @@ void GetNodesOfWays(
 
 bool ExtractBasicPassages(
     const std::vector<NodeWithRange>& nodes,
-    std::vector<std::vector<NodeWithRange> >* const nodes_of_passages,
+    std::vector<std::vector<NodeWithRange>>* const nodes_of_passages,
     std::vector<RoutingResponse::LaneChangeInfo::Type>* const
-    lane_change_types) {
+        lane_change_types) {
   assert(!nodes.empty());
   nodes_of_passages->clear();
   lane_change_types->clear();
   std::vector<NodeWithRange> nodes_of_passage;
   nodes_of_passage.push_back(nodes.at(0));
   for (size_t i = 1; i < nodes.size(); ++i) {
-    auto edge = nodes.at(i - 1).GetTopoNode()
-        ->GetOutEdgeTo(nodes.at(i).GetTopoNode());
+    auto edge =
+        nodes.at(i - 1).GetTopoNode()->GetOutEdgeTo(nodes.at(i).GetTopoNode());
     if (edge == nullptr) {
-      AERROR << "Get null pointer to edge from "
-          << nodes.at(i - 1).LaneId() << " to " << nodes.at(i).LaneId();
+      AERROR << "Get null pointer to edge from " << nodes.at(i - 1).LaneId()
+             << " to " << nodes.at(i).LaneId();
       return false;
     }
     if (edge->Type() == TET_LEFT || edge->Type() == TET_RIGHT) {
@@ -212,9 +213,9 @@ void ExtendBackward(bool enable_use_road_id,
       if (IsCloseEnough(nodes_of_prev_passage.front().StartS(), 0.0)) {
         front_node.SetStartS(0.0);
       } else {
-        double temp_s = nodes_of_prev_passage.front().StartS()
-            / nodes_of_prev_passage.front().FullLength()
-            * front_node.FullLength();
+        double temp_s = nodes_of_prev_passage.front().StartS() /
+                        nodes_of_prev_passage.front().FullLength() *
+                        front_node.FullLength();
         front_node.SetStartS(temp_s);
       }
     } else {
@@ -234,8 +235,8 @@ void ExtendBackward(bool enable_use_road_id,
       }
       // if pred node has been inserted
       if (enable_use_road_id &&
-            node_set_of_curr_passage.find(pred_node)
-                != node_set_of_curr_passage.end()) {
+          node_set_of_curr_passage.find(pred_node) !=
+              node_set_of_curr_passage.end()) {
         continue;
       }
       // if pred node is reachable from prev passage
@@ -244,14 +245,12 @@ void ExtendBackward(bool enable_use_road_id,
         if (range_manager.Find(pred_node)) {
           double black_s_end = range_manager.RangeEnd(pred_node);
           if (!IsCloseEnough(black_s_end, pred_node->Length())) {
-            pred_set.push_back(BuildNodeRange(pred_node,
-                                              black_s_end,
-                                              pred_node->Length()));
+            pred_set.push_back(
+                BuildNodeRange(pred_node, black_s_end, pred_node->Length()));
           }
         } else {
-          pred_set.push_back(BuildNodeRange(pred_node,
-                                            0.0,
-                                            pred_node->Length()));
+          pred_set.push_back(
+              BuildNodeRange(pred_node, 0.0, pred_node->Length()));
         }
       }
     }
@@ -281,7 +280,8 @@ void ExtendForward(bool enable_use_road_id,
         back_node.SetEndS(back_node.FullLength());
       } else {
         double temp_s = nodes_of_next_passage.back().EndS() /
-            nodes_of_next_passage.back().FullLength() * back_node.FullLength();
+                        nodes_of_next_passage.back().FullLength() *
+                        back_node.FullLength();
         back_node.SetEndS(std::min(temp_s, back_node.FullLength()));
       }
     } else {
@@ -293,16 +293,16 @@ void ExtendForward(bool enable_use_road_id,
   while (allowed_to_explore) {
     std::vector<NodeWithRange> succ_set;
     for (const auto& edge :
-            nodes_of_curr_passage->back().GetTopoNode()->OutToSucEdge()) {
+         nodes_of_curr_passage->back().GetTopoNode()->OutToSucEdge()) {
       const auto& succ_node = edge->ToNode();
       // if succ node is not in the same road
       if (enable_use_road_id &&
-            succ_node->RoadId() != nodes_of_curr_passage->back().RoadId()) {
+          succ_node->RoadId() != nodes_of_curr_passage->back().RoadId()) {
         continue;
       }
       // if succ node has been inserted
-      if (node_set_of_curr_passage.find(succ_node)
-            != node_set_of_curr_passage.end()) {
+      if (node_set_of_curr_passage.find(succ_node) !=
+          node_set_of_curr_passage.end()) {
         continue;
       }
       // if next passage is reachable from succ node
@@ -316,12 +316,12 @@ void ExtendForward(bool enable_use_road_id,
         } else {
           if (IsCloseEnough(reachable_node->EndS(),
                             reachable_node->FullLength())) {
-            succ_set.push_back(BuildNodeRange(succ_node,
-                                              0.0,
-                                              succ_node->Length()));
+            succ_set.push_back(
+                BuildNodeRange(succ_node, 0.0, succ_node->Length()));
           } else {
             double push_end_s = reachable_node->EndS() /
-                reachable_node->FullLength() * succ_node->Length();
+                                reachable_node->FullLength() *
+                                succ_node->Length();
             succ_set.push_back(BuildNodeRange(succ_node, 0.0, push_end_s));
           }
         }
@@ -339,36 +339,27 @@ void ExtendForward(bool enable_use_road_id,
 }
 
 void ExtendPassages(
-    bool enable_use_road_id,
-    const TopoRangeManager& range_manager,
-    std::vector<std::vector<NodeWithRange> >* const nodes_of_passages) {
+    bool enable_use_road_id, const TopoRangeManager& range_manager,
+    std::vector<std::vector<NodeWithRange>>* const nodes_of_passages) {
   int passage_num = nodes_of_passages->size();
   for (int i = 0; i < passage_num; ++i) {
     if (i < passage_num - 1) {
-      ExtendForward(enable_use_road_id,
-                    nodes_of_passages->at(i + 1),
-                    range_manager,
-                    &(nodes_of_passages->at(i)));
+      ExtendForward(enable_use_road_id, nodes_of_passages->at(i + 1),
+                    range_manager, &(nodes_of_passages->at(i)));
     }
     if (i > 0) {
-      ExtendBackward(enable_use_road_id,
-                     nodes_of_passages->at(i - 1),
-                     range_manager,
-                     &(nodes_of_passages->at(i)));
+      ExtendBackward(enable_use_road_id, nodes_of_passages->at(i - 1),
+                     range_manager, &(nodes_of_passages->at(i)));
     }
   }
   for (int i = passage_num - 1; i >= 0; --i) {
     if (i < passage_num - 1) {
-      ExtendForward(enable_use_road_id,
-                    nodes_of_passages->at(i + 1),
-                    range_manager,
-                    &(nodes_of_passages->at(i)));
+      ExtendForward(enable_use_road_id, nodes_of_passages->at(i + 1),
+                    range_manager, &(nodes_of_passages->at(i)));
     }
     if (i > 0) {
-      ExtendBackward(enable_use_road_id,
-                     nodes_of_passages->at(i - 1),
-                     range_manager,
-                     &(nodes_of_passages->at(i)));
+      ExtendBackward(enable_use_road_id, nodes_of_passages->at(i - 1),
+                     range_manager, &(nodes_of_passages->at(i)));
     }
   }
 }
@@ -386,8 +377,8 @@ void LaneNodesToPassageRegion(const std::vector<NodeWithRange>& nodes,
 double CalculateDistance(const std::vector<NodeWithRange>& nodes) {
   double distance = nodes.at(0).EndS() - nodes.at(0).StartS();
   for (size_t i = 1; i < nodes.size(); ++i) {
-    auto edge = nodes.at(i - 1).GetTopoNode()
-            ->GetOutEdgeTo(nodes.at(i).GetTopoNode());
+    auto edge =
+        nodes.at(i - 1).GetTopoNode()->GetOutEdgeTo(nodes.at(i).GetTopoNode());
     if (edge->Type() != TET_FORWARD) {
       continue;
     }
@@ -396,11 +387,10 @@ double CalculateDistance(const std::vector<NodeWithRange>& nodes) {
   return distance;
 }
 
-void PrintDebugInfo(
-    const std::vector<std::vector<std::vector<NodeWithRange> > >&
-        nodes_of_passages_of_ways,
-    const std::vector<std::string>& road_id_of_ways,
-    const std::vector<bool>& is_virtual_of_ways) {
+void PrintDebugInfo(const std::vector<std::vector<std::vector<NodeWithRange>>>&
+                        nodes_of_passages_of_ways,
+                    const std::vector<std::string>& road_id_of_ways,
+                    const std::vector<bool>& is_virtual_of_ways) {
   for (size_t i = 0; i < nodes_of_passages_of_ways.size(); ++i) {
     if (is_virtual_of_ways[i]) {
       AINFO << "----------Way " << i << " juntion----------";
@@ -412,7 +402,7 @@ void PrintDebugInfo(
       AINFO << "\tPassage " << j;
       for (const auto& node : nodes_of_passages_of_ways[i][j]) {
         AINFO << "\t\t" << node.LaneId() << "   (" << node.StartS() << ", "
-            << node.EndS() << ")";
+              << node.EndS() << ")";
       }
     }
   }
@@ -420,22 +410,14 @@ void PrintDebugInfo(
 
 }  // namespace
 
-ResultGenerator::ResultGenerator() : _sequence_num(0) { }
-
 bool ResultGenerator::GeneratePassageRegion(
-    const std::string& map_version,
-    const RoutingRequest& request,
+    const std::string& map_version, const RoutingRequest& request,
     const std::vector<NodeWithRange>& nodes,
-    const TopoRangeManager& range_manager,
-    RoutingResponse* const result) {
-
-  result->mutable_header()->set_timestamp_sec(
-      ::apollo::common::time::Clock::NowInSecond());
-  result->mutable_header()->set_module_name(FLAGS_node_name);
-  result->mutable_header()->set_sequence_num(++_sequence_num);
+    const TopoRangeManager& range_manager, RoutingResponse* const result) {
+  AdapterManager::FillRoutingResponseHeader(FLAGS_node_name, result);
 
   if (!GeneratePassageRegion(nodes, range_manager, result)) {
-      return false;
+    return false;
   }
 
   result->set_map_version(map_version);
@@ -446,30 +428,28 @@ bool ResultGenerator::GeneratePassageRegion(
 
 bool ResultGenerator::GeneratePassageRegion(
     const std::vector<NodeWithRange>& nodes,
-    const TopoRangeManager& range_manager,
-    RoutingResponse* const result) {
-  std::vector<std::vector<NodeWithRange> > nodes_of_ways;
+    const TopoRangeManager& range_manager, RoutingResponse* const result) {
+  std::vector<std::vector<NodeWithRange>> nodes_of_ways;
   if (FLAGS_use_road_id) {
     GetNodesOfWays(nodes, &nodes_of_ways);
   } else {
     GetNodesOfWaysBasedOnVirtual(nodes, &nodes_of_ways);
   }
-  std::vector<std::vector<std::vector<NodeWithRange> > >
+  std::vector<std::vector<std::vector<NodeWithRange>>>
       nodes_of_passages_of_ways;
-  std::vector<std::vector<RoutingResponse::LaneChangeInfo::Type> >
+  std::vector<std::vector<RoutingResponse::LaneChangeInfo::Type>>
       lane_change_types_of_ways;
   std::vector<std::string> road_id_of_ways;
   std::vector<bool> is_virtual_of_ways;
   for (size_t i = 0; i < nodes_of_ways.size(); ++i) {
-    std::vector<std::vector<NodeWithRange> > nodes_of_passages;
+    std::vector<std::vector<NodeWithRange>> nodes_of_passages;
     std::vector<RoutingResponse::LaneChangeInfo::Type> lane_change_types;
     if (nodes_of_ways[i].empty()) {
       return false;
     }
     if (!nodes_of_ways[i][0].IsVirtual()) {
       is_virtual_of_ways.push_back(false);
-      if (!ExtractBasicPassages(nodes_of_ways[i],
-                                &nodes_of_passages,
+      if (!ExtractBasicPassages(nodes_of_ways[i], &nodes_of_passages,
                                 &lane_change_types)) {
         return false;
       }
@@ -489,8 +469,7 @@ bool ResultGenerator::GeneratePassageRegion(
     }
   }
 
-  PrintDebugInfo(nodes_of_passages_of_ways,
-                 road_id_of_ways,
+  PrintDebugInfo(nodes_of_passages_of_ways, road_id_of_ways,
                  is_virtual_of_ways);
 
   for (size_t i = 0; i < nodes_of_passages_of_ways.size(); ++i) {
@@ -543,4 +522,3 @@ bool ResultGenerator::GeneratePassageRegion(
 
 }  // namespace routing
 }  // namespace apollo
-

@@ -27,6 +27,7 @@
 #include "tf/transform_listener.h"
 #include "tf_conversions/tf_eigen.h"
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/timer.h"
@@ -40,6 +41,7 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::adapter::AdapterManager;
 using pcl_util::Point;
 using pcl_util::PointD;
 using pcl_util::PointCloud;
@@ -76,9 +78,6 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
   objects_.clear();
   const double kTimeStamp = message.header.stamp.toSec();
   timestamp_ = kTimeStamp;
-  seq_num_++;
-
-  ADEBUG << "process the " << seq_num_ << " frame. timestamp: " << timestamp_;
 
   PERF_BLOCK_START();
   /// get velodyne2world transfrom
@@ -188,7 +187,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
 
   PERF_BLOCK_END("lidar_tracker");
   ADEBUG << "lidar process succ, there are " << objects_.size()
-        << " tracked objects.";
+         << " tracked objects.";
   return true;
 }
 
@@ -353,22 +352,14 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
   *trans = affine_3d.matrix();
 
   ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
-        << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
+         << FLAGS_lidar_tf2_child_frame_id << " trans: " << *trans;
   return true;
 }
 
 bool LidarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
-  // double publish_time = ros::Time::now().toSec();
-  double publish_time = timestamp_;
-  try {
-    publish_time = ros::Time::now().toSec();
-  } catch (ros::Exception& ex) {
-    AERROR << "Exception: " << ex.what();
-  }
+  AdapterManager::FillPerceptionObstaclesHeader(FLAGS_obstacle_module_name,
+                                                obstacles);
   apollo::common::Header* header = obstacles->mutable_header();
-  header->set_timestamp_sec(publish_time);
-  header->set_module_name(FLAGS_obstacle_module_name);
-  header->set_sequence_num(seq_num_);
   header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
   header->set_camera_timestamp(0);
   header->set_radar_timestamp(0);
