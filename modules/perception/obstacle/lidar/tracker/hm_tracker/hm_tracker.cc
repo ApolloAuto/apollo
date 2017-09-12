@@ -455,7 +455,6 @@ bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
   std::vector<int> unassigned_objects;
   unassigned_objects.resize(transformed_objects.size());
   std::iota(unassigned_objects.begin(), unassigned_objects.end(), 0);
-  double time_diff = 0.1;
   CreateNewTracks(transformed_objects, unassigned_objects);
   time_stamp_ = timestamp;
 
