@@ -279,7 +279,6 @@ void CreatePredictionTrajectory(Object *world_object,
 }  // namespace
 
 constexpr int SimulationWorldService::kMaxMonitorItems;
-constexpr double SimulationWorldService::kMapRadius;
 
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
@@ -323,7 +322,7 @@ const SimulationWorld &SimulationWorldService::Update() {
   return world_;
 }
 
-Json SimulationWorldService::GetUpdateAsJson() const {
+Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   std::string sim_world_json;
   ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
 
@@ -333,7 +332,7 @@ Json SimulationWorldService::GetUpdateAsJson() const {
   point.set_y(world_.auto_driving_car().position_y());
 
   MapElementIds map_element_ids =
-      map_service_->CollectMapElementIds(point, kMapRadius);
+      map_service_->CollectMapElementIds(point, radius);
 
   Json update;
   update["type"] = "sim_world_update";
@@ -341,6 +340,7 @@ Json SimulationWorldService::GetUpdateAsJson() const {
   update["world"] = Json::parse(sim_world_json);
   update["mapElementIds"] = map_element_ids.Json();
   update["mapHash"] = map_element_ids.Hash();
+  update["radius"] = radius;
 
   return update;
 }
