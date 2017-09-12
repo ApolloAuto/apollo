@@ -24,8 +24,10 @@
 namespace apollo {
 namespace planning {
 
-PiecewiseLinearKernel::PiecewiseLinearKernel(const uint32_t dimension)
+PiecewiseLinearKernel::PiecewiseLinearKernel(const uint32_t dimension,
+                                             const double unit_segment)
     : dimension_(dimension),
+      unit_segment_(unit_segment),
       kernel_matrix_(Eigen::MatrixXd::Zero(dimension_, dimension_)),
       offset_matrix_(Eigen::MatrixXd::Zero(dimension_, 1)) {}
 
@@ -49,11 +51,80 @@ void PiecewiseLinearKernel::AddDerivativeKernelMatrix(const double weight) {
 
 void PiecewiseLinearKernel::AddSecondOrderDerivativeMatrix(
     const double weight) {
-  // TODO(Liangliang): Implement this function.
+  Eigen::MatrixXd second_derivative_matrix =
+      Eigen::MatrixXd::Zero(dimension_, dimension_);
+  for (std::size_t i = 1; i < dimension_; ++i) {
+    if (i == 1) {
+      second_derivative_matrix(i, i) += 1.0;
+    } else if (i == 2) {
+      second_derivative_matrix(i, i) += 1.0;
+      second_derivative_matrix(i - 1, i - 1) += 4.0;
+      second_derivative_matrix(i - 1, i) += -2.0;
+      second_derivative_matrix(i, i - 1) += -2.0;
+    } else {
+      second_derivative_matrix(i, i) += 1.0;
+      second_derivative_matrix(i - 1, i - 1) += 4.0;
+      second_derivative_matrix(i - 2, i - 2) += 1.0;
+      second_derivative_matrix(i - 1, i) += -2.0;
+      second_derivative_matrix(i, i - 1) += -2.0;
+      second_derivative_matrix(i - 2, i - 1) += -2.0;
+      second_derivative_matrix(i - 1, i - 2) += -2.0;
+      second_derivative_matrix(i, i - 2) += 1.0;
+      second_derivative_matrix(i - 2, i) += 1.0;
+    }
+  }
+  second_derivative_matrix *= 2.0 * weight / std::pow(unit_segment_, 4);
+  kernel_matrix_ += second_derivative_matrix;
 }
 
 void PiecewiseLinearKernel::AddThirdOrderDerivativeMatrix(const double weight) {
-  // TODO(Liangliang): Implement this function.
+  Eigen::MatrixXd jerk_matrix = Eigen::MatrixXd::Zero(dimension_, dimension_);
+  for (std::size_t i = 0; i < dimension_; ++i) {
+    if (i == 1) {
+      jerk_matrix(i, i) += 1.0;
+    } else if (i == 2) {
+      jerk_matrix(i - 1, i - 1) += 9.0;
+      jerk_matrix(i, i) += 1.0;
+
+      jerk_matrix(i - 1, i) += -3.0;
+      jerk_matrix(i, i - 1) += -3.0;
+    } else if (i == 3) {
+      jerk_matrix(i - 2, i - 2) += 9.0;
+      jerk_matrix(i - 1, i - 1) += 9.0;
+      jerk_matrix(i, i) += 1.0;
+
+      jerk_matrix(i - 1, i) += -3.0;
+      jerk_matrix(i, i - 1) += -3.0;
+      jerk_matrix(i - 2, i) += 3.0;
+      jerk_matrix(i, i - 2) += 3.0;
+
+      jerk_matrix(i - 2, i - 1) += -9.0;
+      jerk_matrix(i - 1, i - 2) += -9.0;
+    } else {
+      jerk_matrix(i - 3, i - 3) += 1.0;
+      jerk_matrix(i - 2, i - 2) += 9.0;
+      jerk_matrix(i - 1, i - 1) += 9.0;
+      jerk_matrix(i, i) += 1.0;
+
+      jerk_matrix(i - 1, i) += -3.0;
+      jerk_matrix(i, i - 1) += -3.0;
+      jerk_matrix(i - 2, i) += 3.0;
+      jerk_matrix(i, i - 2) += 3.0;
+      jerk_matrix(i - 3, i) += -1.0;
+      jerk_matrix(i, i - 3) += -1.0;
+
+      jerk_matrix(i - 2, i - 1) += -9.0;
+      jerk_matrix(i - 1, i - 2) += -9.0;
+      jerk_matrix(i - 3, i - 1) += 3.0;
+      jerk_matrix(i - 1, i - 3) += 3.0;
+
+      jerk_matrix(i - 3, i - 2) += -3.0;
+      jerk_matrix(i - 2, i - 3) += -3.0;
+    }
+  }
+
+  jerk_matrix *= 2.0 * weight / std::pow(unit_segment_, 4);
+  kernel_matrix_ += jerk_matrix;
 }
 
 // reference line kernel
