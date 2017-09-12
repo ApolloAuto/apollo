@@ -55,6 +55,7 @@ class Obstacle {
   bool IsStatic() const;
 
   common::TrajectoryPoint GetPointAtTime(const double time) const;
+
   common::math::Box2d GetBoundingBox(
       const common::TrajectoryPoint &point) const;
   /**
