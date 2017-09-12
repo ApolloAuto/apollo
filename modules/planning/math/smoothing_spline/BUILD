@@ -199,6 +199,7 @@ cc_library(
         "piecewise_linear_constraint.h",
     ],
     deps = [
+        "//modules/common:log",
         "@eigen//:eigen",
     ],
 )

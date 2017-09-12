@@ -38,7 +38,7 @@ class PiecewiseLinearGenerator {
  public:
   // x = f(t)
   PiecewiseLinearGenerator(const uint32_t num_of_segments,
-                           const double unit_length);
+                           const double unit_segment);
   virtual ~PiecewiseLinearGenerator() = default;
 
   PiecewiseLinearConstraint* mutable_constraint();
