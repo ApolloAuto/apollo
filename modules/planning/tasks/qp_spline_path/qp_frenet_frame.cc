@@ -330,7 +330,7 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(
     const common::SLPoint& start, const common::SLPoint& end,
     const ObjectNudge::Type nudge_type, const double s_start,
     const double s_end) {
-  double inf = std::numeric_limits<double>::infinity();
+  const double inf = std::numeric_limits<double>::infinity();
   std::pair<double, double> result = std::make_pair(-inf, inf);
 
   if (start.s() > s_end || end.s() < s_start) {
@@ -457,8 +457,7 @@ bool QpFrenetFrame::GetBound(
   double high_second = map_bound[lower_index + 1].second;
 
   // If there is only one infinity in low and high point, then make it equal
-  // to
-  // the not inf one.
+  // to the not inf one.
   if (std::isinf(low_first) && !std::isinf(high_first)) {
     low_first = high_first;
   } else if (!std::isinf(low_first) && std::isinf(high_first)) {
