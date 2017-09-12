@@ -23,7 +23,6 @@ DECLARE_string(planning_config_file);
 DECLARE_string(adapter_config_filename);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
-DECLARE_uint64(backward_trajectory_point_num);
 DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(trajectory_resolution);
 DECLARE_double(look_backward_distance);
@@ -54,7 +53,6 @@ DECLARE_double(speed_upper_bound);
 DECLARE_double(longitudinal_acceleration_lower_bound);
 DECLARE_double(longitudinal_acceleration_upper_bound);
 
-DECLARE_double(lateral_acceleration_bound);
 DECLARE_double(lateral_jerk_bound);
 
 DECLARE_double(longitudinal_jerk_lower_bound);
@@ -73,15 +71,11 @@ DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(stop_distance_obstacle);
 DECLARE_double(stop_distance_destination);
-DECLARE_double(min_driving_width);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
 DECLARE_double(follow_time_buffer);
 
-DECLARE_double(stop_line_min_distance);
-
 DECLARE_string(destination_obstacle_id);
-DECLARE_int32(virtual_obstacle_perception_id);
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_width);
 DECLARE_double(virtual_stop_wall_height);
