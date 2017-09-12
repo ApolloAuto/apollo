@@ -23,10 +23,6 @@ DEFINE_string(adapter_config_filename, "modules/planning/conf/adapter.conf",
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
 
-DEFINE_uint64(backward_trajectory_point_num, 10,
-              "The number of points to be included in planning trajectory "
-              "before the matched point");
-
 DEFINE_uint64(rtk_trajectory_forward, 800,
               "The number of points to be included in RTK trajectory "
               "after the matched point");
@@ -80,8 +76,6 @@ DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
               "The highest longitudinal acceleration allowed.");
 
-DEFINE_double(lateral_acceleration_bound, 4.5,
-              "Bound of lateral acceleration; symmetric for left and right");
 DEFINE_double(lateral_jerk_bound, 4.0,
               "Bound of lateral jerk; symmetric for left and right");
 
@@ -109,8 +103,6 @@ DEFINE_double(stop_distance_obstacle, 10.0,
               "stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 3.0,
               "stop distance from destination line");
-DEFINE_double(min_driving_width, 2.5,
-              "minimum road width(meters) for adc to drive through");
 DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 10,
@@ -118,13 +110,9 @@ DEFINE_double(follow_min_distance, 10,
 DEFINE_double(
     follow_time_buffer, 4.0,
     "follow time buffer (in second) to calculate the following distance.");
-DEFINE_double(stop_line_min_distance, 0.0,
-              "min distance (meters) to stop line for a valid stop");
 
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
-DEFINE_int32(virtual_obstacle_perception_id, -1,
-             "virtual obstacle perception id(a negative int)");
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_width, 3.7, "virtual stop wall width (meters)");
