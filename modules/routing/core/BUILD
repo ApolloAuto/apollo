@@ -53,9 +53,10 @@ cc_library(
         "result_generator.h",
     ],
     deps = [
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/time",
         "//modules/routing/proto:routing_proto",
         "//modules/routing/graph",
-        "//modules/common/time",
     ],
 )
 

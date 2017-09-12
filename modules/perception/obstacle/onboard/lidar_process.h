@@ -71,7 +71,6 @@ class LidarProcess {
   bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans);
 
   bool inited_ = false;
-  size_t seq_num_ = 0;
   double timestamp_;
   apollo::common::ErrorCode error_code_ = apollo::common::OK;
   std::vector<ObjectPtr> objects_;
