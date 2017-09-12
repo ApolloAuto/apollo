@@ -78,9 +78,10 @@ class SimulationWorldService {
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
+   * @param radius the search distance from the current car location
    * @return Json object equivalence of the SimulationWorld object.
    */
-  nlohmann::json GetUpdateAsJson() const;
+  nlohmann::json GetUpdateAsJson(double radius) const;
 
   /**
    * @brief The function Update() is periodically called to check for updates
