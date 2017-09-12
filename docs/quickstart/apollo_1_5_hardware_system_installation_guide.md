@@ -208,7 +208,26 @@ For more information about the NovAtel GPS-703-GGG-HV, see:
 
 [https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/](https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/)
 
+## Light Detection and Ranging System (LiDAR)
+The 64 line LiDAR system **HDL-64E S3** is available from Velodyne Lidars, Inc.
 
+![lidar_image](images/lidar_pic.png)
+
+**Key Features:**
+
+- 64 Channels
+- 120m range
+- 2.2 Million Points per Second
+- 360° Horizontal FOV
+- 26.9° Vertical FOV
+- 0.08° angular resolution (azimuth)
+- <2cm accuracy
+- ~0.4° Vertical Resolution
+- User selectable frame rate
+- Rugged Design
+
+![online](images/online_icon.png)Webpage for Velodyne HDL-64E S3:
+http://velodynelidar.com/hdl-64e.html
 
 # Overview of the Installation Tasks
 
@@ -303,10 +322,21 @@ Follow these steps:
 
 4. ![IPC-6108GC-CableConnected-overexposed.png](images/IPC-6108GC-CableConnected-overexposed.png)
 
-   ![tip_icon](images/tip_icon.png)It is recommended that you use a Digital Visual Interface (DVI) connector on the mother board for the monitor if the system requires extensive GPU computing. To set the display to the DVI port on the motherboard, following is the setting procedure:
+![warning](images/tip_icon.png)It is recommended to configure the fan speed through BIOS settings, if one or more plugin card is added to the system
 
     - While starting up the computer, press F2 to enter BIOS setup menu.
-    - Go to [Advanced]=>[System Agent (SA) Configuration]=>[Graphics Configuration]=>[Primary Display]=> Set the setting to "IGFX"
+    - Go to [Advanced] => [Smart Fan Setting]
+    - Set [Fan Max. Trip Temp] to 50
+    - Set [Fan Start Trip Temp] to 20
+
+
+![tip_icon](images/tip_icon.png)It is recommended that you use a Digital Visual Interface (DVI) connector on the graphic card for the monitor. To set the display to the DVI port on the motherboard, following is the setting procedure:
+
+    - While starting up the computer, press F2 to enter BIOS setup menu.
+    - Go to [Advanced]=>[System Agent (SA) Configuration]=>[Graphics Configuration]=>[Primary Display]=> Set the setting to "PEG"
+![tip_icon](images/tip_icon.png)It is recommended to configure the IPC to run at maximum performance mode at all time:
+     - While starting up the computer, press F2 to enter BIOS setup menu.
+     - Go to [Power] => [SKU POWER CONFIG] => set the setting to "MAX. TDP"
 
 c. Connect the power: 
 
@@ -653,11 +683,19 @@ Each HDL-64E S3 LiDAR includes a cablebundle to connect the LiDAR to power suppl
 
 Follow these steps:
 
-1.   Use a power cable to connect the vehicle power source to the IPC:
+1.   Use a voltage converter/regulator to convert the 12 VDC output from the vehicle to desired voltage to power IPC. 
 
-     Use its power connector as one end (as shown below), and connect the other end to the power panel in the vehicle(see the section, Prerequisites).
+     As recommended by Neousys, use a 12 VDC to 19 VDC converter with maximal output current of 20 A. 
 
-      ![ipc_power_RB](images/ipc_power_RB.png) 
+     ![voltage_regulater_converter](images/voltage_converter2.jpg)
+
+     First, connect the two 19 VDC output wires to IPC's power connector (Green as shown below).
+
+     ![ipc_power_RB](images/ipc_power_RB.png)
+
+     Secondly, connect the two cables of 12 VDC input to the power panel in the vehicle. If the size of the wire is too thick, the wire should be splitted to several wires and connect to corresponding ports, respectively.
+
+     ![warning](images/warning_icon.png)This step is necessary. If the input voltage goes below the required limit. It is highly probable to cause system failure.
 
 
 2.   Place the onboard computer system, the 6108GC, inside the trunk (recommended).
@@ -687,9 +725,7 @@ For more information, see:
 - (Optional) Monitor, keyboard, mouse
 
 
-a.   Connect the power cable to the IPC (as shown):
-
-
+a. Connect the power cable to the IPC (as shown):
 
 b. Connect the other end of the power cable to the vehicle battery (as shown):
 
