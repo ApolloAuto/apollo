@@ -45,7 +45,9 @@ QpSplineStGraph::QpSplineStGraph(
           qp_spline_st_speed_config_.number_of_discrete_graph_t()),
       t_evaluated_resolution_(
           qp_spline_st_speed_config_.total_time() /
-          qp_spline_st_speed_config_.number_of_evaluated_graph_t()) {}
+          qp_spline_st_speed_config_.number_of_evaluated_graph_t()) {
+  Init();
+}
 
 void QpSplineStGraph::Init() {
   // init knots
@@ -63,16 +65,20 @@ void QpSplineStGraph::Init() {
     t_evaluated_.push_back(curr_t);
     curr_t += t_evaluated_resolution_;
   }
-
-  // init spline generator
-  spline_generator_.reset(new Spline1dGenerator(
-      t_knots_, qp_spline_st_speed_config_.spline_order()));
 }
 
 Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
                                const PathData& path_data,
                                SpeedData* const speed_data,
+                               const std::pair<double, double>& accel_bound,
                                STGraphDebug* st_graph_debug) {
+  cruise_.clear();
+
+  // reset spline generator
+  spline_generator_.reset(new Spline1dGenerator(
+      t_knots_, qp_spline_st_speed_config_.spline_order()));
+
+  // start to search for best st points
   init_point_ = st_graph_data.init_point();
   if (st_graph_data.path_data_length() <
       qp_spline_st_speed_config_.total_path_length()) {
@@ -80,13 +86,9 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
         st_graph_data.path_data_length());
   }
 
-  // TODO(all): update config through veh physical limit here generate knots
-
-  // initialize time resolution and
-  Init();
-
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
-                       st_graph_data.st_boundaries(), st_graph_debug)
+                       st_graph_data.st_boundaries(), accel_bound,
+                       st_graph_debug)
            .ok()) {
     const std::string msg = "Apply constraint failed!";
     AERROR << msg;
@@ -128,7 +130,9 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
 
 Status QpSplineStGraph::ApplyConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-    const std::vector<StBoundary>& boundaries, STGraphDebug* st_graph_debug) {
+    const std::vector<StBoundary>& boundaries,
+    const std::pair<double, double>& accel_bound,
+    STGraphDebug* st_graph_debug) {
   Spline1dConstraint* constraint =
       spline_generator_->mutable_spline_constraint();
   // position, velocity, acceleration
@@ -224,10 +228,9 @@ Status QpSplineStGraph::ApplyConstraint(
   }
 
   // acceleration constraint
-  constexpr double kAccelLowerBound = -4.0;
-  constexpr double kAccelUpperBound = 1.5;
-  std::vector<double> accel_lower_bound(t_evaluated_.size(), kAccelLowerBound);
-  std::vector<double> accel_upper_bound(t_evaluated_.size(), kAccelUpperBound);
+  std::vector<double> accel_lower_bound(t_evaluated_.size(), accel_bound.first);
+  std::vector<double> accel_upper_bound(t_evaluated_.size(),
+                                        accel_bound.second);
 
   bool has_follow = false;
   double delta_s = 1.0;

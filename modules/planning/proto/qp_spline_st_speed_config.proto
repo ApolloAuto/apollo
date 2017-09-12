@@ -19,8 +19,8 @@ message QpSplineStSpeedConfig {
   optional double stop_weight = 12 [ default = 1.0 ];
   optional double cruise_weight = 13 [ default = 1.0 ];
   optional double max_speed = 14 [ default = 20.0 ];
-  optional double max_acceleration = 15 [ default = 4.5 ];
-  optional double max_deceleration = 16 [ default = -4.5 ];
+  optional double max_acceleration = 15 [ default = 2.0 ];
+  optional double min_deceleration = 16 [ default = -4.5 ];
   optional double follow_drag_distance = 17 [ default = 15.0 ];
   optional apollo.planning.StBoundaryConfig st_boundary_config = 18;
 }
