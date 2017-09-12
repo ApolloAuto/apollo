@@ -563,6 +563,11 @@ void GLFWViewer::GetClassColor(int cls, float rgb[3]) {
     rgb[1] = 0;
     rgb[2] = 0;  // red
     break;
+  default:
+    rgb[0] = 1;
+    rgb[1] = 1;
+    rgb[2] = 1;  // white
+    break;
   }
 }
 
