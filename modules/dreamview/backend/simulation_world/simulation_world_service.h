@@ -56,10 +56,6 @@ class SimulationWorldService {
   // SimulationWorld.
   static constexpr int kMaxMonitorItems = 30;
 
-  // The radius within which Dreamview will find all the map elements around the
-  // car.
-  static constexpr double kMapRadius = 200.0;
-
   /**
    * @brief Constructor of SimulationWorldService.
    * @param map_service the pointer of MapService.
