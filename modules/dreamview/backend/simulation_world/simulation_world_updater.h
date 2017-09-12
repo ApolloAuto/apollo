@@ -21,6 +21,9 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
 #define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
 
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+
 #include "modules/common/log.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
@@ -74,8 +77,8 @@ class SimulationWorldUpdater {
    * @return True if routing request is constructed successfully
    */
   bool ConstructRoutingRequest(
-        const nlohmann::json &json,
-        apollo::routing::RoutingRequest *routing_request);
+      const nlohmann::json &json,
+      apollo::routing::RoutingRequest *routing_request);
 
   // Time interval, in seconds, between pushing SimulationWorld to frontend.
   static constexpr double kSimWorldTimeInterval = 0.1;
@@ -87,6 +90,13 @@ class SimulationWorldUpdater {
 
   // End point for requesting default route
   apollo::routing::RoutingRequest::LaneWaypoint default_end_point_;
+
+  // The json string to be pushed to frontend, which is updated by timer.
+  std::string simulation_world_json_;
+
+  // Mutex to protect concurrent access to simulation_world_json_.
+  // NOTE: Use boost until we have std version of rwlock support.
+  boost::shared_mutex mutex_;
 };
 
 }  // namespace dreamview
