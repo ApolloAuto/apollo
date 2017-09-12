@@ -100,7 +100,7 @@ DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 DEFINE_double(static_obstacle_speed_threshold, 1.0,
               "obstacles are considered as static obstacle if its speed is "
               "less than this value (m/s)");
-DEFINE_bool(enable_nudge_decision, false, "enable nudge decision");
+DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 2.0,
               "If an obstacle's lateral distance is further away than this "
