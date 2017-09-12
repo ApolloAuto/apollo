@@ -69,20 +69,17 @@ class QpFrenetFrame {
   bool MapStaticObstacleWithDecision(const PathObstacle& path_obstacle);
 
   bool MapPolygon(const std::vector<common::math::Vec2d>& corners,
-                  const double buffer, const int nudge_side,
+                  const ObjectNudge& nudge,
                   std::vector<std::pair<double, double>>* const bound_map);
 
-  // nudge_side > 0 update upper bound, nudge_side < 0 update lower_bound
-  // nudge_side == 0 out of bound
   bool MapLine(const common::SLPoint& start, const common::SLPoint& end,
-               const int nudge_side,
+               const ObjectNudge::Type type,
                std::vector<std::pair<double, double>>* const constraint);
 
-  std::pair<double, double> MapLateralConstraint(const common::SLPoint& start,
-                                                 const common::SLPoint& end,
-                                                 const int nudge_side,
-                                                 const double s_start,
-                                                 const double s_end);
+  std::pair<double, double> MapLateralConstraint(
+      const common::SLPoint& start, const common::SLPoint& end,
+      const ObjectNudge::Type nudge_type, const double s_start,
+      const double s_end);
 
   std::pair<uint32_t, uint32_t> FindInterval(const double start,
                                              const double end) const;
