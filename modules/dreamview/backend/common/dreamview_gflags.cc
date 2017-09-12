@@ -53,3 +53,7 @@ DEFINE_string(ssl_certificate, "",
               "when at least one of the listening_ports is SSL. The file must "
               "be in PEM format, and it must have both, private key and "
               "certificate");
+
+DEFINE_double(map_radius, 200.0,
+              "The radius within which Dreamview will find all the map "
+              "elements around the car.");

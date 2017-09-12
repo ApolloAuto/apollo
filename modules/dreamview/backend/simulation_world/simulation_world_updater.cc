@@ -179,8 +179,7 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
 
     simulation_world_json_ =
-        sim_world_service_.GetUpdateAsJson(SimulationWorldService::kMapRadius)
-            .dump();
+        sim_world_service_.GetUpdateAsJson(FLAGS_map_radius).dump();
   }
 }
 
