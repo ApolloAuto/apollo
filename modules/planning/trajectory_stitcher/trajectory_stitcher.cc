@@ -115,8 +115,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
       prev_trajectory.trajectory_points().begin() + matched_index,
       prev_trajectory.trajectory_points().begin() + forward_index + 1);
 
-  const double zero_time =
-      prev_trajectory.TrajectoryPointAt(matched_index).relative_time();
+  const double zero_time = veh_rel_time;
   const double zero_s =
       prev_trajectory.TrajectoryPointAt(forward_index).path_point().s();
 
