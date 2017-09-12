@@ -16,8 +16,6 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
-#include <string>
-
 #include "google/protobuf/util/json_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -100,6 +98,12 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
   websocket_->RegisterMessageHandler(
       "RequestSimulationWorld",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
+        if (!sim_world_service_.ReadyToPush()) {
+          AWARN_EVERY(100)
+              << "Not sending simulation world as the data is not ready!";
+          return;
+        }
+
         std::string to_send;
         {
           // Pay the price to copy the data instead of sending data over the
@@ -164,18 +168,12 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
 
 void SimulationWorldUpdater::Start() {
   // start ROS timer, one-shot = false, auto-start = true
-  timer_ =
-      AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeInterval),
-                                  &SimulationWorldUpdater::OnPushTimer, this);
+  timer_ = AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeInterval),
+                                       &SimulationWorldUpdater::OnTimer, this);
 }
 
-void SimulationWorldUpdater::OnPushTimer(const ros::TimerEvent &event) {
+void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
   sim_world_service_.Update();
-  if (!sim_world_service_.ReadyToPush()) {
-    AWARN_EVERY(100)
-        << "Not sending simulation world as the data is not ready!";
-    return;
-  }
 
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
