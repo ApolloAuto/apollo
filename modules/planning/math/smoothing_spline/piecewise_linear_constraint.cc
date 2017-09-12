@@ -23,6 +23,8 @@
 
 #include <limits>
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace planning {
 
@@ -44,8 +46,9 @@ Eigen::MatrixXd MergeMaxtrices(const std::vector<Eigen::MatrixXd> matrices) {
 }
 }
 
-PiecewiseLinearConstraint::PiecewiseLinearConstraint(const uint32_t dimension)
-    : dimension_(dimension) {}
+PiecewiseLinearConstraint::PiecewiseLinearConstraint(const uint32_t dimension,
+                                                     const double unit_segment)
+    : dimension_(dimension), unit_segment_(unit_segment) {}
 
 Eigen::MatrixXd PiecewiseLinearConstraint::inequality_constraint_matrix()
     const {
@@ -81,11 +84,13 @@ bool PiecewiseLinearConstraint::AddBoundary(
 
   for (uint32_t i = 0; i < index_list.size(); ++i) {
     uint32_t index = index_list[i];
-    inequality_matrix(i, index) = -1.0;
-    inequality_boundary(i, 0) = -upper_bound[i];
-    inequality_matrix(i + 1, index) = 1.0;
-    inequality_boundary(i + 1, 0) = lower_bound[i];
+    inequality_matrix(2 * i, index) = -1.0;
+    inequality_boundary(2 * i, 0) = -upper_bound[i];
+    inequality_matrix(2 * i + 1, index) = 1.0;
+    inequality_boundary(2 * i + 1, 0) = lower_bound[i];
   }
+  inequality_matrices_.push_back(inequality_matrix);
+  inequality_boundaries_.push_back(inequality_boundary);
   return true;
 }
 
@@ -93,7 +98,34 @@ bool PiecewiseLinearConstraint::AddDerivativeBoundary(
     const std::vector<uint32_t>& index_list,
     const std::vector<double>& lower_bound,
     const std::vector<double>& upper_bound) {
-  // TODO(Liangliang): implement this function
+  if (index_list.size() != lower_bound.size() ||
+      index_list.size() != upper_bound.size()) {
+    AERROR << "The sizes of index list, lower_bound, upper_bound are not "
+              "identical.";
+    return false;
+  }
+  Eigen::MatrixXd inequality_matrix =
+      Eigen::MatrixXd::Zero(2 * index_list.size(), dimension_);
+  Eigen::MatrixXd inequality_boundary =
+      Eigen::MatrixXd::Zero(2 * index_list.size(), 1);
+
+  for (uint32_t i = 0; i < index_list.size(); ++i) {
+    uint32_t index = index_list[i];
+    if (index == 0) {
+      AERROR << "Index should NOT be 0.";
+      return false;
+    }
+
+    inequality_matrix(2 * i, index - 1) = 1.0;
+    inequality_matrix(2 * i, index) = -1.0;
+    inequality_boundary(2 * i, 0) = -unit_segment_ * upper_bound[i];
+
+    inequality_matrix(2 * i + 1, index - 1) = -1.0;
+    inequality_matrix(2 * i + 1, index) = 1.0;
+    inequality_boundary(2 * i, 0) = unit_segment_ * lower_bound[i];
+  }
+  inequality_matrices_.push_back(inequality_matrix);
+  inequality_boundaries_.push_back(inequality_boundary);
   return true;
 }
 
