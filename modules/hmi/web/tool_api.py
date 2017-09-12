@@ -167,6 +167,10 @@ class ToolApi(object):
             system_cmd.copytree(
                 vehicle_conf.velodyne_params_path,
                 Config.get_realpath(conf_pb.velodyne_params_target_path, True))
+        # Copy velodyne launch file.
+        if vehicle_conf.HasField('velodyne_launch_path'):
+            system_cmd.copyfile(vehicle_conf.velodyne_launch_path,
+                                conf_pb.velodyne_launch_target_path)
         # Copy gnss_driver.
         if vehicle_conf.HasField('gnss_driver_path'):
             system_cmd.copyfile(
