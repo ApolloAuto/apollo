@@ -20,7 +20,6 @@ DEFINE_string(routing_conf_file, "modules/routing/conf/routing.pb.txt",
               "default routing conf data file");
 
 DEFINE_string(node_name, "routing", "the name for this node");
-DEFINE_string(node_namespace, "routing", "the namespace for this node");
 
 DEFINE_string(adapter_config_filename, "modules/routing/conf/adapter.conf",
               "The adapter config filename");
@@ -30,6 +29,3 @@ DEFINE_double(min_length_for_lane_change, 10.0,
               "min length for lane change, in creater, in meter");
 DEFINE_bool(enable_change_lane_in_result, false,
             "contain change lane operator in result");
-
-DEFINE_string(debug_route_path, "",
-              "the default path of routing result debug file");
