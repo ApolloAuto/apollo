@@ -157,6 +157,7 @@ bool FileUtil::GetFileContent(const string& path, string* content) {
     size = ::read(fd, data + has_read, fsize - has_read);
     if (size < 0) {
       AWARN << "failed to read file: " << path;
+      ::close(fd);
       return false;
     }
     has_read += size;
