@@ -60,8 +60,9 @@ message Config {
     optional string calibration_table_path = 3
         [default = "modules/control/conf/lincoln.pb.txt"];
     optional string velodyne_params_path = 4;
-    optional string gnss_driver_path = 5;
-    optional string gnss_conf_path = 6;
+    optional string velodyne_launch_path = 5;
+    optional string gnss_driver_path = 6;
+    optional string gnss_conf_path = 7;
   }
   optional string vehicle_param_pb_target_path = 7
       [default = "modules/common/data/mkz_config.pb.txt"];
@@ -70,10 +71,12 @@ message Config {
   // Paths relative to ROS root directory.
   optional string velodyne_params_target_path = 9
       [default = "share/velodyne_pointcloud/params"];
-  optional string gnss_driver_target_path = 10
+  optional string velodyne_launch_target_path = 10
+      [default = "share/velodyne/launch/start_velodyne.launch"];
+  optional string gnss_driver_target_path = 11
       [default = "share/gnss_driver/launch/gnss_driver.launch"];
-  optional string gnss_conf_target_path = 11
+  optional string gnss_conf_target_path = 12
       [default = "share/gnss_driver/conf/gnss_conf_mkz.txt"];
 
-  repeated VehicleConfig available_vehicles = 12;
+  repeated VehicleConfig available_vehicles = 13;
 }
