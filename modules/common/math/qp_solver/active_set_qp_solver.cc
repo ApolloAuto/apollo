@@ -115,11 +115,11 @@ bool ActiveSetQpSolver::Solve() {
                              lower_bound, upper_bound, constraint_lower_bound,
                              constraint_upper_bound, max_iter);
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
-    AERROR << "Fail to initialize qp problem";
     if (ret == qpOASES::RET_MAX_NWSR_REACHED) {
-      AERROR << "Qp solver failed due to reached max iteration";
+      AERROR << "qpOASES solver failed due to reached max iteration";
     } else {
-      AERROR << "Qp failed due to infeasibility or other internal reasons";
+      AERROR << "qpOASES solver failed due to infeasibility or other internal "
+                "reasons";
     }
     return false;
   }
