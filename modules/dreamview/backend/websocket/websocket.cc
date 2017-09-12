@@ -67,7 +67,7 @@ bool WebSocketHandler::BroadcastData(const std::string &data) {
 
   bool all_success = true;
   for (Connection *conn : connections_to_send) {
-    if (!SendData(data, conn, true)) {
+    if (!SendData(conn, data, true)) {
       all_success = false;
     }
   }
@@ -75,8 +75,8 @@ bool WebSocketHandler::BroadcastData(const std::string &data) {
   return all_success;
 }
 
-bool WebSocketHandler::SendData(const std::string &data, Connection *conn,
-                                bool is_broadcast) {
+bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
+                                bool skippable) {
   std::shared_ptr<std::mutex> connection_lock;
   {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -92,9 +92,10 @@ bool WebSocketHandler::SendData(const std::string &data, Connection *conn,
   // Lock the connection while sending.
   if (!connection_lock->try_lock()) {
     // Skip sending data if:
-    // 1. This is a broadcast and there's higher priority data being sent.
+    // 1. Data is skippable according to sender and there's higher priority data
+    // being sent.
     // 2. The connection has been closed.
-    if (is_broadcast) {
+    if (skippable) {
       return false;
     } else {
       connection_lock->lock();  // Block to acquire the lock.
