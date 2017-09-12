@@ -35,7 +35,7 @@ PiecewiseLinearGenerator::PiecewiseLinearGenerator(
       unit_segment_(unit_segment),
       total_t_(num_of_segments * unit_segment),
       constraint_(num_of_segments + 1, unit_segment),
-      kernel_(num_of_segments + 1) {
+      kernel_(num_of_segments + 1, unit_segment) {
   CHECK_GE(num_of_segments, 3);
 }
 

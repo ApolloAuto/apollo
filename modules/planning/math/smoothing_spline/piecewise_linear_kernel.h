@@ -31,7 +31,7 @@ namespace planning {
 
 class PiecewiseLinearKernel {
  public:
-  explicit PiecewiseLinearKernel(const uint32_t dimension);
+  PiecewiseLinearKernel(const uint32_t dimension, const double unit_segment);
 
   void AddRegularization(const double regularized_param);
 
@@ -49,6 +49,7 @@ class PiecewiseLinearKernel {
 
  private:
   const uint32_t dimension_;
+  const double unit_segment_;
   Eigen::MatrixXd kernel_matrix_;
   Eigen::MatrixXd offset_matrix_;
 };
