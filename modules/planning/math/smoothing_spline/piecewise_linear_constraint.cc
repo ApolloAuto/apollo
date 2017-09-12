@@ -70,7 +70,22 @@ bool PiecewiseLinearConstraint::AddBoundary(
     const std::vector<uint32_t>& index_list,
     const std::vector<double>& lower_bound,
     const std::vector<double>& upper_bound) {
-  // TODO(Liangliang): implement this function
+  if (index_list.size() != lower_bound.size() ||
+      index_list.size() != upper_bound.size()) {
+    return false;
+  }
+  Eigen::MatrixXd inequality_matrix =
+      Eigen::MatrixXd::Zero(2 * index_list.size(), dimension_);
+  Eigen::MatrixXd inequality_boundary =
+      Eigen::MatrixXd::Zero(2 * index_list.size(), 1);
+
+  for (uint32_t i = 0; i < index_list.size(); ++i) {
+    uint32_t index = index_list[i];
+    inequality_matrix(i, index) = -1.0;
+    inequality_boundary(i, 0) = -upper_bound[i];
+    inequality_matrix(i + 1, index) = 1.0;
+    inequality_boundary(i + 1, 0) = lower_bound[i];
+  }
   return true;
 }
 
@@ -123,7 +138,6 @@ bool PiecewiseLinearConstraint::AddPointThirdDerivativeConstraint(
 }
 
 bool PiecewiseLinearConstraint::AddMonotoneInequalityConstraint() {
-  // TODO(Liangliang): implement this function
   Eigen::MatrixXd inequality_matrix =
       Eigen::MatrixXd::Zero(dimension_ - 1, dimension_ - 1);
   Eigen::MatrixXd inequality_boundary =
