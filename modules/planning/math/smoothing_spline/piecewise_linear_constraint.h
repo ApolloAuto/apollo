@@ -31,7 +31,8 @@ namespace planning {
 
 class PiecewiseLinearConstraint {
  public:
-  PiecewiseLinearConstraint(const uint32_t dimension);
+  PiecewiseLinearConstraint(const uint32_t dimension,
+                            const double unit_segment);
   virtual ~PiecewiseLinearConstraint() = default;
 
   Eigen::MatrixXd inequality_constraint_matrix() const;
@@ -70,6 +71,7 @@ class PiecewiseLinearConstraint {
 
  private:
   const uint32_t dimension_;
+  const double unit_segment_;
   std::vector<Eigen::MatrixXd> inequality_matrices_;
   std::vector<Eigen::MatrixXd> inequality_boundaries_;
 
