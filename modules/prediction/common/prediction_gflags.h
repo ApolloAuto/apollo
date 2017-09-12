@@ -52,7 +52,6 @@ DECLARE_bool(enable_pedestrian_acc);
 DECLARE_double(coeff_mul_sigma);
 DECLARE_double(pedestrian_min_speed);
 DECLARE_double(pedestrian_max_speed);
-DECLARE_double(pedestrian_min_acc);
 DECLARE_double(pedestrian_max_acc);
 DECLARE_double(prediction_pedestrian_total_time);
 DECLARE_int32(num_trajectory_still_pedestrian);
