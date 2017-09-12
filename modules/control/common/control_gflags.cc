@@ -24,7 +24,6 @@ DEFINE_string(adapter_config_filename, "modules/control/conf/adapter.conf",
 
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
-DEFINE_bool(enable_control_watchdog, true, "True to enable control watchdog");
 DEFINE_string(node_name, "control", "The control node name in proto");
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
 DEFINE_bool(use_preview_speed_for_table, false,

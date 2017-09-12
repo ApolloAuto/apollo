@@ -29,7 +29,6 @@ DECLARE_bool(enable_csv_debug);
 // temporary gflag for test purpose
 DECLARE_bool(enable_speed_station_preview);
 
-DECLARE_bool(enable_control_watchdog);
 DECLARE_string(node_name);
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
