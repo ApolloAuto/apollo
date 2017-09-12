@@ -20,7 +20,6 @@
 #include "gflags/gflags.h"
 
 // System gflags
-DECLARE_string(node_namespace);
 DECLARE_string(node_name);
 DECLARE_string(hmi_name);
 
