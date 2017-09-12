@@ -106,12 +106,26 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   auto debug = frame_->MutableADCTrajectory()->mutable_debug();
   STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
-  if (st_graph.Search(st_graph_data, path_data, speed_data, st_graph_debug) !=
-      Status::OK()) {
-    std::string msg = common::util::StrCat(
-        Name(), ":Failed to search graph with quadratic programming!");
-    RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+  constexpr double kAccelLowerBound = -1.8;
+  constexpr double kAccelUpperBound = 1.2;
+  std::pair<double, double> accel_bound = {kAccelLowerBound, kAccelUpperBound};
+  auto ret = st_graph.Search(st_graph_data, path_data, speed_data, accel_bound,
+                             st_graph_debug);
+  if (ret != Status::OK()) {
+    AERROR << "Failed to solve with ideal acceleration conditions. Use "
+              "secondary choice instead.";
+
+    accel_bound.first = qp_spline_st_speed_config_.min_deceleration();
+    accel_bound.second = qp_spline_st_speed_config_.max_acceleration();
+    ret = st_graph.Search(st_graph_data, path_data, speed_data, accel_bound,
+                          st_graph_debug);
+
+    if (ret != Status::OK()) {
+      std::string msg = common::util::StrCat(
+          Name(), ":Failed to search graph with quadratic programming!");
+      RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
   }
   // record debug info
   RecordSTGraphDebug(boundaries, speed_limits, *speed_data, st_graph_debug);
