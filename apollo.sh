@@ -219,6 +219,10 @@ function release() {
   mkdir -p $MODULES_DIR/drivers/gnss
   cp -r modules/drivers/gnss/conf/ $MODULES_DIR/drivers/gnss
 
+  # velodyne launch
+  mkdir -p $MODULES_DIR/drivers/velodyne/velodyne
+  cp -r modules/drivers/velodyne/velodyne/launch $MODULES_DIR/drivers/velodyne/velodyne
+
   # lib
   LIB_DIR=$ROOT_DIR/lib
   mkdir $LIB_DIR
