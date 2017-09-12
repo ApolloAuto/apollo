@@ -22,4 +22,7 @@ DEFINE_string(sensor_conf_file,
               "Default sensor conf file");
 
 // Canbus gflags
-DEFINE_double(sensor_freq, 100, "Sensor feedback timer frequency.");
+DEFINE_double(sensor_freq, 100, "Sensor feedback timer frequency -- 0 means event trigger.");
+
+// System gflags
+DEFINE_string(sensor_node_name, "", "Sensor node name.");

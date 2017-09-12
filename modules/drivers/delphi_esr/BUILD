@@ -11,7 +11,9 @@ cc_library(
     ],
     deps = [
         "//modules/drivers:sensor_message_manager_base",
+        "//modules/drivers:sensor_gflags",
         "//modules/drivers/delphi_esr/protocol:drivers_delphi_esr_protocol",
+        "//modules/common/adapters:adapter_manager",
     ],
 )
 
