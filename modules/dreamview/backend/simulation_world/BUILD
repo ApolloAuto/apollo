@@ -61,6 +61,9 @@ cc_library(
         "//modules/dreamview/backend/websocket",
         "@com_google_protobuf//:protobuf",
     ],
+    linkopts = [
+        "-lboost_thread",
+    ],
 )
 
 cpplint()

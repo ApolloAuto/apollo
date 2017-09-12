@@ -64,11 +64,11 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
       });
 
   websocket_->RegisterMessageHandler(
-      "RetrieveMapElementsByRadius" ,
+      "RetrieveMapElementsByRadius",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto radius = json.find("radius");
         if (radius == json.end()) {
-          AERROR <<"Cannot retrieve map elements with unknown radius.";
+          AERROR << "Cannot retrieve map elements with unknown radius.";
         }
 
         auto response = sim_world_service_.GetUpdateAsJson(*radius);
@@ -97,9 +97,18 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         }
       });
 
-  // Register an empty callback for heartbeat package.
   websocket_->RegisterMessageHandler(
-      "Ping", [](const Json &json, WebSocketHandler::Connection *conn) {});
+      "RequestSimulationWorld",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        std::string to_send;
+        {
+          // Pay the price to copy the data instead of sending data over the
+          // wire while holding the lock.
+          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+          to_send = simulation_world_json_;
+        }
+        websocket_->SendData(to_send, conn);
+      });
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
@@ -167,9 +176,14 @@ void SimulationWorldUpdater::OnPushTimer(const ros::TimerEvent &event) {
         << "Not sending simulation world as the data is not ready!";
     return;
   }
-  auto json =
-    sim_world_service_.GetUpdateAsJson(SimulationWorldService::kMapRadius);
-  websocket_->BroadcastData(json.dump());
+
+  {
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+
+    simulation_world_json_ =
+        sim_world_service_.GetUpdateAsJson(SimulationWorldService::kMapRadius)
+            .dump();
+  }
 }
 
 }  // namespace dreamview
