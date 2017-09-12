@@ -32,6 +32,14 @@ class Planning:
         self.speed_data_time = {}
         self.speed_data_val = {}
 
+        self.traj_data_lock = threading.Lock()
+        self.traj_speed_history_len = 30
+        self.traj_speed_t_history = []
+        self.traj_speed_v_history = []
+        self.traj_acc_history_len = 30
+        self.traj_acc_t_history = []
+        self.traj_acc_a_history = []
+
         self.st_data_lock = threading.Lock()
         self.st_curve_s = {}
         self.st_curve_t = {}
@@ -232,6 +240,44 @@ class Planning:
         self.kernel_follow_s = kernel_follow_s
 
         self.st_data_lock.release()
+
+    def compute_traj_data(self):
+        traj_speed_t = []
+        traj_speed_v = []
+        traj_acc_t = []
+        traj_acc_a = []
+        base_time = self.planning_pb.header.timestamp_sec
+        for trajectory_point in self.planning_pb.trajectory_point:
+            traj_acc_t.append(base_time + trajectory_point.relative_time)
+            traj_acc_a.append(trajectory_point.a)
+
+        for trajectory_point in self.planning_pb.trajectory_point:
+            traj_speed_t.append(base_time + trajectory_point.relative_time)
+            traj_speed_v.append(trajectory_point.v)
+
+        self.traj_data_lock.acquire()
+        
+        self.traj_speed_t_history.append(traj_speed_t)
+        self.traj_speed_v_history.append(traj_speed_v)
+        if len(self.traj_speed_t_history) > self.traj_speed_history_len:
+            self.traj_speed_t_history = \
+                self.traj_speed_t_history[len(self.traj_speed_t_history)
+                                          - self.traj_speed_history_len:]
+            self.traj_speed_v_history = \
+                self.traj_speed_v_history[len(self.traj_speed_v_history)
+                                          - self.traj_speed_history_len:]
+            
+        self.traj_acc_t_history.append(traj_acc_t)
+        self.traj_acc_a_history.append(traj_acc_a)
+        if len(self.traj_acc_t_history) > self.traj_acc_history_len:
+            self.traj_acc_t_history = \
+                self.traj_acc_t_history[len(self.traj_acc_t_history)
+                                          - self.traj_acc_history_len:]
+            self.traj_acc_a_history = \
+                self.traj_acc_a_history[len(self.traj_acc_a_history)
+                                          - self.traj_acc_history_len:]
+
+        self.traj_data_lock.release()
 
     def replot_sl_data(self,
                        sl_static_obstacle_lower_boundary,
