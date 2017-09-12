@@ -16,8 +16,8 @@
 
 #include "modules/routing/topo_creator/node_creator.h"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 namespace apollo {
 namespace routing {
@@ -55,7 +55,7 @@ double GetLaneLength(const Lane& lane) {
 }  // namespace
 
 void NodeCreator::GetPbNode(const Lane& lane, const std::string& road_id,
-                            Node* pb_node, const RoutingConfig * routingconfig){
+                            Node* pb_node, const RoutingConfig* routingconfig) {
   InitNodeInfo(lane, road_id, pb_node, routingconfig);
   InitNodeCost(lane, pb_node, routingconfig);
 }
@@ -81,7 +81,7 @@ void NodeCreator::AddOutBoundary(
 
 void NodeCreator::InitNodeInfo(const Lane& lane, const std::string& road_id,
                                Node* const node,
-                               const RoutingConfig * routingconfig) {
+                               const RoutingConfig* routingconfig) {
   double lane_length = GetLaneLength(lane);
   node->set_lane_id(lane.id().id());
   node->set_road_id(road_id);
@@ -98,10 +98,10 @@ void NodeCreator::InitNodeInfo(const Lane& lane, const std::string& road_id,
 }
 
 void NodeCreator::InitNodeCost(const Lane& lane, Node* const node,
-                               const RoutingConfig * routingconfig) {
+                               const RoutingConfig* routingconfig) {
   double lane_length = GetLaneLength(lane);
-  double speed_limit =
-    (lane.has_speed_limit()) ? lane.speed_limit() : routingconfig->base_speed();
+  double speed_limit = (lane.has_speed_limit()) ? lane.speed_limit()
+                                                : routingconfig->base_speed();
   double ratio = (speed_limit >= routingconfig->base_speed())
                      ? (1 / sqrt(speed_limit / routingconfig->base_speed()))
                      : 1.0;

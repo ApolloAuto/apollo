@@ -44,7 +44,7 @@ Eigen::MatrixXd MergeMaxtrices(const std::vector<Eigen::MatrixXd> matrices) {
   }
   return res;
 }
-}
+}  // namespace
 
 PiecewiseLinearConstraint::PiecewiseLinearConstraint(const uint32_t dimension,
                                                      const double unit_segment)
