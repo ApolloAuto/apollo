@@ -53,7 +53,9 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
   }
   CHECK_NOTNULL(path_data);
   DPRoadGraph dp_road_graph(config_, reference_line, speed_data);
-  if (!dp_road_graph.FindPathTunnel(init_point, path_data)) {
+  if (!dp_road_graph.FindPathTunnel(init_point,
+        reference_line_info_->path_decision()->path_obstacles().Items(),
+        path_data)) {
     AERROR << "Failed to find tunnel in road graph";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph path generation");
   }

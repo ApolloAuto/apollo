@@ -51,6 +51,7 @@ class DPRoadGraph {
   ~DPRoadGraph() = default;
 
   bool FindPathTunnel(const common::TrajectoryPoint &init_point,
+                      const std::vector<const PathObstacle*> &obstacles,
                       PathData *const path_data);
 
  private:
@@ -84,7 +85,8 @@ class DPRoadGraph {
     QuinticPolynomialCurve1d min_cost_curve;
   };
 
-  bool GenerateMinCostPath(std::vector<DPRoadGraphNode> *min_cost_path);
+  bool GenerateMinCostPath(const std::vector<const PathObstacle*> &obstacles,
+                           std::vector<DPRoadGraphNode> *min_cost_path);
 
   bool SamplePathWaypoints(
       const common::TrajectoryPoint &init_point,

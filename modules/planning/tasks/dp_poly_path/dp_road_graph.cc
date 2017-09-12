@@ -51,8 +51,10 @@ DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
       reference_line_(reference_line),
       speed_data_(speed_data) {}
 
-bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
-                                 PathData *const path_data) {
+bool DPRoadGraph::FindPathTunnel(
+    const common::TrajectoryPoint &init_point,
+    const std::vector<const PathObstacle*> &obstacles,
+    PathData *const path_data) {
   CHECK_NOTNULL(path_data);
   init_point_ = init_point;
   if (!reference_line_.XYToSL(
@@ -63,7 +65,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
     return false;
   }
   std::vector<DPRoadGraphNode> min_cost_path;
-  if (!GenerateMinCostPath(&min_cost_path)) {
+  if (!GenerateMinCostPath(obstacles, &min_cost_path)) {
     AERROR << "Fail to generate graph!";
     return false;
   }
@@ -99,6 +101,7 @@ bool DPRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
 }
 
 bool DPRoadGraph::GenerateMinCostPath(
+    const std::vector<const PathObstacle*> &obstacles,
     std::vector<DPRoadGraphNode> *min_cost_path) {
   CHECK(min_cost_path != nullptr);
 
@@ -113,7 +116,7 @@ bool DPRoadGraph::GenerateMinCostPath(
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
 
-  TrajectoryCost trajectory_cost(config_, reference_line_,
+  TrajectoryCost trajectory_cost(config_, reference_line_, obstacles,
                                  vehicle_config.vehicle_param(), speed_data_);
 
   std::vector<std::vector<DPRoadGraphNode>> graph_nodes(path_waypoints.size());
