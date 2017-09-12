@@ -44,7 +44,7 @@ void SensorCanbus<Mobileye>::PublishSensorData() {
   sensor_message_manager_->GetSensorData(&mobileye);
   ADEBUG << mobileye.ShortDebugString();
 
-  AdapterManager::FillMobileyeHeader(FLAGS_node_name, &mobileye);
+  AdapterManager::FillMobileyeHeader(FLAGS_sensor_node_name, &mobileye);
   AdapterManager::PublishMobileye(mobileye);
 }
 

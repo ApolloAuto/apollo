@@ -178,9 +178,13 @@ Status SensorCanbus<SensorType>::Start() {
   AINFO << "Can receiver is started.";
 
   // 3. set timer to triger publish info periodly
-  const double duration = 1.0 / FLAGS_sensor_freq;
-  timer_ = AdapterManager::CreateTimer(
-      ros::Duration(duration), &SensorCanbus<SensorType>::OnTimer, this);
+  // if sensor_freq == 0, then it is event-triggered publishment.
+  // no need for timer.
+  if (FLAGS_sensor_freq > 0) {
+    const double duration = 1.0 / FLAGS_sensor_freq;
+    timer_ = AdapterManager::CreateTimer(
+        ros::Duration(duration), &SensorCanbus<SensorType>::OnTimer, this);
+  }
 
   // last step: publish monitor messages
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);

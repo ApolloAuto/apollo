@@ -44,7 +44,7 @@ void SensorCanbus<DelphiESR>::PublishSensorData() {
   sensor_message_manager_->GetSensorData(&delphi_esr);
   ADEBUG << delphi_esr.ShortDebugString();
 
-  AdapterManager::FillDelphiESRHeader(FLAGS_node_name, &delphi_esr);
+  AdapterManager::FillDelphiESRHeader(FLAGS_sensor_node_name, &delphi_esr);
   AdapterManager::PublishDelphiESR(delphi_esr);
 }
 
