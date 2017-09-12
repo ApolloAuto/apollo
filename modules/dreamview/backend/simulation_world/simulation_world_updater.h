@@ -21,9 +21,10 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
 #define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
 
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
 #include <string>
+
+#include "boost/thread/locks.hpp"
+#include "boost/thread/shared_mutex.hpp"
 
 #include "modules/common/log.h"
 #include "modules/dreamview/backend/map/map_service.h"
