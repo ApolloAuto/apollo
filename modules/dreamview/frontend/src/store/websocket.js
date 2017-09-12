@@ -2,6 +2,7 @@ import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
 
+
 class WebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
@@ -9,6 +10,7 @@ class WebSocketEndpoint {
         this.counter = 0;
         this.lastUpdateTimestamp = 0;
         this.lastSeqNum = -1;
+        this.currMapRadius = null;
     }
 
     initialize() {
@@ -35,10 +37,13 @@ class WebSocketEndpoint {
                     RENDERER.updateWorld(message.world);
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
-                    if (message.mapHash && (this.counter % 10 === 0)) {
+                    if ((message.mapHash && (this.counter % 10 === 0)) ||
+                        this.currMapRadius !== message.radius) {
                         // NOTE: This is a hack to limit the rate of map updates.
                         this.counter = 0;
-                        RENDERER.updateMapIndex(message.mapHash, message.mapElementIds);
+                        this.currMapRadius = message.radius;
+                        RENDERER.updateMapIndex(message.mapHash,
+                            message.mapElementIds, message.radius);
                     }
                     this.counter += 1;
                     break;
@@ -81,6 +86,13 @@ class WebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "RetrieveMapData",
             elements: elements,
+        }));
+    }
+
+    requestMapElementsByRadius(radius) {
+        this.websocket.send(JSON.stringify({
+            type: "RetrieveMapElementsByRadius",
+            radius: radius,
         }));
     }
 

@@ -113,8 +113,8 @@ class Renderer {
         this.controls.enabled = true;
         this.controls.enableRotate = false;
         this.controls.reset();
-        this.controls.minDistance = 10;
-        this.controls.maxDistance = 2000;
+        this.controls.minDistance = 20;
+        this.controls.maxDistance = 1000;
 
         const carPosition = this.adc.mesh.position;
         this.camera.position.set(carPosition.x, carPosition.y, 50);
@@ -304,8 +304,11 @@ class Renderer {
         this.map.appendMapData(newData, this.coordinates, this.scene);
     }
 
-    updateMapIndex(hash, elementIds) {
-        this.map.updateIndex(hash, elementIds, this.scene);
+    updateMapIndex(hash, elementIds, radius) {
+        if (!this.routingEditor.isInEditingMode() ||
+             this.routingEditor.EDITING_MAP_RADIUS === radius) {
+            this.map.updateIndex(hash, elementIds, this.scene);
+        }
     }
 }
 

@@ -28,6 +28,7 @@ export default class RoutingEditor {
         camera.far = PARAMETERS.camera[pov].far;
 
         camera.updateProjectionMatrix();
+        WS.requestMapElementsByRadius(this.EDITING_MAP_RADIUS);
     }
 
     disableEditingMode(scene) {
@@ -108,3 +109,5 @@ export default class RoutingEditor {
         return true;
     }
 }
+
+RoutingEditor.prototype.EDITING_MAP_RADIUS = 1000.0; //meters

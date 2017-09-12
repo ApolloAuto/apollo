@@ -64,6 +64,18 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
       });
 
   websocket_->RegisterMessageHandler(
+      "RetrieveMapElementsByRadius" ,
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto radius = json.find("radius");
+        if (radius == json.end()) {
+          AERROR <<"Cannot retrieve map elements with unknown radius.";
+        }
+
+        auto response = sim_world_service_.GetUpdateAsJson(*radius);
+        websocket_->SendData(response.dump(), conn);
+      });
+
+  websocket_->RegisterMessageHandler(
       "SendRoutingRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         RoutingRequest routing_request;
@@ -155,7 +167,8 @@ void SimulationWorldUpdater::OnPushTimer(const ros::TimerEvent &event) {
         << "Not sending simulation world as the data is not ready!";
     return;
   }
-  auto json = sim_world_service_.GetUpdateAsJson();
+  auto json =
+    sim_world_service_.GetUpdateAsJson(SimulationWorldService::kMapRadius);
   websocket_->BroadcastData(json.dump());
 }
 
