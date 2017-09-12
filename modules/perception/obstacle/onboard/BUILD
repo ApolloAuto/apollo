@@ -29,6 +29,7 @@ cc_library(
         ":perception_obstacle_hdmapinput",
         "//modules/common",
         "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",

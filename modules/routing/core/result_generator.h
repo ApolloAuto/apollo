@@ -30,7 +30,7 @@ namespace routing {
 
 class ResultGenerator {
  public:
-  ResultGenerator();
+  ResultGenerator() = default;
   ~ResultGenerator() = default;
 
   bool GeneratePassageRegion(const std::string& map_version,
@@ -43,9 +43,6 @@ class ResultGenerator {
   bool GeneratePassageRegion(const std::vector<NodeWithRange>& nodes,
                              const TopoRangeManager& range_manager,
                              RoutingResponse* const result);
-
- private:
-  int _sequence_num;
 };
 
 }  // namespace routing
