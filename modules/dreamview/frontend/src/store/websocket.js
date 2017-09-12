@@ -58,13 +58,13 @@ class WebSocketEndpoint {
             this.initialize();
         };
 
-        // Periodically send heartbeat to server to indicate the connection is still alive.
+        // Request simulation world every 100ms.
         clearInterval(this.timer);
         this.timer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN) {
-                this.websocket.send(JSON.stringify({type : "Ping"}));
+                this.websocket.send(JSON.stringify({type : "RequestSimulationWorld"}));
             }
-        }, 10000);
+        }, 100);
     }
 
     checkMessage(message) {
