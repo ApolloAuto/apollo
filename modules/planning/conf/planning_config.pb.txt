@@ -94,11 +94,11 @@ em_planner_config {
         number_of_evaluated_graph_t: 50
         spline_order: 5
         speed_kernel_weight: 0.0
-        accel_kernel_weight: 0.0
-        jerk_kernel_weight: 1000.0
+        accel_kernel_weight: 500.0
+        jerk_kernel_weight: 500.0
         follow_weight: 2.0
         stop_weight: 0.2
-        cruise_weight: 0.2
+        cruise_weight: 0.1
         max_speed: 20.0
         max_acceleration: 2.5
         max_deceleration: -4.5
