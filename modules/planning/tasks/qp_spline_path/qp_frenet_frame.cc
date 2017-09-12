@@ -85,7 +85,9 @@ bool QpFrenetFrame::Init(const uint32_t num_points,
 
   const auto inf = std::numeric_limits<double>::infinity();
   const double resolution = (end_s_ - start_s_) / num_points;
-  for (double s = start_s_; s <= end_s_; s += resolution) {
+  double s = start_s_;
+  for (uint32_t i = 0; i < num_points;
+       ++i, s = std::min(s + resolution, end_s_)) {
     evaluated_knots_.push_back(s);
     hdmap_bound_.emplace_back(-inf, inf);
     static_obstacle_bound_.emplace_back(-inf, inf);
@@ -284,9 +286,9 @@ bool QpFrenetFrame::MapLine(
     return true;
   }
 
-  double distance =
+  const double distance =
       std::max(further_point.s() - near_point.s(), common::math::kMathEpsilon);
-
+  const double adc_half_width = vehicle_param_.width() / 2;
   for (uint32_t i = impact_index.first; i <= impact_index.second; ++i) {
     double weight = std::abs((evaluated_knots_[i] - near_point.s())) / distance;
     weight = std::max(weight, 0.0);
@@ -295,10 +297,10 @@ bool QpFrenetFrame::MapLine(
         near_point.l() * (1 - weight) + further_point.l() * weight;
 
     if (nudge_type == ObjectNudge::LEFT_NUDGE) {
-      boundary += vehicle_param_.width() / 2;
+      boundary += adc_half_width;
       (*constraint)[i].first = std::max(boundary, (*constraint)[i].first);
     } else {
-      boundary -= vehicle_param_.width() / 2;
+      boundary -= adc_half_width;
       (*constraint)[i].second = std::min(boundary, (*constraint)[i].second);
     }
 
@@ -374,6 +376,7 @@ std::pair<uint32_t, uint32_t> QpFrenetFrame::FindInterval(
 }
 
 void QpFrenetFrame::CalculateHDMapBound() {
+  const double adc_half_width = vehicle_param_.width() / 2.0;
   for (uint32_t i = 0; i < hdmap_bound_.size(); ++i) {
     double left_bound = 0.0;
     double right_bound = 0.0;
@@ -385,14 +388,13 @@ void QpFrenetFrame::CalculateHDMapBound() {
       left_bound = FLAGS_default_reference_line_width / 2;
     }
 
-    hdmap_bound_[i].first = -right_bound + vehicle_param_.width() / 2;
-    hdmap_bound_[i].second = left_bound - vehicle_param_.width() / 2;
+    hdmap_bound_[i].first = -right_bound + adc_half_width;
+    hdmap_bound_[i].second = left_bound - adc_half_width;
 
     if (hdmap_bound_[i].first >= hdmap_bound_[i].second) {
       ADEBUG << "HD Map bound at " << evaluated_knots_[i] << " is infeasible ("
              << hdmap_bound_[i].first << ", " << hdmap_bound_[i].second << ") "
              << std::endl;
-      ADEBUG << "vehicle_param_.width = " << vehicle_param_.width();
       ADEBUG << "left_bound: " << left_bound;
       ADEBUG << "right_bound: " << right_bound;
       feasible_longitudinal_upper_bound_ =
