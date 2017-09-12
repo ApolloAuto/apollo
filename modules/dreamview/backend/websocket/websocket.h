@@ -104,12 +104,14 @@ class WebSocketHandler : public CivetWebSocketHandler {
 
   /**
    * @brief Sends the provided data to a specific connected client.
-   * @param data The message string to be sent.
+   *
    * @param conn The connection to send to.
-   * @param is_broadcast whether this is a broadcast send.
+   * @param data The message string to be sent.
+   * @param skippable whether the data is allowed to be skipped if some other is
+   * being sent to this connection.
    */
-  bool SendData(const std::string &data, Connection *conn,
-                bool is_broadcast = false);
+  bool SendData(Connection *conn, const std::string &data,
+                bool skippable = false);
 
   /**
    * @brief Add a new message handler for a message type.

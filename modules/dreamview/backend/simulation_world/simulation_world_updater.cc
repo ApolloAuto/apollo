@@ -59,7 +59,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           response["type"] = "MapData";
           response["data"] = Json::parse(retrieved_json_string);
 
-          websocket_->SendData(response.dump(), conn);
+          websocket_->SendData(conn, response.dump());
         }
       });
 
@@ -72,7 +72,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         }
 
         auto response = sim_world_service_.GetUpdateAsJson(*radius);
-        websocket_->SendData(response.dump(), conn);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
@@ -107,7 +107,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
           to_send = simulation_world_json_;
         }
-        websocket_->SendData(to_send, conn);
+        websocket_->SendData(conn, to_send, true);
       });
 }
 
