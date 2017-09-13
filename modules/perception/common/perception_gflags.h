@@ -19,8 +19,6 @@
 
 #include "gflags/gflags.h"
 
-DECLARE_int32(perception_loop_rate);
-
 DECLARE_string(adapter_config_filename);
 
 /// lib/config_manager/config_manager.cc
