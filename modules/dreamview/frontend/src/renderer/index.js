@@ -12,6 +12,7 @@ import Decision from "renderer/decision.js";
 import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
+import Stats from "stats.js";
 
 class Renderer {
     constructor() {
@@ -54,6 +55,17 @@ class Renderer {
 
         // The route editor
         this.routingEditor = new RoutingEditor();
+
+        // The Performance Monitor
+        this.stats = null;
+        if (PARAMETERS.debug.performanceMonitor) {
+            this.stats = new Stats();
+            this.stats.showPanel(1);
+            this.stats.domElement.style.position = 'absolute';
+            this.stats.domElement.style.top = null;
+            this.stats.domElement.style.bottom = '0px';
+            document.body.appendChild(this.stats.domElement);
+        }
     }
 
     initialize(canvasId, width, height, options) {
@@ -292,6 +304,9 @@ class Renderer {
             this.animate();
         });
 
+        if (this.stats) {
+            this.stats.update();
+        }
         this.render();
     }
 

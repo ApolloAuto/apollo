@@ -55,3 +55,5 @@ options:
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
+  performanceMonitor: false
+
