@@ -55,8 +55,8 @@ cc_library(
     deps = [
         "//modules/common/adapters:adapter_manager",
         "//modules/common/time",
-        "//modules/routing/proto:routing_proto",
         "//modules/routing/graph",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 

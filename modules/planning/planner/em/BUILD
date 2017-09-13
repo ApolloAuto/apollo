@@ -43,6 +43,7 @@ cc_library(
         "//modules/common/vehicle_state",
         "//modules/map/hdmap",
         "//modules/planning/common:planning_common",
+        "//modules/planning/constraint_checker",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
@@ -57,7 +58,6 @@ cc_library(
         "//modules/planning/tasks/qp_spline_path",
         "//modules/planning/tasks/qp_spline_st_speed:qp_spline_st_speed_optimizer",
         "//modules/planning/tasks/traffic_decider",
-        "//modules/planning/constraint_checker:constraint_checker",
         "@eigen//:eigen",
     ],
 )
