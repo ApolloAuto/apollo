@@ -25,8 +25,8 @@ namespace apollo {
 namespace perception {
 
 struct alignas(16) RoadBoundary {
-    PolygonDType left_boundary;
-    PolygonDType right_boundary;
+  PolygonDType left_boundary;
+  PolygonDType right_boundary;
 };
 
 struct alignas(16) HdmapStruct {
@@ -41,4 +41,3 @@ typedef std::shared_ptr<const HdmapStruct> HdmapStructConstPtr;
 }  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_OBSTACLE_BASE_HDMAP_STRUCT_H_
-

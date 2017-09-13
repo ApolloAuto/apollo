@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/obstacle/base/object.h"
 
-#include "modules/common/macro.h"
 #include "modules/common/log.h"
+#include "modules/common/macro.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
 
-using std::string;
-using std::vector;
 using Eigen::Vector3d;
 
 Object::Object() {
@@ -56,7 +55,7 @@ Object::Object(const Object& rhs) {
   latest_tracked_time = rhs.latest_tracked_time;
 }
 
-Object& Object::operator = (const Object& rhs) {
+Object& Object::operator=(const Object& rhs) {
   id = rhs.id;
   cloud = rhs.cloud;
   polygon = rhs.polygon;
@@ -97,8 +96,9 @@ void Object::clone(const Object& rhs) {
   latest_tracked_time = rhs.latest_tracked_time;
 }
 
-string Object::ToString() const {
-  return apollo::common::util::StrCat(
+std::string Object::ToString() const {
+  // clang-format off
+  return common::util::StrCat(
       "Object[id: ", id, ", "
       "track_id: ", track_id, ", "
       "cloud_size: ", cloud->size(), ", "
@@ -111,6 +111,7 @@ string Object::ToString() const {
       "polygon_size: ", polygon.size(), ", "
       "type: ", type, ", "
       "is_background: ", is_background, "]");
+  // clang-format on
   // "tracking_time: ", GLOG_TIMESTAMP(tracking_time)
   // "latest_tracked_time: ", GLOG_TIMESTAMP(latest_tracked_time)
 }

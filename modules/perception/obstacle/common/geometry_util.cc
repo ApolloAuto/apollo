@@ -28,7 +28,7 @@ using pcl_util::PointCloudPtr;
  * */
 void TransformPointCloud(pcl_util::PointCloudPtr cloud,
                          const std::vector<int>& indices,
-                    pcl_util::PointDCloud* trans_cloud) {
+                         pcl_util::PointDCloud* trans_cloud) {
   if (trans_cloud->size() != indices.size()) {
     trans_cloud->resize(indices.size());
   }
@@ -44,23 +44,23 @@ void TransformPointCloud(pcl_util::PointCloudPtr cloud,
 }
 
 void TransformPointCloud(pcl_util::PointCloudPtr cloud,
-                                const Eigen::Matrix4d& pose_velodyne,
-                                pcl_util::PointDCloudPtr trans_cloud) {
-    Eigen::Matrix4d pose = pose_velodyne;
+                         const Eigen::Matrix4d& pose_velodyne,
+                         pcl_util::PointDCloudPtr trans_cloud) {
+  Eigen::Matrix4d pose = pose_velodyne;
 
-    if (trans_cloud->size() != cloud->size()) {
-        trans_cloud->resize(cloud->size());
-    }
-    for (size_t i = 0; i < cloud->points.size(); ++i) {
-        const Point& p = cloud->at(i);
-        Eigen::Vector4d v(p.x, p.y, p.z, 1);
-        v = pose * v;
-        pcl_util::PointD& tp = trans_cloud->at(i);
-        tp.x = v.x();
-        tp.y = v.y();
-        tp.z = v.z();
-        tp.intensity = p.intensity;
-    }
+  if (trans_cloud->size() != cloud->size()) {
+    trans_cloud->resize(cloud->size());
+  }
+  for (size_t i = 0; i < cloud->points.size(); ++i) {
+    const Point& p = cloud->at(i);
+    Eigen::Vector4d v(p.x, p.y, p.z, 1);
+    v = pose * v;
+    pcl_util::PointD& tp = trans_cloud->at(i);
+    tp.x = v.x();
+    tp.y = v.y();
+    tp.z = v.z();
+    tp.intensity = p.intensity;
+  }
 }
 
 /*
@@ -86,52 +86,52 @@ void TransAffineToMatrix4(const Eigen::Vector3d& translation,
 }
 
 void ComputeMostConsistentBboxDirection(const Eigen::Vector3f& previous_dir,
-  Eigen::Vector3f* current_dir) {
-  float dot_val_00 = previous_dir(0) * (*current_dir)(0)
-      + previous_dir(1) * (*current_dir)(1);
-  float dot_val_01 = previous_dir(0) * (*current_dir)(1)
-      - previous_dir(1) * (*current_dir)(0);
+                                        Eigen::Vector3f* current_dir) {
+  float dot_val_00 =
+      previous_dir(0) * (*current_dir)(0) + previous_dir(1) * (*current_dir)(1);
+  float dot_val_01 =
+      previous_dir(0) * (*current_dir)(1) - previous_dir(1) * (*current_dir)(0);
   if (fabs(dot_val_00) >= fabs(dot_val_01)) {
     if (dot_val_00 < 0) {
       (*current_dir) = -(*current_dir);
     }
   } else {
     if (dot_val_01 < 0) {
-      (*current_dir) = Eigen::Vector3f(
-          (*current_dir)(1), -(*current_dir)(0), 0);
+      (*current_dir) =
+          Eigen::Vector3f((*current_dir)(1), -(*current_dir)(0), 0);
     } else {
-      (*current_dir) = Eigen::Vector3f(
-          -(*current_dir)(1), (*current_dir)(0), 0);
+      (*current_dir) =
+          Eigen::Vector3f(-(*current_dir)(1), (*current_dir)(0), 0);
     }
   }
 }
 
 double VectorCosTheta2dXy(const Eigen::Vector3f& v1,
                           const Eigen::Vector3f& v2) {
-    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
-    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
-    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum()
-        / (v1_len * v2_len);
-    return cos_theta;
+  double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
+  double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
+  double cos_theta =
+      (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
+  return cos_theta;
 }
 
 double VectorTheta2dXy(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2) {
-    double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
-    double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
-    double cos_theta = (v1.head(2).cwiseProduct(v2.head(2))).sum()
-        / (v1_len * v2_len);
-    double sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);
-    if (cos_theta > 1) {
-      cos_theta = 1;
-    }
-    if (cos_theta < -1) {
-      cos_theta = -1;
-    }
-    double theta = acos(cos_theta);
-    if (sin_theta < 0) {
-        theta = -theta;
-    }
-    return theta;
+  double v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
+  double v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
+  double cos_theta =
+      (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
+  double sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);
+  if (cos_theta > 1) {
+    cos_theta = 1;
+  }
+  if (cos_theta < -1) {
+    cos_theta = -1;
+  }
+  double theta = acos(cos_theta);
+  if (sin_theta < 0) {
+    theta = -theta;
+  }
+  return theta;
 }
 
 }  // namespace perception

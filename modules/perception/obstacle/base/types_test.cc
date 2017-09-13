@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/obstacle/base/types.h"
+
 #include "gtest/gtest.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {
