@@ -22,6 +22,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "util_test",
+    size = "small",
+    srcs = [
+        "util_test.cc",
+    ],
+    deps = [
+        ":util",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "lru_cache",
     hdrs = ["lru_cache.h"],
