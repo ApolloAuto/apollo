@@ -246,9 +246,22 @@ Status QpSplineStGraph::ApplyConstraint(
   } else {
     constexpr double kInitPointAccelRelaxedSpeed = 1.0;
     constexpr double kInitPointAccelRelaxedRange = 0.5;
-    if (init_point_.v() > kInitPointAccelRelaxedSpeed) {
-      accel_lower_bound.front() = init_point_.a() - kInitPointAccelRelaxedRange;
-      accel_upper_bound.front() = init_point_.a() + kInitPointAccelRelaxedRange;
+    if (init_point_.v() > kInitPointAccelRelaxedSpeed &&
+        (init_point_.a() > accel_bound.second - kInitPointAccelRelaxedRange ||
+         init_point_.a() < accel_bound.first + kInitPointAccelRelaxedRange)) {
+      accel_lower_bound.front() =
+          std::max(accel_lower_bound.front(),
+                   init_point_.a() - kInitPointAccelRelaxedRange);
+      accel_upper_bound.front() =
+          std::min(accel_upper_bound.front(),
+                   init_point_.a() + kInitPointAccelRelaxedRange);
+    } else {
+      if (!constraint->AddPointSecondDerivativeConstraint(0.0,
+                                                          init_point_.a())) {
+        const std::string msg =
+            "Fail to apply init point acceleration constraints.";
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
     }
   }
 
