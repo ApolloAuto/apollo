@@ -740,7 +740,7 @@ message DelphiESR {
   optional Esr_status4_4e3 esr_status4_4e3 = 6; // report message
   optional Esr_trackmotionpower_540 esr_trackmotionpower_540 = 7; // report message
   optional Acm_inst_req_7e0 acm_inst_req_7e0 = 8; // report message
-  optional Esr_track01_500 esr_track01_500 = 9; // report message
+  repeated Esr_track01_500 esr_track01_500 = 9; // report message
   optional Esr_valid1_5d0 esr_valid1_5d0 = 10; // report message
   optional Esr_valid2_5d1 esr_valid2_5d1 = 11; // report message
   optional Acm_inst_resp_7e4 acm_inst_resp_7e4 = 12; // report message
