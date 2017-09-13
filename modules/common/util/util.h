@@ -22,6 +22,7 @@
 #ifndef MODULES_COMMON_UTIL_H_
 #define MODULES_COMMON_UTIL_H_
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -73,6 +74,16 @@ SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
 PathPoint MakePathPoint(const double x, const double y, const double z,
                         const double theta, const double kappa,
                         const double dkappa, const double ddkappa);
+
+template <typename Container>
+typename Container::value_type MaxElement(const Container& elements) {
+  return *std::max_element(elements.begin(), elements.end());
+}
+
+template <typename Container>
+typename Container::value_type MinElement(const Container& elements) {
+  return *std::min_element(elements.begin(), elements.end());
+}
 
 /**
  * calculate the distance beteween PathPoint a and PathPoint b
