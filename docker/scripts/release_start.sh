@@ -124,6 +124,9 @@ function main() {
         docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
         docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
         docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne_pointcloud"
+        docker exec apollo_release bash -c "chmod a+rw -R /apollo/modules/common/data"
+        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/gnss_driver"
+        docker exec apollo_release bash -c "chmod a+rw -R /apollo/ros/share/velodyne"
     fi
     docker exec -u ${USER} -it apollo_release "/apollo/scripts/hmi.sh"
 }
