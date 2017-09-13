@@ -37,9 +37,11 @@ g_args = None
 
 
 def plot_planning(ax, planning_file):
-    fhandle = file(planning_file, 'r')
-    if not fhandle:
+    try:
+        fhandle = file(planning_file, 'r')
+    except:
         print "Failed to open file %s" % (planning_file)
+        return
     planning_pb = planning_pb2.ADCTrajectory()
     text_format.Merge(fhandle.read(), planning_pb)
     x = [p.path_point.x for p in planning_pb.trajectory_point]
