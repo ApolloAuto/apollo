@@ -252,6 +252,7 @@ message Esr_track01_500 {
   optional Can_tx_track_med_range_modeType can_tx_track_med_range_mode = 11;
   // [deg] [-51.2|51.1]
   optional double can_tx_track_angle = 12;
+  optional int32 can_tx_track_power = 13;
 }
 
 message Esr_valid1_5d0 {
@@ -755,4 +756,5 @@ message DelphiESR {
   optional Vehicle4_5f3 vehicle4_5f3 = 21; // report message
   optional Vehicle5_5f4 vehicle5_5f4 = 22; // report message
   optional Vehicle6_5f5 vehicle6_5f5 = 23; // report message
+  repeated int32 track_power_array = 24;
 }
