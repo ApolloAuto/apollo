@@ -84,7 +84,7 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
     AERROR << "failed to get trans at timestamp: " << kTimeStamp;
-    error_code_ = apollo::common::PERCEPTION_ERROR_TF;
+    error_code_ = common::PERCEPTION_ERROR_TF;
     return false;
   }
   ADEBUG << "get trans pose succ.";
@@ -100,11 +100,11 @@ bool LidarProcess::Process(const sensor_msgs::PointCloud2& message) {
     AERROR << "faile to process msg at timestamp: " << kTimeStamp;
     return false;
   }
-  error_code_ = apollo::common::OK;
+  error_code_ = common::OK;
   return true;
 }
 
-bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
+bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
                            std::shared_ptr<Matrix4d> velodyne_trans) {
   PERF_BLOCK_START();
   /// call hdmap to get ROI
@@ -131,7 +131,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
       roi_indices_ = roi_indices;
     } else {
       AERROR << "failed to call roi filter.";
-      error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
+      error_code_ = common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
@@ -153,7 +153,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
     if (!segmentor_->Segment(roi_cloud, non_ground_indices,
                              segmentation_options, &objects)) {
       AERROR << "failed to call segmention.";
-      error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
+      error_code_ = common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
@@ -165,7 +165,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
     ObjectBuilderOptions object_builder_options;
     if (!object_builder_->Build(object_builder_options, &objects)) {
       AERROR << "failed to call object builder.";
-      error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
+      error_code_ = common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
@@ -180,7 +180,7 @@ bool LidarProcess::Process(double timestamp, PointCloudPtr point_cloud,
     tracker_options.hdmap_input = hdmap_input_;
     if (!tracker_->Track(objects, timestamp, tracker_options, &objects_)) {
       AERROR << "failed to call tracker.";
-      error_code_ = apollo::common::PERCEPTION_ERROR_PROCESS;
+      error_code_ = common::PERCEPTION_ERROR_PROCESS;
       return false;
     }
   }
@@ -359,7 +359,7 @@ bool LidarProcess::GetVelodyneTrans(const double query_time, Matrix4d* trans) {
 bool LidarProcess::GeneratePbMsg(PerceptionObstacles* obstacles) {
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_obstacle_module_name,
                                                 obstacles);
-  apollo::common::Header* header = obstacles->mutable_header();
+  common::Header* header = obstacles->mutable_header();
   header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
   header->set_camera_timestamp(0);
   header->set_radar_timestamp(0);

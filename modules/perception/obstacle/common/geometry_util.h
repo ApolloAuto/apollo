@@ -17,10 +17,12 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 
-#include <float.h>
 #include <algorithm>
+#include <cfloat>
 #include <vector>
+
 #include "Eigen/Core"
+
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 
 namespace apollo {
@@ -59,8 +61,8 @@ void TransformPoint(const PointType& point_in, PointType* point_out,
 
 template <typename PointType>
 void TransformPointCloud(const pcl::PointCloud<PointType>& cloud_in,
-                           pcl::PointCloud<PointType>* cloud_out,
-                           const Eigen::Matrix4d& trans_mat) {
+                         pcl::PointCloud<PointType>* cloud_out,
+                         const Eigen::Matrix4d& trans_mat) {
   if (cloud_out->points.size() < cloud_in.points.size()) {
     cloud_out->points.resize(cloud_in.points.size());
   }
@@ -76,12 +78,12 @@ void TransformPointCloud(const pcl::PointCloud<PointType>& cloud_in,
 }
 
 void TransformPointCloud(pcl_util::PointCloudPtr cloud,
-                    const std::vector<int>& indices,
-                    pcl_util::PointDCloud* trans_cloud);
+                         const std::vector<int>& indices,
+                         pcl_util::PointDCloud* trans_cloud);
 
 void TransformPointCloud(pcl_util::PointCloudPtr cloud,
-                                const Eigen::Matrix4d& pose_velodyne,
-                                typename pcl_util::PointDCloudPtr trans_cloud);
+                         const Eigen::Matrix4d& pose_velodyne,
+                         typename pcl_util::PointDCloudPtr trans_cloud);
 /*
  * Other point cloud related methods
  * */
@@ -121,8 +123,7 @@ void GetCloudMinMax3D(typename pcl::PointCloud<PointT>::Ptr cloud,
 template <typename PointT>
 void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
                            const Eigen::Vector3d& direction,
-                           Eigen::Vector3d* size,
-                           Eigen::Vector3d* center) {
+                           Eigen::Vector3d* size, Eigen::Vector3d* center) {
   Eigen::Vector3d dir(direction[0], direction[1], 0);
   dir.normalize();
   Eigen::Vector3d ortho_dir(-dir[1], dir[0], 0.0);
@@ -145,7 +146,7 @@ void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
   }
   *size = max_pt - min_pt;
   *center = dir * ((max_pt[0] + min_pt[0]) * 0.5) +
-           ortho_dir * ((max_pt[1] + min_pt[1]) * 0.5) + z_dir * min_pt[2];
+            ortho_dir * ((max_pt[1] + min_pt[1]) * 0.5) + z_dir * min_pt[2];
 }
 
 template <typename PointT>

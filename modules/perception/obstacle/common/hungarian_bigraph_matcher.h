@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-/***************************************************************************** 
+/*****************************************************************************
 * Copyright 2010-2012 Google
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +32,8 @@
 * /mixer/matching/HungarianOptimizer.java
 ****************************************************************************/
 
-#ifndef  MODULES_PERCEPTION_OBSTACLE_COMMON_HUNGARIAN_BIGRAPH_MATCHER_H_
-#define  MODULES_PERCEPTION_OBSTACLE_COMMON_HUNGARIAN_BIGRAPH_MATCHER_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_HUNGARIAN_BIGRAPH_MATCHER_H_
+#define MODULES_PERCEPTION_OBSTACLE_COMMON_HUNGARIAN_BIGRAPH_MATCHER_H_
 
 #include <algorithm>
 #include <cstdio>
@@ -71,11 +71,7 @@ class HungarianOptimizer {
  private:
   typedef void (HungarianOptimizer::*Step)();
 
-  typedef enum {
-    NONE,
-    PRIME,
-    STAR
-  } Mark;
+  typedef enum { NONE, PRIME, STAR } Mark;
 
   // Convert the final cost matrix into a set of assignments of agents -> tasks.
   // Returns the assignment in the two vectors passed as argument, the same as
@@ -83,20 +79,18 @@ class HungarianOptimizer {
   void find_assignments(std::vector<int>* agent, std::vector<int>* task);
 
   // Is the cell (row, col) starred?
-  bool is_starred(int row, int col) const {
-    return _marks[row][col] == STAR;
-  }
+  bool is_starred(int row, int col) const { return marks_[row][col] == STAR; }
 
   // Mark cell (row, col) with a star
   void star(int row, int col) {
-    _marks[row][col] = STAR;
-    _stars_in_col[col]++;
+    marks_[row][col] = STAR;
+    stars_in_col_[col]++;
   }
 
   // Remove a star from cell (row, col)
   void unstar(int row, int col) {
-    _marks[row][col] = NONE;
-    _stars_in_col[col]--;
+    marks_[row][col] = NONE;
+    stars_in_col_[col]--;
   }
 
   // Find a column in row 'row' containing a star, or return
@@ -108,56 +102,38 @@ class HungarianOptimizer {
   int find_star_in_col(int col) const;
 
   // Is cell (row, col) marked with a prime?
-  bool is_primed(int row, int col) const {
-    return _marks[row][col] == PRIME;
-  }
+  bool is_primed(int row, int col) const { return marks_[row][col] == PRIME; }
 
   // Mark cell (row, col) with a prime.
-  void prime(int row, int col) {
-    _marks[row][col] = PRIME;
-  }
+  void prime(int row, int col) { marks_[row][col] = PRIME; }
 
   // Find a column in row containing a prime, or return
   // kHungarianOptimizerColNotFound if no such column exists.
   int find_prime_in_row(int row) const;
 
-  // Remove the prime _marks from every cell in the matrix.
+  // Remove the prime marks_ from every cell in the matrix.
   void clear_primes();
 
   // Does column col contain a star?
-  bool col_contains_star(int col) const {
-    return _stars_in_col[col] > 0;
-  }
+  bool col_contains_star(int col) const { return stars_in_col_[col] > 0; }
 
   // Is row 'row' covered?
-  bool row_covered(int row) const {
-    return _rows_covered[row];
-  }
+  bool row_covered(int row) const { return rows_covered_[row]; }
 
   // Cover row 'row'.
-  void cover_row(int row) {
-    _rows_covered[row] = true;
-  }
+  void cover_row(int row) { rows_covered_[row] = true; }
 
   // Uncover row 'row'.
-  void uncover_row(int row) {
-    _rows_covered[row] = false;
-  }
+  void uncover_row(int row) { rows_covered_[row] = false; }
 
   // Is column col covered?
-  bool col_covered(int col) const {
-    return _cols_covered[col];
-  }
+  bool col_covered(int col) const { return cols_covered_[col]; }
 
   // Cover column col.
-  void cover_col(int col) {
-    _cols_covered[col] = true;
-  }
+  void cover_col(int col) { cols_covered_[col] = true; }
 
   // Uncover column col.
-  void uncover_col(int col) {
-    _cols_covered[col] = false;
-  }
+  void uncover_col(int col) { cols_covered_[col] = false; }
 
   // Uncover ever row and column in the matrix.
   void clear_covers();
@@ -220,41 +196,41 @@ class HungarianOptimizer {
   void augment_path();
 
   // The size of the problem, i.e. std::max(#agents, #tasks).
-  int _matrix_size;
+  int matrix_size_;
 
   // The expanded cost matrix.
-  std::vector<std::vector<double> > _costs;
+  std::vector<std::vector<double> > costs_;
 
   // The greatest cost in the initial cost matrix.
-  double _max_cost;
+  double max_cost_;
 
   // Which rows and columns are currently covered.
-  std::vector<bool> _rows_covered;
-  std::vector<bool> _cols_covered;
+  std::vector<bool> rows_covered_;
+  std::vector<bool> cols_covered_;
 
-  // The _marks (star/prime/none) on each element of the cost matrix.
-  std::vector<std::vector<Mark> > _marks;
+  // The marks_ (star/prime/none) on each element of the cost matrix.
+  std::vector<std::vector<Mark> > marks_;
 
   // The number of stars in each column - used to speed up coverStarredZeroes.
-  std::vector<int> _stars_in_col;
+  std::vector<int> stars_in_col_;
 
   // Representation of a path_ through the matrix - used in step 5.
-  std::vector<int> _preimage;  // i.e. the agents
-  std::vector<int> _image;     // i.e. the tasks
+  std::vector<int> preimage_;  // i.e. the agents
+  std::vector<int> image_;     // i.e. the tasks
 
   // The locations of a zero found in step 4.
-  int _zero_col;
-  int _zero_row;
+  int zero_col_;
+  int zero_row_;
 
-  // The _width and _height of the initial (non-expanded) cost matrix.
-  int _width;
-  int _height;
+  // The width_ and height_ of the initial (non-expanded) cost matrix.
+  int width_;
+  int height_;
 
   // The current state of the algorithm
-  HungarianOptimizer::Step _state;
+  HungarianOptimizer::Step state_;
 
-  std::vector<int> _uncov_col;
-  std::vector<int> _uncov_row;
+  std::vector<int> uncov_col_;
+  std::vector<int> uncov_row_;
 };
 
 }  // namespace perception

@@ -13,33 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_BASE_TYPES_H_
 #define MODULES_PERCEPTION_OBSTACLE_BASE_TYPES_H_
 
 #include <string>
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/common/define.h"
+#include "modules/perception/lib/pcl_util/pcl_types.h"
 
 namespace apollo {
 namespace perception {
 
 enum ObjectType {
-    UNKNOWN = 0,
-    UNKNOWN_MOVABLE = 1,
-    UNKNOWN_UNMOVABLE = 2,
-    PEDESTRIAN = 3,
-    BICYCLE = 4,
-    VEHICLE = 5,
-    MAX_OBJECT_TYPE = 6,
+  UNKNOWN = 0,
+  UNKNOWN_MOVABLE = 1,
+  UNKNOWN_UNMOVABLE = 2,
+  PEDESTRIAN = 3,
+  BICYCLE = 4,
+  VEHICLE = 5,
+  MAX_OBJECT_TYPE = 6,
 };
 
 enum SensorType {
-    VELODYNE_64 = 0,
-    VELODYNE_16 = 1,
-    RADAR = 2,
-    CAMERA = 3,
-    UNKNOWN_SENSOR_TYPE = 10,
+  VELODYNE_64 = 0,
+  VELODYNE_16 = 1,
+  RADAR = 2,
+  CAMERA = 3,
+  UNKNOWN_SENSOR_TYPE = 10,
 };
 
 typedef pcl_util::PointCloud PolygonType;

@@ -18,6 +18,7 @@
 
 #include <Eigen/Core>
 #include "gtest/gtest.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -25,17 +26,15 @@ namespace perception {
 
 class GraphUtilTest : public testing::Test {
  protected:
-  GraphUtilTest() {}
-  virtual ~GraphUtilTest() {}
+  GraphUtilTest() = default;
+  virtual ~GraphUtilTest() = default;
   void SetUp() {}
   void TearDown() {}
 };
 
 TEST_F(GraphUtilTest, ConnectedComponentAnalysis) {
   Eigen::MatrixXf association_mat(3, 4);
-  association_mat << 0.3, 1.2, 4.0, 3.0,
-                     0.9, 2.0, 3.0, 8.0,
-                     4.0, 3.0, 0.3, 0.1;
+  association_mat << 0.3, 1.2, 4.0, 3.0, 0.9, 2.0, 3.0, 8.0, 4.0, 3.0, 0.3, 0.1;
   const float connected_threshold = 2.1;
   // Compute connected components within given threshold
   int no_track = association_mat.rows();

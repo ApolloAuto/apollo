@@ -82,11 +82,11 @@ class ConvexHull2DXY : public pcl::ConvexHull<PointInT> {
   using pcl::ConvexHull<PointInT>::total_volume_;
   using pcl::ConvexHull<PointInT>::qhull_flags;
 
-  ConvexHull2DXY() {}
-  virtual ~ConvexHull2DXY() {}
+  ConvexHull2DXY() = default;
+  virtual ~ConvexHull2DXY() = default;
 
   void Reconstruct2dxy(PointCloudPtr hull,
-                       std::vector<pcl::Vertices>* polygons) {
+                       std::vector<pcl::Vertices> *polygons) {
     hull->header = input_->header;
     if (!initCompute() || input_->points.empty() || indices_->empty()) {
       hull->points.clear();
@@ -103,7 +103,7 @@ class ConvexHull2DXY : public pcl::ConvexHull<PointInT> {
   }
 
   void PerformReconstruction2dxy(PointCloudPtr hull,
-                                 std::vector<pcl::Vertices>* polygons,
+                                 std::vector<pcl::Vertices> *polygons,
                                  bool fill_polygon_data = false) {
     int dimension = 2;
 
@@ -224,9 +224,7 @@ class ConvexHull2DXY : public pcl::ConvexHull<PointInT> {
     return;
   }
 
-  std::string getClassName() const {
-    return ("ConvexHull2DXY");
-  }
+  std::string getClassName() const { return ("ConvexHull2DXY"); }
 
  protected:
   using pcl::PCLBase<PointInT>::input_;
