@@ -228,7 +228,6 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   for (uint32_t i = 0; i < num_evaluated_s;
        ++i, curr_evaluated_s = std::min(curr_evaluated_s + ds, back_s)) {
     evaluated_s_.push_back(curr_evaluated_s);
-    curr_evaluated_s += ds;
   }
 
   return true;
