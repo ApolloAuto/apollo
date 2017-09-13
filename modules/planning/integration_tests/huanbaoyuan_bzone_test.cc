@@ -53,5 +53,19 @@ TEST_F(HuangbaoyuanBzoneTest, follow_01) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test yield a vehicle with short distance
+ * A follow test case
+ */
+TEST_F(HuangbaoyuanBzoneTest, yield_01) {
+  std::string seq_num = "2";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
