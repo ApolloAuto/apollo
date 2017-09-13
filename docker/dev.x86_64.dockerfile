@@ -48,7 +48,7 @@ WORKDIR /tmp/protobuf-3.3.0
 RUN ./configure --prefix=/usr && make && make install
 RUN chmod 755 /usr/bin/protoc
 
-# set up node v8.0.0
+# Set up node v8.0.0
 WORKDIR /tmp
 RUN wget https://github.com/tj/n/archive/v2.1.0.tar.gz
 RUN tar xzf v2.1.0.tar.gz
@@ -56,8 +56,8 @@ WORKDIR /tmp/n-2.1.0
 RUN make install
 RUN n 8.0.0
 
-WORKDIR /tmp
 # Install required python packages.
+WORKDIR /tmp
 RUN pip install -r py27_requirements.txt
 
 # Install yarn
@@ -67,7 +67,7 @@ RUN apt-get update && apt-get install -y yarn
 
 ENV ROSCONSOLE_FORMAT '${file}:${line} ${function}() [${severity}] [${time}]: ${message}'
 
-# install dependency for ros build
+# Install dependency for ros build
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 RUN apt-get update && apt-get install -y \
@@ -91,7 +91,7 @@ RUN apt-get update && apt-get install shellcheck
 # https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
 RUN ln -s -f /bin/true /usr/bin/chfn
 
-# install pcl and opencv, prerequisites for Caffe (CPU_ONLY mode)
+# Install pcl and opencv, prerequisites for Caffe (CPU_ONLY mode)
 RUN apt-get update && apt-get install -y \
     libatlas-base-dev \
     libflann-dev \
@@ -107,12 +107,14 @@ RUN apt-get update && apt-get install -y \
     libvtk5-qt4-dev \
     mpi-default-dev
 
+# Install glog
 WORKDIR /tmp
 RUN wget https://github.com/google/glog/archive/v0.3.5.tar.gz
 RUN tar xzf v0.3.5.tar.gz
 WORKDIR /tmp/glog-0.3.5
 RUN ./configure && make && make install
 
+# Install gflags
 WORKDIR /tmp
 RUN wget https://github.com/gflags/gflags/archive/v2.2.0.tar.gz
 RUN tar xzf v2.2.0.tar.gz
@@ -124,11 +126,12 @@ RUN CXXFLAGS="-fPIC" cmake .. && make && make install
 ENV CAFFE_ROOT=/apollo/bazel-genfiles/external/caffe
 RUN echo "$CAFFE_ROOT/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 
-# install Opengl
+# Install Opengl
 RUN echo "deb http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
 RUN echo "deb-src http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
 RUN apt-get update && apt-get install -y --force-yes libglfw3 libglfw3-dev freeglut3-dev
 
+# Install GLEW
 WORKDIR /tmp
 RUN wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.0.0.zip
 RUN unzip glew-2.0.0.zip
