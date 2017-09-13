@@ -1,19 +1,19 @@
 # Apollo 1.5 Quick Start Guide
 
-## TODO(all): Other parts ahead
+This quick start focuses on Apollo 1.5 new features. For general Apollo concepts, please refer to [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
 
-## Launch the Local release env Docker Image
+## Launch release env Docker Image
 
 Run the following commands:
 
 ```bash
 cd $APOLLO_HOME
-bash docker/scripts/release_start.sh local
+bash docker/scripts/release_start.sh
 ```
 
 When Docker starts, it creates a port mapping, which maps the Docker internal port 8887 to the host port 8887. You can then visit the HMI web service in your host machine browser:
 
-Open the Chrome browser and start the Apollo HMI by going to **192.168.10.6:8887**.
+Open the Chrome browser and start the Apollo HMI by going to **localhost:8887**.
  ![](images/hmi_setup_profile.png)
 You'll be required to setup profile before doing anything else. Click the
 dropdown menu to select your HDMap and vehicle in use. The list are defined in
@@ -26,24 +26,19 @@ remember to click "Reset All" on the top-right corner to restart the system.*
 
  ![](images/start_hmi.png)
 
-## TODO(all): Apollo 1.0 functions.
+## (*New!*) Start Auto
 
-## (*New!*) Auto follow
+In Apollo 1.5, we released the new feature, auto following the traffic until destination.
 
-In Apollo 1.5, we released the new feature, auto following the traffic until
-destination.
-
-1. To make it work, firstly you need setup the system by clicking the "Setup"
+1. To make it work,  you need setup the system by clicking the "Setup"
    button on left panel.
 
  ![](images/hmi_setup_1.5.png)
 
-1. Make sure all modules are on and hardware is ready, and the vehicle is in a
-   good state which is safe to enter auto mode to follow the traffic until
-   destination.
+2. Make sure all modules are on and hardware is ready, and the vehicle is in a
 
-   Click the "Start Auto" button, then it will just drive you there!
+good state which is safe to enter auto mode to follow the traffic to destination.
+
+Click the "Start Auto" button, then it will drive you there!
 
  ![](images/hmi_start_auto_following.png)
-
-## TODO(all): Other parts behind
