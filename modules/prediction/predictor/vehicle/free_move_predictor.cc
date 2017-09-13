@@ -22,17 +22,17 @@
 #include <vector>
 #include "Eigen/Dense"
 
+#include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
-#include "modules/common/math/math_utils.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::math::KalmanFilter;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
+using apollo::common::math::KalmanFilter;
 
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
   trajectories_.clear();
@@ -60,29 +60,22 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   }
 
   std::vector<TrajectoryPoint> points(0);
-  DrawFreeMoveTrajectoryPoints(position, velocity, acc,
-                               obstacle->kf_motion_tracker(),
-                               FLAGS_prediction_duration,
-                               FLAGS_prediction_freq,
-                               &points);
+  DrawFreeMoveTrajectoryPoints(
+      position, velocity, acc, obstacle->kf_motion_tracker(),
+      FLAGS_prediction_duration, FLAGS_prediction_freq, &points);
 
   Trajectory trajectory = GenerateTrajectory(points);
   int start_index = 0;
   trajectories_.push_back(std::move(trajectory));
   SetEqualProbability(1.0, start_index);
-  ADEBUG << "Obstacle [" << obstacle->id()
-           << "] has " << trajectories_.size()
-           << " trajectories.";
+  ADEBUG << "Obstacle [" << obstacle->id() << "] has " << trajectories_.size()
+         << " trajectories.";
 }
 
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
-    const Eigen::Vector2d& position,
-    const Eigen::Vector2d& velocity,
-    const Eigen::Vector2d& acc,
-    const KalmanFilter<double, 6, 2, 0>& kf,
-    double total_time,
-    double freq,
-    std::vector<TrajectoryPoint> *points) {
+    const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
+    const Eigen::Vector2d& acc, const KalmanFilter<double, 6, 2, 0>& kf,
+    double total_time, double freq, std::vector<TrajectoryPoint>* points) {
   double theta = std::atan2(velocity(1), velocity(0));
 
   Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
@@ -90,10 +83,8 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   state(1, 0) = 0.0;
   state(2, 0) = velocity(0);
   state(3, 0) = velocity(1);
-  state(4, 0) = ::apollo::common::math::Clamp(
-      acc(0), FLAGS_min_acc, FLAGS_max_acc);
-  state(5, 0) = ::apollo::common::math::Clamp(
-      acc(1), FLAGS_min_acc, FLAGS_max_acc);
+  state(4, 0) = common::math::Clamp(acc(0), FLAGS_min_acc, FLAGS_max_acc);
+  state(5, 0) = common::math::Clamp(acc(1), FLAGS_min_acc, FLAGS_max_acc);
 
   Eigen::Matrix<double, 6, 6> transition(kf.GetTransitionMatrix());
   transition(0, 2) = freq;
@@ -124,7 +115,7 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     // update theta
     if (speed > std::numeric_limits<double>::epsilon()) {
       if (points->size() > 0) {
-        PathPoint *prev_point = points->back().mutable_path_point();
+        PathPoint* prev_point = points->back().mutable_path_point();
         theta = std::atan2(y - prev_point->y(), x - prev_point->x());
         prev_point->set_theta(theta);
       }
@@ -168,8 +159,8 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   }
 
   for (size_t i = 0; i < points->size(); ++i) {
-    apollo::prediction::util::TranslatePoint(
-        position[0], position[1], &(points->operator[](i)));
+    apollo::prediction::util::TranslatePoint(position[0], position[1],
+                                             &(points->operator[](i)));
   }
 }
 

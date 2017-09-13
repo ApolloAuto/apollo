@@ -26,8 +26,8 @@
 
 namespace apollo {
 namespace planning {
-using ::apollo::common::Status;
-using ::apollo::common::VehicleConfigHelper;
+using common::Status;
+using common::VehicleConfigHelper;
 
 TrafficDecider::TrafficDecider() : Task("TrafficDecider") {}
 

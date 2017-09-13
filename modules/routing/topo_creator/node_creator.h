@@ -28,20 +28,20 @@ namespace routing {
 
 class NodeCreator {
  public:
-  static void GetPbNode(const ::apollo::hdmap::Lane& lane,
+  static void GetPbNode(const hdmap::Lane& lane,
                         const std::string& road_id,
                         Node* pb_node, const RoutingConfig * routingconfig);
 
  private:
   static void AddOutBoundary(
-      const ::apollo::hdmap::LaneBoundary& bound, double lane_length,
+      const hdmap::LaneBoundary& bound, double lane_length,
       ::google::protobuf::RepeatedPtrField<CurveRange>* const out_range);
 
-  static void InitNodeInfo(const ::apollo::hdmap::Lane& lane,
+  static void InitNodeInfo(const hdmap::Lane& lane,
                            const std::string& road_id,
                            Node* const node,
                            const RoutingConfig * routingconfig);
-  static void InitNodeCost(const ::apollo::hdmap::Lane& lane, Node* const node,
+  static void InitNodeCost(const hdmap::Lane& lane, Node* const node,
                            const RoutingConfig * routingconfig);
 };
 

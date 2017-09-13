@@ -137,10 +137,10 @@ void LonController::LoadControlCalibrationTable(
 }
 
 Status LonController::ComputeControlCommand(
-    const ::apollo::localization::LocalizationEstimate *localization,
-    const ::apollo::canbus::Chassis *chassis,
-    const ::apollo::planning::ADCTrajectory *planning_published_trajectory,
-    ::apollo::control::ControlCommand *cmd) {
+    const localization::LocalizationEstimate *localization,
+    const canbus::Chassis *chassis,
+    const planning::ADCTrajectory *planning_published_trajectory,
+    control::ControlCommand *cmd) {
   localization_ = localization;
   chassis_ = chassis;
 
@@ -279,7 +279,7 @@ Status LonController::ComputeControlCommand(
   if (std::abs(VehicleState::instance()->linear_velocity()) <=
           FLAGS_max_abs_speed_when_stopped ||
       chassis->gear_location() == trajectory_message_->gear() ||
-      chassis->gear_location() == ::apollo::canbus::Chassis::GEAR_NEUTRAL) {
+      chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(trajectory_message_->gear());
   } else {
     cmd->set_gear_location(chassis->gear_location());

@@ -168,7 +168,7 @@ void LidarExChecker::OnPointCloud(const sensor_msgs::PointCloud2& message) {
   }
 }
 
-void LidarExChecker::OnGps(const ::apollo::localization::Gps& message) {
+void LidarExChecker::OnGps(const localization::Gps& message) {
   if (message.has_localization()) {
     const auto pose_msg = message.localization();
     Eigen::Quaterniond rotation(
@@ -195,8 +195,7 @@ void LidarExChecker::OnGps(const ::apollo::localization::Gps& message) {
   }
 }
 
-void LidarExChecker::OnInsStat(
-    const ::apollo::drivers::gnss::InsStat& message) {
+void LidarExChecker::OnInsStat(const drivers::gnss::InsStat& message) {
   position_type_ = message.pos_type();
 }
 

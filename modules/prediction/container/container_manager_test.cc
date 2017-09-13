@@ -18,41 +18,36 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/prediction/container/container_manager.h"
 #include "modules/common/util/file.h"
+#include "modules/prediction/container/container_manager.h"
 
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterConfig;
 
 class ContainerManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    manager_ = ContainerManager::instance();
-  }
+  virtual void SetUp() { manager_ = ContainerManager::instance(); }
 
  protected:
   ContainerManager *manager_;
-  ::apollo::common::adapter::AdapterManagerConfig conf_;
+  common::adapter::AdapterManagerConfig conf_;
 };
 
 TEST_F(ContainerManagerTest, GetContainer) {
   std::string conf_file = "modules/prediction/testdata/adapter_conf.pb.txt";
-  bool ret_load_conf = ::apollo::common::util::GetProtoFromFile(conf_file,
-                                                                &conf_);
+  bool ret_load_conf = common::util::GetProtoFromFile(conf_file, &conf_);
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(conf_.IsInitialized());
 
   manager_->Init(conf_);
-  EXPECT_TRUE(
-      manager_->GetContainer(AdapterConfig::PERCEPTION_OBSTACLES) != nullptr);
-  EXPECT_TRUE(
-      manager_->GetContainer(AdapterConfig::LOCALIZATION) != nullptr);
-  EXPECT_TRUE(
-      manager_->GetContainer(AdapterConfig::CONTROL_COMMAND) == nullptr);
+  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::PERCEPTION_OBSTACLES) !=
+              nullptr);
+  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::LOCALIZATION) != nullptr);
+  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::CONTROL_COMMAND) ==
+              nullptr);
 }
 
 }  // namespace prediction
 }  // namespace apollo
-

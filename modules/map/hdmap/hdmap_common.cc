@@ -192,7 +192,7 @@ double LaneInfo::Heading(const double s) const {
   if (index == 0 || *iter - s <= common::math::kMathEpsilon) {
     return headings_[index];
   } else {
-    return ::apollo::common::math::slerp(
+    return common::math::slerp(
         headings_[index - 1], accumulated_s_[index - 1], headings_[index],
         accumulated_s_[index], s);
     // return headings_[index - 1];

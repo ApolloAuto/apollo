@@ -61,7 +61,7 @@ class CanReceiver {
    * @param enable_log If log the essential information during running.
    * @return An error code indicating the status of this initialization.
    */
-  ::apollo::common::ErrorCode Init(CanClient *can_client,
+  common::ErrorCode Init(CanClient *can_client,
                                    MessageManager *pt_manager, bool enable_log);
 
   /**
@@ -75,7 +75,7 @@ class CanReceiver {
    * @brief Start the CAN receiver.
    * @return The error code indicating the status of this action.
    */
-  ::apollo::common::ErrorCode Start();
+  common::ErrorCode Start();
 
   /**
    * @brief Stop the CAN receiver.

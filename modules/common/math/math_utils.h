@@ -176,4 +176,4 @@ double Sigmoid(const double x);
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_UTILS_H_ */
+#endif  // MODULES_COMMON_MATH_UTILS_H_

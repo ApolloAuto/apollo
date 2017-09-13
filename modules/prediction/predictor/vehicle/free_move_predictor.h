@@ -24,8 +24,9 @@
 
 #include <vector>
 
-#include "modules/prediction/predictor/predictor.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
 namespace prediction {
@@ -59,13 +60,10 @@ class FreeMovePredictor : public Predictor {
    * @param Generated trajectory points
    */
   void DrawFreeMoveTrajectoryPoints(
-      const Eigen::Vector2d& position,
-      const Eigen::Vector2d& velocity,
+      const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
       const Eigen::Vector2d& acc,
-      const ::apollo::common::math::KalmanFilter<double, 6, 2, 0>& kf,
-      double total_time,
-      double freq,
-      std::vector<::apollo::common::TrajectoryPoint> *points);
+      const common::math::KalmanFilter<double, 6, 2, 0>& kf, double total_time,
+      double freq, std::vector<common::TrajectoryPoint>* points);
 };
 
 }  // namespace prediction

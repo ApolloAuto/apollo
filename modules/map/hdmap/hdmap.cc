@@ -92,7 +92,7 @@ int HDMap::GetRoads(const apollo::common::PointENU& point, double distance,
   return impl_.GetRoads(point, distance, roads);
 }
 
-int HDMap::GetNearestLane(const ::apollo::common::PointENU& point,
+int HDMap::GetNearestLane(const common::PointENU& point,
                           LaneInfoConstPtr* nearest_lane,
                           double* nearest_s, double* nearest_l) const {
   return impl_.GetNearestLane(point, nearest_lane, nearest_s, nearest_l);

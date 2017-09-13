@@ -46,13 +46,13 @@ namespace math {
  */
 template <typename T>
 T lerp(const T& x0, const double t0, const T& x1, const double t1,
-            const double t) {
+       const double t) {
   if (std::abs(t1 - t0) <= 1.0e-6) {
     AERROR << "input time difference is too small";
     return x0;
   }
-  double r = (t - t0) / (t1 - t0);
-  T x = x0 + r * (x1 - x0);
+  const double r = (t - t0) / (t1 - t0);
+  const T x = x0 + r * (x1 - x0);
   return x;
 }
 
@@ -74,4 +74,4 @@ double slerp(const double a0, const double t0, const double a1, const double t1,
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_ */
+#endif  // MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_

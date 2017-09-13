@@ -33,8 +33,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::common::ErrorCode;
-using ::apollo::control::ControlCommand;
+using common::ErrorCode;
+using control::ControlCommand;
 
 namespace {
 
@@ -624,8 +624,8 @@ void LincolnController::SecurityDogThreadFunc() {
 
   std::chrono::duration<double, std::micro> default_period{50000};
   int64_t start =
-      ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-          ::apollo::common::time::Clock::Now());
+      common::time::AsInt64<common::time::micros>(
+          common::time::Clock::Now());
 
   int32_t speed_ctrl_fail = 0;
   int32_t steer_ctrl_fail = 0;
@@ -668,8 +668,8 @@ void LincolnController::SecurityDogThreadFunc() {
       Emergency();
     }
     int64_t end =
-        ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-            ::apollo::common::time::Clock::Now());
+        common::time::AsInt64<common::time::micros>(
+            common::time::Clock::Now());
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);

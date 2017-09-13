@@ -38,11 +38,11 @@ DEFINE_double(steer_inc_delta, 2.0, "steer delta percentage");
 
 namespace {
 
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::time::Clock;
-using ::apollo::control::ControlCommand;
-using ::apollo::canbus::Chassis;
-using ::apollo::control::PadMessage;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::time::Clock;
+using apollo::control::ControlCommand;
+using apollo::canbus::Chassis;
+using apollo::control::PadMessage;
 
 const uint32_t KEYCODE_O = 0x4F;  // '0'
 

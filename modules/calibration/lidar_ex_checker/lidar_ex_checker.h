@@ -61,9 +61,9 @@ class LidarExChecker : public apollo::common::ApolloApp {
   // Upon receiving point cloud data
   void OnPointCloud(const sensor_msgs::PointCloud2& message);
   // Upon receiving GPS data
-  void OnGps(const ::apollo::localization::Gps& message);
+  void OnGps(const localization::Gps& message);
   // Upon receiving INS status data
-  void OnInsStat(const ::apollo::drivers::gnss::InsStat& msg);
+  void OnInsStat(const drivers::gnss::InsStat& msg);
 
   bool is_first_gps_msg_;
 

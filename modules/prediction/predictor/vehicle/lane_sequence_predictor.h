@@ -109,11 +109,11 @@ class LaneSequencePredictor : public Predictor {
    * @param A vector of generated trajectory points
    */
   void DrawLaneSequenceTrajectoryPoints(
-      const ::apollo::common::math::KalmanFilter<double, 4, 2, 0>& kf,
+      const common::math::KalmanFilter<double, 4, 2, 0>& kf,
       const LaneSequence& sequence,
       double total_time,
       double freq,
-      std::vector<::apollo::common::TrajectoryPoint> *points);
+      std::vector<common::TrajectoryPoint> *points);
 
   /**
    * @brief Convert a lane sequence to string

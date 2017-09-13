@@ -27,7 +27,7 @@
 namespace apollo {
 namespace canbus {
 
-using ::apollo::common::ErrorCode;
+using common::ErrorCode;
 
 ErrorCode CanReceiver::Init(CanClient *can_client, MessageManager *pt_manager,
                             bool enable_log) {

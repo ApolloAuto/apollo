@@ -55,13 +55,13 @@ class Prediction : public apollo::common::ApolloApp {
    * @brief Initialize the node
    * @return Status of the initialization
    */
-  ::apollo::common::Status Init() override;
+  common::Status Init() override;
 
   /**
    * @brief Start the node
    * @return Status of the starting process
    */
-  ::apollo::common::Status Start() override;
+  common::Status Start() override;
 
   /**
    * @brief Stop the node
@@ -69,7 +69,7 @@ class Prediction : public apollo::common::ApolloApp {
   void Stop() override;
 
  private:
-  ::apollo::common::Status OnError(const std::string& error_msg);
+  common::Status OnError(const std::string& error_msg);
 
   void OnLocalization(
       const localization::LocalizationEstimate &localization);
@@ -79,7 +79,7 @@ class Prediction : public apollo::common::ApolloApp {
 
  private:
   PredictionConf prediction_conf_;
-  ::apollo::common::adapter::AdapterManagerConfig adapter_conf_;
+  common::adapter::AdapterManagerConfig adapter_conf_;
 };
 
 }  // namespace prediction

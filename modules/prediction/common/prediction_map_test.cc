@@ -22,15 +22,13 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::hdmap::Id;
-using ::apollo::hdmap::LaneInfo;
-using ::apollo::hdmap::MapPathPoint;
+using apollo::hdmap::Id;
+using apollo::hdmap::LaneInfo;
+using apollo::hdmap::MapPathPoint;
 
 class PredictionMapTest : public KMLMapBasedTest {
  public:
-  void SetUp() override {
-    map_ = PredictionMap::instance();
-  }
+  void SetUp() override { map_ = PredictionMap::instance(); }
 
  protected:
   PredictionMap *map_;
@@ -141,7 +139,7 @@ TEST_F(PredictionMapTest, on_lane) {
 
 TEST_F(PredictionMapTest, get_path_heading) {
   std::shared_ptr<const LaneInfo> lane_info = map_->LaneById("l20");
-  ::apollo::common::PointENU point;
+  common::PointENU point;
   point.set_x(124.85931);
   point.set_y(347.52733);
   EXPECT_DOUBLE_EQ(-0.066973788088279029, map_->PathHeading(lane_info, point));
@@ -169,24 +167,24 @@ TEST_F(PredictionMapTest, get_nearby_lanes_by_current_lanes) {
   Eigen::Vector2d point(124.85931, 348.52733);
   double radius = 6.0;
   double theta = -0.061427808505166936;
-  map_->NearbyLanesByCurrentLanes(
-      point, theta, radius, curr_lanes, &nearby_lanes);
+  map_->NearbyLanesByCurrentLanes(point, theta, radius, curr_lanes,
+                                  &nearby_lanes);
   EXPECT_EQ(1, nearby_lanes.size());
   EXPECT_EQ("l21", nearby_lanes[0]->id().id());
 
   // small radius
   nearby_lanes.clear();
   radius = 0.5;
-  map_->NearbyLanesByCurrentLanes(
-      point, theta, radius, curr_lanes, &nearby_lanes);
+  map_->NearbyLanesByCurrentLanes(point, theta, radius, curr_lanes,
+                                  &nearby_lanes);
   EXPECT_EQ(0, nearby_lanes.size());
 
   // without current lanes
   curr_lanes.clear();
   nearby_lanes.clear();
   radius = 5.0;
-  map_->NearbyLanesByCurrentLanes(
-      point, theta, radius, curr_lanes, &nearby_lanes);
+  map_->NearbyLanesByCurrentLanes(point, theta, radius, curr_lanes,
+                                  &nearby_lanes);
   EXPECT_EQ(2, nearby_lanes.size());
   EXPECT_EQ("l21", nearby_lanes[0]->id().id());
   EXPECT_EQ("l20", nearby_lanes[1]->id().id());

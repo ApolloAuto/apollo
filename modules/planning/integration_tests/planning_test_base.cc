@@ -131,18 +131,18 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   TrimPlanning(&adc_trajectory_);
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
-    ::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_,
+    common::util::SetProtoToASCIIFile(adc_trajectory_,
                                                 full_golden_path);
   } else {
     ADCTrajectory golden_result;
-    bool load_success = ::apollo::common::util::GetProtoFromASCIIFile(
+    bool load_success = common::util::GetProtoFromASCIIFile(
         full_golden_path, &golden_result);
     TrimPlanning(&golden_result);
     if (!load_success ||
-        !::apollo::common::util::IsProtoEqual(golden_result, adc_trajectory_)) {
+        !common::util::IsProtoEqual(golden_result, adc_trajectory_)) {
       char tmp_fname[100] = "/tmp/XXXXXX";
       int fd = mkstemp(tmp_fname);
-      if (!::apollo::common::util::SetProtoToASCIIFile(adc_trajectory_, fd)) {
+      if (!common::util::SetProtoToASCIIFile(adc_trajectory_, fd)) {
         AERROR << "Failed to write to file " << tmp_fname;
       }
       AERROR << "found\ndiff " << tmp_fname << " " << full_golden_path;

@@ -24,8 +24,8 @@
 namespace apollo {
 namespace routing {
 
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::monitor::MonitorMessageItem;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::ErrorCode;
 
 std::string Routing::Name() const { return FLAGS_node_name; }
@@ -37,8 +37,7 @@ apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
   AINFO << "Use routing topology graph path: " << routing_map_file;
   navigator_ptr_.reset(new Navigator(routing_map_file));
-  CHECK(::apollo::common::util::GetProtoFromFile(FLAGS_routing_conf_file,
-                                                 &routing_conf_))
+  CHECK(common::util::GetProtoFromFile(FLAGS_routing_conf_file, &routing_conf_))
       << "Unable to load control conf file: " + FLAGS_routing_conf_file;
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
@@ -64,7 +63,7 @@ apollo::common::Status Routing::Start() {
 void Routing::OnRouting_Request(
     const apollo::routing::RoutingRequest &routing_request) {
   AINFO << "Get new routing request!!!";
-  ::apollo::routing::RoutingResponse routing_response;
+  routing::RoutingResponse routing_response;
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
   if (!navigator_ptr_->SearchRoute(routing_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";

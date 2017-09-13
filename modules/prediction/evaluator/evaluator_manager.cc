@@ -17,20 +17,18 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
 #include "modules/common/log.h"
-#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 
 namespace apollo {
 namespace prediction {
 
-using ::apollo::perception::PerceptionObstacles;
-using ::apollo::perception::PerceptionObstacle;
-using ::apollo::common::adapter::AdapterConfig;
+using apollo::perception::PerceptionObstacles;
+using apollo::perception::PerceptionObstacle;
+using apollo::common::adapter::AdapterConfig;
 
-EvaluatorManager::EvaluatorManager() {
-  RegisterEvaluators();
-}
+EvaluatorManager::EvaluatorManager() { RegisterEvaluators(); }
 
 void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::MLP_EVALUATOR);
@@ -39,8 +37,7 @@ void EvaluatorManager::RegisterEvaluators() {
 void EvaluatorManager::Init(const PredictionConf& config) {
   for (const auto& obstacle_conf : config.obstacle_conf()) {
     if (!obstacle_conf.has_obstacle_type()) {
-      ADEBUG << "Obstacle config ["
-             << obstacle_conf.ShortDebugString()
+      ADEBUG << "Obstacle config [" << obstacle_conf.ShortDebugString()
              << "] has not defined obstacle type, status or evaluator type.";
       continue;
     }
@@ -69,15 +66,15 @@ Evaluator* EvaluatorManager::GetEvaluator(
 }
 
 void EvaluatorManager::Run(
-    const ::apollo::perception::PerceptionObstacles& perception_obstacles) {
-  ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
+    const perception::PerceptionObstacles& perception_obstacles) {
+  ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
-      AdapterConfig::PERCEPTION_OBSTACLES));
+          AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(container);
 
-  Evaluator *evaluator = nullptr;
+  Evaluator* evaluator = nullptr;
   for (const auto& perception_obstacle :
-      perception_obstacles.perception_obstacle()) {
+       perception_obstacles.perception_obstacle()) {
     int id = perception_obstacle.id();
     Obstacle* obstacle = container->GetObstacle(id);
 
@@ -115,9 +112,7 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
       evaluator_ptr.reset(new MLPEvaluator());
       break;
     }
-    default: {
-      break;
-    }
+    default: { break; }
   }
   return evaluator_ptr;
 }

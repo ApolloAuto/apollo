@@ -129,7 +129,7 @@ class LatController : public Controller {
   void CloseLogFile();
 
   // vehicle parameter
-  ::apollo::common::VehicleParam vehicle_param_;
+  common::VehicleParam vehicle_param_;
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;

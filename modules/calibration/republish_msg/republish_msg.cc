@@ -46,11 +46,11 @@ Status RepublishMsg::Init() {
   return Status::OK();
 }
 
-void RepublishMsg::OnInsStat(const ::apollo::drivers::gnss::InsStat& msg) {
+void RepublishMsg::OnInsStat(const drivers::gnss::InsStat& msg) {
   position_type_ = msg.pos_type();
 }
 
-void RepublishMsg::OnGps(const ::apollo::localization::Gps& msg) {
+void RepublishMsg::OnGps(const localization::Gps& msg) {
   if (msg.has_localization()) {
     const auto pose_msg = msg.localization();
 
@@ -71,7 +71,7 @@ void RepublishMsg::OnGps(const ::apollo::localization::Gps& msg) {
     Eigen::Quaterniond pub_rot(pub_pose.rotation());
     Eigen::Translation3d pub_trans(pub_pose.translation());
 
-    ::apollo::calibration::republish_msg::RelativeOdometry pub_msg;
+    calibration::republish_msg::RelativeOdometry pub_msg;
     pub_msg.mutable_header()->set_timestamp_sec(msg.header().timestamp_sec());
     pub_msg.mutable_orientation()->set_qw(pub_rot.w());
     pub_msg.mutable_orientation()->set_qx(pub_rot.x());

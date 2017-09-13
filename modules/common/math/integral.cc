@@ -51,8 +51,8 @@ double IntegrateByTrapezoidal(const std::vector<double>& func, const double dx,
 double IntegrateByGaussLegendre(const std::function<double(double)>& func,
                                 const double lower_bound,
                                 const double upper_bound) {
-  double t = (upper_bound - lower_bound) * 0.5;
-  double m = (upper_bound + lower_bound) * 0.5;
+  const double t = (upper_bound - lower_bound) * 0.5;
+  const double m = (upper_bound + lower_bound) * 0.5;
 
   std::array<double, 5> w;
   w[0] = 0.5688888889;

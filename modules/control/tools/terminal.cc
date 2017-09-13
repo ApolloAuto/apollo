@@ -30,8 +30,12 @@
 
 namespace {
 
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::time::Clock;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::time::AsInt64;
+using apollo::common::time::Clock;
+using apollo::control::DrivingAction;
+using apollo::control::PadMessage;
+using apollo::canbus::Chassis;
 
 const int ROS_QUEUE_SIZE = 1;
 const int RESET_COMMAND = 1;
@@ -50,12 +54,12 @@ void help() {
 }
 
 void send(int cmd_type) {
-  ::apollo::control::PadMessage pad;
+  PadMessage pad;
   if (cmd_type == RESET_COMMAND) {
-    pad.set_action(apollo::control::DrivingAction::RESET);
+    pad.set_action(DrivingAction::RESET);
     AINFO << "sending reset action command.";
   } else if (cmd_type == AUTO_DRIVE_COMMAND) {
-    pad.set_action(apollo::control::DrivingAction::START);
+    pad.set_action(DrivingAction::START);
     AINFO << "sending start action command.";
   }
   AdapterManager::FillPadHeader("terminal", &pad);
@@ -63,26 +67,23 @@ void send(int cmd_type) {
   AINFO << "send pad_message OK";
 }
 
-void on_chassis(const apollo::canbus::Chassis &chassis) {
+void on_chassis(const Chassis &chassis) {
   static bool is_first_emergency_mode = true;
   static int64_t count_start = 0;
   static bool waiting_reset = false;
 
   // check if chassis enter security mode, if enter, after 10s should reset to
   // manual
-  if (chassis.driving_mode() == apollo::canbus::Chassis::EMERGENCY_MODE) {
+  if (chassis.driving_mode() == Chassis::EMERGENCY_MODE) {
     if (is_first_emergency_mode == true) {
-      count_start = apollo::common::time::AsInt64<std::chrono::microseconds>(
-          Clock::Now());
+      count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
       is_first_emergency_mode = false;
       AINFO << "detect emergency mode.";
     } else {
-      int64_t diff = apollo::common::time::AsInt64<std::chrono::microseconds>(
-                         Clock::Now()) -
-                     count_start;
+      int64_t diff =
+          AsInt64<std::chrono::microseconds>(Clock::Now()) - count_start;
       if (diff > EMERGENCY_MODE_HOLD_TIME) {
-        count_start = apollo::common::time::AsInt64<std::chrono::microseconds>(
-            Clock::Now());
+        count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
         waiting_reset = true;
         // send a reset command to control
         send(RESET_COMMAND);
@@ -91,8 +92,7 @@ void on_chassis(const apollo::canbus::Chassis &chassis) {
         // nothing to do
       }
     }
-  } else if (chassis.driving_mode() ==
-             apollo::canbus::Chassis::COMPLETE_MANUAL) {
+  } else if (chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
     if (waiting_reset) {
       is_first_emergency_mode = true;
       waiting_reset = false;
@@ -125,7 +125,7 @@ void terminal_thread_func() {
   }
 }
 
-}  // end of namespace
+}  // namespace
 
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
@@ -134,26 +134,30 @@ int main(int argc, char **argv) {
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
+  using apollo::common::adapter::AdapterManagerConfig;
+  using apollo::common::adapter::AdapterManager;
+  using apollo::common::adapter::AdapterConfig;
+
   ros::init(argc, argv, "terminal");
 
-  apollo::common::adapter::AdapterManagerConfig config;
+  AdapterManagerConfig config;
   config.set_is_ros(true);
   {
     auto *sub_config = config.add_config();
-    sub_config->set_mode(apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
-    sub_config->set_type(apollo::common::adapter::AdapterConfig::PAD);
+    sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
+    sub_config->set_type(AdapterConfig::PAD);
   }
 
   {
     auto *sub_config = config.add_config();
-    sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
-    sub_config->set_type(apollo::common::adapter::AdapterConfig::CHASSIS);
+    sub_config->set_mode(AdapterConfig::RECEIVE_ONLY);
+    sub_config->set_type(AdapterConfig::CHASSIS);
   }
 
   {
     auto *sub_config = config.add_config();
-    sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
-    sub_config->set_type(apollo::common::adapter::AdapterConfig::LOCALIZATION);
+    sub_config->set_mode(AdapterConfig::RECEIVE_ONLY);
+    sub_config->set_type(AdapterConfig::LOCALIZATION);
   }
 
   AdapterManager::Init(config);
