@@ -17,14 +17,14 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_GRAPH_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_GRAPH_UTIL_H_
 
-#include<vector>
+#include <vector>
 
 namespace apollo {
 namespace perception {
 
-/*bfs based component analysis*/
+// bfs based component analysis
 void ConnectedComponentAnalysis(const std::vector<std::vector<int> >& graph,
-  std::vector<std::vector<int> >* components);
+                                std::vector<std::vector<int> >* components);
 
 }  // namespace perception
 }  // namespace apollo

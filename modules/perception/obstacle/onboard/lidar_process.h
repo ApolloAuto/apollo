@@ -19,8 +19,12 @@
 
 #include <memory>
 #include <vector>
+
 #include "Eigen/Core"
 #include "gtest/gtest_prod.h"
+#include "sensor_msgs/PointCloud2.h"
+
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -28,11 +32,9 @@
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
-#include "modules/perception/obstacle/onboard/hdmap_input.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "sensor_msgs/PointCloud2.h"
-#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
+#include "modules/perception/obstacle/onboard/hdmap_input.h"
 
 namespace apollo {
 namespace perception {
@@ -43,23 +45,17 @@ class LidarProcess {
   ~LidarProcess() = default;
 
   bool Init();
-  bool IsInit() {
-    return inited_;
-  }
+  bool IsInit() { return inited_; }
   bool Process(const sensor_msgs::PointCloud2& message);
 
-  bool Process(double timestamp, pcl_util::PointCloudPtr cloud,
+  bool Process(const double timestamp, pcl_util::PointCloudPtr cloud,
                std::shared_ptr<Eigen::Matrix4d> velodyne_trans);
 
   bool GeneratePbMsg(PerceptionObstacles* obstacles);
 
-  std::vector<ObjectPtr> GetObjects() {
-    return objects_;
-  }
+  std::vector<ObjectPtr> GetObjects() { return objects_; }
 
-  pcl_util::PointIndicesPtr GetROIIndices() {
-    return roi_indices_;
-  }
+  pcl_util::PointIndicesPtr GetROIIndices() { return roi_indices_; }
 
  private:
   void RegistAllAlgorithm();
@@ -72,7 +68,7 @@ class LidarProcess {
 
   bool inited_ = false;
   double timestamp_;
-  apollo::common::ErrorCode error_code_ = apollo::common::OK;
+  common::ErrorCode error_code_ = common::OK;
   std::vector<ObjectPtr> objects_;
   HDMapInput* hdmap_input_ = NULL;
   std::unique_ptr<BaseROIFilter> roi_filter_;

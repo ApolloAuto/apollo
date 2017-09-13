@@ -17,18 +17,16 @@
 #ifndef ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
 #define ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace apollo {
 namespace perception {
 
-void GetFileNamesInFolderById(
-  const std::string& folder,
-  const std::string& ext,
-  std::vector<std::string>* ret);
+void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
+                              std::vector<std::string>* ret);
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // namespace ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
+#endif  // ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H

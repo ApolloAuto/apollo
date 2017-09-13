@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/common/pose_util.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {

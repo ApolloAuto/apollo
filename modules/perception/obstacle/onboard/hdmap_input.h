@@ -17,10 +17,10 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
 #define MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
 
-#include <mutex>
 #include <memory>
-#include <vector>
+#include <mutex>
 #include <string>
+#include <vector>
 
 #include "gtest/gtest_prod.h"
 
@@ -47,12 +47,12 @@ class HDMapInput {
                                Eigen::Vector3d* lane_direction);
 
  private:
-  void DownSampleBoundary(const apollo::hdmap::LineSegment& line,
+  void DownSampleBoundary(const hdmap::LineSegment& line,
                           PolygonDType* out_boundary_line) const;
 
   int MergeBoundaryJunction(
-      const std::vector<apollo::hdmap::RoadROIBoundaryPtr>& boundaries,
-      const std::vector<apollo::hdmap::JunctionBoundaryPtr>& junctions,
+      const std::vector<hdmap::RoadROIBoundaryPtr>& boundaries,
+      const std::vector<hdmap::JunctionBoundaryPtr>& junctions,
       HdmapStructPtr* mapptr);
 
   std::mutex mutex_;  // multi-thread init safe.

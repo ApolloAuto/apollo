@@ -14,15 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <boost/filesystem.hpp>
-#include <algorithm>
 #include "modules/perception/obstacle/common/file_system_util.h"
+
+#include <algorithm>
+
+#include <boost/filesystem.hpp>
 
 namespace apollo {
 namespace perception {
 
-void GetFileNamesInFolderById(const std::string& folder,
-  const std::string& ext, std::vector<std::string>* ret) {
+void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
+                              std::vector<std::string>* ret) {
   std::vector<int> ret_id;
   ret->clear();
   namespace fs = boost::filesystem;
@@ -37,8 +39,9 @@ void GetFileNamesInFolderById(const std::string& folder,
     if (fs::is_regular_file(*it) && it->path().extension() == ext) {
       std::string temp_path = it->path().filename().string();
       ret->push_back(temp_path);
-      std::string temp_id_str = temp_path.substr(temp_path.rfind('_')+1,
-        temp_path.rfind('.')-temp_path.rfind('_')-1);
+      std::string temp_id_str =
+          temp_path.substr(temp_path.rfind('_') + 1,
+                           temp_path.rfind('.') - temp_path.rfind('_') - 1);
       int temp_id = std::atoi(temp_id_str.c_str());
       ret_id.push_back(temp_id);
     }

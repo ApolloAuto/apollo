@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_H_
 #define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_H_
 
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "Eigen/Core"
+
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/types.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
