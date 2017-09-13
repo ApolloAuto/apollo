@@ -83,6 +83,25 @@ SensorMessageManager<DelphiESR>::SensorMessageManager() {
 }
 
 template <>
+SensorProtocolData<DelphiESR>
+    *SensorMessageManager<DelphiESR>::GetMutableSensorProtocolDataById(
+        const uint32_t message_id) {
+  uint32_t converted_message_id = message_id;
+  if (message_id >= 0x500 && message_id <= 0x539) {
+    // repeated obstacle info
+    converted_message_id = 0x500;
+  }
+
+  if (sensor_protocol_data_map_.find(converted_message_id) ==
+      sensor_protocol_data_map_.end()) {
+    ADEBUG << "Unable to get protocol data because of invalid message_id:"
+           << message_id;
+    return nullptr;
+  }
+  return sensor_protocol_data_map_[converted_message_id];
+}
+
+template <>
 void SensorMessageManager<DelphiESR>::Parse(const uint32_t message_id,
                                             const uint8_t *data,
                                             int32_t length) {
