@@ -136,8 +136,8 @@
       </div>
       <div class="col-xs-4 quick_start_col2">
         <button type="button" class="btn hmi_large_btn" onclick="
-            io_request('ros_bridge_api', 'change_driving_mode', ['auto'])"
-            >Start Auto</button>
+            io_request('ros_bridge_api', 'change_driving_mode', ['auto']);
+            goto_dreamview();">Start Auto</button>
         <span class="glyphicon"></span>
       </div>
     </div>
