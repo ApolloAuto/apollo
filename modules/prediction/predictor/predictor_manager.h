@@ -62,7 +62,7 @@ class PredictorManager {
    * @param Perception obstacles
    */
   void Run(
-      const ::apollo::perception::PerceptionObstacles& perception_obstacles);
+      const perception::PerceptionObstacles& perception_obstacles);
 
   /**
    * @brief Get prediction obstacles

@@ -52,7 +52,7 @@ class TrajectoryCost {
   const common::VehicleParam vehicle_param_;
   SpeedData heuristic_speed_data_;
   uint32_t num_of_time_stamps_;
-  std::vector<std::vector<::apollo::common::math::Box2d>> obstacle_boxes_;
+  std::vector<std::vector<common::math::Box2d>> obstacle_boxes_;
   std::vector<double> obstacle_probabilities_;
 };
 

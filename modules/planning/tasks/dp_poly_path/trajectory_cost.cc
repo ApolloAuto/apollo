@@ -123,7 +123,7 @@ double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
 
     double one_minus_kappa_r_d = 1 - reference_point.kappa() * l;
     double delta_theta = std::atan2(dl, one_minus_kappa_r_d);
-    double theta = ::apollo::common::math::NormalizeAngle(
+    double theta = common::math::NormalizeAngle(
                                       delta_theta + reference_point.heading());
     Box2d ego_box = {ego_xy_point, theta, 
                      vehicle_param_.length(), vehicle_param_.width()};

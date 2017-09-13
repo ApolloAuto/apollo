@@ -36,9 +36,9 @@
 namespace apollo {
 namespace control {
 
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::Point3D;
-using ::apollo::common::VehicleState;
+using common::TrajectoryPoint;
+using common::Point3D;
+using common::VehicleState;
 using Matrix = Eigen::MatrixXd;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
@@ -400,7 +400,7 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
 
   // Reverse heading error if vehicle is going in reverse
   if (VehicleState::instance()->gear() ==
-      ::apollo::canbus::Chassis::GEAR_REVERSE) {
+      canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 
@@ -442,7 +442,7 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
 
   // Reverse heading error if vehicle is going in reverse
   if (VehicleState::instance()->gear() ==
-      ::apollo::canbus::Chassis::GEAR_REVERSE) {
+      canbus::Chassis::GEAR_REVERSE) {
     debug->set_heading_error(-debug->heading_error());
   }
 

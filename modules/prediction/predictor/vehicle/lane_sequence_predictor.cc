@@ -17,17 +17,17 @@
 #include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
 
 #include <cmath>
-#include <utility>
 #include <limits>
 #include <memory>
+#include <utility>
 
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/prediction/common/road_graph.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/common/road_graph.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -35,11 +35,11 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::math::KalmanFilter;
-using ::apollo::common::adapter::AdapterConfig;
-using ::apollo::hdmap::LaneInfo;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
+using apollo::common::math::KalmanFilter;
+using apollo::common::adapter::AdapterConfig;
+using apollo::hdmap::LaneInfo;
 
 void LaneSequencePredictor::Clear() {
   trajectories_.clear();
@@ -65,8 +65,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
-  FilterLaneSequences(feature.lane().lane_graph(),
-                      lane_id,
+  FilterLaneSequences(feature.lane().lane_graph(), lane_id,
                       &enable_lane_sequence);
 
   for (int i = 0; i < num_lane_sequence; ++i) {
@@ -78,35 +77,32 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 
     if (!enable_lane_sequence[i]) {
       ADEBUG << "Lane sequence [" << ToString(sequence)
-             << "] with probability ["
-             <<sequence.probability() << "] is disqualified.";
+             << "] with probability [" << sequence.probability()
+             << "] is disqualified.";
       continue;
     }
 
     ADEBUG << "Obstacle [" << obstacle->id()
-           << "] will draw a lane sequence trajectory ["
-           << ToString(sequence) << "] with probability ["
-           << sequence.probability() << "].";
+           << "] will draw a lane sequence trajectory [" << ToString(sequence)
+           << "] with probability [" << sequence.probability() << "].";
 
     std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
-    DrawLaneSequenceTrajectoryPoints(
-        obstacle->kf_lane_tracker(curr_lane_id), sequence,
-        FLAGS_prediction_duration, FLAGS_prediction_freq, &points);
+    DrawLaneSequenceTrajectoryPoints(obstacle->kf_lane_tracker(curr_lane_id),
+                                     sequence, FLAGS_prediction_duration,
+                                     FLAGS_prediction_freq, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
     trajectories_.push_back(std::move(trajectory));
   }
-  ADEBUG << "Obstacle [" << obstacle->id()
-         << "] has total " << trajectories_.size()
-         << " trajectories.";
+  ADEBUG << "Obstacle [" << obstacle->id() << "] has total "
+         << trajectories_.size() << " trajectories.";
 }
 
 void LaneSequencePredictor::FilterLaneSequences(
-    const LaneGraph& lane_graph,
-    const std::string& lane_id,
-    std::vector<bool> *enable_lane_sequence) {
+    const LaneGraph& lane_graph, const std::string& lane_id,
+    std::vector<bool>* enable_lane_sequence) {
   int num_lane_sequence = lane_graph.lane_sequence_size();
   std::vector<int> lane_change_type(num_lane_sequence, -1);
   std::pair<int, double> change(-1, -1.0);
@@ -123,14 +119,14 @@ void LaneSequencePredictor::FilterLaneSequences(
 
     double probability = sequence.probability();
 
-    if (::apollo::common::math::DoubleCompare(probability, all.second) > 0 ||
-        (::apollo::common::math::DoubleCompare(probability, all.second) == 0 &&
+    if (common::math::DoubleCompare(probability, all.second) > 0 ||
+        (common::math::DoubleCompare(probability, all.second) == 0 &&
          lane_change_type[i] == 0)) {
       all.first = i;
       all.second = probability;
     }
     if (lane_change_type[i] > 0 &&
-        ::apollo::common::math::DoubleCompare(probability, change.second) > 0) {
+        common::math::DoubleCompare(probability, change.second) > 0) {
       change.first = i;
       change.second = probability;
     }
@@ -140,19 +136,18 @@ void LaneSequencePredictor::FilterLaneSequences(
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
     // The obstacle has interference with ADC within a small distance
-    if (::apollo::common::math::DoubleCompare(
-        GetLaneChangeDistanceWithADC(sequence), FLAGS_lane_change_dist) < 0) {
+    if (common::math::DoubleCompare(GetLaneChangeDistanceWithADC(sequence),
+                                    FLAGS_lane_change_dist) < 0) {
       (*enable_lane_sequence)[i] = false;
       continue;
     }
 
     double probability = sequence.probability();
-    if (::apollo::common::math::DoubleCompare(
-        probability, FLAGS_lane_sequence_threshold) < 0 &&
+    if (common::math::DoubleCompare(probability,
+                                    FLAGS_lane_sequence_threshold) < 0 &&
         i != all.first) {
       (*enable_lane_sequence)[i] = false;
-    } else if (change.first >= 0 &&
-               change.first < num_lane_sequence &&
+    } else if (change.first >= 0 && change.first < num_lane_sequence &&
                lane_change_type[i] > 0 &&
                lane_change_type[i] != lane_change_type[change.first]) {
       (*enable_lane_sequence)[i] = false;
@@ -161,7 +156,7 @@ void LaneSequencePredictor::FilterLaneSequences(
 }
 
 void LaneSequencePredictor::GetADC() {
-  ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
+  ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
   if (container == nullptr) {
@@ -169,11 +164,10 @@ void LaneSequencePredictor::GetADC() {
     return;
   }
 
-  Obstacle *adc = container->GetObstacle(PoseContainer::ID);
+  Obstacle* adc = container->GetObstacle(PoseContainer::ID);
   if (adc != nullptr) {
     const Feature& feature = adc->latest_feature();
-    if (feature.has_lane() &&
-        feature.lane().has_lane_feature()) {
+    if (feature.has_lane() && feature.lane().has_lane_feature()) {
       adc_lane_id_ = feature.lane().lane_feature().lane_id();
       adc_lane_s_ = feature.lane().lane_feature().lane_s();
     }
@@ -185,19 +179,18 @@ void LaneSequencePredictor::GetADC() {
 }
 
 int LaneSequencePredictor::GetLaneChangeType(
-    const std::string& lane_id,
-    const LaneSequence& lane_sequence) {
-  PredictionMap *map = PredictionMap::instance();
+    const std::string& lane_id, const LaneSequence& lane_sequence) {
+  PredictionMap* map = PredictionMap::instance();
 
   std::string lane_change_id = lane_sequence.lane_segment(0).lane_id();
   if (lane_id == lane_change_id) {
     return 0;
   } else {
-    if (map->IsLeftNeighborLane(
-        map->LaneById(lane_change_id), map->LaneById(lane_id))) {
+    if (map->IsLeftNeighborLane(map->LaneById(lane_change_id),
+                                map->LaneById(lane_id))) {
       return 1;
-    } else if (map->IsRightNeighborLane(
-        map->LaneById(lane_change_id), map->LaneById(lane_id))) {
+    } else if (map->IsRightNeighborLane(map->LaneById(lane_change_id),
+                                        map->LaneById(lane_id))) {
       return 2;
     }
   }
@@ -210,7 +203,7 @@ double LaneSequencePredictor::GetLaneChangeDistanceWithADC(
     return std::numeric_limits<double>::max();
   }
 
-  PredictionMap *map = PredictionMap::instance();
+  PredictionMap* map = PredictionMap::instance();
   std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
   double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
 
@@ -220,46 +213,41 @@ double LaneSequencePredictor::GetLaneChangeDistanceWithADC(
 
   double lane_s = 0.0;
   double lane_l = 0.0;
-  if (map->GetProjection(adc_position_,
-                         map->LaneById(obstacle_lane_id),
+  if (map->GetProjection(adc_position_, map->LaneById(obstacle_lane_id),
                          &lane_s, &lane_l)) {
     return std::fabs(lane_s - obstacle_lane_s);
   }
   return std::numeric_limits<double>::max();
 }
 
-bool LaneSequencePredictor::SameLaneSequence(
-    const std::string& lane_id, double lane_s) {
-  PredictionMap *map = PredictionMap::instance();
+bool LaneSequencePredictor::SameLaneSequence(const std::string& lane_id,
+                                             double lane_s) {
+  PredictionMap* map = PredictionMap::instance();
 
   std::shared_ptr<const LaneInfo> obstacle_lane = map->LaneById(lane_id);
   std::shared_ptr<const LaneInfo> adc_lane = map->LaneById(adc_lane_id_);
 
   if (obstacle_lane != nullptr && adc_lane != nullptr) {
-    RoadGraph obstacle_road_graph(
-        lane_s, FLAGS_lane_change_dist, obstacle_lane);
+    RoadGraph obstacle_road_graph(lane_s, FLAGS_lane_change_dist,
+                                  obstacle_lane);
     LaneGraph obstacle_lane_graph;
     obstacle_road_graph.BuildLaneGraph(&obstacle_lane_graph);
 
-    RoadGraph adc_road_graph(
-        adc_lane_s_, FLAGS_lane_change_dist, adc_lane);
+    RoadGraph adc_road_graph(adc_lane_s_, FLAGS_lane_change_dist, adc_lane);
     LaneGraph adc_lane_graph;
     adc_road_graph.BuildLaneGraph(&adc_lane_graph);
 
     return obstacle_road_graph.IsOnLaneGraph(adc_lane, obstacle_lane_graph) ||
-        adc_road_graph.IsOnLaneGraph(obstacle_lane, adc_lane_graph);
+           adc_road_graph.IsOnLaneGraph(obstacle_lane, adc_lane_graph);
   }
 
   return false;
 }
 
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
-    const KalmanFilter<double, 4, 2, 0>& kf,
-    const LaneSequence& sequence,
-    double total_time,
-    double freq,
-    std::vector<TrajectoryPoint> *points) {
-  PredictionMap *map = PredictionMap::instance();
+    const KalmanFilter<double, 4, 2, 0>& kf, const LaneSequence& sequence,
+    double total_time, double freq, std::vector<TrajectoryPoint>* points) {
+  PredictionMap* map = PredictionMap::instance();
 
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
   double lane_s = state(0, 0);
@@ -279,17 +267,16 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     double theta = M_PI;
     if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
-             << "] with s [" << lane_s << "] and l [" << lane_l
-             << "]";
+             << "] with s [" << lane_s << "] and l [" << lane_l << "]";
       break;
     }
 
     if (points->size() > 0) {
-      PathPoint *prev_point = points->back().mutable_path_point();
+      PathPoint* prev_point = points->back().mutable_path_point();
       double x_diff = point.x() - prev_point->x();
       double y_diff = point.y() - prev_point->y();
-      if (::apollo::common::math::DoubleCompare(x_diff, 0.0) != 0 ||
-          ::apollo::common::math::DoubleCompare(y_diff, 0.0) != 0) {
+      if (common::math::DoubleCompare(x_diff, 0.0) != 0 ||
+          common::math::DoubleCompare(y_diff, 0.0) != 0) {
         theta = std::atan2(y_diff, x_diff);
         prev_point->set_theta(theta);
       } else {
@@ -298,13 +285,12 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     }
 
     // update state
-    if (::apollo::common::math::DoubleCompare(lane_speed, 0.0) <= 0) {
+    if (common::math::DoubleCompare(lane_speed, 0.0) <= 0) {
       ADEBUG << "Non-positive lane_speed tacked : " << lane_speed;
       lane_speed = 0.0;
       lane_acc = 0.0;
       transition(1, 1) = 1.0;
-    } else if (::apollo::common::math::DoubleCompare(
-        lane_speed, FLAGS_max_speed) >= 0) {
+    } else if (common::math::DoubleCompare(lane_speed, FLAGS_max_speed) >= 0) {
       lane_speed = FLAGS_max_speed;
       lane_acc = 0.0;
     }
@@ -326,7 +312,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     state(3, 0) = lane_acc;
 
     state = transition * state;
-    if (::apollo::common::math::DoubleCompare(lane_s, state(0, 0)) >= 0) {
+    if (common::math::DoubleCompare(lane_s, state(0, 0)) >= 0) {
       state(0, 0) = lane_s;
       state(1, 0) = lane_l;
       state(2, 0) = 0.0;

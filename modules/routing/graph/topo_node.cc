@@ -142,7 +142,7 @@ bool TopoNode::FindAnchorPoint() {
   return false;
 }
 
-void TopoNode::SetAnchorPoint(const ::apollo::common::PointENU& anchor_point) {
+void TopoNode::SetAnchorPoint(const common::PointENU& anchor_point) {
   anchor_point_ = anchor_point;
 }
 
@@ -158,11 +158,11 @@ const std::string& TopoNode::LaneId() const { return pb_node_.lane_id(); }
 
 const std::string& TopoNode::RoadId() const { return pb_node_.road_id(); }
 
-const ::apollo::hdmap::Curve& TopoNode::CentralCurve() const {
+const hdmap::Curve& TopoNode::CentralCurve() const {
   return pb_node_.central_curve();
 }
 
-const ::apollo::common::PointENU& TopoNode::AnchorPoint() const {
+const common::PointENU& TopoNode::AnchorPoint() const {
   return anchor_point_;
 }
 

@@ -31,8 +31,8 @@ namespace apollo {
 namespace canbus {
 namespace can {
 
-using Clock = ::apollo::common::time::Clock;
-using micros = ::apollo::common::time::micros;
+using Clock = common::time::Clock;
+using micros = common::time::micros;
 using apollo::common::ErrorCode;
 
 class FakeCanClientTest : public ::testing::Test {

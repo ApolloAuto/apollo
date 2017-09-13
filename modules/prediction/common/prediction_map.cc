@@ -173,8 +173,8 @@ void PredictionMap::NearbyLanesByCurrentLanes(
         double s = -1.0;
         double l = 0.0;
         GetProjection(point, nearby_lane, &s, &l);
-        if (::apollo::common::math::DoubleCompare(s, 0.0) >= 0 &&
-            ::apollo::common::math::DoubleCompare(std::fabs(l), radius) > 0) {
+        if (common::math::DoubleCompare(s, 0.0) >= 0 &&
+            common::math::DoubleCompare(std::fabs(l), radius) > 0) {
           continue;
         }
         lane_ids.insert(id);
@@ -189,8 +189,8 @@ void PredictionMap::NearbyLanesByCurrentLanes(
         double s = -1.0;
         double l = 0.0;
         GetProjection(point, nearby_lane, &s, &l);
-        if (::apollo::common::math::DoubleCompare(s, 0.0) >= 0 &&
-            ::apollo::common::math::DoubleCompare(std::fabs(l), radius) > 0) {
+        if (common::math::DoubleCompare(s, 0.0) >= 0 &&
+            common::math::DoubleCompare(std::fabs(l), radius) > 0) {
           continue;
         }
         lane_ids.insert(id);

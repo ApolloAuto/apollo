@@ -48,9 +48,9 @@ class TFBroadcaster {
   ros::Subscriber _odometry_sub;
   tf2_ros::TransformBroadcaster _broadcaster;
 
-  void gps_to_transform_stamped(const ::apollo::localization::Gps& gps, 
+  void gps_to_transform_stamped(const localization::Gps& gps, 
                              geometry_msgs::TransformStamped* transform);
-  void odometry_callback(const boost::shared_ptr<const ::apollo::localization::Gps>& gps);
+  void odometry_callback(const boost::shared_ptr<const localization::Gps>& gps);
 };
 
 }  // namespace gnss

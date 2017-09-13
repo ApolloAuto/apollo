@@ -72,10 +72,10 @@ class Controller {
    * @return Status computation status
    */
   virtual common::Status ComputeControlCommand(
-      const ::apollo::localization::LocalizationEstimate *localization,
-      const ::apollo::canbus::Chassis *chassis,
-      const ::apollo::planning::ADCTrajectory *trajectory,
-      ::apollo::control::ControlCommand *cmd) = 0;
+      const localization::LocalizationEstimate *localization,
+      const canbus::Chassis *chassis,
+      const planning::ADCTrajectory *trajectory,
+      control::ControlCommand *cmd) = 0;
 
   /**
    * @brief reset Controller

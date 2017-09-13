@@ -62,7 +62,7 @@ class TrajectoryPointCollector {
    * point and the previous point.
    * @param point The trajectory point to be added.
    */
-  void Collect(const ::apollo::common::TrajectoryPoint &point);
+  void Collect(const common::TrajectoryPoint &point);
 
  private:
   // Does not own the SimulationWorld instance. This is stored as the
@@ -71,7 +71,7 @@ class TrajectoryPointCollector {
 
   // Cache (copied) of the previously collected trajectory point. See
   // class documentation for the reason of caching it.
-  ::apollo::common::TrajectoryPoint previous_;
+  common::TrajectoryPoint previous_;
 
   // Indicates whether there has been any collected points.
   bool has_previous_ = false;

@@ -26,9 +26,9 @@ namespace canbus {
 
 namespace {
 
-using ::apollo::common::time::Clock;
-using ::apollo::common::ErrorCode;
-using micros = ::apollo::common::time::micros;
+using common::time::Clock;
+using common::ErrorCode;
+using micros = common::time::micros;
 
 const uint32_t kSenderInterval = 6000;
 
@@ -99,7 +99,7 @@ void CanSender::PowerSendThreadFunc() {
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
-    tm_start = ::apollo::common::time::AsInt64<micros>(Clock::Now());
+    tm_start = common::time::AsInt64<micros>(Clock::Now());
     new_delta_period = INIT_PERIOD;
 
     for (auto &message : send_messages_) {
@@ -121,7 +121,7 @@ void CanSender::PowerSendThreadFunc() {
       }
     }
     delta_period = new_delta_period;
-    tm_end = ::apollo::common::time::AsInt64<micros>(Clock::Now());
+    tm_end = common::time::AsInt64<micros>(Clock::Now());
     sleep_interval = delta_period - (tm_end - tm_start);
 
     if (sleep_interval > 0) {

@@ -121,17 +121,17 @@ Status SignalsXmlParser::ToPbSignalType(const std::string& xml_type,
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
 
   if (upper_str == "UNKNOWN") {
-    *signal_type = ::apollo::hdmap::Signal::UNKNOWN;
+    *signal_type = hdmap::Signal::UNKNOWN;
   } else if (upper_str == "MIX2HORIZONTAL") {
-    *signal_type = ::apollo::hdmap::Signal::MIX_2_HORIZONTAL;
+    *signal_type = hdmap::Signal::MIX_2_HORIZONTAL;
   } else if (upper_str == "MIX2VERTICAL") {
-    *signal_type = ::apollo::hdmap::Signal::MIX_2_VERTICAL;
+    *signal_type = hdmap::Signal::MIX_2_VERTICAL;
   } else if (upper_str == "MIX3HORIZONTAL") {
-    *signal_type = ::apollo::hdmap::Signal::MIX_3_HORIZONTAL;
+    *signal_type = hdmap::Signal::MIX_3_HORIZONTAL;
   } else if (upper_str == "MIX3VERTICAL") {
-    *signal_type = ::apollo::hdmap::Signal::MIX_3_VERTICAL;
+    *signal_type = hdmap::Signal::MIX_3_VERTICAL;
   } else if (upper_str == "SINGLE") {
-    *signal_type = ::apollo::hdmap::Signal::SINGLE;
+    *signal_type = hdmap::Signal::SINGLE;
   } else {
     std::string err_msg = "Error or unsupport signal layout type";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -147,21 +147,21 @@ Status SignalsXmlParser::ToPbSubSignalType(const std::string& xml_type,
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
 
   if (upper_str == "UNKNOWN") {
-    *sub_signal_type = ::apollo::hdmap::Subsignal::UNKNOWN;
+    *sub_signal_type = hdmap::Subsignal::UNKNOWN;
   } else if (upper_str == "CIRCLE") {
-    *sub_signal_type = ::apollo::hdmap::Subsignal::CIRCLE;
+    *sub_signal_type = hdmap::Subsignal::CIRCLE;
   } else if (upper_str == "ARROWLEFT") {
-    *sub_signal_type = ::apollo::hdmap::Subsignal::ARROW_LEFT;
+    *sub_signal_type = hdmap::Subsignal::ARROW_LEFT;
   } else if (upper_str == "ARROWFORWARD") {
-    *sub_signal_type = ::apollo::hdmap::Subsignal::ARROW_FORWARD;
+    *sub_signal_type = hdmap::Subsignal::ARROW_FORWARD;
   } else if (upper_str == "ARROWRIGHT") {
-    *sub_signal_type = ::apollo::hdmap::Subsignal::ARROW_RIGHT;
+    *sub_signal_type = hdmap::Subsignal::ARROW_RIGHT;
   } else if (upper_str == "ARROWLEFTANDFORWARD") {
-    *sub_signal_type = ::apollo::hdmap::Subsignal::ARROW_LEFT_AND_FORWARD;
+    *sub_signal_type = hdmap::Subsignal::ARROW_LEFT_AND_FORWARD;
   } else if (upper_str == "ARROWRIGHTANDFORWARD") {
-    *sub_signal_type = ::apollo::hdmap::Subsignal::ARROW_RIGHT_AND_FORWARD;
+    *sub_signal_type = hdmap::Subsignal::ARROW_RIGHT_AND_FORWARD;
   } else if (upper_str == "ARROWUTURN") {
-    *sub_signal_type = ::apollo::hdmap::Subsignal::ARROW_U_TURN;
+    *sub_signal_type = hdmap::Subsignal::ARROW_U_TURN;
   } else {
     std::string err_msg = "Error or unsupport sub signal type";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);

@@ -29,13 +29,11 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::Status;
+using apollo::common::Status;
 
 class RoadGraphTest : public KMLMapBasedTest {
  public:
-  virtual void SetUp() {
-    map_ = PredictionMap::instance();
-  }
+  virtual void SetUp() { map_ = PredictionMap::instance(); }
 
  protected:
   PredictionMap *map_;

@@ -15,47 +15,47 @@ limitations under the License.
 #ifndef MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_COMMON_DEFINE_H_
 #define MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_COMMON_DEFINE_H_
 
+#include <string>
 #include <unordered_set>
 #include <vector>
-#include <string>
-#include "modules/map/proto/map.pb.h"
 #include "modules/common/log.h"
+#include "modules/map/proto/map.pb.h"
 
 namespace apollo {
 namespace hdmap {
 namespace adapter {
 
-typedef ::apollo::hdmap::Header        PbHeader;
-typedef ::apollo::hdmap::Road          PbRoad;
-typedef ::apollo::hdmap::RoadSection   PbRoadSection;
-typedef ::apollo::hdmap::Lane          PbLane;
-typedef ::apollo::hdmap::Junction      PbJunction;
-typedef ::apollo::hdmap::Signal        PbSignal;
-typedef ::apollo::hdmap::Subsignal     PbSubSignal;
-typedef ::apollo::hdmap::Crosswalk     PbCrosswalk;
-typedef ::apollo::hdmap::SpeedBump     PbSpeedBump;
-typedef ::apollo::hdmap::StopSign      PbStopSign;
-typedef ::apollo::hdmap::YieldSign     PbYieldSign;
-typedef ::apollo::hdmap::ObjectOverlapInfo PbObjectOverlapInfo;
-typedef ::apollo::hdmap::Overlap       PbOverlap;
-typedef ::apollo::hdmap::ClearArea     PbClearArea;
-typedef ::apollo::hdmap::LineSegment   PbLineSegment;
-typedef ::apollo::hdmap::CurveSegment  PbCurveSegment;
-typedef ::apollo::hdmap::Curve         PbCurve;
-typedef ::apollo::common::PointENU         PbPoint3D;
-typedef ::apollo::hdmap::Lane_LaneType PbLaneType;
-typedef ::apollo::hdmap::Lane_LaneTurn PbTurnType;
-typedef ::apollo::hdmap::Id            PbID;
-typedef ::apollo::hdmap::LaneBoundary  PbLaneBoundary;
-typedef ::apollo::hdmap::LaneBoundaryType_Type PbLaneBoundaryTypeType;
-typedef ::apollo::hdmap::Polygon       PbPolygon;
-typedef ::apollo::hdmap::BoundaryPolygon PbBoundaryPolygon;
-typedef ::apollo::hdmap::BoundaryEdge  PbBoundaryEdge;
+using PbHeader = apollo::hdmap::Header;
+using PbRoad = apollo::hdmap::Road;
+using PbRoadSection = apollo::hdmap::RoadSection;
+using PbLane = apollo::hdmap::Lane;
+using PbJunction = apollo::hdmap::Junction;
+using PbSignal = apollo::hdmap::Signal;
+using PbSubSignal = apollo::hdmap::Subsignal;
+using PbCrosswalk = apollo::hdmap::Crosswalk;
+using PbSpeedBump = apollo::hdmap::SpeedBump;
+using PbStopSign = apollo::hdmap::StopSign;
+using PbYieldSign = apollo::hdmap::YieldSign;
+using PbObjectOverlapInfo = apollo::hdmap::ObjectOverlapInfo;
+using PbOverlap = apollo::hdmap::Overlap;
+using PbClearArea = apollo::hdmap::ClearArea;
+using PbLineSegment = apollo::hdmap::LineSegment;
+using PbCurveSegment = apollo::hdmap::CurveSegment;
+using PbCurve = apollo::hdmap::Curve;
+using PbPoint3D = apollo::common::PointENU;
+using PbLaneType = apollo::hdmap::Lane_LaneType;
+using PbTurnType = apollo::hdmap::Lane_LaneTurn;
+using PbID = apollo::hdmap::Id;
+using PbLaneBoundary = apollo::hdmap::LaneBoundary;
+using PbLaneBoundaryTypeType = apollo::hdmap::LaneBoundaryType_Type;
+using PbPolygon = apollo::hdmap::Polygon;
+using PbBoundaryPolygon = apollo::hdmap::BoundaryPolygon;
+using PbBoundaryEdge = apollo::hdmap::BoundaryEdge;
 
-typedef ::apollo::hdmap::Lane_LaneDirection PbLaneDirection;
-typedef ::apollo::hdmap::Signal_Type        PbSignalType;
-typedef ::apollo::hdmap::Subsignal_Type     PbSubSignalType;
-typedef ::apollo::hdmap::BoundaryEdge_Type  PbBoundaryEdgeType;
+using PbLaneDirection = apollo::hdmap::Lane_LaneDirection;
+using PbSignalType = apollo::hdmap::Signal_Type;
+using PbSubSignalType = apollo::hdmap::Subsignal_Type;
+using PbBoundaryEdgeType = apollo::hdmap::BoundaryEdge_Type;
 
 struct StopLineInternal {
   std::string id;
@@ -131,9 +131,7 @@ struct RoadInternal {
   std::vector<PbSpeedBump> speed_bumps;
   std::vector<StopLineInternal> stop_lines;
 
-  RoadInternal() : in_junction(false) {
-    junction_id = "";
-  }
+  RoadInternal() : in_junction(false) { junction_id = ""; }
 };
 
 }  // namespace adapter

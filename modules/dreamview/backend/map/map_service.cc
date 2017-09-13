@@ -24,20 +24,20 @@
 namespace apollo {
 namespace dreamview {
 
-using ::apollo::common::PointENU;
-using ::apollo::common::util::DownsampleByAngle;
-using ::apollo::hdmap::Map;
-using ::apollo::hdmap::Id;
-using ::apollo::hdmap::LaneInfoConstPtr;
-using ::apollo::hdmap::CrosswalkInfoConstPtr;
-using ::apollo::hdmap::JunctionInfoConstPtr;
-using ::apollo::hdmap::SignalInfoConstPtr;
-using ::apollo::hdmap::StopSignInfoConstPtr;
-using ::apollo::hdmap::YieldSignInfoConstPtr;
-using ::apollo::hdmap::Path;
-using ::apollo::hdmap::MapPathPoint;
-using ::apollo::routing::RoutingResponse;
-using ::apollo::routing::RoutingRequest;
+using apollo::common::PointENU;
+using apollo::common::util::DownsampleByAngle;
+using apollo::hdmap::Map;
+using apollo::hdmap::Id;
+using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::CrosswalkInfoConstPtr;
+using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::hdmap::SignalInfoConstPtr;
+using apollo::hdmap::StopSignInfoConstPtr;
+using apollo::hdmap::YieldSignInfoConstPtr;
+using apollo::hdmap::Path;
+using apollo::hdmap::MapPathPoint;
+using apollo::routing::RoutingResponse;
+using apollo::routing::RoutingRequest;
 
 namespace {
 

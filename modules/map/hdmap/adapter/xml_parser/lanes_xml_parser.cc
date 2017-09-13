@@ -98,11 +98,11 @@ Status LanesXmlParser::ToPbBoundaryType(const std::string& type,
   std::string upper_type = UtilXmlParser::ToUpper(type);
 
   if (upper_type == "LEFTBOUNDARY") {
-    *boundary_type = ::apollo::hdmap::BoundaryEdge::LEFT_BOUNDARY;
+    *boundary_type = hdmap::BoundaryEdge::LEFT_BOUNDARY;
   } else if (upper_type == "RIGHTBOUNDARY") {
-    *boundary_type = ::apollo::hdmap::BoundaryEdge::RIGHT_BOUNDARY;
+    *boundary_type = hdmap::BoundaryEdge::RIGHT_BOUNDARY;
   } else {
-    *boundary_type = ::apollo::hdmap::BoundaryEdge::NORMAL;
+    *boundary_type = hdmap::BoundaryEdge::NORMAL;
   }
 
   return Status::OK();
@@ -558,13 +558,13 @@ Status LanesXmlParser::ToPbLaneType(const std::string& type,
   std::string upper_str = UtilXmlParser::ToUpper(type);
 
   if (upper_str == "NONE") {
-    *lane_type = ::apollo::hdmap::Lane::NONE;
+    *lane_type = hdmap::Lane::NONE;
   } else if (upper_str == "DRIVING") {
-    *lane_type = ::apollo::hdmap::Lane::CITY_DRIVING;
+    *lane_type = hdmap::Lane::CITY_DRIVING;
   } else if (upper_str == "BIKING") {
-    *lane_type = ::apollo::hdmap::Lane::BIKING;
+    *lane_type = hdmap::Lane::BIKING;
   } else if (upper_str == "PARKING") {
-    *lane_type = ::apollo::hdmap::Lane::PARKING;
+    *lane_type = hdmap::Lane::PARKING;
   } else {
     std::string err_msg = "Error or unsupport lane type:" + type;
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -580,13 +580,13 @@ Status LanesXmlParser::ToPbTurnType(const std::string& type,
   std::string upper_str = UtilXmlParser::ToUpper(type);
 
   if (upper_str == "NOTURN") {
-    *pb_turn_type = ::apollo::hdmap::Lane::NO_TURN;
+    *pb_turn_type = hdmap::Lane::NO_TURN;
   } else if (upper_str == "LEFTTURN") {
-    *pb_turn_type = ::apollo::hdmap::Lane::LEFT_TURN;
+    *pb_turn_type = hdmap::Lane::LEFT_TURN;
   } else if (upper_str == "RIGHTTURN") {
-    *pb_turn_type = ::apollo::hdmap::Lane::RIGHT_TURN;
+    *pb_turn_type = hdmap::Lane::RIGHT_TURN;
   } else if (upper_str == "UTURN") {
-    *pb_turn_type = ::apollo::hdmap::Lane::U_TURN;
+    *pb_turn_type = hdmap::Lane::U_TURN;
   } else {
     std::string err_msg = "Error or unsupport turn type:" + type;
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -602,11 +602,11 @@ Status LanesXmlParser::ToPbDirection(const std::string& type,
   std::string upper_str = UtilXmlParser::ToUpper(type);
 
   if (upper_str == "FORWARD") {
-    *pb_direction = ::apollo::hdmap::Lane::FORWARD;
+    *pb_direction = hdmap::Lane::FORWARD;
   } else if (upper_str == "BACKWARD") {
-    *pb_direction = ::apollo::hdmap::Lane::BACKWARD;
+    *pb_direction = hdmap::Lane::BACKWARD;
   } else if (upper_str == "BIDIRECTION") {
-    *pb_direction = ::apollo::hdmap::Lane::BIDIRECTION;
+    *pb_direction = hdmap::Lane::BIDIRECTION;
   } else {
     std::string err_msg = "Error or unsupport dirction:" + type;
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -697,29 +697,29 @@ Status LanesXmlParser::ToPbLaneMarkType(const std::string& type,
   std::string upper_color = UtilXmlParser::ToUpper(color);
 
   if (upper_type == "CURB") {
-    *boundary_type = ::apollo::hdmap::LaneBoundaryType::CURB;
+    *boundary_type = hdmap::LaneBoundaryType::CURB;
     return Status::OK();
   }
 
   if (upper_type == "NONE") {
-    *boundary_type = ::apollo::hdmap::LaneBoundaryType::UNKNOWN;
+    *boundary_type = hdmap::LaneBoundaryType::UNKNOWN;
     return Status::OK();
   }
 
   if (upper_color == "YELLOW") {
     if (upper_type == "SOLID") {
-      *boundary_type = ::apollo::hdmap::LaneBoundaryType::SOLID_YELLOW;
+      *boundary_type = hdmap::LaneBoundaryType::SOLID_YELLOW;
     } else if (upper_type == "BROKEN") {
-      *boundary_type = ::apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW;
+      *boundary_type = hdmap::LaneBoundaryType::DOTTED_YELLOW;
     } else {
       std::string err_msg = "Error or unsupport lane boundary type";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
   } else if (upper_color == "WHITE") {
     if (upper_type == "SOLID") {
-      *boundary_type = ::apollo::hdmap::LaneBoundaryType::SOLID_WHITE;
+      *boundary_type = hdmap::LaneBoundaryType::SOLID_WHITE;
     } else if (upper_type == "BROKEN") {
-      *boundary_type = ::apollo::hdmap::LaneBoundaryType::DOTTED_WHITE;
+      *boundary_type = hdmap::LaneBoundaryType::DOTTED_WHITE;
     } else {
       std::string err_msg = "Error or unsupport lane boundary type";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);

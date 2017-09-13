@@ -76,10 +76,10 @@ class LonController : public Controller {
    * @return Status computation status
    */
   common::Status ComputeControlCommand(
-      const ::apollo::localization::LocalizationEstimate *localization,
-      const ::apollo::canbus::Chassis *chassis,
-      const ::apollo::planning::ADCTrajectory *trajectory,
-      ::apollo::control::ControlCommand *cmd) override;
+      const localization::LocalizationEstimate *localization,
+      const canbus::Chassis *chassis,
+      const planning::ADCTrajectory *trajectory,
+      control::ControlCommand *cmd) override;
 
   /**
    * @brief reset longitudinal controller
@@ -114,11 +114,11 @@ class LonController : public Controller {
 
   void CloseLogFile();
 
-  const ::apollo::localization::LocalizationEstimate *localization_ = nullptr;
-  const ::apollo::canbus::Chassis *chassis_ = nullptr;
+  const localization::LocalizationEstimate *localization_ = nullptr;
+  const canbus::Chassis *chassis_ = nullptr;
 
   std::unique_ptr<Interpolation2D> control_interpolation_;
-  const ::apollo::planning::ADCTrajectory *trajectory_message_ = nullptr;
+  const planning::ADCTrajectory *trajectory_message_ = nullptr;
   std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
 
   std::string name_;

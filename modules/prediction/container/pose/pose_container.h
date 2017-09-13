@@ -71,7 +71,7 @@ class PoseContainer : public Container {
  public:
   static const int ID = -1;
   static const apollo::perception::PerceptionObstacle::Type type_ =
-      ::apollo::perception::PerceptionObstacle::VEHICLE;
+      perception::PerceptionObstacle::VEHICLE;
 
  private:
   std::unique_ptr<apollo::perception::PerceptionObstacle> obstacle_ptr_;

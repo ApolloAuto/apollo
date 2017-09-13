@@ -19,22 +19,20 @@
 #include <memory>
 
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
-#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
-#include "modules/prediction/predictor/pedestrian/regional_predictor.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/predictor/pedestrian/regional_predictor.h"
+#include "modules/prediction/predictor/vehicle/free_move_predictor.h"
+#include "modules/prediction/predictor/vehicle/lane_sequence_predictor.h"
 
 namespace apollo {
 namespace prediction {
 
-using ::apollo::perception::PerceptionObstacles;
-using ::apollo::perception::PerceptionObstacle;
-using ::apollo::common::adapter::AdapterConfig;
+using apollo::perception::PerceptionObstacles;
+using apollo::perception::PerceptionObstacle;
+using apollo::common::adapter::AdapterConfig;
 
-PredictorManager::PredictorManager() {
-  RegisterPredictors();
-}
+PredictorManager::PredictorManager() { RegisterPredictors(); }
 
 void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
@@ -45,8 +43,7 @@ void PredictorManager::RegisterPredictors() {
 void PredictorManager::Init(const PredictionConf& config) {
   for (const auto& obstacle_conf : config.obstacle_conf()) {
     if (!obstacle_conf.has_obstacle_type()) {
-      ADEBUG << "Obstacle config ["
-             << obstacle_conf.ShortDebugString()
+      ADEBUG << "Obstacle config [" << obstacle_conf.ShortDebugString()
              << "] has not defined obstacle type.";
       continue;
     }
@@ -64,7 +61,7 @@ void PredictorManager::Init(const PredictionConf& config) {
         vehicle_off_lane_predictor_ = obstacle_conf.predictor_type();
       }
     } else if (obstacle_conf.obstacle_type() ==
-          PerceptionObstacle::PEDESTRIAN) {
+               PerceptionObstacle::PEDESTRIAN) {
       pedestrian_predictor_ = obstacle_conf.predictor_type();
     }
   }
@@ -73,10 +70,9 @@ void PredictorManager::Init(const PredictionConf& config) {
         << vehicle_on_lane_predictor_ << "].";
   AINFO << "Defined vehicle off lane obstacle predictor ["
         << vehicle_off_lane_predictor_ << "].";
-  AINFO << "Defined pedestrian obstacle predictor ["
-        << pedestrian_predictor_ << "].";
-  AINFO << "Defined default obstacle predictor ["
-        << default_predictor_ << "].";
+  AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_
+        << "].";
+  AINFO << "Defined default obstacle predictor [" << default_predictor_ << "].";
 }
 
 Predictor* PredictorManager::GetPredictor(
@@ -87,14 +83,14 @@ Predictor* PredictorManager::GetPredictor(
 
 void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles_.Clear();
-  ObstaclesContainer *container = dynamic_cast<ObstaclesContainer*>(
+  ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
-      AdapterConfig::PERCEPTION_OBSTACLES));
+          AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(container);
 
-  Predictor *predictor = nullptr;
+  Predictor* predictor = nullptr;
   for (const auto& perception_obstacle :
-      perception_obstacles.perception_obstacle()) {
+       perception_obstacles.perception_obstacle()) {
     PredictionObstacle prediction_obstacle;
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
     int id = perception_obstacle.id();
@@ -133,11 +129,11 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
     }
 
     prediction_obstacle.set_predicted_period(FLAGS_prediction_duration);
-    prediction_obstacle.mutable_perception_obstacle()->
-        CopyFrom(perception_obstacle);
+    prediction_obstacle.mutable_perception_obstacle()->CopyFrom(
+        perception_obstacle);
 
-    prediction_obstacles_.add_prediction_obstacle()->
-        CopyFrom(prediction_obstacle);
+    prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
+        prediction_obstacle);
   }
   prediction_obstacles_.set_perception_error_code(
       perception_obstacles.error_code());
@@ -159,9 +155,7 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
       predictor_ptr.reset(new RegionalPredictor());
       break;
     }
-    default: {
-      break;
-    }
+    default: { break; }
   }
   return predictor_ptr;
 }
@@ -178,4 +172,3 @@ const PredictionObstacles& PredictorManager::prediction_obstacles() {
 
 }  // namespace prediction
 }  // namespace apollo
-

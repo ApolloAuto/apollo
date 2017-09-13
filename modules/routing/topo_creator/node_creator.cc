@@ -26,9 +26,9 @@ namespace {
 
 using ::google::protobuf::RepeatedPtrField;
 
-using ::apollo::hdmap::Lane;
-using ::apollo::hdmap::LaneBoundary;
-using ::apollo::hdmap::LaneBoundaryType;
+using apollo::hdmap::Lane;
+using apollo::hdmap::LaneBoundary;
+using apollo::hdmap::LaneBoundaryType;
 
 bool IsAllowedOut(const LaneBoundaryType& type) {
   if (type.types(0) == LaneBoundaryType::DOTTED_YELLOW ||

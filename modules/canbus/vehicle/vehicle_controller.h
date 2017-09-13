@@ -57,7 +57,7 @@ class VehicleController {
    * @param message_manager a pointer to the message_manager.
    * @return error_code
    */
-  virtual ::apollo::common::ErrorCode Init(
+  virtual common::ErrorCode Init(
       const VehicleParameter &params, CanSender *const can_sender,
       MessageManager *const message_manager) = 0;
 
@@ -83,15 +83,15 @@ class VehicleController {
    * @param command the control command
    * @return error_code
    */
-  virtual ::apollo::common::ErrorCode Update(
-      const ::apollo::control::ControlCommand &command);
+  virtual common::ErrorCode Update(
+      const control::ControlCommand &command);
 
   /**
     * @brief set vehicle to appointed driving mode.
     * @param driving mode to be appointed.
     * @return error_code
     */
-  virtual ::apollo::common::ErrorCode SetDrivingMode(
+  virtual common::ErrorCode SetDrivingMode(
       const Chassis::DrivingMode &driving_mode);
 
  private:
@@ -101,10 +101,10 @@ class VehicleController {
    */
   virtual void Emergency() = 0;
 
-  virtual ::apollo::common::ErrorCode EnableAutoMode() = 0;
-  virtual ::apollo::common::ErrorCode DisableAutoMode() = 0;
-  virtual ::apollo::common::ErrorCode EnableSteeringOnlyMode() = 0;
-  virtual ::apollo::common::ErrorCode EnableSpeedOnlyMode() = 0;
+  virtual common::ErrorCode EnableAutoMode() = 0;
+  virtual common::ErrorCode DisableAutoMode() = 0;
+  virtual common::ErrorCode EnableSteeringOnlyMode() = 0;
+  virtual common::ErrorCode EnableSpeedOnlyMode() = 0;
 
   /*
    * @brief NEUTRAL, REVERSE, DRIVE
@@ -138,18 +138,18 @@ class VehicleController {
    * @brief set Electrical Park Brake
    */
   virtual void SetEpbBreak(
-      const ::apollo::control::ControlCommand &command) = 0;
-  virtual void SetBeam(const ::apollo::control::ControlCommand &command) = 0;
-  virtual void SetHorn(const ::apollo::control::ControlCommand &command) = 0;
+      const control::ControlCommand &command) = 0;
+  virtual void SetBeam(const control::ControlCommand &command) = 0;
+  virtual void SetHorn(const control::ControlCommand &command) = 0;
   virtual void SetTurningSignal(
-      const ::apollo::control::ControlCommand &command) = 0;
+      const control::ControlCommand &command) = 0;
 
  protected:
   virtual Chassis::DrivingMode driving_mode();
   virtual void set_driving_mode(const Chassis::DrivingMode &driving_mode);
 
  protected:
-  ::apollo::canbus::VehicleParameter params_;
+  canbus::VehicleParameter params_;
   CanSender *can_sender_ = nullptr;
   MessageManager *message_manager_ = nullptr;
   bool is_initialized_ = false;  // own by derviative concrete controller

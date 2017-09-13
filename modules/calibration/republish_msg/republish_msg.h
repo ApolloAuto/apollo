@@ -48,9 +48,9 @@ class RepublishMsg : public apollo::common::ApolloApp {
 
  private:
   // Upon receiving INS status data
-  void OnInsStat(const ::apollo::drivers::gnss::InsStat& msg);
+  void OnInsStat(const drivers::gnss::InsStat& msg);
   // Upon receiving GPS data
-  void OnGps(const ::apollo::localization::Gps& msg);
+  void OnGps(const localization::Gps& msg);
 
   // Gps offset pose
   Eigen::Affine3d offset_;

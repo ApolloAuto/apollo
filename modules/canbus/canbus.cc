@@ -40,7 +40,7 @@ std::string Canbus::Name() const { return FLAGS_hmi_name; }
 
 Status Canbus::Init() {
   // load conf
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
+  if (!common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
                                                 &canbus_conf_)) {
     return OnError("Unable to load canbus conf file: " +
                    FLAGS_canbus_conf_file);
@@ -173,7 +173,7 @@ void Canbus::Stop() {
 
 void Canbus::OnControlCommand(const ControlCommand &control_command) {
   int64_t current_timestamp =
-      apollo::common::time::AsInt64<::apollo::common::time::micros>(
+      apollo::common::time::AsInt64<common::time::micros>(
           Clock::Now());
   // if command coming too soon, just ignore it.
   if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {

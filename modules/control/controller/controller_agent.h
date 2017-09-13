@@ -66,10 +66,10 @@ class ControllerAgent {
    * @return Status computation status
    */
   common::Status ComputeControlCommand(
-      const ::apollo::localization::LocalizationEstimate *localization,
-      const ::apollo::canbus::Chassis *chassis,
-      const ::apollo::planning::ADCTrajectory *trajectory,
-      ::apollo::control::ControlCommand *cmd);
+      const localization::LocalizationEstimate *localization,
+      const canbus::Chassis *chassis,
+      const planning::ADCTrajectory *trajectory,
+      control::ControlCommand *cmd);
 
   /**
    * @brief reset ControllerAgent

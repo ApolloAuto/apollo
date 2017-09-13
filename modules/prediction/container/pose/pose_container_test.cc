@@ -24,9 +24,9 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::localization::Pose;
-using ::apollo::perception::PerceptionObstacle;
+using apollo::localization::LocalizationEstimate;
+using apollo::localization::Pose;
+using apollo::perception::PerceptionObstacle;
 
 class PoseContainerTest : public ::testing::Test {
  public:
@@ -47,10 +47,8 @@ class PoseContainerTest : public ::testing::Test {
 void PoseContainerTest::InitPose(LocalizationEstimate *localization) {
   localization->mutable_pose()->mutable_position()->set_x(position_[0]);
   localization->mutable_pose()->mutable_position()->set_y(position_[1]);
-  localization->mutable_pose()->mutable_linear_velocity()->set_x(
-      velocity_[0]);
-  localization->mutable_pose()->mutable_linear_velocity()->set_y(
-      velocity_[1]);
+  localization->mutable_pose()->mutable_linear_velocity()->set_x(velocity_[0]);
+  localization->mutable_pose()->mutable_linear_velocity()->set_y(velocity_[1]);
   localization->mutable_header()->set_timestamp_sec(timestamp_);
 }
 

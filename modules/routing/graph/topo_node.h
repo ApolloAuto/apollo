@@ -50,8 +50,8 @@ class TopoNode {
 
   const std::string& LaneId() const;
   const std::string& RoadId() const;
-  const ::apollo::hdmap::Curve& CentralCurve() const;
-  const ::apollo::common::PointENU& AnchorPoint() const;
+  const hdmap::Curve& CentralCurve() const;
+  const common::PointENU& AnchorPoint() const;
   const std::vector<NodeSRange>& LeftOutRange() const;
   const std::vector<NodeSRange>& RightOutRange() const;
 
@@ -83,10 +83,10 @@ class TopoNode {
  private:
   void Init();
   bool FindAnchorPoint();
-  void SetAnchorPoint(const ::apollo::common::PointENU& anchor_point);
+  void SetAnchorPoint(const common::PointENU& anchor_point);
 
   Node pb_node_;
-  ::apollo::common::PointENU anchor_point_;
+  common::PointENU anchor_point_;
 
   double start_s_;
   double end_s_;

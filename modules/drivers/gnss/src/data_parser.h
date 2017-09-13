@@ -53,8 +53,8 @@ class DataParser {
   void publish_odometry_pb_message(const MessagePtr message);
   void publish_corrimu_pb_message(const MessagePtr message);
   void publish_ins_message(const MessagePtr message);
-  void check_ins_status(::apollo::drivers::gnss::Ins *ins);
-  void check_gnss_status(::apollo::drivers::gnss::Gnss *gnss);
+  void check_ins_status(drivers::gnss::Ins *ins);
+  void check_gnss_status(drivers::gnss::Gnss *gnss);
 
   bool _inited_flag = false;
   std::unique_ptr<Parser> _data_parser;

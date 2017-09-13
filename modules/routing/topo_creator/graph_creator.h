@@ -43,14 +43,14 @@ class GraphCreator {
   std::string GetEdgeID(const std::string& from_id, const std::string& to_id);
 
   void AddEdge(const Node& from_node,
-               const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Id>&
+               const ::google::protobuf::RepeatedPtrField<hdmap::Id>&
                    to_node_vec,
                const Edge::DirectionType& type);
 
  private:
   std::string base_map_file_path_;
   std::string dump_topo_file_path_;
-  ::apollo::hdmap::Map pbmap_;
+  hdmap::Map pbmap_;
   Graph graph_;
   std::unordered_map<std::string, int> node_index_map_;
   std::unordered_map<std::string, std::string> road_id_map_;
