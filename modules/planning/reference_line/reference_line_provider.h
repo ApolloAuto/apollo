@@ -77,6 +77,7 @@ class ReferenceLineProvider {
 
   const hdmap::PncMap* pnc_map_ = nullptr;
 
+  bool has_routing_ = false;
   std::mutex routing_response_mutex_;
   routing::RoutingResponse routing_response_;
 

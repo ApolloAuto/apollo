@@ -72,6 +72,7 @@ void ReferenceLineProvider::UpdateRoutingResponse(
   std::lock_guard<std::mutex> lock(routing_response_mutex_);
   // TODO(all): check if routing needs to be updated before assigning.
   routing_response_ = routing_response;
+  has_routing_ = true;
 }
 
 void ReferenceLineProvider::Generate() {
@@ -80,6 +81,19 @@ void ReferenceLineProvider::Generate() {
         common::VehicleState::instance()->pose().position();
     const auto adc_point_enu = common::util::MakePointENU(
         curr_adc_position.x(), curr_adc_position.y(), curr_adc_position.z());
+    const int32_t kReferenceLineProviderSleepTime = 1000;
+    if (!has_routing_) {
+      AERROR << "Routing is not ready.";
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
+          kReferenceLineProviderSleepTime));
+      continue;
+    }
+
+    if (!curr_adc_position.has_x() || !curr_adc_position.has_y()) {
+      AERROR << "VehicleState is not ready.";
+      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
+          kReferenceLineProviderSleepTime));
+    }
 
     routing::RoutingResponse routing;
     {
