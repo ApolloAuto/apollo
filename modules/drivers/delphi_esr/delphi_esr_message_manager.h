@@ -92,11 +92,14 @@ void SensorMessageManager<DelphiESR>::Parse(const uint32_t message_id,
     return;
   }
 
-  std::lock_guard<std::mutex> lock(sensor_data_mutex_);
-  sensor_protocol_data->Parse(data, length, &sensor_data_);
+  {
+    std::lock_guard<std::mutex> lock(sensor_data_mutex_);
+    sensor_protocol_data->Parse(data, length, &sensor_data_);
+  }
 
   // trigger publishment
   if (message_id == 0x540) {
+    AINFO << "===== message id: " << message_id;
     DelphiESR delphi_esr;
     GetSensorData(&delphi_esr);
     ADEBUG << delphi_esr.ShortDebugString();
@@ -104,7 +107,10 @@ void SensorMessageManager<DelphiESR>::Parse(const uint32_t message_id,
     AdapterManager::FillDelphiESRHeader(FLAGS_sensor_node_name, &delphi_esr);
     AdapterManager::PublishDelphiESR(delphi_esr);
 
+    AINFO << "===== after publish ";
+
     sensor_data_.mutable_esr_track01_500()->Clear();
+    AINFO << "===== after clear ";
   }
 
   received_ids_.insert(message_id);
