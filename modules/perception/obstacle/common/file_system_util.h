@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
-#define ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H_
+#define MODULES_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H_
 
 #include <string>
 #include <vector>
@@ -29,4 +29,4 @@ void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // ADU_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H_
