@@ -19,8 +19,8 @@
  * @brief Obstacles container
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
-#define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
+#ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
+#define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
 
 #include <mutex>
 
@@ -56,7 +56,7 @@ class ObstaclesContainer : public Container {
    *        Timestamp
    */
   void InsertPerceptionObstacle(
-      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      const perception::PerceptionObstacle& perception_obstacle,
       const double timestamp);
 
   /**
@@ -64,7 +64,7 @@ class ObstaclesContainer : public Container {
    * @param Obstacle ID
    * @return Obstacle pointer
    */
-  Obstacle* GetObstacle(int id);
+  Obstacle* GetObstacle(const int id);
 
  private:
   /**
@@ -72,16 +72,15 @@ class ObstaclesContainer : public Container {
    * @param An obstacle
    * @return True if the obstacle is predictable; otherwise false;
    */
-  bool IsPredictable(
-      const apollo::perception::PerceptionObstacle& perception_obstacle);
+  bool IsPredictable(const perception::PerceptionObstacle& perception_obstacle);
 
  private:
-  double timestamp_;
-  apollo::common::util::LRUCache<int, Obstacle> obstacles_;
+  double timestamp_ = 0.0;
+  common::util::LRUCache<int, Obstacle> obstacles_;
   static std::mutex g_mutex_;
 };
 
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_H_
+#endif  // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_

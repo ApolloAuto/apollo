@@ -30,14 +30,13 @@ using apollo::hdmap::Id;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-RoadGraph::RoadGraph(double start_s, double length,
+RoadGraph::RoadGraph(const double start_s, const double length,
                      std::shared_ptr<const LaneInfo> lane_info_ptr)
-    : start_s_(start_s), length_(length), lane_info_ptr_(lane_info_ptr) {
-}
+    : start_s_(start_s), length_(length), lane_info_ptr_(lane_info_ptr) {}
 
-Status RoadGraph::BuildLaneGraph(LaneGraph* lane_graph_ptr) {
+Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   if (length_ < 0.0 || lane_info_ptr_ == nullptr) {
-    const auto error_msg = apollo::common::util::StrCat(
+    const auto error_msg = common::util::StrCat(
         "Invalid road graph settings. Road graph length = ", length_);
     AERROR << error_msg;
     return Status(ErrorCode::PREDICTION_ERROR, error_msg);
@@ -51,15 +50,14 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* lane_graph_ptr) {
 
   std::vector<LaneSegment> lane_segments;
   double accumulated_s = 0.0;
-  ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_,
-                      &lane_segments, lane_graph_ptr);
+  ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_, &lane_segments,
+                      lane_graph_ptr);
 
   return Status::OK();
 }
 
-bool RoadGraph::IsOnLaneGraph(
-    std::shared_ptr<const LaneInfo> lane_info_ptr,
-    const LaneGraph& lane_graph) {
+bool RoadGraph::IsOnLaneGraph(std::shared_ptr<const LaneInfo> lane_info_ptr,
+                              const LaneGraph& lane_graph) {
   if (!lane_graph.IsInitialized()) {
     return false;
   }
@@ -77,10 +75,10 @@ bool RoadGraph::IsOnLaneGraph(
 }
 
 void RoadGraph::ComputeLaneSequence(
-    double accumulated_s, double start_s,
+    const double accumulated_s, const double start_s,
     std::shared_ptr<const LaneInfo> lane_info_ptr,
-    std::vector<LaneSegment>* lane_segments,
-    LaneGraph* lane_graph_ptr) const {
+    std::vector<LaneSegment>* const lane_segments,
+    LaneGraph* const lane_graph_ptr) const {
   if (lane_info_ptr == nullptr) {
     AERROR << "Invalid lane.";
     return;
@@ -100,7 +98,7 @@ void RoadGraph::ComputeLaneSequence(
   lane_segments->push_back(std::move(lane_segment));
 
   if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_ ||
-    lane_info_ptr->lane().successor_id_size() == 0) {
+      lane_info_ptr->lane().successor_id_size() == 0) {
     LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
     *sequence->mutable_lane_segment() = {lane_segments->begin(),
                                          lane_segments->end()};

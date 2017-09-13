@@ -40,8 +40,7 @@ class PredictionMap {
    * @return The position with coordinates.
    */
   static Eigen::Vector2d PositionOnLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
-      const double s);
+      std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s);
 
   /**
    * @brief Get the heading of a point on a specific distance along a lane.
@@ -49,9 +48,8 @@ class PredictionMap {
    * @param s The distance along the lane.
    * @return The heading of the point.
    */
-  static double HeadingOnLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
-      const double s);
+  static double HeadingOnLane(std::shared_ptr<const hdmap::LaneInfo> lane_info,
+                              const double s);
 
   /**
    * @brief Get the width on a specified distance on a lane.
@@ -59,17 +57,15 @@ class PredictionMap {
    * @param s The distance along the lane.
    * @return The width on the distance s.
    */
-  static double LaneTotalWidth(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
-      const double s);
+  static double LaneTotalWidth(std::shared_ptr<const hdmap::LaneInfo> lane_info,
+                               const double s);
 
   /**
    * @brief Get a shared pointer to a lane by lane ID.
    * @param id The ID of the target lane ID in the form of string.
    * @return A shared pointer to the lane with the input lane ID.
    */
-  static std::shared_ptr<const apollo::hdmap::LaneInfo> LaneById(
-      const std::string& id);
+  static std::shared_ptr<const hdmap::LaneInfo> LaneById(const std::string& id);
 
   /**
    * @brief Get the frenet coordinates (s, l) on a lane by a position.
@@ -78,11 +74,9 @@ class PredictionMap {
    * @param s The longitudinal coordinate of the position.
    * @param l The lateral coordinate of the position.
    */
-  static bool GetProjection(
-      const Eigen::Vector2d& position,
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
-      double* s,
-      double* l);
+  static bool GetProjection(const Eigen::Vector2d& position,
+                            std::shared_ptr<const hdmap::LaneInfo> lane_info,
+                            double* s, double* l);
 
   /**
    * @brief Get the nearest path point to a longitudinal coordinate on a lane.
@@ -92,8 +86,8 @@ class PredictionMap {
    * @param If the process is successful.
    */
   static bool ProjectionFromLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
-      double s, apollo::hdmap::MapPathPoint* path_point);
+      std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s,
+      hdmap::MapPathPoint* path_point);
 
   /**
    * @brief Get the connected lanes from some specified lanes.
@@ -101,15 +95,13 @@ class PredictionMap {
    * @param heading The specified heading.
    * @param radius The searching radius.
    * @param on_lane If the position is on lane.
-   * @param lanes The searched lanes. 
+   * @param lanes The searched lanes.
    */
   void OnLane(
-      const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>&
-          prev_lanes,
-      const Eigen::Vector2d& point, const double heading,
-      const double radius,
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& prev_lanes,
+      const Eigen::Vector2d& point, const double heading, const double radius,
       const bool on_lane,
-      std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>* lanes);
+      std::vector<std::shared_ptr<const hdmap::LaneInfo>>* lanes);
 
   /**
    * @brief Get the lane heading on a point.
@@ -117,9 +109,8 @@ class PredictionMap {
    * @param point The point to get the heading.
    * @return The heading of the input point on the input lane.
    */
-  static double PathHeading(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info,
-      const apollo::common::PointENU& point);
+  static double PathHeading(std::shared_ptr<const hdmap::LaneInfo> lane_info,
+                            const common::PointENU& point);
 
   /**
    * @brief Get the smooth point on a lane by a longitudinal coordinate.
@@ -130,10 +121,9 @@ class PredictionMap {
    * @param heading The lane heading on the point.
    * @return If the process is successful.
    */
-  bool SmoothPointFromLane(
-      const std::string& id, const double s,
-      const double l, Eigen::Vector2d* point,
-      double* heading);
+  bool SmoothPointFromLane(const std::string& id, const double s,
+                           const double l, Eigen::Vector2d* point,
+                           double* heading);
 
   /**
    * @brief Get nearby lanes by a position and current lanes.
@@ -144,12 +134,9 @@ class PredictionMap {
    * @param nearby_lanes The searched nearby lanes.
    */
   void NearbyLanesByCurrentLanes(
-      const Eigen::Vector2d& point,
-      double heading,
-      double radius,
-      const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes,
-      std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>*
-          nearby_lanes);
+      const Eigen::Vector2d& point, const double heading, const double radius,
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes,
+      std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
 
   /**
    * @brief Check if a lane is a left neighbor of another lane.
@@ -158,8 +145,8 @@ class PredictionMap {
    * @return If left_lane is a left neighbor of curr_lane.
    */
   static bool IsLeftNeighborLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> left_lane,
-      std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
+      std::shared_ptr<const hdmap::LaneInfo> left_lane,
+      std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
    * @brief Check if a lane is a left neighbor of one of some lanes.
@@ -168,8 +155,8 @@ class PredictionMap {
    * @return If left_lane is a left neighbor of one of lanes.
    */
   static bool IsLeftNeighborLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> left_lane,
-      const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
+      std::shared_ptr<const hdmap::LaneInfo> left_lane,
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if a lane is a right neighbor of another lane.
@@ -178,8 +165,8 @@ class PredictionMap {
    * @return If right_lane is a right neighbor of curr_lane.
    */
   static bool IsRightNeighborLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> right_lane,
-      std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
+      std::shared_ptr<const hdmap::LaneInfo> right_lane,
+      std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
    * @brief Check if a lane is a right neighbor of one of some lanes.
@@ -188,8 +175,8 @@ class PredictionMap {
    * @return If right_lane is a right neighbor of one of lanes.
    */
   static bool IsRightNeighborLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> right_lane,
-      const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
+      std::shared_ptr<const hdmap::LaneInfo> right_lane,
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if a lane is a successor of another lane.
@@ -197,9 +184,8 @@ class PredictionMap {
    * @param curr_lane The current lane.
    * @return If succ_lane is a successor of curr_lane.
    */
-  static bool IsSuccessorLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> succ_lane,
-      std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
+  static bool IsSuccessorLane(std::shared_ptr<const hdmap::LaneInfo> succ_lane,
+                              std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
    * @brief Check if a lane is a successor of one of some lanes.
@@ -208,8 +194,8 @@ class PredictionMap {
    * @return If succ_lane is a successor of one of lanes.
    */
   static bool IsSuccessorLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> succ_lane,
-      const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
+      std::shared_ptr<const hdmap::LaneInfo> succ_lane,
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if a lane is a predecessor of another lane.
@@ -218,8 +204,8 @@ class PredictionMap {
    * @return If pred_lane is a predecessor of curr_lane.
    */
   static bool IsPredecessorLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> pred_lane,
-      std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
+      std::shared_ptr<const hdmap::LaneInfo> pred_lane,
+      std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
    * @brief Check if a lane is a predecessor of one of some lanes.
@@ -228,8 +214,8 @@ class PredictionMap {
    * @return If pred_lane is a predecessor of one of lanes.
    */
   static bool IsPredecessorLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> pred_lane,
-      const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
+      std::shared_ptr<const hdmap::LaneInfo> pred_lane,
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if two lanes are identical.
@@ -237,9 +223,8 @@ class PredictionMap {
    * @param curr_lane The current lane.
    * @return If other_lane is identical to curr_lane.
    */
-  static bool IsIdenticalLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> other_lane,
-      std::shared_ptr<const apollo::hdmap::LaneInfo> curr_lane);
+  static bool IsIdenticalLane(std::shared_ptr<const hdmap::LaneInfo> other_lane,
+                              std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
    * @brief Check if a lane is identical to one of some lanes.
@@ -248,8 +233,8 @@ class PredictionMap {
    * @return If other_lane is identical to one of lanes.
    */
   static bool IsIdenticalLane(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> other_lane,
-      const std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>>& lanes);
+      std::shared_ptr<const hdmap::LaneInfo> other_lane,
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Get lane turn type.
