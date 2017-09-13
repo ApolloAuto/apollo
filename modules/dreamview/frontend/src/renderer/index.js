@@ -125,23 +125,21 @@ class Renderer {
     }
 
     enableOrbitControls() {
+        const carPosition = this.adc.mesh.position;
         this.controls.enabled = true;
         this.controls.enableRotate = false;
         this.controls.reset();
         this.controls.minDistance = 20;
         this.controls.maxDistance = 1000;
+        this.controls.target.set(carPosition.x, carPosition.y, 0);
 
-        const carPosition = this.adc.mesh.position;
         this.camera.position.set(carPosition.x, carPosition.y, 50);
         this.camera.up.set(0, 1, 0);
         this.camera.lookAt(carPosition.x, carPosition.y, 0);
     }
 
     adjustCamera(target, pov) {
-
         if (this.routingEditor.isInEditingMode()) {
-            this.camera.up.set(0, 1, 0);
-            this.camera.lookAt(this.camera.position.x, this.camera.position.y, 0);
             return;
         }
 
@@ -208,9 +206,6 @@ class Renderer {
         case "Map":
             if (!this.controls.enabled) {
                 this.enableOrbitControls();
-            } else {
-                this.camera.up.set(0, 1, 0);
-                this.camera.lookAt(this.camera.position.x, this.camera.position.y, 0);
             }
             break;
         }
