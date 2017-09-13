@@ -33,18 +33,19 @@ const int32_t Esrtrack01500::ID = 0x500;
 
 void Esrtrack01500::Parse(const std::uint8_t* bytes, int32_t length,
                          DelphiESR* delphi_esr) const {
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_grouping_changed(can_tx_track_grouping_changed(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_oncoming(can_tx_track_oncoming(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_lat_rate(can_tx_track_lat_rate(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_bridge_object(can_tx_track_bridge_object(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_width(can_tx_track_width(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_status(can_tx_track_status(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_rolling_count(can_tx_track_rolling_count(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_range_rate(can_tx_track_range_rate(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_range_accel(can_tx_track_range_accel(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_range(can_tx_track_range(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_med_range_mode(can_tx_track_med_range_mode(bytes, length));
-  delphi_esr->mutable_esr_track01_500()->set_can_tx_track_angle(can_tx_track_angle(bytes, length));
+  auto* esr_track01_500 = delphi_esr->add_esr_track01_500();
+  esr_track01_500->set_can_tx_track_grouping_changed(can_tx_track_grouping_changed(bytes, length));
+  esr_track01_500->set_can_tx_track_oncoming(can_tx_track_oncoming(bytes, length));
+  esr_track01_500->set_can_tx_track_lat_rate(can_tx_track_lat_rate(bytes, length));
+  esr_track01_500->set_can_tx_track_bridge_object(can_tx_track_bridge_object(bytes, length));
+  esr_track01_500->set_can_tx_track_width(can_tx_track_width(bytes, length));
+  esr_track01_500->set_can_tx_track_status(can_tx_track_status(bytes, length));
+  esr_track01_500->set_can_tx_track_rolling_count(can_tx_track_rolling_count(bytes, length));
+  esr_track01_500->set_can_tx_track_range_rate(can_tx_track_range_rate(bytes, length));
+  esr_track01_500->set_can_tx_track_range_accel(can_tx_track_range_accel(bytes, length));
+  esr_track01_500->set_can_tx_track_range(can_tx_track_range(bytes, length));
+  esr_track01_500->set_can_tx_track_med_range_mode(can_tx_track_med_range_mode(bytes, length));
+  esr_track01_500->set_can_tx_track_angle(can_tx_track_angle(bytes, length));
 }
 
 // config detail: {'name': 'can_tx_track_grouping_changed', 'enum': {0: 'CAN_TX_TRACK_GROUPING_CHANGED_GROUPINGUNCHANGED', 1: 'CAN_TX_TRACK_GROUPING_CHANGED_GROUPINGCHANGED'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 1, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
