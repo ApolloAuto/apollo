@@ -68,4 +68,4 @@ typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // ADU_PERCEPTION_ONBOARD_HDMAP_INPUT_H
+#endif  // MODULES_PERCEPTION_ONBOARD_HDMAP_INPUT_H_
