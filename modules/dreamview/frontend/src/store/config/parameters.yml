@@ -19,7 +19,7 @@ camera:
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:
-  mpp: 200
+  mpp: 400
   xres: 8192
   yres: 8192
   xorigin: 4096
