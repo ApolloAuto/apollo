@@ -43,25 +43,21 @@ class Timer {
 
  private:
   // in ms.
-  TimePoint _start_time;
-  TimePoint _end_time;
+  TimePoint start_time_;
+  TimePoint end_time_;
 
   DISALLOW_COPY_AND_ASSIGN(Timer);
 };
 
 class TimerWrapper {
  public:
-  explicit TimerWrapper(const std::string& msg) : _msg(msg) {
-    _timer.start();
-  }
+  explicit TimerWrapper(const std::string& msg) : msg_(msg) { timer_.start(); }
 
-  ~TimerWrapper() {
-    _timer.end(_msg);
-  }
+  ~TimerWrapper() { timer_.end(msg_); }
 
  private:
-  Timer _timer;
-  std::string _msg;
+  Timer timer_;
+  std::string msg_;
 
   DISALLOW_COPY_AND_ASSIGN(TimerWrapper);
 };
@@ -72,7 +68,7 @@ class TimerWrapper {
 #define PERF_FUNCTION(function_name) \
   apollo::perception::TimerWrapper _timer_wrapper_(function_name)
 
-#define PERF_BLOCK_START()              \
+#define PERF_BLOCK_START()           \
   apollo::perception::Timer _timer_; \
   _timer_.start()
 

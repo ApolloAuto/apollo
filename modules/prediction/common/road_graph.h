@@ -17,12 +17,13 @@
 #ifndef MODULES_PREDICTION_COMMON_ROAD_GRAPH_H_
 #define MODULES_PREDICTION_COMMON_ROAD_GRAPH_H_
 
-#include <vector>
 #include <memory>
+#include <vector>
+
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -35,15 +36,15 @@ class RoadGraph {
    * @param length The length to build the road graph.
    * @param lane_info_ptr The starting lane.
    */
-  RoadGraph(double start_s, double length,
-            std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
+  RoadGraph(const double start_s, const double length,
+            std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
 
   /**
    * @brief Build the lane graph.
    * @param The built lane graph.
    * @return The status of the road graph building.
    */
-  apollo::common::Status BuildLaneGraph(LaneGraph* lane_graph);
+  common::Status BuildLaneGraph(LaneGraph* const lane_graph);
 
   /**
    * @brief Check if a lane with an s is on the lane graph
@@ -52,22 +53,19 @@ class RoadGraph {
    * @param The pointer to the given lane graph
    * @return If the given lane ID and lane s is on the lane graph
    */
-  bool IsOnLaneGraph(
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
-      const LaneGraph& lane_graph);
+  bool IsOnLaneGraph(std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+                     const LaneGraph& lane_graph);
 
  private:
-  void ComputeLaneSequence(
-      double accumulated_s,
-      double start_s,
-      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr,
-      std::vector<LaneSegment>* lane_segments,
-      LaneGraph* lane_graph_ptr) const;
+  void ComputeLaneSequence(const double accumulated_s, const double start_s,
+                           std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+                           std::vector<LaneSegment>* const lane_segments,
+                           LaneGraph* const lane_graph_ptr) const;
 
  private:
   double start_s_ = 0;
   double length_ = -1.0;
-  std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr_ = nullptr;
+  std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr_ = nullptr;
 };
 
 }  // namespace prediction

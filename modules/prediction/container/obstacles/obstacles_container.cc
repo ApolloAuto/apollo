@@ -30,7 +30,7 @@ using apollo::perception::PerceptionObstacles;
 std::mutex ObstaclesContainer::g_mutex_;
 
 ObstaclesContainer::ObstaclesContainer()
-    : timestamp_(0.0), obstacles_(FLAGS_max_num_obstacles_stored) {}
+    : obstacles_(FLAGS_max_num_obstacles_stored) {}
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   ADEBUG << "message: " << message.ShortDebugString();
@@ -42,7 +42,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
       perception_obstacles.header().has_timestamp_sec()) {
     timestamp = perception_obstacles.header().timestamp_sec();
   }
-  if (apollo::common::math::DoubleCompare(timestamp, timestamp_) < 0) {
+  if (common::math::DoubleCompare(timestamp, timestamp_) < 0) {
     AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev ["
            << timestamp_ << "].";
     return;
@@ -60,14 +60,14 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
 }
 
-Obstacle* ObstaclesContainer::GetObstacle(int id) {
+Obstacle* ObstaclesContainer::GetObstacle(const int id) {
   return obstacles_.GetSilently(id);
 }
 
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
   std::lock_guard<std::mutex> lock(g_mutex_);
-  int id = perception_obstacle.id();
+  const int id = perception_obstacle.id();
   if (id < -1) {
     AERROR << "Invalid ID [" << id << "]";
     return;

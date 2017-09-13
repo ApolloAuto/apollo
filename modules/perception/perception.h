@@ -21,8 +21,8 @@
 #ifndef MODEULES_PERCEPTION_PERCEPTION_H_
 #define MODEULES_PERCEPTION_PERCEPTION_H_
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
@@ -37,11 +37,11 @@
 namespace apollo {
 namespace perception {
 
-class Perception : public apollo::common::ApolloApp {
+class Perception : public common::ApolloApp {
  public:
   std::string Name() const override;
-  apollo::common::Status Init() override;
-  apollo::common::Status Start() override;
+  common::Status Init() override;
+  common::Status Start() override;
   void Stop() override;
 
  private:

@@ -23,11 +23,12 @@
 #include <unordered_set>
 #include <vector>
 
+#include "modules/map/proto/map_id.pb.h"
+
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -42,17 +43,17 @@ PredictionMap::PredictionMap() {}
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
     std::shared_ptr<const LaneInfo> lane_info, const double s) {
-  apollo::common::PointENU point = lane_info->GetSmoothPoint(s);
+  common::PointENU point = lane_info->GetSmoothPoint(s);
   return {point.x(), point.y()};
 }
 
-double PredictionMap::HeadingOnLane(
-    std::shared_ptr<const LaneInfo> lane_info, const double s) {
+double PredictionMap::HeadingOnLane(std::shared_ptr<const LaneInfo> lane_info,
+                                    const double s) {
   return lane_info->Heading(s);
 }
 
 double PredictionMap::LaneTotalWidth(
-    std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info, const double s) {
+    std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s) {
   double left = 0.0;
   double right = 0.0;
   lane_info->GetWidth(s, &left, &right);
@@ -61,7 +62,7 @@ double PredictionMap::LaneTotalWidth(
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
     const std::string& str_id) {
-  return HDMapUtil::BaseMap().GetLaneById(apollo::hdmap::MakeMapId(str_id));
+  return HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(str_id));
 }
 
 bool PredictionMap::GetProjection(const Eigen::Vector2d& position,
@@ -70,18 +71,18 @@ bool PredictionMap::GetProjection(const Eigen::Vector2d& position,
   if (lane_info == nullptr) {
     return false;
   }
-  apollo::common::math::Vec2d pos(position[0], position[1]);
+  const common::math::Vec2d pos(position[0], position[1]);
   return lane_info->GetProjection(pos, s, l);
 }
 
 bool PredictionMap::ProjectionFromLane(
-    std::shared_ptr<const LaneInfo> lane_info, double s,
+    std::shared_ptr<const LaneInfo> lane_info, const double s,
     MapPathPoint* path_point) {
   if (lane_info == nullptr) {
     return false;
   }
-  apollo::common::PointENU point = lane_info->GetSmoothPoint(s);
-  double heading = HeadingOnLane(lane_info, s);
+  const common::PointENU point = lane_info->GetSmoothPoint(s);
+  const double heading = HeadingOnLane(lane_info, s);
   path_point->set_x(point.x());
   path_point->set_y(point.y());
   path_point->set_heading(heading);
@@ -94,15 +95,15 @@ void PredictionMap::OnLane(
     const bool on_lane, std::vector<std::shared_ptr<const LaneInfo>>* lanes) {
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
 
-  apollo::common::PointENU hdmap_point;
+  common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
-  if (HDMapUtil::BaseMap().GetLanesWithHeading(
-          hdmap_point, radius, heading, M_PI, &candidate_lanes) != 0) {
+  if (HDMapUtil::BaseMap().GetLanesWithHeading(hdmap_point, radius, heading,
+                                               M_PI, &candidate_lanes) != 0) {
     return;
   }
 
-  apollo::common::math::Vec2d vec_point(point[0], point[1]);
+  const common::math::Vec2d vec_point(point[0], point[1]);
   for (const auto& candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
       continue;
@@ -117,11 +118,11 @@ void PredictionMap::OnLane(
       continue;
     }
     double distance = 0.0;
-    apollo::common::PointENU nearest_point =
+    common::PointENU nearest_point =
         candidate_lane->GetNearestPoint(vec_point, &distance);
     double nearest_point_heading = PathHeading(candidate_lane, nearest_point);
-    double diff = std::fabs(
-        apollo::common::math::AngleDiff(heading, nearest_point_heading));
+    double diff =
+        std::fabs(common::math::AngleDiff(heading, nearest_point_heading));
     if (diff <= FLAGS_max_lane_angle_diff) {
       lanes->push_back(candidate_lane);
     }
@@ -129,8 +130,8 @@ void PredictionMap::OnLane(
 }
 
 double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
-                                  const apollo::common::PointENU& point) {
-  apollo::common::math::Vec2d vec_point = {point.x(), point.y()};
+                                  const common::PointENU& point) {
+  common::math::Vec2d vec_point = {point.x(), point.y()};
   double s = -1.0;
   double l = 0.0;
   lane_info->GetProjection(vec_point, &s, &l);
@@ -144,7 +145,7 @@ bool PredictionMap::SmoothPointFromLane(const std::string& id, const double s,
     return false;
   }
   std::shared_ptr<const LaneInfo> lane = LaneById(id);
-  apollo::common::PointENU hdmap_point = lane->GetSmoothPoint(s);
+  common::PointENU hdmap_point = lane->GetSmoothPoint(s);
   *heading = PathHeading(lane, hdmap_point);
   point->operator[](0) = hdmap_point.x() - std::sin(*heading) * l;
   point->operator[](1) = hdmap_point.y() + std::cos(*heading) * l;
@@ -152,7 +153,7 @@ bool PredictionMap::SmoothPointFromLane(const std::string& id, const double s,
 }
 
 void PredictionMap::NearbyLanesByCurrentLanes(
-    const Eigen::Vector2d& point, double heading, double radius,
+    const Eigen::Vector2d& point, const double heading, const double radius,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes,
     std::vector<std::shared_ptr<const LaneInfo>>* nearby_lanes) {
   if (lanes.size() == 0) {
@@ -209,7 +210,8 @@ bool PredictionMap::IsLeftNeighborLane(
   if (left_lane == nullptr) {
     return false;
   }
-  for (auto& left_lane_id : curr_lane->lane().left_neighbor_forward_lane_id()) {
+  for (const auto& left_lane_id :
+       curr_lane->lane().left_neighbor_forward_lane_id()) {
     if (left_lane->id().id() == left_lane_id.id()) {
       return true;
     }
@@ -255,7 +257,7 @@ bool PredictionMap::IsRightNeighborLane(
   if (lanes.size() == 0) {
     return true;
   }
-  for (auto& lane : lanes) {
+  for (const auto& lane : lanes) {
     if (IsRightNeighborLane(right_lane, lane)) {
       return true;
     }

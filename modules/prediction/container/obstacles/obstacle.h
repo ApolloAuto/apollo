@@ -23,11 +23,11 @@
 #define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
 
 #include <deque>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <memory>
 
 #include "modules/common/math/kalman_filter.h"
 #include "modules/common/proto/error_code.pb.h"
@@ -51,26 +51,26 @@ class Obstacle {
   /**
    * @brief Constructor
    */
-  Obstacle();
+  Obstacle() = default;
 
   /**
    * @brief Destructor
    */
-  virtual ~Obstacle();
+  virtual ~Obstacle() = default;
 
   /**
    * @brief Insert a perception obstacle with its timestamp.
    * @param perception_obstacle The obstacle from perception.
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
-  void Insert(const apollo::perception::PerceptionObstacle& perception_obstacle,
+  void Insert(const perception::PerceptionObstacle& perception_obstacle,
               const double timestamp);
 
   /**
    * @brief Get the type of perception obstacle's type.
    * @return The type pf perception obstacle.
    */
-  apollo::perception::PerceptionObstacle::Type type() const;
+  perception::PerceptionObstacle::Type type() const;
 
   /**
    * @brief Get the obstacle's ID.
@@ -121,22 +121,21 @@ class Obstacle {
    * @param lane_id The lane ID.
    * @return The lane Kalman filter.
    */
-  const apollo::common::math::KalmanFilter<double, 4, 2, 0>&
-      kf_lane_tracker(const std::string& lane_id);
+  const common::math::KalmanFilter<double, 4, 2, 0>& kf_lane_tracker(
+      const std::string& lane_id);
 
   /**
    * @brief Get the motion Kalman filter.
    * @return The motion Kalman filter.
    */
-  const apollo::common::math::KalmanFilter<double, 6, 2, 0>&
-      kf_motion_tracker() const;
+  const common::math::KalmanFilter<double, 6, 2, 0>& kf_motion_tracker() const;
 
   /**
    * @brief Get the pedestrian Kalman filter.
    * @return The pedestrian Kalman filter.
    */
-  const apollo::common::math::KalmanFilter<double, 2, 2, 4>&
-      kf_pedestrian_tracker() const;
+  const common::math::KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker()
+      const;
 
   /**
    * @brief Check if the obstacle is on any lane.
@@ -145,33 +144,29 @@ class Obstacle {
   bool IsOnLane();
 
  private:
-  apollo::common::ErrorCode SetId(
-      const apollo::perception::PerceptionObstacle& perception_obstacle,
+  common::ErrorCode SetId(
+      const perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
-  apollo::common::ErrorCode SetType(
-      const apollo::perception::PerceptionObstacle& perception_obstacle);
+  common::ErrorCode SetType(
+      const perception::PerceptionObstacle& perception_obstacle);
 
-  void SetTimestamp(
-      const apollo::perception::PerceptionObstacle& perception_obstacle,
-      const double timestamp, Feature* feature);
+  void SetTimestamp(const perception::PerceptionObstacle& perception_obstacle,
+                    const double timestamp, Feature* feature);
 
-  void SetPosition(
-      const apollo::perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  void SetPosition(const perception::PerceptionObstacle& perception_obstacle,
+                   Feature* feature);
 
-  void SetVelocity(
-      const apollo::perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  void SetVelocity(const perception::PerceptionObstacle& perception_obstacle,
+                   Feature* feature);
 
   void SetAcceleration(Feature* feature);
 
-  void SetTheta(
-      const apollo::perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  void SetTheta(const perception::PerceptionObstacle& perception_obstacle,
+                Feature* feature);
 
   void SetLengthWidthHeight(
-      const apollo::perception::PerceptionObstacle& perception_obstacle,
+      const perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
   void InitKFMotionTracker(Feature* feature);
@@ -210,17 +205,17 @@ class Obstacle {
   void Trim();
 
  private:
-  int id_;
-  apollo::perception::PerceptionObstacle::Type type_;
+  int id_ = -1;
+  perception::PerceptionObstacle::Type type_ =
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
   std::deque<Feature> feature_history_;
-  apollo::common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
-  apollo::common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
-  bool kf_motion_tracker_enabled_;
-  bool kf_pedestrian_tracker_enabled_;
-  std::unordered_map<std::string,
-                     apollo::common::math::KalmanFilter<double, 4, 2, 0>>
+  common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
+  common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
+  bool kf_motion_tracker_enabled_ = false;
+  bool kf_pedestrian_tracker_enabled_ = false;
+  std::unordered_map<std::string, common::math::KalmanFilter<double, 4, 2, 0>>
       kf_lane_trackers_;
-  std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> current_lanes_;
+  std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
   static std::mutex mutex_;
 };
 

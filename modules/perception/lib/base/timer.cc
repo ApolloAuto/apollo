@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/lib/base/timer.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -24,19 +25,17 @@ using std::string;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 
-void Timer::start() {
-  _start_time = std::chrono::system_clock::now();
-}
+void Timer::start() { start_time_ = std::chrono::system_clock::now(); }
 
 uint64_t Timer::end(const string& msg) {
-  _end_time = std::chrono::system_clock::now();
+  end_time_ = std::chrono::system_clock::now();
   uint64_t elapsed_time =
-      duration_cast<milliseconds>(_end_time - _start_time).count();
+      duration_cast<milliseconds>(end_time_ - start_time_).count();
 
   ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
 
   // start new timer.
-  _start_time = _end_time;
+  start_time_ = end_time_;
   return elapsed_time;
 }
 
