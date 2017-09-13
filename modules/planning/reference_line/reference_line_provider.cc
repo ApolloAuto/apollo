@@ -81,18 +81,12 @@ void ReferenceLineProvider::Generate() {
         common::VehicleState::instance()->pose().position();
     const auto adc_point_enu = common::util::MakePointENU(
         curr_adc_position.x(), curr_adc_position.y(), curr_adc_position.z());
-    const int32_t kReferenceLineProviderSleepTime = 1000;
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
-      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
-          kReferenceLineProviderSleepTime));
+      constexpr int32_t kRoutingNotReadySleepTime = 1000;
+      std::this_thread::sleep_for(
+          std::chrono::duration<double, std::milli>(kRoutingNotReadySleepTime));
       continue;
-    }
-
-    if (!curr_adc_position.has_x() || !curr_adc_position.has_y()) {
-      AERROR << "VehicleState is not ready.";
-      std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
-          kReferenceLineProviderSleepTime));
     }
 
     routing::RoutingResponse routing;
@@ -108,6 +102,10 @@ void ReferenceLineProvider::Generate() {
     }
     ADEBUG << "ReferenceLine smoothed with adc position: "
            << curr_adc_position.ShortDebugString();
+
+    constexpr int32_t kReferenceLineProviderSleepTime = 200;
+    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
+        kReferenceLineProviderSleepTime));
   }
 }
 
