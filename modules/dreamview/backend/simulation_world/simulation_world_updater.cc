@@ -121,7 +121,6 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     const Json &json, RoutingRequest *routing_request) {
   // Input validations
   if (json.find("start") == json.end() ||
-      json.find("end") == json.end() ||
       json.find("sendDefaultRoute") == json.end()) {
     AERROR << "Cannot prepare a routing request: input validation failed.";
     return false;
@@ -165,6 +164,11 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     pose->set_x(default_end_point_.pose().x());
     pose->set_y(default_end_point_.pose().y());
   } else {
+    if (json.find("end") == json.end()) {
+      AERROR << "Failed to prepare a routing request: end point not found";
+      return false;
+    }
+
     auto end = json["end"];
     if (end.find("x") == end.end() || end.find("y") == end.end()) {
       AERROR << "Failed to prepare a routing request: end point not found";
