@@ -27,11 +27,11 @@ namespace apollo {
 namespace routing {
 
 using ::google::protobuf::RepeatedPtrField;
-using ::apollo::hdmap::Id;
-using ::apollo::hdmap::LaneBoundary;
-using ::apollo::hdmap::LaneBoundaryType;
+using apollo::hdmap::Id;
+using apollo::hdmap::LaneBoundary;
+using apollo::hdmap::LaneBoundaryType;
 
-using ::apollo::common::util::EndWith;
+using apollo::common::util::EndWith;
 
 namespace {
 
@@ -49,7 +49,7 @@ bool IsAllowedToCross(const LaneBoundary& boundary) {
 
 GraphCreator::GraphCreator(const std::string& base_map_file_path,
                            const std::string& dump_topo_file_path,
-                           const RoutingConfig *routing_conf)
+                           const RoutingConfig* routing_conf)
     : base_map_file_path_(base_map_file_path),
       dump_topo_file_path_(dump_topo_file_path),
       routing_conf_(routing_conf) {}
@@ -118,7 +118,7 @@ bool GraphCreator::Create() {
 
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
     if (lane.length() < routing_conf_->min_length_for_lane_change()) {
-        continue;
+      continue;
     }
     if (lane.has_left_boundary() && IsAllowedToCross(lane.left_boundary())) {
       AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
@@ -130,7 +130,7 @@ bool GraphCreator::Create() {
   }
 
   if (!EndWith(dump_topo_file_path_, ".bin") &&
-     !EndWith(dump_topo_file_path_, ".txt")) {
+      !EndWith(dump_topo_file_path_, ".txt")) {
     AERROR << "Failed to dump topo data into file, incorrect file type "
            << dump_topo_file_path_;
     return false;
@@ -138,12 +138,12 @@ bool GraphCreator::Create() {
   int type_pos = dump_topo_file_path_.find_last_of(".") + 1;
   std::string bin_file = dump_topo_file_path_.replace(type_pos, 3, "bin");
   std::string txt_file = dump_topo_file_path_.replace(type_pos, 3, "txt");
-  if (!::apollo::common::util::SetProtoToASCIIFile(graph_, txt_file)) {
+  if (!common::util::SetProtoToASCIIFile(graph_, txt_file)) {
     AERROR << "Failed to dump topo data into file " << txt_file;
     return false;
   }
   AINFO << "Txt file is dumped successfully. Path: " << txt_file;
-  if (!::apollo::common::util::SetProtoToBinaryFile(graph_, bin_file)) {
+  if (!common::util::SetProtoToBinaryFile(graph_, bin_file)) {
     AERROR << "Failed to dump topo data into file " << bin_file;
     return false;
   }
@@ -177,7 +177,7 @@ void GraphCreator::AddEdge(const Node& from_node,
     }
     const auto& to_node = graph_.node(iter->second);
     EdgeCreator::GetPbEdge(from_node, to_node, type, graph_.add_edge(),
-      routing_conf_);
+                           routing_conf_);
   }
 }
 

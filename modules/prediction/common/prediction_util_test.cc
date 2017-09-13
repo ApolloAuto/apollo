@@ -22,7 +22,7 @@ namespace apollo {
 namespace prediction {
 namespace util {
 
-using ::apollo::common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 TEST(PredictionUtilTest, normalize) {
   double value = 3.0;

@@ -18,4 +18,4 @@
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/apollo_app.h"
 
-APOLLO_MAIN(::apollo::canbus::Canbus);
+APOLLO_MAIN(apollo::canbus::Canbus);

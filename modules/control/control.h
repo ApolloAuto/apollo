@@ -99,9 +99,9 @@ class Control : public apollo::common::ApolloApp {
   void SendCmd(ControlCommand *control_command);
 
  private:
-  ::apollo::localization::LocalizationEstimate localization_;
-  ::apollo::canbus::Chassis chassis_;
-  ::apollo::planning::ADCTrajectory trajectory_;
+  localization::LocalizationEstimate localization_;
+  canbus::Chassis chassis_;
+  planning::ADCTrajectory trajectory_;
   PadMessage pad_msg_;
 
   ControllerAgent controller_agent_;

@@ -25,7 +25,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/search.h"
 
-namespace math = ::apollo::common::math;
+namespace math = apollo::common::math;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 

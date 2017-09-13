@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include <cstdio>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include "gflags/gflags.h"
 
 #include "modules/common/configs/config_gflags.h"
@@ -50,12 +50,12 @@ namespace apollo {
 namespace hdmap {
 
 #define QUIT_IF(CONDITION, RET, LEVEL, MSG, ...) \
-do { \
-  if (CONDITION) { \
-    RAW_LOG(LEVEL, MSG, ##__VA_ARGS__); \
-    return RET; \
-  } \
-} while (0);
+  do {                                           \
+    if (CONDITION) {                             \
+      RAW_LOG(LEVEL, MSG, ##__VA_ARGS__);        \
+      return RET;                                \
+    }                                            \
+  } while (0);
 
 class MapUtil {
  public:
@@ -77,8 +77,8 @@ class MapUtil {
     return ret.get();
   }
 
-  int point_to_sl(const PointENU &point,
-                  std::string *lane_id, double *s, double *l) {
+  int point_to_sl(const PointENU &point, std::string *lane_id, double *s,
+                  double *l) {
     QUIT_IF(lane_id == nullptr, -1, ERROR, "arg lane id is null");
     QUIT_IF(s == nullptr, -2, ERROR, "arg s is null");
     QUIT_IF(l == nullptr, -3, ERROR, "arg l is null");
@@ -95,22 +95,20 @@ class MapUtil {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
     const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
-    QUIT_IF(lane == nullptr, -3, ERROR,
-            "get_smooth_point_from_lane[%s] failed", lane_id.c_str());
+    QUIT_IF(lane == nullptr, -3, ERROR, "get_smooth_point_from_lane[%s] failed",
+            lane_id.c_str());
     *point = lane->GetSmoothPoint(s);
     return 0;
   }
 
   int lane_projection(const apollo::common::math::Vec2d &vec2d,
-                      const std::string &lane_id,
-                      double *s, double *l) {
+                      const std::string &lane_id, double *s, double *l) {
     QUIT_IF(s == nullptr, -1, ERROR, "arg s is nullptr");
     const auto lane = HDMapUtil::BaseMap().GetLaneById(MakeMapId(lane_id));
-    QUIT_IF(lane == nullptr, -2, ERROR,
-            "get_lane_by_id[%s] failed", lane_id.c_str());
+    QUIT_IF(lane == nullptr, -2, ERROR, "get_lane_by_id[%s] failed",
+            lane_id.c_str());
     bool ret = lane->GetProjection(vec2d, s, l);
-    QUIT_IF(!ret, -3, ERROR,
-            "lane[%s] get projection for point[%f, %f] failed",
+    QUIT_IF(!ret, -3, ERROR, "lane[%s] get projection for point[%f, %f] failed",
             lane_id.c_str(), vec2d.x(), vec2d.y());
     return 0;
   }
@@ -121,7 +119,7 @@ class MapUtil {
 
 std::ostream &operator<<(
     std::ostream &os,
-    const ::google::protobuf::RepeatedPtrField<::apollo::hdmap::Id> &ids) {
+    const ::google::protobuf::RepeatedPtrField<apollo::hdmap::Id> &ids) {
   for (int i = 0; i < ids.size(); ++i) {
     os << ids.Get(i).id();
     if (i != ids.size() - 1) {
@@ -135,7 +133,7 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   const std::string map_file = apollo::hdmap::BaseMapFile();
-  ::apollo::hdmap::MapUtil map_util;
+  apollo::hdmap::MapUtil map_util;
 
   if (FLAGS_xy_to_sl) {
     double x = FLAGS_x;
@@ -150,8 +148,8 @@ int main(int argc, char *argv[]) {
     map_util.point_to_sl(point, &lane_id, &s, &l);
     double heading = 0.0;
     map_util.sl_to_point(lane_id, s, l, &point, &heading);
-    printf("lane_id[%s], s[%f], l[%f], heading[%f]\n",
-           lane_id.c_str(), s, l, heading);
+    printf("lane_id[%s], s[%f], l[%f], heading[%f]\n", lane_id.c_str(), s, l,
+           heading);
   }
   if (FLAGS_sl_to_xy) {
     PointENU point;
@@ -164,8 +162,8 @@ int main(int argc, char *argv[]) {
     double l = 0.0;
     int ret = map_util.lane_projection({FLAGS_x, FLAGS_y}, FLAGS_lane, &s, &l);
     if (ret != 0) {
-      printf("lane_projection for x[%f], y[%f], lane_id[%s] failed\n",
-             FLAGS_x, FLAGS_y, FLAGS_lane.c_str());
+      printf("lane_projection for x[%f], y[%f], lane_id[%s] failed\n", FLAGS_x,
+             FLAGS_y, FLAGS_lane.c_str());
       return -1;
     }
     printf("lane[%s] s[%f], l[%f]\n", FLAGS_lane.c_str(), s, l);
@@ -183,8 +181,8 @@ int main(int argc, char *argv[]) {
              FLAGS_from_lane.c_str(), FLAGS_s, FLAGS_to_lane.c_str());
       return -1;
     }
-    printf("lane[%s] s[%f], l[%f]\n", FLAGS_to_lane.c_str(),
-           target_s, target_l);
+    printf("lane[%s] s[%f], l[%f]\n", FLAGS_to_lane.c_str(), target_s,
+           target_l);
   }
   if (!FLAGS_lane.empty()) {
     const auto *lane_ptr = map_util.get_lane(FLAGS_lane);
@@ -196,8 +194,8 @@ int main(int argc, char *argv[]) {
 
     PointENU end_point;
     double end_heading = 0.0;
-    map_util.sl_to_point(FLAGS_lane, lane_ptr->total_length(), 0,
-                         &end_point, &end_heading);
+    map_util.sl_to_point(FLAGS_lane, lane_ptr->total_length(), 0, &end_point,
+                         &end_heading);
 
     double left_width = 0.0;
     double right_width = 0.0;
@@ -230,7 +228,7 @@ int main(int argc, char *argv[]) {
       int num = 0;
       for (auto w : sample_left_widthes) {
         std::cout << " " << w.second;
-        if (++num % 10 == 0)  {
+        if (++num % 10 == 0) {
           std::cout << std::endl;
         }
       }
@@ -241,7 +239,7 @@ int main(int argc, char *argv[]) {
                 << std::endl;
       for (auto w : sample_right_widthes) {
         std::cout << " " << w.second;
-        if (++num % 10 == 0)  {
+        if (++num % 10 == 0) {
           std::cout << std::endl;
         }
       }
@@ -251,9 +249,8 @@ int main(int argc, char *argv[]) {
   if (!FLAGS_overlap.empty()) {
     const auto *overlap_ptr = map_util.get_overlap(FLAGS_overlap);
     if (overlap_ptr != nullptr) {
-      std::cout << "overlap[" << overlap_ptr->id().id()
-                << "] info[" << overlap_ptr->overlap().DebugString()
-                << "]" << std::endl;
+      std::cout << "overlap[" << overlap_ptr->id().id() << "] info["
+                << overlap_ptr->overlap().DebugString() << "]" << std::endl;
     }
   }
   if (!FLAGS_signal_info.empty()) {
@@ -273,15 +270,10 @@ int main(int argc, char *argv[]) {
     CHECK(apollo::common::util::GetProtoFromFile(map_file, &map));
     CHECK(apollo::common::util::SetProtoToBinaryFile(map, FLAGS_dump_bin_map));
   }
-  if (!FLAGS_sl_to_xy
-      && !FLAGS_xy_to_sl
-      && !FLAGS_xy_to_lane
-      && !FLAGS_lane_to_lane
-      && FLAGS_lane.empty()
-      && FLAGS_dump_txt_map.empty()
-      && FLAGS_dump_bin_map.empty()
-      && FLAGS_signal_info.empty()
-      && FLAGS_overlap.empty()) {
+  if (!FLAGS_sl_to_xy && !FLAGS_xy_to_sl && !FLAGS_xy_to_lane &&
+      !FLAGS_lane_to_lane && FLAGS_lane.empty() && FLAGS_dump_txt_map.empty() &&
+      FLAGS_dump_bin_map.empty() && FLAGS_signal_info.empty() &&
+      FLAGS_overlap.empty()) {
     std::cout << "usage: --dump_txt_map" << std::endl;
     std::cout << "usage: --dump_bin_map" << std::endl;
     std::cout << "usage: --xy_to_sl --x --y" << std::endl;

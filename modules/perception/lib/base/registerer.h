@@ -136,12 +136,12 @@ bool GetRegisteredClasses(
 
 #define REGISTER_REGISTERER(base_class)                                        \
   class base_class##Registerer {                                               \
-    typedef ::apollo::perception::Any Any;                                     \
-    typedef ::apollo::perception::FactoryMap FactoryMap;                       \
+    typedef perception::Any Any;                                     \
+    typedef perception::FactoryMap FactoryMap;                       \
                                                                                \
    public:                                                                     \
     static base_class *GetInstanceByName(const ::std::string &name) {          \
-      FactoryMap &map = ::apollo::perception::GlobalFactoryMap()[#base_class]; \
+      FactoryMap &map = perception::GlobalFactoryMap()[#base_class]; \
       FactoryMap::iterator iter = map.find(name);                              \
       if (iter == map.end()) {                                                 \
         for (auto c : map) {                                                   \
@@ -155,7 +155,7 @@ bool GetRegisteredClasses(
     }                                                                          \
     static std::vector<base_class *> GetAllInstances() {                       \
       std::vector<base_class *> instances;                                     \
-      FactoryMap &map = ::apollo::perception::GlobalFactoryMap()[#base_class]; \
+      FactoryMap &map = perception::GlobalFactoryMap()[#base_class]; \
       instances.reserve(map.size());                                           \
       for (auto item : map) {                                                  \
         Any object = item.second->NewInstance();                               \
@@ -164,18 +164,18 @@ bool GetRegisteredClasses(
       return instances;                                                        \
     }                                                                          \
     static const ::std::string GetUniqInstanceName() {                         \
-      FactoryMap &map = ::apollo::perception::GlobalFactoryMap()[#base_class]; \
+      FactoryMap &map = perception::GlobalFactoryMap()[#base_class]; \
       CHECK_EQ(map.size(), 1) << map.size();                                   \
       return map.begin()->first;                                               \
     }                                                                          \
     static base_class *GetUniqInstance() {                                     \
-      FactoryMap &map = ::apollo::perception::GlobalFactoryMap()[#base_class]; \
+      FactoryMap &map = perception::GlobalFactoryMap()[#base_class]; \
       CHECK_EQ(map.size(), 1) << map.size();                                   \
       Any object = map.begin()->second->NewInstance();                         \
       return *(object.AnyCast<base_class *>());                                \
     }                                                                          \
     static bool IsValid(const ::std::string &name) {                           \
-      FactoryMap &map = ::apollo::perception::GlobalFactoryMap()[#base_class]; \
+      FactoryMap &map = perception::GlobalFactoryMap()[#base_class]; \
       return map.find(name) != map.end();                                      \
     }                                                                          \
   };
@@ -184,13 +184,13 @@ bool GetRegisteredClasses(
   class ObjectFactory##name : public apollo::perception::ObjectFactory {      \
    public:                                                                    \
     virtual ~ObjectFactory##name() {}                                         \
-    virtual ::apollo::perception::Any NewInstance() {                         \
-      return ::apollo::perception::Any(new name());                           \
+    virtual perception::Any NewInstance() {                         \
+      return perception::Any(new name());                           \
     }                                                                         \
   };                                                                          \
   inline void RegisterFactory##name() {                                       \
-    ::apollo::perception::FactoryMap &map =                                   \
-        ::apollo::perception::GlobalFactoryMap()[#clazz];                     \
+    perception::FactoryMap &map =                                   \
+        perception::GlobalFactoryMap()[#clazz];                     \
     if (map.find(#name) == map.end()) map[#name] = new ObjectFactory##name(); \
   }
 

@@ -72,10 +72,10 @@ class MapService {
       const apollo::routing::RoutingResponse &routing,
       std::vector<apollo::hdmap::MapPathPoint> *points) const;
 
-  // The returned value is of a ::apollo::hdmap::Map proto. This
+  // The returned value is of a hdmap::Map proto. This
   // makes it easy to convert to a JSON object and to send to the
   // javascript clients.
-  ::apollo::hdmap::Map RetrieveMapElements(const MapElementIds &ids) const;
+  hdmap::Map RetrieveMapElements(const MapElementIds &ids) const;
 
   bool GetPoseWithRegardToLane(const double x, const double y, double *theta,
                                double *s) const;
@@ -93,10 +93,10 @@ class MapService {
    */
   bool ConstructLaneWayPoint(
       const double x, const double y,
-      ::apollo::routing::RoutingRequest::LaneWaypoint *laneWayPoint) const;
+      routing::RoutingRequest::LaneWaypoint *laneWayPoint) const;
 
  private:
-  const ::apollo::hdmap::HDMap &BaseMap() const {
+  const hdmap::HDMap &BaseMap() const {
     return pnc_map_.HDMap();
   }
 
@@ -105,9 +105,9 @@ class MapService {
                       double *nearest_s, double *nearest_l) const;
 
   // A wrapper around HDMap to provide some convenient utils dreamview needs.
-  const ::apollo::hdmap::PncMap pnc_map_;
+  const hdmap::PncMap pnc_map_;
   // A downsampled map for dreamview frontend display.
-  ::apollo::hdmap::HDMap sim_map_;
+  hdmap::HDMap sim_map_;
 };
 
 }  // namespace dreamview

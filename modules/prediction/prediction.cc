@@ -29,21 +29,21 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::perception::PerceptionObstacles;
-using ::apollo::perception::PerceptionObstacle;
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::adapter::AdapterConfig;
-using ::apollo::common::Status;
-using ::apollo::common::ErrorCode;
+using apollo::perception::PerceptionObstacles;
+using apollo::perception::PerceptionObstacle;
+using apollo::localization::LocalizationEstimate;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
 Status Prediction::Init() {
   // Load prediction conf
   prediction_conf_.Clear();
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
-                                                &prediction_conf_)) {
+  if (!common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
+                                      &prediction_conf_)) {
     return OnError("Unable to load prediction conf file: " +
                    FLAGS_prediction_conf_file);
   } else {
@@ -52,8 +52,8 @@ Status Prediction::Init() {
   }
 
   adapter_conf_.Clear();
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_adapter_config_filename,
-                                                &adapter_conf_)) {
+  if (!common::util::GetProtoFromFile(FLAGS_adapter_config_filename,
+                                      &adapter_conf_)) {
     return OnError("Unable to load adapter conf file: " +
                    FLAGS_adapter_config_filename);
   } else {

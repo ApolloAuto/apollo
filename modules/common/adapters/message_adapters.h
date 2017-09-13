@@ -47,28 +47,28 @@ namespace apollo {
 namespace common {
 namespace adapter {
 
-using ChassisAdapter = Adapter<::apollo::canbus::Chassis>;
-using ChassisDetailAdapter = Adapter<::apollo::canbus::ChassisDetail>;
-using ControlCommandAdapter = Adapter<::apollo::control::ControlCommand>;
+using ChassisAdapter = Adapter<canbus::Chassis>;
+using ChassisDetailAdapter = Adapter<canbus::ChassisDetail>;
+using ControlCommandAdapter = Adapter<control::ControlCommand>;
 using GpsAdapter = Adapter<apollo::localization::Gps>;
-using ImuAdapter = Adapter<::apollo::localization::Imu>;
-using CameraAdapter = Adapter<::apollo::localization::Camera>;
+using ImuAdapter = Adapter<localization::Imu>;
+using CameraAdapter = Adapter<localization::Camera>;
 using LocalizationAdapter = Adapter<apollo::localization::LocalizationEstimate>;
 using MonitorAdapter = Adapter<apollo::common::monitor::MonitorMessage>;
-using PadAdapter = Adapter<::apollo::control::PadMessage>;
+using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter =
-    Adapter<::apollo::perception::PerceptionObstacles>;
-using PlanningAdapter = Adapter<::apollo::planning::ADCTrajectory>;
+    Adapter<perception::PerceptionObstacles>;
+using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
-using PredictionAdapter = Adapter<::apollo::prediction::PredictionObstacles>;
+using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter =
-    Adapter<::apollo::perception::TrafficLightDetection>;
-using RoutingRequestAdapter = Adapter<::apollo::routing::RoutingRequest>;
-using RoutingResponseAdapter = Adapter<::apollo::routing::RoutingResponse>;
+    Adapter<perception::TrafficLightDetection>;
+using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
+using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 using RelativeOdometryAdapter =
-    Adapter<::apollo::calibration::republish_msg::RelativeOdometry>;
-using InsStatAdapter = Adapter<::apollo::drivers::gnss::InsStat>;
-using HMICommandAdapter = Adapter<::apollo::hmi::HMICommand>;
+    Adapter<calibration::republish_msg::RelativeOdometry>;
+using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
+using HMICommandAdapter = Adapter<hmi::HMICommand>;
 
 }  // namespace adapter
 }  // namespace common

@@ -25,11 +25,11 @@ namespace apollo {
 namespace localization {
 
 using ::Eigen::Vector3d;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::adapter::ImuAdapter;
-using ::apollo::common::monitor::MonitorMessageItem;
-using ::apollo::common::Status;
-using ::apollo::common::time::Clock;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::adapter::ImuAdapter;
+using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::Status;
+using apollo::common::time::Clock;
 
 RTKLocalization::RTKLocalization()
     : monitor_(MonitorMessageItem::LOCALIZATION),
@@ -255,8 +255,7 @@ void RTKLocalization::PrepareLocalizationMsg(
 }
 
 void RTKLocalization::ComposeLocalizationMsg(
-    const ::apollo::localization::Gps &gps_msg,
-    const ::apollo::localization::Imu &imu_msg,
+    const localization::Gps &gps_msg, const localization::Imu &imu_msg,
     LocalizationEstimate *localization) {
   localization->Clear();
 

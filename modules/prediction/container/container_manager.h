@@ -43,7 +43,7 @@ class ContainerManager {
    * @brief Container manager initialization
    * @param Adapter config
    */
-  void Init(const ::apollo::common::adapter::AdapterManagerConfig& config);
+  void Init(const common::adapter::AdapterManagerConfig& config);
 
   /**
    * @brief Get mutable container
@@ -51,7 +51,7 @@ class ContainerManager {
    * @return Pointer to the container given the name
    */
   Container* GetContainer(
-      const ::apollo::common::adapter::AdapterConfig::MessageType &type);
+      const common::adapter::AdapterConfig::MessageType &type);
 
  private:
   /**
@@ -59,7 +59,7 @@ class ContainerManager {
    * @param Container type
    */
   void RegisterContainer(
-      const ::apollo::common::adapter::AdapterConfig::MessageType &type);
+      const common::adapter::AdapterConfig::MessageType &type);
 
   /**
    * @brief Create a container
@@ -67,7 +67,7 @@ class ContainerManager {
    * @return Container pointer
    */
   std::unique_ptr<Container> CreateContainer(
-      const ::apollo::common::adapter::AdapterConfig::MessageType &type);
+      const common::adapter::AdapterConfig::MessageType &type);
 
   /**
    * @brief Register all containers
@@ -75,10 +75,10 @@ class ContainerManager {
   void RegisterContainers();
 
  private:
-  std::map<::apollo::common::adapter::AdapterConfig::MessageType,
+  std::map<common::adapter::AdapterConfig::MessageType,
     std::unique_ptr<Container>> containers_;
 
-  ::apollo::common::adapter::AdapterManagerConfig config_;
+  common::adapter::AdapterManagerConfig config_;
 
   DECLARE_SINGLETON(ContainerManager)
 };

@@ -46,15 +46,15 @@ DEFINE_int32(num_seconds, 10, "Length of execution.");
 DEFINE_int32(feed_frequency, 10,
              "Frequency with which protos are fed to control.");
 
-using std::this_thread::sleep_for;
-
-using ::apollo::canbus::Chassis;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::control::PadMessage;
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::planning::ADCTrajectory;
-
 int main(int argc, char** argv) {
+  using std::this_thread::sleep_for;
+
+  using apollo::canbus::Chassis;
+  using apollo::common::adapter::AdapterManager;
+  using apollo::control::PadMessage;
+  using apollo::localization::LocalizationEstimate;
+  using apollo::planning::ADCTrajectory;
+
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_alsologtostderr = true;

@@ -316,7 +316,7 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
 void MLPEvaluator::LoadModel(const std::string& model_file) {
   model_ptr_.reset(new FnnVehicleModel());
   CHECK(model_ptr_ != nullptr);
-  CHECK(::apollo::common::util::GetProtoFromFile(
+  CHECK(common::util::GetProtoFromFile(
       model_file, model_ptr_.get()))
       << "Unable to load model file: " << model_file << ".";
 

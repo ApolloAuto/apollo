@@ -52,7 +52,7 @@ class RTKLocalizationTest : public ::testing::Test {
  protected:
   template <class T>
   void load_data(const std::string &filename, T *data) {
-    CHECK(::apollo::common::util::GetProtoFromFile(filename, data))
+    CHECK(common::util::GetProtoFromFile(filename, data))
         << "Failed to open file " << filename;
   }
 

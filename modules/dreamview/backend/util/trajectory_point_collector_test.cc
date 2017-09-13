@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 
-using ::apollo::common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 namespace apollo {
 namespace dreamview {

@@ -48,11 +48,11 @@ class PncMap {
    * @brief Warning: this function only works if there is no change lane in
    *routing.
    **/
-  bool CreatePathFromRouting(const ::apollo::routing::RoutingResponse &routing,
+  bool CreatePathFromRouting(const routing::RoutingResponse &routing,
                              Path *const path) const;
 
   bool GetLaneSegmentsFromRouting(
-      const ::apollo::routing::RoutingResponse &routing,
+      const routing::RoutingResponse &routing,
       const common::PointENU &point,
       const double backward_length, const double forward_length,
       std::vector<LaneSegments> *const route_segments) const;
@@ -65,7 +65,7 @@ class PncMap {
                             double start_s, double end_s,
                             LaneSegments *const truncated_segments) const;
 
-  bool ValidateRouting(const ::apollo::routing::RoutingResponse &routing) const;
+  bool ValidateRouting(const routing::RoutingResponse &routing) const;
   static void AppendLaneToPoints(
       LaneInfoConstPtr lane, const double start_s, const double end_s,
       std::vector<MapPathPoint> *const points);

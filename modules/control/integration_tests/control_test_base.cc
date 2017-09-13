@@ -48,7 +48,7 @@ using apollo::control::PadMessage;
 uint32_t ControlTestBase::s_seq_num_ = 0;
 
 bool ControlTestBase::test_control() {
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
+  if (!common::util::GetProtoFromFile(FLAGS_control_conf_file,
                                                 &control_.control_conf_)) {
     AERROR << "Unable to load control conf file: " << FLAGS_control_conf_file;
     exit(EXIT_FAILURE);
@@ -139,24 +139,24 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
     AINFO << "The golden file is " << tmp_golden_path << " Remember to:\n"
           << "mv " << tmp_golden_path << " " << FLAGS_test_data_dir << "\n"
           << "git add " << FLAGS_test_data_dir << "/" << golden_result_file;
-    ::apollo::common::util::SetProtoToASCIIFile(control_command_,
+    common::util::SetProtoToASCIIFile(control_command_,
                                                 golden_result_file);
   } else {
     ControlCommand golden_result;
-    bool load_success = ::apollo::common::util::GetProtoFromASCIIFile(
+    bool load_success = common::util::GetProtoFromASCIIFile(
         full_golden_path, &golden_result);
     if (!load_success) {
       AERROR << "Failed to load golden file: " << full_golden_path;
-      ::apollo::common::util::SetProtoToASCIIFile(control_command_,
+      common::util::SetProtoToASCIIFile(control_command_,
                                                   tmp_golden_path);
       AINFO << "Current result is written to " << tmp_golden_path;
       return false;
     }
     bool same_result =
-        ::apollo::common::util::IsProtoEqual(golden_result, control_command_);
+        common::util::IsProtoEqual(golden_result, control_command_);
     if (!same_result) {
       std::string tmp_planning_file = tmp_golden_path + ".tmp";
-      ::apollo::common::util::SetProtoToASCIIFile(control_command_,
+      common::util::SetProtoToASCIIFile(control_command_,
                                                   tmp_planning_file);
       AERROR << "found diff " << tmp_planning_file << " " << full_golden_path;
     }

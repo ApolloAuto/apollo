@@ -137,7 +137,7 @@ void PrintDebugData(const std::vector<NodeWithRange>& nodes) {
 Navigator::Navigator(const std::string& topo_file_path)
     : is_ready_(false) {
   Graph graph;
-  if (!::apollo::common::util::GetProtoFromFile(topo_file_path, &graph)) {
+  if (!common::util::GetProtoFromFile(topo_file_path, &graph)) {
     AERROR << "Failed to read topology graph from " << topo_file_path;
     return;
   }

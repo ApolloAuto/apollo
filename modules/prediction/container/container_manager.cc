@@ -16,15 +16,15 @@
 
 #include "modules/prediction/container/container_manager.h"
 
+#include "modules/common/log.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::adapter::AdapterConfig;
-using ::apollo::common::adapter::AdapterManagerConfig;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterManagerConfig;
 
 ContainerManager::ContainerManager() {}
 
@@ -44,7 +44,7 @@ void ContainerManager::RegisterContainers() {
 }
 
 Container* ContainerManager::GetContainer(
-    const ::apollo::common::adapter::AdapterConfig::MessageType &type) {
+    const common::adapter::AdapterConfig::MessageType& type) {
   if (containers_.find(type) != containers_.end()) {
     return containers_[type].get();
   } else {
@@ -53,7 +53,7 @@ Container* ContainerManager::GetContainer(
 }
 
 std::unique_ptr<Container> ContainerManager::CreateContainer(
-    const ::apollo::common::adapter::AdapterConfig::MessageType &type) {
+    const common::adapter::AdapterConfig::MessageType& type) {
   std::unique_ptr<Container> container_ptr(nullptr);
   if (type == AdapterConfig::PERCEPTION_OBSTACLES) {
     container_ptr.reset(new ObstaclesContainer());
@@ -64,7 +64,7 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
 }
 
 void ContainerManager::RegisterContainer(
-    const ::apollo::common::adapter::AdapterConfig::MessageType &type) {
+    const common::adapter::AdapterConfig::MessageType& type) {
   containers_[type] = CreateContainer(type);
   AINFO << "Container [" << type << "] is registered.";
 }

@@ -79,10 +79,10 @@ Status ControllerAgent::Init(const ControlConf *control_conf) {
 }
 
 Status ControllerAgent::ComputeControlCommand(
-    const ::apollo::localization::LocalizationEstimate *localization,
-    const ::apollo::canbus::Chassis *chassis,
-    const ::apollo::planning::ADCTrajectory *trajectory,
-    ::apollo::control::ControlCommand *cmd) {
+    const localization::LocalizationEstimate *localization,
+    const canbus::Chassis *chassis,
+    const planning::ADCTrajectory *trajectory,
+    control::ControlCommand *cmd) {
   for (auto &controller : controller_list_) {
     ADEBUG << "controller:" << controller->Name() << " processing ...";
     double start_timestamp = Clock::NowInSecond();

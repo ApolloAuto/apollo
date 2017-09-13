@@ -25,11 +25,11 @@
 namespace apollo {
 namespace localization {
 
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::monitor::MonitorMessageItem;
-using ::apollo::common::monitor::MonitorBuffer;
-using ::apollo::common::Status;
-using ::apollo::common::time::Clock;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::monitor::MonitorBuffer;
+using apollo::common::Status;
+using apollo::common::time::Clock;
 
 CameraLocalization::CameraLocalization()
     : monitor_(MonitorMessageItem::LOCALIZATION) {}
