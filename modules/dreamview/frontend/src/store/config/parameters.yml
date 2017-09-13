@@ -24,7 +24,6 @@ ground:
   yres: 8192
   xorigin: 4096
   yorigin: 4096
-  mapname: SUNNYVALELOOP
   xyoffset: 0
 planning:
   # The minimum interval between two consecutive
