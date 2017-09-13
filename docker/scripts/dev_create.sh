@@ -16,12 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-
 TIME=$(date  +%Y%m%d_%H%M)
 if [ -z "${DOCKER_REPO}" ]; then
     DOCKER_REPO=apolloauto/internal
 fi
-
 
 APOLLO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 ARCH=$(uname -m)
