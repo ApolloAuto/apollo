@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_COMMON_POSE_UTIL_H_
-#define ADU_PERCEPTION_OBSTACLE_COMMON_POSE_UTIL_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_POSE_UTIL_H_
+#define MODULES_PERCEPTION_OBSTACLE_COMMON_POSE_UTIL_H_
 
 #include <fstream>
 #include <iomanip>
@@ -57,4 +57,4 @@ bool ReadPoseFile(const std::string& filename, Eigen::Matrix4d* pose,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // ADU_PERCEPTION_OBSTACLE_COMMON_POSE_UTIL_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_POSE_UTIL_H_
