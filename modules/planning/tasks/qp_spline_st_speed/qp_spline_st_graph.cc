@@ -245,16 +245,12 @@ Status QpSplineStGraph::ApplyConstraint(
     accel_upper_bound.front() = 0.0;
   } else {
     constexpr double kInitPointAccelRelaxedSpeed = 1.0;
-    constexpr double kInitPointAccelRelaxedRange = 0.5;
-    if (init_point_.v() > kInitPointAccelRelaxedSpeed &&
-        (init_point_.a() > accel_bound.second - kInitPointAccelRelaxedRange ||
-         init_point_.a() < accel_bound.first + kInitPointAccelRelaxedRange)) {
-      accel_lower_bound.front() =
-          std::max(accel_lower_bound.front(),
-                   init_point_.a() - kInitPointAccelRelaxedRange);
-      accel_upper_bound.front() =
-          std::min(accel_upper_bound.front(),
-                   init_point_.a() + kInitPointAccelRelaxedRange);
+    constexpr double kInitPointAccelRelaxedRange = 0.4;
+
+    if (init_point_.v() < kInitPointAccelRelaxedSpeed &&
+        init_point_.a() < 0.0) {
+      accel_lower_bound.front() = init_point_.a() - kInitPointAccelRelaxedRange;
+      accel_upper_bound.front() = init_point_.a() + kInitPointAccelRelaxedRange;
     } else {
       if (!constraint->AddPointSecondDerivativeConstraint(0.0,
                                                           init_point_.a())) {
