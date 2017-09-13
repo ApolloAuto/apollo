@@ -67,9 +67,11 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         auto radius = json.find("radius");
         if (radius == json.end()) {
           AERROR << "Cannot retrieve map elements with unknown radius.";
+          return;
         }
 
-        auto response = sim_world_service_.GetUpdateAsJson(*radius);
+        Json response = sim_world_service_.GetMapElements(*radius);
+        response["type"] = "MapElements";
         websocket_->SendData(conn, response.dump());
       });
 
@@ -87,8 +89,8 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
         // Publish monitor message.
         if (succeed) {
-          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
-                                                   "Routing Request Sent");
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::INFO, "Routing Request Sent");
         } else {
           sim_world_service_.PublishMonitorMessage(
               MonitorMessageItem::ERROR, "Failed to send routing request");
@@ -117,6 +119,14 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
     const Json &json, RoutingRequest *routing_request) {
+  // Input validations
+  if (json.find("start") == json.end() ||
+      json.find("end") == json.end() ||
+      json.find("sendDefaultRoute") == json.end()) {
+    AERROR << "Cannot prepare a routing request: input validation failed.";
+    return false;
+  }
+
   // Try to reload end point if it hasn't be loaded yet.
   if (!default_end_point_.has_id() &&
       !GetProtoFromASCIIFile(EndWayPointFile(), &default_end_point_)) {

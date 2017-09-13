@@ -326,6 +326,15 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   std::string sim_world_json;
   ::google::protobuf::util::MessageToJsonString(world_, &sim_world_json);
 
+  Json update = GetMapElements(radius);
+  update["type"] = "sim_world_update";
+  update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
+  update["world"] = Json::parse(sim_world_json);
+
+  return update;
+}
+
+Json SimulationWorldService::GetMapElements(double radius) const {
   // Gather required map element ids based on current location.
   apollo::common::PointENU point;
   point.set_x(world_.auto_driving_car().position_x());
@@ -334,15 +343,12 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   MapElementIds map_element_ids =
       map_service_->CollectMapElementIds(point, radius);
 
-  Json update;
-  update["type"] = "sim_world_update";
-  update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
-  update["world"] = Json::parse(sim_world_json);
-  update["mapElementIds"] = map_element_ids.Json();
-  update["mapHash"] = map_element_ids.Hash();
-  update["radius"] = radius;
+  Json map;
+  map["mapElementIds"] = map_element_ids.Json();
+  map["mapHash"] = map_element_ids.Hash();
+  map["mapRadius"] = radius;
 
-  return update;
+  return map;
 }
 
 template <>

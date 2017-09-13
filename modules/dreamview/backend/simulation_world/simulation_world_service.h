@@ -80,6 +80,14 @@ class SimulationWorldService {
   nlohmann::json GetUpdateAsJson(double radius) const;
 
   /**
+   * @brief Returns the json representation of the map element Ids and hash
+   * within the given radious from the car.
+   * @param radius the search distance from the current car location
+   * @return Json object that contains mapElementIds and mapHash.
+   */
+  nlohmann::json GetMapElements(double radius) const;
+
+  /**
    * @brief The function Update() is periodically called to check for updates
    * from the adapters. All the updates will be written to the SimulationWorld
    * object to reflect the latest status.
