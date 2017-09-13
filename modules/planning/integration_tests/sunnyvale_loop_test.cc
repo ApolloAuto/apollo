@@ -95,5 +95,19 @@ TEST_F(SunnyvaleLoopTest, nudge) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test follow a vehicle with follow fence behind adc
+ * A follow test case
+ */
+TEST_F(SunnyvaleLoopTest, follow_02) {
+  std::string seq_num = "5";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
