@@ -60,16 +60,12 @@ QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
       end_s_(end_s),
       time_resolution_(time_resolution) {}
 
-bool QpFrenetFrame::Init(const uint32_t num_points,
-                         apollo::planning_internal::Debug* planning_debug) {
+bool QpFrenetFrame::Init(const uint32_t num_points) {
   if (num_points < 2) {
     AERROR << "Number of s points [" << num_points
            << "] is too small to evaluate.";
     return false;
   }
-
-  apollo::planning_internal::SLFrameDebug* sl_frame =
-      planning_debug->mutable_planning_data()->mutable_sl_frame()->Add();
 
   constexpr double kMinDistance = 1.0e-8;
   if (std::fabs(start_s_ - end_s_) < kMinDistance) {
@@ -101,6 +97,17 @@ bool QpFrenetFrame::Init(const uint32_t num_points,
     AERROR << "Calculate obstacle bound failed!";
     return false;
   }
+
+  return true;
+}
+
+void QpFrenetFrame::LogQpBound(
+    apollo::planning_internal::Debug* planning_debug) {
+  if (!planning_debug) {
+    return;
+  }
+  apollo::planning_internal::SLFrameDebug* sl_frame =
+      planning_debug->mutable_planning_data()->mutable_sl_frame()->Add();
   for (size_t i = 0; i < evaluated_knots_.size(); ++i) {
     sl_frame->mutable_sampled_s()->Add(evaluated_knots_[i]);
     sl_frame->mutable_map_lower_bound()->Add(hdmap_bound_[i].first);
@@ -114,7 +121,6 @@ bool QpFrenetFrame::Init(const uint32_t num_points,
     sl_frame->mutable_dynamic_obstacle_upper_bound()->Add(
         dynamic_obstacle_bound_[i].second);
   }
-  return true;
 }
 
 bool QpFrenetFrame::GetMapBound(const double s,

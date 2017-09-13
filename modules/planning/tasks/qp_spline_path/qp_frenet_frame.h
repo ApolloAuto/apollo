@@ -49,8 +49,9 @@ class QpFrenetFrame {
                 const double time_resolution);
   virtual ~QpFrenetFrame() = default;
 
-  bool Init(const uint32_t num_points,
-            apollo::planning_internal::Debug* planning_debug);
+  bool Init(const uint32_t num_points);
+
+  void LogQpBound(apollo::planning_internal::Debug* planning_debug);
 
   bool GetMapBound(const double s,
                    std::pair<double, double>* const bound) const;
