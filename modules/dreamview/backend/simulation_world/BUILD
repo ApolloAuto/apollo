@@ -54,15 +54,15 @@ cc_library(
     hdrs = [
         "simulation_world_updater.h",
     ],
+    linkopts = [
+        "-lboost_thread",
+    ],
     deps = [
         ":simulation_world_service",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/websocket",
         "@com_google_protobuf//:protobuf",
-    ],
-    linkopts = [
-        "-lboost_thread",
     ],
 )
 
