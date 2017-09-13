@@ -15,9 +15,12 @@ import RoutingEditor from "renderer/routing_editor.js";
 
 class Renderer {
     constructor() {
+        // Disable antialias for mobile devices.
+        const useAntialias = !this.isMobileDevice();
+
         this.coordinates = new Coordinates();
         this.renderer = new THREE.WebGLRenderer({
-            preserveDrawingBuffer: true, antialias: true
+            antialias: useAntialias
         });
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x031C31);
@@ -288,6 +291,7 @@ class Renderer {
         requestAnimationFrame(() => {
             this.animate();
         });
+
         this.render();
     }
 
@@ -309,6 +313,14 @@ class Renderer {
              this.routingEditor.EDITING_MAP_RADIUS === radius) {
             this.map.updateIndex(hash, elementIds, this.scene);
         }
+    }
+
+    isMobileDevice() {
+        return navigator.userAgent.match(/Android/i)
+            || navigator.userAgent.match(/webOS/i)
+            || navigator.userAgent.match(/iPhone/i)
+            || navigator.userAgent.match(/iPad/i)
+            || navigator.userAgent.match(/iPod/i);
     }
 }
 
