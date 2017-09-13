@@ -55,11 +55,15 @@ QpSplinePathGenerator::QpSplinePathGenerator(
       << "third_derivative_weight should NOT be negative.";
 }
 
+void QpSplinePathGenerator::SetDebugLogger(
+    apollo::planning_internal::Debug* debug) {
+  planning_debug_ = debug;
+}
+
 bool QpSplinePathGenerator::Generate(
     const std::vector<const PathObstacle*>& path_obstacles,
     const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
-    PathData* const path_data,
-    apollo::planning_internal::Debug* planning_debug) {
+    PathData* const path_data) {
   if (!CalculateInitFrenetPoint(init_point, &init_frenet_point_)) {
     AERROR << "Fail to map init point: " << init_point.ShortDebugString();
     return false;
@@ -70,11 +74,11 @@ bool QpSplinePathGenerator::Generate(
   QpFrenetFrame qp_frenet_frame(reference_line_, path_obstacles, speed_data,
                                 init_frenet_point_, start_s, end_s,
                                 qp_spline_path_config_.time_resolution());
-  if (!qp_frenet_frame.Init(qp_spline_path_config_.num_output(),
-                            planning_debug)) {
+  if (!qp_frenet_frame.Init(qp_spline_path_config_.num_output())) {
     AERROR << "Fail to initialize qp frenet frame";
     return false;
   }
+  qp_frenet_frame.LogQpBound(planning_debug_);
 
   ADEBUG << "pss path start with " << start_s << ", end with " << end_s;
 
@@ -84,7 +88,7 @@ bool QpSplinePathGenerator::Generate(
     return false;
   }
 
-  if (!AddConstraint(qp_frenet_frame, planning_debug)) {
+  if (!AddConstraint(qp_frenet_frame)) {
     AERROR << "Fail to setup pss path constraint.";
     return false;
   }
@@ -117,8 +121,9 @@ bool QpSplinePathGenerator::Generate(
       (end_s - init_frenet_point_.s()) / qp_spline_path_config_.num_output();
   while (Double::Compare(s, end_s) < 0) {
     double l = spline(s);
-    if (planning_debug->planning_data().sl_frame().size() >= 1) {
-      auto sl_point = planning_debug->mutable_planning_data()
+    if (planning_debug_ &&
+        planning_debug_->planning_data().sl_frame().size() >= 1) {
+      auto sl_point = planning_debug_->mutable_planning_data()
                           ->mutable_sl_frame(0)
                           ->mutable_sl_path()
                           ->Add();
@@ -234,18 +239,15 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
 }
 
 bool QpSplinePathGenerator::AddConstraint(
-    const QpFrenetFrame& qp_frenet_frame,
-    apollo::planning_internal::Debug* planning_debug) {
+    const QpFrenetFrame& qp_frenet_frame) {
   Spline1dConstraint* spline_constraint =
       spline_generator_->mutable_spline_constraint();
 
   // add init status constraint, equality constraint
   spline_constraint->AddPointConstraint(init_frenet_point_.s(),
                                         init_frenet_point_.l());
-
   spline_constraint->AddPointDerivativeConstraint(init_frenet_point_.s(),
                                                   init_frenet_point_.dl());
-
   spline_constraint->AddPointSecondDerivativeConstraint(
       init_frenet_point_.s(), init_frenet_point_.ddl());
 
@@ -318,12 +320,14 @@ bool QpSplinePathGenerator::AddConstraint(
            << " dynamic_obs_boundary_high: " << dynamic_obs_boundary.second;
   }
 
-  apollo::planning_internal::SLFrameDebug* sl_frame =
-      planning_debug->mutable_planning_data()->mutable_sl_frame()->Add();
-  for (size_t i = 0; i < evaluated_s_.size(); ++i) {
-    sl_frame->mutable_aggregated_boundary_s()->Add(evaluated_s_[i]);
-    sl_frame->mutable_aggregated_boundary_low()->Add(boundary_low[i]);
-    sl_frame->mutable_aggregated_boundary_high()->Add(boundary_high[i]);
+  if (planning_debug_) {
+    apollo::planning_internal::SLFrameDebug* sl_frame =
+        planning_debug_->mutable_planning_data()->mutable_sl_frame()->Add();
+    for (size_t i = 0; i < evaluated_s_.size(); ++i) {
+      sl_frame->mutable_aggregated_boundary_s()->Add(evaluated_s_[i]);
+      sl_frame->mutable_aggregated_boundary_low()->Add(boundary_low[i]);
+      sl_frame->mutable_aggregated_boundary_high()->Add(boundary_high[i]);
+    }
   }
 
   if (!spline_constraint->AddBoundary(evaluated_s_, boundary_low,
