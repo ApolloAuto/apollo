@@ -16,16 +16,17 @@
 
 #include "modules/prediction/container/obstacles/obstacle.h"
 
-#include <string>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include "gtest/gtest.h"
+
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
@@ -42,13 +43,14 @@ class ObstacleTest : public KMLMapBasedTest {
     FLAGS_enable_kf_tracking = true;
     int num_frame = 3;
     for (int i = 1; i <= num_frame; ++i) {
-      const auto filename = apollo::common::util::StrCat(
+      const auto filename = common::util::StrCat(
           "modules/prediction/testdata/frame_sequence/frame_", i, ".pb.txt");
-      apollo::perception::PerceptionObstacles perception_obstacles;
-      apollo::common::util::GetProtoFromFile(filename, &perception_obstacles);
+      perception::PerceptionObstacles perception_obstacles;
+      common::util::GetProtoFromFile(filename, &perception_obstacles);
       container_.Insert(perception_obstacles);
     }
   }
+
  protected:
   ObstaclesContainer container_;
 };
@@ -57,8 +59,7 @@ TEST_F(ObstacleTest, VehicleBasic) {
   Obstacle* obstacle_ptr = container_.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   EXPECT_EQ(obstacle_ptr->id(), 1);
-  EXPECT_EQ(obstacle_ptr->type(),
-            apollo::perception::PerceptionObstacle::VEHICLE);
+  EXPECT_EQ(obstacle_ptr->type(), perception::PerceptionObstacle::VEHICLE);
   EXPECT_TRUE(obstacle_ptr->IsOnLane());
   EXPECT_EQ(obstacle_ptr->history_size(), 3);
   EXPECT_DOUBLE_EQ(obstacle_ptr->timestamp(), 0.2);
@@ -137,8 +138,7 @@ TEST_F(ObstacleTest, PedestrianBasic) {
   Obstacle* obstacle_ptr = container_.GetObstacle(101);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   EXPECT_EQ(obstacle_ptr->id(), 101);
-  EXPECT_EQ(obstacle_ptr->type(),
-            apollo::perception::PerceptionObstacle::PEDESTRIAN);
+  EXPECT_EQ(obstacle_ptr->type(), perception::PerceptionObstacle::PEDESTRIAN);
   EXPECT_EQ(obstacle_ptr->history_size(), 3);
   EXPECT_DOUBLE_EQ(obstacle_ptr->timestamp(), 0.2);
 }

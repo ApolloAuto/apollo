@@ -18,11 +18,11 @@
 #define MODULES_PERCEPTION_LIB_PCL_UTIL_PCL_TYPES_H_
 
 #include <pcl/common/time.h>
+#include <pcl/common/transforms.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/search/impl/kdtree.hpp>
-#include <pcl/common/transforms.h>
 
 namespace apollo {
 namespace perception {
