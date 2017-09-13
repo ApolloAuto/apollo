@@ -50,11 +50,12 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
   QpSplinePathGenerator path_generator(
       reference_line, qp_spline_path_config_,
       reference_line_info_->GetAdcPointOnSmoothReferenceLine());
+  path_generator.SetDebugLogger(
+      frame_->MutableADCTrajectory()->mutable_debug());
 
   if (!path_generator.Generate(
           reference_line_info_->path_decision()->path_obstacles().Items(),
-          speed_data, init_point, path_data,
-          frame_->MutableADCTrajectory()->mutable_debug())) {
+          speed_data, init_point, path_data)) {
     const std::string msg = "failed to generate spline path!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

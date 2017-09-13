@@ -45,11 +45,12 @@ class QpSplinePathGenerator {
                         const QpSplinePathConfig& qp_spline_path_config,
                         const ReferencePoint& adc_smooth_ref_point);
 
+  void SetDebugLogger(apollo::planning_internal::Debug* debug);
+
   bool Generate(const std::vector<const PathObstacle*>& obstacles,
                 const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,
-                PathData* const path_data,
-                apollo::planning_internal::Debug* planning_debug);
+                PathData* const path_data);
 
  private:
   bool CalculateInitFrenetPoint(const common::TrajectoryPoint& traj_point,
@@ -57,14 +58,14 @@ class QpSplinePathGenerator {
 
   bool InitSpline(const double start_s, const double end_s);
 
-  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame,
-                     apollo::planning_internal::Debug* planning_debug);
+  bool AddConstraint(const QpFrenetFrame& qp_frenet_frame);
 
   void AddKernel();
 
   bool Solve();
 
  private:
+  apollo::planning_internal::Debug* planning_debug_ = nullptr;
   const ReferenceLine& reference_line_;
   const QpSplinePathConfig& qp_spline_path_config_;
   const ReferencePoint adc_smooth_ref_point_;
