@@ -94,9 +94,6 @@ void ReferenceLineProvider::Generate() {
     }
     ADEBUG << "ReferenceLine smoothed with adc position: "
            << curr_adc_position.ShortDebugString();
-    const int32_t kReferenceLineProviderSleepTime = 1000;
-    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(
-        kReferenceLineProviderSleepTime));
   }
 }
 
