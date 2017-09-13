@@ -37,15 +37,18 @@ class WebSocketEndpoint {
                     RENDERER.updateWorld(message.world);
                     STORE.meters.update(message.world);
                     STORE.monitor.update(message.world);
-                    if ((message.mapHash && (this.counter % 10 === 0)) ||
-                        this.currMapRadius !== message.radius) {
+                    if (message.mapHash && (this.counter % 10 === 0)) {
                         // NOTE: This is a hack to limit the rate of map updates.
                         this.counter = 0;
-                        this.currMapRadius = message.radius;
+                        this.currMapRadius = message.mapRadius;
                         RENDERER.updateMapIndex(message.mapHash,
-                            message.mapElementIds, message.radius);
+                            message.mapElementIds, message.mapRadius);
                     }
                     this.counter += 1;
+                    break;
+                case "MapElements":
+                    RENDERER.updateMapIndex(message.mapHash,
+                            message.mapElementIds, message.mapRadius);
                     break;
                 case "MapData":
                     RENDERER.updateMap(message.data);

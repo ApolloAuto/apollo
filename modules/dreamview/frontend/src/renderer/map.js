@@ -283,8 +283,6 @@ export default class Map {
     // side. This also means that the server should maintain a state of
     // (possibly) visible elements, presummably in the global store.
     appendMapData(newData, coordinates, scene) {
-        const overlapMap = extractOverlaps(newData['overlap']);
-
         for (const kind in newData) {
             if (!this.data[kind]) {
                 this.data[kind] = [];
@@ -305,6 +303,7 @@ export default class Map {
                         }));
                         break;
                     case "signal":
+                        const overlapMap = extractOverlaps(newData['overlap']);
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: addTrafficLight(newData[kind][i],
                                 overlapMap, this.laneHeading, coordinates, scene)
