@@ -272,6 +272,7 @@ bool QpSplinePathGenerator::AddConstraint(
   }
 
   // add map bound constraint
+  const auto lateral_buf = qp_spline_path_config_.cross_lane_extension_buffer();
   std::vector<double> boundary_low;
   std::vector<double> boundary_high;
   for (const double s : evaluated_s_) {
@@ -283,35 +284,20 @@ bool QpSplinePathGenerator::AddConstraint(
     qp_frenet_frame.GetStaticObstacleBound(s, &static_obs_boundary);
     qp_frenet_frame.GetDynamicObstacleBound(s, &dynamic_obs_boundary);
 
-    if (init_frenet_point_.l() > road_boundary.second) {
-      road_boundary.second =
-          init_frenet_point_.l() +
-          qp_spline_path_config_.cross_lane_extension_buffer();
-    } else if (init_frenet_point_.l() < road_boundary.first) {
-      road_boundary.first =
-          init_frenet_point_.l() -
-          qp_spline_path_config_.cross_lane_extension_buffer();
-    }
+    road_boundary.first =
+        std::fmin(road_boundary.first, init_frenet_point_.l() - lateral_buf);
+    road_boundary.second =
+        std::fmax(road_boundary.second, init_frenet_point_.l() + lateral_buf);
 
-    std::pair<double, double> boundary = road_boundary;
+    boundary_low.emplace_back(common::util::MaxElement(
+        std::vector<double>{road_boundary.first, static_obs_boundary.first,
+                            dynamic_obs_boundary.first}));
+    boundary_high.emplace_back(common::util::MinElement(
+        std::vector<double>{road_boundary.second, static_obs_boundary.second,
+                            dynamic_obs_boundary.second}));
 
-    const double merged_first =
-        std::max(static_obs_boundary.first, dynamic_obs_boundary.first);
-    const double merged_second =
-        std::min(static_obs_boundary.second, dynamic_obs_boundary.second);
-
-    if (merged_first < road_boundary.second) {
-      boundary.first = std::max(boundary.first, merged_first);
-    }
-    if (merged_second > road_boundary.first) {
-      boundary.second = std::min(boundary.second, merged_second);
-    }
-
-    boundary_low.push_back(boundary.first);
-    boundary_high.push_back(boundary.second);
-
-    ADEBUG << "s:" << s << " boundary_low:" << boundary.first
-           << " boundary_high:" << boundary.second
+    ADEBUG << "s:" << s << " boundary_low:" << boundary_low.back()
+           << " boundary_high:" << boundary_high.back()
            << " road_boundary_low: " << road_boundary.first
            << " road_boundary_high: " << road_boundary.second
            << " static_obs_boundary_low: " << static_obs_boundary.first
