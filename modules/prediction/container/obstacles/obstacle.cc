@@ -960,13 +960,12 @@ void Obstacle::SetLanePoints(Feature* feature) {
 }
 
 void Obstacle::SetMotionStatus() {
-  bool is_still = true;
   int history_size = static_cast<int>(feature_history_.size());
   if (history_size < 2) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
            << "is considered stationary [default = true].";
     if (history_size > 0) {
-      feature_history_.front().set_is_still(is_still);
+      feature_history_.front().set_is_still(true);
     }
     return;
   }

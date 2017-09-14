@@ -30,7 +30,7 @@ namespace planning {
 
 namespace {
 
-Eigen::MatrixXd MergeMaxtrices(const std::vector<Eigen::MatrixXd> matrices) {
+Eigen::MatrixXd MergeMaxtrices(const std::vector<Eigen::MatrixXd>& matrices) {
   int32_t d = 0;
   for (const auto& mat : matrices) {
     d += mat.rows();
