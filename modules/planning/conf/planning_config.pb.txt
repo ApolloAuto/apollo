@@ -54,21 +54,9 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            minimal_follow_time: 3.0
-            follow_buffer: 1.0
-            follow_coeff:1.0
-            follow_speed_threshold: 10.0
-            follow_speed_damping_factor: 0.7
-            success_tunnel:0.01
-            expanding_coeff: 1.2
-            follow_distance_buffer: 5.0
             centric_acceleration_limit: 1.0
-            kappa_threshold: 0.04
             minimal_kappa: 0.00001
-            maximal_speed: 25.0
-            speed_limit_on_u_turn: 1.5
             point_extension: 1.0
-            speed_multiply_buffer: 0.9
             lowest_speed: 2.5
         }
     }
@@ -106,21 +94,9 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            minimal_follow_time: 3.0
-            follow_buffer: 1.0
-            follow_coeff:1.0
-            follow_speed_threshold: 10.0
-            follow_speed_damping_factor: 0.7
-            success_tunnel:0.01
-            expanding_coeff: 1.2
-            follow_distance_buffer: 5.0
             centric_acceleration_limit: 1.0
-            kappa_threshold: 0.04
             minimal_kappa: 0.00001
-            maximal_speed: 25.0
-            speed_limit_on_u_turn: 1.5
             point_extension: 1.0
-            speed_multiply_buffer: 0.9
             lowest_speed: 2.5
         }
     }
