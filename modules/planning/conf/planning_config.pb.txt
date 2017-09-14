@@ -100,8 +100,8 @@ em_planner_config {
         stop_weight: 0.2
         cruise_weight: 0.1
         max_speed: 20.0
-        max_acceleration: 1.5
-        min_deceleration: -4.0
+        max_acceleration: 2.0
+        min_deceleration: -4.5
         follow_drag_distance: 17.0
 
         st_boundary_config {
