@@ -149,10 +149,6 @@ Eigen::VectorXf ObjectTrack::Predict(const double& time_diff) {
 
 void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
   const double& time_diff) {
-  // Update track with object
-  if ((*new_object) == nullptr)
-    UpdateWithoutObject(time_diff);
-
   // A. update object track
   // A.1 update filter
   filter_->UpdateWithObject((*new_object), current_object_, time_diff);
