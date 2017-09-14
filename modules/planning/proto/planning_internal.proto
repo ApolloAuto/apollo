@@ -6,45 +6,6 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
 import "modules/routing/proto/routing.proto";
-import "modules/perception/proto/perception_obstacle.proto";
-import "modules/planning/proto/decision.proto";
-import "modules/prediction/proto/prediction_obstacle.proto";
-
-message PlanningObstacle {
-  optional int32 perception_id = 1;
-  optional string decision_id = 2;
-
-  optional apollo.perception.Point position =
-      3;  // obstacle position in the world coordinate system.
-  optional double theta = 4;  // heading in the world coordinate system
-  optional apollo.perception.Point velocity = 5;  // obstacle velocity.
-  // obstacle speed ( == sqrt(velocity.x^2 + velocity.y^2)
-  optional double speed = 6;
-
-  // Size of obstacle bounding box.
-  optional double length = 7;  // obstacle length.
-  optional double width = 8;   // obstacle width.
-  optional double height = 9;  // obstacle height.
-
-  // obstacle corner points.
-  repeated apollo.perception.Point polygon_point = 10;
-  // duration of an obstacle since detection.
-  optional double tracking_time = 11;
-
-  // perception timestamp in ms
-  optional double perception_timestamp = 12;
-  // object type in perception
-  optional apollo.perception.PerceptionObstacle.Type perception_object_type =
-      13;
-
-  optional double prediction_timestamp = 14;  // prediction_timestamp in ms
-  // from prediction
-  repeated apollo.prediction.Trajectory prediction_trajectory = 15;
-
-  optional apollo.planning.ObjectDecisionType object_decision =
-      17 [deprecated = true];
-  repeated apollo.planning.ObjectDecisionType planning_object_decision = 18;
-}
 
 message Debug {
   optional PlanningData planning_data = 2;
