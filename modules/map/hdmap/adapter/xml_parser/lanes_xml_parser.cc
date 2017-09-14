@@ -21,7 +21,7 @@ limitations under the License.
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 namespace {
-constexpr double ToMPS = 1000.0 / 3600.0;
+double ToMPS(double speed) { return speed * 1000.0 / 3600.0; }
 bool IsReferenceLane(int lane_id) { return lane_id == 0; }
 };
 
@@ -341,7 +341,7 @@ Status LanesXmlParser::ParseSpeed(const tinyxml2::XMLElement& xml_node,
       std::string err_msg = "Error parse lane speed attribute";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
-    lane->set_speed_limit(max_speed);
+    lane->set_speed_limit(ToMPS(max_speed));
   }
 
   return Status::OK();
