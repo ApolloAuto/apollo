@@ -21,6 +21,7 @@
 #include <cmath>
 
 #include "modules/l3_perception/l3_perception_util.h"
+#include "modules/l3_perception/l3_perception_gflags.h"
 
 /**
  * @namespace apollo::l3_perception
@@ -88,6 +89,61 @@ void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
     }
   }
 }
+
+double GetDefaultObjectLength(const int object_type) {
+  double default_object_length = 0.0;
+  switch (object_type) {
+    case 0: {
+      default_object_length = FLAGS_default_car_length;
+      break;
+    }
+    case 1: {
+      default_object_length = FLAGS_default_truck_length;
+      break;
+    }
+    case 2: {
+      default_object_length = FLAGS_default_bike_length;
+      break;
+    }
+    case 3: {
+      default_object_length = FLAGS_default_ped_length;
+      break;
+    }
+    case 4: {
+      default_object_length = FLAGS_default_unknown_length;
+      break;
+    }
+  }
+  return default_object_length;
+}
+
+double GetDefaultObjectWidth(const int object_type) {
+  double default_object_width = 0.0;
+  switch (object_type) {
+    case 0: {
+      default_object_width = FLAGS_default_car_width;
+      break;
+    }
+    case 1: {
+      default_object_width = FLAGS_default_truck_width;
+      break;
+    }
+    case 2: {
+      default_object_width = FLAGS_default_bike_width;
+      break;
+    }
+    case 3: {
+      default_object_width = FLAGS_default_ped_width;
+      break;
+    }
+    case 4: {
+      default_object_width = FLAGS_default_unknown_width;
+      break;
+    }
+  }
+  return default_object_width;
+}
+
 
 }  // namespace l3_perception
 }  // namespace apollo

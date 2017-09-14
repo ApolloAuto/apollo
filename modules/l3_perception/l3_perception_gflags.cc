@@ -23,3 +23,17 @@ DEFINE_string(hmi_name, "l3_perception", "Module name in HMI");
 DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 
 DEFINE_double(l3_perception_freq, 100, "L3 perception timer frequency.");
+
+DEFINE_double(mobileye_pos_adjust, 3.0, "adjust mobileye objects's position due to distance between mobileye and gps.");
+DEFINE_double(delphi_esr_pos_adjust, 3.0, "adjust radar objects's position due to distance between radar and gps.");
+
+DEFINE_double(default_car_length, 5.0, "default car length for bounding box.");
+DEFINE_double(default_truck_length, 10.0, "default truck length for bounding box.");
+DEFINE_double(default_bike_length, 2.0, "default bike length for bounding box.");
+DEFINE_double(default_ped_length, 0.5, "default ped length for bounding box.");
+DEFINE_double(default_unknown_length, 5.0, "default unknown length for bounding box.");
+DEFINE_double(default_car_width, 3.0, "default car width for bounding box.");
+DEFINE_double(default_truck_width, 5.0, "default truck width for bounding box.");
+DEFINE_double(default_bike_width, 1.0, "default bike width for bounding box.");
+DEFINE_double(default_ped_width, 0.5, "default ped width for bounding box.");
+DEFINE_double(default_unknown_width, 3.0, "default unknown width for bounding box.");
