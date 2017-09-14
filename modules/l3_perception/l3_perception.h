@@ -62,6 +62,10 @@ class L3Perception : public apollo::common::ApolloApp {
       const apollo::drivers::DelphiESR& delphi_esr,
       const apollo::localization::LocalizationEstimate& localization);
 
+  apollo::perception::PerceptionObstacles FilterDelphiEsrPerceptionObstacles(
+    const apollo::perception::PerceptionObstacles& perception_obstacles,
+    const apollo::drivers::DelphiESR& delphi_esr);
+
   double last_timestamp_ = 0;
   ros::Timer timer_;
   apollo::drivers::Mobileye mobileye_;

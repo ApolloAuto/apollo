@@ -121,7 +121,7 @@ void SensorMessageManager<DelphiESR>::Parse(const uint32_t message_id,
     AdapterManager::FillDelphiESRHeader(FLAGS_sensor_node_name, &sensor_data_);
     AdapterManager::PublishDelphiESR(sensor_data_);
 
-    sensor_data_.mutable_esr_track01_500()->Clear();
+    sensor_data_.Clear();
   }
 
   received_ids_.insert(message_id);
