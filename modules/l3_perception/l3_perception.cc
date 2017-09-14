@@ -104,28 +104,11 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     double mob_vel_x = data_739.obstacle_rel_vel_x();
     int mob_type = data_739.obstacle_type();
 
-    double mob_l = 0.0;
-    if (mob_type == 0) {
-      mob_l = 5;  // car
-    } else if (mob_type == 1) {
-      mob_l = 10;  // truck
-    } else if (mob_type == 2 || mob_type == 4) {
-      mob_l = 2;  // bike
-    } else if (mob_type == 3) {
-      mob_l = .5;  // ped
-    }
+    double mob_l = GetDefaultObjectLength(mob_type);
 
     double mob_w = 0.0;
     if (mobileye.details_73a_size() <= index) {
-      if (mob_type == 0) {
-        mob_w = 3;
-      } else if (mob_type == 1) {
-        mob_w = 5;
-      } else if (mob_type == 2 || mob_type == 4) {
-        mob_w = 1;
-      } else if (mob_type == 3) {
-        mob_w = 0.5;
-      }
+      mob_l = GetDefaultObjectWidth(mob_type);
     } else {
       mob_w = mobileye.details_73a(index).obstacle_width();
     }
@@ -212,9 +195,9 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     double mob_vel_x = mob_range_vel * std::cos(mob_angle * L3_PI / 180.0);
     double mob_vel_y = mob_range_vel * std::sin(mob_angle * L3_PI / 180.0);
 
-    double mob_l = 5.0;
+    double mob_l = GetDefaultObjectLength(4);
 
-    double mob_w = 3.0;
+    double mob_w = GetDefaultObjectWidth(4);
 
     // TODO(lizh): calibrate mobileye and make those consts FLAGS
     mob_pos_x += 3.0;  // offset: imu <-> mobileye

@@ -40,11 +40,22 @@ using ::apollo::perception::PerceptionObstacle;
 
 double GetAngleFromQuaternion(const Quaternion quaternion);
 
-// TODO(lizh): change the variable name of x, y, z
 void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
                            const double mid_x, const double mid_y, const double mid_z,
                            const double length, const double width, const double height,
                            const double heading);
+
+// TODO(lizh): change it to PerceptionObstacle::VEHICLE or so
+//             when perception obstacle type is extended.
+// object type | int
+// car         | 0
+// truck       | 1
+// bike        | 2
+// ped         | 3
+// unknown     | 4
+double GetDefaultObjectLength(const int object_type);
+
+double GetDefaultObjectWidth(const int object_type);
 
 }  // namespace l3_perception
 }  // namespace apollo
