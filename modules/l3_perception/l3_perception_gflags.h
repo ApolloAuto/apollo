@@ -27,4 +27,18 @@ DECLARE_string(adapter_config_filename);
 
 DECLARE_double(l3_perception_freq);
 
+DECLARE_double(mobileye_pos_adjust);
+DECLARE_double(delphi_esr_pos_adjust);
+
+DECLARE_double(default_car_length);
+DECLARE_double(default_truck_length);
+DECLARE_double(default_bike_length);
+DECLARE_double(default_ped_length);
+DECLARE_double(default_unknown_length);
+DECLARE_double(default_car_width);
+DECLARE_double(default_truck_width);
+DECLARE_double(default_bike_width);
+DECLARE_double(default_ped_width);
+DECLARE_double(default_unknown_width);
+
 #endif

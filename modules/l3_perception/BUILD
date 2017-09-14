@@ -7,6 +7,7 @@ cc_library(
     srcs = ["l3_perception_util.cc"],
     hdrs = ["l3_perception_util.h"],
     deps = [
+        ":l3_perception_gflags",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto"
     ],
