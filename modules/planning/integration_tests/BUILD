@@ -61,21 +61,4 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "huanbaoyuan_bzone_test",
-    size = "small",
-    srcs = [
-        "huanbaoyuan_bzone_test.cc",
-    ],
-    data = [
-        "//modules/common/configs:config_gflags",
-        "//modules/map:map_data",
-        "//modules/planning:planning_testdata",
-    ],
-    deps = [
-        ":planning_test_base",
-        "@gtest//:main",
-    ],
-)
-
 cpplint()
