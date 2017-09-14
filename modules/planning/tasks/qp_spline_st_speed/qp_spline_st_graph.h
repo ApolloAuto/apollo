@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_TASKS_QP_SPLINE_ST_SPEED_QP_SPLINE_ST_GRAPH_H_
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"

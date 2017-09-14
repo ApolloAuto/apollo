@@ -33,7 +33,7 @@ class PoseContainerTest : public ::testing::Test {
   PoseContainerTest() = default;
   virtual ~PoseContainerTest() = default;
 
-  virtual void SetUp() override {}
+  void SetUp() override {}
 
  protected:
   void InitPose(LocalizationEstimate *localization);

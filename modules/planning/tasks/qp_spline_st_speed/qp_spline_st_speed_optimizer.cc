@@ -21,6 +21,7 @@
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
