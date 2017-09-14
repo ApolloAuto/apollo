@@ -283,7 +283,9 @@ common::Status Planning::Plan(
 
   const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
   if (!best_reference_line) {
-    std::string msg("planner failed to make a driving plan");
+    std::string msg(
+        "planner failed to make a driving plan because NO best_reference_line "
+        "can be provided.");
     AERROR << msg;
     last_publishable_trajectory_.Clear();
     return Status(ErrorCode::PLANNING_ERROR, msg);
