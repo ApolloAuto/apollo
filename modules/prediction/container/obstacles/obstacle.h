@@ -29,11 +29,12 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/common/math/kalman_filter.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
+
+#include "modules/common/math/kalman_filter.h"
+#include "modules/map/hdmap/hdmap_common.h"
 
 /**
  * @namespace apollo::prediction

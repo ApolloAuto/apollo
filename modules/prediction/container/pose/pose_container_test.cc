@@ -30,7 +30,10 @@ using apollo::perception::PerceptionObstacle;
 
 class PoseContainerTest : public ::testing::Test {
  public:
-  virtual void SetUp() {}
+  PoseContainerTest() = default;
+  virtual ~PoseContainerTest() = default;
+
+  virtual void SetUp() override {}
 
  protected:
   void InitPose(LocalizationEstimate *localization);

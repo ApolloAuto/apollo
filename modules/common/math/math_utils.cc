@@ -31,8 +31,8 @@ double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
   return (end_point_1 - start_point).CrossProd(end_point_2 - start_point);
 }
 
-double InnerProd(const Vec2d &start_point, const Vec2d &end_point_1,
-                 const Vec2d &end_point_2) {
+double InnerProd(const Vec2d& start_point, const Vec2d& end_point_1,
+                 const Vec2d& end_point_2) {
   return (end_point_1 - start_point).InnerProd(end_point_2 - start_point);
 }
 
@@ -89,14 +89,12 @@ int DoubleCompare(const double d1, const double d2, const double epsilon) {
 }
 // Gaussian
 double Gaussian(const double u, const double std, const double x) {
-  return (1.0 / std::sqrt(2 * M_PI * std * std))
-      * std::exp(-(x - u) * (x - u) / (2 * std * std));
+  return (1.0 / std::sqrt(2 * M_PI * std * std)) *
+         std::exp(-(x - u) * (x - u) / (2 * std * std));
 }
 
 // Sigmoid
-double Sigmoid(const double x) {
-  return 1.0 / (1.0 + std::exp(-x));
-}
+double Sigmoid(const double x) { return 1.0 / (1.0 + std::exp(-x)); }
 
 }  // namespace math
 }  // namespace common
