@@ -251,9 +251,9 @@ Status QpSplineStGraph::ApplyConstraint(
     accel_upper_bound.front() = 0.0;
   } else {
     constexpr double kInitPointAccelRelaxedSpeed = 1.0;
-    constexpr double kInitPointAccelRelaxedRange = 0.25;
 
     if (init_point_.v() > kInitPointAccelRelaxedSpeed) {
+      constexpr double kInitPointAccelRelaxedRange = 0.25;
       accel_lower_bound.front() = init_point_.a() - kInitPointAccelRelaxedRange;
       accel_upper_bound.front() = init_point_.a() + kInitPointAccelRelaxedRange;
     }
@@ -278,11 +278,6 @@ Status QpSplineStGraph::ApplyConstraint(
 Status QpSplineStGraph::ApplyKernel(const std::vector<StBoundary>& boundaries,
                                     const SpeedLimit& speed_limit) {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
-
-  if (qp_spline_st_speed_config_.speed_kernel_weight() > 0) {
-    spline_kernel->AddDerivativeKernelMatrix(
-        qp_spline_st_speed_config_.speed_kernel_weight());
-  }
 
   if (qp_spline_st_speed_config_.accel_kernel_weight() > 0) {
     spline_kernel->AddSecondOrderDerivativeMatrix(
