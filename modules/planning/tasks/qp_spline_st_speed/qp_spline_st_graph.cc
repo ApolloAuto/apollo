@@ -67,11 +67,17 @@ void QpSplineStGraph::Init() {
   }
 }
 
+void QpSplineStGraph::SetDebugLogger(
+    planning_internal::STGraphDebug* st_graph_debug) {
+  if (st_graph_debug) {
+    st_graph_debug->Clear();
+    st_graph_debug_ = st_graph_debug;
+  }
+}
+
 Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
-                               const PathData& path_data,
                                SpeedData* const speed_data,
-                               const std::pair<double, double>& accel_bound,
-                               STGraphDebug* st_graph_debug) {
+                               const std::pair<double, double>& accel_bound) {
   cruise_.clear();
 
   // reset spline generator
@@ -87,16 +93,14 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   }
 
   if (!ApplyConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
-                       st_graph_data.st_boundaries(), accel_bound,
-                       st_graph_debug)
+                       st_graph_data.st_boundaries(), accel_bound)
            .ok()) {
     const std::string msg = "Apply constraint failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!ApplyKernel(st_graph_data.st_boundaries(), st_graph_data.speed_limit(),
-                   st_graph_debug)
+  if (!ApplyKernel(st_graph_data.st_boundaries(), st_graph_data.speed_limit())
            .ok()) {
     const std::string msg = "Apply kernel failed!";
     AERROR << msg;
@@ -131,8 +135,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
 Status QpSplineStGraph::ApplyConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     const std::vector<StBoundary>& boundaries,
-    const std::pair<double, double>& accel_bound,
-    STGraphDebug* st_graph_debug) {
+    const std::pair<double, double>& accel_bound) {
   Spline1dConstraint* constraint =
       spline_generator_->mutable_spline_constraint();
   // position, velocity, acceleration
@@ -208,11 +211,14 @@ Status QpSplineStGraph::ApplyConstraint(
   DCHECK_EQ(t_evaluated_.size(), speed_upper_bound.size());
   DCHECK_EQ(t_evaluated_.size(), speed_lower_bound.size());
 
-  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
-    auto speed_constraint = st_graph_debug->mutable_speed_constraint()->Add();
-    speed_constraint->add_t(t_evaluated_[i]);
-    speed_constraint->add_lower_bound(speed_lower_bound[i]);
-    speed_constraint->add_upper_bound(speed_upper_bound[i]);
+  if (st_graph_debug_) {
+    for (size_t i = 0; i < t_evaluated_.size(); ++i) {
+      auto speed_constraint =
+          st_graph_debug_->mutable_speed_constraint()->Add();
+      speed_constraint->add_t(t_evaluated_[i]);
+      speed_constraint->add_lower_bound(speed_lower_bound[i]);
+      speed_constraint->add_upper_bound(speed_upper_bound[i]);
+    }
   }
 
   if (!constraint->AddDerivativeBoundary(t_evaluated_, speed_lower_bound,
@@ -270,8 +276,7 @@ Status QpSplineStGraph::ApplyConstraint(
 }
 
 Status QpSplineStGraph::ApplyKernel(const std::vector<StBoundary>& boundaries,
-                                    const SpeedLimit& speed_limit,
-                                    STGraphDebug* st_graph_debug) {
+                                    const SpeedLimit& speed_limit) {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
   if (qp_spline_st_speed_config_.speed_kernel_weight() > 0) {
@@ -289,15 +294,15 @@ Status QpSplineStGraph::ApplyKernel(const std::vector<StBoundary>& boundaries,
         qp_spline_st_speed_config_.jerk_kernel_weight());
   }
 
-  if (AddCruiseReferenceLineKernel(speed_limit,
-                                   qp_spline_st_speed_config_.cruise_weight(),
-                                   st_graph_debug) != Status::OK()) {
+  if (!AddCruiseReferenceLineKernel(speed_limit,
+                                    qp_spline_st_speed_config_.cruise_weight())
+           .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
 
-  if (AddFollowReferenceLineKernel(boundaries,
-                                   qp_spline_st_speed_config_.follow_weight(),
-                                   st_graph_debug) != Status::OK()) {
+  if (!AddFollowReferenceLineKernel(boundaries,
+                                    qp_spline_st_speed_config_.follow_weight())
+           .ok()) {
     return Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::ApplyKernel");
   }
   return Status::OK();
@@ -310,8 +315,7 @@ Status QpSplineStGraph::Solve() {
 }
 
 Status QpSplineStGraph::AddCruiseReferenceLineKernel(
-    const SpeedLimit& speed_limit, const double weight,
-    STGraphDebug* st_graph_debug) {
+    const SpeedLimit& speed_limit, const double weight) {
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
   if (speed_limit.speed_limit_points().size() == 0) {
     std::string msg = "Fail to apply_kernel due to empty speed limits.";
@@ -319,16 +323,20 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   double dist_ref = 0.0;
-  auto kernel_cruise_ref = st_graph_debug->mutable_kernel_cruise_ref();
   cruise_.push_back(dist_ref);
-  kernel_cruise_ref->mutable_t()->Add(t_evaluated_[0]);
-  kernel_cruise_ref->mutable_cruise_line_s()->Add(dist_ref);
   for (uint32_t i = 1; i < t_evaluated_.size(); ++i) {
     dist_ref += (t_evaluated_[i] - t_evaluated_[i - 1]) *
                 speed_limit.GetSpeedLimitByS(dist_ref);
     cruise_.push_back(dist_ref);
-    kernel_cruise_ref->mutable_t()->Add(t_evaluated_[i]);
+  }
+  if (st_graph_debug_) {
+    auto kernel_cruise_ref = st_graph_debug_->mutable_kernel_cruise_ref();
+    kernel_cruise_ref->mutable_t()->Add(t_evaluated_[0]);
     kernel_cruise_ref->mutable_cruise_line_s()->Add(dist_ref);
+    for (uint32_t i = 1; i < t_evaluated_.size(); ++i) {
+      kernel_cruise_ref->mutable_t()->Add(t_evaluated_[i]);
+      kernel_cruise_ref->mutable_cruise_line_s()->Add(cruise_[i]);
+    }
   }
   DCHECK_EQ(t_evaluated_.size(), cruise_.size());
 
@@ -347,14 +355,12 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(
 }
 
 Status QpSplineStGraph::AddFollowReferenceLineKernel(
-    const std::vector<StBoundary>& boundaries, const double weight,
-    STGraphDebug* st_graph_debug) {
+    const std::vector<StBoundary>& boundaries, const double weight) {
   auto* spline_kernel = spline_generator_->mutable_spline_kernel();
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
-  auto kernel_follow_ref = st_graph_debug->mutable_kernel_follow_ref();
   for (size_t i = 0; i < t_evaluated_.size(); ++i) {
-    double curr_t = t_evaluated_[i];
+    const double curr_t = t_evaluated_[i];
     double s_min = std::numeric_limits<double>::infinity();
     bool success = false;
     for (const auto& boundary : boundaries) {
@@ -376,8 +382,11 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
     if (success && s_min < cruise_[i]) {
       filtered_evaluate_t.push_back(curr_t);
       ref_s.push_back(s_min);
-      kernel_follow_ref->mutable_t()->Add(curr_t);
-      kernel_follow_ref->mutable_follow_line_s()->Add(s_min);
+      if (st_graph_debug_) {
+        auto kernel_follow_ref = st_graph_debug_->mutable_kernel_follow_ref();
+        kernel_follow_ref->mutable_t()->Add(curr_t);
+        kernel_follow_ref->mutable_follow_line_s()->Add(s_min);
+      }
     }
   }
   DCHECK_EQ(filtered_evaluate_t.size(), ref_s.size());

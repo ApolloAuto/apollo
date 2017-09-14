@@ -45,25 +45,24 @@ class QpSplineStGraph {
   QpSplineStGraph(const QpSplineStSpeedConfig& qp_config,
                   const apollo::common::VehicleParam& veh_param);
 
+  void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
+
   common::Status Search(const StGraphData& st_graph_data,
-                        const PathData& path_data, SpeedData* const speed_data,
-                        const std::pair<double, double>& accel_bound,
-                        planning_internal::STGraphDebug* st_graph_debug);
+                        SpeedData* const speed_data,
+                        const std::pair<double, double>& accel_bound);
 
  private:
   void Init();
 
   // apply st graph constraint
-  common::Status ApplyConstraint(
-      const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-      const std::vector<StBoundary>& boundaries,
-      const std::pair<double, double>& accel_bound,
-      planning_internal::STGraphDebug* st_graph_debug);
+  common::Status ApplyConstraint(const common::TrajectoryPoint& init_point,
+                                 const SpeedLimit& speed_limit,
+                                 const std::vector<StBoundary>& boundaries,
+                                 const std::pair<double, double>& accel_bound);
 
   // apply objective function
   common::Status ApplyKernel(const std::vector<StBoundary>& boundaries,
-                             const SpeedLimit& speed_limit,
-                             planning_internal::STGraphDebug* st_graph_debug);
+                             const SpeedLimit& speed_limit);
 
   // solve
   common::Status Solve();
@@ -77,13 +76,11 @@ class QpSplineStGraph {
 
   // generate reference speed profile
   // common::Status ApplyReferenceSpeedProfile();
-  common::Status AddCruiseReferenceLineKernel(
-      const SpeedLimit& speed_limit, const double weight,
-      planning_internal::STGraphDebug* st_graph_debug);
+  common::Status AddCruiseReferenceLineKernel(const SpeedLimit& speed_limit,
+                                              const double weight);
 
   common::Status AddFollowReferenceLineKernel(
-      const std::vector<StBoundary>& boundaries, const double weight,
-      planning_internal::STGraphDebug* st_graph_debug);
+      const std::vector<StBoundary>& boundaries, const double weight);
 
   common::Status EstimateSpeedUpperBound(
       const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
@@ -113,6 +110,8 @@ class QpSplineStGraph {
 
   // reference line kernel
   std::vector<double> cruise_;
+
+  planning_internal::STGraphDebug* st_graph_debug_ = nullptr;
 };
 
 }  // namespace planning
