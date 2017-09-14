@@ -202,7 +202,7 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     auto* mob = obstacles.add_perception_obstacle();
     const auto& data_500 = delphi_esr.esr_track01_500(index);
     //TODO(lizh): object id
-    //int esr_ob_id = data_500.obstacle_id();
+    int mob_id = 0;
     double mob_range = data_500.can_tx_track_range();
     double mob_angle = data_500.can_tx_track_angle();
     double mob_pos_x = mob_range * std::cos(mob_angle * L3_PI / 180.0);
@@ -228,7 +228,7 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     double converted_vx = converted_speed * std::cos(adc_theta);
     double converted_vy = converted_speed * std::sin(adc_theta);
 
-    //mob->set_id(mob_id);
+    mob->set_id(mob_id);
     mob->mutable_position()->set_x(converted_x);
     mob->mutable_position()->set_y(converted_y);
 
