@@ -205,11 +205,11 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     //int esr_ob_id = data_500.obstacle_id();
     double mob_range = data_500.can_tx_track_range();
     double mob_angle = data_500.can_tx_track_angle();
-    double mob_pos_x = mob_range * std::cos(mob_range * L3_PI / 180.0);
-    double mob_pos_y = mob_range * std::sin(mob_range * L3_PI / 180.0);
+    double mob_pos_x = mob_range * std::cos(mob_angle * L3_PI / 180.0);
+    double mob_pos_y = mob_range * std::sin(mob_angle * L3_PI / 180.0);
     double mob_range_vel = data_500.can_tx_track_range_rate();
-    double mob_vel_x = mob_range_vel * std::cos(mob_range * L3_PI / 180.0);
-    double mob_vel_y = mob_range_vel * std::sin(mob_range * L3_PI / 180.0);
+    double mob_vel_x = mob_range_vel * std::cos(mob_angle * L3_PI / 180.0);
+    double mob_vel_y = mob_range_vel * std::sin(mob_angle * L3_PI / 180.0);
 
     double mob_l = 5.0;
 
