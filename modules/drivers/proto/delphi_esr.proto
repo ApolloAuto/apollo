@@ -180,6 +180,14 @@ message Esr_trackmotionpower_540 {
 // Report Message
   // [] [0|1]
   optional bool can_tx_track_rolling_count_2 = 1;
+  optional int32 can_tx_track_can_id_group = 2;
+  message Motionpower {
+    optional bool can_tx_track_moving = 1;
+    optional bool can_tx_track_moving_fast = 2;
+    optional bool can_tx_track_moving_slow = 3;
+    optional int32 can_tx_track_power = 4;
+  }
+  repeated Motionpower can_tx_track_motion_power = 3;
 }
 
 message Acm_inst_req_7e0 {
@@ -252,7 +260,6 @@ message Esr_track01_500 {
   optional Can_tx_track_med_range_modeType can_tx_track_med_range_mode = 11;
   // [deg] [-51.2|51.1]
   optional double can_tx_track_angle = 12;
-  optional int32 can_tx_track_power = 13;
 }
 
 message Esr_valid1_5d0 {
@@ -739,7 +746,7 @@ message DelphiESR {
   optional Esr_status5_5e4 esr_status5_5e4 = 4; // report message
   optional Esr_status3_4e2 esr_status3_4e2 = 5; // report message
   optional Esr_status4_4e3 esr_status4_4e3 = 6; // report message
-  optional Esr_trackmotionpower_540 esr_trackmotionpower_540 = 7; // report message
+  repeated Esr_trackmotionpower_540 esr_trackmotionpower_540 = 7; // report message
   optional Acm_inst_req_7e0 acm_inst_req_7e0 = 8; // report message
   repeated Esr_track01_500 esr_track01_500 = 9; // report message
   optional Esr_valid1_5d0 esr_valid1_5d0 = 10; // report message
@@ -756,5 +763,4 @@ message DelphiESR {
   optional Vehicle4_5f3 vehicle4_5f3 = 21; // report message
   optional Vehicle5_5f4 vehicle5_5f4 = 22; // report message
   optional Vehicle6_5f5 vehicle6_5f5 = 23; // report message
-  repeated int32 track_power_array = 24;
 }

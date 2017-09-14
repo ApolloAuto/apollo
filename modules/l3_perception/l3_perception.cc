@@ -34,6 +34,7 @@ using apollo::common::Status;
 using apollo::common::ErrorCode;
 using apollo::drivers::Mobileye;
 using apollo::drivers::DelphiESR;
+using apollo::drivers::Esr_track01_500;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
@@ -253,20 +254,70 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
   return obstacles;
 }
 
+bool IsPreserved(const PerceptionObstacle& perception_obstacle, const Esr_track01_500& esr_track01_500, const double& rcs) {
+  if (sqrt(perception_obstacle.velocity().x() *
+               perception_obstacle.velocity().x() +
+           perception_obstacle.velocity().y() *
+               perception_obstacle.velocity().y()) < 5.0) {
+    return false;
+  }
+  if (esr_track01_500.can_tx_track_range() > 40.0) {
+    return false;
+  }
+  if (esr_track01_500.can_tx_track_angle() > 25.0 || esr_track01_500.can_tx_track_angle() < -25.0) {
+    return false;
+  }
+  if (rcs < -1.0) {
+    return false;
+  }
+  if (esr_track01_500.can_tx_track_range() < 1e-6) {
+    return false;
+  }
+  return true;
+}
+
+PerceptionObstacles L3Perception::FilterDelphiEsrPerceptionObstacles(
+    const PerceptionObstacles& perception_obstacles,
+    const DelphiESR& delphi_esr) {
+  std::vector<apollo::drivers::Esr_trackmotionpower_540::Motionpower> motionpowers(64);
+  for (const auto& esr_trackmotionpower_540 : delphi_esr.esr_trackmotionpower_540()) {
+    const int& can_tx_track_can_id_group = esr_trackmotionpower_540.can_tx_track_can_id_group();
+    for (int index = 0; index < (can_tx_track_can_id_group < 9 ? 7 : 1); ++index) {
+      motionpowers[can_tx_track_can_id_group * 7 + index].CopyFrom(esr_trackmotionpower_540.can_tx_track_motion_power(index));
+    }
+  }
+
+  PerceptionObstacles filtered_perception_obstacles;
+  for (int index = 0; index < perception_obstacles.perception_obstacle_size(); ++index) {
+    const auto& perception_obstacle = perception_obstacles.perception_obstacle(index);
+    const auto& esr_track01_500 = delphi_esr.esr_track01_500(index);
+    const auto& rcs = static_cast<double>(motionpowers[index].can_tx_track_power()) - 10.0;
+    if (IsPreserved(perception_obstacle, esr_track01_500, rcs)) {
+      auto* obstacle = filtered_perception_obstacles.add_perception_obstacle();
+      obstacle->CopyFrom(perception_obstacle);
+    }
+  }
+  return filtered_perception_obstacles;
+}
+
 void L3Perception::OnTimer(const ros::TimerEvent&) {
   AINFO << "publish PerceptionObstacles";
 
-  apollo::perception::PerceptionObstacles obstacles;
+  PerceptionObstacles obstacles;
 
   // if (mobileye_.header().timestamp_sec() >= last_timestamp_) {
-  apollo::perception::PerceptionObstacles mobileye_obstacles =
+  PerceptionObstacles mobileye_obstacles =
       ConvertToPerceptionObstacles(mobileye_, localization_);
   obstacles.MergeFrom(mobileye_obstacles);
   // }
 
-  apollo::perception::PerceptionObstacles delphi_esr_obstacles =
+  // if (delphi_esr_.header().timestamp_sec() >= last_timestamp_) {
+  PerceptionObstacles delphi_esr_obstacles =
       ConvertToPerceptionObstacles(delphi_esr_, localization_);
-  obstacles.MergeFrom(delphi_esr_obstacles);
+  PerceptionObstacles filtered_delphi_esr_obstacles =
+      FilterDelphiEsrPerceptionObstacles(delphi_esr_obstacles, delphi_esr_);
+  obstacles.MergeFrom(filtered_delphi_esr_obstacles);
+  // }
 
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
   AdapterManager::PublishPerceptionObstacles(obstacles);
