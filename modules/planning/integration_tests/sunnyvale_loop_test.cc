@@ -109,5 +109,33 @@ TEST_F(SunnyvaleLoopTest, follow_02) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test follow a vehicle at right turn with a close leading vehicle
+ * A follow test case
+ */
+TEST_F(SunnyvaleLoopTest, follow_03) {
+  std::string seq_num = "6";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
+/*
+ * test slowdown when dp_st_graph is failed.
+ * A slowdown test case
+ */
+TEST_F(SunnyvaleLoopTest, slowdown_01) {
+  std::string seq_num = "7";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
