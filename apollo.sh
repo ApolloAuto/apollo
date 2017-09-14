@@ -296,7 +296,12 @@ function run_test() {
   START_TIME=$(get_now)
 
   generate_build_targets
-  echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  if [ "$USE_GPU" == "1" ]; then
+    echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
+    echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  else
+    echo "$BUILD_TARGETS" | grep -v "cnnseg_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  fi
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -529,6 +534,11 @@ function main() {
       ;;
     test)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      run_test
+      ;;
+    test_gpu)
+      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      USE_GPU="1"
       run_test
       ;;
     release)
