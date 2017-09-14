@@ -4,20 +4,8 @@ package apollo.planning;
 
 message StBoundaryConfig {
   optional double boundary_buffer = 1 [ default = 0.1 ];
-  optional double minimal_follow_time = 2 [ default = 3.0 ];
-  optional double follow_buffer = 3 [ default = 1.0 ];
-  optional double follow_coeff = 4 [ default = 1.0 ];
-  optional double follow_speed_threshold = 5 [ default = 10.0 ];
-  optional double follow_speed_damping_factor = 6 [ default = 0.7 ];
-  optional double success_tunnel = 7 [ default = 0.01 ];
-  optional double expanding_coeff = 8 [ default = 1.2 ];
-  optional double follow_distance_buffer = 9 [ default = 5.0 ];
-  optional double centric_acceleration_limit = 10 [ default = 1.0 ];
-  optional double kappa_threshold = 11 [ default = 0.04 ];
-  optional double minimal_kappa = 12 [ default = 0.00001 ];
-  optional double maximal_speed = 13 [ default = 25.0 ];
-  optional double speed_limit_on_u_turn = 14 [ default = 1.5 ];
-  optional double point_extension = 15 [ default = 1.0 ];
-  optional double speed_multiply_buffer = 16 [ default = 0.9 ];
-  optional double lowest_speed = 17 [ default = 2.5 ];
+  optional double centric_acceleration_limit = 2 [ default = 1.0 ];
+  optional double minimal_kappa = 3 [ default = 0.00001 ];
+  optional double point_extension = 4 [ default = 1.0 ];
+  optional double lowest_speed = 5 [ default = 2.5 ];
 }
