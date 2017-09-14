@@ -238,6 +238,7 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
 }
 
 bool IsPreserved(const PerceptionObstacle& perception_obstacle, const Esr_track01_500& esr_track01_500, const double& rcs) {
+/*
   if (sqrt(perception_obstacle.velocity().x() *
                perception_obstacle.velocity().x() +
            perception_obstacle.velocity().y() *
@@ -253,6 +254,7 @@ bool IsPreserved(const PerceptionObstacle& perception_obstacle, const Esr_track0
   if (rcs < -1.0) {
     return false;
   }
+*/
   if (esr_track01_500.can_tx_track_range() < 1e-6) {
     return false;
   }
