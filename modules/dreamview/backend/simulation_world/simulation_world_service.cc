@@ -565,7 +565,7 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
       Object &world_obj = obj_map_[std::to_string(id)];
       if (!world_obj.has_type()) {
         world_obj.set_type(Object_Type_VIRTUAL);
-        AINFO << id << " is not a current perception object";
+        ADEBUG << id << " is not a current perception object";
       }
 
       for (const auto &decision : obj_decision.object_decision()) {
