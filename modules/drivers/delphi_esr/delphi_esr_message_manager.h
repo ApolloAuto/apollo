@@ -115,7 +115,7 @@ void SensorMessageManager<DelphiESR>::Parse(const uint32_t message_id,
   sensor_protocol_data->Parse(data, length, &sensor_data_);
 
   // trigger publishment
-  if (message_id == 0x540) {
+  if (message_id == 0x5E5) {
     ADEBUG << sensor_data_.ShortDebugString();
 
     AdapterManager::FillDelphiESRHeader(FLAGS_sensor_node_name, &sensor_data_);
