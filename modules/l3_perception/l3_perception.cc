@@ -277,9 +277,17 @@ PerceptionObstacles L3Perception::FilterDelphiEsrPerceptionObstacles(
     const auto& perception_obstacle = perception_obstacles.perception_obstacle(index);
     const auto& esr_track01_500 = delphi_esr.esr_track01_500(index);
     const auto& rcs = static_cast<double>(motionpowers[index].can_tx_track_power()) - 10.0;
+    const bool& moving = motionpowers[index].can_tx_track_moving();
+    const bool& moving_fast = motionpowers[index].can_tx_track_moving_fast();
+    const bool& moving_slow = motionpowers[index].can_tx_track_moving_slow();
+    AINFO << "index: " << index << "-- moving: " << moving << " | fast: " << moving_fast << " | slow: " << moving_slow;
     if (IsPreserved(perception_obstacle, esr_track01_500, rcs)) {
       auto* obstacle = filtered_perception_obstacles.add_perception_obstacle();
       obstacle->CopyFrom(perception_obstacle);
+      if (!moving)
+        obstacle->set_type(PerceptionObstacle::PEDESTRIAN);
+      if (moving_slow)
+        obstacle->set_type(PerceptionObstacle::BICYCLE);
     }
   }
   return filtered_perception_obstacles;
