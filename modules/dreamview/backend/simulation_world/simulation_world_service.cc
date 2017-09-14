@@ -561,10 +561,11 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   // Update obstacle decision.
   for (const auto &obj_decision : decision_res.object_decision().decision()) {
     if (obj_decision.has_perception_id()) {
-      Object &world_obj =
-          obj_map_[std::to_string(obj_decision.perception_id())];
+      int id = obj_decision.perception_id();
+      Object &world_obj = obj_map_[std::to_string(id)];
       if (!world_obj.has_type()) {
         world_obj.set_type(Object_Type_VIRTUAL);
+        AINFO << id << " is not a current perception object";
       }
 
       for (const auto &decision : obj_decision.object_decision()) {
@@ -573,13 +574,17 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
         if (decision.has_stop() || decision.has_follow() ||
             decision.has_yield() || decision.has_overtake()) {
           if (!LocateMarker(decision, world_decision)) {
-            AWARN << "No decision marker position found for object id="
-                  << world_obj.id();
+            AWARN << "No decision marker position found for object id=" << id;
             continue;
           }
         } else if (decision.has_nudge()) {
           if (world_obj.polygon_point_size() == 0) {
-            AWARN << "No polygon points found for object id=" << world_obj.id();
+            if (world_obj.type() == Object_Type_VIRTUAL) {
+              AWARN << "No current perception object with id=" << id
+                    << " for nudge decision";
+            } else {
+              AWARN << "No polygon points found for object id=" << id;
+            }
             continue;
           }
           FindNudgeRegion(decision, world_obj, world_decision);
