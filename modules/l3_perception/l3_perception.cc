@@ -305,6 +305,7 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
 
   PerceptionObstacles obstacles;
 
+  // TODO(lizh): check timestamp before publish.
   // if (mobileye_.header().timestamp_sec() >= last_timestamp_) {
   PerceptionObstacles mobileye_obstacles =
       ConvertToPerceptionObstacles(mobileye_, localization_);
