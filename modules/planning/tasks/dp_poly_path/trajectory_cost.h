@@ -18,8 +18,8 @@
  * @file trjactory_cost.h
  **/
 
-#ifndef MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H
-#define MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H
+#ifndef MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H_
+#define MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H_
 
 #include <vector>
 
@@ -40,7 +40,7 @@ class TrajectoryCost {
  public:
   explicit TrajectoryCost(const DpPolyPathConfig &config,
                           const ReferenceLine &reference_line,
-                          const std::vector<const PathObstacle*>& obstacles,
+                          const std::vector<const PathObstacle *> &obstacles,
                           const common::VehicleParam &vehicle_param,
                           const SpeedData &heuristic_speed_data);
   double Calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
@@ -51,7 +51,7 @@ class TrajectoryCost {
   const ReferenceLine *reference_line_ = nullptr;
   const common::VehicleParam vehicle_param_;
   SpeedData heuristic_speed_data_;
-  uint32_t num_of_time_stamps_;
+  uint32_t num_of_time_stamps_ = 0;
   std::vector<std::vector<common::math::Box2d>> obstacle_boxes_;
   std::vector<double> obstacle_probabilities_;
 };
@@ -59,4 +59,4 @@ class TrajectoryCost {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H
+#endif  // MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H_
