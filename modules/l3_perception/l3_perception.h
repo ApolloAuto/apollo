@@ -57,6 +57,10 @@ class L3Perception : public apollo::common::ApolloApp {
   apollo::perception::PerceptionObstacles ConvertToPerceptionObstacles(
       const apollo::drivers::Mobileye& mobileye,
       const apollo::localization::LocalizationEstimate& localization);
+  
+  apollo::perception::PerceptionObstacles ConvertToPerceptionObstacles(
+      const apollo::drivers::DelphiESR& delphi_esr,
+      const apollo::localization::LocalizationEstimate& localization);
 
   double last_timestamp_ = 0;
   ros::Timer timer_;

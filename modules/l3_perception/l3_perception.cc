@@ -21,7 +21,10 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/l3_perception/l3_perception_gflags.h"
+#include "modules/l3_perception/l3_perception_util.h"
 #include "ros/include/ros/ros.h"
+
+#define L3_PI 3.141592653
 
 namespace apollo {
 namespace l3_perception {
@@ -87,13 +90,7 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
   double adc_vy = localization.pose().linear_velocity().y();
   double adc_velocity = std::sqrt(adc_vx * adc_vx + adc_vy * adc_vy);
 
-  double adc_theta =
-      std::atan2(2.0 * adc_quaternion.qw() * adc_quaternion.qz() +
-                     adc_quaternion.qx() * adc_quaternion.qy(),
-                 1.0 -
-                     2.0 * (adc_quaternion.qy() * adc_quaternion.qy() +
-                            adc_quaternion.qz() * adc_quaternion.qz())) +
-      acos(-1.0) / 2.0;
+  double adc_theta = GetAngleFromQuaternion(adc_quaternion);
 
   for (int index = 0; index < mobileye.details_738().num_obstacles() &&
                       index < mobileye.details_739_size();
@@ -132,7 +129,9 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
       mob_w = mobileye.details_73a(index).obstacle_width();
     }
 
+    // TODO(lizh): calibrate mobileye and make those consts FLAGS
     mob_pos_x += 3.0;  // offset: imu <-> mobileye
+    mob_pos_x += mob_l / 2.0; // make x the middle point of the vehicle.
 
     double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) +
                          mob_pos_y * std::sin(adc_theta);
@@ -175,58 +174,80 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     mob->set_height(3.0);
 
     mob->clear_polygon_point();
-    double x0 = converted_x;
-    double y0 = converted_y;
-    double z0 = 0.0;
+    double mid_x = converted_x;
+    double mid_y = converted_y;
+    double mid_z = adc_z / 2.0;
     double heading = mob->theta();
-    auto* p1_upper = mob->add_polygon_point();
-    p1_upper->set_x(x0 + mob_l * std::cos(heading) / 2.0 +
-                    mob_w * std::sin(heading) / 2.0);
-    p1_upper->set_y(y0 + mob_l * std::sin(heading) / 2.0 -
-                    mob_w * std::cos(heading) / 2.0);
-    p1_upper->set_z(z0 + mob->height() / 2.0);
-    auto* p1_lower = mob->add_polygon_point();
-    p1_lower->set_x(x0 + mob_l * std::cos(heading) / 2.0 +
-                    mob_w * std::sin(heading) / 2.0);
-    p1_lower->set_y(y0 + mob_l * std::sin(heading) / 2.0 -
-                    mob_w * std::cos(heading) / 2.0);
-    p1_lower->set_z(z0 - mob->height() / 2.0);
-    auto* p2_upper = mob->add_polygon_point();
-    p2_upper->set_x(x0 + mob_l * std::cos(heading) / 2.0 -
-                    mob_w * std::sin(heading) / 2.0);
-    p2_upper->set_y(y0 + mob_l * std::sin(heading) / 2.0 +
-                    mob_w * std::cos(heading) / 2.0);
-    p2_upper->set_z(z0 + mob->height() / 2.0);
-    auto* p2_lower = mob->add_polygon_point();
-    p2_lower->set_x(x0 + mob_l * std::cos(heading) / 2.0 -
-                    mob_w * std::sin(heading) / 2.0);
-    p2_lower->set_y(y0 + mob_l * std::sin(heading) / 2.0 +
-                    mob_w * std::cos(heading) / 2.0);
-    p2_lower->set_z(z0 - mob->height() / 2.0);
-    auto* p3_upper = mob->add_polygon_point();
-    p3_upper->set_x(x0 - mob_l * std::cos(heading) / 2.0 -
-                    mob_w * std::sin(heading) / 2.0);
-    p3_upper->set_y(y0 - mob_l * std::sin(heading) / 2.0 +
-                    mob_w * std::cos(heading) / 2.0);
-    p3_upper->set_z(z0 + mob->height() / 2.0);
-    auto* p3_lower = mob->add_polygon_point();
-    p3_lower->set_x(x0 - mob_l * std::cos(heading) / 2.0 -
-                    mob_w * std::sin(heading) / 2.0);
-    p3_lower->set_y(y0 - mob_l * std::sin(heading) / 2.0 +
-                    mob_w * std::cos(heading) / 2.0);
-    p3_lower->set_z(z0 - mob->height() / 2.0);
-    auto* p4_upper = mob->add_polygon_point();
-    p4_upper->set_x(x0 - mob_l * std::cos(heading) / 2.0 +
-                    mob_w * std::sin(heading) / 2.0);
-    p4_upper->set_y(y0 - mob_l * std::sin(heading) / 2.0 -
-                    mob_w * std::cos(heading) / 2.0);
-    p4_upper->set_z(z0 + mob->height() / 2.0);
-    auto* p4_lower = mob->add_polygon_point();
-    p4_lower->set_x(x0 - mob_l * std::cos(heading) / 2.0 +
-                    mob_w * std::sin(heading) / 2.0);
-    p4_lower->set_y(y0 - mob_l * std::sin(heading) / 2.0 -
-                    mob_w * std::cos(heading) / 2.0);
-    p4_lower->set_z(z0 - mob->height() / 2.0);
+
+    FillPerceptionPolygon(mob, mid_x, mid_y, mid_z, mob_l, mob_w, mob->height(), heading);
+  }
+
+  return obstacles;
+}
+
+PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
+    const DelphiESR& delphi_esr, const LocalizationEstimate& localization) {
+  PerceptionObstacles obstacles;
+  double adc_x = localization.pose().position().x();
+  double adc_y = localization.pose().position().y();
+  double adc_z = localization.pose().position().z();
+  auto adc_quaternion = localization.pose().orientation();
+  double adc_vx = localization.pose().linear_velocity().x();
+  double adc_vy = localization.pose().linear_velocity().y();
+  double adc_velocity = std::sqrt(adc_vx * adc_vx + adc_vy * adc_vy);
+
+  double adc_theta = GetAngleFromQuaternion(adc_quaternion);
+
+  for (int index = 0; index < delphi_esr.esr_track01_500_size(); ++index) {
+    auto* mob = obstacles.add_perception_obstacle();
+    const auto& data_500 = delphi_esr.esr_track01_500(index);
+    //TODO(lizh): object id
+    //int esr_ob_id = data_500.obstacle_id();
+    double mob_range = data_500.can_tx_track_range();
+    double mob_angle = data_500.can_tx_track_angle();
+    double mob_pos_x = mob_range * std::cos(mob_range * L3_PI / 180.0);
+    double mob_pos_y = mob_range * std::sin(mob_range * L3_PI / 180.0);
+    double mob_range_vel = data_500.can_tx_track_range_rate();
+    double mob_vel_x = mob_range_vel * std::cos(mob_range * L3_PI / 180.0);
+    double mob_vel_y = mob_range_vel * std::sin(mob_range * L3_PI / 180.0);
+
+    double mob_l = 5.0;
+
+    double mob_w = 3.0;
+
+    // TODO(lizh): calibrate mobileye and make those consts FLAGS
+    mob_pos_x += 3.0;  // offset: imu <-> mobileye
+    mob_pos_x += mob_l / 2.0; // make x the middle point of the vehicle.
+
+    double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) +
+                         mob_pos_y * std::sin(adc_theta);
+    double converted_y = adc_y + mob_pos_x * std::sin(adc_theta) -
+                         mob_pos_y * std::cos(adc_theta);
+    double converted_speed = std::sqrt((adc_velocity + mob_vel_x) * 
+                             (adc_velocity + mob_vel_x) + mob_vel_y * mob_vel_y);
+    double converted_vx = converted_speed * std::cos(adc_theta);
+    double converted_vy = converted_speed * std::sin(adc_theta);
+
+    //mob->set_id(mob_id);
+    mob->mutable_position()->set_x(converted_x);
+    mob->mutable_position()->set_y(converted_y);
+
+    mob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
+
+    mob->mutable_velocity()->set_x(converted_vx);
+    mob->mutable_velocity()->set_y(converted_vy);
+    mob->set_length(mob_l);
+    mob->set_width(mob_w);
+    mob->set_theta(std::atan2(converted_vy, converted_vx));
+    mob->set_height(3.0);
+
+    mob->clear_polygon_point();
+    double mid_x = converted_x;
+    double mid_y = converted_y;
+    double mid_z = adc_z / 2.0;
+    double heading = mob->theta();
+
+    FillPerceptionPolygon(mob, mid_x, mid_y, mid_z, mob_l, mob_w, mob->height(), heading);
   }
 
   return obstacles;
@@ -242,6 +263,10 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
       ConvertToPerceptionObstacles(mobileye_, localization_);
   obstacles.MergeFrom(mobileye_obstacles);
   // }
+
+  apollo::perception::PerceptionObstacles delphi_esr_obstacles =
+      ConvertToPerceptionObstacles(delphi_esr_, localization_);
+  obstacles.MergeFrom(delphi_esr_obstacles);
 
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
   AdapterManager::PublishPerceptionObstacles(obstacles);
