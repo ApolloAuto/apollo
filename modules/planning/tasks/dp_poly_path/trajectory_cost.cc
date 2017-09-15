@@ -62,8 +62,8 @@ TrajectoryCost::TrajectoryCost(
     for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
       TrajectoryPoint trajectory_point =
           ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
-      Box2d obs_box = ptr_obstacle->GetBoundingBox(trajectory_point);
-      box_by_time.push_back(obs_box);
+      Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
+      box_by_time.push_back(obstacle_box);
     }
     obstacle_boxes_.push_back(box_by_time);
   }
@@ -73,7 +73,7 @@ double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
                                  const double start_s,
                                  const double end_s) const {
   double total_cost = 0.0;
-  // path_cost
+  // Path_cost
   double path_s = 0.0;
   while (path_s < (end_s - start_s)) {
     const double l = std::fabs(curve.Evaluate(0, path_s));
@@ -85,7 +85,7 @@ double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
     path_s += config_.path_resolution();
   }
 
-  // obstacle cost
+  // Obstacle cost
   uint32_t start_index = 0;
   bool is_found_start_index = false;
   uint32_t end_index = 0;
@@ -128,15 +128,16 @@ double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
                      vehicle_param_.width()};
     for (const auto &obstacle_trajectory : obstacle_boxes_) {
       auto &obstacle_box = obstacle_trajectory[start_index];
+      // Simple version: calculate obstacle cost by distance
       double distance = obstacle_box.DistanceTo(ego_box);
-      if (distance > 10.0) {
+      if (distance > config_.obstacle_ignore_distance()) {
         continue;
-      } else if (distance <= 0.2) {
+      } else if (distance <= config_.obstacle_collision_distance()) {
         total_cost += 1e3;
-      } else if (distance <= 2.0) {
+      } else if (distance <= config_.obstacle_risk_distance()) {
         total_cost += (5.0 - distance) * ((5.0 - distance)) * 10;
       } else {
-        total_cost += 10 - distance;
+        total_cost += std::max(10 - distance, 0.0);
       }
     }
   }
