@@ -26,9 +26,10 @@
 #include <vector>
 #include "Eigen/Dense"
 
-#include "modules/prediction/predictor/predictor.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
+
+#include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
 namespace prediction {
@@ -65,7 +66,7 @@ class LaneSequencePredictor : public Predictor {
    */
   void FilterLaneSequences(const LaneGraph& lane_graph,
                            const std::string& lane_id,
-                           std::vector<bool> *enable_lane_sequence);
+                           std::vector<bool>* enable_lane_sequence);
 
   /**
    * @brief Get lane change type
@@ -110,10 +111,8 @@ class LaneSequencePredictor : public Predictor {
    */
   void DrawLaneSequenceTrajectoryPoints(
       const common::math::KalmanFilter<double, 4, 2, 0>& kf,
-      const LaneSequence& sequence,
-      double total_time,
-      double freq,
-      std::vector<common::TrajectoryPoint> *points);
+      const LaneSequence& sequence, double total_time, double freq,
+      std::vector<common::TrajectoryPoint>* points);
 
   /**
    * @brief Convert a lane sequence to string

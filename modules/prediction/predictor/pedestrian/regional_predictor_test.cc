@@ -21,14 +21,15 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -37,12 +38,13 @@ class RegionalPredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
     std::string file =
-      "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
+        "modules/prediction/testdata/multiple_perception_pedestrians.pb.txt";
     apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.01;
     FLAGS_r_var = 0.25;
   }
+
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
@@ -61,30 +63,22 @@ TEST_F(RegionalPredictorTest, MovingPedestrian) {
   predictor.Predict(obstacle_ptr);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
   EXPECT_EQ(trajectories.size(), 2);
-  EXPECT_NEAR(
-      trajectories[0].trajectory_point(9).path_point().x(),
-      -438.159, 0.001);
-  EXPECT_NEAR(
-      trajectories[0].trajectory_point(9).path_point().y(),
-      -157.404, 0.001);
-  EXPECT_NEAR(
-      trajectories[0].trajectory_point(19).path_point().x(),
-      -436.642, 0.001);
-  EXPECT_NEAR(
-      trajectories[0].trajectory_point(19).path_point().y(),
-      -152.635, 0.001);
-  EXPECT_NEAR(
-      trajectories[1].trajectory_point(9).path_point().x(),
-      -436.521, 0.001);
-  EXPECT_NEAR(
-      trajectories[1].trajectory_point(9).path_point().y(),
-      -158.000, 0.001);
-  EXPECT_NEAR(
-      trajectories[1].trajectory_point(19).path_point().x(),
-      -434.618, 0.001);
-  EXPECT_NEAR(
-      trajectories[1].trajectory_point(19).path_point().y(),
-      -153.371, 0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().x(), -438.159,
+              0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().y(), -157.404,
+              0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(19).path_point().x(), -436.642,
+              0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(19).path_point().y(), -152.635,
+              0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(9).path_point().x(), -436.521,
+              0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(9).path_point().y(), -158.000,
+              0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(19).path_point().x(), -434.618,
+              0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(19).path_point().y(), -153.371,
+              0.001);
 }
 
 TEST_F(RegionalPredictorTest, StationaryPedestrian) {
@@ -101,30 +95,30 @@ TEST_F(RegionalPredictorTest, StationaryPedestrian) {
   predictor.Predict(obstacle_ptr);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
   EXPECT_EQ(trajectories.size(), FLAGS_num_trajectory_still_pedestrian);
-  EXPECT_NEAR(
-      trajectories[0].trajectory_point(99).path_point().x(), -412.547, 0.001);
-  EXPECT_NEAR(
-      trajectories[0].trajectory_point(99).path_point().y(), -182.382, 0.001);
-  EXPECT_NEAR(
-      trajectories[1].trajectory_point(99).path_point().x(), -412.052, 0.001);
-  EXPECT_NEAR(
-      trajectories[1].trajectory_point(99).path_point().y(), -183.239, 0.001);
-  EXPECT_NEAR(
-      trajectories[2].trajectory_point(99).path_point().x(), -411.062, 0.001);
-  EXPECT_NEAR(
-      trajectories[2].trajectory_point(99).path_point().y(), -183.239, 0.001);
-  EXPECT_NEAR(
-      trajectories[3].trajectory_point(99).path_point().x(), -410.567, 0.001);
-  EXPECT_NEAR(
-      trajectories[3].trajectory_point(99).path_point().y(), -182.382, 0.001);
-  EXPECT_NEAR(
-      trajectories[4].trajectory_point(99).path_point().x(), -411.062, 0.001);
-  EXPECT_NEAR(
-      trajectories[4].trajectory_point(99).path_point().y(), -181.525, 0.001);
-  EXPECT_NEAR(
-      trajectories[5].trajectory_point(99).path_point().x(), -412.052, 0.001);
-  EXPECT_NEAR(
-      trajectories[5].trajectory_point(99).path_point().y(), -181.525, 0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(99).path_point().x(), -412.547,
+              0.001);
+  EXPECT_NEAR(trajectories[0].trajectory_point(99).path_point().y(), -182.382,
+              0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(99).path_point().x(), -412.052,
+              0.001);
+  EXPECT_NEAR(trajectories[1].trajectory_point(99).path_point().y(), -183.239,
+              0.001);
+  EXPECT_NEAR(trajectories[2].trajectory_point(99).path_point().x(), -411.062,
+              0.001);
+  EXPECT_NEAR(trajectories[2].trajectory_point(99).path_point().y(), -183.239,
+              0.001);
+  EXPECT_NEAR(trajectories[3].trajectory_point(99).path_point().x(), -410.567,
+              0.001);
+  EXPECT_NEAR(trajectories[3].trajectory_point(99).path_point().y(), -182.382,
+              0.001);
+  EXPECT_NEAR(trajectories[4].trajectory_point(99).path_point().x(), -411.062,
+              0.001);
+  EXPECT_NEAR(trajectories[4].trajectory_point(99).path_point().y(), -181.525,
+              0.001);
+  EXPECT_NEAR(trajectories[5].trajectory_point(99).path_point().x(), -412.052,
+              0.001);
+  EXPECT_NEAR(trajectories[5].trajectory_point(99).path_point().y(), -181.525,
+              0.001);
 }
 
 }  // namespace prediction

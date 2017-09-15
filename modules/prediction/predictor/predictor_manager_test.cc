@@ -18,8 +18,9 @@
 
 #include <string>
 
-#include "gtest/gtest.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+
+#include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 
 namespace apollo {
@@ -27,9 +28,7 @@ namespace prediction {
 
 class PredictorManagerTest : public ::testing::Test {
  public:
-  void SetUp() override {
-    manager_ = PredictorManager::instance();
-  }
+  void SetUp() override { manager_ = PredictorManager::instance(); }
 
  protected:
   PredictorManager *manager_;

@@ -16,6 +16,8 @@
 
 #include "modules/prediction/prediction.h"
 
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -24,7 +26,6 @@
 #include "modules/prediction/container/pose/pose_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {

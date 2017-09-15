@@ -22,6 +22,7 @@
 #include <utility>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/map/hdmap/hdmap_util.h"
