@@ -35,65 +35,9 @@ Object::Object() {
   type_probs.resize(MAX_OBJECT_TYPE, 0);
 }
 
-Object::Object(const Object& rhs) {
-  id = rhs.id;
-  cloud = rhs.cloud;
-  polygon = rhs.polygon;
-  direction = rhs.direction;
-  theta = rhs.theta;
-  center = rhs.center;
-  length = rhs.length;
-  width = rhs.width;
-  height = rhs.height;
-  shape_features = rhs.shape_features;
-  type = rhs.type;
-  type_probs = rhs.type_probs;
-  is_background = rhs.is_background;
-  track_id = rhs.track_id;
-  velocity = rhs.velocity;
-  tracking_time = rhs.tracking_time;
-  latest_tracked_time = rhs.latest_tracked_time;
-}
-
-Object& Object::operator=(const Object& rhs) {
-  id = rhs.id;
-  cloud = rhs.cloud;
-  polygon = rhs.polygon;
-  direction = rhs.direction;
-  theta = rhs.theta;
-  center = rhs.center;
-  length = rhs.length;
-  width = rhs.width;
-  height = rhs.height;
-  shape_features = rhs.shape_features;
-  type = rhs.type;
-  type_probs = rhs.type_probs;
-  is_background = rhs.is_background;
-  track_id = rhs.track_id;
-  velocity = rhs.velocity;
-  tracking_time = rhs.tracking_time;
-  latest_tracked_time = rhs.latest_tracked_time;
-  return (*this);
-}
-
 void Object::clone(const Object& rhs) {
-  id = rhs.id;
+  *this = rhs;
   pcl::copyPointCloud<pcl_util::Point, pcl_util::Point>(*(rhs.cloud), *cloud);
-  polygon = rhs.polygon;
-  direction = rhs.direction;
-  theta = rhs.theta;
-  center = rhs.center;
-  length = rhs.length;
-  width = rhs.width;
-  height = rhs.height;
-  shape_features = rhs.shape_features;
-  type = rhs.type;
-  type_probs = rhs.type_probs;
-  is_background = rhs.is_background;
-  track_id = rhs.track_id;
-  velocity = rhs.velocity;
-  tracking_time = rhs.tracking_time;
-  latest_tracked_time = rhs.latest_tracked_time;
 }
 
 std::string Object::ToString() const {
