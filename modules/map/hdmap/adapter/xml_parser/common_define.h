@@ -98,7 +98,6 @@ struct LaneInternal {
   std::vector<OverlapWithLane> overlap_signals;
   std::vector<OverlapWithLane> overlap_objects;
   std::vector<OverlapWithLane> overlap_junctions;
-  // somewhat trick
   std::vector<OverlapWithLane> overlap_lanes;
 };
 
