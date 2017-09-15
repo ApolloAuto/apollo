@@ -59,6 +59,8 @@ double GetDefaultObjectLength(const int object_type);
 
 double GetDefaultObjectWidth(const int object_type);
 
+Point SLtoXY(const Point point, const double theta); 
+
 }  // namespace l3_perception
 }  // namespace apollo
 
