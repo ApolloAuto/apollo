@@ -112,7 +112,7 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     }
 
     // TODO(lizh): calibrate mobileye and make those consts FLAGS
-    mob_pos_x += 3.0;  // offset: imu <-> mobileye
+    mob_pos_x += FLAGS_mobileye_pos_adjust;  // offset: imu <-> mobileye
     mob_pos_x += mob_l / 2.0; // make x the middle point of the vehicle.
 
     double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) +
@@ -198,7 +198,7 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     double mob_w = GetDefaultObjectWidth(4);
 
     // TODO(lizh): calibrate mobileye and make those consts FLAGS
-    mob_pos_x += 3.0;  // offset: imu <-> mobileye
+    mob_pos_x += delphi_esr_adjust;  // offset: imu <-> mobileye
     mob_pos_x += mob_l / 2.0; // make x the middle point of the vehicle.
 
     double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) +
@@ -254,8 +254,8 @@ bool IsPreserved(const PerceptionObstacle& perception_obstacle, const Esr_track0
     return false;
   }
 */
-  if (esr_track01_500.can_tx_track_status() ==
-      ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET) {
+  if (esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET ||
+    esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_COASTED_TARGET ) {
     return false;
   }
 return true;
@@ -277,9 +277,6 @@ PerceptionObstacles L3Perception::FilterDelphiEsrPerceptionObstacles(
     const auto& perception_obstacle = perception_obstacles.perception_obstacle(index);
     const auto& esr_track01_500 = delphi_esr.esr_track01_500(index);
     const auto& rcs = static_cast<double>(motionpowers[index].can_tx_track_power()) - 10.0;
-    const bool& moving = motionpowers[index].can_tx_track_moving();
-    const bool& moving_fast = motionpowers[index].can_tx_track_moving_fast();
-    const bool& moving_slow = motionpowers[index].can_tx_track_moving_slow();
     if (IsPreserved(perception_obstacle, esr_track01_500, rcs)) {
       auto* obstacle = filtered_perception_obstacles.add_perception_obstacle();
       obstacle->CopyFrom(perception_obstacle);
