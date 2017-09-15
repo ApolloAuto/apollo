@@ -34,6 +34,8 @@
 namespace apollo {
 namespace l3_perception {
 
+const double L3_PI = 3.141592653;
+
 using ::apollo::common::Quaternion;
 using ::apollo::perception::Point;
 using ::apollo::perception::PerceptionObstacle;
