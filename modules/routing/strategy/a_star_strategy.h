@@ -31,11 +31,10 @@ class AStarStrategy : public Strategy {
   explicit AStarStrategy(bool enable_change);
   ~AStarStrategy() = default;
 
-  virtual bool Search(const TopoGraph* graph,
-                      const SubTopoGraph* sub_graph,
-                      const TopoNode* src_node,
-                      const TopoNode* dest_node,
+  virtual bool Search(const TopoGraph* graph, const SubTopoGraph* sub_graph,
+                      const TopoNode* src_node, const TopoNode* dest_node,
                       std::vector<NodeWithRange>* const result_nodes);
+
  private:
   void Clear();
   double HeuristicCost(const TopoNode* src_node, const TopoNode* dest_node);

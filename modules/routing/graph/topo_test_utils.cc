@@ -50,8 +50,7 @@ void AddCurve(Curve* curve) {
 
 }  // namespace
 
-void GetNodeDetailForTest(Node* const node,
-                          const std::string& lane_id,
+void GetNodeDetailForTest(Node* const node, const std::string& lane_id,
                           const std::string& road_id) {
   node->set_lane_id(lane_id);
   node->set_length(TEST_LANE_LENGTH);
@@ -66,8 +65,7 @@ void GetNodeDetailForTest(Node* const node,
   right_out->mutable_end()->set_s(TEST_END_S);
 }
 
-void GetNodeForTest(Node* const node,
-                    const std::string& lane_id,
+void GetNodeForTest(Node* const node, const std::string& lane_id,
                     const std::string& road_id) {
   node->set_lane_id(lane_id);
   node->set_length(TEST_LANE_LENGTH);
@@ -81,8 +79,7 @@ void GetNodeForTest(Node* const node,
   right_out->mutable_end()->set_s(TEST_END_S);
 }
 
-void GetEdgeForTest(Edge* const edge,
-                    const std::string& lane_id_1,
+void GetEdgeForTest(Edge* const edge, const std::string& lane_id_1,
                     const std::string& lane_id_2,
                     const Edge::DirectionType& type) {
   edge->set_from_lane_id(lane_id_1);
@@ -152,4 +149,3 @@ void GetGraph3ForTest(Graph* graph) {
 
 }  // namespace routing
 }  // namespace apollo
-

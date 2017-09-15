@@ -23,8 +23,8 @@
 #include <vector>
 
 #include "modules/map/proto/map_lane.pb.h"
-#include "modules/routing/proto/topo_graph.pb.h"
 #include "modules/routing/graph/topo_range.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -34,8 +34,7 @@ class TopoEdge;
 class TopoNode {
  public:
   static bool IsOutRangeEnough(const std::vector<NodeSRange>& range_vec,
-                               double start_s,
-                               double end_s);
+                               double start_s, double end_s);
 
  public:
   explicit TopoNode(const Node& node);
@@ -123,8 +122,7 @@ enum TopoEdgeType {
 
 class TopoEdge {
  public:
-  TopoEdge(const Edge& edge,
-           const TopoNode* from_node,
+  TopoEdge(const Edge& edge, const TopoNode* from_node,
            const TopoNode* to_node);
 
   ~TopoEdge();

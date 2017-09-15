@@ -18,16 +18,16 @@
 #define MODULES_ROUTING_CORE_NAVIGATOR_H_
 
 #include <memory>
+#include <string>
 #include <unordered_set>
 #include <vector>
-#include <string>
 
-#include "modules/routing/proto/routing.pb.h"
-#include "modules/routing/core/result_generator.h"
 #include "modules/routing/core/black_list_range_generator.h"
+#include "modules/routing/core/result_generator.h"
+#include "modules/routing/graph/node_with_range.h"
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_range_manager.h"
-#include "modules/routing/graph/node_with_range.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -43,16 +43,14 @@ class Navigator {
                    RoutingResponse* const response);
 
  private:
-  bool Init(const RoutingRequest& request,
-            const TopoGraph* graph,
+  bool Init(const RoutingRequest& request, const TopoGraph* graph,
             std::vector<const TopoNode*>* const way_nodes,
             std::vector<double>* const way_s);
 
   void Clear();
 
   bool SearchRouteByStrategy(
-      const TopoGraph* graph,
-      const std::vector<const TopoNode*>& way_nodes,
+      const TopoGraph* graph, const std::vector<const TopoNode*>& way_nodes,
       const std::vector<double>& way_s,
       std::vector<NodeWithRange>* const result_nodes) const;
 
@@ -73,4 +71,3 @@ class Navigator {
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_CORE_NAVIGATOR_H_
-

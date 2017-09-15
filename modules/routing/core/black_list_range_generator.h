@@ -18,11 +18,11 @@
 #define MODULES_ROUTING_CORE_BLACK_LIST_RANGE_GENERATOR_H
 
 #include <memory>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
-#include "modules/routing/graph/topo_range_manager.h"
 #include "modules/routing/graph/topo_graph.h"
+#include "modules/routing/graph/topo_range_manager.h"
 #include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
@@ -38,8 +38,7 @@ class BlackListRangeGenerator {
                                    TopoRangeManager* const range_manager) const;
 
   void AddBlackMapFromTerminal(const TopoNode* src_node,
-                               const TopoNode* dest_node,
-                               double start_s,
+                               const TopoNode* dest_node, double start_s,
                                double end_s,
                                TopoRangeManager* const range_manager) const;
 };
@@ -48,4 +47,3 @@ class BlackListRangeGenerator {
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_CORE_BLACK_LIST_RANGE_GENERATOR_H
-

@@ -17,14 +17,14 @@
 #ifndef MODULES_ROUTING_GRAPH_SUB_TOPO_GRAPH_H
 #define MODULES_ROUTING_GRAPH_SUB_TOPO_GRAPH_H
 
+#include <memory>
+#include <queue>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <memory>
-#include <queue>
 
-#include "modules/routing/graph/topo_node.h"
 #include "modules/routing/graph/node_with_range.h"
+#include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
 namespace routing {
@@ -32,8 +32,8 @@ namespace routing {
 class SubTopoGraph {
  public:
   explicit SubTopoGraph(
-              const std::unordered_map<const TopoNode*,
-                                       std::vector<NodeSRange>>& black_map);
+      const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>&
+          black_map);
   ~SubTopoGraph();
 
   // edge: A -> B         not sub edge
@@ -50,8 +50,8 @@ class SubTopoGraph {
   // edge: A -> B is sub edge
   // 1. return empty set
   void GetSubInEdgesIntoSubGraph(
-                const TopoEdge* edge,
-                std::unordered_set<const TopoEdge*>* const sub_edges) const;
+      const TopoEdge* edge,
+      std::unordered_set<const TopoEdge*>* const sub_edges) const;
 
   // edge: A -> B         not sub edge
   // 1. A has no sub node, B has no sub node
@@ -67,12 +67,10 @@ class SubTopoGraph {
   // edge: A -> B is sub edge
   // 1. return empty set
   void GetSubOutEdgesIntoSubGraph(
-                const TopoEdge* edge,
-                std::unordered_set<const TopoEdge*>* const sub_edges) const;
+      const TopoEdge* edge,
+      std::unordered_set<const TopoEdge*>* const sub_edges) const;
 
-
-  const TopoNode* GetSubNodeWithS(const TopoNode* topo_node,
-                                      double s) const;
+  const TopoNode* GetSubNodeWithS(const TopoNode* topo_node, double s) const;
 
  private:
   void InitSubNodeByValidRange(const TopoNode* topo_node,
@@ -110,4 +108,3 @@ class SubTopoGraph {
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_GRAPH_SUB_TOPO_GRAPH_H
-

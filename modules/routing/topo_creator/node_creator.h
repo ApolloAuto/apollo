@@ -20,29 +20,27 @@
 #include <string>
 
 #include "modules/map/proto/map_lane.pb.h"
-#include "modules/routing/proto/topo_graph.pb.h"
 #include "modules/routing/proto/routing_config.pb.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
 
 class NodeCreator {
  public:
-  static void GetPbNode(const hdmap::Lane& lane,
-                        const std::string& road_id,
-                        Node* pb_node, const RoutingConfig * routingconfig);
+  static void GetPbNode(const hdmap::Lane& lane, const std::string& road_id,
+                        Node* pb_node, const RoutingConfig* routingconfig);
 
  private:
   static void AddOutBoundary(
       const hdmap::LaneBoundary& bound, double lane_length,
       ::google::protobuf::RepeatedPtrField<CurveRange>* const out_range);
 
-  static void InitNodeInfo(const hdmap::Lane& lane,
-                           const std::string& road_id,
+  static void InitNodeInfo(const hdmap::Lane& lane, const std::string& road_id,
                            Node* const node,
-                           const RoutingConfig * routingconfig);
+                           const RoutingConfig* routingconfig);
   static void InitNodeCost(const hdmap::Lane& lane, Node* const node,
-                           const RoutingConfig * routingconfig);
+                           const RoutingConfig* routingconfig);
 };
 
 }  // namespace routing

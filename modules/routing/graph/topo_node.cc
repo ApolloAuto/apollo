@@ -162,9 +162,7 @@ const hdmap::Curve& TopoNode::CentralCurve() const {
   return pb_node_.central_curve();
 }
 
-const common::PointENU& TopoNode::AnchorPoint() const {
-  return anchor_point_;
-}
+const common::PointENU& TopoNode::AnchorPoint() const { return anchor_point_; }
 
 const std::vector<NodeSRange>& TopoNode::LeftOutRange() const {
   return left_out_sorted_range_;
