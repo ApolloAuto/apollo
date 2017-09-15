@@ -133,15 +133,23 @@ double TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
       if (distance > config_.obstacle_ignore_distance()) {
         continue;
       } else if (distance <= config_.obstacle_collision_distance()) {
-        total_cost += 1e3;
+        total_cost += config_.obstacle_collision_cost();
       } else if (distance <= config_.obstacle_risk_distance()) {
-        total_cost += (5.0 - distance) * ((5.0 - distance)) * 10;
+        total_cost += RiskDistanceCost(distance);
       } else {
-        total_cost += std::max(10 - distance, 0.0);
+        total_cost += RegularDistanceCost(distance);
       }
     }
   }
   return total_cost;
+}
+
+double TrajectoryCost::RiskDistanceCost(const double distance) const {
+  return (5.0 - distance) * ((5.0 - distance)) * 10;
+}
+
+double TrajectoryCost::RegularDistanceCost(const double distance) const {
+  return std::max(20.0 - distance, 0.0);
 }
 
 }  // namespace planning
