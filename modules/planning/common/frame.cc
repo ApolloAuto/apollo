@@ -73,6 +73,10 @@ const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
 
 void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
   prediction_ = prediction;
+  trajectory_pb_.mutable_debug()
+      ->mutable_planning_data()
+      ->mutable_prediction_header()
+      ->CopyFrom(prediction_.header());
 }
 
 void Frame::CreatePredictionObstacles(

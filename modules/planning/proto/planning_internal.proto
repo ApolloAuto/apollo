@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.planning_internal;
 
+import "modules/common/proto/header.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
@@ -68,7 +69,7 @@ message STGraphDebug {
   optional STGraphKernelFollowRef kernel_follow_ref = 7;
 }
 
-// next id: 16
+// next id: 17
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -80,4 +81,6 @@ message PlanningData {
   repeated SpeedPlan speed_plan = 13;
   repeated STGraphDebug st_graph = 14;
   repeated SLFrameDebug sl_frame = 15;
+
+  optional apollo.common.Header prediction_header = 16;
 }
