@@ -43,6 +43,9 @@ class RadarObstacle {
   const double relative_angle();
   const double relative_range_velocity();
   const double relative_lateral_velocity();
+  const double width();
+  const double length();
+  const double height();
   
   void set_position(const Point& position);
   void set_position(const double x, const double y);
@@ -55,6 +58,9 @@ class RadarObstacle {
   void set_relative_angle(const double relative_angle);
   void set_relative_range_velocity(const double relative_range_velocity);
   void set_relative_lateral_velocity(const double relative_lateral_velocity);
+  void set_width(const double width);
+  void set_length(const double length);
+  void set_height(const double height);
 
  private:
   Point position_;
@@ -66,6 +72,9 @@ class RadarObstacle {
   double relative_angle_;
   double relative_range_velocity_;
   double relative_lateral_velocity_;
+  double width_;
+  double length_;
+  double height_;
 };
 
 }  // namespace l3_perception
