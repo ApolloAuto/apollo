@@ -14,21 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
+#include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
+
 #include <stdio.h>
 #include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
-#include "opencv2/opencv.hpp"
 #include "gtest/gtest.h"
+#include "opencv2/opencv.hpp"
+#include "pcl/io/pcd_io.h"
+#include "pcl/point_cloud.h"
+#include "pcl/point_types.h"
+
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 
 #define VISUALIZE
 
@@ -80,9 +82,7 @@ bool IsValidRowCol(int row, int rows, int col, int cols) {
   return row >= 0 && row < rows && col >= 0 && col < cols;
 }
 
-int RowCol2Grid(int row, int col, int cols) {
-  return row * cols + col;
-}
+int RowCol2Grid(int row, int col, int cols) { return row * cols + col; }
 
 bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
   pcl::PointCloud<PointXYZIT> ori_cloud;

@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <pcl/io/pcd_io.h>
+
+#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
+
 #include <fstream>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
+#include "pcl/io/pcd_io.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 
 namespace apollo {
 namespace perception {
