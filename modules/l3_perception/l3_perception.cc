@@ -24,8 +24,6 @@
 #include "modules/l3_perception/l3_perception_util.h"
 #include "ros/include/ros/ros.h"
 
-#define L3_PI 3.141592653
-
 namespace apollo {
 namespace l3_perception {
 
@@ -245,20 +243,22 @@ bool IsPreserved(const PerceptionObstacle& perception_obstacle, const Esr_track0
                perception_obstacle.velocity().y()) < 5.0) {
     return false;
   }
-  if (esr_track01_500.can_tx_track_range() > 40.0) {
-    return false;
-  }
-  if (esr_track01_500.can_tx_track_angle() > 25.0 || esr_track01_500.can_tx_track_angle() < -25.0) {
-    return false;
-  }
   if (rcs < -1.0) {
     return false;
   }
-*/
-  if (esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET) {
+  if (esr_track01_500.can_tx_track_range() > 40.0) {
     return false;
   }
-  return true;
+  if (esr_track01_500.can_tx_track_angle() > 25.0 ||
+      esr_track01_500.can_tx_track_angle() < -25.0) {
+    return false;
+  }
+*/
+  if (esr_track01_500.can_tx_track_status() ==
+      ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET) {
+    return false;
+  }
+return true;
 }
 
 PerceptionObstacles L3Perception::FilterDelphiEsrPerceptionObstacles(
@@ -280,14 +280,9 @@ PerceptionObstacles L3Perception::FilterDelphiEsrPerceptionObstacles(
     const bool& moving = motionpowers[index].can_tx_track_moving();
     const bool& moving_fast = motionpowers[index].can_tx_track_moving_fast();
     const bool& moving_slow = motionpowers[index].can_tx_track_moving_slow();
-    AINFO << "index: " << index << "-- moving: " << moving << " | fast: " << moving_fast << " | slow: " << moving_slow;
     if (IsPreserved(perception_obstacle, esr_track01_500, rcs)) {
       auto* obstacle = filtered_perception_obstacles.add_perception_obstacle();
       obstacle->CopyFrom(perception_obstacle);
-      if (!moving)
-        obstacle->set_type(PerceptionObstacle::PEDESTRIAN);
-      if (moving_slow)
-        obstacle->set_type(PerceptionObstacle::BICYCLE);
     }
   }
   return filtered_perception_obstacles;
