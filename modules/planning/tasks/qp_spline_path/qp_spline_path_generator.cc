@@ -40,11 +40,9 @@ using Vec2d = apollo::common::math::Vec2d;
 
 QpSplinePathGenerator::QpSplinePathGenerator(
     const ReferenceLine& reference_line,
-    const QpSplinePathConfig& qp_spline_path_config,
-    const ReferencePoint& adc_smooth_ref_point)
+    const QpSplinePathConfig& qp_spline_path_config)
     : reference_line_(reference_line),
-      qp_spline_path_config_(qp_spline_path_config),
-      adc_smooth_ref_point_(adc_smooth_ref_point) {
+      qp_spline_path_config_(qp_spline_path_config) {
   CHECK_GE(qp_spline_path_config_.regularization_weight(), 0.0)
       << "regularization_weight should NOT be negative.";
   CHECK_GE(qp_spline_path_config_.derivative_weight(), 0.0)
@@ -176,11 +174,7 @@ bool QpSplinePathGenerator::CalculateInitFrenetPoint(
   const double l = frenet_frame_point->l();
 
   ReferencePoint ref_point;
-  if (FLAGS_enable_smooth_reference_line) {
-    ref_point = reference_line_.GetReferencePoint(frenet_frame_point->s());
-  } else {
-    ref_point = adc_smooth_ref_point_;
-  }
+  ref_point = reference_line_.GetReferencePoint(frenet_frame_point->s());
 
   const double theta_ref = ref_point.heading();
   const double kappa_ref = ref_point.kappa();

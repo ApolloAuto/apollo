@@ -65,40 +65,6 @@ bool ReferenceLineInfo::Init() {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
   }
-  if (!FLAGS_enable_smooth_reference_line &&
-      !CalculateAdcSmoothReferenLinePoint()) {
-    AERROR << "Fail to get ADC smooth reference line point.";
-    return false;
-  }
-  return true;
-}
-
-bool ReferenceLineInfo::CalculateAdcSmoothReferenLinePoint() {
-  const double backward_s = -5.0;
-  const double forward_s = 10.0;
-  const double delta_s = 2.0;
-  double s = backward_s + adc_sl_boundary_.start_s();
-
-  std::vector<ReferencePoint> local_ref_points;
-  while (s <= forward_s + adc_sl_boundary_.end_s()) {
-    local_ref_points.push_back(reference_line_.GetReferencePoint(s));
-    s += delta_s;
-  }
-  ReferencePoint::RemoveDuplicates(&local_ref_points);
-  if (local_ref_points.size() > 1) {
-    ReferenceLineSmoother smoother;
-    smoother.Init(smoother_config_);
-    ReferenceLine smoothed_segment;
-    if (!smoother.Smooth(ReferenceLine(local_ref_points), &smoothed_segment)) {
-      AERROR << "Failed to smooth reference line";
-      return false;
-    }
-    adc_smooth_ref_point_ = smoothed_segment.GetReferencePoint(
-        init_adc_point_.path_point().x(), init_adc_point_.path_point().y());
-  } else {
-    adc_smooth_ref_point_ = reference_line_.GetReferencePoint(
-        init_adc_point_.path_point().x(), init_adc_point_.path_point().y());
-  }
   return true;
 }
 

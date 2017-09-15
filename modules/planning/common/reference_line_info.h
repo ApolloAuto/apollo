@@ -91,9 +91,6 @@ class ReferenceLineInfo {
       const double time_resolution, const double relative_time,
       DiscretizedTrajectory* discretized_trajectory);
 
-  ReferencePoint GetAdcPointOnSmoothReferenceLine() {
-    return adc_smooth_ref_point_;
-  }
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
@@ -102,7 +99,6 @@ class ReferenceLineInfo {
  private:
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
-  bool CalculateAdcSmoothReferenLinePoint();
 
   const hdmap::PncMap* pnc_map_ = nullptr;
   const ReferenceLine reference_line_;
@@ -110,9 +106,8 @@ class ReferenceLineInfo {
 
   /**
    * @brief this is the number that measures the goodness of this reference
-   * line.
-   * The lower the better.
-   * TODO: implement trajectory cost calculation
+   * line. The lower the better.
+   * TODO(all): implement trajectory cost calculation
    */
   double cost_ = 0.0;
 
@@ -124,7 +119,6 @@ class ReferenceLineInfo {
   DiscretizedTrajectory discretized_trajectory_;
 
   SLBoundary adc_sl_boundary_;
-  ReferencePoint adc_smooth_ref_point_;
   const ReferenceLineSmootherConfig smoother_config_;
 
   planning_internal::Debug debug_;
