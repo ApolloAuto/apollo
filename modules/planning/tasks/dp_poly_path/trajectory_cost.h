@@ -45,6 +45,8 @@ class TrajectoryCost {
                           const SpeedData &heuristic_speed_data);
   double Calculate(const QuinticPolynomialCurve1d &curve, const double start_s,
                    const double end_s) const;
+  double RiskDistanceCost(const double distance) const;
+  double RegularDistanceCost(const double distance) const;
 
  private:
   const DpPolyPathConfig config_;
