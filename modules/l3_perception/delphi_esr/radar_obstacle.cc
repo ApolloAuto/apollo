@@ -37,6 +37,22 @@ namespace l3_perception {
   const bool RadarObstacle::movable() {
     return movable_;
   }
+
+  const double RadarObstacle::relative_range() {
+    return relative_range_;
+  }
+
+  const double RadarObstacle::relative_angle() {
+    return relative_angle_;
+  }
+
+  const double RadarObstacle::relative_range_velocity() {
+    return relative_range_velocity_;
+  }
+
+  const double RadarObstacle::relative_lateral_velocity() {
+    return relative_lateral_velocity_;
+  }
   
   void RadarObstacle::set_position(const Point& position) {
     position_.set_x(position.x());
@@ -68,6 +84,22 @@ namespace l3_perception {
 
   void RadarObstacle::set_movable(const bool movable) {
     movable_ = movable;
+  }
+
+  void RadarObstacle::set_relative_range(const double relative_range) {
+    relative_range_ = relative_range;
+  }
+
+  void RadarObstacle::set_relative_angle(const double relative_angle) {
+    relative_angle_ = relative_angle;
+  }
+
+  void RadarObstacle::set_relative_range_velocity(const double relative_range_velocity) {
+    relative_range_velocity_ = relative_range_velocity;
+  }
+
+  void RadarObstacle::set_relative_lateral_velocity(const double relative_lateral_velocity) {
+    relative_lateral_velocity_ = relative_lateral_velocity;
   }
 
 }  // namespace l3_perception

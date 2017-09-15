@@ -25,7 +25,8 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/proto:perception_proto",
         "//modules/drivers/proto:sensor_proto",
-        "//modules/localization/proto:localization_proto"
+        "//modules/localization/proto:localization_proto",
+        "//modules/l3_perception/delphi_esr:radar_obstacle"
     ],
 )
 

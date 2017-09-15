@@ -39,6 +39,10 @@ class RadarObstacle {
   const uint32_t id();
   const double rcs();
   const bool movable();
+  const double relative_range();
+  const double relative_angle();
+  const double relative_range_velocity();
+  const double relative_lateral_velocity();
   
   void set_position(const Point& position);
   void set_position(const double x, const double y);
@@ -47,6 +51,10 @@ class RadarObstacle {
   void set_id(const uint32_t id);
   void set_rcs(const double rcs);
   void set_movable(const bool movable);
+  void set_relative_range(const double relative_range);
+  void set_relative_angle(const double relative_angle);
+  void set_relative_range_velocity(const double relative_range_velocity);
+  void set_relative_lateral_velocity(const double relative_lateral_velocity);
 
  private:
   Point position_;
@@ -54,6 +62,10 @@ class RadarObstacle {
   uint32_t id_;
   double rcs_;
   bool movable_; 
+  double relative_range_;
+  double relative_angle_;
+  double relative_range_velocity_;
+  double relative_lateral_velocity_;
 };
 
 }  // namespace l3_perception
