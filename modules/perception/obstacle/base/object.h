@@ -33,9 +33,6 @@ namespace perception {
 
 struct alignas(16) Object {
   Object();
-  // shallow copy for copy constructor and assignment
-  Object(const Object& rhs);
-  Object& operator=(const Object& rhs);
   // deep copy
   void clone(const Object& rhs);
   std::string ToString() const;
