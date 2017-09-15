@@ -14,10 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/common/prediction_util.h"
+
 #include <cmath>
 #include <limits>
 
-#include "modules/prediction/common/prediction_util.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace prediction {
@@ -26,26 +28,22 @@ namespace util {
 using apollo::common::TrajectoryPoint;
 
 double Normalize(const double value, const double mean, const double std) {
-  double eps = 1e-10;
+  constexpr double eps = 1e-10;
   return (value - mean) / (std + eps);
 }
 
-double Sigmoid(const double value) {
-  return 1 / (1 + std::exp(-1.0 * value));
-}
+double Sigmoid(const double value) { return 1 / (1 + std::exp(-1.0 * value)); }
 
-double Relu(const double value) {
-  return (value > 0.0) ? value : 0.0;
-}
+double Relu(const double value) { return (value > 0.0) ? value : 0.0; }
 
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots) {
   if (coefficients.size() != 3) {
     return -1;
   }
-  double a = coefficients[0];
-  double b = coefficients[1];
-  double c = coefficients[2];
+  const double a = coefficients[0];
+  const double b = coefficients[1];
+  const double c = coefficients[2];
   if (std::fabs(a) <= std::numeric_limits<double>::epsilon()) {
     return -1;
   }
@@ -62,8 +60,11 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
 
 void TranslatePoint(const double translate_x, const double translate_y,
                     TrajectoryPoint* point) {
-  double original_x = point->path_point().x();
-  double original_y = point->path_point().y();
+  if (point == nullptr || !point->has_path_point()) {
+    AERROR << "Point is nullptr or has NO path_point.";
+  }
+  const double original_x = point->path_point().x();
+  const double original_y = point->path_point().y();
   point->mutable_path_point()->set_x(original_x + translate_x);
   point->mutable_path_point()->set_y(original_y + translate_y);
 }

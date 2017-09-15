@@ -25,10 +25,11 @@
 #include <map>
 #include <memory>
 
-#include "modules/prediction/evaluator/evaluator.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+
 #include "modules/common/macro.h"
+#include "modules/prediction/evaluator/evaluator.h"
 
 /**
  * @namespace apollo::prediction
@@ -41,7 +42,7 @@ class EvaluatorManager {
  public:
   /**
    * @brief Destructor
-   */ 
+   */
   virtual ~EvaluatorManager() = default;
 
   /**
@@ -60,8 +61,7 @@ class EvaluatorManager {
    * @brief Run evaluators
    * @param Perception obstacles
    */
-  void Run(
-      const perception::PerceptionObstacles& perception_obstacles);
+  void Run(const perception::PerceptionObstacles& perception_obstacles);
 
  private:
   /**

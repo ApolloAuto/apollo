@@ -17,6 +17,7 @@
 #include "modules/prediction/common/prediction_map.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/prediction/common/kml_map_based_test.h"
 
 namespace apollo {

@@ -25,9 +25,7 @@ const std::vector<Trajectory>& Predictor::trajectories() {
   return trajectories_;
 }
 
-int Predictor::NumOfTrajectories() {
-  return trajectories_.size();
-}
+int Predictor::NumOfTrajectories() { return trajectories_.size(); }
 
 Trajectory Predictor::GenerateTrajectory(
     const std::vector<apollo::common::TrajectoryPoint>& points) {

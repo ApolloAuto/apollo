@@ -17,12 +17,13 @@
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 
 #include <cmath>
-#include <numeric>
 #include <limits>
+#include <numeric>
+
+#include "modules/map/proto/map_lane.pb.h"
 
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
-#include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 
@@ -45,13 +46,9 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 
 }  // namespace
 
-MLPEvaluator::MLPEvaluator() {
-  LoadModel(FLAGS_vehicle_model_file);
-}
+MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_vehicle_model_file); }
 
-void MLPEvaluator::Clear() {
-  obstacle_feature_values_map_.clear();
-}
+void MLPEvaluator::Clear() { obstacle_feature_values_map_.clear(); }
 
 void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
@@ -114,15 +111,15 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
   if (lane_feature_values.size() != LANE_FEATURE_SIZE) {
     ADEBUG << "Obstacle [" << id << "] has fewer than "
-           << "expected lane feature_values"
-           << lane_feature_values.size() << ".";
+           << "expected lane feature_values" << lane_feature_values.size()
+           << ".";
     return;
   }
 
-  feature_values->insert(feature_values->end(),
-      obstacle_feature_values.begin(), obstacle_feature_values.end());
-  feature_values->insert(feature_values->end(),
-      lane_feature_values.begin(), lane_feature_values.end());
+  feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
+                         obstacle_feature_values.end());
+  feature_values->insert(feature_values->end(), lane_feature_values.begin(),
+                         lane_feature_values.end());
 }
 
 void MLPEvaluator::SetObstacleFeatureValues(
@@ -145,8 +142,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
     if (!feature.IsInitialized()) {
       continue;
     }
-    if (apollo::common::math::DoubleCompare(
-            feature.timestamp(), duration) < 0) {
+    if (apollo::common::math::DoubleCompare(feature.timestamp(), duration) <
+        0) {
       break;
     }
     if (feature.has_lane() && feature.lane().has_lane_feature()) {
@@ -177,10 +174,12 @@ void MLPEvaluator::SetObstacleFeatureValues(
   double speed_mean = ComputeMean(speeds, 0, hist_size - 1);
 
   double time_diff = timestamps.front() - timestamps.back();
-  double dist_lb_rate = (timestamps.size() > 1) ?
-                (dist_lbs.front() - dist_lbs.back()) / time_diff : 0.0;
-  double dist_rb_rate = (timestamps.size() > 1) ?
-                (dist_rbs.front() - dist_rbs.back()) / time_diff : 0.0;
+  double dist_lb_rate = (timestamps.size() > 1)
+                            ? (dist_lbs.front() - dist_lbs.back()) / time_diff
+                            : 0.0;
+  double dist_rb_rate = (timestamps.size() > 1)
+                            ? (dist_rbs.front() - dist_rbs.back()) / time_diff
+                            : 0.0;
 
   double delta_t = 0.0;
   if (timestamps.size() > 1) {
@@ -206,25 +205,25 @@ void MLPEvaluator::SetObstacleFeatureValues(
 
   double acc = 0.0;
   if (static_cast<int>(speeds.size()) >= 3 * curr_size &&
-          delta_t > std::numeric_limits<double>::epsilon()) {
+      delta_t > std::numeric_limits<double>::epsilon()) {
     double speed_1 = ComputeMean(speeds, 0, curr_size - 1);
     double speed_2 = ComputeMean(speeds, curr_size, 2 * curr_size - 1);
     double speed_3 = ComputeMean(speeds, 2 * curr_size, 3 * curr_size - 1);
     acc = (speed_1 - 2 * speed_2 + speed_3) /
-        (curr_size * curr_size * delta_t * delta_t);
+          (curr_size * curr_size * delta_t * delta_t);
   }
 
   double dist_lb_rate_curr = 0.0;
-  if (hist_size >= 2 * curr_size && delta_t >
-      std::numeric_limits<double>::epsilon()) {
+  if (hist_size >= 2 * curr_size &&
+      delta_t > std::numeric_limits<double>::epsilon()) {
     double dist_lb_curr = ComputeMean(dist_lbs, 0, curr_size - 1);
     double dist_lb_prev = ComputeMean(dist_lbs, curr_size, 2 * curr_size - 1);
     dist_lb_rate_curr = (dist_lb_curr - dist_lb_prev) / (curr_size * delta_t);
   }
 
   double dist_rb_rate_curr = 0.0;
-  if (hist_size >= 2 * curr_size && delta_t >
-      std::numeric_limits<double>::epsilon()) {
+  if (hist_size >= 2 * curr_size &&
+      delta_t > std::numeric_limits<double>::epsilon()) {
     double dist_rb_curr = ComputeMean(dist_rbs, 0, curr_size - 1);
     double dist_rb_prev = ComputeMean(dist_rbs, curr_size, 2 * curr_size - 1);
     dist_rb_rate_curr = (dist_rb_curr - dist_rb_prev) / (curr_size * delta_t);
@@ -261,7 +260,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
 }
 
 void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
-    LaneSequence* lane_sequence_ptr, std::vector<double>* feature_values) {
+                                        LaneSequence* lane_sequence_ptr,
+                                        std::vector<double>* feature_values) {
   feature_values->clear();
   feature_values->reserve(LANE_FEATURE_SIZE);
   const Feature& feature = obstacle_ptr->latest_feature();
@@ -273,8 +273,8 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
     return;
   }
 
-  double heading = FLAGS_enable_kf_tracking ? feature.t_velocity_heading()
-                                            : feature.theta();
+  double heading =
+      FLAGS_enable_kf_tracking ? feature.t_velocity_heading() : feature.theta();
   for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
     if (feature_values->size() >= LANE_FEATURE_SIZE) {
       break;
@@ -316,8 +316,7 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
 void MLPEvaluator::LoadModel(const std::string& model_file) {
   model_ptr_.reset(new FnnVehicleModel());
   CHECK(model_ptr_ != nullptr);
-  CHECK(common::util::GetProtoFromFile(
-      model_file, model_ptr_.get()))
+  CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
       << "Unable to load model file: " << model_file << ".";
 
   AINFO << "Succeeded in loading the model file: " << model_file << ".";

@@ -22,10 +22,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/prediction/container/obstacles/obstacle.h"
-#include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/fnn_vehicle_model.pb.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
+
+#include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/evaluator/evaluator.h"
 
 namespace apollo {
 namespace prediction {
