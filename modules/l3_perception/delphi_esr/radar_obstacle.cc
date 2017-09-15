@@ -53,6 +53,18 @@ namespace l3_perception {
   const double RadarObstacle::relative_lateral_velocity() {
     return relative_lateral_velocity_;
   }
+
+  const double RadarObstacle::width() {
+    return width_;
+  }
+
+  const double RadarObstacle::length() {
+    return length_;
+  }
+
+  const double RadarObstacle::height() {
+    return height_;
+  }
   
   void RadarObstacle::set_position(const Point& position) {
     position_.set_x(position.x());
@@ -100,6 +112,18 @@ namespace l3_perception {
 
   void RadarObstacle::set_relative_lateral_velocity(const double relative_lateral_velocity) {
     relative_lateral_velocity_ = relative_lateral_velocity;
+  }
+
+  void RadarObstacle::set_width(const double width) {
+    width_ = width;
+  }
+
+  void RadarObstacle::set_length(const double length) {
+    length_ = length;
+  }
+
+  void RadarObstacle::set_height(const double height) {
+    height_ = height;
   }
 
 }  // namespace l3_perception
