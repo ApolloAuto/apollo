@@ -110,6 +110,12 @@ double GetDefaultObjectWidth(const int object_type) {
   return default_object_width;
 }
 
+Point SLtoXY(const Point point, const double theta) {
+  Point converted_point;
+  converted_point.set_x(point.x() * std::cos(theta) + point.y() * std::sin(theta));
+  converted_point.set_y(point.x() * std::sin(theta) - point.y() * std::cos(theta));
+  return converted_point;
+}
 
 }  // namespace l3_perception
 }  // namespace apollo

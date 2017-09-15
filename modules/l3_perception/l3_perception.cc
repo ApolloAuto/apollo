@@ -36,6 +36,7 @@ using apollo::drivers::Esr_track01_500;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
+using apollo::perception::Point;
 
 std::string L3Perception::Name() const { return FLAGS_hmi_name; }
 
@@ -115,10 +116,13 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     mob_pos_x += FLAGS_mobileye_pos_adjust;  // offset: imu <-> mobileye
     mob_pos_x += mob_l / 2.0; // make x the middle point of the vehicle.
 
-    double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) +
-                         mob_pos_y * std::sin(adc_theta);
-    double converted_y = adc_y + mob_pos_x * std::sin(adc_theta) -
-                         mob_pos_y * std::cos(adc_theta);
+    Point sl_point;
+    sl_point.set_x(mob_pos_x);
+    sl_point.set_y(mob_pos_y);
+    Point xy_point = SLtoXY(sl_point, adc_theta);
+
+    double converted_x = adc_x + xy_point.x();
+    double converted_y = adc_y + xy_point.y();
     double converted_speed = adc_velocity + mob_vel_x;
     double converted_vx = converted_speed * std::cos(adc_theta);
     double converted_vy = converted_speed * std::sin(adc_theta);
@@ -176,7 +180,6 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
   auto adc_quaternion = localization.pose().orientation();
   double adc_vx = localization.pose().linear_velocity().x();
   double adc_vy = localization.pose().linear_velocity().y();
-  double adc_velocity = std::sqrt(adc_vx * adc_vx + adc_vy * adc_vy);
 
   double adc_theta = GetAngleFromQuaternion(adc_quaternion);
 
@@ -186,29 +189,38 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
     //TODO(lizh): object id
     int mob_id = index;
     double mob_range = data_500.can_tx_track_range();
-    double mob_angle = data_500.can_tx_track_angle();
-    double mob_pos_x = mob_range * std::cos(mob_angle * L3_PI / 180.0);
-    double mob_pos_y = mob_range * std::sin(mob_angle * L3_PI / 180.0);
+    double mob_angle = data_500.can_tx_track_angle() * L3_PI / 180.0;
+    double mob_pos_x = mob_range * std::cos(mob_angle);
+    double mob_pos_y = mob_range * std::sin(mob_angle);
     double mob_range_vel = data_500.can_tx_track_range_rate();
-    double mob_vel_x = mob_range_vel * std::cos(mob_angle * L3_PI / 180.0);
-    double mob_vel_y = mob_range_vel * std::sin(mob_angle * L3_PI / 180.0);
+    double mob_lateral_vel = data_500.can_tx_track_lat_rate();
+    double mob_vel_x = mob_range_vel * std::cos(mob_angle) - 
+                       mob_lateral_vel * std::sin(mob_angle);
+    double mob_vel_y = mob_range_vel * std::sin(mob_angle) +
+                       mob_lateral_vel * std::cos(mob_angle);
 
     double mob_l = GetDefaultObjectLength(4);
 
     double mob_w = GetDefaultObjectWidth(4);
 
     // TODO(lizh): calibrate mobileye and make those consts FLAGS
-    mob_pos_x += delphi_esr_adjust;  // offset: imu <-> mobileye
+    mob_pos_x += FLAGS_delphi_esr_pos_adjust;  // offset: imu <-> mobileye
     mob_pos_x += mob_l / 2.0; // make x the middle point of the vehicle.
 
-    double converted_x = adc_x + mob_pos_x * std::cos(adc_theta) +
-                         mob_pos_y * std::sin(adc_theta);
-    double converted_y = adc_y + mob_pos_x * std::sin(adc_theta) -
-                         mob_pos_y * std::cos(adc_theta);
-    double converted_speed = std::sqrt((adc_velocity + mob_vel_x) * 
-                             (adc_velocity + mob_vel_x) + mob_vel_y * mob_vel_y);
-    double converted_vx = converted_speed * std::cos(adc_theta);
-    double converted_vy = converted_speed * std::sin(adc_theta);
+    Point sl_point;
+    sl_point.set_x(mob_pos_x);
+    sl_point.set_y(mob_pos_y);
+    Point xy_point = SLtoXY(sl_point, adc_theta);
+
+    double converted_x = adc_x + xy_point.x();
+    double converted_y = adc_y + xy_point.y();
+    
+    sl_point.set_x(mob_vel_x);
+    sl_point.set_y(mob_vel_y);
+    xy_point = SLtoXY(sl_point, adc_theta);
+    
+    double converted_vx = adc_vx + xy_point.x();
+    double converted_vy = adc_vy + xy_point.y();
 
     mob->set_id(mob_id);
     mob->mutable_position()->set_x(converted_x);
