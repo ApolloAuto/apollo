@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file reference_line_smooother.cpp
+ * @file
  **/
 #include "modules/planning/reference_line/reference_line_smoother.h"
 
@@ -24,9 +24,10 @@
 #include <string>
 #include <utility>
 
+#include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/math/curve_math.h"
 #include "modules/planning/math/double.h"
@@ -197,9 +198,8 @@ bool ReferenceLineSmoother::ApplyConstraint(
   CHECK_EQ(evaluated_t.size(), lateral_bound.size());
 
   auto* spline_constraint = spline_solver_->mutable_constraint();
-  if (!spline_constraint->Add2dBoundary(
-          evaluated_t, headings, xy_points, longitidinal_bound,
-          lateral_bound)) {
+  if (!spline_constraint->Add2dBoundary(evaluated_t, headings, xy_points,
+                                        longitidinal_bound, lateral_bound)) {
     AERROR << "Add 2d boundary constraint failed";
     return false;
   }
