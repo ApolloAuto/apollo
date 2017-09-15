@@ -58,29 +58,29 @@ TEST(TopoNodeTestSuit, static_func_test) {
   std::vector<NodeSRange> range_vec;
   GetRangeVec(&range_vec);
   {
-      double start_s = 13.0;
-      double end_s = 26.0;
-      ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+    double start_s = 13.0;
+    double end_s = 26.0;
+    ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
   }
   {
-      double start_s = 13.0;
-      double end_s = 23.0;
-      ASSERT_FALSE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+    double start_s = 13.0;
+    double end_s = 23.0;
+    ASSERT_FALSE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
   }
   {
-      double start_s = 22.0;
-      double end_s = 32.0;
-      ASSERT_FALSE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+    double start_s = 22.0;
+    double end_s = 32.0;
+    ASSERT_FALSE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
   }
   {
-      double start_s = 31.0;
-      double end_s = 44.0;
-      ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+    double start_s = 31.0;
+    double end_s = 44.0;
+    ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
   }
   {
-      double start_s = -10;
-      double end_s = 100;
-      ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
+    double start_s = -10;
+    double end_s = 100;
+    ASSERT_TRUE(TopoNode::IsOutRangeEnough(range_vec, start_s, end_s));
   }
 }
 

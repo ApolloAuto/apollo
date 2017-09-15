@@ -20,10 +20,10 @@
 #include <string>
 #include <vector>
 
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/routing/graph/node_with_range.h"
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_range_manager.h"
-#include "modules/routing/graph/node_with_range.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -49,4 +49,3 @@ class ResultGenerator {
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_CORE_RESULT_GENERATOR_H_
-

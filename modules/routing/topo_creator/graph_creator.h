@@ -17,13 +17,13 @@
 #ifndef MODULES_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
 #define MODULES_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
 
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <string>
 
 #include "modules/map/proto/map.pb.h"
-#include "modules/routing/proto/topo_graph.pb.h"
 #include "modules/routing/proto/routing_config.pb.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -32,7 +32,7 @@ class GraphCreator {
  public:
   GraphCreator(const std::string& base_map_file_path,
                const std::string& dump_topo_file_path,
-               const RoutingConfig *routing_conf);
+               const RoutingConfig* routing_conf);
 
   ~GraphCreator() = default;
 
@@ -42,10 +42,10 @@ class GraphCreator {
   void InitForbiddenLanes();
   std::string GetEdgeID(const std::string& from_id, const std::string& to_id);
 
-  void AddEdge(const Node& from_node,
-               const ::google::protobuf::RepeatedPtrField<hdmap::Id>&
-                   to_node_vec,
-               const Edge::DirectionType& type);
+  void AddEdge(
+      const Node& from_node,
+      const ::google::protobuf::RepeatedPtrField<hdmap::Id>& to_node_vec,
+      const Edge::DirectionType& type);
 
  private:
   std::string base_map_file_path_;
@@ -57,7 +57,7 @@ class GraphCreator {
   std::unordered_set<std::string> showed_edge_id_set_;
   std::unordered_set<std::string> forbidden_lane_id_set_;
 
-  const RoutingConfig *routing_conf_ = nullptr;
+  const RoutingConfig* routing_conf_ = nullptr;
 };
 
 }  // namespace routing

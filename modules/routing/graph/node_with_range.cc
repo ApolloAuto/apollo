@@ -20,21 +20,17 @@ namespace apollo {
 namespace routing {
 
 NodeWithRange::NodeWithRange(const NodeSRange& range, const TopoNode* node)
-    : NodeSRange(range), topo_node_(node) { }
+    : NodeSRange(range), topo_node_(node) {}
 
-NodeWithRange::~NodeWithRange() { }
+NodeWithRange::~NodeWithRange() {}
 
-bool NodeWithRange::operator < (const NodeWithRange& other) const {
+bool NodeWithRange::operator<(const NodeWithRange& other) const {
   return StartS() > other.StartS();
 }
 
-const TopoNode* NodeWithRange::GetTopoNode() const {
-  return topo_node_;
-}
+const TopoNode* NodeWithRange::GetTopoNode() const { return topo_node_; }
 
-bool NodeWithRange::IsVirtual() const {
-  return topo_node_->IsVirtual();
-}
+bool NodeWithRange::IsVirtual() const { return topo_node_->IsVirtual(); }
 
 const std::string& NodeWithRange::RoadId() const {
   return topo_node_->RoadId();
@@ -44,10 +40,7 @@ const std::string& NodeWithRange::LaneId() const {
   return topo_node_->LaneId();
 }
 
-double NodeWithRange::FullLength() const {
-  return topo_node_->Length();
-}
+double NodeWithRange::FullLength() const { return topo_node_->Length(); }
 
 }  // namespace routing
 }  // namespace apollo
-

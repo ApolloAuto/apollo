@@ -18,8 +18,8 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/routing/graph/topo_test_utils.h"
 #include "modules/routing/graph/topo_graph.h"
+#include "modules/routing/graph/topo_test_utils.h"
 
 namespace apollo {
 namespace routing {

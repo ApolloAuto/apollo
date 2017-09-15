@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "modules/routing/proto/topo_graph.pb.h"
 #include "modules/routing/graph/topo_node.h"
+#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -47,16 +47,13 @@ const double TEST_START_S = 0.0;
 const double TEST_MIDDLE_S = 0.0;
 const double TEST_END_S = TEST_LANE_LENGTH;
 
-void GetNodeDetailForTest(Node* const node,
-                          const std::string& lane_id,
+void GetNodeDetailForTest(Node* const node, const std::string& lane_id,
                           const std::string& road_id);
 
-void GetNodeForTest(Node* const node,
-                    const std::string& lane_id,
+void GetNodeForTest(Node* const node, const std::string& lane_id,
                     const std::string& road_id);
 
-void GetEdgeForTest(Edge* const edge,
-                    const std::string& lane_id_1,
+void GetEdgeForTest(Edge* const edge, const std::string& lane_id_1,
                     const std::string& lane_id_2,
                     const Edge::DirectionType& type);
 
@@ -70,4 +67,3 @@ void GetGraph3ForTest(Graph* graph);
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_GRAPH_TOPO_TEST_UTILS_H
-
