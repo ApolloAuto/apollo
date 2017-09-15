@@ -255,7 +255,7 @@ bool IsPreserved(const PerceptionObstacle& perception_obstacle, const Esr_track0
     return false;
   }
 */
-  if (esr_track01_500.can_tx_track_range() < 1e-6) {
+  if (esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET) {
     return false;
   }
   return true;
