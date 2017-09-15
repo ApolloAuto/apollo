@@ -30,8 +30,7 @@ void merge_block_range(const TopoNode* topo_node,
                        const std::vector<NodeSRange>& origin_range,
                        std::vector<NodeSRange>* block_range) {
   std::vector<NodeSRange> sorted_origin_range;
-  sorted_origin_range.insert(sorted_origin_range.end(),
-                             origin_range.begin(),
+  sorted_origin_range.insert(sorted_origin_range.end(), origin_range.begin(),
                              origin_range.end());
   sort(sorted_origin_range.begin(), sorted_origin_range.end());
   int cur_index = 0;
@@ -71,7 +70,7 @@ double TopoRangeManager::RangeStart(const TopoNode* node) const {
   const auto iter = range_map_.find(node);
   if (iter == range_map_.end()) {
     AERROR << "Error occured when getting range "
-        << "start of non-existent node in map.";
+           << "start of non-existent node in map.";
     exit(-1);
   }
   return iter->second.front().StartS();
@@ -81,7 +80,7 @@ double TopoRangeManager::RangeEnd(const TopoNode* node) const {
   const auto iter = range_map_.find(node);
   if (iter == range_map_.end()) {
     AERROR << "Error occured when getting range "
-        << "end of non-existent node in map.";
+           << "end of non-existent node in map.";
     exit(-1);
   }
   return iter->second.back().EndS();
@@ -91,14 +90,12 @@ void TopoRangeManager::PrintDebugInfo() const {
   for (const auto& map : range_map_) {
     for (const auto& range : map.second) {
       AINFO << "black lane id: " << map.first->LaneId()
-          << ", start s: " << range.StartS() << ", end s: " << range.EndS();
+            << ", start s: " << range.StartS() << ", end s: " << range.EndS();
     }
   }
 }
 
-void TopoRangeManager::Clear() {
-  range_map_.clear();
-}
+void TopoRangeManager::Clear() { range_map_.clear(); }
 
 void TopoRangeManager::Add(const TopoNode* node, double start_s, double end_s) {
   NodeSRange range(start_s, end_s);
@@ -110,12 +107,10 @@ void TopoRangeManager::SortAndMerge() {
     std::vector<NodeSRange> merged_range_vec;
     merge_block_range(iter.first, iter.second, &merged_range_vec);
     iter.second.clear();
-    iter.second.insert(iter.second.begin(),
-                        merged_range_vec.begin(),
-                        merged_range_vec.end());
+    iter.second.insert(iter.second.begin(), merged_range_vec.begin(),
+                       merged_range_vec.end());
   }
 }
 
 }  // namespace routing
 }  // namespace apollo
-

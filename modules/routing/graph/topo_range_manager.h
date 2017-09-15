@@ -17,8 +17,8 @@
 #ifndef MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
 #define MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "modules/routing/graph/topo_node.h"
 #include "modules/routing/graph/topo_range.h"
@@ -31,8 +31,8 @@ class TopoRangeManager {
   TopoRangeManager() = default;
   ~TopoRangeManager() = default;
 
-  const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>&
-        RangeMap() const;
+  const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>& RangeMap()
+      const;
   bool Find(const TopoNode* node) const;
   double RangeStart(const TopoNode* node) const;
   double RangeEnd(const TopoNode* node) const;
@@ -43,11 +43,10 @@ class TopoRangeManager {
   void SortAndMerge();
 
  private:
-    std::unordered_map<const TopoNode*, std::vector<NodeSRange> > range_map_;
+  std::unordered_map<const TopoNode*, std::vector<NodeSRange>> range_map_;
 };
 
 }  // namespace routing
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
-

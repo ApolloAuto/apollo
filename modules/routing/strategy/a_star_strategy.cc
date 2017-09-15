@@ -38,18 +38,18 @@ struct SearchNode {
   const TopoNode* topo_node;
   double f;
 
-  SearchNode() : topo_node(nullptr), f(std::numeric_limits<double>::max()) { }
+  SearchNode() : topo_node(nullptr), f(std::numeric_limits<double>::max()) {}
   explicit SearchNode(const TopoNode* node)
-      : topo_node(node), f(std::numeric_limits<double>::max()) { }
+      : topo_node(node), f(std::numeric_limits<double>::max()) {}
   SearchNode(const SearchNode& search_node)
-      : topo_node(search_node.topo_node), f(search_node.f) { }
+      : topo_node(search_node.topo_node), f(search_node.f) {}
 
-  bool operator < (const SearchNode& node) const {
+  bool operator<(const SearchNode& node) const {
     // in order to let the top of preority queue is the smallest one!
     return f > node.f;
   }
 
-  bool operator == (const SearchNode& node) const {
+  bool operator==(const SearchNode& node) const {
     return topo_node == node.topo_node;
   }
 };
@@ -77,7 +77,7 @@ const TopoNode* GetLargestNode(const std::vector<const TopoNode*>& nodes) {
 }
 
 bool AdjustLaneChangeBackward(
-  std::vector<const TopoNode*>* const result_node_vec) {
+    std::vector<const TopoNode*>* const result_node_vec) {
   for (int i = static_cast<int>(result_node_vec->size()) - 2; i > 0; --i) {
     const auto* from_node = result_node_vec->at(i);
     const auto* to_node = result_node_vec->at(i + 1);
@@ -89,10 +89,10 @@ bool AdjustLaneChangeBackward(
       from_to_edge = to_node->GetInEdgeFrom(from_node);
     }
     if (from_to_edge == nullptr) {
-      AERROR << "Get null ptr to edge:" << from_node->LaneId()
-          << " (" << from_node->StartS() << ", " << from_node->EndS() << ")"
-          << " --> " << to_node->LaneId() << " (" << to_node->StartS()
-          << ", " << to_node->EndS() << ")";
+      AERROR << "Get null ptr to edge:" << from_node->LaneId() << " ("
+             << from_node->StartS() << ", " << from_node->EndS() << ")"
+             << " --> " << to_node->LaneId() << " (" << to_node->StartS()
+             << ", " << to_node->EndS() << ")";
       return false;
     }
     if (from_to_edge->Type() != TopoEdgeType::TET_FORWARD) {
@@ -137,10 +137,10 @@ bool AdjustLaneChangeForward(
       from_to_edge = to_node->GetInEdgeFrom(from_node);
     }
     if (from_to_edge == nullptr) {
-      AERROR << "Get null ptr to edge:" << from_node->LaneId()
-          << " (" << from_node->StartS() << ", " << from_node->EndS() << ")"
-          << " --> " << to_node->LaneId() << " (" << to_node->StartS()
-          << ", " << to_node->EndS() << ")";
+      AERROR << "Get null ptr to edge:" << from_node->LaneId() << " ("
+             << from_node->StartS() << ", " << from_node->EndS() << ")"
+             << " --> " << to_node->LaneId() << " (" << to_node->StartS()
+             << ", " << to_node->EndS() << ")";
       return false;
     }
     if (from_to_edge->Type() != TopoEdgeType::TET_FORWARD) {
@@ -189,8 +189,7 @@ bool AdjustLaneChange(std::vector<const TopoNode*>* const result_node_vec) {
 
 bool Reconstruct(
     const std::unordered_map<const TopoNode*, const TopoNode*>& came_from,
-    const TopoNode* dest_node,
-    std::vector<NodeWithRange>* result_nodes) {
+    const TopoNode* dest_node, std::vector<NodeWithRange>* result_nodes) {
   std::vector<const TopoNode*> result_node_vec;
   result_node_vec.push_back(dest_node);
   auto iter = came_from.find(dest_node);
@@ -214,8 +213,8 @@ bool Reconstruct(
 
 }  // namespace
 
-AStarStrategy::AStarStrategy(bool enable_change) :
-    change_lane_enabled_(enable_change) { }
+AStarStrategy::AStarStrategy(bool enable_change)
+    : change_lane_enabled_(enable_change) {}
 
 void AStarStrategy::Clear() {
   closed_set_.clear();
@@ -236,8 +235,7 @@ double AStarStrategy::HeuristicCost(const TopoNode* src_node,
 
 bool AStarStrategy::Search(const TopoGraph* graph,
                            const SubTopoGraph* sub_graph,
-                           const TopoNode* src_node,
-                           const TopoNode* dest_node,
+                           const TopoNode* src_node, const TopoNode* dest_node,
                            std::vector<NodeWithRange>* const result_nodes) {
   Clear();
   AINFO << "Start A* search algorithm.";
@@ -276,9 +274,9 @@ bool AStarStrategy::Search(const TopoGraph* graph,
 
     // if residual_s is less than LANE_CHANGE_SKIP_S, only move forward
     const auto& neighbor_edges =
-        (GetResidualS(from_node) > LANE_CHANGE_SKIP_S && change_lane_enabled_) ?
-        from_node->OutToAllEdge() :
-        from_node->OutToSucEdge();
+        (GetResidualS(from_node) > LANE_CHANGE_SKIP_S && change_lane_enabled_)
+            ? from_node->OutToAllEdge()
+            : from_node->OutToSucEdge();
     double tentative_g_score = 0.0;
     next_edge_set.clear();
     for (const auto* edge : neighbor_edges) {
@@ -295,8 +293,8 @@ bool AStarStrategy::Search(const TopoGraph* graph,
       if (GetResidualS(edge, to_node) < LANE_CHANGE_SKIP_S) {
         continue;
       }
-      tentative_g_score = g_score_[current_node.topo_node]
-          + GetCostToNeighbor(edge);
+      tentative_g_score =
+          g_score_[current_node.topo_node] + GetCostToNeighbor(edge);
       if (edge->Type() != TopoEdgeType::TET_FORWARD) {
         tentative_g_score -=
             (edge->FromNode()->Cost() + edge->ToNode()->Cost()) / 2;
@@ -307,11 +305,11 @@ bool AStarStrategy::Search(const TopoGraph* graph,
       }
       // if to_node is reached by forward, reset enter_s to start_s
       if (edge->Type() == TopoEdgeType::TET_FORWARD) {
-          enter_s_[to_node] = to_node->StartS();
+        enter_s_[to_node] = to_node->StartS();
       } else {
         // else, add enter_s with LANE_CHANGE_SKIP_S
         double to_node_enter_s = (enter_s_[from_node] + LANE_CHANGE_SKIP_S) /
-            from_node->Length() * to_node->Length();
+                                 from_node->Length() * to_node->Length();
         // enter s could be larger than end_s but should be less than length
         to_node_enter_s = std::min(to_node_enter_s, to_node->Length());
         // if enter_s is larger than end_s and to_node is dest_node
@@ -344,8 +342,8 @@ double AStarStrategy::GetResidualS(const TopoNode* node) {
     }
     start_s = iter->second;
   } else {
-    AWARN << "lane " << node->LaneId() << "(" << node->StartS()
-        << ", " << node->EndS() << "not found in enter_s map";
+    AWARN << "lane " << node->LaneId() << "(" << node->StartS() << ", "
+          << node->EndS() << "not found in enter_s map";
   }
   double end_s = node->EndS();
   const TopoNode* succ_node = nullptr;
@@ -366,7 +364,8 @@ double AStarStrategy::GetResidualS(const TopoEdge* edge,
   if (edge->Type() == TopoEdgeType::TET_FORWARD) {
     return std::numeric_limits<double>::max();
   }
-  double start_s = to_node->StartS();;
+  double start_s = to_node->StartS();
+  ;
   const auto* from_node = edge->FromNode();
   const auto iter = enter_s_.find(from_node);
   if (iter != enter_s_.end()) {
@@ -374,7 +373,7 @@ double AStarStrategy::GetResidualS(const TopoEdge* edge,
     start_s = std::max(start_s, temp_s);
   } else {
     AWARN << "lane " << from_node->LaneId() << "(" << from_node->StartS()
-        << ", " << from_node->EndS() << "not found in enter_s map";
+          << ", " << from_node->EndS() << "not found in enter_s map";
   }
   double end_s = to_node->EndS();
   const TopoNode* succ_node = nullptr;
@@ -392,4 +391,3 @@ double AStarStrategy::GetResidualS(const TopoEdge* edge,
 
 }  // namespace routing
 }  // namespace apollo
-

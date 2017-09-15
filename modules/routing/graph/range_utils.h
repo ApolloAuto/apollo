@@ -23,8 +23,7 @@ namespace apollo {
 namespace routing {
 
 template <typename T>
-int BinarySearchForSLarger(const std::vector<T>& sorted_vec,
-                           double value_s) {
+int BinarySearchForSLarger(const std::vector<T>& sorted_vec, double value_s) {
   if (sorted_vec.empty()) {
     return -1;
   }
@@ -49,8 +48,7 @@ int BinarySearchForSLarger(const std::vector<T>& sorted_vec,
 }
 
 template <typename T>
-int BinarySearchForSSmaller(const std::vector<T>& sorted_vec,
-                            double value_s) {
+int BinarySearchForSSmaller(const std::vector<T>& sorted_vec, double value_s) {
   if (sorted_vec.empty()) {
     return -1;
   }
@@ -75,8 +73,7 @@ int BinarySearchForSSmaller(const std::vector<T>& sorted_vec,
 }
 
 template <typename T>
-int BinarySearchCheckValidSIndex(const std::vector<T>& sorted_vec,
-                                 int index,
+int BinarySearchCheckValidSIndex(const std::vector<T>& sorted_vec, int index,
                                  double value_s) {
   if (index == -1) {
     return -1;
@@ -106,4 +103,3 @@ int BinarySearchForEndS(const std::vector<T>& sorted_vec, double value_s) {
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_GRAPH_RANGE_UTILS_H
-

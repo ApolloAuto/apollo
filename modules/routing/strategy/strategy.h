@@ -20,8 +20,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/sub_topo_graph.h"
+#include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
@@ -31,11 +31,9 @@ class Strategy {
  public:
   virtual ~Strategy() {}
 
-  virtual bool Search(const TopoGraph* graph,
-                      const SubTopoGraph* sub_graph,
-                      const TopoNode* src_node,
-                      const TopoNode* dest_node,
-                      std::vector<NodeWithRange>* const result_nodes)= 0;
+  virtual bool Search(const TopoGraph* graph, const SubTopoGraph* sub_graph,
+                      const TopoNode* src_node, const TopoNode* dest_node,
+                      std::vector<NodeWithRange>* const result_nodes) = 0;
 };
 
 }  // namespace routing

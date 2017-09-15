@@ -31,8 +31,8 @@ namespace routing {
 
 namespace {
 
-const double MIN_DIFF_LENGTH = 0.1e-6;  // in meters
-const double MIN_INTERNAL_FOR_NODE = 0.01;  // in meters
+const double MIN_DIFF_LENGTH = 0.1e-6;             // in meters
+const double MIN_INTERNAL_FOR_NODE = 0.01;         // in meters
 const double MIN_POTENTIAL_LANE_CHANGE_LEN = 3.0;  // in meters
 
 bool IsCloseEnough(double s1, double s2) {
@@ -43,8 +43,7 @@ void MergeBlockRange(const TopoNode* topo_node,
                      const std::vector<NodeSRange>& origin_range,
                      std::vector<NodeSRange>* block_range) {
   std::vector<NodeSRange> sorted_origin_range;
-  sorted_origin_range.insert(sorted_origin_range.end(),
-                             origin_range.begin(),
+  sorted_origin_range.insert(sorted_origin_range.end(), origin_range.begin(),
                              origin_range.end());
   sort(sorted_origin_range.begin(), sorted_origin_range.end());
   int cur_index = 0;
@@ -57,7 +56,7 @@ void MergeBlockRange(const TopoNode* topo_node,
       ++cur_index;
     }
     if (range.EndS() < topo_node->StartS() ||
-      range.StartS() > topo_node->EndS()) {
+        range.StartS() > topo_node->EndS()) {
       continue;
     }
     range.SetStartS(std::max(topo_node->StartS(), range.StartS()));
@@ -96,8 +95,9 @@ bool IsReachable(const TopoNode* from_node, const TopoNode* to_node) {
 
 }  // namespace
 
-SubTopoGraph::SubTopoGraph(const std::unordered_map<const TopoNode*,
-                                        std::vector<NodeSRange> >& black_map) {
+SubTopoGraph::SubTopoGraph(
+    const std::unordered_map<const TopoNode*, std::vector<NodeSRange> >&
+        black_map) {
   std::vector<NodeSRange> valid_range;
   for (const auto& map_iter : black_map) {
     valid_range.clear();
@@ -114,7 +114,7 @@ SubTopoGraph::SubTopoGraph(const std::unordered_map<const TopoNode*,
   }
 }
 
-SubTopoGraph::~SubTopoGraph() { }
+SubTopoGraph::~SubTopoGraph() {}
 
 void SubTopoGraph::GetSubInEdgesIntoSubGraph(
     const TopoEdge* edge,
@@ -122,8 +122,7 @@ void SubTopoGraph::GetSubInEdgesIntoSubGraph(
   const auto* from_node = edge->FromNode();
   const auto* to_node = edge->ToNode();
   std::unordered_set<TopoNode*> sub_nodes;
-  if (from_node->IsSubNode() ||
-      to_node->IsSubNode() ||
+  if (from_node->IsSubNode() || to_node->IsSubNode() ||
       !GetSubNodes(to_node, &sub_nodes)) {
     sub_edges->insert(edge);
     return;
@@ -143,8 +142,7 @@ void SubTopoGraph::GetSubOutEdgesIntoSubGraph(
   const auto* from_node = edge->FromNode();
   const auto* to_node = edge->ToNode();
   std::unordered_set<TopoNode*> sub_nodes;
-  if (from_node->IsSubNode() ||
-      to_node->IsSubNode() ||
+  if (from_node->IsSubNode() || to_node->IsSubNode() ||
       !GetSubNodes(from_node, &sub_nodes)) {
     sub_edges->insert(edge);
     return;
@@ -174,8 +172,7 @@ const TopoNode* SubTopoGraph::GetSubNodeWithS(const TopoNode* topo_node,
 }
 
 void SubTopoGraph::InitSubNodeByValidRange(
-    const TopoNode* topo_node,
-    const std::vector<NodeSRange>& valid_range) {
+    const TopoNode* topo_node, const std::vector<NodeSRange>& valid_range) {
   // Attention: no matter topo node has valid_range or not,
   // create map value first;
   auto& sub_node_vec = sub_node_range_sorted_map_[topo_node];
@@ -184,7 +181,7 @@ void SubTopoGraph::InitSubNodeByValidRange(
   std::vector<TopoNode*> sub_node_sorted_vec;
   for (const auto& range : valid_range) {
     if (range.Length() < MIN_INTERNAL_FOR_NODE) {
-        continue;
+      continue;
     }
     std::shared_ptr<TopoNode> sub_topo_node_ptr;
     sub_topo_node_ptr.reset(new TopoNode(topo_node, range));
@@ -236,18 +233,16 @@ void SubTopoGraph::InitInSubNodeSubEdge(
           continue;
         }
         std::shared_ptr<TopoEdge> topo_edge_ptr;
-        topo_edge_ptr.reset(new TopoEdge(in_edge->PbEdge(),
-                                         sub_from_node,
-                                         sub_node));
+        topo_edge_ptr.reset(
+            new TopoEdge(in_edge->PbEdge(), sub_from_node, sub_node));
         sub_node->AddInEdge(topo_edge_ptr.get());
         sub_from_node->AddOutEdge(topo_edge_ptr.get());
         topo_edges_.push_back(std::move(topo_edge_ptr));
       }
     } else if (in_edge->FromNode()->IsOverlapEnough(sub_node, in_edge)) {
       std::shared_ptr<TopoEdge> topo_edge_ptr;
-      topo_edge_ptr.reset(new TopoEdge(in_edge->PbEdge(),
-                                       in_edge->FromNode(),
-                                       sub_node));
+      topo_edge_ptr.reset(
+          new TopoEdge(in_edge->PbEdge(), in_edge->FromNode(), sub_node));
       sub_node->AddInEdge(topo_edge_ptr.get());
       topo_edges_.push_back(std::move(topo_edge_ptr));
     }
@@ -265,18 +260,16 @@ void SubTopoGraph::InitOutSubNodeSubEdge(
           continue;
         }
         std::shared_ptr<TopoEdge> topo_edge_ptr;
-        topo_edge_ptr.reset(new TopoEdge(out_edge->PbEdge(),
-                                         sub_node,
-                                         sub_to_node));
+        topo_edge_ptr.reset(
+            new TopoEdge(out_edge->PbEdge(), sub_node, sub_to_node));
         sub_node->AddOutEdge(topo_edge_ptr.get());
         sub_to_node->AddInEdge(topo_edge_ptr.get());
         topo_edges_.push_back(std::move(topo_edge_ptr));
       }
     } else if (sub_node->IsOverlapEnough(out_edge->ToNode(), out_edge)) {
       std::shared_ptr<TopoEdge> topo_edge_ptr;
-      topo_edge_ptr.reset(new TopoEdge(out_edge->PbEdge(),
-                                       sub_node,
-                                       out_edge->ToNode()));
+      topo_edge_ptr.reset(
+          new TopoEdge(out_edge->PbEdge(), sub_node, out_edge->ToNode()));
       sub_node->AddOutEdge(topo_edge_ptr.get());
       topo_edges_.push_back(std::move(topo_edge_ptr));
     }
@@ -320,9 +313,8 @@ void SubTopoGraph::AddPotentialInEdge(
           continue;
         }
         std::shared_ptr<TopoEdge> topo_edge_ptr;
-        topo_edge_ptr.reset(new TopoEdge(in_edge->PbEdge(),
-                                         sub_from_node,
-                                         sub_node));
+        topo_edge_ptr.reset(
+            new TopoEdge(in_edge->PbEdge(), sub_from_node, sub_node));
         sub_node->AddInEdge(topo_edge_ptr.get());
         sub_from_node->AddOutEdge(topo_edge_ptr.get());
         topo_edges_.push_back(std::move(topo_edge_ptr));
@@ -332,9 +324,8 @@ void SubTopoGraph::AddPotentialInEdge(
         continue;
       }
       std::shared_ptr<TopoEdge> topo_edge_ptr;
-      topo_edge_ptr.reset(new TopoEdge(in_edge->PbEdge(),
-                                       in_edge->FromNode(),
-                                       sub_node));
+      topo_edge_ptr.reset(
+          new TopoEdge(in_edge->PbEdge(), in_edge->FromNode(), sub_node));
       sub_node->AddInEdge(topo_edge_ptr.get());
       topo_edges_.push_back(std::move(topo_edge_ptr));
     }
@@ -355,9 +346,8 @@ void SubTopoGraph::AddPotentialOutEdge(
           continue;
         }
         std::shared_ptr<TopoEdge> topo_edge_ptr;
-        topo_edge_ptr.reset(new TopoEdge(out_edge->PbEdge(),
-                                         sub_node,
-                                         sub_to_node));
+        topo_edge_ptr.reset(
+            new TopoEdge(out_edge->PbEdge(), sub_node, sub_to_node));
         sub_node->AddOutEdge(topo_edge_ptr.get());
         sub_to_node->AddInEdge(topo_edge_ptr.get());
         topo_edges_.push_back(std::move(topo_edge_ptr));
@@ -367,9 +357,8 @@ void SubTopoGraph::AddPotentialOutEdge(
         continue;
       }
       std::shared_ptr<TopoEdge> topo_edge_ptr;
-      topo_edge_ptr.reset(new TopoEdge(out_edge->PbEdge(),
-                                       sub_node,
-                                       out_edge->ToNode()));
+      topo_edge_ptr.reset(
+          new TopoEdge(out_edge->PbEdge(), sub_node, out_edge->ToNode()));
       sub_node->AddOutEdge(topo_edge_ptr.get());
       topo_edges_.push_back(std::move(topo_edge_ptr));
     }
@@ -378,4 +367,3 @@ void SubTopoGraph::AddPotentialOutEdge(
 
 }  // namespace routing
 }  // namespace apollo
-

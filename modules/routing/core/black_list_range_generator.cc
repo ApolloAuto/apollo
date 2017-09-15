@@ -76,8 +76,7 @@ void GetInParallelLane(const TopoNode* node,
 }
 
 // for new navigator
-void AddBlackMapFromRoad(const RoutingRequest& request,
-                         const TopoGraph* graph,
+void AddBlackMapFromRoad(const RoutingRequest& request, const TopoGraph* graph,
                          TopoRangeManager* const range_manager) {
   for (const auto& road_id : request.blacklisted_road()) {
     std::unordered_set<const TopoNode*> road_nodes_set;
@@ -89,8 +88,7 @@ void AddBlackMapFromRoad(const RoutingRequest& request,
 }
 
 // for new navigator
-void AddBlackMapFromLane(const RoutingRequest& request,
-                         const TopoGraph* graph,
+void AddBlackMapFromLane(const RoutingRequest& request, const TopoGraph* graph,
                          TopoRangeManager* const range_manager) {
   for (const auto& lane : request.blacklisted_lane()) {
     const auto* node = graph->GetNode(lane.id());
@@ -101,8 +99,7 @@ void AddBlackMapFromLane(const RoutingRequest& request,
   }
 }
 
-void AddBlackMapFromOutParallel(const TopoNode* node,
-                                double cut_ratio,
+void AddBlackMapFromOutParallel(const TopoNode* node, double cut_ratio,
                                 TopoRangeManager* const range_manager) {
   std::unordered_set<const TopoNode*> par_node_set;
   GetOutParallelLane(node, &par_node_set);
@@ -115,8 +112,7 @@ void AddBlackMapFromOutParallel(const TopoNode* node,
   }
 }
 
-void AddBlackMapFromInParallel(const TopoNode* node,
-                               double cut_ratio,
+void AddBlackMapFromInParallel(const TopoNode* node, double cut_ratio,
                                TopoRangeManager* const range_manager) {
   std::unordered_set<const TopoNode*> par_node_set;
   GetInParallelLane(node, &par_node_set);
@@ -132,8 +128,7 @@ void AddBlackMapFromInParallel(const TopoNode* node,
 }  // namespace
 
 void BlackListRangeGenerator::GenerateBlackMapFromRequest(
-    const RoutingRequest& request,
-    const TopoGraph* graph,
+    const RoutingRequest& request, const TopoGraph* graph,
     TopoRangeManager* const range_manager) const {
   AddBlackMapFromLane(request, graph, range_manager);
   AddBlackMapFromRoad(request, graph, range_manager);
@@ -141,11 +136,8 @@ void BlackListRangeGenerator::GenerateBlackMapFromRequest(
 }
 
 void BlackListRangeGenerator::AddBlackMapFromTerminal(
-    const TopoNode* src_node,
-    const TopoNode* dest_node,
-    double start_s,
-    double end_s,
-    TopoRangeManager* const range_manager) const {
+    const TopoNode* src_node, const TopoNode* dest_node, double start_s,
+    double end_s, TopoRangeManager* const range_manager) const {
   double start_length = src_node->Length();
   double end_length = dest_node->Length();
   if (start_s < 0.0 || start_s > start_length) {
@@ -159,8 +151,7 @@ void BlackListRangeGenerator::AddBlackMapFromTerminal(
 
   double start_cut_s = MoveSBackward(start_s, 0.0);
   range_manager->Add(src_node, start_cut_s, start_cut_s);
-  AddBlackMapFromOutParallel(src_node,
-                             start_cut_s / start_length,
+  AddBlackMapFromOutParallel(src_node, start_cut_s / start_length,
                              range_manager);
 
   double end_cut_s = MoveSForward(end_s, end_length);

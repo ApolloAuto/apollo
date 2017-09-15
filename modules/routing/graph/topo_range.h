@@ -31,7 +31,7 @@ class NodeSRange {
   NodeSRange(const NodeSRange& other);
   ~NodeSRange() = default;
 
-  bool operator < (const NodeSRange& other) const;
+  bool operator<(const NodeSRange& other) const;
   bool IsValid() const;
   double StartS() const;
   double EndS() const;
@@ -52,4 +52,3 @@ class NodeSRange {
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_GRAPH_TOPO_RANGE_H
-

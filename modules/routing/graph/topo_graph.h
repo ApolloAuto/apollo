@@ -18,10 +18,10 @@
 #define MODULES_ROUTING_GRAPH_TOPO_GRAPH_H
 
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <string>
 
 #include "modules/common/log.h"
 #include "modules/routing/graph/topo_node.h"

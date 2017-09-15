@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "modules/routing/graph/topo_range.h"
 #include "modules/routing/graph/topo_node.h"
+#include "modules/routing/graph/topo_range.h"
 
 namespace apollo {
 namespace routing {
@@ -29,7 +29,7 @@ class NodeWithRange : public NodeSRange {
  public:
   NodeWithRange(const NodeSRange& range, const TopoNode* node);
   ~NodeWithRange();
-  bool operator < (const NodeWithRange& other) const;
+  bool operator<(const NodeWithRange& other) const;
 
   const TopoNode* GetTopoNode() const;
   bool IsVirtual() const;
@@ -45,4 +45,3 @@ class NodeWithRange : public NodeSRange {
 }  // namespace apollo
 
 #endif  // MODULES_ROUTING_GRAPH_NODE_WITH_RANGE_H
-
