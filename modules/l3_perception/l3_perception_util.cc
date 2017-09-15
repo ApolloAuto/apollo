@@ -45,48 +45,14 @@ void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
                            const double mid_x, const double mid_y, const double mid_z,
                            const double length, const double width, const double height,
                            const double heading) {
+  const int sign_h[8] = {1, 0, 1, 0, 1, 0, 1, 0};
+  const int sign_l[8] = {1, 1, 1, 1, -1, -1, -1, -1};
+  const int sign_w[8] = {1, 1, -1, -1, -1, -1, 1, 1};
   for (int i = 0; i < 8; ++i) {
     perception_obstacle->add_polygon_point();
-  }
-  
-  // axis z
-  for (int i = 0; i < 8; ++i) {
-    double sign = i%2 == 0 ? 1.0 : -1.0;
-    perception_obstacle->mutable_polygon_point(i)->set_z(mid_z + sign * height / 2.0);
-  }
-
-  // axis x
-  for (int i = 0; i < 8; ++i) {
-    if (i == 0 || i == 1) { 
-      perception_obstacle->mutable_polygon_point(i)->set_x(mid_x + 
-                         length * std::cos(heading) / 2.0 + width * std::sin(heading) / 2.0);
-    } else if (i == 2 || i == 3) {
-      perception_obstacle->mutable_polygon_point(i)->set_x(mid_x + 
-                         length * std::cos(heading) / 2.0 - width * std::sin(heading) / 2.0);
-    } else if (i == 4 || i == 5) {
-      perception_obstacle->mutable_polygon_point(i)->set_x(mid_x - 
-                         length * std::cos(heading) / 2.0 - width * std::sin(heading) / 2.0);
-    } else {
-      perception_obstacle->mutable_polygon_point(i)->set_x(mid_x - 
-                         length * std::cos(heading) / 2.0 + width * std::sin(heading) / 2.0);
-    }
-  }
-  
-  // axis y
-  for (int i = 0; i < 8; ++i) {
-    if (i == 0 || i == 1) { 
-      perception_obstacle->mutable_polygon_point(i)->set_y(mid_y + 
-                         length * std::sin(heading) / 2.0 - width * std::cos(heading) / 2.0);
-    } else if (i == 2 || i == 3) {
-      perception_obstacle->mutable_polygon_point(i)->set_y(mid_y + 
-                         length * std::sin(heading) / 2.0 + width * std::cos(heading) / 2.0);
-    } else if (i == 4 || i == 5) {
-      perception_obstacle->mutable_polygon_point(i)->set_y(mid_y - 
-                         length * std::sin(heading) / 2.0 + width * std::cos(heading) / 2.0);
-    } else {
-      perception_obstacle->mutable_polygon_point(i)->set_y(mid_y - 
-                         length * std::sin(heading) / 2.0 - width * std::cos(heading) / 2.0);
-    }
+    perception_obstacle->mutable_polygon_point(i)->set_x(mid_x + sign_l[i] * length * std::cos(heading) / 2.0 + sign_w[i] * width * std::sin(heading) / 2.0);
+    perception_obstacle->mutable_polygon_point(i)->set_y(mid_y + sign_l[i] * length * std::cos(heading - L3_PI / 2.0) / 2.0 + sign_w[i] * width * std::sin(heading - L3_PI / 2.0) / 2.0);
+    perception_obstacle->mutable_polygon_point(i)->set_z(mid_z + sign_h[i] * height / 2.0);
   }
 }
 
