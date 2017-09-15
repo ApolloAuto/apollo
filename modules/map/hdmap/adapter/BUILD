@@ -40,14 +40,4 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "opendrive_to_pb",
-    srcs = ["main.cc"],
-    deps = [
-        ":opendrive_adapter",
-        "//modules/common/util",
-        "//modules/map/proto:map_proto",
-    ],
-)
-
 cpplint()

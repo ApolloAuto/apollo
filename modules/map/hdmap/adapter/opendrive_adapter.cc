@@ -16,8 +16,7 @@ limitations under the License.
 
 #include <vector>
 
-#include "glog/logging.h"
-
+#include "modules/common/log.h"
 #include "modules/map/hdmap/adapter/proto_organizer.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 
@@ -35,7 +34,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
     return false;
   }
 
-  // root node;
+  // root node
   const tinyxml2::XMLElement* root_node = document.RootElement();
   CHECK(root_node != nullptr);
   // header

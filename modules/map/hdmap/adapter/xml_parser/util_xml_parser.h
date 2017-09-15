@@ -49,15 +49,7 @@ class UtilXmlParser {
   static tinyxml2::XMLError QueryStringAttribute(
       const tinyxml2::XMLElement& xml_node, const std::string& name,
       std::string* value);
-
- private:
-  static double x_min_;
-  static double x_max_;
-  static double y_min_;
-  static double y_max_;
 };
-
-int GetLongZone(double longitude);
 
 }  // namespace adapter
 }  // namespace hdmap

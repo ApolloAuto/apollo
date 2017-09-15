@@ -13,22 +13,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 
+#include <string>
+
+#include "gflags/gflags.h"
+
+#include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map.pb.h"
 
-int main(int argc, char **argv) {
-  CHECK_GE(argc, 2) << "missing file path.";
+/**
+ * A map tool to transform opendrive map to pb map
+ */
 
-  const std::string map_filename = argv[1];
+DEFINE_string(output_dir, "/tmp/", "output map directory");
+
+int main(int argc, char **argv) {
+  google::InitGoogleLogging(argv[0]);
+  FLAGS_alsologtostderr = true;
+
+  google::ParseCommandLineFlags(&argc, &argv, true);
+
+  const auto map_filename = apollo::hdmap::BaseMapFile();
   apollo::hdmap::Map pb_map;
   CHECK(apollo::hdmap::adapter::OpendriveAdapter::LoadData(
       map_filename, &pb_map)) << "fail to load data";
 
-  const std::string output_ascii_file = map_filename + ".txt";
+  const std::string output_ascii_file = FLAGS_output_dir + "/base_map.txt";
   CHECK(apollo::common::util::SetProtoToASCIIFile(pb_map, output_ascii_file));
 
-  const std::string output_bin_file = map_filename + ".bin";
+  const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
   CHECK(apollo::common::util::SetProtoToBinaryFile(pb_map, output_bin_file));
 
   pb_map.Clear();
@@ -36,5 +51,6 @@ int main(int argc, char **argv) {
       << "load map fail";
 
   AINFO << "load map success";
+
   return 0;
 }

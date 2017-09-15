@@ -32,14 +32,16 @@ class SignalsXmlParser {
   static Status ParseTrafficLights(
       const tinyxml2::XMLElement& xml_node,
       std::vector<TrafficLightInternal>* traffic_lights);
-  static Status ToPbSignalType(const std::string& xml_type,
-                               PbSignalType* signal_type);
-  static Status ToPbSubSignalType(const std::string& xml_type,
-                                  PbSubSignalType* sub_signal_type);
   static Status ParseStopSigns(const tinyxml2::XMLElement& xml_node,
                                std::vector<StopSignInternal>* stop_signs);
   static Status ParseYieldSigns(const tinyxml2::XMLElement& xml_node,
                                 std::vector<YieldSignInternal>* yield_signs);
+
+ private:
+  static Status ToPbSignalType(const std::string& xml_type,
+                               PbSignalType* signal_type);
+  static Status ToPbSubSignalType(const std::string& xml_type,
+                               PbSubSignalType* sub_signal_type);
 };
 
 }  // namespace adapter

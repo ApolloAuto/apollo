@@ -21,8 +21,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "glog/logging.h"
-
+#include "modules/common/log.h"
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
 
 namespace apollo {
@@ -214,16 +213,6 @@ tinyxml2::XMLError UtilXmlParser::QueryStringAttribute(
 
   *value = val;
   return tinyxml2::XML_SUCCESS;
-}
-
-int GetLongZone(double longitude) {
-  double longZone = 0.0;
-  if (longitude < 0.0) {
-    longZone = ((180.0 + longitude) / 6.0) + 1;
-  } else {
-    longZone = (longitude / 6.0) + 31;
-  }
-  return static_cast<int>(longZone);
 }
 
 }  // namespace adapter
