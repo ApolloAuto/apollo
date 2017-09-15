@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <pcl/io/pcd_io.h>
 #include <cstddef>
 #include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "pcl/io/pcd_io.h"
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"

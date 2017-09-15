@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
+
+#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 

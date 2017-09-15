@@ -56,13 +56,14 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_CONVEX_HULLXY_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_CONVEX_HULLXY_H_
 
-#include <pcl/common/centroid.h>
-#include <pcl/surface/convex_hull.h>
-#include <pcl/surface/qhull.h>
 #include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "pcl/common/centroid.h"
+#include "pcl/surface/convex_hull.h"
+#include "pcl/surface/qhull.h"
 
 namespace apollo {
 namespace perception {

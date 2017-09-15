@@ -14,19 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <math.h>
-#include <pcl/io/pcd_io.h>
-#include <iomanip>
+#include <cmath>
 #include <fstream>
-#include <iostream>
-#include <sstream>
+#include <iomanip>
 #include <vector>
 
+#include "pcl/io/pcd_io.h"
+
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
-#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/arc_ball.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
 
 namespace apollo {
 namespace perception {
@@ -58,8 +57,7 @@ GLFWViewer::GLFWViewer() {
 
 GLFWViewer::~GLFWViewer() {
   Close();
-  if (pers_camera_)
-    delete pers_camera_;
+  if (pers_camera_) delete pers_camera_;
 }
 
 bool GLFWViewer::Initialize() {
@@ -239,8 +237,8 @@ bool GLFWViewer::OpenglInit() {
       circle_indices[i] = GLuint(i);
     }
 
-    float ang_interv = 2 * M_PI /
-                  static_cast<float>(kPoint_Num_Per_Circle_VAO_);
+    float ang_interv =
+        2 * M_PI / static_cast<float>(kPoint_Num_Per_Circle_VAO_);
     glGenVertexArrays(kCircle_VAO_Num_, circle_VAO_buf_ids_);
     for (int vao = 0; vao < kCircle_VAO_Num_; ++vao) {
       for (int i = 0; i < kPoint_Num_Per_Circle_VAO_; ++i) {
@@ -310,8 +308,7 @@ void GLFWViewer::Render() {
   glClear(GL_COLOR_BUFFER_BIT);
   PreDraw();
 
-  if (show_cloud_)
-    DrawCloud();
+  if (show_cloud_) DrawCloud();
   DrawObstacles();
   DrawCircle();
   DrawCarForwardDir();
@@ -523,51 +520,51 @@ void GLFWViewer::DrawOffsetVolumn(Eigen::Vector3d *polygon_points, double h,
 
 void GLFWViewer::GetClassColor(int cls, float rgb[3]) {
   switch (cls) {
-  case 0:
-    rgb[0] = 0.5;
-    rgb[1] = 0;
-    rgb[2] = 1;  // purple
-    break;
-  case 1:
-    rgb[0] = 0;
-    rgb[1] = 1;
-    rgb[2] = 1;  // cryan
-    break;
-  case 2:
-    rgb[0] = 1;
-    rgb[1] = 1;
-    rgb[2] = 0;  // yellow
-    break;
-  case 3:
-    rgb[0] = 1;
-    rgb[1] = 0.5;
-    rgb[2] = 0.5;  // red
-    break;
-  case 4:
-    rgb[0] = 0;
-    rgb[1] = 0;
-    rgb[2] = 1;  // blue
-    break;
-  case 5:
-    rgb[0] = 0;
-    rgb[1] = 1;
-    rgb[2] = 0;  // green
-    break;
-  case 6:
-    rgb[0] = 1;
-    rgb[1] = 0.5;
-    rgb[2] = 0;  // orange
-    break;
-  case 7:
-    rgb[0] = 1;
-    rgb[1] = 0;
-    rgb[2] = 0;  // red
-    break;
-  default:
-    rgb[0] = 1;
-    rgb[1] = 1;
-    rgb[2] = 1;  // white
-    break;
+    case 0:
+      rgb[0] = 0.5;
+      rgb[1] = 0;
+      rgb[2] = 1;  // purple
+      break;
+    case 1:
+      rgb[0] = 0;
+      rgb[1] = 1;
+      rgb[2] = 1;  // cryan
+      break;
+    case 2:
+      rgb[0] = 1;
+      rgb[1] = 1;
+      rgb[2] = 0;  // yellow
+      break;
+    case 3:
+      rgb[0] = 1;
+      rgb[1] = 0.5;
+      rgb[2] = 0.5;  // red
+      break;
+    case 4:
+      rgb[0] = 0;
+      rgb[1] = 0;
+      rgb[2] = 1;  // blue
+      break;
+    case 5:
+      rgb[0] = 0;
+      rgb[1] = 1;
+      rgb[2] = 0;  // green
+      break;
+    case 6:
+      rgb[0] = 1;
+      rgb[1] = 0.5;
+      rgb[2] = 0;  // orange
+      break;
+    case 7:
+      rgb[0] = 1;
+      rgb[1] = 0;
+      rgb[2] = 0;  // red
+      break;
+    default:
+      rgb[0] = 1;
+      rgb[1] = 1;
+      rgb[2] = 1;  // white
+      break;
   }
 }
 
@@ -576,8 +573,7 @@ void GLFWViewer::GetClassColor(int cls, float rgb[3]) {
 void GLFWViewer::FramebufferSizeCallback(GLFWwindow *window, int width,
                                          int height) {
   void *user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL)
-    return;
+  if (user_data == NULL) return;
 
   GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
   vis->ResizeFramebuffer(width, height);
@@ -586,8 +582,7 @@ void GLFWViewer::FramebufferSizeCallback(GLFWwindow *window, int width,
 void GLFWViewer::KeyCallback(GLFWwindow *window, int key, int scancode,
                              int action, int mods) {
   void *user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL)
-    return;
+  if (user_data == NULL) return;
   if (action == GLFW_PRESS) {
     GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
     AINFO << "key_value: " << key;
@@ -601,8 +596,7 @@ void GLFWViewer::MouseButtonCallback(GLFWwindow *window, int button, int action,
 void GLFWViewer::MouseCursorPositionCallback(GLFWwindow *window, double xpos,
                                              double ypos) {
   void *user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL)
-    return;
+  if (user_data == NULL) return;
 
   GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
   vis->MouseMove(xpos, ypos);
@@ -611,8 +605,7 @@ void GLFWViewer::MouseCursorPositionCallback(GLFWwindow *window, double xpos,
 void GLFWViewer::MouseScrollCallback(GLFWwindow *window, double xoffset,
                                      double yoffset) {
   void *user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL)
-    return;
+  if (user_data == NULL) return;
 
   GLFWViewer *vis = static_cast<GLFWViewer *>(user_data);
   vis->MouseWheel(yoffset);
@@ -639,12 +632,10 @@ void GLFWViewer::MouseMove(double xpos, double ypos) {
   int y_delta = ypos - mouse_prev_y_;
   if (state_left == GLFW_PRESS) {
     Eigen::Vector3d obj_cen_screen = pers_camera_->PointOnScreen(scn_center_);
-    Eigen::Quaterniond rot =
-        ArcBall::RotateByMouse(static_cast<double>(mouse_prev_x_),
-                               static_cast<double>(mouse_prev_y_),
-                               xpos, ypos, obj_cen_screen(0), obj_cen_screen(1),
-                               static_cast<double>(win_width_),
-                               static_cast<double>(win_height_));
+    Eigen::Quaterniond rot = ArcBall::RotateByMouse(
+        static_cast<double>(mouse_prev_x_), static_cast<double>(mouse_prev_y_),
+        xpos, ypos, obj_cen_screen(0), obj_cen_screen(1),
+        static_cast<double>(win_width_), static_cast<double>(win_height_));
 
     Eigen::Matrix3d rot_mat = rot.inverse().toRotationMatrix();
     Eigen::Vector3d scn_center = scn_center_;
@@ -672,21 +663,21 @@ void GLFWViewer::Reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
 
 void GLFWViewer::Keyboard(int key) {
   switch (key) {
-  case GLFW_KEY_R:  // 'R'
-    Reset();
-    break;
-  case GLFW_KEY_P:  // 'P'
-    show_polygon_ = !show_polygon_;
-    break;
-  case GLFW_KEY_V:  // 'V'
-    show_velocity_ = !show_velocity_;
-    break;
-  case GLFW_KEY_D:  // d
-    show_direction_ = !show_direction_;
-    break;
-  case GLFW_KEY_S:  // 'S'
-    show_cloud_state_ = (show_cloud_state_ + 1) % 3;
-    break;
+    case GLFW_KEY_R:  // 'R'
+      Reset();
+      break;
+    case GLFW_KEY_P:  // 'P'
+      show_polygon_ = !show_polygon_;
+      break;
+    case GLFW_KEY_V:  // 'V'
+      show_velocity_ = !show_velocity_;
+      break;
+    case GLFW_KEY_D:  // d
+      show_direction_ = !show_direction_;
+      break;
+    case GLFW_KEY_S:  // 'S'
+      show_cloud_state_ = (show_cloud_state_ + 1) % 3;
+      break;
   }
 }
 
