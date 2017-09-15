@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
 
 #include "modules/planning/common/path/path_data.h"
@@ -33,7 +34,6 @@
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/tasks/qp_spline_path/qp_frenet_frame.h"
 
 namespace apollo {
@@ -42,8 +42,7 @@ namespace planning {
 class QpSplinePathGenerator {
  public:
   QpSplinePathGenerator(const ReferenceLine& reference_line,
-                        const QpSplinePathConfig& qp_spline_path_config,
-                        const ReferencePoint& adc_smooth_ref_point);
+                        const QpSplinePathConfig& qp_spline_path_config);
 
   void SetDebugLogger(apollo::planning_internal::Debug* debug);
 
@@ -68,7 +67,6 @@ class QpSplinePathGenerator {
   apollo::planning_internal::Debug* planning_debug_ = nullptr;
   const ReferenceLine& reference_line_;
   const QpSplinePathConfig& qp_spline_path_config_;
-  const ReferencePoint adc_smooth_ref_point_;
 
   common::FrenetFramePoint init_frenet_point_;
   std::unique_ptr<Spline1dGenerator> spline_generator_;

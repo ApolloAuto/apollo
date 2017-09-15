@@ -48,6 +48,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_prediction_file = "garage_prediction.pb.txt";
   FLAGS_align_prediction_time = false;
   FLAGS_enable_reference_line_provider_thread = false;
+  FLAGS_enable_trajectory_check = true;
 }
 
 bool PlanningTestBase::SetUpAdapters() {
@@ -131,12 +132,11 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   TrimPlanning(&adc_trajectory_);
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
-    common::util::SetProtoToASCIIFile(adc_trajectory_,
-                                                full_golden_path);
+    common::util::SetProtoToASCIIFile(adc_trajectory_, full_golden_path);
   } else {
     ADCTrajectory golden_result;
-    bool load_success = common::util::GetProtoFromASCIIFile(
-        full_golden_path, &golden_result);
+    bool load_success =
+        common::util::GetProtoFromASCIIFile(full_golden_path, &golden_result);
     TrimPlanning(&golden_result);
     if (!load_success ||
         !common::util::IsProtoEqual(golden_result, adc_trajectory_)) {

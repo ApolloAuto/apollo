@@ -140,7 +140,6 @@ bool ReferenceLineProvider::CreateReferenceLineFromRouting(
   smoother.Init(smoother_config_);
 
   std::vector<ReferenceLine> reference_lines;
-  // TODO(all): Added code to enable partially smoothed reference line here.
   for (const auto &segments : route_segments) {
     hdmap::Path hdmap_path;
     pnc_map_->CreatePathFromLaneSegments(segments, &hdmap_path);
