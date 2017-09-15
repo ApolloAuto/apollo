@@ -42,10 +42,15 @@ namespace l3_perception {
     position_.set_x(position.x());
     position_.set_y(position.y());
   }
+  
+  void RadarObstacle::set_position(const double x, const double y) {
+    position_.set_x(x);
+    position_.set_y(y);
+  }
 
-  void RadarObstacle::set_velocity(const Point& velocity) {
-    velocity_.set_x(velocity.x());
-    velocity_.set_y(velocity.y());
+  void RadarObstacle::set_velocity(const double x, const double y) {
+    velocity_.set_x(x);
+    velocity_.set_y(y);
   }
 
   void RadarObstacle::set_id(const uint32_t id) {
