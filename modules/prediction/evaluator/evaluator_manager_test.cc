@@ -27,12 +27,10 @@ namespace prediction {
 
 class EvaluatorManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    manager_ = EvaluatorManager::instance();
-  }
+  virtual void SetUp() { manager_ = EvaluatorManager::instance(); }
 
  protected:
-  EvaluatorManager *manager_;
+  EvaluatorManager *manager_ = nullptr;
   PredictionConf conf_;
 };
 

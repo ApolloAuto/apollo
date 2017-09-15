@@ -22,8 +22,8 @@
 #ifndef MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
 #define MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "google/protobuf/message.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
@@ -57,4 +57,3 @@ class Evaluator {
 }  // namespace apollo
 
 #endif  // MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
-

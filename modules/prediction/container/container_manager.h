@@ -23,12 +23,13 @@
 #define MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
 
 #include <map>
-#include <string>
 #include <memory>
+#include <string>
 
-#include "modules/prediction/container/container.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
 #include "modules/common/macro.h"
+#include "modules/prediction/container/container.h"
 
 /**
  * @namespace apollo::prediction
@@ -43,14 +44,14 @@ class ContainerManager {
    * @brief Container manager initialization
    * @param Adapter config
    */
-  void Init(const common::adapter::AdapterManagerConfig& config);
+  void Init(const common::adapter::AdapterManagerConfig &config);
 
   /**
    * @brief Get mutable container
    * @param Type of the container
    * @return Pointer to the container given the name
    */
-  Container* GetContainer(
+  Container *GetContainer(
       const common::adapter::AdapterConfig::MessageType &type);
 
  private:
@@ -76,7 +77,8 @@ class ContainerManager {
 
  private:
   std::map<common::adapter::AdapterConfig::MessageType,
-    std::unique_ptr<Container>> containers_;
+           std::unique_ptr<Container>>
+      containers_;
 
   common::adapter::AdapterManagerConfig config_;
 

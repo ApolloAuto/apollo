@@ -25,9 +25,10 @@
 #include <memory>
 #include <mutex>
 
-#include "modules/prediction/container/container.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/prediction/container/container.h"
 
 namespace apollo {
 namespace prediction {
@@ -66,7 +67,7 @@ class PoseContainer : public Container {
    * @brief Update pose
    * @param Received localization message
    */
-  void Update(const localization::LocalizationEstimate &localization);
+  void Update(const localization::LocalizationEstimate& localization);
 
  public:
   static const int ID = -1;

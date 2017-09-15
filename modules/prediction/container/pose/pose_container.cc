@@ -32,7 +32,7 @@ void PoseContainer::Insert(const ::google::protobuf::Message& message) {
 }
 
 void PoseContainer::Update(
-    const localization::LocalizationEstimate &localization) {
+    const localization::LocalizationEstimate& localization) {
   if (!localization.has_header() ||
       !localization.header().has_timestamp_sec()) {
     AERROR << "Localization message has no timestamp ["

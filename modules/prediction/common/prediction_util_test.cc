@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
-
 #include "modules/prediction/common/prediction_util.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace prediction {

@@ -25,11 +25,12 @@
 #include <map>
 #include <memory>
 
-#include "modules/prediction/predictor/predictor.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/common/macro.h"
+#include "modules/prediction/predictor/predictor.h"
 
 /**
  * @namespace apollo::prediction
@@ -42,7 +43,7 @@ class PredictorManager {
  public:
   /**
    * @brief Destructor
-   */ 
+   */
   virtual ~PredictorManager() = default;
 
   /**
@@ -61,8 +62,7 @@ class PredictorManager {
    * @brief Execute the predictor generation on perception obstacles
    * @param Perception obstacles
    */
-  void Run(
-      const perception::PerceptionObstacles& perception_obstacles);
+  void Run(const perception::PerceptionObstacles& perception_obstacles);
 
   /**
    * @brief Get prediction obstacles
@@ -114,4 +114,3 @@ class PredictorManager {
 }  // namespace apollo
 
 #endif  // MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
-
