@@ -72,11 +72,11 @@ Status CoordinateConvertTool::SetConvertParam(const std::string &source_param,
 Status CoordinateConvertTool::CoordiateConvert(const double longitude,
                                              const double latitude,
                                              const double height_ellipsoid,
-                                             double* ltm_x, double* ltm_y,
-                                             double* ltm_z) {
-  CHECK_NOTNULL(ltm_x);
-  CHECK_NOTNULL(ltm_y);
-  CHECK_NOTNULL(ltm_z);
+                                             double* utm_x, double* utm_y,
+                                             double* utm_z) {
+  CHECK_NOTNULL(utm_x);
+  CHECK_NOTNULL(utm_y);
+  CHECK_NOTNULL(utm_z);
   if (!pj_from_ || !pj_to_) {
       std::string err_msg = "no transform param";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -103,9 +103,9 @@ Status CoordinateConvertTool::CoordiateConvert(const double longitude,
     gps_latitude *= RAD_TO_DEG;
   }
 
-  *ltm_x = gps_longitude;
-  *ltm_y = gps_latitude;
-  *ltm_z = gps_alt;
+  *utm_x = gps_longitude;
+  *utm_y = gps_latitude;
+  *utm_z = gps_alt;
 
   return Status::OK();
 }

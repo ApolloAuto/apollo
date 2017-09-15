@@ -15,14 +15,22 @@ limitations under the License.
 
 #include "modules/map/hdmap/adapter/xml_parser/header_xml_parser.h"
 
-#include <chrono>
-#include <ctime>
-#include <iomanip>
-#include <sstream>
 #include <string>
 
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
+
+namespace {
+int GetLongZone(double longitude) {
+  double longZone = 0.0;
+  if (longitude < 0.0) {
+    longZone = ((180.0 + longitude) / 6.0) + 1;
+  } else {
+    longZone = (longitude / 6.0) + 31;
+  }
+  return static_cast<int>(longZone);
+}
+}  // namespace
 
 namespace apollo {
 namespace hdmap {
@@ -90,7 +98,15 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
 
   header->set_version(std::to_string(version));
   header->set_date(date);
+  header->mutable_projection()->set_proj(to_coordinate);
   header->set_district(database_name);
+  header->set_rev_major(std::to_string(rev_major));
+  header->set_rev_minor(std::to_string(rev_minor));
+  header->set_left(west);
+  header->set_right(east);
+  header->set_top(north);
+  header->set_bottom(south);
+  header->set_vendor(vendor);
 
   return Status::OK();
 }
