@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/planning/common/planning_gflags.h"
-DEFINE_int32(planning_loop_rate, 5, "Loop rate for planning node");
+DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
 DEFINE_string(adapter_config_filename, "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
