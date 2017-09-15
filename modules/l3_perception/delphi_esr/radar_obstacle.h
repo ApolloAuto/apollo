@@ -41,7 +41,9 @@ class RadarObstacle {
   const bool movable();
   
   void set_position(const Point& position);
+  void set_position(const double x, const double y);
   void set_velocity(const Point& velocity);
+  void set_velocity(const double x, const double y);
   void set_id(const uint32_t id);
   void set_rcs(const double rcs);
   void set_movable(const bool movable);
