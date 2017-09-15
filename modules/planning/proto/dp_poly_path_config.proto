@@ -12,4 +12,7 @@ message DpPolyPathConfig {
   // Trajectory Cost Config
   optional double eval_time_interval = 7 [default = 0.1];
   optional double path_resolution = 8 [default = 0.1];
+  optional double obstacle_ignore_distance = 9 [default = 10.0];
+  optional double obstacle_collision_distance = 10 [default = 0.2];
+  optional double obstacle_risk_distance = 11 [default = 2.0];
 }
