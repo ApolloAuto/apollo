@@ -107,9 +107,9 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   auto debug = frame_->MutableADCTrajectory()->mutable_debug();
   STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
-  constexpr double kAccelLowerBound = -1.8;
-  constexpr double kAccelUpperBound = 1.2;
-  std::pair<double, double> accel_bound = {kAccelLowerBound, kAccelUpperBound};
+  std::pair<double, double> accel_bound = {
+      qp_spline_st_speed_config_.preferred_min_deceleration(),
+      qp_spline_st_speed_config_.preferred_max_acceleration()};
   st_graph.SetDebugLogger(st_graph_debug);
   auto ret = st_graph.Search(st_graph_data, speed_data, accel_bound);
   if (ret != Status::OK()) {
