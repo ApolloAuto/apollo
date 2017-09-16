@@ -41,6 +41,7 @@
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -65,6 +66,8 @@ class Frame {
   std::string DebugString() const;
 
   ADCTrajectory *MutableADCTrajectory();
+
+  planning_internal::Debug *DebugLogger();
 
   const PublishableTrajectory &ComputedTrajectory() const;
 

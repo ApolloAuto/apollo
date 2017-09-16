@@ -94,6 +94,10 @@ const routing::RoutingResponse &Frame::routing_response() const {
 
 ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
 
+planning_internal::Debug *Frame::DebugLogger() {
+  return trajectory_pb_.mutable_debug();
+}
+
 std::vector<ReferenceLineInfo> &Frame::reference_line_info() {
   return reference_line_info_;
 }
@@ -302,7 +306,7 @@ void Frame::RecordInputDebug() {
     ADEBUG << "Skip record input into debug";
     return;
   }
-  auto planning_data = trajectory_pb_.mutable_debug()->mutable_planning_data();
+  auto planning_data = DebugLogger()->mutable_planning_data();
   auto adc_position = planning_data->mutable_adc_position();
   const auto &localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
