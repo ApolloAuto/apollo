@@ -42,6 +42,7 @@ RUN rm -fr /var/lib/apt/lists/*
 RUN mkdir -p /usr/local/bin
 WORKDIR /usr/local/bin/
 RUN wget https://github.com/startcode/bazel-arm64/releases/download/0.4.4/bazel-aarch64 && ln -rs bazel-aarch64 bazel
+RUN chmod +x /usr/local/bin/bazel-aarch64
 
 # Install protobuf 3.3.0
 WORKDIR /tmp
