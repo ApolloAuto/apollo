@@ -232,8 +232,25 @@ RadarObstacles L3Perception::ConvertToRadarObstacles(
       radar_obstacle.set_movable(false);
     } else {
       // also appeared in the last frame
-      absolute_vel.set_x((absolute_pos.x() - iter->second.position().x()) / (current_timestamp - last_timestamp));
-      absolute_vel.set_y((absolute_pos.y() - iter->second.position().y()) / (current_timestamp - last_timestamp));
+      if (fabs(absolute_pos.x() - iter->second.position().x()) < 1e-6 &&
+          fabs(absolute_pos.y() - iter->second.position().y()) < 1e-6) {
+        absolute_vel.set_x(iter->second.velocity().x());
+        absolute_vel.set_y(iter->second.velocity().y());
+      } else {
+        absolute_vel.set_x((absolute_pos.x() - iter->second.position().x()) /
+                           (current_timestamp - last_timestamp));
+        absolute_vel.set_y((absolute_pos.y() - iter->second.position().y()) / (current_timestamp - last_timestamp));
+      }
+      if (id == 14) {
+        AINFO << std::setprecision(2) << std::fixed
+              << "id: " << id
+              << " last_pos: x = " << iter->second.position().x()
+              << " y = " << iter->second.position().y()
+              << " curr_pos: x = " << absolute_pos.x()
+              << " y = " << absolute_pos.y()
+              << " vx = " << absolute_vel.x()
+              << " vy = " << absolute_vel.y();
+      }
       double absolute_speed = std::sqrt(absolute_vel.x() * absolute_vel.x() +
                                         absolute_vel.y() * absolute_vel.y());
       if (absolute_speed > 5.0) {
@@ -272,9 +289,15 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
 
     mob->clear_polygon_point();
 
+    if (id == 14) {
+      AINFO << std::setprecision(2) << std::fixed
+            << "x: " << mob->position().x()
+            << " y: " << mob->position().y();
+    }
+
     FillPerceptionPolygon(
-        mob, radar_obstacle.position().x(), radar_obstacle.position().y(),
-        radar_obstacle.position().z(), mob->length(), mob->width(), mob->height(), mob->theta());
+        mob, mob->position().x(), mob->position().y(),
+        mob->position().z(), mob->length(), mob->width(), mob->height(), mob->theta());
   }
   return obstacles;
 }
@@ -299,6 +322,9 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
   }
   if (esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET ||
     esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_COASTED_TARGET ) {
+    return false;
+  }
+  if (!radar_obstacle.movable()) {
     return false;
   }
   */
