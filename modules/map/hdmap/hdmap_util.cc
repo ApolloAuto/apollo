@@ -33,8 +33,10 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
       return file_path;
     }
   }
-  AERROR << "No existing file found in " << dir << "/" << files;
-  return "";
+  AERROR << "No existing file found in " << dir << "/" << files << ". "
+            "Fallback to first candidate as default result.";
+  CHECK(!candidates.empty()) << "Please specify at least one map.";
+  return apollo::common::util::StrCat(FLAGS_map_dir, "/", candidates[0]);
 }
 
 }  // namespace
