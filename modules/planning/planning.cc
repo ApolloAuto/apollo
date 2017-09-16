@@ -269,7 +269,7 @@ common::Status Planning::Plan(
     const std::vector<common::TrajectoryPoint>& stitching_trajectory) {
   auto trajectory_pb = frame_->MutableADCTrajectory();
   if (FLAGS_enable_record_debug) {
-    trajectory_pb->mutable_debug()
+    frame_->DebugLogger()
         ->mutable_planning_data()
         ->mutable_init_point()
         ->CopyFrom(stitching_trajectory.back());
@@ -291,7 +291,7 @@ common::Status Planning::Plan(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  auto* ptr_debug = frame_->MutableADCTrajectory()->mutable_debug();
+  auto* ptr_debug = frame_->DebugLogger();
   ptr_debug->MergeFrom(best_reference_line->debug());
   frame_->MutableADCTrajectory()->mutable_latency_stats()->MergeFrom(
       best_reference_line->latency_stats());

@@ -73,7 +73,7 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed) const {
 }
 
 void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
-  auto debug = frame_->MutableADCTrajectory()->mutable_debug();
+  auto* debug = frame_->DebugLogger();
   auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
   ptr_speed_plan->set_name(Name());
   ptr_speed_plan->mutable_speed_point()->CopyFrom(
@@ -88,8 +88,6 @@ void SpeedOptimizer::RecordSTGraphDebug(
     return;
   }
 
-  // auto debug = frame_->MutableADCTrajectory()->mutable_debug();
-  // auto st_graph_debug = debug->mutable_planning_data()->add_st_graph();
   st_graph_debug->set_name(Name());
   for (const auto boundary : boundaries) {
     auto boundary_debug = st_graph_debug->add_boundary();
