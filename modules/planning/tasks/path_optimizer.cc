@@ -37,9 +37,9 @@ apollo::common::Status PathOptimizer::Execute(
 }
 
 void PathOptimizer::RecordDebugInfo(const PathData& path_data) {
-  auto debug = frame_->MutableADCTrajectory()->mutable_debug();
   const auto& path_points = path_data.discretized_path().path_points();
-  auto ptr_optimized_path = debug->mutable_planning_data()->add_path();
+  auto ptr_optimized_path =
+      frame_->DebugLogger()->mutable_planning_data()->add_path();
   ptr_optimized_path->set_name(Name());
   ptr_optimized_path->mutable_path_point()->CopyFrom(
       {path_points.begin(), path_points.end()});
