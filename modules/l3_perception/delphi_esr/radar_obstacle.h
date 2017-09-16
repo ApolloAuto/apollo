@@ -34,18 +34,18 @@ using ::apollo::perception::Point;
 
 class RadarObstacle {
  public:
-  const Point position();
-  const Point velocity();
-  const uint32_t id();
-  const double rcs();
-  const bool movable();
-  const double relative_range();
-  const double relative_angle();
-  const double relative_range_velocity();
-  const double relative_lateral_velocity();
-  const double width();
-  const double length();
-  const double height();
+  const Point position() const;
+  const Point velocity() const;
+  const uint32_t id() const;
+  const double rcs() const;
+  const bool movable() const;
+  const double relative_range() const;
+  const double relative_angle() const;
+  const double relative_range_velocity() const;
+  const double relative_lateral_velocity() const;
+  const double width() const;
+  const double length() const;
+  const double height() const;
   
   void set_position(const Point& position);
   void set_position(const double x, const double y);

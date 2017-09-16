@@ -22,11 +22,13 @@
 #define MODEULES_L3_PERCEPTION_L3_PERCEPTION_H_
 
 #include <string>
+#include <map>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/l3_perception/delphi_esr/radar_obstacle.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "ros/include/ros/ros.h"
@@ -37,6 +39,8 @@
  */
 namespace apollo {
 namespace l3_perception {
+
+typedef std::map<int, RadarObstacle> RadarObstacles;
 
 class L3Perception : public apollo::common::ApolloApp {
  public:
@@ -58,14 +62,20 @@ class L3Perception : public apollo::common::ApolloApp {
       const apollo::drivers::Mobileye& mobileye,
       const apollo::localization::LocalizationEstimate& localization);
   
-  apollo::perception::PerceptionObstacles ConvertToPerceptionObstacles(
+  RadarObstacles ConvertToRadarObstacles(
       const apollo::drivers::DelphiESR& delphi_esr,
-      const apollo::localization::LocalizationEstimate& localization);
+      const RadarObstacles& last,
+      const apollo::localization::LocalizationEstimate& localization,
+      const double last_timestamp,
+      const double current_timestamp);
 
-  apollo::perception::PerceptionObstacles FilterDelphiEsrPerceptionObstacles(
-    const apollo::perception::PerceptionObstacles& perception_obstacles,
-    const apollo::drivers::DelphiESR& delphi_esr);
+  RadarObstacles FilterRadarObstacles(
+      const RadarObstacles& radar_obstacles);
 
+  apollo::perception::PerceptionObstacles ConvertToPerceptionObstacles(
+      const RadarObstacles& radar_obstacles);
+
+  RadarObstacles last_map_;
   double last_timestamp_ = 0;
   ros::Timer timer_;
   apollo::drivers::Mobileye mobileye_;

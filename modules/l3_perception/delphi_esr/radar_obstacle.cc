@@ -18,51 +18,51 @@
 namespace apollo {
 namespace l3_perception {
 
-  const Point RadarObstacle::position() {
+  const Point RadarObstacle::position() const {
     return position_;
   }
 
-  const Point RadarObstacle::velocity() {
+  const Point RadarObstacle::velocity() const {
     return velocity_;
   }
 
-  const uint32_t RadarObstacle::id() {
+  const uint32_t RadarObstacle::id() const {
     return id_;
   }
 
-  const double RadarObstacle::rcs() {
+  const double RadarObstacle::rcs() const {
     return rcs_;
   }
 
-  const bool RadarObstacle::movable() {
+  const bool RadarObstacle::movable() const {
     return movable_;
   }
 
-  const double RadarObstacle::relative_range() {
+  const double RadarObstacle::relative_range() const {
     return relative_range_;
   }
 
-  const double RadarObstacle::relative_angle() {
+  const double RadarObstacle::relative_angle() const {
     return relative_angle_;
   }
 
-  const double RadarObstacle::relative_range_velocity() {
+  const double RadarObstacle::relative_range_velocity() const {
     return relative_range_velocity_;
   }
 
-  const double RadarObstacle::relative_lateral_velocity() {
+  const double RadarObstacle::relative_lateral_velocity() const {
     return relative_lateral_velocity_;
   }
 
-  const double RadarObstacle::width() {
+  const double RadarObstacle::width() const {
     return width_;
   }
 
-  const double RadarObstacle::length() {
+  const double RadarObstacle::length() const {
     return length_;
   }
 
-  const double RadarObstacle::height() {
+  const double RadarObstacle::height() const {
     return height_;
   }
   
