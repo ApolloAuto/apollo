@@ -18,7 +18,7 @@
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20170913_1525-gpu"
+VERSION_X86_64="dev-x86_64-20170917_1439"
 VERSION_AARCH64="dev-aarch64-20170712_1533"
 if [[ $# == 1 ]];then
     VERSION=$1
@@ -32,33 +32,21 @@ else
 fi
 
 if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/internal
+    DOCKER_REPO=apolloauto/apollo
 fi
 
 IMG=${DOCKER_REPO}:$VERSION
-LOCAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-
-if [ ! -e "${LOCAL_DIR}/data/log" ]; then
-    mkdir -p "${LOCAL_DIR}/data/log"
-fi
-if [ ! -e "${LOCAL_DIR}/data/bag" ]; then
-    mkdir -p "${LOCAL_DIR}/data/bag"
-fi
-if [ ! -e "${LOCAL_DIR}/data/core" ]; then
-    mkdir -p "${LOCAL_DIR}/data/core"
-fi
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
 if [ ! -e /apollo ]; then
-    sudo ln -sf ${LOCAL_DIR} /apollo
+    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
 fi
 
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 
-source ${LOCAL_DIR}/scripts/apollo_base.sh
+source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
-    #FIX ME: remove login when open source.
-    docker login -u autoapollo -p baidu123
     docker pull $IMG
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
@@ -104,7 +92,7 @@ function main(){
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-        -v $LOCAL_DIR:/apollo \
+        -v $APOLLO_ROOT_DIR:/apollo \
         -v /media:/media \
         -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -v /etc/localtime:/etc/localtime:ro \
