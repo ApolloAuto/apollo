@@ -246,39 +246,9 @@ hardware {
   }
 }
 available_maps {
-  name: "Garage"
-  map_dir: "modules/map/data/new_garage"
-}
-available_maps {
-  name: "Sunnyvale Loop"
-  map_dir: "modules/map/data/sunnyvale_loop"
-}
-available_maps {
-  name: "Sunnyvale Office"
-  map_dir: "modules/map/data/sunnyvale_office"
-}
-available_maps {
-  name: "Huanbaoyuan BZone"
-  map_dir: "modules/map/data/huanbaoyuan_bzone"
+  name: "Demo"
+  map_dir: "modules/map/data/demo"
 }
 available_vehicles {
-  name: "MKZ 8"
-  velodyne_params_path: "modules/calibration/data/mkz8"
-  velodyne_launch_path: "modules/drivers/velodyne/velodyne/launch/start_velodyne.launch"
-  gnss_driver_path: "modules/drivers/gnss/conf/conf_us/gnss_driver.launch"
-  gnss_conf_path: "modules/drivers/gnss/conf/conf_us/gnss_conf_mkz8.txt"
-}
-available_vehicles {
-  name: "MKZ 9"
-  velodyne_params_path: "modules/calibration/data/mkz9"
-  velodyne_launch_path: "modules/drivers/velodyne/velodyne/launch/start_velodyne.launch"
-  gnss_driver_path: "modules/drivers/gnss/conf/conf_us/gnss_driver.launch"
-  gnss_conf_path: "modules/drivers/gnss/conf/conf_us/gnss_conf_mkz9.txt"
-}
-available_vehicles {
-  name: "Beijing MKZ"
-  velodyne_params_path: "modules/calibration/data/mkz056"
-  velodyne_launch_path: "modules/drivers/velodyne/velodyne/launch/start_velodyne_bj.launch"
-  gnss_driver_path: "modules/drivers/gnss/conf/conf_beijing/gnss_driver.launch"
-  gnss_conf_path: "modules/drivers/gnss/conf/conf_beijing/gnss_conf_mkz_BDKJ.txt"
+  name: "Lincoln MKZ"
 }
