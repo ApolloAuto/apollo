@@ -21,7 +21,7 @@ set -x
 TIME=$(date  +%Y%m%d_%H%M)
 
 if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/internal
+    DOCKER_REPO=apolloauto/apollo
 fi
 
 APOLLO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
@@ -31,5 +31,3 @@ TAG="run-env-${TIME}"
 docker build -t "${DOCKER_REPO}:${TAG}" \
     -f "${APOLLO_ROOT}/docker/run_env.dockerfile" \
     "${APOLLO_ROOT}"
-
-sed -i "s/run-env.*\"/${TAG}\"/g" ${APOLLO_ROOT}/apollo_docker.sh

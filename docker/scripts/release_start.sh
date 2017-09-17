@@ -17,36 +17,10 @@
 ###############################################################################
 
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-if [ -e "$DIR/../../scripts/apollo_base.sh" ]; then
-    # run from source
-    APOLLO_ROOT_DIR=$(cd "${DIR}/../.." && pwd)
-else
-    # run from script only
-    APOLLO_ROOT_DIR=~
-fi
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")../.." && pwd )"
 
 source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
-export APOLLO_ROOT_DIR
-
-if [ ! -e "${APOLLO_ROOT_DIR}/data" ]; then
-    mkdir -p ${APOLLO_ROOT_DIR}/data
-fi
-if [ ! -e "${APOLLO_ROOT_DIR}/data/log" ]; then
-    mkdir -p ${APOLLO_ROOT_DIR}/data/log
-fi
-if [ ! -e "${APOLLO_ROOT_DIR}/data/bag" ]; then
-    mkdir -p ${APOLLO_ROOT_DIR}/data/bag
-fi
-if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
-    mkdir -p ${APOLLO_ROOT_DIR}/data/core
-fi
-
-if [ ! -e /apollo ]; then
-    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
-fi
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 echo "APOLLO_ROOT_DIR=$APOLLO_ROOT_DIR"
 
@@ -55,13 +29,11 @@ if [[ $# == 1 ]];then
     VERSION=$1
 fi
 if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/internal
+    DOCKER_REPO=apolloauto/apollo
 fi
 IMG=${DOCKER_REPO}:$VERSION
 
 function main() {
-    #FIX ME: remove login when open source.
-    docker login -u autoapollo -p baidu123
     docker pull "$IMG"
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
@@ -101,7 +73,7 @@ function main() {
         --name apollo_release \
         --net host \
         -v /media:/media \
-        -v ${APOLLO_ROOT_DIR}/data:/apollo/data \
+        -v ${HOME}/data:/apollo/data \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /etc/localtime:/etc/localtime:ro \
         -v $HOME/.cache:${DOCKER_HOME}/.cache \

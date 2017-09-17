@@ -95,6 +95,7 @@ function check_agreement() {
 function check_in_docker() {
   if [ -f /.dockerenv ]; then
       APOLLO_IN_DOCKER=true
+      check_agreement
   else
       APOLLO_IN_DOCKER=false
   fi
@@ -127,16 +128,22 @@ function set_lib_path() {
 }
 
 function create_data_dir() {
-  if [ ! -e "${APOLLO_ROOT_DIR}/data/log" ]; then
-      mkdir -p "${APOLLO_ROOT_DIR}/data/log"
+  local DATA_DIR=""
+  if [ "$RELEASE_DOCKER" != "1" ];then
+      DATA_DIR="${APOLLO_ROOT_DIR}/data"
+  else
+      DATA_DIR="${HOME}/data"
+  fi
+  if [ ! -e "${DATA_DIR}/log" ]; then
+      mkdir -p "${DATA_DIR}/log"
   fi
 
-  if [ ! -e "${APOLLO_ROOT_DIR}/data/bag" ]; then
-      mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
+  if [ ! -e "${DATA_DIR}/bag" ]; then
+      mkdir -p "${DATA_DIR}/bag"
   fi
 
-  if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
-      mkdir -p "${APOLLO_ROOT_DIR}/data/core"
+  if [ ! -e "${DATA_DIR}/core" ]; then
+      mkdir -p "${DATA_DIR}/core"
   fi
 }
 
@@ -274,7 +281,6 @@ function run() {
     esac
 }
 
-check_agreement
 check_in_docker
 create_data_dir
 set_lib_path
