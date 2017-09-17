@@ -34,9 +34,11 @@ if [ -e /dev/ttyUSB0 ]; then
 fi
 
 if [ "$RELEASE_DOCKER" != "1" ];then
-  # setup big data
-  cp -r /home/tmp/modules_data/* /apollo/modules/
-  chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
+  # setup map data
+  if [ -e /home/tmp/modules_data ]; then
+    cp -r /home/tmp/modules_data/* /apollo/modules/
+    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
+  fi
 
   # setup HMI config for internal maps and vehicles.
   HMI_INTERNAL_PACTH=modules/hmi/conf/internal_config.patch
@@ -47,10 +49,14 @@ if [ "$RELEASE_DOCKER" != "1" ];then
     rm ${HMI_INTERNAL_PACTH}
   fi
 
-  # setup internal configuration
-  cp -r /home/tmp/esd_can/include /apollo/third_party/can_card_library/esd_can
-  cp -r /home/tmp/esd_can/lib /apollo/third_party/can_card_library/esd_can
-  chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/third_party/can_card_library/esd_can"
-  cp -r /home/tmp/gnss_conf/* /apollo/modules/drivers/gnss/conf/
-  chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/drivers/gnss/conf/"
+  # setup car specific configuration
+  if [ -e /home/tmp/esd_can ]; then
+    cp -r /home/tmp/esd_can/include /apollo/third_party/can_card_library/esd_can
+    cp -r /home/tmp/esd_can/lib /apollo/third_party/can_card_library/esd_can
+    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/third_party/can_card_library/esd_can"
+  fi
+  if [ -e /home/tmp/gnss_conf ]; then
+    cp -r /home/tmp/gnss_conf/* /apollo/modules/drivers/gnss/conf/
+    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules/drivers/gnss/conf/"
+  fi
 fi
