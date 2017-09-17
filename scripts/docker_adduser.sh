@@ -34,10 +34,20 @@ if [ -e /dev/ttyUSB0 ]; then
 fi
 
 if [ "$RELEASE_DOCKER" != "1" ];then
-  #setup big data
+  # setup big data
   cp -r /home/tmp/modules_data/* /apollo/modules/
   chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
-  #setup internal configuration
+
+  # setup HMI config for internal maps and vehicles.
+  HMI_INTERNAL_PACTH=modules/hmi/conf/internal_config.patch
+  if [ -e /apollo/${HMI_INTERNAL_PACTH} ]; then
+    cd /apollo
+    git apply ${HMI_INTERNAL_PACTH}
+    git update-index --assume-unchanged modules/hmi/conf/config.pb.txt
+    rm ${HMI_INTERNAL_PACTH}
+  fi
+
+  # setup internal configuration
   cp -r /home/tmp/esd_can/include /apollo/third_party/can_card_library/esd_can
   cp -r /home/tmp/esd_can/lib /apollo/third_party/can_card_library/esd_can
   chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/third_party/can_card_library/esd_can"
