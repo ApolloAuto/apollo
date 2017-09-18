@@ -22,6 +22,7 @@
 #include <sstream>
 
 #include "gtest/gtest.h"
+
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -60,8 +61,8 @@ class HmObjectTrackerTest : public testing::Test {
   }
 
  protected:
-  HmObjectTracker* hm_tracker_;
-  MinBoxObjectBuilder* object_builder_;
+  HmObjectTracker* hm_tracker_ = nullptr;
+  MinBoxObjectBuilder* object_builder_ = nullptr;
   ObjectBuilderOptions object_builder_options_;
   TrackerOptions tracker_options_;
 };
@@ -81,8 +82,8 @@ bool ConstructObjects(const std::string& filename,
     ObjectPtr obj(new Object());
     obj->cloud->resize(no_point);
     for (int j = 0; j < no_point; ++j) {
-      ifs >> obj->cloud->points[j].x >> obj->cloud->points[j].y
-          >> obj->cloud->points[j].z >> obj->cloud->points[j].intensity;
+      ifs >> obj->cloud->points[j].x >> obj->cloud->points[j].y >>
+          obj->cloud->points[j].z >> obj->cloud->points[j].intensity;
     }
     (*objects).push_back(obj);
   }

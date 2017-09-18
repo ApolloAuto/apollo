@@ -14,22 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
+
+#include "modules/perception/obstacle/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {
 
-TrackedObject::TrackedObject() {
-}
+TrackedObject::TrackedObject() {}
 
 TrackedObject::TrackedObject(ObjectPtr obj_ptr) : object_ptr(obj_ptr) {
   if (object_ptr != nullptr) {
     barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
-      object_ptr->cloud).cast<float>();
+                     object_ptr->cloud)
+                     .cast<float>();
     center = object_ptr->center.cast<float>();
     size = Eigen::Vector3f(object_ptr->length, object_ptr->width,
-      object_ptr->height);
+                           object_ptr->height);
     direction = object_ptr->direction.cast<float>();
     lane_direction = Eigen::Vector3f::Zero();
     anchor_point = barycenter;
@@ -54,7 +55,7 @@ TrackedObject::TrackedObject(const TrackedObject& rhs) {
   association_score = rhs.association_score;
 }
 
-TrackedObject& TrackedObject::operator = (const TrackedObject& rhs) {
+TrackedObject& TrackedObject::operator=(const TrackedObject& rhs) {
   object_ptr = rhs.object_ptr;
   center = rhs.center;
   direction = rhs.direction;

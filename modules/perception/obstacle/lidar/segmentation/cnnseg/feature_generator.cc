@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/feature_generator.h"
+
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/util.h"
 
 using std::vector;
@@ -33,15 +34,17 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 
   // raw feature parameters
   range_ = feature_param.has_point_cloud_range()
-               ? static_cast<int>(feature_param.point_cloud_range()) : 60;
-  width_ = feature_param.has_width()
-               ? static_cast<int>(feature_param.width()) : 512;
+               ? static_cast<int>(feature_param.point_cloud_range())
+               : 60;
+  width_ =
+      feature_param.has_width() ? static_cast<int>(feature_param.width()) : 512;
   height_ = feature_param.has_height()
-                ? static_cast<int>(feature_param.height()) : 512;
-  min_height_ = feature_param.has_min_height()
-                    ? feature_param.min_height() : -5.0;
-  max_height_ = feature_param.has_max_height()
-                    ? feature_param.max_height() : 5.0;
+                ? static_cast<int>(feature_param.height())
+                : 512;
+  min_height_ =
+      feature_param.has_min_height() ? feature_param.min_height() : -5.0;
+  max_height_ =
+      feature_param.has_max_height() ? feature_param.max_height() : 5.0;
   CHECK_EQ(width_, height_)
       << "Current implementation version requires input_width == input_height.";
 

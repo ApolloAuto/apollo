@@ -27,16 +27,14 @@ class MinBoxObjectBuilderTest : public testing::Test {
  protected:
   MinBoxObjectBuilderTest() {}
   ~MinBoxObjectBuilderTest() {}
-  void SetUp() {
-    _min_box_object_builder = new MinBoxObjectBuilder();
-  }
+  void SetUp() { min_box_object_builder_ = new MinBoxObjectBuilder(); }
   void TearDown() {
-    delete _min_box_object_builder;
-    _min_box_object_builder = NULL;
+    delete min_box_object_builder_;
+    min_box_object_builder_ = nullptr;
   }
 
  protected:
-  MinBoxObjectBuilder* _min_box_object_builder;
+  MinBoxObjectBuilder* min_box_object_builder_ = nullptr;
 };
 
 bool ConstructPointCloud(std::vector<ObjectPtr>* objects) {
@@ -74,7 +72,7 @@ TEST_F(MinBoxObjectBuilderTest, build) {
   ConstructPointCloud(&objects);
   EXPECT_EQ(5, objects.size());
   ObjectBuilderOptions options;
-  EXPECT_TRUE(_min_box_object_builder->Build(options, &objects));
+  EXPECT_TRUE(min_box_object_builder_->Build(options, &objects));
   const double EPSILON = 1e-6;
   // obj 1
   EXPECT_EQ(3, objects[0]->cloud->points.size());
