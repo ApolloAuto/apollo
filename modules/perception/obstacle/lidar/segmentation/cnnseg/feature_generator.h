@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEAT_GEN_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEAT_GEN_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
 
 #include <cmath>
 #include <string>
@@ -38,12 +38,9 @@ class FeatureGenerator {
 
   bool Init(const FeatureParam& feature_param, caffe::Blob<Dtype>* out_blob);
 
-  void Generate(
-      const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
+  void Generate(const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
 
-  inline std::string name() const {
-    return "FeatureGenerator";
-  }
+  inline std::string name() const { return "FeatureGenerator"; }
 
  private:
   Dtype LogCount(int count) {
@@ -55,12 +52,12 @@ class FeatureGenerator {
 
   std::vector<Dtype> log_table_;
 
-  int width_;
-  int height_;
-  int range_;
+  int width_ = 0;
+  int height_ = 0;
+  int range_ = 0;
 
-  float min_height_;
-  float max_height_;
+  float min_height_ = 0.0;
+  float max_height_ = 0.0;
 
   // raw feature data
   Dtype* max_height_data_ = nullptr;
@@ -86,4 +83,4 @@ typedef FeatureGenerator<double> FP64FeatureGenerator;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEAT_GEN_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_

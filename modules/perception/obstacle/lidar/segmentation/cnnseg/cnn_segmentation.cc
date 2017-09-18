@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
+
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/base/file_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -64,8 +65,8 @@ bool CNNSegmentation::Init() {
 #ifndef USE_CAFFE_GPU
   caffe::Caffe::set_mode(caffe::Caffe::CPU);
 #else
-  int gpu_id = cnnseg_param_.has_gpu_id()
-                   ? static_cast<int>(cnnseg_param_.gpu_id()) : 0;
+  int gpu_id =
+      cnnseg_param_.has_gpu_id() ? static_cast<int>(cnnseg_param_.gpu_id()) : 0;
   CHECK_GE(gpu_id, 0);
   caffe::Caffe::SetDevice(gpu_id);
   caffe::Caffe::set_mode(caffe::Caffe::GPU);
@@ -111,9 +112,8 @@ bool CNNSegmentation::Init() {
   CHECK(height_pt_blob_ != nullptr) << "`" << height_pt_blob_name
                                     << "` not exists!";
   // raw feature data
-  string feature_blob_name = network_param.has_feature_blob()
-                                 ? network_param.feature_blob()
-                                 : "data";
+  string feature_blob_name =
+      network_param.has_feature_blob() ? network_param.feature_blob() : "data";
   feature_blob_ = caffe_net_->blob_by_name(feature_blob_name);
   CHECK(feature_blob_ != nullptr) << "`" << feature_blob_name
                                   << "` not exists!";
@@ -144,8 +144,8 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   }
 
   use_full_cloud_ =
-      (cnnseg_param_.has_use_full_cloud() ?
-       cnnseg_param_.use_full_cloud() : false) &&
+      (cnnseg_param_.has_use_full_cloud() ? cnnseg_param_.use_full_cloud()
+                                          : false) &&
       (options.origin_cloud != nullptr);
   PERF_BLOCK_START();
 
@@ -166,10 +166,12 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
 
   // clutser points and construct segments/objects
   float objectness_thresh = cnnseg_param_.has_objectness_thresh()
-                                ? cnnseg_param_.objectness_thresh() : 0.5;
+                                ? cnnseg_param_.objectness_thresh()
+                                : 0.5;
   bool use_all_grids_for_clustering =
       cnnseg_param_.has_use_all_grids_for_clustering()
-          ? cnnseg_param_.use_all_grids_for_clustering() : false;
+          ? cnnseg_param_.use_all_grids_for_clustering()
+          : false;
   cluster2d_->Cluster(*category_pt_blob_, *instance_pt_blob_, pc_ptr,
                       valid_indices, objectness_thresh,
                       use_all_grids_for_clustering);
@@ -178,20 +180,21 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   cluster2d_->Filter(*confidence_pt_blob_, *height_pt_blob_);
 
   float confidence_thresh = cnnseg_param_.has_confidence_thresh()
-                                ? cnnseg_param_.confidence_thresh() : 0.1;
-  float height_thresh = cnnseg_param_.has_height_thresh()
-                            ? cnnseg_param_.height_thresh() : 0.5;
+                                ? cnnseg_param_.confidence_thresh()
+                                : 0.1;
+  float height_thresh =
+      cnnseg_param_.has_height_thresh() ? cnnseg_param_.height_thresh() : 0.5;
   int min_pts_num = cnnseg_param_.has_min_pts_num()
-                        ? static_cast<int>(cnnseg_param_.min_pts_num()) : 3;
-  cluster2d_->GetObjects(confidence_thresh, height_thresh,
-                         min_pts_num, objects);
+                        ? static_cast<int>(cnnseg_param_.min_pts_num())
+                        : 3;
+  cluster2d_->GetObjects(confidence_thresh, height_thresh, min_pts_num,
+                         objects);
   PERF_BLOCK_END("[CNNSeg] post-processing");
 
   return true;
 }
 
-bool CNNSegmentation::GetConfigs(string* config_file,
-                                 string* proto_file,
+bool CNNSegmentation::GetConfigs(string* config_file, string* proto_file,
                                  string* weight_file) {
   ConfigManager* config_manager = ConfigManager::instance();
 
