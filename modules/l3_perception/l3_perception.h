@@ -76,6 +76,8 @@ class L3Perception : public apollo::common::ApolloApp {
       const RadarObstacles& radar_obstacles);
 
   RadarObstacles last_map_;
+  RadarObstacles curr_map_;
+  double last_radar_timestamp_ = 0;
   double last_timestamp_ = 0;
   ros::Timer timer_;
   apollo::drivers::Mobileye mobileye_;
