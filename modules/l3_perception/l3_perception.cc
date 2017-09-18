@@ -71,7 +71,12 @@ void L3Perception::OnMobileye(const Mobileye& message) {
 
 void L3Perception::OnDelphiESR(const DelphiESR& message) {
   AINFO << "receive DelphiESR callback";
+  double current_radar_timestamp = apollo::common::time::Clock::NowInSecond();
   delphi_esr_.CopyFrom(message);
+  curr_map_ = ConvertToRadarObstacles(delphi_esr_, last_map_, localization_,
+                                      last_radar_timestamp_, current_radar_timestamp);
+  last_map_ = curr_map_;
+  last_radar_timestamp_ = current_radar_timestamp;
 }
 
 void L3Perception::OnLocalization(const LocalizationEstimate& message) {
@@ -200,7 +205,11 @@ RadarObstacles L3Perception::ConvertToRadarObstacles(
     RadarObstacle radar_obstacle;
 
     const auto& data_500 = delphi_esr.esr_track01_500(index);
-    //TODO(lizh): object id
+    if (data_500.can_tx_track_status() ==
+        ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET) {
+      continue;
+    }
+    // TODO(lizh): object id
     int id = index;
     radar_obstacle.set_id(id);
     radar_obstacle.set_relative_range(data_500.can_tx_track_range());
@@ -232,16 +241,18 @@ RadarObstacles L3Perception::ConvertToRadarObstacles(
       radar_obstacle.set_movable(false);
     } else {
       // also appeared in the last frame
-      if (fabs(absolute_pos.x() - iter->second.position().x()) < 1e-6 &&
-          fabs(absolute_pos.y() - iter->second.position().y()) < 1e-6) {
-        absolute_vel.set_x(iter->second.velocity().x());
-        absolute_vel.set_y(iter->second.velocity().y());
+      absolute_vel.set_x((absolute_pos.x() - iter->second.position().x()) /
+                         (current_timestamp - last_timestamp));
+      absolute_vel.set_y((absolute_pos.y() - iter->second.position().y()) /
+                         (current_timestamp - last_timestamp));
+      double absolute_speed = std::sqrt(absolute_vel.x() * absolute_vel.x() +
+                                        absolute_vel.y() * absolute_vel.y());
+      if (absolute_speed > 5.0) {
+        radar_obstacle.set_movable(true);
       } else {
-        absolute_vel.set_x((absolute_pos.x() - iter->second.position().x()) /
-                           (current_timestamp - last_timestamp));
-        absolute_vel.set_y((absolute_pos.y() - iter->second.position().y()) / (current_timestamp - last_timestamp));
+        radar_obstacle.set_movable(iter->second.movable());
       }
-      if (id == 14) {
+      if (id == 45) {
         AINFO << std::setprecision(2) << std::fixed
               << "id: " << id
               << " last_pos: x = " << iter->second.position().x()
@@ -249,12 +260,8 @@ RadarObstacles L3Perception::ConvertToRadarObstacles(
               << " curr_pos: x = " << absolute_pos.x()
               << " y = " << absolute_pos.y()
               << " vx = " << absolute_vel.x()
-              << " vy = " << absolute_vel.y();
-      }
-      double absolute_speed = std::sqrt(absolute_vel.x() * absolute_vel.x() +
-                                        absolute_vel.y() * absolute_vel.y());
-      if (absolute_speed > 5.0) {
-        radar_obstacle.set_movable(true);
+              << " vy = " << absolute_vel.y()
+              << " movable = " << radar_obstacle.movable();
       }
     }
 
@@ -289,7 +296,7 @@ PerceptionObstacles L3Perception::ConvertToPerceptionObstacles(
 
     mob->clear_polygon_point();
 
-    if (id == 14) {
+    if (id == 45) {
       AINFO << std::setprecision(2) << std::fixed
             << "x: " << mob->position().x()
             << " y: " << mob->position().y();
@@ -324,10 +331,10 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
     esr_track01_500.can_tx_track_status() == ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_COASTED_TARGET ) {
     return false;
   }
+  */
   if (!radar_obstacle.movable()) {
     return false;
   }
-  */
   return true;
 }
 
@@ -357,9 +364,7 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   // }
 
   // if (delphi_esr_.header().timestamp_sec() >= last_timestamp_) {
-  RadarObstacles curr_map = ConvertToRadarObstacles(delphi_esr_, last_map_, localization_,
-                                      last_timestamp_, current_timestamp);
-  RadarObstacles filtered_map = FilterRadarObstacles(curr_map);
+  RadarObstacles filtered_map = FilterRadarObstacles(curr_map_);
   PerceptionObstacles filtered_delphi_esr_obstacles =
       ConvertToPerceptionObstacles(filtered_map);
   obstacles.MergeFrom(filtered_delphi_esr_obstacles);
@@ -369,7 +374,6 @@ void L3Perception::OnTimer(const ros::TimerEvent&) {
   AdapterManager::PublishPerceptionObstacles(obstacles);
 
   last_timestamp_ = current_timestamp;
-  last_map_ = curr_map;
 }
 
 }  // namespace l3_perception
