@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEG_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEG_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_
 
 #include <memory>
 #include <string>
@@ -58,11 +58,11 @@ class CNNSegmentation : public BaseSegmentation {
   bool GetConfigs(std::string* config_file, std::string* proto_file,
                   std::string* weight_file);
   // range of bird-view field (for each side)
-  float range_;
+  float range_ = 0.0;
   // number of cells in bird-view width
-  int width_;
+  int width_ = 0;
   // number of cells in bird-view height
-  int height_;
+  int height_ = 0;
 
   // paramters of CNNSegmentation
   apollo::perception::cnnseg::CNNSegParam cnnseg_param_;
@@ -84,7 +84,7 @@ class CNNSegmentation : public BaseSegmentation {
   boost::shared_ptr<caffe::Blob<float>> feature_blob_;
 
   // use all points of cloud to compute features
-  bool use_full_cloud_;
+  bool use_full_cloud_ = false;
 
   // clustering model for post-processing
   std::shared_ptr<cnnseg::Cluster2D> cluster2d_;
@@ -100,4 +100,4 @@ REGISTER_SEGMENTATION(CNNSegmentation);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEG_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CNN_SEGMENTATION_H_

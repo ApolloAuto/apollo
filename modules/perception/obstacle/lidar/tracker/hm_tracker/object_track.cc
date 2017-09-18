@@ -47,7 +47,7 @@ bool ObjectTrack::SetFilterMethod(const std::string& filter_method_name) {
 }
 
 bool ObjectTrack::SetTrackCachedHistorySizeMaximum(
-  const int& track_cached_history_size_maximum) {
+    const int& track_cached_history_size_maximum) {
   if (track_cached_history_size_maximum > 0) {
     s_track_cached_history_size_maximum_ = track_cached_history_size_maximum;
     AINFO << "track cached history size maximum of object track is "
@@ -70,7 +70,7 @@ bool ObjectTrack::SetSpeedNoiseMaximum(const double& speed_noise_maximum) {
 }
 
 bool ObjectTrack::SetAccelerationNoiseMaximum(
-  const double& acceleration_noise_maximum) {
+    const double& acceleration_noise_maximum) {
   if (acceleration_noise_maximum > 0) {
     s_acceleration_noise_maximum_ = acceleration_noise_maximum;
     AINFO << "acceleration noise maximum of object track is "
@@ -148,7 +148,7 @@ Eigen::VectorXf ObjectTrack::Predict(const double& time_diff) {
 }
 
 void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
-  const double& time_diff) {
+                                   const double& time_diff) {
   // A. update object track
   // A.1 update filter
   filter_->UpdateWithObject((*new_object), current_object_, time_diff);
@@ -159,8 +159,8 @@ void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
   (*new_object)->anchor_point = belief_anchor_point_;
   (*new_object)->velocity = belief_velocity_;
 
-  belief_velocity_accelaration_ = ((*new_object)->velocity -
-    current_object_->velocity) / time_diff;
+  belief_velocity_accelaration_ =
+      ((*new_object)->velocity - current_object_->velocity) / time_diff;
   // A.2 update track info
   age_++;
   total_visible_count_++;
@@ -229,7 +229,7 @@ void ObjectTrack::UpdateWithoutObject(const double& time_diff) {
 }
 
 void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
-  const double& time_diff) {
+                                      const double& time_diff) {
   // A. update object of track
   TrackedObjectPtr new_obj(new TrackedObject());
   new_obj->clone(*current_object_);
@@ -277,16 +277,15 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
 }
 
 void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
-  const double& time_diff) {
+                                      const double& time_diff) {
   // A. keep motion if accelaration of filter is greater than a threshold
   Eigen::Vector3f filter_anchor_point = Eigen::Vector3f::Zero();
   Eigen::Vector3f filter_velocity = Eigen::Vector3f::Zero();
   Eigen::Vector3f filter_velocity_accelaration = Eigen::Vector3f::Zero();
   filter_->GetState(&filter_anchor_point, &filter_velocity,
-    &filter_velocity_accelaration);
+                    &filter_velocity_accelaration);
   double filter_accelaration = filter_velocity_accelaration.norm();
-  bool need_keep_motion = filter_accelaration >
-    s_acceleration_noise_maximum_;
+  bool need_keep_motion = filter_accelaration > s_acceleration_noise_maximum_;
   if (need_keep_motion) {
     Eigen::Vector3f last_velocity = Eigen::Vector3f::Zero();
     if (history_objects_.size() > 0) {
@@ -302,8 +301,8 @@ void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
     return;
   }
   // B. static hypothesis check & claping noise
-  is_static_hypothesis_ = CheckTrackStaticHypothesis(new_object->object_ptr,
-    time_diff);
+  is_static_hypothesis_ =
+      CheckTrackStaticHypothesis(new_object->object_ptr, time_diff);
   if (is_static_hypothesis_) {
     belief_velocity_ = Eigen::Vector3f::Zero();
     belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
@@ -327,19 +326,19 @@ void ObjectTrack::SmoothTrackOrientation() {
   current_dir.normalize();
   Eigen::Vector3d new_size;
   Eigen::Vector3d new_center;
-  ComputeBboxSizeCenter<pcl_util::Point>(
-    current_object_->object_ptr->cloud,
-    current_dir.cast<double>(), &new_size, &new_center);
+  ComputeBboxSizeCenter<pcl_util::Point>(current_object_->object_ptr->cloud,
+                                         current_dir.cast<double>(), &new_size,
+                                         &new_center);
   current_object_->direction = current_dir;
   current_object_->center = new_center.cast<float>();
   current_object_->size = new_size.cast<float>();
 }
 
 bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
-  const double& time_diff) {
+                                             const double& time_diff) {
   // A. check whether track velocity angle changed obviously
   bool is_velocity_angle_change =
-    CheckTrackStaticHypothesisByVelocityAngleChange(new_object, time_diff);
+      CheckTrackStaticHypothesisByVelocityAngleChange(new_object, time_diff);
 
   // B. evaluate velocity level
   double speed = belief_velocity_.head(2).norm();
@@ -359,13 +358,12 @@ bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
 }
 
 bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
-  const ObjectPtr& new_object,
-  const double& time_diff) {
+    const ObjectPtr& new_object, const double& time_diff) {
   Eigen::Vector3f previous_velocity =
-    history_objects_[history_objects_.size() - 1]->velocity;
+      history_objects_[history_objects_.size() - 1]->velocity;
   Eigen::Vector3f current_velocity = current_object_->velocity;
-  double velocity_angle_change = VectorTheta2dXy(previous_velocity,
-    current_velocity);
+  double velocity_angle_change =
+      VectorTheta2dXy(previous_velocity, current_velocity);
   if (fabs(velocity_angle_change) > M_PI / 4.0) {
     return true;
   }
@@ -373,19 +371,15 @@ bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
 }
 
 /*class ObjectTrackSet*/
-ObjectTrackSet::ObjectTrackSet() {
-  tracks_.reserve(1000);
-}
+ObjectTrackSet::ObjectTrackSet() { tracks_.reserve(1000); }
 
-ObjectTrackSet::~ObjectTrackSet() {
-  Clear();
-}
+ObjectTrackSet::~ObjectTrackSet() { Clear(); }
 
 bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
-  const int& track_consecutive_invisible_maximum) {
+    const int& track_consecutive_invisible_maximum) {
   if (track_consecutive_invisible_maximum >= 0) {
     s_track_consecutive_invisible_maximum_ =
-      track_consecutive_invisible_maximum;
+        track_consecutive_invisible_maximum;
     AINFO << "track consecutive invisible maximum of object track set is "
           << s_track_consecutive_invisible_maximum_;
     return true;
@@ -395,9 +389,8 @@ bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
 }
 
 bool ObjectTrackSet::SetTrackVisibleRatioMinimum(
-  const float& track_visible_ratio_minimum) {
-  if (track_visible_ratio_minimum >= 0 &&
-      track_visible_ratio_minimum <= 1) {
+    const float& track_visible_ratio_minimum) {
+  if (track_visible_ratio_minimum >= 0 && track_visible_ratio_minimum <= 1) {
     s_track_visible_ratio_minimum_ = track_visible_ratio_minimum;
     AINFO << "track visible ratio minimum of object track set is "
           << s_track_visible_ratio_minimum_;
@@ -421,13 +414,12 @@ int ObjectTrackSet::RemoveLostTracks() {
   size_t track_num = 0;
   for (size_t i = 0; i < tracks_.size(); ++i) {
     // A. remove tracks invisible ratio less than given minimum
-    float track_visible_ratio = tracks_[i]->total_visible_count_ * 1.0f /
-      tracks_[i]->age_;
-    if (track_visible_ratio < s_track_visible_ratio_minimum_)
-      continue;
+    float track_visible_ratio =
+        tracks_[i]->total_visible_count_ * 1.0f / tracks_[i]->age_;
+    if (track_visible_ratio < s_track_visible_ratio_minimum_) continue;
     // B. remove tracks consecutive invisible count greater than given maximum
     int track_consecutive_invisible_count =
-      tracks_[i]->consecutive_invisible_count_;
+        tracks_[i]->consecutive_invisible_count_;
     if (track_consecutive_invisible_count >
         s_track_consecutive_invisible_maximum_)
       continue;
