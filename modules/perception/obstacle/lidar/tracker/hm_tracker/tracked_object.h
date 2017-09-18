@@ -68,4 +68,4 @@ typedef std::shared_ptr<const TrackedObject> TrackedObjectConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_  // NOLINT
