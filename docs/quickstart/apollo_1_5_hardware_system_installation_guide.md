@@ -74,6 +74,7 @@ The following set of documentation describes Apollo 1.5:
     - **Software**:
       - Ubuntu Linux
       - Apollo Linux Kernel
+      - Nvidia GPU Driver
 
 - ***<u>[Apollo Quick Start Guide]</u>*** ─ A combination tutorial and roadmap that provide the complete set of end-to-end instructions. The Quick Start Guide also provides links to additional documents that describe the conversion of a regular car to an autonomous-driving vehicle.
 
@@ -284,6 +285,7 @@ Perform these tasks:
 - Install the software for the IPC:
     - Ubuntu Linux
     - Apollo Kernel
+    - Nvidia GPU Driver
 
 ### Preparing the IPC
 Follow these steps:
@@ -349,6 +351,7 @@ This section describes the steps to install:
 
 - Ubuntu Linux
 - Apollo Kernel
+- Nvidia GPU Driver
 
 ![tip_icon](images/tip_icon.png)It is assumed that you have experience working with Linux to successfully perform the software installation.
 
@@ -408,6 +411,7 @@ cd install
 sudo bash install_kernel.sh
 ```
 3. Reboot your system by the `reboot` command
+
 4. Build the ESD CAN driver source code
   Now you need to build the ESD CAN driver source code according to [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)
 
@@ -426,6 +430,22 @@ cd apollo-kernel
 bash build.sh
 ```
 4. Install the kernel the same way as using a pre-built Apollo Kernel.
+
+#### Installing Nvidia GPU Driver
+
+The Apollo runtime in the vehicle requires the [Nvidia GPU Driver](http://www.nvidia.com/download/driverResults.aspx/114708/en-us). You are required to install the Nvidia GPU driver with specific options.
+
+1. Download the installation files
+```
+wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
+```
+
+2. Start the installation
+```
+sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-kernel-module --no-x-check -a -s
+```
+
+3. Reboot your system by the `sudo reboot` command
 
 ##### Optional: Test the ESD CAN device node
 After rebooting the IPC with the new kernel:
