@@ -866,4 +866,4 @@ Youwill use the components that you were required to provide to perform the foll
 
 # Next Steps
 
-After you complete the hardware installation in the vehicle, see the [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md) for the steps to complete the software installation.
+After you complete the hardware installation in the vehicle, see the [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md) for the steps to complete the software installation.
