@@ -21,8 +21,6 @@
 namespace apollo {
 namespace perception {
 
-TrackedObject::TrackedObject() {}
-
 TrackedObject::TrackedObject(ObjectPtr obj_ptr) : object_ptr(obj_ptr) {
   if (object_ptr != nullptr) {
     barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
@@ -40,52 +38,10 @@ TrackedObject::TrackedObject(ObjectPtr obj_ptr) : object_ptr(obj_ptr) {
   }
 }
 
-TrackedObject::TrackedObject(const TrackedObject& rhs) {
-  object_ptr = rhs.object_ptr;
-  center = rhs.center;
-  direction = rhs.direction;
-  lane_direction = rhs.lane_direction;
-  size = rhs.size;
-  type = rhs.type;
-  barycenter = rhs.barycenter;
-  anchor_point = rhs.anchor_point;
-  velocity = rhs.velocity;
-  acceleration = rhs.acceleration;
-  type = rhs.type;
-  association_score = rhs.association_score;
-}
-
-TrackedObject& TrackedObject::operator=(const TrackedObject& rhs) {
-  object_ptr = rhs.object_ptr;
-  center = rhs.center;
-  direction = rhs.direction;
-  lane_direction = rhs.lane_direction;
-  size = rhs.size;
-  type = rhs.type;
-  barycenter = rhs.barycenter;
-  anchor_point = rhs.anchor_point;
-  velocity = rhs.velocity;
-  acceleration = rhs.acceleration;
-  type = rhs.type;
-  association_score = rhs.association_score;
-  return (*this);
-}
-
 void TrackedObject::clone(const TrackedObject& rhs) {
+  *this = rhs;
   object_ptr.reset(new Object());
   object_ptr->clone(*rhs.object_ptr);
-
-  center = rhs.center;
-  direction = rhs.direction;
-  lane_direction = rhs.lane_direction;
-  size = rhs.size;
-  type = rhs.type;
-  barycenter = rhs.barycenter;
-  anchor_point = rhs.anchor_point;
-  velocity = rhs.velocity;
-  acceleration = rhs.acceleration;
-  type = rhs.type;
-  association_score = rhs.association_score;
 }
 
 }  // namespace perception
