@@ -17,12 +17,11 @@
 // @todo: complete this using gmock & gtest, capture logging contents and do
 // checks.
 
-#include "apollo/platform/log.h"
-
-using namespace apollo::platform::log;
+#include "modules/monitor/common/log.h"
 
 int main() {
-  LogModule m1 = {"test", 5, 10, platform_log_printf};
+  apollo::platform::log::LogModule m1 = {
+      "test", 5, 10, apollo::platform::log::platform_log_printf};
   m1.set_log_lvl(7);
 
   PLATFORM_LOG(&m1, 3, "test");
