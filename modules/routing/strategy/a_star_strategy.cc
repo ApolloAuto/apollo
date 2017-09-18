@@ -45,7 +45,7 @@ struct SearchNode {
       : topo_node(search_node.topo_node), f(search_node.f) {}
 
   bool operator<(const SearchNode& node) const {
-    // in order to let the top of preority queue is the smallest one!
+    // in order to let the top of priority queue is the smallest one!
     return f > node.f;
   }
 
@@ -365,7 +365,6 @@ double AStarStrategy::GetResidualS(const TopoEdge* edge,
     return std::numeric_limits<double>::max();
   }
   double start_s = to_node->StartS();
-  ;
   const auto* from_node = edge->FromNode();
   const auto iter = enter_s_.find(from_node);
   if (iter != enter_s_.end()) {
