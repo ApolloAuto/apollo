@@ -16,7 +16,7 @@
 
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <memory>
 #include <string>
 #include <unordered_set>
