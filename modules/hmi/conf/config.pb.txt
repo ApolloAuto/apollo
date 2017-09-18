@@ -249,6 +249,10 @@ available_maps {
   name: "Demo"
   map_dir: "modules/map/data/demo"
 }
+available_maps {
+  name: "Sunnyvale Loop"
+  map_dir: "modules/map/data/sunnyvale_loop"
+}
 available_vehicles {
   name: "Lincoln MKZ"
 }
