@@ -22,14 +22,16 @@
 #include <vector>
 
 #include "caffe/caffe.hpp"
+
+#include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
+
 #include "modules/common/log.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/lib/base/timer.h"
+#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
-#include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
-#include "modules/perception/obstacle/lidar/segmentation/cnnseg/feature_generator.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cluster2d.h"
+#include "modules/perception/obstacle/lidar/segmentation/cnnseg/feature_generator.h"
 
 namespace apollo {
 namespace perception {
@@ -42,9 +44,9 @@ class CNNSegmentation : public BaseSegmentation {
   bool Init() override;
 
   bool Segment(const pcl_util::PointCloudPtr& pc_ptr,
-                       const pcl_util::PointIndices& valid_indices,
-                       const SegmentationOptions& options,
-                       std::vector<ObjectPtr>* objects) override;
+               const pcl_util::PointIndices& valid_indices,
+               const SegmentationOptions& options,
+               std::vector<ObjectPtr>* objects) override;
 
   std::string name() const override { return "CNNSegmentation"; }
 
@@ -53,8 +55,7 @@ class CNNSegmentation : public BaseSegmentation {
   int height() const { return height_; }
 
  private:
-  bool GetConfigs(std::string* config_file,
-                  std::string* proto_file,
+  bool GetConfigs(std::string* config_file, std::string* proto_file,
                   std::string* weight_file);
   // range of bird-view field (for each side)
   float range_;
@@ -66,21 +67,21 @@ class CNNSegmentation : public BaseSegmentation {
   // paramters of CNNSegmentation
   apollo::perception::cnnseg::CNNSegParam cnnseg_param_;
   // Caffe network object
-  std::shared_ptr<caffe::Net<float> > caffe_net_;
+  std::shared_ptr<caffe::Net<float>> caffe_net_;
 
   // bird-view raw feature generator
   std::shared_ptr<cnnseg::FeatureGenerator<float>> feature_generator_;
 
   // center offset prediction
-  boost::shared_ptr<caffe::Blob<float> > instance_pt_blob_;
+  boost::shared_ptr<caffe::Blob<float>> instance_pt_blob_;
   // objectness prediction
-  boost::shared_ptr<caffe::Blob<float> > category_pt_blob_;
+  boost::shared_ptr<caffe::Blob<float>> category_pt_blob_;
   // fg probability prediction
-  boost::shared_ptr<caffe::Blob<float> > confidence_pt_blob_;
+  boost::shared_ptr<caffe::Blob<float>> confidence_pt_blob_;
   // object height prediction
-  boost::shared_ptr<caffe::Blob<float> > height_pt_blob_;
+  boost::shared_ptr<caffe::Blob<float>> height_pt_blob_;
   // raw features to be input into network
-  boost::shared_ptr<caffe::Blob<float> > feature_blob_;
+  boost::shared_ptr<caffe::Blob<float>> feature_blob_;
 
   // use all points of cloud to compute features
   bool use_full_cloud_;

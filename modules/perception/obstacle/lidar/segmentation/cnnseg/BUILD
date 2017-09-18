@@ -55,10 +55,10 @@ cc_library(
 )
 
 cc_test(
-    name = "cnnseg_test",
+    name = "cnn_segmentation_test",
     size = "small",
     srcs = [
-        "cnnseg_test.cc",
+        "cnn_segmentation_test.cc",
     ],
     data = [
         "//modules/perception:perception_data",
