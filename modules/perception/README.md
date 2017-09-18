@@ -302,11 +302,10 @@ HM Object Tracker
 The HM object tracker is designed to track obstacles detected by the
 segmentation step. In general, it forms and updates track lists by
 associating current detections with existing track lists, deletes the
-old track lists if it no longer persists, and spawns new track lists if
-it identifies new detections. The motion state of the updated track
-lists will be estimated after association. In HM object track, the
+old track lists if it no longer persists, and spawns new track lists if new detections are identified. The motion state of the updated track
+lists will be estimated after association. In HM object tracker, the
 Hungarian algorithm is used for detection-to-track association, and a
-Robust Kalman Filter is adopted for motion and velocity estimation.
+Robust Kalman Filter is adopted for motion estimation.
 
 ### Detection-to-Track Association
 
@@ -317,20 +316,21 @@ detection-to-track matching with minimum cost (distance).
 **Computing Association Distance Matrix**
 
 In the first step, an association distance matrix is established. The
-distance between a given detection and track is calculated according to
+distance between a given detection and one track is calculated according to
 a series of association features including motion consistency,
 appearance consistency, etc. Some features used in HM tracker’s distance
 computing are shown as below:
 
-  |location_distance     |Evaluating motion consistency      |
-  |--------------------- |-----------------------------------|
-  |direction_distance    |Evaluating motion consistency      |
-  |bbox_size_distance    |Evaluating appearance consistency  |
-  |point_num_distance    |Evaluating appearance consistency  |
-  |histogram_distance    |Evaluating appearance consistency  |
+  |Association Feature Name |Description                       |
+  |-------------------------|----------------------------------|
+  |location_distance        |Evaluating motion consistency     |
+  |direction_distance       |Evaluating motion consistency     |
+  |bbox_size_distance       |Evaluating appearance consistency |
+  |point_num_distance       |Evaluating appearance consistency |
+  |histogram_distance       |Evaluating appearance consistency |
 
-Besides, there are important parameters of distance weights which are
-used for combining the above-mentioned distance features into a final
+Besides, there are some important parameters of distance weights which are
+used for combining the above-mentioned association features into a final
 distance measurement.
 
 **Bipartite Graph Matching via Hungarian Algorithm**
@@ -339,7 +339,7 @@ Given the association distance matrix, as shown in figure 5, Apollo
 constructs a bipartite graph and uses Hungarian algorithm to find the
 best detection-to-track matching via minimizing the distance cost. It
 solves the assignment problem within O(n\^3) time complexity. To boost
-its computing performance, Hungarian algorithm is implemented after
+its computing performance, the Hungarian algorithm is implemented after
 cutting original bipartite graph into subgraphs, by deleting vertices
 with distance greater than a reasonable maximum distance threshold.
 
@@ -390,7 +390,7 @@ A high-level workflow of HM object tracker is given in figure 6.
 
 <div align=center>Figure 6 Workflow of HM Object Tracker</div>
 
-1)  Construct tracked objects and transform them into world coordinates.
+1)  Construct the tracked objects and transform them into world coordinates.
 
 2)  Predict the states of existing track lists and match detections to
     them.
