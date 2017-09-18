@@ -21,6 +21,7 @@ APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")/../.." && pwd )"
 # the machine type, currently support x86_64, aarch64
 MACHINE_ARCH=$(uname -m)
 
+export RELEASE_DOCKER=1
 source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
