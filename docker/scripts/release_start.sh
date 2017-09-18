@@ -17,14 +17,15 @@
 ###############################################################################
 
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")../.." && pwd )"
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")/../.." && pwd )"
+# the machine type, currently support x86_64, aarch64
+MACHINE_ARCH=$(uname -m)
 
 source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
-echo "APOLLO_ROOT_DIR=$APOLLO_ROOT_DIR"
 
-VERSION=release-latest
+VERSION="release-${MACHINE_ARCH}-latest"
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
