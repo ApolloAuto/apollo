@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJ_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJ_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_
+#define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_
 
 #include <memory>
 #include <string>
@@ -31,10 +31,10 @@ struct TrackedObject {
   /* NEED TO NOTICE: All the states of track would be collected mainly based on
    * the states of tracked object. Thus, update tracked object's state when you
    * update the state of track !!! */
-  TrackedObject();
+  TrackedObject() = default;
   explicit TrackedObject(ObjectPtr obj_ptr);
-  TrackedObject(const TrackedObject& rhs);
-  TrackedObject& operator=(const TrackedObject& rhs);
+
+  // deep copy (copy point clonds)
   void clone(const TrackedObject& rhs);
 
   // cloud
@@ -68,4 +68,4 @@ typedef std::shared_ptr<const TrackedObject> TrackedObjectConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJ_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_TRACKED_OBJECT_H_
