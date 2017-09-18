@@ -21,7 +21,6 @@ APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")/../.." && pwd )"
 # the machine type, currently support x86_64, aarch64
 MACHINE_ARCH=$(uname -m)
 
-export RELEASE_DOCKER=1
 source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
@@ -34,6 +33,19 @@ if [ -z "${DOCKER_REPO}" ]; then
     DOCKER_REPO=apolloauto/apollo
 fi
 IMG=${DOCKER_REPO}:$VERSION
+
+DATA_DIR="${HOME}/data"
+if [ ! -e "${DATA_DIR}/log" ]; then
+  mkdir -p "${DATA_DIR}/log"
+fi
+
+if [ ! -e "${DATA_DIR}/bag" ]; then
+  mkdir -p "${DATA_DIR}/bag"
+fi
+
+if [ ! -e "${DATA_DIR}/core" ]; then
+  mkdir -p "${DATA_DIR}/core"
+fi
 
 function main() {
     docker pull "$IMG"
