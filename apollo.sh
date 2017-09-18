@@ -101,7 +101,7 @@ function build() {
   echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH..."
-  echo "$BUILD_TARGETS" | xargs bazel build --jobs="auto" $DEFINES -c $1
+  echo "$BUILD_TARGETS" | xargs bazel build $DEFINES -c $1
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
