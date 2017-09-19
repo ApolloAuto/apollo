@@ -327,6 +327,14 @@ bool QpSplinePathGenerator::AddConstraint(
 void QpSplinePathGenerator::AddKernel() {
   Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
 
+  if (qp_spline_path_config_.reference_line_weight() > 0.0) {
+    std::vector<double> ref_l(evaluated_s_.size(), 0.0);
+
+    DCHECK_EQ(evaluated_s_.size(), ref_l.size());
+    spline_kernel->AddReferenceLineKernelMatrix(
+        evaluated_s_, ref_l, qp_spline_path_config_.reference_line_weight());
+  }
+
   if (qp_spline_path_config_.regularization_weight() > 0.0) {
     spline_kernel->AddRegularization(
         qp_spline_path_config_.regularization_weight());
