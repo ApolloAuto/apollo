@@ -6,11 +6,11 @@ When the calibration is completed, the point cloud stitched during the calibrati
 
 Figure 1 shows the comparison between the stitched point clouds with good (a) and insufficient(b) calibration quality.
 
-![](/apollo/img/calibration/good_calib.png)
+![](images/good_calib.png)
 
 <center>(a)</center>
 
-![](/apollo/img/calibration/poor_calib.png)
+![](images/poor_calib.png)
 
 <center>(b)</center>
 
