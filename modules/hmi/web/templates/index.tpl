@@ -26,14 +26,18 @@
   .debug_item {
     overflow: auto;
     border: 0;
-    background-color: #03294b;
+    background: rgba(3, 41, 75, 0.4);
     margin-bottom: 0;
     font-size: 16px;
     padding: 0;
   }
 
+  .debug_item + .light {
+    background: rgba(3, 41, 75, 1);
+  }
+
   .debug_item .item_content {
-    margin: 15px 20px;
+    margin: 12px 20px;
   }
 
   .hmi_small_btn, .hmi_small_btn:hover, .hmi_small_btn:focus {
@@ -80,25 +84,17 @@
 
 <div class="row body_row">
   <div class="col-md-4 body_col">
-    {% include 'cards/quick_start_panel.tpl' %}
+    {% include 'cards/left_panel.tpl' %}
   </div>
   <div class="col-md-4 body_col">
-    {% include 'cards/modules_panel.tpl' %}
+    {% include 'cards/center_panel.tpl' %}
   </div>
   <div class="col-md-4 body_col">
-    {% include 'cards/hardware_panel.tpl' %}
+    {% include 'cards/right_panel.tpl' %}
   </div>
 </div>
 
 <script>
-  // Execute the tool command at background.
-  function exec_tool(tool_name) {
-    // The pattern is generated at template compiling time.
-    url_pattern = '{{ url_for('toolapi', tool_name='TOOL_NAME') }}';
-    url = url_pattern.replace('TOOL_NAME', tool_name);
-    $.get(url);
-  }
-
   function goto_dreamview() {
     javascript:window.location.port = 8888;
   }
@@ -108,23 +104,35 @@
     on_hardware_status_change(global_status);
     on_modules_status_change(global_status);
     on_tools_status_change(global_status);
+    on_config_status_change(global_status);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Client-server communication via socketio.
+  //////////////////////////////////////////////////////////////////////////////
+  socketio = undefined;
+  // Parameters are mapped to apollo::hmi::SocketIORequest.
+  function io_request(api, cmd_name, cmd_args=[]) {
+    socketio.emit('socketio_api',
+                  {api_name: api, command_name: cmd_name, args: cmd_args});
   }
 
   $(document).ready(function() {
     init_modules_panel();
 
     // Get current status once to init UI elements.
-    $.get('{{ url_for('runtimestatusapi') }}', function(json) {
-      on_status_change(json);
+    $.getJSON('{{ url_for('runtime_status') }}', function( status_json ) {
+      on_status_change(status_json);
     });
 
-    // Setup websocket to monitor runtime status change.
-    var socket = io.connect('http://' + document.domain + ':' + location.port + '/runtime_status');
-    socket.on('new_status', function(json) {
-      on_status_change(json);
+    // Setup socketio to communicate with HMI server.
+    socketio = io.connect(
+        '{{ protocol }}://' + document.domain + ':' + location.port + '/io_frontend');
+    socketio.on('current_status', function(status_json) {
+      on_status_change(status_json);
     });
   });
 </script>
 
-<script src="{{ url_for('static', filename='lib/socket.io/1.3.6/socket.io.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.4/socket.io.min.js"></script>
 {% endblock %}

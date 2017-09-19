@@ -19,8 +19,14 @@
 
 #include <vector>
 
-#include "modules/common/proto/path_point.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -47,15 +53,18 @@ class Planner {
    */
   virtual ~Planner() = default;
 
+  virtual apollo::common::Status Init(const PlanningConfig& config) = 0;
+
   /**
    * @brief Compute a trajectory for execution.
    * @param start_point The trajectory point where planning starts
-   * @param discretized_trajectory The computed trajectory
-   * @return true if planning succeeds; false otherwise.
+   * @param trajectory_pb The computed trajectory
+   * @return OK if planning succeeds; error otherwise.
    */
-  virtual bool Plan(
-      const apollo::common::TrajectoryPoint &start_point,
-      std::vector<apollo::common::TrajectoryPoint> *discretized_trajectory) = 0;
+
+  virtual apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ReferenceLineInfo* reference_line_info) = 0;
 };
 
 }  // namespace planning

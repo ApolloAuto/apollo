@@ -25,4 +25,4 @@ source "${DIR}/apollo_base.sh"
 
 set -x
 
-python modules/tools/realtime_plot/realtime_plot.py
+python modules/tools/realtime_plot/realtime_plot.py $@

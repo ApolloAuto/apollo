@@ -1,31 +1,35 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
-load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
+cc_proto_library(
+    name = "config_proto",
+    deps = [":config_proto_lib"],
+)
 
-py_proto_compile(
-    name = "config_proto_pylib",
-    protos = ["config.proto"],
+proto_library(
+    name = "config_proto_lib",
+    srcs = ["config.proto"],
 )
 
 cc_proto_library(
     name = "runtime_status_proto",
-    protos = ["runtime_status.proto"],
+    deps = [":runtime_status_proto_lib"],
 )
 
-py_proto_compile(
-    name = "runtime_status_proto_pylib",
-    protos = ["runtime_status.proto"],
+proto_library(
+    name = "runtime_status_proto_lib",
+    srcs = ["runtime_status.proto"],
 )
 
 cc_proto_library(
-    name = "ros_node_proto",
-    protos = ["ros_node.proto"],
-    with_grpc = True,
+    name = "hmi_message_proto",
+    deps = [":hmi_message_proto_lib"],
 )
 
-py_proto_compile(
-    name = "ros_node_proto_pylib",
-    protos = ["ros_node.proto"],
-    with_grpc = True,
+proto_library(
+    name = "hmi_message_proto_lib",
+    srcs = ["hmi_message.proto"],
+    deps = [
+        "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+    ],
 )

@@ -16,27 +16,39 @@
 # limitations under the License.
 ###############################################################################
 """Entry point of the server."""
+import ssl
 
-import gflags
 import google.apputils.app
 
+from config import Config
+from ros_bridge_api import RosBridgeApi
+from runtime_status import RuntimeStatus
 import handlers
-import runtime_status
-
-gflags.DEFINE_string('host', '0.0.0.0', 'Host of the HMI server.')
-gflags.DEFINE_integer('port', 8887, 'Port of the HMI server.')
-gflags.DEFINE_string(
-    'conf', './conf/config.pb.txt',
-    'HMI config file, which should be text-formatted config proto.')
 
 
 def main(argv):
     """App entry point."""
-    runtime_status.RuntimeStatus.reset(True)
-
-    FLAGS = gflags.FLAGS
+    conf = Config.get_pb()
+    # Module initialization.
+    RuntimeStatus.reset(True)
+    RosBridgeApi.init_ros()
     # Start web server.
-    return handlers.socketio.run(handlers.app, host=FLAGS.host, port=FLAGS.port)
+    kwargs = {}
+    https = conf.server.https
+    if https.enabled:
+        # See https://docs.python.org/2/library/ssl.html#ssl.wrap_socket
+        kwargs = {
+            'server_side': True,
+            'ssl_version': ssl.PROTOCOL_TLSv1,
+            'keyfile': Config.get_realpath(https.server_key),
+            'certfile': Config.get_realpath(https.server_cert)
+        }
+        if https.client_cert_required:
+            kwargs['cert_reqs'] = ssl.CERT_REQUIRED
+    return handlers.socketio.run(handlers.app,
+                                 host=conf.server.binding_ip,
+                                 port=conf.server.port,
+                                 **kwargs)
 
 
 if __name__ == '__main__':

@@ -21,8 +21,8 @@
 namespace apollo {
 namespace canbus {
 
-using ::apollo::common::ErrorCode;
-using ::apollo::control::ControlCommand;
+using common::ErrorCode;
+using control::ControlCommand;
 
 Chassis::DrivingMode VehicleController::driving_mode() {
   std::lock_guard<std::mutex> lock(mode_mutex_);
@@ -106,12 +106,12 @@ ErrorCode VehicleController::Update(const ControlCommand &command) {
           << control_command.pad_msg().ShortDebugString();
     Chassis::DrivingMode mode = Chassis::COMPLETE_MANUAL;
     switch (control_command.pad_msg().action()) {
-      case ::apollo::control::DrivingAction::START: {
+      case control::DrivingAction::START: {
         mode = params_.driving_mode();
         break;
       }
-      case ::apollo::control::DrivingAction::STOP:
-      case ::apollo::control::DrivingAction::RESET: {
+      case control::DrivingAction::STOP:
+      case control::DrivingAction::RESET: {
         mode = Chassis::COMPLETE_MANUAL;
         break;
       }

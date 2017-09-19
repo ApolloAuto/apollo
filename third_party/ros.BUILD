@@ -16,6 +16,11 @@ cc_library(
         "lib/librostime.so",
         "lib/libxmlrpcpp.so",
         "lib/librosconsole_log4cxx.so",
+        "lib/libtf2.so",
+        "lib/libtf2_ros.so",
+        "lib/libeigen_conversions.so",
+        "lib/liborocos-kdl.so.1.3",
+        "lib/libactionlib.so",
     ],
     hdrs = glob([
         "include/*/*.h",

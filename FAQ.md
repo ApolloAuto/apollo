@@ -19,7 +19,7 @@ Many build problems are related to the environment settings.
 1. Run the script to get your environment: `bash scripts/env.sh >& env.txt` 
 2. Provide the content of env.txt in your post.
 
-## Which ports need be white list to run Apollo in public cloud instance?
+## Which ports must be whitelisted to run Apollo in a public cloud instance?
 Use these ports for HMI and Dreamview:
 - 8887: HMI
 - 8888: Dreamview

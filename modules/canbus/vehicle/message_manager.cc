@@ -25,9 +25,9 @@
 namespace apollo {
 namespace canbus {
 
-using Clock = ::apollo::common::time::Clock;
+using Clock = common::time::Clock;
 using micros = std::chrono::microseconds;
-using ::apollo::common::ErrorCode;
+using common::ErrorCode;
 
 ProtocolData *MessageManager::GetMutableProtocolDataById(
     const uint32_t message_id) {

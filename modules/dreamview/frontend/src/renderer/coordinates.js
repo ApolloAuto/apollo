@@ -16,21 +16,28 @@ export default class Coordinates {
         };
     }
 
-    applyOffset(point, offset) {
+    applyOffset(point, reverse = false) {
         if (this.offset === null) {
             console.error("Offset is not set.");
             return null;
+        } else if (isNaN(this.offset.x) || isNaN(this.offset.y)) {
+            console.error("Offset contains NaN!");
+            return null;
         } else if (isNaN(point.x) || isNaN(point.y)) {
-            // TODO Add warning.
+            console.warn("Point contains NaN!");
             return null;
         } else if (!isNaN(point.z)) {
             return new THREE.Vector3(
-                point.x - this.offset.x,
-                point.y - this.offset.y,
+                reverse ? point.x + this.offset.x : point.x - this.offset.x,
+                reverse ? point.y + this.offset.y : point.y - this.offset.y,
                 point.z);
         }
 
-        return new THREE.Vector2(point.x - this.offset.x,
-                                 point.y - this.offset.y);
+        return new THREE.Vector2(reverse ? point.x + this.offset.x : point.x - this.offset.x,
+                                 reverse ? point.y + this.offset.y : point.y - this.offset.y);
+    }
+
+    applyOffsetToArray(points) {
+        return points.map(point => this.applyOffset(point));
     }
 }

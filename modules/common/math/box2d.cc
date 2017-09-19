@@ -18,10 +18,10 @@
 
 #include <algorithm>
 #include <cmath>
-#include <sstream>
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
@@ -303,12 +303,10 @@ void Box2d::RotateFromCenter(const double rotate_angle) {
 void Box2d::Shift(const Vec2d &shift_vec) { center_ += shift_vec; }
 
 std::string Box2d::DebugString() const {
-  std::ostringstream sout;
-  sout << "box2d ( center = " << center_.DebugString()
-       << "  heading = " << heading_ << "  length = " << length_
-       << "  width = " << width_ << " )";
-  sout.flush();
-  return sout.str();
+  return util::StrCat(
+      "box2d ( center = ", center_.DebugString(),
+      "  heading = ", heading_, "  length = ", length_,
+      "  width = ", width_, " )");
 }
 
 }  // namespace math

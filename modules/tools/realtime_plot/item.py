@@ -144,11 +144,5 @@ class Item(object):
         for polygon in self.ax.patches:
             self.ax.draw_artist(polygon)
 
-        if self.planningavailable:
-            self.ax.draw_artist(self.current_line)
-
-        if self.targethistidx != -1:
-            self.ax.draw_artist(self.ax.lines[self.targethistidx])
-
-        if self.histidx != -1:
-            self.ax.draw_artist(self.ax.lines[self.histidx])
+        for line in self.ax.lines:
+            self.ax.draw_artist(line)

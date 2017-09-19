@@ -21,15 +21,18 @@
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
 namespace control {
 
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::time::Clock;
-using ::apollo::common::vehicle_state::VehicleState;
+using apollo::common::TrajectoryPoint;
+using apollo::common::time::Clock;
+using apollo::common::VehicleState;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 const double GRA_ACC = 9.8;
 
@@ -100,9 +103,7 @@ Status LonController::Init(const ControlConf *control_conf) {
   station_pid_controller_.Init(lon_controller_conf.station_pid_conf());
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
 
-  SetDigitalFilterAcceleration(lon_controller_conf);
-  SetDigitalFilterThrottle(lon_controller_conf);
-  SetDigitalFilterBrake(lon_controller_conf);
+  SetDigitalFilterPitchAngle(lon_controller_conf);
 
   LoadControlCalibrationTable(lon_controller_conf);
   controller_initialized_ = true;
@@ -110,26 +111,12 @@ Status LonController::Init(const ControlConf *control_conf) {
   return Status::OK();
 }
 
-void LonController::SetDigitalFilterAcceleration(
+void LonController::SetDigitalFilterPitchAngle(
     const LonControllerConf &lon_controller_conf) {
   double cutoff_freq =
-      lon_controller_conf.acceleration_filter_conf().cutoff_freq();
+      lon_controller_conf.pitch_angle_filter_conf().cutoff_freq();
   double ts = lon_controller_conf.ts();
-  SetDigitalFilter(ts, cutoff_freq, &digital_filter_acceleration_);
-}
-
-void LonController::SetDigitalFilterThrottle(
-    const LonControllerConf &lon_controller_conf) {
-  double cutoff_freq = lon_controller_conf.throttle_filter_conf().cutoff_freq();
-  double ts = lon_controller_conf.ts();
-  SetDigitalFilter(ts, cutoff_freq, &digital_filter_throttle_);
-}
-
-void LonController::SetDigitalFilterBrake(
-    const LonControllerConf &lon_controller_conf) {
-  double cutoff_freq = lon_controller_conf.brake_filter_conf().cutoff_freq();
-  double ts = lon_controller_conf.ts();
-  SetDigitalFilter(ts, cutoff_freq, &digital_filter_brake_);
+  SetDigitalFilter(ts, cutoff_freq, &digital_filter_pitch_angle_);
 }
 
 void LonController::LoadControlCalibrationTable(
@@ -150,13 +137,12 @@ void LonController::LoadControlCalibrationTable(
 }
 
 Status LonController::ComputeControlCommand(
-    const ::apollo::localization::LocalizationEstimate *localization,
-    const ::apollo::canbus::Chassis *chassis,
-    const ::apollo::planning::ADCTrajectory *planning_published_trajectory,
-    ::apollo::control::ControlCommand *cmd) {
+    const localization::LocalizationEstimate *localization,
+    const canbus::Chassis *chassis,
+    const planning::ADCTrajectory *planning_published_trajectory,
+    control::ControlCommand *cmd) {
   localization_ = localization;
   chassis_ = chassis;
-  vehicle_state_ = std::move(VehicleState(localization, chassis));
 
   trajectory_message_ = planning_published_trajectory;
   if (!control_interpolation_) {
@@ -182,12 +168,12 @@ Status LonController::ComputeControlCommand(
   double preview_time = lon_controller_conf.preview_window() * ts;
 
   if (preview_time < 0.0) {
-    AERROR << "Preview time set as: " << preview_time << " less than 0";
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
-                  "Invalid preview time:" + std::to_string(preview_time));
+    const auto error_msg = apollo::common::util::StrCat(
+        "Preview time set as: ", preview_time, " less than 0");
+    AERROR << error_msg;
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
-  ComputeLongitudinalErrors(vehicle_state_, trajectory_analyzer_.get(),
-                            preview_time, debug);
+  ComputeLongitudinalErrors(trajectory_analyzer_.get(), preview_time, debug);
 
   double station_error_limit = lon_controller_conf.station_error_limit();
   double station_error_limited = 0.0;
@@ -216,7 +202,8 @@ Status LonController::ComputeControlCommand(
       speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
-  if (vehicle_state_.linear_velocity() <= lon_controller_conf.switch_speed()) {
+  if (VehicleState::instance()->linear_velocity() <=
+      lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
     acceleration_cmd_closeloop =
         speed_pid_controller_.Control(speed_controller_input_limited, ts);
@@ -227,10 +214,10 @@ Status LonController::ComputeControlCommand(
   }
 
   double acceleration_cmd =
-      acceleration_cmd_closeloop + debug->preview_acceleration_reference() + \
-      digital_filter_acceleration_.Filter(GRA_ACC \
-              * std::sin(vehicle_state_.pitch()));
-      debug->set_is_full_stop(false);
+      acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
+      digital_filter_pitch_angle_.Filter(
+          GRA_ACC * std::sin(VehicleState::instance()->pitch()));
+  debug->set_is_full_stop(false);
   if (std::abs(debug->preview_acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
       std::abs(debug->preview_speed_reference()) <=
@@ -289,10 +276,10 @@ Status LonController::ComputeControlCommand(
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
 
-  if (std::abs(vehicle_state_.linear_velocity()) <=
+  if (std::abs(VehicleState::instance()->linear_velocity()) <=
           FLAGS_max_abs_speed_when_stopped ||
       chassis->gear_location() == trajectory_message_->gear() ||
-      chassis->gear_location() == ::apollo::canbus::Chassis::GEAR_NEUTRAL) {
+      chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(trajectory_message_->gear());
   } else {
     cmd->set_gear_location(chassis->gear_location());
@@ -310,7 +297,6 @@ Status LonController::Reset() {
 std::string LonController::Name() const { return name_; }
 
 void LonController::ComputeLongitudinalErrors(
-    const VehicleState &vehicle_state,
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
     SimpleLongitudinalDebug *debug) {
   // the decomposed vehicle motion onto Frenet frame
@@ -324,14 +310,15 @@ void LonController::ComputeLongitudinalErrors(
   double d_dot_matched = 0.0;
 
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      vehicle_state.x(), vehicle_state.y());
+      VehicleState::instance()->x(), VehicleState::instance()->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      vehicle_state.x(), vehicle_state.y(), vehicle_state.heading(),
-      vehicle_state.linear_velocity(), matched_point, &s_matched,
+      VehicleState::instance()->x(), VehicleState::instance()->y(),
+      VehicleState::instance()->heading(),
+      VehicleState::instance()->linear_velocity(), matched_point, &s_matched,
       &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = apollo::common::time::ToSecond(Clock::Now());
+  double current_control_time = Clock::NowInSecond();
   double preview_control_time = current_control_time + preview_time;
 
   TrajectoryPoint reference_point =
@@ -344,12 +331,12 @@ void LonController::ComputeLongitudinalErrors(
   ADEBUG << "matched point:" << matched_point.DebugString();
   ADEBUG << "reference point:" << reference_point.DebugString();
   ADEBUG << "preview point:" << preview_point.DebugString();
-  debug->set_station_error(reference_point.s() - s_matched);
+  debug->set_station_error(reference_point.path_point().s() - s_matched);
   debug->set_speed_error(reference_point.v() - s_dot_matched);
 
-  debug->set_station_reference(reference_point.s());
+  debug->set_station_reference(reference_point.path_point().s());
   debug->set_speed_reference(reference_point.v());
-  debug->set_preview_station_error(preview_point.s() - s_matched);
+  debug->set_preview_station_error(preview_point.path_point().s() - s_matched);
   debug->set_preview_speed_error(preview_point.v() - s_dot_matched);
   debug->set_preview_speed_reference(preview_point.v());
   debug->set_preview_acceleration_reference(preview_point.a());

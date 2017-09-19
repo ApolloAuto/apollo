@@ -17,39 +17,54 @@
 #include "modules/hmi/utils/hmi_status_helper.h"
 
 #include "gflags/gflags.h"
+#include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
+#include "modules/hmi/proto/config.pb.h"
 #include "modules/hmi/utils/restful_client.h"
 
-DEFINE_string(hmi_runtime_status_api,
-              "http://127.0.0.1:8887/runtime_status_api",
-              "Address of HMI runtime status restful api.");
+DEFINE_string(hmi_config_file, "modules/hmi/conf/config.pb.txt",
+              "HMI config file, which should be text-formatted config proto.");
 
 namespace apollo {
 namespace hmi {
 namespace {
 
-template <class T>
-void VectorToRepeatedPtrField(const std::vector<T> &src,
-                              google::protobuf::RepeatedPtrField<T> *dst) {
-  *dst = google::protobuf::RepeatedPtrField<T>(src.begin(), src.end());
+RestfulClient* InitRestfulClient() {
+  Config conf_pb;
+  if (!apollo::common::util::GetProtoFromASCIIFile(FLAGS_hmi_config_file,
+                                                   &conf_pb)) {
+    return nullptr;
+  }
+  const auto& server = conf_pb.server();
+  const auto url = apollo::common::util::StrCat(
+      server.https().enabled() ? "https://" : "http://",
+      "127.0.0.1:", server.port(), "/runtime_status");
+  return new RestfulClient(url);
+}
+
+void ReportRuntimeStatus(const RuntimeStatus& runtime_status) {
+  static auto* client = InitRestfulClient();
+  if (client) {
+    client->Post(runtime_status);
+  } else {
+    AERROR << "Cannot connect to HMI server.";
+  }
 }
 
 }  // namespace
 
 void HMIStatusHelper::ReportHardwareStatus(
     const std::vector<HardwareStatus> &hardware_status) {
-  auto runtime_status = RuntimeStatus();
-  VectorToRepeatedPtrField(hardware_status, runtime_status.mutable_hardware());
-
-  RestfulClient client(FLAGS_hmi_runtime_status_api);
-  client.Post(runtime_status);
+  RuntimeStatus runtime_status;
+  *runtime_status.mutable_hardware() = {hardware_status.begin(),
+                                        hardware_status.end()};
+  ReportRuntimeStatus(runtime_status);
 }
 
 void HMIStatusHelper::ReportModuleStatus(const ModuleStatus &module_status) {
-  auto runtime_status = RuntimeStatus();
+  RuntimeStatus runtime_status;
   *runtime_status.add_modules() = module_status;
-
-  RestfulClient client(FLAGS_hmi_runtime_status_api);
-  client.Post(runtime_status);
+  ReportRuntimeStatus(runtime_status);
 }
 
 }  // namespace hmi

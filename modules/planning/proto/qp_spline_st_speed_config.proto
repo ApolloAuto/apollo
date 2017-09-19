@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/st_boundary_config.proto";
+
+message QpSplineStSpeedConfig {
+  optional double total_path_length = 1 [ default = 80.0 ];
+  optional double total_time = 2 [ default = 8.0 ];
+  optional double output_time_resolution = 3 [ default = 0.05 ];
+  optional uint32 number_of_discrete_graph_s = 4 [ default = 80 ];
+  optional uint32 number_of_discrete_graph_t = 5 [ default = 10 ];
+  optional uint32 number_of_evaluated_graph_t = 6 [ default = 10 ];
+  optional uint32 spline_order = 7 [ default = 6 ];
+  optional double speed_kernel_weight = 8 [ default = 0.0 ];
+  optional double accel_kernel_weight = 9 [ default = 0.0 ];
+  optional double jerk_kernel_weight = 10 [ default = 1000.0 ];
+  optional double follow_weight = 11 [ default = 1.0 ];
+  optional double stop_weight = 12 [ default = 1.0 ];
+  optional double cruise_weight = 13 [ default = 1.0 ];
+  optional double max_speed = 14 [ default = 20.0 ];
+  optional double preferred_max_acceleration = 15 [ default = 1.2 ];
+  optional double preferred_min_deceleration = 16 [ default = -1.8 ];
+  optional double max_acceleration = 17 [ default = 2.0 ];
+  optional double min_deceleration = 18 [ default = -4.5 ];
+  optional double follow_drag_distance = 19 [ default = 15.0 ];
+  optional apollo.planning.StBoundaryConfig st_boundary_config = 20;
+}

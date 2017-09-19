@@ -95,6 +95,7 @@ function check_agreement() {
 function check_in_docker() {
   if [ -f /.dockerenv ]; then
       APOLLO_IN_DOCKER=true
+      check_agreement
   else
       APOLLO_IN_DOCKER=false
   fi
@@ -105,26 +106,44 @@ function set_lib_path() {
   if [ "$RELEASE_DOCKER" == 1 ];then
       source /apollo/ros/setup.bash
       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib
-      export PYTHONPATH=/apollo/lib:${PYTHONPATH}
+      PY_LIB_PATH=/apollo/lib
+      PY_TOOLS_PATH=/apollo/modules/tools
   else
-      if [ -e "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash" ]; then
-         source "${APOLLO_ROOT_DIR}/bazel-apollo/external/ros/setup.bash"
+      local MD5=`echo -n $APOLLO_ROOT_DIR | md5sum | cut -d' ' -f1`
+      local ROS_SETUP="${HOME}/.cache/bazel/_bazel_${USER}/${MD5}/external/ros/setup.bash"
+      if [ -e "${ROS_SETUP}" ]; then
+         source "${ROS_SETUP}"
       fi
-      export PYTHONPATH=${APOLLO_ROOT_DIR}/bazel-genfiles:${PYTHONPATH}
+      PY_LIB_PATH=${APOLLO_ROOT_DIR}/py_proto
+      PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib
+  fi
+  export PYTHONPATH=${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
+  if [ -e /usr/local/cuda-8.0/ ];then
+      export PATH=/usr/local/cuda-8.0/bin:$PATH
+      export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
+      export C_INCLUDE_PATH=/usr/local/cuda-8.0/include:$C_INCLUDE_PATH
+      export CPLUS_INCLUDE_PATH=/usr/local/cuda-8.0/include:$CPLUS_INCLUDE_PATH
   fi
 }
 
 function create_data_dir() {
-  if [ ! -e "${APOLLO_ROOT_DIR}/data/log" ]; then
-      mkdir -p "${APOLLO_ROOT_DIR}/data/log"
+  local DATA_DIR=""
+  if [ "$RELEASE_DOCKER" != "1" ];then
+      DATA_DIR="${APOLLO_ROOT_DIR}/data"
+  else
+      DATA_DIR="${HOME}/data"
+  fi
+  if [ ! -e "${DATA_DIR}/log" ]; then
+      mkdir -p "${DATA_DIR}/log"
   fi
 
-  if [ ! -e "${APOLLO_ROOT_DIR}/data/bag" ]; then
-      mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
+  if [ ! -e "${DATA_DIR}/bag" ]; then
+      mkdir -p "${DATA_DIR}/bag"
   fi
 
-  if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
-      mkdir -p "${APOLLO_ROOT_DIR}/data/core"
+  if [ ! -e "${DATA_DIR}/core" ]; then
+      mkdir -p "${DATA_DIR}/core"
   fi
 }
 
@@ -134,6 +153,43 @@ function determine_bin_prefix() {
       APOLLO_BIN_PREFIX="${APOLLO_ROOT_DIR}/bazel-bin"
   fi
   export APOLLO_BIN_PREFIX
+}
+
+function find_device() {
+    # ${1} = device pattern
+    local device_list=$(find /dev -name "${1}")
+    if [ -z "${device_list}" ]; then
+        warning "Failed to find device with pattern \"${1}\" ..."
+    else
+        local devices=""
+        for device in $(find /dev -name "${1}"); do
+            ok "Found device: ${device}."
+            devices="${devices} --device ${device}:${device}"
+        done
+        echo "${devices}"
+    fi
+}
+
+function setup_device() {
+    # setup CAN device
+    if [ ! -e /dev/can0 ]; then
+        sudo mknod --mode=a+rw /dev/can0 c 52 0
+    fi
+    # setup nvidia device
+    sudo /sbin/modprobe nvidia
+    sudo /sbin/modprobe nvidia-uvm
+    if [ ! -e /dev/nvidia0 ];then
+        sudo mknod -m 666 /dev/nvidia0 c 195 0
+    fi
+    if [ ! -e /dev/nvidiactl ];then
+        sudo mknod -m 666 /dev/nvidiactl c 195 255
+    fi
+    if [ ! -e /dev/nvidia-uvm ];then
+        sudo mknod -m 666 /dev/nvidia-uvm c 243 0
+    fi
+    if [ ! -e /dev/nvidia-uvm-tools ];then
+        sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
+    fi
 }
 
 function is_stopped() {
@@ -148,12 +204,15 @@ function is_stopped() {
 
 function start() {
     MODULE=$1
+    shift
+
     LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
     is_stopped "${MODULE}"
     if [ $? -eq 1 ]; then
         eval "nohup ${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE} \
             --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
-            --log_dir=${APOLLO_ROOT_DIR}/data/log  </dev/null >${LOG} 2>&1 &"
+            --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
+        sleep 0.5
         is_stopped "${MODULE}"
         if [ $? -eq 0 ]; then
             echo "Launched module ${MODULE}."
@@ -170,9 +229,11 @@ function start() {
 
 function start_fe() {
     MODULE=$1
+    shift
+
     eval "${APOLLO_BIN_PREFIX}/modules/${MODULE}/${MODULE} \
         --flagfile=modules/${MODULE}/conf/${MODULE}.conf \
-        --log_dir=${APOLLO_ROOT_DIR}/data/log"
+        --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
 }
 
 function stop() {
@@ -198,26 +259,28 @@ function help() {
 
 # run command_name module_name
 function run() {
-    case $1 in
+    local module=$1
+    local cmd=$2
+    shift 2
+    case $cmd in
         start)
-            start "$2"
+            start $module "$@"
             ;;
         start_fe)
-            start_fe "$2"
+            start_fe $module "$@"
             ;;
         stop)
-            stop "$2"
+            stop $module
             ;;
         help)
             help
             ;;
         *)
-            start "$2"
+            start $module "$@"
             ;;
     esac
 }
 
-check_agreement
 check_in_docker
 create_data_dir
 set_lib_path
