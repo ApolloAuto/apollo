@@ -1,61 +1,61 @@
-#Module introduction
-This module is to collect the sensor data and vehicle parameter in the environment of ROS of PX2.
+#Sensor Data Module
+
+Use the sensor data module to collect the sensor data and vehicle parameters in the ROS of PX2 environment.
 
 #Prerequisites
 1.	Ubuntu 16.04 LTS
 2.	ROS Kinetic – recommend ros-kinetic-desktop-full.
 3.	Px2 driveworks0.1 version
 
-#Building and Installing the Module
-Building and installing this module is accomplished by utilizing the ROS  catkin tool.
+- [ ] **FIRST:**  Ubuntu 16.04 LTS2 *must* be installed.
 
-First, we should install ROS. It is assumed that ROS packages will be installed at `~/ros`. For convenience, we add the following to the `~/.bash_profile` to use the catkin tool in the new bash shell:
+       Apollo recommends using ROS Kinetic (ros-kinetic-desktop-full.3) with Px2 driveworks, version 0.1 to build and install the module using the ROS catkin tool.
 
-```
-	if [ -f /opt/ros/kinetic/setup.bash ]; then
-       source /opt/ros/kinetic/setup.bash
-    fi
-```
+- [ ] Next, Install ROS.
 
-Next, a catkin workspace should be created to build and install that code. For example, we could create `~/catkin_ws`, and then:
+      It is assumed that ROS packages will be installed at `~/ros`. Add the following to the `~/.bash_profile` to use the catkin tool in the new bash shell:
 
-```
-	cd ~/catkin_ws
-	mkdir src
-	cd src
-```
+      ```
+      if [ -f /opt/ros/kinetic/setup.bash ]; then source /opt/ros/kinetic/setup.bash
+      ```
 
-Then , the source code could be gitcloned to the `~/catkin_ws/src`.
+- [ ] Create a catkin workspace to build and install that code.
 
-Finally , the source code could be complied in the `~/catkin_ws` with the `catkin_make`.
+    For example , create `~/catkin_ws` , and then:
 
-All the exe and lib file will be generated in the  `~/catkin_ws/devel`
-For convenince, we add the following to our `~/.bash_profile` to enter the module environment in the bash shell.
+      ```
+      $ cd ~/catkin_ws	$ mkdir src	$ cd src
+      ```
+
+- [ ] gitclone the source code to the `~/catkin_ws/src`.
 
 
-```
-	source ~/catkin_ws/devel/setup.bash
-```
+- [ ] Compile the source code in the `~/catkin_ws` with the `catkin_make`.  All the `.exe` and `.lib` files will be generated in the  `~/catkin_ws/dev`.
 
-Attention：
+- [ ] Add the following to your `~/.bash_profile` to enter the module environment in the bash shell:
 
-sometimes erros will appear saying that "msg not found". In this case , the msg module could be complied first, and then other modules could be complied afterwards.
+  ```
+  source ~/catkin_ws/devel/setup.bash
+  ```
+
+  **NOTE：**
+  An error may appear saying that *msg not found*. If this occurs , compile the `msg` module first, and then compile the rest of the modules.
+
+##Module usage:
+
+To test:
+
+- [ ] Open a fresh bash shell.
+
+- [ ] Start up a ROS core: `$ roscore` .
+
+- [ ] Open a second bash shell and initialize the camera node using the following:
+
+      ```
+      $ rosrun px2_camera_image px2_camera_node
+      ```
 
 
+- [ ] Open a third bash shell, and then open the `rviz` to visualize the data coming from the camera.
 
-#Module usage:
-To test , a fresh bash shell could be opened to start up a ROS core:
-
-```
-	roscore
-```
-And open another bash shell and initialize the camera node:
-
-```
-	rosrun px2_camera_image px2_camera_node
-```
-
- Finally open another bash shell and open the rviz to visualize the data coming from the camera.
-
-#LICENSE
-Please see the license file.
+**LICENSE:**  Please see the License file.
