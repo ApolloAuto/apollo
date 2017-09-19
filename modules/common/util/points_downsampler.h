@@ -44,8 +44,8 @@ namespace util {
  * point.
  */
 template <typename PointType>
-double GetPathAngle(const std::vector<PointType> &points, const int start,
-                    const int end) {
+double GetPathAngle(const std::vector<PointType> &points, const size_t start,
+                    const size_t end) {
   if (start >= points.size() - 1 || end >= points.size() - 1) {
     AERROR << "Input indices are out of the range of the points vector: "
            << "should be less than vector size - 1.";
@@ -86,8 +86,8 @@ std::vector<int> DownsampleByAngle(const std::vector<PointType> &points,
   }
   sampled_indices.push_back(0);
   if (points.size() > 1) {
-    int start = 0;
-    int end = 1;
+    size_t start = 0;
+    size_t end = 1;
     double accum_degree = 0.0;
     while (end < points.size() - 1) {
       double angle = GetPathAngle(points, start, end);
@@ -123,7 +123,7 @@ std::vector<int> DownsampleByDistance(const std::vector<PointType> &points,
   std::vector<int> sampled_indices;
   if (points.size() <= 4) {
     // No need to downsample if there are not too many points.
-    for (int i = 0; i < points.size(); ++i) {
+    for (size_t i = 0; i < points.size(); ++i) {
       sampled_indices.push_back(i);
     }
     return sampled_indices;
