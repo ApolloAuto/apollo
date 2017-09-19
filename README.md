@@ -56,10 +56,10 @@ to load Dreamview UI.
 ```
 # in a different terminal, in the apollo directory
 bash docker/scripts/dev_into.sh # jump into the docker container
-rosbag play -l ./docs/demo_guide/demo.bag
+rosbag play -l ./docs/demo_guide/demo_1.5.bag
 ```
 Dreamview should show a running vehicle with trajectory now.
-![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory.png)
+![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_1.5.png)
 
 Advanced users who wish to build outside this Docker container can refer
 to the corresponding Docker specification file (`./docker/dev.dockerfile`).
