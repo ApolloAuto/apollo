@@ -189,7 +189,7 @@ function release() {
 
   # ros
   cp -Lr bazel-apollo/external/ros $ROOT_DIR/
-  rm ${ROOT_DIR}/ros/*.tar.gz
+  rm -f ${ROOT_DIR}/ros/*.tar.gz
 
   # scripts
   cp -r scripts $ROOT_DIR
