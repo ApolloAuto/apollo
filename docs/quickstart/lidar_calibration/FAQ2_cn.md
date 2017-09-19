@@ -4,10 +4,16 @@
 
 ![](images/good_calib.png)
 
-<center>(a)</center>
+<p align="center">
+(a)
+</p>
 
 ![](images/poor_calib.png)
 
-<center>(b)</center>
+<p align="center">
+(b)
+</p>
 
-<center>图1.(a)高质量的标定结果 (b)质量较差的标定结果。</center>
+<p align="center">
+图1. (a) 高质量的标定结果 (b) 质量较差的标定结果。
+</p>

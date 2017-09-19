@@ -7,11 +7,15 @@ When the calibration is completed, the point cloud stitched during the calibrati
 Figure 1 shows the comparison between the stitched point clouds with good (a) and insufficient(b) calibration quality.
 
 ![](images/good_calib.png)
-
-<center>(a)</center>
+<p align="center">
+(a)
+</p>
 
 ![](images/poor_calib.png)
+<p align="center">
+(b)
+</p>
 
-<center>(b)</center>
-
-<center>Figure 1 (a) a high quality calibration result (b) an insufficient one.</center>
+<p align="center">
+Figure 1. (a) a high quality calibration result (b) an insufficient one.
+</p>
