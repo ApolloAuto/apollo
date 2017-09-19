@@ -46,11 +46,11 @@ An ideal calibration field requires no tall buildings around the calibration are
 
 ![](lidar_calibration/images/calibration/trajectory.png)
 
-<center>Figure 1. The trajectory  for calibration.</center>
+<p align="center">Figure 1. The trajectory  for calibration.</p>
 
 ![](lidar_calibration/images/calibration/field.png)
 
-<center>Figure 2. Calibration field.</center>
+<p align="center">Figure 2. Calibration field.</p>
 
 ### Recording Calibration Data 
 
@@ -98,11 +98,11 @@ After recording the calibration data, please login to the [calibration service p
 If validation fails, the corresponding error message is prompted. See the Error Description section below for details.
 
 ![](lidar_calibration/images/calib_valid_en.png)
-<center>Figure 3. Calibration data verification.</center>
+<p align="center">Figure 3. Calibration data verification.</p>
 	
 6.After data validation, the calibration process begins, as shown in Figure 4.  A detailed calibration progress page is displayed to users. Depending on the size and quality of the data, the overall calibration time lasts about 10-30 minutes. You can enter the page at any time to see the progress of the current task.
 ![](lidar_calibration/images/calib_progress_en.png)
-<center>Figure 4. Calibration progress page.</center>
+<p align="center">Figure 4. Calibration progress page.</p>
 	
 7.When calibration succeeds, click the **View detail** button to display a stitched point cloud. You can confirm the quality verification by checking the sharpness of the point cloud. If you are satisfied with the calibration quality, you can click **Confirm** to keep the result and download the calibration results by clicking **Download**. This fulfills the completion of the calibration process. 
 
