@@ -23,6 +23,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
@@ -83,6 +84,8 @@ class L3Perception : public apollo::common::ApolloApp {
   apollo::drivers::Mobileye mobileye_;
   apollo::drivers::DelphiESR delphi_esr_;
   apollo::localization::LocalizationEstimate localization_;
+  std::mutex l3_mutex_;
+
 };
 
 }  // namespace l3_perception
