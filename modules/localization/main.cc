@@ -17,4 +17,4 @@
 #include "modules/common/apollo_app.h"
 #include "modules/localization/localization.h"
 
-APOLLO_MAIN(::apollo::localization::Localization)
+APOLLO_MAIN(apollo::localization::Localization)

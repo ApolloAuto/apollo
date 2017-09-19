@@ -20,7 +20,6 @@
 #include <utility>
 
 #include "gtest/gtest.h"
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/control/common/control_gflags.h"
@@ -41,16 +40,16 @@ TEST_F(ControlTest, Name) { EXPECT_EQ("control", control_.Name()); }
 
 TEST_F(ControlTest, Init) {
   FLAGS_control_conf_file = "";
-  FLAGS_adapter_config_path = "";
-  auto result =
-      Status(ErrorCode::CONTROL_INIT_ERROR,
-             "Unable to load control conf file: " + FLAGS_control_conf_file);
-  EXPECT_EQ(result, control_.Init());
+  auto result = common::Status(
+      common::ErrorCode::CONTROL_INIT_ERROR,
+      "Unable to load control conf file: " + FLAGS_control_conf_file);
+  EXPECT_DEATH(control_.Init(), "Unable to load control conf file");
   FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
+  FLAGS_adapter_config_filename = "";
   EXPECT_DEATH(control_.Init(), "Unable to parse adapter config file " +
-                                    FLAGS_adapter_config_path);
-  FLAGS_adapter_config_path = "modules/control/testdata/conf/adapter.conf";
-  EXPECT_EQ(Status::OK(), control_.Init());
+                                    FLAGS_adapter_config_filename);
+  FLAGS_adapter_config_filename = "modules/control/testdata/conf/adapter.conf";
+  EXPECT_EQ(common::Status::OK(), control_.Init());
 }
 
 }  // namespace control

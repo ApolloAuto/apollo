@@ -22,11 +22,21 @@
 #define MODULES_COMMON_LOG_H_
 
 #include "glog/logging.h"
+#include "glog/raw_logging.h"
 
 #define ADEBUG VLOG(4) << "[DEBUG] "
-#define AINFO VLOG(3) << "[INFO] "
+#define AINFO LOG(INFO)
 #define AWARN LOG(WARNING)
 #define AERROR LOG(ERROR)
 #define AFATAL LOG(FATAL)
+
+// LOG_IF
+#define AINFO_IF(cond) LOG_IF(INFO, cond)
+#define AERROR_IF(cond) LOG_IF(ERROR, cond)
+
+// LOG_EVERY_N
+#define AINFO_EVERY(freq) LOG_EVERY_N(INFO, freq)
+#define AWARN_EVERY(freq) LOG_EVERY_N(WARNING, freq)
+#define AERROR_EVERY(freq) LOG_EVERY_N(ERROR, freq)
 
 #endif  // MODULES_COMMON_LOG_H_

@@ -49,20 +49,23 @@ class DataParser {
  private:
   void raw_data_callback(const std_msgs::String::ConstPtr &msg);
   void dispatch_message(Parser::MessageType type, MessagePtr message);
+  void publish_ins_stat(const MessagePtr message);
   void publish_odometry_pb_message(const MessagePtr message);
   void publish_corrimu_pb_message(const MessagePtr message);
-  void check_ins_status(::apollo::drivers::gnss::Ins *ins);
-  void check_gnss_status(::apollo::drivers::gnss::Gnss *gnss);
+  void publish_ins_message(const MessagePtr message);
+  void check_ins_status(drivers::gnss::Ins *ins);
+  void check_gnss_status(drivers::gnss::Gnss *gnss);
 
   bool _inited_flag = false;
   std::unique_ptr<Parser> _data_parser;
 
   const ros::Subscriber _raw_data_sub;
-  const ros::Publisher _gpgga_publisher;
+  const ros::Publisher _ins_stat_publisher;
   const ros::Publisher _imu_publisher;
   const ros::Publisher _nav_odometry_publisher;
   const ros::Publisher _gnss_status_publisher;
   const ros::Publisher _ins_status_publisher;
+  const ros::Publisher _ins_publisher;
 
   boost::shared_ptr<apollo::common::gnss_status::GnssStatus> _gnss_status;
   boost::shared_ptr<apollo::common::gnss_status::InsStatus> _ins_status;

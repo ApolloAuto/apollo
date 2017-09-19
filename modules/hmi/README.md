@@ -31,5 +31,8 @@ python modules/hmi/web/hmi_main.py --help|--helpfull
 
 
 ### View HMI
-Point your web browser to http://localhost:8887 (or your customized address) to
+Point your web browser to http://127.0.0.1:8887 (or your customized address) to
 see the home page.
+
+If you enabled HTTPS, the url should be like https://apollo.hmi:8887, which
+varies according to your config.

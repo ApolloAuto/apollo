@@ -24,6 +24,11 @@ namespace apollo {
 namespace common {
 namespace util {
 
+bool PathExists(const std::string &path) {
+  struct stat info;
+  return stat(path.c_str(), &info) == 0;
+}
+
 bool DirectoryExists(const std::string &directory_path) {
   struct stat info;
   if (stat(directory_path.c_str(), &info) != 0) {

@@ -31,5 +31,3 @@ TAG="run-env-${TIME}"
 docker build -t "${DOCKER_REPO}:${TAG}" \
     -f "${APOLLO_ROOT}/docker/run_env.dockerfile" \
     "${APOLLO_ROOT}"
-
-sed -i "s/run-env.*\"/${TAG}\"/g" ${APOLLO_ROOT}/apollo_docker.sh

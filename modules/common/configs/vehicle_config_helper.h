@@ -32,7 +32,6 @@
  */
 namespace apollo {
 namespace common {
-namespace config {
 
 /**
  * @class VehicleConfigHelper
@@ -76,10 +75,10 @@ class VehicleConfigHelper {
 
  private:
   static VehicleConfig vehicle_config_;
+  static bool is_init_;
   DECLARE_SINGLETON(VehicleConfigHelper);
 };
 
-}  // namespace config
 }  // namespace common
 }  // namespace apollo
 

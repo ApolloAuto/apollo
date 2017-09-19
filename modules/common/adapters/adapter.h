@@ -27,6 +27,7 @@
 #include <mutex>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "glog/logging.h"
 #include "google/protobuf/descriptor.h"
@@ -36,7 +37,10 @@
 #include "modules/common/proto/header.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
+
+#include "sensor_msgs/PointCloud2.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -76,7 +80,7 @@ class Adapter {
   typedef D DataType;
 
   typedef typename std::list<std::shared_ptr<D>>::const_iterator Iterator;
-  typedef typename std::function<void(const D &)> Callback;
+  typedef typename std::function<void(const D&)> Callback;
 
   /**
    * @brief Construct the \class Adapter object.
@@ -88,8 +92,8 @@ class Adapter {
    * adapter stores. Older messages will be removed upon calls to
    * Adapter::OnReceive().
    */
-  Adapter(const std::string &adapter_name, const std::string &topic_name,
-          size_t message_num, const std::string &dump_dir = "/tmp")
+  Adapter(const std::string& adapter_name, const std::string& topic_name,
+          size_t message_num, const std::string& dump_dir = "/tmp")
       : topic_name_(topic_name),
         message_num_(message_num),
         enable_dump_(FLAGS_enable_adapter_dump && HasSequenceNumber<D>()),
@@ -112,7 +116,9 @@ class Adapter {
   /**
    * @brief returns the topic name that this adapter listens to.
    */
-  const std::string &topic_name() const { return topic_name_; }
+  const std::string& topic_name() const {
+    return topic_name_;
+  }
 
   /**
    * @brief reads the proto message from the file, and push it into
@@ -120,11 +126,9 @@ class Adapter {
    * @param message_file the path to the file that contains a (usually
    * proto) message of DataType.
    */
-  void FeedProtoFile(const std::string &message_file) {
-    D data;
-    CHECK(apollo::common::util::GetProtoFromFile(message_file, &data))
-        << "Unable to parse input pb file " << message_file;
-    FeedProto(data);
+  template <class T = D>
+  bool FeedFile(const std::string& message_file) {
+    return FeedFile(message_file, IdentifierType<T>());
   }
 
   /**
@@ -132,9 +136,8 @@ class Adapter {
    * the adapter.
    * @param data the input data.
    */
-  void FeedProto(const D &data) {
-    auto data_ptr = std::make_shared<D>(data);
-    EnqueueData(data_ptr);
+  void FeedData(const D& data) {
+    EnqueueData(data);
   }
 
   /**
@@ -142,11 +145,9 @@ class Adapter {
    * message is received.
    * @param message the newly received message.
    */
-  void OnReceive(const D &message) {
-    auto data_ptr = std::make_shared<D>(message);
-
-    EnqueueData(data_ptr);
-    FireCallback(message);
+  void OnReceive(const D& message) {
+    EnqueueData(message);
+    FireCallbacks(message);
   }
 
   /**
@@ -167,13 +168,21 @@ class Adapter {
   }
 
   /**
+   * @brief returns TRUE if the adapter has received any message.
+   */
+  bool HasReceived() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return !data_queue_.empty();
+  }
+
+  /**
    * @brief returns the most recent message in the observing queue.
    *
    * /note
    * Please call Empty() to make sure that there is data in the
    * queue before calling GetOldestObserved().
    */
-  const D &GetLatestObserved() const {
+  const D& GetLatestObserved() const {
     std::lock_guard<std::mutex> lock(mutex_);
     DCHECK(!observed_queue_.empty())
         << "The view of data queue is empty. No data is received yet or you "
@@ -189,7 +198,7 @@ class Adapter {
    * Please call Empty() to make sure that there is data in the
    * queue before calling GetOldestObserved().
    */
-  const D &GetOldestObserved() const {
+  const D& GetOldestObserved() const {
     std::lock_guard<std::mutex> lock(mutex_);
     DCHECK(!observed_queue_.empty())
         << "The view of data queue is empty. No data is received yet or you "
@@ -202,14 +211,18 @@ class Adapter {
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator begin() const { return observed_queue_.begin(); }
+  Iterator begin() const {
+    return observed_queue_.begin();
+  }
 
   /**
    * @brief returns an iterator representing the tail of the observing
    * queue. The caller can use it to iterate over the observed data
    * from the head. The API also supports range based for loop.
    */
-  Iterator end() const { return observed_queue_.end(); }
+  Iterator end() const {
+    return observed_queue_.end();
+  }
 
   /**
    * @brief registers the provided callback function to the adapter,
@@ -217,28 +230,61 @@ class Adapter {
    * message hits the adapter.
    * @param callback the callback with signature void(const D &).
    */
-  void SetCallback(Callback callback) { receive_callback_ = callback; }
+  void AddCallback(Callback callback) {
+    receive_callbacks_.push_back(callback);
+  }
 
   /**
    * @brief fills the fields module_name, timestamp_sec and
    * sequence_num in the header.
    */
-  void FillHeader(const std::string &module_name,
-                  apollo::common::Header *header) {
-    double timestamp =
-        apollo::common::time::ToSecond(apollo::common::time::Clock::Now());
+  void FillHeader(const std::string& module_name, D* data) {
+    static_assert(std::is_base_of<google::protobuf::Message, D>::value,
+                  "Can only fill header to proto messages!");
+    auto* header = data->mutable_header();
+    double timestamp = apollo::common::time::Clock::NowInSecond();
     header->set_module_name(module_name);
     header->set_timestamp_sec(timestamp);
     header->set_sequence_num(++seq_num_);
   }
 
+  uint32_t GetSeqNum() const {
+    return seq_num_;
+  }
+
+  void SetLatestPublished(const D& data) {
+    latest_published_data_.reset(new D(data));
+  }
+
+  const D* GetLatestPublished() {
+    return latest_published_data_.get();
+  }
+
  private:
+  template <typename T>
+  struct IdentifierType {};
+
+  template <class T>
+  bool FeedFile(const std::string& message_file, IdentifierType<T>) {
+    D data;
+    if (!apollo::common::util::GetProtoFromFile(message_file, &data)) {
+      AERROR << "Unable to parse input pb file " << message_file;
+      return false;
+    }
+    FeedData(data);
+    return true;
+  }
+  bool FeedFile(const std::string& message_file,
+                IdentifierType<::sensor_msgs::PointCloud2>) {
+    return false;
+  }
+
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
       typename std::enable_if<
           !std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type *message = nullptr) {
+          InputMessageType>::type* message = nullptr) {
     return false;
   }
 
@@ -248,7 +294,7 @@ class Adapter {
   static bool HasSequenceNumber(
       typename std::enable_if<
           std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type *message = nullptr) {
+          InputMessageType>::type* message = nullptr) {
     using gpf = google::protobuf::FieldDescriptor;
     InputMessageType sample;
     auto descriptor = sample.GetDescriptor();
@@ -275,7 +321,7 @@ class Adapter {
   bool DumpMessage(
       const typename std::enable_if<
           !std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type &message) {
+          InputMessageType>::type& message) {
     return true;
   }
 
@@ -286,7 +332,7 @@ class Adapter {
   bool DumpMessage(
       const typename std::enable_if<
           std::is_base_of<google::protobuf::Message, InputMessageType>::value,
-          InputMessageType>::type &message) {
+          InputMessageType>::type& message) {
     using google::protobuf::Message;
     auto descriptor = message.GetDescriptor();
     auto header_descriptor = descriptor->FindFieldByName("header");
@@ -294,8 +340,8 @@ class Adapter {
       ADEBUG << "Fail to find header field in pb.";
       return false;
     }
-    const Message &header = message.GetReflection()->GetMessage(
-        *static_cast<const Message *>(&message), header_descriptor);
+    const Message& header = message.GetReflection()->GetMessage(
+        *static_cast<const Message*>(&message), header_descriptor);
     auto seq_num_descriptor =
         header.GetDescriptor()->FindFieldByName("sequence_num");
     if (seq_num_descriptor == nullptr) {
@@ -304,17 +350,18 @@ class Adapter {
     }
     uint32_t sequence_num =
         header.GetReflection()->GetUInt32(header, seq_num_descriptor);
-    return apollo::common::util::SetProtoToASCIIFile(
-        message, dump_path_ + "/" + std::to_string(sequence_num) + ".pb.txt");
+    return util::SetProtoToASCIIFile(
+        message, util::StrCat(dump_path_, "/", sequence_num, ".pb.txt"));
   }
 
   /**
-   * @brief proactively invokes the callback with the specified data.
+   * @brief proactively invokes the callbacks one by one registered with the
+   * specified data.
    * @param data the specified data.
    */
-  void FireCallback(const D &data) {
-    if (receive_callback_ != nullptr) {
-      receive_callback_(data);
+  void FireCallbacks(const D& data) {
+    for (const auto& callback : receive_callbacks_) {
+      callback(data);
     }
   }
 
@@ -322,9 +369,14 @@ class Adapter {
    * @brief push the shared-pointer-guarded data to the data queue of
    * the adapter.
    */
-  void EnqueueData(std::shared_ptr<D> data_ptr) {
+  void EnqueueData(const D& data) {
     if (enable_dump_) {
-      DumpMessage<D>(*data_ptr);
+      DumpMessage<D>(data);
+    }
+
+    // Don't try to copy data and enqueue if the message_num is 0
+    if (message_num_ == 0) {
+      return;
     }
 
     // Lock the queue.
@@ -332,7 +384,7 @@ class Adapter {
     if (data_queue_.size() + 1 > message_num_) {
       data_queue_.pop_back();
     }
-    data_queue_.push_front(data_ptr);
+    data_queue_.push_front(std::make_shared<D>(data));
   }
 
   /// The topic name that the adapter listens to.
@@ -349,7 +401,7 @@ class Adapter {
   std::list<std::shared_ptr<D>> observed_queue_;
 
   /// User defined function when receiving a message
-  Callback receive_callback_ = nullptr;
+  std::vector<Callback> receive_callbacks_;
 
   /// The mutex guarding data_queue_ and observed_queue_
   mutable std::mutex mutex_;
@@ -363,6 +415,9 @@ class Adapter {
   /// The monotonically increasing sequence number of the message to
   /// be published.
   uint32_t seq_num_ = 0;
+
+  /// The most recenct published data.
+  std::unique_ptr<D> latest_published_data_;
 };
 
 }  // namespace adapter

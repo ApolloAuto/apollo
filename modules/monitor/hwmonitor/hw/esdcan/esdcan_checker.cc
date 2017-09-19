@@ -16,10 +16,10 @@
 
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_checker.h"
 
-#include <sstream>
 #include <utility>
 #include <vector>
 
+#include "modules/common/util/string_util.h"
 #include "modules/monitor/hwmonitor/hw/esdcan/esdcan_err_str.h"
 #include "modules/monitor/hwmonitor/hw/hw_log_module.h"
 
@@ -30,9 +30,7 @@ namespace hw {
 const char EsdCanChecker::ESD_CAN_NAME[] = "ESD_CAN";
 
 EsdCanChecker::EsdCanChecker(int id) : can_id_(id) {
-  std::ostringstream os;
-  os << ESD_CAN_NAME << "-" << id;
-  name_ = os.str();
+  name_ = apollo::common::util::StrCat(ESD_CAN_NAME, "-", id);
 }
 
 hw::Status EsdCanChecker::esdcan_result_to_hw_status(NTCAN_RESULT ntstatus) {

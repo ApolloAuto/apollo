@@ -16,12 +16,13 @@
 # limitations under the License.
 ###############################################################################
 
-import numpy as np
 import sys
-sys.path.append("../../bazel-genfiles")
+
+import numpy as np
+
+import common.proto_utils as proto_utils
 from modules.control.proto import calibration_table_pb2
-from modules.control.proto import control_conf_pb2
-from google.protobuf import text_format
+from modules.control.proto.control_conf_pb2 import ControlConf
 
 
 def load_calibration_raw_data(fn):
@@ -83,14 +84,6 @@ def load_calibration_raw_data_old(fn):
     return speed_table
 
 
-def load_old_control_conf_pb_txt(control_conf_pb_txt_file):
-    control_conf_pb = control_conf_pb2.ControlConf()
-    f_handle = open(control_conf_pb_txt_file, 'r')
-    text_format.Merge(f_handle.read(), control_conf_pb)
-    f_handle.close()
-    return control_conf_pb
-
-
 def get_calibration_table_pb(speed_table):
     calibration_table_pb = calibration_table_pb2.ControlCalibrationTable()
     speeds = speed_table.keys()
@@ -113,7 +106,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print "usage: python plot_results.py old_control_conf.pb.txt result.csv"
 
-    ctl_conf_pb = load_old_control_conf_pb_txt(sys.argv[1])
+    ctl_conf_pb = proto_utils.get_pb_from_text_file(sys.argv[1], ControlConf())
     speed_table_dict = load_calibration_raw_data(sys.argv[2])
     calibration_table_pb = get_calibration_table_pb(speed_table_dict)
     ctl_conf_pb.lon_controller_conf.calibration_table.CopyFrom(

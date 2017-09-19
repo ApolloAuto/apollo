@@ -1,0 +1,15 @@
+obstacle_conf {
+  obstacle_type: VEHICLE
+  obstacle_status: ON_LANE
+  evaluator_type: MLP_EVALUATOR
+  predictor_type: LANE_SEQUENCE_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: VEHICLE
+  obstacle_status: OFF_LANE
+  predictor_type: FREE_MOVE_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: PEDESTRIAN
+  predictor_type: REGIONAL_PREDICTOR
+}

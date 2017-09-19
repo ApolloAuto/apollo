@@ -60,7 +60,7 @@ class LincolnController final : public VehicleController {
    * @brief initialize the lincoln vehicle controller.
    * @return init error_code
    */
-  ::apollo::common::ErrorCode Init(
+  common::ErrorCode Init(
       const VehicleParameter &params, CanSender *const can_sender,
       MessageManager *const message_manager) override;
 
@@ -88,10 +88,10 @@ class LincolnController final : public VehicleController {
  private:
   // main logical function for operation the car enter or exit the auto driving
   void Emergency() override;
-  ::apollo::common::ErrorCode EnableAutoMode() override;
-  ::apollo::common::ErrorCode DisableAutoMode() override;
-  ::apollo::common::ErrorCode EnableSteeringOnlyMode() override;
-  ::apollo::common::ErrorCode EnableSpeedOnlyMode() override;
+  common::ErrorCode EnableAutoMode() override;
+  common::ErrorCode DisableAutoMode() override;
+  common::ErrorCode EnableSteeringOnlyMode() override;
+  common::ErrorCode EnableSpeedOnlyMode() override;
 
   // NEUTRAL, REVERSE, DRIVE
   void Gear(Chassis::GearPosition state) override;
@@ -115,11 +115,11 @@ class LincolnController final : public VehicleController {
   void Steer(double angle, double angle_spd) override;
 
   // set Electrical Park Brake
-  void SetEpbBreak(const ::apollo::control::ControlCommand &command) override;
-  void SetBeam(const ::apollo::control::ControlCommand &command) override;
-  void SetHorn(const ::apollo::control::ControlCommand &command) override;
+  void SetEpbBreak(const control::ControlCommand &command) override;
+  void SetBeam(const control::ControlCommand &command) override;
+  void SetHorn(const control::ControlCommand &command) override;
   void SetTurningSignal(
-      const ::apollo::control::ControlCommand &command) override;
+      const control::ControlCommand &command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
@@ -140,7 +140,7 @@ class LincolnController final : public VehicleController {
   Gear66 *gear_66_ = nullptr;
   Turnsignal68 *turnsignal_68_ = nullptr;
 
-  CanSender *can_sender_;
+  CanSender *can_sender_ = nullptr;
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;
   bool is_chassis_error_ = false;

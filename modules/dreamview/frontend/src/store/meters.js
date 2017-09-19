@@ -5,12 +5,23 @@ function roundToTens(percent) {
 }
 
 function toDrivingMode(disengageType) {
-    if (disengageType === "DISENGAGE_MANUAL") {
-        return "MANUAL";
-    } else if (disengageType === "DISENGAGE_NONE") {
-        return "AUTO";
+    switch (disengageType) {
+        case "DISENGAGE_MANUAL":
+            return "MANUAL";
+        case "DISENGAGE_NONE":
+            return "AUTO";
+        case "DISENGAGE_EMERGENCY":
+            return "DISENGAGED";
+        case "DISENGAGE_AUTO_STEER_ONLY":
+            return "AUTO STEER ONLY";
+        case "DISENGAGE_AUTO_SPEED_ONLY":
+            return "AUTO SPEED ONLY";
+        case "DISENGAGE_CHASSIS_ERROR":
+            return "CHASSIS ERROR";
+        default:
+            return "?";
     }
-    return "?";
+
 }
 
 function meterPerSecondToKmPerHour(speed) {
@@ -23,21 +34,40 @@ export default class Meters {
     @observable speed = 0;
     @observable steeringAngle = 0;
     @observable drivingMode = "?";
+    @observable turnSignal = "";
 
     @action update(world) {
         if (world.autoDrivingCar) {
-            this.throttlePercent = roundToTens(
-                world.autoDrivingCar.throttlePercentage);
-            this.brakePercent = roundToTens(
-                world.autoDrivingCar.brakePercentage);
-            // Convert the unit from m/s to mph.
-            this.speed = meterPerSecondToKmPerHour(world.autoDrivingCar.speed);
-            this.steeringAngle =
-                -Math.round(world.autoDrivingCar.steeringAngle / 100 * 470);
-            this.drivingMode =
-                toDrivingMode(world.autoDrivingCar.disengageType);
-            /* TODO Turn signal is not working. Please check and make sure
-             * that it is set correctly in the backend.*/
+            if (world.autoDrivingCar.throttlePercentage) {
+                this.throttlePercent = roundToTens(
+                    world.autoDrivingCar.throttlePercentage);
+            }
+            if (world.autoDrivingCar.brakePercentage) {
+                this.brakePercent = roundToTens(
+                    world.autoDrivingCar.brakePercentage);
+            }
+
+            if (world.autoDrivingCar.speed) {
+                // Convert the unit from m/s to mph.
+                this.speed = meterPerSecondToKmPerHour(
+                    world.autoDrivingCar.speed);
+            }
+
+            if (world.autoDrivingCar.steeringAngle) {
+                // TODO(siyangy): Avoid magic number here.
+                this.steeringAngle =
+                    -Math.round(
+                        world.autoDrivingCar.steeringAngle * 4.7);
+            }
+
+            if (world.autoDrivingCar.disengageType) {
+                this.drivingMode =
+                    toDrivingMode(world.autoDrivingCar.disengageType);
+            }
+
+            if (world.autoDrivingCar.currentSignal) {
+                this.turnSignal = world.autoDrivingCar.currentSignal;
+            }
         }
     }
 }

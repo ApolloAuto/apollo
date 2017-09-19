@@ -82,25 +82,12 @@ function check_esd_files() {
 }
 
 function generate_build_targets() {
-  BUILD_TARGETS=$(bazel query //... | grep -v "_test$" | grep -v "third_party" \
-    | grep -v "_cpplint$" | grep -v "release" | grep -v "kernel")
+  BUILD_TARGETS=$(bazel query //...)
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
-
   if ! $USE_ESD_CAN; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
-  fi
-}
-
-function generate_test_targets() {
-  TEST_TARGETS=$(bazel query //... | grep "_test$" | grep -v "third_party" | grep -v "kernel")
-  if [ $? -ne 0 ]; then
-    fail 'Test failed!'
-  fi
-
-  if ! $USE_ESD_CAN; then
-     TEST_TARGETS=$(echo $TEST_TARGETS| tr ' ' '\n' | grep -v "hwmonitor" | grep -v "esd")
   fi
 }
 
@@ -108,25 +95,44 @@ function generate_test_targets() {
 #              Build functions
 #=================================================
 
-function apollo_build() {
+function build() {
   START_TIME=$(get_now)
 
   echo "Start building, please wait ..."
   generate_build_targets
-  echo "Building on $MACHINE_ARCH, with targets:"
-  echo "$BUILD_TARGETS"
-  echo "$BUILD_TARGETS" | xargs bazel --batch --batch_cpu_scheduling build --jobs=10 --define ARCH="$MACHINE_ARCH" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg
+  echo "Building on $MACHINE_ARCH..."
+  echo "$BUILD_TARGETS" | xargs bazel build $DEFINES -c $1
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
     fail 'Build failed!'
   fi
-  find bazel-genfiles/* -type d -exec touch "{}/__init__.py" \;
+
+  # Build python proto
+  build_py_proto
+}
+
+function apollo_build_dbg() {
+  build "dbg"
+}
+
+function apollo_build_opt() {
+  build "opt"
+}
+
+function build_py_proto() {
+  if [ -d "./py_proto" ];then
+    rm -rf py_proto
+  fi
+  mkdir py_proto
+  PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
+  find modules/ -name "*.proto" | grep -v gnss | xargs ${PROTOC} --python_out=py_proto
+  find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 
 function check() {
   local check_start_time=$(get_now)
-  apollo_build && run_test && run_lint
+  apollo_build_dbg && run_test && run_lint
 
   START_TIME=$check_start_time
   if [ $? -eq 0 ]; then
@@ -157,16 +163,19 @@ function release() {
   # modules
   MODULES_DIR=$ROOT_DIR/modules
   mkdir -p $MODULES_DIR
-  for m in control canbus localization decision perception prediction planning
+  for m in control canbus localization decision perception \
+       prediction planning routing calibration
   do
     TARGET_DIR=$MODULES_DIR/$m
     mkdir -p $TARGET_DIR
-    cp bazel-bin/modules/$m/$m $TARGET_DIR
+     if [ -e bazel-bin/modules/$m/$m ]; then
+         cp bazel-bin/modules/$m/$m $TARGET_DIR
+     fi
     if [ -d modules/$m/conf ];then
         cp -r modules/$m/conf $TARGET_DIR
     fi
     if [ -d modules/$m/data ];then
-        cp -r modules/$m/conf $TARGET_DIR
+        cp -r modules/$m/data $TARGET_DIR
     fi
   done
 
@@ -180,6 +189,7 @@ function release() {
 
   # ros
   cp -Lr bazel-apollo/external/ros $ROOT_DIR/
+  rm -f ${ROOT_DIR}/ros/*.tar.gz
 
   # scripts
   cp -r scripts $ROOT_DIR
@@ -188,16 +198,31 @@ function release() {
   cp -Lr bazel-bin/modules/dreamview/dreamview.runfiles/apollo/modules/dreamview $MODULES_DIR
   cp -r modules/dreamview/conf $MODULES_DIR/dreamview
 
+  # map
+  mkdir $MODULES_DIR/map
+  cp -r modules/map/data $MODULES_DIR/map
+
   # common data
   mkdir $MODULES_DIR/common
   cp -r modules/common/data $MODULES_DIR/common
 
   # hmi
-  mkdir -p $MODULES_DIR/hmi/ros_node $MODULES_DIR/hmi/utils
-  cp bazel-bin/modules/hmi/ros_node/ros_node_service $MODULES_DIR/hmi/ros_node/
+  mkdir -p $MODULES_DIR/hmi/ros_bridge $MODULES_DIR/hmi/utils
+  cp bazel-bin/modules/hmi/ros_bridge/ros_bridge $MODULES_DIR/hmi/ros_bridge/
   cp -r modules/hmi/conf $MODULES_DIR/hmi
   cp -r modules/hmi/web $MODULES_DIR/hmi
   cp -r modules/hmi/utils/*.py $MODULES_DIR/hmi/utils
+
+  # perception
+  cp -r modules/perception/model/ $MODULES_DIR/perception
+
+  # gnss config
+  mkdir -p $MODULES_DIR/drivers/gnss
+  cp -r modules/drivers/gnss/conf/ $MODULES_DIR/drivers/gnss
+
+  # velodyne launch
+  mkdir -p $MODULES_DIR/drivers/velodyne/velodyne
+  cp -r modules/drivers/velodyne/velodyne/launch $MODULES_DIR/drivers/velodyne/velodyne
 
   # lib
   LIB_DIR=$ROOT_DIR/lib
@@ -215,7 +240,8 @@ function release() {
     mkdir -p $MODULES_DIR/monitor/hwmonitor/hw/tools/
     cp bazel-bin/modules/monitor/hwmonitor/hw/tools/esdcan_test_app $MODULES_DIR/monitor/hwmonitor/hw/tools/
   fi
-  cp -r bazel-genfiles/* $LIB_DIR
+  cp -r bazel-genfiles/external $LIB_DIR
+  cp -r py_proto/modules $LIB_DIR
 
   # doc
   cp -r docs $ROOT_DIR
@@ -229,14 +255,13 @@ function release() {
 }
 
 function gen_coverage() {
-  START_TIME=$(get_now)
-
   bazel clean
-  generate_test_targets
-  echo "$TEST_TARGETS" | xargs bazel test --define ARCH="$(uname -m)" --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --config=coverage
+  generate_build_targets
+  echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES -c dbg --config=coverage
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
+
   COV_DIR=data/cov
   rm -rf $COV_DIR
   files=$(find bazel-out/local-dbg/bin/modules/ -iname "*.gcda" -o -iname "*.gcno" | grep -v external)
@@ -245,6 +270,14 @@ function gen_coverage() {
     mkdir -p "$(dirname "$target")"
     cp "$f" "$target"
   done
+
+  files=$(find bazel-out/local-opt/bin/modules/ -iname "*.gcda" -o -iname "*.gcno" | grep -v external)
+  for f in $files; do
+    target="$COV_DIR/objs/modules/${f##*modules}"
+    mkdir -p "$(dirname "$target")"
+    cp "$f" "$target"
+  done
+
   lcov --capture --directory "$COV_DIR/objs" --output-file "$COV_DIR/conv.info"
   if [ $? -ne 0 ]; then
     fail 'lcov failed!'
@@ -257,15 +290,19 @@ function gen_coverage() {
       "tools/*" \
       -o $COV_DIR/stripped_conv.info
   genhtml $COV_DIR/stripped_conv.info --output-directory $COV_DIR/report
-
-  success 'Generated coverage report in $COV_DIR/report/index.html'
+  echo "Generated coverage report in $COV_DIR/report/index.html"
 }
 
 function run_test() {
   START_TIME=$(get_now)
 
-  generate_test_targets
-  echo "$TEST_TARGETS" | xargs bazel test --define "ARCH=$MACHINE_ARCH"  --define CAN_CARD=${CAN_CARD} --config=unit_test --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN} -c dbg --test_verbose_timeout_warnings
+  generate_build_targets
+  if [ "$USE_GPU" == "1" ]; then
+    echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
+    echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  else
+    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+  fi
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -276,11 +313,12 @@ function run_test() {
 }
 
 function run_cpp_lint() {
-  bazel test --config=cpplint //...
+  generate_build_targets
+  echo "$BUILD_TARGETS" | xargs bazel test --config=cpplint -c dbg
 }
 
 function run_bash_lint() {
-  FILES=$(find "${APOLLO_ROOT_DIR}" -type f -name "*.sh" | grep -v ros | grep -v kernel)
+  FILES=$(find "${APOLLO_ROOT_DIR}" -type f -name "*.sh" | grep -v ros)
   echo "${FILES}" | xargs shellcheck
 }
 
@@ -323,23 +361,9 @@ function buildify() {
   rm ~/.buildifier
 }
 
-function print_usage() {
-  echo 'Usage:
-  ./apollo.sh [OPTION]'
-  echo 'Options:
-  build : run build only
-  buildify: fix style of BUILD files
-  check: run build/lint/test, please make sure it passes before checking in new code
-  clean: runs Bazel clean
-  config: run configurator tool
-  coverage: generate test coverage report
-  doc: generate doxygen document
-  lint: run code style check
-  print_usage: prints this menu
-  release: to build release version
-  test: run all the unit tests
-  version: current commit and date
-  '
+function build_fe() {
+  cd modules/dreamview/frontend
+  yarn build
 }
 
 function gen_doc() {
@@ -375,13 +399,13 @@ function build_gnss() {
 
   protoc modules/drivers/gnss/proto/gnss.proto --cpp_out=./
   protoc modules/drivers/gnss/proto/imu.proto --cpp_out=./
-  protoc modules/drivers/gnss/proto/ins.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/ins.proto --cpp_out=./ --python_out=./
   protoc modules/drivers/gnss/proto/config.proto --cpp_out=./
-  protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./ --python_out=./
   protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
 
   cd modules
-  catkin_make_isolated --install --source drivers \
+  catkin_make_isolated --install --source drivers/gnss \
     --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
     --cmake-args --no-warn-unused-cli
   find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
@@ -391,8 +415,32 @@ function build_gnss() {
   rm -rf modules/common/proto/*.pb.h
   rm -rf modules/drivers/gnss/proto/*.pb.cc
   rm -rf modules/drivers/gnss/proto/*.pb.h
+  rm -rf modules/drivers/gnss/proto/*_pb2.py
   rm -rf modules/localization/proto/*.pb.cc
   rm -rf modules/localization/proto/*.pb.h
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
+function build_velodyne() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${CURRENT_PATH}/bazel-apollo/external/ros" ]; then
+    ROS_PATH="${CURRENT_PATH}/bazel-apollo/external/ros"
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/velodyne \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
 
   rm -rf modules/.catkin_workspace
   rm -rf modules/build_isolated/
@@ -403,24 +451,78 @@ function config() {
   ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
 
+function print_usage() {
+  RED='\033[0;31m'
+  BLUE='\033[0;34m'
+  BOLD='\033[1m'
+  NONE='\033[0m'
+
+  echo -e "\n${RED}Usage${NONE}:
+  .${BOLD}/apollo.sh${NONE} [OPTION]"
+
+  echo -e "\n${RED}Options${NONE}:
+  ${BLUE}build${NONE}: run build only
+  ${BLUE}build_opt${NONE}: build optimized binary for the code
+  ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
+  ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
+  ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
+  ${BLUE}buildify${NONE}: fix style of BUILD files
+  ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
+  ${BLUE}clean${NONE}: run Bazel clean
+  ${BLUE}config${NONE}: run configurator tool
+  ${BLUE}coverage${NONE}: generate test coverage report
+  ${BLUE}doc${NONE}: generate doxygen document
+  ${BLUE}lint${NONE}: run code style check
+  ${BLUE}usage${NONE}: print this menu
+  ${BLUE}release${NONE}: build release version
+  ${BLUE}test${NONE}: run all unit tests
+  ${BLUE}version${NONE}: display current commit and date
+  "
+}
+
 function main() {
   source_apollo_base
   apollo_check_system_config
   check_machine_arch
   check_esd_files
 
+  DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+
   case $1 in
     check)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       check
       ;;
     build)
-      apollo_build
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      apollo_build_dbg
+      ;;
+    build_opt)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      apollo_build_opt
+      ;;
+    build_gpu)
+      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      apollo_build_dbg
+      ;;
+    build_opt_gpu)
+      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      apollo_build_opt
+      ;;
+    build_fe)
+      build_fe
       ;;
     buildify)
       buildify
       ;;
     buildgnss)
       build_gnss
+      ;;
+    build_py)
+      build_py_proto
+      ;;
+    buildvelodyne)
+      build_velodyne
       ;;
     config)
       config
@@ -432,6 +534,12 @@ function main() {
       run_lint
       ;;
     test)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      run_test
+      ;;
+    test_gpu)
+      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      USE_GPU="1"
       run_test
       ;;
     release)
@@ -448,6 +556,9 @@ function main() {
       ;;
     version)
       version
+      ;;
+    usage)
+      print_usage
       ;;
     *)
       print_usage

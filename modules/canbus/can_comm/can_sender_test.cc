@@ -40,7 +40,7 @@ TEST(CanSenderTest, OneRunCase) {
   EXPECT_EQ(msg.CanFrame().id, 1);
 
   sender.AddMessage(1, &mpd);
-  EXPECT_EQ(sender.Start(), ::apollo::common::ErrorCode::OK);
+  EXPECT_EQ(sender.Start(), common::ErrorCode::OK);
   EXPECT_TRUE(sender.IsRunning());
   EXPECT_TRUE(sender.enable_log());
 

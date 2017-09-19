@@ -17,29 +17,13 @@
 ###############################################################################
 
 import sys
-import gflags
-from gflags import FLAGS
+
 import matplotlib.pyplot as plt
-from google.protobuf import text_format
+
+import common.proto_utils as proto_utils
 import mkz_polygon
-from modules.planning.proto import planning_pb2
-from modules.localization.proto import localization_pb2
-
-
-def read_planning_pb(planning_pb_file):
-    planning_pb = planning_pb2.ADCTrajectory()
-    f_handle = open(planning_pb_file, 'r')
-    text_format.Merge(f_handle.read(), planning_pb)
-    f_handle.close()
-    return planning_pb
-
-
-def read_localization_pb(localization_pb_file):
-    localization_pb = localization_pb2.LocalizationEstimate()
-    f_handle = open(localization_pb_file, 'r')
-    text_format.Merge(f_handle.read(), localization_pb)
-    f_handle.close()
-    return localization_pb
+from modules.planning.proto.planning_pb2 import ADCTrajectory
+from modules.localization.proto.localization_pb2 import LocalizationEstimate
 
 
 def plot_trajectory(planning_pb, ax):
@@ -140,8 +124,10 @@ if __name__ == "__main__":
 
     planning_pb_file = sys.argv[1]
     localization_pb_file = sys.argv[2]
-    planning_pb = read_planning_pb(planning_pb_file)
-    localization_pb = read_localization_pb(localization_pb_file)
+    planning_pb = proto_utils.get_pb_from_text_file(
+        planning_pb_file, ADCTrajectory())
+    localization_pb = proto_utils.get_pb_from_text_file(
+        localization_pb_file, LocalizationEstimate())
 
     plot_trajectory(planning_pb, plt)
     plot_vehicle(localization_pb, plt)

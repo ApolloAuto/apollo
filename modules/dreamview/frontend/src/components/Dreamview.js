@@ -4,6 +4,8 @@ import { inject, observer } from "mobx-react";
 import SideBar from "components/SideBar";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
+import RouteEditingBar from "components/RouteEditingBar";
+import Loader from "components/common/Loader";
 import WS from "store/websocket";
 
 @inject("store") @observer
@@ -16,13 +18,24 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { dimension, meters } = this.props.store;
+        const { dimension, meters, options,
+                routeEditingManager, isInitialized} = this.props.store;
+
+        const showBars = !routeEditingManager.inEditingView && isInitialized;
+        const showRoutingBar = routeEditingManager.inEditingView;
+        const showLoader = !isInitialized;
 
         return (
             <div>
-                <SideBar />
-                <StatusBar meters={meters} />
-                <Scene width={dimension.width} height={dimension.height} />
+                {showBars ? <SideBar /> : null}
+                {showBars ? <StatusBar meters={meters} /> : null}
+                {showRoutingBar ? <RouteEditingBar /> : null}
+                <Scene
+                    width={dimension.width}
+                    height={dimension.height}
+                    options={options}
+                    invisible={!isInitialized}/>
+                {showLoader ? <Loader /> : null}
             </div>
         );
     }

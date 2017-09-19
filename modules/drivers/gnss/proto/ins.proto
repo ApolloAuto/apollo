@@ -5,6 +5,12 @@ package apollo.drivers.gnss;
 import "modules/common/proto/header.proto";
 import "modules/common/proto/geometry.proto";
 
+message InsStat {
+  optional apollo.common.Header header = 1;
+  optional uint32 ins_status = 2;
+  optional uint32 pos_type = 3;
+}
+
 // Solution from a inertial navigation system (INS), which usually fuses GNSS
 // and IMU measurements.
 message Ins {

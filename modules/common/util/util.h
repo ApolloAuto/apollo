@@ -22,7 +22,18 @@
 #ifndef MODULES_COMMON_UTIL_H_
 #define MODULES_COMMON_UTIL_H_
 
+#include <algorithm>
+#include <iostream>
+#include <memory>
 #include <string>
+#include <utility>
+
+#include "google/protobuf/util/message_differencer.h"
+
+#include "modules/common/math/vec2d.h"
+#include "modules/common/proto/geometry.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 /**
  * @namespace apollo::common::util
@@ -32,18 +43,64 @@ namespace apollo {
 namespace common {
 namespace util {
 
+template <typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+template <typename ProtoA, typename ProtoB>
+bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
+  return google::protobuf::util::MessageDifferencer::Equals(a, b);
+}
+
 /**
- * @brief Check if a string ends with a pattern.
- * @param original The original string. To see if it ends with some
- *        specified pattern.
- * @param pattern The target pattern. To see if the original string ends
- *        with it.
- * @return Whether the original string ends with the specified pattern.
+ * @brief create a SL point
+ * @param s the s value
+ * @param l the l value
+ * @return a SLPoint instance
  */
-bool EndWith(const std::string &original, const std::string &pattern);
+SLPoint MakeSLPoint(const double s, const double l);
+
+PointENU MakePointENU(const double x, const double y, const double z);
+
+PointENU MakePointENU(const math::Vec2d& xy);
+
+apollo::perception::Point MakePerceptionPoint(const double x, const double y,
+                                              const double z);
+
+SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
+                          const double a, const double da);
+
+PathPoint MakePathPoint(const double x, const double y, const double z,
+                        const double theta, const double kappa,
+                        const double dkappa, const double ddkappa);
+
+template <typename Container>
+typename Container::value_type MaxElement(const Container& elements) {
+  return *std::max_element(elements.begin(), elements.end());
+}
+
+template <typename Container>
+typename Container::value_type MinElement(const Container& elements) {
+  return *std::min_element(elements.begin(), elements.end());
+}
+
+/**
+ * calculate the distance beteween PathPoint a and PathPoint b
+ * @param a one path point
+ * @param b another path point
+ * @return sqrt((a.x-b.x)^2 + (a.y-b.y)^2), i.e., the Euclid distance on XY
+ * dimension
+ */
+double Distance2D(const PathPoint& a, const PathPoint& b);
 
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
+
+template <typename A, typename B>
+std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {
+  return os << "first: " << p.first << ", second: " << p.second;
+}
 
 #endif  // MODULES_COMMON_UTIL_H_

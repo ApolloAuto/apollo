@@ -17,13 +17,15 @@
 #ifndef MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 #define MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 
+#include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/adapters/adapter.h"
 #include "modules/common/monitor/proto/monitor.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
-#include "modules/decision/proto/decision.pb.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/hmi/proto/hmi_message.pb.h"
 #include "modules/localization/proto/camera.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -32,6 +34,8 @@
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
+#include "sensor_msgs/PointCloud2.h"
 
 /**
  * @file message_adapters.h
@@ -43,22 +47,28 @@ namespace apollo {
 namespace common {
 namespace adapter {
 
-using ChassisAdapter = Adapter<::apollo::canbus::Chassis>;
-using ChassisDetailAdapter = Adapter<::apollo::canbus::ChassisDetail>;
-using ControlCommandAdapter = Adapter<::apollo::control::ControlCommand>;
-using DecisionAdapter = Adapter<::apollo::decision::DecisionResult>;
+using ChassisAdapter = Adapter<canbus::Chassis>;
+using ChassisDetailAdapter = Adapter<canbus::ChassisDetail>;
+using ControlCommandAdapter = Adapter<control::ControlCommand>;
 using GpsAdapter = Adapter<apollo::localization::Gps>;
-using ImuAdapter = Adapter<::apollo::localization::Imu>;
-using CameraAdapter = Adapter<::apollo::localization::Camera>;
+using ImuAdapter = Adapter<localization::Imu>;
+using CameraAdapter = Adapter<localization::Camera>;
 using LocalizationAdapter = Adapter<apollo::localization::LocalizationEstimate>;
 using MonitorAdapter = Adapter<apollo::common::monitor::MonitorMessage>;
-using PadAdapter = Adapter<::apollo::control::PadMessage>;
+using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter =
-    Adapter<::apollo::perception::PerceptionObstacles>;
-using PlanningTrajectoryAdapter = Adapter<::apollo::planning::ADCTrajectory>;
-using PredictionAdapter = Adapter<::apollo::prediction::PredictionObstacles>;
+    Adapter<perception::PerceptionObstacles>;
+using PlanningAdapter = Adapter<planning::ADCTrajectory>;
+using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using TrafficLightDetectionAdapter =
-    Adapter<::apollo::perception::TrafficLightDetection>;
+    Adapter<perception::TrafficLightDetection>;
+using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
+using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
+using RelativeOdometryAdapter =
+    Adapter<calibration::republish_msg::RelativeOdometry>;
+using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
+using HMICommandAdapter = Adapter<hmi::HMICommand>;
 
 }  // namespace adapter
 }  // namespace common

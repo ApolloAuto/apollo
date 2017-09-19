@@ -26,14 +26,6 @@
 #include "modules/control/control.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-#define TMAIN                                            \
-  int main(int argc, char **argv) {                      \
-    ::testing::InitGoogleTest(&argc, argv);              \
-    google::InitGoogleLogging(argv[0]);                  \
-    ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    return RUN_ALL_TESTS();                              \
-  }
-
 #define RUN_GOLDEN_TEST                                            \
   {                                                                \
     const ::testing::TestInfo *const test_info =                   \
@@ -69,7 +61,7 @@ class ControlTestBase : public ::testing::Test {
   void trim_control_command(apollo::control::ControlCommand *origin);
   ControlCommand control_command_;
   Control control_;
-  static uint32_t _s_seq_num;
+  static uint32_t s_seq_num_;
 };
 
 }  // namespace control

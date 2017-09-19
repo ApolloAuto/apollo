@@ -21,18 +21,23 @@
 #ifndef MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 #define MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
 
+#include <memory>
+#include <string>
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 
-#include "Eigen/Core"
+#include "modules/common/macro.h"
+#include "modules/common/math/box2d.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/common/status/status.h"
 
 /**
- * @namespace apollo::common::vehicle_state
- * @brief apollo::common::vehicle_state
+ * @namespace apollo::common
+ * @brief apollo::common
  */
 namespace apollo {
 namespace common {
-namespace vehicle_state {
 
 /**
  * @class VehicleState
@@ -43,23 +48,24 @@ namespace vehicle_state {
 class VehicleState {
  public:
   /**
-   * @brief Empty constructor.
-   */
-  VehicleState() = default;
-
-  /**
-   * @brief Constructor only by information of localization.
-   * @param localization Localization information of the vehicle.
-   */
-  explicit VehicleState(const localization::LocalizationEstimate &localization);
-
-  /**
    * @brief Constructor by information of localization and chassis.
    * @param localization Localization information of the vehicle.
    * @param chassis Chassis information of the vehicle.
    */
-  VehicleState(const localization::LocalizationEstimate *localization,
-               const canbus::Chassis *chassis);
+  Status Update(const localization::LocalizationEstimate& localization,
+                const canbus::Chassis& chassis);
+
+  /**
+   * @brief Update VehicleState instance by protobuf files.
+   * @param localization_file the localization protobuf file.
+   * @param chassis_file The chassis protobuf file
+   */
+  void Update(const std::string& localization_file,
+              const std::string& chassis_file);
+
+  double timestamp() const { return timestamp_; }
+
+  const localization::Pose& pose() const { return pose_; }
 
   /**
    * @brief Default destructor.
@@ -84,11 +90,27 @@ class VehicleState {
    */
   double z() const;
 
+  double kappa() const;
+
+  /**
+   * @brief Get the vehicle roll angle.
+   * @return The euler roll angle.
+   */
+  double roll() const;
+
   /**
    * @brief Get the vehicle pitch angle.
    * @return The euler pitch angle.
    */
   double pitch() const;
+
+  /**
+   * @brief Get the vehicle yaw angle.
+   *  As of now, use the heading instead of yaw angle.
+   *  Heading angle with East as zero, yaw angle has North as zero
+   * @return The euler yaw angle.
+   */
+  double yaw() const;
 
   /**
    * @brief Get the heading of vehicle position, which is the angle
@@ -120,7 +142,7 @@ class VehicleState {
    * @brief Get the vehicle's gear position.
    * @return The vehicle's gear position.
    */
-  canbus::Chassis::GearPosition gear() const;
+  double gear() const;
 
   /**
    * @brief Set the x-coordinate of vehicle position.
@@ -141,10 +163,22 @@ class VehicleState {
   void set_z(const double z);
 
   /**
+   * @brief Set the vehicle roll angle.
+   * @param pitch The vehicle roll angle.
+   */
+  void set_roll(const double roll);
+
+  /**
    * @brief Set the vehicle pitch angle.
    * @param pitch The vehicle pitch angle.
    */
   void set_pitch(const double pitch);
+
+  /**
+   * @brief Set the vehicle yaw angle.
+   * @param pitch The vehicle yaw angle.
+   */
+  void set_yaw(const double yaw);
 
   /**
    * @brief Set the heading of vehicle position, which is the angle
@@ -153,6 +187,8 @@ class VehicleState {
    *         and the x-axis.
    */
   void set_heading(const double heading);
+
+  void set_kappa(const double kappa) { kappa_ = kappa; }
 
   /**
    * @brief Set the vehicle's linear velocity.
@@ -179,44 +215,51 @@ class VehicleState {
    * @param t The length of time period.
    * @return The estimated future position in time t.
    */
-  Eigen::Vector2d EstimateFuturePosition(const double t) const;
+  math::Vec2d EstimateFuturePosition(const double t) const;
 
   /**
- * @brief Compute the position of center of mass(COM) of the vehicle,
- *        given the distance from rear wheels to the center of mass.
- * @param rear_to_com_distance Distance from rear wheels to
- *        the vehicle's center of mass.
- * @return The position of the vehicle's center of mass.
- */
-  Eigen::Vector2d ComputeCOMPosition(const double rear_to_com_distance) const;
+   * @brief Compute the position of center of mass(COM) of the vehicle,
+   *        given the distance from rear wheels to the center of mass.
+   * @param rear_to_com_distance Distance from rear wheels to
+   *        the vehicle's center of mass.
+   * @return The position of the vehicle's center of mass.
+   */
+  math::Vec2d ComputeCOMPosition(
+      const double rear_to_com_distance) const;
+
+  /**
+   * @brief Compute the bouding box of the vehicle.
+   * @return the bounding box of the vehicle represented by Box2d.
+   */
+  const math::Box2d& AdcBoundingBox() const;
 
  private:
-  void ConstructExceptLinearVelocity(
-      const localization::LocalizationEstimate *localization);
+  DECLARE_SINGLETON(VehicleState);
+
+  void InitAdcBoundingBox();
+
+  bool ConstructExceptLinearVelocity(
+      const localization::LocalizationEstimate& localization);
 
   double x_ = 0.0;
-
   double y_ = 0.0;
-
   double z_ = 0.0;
-
+  double roll_ = 0.0;
   double pitch_ = 0.0;
-
+  double yaw_ = 0.0;
   double heading_ = 0.0;
-
+  // TODO(all): check the setting of kappa_
+  double kappa_ = 0.0;
   double linear_v_ = 0.0;
-
   double angular_v_ = 0.0;
-
+  double timestamp_ = 0.0;
   double linear_a_y_ = 0.0;
-
   canbus::Chassis::GearPosition gear_;
-
-  const localization::LocalizationEstimate *localization_ptr_ = nullptr;
+  localization::Pose pose_;
+  std::unique_ptr<math::Box2d> adc_bounding_box_ = nullptr;
 };
 
-}  // namespace vehicle_state
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_ */
+#endif  // MODULES_COMMON_VEHICLE_STATE_VEHICLE_STATE_H_
