@@ -38,14 +38,13 @@ namespace planning {
 class SplineSegKernel {
  public:
   // generating kernel matrix
-  Eigen::MatrixXd Kernel(const std::uint32_t order,
-                            const double accumalated_x);
+  Eigen::MatrixXd Kernel(const std::uint32_t order, const double accumalated_x);
   Eigen::MatrixXd DerivativeKernel(const std::uint32_t order,
-                                    const double accumalated_x);
+                                   const double accumalated_x);
   Eigen::MatrixXd SecondOrderDerivativeKernel(const std::uint32_t order,
-                                                 const double accumalated_x);
+                                              const double accumalated_x);
   Eigen::MatrixXd ThirdOrderDerivativeKernel(const std::uint32_t order,
-                                                const double accumalated_x);
+                                             const double accumalated_x);
 
  private:
   void integrated_term_matrix(const std::uint32_t order, const double x,

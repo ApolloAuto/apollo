@@ -38,6 +38,7 @@ class SpeedLimit {
   double GetSpeedLimitByS(const double s) const;
 
   void Clear();
+
  private:
   // use a vector to represent speed limit
   // the first number is s, the second number is v

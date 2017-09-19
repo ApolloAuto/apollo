@@ -53,7 +53,7 @@ DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
 
 bool DPRoadGraph::FindPathTunnel(
     const common::TrajectoryPoint &init_point,
-    const std::vector<const PathObstacle*> &obstacles,
+    const std::vector<const PathObstacle *> &obstacles,
     PathData *const path_data) {
   CHECK_NOTNULL(path_data);
   init_point_ = init_point;
@@ -101,7 +101,7 @@ bool DPRoadGraph::FindPathTunnel(
 }
 
 bool DPRoadGraph::GenerateMinCostPath(
-    const std::vector<const PathObstacle*> &obstacles,
+    const std::vector<const PathObstacle *> &obstacles,
     std::vector<DPRoadGraphNode> *min_cost_path) {
   CHECK(min_cost_path != nullptr);
 

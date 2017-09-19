@@ -29,12 +29,12 @@ namespace apollo {
 namespace planning {
 
 DecisionResult Decider::MakeDecision(
-    const ReferenceLineInfo &reference_line_info) {
+    const ReferenceLineInfo& reference_line_info) {
   Decider decider;
   return decider.InternalMakeDecision(reference_line_info);
 }
 
-DecisionResult &Decider::InternalMakeDecision(
+DecisionResult& Decider::InternalMakeDecision(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decision = reference_line_info.path_decision();
 

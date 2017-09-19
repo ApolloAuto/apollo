@@ -25,10 +25,10 @@ namespace planning {
 
 using apollo::common::TrajectoryPoint;
 
-StGraphData::StGraphData(
-    const std::vector<StBoundary>& st_boundaries,
-    const TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-    const double path_data_length)
+StGraphData::StGraphData(const std::vector<StBoundary>& st_boundaries,
+                         const TrajectoryPoint& init_point,
+                         const SpeedLimit& speed_limit,
+                         const double path_data_length)
     : st_boundaries_(st_boundaries),
       init_point_(init_point),
       speed_limit_(speed_limit),

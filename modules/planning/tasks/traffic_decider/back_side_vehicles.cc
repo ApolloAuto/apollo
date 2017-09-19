@@ -18,8 +18,8 @@
  * @file
  **/
 
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/back_side_vehicles.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
