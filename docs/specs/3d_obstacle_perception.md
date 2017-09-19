@@ -1,4 +1,4 @@
-Obstacle Perception
+3D Obstacle Perception
 ===================
 
 The following sections describe the perception pipeline of obstacles
