@@ -21,13 +21,13 @@ Real Time Plotting of planning and control
 import curses
 import os
 import random
-import rospy
 import threading
 import traceback
+
+import rospy
 from std_msgs.msg import String
 
-from Message import Message
-import batch_include
+from message import Message
 
 primitive = (int, str, bool, unicode)
 
@@ -38,10 +38,9 @@ class Diagnostics(object):
     """
 
     def __init__(self, stdscr):
+        META_DATA_FILE = os.path.join(os.path.dirname(__file__), 'meta.data')
         self.stdscr = stdscr
         # topic
-        self.META_DATA_FILE = os.path.join(
-            os.path.dirname(__file__), 'meta.data')
         self.messages = []
 
         curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
@@ -50,29 +49,17 @@ class Diagnostics(object):
         curses.curs_set(0)
 
         self.lock = threading.Lock()
-        try:
-            with open(self.META_DATA_FILE) as f:
-                for line in f:
-                    module_name, proto_name, topic, period = line.strip().split(
-                        ' ')
-                    if module_name == 'MODULE' or proto_name == '#' or\
-                        topic == '#' or period == '#':
-                        pass
-                    else:
-                        cur_message = Message(module_name, proto_name, topic,
-                                              period, self.stdscr, self.lock)
-                        self.messages.append(cur_message)
-        except Exception as e:
-            print '{0} open failed! with error: {1}'.format(
-                self.META_DATA_FILE, e.message)
-            exit(1)
-        self.options = []
+        with open(META_DATA_FILE) as f:
+            for line in f:
+                line = line.strip()
+                # Skip empty lines, header and comments.
+                if not line or line.startswith('#'):
+                    continue
+                module_name, proto_name, topic, period = line.split()
+                self.messages.append(Message(module_name, proto_name, topic,
+                                             period, self.stdscr, self.lock))
         self.selection = 0
-        for i in range(len(self.messages)):
-            position = [0, i]
-            self.options.append(position)
         self.current_index = 0
-
         self.MENU = True
 
     def callback_timer(self, event):
@@ -122,12 +109,7 @@ def main(stdscr):
     rospy.init_node('adu_diagnostics_' + str(random.random()), anonymous=True)
 
     diag = Diagnostics(stdscr)
-    sublist = []
-    for msg in diag.messages:
-        sublist.append(
-            rospy.Subscriber(
-                msg.topic, eval(msg.proto_name), msg.callback, queue_size=10))
-
+    sublist = [msg.subscribe() for msg in diag.messages]
     maintimercallback = rospy.Timer(rospy.Duration(0.05), diag.callback_timer)
 
     while True:
@@ -145,7 +127,7 @@ def main(stdscr):
             if c == curses.KEY_DOWN:
                 if diag.MENU:
                     diag.selection = min((diag.selection + 1),
-                                         len(diag.options) - 1)
+                                         len(diag.messages) - 1)
                 else:
                     diag.messages[diag.selection].key_down()
             elif c == curses.KEY_UP:
@@ -193,5 +175,4 @@ if __name__ == '__main__':
     try:
         curses.wrapper(main)
     except Exception as e:
-        tb = traceback.format_exc()
-        print tb
+        print traceback.format_exc()

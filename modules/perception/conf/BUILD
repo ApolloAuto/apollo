@@ -6,3 +6,11 @@ filegroup(
         "adapter.conf",
     ],
 )
+
+filegroup(
+    name = "perception_config",
+    srcs = [
+        "config_manager.config",
+        "perception.conf",
+    ],
+)

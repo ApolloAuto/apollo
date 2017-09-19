@@ -16,12 +16,13 @@
 # limitations under the License.
 ###############################################################################
 
-import matplotlib.pyplot as plt
 import math
 import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import colors as mcolors
 from matplotlib import cm as cmx
+from matplotlib import colors as mcolors
 
 markers = [
     "o", "v", "^", "<", ">", "1", "2", "3", "4", "8", "s", "p", "*", "+", "x",

@@ -38,8 +38,7 @@ constexpr double kMathEpsilon = 1e-10;
 /**
  * @class Vec2d
  *
- * @brief Implements a class of 2-dimensional vectors,
- * similar to Eigen::Vector2d.
+ * @brief Implements a class of 2-dimensional vectors.
  */
 class Vec2d {
  public:
@@ -87,6 +86,9 @@ class Vec2d {
 
   //! Returns the inner product between these two Vec2d.
   double InnerProd(const Vec2d &other) const;
+
+  //! rotate the vector by angle.
+  Vec2d rotate(const double angle) const;
 
   //! Sums two Vec2d
   Vec2d operator+(const Vec2d &other) const;

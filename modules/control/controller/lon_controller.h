@@ -64,7 +64,7 @@ class LonController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Status Init(const ControlConf *control_conf) override;
+  common::Status Init(const ControlConf *control_conf) override;
 
   /**
    * @brief compute brake / throttle values based on current vehicle status
@@ -75,17 +75,17 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Status ComputeControlCommand(
-      const ::apollo::localization::LocalizationEstimate *localization,
-      const ::apollo::canbus::Chassis *chassis,
-      const ::apollo::planning::ADCTrajectory *trajectory,
-      ::apollo::control::ControlCommand *cmd) override;
+  common::Status ComputeControlCommand(
+      const localization::LocalizationEstimate *localization,
+      const canbus::Chassis *chassis,
+      const planning::ADCTrajectory *trajectory,
+      control::ControlCommand *cmd) override;
 
   /**
    * @brief reset longitudinal controller
    * @return Status reset status
    */
-  Status Reset() override;
+  common::Status Reset() override;
 
   /**
    * @brief stop longitudinal controller
@@ -99,18 +99,12 @@ class LonController : public Controller {
   std::string Name() const override;
 
  protected:
-  void ComputeLongitudinalErrors(
-      const ::apollo::common::vehicle_state::VehicleState &vehicle_state,
-      const TrajectoryAnalyzer *trajectory, const double preview_time,
-      SimpleLongitudinalDebug *debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
+                                 const double preview_time,
+                                 SimpleLongitudinalDebug *debug);
 
  private:
-  void SetDigitalFilterAcceleration(
-      const LonControllerConf &lon_controller_conf);
-
-  void SetDigitalFilterThrottle(const LonControllerConf &lon_controller_conf);
-
-  void SetDigitalFilterBrake(const LonControllerConf &lon_controller_conf);
+  void SetDigitalFilterPitchAngle(const LonControllerConf &lon_controller_conf);
 
   void LoadControlCalibrationTable(
       const LonControllerConf &lon_controller_conf);
@@ -120,12 +114,11 @@ class LonController : public Controller {
 
   void CloseLogFile();
 
-  const ::apollo::localization::LocalizationEstimate *localization_ = nullptr;
-  const ::apollo::canbus::Chassis *chassis_ = nullptr;
-  ::apollo::common::vehicle_state::VehicleState vehicle_state_;
+  const localization::LocalizationEstimate *localization_ = nullptr;
+  const canbus::Chassis *chassis_ = nullptr;
 
   std::unique_ptr<Interpolation2D> control_interpolation_;
-  const ::apollo::planning::ADCTrajectory *trajectory_message_ = nullptr;
+  const planning::ADCTrajectory *trajectory_message_ = nullptr;
   std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
 
   std::string name_;
@@ -136,9 +129,7 @@ class LonController : public Controller {
 
   FILE *speed_log_file_ = nullptr;
 
-  DigitalFilter digital_filter_throttle_;
-  DigitalFilter digital_filter_brake_;
-  DigitalFilter digital_filter_acceleration_;
+  DigitalFilter digital_filter_pitch_angle_;
 
   const ControlConf *control_conf_ = nullptr;
 };

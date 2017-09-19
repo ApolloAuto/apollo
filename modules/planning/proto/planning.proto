@@ -3,10 +3,13 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/common/proto/header.proto";
+import "modules/common/proto/vehicle_signal.proto";
+import "modules/common/proto/pnc_point.proto";
 import "modules/canbus/proto/chassis.proto";
+import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
 
-// TODO(aaron): Migrate to apollo::common::TrajectoryPoint.
+// Deprecated: replaced by apollo.common.TrajectoryPoint
 message ADCTrajectoryPoint {
   optional double x = 1;  // in meters.
   optional double y = 2;  // in meters.
@@ -29,6 +32,16 @@ message ADCTrajectoryPoint {
   optional double l = 5 [deprecated = true];
 }
 
+// Deprecated: replaced by apollo.common.PathPoint
+message ADCPathPoint {
+  optional double x = 1;  // in meters
+  optional double y = 2;  // in meters
+  optional double z = 3;  // in meters
+  optional double curvature = 4;  // curvature (k = 1/r), unit: (1/meters)
+  optional double heading = 5;  // relative to absolute coordinate system
+}
+
+
 message ADCSignals {
   enum SignalType {
     LEFT_TURN = 1;
@@ -44,30 +57,39 @@ message ADCSignals {
 message EStop {
   // is_estop == true when emergency stop is required
   optional bool is_estop = 1;
+  optional string reason = 2;
 }
 
-// TODO(aaron): Migrate to apollo::common::PathPoint.
-message ADCPathPoint {
-  optional double x = 1;  // in meters
-  optional double y = 2;  // in meters
-  optional double z = 3;  // in meters
-  optional double curvature = 4;  // curvature (k = 1/r), unit: (1/meters)
-  optional double heading = 5;  // relative to absolute coordinate system
+message TaskStats {
+  optional string name = 1;
+  optional double time_ms = 2;
 }
 
+message LatencyStats {
+  optional double total_time_ms = 1;
+  repeated TaskStats task_stats = 2;
+  optional double init_frame_time_ms = 3;
+}
+
+// next id: 16
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
   optional double total_path_length = 2; // in meters
   optional double total_path_time = 3; // in seconds
-  repeated ADCTrajectoryPoint adc_trajectory_point = 4;
+  repeated apollo.common.TrajectoryPoint trajectory_point = 12;
   optional EStop estop = 6;
-  repeated ADCPathPoint adc_path_point = 7;
+  repeated apollo.common.PathPoint path_point = 13;
+  optional apollo.planning_internal.Debug debug = 8;
   // is_replan == true mean replan triggered
   optional bool is_replan = 9 [default = false];
   // Specify trajectory gear
   optional apollo.canbus.Chassis.GearPosition gear = 10;
-  optional apollo.planning_internal.Debug debug = 8;
-  optional apollo.canbus.Signal signal = 11;
+  optional apollo.common.VehicleSignal signal = 11;
+  optional apollo.planning.DecisionResult decision = 14;
+  optional LatencyStats latency_stats = 15;
 
-  optional ADCSignals signals = 5 [deprecated = true];
+  // replaced by path_point
+  repeated ADCPathPoint adc_path_point = 7 [deprecated=true];
+  // replaced by trajectory_point
+  repeated ADCTrajectoryPoint adc_trajectory_point = 4 [deprecated=true];
 }

@@ -1,0 +1,61 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/map/proto/map_id.proto";
+
+message LaneOverlapInfo {
+  optional double start_s = 1;  //position (s-coordinate)
+  optional double end_s = 2;    //position (s-coordinate)
+  optional bool is_merge = 3;
+}
+
+message SignalOverlapInfo {
+}
+
+message StopSignOverlapInfo {
+}
+
+message CrosswalkOverlapInfo {
+}
+
+message JunctionOverlapInfo {
+}
+
+message YieldOverlapInfo {
+}
+
+message ClearAreaOverlapInfo {
+}
+
+message SpeedBumpOverlapInfo {
+}
+
+message ParkingSpaceOverlapInfo {
+}
+
+// Information about one object in the overlap.
+message ObjectOverlapInfo {
+  optional Id id = 1;
+
+  oneof overlap_info {
+    LaneOverlapInfo lane_overlap_info = 3;
+    SignalOverlapInfo signal_overlap_info = 4;
+    StopSignOverlapInfo stop_sign_overlap_info = 5;
+    CrosswalkOverlapInfo crosswalk_overlap_info = 6;
+    JunctionOverlapInfo junction_overlap_info = 7;
+    YieldOverlapInfo yield_sign_overlap_info = 8;
+    ClearAreaOverlapInfo clear_area_overlap_info = 9;
+    SpeedBumpOverlapInfo speed_bump_overlap_info = 10;
+    ParkingSpaceOverlapInfo parking_space_overlap_info = 11;
+  }
+}
+
+// Here, the "overlap" includes any pair of objects on the map
+// (e.g. lanes, junctions, and crosswalks).
+message Overlap {
+  optional Id id = 1;
+
+  // Information about one overlap, include all overlapped objects.
+  repeated ObjectOverlapInfo object = 2;
+}

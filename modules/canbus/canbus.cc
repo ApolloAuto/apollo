@@ -40,7 +40,7 @@ std::string Canbus::Name() const { return FLAGS_hmi_name; }
 
 Status Canbus::Init() {
   // load conf
-  if (!::apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
+  if (!common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
                                                 &canbus_conf_)) {
     return OnError("Unable to load canbus conf file: " +
                    FLAGS_canbus_conf_file);
@@ -96,7 +96,7 @@ Status Canbus::Init() {
   }
   AINFO << "The vehicle controller is successfully initialized.";
 
-  AdapterManager::Init();
+  AdapterManager::Init(FLAGS_adapter_config_filename);
 
   AINFO << "The adapter manager is successfully initialized.";
 
@@ -130,7 +130,7 @@ Status Canbus::Start() {
   const double duration = 1.0 / FLAGS_chassis_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &Canbus::OnTimer, this);
-  AdapterManager::SetControlCommandCallback(&Canbus::OnControlCommand, this);
+  AdapterManager::AddControlCommandCallback(&Canbus::OnControlCommand, this);
 
   // last step: publish monitor messages
   apollo::common::monitor::MonitorBuffer buffer(&monitor_);
@@ -141,7 +141,7 @@ Status Canbus::Start() {
 
 void Canbus::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
-  AdapterManager::FillChassisHeader(FLAGS_node_name, chassis.mutable_header());
+  AdapterManager::FillChassisHeader(FLAGS_node_name, &chassis);
 
   AdapterManager::PublishChassis(chassis);
   ADEBUG << chassis.ShortDebugString();
@@ -173,7 +173,7 @@ void Canbus::Stop() {
 
 void Canbus::OnControlCommand(const ControlCommand &control_command) {
   int64_t current_timestamp =
-      apollo::common::time::AsInt64<::apollo::common::time::micros>(
+      apollo::common::time::AsInt64<common::time::micros>(
           Clock::Now());
   // if command coming too soon, just ignore it.
   if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {

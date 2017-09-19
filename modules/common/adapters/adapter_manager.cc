@@ -31,7 +31,7 @@ void AdapterManager::Observe() {
   }
 }
 
-void AdapterManager::Init() { Init(FLAGS_adapter_config_path); }
+bool AdapterManager::Initialized() { return instance()->initialized_; }
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   // Parse config file
@@ -44,12 +44,17 @@ void AdapterManager::Init(const std::string &adapter_config_filename) {
 }
 
 void AdapterManager::Init(const AdapterManagerConfig &configs) {
+  instance()->initialized_ = true;
   if (configs.is_ros()) {
     instance()->node_handle_.reset(new ros::NodeHandle());
   }
 
   for (const auto &config : configs.config()) {
     switch (config.type()) {
+      case AdapterConfig::POINT_CLOUD:
+        EnablePointCloud(FLAGS_pointcloud_topic, config.mode(),
+                         config.message_history_limit());
+        break;
       case AdapterConfig::GPS:
         EnableGps(FLAGS_gps_topic, config.mode(),
                   config.message_history_limit());
@@ -83,9 +88,17 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableControlCommand(FLAGS_control_command_topic, config.mode(),
                              config.message_history_limit());
         break;
+      case AdapterConfig::ROUTING_REQUEST:
+        EnableRoutingRequest(FLAGS_routing_request_topic, config.mode(),
+                             config.message_history_limit());
+        break;
+      case AdapterConfig::ROUTING_RESPONSE:
+        EnableRoutingResponse(FLAGS_routing_response_topic, config.mode(),
+                              config.message_history_limit());
+        break;
       case AdapterConfig::PLANNING_TRAJECTORY:
-        EnablePlanningTrajectory(FLAGS_planning_trajectory_topic, config.mode(),
-                                 config.message_history_limit());
+        EnablePlanning(FLAGS_planning_trajectory_topic, config.mode(),
+                       config.message_history_limit());
         break;
       case AdapterConfig::PREDICTION:
         EnablePrediction(FLAGS_prediction_topic, config.mode(),
@@ -99,9 +112,17 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableChassisDetail(FLAGS_chassis_detail_topic, config.mode(),
                             config.message_history_limit());
         break;
-      case AdapterConfig::DECISION:
-        EnableDecision(FLAGS_decision_topic, config.mode(),
-                       config.message_history_limit());
+      case AdapterConfig::RELATIVE_ODOMETRY:
+        EnableRelativeOdometry(FLAGS_relative_odometry_topic, config.mode(),
+                               config.message_history_limit());
+        break;
+      case AdapterConfig::INS_STAT:
+        EnableInsStat(FLAGS_ins_stat_topic, config.mode(),
+                      config.message_history_limit());
+        break;
+      case AdapterConfig::HMI_COMMAND:
+        EnableHMICommand(FLAGS_hmi_command_topic, config.mode(),
+                         config.message_history_limit());
         break;
       default:
         AERROR << "Unknown adapter config type!";

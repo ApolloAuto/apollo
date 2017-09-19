@@ -75,5 +75,3 @@
 * socketio
     MIT License
     https://github.com/socketio/socket.io-client/blob/master/LICENSE
-* websocketpp
-    https://github.com/zaphoyd/websocketpp/blob/master/COPYING

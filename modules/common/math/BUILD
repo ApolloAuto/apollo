@@ -16,6 +16,7 @@ cc_library(
         ":linear_interpolation",
         ":lqr",
         ":math_utils",
+        ":mpc",
         ":polygon2d",
         ":quaternion",
         ":search",
@@ -48,6 +49,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/util:string_util",
     ],
 )
 
@@ -164,6 +166,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/math:matrix_operations",
+        "//modules/common/util:string_util",
         "@eigen//:eigen",
     ],
 )
@@ -247,6 +250,9 @@ cc_library(
     hdrs = [
         "integral.h",
     ],
+    deps = [
+        "//modules/common:log",
+    ],
 )
 
 cc_library(
@@ -260,6 +266,36 @@ cc_library(
     deps = [
         "//modules/common:log",
         "@eigen//:eigen",
+    ],
+)
+
+cc_library(
+    name = "mpc",
+    srcs = [
+        "mpc_solver.cc",
+    ],
+    hdrs = [
+        "mpc_solver.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/math/qp_solver",
+        "//modules/common/math/qp_solver:active_set_qp_solver",
+        "@eigen//:eigen",
+    ],
+)
+
+cc_test(
+    name = "mpc_test",
+    size = "small",
+    srcs = [
+        "mpc_solver_test.cc",
+    ],
+    deps = [
+        ":mpc",
+        "//modules/common/math/qp_solver",
+        "//modules/common/math/qp_solver:active_set_qp_solver",
+        "@gtest//:main",
     ],
 )
 
@@ -284,6 +320,7 @@ cc_test(
     deps = [
         ":linear_interpolation",
         "//modules/common:log",
+        "@eigen//:eigen",
         "@gtest//:main",
     ],
 )

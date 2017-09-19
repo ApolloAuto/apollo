@@ -1,59 +1,96 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
-load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
-
 cc_proto_library(
     name = "error_code_proto",
-    protos = [
+    deps = [
+        ":error_code_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "error_code_proto_lib",
+    srcs = [
         "error_code.proto",
     ],
 )
 
 cc_proto_library(
     name = "header_proto",
-    protos = [
+    deps = [
+        ":header_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "header_proto_lib",
+    srcs = [
         "header.proto",
     ],
     deps = [
-        ":error_code_proto",
+        ":error_code_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "vehicle_signal_proto",
+    deps = [
+        ":vehicle_signal_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "vehicle_signal_proto_lib",
+    srcs = [
+        "vehicle_signal.proto",
     ],
 )
 
 cc_proto_library(
     name = "common_proto",
-    protos = [
+    deps = [
+        ":common_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "common_proto_lib",
+    srcs = [
         "geometry.proto",
     ],
     deps = [
-        ":error_code_proto",
-        ":header_proto",
+        ":error_code_proto_lib",
+        ":header_proto_lib",
     ],
 )
 
 cc_proto_library(
     name = "gnss_status_proto",
-    protos = [
+    deps = [
+        ":gnss_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "gnss_status_proto_lib",
+    srcs = [
         "gnss_status.proto",
     ],
     deps = [
-        ":error_code_proto",
-        ":header_proto",
+        ":error_code_proto_lib",
+        ":header_proto_lib",
     ],
 )
 
 cc_proto_library(
-    name = "path_point_proto",
-    protos = [
-        "path_point.proto",
+    name = "pnc_point_proto",
+    deps = [
+        ":pnc_point_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "common_proto_pylib",
-    protos = [
-        "error_code.proto",
-        "geometry.proto",
-        "header.proto",
+proto_library(
+    name = "pnc_point_proto_lib",
+    srcs = [
+        "pnc_point.proto",
     ],
 )

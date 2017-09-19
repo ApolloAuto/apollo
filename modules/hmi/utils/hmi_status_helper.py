@@ -22,11 +22,10 @@ import glog
 import google.protobuf.json_format as json_format
 import requests
 
-# Make sure <apollo>/bazel-genfiles is in your PYTHONPATH.
-import modules.hmi.proto.runtime_status_pb2 as runtime_status_pb2
+from modules.hmi.proto.runtime_status_pb2 import RuntimeStatus
 
 gflags.DEFINE_string('hmi_runtime_status_api',
-                     'http://127.0.0.1:8887/runtime_status_api',
+                     'http://127.0.0.1:8887/runtime_status',
                      'Address of HMI runtime status restful api.')
 
 
@@ -36,25 +35,25 @@ class HMIStatusHelper(object):
     @staticmethod
     def report_hardware_status(hardware_status_list):
         """Report hardware status to HMI."""
-        status_pb = runtime_status_pb2.RuntimeStatus()
+        status_pb = RuntimeStatus()
         for hardware_status in hardware_status_list:
             status_pb.hardware.add().MergeFrom(hardware_status)
 
         json_dict = json_format.MessageToDict(status_pb, False, True)
         try:
-            req = requests.post(
-                gflags.FLAGS.hmi_runtime_status_api, json=json_dict)
+            req = requests.post(gflags.FLAGS.hmi_runtime_status_api,
+                                json=json_dict)
             glog.info('Put HardwareStatus: {}'.format(req.json()))
-        except Exception as e:
-            glog.error('Failed to put HardwareStatus: {}'.format(e))
+        except requests.exceptions.RequestException as exception:
+            glog.error('Failed to put HardwareStatus: {}'.format(exception))
 
     @staticmethod
     def report_status(status):
         """Report status to HMI."""
         json_dict = json_format.MessageToDict(status, False, True)
         try:
-            req = requests.post(
-                gflags.FLAGS.hmi_runtime_status_api, json=json_dict)
-            glog.info('Put RuntimeStatus: {}'.format(req.json()))
-        except Exception as e:
-            glog.error('Failed to put RuntimeStatus: {}'.format(e))
+            req = requests.post(gflags.FLAGS.hmi_runtime_status_api,
+                                json=json_dict)
+            glog.info('Put RuntimeStatus result: {}'.format(req.status_code))
+        except requests.exceptions.RequestException as exception:
+            glog.error('Failed to put RuntimeStatus: {}'.format(exception))

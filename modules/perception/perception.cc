@@ -14,45 +14,53 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/perception.h"
-
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/onboard/lidar_process.h"
+#include "modules/perception/perception.h"
 #include "ros/include/ros/ros.h"
+#include "sensor_msgs/PointCloud2.h"
 
 namespace apollo {
 namespace perception {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 std::string Perception::Name() const { return "perception"; }
 
 Status Perception::Init() {
-  AdapterManager::Init();
-  return Status::OK();
-}
+  AdapterManager::Init(FLAGS_adapter_config_filename);
 
-Status Perception::Start() {
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
-  ros::waitForShutdown();
-  spinner.stop();
-  ros::Rate loop_rate(FLAGS_perception_loop_rate);
-  while (ros::ok()) {
-    AdapterManager::Observe();
-    PerceptionObstacles perceptionObstacles;
-    AdapterManager::FillPerceptionObstaclesHeader(
-        Name(), perceptionObstacles.mutable_header());
-    AdapterManager::PublishPerceptionObstacles(perceptionObstacles);
-
-    TrafficLightDetection trafficLightDetection;
-    AdapterManager::FillTrafficLightDetectionHeader(
-        Name(), trafficLightDetection.mutable_header());
-    AdapterManager::PublishTrafficLightDetection(trafficLightDetection);
+  lidar_process_.reset(new LidarProcess());
+  if (lidar_process_ != nullptr && !lidar_process_->Init()) {
+    AERROR << "failed to init lidar_process.";
+    return Status(ErrorCode::PERCEPTION_ERROR, "failed to init lidar_process.");
   }
+
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  AdapterManager::AddPointCloudCallback(&Perception::OnPointCloud, this);
   return Status::OK();
 }
+
+void Perception::OnPointCloud(const sensor_msgs::PointCloud2& message) {
+  ADEBUG << "get point cloud callback";
+
+  if (lidar_process_ != nullptr && lidar_process_->IsInit()) {
+    lidar_process_->Process(message);
+
+    /// public obstacle message
+    PerceptionObstacles obstacles;
+    if (lidar_process_->GeneratePbMsg(&obstacles)) {
+      AdapterManager::PublishPerceptionObstacles(obstacles);
+    }
+  }
+}
+
+Status Perception::Start() { return Status::OK(); }
 
 void Perception::Stop() {}
 

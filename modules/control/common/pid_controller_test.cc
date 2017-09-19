@@ -16,12 +16,13 @@
 
 #include "modules/control/common/pid_controller.h"
 
+#include <iostream>
 #include <string>
 
 #include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_conf.pb.h"
-#include "modules/control/proto/lon_controller_conf.pb.h"
+#include "modules/control/proto/pid_conf.pb.h"
 
 namespace apollo {
 namespace control {
@@ -31,7 +32,7 @@ class PidControllerTest : public ::testing::Test {
   virtual void SetUp() {
     std::string control_conf_file =
         "modules/control/testdata/conf/lincoln.pb.txt";
-    CHECK(::apollo::common::util::GetProtoFromFile(control_conf_file,
+    CHECK(common::util::GetProtoFromFile(control_conf_file,
                                                    &control_conf_));
     lon_controller_conf_ = control_conf_.lon_controller_conf();
   }
@@ -55,7 +56,7 @@ TEST_F(PidControllerTest, StationPidController) {
   EXPECT_NEAR(control_value, -0.01, 1e-6);
   dt = 0.0;
   EXPECT_EQ(pid_controller.Control(100, dt), control_value);
-  EXPECT_EQ(pid_controller.integrator_hold(), false);
+  EXPECT_EQ(pid_controller.IntegratorHold(), false);
 }
 
 TEST_F(PidControllerTest, SpeedPidController) {
@@ -71,11 +72,10 @@ TEST_F(PidControllerTest, SpeedPidController) {
   EXPECT_NEAR(pid_controller.Control(-0.1, dt), -0.1505, 1e-6);
   pid_controller.Reset();
   EXPECT_NEAR(pid_controller.Control(500.0, dt), 750.3, 1e-6);
-  pid_controller.Reset();
-  EXPECT_EQ(pid_controller.saturation_status(), 1);
+  EXPECT_EQ(pid_controller.IntegratorSaturationStatus(), 1);
   pid_controller.Reset();
   EXPECT_NEAR(pid_controller.Control(-500.0, dt), -750.3, 1e-6);
-  EXPECT_EQ(pid_controller.saturation_status(), -1);
+  EXPECT_EQ(pid_controller.IntegratorSaturationStatus(), -1);
 }
 
 }  // namespace control

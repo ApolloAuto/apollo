@@ -1,0 +1,64 @@
+syntax = "proto2";
+
+// Defined Point types that are commoly used in PnC (Planning and Control) modules.
+
+package apollo.common;
+
+message SLPoint {
+    optional double s = 1;
+    optional double l = 2;
+}
+
+message FrenetFramePoint {
+    optional double s = 1;
+    optional double l = 2;
+    optional double dl = 3;
+    optional double ddl = 4;
+}
+
+message SpeedPoint {
+  optional double s = 1;
+  optional double t = 2;
+  // speed (m/s)
+  optional double v = 3;
+  // acceleration (m/s^2)
+  optional double a = 4;
+  // jerk (m/s^3)
+  optional double da = 5;
+}
+
+message PathPoint {
+  // coordinates
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+
+  // direction on the x-y plane
+  optional double theta = 4;
+  // curvature on the x-y planning
+  optional double kappa = 5;
+  // accumulated distance from beginning of the path
+  optional double s = 6;
+
+  // derivative of kappa w.r.t s.
+  optional double dkappa = 7;
+  // derivative of derivative of kappa w.r.t s.
+  optional double ddkappa = 8;
+}
+
+message Path {
+  optional string name = 1;
+  repeated PathPoint path_point = 2;
+}
+
+message TrajectoryPoint {
+  // path point
+  optional PathPoint path_point = 1;
+
+  // linear velocity
+  optional double v = 2;  // in [m/s]
+  // linear acceleration
+  optional double a = 3;
+  // relative time from beginning of the trajectory
+  optional double relative_time = 4;
+}

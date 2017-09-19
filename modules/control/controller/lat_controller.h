@@ -26,6 +26,8 @@
 #include <memory>
 #include <string>
 
+#include "Eigen/Core"
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/trajectory_analyzer.h"
@@ -65,7 +67,7 @@ class LatController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Status Init(const ControlConf *control_conf) override;
+  common::Status Init(const ControlConf *control_conf) override;
 
   /**
    * @brief compute steering target based on current vehicle status
@@ -76,7 +78,7 @@ class LatController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Status ComputeControlCommand(
+  common::Status ComputeControlCommand(
       const localization::LocalizationEstimate *localization,
       const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
       ControlCommand *cmd) override;
@@ -85,7 +87,7 @@ class LatController : public Controller {
    * @brief reset Lateral Controller
    * @return Status reset status
    */
-  Status Reset() override;
+  common::Status Reset() override;
 
   /**
    * @brief stop Lateral controller
@@ -99,6 +101,8 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
+  void UpdateState(SimpleLateralDebug *debug);
+
   void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
 
   void UpdateMatrix();
@@ -108,7 +112,7 @@ class LatController : public Controller {
   double ComputeFeedForward(double ref_curvature) const;
 
   double GetLateralError(
-      const Eigen::Vector2d &point,
+      const common::math::Vec2d &point,
       apollo::common::TrajectoryPoint *trajectory_point) const;
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
@@ -124,11 +128,8 @@ class LatController : public Controller {
 
   void CloseLogFile();
 
-  // a proxy to access vehicle movement state
-  ::apollo::common::vehicle_state::VehicleState vehicle_state_;
-
   // vehicle parameter
-  ::apollo::common::config::VehicleParam vehicle_param_;
+  common::VehicleParam vehicle_param_;
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;

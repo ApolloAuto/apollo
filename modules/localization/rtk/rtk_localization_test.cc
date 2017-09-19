@@ -52,7 +52,7 @@ class RTKLocalizationTest : public ::testing::Test {
  protected:
   template <class T>
   void load_data(const std::string &filename, T *data) {
-    CHECK(::apollo::common::util::GetProtoFromFile(filename, data))
+    CHECK(common::util::GetProtoFromFile(filename, data))
         << "Failed to open file " << filename;
   }
 
@@ -181,6 +181,8 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
     EXPECT_STREQ(expected_result.pose().DebugString().c_str(),
                  localization.pose().DebugString().c_str());
   }
+
+  // TODO(Qi Luo) Update test once got new imu data for euler angle.
 }
 
 }  // namespace localization

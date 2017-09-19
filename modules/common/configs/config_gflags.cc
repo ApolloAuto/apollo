@@ -16,5 +16,21 @@
 
 #include "modules/common/configs/config_gflags.h"
 
+DEFINE_string(map_dir, "modules/map/data/demo",
+              "Directory which contains a group of related maps.");
+
+DEFINE_string(base_map_filename, "base_map.xml|base_map.bin|base_map.txt",
+              "Base map files in the map_dir, search in order.");
+DEFINE_string(sim_map_filename, "sim_map.bin|sim_map.txt",
+              "Simulation map files in the map_dir, search in order.");
+DEFINE_string(routing_map_filename, "routing_map.bin|routing_map.txt",
+              "Routing map files in the map_dir, search in order.");
+DEFINE_string(end_way_point_filename, "default_end_way_point.txt",
+              "End way point of the map, will be sent in RoutingRequest.");
+
 DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
               "the file path of vehicle config file");
+
+DEFINE_bool(use_ros_time, false,
+            "Whether Clock::Now() gets time from system_clock::now() or from "
+            "ros::Time::now().");

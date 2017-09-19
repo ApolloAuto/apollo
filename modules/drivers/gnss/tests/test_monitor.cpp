@@ -20,6 +20,7 @@
 #include <std_msgs/String.h>
 
 #include "proto/gnss_status.pb.h"
+#include "proto/ins.pb.h"
 
 void ins_status_callback(const apollo::common::gnss_status::InsStatus &ins_status) {
     switch (ins_status.type()) {
@@ -34,6 +35,10 @@ void ins_status_callback(const apollo::common::gnss_status::InsStatus &ins_statu
         fprintf(stdout, "INS status is INVALID.\r\n");
         break;
     }
+}
+
+void ins_stat_callback(const ::apollo::drivers::gnss::InsStat &ins_stat) {
+    std::cout << "INS stat: " << ins_stat.DebugString() << std::endl;
 }
 
 void stream_status_callback(const apollo::common::gnss_status::StreamStatus &stream_status) {
@@ -73,13 +78,15 @@ int main(int argc, char *argv[]) {
     ros::init(argc, argv, std::string("gnss_monitor_test"));
 
     ros::NodeHandle nh;
-    ros::Subscriber ins_status_publisher;
-    ros::Subscriber gnss_status_publisher;
-    ros::Subscriber stream_status_publisher;
+    ros::Subscriber ins_status_sub;
+    ros::Subscriber gnss_status_sub;
+    ros::Subscriber stream_status_sub;
+    ros::Subscriber ins_stat_sub;
 
-    ins_status_publisher = nh.subscribe("/apollo/sensor/gnss/ins_status", 16, ins_status_callback);
-    gnss_status_publisher = nh.subscribe("/apollo/sensor/gnss/gnss_status", 16, gnss_status_callback);
-    stream_status_publisher = nh.subscribe("/apollo/sensor/gnss/stream_status", 16, stream_status_callback);
+    ins_status_sub = nh.subscribe("/apollo/sensor/gnss/ins_status", 16, ins_status_callback);
+    gnss_status_sub = nh.subscribe("/apollo/sensor/gnss/gnss_status", 16, gnss_status_callback);
+    stream_status_sub = nh.subscribe("/apollo/sensor/gnss/stream_status", 16, stream_status_callback);
+    ins_stat_sub = nh.subscribe("/apollo/sensor/gnss/ins_stat", 16, ins_stat_callback);
 
     ros::spin();
 

@@ -11,10 +11,8 @@ message Command {
   repeated string command = 2;
 
   // Log file paths.
-  // Note that only files under /apollo/data can be viewed from HMI.
-  optional string stdout_file = 3 [default = '/dev/null'];
-  optional string stderr_file = 4 [default = '/dev/null'];
-  repeated string log_files = 5;
+  optional string stdout_file = 3 [default = "/dev/null"];
+  optional string stderr_file = 4 [default = "/dev/null"];
 }
 
 message Component {
@@ -24,7 +22,61 @@ message Component {
 }
 
 message Config {
-  repeated Component modules = 1;
-  repeated Component hardware = 2;
-  repeated Command tools = 3;
+  message Server {
+    optional string binding_ip = 1 [default = "0.0.0.0"];
+    optional string domain = 2 [default = "apollo.hmi"];
+    optional int32 port = 3 [default = 8887];
+    optional string log_file = 4 [default = "data/log/hmi.log"];
+
+    // HTTPS configs.
+    message Https {
+      optional bool enabled = 1;
+      optional string server_key = 2;
+      optional string server_cert = 3;
+      optional bool client_cert_required = 4;
+    }
+    optional Https https = 5;
+  }
+  optional Server server = 1;
+
+  repeated Component modules = 2;
+  repeated Component hardware = 3;
+  repeated Command tools = 4;
+  optional string global_flagfile = 5
+      [default = "modules/common/data/global_flagfile.txt"];
+
+  // HDMaps.
+  message HDMap {
+    optional string name = 1;
+    optional string map_dir = 2;
+  }
+  repeated HDMap available_maps = 6;
+
+  // Vehicle config.
+  message VehicleConfig {
+    optional string name = 1;
+    optional string vehicle_param_pb_path = 2
+        [default = "modules/common/data/mkz_config.pb.txt"];
+    optional string calibration_table_path = 3
+        [default = "modules/control/conf/lincoln.pb.txt"];
+    optional string velodyne_params_path = 4;
+    optional string velodyne_launch_path = 5;
+    optional string gnss_driver_path = 6;
+    optional string gnss_conf_path = 7;
+  }
+  optional string vehicle_param_pb_target_path = 7
+      [default = "modules/common/data/mkz_config.pb.txt"];
+  optional string calibration_table_target_path = 8
+      [default = "modules/control/conf/lincoln.pb.txt"];
+  // Paths relative to ROS root directory.
+  optional string velodyne_params_target_path = 9
+      [default = "share/velodyne_pointcloud/params"];
+  optional string velodyne_launch_target_path = 10
+      [default = "share/velodyne/launch/start_velodyne.launch"];
+  optional string gnss_driver_target_path = 11
+      [default = "share/gnss_driver/launch/gnss_driver.launch"];
+  optional string gnss_conf_target_path = 12
+      [default = "share/gnss_driver/conf/gnss_conf_mkz.txt"];
+
+  repeated VehicleConfig available_vehicles = 13;
 }
