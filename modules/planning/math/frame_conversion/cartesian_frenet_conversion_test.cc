@@ -44,8 +44,9 @@ TEST(TestCartesianFrenetConversion, cartesian_to_frenet_test) {
   std::array<double, 3> s_conditions;
   std::array<double, 3> d_conditions;
 
-  CartesianFrenetConverter::cartesian_to_frenet(rs, rx, ry, rtheta, rkappa,
-      rdkappa, x, y, v, a, theta, kappa, &s_conditions, &d_conditions);
+  CartesianFrenetConverter::cartesian_to_frenet(
+      rs, rx, ry, rtheta, rkappa, rdkappa, x, y, v, a, theta, kappa,
+      &s_conditions, &d_conditions);
 
   double x_out;
   double y_out;
@@ -54,9 +55,9 @@ TEST(TestCartesianFrenetConversion, cartesian_to_frenet_test) {
   double v_out;
   double a_out;
 
-  CartesianFrenetConverter::frenet_to_cartesian(rs, rx, ry, rtheta, rkappa,
-      rdkappa, s_conditions, d_conditions, &x_out, &y_out, &theta_out,
-      &kappa_out, &v_out, &a_out);
+  CartesianFrenetConverter::frenet_to_cartesian(
+      rs, rx, ry, rtheta, rkappa, rdkappa, s_conditions, d_conditions, &x_out,
+      &y_out, &theta_out, &kappa_out, &v_out, &a_out);
 
   EXPECT_NEAR(x, x_out, 1.0e-6);
   EXPECT_NEAR(y, y_out, 1.0e-6);

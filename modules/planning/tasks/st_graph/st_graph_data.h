@@ -26,8 +26,8 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/planning/common/speed_limit.h"
 #include "modules/planning/common/speed/st_boundary.h"
+#include "modules/planning/common/speed_limit.h"
 
 namespace apollo {
 namespace planning {

@@ -21,8 +21,8 @@
 #ifndef MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
 #define MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
 
-#include <utility>
 #include <array>
+#include <utility>
 
 #include "modules/common/log.h"
 

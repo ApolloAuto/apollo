@@ -97,9 +97,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   const auto& vehicle_state = *VehicleState::instance();
   auto matched_point = prev_trajectory.TrajectoryPointAt(matched_index);
-  const double position_diff = std::hypot(
-      matched_point.path_point().x() - vehicle_state.x(),
-      matched_point.path_point().y() - vehicle_state.y());
+  const double position_diff =
+      std::hypot(matched_point.path_point().x() - vehicle_state.x(),
+                 matched_point.path_point().y() - vehicle_state.y());
 
   if (position_diff > FLAGS_replan_distance_threshold) {
     AWARN << "the distance between matched point and actual position is too "

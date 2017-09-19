@@ -46,7 +46,7 @@ Spline2dSeg::Spline2dSeg(const std::vector<double>& x_param,
 }
 
 bool Spline2dSeg::SetParams(const std::vector<double>& x_param,
-                             const std::vector<double>& y_param) {
+                            const std::vector<double>& y_param) {
   if (x_param.size() != y_param.size()) {
     return false;
   }

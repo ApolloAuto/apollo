@@ -38,7 +38,7 @@ class Spline2dSeg {
   ~Spline2dSeg() = default;
 
   bool SetParams(const std::vector<double>& x_param,
-                  const std::vector<double>& y_param);
+                 const std::vector<double>& y_param);
 
   std::pair<double, double> operator()(const double t) const;
   double x(const double t) const;

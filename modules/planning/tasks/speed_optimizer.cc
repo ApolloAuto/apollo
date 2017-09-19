@@ -18,9 +18,9 @@
  * @file speed_optimizer.cc
  **/
 
+#include "modules/planning/tasks/speed_optimizer.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/tasks/speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
