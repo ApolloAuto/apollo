@@ -1,6 +1,8 @@
 # Apollo 1.5 Quick Start Guide
 
-This quick start focuses on Apollo 1.5 new features. For general Apollo concepts, please refer to [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
+This quick start focuses on Apollo 1.5 new features. For general Apollo concepts, please refer to [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md). 
+
+Before doing the following steps, make sure you have calibrated the extrinsic parameters between the LiDAR and the GNSS/INS. For sensor calibration, please refer to [Apollo 1.5 LiDAR calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md).
 
 ## Launch release env Docker Image
 
