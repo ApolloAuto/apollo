@@ -49,18 +49,17 @@ const std::vector<common::SpeedPoint>& SpeedData::speed_vector() const {
   return speed_vector_;
 }
 
-void SpeedData::set_speed_vector(
-    std::vector<common::SpeedPoint> speed_points) {
+void SpeedData::set_speed_vector(std::vector<common::SpeedPoint> speed_points) {
   speed_vector_ = std::move(speed_points);
 }
 
-bool SpeedData::EvaluateByTime(
-    const double t, common::SpeedPoint* const speed_point) const {
+bool SpeedData::EvaluateByTime(const double t,
+                               common::SpeedPoint* const speed_point) const {
   if (speed_vector_.size() < 2) {
     return false;
   }
-  if (!(speed_vector_.front().t() < t + 1.0e-6
-      && t - 1.0e-6 < speed_vector_.back().t())) {
+  if (!(speed_vector_.front().t() < t + 1.0e-6 &&
+        t - 1.0e-6 < speed_vector_.back().t())) {
     return false;
   }
 
@@ -68,8 +67,8 @@ bool SpeedData::EvaluateByTime(
     return sp.t() < t;
   };
 
-  auto it_lower = std::lower_bound(speed_vector_.begin(),
-                                   speed_vector_.end(), t, comp);
+  auto it_lower =
+      std::lower_bound(speed_vector_.begin(), speed_vector_.end(), t, comp);
   if (it_lower == speed_vector_.end()) {
     *speed_point = speed_vector_.back();
   } else if (it_lower == speed_vector_.begin()) {

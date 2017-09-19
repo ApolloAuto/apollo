@@ -49,10 +49,10 @@ class SpeedOptimizer : public Task {
 
   SpeedData GenerateStopProfile(const double init_speed) const;
 
-  void RecordSTGraphDebug(
-      const std::vector<StBoundary>& boundaries, const SpeedLimit& speed_limits,
-      const SpeedData& speed_data,
-      planning_internal::STGraphDebug* stGraphDebug);
+  void RecordSTGraphDebug(const std::vector<StBoundary>& boundaries,
+                          const SpeedLimit& speed_limits,
+                          const SpeedData& speed_data,
+                          planning_internal::STGraphDebug* stGraphDebug);
 
   void RecordDebugInfo(const SpeedData& speed_data);
 };

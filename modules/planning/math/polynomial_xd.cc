@@ -59,7 +59,7 @@ void PolynomialXd::IntegratedFrom(const PolynomialXd& base) {
 }
 
 void PolynomialXd::IntegratedFrom(const PolynomialXd& base,
-                                   const double intercept) {
+                                  const double intercept) {
   params_.resize(base.order() + 1);
   params_[0] = intercept;
   for (std::uint32_t i = 0; i < base.order(); ++i) {

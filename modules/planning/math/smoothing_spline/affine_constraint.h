@@ -40,7 +40,7 @@ class AffineConstraint {
   const Eigen::MatrixXd& constraint_matrix() const;
   const Eigen::MatrixXd& constraint_boundary() const;
   bool AddConstraint(const Eigen::MatrixXd& constraint_matrix,
-                      const Eigen::MatrixXd& constraint_boundary);
+                     const Eigen::MatrixXd& constraint_boundary);
 
  private:
   Eigen::MatrixXd constraint_matrix_;
