@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_COMMON_FRAME_H_
 
 #include <cstdint>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -75,7 +76,7 @@ class Frame {
 
   void RecordInputDebug();
 
-  std::vector<ReferenceLineInfo> &reference_line_info();
+  std::list<ReferenceLineInfo> &reference_line_info();
 
   bool AddObstacle(std::unique_ptr<Obstacle> obstacle);
 
@@ -119,7 +120,7 @@ class Frame {
  private:
   common::TrajectoryPoint planning_start_point_;
 
-  std::vector<ReferenceLineInfo> reference_line_info_;
+  std::list<ReferenceLineInfo> reference_line_info_;
 
   /**
    * the reference line info that the vehicle finally choose to drive on.

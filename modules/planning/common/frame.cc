@@ -98,7 +98,7 @@ planning_internal::Debug *Frame::DebugLogger() {
   return trajectory_pb_.mutable_debug();
 }
 
-std::vector<ReferenceLineInfo> &Frame::reference_line_info() {
+std::list<ReferenceLineInfo> &Frame::reference_line_info() {
   return reference_line_info_;
 }
 

@@ -123,6 +123,8 @@ class ReferenceLineInfo {
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;
+
+  DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };
 
 }  // namespace planning
