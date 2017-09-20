@@ -72,4 +72,3 @@ else:
 `模型文件:src\acc_model.py`
 
 <img src="./png_resource/acc_model.png" width = "300" height = "320" align=center />
-
