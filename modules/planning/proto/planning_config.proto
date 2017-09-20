@@ -15,6 +15,7 @@ enum TaskType {
   QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
   TRAFFIC_DECIDER = 4;
   PATH_DECIDER = 5;
+  SPEED_DECIDER = 6;
 };
 
 message RuleConfig {
