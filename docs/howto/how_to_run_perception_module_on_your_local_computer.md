@@ -34,12 +34,12 @@ chmod +x ./NVIDIA-Linux-x86_64-375.39.run
 
 6. Commit a new docker image (in host):
 ```
-docker commit [CONTAINER_ID] apolloauto/apollo:[NEW_DOCKER_IMAGE_TAG]
+docker commit CONTAINER_ID apolloauto/apollo:NEW_DOCKER_IMAGE_TAG
 ```
 
 7. Start the new docker image (in host) and get into docker:
 ```
-./docker/scripts/dev_start.sh [NEW_DOCKER_IMAGE_TAG]
+./docker/scripts/dev_start.sh NEW_DOCKER_IMAGE_TAG
 ./docker/scripts/dev_into.sh
 ```
 
