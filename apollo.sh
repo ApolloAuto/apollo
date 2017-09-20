@@ -257,7 +257,7 @@ function release() {
 function gen_coverage() {
   bazel clean
   generate_build_targets
-  echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES -c dbg --config=coverage
+  echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES -c dbg --config=coverage $@
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
@@ -299,9 +299,9 @@ function run_test() {
   generate_build_targets
   if [ "$USE_GPU" == "1" ]; then
     echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
-    echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+    echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
-    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings
+    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
   if [ $? -eq 0 ]; then
     success 'Test passed!'
@@ -538,12 +538,12 @@ function main() {
       ;;
     test)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      run_test
+      run_test $@
       ;;
     test_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
       USE_GPU="1"
-      run_test
+      run_test $@
       ;;
     release)
       release 1
@@ -552,7 +552,7 @@ function main() {
       release 0
       ;;
     coverage)
-      gen_coverage
+      gen_coverage $@
       ;;
     clean)
       clean
