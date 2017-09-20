@@ -86,7 +86,7 @@ function push() {
   docker push "$RELEASE_NAME"
 }
 
-if [ $# != 1 ];then
+if [ $# == 0 ];then
     print_usage
     exit 1
 fi
@@ -104,6 +104,6 @@ case $1 in
     gen_docker
     ;;
   *)
-    docker exec -u $USER apollo_dev bash -c "./apollo.sh $1"
+    docker exec -u $USER apollo_dev bash -c "./apollo.sh $@"
     ;;
 esac
