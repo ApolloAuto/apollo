@@ -152,9 +152,6 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   reference_line_info->SetTrajectory(trajectory);
-  reference_line_info->ExportDecision(
-      frame->MutableADCTrajectory()->mutable_decision());
-
   return ret;
 }
 
