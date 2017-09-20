@@ -66,15 +66,11 @@ class Frame {
 
   std::string DebugString() const;
 
-  ADCTrajectory *MutableADCTrajectory();
-
-  planning_internal::Debug *DebugLogger();
-
   const PublishableTrajectory &ComputedTrajectory() const;
 
   const routing::RoutingResponse &routing_response() const;
 
-  void RecordInputDebug();
+  void RecordInputDebug(planning_internal::Debug *debug);
 
   std::list<ReferenceLineInfo> &reference_line_info();
 
@@ -137,8 +133,6 @@ class Frame {
   localization::Pose init_pose_;
   static const hdmap::PncMap *pnc_map_;
   ReferenceLineSmootherConfig smoother_config_;
-
-  ADCTrajectory trajectory_pb_;  // planning output pb
 
   std::string collision_obstacle_id_;
 };

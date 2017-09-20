@@ -104,8 +104,9 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   StGraphData st_graph_data(boundaries, init_point, speed_limits,
                             path_data.discretized_path().Length());
 
-  STGraphDebug* st_graph_debug =
-      frame_->DebugLogger()->mutable_planning_data()->add_st_graph();
+  STGraphDebug* st_graph_debug = reference_line_info_->mutable_debug()
+                                     ->mutable_planning_data()
+                                     ->add_st_graph();
 
   std::pair<double, double> accel_bound = {
       qp_spline_st_speed_config_.preferred_min_deceleration(),
