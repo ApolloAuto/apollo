@@ -73,6 +73,20 @@ const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
   return adc_sl_boundary_;
 }
 
+PathDecision* ReferenceLineInfo::path_decision() { return &path_decision_; }
+
+const PathDecision& ReferenceLineInfo::path_decision() const {
+  return path_decision_;
+}
+
+const ReferenceLine& ReferenceLineInfo::reference_line() const {
+  return reference_line_;
+}
+
+void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
+  discretized_trajectory_ = trajectory;
+}
+
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   auto path_obstacle = CreatePathObstacle(obstacle);
   if (!path_obstacle) {

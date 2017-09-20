@@ -37,23 +37,22 @@ namespace {
 std::vector<TrajectoryPoint> ComputeReinitStitchingTrajectory() {
   TrajectoryPoint init_point;
   const auto& vehicle_state = *VehicleState::instance();
+  DCHECK(!std::isnan(vehicle_state.x()));
+  DCHECK(!std::isnan(vehicle_state.y()));
+  DCHECK(!std::isnan(vehicle_state.z()));
+  DCHECK(!std::isnan(vehicle_state.heading()));
+  DCHECK(!std::isnan(vehicle_state.kappa()));
+  DCHECK(!std::isnan(vehicle_state.linear_velocity()));
+  DCHECK(!std::isnan(vehicle_state.linear_acceleration()));
+
   init_point.mutable_path_point()->set_x(vehicle_state.x());
   init_point.mutable_path_point()->set_y(vehicle_state.y());
   init_point.mutable_path_point()->set_z(vehicle_state.z());
   init_point.mutable_path_point()->set_theta(vehicle_state.heading());
   init_point.mutable_path_point()->set_kappa(vehicle_state.kappa());
-
   init_point.set_v(vehicle_state.linear_velocity());
   init_point.set_a(vehicle_state.linear_acceleration());
   init_point.set_relative_time(0.0);
-
-  DCHECK(!std::isnan(init_point.path_point().x()));
-  DCHECK(!std::isnan(init_point.path_point().y()));
-  DCHECK(!std::isnan(init_point.path_point().z()));
-  DCHECK(!std::isnan(init_point.path_point().theta()));
-  DCHECK(!std::isnan(init_point.path_point().kappa()));
-  DCHECK(!std::isnan(init_point.v()));
-  DCHECK(!std::isnan(init_point.a()));
 
   return std::vector<TrajectoryPoint>(1, init_point);
 }
