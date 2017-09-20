@@ -1,0 +1,1430 @@
+<html>
+  <head>
+		  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>spec.html</title>
+
+			<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+			<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+			<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+
+		  <style>
+			pre {
+			    counter-reset: line-numbering;
+			    border: solid 1px #d9d9d9;
+			    border-radius: 0;
+			    background: #fff;
+			    padding: 0;
+			    line-height: 23px;
+			    margin-bottom: 30px;
+			    white-space: pre;
+			    overflow-x: auto;
+			    word-break: inherit;
+			    word-wrap: inherit;
+			}
+
+			pre a::before {
+			  content: counter(line-numbering);
+			  counter-increment: line-numbering;
+			  padding-right: 1em; /* space after numbers */
+			  width: 25px;
+			  text-align: right;
+			  opacity: 0.7;
+			  display: inline-block;
+			  color: #aaa;
+			  background: #eee;
+			  margin-right: 16px;
+			  padding: 2px 10px;
+			  font-size: 13px;
+			  -webkit-touch-callout: none;
+			  -webkit-user-select: none;
+			  -khtml-user-select: none;
+			  -moz-user-select: none;
+			  -ms-user-select: none;
+			  user-select: none;
+			}
+
+			pre a:first-of-type::before {
+			  padding-top: 10px;
+			}
+
+			pre a:last-of-type::before {
+			  padding-bottom: 10px;
+			}
+
+			pre a:only-of-type::before {
+			  padding: 10px;
+			}
+
+			.highlight { background-color: #ffffcc } /* RIGHT */
+  .highlight .hll { background-color: #ffffcc }
+  .highlight  { background: #f0f0f0; }
+  .highlight .c { color: #60a0b0; font-style: italic } /* Comment */
+  .highlight .err { border: 1px solid #FF0000 } /* Error */
+  .highlight .k { color: #007020; font-weight: bold } /* Keyword */
+  .highlight .o { color: #666666 } /* Operator */
+  .highlight .ch { color: #60a0b0; font-style: italic } /* Comment.Hashbang */
+  .highlight .cm { color: #60a0b0; font-style: italic } /* Comment.Multiline */
+  .highlight .cp { color: #007020 } /* Comment.Preproc */
+  .highlight .cpf { color: #60a0b0; font-style: italic } /* Comment.PreprocFile */
+  .highlight .c1 { color: #60a0b0; font-style: italic } /* Comment.Single */
+  .highlight .cs { color: #60a0b0; background-color: #fff0f0 } /* Comment.Special */
+  .highlight .gd { color: #A00000 } /* Generic.Deleted */
+  .highlight .ge { font-style: italic } /* Generic.Emph */
+  .highlight .gr { color: #FF0000 } /* Generic.Error */
+  .highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+  .highlight .gi { color: #00A000 } /* Generic.Inserted */
+  .highlight .go { color: #888888 } /* Generic.Output */
+  .highlight .gp { color: #c65d09; font-weight: bold } /* Generic.Prompt */
+  .highlight .gs { font-weight: bold } /* Generic.Strong */
+  .highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+  .highlight .gt { color: #0044DD } /* Generic.Traceback */
+  .highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+  .highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+  .highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+  .highlight .kp { color: #007020 } /* Keyword.Pseudo */
+  .highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+  .highlight .kt { color: #902000 } /* Keyword.Type */
+  .highlight .m { color: #40a070 } /* Literal.Number */
+  .highlight .s { color: #4070a0 } /* Literal.String */
+  .highlight .na { color: #4070a0 } /* Name.Attribute */
+  .highlight .nb { color: #007020 } /* Name.Builtin */
+  .highlight .nc { color: #0e84b5; font-weight: bold } /* Name.Class */
+  .highlight .no { color: #60add5 } /* Name.Constant */
+  .highlight .nd { color: #555555; font-weight: bold } /* Name.Decorator */
+  .highlight .ni { color: #d55537; font-weight: bold } /* Name.Entity */
+  .highlight .ne { color: #007020 } /* Name.Exception */
+  .highlight .nf { color: #06287e } /* Name.Function */
+  .highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+  .highlight .nn { color: #0e84b5; font-weight: bold } /* Name.Namespace */
+  .highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+  .highlight .nv { color: #bb60d5 } /* Name.Variable */
+  .highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+  .highlight .w { color: #bbbbbb } /* Text.Whitespace */
+  .highlight .mb { color: #40a070 } /* Literal.Number.Bin */
+  .highlight .mf { color: #40a070 } /* Literal.Number.Float */
+  .highlight .mh { color: #40a070 } /* Literal.Number.Hex */
+  .highlight .mi { color: #40a070 } /* Literal.Number.Integer */
+  .highlight .mo { color: #40a070 } /* Literal.Number.Oct */
+  .highlight .sa { color: #4070a0 } /* Literal.String.Affix */
+  .highlight .sb { color: #4070a0 } /* Literal.String.Backtick */
+  .highlight .sc { color: #4070a0 } /* Literal.String.Char */
+  .highlight .dl { color: #4070a0 } /* Literal.String.Delimiter */
+  .highlight .sd { color: #4070a0; font-style: italic } /* Literal.String.Doc */
+  .highlight .s2 { color: #4070a0 } /* Literal.String.Double */
+  .highlight .se { color: #4070a0; font-weight: bold } /* Literal.String.Escape */
+  .highlight .sh { color: #4070a0 } /* Literal.String.Heredoc */
+  .highlight .si { color: #70a0d0; font-style: italic } /* Literal.String.Interpol */
+  .highlight .sx { color: #c65d09 } /* Literal.String.Other */
+  .highlight .sr { color: #235388 } /* Literal.String.Regex */
+  .highlight .s1 { color: #4070a0 } /* Literal.String.Single */
+  .highlight .ss { color: #517918 } /* Literal.String.Symbol */
+  .highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+  .highlight .fm { color: #06287e } /* Name.Function.Magic */
+  .highlight .vc { color: #bb60d5 } /* Name.Variable.Class */
+  .highlight .vg { color: #bb60d5 } /* Name.Variable.Global */
+  .highlight .vi { color: #bb60d5 } /* Name.Variable.Instance */
+  .highlight .vm { color: #bb60d5 } /* Name.Variable.Magic */
+  .highlight .il { color: #40a070 } /* Literal.Number.Integer.Long */</style>
+  </head>
+  <body>
+		<div>
+			<div style='width:25%; '>
+					<ul id="tree" class="ztree" style='width:100%;'>
+
+					</ul>
+			</div>
+	        <div id='readme' style='width:70%;margin-left:20%;'>
+	          	<article class='markdown-body'>
+
+<h1 id="toc_0">百度DuerOS车载版接入指南</h1>
+
+<blockquote>
+<p>百度DuerOS车载版，版权归百度公司所有，侵权必究</p>
+
+<p>联系email：dueros_feedback@baidu.com</p>
+</blockquote>
+
+<h1 id="toc_1">版本历史</h1>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">版本号</th>
+<th style="text-align: left">修改内容简介</th>
+<th style="text-align: right">修改日期</th>
+<th style="text-align: right">修改人</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">V1.0.0.0</td>
+<td style="text-align: left">创建</td>
+<td style="text-align: right">2016-12-13</td>
+<td style="text-align: right">DuerOS车载版 Team</td>
+</tr>
+<tr>
+<td style="text-align: left">V1.0.0.1</td>
+<td style="text-align: left">增加DuerOS车载版接入、打断式交互、MIC设计参考等三个章节</td>
+<td style="text-align: right">2017-04-28</td>
+<td style="text-align: right">欧阳能钧、赵科</td>
+</tr>
+<tr>
+<td style="text-align: left">V1.0.0.2</td>
+<td style="text-align: left">增加云端语义服务接入资料</td>
+<td style="text-align: right">2017-06-06</td>
+<td style="text-align: right">杜秋</td>
+</tr>
+<tr>
+<td style="text-align: left">V1.0.1.0</td>
+<td style="text-align: left">增加蓝牙电话、在线更新以及UI规范等内容</td>
+<td style="text-align: right">2017-07-24</td>
+<td style="text-align: right">张龙、伟亮、赵科</td>
+</tr>
+<tr>
+<td style="text-align: left">V1.0.3.0</td>
+<td style="text-align: left">调整SystemTool，MediaTool，CdTTSManager接口</td>
+<td style="text-align: right">2017-08-24</td>
+<td style="text-align: right">郭敬、宋晔</td>
+</tr>
+</tbody>
+</table>
+
+<h1 id="toc_2">简介</h1>
+
+<h2 id="toc_3">DuerOS车载版是什么</h2>
+
+<p>百度DuerOS是百度推出的对话式人工智能系统，广泛支持各类硬件设备，已具备70多项能力。百度DuerOS车载版是针对联网汽车，以智能语音为人机交互方式，基于百度的语音技术和自然语言处理技术等AI技术打造的全语音交互整体解决方案。</p>
+
+<p>DuerOS车载版可以提供语音交互、电话、音乐和导航四大功能。车主在驾驶过程中可以随时通过语音完成导航、音乐、电话等操作，可以让驾驶者从繁琐枯燥的驾车程序中解脱出来，让行车更安全、便捷和经济，并且借助于百度所连接的众多O2O生态获取停车、加油、保养等车后服务。</p>
+
+<p>本文档是DuerOS车载版 语音交互接入详细指南，为合作方在车机端接入DuerOS车载版的开发提供硬件、系统和软件实现等方面特别是语音交互集成的详细指导。</p>
+
+<h2 id="toc_4">怎么接入DuerOS车载版</h2>
+
+<blockquote>
+<p>DuerOS车载版暂时不支持个人开发者的接入。</p>
+</blockquote>
+
+<p>DuerOS车载版目前主要面向车厂、车机方案商、芯片商、运营商等开放接入，下面简称DuerOS合作方。接入流程有</p>
+
+<ol>
+<li>商务沟通：DuerOS合作方联系百度商务(<a href="mailto:iov-bd@baidu.com" title="iov-bd@baidu.com">iov-bd@baidu.com</a>),进行NDA等合同签署。</li>
+<li>开发包获取：完成商务流程后，DuerOS合作方即可获得<a href="#DuerOS%E5%8F%91%E5%B8%83%E5%8C%85%E5%8C%85%E5%90%AB%E4%BB%80%E4%B9%88%E5%86%85%E5%AE%B9">DuerOS车载版发布包</a>下载地址。</li>
+<li>接入适配：拿到发布包后，根据文档及自己的需求进行适配接入，完成接入后DuerOS合作方需根据百度提供的<a href="#DuerOS%E6%B5%8B%E8%AF%95%E9%AA%8C%E6%94%B6%E6%B5%81%E7%A8%8B">验收文档</a>
+进行验收。</li>
+<li>百度验收：在DuerOS合作方验收通过后，邮寄预量产的设备给百度，由百度进行验收，百度验收通过的设备都将获得授权、发布签名和认证。邮寄地址请联系百度商务获得。</li>
+<li>量产发布：由DuerOS合作方负责，百度可适当参与PR等工作。</li>
+</ol>
+
+<p>如下情况，请联系百度商务(<a href="mailto:iov-bd@baidu.com" title="iov-bd@baidu.com">iov-bd@baidu.com</a>)沟通确定。</p>
+
+<blockquote>
+<p>1.针对前装车厂，需要更多紧密研发和耦合获得更好效果的。</p>
+
+<p>2.存在定制需求的。</p>
+</blockquote>
+
+<h2 id="toc_5">发布包包含什么内容</h2>
+
+<p><a name="DuerOS发布包包含什么内容" ></a></p>
+
+<p>目前DuerOS车载版主要发布了Andriod系统的解决方案及在线云API服务。Linux、QNX、IOS等其他系统的解决方案暂未支持。</p>
+
+<blockquote>
+<p>所有DuerOS合作方只要与百度商务(<a href="mailto:iov-bd@baidu.com" title="iov-bd@baidu.com">iov-bd@baidu.com</a>)完成NDA协议签订，就可以获得DuerOS车载版发布包。</p>
+</blockquote>
+
+<p>DuerOS发布包主要包含了4个APK、1个SDK、文档和示例代码组成。</p>
+
+<h3 id="toc_6">APK目录</h3>
+
+<p>该目录包含4个APK：</p>
+
+<ul>
+<li>DuerOS_CoDriver_*.*.*_Release.apk：语音交互核心模块，是DuerOS运行必选。</li>
+<li>DuerOS_CarRadio_*.*.*_Release.apk：语音内容生态电台，与语音交互结合提供海量语音内容，如歌曲、戏曲、广播等。</li>
+<li>DuerOS_*.*.*_Release.apk：车载版本百度地图。</li>
+<li>DuerOS_*.*.*_Release.apk：DuerOS Launcher车机程序，可以代替Andriod原生Launcher。该程序有开源代码，可以供厂商修改或参考。</li>
+<li>DuerOS<em>Launcher</em>Mirror<em><em>.</em>.*</em>Release.apk：DuerOS Launcher后视镜程序，可以代替Andriod原生Launcher。该程序有开源代码，可以供厂商修改或参考。</li>
+</ul>
+
+<h3 id="toc_7">SDK目录</h3>
+
+<p>codriver_sdk_*.*.*_release.jar: DuerOS提供的SDK，通过该SDK可以与DuerOS进行通信，实现各种SDK开发者定制功能。</p>
+
+<h3 id="toc_8">Doc目录</h3>
+
+<p>该目录主要包含4个说明文档：</p>
+
+<ul>
+<li>百度DuerOS车载版基本功能测试Case.xlsx:该份Case是百度已经验证DuerOS支持的功能集合；在DuerOS开发者完成DuerOS集成后，建议先试用该测试case进行验证效果，如果有问题则需要跟进是不是集成存在问题，也可以联系百度需求帮助。</li>
+<li>百度DuerOS车载版第三方视觉规范.pdf：DuerOS的launcher和部分UI是开源和允许开发者进行修改的，所有UI的修改都需要遵循该规范，否则存在产品验收在百度端不通过的风险。</li>
+<li>百度DuerOS车载版接入指南.pdf：包含了DuerOS车载版的架构、策略、API、注意事项说明，是开发者的主要参考依据。</li>
+<li>百度车联网DuerOS XXX项目记录表-模板.xls：这个需要开发者填写，并发送给百度dueros_feedback@baidu.com，百度用于记录接入者情况，</li>
+<li>百度DuerOS车载版语音指令集.xlsx: 目前DuerOS推荐的指令样例集合。</li>
+</ul>
+
+<h3 id="toc_9">Demo目录</h3>
+
+<p>这是百度apollo开源计划的代码开源一小分支，该目录包含了如下开源代码：</p>
+
+<ul>
+<li>DuerOS Launcher代码：DuerOS Launcher开源代码，供开发者参考。</li>
+<li>DuerOS CustomAPP代码：该代码主要包含如何使用SDK开发自己的应用与DuerOS进行通信互动。</li>
+</ul>
+
+<h2 id="toc_10">推荐的软硬件配置</h2>
+
+<p>为了让DuerOS在你的设备上运行良好，我们推荐设备配置如下</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">Head Unit Specs</th>
+<th style="text-align: left">Recommended Requirement</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">CPU</td>
+<td style="text-align: left">Cortex A9 dual cores、 1.2GHz</td>
+</tr>
+<tr>
+<td style="text-align: left">RAM</td>
+<td style="text-align: left">2GB</td>
+</tr>
+<tr>
+<td style="text-align: left">NETWORK</td>
+<td style="text-align: left">3G、4G</td>
+</tr>
+<tr>
+<td style="text-align: left">STORAGE</td>
+<td style="text-align: left">8GB</td>
+</tr>
+<tr>
+<td style="text-align: left">TELEPHONE</td>
+<td style="text-align: left">BLUETOOTH 4.0 or beyond</td>
+</tr>
+<tr>
+<td style="text-align: left">Mic Input</td>
+<td style="text-align: left">Support echo cancellation, SNR &gt; 10dB, 16bit, 16KHz, mplitude ∈ (2000、 30000)</td>
+</tr>
+<tr>
+<td style="text-align: left">OS</td>
+<td style="text-align: left">Android 4.1 or beyond</td>
+</tr>
+<tr>
+<td style="text-align: left">GPS</td>
+<td style="text-align: left">GPS、A-GPS</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_11">整体架构</h2>
+
+<p>DuerOS车载版整体技术架构主要包含三个方面，分别是服务端、客户端以及第三方服务和内容（比如音乐、导航、地图以及FM等应用），主要架构如下图：
+<img src="img/dueros_arch.png" alt="DuerOS车载版框架图"></p>
+
+<p>服务端：目前主要考虑统计服务、路况电台、渠道动态配置以及语音识别、语义解析以及NLP等服务的提供。</p>
+
+<p>客户端：核心模块是语音模块和通信模块。语音模块获取用户的输入，与服务端进行交互对用户的语音进行识别、解析，得到语义解析的结果传给指令模块生成对应的指令，并传给通信模块，通过IPC将各指令传递给第三方服务或者内容进行执行，并将执行结果以及数据反馈给通信模块，传递到UI层进行展示。其中语音模块作为客户端的核心模块，主要包括语音引擎管理、自定义唤醒词、自定义场景化命令词、自定义离线指令、第三方录音、回声消噪等模块。除此之外，客户端还需要支持统计埋点、根据服务端配置动态调整策略、路况电台、OTA升级等功能。</p>
+
+<p>语音引擎目前使用百度自主研发的语音识别引擎，封装了语音采集、语音预处理、在线识别、离线识别等功能，识别准确率高达97%。语音播报使用百度自主研发的TTS引擎，目前支持对语速、音调、音量等的配置，支持标准男女声、情感化男女声的TTS播报服务，支持离在线结合的方式。语音模块除了考虑使用百度公司自有的语音SDK外，后续还会考虑灵活支持第三方语音解决方案的需求。</p>
+
+<p>DuerOS车载版与百度汽车版地图进行了深度整合，力图为车主打造出最好的语音导航交互体验。UIUE方面，DuerOS车载版尽量采人性化的诱导式交互、支持用户自定义UI、NLP各类目界面展示以及较为灵活的多分辨率适配方案等等。</p>
+
+<p>DuerOS车载版整体方案需要实现平台化，一方面需要提供SDK、Src Code以及Demo给方案商、Tier One或者OEM进行集成开发，提供语音初始化接口、UI定制、语音唤醒以及场景命令词配置等功能。另一方面需要提供SDK给第三方服务和内容开发商集成，DuerOS车载版核心模块对用户的语音进行识别、解析以后，生成Cammand指令，发送给第三方进行处理执行，同时第三方也可以通过SDK提供的相关接口将执行结果、数据等信息回传给核心模块。DuerOS车载版核心模块集成语音服务（语音识别和语义解析），通信模块（和Custom APP之间的通信）以及和第三方服务或者内容之间的通信。整体架构如下图：
+<img src="img/dueros_client_arch.png" alt="DuerOS车载版客户端框架图"></p>
+
+<h1 id="toc_12">DuerOS车载版接入</h1>
+
+<p>如果想通过SDK与DuerOS进行通信，则需先进行工程配置和初始化SDK，完成这二步操作后就能通过SDK与DuerOS互动，开发定制功能。</p>
+
+<h2 id="toc_13">工程配置</h2>
+
+<p>将codriver-sdk.jar和gson-2.2.4.jar导入到CustomApp工程中</p>
+
+<p><img src="img/import_sdk.png" alt="DuerOS SDK导入"></p>
+
+<p>参考CustomAppDemo工程，在AndroidManifest.xml中加入以下代码：</p>
+
+<div><pre><code class="language-markup">&lt;uses-permission android:name=&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;/&gt;
+
+&lt;service android:name=&quot;com.baidu.che.codriversdk.PlatformService&quot;&gt;
+&lt;/service&gt;
+
+&lt;receiver android:name=&quot;com.baidu.che.codriversdk.BootReceiver&quot;&gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name=&quot;android.intent.action.BOOT_COMPLETED&quot;/&gt;
+        &lt;action android:name=&quot;com.baidu.che.codrivercustom.START&quot;/&gt;
+    &lt;/intent-filter&gt;
+&lt;/receiver&gt;</code></pre></div>
+
+<h2 id="toc_14">初始化SDK</h2>
+
+<p>在Application类onCreate()函数中进行初始化。</p>
+
+<div><pre><code class="language-java">CdConfigManager.getInstance().initialize(getApplicationContext(), new InitListener() {
+    @Override
+    public void onConnectedToRemote() {
+        // 与DuerOS连接成功：可以调用定制化接口
+        // 这里初始化各种模块，进行功能定制
+    }
+
+    @Override
+    public void onDisconnectedToRemote() {
+        // 与DuerOS连接断开：可以做一些清理工作
+    }
+});</code></pre></div>
+
+<h2 id="toc_15">休眠唤醒</h2>
+
+<h3 id="toc_16">休眠</h3>
+
+<p>设备休眠时可调用此接口，关闭其他相关APK及功能，降低消耗。</p>
+
+<div><pre><code class="language-java">CdConfigManager.getInstance().notifySystemSleep();</code></pre></div>
+
+<h3 id="toc_17">唤醒</h3>
+
+<p>设备唤醒后可调用此接口，打开CoDriver唤醒及相关功能。</p>
+
+<div><pre><code class="language-java">CdConfigManager.getInstance().notifySystemWakeUp();</code></pre></div>
+
+<h2 id="toc_18">语音识别ASR</h2>
+
+<p>CdAsrManager类负责管理ASR相关的功能，通过CdAsrManager.getInstance()获取单例。</p>
+
+<h3 id="toc_19">自定义唤醒词</h3>
+
+<p>addWakeUpWord方法设置自定义唤醒词，实例代码如下：</p>
+
+<div><pre><code class="language-java">CdAsrManager.getInstance().addWakeUpWord(&quot;你好百度汽车&quot;);</code></pre></div>
+
+<p>可以多次调用该接口来添加多个唤醒词，但唤醒词的个数建议不超过三个，以便取得最佳唤醒效果。</p>
+
+<h3 id="toc_20">对话流控制</h3>
+
+<p>对话流的打开和关闭可以通过openDialog()和closeDialog()实现。</p>
+
+<div><pre><code class="language-java">CdAsrManager.getInstance().setAsrTool(new CdAsrManager.AsrTool() {
+    @Override
+    public void onVrDialogShow() {
+        LogUtil.d(TAG, &quot;显示对话流界面&quot;);
+    }
+
+    @Override
+    public void onVrDialogDismiss() {
+        LogUtil.d(TAG, &quot;退出对话流界面&quot;);
+    }
+});</code></pre></div>
+
+<h3 id="toc_21">注册场景化命令词</h3>
+
+<p>场景化命令词是指在非对话流页面进行说话，该说话指令能够直接实现语音控制效果，比如在地图界面直接说“放大地图”。</p>
+
+<p>场景化命令词的优势在于无需唤醒，直接说出语音指令即可进行语音操控。
+注册场景化命令词的示例如下：</p>
+
+<div><pre><code class="language-java">CdAsrManager.SceneCommand sceneCommand = new CdAsrManager.SceneCommand() {
+    @Override
+    public void onCommand(String type, String cmd) {
+        LogUtil.e(LOG_TAG, &quot;onCommand(): type=&quot; + type + &quot; cmd=&quot; + cmd);
+        
+    }
+
+    @Override
+    public String getId() {
+        return &quot;cmd_test&quot;;
+    }
+};
+
+sceneCommand.addCommand(&quot;zoom_in&quot;, &quot;放大地图&quot;, &quot;地图放大&quot;);
+sceneCommand.addCommand(&quot;zoom_out&quot;, &quot;缩小地图&quot;, &quot;地图缩小&quot;);
+CdAsrManager.getInstance().registerCmd(sceneCommand);</code></pre></div>
+
+<p>反注册场景化命令词的示例如下：</p>
+
+<div><pre><code class="language-java">CdAsrManager.getInstance().unRegisterCmd(sceneCommand);</code></pre></div>
+
+<h3 id="toc_22">注册非场景化命令词</h3>
+
+<p>暂未开放非场景化命令词的动态注册，该接口正在研发中，后续会开放。</p>
+
+<h3 id="toc_23">其他API说明</h3>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">API</th>
+<th style="text-align: left">说明</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">disableAsr</td>
+<td style="text-align: left">关闭语音功能开关（关闭唤醒，会释放MIC）</td>
+</tr>
+<tr>
+<td style="text-align: left">enableAsr</td>
+<td style="text-align: left">打开语音功能开关（开启唤醒，会使用MIC）</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_24">语音合成TTS</h2>
+
+<p>com.baidu.che.codriversdk.manager.CdTTSPlayerManager是负责管理TTS的类对象，获取到该类的单例即可使用TTS播报，详细API说明如下所示：</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">关键API</th>
+<th style="text-align: left">说明</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">play(String text)</td>
+<td style="text-align: left">播放合成语音</td>
+</tr>
+<tr>
+<td style="text-align: left">playWithUtteranceId(String text, String utteranceId)</td>
+<td style="text-align: left">播放合成语音，带有文本对应的标识ID</td>
+</tr>
+<tr>
+<td style="text-align: left">playAndShow(String text, PlayAndShowListener listener)</td>
+<td style="text-align: left">播放合成语音，且展示出来，带播放完成的回调</td>
+</tr>
+<tr>
+<td style="text-align: left">playAndShow(String text)</td>
+<td style="text-align: left">播放合成语音，且展示出来</td>
+</tr>
+<tr>
+<td style="text-align: left">setTTSPlayerListener(TTSPlayerListener listener)</td>
+<td style="text-align: left">设置所有TTS播报的listener</td>
+</tr>
+<tr>
+<td style="text-align: left">setTTSPlayStatusListener(TTSPlayStatusListener listener)</td>
+<td style="text-align: left">设置当前应用通过play或playWithUtteranceId接口播报TTS的listener</td>
+</tr>
+<tr>
+<td style="text-align: left">stop()</td>
+<td style="text-align: left">停止播放</td>
+</tr>
+<tr>
+<td style="text-align: left">switchSpeak(SpeechType type)</td>
+<td style="text-align: left">设置发音类型，具体发音类型支持见下表。</td>
+</tr>
+<tr>
+<td style="text-align: left">setAudioStreamType(String mType)</td>
+<td style="text-align: left">设置TTS的StreamType</td>
+</tr>
+</tbody>
+</table>
+
+<p>目前DuerOS支持的发音类型有</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">类型</th>
+<th style="text-align: left">枚举类型</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">标准男生</td>
+<td style="text-align: left">NORMAL_MALE</td>
+</tr>
+<tr>
+<td style="text-align: left">标准女生</td>
+<td style="text-align: left">NORMAL_FEMALE</td>
+</tr>
+<tr>
+<td style="text-align: left">情感男生</td>
+<td style="text-align: left">EMOTION_MALE</td>
+</tr>
+<tr>
+<td style="text-align: left">情感女生</td>
+<td style="text-align: left">EMOTION_FEMALE</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_25">蓝牙电话接入</h2>
+
+<h3 id="toc_26">设置蓝牙功能</h3>
+
+<p>使用CdBlueToothManager.getInstance().setBlueToothTool
+(BlueToothTool tool)设置蓝牙工具实例，由该实例实现打开系统蓝牙页面、下载联系人等功能，示例代码如下：</p>
+
+<div><pre><code class="language-java">/**
+ * 设置蓝牙工具
+ */
+CdBlueToothManager.getInstance().setBlueToothTool(new CdBlueToothManager.BlueToothTool() {
+    @Override
+    public void openBlueToothView() {
+        LogUtil.d(TAG, &quot;打开蓝牙连接界面&quot;);
+        // TODO: 打开蓝牙连接界面
+    }
+
+    @Override
+    public void openContractDownloadView() {
+        LogUtil.d(TAG, &quot;打开电话本下载界面&quot;);
+        // TODO: 打开电话本下载界面
+    }
+});</code></pre></div>
+
+<h3 id="toc_27">设置电话功能</h3>
+
+<p>使用CdPhoneManager.getInstance().setPhoneTool(PhoneTool tool)一个新的PhoneTool实例,由该实例来实现拨打电话功能，即可在声控拨打电话时调用到此处。示例代码如下：</p>
+
+<div><pre><code class="language-java">CdPhoneManager.getInstance().setPhoneTool(new CdPhoneManager.PhoneTool() {
+    @Override
+    public void dialNum(String number) {
+        LogUtil.d(TAG, &quot;拨打电话：&quot; + number);
+        // TODO: 拨打电话
+    }
+});</code></pre></div>
+
+<h3 id="toc_28">蓝牙电话状态同步</h3>
+
+<p>由于不同厂商的车机系统，获取蓝牙状态的接口各不相同，通过CdBlueToothManager.getInstance().onNotifyBTStatus(BtStatus status)可以通知蓝牙连接状态到DuerOS语音模块， CdBlueToothManager.BtStatus中定义如下几种蓝牙状态：</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">宏</th>
+<th style="text-align: left">参数值(status)</th>
+<th style="text-align: left">备注</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">BT_DISCONNECTED</td>
+<td style="text-align: left">0</td>
+<td style="text-align: left">断开连接</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_CONNECTING</td>
+<td style="text-align: left">1</td>
+<td style="text-align: left">正在连接</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_CONNECTED</td>
+<td style="text-align: left">2</td>
+<td style="text-align: left">连接成功</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_DISCONNECTING</td>
+<td style="text-align: left">3</td>
+<td style="text-align: left">正在断开连接</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_CANCELLING</td>
+<td style="text-align: left">4</td>
+<td style="text-align: left">正在取消</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_CANCELLED</td>
+<td style="text-align: left">5</td>
+<td style="text-align: left">已经取消</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_PAIRED</td>
+<td style="text-align: left">6</td>
+<td style="text-align: left">已经配对</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_NOPAIR</td>
+<td style="text-align: left">7</td>
+<td style="text-align: left">未配对</td>
+</tr>
+</tbody>
+</table>
+
+<p>使用CdBlueToothManager.getInstance().onNotifyBTPhoneStatus(BTPhoneStatus status)通知电话本授权情况到DuerOS语音模块，CdBlueToothManager.BTPhoneStatus中定义如下目几种电话本授权状态：</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">宏</th>
+<th style="text-align: left">参数值(status)</th>
+<th style="text-align: left">备注</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">BT_PHONE_NO_AUTHORIZED</td>
+<td style="text-align: left">0</td>
+<td style="text-align: left">无授权</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_PHONE_AUTHORIZING</td>
+<td style="text-align: left">1</td>
+<td style="text-align: left">正在授权</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_PHONE_AUTHORIZED</td>
+<td style="text-align: left">2</td>
+<td style="text-align: left">已授权</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_PHONE_REQUESTING</td>
+<td style="text-align: left">3</td>
+<td style="text-align: left">请求授权中</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_PHONE_RESERVED_1</td>
+<td style="text-align: left">4</td>
+<td style="text-align: left">保留字段</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_PHONE_RESERVED_2</td>
+<td style="text-align: left">5</td>
+<td style="text-align: left">保留字段</td>
+</tr>
+<tr>
+<td style="text-align: left">BT_PHONE_CANNOT_AUTHORIZED</td>
+<td style="text-align: left">6</td>
+<td style="text-align: left">无法获取授权</td>
+</tr>
+</tbody>
+</table>
+
+<p>使用CdPhoneManager.getInstance().onNotifyPhoneStatus(PhoneDownload Status  status)通知电话本下载情况，CdPhoneManager.PhoneDownloadStatus中定义如下几种电话本下载状态：</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">宏</th>
+<th style="text-align: left">参数值(status)</th>
+<th style="text-align: left">备注</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">CONTACTS_NO_DOWNLOADED</td>
+<td style="text-align: left">0</td>
+<td style="text-align: left">默认状态</td>
+</tr>
+<tr>
+<td style="text-align: left">ACTION_PBAP_DOWNLOAD_SUPPORT</td>
+<td style="text-align: left">1</td>
+<td style="text-align: left">访问配置文件成功</td>
+</tr>
+<tr>
+<td style="text-align: left">CONTACTS_DOWNLOAD_REQUEST</td>
+<td style="text-align: left">2</td>
+<td style="text-align: left">电话本下载请求</td>
+</tr>
+<tr>
+<td style="text-align: left">CONTACTS_DOWNLOAD_STARTED</td>
+<td style="text-align: left">3</td>
+<td style="text-align: left">电话本下载开始</td>
+</tr>
+<tr>
+<td style="text-align: left">CONTACTS_DOWNLOAD_PROGRESS</td>
+<td style="text-align: left">4</td>
+<td style="text-align: left">电话本下载中</td>
+</tr>
+<tr>
+<td style="text-align: left">CONTACTS_DOWNLOAD_COMPLETE</td>
+<td style="text-align: left">5</td>
+<td style="text-align: left">通讯电话本下载完成</td>
+</tr>
+<tr>
+<td style="text-align: left">CONTACTS_UPDATE_READY</td>
+<td style="text-align: left">6</td>
+<td style="text-align: left">联系人准备更新</td>
+</tr>
+<tr>
+<td style="text-align: left">CONTACTS_UPDATE_COMPLETE</td>
+<td style="text-align: left">7</td>
+<td style="text-align: left">联系人更新完毕</td>
+</tr>
+<tr>
+<td style="text-align: left">CALLLOGS_DOWNLOAD_STARTED</td>
+<td style="text-align: left">8</td>
+<td style="text-align: left">通讯记录下载开始</td>
+</tr>
+<tr>
+<td style="text-align: left">CALLLOGS_DOWNLOAD_PROGRESS</td>
+<td style="text-align: left">9</td>
+<td style="text-align: left">通讯记录下载中</td>
+</tr>
+<tr>
+<td style="text-align: left">CALLLOGS_DOWNLOAD_COMPLETE</td>
+<td style="text-align: left">10</td>
+<td style="text-align: left">通讯记录下载完成</td>
+</tr>
+<tr>
+<td style="text-align: left">OTHER</td>
+<td style="text-align: left">11</td>
+<td style="text-align: left">其他</td>
+</tr>
+</tbody>
+</table>
+
+<p>使用CdPhoneManager.getInstance().sendPhoneBookData(PhoneContactList  data)同步联系人通讯录数据，具体示例如下：</p>
+
+<div><pre><code class="language-java">//初始化Model
+CdPhoneManager.PhoneContactList mPhoneModel = new CdPhoneManager.PhoneContactList();
+
+//增加每个联系人名称以及电话
+//@note 同一联系人有多个号码当成不同的联系人处理
+mPhoneModel.addContact(&quot;张三&quot;, &quot;13888888888&quot;);
+mPhoneModel.addContact(&quot;张三&quot;, &quot;13899999999&quot;);
+mPhoneModel.addContact(&quot;李四&quot;, &quot;13800000000&quot;);
+//设置完毕传递数据并通知：
+CdPhoneManager.getInstance().sendPhoneBookData(mPhoneModel);</code></pre></div>
+
+<h3 id="toc_29">BlueToothTool API说明</h3>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">API</th>
+<th style="text-align: left">说明</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">openBlueToothView()</td>
+<td style="text-align: left">在语音打电话给某某人，DuerOS收到状态为未连接蓝牙时调用，目的打开蓝牙页面，厂商需要在里面重写实现。</td>
+</tr>
+<tr>
+<td style="text-align: left">openContractDownloadView()</td>
+<td style="text-align: left">在语音打电话给某某人，DuerOS收到状态已连接蓝牙，但是为无联系人时调用，目的打开联系人页面，厂商需要在里面重写实现方法</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_30">多媒体功能接入</h2>
+
+<p>为了实现“打开无线电、打开FM、打开AM、打开USB音乐、打开CD音乐、打开AUX音乐、打开Ipod音乐、打开蓝牙音乐”等指令，DuerOS提供了统一的接口<code>setMediaTool</code>供SDK开发厂商进行使用，适配各车机系统提供多媒体接口。</p>
+
+<p>可通过CdMediaManager.getInstance().setMediaTool(MediaTool tool)设置多媒体工具实例，通过实现该实例中的各个接口，可以实现“打开无线电、打开FM、打开AM、打开USB音乐、打开CD音乐、打开AUX音乐、打开Ipod音乐、打开蓝牙音乐”等功能。</p>
+
+<div><pre><code class="language-java">CdMediaManager.getInstance().setMediaTool(new MediaTool() {
+    @Override
+    public void openRadio() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void closeRadio() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openMyMusic() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openMusicUsb() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openMusicIpod() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openMusicCd() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openMusicBt() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openMusicAux() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openFMChannel(String arg0) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openFM() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openAMChannel(String arg0) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openAM() {
+        // TODO Auto-generated method stub
+    }
+});</code></pre></div>
+
+<h2 id="toc_31">音乐功能接入</h2>
+
+<p>厂商通过CdMusicManager.getInstance().setMusicTool(MusicTool tool)可设置音乐工具实例，从而控制自己的音乐播放器，示例代码如下：</p>
+
+<div><pre><code class="language-java">CdMusicManager.getInstance().setMusicTool(new MusicTool() {
+    @Override
+    public void searchMusic(String arg0, String arg1,
+        OnSearchResultListener arg2) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void playMusic(MusicModel arg0) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void playList(List&lt;MusicModel&gt; arg0, int arg1) {
+        // TODO Auto-generated method stub
+    }
+});</code></pre></div>
+
+<h2 id="toc_32">播放器功能接入</h2>
+
+<p>厂商可以通过CdPlayerManager.getInstance().setPlayerTool(PlayerTool tool)设置播放器工具，通过实现该实例的各个接口可以实现切换播放模式、切换上一首、切换下一首、播放、暂停、退出等功能。这几个功能是公共行为，以暂停为例，可能是暂停播放音乐，也可能是暂停FM、AM等。示例代码如下：</p>
+
+<div><pre><code class="language-java">CdPlayerManager.getInstance().setPlayerTool(new PlayerTool() {
+    @Override
+    public void switchMode(int arg0) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void prev() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void play() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void pause() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void next() {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void exit() {
+        // TODO Auto-generated method stub
+    }
+});</code></pre></div>
+
+<p>其中swithMode(int mode)支持三种模式，在PlayerTool：</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">宏</th>
+<th style="text-align: left">参数值</th>
+<th style="text-align: left">备注</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">PlayerTool.MODE_SINGLE_LOOP</td>
+<td style="text-align: left">0</td>
+<td style="text-align: left">单曲循环</td>
+</tr>
+<tr>
+<td style="text-align: left">PlayerTool.MODE_RANDOM</td>
+<td style="text-align: left">1</td>
+<td style="text-align: left">随机播放</td>
+</tr>
+<tr>
+<td style="text-align: left">PlayerTool.MODE_FULL_LOOP</td>
+<td style="text-align: left">2</td>
+<td style="text-align: left">循环播放</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_33">硬按键事件监听功能</h2>
+
+<p>厂商可以通过CdHardKeyManager.getInstance().setHardKeyTool
+(HardKeyTool tool)设置硬按键工具，实现该实例后，可将按下、弹起、单击、长按等按键事件释放出来。</p>
+
+<div><pre><code class="language-java">CdHardKeyManager.getInstance().setHardKeyTool(new CdHardKeyManager.HardKeyTool() {
+    @Override
+    public void onKeyDown(int arg0, KeyEvent arg1) {
+    }
+    @Override
+    public void onKeyUp(int arg0, KeyEvent arg1){
+    }
+    @Override
+    public void onSingleClick(int keyCode){
+    }
+    @Override
+    public void onLongClick(int keyCode){
+    }
+});</code></pre></div>
+
+<h2 id="toc_34">车辆控制功能接入</h2>
+
+<p>厂商可以通过CdSystemManager.getInstance().setSystemTool(SystemTool tool)设置系统工具，通过该工具厂商可以实现开关空调、调节温度、开关车窗、调节系统音量等功能。示例代码如下：</p>
+
+<div><pre><code class="language-java">CdSystemManager.getInstance().setSystemTool(new SystemTool() {
+    @Override
+    public void reduceFeature(String feature) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void operateFeature(String feature, String value) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void openFeature(String feature) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void minFeature(String feature) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void maxFeature(String feature) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void increaseFeature(String feature) {
+        // TODO Auto-generated method stub
+    }
+    @Override
+    public void closeFeature(String feature) {
+        // TODO Auto-generated method stub
+    }
+});</code></pre></div>
+
+<p>说明：</p>
+
+<ul>
+<li>支持的指令，执行完相应指令可以调用CdAsrManager.getInstance().closeDialog()关闭语音对话流</li>
+<li>不支持的指令，可以调用CdTTSManager.getInstance().playAndShow()接口展示并播报一个反馈语到语音对话流</li>
+<li>如果不做任何处理，超时3s后，DuerOS会提示“小度不支持”并退出语音对话流</li>
+</ul>
+
+<p>Feature常量定义如下：</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">常量名</th>
+<th style="text-align: left">常量值</th>
+<th style="text-align: left">支持的方法</th>
+<th style="text-align: left">备注</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">FEATURE_VOLUME</td>
+<td style="text-align: left">volume</td>
+<td style="text-align: left">increase/reduce</td>
+<td style="text-align: left">增大/减小音量</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_BLUETOOTH</td>
+<td style="text-align: left">bluetooth</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">打开/关闭蓝牙</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_LIGHT</td>
+<td style="text-align: left">light</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">打开/关闭车灯</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_WIFI</td>
+<td style="text-align: left">wifi</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">打开/关闭WIFI</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_NETWORK</td>
+<td style="text-align: left">network</td>
+<td style="text-align: left">open</td>
+<td style="text-align: left">打开/关闭网络</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_SETTING</td>
+<td style="text-align: left">system_setting</td>
+<td style="text-align: left">open</td>
+<td style="text-align: left">打开/关闭设置</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_PICTURE</td>
+<td style="text-align: left">picture</td>
+<td style="text-align: left">open</td>
+<td style="text-align: left">打开/关闭相册</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_WIND_FLOW</td>
+<td style="text-align: left">wind_flow</td>
+<td style="text-align: left">operate(up/down/high/low/normal)</td>
+<td style="text-align: left">调节风量大小</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_WIND_DIRECTION</td>
+<td style="text-align: left">wind_direction</td>
+<td style="text-align: left">operate(next)</td>
+<td style="text-align: left">下一个出风方向</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_TEMP</td>
+<td style="text-align: left">temp</td>
+<td style="text-align: left">operate(max/min/up/down/cold/hot)</td>
+<td style="text-align: left">调节空调温度</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_CLIMATE</td>
+<td style="text-align: left">climate</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">气温系统</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_AIR_CONDITIONER</td>
+<td style="text-align: left">air_conditioner</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">空调</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_INTERNAL_RECYCLE</td>
+<td style="text-align: left">internal_recycle</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">内循环</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_AIR_CLEAN</td>
+<td style="text-align: left">air_clean</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">空气清新系统</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_DEFROST</td>
+<td style="text-align: left">defrost</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">挡风除霜</td>
+</tr>
+<tr>
+<td style="text-align: left">FEATURE_MUTE</td>
+<td style="text-align: left">mute</td>
+<td style="text-align: left">open/close</td>
+<td style="text-align: left">打开/关闭静音</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_35">在线更新功能接入</h2>
+
+<h3 id="toc_36">在线更新功能简介</h3>
+
+<p>在线更新模块通过单次下载和静默安装，实现DuerOS生态内所有App的整体升级。主要流程如下：</p>
+
+<p>1) 检测升级配置：分为用户手动检测和系统自动检测两种方式，自动检测在DuerOS启动30秒后进行；</p>
+
+<p>2) 下载升级包：以zip压缩包的形式下载DuerOS生态内所有需要升级的App；</p>
+
+<p>3) 静默安装：升级包下载完成后，DuerOS发出广播，由车机系统接收广播并完成指定目录下apk文件的批量静默安装</p>
+
+<h3 id="toc_37">需要车机系统开发的功能</h3>
+
+<p>1）接收DuerOS发送的在线更新升级广播，广播Intent如下：</p>
+
+<div><pre><code class="language-java">Intent intent = new Intent();
+intent.setAction(&quot;codriver.intent.action.SYSTEM_RESTART&quot;);
+intent.putExtra(&quot;dueros_ota_dir&quot;, otaCacheDir);</code></pre></div>
+
+<p>2）通过在线更新升级广播intent的dueros<em>ota</em>dir参数获取在线更新安装包的存储目录，静默安装该目录下全部apk文件；</p>
+
+<p>3）安装成功后，删除在线更新安装包存储目录下的全部apk文件，并重启车机。</p>
+
+<h1 id="toc_38">核心功能指令</h1>
+
+<p>具体请参见<a href="%E7%99%BE%E5%BA%A6DuerOS%E8%BD%A6%E8%BD%BD%E7%89%88%E8%AF%AD%E9%9F%B3%E6%8C%87%E4%BB%A4%E9%9B%86.xlsx" title="百度DuerOS车载版语音指令集.xlsx">百度DuerOS车载版语音指令集.xlsx</a></p>
+
+<h1 id="toc_39">打断式交互（Barge-In）</h1>
+
+<p>针对不同合作方的需求，百度开发了软件消噪和硬件消噪两套算法，满足不同定位产品的需求。</p>
+
+<h2 id="toc_40">功能概述</h2>
+
+<p>大部分语音应用都有个无法回避的痛点，就是MIC不得不将设备本身喇叭发出来的声音（简称Speaker信号，比如音乐、TTS等音源）录进来，作为录音识别的语料与人声一同送往语音引擎而造成识别率下降。目前主流语音技术仍然无法从混杂声音信号中自动分辨人声，在这种情况下，语音引擎一直接收混杂着设备喇叭与人声的信号，与单纯人声输入相比，效果相差很大。</p>
+
+<p>车载语音又远比手机语音环境复杂很多，比如在手机场景中，用户可以用MIC贴近嘴进行录音可以有效避免其他干扰，或者手动关闭声音也很方便。然而，在车载场景中，MIC离用户至少有一臂的距离，为保证用户的驾车安全，更不能要求用户降低喇叭音量才来使用语音，因此，Barge-In技术逐渐成为了车载语音的刚需。</p>
+
+<p>百度DuerOS车载版使用百度自身的回声消噪算法，实现了打断式交互，很好地解决用户的痛点，下面将详细介绍百度Barge-In技术的核心原理。</p>
+
+<h2 id="toc_41">关键技术描述</h2>
+
+<p>百度DuerOS车载版实现Barge-In的关键技术叫AEC(Acoustic Echo Canceling),即声学回声消除技术，简称回声消除。这项技术起源于电话通信和VOIP的发展，图5-1展示了一个应用AEC算法的通信系统。在此例中，通信链路近端的扬声器和话筒之间的声学耦合会产生回声，这导致在远端产生明显的干扰回声。在这种情况下，近端运行的AEC算法将抑制回声并提高系统的性能。
+<img src="img/aec.png" alt="回声消噪">
+其基本原理和步骤如下：</p>
+
+<ul>
+<li>输送给近端喇叭的语音信号被采样，作为回声消除参考信号Speaker信号</li>
+<li>近端MIC拾取语音输入，作为MIC信号</li>
+<li>针对MIC信号和Speaker信号进行相关性分析（起始的时延和比对窗口）</li>
+<li>自适应滤波器降噪处理</li>
+</ul>
+
+<p>百度DuerOS车载版使用的AEC算法是由百度语音技术部提供的，该算法已经在多款车载设备上得到应用，是一套鲁棒性很高的算法。</p>
+
+<h2 id="toc_42">实现Barge-In的关键依赖项</h2>
+
+<p>百度既已实现回声消除算法，进入工程阶段的关键依赖项就变成如何能获得Speaker信号了，对于该路信号我们有两点要求：</p>
+
+<ul>
+<li>客户端在接收MIC信号同时，也能连续不断地获取到Speaker信号</li>
+<li>MIC信号和从底层获取的Speaker信号要保证同步，两者的时延必须严格控制在400ms以内。</li>
+</ul>
+
+<p>要获取到高质量的Speaker信号，推荐采用修改Linux 驱动层或者通过修改IIS总线（Inter-IC Sound，集成电路内置音频总线）去获取Speaker信号。因为只有在Linux驱动层或者IIS最接近Codec硬件，而且通常情况下，录音和播放是同样的Codec芯片，所以会采用相同的采样率，所以，如果能在同一个采样周期里，获取到的Speaker信号和MIC信号应该是对齐的，严格来说，不会有时差，这是取得良好性能的关键。如果时延不能保证，依靠纯软件算法去动态对齐，是非常消耗CPU运算的，效果也得不到保障。整个Barge-In技术流程如下：</p>
+
+<ul>
+<li>客户端打开录音设备，要求系统进行双声道立体声录音，以android系统为例</li>
+</ul>
+
+<div><pre><code class="language-java">AudioRecord recordInstance = new AudioRecord(audioSource,
+   RECORD_SAMPLE_RATE_16K,
+   AudioFormat.CHANNEL_IN_STEREO, 
+   AudioFormat.ENCODING_PCM_16BIT, 
+   DEFAULT_BUFFER_SIZE);</code></pre></div>
+
+<ul>
+<li>Linux驱动层或者IIS总线层在接收到客户端调用后进行录音，收到的MIC信号放入左声道</li>
+<li>同时，Linux驱动层或者IIS总线层要把送给喇叭的Speaker信号填入右声道</li>
+<li>客户端要将收到的立体声数据分离，分离成两路信号</li>
+<li>客户端继而要将这两路信号进行AEC模块处理</li>
+<li>客户端再将经过AEC处理后的音频流送入百度语音引擎进行识别</li>
+</ul>
+
+<h2 id="toc_43">联调建议</h2>
+
+<p>合作厂商先内部评估下能否从Linux驱动层或者IIS总线层去获取到Speaker信号。
+确定可行后，可以开发一个demo出来，将MIC信号和Speaker信号分别以PCM流形式保存在本地，送给百度侧评估。
+百度会验证这两个文件是否符合算法要求，并会交给AEC模块处理，得到一路信号保存下来分析。
+百度确认可行之后，合作厂商可以实施Linux驱动层或者IIS总线层的修改工作。
+实施过程中，要保证MIC信号塞入左声道，Speaker信号塞入右声道；且没有音乐或者TTS播放时，也需要往右声道塞入空数据。
+实施完成后，双方进行联调测试，优化Barge-In效果。</p>
+
+<h1 id="toc_44">MIC设计参考</h1>
+
+<p>该章节参考《Automotive Microphone Hardware_acoustics design guidelines - Baidu Speech V0.1》。</p>
+
+<h2 id="toc_45">麦克风选型参考</h2>
+
+<p>百度的MIC参考方案与市场主流的麦克风都是匹配的，以下两个类型的麦克风在市场上都很常见：</p>
+
+<p>驻极体电容式麦克风（ECM）：直径在4mm-6mm之间，高度在2mm-3mm（算上密封垫片或者防护罩,每项指标可能要增加1mm-2mm）</p>
+
+<p>微型机电式传感器（MEMS）：体型更小，广泛用于更薄的产品中，比如手机，平板电脑以及智能电视的语音遥控器等等。</p>
+
+<p>总体上来说，前置的全向麦克风性能最为优越，其次是两极和单极麦克风。详细的指标如下：</p>
+
+<p>性噪比：SNR&gt;=60dB</p>
+
+<p>频响范围：-4dB/+8dB(300Hz-8kHz)</p>
+
+<p>灵敏度：模拟麦克风，灵敏度是-38dB(±3dB)；数字麦克风，灵敏度是-26dB(±3dB)</p>
+
+<h2 id="toc_46">麦克风位置和朝向参考</h2>
+
+<p>百度语音引擎支持两种类型的麦克风输入模式：</p>
+
+<p>1）单MIC，无消噪算法</p>
+
+<p>2）双MIC阵列，自带消噪算法</p>
+
+<p>对于双MIC阵列，我们有两点建议：</p>
+
+<p>1）左右两个MIC的距离范围在50-80mm之间</p>
+
+<p>2）MIC的安装朝向最好面朝用户，以确保更少的失真</p>
+
+<p>在设计麦克风安放位置时，需要尽量扩大产品内部噪音与麦克风之间的距离，远离干扰或震动。对于震动，一般采用硅胶套进行减震密封处理，对于硅胶软硬度，可根据实际情况进行匹配验证，一般要求尽可能软。</p>
+
+<h2 id="toc_47">麦克风外壳要求参考</h2>
+
+<p>一般来说，麦克风的外壳设计取决于所选的麦克风类型，全向麦克风安装最为简单，只需要一个开孔来接收环境音量即可；而双极和单极麦克风则要求每个麦克风两个开孔，每个开孔对应麦克风的纹路方向，这种机制将导致麦克风的闭环设计更加复杂。</p>
+
+<h2 id="toc_48">功放增益设计参考</h2>
+
+<p>喇叭和麦克风距离尽量远，喇叭到麦克风的声压不超过80分贝（在麦克风处测得），人声音量和喇叭音量强度信噪比不低于-15dB（人声到麦克风的声压约65分贝）。
+建议调试步骤：</p>
+
+<ul>
+<li>在喇叭最大播音音量下，确保麦克录音不截幅；</li>
+<li>在喇叭最大播音音量下，距离麦克60-100cm进行唤醒测试，如果不能正常唤醒，则需要调小功放增益，直到能正常唤醒为止。</li>
+</ul>
+
+<h1 id="toc_49">后视镜版本特殊说明</h1>
+
+<p>针对后视镜的特点，DuerOS做了一些功能调整和UI适配。主要有</p>
+
+<ul>
+<li>行车记录仪栏目：需要DuerOS开发者通过该入口接入行车记录仪的功能。</li>
+<li>电话栏目：需要DuerOS开发者通过该入口接入系统蓝牙电话。</li>
+<li>设置栏目：需要DuerOS开发者通过该入口接入机器系统设置。</li>
+</ul>
+
+<h1 id="toc_50">云端语义服务</h1>
+
+<h2 id="toc_51">概述</h2>
+
+<p>云端语义服务包含语义解析和结果召回两个能力，合作伙伴直接将ASR识别后的文本通过接口提交到云端，即可以获取到包含召回结果的内容。</p>
+
+<p><a href="%E7%99%BE%E5%BA%A6DuerOS%E8%BD%A6%E8%BD%BD%E7%89%88%E4%BA%91%E7%AB%AFAPI%E6%8E%A5%E5%85%A5%E6%8C%87%E5%8D%97.docx" title="百度DuerOS车载版云端API接入指南.docx">百度DuerOS车载版云端API接入指南.docx</a></p>
+
+<h1 id="toc_52">第三方系统视觉规范</h1>
+
+<p>具体请参见<a href="%E7%99%BE%E5%BA%A6DuerOS%E8%BD%A6%E8%BD%BD%E7%89%88%E7%AC%AC%E4%B8%89%E6%96%B9%E8%A7%86%E8%A7%89%E8%A7%84%E8%8C%83.pdf" title="百度DuerOS车载版第三方视觉规范.pdf">《百度DuerOS车载版第三方视觉规范.pdf》</a></p>
+
+<h1 id="toc_53">DuerOS测试验收流程</h1>
+
+<p><a name="DuerOS测试验收流程" ></a></p>
+
+<h2 id="toc_54">质量认证体系</h2>
+
+<p>为保障百度DuerOS的质量及用户使用体验，我们制定了一系列测试验收流程，对DuerOS各个模块进行全面的质量检验，以决定其是否合格，是否达到量产标准。测试&amp;验收主要包括四个环节：开发联调、全功能验收、合作方验收、量产验收（如下图所示），其中任何一轮测试不通过，需要相关负责人进行修复直至通过本轮测试才可开展后续测试。</p>
+
+<p><img src="img/test_process.png" alt="DuerOS验收流程"></p>
+
+<h3 id="toc_55">开发联调</h3>
+
+<p>开发联调主要由双方研发人员负责，确保DuerOS各项核心功能在合作方设备上可以正常使用。</p>
+
+<p>当开发联调完成（完成基本功能）后，合作方需要完成以下2项工作，才能进入全功能验收阶段：</p>
+
+<ul>
+<li>提供车机软、硬件环境。提供可安装DuerOS的车机、车机系统及使用DuerOS过程中的相关附属配件及系统配置说明文档。<strong>若车机系统版本有更新请及时通知百度DuerOS团队更新。车机最好为目标量产车机或者同系列车机。</strong></li>
+<li>提供相关测试报告及文档。合作方完成联调开发后，需进行基本功能自测试,确保能达到全功能提测要求后，方可进入全功能验收流程，并且需提供以下文档和测试报告给百度，具体如下表。</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">编号</th>
+<th style="text-align: left">名称</th>
+<th style="text-align: left">形式</th>
+<th style="text-align: left">介质</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="text-align: left">1</td>
+<td style="text-align: left">基本功能测试报告</td>
+<td style="text-align: left">文档</td>
+<td style="text-align: left">电子/纸质</td>
+</tr>
+<tr>
+<td style="text-align: left">2</td>
+<td style="text-align: left">项目记录表--问题列表</td>
+<td style="text-align: left">表格</td>
+<td style="text-align: left">电子/纸质</td>
+</tr>
+</tbody>
+</table>
+
+<p>1)  基本功能测试报告。基本功能测试通过，具体参考<a href="%E7%99%BE%E5%BA%A6DuerOS%E8%BD%A6%E8%BD%BD%E7%89%88%E5%9F%BA%E6%9C%AC%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95Case.xlsx" title="百度DuerOS车载版基本功能测试Case">《百度DuerOS车载版基本功能测试Case.xlsx》</a>；</p>
+
+<p>2)  问题记录表。合作方和百度共同维护此文档，在开发、测试、验收、回归过程中都以此文档为主，具体模板请参考 <a href="%E8%B4%B5%E5%85%AC%E5%8F%B8%E5%90%8D%E7%A7%B0-DuerOS%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95%E8%A1%A8.xlsx" title="贵公司名称-DuerOS项目记录表">《贵公司名称-DuerOS项目记录表.xlsx》</a>。</p>
+
+<h3 id="toc_56">全功能验收</h3>
+
+<p>全功能验收主要是指百度与合作方联调通过、达到全功能验收条件后，百度测试人员根据合作方提供的文档和报告进行一系列的全功能测试验收，全功能测试结束后百度将给出对应的测试报告及问题列表。</p>
+
+<p>全功能验收阶段，百度侧进行以下两项工作，耗时2~3周： </p>
+
+<ul>
+<li>  进行一系列测试，包括DuerOS各个功能模块的功能测试、性能测试、稳定性测试等，测试完成后生成相应测试报告； </li>
+<li>  记录验收过程中发现的问题，需把其录入到问题记录表并将结果同步给合作方共同跟进解决；</li>
+</ul>
+
+<p>关于测试过程中问题的解决机制:</p>
+
+<ul>
+<li>导致用户不能正常使用的问题，则必须解决；</li>
+<li>针对偶现性问题，问题提出方需要进行复现，找到必现路径或者捕捉有效日志进行修复；</li>
+<li>针对偶现率极低且对用户使用影响不大问题，建议降低优化级后续跟进处理。</li>
+</ul>
+
+<h3 id="toc_57">合作方验收</h3>
+
+<p>全功能验收测试后，合作方可进行一系列系统测试、路测等测试手段发现问题，如属于百度问题，可写入问题记录表，邮件发送给百度方解决；如属于合作方问题，合作方需要对相应问题进行修复及测试验证，直到所有问题都已解决。</p>
+
+<p>合作方产出项：</p>
+
+<ul>
+<li>  所有功能用例<a href="%E7%99%BE%E5%BA%A6DuerOS%E8%BD%A6%E8%BD%BD%E7%89%88%E5%9F%BA%E6%9C%AC%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95Case.xlsx" title="百度DuerOS车载版基本功能测试Case.xlsx">《百度DuerOS车载版基本功能测试Case.xlsx》</a>测试结果；</li>
+<li>  问题修复列表及验证结果，可通过问题记录表记录、维护</li>
+<li>  若有遗留问题，请在问题列表中注明遗留原因。</li>
+</ul>
+
+<h3 id="toc_58">量产验收</h3>
+
+<p>量产版本验收是百度使用合作方提供的量产车机，对DuerOS基本功能进行最终验证。验证结果为通过时，合作方才可进行量产，验收耗时1~2周。</p>
+
+<p>合作方交付项：</p>
+
+<ul>
+<li>  量产车机，车机要搭载要量产的系统；</li>
+<li>  功能测试及问题修复结果报告；</li>
+<li>  遗留问题列表及原因；</li>
+</ul>
+
+<p>百度产出项：</p>
+
+<ul>
+<li>验收通过标准：
+
+<ul>
+<li>DuerOS所有功能模块正常运行，所有功能测试用例pass；</li>
+<li>软件界面友好，易于交互，且符合车机端HMI设计规范；</li>
+<li>车机系统使用带”DuerOS” 相关字样提示时，需提前与百度协商</li>
+<li>无P0（严重），P1级（一般）级别以上BUG。</li>
+</ul></li>
+<li>量产验收结论：通过/不通过；</li>
+</ul>
+
+
+
+
+
+	          	</article>
+	        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+	$('#tree').ztree_toc({
+		is_auto_number:true,
+		documment_selector:'.markdown-body',
+	  ztreeStyle: {
+	    width:'260px',
+	    overflow: 'auto',
+	    position: 'fixed',
+	    'z-index': 2147483647,
+	    border: '0px none',
+	    left: '0px',
+	    top: '0px'
+	}
+	});
+});
+//-->
+</SCRIPT>
+
