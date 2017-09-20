@@ -96,6 +96,10 @@ class PathObstacle {
                           const ObjectDecisionType& decision);
   bool HasLateralDecision() const;
 
+  void SetStBoundary(const StBoundary& boundary);
+
+  void EraseStBoundary();
+
   bool HasLongitudinalDecision() const;
 
   bool HasNonIgnoreDecision() const;

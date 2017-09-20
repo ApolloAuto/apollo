@@ -381,8 +381,14 @@ const std::string PathObstacle::DebugString() const {
   return ss.str();
 }
 
+void PathObstacle::EraseStBoundary() { st_boundary_ = StBoundary(); }
+
 const SLBoundary& PathObstacle::perception_sl_boundary() const {
   return perception_sl_boundary_;
+}
+
+void PathObstacle::SetStBoundary(const StBoundary& boundary) {
+  st_boundary_ = boundary;
 }
 
 }  // namespace planning

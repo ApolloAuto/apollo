@@ -75,6 +75,7 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       dp_st_speed_config_.total_time());
 
   // step 1 get boundaries
+  path_decision->EraseStBoundaries();
   std::vector<StBoundary> boundaries;
   if (boundary_mapper.GetGraphBoundary(*path_decision, &boundaries).code() ==
       ErrorCode::PLANNING_ERROR) {
@@ -82,6 +83,10 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
         "Mapping obstacle for dp st speed optimizer failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  for (const auto& boundary : boundaries) {
+    path_decision->SetStBoundary(boundary.id(), boundary);
   }
 
   // step 2 perform graph search
