@@ -78,12 +78,7 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     AERROR << "Failed to create path obstacle for " << obstacle->Id();
     return nullptr;
   }
-  auto* ptr = path_obstacle.get();
-  if (!path_decision_.AddPathObstacle(std::move(path_obstacle))) {
-    AERROR << "Failed to add path_obstacle " << obstacle->Id();
-    return nullptr;
-  }
-  return ptr;
+  return path_decision_.AddPathObstacle(*path_obstacle);
 }
 
 bool ReferenceLineInfo::AddObstacles(

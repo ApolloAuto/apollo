@@ -31,45 +31,22 @@ namespace apollo {
 namespace planning {
 
 using StringIndexedList = IndexedList<int, std::string>;
-TEST(IndexedList, Add_UniquePtr) {
-  StringIndexedList object;
-  {
-    ASSERT_TRUE(object.Add(1, common::util::make_unique<std::string>("one")));
-    ASSERT_TRUE(object.Find(1) != nullptr);
-    const auto& items = object.Items();
-    ASSERT_TRUE(object.Find(2) == nullptr);
-    ASSERT_FALSE(object.Add(1, common::util::make_unique<std::string>("one")));
-    ASSERT_EQ(1, items.size());
-    ASSERT_EQ("one", *items[0]);
-  }
-  {
-    ASSERT_TRUE(object.Add(2, common::util::make_unique<std::string>("two")));
-    ASSERT_FALSE(object.Add(2, common::util::make_unique<std::string>("two")));
-    ASSERT_TRUE(object.Find(1) != nullptr);
-    ASSERT_TRUE(object.Find(2) != nullptr);
-    const auto& items = object.Items();
-    ASSERT_EQ(2, items.size());
-    ASSERT_EQ("one", *items[0]);
-    ASSERT_EQ("two", *items[1]);
-  }
-}
-
 TEST(IndexedList, Add_ConstRef) {
   StringIndexedList object;
   {
-    ASSERT_TRUE(object.Add(1, "one"));
-    ASSERT_TRUE(object.Find(1) != nullptr);
+    ASSERT_NE(nullptr, object.Add(1, "one"));
+    ASSERT_NE(nullptr, object.Find(1));
+    ASSERT_EQ(nullptr, object.Add(1, "one"));
     const auto& items = object.Items();
-    ASSERT_TRUE(object.Find(2) == nullptr);
-    ASSERT_FALSE(object.Add(1, "one"));
+    ASSERT_EQ(nullptr, object.Find(2));
     ASSERT_EQ(1, items.size());
     ASSERT_EQ("one", *items[0]);
   }
   {
-    ASSERT_TRUE(object.Add(2, "two"));
-    ASSERT_FALSE(object.Add(2, "two"));
-    ASSERT_TRUE(object.Find(1) != nullptr);
-    ASSERT_TRUE(object.Find(2) != nullptr);
+    ASSERT_NE(nullptr, object.Add(2, "two"));
+    ASSERT_EQ(nullptr, object.Add(2, "two"));
+    ASSERT_NE(nullptr, object.Find(1));
+    ASSERT_NE(nullptr, object.Find(2));
     const auto& items = object.Items();
     ASSERT_EQ(2, items.size());
     ASSERT_EQ("one", *items[0]);
@@ -79,15 +56,15 @@ TEST(IndexedList, Add_ConstRef) {
 
 TEST(IndexedList, Find) {
   StringIndexedList object;
-  ASSERT_TRUE(object.Add(1, common::util::make_unique<std::string>("one")));
+  object.Add(1, "one");
   auto* one = object.Find(1);
   ASSERT_EQ(*one, "one");
-  ASSERT_TRUE(one != nullptr);
+  ASSERT_NE(nullptr, one);
   *one = "one_again";
   const auto* one_again = object.Find(1);
-  ASSERT_TRUE(one_again != nullptr);
+  ASSERT_NE(nullptr, one_again);
   ASSERT_EQ("one_again", *one_again);
-  ASSERT_FALSE(object.Find(2));
+  ASSERT_EQ(nullptr, object.Find(2));
 }
 
 }  // namespace planning
