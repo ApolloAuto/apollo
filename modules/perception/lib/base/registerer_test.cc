@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
-
 #include "modules/perception/lib/base/registerer.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
