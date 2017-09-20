@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <opencv2/opencv.hpp>
 #include <fstream>
 #include <iostream>
+#include <opencv2/opencv.hpp>
 #include <string>
 #include "gflags/gflags.h"
 
@@ -62,4 +62,3 @@ int main(int argc, char** argv) {
   google::ShutDownCommandLineFlags();
   return 0;
 }
-

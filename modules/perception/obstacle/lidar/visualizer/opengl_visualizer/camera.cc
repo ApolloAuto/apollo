@@ -15,15 +15,18 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/camera.h"
-#include <math.h>
 #include <GL/glut.h>
+#include <math.h>
 
 namespace apollo {
 namespace perception {
 
 Camera::Camera()
-    : rot_c2w_(Eigen::Matrix3d::Identity()), t_c2w_(0, 0, 0), fov_(45.0),
-      screen_width_(600), screen_height_(600),
+    : rot_c2w_(Eigen::Matrix3d::Identity()),
+      t_c2w_(0, 0, 0),
+      fov_(45.0),
+      screen_width_(600),
+      screen_height_(600),
       view_mat_(Eigen::Matrix4d::Identity()),
       proj_mat_(Eigen::Matrix4d::Zero()) {}
 
@@ -114,8 +117,8 @@ Eigen::Vector3d Camera::PointOnScreen(Eigen::Vector3d point) {
       proj_mat_(0, 2), proj_mat_(1, 2), proj_mat_(2, 2), proj_mat_(3, 2),
       proj_mat_(0, 3), proj_mat_(1, 3), proj_mat_(2, 3), proj_mat_(3, 3)};
   // here the view_mat should be view_mode_mat acutally
-  gluProject(point(0), point(1), point(2), view_mat, proj_mat, viewport, &x, &y,
-             &z);
+  gluProject(point(0), point(1), point(2), view_mat,
+             proj_mat, viewport, &x, &y, &z);
 
   return Eigen::Vector3d(x, y, z);
 }
