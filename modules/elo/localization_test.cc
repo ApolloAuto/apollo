@@ -1,13 +1,17 @@
-#include <string>
 #include <fstream>
-#include "opencv2/opencv.hpp"
+#include <string>
 #include "camera_localization.h"
+#include "opencv2/opencv.hpp"
 
 int main(int argc, char* argv[]) {
   if (argc != 4) {
     std::cout << "Input Error!" << std::endl;
-    std::cout << "Usage: ./localization_test ../config/apollo_release.config ../data/testdata1/test_list.txt ../data/testdata1/image/" << std::endl;
-    std::cout << "   or: ./localization_test ../config/apollo_release.config ../data/testdata2/test_list.txt ../data/testdata2/image/" << std::endl;
+    std::cout << "Usage: ./localization_test ../config/apollo_release.config "
+                 "../data/testdata1/test_list.txt ../data/testdata1/image/"
+              << std::endl;
+    std::cout << "   or: ./localization_test ../config/apollo_release.config "
+                 "../data/testdata2/test_list.txt ../data/testdata2/image/"
+              << std::endl;
     return -1;
   }
 
@@ -15,7 +19,7 @@ int main(int argc, char* argv[]) {
   std::string test_file_name = argv[2];
   std::string img_dir = argv[3];
   apollo::localization::CameraLocalization loc;
-  if(!loc.init(config_file)) {
+  if (!loc.init(config_file)) {
     return -1;
   }
   std::ifstream test_file(test_file_name.c_str());
@@ -40,10 +44,10 @@ int main(int argc, char* argv[]) {
       continue;
     }
     std::cout << std::setiosflags(std::ios::fixed);
-    std::cout << "[INFO] GROUNDTRUTH (" << std::setprecision(8)
-        << h_x << ", " << std::setprecision(8) << h_y << ")\t"
-        << " LOCALIZATION (" << output_pos.longitude << ", "
-        << output_pos.latitude << ")" << std::endl;
+    std::cout << "[INFO] GROUNDTRUTH (" << std::setprecision(8) << h_x << ", "
+              << std::setprecision(8) << h_y << ")\t"
+              << " LOCALIZATION (" << output_pos.longitude << ", "
+              << output_pos.latitude << ")" << std::endl;
     std::cout << std::endl;
   }
   return 0;
