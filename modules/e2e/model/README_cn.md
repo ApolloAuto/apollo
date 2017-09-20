@@ -6,6 +6,6 @@
 	sh run_predict.sh path/to/steering_model path/to/acc_model path/to/test_img t/path/to/result
 
 ## 关于
-* 数据集下载：请参考 <https://console.bce.baidu.com/apollo/task/download#/apollo/home>
-* 数据集概览：请参考 data_overview.md
-* 模型概览：请参考 model_overview.md
+* 数据集下载：请参考 [data](https://console.bce.baidu.com/apollo/task/download#/apollo/home)
+* 数据集概览：请参考 [data_overview.md](https://github.com/ApolloAuto/apollo/blob/master/modules/e2e/model/data_overview.md)
+* 模型概览：请参考 [model_overview.md](https://github.com/ApolloAuto/apollo/blob/master/modules/e2e/model/model_overview.md)
