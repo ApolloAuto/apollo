@@ -37,3 +37,5 @@ DEFINE_double(default_truck_width, 5.0, "default truck width for bounding box.")
 DEFINE_double(default_bike_width, 1.0, "default bike width for bounding box.");
 DEFINE_double(default_ped_width, 0.5, "default ped width for bounding box.");
 DEFINE_double(default_unknown_width, 3.0, "default unknown width for bounding box.");
+
+DEFINE_double(filter_y_distance, 7.5, "fiter the radar objects far away from the main vehicle on y-axis.");

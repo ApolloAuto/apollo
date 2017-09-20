@@ -333,6 +333,9 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
     return false;
   }
   */
+  if (std::abs(radar_obstacle.relative_range() * std::sin(radar_obstacle.relative_angle())) > FLAGS_filter_y_distance) {
+    return false;
+  }
   return true;
 }
 
