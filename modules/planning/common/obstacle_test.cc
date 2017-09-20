@@ -79,7 +79,7 @@ class ObstacleTest : public ::testing::Test {
     ASSERT_EQ(5, obstacles.size());
     for (auto& obstacle : obstacles) {
       const auto id = obstacle->Id();
-      indexed_obstacles_.Add(id, std::move(obstacle));
+      indexed_obstacles_.Add(id, *obstacle);
     }
   }
 

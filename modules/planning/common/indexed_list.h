@@ -33,37 +33,22 @@ template <typename I, typename T>
 class IndexedList {
  public:
   /**
-   * @brief move a unique ptr into the container.
+   * @brief copy object into the container
    * @param id the id of the object
-   * @param ptr the unique pointer of the object to be moved to the container.
-   * @return true if successly added and return false if the id already exists
-   * in the container.
-   */
-  bool Add(const I id, std::unique_ptr<T> ptr) {
-    if (Find(id)) {
-      return false;
-    }
-    object_list_.push_back(ptr.get());
-    object_dict_[id] = std::move(ptr);
-    return true;
-  }
-
-  /**
-   * @brief copy ref into the container
-   * @param id the id of the object
-   * @param ref the const reference of the objected to be copied to the
+   * @param object the const reference of the objected to be copied to the
    * container.
-   * @return true if successly added and return false if the id already exists
-   * in the container.
+   * @return The pointer to the object in the container.
    */
-  bool Add(const I id, const T& ref) {
-    if (Find(id)) {
-      return false;
+  T* Add(const I id, const T& object) {
+    auto* ptr = Find(id);
+    if (ptr) {
+      return nullptr;
+    } else {
+      const auto iter = object_dict_.insert(
+          typename std::unordered_map<I, T>::value_type(id, object));
+      object_list_.push_back(&(iter.first->second));
+      return &(iter.first->second);
     }
-    auto ptr = std::unique_ptr<T>(new T(ref));
-    object_list_.push_back(ptr.get());
-    object_dict_[id] = std::move(ptr);
-    return true;
   }
 
   /**
@@ -77,7 +62,7 @@ class IndexedList {
     if (iter == object_dict_.end()) {
       return nullptr;
     } else {
-      return iter->second.get();
+      return &iter->second;
     }
   }
 
@@ -89,7 +74,7 @@ class IndexedList {
 
  private:
   std::vector<const T*> object_list_;
-  std::unordered_map<I, std::unique_ptr<T>> object_dict_;
+  std::unordered_map<I, T> object_dict_;
 };
 
 }  // namespace planning
