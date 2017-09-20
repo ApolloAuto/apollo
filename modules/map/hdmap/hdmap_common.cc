@@ -185,9 +185,9 @@ void LaneInfo::GetWidth(const double s, double *left_width,
 
 double LaneInfo::Heading(const double s) const {
   CHECK(common::math::DoubleCompare(s, accumulated_s_.front()) >= 0)
-      << "s should be >= " << accumulated_s_.front();
+      << "s:" << s << " should be >= " << accumulated_s_.front();
   CHECK(common::math::DoubleCompare(s, accumulated_s_.back()) <= 0)
-      << "s should be <= " << accumulated_s_.back();
+      << "s:" << s  << " should be <= " << accumulated_s_.back();
   auto iter = std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
   int index = std::distance(accumulated_s_.begin(), iter);
   if (index == 0 || *iter - s <= common::math::kMathEpsilon) {
