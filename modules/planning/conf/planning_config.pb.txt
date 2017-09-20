@@ -58,7 +58,10 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            centric_acceleration_limit: 1.0
+            high_speed_centric_acceleration_limit: 1.0
+            low_speed_centric_acceleration_limit: 1.35
+            high_speed_threshold: 20
+            low_speed_threshold: 7
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
@@ -102,7 +105,10 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            centric_acceleration_limit: 1.0
+            high_speed_centric_acceleration_limit: 1.0
+            low_speed_centric_acceleration_limit: 1.35
+            high_speed_threshold: 20
+            low_speed_threshold: 7
             minimal_kappa: 0.00001
             point_extension: 1.0
             lowest_speed: 2.5
