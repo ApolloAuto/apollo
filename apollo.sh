@@ -101,7 +101,7 @@ function build() {
   echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH..."
-  echo "$BUILD_TARGETS" | xargs bazel build $DEFINES -c $1
+  echo "$BUILD_TARGETS" | xargs bazel build $DEFINES -c $@
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
@@ -113,11 +113,11 @@ function build() {
 }
 
 function apollo_build_dbg() {
-  build "dbg"
+  build "dbg" $@
 }
 
 function apollo_build_opt() {
-  build "opt"
+  build "opt" $@
 }
 
 function build_py_proto() {
@@ -132,7 +132,7 @@ function build_py_proto() {
 
 function check() {
   local check_start_time=$(get_now)
-  apollo_build_dbg && run_test && run_lint
+  apollo_build_dbg $@ && run_test && run_lint
 
   START_TIME=$check_start_time
   if [ $? -eq 0 ]; then
@@ -488,26 +488,29 @@ function main() {
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
 
-  case $1 in
+  local cmd=$1
+  shift
+
+  case $cmd in
     check)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      check
+      check $@
       ;;
     build)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      apollo_build_dbg
+      apollo_build_dbg $@
       ;;
     build_opt)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      apollo_build_opt
+      apollo_build_opt $@
       ;;
     build_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
-      apollo_build_dbg
+      apollo_build_dbg $@
       ;;
     build_opt_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
-      apollo_build_opt
+      apollo_build_opt $@
       ;;
     build_fe)
       build_fe
