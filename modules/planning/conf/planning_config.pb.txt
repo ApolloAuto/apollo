@@ -92,6 +92,7 @@ em_planner_config {
         follow_weight: 2.0
         stop_weight: 0.2
         cruise_weight: 0.3
+        regularization_weight: 0.05
         max_speed: 20.0
         preferred_max_acceleration: 1.2
         preferred_min_deceleration: -1.8

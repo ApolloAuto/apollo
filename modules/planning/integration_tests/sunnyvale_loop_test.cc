@@ -137,5 +137,19 @@ TEST_F(SunnyvaleLoopTest, slowdown_01) {
   RUN_GOLDEN_TEST;
 }
 
+/*
+ * test right turn.
+ * A right turn test case
+ */
+TEST_F(SunnyvaleLoopTest, rightturn_01) {
+  std::string seq_num = "8";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST;
+}
+
 }  // namespace planning
 }  // namespace apollo
