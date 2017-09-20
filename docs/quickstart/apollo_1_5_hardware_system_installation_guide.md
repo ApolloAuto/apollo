@@ -406,7 +406,7 @@ https://github.com/ApolloAuto/apollo-kernel/releases
 2. Install the kernel
   After having the release package downloaded:
 ```
-tar zxvf linux-4.4.32-apollo-1.0.0.tar.gz
+tar zxvf linux-4.4.32-apollo-1.5.0.tar.gz
 cd install
 sudo bash install_kernel.sh
 ```
@@ -442,10 +442,8 @@ wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_
 
 2. Start the installation
 ```
-sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-kernel-module --no-x-check -a -s
+sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s
 ```
-
-3. Reboot your system by the `sudo reboot` command
 
 ##### Optional: Test the ESD CAN device node
 After rebooting the IPC with the new kernel:
