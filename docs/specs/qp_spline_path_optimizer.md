@@ -1,8 +1,8 @@
 # QP-Spline-Path Optimizer
 
-Quadratic programming + Spline interpolation
+_**Tip**: to read the equations in the document, you are recommended to use Chrome with [a plugin](https://chrome.google.com/webstore/detail/tex-all-the-things/cbimabofgmfdkicghcadidpemeenbffn) or copy the latex equation to [an online editor](http://www.hostmath.com/)_
 
-_**Tip**: to read the equations in the document, you are recommended to use Chrome with [a plugin](https://chrome.google.com/webstore/detail/tex-all-the-things/cbimabofgmfdkicghcadidpemeenbffn)_
+Quadratic programming + Spline interpolation
 
 ## 1.  Objective function
 
