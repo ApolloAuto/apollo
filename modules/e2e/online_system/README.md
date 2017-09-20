@@ -9,23 +9,25 @@ Use the sensor data module to collect the sensor data and vehicle parameters in 
 
 - [ ] **FIRST:**  Ubuntu 16.04 LTS2 *must* be installed.
 
-       Apollo recommends using ROS Kinetic (ros-kinetic-desktop-full.3) with Px2 driveworks, version 0.1 to build and install the module using the ROS catkin tool.
+	Apollo recommends using ROS Kinetic (ros-kinetic-desktop-full.3) with Px2 driveworks, version 0.1 to build and install the module using the ROS catkin tool.
 
 - [ ] Next, Install ROS.
 
-      It is assumed that ROS packages will be installed at `~/ros`. Add the following to the `~/.bash_profile` to use the catkin tool in the new bash shell:
+	It is assumed that ROS packages will be installed at `~/ros`. Add the following to the `~/.bash_profile` to use the catkin tool in the new bash shell:
 
-      ```
-      if [ -f /opt/ros/kinetic/setup.bash ]; then source /opt/ros/kinetic/setup.bash
-      ```
+	```
+	if [ -f /opt/ros/kinetic/setup.bash ]; then source /opt/ros/kinetic/setup.bash
+	```
 
 - [ ] Create a catkin workspace to build and install that code.
 
     For example , create `~/catkin_ws` , and then:
 
-      ```
-      $ cd ~/catkin_ws	$ mkdir src	$ cd src
-      ```
+	```
+	$ cd ~/catkin_ws
+	$ mkdir src
+	$ cd src
+	```
 
 - [ ] gitclone the source code to the `~/catkin_ws/src`.
 
@@ -51,9 +53,9 @@ To test:
 
 - [ ] Open a second bash shell and initialize the camera node using the following:
 
-      ```
-      $ rosrun px2_camera_image px2_camera_node
-      ```
+	```
+	$ rosrun px2_camera_image px2_camera_node
+    ```
 
 
 - [ ] Open a third bash shell, and then open the `rviz` to visualize the data coming from the camera.
