@@ -51,6 +51,9 @@ class PathDecision {
 
   PathObstacle *Find(const std::string &object_id);
 
+  void SetStBoundary(const std::string &id, const StBoundary &boundary);
+  void EraseStBoundaries();
+
  private:
   IndexedList<std::string, PathObstacle> path_obstacles_;
 };

@@ -105,8 +105,9 @@ Status StBoundaryMapper::GetGraphBoundary(
   double min_stop_s = std::numeric_limits<double>::max();
 
   for (const auto* path_obstacle : path_obstacles.Items()) {
+    StBoundary boundary;
+    boundary.SetId(path_obstacle->Id());
     if (!path_obstacle->HasLongitudinalDecision()) {
-      StBoundary boundary;
       const auto ret = MapWithoutDecision(*path_obstacle, &boundary);
       if (!ret.ok()) {
         std::string msg = common::util::StrCat(
@@ -139,7 +140,6 @@ Status StBoundaryMapper::GetGraphBoundary(
       }
     } else if (decision.has_follow() || decision.has_overtake() ||
                decision.has_yield()) {
-      StBoundary boundary;
       const auto ret =
           MapWithPredictionTrajectory(*path_obstacle, decision, &boundary);
       if (!ret.ok()) {
@@ -239,7 +239,7 @@ Status StBoundaryMapper::MapWithoutDecision(const PathObstacle& path_obstacle,
     *boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
                     .ExpandByS(boundary_s_buffer)
                     .ExpandByT(boundary_t_buffer);
-    boundary->SetId(path_obstacle.obstacle()->Id());
+    boundary->SetId(path_obstacle.Id());
   }
   return Status::OK();
 }
