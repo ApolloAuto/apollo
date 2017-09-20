@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/common/graph_util.h"
+
 #include <queue>
 #include <iostream>
-#include "modules/perception/obstacle/common/graph_util.h"
 
 namespace apollo {
 namespace perception {
 
 void ConnectedComponentAnalysis(const std::vector<std::vector<int> >& graph,
-  std::vector<std::vector<int> >* components) {
+                                std::vector<std::vector<int> >* components) {
   int no_item = graph.size();
   std::vector<int> visited;
   visited.resize(no_item, 0);

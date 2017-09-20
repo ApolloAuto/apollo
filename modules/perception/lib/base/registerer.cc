@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/lib/base/registerer.h"
+
 #include <string>
 #include <vector>
 
