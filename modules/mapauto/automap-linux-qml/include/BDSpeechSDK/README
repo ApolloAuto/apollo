@@ -1,0 +1,9 @@
+Contents of this directory:
+ASR/
+    Definitions for using ASR module of the SDK.
+TTS/
+    Definitions for using TTS module of the SDK.
+BDSpeechSDK.hpp
+    The main interface of the SDK. You need this for both TTS and ASR.
+BDSSDKMessage.hpp
+    Message class encapsulating messages to/from SDK.
