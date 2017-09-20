@@ -9,30 +9,30 @@ The generator data module sequentially generates the collected data.
 
 - [ ] Run the generator data for steering:
 
-      ```
-      def generator_data_steering()
-      ```
+	```
+	def generator_data_steering()
+	```
 
 
 - [ ] Filter the abnormal values：
 
-      ```
-      - [ ] def filter(c,v):
+ 	```
+	def filter(c,v):
+		return v > 1 and c < 0.5
 
-      	return v > 1 and c < 0.5
-      ```
+	```
 
 
 The collected data can contain a large number of straight lines data, with a curvature less than or equal to 0.0001.
 
 - [ ] After filtering for the abnormal values, select the straight line data by probability of 10% using the following:
 
-      ```
-      if filter(curv, speed) and (curv > 0.0001 or random.randint(1, 10) == 1)
-      ```
+    ```
+    if filter(curv, speed) and (curv > 0.0001 or random.randint(1, 10) == 1)
+    ```
 
 ## CNN Model
-The CNN model XXX.  See:
+The CNN model.  See:
 
 `model file：src\steering_model.py`
 
@@ -52,18 +52,17 @@ To compute the accleration, run the data generator and filter the values using t
 
 - [ ] Run the generator for data:
 
-      ```
-      def generator_data_acc():
-      ```
+	```
+    def generator_data_acc():
+    ```
 
 
 - [ ] Filter the abnormal values：
 
-      ```
-      def filter(c,v):
-
-      return v > 1 and c < 0.5
-      ```
+	```
+	def filter(c,v):
+    	return v > 1 and c < 0.5
+    ```
 
 
 The longitudinal model processes the data in the following order:
@@ -77,9 +76,7 @@ Each frame interval of 0.125s, with the fifth frame of the acceleration:
 
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-```
 $$ ACC_5 = \frac{(V_6-V_4)}\{0.25} $$
-```
 
 
 If the filter removes the sixth frame velocity value, then discard the 5 frames of the timestep sample.
@@ -96,7 +93,7 @@ else:
 ```
 
 ## Conv_LSTM Model
-The Conv_LSTM  model XXX.  See:
+The Conv_LSTM  model.  See:
 
 ```
 model file:src\acc_model.py
