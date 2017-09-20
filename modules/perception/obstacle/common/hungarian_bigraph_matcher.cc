@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <iostream>
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
+
+#include <iostream>
 
 namespace apollo {
 namespace perception {
