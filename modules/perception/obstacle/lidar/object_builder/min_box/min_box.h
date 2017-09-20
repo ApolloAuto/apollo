@@ -17,8 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_BUILDER_MIN_BOX_H
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_BUILDER_MIN_BOX_H
 
-#include <vector>
 #include <string>
+#include <vector>
+
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
 
@@ -27,44 +28,34 @@ namespace perception {
 
 class MinBoxObjectBuilder : public BaseObjectBuilder {
  public:
-    MinBoxObjectBuilder() : BaseObjectBuilder() {}
-    virtual ~MinBoxObjectBuilder() {}
+  MinBoxObjectBuilder() : BaseObjectBuilder() {}
+  virtual ~MinBoxObjectBuilder() {}
 
-    bool Init() override {
-        // Do something.
-        return true;
-    }
+  bool Init() override {
+    return true;
+  }
 
-    bool Build(
-             const ObjectBuilderOptions& options,
+  bool Build(const ObjectBuilderOptions& options,
              std::vector<ObjectPtr>* objects) override;
-
-    std::string name() const override {
-        return "MinBoxObjectBuilder";
-    }
+  std::string name() const override {
+    return "MinBoxObjectBuilder";
+  }
 
  protected:
-    void BuildObject(
-            ObjectBuilderOptions options,
-            ObjectPtr object);
+  void BuildObject(ObjectBuilderOptions options, ObjectPtr object);
 
-    void ComputePolygon2dxy(ObjectPtr obj);
+  void ComputePolygon2dxy(ObjectPtr obj);
 
-    double ComputeAreaAlongOneEdge(
-            ObjectPtr obj,
-            size_t first_in_point,
-            Eigen::Vector3d* center,
-            double* lenth, double* width,
-            Eigen::Vector3d* dir);
+  double ComputeAreaAlongOneEdge(ObjectPtr obj, size_t first_in_point,
+                                 Eigen::Vector3d* center, double* lenth,
+                                 double* width, Eigen::Vector3d* dir);
 
-    void  ReconstructPolygon(
-            const Eigen::Vector3d &ref_ct,
-            ObjectPtr obj);
+  void ReconstructPolygon(const Eigen::Vector3d& ref_ct, ObjectPtr obj);
 
-    void ComputeGeometricFeature(const Eigen::Vector3d &ref_ct, ObjectPtr obj);
+  void ComputeGeometricFeature(const Eigen::Vector3d& ref_ct, ObjectPtr obj);
 
  private:
-    DISALLOW_COPY_AND_ASSIGN(MinBoxObjectBuilder);
+  DISALLOW_COPY_AND_ASSIGN(MinBoxObjectBuilder);
 };
 
 // Register plugin.
