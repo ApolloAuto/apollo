@@ -13,15 +13,15 @@
 
 ```
 	if [ -f /opt/ros/kinetic/setup.bash ]; then
-       source /opt/ros/kinetic/setup.bash
-    fi
+       	    source /opt/ros/kinetic/setup.bash
+    	fi
 ```
 然后应该建立catkin的工作空间来编译以及安装源代码。例如可以建立`~/catkin_ws`.然后：
 
 ```
-	cd ~/catkin_ws
-	mkdir src
-	cd src
+	$ cd ~/catkin_ws
+	$ mkdir src
+	$ cd src
 ```
 这样可以将源代码 gitclone 到 `~/catkin_ws/src` 目录下面。
 
@@ -55,4 +55,3 @@
 
 # LICENSE
 请看相应的license 文件。
-
