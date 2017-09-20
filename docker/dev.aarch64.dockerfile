@@ -30,6 +30,9 @@ RUN apt-get install -y git
 RUN apt-get install -y bc
 RUN apt-get install -y apt-transport-https
 RUN apt-get install -y shellcheck
+RUN apt-get install -y cmake
+RUN apt-get install -y gdb
+RUN apt-get install -y psmisc
 
 RUN add-apt-repository ppa:webupd8team/java
 RUN apt-get update
