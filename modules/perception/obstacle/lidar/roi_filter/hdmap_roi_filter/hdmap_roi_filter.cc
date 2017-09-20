@@ -17,8 +17,8 @@ namespace apollo {
 namespace perception {
 
 bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
-                          const ROIFilterOptions &roi_filter_options,
-                          pcl_util::PointIndices* roi_indices) {
+                            const ROIFilterOptions &roi_filter_options,
+                            pcl_util::PointIndices* roi_indices) {
   if (roi_filter_options.hdmap == nullptr
       || roi_filter_options.velodyne_trans == nullptr) {
     return false;
@@ -30,7 +30,7 @@ bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
   MergeHdmapStructToPolygons(roi_filter_options.hdmap, &polygons);
 
   if (polygons.size() == 0) {
-      return false;
+    return false;
   }
 
   // 1. Transform polygon and point to local coordinates
@@ -178,11 +178,11 @@ bool HdmapROIFilter::Init() {
 }
 
 void HdmapROIFilter::TransformFrame(
-        const pcl_util::PointCloudConstPtr &cloud,
-        const Eigen::Affine3d &vel_pose,
-        const std::vector<PolygonDType> &polygons_world,
-        std::vector<PolygonType>* polygons_local,
-        pcl_util::PointCloudPtr cloud_local) {
+    const pcl_util::PointCloudConstPtr &cloud,
+    const Eigen::Affine3d &vel_pose,
+    const std::vector<PolygonDType> &polygons_world,
+    std::vector<PolygonType>* polygons_local,
+    pcl_util::PointCloudPtr cloud_local) {
   cloud_local->header = cloud->header;
   Eigen::Vector3d vel_location = vel_pose.translation();
   Eigen::Matrix3d vel_rot = vel_pose.linear();
