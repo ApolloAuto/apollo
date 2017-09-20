@@ -18,7 +18,7 @@ docker exec -it apollo_dev /bin/bash
 
 3. Uninstall the pre-installed Nvidia driver in docker:
 ```
-sudo apt-get autoremove --purge nvidia-*
+sudo apt-get --purge remove nvidia*
 ```
 
 4. Download official Nvidia driver installation file which should be the exactly same version as the one installed in the host machine. We recommand the version of 375.39:
