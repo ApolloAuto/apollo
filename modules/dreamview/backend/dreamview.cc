@@ -64,12 +64,12 @@ Status Dreamview::Init() {
   server_.reset(new CivetServer(options));
 
   websocket_.reset(new WebSocketHandler());
-  server_->addWebSocketHandler("/websocket", *websocket_);
-
   map_service_.reset(new MapService(BaseMapFile(), SimMapFile()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_service_.get(), FLAGS_routing_from_file));
   sim_control_.reset(new SimControl(map_service_.get()));
+
+  server_->addWebSocketHandler("/websocket", *websocket_);
 
   return Status::OK();
 }
