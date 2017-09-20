@@ -84,7 +84,7 @@ void Frame::CreatePredictionObstacles(
   auto obstacles = Obstacle::CreateObstacles(prediction);
   for (auto &ptr : obstacles) {
     auto id(ptr->Id());
-    obstacles_.Add(id, std::move(ptr));
+    obstacles_.Add(id, *ptr);
   }
 }
 
@@ -152,11 +152,11 @@ const Obstacle *Frame::AddStaticVirtualObstacle(
     point->set_x(corner_point.x());
     point->set_y(corner_point.y());
   }
-
-  auto ptr = std::unique_ptr<Obstacle>(new Obstacle(id, perception_obstacle));
-  auto *obstacle_ptr = ptr.get();
-  obstacles_.Add(id, std::move(ptr));
-  return obstacle_ptr;
+  auto *ptr = obstacles_.Add(id, Obstacle(id, perception_obstacle));
+  if (!ptr) {
+    AERROR << "Failed to create virtual obstacle " << id;
+  }
+  return ptr;
 }
 
 const Obstacle *Frame::CreateDestinationObstacle() {
@@ -338,11 +338,9 @@ void Frame::AlignPredictionTime(const double trajectory_header_time) {
   }
 }
 
-bool Frame::AddObstacle(std::unique_ptr<Obstacle> obstacle) {
-  auto id(obstacle->Id());
-
+void Frame::AddObstacle(const Obstacle &obstacle) {
   std::lock_guard<std::mutex> lock(obstacles_mutex_);
-  return obstacles_.Add(id, std::move(obstacle));
+  obstacles_.Add(obstacle.Id(), obstacle);
 }
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
