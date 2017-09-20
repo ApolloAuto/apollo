@@ -79,7 +79,8 @@ class Planning : public apollo::common::ApolloApp {
    */
   common::Status Plan(
       const double current_time_stamp,
-      const std::vector<common::TrajectoryPoint>& stitching_trajectory);
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      ADCTrajectory* trajectory);
 
   void RunOnce();
 
@@ -89,8 +90,6 @@ class Planning : public apollo::common::ApolloApp {
  private:
   // Watch dog timer
   void OnTimer(const ros::TimerEvent&);
-
-  void PublishPlanningPb(ADCTrajectory* trajectory_pb);
 
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
 

@@ -50,7 +50,7 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
 }
 
-Status Planning::InitFrame(const uint32_t sequence_num, const double time_stamp,
+Status Planning::InitFrame(const uint32_t sequence_num, const double timestamp,
                            const TrajectoryPoint& init_adc_point) {
   frame_.reset(new Frame(sequence_num));
   frame_->SetPlanningStartPoint(init_adc_point);
@@ -74,12 +74,11 @@ Status Planning::InitFrame(const uint32_t sequence_num, const double time_stamp,
     ADEBUG << "Get prediction: " << prediction.DebugString();
   }
 
-  auto status = frame_->Init(config_, time_stamp);
+  auto status = frame_->Init(config_, timestamp);
   if (!status.ok()) {
     AERROR << "failed to init frame";
     return Status(ErrorCode::PLANNING_ERROR, "init frame failed");
   }
-  frame_->RecordInputDebug();
   return Status::OK();
 }
 
@@ -147,13 +146,6 @@ void Planning::OnTimer(const ros::TimerEvent&) {
   }
 }
 
-void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb) {
-  AdapterManager::FillPlanningHeader(Name(), trajectory_pb);
-  // TODO(all): integrate reverse gear
-  trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-  AdapterManager::PublishPlanning(*trajectory_pb);
-}
-
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                  double timestamp) {
   AdapterManager::FillPlanningHeader(Name(), trajectory_pb);
@@ -182,7 +174,7 @@ void Planning::RunOnce() {
   }
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
-    PublishPlanningPb(&not_ready_pb);
+    PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
 
@@ -202,7 +194,7 @@ void Planning::RunOnce() {
     AERROR << "Update VehicleState failed.";
     not_ready->set_reason("Update VehicleState failed.");
     status.Save(not_ready_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&not_ready_pb);
+    PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
 
@@ -222,10 +214,12 @@ void Planning::RunOnce() {
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   status = InitFrame(frame_num, start_timestamp, stitching_trajectory.back());
-  double end_timestamp = Clock::NowInSecond();
-  double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
-  auto trajectory_pb = frame_->MutableADCTrajectory();
-  trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(time_diff_ms);
+  ADCTrajectory trajectory_pb;
+  if (FLAGS_enable_record_debug) {
+    frame_->RecordInputDebug(trajectory_pb.mutable_debug());
+  }
+  trajectory_pb.mutable_latency_stats()->set_init_frame_time_ms(
+      Clock::NowInSecond() - start_timestamp);
   if (!status.ok()) {
     ADCTrajectory estop;
     estop.mutable_estop();
@@ -235,22 +229,20 @@ void Planning::RunOnce() {
     return;
   }
 
-  status = Plan(start_timestamp, stitching_trajectory);
+  status = Plan(start_timestamp, stitching_trajectory, &trajectory_pb);
 
-  end_timestamp = Clock::NowInSecond();
-  time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  const auto time_diff_ms = (Clock::NowInSecond() - start_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
-  trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  ADEBUG << "Planning latency: "
-         << trajectory_pb->latency_stats().DebugString();
+  trajectory_pb.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  ADEBUG << "Planning latency: " << trajectory_pb.latency_stats().DebugString();
 
   if (status.ok()) {
-    PublishPlanningPb(trajectory_pb, start_timestamp);
-    ADEBUG << "Planning succeeded:" << trajectory_pb->header().DebugString();
+    PublishPlanningPb(&trajectory_pb, start_timestamp);
+    ADEBUG << "Planning succeeded:" << trajectory_pb.header().DebugString();
   } else {
-    status.Save(trajectory_pb->mutable_header()->mutable_status());
-    PublishPlanningPb(trajectory_pb, start_timestamp);
+    status.Save(trajectory_pb.mutable_header()->mutable_status());
+    PublishPlanningPb(&trajectory_pb, start_timestamp);
     AERROR << "Planning failed";
   }
 }
@@ -266,13 +258,12 @@ void Planning::Stop() {
 
 common::Status Planning::Plan(
     const double current_time_stamp,
-    const std::vector<common::TrajectoryPoint>& stitching_trajectory) {
-  auto trajectory_pb = frame_->MutableADCTrajectory();
+    const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+    ADCTrajectory* trajectory_pb) {
+  auto* ptr_debug = trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
-    frame_->DebugLogger()
-        ->mutable_planning_data()
-        ->mutable_init_point()
-        ->CopyFrom(stitching_trajectory.back());
+    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
+        stitching_trajectory.back());
   }
   auto status = Status::OK();
   for (auto& reference_line_info : frame_->reference_line_info()) {
@@ -291,10 +282,11 @@ common::Status Planning::Plan(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  auto* ptr_debug = frame_->DebugLogger();
   ptr_debug->MergeFrom(best_reference_line->debug());
-  frame_->MutableADCTrajectory()->mutable_latency_stats()->MergeFrom(
+  trajectory_pb->mutable_latency_stats()->MergeFrom(
       best_reference_line->latency_stats());
+
+  best_reference_line->ExportDecision(trajectory_pb->mutable_decision());
 
   // Add debug information.
   if (FLAGS_enable_record_debug) {

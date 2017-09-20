@@ -18,9 +18,9 @@
  * @file speed_optimizer.cc
  **/
 
-#include "modules/planning/tasks/speed_optimizer.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_limit.h"
+#include "modules/planning/tasks/speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -73,7 +73,7 @@ SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed) const {
 }
 
 void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
-  auto* debug = frame_->DebugLogger();
+  auto* debug = reference_line_info_->mutable_debug();
   auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
   ptr_speed_plan->set_name(Name());
   ptr_speed_plan->mutable_speed_point()->CopyFrom(

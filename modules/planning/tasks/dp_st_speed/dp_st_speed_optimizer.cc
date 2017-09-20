@@ -98,7 +98,7 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
   DpStGraph st_graph(reference_line, st_graph_data, dp_st_speed_config_,
                      path_data, adc_sl_boundary);
-  auto* debug = frame_->DebugLogger();
+  auto* debug = reference_line_info_->mutable_debug();
   STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
   if (!st_graph.Search(path_decision, speed_data).ok()) {

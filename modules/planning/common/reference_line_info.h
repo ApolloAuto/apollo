@@ -53,16 +53,11 @@ class ReferenceLineInfo {
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
 
-  // FIXME(all) this interface is temp. solution to make the code work.
-  // remove this interface when ready.
-  PathDecision* path_decision() { return &path_decision_; }
-  const PathDecision& path_decision() const { return path_decision_; }
-  const ReferenceLine& reference_line() const { return reference_line_; }
+  PathDecision* path_decision();
+  const PathDecision& path_decision() const;
+  const ReferenceLine& reference_line() const;
 
-  // TODO(all) remove this inteface when ready.
-  void SetTrajectory(const DiscretizedTrajectory& trajectory) {
-    discretized_trajectory_ = trajectory;
-  }
+  void SetTrajectory(const DiscretizedTrajectory& trajectory);
 
   const DiscretizedTrajectory& trajectory() const;
 

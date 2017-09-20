@@ -73,10 +73,6 @@ const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
 
 void Frame::SetPrediction(const prediction::PredictionObstacles &prediction) {
   prediction_ = prediction;
-  trajectory_pb_.mutable_debug()
-      ->mutable_planning_data()
-      ->mutable_prediction_header()
-      ->CopyFrom(prediction_.header());
 }
 
 void Frame::CreatePredictionObstacles(
@@ -90,12 +86,6 @@ void Frame::CreatePredictionObstacles(
 
 const routing::RoutingResponse &Frame::routing_response() const {
   return routing_response_;
-}
-
-ADCTrajectory *Frame::MutableADCTrajectory() { return &trajectory_pb_; }
-
-planning_internal::Debug *Frame::DebugLogger() {
-  return trajectory_pb_.mutable_debug();
 }
 
 std::list<ReferenceLineInfo> &Frame::reference_line_info() {
@@ -301,13 +291,13 @@ std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);
 }
 
-void Frame::RecordInputDebug() {
-  if (!FLAGS_enable_record_debug) {
+void Frame::RecordInputDebug(planning_internal::Debug *debug) {
+  if (!debug) {
     ADEBUG << "Skip record input into debug";
     return;
   }
-  auto planning_data = DebugLogger()->mutable_planning_data();
-  auto adc_position = planning_data->mutable_adc_position();
+  auto *planning_data = debug->mutable_planning_data();
+  auto *adc_position = planning_data->mutable_adc_position();
   const auto &localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
   adc_position->CopyFrom(localization);
@@ -321,6 +311,8 @@ void Frame::RecordInputDebug() {
 
   auto debug_routing = planning_data->mutable_routing();
   debug_routing->CopyFrom(routing_response);
+
+  planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
 }
 
 void Frame::AlignPredictionTime(const double trajectory_header_time) {
