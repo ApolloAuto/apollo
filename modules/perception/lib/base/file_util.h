@@ -95,6 +95,7 @@ class FileUtil {
 
   DISALLOW_COPY_AND_ASSIGN(FileUtil);
 };
+
 }  // namespace perception
 }  // namespace apollo
 
