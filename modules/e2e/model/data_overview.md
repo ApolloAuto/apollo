@@ -16,9 +16,8 @@ The camera is located on the luggage rack that is installed on the car roof.
 
 - [ ] Move the equipment bracket to the middle of the luggage rack to ensure that the middle of CCD images coincides with the centerline of the vehicle.
 
-       <img src="./png_resource/1.png" width = "300" height = "320" align=center />
-
-       <img src="./png_resource/2.png" width = "300" height = "320" align=center />
+<img src="./png_resource/1.png" width = "300" height = "320" align=center />
+ <img src="./png_resource/2.png" width = "300" height = "320" align=center />
 
 ## Data usage
 
@@ -49,13 +48,14 @@ The training set contains two parts of data, including image and attr. Image is 
 
 #### Formats of Training Sets
 * The training data are organized according to the following directory structure:
+
   ```
   trainsets/			   // top folders of the training data
   ├── image				 // it includes the image files in the training data
-  │   ├── 119.h5
-  │   ├── ..
-  │   └── 123.h5
-  └── attr		// it includes the attitude files corresponding to image files
+  │   ├── 119.h5
+  │   ├── ..
+  │   └── 123.h5
+  └── attr		// it includes the attribute files corresponding to image files
     ├── 119.h5
     ├── ..
     └── 123.h5
@@ -70,7 +70,7 @@ The training set contains two parts of data, including image and attr. Image is 
   - Key:  UTC time.
 
 
-  - Value:  the encoded jpg format of 320*320*3 pixel matrix jpg.
+  - Value:  the encoded jpg format of 320 * 320 * 3 pixel matrix jpg.
 
   - Decoding example：
 
@@ -80,30 +80,41 @@ The training set contains two parts of data, including image and attr. Image is 
     		img = cv2.imdecode(f[t][:], 1)
     ```
 
-* The format of the attitude files:  .h5 file.
+* The format of the attribute files:  .h5 file.
 
-  * The attitude data of one moment will be stored in the hdf5 in the form of 2D array as a whole.
-  * The first dimension is attrs and the second dimension is the attitude data［t, VEast, VNorth, curv1, curv2, curv3, curv4, curv5, curv6, x, y, heading,tag］.
-  * For an image of the UTC time in the image file, there must be a line of attitude data corresponding to the image. Each line has 13 items of data in the form of 64-bit floating point number.
+  * The attribute data of one moment will be stored in the hdf5 in the form of 2D array as a whole.
+  * The first dimension is attrs and the second dimension is the attribute data［t, VEast, VNorth, curv1, curv2, curv3, curv4, curv5, curv6, x, y, heading,tag］.
+  * For an image of the UTC time in the image file, there must be a line of attribute data corresponding to the image. Each line has 13 items of data in the form of 64-bit floating point number.
   * Variables and related instructions are described as follows:
 
-  | Column: variables | Units                     | Description                              |
-  | ----------------- | ------------------------- | ---------------------------------------- |
-  | 01 : t            | decimal system (Unsigned) | Current UTC timestamp                    |
-  | 02 : VEast        | m/s                       | Current speed of the vehicle towards the east |
-  | 03 : VNorth       | m/s                       | Current speed of the vehicle towards the north |
-  | 04 : curv1        |                           |                                          |
+  Column: variables | Units | Description
+	------------ | ------------- | ------------
+	01 : t | decimal system (Unsigned) | Current UTC timestamp
+	02 : VEast|	m/s | Current speed of the vehicle towards the east
+	03 : VNorth|	m/s | Current speed of the vehicle towards the north
+	04 : curv1 | decimal system (Signed) | [t,t+1] Curvature 1, left turning as positive
+	05 : curv2 | decimal system (Signed) | [t,t+1] Curvature 2, left turning as positive
+	06 : curv3 | decimal system (Signed) | [t,t+1] Curvature 3, left turning as positive
+	07 : curv4 | decimal system (Signed) | [t,t+1] Curvature 4, left turning as positive
+	08 : curv5 | decimal system (Signed) | [t,t+1] Curvature 5, left turning as positive
+	09 : curv6 | decimal system (Signed） | [t,t+1] Curvature 6, left turning as positive
+	10 : x | decimal system (Unsigned) | relative displacement against the east x-axis
+	11 : y | decimal system (Unsigned) | relative displacement against the north y-axis
+	12 : heading | degree, decimal floating-point number (Signed） | the clockwise angle to the north
+	13 : tag | decimal system (Unsigned) | Reserved annotation bit, not yet used
+
 
 ### Formats of test sets:
 
-* The format of the test set is consistent with that of the training set, but there is no attribute folder. The test set is organized as follows:
+* The format of the test set is consistent with that of the training set. The test set is organized as follows:
+
   ```
   testsets/			   // top folders of the test data
   ├── image				 // it includes the image files in the test data
-  │   ├── testfile_part01.h5
-  │   ├── ..
-  │   └── testfile_part04.h5
-  └── attr		// it includes the attitude files corresponding to image files
+  │   ├── testfile_part01.h5
+  │   ├── ..
+  │   └── testfile_part04.h5
+  └── attr		// it includes the attribute files corresponding to image files
     ├── testfile_part01.h5
     ├── ..
     └── testfile_part04.h5 		```
@@ -127,6 +138,4 @@ The training set contains two parts of data, including image and attr. Image is 
 The horizontal control model and the horizontal control model are measured by using the mean square error (MSE) indicator. The mean square error is the quadratic mean of the predicted value and the true value difference. The smaller the mean variance error, the better the effect. This indicator is used to measure the prediction precision, which is defined as follows:
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-$$
 $$ MSE = \frac1{n}\sum_{i=1}^n{(truth- predict )^2} $$
-$$
