@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_LOCALIZATION_CAMERA_LOCALIZATION_CAMERA_H_
 #define MODULES_LOCALIZATION_CAMERA_LOCALIZATION_CAMERA_H_
+
 #include <iomanip>
 #include <string>
+
 #include "opencv2/opencv.hpp"
 
 class SceneInterface;
@@ -25,21 +28,24 @@ namespace apollo {
 namespace localization {
 
 struct PosInfo {
-    double longitude;
-    double latitude;
+  double longitude;
+  double latitude;
 };
 
 class CameraLocalization {
-public:
+ public:
   CameraLocalization();
   ~CameraLocalization();
 
   bool init(const std::string& param_path);
-  bool get_ego_position(const cv::Mat& image, const PosInfo& init_pos, PosInfo& res_pos);
-private:
+  bool get_ego_position(const cv::Mat& image, const PosInfo& init_pos,
+                        PosInfo& res_pos);
+
+ private:
   SceneInterface* scene_interface_;
 };
 
-} // localization
-} // apollo
-#endif // MODULES_LOCALIZATION_Camera_LOCALIZATION_Camera_H_
+}  // localization
+}  // apollo
+
+#endif  // MODULES_LOCALIZATION_CAMERA_LOCALIZATION_CAMERA_H_
