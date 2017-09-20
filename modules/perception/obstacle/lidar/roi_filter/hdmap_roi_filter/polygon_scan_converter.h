@@ -102,4 +102,5 @@ class PolygonScanConverter {
 
 }  // namespace perception
 }  // namespace apollo
+
 #endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_ROI_FILTER_HDMAP_ROI_FILTER_PSC_H_
