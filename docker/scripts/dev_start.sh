@@ -103,7 +103,9 @@ function main(){
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_dev_docker \
         --shm-size 512M \
-        $IMG
+        $IMG \
+        /bin/bash
+
     if [ "${USER}" != "root" ]; then
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi
