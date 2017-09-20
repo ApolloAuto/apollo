@@ -475,8 +475,11 @@ Status StBoundaryMapper::GetSpeedLimits(
         reference_line_.GetSpeedLimitFromS(path_point.s());
 
     // speed limit from path curvature
+    const double centric_acceleration_limit =
+        GetCentricAccLimit(std::fabs(path_point.kappa()));
+
     double speed_limit_on_path =
-        std::sqrt(st_boundary_config_.centric_acceleration_limit() /
+        std::sqrt(centric_acceleration_limit /
                   std::fmax(std::fabs(path_point.kappa()),
                             st_boundary_config_.minimal_kappa()));
 
@@ -495,6 +498,31 @@ void StBoundaryMapper::AppendBoundary(
     return;
   }
   st_boundaries->push_back(std::move(boundary));
+}
+
+double StBoundaryMapper::GetCentricAccLimit(const double kappa) const {
+  // this function uses a linear model with upper and lower bound to determine
+  // centric acceleration limit
+
+  // suppose acc = k1 * v + k2
+  // consider acc = v ^ 2 * kappa
+  // we determine acc by the two functions above, with uppper and lower speed
+  // bounds
+  const double k1 = -33.3;
+  const double k2 = 53.3;
+
+  const double v = std::sqrt(-k1 + (k1 * k1 - 4 * kappa * (-k2))) / (2 * kappa);
+
+  const double max_v = 20.0;
+  const double min_v = 7.0;
+
+  if (v > max_v) {
+    return st_boundary_config_.high_speed_centric_acceleration_limit();
+  } else if (v < min_v) {
+    return st_boundary_config_.low_speed_centric_acceleration_limit();
+  } else {
+    return v * k1 + k2;
+  }
 }
 
 }  // namespace planning
