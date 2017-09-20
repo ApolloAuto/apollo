@@ -37,6 +37,7 @@
 #include "modules/planning/tasks/path_decider/path_decider.h"
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
+#include "modules/planning/tasks/speed_decider/speed_decider.h"
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
 namespace apollo {
@@ -60,6 +61,8 @@ void EMPlanner::RegisterTasks() {
                          []() -> Task* { return new PathDecider(); });
   task_factory_.Register(DP_ST_SPEED_OPTIMIZER,
                          []() -> Task* { return new DpStSpeedOptimizer(); });
+  task_factory_.Register(SPEED_DECIDER,
+                         []() -> Task* { return new SpeedDecider(); });
   task_factory_.Register(QP_SPLINE_PATH_OPTIMIZER,
                          []() -> Task* { return new QpSplinePathOptimizer(); });
   task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Task* {

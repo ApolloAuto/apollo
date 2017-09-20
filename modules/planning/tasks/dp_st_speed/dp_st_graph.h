@@ -56,9 +56,6 @@ class DpStGraph {
   apollo::common::Status RetrieveSpeedProfile(
       SpeedData* const speed_data) const;
 
-  apollo::common::Status MakeObjectDecision(
-      const SpeedData& speed_profile, PathDecision* const path_decision) const;
-
   apollo::common::Status CalculateTotalCost();
   void CalculateCostAt(const uint32_t r, const uint32_t c);
 
@@ -75,41 +72,6 @@ class DpStGraph {
                                    uint32_t* const lower_bound,
                                    uint32_t* const upper_bound) const;
 
-  /**
-   * @brief check if the ADC should follow an obstacle by examing the
-   *StBoundary of the obstacle.
-   * @param boundary The boundary of the obstacle.
-   * @return true if the ADC believe it should follow the obstacle, and
-   *         false otherwise.
-   **/
-  bool CheckIsFollowByT(const StBoundary& boundary) const;
-
-  /**
-   * @brief create follow decision based on the boundary
-   * @return true if the follow decision is created successfully, and
-   *         false otherwise.
-   **/
-  bool CreateFollowDecision(const PathObstacle& path_obstacle,
-                            const StBoundary& boundary,
-                            ObjectDecisionType* const follow_decision) const;
-
-  /**
-   * @brief create yield decision based on the boundary
-   * @return true if the yield decision is created successfully, and
-   *         false otherwise.
-   **/
-  bool CreateYieldDecision(const StBoundary& boundary,
-                           ObjectDecisionType* const yield_decision) const;
-
-  /**
-   * @brief create overtake decision based on the boundary
-   * @return true if the overtake decision is created successfully, and
-   *         false otherwise.
-   **/
-  bool CreateOvertakeDecision(
-      const PathObstacle& path_obstacle, const StBoundary& boundary,
-      ObjectDecisionType* const overtake_decision) const;
-
   void GetRowRange(const StGraphPoint& point, uint32_t* highest_row,
                    uint32_t* lowest_row);
 
@@ -122,8 +84,6 @@ class DpStGraph {
 
   // vehicle configuration parameter
   common::VehicleParam vehicle_param_;
-
-  const PathData& path_data_;
 
   const SLBoundary& adc_sl_boundary_;
 
