@@ -263,7 +263,7 @@ explains the parameter usage and default values for CNN Segmentation.
  |height_thresh                      |If it is non-negative, the points that are higher than the predicted object height by height_thresh will be filtered out in the post-processing step.	|0.5 meters |
  |min_pts_num                        |In the post-processing step, the candidate clusters with less than min_pts_num points are removed. |3   |
  |use_full_cloud                     |If it is set by true, all the points of the original point cloud will be used for extracting channel features. Otherwise only the points of input point cloud (i.e., the points after HDMap ROI filter) are used.   |true	|
- |grid_id                            |The ID of the GPU device used in the CNN-based obstacle prediction step.			  |0	      |
+ |gpu_id                             |The ID of the GPU device used in the CNN-based obstacle prediction step.			  |0	      |
  |feature_param {width}              |The number of cells in X (column) axis of the 2D grid.					  |512	      |
  |feature_param {height}             |The number of cells in Y (row) axis of the 2D grid. 					  |512        |
  |feature_param {range}              |The range of the 2D grid with respect to the origin (the LiDAR sensor).			  |60 meters  |
