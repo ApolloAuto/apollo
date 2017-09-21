@@ -268,7 +268,15 @@ const ObjectDecisionType& PathObstacle::LateralDecision() const {
 }
 
 bool PathObstacle::IsIgnore() const {
-  return longitudinal_decision_.has_ignore() && lateral_decision_.has_ignore();
+  return IsLongitudinalIgnore() && IsLateralIgnore();
+}
+
+bool PathObstacle::IsLongitudinalIgnore() const {
+  return longitudinal_decision_.has_ignore();
+}
+
+bool PathObstacle::IsLateralIgnore() const {
+  return lateral_decision_.has_ignore();
 }
 
 ObjectDecisionType PathObstacle::MergeLateralDecision(
@@ -316,6 +324,11 @@ bool PathObstacle::HasLateralDecision() const {
 bool PathObstacle::HasLongitudinalDecision() const {
   return longitudinal_decision_.object_tag_case() !=
          ObjectDecisionType::OBJECT_TAG_NOT_SET;
+}
+
+bool PathObstacle::HasNonIgnoreDecision() const {
+  return (HasLateralDecision() && !IsLateralIgnore()) ||
+         (HasLongitudinalDecision() && !IsLongitudinalIgnore());
 }
 
 const Obstacle* PathObstacle::obstacle() const { return obstacle_; }

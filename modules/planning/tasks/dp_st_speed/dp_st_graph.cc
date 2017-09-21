@@ -485,6 +485,12 @@ Status DpStGraph::MakeObjectDecision(const SpeedData& speed_profile,
       path_decision->AddLongitudinalDecision("dp_st_graph", path_obstacle->Id(),
                                              ignore_decision);
     }
+    if (!path_obstacle->HasLateralDecision()) {
+      ObjectDecisionType ignore_decision;
+      ignore_decision.mutable_ignore();
+      path_decision->AddLateralDecision("dp_st_graph", path_obstacle->Id(),
+                                        ignore_decision);
+    }
   }
   return Status::OK();
 }
