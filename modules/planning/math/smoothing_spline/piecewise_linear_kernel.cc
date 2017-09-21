@@ -21,6 +21,8 @@
 
 #include "modules/planning/math/smoothing_spline/piecewise_linear_kernel.h"
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace planning {
 
@@ -139,7 +141,19 @@ void PiecewiseLinearKernel::AddThirdOrderDerivativeMatrix(
 bool PiecewiseLinearKernel::AddReferenceLineKernelMatrix(
     const std::vector<uint32_t>& index_list,
     const std::vector<double>& pos_list, const double weight) {
-  // TODO(Liangliang): Implement this function.
+  if (index_list.size() != pos_list.size()) {
+    AERROR
+        << "index_list and pos_list must have equal size. index_list.size() = "
+        << index_list.size() << ", pos_list.size() = " << pos_list.size();
+    return false;
+  }
+  Eigen::MatrixXd ref_kernel = Eigen::MatrixXd::Zero(dimension_, dimension_);
+  for (uint32_t i = 0; i < dimension_; ++i) {
+    uint32_t index = index_list[i];
+    ref_kernel(index, index) += 1.0;
+    offset_matrix_(index, 0) += -2.0 * weight * pos_list[i];
+  }
+  kernel_matrix_ += ref_kernel * weight;
   return true;
 }
 
