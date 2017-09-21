@@ -57,10 +57,8 @@ class PiecewiseLinearConstraint {
   /**
    * @brief: equality constraints
    **/
-  bool AddPointConstraint(const double x, const double fx);
-  bool AddPointDerivativeConstraint(const double x, const double dfx);
-  bool AddPointSecondDerivativeConstraint(const double x, const double ddfx);
-  bool AddPointThirdDerivativeConstraint(const double x, const double dddfx);
+  bool AddPointConstraint(const uint32_t index, const double val);
+  bool AddPointDerivativeConstraint(const uint32_t index, const double val);
 
   /**
    * @brief: Add monotone constraint inequality at all indices
