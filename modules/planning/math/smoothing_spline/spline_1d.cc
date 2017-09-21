@@ -93,6 +93,8 @@ Spline1dSeg* Spline1d::mutable_smoothing_spline(const std::uint32_t index) {
   if (index >= splines_.size()) {
     return nullptr;
   } else {
+    // TODO(all): the address of spline_[index] may change, so we need a better
+    // design here to avoid potential crash.
     return &splines_[index];
   }
 }
