@@ -105,6 +105,8 @@ bool PathDecider::MakeStaticObstacleDecision(
         sl_boundary.start_s() > frenet_points.back().s()) {
       path_decision->AddLongitudinalDecision("PathDecider", obstacle.Id(),
                                              object_decision);
+      path_decision->AddLateralDecision("PathDecider", obstacle.Id(),
+                                        object_decision);
       continue;
     }
 

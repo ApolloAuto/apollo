@@ -121,20 +121,21 @@ void Decider::SetObjectDecisions(const PathDecision& path_decision) {
       decision_result_->mutable_object_decision();
 
   for (const auto path_obstacle : path_decision.path_obstacles().Items()) {
+    if (!path_obstacle->HasNonIgnoreDecision()) {
+      continue;
+    }
     auto* object_decision = object_decisions->add_decision();
 
     const auto& obstacle = path_obstacle->obstacle();
     object_decision->set_id(obstacle->Id());
     object_decision->set_perception_id(obstacle->PerceptionId());
-    if (path_obstacle->IsIgnore()) {
-      object_decision->add_object_decision()->mutable_ignore();
-      continue;
-    }
-    if (path_obstacle->HasLateralDecision()) {
+    if (path_obstacle->HasLateralDecision() &&
+        !path_obstacle->IsLateralIgnore()) {
       object_decision->add_object_decision()->CopyFrom(
           path_obstacle->LateralDecision());
     }
-    if (path_obstacle->HasLongitudinalDecision()) {
+    if (path_obstacle->HasLongitudinalDecision() &&
+        !path_obstacle->IsLongitudinalIgnore()) {
       object_decision->add_object_decision()->CopyFrom(
           path_obstacle->LongitudinalDecision());
     }
