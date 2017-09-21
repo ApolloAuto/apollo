@@ -29,7 +29,7 @@ class StSpeedSubplot:
             ax.plot([0], [0], "b-", lw=3, alpha=1, label="lower")[0]
         self.st_name = st_name
         ax.set_xlim(-10, 220)
-        ax.set_ylim(-1, 20)
+        ax.set_ylim(-1, 40)
         ax.set_xlabel("s - qp_path(m)")
         ax.set_ylabel("v (m/s)")
         ax.set_title("QP Speed - sv graph")
