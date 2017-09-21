@@ -51,9 +51,9 @@ def filter(c,v):
 顺序读取数据，定义time_step＝5，过滤异常数据，选取顺序的五帧图，求得的第五帧图时刻的加速度值作为输入。
 每帧图间隔0.125s，第五帧的加速度
 
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
+<p>
 $$ ACC_5 = \frac{(V_6-V_4)}\{0.25} $$
+</p>
 
 如果第六帧速度值经filter被过滤掉，则丢弃该样本，即这五帧图。
 

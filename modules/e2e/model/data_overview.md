@@ -136,6 +136,7 @@ The training set contains two parts of data, including image and attr. Image is 
 ## Descriptions of Evaluation Indicators
 
 The horizontal control model and the horizontal control model are measured by using the mean square error (MSE) indicator. The mean square error is the quadratic mean of the predicted value and the true value difference. The smaller the mean variance error, the better the effect. This indicator is used to measure the prediction precision, which is defined as follows:
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-$$ MSE = \frac1{n}\sum_{i=1}^n{(truth- predict )^2} $$
+<p>
+$$ MSE = \frac{1}{n}\sum_{i=1}^n{(truth- predict )^2} $$
+</p>
