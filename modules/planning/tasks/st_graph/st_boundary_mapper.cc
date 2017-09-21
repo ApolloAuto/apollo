@@ -261,6 +261,11 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
 
   const auto& trajectory = obstacle.Trajectory();
   if (trajectory.trajectory_point_size() == 0) {
+    if (!obstacle.IsStatic()) {
+      AWARN << "Non-static obstacle[" << obstacle.Id()
+            << "] has NO prediction trajectory."
+            << obstacle.Perception().ShortDebugString();
+    }
     for (const auto& curr_point_on_path : path_points) {
       if (curr_point_on_path.s() > planning_distance_) {
         break;
