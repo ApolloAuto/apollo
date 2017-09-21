@@ -37,7 +37,7 @@ class SlMainSubplot:
         self.sl_aggregated_boundary_high_line, = \
             ax.plot([0], [0], "k-", lw=1, ms=2)
 
-        ax.set_xlim([-10, 100])
+        ax.set_xlim([-10, 220])
         ax.set_ylim([-2.5, 2.5])
         ax.set_xlabel("s - ref_line (m)")
         ax.set_ylabel("l (m)")
