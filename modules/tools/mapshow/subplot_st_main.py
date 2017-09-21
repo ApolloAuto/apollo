@@ -34,7 +34,7 @@ class StMainSubplot:
         #    planning_config_pb2.QP_SPLINE_ST_SPEED_OPTIMIZER)
         self.st_name = st_name
         ax.set_xlim(-3, 9)
-        ax.set_ylim(-10, 90)
+        ax.set_ylim(-10, 220)
         ax.set_xlabel("t (second)")
         ax.set_ylabel("s (m)")
         ax.set_title(st_name)
