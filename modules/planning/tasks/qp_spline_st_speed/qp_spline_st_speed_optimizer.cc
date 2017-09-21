@@ -114,7 +114,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   st_graph.SetDebugLogger(st_graph_debug);
   auto ret = st_graph.Search(st_graph_data, speed_data, accel_bound);
   if (ret != Status::OK()) {
-    AERROR << "Failed to solve with ideal acceleration conditions. Use "
+    AWARN << "Failed to solve with ideal acceleration conditions. Use "
               "secondary choice instead.";
 
     accel_bound.first = qp_spline_st_speed_config_.min_deceleration();
