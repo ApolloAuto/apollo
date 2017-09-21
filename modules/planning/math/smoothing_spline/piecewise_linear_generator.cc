@@ -15,10 +15,9 @@
  *****************************************************************************/
 
 /**
- * @file : piecewise_linear_geneartor.cc
- * @brief: piecewise_smoothing_spline (pss) generator class
- *           solve pss by qp algorithm, include adding constraint, adding
- *kernel, and solver solve
+ * @file
+ * @brief: piecewise_smoothing_spline (pss) generator class solve pss by qp
+ *  algorithm, include adding constraint, adding kernel, and solver solve
  **/
 
 #include "modules/planning/math/smoothing_spline/piecewise_linear_generator.h"
@@ -29,13 +28,14 @@
 namespace apollo {
 namespace planning {
 
+// NOTICE: the first point is kept at 0.0
 PiecewiseLinearGenerator::PiecewiseLinearGenerator(
     const uint32_t num_of_segments, const double unit_segment)
     : num_of_segments_(num_of_segments),
       unit_segment_(unit_segment),
       total_t_(num_of_segments * unit_segment),
-      constraint_(num_of_segments + 1, unit_segment),
-      kernel_(num_of_segments + 1, unit_segment) {
+      constraint_(num_of_segments, unit_segment),
+      kernel_(num_of_segments, unit_segment) {
   CHECK_GE(num_of_segments, 3);
 }
 
