@@ -32,7 +32,7 @@ class SpeedSubplot:
 
         ax.set_xlabel("t (second)")
         ax.set_xlim([-2, 10])
-        ax.set_ylim([-1, 20])
+        ax.set_ylim([-1, 40])
         ax.set_ylabel("speed (m/s)")
         ax.set_title("PLANNING SPEED")
         self.set_visible(False)
