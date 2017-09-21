@@ -1718,21 +1718,5 @@ decision {
         }
       }
     }
-    decision {
-      id: "711_0"
-      perception_id: 711
-      object_decision {
-        ignore {
-        }
-      }
-    }
-    decision {
-      id: "DEST"
-      perception_id: -1109540454
-      object_decision {
-        ignore {
-        }
-      }
-    }
   }
 }

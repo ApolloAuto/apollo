@@ -1703,29 +1703,5 @@ decision {
     }
   }
   object_decision {
-    decision {
-      id: "683_0"
-      perception_id: 683
-      object_decision {
-        ignore {
-        }
-      }
-    }
-    decision {
-      id: "726_0"
-      perception_id: 726
-      object_decision {
-        ignore {
-        }
-      }
-    }
-    decision {
-      id: "DEST"
-      perception_id: -1109540454
-      object_decision {
-        ignore {
-        }
-      }
-    }
   }
 }
