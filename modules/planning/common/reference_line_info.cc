@@ -31,6 +31,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/planning/common/decider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 
@@ -169,6 +170,11 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
   return apollo::common::util::StrCat("path_data:", path_data_.DebugString(),
                                       "speed_data:", speed_data_.DebugString());
+}
+
+void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
+  Decider decider;
+  decider.MakeDecision(*this, decision_result);
 }
 
 }  // namespace planning

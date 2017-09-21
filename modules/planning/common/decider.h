@@ -14,14 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNER_EM_DECIDER_H_
-#define MODULES_PLANNING_PLANNER_EM_DECIDER_H_
+#ifndef MODULES_PLANNING_COMMON_DECIDER_H_
+#define MODULES_PLANNING_COMMON_DECIDER_H_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/proto/decision.pb.h"
 
 /**
@@ -31,23 +30,24 @@
 namespace apollo {
 namespace planning {
 
+class ReferenceLineInfo;
+class PathDecision;
+
 class Decider {
  public:
-  static DecisionResult MakeDecision(
-      const ReferenceLineInfo &reference_line_info);
+  void MakeDecision(const ReferenceLineInfo &reference_line_info,
+                    DecisionResult *decision_result);
 
  private:
-  DecisionResult &InternalMakeDecision(
-      const ReferenceLineInfo &reference_line_info);
   int MakeMainStopDecision(const ReferenceLineInfo &reference_line_info);
   void MakeEStopDecision(const PathDecision &path_decision);
   void SetObjectDecisions(const PathDecision &path_decision);
 
  private:
-  DecisionResult decision_result_;
+  DecisionResult *decision_result_ = nullptr;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_EM_DECIDER_H_
+#endif  // MODULES_PLANNING_COMMON_DECIDER_H_

@@ -20,37 +20,34 @@
 
 #include <limits>
 
+#include "modules/planning/common/decider.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/planning/planner/em/decider.h"
+#include "modules/planning/common/reference_line_info.h"
 
 namespace apollo {
 namespace planning {
 
-DecisionResult Decider::MakeDecision(
-    const ReferenceLineInfo& reference_line_info) {
-  Decider decider;
-  return decider.InternalMakeDecision(reference_line_info);
-}
-
-DecisionResult& Decider::InternalMakeDecision(
-    const ReferenceLineInfo& reference_line_info) {
+void Decider::MakeDecision(const ReferenceLineInfo& reference_line_info,
+                           DecisionResult* decision_result) {
+  CHECK_NOTNULL(decision_result);
+  decision_result->Clear();
+  decision_result_ = decision_result;
   const auto& path_decision = reference_line_info.path_decision();
 
   // cruise by default
-  decision_result_.mutable_main_decision()->mutable_cruise();
+  decision_result_->mutable_main_decision()->mutable_cruise();
 
   // check stop decision
   int error_code = MakeMainStopDecision(reference_line_info);
   if (error_code < 0) {
     MakeEStopDecision(path_decision);
-    return decision_result_;
   }
   // TODO(all): check other main decisions
 
   SetObjectDecisions(path_decision);
-  return decision_result_;
 }
 
 int Decider::MakeMainStopDecision(
@@ -101,7 +98,7 @@ int Decider::MakeMainStopDecision(
 
   if (stop_obstacle != nullptr) {
     MainStop* main_stop =
-        decision_result_.mutable_main_decision()->mutable_stop();
+        decision_result_->mutable_main_decision()->mutable_stop();
     main_stop->set_reason_code(stop_decision->reason_code());
     main_stop->set_reason("stop by " + stop_obstacle->Id());
     main_stop->mutable_stop_point()->set_x(stop_decision->stop_point().x());
@@ -121,7 +118,7 @@ int Decider::MakeMainStopDecision(
 
 void Decider::SetObjectDecisions(const PathDecision& path_decision) {
   ObjectDecisions* object_decisions =
-      decision_result_.mutable_object_decision();
+      decision_result_->mutable_object_decision();
 
   for (const auto path_obstacle : path_decision.path_obstacles().Items()) {
     auto* object_decision = object_decisions->add_decision();
@@ -145,17 +142,17 @@ void Decider::SetObjectDecisions(const PathDecision& path_decision) {
 }
 
 void Decider::MakeEStopDecision(const PathDecision& path_decision) {
-  decision_result_.Clear();
+  decision_result_->Clear();
 
   MainEmergencyStop* main_estop =
-      decision_result_.mutable_main_decision()->mutable_estop();
+      decision_result_->mutable_main_decision()->mutable_estop();
   main_estop->set_reason_code(MainEmergencyStop::ESTOP_REASON_INTERNAL_ERR);
   main_estop->set_reason("estop reason to be added");
   main_estop->mutable_cruise_to_stop();
 
   // set object decisions
   ObjectDecisions* object_decisions =
-      decision_result_.mutable_object_decision();
+      decision_result_->mutable_object_decision();
   for (const auto path_obstacle : path_decision.path_obstacles().Items()) {
     auto* object_decision = object_decisions->add_decision();
     const auto& obstacle = path_obstacle->obstacle();

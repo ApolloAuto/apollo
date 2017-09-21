@@ -96,6 +96,8 @@ class ReferenceLineInfo {
 
   const hdmap::PncMap* pnc_map() const { return pnc_map_; }
 
+  void ExportDecision(DecisionResult* decision_result) const;
+
  private:
   std::unique_ptr<PathObstacle> CreatePathObstacle(const Obstacle* obstacle);
   bool InitPerceptionSLBoundary(PathObstacle* path_obstacle);
