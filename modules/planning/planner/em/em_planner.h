@@ -82,10 +82,6 @@ class EMPlanner : public Planner {
   std::vector<common::SpeedPoint> GenerateSpeedHotStart(
       const common::TrajectoryPoint& planning_init_point);
 
-  // FIXME(all) remove frame from this function.
-  void PopulateDecision(const ReferenceLineInfo& reference_line_info,
-                        Frame* frame);
-
   void RecordDebugInfo(const std::string& name, const double time_diff_ms,
                        planning::LatencyStats* ptr_latency_stats);
 
