@@ -25,7 +25,6 @@
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"

@@ -24,7 +24,6 @@
 #include "Eigen/Core"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/types.h"
 

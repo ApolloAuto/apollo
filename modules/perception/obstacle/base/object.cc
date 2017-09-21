@@ -41,7 +41,6 @@ void Object::clone(const Object& rhs) {
 }
 
 std::string Object::ToString() const {
-  // clang-format off
   return common::util::StrCat(
       "Object[id: ", id, ", "
       "track_id: ", track_id, ", "
@@ -55,9 +54,6 @@ std::string Object::ToString() const {
       "polygon_size: ", polygon.size(), ", "
       "type: ", type, ", "
       "is_background: ", is_background, "]");
-  // clang-format on
-  // "tracking_time: ", GLOG_TIMESTAMP(tracking_time)
-  // "latest_tracked_time: ", GLOG_TIMESTAMP(latest_tracked_time)
 }
 
 bool Object::Serialize(PerceptionObstacle* pb_obj) const {

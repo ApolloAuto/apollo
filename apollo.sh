@@ -112,6 +112,29 @@ function build() {
   build_py_proto
 }
 
+function cibuild() {
+  START_TIME=$(get_now)
+
+  echo "Start building, please wait ..."
+  generate_build_targets
+  echo "Building on $MACHINE_ARCH..."
+  BUILD_TARGETS="
+  //modules/control
+  //modules/dreamview
+  //modules/localization
+  //modules/perception
+  //modules/planning
+  //modules/prediction
+  //modules/routing
+  "
+  bazel build $DEFINES -c dbg $@ $BUILD_TARGETS
+  if [ $? -eq 0 ]; then
+    success 'Build passed!'
+  else
+    fail 'Build failed!'
+  fi
+}
+
 function apollo_build_dbg() {
   build "dbg" $@
 }
@@ -312,6 +335,24 @@ function run_test() {
   fi
 }
 
+function citest() {
+  START_TIME=$(get_now)
+  BUILD_TARGETS="
+  //modules/planning/integration_tests:garage_test
+  //modules/planning/integration_tests:sunnyvale_loop_test
+  //modules/control/integration_tests:simple_control_test
+  //modules/prediction/container/obstacles:obstacle_test
+  "
+  bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
+  if [ $? -eq 0 ]; then
+    success 'Test passed!'
+    return 0
+  else
+    fail 'Test failed!'
+    return 1
+  fi
+}
+
 function run_cpp_lint() {
   generate_build_targets
   echo "$BUILD_TARGETS" | xargs bazel test --config=cpplint -c dbg
@@ -500,6 +541,10 @@ function main() {
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       apollo_build_dbg $@
       ;;
+    cibuild)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      cibuild $@
+      ;;
     build_opt)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       apollo_build_opt $@
@@ -539,6 +584,10 @@ function main() {
     test)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       run_test $@
+      ;;
+    citest)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      citest $@
       ;;
     test_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"

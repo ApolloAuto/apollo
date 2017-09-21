@@ -80,6 +80,8 @@ class StBoundaryMapper {
   void AppendBoundary(const StBoundary& boundary,
                       std::vector<StBoundary>* st_boundaries) const;
 
+  double GetCentricAccLimit(const double kappa) const;
+
  private:
   const hdmap::PncMap* pnc_map_ = nullptr;
   const SLBoundary& adc_sl_boundary_;

@@ -18,7 +18,7 @@ docker exec -it apollo_dev /bin/bash
 
 3. Uninstall the pre-installed Nvidia driver in docker:
 ```
-sudo apt-get autoremove --purge nvidia-*
+sudo apt-get --purge remove nvidia*
 ```
 
 4. Download official Nvidia driver installation file which should be the exactly same version as the one installed in the host machine. We recommand the version of 375.39:
@@ -52,4 +52,4 @@ or
 ./apollo.sh build_opt_gpu
 ```
 
-Now the perception module can be running in GPU mode with command `./scripts/perception start`. Please note that the Nvidia driver should be installed appropriately as shown above even if the perception moduled is running in Caffe CPU_ONLY mode (i.e., using `./apollo.sh build` or `./apollo.sh build_opt` to build the perception module). Please note that the Nvidia driver should be installed appropriately as shown above even if the perception moduled is running in Caffe CPU_ONLY mode (i.e., using `./apollo.sh build` or `./apollo.sh build_opt` to build the perception module).
+Now the perception module can be running in GPU mode with command `./scripts/perception.sh start`. Please note that the Nvidia driver should be installed appropriately as shown above even if the perception module is running in Caffe CPU_ONLY mode (i.e., using `./apollo.sh build` or `./apollo.sh build_opt` to build the perception module).

@@ -30,6 +30,13 @@ RUN apt-get install -y git
 RUN apt-get install -y bc
 RUN apt-get install -y apt-transport-https
 RUN apt-get install -y shellcheck
+RUN apt-get install -y cmake
+RUN apt-get install -y gdb
+RUN apt-get install -y psmisc
+RUN apt-get install -y python-empy
+RUN apt-get install -y librosconsole0d
+RUN apt-get install -y librosconsole-dev
+RUN apt-get install -y libtf-conversions0d
 
 RUN add-apt-repository ppa:webupd8team/java
 RUN apt-get update
