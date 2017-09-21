@@ -112,9 +112,6 @@ RUN apt-get install -y libvtk5-dev
 RUN apt-get install -y libvtk5-qt4-dev
 RUN apt-get install -y mpi-default-dev
 
-ENV CAFFE_ROOT=/apollo/bazel-genfiles/external/caffe
-RUN echo "$CAFFE_ROOT/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
-
 # Install Opengl
 RUN echo "deb http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | tee -a /etc/apt/sources.list.d/fillwave_ext.list
 RUN echo "deb-src http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | tee -a /etc/apt/sources.list.d/fillwave_ext.list
