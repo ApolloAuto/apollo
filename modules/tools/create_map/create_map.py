@@ -27,14 +27,9 @@ import os
 import rospy
 import sys
 
-import gflags
-FLAGS = gflags.FLAGS
-
 from modules.map.proto.map_pb2 import Map
 from modules.map.proto.map_lane_pb2 import LaneBoundaryType, Lane
 from modules.map.proto.map_road_pb2 import BoundaryEdge
-
-gflags.DEFINE_string('map_dir', 'modules/map/data/demo', 'output map directory')
 
 class DataPoint:
 	def __init__(self):
@@ -79,7 +74,8 @@ def main():
 			rows.append(row)
 
 	data = []
-	for row in rows[3201:-3000]:
+	# for row in rows[3201:-3000]:
+	for row in rows[1:-1000]:
 		entry = DataPoint()
 		entry.pos_x = float(row[0])
 		entry.pos_y = float(row[1])
@@ -93,27 +89,123 @@ def main():
 		entry.ratio = 0.0
 		data.append(entry)
 
+	intervals = []
+	interval_begin = -1
+	interval_end = -1
+	for (index, entry) in enumerate(data):
+		if entry.conf_left >= 0 or entry.conf_right >= 0:
+			if interval_begin < 0:
+				interval_begin = index
+			interval_end = index
+		else:
+			if interval_begin >= 0:
+				intervals.append((interval_begin, interval_end))
+				interval_begin = -1
+				interval_end = -1
+			entry.width = entry.dist_left + entry.dist_right
+
+	for interval in intervals:
+		for index in range(interval[0], interval[1] + 1):
+			width_begin = data[interval[0] - 1].width
+			width_end = data[interval[1] + 1].width
+			if interval[0] == 0:
+				data[index].width = width_end
+			elif interval[1] == len(data) - 1:
+				data[index].width = width_begin
+			else:
+				alpha = float(index - interval[0] + 1) / (interval[1] - interval[0] + 2)
+				data[index].width = (1.0 - alpha) * width_begin + alpha * width_end
+
+	for (index, entry) in enumerate(data):
+		if entry.conf_left >= 0 and entry.conf_right < 0:
+			entry.dist_left = entry.width - entry.dist_right
+			entry.conf_left = -1
+		elif entry.conf_left < 0 and entry.conf_right >= 0:
+			entry.dist_right = entry.width - entry.dist_left
+			entry.conf_right = -1
+
+	intervals = []
+	interval_begin = -1
+	interval_end = -1
+	for (index, entry) in enumerate(data):
+		if entry.conf_left >= 0 and entry.conf_right >= 0:
+			if interval_begin < 0:
+				interval_begin = index
+			interval_end = index
+		else:
+			if interval_begin >= 0:
+				intervals.append((interval_begin, interval_end))
+				interval_begin = -1
+				interval_end = -1
+			entry.ratio = float(entry.dist_left) / entry.width
+
+	for interval in intervals:
+		for index in range(interval[0], interval[1] + 1):
+			ratio_begin = data[interval[0] - 1].ratio
+			ratio_end = data[interval[1] + 1].ratio
+			if interval[0] == 0:
+				data[index].ratio = ratio_end
+			elif interval[1] == len(data) - 1:
+				data[index].ratio = ratio_begin
+			else:
+				alpha = float(index - interval[0] + 1) / (interval[1] - interval[0] + 2)
+				data[index].ratio = (1.0 - alpha) * ratio_begin + alpha * ratio_end
+
+	for (index, entry) in enumerate(data):
+		if entry.conf_left >= 0 and entry.conf_right >= 0:
+			entry.dist_left = entry.width * entry.ratio
+			entry.dist_right = entry.width - entry.dist_left
+			entry.conf_left = -1
+			entry.conf_right = -1
+
 	# width = 3.5
 
-	map = Map()
-	map.header.version = "1.400000"
-	map.header.date = "20170919"
-	map.header.district = "101"
-	# map.header.projection.proj = "+proj=tmerc +lat_0={37.413082} +lon_0={-122.013332} +k={0.9999999996} +ellps=WGS84 +no_defs"
+	mp = Map()
+	mp.header.version = "1.400000"
+	mp.header.date = "20170919"
+	mp.header.district = "101"
+	# mp.header.projection.proj = "+proj=tmerc +lat_0={37.413082} +lon_0={-122.013332} +k={0.9999999996} +ellps=WGS84 +no_defs"
+
+	road = mp.road.add()
+	road.id.id = "road"
+	section = road.section.add()
+	section.id.id = "section"
+
+	left_edge = section.boundary.outer_polygon.edge.add()
+	left_edge.type = BoundaryEdge.LEFT_BOUNDARY
+
+	right_edge = section.boundary.outer_polygon.edge.add()
+	right_edge.type = BoundaryEdge.RIGHT_BOUNDARY
+
+	sample_distance = 0.2
+	max_lane_length = 100.0
 
 	total_length = 0.0
-	sample_distance = 0.2
+	current_length = 0.0
+	lane_count = 0
 
-	lane = map.lane.add()
-	lane.id.id = "84_1_-1"
-	central_curve_seg = lane.central_curve.segment.add()
-	central_curve_seg.s = 0.0
+	lane = mp.lane.add()
+	lane.id.id = "lane_" + str(lane_count)
 
-	left_boundary_curve_seg = lane.left_boundary.curve.segment.add()
-	left_boundary_curve_seg.s = 0.0
+	lane_central_curve_seg = lane.central_curve.segment.add()
 
-	right_boundary_curve_seg = lane.right_boundary.curve.segment.add()
-	right_boundary_curve_seg.s = 0.0
+	start_heading = data[0].theta
+
+	lane_left_boundary_curve_seg = lane.left_boundary.curve.segment.add()
+	lane_left_boundary_curve_seg.heading = float(start_heading)
+	lane_left_boundary_curve_seg.s = 0.0
+
+	left_edge_curve_seg = left_edge.curve.segment.add()
+	left_edge_curve_seg.heading = float(start_heading)
+	left_edge_curve_seg.s = 0.0
+
+	lane_right_boundary_curve_seg = lane.right_boundary.curve.segment.add()
+	lane_right_boundary_curve_seg.heading = float(start_heading)
+	lane_right_boundary_curve_seg.s = 0.0
+
+	right_edge_curve_seg = right_edge.curve.segment.add()
+	right_edge_curve_seg.heading = float(start_heading)
+	right_edge_curve_seg.s = 0.0
 
 	last_x = 0.0
 	last_y = 0.0
@@ -142,84 +234,136 @@ def main():
 		pos_c_y = (pos_l_y + pos_r_y) / 2.0
 
 		if index == 0:
-			central_curve_seg.start_position.x = pos_c_x
-			central_curve_seg.start_position.y = pos_c_y
+			lane_central_curve_seg.start_position.x = pos_c_x
+			lane_central_curve_seg.start_position.y = pos_c_y
 
-			left_boundary_curve_seg.start_position.x = pos_l_x
-			left_boundary_curve_seg.start_position.y = pos_l_y
+			lane_left_boundary_curve_seg.start_position.x = pos_l_x
+			lane_left_boundary_curve_seg.start_position.y = pos_l_y
 
-			right_boundary_curve_seg.start_position.x = pos_r_x
-			right_boundary_curve_seg.start_position.y = pos_r_y
+			left_edge_curve_seg.start_position.x = pos_l_x
+			left_edge_curve_seg.start_position.y = pos_l_y
+
+			lane_right_boundary_curve_seg.start_position.x = pos_r_x
+			lane_right_boundary_curve_seg.start_position.y = pos_r_y
+
+			right_edge_curve_seg.start_position.x = pos_r_x
+			right_edge_curve_seg.start_position.y = pos_r_y
 		else:
 			dist = distance(last_x, last_y, pos_c_x, pos_c_y)
 			if dist <= sample_distance:
 				continue
+			current_length += dist
 			total_length += dist
 
-		point = central_curve_seg.line_segment.point.add()
+		point = lane_central_curve_seg.line_segment.point.add()
 		point.x = pos_c_x
 		point.y = pos_c_y
 
-		point = left_boundary_curve_seg.line_segment.point.add()
+		point = lane_left_boundary_curve_seg.line_segment.point.add()
 		point.x = pos_l_x
 		point.y = pos_l_y
 
-		point = right_boundary_curve_seg.line_segment.point.add()	
+		point = left_edge_curve_seg.line_segment.point.add()
+		point.x = pos_l_x
+		point.y = pos_l_y
+
+		point = lane_right_boundary_curve_seg.line_segment.point.add()	
+		point.x = pos_r_x
+		point.y = pos_r_y
+
+		point = right_edge_curve_seg.line_segment.point.add()	
 		point.x = pos_r_x
 		point.y = pos_r_y
 
 		sample = lane.left_sample.add()
-		sample.s = total_length
+		sample.s = current_length
 		sample.width = dist_left
 
 		sample = lane.right_sample.add()
-		sample.s = total_length
+		sample.s = current_length
 		sample.width = dist_right
+
+		if (current_length > max_lane_length) or (index == len(data) - 1):
+			# cut!
+			lane_central_curve_seg.length = current_length
+			lane_left_boundary_curve_seg.length = current_length
+			lane_right_boundary_curve_seg.length = current_length
+
+			boundary_type = lane.left_boundary.boundary_type.add()
+			boundary_type.s = 0.0
+			boundary_type.types.append(LaneBoundaryType.DOTTED_YELLOW)
+
+			lane.left_boundary.length = current_length
+
+			boundary_type = lane.right_boundary.boundary_type.add()
+			boundary_type.s = 0.0
+			boundary_type.types.append(LaneBoundaryType.CURB)
+
+			lane.right_boundary.length = current_length
+
+			lane.length = current_length
+			lane.speed_limit = 29.06
+			lane.type = Lane.CITY_DRIVING
+			lane.turn = Lane.NO_TURN
+
+			section.lane_id.add().id = "lane_" + str(lane_count)
+			current_length = 0.0
+
+			if index < len(data) - 1:
+				lane_count += 1
+
+				new_lane = mp.lane.add()
+				lane.successor_id.add().id = "lane_" + str(lane_count)
+				new_lane.predecessor_id.add().id = "lane_" + str(lane_count - 1)
+
+				lane = new_lane
+				lane.id.id = "lane_" + str(lane_count)
+
+				lane_central_curve_seg = lane.central_curve.segment.add()
+				lane_central_curve_seg.s = 0.0
+				lane_central_curve_seg.start_position.x = pos_c_x
+				lane_central_curve_seg.start_position.y = pos_c_y
+
+				lane_left_boundary_curve_seg = lane.left_boundary.curve.segment.add()
+				lane_left_boundary_curve_seg.heading = theta
+				lane_left_boundary_curve_seg.s = 0.0
+				lane_left_boundary_curve_seg.start_position.x = pos_l_x
+				lane_left_boundary_curve_seg.start_position.y = pos_l_y
+
+				lane_right_boundary_curve_seg = lane.right_boundary.curve.segment.add()
+				lane_right_boundary_curve_seg.heading = theta
+				lane_right_boundary_curve_seg.s = 0.0
+				lane_right_boundary_curve_seg.start_position.x = pos_r_x
+				lane_right_boundary_curve_seg.start_position.y = pos_r_y
+
+				point = lane_central_curve_seg.line_segment.point.add()
+				point.x = pos_c_x
+				point.y = pos_c_y
+
+				point = lane_left_boundary_curve_seg.line_segment.point.add()
+				point.x = pos_l_x
+				point.y = pos_l_y
+
+				point = lane_right_boundary_curve_seg.line_segment.point.add()	
+				point.x = pos_r_x
+				point.y = pos_r_y
+
+				sample = lane.left_sample.add()
+				sample.s = current_length
+				sample.width = dist_left
+
+				sample = lane.right_sample.add()
+				sample.s = current_length
+				sample.width = dist_right
 
 		last_x = pos_c_x
 		last_y = pos_c_y
 
-	central_curve_seg.length = total_length
-
-	left_boundary_curve_seg.heading = float(data[0].theta)
-	left_boundary_curve_seg.length = total_length
-
-	right_boundary_curve_seg.heading = float(data[0].theta)
-	right_boundary_curve_seg.length = total_length
-
-	boundary_type = lane.left_boundary.boundary_type.add()
-	boundary_type.s = 0.0
-	boundary_type.types.append(LaneBoundaryType.DOTTED_YELLOW)
-
-	lane.left_boundary.length = total_length
-
-	boundary_type = lane.right_boundary.boundary_type.add()
-	boundary_type.s = 0.0
-	boundary_type.types.append(LaneBoundaryType.CURB)
-
-	lane.right_boundary.length = total_length
-
-	lane.length = total_length
-	lane.speed_limit = 45
-	lane.type = Lane.CITY_DRIVING
-	lane.turn = Lane.NO_TURN
-
-	road = map.road.add()
-	road.id.id = "84"
-	section = road.section.add()
-	section.id.id = "1"
-	section.lane_id.add().id = "84_1_-1"
-
-	left_edge = section.boundary.outer_polygon.edge.add()
-	left_edge.type = BoundaryEdge.LEFT_BOUNDARY
-	left_edge.curve.CopyFrom(lane.left_boundary.curve)
-
-	right_edge = section.boundary.outer_polygon.edge.add()
-	right_edge.type = BoundaryEdge.RIGHT_BOUNDARY
-	right_edge.curve.CopyFrom(lane.right_boundary.curve)
+	left_edge_curve_seg.length = total_length
+	right_edge_curve_seg.length = total_length
 
 	with open(map_file_name, "w") as f:
-		f.write(map.__str__())
+		f.write(mp.__str__())
 
 if __name__ == '__main__':
     main()
