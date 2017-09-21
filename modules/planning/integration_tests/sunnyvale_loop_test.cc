@@ -36,6 +36,7 @@ class SunnyvaleLoopTest : public PlanningTestBase {
   virtual void SetUp() {
     FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
+    FLAGS_planning_upper_speed_limit = 12.5;
   }
 };
 
