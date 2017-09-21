@@ -123,9 +123,6 @@ RUN mkdir build
 WORKDIR /tmp/gflags-2.2.0/build
 RUN CXXFLAGS="-fPIC" cmake .. && make && make install
 
-ENV CAFFE_ROOT=/apollo/bazel-genfiles/external/caffe
-RUN echo "$CAFFE_ROOT/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
-
 # Install Opengl
 RUN echo "deb http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
 RUN echo "deb-src http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
