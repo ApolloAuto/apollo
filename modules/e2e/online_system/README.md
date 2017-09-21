@@ -7,7 +7,7 @@ Use the sensor data module to collect the sensor data and vehicle parameters in 
 2.	ROS Kinetic – recommend ros-kinetic-desktop-full.
 3.	Px2 driveworks0.1 version
 
-- [ ] **FIRST:**  Ubuntu 16.04 LTS2 *must* be installed.
+- [ ] First, Ubuntu 16.04 LTS2 *must* be installed.
 
 	Apollo recommends using ROS Kinetic (ros-kinetic-desktop-full.3) with Px2 driveworks, version 0.1 to build and install the module using the ROS catkin tool.
 
@@ -24,9 +24,9 @@ Use the sensor data module to collect the sensor data and vehicle parameters in 
     For example , create `~/catkin_ws` , and then:
 
 	```
-	$ cd ~/catkin_ws
-	$ mkdir src
-	$ cd src
+	cd ~/catkin_ws
+	mkdir src
+	cd src
 	```
 
 - [ ] gitclone the source code to the `~/catkin_ws/src`.
@@ -54,7 +54,7 @@ To test:
 - [ ] Open a second bash shell and initialize the camera node using the following:
 
 	```
-	$ rosrun px2_camera_image px2_camera_node
+	rosrun px2_camera_image px2_camera_node
     ```
 
 

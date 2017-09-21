@@ -74,9 +74,9 @@ The longitudinal model processes the data in the following order:
 
 Each frame interval of 0.125s, with the fifth frame of the acceleration:
 
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
+<p>
 $$ ACC_5 = \frac{(V_6-V_4)}\{0.25} $$
+</p>
 
 
 If the filter removes the sixth frame velocity value, then discard the 5 frames of the timestep sample.

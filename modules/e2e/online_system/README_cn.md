@@ -9,25 +9,25 @@
 # 编译以及安装此模块
 编译和安装此模块都是通过ROS catkin的工具来完成的。
 
-首先应该安装ROS环境，例如安装到`~/ros`目录下面，为了方便起见，可以将下面的代码加入到`~/.bash_profile`，以便每次打开一个新的bash shell都能进入到ROS环境当中去以便使用catkin的编译工具:
+首先应该安装ROS环境，例如安装到 `~/ros` 目录下面，为了方便起见，可以将下面的代码加入到 `~/.bash_profile`，以便每次打开一个新的bash shell都能进入到ROS环境当中去以便使用catkin的编译工具:
 
 ```
 	if [ -f /opt/ros/kinetic/setup.bash ]; then
        	    source /opt/ros/kinetic/setup.bash
-    	fi
+    fi
 ```
 然后应该建立catkin的工作空间来编译以及安装源代码。例如可以建立`~/catkin_ws`.然后：
 
 ```
-	$ cd ~/catkin_ws
-	$ mkdir src
-	$ cd src
+	cd ~/catkin_ws
+	mkdir src
+	cd src
 ```
 这样可以将源代码 gitclone 到 `~/catkin_ws/src` 目录下面。
 
 最后进行源代码的编译。编译的路径是在 `~/catkin_ws` 下面，用 `catkin_make` 指令进行编译安装。
 
-生成的可执行文件以及库文件都会生成到~/catkin_ws/devel目录下面。为了方便调用模块，可以在 `~/.bash_profile` 加入下面的指令，以便每次打开一个新的bash shell都能进入到模块环境当中去：
+生成的可执行文件以及库文件都会生成到 `~/catkin_ws/devel` 目录下面。为了方便调用模块，可以在 `~/.bash_profile` 加入下面的指令，以便每次打开一个新的bash shell都能进入到模块环境当中去：
 
 ```
 	source ~/catkin_ws/devel/setup.bash
