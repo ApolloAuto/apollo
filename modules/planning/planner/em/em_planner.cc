@@ -32,7 +32,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
-#include "modules/planning/planner/em/decider.h"
 #include "modules/planning/tasks/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/path_decider/path_decider.h"
@@ -99,12 +98,6 @@ void EMPlanner::RecordDebugInfo(const std::string& name,
   ptr_stats->set_time_ms(time_diff_ms);
 }
 
-void EMPlanner::PopulateDecision(const ReferenceLineInfo& reference_line_info,
-                                 Frame* frame) {
-  auto* planning_pb = frame->MutableADCTrajectory();
-  *planning_pb->mutable_decision() = Decider::MakeDecision(reference_line_info);
-}
-
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame, ReferenceLineInfo* reference_line_info) {
   if (!frame) {
@@ -159,7 +152,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   reference_line_info->SetTrajectory(trajectory);
-  PopulateDecision(*reference_line_info, frame);
+  reference_line_info->ExportDecision(
+      frame->MutableADCTrajectory()->mutable_decision());
 
   return ret;
 }
