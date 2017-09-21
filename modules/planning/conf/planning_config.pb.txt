@@ -75,18 +75,18 @@ em_planner_config {
         derivative_weight: 10.0
         second_derivative_weight: 1.0
         third_derivative_weight: 1.0
-        reference_line_weight: 0.5
+        reference_line_weight: 0.1
         num_refline_point: 10
         num_output: 100
         cross_lane_extension_buffer: 0.2
     }
     qp_spline_st_speed_config {
-        total_path_length: 80.0
-        total_time: 8.0
+        total_path_length: 200.0
+        total_time: 6.0
         output_time_resolution: 0.05
         number_of_discrete_graph_s: 80
         number_of_discrete_graph_t: 4
-        number_of_evaluated_graph_t: 50
+        number_of_evaluated_graph_t: 40
         spline_order: 6
         speed_kernel_weight: 0.0
         accel_kernel_weight: 1000.0
@@ -103,8 +103,8 @@ em_planner_config {
 
         st_boundary_config {
             boundary_buffer: 0.1
-            high_speed_centric_acceleration_limit: 1.0
-            low_speed_centric_acceleration_limit: 1.35
+            high_speed_centric_acceleration_limit: 2.0
+            low_speed_centric_acceleration_limit: 2.0
             high_speed_threshold: 20
             low_speed_threshold: 7
             minimal_kappa: 0.00001
