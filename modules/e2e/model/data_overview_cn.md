@@ -87,6 +87,7 @@ testsets/				    // 测试数据的顶层文件夹
 
 # 评测指标说明
 横纵向模型预测效果使用均方差(MSE)指标来衡量。均方差是指预测值与真实值差值的平方的均值，均方差值越小，效果越好。该指标用来衡量预测的精确性，定义公式如下：
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-$$ MSE = \frac1{n}\sum_{i=1}^n{(truth- predict )^2} $$
+<p>
+$$ MSE = \frac{1}{n}\sum_{i=1}^n{(truth- predict )^2} $$
+</p>
