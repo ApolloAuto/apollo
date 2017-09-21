@@ -855,30 +855,6 @@ decision {
   }
   object_decision {
     decision {
-      id: "99_0"
-      perception_id: 99
-      object_decision {
-        ignore {
-        }
-      }
-    }
-    decision {
-      id: "99_1"
-      perception_id: 99
-      object_decision {
-        ignore {
-        }
-      }
-    }
-    decision {
-      id: "99_2"
-      perception_id: 99
-      object_decision {
-        ignore {
-        }
-      }
-    }
-    decision {
       id: "401_0"
       perception_id: 401
       object_decision {
@@ -920,22 +896,6 @@ decision {
             y: 4141548.8191453074
           }
           stop_heading: 1.250523303060139
-        }
-      }
-    }
-    decision {
-      id: "412_0"
-      perception_id: 412
-      object_decision {
-        ignore {
-        }
-      }
-    }
-    decision {
-      id: "DEST"
-      perception_id: -1109540454
-      object_decision {
-        ignore {
         }
       }
     }
