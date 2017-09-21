@@ -19,7 +19,7 @@
 VERSION=""
 ARCH=$(uname -m)
 VERSION_X86_64="dev-x86_64-20170920_1652"
-VERSION_AARCH64="dev-aarch64-20170712_1533"
+VERSION_AARCH64="dev-aarch64-20170921_1158"
 if [[ $# == 1 ]];then
     VERSION=$1
 elif [ ${ARCH} == "x86_64" ]; then
