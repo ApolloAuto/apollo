@@ -1,6 +1,6 @@
 # How to Run Perception Module on Your Local Computer
 
-The perception module requires Nvidia GPU and CUDA installed to run the CNN Segmentation algorithm with Caffe. We have already installed the CUDA and Caffe libraries in the released docker. However, the pre-installed Nvidia GPU driver in the released docker image may be not compatible to your host machine for offline debugging and simulation, which will make the percetion module fail to run. We suggest to reinstall the exactly same version of Nvidia driver in the docker image as the one installed in the host machine, and build Apollo with GPU option.
+The perception module requires Nvidia GPU and CUDA installed to run the CNN Segmentation algorithm with Caffe. We have already installed the CUDA and Caffe libraries in the released docker. However, the Nvidia GPU driver is not installed in the released dev docker image. To run the perception module with CUDA acceleration, we suggest to install the exactly same version of Nvidia driver in the docker as the one installed in your host machine, and build Apollo with GPU option.
 
 We provide a step-by-step instruction on running perception module with Nvidia GPU as below:
 
@@ -16,34 +16,29 @@ We provide a step-by-step instruction on running perception module with Nvidia G
 docker exec -it apollo_dev /bin/bash
 ```
 
-3. Uninstall the pre-installed Nvidia driver in docker:
-```
-sudo apt-get --purge remove nvidia*
-```
-
-4. Download official Nvidia driver installation file which should be the exactly same version as the one installed in the host machine. We recommand the version of 375.39:
+3. Download the official Nvidia driver installation file which should be the exactly same version as the one installed in your host machine. We recommand the version of 375.39:
 ```
 wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
 ```
 
-5. Install Nvidia driver in docker (using Linux-x86-375.39 version as example):
+4. Install Nvidia driver in docker (using Linux-x86-375.39 version as example):
 ```
 chmod +x ./NVIDIA-Linux-x86_64-375.39.run
 ./NVIDIA-Linux-x86_64-375.39.run --no-opengl-files -a -s
 ```
 
-6. Commit a new docker image (in host):
+5. Commit a new docker image (in host):
 ```
 docker commit CONTAINER_ID apolloauto/apollo:NEW_DOCKER_IMAGE_TAG
 ```
 
-7. Start the new docker image (in host) and get into docker:
+6. Start the new docker image (in host) and get into docker:
 ```
 ./docker/scripts/dev_start.sh NEW_DOCKER_IMAGE_TAG
 ./docker/scripts/dev_into.sh
 ```
 
-8. Build Apollo with GPU option (in docker):
+7. Build Apollo with GPU option (in docker):
 ```
 ./apollo.sh build_gpu
 ```
