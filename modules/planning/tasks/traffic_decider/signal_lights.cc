@@ -18,7 +18,10 @@
  * @file
  **/
 
+#include <vector>
+
 #include "modules/planning/tasks/traffic_decider/signal_lights.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -26,6 +29,14 @@ namespace planning {
 SignalLights::SignalLights() : TrafficRule("SignalLights") {}
 
 bool SignalLights::ApplyRule(ReferenceLineInfo* const reference_line_info) {
+  if (!FLAGS_enable_signal_lights) {
+    return true;
+  }
+  const std::vector<hdmap::PathOverlap>& signals = reference_line_info
+      ->reference_line().map_path().signal_overlaps();
+  if (signals.size() <= 0) {
+    return true;
+  }
   return true;
 }
 
