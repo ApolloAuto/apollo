@@ -468,7 +468,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     }
 
     for (uint32_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
-      speed_upper_bound->push_back(qp_spline_st_speed_config_.max_speed());
+      speed_upper_bound->push_back(FLAGS_planning_upper_speed_limit);
       ADEBUG << "speed upper bound:" << speed_upper_bound->back();
     }
   } else {
