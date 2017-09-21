@@ -49,10 +49,10 @@ class QuinticSpiralCurve : public SpiralCurve {
   bool CalculatePath();
   common::Status GetPathVec(
       const std::uint32_t n,
-      std::vector<common::PathPoint>* path_points) const override = 0;
+      std::vector<common::PathPoint>* path_points) const override;
   common::Status GetPathVecWithS(
       const std::vector<double>& vec_s,
-      std::vector<common::PathPoint>* path_points) const override = 0;
+      std::vector<common::PathPoint>* path_points) const override;
 };
 
 }  // namespace planning
