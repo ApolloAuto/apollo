@@ -142,7 +142,7 @@ void DpStGraph::CalculatePointwiseCost(
   std::vector<STPoint> reference_points;
   double curr_t = 0.0;
   for (uint32_t i = 0; i < cost_table_.size(); ++i) {
-    reference_points.emplace_back(curr_t * dp_st_speed_config_.max_speed(),
+    reference_points.emplace_back(curr_t * FLAGS_planning_upper_speed_limit,
                                   curr_t);
     curr_t += unit_t_;
   }
@@ -237,7 +237,7 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   }
 
   const uint32_t max_s_diff = static_cast<uint32_t>(
-      dp_st_speed_config_.max_speed() * unit_t_ / unit_s_);
+      FLAGS_planning_upper_speed_limit * unit_t_ / unit_s_);
   const uint32_t r_low = (max_s_diff < r ? r - max_s_diff : 0);
 
   const auto& pre_col = cost_table_[c - 1];

@@ -606,9 +606,9 @@ bool Spline1dConstraint::FilterConstraints(
 void Spline1dConstraint::GeneratePowerX(
     const double x, const std::uint32_t order,
     std::vector<double>* const power_x) const {
-  double cur_x = 1;
+  double cur_x = 1.0;
   for (std::uint32_t i = 0; i < order; ++i) {
-    power_x->emplace_back(cur_x);
+    power_x->push_back(cur_x);
     cur_x *= x;
   }
 }
