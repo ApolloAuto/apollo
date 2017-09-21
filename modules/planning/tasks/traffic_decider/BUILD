@@ -6,9 +6,11 @@ cc_library(
     name = "traffic_rules",
     srcs = [
         "back_side_vehicles.cc",
+        "signal_lights.cc",
     ],
     hdrs = [
         "back_side_vehicles.h",
+        "signal_lights.h",
         "traffic_rule.h",
     ],
     deps = [
