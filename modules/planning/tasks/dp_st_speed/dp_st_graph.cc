@@ -81,7 +81,7 @@ Status DpStGraph::Search(PathDecision* const path_decision,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  CalculatePointwiseCost(st_graph_data_.st_boundaries());
+  CalculatePointwiseCost(path_decision->path_obstacles().Items());
 
   if (!CalculateTotalCost().ok()) {
     const std::string msg = "Calculate total cost failed.";
@@ -130,7 +130,7 @@ Status DpStGraph::InitCostTable() {
 }
 
 void DpStGraph::CalculatePointwiseCost(
-    const std::vector<StBoundary>& boundaries) {
+    const std::vector<const PathObstacle*> obstacles) {
   // TODO(all): extract reference line from decision first
   std::vector<STPoint> reference_points;
   double curr_t = 0.0;
@@ -145,7 +145,7 @@ void DpStGraph::CalculatePointwiseCost(
       double ref_cost = dp_st_cost_.GetReferenceCost(st_graph_point.point(),
                                                      reference_points[i]);
       double obs_cost =
-          dp_st_cost_.GetObstacleCost(st_graph_point.point(), boundaries);
+          dp_st_cost_.GetObstacleCost(st_graph_point.point(), obstacles);
       st_graph_point.SetReferenceCost(ref_cost);
       st_graph_point.SetObstacleCost(obs_cost);
       st_graph_point.SetTotalCost(std::numeric_limits<double>::infinity());

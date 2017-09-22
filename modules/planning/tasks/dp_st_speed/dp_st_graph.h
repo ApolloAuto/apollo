@@ -51,7 +51,7 @@ class DpStGraph {
  private:
   apollo::common::Status InitCostTable();
 
-  void CalculatePointwiseCost(const std::vector<StBoundary>& boundaries);
+  void CalculatePointwiseCost(const std::vector<const PathObstacle*> obstacles);
 
   apollo::common::Status RetrieveSpeedProfile(
       SpeedData* const speed_data) const;
