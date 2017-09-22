@@ -22,8 +22,11 @@
 #define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHTS_H_
 
 #include <string>
+#include <vector>
+#include <unordered_map>
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -34,6 +37,14 @@ class SignalLights : public TrafficRule {
   virtual ~SignalLights() = default;
 
   bool ApplyRule(ReferenceLineInfo* const reference_line_info);
+
+ private:
+  void ReadSignals();
+  bool FindValidSignalLights(ReferenceLineInfo* const reference_line_info);
+
+  std::vector<const hdmap::PathOverlap*> signal_lights_;
+  std::unordered_map<std::string, const apollo::perception::TrafficLight*>
+      signals_;
 };
 
 }  // namespace planning
