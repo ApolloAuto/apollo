@@ -1,13 +1,11 @@
 # Routing
 
 ## Introduction
-  Based on planning and current car status, use different control algorithms to
-  generate comfortable driving experience.
+  Routing module generates high level navigation information based on request.
 
 ## Input
-  * Planning trajectory
-  * Car status
-  * HMI AUTO mode change request
+  * Map data
+  * Routing request (Start and end location)
 
 ## Output
-  * control command (steering, throttle, brake) to canbus.
+  * Routing navigation information
