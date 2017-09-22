@@ -22,22 +22,53 @@
 
 #include "modules/planning/tasks/traffic_decider/signal_lights.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/common/adapters/adapter_manager.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::adapter::AdapterManager;
+using apollo::perception::TrafficLight;
+using apollo::perception::TrafficLightDetection;
+
 SignalLights::SignalLights() : TrafficRule("SignalLights") {}
 
-bool SignalLights::ApplyRule(ReferenceLineInfo* const reference_line_info) {
+bool SignalLights::ApplyRule(ReferenceLineInfo *const reference_line_info) {
   if (!FLAGS_enable_signal_lights) {
     return true;
   }
-  const std::vector<hdmap::PathOverlap>& signals = reference_line_info
-      ->reference_line().map_path().signal_overlaps();
-  if (signals.size() <= 0) {
+  if (!FindValidSignalLights(reference_line_info)) {
     return true;
   }
+  ReadSignals();
   return true;
+}
+
+void SignalLights::ReadSignals() {
+  if (!AdapterManager::GetTrafficLightDetection()->Empty()) {
+    return;
+  }
+  const TrafficLightDetection& detection =
+      AdapterManager::GetTrafficLightDetection()->GetLatestObserved();
+  for (int j = 0; j < detection.traffic_light_size(); j++) {
+    const TrafficLight& signal = detection.traffic_light(j);
+    signals_[signal.id()] = &signal;
+  }
+}
+
+bool SignalLights::FindValidSignalLights(
+    ReferenceLineInfo *const reference_line_info) {
+  const std::vector<hdmap::PathOverlap> &signal_lights = reference_line_info
+      ->reference_line().map_path().signal_overlaps();
+  if (signal_lights.size() <= 0) {
+    return false;
+  }
+  for (const hdmap::PathOverlap &signal_light : signal_lights) {
+    if (signal_light.start_s > reference_line_info->AdcSlBoundary().start_s()) {
+      signal_lights_.push_back(&signal_light);
+    }
+  }
+  return signal_lights_.size() > 0;
 }
 
 }  // namespace planning
