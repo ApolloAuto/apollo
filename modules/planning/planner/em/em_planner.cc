@@ -190,9 +190,10 @@ std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
                    planning_init_point.path_point().y());
     SLPoint sl_point;
     if (!last_reference_line_info->reference_line().XYToSL(xy_point,
-                                                           &last_sl_point)) {
+                                                           &sl_point)) {
       AERROR << "Fail to transfer xy to sl when init speed profile";
     }
+    
     double s_diff = sl_point.s() - last_sl_point.s();
     double start_time = 0.0;
     double start_s = 0.0;
