@@ -36,7 +36,7 @@ namespace apollo {
 namespace planning {
 
 using common::SpeedPoint;
-using ConstPathObstacleList = std::vector<const PathObstacle*>;
+using PathObstaclePtrList = std::vector<PathObstacle*>;
 
 namespace {
 
@@ -44,7 +44,7 @@ constexpr double kEpsilontol = 1e-6;
 }
 
 QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
-                             const ConstPathObstacleList& path_obstacles,
+                             const PathObstaclePtrList& path_obstacles,
                              const SpeedData& speed_data,
                              const common::FrenetFramePoint& init_frenet_point,
                              const double start_s, const double end_s,

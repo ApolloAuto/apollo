@@ -96,8 +96,7 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   return path_decision_.AddPathObstacle(*path_obstacle);
 }
 
-bool ReferenceLineInfo::AddObstacles(
-    const std::vector<const Obstacle*>& obstacles) {
+bool ReferenceLineInfo::AddObstacles(const std::vector<Obstacle*>& obstacles) {
   for (const auto* obstacle : obstacles) {
     if (!AddObstacle(obstacle)) {
       AERROR << "Failed to add obstacle " << obstacle->Id();

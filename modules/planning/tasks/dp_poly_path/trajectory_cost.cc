@@ -34,11 +34,11 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::TrajectoryPoint;
 
-TrajectoryCost::TrajectoryCost(
-    const DpPolyPathConfig &config, const ReferenceLine &reference_line,
-    const std::vector<const PathObstacle *> &obstacles,
-    const common::VehicleParam &vehicle_param,
-    const SpeedData &heuristic_speed_data)
+TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
+                               const ReferenceLine &reference_line,
+                               const std::vector<PathObstacle *> &obstacles,
+                               const common::VehicleParam &vehicle_param,
+                               const SpeedData &heuristic_speed_data)
     : config_(config),
       reference_line_(&reference_line),
       vehicle_param_(vehicle_param),

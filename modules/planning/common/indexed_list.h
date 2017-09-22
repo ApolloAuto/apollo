@@ -68,12 +68,12 @@ class IndexedList {
 
   /**
    * @brief List all the items in the container.
-   * @return the list of const raw pointers of the objects in the container.
+   * @return the list of raw pointers of the objects in the container.
    */
-  const std::vector<const T*>& Items() const { return object_list_; }
+  const std::vector<T*>& Items() const { return object_list_; }
 
  private:
-  std::vector<const T*> object_list_;
+  std::vector<T*> object_list_;
   std::unordered_map<I, T> object_dict_;
 };
 
